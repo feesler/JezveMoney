@@ -20,6 +20,7 @@ import {
     IMPORT_COND_OP_STRING_INCLUDES,
     IMPORT_COND_OP_LESS,
     IMPORT_COND_OP_GREATER,
+    IMPORT_COND_OP_FIELD_FLAG,
 } from './model/importcondition.js';
 import {
     IMPORT_ACTION_SET_TR_TYPE,
@@ -49,6 +50,8 @@ import * as ApiTests from './run/api.js';
 import * as AccountApiTests from './run/api/account.js';
 import * as PersonApiTests from './run/api/person.js';
 import * as TransactionApiTests from './run/api/transaction.js';
+import * as ImportTemplateApiTests from './run/api/importtemplate.js';
+import * as ImportRuleApiTests from './run/api/importrule.js';
 
 import { api } from './model/api.js';
 import { Runner } from './runner.js';
@@ -205,6 +208,9 @@ export class Scenario {
 
         await this.apiUpdateTransactions();
         await this.apiSetTransactionPos();
+
+        await this.apiImportTemplateTests();
+        await this.apiImportRuleTests();
 
         await this.apiFilterTransactions();
 
@@ -878,6 +884,371 @@ export class Scenario {
         }];
 
         return this.runner.runGroup(TransactionApiTests.filter, data);
+    }
+
+    async apiImportTemplateTests() {
+        this.environment.setBlock('Import template', 2);
+
+        await this.apiCreateImportTemplateTests();
+        await this.apiUpdateImportTemplateTests();
+        await this.apiDeleteImportTemplateTests();
+    }
+
+    async apiCreateImportTemplateTests() {
+        this.environment.setBlock('Create import template', 2);
+
+        const data = [{
+            name: 'Template 1',
+            type: 0,
+            account_amount_col: 1,
+            account_curr_col: 2,
+            trans_amount_col: 3,
+            trans_curr_col: 4,
+            date_col: 5,
+            comment_col: 6,
+        }, {
+            name: 'Template 2',
+            type: 1,
+            account_amount_col: 1,
+            account_curr_col: 2,
+            trans_amount_col: 1,
+            trans_curr_col: 2,
+            date_col: 5,
+            comment_col: 5,
+        }, {
+            name: 'Template 3',
+            type: 0,
+            account_amount_col: 10,
+            account_curr_col: 20,
+            trans_amount_col: 30,
+            trans_curr_col: 40,
+            date_col: 50,
+            comment_col: 60,
+        }, {
+            // Invalid templates
+            name: 'Invalid template',
+        }, {
+            name: null,
+        }, {
+            account_amount_col: 1,
+            account_curr_col: 2,
+            trans_amount_col: 3,
+            trans_curr_col: 4,
+            date_col: 5,
+            comment_col: 6,
+        }, {
+            name: 'Invalid template',
+            account_amount_col: 0,
+            account_curr_col: 2,
+            trans_amount_col: 3,
+            trans_curr_col: 4,
+            date_col: 5,
+            comment_col: 6,
+        }];
+
+        [
+            this.TEMPLATE_1,
+            this.TEMPLATE_2,
+            this.TEMPLATE_3,
+        ] = await this.runner.runGroup(ImportTemplateApiTests.create, data);
+    }
+
+    async apiUpdateImportTemplateTests() {
+        this.environment.setBlock('Update import template', 2);
+
+        const data = [{
+            id: this.TEMPLATE_1,
+            name: 'TPL',
+            type: 1,
+            comment_col: 8,
+        }, {
+            id: this.TEMPLATE_2,
+            name: null,
+        }, {
+            id: this.TEMPLATE_2,
+            account_amount_col: 0,
+        }];
+
+        await this.runner.runGroup(ImportTemplateApiTests.update, data);
+    }
+
+    async apiDeleteImportTemplateTests() {
+        this.environment.setBlock('Delete import template', 2);
+
+        const data = [
+            [this.TEMPLATE_3],
+            [this.TEMPLATE_1, this.TEMPLATE_2],
+        ];
+
+        await this.runner.runGroup(ImportTemplateApiTests.del, data);
+    }
+
+    async apiImportRuleTests() {
+        this.environment.setBlock('Import rule', 2);
+
+        await this.apiCreateImportRuleTests();
+        await this.apiUpdateImportRuleTests();
+        await this.apiDeleteImportRuleTests();
+    }
+
+    async apiCreateImportRuleTests() {
+        this.environment.setBlock('Create import rule', 2);
+
+        const taxiCondition = {
+            field_id: IMPORT_COND_FIELD_COMMENT,
+            operator: IMPORT_COND_OP_STRING_INCLUDES,
+            value: 'BANK MESSAGE',
+            flags: 0,
+        };
+        const taxiAction = {
+            action_id: IMPORT_ACTION_SET_COMMENT,
+            value: 'Rule',
+        };
+
+        const data = [{
+            flags: 0,
+            conditions: [{
+                field_id: IMPORT_COND_FIELD_MAIN_ACCOUNT,
+                operator: IMPORT_COND_OP_NOT_EQUAL,
+                value: this.CASH_RUB,
+                flags: 0,
+            }],
+            actions: [{
+                action_id: IMPORT_ACTION_SET_COMMENT,
+                value: 'Rule',
+            }],
+        }, {
+            flags: 0,
+            conditions: [{
+                field_id: IMPORT_COND_FIELD_TR_AMOUNT,
+                operator: IMPORT_COND_OP_NOT_EQUAL,
+                value: IMPORT_COND_FIELD_ACC_AMOUNT,
+                flags: IMPORT_COND_OP_FIELD_FLAG,
+            }, {
+                field_id: IMPORT_COND_FIELD_COMMENT,
+                operator: IMPORT_COND_OP_STRING_INCLUDES,
+                value: 'BANK MESSAGE',
+                flags: 0,
+            }],
+            actions: [{
+                action_id: IMPORT_ACTION_SET_TR_TYPE,
+                value: 'transferfrom',
+            }, {
+                action_id: IMPORT_ACTION_SET_COMMENT,
+                value: 'Bank',
+            }],
+        }, {
+            flags: 0,
+            conditions: [taxiCondition],
+            actions: [taxiAction],
+        }, {
+            // Invalid rules
+            flags: 0,
+        }, {
+            flags: 0,
+            conditions: null,
+        }, {
+            flags: 0,
+            actions: null,
+        }, {
+            flags: 0,
+            conditions: [],
+            actions: [],
+        }, {
+            flags: 0,
+            conditions: [taxiCondition],
+            actions: [],
+        }, {
+            flags: 0,
+            conditions: [],
+            actions: [taxiAction],
+        }, {
+            flags: 0,
+            conditions: [null],
+            actions: [null],
+        }, {
+            flags: 0,
+            conditions: [{
+                field_id: 100,
+                operator: IMPORT_COND_OP_STRING_INCLUDES,
+                value: 'TEST',
+                flags: 0,
+            }],
+            actions: [null],
+        }, {
+            flags: 0,
+            conditions: [{
+                field_id: IMPORT_COND_FIELD_COMMENT,
+                operator: 100,
+                value: 'TEST',
+                flags: 0,
+            }],
+            actions: [null],
+        }, {
+            flags: 0,
+            conditions: [{
+                field_id: IMPORT_COND_FIELD_COMMENT,
+                operator: IMPORT_COND_OP_STRING_INCLUDES,
+                value: null,
+                flags: 0,
+            }],
+            actions: [null],
+        }, {
+            flags: 0,
+            conditions: [{
+                operator: IMPORT_COND_OP_STRING_INCLUDES,
+                value: 'TEST',
+                flags: 0,
+            }],
+            actions: [null],
+        }, {
+            flags: 0,
+            conditions: [{
+                field_id: IMPORT_COND_FIELD_COMMENT,
+                value: 'TEST',
+                flags: 0,
+            }],
+            actions: [null],
+        }, {
+            flags: 0,
+            conditions: [{
+                field_id: IMPORT_COND_FIELD_COMMENT,
+                operator: IMPORT_COND_OP_STRING_INCLUDES,
+                flags: 0,
+            }],
+            actions: [null],
+        }, {
+            flags: 0,
+            conditions: [{
+                field_id: IMPORT_COND_FIELD_COMMENT,
+                operator: IMPORT_COND_OP_STRING_INCLUDES,
+                value: 'TEST',
+            }],
+            actions: [null],
+        }, {
+            flags: 0,
+            conditions: [{
+                field_id: IMPORT_COND_FIELD_COMMENT,
+                operator: IMPORT_COND_OP_STRING_INCLUDES,
+                value: 'TEST',
+                flags: 0,
+            }],
+            actions: [{
+                action_id: IMPORT_ACTION_SET_COMMENT,
+            }],
+        }, {
+            flags: 0,
+            conditions: [{
+                field_id: IMPORT_COND_FIELD_COMMENT,
+                operator: IMPORT_COND_OP_STRING_INCLUDES,
+                value: 'TEST',
+                flags: 0,
+            }],
+            actions: [{
+                value: 'Rule',
+            }],
+        }, {
+            flags: 0,
+            conditions: [{
+                field_id: IMPORT_COND_FIELD_COMMENT,
+                operator: IMPORT_COND_OP_STRING_INCLUDES,
+                value: 'TEST',
+                flags: 0,
+            }],
+            actions: [{
+                action_id: 100,
+                value: 'Rule',
+            }],
+        }, {
+            flags: 0,
+            conditions: [{
+                field_id: IMPORT_COND_FIELD_COMMENT,
+                operator: IMPORT_COND_OP_STRING_INCLUDES,
+                value: 'TEST',
+                flags: 0,
+            }],
+            actions: [{
+                action_id: IMPORT_ACTION_SET_TR_TYPE,
+                value: 100,
+            }],
+        }];
+
+        [
+            this.RULE_1,
+            this.RULE_2,
+            this.RULE_3,
+        ] = await this.runner.runGroup(ImportRuleApiTests.create, data);
+    }
+
+    async apiUpdateImportRuleTests() {
+        this.environment.setBlock('Update import rule', 2);
+
+        const diffAmountCondition = {
+            field_id: IMPORT_COND_FIELD_TR_AMOUNT,
+            operator: IMPORT_COND_OP_NOT_EQUAL,
+            value: IMPORT_COND_FIELD_ACC_AMOUNT,
+            flags: IMPORT_COND_OP_FIELD_FLAG,
+        };
+        const debtAction = {
+            action_id: IMPORT_ACTION_SET_TR_TYPE,
+            value: 'debtto',
+        };
+
+        const data = [{
+            id: this.RULE_1,
+            conditions: [{
+                field_id: IMPORT_COND_FIELD_MAIN_ACCOUNT,
+                operator: IMPORT_COND_OP_EQUAL,
+                value: this.CASH_RUB,
+                flags: 0,
+            }, {
+                field_id: IMPORT_COND_FIELD_COMMENT,
+                operator: IMPORT_COND_OP_STRING_INCLUDES,
+                value: 'MARKET',
+                flags: 0,
+            }],
+            actions: [{
+                action_id: IMPORT_ACTION_SET_TR_TYPE,
+                value: 'transferto',
+            }],
+        }, {
+            id: this.RULE_2,
+            conditions: null,
+            actions: [debtAction],
+        }, {
+            id: this.RULE_2,
+            conditions: [],
+            actions: [debtAction],
+        }, {
+            id: this.RULE_2,
+            conditions: [null],
+            actions: [debtAction],
+        }, {
+            id: this.RULE_2,
+            conditions: [diffAmountCondition],
+            actions: null,
+        }, {
+            id: this.RULE_2,
+            conditions: [diffAmountCondition],
+            actions: [],
+        }, {
+            id: this.RULE_2,
+            conditions: [diffAmountCondition],
+            actions: [null],
+        }];
+
+        await this.runner.runGroup(ImportRuleApiTests.update, data);
+    }
+
+    async apiDeleteImportRuleTests() {
+        this.environment.setBlock('Delete import rule', 2);
+
+        const data = [
+            [this.RULE_3],
+            [this.RULE_1, this.RULE_2],
+        ];
+
+        await this.runner.runGroup(ImportRuleApiTests.del, data);
     }
 
     async apiProfile() {

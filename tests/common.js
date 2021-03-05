@@ -239,6 +239,12 @@ export function isValidValue(val) {
     return (typeof val !== 'undefined' && val !== null && !Number.isNaN(parseFloat(fixFloat(val))));
 }
 
+/** Validate amount value */
+export function isValidAmount(value) {
+    const amount = parseFloat(fixFloat(value));
+    return (!Number.isNaN(amount) && amount > 0);
+}
+
 /*
 * Other
 */

@@ -1,4 +1,3 @@
-import { fixFloat, convDate } from '../common.js';
 import {
     IMPORT_COND_OP_EQUAL,
     IMPORT_COND_OP_LESS,
@@ -28,6 +27,16 @@ export class ImportRule {
         this.actions = new ImportActionList(data.actions);
     }
 
+    /** Convert ImportRule instance to object */
+    toPlain() {
+        return {
+            id: this.id,
+            flags: this.flags,
+            conditions: this.conditions.map((condition) => ({ ...condition })),
+            actions: this.actions.map((action) => ({ ...action })),
+        };
+    }
+
     /** Check specified data is meet all conditions of rule */
     meetConditions(data) {
         return this.conditions.every((condition) => condition.meet(data));
@@ -36,12 +45,6 @@ export class ImportRule {
     /** Run actions assigned to rule */
     runActions(context) {
         this.actions.forEach((item) => item.execute(context));
-    }
-
-    /** Validate amount value */
-    isValidAmount(value) {
-        const amount = parseFloat(fixFloat(value));
-        return (!Number.isNaN(amount) && amount > 0);
     }
 
     /** Validate import rule */
@@ -57,35 +60,12 @@ export class ImportRule {
         const greaterConds = new ImportConditionList();
 
         for (const condition of this.conditions.data) {
+            if (!condition.validate()) {
+                return false;
+            }
+
             // Check full duplicates of condition
             if (this.conditions.hasSameCondition(condition)) {
-                return false;
-            }
-
-            // Check amount value
-            if (condition.isAmountField()
-                && !this.isValidAmount(condition.value)) {
-                return false;
-            }
-
-            // Check date condition
-            if (condition.isDateField()
-                && !convDate(condition.value)) {
-                return false;
-            }
-
-            // Check empty condition value is used only for string field
-            // with 'equal' and 'not equal' operators
-            if (condition.value === ''
-                && !(condition.isStringField()
-                    && condition.isItemOperator())
-            ) {
-                return false;
-            }
-
-            // Check property is not compared with itself as property value
-            if (condition.isPropertyValue()
-                && condition.field_id === parseInt(condition.value, 10)) {
                 return false;
             }
 
@@ -146,23 +126,24 @@ export class ImportRule {
         }
 
         for (const action of this.actions.data) {
+            if (!action.validate()) {
+                return false;
+            }
+
             // Check each type of action is used only once
             if (ruleActionTypes.includes(action.action_id)) {
                 return false;
             }
-
             ruleActionTypes.push(action.action_id);
-            // Amount value
-            if (action.isAmountValue()
-                && !this.isValidAmount(action.value)) {
-                return false;
-            }
-            // Account value
+
+            // In case action type is 'Set account' check action 'Set transaction type'
+            // with value 'transferto' or 'transferfrom' is also exist
             if (action.isAccountValue()
                 && !this.actions.hasSetTransfer()) {
                 return false;
             }
-            // Person value
+            // In case action type is 'Set person' check action 'Set transaction type'
+            // with value 'debtto' or 'debtfrom' is also exist
             if (action.isPersonValue()
                 && !this.actions.hasSetDebt()) {
                 return false;

@@ -1,4 +1,5 @@
-import { isFunction } from '../common.js';
+import { isFunction, isValidAmount } from '../common.js';
+import { App } from '../app.js';
 import { ImportTransaction } from './importtransaction.js';
 
 /** Action types */
@@ -12,12 +13,48 @@ export const IMPORT_ACTION_SET_COMMENT = 6;
 /** Import action model */
 export class ImportAction {
     constructor(data) {
+        const requiredProps = ['action_id', 'value'];
+
         if (!data) {
             throw new Error('Invalid data');
         }
 
-        this.action_id = data.action_id;
-        this.value = data.value;
+        requiredProps.forEach((propName) => {
+            if (!(propName in data)) {
+                throw new Error(`Property '${propName}' not found.`);
+            }
+
+            this[propName] = data[propName];
+        });
+    }
+
+    /** Check correctness of action */
+    validate() {
+        if (!(this.action_id in ImportAction.actionsMap)) {
+            return false;
+        }
+
+        if (this.action_id === IMPORT_ACTION_SET_TR_TYPE) {
+            if (!(this.value in ImportTransaction.typesMap)) {
+                return false;
+            }
+        } else if (this.isAccountValue()) {
+            const account = App.state.accounts.getItem(this.value);
+            if (!account) {
+                return false;
+            }
+        } else if (this.isPersonValue()) {
+            const person = App.state.persons.getItem(this.value);
+            if (!person) {
+                return false;
+            }
+        } else if (this.isAmountValue()) {
+            if (!isValidAmount(this.value)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     static actionTypes = [

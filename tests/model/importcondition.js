@@ -1,4 +1,9 @@
-import { isFunction, isObject, convDate } from '../common.js';
+import {
+    isFunction,
+    isObject,
+    convDate,
+    isValidAmount,
+} from '../common.js';
 
 /* eslint-disable no-bitwise */
 
@@ -23,14 +28,19 @@ export const IMPORT_COND_OP_FIELD_FLAG = 0x01;
 /** Import condition model */
 export class ImportCondition {
     constructor(data) {
+        const requiredProps = ['field_id', 'operator', 'value', 'flags'];
+
         if (!data) {
             throw new Error('Invalid data');
         }
 
-        this.field_id = data.field_id;
-        this.operator = data.operator;
-        this.value = data.value;
-        this.flags = data.flags;
+        requiredProps.forEach((propName) => {
+            if (!(propName in data)) {
+                throw new Error(`Property '${propName}' not found.`);
+            }
+
+            this[propName] = data[propName];
+        });
     }
 
     /** Item field types */
@@ -297,6 +307,38 @@ export class ImportCondition {
     /** Return array of operators available for current type of field */
     getAvailOperators() {
         return ImportCondition.getAvailOperators(this.field_id);
+    }
+
+    /** Check correctness of condition */
+    validate() {
+        // Check amount value
+        if (this.isAmountField()
+            && !isValidAmount(this.value)) {
+            return false;
+        }
+
+        // Check date condition
+        if (this.isDateField()
+            && !convDate(this.value)) {
+            return false;
+        }
+
+        // Check empty condition value is used only for string field
+        // with 'equal' and 'not equal' operators
+        if (this.value === ''
+            && !(this.isStringField()
+                && this.isItemOperator())
+        ) {
+            return false;
+        }
+
+        // Check property is not compared with itself as property value
+        if (this.isPropertyValue()
+            && this.field_id === parseInt(this.value, 10)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

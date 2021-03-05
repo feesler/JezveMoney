@@ -63,6 +63,35 @@ class ImportRule extends ApiController
         $this->ok($res);
     }
 
+    private function checkRuleData($data)
+    {
+        if (
+            !is_array($data)
+            || !isset($data["conditions"])
+            || !is_array($data["conditions"])
+            || !count($data["conditions"])
+            || !isset($data["actions"])
+            || !is_array($data["actions"])
+            || !count($data["actions"])
+        ) {
+            return false;
+        }
+
+        foreach ($data["conditions"] as $condition) {
+            if (!is_array($condition)) {
+                return false;
+            }
+        }
+
+        foreach ($data["actions"] as $action) {
+            if (!is_array($action)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private function setRuleData($ruleId, $data)
     {
         if (!is_array($data)) {
@@ -95,6 +124,9 @@ class ImportRule extends ApiController
         }
 
         $request = $this->getRequestData();
+        if (!$this->checkRuleData($request)) {
+            $this->fail($defMsg);
+        }
         $reqData = checkFields($request, $this->requiredFields);
         if ($reqData === false) {
             $this->fail($defMsg);
@@ -106,6 +138,7 @@ class ImportRule extends ApiController
         }
 
         if (!$this->setRuleData($item_id, $request)) {
+            $this->model->del($item_id);
             $this->fail($defMsg);
         }
 
@@ -123,6 +156,9 @@ class ImportRule extends ApiController
 
         $request = $this->getRequestData();
         if (!$request || !isset($request["id"])) {
+            $this->fail($defMsg);
+        }
+        if (!$this->checkRuleData($request)) {
             $this->fail($defMsg);
         }
 

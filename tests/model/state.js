@@ -945,6 +945,28 @@ export class AppState {
         }
     }
 
+    prepareConditions(conditions) {
+        if (!Array.isArray(conditions)) {
+            throw new Error('Invalid conditions parameter');
+        }
+
+        return conditions.map((condition) => ({
+            ...condition,
+            value: ('value' in condition) ? condition.value.toString() : undefined,
+        }));
+    }
+
+    prepareActions(actions) {
+        if (!Array.isArray(actions)) {
+            throw new Error('Invalid actions parameter');
+        }
+
+        return actions.map((action) => ({
+            ...action,
+            value: ('value' in action) ? action.value.toString() : undefined,
+        }));
+    }
+
     createRule(params) {
         const resExpected = this.checkRuleCorrectness(params);
         if (!resExpected) {
@@ -952,6 +974,8 @@ export class AppState {
         }
 
         const data = copyFields(params, ruleReqFields);
+        data.conditions = this.prepareConditions(data.conditions);
+        data.actions = this.prepareActions(data.actions);
 
         const ind = this.rules.create(data);
         const item = this.rules.getItemByIndex(ind);
@@ -965,9 +989,7 @@ export class AppState {
             return false;
         }
 
-        const expRule = copyObject(origItem);
-        expRule.conditions = expRule.conditions.data;
-        expRule.actions = expRule.actions.data;
+        const expRule = origItem.toPlain();
         const data = copyFields(params, ruleReqFields);
         setParam(expRule, data);
 
@@ -975,6 +997,9 @@ export class AppState {
         if (!resExpected) {
             return false;
         }
+
+        expRule.conditions = this.prepareConditions(expRule.conditions);
+        expRule.actions = this.prepareActions(expRule.actions);
 
         this.rules.update(expRule);
 
