@@ -28,11 +28,13 @@ export class Environment {
     constructor() {
         this.app = null;
         this.results = null;
+        this.errorHandler = this.onPageError.bind(this);
 
         this.interface = [
             'baseUrl',
             'url',
             'navigation',
+            'setErrorHandler',
             'goTo',
             'parentNode',
             'query',
@@ -86,6 +88,11 @@ export class Environment {
         const ViewClass = await route(this, await this.url());
         this.app.view = new ViewClass({ environment: this });
         await this.app.view.parse();
+    }
+
+    onPageError(error) {
+        this.addResult(error);
+        throw error;
     }
 
     async wait(condition, options) {

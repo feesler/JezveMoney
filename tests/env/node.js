@@ -420,6 +420,10 @@ export class NodeEnvironment extends Environment {
         return this.page.content();
     }
 
+    setErrorHandler() {
+        this.page.on('pageerror', this.errorHandler);
+    }
+
     async navigation(action) {
         if (!isFunction(action)) {
             throw new Error('Wrong action specified');
@@ -484,6 +488,7 @@ export class NodeEnvironment extends Environment {
             });
             const allPages = await browser.pages();
             this.page = (allPages.length) ? allPages[0] : await browser.newPage();
+            this.setErrorHandler();
 
             this.addResult('Test initialization', true);
 

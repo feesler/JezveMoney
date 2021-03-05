@@ -2,7 +2,12 @@ import 'core-js/stable';
 import 'core-js/features/url';
 import 'core-js/features/url-search-params';
 import 'whatwg-fetch';
-import { setParam, formatTime, isFunction } from '../common.js';
+import {
+    copyObject,
+    setParam,
+    formatTime,
+    isFunction,
+} from '../common.js';
 import { App } from '../app.js';
 import { Environment, visibilityResolver } from './base.js';
 
@@ -14,6 +19,7 @@ class BrowserEnvironment extends Environment {
 
         this.vdoc = null;
         this.viewframe = null;
+        this.viewError = null;
         this.resContainer = null;
         this.restbl = null;
         this.totalRes = null;
@@ -430,6 +436,13 @@ class BrowserEnvironment extends Environment {
         this.scopedQuerySelectorPolyfill(view);
     }
 
+    setErrorHandler() {
+        window.addEventListener('message', (e) => {
+            this.viewError = copyObject(e.data);
+            this.errorHandler(this.viewError);
+        });
+    }
+
     async navigation(action) {
         if (!isFunction(action)) {
             throw new Error('Wrong action specified');
@@ -437,6 +450,10 @@ class BrowserEnvironment extends Environment {
 
         const navPromise = new Promise((resolve, reject) => {
             this.navigationHandler = async () => {
+                if (this.viewError) {
+                    throw this.viewError;
+                }
+
                 try {
                     this.viewframe.removeEventListener('load', this.navigationHandler);
 
@@ -534,6 +551,7 @@ class BrowserEnvironment extends Environment {
                 if (this.app.config.testsExpected) {
                     this.results.expected = this.app.config.testsExpected;
                 }
+                this.setErrorHandler();
 
                 this.addResult('Test initialization', true);
 
