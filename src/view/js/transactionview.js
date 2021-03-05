@@ -685,7 +685,6 @@ TransactionView.prototype.onDestCurrencySel = function (obj) {
  */
 TransactionView.prototype.toggleEnableAccount = function () {
     var currencyId;
-    var lastAcc;
     var debtAccountLabel = 'No account';
 
     if (this.model.transaction.noAccount) {
@@ -706,9 +705,9 @@ TransactionView.prototype.toggleEnableAccount = function () {
 
         currencyId = parseInt(this.srcCurrInp.value, 10);
     } else {
-        lastAcc = this.model.accounts.getItem(this.model.transaction.lastAcc_id);
-        this.debtAccountInp.value = lastAcc.id;
-        currencyId = lastAcc.curr_id;
+        this.debtAccount = this.model.accounts.getItem(this.model.transaction.lastAcc_id);
+        this.debtAccountInp.value = this.debtAccount.id;
+        currencyId = this.debtAccount.curr_id;
     }
     this.model.transaction.updateValue('src_curr', currencyId);
     this.model.transaction.updateValue('dest_curr', currencyId);
