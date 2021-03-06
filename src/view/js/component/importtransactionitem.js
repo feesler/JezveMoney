@@ -281,14 +281,18 @@ ImportTransactionItem.prototype.createDataValue = function (title, value, extraC
  * @param {Object} data - import transaction object
  */
 ImportTransactionItem.prototype.createOrigDataContainer = function (data) {
+    var dateFmt;
+
     if (!data) {
         throw new Error('Invalid data');
     }
 
+    dateFmt = formatDate(new Date(data.date));
+
     return this.createContainer('orig-data', [
         ce('h3', { textContent: 'Original imported data' }),
         this.createContainer('orig-data-table', [
-            this.createDataValue('Date', data.date),
+            this.createDataValue('Date', dateFmt),
             this.createDataValue('Tr. amount', data.trAmountVal),
             this.createDataValue('Tr. currency', data.trCurrVal),
             this.createDataValue('Acc. amount', data.accAmountVal),
