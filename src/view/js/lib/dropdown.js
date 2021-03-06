@@ -1000,15 +1000,10 @@ DropDown.prototype.enable = function (val) {
     if (this.disabled) {
         this.containerElem.classList.add('dd__container_disabled');
         this.containerElem.classList.remove('dd__container_enabled');
-        this.makeEditable(false);
         this.removeInputHandlers(this.containerElem);
     } else {
         this.containerElem.classList.remove('dd__container_disabled');
         this.containerElem.classList.add('dd__container_enabled');
-        if (this.createParams.editable !== false) {
-            this.makeEditable();
-        }
-
         this.assignInputHandlers(this.containerElem);
     }
 
