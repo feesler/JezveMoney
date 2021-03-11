@@ -1,7 +1,7 @@
 'use strict';
 
-/* global ge, re, ce, removeChilds, enable, extend */
-/* global ajax, createMessage, baseURL */
+/* global ge, re, ce, removeChilds, enable, formatDate, extend */
+/* global urlJoin, ajax, timestampFromString, createMessage, baseURL */
 /* global AccountList, CurrencyList, PersonList, ImportRuleList, ImportTemplateList */
 /* global View, IconLink, Sortable, DropDown, ImportUploadDialog, ImportRulesDialog */
 /* global ImportTransactionItem */
@@ -120,21 +120,176 @@ ImportView.prototype.showUploadDialog = function () {
     this.uploadDialog.show();
 };
 
-/** Hide import file form */
+/** File upload done handler */
 ImportView.prototype.onImportDone = function (items) {
     this.uploadDialog.hide();
 
-    if (Array.isArray(items)) {
-        items.forEach(function (item) {
-            var res = item;
-
-            res.pos = this.model.transactionRows.length;
-            this.model.transactionRows.push(res);
-            this.rowsContainer.appendChild(res.elem);
-        }, this);
-    }
+    this.mapImportedItems(items);
 
     this.updateItemsCount();
+};
+
+/** Map data after template applied and request API for transactions in same date range */
+ImportView.prototype.mapImportedItems = function (data) {
+    if (!Array.isArray(data)) {
+        throw new Error('Invalid data');
+    }
+
+    data.forEach(function (row) {
+        var item = this.mapImportItem(row);
+        if (!item) {
+            throw new Error('Failed to map data row');
+        }
+
+        item.pos = this.model.transactionRows.length;
+        this.model.transactionRows.push(item);
+        this.rowsContainer.appendChild(item.elem);
+    }, this);
+
+    this.requestSimilar();
+};
+
+/**
+ * Map import row to new transaction
+ * @param {Object} data - import data
+ */
+ImportView.prototype.mapImportItem = function (data) {
+    var item;
+
+    if (!data) {
+        throw new Error('Invalid data');
+    }
+
+    item = new ImportTransactionItem({
+        parent: this,
+        currencyModel: this.model.currency,
+        accountModel: this.model.accounts,
+        personModel: this.model.persons,
+        mainAccount: this.model.mainAccount,
+        originalData: data
+    });
+
+    if (this.model.rulesEnabled) {
+        this.model.rules.applyTo(item);
+    }
+    item.render();
+
+    return item;
+};
+
+/** Send API request to obtain transactions similar to imported */
+ImportView.prototype.requestSimilar = function () {
+    var importedItems;
+    var reqParams;
+    var importedDateRange = { start: 0, end: 0 };
+
+    // Obtain date region of imported transactions
+    importedItems = this.getImportedItems();
+    importedItems.forEach(function (item) {
+        var timestamp;
+        var date;
+
+        try {
+            date = item.getDate();
+            timestamp = timestampFromString(date);
+        } catch (e) {
+            return;
+        }
+
+        if (importedDateRange.start === 0 || importedDateRange.start > timestamp) {
+            importedDateRange.start = timestamp;
+        }
+        if (importedDateRange.end === 0 || importedDateRange.end < timestamp) {
+            importedDateRange.end = timestamp;
+        }
+    });
+    // Prepare request data
+    reqParams = urlJoin({
+        count: 0,
+        stdate: formatDate(new Date(importedDateRange.start)),
+        enddate: formatDate(new Date(importedDateRange.end)),
+        acc_id: this.model.mainAccount.id
+    });
+    // Send request
+    ajax.get({
+        url: baseURL + 'api/transaction/list/?' + reqParams,
+        callback: this.onTrCacheResult.bind(this)
+    });
+};
+
+/**
+ * Transactions list API request callback
+ * Compare list of import items with transactions already in DB
+ *  and disable import item if same(similar) transaction found
+ * @param {string} response - server response string
+ */
+ImportView.prototype.onTrCacheResult = function (response) {
+    var jsondata;
+    var importedItems;
+
+    try {
+        jsondata = JSON.parse(response);
+        if (!jsondata || jsondata.result !== 'ok') {
+            throw new Error('Invalid server response');
+        }
+    } catch (e) {
+        return;
+    }
+
+    this.model.transCache = jsondata.data;
+    importedItems = this.getImportedItems();
+    importedItems.forEach(function (item) {
+        var data;
+        var transaction;
+
+        item.enable(true);
+        data = item.getData();
+        transaction = this.findSameTransaction(data);
+        if (transaction) {
+            transaction.picked = true;
+            item.enable(false);
+        }
+        item.render();
+    }, this);
+};
+
+/**
+ * Compare transaction item with reference object
+ * @param {TransactionItem} item - transaction item object
+ * @param {Object} reference - imported transaction object
+ */
+ImportView.prototype.isSameTransaction = function (item, reference) {
+    var refSrcAmount;
+    var refDestAmount;
+
+    if (!item || !reference) {
+        throw new Error('Invalid parameters');
+    }
+
+    // Check date, source and destination accounts
+    if (item.src_id !== reference.src_id
+        || item.dest_id !== reference.dest_id
+        || item.date !== reference.date) {
+        return false;
+    }
+
+    // Check amounts
+    // Source and destination amount can be swapped
+    refSrcAmount = Math.abs(reference.src_amount);
+    refDestAmount = Math.abs(reference.dest_amount);
+    if ((item.src_amount !== refSrcAmount && item.src_amount !== refDestAmount)
+        || (item.dest_amount !== refDestAmount && item.dest_amount !== refSrcAmount)) {
+        return false;
+    }
+
+    return true;
+};
+
+/** Return first found transaction with same date and amount as reference */
+ImportView.prototype.findSameTransaction = function (reference) {
+    return this.model.transCache.find(function (item) {
+        return (item && !item.picked && this.isSameTransaction(item, reference));
+    }, this);
 };
 
 /** Initial account of upload change callback */
@@ -265,6 +420,17 @@ ImportView.prototype.onMainAccChange = function () {
     this.model.transactionRows.forEach(function (item) {
         item.onMainAccountChanged(this.model.mainAccount.id);
     }, this);
+};
+
+/** Filter imported transaction items */
+ImportView.prototype.getImportedItems = function () {
+    if (!this.model || !Array.isArray(this.model.transactionRows)) {
+        throw new Error('Invalid state');
+    }
+
+    return this.model.transactionRows.filter(function (item) {
+        return item.getOriginal() !== null;
+    });
 };
 
 /** Filter enabled transaction items */

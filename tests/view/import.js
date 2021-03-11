@@ -123,6 +123,10 @@ export class ImportView extends TestView {
         return res;
     }
 
+    isRulesEnabled() {
+        return this.model.rulesEnabled;
+    }
+
     isRulesState() {
         return this.model.state === 'rules';
     }

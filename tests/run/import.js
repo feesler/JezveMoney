@@ -228,10 +228,15 @@ export async function submitUploaded(params) {
             : App.view.getExpectedTemplate();
         const template = new ImportTemplate(templateData);
 
-        const skipList = [];
         const importTransactions = template.applyTo(importData, mainAccount);
+        if (App.view.isRulesEnabled()) {
+            for (const item of importTransactions) {
+                App.state.rules.applyTo(item);
+            }
+        }
+
+        const skipList = [];
         for (const item of importTransactions) {
-            App.state.rules.applyTo(item);
             const tr = findSimilar(item, skipList);
             if (tr) {
                 skipList.push(tr.id);
@@ -286,11 +291,28 @@ export async function changeMainAccount(accountId) {
     await test(`Change main account to '${account.name}'`, async () => {
         await checkNavigation();
 
-        const itemsData = App.view.content.itemsList.items.map(
-            (item) => {
-                const model = item.onChangeMainAccount(accountId);
-                return copyObject(item.getExpectedState(model).values);
-            },
+        const expectedItems = App.view.content.itemsList.items.map(
+            (item) => ({
+                item,
+                model: item.onChangeMainAccount(accountId),
+            }),
+        );
+
+        const skipList = [];
+        for (const expected of expectedItems) {
+            const expectedTransaction = expected.item.getExpectedTransaction(expected.model);
+            let tr = null;
+            if (expectedTransaction) {
+                tr = findSimilar(expectedTransaction, skipList);
+            }
+            if (tr) {
+                skipList.push(tr.id);
+                expected.model.enabled = false;
+            }
+        }
+
+        const itemsData = expectedItems.map(
+            (expected) => copyObject(expected.item.getExpectedState(expected.model).values),
         );
 
         await App.view.selectMainAccount(accountId);

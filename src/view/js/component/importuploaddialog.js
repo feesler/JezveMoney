@@ -1,9 +1,7 @@
 'use strict';
 
-/* global ge, formatDate, isFunction, show, enable, extend */
-/* global urlJoin, ajax, timestampFromString, createMessage, baseURL */
-/* global Component, Popup, DropDown, ImportTransactionItem */
-/* global ImportFileUploader, ImportTemplateManager */
+/* global ge, isFunction, show, enable, extend, createMessage */
+/* global AppComponent, Popup, DropDown, ImportFileUploader, ImportTemplateManager */
 
 /**
  * ImportUploadDialog component constructor
@@ -93,7 +91,7 @@ function ImportUploadDialog() {
     this.submitUploadedBtn.addEventListener('click', this.onSubmit.bind(this));
 }
 
-extend(ImportUploadDialog, Component);
+extend(ImportUploadDialog, AppComponent);
 
 /** Show/hide dialog */
 ImportUploadDialog.prototype.show = function (val) {
@@ -188,16 +186,14 @@ ImportUploadDialog.prototype.onAccountChange = function (selectedAccount) {
 
 /** Submit event handler */
 ImportUploadDialog.prototype.onSubmit = function () {
-    var data;
-
     try {
-        data = this.tplManager.applyTemplate();
-        this.mapImportedItems(data);
+        this.importedItems = this.tplManager.applyTemplate();
     } catch (e) {
         createMessage(e.message, 'msg_error');
         this.importedItems = null;
-        this.importDone();
     }
+
+    this.importDone();
 };
 
 /**
@@ -233,148 +229,6 @@ ImportUploadDialog.prototype.onUploaded = function (data) {
  */
 ImportUploadDialog.prototype.onTemplateStatus = function (status) {
     this.enableUpload(status);
-};
-
-/** Map data after template applied and request API for transactions in same date range */
-ImportUploadDialog.prototype.mapImportedItems = function (data) {
-    var importedDateRange = { start: 0, end: 0 };
-    var reqParams;
-
-    this.importedItems = data.map(function (row) {
-        var timestamp;
-        var item;
-
-        if (!row) {
-            throw new Error('Invalid data row object');
-        }
-
-        // Store date region of imported transactions
-        timestamp = timestampFromString(row.date);
-        if (importedDateRange.start === 0 || importedDateRange.start > timestamp) {
-            importedDateRange.start = timestamp;
-        }
-        if (importedDateRange.end === 0 || importedDateRange.end < timestamp) {
-            importedDateRange.end = timestamp;
-        }
-
-        item = this.mapImportItem(row);
-        if (!item) {
-            throw new Error('Failed to map data row');
-        }
-
-        return item;
-    }, this);
-
-    reqParams = urlJoin({
-        count: 0,
-        stdate: formatDate(new Date(importedDateRange.start)),
-        enddate: formatDate(new Date(importedDateRange.end)),
-        acc_id: this.model.mainAccount.id
-    });
-
-    ajax.get({
-        url: baseURL + 'api/transaction/list/?' + reqParams,
-        callback: this.onTrCacheResult.bind(this)
-    });
-};
-
-/**
- * Map import row to new transaction
- * @param {Object} data - import data
- */
-ImportUploadDialog.prototype.mapImportItem = function (data) {
-    var item;
-
-    if (!data) {
-        throw new Error('Invalid data');
-    }
-
-    item = new ImportTransactionItem({
-        parent: this.parent,
-        currencyModel: this.model.currency,
-        accountModel: this.model.accounts,
-        personModel: this.model.persons,
-        mainAccount: this.model.mainAccount,
-        originalData: data
-    });
-
-    this.model.rules.applyTo(item);
-    item.render();
-
-    return item;
-};
-
-/**
- * Compare transaction item with reference object
- * @param {TransactionItem} item - transaction item object
- * @param {Object} reference - imported transaction object
- */
-ImportUploadDialog.prototype.isSameTransaction = function (item, reference) {
-    var refSrcAmount;
-    var refDestAmount;
-
-    if (!item || !reference) {
-        throw new Error('Invalid parameters');
-    }
-
-    // Check date, source and destination accounts
-    if (item.src_id !== reference.src_id
-        || item.dest_id !== reference.dest_id
-        || item.date !== reference.date) {
-        return false;
-    }
-
-    // Check amounts
-    // Source and destination amount can be swapped
-    refSrcAmount = Math.abs(reference.src_amount);
-    refDestAmount = Math.abs(reference.dest_amount);
-    if ((item.src_amount !== refSrcAmount && item.src_amount !== refDestAmount)
-        || (item.dest_amount !== refDestAmount && item.dest_amount !== refSrcAmount)) {
-        return false;
-    }
-
-    return true;
-};
-
-/** Return first found transaction with same date and amount as reference */
-ImportUploadDialog.prototype.findSameTransaction = function (reference) {
-    return this.model.transCache.find(function (item) {
-        return (item && !item.picked && this.isSameTransaction(item, reference));
-    }, this);
-};
-
-/**
- * Transactions list API request callback
- * Compare list of import items with transactions already in DB
- *  and disable import item if same(similar) transaction found
- * @param {string} response - server response string
- */
-ImportUploadDialog.prototype.onTrCacheResult = function (response) {
-    var jsondata;
-
-    try {
-        jsondata = JSON.parse(response);
-        if (!jsondata || jsondata.result !== 'ok') {
-            throw new Error('Invalid server response');
-        }
-    } catch (e) {
-        this.importedItems = null;
-        this.importDone();
-        return;
-    }
-
-    this.model.transCache = jsondata.data;
-    this.importedItems.forEach(function (item) {
-        var data = item.getData();
-        var transaction = this.findSameTransaction(data);
-        if (transaction) {
-            transaction.picked = true;
-            item.enable(false);
-            item.render();
-        }
-    }, this);
-
-    this.importDone();
 };
 
 /** Hide import file form */

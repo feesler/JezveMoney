@@ -607,19 +607,19 @@ ImportTransactionItem.prototype.setTransactionType = function (value) {
 /** Invert type of transaction */
 ImportTransactionItem.prototype.invertTransactionType = function () {
     var typeValue;
-    var trType = this.typeDropDown.getSelectionData();
+    var trType = this.state.type;
 
-    if (trType.id === 'expense') {
+    if (trType === 'expense') {
         typeValue = 'income';
-    } else if (trType.id === 'income') {
+    } else if (trType === 'income') {
         typeValue = 'expense';
-    } else if (trType.id === 'transferfrom') {
+    } else if (trType === 'transferfrom') {
         typeValue = 'transferto';
-    } else if (trType.id === 'transferto') {
+    } else if (trType === 'transferto') {
         typeValue = 'transferfrom';
-    } else if (trType.id === 'debtto') {
+    } else if (trType === 'debtto') {
         typeValue = 'debtfrom';
-    } else if (trType.id === 'debtfrom') {
+    } else if (trType === 'debtfrom') {
         typeValue = 'debtto';
     }
 
@@ -888,6 +888,11 @@ ImportTransactionItem.prototype.validate = function () {
     }
 
     return true;
+};
+
+/** Return date string */
+ImportTransactionItem.prototype.getDate = function () {
+    return this.state.date;
 };
 
 /** Return transaction object */
