@@ -154,6 +154,7 @@ function ImportTransactionItem() {
         this.extendedContainer
     ]);
 
+    this.data = null;
     if (this.props.originalData) {
         this.setOriginal(this.props.originalData);
         this.setExtendedContent(this.createOrigDataContainer(this.props.originalData));
@@ -319,9 +320,7 @@ ImportTransactionItem.prototype.setExtendedContent = function (content) {
     show(this.toggleExtBtn, content);
 };
 
-/**
- * Remove item component
- */
+/** Apply import data to component */
 ImportTransactionItem.prototype.setOriginal = function (data) {
     var amount;
     var trAmount;
@@ -362,13 +361,10 @@ ImportTransactionItem.prototype.setOriginal = function (data) {
         this.invertTransactionType();
     }
 
-    this.data.accAmountVal = Math.abs(amount);
-    this.data.trAmount = Math.abs(trAmount);
-
-    this.setAmount(this.data.accAmountVal);
+    this.setAmount(Math.abs(amount));
     if (trCurr.id !== accCurr.id) {
         this.setCurrency(trCurr.id);
-        this.setSecondAmount(this.data.trAmount);
+        this.setSecondAmount(Math.abs(trAmount));
     }
     this.setDate(formatDate(new Date(this.data.date)));
     this.setComment(this.data.comment);
