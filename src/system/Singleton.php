@@ -7,13 +7,13 @@ trait Singleton
     protected static $instance = null;
 
 
-    private function __construct()
+    public function __construct()
     {
     }
-    private function __clone()
+    public function __clone()
     {
     }
-    private function __wakeup()
+    public function __wakeup()
     {
     }
 
