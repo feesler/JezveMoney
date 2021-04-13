@@ -146,6 +146,9 @@ class BrowserEnvironment extends Environment {
         if (typeof relem === 'string') {
             relem = await this.query(`#${relem}`);
         }
+        if (!relem) {
+            return false;
+        }
 
         return visibilityResolver(relem, recursive);
     }
