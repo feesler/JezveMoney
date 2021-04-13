@@ -212,7 +212,9 @@ ImportConditionForm.prototype.createCurrencyField = function () {
 
 /** Create value property field */
 ImportConditionForm.prototype.createValuePropField = function () {
-    var items = this.fieldTypes.map(function (fieldType) {
+    var items = this.fieldTypes.filter(function (fieldType) {
+        return !ImportCondition.isTemplateField(fieldType.id);
+    }).map(function (fieldType) {
         return { id: fieldType.id, title: fieldType.title };
     });
     var selectElem = ce('select');
