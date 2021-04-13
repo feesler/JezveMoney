@@ -65,6 +65,7 @@
 
                         <div id="rowsContainer" class="data-container">
                             <span class="nodata-message">No transactions to import</span>
+                            <div class="data-container__loading hidden">Loading...</div>
                         </div>
                         <div class="import-controls std_margin">
                             <input id="submitbtn" class="btn submit-btn" type="button" value="ok" disabled>

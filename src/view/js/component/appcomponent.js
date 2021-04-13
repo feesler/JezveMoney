@@ -1,7 +1,6 @@
 'use strict';
 
-/* global extend, Component */
-/* global ce, svg */
+/* global ce, svg, isVisible, extend, Component */
 
 /**
  * Base app component constructor
@@ -13,6 +12,11 @@ function AppComponent() {
 }
 
 extend(AppComponent, Component);
+
+/** Check root element of component is visible */
+AppComponent.prototype.isVisible = function () {
+    return isVisible(this.elem, true);
+};
 
 /** Create simple container element */
 AppComponent.prototype.createContainer = function (elemClass, children, events) {

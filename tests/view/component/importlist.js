@@ -15,21 +15,23 @@ export class ImportList extends Component {
         this.items = [];
         this.invalidated = false;
 
-        const listItems = await this.queryAll(this.elem, ':scope > *');
-        if (
-            !listItems
-            || !listItems.length
-            || (listItems.length === 1 && await this.hasClass(listItems[0], 'nodata-message'))
-        ) {
-            return;
+        const listItems = await this.queryAll(this.elem, '.import-item');
+        if (listItems) {
+            this.items = await asyncMap(
+                listItems,
+                (item) => ImportListItem.create(this.parent, item, this.mainAccount),
+            );
+            this.invalidated = this.items.some((item) => item.model.invalidated);
+        } else {
+            const noDataMsg = await this.query(this.elem, '.nodata-message');
+            const visible = await this.isVisible(noDataMsg);
+            if (!visible) {
+                throw new Error('No data message is not visible');
+            }
         }
 
-        this.items = await asyncMap(
-            listItems,
-            (item) => ImportListItem.create(this.parent, item, this.mainAccount),
-        );
-
-        this.invalidated = this.items.some((item) => item.model.invalidated);
+        const loadingIndicator = await this.query(this.elem, '.data-container__loading');
+        this.isLoading = await this.isVisible(loadingIndicator);
     }
 
     getItem(index) {

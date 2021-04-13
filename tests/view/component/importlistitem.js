@@ -9,11 +9,11 @@ import {
 import { ImportTransaction } from '../../model/importtransaction.js';
 import { Currency } from '../../model/currency.js';
 import {
-    checkDate,
     normalize,
     setParam,
     copyObject,
     asyncMap,
+    fixFloat,
 } from '../../common.js';
 import { App } from '../../app.js';
 
@@ -92,6 +92,47 @@ export class ImportListItem extends Component {
         return res;
     }
 
+    async parseOriginalData() {
+        if (!this.origDataTable) {
+            this.originalData = null;
+            return;
+        }
+        this.originalData = {};
+        const labelsMap = {
+            mainAccount: 'Main account',
+            trAmountVal: 'Tr. amount',
+            trCurrVal: 'Tr. currency',
+            accAmountVal: 'Acc. amount',
+            accCurrVal: 'Acc. currency',
+            comment: 'Comment',
+            date: 'Date',
+        };
+
+        const dataValues = await this.queryAll(this.origDataTable, '.data-value');
+        for (const dataValueElem of dataValues) {
+            const labelElem = await this.query(dataValueElem, 'label');
+            const valueElem = await this.query(dataValueElem, 'div');
+            if (!labelElem || !valueElem) {
+                throw new Error('Invalid structure of import item');
+            }
+
+            const label = await this.prop(labelElem, 'textContent');
+            const value = await this.prop(valueElem, 'textContent');
+            const prop = Object.keys(labelsMap).find((key) => label === labelsMap[key]);
+
+            if (prop) {
+                this.originalData[prop] = value;
+            } else {
+                throw new Error(`Invalid label: '${label}'`);
+            }
+        }
+
+        const valid = Object.keys(labelsMap).every((key) => key in this.originalData);
+        if (!valid) {
+            throw new Error('Invalid structure of import item');
+        }
+    }
+
     async parse() {
         this.enableCheck = await this.query(this.elem, '.enable-check input[type="checkbox"]');
         if (!this.enableCheck) {
@@ -105,6 +146,7 @@ export class ImportListItem extends Component {
         this.invFeedback = { elem: await this.query(this.elem, '.invalid-feedback') };
         this.deleteBtn = await this.query(this.elem, '.delete-btn');
         this.toggleBtn = await this.query(this.elem, '.toggle-btn');
+        this.origDataTable = await this.query(this.elem, '.orig-data-table');
 
         if (
             !this.typeField
@@ -120,6 +162,8 @@ export class ImportListItem extends Component {
         ) {
             throw new Error('Invalid structure of import item');
         }
+
+        await this.parseOriginalData();
 
         this.model = await this.buildModel();
         this.data = this.getExpectedTransaction(this.model);
@@ -177,6 +221,10 @@ export class ImportListItem extends Component {
         res.isDifferent = this.isDifferentCurrencies(res);
 
         res.invalidated = await this.isVisible(this.invFeedback.elem, true);
+        res.imported = await this.isVisible(this.toggleBtn, true);
+        if (this.originalData) {
+            res.original = copyObject(this.originalData);
+        }
 
         return res;
     }
@@ -347,13 +395,46 @@ export class ImportListItem extends Component {
         res.date = model.date;
         res.comment = model.comment;
 
-        if (
-            res.src_amount <= 0
-            || res.dest_amount <= 0
-            || !checkDate(res.date)
-        ) {
-            return null;
+        return res;
+    }
+
+    restoreOriginal() {
+        if (!this.model.original) {
+            throw new Error('Original data not found');
         }
+
+        const res = copyObject(this.model);
+
+        res.mainAccount = App.state.accounts.findByName(res.original.mainAccount);
+        if (!res.mainAccount) {
+            throw new Error(`Account ${res.original.mainAccount} not found`);
+        }
+
+        const amount = parseFloat(fixFloat(res.original.accAmountVal));
+        const destAmount = parseFloat(fixFloat(res.original.trAmountVal));
+        res.type = (amount > 0) ? 'income' : 'expense';
+        res.amount = Math.abs(amount);
+        res.destId = 0;
+        res.destAccount = null;
+        if (res.original.accCurrVal === res.original.trCurrVal) {
+            res.currId = res.mainAccount.curr_id;
+            res.destAmount = '';
+        } else {
+            const currency = Currency.findByName(res.original.trCurrVal);
+            if (!currency) {
+                throw new Error(`Currency ${res.original.trCurrVal} not found`);
+            }
+            res.currId = currency.id;
+            res.destAmount = Math.abs(destAmount);
+        }
+
+        res.currency = Currency.getById(res.currId);
+        res.personId = 0;
+        res.person = null;
+        res.date = res.original.date;
+        res.comment = res.original.comment;
+        res.isDifferent = this.isDifferentCurrencies(res);
+        res.invalidated = false;
 
         return res;
     }
@@ -379,8 +460,12 @@ export class ImportListItem extends Component {
         }
     }
 
-    onChangeMainAccount(value) {
-        const res = copyObject(this.model);
+    onChangeMainAccount(model, value) {
+        if (!model) {
+            throw new Error('Invalid model specified');
+        }
+
+        const res = copyObject(model);
 
         res.mainAccount = App.state.accounts.getItem(value);
         if (!res.mainAccount) {

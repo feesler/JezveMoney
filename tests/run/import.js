@@ -2,7 +2,9 @@ import { App } from '../app.js';
 import { test, copyObject } from '../common.js';
 import { Currency } from '../model/currency.js';
 import { ImportTemplate } from '../model/importtemplate.js';
+import { ImportTransaction } from '../model/importtransaction.js';
 import { ImportList } from '../view/component/importlist.js';
+import { ImportListItem } from '../view/component/importlistitem.js';
 import { ImportView } from '../view/import.js';
 import { ImportViewSubmitError } from '../error/importviewsubmit.js';
 
@@ -70,9 +72,19 @@ function isSimilarTransaction(item, reference) {
 }
 
 function findSimilar(transaction, skipList) {
-    const res = App.state.transactions.find(
-        (item) => !skipList.includes(item.id) && isSimilarTransaction(item, transaction),
-    );
+    if (
+        !transaction
+        || !transaction.mainAccount
+        || !transaction.mainAccount.id
+    ) {
+        throw new Error('Invalid transaction');
+    }
+
+    const res = App.state.transactions.find((item) => (
+        [item.src_id, item.dest_id].includes(transaction.mainAccount.id)
+        && !skipList.includes(item.id)
+        && isSimilarTransaction(item, transaction)
+    ));
 
     return res;
 }
@@ -249,7 +261,7 @@ export async function submitUploaded(params) {
             itemsList = {};
             itemsList.items = App.view.content.itemsList.items.map(
                 (item) => {
-                    const model = item.onChangeMainAccount(params.account);
+                    const model = item.onChangeMainAccount(item.model, params.account);
                     return copyObject(item.getExpectedState(model).values);
                 },
             );
@@ -291,29 +303,43 @@ export async function changeMainAccount(accountId) {
     await test(`Change main account to '${account.name}'`, async () => {
         await checkNavigation();
 
-        const expectedItems = App.view.content.itemsList.items.map(
-            (item) => ({
-                item,
-                model: item.onChangeMainAccount(accountId),
-            }),
-        );
-
         const skipList = [];
-        for (const expected of expectedItems) {
-            const expectedTransaction = expected.item.getExpectedTransaction(expected.model);
-            let tr = null;
-            if (expectedTransaction) {
-                tr = findSimilar(expectedTransaction, skipList);
-            }
-            if (tr) {
-                skipList.push(tr.id);
-                expected.model.enabled = false;
-            }
-        }
+        const itemsData = App.view.content.itemsList.items.map((item) => {
+            // Reapply rules
+            if (item.model.original && App.view.isRulesEnabled()) {
+                item.model = item.restoreOriginal();
+                item.model = item.onChangeMainAccount(item.model, accountId);
 
-        const itemsData = expectedItems.map(
-            (expected) => copyObject(expected.item.getExpectedState(expected.model).values),
-        );
+                const expectedTransaction = item.getExpectedTransaction(item.model);
+
+                const importTrans = new ImportTransaction({
+                    ...expectedTransaction,
+                    enabled: item.model.enabled,
+                    mainAccount: account,
+                    type: item.model.type,
+                    original: {
+                        ...item.model.original,
+                        mainAccount: account,
+                    },
+                });
+
+                App.state.rules.applyTo(importTrans);
+
+                importTrans.enabled = true;
+                const tr = findSimilar(importTrans, skipList);
+                if (tr) {
+                    skipList.push(tr.id);
+                    importTrans.enabled = false;
+                }
+
+                const imported = ImportListItem.render(importTrans, App.state);
+                return copyObject(imported);
+            }
+
+            item.model = item.onChangeMainAccount(item.model, accountId);
+
+            return copyObject(item.getExpectedState(item.model).values);
+        });
 
         await App.view.selectMainAccount(accountId);
 
@@ -324,6 +350,69 @@ export async function changeMainAccount(accountId) {
                 },
             },
         };
+        return App.view.checkState();
+    });
+}
+
+export async function enableRules(value = true) {
+    const enable = !!value;
+    const descr = enable ? 'Enable rules' : 'Disable rules';
+
+    await test(`${descr}`, async () => {
+        await checkNavigation();
+
+        if (enable === App.view.isRulesEnabled()) {
+            throw new Error(`Import rules already ${enable ? 'enabled' : 'disabled'}`);
+        }
+
+        // Apply rules or restore original import data according to enable flag
+        // and convert to expected state of ImportListItem component
+        const itemsData = App.view.content.itemsList.items.map((item) => {
+            let model;
+
+            if (item.model.original) {
+                if (enable) {
+                    const expTrans = item.getExpectedTransaction(item.model);
+                    const origMainAccount = App.state.accounts.findByName(item.model.original.mainAccount);
+                    const importTrans = new ImportTransaction({
+                        ...expTrans,
+                        enabled: item.model.enabled,
+                        mainAccount: origMainAccount,
+                        type: item.model.type,
+                        original: {
+                            ...item.model.original,
+                            mainAccount: origMainAccount,
+                        },
+                    });
+
+                    App.state.rules.applyTo(importTrans);
+
+                    const imported = ImportList.render([importTrans], App.state);
+                    return copyObject(imported.items[0]);
+                }
+
+                model = item.restoreOriginal();
+                if (App.view.model.mainAccount !== model.mainAccount.id) {
+                    model = item.onChangeMainAccount(model, App.view.model.mainAccount);
+                }
+            } else {
+                model = item.model;
+            }
+
+            const result = item.getExpectedState(model).values;
+            return copyObject(result);
+        });
+
+        await App.view.enableRules(enable);
+
+        App.view.expectedState = {
+            values: {
+                itemsList: {
+                    items: itemsData,
+                },
+            },
+        };
+
         return App.view.checkState();
     });
 }

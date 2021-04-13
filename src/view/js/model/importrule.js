@@ -274,6 +274,7 @@ ImportRuleList.prototype.createItem = function (obj) {
  * @param {Object} item - import transaction
  */
 ImportRuleList.prototype.applyTo = function (item) {
+    var applied = false;
     var data = item.getOriginal();
 
     this.forEach(function (rule) {
@@ -281,6 +282,9 @@ ImportRuleList.prototype.applyTo = function (item) {
             return;
         }
 
+        applied = true;
         rule.runActions(item);
     }, this);
+
+    return applied;
 };

@@ -149,6 +149,15 @@ export class ImportView extends TestView {
         this.assertStateId('rules');
     }
 
+    async enableRules(value) {
+        this.checkMainState();
+
+        if (value === this.isRulesEnabled()) {
+            throw new Error(value ? 'Rules already enabled' : 'Result already disabled');
+        }
+        await this.performAction(() => this.click(this.content.rulesCheck.elem));
+    }
+
     async launchUploadDialog() {
         this.checkMainState();
 

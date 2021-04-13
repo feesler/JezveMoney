@@ -157,7 +157,9 @@ function ImportTransactionItem() {
     this.data = null;
     if (this.props.originalData) {
         this.setOriginal(this.props.originalData);
-        this.setExtendedContent(this.createOrigDataContainer(this.props.originalData));
+        this.setExtendedContent(
+            this.createOrigDataContainer(this.props.originalData, this.model.mainAccount)
+        );
     }
 
     this.render();
@@ -281,10 +283,10 @@ ImportTransactionItem.prototype.createDataValue = function (title, value, extraC
  * Create set of static data values for original transaction data
  * @param {Object} data - import transaction object
  */
-ImportTransactionItem.prototype.createOrigDataContainer = function (data) {
+ImportTransactionItem.prototype.createOrigDataContainer = function (data, mainAccount) {
     var dateFmt;
 
-    if (!data) {
+    if (!data || !mainAccount) {
         throw new Error('Invalid data');
     }
 
@@ -293,6 +295,7 @@ ImportTransactionItem.prototype.createOrigDataContainer = function (data) {
     return this.createContainer('orig-data', [
         ce('h3', { textContent: 'Original imported data' }),
         this.createContainer('orig-data-table', [
+            this.createDataValue('Main account', mainAccount.name),
             this.createDataValue('Date', dateFmt),
             this.createDataValue('Tr. amount', data.trAmountVal),
             this.createDataValue('Tr. currency', data.trCurrVal),
@@ -331,8 +334,10 @@ ImportTransactionItem.prototype.setOriginal = function (data) {
         throw new Error('Invalid data');
     }
 
-    this.data = copyObject(data);
-
+    if (data !== this.data) {
+        this.data = copyObject(data);
+        this.data.origAccount = copyObject(this.model.mainAccount);
+    }
     this.data.mainAccount = this.model.mainAccount.id;
 
     accCurr = this.model.currency.findByName(this.data.accCurrVal);
@@ -368,6 +373,20 @@ ImportTransactionItem.prototype.setOriginal = function (data) {
     }
     this.setDate(formatDate(new Date(this.data.date)));
     this.setComment(this.data.comment);
+};
+
+/** Restore original data */
+ImportTransactionItem.prototype.restoreOriginal = function () {
+    var currentMainAccount = this.data.mainAccount;
+
+    this.setTransactionType('expense');
+    this.setMainAccount(this.data.origAccount.id);
+    this.setCurrency(this.data.origAccount.curr_id);
+    this.setAmount(0);
+
+    this.setOriginal(this.data);
+
+    this.setMainAccount(currentMainAccount);
 };
 
 /**
@@ -782,7 +801,10 @@ ImportTransactionItem.prototype.setSecondAmount = function (value) {
         throw new Error('Invalid amount value');
     }
 
-    if (this.state.secondAmount === value) {
+    if (
+        !this.state.isDiff
+        || this.state.secondAmount === value
+    ) {
         return this.state;
     }
     state = copyObject(this.state);

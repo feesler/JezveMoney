@@ -1,6 +1,6 @@
 'use strict';
 
-/* global ge, re, ce, removeChilds, enable, formatDate, extend */
+/* global ge, re, ce, show, enable, formatDate, extend */
 /* global urlJoin, ajax, timestampFromString, createMessage, baseURL */
 /* global AccountList, CurrencyList, PersonList, ImportRuleList, ImportTemplateList */
 /* global View, IconLink, Sortable, DropDown, ImportUploadDialog, ImportRulesDialog */
@@ -79,6 +79,10 @@ ImportView.prototype.onStart = function () {
     this.rulesBtn.addEventListener('click', this.onRulesClick.bind(this));
 
     this.noDataMsg = this.rowsContainer.querySelector('.nodata-message');
+    this.loadingInd = this.rowsContainer.querySelector('.data-container__loading');
+    if (!this.loadingInd) {
+        throw new Error('Failed to initialize Import view');
+    }
 
     this.trListSortable = new Sortable({
         oninsertat: this.onTransPosChanged.bind(this),
@@ -98,6 +102,8 @@ ImportView.prototype.onUpdateRules = function () {
     var rulesCount = this.model.rules.length;
 
     this.rulesCountElem.textContent = rulesCount;
+
+    this.reApplyRules();
 };
 
 /** Show upload file dialog popup */
@@ -183,6 +189,8 @@ ImportView.prototype.requestSimilar = function () {
     var reqParams;
     var importedDateRange = { start: 0, end: 0 };
 
+    show(this.loadingInd, true);
+
     // Obtain date region of imported transactions
     importedItems = this.getImportedItems();
     importedItems.forEach(function (item) {
@@ -233,6 +241,7 @@ ImportView.prototype.onTrCacheResult = function (response) {
             throw new Error('Invalid server response');
         }
     } catch (e) {
+        show(this.loadingInd, false);
         return;
     }
 
@@ -251,6 +260,9 @@ ImportView.prototype.onTrCacheResult = function (response) {
         }
         item.render();
     }, this);
+
+    show(this.loadingInd, false);
+    this.updateItemsCount();
 };
 
 /**
@@ -348,8 +360,10 @@ ImportView.prototype.updateItemsCount = function () {
 
 /** Remove all transaction rows */
 ImportView.prototype.removeAllItems = function () {
+    this.model.transactionRows.forEach(function (item) {
+        re(item.elem);
+    });
     this.model.transactionRows = [];
-    removeChilds(this.rowsContainer);
     this.updateItemsCount();
 };
 
@@ -420,6 +434,12 @@ ImportView.prototype.onMainAccChange = function () {
     this.model.transactionRows.forEach(function (item) {
         item.onMainAccountChanged(this.model.mainAccount.id);
     }, this);
+
+    this.reApplyRules();
+
+    if (!this.uploadDialog || !this.uploadDialog.isVisible()) {
+        this.requestSimilar();
+    }
 };
 
 /** Filter imported transaction items */
@@ -504,10 +524,42 @@ ImportView.prototype.onSubmitResult = function (response) {
     createMessage(message, (status ? 'msg_success' : 'msg_error'));
 };
 
+/** Apply rules to imported items */
+ImportView.prototype.reApplyRules = function () {
+    var importedItems;
+
+    if (!this.model.rulesEnabled) {
+        return;
+    }
+
+    importedItems = this.getImportedItems();
+    importedItems.forEach(function (item) {
+        var applied;
+
+        item.restoreOriginal();
+        applied = this.model.rules.applyTo(item);
+        if (applied) {
+            item.render();
+        }
+    }, this);
+};
+
 /** Rules checkbox 'change' event handler */
 ImportView.prototype.onToggleEnableRules = function () {
+    var importedItems;
+
     this.model.rulesEnabled = !!this.rulesCheck.checked;
     enable(this.rulesBtn, this.model.rulesEnabled);
+
+    importedItems = this.getImportedItems();
+    importedItems.forEach(function (item) {
+        if (this.model.rulesEnabled) {
+            this.model.rules.applyTo(item);
+        } else {
+            item.restoreOriginal();
+        }
+        item.render();
+    }, this);
 };
 
 /** Rules button 'click' event handler */

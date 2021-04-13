@@ -2360,6 +2360,11 @@ export class Scenario {
         });
         await ImportTests.submitUploaded({ data: this.csvStatement, account: this.ACC_RUB });
 
+        // Enable/disable rules
+        this.environment.setBlock('Enable/disable rules', 2);
+        await ImportTests.enableRules(false);
+        await ImportTests.enableRules(true);
+
         // Disable all items except 0 and 1
         await ImportTests.enableItems({
             index: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
@@ -2459,11 +2464,7 @@ export class Scenario {
         this.environment.setBlock('Import item state loop', 2);
 
         await ImportTests.changeMainAccount(this.ACC_3);
-        // Enable all items
-        await ImportTests.enableItems({
-            index: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
-            value: true,
-        });
+
         await ImportTests.updateItem({
             pos: 0,
             action: [
@@ -2580,12 +2581,16 @@ export class Scenario {
         await ImportTests.changeMainAccount(this.ACC_EUR);
         await ImportTests.updateItem({
             pos: 0,
-            action: { action: 'changeDestAccount', data: this.ACC_3 }, // 8-8
+            action: [
+                { action: 'changeType', data: 'transferto' },
+                { action: 'changeDestAccount', data: this.ACC_3 }, // 8-8
+            ],
         });
-        await ImportTests.changeMainAccount(this.ACC_3); // for item 0: 8-7
+        await ImportTests.changeMainAccount(this.ACC_3); // for item 0: 8-1
         await ImportTests.updateItem({
             pos: 0,
             action: [
+                { action: 'changeType', data: 'transferto' }, // 1-6
                 { action: 'changeDestAccount', data: this.ACC_USD }, // 7-8
                 { action: 'changeType', data: 'transferfrom' }, // 8-6
                 { action: 'changeType', data: 'debtfrom' }, // 6-9
@@ -2617,7 +2622,10 @@ export class Scenario {
 
         await ImportTests.updateItem({
             pos: 7,
-            action: { action: 'changePerson', data: this.MARIA },
+            action: [
+                { action: 'changeType', data: 'debtto' },
+                { action: 'changePerson', data: this.MARIA },
+            ],
         });
 
         await ImportTests.submit();
