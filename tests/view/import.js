@@ -264,6 +264,10 @@ export class ImportView extends TestView {
 
         await this.performAction(() => this.content.uploadDialog.submit());
         await this.performAction(() => this.wait(this.uploadPopupId, { hidden: true }));
+        await this.waitForFunction(async () => {
+            await this.parse();
+            return !this.content.itemsList.isLoading;
+        });
     }
 
     /** Return current state of upload dialog */
@@ -284,6 +288,10 @@ export class ImportView extends TestView {
         this.checkMainState();
 
         await this.performAction(() => this.content.mainAccountSelect.selectItem(val));
+        await this.waitForFunction(async () => {
+            await this.parse();
+            return !this.content.itemsList.isLoading;
+        });
     }
 
     checkRulesFormState() {
