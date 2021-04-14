@@ -69,13 +69,13 @@ class State extends ApiController
         // User profile
         $userObj = $this->uMod->getItem($this->user_id);
         if (!$userObj) {
-            $this->fail("User not found");
+            throw new \Error("User not found");
         }
 
         $res->profile = new \stdClass();
         $pObj = $this->pModel->getItem($this->owner_id);
         if (!$pObj) {
-            $this->fail("Person not found");
+            throw new \Error("Person not found");
         }
         $res->profile->login = $userObj->login;
         $res->profile->user_id = $this->user_id;

@@ -3,12 +3,13 @@
 namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiController;
+use JezveMoney\Core\Message;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Item\CurrencyItem;
 
 class Currency extends ApiController
 {
-    protected $requiredFields = [ "name", "sign", "flags" ];
+    protected $requiredFields = ["name", "sign", "flags"];
     protected $model = null;
 
 
@@ -24,14 +25,14 @@ class Currency extends ApiController
     {
         $ids = $this->getRequestedIds();
         if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            $this->fail("No currency specified");
+            throw new \Error("No currency specified");
         }
 
         $res = [];
         foreach ($ids as $curr_id) {
             $item = $this->model->getItem($curr_id);
             if (!$item) {
-                $this->fail("Currency $curr_id not found");
+                throw new \Error("Currency $curr_id not found");
             }
 
             $res[] = new CurrencyItem($item);
@@ -55,47 +56,47 @@ class Currency extends ApiController
 
     protected function create()
     {
-        $defMsg = ERR_CURRENCY_CREATE;
+        $defMsg = Message::get(ERR_CURRENCY_CREATE);
 
         if (!$this->isPOST()) {
-            $this->fail($defMsg);
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $request = $this->getRequestData();
         $reqData = checkFields($request, $this->requiredFields);
         if ($reqData === false) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
         $curr_id = $this->model->create($reqData);
         if (!$curr_id) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
-        $this->ok([ "id" => $curr_id ]);
+        $this->ok(["id" => $curr_id]);
     }
 
 
     protected function update()
     {
-        $defMsg = ERR_CURRENCY_UPDATE;
+        $defMsg = Message::get(ERR_CURRENCY_UPDATE);
 
         if (!$this->isPOST()) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $request = $this->getRequestData();
         if (!$request || !isset($request["id"])) {
-            $this->fail();
+            throw new \Error();
         }
 
         $reqData = checkFields($request, $this->requiredFields);
         if ($reqData === false) {
-            $this->fail();
+            throw new \Error();
         }
 
         if (!$this->model->update($request["id"], $reqData)) {
-            $this->fail();
+            throw new \Error();
         }
 
         $this->ok();
@@ -104,19 +105,19 @@ class Currency extends ApiController
 
     protected function del()
     {
-        $defMsg = ERR_CURRENCY_DELETE;
+        $defMsg = Message::get(ERR_CURRENCY_DELETE);
 
         if (!$this->isPOST()) {
-            $this->fail($defMsg);
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $ids = $this->getRequestedIds(true, $this->isJsonContent());
         if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            $this->fail("No currency specified");
+            throw new \Error("No currency specified");
         }
 
         if (!$this->model->del($ids)) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
         $this->ok();

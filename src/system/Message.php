@@ -116,6 +116,9 @@ class Message
 
 define("MSG_NONE", 0);
 
+define("ERR_INVALID_REQUEST", 1);
+define("ERR_INVALID_REQUEST_DATA", 2);
+
 define("MSG_REGISTER", 100);
 define("ERR_REGISTER_FAIL", 101);
 define("MSG_LOGIN", 102);
@@ -175,6 +178,8 @@ define("MSG_TRANS_UPDATE", 602);
 define("ERR_TRANS_UPDATE", 603);
 define("MSG_TRANS_DELETE", 604);
 define("ERR_TRANS_DELETE", 605);
+define("MSG_TRANS_CHANGE_POS", 606);
+define("ERR_TRANS_CHANGE_POS", 607);
 
 define("MSG_DEBT_CREATE", 700);
 define("ERR_DEBT_CREATE", 701);

@@ -3,6 +3,7 @@
 namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiController;
+use JezveMoney\Core\Message;
 use JezveMoney\App\Model\PersonModel;
 use JezveMoney\App\Item\PersonItem;
 
@@ -24,14 +25,14 @@ class Person extends ApiController
     {
         $ids = $this->getRequestedIds();
         if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            $this->fail("No persons specified");
+            throw new \Error("No persons specified");
         }
 
         $res = [];
         foreach ($ids as $person_id) {
             $item = $this->model->getItem($person_id);
             if (!$item) {
-                $this->fail("Person $person_id not found");
+                throw new \Error("Person $person_id not found");
             }
 
             $res[] = new PersonItem($item);
@@ -64,18 +65,18 @@ class Person extends ApiController
     public function create()
     {
         if (!$this->isPOST()) {
-            $this->fail();
+            throw new \Error("Invalid request type");
         }
 
         $request = $this->getRequestData();
         $reqData = checkFields($request, $this->requiredFields);
         if ($reqData === false) {
-            $this->fail();
+            throw new \Error("Invalid request data");
         }
 
         $p_id = $this->model->create($reqData);
         if (!$p_id) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_PERSON_CREATE));
         }
 
         $this->ok([ "id" => $p_id ]);
@@ -85,21 +86,21 @@ class Person extends ApiController
     public function update()
     {
         if (!$this->isPOST()) {
-            $this->fail();
+            throw new \Error("Invalid request type");
         }
 
         $request = $this->getRequestData();
         if (!$request || !isset($request["id"])) {
-            $this->fail();
+            throw new \Error("Invalid request data");
         }
 
         $reqData = checkFields($request, $this->requiredFields);
         if ($reqData === false) {
-            $this->fail();
+            throw new \Error("Invalid request data");
         }
 
         if (!$this->model->update($request["id"], $reqData)) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_PERSON_UPDATE));
         }
 
         $this->ok();
@@ -109,16 +110,16 @@ class Person extends ApiController
     public function del()
     {
         if (!$this->isPOST()) {
-            $this->fail();
+            throw new \Error("Invalid request type");
         }
 
         $ids = $this->getRequestedIds(true, $this->isJsonContent());
         if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            $this->fail("No persons specified");
+            throw new \Error("No persons specified");
         }
 
         if (!$this->model->del($ids)) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_PERSON_DELETE));
         }
 
         $this->ok();

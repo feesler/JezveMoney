@@ -3,6 +3,7 @@
 namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiController;
+use JezveMoney\Core\Message;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\DebtModel;
@@ -49,14 +50,14 @@ class Transaction extends ApiController
     {
         $ids = $this->getRequestedIds();
         if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            $this->fail("No transaction specified");
+            throw new \Error("No transaction specified");
         }
 
         $res = [];
         foreach ($ids as $trans_id) {
             $item = $this->model->getItem($trans_id);
             if (is_null($item)) {
-                $this->fail("Transaction $trans_id not found");
+                throw new \Error("Transaction $trans_id not found");
             }
 
             $res[] = new TransactionItem($item);
@@ -89,7 +90,7 @@ class Transaction extends ApiController
                     $type_id = TransactionModel::stringToType($type_str);
                 }
                 if (is_null($type_id)) {
-                    $this->fail("Invalid type '$type_str'");
+                    throw new \Error("Invalid type '$type_str'");
                 }
 
                 if ($type_id) {
@@ -126,7 +127,7 @@ class Transaction extends ApiController
             }
             foreach ($accountsReq as $acc_id) {
                 if (!$accMod->isExist($acc_id)) {
-                    $this->fail("Invalid account '$acc_id'");
+                    throw new \Error("Invalid account '$acc_id'");
                 }
 
                 $accFilter[] = intval($acc_id);
@@ -159,12 +160,12 @@ class Transaction extends ApiController
     public function create()
     {
         if (!$this->isPOST()) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $request = $this->getRequestData();
         if (!$request || !isset($request["type"])) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
         }
 
         $trans_type = intval($request["type"]);
@@ -172,7 +173,7 @@ class Transaction extends ApiController
         $fieldsToCheck = ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields;
         $reqData = checkFields($request, $fieldsToCheck);
         if ($reqData === false) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
         }
 
         $trans_id = 0;
@@ -184,7 +185,7 @@ class Transaction extends ApiController
         }
 
         if (!$trans_id) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_TRANS_CREATE));
         }
 
         $this->ok(["id" => $trans_id]);
@@ -194,14 +195,14 @@ class Transaction extends ApiController
     public function createMultiple()
     {
         if (!$this->isPOST()) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $request = $this->getRequestData();
         $transactions = [];
         foreach ($request as $item) {
             if (!is_array($item)) {
-                $this->fail("Invalid transaction data");
+                throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
             }
 
             if ($item["type"] == DEBT) {
@@ -217,7 +218,7 @@ class Transaction extends ApiController
 
         $trans_ids = $this->model->createMultiple($transactions);
         if (!$trans_ids) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_TRANS_CREATE));
         }
 
         $this->ok(["ids" => $trans_ids]);
@@ -227,12 +228,12 @@ class Transaction extends ApiController
     public function update()
     {
         if (!$this->isPOST()) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $request = $this->getRequestData();
         if (!$request || !isset($request["id"])) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
         }
 
         $trans_id = intval($request["id"]);
@@ -241,17 +242,17 @@ class Transaction extends ApiController
         $fieldsToCheck = ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields;
         $reqData = checkFields($request, $fieldsToCheck);
         if ($reqData === false) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
         }
 
         if ($trans_type == DEBT) {
             $debtMod = DebtModel::getInstance();
             if (!$debtMod->update($trans_id, $reqData)) {
-                $this->fail();
+                throw new \Error(Message::get(ERR_DEBT_UPDATE));
             }
         } else {
             if (!$this->model->update($trans_id, $reqData)) {
-                $this->fail();
+                throw new \Error(Message::get(ERR_TRANS_UPDATE));
             }
         }
 
@@ -262,16 +263,16 @@ class Transaction extends ApiController
     public function del()
     {
         if (!$this->isPOST()) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $ids = $this->getRequestedIds(true, $this->isJsonContent());
         if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            $this->fail("No account specified");
+            throw new \Error("No account specified");
         }
 
         if (!$this->model->del($ids)) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_TRANS_DELETE));
         }
 
         $this->ok();
@@ -281,17 +282,17 @@ class Transaction extends ApiController
     public function setPos()
     {
         if (!$this->isPOST()) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $request = $this->getRequestData();
         $reqData = checkFields($request, ["id", "pos"]);
         if ($reqData === false) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
         }
 
         if (!$this->model->updatePosition($reqData["id"], $reqData["pos"])) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_TRANS_CHANGE_POS));
         }
 
         $this->ok();

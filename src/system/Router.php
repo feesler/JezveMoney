@@ -140,9 +140,7 @@ class Router
             call_user_func_array($this->onBeforeActionHandler, [$controller, $contrStr, $action, $routeParts]);
         }
 
-        if (method_exists($controller, $action)) {
-            $controller->$action();
-        }
+        $controller->runAction($action);
 
         if (is_callable($this->onAfterActionHandler)) {
             call_user_func_array($this->onAfterActionHandler, [$controller, $contrStr, $action, $routeParts]);

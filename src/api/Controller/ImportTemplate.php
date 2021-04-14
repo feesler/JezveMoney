@@ -34,14 +34,14 @@ class ImportTemplate extends ApiController
     {
         $ids = $this->getRequestedIds();
         if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            $this->fail("No items specified");
+            throw new \Error("No items specified");
         }
 
         $res = [];
         foreach ($ids as $item_id) {
             $item = $this->model->getItem($item_id);
             if (!$item) {
-                $this->fail("Item '$item_id' not found");
+                throw new \Error("Item '$item_id' not found");
             }
 
             $res[] = new ImportTemplateItem($item);
@@ -65,21 +65,19 @@ class ImportTemplate extends ApiController
 
     public function create()
     {
-        $defMsg = Message::get(ERR_IMPTPL_CREATE);
-
         if (!$this->isPOST()) {
-            $this->fail($defMsg);
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $request = $this->getRequestData();
         $reqData = checkFields($request, $this->requiredFields);
         if ($reqData === false) {
-            $this->fail($defMsg);
+            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
         }
 
         $item_id = $this->model->create($reqData);
         if (!$item_id) {
-            $this->fail($defMsg);
+            throw new \Error(Message::get(ERR_IMPTPL_CREATE));
         }
 
         $this->ok([ "id" => $item_id ]);
@@ -88,24 +86,22 @@ class ImportTemplate extends ApiController
 
     public function update()
     {
-        $defMsg = Message::get(ERR_IMPTPL_UPDATE);
-
         if (!$this->isPOST()) {
-            $this->fail($defMsg);
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $request = $this->getRequestData();
         if (!$request || !isset($request["id"])) {
-            $this->fail($defMsg);
+            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
         }
 
         $reqData = checkFields($request, $this->requiredFields);
         if ($reqData === false) {
-            $this->fail($defMsg);
+            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
         }
 
         if (!$this->model->update($request["id"], $reqData)) {
-            $this->fail($defMsg);
+            throw new \Error(Message::get(ERR_IMPTPL_UPDATE));
         }
 
         $this->ok();
@@ -114,19 +110,17 @@ class ImportTemplate extends ApiController
 
     public function del()
     {
-        $defMsg = Message::get(ERR_IMPTPL_DELETE);
-
         if (!$this->isPOST()) {
-            $this->fail($defMsg);
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $ids = $this->getRequestedIds(true, $this->isJsonContent());
         if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            $this->fail("No item specified");
+            throw new \Error("No item specified");
         }
 
         if (!$this->model->del($ids)) {
-            $this->fail($defMsg);
+            throw new \Error(Message::get(ERR_IMPTPL_DELETE));
         }
 
         $this->ok();

@@ -15,13 +15,13 @@ class User extends ApiController
         $requiredFields = [ "login", "password" ];
 
         if (!$this->isPOST()) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $request = $this->getRequestData();
         $reqData = checkFields($request, $requiredFields);
         if (!$this->uMod->login($reqData)) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_LOGIN_FAIL));
         }
 
         $this->ok();
@@ -31,7 +31,7 @@ class User extends ApiController
     public function logout()
     {
         if (!$this->isPOST()) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $this->uMod->logout();
@@ -43,21 +43,21 @@ class User extends ApiController
     public function register()
     {
         if (!$this->isPOST()) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
-        if ($this->user_id != 0) {        // need to log out first
-            $this->fail();
+        if ($this->user_id != 0) {
+            throw new \Error("Need to log out first");
         }
 
         $request = $this->getRequestData();
         $reqData = checkFields($request, $this->createRequiredFields);
         if ($reqData === false) {
-            $this->fail();
+            throw new \Error("Invalid request data");
         }
 
         if (!$this->uMod->create($reqData)) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_REGISTER_FAIL));
         }
 
         $this->ok();
@@ -73,23 +73,23 @@ class User extends ApiController
 
     protected function create()
     {
-        $defMsg = ERR_USER_CREATE;
+        $defMsg = Message::get(ERR_USER_CREATE);
 
         if (!$this->isPOST()) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $request = $this->getRequestData();
         $reqData = checkFields($request, $this->createRequiredFields);
         if ($reqData === false) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
         $reqData["access"] = isset($request["access"]) ? intval($request["access"]) : 0;
 
         $new_user_id = $this->uMod->create($reqData);
         if (!$new_user_id) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
         $this->setMessage(Message::get(MSG_USER_CREATE));
@@ -99,20 +99,18 @@ class User extends ApiController
 
     protected function update()
     {
-        $defMsg = ERR_USER_UPDATE;
-
         if (!$this->isPOST()) {
-            $this->fail($defMsg);
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $request = $this->getRequestData();
         if (!isset($request["id"])) {
-            $this->fail($defMsg);
+            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
         }
 
         $reqData = checkFields($request, $this->createRequiredFields);
         if ($reqData === false) {
-            $this->fail($defMsg);
+            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
         }
 
         if (isset($request["access"])) {
@@ -121,7 +119,7 @@ class User extends ApiController
 
         $updateRes = $this->uMod->update($request["id"], $reqData);
         if (!$updateRes) {
-            $this->fail($defMsg);
+            throw new \Error(Message::get(ERR_USER_UPDATE));
         }
 
         $this->setMessage(Message::get(MSG_USER_UPDATE));
@@ -132,47 +130,47 @@ class User extends ApiController
     protected function changePassword()
     {
         $requiredFields = [ "id", "password" ];
-        $defMsg = ERR_PROFILE_PASSWORD;
+        $defMsg = Message::get(ERR_PROFILE_PASSWORD);
 
         if (!$this->isPOST()) {
-            $this->fail($defMsg);
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $request = $this->getRequestData();
         $reqData = checkFields($request, $requiredFields);
         if ($reqData === false) {
-            $this->fail($defMsg);
+            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
         }
 
         $uObj = $this->uMod->getItem($reqData["id"]);
         if (!$uObj) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
         if (!$this->uMod->setPassword($uObj->login, $reqData["password"])) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
         $this->setMessage(Message::get(MSG_PROFILE_PASSWORD));
         $this->ok();
     }
-    
+
 
     protected function del()
     {
-        $defMsg = ERR_USER_DELETE;
+        $defMsg = Message::get(ERR_USER_DELETE);
 
         if (!$this->isPOST()) {
-            $this->fail($defMsg);
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $ids = $this->getRequestedIds(true, $this->isJsonContent());
         if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            $this->fail("No account specified");
+            throw new \Error("No account specified");
         }
 
         if (!$this->uMod->del($ids)) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
         $this->setMessage(Message::get(MSG_USER_DELETE));

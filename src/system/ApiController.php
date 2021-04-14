@@ -13,6 +13,20 @@ class ApiController extends Controller
     public $authRequired = true;
 
 
+    public function runAction($action)
+    {
+        if (!method_exists($this, $action)) {
+            return;
+        }
+
+        try {
+            $this->$action();
+        } catch (\Error $e) {
+            $this->fail($e->getMessage());
+        }
+    }
+
+
     protected function setMessage($msg = null)
     {
         if (!$this->response) {
@@ -79,7 +93,7 @@ class ApiController extends Controller
             $this->fail("Access denied");
         }
 
-        return call_user_func_array([ $this, $method ], $parameters);
+        return call_user_func_array([$this, $method], $parameters);
     }
 
 

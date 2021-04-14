@@ -2,6 +2,9 @@
 
 namespace JezveMoney\Core;
 
+Message::add(ERR_INVALID_REQUEST, MSG_TYPE_ERROR, "Invalid type of request");
+Message::add(ERR_INVALID_REQUEST_DATA, MSG_TYPE_ERROR, "Invalid request data");
+
 Message::add(MSG_REGISTER, MSG_TYPE_SUCCESS, "You successfully registered.");
 Message::add(ERR_REGISTER_FAIL, MSG_TYPE_ERROR, "Fail to register.");
 Message::add(MSG_LOGIN);
@@ -61,6 +64,8 @@ Message::add(MSG_TRANS_UPDATE);
 Message::add(ERR_TRANS_UPDATE, MSG_TYPE_ERROR, "Fail to update transaction.");
 Message::add(MSG_TRANS_DELETE);
 Message::add(ERR_TRANS_DELETE, MSG_TYPE_ERROR, "Fail to delete transaction.");
+Message::add(MSG_TRANS_CHANGE_POS);
+Message::add(ERR_TRANS_CHANGE_POS, MSG_TYPE_ERROR, "Fail to change position of transaction.");
 
 Message::add(MSG_DEBT_CREATE);
 Message::add(ERR_DEBT_CREATE, MSG_TYPE_ERROR, "Fail to create new debt.");

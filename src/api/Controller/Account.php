@@ -3,6 +3,7 @@
 namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiController;
+use JezveMoney\Core\Message;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Item\AccountItem;
 
@@ -24,14 +25,14 @@ class Account extends ApiController
     {
         $ids = $this->getRequestedIds();
         if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            $this->fail("No account specified");
+            throw new \Error("No account specified");
         }
 
         $res = [];
         foreach ($ids as $acc_id) {
             $item = $this->model->getItem($acc_id);
             if (is_null($item)) {
-                $this->fail("Account $acc_id not found");
+                throw new \Error("Account $acc_id not found");
             }
 
             $res[] = new AccountItem($item);
@@ -64,49 +65,46 @@ class Account extends ApiController
     public function create()
     {
         if (!$this->isPOST()) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $request = $this->getRequestData();
-        $reqData = checkFields($request, $this->requiredFields);
-        if ($reqData === false) {
-            $this->fail();
-        }
+        $reqData = checkFields($request, $this->requiredFields, true);
 
         $uObj = $this->uMod->getItem($this->user_id);
         if (!$uObj) {
-            $this->fail("User not found");
+            throw new \Error("User not found");
         }
 
         $reqData["owner_id"] = $uObj->owner_id;
 
         $acc_id = $this->model->create($reqData);
         if (!$acc_id) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_ACCOUNT_CREATE));
         }
 
-        $this->ok([ "id" => $acc_id ]);
+        $this->ok(["id" => $acc_id]);
     }
 
 
     public function update()
     {
         if (!$this->isPOST()) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $request = $this->getRequestData();
         if (!$request || !isset($request["id"])) {
-            $this->fail();
+            throw new \Error("Invalid request data");
         }
 
         $reqData = checkFields($request, $this->requiredFields);
         if ($reqData === false) {
-            $this->fail();
+            throw new \Error("Invalid request data");
         }
 
         if (!$this->model->update($request["id"], $reqData)) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_ACCOUNT_UPDATE));
         }
 
         $this->ok();
@@ -116,16 +114,16 @@ class Account extends ApiController
     public function del()
     {
         if (!$this->isPOST()) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $ids = $this->getRequestedIds(true, $this->isJsonContent());
         if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            $this->fail("No account specified");
+            throw new \Error("No account specified");
         }
 
         if (!$this->model->del($ids)) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_ACCOUNT_DELETE));
         }
 
         $this->ok();
@@ -135,7 +133,7 @@ class Account extends ApiController
     public function reset()
     {
         if (!$this->model->reset($this->user_id)) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_ACCOUNTS_RESET));
         }
 
         $this->ok();

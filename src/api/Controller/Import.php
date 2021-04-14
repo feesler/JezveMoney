@@ -3,6 +3,7 @@
 namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiController;
+use JezveMoney\Core\Message;
 use JezveMoney\App\Model\ImportTemplateModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
@@ -216,7 +217,7 @@ class Import extends ApiController
     public function upload()
     {
         if (!$this->isPOST()) {
-            return;
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
         }
 
         $hdrs = [];
@@ -276,7 +277,7 @@ class Import extends ApiController
 
             $this->setData($data);
         } catch (\Error $e) {
-            $this->fail($e->getMessage());
+            throw new \Error($e->getMessage());
         }
 
         if (isset($hdrs["x-file-id"])) {
