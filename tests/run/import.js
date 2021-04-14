@@ -307,7 +307,9 @@ export async function changeMainAccount(accountId) {
         const itemsData = App.view.content.itemsList.items.map((item) => {
             // Reapply rules
             if (item.model.original && App.view.isRulesEnabled()) {
+                /* eslint-disable-next-line no-param-reassign */
                 item.model = item.restoreOriginal();
+                /* eslint-disable-next-line no-param-reassign */
                 item.model = item.onChangeMainAccount(item.model, accountId);
 
                 const expectedTransaction = item.getExpectedTransaction(item.model);
@@ -336,6 +338,7 @@ export async function changeMainAccount(accountId) {
                 return copyObject(imported);
             }
 
+            /* eslint-disable-next-line no-param-reassign */
             item.model = item.onChangeMainAccount(item.model, accountId);
 
             return copyObject(item.getExpectedState(item.model).values);
@@ -373,7 +376,9 @@ export async function enableRules(value = true) {
             if (item.model.original) {
                 if (enable) {
                     const expTrans = item.getExpectedTransaction(item.model);
-                    const origMainAccount = App.state.accounts.findByName(item.model.original.mainAccount);
+                    const origMainAccount = App.state.accounts.findByName(
+                        item.model.original.mainAccount,
+                    );
                     const importTrans = new ImportTransaction({
                         ...expTrans,
                         enabled: item.model.enabled,
