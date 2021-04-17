@@ -177,12 +177,14 @@ List.prototype.updateItemByIndex = function (index, obj) {
  * @param {Number} itemId - id item to remove
  */
 List.prototype.deleteItem = function (itemId) {
-    var ind = this.getItemIndex(itemId);
-    if (ind === null) {
-        throw new Error('Item not found');
+    var id = parseInt(itemId, 10);
+    if (!id) {
+        return;
     }
 
-    this.deleteItemByIndex(ind);
+    this.data = this.data.filter(function (item) {
+        return item.id !== id;
+    });
 };
 
 /**

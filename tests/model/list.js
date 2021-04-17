@@ -193,19 +193,13 @@ export class List {
             throw new Error('Unexpected input');
         }
 
-        const itemIds = Array.isArray(ids) ? ids : [ids];
-        const res = copyObject(list);
-        for (const id of itemIds) {
-            const itemId = parseInt(id, 10);
-            if (!itemId) {
-                continue;
-            }
+        let itemIds = Array.isArray(ids) ? ids : [ids];
+        itemIds = itemIds
+            .map((id) => parseInt(id, 10))
+            .filter((id) => !!id);
 
-            const ind = res.findIndex((item) => item.id === itemId);
-            if (ind !== -1) {
-                res.splice(ind, 1);
-            }
-        }
+        const res = copyObject(list)
+            .filter((item) => !itemIds.includes(item.id));
 
         return res;
     }
