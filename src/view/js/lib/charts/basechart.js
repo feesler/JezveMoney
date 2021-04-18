@@ -35,6 +35,7 @@ function BaseChart() {
     this.barWidth = 0;
     this.chartWidth = 0;
     this.chartHeight = 0;
+    this.lastHLabelOffset = 0;
     this.chartContentWidth = 0;
     this.gridValuesMargin = 0.1;
     this.minGridStep = 30;
@@ -139,7 +140,6 @@ BaseChart.prototype.init = function () {
 
     this.containerOffset = getOffset(this.container);
 
-    this.drawGrid();
     this.drawVLabels();
 
     // create bars
@@ -148,6 +148,9 @@ BaseChart.prototype.init = function () {
 
     // create horizontal labels
     this.createHLabels();
+    this.updateChartWidth();
+
+    this.drawGrid();
 };
 
 /** Return charts content elemtnt */
@@ -261,6 +264,9 @@ BaseChart.prototype.updateChartWidth = function () {
     var paperWidth;
     var chartOffset;
 
+    this.chartContentWidth = (this.data.values.length) * (this.barWidth + this.barMargin);
+    this.chartContentWidth = Math.max(this.chartContentWidth, this.lastHLabelOffset);
+
     chartOffset = this.getChartOffset(this.chart);
     paperWidth = Math.max(chartOffset - this.vLabelsWidth, this.chartContentWidth);
 
@@ -272,17 +278,20 @@ BaseChart.prototype.updateChartWidth = function () {
 
 /** Set new width for vertical labels block and SVG object */
 BaseChart.prototype.setVertLabelsWidth = function (width) {
+    var lWidth;
+
     if (!this.labelsContainer || !this.chart) {
         return;
     }
 
-    if (this.vLabelsWidth === width) {
+    lWidth = Math.ceil(width);
+    if (this.vLabelsWidth === lWidth) {
         return;
     }
 
-    this.labelsContainer.setAttribute('width', width);
+    this.labelsContainer.setAttribute('width', lWidth);
     this.labelsContainer.setAttribute('height', this.paperHeight + 20);
-    this.vLabelsWidth = width;
+    this.vLabelsWidth = lWidth;
 
     this.updateChartWidth();
 };
@@ -318,6 +327,7 @@ BaseChart.prototype.getVisibleItems = function () {
 BaseChart.prototype.drawVLabels = function () {
     var tVal;
     var tspan;
+    var prop;
     var el;
     var isZero;
     var xOffset = 5;
@@ -325,6 +335,7 @@ BaseChart.prototype.drawVLabels = function () {
     var curY = this.grid.yFirst;
     var val = this.grid.valueFirst;
     var step = 0;
+    var labelRect;
     var labelsWidth = 0;
 
     if (!this.grid.steps) {
@@ -339,7 +350,8 @@ BaseChart.prototype.drawVLabels = function () {
         tVal = (isZero) ? 0 : this.grid.toPrecString(val);
 
         tspan = svg('tspan', { dy: dyOffset });
-        tspan.innerHTML = tVal.toString();
+        prop = ('innerHTML' in tspan) ? 'innerHTML' : 'textContent';
+        tspan[prop] = tVal.toString();
         el = svg('text', {
             className: 'chart__text',
             x: xOffset,
@@ -349,7 +361,8 @@ BaseChart.prototype.drawVLabels = function () {
         this.labelsContainer.appendChild(el);
         this.vertLabels.push(el);
 
-        labelsWidth = Math.max(labelsWidth, el.clientWidth + 10);
+        labelRect = el.getBoundingClientRect();
+        labelsWidth = Math.max(labelsWidth, Math.ceil(labelRect.width) + 10);
         val -= this.grid.valueStep;
         curY += this.grid.yStep;
         step += 1;
@@ -367,14 +380,17 @@ BaseChart.prototype.createHLabels = function () {
     var lblY = this.paperHeight - (this.hLabelsHeight / 2);
 
     this.data.series.forEach(function (val) {
+        var labelRect;
         var txtEl;
         var tspan;
+        var prop;
         var itemDate = val[0];
         var itemsCount = val[1];
 
         if (lastOffset === 0 || labelShift > lastOffset + lblMarginLeft) {
             tspan = svg('tspan', { dy: dyOffset });
-            tspan.innerHTML = itemDate.toString();
+            prop = ('innerHTML' in tspan) ? 'innerHTML' : 'textContent';
+            tspan[prop] = itemDate.toString();
             txtEl = svg('text', {
                 className: 'chart__text',
                 x: labelShift,
@@ -383,10 +399,13 @@ BaseChart.prototype.createHLabels = function () {
 
             this.container.appendChild(txtEl);
 
-            lastOffset = labelShift + txtEl.clientWidth;
+            labelRect = txtEl.getBoundingClientRect();
+            lastOffset = labelShift + Math.ceil(labelRect.width);
         }
         labelShift += itemsCount * (this.barWidth + this.barMargin);
     }, this);
+
+    this.lastHLabelOffset = lastOffset;
 };
 
 /** Find item by event object */
@@ -424,15 +443,18 @@ BaseChart.prototype.onItemOver = function (e) {
         return;
     }
     item = this.findItemByEvent(e);
-    if (!item || this.activeItem === item) {
+    if (this.activeItem === item) {
         return;
     }
     if (this.activeItem && isFunction(this.itemOutHandler)) {
         this.itemOutHandler.call(this, e, this.activeItem);
     }
 
-    this.activeItem = item;
+    if (!item) {
+        return;
+    }
 
+    this.activeItem = item;
     this.itemOverHandler.call(this, e, item);
 };
 
@@ -447,6 +469,9 @@ BaseChart.prototype.onItemOut = function (e) {
     item = this.activeItem;
     this.activeItem = null;
 
+    if (!item) {
+        return;
+    }
     this.itemOutHandler.call(this, e, item);
 };
 

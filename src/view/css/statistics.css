@@ -4,6 +4,9 @@
 	width: 100%;
 }
 
+.bar_active {
+  fill: #00ffbf;
+}
 
 /* Bar chart information popup */
 .chart_popup

@@ -308,9 +308,11 @@ StatisticsView.prototype.onBarClick = function (e, barRect, val) {
  * @param {object} bar
  */
 StatisticsView.prototype.onBarOver = function (e, bar) {
-    if (bar) {
-        bar.setAttribute('fill', '#00ffbf');
+    if (!bar || !bar.elem) {
+        return
     }
+
+    bar.elem.classList.add('bar_active');
 };
 
 /**
@@ -318,7 +320,9 @@ StatisticsView.prototype.onBarOver = function (e, bar) {
  * @param {object} bar - bar rectangle element mouse leave from
  */
 StatisticsView.prototype.onBarOut = function (e, bar) {
-    if (bar) {
-        bar.setAttribute('fill', '#00bfff');
+    if (!bar || !bar.elem) {
+        return
     }
+
+    bar.elem.classList.remove('bar_active');
 };
