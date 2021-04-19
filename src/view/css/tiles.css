@@ -1,108 +1,85 @@
-.tiles
-{
-	display: flex;
-	flex-flow: row wrap;
-	max-width: 440px;
-	overflow: hidden;
+.tiles {
+  display: flex;
+  flex-flow: row wrap;
+  max-width: 440px;
+  overflow: hidden;
 }
 
-
-.tiles .tile
-{
-	margin: 0px 10px 10px 0px;
+.tiles .tile {
+  margin: 0px 10px 10px 0px;
 }
 
-
-.tile
-{
-	width: 100px;
-	height: 100px;
-	background-color: #20A0FF;
-	padding: 0;
-	display: inline-flex;
-	position: relative;
-	overflow: hidden;
-	cursor: pointer;
+.tile {
+  width: 100px;
+  height: 100px;
+  background-color: #20a0ff;
+  padding: 0;
+  display: inline-flex;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
 }
 
-
-.tile:hover
-{
-	background-color: #1E82CC;
+.tile:hover {
+  background-color: #1e82cc;
 }
 
-
-.tile_selected .tilelink::after
-{
-	content: '';
-	display: block;
-	position: absolute;
-	left: 0;
-	right: 0;
-	top: 0;
-	bottom: 0;
-	border: 3px solid #0072C6;
-	cursor: pointer;
+.tile_selected .tilelink::after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border: 3px solid #0072c6;
+  cursor: pointer;
 }
 
-
-button.tilelink
-{
-	width: 100px;
-	height: 100px;
-	border: 0 none;
-	background: none;
-	padding: 0;
-	margin: 0;
-	text-transform: none;
-	font-weight: normal;
+button.tilelink {
+  width: 100px;
+  height: 100px;
+  border: 0 none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  text-transform: none;
+  font-weight: normal;
 }
 
-
-a.tilelink
-{
-	text-decoration: none;
+a.tilelink {
+  text-decoration: none;
 }
 
-
-.tilelink > span
-{
-	height: 100px;
-	width: 100px;
-	margin: 0;
-	padding: 0;
-	display: block;
+.tilelink > span {
+  height: 100px;
+  width: 100px;
+  margin: 0;
+  padding: 0;
+  display: block;
 }
 
-
-.tilelink > span > span
-{
-	position: absolute;
-	color: #FFFFFF;
-	white-space: nowrap;
+.tilelink > span > span {
+  position: absolute;
+  color: #ffffff;
+  white-space: nowrap;
 }
 
-
-.tile__title
-{
-	left: 5px;
-	bottom: 2px;
-	font-size: 18px;
-	text-align: left;
+.tile__title {
+  left: 5px;
+  bottom: 2px;
+  font-size: 18px;
+  text-align: left;
 }
 
-
-.tile__subtitle
-{
-	top: 2px;
-	right: 5px;
-	font-size: 14px;
-	text-align: right;
+.tile__subtitle {
+  top: 2px;
+  right: 5px;
+  font-size: 14px;
+  text-align: right;
 }
 
-
-.tile__icon
-{
-	top: 23px;
-	left: 20px;
+.tile__icon {
+  top: 23px;
+  left: 20px;
 }

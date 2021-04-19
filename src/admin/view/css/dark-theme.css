@@ -1,106 +1,78 @@
-body
-{
-    color: #DDDDDD;
-	background-color: #101010;
+body {
+  color: #dddddd;
+  background-color: #101010;
 }
-
 
 .admin-tbl,
 .admin-tbl th,
-.admin-tbl td
-{
-	border-color: #DDDDDD;
+.admin-tbl td {
+  border-color: #dddddd;
 }
 
-
-.admin-tbl tr:hover td
-{
-	background-color: #444444;
+.admin-tbl tr:hover td {
+  background-color: #444444;
 }
 
-
-textarea
-{
-	color: #DDDDDD;
-	border-color: #DDDDDD;
-	background-color: #202020;
+textarea {
+  color: #dddddd;
+  border-color: #dddddd;
+  background-color: #202020;
 }
 
 /* Popup */
-.popup__content .popup__content-box
-{
-    color: #DDDDDD;
-    background-color: #303030;
+.popup__content .popup__content-box {
+  color: #dddddd;
+  background-color: #303030;
 }
 
-
 .popup__title,
-.popup__message
-{
-    color: #DDDDDD;
+.popup__message {
+  color: #dddddd;
 }
 
 /* Tests */
-.results-container td
-{
-	border-color: #DDDDDD;
+.results-container td {
+  border-color: #dddddd;
 }
-
 
 /* API tests */
 .left-column,
-.right-column
-{
-	background-color: #202020;
+.right-column {
+  background-color: #202020;
 }
 
-
-.menu-list > li > button
-{
-	color: #DDDDDD;
+.menu-list > li > button {
+  color: #dddddd;
 }
 
-
-.menu-list .sub-menu-list > li:hover
-{
-	color: #B0B0B0;
+.menu-list .sub-menu-list > li:hover {
+  color: #b0b0b0;
 }
 
-
-.request-data-form
-{
-	background-color: #444444;
-    border-color: #202020;
+.request-data-form {
+  background-color: #444444;
+  border-color: #202020;
 }
 
-
-.request-data-form input[type="text"]
-{
-	color: #DDDDDD;
-    border-color: #DDDDDD;
-	background-color: #101010;
+.request-data-form input[type="text"] {
+  color: #dddddd;
+  border-color: #dddddd;
+  background-color: #101010;
 }
-
 
 .request-data-form input[disabled],
 .request-data-form select[disabled],
-.request-data-form textarea[disabled]
-{
-	color: #888888;
-	border-color: #888888;
+.request-data-form textarea[disabled] {
+  color: #888888;
+  border-color: #888888;
 }
 
-
-.request-item
-{
-	border-color: #444444;
-    background-color: #444444;
+.request-item {
+  border-color: #444444;
+  background-color: #444444;
 }
 
-
-.request-item .response-container.response-container_pending
-{
-	border-color: #444444;
-	color: #444444;
+.request-item .response-container.response-container_pending {
+  border-color: #444444;
+  color: #444444;
 }
-

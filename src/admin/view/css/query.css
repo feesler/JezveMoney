@@ -1,28 +1,20 @@
-.query-error
-{
-	color: #dd2626;
+.query-error {
+  color: #dd2626;
 }
-
 
 .query-form,
-.query-history
-{
-	height: 100%;
+.query-history {
+  height: 100%;
 }
 
-
-.query-form
-{
-	width: 50%;
+.query-form {
+  width: 50%;
 }
 
-
-.query-form textarea
-{
-	max-width: 90%
+.query-form textarea {
+  max-width: 90%;
 }
 
-.query-history
-{
-	width: 45%;
+.query-history {
+  width: 45%;
 }

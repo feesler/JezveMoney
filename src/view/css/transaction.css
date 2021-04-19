@@ -1,130 +1,99 @@
-.tile_header
-{
-	flex-basis: 100%;
-	flex-grow: 2;
-	flex-shrink: 0;
-	height: 20px;
-	line-height: 20px;
-	overflow: hidden;
+.tile_header {
+  flex-basis: 100%;
+  flex-grow: 2;
+  flex-shrink: 0;
+  height: 20px;
+  line-height: 20px;
+  overflow: hidden;
 }
 
-
-.tile_header > label
-{
-	display: inline-flex;
-	font-size: 16px;
-	margin: 0 5px 0 0;
+.tile_header > label {
+  display: inline-flex;
+  font-size: 16px;
+  margin: 0 5px 0 0;
 }
 
-
-.tile_header > .close-btn
-{
-	display: inline-flex;
-    padding: 1px;
-    margin: 0;
-    background: none;
-    cursor: pointer;
-    line-height: 20px;
-    height: 20px;
+.tile_header > .close-btn {
+  display: inline-flex;
+  padding: 1px;
+  margin: 0;
+  background: none;
+  cursor: pointer;
+  line-height: 20px;
+  height: 20px;
 }
 
-
-.tile_header > .close-btn > svg
-{
-	height: 14px;
-	width: 14px;
-	fill: #888888;
+.tile_header > .close-btn > svg {
+  height: 14px;
+  width: 14px;
+  fill: #888888;
 }
 
-
-.tile_header > .close-btn:hover > svg
-{
-	fill: #000000;
+.tile_header > .close-btn:hover > svg {
+  fill: #000000;
 }
 
-
-.tile-base
-{
-	display: flex;
-	flex-flow: row wrap;
+.tile-base {
+  display: flex;
+  flex-flow: row wrap;
 }
 
-
-.tile_container
-{
-	width: 100px;
-	height: 100px;
-	padding: 8px 5px 8px 0px;
+.tile_container {
+  width: 100px;
+  height: 100px;
+  padding: 8px 5px 8px 0px;
 }
 
-
-.tile-info-block
-{
-	height: 100px;
-	min-width: 100px;
-	margin: 8px 20px 10px 0px;
-	overflow: hidden;
+.tile-info-block {
+  height: 100px;
+  min-width: 100px;
+  margin: 8px 20px 10px 0px;
+  overflow: hidden;
 }
 
-
-.tile-info-block > div
-{
-	margin: 0px 0px 10px 0px;
+.tile-info-block > div {
+  margin: 0px 0px 10px 0px;
 }
 
-
-.account-toggler
-{
-	padding: 8px 5px 8px 0px;
+.account-toggler {
+  padding: 8px 5px 8px 0px;
 }
 
-
-.account-container
-{
-	min-width: 100px;
-	max-width: 400px;
-	display: inline-flex;
-	flex-flow: column nowrap;
+.account-container {
+  min-width: 100px;
+  max-width: 400px;
+  display: inline-flex;
+  flex-flow: column nowrap;
 }
-
 
 /* Debt operation type selector */
-.debt-op-selector
-{
-	margin: 2px 0px 10px 0px;
-	display: inline-flex;
-	flex-flow: row nowrap;
-	align-items: center;
+.debt-op-selector {
+  margin: 2px 0px 10px 0px;
+  display: inline-flex;
+  flex-flow: row nowrap;
+  align-items: center;
 }
 
-
-.debt-op-selector > label
-{
-	width: auto;
-	height: auto;
-	display: inline-flex;
-	flex-flow: row nowrap;
-	align-items: center;
+.debt-op-selector > label {
+  width: auto;
+  height: auto;
+  display: inline-flex;
+  flex-flow: row nowrap;
+  align-items: center;
 }
 
-
-.debt-op-selector input
-{
-	line-height: 22px;
-	height: 22px;
+.debt-op-selector input {
+  line-height: 22px;
+  height: 22px;
 }
 
-
-.debt-op-selector span
-{
-	line-height: 22px;
-	margin: 0px 10px 0px 5px;
+.debt-op-selector span {
+  line-height: 22px;
+  margin: 0px 10px 0px 5px;
 }
-
 
 /* transactions page filer */
-.search-filter-item
-{
-	margin-right: 0;
-	margin-left: auto;
+.search-filter-item {
+  margin-right: 0;
+  margin-left: auto;
 }

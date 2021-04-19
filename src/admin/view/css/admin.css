@@ -1,158 +1,118 @@
-.admin-header
-{
-	box-sizing: border-box;
-	width: 100%;
-	position: absolute;
-	background-color: #404040;
-	color: #FFFFFF;
-	padding: 12px;
+.admin-header {
+  box-sizing: border-box;
+  width: 100%;
+  position: absolute;
+  background-color: #404040;
+  color: #ffffff;
+  padding: 12px;
 }
 
-
-.admin-header > .menu > span
-{
-	display: inline;
-	padding: 0px 10px 0px 0px;
-	white-space: nowrap;
+.admin-header > .menu > span {
+  display: inline;
+  padding: 0px 10px 0px 0px;
+  white-space: nowrap;
 }
 
-
-.admin_cont_wrap
-{
-	padding: 100px 12px 50px 12px;
+.admin_cont_wrap {
+  padding: 100px 12px 50px 12px;
 }
-
 
 /* Admin action button */
-.adm_act_btn
-{
-	padding: 3px 10px;
-	background-color: #44AAFF;
-	color: #FFFFFF;
+.adm_act_btn {
+  padding: 3px 10px;
+  background-color: #44aaff;
+  color: #ffffff;
 }
 
-
-.adm_act_btn:disabled
-{
-	background-color: #708290;
+.adm_act_btn:disabled {
+  background-color: #708290;
 }
-
 
 /* Admin table */
-.admin-tbl
-{
-	border-collapse: collapse;
-	border: 1px solid;
+.admin-tbl {
+  border-collapse: collapse;
+  border: 1px solid;
 }
-
 
 .admin-tbl th,
-.admin-tbl td
-{
-	border: 1px solid;
-	padding: 5px;
+.admin-tbl td {
+  border: 1px solid;
+  padding: 5px;
 }
 
-
-.admin-tbl tr
-{
-	cursor: pointer;
+.admin-tbl tr {
+  cursor: pointer;
 }
 
-
-.admin-tbl tr.act
-{
-	background-color: #0088DD;
-	color: #FFFFFF;
+.admin-tbl tr.act {
+  background-color: #0088dd;
+  color: #ffffff;
 }
-
 
 /* Common style for textarea */
-textarea
-{
-	border: 1px solid;
-	padding: 5px;
+textarea {
+  border: 1px solid;
+  padding: 5px;
 }
 
-
-.popup__form-controls
-{
-	margin-top: 25px;
+.popup__form-controls {
+  margin-top: 25px;
 }
-
 
 /* Select */
-.admin-select
-{
-    width: 100%;
-    border: 1px solid;
+.admin-select {
+  width: 100%;
+  border: 1px solid;
 }
-
 
 /* Checkbox wrapper */
-.checkbox-wrap
-{
-	height: 20px;
-	padding: 5px 0px;
+.checkbox-wrap {
+  height: 20px;
+  padding: 5px 0px;
 }
 
-
-.checkbox-wrap > input[type="checkbox"]
-{
-	display: inline;
-	height: 20px;
-	line-height: 20px;
+.checkbox-wrap > input[type="checkbox"] {
+  display: inline;
+  height: 20px;
+  line-height: 20px;
 }
 
-
-.checkbox-wrap > label
-{
-	display: inline;
-	padding: 0px 5px;
-	font-size: 16px;
-	height: 20px;
-	line-height: 20px;
+.checkbox-wrap > label {
+  display: inline;
+  padding: 0px 5px;
+  font-size: 16px;
+  height: 20px;
+  line-height: 20px;
 }
 
-
-.checkbox-wrap label > input
-{
-	margin-right: 8px;
+.checkbox-wrap label > input {
+  margin-right: 8px;
 }
 
-
-.checkbox-wrap.checkbox-wrap_inline
-{
-	display: inline-block;
-	margin-right: 10px;
+.checkbox-wrap.checkbox-wrap_inline {
+  display: inline-block;
+  margin-right: 10px;
 }
-
 
 /* Create/update item popup */
-.item-form .popup__content-box
-{
-    width: 100%;
-	max-width: 400px;
-	min-width: 200px;
+.item-form .popup__content-box {
+  width: 100%;
+  max-width: 400px;
+  min-width: 200px;
 }
 
-
-.item-form label
-{
-	display: block;
-	width: 100%;
-	font-size: 16px;
-	padding: 5px 0px;
+.item-form label {
+  display: block;
+  width: 100%;
+  font-size: 16px;
+  padding: 5px 0px;
 }
 
-
-.item-form .stretch-input
-{
-	border-width: 1px;
+.item-form .stretch-input {
+  border-width: 1px;
 }
 
 /* Custom popup styles */
-.popup__content
-{
-	background: none;
+.popup__content {
+  background: none;
 }

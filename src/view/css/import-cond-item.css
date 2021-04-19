@@ -1,66 +1,58 @@
 /* Import condition item */
-.cond-item
-{
-    display: flex;
-    flex-flow: row nowrap;
-    flex: 1 1 auto;
-    align-items: center;
-    font-size: 16px;
-    padding: 8px 4px 8px 8px;
-    border-width: 1px;
-    border-style: solid;
+.cond-item {
+  display: flex;
+  flex-flow: row nowrap;
+  flex: 1 1 auto;
+  align-items: center;
+  font-size: 16px;
+  padding: 8px 4px 8px 8px;
+  border-width: 1px;
+  border-style: solid;
 }
 
-.cond-item + .cond-item
-{
-    margin-top: 1px;
+.cond-item + .cond-item {
+  margin-top: 1px;
 }
 
 /* Condition property */
 .cond-item__property,
-.cond-item__value-property
-{
-    font-weight: 200;
-    white-space: nowrap;
-    margin-right: 12px;
+.cond-item__value-property {
+  font-weight: 200;
+  white-space: nowrap;
+  margin-right: 12px;
 }
 
 /* Condition operator, value */
-.cond-item__operator
-{
-    font-size: 16px;
-    font-weight: 200;
-    font-style: italic;
-    white-space: nowrap;
-    margin-right: 12px;
+.cond-item__operator {
+  font-size: 16px;
+  font-weight: 200;
+  font-style: italic;
+  white-space: nowrap;
+  margin-right: 12px;
 }
 
 /* Condition value */
-.cond-item__value
-{
-    flex-grow: 1;
-    font-weight: 400;
+.cond-item__value {
+  flex-grow: 1;
+  font-weight: 400;
 }
 
 .cond-item__value::before,
-.cond-item__value::after
-{
-    content: '`';
+.cond-item__value::after {
+  content: "`";
 }
 
 /* Controls */
-.cond-item__controls
-{
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: center;
+.cond-item__controls {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
 }
 
 /* Delete and toggle expand/collapse button */
 .cond-item .icon-btn,
 .cond-item .icon-btn:visited,
-.cond-item .icon-btn:active
-{
-    background: none;
-    cursor: pointer;
+.cond-item .icon-btn:active {
+  background: none;
+  cursor: pointer;
 }

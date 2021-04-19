@@ -1,9 +1,8 @@
 .main-container {
-    display: flex;
-    flex-flow: row wrap;
+  display: flex;
+  flex-flow: row wrap;
 }
 
-.list-view-container
-{
-    margin-right: 12px;
+.list-view-container {
+  margin-right: 12px;
 }

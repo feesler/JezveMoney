@@ -1,134 +1,105 @@
 /* icon link */
-.iconlink
-{
-	box-sizing: border-box;
-	display: inline-flex;
-	flex-flow: row nowrap;
-	overflow: hidden;
-	height: 32px;
+.iconlink {
+  box-sizing: border-box;
+  display: inline-flex;
+  flex-flow: row nowrap;
+  overflow: hidden;
+  height: 32px;
 }
 
-
-.iconlink .iconlink__icon
-{
-	box-sizing: border-box;
-	width: 32px;
-	height: 32px;
-	border: 2px solid #000000;
-	border-radius: 50%;
-	padding: 2px;
-	overflow: hidden;
+.iconlink .iconlink__icon {
+  box-sizing: border-box;
+  width: 32px;
+  height: 32px;
+  border: 2px solid #000000;
+  border-radius: 50%;
+  padding: 2px;
+  overflow: hidden;
 }
 
-
-.iconlink:hover .iconlink__icon
-{
-	background-color: #000000;
+.iconlink:hover .iconlink__icon {
+  background-color: #000000;
 }
 
-
-.iconlink:hover .iconlink__icon svg *
-{
-	fill: #FFFFFF;
+.iconlink:hover .iconlink__icon svg * {
+  fill: #ffffff;
 }
 
-
-.iconlink .iconlink__icon.sidebar-icon
-{
-	border-color: #FFFFFF;
+.iconlink .iconlink__icon.sidebar-icon {
+  border-color: #ffffff;
 }
 
-
-.iconlink:hover .iconlink__icon.sidebar-icon
-{
-	background-color: #FFFFFF;
+.iconlink:hover .iconlink__icon.sidebar-icon {
+  background-color: #ffffff;
 }
 
-
-.iconlink .iconlink__icon.sidebar-icon svg *
-{
-	fill: #FFFFFF;
+.iconlink .iconlink__icon.sidebar-icon svg * {
+  fill: #ffffff;
 }
 
-
-.iconlink:hover .iconlink__icon.sidebar-icon svg *
-{
-	fill: #44AAFF;
+.iconlink:hover .iconlink__icon.sidebar-icon svg * {
+  fill: #44aaff;
 }
 
-
-.iconlink .iconlink__content
-{
-	height: 32px;
-	color: #000000;
-	display: inline-flex;
-	flex-flow: column nowrap;
-	align-items: flex-start;
-	vertical-align: middle;
-	padding: 0px 0px 0px 5px;
-	white-space: nowrap;
-	line-height: 32px;
-	font-size: 16px;
-	font-weight: normal;
-	text-decoration: none;
-	text-transform: none;
+.iconlink .iconlink__content {
+  height: 32px;
+  color: #000000;
+  display: inline-flex;
+  flex-flow: column nowrap;
+  align-items: flex-start;
+  vertical-align: middle;
+  padding: 0px 0px 0px 5px;
+  white-space: nowrap;
+  line-height: 32px;
+  font-size: 16px;
+  font-weight: normal;
+  text-decoration: none;
+  text-transform: none;
 }
 
-
-.iconlink .iconlink__title
-{
-	height: 20px;
-	line-height: 20px;
-	white-space: nowrap;
-	font-size: 16px;
-	font-weight: normal;
-	text-decoration: none;
-	text-transform: none;
+.iconlink .iconlink__title {
+  height: 20px;
+  line-height: 20px;
+  white-space: nowrap;
+  font-size: 16px;
+  font-weight: normal;
+  text-decoration: none;
+  text-transform: none;
 }
 
-
-.iconlink .iconlink__subtitle
-{
-	height: 12px;
-	line-height: 12px;
-	clear: both;
-	color: #20A0FF;
-	font-size: 10px;
-	font-weight: bold;
-	white-space: nowrap;
+.iconlink .iconlink__subtitle {
+  height: 12px;
+  line-height: 12px;
+  clear: both;
+  color: #20a0ff;
+  font-size: 10px;
+  font-weight: bold;
+  white-space: nowrap;
 }
 
-
-.iconlink > *:hover > span
-{
-	color: #000000;
+.iconlink > *:hover > span {
+  color: #000000;
 }
 
-
-.iconlink > a
-{
-	height: 32px;
-	display: inline-flex;
-	flex-flow: row nowrap;
-	vertical-align: middle;
-	text-decoration: none;
+.iconlink > a {
+  height: 32px;
+  display: inline-flex;
+  flex-flow: row nowrap;
+  vertical-align: middle;
+  text-decoration: none;
 }
 
-
-.iconlink > button
-{
-	display: inline-flex;
-	flex-flow: row nowrap;
-	height: 32px;
-	border: 0 none;
-	cursor: pointer;
-	padding: 0;
-	background: none;
+.iconlink > button {
+  display: inline-flex;
+  flex-flow: row nowrap;
+  height: 32px;
+  border: 0 none;
+  cursor: pointer;
+  padding: 0;
+  background: none;
 }
 
-
-.iconlink[disabled]
-{
-    pointer-events: none;
-    opacity: 0.3;
+.iconlink[disabled] {
+  pointer-events: none;
+  opacity: 0.3;
 }

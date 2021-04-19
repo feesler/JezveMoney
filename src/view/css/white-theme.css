@@ -1,556 +1,424 @@
 /* Page */
 body,
-.page_wrapper
-{
-    color: #000000;
-    background-color: #FFFFFF;
+.page_wrapper {
+  color: #000000;
+  background-color: #ffffff;
 }
-
 
 /* Main content */
-.container
-{
-    background-color: #FFFFFF;
+.container {
+  background-color: #ffffff;
 }
-
 
 /* Input controls color */
 input[type="text"],
 input[type="password"],
-select
-{
-    border-color: #000000;
-    background-color: #FFFFFF;
-    color: #000000;
+select {
+  border-color: #000000;
+  background-color: #ffffff;
+  color: #000000;
 }
-
 
 /* Login/Register view */
 .login-layer,
-.register-layer
-{
-    background-color: #FFFFFF;
+.register-layer {
+  background-color: #ffffff;
 }
-
 
 .login-layer h1,
-.register-layer h1
-{
-    color: #000000;
+.register-layer h1 {
+  color: #000000;
 }
 
-
-.heading
-{
-    color: #000000;
+.heading {
+  color: #000000;
 }
 
-
-.iconlink .iconlink__icon
-{
-    border-color: #000000;
+.iconlink .iconlink__icon {
+  border-color: #000000;
 }
 
-
-.iconlink:hover .iconlink__icon
-{
-    background-color: #000000;
+.iconlink:hover .iconlink__icon {
+  background-color: #000000;
 }
 
-
-.iconlink .iconlink__icon svg *
-{
-    fill: #000000;
+.iconlink .iconlink__icon svg * {
+  fill: #000000;
 }
 
-
-.iconlink:hover .iconlink__icon svg *
-{
-    fill: #FFFFFF;
+.iconlink:hover .iconlink__icon svg * {
+  fill: #ffffff;
 }
 
-
-.iconlink span.iconlink__content
-{
-    color: #000000;
+.iconlink span.iconlink__content {
+  color: #000000;
 }
 
-
-.iconlink > *:hover > span
-{
-    color: #000000;
+.iconlink > *:hover > span {
+  color: #000000;
 }
 
 /* No data message for lists & etc. */
-.nodata-message
-{
-    background-color: #FFFFFF;
-    color: #404040;
+.nodata-message {
+  background-color: #ffffff;
+  color: #404040;
 }
 
 /* Main view widgets */
 .widget_title,
 .widget_title > a,
-.widget_title > a:hover
-{
-    color: #000000;
+.widget_title > a:hover {
+  color: #000000;
 }
 
-
-.widget_title .glyph svg *
-{
-    fill: #000000;
+.widget_title .glyph svg * {
+  fill: #000000;
 }
-
 
 /* Transaction type menu */
-.trtype-menu__item_selected
-{
-    color: #000000;
+.trtype-menu__item_selected {
+  color: #000000;
 }
-
 
 /* Tile info block */
-.tile-info-block > div > span
-{
-    color: #000000;
+.tile-info-block > div > span {
+  color: #000000;
 }
 
-
-.stretch-input
-{
-    border-color: #000000;
-    background-color: #FFFFFF;
+.stretch-input {
+  border-color: #000000;
+  background-color: #ffffff;
 }
 
-
-.input-group__btn_inactive
-{
-    color: #000000;
-    background-color: #FFFFFF;
+.input-group__btn_inactive {
+  color: #000000;
+  background-color: #ffffff;
 }
-
 
 /* DropDown  */
 .dd__combo,
 .dd__input,
 .dd__single-selection,
-.dd__toggle-btn
-{
-    background-color: #FFFFFF;
-    color: #000000;
+.dd__toggle-btn {
+  background-color: #ffffff;
+  color: #000000;
 }
 
-
-.dd__combo
-{
-    border-color: #000000;
+.dd__combo {
+  border-color: #000000;
 }
-
 
 .dd__container_active .dd__combo,
 .dd__container_active .dd__input,
 .dd__container_active .dd__single-selection,
-.dd__container_active .dd__toggle-btn
-{
-    color: #202020;
+.dd__container_active .dd__toggle-btn {
+  color: #202020;
 }
 
-
-.dd__list
-{
-    background-color: #FFFFFF;
-    border-right-color: #000000;
-    border-left-color: #000000;
+.dd__list {
+  background-color: #ffffff;
+  border-right-color: #000000;
+  border-left-color: #000000;
 }
 
-
-.dd__list_drop-down
-{
-    border-bottom-color: #000000;
+.dd__list_drop-down {
+  border-bottom-color: #000000;
 }
 
-
-.dd__list_drop-up
-{
-    border-top-color: #000000;
+.dd__list_drop-up {
+  border-top-color: #000000;
 }
 
-
-.dd__list-item
-{
-    color: #000000;
-    background-color: #FFFFFF;
+.dd__list-item {
+  color: #000000;
+  background-color: #ffffff;
 }
 
-
-.dd__list-item > svg
-{
-    fill: #000000;
+.dd__list-item > svg {
+  fill: #000000;
 }
 
-
-.dd__container_enabled .dd__toggle-btn:hover path
-{
-    fill: #000000;
+.dd__container_enabled .dd__toggle-btn:hover path {
+  fill: #000000;
 }
 
+@media (max-width: 767px) {
+  .dd__container.dd__fullscreen.dd__open .dd__background {
+    background-color: #ffffff;
+  }
 
-
-@media (max-width: 767px)
-{
-
-.dd__container.dd__fullscreen.dd__open .dd__background
-{
-    background-color: #FFFFFF;
-}
-
-
-.dd__container.dd__fullscreen.dd__open .dd__list
-{
+  .dd__container.dd__fullscreen.dd__open .dd__list {
     border-color: #000000;
-}
-
+  }
 }
 
 /* Date picker */
-.dp__wrapper
-{
-    background-color: #FFFFFF;
-    color: #000000;
-    border-color: #000000;
+.dp__wrapper {
+  background-color: #ffffff;
+  color: #000000;
+  border-color: #000000;
 }
 
-
-.dp__cell
-{
-    color: #000000;
-    border-color: #FFFFFF;
-    background-color: #FFFFFF;
+.dp__cell {
+  color: #000000;
+  border-color: #ffffff;
+  background-color: #ffffff;
 }
 
-
-.dp__other-month-cell
-{
-    color: #B0B0B0;
+.dp__other-month-cell {
+  color: #b0b0b0;
 }
-
 
 .dp__today-cell,
-.dp__cell_hl.dp__today-cell
-{
-    border: 1px dashed #00bef3;
+.dp__cell_hl.dp__today-cell {
+  border: 1px dashed #00bef3;
 }
 
-
-.dp__cell_act
-{
-    border-color: #20D0FF;
+.dp__cell_act {
+  border-color: #20d0ff;
 }
 
-
-.dp__cell_hl
-{
-    background-color: #005688;
-    border-color: #005688;
-    color: #FFFFFF;
+.dp__cell_hl {
+  background-color: #005688;
+  border-color: #005688;
+  color: #ffffff;
 }
 
 .dp__year-range-view__cell:hover,
 .dp__year-view__cell:hover,
-.dp__day-cell:hover
-{
-    background-color: #80D0FF;
-    color: #FFFFFF;
+.dp__day-cell:hover {
+  background-color: #80d0ff;
+  color: #ffffff;
 }
-
 
 /* Transaction list */
-.trans-list > span
-{
-    color: #000000;
+.trans-list > span {
+  color: #000000;
 }
-
 
 /* Transaction list mode selector */
-.mode-selector > b > span
-{
-    color: #000000;
+.mode-selector > b > span {
+  color: #000000;
 }
 
-
-.paginator > span
-{
-    color: #000000;
+.paginator > span {
+  color: #000000;
 }
-
 
 /* Transaction list item */
 .trans-list_details td > div,
-.trans-list_details tr.trans-list__item_selected > td > div
-{
-    background-color: #F0F0F0;
+.trans-list_details tr.trans-list__item_selected > td > div {
+  background-color: #f0f0f0;
 }
 
-
-.trans-list_details .trans-list__item-comment
-{
-    color: #808080;
+.trans-list_details .trans-list__item-comment {
+  color: #808080;
 }
-
 
 .trans-list__item,
-div.trans-list__item_selected
-{
-    background-color: #F0F0F0;
+div.trans-list__item_selected {
+  background-color: #f0f0f0;
 }
-
 
 .tritem_balance,
 .trans-list__item-title,
-.trans-list__item-content
-{
-    color: #000000;
+.trans-list__item-content {
+  color: #000000;
 }
 
-
-.trans-list__item-details
-{
-    color: #808080;
+.trans-list__item-details {
+  color: #808080;
 }
 
-
-.trans-list__item-comment
-{
-    border-left-color: #808080;
+.trans-list__item-comment {
+  border-left-color: #808080;
 }
-
 
 /* Bar chart */
-.charts svg text tspan
-{
-    fill: #000000;
+.charts svg text tspan {
+  fill: #000000;
 }
-
 
 /* Profile view */
-.profile_block
-{
-    color: #000000;
+.profile_block {
+  color: #000000;
 }
-
 
 /* Popup */
-.popup__content .popup__content-box
-{
-    color: #000000;
-    background-color: #FFFFFF;
+.popup__content .popup__content-box {
+  color: #000000;
+  background-color: #ffffff;
 }
-
 
 .popup__title,
-.popup__message
-{
-    color: #000000;
+.popup__message {
+  color: #000000;
 }
-
 
 /* Tiles list */
 .tiles > span,
-.info-tiles > span
-{
-    color: #000000;
+.info-tiles > span {
+  color: #000000;
 }
-
 
 /* Import view */
-.import-item
-{
-    background-color: #DDDDDD;
+.import-item {
+  background-color: #dddddd;
 }
 
-.import-item .extended-content
-{
-    color: #202020;
-    border-color: #B0B0B0;
-    background-color: #CCCCCC;
+.import-item .extended-content {
+  color: #202020;
+  border-color: #b0b0b0;
+  background-color: #cccccc;
 }
 
-.import-item.import-item_disabled .extended-content
-{
-    color: #A0A0A0;
-    border-color: #D0D0D0;
-    background-color: #E0E0E0;
+.import-item.import-item_disabled .extended-content {
+  color: #a0a0a0;
+  border-color: #d0d0d0;
+  background-color: #e0e0e0;
 }
 
 .import-item select,
-.import-item input[type="text"]
-{
-    border-color: #000000;
+.import-item input[type="text"] {
+  border-color: #000000;
 }
 
 .import-item select[disabled],
-.import-item input[disabled]
-{
-    color: #DDDDDD;
-    border-color: #DDDDDD;
-    background-color: #EEEEEE;
+.import-item input[disabled] {
+  color: #dddddd;
+  border-color: #dddddd;
+  background-color: #eeeeee;
 }
 
-.import-item.import-item_disabled
-{
-    background-color: #E8E8E8;
-    color: #808080;
-    border-color: #E8E8E8;
+.import-item.import-item_disabled {
+  background-color: #e8e8e8;
+  color: #808080;
+  border-color: #e8e8e8;
 }
 
 .import-item_disabled select,
 .import-item_disabled select[disabled],
 .import-item_disabled input[type="text"],
-.import-item_disabled input[disabled]
-{
-    color: #DDDDDD;
-    border-color: #EEEEEE;
-    background-color: #EEEEEE;
+.import-item_disabled input[disabled] {
+  color: #dddddd;
+  border-color: #eeeeee;
+  background-color: #eeeeee;
 }
 
-.import-item_disabled input::placeholder
-{
-    color: #DDDDDD;
+.import-item_disabled input::placeholder {
+  color: #dddddd;
 }
 
 .import-item .btn,
 .import-item .btn:visited,
-.import-item .btn:active
-{
-    color: #202020;
+.import-item .btn:active {
+  color: #202020;
 }
 
-.import-item .btn:hover
-{
-    background-color: #808080;
+.import-item .btn:hover {
+  background-color: #808080;
 }
 
-.import-item .btn svg
-{
-    fill: #A7A7A7;
+.import-item .btn svg {
+  fill: #a7a7a7;
 }
 
-.import-item .btn:hover svg
-{
-    fill: #FFFFFF;
+.import-item .btn:hover svg {
+  fill: #ffffff;
 }
 
 /* Placeholder */
-.import-item.import-item__placeholder
-{
-    border-color:#888888;
-    background-color: #FFFFFF;
+.import-item.import-item__placeholder {
+  border-color: #888888;
+  background-color: #ffffff;
 }
 
-.import-controls
-{
-    color: #FFFFFF;
+.import-controls {
+  color: #ffffff;
 }
 
 /* Upload dialog */
-.upload-form__browser.drag-over
-{
-    outline-color: #202020;
+.upload-form__browser.drag-over {
+  outline-color: #202020;
 }
 
 /* Import rules dialog */
-.rules-dialog__loading
-{
-    color: #000000;
-    background-color: #D0D0D0;
+.rules-dialog__loading {
+  color: #000000;
+  background-color: #d0d0d0;
 }
 
 /* Import rule */
-.rule-item__ext
-{
-    background-color: #DDDDDD;
+.rule-item__ext {
+  background-color: #dddddd;
 }
 
 .rule-item__main,
-.rule-form__collapse-header
-{
-    background-color: #DDDDDD;
-    border-color: #DDDDDD;
+.rule-form__collapse-header {
+  background-color: #dddddd;
+  border-color: #dddddd;
 }
 
 .rule-item__main:hover,
-.rule-form__collapse-header:hover
-{
-    background-color: #CCCCCC;
-    border-color: #808080;
+.rule-form__collapse-header:hover {
+  background-color: #cccccc;
+  border-color: #808080;
 }
 
-.rule-item__operator
-{
-    color: #808080;
+.rule-item__operator {
+  color: #808080;
 }
 
 .rule-item .icon-btn:hover,
-.rule-form .icon-btn:hover
-{
-    background-color: #CCCCCC;
+.rule-form .icon-btn:hover {
+  background-color: #cccccc;
 }
 
 .rule-item .icon-btn svg,
-.rule-form .icon-btn svg
-{
-    fill: #B0B0B0;
+.rule-form .icon-btn svg {
+  fill: #b0b0b0;
 }
 
 .rule-item .icon-btn:hover svg,
-.rule-form .icon-btn:hover svg
-{
-    fill: #FFFFFF;
+.rule-form .icon-btn:hover svg {
+  fill: #ffffff;
 }
 
-.rule-item__info
-{
-    color: #808080;
+.rule-item__info {
+  color: #808080;
 }
 
 .rule-form__collapse-content,
-.rule-item .rule-item__ext
-{
-    color: #202020;
-    border-color: #FFFFFF;
-    background-color: #E8E8E8;
+.rule-item .rule-item__ext {
+  color: #202020;
+  border-color: #ffffff;
+  background-color: #e8e8e8;
 }
 
 /* Condition item */
 .cond-item,
-.cond-form
-{
-    background-color: #CCCCCC;
-    border-color: #CCCCCC;
+.cond-form {
+  background-color: #cccccc;
+  border-color: #cccccc;
 }
 
-.cond-item__operator
-{
-    color: #808080;
+.cond-item__operator {
+  color: #808080;
 }
 
 /* Action item */
 .action-item,
-.action-form
-{
-    background-color: #CCCCCC;
+.action-form {
+  background-color: #cccccc;
 }
 
 /* Statistics view */
-.stat-histogram > span
-{
-    color: #000000;
+.stat-histogram > span {
+  color: #000000;
 }
 
-.chart_popup
-{
-    border-color: #000000;
-    background-color: #FFFFFF;
-    color: #000000;
+.chart_popup {
+  border-color: #000000;
+  background-color: #ffffff;
+  color: #000000;
 }
