@@ -227,14 +227,22 @@ class DBVersion
             throw new \Error("Invalid DB client");
         }
 
-        $res = $this->dbClient->addColumns("import_tpl", ["user_id" => "INT(11) NOT NULL"]);
-        if (!$res) {
-            throw new \Error("Fail to update 'import_tpl' table");
+        $tableName = "import_tpl";
+        $columns = $this->dbClient->getColumns($tableName);
+        if (!$columns) {
+            throw new \Error("Fail to obtian columns of '$tableName' table");
         }
 
-        $res = $this->dbClient->addKeys("import_tpl", ["user_id" => "user_id"]);
-        if (!$res) {
-            throw new \Error("Fail to update 'import_tpl' table");
+        if (!isset($columns["user_id"])) {
+            $res = $this->dbClient->addColumns($tableName, ["user_id" => "INT(11) NOT NULL"]);
+            if (!$res) {
+                throw new \Error("Fail to update '$tableName' table");
+            }
+
+            $res = $this->dbClient->addKeys($tableName, ["user_id" => "user_id"]);
+            if (!$res) {
+                throw new \Error("Fail to update '$tableName' table");
+            }
         }
 
         return 7;
@@ -247,15 +255,32 @@ class DBVersion
             throw new \Error("Invalid DB client");
         }
 
-        if ($this->dbClient->isTableExist("import_rule")) {
-            $res = $this->dbClient->dropColumns("import_rule", [
+        $tableName = "import_rule";
+        if ($this->dbClient->isTableExist($tableName)) {
+            $columnsToDrop = [
                 "parent_id",
                 "field_id",
                 "operator",
                 "value"
-            ]);
-            if (!$res) {
-                throw new \Error("Fail to update 'import_rule' table");
+            ];
+
+            $columns = $this->dbClient->getColumns($tableName);
+            if (!$columns) {
+                throw new \Error("Fail to obtian columns of '$tableName' table");
+            }
+
+            $toDrop = [];
+            foreach ($columnsToDrop as $colName) {
+                if (isset($columns[$colName])) {
+                    $toDrop[] = $colName;
+                }
+            }
+
+            if (count($toDrop) > 0) {
+                $res = $this->dbClient->dropColumns($tableName, $toDrop);
+                if (!$res) {
+                    throw new \Error("Fail to update '$tableName' table");
+                }
             }
         } else {
             $this->createImportRuleTable();
