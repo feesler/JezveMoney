@@ -542,14 +542,17 @@ select
 /* Main view */
 .main-view
 {
+    display: -ms-flexbox;
 	display: inline-flex;
 	flex-flow: row wrap;
+    width: 100%;
 }
 
 
 /* Main page widgets */
 .widget
 {
+    display: -ms-flexbox;
 	display: inline-flex;
 	flex-flow: column nowrap;
 	min-width: 200px;
@@ -679,7 +682,6 @@ select
 .btn,
 .btn:visited
 {
-	font-family: "SF Pro Display", "SF Pro Icons", "Segoe UI", "Lucida Sans Unicode", "Geneva", "Helvetica Neue", "Arial", "Nimbus Sans L", sans-serif;
 	font-weight: normal;
 	font-size: 16px;
 	display: inline-block;
