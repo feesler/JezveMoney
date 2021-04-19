@@ -584,6 +584,39 @@ class MySqlDB
     }
 
 
+    public function getColumns($table)
+    {
+        if (!$table || $table == "") {
+            return false;
+        }
+
+        $tblName = $this->escape($table);
+        if (!$tblName) {
+            return false;
+        }
+
+        $query = "SHOW COLUMNS FROM `" . $tblName . "`;";
+        $result = $this->rawQ($query);
+        $rows = mysqli_num_rows($result);
+
+        $columns = [];
+        if ($result && !$this->errno && $rows > 0) {
+            while ($row = mysqli_fetch_array($result)) {
+                $columnName = $row["Field"];
+                $columns[$columnName] = [
+                    "Type" => $row["Type"],
+                    "Null" => $row["Null"],
+                    "Key" => $row["Key"],
+                    "Default" => $row["Default"],
+                    "Extra" => $row["Extra"]
+                ];
+            }
+        }
+
+        return $columns;
+    }
+
+
     // Add columns to specified table
     // $columns expected to be an array as follows:
     //  ["column_1" => "INT NOT NULL", "column_2" => "VARCHAR(255) NULL"]
