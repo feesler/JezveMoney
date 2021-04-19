@@ -125,6 +125,11 @@ ImportConditionForm.prototype.init = function () {
 
 /** Create property field */
 ImportConditionForm.prototype.createPropertyField = function () {
+    var filedTypeItems = this.fieldTypes.filter(function (fieldType) {
+        return !ImportCondition.isTemplateField(fieldType.id);
+    }).map(function (fieldType) {
+        return { id: fieldType.id, title: fieldType.title };
+    });
     var selectElem = ce('select');
     this.propertyField = this.createField('Property', selectElem);
 
@@ -134,16 +139,8 @@ ImportConditionForm.prototype.createPropertyField = function () {
         editable: false
     });
 
-    this.fieldTypes.forEach(function (fieldType) {
-        if (ImportCondition.isTemplateField(fieldType.id)) {
-            return;
-        }
-
-        this.propertyDropDown.addItem({
-            id: fieldType.id,
-            title: fieldType.title
-        });
-    }, this);
+    this.propertyDropDown.append(filedTypeItems);
+    this.propertyDropDown.selectItem(filedTypeItems[0].id);
 };
 
 /** Create operator field */
@@ -160,6 +157,7 @@ ImportConditionForm.prototype.createOperatorField = function () {
         editable: false
     });
     this.operatorDropDown.append(operatorItems);
+    this.operatorDropDown.selectItem(operatorItems[0].id);
 };
 
 /** Create account field */
@@ -176,6 +174,7 @@ ImportConditionForm.prototype.createAccountField = function () {
         editable: false
     });
     this.accountDropDown.append(accountItems);
+    this.accountDropDown.selectItem(accountItems[0].id);
 };
 
 /** Create template field */
@@ -192,6 +191,9 @@ ImportConditionForm.prototype.createTemplateField = function () {
         editable: false
     });
     this.templateDropDown.append(templateItems);
+    if (templateItems.length > 0) {
+        this.templateDropDown.selectItem(templateItems[0].id);
+    }
 };
 
 /** Create currency field */
@@ -208,6 +210,7 @@ ImportConditionForm.prototype.createCurrencyField = function () {
         editable: false
     });
     this.currencyDropDown.append(currencyItems);
+    this.currencyDropDown.selectItem(currencyItems[0].id);
 };
 
 /** Create value property field */
@@ -226,6 +229,7 @@ ImportConditionForm.prototype.createValuePropField = function () {
         editable: false
     });
     this.valuePropDropDown.append(items);
+    this.valuePropDropDown.selectItem(items[0].id);
 };
 
 /** Verify correctness of operator */

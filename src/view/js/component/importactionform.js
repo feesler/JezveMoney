@@ -151,6 +151,7 @@ ImportActionForm.prototype.createTransTypeField = function () {
         editable: false
     });
     this.trTypeDropDown.append(items);
+    this.trTypeDropDown.selectItem(items[0].id);
 };
 
 /** Create account field */
@@ -168,6 +169,7 @@ ImportActionForm.prototype.createAccountField = function () {
         editable: false
     });
     this.accountDropDown.append(items);
+    this.accountDropDown.selectItem(items[0].id);
 };
 
 /** Create person field */
@@ -185,6 +187,7 @@ ImportActionForm.prototype.createPersonField = function () {
         editable: false
     });
     this.personDropDown.append(items);
+    this.personDropDown.selectItem(items[0].id);
 };
 
 /** Set data for component */
