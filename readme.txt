@@ -29,6 +29,11 @@
 Ex.: $osPanelPath = "c:\ospanel"
 $phpPath = "$osPanelPath\modules\php\PHP_7.4"
 
+- HTTPS setup with OpenServer
+1. Generate certificates
+2. Run PowerShell as Administrator and open generated DOMAIN-rootCA.crt
+3. Install Certificate > Current User > Trusted Root Certification Authorities > Local Computer
+
 
 - PowerShell browserify access rights issue:
 
