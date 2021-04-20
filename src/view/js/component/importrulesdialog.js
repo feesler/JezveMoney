@@ -86,7 +86,8 @@ ImportRulesDialog.prototype.hide = function () {
 ImportRulesDialog.prototype.reset = function () {
     this.state = {
         id: this.LIST_STATE,
-        listLoading: false
+        listLoading: false,
+        renderTime: Date.now()
     };
 };
 
@@ -99,6 +100,7 @@ ImportRulesDialog.prototype.startLoading = function () {
 /** Remove loading state and render component */
 ImportRulesDialog.prototype.stopLoading = function () {
     this.state.listLoading = false;
+    this.state.renderTime = Date.now();
     this.render(this.state);
 };
 
@@ -270,7 +272,7 @@ ImportRulesDialog.prototype.onRulesListResult = function (response) {
 };
 
 /** Render list state of component */
-ImportRulesDialog.prototype.renderList = function () {
+ImportRulesDialog.prototype.renderList = function (state) {
     var ruleItems = this.model.rules.map(function (rule) {
         return new ImportRuleItem({
             parent: this.parent,
@@ -284,6 +286,7 @@ ImportRulesDialog.prototype.renderList = function () {
         });
     }, this);
 
+    this.listContainer.dataset.time = state.renderTime;
     removeChilds(this.listContainer);
     if (!ruleItems.length) {
         this.noDataMsg = ce('span', { className: 'nodata-message', textContent: 'No rules' });
@@ -335,7 +338,7 @@ ImportRulesDialog.prototype.render = function (state) {
     if (state.id === this.LIST_STATE) {
         this.titleElem.textContent = 'Import rules';
 
-        this.renderList();
+        this.renderList(state);
     } else if (state.id === this.CREATE_STATE || state.id === this.UPDATE_STATE) {
         this.titleElem.textContent = (state.id === this.CREATE_STATE)
             ? 'Create import rule'

@@ -95,6 +95,12 @@ ImportView.prototype.onStart = function () {
     });
 
     this.updMainAccObj();
+    this.setRenderTime();
+};
+
+/** Update render time data attribute of list container */
+ImportView.prototype.setRenderTime = function () {
+    this.rowsContainer.dataset.time = Date.now();
 };
 
 /** Import rules 'update' event handler */
@@ -263,6 +269,7 @@ ImportView.prototype.onTrCacheResult = function (response) {
 
     show(this.loadingInd, false);
     this.updateItemsCount();
+    this.setRenderTime();
 };
 
 /**
@@ -439,6 +446,8 @@ ImportView.prototype.onMainAccChange = function () {
 
     if (!this.uploadDialog || !this.uploadDialog.isVisible()) {
         this.requestSimilar();
+    } else {
+        this.setRenderTime();
     }
 };
 

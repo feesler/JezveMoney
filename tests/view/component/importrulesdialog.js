@@ -36,6 +36,7 @@ export class ImportRulesDialog extends Component {
             throw new Error('Failed to initialize import rules dialog');
         }
 
+        this.rulesList.renderTime = await this.prop(this.rulesList.elem, 'dataset.time');
         this.header.title = await this.prop(this.header.labelElem, 'textContent');
 
         const listItems = await this.queryAll(this.rulesList.elem, '.rule-item');
@@ -63,6 +64,7 @@ export class ImportRulesDialog extends Component {
         const res = {};
 
         res.loading = cont.loadingIndicator.visible;
+        res.renderTime = cont.rulesList.renderTime;
         res.rules = cont.items.map((item) => copyObject(item.model));
 
         const isListState = cont.rulesList.visible && cont.header.title === 'Import rules';
@@ -224,11 +226,17 @@ export class ImportRulesDialog extends Component {
             throw new Error('OK button not found');
         }
 
+        const prevTime = this.model.renderTime;
+
         await this.click(this.delete_warning.okBtn);
         await this.wait(this.ruleDeletePopupId, { hidden: true });
         await this.waitForFunction(async () => {
             await this.parse();
-            return !this.model.loading && this.isListState();
+            return (
+                !this.model.loading
+                && this.isListState()
+                && prevTime !== this.model.renderTime
+            );
         });
 
         return this.checkState();
@@ -254,10 +262,16 @@ export class ImportRulesDialog extends Component {
         }
         this.expectedState = this.getExpectedState(this.model);
 
+        const prevTime = this.model.renderTime;
+
         await this.ruleForm.submit();
         await this.waitForFunction(async () => {
             await this.parse();
-            return !valid || (!this.model.loading && this.isListState());
+            return !valid || (
+                !this.model.loading
+                && this.model.renderTime !== prevTime
+                && this.isListState()
+            );
         });
 
         return this.checkState();

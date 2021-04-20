@@ -56,6 +56,8 @@ export class ImportView extends TestView {
         res.rulesCount.value = await this.prop(res.rulesCount.elem, 'textContent');
 
         const rowsContainer = await this.query('#rowsContainer');
+        res.renderTime = await this.prop(rowsContainer, 'dataset.time');
+
         const mainAccountId = res.mainAccountSelect.value;
         res.itemsList = await ImportList.create(this, rowsContainer, mainAccountId);
         if (!res.itemsList) {
@@ -92,6 +94,7 @@ export class ImportView extends TestView {
         res.mainAccount = parseInt(cont.mainAccountSelect.value, 10);
         res.rulesEnabled = cont.rulesCheck.checked;
         res.rulesCount = parseInt(cont.rulesCount.value, 10);
+        res.renderTime = cont.renderTime;
         res.items = cont.itemsList.getItems();
         res.invalidated = cont.itemsList.invalidated;
 
@@ -271,11 +274,16 @@ export class ImportView extends TestView {
     async submitUploaded() {
         this.checkUploadState();
 
+        const prevTime = this.model.renderTime;
+
         await this.performAction(() => this.content.uploadDialog.submit());
         await this.performAction(() => this.wait(this.uploadPopupId, { hidden: true }));
         await this.waitForFunction(async () => {
             await this.parse();
-            return !this.content.itemsList.isLoading;
+            return (
+                !this.content.itemsList.isLoading
+                && prevTime !== this.content.renderTime
+            );
         });
     }
 
@@ -296,10 +304,15 @@ export class ImportView extends TestView {
     async selectMainAccount(val) {
         this.checkMainState();
 
+        const prevTime = this.model.renderTime;
+
         await this.performAction(() => this.content.mainAccountSelect.selectItem(val));
         await this.waitForFunction(async () => {
             await this.parse();
-            return !this.content.itemsList.isLoading;
+            return (
+                !this.content.itemsList.isLoading
+                && prevTime !== this.content.renderTime
+            );
         });
     }
 
