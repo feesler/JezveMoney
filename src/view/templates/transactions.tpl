@@ -33,30 +33,28 @@
 <?php	}			?>
                         </div>
 
-                        <div class="std_margin filters-container">
-                            <div class="filter-item">
-                                <div>
-                                    <select id="acc_id" name="acc_id" multiple>
-                                        <option value="0">All</option>
+                        <div class="filters-container">
+                            <div class="filter-item std_margin">
+                                <select id="acc_id" name="acc_id" multiple>
+                                    <option value="0">All</option>
 <?php	foreach($accArr as $accData) {
             if (in_array($accData->id, $accFilter)) {		?>
-                                        <option value="<?=e($accData->id)?>" selected><?=e($accData->name)?></option>
+                                    <option value="<?=e($accData->id)?>" selected><?=e($accData->name)?></option>
 <?php		} else {		?>
-                                        <option value="<?=e($accData->id)?>"><?=e($accData->name)?></option>
+                                    <option value="<?=e($accData->id)?>"><?=e($accData->name)?></option>
 <?php		}
         }
         foreach($hiddenAccArr as $accData) {
             if (in_array($accData->id, $accFilter)) {		?>
-                                        <option value="<?=e($accData->id)?>" selected><?=e($accData->name)?></option>
+                                    <option value="<?=e($accData->id)?>" selected><?=e($accData->name)?></option>
 <?php		} else {		?>
-                                        <option value="<?=e($accData->id)?>"><?=e($accData->name)?></option>
+                                    <option value="<?=e($accData->id)?>"><?=e($accData->name)?></option>
 <?php		}
         }	?>
-                                    </select>
-                                </div>
+                                </select>
                             </div>
 
-                            <div class="filter-item">
+                            <div class="filter-item std_margin">
 <?php if (is_empty($dateFmt)) {		?>
                                 <div id="calendar_btn" class="iconlink">
                                     <button type="button">
@@ -86,7 +84,7 @@
                                 </div>
                             </div>
 
-                            <div class="filter-item search-filter-item">
+                            <div class="filter-item search-filter-item std_margin">
                                 <form id="searchFrm" method="get" action="<?=BASEURL?>transactions/">
                                 <div class="input-group search-form">
                                     <div class="stretch-input rbtn_input">

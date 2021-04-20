@@ -830,10 +830,11 @@ select {
 /* Filters */
 .filters-container {
   display: flex;
-  flex-flow: row nowrap;
+  flex-flow: row wrap;
   align-items: center;
 }
 
 .filter-item {
+  flex: 1 0 auto;
   margin-right: 15px;
 }

@@ -48,27 +48,31 @@ StatisticsView.prototype.onStart = function () {
     this.filterTypeDropDown = DropDown.create({
         input_id: 'filter_type',
         onitemselect: this.onFilterSel.bind(this),
-        editable: false
+        editable: false,
+        extraClass: 'dd__fullwidth'
     });
 
     if (this.model.filter.filter === 'currency') {
         this.currencyDropDown = DropDown.create({
             input_id: 'curr_id',
             onitemselect: this.onCurrencySel.bind(this),
-            editable: false
+            editable: false,
+            extraClass: 'dd__fullwidth'
         });
     } else {
         this.accountDropDown = DropDown.create({
             input_id: 'acc_id',
             onitemselect: this.onAccountSel.bind(this),
-            editable: false
+            editable: false,
+            extraClass: 'dd__fullwidth'
         });
     }
 
     this.groupDropDown = DropDown.create({
         input_id: 'groupsel',
         onitemselect: this.onGroupSel.bind(this),
-        editable: false
+        editable: false,
+        extraClass: 'dd__fullwidth'
     });
 
     this.datePickerBtn = IconLink.fromElement({
@@ -309,7 +313,7 @@ StatisticsView.prototype.onBarClick = function (e, barRect, val) {
  */
 StatisticsView.prototype.onBarOver = function (e, bar) {
     if (!bar || !bar.elem) {
-        return
+        return;
     }
 
     bar.elem.classList.add('bar_active');
@@ -321,7 +325,7 @@ StatisticsView.prototype.onBarOver = function (e, bar) {
  */
 StatisticsView.prototype.onBarOut = function (e, bar) {
     if (!bar || !bar.elem) {
-        return
+        return;
     }
 
     bar.elem.classList.remove('bar_active');
