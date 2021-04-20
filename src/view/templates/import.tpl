@@ -100,19 +100,19 @@
                 <input id="serverUploadBtn" class="btn submit-btn" type="button" value="Upload">
             </div>
 <?php   }   ?>
-            <div class="upload-form__options">
-                <label class="checkwrap">
-                    <input id="isEncodeCheck" name="encode" type="checkbox" checked>
-                    <span>CP-1251 encoding</span>
-                </label>
-            </div>
         </div>
+        <div class="upload-form__options">
+            <label class="checkwrap">
+                <input id="isEncodeCheck" name="encode" type="checkbox" checked>
+                <span>CP-1251 encoding</span>
+            </label>
 <?php	if ($this->uMod->isAdmin($this->user_id) || $this->uMod->isTester($this->user_id)) { ?>
-        <label class="checkwrap std_margin">
-            <input id="useServerCheck" type="checkbox">
-            <span>Use address on server</span>
-        </label>
+            <label class="checkwrap">
+                <input id="useServerCheck" type="checkbox">
+                <span>Use address on server</span>
+            </label>
 <?php   }   ?>
+        </div>
     </div>
 
     <div id="templateBlock" class="tpl-form hidden">
@@ -122,7 +122,7 @@
                 <input id="createTplBtn" class="btn link-btn" type="button" value="Create template">
             </div>
             <label id="tplStateLbl" class="hidden">Create template</label>
-            <div class="row-container std_margin">
+            <div class="tpl-form-fields">
                 <div id="tplField" class="tpl-form-field">
                     <select id="templateSel">
 <?php   foreach($impTemplates as $impTpl) {     ?>

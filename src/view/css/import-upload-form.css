@@ -86,14 +86,16 @@
   font-weight: 100;
 }
 
-.upload-form__collapsed .upload-form,
-.upload-form__collapsed .upload-form__inner {
+.upload-form__collapsed .upload-form {
   flex-flow: row nowrap;
+}
+
+.upload-form__collapsed .upload-form__inner {
+  flex-flow: row wrap;
 }
 
 .upload-form__collapsed .upload-form {
   overflow: hidden;
-  margin-right: 20px;
   align-items: baseline;
 }
 
@@ -105,5 +107,5 @@
 }
 
 .upload-form__collapsed .upload-form__options {
-  margin: 0 0 0 auto;
+  margin: 0;
 }

@@ -71,7 +71,7 @@
   display: flex;
   flex-flow: row nowrap;
   justify-content: flex-end;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
 }
 
 /* Rules block */
