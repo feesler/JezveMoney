@@ -18,8 +18,17 @@
 /* Header */
 .data-header {
   display: flex;
-  flex-flow: row nowrap;
+  flex-flow: row wrap;
   align-items: center;
+}
+
+.header-actions {
+  box-sizing: border-box;
+  display: flex;
+  flex-flow: row wrap;
+  align-items: baseline;
+  justify-content: flex-end;
+  flex: 1 1 auto;
 }
 
 .header-field {
@@ -45,13 +54,24 @@
 }
 
 /* Main account header field */
+.account-field {
+  flex-shrink: 0;
+}
+
 .account-field div {
   justify-content: left;
 }
 
 /* Icon buttons */
-.data-header .iconlink + .iconlink {
-  margin-left: 8px;
+.header-actions .iconlink {
+  margin: 4px;
+}
+
+.header-info {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-end;
+  flex: 1 1 auto;
 }
 
 /* Rules block */

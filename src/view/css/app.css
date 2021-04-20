@@ -506,9 +506,10 @@ select {
   line-height: 32px;
   height: 32px;
   padding: 0;
-  margin: 0;
   margin-right: 30px;
+  margin-bottom: 8px;
   vertical-align: middle;
+  white-space: nowrap;
 }
 
 .amount-input {

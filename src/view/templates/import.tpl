@@ -32,7 +32,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="right-align">
+                            <div class="header-actions">
                                 <div id="newItemBtn" class="iconlink">
                                     <button type="button">
                                         <span class="iconlink__icon"><?=svgIcon("plus")?></span>
@@ -46,13 +46,15 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="header-field">
-                                <label>Total</label>
-                                <div class="header-field__content"><span id="trcount">0</span></div>
-                            </div>
-                            <div class="header-field">
-                                <label>Enabled</label>
-                                <div class="header-field__content"><span id="entrcount">0</span></div>
+                            <div class="header-info">
+                                <div class="header-field">
+                                    <label>Total</label>
+                                    <div class="header-field__content"><span id="trcount">0</span></div>
+                                </div>
+                                <div class="header-field">
+                                    <label>Enabled</label>
+                                    <div class="header-field__content"><span id="entrcount">0</span></div>
+                                </div>
                             </div>
                         </div>
 

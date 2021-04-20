@@ -50,7 +50,8 @@ ImportView.prototype.onStart = function () {
     this.accountDropDown = DropDown.create({
         input_id: 'acc_id',
         onchange: this.onMainAccChange.bind(this),
-        editable: false
+        editable: false,
+        extraClass: 'dd__fullwidth'
     });
 
     this.submitBtn = ge('submitbtn');
