@@ -258,9 +258,8 @@ StatisticsView.prototype.onChartsScroll = function () {
 /**
  * Histogram bar click callback
  * @param {object} barRect - bar rectangle element
- * @param {number} val - value of selected bar
  */
-StatisticsView.prototype.onBarClick = function (e, barRect, val) {
+StatisticsView.prototype.onBarClick = function (e, barRect) {
     var chartsWrapper;
     var chartContent;
     var rectBBox;
@@ -288,22 +287,32 @@ StatisticsView.prototype.onBarClick = function (e, barRect, val) {
         chartsWrapper.style.position = (isRelative) ? 'relative' : '';
 
         this.popup.textContent = this.model.currency.formatCurrency(
-            val,
+            barRect.value,
             this.model.accountCurrency
         );
 
-        rectBBox = barRect.getBBox();
-        chartsBRect = chartsWrapper.getBoundingClientRect();
-        popupX = rectBBox.x2 - chartContent.scrollLeft + 10;
-        popupY = e.clientY - chartsBRect.top - 10;
+        rectBBox = barRect.elem.getBBox();
+        chartsBRect = chartContent.getBoundingClientRect();
+        popupX = rectBBox.x - chartContent.scrollLeft
+            + (rectBBox.width - this.popup.offsetWidth) / 2;
+        popupY = rectBBox.y - this.popup.offsetHeight - 10;
 
+        if (popupX < 0) {
+            popupX = 0;
+        }
         if (this.popup.offsetWidth + popupX > chartsBRect.width) {
             popupX -= this.popup.offsetWidth + rectBBox.width + 20;
         }
 
         setParam(this.popup.style, { left: px(popupX), top: px(popupY) });
 
-        setTimeout(setEmptyClick.bind(this, this.hideChartPopup.bind(this), [barRect[0]]));
+        setTimeout(
+            setEmptyClick.bind(
+                this,
+                this.hideChartPopup.bind(this),
+                [barRect.elem, this.popup]
+            )
+        );
     }
 };
 
