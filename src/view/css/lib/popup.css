@@ -23,6 +23,7 @@
 }
 
 .popup__wrapper {
+  display: -ms-flexbox;
   display: flex;
   width: 100%;
   height: 100%;
@@ -31,11 +32,13 @@
 }
 
 .popup__content {
+  display: -ms-flexbox;
   display: flex;
   flex-direction: column;
   align-items: center;
   box-sizing: border-box;
   min-width: 100%;
+  max-width: 100vw;
   width: 100%;
   background-color: #ffffff;
   color: #000000;
