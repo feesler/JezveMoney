@@ -595,6 +595,7 @@ select {
 .trtype-menu__item {
   padding: 2px;
   margin: 0 12px 0 0;
+  white-space: nowrap;
   cursor: pointer;
 }
 
