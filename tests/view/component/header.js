@@ -1,6 +1,5 @@
 import { asyncMap } from '../../common.js';
 import { Component } from './component.js';
-import { IconLink } from './iconlink.js';
 
 export class Header extends Component {
     async parse() {
@@ -19,9 +18,6 @@ export class Header extends Component {
         if (!this.logo.linkElem) {
             throw new Error('Logo link element not found');
         }
-
-        const iconLinkElem = await this.query(this.elem, '.iconlink');
-        this.importBtn = await IconLink.create(this.parent, iconLinkElem);
 
         this.user = {};
         this.user.elem = await this.query(this.elem, '.user-block');

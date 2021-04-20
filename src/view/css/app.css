@@ -292,7 +292,7 @@ select {
 /* Theme switch */
 .theme-switch {
   display: flex;
-  margin: 0px 6px 0 18px;
+  margin: 0px 6px 0 auto;
 }
 
 .switch {
@@ -510,6 +510,10 @@ select {
   margin-bottom: 8px;
   vertical-align: middle;
   white-space: nowrap;
+}
+
+.heading .iconlink + .iconlink {
+    margin-left: 16px;
 }
 
 .amount-input {

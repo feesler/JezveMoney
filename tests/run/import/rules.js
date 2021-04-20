@@ -5,11 +5,17 @@ import { ImportTransaction } from '../../model/importtransaction.js';
 import { ImportCondition } from '../../model/importcondition.js';
 import { ImportAction } from '../../model/importaction.js';
 import { ImportView } from '../../view/import.js';
+import { TransactionsView } from '../../view/transactions.js';
 
 /** Navigate to import page */
 async function checkNavigation() {
     if (App.view instanceof ImportView) {
         return;
+    }
+
+    if (!(App.view instanceof TransactionsView)) {
+        await App.goToMainView();
+        await App.view.goToTransactions();
     }
 
     await App.view.goToImportView();

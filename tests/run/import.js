@@ -6,6 +6,7 @@ import { ImportTransaction } from '../model/importtransaction.js';
 import { ImportList } from '../view/component/importlist.js';
 import { ImportListItem } from '../view/component/importlistitem.js';
 import { ImportView } from '../view/import.js';
+import { TransactionsView } from '../view/transactions.js';
 import { ImportViewSubmitError } from '../error/importviewsubmit.js';
 
 /** Reexport import templates and import rules runners */
@@ -16,6 +17,11 @@ export * from './import/rules.js';
 async function checkNavigation() {
     if (App.view instanceof ImportView) {
         return;
+    }
+
+    if (!(App.view instanceof TransactionsView)) {
+        await App.goToMainView();
+        await App.view.goToTransactions();
     }
 
     await App.view.goToImportView();

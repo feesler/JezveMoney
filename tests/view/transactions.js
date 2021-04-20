@@ -19,6 +19,7 @@ export class TransactionsView extends TestView {
         const res = {
             titleEl: await this.query('.content_wrap > .heading > h1'),
             addBtn: await IconLink.create(this, await this.query('#add_btn')),
+            importBtn: await IconLink.create(this, await this.query('#import_btn')),
             toolbar: await Toolbar.create(this, await this.query('#toolbar')),
         };
 
@@ -430,6 +431,11 @@ export class TransactionsView extends TestView {
     /** Click on add button */
     async goToCreateTransaction() {
         await this.navigation(() => this.content.addBtn.click());
+    }
+
+    /** Click on import button */
+    async goToImportView() {
+        await this.navigation(() => this.content.importBtn.click());
     }
 
     async selectTransactions(data) {

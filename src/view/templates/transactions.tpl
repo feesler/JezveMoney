@@ -12,7 +12,18 @@
                 <div class="content_wrap">
                     <div class="heading">
                         <h1>Transactions</h1>
-                        <div id="add_btn" class="iconlink"><a href="<?=BASEURL?>transactions/new/"><span class="iconlink__icon"><?=svgIcon("plus")?></span><span class="iconlink__content"><span>New</span></span></a></div>
+                        <div id="add_btn" class="iconlink">
+                            <a href="<?=BASEURL?>transactions/new/">
+                                <span class="iconlink__icon"><?=svgIcon("plus")?></span>
+                                <span class="iconlink__content"><span>New</span></span>
+                            </a>
+                        </div>
+                        <div id="import_btn" class="iconlink">
+                            <a href="<?=BASEURL?>import/">
+                                <span class="iconlink__icon"><?=svgIcon("import")?></span>
+                                <span class="iconlink__content"><span>Import</span></span>
+                            </a>
+                        </div>
                     </div>
 
                     <div>

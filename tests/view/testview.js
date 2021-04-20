@@ -220,12 +220,4 @@ export class TestView {
 
         await this.navigation(() => this.click(this.header.logo.linkElem));
     }
-
-    async goToImportView() {
-        if (!this.isUserLoggedIn()) {
-            throw new Error('User not logged in');
-        }
-
-        await this.navigation(() => this.header.importBtn.click());
-    }
 }
