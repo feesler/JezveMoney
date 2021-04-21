@@ -327,8 +327,6 @@ ImportTransactionItem.prototype.setExtendedContent = function (content) {
 ImportTransactionItem.prototype.setOriginal = function (data) {
     var amount;
     var trAmount;
-    var accCurr;
-    var trCurr;
 
     if (!data) {
         throw new Error('Invalid data');
@@ -340,17 +338,8 @@ ImportTransactionItem.prototype.setOriginal = function (data) {
     }
     this.data.mainAccount = this.model.mainAccount.id;
 
-    accCurr = this.model.currency.findByName(this.data.accCurrVal);
-    if (!accCurr) {
-        throw new Error('Unknown currency ' + this.data.accCurrVal);
-    }
-    if (accCurr.id !== this.model.mainAccount.curr_id) {
+    if (this.data.accCurrId !== this.model.mainAccount.curr_id) {
         throw new Error('Currency must be the same as main account');
-    }
-
-    trCurr = this.model.currency.findByName(this.data.trCurrVal);
-    if (!trCurr) {
-        throw new Error('Unknown currency ' + data.trCurrVal);
     }
 
     amount = parseFloat(fixFloat(data.accAmountVal));
@@ -367,8 +356,8 @@ ImportTransactionItem.prototype.setOriginal = function (data) {
     }
 
     this.setAmount(Math.abs(amount));
-    if (trCurr.id !== accCurr.id) {
-        this.setCurrency(trCurr.id);
+    if (this.data.trCurrId !== this.data.accCurrId) {
+        this.setCurrency(this.data.trCurrId);
         this.setSecondAmount(Math.abs(trAmount));
     }
     this.setDate(formatDate(new Date(this.data.date)));

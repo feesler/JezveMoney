@@ -141,7 +141,7 @@ ImportTemplateManager.prototype.applyTemplate = function () {
     data = this.getDataRows(this.state, false);
 
     return data.map(function (item) {
-        return this.state.template.applyTo(item);
+        return this.state.template.applyTo(item, this.model.currency);
     }, this);
 };
 

@@ -156,7 +156,8 @@ ImportTemplate.prototype.getComment = function (data) {
 };
 
 /** Apply import template to specified data row */
-ImportTemplate.prototype.applyTo = function (data) {
+ImportTemplate.prototype.applyTo = function (data, currencyModel) {
+    var currency;
     var res = {
         accAmountVal: this.getAccountAmount(data),
         accCurrVal: this.getAccountCurrency(data),
@@ -166,6 +167,12 @@ ImportTemplate.prototype.applyTo = function (data) {
         comment: this.getComment(data),
         template: this.id
     };
+
+    currency = currencyModel.findByName(res.accCurrVal);
+    res.accCurrId = (currency) ? currency.id : null;
+
+    currency = currencyModel.findByName(res.trCurrVal);
+    res.trCurrId = (currency) ? currency.id : null;
 
     return res;
 };
