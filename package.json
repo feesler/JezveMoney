@@ -1,11 +1,11 @@
 {
   "name": "jezve-money",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "type": "module",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "lint-php": "php ./dev-tools/vendor/bin/phpcs --standard=PSR12 ./src/admin/Controller/ ./src/admin/index.php ./src/api/ ./src/Controller/ ./src/Model/ ./src/system/ ./src/index.php",
+    "lint-php": "dev-tools/vendor/bin/phpcs --standard=PSR12 ./src/admin/Controller/ ./src/admin/index.php ./src/api/ ./src/Controller/ ./src/Model/ ./src/system/ ./src/index.php",
     "all": "npm-run-all lint test build",
     "test": "node ./tests/index.js",
     "lint": "npm-run-all lint-src lint-tests lint-php",
