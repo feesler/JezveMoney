@@ -71,7 +71,7 @@ AccountList.prototype.getUserAccounts = function (ownerId) {
         return null;
     }
 
-    return this.data.filter(function (item) {
+    return this.filter(function (item) {
         return item && item.owner_id === ownerId;
     });
 };
@@ -80,7 +80,7 @@ AccountList.prototype.getUserAccounts = function (ownerId) {
  * Return list of visible Accounts
  */
 AccountList.prototype.getVisible = function () {
-    return this.data.filter(function (item) {
+    return this.filter(function (item) {
         return item && item.isVisible();
     });
 };
@@ -93,7 +93,7 @@ AccountList.prototype.getVisible = function () {
 AccountList.prototype.getNextAccount = function (accountId) {
     var pos;
 
-    if (!Array.isArray(this.data) || this.data.length < 2 || !accountId) {
+    if (!Array.isArray(this.data) || this.length < 2 || !accountId) {
         return 0;
     }
 
@@ -102,7 +102,7 @@ AccountList.prototype.getNextAccount = function (accountId) {
         return 0;
     }
 
-    pos = ((pos === this.data.length - 1) ? 0 : pos + 1);
+    pos = ((pos === this.length - 1) ? 0 : pos + 1);
 
     return this.data[pos].id;
 };
@@ -143,7 +143,7 @@ AccountList.prototype.getPersonAccount = function (personId, currencyId) {
     }
 
     // check person have account in specified currency
-    return this.data.find(function (item) {
+    return this.find(function (item) {
         return item && item.owner_id === pId && item.curr_id === currId;
     });
 };

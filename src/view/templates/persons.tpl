@@ -32,7 +32,7 @@
                         </div>
 <?php       }
         } else {	?>
-                        <span>You have no one person. Please create one.</span>
+                        <span class="nodata-message">You have no one person. Please create one.</span>
 <?php	}	?>
                     </div>
 <?php	if (count($hiddenPersArr)) {	?>

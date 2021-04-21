@@ -27,7 +27,7 @@ class Profile extends ApiController
     {
         $pObj = $this->personMod->getItem($this->owner_id);
         if (!$pObj) {
-            $this->fail("Person not found");
+            throw new \Error("Person not found");
         }
 
         $userObj = $this->uMod->getItem($this->user_id);
@@ -47,17 +47,17 @@ class Profile extends ApiController
         $defMsg = Message::get(ERR_PROFILE_NAME);
 
         if (!$this->isPOST()) {
-            $this->fail();
+            throw new \Error("Invalid type of request");
         }
 
         $request = $this->getRequestData();
         $reqData = checkFields($request, $requiredFields);
         if ($reqData === false) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
         if (!$this->personMod->update($this->owner_id, $reqData)) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
         $this->setMessage(Message::get(MSG_PROFILE_NAME));
@@ -71,22 +71,22 @@ class Profile extends ApiController
         $defMsg = Message::get(ERR_PROFILE_PASSWORD);
 
         if (!$this->isPOST()) {
-            $this->fail();
+            throw new \Error("Invalid type of request");
         }
 
         $request = $this->getRequestData();
         $reqData = checkFields($request, $requiredFields);
         if ($reqData === false) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
         $uObj = $this->uMod->getItem($this->user_id);
         if (!$uObj) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
         if (!$this->uMod->changePassword($uObj->login, $reqData["current"], $reqData["new"])) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
         $this->setMessage(Message::get(MSG_PROFILE_PASSWORD));
@@ -99,16 +99,16 @@ class Profile extends ApiController
         $defMsg = Message::get(ERR_PROFILE_PASSWORD);
 
         if (!$this->isPOST()) {
-            $this->fail();
+            throw new \Error("Invalid type of request");
         }
 
         $accMod = AccountModel::getInstance();
         if (!$accMod->reset($this->user_id)) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
         if (!$this->personMod->reset()) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
         $this->setMessage(Message::get(MSG_PROFILE_RESETALL));
@@ -119,11 +119,11 @@ class Profile extends ApiController
     public function del()
     {
         if (!$this->isPOST()) {
-            $this->fail();
+            throw new \Error("Invalid type of request");
         }
 
         if (!$this->uMod->del($this->user_id)) {
-            $this->fail();
+            throw new \Error(Message::get(ERR_PROFILE_DELETE));
         }
 
         $this->ok();

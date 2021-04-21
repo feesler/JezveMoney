@@ -153,6 +153,88 @@ function isTransaction(obj) {
 /** Verify object is array of transactions */
 function isTransactionsArray(obj) { return isArrayOf(obj, isTransaction); }
 
+/** Verify object is import template */
+function isTemplateColumns(obj) {
+    return verifyObject(obj, {
+        accountAmount: isInt,
+        accountCurrency: isInt,
+        transactionAmount: isInt,
+        transactionCurrency: isInt,
+        date: isInt,
+        comment: isInt
+    });
+}
+
+/** Verify object is import template */
+function isTemplate(obj) {
+    return verifyObject(obj, {
+        id: isInt,
+        name: isString,
+        type_id: isInt,
+        columns: isTemplateColumns
+    }, {
+        user_id: isInt,
+        createdate: isInt,
+        updatedate: isInt
+    });
+}
+
+/** Verify object is array of import templates */
+function isTemplatesArray(obj) { return isArrayOf(obj, isTemplate); }
+
+/** Verify object is import condition */
+function isImportCondition(obj) {
+    return verifyObject(obj, {
+        id: isInt,
+        rule_id: isInt,
+        field_id: isInt,
+        operator: isInt,
+        value: isString,
+        flags: isInt
+    }, {
+        user_id: isInt,
+        createdate: isInt,
+        updatedate: isInt
+    });
+}
+
+/** Verify object is array of import conditions */
+function isConditionsArray(obj) { return isArrayOf(obj, isImportCondition); }
+
+/** Verify object is import action */
+function isImportAction(obj) {
+    return verifyObject(obj, {
+        id: isInt,
+        rule_id: isInt,
+        action_id: isInt,
+        value: isString
+    }, {
+        user_id: isInt,
+        createdate: isInt,
+        updatedate: isInt
+    });
+}
+
+/** Verify object is array of import conditions */
+function isActionsArray(obj) { return isArrayOf(obj, isImportAction); }
+
+/** Verify object is import rule */
+function isImportRule(obj) {
+    return verifyObject(obj, {
+        id: isInt,
+        flags: isInt
+    }, {
+        user_id: isInt,
+        actions: isActionsArray,
+        conditions: isConditionsArray,
+        createdate: isInt,
+        updatedate: isInt
+    });
+}
+
+/** Verify object is array of import templates */
+function isImportRulesArray(obj) { return isArrayOf(obj, isImportRule); }
+
 /** Verify object is currency */
 function isCurrency(obj) {
     return verifyObject(obj, {
@@ -274,6 +356,10 @@ AdminApiConsoleView.prototype.onStart = function () {
     this.initAccountForms();
     this.initPersonForms();
     this.initTransactionForms();
+    this.initTemplateForms();
+    this.initRuleForms();
+    this.initConditionForms();
+    this.initActionForms();
     this.initCurrencyForms();
     this.initIconForms();
     this.initUserForms();
@@ -309,13 +395,15 @@ AdminApiConsoleView.prototype.initAccountForms = function () {
     checkboxes = Array.from(checkboxes);
     checkboxes.forEach(function (elem) {
         elem.addEventListener('change', this.onCheck.bind(this));
-    }.bind(this));
+    }, this);
 
     readaccbtn = ge('readaccbtn');
     if (!readaccbtn) {
         throw new Error('Fail to init view');
     }
-    readaccbtn.addEventListener('click', this.onReadAccountSubmit.bind(this));
+    readaccbtn.addEventListener('click', function (e) {
+        this.onReadItemsSubmit(e, 'readaccid', 'account/', isAccountsArray);
+    }.bind(this));
 
     createAccForm = document.querySelector('#createAccForm > form');
     if (!createAccForm) {
@@ -333,7 +421,9 @@ AdminApiConsoleView.prototype.initAccountForms = function () {
     if (!delaccbtn) {
         throw new Error('Fail to init view');
     }
-    delaccbtn.addEventListener('click', this.onDeleteAccountSubmit.bind(this));
+    delaccbtn.addEventListener('click', function (e) {
+        this.onDeleteItemsSubmit(e, 'delaccounts', 'account/delete');
+    }.bind(this));
 
     resetAccForm = document.querySelector('#resetAccForm > form');
     if (!resetAccForm) {
@@ -361,13 +451,15 @@ AdminApiConsoleView.prototype.initPersonForms = function () {
     checkboxes = Array.from(checkboxes);
     checkboxes.forEach(function (elem) {
         elem.addEventListener('change', this.onCheck.bind(this));
-    }.bind(this));
+    }, this);
 
     readpersonbtn = ge('readpersonbtn');
     if (!readpersonbtn) {
         throw new Error('Fail to init view');
     }
-    readpersonbtn.addEventListener('click', this.onReadPersonSubmit.bind(this));
+    readpersonbtn.addEventListener('click', function (e) {
+        this.onReadItemsSubmit(e, 'read_person_id', 'person/', isPersonsArray);
+    }.bind(this));
 
     createPersonForm = document.querySelector('#createPersonForm > form');
     if (!createPersonForm) {
@@ -385,7 +477,9 @@ AdminApiConsoleView.prototype.initPersonForms = function () {
     if (!delpersonbtn) {
         throw new Error('Fail to init view');
     }
-    delpersonbtn.addEventListener('click', this.onDeletePersonSubmit.bind(this));
+    delpersonbtn.addEventListener('click', function (e) {
+        this.onDeleteItemsSubmit(e, 'delpersons', 'person/delete');
+    }.bind(this));
 };
 
 /** Initialization of forms for Transaction API controller */
@@ -410,13 +504,15 @@ AdminApiConsoleView.prototype.initTransactionForms = function () {
     checkboxes = Array.from(checkboxes);
     checkboxes.forEach(function (elem) {
         elem.addEventListener('change', this.onCheck.bind(this));
-    }.bind(this));
+    }, this);
 
     readtransbtn = ge('readtransbtn');
     if (!readtransbtn) {
         throw new Error('Fail to init view');
     }
-    readtransbtn.addEventListener('click', this.onReadTransactionSubmit.bind(this));
+    readtransbtn.addEventListener('click', function (e) {
+        this.onReadItemsSubmit(e, 'read_trans_id', 'transaction/', isTransactionsArray);
+    }.bind(this));
 
     createTrForm = document.querySelector('#createTrForm > form');
     if (!createTrForm) {
@@ -446,13 +542,201 @@ AdminApiConsoleView.prototype.initTransactionForms = function () {
     if (!deltransbtn) {
         throw new Error('Fail to init view');
     }
-    deltransbtn.addEventListener('click', this.onDeleteTransactionSubmit.bind(this));
+    deltransbtn.addEventListener('click', function (e) {
+        this.onDeleteItemsSubmit(e, 'deltransactions', 'transaction/delete');
+    }.bind(this));
 
     setTrPosForm = document.querySelector('#setTrPosForm > form');
     if (!setTrPosForm) {
         throw new Error('Fail to init view');
     }
     setTrPosForm.addEventListener('submit', this.onFormSubmit.bind(this));
+};
+
+/** Initialization of forms for Import template API controller */
+AdminApiConsoleView.prototype.initTemplateForms = function () {
+    var listForm;
+    var readBtn;
+    var createForm;
+    var updateForm;
+    var delBtn;
+
+    listForm = document.querySelector('#listTplForm > form');
+    if (!listForm) {
+        throw new Error('Fail to init view');
+    }
+    listForm.addEventListener('submit', this.getVerifyHandler(isTemplatesArray));
+
+    readBtn = ge('readtplbtn');
+    if (!readBtn) {
+        throw new Error('Fail to init view');
+    }
+    readBtn.addEventListener('click', function (e) {
+        this.onReadItemsSubmit(e, 'readtplid', 'importtpl/', isTemplatesArray);
+    }.bind(this));
+
+    createForm = document.querySelector('#createTplForm > form');
+    if (!createForm) {
+        throw new Error('Fail to init view');
+    }
+    createForm.addEventListener('submit', this.getVerifyHandler(isCreateResult));
+
+    updateForm = document.querySelector('#updateTplForm > form');
+    if (!updateForm) {
+        throw new Error('Fail to init view');
+    }
+    updateForm.addEventListener('submit', this.onFormSubmit.bind(this));
+
+    delBtn = ge('deltplbtn');
+    if (!delBtn) {
+        throw new Error('Fail to init view');
+    }
+    delBtn.addEventListener('click', function (e) {
+        this.onDeleteItemsSubmit(e, 'deltemplates', 'importtpl/delete');
+    }.bind(this));
+};
+
+/** Initialization of forms for Import rules API controller */
+AdminApiConsoleView.prototype.initRuleForms = function () {
+    var listForm;
+    var readBtn;
+    var createForm;
+    var updateForm;
+    var delBtn;
+
+    listForm = document.querySelector('#listRuleForm > form');
+    if (!listForm) {
+        throw new Error('Fail to init view');
+    }
+    listForm.addEventListener('submit', this.getVerifyHandler(isImportRulesArray));
+
+    readBtn = ge('readrulebtn');
+    if (!readBtn) {
+        throw new Error('Fail to init view');
+    }
+    readBtn.addEventListener('click', function (e) {
+        this.onReadItemsSubmit(e, 'readruleid', 'importrule/', isImportRulesArray);
+    }.bind(this));
+
+    createForm = document.querySelector('#createRuleForm > form');
+    if (!createForm) {
+        throw new Error('Fail to init view');
+    }
+    createForm.addEventListener('submit', this.getVerifyHandler(isCreateResult));
+
+    updateForm = document.querySelector('#updateRuleForm > form');
+    if (!updateForm) {
+        throw new Error('Fail to init view');
+    }
+    updateForm.addEventListener('submit', this.onFormSubmit.bind(this));
+
+    delBtn = ge('delrulebtn');
+    if (!delBtn) {
+        throw new Error('Fail to init view');
+    }
+    delBtn.addEventListener('click', function (e) {
+        this.onDeleteItemsSubmit(e, 'delrules', 'importrule/delete');
+    }.bind(this));
+};
+
+/** Initialization of forms for Import conditions API controller */
+AdminApiConsoleView.prototype.initConditionForms = function () {
+    var listForm;
+    var checkboxes;
+    var readBtn;
+    var createForm;
+    var updateForm;
+    var delBtn;
+
+    listForm = document.querySelector('#listCondForm > form');
+    if (!listForm) {
+        throw new Error('Fail to init view');
+    }
+    listForm.addEventListener('submit', this.getVerifyHandler(isConditionsArray));
+
+    checkboxes = listForm.querySelectorAll('input[type="checkbox"]');
+    checkboxes = Array.from(checkboxes);
+    checkboxes.forEach(function (elem) {
+        elem.addEventListener('change', this.onCheck.bind(this));
+    }, this);
+
+    readBtn = ge('readcondbtn');
+    if (!readBtn) {
+        throw new Error('Fail to init view');
+    }
+    readBtn.addEventListener('click', function (e) {
+        this.onReadItemsSubmit(e, 'readcondid', 'importcond/', isConditionsArray);
+    }.bind(this));
+
+    createForm = document.querySelector('#createCondForm > form');
+    if (!createForm) {
+        throw new Error('Fail to init view');
+    }
+    createForm.addEventListener('submit', this.getVerifyHandler(isCreateResult));
+
+    updateForm = document.querySelector('#updateCondForm > form');
+    if (!updateForm) {
+        throw new Error('Fail to init view');
+    }
+    updateForm.addEventListener('submit', this.onFormSubmit.bind(this));
+
+    delBtn = ge('delcondbtn');
+    if (!delBtn) {
+        throw new Error('Fail to init view');
+    }
+    delBtn.addEventListener('click', function (e) {
+        this.onDeleteItemsSubmit(e, 'delconds', 'importcond/delete');
+    }.bind(this));
+};
+
+/** Initialization of forms for Import actions API controller */
+AdminApiConsoleView.prototype.initActionForms = function () {
+    var listForm;
+    var checkboxes;
+    var readBtn;
+    var createForm;
+    var updateForm;
+    var delBtn;
+
+    listForm = document.querySelector('#listActForm > form');
+    if (!listForm) {
+        throw new Error('Fail to init view');
+    }
+    listForm.addEventListener('submit', this.getVerifyHandler(isActionsArray));
+
+    checkboxes = listForm.querySelectorAll('input[type="checkbox"]');
+    checkboxes = Array.from(checkboxes);
+    checkboxes.forEach(function (elem) {
+        elem.addEventListener('change', this.onCheck.bind(this));
+    }, this);
+
+    readBtn = ge('readactbtn');
+    if (!readBtn) {
+        throw new Error('Fail to init view');
+    }
+    readBtn.addEventListener('click', function (e) {
+        this.onReadItemsSubmit(e, 'readactid', 'importaction/', isActionsArray);
+    }.bind(this));
+
+    createForm = document.querySelector('#createActForm > form');
+    if (!createForm) {
+        throw new Error('Fail to init view');
+    }
+    createForm.addEventListener('submit', this.getVerifyHandler(isCreateResult));
+
+    updateForm = document.querySelector('#updateActForm > form');
+    if (!updateForm) {
+        throw new Error('Fail to init view');
+    }
+    updateForm.addEventListener('submit', this.onFormSubmit.bind(this));
+
+    delBtn = ge('delactbtn');
+    if (!delBtn) {
+        throw new Error('Fail to init view');
+    }
+    delBtn.addEventListener('click', function (e) {
+        this.onDeleteItemsSubmit(e, 'delactions', 'importaction/delete');
+    }.bind(this));
 };
 
 /** Initialization of forms for Currency API controller */
@@ -473,7 +757,9 @@ AdminApiConsoleView.prototype.initCurrencyForms = function () {
     if (!readCurrBtn) {
         throw new Error('Fail to init view');
     }
-    readCurrBtn.addEventListener('click', this.onCurrencyReadSubmit.bind(this));
+    readCurrBtn.addEventListener('click', function (e) {
+        this.onReadItemsSubmit(e, 'read_curr_id', 'currency/', isCurrenciesArray);
+    }.bind(this));
 
     createCurrForm = document.querySelector('#createCurrForm > form');
     if (!createCurrForm) {
@@ -491,7 +777,9 @@ AdminApiConsoleView.prototype.initCurrencyForms = function () {
     if (!delCurrBtn) {
         throw new Error('Fail to init view');
     }
-    delCurrBtn.addEventListener('click', this.onDeleteCurrencySubmit.bind(this));
+    delCurrBtn.addEventListener('click', function (e) {
+        this.onDeleteItemsSubmit(e, 'delcurrencies', 'currency/delete');
+    }.bind(this));
 };
 
 /** Initialization of forms for Icon API controller */
@@ -512,7 +800,9 @@ AdminApiConsoleView.prototype.initIconForms = function () {
     if (!readIconBtn) {
         throw new Error('Fail to init view');
     }
-    readIconBtn.addEventListener('click', this.onIconReadSubmit.bind(this));
+    readIconBtn.addEventListener('click', function (e) {
+        this.onReadItemsSubmit(e, 'read_icon_id', 'icon/', isIconsArray);
+    }.bind(this));
 
     createIconForm = document.querySelector('#createIconForm > form');
     if (!createIconForm) {
@@ -530,7 +820,9 @@ AdminApiConsoleView.prototype.initIconForms = function () {
     if (!delIconBtn) {
         throw new Error('Fail to init view');
     }
-    delIconBtn.addEventListener('click', this.onDeleteIconsSubmit.bind(this));
+    delIconBtn.addEventListener('click', function (e) {
+        this.onDeleteItemsSubmit(e, 'del_icons', 'icon/delete');
+    }.bind(this));
 };
 
 /** Initialization of forms for User API controller */
@@ -679,36 +971,6 @@ AdminApiConsoleView.prototype.onContrClick = function (e) {
 AdminApiConsoleView.prototype.clearResults = function () {
     removeChilds(this.resultsContainer);
     this.clearResultsBtn.disabled = true;
-};
-
-/**
- * Obtain request data of specified form element
- * @param {HTMLFormElement} form - form element to obtain data from
- */
-AdminApiConsoleView.prototype.getFormData = function (form) {
-    var i;
-    var inputEl;
-    var res = {};
-
-    if (!form || !form.elements) {
-        return null;
-    }
-
-    for (i = 0; i < form.elements.length; i += 1) {
-        inputEl = form.elements[i];
-        if (inputEl.disabled || inputEl.name === '') {
-            continue;
-        }
-
-        if ((inputEl.type === 'checkbox' || inputEl.type === 'radio')
-            && !inputEl.checked) {
-            continue;
-        }
-
-        res[inputEl.name] = inputEl.value;
-    }
-
-    return res;
 };
 
 /**
@@ -998,135 +1260,44 @@ AdminApiConsoleView.prototype.apiPost = function (request, callback) {
     ajax.post(requestItem);
 };
 
-/** Read account form 'submit' event handler */
-AdminApiConsoleView.prototype.onReadAccountSubmit = function (e) {
-    var accInp;
+/** Send read items request */
+AdminApiConsoleView.prototype.onReadItemsSubmit = function (e, inputId, method, verifyFunc) {
+    var itemsInp;
+
+    if (typeof method !== 'string') {
+        throw new Error('Invalid parameters');
+    }
 
     e.preventDefault();
-    accInp = ge('readaccid');
-    if (!accInp) {
+    itemsInp = ge(inputId);
+    if (!itemsInp) {
         return;
     }
 
     this.apiGet({
-        method: 'account/',
-        data: this.parseIds(accInp.value),
-        verify: isAccountsArray
+        method: method,
+        data: this.parseIds(itemsInp.value),
+        verify: verifyFunc
     });
 };
 
-/** Delete accounts form 'submit' event handler */
-AdminApiConsoleView.prototype.onDeleteAccountSubmit = function (e) {
-    var accountsInp;
+/** Send delete items request */
+AdminApiConsoleView.prototype.onDeleteItemsSubmit = function (e, inputId, method) {
+    var itemsInp;
+
+    if (typeof method !== 'string') {
+        throw new Error('Invalid parameters');
+    }
 
     e.preventDefault();
-    accountsInp = ge('delaccounts');
-    if (!accountsInp) {
+    itemsInp = ge(inputId);
+    if (!itemsInp) {
         return;
     }
 
     this.apiPost({
-        method: 'account/delete',
-        data: this.parseIds(accountsInp.value)
-    });
-};
-
-/** Read currency form 'submit' event handler */
-AdminApiConsoleView.prototype.onCurrencyReadSubmit = function (e) {
-    var currIdInp;
-
-    e.preventDefault();
-    currIdInp = ge('read_curr_id');
-    if (!currIdInp) {
-        return;
-    }
-
-    this.apiGet({
-        method: 'currency/',
-        data: this.parseIds(currIdInp.value),
-        verify: isCurrenciesArray
-    });
-};
-
-/** Delete currencies form 'submit' event handler */
-AdminApiConsoleView.prototype.onDeleteCurrencySubmit = function (e) {
-    var idInp;
-
-    e.preventDefault();
-    idInp = ge('delcurrencies');
-    if (!idInp) {
-        return;
-    }
-
-    this.apiPost({
-        method: 'currency/delete',
-        data: this.parseIds(idInp.value)
-    });
-};
-
-/** Read icon form 'submit' event handler */
-AdminApiConsoleView.prototype.onIconReadSubmit = function (e) {
-    var iconIdInp;
-
-    e.preventDefault();
-    iconIdInp = ge('read_icon_id');
-    if (!iconIdInp) {
-        return;
-    }
-
-    this.apiGet({
-        method: 'icon/',
-        data: this.parseIds(iconIdInp.value),
-        verify: isIconsArray
-    });
-};
-
-/** Delete icons form 'submit' event handler */
-AdminApiConsoleView.prototype.onDeleteIconsSubmit = function (e) {
-    var idInp;
-
-    e.preventDefault();
-    idInp = ge('del_icons');
-    if (!idInp) {
-        return;
-    }
-
-    this.apiPost({
-        method: 'icon/delete',
-        data: this.parseIds(idInp.value)
-    });
-};
-
-/** Read person form 'submit' event handler */
-AdminApiConsoleView.prototype.onReadPersonSubmit = function (e) {
-    var idInp;
-
-    e.preventDefault();
-    idInp = ge('read_person_id');
-    if (!idInp) {
-        return;
-    }
-
-    this.apiGet({
-        method: 'person/',
-        data: this.parseIds(idInp.value),
-        verify: isPersonsArray
-    });
-};
-
-/** Delete persons form 'submit' event handler */
-AdminApiConsoleView.prototype.onDeletePersonSubmit = function (e) {
-    var persondInp;
-
-    e.preventDefault();
-    persondInp = ge('delpersons');
-    if (!persondInp) {
-        return;
-    }
-
-    this.apiPost({
-        method: 'person/delete',
-        data: this.parseIds(persondInp.value)
+        method: method,
+        data: this.parseIds(itemsInp.value)
     });
 };
 
@@ -1155,37 +1326,4 @@ AdminApiConsoleView.prototype.onListTransactionSubmit = function (e) {
     });
 
     return false;
-};
-
-/** Read transactions form 'submit' event handler */
-AdminApiConsoleView.prototype.onReadTransactionSubmit = function (e) {
-    var transInp;
-
-    e.preventDefault();
-    transInp = ge('read_trans_id');
-    if (!transInp) {
-        return;
-    }
-
-    this.apiGet({
-        method: 'transaction/',
-        data: this.parseIds(transInp.value),
-        verify: isTransactionsArray
-    });
-};
-
-/** Delete transactions form 'submit' event handler */
-AdminApiConsoleView.prototype.onDeleteTransactionSubmit = function (e) {
-    var transInp;
-
-    e.preventDefault();
-    transInp = ge('deltransactions');
-    if (!transInp) {
-        return;
-    }
-
-    this.apiPost({
-        method: 'transaction/delete',
-        data: this.parseIds(transInp.value)
-    });
 };

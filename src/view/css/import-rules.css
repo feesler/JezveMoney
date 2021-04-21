@@ -1,0 +1,60 @@
+/* Import rules dialog */
+.rules-popup .popup__content-box {
+  max-width: 600px;
+  width: 100%;
+  max-height: 100vh;
+}
+
+.rules-dialog {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  flex: 1 1 auto;
+  min-height: 100px;
+}
+
+.rules-dialog__loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 400;
+  z-index: 10;
+  background-color: rgb(50 50 50 / 70%);
+  border-radius: 10px;
+}
+
+/* Import rules dialog heading */
+.rules-header {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+
+.rules-header label {
+  font-size: 24px;
+  font-weight: 300;
+  margin-right: 16px;
+}
+
+.rules-list {
+  display: flex;
+  flex-flow: column nowrap;
+  overflow-y: auto;
+}
+
+/* Create button */
+.rules-dialog .link-btn,
+.rules-dialog .link-btn:visited,
+.rules-dialog .link-btn:active {
+  pointer-events: all;
+  padding: 0;
+  cursor: pointer;
+}

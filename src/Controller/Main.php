@@ -70,7 +70,8 @@ class Main extends TemplateController
 
         $titleString = "Jezve Money";
 
-        array_push($this->css->libs,
+        array_push(
+            $this->css->libs,
             "lib/iconlink.css",
             "tiles.css",
             "trlist.css",
@@ -78,13 +79,14 @@ class Main extends TemplateController
         );
         $this->buildCSS();
 
-        array_push($this->jsArr,
-            "lib/raphael.min.js",
-            "lib/charts.js",
-            "component/component.js",
+        array_push(
+            $this->jsArr,
+            "lib/charts/chartgrid.js",
+            "lib/charts/basechart.js",
+            "lib/charts/histogram.js",
             "component/header.js",
-			"view.js",
-			"mainview.js"
+            "view.js",
+            "mainview.js"
         );
 
         include(TPL_PATH . "main.tpl");

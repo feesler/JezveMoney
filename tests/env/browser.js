@@ -2,7 +2,12 @@ import 'core-js/stable';
 import 'core-js/features/url';
 import 'core-js/features/url-search-params';
 import 'whatwg-fetch';
-import { setParam, formatTime, isFunction } from '../common.js';
+import {
+    copyObject,
+    setParam,
+    formatTime,
+    isFunction,
+} from '../common.js';
 import { App } from '../app.js';
 import { Environment, visibilityResolver } from './base.js';
 
@@ -14,6 +19,7 @@ class BrowserEnvironment extends Environment {
 
         this.vdoc = null;
         this.viewframe = null;
+        this.viewError = null;
         this.resContainer = null;
         this.restbl = null;
         this.totalRes = null;
@@ -140,33 +146,48 @@ class BrowserEnvironment extends Environment {
         if (typeof relem === 'string') {
             relem = await this.query(`#${relem}`);
         }
+        if (!relem) {
+            return false;
+        }
 
         return visibilityResolver(relem, recursive);
     }
 
     /* eslint-disable no-param-reassign */
-    async selectByValue(selectObj, selValue, selBool) {
-        if (!selectObj || !selectObj.options) {
-            return -1;
+    async selectByValue(elem, value, bool = true) {
+        if (!elem || !elem.options) {
+            throw new Error('Invalid select element');
+        }
+        if (typeof value === 'undefined') {
+            throw new Error('Invalid value');
         }
 
-        for (let i = 0, l = selectObj.options.length; i < l; i += 1) {
-            if (selectObj.options[i] && selectObj.options[i].value === selValue) {
-                if (selectObj.multiple) {
-                    selectObj.options[i].selected = (selBool !== undefined) ? selBool : true;
+        const selValue = value.toString();
+        const selBool = !!bool;
+        for (let i = 0, l = elem.options.length; i < l; i += 1) {
+            const option = elem.options[i];
+            if (option && option.value === selValue) {
+                if (elem.multiple) {
+                    option.selected = selBool;
                 } else {
-                    selectObj.selectedIndex = i;
+                    elem.selectedIndex = i;
                 }
-                return true;
+                return;
             }
         }
 
-        return false;
+        throw new Error('Value not found');
     }
     /* eslint-enable no-param-reassign */
 
     async onChange(elem) {
-        return elem.onchange();
+        if ('createEvent' in this.vdoc) {
+            const evt = this.vdoc.createEvent('HTMLEvents');
+            evt.initEvent('change', true, false);
+            elem.dispatchEvent(evt);
+        } else {
+            elem.fireEvent('onchange');
+        }
     }
 
     async onBlur(elem) {
@@ -418,6 +439,13 @@ class BrowserEnvironment extends Environment {
         this.scopedQuerySelectorPolyfill(view);
     }
 
+    setErrorHandler() {
+        window.addEventListener('message', (e) => {
+            this.viewError = copyObject(e.data);
+            this.errorHandler(this.viewError);
+        });
+    }
+
     async navigation(action) {
         if (!isFunction(action)) {
             throw new Error('Wrong action specified');
@@ -425,6 +453,10 @@ class BrowserEnvironment extends Environment {
 
         const navPromise = new Promise((resolve, reject) => {
             this.navigationHandler = async () => {
+                if (this.viewError) {
+                    throw this.viewError;
+                }
+
                 try {
                     this.viewframe.removeEventListener('load', this.navigationHandler);
 
@@ -522,10 +554,10 @@ class BrowserEnvironment extends Environment {
                 if (this.app.config.testsExpected) {
                     this.results.expected = this.app.config.testsExpected;
                 }
+                this.setErrorHandler();
 
                 this.addResult('Test initialization', true);
 
-                await this.goTo(this.base);
                 await this.app.startTests();
             } catch (e) {
                 this.addResult(e);

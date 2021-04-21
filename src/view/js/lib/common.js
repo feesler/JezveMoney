@@ -1,12 +1,12 @@
 'use strict';
 
-/* exported ge, isDate, isFunction, isObject, copyObject, setParam, addChilds */
-/* exported ce, svg, re, isNum, isInt, isVisible, show, enable, computedStyle */
-/* exported getCaretPos, getCursorPos, checkDate, selectedText, selectedValue */
+/* exported ge, isDate, isFunction, isObject, copyObject, setParam, addChilds, setEvents */
+/* exported removeEvents, ce, svg, re, isNum, isInt, isVisible, show, enable, computedStyle */
+/* exported getCaretPos, getCursorPos, setCursorPos, checkDate, selectedText, selectedValue */
 /* exported selectByValue, insertBefore, insertAfter, prependChild, removeChilds */
 /* exported fixEvent, onEmptyClick, setEmptyClick, getOffset, getOffsetRect, getOffsetSum */
 /* exported comparePosition, getPageScroll, isEmpty, childCount, px, urlJoin, head */
-/* exported transform, getRealDPI, onReady, extend */
+/* exported transform, getRealDPI, onReady, extend, extendError */
 /* eslint no-restricted-globals: "off" */
 /* eslint no-bitwise: "off" */
 
@@ -88,6 +88,17 @@ function setParam(obj, params) {
 }
 /* eslint-enable no-param-reassign */
 
+/** Set attributes to specified element */
+function setAttributes(element, attrs) {
+    if (!element || !isObject(attrs)) {
+        return;
+    }
+
+    Object.keys(attrs).forEach(function (key) {
+        element.setAttribute(key, attrs[key]);
+    });
+}
+
 /**
  * Append child to specified element
  * @param {Element} elem - element to append child to
@@ -109,12 +120,43 @@ function addChilds(elem, childs) {
 }
 
 /**
+ * Set up event handlers for specified element
+ * @param {Element} elem - element to set event handlers
+ * @param {Object} events - event handlers object
+ */
+function setEvents(elem, events) {
+    if (!elem || !events) {
+        return;
+    }
+
+    Object.keys(events).forEach(function (eventName) {
+        elem.addEventListener(eventName, events[eventName]);
+    });
+}
+
+/**
+ * Remove event handlers from specified element
+ * @param {Element} elem - element to remove event handlers from
+ * @param {Object} events - event handlers object
+ */
+function removeEvents(elem, events) {
+    if (!elem || !events) {
+        return;
+    }
+
+    Object.keys(events).forEach(function (eventName) {
+        elem.removeEventListener(eventName, events[eventName]);
+    });
+}
+
+/**
  * Create specified DOM element and set parameters if specified
  * @param {string} tagName - tag name of element to create
  * @param {Object} params - properties to set for created element
- * @param {Element[]} childs - element or array of elements to append to created element
+ * @param {Element[]} children - element or array of elements to append to created element
+ * @param {Object} events - event handlers object
  */
-function ce(tagName, params, childs) {
+function ce(tagName, params, children, events) {
     var elem;
 
     if (typeof tagName !== 'string') {
@@ -126,8 +168,15 @@ function ce(tagName, params, childs) {
         return null;
     }
 
-    setParam(elem, params);
-    addChilds(elem, childs);
+    if (params) {
+        setParam(elem, params);
+    }
+    if (children) {
+        addChilds(elem, children);
+    }
+    if (events) {
+        setEvents(elem, events);
+    }
 
     return elem;
 }
@@ -135,10 +184,11 @@ function ce(tagName, params, childs) {
 /**
  * Create new SVG namespace element, set attributes
  * @param {string} tagName
- * @param {Object} attributues
+ * @param {Object} attributes
  * @param {Element[]} children
+ * @param {Object} events - event handlers object
  */
-function svg(tagName, attributues, children) {
+function svg(tagName, attributes, children, events) {
     var elem;
 
     if (typeof tagName !== 'string') {
@@ -147,13 +197,15 @@ function svg(tagName, attributues, children) {
 
     elem = document.createElementNS('http://www.w3.org/2000/svg', tagName);
 
-    if (isObject(attributues)) {
-        Object.keys(attributues).forEach(function (attr) {
-            elem.setAttribute(attr, attributues[attr]);
-        });
+    if (attributes) {
+        setAttributes(elem, attributes);
     }
-
-    addChilds(elem, children);
+    if (children) {
+        addChilds(elem, children);
+    }
+    if (events) {
+        setEvents(elem, events);
+    }
 
     return elem;
 }
@@ -296,6 +348,10 @@ function getCursorPos(input) {
     var len;
     var pos;
 
+    if (!input) {
+        return null;
+    }
+
     if ('selectionStart' in input && document.activeElement === input) {
         return {
             start: input.selectionStart,
@@ -329,6 +385,29 @@ function getCursorPos(input) {
     }
 
     return null;
+}
+
+/**
+ * Set curson position for specified input element
+ * @param {Element} input
+ * @param {number} pos
+ */
+function setCursorPos(input, pos) {
+    var range;
+
+    if (!input) {
+        return;
+    }
+
+    if (input.createTextRange) {
+        range = input.createTextRange();
+        range.collapse(true);
+        range.moveEnd('character', pos);
+        range.moveStart('character', pos);
+        range.select();
+    } else if (input.setSelectionRange) {
+        input.setSelectionRange(pos, pos);
+    }
 }
 
 /** Check string is correct date in dd.mm.yyyy format */
@@ -814,5 +893,24 @@ function extend(Child, Parent) {
     Child.prototype = new F();
     Child.prototype.constructor = Child;
     Child.parent = Parent.prototype;
+}
+
+/** Extends Error with specified class constructor */
+function extendError(Class) {
+    Class.prototype = Object.create(Error.prototype, {
+        constructor: {
+            value: Error,
+            enumerable: false,
+            writable: true,
+            configurable: true
+        }
+    });
+
+    if (Object.setPrototypeOf) {
+        Object.setPrototypeOf(Class, Error);
+    } else {
+        /* eslint-disable-next-line no-proto */
+        Class.__proto__ = Error;
+    }
 }
 /* eslint-enable no-param-reassign */

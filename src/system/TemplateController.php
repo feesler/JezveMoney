@@ -36,9 +36,11 @@ abstract class TemplateController extends Controller
         $this->css->page = [];
 
         $this->jsArr = [
+            "lib/classList.min.js",
             "lib/polyfill.min.js",
             "lib/common.js",
             "lib/ajax.js",
+            "lib/component.js",
             "lib/popup.js",
             "app.js"
         ];

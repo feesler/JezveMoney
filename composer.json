@@ -1,4 +1,7 @@
 {
+    "name": "henryfeesler/jezvemoney",
+    "version": "1.6.0",
+    "description": "",
 	"config": {
 		"vendor-dir": "src/vendor",
 		"classmap-authoritative": true

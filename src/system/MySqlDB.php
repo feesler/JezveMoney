@@ -66,7 +66,7 @@ function andJoin($pieces)
 function brace($str)
 {
     $len = strlen($str);
-    if ($len > 1 && ($str[0] != "(" || $str[ $len - 1 ] != ")")) {
+    if ($len > 1 && ($str[0] != "(" || $str[$len - 1] != ")")) {
         return "($str)";
     }
 
@@ -92,7 +92,7 @@ function orJoin($pieces)
 function assignJoin($assignments)
 {
     if (!is_array($assignments)) {
-        $assignments = [ $assignments ];
+        $assignments = [$assignments];
     }
 
     $res = [];
@@ -584,7 +584,42 @@ class MySqlDB
     }
 
 
+    public function getColumns($table)
+    {
+        if (!$table || $table == "") {
+            return false;
+        }
+
+        $tblName = $this->escape($table);
+        if (!$tblName) {
+            return false;
+        }
+
+        $query = "SHOW COLUMNS FROM `" . $tblName . "`;";
+        $result = $this->rawQ($query);
+        $rows = mysqli_num_rows($result);
+
+        $columns = [];
+        if ($result && !$this->errno && $rows > 0) {
+            while ($row = mysqli_fetch_array($result)) {
+                $columnName = $row["Field"];
+                $columns[$columnName] = [
+                    "Type" => $row["Type"],
+                    "Null" => $row["Null"],
+                    "Key" => $row["Key"],
+                    "Default" => $row["Default"],
+                    "Extra" => $row["Extra"]
+                ];
+            }
+        }
+
+        return $columns;
+    }
+
+
     // Add columns to specified table
+    // $columns expected to be an array as follows:
+    //  ["column_1" => "INT NOT NULL", "column_2" => "VARCHAR(255) NULL"]
     public function addColumns($table, $columns)
     {
         if (!$table || $table == "") {
@@ -596,6 +631,10 @@ class MySqlDB
 
         $colDefs = [];
         foreach ($columns as $columnName => $columnDef) {
+            if (!is_string($columnName)) {
+                wlog("String key for column name is expected");
+                return false;
+            }
             $colDefs[] = $columnName . " " . $columnDef;
         }
 
@@ -625,6 +664,65 @@ class MySqlDB
     }
 
 
+    // Remove specified columns from table
+    public function dropColumns($table, $columns)
+    {
+        if (!$table || $table == "") {
+            return false;
+        }
+        if (is_null($columns) || $columns == "") {
+            return false;
+        }
+
+        if (!is_array($columns)) {
+            $columns = [$columns];
+        }
+
+        $dropOperations = [];
+        foreach ($columns as $columnName) {
+            if (!is_string($columnName) || $columnName == "") {
+                return false;
+            }
+
+            $dropOperations[] = "DROP COLUMN `$columnName`";
+        }
+
+        $query = "ALTER TABLE `" . $table . "` " . implode(", ", $dropOperations) . ";";
+        $this->rawQ($query);
+
+        return ($this->errno == 0);
+    }
+
+
+    // Add keys(indexes) to specified table
+    // $keys expected to be an associative array as follows:
+    //  ["key_name_1" => "field_name", "key_name_2" => ["field_1", "field_2"]]
+    public function addKeys($table, $keys)
+    {
+        if (!$table || $table == "") {
+            return false;
+        }
+        if (!is_array($keys)) {
+            return false;
+        }
+
+        $keyDefs = [];
+        foreach ($keys as $keyName => $keyDef) {
+            if (!is_string($keyName)) {
+                wlog("String key name is expected");
+                return false;
+            }
+            $keyColumns = is_array($keyDef) ? $keyDef : [$keyDef];
+            $keyDefs[] = $keyName . " (`" . implode("`, `", $keyColumns) . "`)";
+        }
+
+        $query = "ALTER TABLE `" . $table . "` ADD KEY " . implode(", ", $keyDefs) . ";";
+        $this->rawQ($query);
+
+        return ($this->errno == 0);
+    }
+
+
     // Return current autoincrement value of specified table
     // Return FALSE in case of error
     public function getAutoIncrement($table)
@@ -641,8 +739,10 @@ class MySqlDB
         $qResult = $this->selectQ(
             "AUTO_INCREMENT",
             "INFORMATION_SCHEMA.TABLES",
-            [ "TABLE_SCHEMA=" . qnull(self::$dbname),
-                                        "TABLE_NAME=" . qnull($table)]
+            [
+                "TABLE_SCHEMA=" . qnull(self::$dbname),
+                "TABLE_NAME=" . qnull($table)
+            ]
         );
         $row = $this->fetchRow($qResult);
         if (!$row) {

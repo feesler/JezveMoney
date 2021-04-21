@@ -77,7 +77,11 @@ class Application {
     }
 
     async goToMainView() {
-        await this.view.goToMainView();
+        if (this.view) {
+            await this.view.goToMainView();
+        } else {
+            await this.environment.goTo(this.environment.baseUrl());
+        }
     }
 }
 

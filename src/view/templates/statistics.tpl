@@ -31,8 +31,8 @@
         }	?>
                         </div>
 
-                        <div class="std_margin filters-container">
-                            <div class="filter-item">
+                        <div class="filters-container">
+                            <div class="filter-item std_margin">
                                 <select id="filter_type">
 <?php	foreach($byCurrArr as $ind => $byCurrItem) {	?>
 <?php		if ($byCurrItem["selected"]) {		?>
@@ -45,9 +45,9 @@
                             </div>
 
 <?php	if ($byCurrency) {		?>
-                            <div id="acc_block" class="filter-item hidden">
+                            <div id="acc_block" class="filter-item std_margin hidden">
 <?php	} else {	?>
-                            <div id="acc_block" class="filter-item">
+                            <div id="acc_block" class="filter-item std_margin">
 <?php	}	?>
                                 <select id="acc_id">
 <?php	foreach($accArr as $accInfo) {
@@ -61,9 +61,9 @@
                             </div>
 
 <?php	if ($byCurrency) {		?>
-                            <div id="curr_block" class="filter-item">
+                            <div id="curr_block" class="filter-item std_margin">
 <?php	} else {	?>
-                            <div id="curr_block" class="filter-item hidden">
+                            <div id="curr_block" class="filter-item std_margin hidden">
 <?php	}	?>
                                 <select id="curr_id">
 <?php	foreach($currArr as $currInfo) {
@@ -76,7 +76,7 @@
                                 </select>
                             </div>
 
-                            <div class="filter-item">
+                            <div class="filter-item std_margin">
                                 <select id="groupsel">
 <?php	foreach($groupTypes as $val => $grtype) {	?>
 <?php		if ($val == $groupType_id) {		?>
@@ -88,16 +88,16 @@
                                 </select>
                             </div>
 
-                            <div class="filter-item">
+                            <div class="filter-item std_margin">
 <?php	if (is_empty($dateFmt)) {		?>
-                                <div id="calendar_btn" class="iconlink std_margin">
+                                <div id="calendar_btn" class="iconlink">
                                     <button type="button">
                                         <span class="iconlink__icon"><?=svgIcon("cal")?></span>
                                         <span class="iconlink__content"><span>Select range</span></span>
                                     </button>
                                 </div>
 <?php	} else { 	?>
-                                <div id="calendar_btn" class="iconlink std_margin">
+                                <div id="calendar_btn" class="iconlink">
                                     <button type="button">
                                         <span class="iconlink__icon"><?=svgIcon("cal")?></span>
                                         <span class="iconlink__content">
@@ -121,7 +121,7 @@
 
                         <div id="chart" class="stat-histogram">
 <?php	if (!$statArr || !is_array($statArr->values) || !count($statArr->values)) {	?>
-                            <span>No results found.</span>
+                            <span class="nodata-message">No results found.</span>
 <?php	}		?>
                         </div>
                     </div>

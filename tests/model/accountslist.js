@@ -130,15 +130,15 @@ export class AccountsList extends List {
 
         if (caseSens) {
             lookupName = name;
-            return this.data.find((item) => item.name === lookupName);
+            return this.find((item) => item.name === lookupName);
         }
 
         lookupName = name.toLowerCase();
-        return this.data.find((item) => item.name.toLowerCase() === lookupName);
+        return this.find((item) => item.name.toLowerCase() === lookupName);
     }
 
     getUserAccounts(returnRaw = false) {
-        const res = this.data.filter((item) => item.owner_id === App.owner_id);
+        const res = this.filter((item) => item.owner_id === App.owner_id);
 
         if (returnRaw) {
             return copyObject(res);
@@ -156,7 +156,7 @@ export class AccountsList extends List {
     }
 
     getVisible(returnRaw = false) {
-        const res = this.data.filter((item) => !this.isHidden(item));
+        const res = this.filter((item) => !this.isHidden(item));
 
         if (returnRaw) {
             return copyObject(res);
@@ -166,7 +166,7 @@ export class AccountsList extends List {
     }
 
     getHidden(returnRaw = false) {
-        const res = this.data.filter((item) => this.isHidden(item));
+        const res = this.filter((item) => this.isHidden(item));
 
         if (returnRaw) {
             return copyObject(res);
@@ -175,32 +175,37 @@ export class AccountsList extends List {
         return new AccountsList(res);
     }
 
+    /** Return visible user accounts */
+    getUserVisible(returnRaw = false) {
+        return this.getUserAccounts().getVisible(returnRaw);
+    }
+
     /**
      * Return another visible user account id if possible
+     * Return first account if no id specified
      * Return zero if no account found
      * @param {number} accountId - identifier of account
      */
-    getNext(accountId) {
+    getNext(accountId = 0) {
+        const userVisible = this.getUserVisible();
+        if (!userVisible || !userVisible.length) {
+            return 0;
+        }
+
         if (!accountId) {
-            return 0;
+            return userVisible.indexToId(0);
         }
 
-        const userAccounts = this.getUserAccounts();
-        if (!userAccounts) {
+        if (userVisible.length < 2) {
             return 0;
         }
-        const visibleAccounts = userAccounts.getVisible();
-        if (!visibleAccounts || visibleAccounts.length < 2) {
-            return 0;
-        }
-
-        let ind = visibleAccounts.getIndexOf(accountId);
+        let ind = userVisible.getIndexById(accountId);
         if (ind === -1) {
             return 0;
         }
 
-        ind = (ind === visibleAccounts.length - 1) ? 0 : ind + 1;
+        ind = (ind === userVisible.length - 1) ? 0 : ind + 1;
 
-        return visibleAccounts.indexToId(ind);
+        return userVisible.indexToId(ind);
     }
 }

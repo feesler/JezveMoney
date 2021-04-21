@@ -8,7 +8,23 @@ class User extends AdminController
 {
     public function index()
     {
-        $uArr = $this->uMod->getData([ "all" => true ]);
+        $itemsData = $this->uMod->getData(["all" => true]);
+
+        $accessLevels = [
+            "0" => "Default",
+            "1" => "Admin",
+            "2" => "Tester",
+        ];
+        foreach ($itemsData as $userInfo) {
+            if (isset($accessLevels[$userInfo->access])) {
+                $userInfo->accessTitle = $accessLevels[$userInfo->access];
+            } else {
+                $userInfo->accessTitle = "Unknown access level: " . $userInfo->access;
+            }
+        }
+        $viewData = [
+            "data" => $itemsData
+        ];
 
         $this->menuItems["users"]["active"] = true;
 
@@ -16,8 +32,13 @@ class User extends AdminController
 
         $this->buildCSS();
 
-        $this->jsArr[] = "view.js";
-        array_push($this->jsAdmin,
+        array_push(
+            $this->jsArr,
+            "component/confirmdialog.js",
+            "view.js"
+        );
+        array_push(
+            $this->jsAdmin,
             "adminview.js",
             "adminlistview.js",
             "userview.js",

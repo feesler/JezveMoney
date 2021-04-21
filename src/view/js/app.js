@@ -1,7 +1,8 @@
 'use strict';
 
-/* global Popup */
+/* global isDate, Popup */
 /* exported EXPENSE, INCOME, TRANSFER, DEBT */
+/* exported formatDate, amountFix, fixDate, timestampFromString */
 /* exported createMessage, fixFloat, correct, correctExch, normalize, normalizeExch, isValidValue */
 
 /** Types of transactions */
@@ -11,6 +12,68 @@ var TRANSFER = 3;
 var DEBT = 4;
 
 var messageBox = null;
+
+/**
+ * Format date as DD.MM.YYYY
+ * @param {Date} date - date to format
+ */
+function formatDate(date) {
+    var month;
+    var year;
+    var day;
+
+    if (!isDate(date)) {
+        throw new Error('Invalid type of parameter');
+    }
+
+    month = date.getMonth();
+    year = date.getFullYear();
+    day = date.getDate();
+
+    return ((day > 9) ? '' : '0') + day + '.'
+        + ((month + 1 > 9) ? '' : '0') + (month + 1) + '.'
+        + year;
+}
+
+/** Convert DD.MM.YYYY string to timestamp */
+function fixDate(str) {
+    var res;
+
+    if (typeof str !== 'string') {
+        return null;
+    }
+
+    res = Date.parse(str.split('.').reverse().join('-'));
+    if (Number.isNaN(res)) {
+        return null;
+    }
+
+    return res;
+}
+
+/** Convert date string to timestamp */
+function timestampFromString(str) {
+    var tmpDate;
+    var pos;
+
+    if (typeof str === 'number') {
+        return str;
+    }
+    if (isDate(str)) {
+        return str.getTime();
+    }
+    if (typeof str !== 'string') {
+        throw new Error('Invalid type of parameter');
+    }
+
+    tmpDate = str;
+    pos = str.indexOf(' ');
+    if (pos !== -1) {
+        tmpDate = tmpDate.substr(0, pos);
+    }
+
+    return fixDate(tmpDate);
+}
 
 /**
  * Create notification message
@@ -55,6 +118,21 @@ function fixFloat(str) {
     }
 
     return null;
+}
+
+/** Convert string to amount value */
+function amountFix(value) {
+    var res;
+
+    if (typeof value === 'number') {
+        return value;
+    }
+    if (typeof value !== 'string') {
+        return null;
+    }
+
+    res = value.replace(/ /, '');
+    return parseFloat(fixFloat(res));
 }
 
 /**

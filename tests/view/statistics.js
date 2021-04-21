@@ -43,6 +43,11 @@ export class StatisticsView extends TestView {
             throw new Error('Invalid statistics view structure');
         }
 
+        const chartChild = await this.query(res.chart.elem, '.nodata-message');
+        if (chartChild) {
+            return res;
+        }
+
         const bars = await this.queryAll(res.chart.elem, 'svg > rect');
         for (const bar of bars) {
             const nodeOpacity = await this.prop(bar, 'attributes.fill-opacity.nodeValue');

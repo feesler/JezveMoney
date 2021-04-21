@@ -1,7 +1,7 @@
 'use strict';
 
 /* global ge, ce, isDate, isVisible, show, setParam, setEmptyClick, urlJoin, px, extend, View */
-/* global isEmpty, baseURL, CurrencyList, Charts, DatePicker, DropDown, IconLink */
+/* global isEmpty, baseURL, CurrencyList, Histogram, DatePicker, DropDown, IconLink */
 
 /**
  * Statistics view
@@ -35,40 +35,44 @@ extend(StatisticsView, View);
  * View initialization
  */
 StatisticsView.prototype.onStart = function () {
-    this.histogram = Charts.createHistogram({
+    this.histogram = Histogram.create({
+        elem: 'chart',
         data: this.model.chartData,
-        container: 'chart',
         autoScale: true,
-        onbarclick: this.onBarClick.bind(this),
+        onitemclick: this.onBarClick.bind(this),
         onscroll: this.onChartsScroll.bind(this),
-        onbarover: this.onBarOver.bind(this),
-        onbarout: this.onBarOut.bind(this)
+        onitemover: this.onBarOver.bind(this),
+        onitemout: this.onBarOut.bind(this)
     });
 
     this.filterTypeDropDown = DropDown.create({
         input_id: 'filter_type',
         onitemselect: this.onFilterSel.bind(this),
-        editable: false
+        editable: false,
+        extraClass: 'dd__fullwidth'
     });
 
     if (this.model.filter.filter === 'currency') {
         this.currencyDropDown = DropDown.create({
             input_id: 'curr_id',
             onitemselect: this.onCurrencySel.bind(this),
-            editable: false
+            editable: false,
+            extraClass: 'dd__fullwidth'
         });
     } else {
         this.accountDropDown = DropDown.create({
             input_id: 'acc_id',
             onitemselect: this.onAccountSel.bind(this),
-            editable: false
+            editable: false,
+            extraClass: 'dd__fullwidth'
         });
     }
 
     this.groupDropDown = DropDown.create({
         input_id: 'groupsel',
         onitemselect: this.onGroupSel.bind(this),
-        editable: false
+        editable: false,
+        extraClass: 'dd__fullwidth'
     });
 
     this.datePickerBtn = IconLink.fromElement({
@@ -254,9 +258,8 @@ StatisticsView.prototype.onChartsScroll = function () {
 /**
  * Histogram bar click callback
  * @param {object} barRect - bar rectangle element
- * @param {number} val - value of selected bar
  */
-StatisticsView.prototype.onBarClick = function (e, barRect, val) {
+StatisticsView.prototype.onBarClick = function (e, barRect) {
     var chartsWrapper;
     var chartContent;
     var rectBBox;
@@ -284,22 +287,32 @@ StatisticsView.prototype.onBarClick = function (e, barRect, val) {
         chartsWrapper.style.position = (isRelative) ? 'relative' : '';
 
         this.popup.textContent = this.model.currency.formatCurrency(
-            val,
+            barRect.value,
             this.model.accountCurrency
         );
 
-        rectBBox = barRect.getBBox();
-        chartsBRect = chartsWrapper.getBoundingClientRect();
-        popupX = rectBBox.x2 - chartContent.scrollLeft + 10;
-        popupY = e.clientY - chartsBRect.top - 10;
+        rectBBox = barRect.elem.getBBox();
+        chartsBRect = chartContent.getBoundingClientRect();
+        popupX = rectBBox.x - chartContent.scrollLeft
+            + (rectBBox.width - this.popup.offsetWidth) / 2;
+        popupY = rectBBox.y - this.popup.offsetHeight - 10;
 
+        if (popupX < 0) {
+            popupX = 0;
+        }
         if (this.popup.offsetWidth + popupX > chartsBRect.width) {
             popupX -= this.popup.offsetWidth + rectBBox.width + 20;
         }
 
         setParam(this.popup.style, { left: px(popupX), top: px(popupY) });
 
-        setTimeout(setEmptyClick.bind(this, this.hideChartPopup.bind(this), [barRect[0]]));
+        setTimeout(
+            setEmptyClick.bind(
+                this,
+                this.hideChartPopup.bind(this),
+                [barRect.elem, this.popup]
+            )
+        );
     }
 };
 
@@ -307,18 +320,22 @@ StatisticsView.prototype.onBarClick = function (e, barRect, val) {
  * Histogram bar mouse over callback
  * @param {object} bar
  */
-StatisticsView.prototype.onBarOver = function (bar) {
-    if (bar) {
-        bar.attr({ fill: '#00ffbf' });
+StatisticsView.prototype.onBarOver = function (e, bar) {
+    if (!bar || !bar.elem) {
+        return;
     }
+
+    bar.elem.classList.add('bar_active');
 };
 
 /**
  * Histogram bar mouse out callback
  * @param {object} bar - bar rectangle element mouse leave from
  */
-StatisticsView.prototype.onBarOut = function (bar) {
-    if (bar) {
-        bar.attr({ fill: '#00bfff' });
+StatisticsView.prototype.onBarOut = function (e, bar) {
+    if (!bar || !bar.elem) {
+        return;
     }
+
+    bar.elem.classList.remove('bar_active');
 };

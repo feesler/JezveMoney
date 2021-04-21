@@ -6,7 +6,9 @@ use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
 use JezveMoney\Core\CachedInstance;
+use JezveMoney\App\Item\CurrencyItem;
 
+use function JezveMoney\Core\orJoin;
 use function JezveMoney\Core\qnull;
 
 class CurrencyModel extends CachedTable
@@ -146,7 +148,11 @@ class CurrencyModel extends CachedTable
             return true;
         }
 
-        $qResult = $this->dbObj->selectQ("id", "transactions", "curr_id=" . $curr_id);
+        $qResult = $this->dbObj->selectQ(
+            "id",
+            "transactions",
+            orJoin(["src_curr=" . $curr_id, "dest_curr=" . $curr_id])
+        );
         if ($this->dbObj->rowsCount($qResult) > 0) {
             return true;
         }
@@ -197,14 +203,8 @@ class CurrencyModel extends CachedTable
             return $res;
         }
 
-        foreach ($this->cache as $curr_id => $item) {
-            $currObj = new \stdClass();
-
-            $currObj->id = $item->id;
-            $currObj->name = $item->name;
-            $currObj->sign = $item->sign;
-            $currObj->flags = $item->flags;
-
+        foreach ($this->cache as $item) {
+            $currObj = new CurrencyItem($item);
             $res[] = $currObj;
         }
 

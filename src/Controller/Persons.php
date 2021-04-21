@@ -18,16 +18,18 @@ class Persons extends TemplateController
 
         $titleString = "Jezve Money | Persons";
 
-        array_push($this->css->libs,
+        array_push(
+            $this->css->libs,
             "tiles.css",
             "lib/iconlink.css",
-            "toolbar.css");
+            "toolbar.css"
+        );
         $this->buildCSS();
-        array_push($this->jsArr,
+        array_push(
+            $this->jsArr,
             "model/list.js",
             "model/person.js",
             "lib/selection.js",
-            "component/component.js",
             "component/header.js",
             "component/toolbar.js",
             "component/iconlink.js",
@@ -66,12 +68,14 @@ class Persons extends TemplateController
         $headString = "New person";
         $titleString .= $headString;
 
-        array_push($this->css->libs,
+        array_push(
+            $this->css->libs,
             "lib/iconlink.css",
-            "tiles.css");
+            "tiles.css"
+        );
         $this->buildCSS();
-        array_push($this->jsArr,
-            "component/component.js",
+        array_push(
+            $this->jsArr,
             "component/header.js",
             "view.js",
             "personview.js"
@@ -103,12 +107,14 @@ class Persons extends TemplateController
         $headString = "Edit person";
         $titleString .= $headString;
 
-        array_push($this->css->libs,
+        array_push(
+            $this->css->libs,
             "lib/iconlink.css",
-            "tiles.css");
+            "tiles.css"
+        );
         $this->buildCSS();
-        array_push($this->jsArr,
-            "component/component.js",
+        array_push(
+            $this->jsArr,
             "component/header.js",
             "component/iconlink.js",
             "component/confirmdialog.js",

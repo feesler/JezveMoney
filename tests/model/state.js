@@ -1,6 +1,8 @@
 import {
+    checkDate,
     isValidValue,
     isObject,
+    isInt,
     copyObject,
     setParam,
     checkObjValue,
@@ -13,11 +15,14 @@ import {
     TRANSFER,
 } from './transaction.js';
 import { App } from '../app.js';
+import { List } from './list.js';
 import { Currency } from './currency.js';
 import { Icon } from './icon.js';
+import { ImportRule } from './importrule.js';
 import { ACCOUNT_HIDDEN, AccountsList } from './accountslist.js';
 import { PERSON_HIDDEN, PersonsList } from './personslist.js';
 import { TransactionsList } from './transactionslist.js';
+import { ImportRuleList } from './importrulelist.js';
 import { api } from './api.js';
 
 /* eslint-disable no-bitwise */
@@ -37,6 +42,22 @@ const pReqFields = ['name', 'flags'];
  */
 const trReqFields = ['type', 'src_id', 'dest_id', 'src_amount', 'dest_amount', 'src_curr', 'dest_curr', 'date', 'comment'];
 
+/**
+ * Import templates
+ */
+const tplReqFields = ['name', 'type_id', 'columns'];
+const tplReqColumns = ['accountAmount', 'transactionAmount', 'accountCurrency', 'transactionCurrency', 'date', 'comment'];
+
+/**
+ * Import rules
+ */
+const ruleReqFields = ['flags', 'conditions', 'actions'];
+
+/**
+ * Check all properties of expected object are presents in specified object
+ * @param {Object} fields - object to check
+ * @param {Object} expFields - expected object
+ */
 function checkFields(fields, expFields) {
     if (!fields || !expFields) {
         return false;
@@ -51,6 +72,11 @@ function checkFields(fields, expFields) {
     return true;
 }
 
+/**
+ * Return new object with properties of specified object which are presents in expected object
+ * @param {Object} fields - object to check
+ * @param {Object} expFields - expected object
+ */
 function copyFields(fields, expFields) {
     const res = {};
 
@@ -60,7 +86,7 @@ function copyFields(fields, expFields) {
 
     for (const f of expFields) {
         if (f in fields) {
-            res[f] = fields[f];
+            res[f] = copyObject(fields[f]);
         }
     }
 
@@ -72,6 +98,8 @@ export class AppState {
         this.accounts = null;
         this.persons = null;
         this.transactions = null;
+        this.templates = null;
+        this.rules = null;
         this.profile = null;
     }
 
@@ -84,21 +112,32 @@ export class AppState {
         if (!this.accounts) {
             this.accounts = new AccountsList();
         }
-        this.accounts.data = copyObject(state.accounts.data);
+        this.accounts.setData(state.accounts.data);
         this.accounts.autoincrement = state.accounts.autoincrement;
 
         if (!this.persons) {
             this.persons = new PersonsList();
         }
-        this.persons.data = copyObject(state.persons.data);
+        this.persons.setData(state.persons.data);
         this.persons.autoincrement = state.persons.autoincrement;
 
         if (!this.transactions) {
             this.transactions = new TransactionsList();
         }
-        this.transactions.data = copyObject(state.transactions.data);
-        this.transactions.sort();
+        this.transactions.setData(state.transactions.data);
         this.transactions.autoincrement = state.transactions.autoincrement;
+
+        if (!this.templates) {
+            this.templates = new List();
+        }
+        this.templates.setData(state.templates.data);
+        this.templates.autoincrement = state.templates.autoincrement;
+
+        if (!this.rules) {
+            this.rules = new ImportRuleList();
+        }
+        this.rules.setData(state.rules.data);
+        this.rules.autoincrement = state.rules.autoincrement;
 
         this.profile = copyObject(state.profile);
     }
@@ -121,6 +160,8 @@ export class AppState {
         res.accounts = this.accounts.clone();
         res.persons = this.persons.clone();
         res.transactions = this.transactions.clone();
+        res.templates = this.templates.clone();
+        res.rules = this.rules.clone();
         res.profile = copyObject(this.profile);
 
         return res;
@@ -130,6 +171,8 @@ export class AppState {
         const res = checkObjValue(this.accounts.data, expected.accounts.data)
             && checkObjValue(this.transactions.data, expected.transactions.data)
             && checkObjValue(this.persons.data, expected.persons.data)
+            && checkObjValue(this.templates.data, expected.templates.data)
+            && checkObjValue(this.rules.data, expected.rules.data)
             && checkObjValue(this.profile, expected.profile);
         return res;
     }
@@ -153,6 +196,12 @@ export class AppState {
         }
         if (this.transactions) {
             this.transactions.reset();
+        }
+        if (this.templates) {
+            this.templates.reset();
+        }
+        if (this.rules) {
+            this.rules.reset();
         }
     }
 
@@ -251,17 +300,19 @@ export class AppState {
     }
 
     deleteAccounts(ids) {
-        const itemIds = Array.isArray(ids) ? ids : [ids];
+        let itemIds = Array.isArray(ids) ? ids : [ids];
         if (!itemIds.length) {
             return false;
         }
 
+        itemIds = itemIds.map((id) => parseInt(id, 10));
         for (const accountId of itemIds) {
             if (!this.accounts.getItem(accountId)) {
                 return false;
             }
         }
 
+        this.rules.deleteAccounts(itemIds);
         this.transactions = this.transactions.deleteAccounts(this.accounts.data, itemIds);
 
         // Prepare expected updates of accounts list
@@ -302,15 +353,18 @@ export class AppState {
     }
 
     getAccountByIndex(ind, visibleAccList, hiddenAccList) {
-        if (ind < 0 || ind > visibleAccList.length + hiddenAccList.length) {
+        const index = parseInt(ind, 10);
+        if (Number.isNaN(index)
+            || index < 0
+            || index > visibleAccList.length + hiddenAccList.length) {
             throw new Error(`Invalid account index ${ind}`);
         }
 
-        if (ind < visibleAccList.length) {
-            return visibleAccList[ind].id;
+        if (index < visibleAccList.length) {
+            return visibleAccList[index].id;
         }
 
-        const hiddenInd = ind - visibleAccList.length;
+        const hiddenInd = index - visibleAccList.length;
         return hiddenAccList[hiddenInd].id;
     }
 
@@ -338,7 +392,7 @@ export class AppState {
                 throw new Error(`Account '${name}' not found`);
             }
 
-            return userAccounts.getIndexOf(acc.id);
+            return userAccounts.getIndexById(acc.id);
         });
     }
 
@@ -420,6 +474,7 @@ export class AppState {
             }
         }
 
+        this.rules.deletePersons(ids);
         this.persons.deleteItems(ids);
 
         // Prepare expected updates of transactions
@@ -457,7 +512,7 @@ export class AppState {
             return null;
         }
 
-        const accObj = this.accounts.data.find(
+        const accObj = this.accounts.find(
             (item) => item.owner_id === pId && item.curr_id === currId,
         );
 
@@ -527,7 +582,7 @@ export class AppState {
                 throw new Error(`Person '${name}' not found`);
             }
 
-            return visibleList.getIndexOf(person.id);
+            return visibleList.getIndexById(person.id);
         });
     }
 
@@ -544,7 +599,7 @@ export class AppState {
             return false;
         }
 
-        if (params.src_amount === 0 || params.dest_amount === 0) {
+        if (params.src_amount <= 0 || params.dest_amount <= 0) {
             return false;
         }
 
@@ -603,6 +658,10 @@ export class AppState {
             } else if (params.type === INCOME || params.type === TRANSFER) {
                 return false;
             }
+        }
+
+        if ('date' in params && !checkDate(params.date)) {
+            return false;
         }
 
         return true;
@@ -683,7 +742,7 @@ export class AppState {
 
     updatePersonAccounts() {
         for (const person of this.persons.data) {
-            person.accounts = this.accounts.data.filter((item) => item.owner_id === person.id)
+            person.accounts = this.accounts.filter((item) => item.owner_id === person.id)
                 .map((item) => ({ id: item.id, balance: item.balance, curr_id: item.curr_id }));
         }
     }
@@ -787,6 +846,179 @@ export class AppState {
         }
 
         this.transactions.updateResults(this.accounts);
+
+        return true;
+    }
+
+    /**
+     * Import templates
+     */
+    checkTemplateCorrectness(params) {
+        if (!isObject(params)) {
+            return false;
+        }
+
+        if (!checkFields(params, tplReqFields)) {
+            return false;
+        }
+
+        if (typeof params.name !== 'string' || params.name === '') {
+            return false;
+        }
+
+        if (!isObject(params.columns)) {
+            return false;
+        }
+        // Check every column value is present and have correct value
+        return tplReqColumns.every((columnName) => (
+            (columnName in params.columns)
+            && isInt(params.columns[columnName])
+            && params.columns[columnName] > 0
+        ));
+    }
+
+    createTemplate(params) {
+        const resExpected = this.checkTemplateCorrectness(params);
+        if (!resExpected) {
+            return false;
+        }
+
+        const data = copyFields(params, tplReqFields);
+
+        const ind = this.templates.create(data);
+        const item = this.templates.getItemByIndex(ind);
+
+        return item.id;
+    }
+
+    updateTemplate(params) {
+        const origItem = this.templates.getItem(params.id);
+        if (!origItem) {
+            return false;
+        }
+
+        const expTemplate = copyObject(origItem);
+        const data = copyFields(params, tplReqFields);
+        setParam(expTemplate, data);
+
+        const resExpected = this.checkTemplateCorrectness(expTemplate);
+        if (!resExpected) {
+            return false;
+        }
+
+        this.templates.update(expTemplate);
+
+        return true;
+    }
+
+    deleteTemplates(ids) {
+        const itemIds = Array.isArray(ids) ? ids : [ids];
+        if (!itemIds.length) {
+            return false;
+        }
+
+        for (const itemId of itemIds) {
+            if (!this.templates.getItem(itemId)) {
+                return false;
+            }
+        }
+
+        this.rulesDeleteTemplate(ids);
+        this.templates.deleteItems(ids);
+
+        return true;
+    }
+
+    /**
+     * Import rules
+     */
+    checkRuleCorrectness(params) {
+        if (!checkFields(params, ruleReqFields)) {
+            return false;
+        }
+
+        try {
+            const rule = new ImportRule(params);
+            return rule.validate();
+        } catch (e) {
+            return false;
+        }
+    }
+
+    prepareConditions(conditions) {
+        if (!Array.isArray(conditions)) {
+            throw new Error('Invalid conditions parameter');
+        }
+
+        return conditions.map((condition) => ({
+            ...condition,
+            value: ('value' in condition) ? condition.value.toString() : undefined,
+        }));
+    }
+
+    prepareActions(actions) {
+        if (!Array.isArray(actions)) {
+            throw new Error('Invalid actions parameter');
+        }
+
+        return actions.map((action) => ({
+            ...action,
+            value: ('value' in action) ? action.value.toString() : undefined,
+        }));
+    }
+
+    createRule(params) {
+        const resExpected = this.checkRuleCorrectness(params);
+        if (!resExpected) {
+            return false;
+        }
+
+        const data = copyFields(params, ruleReqFields);
+        data.conditions = this.prepareConditions(data.conditions);
+        data.actions = this.prepareActions(data.actions);
+
+        const ind = this.rules.create(data);
+        const item = this.rules.getItemByIndex(ind);
+
+        return item.id;
+    }
+
+    updateRule(params) {
+        const origItem = this.rules.getItem(params.id);
+        if (!origItem) {
+            return false;
+        }
+
+        const expRule = origItem.toPlain();
+        const data = copyFields(params, ruleReqFields);
+        setParam(expRule, data);
+
+        const resExpected = this.checkRuleCorrectness(expRule);
+        if (!resExpected) {
+            return false;
+        }
+
+        expRule.conditions = this.prepareConditions(expRule.conditions);
+        expRule.actions = this.prepareActions(expRule.actions);
+
+        this.rules.update(expRule);
+
+        return true;
+    }
+
+    deleteRules(ids) {
+        const itemIds = Array.isArray(ids) ? ids : [ids];
+        if (!itemIds.length) {
+            return false;
+        }
+
+        for (const itemId of itemIds) {
+            if (!this.rules.getItem(itemId)) {
+                return false;
+            }
+        }
+
+        this.rules.deleteItems(ids);
 
         return true;
     }

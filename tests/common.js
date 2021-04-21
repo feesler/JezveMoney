@@ -18,6 +18,27 @@ export function isObject(o) {
         && Object.prototype.toString.call(o) === '[object Object]';
 }
 
+/** Check is specified string is number */
+export function isNum(val) {
+    const fval = parseFloat(val);
+    if (fval === 0) {
+        return true;
+    }
+
+    return !!(val / val);
+}
+
+/** Check parameter is integer */
+export function isInt(x) {
+    const y = parseInt(x, 10);
+
+    if (Number.isNaN(y)) {
+        return false;
+    }
+
+    return x === y && x.toString() === y.toString();
+}
+
 export async function asyncMap(data, func) {
     if (!Array.isArray(data)) {
         throw new Error('Invalid data type');
@@ -121,6 +142,34 @@ export function fixDate(date) {
     return convDate(date);
 }
 
+/** Check string is correct date in dd.mm.yyyy format */
+export function checkDate(str) {
+    if (typeof str !== 'string' || !str.length) {
+        return false;
+    }
+
+    const sparr = str.split('.');
+    if (sparr.length !== 3) {
+        return false;
+    }
+
+    if (!isNum(sparr[0]) || !isNum(sparr[1]) || !isNum(sparr[2])) {
+        return false;
+    }
+
+    if (
+        sparr[0] < 1
+        || sparr[0] > 31
+        || sparr[1] < 1
+        || sparr[1] > 12
+        || sparr[2] < 1970
+    ) {
+        return false;
+    }
+
+    return true;
+}
+
 const SECOND = 1000;
 const MINUTE = 60000;
 const HOUR = 3600000;
@@ -190,9 +239,50 @@ export function isValidValue(val) {
     return (typeof val !== 'undefined' && val !== null && !Number.isNaN(parseFloat(fixFloat(val))));
 }
 
+/** Validate amount value */
+export function isValidAmount(value) {
+    const amount = parseFloat(fixFloat(value));
+    return (!Number.isNaN(amount) && amount > 0);
+}
+
 /*
 * Other
 */
+
+/** Quote string for CSV */
+function quoteString(str) {
+    const escaped = str.toString().split('"').join('\\"');
+
+    return `"${escaped}"`;
+}
+
+/** Return CSV */
+export function createCSV({
+    header = null,
+    data = [],
+    delimiter = ';',
+    newLine = '\r\n',
+}) {
+    let rows = [];
+
+    if (typeof delimiter !== 'string'
+        || typeof newLine !== 'string'
+        || !Array.isArray(data)) {
+        throw new Error('Invalid parameters');
+    }
+
+    if (Array.isArray(header)) {
+        rows.push(header);
+    }
+
+    rows = rows.concat(data);
+
+    const res = rows.map(
+        (row) => row.map(quoteString).join(delimiter),
+    ).join(newLine).trim();
+
+    return `${res}${newLine}`;
+}
 
 /** Return deep copy of object */
 export function copyObject(item) {

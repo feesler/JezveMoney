@@ -1,0 +1,128 @@
+/* Import file form */
+.upload-popup .popup__content-box {
+  max-width: 600px;
+  width: 100%;
+}
+
+/* Main account block */
+.upload-dialog-account {
+  margin-bottom: 12px;
+}
+
+/* Upload dialog controls block */
+.upload-dialog-controls {
+  margin-bottom: 12px;
+}
+
+/* Transactions list */
+/* Header */
+.data-header {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+}
+
+.header-actions {
+  box-sizing: border-box;
+  display: flex;
+  flex-flow: row wrap;
+  align-items: baseline;
+  justify-content: flex-end;
+  flex: 1 1 auto;
+}
+
+.header-field {
+  display: flex;
+  flex-flow: column nowrap;
+  margin-left: 12px;
+}
+
+.header-field:first-child {
+  margin-left: 0;
+}
+
+.header-field label {
+  font-size: 14px;
+}
+
+.header-field__content {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 34px;
+  margin: 9px 0;
+}
+
+/* Main account header field */
+.account-field {
+  flex-shrink: 0;
+}
+
+.account-field div {
+  justify-content: left;
+}
+
+/* Icon buttons */
+.header-actions .iconlink {
+  margin: 4px;
+}
+
+.header-info {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-end;
+  flex: 0 1 auto;
+}
+
+/* Rules block */
+.rules-container {
+  display: flex;
+  flex-flow: row nowrap;
+  margin: 4px 0;
+}
+
+.rules-container .btn {
+  font-size: 16px;
+}
+
+/* Transaction items container */
+.data-container {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  position: relative;
+}
+
+.data-container__loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 400;
+  z-index: 10;
+  opacity: 0.7;
+  border-radius: 10px;
+}
+
+/* Checkbox or radiobutton wrapper */
+.checkwrap {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+.checkwrap > span {
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.checkwrap > input[type="checkbox"],
+.checkwrap > input[type="radio"] {
+  margin: 0px 5px 0px 0px;
+}

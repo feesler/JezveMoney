@@ -1,4 +1,5 @@
-import { api, ApiRequestError } from '../../model/api.js';
+import { api } from '../../model/api.js';
+import { ApiRequestError } from '../../error/apirequest.js';
 import { Transaction } from '../../model/transaction.js';
 import {
     test,
@@ -165,7 +166,7 @@ export async function setPos(params) {
 export async function filter(params) {
     await test(`Filter transactions (${formatProps(params)})`, async () => {
         const transactions = App.state.transactions.clone();
-        let expTransList = transactions.filter(params);
+        let expTransList = transactions.applyFilter(params);
         if ('page' in params || 'onPage' in params) {
             const targetPage = ('page' in params) ? params.page : 1;
             expTransList = expTransList.getPage(targetPage, params.onPage);

@@ -56,16 +56,22 @@ function setLogs($enable)
 }
 
 
-function domainFromHost($host)
+function setupLogs()
 {
-    $pos = strpos($host, ":");
-    if ($pos !== false) {
-        return substr($host, 0, $pos);
+    global $noLogs;
+
+    if (!isset($noLogs) || !$noLogs) {
+        function wlog($str = null)
+        {
+            \JezveMoney\Core\Logger::write($str);
+        }
+        bootLog();
     } else {
-        return $host;
+        function wlog()
+        {
+        }
     }
 }
-
 
 // Set location header to redirect page and exit from script
 function setLocation($loc)
@@ -79,6 +85,14 @@ function setLocation($loc)
 function is_empty($str)
 {
     return is_null($str) || $str == "";
+}
+
+
+// If specified object is array just return it
+// If object is not array then return array contains it
+function asArray($obj)
+{
+    return is_array($obj) ? $obj : [$obj];
 }
 
 
@@ -165,24 +179,6 @@ function urlJoin($base, $params = null, $raw = false)
 }
 
 
-function pathJoin(...$segments)
-{
-    if (!is_array($segments) || !count($segments)) {
-        return "";
-    }
-
-    $trimmed = [];
-    $res = (strpos($segments[0], DIRECTORY_SEPARATOR) === 0) ? DIRECTORY_SEPARATOR : "";
-    foreach ($segments as $segment) {
-        $trimmed[] = trim($segment, DIRECTORY_SEPARATOR);
-    }
-
-    $res .= implode(DIRECTORY_SEPARATOR, $trimmed) . DIRECTORY_SEPARATOR;
-
-    return $res;
-}
-
-
 // Return file modification timestamp
 function getModifiedTime($file)
 {
@@ -265,13 +261,34 @@ function checkFields($obj, $expectedFields, $throw = false)
     foreach ($expectedFields as $field) {
         if (!array_key_exists($field, $obj)) {
             if ($throw) {
-                throw new \Error("Field $field not found");
+                throw new \Error("Field '$field' not found");
             } else {
+                wlog("Field '$field' not found");
                 return false;
             }
         }
 
         $res[$field] = $obj[$field];
+    }
+
+    return $res;
+}
+
+
+// Convert associative array to array of objects {id, name}
+function convertToObjectArray($data)
+{
+    if (!is_array($data)) {
+        return null;
+    }
+
+    $res = [];
+    foreach ($data as $item_id => $value) {
+        $item = new \stdClass();
+        $item->id = $item_id;
+        $item->name = $value;
+
+        $res[] = $item;
     }
 
     return $res;

@@ -1,331 +1,271 @@
 'use strict';
 
 /* global isFunction, ge, ce, svg, addChilds, setParam, re, insertAfter, insertBefore */
-/* global prependChild, show, setEmptyClick */
+/* global prependChild, show, setEmptyClick, Component, extend */
 /* exported Popup */
 
 var CLOSE_ICON = 'M 1.1415,2.4266 5.7838,7 1.1415,11.5356 2.4644,12.8585 7,8.2162 11.5734,12.8585 12.8585,11.5356 8.2162,7 12.8585,2.4266 11.5734,1.1415 7,5.7838 2.4644,1.1415 Z';
 
-/** Popup constructor */
-var Popup = new (function () {
-    // Modal instance constructor
-    function Modal(params) {
-        var popupObj = null;
-        var backObj = null;
-        var contentObj = null;
-        var boxObj = null;
-        var titleObj = null;
-        var messageObj = null;
-        var controlsObj = null;
-        var okBtn = null;
-        var cancelBtn = null;
-        var closeBtn = null;
-        var onCloseHandler = null;
-        var props = null;
-        var self = this;
+/**
+ * Popup component constructor
+ * @param {Object} params:
+ * @param {String} params.id - identifier of element will be created for popup
+ * @param {boolean} params.nodim - option to not dim background on popup appear
+ * @param {Function} params.onclose - popup close event handler
+ * @param {String|String[]} params.additional - list of additional CSS classes for popup
+ * @param {String} params.title - title of popup
+ * @param {Object} params.btn:
+ * @param {Object|false} params.btn.okBtn - properties object. Remove if false
+ * @param {Object|false} params.btn.cancelBtn - properties object. Remove if false
+ * @param {Object|false} params.btn.closeBtn - properties object. Remove if false
+ */
+function Popup() {
+    var addClassNames;
 
-        function hideModal() {
-            if (!popupObj) {
-                return;
-            }
+    Popup.parent.constructor.apply(this, arguments);
 
-            show(popupObj, false);
-            document.body.style.overflow = '';
-
-            if (props.closeOnEmptyClick === true) {
-                setEmptyClick();
-            }
-        }
-
-        function closeModal() {
-            hideModal();
-
-            if (isFunction(onCloseHandler)) {
-                onCloseHandler();
-            }
-        }
-
-        // Set click handler for close button
-        function setOnClose(elem) {
-            var btn = (elem) ? elem.firstElementChild : null;
-            if (btn) {
-                btn.onclick = closeModal.bind(self);
-            }
-        }
-
-        // Add close button to the popup
-        function addCloseButton() {
-            if (!boxObj || closeBtn) {
-                return;
-            }
-
-            closeBtn = ce('button', { className: 'close-btn', type: 'button' },
-                svg('svg', {},
-                    svg('path', { d: CLOSE_ICON })));
-            boxObj.appendChild(closeBtn);
-
-            setOnClose(closeBtn);
-        }
-
-        // Remove close button
-        function removeCloseButton() {
-            re(closeBtn);
-            closeBtn = null;
-        }
-
-        function setModalContent(content) {
-            var newMessageObj;
-
-            if (!content) {
-                return false;
-            }
-
-            if (typeof content === 'string') {
-                newMessageObj = ce(
-                    'div',
-                    { className: 'popup__message' },
-                    ce('div', { innerHTML: content })
-                );
-            } else {
-                newMessageObj = content;
-            }
-
-            if (messageObj) {
-                insertBefore(newMessageObj, messageObj);
-                re(messageObj);
-            }
-
-            messageObj = newMessageObj;
-
-            return true;
-        }
-
-        function setModalTitle(titleStr) {
-            if (!titleStr) {
-                return;
-            }
-
-            if (!titleObj) {
-                titleObj = ce('h1', { className: 'popup__title', textContent: params.title });
-                prependChild(boxObj, titleObj);
-            }
-
-            titleObj.textContent = titleStr;
-        }
-
-        function removeModalTitle() {
-            re(titleObj);
-            titleObj = null;
-        }
-
-        function setModalControls(controlsProps) {
-            var newHasControls;
-
-            if (!controlsProps) {
-                return false;
-            }
-
-            newHasControls = (controlsProps.okBtn !== false || controlsProps.cancelBtn !== false);
-            if (newHasControls) {
-                if (!controlsObj) {
-                    controlsObj = ce('div', { className: 'popup__controls' });
-                }
-            } else {
-                re(controlsObj);
-                controlsObj = null;
-            }
-
-            if (typeof controlsProps.okBtn !== 'undefined') {
-                if (controlsProps.okBtn === false && okBtn) {
-                    re(okBtn);
-                    okBtn = null;
-                } else {
-                    if (!okBtn) {
-                        okBtn = ce('input', {
-                            className: 'btn submit-btn',
-                            type: 'button',
-                            value: 'ok'
-                        });
-                    }
-
-                    setParam(okBtn, controlsProps.okBtn);
-                }
-            }
-
-            if (typeof controlsProps.cancelBtn !== 'undefined') {
-                if (controlsProps.cancelBtn === false && cancelBtn) {
-                    re(cancelBtn);
-                    cancelBtn = null;
-                } else {
-                    if (!cancelBtn) {
-                        cancelBtn = ce('input', {
-                            className: 'btn cancel-btn',
-                            type: 'button',
-                            value: 'cancel',
-                            onclick: closeModal.bind(self)
-                        });
-                    }
-
-                    setParam(cancelBtn, controlsProps.cancelBtn);
-                }
-            }
-
-            if (newHasControls) {
-                addChilds(controlsObj, [okBtn, cancelBtn]);
-                insertAfter(controlsObj, messageObj);
-            }
-
-            if (typeof controlsProps.closeBtn !== 'undefined') {
-                if (controlsProps.closeBtn === true) {
-                    addCloseButton();
-                } else if (controlsProps.closeBtn === false) {
-                    removeCloseButton();
-                }
-            }
-
-            return true;
-        }
-
-        function create(createParams) {
-            var addClassNames;
-
-            if (!createParams) {
-                return false;
-            }
-
-            props = createParams;
-
-            // check popup with same id is already exist
-            if ('id' in props) {
-                popupObj = ge(props.id);
-                if (popupObj) {
-                    return false;
-                }
-            }
-            popupObj = ce('div', { className: 'popup hidden' });
-            if ('id' in props) {
-                popupObj.id = props.id;
-            }
-
-            backObj = ce('div', { className: 'popup__back' });
-            if (!backObj) {
-                return false;
-            }
-
-            if (props.nodim === true) {
-                show(backObj, false);
-            }
-
-            if (isFunction(props.onclose)) {
-                this.onCloseHandler = props.onclose;
-            }
-
-            if (!setModalContent(props.content)) {
-                return false;
-            }
-
-            contentObj = ce('div', { className: 'popup__content' });
-            boxObj = ce('div', { className: 'popup__content-box' });
-            if (!contentObj || !boxObj) {
-                return false;
-            }
-
-            if (Array.isArray(props.additional) || typeof props.additional === 'string') {
-                addClassNames = Array.isArray(props.additional)
-                    ? props.additional
-                    : props.additional.split(' ');
-
-                addClassNames.forEach(function (item) {
-                    contentObj.classList.add(item);
-                });
-            }
-
-            prependChild(boxObj, messageObj);
-            setModalTitle(props.title);
-            setModalControls(props.btn);
-            contentObj.appendChild(boxObj);
-            show(messageObj, true);
-            addChilds(popupObj, [backObj, contentObj]);
-            document.body.appendChild(popupObj);
-
-            return true;
-        }
-
-        function showModal() {
-            if (!popupObj) {
-                return;
-            }
-
-            document.body.style.overflow = 'hidden';
-            document.documentElement.scrollTop = 0;
-            show(popupObj, true);
-
-            if (props.closeOnEmptyClick === true) {
-                setTimeout(function () {
-                    setEmptyClick(closeModal.bind(self), [boxObj]);
-                });
-            }
-        }
-
-        function destroyModal() {
-            if (popupObj && popupObj.parentNode) {
-                popupObj.parentNode.removeChild(popupObj);
-            }
-            popupObj = null;
-        }
-
-        create.call(this, params);
-
-        // Modal public methods
-        this.show = function () {
-            showModal();
-        };
-
-        this.hide = function () {
-            hideModal();
-        };
-
-        this.close = function () {
-            closeModal();
-        };
-
-        this.destroy = function () {
-            destroyModal();
-        };
-
-        this.setTitle = function (titleStr) {
-            setModalTitle(titleStr);
-        };
-
-        this.removeTitle = function () {
-            removeModalTitle();
-        };
-
-        this.setContent = function (content) {
-            return setModalContent(content);
-        };
-
-        this.setControls = function (controls) {
-            return setModalControls(controls);
-        };
+    if (!this.props) {
+        return false;
     }
 
-    /* Popup global object public methods */
+    // check popup with same id is already exist
+    if ('id' in this.props) {
+        this.elem = ge(this.props.id);
+        if (this.elem) {
+            throw new Error('Element with id ' + this.props.id + ' already exist');
+        }
+    }
+    this.elem = ce('div', { className: 'popup hidden' });
+    if ('id' in this.props) {
+        this.elem.id = this.props.id;
+    }
 
-    /**
-     *
-     * @param {Object} params:
-     * @param {String} params.id - identifier of element will be created for popup
-     * @param {boolean} params.nodim - option to not dim background on popup appear
-     * @param {Function} params.onclose - popup close event handler
-     * @param {String|String[]} params.additional - list of additional CSS classes for popup
-     * @param {String} params.title - title of popup
-     * @param {Object} params.btn:
-     * @param {Object|false} params.btn.okBtn - properties object. Remove if false
-     * @param {Object|false} params.btn.cancelBtn - properties object. Remove if false
-     * @param {Object|false} params.btn.closeBtn - properties object. Remove if false
-     */
-    this.create = function (params) {
-        return new Modal(params);
-    };
-})();
+    if (this.props.nodim === true) {
+        this.elem.classList.add('nodim');
+    }
+
+    this.onCloseHandler = (isFunction(this.props.onclose)) ? this.props.onclose : null;
+
+    if (!this.setContent(this.props.content)) {
+        return false;
+    }
+
+    this.boxElem = ce('div', { className: 'popup__content-box' });
+    this.contentElem = ce('div', { className: 'popup__content' }, this.boxElem);
+    this.wrapperElem = ce('div', { className: 'popup__wrapper' }, this.contentElem);
+    this.scrollerElem = ce('div', { className: 'popup__scroller' }, this.wrapperElem);
+
+    if (Array.isArray(this.props.additional)
+        || typeof this.props.additional === 'string') {
+        addClassNames = Array.isArray(this.props.additional)
+            ? this.props.additional
+            : this.props.additional.split(' ');
+
+        addClassNames.forEach(function (cl) {
+            this.contentElem.classList.add(cl);
+        }, this);
+    }
+
+    prependChild(this.boxElem, this.messageElem);
+    this.setTitle(this.props.title);
+    this.setControls(this.props.btn);
+    this.contentElem.appendChild(this.boxElem);
+    show(this.messageElem, true);
+
+    this.elem.appendChild(this.scrollerElem);
+
+    document.body.appendChild(this.elem);
+}
+
+extend(Popup, Component);
+
+/** Static alias for Popup constructor */
+Popup.create = function (props) {
+    try {
+        return new Popup(props);
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+};
+
+Popup.prototype.destroy = function () {
+    if (this.elem && this.elem.parentNode) {
+        this.elem.parentNode.removeChild(this.elem);
+    }
+    this.elem = null;
+};
+
+Popup.prototype.show = function (val) {
+    var toShow = (typeof val === 'undefined') ? true : !!val;
+    if (!toShow) {
+        this.hide();
+        return;
+    }
+
+    document.body.style.overflow = 'hidden';
+    document.documentElement.scrollTop = 0;
+    show(this.elem, true);
+
+    if (this.props.closeOnEmptyClick === true) {
+        setTimeout(function () {
+            setEmptyClick(this.close.bind(this), [this.boxElem]);
+        }.bind(this));
+    }
+};
+
+Popup.prototype.hide = function () {
+    if (!this.elem) {
+        return;
+    }
+
+    show(this.elem, false);
+    document.body.style.overflow = '';
+
+    if (this.props.closeOnEmptyClick === true) {
+        setEmptyClick();
+    }
+};
+
+Popup.prototype.close = function () {
+    this.hide();
+
+    if (isFunction(this.onCloseHandler)) {
+        this.onCloseHandler();
+    }
+};
+
+// Add close button to the popup
+Popup.prototype.addCloseButton = function () {
+    if (!this.boxElem || this.closeBtn) {
+        return;
+    }
+
+    this.closeBtn = ce(
+        'button',
+        { className: 'close-btn', type: 'button' },
+        svg('svg', {}, svg('path', { d: CLOSE_ICON })),
+        { click: this.close.bind(this) }
+    );
+    this.boxElem.appendChild(this.closeBtn);
+};
+
+// Remove close button
+Popup.prototype.removeCloseButton = function () {
+    re(this.closeBtn);
+    this.closeBtn = null;
+};
+
+Popup.prototype.setContent = function (content) {
+    var newMessageObj;
+
+    if (!content) {
+        return false;
+    }
+
+    if (typeof content === 'string') {
+        newMessageObj = ce(
+            'div',
+            { className: 'popup__message' },
+            ce('div', { innerHTML: content })
+        );
+    } else {
+        newMessageObj = content;
+    }
+
+    if (this.messageElem) {
+        insertBefore(newMessageObj, this.messageElem);
+        re(this.messageElem);
+    }
+
+    this.messageElem = newMessageObj;
+
+    return true;
+};
+
+Popup.prototype.setTitle = function (title) {
+    if (!title) {
+        return;
+    }
+
+    if (!this.titleElem) {
+        this.titleElem = ce('h1', { className: 'popup__title' });
+        prependChild(this.boxElem, this.titleElem);
+    }
+
+    this.titleElem.textContent = title;
+};
+
+Popup.prototype.removeTitle = function () {
+    re(this.titleElem);
+    this.titleElem = null;
+};
+
+Popup.prototype.setControls = function (controls) {
+    var newHasControls;
+
+    if (!controls) {
+        return false;
+    }
+
+    newHasControls = ('okBtn' in controls && controls.okBtn !== false)
+        || ('cancelBtn' in controls && controls.cancelBtn !== false);
+    if (newHasControls) {
+        if (!this.controlsElem) {
+            this.controlsElem = ce('div', { className: 'popup__controls' });
+        }
+    } else {
+        re(this.controlsElem);
+        this.controlsElem = null;
+    }
+
+    if ('okBtn' in controls) {
+        if (controls.okBtn === false && this.okBtn) {
+            re(this.okBtn);
+            this.okBtn = null;
+        } else {
+            if (!this.okBtn) {
+                this.okBtn = ce('input', {
+                    className: 'btn submit-btn',
+                    type: 'button',
+                    value: 'ok'
+                });
+            }
+
+            setParam(this.okBtn, controls.okBtn);
+        }
+    }
+
+    if ('cancelBtn' in controls) {
+        if (controls.cancelBtn === false && this.cancelBtn) {
+            re(this.cancelBtn);
+            this.cancelBtn = null;
+        } else {
+            if (!this.cancelBtn) {
+                this.cancelBtn = ce('input', {
+                    className: 'btn cancel-btn',
+                    type: 'button',
+                    value: 'cancel',
+                    onclick: this.close.bind(this)
+                });
+            }
+
+            setParam(this.cancelBtn, controls.cancelBtn);
+        }
+    }
+
+    if (newHasControls) {
+        addChilds(this.controlsElem, [this.okBtn, this.cancelBtn]);
+        insertAfter(this.controlsElem, this.messageElem);
+    }
+
+    if (typeof controls.closeBtn !== 'undefined') {
+        if (controls.closeBtn === true) {
+            this.addCloseButton();
+        } else if (controls.closeBtn === false) {
+            this.removeCloseButton();
+        }
+    }
+
+    return true;
+};

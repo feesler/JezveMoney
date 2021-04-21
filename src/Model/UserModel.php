@@ -132,8 +132,8 @@ class UserModel extends CachedTable
     {
         $expTime = time() + 31536000;    // year after now
 
-        setcookie("login", $login, $expTime, APP_PATH, APP_DOMAIN, isSecure());
-        setcookie("passhash", $passhash, $expTime, APP_PATH, APP_DOMAIN, isSecure());
+        setcookie("login", $login, $expTime, APP_PATH, "", isSecure());
+        setcookie("passhash", $passhash, $expTime, APP_PATH, "", isSecure());
     }
 
 
@@ -142,8 +142,8 @@ class UserModel extends CachedTable
     {
         $expTime = time() - 3600;    // hour before now
 
-        setcookie("login", "", $expTime, APP_PATH, APP_DOMAIN, isSecure());
-        setcookie("passhash", "", $expTime, APP_PATH, APP_DOMAIN, isSecure());
+        setcookie("login", "", $expTime, APP_PATH, "", isSecure());
+        setcookie("passhash", "", $expTime, APP_PATH, "", isSecure());
     }
 
 
@@ -205,7 +205,7 @@ class UserModel extends CachedTable
         $themeCookie = (intval($theme) == DARK_THEME) ? DARK_THEME : WHITE_THEME;
 
         $expTime = time() + 31536000;    // year after now
-        setcookie("theme", $themeCookie, $expTime, APP_PATH, APP_DOMAIN, isSecure());
+        setcookie("theme", $themeCookie, $expTime, APP_PATH, "", isSecure());
     }
 
 
@@ -215,6 +215,15 @@ class UserModel extends CachedTable
         $uObj = $this->getItem($item_id);
 
         return ($uObj && ($uObj->access & 0x1) == 0x1);
+    }
+
+
+    // Check user has test access
+    public function isTester($item_id)
+    {
+        $uObj = $this->getItem($item_id);
+
+        return ($uObj && ($uObj->access & 0x2) == 0x2);
     }
 
 
@@ -456,14 +465,23 @@ class UserModel extends CachedTable
             $personMod = PersonModel::getInstance();
             $personObj = $personMod->getItem($userObj->owner_id);
             if (!$personObj) {
-                $person_id = $personMod->create(["name" => $this->personName, "user_id" => $item_id, "flags" => 0]);
+                $personData = [
+                    "name" => $this->personName,
+                    "user_id" => $item_id,
+                    "flags" => 0
+                ];
+                $person_id = $personMod->create($personData);
                 if (!$person_id) {
                     throw new \Error("Fail to create person for user");
                 }
 
                 $this->setOwner($item_id, $person_id);
             } else {
-                if (!$personMod->adminUpdate($userObj->owner_id, ["name" => $this->personName, "user_id" => $item_id])) {
+                $personData = [
+                    "name" => $this->personName,
+                    "user_id" => $item_id
+                ];
+                if (!$personMod->adminUpdate($userObj->owner_id, $personData)) {
                     throw new \Error("Fail to update person of user");
                 }
             }
@@ -723,8 +741,11 @@ class UserModel extends CachedTable
             return false;
         }
 
-        if (!$this->dbObj->deleteQ("persons", "user_id" . $setCond)) {
-            return false;
+        $tables = ["persons", "import_tpl", "import_rule", "import_act"];
+        foreach ($tables as $table) {
+            if (!$this->dbObj->deleteQ($table, "user_id" . $setCond)) {
+                return false;
+            }
         }
 
         return true;

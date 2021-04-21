@@ -142,11 +142,12 @@ export class TestView {
                 continue;
             }
 
-            const expected = controls[countrolName];
-            const control = this.content[countrolName];
-            if (!control) {
+            if (!(countrolName in this.content)) {
                 throw new Error(`Control (${countrolName}) not found`);
             }
+            const expected = controls[countrolName];
+            const control = this.content[countrolName];
+            const isObj = isObject(control);
 
             if (isObject(expected) || Array.isArray(expected)) {
                 res = checkObjValue(control, expected, true);
@@ -154,7 +155,10 @@ export class TestView {
                     res.key = `${countrolName}.${res.key}`;
                     break;
                 }
-            } else if (control.value !== expected) {
+            } else if (
+                (isObj && control.value !== expected)
+                || (!isObj && control !== expected)
+            ) {
                 res = {
                     key: countrolName,
                     value: control.value,

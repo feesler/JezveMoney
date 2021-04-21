@@ -19,6 +19,7 @@ export class TransactionsView extends TestView {
         const res = {
             titleEl: await this.query('.content_wrap > .heading > h1'),
             addBtn: await IconLink.create(this, await this.query('#add_btn')),
+            importBtn: await IconLink.create(this, await this.query('#import_btn')),
             toolbar: await Toolbar.create(this, await this.query('#toolbar')),
         };
 
@@ -102,7 +103,7 @@ export class TransactionsView extends TestView {
             res.filter.endDate = dateRange.endDate;
         }
 
-        res.filtered = res.data.filter(res.filter);
+        res.filtered = res.data.applyFilter(res.filter);
 
         if (cont.paginator && cont.transList) {
             res.list = {
@@ -148,7 +149,7 @@ export class TransactionsView extends TestView {
     updateModelFilter(model) {
         const res = this.cloneModel(model);
 
-        res.filtered = res.data.filter(res.filter);
+        res.filtered = res.data.applyFilter(res.filter);
 
         const pageItems = res.filtered.getPage(1);
         if (res.filtered.length > 0) {
@@ -180,7 +181,7 @@ export class TransactionsView extends TestView {
 
         const res = this.cloneModel(model);
 
-        res.filtered = res.data.filter(res.filter);
+        res.filtered = res.data.applyFilter(res.filter);
         res.list.page = page;
         const pageItems = res.filtered.getPage(page);
         res.list.items = TransactionList.render(pageItems.data, App.state);
@@ -430,6 +431,11 @@ export class TransactionsView extends TestView {
     /** Click on add button */
     async goToCreateTransaction() {
         await this.navigation(() => this.content.addBtn.click());
+    }
+
+    /** Click on import button */
+    async goToImportView() {
+        await this.navigation(() => this.content.importBtn.click());
     }
 
     async selectTransactions(data) {

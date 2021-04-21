@@ -176,7 +176,7 @@ class TransactionModel extends CachedTable
         if (isset($params["src_curr"])) {
             $res["src_curr"] = intval($params["src_curr"]);
             if (
-                !$this->currMod->is_exist($res["src_curr"]) ||
+                !$this->currMod->isExist($res["src_curr"]) ||
                 ($srcAcc && $srcAcc->curr_id != $res["src_curr"])
             ) {
                 wlog("Invalid src_curr specified");
@@ -187,7 +187,7 @@ class TransactionModel extends CachedTable
         if (isset($params["dest_curr"])) {
             $res["dest_curr"] = intval($params["dest_curr"]);
             if (
-                !$this->currMod->is_exist($res["dest_curr"]) ||
+                !$this->currMod->isExist($res["dest_curr"]) ||
                 ($destAcc && $destAcc->curr_id != $res["dest_curr"])
             ) {
                 wlog("Invalid dest_curr specified");
@@ -325,25 +325,7 @@ class TransactionModel extends CachedTable
 
         $this->balanceChanges = $this->applyTransaction($res, $this->balanceChanges);
 
-        // check target date is today
-        $today_date = getdate();
-        $target_date = getdate($res["date"]);
-        $today_time = mktime(0, 0, 0, $today_date["mon"], $today_date["mday"], $today_date["year"]);
-        $target_time = mktime(0, 0, 0, $target_date["mon"], $target_date["mday"], $target_date["year"]);
-
-        if ($today_time > $target_time) {
-            $res["pos"] = 0;
-        } else {
-            if ($isMultiple) {
-                if (is_null($this->latestPos)) {
-                    $this->latestPos = $this->getLatestPos();
-                }
-                $res["pos"] = (++$this->latestPos);
-            } else {
-                $res["pos"] = $this->getLatestPos() + 1;
-            }
-        }
-
+        $res["pos"] = 0;
         $res["date"] = date("Y-m-d H:i:s", $res["date"]);
         $res["src_result"] = ($res["src_id"] != 0) ? $this->balanceChanges[$res["src_id"]] : 0;
         $res["dest_result"] = ($res["dest_id"] != 0) ? $this->balanceChanges[$res["dest_id"]] : 0;
@@ -526,7 +508,7 @@ class TransactionModel extends CachedTable
         $this->accModel->updateBalances($this->balanceChanges);
         $this->balanceChanges = null;
 
-        // update position of transaction if target date is not today
+        // update position of transaction if target date was changed
         if ($trObj->pos === 0) {
             $latest_pos = $this->getLatestPos($trObj->date);
             $this->updatePos($item_id, $latest_pos + 1);
@@ -892,7 +874,7 @@ class TransactionModel extends CachedTable
     // Remove specified account from transactions
     public function onAccountDelete($accounts)
     {
-        if (!self::$user_id) {
+        if (!self::$user_id || is_null($accounts)) {
             return false;
         }
 
@@ -902,10 +884,7 @@ class TransactionModel extends CachedTable
             throw new \Error("User not found");
         }
 
-        if (!is_array($accounts)) {
-            $accounts = [$accounts];
-        }
-
+        $accounts = asArray($accounts);
         $ids = [];
         $personAccounts = [];
         $userAccounts = [];

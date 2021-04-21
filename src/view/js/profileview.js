@@ -137,7 +137,7 @@ ProfileView.prototype.showChangeNamePopup = function (e) {
             id: 'chname_popup',
             title: 'Change name',
             content: this.changeNameContent,
-            additional: 'center_only chname_popup'
+            additional: 'chname_popup'
         });
 
         this.changeNamePopup.setControls({
@@ -229,7 +229,7 @@ ProfileView.prototype.showChangePasswordPopup = function (e) {
             id: 'chpass_popup',
             title: 'Change password',
             content: this.changePassContent,
-            additional: 'center_only chpass_popup'
+            additional: 'chpass_popup'
         });
 
         this.changePassPopup.setControls({

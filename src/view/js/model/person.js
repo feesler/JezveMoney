@@ -64,7 +64,7 @@ PersonList.prototype.createItem = function (obj) {
  * Return list of visible Persons
  */
 PersonList.prototype.getVisible = function () {
-    return this.data.filter(function (item) {
+    return this.filter(function (item) {
         return item && item.isVisible();
     });
 };

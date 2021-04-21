@@ -34,6 +34,9 @@ function ConfirmDialog() {
     if ('id' in this.props) {
         popupProps.id = this.props.id;
     }
+    if ('additional' in this.props) {
+        popupProps.additional = this.props.additional;
+    }
 
     this.popup = Popup.create(popupProps);
     if (!this.popup) {
@@ -69,6 +72,7 @@ ConfirmDialog.prototype.show = function () {
  * @param {boolean} toShow - if true component will be shown, hidden otherwise. Default is true
  */
 ConfirmDialog.prototype.onResult = function (confirmResult) {
+    this.popup.hide();
     this.popup.destroy();
 
     if (confirmResult) {

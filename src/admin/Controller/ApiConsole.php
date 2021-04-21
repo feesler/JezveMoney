@@ -2,12 +2,16 @@
 
 namespace JezveMoney\App\Admin\Controller;
 
+use JezveMoney\App\Model\ImportTemplateModel;
 use JezveMoney\Core\AdminController;
 
 class ApiConsole extends AdminController
 {
     public function index()
     {
+        $tplModel = ImportTemplateModel::getInstance();
+        $tplColumns = $tplModel->getColumnTypes();
+
         $this->menuItems["apiconsole"]["active"] = true;
 
         $titleString = "Admin panel | API console";
@@ -16,7 +20,8 @@ class ApiConsole extends AdminController
         $this->buildCSS();
 
         $this->jsArr[] = "view.js";
-        array_push($this->jsAdmin,
+        array_push(
+            $this->jsAdmin,
             "adminview.js",
             "apiconsoleview.js"
         );

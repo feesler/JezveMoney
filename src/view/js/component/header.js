@@ -53,7 +53,7 @@ Header.prototype.parse = function () {
     }
     this.themeCheck.addEventListener('change', this.onToggleTheme.bind(this));
 
-    this.userNameElem = this.elem.querySelector('.user_title');
+    this.userNameElem = this.elem.querySelector('.user__title');
     if (this.userNameElem) {
         this.userName = this.userNameElem.textContent;
     }

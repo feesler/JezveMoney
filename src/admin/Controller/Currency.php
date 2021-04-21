@@ -18,16 +18,23 @@ class Currency extends AdminController
 
     public function index()
     {
-        $currArr = $this->model->getData();
+        $itemsData = $this->model->getData();
+        $viewData = [
+            "data" => $itemsData
+        ];
 
         $this->menuItems["curr"]["active"] = true;
 
         $titleString = "Admin panel | Currency";
 
         $this->buildCSS();
-
-        $this->jsArr[] = "view.js";
-        array_push($this->jsAdmin,
+        array_push(
+            $this->jsArr,
+            "component/confirmdialog.js",
+            "view.js"
+        );
+        array_push(
+            $this->jsAdmin,
             "adminview.js",
             "adminlistview.js",
             "currencyview.js"

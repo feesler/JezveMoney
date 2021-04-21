@@ -1,5 +1,17 @@
 /* Statistics view histogram chart */
-.stat-histogram
-{
-	width: 100%;
+.stat-histogram {
+  width: 100%;
+}
+
+.bar_active {
+  fill: #00ffbf;
+}
+
+/* Bar chart information popup */
+.chart_popup {
+  position: absolute;
+  border: 1px solid #000000;
+  background-color: #ffffff;
+  padding: 5px;
+  white-space: nowrap;
 }

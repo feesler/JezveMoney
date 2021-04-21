@@ -20,6 +20,9 @@ class Icon extends AdminController
     {
         $itemsData = $this->model->getData();
         $typesData = $this->model->getTypes();
+        $viewData = [
+            "data" => $itemsData
+        ];
 
         $this->menuItems["icon"]["active"] = true;
 
@@ -27,8 +30,13 @@ class Icon extends AdminController
 
         $this->buildCSS();
 
-        $this->jsArr[] = "view.js";
-        array_push($this->jsAdmin,
+        array_push(
+            $this->jsArr,
+            "component/confirmdialog.js",
+            "view.js"
+        );
+        array_push(
+            $this->jsAdmin,
             "adminview.js",
             "adminlistview.js",
             "iconview.js"

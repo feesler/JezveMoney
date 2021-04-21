@@ -2,11 +2,20 @@ import { copyObject } from '../common.js';
 
 export class List {
     constructor(data = []) {
-        if (!Array.isArray(data)) {
+        if (data instanceof List) {
+            this.setData(data.data);
+        } else if (Array.isArray(data)) {
+            this.setData(data);
+        } else {
             throw new Error('Invalid data specified');
         }
+    }
 
-        this.setData(data);
+    clone() {
+        const res = new List(this.data);
+        res.autoincrement = this.autoincrement;
+
+        return res;
     }
 
     get length() {
@@ -14,7 +23,7 @@ export class List {
     }
 
     setData(data) {
-        this.data = copyObject(data);
+        this.data = data.map((item) => this.createItem(item));
     }
 
     reset() {
@@ -30,20 +39,24 @@ export class List {
         this.setData(newData);
     }
 
+    getIds() {
+        return this.data.map((item) => item.id);
+    }
+
     getItem(id) {
         const itemId = parseInt(id, 10);
         if (!itemId) {
             return null;
         }
         const res = this.data.find((item) => item.id === itemId);
-        return copyObject(res);
+        return this.createItem(res);
     }
 
     getItems(ids) {
         const itemIds = (Array.isArray(ids) ? ids : [ids])
             .map((id) => parseInt(id, 10));
         const res = this.data.filter((item) => itemIds.includes(item.id));
-        return copyObject(res);
+        return res.map((item) => this.createItem(item));
     }
 
     getItemByIndex(ind) {
@@ -52,11 +65,11 @@ export class List {
             return null;
         }
 
-        return copyObject(this.data[pos]);
+        return this.createItem(this.data[pos]);
     }
 
     // Return index of item with specified id
-    getIndexOf(id) {
+    getIndexById(id) {
         const itemId = parseInt(id, 10);
         if (!itemId) {
             return null;
@@ -81,7 +94,7 @@ export class List {
             throw new Error(`Invalid position ${pos} specified`);
         }
 
-        const item = this.data[pos];
+        const item = this.data[ind];
         return item.id;
     }
 
@@ -105,6 +118,27 @@ export class List {
         return 0;
     }
 
+    /** Convert object to list item */
+    createItem(obj) {
+        return copyObject(obj);
+    }
+
+    /**
+     * Push item to the end of list
+     * Return index of new item in the list
+     * @param {Object} item - item data
+     */
+    addItem(item) {
+        if (!item) {
+            throw new Error('Invalid item');
+        }
+
+        const res = this.length;
+        this.data.push(item);
+
+        return res;
+    }
+
     /**
      * Push item to the end of list, automatically generate id
      * Return index of new item in the list
@@ -115,7 +149,7 @@ export class List {
             throw new Error('Invalid item');
         }
 
-        const itemObj = copyObject(item);
+        const itemObj = this.createItem(item);
 
         const nextId = this.getNextId();
         if (nextId) {
@@ -123,10 +157,7 @@ export class List {
             this.autoincrement = nextId + 1;
         }
 
-        const res = this.length;
-        this.data.push(itemObj);
-
-        return res;
+        return this.addItem(itemObj);
     }
 
     /**
@@ -139,12 +170,12 @@ export class List {
             throw new Error('Invalid item');
         }
 
-        const ind = this.getIndexOf(item.id);
+        const ind = this.getIndexById(item.id);
         if (ind === -1) {
             return false;
         }
 
-        const itemObj = copyObject(item);
+        const itemObj = this.createItem(item);
         this.data.splice(ind, 1, itemObj);
 
         return true;
@@ -162,20 +193,50 @@ export class List {
             throw new Error('Unexpected input');
         }
 
-        const itemIds = Array.isArray(ids) ? ids : [ids];
-        const res = copyObject(list);
-        for (const id of itemIds) {
-            const itemId = parseInt(id, 10);
-            if (!itemId) {
-                continue;
-            }
+        let itemIds = Array.isArray(ids) ? ids : [ids];
+        itemIds = itemIds
+            .map((id) => parseInt(id, 10))
+            .filter((id) => !!id);
 
-            const ind = res.findIndex((item) => item.id === itemId);
-            if (ind !== -1) {
-                res.splice(ind, 1);
-            }
-        }
+        const res = copyObject(list)
+            .filter((item) => !itemIds.includes(item.id));
 
         return res;
+    }
+
+    forEach(...args) {
+        this.data.forEach(...args);
+    }
+
+    every(...args) {
+        return this.data.every(...args);
+    }
+
+    some(...args) {
+        return this.data.some(...args);
+    }
+
+    find(...args) {
+        return this.data.find(...args);
+    }
+
+    findIndex(...args) {
+        return this.data.findIndex(...args);
+    }
+
+    filter(...args) {
+        return this.data.filter(...args);
+    }
+
+    map(...args) {
+        return this.data.map(...args);
+    }
+
+    reduce(...args) {
+        return this.data.reduce(...args);
+    }
+
+    slice(...args) {
+        return this.data.slice(...args);
     }
 }

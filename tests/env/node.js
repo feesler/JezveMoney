@@ -114,33 +114,48 @@ export class NodeEnvironment extends Environment {
         if (typeof relem === 'string') {
             relem = await this.query(`#${relem}`);
         }
+        if (!relem) {
+            return false;
+        }
 
-        return elem.evaluate(visibilityResolver, recursive);
+        return relem.evaluate(visibilityResolver, recursive);
     }
 
     /** Select item with specified value if exist */
     /* eslint-disable no-param-reassign, no-await-in-loop */
-    async selectByValue(selectObj, selValue, selBool) {
-        if (!selectObj) {
-            return false;
+    async selectByValue(elem, value, bool = true) {
+        if (!elem) {
+            throw new Error('Invalid select element');
+        }
+        if (typeof value === 'undefined') {
+            throw new Error('Invalid value');
         }
 
-        const options = await this.prop(selectObj, 'options');
-        if (!options) {
-            return false;
-        }
-
-        for (let i = 0, l = options.length; i < l; i += 1) {
-            const option = options[i];
-            if (option && await this.prop(option, 'value') === selValue) {
-                await option.evaluate((el, sel) => {
-                    el.selected = (typeof sel !== 'undefined') ? sel : true;
-                }, selBool);
-                return true;
+        const selValue = value.toString();
+        const selBool = !!bool;
+        const res = await elem.evaluate((el, val, sel) => {
+            if (!el.options || !el.options.length) {
+                return false;
             }
-        }
 
-        return false;
+            for (let i = 0, l = el.options.length; i < l; i += 1) {
+                const option = el.options[i];
+                if (option && option.value === val) {
+                    if (el.multiple) {
+                        option.selected = sel;
+                    } else {
+                        el.selectedIndex = i;
+                    }
+                    return true;
+                }
+            }
+
+            return false;
+        }, selValue, selBool);
+
+        if (!res) {
+            throw new Error('Value not found');
+        }
     }
     /* eslint-enable no-param-reassign, no-await-in-loop */
 
@@ -161,12 +176,20 @@ export class NodeEnvironment extends Environment {
         await elem.evaluate((el) => {
             el.value = '';
         });
-        return elem.type(val);
+        return elem.type(val.toString());
     }
     /* eslint-enable no-param-reassign */
 
     async onChange(elem) {
-        return elem.evaluate((el) => el.onchange());
+        return elem.evaluate((el) => {
+            if ('createEvent' in document) {
+                const evt = document.createEvent('HTMLEvents');
+                evt.initEvent('change', true, false);
+                el.dispatchEvent(evt);
+            } else {
+                el.fireEvent('onchange');
+            }
+        });
     }
 
     async onBlur(elem) {
@@ -400,6 +423,10 @@ export class NodeEnvironment extends Environment {
         return this.page.content();
     }
 
+    setErrorHandler() {
+        this.page.on('pageerror', this.errorHandler);
+    }
+
     async navigation(action) {
         if (!isFunction(action)) {
             throw new Error('Wrong action specified');
@@ -464,10 +491,10 @@ export class NodeEnvironment extends Environment {
             });
             const allPages = await browser.pages();
             this.page = (allPages.length) ? allPages[0] : await browser.newPage();
+            this.setErrorHandler();
 
             this.addResult('Test initialization', true);
 
-            await this.goTo(this.base);
             await this.app.startTests();
             res = 0;
         } catch (e) {

@@ -187,6 +187,10 @@ SortableDragZone.prototype.findDragZoneItem = function (target) {
     el = target;
     while (el && el !== this.elem) {
         if (isFunction(el.matches) && el.matches(this.params.selector)) {
+            if (el.classList.contains(this.params.placeholderClass)) {
+                return null;
+            }
+
             return el;
         }
         el = el.parentNode;
@@ -203,12 +207,15 @@ SortableDragZone.prototype.isValidDragHandle = function (target) {
         return false;
     }
 
+    item = this.findDragZoneItem(target);
+    if (!item) {
+        return false;
+    }
+
     // allow to drag using whole drag zone in case no handles is set
     if (!this.params || !this.params.onlyRootHandle) {
         return SortableDragZone.parent.isValidDragHandle.apply(this, arguments);
     }
-
-    item = this.findDragZoneItem(target);
 
     return this.params.onlyRootHandle && target === item;
 };

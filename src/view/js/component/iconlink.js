@@ -64,6 +64,17 @@ IconLink.prototype.parse = function () {
 };
 
 /** Set title text */
+IconLink.prototype.enable = function (value) {
+    if (value) {
+        this.elem.removeAttribute('disabled');
+        this.buttonElem.removeAttribute('disabled');
+    } else {
+        this.elem.setAttribute('disabled', '');
+        this.buttonElem.setAttribute('disabled', '');
+    }
+};
+
+/** Set title text */
 IconLink.prototype.setTitle = function (title) {
     if (typeof title !== 'string') {
         throw new Error('Invalid title specified');

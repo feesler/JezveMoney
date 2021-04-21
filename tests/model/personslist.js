@@ -22,10 +22,10 @@ export class PersonsList extends List {
         let res;
 
         if (caseSens) {
-            res = this.data.find((item) => item.name === name);
+            res = this.find((item) => item.name === name);
         } else {
             const lookupName = name.toLowerCase();
-            res = this.data.find((item) => item.name.toLowerCase() === lookupName);
+            res = this.find((item) => item.name.toLowerCase() === lookupName);
         }
 
         return copyObject(res);
@@ -40,7 +40,7 @@ export class PersonsList extends List {
     }
 
     getVisible(returnRaw = false) {
-        const res = this.data.filter((item) => !this.isHidden(item));
+        const res = this.filter((item) => !this.isHidden(item));
 
         if (returnRaw) {
             return copyObject(res);
@@ -50,7 +50,7 @@ export class PersonsList extends List {
     }
 
     getHidden(returnRaw = false) {
-        const res = this.data.filter((item) => this.isHidden(item));
+        const res = this.filter((item) => this.isHidden(item));
 
         if (returnRaw) {
             return copyObject(res);

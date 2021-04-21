@@ -105,7 +105,7 @@ abstract class CachedTable extends Model
 
 
     // Check is specified object is exist
-    public function is_exist($obj_id)
+    public function isExist($obj_id)
     {
         $obj_id = intval($obj_id);
         if (!$obj_id) {

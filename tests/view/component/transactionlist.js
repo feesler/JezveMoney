@@ -11,7 +11,7 @@ export class TransactionList extends Component {
         if (
             !listItems
             || !listItems.length
-            || (listItems.length === 1 && await this.prop(listItems[0], 'tagName') === 'SPAN')
+            || (listItems.length === 1 && await this.hasClass(listItems[0], 'nodata-message'))
         ) {
             return;
         }

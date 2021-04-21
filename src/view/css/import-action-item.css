@@ -1,0 +1,27 @@
+/* Rule action item */
+.action-item {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: 8px;
+}
+
+.action-item + .action-item {
+  margin-top: 1px;
+}
+
+.action-item__type {
+  font-size: 14px;
+  margin-right: 12px;
+}
+
+.action-item__value {
+  font-size: 14px;
+  flex-grow: 1;
+  font-weight: 400;
+}
+
+.action-item__value::before,
+.action-item__value::after {
+  content: "`";
+}

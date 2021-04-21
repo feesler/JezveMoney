@@ -16,6 +16,14 @@ abstract class Controller
     }
 
 
+    public function runAction($action)
+    {
+        if (method_exists($this, $action)) {
+            $this->$action();
+        }
+    }
+
+
     // Check current request is POST
     protected function isPOST()
     {
