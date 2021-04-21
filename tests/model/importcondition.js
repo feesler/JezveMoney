@@ -2,7 +2,7 @@ import {
     isFunction,
     isObject,
     convDate,
-    isValidAmount,
+    fixFloat,
 } from '../common.js';
 
 /* eslint-disable no-bitwise */
@@ -309,11 +309,17 @@ export class ImportCondition {
         return ImportCondition.getAvailOperators(this.field_id);
     }
 
+    /** Validate condition amount value */
+    isValidAmount(value) {
+        const amount = parseFloat(fixFloat(value));
+        return !Number.isNaN(amount);
+    }
+
     /** Check correctness of condition */
     validate() {
         // Check amount value
         if (this.isAmountField()
-            && !isValidAmount(this.value)) {
+            && !this.isValidAmount(this.value)) {
             return false;
         }
 

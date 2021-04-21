@@ -7,6 +7,7 @@ import {
     DEBT,
 } from '../../model/transaction.js';
 import { ImportTransaction } from '../../model/importtransaction.js';
+import { ImportTemplate } from '../../model/importtemplate.js';
 import { Currency } from '../../model/currency.js';
 import {
     normalize,
@@ -14,6 +15,7 @@ import {
     copyObject,
     asyncMap,
     fixFloat,
+    formatDate,
 } from '../../common.js';
 import { App } from '../../app.js';
 
@@ -224,6 +226,11 @@ export class ImportListItem extends Component {
         res.imported = await this.isVisible(this.toggleBtn, true);
         if (this.originalData) {
             res.original = copyObject(this.originalData);
+            res.original.accAmountVal = ImportTemplate.amountFix(res.original.accAmountVal);
+            res.original.trAmountVal = ImportTemplate.amountFix(res.original.trAmountVal);
+
+            const date = ImportTemplate.dateFromString(res.original.date);
+            res.original.date = formatDate(date);
         }
 
         return res;

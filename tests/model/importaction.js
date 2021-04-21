@@ -1,4 +1,4 @@
-import { isFunction, isValidAmount } from '../common.js';
+import { isFunction, fixFloat } from '../common.js';
 import { App } from '../app.js';
 import { ImportTransaction } from './importtransaction.js';
 
@@ -28,6 +28,12 @@ export class ImportAction {
         });
     }
 
+    /** Validate action amount value */
+    isValidAmount(value) {
+        const amount = parseFloat(fixFloat(value));
+        return (!Number.isNaN(amount) && amount > 0);
+    }
+
     /** Check correctness of action */
     validate() {
         if (!(this.action_id in ImportAction.actionsMap)) {
@@ -49,7 +55,7 @@ export class ImportAction {
                 return false;
             }
         } else if (this.isAmountValue()) {
-            if (!isValidAmount(this.value)) {
+            if (!this.isValidAmount(this.value)) {
                 return false;
             }
         }
