@@ -253,7 +253,7 @@ ImportRuleForm.prototype.getNextAvailProperty = function (state) {
     // Filter available field types
     availFields = this.fieldTypes.filter(function (fieldType) {
         if (ImportCondition.isTemplateField(fieldType.id)) {
-            return this.model.template.length > 0;
+            return false;
         }
 
         return true;
