@@ -548,7 +548,7 @@ ImportTransactionItem.prototype.onDateInput = function () {
 
 /** Comment field 'input' event handler */
 ImportTransactionItem.prototype.onCommentInput = function () {
-    var value = this.dateInp.value;
+    var value = this.commInp.value;
     this.setComment(value);
     this.clearInvalid();
     this.render();
