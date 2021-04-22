@@ -83,8 +83,14 @@ ImportRule.prototype.runActions = function (context) {
     });
 };
 
-/** Validate amount value */
-ImportRule.prototype.isValidAmount = function (value) {
+/** Validate condition amount value */
+ImportRule.prototype.isValidConditionAmount = function (value) {
+    var amount = parseFloat(fixFloat(value));
+    return !Number.isNaN(amount);
+};
+
+/** Validate action amount value */
+ImportRule.prototype.isValidActionAmount = function (value) {
     var amount = parseFloat(fixFloat(value));
     return (!Number.isNaN(amount) && amount > 0);
 };
@@ -116,7 +122,7 @@ ImportRule.prototype.validate = function () {
 
             // Check amount value
             if (condition.isAmountField()
-                && !this.isValidAmount(condition.value)) {
+                && !this.isValidConditionAmount(condition.value)) {
                 throw new ImportConditionValidationError('Input correct amount', ind);
             }
 
@@ -216,7 +222,7 @@ ImportRule.prototype.validate = function () {
             ruleActionTypes.push(action.action_id);
             // Amount value
             if (action.isAmountValue()
-                && !this.isValidAmount(action.value)) {
+                && !this.isValidActionAmount(action.value)) {
                 throw new ImportActionValidationError('Input correct amount', ind);
             }
 

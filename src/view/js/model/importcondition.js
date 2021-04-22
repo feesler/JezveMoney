@@ -125,10 +125,10 @@ ImportCondition.operatorTypes = [
 ImportCondition.fieldsMap = {};
 ImportCondition.fieldsMap[IMPORT_COND_FIELD_MAIN_ACCOUNT] = 'mainAccount';
 ImportCondition.fieldsMap[IMPORT_COND_FIELD_TPL] = 'template';
-ImportCondition.fieldsMap[IMPORT_COND_FIELD_TR_AMOUNT] = 'trAmountVal';
-ImportCondition.fieldsMap[IMPORT_COND_FIELD_TR_CURRENCY] = 'trCurrVal';
-ImportCondition.fieldsMap[IMPORT_COND_FIELD_ACC_AMOUNT] = 'accAmountVal';
-ImportCondition.fieldsMap[IMPORT_COND_FIELD_ACC_CURRENCY] = 'accCurrVal';
+ImportCondition.fieldsMap[IMPORT_COND_FIELD_TR_AMOUNT] = 'transactionAmount';
+ImportCondition.fieldsMap[IMPORT_COND_FIELD_TR_CURRENCY] = 'transactionCurrencyId';
+ImportCondition.fieldsMap[IMPORT_COND_FIELD_ACC_AMOUNT] = 'accountAmount';
+ImportCondition.fieldsMap[IMPORT_COND_FIELD_ACC_CURRENCY] = 'accountCurrencyId';
 ImportCondition.fieldsMap[IMPORT_COND_FIELD_DATE] = 'date';
 ImportCondition.fieldsMap[IMPORT_COND_FIELD_COMMENT] = 'comment';
 /** Operator functions map */

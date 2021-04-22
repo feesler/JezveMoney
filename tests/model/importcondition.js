@@ -2,7 +2,7 @@ import {
     isFunction,
     isObject,
     convDate,
-    isValidAmount,
+    fixFloat,
 } from '../common.js';
 
 /* eslint-disable no-bitwise */
@@ -102,10 +102,10 @@ export class ImportCondition {
     static fieldsMap = {
         [IMPORT_COND_FIELD_MAIN_ACCOUNT]: (data) => data.mainAccount.id,
         [IMPORT_COND_FIELD_TPL]: 'template',
-        [IMPORT_COND_FIELD_TR_AMOUNT]: 'trAmountVal',
-        [IMPORT_COND_FIELD_TR_CURRENCY]: 'trCurrVal',
-        [IMPORT_COND_FIELD_ACC_AMOUNT]: 'accAmountVal',
-        [IMPORT_COND_FIELD_ACC_CURRENCY]: 'accCurrVal',
+        [IMPORT_COND_FIELD_TR_AMOUNT]: 'transactionAmount',
+        [IMPORT_COND_FIELD_TR_CURRENCY]: 'transactionCurrency',
+        [IMPORT_COND_FIELD_ACC_AMOUNT]: 'accountAmount',
+        [IMPORT_COND_FIELD_ACC_CURRENCY]: 'accountCurrency',
         [IMPORT_COND_FIELD_DATE]: 'date',
         [IMPORT_COND_FIELD_COMMENT]: 'comment',
     };
@@ -309,11 +309,17 @@ export class ImportCondition {
         return ImportCondition.getAvailOperators(this.field_id);
     }
 
+    /** Validate condition amount value */
+    isValidAmount(value) {
+        const amount = parseFloat(fixFloat(value));
+        return !Number.isNaN(amount);
+    }
+
     /** Check correctness of condition */
     validate() {
         // Check amount value
         if (this.isAmountField()
-            && !isValidAmount(this.value)) {
+            && !this.isValidAmount(this.value)) {
             return false;
         }
 

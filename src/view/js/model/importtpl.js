@@ -156,16 +156,23 @@ ImportTemplate.prototype.getComment = function (data) {
 };
 
 /** Apply import template to specified data row */
-ImportTemplate.prototype.applyTo = function (data) {
+ImportTemplate.prototype.applyTo = function (data, currencyModel) {
+    var currency;
     var res = {
-        accAmountVal: this.getAccountAmount(data),
-        accCurrVal: this.getAccountCurrency(data),
-        trAmountVal: this.getTransactionAmount(data),
-        trCurrVal: this.getTransactionCurrency(data),
+        accountAmount: this.getAccountAmount(data),
+        accountCurrency: this.getAccountCurrency(data),
+        transactionAmount: this.getTransactionAmount(data),
+        transactionCurrency: this.getTransactionCurrency(data),
         date: this.getDate(data),
         comment: this.getComment(data),
         template: this.id
     };
+
+    currency = currencyModel.findByName(res.accountCurrency);
+    res.accountCurrencyId = (currency) ? currency.id : null;
+
+    currency = currencyModel.findByName(res.transactionCurrency);
+    res.transactionCurrencyId = (currency) ? currency.id : null;
 
     return res;
 };

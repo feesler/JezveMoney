@@ -95,11 +95,30 @@ export class Scenario {
     }
 
     async runTestScenario() {
+        await ApiTests.loginTest(App.config.testAdminUser);
+        await this.prepareImportTests();
+
         await ApiTests.loginTest(App.config.testUser);
         await App.setupUser();
         this.setupCurrencies();
         await App.goToMainView();
         await ProfileTests.relogin(App.config.testUser);
+
+        await App.state.fetch();
+
+        const ruleIds = App.state.rules.getIds();
+        if (ruleIds.length) {
+            await api.importrule.del(ruleIds);
+        }
+
+        const templateIds = App.state.templates.getIds();
+        if (templateIds.length) {
+            await api.importtemplate.del(templateIds);
+        }
+
+        await this.prepareTransactionTests();
+
+        await this.importTests();
     }
 
     async runFullScenario() {
@@ -2735,30 +2754,6 @@ export class Scenario {
         });
         await ImportTests.submitRule();
 
-        this.environment.setBlock('Submit condition with zero amount', 2);
-        await ImportTests.updateRuleCondition({
-            pos: 1,
-            action: { action: 'inputAmount', data: '00.0' },
-        });
-        await ImportTests.submitRule();
-        await ImportTests.updateRuleCondition({
-            pos: 1,
-            action: { action: 'changeFieldType', data: IMPORT_COND_FIELD_ACC_AMOUNT },
-        });
-        await ImportTests.submitRule();
-
-        this.environment.setBlock('Submit condition with negative amount', 2);
-        await ImportTests.updateRuleCondition({
-            pos: 1,
-            action: { action: 'inputAmount', data: '-100.0' },
-        });
-        await ImportTests.submitRule();
-        await ImportTests.updateRuleCondition({
-            pos: 1,
-            action: { action: 'changeFieldType', data: IMPORT_COND_FIELD_TR_AMOUNT },
-        });
-        await ImportTests.submitRule();
-
         this.environment.setBlock('Submit duplicate conditions', 2);
         await ImportTests.updateRuleCondition({
             pos: 1,
@@ -2909,6 +2904,11 @@ export class Scenario {
             { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
             { action: 'inputValue', data: 'SIGMA' },
         ]);
+        await ImportTests.createRuleCondition([
+            { action: 'changeFieldType', data: IMPORT_COND_FIELD_TR_AMOUNT },
+            { action: 'changeOperator', data: IMPORT_COND_OP_LESS },
+            { action: 'inputAmount', data: '0' },
+        ]);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
             { action: 'changeTransactionType', data: 'transferto' },
@@ -2933,7 +2933,7 @@ export class Scenario {
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_ACC_AMOUNT },
             { action: 'changeOperator', data: IMPORT_COND_OP_GREATER },
-            { action: 'inputAmount', data: '100' },
+            { action: 'inputAmount', data: '-100' },
         ]);
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_ACC_AMOUNT },
