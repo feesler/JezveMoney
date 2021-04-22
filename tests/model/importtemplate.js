@@ -58,6 +58,14 @@ export class ImportTemplate {
     * @param {Account} mainAccount - main account object
     */
     applyTo(data, mainAccount) {
+        const columns = [
+            'accountAmount',
+            'accountCurrency',
+            'transactionAmount',
+            'transactionCurrency',
+            'date',
+            'comment',
+        ];
         const skipRows = 1;
 
         if (!Array.isArray(data) || !mainAccount) {
@@ -71,37 +79,27 @@ export class ImportTemplate {
             }
 
             const original = { mainAccount };
+            columns.forEach((column) => {
+                if (!(column in this.columns)) {
+                    throw new Error(`Column '${column}' not found`);
+                }
 
-            const accAmount = ImportTemplate.getColumn(row, this.columns.accountAmount);
-            original.accAmountVal = ImportTemplate.amountFix(accAmount);
-            if (!original.accAmountVal) {
-                return;
-            }
-            original.accCurrVal = ImportTemplate.getColumn(row, this.columns.accountCurrency);
-            original.accCurr = Currency.findByName(original.accCurrVal);
-            if (!original.accCurr) {
-                console.log(`Currency ${original.accCurrVal} not found`);
-                return;
-            }
+                let value = ImportTemplate.getColumn(row, this.columns[column]);
 
-            const trAmount = ImportTemplate.getColumn(row, this.columns.transactionAmount);
-            original.trAmountVal = ImportTemplate.amountFix(trAmount);
-            if (!original.accAmountVal) {
-                return;
-            }
-            original.trCurrVal = ImportTemplate.getColumn(row, this.columns.transactionCurrency);
-            original.trCurr = Currency.findByName(original.trCurrVal);
-            if (!original.trCurr) {
-                console.log(`Currency ${original.trCurrVal} not found`);
-                return;
-            }
+                if (['accountAmount', 'transactionAmount'].includes(column)) {
+                    value = ImportTemplate.amountFix(value);
+                } else if (column === 'date') {
+                    value = formatDate(ImportTemplate.dateFromString(value));
+                }
 
-            original.date = ImportTemplate.dateFromString(
-                ImportTemplate.getColumn(row, this.columns.date),
-            );
-            original.date = formatDate(original.date);
+                original[column] = value;
+            });
 
-            original.comment = ImportTemplate.getColumn(row, this.columns.comment);
+            const accCurrency = Currency.findByName(original.accountCurrency);
+            original.accountCurrencyId = accCurrency ? accCurrency.id : null;
+
+            const trCurrency = Currency.findByName(original.transactionCurrency);
+            original.transactionCurrencyId = trCurrency ? trCurrency.id : null;
 
             const item = ImportTransaction.fromImportData(original, mainAccount);
 

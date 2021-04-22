@@ -297,10 +297,10 @@ ImportTransactionItem.prototype.createOrigDataContainer = function (data, mainAc
         this.createContainer('orig-data-table', [
             this.createDataValue('Main account', mainAccount.name),
             this.createDataValue('Date', dateFmt),
-            this.createDataValue('Tr. amount', data.trAmountVal),
-            this.createDataValue('Tr. currency', data.trCurrVal),
-            this.createDataValue('Acc. amount', data.accAmountVal),
-            this.createDataValue('Acc. currency', data.accCurrVal),
+            this.createDataValue('Tr. amount', data.transactionAmount),
+            this.createDataValue('Tr. currency', data.transactionCurrency),
+            this.createDataValue('Acc. amount', data.accountAmount),
+            this.createDataValue('Acc. currency', data.accountCurrency),
             this.createDataValue('Comment', data.comment, 'comment-value')
         ])
     ]);
@@ -338,15 +338,15 @@ ImportTransactionItem.prototype.setOriginal = function (data) {
     }
     this.data.mainAccount = this.model.mainAccount.id;
 
-    if (this.data.accCurrId !== this.model.mainAccount.curr_id) {
+    if (this.data.accountCurrencyId !== this.model.mainAccount.curr_id) {
         throw new Error('Currency must be the same as main account');
     }
 
-    amount = parseFloat(fixFloat(data.accAmountVal));
+    amount = parseFloat(fixFloat(data.accountAmount));
     if (Number.isNaN(amount) || amount === 0) {
         throw new Error('Invalid account amount value');
     }
-    trAmount = parseFloat(fixFloat(data.trAmountVal));
+    trAmount = parseFloat(fixFloat(data.transactionAmount));
     if (Number.isNaN(trAmount) || trAmount === 0) {
         throw new Error('Invalid transaction amount value');
     }
@@ -356,8 +356,8 @@ ImportTransactionItem.prototype.setOriginal = function (data) {
     }
 
     this.setAmount(Math.abs(amount));
-    if (this.data.trCurrId !== this.data.accCurrId) {
-        this.setCurrency(this.data.trCurrId);
+    if (this.data.transactionCurrencyId !== this.data.accountCurrencyId) {
+        this.setCurrency(this.data.transactionCurrencyId);
         this.setSecondAmount(Math.abs(trAmount));
     }
     this.setDate(formatDate(new Date(this.data.date)));

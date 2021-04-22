@@ -40,14 +40,14 @@ export class ImportTransaction {
             throw new Error('Invalid data');
         }
 
-        if (mainAccount.curr_id !== data.accCurr.id) {
-            throw new Error(`Invalid currency ${data.accCurr.id} Expected ${mainAccount.curr_id}`);
+        if (mainAccount.curr_id !== data.accountCurrencyId) {
+            throw new Error(`Invalid currency ${data.accountCurrencyId} Expected ${mainAccount.curr_id}`);
         }
 
         const res = new ImportTransaction({
             enabled: true,
             mainAccount,
-            type: (data.accAmountVal < 0) ? 'expense' : 'income',
+            type: (data.accountAmount < 0) ? 'expense' : 'income',
             date: data.date,
             comment: data.comment,
             original: data,
@@ -56,17 +56,17 @@ export class ImportTransaction {
         if (res.type === 'expense') {
             res.src_id = mainAccount.id;
             res.dest_id = 0;
-            res.src_amount = Math.abs(data.accAmountVal);
-            res.dest_amount = Math.abs(data.trAmountVal);
-            res.src_curr = data.accCurr.id;
-            res.dest_curr = data.trCurr.id;
+            res.src_amount = Math.abs(data.accountAmount);
+            res.dest_amount = Math.abs(data.transactionAmount);
+            res.src_curr = data.accountCurrencyId;
+            res.dest_curr = data.transactionCurrencyId;
         } else {
             res.src_id = 0;
             res.dest_id = mainAccount.id;
-            res.src_amount = Math.abs(data.trAmountVal);
-            res.dest_amount = Math.abs(data.accAmountVal);
-            res.src_curr = data.trCurr.id;
-            res.dest_curr = data.accCurr.id;
+            res.src_amount = Math.abs(data.transactionAmount);
+            res.dest_amount = Math.abs(data.accountAmount);
+            res.src_curr = data.transactionCurrencyId;
+            res.dest_curr = data.accountCurrencyId;
         }
 
         return res;

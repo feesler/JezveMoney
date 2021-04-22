@@ -102,10 +102,10 @@ export class ImportCondition {
     static fieldsMap = {
         [IMPORT_COND_FIELD_MAIN_ACCOUNT]: (data) => data.mainAccount.id,
         [IMPORT_COND_FIELD_TPL]: 'template',
-        [IMPORT_COND_FIELD_TR_AMOUNT]: 'trAmountVal',
-        [IMPORT_COND_FIELD_TR_CURRENCY]: 'trCurrVal',
-        [IMPORT_COND_FIELD_ACC_AMOUNT]: 'accAmountVal',
-        [IMPORT_COND_FIELD_ACC_CURRENCY]: 'accCurrVal',
+        [IMPORT_COND_FIELD_TR_AMOUNT]: 'transactionAmount',
+        [IMPORT_COND_FIELD_TR_CURRENCY]: 'transactionCurrency',
+        [IMPORT_COND_FIELD_ACC_AMOUNT]: 'accountAmount',
+        [IMPORT_COND_FIELD_ACC_CURRENCY]: 'accountCurrency',
         [IMPORT_COND_FIELD_DATE]: 'date',
         [IMPORT_COND_FIELD_COMMENT]: 'comment',
     };

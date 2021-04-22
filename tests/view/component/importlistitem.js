@@ -102,10 +102,10 @@ export class ImportListItem extends Component {
         this.originalData = {};
         const labelsMap = {
             mainAccount: 'Main account',
-            trAmountVal: 'Tr. amount',
-            trCurrVal: 'Tr. currency',
-            accAmountVal: 'Acc. amount',
-            accCurrVal: 'Acc. currency',
+            transactionAmount: 'Tr. amount',
+            transactionCurrency: 'Tr. currency',
+            accountAmount: 'Acc. amount',
+            accountCurrency: 'Acc. currency',
             comment: 'Comment',
             date: 'Date',
         };
@@ -225,12 +225,14 @@ export class ImportListItem extends Component {
         res.invalidated = await this.isVisible(this.invFeedback.elem, true);
         res.imported = await this.isVisible(this.toggleBtn, true);
         if (this.originalData) {
-            res.original = copyObject(this.originalData);
-            res.original.accAmountVal = ImportTemplate.amountFix(res.original.accAmountVal);
-            res.original.trAmountVal = ImportTemplate.amountFix(res.original.trAmountVal);
-
-            const date = ImportTemplate.dateFromString(res.original.date);
-            res.original.date = formatDate(date);
+            res.original = {
+                ...this.originalData,
+                accountAmount: ImportTemplate.amountFix(this.originalData.accountAmount),
+                transactionAmount: ImportTemplate.amountFix(this.originalData.transactionAmount),
+                date: formatDate(
+                    ImportTemplate.dateFromString(this.originalData.date),
+                ),
+            };
         }
 
         return res;
@@ -417,19 +419,19 @@ export class ImportListItem extends Component {
             throw new Error(`Account ${res.original.mainAccount} not found`);
         }
 
-        const amount = parseFloat(fixFloat(res.original.accAmountVal));
-        const destAmount = parseFloat(fixFloat(res.original.trAmountVal));
+        const amount = parseFloat(fixFloat(res.original.accountAmount));
+        const destAmount = parseFloat(fixFloat(res.original.transactionAmount));
         res.type = (amount > 0) ? 'income' : 'expense';
         res.amount = Math.abs(amount);
         res.destId = 0;
         res.destAccount = null;
-        if (res.original.accCurrVal === res.original.trCurrVal) {
+        if (res.original.accountCurrency === res.original.transactionCurrency) {
             res.currId = res.mainAccount.curr_id;
             res.destAmount = '';
         } else {
-            const currency = Currency.findByName(res.original.trCurrVal);
+            const currency = Currency.findByName(res.original.transactionCurrency);
             if (!currency) {
-                throw new Error(`Currency ${res.original.trCurrVal} not found`);
+                throw new Error(`Currency ${res.original.transactionCurrency} not found`);
             }
             res.currId = currency.id;
             res.destAmount = Math.abs(destAmount);
