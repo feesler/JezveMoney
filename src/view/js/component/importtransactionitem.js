@@ -69,7 +69,8 @@ function ImportTransactionItem() {
     this.amountInp = ce('input', {
         type: 'text',
         name: 'amount[]',
-        placeholder: 'Amount'
+        placeholder: 'Amount',
+        autocomplete: 'off'
     }, null, { input: this.onAmountInput.bind(this) });
     this.amountField = this.createField('Amount', this.amountInp, 'amount-field');
 
@@ -79,7 +80,8 @@ function ImportTransactionItem() {
             type: 'text',
             name: 'dest_amount[]',
             disabled: true,
-            placeholder: 'Destination amount'
+            placeholder: 'Destination amount',
+            autocomplete: 'off'
         },
         null,
         { input: this.onDestAmountInput.bind(this) }
@@ -88,7 +90,7 @@ function ImportTransactionItem() {
     // Date field
     this.dateInp = ce(
         'input',
-        { type: 'text', name: 'date[]', placeholder: 'Date' },
+        { type: 'text', name: 'date[]', placeholder: 'Date', autocomplete: 'off' },
         null,
         { input: this.onDateInput.bind(this) }
     );
@@ -96,7 +98,7 @@ function ImportTransactionItem() {
     // Comment field
     this.commInp = ce(
         'input',
-        { type: 'text', name: 'comment[]', placeholder: 'Comment' },
+        { type: 'text', name: 'comment[]', placeholder: 'Comment', autocomplete: 'off' },
         null,
         { input: this.onCommentInput.bind(this) }
     );
