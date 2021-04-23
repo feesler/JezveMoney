@@ -847,6 +847,8 @@ DropDown.prototype.show = function (val) {
             border = (this.comboElem.offsetHeight - this.comboElem.scrollHeight) / 2;
         }
 
+        this.list.style.height = px(0);
+
         offset = getOffset(this.list.offsetParent);
         container = getOffset(this.containerElem);
         container.width = this.containerElem.offsetWidth;
