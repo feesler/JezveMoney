@@ -146,7 +146,8 @@ ProfileView.prototype.showChangeNamePopup = function (e) {
         });
 
         this.newNameInp = ge('newname');
-        if (!this.newNameInp) {
+        this.changeNameLoading = ge('changeNameLoading');
+        if (!this.newNameInp || !this.changeNameLoading) {
             throw new Error('Failed to initialize change name dialog');
         }
 
@@ -165,6 +166,8 @@ ProfileView.prototype.showChangeNamePopup = function (e) {
 ProfileView.prototype.onChangePasswordResult = function (response) {
     var success;
     var res;
+
+    show(this.changePassLoading, false);
 
     res = JSON.parse(response);
     if (!res) {
@@ -206,6 +209,8 @@ ProfileView.prototype.onChangePassSubmit = function (e) {
     }
 
     if (valid) {
+        show(this.changePassLoading, true);
+
         ajax.post({
             url: baseURL + 'api/profile/changepass',
             data: JSON.stringify({
@@ -239,7 +244,12 @@ ProfileView.prototype.showChangePasswordPopup = function (e) {
 
         this.oldPassInp = ge('oldpwd');
         this.newPassInp = ge('newpwd');
-        if (!this.oldPassInp || !this.newPassInp) {
+        this.changePassLoading = ge('changePassLoading');
+        if (
+            !this.oldPassInp
+            || !this.newPassInp
+            || !this.changePassLoading
+        ) {
             throw new Error('Failed to initialize change password dialog');
         }
 
@@ -257,6 +267,8 @@ ProfileView.prototype.showChangePasswordPopup = function (e) {
 ProfileView.prototype.onChangeNameResult = function (response) {
     var success;
     var res;
+
+    show(this.changeNameLoading, false);
 
     res = JSON.parse(response);
     if (!res) {
@@ -296,6 +308,8 @@ ProfileView.prototype.onChangeNameSubmit = function (e) {
     }
 
     if (valid) {
+        show(this.changeNameLoading, true);
+
         ajax.post({
             url: baseURL + 'api/profile/changename',
             data: JSON.stringify({

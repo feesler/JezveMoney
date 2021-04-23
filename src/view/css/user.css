@@ -109,6 +109,27 @@
   font-size: 16px;
 }
 
+.profile-form-container {
+  position: relative;
+}
+
+.form__loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 400;
+  z-index: 10;
+  background-color: rgb(50 50 50 / 70%);
+  border-radius: 10px;
+}
+
 @media all and (min-width: 700px) {
   .login-layer {
     display: flex;

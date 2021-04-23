@@ -57,7 +57,7 @@
     </div>
 </div>
 
-<div id="changename" class="hidden">
+<div id="changename" class="profile-form-container hidden">
 <form method="post" action="<?=BASEURL?>profile/changename/">
     <div id="name-inp-block" class="validation-block view-row">
         <label for="newname">New name</label>
@@ -66,10 +66,11 @@
         </div>
         <div class="invalid-feedback">Please input correct name.<br>New name must be different from the old.</div>
     </div>
+    <div id="changeNameLoading" class="form__loading hidden">Loading...</div>
 </form>
 </div>
 
-<div id="changepass" class="hidden">
+<div id="changepass" class="profile-form-container hidden">
 <form method="post" action="<?=BASEURL?>profile/changepass/">
     <div id="old-pwd-inp-block" class="validation-block view-row">
         <label for="oldpwd">Current password</label>
@@ -86,6 +87,8 @@
         </div>
         <div class="invalid-feedback">Please input correct new password.<br>New password must be different from the old.</div>
     </div>
+
+    <div id="changePassLoading" class="form__loading hidden">Loading...</div>
 </form>
 </div>
 
