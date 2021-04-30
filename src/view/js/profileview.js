@@ -1,6 +1,6 @@
 'use strict';
 
-/* global ge, extend, View, Popup, ConfirmDialog, baseURL, ajax, createMessage */
+/* global ge, show, extend, View, Popup, ConfirmDialog, baseURL, ajax, createMessage */
 
 var resetAccMsg = 'Are you sure want to reset all your accounts?<br>All accounts and transactions will be lost.';
 var resetAllMsg = 'Are you sure to reset all your data?<br>Everything will be lost.';
