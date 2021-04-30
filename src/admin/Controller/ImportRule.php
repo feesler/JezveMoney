@@ -42,7 +42,7 @@ class ImportRule extends AdminController
 
         array_push(
             $this->jsArr,
-            "component/confirmdialog.js",
+            "../Components/ConfirmDialog/ConfirmDialog.js",
             "model/list.js",
             "view.js"
         );

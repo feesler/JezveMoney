@@ -172,8 +172,8 @@ class Statistics extends TemplateController
             "lib/charts/chartgrid.js",
             "lib/charts/basechart.js",
             "lib/charts/histogram.js",
-            "component/header.js",
-            "component/iconlink.js",
+            "../Components/Header/Header.js",
+            "../Components/IconLink/IconLink.js",
             "view.js",
             "statisticsview.js"
         );

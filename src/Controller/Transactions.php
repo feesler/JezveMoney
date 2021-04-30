@@ -224,7 +224,7 @@ class Transactions extends TemplateController
             "lib/datepicker.css",
             "lib/dropdown.css",
             "trlist.css",
-            "toolbar.css"
+            "../Components/Toolbar/style.css"
         );
         $this->css->page[] = "transaction.css";
         $this->buildCSS();
@@ -239,10 +239,10 @@ class Transactions extends TemplateController
             "lib/dragndrop.js",
             "lib/sortable.js",
             "lib/dropdown.js",
-            "component/header.js",
-            "component/toolbar.js",
-            "component/iconlink.js",
-            "component/confirmdialog.js",
+            "../Components/Header/Header.js",
+            "../Components/Toolbar/Toolbar.js",
+            "../Components/IconLink/IconLink.js",
+            "../Components/ConfirmDialog/ConfirmDialog.js",
             "view.js",
             "translistview.js"
         );
@@ -585,11 +585,11 @@ class Transactions extends TemplateController
             "lib/datepicker.js",
             "lib/dropdown.js",
             "lib/decimalinput.js",
-            "component/header.js",
-            "component/tile.js",
-            "component/accounttile.js",
-            "component/tileinfoitem.js",
-            "component/iconlink.js",
+            "../Components/Header/Header.js",
+            "../Components/Tile/Tile.js",
+            "../Components/AccountTile/AccountTile.js",
+            "../Components/TileInfoItem/TileInfoItem.js",
+            "../Components/IconLink/IconLink.js",
             "view.js",
             "transactionview.js"
         );
@@ -872,12 +872,12 @@ class Transactions extends TemplateController
             "lib/datepicker.js",
             "lib/dropdown.js",
             "lib/decimalinput.js",
-            "component/header.js",
-            "component/tile.js",
-            "component/accounttile.js",
-            "component/tileinfoitem.js",
-            "component/iconlink.js",
-            "component/confirmdialog.js",
+            "../Components/Header/Header.js",
+            "../Components/Tile/Tile.js",
+            "../Components/AccountTile/AccountTile.js",
+            "../Components/TileInfoItem/TileInfoItem.js",
+            "../Components/IconLink/IconLink.js",
+            "../Components/ConfirmDialog/ConfirmDialog.js",
             "view.js",
             "transactionview.js"
         );

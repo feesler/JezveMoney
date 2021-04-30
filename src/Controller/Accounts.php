@@ -38,7 +38,7 @@ class Accounts extends TemplateController
             $this->css->libs,
             "tiles.css",
             "lib/iconlink.css",
-            "toolbar.css"
+            "../Components/Toolbar/style.css"
         );
         $this->buildCSS();
         array_push(
@@ -47,10 +47,10 @@ class Accounts extends TemplateController
             "model/account.js",
             "model/currency.js",
             "lib/selection.js",
-            "component/header.js",
-            "component/toolbar.js",
-            "component/iconlink.js",
-            "component/confirmdialog.js",
+            "../Components/Header/Header.js",
+            "../Components/Toolbar/Toolbar.js",
+            "../Components/IconLink/IconLink.js",
+            "../Components/ConfirmDialog/ConfirmDialog.js",
             "view.js",
             "accountlistview.js"
         );
@@ -112,9 +112,9 @@ class Accounts extends TemplateController
             "lib/selection.js",
             "lib/dropdown.js",
             "lib/decimalinput.js",
-            "component/header.js",
-            "component/tile.js",
-            "component/accounttile.js",
+            "../Components/Header/Header.js",
+            "../Components/Tile/Tile.js",
+            "../Components/AccountTile/AccountTile.js",
             "view.js",
             "accountview.js"
         );
@@ -182,11 +182,11 @@ class Accounts extends TemplateController
             "lib/selection.js",
             "lib/dropdown.js",
             "lib/decimalinput.js",
-            "component/header.js",
-            "component/tile.js",
-            "component/accounttile.js",
-            "component/iconlink.js",
-            "component/confirmdialog.js",
+            "../Components/Header/Header.js",
+            "../Components/Tile/Tile.js",
+            "../Components/AccountTile/AccountTile.js",
+            "../Components/IconLink/IconLink.js",
+            "../Components/ConfirmDialog/ConfirmDialog.js",
             "view.js",
             "accountview.js"
         );

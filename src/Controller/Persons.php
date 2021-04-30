@@ -22,7 +22,7 @@ class Persons extends TemplateController
             $this->css->libs,
             "tiles.css",
             "lib/iconlink.css",
-            "toolbar.css"
+            "../Components/Toolbar/style.css"
         );
         $this->buildCSS();
         array_push(
@@ -30,10 +30,10 @@ class Persons extends TemplateController
             "model/list.js",
             "model/person.js",
             "lib/selection.js",
-            "component/header.js",
-            "component/toolbar.js",
-            "component/iconlink.js",
-            "component/confirmdialog.js",
+            "../Components/Header/Header.js",
+            "../Components/Toolbar/Toolbar.js",
+            "../Components/IconLink/IconLink.js",
+            "../Components/ConfirmDialog/ConfirmDialog.js",
             "view.js",
             "personlistview.js"
         );
@@ -76,7 +76,7 @@ class Persons extends TemplateController
         $this->buildCSS();
         array_push(
             $this->jsArr,
-            "component/header.js",
+            "../Components/Header/Header.js",
             "view.js",
             "personview.js"
         );
@@ -115,9 +115,9 @@ class Persons extends TemplateController
         $this->buildCSS();
         array_push(
             $this->jsArr,
-            "component/header.js",
-            "component/iconlink.js",
-            "component/confirmdialog.js",
+            "../Components/Header/Header.js",
+            "../Components/IconLink/IconLink.js",
+            "../Components/ConfirmDialog/ConfirmDialog.js",
             "view.js",
             "personview.js"
         );

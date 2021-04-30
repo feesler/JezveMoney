@@ -32,7 +32,7 @@ class Icon extends AdminController
 
         array_push(
             $this->jsArr,
-            "component/confirmdialog.js",
+            "../Components/ConfirmDialog/ConfirmDialog.js",
             "view.js"
         );
         array_push(
