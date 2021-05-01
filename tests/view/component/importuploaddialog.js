@@ -1,13 +1,7 @@
-import { Component } from './component.js';
+import { TestComponent, isNum, copyObject } from 'jezve-test';
 import { DropDown } from './dropdown.js';
 import { App } from '../../app.js';
-import {
-    asyncMap,
-    setParam,
-    fixFloat,
-    isNum,
-    copyObject,
-} from '../../common.js';
+import { asyncMap, fixFloat } from '../../common.js';
 import { WarningPopup } from './warningpopup.js';
 
 export const BROWSE_FILE_STATE = 1;
@@ -16,7 +10,7 @@ export const RAW_DATA_STATE = 3;
 export const CREATE_TPL_STATE = 4;
 export const UPDATE_TPL_STATE = 5;
 
-export class ImportUploadDialog extends Component {
+export class ImportUploadDialog extends TestComponent {
     async parse() {
         if (!this.elem) {
             throw new Error('Invalid import upload dialog element');
@@ -258,7 +252,7 @@ export class ImportUploadDialog extends Component {
                 throw new Error('Invalid model: expected template');
             }
 
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 templateBlock: true,
                 loadingIndicator: false,
                 tplField: false,
@@ -277,7 +271,7 @@ export class ImportUploadDialog extends Component {
 
             res.values.tplNameInp = (model.template) ? model.template.name : '';
         } else if (model.state === RAW_DATA_STATE) {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 templateBlock: true,
                 loadingIndicator: false,
                 tplField: true,
@@ -291,7 +285,7 @@ export class ImportUploadDialog extends Component {
                 tplFeedback: true,
             });
         } else if (model.state === LOADING_STATE) {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 templateBlock: true,
                 loadingIndicator: true,
                 nameField: false,
@@ -304,7 +298,7 @@ export class ImportUploadDialog extends Component {
                 tplFeedback: false,
             });
         } else if (model.state === BROWSE_FILE_STATE) {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 templateBlock: false,
                 loadingIndicator: false,
                 nameField: false,
@@ -489,7 +483,7 @@ export class ImportUploadDialog extends Component {
         await this.click(this.deleteTplBtn.elem);
         await this.parse();
 
-        if (!await Component.isVisible(this.delete_warning)) {
+        if (!await TestComponent.isVisible(this.delete_warning)) {
             throw new Error('Delete template warning popup not appear');
         }
         if (!this.delete_warning.okBtn) {

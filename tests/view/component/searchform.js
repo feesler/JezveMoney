@@ -1,6 +1,6 @@
-import { Component } from './component.js';
+import { TestComponent } from 'jezve-test';
 
-export class SearchForm extends Component {
+export class SearchForm extends TestComponent {
     async parse() {
         this.inputElem = await this.query(this.elem, '#search');
         this.submitBtn = await this.query(this.elem, 'button.search_btn');

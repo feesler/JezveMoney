@@ -1,7 +1,7 @@
-import { Component } from './component.js';
+import { TestComponent } from 'jezve-test';
 import { MenuItem } from './menuitem.js';
 
-export class TransactionTypeMenu extends Component {
+export class TransactionTypeMenu extends TestComponent {
     async parse() {
         this.items = [];
         this.selectedTypes = [];

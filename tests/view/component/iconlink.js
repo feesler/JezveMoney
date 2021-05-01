@@ -1,6 +1,6 @@
-import { Component } from './component.js';
+import { TestComponent } from 'jezve-test';
 
-export class IconLink extends Component {
+export class IconLink extends TestComponent {
     async parse() {
         if (!this.elem) {
             return;

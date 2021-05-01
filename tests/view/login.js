@@ -1,11 +1,11 @@
-import { TestView } from './testview.js';
+import { AppView } from './AppView.js';
 import { MainView } from './main.js';
 import { RegisterView } from './register.js';
 import { App } from '../app.js';
 import { InputRow } from './component/inputrow.js';
 
 /** Log in view class */
-export class LoginView extends TestView {
+export class LoginView extends AppView {
     async parseContent() {
         const res = {
             loginInp: await InputRow.create(this, await this.query('#login-inp-block')),

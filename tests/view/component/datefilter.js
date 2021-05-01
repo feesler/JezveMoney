@@ -1,9 +1,8 @@
-import { Component } from './component.js';
+import { TestComponent, copyObject, isDate } from 'jezve-test';
 import { IconLink } from './iconlink.js';
-import { copyObject, isDate } from '../../common.js';
 import { DatePicker } from './datepicker.js';
 
-export class DatePickerFilter extends Component {
+export class DatePickerFilter extends TestComponent {
     async parse() {
         this.iconLink = await IconLink.create(this.parent, await this.query(this.elem, '.iconlink'));
         if (!this.iconLink) {

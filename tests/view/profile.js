@@ -1,12 +1,12 @@
-import { TestView } from './testview.js';
+import { TestComponent } from 'jezve-test';
+import { AppView } from './AppView.js';
 import { LoginView } from './login.js';
 import { App } from '../app.js';
 import { WarningPopup } from './component/warningpopup.js';
 import { InputRow } from './component/inputrow.js';
-import { Component } from './component/component.js';
 
 // Profile view class
-export class ProfileView extends TestView {
+export class ProfileView extends AppView {
     async parseContent() {
         const res = {};
 
@@ -126,7 +126,7 @@ export class ProfileView extends TestView {
 
         await this.performAction(() => this.click(this.content.resetBtn));
 
-        if (!await Component.isVisible(this.content.reset_warning)) {
+        if (!await TestComponent.isVisible(this.content.reset_warning)) {
             throw new Error('Warning popup not appear');
         }
         if (!this.content.reset_warning.okBtn) {
@@ -143,7 +143,7 @@ export class ProfileView extends TestView {
 
         await this.performAction(() => this.click(this.content.resetAllBtn));
 
-        if (!await Component.isVisible(this.content.reset_all_warning)) {
+        if (!await TestComponent.isVisible(this.content.reset_all_warning)) {
             throw new Error('Warning popup not appear');
         }
         if (!this.content.reset_all_warning.okBtn) {
@@ -160,7 +160,7 @@ export class ProfileView extends TestView {
 
         await this.performAction(() => this.click(this.content.deleteProfileBtn));
 
-        if (!await Component.isVisible(this.content.delete_warning)) {
+        if (!await TestComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Warning popup not appear');
         }
         if (!this.content.delete_warning.okBtn) {

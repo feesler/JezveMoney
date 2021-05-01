@@ -1,5 +1,5 @@
+import { test, copyObject } from 'jezve-test';
 import { App } from '../app.js';
-import { test, copyObject } from '../common.js';
 import { Currency } from '../model/currency.js';
 import { ImportTemplate } from '../model/importtemplate.js';
 import { ImportTransaction } from '../model/importtransaction.js';

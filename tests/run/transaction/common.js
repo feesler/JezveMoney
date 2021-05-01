@@ -1,3 +1,9 @@
+import {
+    test,
+    isObject,
+    copyObject,
+    formatDate,
+} from 'jezve-test';
 import { TransactionsView } from '../../view/transactions.js';
 import { TransactionView } from '../../view/transaction.js';
 import { MainView } from '../../view/main.js';
@@ -5,14 +11,7 @@ import { Currency } from '../../model/currency.js';
 import { Transaction } from '../../model/transaction.js';
 import { AccountsList } from '../../model/accountslist.js';
 import { App } from '../../app.js';
-import {
-    test,
-    isObject,
-    copyObject,
-    formatProps,
-    formatDate,
-    fixDate,
-} from '../../common.js';
+import { formatProps, fixDate } from '../../common.js';
 
 export async function runAction({ action, data }) {
     let testDescr = null;

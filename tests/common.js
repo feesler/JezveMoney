@@ -1,43 +1,9 @@
-/** Check object is date */
-export function isDate(obj) {
-    return (obj instanceof Date && !Number.isNaN(obj.valueOf()));
-}
-
-/** Check object is function */
-export function isFunction(obj) {
-    const getType = {};
-    return obj
-        && (getType.toString.call(obj) === '[object Function]'
-            || typeof obj === 'function');
-}
-
-/** Check object is {} */
-export function isObject(o) {
-    return o !== null
-        && typeof o === 'object'
-        && Object.prototype.toString.call(o) === '[object Object]';
-}
-
-/** Check is specified string is number */
-export function isNum(val) {
-    const fval = parseFloat(val);
-    if (fval === 0) {
-        return true;
-    }
-
-    return !!(val / val);
-}
-
-/** Check parameter is integer */
-export function isInt(x) {
-    const y = parseInt(x, 10);
-
-    if (Number.isNaN(y)) {
-        return false;
-    }
-
-    return x === y && x.toString() === y.toString();
-}
+import {
+    isFunction,
+    isDate,
+    isNum,
+    isObject,
+} from 'jezve-test';
 
 export async function asyncMap(data, func) {
     if (!Array.isArray(data)) {
@@ -51,36 +17,6 @@ export async function asyncMap(data, func) {
     return Promise.all(tasks);
 }
 
-/* eslint-disable no-param-reassign */
-/** Set parameters of object */
-export function setParam(obj, params) {
-    if (!obj || !params || typeof params !== 'object') {
-        return;
-    }
-
-    Object.keys(params).forEach((key) => {
-        const val = params[key];
-        if (Array.isArray(val)) {
-            obj[key] = val.map((item) => item);
-        } else if (isObject(val)) {
-            if (obj[key] === null || typeof obj[key] === 'undefined') {
-                obj[key] = {};
-            }
-
-            setParam(obj[key], val);
-        } else {
-            try {
-                obj[key] = val;
-            } catch (e) {
-                if (obj.setAttribute) {
-                    obj.setAttribute(key, val);
-                }
-            }
-        }
-    });
-}
-/* eslint-enable no-param-reassign */
-
 /** Convert date string from DD.MM.YYYY to timestamp */
 export function convDate(dateStr) {
     if (typeof dateStr !== 'string') {
@@ -93,31 +29,6 @@ export function convDate(dateStr) {
     }
 
     return res;
-}
-
-function leadZero(val) {
-    const v = parseInt(val, 10);
-    if (Number.isNaN(v)) {
-        throw new Error('Invalid time values speicifed');
-    }
-
-    if (v < 10) {
-        return `0${v}`;
-    }
-
-    return v.toString();
-}
-
-/** Format date as DD.MM.YYYY */
-export function formatDate(date) {
-    if (!isDate(date)) {
-        throw new Error('Invalid type of parameter');
-    }
-
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    const day = date.getDate();
-    return `${leadZero(day)}.${leadZero(month)}.${leadZero(year)}`;
 }
 
 /** Return timestamp for the start of the day */
@@ -168,24 +79,6 @@ export function checkDate(str) {
     }
 
     return true;
-}
-
-const SECOND = 1000;
-const MINUTE = 60000;
-const HOUR = 3600000;
-
-/** Format time in milliseconds to HH:MM:SS format */
-export function formatTime(time) {
-    const t = parseInt(time, 10);
-    if (Number.isNaN(t)) {
-        throw new Error('Invalid time values speicifed');
-    }
-
-    const hours = Math.floor(t / HOUR);
-    const minutes = Math.floor((t % HOUR) / MINUTE);
-    const seconds = Math.floor((t % MINUTE) / SECOND);
-
-    return `${leadZero(hours)}:${leadZero(minutes)}:${leadZero(seconds)}`;
 }
 
 /** Format specified value */
@@ -278,24 +171,6 @@ export function createCSV({
     return `${res}${newLine}`;
 }
 
-/** Return deep copy of object */
-export function copyObject(item) {
-    if (Array.isArray(item)) {
-        return item.map(copyObject);
-    }
-
-    if (isObject(item)) {
-        const res = {};
-        Object.getOwnPropertyNames(item).forEach((key) => {
-            res[key] = copyObject(item[key]);
-        });
-
-        return res;
-    }
-
-    return item;
-}
-
 /** Join parameters and values of object to URL */
 export function urlJoin(obj) {
     if (!isObject(obj)) {
@@ -349,98 +224,5 @@ export function checkPHPerrors(content) {
     const found = errSignatures.some((item) => content.includes(item));
     if (found) {
         throw new Error('PHP error signature found');
-    }
-}
-
-export function checkObjValue(obj, expectedObj, ret = false) {
-    let res = true;
-
-    // undefined means no care
-    if (typeof expectedObj === 'undefined') {
-        return true;
-    }
-
-    if (!isObject(expectedObj) && !Array.isArray(expectedObj)) {
-        if (obj === expectedObj) {
-            return true;
-        }
-
-        if (ret) {
-            return {
-                key: '',
-                value: obj,
-                expected: expectedObj,
-            };
-        }
-
-        throw new Error(`Not expected value "${obj}", "${expectedObj}" is expected`);
-    }
-
-    if (obj === expectedObj) {
-        return true;
-    }
-
-    let value;
-    let expected;
-    const expectedKeys = Object.getOwnPropertyNames(expectedObj);
-    for (const vKey of expectedKeys) {
-        if (obj === null || !(vKey in obj)) {
-            res = { key: vKey };
-            break;
-        }
-
-        expected = expectedObj[vKey];
-        value = obj[vKey];
-        if (isObject(expected) || Array.isArray(expected)) {
-            res = checkObjValue(value, expected, true);
-            if (res !== true) {
-                res.key = `${vKey}.${res.key}`;
-                break;
-            }
-        } else if (value !== expected) {
-            res = {
-                key: vKey,
-                value,
-                expected,
-            };
-            break;
-        }
-    }
-
-    if (res !== true && !ret) {
-        if ('expected' in res) {
-            throw new Error(`Not expected value "${res.value}" for (${res.key}) "${res.expected}" is expected`);
-        } else {
-            throw new Error(`Path (${res.key}) not found`);
-        }
-    }
-
-    return res;
-}
-
-let testEnv = null;
-
-export function setupTest(env) {
-    if (!env) {
-        throw new Error('Invalid environment specified');
-    }
-
-    testEnv = env;
-}
-
-/**
- * Run action and add result to the list
- * @param {string} descr - description of test
- * @param {Function} action - action function
- */
-export async function test(descr, action) {
-    try {
-        const res = await action();
-
-        testEnv.addResult(descr, res);
-    } catch (e) {
-        const extError = (e instanceof Error) ? e : new Error(e);
-        extError.descr = descr;
-        throw extError;
     }
 }

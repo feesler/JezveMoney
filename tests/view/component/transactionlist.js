@@ -1,8 +1,8 @@
-import { Component } from './component.js';
+import { TestComponent } from 'jezve-test';
 import { TransactionListItem } from './transactionlistitem.js';
 import { asyncMap } from '../../common.js';
 
-export class TransactionList extends Component {
+export class TransactionList extends TestComponent {
     async parse() {
         this.items = [];
         this.details = (await this.prop(this.elem, 'tagName') === 'TABLE');

@@ -1,4 +1,4 @@
-import { Component } from './component.js';
+import { TestComponent } from 'jezve-test';
 import { DropDown } from './dropdown.js';
 import {
     asyncMap,
@@ -30,7 +30,7 @@ const actionValueMap = {
 };
 
 /** Import action form */
-export class ImportActionForm extends Component {
+export class ImportActionForm extends TestComponent {
     async parse() {
         const fieldElems = await this.queryAll(this.elem, '.field');
         await asyncMap(fieldElems, (field) => this.parseField(field));

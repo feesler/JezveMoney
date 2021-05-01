@@ -1,11 +1,11 @@
-import { App } from '../app.js';
 import {
     test,
     formatDate,
-    fixDate,
     copyObject,
     checkObjValue,
-} from '../common.js';
+} from 'jezve-test';
+import { App } from '../app.js';
+import { fixDate } from '../common.js';
 import { TransactionsView } from '../view/transactions.js';
 import { MainView } from '../view/main.js';
 import { availTransTypes, Transaction } from '../model/transaction.js';

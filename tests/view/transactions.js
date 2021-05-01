@@ -1,4 +1,5 @@
-import { TestView } from './testview.js';
+import { copyObject, TestComponent } from 'jezve-test';
+import { AppView } from './AppView.js';
 import { App } from '../app.js';
 import { DropDown } from './component/dropdown.js';
 import { IconLink } from './component/iconlink.js';
@@ -9,12 +10,11 @@ import { Paginator } from './component/paginator.js';
 import { ModeSelector } from './component/modeselector.js';
 import { SearchForm } from './component/searchform.js';
 import { TransactionList } from './component/transactionlist.js';
-import { copyObject, fixDate, setParam } from '../common.js';
+import { fixDate } from '../common.js';
 import { Toolbar } from './component/toolbar.js';
-import { Component } from './component/component.js';
 
 /** List of transactions view class */
-export class TransactionsView extends TestView {
+export class TransactionsView extends AppView {
     async parseContent() {
         const res = {
             titleEl: await this.query('.content_wrap > .heading > h1'),
@@ -213,7 +213,7 @@ export class TransactionsView extends TestView {
         };
 
         if (isItemsAvailable) {
-            setParam(res.values, {
+            Object.assign(res.values, {
                 paginator: {
                     pages: this.model.list.pages,
                     active: this.model.list.page,
@@ -495,7 +495,7 @@ export class TransactionsView extends TestView {
 
         await this.performAction(() => this.content.toolbar.clickButton('del'));
 
-        if (!await Component.isVisible(this.content.delete_warning)) {
+        if (!await TestComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Delete transaction warning popup not appear');
         }
         if (!this.content.delete_warning.okBtn) {

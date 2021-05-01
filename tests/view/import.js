@@ -1,15 +1,14 @@
-import { TestView } from './testview.js';
+import { TestComponent, copyObject } from 'jezve-test';
+import { AppView } from './AppView.js';
 import { IconLink } from './component/iconlink.js';
 import { ImportList } from './component/importlist.js';
 import { ImportUploadDialog } from './component/importuploaddialog.js';
 import { ImportRulesDialog } from './component/importrulesdialog.js';
-import { Component } from './component/component.js';
 import { DropDown } from './component/dropdown.js';
 import { ImportViewSubmitError } from '../error/importviewsubmit.js';
-import { copyObject } from '../common.js';
 
 /** Import view class */
-export class ImportView extends TestView {
+export class ImportView extends AppView {
     constructor(...args) {
         super(...args);
 
@@ -76,8 +75,8 @@ export class ImportView extends TestView {
     async buildModel(cont) {
         const res = {};
 
-        const uploadVisible = await Component.isVisible(cont.uploadDialog);
-        const rulesVisible = await Component.isVisible(cont.rulesDialog);
+        const uploadVisible = await TestComponent.isVisible(cont.uploadDialog);
+        const rulesVisible = await TestComponent.isVisible(cont.rulesDialog);
         if (uploadVisible && !rulesVisible) {
             res.state = 'upload';
         } else if (!uploadVisible && rulesVisible) {
@@ -167,7 +166,7 @@ export class ImportView extends TestView {
         await this.performAction(() => this.content.uploadBtn.click());
         await this.performAction(() => this.wait(this.uploadPopupId, { visible: true }));
 
-        if (!await Component.isVisible(this.content.uploadDialog)) {
+        if (!await TestComponent.isVisible(this.content.uploadDialog)) {
             throw new Error('File upload dialog not appear');
         }
     }
@@ -178,7 +177,7 @@ export class ImportView extends TestView {
         await this.performAction(() => this.content.uploadDialog.close());
         await this.performAction(() => this.wait(this.uploadPopupId, { visible: true }));
 
-        if (await Component.isVisible(this.content.uploadDialog)) {
+        if (await TestComponent.isVisible(this.content.uploadDialog)) {
             throw new Error('File upload dialog not closed');
         }
     }
@@ -570,7 +569,7 @@ export class ImportView extends TestView {
                 return true;
             }
 
-            const notification = await Component.isVisible(this.msgPopup, true);
+            const notification = await TestComponent.isVisible(this.msgPopup, true);
             if (notification) {
                 return true;
             }

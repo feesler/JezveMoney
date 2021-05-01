@@ -1,12 +1,9 @@
-import { Component } from './component.js';
+import { TestComponent, copyObject } from 'jezve-test';
 import { ImportConditionItem } from './importconditionitem.js';
 import { ImportActionItem } from './importactionitem.js';
-import {
-    asyncMap,
-    copyObject,
-} from '../../common.js';
+import { asyncMap } from '../../common.js';
 
-export class ImportRuleItem extends Component {
+export class ImportRuleItem extends TestComponent {
     constructor(parent, elem, mainAccount) {
         super(parent, elem);
 

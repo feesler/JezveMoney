@@ -1,5 +1,5 @@
+import { test } from 'jezve-test';
 import * as TransactionTests from './common.js';
-import { test } from '../../common.js';
 import { Currency } from '../../model/currency.js';
 import { INCOME } from '../../model/transaction.js';
 import { IncomeTransactionView } from '../../view/transaction/income.js';

@@ -1,10 +1,10 @@
-import { Component } from './component.js';
+import { TestComponent } from 'jezve-test';
 import { Tile } from './tile.js';
 import { AccountsList } from '../../model/accountslist.js';
 import { PersonsList } from '../../model/personslist.js';
 import { asyncMap } from '../../common.js';
 
-export class TilesList extends Component {
+export class TilesList extends TestComponent {
     constructor(parent, elem, tileClass) {
         super(parent, elem);
 

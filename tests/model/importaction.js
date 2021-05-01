@@ -1,4 +1,5 @@
-import { isFunction, fixFloat } from '../common.js';
+import { isFunction } from 'jezve-test';
+import { fixFloat } from '../common.js';
 import { App } from '../app.js';
 import { ImportTransaction } from './importtransaction.js';
 

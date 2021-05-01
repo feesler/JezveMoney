@@ -1,4 +1,4 @@
-import { test } from '../common.js';
+import { test } from 'jezve-test';
 import { App } from '../app.js';
 
 export async function checkAccess(url) {

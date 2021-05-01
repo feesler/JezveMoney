@@ -1,4 +1,5 @@
-import { urlJoin, copyObject } from '../common.js';
+import { copyObject } from 'jezve-test';
+import { urlJoin } from '../common.js';
 import { ApiRequestError } from '../error/apirequest.js';
 import { App } from '../app.js';
 

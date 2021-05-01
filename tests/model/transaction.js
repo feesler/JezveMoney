@@ -1,4 +1,4 @@
-import { copyObject } from '../common.js';
+import { copyObject } from 'jezve-test';
 import { App } from '../app.js';
 
 /** Types of transactions */

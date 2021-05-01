@@ -1,9 +1,5 @@
-import {
-    isFunction,
-    isObject,
-    convDate,
-    fixFloat,
-} from '../common.js';
+import { isFunction, isObject } from 'jezve-test';
+import { convDate, fixFloat } from '../common.js';
 
 /* eslint-disable no-bitwise */
 

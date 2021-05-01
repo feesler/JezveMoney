@@ -1,10 +1,9 @@
 import {
     test,
-    setParam,
     copyObject,
     checkObjValue,
-    formatProps,
-} from '../common.js';
+} from 'jezve-test';
+import { formatProps } from '../common.js';
 import { PersonsView } from '../view/persons.js';
 import { PersonView } from '../view/person.js';
 import { MainView } from '../view/main.js';
@@ -103,7 +102,7 @@ export async function update(params) {
         const expPerson = await submitPerson(props);
         if (expPerson) {
             // Check updates in the person tiles
-            setParam(expectedPerson, props);
+            Object.assign(expectedPerson, props);
             App.state.updatePerson(expectedPerson);
         } else {
             await App.view.cancel();

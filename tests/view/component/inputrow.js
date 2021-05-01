@@ -1,7 +1,7 @@
-import { Component } from './component.js';
+import { TestComponent } from 'jezve-test';
 import { DropDown } from './dropdown.js';
 
-export class InputRow extends Component {
+export class InputRow extends TestComponent {
     async parse() {
         this.labelEl = await this.query(this.elem, 'label');
         if (!this.labelEl) {

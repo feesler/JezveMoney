@@ -1,8 +1,8 @@
-import { Component } from './component.js';
+import { TestComponent } from 'jezve-test';
 import { IconLink } from './iconlink.js';
 import { InputRow } from './inputrow.js';
 
-export class CommentRow extends Component {
+export class CommentRow extends TestComponent {
     async parse() {
         const iconLinkElem = await this.query(this.elem, '.iconlink');
 

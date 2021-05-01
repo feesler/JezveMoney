@@ -1,6 +1,6 @@
-import { Component } from './component.js';
+import { TestComponent } from 'jezve-test';
 
-export class WarningPopup extends Component {
+export class WarningPopup extends TestComponent {
     async parse() {
         this.titleElem = await this.query(this.elem, '.popup__title');
         this.title = await this.prop(this.titleElem, 'textContent');

@@ -1,4 +1,5 @@
-import { TestView } from './testview.js';
+import { TestComponent } from 'jezve-test';
+import { AppView } from './AppView.js';
 import {
     convDate,
     correctExch,
@@ -15,10 +16,9 @@ import { CommentRow } from './component/commentrow.js';
 import { TileInfoItem } from './component/tileinfoitem.js';
 import { TileBlock } from './component/tileblock.js';
 import { Button } from './component/button.js';
-import { Component } from './component/component.js';
 
 /** Create or update transaction view class */
-export class TransactionView extends TestView {
+export class TransactionView extends AppView {
     constructor(...args) {
         super(...args);
 
@@ -118,13 +118,13 @@ export class TransactionView extends TestView {
     }
 
     async isValid() {
-        if (await Component.isVisible(this.content.src_amount_row)) {
+        if (await TestComponent.isVisible(this.content.src_amount_row)) {
             if (!this.model.srcAmount.length || !isValidValue(this.model.srcAmount)) {
                 return false;
             }
         }
 
-        if (await Component.isVisible(this.content.dest_amount_row)) {
+        if (await TestComponent.isVisible(this.content.dest_amount_row)) {
             if (!this.model.destAmount.length || !isValidValue(this.model.destAmount)) {
                 return false;
             }
@@ -217,7 +217,7 @@ export class TransactionView extends TestView {
     async deleteSelfItem() {
         await this.clickDeleteButton();
 
-        if (!await Component.isVisible(this.content.delete_warning)) {
+        if (!await TestComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Delete transaction warning popup not appear');
         }
         if (!this.content.delete_warning.okBtn) {

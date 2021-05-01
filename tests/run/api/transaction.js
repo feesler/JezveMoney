@@ -1,15 +1,13 @@
+import {
+    test,
+    formatDate,
+    copyObject,
+    checkObjValue,
+} from 'jezve-test';
 import { api } from '../../model/api.js';
 import { ApiRequestError } from '../../error/apirequest.js';
 import { Transaction } from '../../model/transaction.js';
-import {
-    test,
-    setParam,
-    formatDate,
-    fixDate,
-    checkObjValue,
-    copyObject,
-    formatProps,
-} from '../../common.js';
+import { fixDate, formatProps } from '../../common.js';
 import { App } from '../../app.js';
 
 /**
@@ -88,7 +86,7 @@ export async function update(params) {
             updParams = App.state.transactionToRequest(expTrans);
         }
         if (!resExpected) {
-            setParam(updParams, params);
+            Object.assign(updParams, params);
         }
 
         // Send API sequest to server

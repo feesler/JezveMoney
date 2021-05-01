@@ -1,6 +1,6 @@
-import { Component } from './component.js';
+import { TestComponent } from 'jezve-test';
 
-export class MenuItem extends Component {
+export class MenuItem extends TestComponent {
     async parse() {
         if (!this.elem) {
             throw new Error('Wrong structure of menu item');

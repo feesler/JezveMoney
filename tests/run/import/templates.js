@@ -1,5 +1,5 @@
+import { test } from 'jezve-test';
 import { App } from '../../app.js';
-import { test } from '../../common.js';
 import { ImportView } from '../../view/import.js';
 import { CREATE_TPL_STATE } from '../../view/component/importuploaddialog.js';
 

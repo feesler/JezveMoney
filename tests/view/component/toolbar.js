@@ -1,7 +1,7 @@
-import { Component } from './component.js';
+import { TestComponent } from 'jezve-test';
 import { IconLink } from './iconlink.js';
 
-export class Toolbar extends Component {
+export class Toolbar extends TestComponent {
     async parse() {
         if (!this.elem) {
             return;

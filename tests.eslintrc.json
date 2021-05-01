@@ -4,7 +4,7 @@
         "browser": true,
         "node": true
     },
-    "parser": "babel-eslint",
+    "parser": "@babel/eslint-parser",
     "parserOptions": {
         "ecmaVersion": 2017,
         "sourceType": "module"
@@ -18,5 +18,12 @@
         "import/no-cycle": ["warn"],
         "no-restricted-syntax": ["warn"],
         "no-await-in-loop": ["warn"]
+    },
+    "settings": {
+        "import/resolver": {
+            "node": {
+                "extensions": [".js", ".jsx", ".ts", ".tsx"]
+            }
+        }
     }
 }

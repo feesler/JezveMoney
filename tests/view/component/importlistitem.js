@@ -1,4 +1,4 @@
-import { Component } from './component.js';
+import { TestComponent, formatDate, copyObject } from 'jezve-test';
 import { DropDown } from './dropdown.js';
 import {
     EXPENSE,
@@ -11,15 +11,12 @@ import { ImportTemplate } from '../../model/importtemplate.js';
 import { Currency } from '../../model/currency.js';
 import {
     normalize,
-    setParam,
-    copyObject,
     asyncMap,
     fixFloat,
-    formatDate,
 } from '../../common.js';
 import { App } from '../../app.js';
 
-export class ImportListItem extends Component {
+export class ImportListItem extends TestComponent {
     constructor(parent, elem, mainAccount) {
         super(parent, elem);
 
@@ -285,7 +282,7 @@ export class ImportListItem extends Component {
         };
 
         if (model.type === 'expense') {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 destAmountField: model.isDifferent,
                 destAccountField: false,
                 personField: false,
@@ -294,7 +291,7 @@ export class ImportListItem extends Component {
             res.values.destAccountField.disabled = true;
             res.values.personField.disabled = true;
         } else if (model.type === 'income') {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 destAmountField: model.isDifferent,
                 destAccountField: false,
                 personField: false,
@@ -303,7 +300,7 @@ export class ImportListItem extends Component {
             res.values.destAccountField.disabled = true;
             res.values.personField.disabled = true;
         } else if (model.type === 'transferfrom' || model.type === 'transferto') {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 destAmountField: model.isDifferent,
                 destAccountField: true,
                 personField: false,
@@ -315,7 +312,7 @@ export class ImportListItem extends Component {
             res.values.currencyField.disabled = true;
             res.values.personField.disabled = true;
         } else if (model.type === 'debtfrom' || model.type === 'debtto') {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 destAmountField: false,
                 destAccountField: false,
                 personField: true,

@@ -1,4 +1,4 @@
-import { copyObject } from '../common.js';
+import { copyObject } from 'jezve-test';
 
 export class List {
     constructor(data = []) {

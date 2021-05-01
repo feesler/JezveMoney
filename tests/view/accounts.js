@@ -1,13 +1,13 @@
-import { TestView } from './testview.js';
+import { TestComponent } from 'jezve-test';
+import { AppView } from './AppView.js';
 import { TilesList } from './component/tileslist.js';
 import { Tile } from './component/tile.js';
 import { IconLink } from './component/iconlink.js';
 import { WarningPopup } from './component/warningpopup.js';
 import { Toolbar } from './component/toolbar.js';
-import { Component } from './component/component.js';
 
 /** List of accounts view class */
-export class AccountsView extends TestView {
+export class AccountsView extends AppView {
     async parseContent() {
         const res = {
             titleEl: await this.query('.content_wrap > .heading > h1'),
@@ -129,7 +129,7 @@ export class AccountsView extends TestView {
         await this.selectAccounts(data);
 
         await this.performAction(() => this.content.toolbar.clickButton('del'));
-        if (!await Component.isVisible(this.content.delete_warning)) {
+        if (!await TestComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Delete account warning popup not appear');
         }
 

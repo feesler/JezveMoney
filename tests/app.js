@@ -1,4 +1,4 @@
-import { formatDate, setupTest } from './common.js';
+import { TestApplication, formatDate, setupTest } from 'jezve-test';
 import { api } from './model/api.js';
 import { config } from './config.js';
 import { AppState } from './model/state.js';
@@ -6,8 +6,10 @@ import { Currency } from './model/currency.js';
 import { Icon } from './model/icon.js';
 import { Scenario } from './scenario.js';
 
-class Application {
+class Application extends TestApplication {
     constructor() {
+        super();
+
         this.config = config;
         this.user_id = null;
     }
@@ -58,22 +60,8 @@ class Application {
         await Icon.init();
     }
 
-    beforeRun() {
-        this.startTime = Date.now();
-    }
-
-    afterRun() {
-        const testsDuration = Date.now() - this.startTime;
-
-        this.environment.setDuration(testsDuration);
-    }
-
     async startTests() {
-        this.beforeRun();
-
         await this.scenario.run();
-
-        this.afterRun();
     }
 
     async goToMainView() {

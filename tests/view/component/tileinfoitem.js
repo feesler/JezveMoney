@@ -1,6 +1,6 @@
-import { Component } from './component.js';
+import { TestComponent } from 'jezve-test';
 
-export class TileInfoItem extends Component {
+export class TileInfoItem extends TestComponent {
     async parse() {
         this.titleElem = await this.query(this.elem, ':scope > *');
         if (!this.titleElem) {

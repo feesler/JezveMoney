@@ -1,6 +1,6 @@
+import { test } from 'jezve-test';
 import { LoginView } from '../view/login.js';
 import { MainView } from '../view/main.js';
-import { test } from '../common.js';
 import { App } from '../app.js';
 import { RegisterView } from '../view/register.js';
 import { ProfileView } from '../view/profile.js';

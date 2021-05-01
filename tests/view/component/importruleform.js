@@ -1,4 +1,4 @@
-import { Component } from './component.js';
+import { TestComponent, copyObject } from 'jezve-test';
 import { Currency } from '../../model/currency.js';
 import { ImportTransaction } from '../../model/importtransaction.js';
 import { ImportRule } from '../../model/importrule.js';
@@ -9,13 +9,10 @@ import {
 import { ImportAction } from '../../model/importaction.js';
 import { ImportConditionForm } from './importconditionform.js';
 import { ImportActionForm } from './importactionform.js';
-import {
-    asyncMap,
-    copyObject,
-} from '../../common.js';
+import { asyncMap } from '../../common.js';
 import { App } from '../../app.js';
 
-export class ImportRuleForm extends Component {
+export class ImportRuleForm extends TestComponent {
     async parse() {
         const accordionElems = await this.queryAll(this.elem, '.rule-form__collapse');
         const accordionItems = await asyncMap(

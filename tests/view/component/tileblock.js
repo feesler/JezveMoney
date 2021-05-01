@@ -1,8 +1,8 @@
-import { Component } from './component.js';
+import { TestComponent } from 'jezve-test';
 import { Tile } from './tile.js';
 import { DropDown } from './dropdown.js';
 
-export class TileBlock extends Component {
+export class TileBlock extends TestComponent {
     async parse() {
         const lbl = await this.query(this.elem, 'div > label');
         if (!lbl) {

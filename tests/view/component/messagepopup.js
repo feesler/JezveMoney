@@ -1,6 +1,6 @@
-import { Component } from './component.js';
+import { TestComponent } from 'jezve-test';
 
-export class MessagePopup extends Component {
+export class MessagePopup extends TestComponent {
     static async create(...args) {
         if (args.length < 2 || !args[1]) {
             return null;
@@ -9,7 +9,7 @@ export class MessagePopup extends Component {
         let instance;
         try {
             instance = new this(...args);
-            if (!await Component.isVisible(instance)) {
+            if (!await TestComponent.isVisible(instance)) {
                 return null;
             }
 

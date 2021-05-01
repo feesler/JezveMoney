@@ -1,13 +1,9 @@
+import { TestComponent } from 'jezve-test';
 import { TransactionView } from '../transaction.js';
 import { Currency } from '../../model/currency.js';
-import {
-    isValidValue,
-    normalize,
-    setParam,
-} from '../../common.js';
+import { isValidValue, normalize } from '../../common.js';
 import { DEBT } from '../../model/transaction.js';
 import { App } from '../../app.js';
-import { Component } from '../component/component.js';
 
 /** Create or update transfer transaction view class */
 export class DebtTransactionView extends TransactionView {
@@ -66,7 +62,7 @@ export class DebtTransactionView extends TransactionView {
             };
         }
 
-        const isSelectAccountVisible = await Component.isVisible(cont.selaccount);
+        const isSelectAccountVisible = await TestComponent.isVisible(cont.selaccount);
         res.noAccount = isSelectAccountVisible;
 
         res.account = App.state.accounts.getItem(cont.account.id);
@@ -121,9 +117,9 @@ export class DebtTransactionView extends TransactionView {
         res.exchRate = cont.exchange_row.value;
         this.updateExch();
 
-        const isSrcAmountRowVisible = await Component.isVisible(cont.src_amount_row);
-        const isSrcResBalRowVisible = await Component.isVisible(cont.result_balance_row);
-        const isDestResBalRowVisible = await Component.isVisible(cont.result_balance_dest_row);
+        const isSrcAmountRowVisible = await TestComponent.isVisible(cont.src_amount_row);
+        const isSrcResBalRowVisible = await TestComponent.isVisible(cont.result_balance_row);
+        const isDestResBalRowVisible = await TestComponent.isVisible(cont.result_balance_dest_row);
 
         res.isDiffCurr = false;
 
@@ -304,7 +300,7 @@ export class DebtTransactionView extends TransactionView {
         }
 
         if (this.model.debtType) {
-            setParam(res.values, {
+            Object.assign(res.values, {
                 person: {
                     tile: {
                         name: this.model.person.name,
@@ -324,15 +320,18 @@ export class DebtTransactionView extends TransactionView {
             }
 
             if (!this.model.noAccount) {
-                setParam(res.values.account, {
-                    tile: {
-                        name: this.model.destAccount.name,
-                        balance: this.model.destAccount.fmtBalance,
+                res.values.account = Object.assign(
+                    (res.values.account) ? res.values.account : {},
+                    {
+                        tile: {
+                            name: this.model.destAccount.name,
+                            balance: this.model.destAccount.fmtBalance,
+                        },
                     },
-                });
+                );
             }
         } else {
-            setParam(res.values, {
+            Object.assign(res.values, {
                 person: {
                     tile: {
                         name: this.model.person.name,
@@ -352,17 +351,20 @@ export class DebtTransactionView extends TransactionView {
             }
 
             if (!this.model.noAccount) {
-                setParam(res.values.account, {
-                    tile: {
-                        name: this.model.srcAccount.name,
-                        balance: this.model.srcAccount.fmtBalance,
+                res.values.account = Object.assign(
+                    (res.values.account) ? res.values.account : {},
+                    {
+                        tile: {
+                            name: this.model.srcAccount.name,
+                            balance: this.model.srcAccount.fmtBalance,
+                        },
                     },
-                });
+                );
             }
         }
 
         if (newState === 0) {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 src_amount_row: true,
                 src_amount_left: false,
                 result_balance_row: false,
@@ -371,7 +373,7 @@ export class DebtTransactionView extends TransactionView {
                 dest_res_balance_left: true,
             });
         } else if (newState === 1) {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 src_amount_row: false,
                 src_amount_left: true,
                 result_balance_row: true,
@@ -380,7 +382,7 @@ export class DebtTransactionView extends TransactionView {
                 dest_res_balance_left: true,
             });
         } else if (newState === 2) {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 src_amount_row: false,
                 src_amount_left: true,
                 result_balance_row: false,
@@ -389,7 +391,7 @@ export class DebtTransactionView extends TransactionView {
                 dest_res_balance_left: false,
             });
         } else if (newState === 3) {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 src_amount_row: true,
                 src_amount_left: false,
                 result_balance_row: false,
@@ -398,7 +400,7 @@ export class DebtTransactionView extends TransactionView {
                 dest_res_balance_left: true,
             });
         } else if (newState === 4) {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 src_amount_row: false,
                 src_amount_left: true,
                 result_balance_row: false,
@@ -407,7 +409,7 @@ export class DebtTransactionView extends TransactionView {
                 dest_res_balance_left: false,
             });
         } else if (newState === 5) {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 src_amount_row: false,
                 src_amount_left: true,
                 result_balance_row: true,
@@ -416,7 +418,7 @@ export class DebtTransactionView extends TransactionView {
                 dest_res_balance_left: true,
             });
         } else if (newState === 6) {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 src_amount_row: true,
                 src_amount_left: false,
                 result_balance_row: false,
@@ -425,7 +427,7 @@ export class DebtTransactionView extends TransactionView {
                 dest_res_balance_left: false,
             });
         } else if (newState === 7) {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 src_amount_row: true,
                 src_amount_left: false,
                 result_balance_row: false,
@@ -434,7 +436,7 @@ export class DebtTransactionView extends TransactionView {
                 dest_res_balance_left: true,
             });
         } else if (newState === 8) {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 src_amount_row: false,
                 src_amount_left: true,
                 result_balance_row: false,
@@ -443,7 +445,7 @@ export class DebtTransactionView extends TransactionView {
                 dest_res_balance_left: false,
             });
         } else if (newState === 9) {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 src_amount_row: false,
                 src_amount_left: true,
                 result_balance_row: true,

@@ -1,8 +1,8 @@
-import { Component } from './component.js';
+import { TestComponent, copyObject } from 'jezve-test';
 import { ImportListItem } from './importlistitem.js';
-import { asyncMap, copyObject } from '../../common.js';
+import { asyncMap } from '../../common.js';
 
-export class ImportList extends Component {
+export class ImportList extends TestComponent {
     constructor(parent, elem, mainAccount) {
         super(parent, elem);
 

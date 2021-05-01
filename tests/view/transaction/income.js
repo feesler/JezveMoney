@@ -1,3 +1,4 @@
+import { TestComponent } from 'jezve-test';
 import { TransactionView } from '../transaction.js';
 import { Currency } from '../../model/currency.js';
 import {
@@ -5,11 +6,9 @@ import {
     normalize,
     normalizeExch,
     correct,
-    setParam,
 } from '../../common.js';
 import { INCOME } from '../../model/transaction.js';
 import { App } from '../../app.js';
-import { Component } from '../component/component.js';
 
 // Create or update income transaction view class
 export class IncomeTransactionView extends TransactionView {
@@ -68,8 +67,8 @@ export class IncomeTransactionView extends TransactionView {
         res.exchRate = cont.exchange_row.value;
         this.updateExch();
 
-        const isDestResBalRowVisible = await Component.isVisible(cont.result_balance_dest_row);
-        const isExchRowVisible = await Component.isVisible(cont.exchange_row);
+        const isDestResBalRowVisible = await TestComponent.isVisible(cont.result_balance_dest_row);
+        const isExchRowVisible = await TestComponent.isVisible(cont.exchange_row);
 
         res.isDiffCurr = (res.src_curr_id !== res.dest_curr_id);
 
@@ -175,19 +174,19 @@ export class IncomeTransactionView extends TransactionView {
         }
 
         if (newState === 0 || newState === 1) {
-            setParam(res.values, {
+            Object.assign(res.values, {
                 src_amount_row: { label: 'Amount' },
                 dest_amount_row: { label: 'Amount' },
             });
         } else {
-            setParam(res.values, {
+            Object.assign(res.values, {
                 src_amount_row: { label: 'Source amount' },
                 dest_amount_row: { label: 'Destination amount' },
             });
         }
 
         if (newState === 0) {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 src_amount_left: false,
                 dest_amount_left: false,
                 dest_res_balance_left: true,
@@ -198,7 +197,7 @@ export class IncomeTransactionView extends TransactionView {
                 exchange_row: false,
             });
         } else if (newState === 1) {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 src_amount_left: true,
                 dest_amount_left: false,
                 dest_res_balance_left: false,
@@ -209,7 +208,7 @@ export class IncomeTransactionView extends TransactionView {
                 exchange_row: false,
             });
         } else if (newState === 2) {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 src_amount_left: false,
                 dest_amount_left: false,
                 dest_res_balance_left: true,
@@ -220,7 +219,7 @@ export class IncomeTransactionView extends TransactionView {
                 result_balance_dest_row: false,
             });
         } else if (newState === 3) {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 src_amount_left: false,
                 dest_amount_left: true,
                 dest_res_balance_left: true,
@@ -231,7 +230,7 @@ export class IncomeTransactionView extends TransactionView {
                 result_balance_dest_row: false,
             });
         } else if (newState === 4) {
-            setParam(res.visibility, {
+            Object.assign(res.visibility, {
                 src_amount_left: false,
                 dest_amount_left: true,
                 dest_res_balance_left: false,

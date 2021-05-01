@@ -1,8 +1,5 @@
-import {
-    copyObject,
-    convDate,
-    fixDate,
-} from '../common.js';
+import { copyObject } from 'jezve-test';
+import { convDate, fixDate } from '../common.js';
 import { App } from '../app.js';
 import { api } from './api.js';
 import { List } from './list.js';

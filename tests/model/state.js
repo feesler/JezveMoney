@@ -1,11 +1,12 @@
 import {
-    checkDate,
-    isValidValue,
     isObject,
     isInt,
     copyObject,
-    setParam,
     checkObjValue,
+} from 'jezve-test';
+import {
+    checkDate,
+    isValidValue,
 } from '../common.js';
 import {
     EXPENSE,
@@ -275,7 +276,7 @@ export class AppState {
         const expAccount = copyObject(origAcc);
         const data = copyFields(params, accReqFields);
         data.owner_id = this.profile.owner_id;
-        setParam(expAccount, data);
+        Object.assign(expAccount, data);
 
         const resExpected = this.checkAccountCorrectness(expAccount);
         if (!resExpected) {
@@ -444,7 +445,7 @@ export class AppState {
 
         const expPerson = copyObject(origPerson);
         const data = copyFields(params, pReqFields);
-        setParam(expPerson, data);
+        Object.assign(expPerson, data);
 
         const resExpected = this.checkPersonCorrectness(expPerson);
         if (!resExpected) {
@@ -787,7 +788,7 @@ export class AppState {
         // Convert original transaction to request form
         // (only for DEBT: person_id, acc_id, op fields)
         const updTrans = this.transactionToRequest(origTrans);
-        setParam(updTrans, params);
+        Object.assign(updTrans, params);
 
         const correct = this.checkTransactionCorrectness(updTrans);
         if (!correct) {
@@ -899,7 +900,7 @@ export class AppState {
 
         const expTemplate = copyObject(origItem);
         const data = copyFields(params, tplReqFields);
-        setParam(expTemplate, data);
+        Object.assign(expTemplate, data);
 
         const resExpected = this.checkTemplateCorrectness(expTemplate);
         if (!resExpected) {
@@ -991,7 +992,7 @@ export class AppState {
 
         const expRule = origItem.toPlain();
         const data = copyFields(params, ruleReqFields);
-        setParam(expRule, data);
+        Object.assign(expRule, data);
 
         const resExpected = this.checkRuleCorrectness(expRule);
         if (!resExpected) {

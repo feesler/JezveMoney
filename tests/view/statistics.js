@@ -1,9 +1,9 @@
-import { TestView } from './testview.js';
+import { AppView } from './AppView.js';
 import { DropDown } from './component/dropdown.js';
 import { TransactionTypeMenu } from './component/transactiontypemenu.js';
 
 /** Statistics view class */
-export class StatisticsView extends TestView {
+export class StatisticsView extends AppView {
     async parseContent() {
         const res = {
             titleEl: await this.query('.content_wrap > .heading > h1'),

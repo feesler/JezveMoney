@@ -1,11 +1,11 @@
-import { TestView } from './testview.js';
-import { Component } from './component/component.js';
+import { TestComponent } from 'jezve-test';
+import { AppView } from './AppView.js';
 import { InputRow } from './component/inputrow.js';
 import { IconLink } from './component/iconlink.js';
 import { WarningPopup } from './component/warningpopup.js';
 
 /** Create or update account view tests */
-export class PersonView extends TestView {
+export class PersonView extends AppView {
     async parseContent() {
         const res = {};
 
@@ -97,7 +97,7 @@ export class PersonView extends TestView {
     async deleteSelfItem() {
         await this.clickDeleteButton();
 
-        if (!await Component.isVisible(this.content.delete_warning)) {
+        if (!await TestComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Delete transaction warning popup not appear');
         }
         if (!this.content.delete_warning.okBtn) {

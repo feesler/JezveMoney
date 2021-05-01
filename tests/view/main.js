@@ -1,4 +1,4 @@
-import { TestView } from './testview.js';
+import { AppView } from './AppView.js';
 import { App } from '../app.js';
 import { TransactionList } from './component/transactionlist.js';
 import { TilesList } from './component/tileslist.js';
@@ -6,7 +6,7 @@ import { Tile } from './component/tile.js';
 import { InfoTile } from './component/infotile.js';
 
 /** Main view class */
-export class MainView extends TestView {
+export class MainView extends AppView {
     async parseContent() {
         const widgetsElem = await this.queryAll('.content_wrap .widget');
         if (!widgetsElem) {

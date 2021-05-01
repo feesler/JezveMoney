@@ -1,9 +1,9 @@
-import { Component } from './component.js';
+import { TestComponent } from 'jezve-test';
 import { ImportCondition } from '../../model/importcondition.js';
 import { Currency } from '../../model/currency.js';
 import { App } from '../../app.js';
 
-export class ImportConditionItem extends Component {
+export class ImportConditionItem extends TestComponent {
     async parse() {
         if (!this.elem) {
             throw new Error('Invalid import condition item');

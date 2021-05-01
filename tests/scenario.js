@@ -1,4 +1,4 @@
-import { copyObject } from './common.js';
+import { Runner, copyObject } from 'jezve-test';
 import { Currency } from './model/currency.js';
 import {
     EXPENSE,
@@ -54,7 +54,6 @@ import * as ImportTemplateApiTests from './run/api/importtemplate.js';
 import * as ImportRuleApiTests from './run/api/importrule.js';
 
 import { api } from './model/api.js';
-import { Runner } from './runner.js';
 import { App } from './app.js';
 
 export class Scenario {

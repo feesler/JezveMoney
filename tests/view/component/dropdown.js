@@ -1,7 +1,7 @@
-import { Component } from './component.js';
+import { TestComponent } from 'jezve-test';
 import { asyncMap } from '../../common.js';
 
-export class DropDown extends Component {
+export class DropDown extends TestComponent {
     /** Find for closest parent DropDown container of element */
     static async getParentContainer(env, elem) {
         if (!elem) {

@@ -1,10 +1,9 @@
-import { Component } from './component.js';
-import { copyObject, isDate } from '../../common.js';
+import { TestComponent, copyObject, isDate } from 'jezve-test';
 
 const shortMonthTitles = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 const monthTitles = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
 
-export class DatePicker extends Component {
+export class DatePicker extends TestComponent {
     async parse() {
         this.wrapper = await this.query(this.elem, '.dp__wrapper');
 

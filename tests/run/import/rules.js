@@ -1,5 +1,5 @@
+import { test } from 'jezve-test';
 import { App } from '../../app.js';
-import { test } from '../../common.js';
 import { Currency } from '../../model/currency.js';
 import { ImportTransaction } from '../../model/importtransaction.js';
 import { ImportCondition } from '../../model/importcondition.js';

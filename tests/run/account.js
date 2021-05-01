@@ -1,14 +1,9 @@
+import { test, copyObject, checkObjValue } from 'jezve-test';
 import { MainView } from '../view/main.js';
 import { AccountsView } from '../view/accounts.js';
 import { Transaction } from '../model/transaction.js';
 import { Currency } from '../model/currency.js';
-import {
-    test,
-    formatProps,
-    copyObject,
-    checkObjValue,
-    createCSV,
-} from '../common.js';
+import { formatProps, createCSV } from '../common.js';
 import { App } from '../app.js';
 import { AccountView } from '../view/account.js';
 

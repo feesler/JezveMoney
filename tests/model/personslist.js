@@ -1,6 +1,6 @@
+import { copyObject } from 'jezve-test';
 import { List } from './list.js';
 import { api } from './api.js';
-import { copyObject } from '../common.js';
 
 /* eslint-disable no-bitwise */
 

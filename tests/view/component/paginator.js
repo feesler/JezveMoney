@@ -1,6 +1,6 @@
-import { Component } from './component.js';
+import { TestComponent } from 'jezve-test';
 
-export class Paginator extends Component {
+export class Paginator extends TestComponent {
     async parse() {
         this.items = [];
         this.activeItem = null;

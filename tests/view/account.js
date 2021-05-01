@@ -1,12 +1,8 @@
-import { TestView } from './testview.js';
+import { TestComponent, copyObject } from 'jezve-test';
+import { AppView } from './AppView.js';
 import { Currency } from '../model/currency.js';
 import { Icon } from '../model/icon.js';
-import {
-    isValidValue,
-    normalize,
-    copyObject,
-} from '../common.js';
-import { Component } from './component/component.js';
+import { isValidValue, normalize } from '../common.js';
 import { Tile } from './component/tile.js';
 import { DropDown } from './component/dropdown.js';
 import { InputRow } from './component/inputrow.js';
@@ -14,7 +10,7 @@ import { IconLink } from './component/iconlink.js';
 import { WarningPopup } from './component/warningpopup.js';
 
 /** Create or update account view class */
-export class AccountView extends TestView {
+export class AccountView extends AppView {
     constructor(...args) {
         super(...args);
 
@@ -227,7 +223,7 @@ export class AccountView extends TestView {
     async deleteSelfItem() {
         await this.clickDeleteButton();
 
-        if (!await Component.isVisible(this.content.delete_warning)) {
+        if (!await TestComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Delete transaction warning popup not appear');
         }
         if (!this.content.delete_warning.okBtn) {

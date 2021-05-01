@@ -1,6 +1,6 @@
-import { Component } from './component.js';
+import { TestComponent } from 'jezve-test';
 
-export class Button extends Component {
+export class Button extends TestComponent {
     async parse() {
         this.btnElem = await this.query(this.elem, ':scope > *');
         if (!this.btnElem) {

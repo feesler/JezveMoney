@@ -1,4 +1,4 @@
-import { Component } from './component.js';
+import { TestComponent } from 'jezve-test';
 import { Currency } from '../../model/currency.js';
 import {
     EXPENSE,
@@ -7,7 +7,7 @@ import {
     DEBT,
 } from '../../model/transaction.js';
 
-export class TransactionListItem extends Component {
+export class TransactionListItem extends TestComponent {
     async parse() {
         this.id = parseInt(await this.prop(this.elem, 'dataset.id'), 10);
         this.selected = await this.hasClass(this.elem, 'trans-list__item_selected');
