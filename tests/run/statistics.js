@@ -1,11 +1,11 @@
 import { test } from 'jezve-test';
-import { App } from '../app.js';
+import { App } from '../Application.js';
 import {
     EXPENSE,
     INCOME,
     TRANSFER,
     DEBT,
-} from '../model/transaction.js';
+} from '../model/Transaction.js';
 
 export async function run() {
     App.view.setBlock('Statistics', 1);

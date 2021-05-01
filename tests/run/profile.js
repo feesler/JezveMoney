@@ -1,9 +1,9 @@
 import { test } from 'jezve-test';
-import { LoginView } from '../view/login.js';
-import { MainView } from '../view/main.js';
-import { App } from '../app.js';
-import { RegisterView } from '../view/register.js';
-import { ProfileView } from '../view/profile.js';
+import { LoginView } from '../view/LoginView.js';
+import { MainView } from '../view/MainView.js';
+import { App } from '../Application.js';
+import { RegisterView } from '../view/RegisterView.js';
+import { ProfileView } from '../view/ProfileView.js';
 
 async function checkLoginNavigation() {
     if (App.view.isUserLoggedIn()) {

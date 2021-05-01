@@ -4,10 +4,10 @@ import {
     checkObjValue,
 } from 'jezve-test';
 import { formatProps } from '../common.js';
-import { PersonsView } from '../view/persons.js';
-import { PersonView } from '../view/person.js';
-import { MainView } from '../view/main.js';
-import { App } from '../app.js';
+import { PersonsView } from '../view/PersonsView.js';
+import { PersonView } from '../view/PersonView.js';
+import { MainView } from '../view/MainView.js';
+import { App } from '../Application.js';
 
 /** Navigate to persons list page */
 async function checkNavigation() {

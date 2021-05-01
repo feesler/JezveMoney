@@ -5,10 +5,10 @@ import {
     checkObjValue,
 } from 'jezve-test';
 import { api } from '../../model/api.js';
-import { ApiRequestError } from '../../error/apirequest.js';
-import { Transaction } from '../../model/transaction.js';
+import { ApiRequestError } from '../../error/ApiRequestError.js';
+import { Transaction } from '../../model/Transaction.js';
 import { fixDate, formatProps } from '../../common.js';
-import { App } from '../../app.js';
+import { App } from '../../Application.js';
 
 /**
  * Create transaction with specified params and check expected state of app

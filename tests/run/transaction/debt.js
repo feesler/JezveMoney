@@ -1,8 +1,8 @@
 import { test } from 'jezve-test';
 import * as TransactionTests from './common.js';
-import { DEBT } from '../../model/transaction.js';
-import { DebtTransactionView } from '../../view/transaction/debt.js';
-import { App } from '../../app.js';
+import { DEBT } from '../../model/Transaction.js';
+import { DebtTransactionView } from '../../view/transaction/DebtTransactionView.js';
+import { App } from '../../Application.js';
 
 export async function submit(params) {
     if ('acc' in params) {

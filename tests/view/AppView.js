@@ -1,6 +1,6 @@
 import { TestView } from 'jezve-test';
-import { Header } from './component/header.js';
-import { MessagePopup } from './component/messagepopup.js';
+import { Header } from './component/Header.js';
+import { MessagePopup } from './component/MessagePopup.js';
 
 export class AppView extends TestView {
     constructor({ environment }) {

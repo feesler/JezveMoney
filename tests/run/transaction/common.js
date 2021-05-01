@@ -4,13 +4,13 @@ import {
     copyObject,
     formatDate,
 } from 'jezve-test';
-import { TransactionsView } from '../../view/transactions.js';
-import { TransactionView } from '../../view/transaction.js';
-import { MainView } from '../../view/main.js';
-import { Currency } from '../../model/currency.js';
-import { Transaction } from '../../model/transaction.js';
-import { AccountsList } from '../../model/accountslist.js';
-import { App } from '../../app.js';
+import { TransactionsView } from '../../view/TransactionsView.js';
+import { TransactionView } from '../../view/TransactionView.js';
+import { MainView } from '../../view/MainView.js';
+import { Currency } from '../../model/Currency.js';
+import { Transaction } from '../../model/Transaction.js';
+import { AccountsList } from '../../model/AccountsList.js';
+import { App } from '../../Application.js';
 import { formatProps, fixDate } from '../../common.js';
 
 export async function runAction({ action, data }) {

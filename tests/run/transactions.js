@@ -4,11 +4,11 @@ import {
     copyObject,
     checkObjValue,
 } from 'jezve-test';
-import { App } from '../app.js';
+import { App } from '../Application.js';
 import { fixDate } from '../common.js';
-import { TransactionsView } from '../view/transactions.js';
-import { MainView } from '../view/main.js';
-import { availTransTypes, Transaction } from '../model/transaction.js';
+import { TransactionsView } from '../view/TransactionsView.js';
+import { MainView } from '../view/MainView.js';
+import { availTransTypes, Transaction } from '../model/Transaction.js';
 
 /** Navigate to transactions list page */
 async function checkNavigation() {

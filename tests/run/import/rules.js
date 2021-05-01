@@ -1,11 +1,11 @@
 import { test } from 'jezve-test';
-import { App } from '../../app.js';
-import { Currency } from '../../model/currency.js';
-import { ImportTransaction } from '../../model/importtransaction.js';
-import { ImportCondition } from '../../model/importcondition.js';
-import { ImportAction } from '../../model/importaction.js';
-import { ImportView } from '../../view/import.js';
-import { TransactionsView } from '../../view/transactions.js';
+import { App } from '../../Application.js';
+import { Currency } from '../../model/Currency.js';
+import { ImportTransaction } from '../../model/ImportTransaction.js';
+import { ImportCondition } from '../../model/ImportCondition.js';
+import { ImportAction } from '../../model/ImportAction.js';
+import { ImportView } from '../../view/ImportView.js';
+import { TransactionsView } from '../../view/TransactionsView.js';
 
 /** Navigate to import page */
 async function checkNavigation() {

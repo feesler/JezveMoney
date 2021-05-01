@@ -1,8 +1,8 @@
 import { test, copyObject } from 'jezve-test';
 import { api } from '../../model/api.js';
-import { ApiRequestError } from '../../error/apirequest.js';
+import { ApiRequestError } from '../../error/ApiRequestError.js';
 import { formatProps } from '../../common.js';
-import { App } from '../../app.js';
+import { App } from '../../Application.js';
 
 /**
  * Create account with specified params and check expected state of app
