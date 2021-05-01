@@ -60,14 +60,23 @@ class Import extends TemplateController
 
         array_push(
             $this->jsArr,
-            "model/list.js",
-            "model/account.js",
-            "model/currency.js",
-            "model/person.js",
-            "model/importcondition.js",
-            "model/importaction.js",
-            "model/importrule.js",
-            "model/importtpl.js",
+            "model/List.js",
+            "model/Account.js",
+            "model/AccountList.js",
+            "model/Currency.js",
+            "model/CurrencyList.js",
+            "model/Person.js",
+            "model/PersonList.js",
+            "model/ImportCondition.js",
+            "model/ImportConditionList.js",
+            "model/ImportAction.js",
+            "model/ImportActionList.js",
+            "model/ImportRule.js",
+            "model/ImportRuleList.js",
+            "error/ImportConditionValidationError.js",
+            "error/ImportActionValidationError.js",
+            "model/ImportTemplate.js",
+            "model/ImportTemplateList.js",
             "lib/dragndrop.js",
             "lib/sortable.js",
             "lib/dropdown.js",
@@ -88,15 +97,15 @@ class Import extends TemplateController
             "../Components/ImportConditionForm/ImportConditionForm.js",
             "../Components/ImportActionItem/ImportActionItem.js",
             "../Components/ImportActionForm/ImportActionForm.js",
-            "view.js",
-            "importview.js"
+            "View.js",
+            "ImportView.js"
         );
 
         if (
             $this->uMod->isAdmin($this->user_id)
             || $this->uMod->isTester($this->user_id)
         ) {
-            array_push($this->jsArr, "importadmin.js");
+            array_push($this->jsArr, "../Components/ImportFileUploader/ImportFileUploaderAdmin.js");
         }
 
         $titleString = "Jezve Money | Import transactions";

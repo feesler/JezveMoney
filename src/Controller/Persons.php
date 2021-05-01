@@ -27,15 +27,16 @@ class Persons extends TemplateController
         $this->buildCSS();
         array_push(
             $this->jsArr,
-            "model/list.js",
-            "model/person.js",
+            "model/List.js",
+            "model/Person.js",
+            "model/PersonList.js",
             "lib/selection.js",
             "../Components/Header/Header.js",
             "../Components/Toolbar/Toolbar.js",
             "../Components/IconLink/IconLink.js",
             "../Components/ConfirmDialog/ConfirmDialog.js",
-            "view.js",
-            "personlistview.js"
+            "View.js",
+            "PersonListView.js"
         );
 
         include(TPL_PATH . "persons.tpl");
@@ -77,8 +78,8 @@ class Persons extends TemplateController
         array_push(
             $this->jsArr,
             "../Components/Header/Header.js",
-            "view.js",
-            "personview.js"
+            "View.js",
+            "PersonView.js"
         );
 
         include(TPL_PATH . "person.tpl");
@@ -118,8 +119,8 @@ class Persons extends TemplateController
             "../Components/Header/Header.js",
             "../Components/IconLink/IconLink.js",
             "../Components/ConfirmDialog/ConfirmDialog.js",
-            "view.js",
-            "personview.js"
+            "View.js",
+            "PersonView.js"
         );
 
         include(TPL_PATH . "person.tpl");

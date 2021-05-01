@@ -231,9 +231,11 @@ class Transactions extends TemplateController
 
         array_push(
             $this->jsArr,
-            "model/list.js",
-            "model/currency.js",
-            "model/account.js",
+            "model/List.js",
+            "model/Currency.js",
+            "model/CurrencyList.js",
+            "model/Account.js",
+            "model/AccountList.js",
             "lib/selection.js",
             "lib/datepicker.js",
             "lib/dragndrop.js",
@@ -243,8 +245,8 @@ class Transactions extends TemplateController
             "../Components/Toolbar/Toolbar.js",
             "../Components/IconLink/IconLink.js",
             "../Components/ConfirmDialog/ConfirmDialog.js",
-            "view.js",
-            "translistview.js"
+            "View.js",
+            "TransactionListView.js"
         );
 
         include(TPL_PATH . "transactions.tpl");
@@ -575,12 +577,16 @@ class Transactions extends TemplateController
 
         array_push(
             $this->jsArr,
-            "model/list.js",
-            "model/currency.js",
-            "model/icon.js",
-            "model/account.js",
-            "model/person.js",
-            "model/transaction.js",
+            "model/List.js",
+            "model/Currency.js",
+            "model/CurrencyList.js",
+            "model/Icon.js",
+            "model/IconList.js",
+            "model/Account.js",
+            "model/AccountList.js",
+            "model/Person.js",
+            "model/PersonList.js",
+            "model/TransactionModel.js",
             "lib/selection.js",
             "lib/datepicker.js",
             "lib/dropdown.js",
@@ -590,8 +596,8 @@ class Transactions extends TemplateController
             "../Components/AccountTile/AccountTile.js",
             "../Components/TileInfoItem/TileInfoItem.js",
             "../Components/IconLink/IconLink.js",
-            "view.js",
-            "transactionview.js"
+            "View.js",
+            "TransactionView.js"
         );
 
         include(TPL_PATH . "transaction.tpl");
@@ -862,12 +868,16 @@ class Transactions extends TemplateController
 
         array_push(
             $this->jsArr,
-            "model/list.js",
-            "model/currency.js",
-            "model/icon.js",
-            "model/account.js",
-            "model/person.js",
-            "model/transaction.js",
+            "model/List.js",
+            "model/Currency.js",
+            "model/CurrencyList.js",
+            "model/Icon.js",
+            "model/IconList.js",
+            "model/Account.js",
+            "model/AccountList.js",
+            "model/Person.js",
+            "model/PersonList.js",
+            "model/TransactionModel.js",
             "lib/selection.js",
             "lib/datepicker.js",
             "lib/dropdown.js",
@@ -878,8 +888,8 @@ class Transactions extends TemplateController
             "../Components/TileInfoItem/TileInfoItem.js",
             "../Components/IconLink/IconLink.js",
             "../Components/ConfirmDialog/ConfirmDialog.js",
-            "view.js",
-            "transactionview.js"
+            "View.js",
+            "TransactionView.js"
         );
 
         include(TPL_PATH . "transaction.tpl");

@@ -43,16 +43,18 @@ class Accounts extends TemplateController
         $this->buildCSS();
         array_push(
             $this->jsArr,
-            "model/list.js",
-            "model/account.js",
-            "model/currency.js",
+            "model/List.js",
+            "model/Account.js",
+            "model/AccountList.js",
+            "model/Currency.js",
+            "model/CurrencyList.js",
             "lib/selection.js",
             "../Components/Header/Header.js",
             "../Components/Toolbar/Toolbar.js",
             "../Components/IconLink/IconLink.js",
             "../Components/ConfirmDialog/ConfirmDialog.js",
-            "view.js",
-            "accountlistview.js"
+            "View.js",
+            "AccountListView.js"
         );
 
         include(TPL_PATH . "accounts.tpl");
@@ -105,18 +107,21 @@ class Accounts extends TemplateController
         $this->buildCSS();
         array_push(
             $this->jsArr,
-            "model/list.js",
-            "model/currency.js",
-            "model/account.js",
-            "model/icon.js",
+            "model/List.js",
+            "model/Currency.js",
+            "model/CurrencyList.js",
+            "model/Account.js",
+            "model/AccountList.js",
+            "model/Icon.js",
+            "model/IconList.js",
             "lib/selection.js",
             "lib/dropdown.js",
             "lib/decimalinput.js",
             "../Components/Header/Header.js",
             "../Components/Tile/Tile.js",
             "../Components/AccountTile/AccountTile.js",
-            "view.js",
-            "accountview.js"
+            "View.js",
+            "AccountView.js"
         );
 
         include(TPL_PATH . "account.tpl");
@@ -175,10 +180,13 @@ class Accounts extends TemplateController
 
         array_push(
             $this->jsArr,
-            "model/list.js",
-            "model/currency.js",
-            "model/account.js",
-            "model/icon.js",
+            "model/List.js",
+            "model/Currency.js",
+            "model/CurrencyList.js",
+            "model/Account.js",
+            "model/AccountList.js",
+            "model/Icon.js",
+            "model/IconList.js",
             "lib/selection.js",
             "lib/dropdown.js",
             "lib/decimalinput.js",
@@ -187,8 +195,8 @@ class Accounts extends TemplateController
             "../Components/AccountTile/AccountTile.js",
             "../Components/IconLink/IconLink.js",
             "../Components/ConfirmDialog/ConfirmDialog.js",
-            "view.js",
-            "accountview.js"
+            "View.js",
+            "AccountView.js"
         );
 
         include(TPL_PATH . "account.tpl");

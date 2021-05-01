@@ -1,6 +1,6 @@
 'use strict';
 
-/* global amountFix, timestampFromString, extend, ListItem, List */
+/* global amountFix, timestampFromString, extend, ListItem */
 
 /**
  * @constructor Import template class
@@ -175,27 +175,4 @@ ImportTemplate.prototype.applyTo = function (data, currencyModel) {
     res.transactionCurrencyId = (currency) ? currency.id : null;
 
     return res;
-};
-
-/**
- * @constructor ImportTemplateList class
- * @param {object[]} props - array of import rules
- */
-function ImportTemplateList() {
-    ImportTemplateList.parent.constructor.apply(this, arguments);
-}
-
-extend(ImportTemplateList, List);
-
-/** Static alias for ImportTemplateList constructor */
-ImportTemplateList.create = function (props) {
-    return new ImportTemplateList(props);
-};
-
-/**
- * Create list item from specified object
- * @param {Object} obj
- */
-ImportTemplateList.prototype.createItem = function (obj) {
-    return new ImportTemplate(obj);
 };

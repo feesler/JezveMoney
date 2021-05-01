@@ -40,8 +40,8 @@ class Profile extends TemplateController
             $this->jsArr,
             "../Components/Header/Header.js",
             "../Components/ConfirmDialog/ConfirmDialog.js",
-            "view.js",
-            "profileview.js"
+            "View.js",
+            "ProfileView.js"
         );
 
         include(TPL_PATH . "profile.tpl");

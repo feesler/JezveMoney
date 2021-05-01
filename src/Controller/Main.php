@@ -85,7 +85,7 @@ class Main extends TemplateController
             "lib/charts/basechart.js",
             "lib/charts/histogram.js",
             "../Components/Header/Header.js",
-            "view.js",
+            "View.js",
             "mainview.js"
         );
 

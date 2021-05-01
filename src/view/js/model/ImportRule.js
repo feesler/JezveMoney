@@ -1,43 +1,10 @@
 'use strict';
 
-/* global fixFloat, checkDate, extend, extendError, ListItem, List */
+/* global fixFloat, checkDate, extend, ListItem */
 /* global ImportConditionList, ImportActionList */
+/* global ImportConditionValidationError, ImportActionValidationError */
 /* global IMPORT_COND_OP_EQUAL, IMPORT_COND_OP_NOT_EQUAL */
 /* global IMPORT_COND_OP_LESS, IMPORT_COND_OP_GREATER */
-
-/**
- * @constructor Import condition validation error class
- * @param {string} message - error message string
- * @param {number} conditionIndex - index of condition in the list
- */
-function ImportConditionValidationError(message, conditionIndex) {
-    var instance = new Error(message);
-    Object.setPrototypeOf(instance, Object.getPrototypeOf(this));
-
-    instance.name = 'ImportConditionValidationError';
-    instance.conditionIndex = conditionIndex;
-
-    return instance;
-}
-
-extendError(ImportConditionValidationError);
-
-/**
- * @constructor Import action validation error class
- * @param {string} message - error message string
- * @param {number} actionIndex - index of action in the list
- */
-function ImportActionValidationError(message, actionIndex) {
-    var instance = new Error(message);
-    Object.setPrototypeOf(instance, Object.getPrototypeOf(this));
-
-    instance.name = 'ImportActionValidationError';
-    instance.actionIndex = actionIndex;
-
-    return instance;
-}
-
-extendError(ImportActionValidationError);
 
 /**
  * @constructor Import rule class
@@ -250,47 +217,4 @@ ImportRule.prototype.validate = function () {
     result.valid = true;
 
     return result;
-};
-
-/**
- * @constructor ImportRuleList class
- * @param {object[]} props - array of import rules
- */
-function ImportRuleList() {
-    ImportRuleList.parent.constructor.apply(this, arguments);
-}
-
-extend(ImportRuleList, List);
-
-/** Static alias for ImportRuleList constructor */
-ImportRuleList.create = function (props) {
-    return new ImportRuleList(props);
-};
-
-/**
- * Create list item from specified object
- * @param {Object} obj
- */
-ImportRuleList.prototype.createItem = function (obj) {
-    return new ImportRule(obj);
-};
-
-/**
- * Apply list of import rules to specified transaction
- * @param {Object} item - import transaction
- */
-ImportRuleList.prototype.applyTo = function (item) {
-    var applied = false;
-    var data = item.getOriginal();
-
-    this.forEach(function (rule) {
-        if (!rule.meetConditions(data)) {
-            return;
-        }
-
-        applied = true;
-        rule.runActions(item);
-    }, this);
-
-    return applied;
 };

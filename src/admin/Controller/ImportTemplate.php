@@ -32,7 +32,7 @@ class ImportTemplate extends AdminController
         array_push(
             $this->jsArr,
             "../Components/ConfirmDialog/ConfirmDialog.js",
-            "view.js"
+            "View.js"
         );
         array_push(
             $this->jsAdmin,

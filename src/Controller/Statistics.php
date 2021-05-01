@@ -164,8 +164,9 @@ class Statistics extends TemplateController
 
         array_push(
             $this->jsArr,
-            "model/list.js",
-            "model/currency.js",
+            "model/List.js",
+            "model/Currency.js",
+            "model/CurrencyList.js",
             "lib/selection.js",
             "lib/datepicker.js",
             "lib/dropdown.js",
@@ -174,8 +175,8 @@ class Statistics extends TemplateController
             "lib/charts/histogram.js",
             "../Components/Header/Header.js",
             "../Components/IconLink/IconLink.js",
-            "view.js",
-            "statisticsview.js"
+            "View.js",
+            "StatisticsView.js"
         );
 
         include(TPL_PATH . "statistics.tpl");

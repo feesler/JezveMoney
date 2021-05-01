@@ -39,8 +39,8 @@ class User extends TemplateController
         array_push(
             $this->jsArr,
             "../Components/Header/Header.js",
-            "view.js",
-            "loginview.js"
+            "View.js",
+            "LoginView.js"
         );
 
         include(TPL_PATH . "login.tpl");
@@ -88,8 +88,8 @@ class User extends TemplateController
         array_push(
             $this->jsArr,
             "../Components/Header/Header.js",
-            "view.js",
-            "registerview.js"
+            "View.js",
+            "RegisterView.js"
         );
 
         include(TPL_PATH . "register.tpl");
