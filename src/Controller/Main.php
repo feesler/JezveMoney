@@ -86,7 +86,7 @@ class Main extends TemplateController
             "lib/charts/histogram.js",
             "../Components/Header/Header.js",
             "View.js",
-            "mainview.js"
+            "MainView.js"
         );
 
         include(TPL_PATH . "main.tpl");
