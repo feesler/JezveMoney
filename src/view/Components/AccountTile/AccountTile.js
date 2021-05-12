@@ -1,51 +1,47 @@
-'use strict';
-
-/* global extend, isObject, Tile */
+import { isObject } from '../../js/lib/common.js';
+import { Tile } from '../Tile/Tile.js';
 
 /**
- * Account Tile component constructor
+ * Account Tile component
  * @param {object} props
  */
-function AccountTile() {
-    AccountTile.parent.constructor.apply(this, arguments);
+export class AccountTile extends Tile {
+    constructor(...args) {
+        super(...args);
 
-    this.parent = this.props.parent;
+        this.parent = this.props.parent;
+    }
+
+    /**
+     * Create new Account Tile from specified element
+     */
+    static fromElement(props) {
+        let res;
+
+        try {
+            res = new AccountTile(props);
+            res.parse();
+        } catch (e) {
+            res = null;
+        }
+
+        return res;
+    }
+
+    /**
+     * Render specified account
+     * @param {object} account - account object
+     */
+    render(account) {
+        if (!isObject(account)) {
+            throw new Error('Invalid account specified');
+        }
+
+        const fmtBalance = this.parent.model.currency.formatCurrency(account.balance, account.curr_id);
+        const icon = this.parent.model.icons.getItem(account.icon_id);
+
+        this.setTitle(account.name);
+        this.setSubTitle(fmtBalance);
+        this.setIcon((icon) ? icon.file : null);
+    }
 }
-
-extend(AccountTile, Tile);
-
-/**
- * Create new Account Tile from specified element
- */
-AccountTile.fromElement = function (props) {
-    var res;
-
-    try {
-        res = new AccountTile(props);
-        res.parse();
-    } catch (e) {
-        res = null;
-    }
-
-    return res;
-};
-
-/**
- * Render specified account
- * @param {object} account - account object
- */
-AccountTile.prototype.render = function (account) {
-    var fmtBalance;
-    var icon;
-
-    if (!isObject(account)) {
-        throw new Error('Invalid account specified');
-    }
-
-    fmtBalance = this.parent.model.currency.formatCurrency(account.balance, account.curr_id);
-    icon = this.parent.model.icons.getItem(account.icon_id);
-
-    this.setTitle(account.name);
-    this.setSubTitle(fmtBalance);
-    this.setIcon((icon) ? icon.file : null);
-};

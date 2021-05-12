@@ -1,23 +1,16 @@
-'use strict';
-
-/* global extend, ListItem */
+import { ListItem } from './ListItem.js';
 
 /**
- * @constructor Icon class
- * @param {*} props
+ * Icon class
  */
-function Icon() {
-    Icon.parent.constructor.apply(this, arguments);
+export class Icon extends ListItem {
+    /**
+     * Check specified field name is available
+     * @param {string} field - field name to check
+     */
+    isAvailField(field) {
+        const availFields = ['id', 'name', 'file', 'type'];
+
+        return typeof field === 'string' && availFields.includes(field);
+    }
 }
-
-extend(Icon, ListItem);
-
-/**
- * Check specified field name is available
- * @param {string} field - field name to check
- */
-Icon.prototype.isAvailField = function (field) {
-    var availFields = ['id', 'name', 'file', 'type'];
-
-    return typeof field === 'string' && availFields.includes(field);
-};

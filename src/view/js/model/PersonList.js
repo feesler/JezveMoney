@@ -1,35 +1,28 @@
-'use strict';
-
-/* global extend, List, Person */
+import { List } from './List.js';
+import { Person } from './Person.js';
 
 /**
  * @constructor PersonList class
  * @param {object[]} props - array of persons
  */
-function PersonList() {
-    PersonList.parent.constructor.apply(this, arguments);
+export class PersonList extends List {
+    /** Static alias for PersonList constructor */
+    static create(props) {
+        return new PersonList(props);
+    }
+
+    /**
+     * Create list item from specified object
+     * @param {Object} obj
+     */
+    createItem(obj) {
+        return new Person(obj);
+    }
+
+    /**
+     * Return list of visible Persons
+     */
+    getVisible() {
+        return this.filter((item) => item && item.isVisible());
+    }
 }
-
-extend(PersonList, List);
-
-/** Static alias for PersonList constructor */
-PersonList.create = function (props) {
-    return new PersonList(props);
-};
-
-/**
- * Create list item from specified object
- * @param {Object} obj
- */
-PersonList.prototype.createItem = function (obj) {
-    return new Person(obj);
-};
-
-/**
- * Return list of visible Persons
- */
-PersonList.prototype.getVisible = function () {
-    return this.filter(function (item) {
-        return item && item.isVisible();
-    });
-};

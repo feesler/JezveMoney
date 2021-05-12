@@ -1,26 +1,21 @@
-'use strict';
-
-/* global extend, List, Icon */
+import { List } from './List.js';
+import { Icon } from './Icon.js';
 
 /**
- * @constructor IconList class
+ * Icons list class
  * @param {object[]} props - array of icons
  */
-function IconList() {
-    IconList.parent.constructor.apply(this, arguments);
+export class IconList extends List {
+    /** Static alias for IconList constructor */
+    static create(props) {
+        return new IconList(props);
+    }
+
+    /**
+     * Create list item from specified object
+     * @param {Object} obj
+     */
+    createItem(obj) {
+        return new Icon(obj);
+    }
 }
-
-extend(IconList, List);
-
-/** Static alias for IconList constructor */
-IconList.create = function (props) {
-    return new IconList(props);
-};
-
-/**
- * Create list item from specified object
- * @param {Object} obj
- */
-IconList.prototype.createItem = function (obj) {
-    return new Icon(obj);
-};

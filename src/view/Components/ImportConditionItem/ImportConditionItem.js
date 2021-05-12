@@ -1,182 +1,179 @@
-'use strict';
-
-/* global ce, extend, AppComponent */
-/* global ImportCondition */
-/* global IMPORT_COND_OP_FIELD_FLAG, IMPORT_COND_FIELD_TR_CURRENCY */
-/* global IMPORT_COND_FIELD_ACC_CURRENCY */
-/* global IMPORT_COND_FIELD_MAIN_ACCOUNT, IMPORT_COND_FIELD_TPL */
+import { ce } from '../../js/lib/common.js';
+import { AppComponent } from '../AppComponent/AppComponent.js';
+import {
+    ImportCondition,
+    IMPORT_COND_OP_FIELD_FLAG,
+    IMPORT_COND_FIELD_TR_CURRENCY,
+    IMPORT_COND_FIELD_ACC_CURRENCY,
+    IMPORT_COND_FIELD_MAIN_ACCOUNT,
+    IMPORT_COND_FIELD_TPL,
+} from '../../js/model/ImportCondition.js';
 
 /**
- * ImportConditionItem component constructor
- * @param {Object} props
+ * ImportConditionItem component
  */
-function ImportConditionItem() {
-    ImportConditionItem.parent.constructor.apply(this, arguments);
+export class ImportConditionItem extends AppComponent {
+    constructor(...args) {
+        super(...args);
 
-    if (
-        !this.parent
-        || !this.props
-        || !this.props.data
-        || !this.props.tplModel
-        || !this.props.currencyModel
-        || !this.props.accountModel
-        || !this.props.personModel
-    ) {
-        throw new Error('Invalid props');
+        if (
+            !this.parent
+            || !this.props
+            || !this.props.data
+            || !this.props.tplModel
+            || !this.props.currencyModel
+            || !this.props.accountModel
+            || !this.props.personModel
+        ) {
+            throw new Error('Invalid props');
+        }
+
+        this.submitHandler = this.props.submit;
+        this.cancelHandler = this.props.cancel;
+        this.updateHandler = this.props.update;
+        this.deleteHandler = this.props.remove;
+
+        this.model = {
+            templates: this.props.tplModel,
+            currency: this.props.currencyModel,
+            accounts: this.props.accountModel,
+            persons: this.props.personModel
+        };
+
+        if (!(this.props.data instanceof ImportCondition)) {
+            throw new Error('Invalid rule item');
+        }
+
+        this.init();
+        this.setData(this.props.data);
     }
 
-    this.submitHandler = this.props.submit;
-    this.cancelHandler = this.props.cancel;
-    this.updateHandler = this.props.update;
-    this.deleteHandler = this.props.remove;
-
-    this.model = {
-        templates: this.props.tplModel,
-        currency: this.props.currencyModel,
-        accounts: this.props.accountModel,
-        persons: this.props.personModel
-    };
-
-    if (!(this.props.data instanceof ImportCondition)) {
-        throw new Error('Invalid rule item');
+    /** Shortcut for ImportConditionItem constructor */
+    static create(props) {
+        return new ImportConditionItem(props);
     }
 
-    this.init();
-    this.setData(this.props.data);
-}
+    /** Main structure initialization */
+    init() {
+        this.propertyLabel = ce('span', { className: 'cond-item__property' });
+        this.operatorLabel = ce('span', { className: 'cond-item__operator' });
+        this.valueLabel = ce('span', { className: 'cond-item__value' });
 
-extend(ImportConditionItem, AppComponent);
-
-/** Shortcut for ImportConditionItem constructor */
-ImportConditionItem.create = function (props) {
-    return new ImportConditionItem(props);
-};
-
-/** Main structure initialization */
-ImportConditionItem.prototype.init = function () {
-    this.propertyLabel = ce('span', { className: 'cond-item__property' });
-    this.operatorLabel = ce('span', { className: 'cond-item__operator' });
-    this.valueLabel = ce('span', { className: 'cond-item__value' });
-
-    this.elem = this.createContainer('cond-item', [
-        this.propertyLabel,
-        this.operatorLabel,
-        this.valueLabel
-    ]);
-};
-
-/** Set main state of component */
-ImportConditionItem.prototype.setData = function (data) {
-    if (!data) {
-        throw new Error('Invalid data');
+        this.elem = this.createContainer('cond-item', [
+            this.propertyLabel,
+            this.operatorLabel,
+            this.valueLabel
+        ]);
     }
 
-    this.state = {
-        conditionId: data.id,
-        parentRuleId: data.rule_id,
-        fieldType: data.field_id,
-        operator: data.operator,
-        isFieldValue: data.isPropertyValue(),
-        value: data.value
-    };
+    /** Set main state of component */
+    setData(data) {
+        if (!data) {
+            throw new Error('Invalid data');
+        }
 
-    this.render(this.state);
-};
+        this.state = {
+            conditionId: data.id,
+            parentRuleId: data.rule_id,
+            fieldType: data.field_id,
+            operator: data.operator,
+            isFieldValue: data.isPropertyValue(),
+            value: data.value
+        };
 
-/** Return import rule object */
-ImportConditionItem.prototype.getData = function () {
-    var res = {
-        parent_id: this.state.parentRuleId,
-        field_id: this.state.fieldType,
-        operator: this.state.operator,
-        value: this.state.value,
-        flags: (this.state.isFieldValue) ? IMPORT_COND_OP_FIELD_FLAG : 0
-    };
-
-    if (this.state.conditionId) {
-        res.id = this.state.conditionId;
+        this.render(this.state);
     }
 
-    return res;
-};
+    /** Return import rule object */
+    getData() {
+        const res = {
+            parent_id: this.state.parentRuleId,
+            field_id: this.state.fieldType,
+            operator: this.state.operator,
+            value: this.state.value,
+            flags: (this.state.isFieldValue) ? IMPORT_COND_OP_FIELD_FLAG : 0
+        };
 
-/** Return formatted rule value */
-ImportConditionItem.prototype.formatValue = function (state) {
-    var propertyType;
-    var valueItem;
+        if (this.state.conditionId) {
+            res.id = this.state.conditionId;
+        }
 
-    if (!state) {
-        throw new Error('Invalid state');
+        return res;
     }
 
-    if (state.isFieldValue) {
-        propertyType = ImportCondition.getFieldTypeById(state.value);
+    /** Return formatted rule value */
+    formatValue(state) {
+        if (!state) {
+            throw new Error('Invalid state');
+        }
+
+        if (state.isFieldValue) {
+            const propertyType = ImportCondition.getFieldTypeById(state.value);
+            if (!propertyType) {
+                throw new Error('Field type not found');
+            }
+
+            return propertyType.title;
+        }
+
+        if (state.fieldType === IMPORT_COND_FIELD_TR_CURRENCY
+            || state.fieldType === IMPORT_COND_FIELD_ACC_CURRENCY) {
+            const valueItem = this.model.currency.getItem(state.value);
+            if (!valueItem) {
+                throw new Error('Invalid currency');
+            }
+
+            return valueItem.name;
+        }
+
+        if (state.fieldType === IMPORT_COND_FIELD_MAIN_ACCOUNT) {
+            const valueItem = this.model.accounts.getItem(state.value);
+            if (!valueItem) {
+                throw new Error('Invalid account');
+            }
+
+            return valueItem.name;
+        }
+
+        if (state.fieldType === IMPORT_COND_FIELD_TPL) {
+            const valueItem = this.model.templates.getItem(state.value);
+            if (!valueItem) {
+                throw new Error('Invalid template');
+            }
+
+            return valueItem.name;
+        }
+
+        return state.value;
+    }
+
+    /** Render component state */
+    render(state) {
+        if (!state) {
+            throw new Error('Invalid state');
+        }
+
+        // Left value property
+        const propertyType = ImportCondition.getFieldTypeById(state.fieldType);
         if (!propertyType) {
             throw new Error('Field type not found');
         }
-
-        return propertyType.title;
-    }
-
-    if (state.fieldType === IMPORT_COND_FIELD_TR_CURRENCY
-        || state.fieldType === IMPORT_COND_FIELD_ACC_CURRENCY) {
-        valueItem = this.model.currency.getItem(state.value);
-        if (!valueItem) {
-            throw new Error('Invalid currency');
+        this.propertyLabel.textContent = propertyType.title;
+        // Operator
+        const operatorType = ImportCondition.getOperatorById(state.operator);
+        if (!operatorType) {
+            throw new Error('Operator not found');
         }
-
-        return valueItem.name;
-    }
-
-    if (state.fieldType === IMPORT_COND_FIELD_MAIN_ACCOUNT) {
-        valueItem = this.model.accounts.getItem(state.value);
-        if (!valueItem) {
-            throw new Error('Invalid account');
+        this.operatorLabel.textContent = operatorType.title;
+        // Right value
+        if (state.isFieldValue) {
+            this.valueLabel.classList.add('cond-item__value-property');
+            this.valueLabel.classList.remove('cond-item__value');
+        } else {
+            this.valueLabel.classList.remove('cond-item__value-property');
+            this.valueLabel.classList.add('cond-item__value');
         }
-
-        return valueItem.name;
+        this.valueLabel.textContent = this.formatValue(state);
     }
 
-    if (state.fieldType === IMPORT_COND_FIELD_TPL) {
-        valueItem = this.model.templates.getItem(state.value);
-        if (!valueItem) {
-            throw new Error('Invalid template');
-        }
-
-        return valueItem.name;
-    }
-
-    return state.value;
-};
-
-/** Render component state */
-ImportConditionItem.prototype.render = function (state) {
-    var propertyType;
-    var operatorType;
-
-    if (!state) {
-        throw new Error('Invalid state');
-    }
-
-    // Left value property
-    propertyType = ImportCondition.getFieldTypeById(state.fieldType);
-    if (!propertyType) {
-        throw new Error('Field type not found');
-    }
-    this.propertyLabel.textContent = propertyType.title;
-    // Operator
-    operatorType = ImportCondition.getOperatorById(state.operator);
-    if (!operatorType) {
-        throw new Error('Operator not found');
-    }
-    this.operatorLabel.textContent = operatorType.title;
-    // Right value
-    if (state.isFieldValue) {
-        this.valueLabel.classList.add('cond-item__value-property');
-        this.valueLabel.classList.remove('cond-item__value');
-    } else {
-        this.valueLabel.classList.remove('cond-item__value-property');
-        this.valueLabel.classList.add('cond-item__value');
-    }
-    this.valueLabel.textContent = this.formatValue(state);
-};
+}

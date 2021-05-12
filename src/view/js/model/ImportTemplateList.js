@@ -1,26 +1,21 @@
-'use strict';
-
-/* global extend, List, ImportTemplate */
+import { List } from './List.js';
+import { ImportTemplate } from './ImportTemplate.js';
 
 /**
  * @constructor ImportTemplateList class
  * @param {object[]} props - array of import rules
  */
-function ImportTemplateList() {
-    ImportTemplateList.parent.constructor.apply(this, arguments);
+export class ImportTemplateList extends List {
+    /** Static alias for ImportTemplateList constructor */
+    static create(props) {
+        return new ImportTemplateList(props);
+    }
+
+    /**
+     * Create list item from specified object
+     * @param {Object} obj
+     */
+    createItem(obj) {
+        return new ImportTemplate(obj);
+    }
 }
-
-extend(ImportTemplateList, List);
-
-/** Static alias for ImportTemplateList constructor */
-ImportTemplateList.create = function (props) {
-    return new ImportTemplateList(props);
-};
-
-/**
- * Create list item from specified object
- * @param {Object} obj
- */
-ImportTemplateList.prototype.createItem = function (obj) {
-    return new ImportTemplate(obj);
-};
