@@ -29,18 +29,7 @@ class Icon extends AdminController
         $titleString = "Admin panel | Icons";
 
         $this->buildCSS();
-
-        array_push(
-            $this->jsArr,
-            "../Components/ConfirmDialog/ConfirmDialog.js",
-            "View.js"
-        );
-        array_push(
-            $this->jsAdmin,
-            "adminview.js",
-            "adminlistview.js",
-            "iconview.js"
-        );
+        $this->jsAdmin[] = "AdminIconView.js";
 
         include(ADMIN_TPL_PATH . "icon.tpl");
     }

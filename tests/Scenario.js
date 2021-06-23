@@ -181,6 +181,9 @@ export class Scenario {
         ]);
 
         this.uploadFilename = await ImportTests.putFile(this.csvStatement);
+        if (!this.uploadFilename) {
+            throw new Error('Fail to put file');
+        }
     }
 
     async finishTests() {

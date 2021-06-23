@@ -1,5 +1,4 @@
-import { isFunction } from '../../js/lib/common.js';
-import { Component } from '../../js/lib/component.js';
+import { isFunction, Component } from 'jezvejs';
 
 /**
  * TileInfoItem component
@@ -9,8 +8,14 @@ export class TileInfoItem extends Component {
      * Create new TileInfoItem from specified element
      */
     static fromElement(props) {
-        const res = new TileInfoItem(props);
-        res.parse();
+        let res;
+
+        try {
+            res = new TileInfoItem(props);
+            res.parse();
+        } catch {
+            return null;
+        }
 
         return res;
     }

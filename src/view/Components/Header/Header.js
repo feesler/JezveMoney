@@ -1,6 +1,11 @@
-import { ge, isVisible, show, setEmptyClick } from '../../js/lib/common.js';
-import { ajax } from '../../js/lib/ajax.js';
-import { Component } from '../../js/lib/Component.js';
+import {
+    ge,
+    isVisible,
+    show,
+    setEmptyClick,
+    ajax,
+    Component,
+} from 'jezvejs';
 
 /* global baseURL, themes */
 

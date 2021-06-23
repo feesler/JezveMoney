@@ -7,9 +7,9 @@ import {
     copyObject,
     addChilds,
     removeChilds,
-} from '../../js/lib/common.js';
+    DropDown,
+} from 'jezvejs';
 import { AppComponent } from '../AppComponent/AppComponent.js';
-import { DropDown } from '../../js/lib/dropdown.js';
 import {
     fixFloat,
     formatDate,
@@ -19,6 +19,7 @@ import {
     DEBT,
 } from '../../js/app.js';
 import { AccountList } from '../../js/model/AccountList.js';
+import './style.css';
 
 /**
  * ImportTransactionItem component
@@ -442,7 +443,7 @@ export class ImportTransactionItem extends AppComponent {
         const userAccountsData = this.model.accounts.getUserAccounts(this.model.mainAccount.owner_id);
         const userAccounts = new AccountList(userAccountsData);
         const visibleAccounts = userAccounts.getVisible();
-        const res = visibleAccounts[0];
+        let res = visibleAccounts[0];
 
         if (res.id === state.accountId) {
             res = visibleAccounts[1];
@@ -806,7 +807,7 @@ export class ImportTransactionItem extends AppComponent {
         if (this.state.comment === value) {
             return this.state;
         }
-        conststate = copyObject(this.state);
+        const state = copyObject(this.state);
         state.comment = value;
 
         this.state = state;

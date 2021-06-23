@@ -1,19 +1,20 @@
 import {
-    ce,
+    ge,
     ce,
     re,
     removeChilds,
     show,
     insertAfter,
-} from '../../js/lib/common.js';
-import { ajax } from '../../js/lib/ajax.js';
-import { Component } from '../../js/lib/component.js';
-import { Popup } from '../../js/lib/popup.js';
+    ajax,
+    Component,
+    Popup,
+} from 'jezvejs';
 import { createMessage } from '../../js/app.js';
 import { ImportRule } from '../../js/model/ImportRule.js';
 import { ImportRuleForm } from '../ImportRuleForm/ImportRuleForm.js';
 import { ImportRuleItem } from '../ImportRuleItem/ImportRuleItem.js';
 import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog.js';
+import './style.css';
 
 /* global baseURL */
 

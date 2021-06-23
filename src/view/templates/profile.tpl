@@ -92,14 +92,14 @@
 </form>
 </div>
 
-<?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-    var view = new ProfileView({
-        profile: <?=JSON::encode($profileInfo)?>,
+window.app = {
+    profile: <?=JSON::encode($profileInfo)?>,
 <?php	if ($this->action == "changepass" || $this->action == "changename") {		?>
-        action: <?=JSON::encode($this->action)?>
+    action: <?=JSON::encode($this->action)?>
 <?php	}	?>
-    });
+};
 </script>
+<?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

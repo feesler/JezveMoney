@@ -1,4 +1,4 @@
-import { copyObject, isObject } from '../lib/common.js';
+import { copyObject, isObject } from 'jezvejs';
 import { timestampFromString } from '../app.js';
 import { ListItem } from './ListItem.js';
 

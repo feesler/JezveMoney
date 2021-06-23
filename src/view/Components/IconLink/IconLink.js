@@ -1,5 +1,4 @@
-import { isFunction } from '../../js/lib/common.js';
-import { Component } from '../../js/lib/Component.js';
+import { isFunction, Component } from 'jezvejs';
 
 /**
  * IconLink component
@@ -9,7 +8,7 @@ export class IconLink extends Component {
      * Create new IconLink from specified element
      */
     static fromElement(props) {
-        var res;
+        let res;
 
         try {
             res = new IconLink(props);

@@ -1,7 +1,7 @@
 import {
     isObject,
     isFunction,
-} from '../lib/common.js';
+} from 'jezvejs';
 import {
     EXPENSE,
     INCOME,

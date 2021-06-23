@@ -1,5 +1,5 @@
+import { checkDate } from 'jezvejs';
 import { fixFloat } from '../app.js';
-import { checkDate } from '../lib/common.js';
 import { ListItem } from './ListItem.js';
 import {
     IMPORT_COND_OP_EQUAL,

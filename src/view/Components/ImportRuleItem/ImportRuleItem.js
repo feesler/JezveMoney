@@ -5,13 +5,14 @@ import {
     copyObject,
     addChilds,
     removeChilds,
-} from '../../js/lib/common.js';
+} from 'jezvejs';
 import { AppComponent } from '../AppComponent/AppComponent.js';
 import { ImportRule } from '../../js/model/ImportRule.js';
 import { ImportConditionList } from '../../js/model/ImportConditionList.js';
 import { ImportActionList } from '../../js/model/ImportActionList.js';
 import { ImportConditionItem } from '../ImportConditionItem/ImportConditionItem.js';
 import { ImportActionItem } from '../ImportActionItem/ImportActionItem.js';
+import './style.css';
 
 /**
  * ImportRuleItem component constructor

@@ -3,13 +3,14 @@ import {
     isFunction,
     show,
     enable,
-} from '../../js/lib/common.js';
+    DropDown,
+    Popup,
+} from 'jezvejs';
 import { AppComponent } from '../AppComponent/AppComponent.js';
-import { DropDown } from '../../js/lib/dropdown.js';
-import { Popup } from '../../js/lib/popup.js';
 import { createMessage } from '../../js/app.js';
-import { ImportFileUploader } from '../../ImportFileUploader/ImportFileUploader.js';
-import { ImportTemplateManager } from '../../ImportTemplateManager/ImportTemplateManager.js';
+import { ImportFileUploader } from '../ImportFileUploader/ImportFileUploader.js';
+import { ImportTemplateManager } from '../ImportTemplateManager/ImportTemplateManager.js';
+import './style.css';
 
 /**
  * ImportUploadDialog component

@@ -1,6 +1,4 @@
-import { isFunction } from '../../js/lib/common.js';
-import { Component } from '../../js/lib/Component.js';
-import { Popup } from '../../js/lib/Component.js';
+import { isFunction, Component, Popup } from 'jezvejs';
 
 /**
  * Confirmation dialog component

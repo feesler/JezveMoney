@@ -52,11 +52,11 @@
 </form>
 <?php	}	?>
 
-<?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-    var view = new PersonView({
-        person: <?=JSON::encode($pInfo)?>
-    });
+window.app = {
+    person: <?=JSON::encode($pInfo)?>
+};
 </script>
+<?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

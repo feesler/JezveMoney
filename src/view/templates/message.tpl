@@ -1,4 +1,7 @@
 <?php
     use JezveMoney\Core\JSON;
 ?>
-    onReady(function(){ createMessage(<?=JSON::encode($msgMessage)?>, '<?=$msgClass?>'); });
+if (!window.app) {
+    window.app = {};
+}
+window.app.message = { title: <?=JSON::encode($msgMessage)?>, type: '<?=$msgClass?>' };

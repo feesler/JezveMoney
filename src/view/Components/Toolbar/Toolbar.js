@@ -1,6 +1,6 @@
-import { isFunction } from '../../js/lib/common.js';
-import { Component } from '../../js/lib/component.js';
-import { Component } from '../../IconLink/IconLink.js';
+import { isFunction, Component } from 'jezvejs';
+import { IconLink } from '../IconLink/IconLink.js';
+import './style.css';
 
 /**
  * Toolbar component

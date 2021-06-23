@@ -2,8 +2,8 @@ import {
     isObject,
     ce,
     svg,
-} from '../../js/lib/common.js';
-import { Component } from '../../js/lib/component.js';
+    Component,
+} from 'jezvejs';
 
 /**
  * Tile component
@@ -13,8 +13,14 @@ export class Tile extends Component {
      * Create new Tile from specified element
      */
     static fromElement(props) {
-        const res = new Tile(props);
-        res.parse();
+        let res;
+
+        try {
+            res = new Tile(props);
+            res.parse();
+        } catch {
+            return null;
+        }
 
         return res;
     }

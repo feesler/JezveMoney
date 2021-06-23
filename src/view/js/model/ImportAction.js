@@ -1,4 +1,4 @@
-import { copyObject } from '../lib/common.js';
+import { copyObject } from 'jezvejs';
 import { ListItem } from './ListItem.js';
 import { ImportTransactionItem } from '../../Components/ImportTransactionItem/ImportTransactionItem.js';
 

@@ -180,9 +180,9 @@
 </div>
 
 <?php	include(TPL_PATH."icons.tpl");	?>
-<?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-var view = new ImportView(<?=JSON::encode($viewData)?>);
+window.app = <?=JSON::encode($viewData)?>;
 </script>
+<?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

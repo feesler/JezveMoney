@@ -1,4 +1,4 @@
-import { isObject } from '../lib/common.js';
+import { isObject } from 'jezvejs';
 
 /**
  * @constructor ListItem

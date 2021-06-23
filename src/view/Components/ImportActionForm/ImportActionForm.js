@@ -1,7 +1,11 @@
-import { ce, show, isFunction } from '../../js/lib/common.js';
+import {
+    ce,
+    show,
+    isFunction,
+    DropDown,
+    DecimalInput,
+} from 'jezvejs';
 import { AppComponent } from '../AppComponent/AppComponent.js';
-import { DropDown } from '../../js/lib/DropDown.js';
-import { DecimalInput } from '../../js/lib/DecimalInput.js';
 import {
     ImportAction,
     IMPORT_ACTION_SET_TR_TYPE,
@@ -9,6 +13,7 @@ import {
     IMPORT_ACTION_SET_PERSON,
 } from '../../js/model/ImportAction.js';
 import { View } from '../../js/View.js';
+import './style.css';
 
 /**
  * ImportActionForm component

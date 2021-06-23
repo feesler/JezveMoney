@@ -1,4 +1,4 @@
-import { copyObject } from '../lib/common.js';
+import { copyObject } from 'jezvejs';
 
 /**
  * Base List class

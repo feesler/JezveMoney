@@ -1,5 +1,4 @@
-import { ce, svg, isVisible } from '../../js/lib/common.js';
-import { Component } from '../../js/lib/Component.js';
+import { ce, svg, isVisible, Component } from 'jezvejs';
 
 /**
  * Base app component

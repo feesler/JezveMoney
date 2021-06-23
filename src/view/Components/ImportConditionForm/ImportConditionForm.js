@@ -1,12 +1,17 @@
-import { ce, show, isFunction } from '../../js/lib/common.js';
+import {
+    ce,
+    show,
+    isFunction,
+    DropDown,
+    DecimalInput,
+} from 'jezvejs';
 import { AppComponent } from '../AppComponent/AppComponent.js';
-import { DropDown } from '../../js/lib/DropDown.js';
-import { DecimalInput } from '../../js/lib/DecimalInput.js';
 import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,
 } from '../../js/model/ImportCondition.js';
 import { View } from '../../js/View.js';
+import './style.css';
 
 /**
  * ImportConditionForm component constructor

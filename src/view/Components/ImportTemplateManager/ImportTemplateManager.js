@@ -1,18 +1,20 @@
 import {
     ge,
     ce,
+    isFunction,
     addChilds,
     removeChilds,
     copyObject,
     show,
     enable,
-} from '../../js/lib/common.js';
-import { ajax } from '../../js/lib/ajax.js';
-import { Component } from '../../js/lib/component.js';
-import { DropDown } from '../../js/lib/dropdown.js';
+    ajax,
+    Component,
+    DropDown,
+} from 'jezvejs';
 import { createMessage } from '../../js/app.js';
 import { ImportTemplate } from '../../js/model/ImportTemplate.js';
 import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog.js';
+import './style.css';
 
 /* global baseURL */
 
@@ -56,7 +58,7 @@ export class ImportTemplateManager extends Component {
         this.RAW_DATA_STATE = 2;
         this.TPL_UPDATE_STATE = 3;
 
-        this.statusHanlder = this.props.templateStatus;
+        this.statusHandler = this.props.templateStatus;
 
         this.templateDropDown = DropDown.create({
             input_id: 'templateSel',
@@ -482,8 +484,6 @@ export class ImportTemplateManager extends Component {
 
     /** Validate current template on raw data */
     validateTemplate(state) {
-        var currency;
-
         if (!state) {
             throw new Error('Invalid state');
         }
@@ -593,15 +593,12 @@ export class ImportTemplateManager extends Component {
         let propertiesPerColumn = 0;
         const headerRow = state.rawData.slice(0, 1)[0];
         const dataRows = this.getDataRows(state, true);
-        const colElems = headerRow.map( (title, columnInd) => {
-            var headElem;
-            var columnData;
-
+        const colElems = headerRow.map((title, columnInd) => {
             const tplElem = ce('div', { className: 'raw-data-column__tpl' });
             if (state.template) {
                 const columnsInfo = state.template.getColumnsByIndex(columnInd + 1);
                 if (Array.isArray(columnsInfo)) {
-                    const columnElems = columnsInfo.map( (column) =>
+                    const columnElems = columnsInfo.map((column) =>
                         ce('div', { className: 'raw-data-column__tpl-prop', textContent: column.title }),
                     );
                     addChilds(tplElem, columnElems);
@@ -631,10 +628,11 @@ export class ImportTemplateManager extends Component {
         removeChilds(this.rawDataTable);
         this.rawDataTable.appendChild(tableElem);
 
+        let isValid = false;
         if (state.id === this.LOADING_STATE) {
             this.setTemplateFeedback();
         } else {
-            const isValid = this.validateTemplate(state);
+            isValid = this.validateTemplate(state);
             if (isValid) {
                 enable(this.submitTplBtn, true);
                 this.setTemplateFeedback('Valid template');
@@ -646,8 +644,8 @@ export class ImportTemplateManager extends Component {
             }
         }
 
-        if (isFunction(this.statusHanlder)) {
-            this.statusHanlder(state.id === this.RAW_DATA_STATE && isValid);
+        if (isFunction(this.statusHandler)) {
+            this.statusHandler(state.id === this.RAW_DATA_STATE && isValid);
         }
     }
 }

@@ -1,4 +1,4 @@
-import { isObject } from '../../js/lib/common.js';
+import { isObject } from 'jezvejs';
 import { Tile } from '../Tile/Tile.js';
 
 /**

@@ -4,7 +4,7 @@ import {
     isFunction,
     copyObject,
     removeChilds,
-} from '../../js/lib/common.js';
+} from 'jezvejs';
 import { AppComponent } from '../AppComponent/AppComponent.js';
 import { ImportRule } from '../../js/model/ImportRule.js';
 import { ImportAction } from '../../js/model/ImportAction.js';
@@ -12,6 +12,7 @@ import { ImportCondition } from '../../js/model/ImportCondition.js';
 import { ImportConditionForm } from '../ImportConditionForm/ImportConditionForm.js';
 import { ImportActionForm } from '../ImportActionForm/ImportActionForm.js';
 import { View } from '../../js/View.js';
+import './style.css';
 
 /**
  * ImportRuleForm component constructor
@@ -446,9 +447,6 @@ export class ImportRuleForm extends AppComponent {
 
     /** Render component state */
     render(state) {
-        var actionItems;
-        var conditionItems;
-
         if (!state) {
             throw new Error('Invalid state');
         }

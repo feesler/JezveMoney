@@ -1,6 +1,12 @@
-import { ge, isFunction } from '../../js/lib/common.js';
+import {
+    ge,
+    show,
+    isFunction,
+    urlJoin,
+    ajax,
+    Component,
+} from 'jezvejs';
 import { createMessage } from '../../js/app.js';
-import { Component } from '../../js/lib/component.js';
 import { Uploader } from '../../js/component/uploader.js';
 
 /**
@@ -14,7 +20,7 @@ export class ImportFileUploader extends Component {
         this.uploadedHandler = this.props.uploaded;
         this.state = {
             fileName: null,
-            collapsed: false
+            collapsed: false,
         };
 
         this.formElem = ge('fileimportfrm');
@@ -27,9 +33,7 @@ export class ImportFileUploader extends Component {
 
         this.inputElem.addEventListener('change', this.onChangeUploadFile.bind(this));
 
-        if (isFunction(this.initUploadExtras)) {
-            this.initUploadExtras();
-        }
+        this.initUploadExtras();
     }
 
     /**
@@ -116,6 +120,84 @@ export class ImportFileUploader extends Component {
             this.onImportProgress.bind(this)
         );
         uploader.upload();
+
+        if (isFunction(this.uploadStartHandler)) {
+            this.uploadStartHandler();
+        }
+    }
+
+    /** Setup extra controls of file upload dialog */
+    initUploadExtras() {
+        this.useServerCheck = ge('useServerCheck');
+        this.serverAddressBlock = ge('serverAddressBlock');
+        this.serverAddressInput = ge('serverAddress');
+        this.uploadBtn = ge('serverUploadBtn');
+        if (
+            !this.useServerCheck
+            || !this.serverAddressBlock
+            || !this.serverAddressInput
+            || !this.uploadBtn
+        ) {
+            return;
+        }
+
+        this.formElem.addEventListener('reset', this.onResetUploadAdmin.bind(this));
+        this.useServerCheck.addEventListener('change', this.onCheckServer.bind(this));
+        this.uploadBtn.addEventListener('click', this.uploadFromServer.bind(this));
+    }
+
+    /** Upload form 'reset' event handler */
+    onResetUploadAdmin() {
+        setTimeout(() => this.setUseServerAddress(false));
+    }
+
+    /** Use server checkbox 'change' event handler */
+    onCheckServer() {
+        const useServer = this.useServerCheck.checked;
+
+        this.setUseServerAddress(useServer);
+    }
+
+    setUseServerAddress(value) {
+        this.useServerCheck.checked = value;
+
+        show(this.serverAddressBlock, value);
+        if (value) {
+            show(this.formElem, false);
+            show(this.serverAddressBlock, true);
+        } else {
+            show(this.formElem, true);
+            show(this.serverAddressBlock, false);
+        }
+    }
+
+    /** Send file upload request using address on server */
+    uploadFromServer() {
+        const useServer = this.useServerCheck.checked;
+        const isEncoded = this.isEncodeCheck.checked;
+
+        if (!useServer) {
+            return;
+        }
+
+        const reqObj = {
+            filename: this.serverAddressInput.value,
+            template: 0,
+            encode: (isEncoded ? 1 : 0),
+        };
+
+        if (!reqObj.filename.length) {
+            return;
+        }
+
+        this.state.collapsed = true;
+        this.render(this.state);
+
+        ajax.post({
+            url: `${baseURL}api/import/upload/`,
+            data: urlJoin(reqObj),
+            callback: this.onImportSuccess.bind(this)
+        });
 
         if (isFunction(this.uploadStartHandler)) {
             this.uploadStartHandler();

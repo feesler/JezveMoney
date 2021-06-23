@@ -130,11 +130,11 @@
 </div>
 
 <?php	include(TPL_PATH."icons.tpl");	?>
-<?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-    var view = new MainView({
-        chartData: <?=JSON::encode($statArr)?>
-    });
+window.app = {
+    chartData: <?=JSON::encode($statArr)?>
+};
 </script>
+<?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

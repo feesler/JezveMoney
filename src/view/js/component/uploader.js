@@ -1,4 +1,4 @@
-import { isFunction } from '../lib/common.js';
+import { isFunction } from 'jezvejs';
 
 /* global baseURL */
 /* eslint no-bitwise: "off" */

@@ -444,19 +444,19 @@
 <?php	}	?>
 
 <?php	include(TPL_PATH."icons.tpl");	?>
-<?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-    var view = new TransactionView({
-        mode: '<?=(($action == "edit") ? "update" : "create")?>',
-        profile: <?=JSON::encode($profileData)?>,
-        transaction: <?=JSON::encode($tr)?>,
-        accounts: <?=JSON::encode($accArr)?>,
-        currency: <?=JSON::encode($currArr)?>,
-        icons: <?=JSON::encode($icons)?>,
+window.app = {
+    mode: '<?=(($action == "edit") ? "update" : "create")?>',
+    profile: <?=JSON::encode($profileData)?>,
+    transaction: <?=JSON::encode($tr)?>,
+    accounts: <?=JSON::encode($accArr)?>,
+    currency: <?=JSON::encode($currArr)?>,
+    icons: <?=JSON::encode($icons)?>,
 <?php	if ($tr["type"] == DEBT) {		?>
-        persons: <?=JSON::encode($persArr)?>
+    persons: <?=JSON::encode($persArr)?>
 <?php	}	?>
-    });
+};
 </script>
+<?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

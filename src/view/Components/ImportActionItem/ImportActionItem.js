@@ -1,4 +1,4 @@
-import { ce } from '../../js/lib/common.js';
+import { ce } from 'jezvejs';
 import { AppComponent } from '../AppComponent/AppComponent.js';
 import {
     ImportAction,
@@ -6,6 +6,7 @@ import {
     IMPORT_ACTION_SET_ACCOUNT,
     IMPORT_ACTION_SET_PERSON,
 } from '../../js/model/ImportAction.js';
+import './style.css';
 
 /**
  * ImportActionItem component

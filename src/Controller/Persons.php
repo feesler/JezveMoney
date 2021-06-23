@@ -18,26 +18,8 @@ class Persons extends TemplateController
 
         $titleString = "Jezve Money | Persons";
 
-        array_push(
-            $this->css->libs,
-            "tiles.css",
-            "lib/iconlink.css",
-            "../Components/Toolbar/style.css"
-        );
         $this->buildCSS();
-        array_push(
-            $this->jsArr,
-            "model/List.js",
-            "model/Person.js",
-            "model/PersonList.js",
-            "lib/selection.js",
-            "../Components/Header/Header.js",
-            "../Components/Toolbar/Toolbar.js",
-            "../Components/IconLink/IconLink.js",
-            "../Components/ConfirmDialog/ConfirmDialog.js",
-            "View.js",
-            "PersonListView.js"
-        );
+        $this->jsArr[] = "PersonListView.js";
 
         include(TPL_PATH . "persons.tpl");
     }
@@ -69,18 +51,8 @@ class Persons extends TemplateController
         $headString = "New person";
         $titleString .= $headString;
 
-        array_push(
-            $this->css->libs,
-            "lib/iconlink.css",
-            "tiles.css"
-        );
         $this->buildCSS();
-        array_push(
-            $this->jsArr,
-            "../Components/Header/Header.js",
-            "View.js",
-            "PersonView.js"
-        );
+        $this->jsArr[] = "PersonView.js";
 
         include(TPL_PATH . "person.tpl");
     }
@@ -108,20 +80,8 @@ class Persons extends TemplateController
         $headString = "Edit person";
         $titleString .= $headString;
 
-        array_push(
-            $this->css->libs,
-            "lib/iconlink.css",
-            "tiles.css"
-        );
         $this->buildCSS();
-        array_push(
-            $this->jsArr,
-            "../Components/Header/Header.js",
-            "../Components/IconLink/IconLink.js",
-            "../Components/ConfirmDialog/ConfirmDialog.js",
-            "View.js",
-            "PersonView.js"
-        );
+        $this->jsArr[] = "PersonView.js";
 
         include(TPL_PATH . "person.tpl");
     }

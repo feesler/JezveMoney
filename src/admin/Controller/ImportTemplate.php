@@ -28,18 +28,7 @@ class ImportTemplate extends AdminController
         $titleString = "Admin panel | Import templates";
 
         $this->buildCSS();
-
-        array_push(
-            $this->jsArr,
-            "../Components/ConfirmDialog/ConfirmDialog.js",
-            "View.js"
-        );
-        array_push(
-            $this->jsAdmin,
-            "adminview.js",
-            "adminlistview.js",
-            "importtplview.js"
-        );
+        $this->jsAdmin[] = "AdminImportTplView.js";
 
         include(ADMIN_TPL_PATH . "importtpl.tpl");
     }

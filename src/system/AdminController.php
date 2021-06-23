@@ -25,24 +25,9 @@ abstract class AdminController extends TemplateController
 
     public function initDefResources()
     {
-        $this->css = new \stdClass();
-        $this->css->clear = ["lib/common.css"];
-        $this->css->libs = ["lib/popup.css"];
-        $this->css->app = ["app.css"];
-        $this->css->page = [];
-        $this->cssAdmin = ["admin.css"];
-
-        $this->jsArr = [
-            "lib/classList.min.js",
-            "lib/polyfill.min.js",
-            "lib/common.js",
-            "lib/ajax.js",
-            "lib/component.js",
-            "lib/popup.js",
-            "app.js"
-        ];
+        $this->cssArr = [];
+        $this->cssAdmin = [];
         $this->jsAdmin = [];
-        $this->jsAdminModule = [];
     }
 
 

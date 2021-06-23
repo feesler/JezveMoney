@@ -1,4 +1,4 @@
-import { ce } from '../../js/lib/common.js';
+import { ce } from 'jezvejs';
 import { AppComponent } from '../AppComponent/AppComponent.js';
 import {
     ImportCondition,
@@ -8,6 +8,7 @@ import {
     IMPORT_COND_FIELD_MAIN_ACCOUNT,
     IMPORT_COND_FIELD_TPL,
 } from '../../js/model/ImportCondition.js';
+import './style.css';
 
 /**
  * ImportConditionItem component

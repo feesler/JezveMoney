@@ -101,11 +101,11 @@
 <input id="delpersons" name="persons" type="hidden" value="">
 </form>
 
-<?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-    var view = new PersonListView({
-        persons: <?=JSON::encode($personsData)?>
-    });
+window.app = {
+    persons: <?=JSON::encode($personsData)?>
+};
 </script>
+<?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

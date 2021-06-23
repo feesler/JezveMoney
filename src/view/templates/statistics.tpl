@@ -131,14 +131,14 @@
     </div>
 </div>
 
-<?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-    var view = new StatisticsView({
-        currency: <?=JSON::encode($currArr)?>,
-        accountCurrency: <?=$accCurr?>,
-        filter: <?=JSON::encode($filterObj)?>,
-        chartData: <?=JSON::encode($statArr)?>
-    });
+window.app = {
+    currency: <?=JSON::encode($currArr)?>,
+    accountCurrency: <?=$accCurr?>,
+    filter: <?=JSON::encode($filterObj)?>,
+    chartData: <?=JSON::encode($statArr)?>
+};
 </script>
+<?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

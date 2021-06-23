@@ -108,11 +108,11 @@
 <input id="delaccounts" name="accounts" type="hidden" value="">
 </form>
 <?php	include(TPL_PATH."icons.tpl");	?>
-<?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-    var view = new AccountListView({
-        accounts: <?=JSON::encode($accountsData)?>
-    });
+window.app = {
+    accounts: <?=JSON::encode($accountsData)?>
+};
 </script>
+<?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

@@ -1,4 +1,4 @@
-import { extendError } from '../lib/common.js';
+import { extendError } from 'jezvejs';
 
 /**
  * Import condition validation error class

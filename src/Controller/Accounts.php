@@ -34,28 +34,8 @@ class Accounts extends TemplateController
 
         $titleString = "Jezve Money | Accounts";
 
-        array_push(
-            $this->css->libs,
-            "tiles.css",
-            "lib/iconlink.css",
-            "../Components/Toolbar/style.css"
-        );
         $this->buildCSS();
-        array_push(
-            $this->jsArr,
-            "model/List.js",
-            "model/Account.js",
-            "model/AccountList.js",
-            "model/Currency.js",
-            "model/CurrencyList.js",
-            "lib/selection.js",
-            "../Components/Header/Header.js",
-            "../Components/Toolbar/Toolbar.js",
-            "../Components/IconLink/IconLink.js",
-            "../Components/ConfirmDialog/ConfirmDialog.js",
-            "View.js",
-            "AccountListView.js"
-        );
+        $this->jsArr[] = "AccountListView.js";
 
         include(TPL_PATH . "accounts.tpl");
     }
@@ -98,31 +78,8 @@ class Accounts extends TemplateController
         $headString = "New account";
         $titleString .= $headString;
 
-        array_push(
-            $this->css->libs,
-            "lib/iconlink.css",
-            "lib/dropdown.css",
-            "tiles.css"
-        );
         $this->buildCSS();
-        array_push(
-            $this->jsArr,
-            "model/List.js",
-            "model/Currency.js",
-            "model/CurrencyList.js",
-            "model/Account.js",
-            "model/AccountList.js",
-            "model/Icon.js",
-            "model/IconList.js",
-            "lib/selection.js",
-            "lib/dropdown.js",
-            "lib/decimalinput.js",
-            "../Components/Header/Header.js",
-            "../Components/Tile/Tile.js",
-            "../Components/AccountTile/AccountTile.js",
-            "View.js",
-            "AccountView.js"
-        );
+        $this->jsArr[] = "AccountView.js";
 
         include(TPL_PATH . "account.tpl");
     }
@@ -170,34 +127,8 @@ class Accounts extends TemplateController
         $headString = "Edit account";
         $titleString .= $headString;
 
-        array_push(
-            $this->css->libs,
-            "lib/iconlink.css",
-            "lib/dropdown.css",
-            "tiles.css"
-        );
         $this->buildCSS();
-
-        array_push(
-            $this->jsArr,
-            "model/List.js",
-            "model/Currency.js",
-            "model/CurrencyList.js",
-            "model/Account.js",
-            "model/AccountList.js",
-            "model/Icon.js",
-            "model/IconList.js",
-            "lib/selection.js",
-            "lib/dropdown.js",
-            "lib/decimalinput.js",
-            "../Components/Header/Header.js",
-            "../Components/Tile/Tile.js",
-            "../Components/AccountTile/AccountTile.js",
-            "../Components/IconLink/IconLink.js",
-            "../Components/ConfirmDialog/ConfirmDialog.js",
-            "View.js",
-            "AccountView.js"
-        );
+        $this->jsArr[] = "AccountView.js";
 
         include(TPL_PATH . "account.tpl");
     }
