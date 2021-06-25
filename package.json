@@ -1,9 +1,9 @@
 {
   "name": "jezve-money",
   "version": "1.6.1",
-  "type": "module",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "lint-php": "dev-tools/vendor/bin/phpcs --standard=PSR12 ./src/admin/Controller/ ./src/admin/index.php ./src/api/ ./src/Controller/ ./src/Model/ ./src/system/ ./src/index.php",
     "all": "npm-run-all lint test build",
@@ -40,6 +40,7 @@
     "@babel/preset-env": "^7.13.9",
     "astroturf": "*",
     "babel-loader": "^8.2.2",
+    "browserslist": "^4.16.6",
     "css-loader": "^5.2.6",
     "del-cli": "^3.0.1",
     "eslint": "^7.21.0",
@@ -56,7 +57,7 @@
   "dependencies": {
     "@babel/runtime": "^7.13.9",
     "core-js": "^3.9.1",
-    "jezvejs": "^1.0.0",
+    "jezvejs": "^1.0.16",
     "whatwg-fetch": "^3.6.2"
   }
 }

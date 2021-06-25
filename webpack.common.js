@@ -4,7 +4,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default {
-    target: ['web', 'es5'],
+    target: 'browserslist',
     entry: {
         MainView: {
             import: './src/view/js/MainView.js',
@@ -82,7 +82,7 @@ export default {
     },
     output: {
         filename: '[name].js',
-        path: resolve(__dirname, 'dist'),
+        path: resolve(__dirname, './dist'),
         clean: {
             keep: 'vendor',
         },
@@ -91,8 +91,22 @@ export default {
         rules: [
             {
                 test: /\.m?js$/,
-                exclude: /node_modules/,
-                use: ['babel-loader', 'astroturf/loader'],
+                include: [
+                    resolve(__dirname, 'src'),
+                    resolve('node_modules/jezvejs'),
+                ],
+                exclude: /node_modules\/(?!(jezvejs)\/).*/,
+                use: [
+                    {
+                        loader: 'babel-loader',
+                        options: {
+                            cacheDirectory: true,
+                            babelrc: false,
+                            rootMode: 'upward',
+                        }
+                    },
+                    'astroturf/loader'
+                ],
             },
             {
                 test: /\.css$/i,

@@ -4,9 +4,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default {
-    mode: 'development',
-    devtool: 'inline-source-map',
-    target: ['web', 'es5'],
+    mode: 'production',
+    target: 'browserslist',
     entry: './tests/index.browser.js',
     output: {
         filename: 'index.js',
@@ -17,10 +16,21 @@ export default {
         rules: [
             {
                 test: /\.m?js$/,
-                exclude: /node_modules/,
-                use: {
-                    loader: 'babel-loader'
-                }
+                include: [
+                    resolve(__dirname, 'tests'),
+                    resolve('node_modules/jezve-test'),
+                ],
+                exclude: /node_modules\/(?!(jezve-test)\/).*/,
+                use: [
+                    {
+                        loader: 'babel-loader',
+                        options: {
+                            cacheDirectory: true,
+                            babelrc: false,
+                            rootMode: 'upward',
+                        }
+                    }
+                ],
             },
         ]
     },
