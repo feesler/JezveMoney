@@ -125,7 +125,8 @@ export default {
                             },
                         },
                     },
-                    'css-loader'
+                    'css-loader',
+                    'postcss-loader'
                 ],
             },
             {
