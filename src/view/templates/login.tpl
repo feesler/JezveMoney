@@ -1,7 +1,6 @@
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body>
-<link id="theme-style" rel="stylesheet" type="text/css" href="<?=e(BASEURL."view/css/".$this->themeStylesheet)?>">
 <form id="loginfrm" action="<?=BASEURL?>login/" method="post">
 <div class="layer login-layer">
     <div class="layer-box">

@@ -110,7 +110,23 @@ export default {
             },
             {
                 test: /\.css$/i,
-                use: ['style-loader', 'css-loader'],
+                use: [
+                    {
+                        loader: "style-loader",
+                        options: {
+                            insert: function insertStyle(element) {
+                                var parent = document.querySelector('head');
+                                var themeStyleLink = document.getElementById('theme-style');
+                                if (themeStyleLink) {
+                                    parent.insertBefore(element, themeStyleLink);
+                                } else {
+                                    parent.appendChild(element);
+                                }
+                            },
+                        },
+                    },
+                    'css-loader'
+                ],
             },
             {
                 test: /\.(png|svg|jpg|jpeg|gif)$/i,

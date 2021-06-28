@@ -67,7 +67,8 @@ select {
 /* Main view widgets */
 .widget_title,
 .widget_title > a,
-.widget_title > a:hover {
+.widget_title > a:hover,
+.widget_title > a:visited {
   color: #000000;
 }
 

@@ -1,4 +1,3 @@
-<link id="theme-style" rel="stylesheet" type="text/css" href="<?=e(BASEURL."view/css/".$this->themeStylesheet)?>">
 <div class="header">
     <div class="header__content centered">
         <div class="logo">
