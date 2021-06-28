@@ -32,8 +32,8 @@ abstract class TemplateController extends Controller
         $this->cssArr = [];
 
         $this->jsArr = [
-            "lib/classList.min.js",
-            "lib/polyfill.min.js"
+            "polyfill/classList.min.js",
+            "polyfill/polyfill.min.js"
         ];
     }
 

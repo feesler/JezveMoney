@@ -18,7 +18,7 @@
     "copy-admin": "cp \"./src/admin/Controller\",\"./src/admin/.htaccess\",\"./src/admin/index.php\" -Destination ./dist/admin/ -Force -Recurse",
     "copy-admin-view": "cp \"./src/admin/view/templates\",\"./src/admin/view/css\" -Destination ./dist/admin/view -Force -Recurse",
     "copy-client": "cp \"./src/view/templates\",\"./src/view/img\",\"./src/view/css\" -Destination ./dist/view -Force -Recurse",
-    "copy-polyfills": "cp ./src/view/js/lib -Destination ./dist/view/js -Force -Recurse",
+    "copy-polyfills": "cp ./src/view/js/polyfill -Destination ./dist/view/js -Force -Recurse",
     "copy-dist": "npm-run-all copy-server copy-admin copy-admin-view copy-client copy-polyfills",
     "postbuild": "npm run copy-dist",
     "postbuild-dev": "npm run copy-dist",

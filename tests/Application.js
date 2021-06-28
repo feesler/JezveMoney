@@ -40,7 +40,7 @@ class Application extends TestApplication {
             new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()),
         );
 
-        Object.keys(this.dates).forEach((key) => this.dateList.push(this.dates[key]));
+        this.dateList.push(...Object.values(this.dates));
 
         setupTest(this.environment);
     }
