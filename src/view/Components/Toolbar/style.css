@@ -66,11 +66,11 @@
   .sidebar .siderbar__content,
   .sidebar.sidebar_active .siderbar__content {
     display: flex;
-    padding: 0px;
+    padding: 0;
     color: #ffffff;
     background-color: #44aaff;
     position: static;
-    margin: 0px auto;
+    margin: 0 auto;
     max-width: 824px;
     min-width: 200px;
   }
@@ -87,6 +87,6 @@
   }
 
   .siderbar__content .iconlink {
-    margin: 9px 0px 9px 12px;
+    margin: 9px 0 9px 12px;
   }
 }

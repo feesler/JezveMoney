@@ -1,6 +1,6 @@
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
 </head>
-<body>
+<body class="<?=($this->themeClass)?>">
 <form id="loginfrm" action="<?=BASEURL?>login/" method="post">
 <div class="layer login-layer">
     <div class="layer-box">

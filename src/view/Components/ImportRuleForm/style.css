@@ -4,7 +4,7 @@
   flex-flow: column nowrap;
   max-height: 100%;
   flex: 1 1 auto;
-  min-height: 0px;
+  min-height: 0;
 }
 
 /* Collapsible container */
@@ -49,11 +49,6 @@
   transform: none;
 }
 
-.rule-form__collapse.collapsed .link-btn,
-.rule-form__collapse.collapsed .rule-form__collapse-content {
-  display: none;
-}
-
 /* No data message */
 .rule-form .nodata-message {
   display: flex;
@@ -86,6 +81,7 @@
   flex: none;
 }
 
-/* Desktop */
-@media (min-width: 768px) {
+.rule-form__collapse.collapsed .link-btn,
+.rule-form__collapse.collapsed .rule-form__collapse-content {
+  display: none;
 }

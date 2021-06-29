@@ -1,7 +1,7 @@
 <div class="header">
     <div class="header__content centered">
         <div class="logo">
-            <a href="<?=BASEURL?>">
+            <a class="logo__link" href="<?=BASEURL?>">
                 <span class="logo__icon"><?=svgIcon("header_logo")?></span>
                 <span class="logo__title">Jezve Money</span>
             </a>

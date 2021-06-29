@@ -48,7 +48,7 @@
   flex-flow: column nowrap;
   align-items: flex-start;
   vertical-align: middle;
-  padding: 0px 0px 0px 5px;
+  padding: 0 0 0 5px;
   white-space: nowrap;
   line-height: 32px;
   font-size: 16px;
@@ -77,7 +77,8 @@
   white-space: nowrap;
 }
 
-.iconlink > *:hover > span {
+.iconlink > *:hover .iconlink__icon,
+.iconlink > *:hover .iconlink__content {
   color: #000000;
 }
 

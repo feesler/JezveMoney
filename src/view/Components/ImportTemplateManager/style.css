@@ -1,10 +1,11 @@
 /* Import template section */
+
 /* Header */
 .tpl-form-header {
   display: flex;
   flex-flow: row;
   align-items: baseline;
-  margin: 6px 0px;
+  margin: 6px 0;
 }
 
 .tpl-form-header label {
@@ -98,10 +99,6 @@
   background-color: #214b6f;
 }
 
-.raw-data-column:hover .raw-data-column__tpl {
-  background-color: #2c6290;
-}
-
 .raw-data-column__header {
   font-weight: 600;
 }
@@ -134,6 +131,10 @@
 
 .raw-data-table__tpl-6 .raw-data-column__tpl {
   height: 7.5rem;
+}
+
+.raw-data-column:hover .raw-data-column__tpl {
+  background-color: #2c6290;
 }
 
 /* Create/update template controls: Save, cancel buttons */

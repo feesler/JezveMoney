@@ -52,7 +52,8 @@ abstract class TemplateController extends Controller
     {
         $this->userTheme = $this->uMod->getUserTheme();
         $this->themes = getThemes("view/css/");
-        $this->themeStylesheet = $this->themes[$this->userTheme];
+        $this->themeStylesheet = $this->themes[$this->userTheme]["file"];
+        $this->themeClass = $this->themes[$this->userTheme]["className"];
     }
 
 

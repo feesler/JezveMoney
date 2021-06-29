@@ -16,29 +16,25 @@ body {
   display: none;
 }
 
-/* Firefox fix */
-button::-moz-focus-inner {
-  padding: 0;
-  border: 0;
-}
-
 /* WebKit focus fix */
 *:focus {
   outline: none;
 }
 
-/* IE button padding fix */
 input[type="button"],
 input[type="submit"],
 button {
+  /* IE button padding fix */
   overflow: visible;
+
+  /* iOS Safari styling issue fix */
+  appearance: button;
 }
 
-/* iOS Safari styling issue fix */
-input[type="button"],
-input[type="submit"],
-button {
-  -webkit-appearance: button;
+/* Firefox fix */
+button::-moz-focus-inner {
+  padding: 0;
+  border: 0;
 }
 
 /* Hidden element */
@@ -54,12 +50,13 @@ button {
   zoom: 1;
 }
 
-.clearfix:after {
+.clearfix::after {
   content: ". .";
   display: block;
   word-spacing: 99in;
   height: 0;
   overflow: hidden;
+
   /* Opera fix */
   font-size: 0.13em;
   line-height: 0;

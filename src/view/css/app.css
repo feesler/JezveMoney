@@ -57,14 +57,13 @@ b {
 h1 {
   font-weight: 200;
   font-size: 32px;
-  font-weight: normal;
-  margin: 0px 0px 10px 0px;
+  margin: 0 0 10px 0;
 }
 
 h2 {
   font-size: 20px;
   font-weight: normal;
-  padding: 2px 0px;
+  padding: 2px 0;
 }
 
 /* link style */
@@ -158,7 +157,7 @@ select {
 
 /* text input controls with button on the right */
 .stretch-input.rbtn_input {
-  border-width: 2px 0px 2px 2px;
+  border-width: 2px 0 2px 2px;
 }
 
 /* Validation */
@@ -237,32 +236,6 @@ select {
   align-items: center;
 }
 
-/* logo block */
-.logo a {
-  text-decoration: none;
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  padding: 0 12px 0 0;
-}
-
-.logo a:hover {
-  background-color: #606060;
-}
-
-.logo__icon,
-.logo__icon svg {
-  width: 50px;
-  height: 50px;
-}
-
-.logo__title {
-  font-size: 20px;
-  font-weight: 200;
-  color: #ffffff;
-  white-space: nowrap;
-}
-
 /* Aligned to right element */
 .right-align {
   margin-left: auto;
@@ -273,12 +246,12 @@ select {
   color: #ffffff;
 }
 
-.header .iconlink:hover .iconlink__icon {
-  background-color: #ffffff;
-}
-
 .header .iconlink .iconlink__icon {
   border-color: #ffffff;
+}
+
+.header .iconlink:hover .iconlink__icon {
+  background-color: #ffffff;
 }
 
 .header .iconlink .iconlink__icon svg * {
@@ -292,7 +265,7 @@ select {
 /* Theme switch */
 .theme-switch {
   display: flex;
-  margin: 0px 6px 0 auto;
+  margin: 0 6px 0 auto;
 }
 
 .switch {
@@ -328,16 +301,16 @@ select {
   border-radius: 8px;
 }
 
-.switch input:checked + .switch-slider::before {
-  left: 17px;
-}
-
 .switch-slider:hover {
   background-color: #707070;
 }
 
 .switch-slider:hover::before {
   background-color: #ffffff;
+}
+
+.switch input:checked + .switch-slider::before {
+  left: 17px;
 }
 
 /* user block */
@@ -351,7 +324,7 @@ select {
   align-items: center;
   border: 0 none;
   background-color: #404040;
-  padding: 0px 12px 0px 3px;
+  padding: 0 12px 0 3px;
 }
 
 .user-menu-btn:hover {
@@ -372,7 +345,7 @@ select {
   margin: 13px 2px;
 }
 
-.user-menu-btn .user__icon svg {
+.user__icon svg {
   width: 24px;
   height: 24px;
 }
@@ -382,11 +355,11 @@ select {
   display: inline-block;
   position: absolute;
   top: 50px;
-  right: 0px;
+  right: 0;
   z-index: 10;
 }
 
-.user-menu > ul {
+.user-menu ul {
   list-style-image: none;
   list-style-type: none;
   background-color: #404040;
@@ -394,7 +367,7 @@ select {
   padding: 0;
 }
 
-.user-menu > ul > li {
+.user-menu li {
   color: #ffffff;
   list-style-image: none;
   border: 0 none;
@@ -403,21 +376,47 @@ select {
   text-align: center;
 }
 
-.user-menu > ul > li:hover {
+.user-menu li:hover {
   background-color: #808080;
 }
 
-.user-menu > ul > li > a,
-.user-menu > ul > li > a:hover {
+.user-menu li a,
+.user-menu li a:hover {
   text-decoration: none;
   color: #ffffff;
 }
 
-.user-menu > ul > li.separator {
+.user-menu li.separator {
   height: 0;
   border: 0 none;
   border-bottom: 1px solid #808080;
   padding: 0;
+}
+
+/* logo block */
+.logo__link {
+  text-decoration: none;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: 0 12px 0 0;
+}
+
+.logo__link:hover {
+  background-color: #606060;
+}
+
+.logo__icon,
+.logo__icon svg {
+  width: 50px;
+  height: 50px;
+}
+
+.logo__title {
+  font-size: 20px;
+  font-weight: 200;
+  color: #ffffff;
+  white-space: nowrap;
 }
 
 /* Main view */
@@ -434,14 +433,14 @@ select {
   display: inline-flex;
   flex-flow: column nowrap;
   min-width: 200px;
-  margin: 0px 20px 20px 0px;
+  margin: 0 20px 20px 0;
 }
 
 @media screen and (max-width: 500px) {
   .widget {
     display: block;
-    margin: 0px;
-    padding: 0px 0px 20px 0px;
+    margin: 0;
+    padding: 0 0 20px 0;
     overflow: hidden;
   }
 
@@ -454,11 +453,11 @@ select {
 .widget_title {
   display: block;
   height: 32px;
-  margin: 10px 0px;
+  margin: 10px 0;
 }
 
-.widget_title > a,
-.widget_title > a:hover {
+.widget_title-link,
+.widget_title-link:hover {
   height: 32px;
   text-decoration: none;
 }
@@ -478,7 +477,7 @@ select {
   vertical-align: text-bottom;
 }
 
-.widget_title .glyph svg {
+.glyph svg {
   width: 24px;
   height: 24px;
 }
@@ -493,11 +492,11 @@ select {
   flex-basis: 350px;
 }
 
-/* accounts page*/
+/* accounts page */
 .heading {
   display: flex;
   flex-flow: row wrap;
-  padding: 10px 0px;
+  padding: 10px 0;
 }
 
 .heading > h1 {
@@ -513,7 +512,7 @@ select {
 }
 
 .heading .iconlink + .iconlink {
-    margin-left: 16px;
+  margin-left: 16px;
 }
 
 .amount-input {
@@ -521,11 +520,11 @@ select {
 }
 
 .std_margin {
-  margin: 9px 0px;
+  margin: 9px 0;
 }
 
 .acc_controls {
-  padding: 5px 0px;
+  padding: 5px 0;
   clear: both;
 }
 
@@ -591,9 +590,26 @@ select {
   pointer-events: none;
 }
 
+/* flat square button with icon */
+.icon-btn,
+.btn.icon-btn {
+  width: 34px;
+  height: 34px;
+  padding: 5px;
+  color: #ffffff;
+  background-color: #0072c6;
+  cursor: pointer;
+}
+
+.icon-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: #ffffff;
+}
+
 /* Transaction types menu */
 .trtype-menu {
-  padding: 10px 0px;
+  padding: 10px 0;
   font-size: 16px;
 }
 
@@ -602,14 +618,6 @@ select {
   margin: 0 12px 0 0;
   white-space: nowrap;
   cursor: pointer;
-}
-
-.trtype-menu__item .trtype-menu__item-check:hover {
-  background-color: #cccccc;
-}
-
-.trtype-menu__item .trtype-menu__item-check:active {
-  background-color: #1e82cc;
 }
 
 .trtype-menu__item-check {
@@ -628,16 +636,21 @@ select {
   visibility: hidden;
 }
 
-.trtype-menu__item-check:hover svg {
-  visibility: visible;
-}
-
 .trtype-menu__item-check:hover {
   background-color: #1e82cc;
 }
 
 .trtype-menu__item-check:hover svg {
+  visibility: visible;
   fill: #ffffff;
+}
+
+.trtype-menu__item .trtype-menu__item-check:hover {
+  background-color: #cccccc;
+}
+
+.trtype-menu__item .trtype-menu__item-check:active {
+  background-color: #1e82cc;
 }
 
 .trtype-menu__item_selected {
@@ -699,7 +712,7 @@ select {
   display: inline-flex;
   width: 80px;
   height: 80px;
-  margin: 0px 10px 10px 0px;
+  margin: 0 10px 10px 0;
   padding: 5px;
   color: #000000;
   background-color: #d0d0d0;
@@ -748,23 +761,6 @@ select {
   height: 30px;
   line-height: 30px;
   white-space: nowrap;
-}
-
-/* flat square button with icon */
-.icon-btn,
-.btn.icon-btn {
-  width: 34px;
-  height: 34px;
-  padding: 5px;
-  color: #ffffff;
-  background-color: #0072c6;
-  cursor: pointer;
-}
-
-.icon-btn > svg {
-  width: 24px;
-  height: 24px;
-  fill: #ffffff;
 }
 
 /* Popup */
@@ -823,13 +819,6 @@ select {
 .popup .close-btn,
 .popup__content-box.dragging .close-btn {
   display: block;
-}
-
-/* Change name and change password popups */
-.chname_popup .popup__content-box,
-.chpass_popup .popup__content-box {
-  max-width: 400px;
-  width: 100%;
 }
 
 /* Filters */

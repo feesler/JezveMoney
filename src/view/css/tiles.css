@@ -5,10 +5,6 @@
   overflow: hidden;
 }
 
-.tiles .tile {
-  margin: 0px 10px 10px 0px;
-}
-
 .tile {
   width: 100px;
   height: 100px;
@@ -22,6 +18,10 @@
 
 .tile:hover {
   background-color: #1e82cc;
+}
+
+.tiles .tile {
+  margin: 0 10px 10px 0;
 }
 
 .tile_selected .tilelink::after {

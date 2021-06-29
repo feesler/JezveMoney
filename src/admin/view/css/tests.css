@@ -8,15 +8,11 @@
 
 /* Results */
 .results {
-  margin: 0px 0px 10px 0px;
+  margin: 0 0 10px 0;
   display: -ms-flexbox;
   display: flex;
   flex-flow: column nowrap;
   max-height: 70vh;
-}
-
-.results-expanded .results-container {
-  display: block;
 }
 
 .results-container {
@@ -24,8 +20,12 @@
   overflow-y: auto;
 }
 
+.results-expanded .results-container {
+  display: block;
+}
+
 .controls {
-  padding: 0px 0px 10px 0px;
+  padding: 0 0 10px 0;
 }
 
 .admin-tbl.counter-tbl {
@@ -92,7 +92,7 @@
   .results {
     flex-grow: 0;
     flex-basis: 35%;
-    margin: 0px 10px 0px 0px;
+    margin: 0 10px 0 0;
   }
 
   .results-container {

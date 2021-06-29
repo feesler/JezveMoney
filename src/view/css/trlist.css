@@ -8,13 +8,13 @@
 .trans-list__item-wrapper,
 .trans-list__item-placeholder {
   width: 100%;
-  margin: 2px 0px;
+  margin: 2px 0;
   height: 85px;
 }
 
 .trans-list__item {
   padding: 8px;
-  border: 0px none;
+  border: 0 none;
 }
 
 .trans-list__item-placeholder > .trans-list__item {
@@ -30,13 +30,6 @@ div.trans-list__item_selected {
 .trans-list__item > div {
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.trans-list__item > div > span,
-.trans-list__item_selected > div > span,
-.trans-list_details span {
-  height: 23px;
-  line-height: 23px;
 }
 
 .trans-list__item-title {
@@ -61,10 +54,107 @@ div.trans-list__item_selected {
 }
 
 .trans-list__item-comment {
-  margin: 0px 0px 0px 5px;
-  padding: 0px 0px 0px 5px;
+  margin: 0 0 0 5px;
+  padding: 0 0 0 5px;
   border-left-width: 1px;
   border-left-style: solid;
+}
+
+/* Details mode */
+.trans-list_details {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.trans-list_details > tbody {
+  height: 43px;
+}
+
+.trans-list_details td {
+  padding: 2px 0;
+}
+
+.trans-list_details span {
+  font-size: 14px;
+  height: 23px;
+  line-height: 23px;
+}
+
+.trans-list_details .trans-list__item-content {
+  color: #0080b0;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.trans-list_details .trans-list__item-comment {
+  margin: 0;
+  padding: 0;
+  border: 0 none;
+}
+
+.trans-list_details .tritem_balance {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.tritem_balance > span {
+  margin: 0 10px 0 0;
+}
+
+/* Mode selector and paginator row */
+.paginator-row {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+}
+
+/* Mode selector */
+.mode-selector {
+  display: inline-flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.mode-selector__item {
+  display: inline-flex;
+  flex-flow: row nowrap;
+}
+
+.mode-selector__item span {
+  height: 22px;
+  line-height: 22px;
+  padding: 0 10px 0 5px;
+}
+
+.mode-selector__item .icon {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+}
+
+/* Paginator */
+.paginator {
+  display: inline-flex;
+  flex-flow: row nowrap;
+  margin-left: auto;
+  padding: 5px 0;
+}
+
+.paginator > span {
+  margin-left: 5px;
+  height: 22px;
+  line-height: 22px;
+}
+
+/* Search form */
+.search-form {
+  align-self: right;
+}
+
+.search_btn {
+  align-self: right;
+  flex-grow: 0;
 }
 
 /* Ellipsis cell */
@@ -86,7 +176,7 @@ div.trans-list__item_selected {
 }
 
 /* cell stretching content */
-.ellipsis-cell > div:after {
+.ellipsis-cell > div::after {
   content: attr(title);
   overflow: hidden;
   height: 0;
@@ -94,28 +184,22 @@ div.trans-list__item_selected {
   font-size: 14px;
 }
 
-/* Details mode */
-.trans-list_details {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-.trans-list_details > tbody {
-  height: 43px;
-}
-
-.trans-list_details td {
-  padding: 2px 0px;
-}
-
-.trans-list_details span {
-  font-size: 14px;
-}
-
 .trans-list_details td > div {
   height: 39px;
   padding: 8px;
   box-sizing: border-box;
+}
+
+/* Common height style of item elements */
+.trans-list__item > div > span,
+.trans-list__item_selected > div > span {
+  height: 23px;
+  line-height: 23px;
+}
+
+/* Drag'n'Drop placeholder */
+.trans-list_details .trans-list__item-placeholder td > div {
+  opacity: 0;
 }
 
 /* Active table row */
@@ -129,94 +213,13 @@ div.trans-list__item_selected {
 .trans-list_details tr.trans-list__item_selected > td:first-child > div {
   padding: 5px 8px 5px 5px;
   border: 3px solid #0072c6;
-  border-right: 0px none;
+  border-right: 0 none;
   cursor: pointer;
 }
 
 .trans-list_details tr.trans-list__item_selected > td:last-child > div {
   padding: 5px 5px 5px 8px;
   border: 3px solid #0072c6;
-  border-left: 0px none;
+  border-left: 0 none;
   cursor: pointer;
-}
-
-.trans-list_details .trans-list__item-content {
-  color: #0080b0;
-  white-space: nowrap;
-  text-align: right;
-}
-
-.trans-list_details .trans-list__item-comment {
-  margin: 0;
-  padding: 0;
-  border: 0px none;
-}
-
-.trans-list_details .tritem_balance {
-  text-align: right;
-  white-space: nowrap;
-}
-
-.tritem_balance > span {
-  margin: 0px 10px 0px 0px;
-}
-
-.trans-list_details .trans-list__item-placeholder td > div {
-  opacity: 0;
-}
-
-/* Mode selector and paginator row */
-.paginator-row {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-between;
-}
-
-/* Mode selector */
-.mode-selector {
-  display: inline-flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  padding: 5px 0px;
-}
-
-.mode-selector__item {
-  display: inline-flex;
-  flex-flow: row nowrap;
-}
-
-.mode-selector__item span {
-  height: 22px;
-  line-height: 22px;
-  padding: 0px 10px 0px 5px;
-}
-
-.mode-selector__item .icon {
-  width: 24px;
-  height: 24px;
-  padding: 0;
-}
-
-/* Paginator */
-.paginator {
-  display: inline-flex;
-  flex-flow: row nowrap;
-  margin-left: auto;
-  padding: 5px 0px;
-}
-
-.paginator > span {
-  margin-left: 5px;
-  height: 22px;
-  line-height: 22px;
-}
-
-/* Search form */
-.search-form {
-  align-self: right;
-}
-
-.search_btn {
-  align-self: right;
-  flex-grow: 0;
 }

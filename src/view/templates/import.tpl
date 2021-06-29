@@ -3,7 +3,7 @@
 ?>
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
 </head>
-<body>
+<body class="<?=($this->themeClass)?>">
 <div class="page">
     <div class="page_wrapper">
 <?php	require_once(TPL_PATH."header.tpl");		?>

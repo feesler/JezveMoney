@@ -73,8 +73,10 @@ export class Header extends Component {
 
         var linkElem = ge('theme-style');
         if (linkElem) {
-            linkElem.href = baseURL + 'view/css/' + themes[newTheme];
+            linkElem.href = baseURL + 'view/css/' + themes[newTheme].file;
         }
+
+        document.body.className = themes[newTheme].className;
 
         ajax.get({
             url: baseURL + 'main/setTheme/?theme=' + newTheme

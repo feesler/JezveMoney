@@ -3,7 +3,7 @@
 ?>
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
 </head>
-<body>
+<body class="<?=($this->themeClass)?>">
 <div class="page">
     <div class="page_wrapper">
 <?php	require_once(TPL_PATH."header.tpl");		?>
@@ -12,7 +12,7 @@
                 <div class="content_wrap main-view">
                     <div class="widget accounts-widget">
                         <div class="widget_title">
-                            <a href="<?=BASEURL?>accounts/">
+                            <a class="widget_title-link" href="<?=BASEURL?>accounts/">
                                 <span>Accounts</span>
                                 <div class="glyph"><?=svgIcon("glyph")?></div>
                             </a>
@@ -56,7 +56,7 @@
 
                     <div class="widget transactions-widget">
                         <div class="widget_title">
-                            <a href="<?=BASEURL?>transactions/">
+                            <a class="widget_title-link" href="<?=BASEURL?>transactions/">
                                 <span>Transactions</span>
                                 <div class="glyph"><?=svgIcon("glyph")?></div>
                             </a>
@@ -87,7 +87,7 @@
 
                     <div class="widget">
                         <div class="widget_title">
-                            <a href="<?=BASEURL?>persons/">
+                            <a class="widget_title-link" href="<?=BASEURL?>persons/">
                                 <span>Persons</span>
                                 <div class="glyph"><?=svgIcon("glyph")?></div>
                             </a>
@@ -112,7 +112,7 @@
 
                     <div class="widget">
                         <div class="widget_title">
-                            <a href="<?=BASEURL?>statistics/">
+                            <a class="widget_title-link" href="<?=BASEURL?>statistics/">
                                 <span>Statistics</span>
                                 <div class="glyph"><?=svgIcon("glyph")?></div>
                             </a>

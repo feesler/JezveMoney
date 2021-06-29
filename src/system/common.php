@@ -205,18 +205,22 @@ function auto_version($file)
 function getThemes($base)
 {
     $themeFiles = [
-        WHITE_THEME => "white-theme.css",
-        DARK_THEME => "dark-theme.css"
+        WHITE_THEME => "white-theme",
+        DARK_THEME => "dark-theme"
     ];
 
     $res = [];
     foreach ($themeFiles as $theme_id => $themeName) {
-        $mtime = getModifiedTime($base . $themeName);
+        $fileName = $themeName . ".css";
+        $mtime = getModifiedTime($base . $fileName);
         if ($mtime === false) {
             continue;
         }
 
-        $res[$theme_id] = $themeName . "?" . $mtime;
+        $res[$theme_id] = [
+            "file" => $fileName . "?" . $mtime,
+            "className" => $themeName,
+        ];
     }
 
     return $res;

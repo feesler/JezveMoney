@@ -9,7 +9,7 @@
 
 .admin-header > .menu > span {
   display: inline;
-  padding: 0px 10px 0px 0px;
+  padding: 0 10px 0 0;
   white-space: nowrap;
 }
 
@@ -68,7 +68,7 @@ textarea {
 /* Checkbox wrapper */
 .checkbox-wrap {
   height: 20px;
-  padding: 5px 0px;
+  padding: 5px 0;
 }
 
 .checkbox-wrap > input[type="checkbox"] {
@@ -79,7 +79,7 @@ textarea {
 
 .checkbox-wrap > label {
   display: inline;
-  padding: 0px 5px;
+  padding: 0 5px;
   font-size: 16px;
   height: 20px;
   line-height: 20px;
@@ -105,7 +105,7 @@ textarea {
   display: block;
   width: 100%;
   font-size: 16px;
-  padding: 5px 0px;
+  padding: 5px 0;
 }
 
 .item-form .stretch-input {

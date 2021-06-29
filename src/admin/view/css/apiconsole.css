@@ -2,14 +2,14 @@ h2 {
   font-size: 18px;
   font-weight: 400;
   clear: both;
-  margin: 0px 0px 12px 0px;
+  margin: 0 0 12px 0;
 }
 
 h3 {
   font-size: 16px;
   font-weight: 500;
   clear: both;
-  margin: 0px 0px 12px 0px;
+  margin: 0 0 12px 0;
 }
 
 .api-console {
@@ -49,18 +49,18 @@ h3 {
   list-style-type: none;
 }
 
-.menu-list > li.active > button {
-  font-weight: bold;
-}
-
 .menu-list > li > button {
   font-size: 18px;
   background: none;
   cursor: pointer;
 }
 
+.menu-list > li.active > button {
+  font-weight: bold;
+}
+
 .menu-list .sub-menu-list {
-  padding: 0px 0px 0px 10px;
+  padding: 0 0 0 10px;
   display: none;
   list-style-image: none;
 }
@@ -73,7 +73,7 @@ h3 {
   list-style-image: none;
   list-style-type: none;
   cursor: pointer;
-  padding: 5px 0px;
+  padding: 5px 0;
   text-overflow: ellipsis;
   overflow: hidden;
 }
@@ -142,27 +142,22 @@ h3 {
   line-height: 25px;
 }
 
-.request-item .request-container .title:before,
-.request-item .response-container .title:before {
+.request-item .request-container .title::before,
+.request-item .response-container .title::before {
   content: "-";
-  padding: 0px 10px;
+  padding: 0 10px;
   display: inline-block;
   width: 0.5rem;
   text-align: center;
 }
 
-.request-item .request-container .title:hover:before {
+.request-item .request-container .title:hover::before {
   background-color: #95c3ff;
 }
 
-.request-item .request-container.collapsed .title:before,
-.request-item .response-container.collapsed .title:before {
+.request-item .request-container.collapsed .title::before,
+.request-item .response-container.collapsed .title::before {
   content: "+";
-}
-
-.request-item .request-container.collapsed .request-details,
-.request-item .response-container.collapsed .response-details {
-  display: none;
 }
 
 .request-item .request-container .request-details,
@@ -170,6 +165,11 @@ h3 {
   word-break: break-all;
   font-size: 14px;
   padding: 0 5px;
+}
+
+.request-item .request-container.collapsed .request-details,
+.request-item .response-container.collapsed .response-details {
+  display: none;
 }
 
 /* Result */
@@ -186,11 +186,11 @@ h3 {
   background-color: #ff6666;
 }
 
-.request-item .response-container.ok-result .title:hover:before {
+.request-item .response-container.ok-result .title:hover::before {
   background-color: #59b74e;
 }
 
-.request-item .response-container.fail-result .title:hover:before {
+.request-item .response-container.fail-result .title:hover::before {
   background-color: #ff8a8a;
 }
 

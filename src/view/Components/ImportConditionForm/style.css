@@ -4,7 +4,7 @@
   flex-flow: row nowrap;
   max-height: 100%;
   flex: 1 1 auto;
-  min-height: 0px;
+  min-height: 0;
   padding: 4px;
 }
 
@@ -18,7 +18,7 @@
   flex-flow: column nowrap;
   max-height: 100%;
   flex: 1 1 auto;
-  min-height: 0px;
+  min-height: 0;
 }
 
 /* Fields container */
@@ -27,7 +27,7 @@
   flex-flow: column nowrap;
   max-height: 100%;
   flex: 1 1 auto;
-  min-height: 0px;
+  min-height: 0;
 }
 
 /* Input field and label group */
