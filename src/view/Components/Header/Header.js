@@ -6,6 +6,7 @@ import {
     ajax,
     Component,
 } from 'jezvejs';
+import './style.css';
 
 /* global baseURL, themes */
 

@@ -1,0 +1,173 @@
+/* header */
+.header {
+  height: 50px;
+  background-color: #404040;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+}
+
+.header__content {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+/* Theme switch */
+.theme-switch {
+  display: flex;
+  margin: 0 6px 0 auto;
+}
+
+.switch {
+  position: relative;
+  width: 34px;
+  height: 20px;
+}
+
+.switch input {
+  display: none;
+}
+
+.switch-slider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #555555;
+  cursor: pointer;
+  border-radius: 9px;
+}
+
+.switch-slider::before {
+  content: "";
+  top: 2px;
+  left: 2px;
+  transition: left 0.2s;
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background-color: #ababab;
+  border-radius: 8px;
+}
+
+.switch-slider:hover {
+  background-color: #707070;
+}
+
+.switch-slider:hover::before {
+  background-color: #ffffff;
+}
+
+.switch input:checked + .switch-slider::before {
+  left: 17px;
+}
+
+/* user block */
+.user-block {
+  position: relative;
+}
+
+.user-menu-btn {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  border: 0 none;
+  background-color: #404040;
+  padding: 0 12px 0 3px;
+}
+
+.user-menu-btn:hover {
+  background-color: #606060;
+}
+
+.user-menu-btn .user__title {
+  font-size: 16px;
+  font-weight: normal;
+  color: #ffffff;
+  text-transform: none;
+}
+
+.user-menu-btn .user__icon {
+  width: 24px;
+  height: 24px;
+  overflow: hidden;
+  margin: 13px 2px;
+}
+
+.user__icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* drop down user menu */
+.user-menu {
+  display: inline-block;
+  position: absolute;
+  top: 50px;
+  right: 0;
+  z-index: 10;
+}
+
+.user-menu ul {
+  list-style-image: none;
+  list-style-type: none;
+  background-color: #404040;
+  margin: 0;
+  padding: 0;
+}
+
+.user-menu li {
+  color: #ffffff;
+  list-style-image: none;
+  border: 0 none;
+  padding: 10px 30px;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.user-menu li:hover {
+  background-color: #808080;
+}
+
+.user-menu li a,
+.user-menu li a:hover {
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.user-menu li.separator {
+  height: 0;
+  border: 0 none;
+  border-bottom: 1px solid #808080;
+  padding: 0;
+}
+
+/* logo block */
+.logo__link {
+  text-decoration: none;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: 0 12px 0 0;
+}
+
+.logo__link:hover {
+  background-color: #606060;
+}
+
+.logo__icon,
+.logo__icon svg {
+  width: 50px;
+  height: 50px;
+}
+
+.logo__title {
+  font-size: 20px;
+  font-weight: 200;
+  color: #ffffff;
+  white-space: nowrap;
+}
