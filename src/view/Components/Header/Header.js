@@ -70,17 +70,17 @@ export class Header extends Component {
      * @param {Event} e - event object
      */
     onToggleTheme(e) {
-        var newTheme = e.target.checked ? DARK_THEME : WHITE_THEME;
+        const newTheme = e.target.checked ? DARK_THEME : WHITE_THEME;
 
-        var linkElem = ge('theme-style');
+        const linkElem = ge('theme-style');
         if (linkElem) {
-            linkElem.href = baseURL + 'view/css/' + themes[newTheme].file;
+            linkElem.href = `${baseURL}view/css/${themes[newTheme].file}`;
         }
 
         document.body.className = themes[newTheme].className;
 
         ajax.get({
-            url: baseURL + 'main/setTheme/?theme=' + newTheme
+            url: `${baseURL}main/setTheme/?theme=${newTheme}`,
         });
     }
 
@@ -105,7 +105,7 @@ export class Header extends Component {
      * Create new Header from specified element
      */
     static create() {
-        var res;
+        let res;
 
         try {
             res = new Header();

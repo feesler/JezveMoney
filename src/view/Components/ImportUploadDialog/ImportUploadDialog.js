@@ -37,7 +37,7 @@ export class ImportUploadDialog extends AppComponent {
             accounts: this.props.accountModel,
             persons: this.props.personModel,
             rules: this.props.rulesModel,
-            mainAccount: this.props.mainAccount
+            mainAccount: this.props.mainAccount,
         };
 
         if (!isFunction(this.props.onuploaddone)) {
@@ -52,7 +52,7 @@ export class ImportUploadDialog extends AppComponent {
             elem: 'fileBlock',
             parent: this.parent,
             uploadStarted: this.onUploadStart.bind(this),
-            uploaded: this.onUploaded.bind(this)
+            uploaded: this.onUploaded.bind(this),
         });
         this.tplManager = new ImportTemplateManager({
             elem: 'templateBlock',
@@ -60,7 +60,7 @@ export class ImportUploadDialog extends AppComponent {
             currencyModel: this.props.currencyModel,
             tplModel: this.props.tplModel,
             rulesModel: this.model.rules,
-            templateStatus: this.onTemplateStatus.bind(this)
+            templateStatus: this.onTemplateStatus.bind(this),
         });
 
         this.popup = Popup.create({
@@ -69,9 +69,9 @@ export class ImportUploadDialog extends AppComponent {
             content: this.elem,
             onclose: this.onClose.bind(this),
             btn: {
-                closeBtn: true
+                closeBtn: true,
             },
-            additional: 'upload-popup'
+            additional: 'upload-popup',
         });
 
         this.elem.addEventListener('dragenter', this.onDragEnter.bind(this), false);
@@ -82,7 +82,7 @@ export class ImportUploadDialog extends AppComponent {
         this.accountDropDown = DropDown.create({
             input_id: 'initialAccount',
             onchange: this.onAccountChange.bind(this),
-            editable: false
+            editable: false,
         });
 
         this.initialAccField = ge('initialAccField');
@@ -147,14 +147,12 @@ export class ImportUploadDialog extends AppComponent {
 
     /** File 'drop' event handler */
     onDrop(e) {
-        var files;
-
         e.stopPropagation();
         e.preventDefault();
 
         this.uploader.elem.classList.remove('drag-over');
 
-        files = e.dataTransfer.files;
+        const { files } = e.dataTransfer;
         if (!files.length) {
             return;
         }

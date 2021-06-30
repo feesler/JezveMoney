@@ -5,7 +5,7 @@ import './style.css';
 /**
  * Toolbar component
  */
-export class Toolbar extends Component{
+export class Toolbar extends Component {
     constructor(...args) {
         super(...args);
 
@@ -44,15 +44,15 @@ export class Toolbar extends Component{
         this.exportBtn = IconLink.fromElement({ elem: 'export_btn' });
         this.showBtn = IconLink.fromElement({
             elem: 'show_btn',
-            onclick: this.onShowClick.bind(this)
+            onclick: this.onShowClick.bind(this),
         });
         this.hideBtn = IconLink.fromElement({
             elem: 'hide_btn',
-            onclick: this.onHideClick.bind(this)
+            onclick: this.onHideClick.bind(this),
         });
         this.deleteBtn = IconLink.fromElement({
             elem: 'del_btn',
-            onclick: this.onDeleteClick.bind(this)
+            onclick: this.onDeleteClick.bind(this),
         });
     }
 

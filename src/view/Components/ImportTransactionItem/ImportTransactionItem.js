@@ -87,38 +87,33 @@ export class ImportTransactionItem extends AppComponent {
             type: 'text',
             name: 'amount[]',
             placeholder: 'Amount',
-            autocomplete: 'off'
+            autocomplete: 'off',
         }, null, { input: this.onAmountInput.bind(this) });
         this.amountField = this.createField('Amount', this.amountInp, 'amount-field');
 
-        this.destAmountInp = ce(
-            'input',
-            {
-                type: 'text',
-                name: 'dest_amount[]',
-                disabled: true,
-                placeholder: 'Destination amount',
-                autocomplete: 'off'
-            },
-            null,
-            { input: this.onDestAmountInput.bind(this) },
-        );
+        this.destAmountInp = ce('input', {
+            type: 'text',
+            name: 'dest_amount[]',
+            disabled: true,
+            placeholder: 'Destination amount',
+            autocomplete: 'off',
+        }, null, { input: this.onDestAmountInput.bind(this) });
         this.destAmountField = this.createField('Destination amount', this.destAmountInp, 'amount-field');
         // Date field
-        this.dateInp = ce(
-            'input',
-            { type: 'text', name: 'date[]', placeholder: 'Date', autocomplete: 'off' },
-            null,
-            { input: this.onDateInput.bind(this) },
-        );
+        this.dateInp = ce('input', {
+            type: 'text',
+            name: 'date[]',
+            placeholder: 'Date',
+            autocomplete: 'off',
+        }, null, { input: this.onDateInput.bind(this) });
         this.dateField = this.createField('Date', this.dateInp, 'date-field');
         // Comment field
-        this.commInp = ce(
-            'input',
-            { type: 'text', name: 'comment[]', placeholder: 'Comment', autocomplete: 'off' },
-            null,
-            { input: this.onCommentInput.bind(this) },
-        );
+        this.commInp = ce('input', {
+            type: 'text',
+            name: 'comment[]',
+            placeholder: 'Comment',
+            autocomplete: 'off',
+        }, null, { input: this.onCommentInput.bind(this) });
         this.commentField = this.createField('Comment', this.commInp, 'comment-field');
         // Delete button
         this.delBtn = ce(
@@ -210,7 +205,7 @@ export class ImportTransactionItem extends AppComponent {
         this.typeDropDown = DropDown.create({
             input_id: selectElem,
             onchange: this.onTrTypeChanged.bind(this),
-            editable: false
+            editable: false,
         });
         typeItems.forEach((typeItem) => {
             this.typeDropDown.addItem(typeItem);
@@ -232,7 +227,7 @@ export class ImportTransactionItem extends AppComponent {
             input_id: selectElem,
             disabled: true,
             onchange: this.onDestChanged.bind(this),
-            editable: false
+            editable: false,
         });
 
         this.destAccDropDown.append(accountItems);
@@ -251,7 +246,7 @@ export class ImportTransactionItem extends AppComponent {
             input_id: selectElem,
             disabled: true,
             onchange: this.onPersonChanged.bind(this),
-            editable: false
+            editable: false,
         });
 
         this.personDropDown.append(personItems);
@@ -268,7 +263,7 @@ export class ImportTransactionItem extends AppComponent {
         this.currencyDropDown = DropDown.create({
             input_id: selectElem,
             onchange: this.onCurrChanged.bind(this),
-            editable: false
+            editable: false,
         });
 
         this.currencyDropDown.append(currencyItems);
@@ -309,7 +304,7 @@ export class ImportTransactionItem extends AppComponent {
                 this.createDataValue('Acc. amount', data.accountAmount),
                 this.createDataValue('Acc. currency', data.accountCurrency),
                 this.createDataValue('Comment', data.comment, 'comment-value'),
-            ])
+            ]),
         ]);
     }
 
@@ -440,13 +435,14 @@ export class ImportTransactionItem extends AppComponent {
      * @param {Object} state - state object
      */
     getFirstAvailAccount(state) {
-        const userAccountsData = this.model.accounts.getUserAccounts(this.model.mainAccount.owner_id);
+        const userAccountsData = this.model.accounts
+            .getUserAccounts(this.model.mainAccount.owner_id);
         const userAccounts = new AccountList(userAccountsData);
         const visibleAccounts = userAccounts.getVisible();
-        let res = visibleAccounts[0];
+        let [res] = visibleAccounts;
 
         if (res.id === state.accountId) {
-            res = visibleAccounts[1];
+            [, res] = visibleAccounts;
         }
 
         return res;
@@ -457,7 +453,8 @@ export class ImportTransactionItem extends AppComponent {
      * @param {number} accountId - account id to find next account for
      */
     getNextAccount(accountId) {
-        const userAccountsData = this.model.accounts.getUserAccounts(this.model.mainAccount.owner_id);
+        const userAccountsData = this.model.accounts
+            .getUserAccounts(this.model.mainAccount.owner_id);
         const userAccounts = new AccountList(userAccountsData);
         const visibleAccountsData = userAccounts.getVisible();
         const userVisible = new AccountList(visibleAccountsData);
@@ -517,7 +514,7 @@ export class ImportTransactionItem extends AppComponent {
 
     /** Amount field 'input' event handler */
     onAmountInput() {
-        const value = this.amountInp.value;
+        const { value } = this.amountInp;
         this.setAmount(value);
         this.clearInvalid();
         this.render();
@@ -525,7 +522,7 @@ export class ImportTransactionItem extends AppComponent {
 
     /** Destination amount field 'input' event handler */
     onDestAmountInput() {
-        const value = this.destAmountInp.value;
+        const { value } = this.destAmountInp;
         this.setSecondAmount(value);
         this.clearInvalid();
         this.render();
@@ -540,7 +537,7 @@ export class ImportTransactionItem extends AppComponent {
 
     /** Date field 'input' event handler */
     onDateInput() {
-        const value = this.dateInp.value;
+        const { value } = this.dateInp;
         this.setDate(value);
         this.clearInvalid();
         this.render();
@@ -548,7 +545,7 @@ export class ImportTransactionItem extends AppComponent {
 
     /** Comment field 'input' event handler */
     onCommentInput() {
-        const value = this.commInp.value;
+        const { value } = this.commInp;
         this.setComment(value);
         this.clearInvalid();
         this.render();
@@ -797,7 +794,6 @@ export class ImportTransactionItem extends AppComponent {
         return state;
     }
 
-
     /** Set comment */
     setComment(value) {
         if (typeof value !== 'string') {
@@ -841,7 +837,7 @@ export class ImportTransactionItem extends AppComponent {
 
     /** Validate transaction object */
     validate() {
-        const state = this.state;
+        const { state } = this;
 
         const amountVal = parseFloat(fixFloat(state.amount));
         if (Number.isNaN(amountVal) || amountVal <= 0) {
@@ -875,7 +871,7 @@ export class ImportTransactionItem extends AppComponent {
 
     /** Return transaction object */
     getData() {
-        const state = this.state;
+        const { state } = this;
 
         const secondAcc = this.model.accounts.getItem(state.secondAccountId);
         const person = this.model.persons.getItem(state.personId);
@@ -942,7 +938,7 @@ export class ImportTransactionItem extends AppComponent {
 
     /** Render component */
     render() {
-        const state = this.state;
+        const { state } = this;
 
         if (!state) {
             throw new Error('Invalid state');

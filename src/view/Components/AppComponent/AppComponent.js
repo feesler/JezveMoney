@@ -1,4 +1,9 @@
-import { ce, svg, isVisible, Component } from 'jezvejs';
+import {
+    ce,
+    svg,
+    isVisible,
+    Component,
+} from 'jezvejs';
 
 /**
  * Base app component
@@ -55,7 +60,7 @@ export class AppComponent extends Component {
 
         return ce('div', { className: elemClasses.join(' ') }, [
             ce('label', { textContent: title }),
-            ce('div', {}, input)
+            ce('div', {}, input),
         ]);
     }
 }

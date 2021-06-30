@@ -43,7 +43,7 @@ export class ImportRuleItem extends AppComponent {
             templates: this.props.tplModel,
             currency: this.props.currencyModel,
             accounts: this.props.accountModel,
-            persons: this.props.personModel
+            persons: this.props.personModel,
         };
 
         if (!(this.props.data instanceof ImportRule)) {
@@ -71,40 +71,40 @@ export class ImportRuleItem extends AppComponent {
             'button',
             { className: 'btn icon-btn update-btn', type: 'button' },
             this.createIcon('update'),
-            { click: this.onUpdate.bind(this) }
+            { click: this.onUpdate.bind(this) },
         );
         // Delete button
         this.delBtn = ce(
             'button',
             { className: 'btn icon-btn delete-btn', type: 'button' },
             this.createIcon('del'),
-            { click: this.onDelete.bind(this) }
+            { click: this.onDelete.bind(this) },
         );
         // Toggle expand/collapse
         this.toggleExtBtn = ce(
             'button',
             { className: 'btn icon-btn toggle-btn', type: 'button' },
-            this.createIcon('toggle-ext')
+            this.createIcon('toggle-ext'),
         );
 
         this.topRow = this.createContainer('rule-item__main-top', [
             this.propertyLabel,
             this.operatorLabel,
-            this.valueLabel
+            this.valueLabel,
         ]);
         this.bottomRow = this.createContainer('rule-item__main-bottom', [
-            this.infoLabel
+            this.infoLabel,
         ]);
 
         this.infoContainer = this.createContainer('rule-item__main-info', [
             this.topRow,
-            this.bottomRow
+            this.bottomRow,
         ]);
 
         this.controls = this.createContainer('rule-item__main-controls', [
             this.updateBtn,
             this.delBtn,
-            this.toggleExtBtn
+            this.toggleExtBtn,
         ]);
 
         this.conditionsHeader = ce('label', { className: 'rule-item__header', textContent: 'Conditions' });
@@ -117,18 +117,18 @@ export class ImportRuleItem extends AppComponent {
             this.conditionsHeader,
             this.conditionsContainer,
             this.actionsHeader,
-            this.actionsContainer
+            this.actionsContainer,
         ]);
 
         this.headerContainer = this.createContainer(
             'rule-item__main',
             [this.infoContainer, this.controls],
-            { click: this.toggleCollapse.bind(this) }
+            { click: this.toggleCollapse.bind(this) },
         );
 
         this.elem = this.createContainer('rule-item', [
             this.headerContainer,
-            this.dataContainer
+            this.dataContainer,
         ]);
     }
 
@@ -149,7 +149,7 @@ export class ImportRuleItem extends AppComponent {
             expanded: false,
             ruleId: data.id,
             conditions: data.conditions,
-            actions: data.actions
+            actions: data.actions,
         };
 
         this.render(this.state);
@@ -158,7 +158,7 @@ export class ImportRuleItem extends AppComponent {
     /** Return import rule object */
     getData() {
         const res = {
-            flags: 0
+            flags: 0,
         };
 
         if (this.state.ruleId) {
@@ -204,9 +204,7 @@ export class ImportRuleItem extends AppComponent {
         removeChilds(container);
         const isValid = (Array.isArray(data) && data.length > 0);
         if (isValid) {
-            addChilds(container, data.map(function (item) {
-                return item.elem;
-            }));
+            addChilds(container, data.map((item) => item.elem));
         }
 
         show(container, isValid);
@@ -231,18 +229,16 @@ export class ImportRuleItem extends AppComponent {
         }
 
         // Render conditions
-        const conditionItems = state.conditions.map((item) => {
-            const res = new ImportConditionItem({
+        const conditionItems = state.conditions.map(
+            (item) => (new ImportConditionItem({
                 parent: this,
                 data: item,
                 tplModel: this.model.templates,
                 currencyModel: this.model.currency,
                 accountModel: this.model.accounts,
-                personModel: this.model.persons
-            });
-
-            return res;
-        });
+                personModel: this.model.persons,
+            })),
+        );
         show(this.conditionsHeader, (conditionItems.length > 0));
         this.setListContainerData(this.conditionsContainer, conditionItems);
 
@@ -273,7 +269,7 @@ export class ImportRuleItem extends AppComponent {
         }
 
         if (conditionItems.length > 1) {
-            const conditionsTitle = (conditionItems.length - 1) + ' more condition(s).';
+            const conditionsTitle = `${conditionItems.length - 1} more condition(s).`;
 
             this.infoLabel.textContent = `${conditionsTitle} ${actionsTitle}`;
         } else {
@@ -281,17 +277,15 @@ export class ImportRuleItem extends AppComponent {
         }
 
         // Render actions
-        const actionItems = state.actions.map((item) => {
-            const res = new ImportActionItem({
+        const actionItems = state.actions.map(
+            (item) => (new ImportActionItem({
                 parent: this,
                 data: item,
                 currencyModel: this.model.currency,
                 accountModel: this.model.accounts,
-                personModel: this.model.persons
-            });
-
-            return res;
-        });
+                personModel: this.model.persons,
+            })),
+        );
         show(this.actionsHeader, (actionItems.length > 0));
         this.setListContainerData(this.actionsContainer, actionItems);
     }

@@ -43,7 +43,7 @@ export class ImportConditionForm extends AppComponent {
             template: this.props.tplModel,
             currency: this.props.currencyModel,
             accounts: this.props.accountModel,
-            persons: this.props.personModel
+            persons: this.props.personModel,
         };
 
         if (!(this.props.data instanceof ImportCondition)) {
@@ -90,7 +90,12 @@ export class ImportConditionForm extends AppComponent {
         this.valueField = this.createField('Value', this.valueInput);
 
         // Field value checkbox
-        this.fieldValueCheck = ce('input', { type: 'checkbox' });
+        this.fieldValueCheck = ce(
+            'input',
+            { type: 'checkbox' },
+            null,
+            { change: () => this.onFieldValueChecked() },
+        );
         this.fieldValueCheck.addEventListener('change', this.onFieldValueChecked.bind(this));
         this.valueFieldBlock = this.createContainer('value-field', [
             this.accountField,
@@ -120,7 +125,7 @@ export class ImportConditionForm extends AppComponent {
             'button',
             { className: 'btn icon-btn delete-btn', type: 'button' },
             this.createIcon('del'),
-            { click: this.onDelete.bind(this) }
+            { click: () => this.onDelete() },
         );
         this.controls = this.createContainer('cond-form__controls', this.delBtn);
 
@@ -160,7 +165,7 @@ export class ImportConditionForm extends AppComponent {
         this.operatorDropDown = DropDown.create({
             input_id: selectElem,
             onchange: this.onOperatorChange.bind(this),
-            editable: false
+            editable: false,
         });
         this.operatorDropDown.append(operatorItems);
         this.operatorDropDown.selectItem(operatorItems[0].id);
@@ -168,8 +173,9 @@ export class ImportConditionForm extends AppComponent {
 
     /** Create account field */
     createAccountField() {
-        const accountItems = this.model.accounts
-            .map((account) => ({ id: account.id, title: account.name }));
+        const accountItems = this.model.accounts.map(
+            (account) => ({ id: account.id, title: account.name }),
+        );
 
         const selectElem = ce('select');
         this.accountField = this.createField('Account', selectElem);
@@ -177,7 +183,7 @@ export class ImportConditionForm extends AppComponent {
         this.accountDropDown = DropDown.create({
             input_id: selectElem,
             onchange: this.onValueChange.bind(this),
-            editable: false
+            editable: false,
         });
         this.accountDropDown.append(accountItems);
         this.accountDropDown.selectItem(accountItems[0].id);
@@ -185,8 +191,9 @@ export class ImportConditionForm extends AppComponent {
 
     /** Create template field */
     createTemplateField() {
-        const templateItems = this.model.template
-            .map((template) => ({ id: template.id, title: template.name }));
+        const templateItems = this.model.template.map(
+            (template) => ({ id: template.id, title: template.name }),
+        );
 
         const selectElem = ce('select');
         this.templateField = this.createField('Template', selectElem);
@@ -194,7 +201,7 @@ export class ImportConditionForm extends AppComponent {
         this.templateDropDown = DropDown.create({
             input_id: selectElem,
             onchange: this.onValueChange.bind(this),
-            editable: false
+            editable: false,
         });
         this.templateDropDown.append(templateItems);
         if (templateItems.length > 0) {
@@ -204,8 +211,9 @@ export class ImportConditionForm extends AppComponent {
 
     /** Create currency field */
     createCurrencyField() {
-        const currencyItems = this.model.currency
-            .map((currency) => ({ id: currency.id, title: currency.name }));
+        const currencyItems = this.model.currency.map(
+            (currency) => ({ id: currency.id, title: currency.name }),
+        );
 
         const selectElem = ce('select');
         this.currencyField = this.createField('Currency', selectElem);
@@ -213,11 +221,12 @@ export class ImportConditionForm extends AppComponent {
         this.currencyDropDown = DropDown.create({
             input_id: selectElem,
             onchange: this.onValueChange.bind(this),
-            editable: false
+            editable: false,
         });
         this.currencyDropDown.append(currencyItems);
         this.currencyDropDown.selectItem(currencyItems[0].id);
     }
+
     /** Create value property field */
     createValuePropField() {
         const items = this.fieldTypes
@@ -230,7 +239,7 @@ export class ImportConditionForm extends AppComponent {
         this.valuePropDropDown = DropDown.create({
             input_id: selectElem,
             onchange: this.onValueChange.bind(this),
-            editable: false
+            editable: false,
         });
         this.valuePropDropDown.append(items);
         this.valuePropDropDown.selectItem(items[0].id);
@@ -261,7 +270,7 @@ export class ImportConditionForm extends AppComponent {
             isFieldValue: data.isPropertyValue(),
             value: data.value,
             isValid: data.isValid,
-            message: data.message
+            message: data.message,
         };
 
         this.verifyOperator(this.state);
@@ -293,7 +302,7 @@ export class ImportConditionForm extends AppComponent {
         this.state.availOperators = fieldType.operators;
         // If not available operator is selected then select first available
         if (!this.state.availOperators.includes(this.state.operator)) {
-            this.state.operator = this.state.availOperators[0];
+            [this.state.operator] = this.state.availOperators;
         }
 
         this.state.value = this.getConditionValue(this.state);
@@ -409,7 +418,7 @@ export class ImportConditionForm extends AppComponent {
             field_id: state.fieldType,
             operator: state.operator,
             value: state.value,
-            flags: (state.isFieldValue) ? IMPORT_COND_OP_FIELD_FLAG : 0
+            flags: (state.isFieldValue) ? IMPORT_COND_OP_FIELD_FLAG : 0,
         };
 
         if (state.conditionId) {
@@ -443,7 +452,7 @@ export class ImportConditionForm extends AppComponent {
             .filter((operatorType) => state.availOperators.includes(operatorType.id))
             .map((operatorType) => ({
                 id: operatorType.id,
-                title: operatorType.title
+                title: operatorType.title,
             }));
 
         this.operatorDropDown.removeAll();
@@ -469,13 +478,28 @@ export class ImportConditionForm extends AppComponent {
         this.renderOperator(state);
         this.fieldValueCheck.checked = state.isFieldValue;
 
-        const isAccountValue = !state.isFieldValue && ImportCondition.isAccountField(state.fieldType);
-        const isTplValue = !state.isFieldValue && ImportCondition.isTemplateField(state.fieldType);
-        const isCurrencyValue = !state.isFieldValue && ImportCondition.isCurrencyField(state.fieldType);
-        const isAmountValue = !state.isFieldValue && ImportCondition.isAmountField(state.fieldType);
-        const isTextValue = (!state.isFieldValue
-            && (ImportCondition.isDateField(state.fieldType)
-                || ImportCondition.isStringField(state.fieldType))
+        const isAccountValue = (
+            !state.isFieldValue
+            && ImportCondition.isAccountField(state.fieldType)
+        );
+        const isTplValue = (
+            !state.isFieldValue
+            && ImportCondition.isTemplateField(state.fieldType)
+        );
+        const isCurrencyValue = (
+            !state.isFieldValue
+            && ImportCondition.isCurrencyField(state.fieldType)
+        );
+        const isAmountValue = (
+            !state.isFieldValue
+            && ImportCondition.isAmountField(state.fieldType)
+        );
+        const isTextValue = (
+            !state.isFieldValue
+            && (
+                ImportCondition.isDateField(state.fieldType)
+                || ImportCondition.isStringField(state.fieldType)
+            )
         );
 
         show(this.accountField, isAccountValue);

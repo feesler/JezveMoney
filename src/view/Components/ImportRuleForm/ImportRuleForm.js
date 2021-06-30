@@ -46,7 +46,7 @@ export class ImportRuleForm extends AppComponent {
             template: this.props.tplModel,
             currency: this.props.currencyModel,
             accounts: this.props.accountModel,
-            persons: this.props.personModel
+            persons: this.props.personModel,
         };
 
         if (!(this.props.data instanceof ImportRule)) {
@@ -75,22 +75,22 @@ export class ImportRuleForm extends AppComponent {
             'button',
             { className: 'btn link-btn create-btn', type: 'button', textContent: 'Create' },
             null,
-            { click: this.onCreateConditionClick.bind(this) }
+            { click: this.onCreateConditionClick.bind(this) },
         );
         this.toggleCondBtn = ce(
             'button',
             { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
-            this.createIcon('toggle-ext')
+            this.createIcon('toggle-ext'),
         );
         this.conditionsHeader = this.createContainer('rule-form__collapse-header', [
             ce('label', { textContent: 'Conditions' }),
             this.createCondBtn,
-            this.toggleCondBtn
+            this.toggleCondBtn,
         ], { click: this.onToggleConditions.bind(this) });
         this.conditionsContainer = this.createContainer('rule-form__collapse-content', []);
         this.formConditions = this.createContainer('rule-form__collapse', [
             this.conditionsHeader,
-            this.conditionsContainer
+            this.conditionsContainer,
         ]);
 
         // Actions
@@ -98,22 +98,22 @@ export class ImportRuleForm extends AppComponent {
             'button',
             { className: 'btn link-btn create-btn', type: 'button', textContent: 'Create' },
             null,
-            { click: this.onCreateActionClick.bind(this) }
+            { click: this.onCreateActionClick.bind(this) },
         );
         this.toggleActionsBtn = ce(
             'button',
             { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
-            this.createIcon('toggle-ext')
+            this.createIcon('toggle-ext'),
         );
         this.actionsHeader = this.createContainer('rule-form__collapse-header', [
             ce('label', { textContent: 'Actions' }),
             this.createActionBtn,
-            this.toggleActionsBtn
+            this.toggleActionsBtn,
         ], { click: this.onToggleActions.bind(this) });
         this.formActionsContainer = this.createContainer('rule-form__collapse-content', []);
         this.formActions = this.createContainer('rule-form__collapse', [
             this.actionsHeader,
-            this.formActionsContainer
+            this.formActionsContainer,
         ]);
 
         // Controls
@@ -121,25 +121,25 @@ export class ImportRuleForm extends AppComponent {
             'button',
             { className: 'btn submit-btn', type: 'button', textContent: 'Ok' },
             null,
-            { click: this.onSubmit.bind(this) }
+            { click: this.onSubmit.bind(this) },
         );
         this.cancelBtn = ce(
             'button',
             { className: 'btn link-btn cancel-btn', type: 'button', textContent: 'Cancel' },
             null,
-            { click: this.onCancel.bind(this) }
+            { click: this.onCancel.bind(this) },
         );
 
         // Invalid feedback message
         this.validFeedback = ce('div', { className: 'invalid-feedback' });
         this.feedbackContainer = this.createContainer(
             'rule-form__feedback validation-block',
-            this.validFeedback
+            this.validFeedback,
         );
 
         this.controls = this.createContainer('rule-form__controls', [
             this.saveBtn,
-            this.cancelBtn
+            this.cancelBtn,
         ]);
 
         this.elem = this.createContainer('rule-form', [
@@ -147,7 +147,7 @@ export class ImportRuleForm extends AppComponent {
             this.formConditions,
             this.formActions,
             this.feedbackContainer,
-            this.controls
+            this.controls,
         ]);
     }
 
@@ -160,7 +160,7 @@ export class ImportRuleForm extends AppComponent {
         this.state = {
             rule: data,
             conditionsCollapsed: false,
-            actionsCollapsed: true
+            actionsCollapsed: true,
         };
 
         this.render(this.state);
@@ -173,13 +173,11 @@ export class ImportRuleForm extends AppComponent {
         }
 
         // Obtain action types currently used by rule
-        const ruleActionTypes = state.rule.actions.map(function (action) {
-            return action.action_id;
-        });
+        const ruleActionTypes = state.rule.actions.map((action) => action.action_id);
         // Search for first action type not in list
-        return this.actionTypes.find(function (actionType) {
-            return !ruleActionTypes.includes(actionType.id);
-        });
+        return this.actionTypes.find(
+            (actionType) => !ruleActionTypes.includes(actionType.id),
+        );
     }
 
     /** Return default value for specified action type */
@@ -226,7 +224,7 @@ export class ImportRuleForm extends AppComponent {
 
         const actionData = {
             action_id: actionType.id,
-            value: this.getActionDefaultValue(actionType.id)
+            value: this.getActionDefaultValue(actionType.id),
         };
 
         this.state.rule.actions.addItem(actionData);
@@ -247,8 +245,9 @@ export class ImportRuleForm extends AppComponent {
         // Obtain condition field types currently used by rule
         const ruleFieldTypes = state.rule.conditions.map((condition) => condition.field_id);
         // Filter available field types
-        const availFields = this.fieldTypes
-            .filter((fieldType) => !ImportCondition.isTemplateField(fieldType.id));
+        const availFields = this.fieldTypes.filter(
+            (fieldType) => !ImportCondition.isTemplateField(fieldType.id),
+        );
 
         // Search for first field type not in list
         return availFields.find((fieldType) => !ruleFieldTypes.includes(fieldType.id));
@@ -304,7 +303,7 @@ export class ImportRuleForm extends AppComponent {
             field_id: fieldType.id,
             operator: fieldType.operators[0],
             value: this.getConditionDefaultValue(fieldType.id),
-            flags: 0
+            flags: 0,
         };
 
         this.state.rule.conditions.addItem(conditionData);
@@ -429,9 +428,7 @@ export class ImportRuleForm extends AppComponent {
 
         removeChilds(container);
         if (Array.isArray(data) && data.length > 0) {
-            data.forEach(function (item) {
-                container.appendChild(item.elem);
-            }, this);
+            data.forEach((item) => container.appendChild(item.elem));
         } else {
             const noDataMsgElem = ce('span', { className: 'nodata-message', textContent: message });
             container.appendChild(noDataMsgElem);
@@ -481,7 +478,7 @@ export class ImportRuleForm extends AppComponent {
                 accountModel: this.model.accounts,
                 personModel: this.model.persons,
                 update: this.onActionUpdate.bind(this, index),
-                remove: this.onActionDelete.bind(this, index)
+                remove: this.onActionDelete.bind(this, index),
             };
 
             if (
@@ -512,7 +509,7 @@ export class ImportRuleForm extends AppComponent {
                 accountModel: this.model.accounts,
                 personModel: this.model.persons,
                 update: this.onConditionUpdate.bind(this, index),
-                remove: this.onConditionDelete.bind(this, index)
+                remove: this.onConditionDelete.bind(this, index),
             };
 
             if (state.validation

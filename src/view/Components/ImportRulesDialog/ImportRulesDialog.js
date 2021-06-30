@@ -45,7 +45,7 @@ export class ImportRulesDialog extends Component {
             currency: this.props.currencyModel,
             accounts: this.props.accountModel,
             persons: this.props.personModel,
-            rules: this.props.rulesModel
+            rules: this.props.rulesModel,
         };
 
         this.LIST_STATE = 1;
@@ -57,9 +57,9 @@ export class ImportRulesDialog extends Component {
             content: this.elem,
             onclose: this.onClose.bind(this),
             btn: {
-                closeBtn: true
+                closeBtn: true,
             },
-            additional: 'rules-popup'
+            additional: 'rules-popup',
         });
 
         this.createRuleBtn = ge('createRuleBtn');
@@ -95,7 +95,7 @@ export class ImportRulesDialog extends Component {
         this.state = {
             id: this.LIST_STATE,
             listLoading: false,
-            renderTime: Date.now()
+            renderTime: Date.now(),
         };
     }
 
@@ -128,7 +128,7 @@ export class ImportRulesDialog extends Component {
         this.state.rule = new ImportRule({
             flags: 0,
             conditions: [],
-            actions: []
+            actions: [],
         });
 
         this.render(this.state);
@@ -136,7 +136,7 @@ export class ImportRulesDialog extends Component {
 
     /** Set update rule state */
     setUpdateRuleState(ruleId) {
-        var item = this.model.rules.getItem(ruleId);
+        const item = this.model.rules.getItem(ruleId);
         if (!item) {
             throw new Error('Rule not found');
         }
@@ -173,7 +173,7 @@ export class ImportRulesDialog extends Component {
             id: 'rule_delete_warning',
             title: this.ruleDeleteTitle,
             content: this.ruleDeleteMsg,
-            onconfirm: this.deleteRule.bind(this, ruleId)
+            onconfirm: () => this.deleteRule(ruleId),
         });
     }
 
@@ -192,7 +192,7 @@ export class ImportRulesDialog extends Component {
             url: reqURL,
             data: JSON.stringify(data),
             headers: { 'Content-Type': 'application/json' },
-            callback: this.onRuleRequestResult.bind(this)
+            callback: this.onRuleRequestResult.bind(this),
         });
     }
 
@@ -212,7 +212,7 @@ export class ImportRulesDialog extends Component {
             url: reqURL,
             data: JSON.stringify(data),
             headers: { 'Content-Type': 'application/json' },
-            callback: this.onRuleRequestResult.bind(this)
+            callback: this.onRuleRequestResult.bind(this),
         });
     }
 
@@ -244,8 +244,8 @@ export class ImportRulesDialog extends Component {
     /** Send API request to obain list of import rules */
     requestRulesList() {
         ajax.get({
-            url: baseURL + 'api/importrule/list/?extended=true',
-            callback: this.onRulesListResult.bind(this)
+            url: `${baseURL}api/importrule/list/?extended=true`,
+            callback: this.onRulesListResult.bind(this),
         });
     }
 

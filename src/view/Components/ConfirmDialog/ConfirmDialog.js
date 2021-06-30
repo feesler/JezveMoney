@@ -24,9 +24,9 @@ export class ConfirmDialog extends Component {
             title: this.props.title,
             content: this.props.content,
             btn: {
-                okBtn: { onclick: this.onResult.bind(this, true) },
-                cancelBtn: { onclick: this.onResult.bind(this, false) }
-            }
+                okBtn: { onclick: () => this.onResult(true) },
+                cancelBtn: { onclick: () => this.onResult(false) },
+            },
         };
         if ('id' in this.props) {
             popupProps.id = this.props.id;
@@ -43,7 +43,7 @@ export class ConfirmDialog extends Component {
 
     /** Create ConfirmDialog and show */
     static create(props) {
-        var res;
+        let res;
 
         try {
             res = new ConfirmDialog(props);

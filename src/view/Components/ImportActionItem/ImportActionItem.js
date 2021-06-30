@@ -30,7 +30,7 @@ export class ImportActionItem extends AppComponent {
         this.model = {
             currency: this.props.currencyModel,
             accounts: this.props.accountModel,
-            persons: this.props.personModel
+            persons: this.props.personModel,
         };
 
         this.actionTypes = ImportAction.getTypes();
@@ -42,7 +42,7 @@ export class ImportActionItem extends AppComponent {
 
     /** Shortcut for ImportActionItem constructor */
     static create(props) {
-        var res;
+        let res;
 
         try {
             res = new ImportActionItem(props);
@@ -60,7 +60,7 @@ export class ImportActionItem extends AppComponent {
 
         this.elem = this.createContainer('action-item', [
             this.actionTypeLabel,
-            this.valueLabel
+            this.valueLabel,
         ]);
     }
 
@@ -73,7 +73,7 @@ export class ImportActionItem extends AppComponent {
         this.state = {
             actionId: data.id,
             actionType: data.action_id,
-            value: data.value
+            value: data.value,
         };
 
         this.render(this.state);
@@ -83,7 +83,7 @@ export class ImportActionItem extends AppComponent {
     getData() {
         const res = {
             action_id: this.state.actionType,
-            value: this.state.value
+            value: this.state.value,
         };
 
         if (this.state.actionId) {

@@ -38,7 +38,7 @@ export class ImportTemplateManager extends Component {
         this.model = {
             currency: this.props.currencyModel,
             template: this.props.tplModel,
-            rules: this.props.rulesModel
+            rules: this.props.rulesModel,
         };
 
         this.jsonParseErrorMessage = 'Fail to parse server response';
@@ -51,7 +51,7 @@ export class ImportTemplateManager extends Component {
             transactionAmount: { msg: 'Please select decimal column for transaction amount' },
             transactionCurrency: { msg: 'Please select correct column for transaction currency' },
             date: { msg: 'Please select column for date' },
-            comment: { msg: 'Please select column for comment' }
+            comment: { msg: 'Please select column for comment' },
         };
 
         this.LOADING_STATE = 1;
@@ -63,11 +63,11 @@ export class ImportTemplateManager extends Component {
         this.templateDropDown = DropDown.create({
             input_id: 'templateSel',
             onchange: this.onTemplateChange.bind(this),
-            editable: false
+            editable: false,
         });
         this.columnDropDown = DropDown.create({
             input_id: 'columnSel',
-            editable: false
+            editable: false,
         });
 
         this.tplHeading = ge('tplHeading');
@@ -158,7 +158,7 @@ export class ImportTemplateManager extends Component {
             rawData: null,
             startFromRow: 2,
             rowsToShow: 3,
-            listLoading: false
+            listLoading: false,
         };
         this.render(this.state);
         this.hide();
@@ -233,7 +233,7 @@ export class ImportTemplateManager extends Component {
         this.state.template = new ImportTemplate({
             name: '',
             type_id: 0,
-            columns: {}
+            columns: {},
         });
 
         this.render(this.state);
@@ -260,7 +260,7 @@ export class ImportTemplateManager extends Component {
                 this.state.listLoading = true;
                 this.render(this.state);
                 ajax.post({
-                    url: baseURL + 'api/importtpl/delete',
+                    url: `${baseURL}api/importtpl/delete`,
                     data: JSON.stringify(requestObj),
                     headers: { 'Content-Type': 'application/json' },
                     callback: this.onTemplateRequestResult.bind(this),
@@ -331,8 +331,8 @@ export class ImportTemplateManager extends Component {
     /** Send API request to obain list of import templates */
     requestTemplatesList() {
         ajax.get({
-            url: baseURL + 'api/importtpl/list/',
-            callback: this.onTemplateListResult.bind(this)
+            url: `${baseURL}api/importtpl/list/`,
+            callback: this.onTemplateListResult.bind(this),
         });
     }
 
@@ -371,8 +371,8 @@ export class ImportTemplateManager extends Component {
     /** Send API request to obain list of import rules */
     requestRulesList() {
         ajax.get({
-            url: baseURL + 'api/importrule/list/?extended=true',
-            callback: this.onRulesListResult.bind(this)
+            url: `${baseURL}api/importrule/list/?extended=true`,
+            callback: this.onRulesListResult.bind(this),
         });
     }
 
@@ -418,7 +418,7 @@ export class ImportTemplateManager extends Component {
 
         // Restore selection
         if (!selectedTemplate) {
-            selectedTemplate = templateItems[0];
+            [selectedTemplate] = templateItems;
         }
         this.templateDropDown.selectItem(selectedTemplate.id);
 
@@ -598,8 +598,11 @@ export class ImportTemplateManager extends Component {
             if (state.template) {
                 const columnsInfo = state.template.getColumnsByIndex(columnInd + 1);
                 if (Array.isArray(columnsInfo)) {
-                    const columnElems = columnsInfo.map((column) =>
-                        ce('div', { className: 'raw-data-column__tpl-prop', textContent: column.title }),
+                    const columnElems = columnsInfo.map(
+                        (column) => ce('div', {
+                            className: 'raw-data-column__tpl-prop',
+                            textContent: column.title,
+                        }),
                     );
                     addChilds(tplElem, columnElems);
 
@@ -608,21 +611,24 @@ export class ImportTemplateManager extends Component {
             }
 
             const headElem = ce('div', { className: 'raw-data-column__header', textContent: title });
-            const columnData = dataRows.map((row) =>
-                ce('div', { className: 'raw-data-column__cell', textContent: row[columnInd] }),
+            const columnData = dataRows.map(
+                (row) => ce('div', {
+                    className: 'raw-data-column__cell',
+                    textContent: row[columnInd],
+                }),
             );
 
             return ce(
                 'div',
                 { className: 'raw-data-column' },
                 [tplElem, headElem].concat(columnData),
-                { click: this.onDataColumnClick.bind(this, columnInd) }
+                { click: this.onDataColumnClick.bind(this, columnInd) },
             );
         }, this);
 
         const tableElem = ce('div', { className: 'raw-data-table' }, colElems);
         if (propertiesPerColumn > 1) {
-            tableElem.classList.add('raw-data-table__tpl-' + propertiesPerColumn);
+            tableElem.classList.add(`raw-data-table__tpl-${propertiesPerColumn}`);
         }
 
         removeChilds(this.rawDataTable);

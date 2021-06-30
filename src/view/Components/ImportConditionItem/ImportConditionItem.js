@@ -38,7 +38,7 @@ export class ImportConditionItem extends AppComponent {
             templates: this.props.tplModel,
             currency: this.props.currencyModel,
             accounts: this.props.accountModel,
-            persons: this.props.personModel
+            persons: this.props.personModel,
         };
 
         if (!(this.props.data instanceof ImportCondition)) {
@@ -63,7 +63,7 @@ export class ImportConditionItem extends AppComponent {
         this.elem = this.createContainer('cond-item', [
             this.propertyLabel,
             this.operatorLabel,
-            this.valueLabel
+            this.valueLabel,
         ]);
     }
 
@@ -79,7 +79,7 @@ export class ImportConditionItem extends AppComponent {
             fieldType: data.field_id,
             operator: data.operator,
             isFieldValue: data.isPropertyValue(),
-            value: data.value
+            value: data.value,
         };
 
         this.render(this.state);
@@ -92,7 +92,7 @@ export class ImportConditionItem extends AppComponent {
             field_id: this.state.fieldType,
             operator: this.state.operator,
             value: this.state.value,
-            flags: (this.state.isFieldValue) ? IMPORT_COND_OP_FIELD_FLAG : 0
+            flags: (this.state.isFieldValue) ? IMPORT_COND_OP_FIELD_FLAG : 0,
         };
 
         if (this.state.conditionId) {
@@ -117,8 +117,10 @@ export class ImportConditionItem extends AppComponent {
             return propertyType.title;
         }
 
-        if (state.fieldType === IMPORT_COND_FIELD_TR_CURRENCY
-            || state.fieldType === IMPORT_COND_FIELD_ACC_CURRENCY) {
+        if (
+            state.fieldType === IMPORT_COND_FIELD_TR_CURRENCY
+            || state.fieldType === IMPORT_COND_FIELD_ACC_CURRENCY
+        ) {
             const valueItem = this.model.currency.getItem(state.value);
             if (!valueItem) {
                 throw new Error('Invalid currency');
@@ -176,5 +178,4 @@ export class ImportConditionItem extends AppComponent {
         }
         this.valueLabel.textContent = this.formatValue(state);
     }
-
 }

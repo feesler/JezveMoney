@@ -9,6 +9,8 @@ import {
 import { createMessage } from '../../js/app.js';
 import { Uploader } from '../../js/component/uploader.js';
 
+/* global baseURL */
+
 /**
  * ImportFileUploader component constructor
  */
@@ -62,7 +64,7 @@ export class ImportFileUploader extends Component {
         this.formElem.reset();
         this.state = {
             fileName: null,
-            collapsed: false
+            collapsed: false,
         };
         this.render(this.state);
     }
@@ -117,7 +119,7 @@ export class ImportFileUploader extends Component {
             { template: 0, encode: isEncoded },
             this.onImportSuccess.bind(this),
             this.onImportError.bind(this),
-            this.onImportProgress.bind(this)
+            this.onImportProgress.bind(this),
         );
         uploader.upload();
 
@@ -196,7 +198,7 @@ export class ImportFileUploader extends Component {
         ajax.post({
             url: `${baseURL}api/import/upload/`,
             data: urlJoin(reqObj),
-            callback: this.onImportSuccess.bind(this)
+            callback: this.onImportSuccess.bind(this),
         });
 
         if (isFunction(this.uploadStartHandler)) {

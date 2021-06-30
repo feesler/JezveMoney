@@ -75,7 +75,7 @@ export class ImportActionForm extends AppComponent {
         this.amountInput = ce('input', { type: 'text' });
         this.decAmountInput = DecimalInput.create({
             elem: this.amountInput,
-            oninput: this.onValueChange.bind(this)
+            oninput: this.onValueChange.bind(this),
         });
         this.amountField = this.createField('Amount', this.amountInput);
         // Create value input element
@@ -111,7 +111,7 @@ export class ImportActionForm extends AppComponent {
         );
 
         this.controls = this.createContainer('action-form__controls', [
-            this.delBtn
+            this.delBtn,
         ]);
 
         this.elem = this.createContainer('action-form', [
@@ -153,7 +153,9 @@ export class ImportActionForm extends AppComponent {
 
     /** Create account field */
     createAccountField() {
-        const items = this.model.accounts.map((account) => ({ id: account.id, title: account.name }));
+        const items = this.model.accounts.map(
+            (account) => ({ id: account.id, title: account.name }),
+        );
 
         const selectElem = ce('select');
         this.accountField = this.createField('Account', selectElem);
