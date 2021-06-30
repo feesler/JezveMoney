@@ -152,31 +152,8 @@ class Statistics extends TemplateController
 
         $titleString = "Jezve Money | Statistics";
 
-        array_push(
-            $this->css->libs,
-            "lib/iconlink.css",
-            "lib/dropdown.css",
-            "lib/datepicker.css",
-            "lib/charts.css"
-        );
-        $this->css->page[] = "statistics.css";
         $this->buildCSS();
-
-        array_push(
-            $this->jsArr,
-            "model/list.js",
-            "model/currency.js",
-            "lib/selection.js",
-            "lib/datepicker.js",
-            "lib/dropdown.js",
-            "lib/charts/chartgrid.js",
-            "lib/charts/basechart.js",
-            "lib/charts/histogram.js",
-            "component/header.js",
-            "component/iconlink.js",
-            "view.js",
-            "statisticsview.js"
-        );
+        $this->jsArr[] = "StatisticsView.js";
 
         include(TPL_PATH . "statistics.tpl");
     }

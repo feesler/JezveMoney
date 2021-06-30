@@ -3,7 +3,7 @@
 ?>
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
 </head>
-<body>
+<body class="<?=($this->themeClass)?>">
 <div class="page">
     <div class="page_wrapper">
 <?php	require_once(TPL_PATH."header.tpl");	?>
@@ -131,14 +131,14 @@
     </div>
 </div>
 
-<?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-    var view = new StatisticsView({
-        currency: <?=JSON::encode($currArr)?>,
-        accountCurrency: <?=$accCurr?>,
-        filter: <?=JSON::encode($filterObj)?>,
-        chartData: <?=JSON::encode($statArr)?>
-    });
+window.app = {
+    currency: <?=JSON::encode($currArr)?>,
+    accountCurrency: <?=$accCurr?>,
+    filter: <?=JSON::encode($filterObj)?>,
+    chartData: <?=JSON::encode($statArr)?>
+};
 </script>
+<?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

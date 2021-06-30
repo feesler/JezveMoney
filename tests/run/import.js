@@ -1,13 +1,13 @@
-import { App } from '../app.js';
-import { test, copyObject } from '../common.js';
-import { Currency } from '../model/currency.js';
-import { ImportTemplate } from '../model/importtemplate.js';
-import { ImportTransaction } from '../model/importtransaction.js';
-import { ImportList } from '../view/component/importlist.js';
-import { ImportListItem } from '../view/component/importlistitem.js';
-import { ImportView } from '../view/import.js';
-import { TransactionsView } from '../view/transactions.js';
-import { ImportViewSubmitError } from '../error/importviewsubmit.js';
+import { test, copyObject } from 'jezve-test';
+import { App } from '../Application.js';
+import { Currency } from '../model/Currency.js';
+import { ImportTemplate } from '../model/ImportTemplate.js';
+import { ImportTransaction } from '../model/ImportTransaction.js';
+import { ImportList } from '../view/component/Import/ImportList.js';
+import { ImportListItem } from '../view/component/Import/ImportListItem.js';
+import { ImportView } from '../view/ImportView.js';
+import { TransactionsView } from '../view/TransactionsView.js';
+import { ImportViewSubmitError } from '../error/ImportViewSubmitError.js';
 
 /** Reexport import templates and import rules runners */
 export * from './import/templates.js';

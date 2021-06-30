@@ -1,5 +1,5 @@
-import { NodeEnvironment } from './env/node.js';
-import { App } from './app.js';
+import { NodeEnvironment } from 'jezve-test/NodeEnvironment';
+import options from './options.js';
 
-const env = new NodeEnvironment();
-env.init(App);
+const environment = new NodeEnvironment();
+environment.init(options);

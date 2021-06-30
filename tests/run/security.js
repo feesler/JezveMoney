@@ -1,5 +1,5 @@
-import { test } from '../common.js';
-import { App } from '../app.js';
+import { test } from 'jezve-test';
+import { App } from '../Application.js';
 
 export async function checkAccess(url) {
     await test(`Check access to ${url}`, async () => {

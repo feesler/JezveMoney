@@ -1,7 +1,8 @@
+import { test } from 'jezve-test';
 import { api } from '../../model/api.js';
-import { ApiRequestError } from '../../error/apirequest.js';
-import { test, formatProps } from '../../common.js';
-import { App } from '../../app.js';
+import { ApiRequestError } from '../../error/ApiRequestError.js';
+import { formatProps } from '../../common.js';
+import { App } from '../../Application.js';
 
 /**
  * Create person with specified params and check expected state of app

@@ -33,16 +33,8 @@ class Profile extends TemplateController
             $titleString .= " | Change password";
         }
 
-        $this->css->libs[] = "lib/iconlink.css";
-        $this->css->page[] = "user.css";
         $this->buildCSS();
-        array_push(
-            $this->jsArr,
-            "component/header.js",
-            "component/confirmdialog.js",
-            "view.js",
-            "profileview.js"
-        );
+        $this->jsArr[] = "ProfileView.js";
 
         include(TPL_PATH . "profile.tpl");
     }

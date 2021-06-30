@@ -1229,9 +1229,9 @@
         </div>
     </div>
 </div>
-<?php	include(ADMIN_TPL_PATH."footer.tpl");	?>
 <script>
-var view = new AdminApiConsoleView();
+window.app = {};
 </script>
+<?php	include(ADMIN_TPL_PATH."footer.tpl");	?>
 </body>
 </html>

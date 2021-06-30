@@ -1,0 +1,115 @@
+/* Import condition create/update form */
+.cond-form {
+  display: flex;
+  flex-flow: row nowrap;
+  max-height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 4px;
+}
+
+.cond-form + .cond-form {
+  margin-top: 3px;
+}
+
+/* Form container */
+.cond-form__container {
+  display: flex;
+  flex-flow: column nowrap;
+  max-height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Fields container */
+.cond-form__fields {
+  display: flex;
+  flex-flow: column nowrap;
+  max-height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Input field and label group */
+.cond-form .field {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  margin: 0 0 4px 0;
+}
+
+.cond-form .field label {
+  width: 20%;
+  font-size: 14px;
+  min-width: 70px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.cond-form .dd__combo {
+  min-height: auto;
+  padding-right: 30px;
+}
+
+.cond-form .dd__combo,
+.cond-form .dd__list {
+  border-width: 1px;
+}
+
+.cond-form input[type="text"] {
+  display: flex;
+  border: 1px solid;
+  padding: 5px;
+  height: 32px;
+  box-sizing: border-box;
+}
+
+.value-field {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.value-field .checkwrap {
+  margin-left: 20%;
+}
+
+/* Controls container */
+.cond-form__controls {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+/* Update and delete buttons */
+.cond-form .icon-btn,
+.cond-form .icon-btn:visited,
+.cond-form .icon-btn:active {
+  background: none;
+  cursor: pointer;
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .cond-form__fields {
+    flex-flow: row nowrap;
+  }
+
+  .cond-form .field {
+    flex-flow: column nowrap;
+    align-items: normal;
+    margin: 0 8px 0 0;
+  }
+
+  .cond-form .field label {
+    width: auto;
+    min-width: auto;
+    font-size: 12px;
+    text-align: left;
+  }
+
+  .value-field .checkwrap {
+    margin-left: 0;
+  }
+}

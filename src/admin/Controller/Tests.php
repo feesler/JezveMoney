@@ -21,16 +21,10 @@ class Tests extends AdminController
         $iconMod = IconModel::getInstance();
         $icons = $iconMod->getData();
 
-        $this->cssAdmin[] = "tests.css";
+        $this->cssArr = ["lib/common.css", "app.css"];
+        $this->cssAdmin = ["admin.css", "tests.css"];
         $this->buildCSS();
 
-        $this->jsArr = [
-            "lib/common.js",
-            "lib/ajax.js",
-            "lib/component.js",
-            "lib/popup.js",
-            "app.js"
-        ];
         $this->jsAdmin[] = "tests/index.js";
 
         include(ADMIN_TPL_PATH . "tests.tpl");

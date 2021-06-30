@@ -64,10 +64,9 @@
     </div>
 </form>
 
-<?php	include(ADMIN_TPL_PATH."footer.tpl");	?>
-
 <script>
-var view = new AdminIconListView(<?=JSON::encode($viewData)?>);
+window.app = <?=JSON::encode($viewData)?>;
 </script>
+<?php	include(ADMIN_TPL_PATH."footer.tpl");	?>
 </body>
 </html>

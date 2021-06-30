@@ -1,7 +1,7 @@
+import { test } from 'jezve-test';
 import { api } from '../model/api.js';
-import { ApiRequestError } from '../error/apirequest.js';
-import { test } from '../common.js';
-import { App } from '../app.js';
+import { ApiRequestError } from '../error/ApiRequestError.js';
+import { App } from '../Application.js';
 
 export async function deleteUserIfExist({ login }) {
     const users = await api.user.list();

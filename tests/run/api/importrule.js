@@ -1,12 +1,8 @@
+import { test, copyObject } from 'jezve-test';
 import { api } from '../../model/api.js';
-import { ApiRequestError } from '../../error/apirequest.js';
-import {
-    test,
-    copyObject,
-    setParam,
-    formatProps,
-} from '../../common.js';
-import { App } from '../../app.js';
+import { ApiRequestError } from '../../error/ApiRequestError.js';
+import { formatProps } from '../../common.js';
+import { App } from '../../Application.js';
 
 /**
  * Create import rule with specified params and check expected state of app
@@ -61,7 +57,7 @@ export async function update(params) {
         if (!resExpected) {
             updParams.conditions = [];
             updParams.actions = [];
-            setParam(updParams, props);
+            Object.assign(updParams, props);
         }
 
         // Send API sequest to server

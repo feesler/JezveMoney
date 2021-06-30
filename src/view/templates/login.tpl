@@ -1,6 +1,6 @@
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
 </head>
-<body>
+<body class="<?=($this->themeClass)?>">
 <form id="loginfrm" action="<?=BASEURL?>login/" method="post">
 <div class="layer login-layer">
     <div class="layer-box">
@@ -34,8 +34,5 @@
 </form>
 
 <?php	include(TPL_PATH."footer.tpl");	?>
-<script>
-var view = new LoginView();
-</script>
 </body>
 </html>

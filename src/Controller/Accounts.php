@@ -34,26 +34,8 @@ class Accounts extends TemplateController
 
         $titleString = "Jezve Money | Accounts";
 
-        array_push(
-            $this->css->libs,
-            "tiles.css",
-            "lib/iconlink.css",
-            "toolbar.css"
-        );
         $this->buildCSS();
-        array_push(
-            $this->jsArr,
-            "model/list.js",
-            "model/account.js",
-            "model/currency.js",
-            "lib/selection.js",
-            "component/header.js",
-            "component/toolbar.js",
-            "component/iconlink.js",
-            "component/confirmdialog.js",
-            "view.js",
-            "accountlistview.js"
-        );
+        $this->jsArr[] = "AccountListView.js";
 
         include(TPL_PATH . "accounts.tpl");
     }
@@ -96,28 +78,8 @@ class Accounts extends TemplateController
         $headString = "New account";
         $titleString .= $headString;
 
-        array_push(
-            $this->css->libs,
-            "lib/iconlink.css",
-            "lib/dropdown.css",
-            "tiles.css"
-        );
         $this->buildCSS();
-        array_push(
-            $this->jsArr,
-            "model/list.js",
-            "model/currency.js",
-            "model/account.js",
-            "model/icon.js",
-            "lib/selection.js",
-            "lib/dropdown.js",
-            "lib/decimalinput.js",
-            "component/header.js",
-            "component/tile.js",
-            "component/accounttile.js",
-            "view.js",
-            "accountview.js"
-        );
+        $this->jsArr[] = "AccountView.js";
 
         include(TPL_PATH . "account.tpl");
     }
@@ -165,31 +127,8 @@ class Accounts extends TemplateController
         $headString = "Edit account";
         $titleString .= $headString;
 
-        array_push(
-            $this->css->libs,
-            "lib/iconlink.css",
-            "lib/dropdown.css",
-            "tiles.css"
-        );
         $this->buildCSS();
-
-        array_push(
-            $this->jsArr,
-            "model/list.js",
-            "model/currency.js",
-            "model/account.js",
-            "model/icon.js",
-            "lib/selection.js",
-            "lib/dropdown.js",
-            "lib/decimalinput.js",
-            "component/header.js",
-            "component/tile.js",
-            "component/accounttile.js",
-            "component/iconlink.js",
-            "component/confirmdialog.js",
-            "view.js",
-            "accountview.js"
-        );
+        $this->jsArr[] = "AccountView.js";
 
         include(TPL_PATH . "account.tpl");
     }

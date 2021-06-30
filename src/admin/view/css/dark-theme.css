@@ -1,78 +1,78 @@
-body {
+body.dark-theme {
   color: #dddddd;
   background-color: #101010;
 }
 
-.admin-tbl,
-.admin-tbl th,
-.admin-tbl td {
+.dark-theme .admin-tbl,
+.dark-theme .admin-tbl th,
+.dark-theme .admin-tbl td {
   border-color: #dddddd;
 }
 
-.admin-tbl tr:hover td {
+/* Tests */
+.dark-theme .results-container td {
+  border-color: #dddddd;
+}
+
+.dark-theme .admin-tbl tr:hover td {
   background-color: #444444;
 }
 
-textarea {
+.dark-theme textarea {
   color: #dddddd;
   border-color: #dddddd;
   background-color: #202020;
 }
 
 /* Popup */
-.popup__content .popup__content-box {
+.dark-theme .popup__content .popup__content-box {
   color: #dddddd;
   background-color: #303030;
 }
 
-.popup__title,
-.popup__message {
+.dark-theme .popup__title,
+.dark-theme .popup__message {
   color: #dddddd;
-}
-
-/* Tests */
-.results-container td {
-  border-color: #dddddd;
 }
 
 /* API tests */
-.left-column,
-.right-column {
+.dark-theme .left-column,
+.dark-theme .right-column {
   background-color: #202020;
 }
 
-.menu-list > li > button {
+.dark-theme .menu-list > li > button {
   color: #dddddd;
 }
 
-.menu-list .sub-menu-list > li:hover {
+.dark-theme .menu-list .sub-menu-list > li:hover {
   color: #b0b0b0;
 }
 
-.request-data-form {
+.dark-theme .request-data-form {
   background-color: #444444;
   border-color: #202020;
 }
 
-.request-data-form input[type="text"] {
+.dark-theme .request-data-form input[type="text"] {
   color: #dddddd;
   border-color: #dddddd;
   background-color: #101010;
 }
 
-.request-data-form input[disabled],
-.request-data-form select[disabled],
-.request-data-form textarea[disabled] {
+.dark-theme .request-data-form input[disabled],
+.dark-theme .request-data-form select[disabled],
+.dark-theme .request-data-form textarea[disabled] {
   color: #888888;
   border-color: #888888;
 }
 
-.request-item {
+.dark-theme .request-item {
   border-color: #444444;
   background-color: #444444;
 }
 
-.request-item .response-container.response-container_pending {
+.dark-theme .request-item .response-container.response-container_pending {
   border-color: #444444;
   color: #444444;
 }

@@ -217,35 +217,8 @@ class Transactions extends TemplateController
 
         $titleString = "Jezve Money | Transactions";
 
-        array_push(
-            $this->css->libs,
-            "tiles.css",
-            "lib/iconlink.css",
-            "lib/datepicker.css",
-            "lib/dropdown.css",
-            "trlist.css",
-            "toolbar.css"
-        );
-        $this->css->page[] = "transaction.css";
         $this->buildCSS();
-
-        array_push(
-            $this->jsArr,
-            "model/list.js",
-            "model/currency.js",
-            "model/account.js",
-            "lib/selection.js",
-            "lib/datepicker.js",
-            "lib/dragndrop.js",
-            "lib/sortable.js",
-            "lib/dropdown.js",
-            "component/header.js",
-            "component/toolbar.js",
-            "component/iconlink.js",
-            "component/confirmdialog.js",
-            "view.js",
-            "translistview.js"
-        );
+        $this->jsArr[] = "TransactionListView.js";
 
         include(TPL_PATH . "transactions.tpl");
     }
@@ -563,36 +536,8 @@ class Transactions extends TemplateController
         }
         $titleString .= $headString;
 
-        array_push(
-            $this->css->libs,
-            "tiles.css",
-            "lib/iconlink.css",
-            "lib/dropdown.css",
-            "lib/datepicker.css"
-        );
-        $this->css->page[] = "transaction.css";
         $this->buildCSS();
-
-        array_push(
-            $this->jsArr,
-            "model/list.js",
-            "model/currency.js",
-            "model/icon.js",
-            "model/account.js",
-            "model/person.js",
-            "model/transaction.js",
-            "lib/selection.js",
-            "lib/datepicker.js",
-            "lib/dropdown.js",
-            "lib/decimalinput.js",
-            "component/header.js",
-            "component/tile.js",
-            "component/accounttile.js",
-            "component/tileinfoitem.js",
-            "component/iconlink.js",
-            "view.js",
-            "transactionview.js"
-        );
+        $this->jsArr[] = "TransactionView.js";
 
         include(TPL_PATH . "transaction.tpl");
     }
@@ -850,37 +795,8 @@ class Transactions extends TemplateController
         }
         $titleString .= $headString;
 
-        array_push(
-            $this->css->libs,
-            "tiles.css",
-            "lib/iconlink.css",
-            "lib/dropdown.css",
-            "lib/datepicker.css"
-        );
-        $this->css->page[] = "transaction.css";
         $this->buildCSS();
-
-        array_push(
-            $this->jsArr,
-            "model/list.js",
-            "model/currency.js",
-            "model/icon.js",
-            "model/account.js",
-            "model/person.js",
-            "model/transaction.js",
-            "lib/selection.js",
-            "lib/datepicker.js",
-            "lib/dropdown.js",
-            "lib/decimalinput.js",
-            "component/header.js",
-            "component/tile.js",
-            "component/accounttile.js",
-            "component/tileinfoitem.js",
-            "component/iconlink.js",
-            "component/confirmdialog.js",
-            "view.js",
-            "transactionview.js"
-        );
+        $this->jsArr[] = "TransactionView.js";
 
         include(TPL_PATH . "transaction.tpl");
     }

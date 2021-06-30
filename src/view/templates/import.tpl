@@ -3,7 +3,7 @@
 ?>
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
 </head>
-<body>
+<body class="<?=($this->themeClass)?>">
 <div class="page">
     <div class="page_wrapper">
 <?php	require_once(TPL_PATH."header.tpl");		?>
@@ -180,9 +180,9 @@
 </div>
 
 <?php	include(TPL_PATH."icons.tpl");	?>
-<?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-var view = new ImportView(<?=JSON::encode($viewData)?>);
+window.app = <?=JSON::encode($viewData)?>;
 </script>
+<?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

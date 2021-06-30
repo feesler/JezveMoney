@@ -1,9 +1,9 @@
 {
     "name": "henryfeesler/jezvemoney",
-    "version": "1.6.1",
+    "version": "1.7.0",
     "description": "",
 	"config": {
-		"vendor-dir": "src/vendor",
+		"vendor-dir": "vendor",
 		"classmap-authoritative": true
 	},
 	"require": {
@@ -11,11 +11,11 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"JezveMoney\\Core\\": "src/system/",
-			"JezveMoney\\App\\": "src/",
-			"JezveMoney\\App\\Admin\\": "src/admin/",
-			"JezveMoney\\App\\API\\": "src/api/",
-			"JezveMoney\\App\\Item\\": "src/api/Item/"
+			"JezveMoney\\Core\\": "system/",
+			"JezveMoney\\App\\": "",
+			"JezveMoney\\App\\Admin\\": "admin/",
+			"JezveMoney\\App\\API\\": "api/",
+			"JezveMoney\\App\\Item\\": "api/Item/"
 		}
 	}
 }

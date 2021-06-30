@@ -41,22 +41,22 @@
 .tile_container {
   width: 100px;
   height: 100px;
-  padding: 8px 5px 8px 0px;
+  padding: 8px 5px 8px 0;
 }
 
 .tile-info-block {
   height: 100px;
   min-width: 100px;
-  margin: 8px 20px 10px 0px;
+  margin: 8px 20px 10px 0;
   overflow: hidden;
 }
 
 .tile-info-block > div {
-  margin: 0px 0px 10px 0px;
+  margin: 0 0 10px 0;
 }
 
 .account-toggler {
-  padding: 8px 5px 8px 0px;
+  padding: 8px 5px 8px 0;
 }
 
 .account-container {
@@ -68,7 +68,7 @@
 
 /* Debt operation type selector */
 .debt-op-selector {
-  margin: 2px 0px 10px 0px;
+  margin: 2px 0 10px 0;
   display: inline-flex;
   flex-flow: row nowrap;
   align-items: center;
@@ -89,7 +89,7 @@
 
 .debt-op-selector span {
   line-height: 22px;
-  margin: 0px 10px 0px 5px;
+  margin: 0 10px 0 5px;
 }
 
 /* transactions page filer */

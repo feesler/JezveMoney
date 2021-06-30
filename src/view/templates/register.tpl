@@ -1,6 +1,6 @@
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
 </head>
-<body>
+<body class="<?=($this->themeClass)?>">
 <?php	require_once(TPL_PATH."header.tpl");		?>
 <form id="regfrm" action="<?=BASEURL?>register/" method="post">
 <div class="layer register-layer">
@@ -34,8 +34,5 @@
 </form>
 
 <?php	include(TPL_PATH."footer.tpl");	?>
-<script>
-var view = new RegisterView();
-</script>
 </body>
 </html>

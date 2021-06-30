@@ -1,8 +1,8 @@
+import { test } from 'jezve-test';
 import * as TransactionTests from './common.js';
-import { test } from '../../common.js';
-import { TRANSFER } from '../../model/transaction.js';
-import { TransferTransactionView } from '../../view/transaction/transfer.js';
-import { App } from '../../app.js';
+import { TRANSFER } from '../../model/Transaction.js';
+import { TransferTransactionView } from '../../view/transaction/TransferTransactionView.js';
+import { App } from '../../Application.js';
 
 export async function submit(params) {
     if ('srcAcc' in params) {

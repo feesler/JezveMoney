@@ -1,0 +1,286 @@
+/* Transaction item */
+.import-item {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  margin: 2px 0;
+}
+
+.import-item .form-container {
+  display: flex;
+  flex-flow: column nowrap;
+  flex-grow: 1;
+}
+
+.import-item .form-rows {
+  display: flex;
+  flex-flow: column nowrap;
+  flex-grow: 1;
+}
+
+.import-item .form-row {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+/* Data value static element */
+.data-value {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.data-value label {
+  font-size: 14px;
+  font-weight: 800;
+  padding: 2px 8px;
+  width: 20%;
+  min-width: 120px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.data-value div {
+  font-size: 16px;
+  padding: 2px 8px;
+}
+
+/* Input field and label group */
+.field {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  margin: 0 0 4px 0;
+}
+
+.field label {
+  width: 15%;
+  font-size: 14px;
+  min-width: 70px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.amount-field input {
+  min-width: 50px;
+  max-width: 130px;
+}
+
+.date-field input {
+  min-width: 50px;
+  max-width: 100px;
+}
+
+.amount-field input,
+.date-field input,
+.comment-field input {
+  width: 100%;
+}
+
+.import-item .form-row .comment-field,
+.import-item .form-row .comment-field div {
+  flex-grow: 1;
+}
+
+/* Controls */
+.import-item .controls {
+  align-items: center;
+}
+
+.import-item .dd__container {
+  display: flex;
+  box-sizing: border-box;
+}
+
+.import-item .dd__combo,
+.import-item .dd__container.dd__container_disabled .dd__combo {
+  border: 1px solid;
+}
+
+.import-item input[type="text"] {
+  display: flex;
+  border: 1px solid;
+  padding: 5px;
+  height: 34px;
+  box-sizing: border-box;
+}
+
+.import-item input[type="button"] {
+  width: 30px;
+  border: 0 none;
+  pointer-events: all;
+}
+
+/* Enable/disable item checkbox container */
+.import-item .enable-check {
+  display: flex;
+  align-items: center;
+}
+
+.import-item .enable-check input[type="checkbox"] {
+  margin: 0 8px;
+  width: 20px;
+  pointer-events: all;
+}
+
+/* Disabled transaction row */
+.import-item_disabled .dd__container,
+.import-item_disabled input[type="text"],
+.import-item_disabled input[disabled] {
+  pointer-events: none;
+}
+
+/* Common buttons style */
+.import-item .btn,
+.import-item .btn:visited,
+.import-item .btn:active {
+  pointer-events: all;
+  background: none;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.import-item .btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Toggle expand/collapse button */
+.import-item .toggle-btn,
+.import-item .toggle-btn:visited,
+.import-item .toggle-btn:active {
+  padding: 7px;
+}
+
+.import-item .toggle-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.import-item_expanded .toggle-btn svg {
+  transform: rotate(180deg);
+}
+
+/* Container for transaction form */
+.import-item .main-content {
+  padding: 4px 0 0 0;
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+/* Container for extended conten */
+.import-item .extended-content {
+  display: none;
+  border-top: 1px solid;
+  padding: 8px;
+  overflow: hidden;
+}
+
+.import-item.import-item_expanded .extended-content {
+  display: flex;
+}
+
+/* Original import data container */
+.orig-data {
+  display: flex;
+  flex-flow: column nowrap;
+  width: 100%;
+}
+
+.orig-data h3 {
+  font-size: 14px;
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+
+/* Original import data table */
+.orig-data-table {
+  display: flex;
+  flex-flow: column nowrap;
+  width: 100%;
+}
+
+/* Placeholder */
+.import-item__placeholder {
+  border: 1px dashed;
+  height: 56px;
+  margin: 3px 0;
+}
+
+.import-item__placeholder * {
+  opacity: 0;
+}
+
+/* Validation */
+.import-item .invalid-feedback {
+  padding: 4px 8px;
+  color: #ff0000;
+}
+
+.field.invalid-block label {
+  color: #ff0000;
+}
+
+.import-item .field.invalid-block input,
+.import-item .field.invalid-block .dd__combo {
+  border-color: #ff0000;
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .import-item .form-container {
+    flex-flow: row nowrap;
+  }
+
+  .import-item .form-row {
+    flex-flow: row nowrap;
+  }
+
+  .import-item .main-content {
+    padding: 4px 0 6px 0;
+  }
+
+  .field {
+    flex-flow: column nowrap;
+    align-items: normal;
+    margin: 0 8px 0 0;
+  }
+
+  .field label {
+    width: auto;
+    min-width: auto;
+    font-size: 12px;
+    text-align: left;
+  }
+
+  .import-item .controls {
+    align-items: start;
+    padding-top: 16px;
+  }
+
+  .orig-data-table {
+    flex-flow: row nowrap;
+  }
+
+  .data-value {
+    flex-flow: column nowrap;
+  }
+
+  .data-value label {
+    padding: 2px 8px;
+    width: auto;
+    min-width: auto;
+  }
+
+  .data-value div {
+    padding: 2px 8px;
+    min-width: auto;
+    text-align: right;
+  }
+
+  .data-value.comment-value div {
+    text-align: left;
+  }
+}

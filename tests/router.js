@@ -1,18 +1,18 @@
-import { MainView } from './view/main.js';
-import { LoginView } from './view/login.js';
-import { RegisterView } from './view/register.js';
-import { ProfileView } from './view/profile.js';
-import { AccountView } from './view/account.js';
-import { AccountsView } from './view/accounts.js';
-import { PersonView } from './view/person.js';
-import { PersonsView } from './view/persons.js';
-import { TransactionsView } from './view/transactions.js';
-import { ExpenseTransactionView } from './view/transaction/expense.js';
-import { IncomeTransactionView } from './view/transaction/income.js';
-import { TransferTransactionView } from './view/transaction/transfer.js';
-import { DebtTransactionView } from './view/transaction/debt.js';
-import { ImportView } from './view/import.js';
-import { StatisticsView } from './view/statistics.js';
+import { MainView } from './view/MainView.js';
+import { LoginView } from './view/LoginView.js';
+import { RegisterView } from './view/RegisterView.js';
+import { ProfileView } from './view/ProfileView.js';
+import { AccountView } from './view/AccountView.js';
+import { AccountsView } from './view/AccountsView.js';
+import { PersonView } from './view/PersonView.js';
+import { PersonsView } from './view/PersonsView.js';
+import { TransactionsView } from './view/TransactionsView.js';
+import { ExpenseTransactionView } from './view/transaction/ExpenseTransactionView.js';
+import { IncomeTransactionView } from './view/transaction/IncomeTransactionView.js';
+import { TransferTransactionView } from './view/transaction/TransferTransactionView.js';
+import { DebtTransactionView } from './view/transaction/DebtTransactionView.js';
+import { ImportView } from './view/ImportView.js';
+import { StatisticsView } from './view/StatisticsView.js';
 
 /** Process request url and return view class if match */
 export async function route(env, url) {

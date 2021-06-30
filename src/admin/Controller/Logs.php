@@ -15,6 +15,8 @@ class Logs extends AdminController
 
         $titleString = "Admin panel | Log";
 
+        $this->cssArr = ["lib/common.css", "app.css"];
+        $this->cssAdmin = ["admin.css"];
         $this->buildCSS();
 
         include(ADMIN_TPL_PATH . "log.tpl");

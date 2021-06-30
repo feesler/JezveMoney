@@ -29,20 +29,11 @@ abstract class TemplateController extends Controller
 
     public function initDefResources()
     {
-        $this->css = new \stdClass();
-        $this->css->clear = ["lib/common.css"];
-        $this->css->libs = ["lib/popup.css"];
-        $this->css->app = ["app.css"];
-        $this->css->page = [];
+        $this->cssArr = [];
 
         $this->jsArr = [
-            "lib/classList.min.js",
-            "lib/polyfill.min.js",
-            "lib/common.js",
-            "lib/ajax.js",
-            "lib/component.js",
-            "lib/popup.js",
-            "app.js"
+            "polyfill/classList.min.js",
+            "polyfill/polyfill.min.js"
         ];
     }
 
@@ -59,20 +50,10 @@ abstract class TemplateController extends Controller
 
     protected function buildCSS()
     {
-        if (is_null($this->css)) {
-            return;
-        }
-
-        $this->cssArr = array_merge(
-            (array)$this->css->clear,
-            (array)$this->css->libs,
-            (array)$this->css->app,
-            (array)$this->css->page
-        );
-
         $this->userTheme = $this->uMod->getUserTheme();
         $this->themes = getThemes("view/css/");
-        $this->themeStylesheet = $this->themes[$this->userTheme];
+        $this->themeStylesheet = $this->themes[$this->userTheme]["file"];
+        $this->themeClass = $this->themes[$this->userTheme]["className"];
     }
 
 

@@ -34,14 +34,8 @@ class User extends TemplateController
 
         $titleString = "Jezve Money | Log in";
 
-        $this->css->page[] = "user.css";
         $this->buildCSS();
-        array_push(
-            $this->jsArr,
-            "component/header.js",
-            "view.js",
-            "loginview.js"
-        );
+        $this->jsArr[] = "LoginView.js";
 
         include(TPL_PATH . "login.tpl");
     }
@@ -82,15 +76,8 @@ class User extends TemplateController
 
         $titleString = "Jezve Money | Registration";
 
-        $this->css->page[] = "user.css";
         $this->buildCSS();
-
-        array_push(
-            $this->jsArr,
-            "component/header.js",
-            "view.js",
-            "registerview.js"
-        );
+        $this->jsArr[] = "RegisterView.js";
 
         include(TPL_PATH . "register.tpl");
     }

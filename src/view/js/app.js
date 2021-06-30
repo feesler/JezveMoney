@@ -1,49 +1,46 @@
-'use strict';
-
-/* global isDate, Popup */
-/* exported EXPENSE, INCOME, TRANSFER, DEBT */
-/* exported formatDate, amountFix, fixDate, timestampFromString */
-/* exported createMessage, fixFloat, correct, correctExch, normalize, normalizeExch, isValidValue */
+import { isDate, Popup } from 'jezvejs';
 
 /** Types of transactions */
-var EXPENSE = 1;
-var INCOME = 2;
-var TRANSFER = 3;
-var DEBT = 4;
+export const EXPENSE = 1;
+export const INCOME = 2;
+export const TRANSFER = 3;
+export const DEBT = 4;
 
-var messageBox = null;
+let messageBox = null;
 
-/**
- * Format date as DD.MM.YYYY
- * @param {Date} date - date to format
- */
-function formatDate(date) {
-    var month;
-    var year;
-    var day;
+/* Convert number to string and prepend zero if value is less than 10 */
+export function leadZero(val) {
+    const v = parseInt(val, 10);
+    if (Number.isNaN(v)) {
+        throw new Error('Invalid value');
+    }
 
+    if (v < 10) {
+        return `0${v}`;
+    }
+
+    return v.toString();
+}
+
+/** Format date as DD.MM.YYYY */
+export function formatDate(date) {
     if (!isDate(date)) {
         throw new Error('Invalid type of parameter');
     }
 
-    month = date.getMonth();
-    year = date.getFullYear();
-    day = date.getDate();
-
-    return ((day > 9) ? '' : '0') + day + '.'
-        + ((month + 1 > 9) ? '' : '0') + (month + 1) + '.'
-        + year;
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const day = date.getDate();
+    return `${leadZero(day)}.${leadZero(month)}.${leadZero(year)}`;
 }
 
 /** Convert DD.MM.YYYY string to timestamp */
-function fixDate(str) {
-    var res;
-
+export function fixDate(str) {
     if (typeof str !== 'string') {
         return null;
     }
 
-    res = Date.parse(str.split('.').reverse().join('-'));
+    const res = Date.parse(str.split('.').reverse().join('-'));
     if (Number.isNaN(res)) {
         return null;
     }
@@ -52,10 +49,7 @@ function fixDate(str) {
 }
 
 /** Convert date string to timestamp */
-function timestampFromString(str) {
-    var tmpDate;
-    var pos;
-
+export function timestampFromString(str) {
     if (typeof str === 'number') {
         return str;
     }
@@ -66,8 +60,8 @@ function timestampFromString(str) {
         throw new Error('Invalid type of parameter');
     }
 
-    tmpDate = str;
-    pos = str.indexOf(' ');
+    let tmpDate = str;
+    const pos = str.indexOf(' ');
     if (pos !== -1) {
         tmpDate = tmpDate.substr(0, pos);
     }
@@ -80,7 +74,7 @@ function timestampFromString(str) {
  * @param {string} message - notification text
  * @param {string} msgClass - CSS class for message box
  */
-function createMessage(message, msgClass) {
+export function createMessage(message, msgClass) {
     if (messageBox) {
         messageBox.destroy();
         messageBox = null;
@@ -90,9 +84,9 @@ function createMessage(message, msgClass) {
         id: 'notificationPopup',
         content: message,
         btn: { closeBtn: true },
-        additional: 'msg ' + msgClass,
+        additional: `msg ${msgClass}`,
         nodim: true,
-        closeOnEmptyClick: true
+        closeOnEmptyClick: true,
     });
 
     messageBox.show();
@@ -102,17 +96,15 @@ function createMessage(message, msgClass) {
  * Fix string to correct float number format
  * @param {string} str - decimal value string
  */
-function fixFloat(str) {
-    var res;
-
+export function fixFloat(str) {
     if (typeof str === 'number') {
         return str;
     }
 
     if (typeof str === 'string') {
-        res = str.replace(/,/g, '.');
+        let res = str.replace(/,/g, '.');
         if (res.indexOf('.') === 0 || !res.length) {
-            res = '0' + res;
+            res = `0${res}`;
         }
         return res;
     }
@@ -121,9 +113,7 @@ function fixFloat(str) {
 }
 
 /** Convert string to amount value */
-function amountFix(value) {
-    var res;
-
+export function amountFix(value) {
     if (typeof value === 'number') {
         return value;
     }
@@ -131,7 +121,7 @@ function amountFix(value) {
         return null;
     }
 
-    res = value.replace(/ /, '');
+    const res = value.replace(/ /, '');
     return parseFloat(fixFloat(res));
 }
 
@@ -140,16 +130,15 @@ function amountFix(value) {
  * @param {string|Number} val - value to correct
  * @param {Number} prec - precision
  */
-function correct(val, prec) {
-    var p = (typeof prec !== 'undefined') ? prec : 2;
-    return parseFloat(parseFloat(val).toFixed(p));
+export function correct(val, prec = 2) {
+    return parseFloat(parseFloat(val).toFixed(prec));
 }
 
 /**
  * Correct calculated exchange rate value
  * @param {string|Number} val - exchange rate value
  */
-function correctExch(val) {
+export function correctExch(val) {
     return correct(val, 5);
 }
 
@@ -158,16 +147,15 @@ function correctExch(val) {
  * @param {string|Number} val - value to normalize
  * @param {Number} prec - precision of result decimal
  */
-function normalize(val, prec) {
-    var p = (typeof prec !== 'undefined') ? prec : 2;
-    return parseFloat(parseFloat(fixFloat(val)).toFixed(p));
+export function normalize(val, prec = 2) {
+    return parseFloat(parseFloat(fixFloat(val)).toFixed(prec));
 }
 
 /**
  * Normalize exchange rate value from string
  * @param {string|Number} val - exchange rate value
  */
-function normalizeExch(val) {
+export function normalizeExch(val) {
     return normalize(val, 5);
 }
 
@@ -175,6 +163,6 @@ function normalizeExch(val) {
  * Check value is valid
  * @param {string|Number} val - value to check
  */
-function isValidValue(val) {
+export function isValidValue(val) {
     return (typeof val !== 'undefined' && val !== null && !Number.isNaN(parseFloat(fixFloat(val))));
 }

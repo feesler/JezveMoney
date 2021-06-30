@@ -37,23 +37,8 @@ class ImportRule extends AdminController
 
         $titleString = "Admin panel | Import rules";
 
-        $this->cssAdmin[] = "importrule.css";
         $this->buildCSS();
-
-        array_push(
-            $this->jsArr,
-            "component/confirmdialog.js",
-            "model/list.js",
-            "view.js"
-        );
-        array_push(
-            $this->jsAdmin,
-            "adminview.js",
-            "adminlistview.js",
-            "importconditionview.js",
-            "importactionview.js",
-            "importruleview.js"
-        );
+        $this->jsAdmin[] = "AdminImportRuleView.js";
 
         include(ADMIN_TPL_PATH . "importrule.tpl");
     }

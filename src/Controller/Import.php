@@ -38,66 +38,8 @@ class Import extends TemplateController
             "templates" => $impTemplates
         ];
 
-        array_push(
-            $this->css->libs,
-            "lib/iconlink.css",
-            "lib/dropdown.css"
-        );
-        $this->css->page = [
-            "import-upload-form.css",
-            "import-template.css",
-            "import-item.css",
-            "import-rules.css",
-            "import-rule-item.css",
-            "import-rule-form.css",
-            "import-cond-item.css",
-            "import-cond-form.css",
-            "import-action-item.css",
-            "import-action-form.css",
-            "import.css"
-        ];
         $this->buildCSS();
-
-        array_push(
-            $this->jsArr,
-            "model/list.js",
-            "model/account.js",
-            "model/currency.js",
-            "model/person.js",
-            "model/importcondition.js",
-            "model/importaction.js",
-            "model/importrule.js",
-            "model/importtpl.js",
-            "lib/dragndrop.js",
-            "lib/sortable.js",
-            "lib/dropdown.js",
-            "lib/decimalinput.js",
-            "component/header.js",
-            "component/iconlink.js",
-            "component/uploader.js",
-            "component/confirmdialog.js",
-            "component/appcomponent.js",
-            "component/importuploaddialog.js",
-            "component/importfileuploader.js",
-            "component/importtemplatemanager.js",
-            "component/importtransactionitem.js",
-            "component/importrulesdialog.js",
-            "component/importruleitem.js",
-            "component/importruleform.js",
-            "component/importconditionitem.js",
-            "component/importconditionform.js",
-            "component/importactionitem.js",
-            "component/importactionform.js",
-            "view.js",
-            "importview.js"
-        );
-
-        if (
-            $this->uMod->isAdmin($this->user_id)
-            || $this->uMod->isTester($this->user_id)
-        ) {
-            array_push($this->jsArr, "importadmin.js");
-        }
+        $this->jsArr[] = "ImportView.js";
 
         $titleString = "Jezve Money | Import transactions";
 

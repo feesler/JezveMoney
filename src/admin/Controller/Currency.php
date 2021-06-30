@@ -28,17 +28,7 @@ class Currency extends AdminController
         $titleString = "Admin panel | Currency";
 
         $this->buildCSS();
-        array_push(
-            $this->jsArr,
-            "component/confirmdialog.js",
-            "view.js"
-        );
-        array_push(
-            $this->jsAdmin,
-            "adminview.js",
-            "adminlistview.js",
-            "currencyview.js"
-        );
+        $this->jsAdmin[] = "AdminCurrencyView.js";
 
         include(ADMIN_TPL_PATH . "currency.tpl");
     }

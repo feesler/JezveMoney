@@ -1,16 +1,11 @@
-import { MainView } from '../view/main.js';
-import { AccountsView } from '../view/accounts.js';
-import { Transaction } from '../model/transaction.js';
-import { Currency } from '../model/currency.js';
-import {
-    test,
-    formatProps,
-    copyObject,
-    checkObjValue,
-    createCSV,
-} from '../common.js';
-import { App } from '../app.js';
-import { AccountView } from '../view/account.js';
+import { test, copyObject, checkObjValue } from 'jezve-test';
+import { MainView } from '../view/MainView.js';
+import { AccountsView } from '../view/AccountsView.js';
+import { Transaction } from '../model/Transaction.js';
+import { Currency } from '../model/Currency.js';
+import { formatProps, createCSV } from '../common.js';
+import { App } from '../Application.js';
+import { AccountView } from '../view/AccountView.js';
 
 /** Navigate to accounts list page */
 async function checkNavigation() {

@@ -1,14 +1,13 @@
 import {
     test,
-    setParam,
     copyObject,
     checkObjValue,
-    formatProps,
-} from '../common.js';
-import { PersonsView } from '../view/persons.js';
-import { PersonView } from '../view/person.js';
-import { MainView } from '../view/main.js';
-import { App } from '../app.js';
+} from 'jezve-test';
+import { formatProps } from '../common.js';
+import { PersonsView } from '../view/PersonsView.js';
+import { PersonView } from '../view/PersonView.js';
+import { MainView } from '../view/MainView.js';
+import { App } from '../Application.js';
 
 /** Navigate to persons list page */
 async function checkNavigation() {
@@ -103,7 +102,7 @@ export async function update(params) {
         const expPerson = await submitPerson(props);
         if (expPerson) {
             // Check updates in the person tiles
-            setParam(expectedPerson, props);
+            Object.assign(expectedPerson, props);
             App.state.updatePerson(expectedPerson);
         } else {
             await App.view.cancel();

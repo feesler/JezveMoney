@@ -1,16 +1,14 @@
-import { api } from '../../model/api.js';
-import { ApiRequestError } from '../../error/apirequest.js';
-import { Transaction } from '../../model/transaction.js';
 import {
     test,
-    setParam,
     formatDate,
-    fixDate,
-    checkObjValue,
     copyObject,
-    formatProps,
-} from '../../common.js';
-import { App } from '../../app.js';
+    checkObjValue,
+} from 'jezve-test';
+import { api } from '../../model/api.js';
+import { ApiRequestError } from '../../error/ApiRequestError.js';
+import { Transaction } from '../../model/Transaction.js';
+import { fixDate, formatProps } from '../../common.js';
+import { App } from '../../Application.js';
 
 /**
  * Create transaction with specified params and check expected state of app
@@ -88,7 +86,7 @@ export async function update(params) {
             updParams = App.state.transactionToRequest(expTrans);
         }
         if (!resExpected) {
-            setParam(updParams, params);
+            Object.assign(updParams, params);
         }
 
         // Send API sequest to server

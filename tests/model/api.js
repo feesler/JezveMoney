@@ -1,6 +1,7 @@
-import { urlJoin, copyObject } from '../common.js';
-import { ApiRequestError } from '../error/apirequest.js';
-import { App } from '../app.js';
+import { copyObject } from 'jezve-test';
+import { urlJoin } from '../common.js';
+import { ApiRequestError } from '../error/ApiRequestError.js';
+import { App } from '../Application.js';
 
 async function apiRequest(method, url, data = null) {
     if (!App.environment) {

@@ -3,7 +3,7 @@
 ?>
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
 </head>
-<body>
+<body class="<?=($this->themeClass)?>">
 <div class="page">
     <div class="page_wrapper">
 <?php	require_once(TPL_PATH."header.tpl");	?>
@@ -101,11 +101,11 @@
 <input id="delpersons" name="persons" type="hidden" value="">
 </form>
 
-<?php	include(TPL_PATH."footer.tpl");	?>
 <script>
-    var view = new PersonListView({
-        persons: <?=JSON::encode($personsData)?>
-    });
+window.app = {
+    persons: <?=JSON::encode($personsData)?>
+};
 </script>
+<?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

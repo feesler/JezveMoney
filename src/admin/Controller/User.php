@@ -31,18 +31,7 @@ class User extends AdminController
         $titleString = "Admin panel | Users";
 
         $this->buildCSS();
-
-        array_push(
-            $this->jsArr,
-            "component/confirmdialog.js",
-            "view.js"
-        );
-        array_push(
-            $this->jsAdmin,
-            "adminview.js",
-            "adminlistview.js",
-            "userview.js",
-        );
+        $this->jsAdmin[] = "AdminUserView.js";
 
         include(ADMIN_TPL_PATH . "user.tpl");
     }

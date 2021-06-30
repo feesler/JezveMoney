@@ -1,14 +1,14 @@
-import { App } from '../app.js';
 import {
     test,
     formatDate,
-    fixDate,
     copyObject,
     checkObjValue,
-} from '../common.js';
-import { TransactionsView } from '../view/transactions.js';
-import { MainView } from '../view/main.js';
-import { availTransTypes, Transaction } from '../model/transaction.js';
+} from 'jezve-test';
+import { App } from '../Application.js';
+import { fixDate } from '../common.js';
+import { TransactionsView } from '../view/TransactionsView.js';
+import { MainView } from '../view/MainView.js';
+import { availTransTypes, Transaction } from '../model/Transaction.js';
 
 /** Navigate to transactions list page */
 async function checkNavigation() {
