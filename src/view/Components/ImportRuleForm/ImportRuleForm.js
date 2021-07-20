@@ -4,20 +4,21 @@ import {
     isFunction,
     copyObject,
     removeChilds,
+    Component,
 } from 'jezvejs';
-import { AppComponent } from '../AppComponent/AppComponent.js';
 import { ImportRule } from '../../js/model/ImportRule.js';
 import { ImportAction } from '../../js/model/ImportAction.js';
 import { ImportCondition } from '../../js/model/ImportCondition.js';
 import { ImportConditionForm } from '../ImportConditionForm/ImportConditionForm.js';
 import { ImportActionForm } from '../ImportActionForm/ImportActionForm.js';
 import { View } from '../../js/View.js';
+import { createContainer, createIcon } from '../../js/app.js';
 import './style.css';
 
 /**
  * ImportRuleForm component constructor
  */
-export class ImportRuleForm extends AppComponent {
+export class ImportRuleForm extends Component {
     constructor(...args) {
         super(...args);
 
@@ -80,15 +81,15 @@ export class ImportRuleForm extends AppComponent {
         this.toggleCondBtn = ce(
             'button',
             { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
-            this.createIcon('toggle-ext'),
+            createIcon('toggle-ext'),
         );
-        this.conditionsHeader = this.createContainer('rule-form__collapse-header', [
+        this.conditionsHeader = createContainer('rule-form__collapse-header', [
             ce('label', { textContent: 'Conditions' }),
             this.createCondBtn,
             this.toggleCondBtn,
         ], { click: this.onToggleConditions.bind(this) });
-        this.conditionsContainer = this.createContainer('rule-form__collapse-content', []);
-        this.formConditions = this.createContainer('rule-form__collapse', [
+        this.conditionsContainer = createContainer('rule-form__collapse-content', []);
+        this.formConditions = createContainer('rule-form__collapse', [
             this.conditionsHeader,
             this.conditionsContainer,
         ]);
@@ -103,15 +104,15 @@ export class ImportRuleForm extends AppComponent {
         this.toggleActionsBtn = ce(
             'button',
             { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
-            this.createIcon('toggle-ext'),
+            createIcon('toggle-ext'),
         );
-        this.actionsHeader = this.createContainer('rule-form__collapse-header', [
+        this.actionsHeader = createContainer('rule-form__collapse-header', [
             ce('label', { textContent: 'Actions' }),
             this.createActionBtn,
             this.toggleActionsBtn,
         ], { click: this.onToggleActions.bind(this) });
-        this.formActionsContainer = this.createContainer('rule-form__collapse-content', []);
-        this.formActions = this.createContainer('rule-form__collapse', [
+        this.formActionsContainer = createContainer('rule-form__collapse-content', []);
+        this.formActions = createContainer('rule-form__collapse', [
             this.actionsHeader,
             this.formActionsContainer,
         ]);
@@ -132,17 +133,17 @@ export class ImportRuleForm extends AppComponent {
 
         // Invalid feedback message
         this.validFeedback = ce('div', { className: 'invalid-feedback' });
-        this.feedbackContainer = this.createContainer(
+        this.feedbackContainer = createContainer(
             'rule-form__feedback validation-block',
             this.validFeedback,
         );
 
-        this.controls = this.createContainer('rule-form__controls', [
+        this.controls = createContainer('rule-form__controls', [
             this.saveBtn,
             this.cancelBtn,
         ]);
 
-        this.elem = this.createContainer('rule-form', [
+        this.elem = createContainer('rule-form', [
             this.idInput,
             this.formConditions,
             this.formActions,

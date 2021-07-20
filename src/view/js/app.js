@@ -1,4 +1,9 @@
-import { isDate, Popup } from 'jezvejs';
+import {
+    ce,
+    svg,
+    isDate,
+    Popup,
+} from 'jezvejs';
 
 /** Types of transactions */
 export const EXPENSE = 1;
@@ -90,6 +95,54 @@ export function createMessage(message, msgClass) {
     });
 
     messageBox.show();
+}
+
+/** Create simple container element */
+export function createContainer(elemClass, children, events) {
+    return ce('div', { className: elemClass }, children, events);
+}
+
+/** Create SVG icon element */
+export function createIcon(icon) {
+    const useElem = svg('use');
+    const res = svg('svg', {}, useElem);
+
+    useElem.href.baseVal = (icon) ? `#${icon}` : '';
+
+    return res;
+}
+
+/**
+ * Create checkbox container from given input element
+ * @param {Element} input - checkbox input element
+ * @param {string} elemClass - class for checkbox container element
+ * @param {string} title - optional title
+ */
+export function createCheck(input, elemClass, title) {
+    if (!input) {
+        throw new Error('Invalid input element');
+    }
+
+    const childs = [input];
+    if (typeof title === 'string') {
+        childs.push(ce('span', { textContent: title }));
+    }
+
+    return ce('label', { className: elemClass }, childs);
+}
+
+/** Create field element from given input element */
+export function createField(title, input, extraClass) {
+    const elemClasses = ['field'];
+
+    if (typeof extraClass === 'string' && extraClass.length > 0) {
+        elemClasses.push(extraClass);
+    }
+
+    return ce('div', { className: elemClasses.join(' ') }, [
+        ce('label', { textContent: title }),
+        ce('div', {}, input),
+    ]);
 }
 
 /**

@@ -5,8 +5,8 @@ import {
     enable,
     DropDown,
     Popup,
+    Component,
 } from 'jezvejs';
-import { AppComponent } from '../AppComponent/AppComponent.js';
 import { createMessage } from '../../js/app.js';
 import { ImportFileUploader } from '../ImportFileUploader/ImportFileUploader.js';
 import { ImportTemplateManager } from '../ImportTemplateManager/ImportTemplateManager.js';
@@ -15,7 +15,7 @@ import './style.css';
 /**
  * ImportUploadDialog component
  */
-export class ImportUploadDialog extends AppComponent {
+export class ImportUploadDialog extends Component {
     constructor(...args) {
         super(...args);
 

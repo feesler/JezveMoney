@@ -1,5 +1,4 @@
-import { ce } from 'jezvejs';
-import { AppComponent } from '../AppComponent/AppComponent.js';
+import { ce, Component } from 'jezvejs';
 import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,
@@ -8,12 +7,13 @@ import {
     IMPORT_COND_FIELD_MAIN_ACCOUNT,
     IMPORT_COND_FIELD_TPL,
 } from '../../js/model/ImportCondition.js';
+import { createContainer } from '../../js/app.js';
 import './style.css';
 
 /**
  * ImportConditionItem component
  */
-export class ImportConditionItem extends AppComponent {
+export class ImportConditionItem extends Component {
     constructor(...args) {
         super(...args);
 
@@ -60,7 +60,7 @@ export class ImportConditionItem extends AppComponent {
         this.operatorLabel = ce('span', { className: 'cond-item__operator' });
         this.valueLabel = ce('span', { className: 'cond-item__value' });
 
-        this.elem = this.createContainer('cond-item', [
+        this.elem = createContainer('cond-item', [
             this.propertyLabel,
             this.operatorLabel,
             this.valueLabel,

@@ -299,9 +299,7 @@ export class ImportRulesDialog extends Component {
             this.noDataMsg = ce('span', { className: 'nodata-message', textContent: 'No rules' });
             this.listContainer.appendChild(this.noDataMsg);
         } else {
-            ruleItems.forEach(function (item) {
-                this.listContainer.appendChild(item.elem);
-            }, this);
+            ruleItems.forEach((item) => this.listContainer.appendChild(item.elem));
         }
 
         show(this.listContainer, true);

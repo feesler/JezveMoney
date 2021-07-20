@@ -5,20 +5,21 @@ import {
     copyObject,
     addChilds,
     removeChilds,
+    Component,
 } from 'jezvejs';
-import { AppComponent } from '../AppComponent/AppComponent.js';
 import { ImportRule } from '../../js/model/ImportRule.js';
 import { ImportConditionList } from '../../js/model/ImportConditionList.js';
 import { ImportActionList } from '../../js/model/ImportActionList.js';
 import { ImportConditionItem } from '../ImportConditionItem/ImportConditionItem.js';
 import { ImportActionItem } from '../ImportActionItem/ImportActionItem.js';
+import { createContainer, createIcon } from '../../js/app.js';
 import './style.css';
 
 /**
  * ImportRuleItem component constructor
  * @param {Object} props
  */
-export class ImportRuleItem extends AppComponent {
+export class ImportRuleItem extends Component {
     constructor(...args) {
         super(...args);
 
@@ -70,63 +71,63 @@ export class ImportRuleItem extends AppComponent {
         this.updateBtn = ce(
             'button',
             { className: 'btn icon-btn update-btn', type: 'button' },
-            this.createIcon('update'),
+            createIcon('update'),
             { click: this.onUpdate.bind(this) },
         );
         // Delete button
         this.delBtn = ce(
             'button',
             { className: 'btn icon-btn delete-btn', type: 'button' },
-            this.createIcon('del'),
+            createIcon('del'),
             { click: this.onDelete.bind(this) },
         );
         // Toggle expand/collapse
         this.toggleExtBtn = ce(
             'button',
             { className: 'btn icon-btn toggle-btn', type: 'button' },
-            this.createIcon('toggle-ext'),
+            createIcon('toggle-ext'),
         );
 
-        this.topRow = this.createContainer('rule-item__main-top', [
+        this.topRow = createContainer('rule-item__main-top', [
             this.propertyLabel,
             this.operatorLabel,
             this.valueLabel,
         ]);
-        this.bottomRow = this.createContainer('rule-item__main-bottom', [
+        this.bottomRow = createContainer('rule-item__main-bottom', [
             this.infoLabel,
         ]);
 
-        this.infoContainer = this.createContainer('rule-item__main-info', [
+        this.infoContainer = createContainer('rule-item__main-info', [
             this.topRow,
             this.bottomRow,
         ]);
 
-        this.controls = this.createContainer('rule-item__main-controls', [
+        this.controls = createContainer('rule-item__main-controls', [
             this.updateBtn,
             this.delBtn,
             this.toggleExtBtn,
         ]);
 
         this.conditionsHeader = ce('label', { className: 'rule-item__header', textContent: 'Conditions' });
-        this.conditionsContainer = this.createContainer('rule-item__conditions', []);
+        this.conditionsContainer = createContainer('rule-item__conditions', []);
 
         this.actionsHeader = ce('label', { className: 'rule-item__header', textContent: 'Actions' });
-        this.actionsContainer = this.createContainer('rule-item__actions', []);
+        this.actionsContainer = createContainer('rule-item__actions', []);
 
-        this.dataContainer = this.createContainer('rule-item__ext', [
+        this.dataContainer = createContainer('rule-item__ext', [
             this.conditionsHeader,
             this.conditionsContainer,
             this.actionsHeader,
             this.actionsContainer,
         ]);
 
-        this.headerContainer = this.createContainer(
+        this.headerContainer = createContainer(
             'rule-item__main',
             [this.infoContainer, this.controls],
             { click: this.toggleCollapse.bind(this) },
         );
 
-        this.elem = this.createContainer('rule-item', [
+        this.elem = createContainer('rule-item', [
             this.headerContainer,
             this.dataContainer,
         ]);

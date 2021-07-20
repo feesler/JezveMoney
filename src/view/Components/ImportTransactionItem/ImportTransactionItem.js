@@ -8,8 +8,8 @@ import {
     addChilds,
     removeChilds,
     DropDown,
+    Component,
 } from 'jezvejs';
-import { AppComponent } from '../AppComponent/AppComponent.js';
 import {
     fixFloat,
     formatDate,
@@ -17,6 +17,10 @@ import {
     INCOME,
     TRANSFER,
     DEBT,
+    createField,
+    createContainer,
+    createIcon,
+    createCheck,
 } from '../../js/app.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import './style.css';
@@ -24,7 +28,7 @@ import './style.css';
 /**
  * ImportTransactionItem component
  */
-export class ImportTransactionItem extends AppComponent {
+export class ImportTransactionItem extends Component {
     constructor(...args) {
         super(...args);
 
@@ -89,7 +93,7 @@ export class ImportTransactionItem extends AppComponent {
             placeholder: 'Amount',
             autocomplete: 'off',
         }, null, { input: this.onAmountInput.bind(this) });
-        this.amountField = this.createField('Amount', this.amountInp, 'amount-field');
+        this.amountField = createField('Amount', this.amountInp, 'amount-field');
 
         this.destAmountInp = ce('input', {
             type: 'text',
@@ -98,7 +102,7 @@ export class ImportTransactionItem extends AppComponent {
             placeholder: 'Destination amount',
             autocomplete: 'off',
         }, null, { input: this.onDestAmountInput.bind(this) });
-        this.destAmountField = this.createField('Destination amount', this.destAmountInp, 'amount-field');
+        this.destAmountField = createField('Destination amount', this.destAmountInp, 'amount-field');
         // Date field
         this.dateInp = ce('input', {
             type: 'text',
@@ -106,7 +110,7 @@ export class ImportTransactionItem extends AppComponent {
             placeholder: 'Date',
             autocomplete: 'off',
         }, null, { input: this.onDateInput.bind(this) });
-        this.dateField = this.createField('Date', this.dateInp, 'date-field');
+        this.dateField = createField('Date', this.dateInp, 'date-field');
         // Comment field
         this.commInp = ce('input', {
             type: 'text',
@@ -114,55 +118,55 @@ export class ImportTransactionItem extends AppComponent {
             placeholder: 'Comment',
             autocomplete: 'off',
         }, null, { input: this.onCommentInput.bind(this) });
-        this.commentField = this.createField('Comment', this.commInp, 'comment-field');
+        this.commentField = createField('Comment', this.commInp, 'comment-field');
         // Delete button
         this.delBtn = ce(
             'button',
             { className: 'btn delete-btn', type: 'button' },
-            this.createIcon('del'),
+            createIcon('del'),
             { click: this.remove.bind(this) },
         );
         // Toggle expand/collapse
         this.toggleExtBtn = ce(
             'button',
             { className: 'btn toggle-btn hidden', type: 'button' },
-            this.createIcon('toggle-ext'),
+            createIcon('toggle-ext'),
             { click: this.toggleCollapse.bind(this) },
         );
 
-        this.topRow = this.createContainer('form-row', [
+        this.topRow = createContainer('form-row', [
             this.amountField,
             this.currField,
             this.dateField,
             this.commentField,
         ]);
 
-        this.bottomRow = this.createContainer('form-row hidden', [
+        this.bottomRow = createContainer('form-row hidden', [
             this.destAccountField,
             this.personField,
             this.destAmountField,
         ]);
 
-        this.formContainer = this.createContainer('form-container', [
+        this.formContainer = createContainer('form-container', [
             this.trTypeField,
-            this.createContainer('form-rows', [
+            createContainer('form-rows', [
                 this.topRow,
                 this.bottomRow,
             ]),
         ]);
 
-        this.mainContainer = this.createContainer('main-content', [
-            this.createCheck(this.enableCheck, 'enable-check'),
+        this.mainContainer = createContainer('main-content', [
+            createCheck(this.enableCheck, 'enable-check'),
             this.formContainer,
-            this.createContainer('row-container controls', [
+            createContainer('row-container controls', [
                 this.delBtn,
                 this.toggleExtBtn,
             ]),
         ]);
         this.feedbackElem = ce('div', { className: 'invalid-feedback hidden' });
-        this.extendedContainer = this.createContainer('extended-content');
+        this.extendedContainer = createContainer('extended-content');
 
-        this.elem = this.createContainer('import-item', [
+        this.elem = createContainer('import-item', [
             this.mainContainer,
             this.feedbackElem,
             this.extendedContainer,
@@ -200,7 +204,7 @@ export class ImportTransactionItem extends AppComponent {
         ];
 
         const selectElem = ce('select');
-        this.trTypeField = this.createField('Type', selectElem);
+        this.trTypeField = createField('Type', selectElem);
 
         this.typeDropDown = DropDown.create({
             input_id: selectElem,
@@ -221,7 +225,7 @@ export class ImportTransactionItem extends AppComponent {
             .map((account) => ({ id: account.id, title: account.name }));
 
         const selectElem = ce('select');
-        this.destAccountField = this.createField('Destination account', selectElem);
+        this.destAccountField = createField('Destination account', selectElem);
 
         this.destAccDropDown = DropDown.create({
             input_id: selectElem,
@@ -240,7 +244,7 @@ export class ImportTransactionItem extends AppComponent {
             .map((person) => ({ id: person.id, title: person.name }));
 
         const selectElem = ce('select');
-        this.personField = this.createField('Person', selectElem);
+        this.personField = createField('Person', selectElem);
 
         this.personDropDown = DropDown.create({
             input_id: selectElem,
@@ -258,7 +262,7 @@ export class ImportTransactionItem extends AppComponent {
             .map((currency) => ({ id: currency.id, title: currency.name }));
 
         const selectElem = ce('select');
-        this.currField = this.createField('Currency', selectElem);
+        this.currField = createField('Currency', selectElem);
 
         this.currencyDropDown = DropDown.create({
             input_id: selectElem,
@@ -294,9 +298,9 @@ export class ImportTransactionItem extends AppComponent {
 
         const dateFmt = formatDate(new Date(data.date));
 
-        return this.createContainer('orig-data', [
+        return createContainer('orig-data', [
             ce('h3', { textContent: 'Original imported data' }),
-            this.createContainer('orig-data-table', [
+            createContainer('orig-data-table', [
                 this.createDataValue('Main account', mainAccount.name),
                 this.createDataValue('Date', dateFmt),
                 this.createDataValue('Tr. amount', data.transactionAmount),
