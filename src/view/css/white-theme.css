@@ -184,7 +184,6 @@ body.white-theme,
   color: #ffffff;
 }
 
-
 /* Transaction list */
 
 .white-theme .paginator > span {
@@ -331,17 +330,18 @@ body.white-theme,
 }
 
 /* Import rule */
-.white-theme .rule-item__ext {
+.white-theme .rule-item .collapsible-content {
   background-color: #dddddd;
 }
 
-.white-theme .rule-item__main,
+.white-theme .rule-item .collapsible-header,
 .white-theme .rule-form__collapse-header {
+  color: #000000;
   background-color: #dddddd;
   border-color: #dddddd;
 }
 
-.white-theme .rule-item__main:hover,
+.white-theme .rule-item .collapsible-header:hover,
 .white-theme .rule-form__collapse-header:hover {
   background-color: #cccccc;
   border-color: #808080;
@@ -371,7 +371,7 @@ body.white-theme,
 }
 
 .white-theme .rule-form__collapse-content,
-.white-theme .rule-item .rule-item__ext {
+.white-theme .rule-item .collapsible-content {
   color: #202020;
   border-color: #ffffff;
   background-color: #e8e8e8;
@@ -398,7 +398,6 @@ body.white-theme,
 .white-theme .import-item .btn:hover svg {
   fill: #ffffff;
 }
-
 
 /* Statistics view */
 .white-theme .stat-histogram > span {

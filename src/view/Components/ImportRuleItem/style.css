@@ -1,8 +1,5 @@
 /* Import rule item */
 .rule-item {
-  display: flex;
-  flex-flow: column nowrap;
-  flex: 1 1 auto;
   margin-right: 3px;
 }
 
@@ -11,8 +8,7 @@
 }
 
 /* Main static view */
-.rule-item__main {
-  display: flex;
+.rule-item .collapsible-header {
   flex-flow: row nowrap;
   align-items: center;
   font-size: 16px;
@@ -80,23 +76,18 @@
   height: 18px;
 }
 
-.rule-item_expanded > .rule-item__main .toggle-btn svg {
+.rule-item.collapsible__expanded .toggle-btn svg {
   transform: rotate(180deg);
 }
 
-/* Rule item extended info block */
-.rule-item__ext {
-  display: none;
+/* Rule item content */
+.rule-item .collapsible-content {
   flex-flow: column nowrap;
   padding: 8px;
   margin: 0 1px;
   border: 0 none;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
-}
-
-.rule-item_expanded > .rule-item__ext {
-  display: flex;
 }
 
 .rule-item__header {

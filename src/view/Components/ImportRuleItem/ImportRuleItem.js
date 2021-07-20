@@ -6,6 +6,7 @@ import {
     addChilds,
     removeChilds,
     Component,
+    Collapsible,
 } from 'jezvejs';
 import { ImportRule } from '../../js/model/ImportRule.js';
 import { ImportConditionList } from '../../js/model/ImportConditionList.js';
@@ -114,30 +115,17 @@ export class ImportRuleItem extends Component {
         this.actionsHeader = ce('label', { className: 'rule-item__header', textContent: 'Actions' });
         this.actionsContainer = createContainer('rule-item__actions', []);
 
-        this.dataContainer = createContainer('rule-item__ext', [
-            this.conditionsHeader,
-            this.conditionsContainer,
-            this.actionsHeader,
-            this.actionsContainer,
-        ]);
-
-        this.headerContainer = createContainer(
-            'rule-item__main',
-            [this.infoContainer, this.controls],
-            { click: this.toggleCollapse.bind(this) },
-        );
-
-        this.elem = createContainer('rule-item', [
-            this.headerContainer,
-            this.dataContainer,
-        ]);
-    }
-
-    /** Toggle expand/collapse button 'click' event handler */
-    toggleCollapse() {
-        this.state.expanded = !this.state.expanded;
-
-        this.render(this.state);
+        this.collapse = new Collapsible({
+            className: 'rule-item',
+            header: [this.infoContainer, this.controls],
+            content: [
+                this.conditionsHeader,
+                this.conditionsContainer,
+                this.actionsHeader,
+                this.actionsContainer,
+            ],
+        });
+        this.elem = this.collapse.elem;
     }
 
     /** Set main state of component */
@@ -147,7 +135,6 @@ export class ImportRuleItem extends Component {
         }
 
         this.state = {
-            expanded: false,
             ruleId: data.id,
             conditions: data.conditions,
             actions: data.actions,
@@ -221,12 +208,6 @@ export class ImportRuleItem extends Component {
 
         if (state.ruleId) {
             this.elem.setAttribute('data-id', state.ruleId);
-        }
-
-        if (state.expanded) {
-            this.elem.classList.add('rule-item_expanded');
-        } else {
-            this.elem.classList.remove('rule-item_expanded');
         }
 
         // Render conditions

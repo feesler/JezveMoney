@@ -338,17 +338,18 @@ body.dark-theme,
 }
 
 /* Import rule */
-.dark-theme .rule-item__ext {
+.dark-theme .rule-item .collapsible-content {
   background-color: #202020;
 }
 
-.dark-theme .rule-item__main,
+.dark-theme .rule-item .collapsible-header,
 .dark-theme .rule-form__collapse-header {
+  color: #dddddd;
   background-color: #202020;
   border-color: #202020;
 }
 
-.dark-theme .rule-item__main:hover,
+.dark-theme .rule-item .collapsible-header:hover,
 .dark-theme .rule-form__collapse-header:hover {
   background-color: #2e2e2e;
   border-color: #505050;
@@ -378,7 +379,7 @@ body.dark-theme,
 }
 
 .dark-theme .rule-form__collapse-content,
-.dark-theme .rule-item .rule-item__ext {
+.dark-theme .rule-item .collapsible-content {
   color: #bbbbbb;
   border-color: #303030;
   background-color: #252525;
@@ -405,7 +406,6 @@ body.dark-theme,
 .dark-theme .import-item .btn:hover svg {
   fill: #dddddd;
 }
-
 
 /* Statistics view */
 .dark-theme .stat-histogram > span {
