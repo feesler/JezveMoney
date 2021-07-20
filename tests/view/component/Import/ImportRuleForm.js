@@ -14,18 +14,18 @@ import { App } from '../../../Application.js';
 
 export class ImportRuleForm extends TestComponent {
     async parse() {
-        const accordionElems = await this.queryAll(this.elem, '.rule-form__collapse');
+        const accordionElems = await this.queryAll(this.elem, '.rule-form-collapse');
         const accordionItems = await asyncMap(
             accordionElems,
             async (elem) => {
                 const res = {
                     elem,
-                    collapsed: await this.hasClass(elem, 'collapsed'),
-                    headerElem: await this.query(elem, '.rule-form__collapse-header'),
-                    labelElem: await this.query(elem, '.rule-form__collapse-header label'),
-                    createBtn: await this.query(elem, '.rule-form__collapse-header .create-btn'),
-                    toggleBtn: await this.query(elem, '.rule-form__collapse-header .toggle-btn'),
-                    contentElem: await this.query(elem, '.rule-form__collapse-content'),
+                    collapsed: !(await this.hasClass(elem, 'collapsible__expanded')),
+                    headerElem: await this.query(elem, '.collapsible-header'),
+                    labelElem: await this.query(elem, '.collapsible-header label'),
+                    createBtn: await this.query(elem, '.collapsible-header .create-btn'),
+                    toggleBtn: await this.query(elem, '.collapsible-header .toggle-btn'),
+                    contentElem: await this.query(elem, '.collapsible-content'),
                 };
 
                 if (

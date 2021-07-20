@@ -3,8 +3,8 @@ import {
     enable,
     isFunction,
     copyObject,
-    removeChilds,
     Component,
+    Collapsible,
 } from 'jezvejs';
 import { ImportRule } from '../../js/model/ImportRule.js';
 import { ImportAction } from '../../js/model/ImportAction.js';
@@ -83,16 +83,17 @@ export class ImportRuleForm extends Component {
             { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
             createIcon('toggle-ext'),
         );
-        this.conditionsHeader = createContainer('rule-form__collapse-header', [
-            ce('label', { textContent: 'Conditions' }),
-            this.createCondBtn,
-            this.toggleCondBtn,
-        ], { click: this.onToggleConditions.bind(this) });
-        this.conditionsContainer = createContainer('rule-form__collapse-content', []);
-        this.formConditions = createContainer('rule-form__collapse', [
-            this.conditionsHeader,
-            this.conditionsContainer,
-        ]);
+
+        this.conditionsCollapse = new Collapsible({
+            className: 'rule-form-collapse',
+            header: [
+                ce('label', { textContent: 'Conditions' }),
+                this.createCondBtn,
+                this.toggleCondBtn,
+            ],
+            content: [],
+            onStateChange: (expanded) => this.onToggleConditions(expanded),
+        });
 
         // Actions
         this.createActionBtn = ce(
@@ -106,16 +107,17 @@ export class ImportRuleForm extends Component {
             { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
             createIcon('toggle-ext'),
         );
-        this.actionsHeader = createContainer('rule-form__collapse-header', [
-            ce('label', { textContent: 'Actions' }),
-            this.createActionBtn,
-            this.toggleActionsBtn,
-        ], { click: this.onToggleActions.bind(this) });
-        this.formActionsContainer = createContainer('rule-form__collapse-content', []);
-        this.formActions = createContainer('rule-form__collapse', [
-            this.actionsHeader,
-            this.formActionsContainer,
-        ]);
+
+        this.actionsCollapse = new Collapsible({
+            className: 'rule-form-collapse',
+            header: [
+                ce('label', { textContent: 'Actions' }),
+                this.createActionBtn,
+                this.toggleActionsBtn,
+            ],
+            content: [],
+            onStateChange: (expanded) => this.onToggleActions(expanded),
+        });
 
         // Controls
         this.saveBtn = ce(
@@ -145,8 +147,8 @@ export class ImportRuleForm extends Component {
 
         this.elem = createContainer('rule-form', [
             this.idInput,
-            this.formConditions,
-            this.formActions,
+            this.conditionsCollapse.elem,
+            this.actionsCollapse.elem,
             this.feedbackContainer,
             this.controls,
         ]);
@@ -160,8 +162,6 @@ export class ImportRuleForm extends Component {
 
         this.state = {
             rule: data,
-            conditionsCollapsed: false,
-            actionsCollapsed: true,
         };
 
         this.render(this.state);
@@ -230,8 +230,8 @@ export class ImportRuleForm extends Component {
 
         this.state.rule.actions.addItem(actionData);
 
-        this.state.conditionsCollapsed = true;
-        this.state.actionsCollapsed = false;
+        this.conditionsCollapse.collapse();
+        this.actionsCollapse.expand();
         this.state.validation = null;
 
         this.render(this.state);
@@ -309,31 +309,25 @@ export class ImportRuleForm extends Component {
 
         this.state.rule.conditions.addItem(conditionData);
 
-        this.state.conditionsCollapsed = false;
-        this.state.actionsCollapsed = true;
+        this.conditionsCollapse.expand();
+        this.actionsCollapse.collapse();
         this.state.validation = null;
 
         this.render(this.state);
     }
 
-    /** Conditions toggle button 'click' event handler */
-    onToggleConditions() {
-        this.state.conditionsCollapsed = !this.state.conditionsCollapsed;
-        if (!this.state.conditionsCollapsed) {
-            this.state.actionsCollapsed = true;
+    /** Conditions collapse state change event handler */
+    onToggleConditions(expanded) {
+        if (expanded) {
+            this.actionsCollapse.collapse();
         }
-
-        this.render(this.state);
     }
 
-    /** Actions toggle button 'click' event handler */
-    onToggleActions() {
-        this.state.actionsCollapsed = !this.state.actionsCollapsed;
-        if (!this.state.actionsCollapsed) {
-            this.state.conditionsCollapsed = true;
+    /** Actions collapse state change  event handler */
+    onToggleActions(expanded) {
+        if (expanded) {
+            this.conditionsCollapse.collapse();
         }
-
-        this.render(this.state);
     }
 
     /** Return import rule object */
@@ -363,11 +357,11 @@ export class ImportRuleForm extends Component {
 
         if (validation && !validation.valid) {
             if ('conditionIndex' in validation) {
-                this.state.conditionsCollapsed = false;
-                this.state.actionsCollapsed = true;
+                this.conditionsCollapse.expand();
+                this.actionsCollapse.collapse();
             } else if ('actionIndex' in validation) {
-                this.state.conditionsCollapsed = true;
-                this.state.actionsCollapsed = false;
+                this.conditionsCollapse.collapse();
+                this.actionsCollapse.expand();
             }
         }
 
@@ -427,12 +421,12 @@ export class ImportRuleForm extends Component {
             ? noDataMessage
             : 'No data';
 
-        removeChilds(container);
         if (Array.isArray(data) && data.length > 0) {
-            data.forEach((item) => container.appendChild(item.elem));
+            const dataItems = data.map((item) => item.elem);
+            container.setContent(dataItems);
         } else {
             const noDataMsgElem = ce('span', { className: 'nodata-message', textContent: message });
-            container.appendChild(noDataMsgElem);
+            container.setContent(noDataMsgElem);
         }
     }
 
@@ -465,11 +459,6 @@ export class ImportRuleForm extends Component {
         }
 
         // Actions
-        if (state.actionsCollapsed) {
-            this.formActions.classList.add('collapsed');
-        } else {
-            this.formActions.classList.remove('collapsed');
-        }
         const actionItems = state.rule.actions.map((action, index) => {
             const props = {
                 parent: this,
@@ -493,13 +482,9 @@ export class ImportRuleForm extends Component {
 
             return new ImportActionForm(props);
         });
-        this.setListContainerData(this.formActionsContainer, actionItems, 'No actions');
+        this.setListContainerData(this.actionsCollapse, actionItems, 'No actions');
+
         // Conditions
-        if (state.conditionsCollapsed) {
-            this.formConditions.classList.add('collapsed');
-        } else {
-            this.formConditions.classList.remove('collapsed');
-        }
         const conditionItems = state.rule.conditions.map((condition, index) => {
             const props = {
                 parent: this,
@@ -522,6 +507,6 @@ export class ImportRuleForm extends Component {
 
             return new ImportConditionForm(props);
         });
-        this.setListContainerData(this.conditionsContainer, conditionItems, 'No conditions');
+        this.setListContainerData(this.conditionsCollapse, conditionItems, 'No conditions');
     }
 }

@@ -343,14 +343,14 @@ body.dark-theme,
 }
 
 .dark-theme .rule-item .collapsible-header,
-.dark-theme .rule-form__collapse-header {
+.dark-theme .rule-form-collapse .collapsible-header {
   color: #dddddd;
   background-color: #202020;
   border-color: #202020;
 }
 
 .dark-theme .rule-item .collapsible-header:hover,
-.dark-theme .rule-form__collapse-header:hover {
+.dark-theme .rule-form-collapse .collapsible-header:hover {
   background-color: #2e2e2e;
   border-color: #505050;
 }
@@ -378,7 +378,7 @@ body.dark-theme,
   color: #b0b0b0;
 }
 
-.dark-theme .rule-form__collapse-content,
+.dark-theme .rule-form-collapse .collapsible-content,
 .dark-theme .rule-item .collapsible-content {
   color: #bbbbbb;
   border-color: #303030;
