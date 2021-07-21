@@ -42,6 +42,6 @@ abstract class AdminController extends TemplateController
         parent::buildCSS();
 
         $this->adminThemes = getThemes("view/css/");
-        $this->adminThemeStylesheet = $this->adminThemes[$this->userTheme];
+        $this->adminThemeStylesheet = $this->adminThemes[$this->userTheme]["file"];
     }
 }

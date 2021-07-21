@@ -1,6 +1,6 @@
 <?php	include(ADMIN_TPL_PATH."commonhdr.tpl");	?>
 </head>
-<body>
+<body class="<?=($this->themeClass)?>">
 <div class="page">
     <div class="page_wrapper">
 <?php	include(ADMIN_TPL_PATH."header.tpl");	?>
