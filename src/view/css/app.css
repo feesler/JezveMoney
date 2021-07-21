@@ -85,6 +85,25 @@ svg * {
   stroke-linejoin: round;
 }
 
+/* layered layout */
+.layer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+}
+
+.layer-box {
+  display: flex;
+  flex-basis: 100%;
+  flex-flow: column nowrap;
+  padding: 0;
+}
+
 /* single line block */
 .view-row {
   max-width: 300px;
@@ -224,77 +243,25 @@ select {
   margin-left: auto;
 }
 
-/* Main view */
-.main-view {
-  display: -ms-flexbox;
-  display: inline-flex;
-  flex-flow: row wrap;
-  width: 100%;
-}
-
-/* Main page widgets */
-.widget {
-  display: -ms-flexbox;
-  display: inline-flex;
+/* Classes used both by Login and Registration views */
+.form-container {
+  display: flex;
+  flex-basis: 100%;
   flex-flow: column nowrap;
-  min-width: 200px;
-  margin: 0 20px 20px 0;
+  align-items: center;
+  justify-content: center;
 }
 
-@media screen and (max-width: 500px) {
-  .widget {
-    display: block;
-    margin: 0;
-    padding: 0 0 20px 0;
-    overflow: hidden;
-  }
-
-  .widget_title {
-    clear: both;
-  }
+.form-controls {
+  padding: 5px 0;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
 }
 
-/* title of main page widget */
-.widget_title {
-  display: block;
-  height: 32px;
-  margin: 10px 0;
-}
-
-.widget_title-link,
-.widget_title-link:hover {
-  height: 32px;
-  text-decoration: none;
-}
-
-.widget_title span {
-  font-weight: 300;
-  font-size: 26px;
-  line-height: 32px;
-  display: inline-block;
-}
-
-.widget_title .glyph {
-  width: 24px;
-  height: 24px;
-  display: inline-block;
-  margin: 0 0 0 4px;
-  vertical-align: text-bottom;
-}
-
-.glyph svg {
-  width: 24px;
-  height: 24px;
-}
-
-/* Main page accounts widget */
-.accounts-widget {
-  max-width: 440px;
-}
-
-/* main page latest transactions widget */
-.transactions-widget {
-  flex-basis: 350px;
+/* alternative link */
+.alter_link {
+  margin: 0 20px;
 }
 
 /* accounts page */
@@ -412,66 +379,6 @@ select {
   fill: #ffffff;
 }
 
-/* Transaction types menu */
-.trtype-menu {
-  padding: 10px 0;
-  font-size: 16px;
-}
-
-.trtype-menu__item {
-  padding: 2px;
-  margin: 0 12px 0 0;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.trtype-menu__item-check {
-  width: 14px;
-  height: 14px;
-  display: inline-block;
-  vertical-align: bottom;
-  border: 1px solid #cccccc;
-  padding: 2px;
-  margin: 0 6px 0 0;
-}
-
-.trtype-menu__item-check svg {
-  width: 14px;
-  height: 14px;
-  visibility: hidden;
-}
-
-.trtype-menu__item-check:hover {
-  background-color: #1e82cc;
-}
-
-.trtype-menu__item-check:hover svg {
-  visibility: visible;
-  fill: #ffffff;
-}
-
-.trtype-menu__item .trtype-menu__item-check:hover {
-  background-color: #cccccc;
-}
-
-.trtype-menu__item .trtype-menu__item-check:active {
-  background-color: #1e82cc;
-}
-
-.trtype-menu__item_selected {
-  font-weight: bold;
-}
-
-.trtype-menu__item_selected .trtype-menu__item-check svg {
-  visibility: visible;
-  fill: #5082aa;
-}
-
-/* Show selected items for multi select menu as normal links */
-.trtype-menu-multi .trtype-menu__item_selected {
-  font-weight: normal;
-}
-
 /* dashed underline button */
 .dashed-btn {
   border: 0 none;
@@ -503,6 +410,14 @@ select {
 
 .widget .nodata-message {
   text-align: left;
+}
+
+/* Tiles list */
+.tiles {
+  display: flex;
+  flex-flow: row wrap;
+  max-width: 440px;
+  overflow: hidden;
 }
 
 /* Information tiles */

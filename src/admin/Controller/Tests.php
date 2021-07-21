@@ -21,8 +21,7 @@ class Tests extends AdminController
         $iconMod = IconModel::getInstance();
         $icons = $iconMod->getData();
 
-        $this->cssArr = ["lib/common.css", "app.css"];
-        $this->cssAdmin = ["admin.css", "tests.css"];
+        $this->cssAdmin[] = "TestsView.css";
         $this->buildCSS();
 
         $this->jsAdmin[] = "tests/index.js";

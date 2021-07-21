@@ -51,7 +51,7 @@ abstract class TemplateController extends Controller
     protected function buildCSS()
     {
         $this->userTheme = $this->uMod->getUserTheme();
-        $this->themes = getThemes("view/css/");
+        $this->themes = getThemes("view/themes/");
         $this->themeStylesheet = $this->themes[$this->userTheme]["file"];
         $this->themeClass = $this->themes[$this->userTheme]["className"];
     }

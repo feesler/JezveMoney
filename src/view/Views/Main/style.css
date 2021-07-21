@@ -1,0 +1,72 @@
+/* Main view */
+.main-view {
+  display: -ms-flexbox;
+  display: inline-flex;
+  flex-flow: row wrap;
+  width: 100%;
+}
+
+/* Main page widgets */
+.widget {
+  display: -ms-flexbox;
+  display: inline-flex;
+  flex-flow: column nowrap;
+  min-width: 200px;
+  margin: 0 20px 20px 0;
+}
+
+@media screen and (max-width: 500px) {
+  .widget {
+    display: block;
+    margin: 0;
+    padding: 0 0 20px 0;
+    overflow: hidden;
+  }
+
+  .widget_title {
+    clear: both;
+  }
+}
+
+/* title of main page widget */
+.widget_title {
+  display: block;
+  height: 32px;
+  margin: 10px 0;
+}
+
+.widget_title-link,
+.widget_title-link:hover {
+  height: 32px;
+  text-decoration: none;
+}
+
+.widget_title span {
+  font-weight: 300;
+  font-size: 26px;
+  line-height: 32px;
+  display: inline-block;
+}
+
+.widget_title .glyph {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  margin: 0 0 0 4px;
+  vertical-align: text-bottom;
+}
+
+.glyph svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Main page accounts widget */
+.accounts-widget {
+  max-width: 440px;
+}
+
+/* main page latest transactions widget */
+.transactions-widget {
+  flex-basis: 350px;
+}

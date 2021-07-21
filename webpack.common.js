@@ -8,76 +8,100 @@ export default {
     target: 'browserslist',
     entry: {
         MainView: {
-            import: './src/view/js/MainView.js',
+            import: './src/view/Views/Main/MainView.js',
             filename: 'view/js/[name].js',
         },
         LoginView: {
-            import: './src/view/js/LoginView.js',
+            import: './src/view/Views/Login/LoginView.js',
             filename: 'view/js/[name].js',
         },
         RegisterView: {
-            import: './src/view/js/RegisterView.js',
+            import: './src/view/Views/Register/RegisterView.js',
             filename: 'view/js/[name].js',
         },
         AccountListView: {
-            import: './src/view/js/AccountListView.js',
+            import: './src/view/Views/AccountList/AccountListView.js',
             filename: 'view/js/[name].js',
         },
         AccountView: {
-            import: './src/view/js/AccountView.js',
+            import: './src/view/Views/Account/AccountView.js',
             filename: 'view/js/[name].js',
         },
         PersonListView: {
-            import: './src/view/js/PersonListView.js',
+            import: './src/view/Views/PersonList/PersonListView.js',
             filename: 'view/js/[name].js',
         },
         PersonView: {
-            import: './src/view/js/PersonView.js',
+            import: './src/view/Views/Person/PersonView.js',
             filename: 'view/js/[name].js',
         },
         ProfileView: {
-            import: './src/view/js/ProfileView.js',
+            import: './src/view/Views/Profile/ProfileView.js',
             filename: 'view/js/[name].js',
         },
         TransactionListView: {
-            import: './src/view/js/TransactionListView.js',
+            import: './src/view/Views/TransactionList/TransactionListView.js',
             filename: 'view/js/[name].js',
         },
         TransactionView: {
-            import: './src/view/js/TransactionView.js',
+            import: './src/view/Views/Transaction/TransactionView.js',
             filename: 'view/js/[name].js',
         },
         ImportView: {
-            import: './src/view/js/ImportView.js',
+            import: './src/view/Views/Import/ImportView.js',
             filename: 'view/js/[name].js',
         },
         StatisticsView: {
-            import: './src/view/js/StatisticsView.js',
+            import: './src/view/Views/Statistics/StatisticsView.js',
             filename: 'view/js/[name].js',
         },
 
         ApiConsoleView: {
-            import: './src/admin/view/js/ApiConsoleView.js',
+            import: './src/admin/view/Views/ApiConsole/ApiConsoleView.js',
             filename: 'admin/view/js/[name].js',
         },
         AdminCurrencyView: {
-            import: './src/admin/view/js/CurrencyView.js',
+            import: './src/admin/view/Views/Currency/CurrencyView.js',
             filename: 'admin/view/js/[name].js',
         },
         AdminIconView: {
-            import: './src/admin/view/js/IconView.js',
+            import: './src/admin/view/Views/Icon/IconView.js',
             filename: 'admin/view/js/[name].js',
         },
         AdminImportRuleView: {
-            import: './src/admin/view/js/ImportRuleView.js',
+            import: './src/admin/view/Views/ImportRule/ImportRuleView.js',
             filename: 'admin/view/js/[name].js',
         },
         AdminImportTplView: {
-            import: './src/admin/view/js/ImportTplView.js',
+            import: './src/admin/view/Views/ImportTpl/ImportTplView.js',
             filename: 'admin/view/js/[name].js',
         },
         AdminUserView: {
-            import: './src/admin/view/js/UserView.js',
+            import: './src/admin/view/Views/User/UserView.js',
+            filename: 'admin/view/js/[name].js',
+        },
+        BalanceView: {
+            import: './src/admin/view/Views/Balance/BalanceView.js',
+            filename: 'admin/view/js/[name].js',
+        },
+        AdminMainView: {
+            import: './src/admin/view/Views/Main/MainView.js',
+            filename: 'admin/view/js/[name].js',
+        },
+        AdminLogsView: {
+            import: './src/admin/view/Views/Logs/LogsView.js',
+            filename: 'admin/view/js/[name].js',
+        },
+        DBInstallView: {
+            import: './src/admin/view/Views/DBInstall/DBInstallView.js',
+            filename: 'admin/view/js/[name].js',
+        },
+        QueriesView: {
+            import: './src/admin/view/Views/Queries/QueriesView.js',
+            filename: 'admin/view/js/[name].js',
+        },
+        TestsView: {
+            import: './src/admin/view/Views/Tests/TestsView.js',
             filename: 'admin/view/js/[name].js',
         },
     },
