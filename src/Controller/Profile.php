@@ -33,6 +33,7 @@ class Profile extends TemplateController
             $titleString .= " | Change password";
         }
 
+        $this->cssArr[] = "ProfileView.css";
         $this->buildCSS();
         $this->jsArr[] = "ProfileView.js";
 

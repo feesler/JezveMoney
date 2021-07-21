@@ -34,6 +34,7 @@ class User extends TemplateController
 
         $titleString = "Jezve Money | Log in";
 
+        $this->cssArr[] = "LoginView.css";
         $this->buildCSS();
         $this->jsArr[] = "LoginView.js";
 
@@ -76,6 +77,7 @@ class User extends TemplateController
 
         $titleString = "Jezve Money | Registration";
 
+        $this->cssArr[] = "RegisterView.css";
         $this->buildCSS();
         $this->jsArr[] = "RegisterView.js";
 

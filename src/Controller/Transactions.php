@@ -217,6 +217,7 @@ class Transactions extends TemplateController
 
         $titleString = "Jezve Money | Transactions";
 
+        $this->cssArr[] = "TransactionListView.css";
         $this->buildCSS();
         $this->jsArr[] = "TransactionListView.js";
 
@@ -536,6 +537,7 @@ class Transactions extends TemplateController
         }
         $titleString .= $headString;
 
+        $this->cssArr[] = "TransactionView.css";
         $this->buildCSS();
         $this->jsArr[] = "TransactionView.js";
 
@@ -795,6 +797,7 @@ class Transactions extends TemplateController
         }
         $titleString .= $headString;
 
+        $this->cssArr[] = "TransactionView.css";
         $this->buildCSS();
         $this->jsArr[] = "TransactionView.js";
 

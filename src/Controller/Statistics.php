@@ -152,6 +152,7 @@ class Statistics extends TemplateController
 
         $titleString = "Jezve Money | Statistics";
 
+        $this->cssArr[] = "StatisticsView.css";
         $this->buildCSS();
         $this->jsArr[] = "StatisticsView.js";
 

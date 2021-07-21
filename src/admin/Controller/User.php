@@ -30,6 +30,7 @@ class User extends AdminController
 
         $titleString = "Admin panel | Users";
 
+        $this->cssAdmin[] = "AdminUserView.css";
         $this->buildCSS();
         $this->jsAdmin[] = "AdminUserView.js";
 

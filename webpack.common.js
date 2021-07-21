@@ -2,6 +2,7 @@ import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 
 export default {
     target: 'browserslist',
@@ -87,6 +88,13 @@ export default {
             keep: 'vendor',
         },
     },
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: ({ chunk }) => chunk.filenameTemplate
+                .replace("/js/", "/css/")
+                .replace(".js", ".css")
+        }),
+    ],
     module: {
         rules: [
             {
@@ -111,22 +119,9 @@ export default {
             {
                 test: /\.css$/i,
                 use: [
-                    {
-                        loader: "style-loader",
-                        options: {
-                            insert: function insertStyle(element) {
-                                var parent = document.querySelector('head');
-                                var themeStyleLink = document.getElementById('theme-style');
-                                if (themeStyleLink) {
-                                    parent.insertBefore(element, themeStyleLink);
-                                } else {
-                                    parent.appendChild(element);
-                                }
-                            },
-                        },
-                    },
+                    MiniCssExtractPlugin.loader,
                     'css-loader',
-                    'postcss-loader'
+                    'postcss-loader',
                 ],
             },
             {
