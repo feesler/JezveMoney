@@ -11,11 +11,11 @@ import {
     removeChilds,
     setEmptyClick,
     ajax,
-    DropDown,
-    DatePicker,
-    Sortable,
-    Selection,
 } from 'jezvejs';
+import { DropDown } from 'jezvejs/DropDown';
+import { DatePicker } from 'jezvejs/DatePicker';
+import { Sortable } from 'jezvejs/Sortable';
+import { Selection } from 'jezvejs/Selection';
 import {
     EXPENSE,
     INCOME,

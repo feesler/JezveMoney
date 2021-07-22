@@ -4,8 +4,8 @@ import {
     show,
     setEmptyClick,
     ajax,
-    Component,
 } from 'jezvejs';
+import { Component } from 'jezvejs/Component';
 import './style.css';
 
 /* global baseURL, themes */

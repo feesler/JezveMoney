@@ -1,4 +1,5 @@
-import { ge, Selection } from 'jezvejs';
+import { ge } from 'jezvejs';
+import { Selection } from 'jezvejs/Selection';
 import { View } from '../../js/View.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';

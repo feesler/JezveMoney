@@ -1,4 +1,4 @@
-import { Histogram } from 'jezvejs';
+import { Histogram } from 'jezvejs/Histogram';
 import { View } from '../../js/View.js';
 import '../../css/common.css';
 import '../../Components/IconLink/style.css';

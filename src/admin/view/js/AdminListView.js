@@ -7,8 +7,8 @@ import {
     show,
     urlJoin,
     ajax,
-    Popup,
 } from 'jezvejs';
+import { Popup } from 'jezvejs/Popup';
 import { createMessage } from '../../../view/js/app.js';
 import { ConfirmDialog } from '../../../view/Components/ConfirmDialog/ConfirmDialog.js';
 import { AdminView } from './AdminView.js';

@@ -1,4 +1,5 @@
-import { ge, urlJoin, Selection } from 'jezvejs';
+import { ge, urlJoin } from 'jezvejs';
+import { Selection } from 'jezvejs/Selection';
 import { View } from '../../js/View.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';

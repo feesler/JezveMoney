@@ -1,9 +1,9 @@
 import {
     ge,
     show,
-    Popup,
     ajax,
 } from 'jezvejs';
+import { Popup } from 'jezvejs/Popup';
 import { createMessage } from '../../js/app.js';
 import { View } from '../../js/View.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';

@@ -6,9 +6,9 @@ import {
     enable,
     urlJoin,
     ajax,
-    Sortable,
-    DropDown,
 } from 'jezvejs';
+import { Sortable } from 'jezvejs/Sortable';
+import { DropDown } from 'jezvejs/DropDown';
 import { formatDate, timestampFromString, createMessage } from '../../js/app.js';
 import { View } from '../../js/View.js';
 import { AccountList } from '../../js/model/AccountList.js';

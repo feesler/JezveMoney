@@ -6,9 +6,9 @@ import {
     show,
     insertAfter,
     ajax,
-    Component,
-    Popup,
 } from 'jezvejs';
+import { Component } from 'jezvejs/Component';
+import { Popup } from 'jezvejs/Popup';
 import { createMessage } from '../../js/app.js';
 import { ImportRule } from '../../js/model/ImportRule.js';
 import { ImportRuleForm } from '../ImportRuleForm/ImportRuleForm.js';

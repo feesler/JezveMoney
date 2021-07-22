@@ -3,9 +3,9 @@ import {
     enable,
     isFunction,
     copyObject,
-    Component,
-    Collapsible,
 } from 'jezvejs';
+import { Component } from 'jezvejs/Component';
+import { Collapsible } from 'jezvejs/Collapsible';
 import { ImportRule } from '../../js/model/ImportRule.js';
 import { ImportAction } from '../../js/model/ImportAction.js';
 import { ImportCondition } from '../../js/model/ImportCondition.js';

@@ -2,9 +2,9 @@ import {
     ge,
     copyObject,
     isNum,
-    DropDown,
-    DecimalInput,
 } from 'jezvejs';
+import { DropDown } from 'jezvejs/DropDown';
+import { DecimalInput } from 'jezvejs/DecimalInput';
 import { normalize } from '../../js/app.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { IconList } from '../../js/model/IconList.js';

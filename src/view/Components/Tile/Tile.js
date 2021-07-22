@@ -2,8 +2,8 @@ import {
     isObject,
     ce,
     svg,
-    Component,
 } from 'jezvejs';
+import { Component } from 'jezvejs/Component';
 import './style.css';
 
 /**

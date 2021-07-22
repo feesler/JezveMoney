@@ -1,4 +1,5 @@
-import { ce, Component } from 'jezvejs';
+import { ce } from 'jezvejs';
+import { Component } from 'jezvejs/Component';
 import {
     ImportAction,
     IMPORT_ACTION_SET_TR_TYPE,

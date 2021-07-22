@@ -9,10 +9,10 @@ import {
     urlJoin,
     px,
     isEmpty,
-    Histogram,
-    DatePicker,
-    DropDown,
 } from 'jezvejs';
+import { Histogram } from 'jezvejs/Histogram';
+import { DatePicker } from 'jezvejs/DatePicker';
+import { DropDown } from 'jezvejs/DropDown';
 import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';

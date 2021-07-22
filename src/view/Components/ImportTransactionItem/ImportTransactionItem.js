@@ -7,9 +7,9 @@ import {
     copyObject,
     addChilds,
     removeChilds,
-    DropDown,
-    Component,
 } from 'jezvejs';
+import { Component } from 'jezvejs/Component';
+import { DropDown } from 'jezvejs/DropDown';
 import {
     fixFloat,
     formatDate,

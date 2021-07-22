@@ -3,10 +3,10 @@ import {
     isFunction,
     show,
     enable,
-    DropDown,
-    Popup,
-    Component,
 } from 'jezvejs';
+import { Component } from 'jezvejs/Component';
+import { DropDown } from 'jezvejs/DropDown';
+import { Popup } from 'jezvejs/Popup';
 import { createMessage } from '../../js/app.js';
 import { ImportFileUploader } from '../ImportFileUploader/ImportFileUploader.js';
 import { ImportTemplateManager } from '../ImportTemplateManager/ImportTemplateManager.js';
