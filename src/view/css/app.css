@@ -454,6 +454,13 @@ select {
   position: absolute;
 }
 
+/* DropDown */
+.dark-theme .dd__list-item.dd__list-item_active,
+.white-theme .dd__list-item.dd__list-item_active {
+  color: #ffffff;
+  background-color: #3078e2;
+}
+
 /* Stretching DropDown */
 .dd__fullwidth {
   display: -ms-flexbox;
