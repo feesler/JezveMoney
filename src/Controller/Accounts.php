@@ -34,6 +34,7 @@ class Accounts extends TemplateController
 
         $titleString = "Jezve Money | Accounts";
 
+        $this->cssArr[] = "AccountListView.css";
         $this->buildCSS();
         $this->jsArr[] = "AccountListView.js";
 
@@ -78,6 +79,7 @@ class Accounts extends TemplateController
         $headString = "New account";
         $titleString .= $headString;
 
+        $this->cssArr[] = "AccountView.css";
         $this->buildCSS();
         $this->jsArr[] = "AccountView.js";
 
@@ -127,6 +129,7 @@ class Accounts extends TemplateController
         $headString = "Edit account";
         $titleString .= $headString;
 
+        $this->cssArr[] = "AccountView.css";
         $this->buildCSS();
         $this->jsArr[] = "AccountView.js";
 

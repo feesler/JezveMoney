@@ -1,0 +1,55 @@
+/* Mode selector and paginator row */
+.paginator-row {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+}
+
+/* Mode selector */
+.mode-selector {
+  display: inline-flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.mode-selector__item {
+  display: inline-flex;
+  flex-flow: row nowrap;
+}
+
+.mode-selector__item span {
+  height: 22px;
+  line-height: 22px;
+  padding: 0 10px 0 5px;
+}
+
+.mode-selector__item .icon {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+}
+
+/* Paginator */
+.paginator {
+  display: inline-flex;
+  flex-flow: row nowrap;
+  margin-left: auto;
+  padding: 5px 0;
+}
+
+.paginator > span {
+  margin-left: 5px;
+  height: 22px;
+  line-height: 22px;
+}
+
+/* Search form */
+.search-form {
+  align-self: right;
+}
+
+.search_btn {
+  align-self: right;
+  flex-grow: 0;
+}

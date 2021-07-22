@@ -10,8 +10,7 @@ class Main extends AdminController
     {
         $titleString = "Admin panel";
 
-        $this->cssArr = ["lib/common.css", "app.css"];
-        $this->cssAdmin = ["admin.css"];
+        $this->cssAdmin[] = "AdminMainView.css";
         $this->buildCSS();
 
         include(ADMIN_TPL_PATH . "index.tpl");

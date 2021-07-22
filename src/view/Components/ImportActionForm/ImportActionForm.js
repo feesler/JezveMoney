@@ -2,10 +2,10 @@ import {
     ce,
     show,
     isFunction,
-    DropDown,
-    DecimalInput,
 } from 'jezvejs';
-import { AppComponent } from '../AppComponent/AppComponent.js';
+import { Component } from 'jezvejs/Component';
+import { DropDown } from 'jezvejs/DropDown';
+import { DecimalInput } from 'jezvejs/DecimalInput';
 import {
     ImportAction,
     IMPORT_ACTION_SET_TR_TYPE,
@@ -13,12 +13,13 @@ import {
     IMPORT_ACTION_SET_PERSON,
 } from '../../js/model/ImportAction.js';
 import { View } from '../../js/View.js';
+import { createField, createContainer, createIcon } from '../../js/app.js';
 import './style.css';
 
 /**
  * ImportActionForm component
  */
-export class ImportActionForm extends AppComponent {
+export class ImportActionForm extends Component {
     constructor(...args) {
         super(...args);
 
@@ -77,7 +78,7 @@ export class ImportActionForm extends AppComponent {
             elem: this.amountInput,
             oninput: this.onValueChange.bind(this),
         });
-        this.amountField = this.createField('Amount', this.amountInput);
+        this.amountField = createField('Amount', this.amountInput);
         // Create value input element
         this.valueInput = ce(
             'input',
@@ -85,9 +86,9 @@ export class ImportActionForm extends AppComponent {
             null,
             { input: this.onValueChange.bind(this) },
         );
-        this.valueField = this.createField('Value', this.valueInput);
+        this.valueField = createField('Value', this.valueInput);
         // Form fields container
-        this.fieldsContainer = this.createContainer('action-form__fields', [
+        this.fieldsContainer = createContainer('action-form__fields', [
             this.actionTypeField,
             this.transTypeField,
             this.accountField,
@@ -97,7 +98,7 @@ export class ImportActionForm extends AppComponent {
         ]);
         // Invalid feedback message
         this.validFeedback = ce('div', { className: 'invalid-feedback' });
-        this.container = this.createContainer('action-form__container validation-block', [
+        this.container = createContainer('action-form__container validation-block', [
             this.fieldsContainer,
             this.validFeedback,
         ]);
@@ -106,15 +107,15 @@ export class ImportActionForm extends AppComponent {
         this.delBtn = ce(
             'button',
             { className: 'btn icon-btn delete-btn right-align', type: 'button' },
-            this.createIcon('del'),
+            createIcon('del'),
             { click: this.onDelete.bind(this) },
         );
 
-        this.controls = this.createContainer('action-form__controls', [
+        this.controls = createContainer('action-form__controls', [
             this.delBtn,
         ]);
 
-        this.elem = this.createContainer('action-form', [
+        this.elem = createContainer('action-form', [
             this.container,
             this.controls,
         ]);
@@ -125,7 +126,7 @@ export class ImportActionForm extends AppComponent {
         const items = this.actionTypes.map((type) => ({ id: type.id, title: type.title }));
 
         const selectElem = ce('select');
-        this.actionTypeField = this.createField('Action', selectElem);
+        this.actionTypeField = createField('Action', selectElem);
 
         this.actionDropDown = DropDown.create({
             input_id: selectElem,
@@ -140,7 +141,7 @@ export class ImportActionForm extends AppComponent {
         const items = this.transactionTypes.map((type) => ({ id: type.id, title: type.title }));
 
         const selectElem = ce('select');
-        this.transTypeField = this.createField('Transaction type', selectElem);
+        this.transTypeField = createField('Transaction type', selectElem);
 
         this.trTypeDropDown = DropDown.create({
             input_id: selectElem,
@@ -158,7 +159,7 @@ export class ImportActionForm extends AppComponent {
         );
 
         const selectElem = ce('select');
-        this.accountField = this.createField('Account', selectElem);
+        this.accountField = createField('Account', selectElem);
 
         this.accountDropDown = DropDown.create({
             input_id: selectElem,
@@ -174,7 +175,7 @@ export class ImportActionForm extends AppComponent {
         const items = this.model.persons.map((person) => ({ id: person.id, title: person.name }));
 
         const selectElem = ce('select');
-        this.personField = this.createField('Person', selectElem);
+        this.personField = createField('Person', selectElem);
 
         this.personDropDown = DropDown.create({
             input_id: selectElem,

@@ -8,16 +8,12 @@
 }
 
 /* Collapsible container */
-.rule-form__collapse {
-  display: flex;
-  flex-flow: column nowrap;
-  flex: 1 1 auto;
+.rule-form-collapse {
   min-height: 40px;
   margin-bottom: 9px;
 }
 
-.rule-form__collapse-header {
-  display: flex;
+.rule-form-collapse .collapsible-header {
   flex-flow: row wrap;
   align-items: center;
   flex: none;
@@ -27,7 +23,7 @@
   cursor: pointer;
 }
 
-.rule-form__collapse-header label {
+.rule-form-collapse .collapsible-header label {
   font-size: 18px;
   margin-right: 12px;
 }
@@ -40,24 +36,21 @@
   cursor: pointer;
 }
 
-.rule-form__collapse .toggle-btn svg {
+.rule-form-collapse.collapsible__expanded .toggle-btn svg {
   transform: rotate(180deg);
   height: 18px;
-}
-
-.rule-form__collapse.collapsed .toggle-btn svg {
-  transform: none;
 }
 
 /* No data message */
 .rule-form .nodata-message {
   display: flex;
   flex-direction: column;
+  width: 100%;
   background: none;
 }
 
 /* Conditions/Actions list container */
-.rule-form__collapse-content {
+.rule-form-collapse .collapsible-content {
   flex: 1 1 auto;
   min-height: 48px;
   overflow-y: auto;
@@ -66,6 +59,10 @@
   margin: 0 1px;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
+}
+
+.rule-form-collapse.collapsible__expanded > .collapsible-content {
+    display: block;
 }
 
 /* Validation feedback container */
@@ -81,7 +78,10 @@
   flex: none;
 }
 
-.rule-form__collapse.collapsed .link-btn,
-.rule-form__collapse.collapsed .rule-form__collapse-content {
+.rule-form-collapse .link-btn {
   display: none;
+}
+
+.rule-form-collapse.collapsible__expanded .link-btn {
+  display: inline-block;
 }

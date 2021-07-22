@@ -16,6 +16,7 @@ class ApiConsole extends AdminController
 
         $titleString = "Admin panel | API console";
 
+        $this->cssAdmin[] = "ApiConsoleView.css";
         $this->buildCSS();
         $this->jsAdmin[] = "ApiConsoleView.js";
 

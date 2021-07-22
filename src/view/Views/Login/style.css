@@ -1,0 +1,67 @@
+.login-layer {
+  justify-content: flex-start;
+}
+
+.logo-container {
+  width: 100%;
+  background-color: #20a0ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-logo {
+  max-width: 300px;
+  padding: 12px;
+  height: 62px;
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.login-logo > .logo {
+  width: 62px;
+}
+
+.login-logo > .logo > svg {
+  width: 62px;
+  height: 62px;
+}
+
+.login-logo > .title {
+  height: 62px;
+  line-height: 62px;
+  font-size: 32px;
+  font-weight: normal;
+  color: #ffffff;
+  white-space: nowrap;
+  margin: 0 0 0 12px;
+}
+
+.login-form {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 100px;
+  max-width: 300px;
+  padding: 0 12px;
+}
+
+@media all and (min-width: 700px) {
+  .login-layer {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .login-layer .layer-box {
+    display: flex;
+    flex-flow: row nowrap;
+    flex-basis: auto;
+    justify-content: center;
+    width: 100%;
+    max-width: 700px;
+    height: 300px;
+    margin: 0 auto;
+    padding: 0 12px;
+  }
+}

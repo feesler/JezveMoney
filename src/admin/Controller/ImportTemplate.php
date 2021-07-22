@@ -27,6 +27,7 @@ class ImportTemplate extends AdminController
 
         $titleString = "Admin panel | Import templates";
 
+        $this->cssAdmin[] = "AdminImportTplView.css";
         $this->buildCSS();
         $this->jsAdmin[] = "AdminImportTplView.js";
 

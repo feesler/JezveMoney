@@ -1,0 +1,433 @@
+/* Page */
+body.dark-theme,
+.dark-theme .page_wrapper {
+  color: #dddddd;
+  background-color: #101010;
+}
+
+/* Main content */
+.dark-theme .container {
+  background-color: #202020;
+}
+
+/* Input controls color */
+.dark-theme input[type="text"],
+.dark-theme input[type="password"],
+.dark-theme select {
+  border-color: #dddddd;
+  background-color: #202020;
+  color: #dddddd;
+}
+
+/* Login/Register view */
+.dark-theme .login-layer,
+.dark-theme .register-layer {
+  background-color: #101010;
+}
+
+.dark-theme .login-layer h1,
+.dark-theme .register-layer h1 {
+  color: #dddddd;
+}
+
+.dark-theme .heading {
+  color: #dddddd;
+}
+
+.dark-theme .iconlink .iconlink__icon {
+  border-color: #dddddd;
+}
+
+.dark-theme .iconlink:hover .iconlink__icon {
+  background-color: #dddddd;
+}
+
+.dark-theme .iconlink .iconlink__icon svg * {
+  fill: #dddddd;
+}
+
+.dark-theme .iconlink .iconlink__content {
+  color: #dddddd;
+}
+
+.dark-theme .iconlink > *:hover .iconlink__icon,
+.dark-theme .iconlink > *:hover .iconlink__content {
+  color: #dddddd;
+}
+
+/* No data message for lists & etc. */
+.dark-theme .nodata-message {
+  background-color: #292929;
+  color: #b0b0b0;
+}
+
+/* Main view widgets */
+.dark-theme .widget_title,
+.dark-theme .widget_title > a,
+.dark-theme .widget_title > a:hover,
+.dark-theme .widget_title > a:visited {
+  color: #dddddd;
+}
+
+.dark-theme .widget_title .glyph svg * {
+  fill: #dddddd;
+}
+
+/* Transaction type menu */
+.dark-theme .trtype-menu__item_selected {
+  color: #dddddd;
+}
+
+.dark-theme .stretch-input {
+  border-color: #dddddd;
+  background-color: #202020;
+}
+
+.dark-theme .input-group__btn_inactive {
+  color: #dddddd;
+  background-color: #202020;
+}
+
+/* DropDown  */
+.dark-theme .dd__combo,
+.dark-theme .dd__input,
+.dark-theme .dd__single-selection,
+.dark-theme .dd__toggle-btn {
+  background-color: #202020;
+  color: #dddddd;
+}
+
+.dark-theme .dd__combo {
+  border-color: #dddddd;
+}
+
+.dark-theme .dd__container_active .dd__combo,
+.dark-theme .dd__container_active .dd__input,
+.dark-theme .dd__container_active .dd__single-selection,
+.dark-theme .dd__container_active .dd__toggle-btn {
+  color: #dddddd;
+  border-color: #dddddd;
+  background-color: #202020;
+}
+
+.dark-theme .dd__container.dd__container_disabled .dd__combo {
+  color: #707070;
+  border-color: #202020;
+  background-color: #202020;
+}
+
+.dark-theme .dd__list {
+  background-color: #202020;
+  border-right-color: #dddddd;
+  border-left-color: #dddddd;
+}
+
+.dark-theme .dd__list_drop-down {
+  border-bottom-color: #dddddd;
+}
+
+.dark-theme .dd__list_drop-up {
+  border-top-color: #dddddd;
+}
+
+.dark-theme .dd__list-item {
+  color: #dddddd;
+  background-color: #202020;
+}
+
+.dark-theme .dd__list-item > svg {
+  fill: #dddddd;
+}
+
+.dark-theme .dd__container_enabled .dd__toggle-btn:hover path {
+  fill: #dddddd;
+}
+
+@media (max-width: 767px) {
+  .dark-theme .dd__container.dd__fullscreen.dd__open .dd__background {
+    background-color: #202020;
+  }
+
+  .dark-theme .dd__container.dd__fullscreen.dd__open .dd__list {
+    border-color: #dddddd;
+  }
+}
+
+/* Date picker */
+.dark-theme .dp__wrapper {
+  background-color: #202020;
+  color: #dddddd;
+  border-color: #dddddd;
+}
+
+.dark-theme .dp__cell {
+  color: #dddddd;
+  border-color: #202020;
+  background-color: #202020;
+}
+
+.dark-theme .dp__other-month-cell {
+  color: #505050;
+}
+
+.dark-theme .dp__today-cell,
+.dark-theme .dp__cell_hl.dp__today-cell {
+  border: 1px dashed #00bef3;
+}
+
+.dark-theme .dp__cell_act {
+  border-color: #20d0ff;
+}
+
+.dark-theme .dp__cell_hl {
+  background-color: #005688;
+  border-color: #005688;
+  color: #ffffff;
+}
+
+.dark-theme .dp__year-range-view__cell:hover,
+.dark-theme .dp__year-view__cell:hover,
+.dark-theme .dp__day-cell:hover {
+  background-color: #3198d4;
+  color: #dddddd;
+}
+
+/* Transaction list */
+
+.dark-theme .paginator > span {
+  color: #dddddd;
+}
+
+/* Transaction list item */
+.dark-theme .trans-list_details td > div,
+.dark-theme .trans-list_details tr.trans-list__item_selected > td > div {
+  background-color: #505050;
+}
+
+.dark-theme .trans-list__item-comment {
+  border-left-color: #b0b0b0;
+}
+
+.dark-theme .trans-list_details .trans-list__item-comment {
+  color: #dddddd;
+}
+
+.dark-theme .trans-list__item,
+.dark-theme div.trans-list__item_selected {
+  background-color: #505050;
+}
+
+.dark-theme .tritem_balance,
+.dark-theme .trans-list__item-title,
+.dark-theme .trans-list__item-content {
+  color: #dddddd;
+}
+
+.dark-theme .trans-list__item-details {
+  color: #b0b0b0;
+}
+
+/* Bar chart */
+.dark-theme .charts svg text tspan {
+  fill: #dddddd;
+}
+
+/* Profile view */
+.dark-theme .profile_block {
+  color: #dddddd;
+}
+
+/* Popup */
+.dark-theme .popup__content .popup__content-box {
+  color: #dddddd;
+  background-color: #303030;
+}
+
+.dark-theme .popup__title,
+.dark-theme .popup__message {
+  color: #dddddd;
+}
+
+/* Tiles list */
+.dark-theme .tiles > span,
+.dark-theme .info-tiles > span {
+  color: #dddddd;
+}
+
+/* Import view */
+.dark-theme .import-item {
+  background-color: #505050;
+}
+
+.dark-theme .import-item .extended-content {
+  color: #bbbbbb;
+  border-color: #3c3c3c;
+  background-color: #444444;
+}
+
+.dark-theme .import-item.import-item_disabled .extended-content {
+  color: #707070;
+  border-color: #333333;
+  background-color: #232323;
+}
+
+.dark-theme .import-item select,
+.dark-theme .import-item input[type="text"] {
+  border-color: #dddddd;
+}
+
+.dark-theme .import-item select[disabled],
+.dark-theme .import-item input[disabled] {
+  color: #808080;
+  border-color: #808080;
+  background-color: #202020;
+}
+
+.dark-theme .import-item.import-item_disabled {
+  background-color: #292929;
+  color: #707070;
+  border-color: #707070;
+}
+
+.dark-theme .import-item_disabled select,
+.dark-theme .import-item_disabled select[disabled],
+.dark-theme .import-item_disabled input[type="text"],
+.dark-theme .import-item_disabled input[disabled] {
+  color: #707070;
+  border-color: #202020;
+  background-color: #202020;
+}
+
+.dark-theme .import-item_disabled input::placeholder {
+  color: #707070;
+}
+
+.dark-theme .import-item .btn,
+.dark-theme .import-item .btn:visited,
+.dark-theme .import-item .btn:active {
+  color: #dddddd;
+}
+
+.dark-theme .import-item .btn:hover {
+  background-color: #303030;
+}
+
+.dark-theme .import-item .btn svg {
+  fill: #888888;
+}
+
+/* Placeholder */
+.dark-theme .import-item.import-item__placeholder {
+  border-color: #888888;
+  background-color: #202020;
+}
+
+.dark-theme .import-controls {
+  color: #dddddd;
+}
+
+/* Upload dialog */
+.dark-theme .upload-form__browser.drag-over {
+  outline-color: #dddddd;
+}
+
+/* Import rules dialog */
+.dark-theme .rules-dialog__loading {
+  color: #dddddd;
+  background-color: #303030;
+}
+
+/* Import rule */
+.dark-theme .rule-item .collapsible-content {
+  background-color: #202020;
+}
+
+.dark-theme .rule-item .collapsible-header,
+.dark-theme .rule-form-collapse .collapsible-header {
+  color: #dddddd;
+  background-color: #202020;
+  border-color: #202020;
+}
+
+.dark-theme .rule-item .collapsible-header:hover,
+.dark-theme .rule-form-collapse .collapsible-header:hover {
+  background-color: #2e2e2e;
+  border-color: #505050;
+}
+
+.dark-theme .rule-item__operator {
+  color: #808080;
+}
+
+.dark-theme .rule-item .icon-btn:hover,
+.dark-theme .rule-form .icon-btn:hover {
+  background-color: #2e2e2e;
+}
+
+.dark-theme .rule-item .icon-btn svg,
+.dark-theme .rule-form .icon-btn svg {
+  fill: #888888;
+}
+
+.dark-theme .rule-item .icon-btn:hover svg,
+.dark-theme .rule-form .icon-btn:hover svg {
+  fill: #dddddd;
+}
+
+.dark-theme .rule-item__info {
+  color: #b0b0b0;
+}
+
+.dark-theme .rule-form-collapse .collapsible-content,
+.dark-theme .rule-item .collapsible-content {
+  color: #bbbbbb;
+  border-color: #303030;
+  background-color: #252525;
+}
+
+/* Condition item */
+.dark-theme .cond-item,
+.dark-theme .cond-form {
+  background-color: #353535;
+  border-color: #353535;
+}
+
+.dark-theme .cond-item__operator {
+  color: #808080;
+}
+
+/* Action item */
+.dark-theme .action-item,
+.dark-theme .action-form {
+  background-color: #353535;
+}
+
+/* Import item */
+.dark-theme .import-item .btn:hover svg {
+  fill: #dddddd;
+}
+
+/* Statistics view */
+.dark-theme .stat-histogram > span {
+  color: #dddddd;
+}
+
+.dark-theme .chart_popup {
+  border-color: #000000;
+  background-color: #202020;
+  color: #dddddd;
+}
+
+.dark-theme .iconlink:hover .iconlink__icon svg * {
+  fill: #202020;
+}
+
+/* Tile info block */
+.dark-theme .tile-info-block > div > span {
+  color: #dddddd;
+}
+
+/* Transaction list mode selector */
+.dark-theme .mode-selector > b > span {
+  color: #dddddd;
+}

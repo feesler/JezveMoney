@@ -25,8 +25,7 @@ class DBInstall extends AdminController
 
         $titleString = "Admin panel | DB update";
 
-        $this->cssArr = ["lib/common.css", "app.css"];
-        $this->cssAdmin = ["admin.css"];
+        $this->cssAdmin[] = "DBInstallView.css";
         $this->buildCSS();
 
         include(ADMIN_TPL_PATH . "dbinstall.tpl");

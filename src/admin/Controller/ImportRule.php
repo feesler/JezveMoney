@@ -37,6 +37,7 @@ class ImportRule extends AdminController
 
         $titleString = "Admin panel | Import rules";
 
+        $this->cssAdmin[] = "AdminImportRuleView.css";
         $this->buildCSS();
         $this->jsAdmin[] = "AdminImportRuleView.js";
 

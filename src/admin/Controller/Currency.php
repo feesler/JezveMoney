@@ -27,6 +27,7 @@ class Currency extends AdminController
 
         $titleString = "Admin panel | Currency";
 
+        $this->cssAdmin[] = "AdminCurrencyView.css";
         $this->buildCSS();
         $this->jsAdmin[] = "AdminCurrencyView.js";
 

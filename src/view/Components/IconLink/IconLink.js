@@ -1,4 +1,6 @@
-import { isFunction, Component } from 'jezvejs';
+import { isFunction } from 'jezvejs';
+import { Component } from 'jezvejs/Component';
+import './style.css';
 
 /**
  * IconLink component

@@ -1,4 +1,6 @@
-import { isFunction, Component, Popup } from 'jezvejs';
+import { isFunction } from 'jezvejs';
+import { Component } from 'jezvejs/Component';
+import { Popup } from 'jezvejs/Popup';
 
 /**
  * Confirmation dialog component

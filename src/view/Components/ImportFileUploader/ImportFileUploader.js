@@ -4,8 +4,8 @@ import {
     isFunction,
     urlJoin,
     ajax,
-    Component,
 } from 'jezvejs';
+import { Component } from 'jezvejs/Component';
 import { createMessage } from '../../js/app.js';
 import { Uploader } from '../../js/component/uploader.js';
 

@@ -8,9 +8,9 @@ import {
     show,
     enable,
     ajax,
-    Component,
-    DropDown,
 } from 'jezvejs';
+import { Component } from 'jezvejs/Component';
+import { DropDown } from 'jezvejs/DropDown';
 import { createMessage } from '../../js/app.js';
 import { ImportTemplate } from '../../js/model/ImportTemplate.js';
 import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog.js';

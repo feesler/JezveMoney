@@ -1,18 +1,19 @@
 import { ce } from 'jezvejs';
-import { AppComponent } from '../AppComponent/AppComponent.js';
+import { Component } from 'jezvejs/Component';
 import {
     ImportAction,
     IMPORT_ACTION_SET_TR_TYPE,
     IMPORT_ACTION_SET_ACCOUNT,
     IMPORT_ACTION_SET_PERSON,
 } from '../../js/model/ImportAction.js';
+import { createContainer } from '../../js/app.js';
 import './style.css';
 
 /**
  * ImportActionItem component
  * @param {Object} props
  */
-export class ImportActionItem extends AppComponent {
+export class ImportActionItem extends Component {
     constructor(...args) {
         super(...args);
 
@@ -58,7 +59,7 @@ export class ImportActionItem extends AppComponent {
         this.actionTypeLabel = ce('span', { className: 'action-item__type' });
         this.valueLabel = ce('span', { className: 'action-item__value' });
 
-        this.elem = this.createContainer('action-item', [
+        this.elem = createContainer('action-item', [
             this.actionTypeLabel,
             this.valueLabel,
         ]);

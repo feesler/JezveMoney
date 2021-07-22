@@ -6,9 +6,9 @@ import {
     show,
     insertAfter,
     ajax,
-    Component,
-    Popup,
 } from 'jezvejs';
+import { Component } from 'jezvejs/Component';
+import { Popup } from 'jezvejs/Popup';
 import { createMessage } from '../../js/app.js';
 import { ImportRule } from '../../js/model/ImportRule.js';
 import { ImportRuleForm } from '../ImportRuleForm/ImportRuleForm.js';
@@ -299,9 +299,7 @@ export class ImportRulesDialog extends Component {
             this.noDataMsg = ce('span', { className: 'nodata-message', textContent: 'No rules' });
             this.listContainer.appendChild(this.noDataMsg);
         } else {
-            ruleItems.forEach(function (item) {
-                this.listContainer.appendChild(item.elem);
-            }, this);
+            ruleItems.forEach((item) => this.listContainer.appendChild(item.elem));
         }
 
         show(this.listContainer, true);

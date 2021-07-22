@@ -18,6 +18,7 @@ class Persons extends TemplateController
 
         $titleString = "Jezve Money | Persons";
 
+        $this->cssArr[] = "PersonListView.css";
         $this->buildCSS();
         $this->jsArr[] = "PersonListView.js";
 
@@ -51,6 +52,7 @@ class Persons extends TemplateController
         $headString = "New person";
         $titleString .= $headString;
 
+        $this->cssArr[] = "PersonView.css";
         $this->buildCSS();
         $this->jsArr[] = "PersonView.js";
 
@@ -80,6 +82,7 @@ class Persons extends TemplateController
         $headString = "Edit person";
         $titleString .= $headString;
 
+        $this->cssArr[] = "PersonView.css";
         $this->buildCSS();
         $this->jsArr[] = "PersonView.js";
 

@@ -70,6 +70,7 @@ class Main extends TemplateController
 
         $titleString = "Jezve Money";
 
+        $this->cssArr[] = "MainView.css";
         $this->buildCSS();
         $this->jsArr[] = "MainView.js";
 

@@ -1,0 +1,15 @@
+/* Registration view */
+.register-form {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 100px;
+  max-width: 300px;
+  padding: 0 12px;
+}
+
+.register-layer {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  top: 50px;
+}

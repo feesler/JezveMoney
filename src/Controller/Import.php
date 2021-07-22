@@ -38,6 +38,7 @@ class Import extends TemplateController
             "templates" => $impTemplates
         ];
 
+        $this->cssArr[] = "ImportView.css";
         $this->buildCSS();
         $this->jsArr[] = "ImportView.js";
 

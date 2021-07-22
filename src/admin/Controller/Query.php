@@ -55,8 +55,7 @@ class Query extends AdminController
 
         $titleString = "Admin panel | DB queries";
 
-        $this->cssArr = ["lib/common.css", "app.css"];
-        $this->cssAdmin = ["admin.css", "query.css"];
+        $this->cssAdmin[] = "QueriesView.css";
         $this->buildCSS();
 
         include(ADMIN_TPL_PATH . "query.tpl");

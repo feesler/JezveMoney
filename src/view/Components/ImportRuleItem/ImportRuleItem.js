@@ -6,19 +6,21 @@ import {
     addChilds,
     removeChilds,
 } from 'jezvejs';
-import { AppComponent } from '../AppComponent/AppComponent.js';
+import { Component } from 'jezvejs/Component';
+import { Collapsible } from 'jezvejs/Collapsible';
 import { ImportRule } from '../../js/model/ImportRule.js';
 import { ImportConditionList } from '../../js/model/ImportConditionList.js';
 import { ImportActionList } from '../../js/model/ImportActionList.js';
 import { ImportConditionItem } from '../ImportConditionItem/ImportConditionItem.js';
 import { ImportActionItem } from '../ImportActionItem/ImportActionItem.js';
+import { createContainer, createIcon } from '../../js/app.js';
 import './style.css';
 
 /**
  * ImportRuleItem component constructor
  * @param {Object} props
  */
-export class ImportRuleItem extends AppComponent {
+export class ImportRuleItem extends Component {
     constructor(...args) {
         super(...args);
 
@@ -70,73 +72,60 @@ export class ImportRuleItem extends AppComponent {
         this.updateBtn = ce(
             'button',
             { className: 'btn icon-btn update-btn', type: 'button' },
-            this.createIcon('update'),
+            createIcon('update'),
             { click: this.onUpdate.bind(this) },
         );
         // Delete button
         this.delBtn = ce(
             'button',
             { className: 'btn icon-btn delete-btn', type: 'button' },
-            this.createIcon('del'),
+            createIcon('del'),
             { click: this.onDelete.bind(this) },
         );
         // Toggle expand/collapse
         this.toggleExtBtn = ce(
             'button',
             { className: 'btn icon-btn toggle-btn', type: 'button' },
-            this.createIcon('toggle-ext'),
+            createIcon('toggle-ext'),
         );
 
-        this.topRow = this.createContainer('rule-item__main-top', [
+        this.topRow = createContainer('rule-item__main-top', [
             this.propertyLabel,
             this.operatorLabel,
             this.valueLabel,
         ]);
-        this.bottomRow = this.createContainer('rule-item__main-bottom', [
+        this.bottomRow = createContainer('rule-item__main-bottom', [
             this.infoLabel,
         ]);
 
-        this.infoContainer = this.createContainer('rule-item__main-info', [
+        this.infoContainer = createContainer('rule-item__main-info', [
             this.topRow,
             this.bottomRow,
         ]);
 
-        this.controls = this.createContainer('rule-item__main-controls', [
+        this.controls = createContainer('rule-item__main-controls', [
             this.updateBtn,
             this.delBtn,
             this.toggleExtBtn,
         ]);
 
         this.conditionsHeader = ce('label', { className: 'rule-item__header', textContent: 'Conditions' });
-        this.conditionsContainer = this.createContainer('rule-item__conditions', []);
+        this.conditionsContainer = createContainer('rule-item__conditions', []);
 
         this.actionsHeader = ce('label', { className: 'rule-item__header', textContent: 'Actions' });
-        this.actionsContainer = this.createContainer('rule-item__actions', []);
+        this.actionsContainer = createContainer('rule-item__actions', []);
 
-        this.dataContainer = this.createContainer('rule-item__ext', [
-            this.conditionsHeader,
-            this.conditionsContainer,
-            this.actionsHeader,
-            this.actionsContainer,
-        ]);
-
-        this.headerContainer = this.createContainer(
-            'rule-item__main',
-            [this.infoContainer, this.controls],
-            { click: this.toggleCollapse.bind(this) },
-        );
-
-        this.elem = this.createContainer('rule-item', [
-            this.headerContainer,
-            this.dataContainer,
-        ]);
-    }
-
-    /** Toggle expand/collapse button 'click' event handler */
-    toggleCollapse() {
-        this.state.expanded = !this.state.expanded;
-
-        this.render(this.state);
+        this.collapse = new Collapsible({
+            className: 'rule-item',
+            header: [this.infoContainer, this.controls],
+            content: [
+                this.conditionsHeader,
+                this.conditionsContainer,
+                this.actionsHeader,
+                this.actionsContainer,
+            ],
+        });
+        this.elem = this.collapse.elem;
     }
 
     /** Set main state of component */
@@ -146,7 +135,6 @@ export class ImportRuleItem extends AppComponent {
         }
 
         this.state = {
-            expanded: false,
             ruleId: data.id,
             conditions: data.conditions,
             actions: data.actions,
@@ -220,12 +208,6 @@ export class ImportRuleItem extends AppComponent {
 
         if (state.ruleId) {
             this.elem.setAttribute('data-id', state.ruleId);
-        }
-
-        if (state.expanded) {
-            this.elem.classList.add('rule-item_expanded');
-        } else {
-            this.elem.classList.remove('rule-item_expanded');
         }
 
         // Render conditions
