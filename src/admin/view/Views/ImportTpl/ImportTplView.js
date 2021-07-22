@@ -1,6 +1,6 @@
+import 'jezvejs/style';
 import { ge, ce } from 'jezvejs';
 import { AdminListView } from '../../js/AdminListView.js';
-import '../../../../view/css/common.css';
 import '../../../../view/css/app.css';
 import '../../css/admin.css';
 

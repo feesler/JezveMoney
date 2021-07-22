@@ -1,3 +1,4 @@
+import 'jezvejs/style';
 import {
     ge,
     ce,
@@ -8,7 +9,6 @@ import {
 import { AdminListView } from '../../js/AdminListView.js';
 import { AdminImportConditionListView } from './ImportConditionView.js';
 import { AdminImportActionListView } from './ImportActionView.js';
-import '../../../../view/css/common.css';
 import '../../../../view/css/app.css';
 import '../../css/admin.css';
 import './style.css';

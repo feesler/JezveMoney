@@ -1,3 +1,4 @@
+import 'jezvejs/style';
 import {
     ge,
     ce,
@@ -16,7 +17,6 @@ import { DropDown } from 'jezvejs/DropDown';
 import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
-import '../../css/common.css';
 import '../../css/app.css';
 import '../../Components/TransactionTypeMenu/style.css';
 import './style.css';

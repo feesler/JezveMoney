@@ -1,3 +1,4 @@
+import 'jezvejs/style';
 import {
     ge,
     ce,
@@ -11,7 +12,6 @@ import {
     ajax,
 } from 'jezvejs';
 import { AdminView } from '../../js/AdminView.js';
-import '../../../../view/css/common.css';
 import '../../../../view/css/app.css';
 import '../../css/admin.css';
 import './style.css';

@@ -1,10 +1,10 @@
+import 'jezvejs/style';
 import { ge, urlJoin } from 'jezvejs';
 import { Selection } from 'jezvejs/Selection';
 import { View } from '../../js/View.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { AccountList } from '../../js/model/AccountList.js';
-import '../../css/common.css';
 import '../../css/app.css';
 import '../../Components/Tile/style.css';
 import '../../Components/IconLink/style.css';

@@ -1,3 +1,4 @@
+import 'jezvejs/style';
 import {
     ge,
     re,
@@ -17,7 +18,6 @@ import { PersonList } from '../../js/model/PersonList.js';
 import { ImportRuleList } from '../../js/model/ImportRuleList.js';
 import { ImportTemplateList } from '../../js/model/ImportTemplateList.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
-import '../../css/common.css';
 import '../../css/app.css';
 import './style.css';
 import { ImportUploadDialog } from '../../Components/ImportUploadDialog/ImportUploadDialog.js';

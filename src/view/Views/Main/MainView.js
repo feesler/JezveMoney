@@ -1,6 +1,6 @@
+import 'jezvejs/style';
 import { Histogram } from 'jezvejs/Histogram';
 import { View } from '../../js/View.js';
-import '../../css/common.css';
 import '../../Components/IconLink/style.css';
 import '../../css/app.css';
 import '../../Components/Tile/style.css';

@@ -1,3 +1,4 @@
+import 'jezvejs/style';
 import {
     ge,
     ce,
@@ -28,7 +29,6 @@ import { IconLink } from '../../Components/IconLink/IconLink.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
-import '../../css/common.css';
 import '../../css/app.css';
 import '../../Components/TransactionTypeMenu/style.css';
 import '../../Components/TransactionsList/style.css';

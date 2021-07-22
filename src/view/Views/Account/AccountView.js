@@ -1,3 +1,4 @@
+import 'jezvejs/style';
 import {
     ge,
     copyObject,
@@ -12,7 +13,6 @@ import { View } from '../../js/View.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
-import '../../css/common.css';
 import '../../css/app.css';
 import '../../Components/Tile/style.css';
 

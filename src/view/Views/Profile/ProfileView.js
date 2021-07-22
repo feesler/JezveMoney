@@ -1,3 +1,4 @@
+import 'jezvejs/style';
 import {
     ge,
     show,
@@ -7,7 +8,6 @@ import { Popup } from 'jezvejs/Popup';
 import { createMessage } from '../../js/app.js';
 import { View } from '../../js/View.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import '../../css/common.css';
 import '../../css/app.css';
 import './style.css';
 

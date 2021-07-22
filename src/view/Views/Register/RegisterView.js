@@ -1,6 +1,6 @@
+import 'jezvejs/style';
 import { ge } from 'jezvejs';
 import { View } from '../../js/View.js';
-import '../../css/common.css';
 import '../../css/app.css';
 import './style.css';
 

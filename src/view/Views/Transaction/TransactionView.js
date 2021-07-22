@@ -1,3 +1,4 @@
+import 'jezvejs/style';
 import {
     ge,
     isNum,
@@ -28,7 +29,6 @@ import { Tile } from '../../Components/Tile/Tile.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TileInfoItem } from '../../Components/TileInfoItem/TileInfoItem.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
-import '../../css/common.css';
 import '../../css/app.css';
 import './style.css';
 
