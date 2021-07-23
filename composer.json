@@ -11,7 +11,7 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"JezveMoney\\Core\\": "system/",
+			"JezveMoney\\Core\\": "system/Engine/",
 			"JezveMoney\\App\\": "",
 			"JezveMoney\\App\\Admin\\": "admin/",
 			"JezveMoney\\App\\API\\": "api/",

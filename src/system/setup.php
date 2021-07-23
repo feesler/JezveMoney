@@ -25,7 +25,7 @@ if (!isSecure()) {
     exit;
 }
 
-require_once(APP_ROOT . "system/JSON.php");
+require_once(APP_ROOT . "system/Engine/JSON.php");
 require_once(APP_ROOT . "vendor/autoload.php");
 
 setupLogs();
@@ -35,6 +35,6 @@ JezveMoney\Core\MySqlDB::setup($dbConfig);
 
 date_default_timezone_set("Europe/Moscow");
 
-require_once(APP_ROOT . "system/Message.php");
+require_once(APP_ROOT . "system/Engine/Message.php");
 require_once(APP_ROOT . "system/messages.php");
 wlog("==================================================");
