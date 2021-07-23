@@ -30,6 +30,7 @@ import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TileInfoItem } from '../../Components/TileInfoItem/TileInfoItem.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import '../../css/app.css';
+import '../../Components/TransactionTypeMenu/style.css';
 import './style.css';
 
 const singleTransDeleteTitle = 'Delete transaction';
