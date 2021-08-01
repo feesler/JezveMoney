@@ -4,6 +4,8 @@ namespace JezveMoney\App\Controller;
 
 use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Message;
+use JezveMoney\Core\Template;
+use JezveMoney\Core\JSON;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\IconModel;
@@ -27,18 +29,23 @@ class Accounts extends TemplateController
 
     public function index()
     {
+        $this->template = new Template(TPL_PATH . "accounts.tpl");
+        $data = [
+            "titleString" => "Jezve Money | Accounts"
+        ];
+
         $accountsData = $this->model->getData(["type" => "all"]);
+        $data["tilesArr"] = $this->model->getTilesArray();
+        $data["hiddenTilesArr"] = $this->model->getTilesArray(["type" => "hidden"]);
 
-        $tilesArr = $this->model->getTilesArray();
-        $hiddenTilesArr = $this->model->getTilesArray(["type" => "hidden"]);
-
-        $titleString = "Jezve Money | Accounts";
+        $data["viewData"] = JSON::encode([
+            "accounts" => $accountsData
+        ]);
 
         $this->cssArr[] = "AccountListView.css";
-        $this->buildCSS();
         $this->jsArr[] = "AccountListView.js";
 
-        include(TPL_PATH . "accounts.tpl");
+        $this->render($data);
     }
 
 
@@ -48,6 +55,12 @@ class Accounts extends TemplateController
             $this->createAccount();
             return;
         }
+
+        $this->template = new Template(TPL_PATH . "account.tpl");
+        $data = [
+            "headString" => "New account",
+            "titleString" => "Jezve Money | New account"
+        ];
 
         $currMod = CurrencyModel::getInstance();
 
@@ -68,22 +81,24 @@ class Accounts extends TemplateController
 
         $accInfo->sign = $currObj->sign;
         $accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr_id);
-        $tileAccName = "New account";
+        $data["accInfo"] = $accInfo;
+        $data["tileAccName"] = "New account";
 
-        $currArr = $currMod->getData();
+        $data["currArr"] = $currMod->getData();
 
         $iconModel = IconModel::getInstance();
-        $icons = $iconModel->getData();
+        $data["icons"] = $iconModel->getData();
 
-        $titleString = "Jezve Money | ";
-        $headString = "New account";
-        $titleString .= $headString;
+        $data["viewData"] = JSON::encode([
+            "account" => $accInfo,
+            "currency" => $data["currArr"],
+            "icons" => $data["icons"]
+        ]);
 
         $this->cssArr[] = "AccountView.css";
-        $this->buildCSS();
         $this->jsArr[] = "AccountView.js";
 
-        include(TPL_PATH . "account.tpl");
+        $this->render($data);
     }
 
 
@@ -104,12 +119,19 @@ class Accounts extends TemplateController
             return;
         }
 
+        $this->template = new Template(TPL_PATH . "account.tpl");
+        $data = [
+            "headString" => "Edit account",
+            "titleString" => "Jezve Money | Edit account"
+        ];
+
         $currMod = CurrencyModel::getInstance();
 
         $acc_id = intval($this->actionParam);
         if (!$acc_id) {
             $this->fail();
         }
+        $data["acc_id"] = $acc_id;
 
         $accInfo = $this->model->getItem($acc_id);
 
@@ -117,23 +139,25 @@ class Accounts extends TemplateController
         $accInfo->sign = ($currObj) ? $currObj->sign : null;
         $accInfo->icon = $this->model->getIconFile($acc_id);
         $accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr_id);
+        $data["accInfo"] = $accInfo;
 
-        $tileAccName = $accInfo->name;
+        $data["tileAccName"] = $accInfo->name;
 
-        $currArr = $currMod->getData();
+        $data["currArr"] = $currMod->getData();
 
         $iconModel = IconModel::getInstance();
-        $icons = $iconModel->getData();
+        $data["icons"] = $iconModel->getData();
 
-        $titleString = "Jezve Money | ";
-        $headString = "Edit account";
-        $titleString .= $headString;
+        $data["viewData"] = JSON::encode([
+            "account" => $accInfo,
+            "currency" => $data["currArr"],
+            "icons" => $data["icons"]
+        ]);
 
         $this->cssArr[] = "AccountView.css";
-        $this->buildCSS();
         $this->jsArr[] = "AccountView.js";
 
-        include(TPL_PATH . "account.tpl");
+        $this->render($data);
     }
 
 

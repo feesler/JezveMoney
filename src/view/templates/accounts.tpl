@@ -1,6 +1,3 @@
-<?php
-    use JezveMoney\Core\JSON;
-?>
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body class="<?=($this->themeClass)?>">
@@ -108,11 +105,6 @@
 <input id="delaccounts" name="accounts" type="hidden" value="">
 </form>
 <?php	include(TPL_PATH."icons.tpl");	?>
-<script>
-window.app = {
-    accounts: <?=JSON::encode($accountsData)?>
-};
-</script>
 <?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

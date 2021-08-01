@@ -1,6 +1,3 @@
-<?php
-    use JezveMoney\Core\JSON;
-?>
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body class="<?=($this->themeClass)?>">
@@ -131,14 +128,6 @@
     </div>
 </div>
 
-<script>
-window.app = {
-    currency: <?=JSON::encode($currArr)?>,
-    accountCurrency: <?=$accCurr?>,
-    filter: <?=JSON::encode($filterObj)?>,
-    chartData: <?=JSON::encode($statArr)?>
-};
-</script>
 <?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

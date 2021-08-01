@@ -1,6 +1,3 @@
-<?php
-    use JezveMoney\Core\JSON;
-?>
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body class="<?=($this->themeClass)?>">
@@ -45,12 +42,12 @@
                         <span class="nodata-message">You need at least two active accounts for transfer.</span>
 <?php	} else if ($action == "new" && !$acc_count && $tr["type"] != TRANSFER) {		?>
                         <span class="nodata-message">You have no one active account. Please create one.</span>
-<?php	} else if ($action == "new" && !$person_id && $tr["type"] == DEBT) {		?>
+<?php	} else if ($action == "new" && $tr["type"] == DEBT && !$tr["person_id"]) {		?>
                         <span class="nodata-message">You have no one active person. Please create one for debts.</span>
 <?php	} else {		?>
 <?php	if ($tr["type"] == DEBT) {		?>
                         <div id="person" class="account-container">
-                            <input id="person_id" name="person_id" type="hidden" value="<?=e($person_id)?>">
+                            <input id="person_id" name="person_id" type="hidden" value="<?=e($tr["person_id"])?>">
                             <div class="tile_header"><label>Person name</label></div>
                             <div class="tile-base">
                                 <div class="tile_container">
@@ -81,7 +78,7 @@
                                             <button class="dashed-btn" type="button"><span><?=e($rtExchange)?></span></button>
                                         </div>
                                     </div>
-<?php		if ($give) {		?>
+<?php		if ($tr["debtType"]) {		?>
                                     <div id="src_res_balance_left">
                                         <span>Result balance</span>
                                         <div>
@@ -103,13 +100,13 @@
                         <div id="source" class="account-container">
                             <div class="tile_header">
                                 <label id="acclbl"><?=e($accLbl)?></label>
-<?php		if ($noAccount) {		?>
+<?php		if ($tr["noAccount"]) {		?>
                                 <button id="noacc_btn" class="close-btn hidden" type="button"><?=svgIcon("close")?></button>
 <?php		} else {	?>
                                 <button id="noacc_btn" class="close-btn" type="button"><?=svgIcon("close")?></button>
 <?php		}	?>
                             </div>
-<?php		if ($noAccount) {		?>
+<?php		if ($tr["noAccount"]) {		?>
                             <div class="tile-base hidden">
 <?php		} else {	?>
                             <div class="tile-base">
@@ -134,7 +131,7 @@
                                             <button class="dashed-btn" type="button"><span><?=e($rtDestAmount)?></span></button>
                                         </div>
                                     </div>
-<?php		if ($give) { 		?>
+<?php		if ($tr["debtType"]) { 		?>
                                     <div id="dest_res_balance_left">
                                         <span>Result balance</span>
                                         <div>
@@ -151,7 +148,7 @@
 <?php		}		?>
                                 </div>
                             </div>
-<?php		if ($noAccount) {		?>
+<?php		if ($tr["noAccount"]) {		?>
                             <div id="selaccount" class="account-toggler">
 <?php		} else {	?>
                             <div id="selaccount" class="account-toggler hidden">
@@ -277,8 +274,8 @@
                         <div id="operation" class="view-row">
                             <div><label>Operation</label></div>
                             <div class="debt-op-selector">
-                                <label><input id="debtgive" name="op" type="radio" value="1"<?=($give ? " checked" : "")?>><span>give</span></label>
-                                <label><input id="debttake" name="op" type="radio" value="2"<?=($give ? "" : " checked")?>><span>take</span></label>
+                                <label><input id="debtgive" name="op" type="radio" value="1"<?=($tr["debtType"] ? " checked" : "")?>><span>give</span></label>
+                                <label><input id="debttake" name="op" type="radio" value="2"<?=($tr["debtType"] ? "" : " checked")?>><span>take</span></label>
                             </div>
                         </div>
 <?php	}	?>
@@ -444,19 +441,6 @@
 <?php	}	?>
 
 <?php	include(TPL_PATH."icons.tpl");	?>
-<script>
-window.app = {
-    mode: '<?=(($action == "edit") ? "update" : "create")?>',
-    profile: <?=JSON::encode($profileData)?>,
-    transaction: <?=JSON::encode($tr)?>,
-    accounts: <?=JSON::encode($accArr)?>,
-    currency: <?=JSON::encode($currArr)?>,
-    icons: <?=JSON::encode($icons)?>,
-<?php	if ($tr["type"] == DEBT) {		?>
-    persons: <?=JSON::encode($persArr)?>
-<?php	}	?>
-};
-</script>
 <?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

@@ -10,7 +10,7 @@
     <div class="paginator-row">
         <div class="mode-selector">
 <?php		if ($showDetails) {		?>
-            <a class="mode-selector__item" href="<?=e($linkStr)?>">
+            <a class="mode-selector__item" href="<?=e($modeLink)?>">
                 <span class="icon"><?=svgIcon("list")?></span>
                 <span>Classic</span>
             </a>
@@ -23,7 +23,7 @@
                 <span class="icon"><?=svgIcon("list")?></span>
                 <span>Classic</span>
             </b>
-            <a class="mode-selector__item" href="<?=e($linkStr)?>">
+            <a class="mode-selector__item" href="<?=e($modeLink)?>">
                 <span class="icon"><?=svgIcon("details")?></span>
                 <span>Details</span>
             </a>

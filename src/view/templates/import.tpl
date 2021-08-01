@@ -94,7 +94,7 @@
                 </label>
                 <div class="upload-form__filename"></div>
             </form>
-<?php	if ($this->uMod->isAdmin($this->user_id) || $this->uMod->isTester($this->user_id)) { ?>
+<?php	if ($this->adminUser || $this->testerUser) { ?>
             <div id="serverAddressBlock" class="row-container hidden">
                 <input id="serverAddress" type="text">
                 <input id="serverUploadBtn" class="btn submit-btn" type="button" value="Upload">
@@ -106,7 +106,7 @@
                 <input id="isEncodeCheck" name="encode" type="checkbox" checked>
                 <span>CP-1251 encoding</span>
             </label>
-<?php	if ($this->uMod->isAdmin($this->user_id) || $this->uMod->isTester($this->user_id)) { ?>
+<?php	if ($this->adminUser || $this->testerUser) { ?>
             <label class="checkwrap">
                 <input id="useServerCheck" type="checkbox">
                 <span>Use address on server</span>
@@ -180,9 +180,6 @@
 </div>
 
 <?php	include(TPL_PATH."icons.tpl");	?>
-<script>
-window.app = <?=JSON::encode($viewData)?>;
-</script>
 <?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

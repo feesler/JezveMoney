@@ -130,11 +130,6 @@
 </div>
 
 <?php	include(TPL_PATH."icons.tpl");	?>
-<script>
-window.app = {
-    chartData: <?=JSON::encode($statArr)?>
-};
-</script>
 <?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

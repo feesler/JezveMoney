@@ -1,6 +1,3 @@
-<?php
-    use JezveMoney\Core\JSON;
-?>
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body class="<?=($this->themeClass)?>">
@@ -92,14 +89,6 @@
 </form>
 </div>
 
-<script>
-window.app = {
-    profile: <?=JSON::encode($profileInfo)?>,
-<?php	if ($this->action == "changePass" || $this->action == "changeName") {		?>
-    action: <?=JSON::encode($this->action)?>
-<?php	}	?>
-};
-</script>
 <?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

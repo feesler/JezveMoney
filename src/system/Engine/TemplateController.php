@@ -10,6 +10,7 @@ abstract class TemplateController extends Controller
 {
     public $action = null;
     public $actionParam = null;
+    protected $template = null;
     protected $cssArr = null;
     protected $css = null;
     protected $jsArr = null;
@@ -48,12 +49,25 @@ abstract class TemplateController extends Controller
     }
 
 
-    protected function buildCSS()
+    protected function render($data = [])
     {
-        $this->userTheme = $this->uMod->getUserTheme();
-        $this->themes = getThemes("view/themes/");
-        $this->themeStylesheet = $this->themes[$this->userTheme]["file"];
-        $this->themeClass = $this->themes[$this->userTheme]["className"];
+        $this->template->action = $this->action;
+        $this->template->actionParam = $this->actionParam;
+
+        $this->template->cssArr = $this->cssArr;
+        $this->template->jsArr = $this->jsArr;
+        $this->template->user_id = $this->user_id;
+        $this->template->user_name = $this->user_name;
+        $this->template->adminUser = $this->adminUser;
+
+        $userTheme = $this->uMod->getUserTheme();
+        $this->template->userTheme = $userTheme;
+        $themes = getThemes("view/themes/");
+        $this->template->themes = $themes;
+        $this->template->themeStylesheet = $themes[$userTheme]["file"];
+        $this->template->themeClass = $themes[$userTheme]["className"];
+
+        echo $this->template->render($data);
     }
 
 
@@ -63,6 +77,7 @@ abstract class TemplateController extends Controller
         $this->uMod = UserModel::getInstance();
         // Check session and cookies
         $this->user_id = $this->uMod->check();
+        $this->adminUser = $this->uMod->isAdmin($this->user_id);
 
         // Get name of user person
         if ($this->user_id) {

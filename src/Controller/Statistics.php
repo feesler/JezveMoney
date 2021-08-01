@@ -3,21 +3,27 @@
 namespace JezveMoney\App\Controller;
 
 use JezveMoney\Core\TemplateController;
+use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\TransactionModel;
+use JezveMoney\Core\JSON;
 
 class Statistics extends TemplateController
 {
     public function index()
     {
+        $this->template = new Template(TPL_PATH . "statistics.tpl");
+        $data = [];
+
         $transMod = TransactionModel::getInstance();
         $accMod = AccountModel::getInstance();
         $currMod = CurrencyModel::getInstance();
         $filterObj = new \stdClass();
 
         $byCurrency = (isset($_GET["filter"]) && $_GET["filter"] == "currency");
+        $data["byCurrency"] = $byCurrency;
         $filterObj->filter = $byCurrency ? "currency" : "account";
 
         $trans_type = EXPENSE;
@@ -63,6 +69,8 @@ class Statistics extends TemplateController
 
             $curr_id = null;
         }
+        $data["acc_id"] = $acc_id;
+        $data["curr_id"] = $curr_id;
 
         // Prepare transaction types menu
         $trTypes = TransactionModel::getTypeNames();
@@ -93,8 +101,9 @@ class Statistics extends TemplateController
 
             $transMenu[] = $menuItem;
         }
+        $data["transMenu"] = $transMenu;
 
-        $byCurrArr = [
+        $data["byCurrArr"] = [
             ["title" => "Accounts", "selected" => ($byCurrency == false)],
             ["title" => "Currencies", "selected" => ($byCurrency == true)]
         ];
@@ -113,8 +122,10 @@ class Statistics extends TemplateController
             $filterObj->stdate = $stDate;
             $filterObj->enddate = $endDate;
         }
+        $data["dateFmt"] = $dateFmt;
 
         $groupTypes = ["None", "Day", "Week", "Month", "Year"];
+        $data["groupTypes"] = $groupTypes;
 
         $groupType = null;
         $groupType_id = 0;
@@ -132,9 +143,10 @@ class Statistics extends TemplateController
                 $filterObj->group = $groupType;
             }
         }
+        $data["groupType_id"] = $groupType_id;
 
-        $accArr = $accMod->getData();
-        $currArr = $currMod->getData();
+        $data["accArr"] = $accMod->getData();
+        $data["currArr"] = $currMod->getData();
         $accObj = $accMod->getItem($acc_id);
 
         if ($byCurrency) {
@@ -149,14 +161,21 @@ class Statistics extends TemplateController
             $trans_type,
             $groupType_id
         );
+        $data["statArr"] = $statArr;
 
-        $titleString = "Jezve Money | Statistics";
+        $data["titleString"] = "Jezve Money | Statistics";
+
+        $data["viewData"] = JSON::encode([
+            "currency" => $data["currArr"],
+            "accountCurrency" => $accCurr,
+            "filter" => $filterObj,
+            "chartData" => $statArr
+        ]);
 
         $this->cssArr[] = "StatisticsView.css";
-        $this->buildCSS();
         $this->jsArr[] = "StatisticsView.js";
 
-        include(TPL_PATH . "statistics.tpl");
+        $this->render($data);
     }
 
 

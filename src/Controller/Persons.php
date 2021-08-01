@@ -3,7 +3,9 @@
 namespace JezveMoney\App\Controller;
 
 use JezveMoney\Core\TemplateController;
+use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
+use JezveMoney\Core\JSON;
 
 class Persons extends TemplateController
 {
@@ -12,17 +14,23 @@ class Persons extends TemplateController
 
     public function index()
     {
-        $personsData = $this->personMod->getData(["type" => "all"]);
-        $persArr = $this->personMod->getData();
-        $hiddenPersArr = $this->personMod->getData(["type" => "hidden"]);
+        $this->template = new Template(TPL_PATH . "persons.tpl");
+        $data = [];
 
-        $titleString = "Jezve Money | Persons";
+        $personsData = $this->personMod->getData(["type" => "all"]);
+        $data["persArr"] = $this->personMod->getData();
+        $data["hiddenPersArr"] = $this->personMod->getData(["type" => "hidden"]);
+
+        $data["titleString"] = "Jezve Money | Persons";
+
+        $data["viewData"] = JSON::encode([
+            "persons" => $personsData
+        ]);
 
         $this->cssArr[] = "PersonListView.css";
-        $this->buildCSS();
         $this->jsArr[] = "PersonListView.js";
 
-        include(TPL_PATH . "persons.tpl");
+        $this->render($data);
     }
 
 
@@ -43,20 +51,26 @@ class Persons extends TemplateController
             return;
         }
 
+        $this->template = new Template(TPL_PATH . "person.tpl");
+        $data = [];
+
         $pInfo = new \stdClass();
         $pInfo->id = 0;
         $pInfo->name = "";
         $pInfo->flags = 0;
+        $data["pInfo"] = $pInfo;
 
-        $titleString = "Jezve Money | ";
-        $headString = "New person";
-        $titleString .= $headString;
+        $data["headString"] = "New person";
+        $data["titleString"] = "Jezve Money | ".$data["headString"];
+
+        $data["viewData"] = JSON::encode([
+            "person" => $pInfo
+        ]);
 
         $this->cssArr[] = "PersonView.css";
-        $this->buildCSS();
         $this->jsArr[] = "PersonView.js";
 
-        include(TPL_PATH . "person.tpl");
+        $this->render($data);
     }
 
 
@@ -66,27 +80,31 @@ class Persons extends TemplateController
             $this->updatePerson();
         }
 
+        $this->template = new Template(TPL_PATH . "person.tpl");
+        $data = [];
+
         $p_id = intval($this->actionParam);
         if (!$p_id) {
             $this->fail(ERR_PERSON_UPDATE);
         }
 
-        $pObj = $this->personMod->getItem($p_id);
-        if (!$pObj) {
+        $pInfo = $this->personMod->getItem($p_id);
+        if (!$pInfo) {
             $this->fail(ERR_PERSON_UPDATE);
         }
+        $data["pInfo"] = $pInfo;
 
-        $pInfo = clone $pObj;
+        $data["headString"] = "Edit person";
+        $data["titleString"] = "Jezve Money | ".$data["headString"];
 
-        $titleString = "Jezve Money | ";
-        $headString = "Edit person";
-        $titleString .= $headString;
+        $data["viewData"] = JSON::encode([
+            "person" => $pInfo
+        ]);
 
         $this->cssArr[] = "PersonView.css";
-        $this->buildCSS();
         $this->jsArr[] = "PersonView.js";
 
-        include(TPL_PATH . "person.tpl");
+        $this->render($data);
     }
 
 

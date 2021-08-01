@@ -3,19 +3,24 @@
 namespace JezveMoney\App\Controller;
 
 use JezveMoney\Core\TemplateController;
+use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
+use JezveMoney\Core\JSON;
 use JezveMoney\App\Model\AccountModel;
 
 class Profile extends TemplateController
 {
     public function index()
     {
+        $this->template = new Template(TPL_PATH . "profile.tpl");
+        $data = [];
+
         $uObj = $this->uMod->getItem($this->user_id);
         if (!$uObj) {
             throw new \Error("User not found");
         }
 
-        $user_login = $uObj->login;
+        $data["user_login"] = $uObj->login;
 
         $pObj = $this->personMod->getItem($uObj->owner_id);
         if (!$pObj) {
@@ -24,6 +29,7 @@ class Profile extends TemplateController
 
         $profileInfo = new \stdClass();
         $profileInfo->name = $pObj->name;
+        $data["profileInfo"] = $profileInfo;
 
         $titleString = "Jezve Money | Profile";
         if ($this->action == "changeName") {
@@ -31,12 +37,22 @@ class Profile extends TemplateController
         } elseif ($this->action == "changePass") {
             $titleString .= " | Change password";
         }
+        $data["titleString"] = $titleString;
+
+        $viewData = [
+            "profile" => $profileInfo
+        ];
+
+        if ($this->action == "changePass" || $this->action == "changeName") {
+            $viewData["action"] = $this->action;
+        }
+
+        $data["viewData"] = JSON::encode($viewData);
 
         $this->cssArr[] = "ProfileView.css";
-        $this->buildCSS();
         $this->jsArr[] = "ProfileView.js";
 
-        include(TPL_PATH . "profile.tpl");
+        $this->render($data);
     }
 
 

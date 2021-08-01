@@ -1,6 +1,3 @@
-<?php
-    use JezveMoney\Core\JSON;
-?>
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body class="<?=($this->themeClass)?>">
@@ -141,14 +138,6 @@
 <input id="deltrans" name="transactions" type="hidden" value="">
 </form>
 
-<script>
-window.app = {
-    accounts: <?=JSON::encode($accArr)?>,
-    currency: <?=JSON::encode($currArr)?>,
-    transArr: <?=JSON::encode($transArr)?>,
-    filterObj: <?=JSON::encode($filterObj)?>
-};
-</script>
 <?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

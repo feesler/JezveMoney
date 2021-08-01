@@ -24,7 +24,7 @@
             </button>
             <div id="menupopup" class="user-menu hidden">
                 <ul>
-<?php	if ($this->uMod->isAdmin($this->user_id)) {		?>
+<?php	if ($this->adminUser) {		?>
                     <li><a href="<?=BASEURL?>admin/">admin panel</a></li>
                     <li class="separator"></li>
 <?php	}		?>
