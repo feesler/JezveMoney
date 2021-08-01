@@ -22,12 +22,12 @@
                     <div class="profile_block">
                         <h2>User name</h2>
                         <span id="namestatic"><?=e($profileInfo->name)?></span>
-                        <div><a id="changeNameBtn" href="<?=BASEURL?>profile/changename/">Change</a></div>
+                        <div><a id="changeNameBtn" href="<?=BASEURL?>profile/changeName/">Change</a></div>
                     </div>
 
                     <div class="profile_block">
                         <h2>Security</h2>
-                        <div><a id="changePassBtn" href="<?=BASEURL?>profile/changepass/">Change password</a></div>
+                        <div><a id="changePassBtn" href="<?=BASEURL?>profile/changePass/">Change password</a></div>
                     </div>
 
                     <div class="profile_block">
@@ -95,7 +95,7 @@
 <script>
 window.app = {
     profile: <?=JSON::encode($profileInfo)?>,
-<?php	if ($this->action == "changepass" || $this->action == "changename") {		?>
+<?php	if ($this->action == "changePass" || $this->action == "changeName") {		?>
     action: <?=JSON::encode($this->action)?>
 <?php	}	?>
 };

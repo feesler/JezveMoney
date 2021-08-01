@@ -16,7 +16,6 @@ class Profile extends TemplateController
         }
 
         $user_login = $uObj->login;
-        $action = $this->action;
 
         $pObj = $this->personMod->getItem($uObj->owner_id);
         if (!$pObj) {
@@ -27,9 +26,9 @@ class Profile extends TemplateController
         $profileInfo->name = $pObj->name;
 
         $titleString = "Jezve Money | Profile";
-        if ($action == "changename") {
+        if ($this->action == "changeName") {
             $titleString .= " | Change name";
-        } elseif ($action == "changepassword") {
+        } elseif ($this->action == "changePass") {
             $titleString .= " | Change password";
         }
 
@@ -56,7 +55,7 @@ class Profile extends TemplateController
         $requiredFields = ["name"];
 
         if (!$this->isPOST()) {
-            setLocation(BASEURL . "profile/");
+            return $this->index();
         }
 
         $defMsg = ERR_PROFILE_NAME;
@@ -83,7 +82,7 @@ class Profile extends TemplateController
         $requiredFields = ["current", "new"];
 
         if (!$this->isPOST()) {
-            setLocation(BASEURL . "profile/");
+            return $this->index();
         }
 
         $defMsg = ERR_PROFILE_PASSWORD;
