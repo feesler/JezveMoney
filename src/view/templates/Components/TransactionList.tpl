@@ -3,11 +3,7 @@
 
 use JezveMoney\App\Template\Paginator;
 
-if (!$accounts) {		?>
-    <span class="nodata-message">You have no one account. Please create one.</span>
-<?php	} else if (!$totalTrCount) {	?>
-    <span class="nodata-message">You have no one transaction yet.</span>
-<?php	} else if (!count($transArr)) {	?>
+        if (!count($items)) {	?>
     <span class="nodata-message">No transactions found.</span>
 <?php	} else {		?>
 <?php	if ($showPaginator == TRUE) {		?>
@@ -33,17 +29,15 @@ if (!$accounts) {		?>
             </a>
 <?php		}	?>
         </div>
-<?php	}	?>
-<?php	if ($trParams["onPage"] > 0 && $showPaginator == TRUE) {		?>
 <?=Paginator::render($paginator)?>
-<?php	}	?>
     </div>
+<?php	}	?>
 <?php	if ($showDetails) {	?>
     <table id="tritems" class="trans-list_details">
 <?php	} else {	?>
     <div id="tritems">
 <?php	}	?>
-<?php	foreach($trListData as $trItem) {	?>
+<?php	foreach($items as $trItem) {	?>
 <?php	    if ($showDetails) {		?>
         <tbody class="trans-list__item-wrapper">
         <tr data-id="<?=e($trItem["id"])?>">
@@ -106,7 +100,7 @@ if (!$accounts) {		?>
 <?php	} else {	?>
     </div>
 <?php	}	?>
-<?php	if ($trParams["onPage"] > 0 && $showPaginator == TRUE) {		?>
+<?php	if ($showPaginator == TRUE) {		?>
     <div class="paginator-row">
 <?=Paginator::render($paginator)?>
     </div>

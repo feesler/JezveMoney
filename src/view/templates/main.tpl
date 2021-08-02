@@ -1,5 +1,5 @@
 <?php
-    use JezveMoney\Core\JSON;
+    use JezveMoney\App\Template\TransactionList;
 ?>
 <?php	include(TPL_PATH."commonhdr.tpl");	?>
 </head>
@@ -61,28 +61,7 @@
                                 <div class="glyph"><?=svgIcon("glyph")?></div>
                             </a>
                         </div>
-                        <div id="trlist" class="trans-list">
-<?php	if (!count($trListData)) {	?>
-                            <span class="nodata-message">You have no one transaction yet.</span>
-<?php	} else if (!count($tilesArr)) {	?>
-                            <span class="nodata-message">You have no one account. Please create one.</span>
-<?php	} else {	?>
-<?php		foreach($trListData as $trItem) {	?>
-                            <div class="trans-list__item-wrapper">
-                                <div class="trans-list__item" data-id="<?=e($trItem["id"])?>">
-                                    <div class="trans-list__item-title"><span><?=e($trItem["acc"])?></span></div>
-                                    <div class="trans-list__item-content"><span><?=e($trItem["amount"])?></span></div>
-                                    <div class="trans-list__item-details">
-                                        <span><?=e($trItem["date"])?></span>
-<?php		if ($trItem["comment"] != "") {		?>
-                                        <span class="trans-list__item-comment"><?=e($trItem["comment"])?></span>
-<?php		}	?>
-                                    </div>
-                                </div>
-                            </div>
-<?php		}	?>
-<?php	}	?>
-                        </div>
+<?=TransactionList::render($transactionsData)?>
                     </div>
 
                     <div class="widget">

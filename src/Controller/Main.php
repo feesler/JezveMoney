@@ -14,7 +14,9 @@ class Main extends TemplateController
     public function index()
     {
         $this->template = new Template(TPL_PATH . "main.tpl");
-        $data = [];
+        $data = [
+            "titleString" => "Jezve Money"
+        ];
 
         $accMod = AccountModel::getInstance();
         $transMod = TransactionModel::getInstance();
@@ -44,7 +46,12 @@ class Main extends TemplateController
 
             $trListData[] = $itemData;
         }
-        $data["trListData"] = $trListData;
+        $transactionsData = [
+            "items" => $trListData,
+            "showPaginator" => false,
+            "showDetails" => false
+        ];
+        $data["transactionsData"] = $transactionsData;
 
         $persArr = $this->personMod->getData();
         foreach ($persArr as $ind => $pData) {
@@ -73,8 +80,6 @@ class Main extends TemplateController
         $groupType_id = 2;        // group by week
 
         $data["statArr"] = $transMod->getHistogramSeries($byCurrency, $curr_acc_id, EXPENSE, $groupType_id, 5);
-
-        $data["titleString"] = "Jezve Money";
 
         $data["viewData"] = JSON::encode([
             "chartData" => $data["statArr"]

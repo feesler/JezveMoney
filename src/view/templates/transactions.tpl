@@ -1,4 +1,8 @@
-<?php	include(TPL_PATH."commonhdr.tpl");	?>
+<?php
+use JezveMoney\App\Template\TransactionList;
+
+include(TPL_PATH."commonhdr.tpl");
+?>
 </head>
 <body class="<?=($this->themeClass)?>">
 <div class="page">
@@ -104,9 +108,7 @@
                             </div>
                         </div>
 
-<?php
-    include(TPL_PATH."trlist.tpl");
-?>
+<?=TransactionList::render($listData)?>
                     </div>
                 </div>
             </div>

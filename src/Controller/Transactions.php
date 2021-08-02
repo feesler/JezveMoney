@@ -53,7 +53,12 @@ class Transactions extends TemplateController
     public function index()
     {
         $this->template = new Template(TPL_PATH . "transactions.tpl");
-        $data = [];
+        $data = [
+            "titleString" => "Jezve Money | Transactions"
+        ];
+        $listData = [
+            "showPaginator" => true,
+        ];
 
         $filterObj = new \stdClass();
         $trParams = [
@@ -139,17 +144,14 @@ class Transactions extends TemplateController
             $showDetails = true;
             $filterObj->mode = "details";
         }
-        $data["showDetails"] = $showDetails;
+        $listData["showDetails"] = $showDetails;
 
         $data["accArr"] = $this->accModel->getData();
         $data["hiddenAccArr"] = $this->accModel->getData(["type" => "hidden"]);
         $data["accounts"] = $this->accModel->getCount(["type" => "all"]);
 
-        $totalTrCount = $this->model->getCount();
-        $data["totalTrCount"] = $totalTrCount;
+        $transArr = $this->model->getData($trParams);
 
-        $transArr = ($totalTrCount) ? $this->model->getData($trParams) : [];
-        $data["transArr"] = $transArr;
         $transCount = $this->model->getTransCount($trParams);
         $data["transCount"] = $transCount;
 
@@ -189,15 +191,13 @@ class Transactions extends TemplateController
         }
         $data["transMenu"] = $transMenu;
 
-        $showPaginator = true;
-
         // Prepare mode selector and paginator
-        if ($showPaginator == true) {
+        if ($listData["showPaginator"] == true) {
             // Prepare classic/details mode link
             $urlParams = (array)$filterObj;
             $urlParams["mode"] = ($showDetails) ? "classic" : "details";
 
-            $data["modeLink"] = urlJoin(BASEURL . "transactions/", $urlParams);
+            $listData["modeLink"] = urlJoin(BASEURL . "transactions/", $urlParams);
 
             // Build data for paginator
             if ($trParams["onPage"] > 0) {
@@ -218,10 +218,8 @@ class Transactions extends TemplateController
                     }
                 }
             }
-            $data["paginator"] = ["pagesArr" => $pagesArr];
+            $listData["paginator"] = ["pagesArr" => $pagesArr];
         }
-        $data["trParams"] = $trParams;
-        $data["showPaginator"] = $showPaginator;
 
         // Prepare data of transaction list items
         $trListData = [];
@@ -230,9 +228,9 @@ class Transactions extends TemplateController
 
             $trListData[] = $itemData;
         }
-        $data["trListData"] = $trListData;
+        $listData["items"] = $trListData;
 
-        $data["titleString"] = "Jezve Money | Transactions";
+        $data["listData"] = $listData;
 
         $data["viewData"] = JSON::encode([
             "accounts" => $data["accArr"],
