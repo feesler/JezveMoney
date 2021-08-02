@@ -15,9 +15,11 @@ class Template
     {
         ob_start();
 
-        foreach ($data as $key => $value) {
-            ${$key} = $value;
+        foreach ($data as $__key => $__value) {
+            ${$__key} = $__value;
         }
+        unset($__key);
+        unset($__value);
 
         include $this->filename;
 
