@@ -3,7 +3,7 @@ use JezveMoney\Core\JSON;
 use JezveMoney\Core\Message;
 ?>
 <script>
-    window.app = <?=$viewData?>;
+    window.app = <?=(isset($viewData) ? $viewData : "{}")?>;
     window.addEventListener('error', function(e) {
         if (window.parent) {
             window.parent.postMessage(e.error, '*');

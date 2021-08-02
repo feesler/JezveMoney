@@ -35,8 +35,7 @@ class User extends TemplateController
 
         $this->template = new Template(TPL_PATH . "login.tpl");
         $data = [
-            "titleString" => "Jezve Money | Log in",
-            "viewData" => null
+            "titleString" => "Jezve Money | Log in"
         ];
 
         $this->cssArr[] = "LoginView.css";
@@ -81,8 +80,7 @@ class User extends TemplateController
 
         $this->template = new Template(TPL_PATH . "register.tpl");
         $data = [
-            "titleString" => "Jezve Money | Registration",
-            "viewData" => null
+            "titleString" => "Jezve Money | Registration"
         ];
 
         $this->cssArr[] = "RegisterView.css";
