@@ -1,4 +1,7 @@
-<?php	include(TPL_PATH."commonhdr.tpl");	?>
+<?php
+use JezveMoney\App\Template\TileInfoItem;
+
+include(TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body class="<?=($this->themeClass)?>">
 <div class="page">
@@ -62,36 +65,12 @@
                                 </div>
 
                                 <div class="tile-info-block">
-                                    <div id="src_amount_left" class="hidden">
-                                        <span><?=e($srcAmountLbl)?></span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtSrcAmount)?></span></button>
-                                        </div>
-                                    </div>
-<?php		if ($srcAmountCurr != $destAmountCurr) {		?>
-                                    <div id="exch_left">
-<?php		} else {	?>
-                                    <div id="exch_left" class="hidden">
-<?php		}	?>
-                                        <span>Exchange rate</span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtExchange)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($srcAmountInfo)?>
+                                    <?=TileInfoItem::render($exchangeInfo)?>
 <?php		if ($tr["debtType"]) {		?>
-                                    <div id="src_res_balance_left">
-                                        <span>Result balance</span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtSrcResBal)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($srcResultInfo)?>
 <?php		} else {	?>
-                                    <div id="dest_res_balance_left">
-                                        <span>Result balance</span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtDestResBal)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($destResultInfo)?>
 <?php		}	?>
                                 </div>
                             </div>
@@ -125,26 +104,11 @@
                                 </div>
 
                                 <div class="tile-info-block">
-                                    <div id="dest_amount_left" class="hidden">
-                                        <span><?=e($destAmountLbl)?></span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtDestAmount)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($destAmountInfo)?>
 <?php		if ($tr["debtType"]) { 		?>
-                                    <div id="dest_res_balance_left">
-                                        <span>Result balance</span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtDestResBal)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($destResultInfo)?>
 <?php		} else {		?>
-                                    <div id="src_res_balance_left">
-                                        <span>Result balance</span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtSrcResBal)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($srcResultInfo)?>
 <?php		}		?>
                                 </div>
                             </div>
@@ -176,37 +140,13 @@
 
                                 <div class="tile-info-block">
 <?php	if ($tr["type"] == TRANSFER) {		?>
-                                    <div id="src_amount_left" class="hidden">
-                                        <span><?=e($srcAmountLbl)?></span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtSrcAmount)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($srcAmountInfo)?>
 <?php	}	?>
 <?php	if ($tr["type"] == EXPENSE) {		?>
-                                    <div id="dest_amount_left" class="hidden">
-                                        <span><?=e($destAmountLbl)?></span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtDestAmount)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($destAmountInfo)?>
 <?php	}	?>
-                                    <div id="src_res_balance_left">
-                                        <span>Result balance</span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtSrcResBal)?></span></button>
-                                        </div>
-                                    </div>
-<?php	if (($tr["type"] == TRANSFER && $src->curr_id == $dest->curr_id) || (($tr["type"] == EXPENSE || $tr["type"] == INCOME) && $tr["src_curr"] == $tr["dest_curr"])) {		?>
-                                    <div id="exch_left" class="hidden">
-<?php	} else {	?>
-                                    <div id="exch_left">
-<?php	}	?>
-                                        <span>Exchange rate</span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtExchange)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($srcResultInfo)?>
+                                    <?=TileInfoItem::render($exchangeInfo)?>
                                 </div>
                             </div>
                         </div>
@@ -233,36 +173,13 @@
 
                                 <div class="tile-info-block">
 <?php	if ($tr["type"] == INCOME) {		?>
-                                    <div id="src_amount_left" class="hidden">
-                                        <span><?=e($srcAmountLbl)?></span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtSrcAmount)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($srcAmountInfo)?>
 <?php	}	?>
-                                    <div id="dest_amount_left" class="hidden">
-                                        <span><?=e($destAmountLbl)?></span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtDestAmount)?></span></button>
-                                        </div>
-                                    </div>
-                                    <div id="dest_res_balance_left">
-                                        <span>Result balance</span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtDestResBal)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($destAmountInfo)?>
+                                    <?=TileInfoItem::render($destResultInfo)?>
+
 <?php	if ($tr["type"] == INCOME) {		?>
-<?php		if ($tr["src_curr"] == $tr["dest_curr"]) {		?>
-                                    <div id="exch_left" class="hidden">
-<?php		} else {		?>
-                                    <div id="exch_left">
-<?php		}				?>
-                                        <span>Exchange rate</span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtExchange)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($exchangeInfo)?>
 <?php	}	?>
                                 </div>
                             </div>

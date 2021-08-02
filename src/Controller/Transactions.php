@@ -534,26 +534,54 @@ class Transactions extends TemplateController
         $data["exchSign"] = $destAmountSign . "/" . $srcAmountSign;
         $data["exchValue"] = 1;
 
-        $data["rtSrcAmount"] = $this->currModel->format($tr["src_amount"], $srcAmountCurr);
-        $data["rtDestAmount"] = $this->currModel->format($tr["dest_amount"], $destAmountCurr);
-        $data["rtExchange"] = $data["exchValue"] . " " . $data["exchSign"];
         if ($tr["type"] != DEBT) {
             $srcResBalance = ($src) ? $src->balance : null;
             $destResBalance = ($dest) ? $dest->balance : null;
 
-            $data["rtSrcResBal"] = $src ? $this->currModel->format($src->balance, $src->curr_id) : null;
-            $data["rtDestResBal"] = $dest ? $this->currModel->format($dest->balance, $dest->curr_id) : null;
+            $rtSrcResBal = $src ? $this->currModel->format($src->balance, $src->curr_id) : null;
+            $rtDestResBal = $dest ? $this->currModel->format($dest->balance, $dest->curr_id) : null;
         } else {
             $acc_res_balance = ($debtAcc && !$noAccount) ? $debtAcc->balance : null;
 
             $srcResBalance = ($give) ? $person_res_balance : $acc_res_balance;
             $destResBalance = ($give) ? $acc_res_balance : $person_res_balance;
 
-            $data["rtSrcResBal"] = $this->currModel->format($srcResBalance, $srcAmountCurr);
-            $data["rtDestResBal"] = $this->currModel->format($destResBalance, $destAmountCurr);
+            $rtSrcResBal = $this->currModel->format($srcResBalance, $srcAmountCurr);
+            $rtDestResBal = $this->currModel->format($destResBalance, $destAmountCurr);
         }
         $data["srcResBalance"] = $srcResBalance;
         $data["destResBalance"] = $destResBalance;
+
+        $data["srcAmountInfo"] = [
+            "id" => "src_amount_left",
+            "title" => $data["srcAmountLbl"],
+            "value" => $this->currModel->format($tr["src_amount"], $srcAmountCurr),
+            "hidden" => true
+        ];
+        $data["destAmountInfo"] = [
+            "id" => "dest_amount_left",
+            "title" => $data["destAmountLbl"],
+            "value" => $this->currModel->format($tr["dest_amount"], $destAmountCurr),
+            "hidden" => true
+        ];
+        $data["srcResultInfo"] = [
+            "id" => "src_res_balance_left",
+            "title" => "Result balance",
+            "value" => $rtSrcResBal,
+            "hidden" => false
+        ];
+        $data["destResultInfo"] = [
+            "id" => "dest_res_balance_left",
+            "title" => "Result balance",
+            "value" => $rtDestResBal,
+            "hidden" => false
+        ];
+        $data["exchangeInfo"] = [
+            "id" => "exch_left",
+            "title" => "Exchange rate",
+            "value" => $data["exchValue"] . " " . $data["exchSign"],
+            "hidden" => ($tr["src_curr"] == $tr["dest_curr"])
+        ];
 
         $data["dateFmt"] = date("d.m.Y");
 
@@ -803,29 +831,57 @@ class Transactions extends TemplateController
         $backExchSign = $data["srcAmountSign"] . "/" . $data["destAmountSign"];
         $backExchValue = round($tr["src_amount"] / $tr["dest_amount"], 5);
 
-        $data["rtSrcAmount"] = $this->currModel->format($tr["src_amount"], $srcAmountCurr);
-        $data["rtDestAmount"] = $this->currModel->format($tr["dest_amount"], $destAmountCurr);
         $rtExchange = $data["exchValue"] . " " . $data["exchSign"];
         if ($data["exchValue"] != 1) {
             $rtExchange .= " (" . $backExchValue . " " . $backExchSign . ")";
         }
-        $data["rtExchange"] = $rtExchange;
 
         if ($tr["type"] != DEBT) {
             $srcResBalance = ($src) ? $src->balance : null;
             $destResBalance = ($dest) ? $dest->balance : null;
 
-            $data["rtSrcResBal"] = ($src) ? $this->currModel->format($src->balance, $src->curr_id) : null;
-            $data["rtDestResBal"] = ($dest) ? $this->currModel->format($dest->balance, $dest->curr_id) : null;
+            $rtSrcResBal = ($src) ? $this->currModel->format($src->balance, $src->curr_id) : null;
+            $rtDestResBal = ($dest) ? $this->currModel->format($dest->balance, $dest->curr_id) : null;
         } else {
             $acc_res_balance = ($debtAcc && !$noAccount) ? $debtAcc->balance : null;
             $srcResBalance = ($give) ? $person_res_balance : $acc_res_balance;
             $destResBalance = ($give) ? $acc_res_balance : $person_res_balance;
-            $data["rtSrcResBal"] = $this->currModel->format($srcResBalance, $srcAmountCurr);
-            $data["rtDestResBal"] = $this->currModel->format($destResBalance, $destAmountCurr);
+            $rtSrcResBal = $this->currModel->format($srcResBalance, $srcAmountCurr);
+            $rtDestResBal = $this->currModel->format($destResBalance, $destAmountCurr);
         }
         $data["srcResBalance"] = $srcResBalance;
         $data["destResBalance"] = $destResBalance;
+
+        $data["srcAmountInfo"] = [
+            "id" => "src_amount_left",
+            "title" => $data["srcAmountLbl"],
+            "value" => $this->currModel->format($tr["src_amount"], $srcAmountCurr),
+            "hidden" => true
+        ];
+        $data["destAmountInfo"] = [
+            "id" => "dest_amount_left",
+            "title" => $data["destAmountLbl"],
+            "value" => $this->currModel->format($tr["dest_amount"], $destAmountCurr),
+            "hidden" => true
+        ];
+        $data["srcResultInfo"] = [
+            "id" => "src_res_balance_left",
+            "title" => "Result balance",
+            "value" => $rtSrcResBal,
+            "hidden" => false
+        ];
+        $data["destResultInfo"] = [
+            "id" => "dest_res_balance_left",
+            "title" => "Result balance",
+            "value" => $rtDestResBal,
+            "hidden" => false
+        ];
+        $data["exchangeInfo"] = [
+            "id" => "exch_left",
+            "title" => "Exchange rate",
+            "value" => $rtExchange,
+            "hidden" => ($tr["src_curr"] == $tr["dest_curr"])
+        ];
 
         $data["dateFmt"] = date("d.m.Y", $tr["date"]);
 
