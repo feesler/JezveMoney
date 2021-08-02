@@ -218,7 +218,7 @@ class Transactions extends TemplateController
                     }
                 }
             }
-            $data["pagesArr"] = $pagesArr;
+            $data["paginator"] = ["pagesArr" => $pagesArr];
         }
         $data["trParams"] = $trParams;
         $data["showPaginator"] = $showPaginator;

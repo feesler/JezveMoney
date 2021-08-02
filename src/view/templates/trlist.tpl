@@ -1,5 +1,9 @@
 <div id="trlist" class="trans-list">
-<?php	if (!$accounts) {		?>
+<?php
+
+use JezveMoney\App\Template\Paginator;
+
+if (!$accounts) {		?>
     <span class="nodata-message">You have no one account. Please create one.</span>
 <?php	} else if (!$totalTrCount) {	?>
     <span class="nodata-message">You have no one transaction yet.</span>
@@ -31,17 +35,7 @@
         </div>
 <?php	}	?>
 <?php	if ($trParams["onPage"] > 0 && $showPaginator == TRUE) {		?>
-        <div class="paginator">
-<?php		foreach($pagesArr as $pageItem) {
-                if (!is_numeric($pageItem["text"])) {   ?>
-            <span><?=e($pageItem["text"])?></span>
-<?php			} else if ($pageItem["active"]) {   ?>
-            <span><b><?=e($pageItem["text"])?></b></span>
-<?php			} else {    ?>
-            <span><a href="<?=e($pageItem["link"])?>"><?=e($pageItem["text"])?></a></span>
-<?php           }
-            }	?>
-        </div>
+<?=Paginator::render($paginator)?>
 <?php	}	?>
     </div>
 <?php	if ($showDetails) {	?>
@@ -114,18 +108,8 @@
 <?php	}	?>
 <?php	if ($trParams["onPage"] > 0 && $showPaginator == TRUE) {		?>
     <div class="paginator-row">
-        <div class="paginator">
-<?php       foreach($pagesArr as $pageItem) {
-                if (!is_numeric($pageItem["text"])) {   ?>
-                                    <span><?=e($pageItem["text"])?></span>
-<?php           } else if ($pageItem["active"]) {   ?>
-                                    <span><b><?=e($pageItem["text"])?></b></span>
-<?php			} else {    ?>
-                                    <span><a href="<?=e($pageItem["link"])?>"><?=e($pageItem["text"])?></a></span>
-<?php			}
-            }	?>
-                                </div>
-<?php	}	?>
+<?=Paginator::render($paginator)?>
     </div>
+<?php	}	?>
 <?php	}	?>
 </div>
