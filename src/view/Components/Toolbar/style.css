@@ -51,6 +51,22 @@
   color: #ffffff;
 }
 
+.sidebar .sidebar__controls .iconlink .iconlink__icon {
+  border-color: #ffffff;
+}
+
+.sidebar .sidebar__controls .iconlink:hover .iconlink__icon {
+  background-color: #ffffff;
+}
+
+.sidebar .sidebar__controls .iconlink .iconlink__icon svg * {
+  fill: #ffffff;
+}
+
+.sidebar .sidebar__controls .iconlink:hover .iconlink__icon svg * {
+  fill: #404040;
+}
+
 @media screen and (min-width: 701px) {
   .sidebar {
     min-height: 0;
@@ -88,5 +104,9 @@
 
   .siderbar__content .iconlink {
     margin: 9px 0 9px 12px;
+  }
+
+  .sidebar .sidebar__controls .iconlink:hover .iconlink__icon svg * {
+    fill: #44aaff;
   }
 }
