@@ -61,16 +61,16 @@ class Persons extends TemplateController
         }
 
         $this->template = new Template(TPL_PATH . "person.tpl");
-        $data = [];
+        $data = [
+            "headString" => "New person",
+            "titleString" => "Jezve Money | New person"
+        ];
 
         $pInfo = new \stdClass();
         $pInfo->id = 0;
         $pInfo->name = "";
         $pInfo->flags = 0;
         $data["pInfo"] = $pInfo;
-
-        $data["headString"] = "New person";
-        $data["titleString"] = "Jezve Money | ".$data["headString"];
 
         $data["viewData"] = JSON::encode([
             "person" => $pInfo
@@ -90,7 +90,10 @@ class Persons extends TemplateController
         }
 
         $this->template = new Template(TPL_PATH . "person.tpl");
-        $data = [];
+        $data = [
+            "headString" => "Edit person",
+            "titleString" => "Jezve Money | Edit person"
+        ];
 
         $p_id = intval($this->actionParam);
         if (!$p_id) {
@@ -102,9 +105,6 @@ class Persons extends TemplateController
             $this->fail(ERR_PERSON_UPDATE);
         }
         $data["pInfo"] = $pInfo;
-
-        $data["headString"] = "Edit person";
-        $data["titleString"] = "Jezve Money | ".$data["headString"];
 
         $data["viewData"] = JSON::encode([
             "person" => $pInfo

@@ -311,16 +311,16 @@ class TransactionView extends View {
                 (person) => this.persDDList.addItem({ id: person.id, title: person.name }),
             );
 
-            const person_id = parseInt(this.personIdInp.value, 10);
-            this.appendHiddenPerson(this.persDDList, person_id);
-            this.persDDList.selectItem(person_id);
+            const personId = parseInt(this.personIdInp.value, 10);
+            this.appendHiddenPerson(this.persDDList, personId);
+            this.persDDList.selectItem(personId);
 
             if (!this.model.transaction.noAccount) {
                 this.initAccList();
             }
         } else {
-            const src_id = this.model.transaction.srcAcc();
-            const dest_id = this.model.transaction.destAcc();
+            const srcId = this.model.transaction.srcAcc();
+            const destId = this.model.transaction.destAcc();
 
             this.srcDDList = DropDown.create({
                 input_id: 'source_tile',
@@ -334,9 +334,9 @@ class TransactionView extends View {
                     (acc) => this.srcDDList.addItem({ id: acc.id, title: acc.name }),
                 );
 
-                this.appendHiddenAccount(this.srcDDList, src_id);
-                this.appendHiddenAccount(this.srcDDList, dest_id);
-                this.srcDDList.selectItem(src_id);
+                this.appendHiddenAccount(this.srcDDList, srcId);
+                this.appendHiddenAccount(this.srcDDList, destId);
+                this.srcDDList.selectItem(srcId);
             }
 
             this.destDDList = DropDown.create({
@@ -350,9 +350,9 @@ class TransactionView extends View {
                     (acc) => this.destDDList.addItem({ id: acc.id, title: acc.name }),
                 );
 
-                this.appendHiddenAccount(this.destDDList, src_id);
-                this.appendHiddenAccount(this.destDDList, dest_id);
-                this.destDDList.selectItem(dest_id);
+                this.appendHiddenAccount(this.destDDList, srcId);
+                this.appendHiddenAccount(this.destDDList, destId);
+                this.destDDList.selectItem(destId);
             }
         }
 
@@ -388,14 +388,14 @@ class TransactionView extends View {
     /**
      * Check account is hidden and then append it to the end of list
      * @param {DropDown} dropDown
-     * @param {Number} account_id
+     * @param {Number} accountId
      */
-    appendHiddenAccount(dropDown, account_id) {
-        if (!account_id) {
+    appendHiddenAccount(dropDown, accountId) {
+        if (!accountId) {
             return;
         }
 
-        const account = this.model.accounts.find((item) => item.id === account_id);
+        const account = this.model.accounts.find((item) => item.id === accountId);
         if (account && !account.isVisible()) {
             dropDown.addItem({ id: account.id, title: account.name });
         }
@@ -404,14 +404,14 @@ class TransactionView extends View {
     /**
      * Check person is hidden and then append it to the end of list
      * @param {DropDown} dropDown
-     * @param {Number} person_id
+     * @param {Number} personId
      */
-    appendHiddenPerson(dropDown, person_id) {
-        if (!person_id) {
+    appendHiddenPerson(dropDown, personId) {
+        if (!personId) {
             return;
         }
 
-        const person = this.model.persons.find((item) => item.id === person_id);
+        const person = this.model.persons.find((item) => item.id === personId);
         if (person && !person.isVisible()) {
             dropDown.addItem({ id: person.id, title: person.name });
         }
@@ -435,9 +435,9 @@ class TransactionView extends View {
         this.model.visibleUserAccounts.forEach(
             (acc) => this.accDDList.addItem({ id: acc.id, title: acc.name }),
         );
-        const account_id = this.debtAccount.id;
-        this.appendHiddenAccount(this.accDDList, account_id);
-        this.accDDList.selectItem(account_id);
+        const accountId = this.debtAccount.id;
+        this.appendHiddenAccount(this.accDDList, accountId);
+        this.accDDList.selectItem(accountId);
     }
 
     /**
