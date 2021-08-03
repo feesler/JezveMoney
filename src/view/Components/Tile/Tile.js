@@ -38,6 +38,8 @@ export class Tile extends Component {
             throw new Error('Invalid element specified');
         }
 
+        this.containerElem = this.elem.querySelector('.tilelink > span');
+
         this.titleElem = this.elem.querySelector('.tile__title');
         if (this.titleElem) {
             this.title = this.titleElem.textContent;
@@ -77,7 +79,7 @@ export class Tile extends Component {
 
         if (!this.titleElem) {
             this.titleElem = ce('span', { className: 'tile__title' });
-            this.elem.appendChild(this.titleElem);
+            this.containerElem.appendChild(this.titleElem);
         }
 
         this.titleElem.textContent = this.title;
@@ -99,7 +101,7 @@ export class Tile extends Component {
 
         if (!this.subTitleElem) {
             this.subTitleElem = ce('span', { className: 'tile__subtitle' });
-            this.elem.appendChild(this.subTitleElem);
+            this.containerElem.appendChild(this.subTitleElem);
         }
 
         this.subTitleElem.textContent = this.subtitle;
@@ -121,7 +123,7 @@ export class Tile extends Component {
 
         if (!this.iconElem) {
             this.iconElem = ce('span', { className: 'tile__icon' });
-            this.elem.appendChild(this.iconElem);
+            this.containerElem.appendChild(this.iconElem);
         }
 
         if (!this.iconUseElem) {
