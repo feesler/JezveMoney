@@ -1,4 +1,7 @@
-<?php	include(TPL_PATH."commonhdr.tpl");	?>
+<?php
+use JezveMoney\App\Template\Tile;
+
+include(TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body class="<?=($this->themeClass)?>">
 <div class="page">
@@ -25,15 +28,7 @@
                         <input id="accid" name="id" type="hidden" value="<?=e($accInfo->id)?>">
 <?php	}	?>
                         <div class="view-row std_margin">
-                            <div id="acc_tile" class="tile">
-                                <button class="tilelink" type="button">
-                                    <span>
-                                        <span class="tile__subtitle"><?=e($accInfo->balfmt)?></span>
-                                        <span class="tile__icon"><?=useIcon($accInfo->icon, 60, 54)?></span>
-                                        <span class="tile__title"><?=e($tileAccName)?></span>
-                                    </span>
-                                </button>
-                            </div>
+                            <?=Tile::render($tile)?>
                         </div>
                         <div class="view-row std_margin">
                             <label for="icon">Icon</label>

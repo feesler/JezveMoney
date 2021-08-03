@@ -1,7 +1,8 @@
 <?php
-    use JezveMoney\App\Template\TransactionList;
-?>
-<?php	include(TPL_PATH."commonhdr.tpl");	?>
+use JezveMoney\App\Template\TransactionList;
+use JezveMoney\App\Template\Tile;
+
+include(TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body class="<?=($this->themeClass)?>">
 <div class="page">
@@ -21,16 +22,8 @@
 <?php   if (!count($tilesArr)) {	?>
                             <span class="nodata-message">You have no one account. Please create one.</span>
 <?php	} else {
-            foreach($tilesArr as $acc_id => $tile) {    ?>
-                            <div class="tile" data-id="<?=e($acc_id)?>">
-                                <a href="<?=BASEURL?>transactions/new/?acc_id=<?=e($acc_id)?>" class="tilelink">
-                                    <span>
-                                        <span class="tile__subtitle"><?=e($tile["balance"])?></span>
-                                        <span class="tile__icon"><?=useIcon($tile["icon"], 60, 54)?></span>
-                                        <span class="tile__title"><?=e($tile["name"])?></span>
-                                    </span>
-                                </a>
-                            </div>
+            foreach($tilesArr as $tile) {    ?>
+<?=Tile::render($tile)?>
 <?php       }
         }	?>
                         </div>

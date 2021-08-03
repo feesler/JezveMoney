@@ -1,4 +1,7 @@
-<?php	include(TPL_PATH."commonhdr.tpl");	?>
+<?php
+use JezveMoney\App\Template\Tile;
+
+include(TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body class="<?=($this->themeClass)?>">
 <div class="page">
@@ -19,15 +22,7 @@
                     <div id="tilesContainer" class="tiles">
 <?php   if (count($tilesArr)) {     ?>
 <?php		foreach($tilesArr as $acc_id => $tile) {    ?>
-                        <div class="tile" data-id="<?=e($acc_id)?>">
-                            <button class="tilelink" type="button">
-                                <span>
-                                    <span class="tile__subtitle"><?=e($tile["balance"])?></span>
-                                    <span class="tile__icon"><?=useIcon($tile["icon"], 60, 54)?></span>
-                                    <span class="tile__title"><?=e($tile["name"])?></span>
-                                </span>
-                            </button>
-                        </div>
+<?=Tile::render($tile)?>
 <?php       }   ?>
 <?php	} else {	?>
                         <span class="nodata-message">You have no one account. Please create one.</span>
@@ -39,15 +34,7 @@
                     </div>
                     <div id="hiddenTilesContainer" class="tiles">
 <?php       foreach($hiddenTilesArr as $acc_id => $tile) {  ?>
-                        <div class="tile" data-id="<?=e($acc_id)?>">
-                            <button class="tilelink" type="button">
-                                <span>
-                                    <span class="tile__subtitle"><?=e($tile["balance"])?></span>
-                                    <span class="tile__icon"><?=useIcon($tile["icon"], 60, 54)?></span>
-                                    <span class="tile__title"><?=e($tile["name"])?></span>
-                                </span>
-                            </button>
-                        </div>
+<?=Tile::render($tile)?>
 <?php       }   ?>
                     </div>
 <?php	} else {	?>

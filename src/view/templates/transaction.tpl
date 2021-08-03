@@ -1,4 +1,5 @@
 <?php
+use JezveMoney\App\Template\Tile;
 use JezveMoney\App\Template\TileInfoItem;
 
 include(TPL_PATH."commonhdr.tpl");	?>
@@ -54,14 +55,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <div class="tile_header"><label>Person name</label></div>
                             <div class="tile-base">
                                 <div class="tile_container">
-                                    <div id="person_tile" class="tile">
-                                        <div class="tilelink">
-                                            <span>
-                                                <span class="tile__subtitle"><?=e($p_balfmt)?></span>
-                                                <span class="tile__title"><?=e($person_name)?></span>
-                                            </span>
-                                        </div>
-                                    </div>
+                                    <?=Tile::render($personTile)?>
                                 </div>
 
                                 <div class="tile-info-block">
@@ -91,16 +85,8 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <div class="tile-base">
 <?php		}	?>
                                 <div class="tile_container">
-                                    <div id="acc_tile" class="tile">
-                                        <div class="tilelink">
-                                            <span>
-                                                <span class="tile__subtitle"><?=($debtAcc->balfmt)?></span>
-                                                <span class="tile__icon"><?=useIcon($debtAcc->icon, 60, 54)?></span>
-                                                <span class="tile__title"><?=($debtAcc->name)?></span>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <input id="acc_id" name="acc_id" type="hidden" value="<?=($debtAcc->id)?>">
+                                    <?=Tile::render($debtAccountTile)?>
+                                    <input id="acc_id" name="acc_id" type="hidden" value="<?=e($acc_id)?>">
                                 </div>
 
                                 <div class="tile-info-block">
@@ -126,15 +112,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <div class="tile_header"><label>Source account</label></div>
                             <div class="tile-base">
                                 <div class="tile_container">
-                                    <div id="source_tile" class="tile">
-                                        <div class="tilelink">
-                                            <span>
-                                                <span class="tile__subtitle"><?=($src->balfmt)?></span>
-                                                <span class="tile__icon"><?=useIcon($src->icon, 60, 54)?></span>
-                                                <span class="tile__title"><?=($src->name)?></span>
-                                            </span>
-                                        </div>
-                                    </div>
+                                    <?=Tile::render($srcAccountTile)?>
                                     <input id="src_id" name="src_id" type="hidden" value="<?=e($tr["src_id"])?>">
                                 </div>
 
@@ -159,15 +137,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <div class="tile_header"><label>Destination account</label></div>
                             <div class="tile-base">
                                 <div class="tile_container">
-                                    <div id="dest_tile" class="tile">
-                                        <div class="tilelink">
-                                            <span>
-                                                <span class="tile__subtitle"><?=($dest->balfmt)?></span>
-                                                <span class="tile__icon"><?=useIcon($dest->icon, 60, 54)?></span>
-                                                <span class="tile__title"><?=($dest->name)?></span>
-                                            </span>
-                                        </div>
-                                    </div>
+                                    <?=Tile::render($destAccountTile)?>
                                     <input id="dest_id" name="dest_id" type="hidden" value="<?=e($tr["dest_id"])?>">
                                 </div>
 

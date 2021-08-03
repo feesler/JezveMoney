@@ -614,45 +614,6 @@ class AccountModel extends CachedTable
     }
 
 
-    // Return array of accounts for template
-    public function getTilesArray($params = null)
-    {
-        $res = [];
-
-        if (!$this->checkCache()) {
-            return $res;
-        }
-
-        if (!is_array($params)) {
-            $params = [];
-        }
-
-        $requestedType = isset($params["type"]) ? $params["type"] : "visible";
-        $includeVisible = in_array($requestedType, ["all", "visible"]);
-        $includeHidden = in_array($requestedType, ["all", "hidden"]);
-
-        foreach ($this->cache as $acc_id => $item) {
-            if ($item->owner_id != self::$owner_id) {
-                continue;
-            }
-            $hidden = $this->isHidden($item);
-            if ((!$includeHidden && $hidden) || (!$includeVisible && !$hidden)) {
-                continue;
-            }
-
-            $balance_fmt = $this->currMod->format($item->balance, $item->curr_id);
-
-            $res[$acc_id] = [
-                "name" => $item->name,
-                "balance" => $balance_fmt,
-                "icon" => $this->getIconFile($acc_id)
-            ];
-        }
-
-        return $res;
-    }
-
-
     // Return icon file name of specified account
     public function getIconFile($item_id)
     {
@@ -679,7 +640,7 @@ class AccountModel extends CachedTable
             return $res;
         }
 
-        foreach ($this->cache as $acc_id => $item) {
+        foreach ($this->cache as $item) {
             if ($item->owner_id != self::$owner_id) {
                 continue;
             }

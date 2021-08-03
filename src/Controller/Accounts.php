@@ -31,12 +31,25 @@ class Accounts extends TemplateController
     {
         $this->template = new Template(TPL_PATH . "accounts.tpl");
         $data = [
-            "titleString" => "Jezve Money | Accounts"
+            "titleString" => "Jezve Money | Accounts",
+            "tilesArr" => [],
+            "hiddenTilesArr" => []
         ];
 
+        $currMod = CurrencyModel::getInstance();
+
         $accountsData = $this->model->getData(["type" => "all"]);
-        $data["tilesArr"] = $this->model->getTilesArray();
-        $data["hiddenTilesArr"] = $this->model->getTilesArray(["type" => "hidden"]);
+        foreach ($accountsData as $account) {
+            $hidden = $this->model->isHidden($account);
+            $var = $hidden ? "hiddenTilesArr" : "tilesArr";
+            $data[$var][] = [
+                "type" => "button",
+                "attributes" => ["data-id" => $account->id],
+                "title" => $account->name,
+                "subtitle" => $currMod->format($account->balance, $account->curr_id),
+                "icon" => $this->model->getIconFile($account->id)
+            ];
+        }
 
         $data["viewData"] = JSON::encode([
             "accounts" => $accountsData
@@ -80,9 +93,14 @@ class Accounts extends TemplateController
         }
 
         $accInfo->sign = $currObj->sign;
-        $accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr_id);
         $data["accInfo"] = $accInfo;
-        $data["tileAccName"] = "New account";
+        $data["tile"] = [
+            "type" => "button",
+            "attributes" => ["id" => "acc_tile"],
+            "title" => "New account",
+            "subtitle" => $currMod->format($accInfo->balance, $accInfo->curr_id),
+            "icon" => $accInfo->icon
+        ];
 
         $data["currArr"] = $currMod->getData();
 
@@ -138,10 +156,15 @@ class Accounts extends TemplateController
         $currObj = $currMod->getItem($accInfo->curr_id);
         $accInfo->sign = ($currObj) ? $currObj->sign : null;
         $accInfo->icon = $this->model->getIconFile($acc_id);
-        $accInfo->balfmt = $currMod->format($accInfo->balance, $accInfo->curr_id);
         $data["accInfo"] = $accInfo;
 
-        $data["tileAccName"] = $accInfo->name;
+        $data["tile"] = [
+            "type" => "button",
+            "attributes" => ["id" => "acc_tile"],
+            "title" => $accInfo->name,
+            "subtitle" => $currMod->format($accInfo->balance, $accInfo->curr_id),
+            "icon" => $accInfo->icon
+        ];
 
         $data["currArr"] = $currMod->getData();
 

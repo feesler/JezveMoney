@@ -1,4 +1,7 @@
-<?php	include(TPL_PATH."commonhdr.tpl");	?>
+<?php
+use JezveMoney\App\Template\Tile;
+
+include(TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body class="<?=($this->themeClass)?>">
 <div class="page">
@@ -18,15 +21,8 @@
                     </div>
                     <div id="tilesContainer" class="tiles">
 <?php   if (count($persArr)) {
-               foreach($persArr as $pData) {       ?>
-                        <div class="tile" data-id="<?=e($pData->id)?>">
-                            <button class="tilelink" type="button">
-                                <span>
-                                    <span class="tile__subtitle"></span>
-                                    <span class="tile__title"><?=e($pData->name)?></span>
-                                </span>
-                            </button>
-                        </div>
+               foreach($persArr as $tile) {       ?>
+<?=Tile::render($tile)?>
 <?php       }
         } else {	?>
                         <span class="nodata-message">You have no one person. Please create one.</span>
@@ -37,15 +33,8 @@
                         <h1>Hidden</h1>
                     </div>
                     <div id="hiddenTilesContainer" class="tiles">
-<?php		foreach($hiddenPersArr as $pData) {     ?>
-                        <div class="tile" data-id="<?=e($pData->id)?>">
-                            <button class="tilelink" type="button">
-                                <span>
-                                    <span class="tile__subtitle"></span>
-                                    <span class="tile__title"><?=e($pData->name)?></span>
-                                </span>
-                            </button>
-                        </div>
+<?php		foreach($hiddenPersArr as $tile) {     ?>
+<?=Tile::render($tile)?>
 <?php		}   ?>
                     </div>
 <?php	} else {	?>

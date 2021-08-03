@@ -15,13 +15,22 @@ class Persons extends TemplateController
     public function index()
     {
         $this->template = new Template(TPL_PATH . "persons.tpl");
-        $data = [];
+        $data = [
+            "titleString" => "Jezve Money | Persons",
+            "persArr" => [],
+            "hiddenPersArr" => [],
+        ];
 
         $personsData = $this->personMod->getData(["type" => "all"]);
-        $data["persArr"] = $this->personMod->getData();
-        $data["hiddenPersArr"] = $this->personMod->getData(["type" => "hidden"]);
-
-        $data["titleString"] = "Jezve Money | Persons";
+        foreach ($personsData as $person) {
+            $hidden = $this->personMod->isHidden($person);
+            $var = $hidden ? "hiddenPersArr" : "persArr";
+            $data[$var][] = [
+                "type" => "button",
+                "attributes" => ["data-id" => $person->id],
+                "title" => $person->name,
+            ];
+        }
 
         $data["viewData"] = JSON::encode([
             "persons" => $personsData

@@ -22,8 +22,17 @@ class Main extends TemplateController
         $transMod = TransactionModel::getInstance();
         $currMod = CurrencyModel::getInstance();
 
-        $data["accArr"] = $accMod->getData();
-        $data["tilesArr"] = $accMod->getTilesArray();
+        $accounts = $accMod->getData();
+        $data["tilesArr"] = [];
+        foreach($accounts as $account) {
+            $data["tilesArr"][] = [
+                "type" => "link",
+                "link" => BASEURL."transactions/new/?acc_id=".e($account->id),
+                "title" => $account->name,
+                "subtitle" => $currMod->format($account->balance, $account->curr_id),
+                "icon" => $accMod->getIconFile($account->id)
+            ];
+        }
 
         $totalsArr = $accMod->getTotalsArray();
         foreach ($totalsArr as $curr_id => $balance) {
