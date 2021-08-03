@@ -1,6 +1,7 @@
 <?php
 use JezveMoney\App\Template\Tile;
 use JezveMoney\App\Template\TileInfoItem;
+use JezveMoney\App\Template\IconLink;
 
 include(TPL_PATH."commonhdr.tpl");	?>
 </head>
@@ -14,12 +15,11 @@ include(TPL_PATH."commonhdr.tpl");	?>
                     <div class="heading">
                         <h1><?=e($headString)?></h1>
 <?php	if ($action == "edit") {	?>
-                        <div id="del_btn" class="iconlink">
-                            <button type="button">
-                                <span class="iconlink__icon"><?=svgIcon("del")?></span>
-                                <span class="iconlink__content"><span>Delete</span></span>
-                            </button>
-                        </div>
+                        <?=IconLink::render([
+                            "id" => "del_btn",
+                            "icon" => "del",
+                            "title" => "Delete"
+                        ])?>
 <?php	}	?>
                     </div>
                     <div>
@@ -258,15 +258,13 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         </div>
 <?php	}	?>
                         <div class="view-row">
-                            <div id="calendar_btn" class="iconlink std_margin">
-                                <button type="button">
-                                    <span class="iconlink__icon"><?=svgIcon("cal")?></span>
-                                    <span class="iconlink__content">
-                                        <span class="iconlink__title">Change date</span>
-                                        <span class="iconlink__subtitle"><?=e($dateFmt)?></span>
-                                    </span>
-                                </button>
-                            </div>
+                            <?=IconLink::render([
+                                "id" => "calendar_btn",
+                                "classNames" => "std_margin",
+                                "icon" => "cal",
+                                "title" => "Change date",
+                                "subtitle" => $dateFmt
+                            ])?>
                             <div id="date_block" class="validation-block hidden">
                                 <div><label for="date">Date</label></div>
                                 <div class="column-container std_margin">
@@ -283,21 +281,16 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         </div>
 
                         <div class="view-row">
+                            <?=IconLink::render([
+                                "id" => "comm_btn",
+                                "classNames" => "std_margin",
+                                "icon" => "plus",
+                                "title" => "Add comment",
+                                "hidden" => !is_empty($tr["comment"])
+                            ])?>
 <?php	if (is_empty($tr["comment"])) {		?>
-                            <div id="comm_btn" class="iconlink std_margin">
-                                <button type="button">
-                                    <span class="iconlink__icon"><?=svgIcon("plus")?></span>
-                                    <span class="iconlink__content"><span>Add comment</span></span>
-                                </button>
-                            </div>
                             <div id="comment_block" class="hidden">
 <?php	} else {	?>
-                            <div id="comm_btn" class="iconlink std_margin hidden">
-                                <button type="button">
-                                    <span class="iconlink__icon"><?=svgIcon("plus")?></span>
-                                    <span class="iconlink__content"><span>Add comment</span></span>
-                                </button>
-                            </div>
                             <div id="comment_block">
 <?php	}	?>
                                 <div><label for="comm">Comment</label></div>

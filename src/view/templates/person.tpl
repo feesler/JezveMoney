@@ -1,4 +1,7 @@
-<?php	include(TPL_PATH."commonhdr.tpl");	?>
+<?php
+use JezveMoney\App\Template\IconLink;
+
+include(TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body class="<?=($this->themeClass)?>">
 <div class="page">
@@ -10,12 +13,11 @@
                     <div class="heading">
                         <h1><?=e($headString)?></h1>
 <?php	if ($this->action == "update") {		?>
-                        <div id="del_btn" class="iconlink">
-                            <button type="button">
-                                <span class="iconlink__icon"><?=svgIcon("del")?></span>
-                                    <span class="iconlink__content"><span>Delete</span></span>
-                                </button>
-                            </div>
+                        <?=IconLink::render([
+                            "id" => "del_btn",
+                            "title" => "Delete",
+                            "icon" => "del"
+                        ])?>
 <?php	}	?>
                     </div>
                     <div>

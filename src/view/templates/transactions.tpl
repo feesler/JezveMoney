@@ -1,5 +1,6 @@
 <?php
 use JezveMoney\App\Template\TransactionList;
+use JezveMoney\App\Template\IconLink;
 
 include(TPL_PATH."commonhdr.tpl");
 ?>
@@ -13,18 +14,20 @@ include(TPL_PATH."commonhdr.tpl");
                 <div class="content_wrap">
                     <div class="heading">
                         <h1>Transactions</h1>
-                        <div id="add_btn" class="iconlink">
-                            <a href="<?=BASEURL?>transactions/new/">
-                                <span class="iconlink__icon"><?=svgIcon("plus")?></span>
-                                <span class="iconlink__content"><span>New</span></span>
-                            </a>
-                        </div>
-                        <div id="import_btn" class="iconlink">
-                            <a href="<?=BASEURL?>import/">
-                                <span class="iconlink__icon"><?=svgIcon("import")?></span>
-                                <span class="iconlink__content"><span>Import</span></span>
-                            </a>
-                        </div>
+                        <?=IconLink::render([
+                            "id" => "add_btn",
+                            "type" => "link",
+                            "link" => BASEURL . "transactions/new/",
+                            "title" => "New",
+                            "icon" => "plus"
+                        ])?>
+                        <?=IconLink::render([
+                            "id" => "import_btn",
+                            "type" => "link",
+                            "link" => BASEURL . "import/",
+                            "title" => "Import",
+                            "icon" => "import"
+                        ])?>
                     </div>
 
                     <div>
@@ -67,24 +70,12 @@ include(TPL_PATH."commonhdr.tpl");
                             </div>
 
                             <div class="filter-item std_margin">
-<?php if (is_empty($dateFmt)) {		?>
-                                <div id="calendar_btn" class="iconlink">
-                                    <button type="button">
-                                        <span class="iconlink__icon"><?=svgIcon("cal")?></span>
-                                        <span class="iconlink__content"><span>Select range</span></span>
-                                    </button>
-                                </div>
-<?php } else {	?>
-                                <div id="calendar_btn" class="iconlink">
-                                    <button type="button">
-                                        <span class="iconlink__icon"><?=svgIcon("cal")?></span>
-                                        <span class="iconlink__content">
-                                            <span class="iconlink__title">Select range</span>
-                                            <span class="iconlink__subtitle"><?=e($dateFmt)?></span>
-                                        </span>
-                                    </button>
-                                </div>
-<?php }		?>
+                                <?=IconLink::render([
+                                    "id" => "calendar_btn",
+                                    "icon" => "cal",
+                                    "title" => "Select range",
+                                    "subtitle" => $dateFmt
+                                ])?>
                                 <div id="date_block" class="column-container hidden">
                                     <div class="input-group">
                                         <div class="stretch-input rbtn_input">
@@ -119,19 +110,19 @@ include(TPL_PATH."commonhdr.tpl");
         <div class="siderbar__content">
             <div id="sbEllipsis" class="sidebar__ellipsis"><?=svgIcon("sbellipsis")?></div>
             <div id="sbButtons" class="sidebar__controls">
-                <div id="edit_btn" class="iconlink hidden">
-                    <a>
-                        <span class="iconlink__icon sidebar-icon"><?=svgIcon("edit")?></span>
-                        <span class="iconlink__content"><span>Edit</span></span>
-                    </a>
-                </div>
-
-                <div id="del_btn" class="iconlink hidden">
-                    <button type="button">
-                        <span class="iconlink__icon sidebar-icon"><?=svgIcon("del")?></span>
-                        <span class="iconlink__content"><span>Delete</span></span>
-                    </button>
-                </div>
+                <?=IconLink::render([
+                    "id" => "edit_btn",
+                    "type" => "link",
+                    "title" => "Edit",
+                    "icon" => "edit",
+                    "hidden" => true
+                ])?>
+                <?=IconLink::render([
+                    "id" => "del_btn",
+                    "title" => "Delete",
+                    "icon" => "del",
+                    "hidden" => true
+                ])?>
             </div>
         </div>
     </div>

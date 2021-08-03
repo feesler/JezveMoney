@@ -1,5 +1,6 @@
 <?php
 use JezveMoney\App\Template\Tile;
+use JezveMoney\App\Template\IconLink;
 
 include(TPL_PATH."commonhdr.tpl");	?>
 </head>
@@ -12,12 +13,13 @@ include(TPL_PATH."commonhdr.tpl");	?>
                 <div class="content_wrap">
                     <div class="heading">
                         <h1>Accounts</h1>
-                        <div id="add_btn" class="iconlink">
-                            <a href="<?=BASEURL?>accounts/new/">
-                                <span class="iconlink__icon"><?=svgIcon("plus")?></span>
-                                <span class="iconlink__content"><span>New</span></span>
-                            </a>
-                        </div>
+                        <?=IconLink::render([
+                            "id" => "add_btn",
+                            "type" => "link",
+                            "link" => BASEURL . "accounts/new/",
+                            "title" => "New",
+                            "icon" => "plus"
+                        ])?>
                     </div>
                     <div id="tilesContainer" class="tiles">
 <?php   if (count($tilesArr)) {     ?>
@@ -48,36 +50,38 @@ include(TPL_PATH."commonhdr.tpl");	?>
         <div class="siderbar__content">
             <div id="sbEllipsis" class="sidebar__ellipsis"><?=svgIcon("sbellipsis")?></div>
             <div id="sbButtons" class="sidebar__controls">
-                <div id="edit_btn" class="iconlink hidden">
-                    <a>
-                        <span class="iconlink__icon sidebar-icon"><?=svgIcon("edit")?></span>
-                        <span class="iconlink__content"><span>Edit</span></span>
-                    </a>
-                </div>
-                <div id="export_btn" class="iconlink hidden">
-                    <a>
-                        <span class="iconlink__icon sidebar-icon"><?=svgIcon("export")?></span>
-                        <span class="iconlink__content"><span>Export to CSV</span></span>
-                    </a>
-                </div>
-                <div id="show_btn" class="iconlink hidden">
-                    <button type="button">
-                        <span class="iconlink__icon sidebar-icon"><?=svgIcon("show")?></span>
-                        <span class="iconlink__content"><span>Restore</span></span>
-                    </button>
-                </div>
-                <div id="hide_btn" class="iconlink hidden">
-                    <button type="button">
-                        <span class="iconlink__icon sidebar-icon"><?=svgIcon("hide")?></span>
-                        <span class="iconlink__content"><span>Hide</span></span>
-                    </button>
-                </div>
-                <div id="del_btn" class="iconlink hidden">
-                    <button type="button">
-                        <span class="iconlink__icon sidebar-icon"><?=svgIcon("del")?></span>
-                        <span class="iconlink__content"><span>Delete</span></span>
-                    </button>
-                </div>
+                <?=IconLink::render([
+                    "id" => "edit_btn",
+                    "type" => "link",
+                    "title" => "Edit",
+                    "icon" => "edit",
+                    "hidden" => true
+                ])?>
+                <?=IconLink::render([
+                    "id" => "export_btn",
+                    "type" => "link",
+                    "title" => "Export to CSV",
+                    "icon" => "export",
+                    "hidden" => true
+                ])?>
+                <?=IconLink::render([
+                    "id" => "show_btn",
+                    "title" => "Restore",
+                    "icon" => "show",
+                    "hidden" => true
+                ])?>
+                <?=IconLink::render([
+                    "id" => "hide_btn",
+                    "title" => "Hide",
+                    "icon" => "hide",
+                    "hidden" => true
+                ])?>
+                <?=IconLink::render([
+                    "id" => "del_btn",
+                    "title" => "Delete",
+                    "icon" => "del",
+                    "hidden" => true
+                ])?>
             </div>
         </div>
     </div>

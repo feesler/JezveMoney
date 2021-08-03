@@ -1,7 +1,7 @@
 <?php
-    use JezveMoney\Core\JSON;
-?>
-<?php	include(TPL_PATH."commonhdr.tpl");	?>
+use JezveMoney\App\Template\IconLink;
+
+include(TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body class="<?=($this->themeClass)?>">
 <div class="page">
@@ -12,12 +12,11 @@
                 <div class="content_wrap">
                     <div class="heading">
                         <h1>Import transactions</h1>
-                        <div id="uploadBtn" class="iconlink">
-                            <button type="button">
-                                <span class="iconlink__icon"><?=svgIcon("import")?></span>
-                                <span class="iconlink__content"><span>Upload file</span></span>
-                            </button>
-                        </div>
+                        <?=IconLink::render([
+                            "id" => "uploadBtn",
+                            "title" => "Upload file",
+                            "icon" => "import"
+                        ])?>
                     </div>
 
                     <div class="data-form">
@@ -33,18 +32,16 @@
                                 </div>
                             </div>
                             <div class="header-actions">
-                                <div id="newItemBtn" class="iconlink">
-                                    <button type="button">
-                                        <span class="iconlink__icon"><?=svgIcon("plus")?></span>
-                                        <span class="iconlink__content"><span>Add item</span></span>
-                                    </button>
-                                </div>
-                                <div id="clearFormBtn" class="iconlink" disabled>
-                                    <button type="button" disabled>
-                                        <span class="iconlink__icon"><?=svgIcon("del")?></span>
-                                        <span class="iconlink__content"><span>Delete all</span></span>
-                                    </button>
-                                </div>
+                                <?=IconLink::render([
+                                    "id" => "newItemBtn",
+                                    "title" => "Add item",
+                                    "icon" => "plus"
+                                ])?>
+                                <?=IconLink::render([
+                                    "attributes" => ["id" => "clearFormBtn", "disabled" => true],
+                                    "title" => "Delete all",
+                                    "icon" => "del"
+                                ])?>
                             </div>
                             <div class="header-info">
                                 <div class="header-field">
