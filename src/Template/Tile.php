@@ -14,15 +14,16 @@ class Tile
             self::$template = new Template(TPL_PATH . "Components/Tile.tpl");
         }
 
+        $attrs = [];
         if (isset($data["attributes"])) {
-            $attrs = [];
-            foreach($data["attributes"] as $attribute => $value) {
-                $attrs[] = e($attribute)."=\"".e($value)."\"";
+            foreach ($data["attributes"] as $attribute => $value) {
+                $attrs[] = e($attribute) . "=\"" . e($value) . "\"";
             }
-            $data["attributes"] = implode(" ", $attrs);
-        } else {
-            $data["attributes"] = "";
         }
+        if (isset($data["id"])) {
+            $attrs[] = "id=\"" . e($data["id"]) . "\"";
+        }
+        $data["attributes"] = implode(" ", $attrs);
 
         if (!isset($data["type"])) {
             $data["type"] = "none";

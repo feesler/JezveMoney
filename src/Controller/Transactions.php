@@ -259,7 +259,7 @@ class Transactions extends TemplateController
     protected function getAccountTileData($account, $tileId, $balanceDiff = 0)
     {
         return [
-            "attributes" => ["id" => $tileId],
+            "id" => $tileId,
             "title" => $account->name,
             "subtitle" => $this->currModel->format($account->balance + $balanceDiff, $account->curr_id),
             "icon" => $this->accModel->getIconFile($account->id)
@@ -340,7 +340,7 @@ class Transactions extends TemplateController
             $data["acc_id"] = ($debtAcc) ? $debtAcc->id : 0;
 
             $data["personTile"] = [
-                "attributes" => ["id" => "person_tile"],
+                "id" => "person_tile",
                 "title" => ($pObj) ? $pObj->name : null,
                 "subtitle" => $this->currModel->format($person_balance, $debtAcc->curr_id)
             ];
@@ -753,7 +753,7 @@ class Transactions extends TemplateController
             $noAccount = is_null($debtAcc);
 
             $data["personTile"] = [
-                "attributes" => ["id" => "person_tile"],
+                "id" => "person_tile",
                 "title" => $pObj->name,
                 "subtitle" => $this->currModel->format($person_balance, $person_acc->curr_id)
             ];
