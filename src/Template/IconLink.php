@@ -2,18 +2,15 @@
 
 namespace JezveMoney\App\Template;
 
-use JezveMoney\Core\Template;
+use JezveMoney\Core\TemplateComponent;
 
-class IconLink
+class IconLink extends TemplateComponent
 {
     protected static $template = null;
+    protected static $filename = "IconLink.tpl";
 
     public static function render($data)
     {
-        if (!self::$template) {
-            self::$template = new Template(TPL_PATH . "Components/IconLink.tpl");
-        }
-
         $attrs = [];
         if (isset($data["attributes"])) {
             foreach ($data["attributes"] as $attribute => $value) {
@@ -44,6 +41,6 @@ class IconLink
                 : "";
         }
 
-        return self::$template->render($data);
+        return self::renderTemplate($data);
     }
 }

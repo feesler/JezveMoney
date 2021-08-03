@@ -2,18 +2,10 @@
 
 namespace JezveMoney\App\Template;
 
-use JezveMoney\Core\Template;
+use JezveMoney\Core\TemplateComponent;
 
-class TransactionList
+class TransactionList extends TemplateComponent
 {
     protected static $template = null;
-
-    public static function render($data)
-    {
-        if (!self::$template) {
-            self::$template = new Template(TPL_PATH . "Components/TransactionList.tpl");
-        }
-
-        return self::$template->render($data);
-    }
+    protected static $filename = "TransactionList.tpl";
 }
