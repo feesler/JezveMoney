@@ -16,6 +16,7 @@ import {
 import { formatDate } from 'jezvejs/DateUtils';
 import { DropDown } from 'jezvejs/DropDown';
 import { DatePicker } from 'jezvejs/DatePicker';
+import { Paginator } from 'jezvejs/Paginator';
 import { Sortable } from 'jezvejs/Sortable';
 import { Selection } from 'jezvejs/Selection';
 import {

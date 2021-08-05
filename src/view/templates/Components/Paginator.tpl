@@ -1,11 +1,11 @@
 <div class="paginator">
 <?php   foreach($pagesArr as $pageItem) {
         if (!is_numeric($pageItem["text"])) {   ?>
-    <span><?=e($pageItem["text"])?></span>
+    <span class="paginator-item"><?=e($pageItem["text"])?></span>
 <?php			} else if ($pageItem["active"]) {   ?>
-    <span><b><?=e($pageItem["text"])?></b></span>
+    <span class="paginator-item paginator-item__active"><?=e($pageItem["text"])?></span>
 <?php			} else {    ?>
-    <span><a href="<?=e($pageItem["link"])?>"><?=e($pageItem["text"])?></a></span>
+    <a href="<?=e($pageItem["link"])?>" class="paginator-item"><?=e($pageItem["text"])?></a>
 <?php           }
     }	?>
 </div>

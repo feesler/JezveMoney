@@ -185,9 +185,9 @@ body.white-theme,
 }
 
 /* Transaction list */
-
-.white-theme .paginator > span {
-  color: #000000;
+.dark-theme .paginator-item,
+.dark-theme a.paginator-arrow:hover {
+  border-color: #ffffff;
 }
 
 /* Transaction list item */
