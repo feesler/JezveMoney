@@ -136,6 +136,16 @@ class TransactionListView extends View {
             this.listItems.addEventListener('click', this.onTransClick.bind(this));
         }
 
+        const paginatorElems = document.querySelectorAll('.paginator');
+        if (paginatorElems.length === 2) {
+            const paginatorOptions = {
+                onChange: (page) => this.onChangePage(page),
+            };
+
+            this.topPaginator = Paginator.fromElement(paginatorElems[0], paginatorOptions);
+            this.bottomPaginator = Paginator.fromElement(paginatorElems[1], paginatorOptions);
+        }
+
         this.toolbar = Toolbar.create({
             elem: 'toolbar',
             ondelete: () => this.confirmDelete(),
@@ -706,6 +716,9 @@ class TransactionListView extends View {
             this.datePickerBtn.elem,
             this.dateInputBtn,
         ]);
+    }
+
+    onChangePage(page) {
     }
 }
 

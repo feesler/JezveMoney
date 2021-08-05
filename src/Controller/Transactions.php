@@ -210,9 +210,9 @@ class Transactions extends TemplateController
                     $pagesArr = $this->model->getPaginatorArray($page_num, $pageCount);
                 }
 
-                foreach ($pagesArr as $ind => $pageItem) {
-                    if (is_numeric($pageItem["text"]) && !$pageItem["active"]) {
-                        $urlParams["page"] = intval($pageItem["text"]);
+                foreach ($pagesArr as $ind => $item) {
+                    if (isset($item["page"]) && !$item["active"]) {
+                        $urlParams["page"] = intval($item["page"]);
 
                         $pagesArr[$ind]["link"] = urlJoin(BASEURL . "transactions/", $urlParams);
                     }
