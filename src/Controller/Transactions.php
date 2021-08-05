@@ -231,9 +231,15 @@ class Transactions extends TemplateController
         $listData["items"] = $trListData;
 
         $data["listData"] = $listData;
-
+        $profileData = [
+            "user_id" => $this->user_id,
+            "owner_id" => $this->owner_id,
+            "name" => $this->user_name,
+        ];
         $data["viewData"] = JSON::encode([
-            "accounts" => $data["accArr"],
+            "profile" => $profileData,
+            "accounts" => $this->accModel->getData(["full" => true]),
+            "persons" => $this->personMod->getData(["type" => "all"]),
             "currency" => $currArr,
             "transArr" => $transArr,
             "filterObj" => $filterObj

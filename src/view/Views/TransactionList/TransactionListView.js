@@ -31,10 +31,13 @@ import { IconLink } from '../../Components/IconLink/IconLink.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
+import { AccountList } from '../../js/model/AccountList.js';
+import { PersonList } from '../../js/model/PersonList.js';
 import '../../css/app.css';
 import '../../Components/TransactionTypeMenu/style.css';
 import '../../Components/TransactionsList/style.css';
 import './style.css';
+import { TransactionListItem } from '../../Components/TransactionListItem/TransactionListItem.js';
 
 const singleTransDeleteTitle = 'Delete transaction';
 const multiTransDeleteTitle = 'Delete transactions';
@@ -59,6 +62,14 @@ class TransactionListView extends View {
             selDateRange: null,
             currency: CurrencyList.create(this.props.currency),
         };
+
+        if (!window.app.model) {
+            window.app.model = {};
+        }
+        window.app.model.currency = CurrencyList.create(this.props.currency);
+        window.app.model.account = AccountList.create(this.props.accounts);
+        window.app.model.person = PersonList.create(this.props.persons);
+        window.app.model.profile = { ...this.props.profile };
 
         this.state = {
             items: [...this.props.transArr],
@@ -298,11 +309,13 @@ class TransactionListView extends View {
 
         removeChilds(transBalanceItem);
 
+        const currencyModel = window.app.model.currency;
+
         if (tr.type === EXPENSE
             || tr.type === TRANSFER
             || (tr.type === DEBT && tr.src_id !== 0)) {
             const balSpan = ce('span');
-            balSpan.textContent = this.model.currency.formatCurrency(
+            balSpan.textContent = currencyModel.formatCurrency(
                 tr.src_result,
                 tr.src_curr,
             );
@@ -313,7 +326,7 @@ class TransactionListView extends View {
             || tr.type === TRANSFER
             || (tr.type === DEBT && tr.dest_id !== 0)) {
             const balSpan = ce('span');
-            balSpan.textContent = this.model.currency.formatCurrency(
+            balSpan.textContent = currencyModel.formatCurrency(
                 tr.dest_result,
                 tr.dest_curr,
             );
@@ -727,7 +740,11 @@ class TransactionListView extends View {
     }
 
     requestTransactions(options) {
-        const apiReq = `${baseURL}api/transaction/list?${urlJoin(options)}`;
+        const reqOptions = {
+            ...options,
+            order: 'desc',
+        };
+        const apiReq = `${baseURL}api/transaction/list?${urlJoin(reqOptions)}`;
 
         ajax.get({
             url: apiReq,
@@ -746,40 +763,21 @@ class TransactionListView extends View {
         this.render(this.state);
     }
 
-    renderDetailsItem(item) {
-    }
-
-    renderItem(item) {
-        const accountsTitle = 'Test test';
-        const amountTitle = `${item.src_amount} (${item.dest_amount})`;
-
-        const detailsElem = ce('div', { className: 'trans-list__item-details' }, ce('span', { textContent: item.date }));
-        if (item.comment !== '') {
-            const commentElem = ce('span', {
-                className: 'trans-list__item-comment',
-                textContent: item.comment,
-            });
-            detailsElem.appendChild(commentElem);
-        }
-
-        const itemElem = ce('div', { className: 'trans-list__item' }, [
-            ce('div', { className: 'trans-list__item-title' }, ce('span', { textContent: accountsTitle })),
-            ce('div', { className: 'trans-list__item-content' }, ce('span', { textContent: amountTitle })),
-            detailsElem,
-        ]);
-        itemElem.setAttribute('data-id', item.id);
-
-        return ce('div', { className: 'trans-list__item-wrapper' }, itemElem);
-    }
-
     render(state) {
-        const renderMethod = (state.filter.mode === 'details')
-            ? (item) => this.renderDetailsItem(item)
-            : (item) => this.renderItem(item);
-        const elems = state.items.map(renderMethod);
+        const elems = state.items.map((item) => {
+            const tritem = TransactionListItem.create({
+                mode: state.filter.mode,
+                item,
+            });
+            tritem.render(tritem.state);
+            return tritem.elem;
+        });
 
         removeChilds(this.listItems);
         addChilds(this.listItems, elems);
+
+        this.topPaginator.setPage(state.filter.page);
+        this.bottomPaginator.setPage(state.filter.page);
     }
 }
 
