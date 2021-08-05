@@ -6,9 +6,9 @@ import {
     isDate,
     urlJoin,
     isEmpty,
-    setParam,
     insertAfter,
     prependChild,
+    addChilds,
     removeChilds,
     setEmptyClick,
     ajax,
@@ -58,6 +58,11 @@ class TransactionListView extends View {
             selection: new Selection(),
             selDateRange: null,
             currency: CurrencyList.create(this.props.currency),
+        };
+
+        this.state = {
+            items: [...this.props.transArr],
+            filter: { ...this.props.filterObj },
         };
     }
 
@@ -501,9 +506,7 @@ class TransactionListView extends View {
      */
     buildAddress() {
         let newLocation = `${baseURL}transactions/`;
-        const locFilter = {};
-
-        setParam(locFilter, this.props.filterObj);
+        const locFilter = { ...this.props.filterObj };
 
         if ('type' in locFilter) {
             if (!Array.isArray(locFilter.type)) {
@@ -719,6 +722,64 @@ class TransactionListView extends View {
     }
 
     onChangePage(page) {
+        this.state.filter.page = page;
+        this.requestTransactions(this.state.filter);
+    }
+
+    requestTransactions(options) {
+        const apiReq = `${baseURL}api/transaction/list?${urlJoin(options)}`;
+
+        ajax.get({
+            url: apiReq,
+            headers: { 'Content-Type': 'application/json' },
+            callback: (resp) => this.onTransactionsCallback(resp),
+        });
+    }
+
+    onTransactionsCallback(response) {
+        const res = JSON.parse(response);
+        if (!res || res.result !== 'ok') {
+            return;
+        }
+
+        this.state.items = [...res.data];
+        this.render(this.state);
+    }
+
+    renderDetailsItem(item) {
+    }
+
+    renderItem(item) {
+        const accountsTitle = 'Test test';
+        const amountTitle = `${item.src_amount} (${item.dest_amount})`;
+
+        const detailsElem = ce('div', { className: 'trans-list__item-details' }, ce('span', { textContent: item.date }));
+        if (item.comment !== '') {
+            const commentElem = ce('span', {
+                className: 'trans-list__item-comment',
+                textContent: item.comment,
+            });
+            detailsElem.appendChild(commentElem);
+        }
+
+        const itemElem = ce('div', { className: 'trans-list__item' }, [
+            ce('div', { className: 'trans-list__item-title' }, ce('span', { textContent: accountsTitle })),
+            ce('div', { className: 'trans-list__item-content' }, ce('span', { textContent: amountTitle })),
+            detailsElem,
+        ]);
+        itemElem.setAttribute('data-id', item.id);
+
+        return ce('div', { className: 'trans-list__item-wrapper' }, itemElem);
+    }
+
+    render(state) {
+        const renderMethod = (state.filter.mode === 'details')
+            ? (item) => this.renderDetailsItem(item)
+            : (item) => this.renderItem(item);
+        const elems = state.items.map(renderMethod);
+
+        removeChilds(this.listItems);
+        addChilds(this.listItems, elems);
     }
 }
 
