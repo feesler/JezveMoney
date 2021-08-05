@@ -1,4 +1,5 @@
-import { TestApplication, formatDate, setupTest } from 'jezve-test';
+import { formatDate } from 'jezvejs/DateUtils';
+import { TestApplication, setupTest } from 'jezve-test';
 import { api } from './model/api.js';
 import { config } from './config.js';
 import { AppState } from './model/AppState.js';

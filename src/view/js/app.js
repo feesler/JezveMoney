@@ -27,18 +27,6 @@ export function leadZero(val) {
     return v.toString();
 }
 
-/** Format date as DD.MM.YYYY */
-export function formatDate(date) {
-    if (!isDate(date)) {
-        throw new Error('Invalid type of parameter');
-    }
-
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    const day = date.getDate();
-    return `${leadZero(day)}.${leadZero(month)}.${leadZero(year)}`;
-}
-
 /** Convert DD.MM.YYYY string to timestamp */
 export function fixDate(str) {
     if (typeof str !== 'string') {

@@ -1,9 +1,6 @@
-import {
-    test,
-    isObject,
-    copyObject,
-    formatDate,
-} from 'jezve-test';
+import { isObject, copyObject } from 'jezvejs';
+import { formatDate } from 'jezvejs/DateUtils';
+import { test } from 'jezve-test';
 import { TransactionsView } from '../../view/TransactionsView.js';
 import { TransactionView } from '../../view/TransactionView.js';
 import { MainView } from '../../view/MainView.js';

@@ -13,6 +13,7 @@ import {
     setEmptyClick,
     ajax,
 } from 'jezvejs';
+import { formatDate } from 'jezvejs/DateUtils';
 import { DropDown } from 'jezvejs/DropDown';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { Sortable } from 'jezvejs/Sortable';
@@ -643,8 +644,8 @@ class TransactionListView extends View {
 
         this.model.selDateRange = range;
         this.datePicker.hide();
-        const start = DatePicker.format(range.start);
-        const end = DatePicker.format(range.end);
+        const start = formatDate(range.start);
+        const end = formatDate(range.end);
 
         this.dateInput.value = `${start} - ${end}`;
     }
@@ -657,8 +658,8 @@ class TransactionListView extends View {
             return;
         }
 
-        const newStartDate = DatePicker.format(this.model.selDateRange.start);
-        const newEndDate = DatePicker.format(this.model.selDateRange.end);
+        const newStartDate = formatDate(this.model.selDateRange.start);
+        const newEndDate = formatDate(this.model.selDateRange.end);
 
         if (this.props.filterObj.stdate === newStartDate
             && this.props.filterObj.enddate === newEndDate) {
@@ -684,6 +685,7 @@ class TransactionListView extends View {
             this.datePicker = DatePicker.create({
                 wrapper: this.datePickerWrapper,
                 relparent: this.datePickerWrapper.parentNode,
+                locales: 'en',
                 range: true,
                 onrangeselect: (range) => this.onRangeSelect(range),
                 onhide: () => this.onDatePickerHide(),

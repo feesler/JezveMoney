@@ -9,6 +9,7 @@ import {
     checkDate,
     insertAfter,
 } from 'jezvejs';
+import { formatDate } from 'jezvejs/DateUtils';
 import { DropDown } from 'jezvejs/DropDown';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { DecimalInput } from 'jezvejs/DecimalInput';
@@ -449,7 +450,7 @@ class TransactionView extends View {
             return;
         }
 
-        this.dateInput.value = DatePicker.format(date);
+        this.dateInput.value = formatDate(date);
 
         this.calendarObj.hide();
     }
@@ -462,7 +463,8 @@ class TransactionView extends View {
             this.calendarObj = DatePicker.create({
                 wrapper: this.datePickerWrapper,
                 relparent: this.datePickerWrapper.parentNode,
-                ondateselect: this.onSelectDate.bind(this),
+                locales: 'en',
+                ondateselect: (d) => this.onSelectDate(d),
             });
         }
         if (!this.calendarObj) {

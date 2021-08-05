@@ -11,6 +11,7 @@ import {
     px,
     isEmpty,
 } from 'jezvejs';
+import { formatDate } from 'jezvejs/DateUtils';
 import { Histogram } from 'jezvejs/Histogram';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { DropDown } from 'jezvejs/DropDown';
@@ -130,8 +131,8 @@ class StatisticsView extends View {
         }
 
         this.selDateRange = range;
-        const start = DatePicker.format(range.start);
-        const end = DatePicker.format(range.end);
+        const start = formatDate(range.start);
+        const end = formatDate(range.end);
 
         this.dateInput.value = `${start} - ${end}`;
     }
@@ -144,8 +145,8 @@ class StatisticsView extends View {
             return;
         }
 
-        this.model.filter.stdate = DatePicker.format(this.selDateRange.start);
-        this.model.filter.enddate = DatePicker.format(this.selDateRange.end);
+        this.model.filter.stdate = formatDate(this.selDateRange.start);
+        this.model.filter.enddate = formatDate(this.selDateRange.end);
 
         window.location = this.buildAddress();
     }
@@ -158,6 +159,7 @@ class StatisticsView extends View {
             this.datePicker = DatePicker.create({
                 wrapper: this.datePickerWrapper,
                 relparent: this.datePickerWrapper.parentNode,
+                locales: 'en',
                 range: true,
                 onrangeselect: (range) => this.onRangeSelect(range),
                 onhide: () => this.onDatePickerHide(),
