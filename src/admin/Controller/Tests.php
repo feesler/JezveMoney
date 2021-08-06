@@ -24,7 +24,6 @@ class Tests extends AdminController
         $this->cssAdmin[] = "TestsView.css";
         $this->buildCSS();
 
-        $this->jsArr = [];
         $this->jsAdmin[] = "tests/index.js";
 
         include(ADMIN_TPL_PATH . "tests.tpl");
