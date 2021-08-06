@@ -59,6 +59,9 @@ export class TransactionsView extends AppView {
             throw new Error('List of transactions not found');
         }
 
+        res.loadingIndicator = { elem: await this.query(transList, '.trans-list__loading') };
+        res.loadingIndicator.visible = await this.isVisible(res.loadingIndicator.elem, true);
+
         res.modeSelector = await ModeSelector.create(this, await this.query(transList, '.mode-selector'));
         res.paginator = await Paginator.create(this, await this.query(transList, '.paginator'));
 
@@ -111,6 +114,7 @@ export class TransactionsView extends AppView {
                 pages: cont.paginator.getPages(),
                 items: cont.transList.getItems(),
             };
+            res.renderTime = cont.transList.renderTime;
         } else {
             res.list = {
                 page: 0,
@@ -125,6 +129,8 @@ export class TransactionsView extends AppView {
             const locURL = new URL(this.location);
             res.detailsMode = locURL.searchParams.has('mode') && locURL.searchParams.get('mode') === 'details';
         }
+
+        res.loading = cont.loadingIndicator.visible;
 
         return res;
     }
@@ -313,6 +319,20 @@ export class TransactionsView extends AppView {
         return !this.content.paginator || this.content.paginator.isLastPage();
     }
 
+    async waitForList(action) {
+        const prevTime = this.model.renderTime;
+
+        await action();
+
+        await this.waitForFunction(async () => {
+            await this.parse();
+            return (
+                !this.model.loading
+                && prevTime !== this.model.renderTime
+            );
+        });
+    }
+
     async goToFirstPage() {
         if (this.isFirstPage()) {
             return this;
@@ -320,7 +340,7 @@ export class TransactionsView extends AppView {
 
         const expected = this.onPageChanged(1);
 
-        await this.navigation(() => this.content.paginator.goToFirstPage());
+        await this.waitForList(() => this.content.paginator.goToFirstPage());
 
         return App.view.checkState(expected);
     }
@@ -332,7 +352,7 @@ export class TransactionsView extends AppView {
 
         const expected = this.onPageChanged(this.pagesCount());
 
-        await this.navigation(() => this.content.paginator.goToLastPage());
+        await this.waitForList(() => this.content.paginator.goToLastPage());
 
         return App.view.checkState(expected);
     }
@@ -344,7 +364,7 @@ export class TransactionsView extends AppView {
 
         const expected = this.onPageChanged(this.currentPage() - 1);
 
-        await this.navigation(() => this.content.paginator.goToPrevPage());
+        await this.waitForList(() => this.content.paginator.goToPrevPage());
 
         return App.view.checkState(expected);
     }
@@ -356,7 +376,7 @@ export class TransactionsView extends AppView {
 
         const expected = this.onPageChanged(this.currentPage() + 1);
 
-        await this.navigation(() => this.content.paginator.goToNextPage());
+        await this.waitForList(() => this.content.paginator.goToNextPage());
 
         return App.view.checkState(expected);
     }

@@ -61,45 +61,6 @@ export class TransactionListItem extends Component {
         ]);
 
         this.elem = ce('tbody', { className: 'trans-list__item-wrapper' }, this.contentElem);
-        /*
-                <tbody class="trans-list__item-wrapper">
-                <tr data-id="<?=e($trItem["id"])?>">
-                    <td>
-                        <div class="ellipsis-cell">
-                            <div class="trans-list__item-title" title="<?=e($trItem["acc"])?>">
-                                <span><?=e($trItem["acc"])?></span>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="trans-list__item-content">
-                            <span><?=e($trItem["amount"])?></span>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tritem_balance">
-                            <span><?=implode("</span><span>", array_map("e", $trItem["balance"]))?></span>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="trans-list__item-details">
-                            <span><?=e($trItem["date"])?></span>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="ellipsis-cell">
-        <?php           if ($trItem["comment"] != "") {		?>
-                            <div title="<?=e($trItem["comment"])?>">
-                                <span class="trans-list__item-comment"><?=e($trItem["comment"])?></span>
-                            </div>
-        <?php           } else {		?>
-                            <div></div>
-        <?php           }	?>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-        */
     }
 
     render(state) {
@@ -185,6 +146,16 @@ export class TransactionListItem extends Component {
         this.amountElem.appendChild(ce('span', { textContent: amountText }));
 
         if (state.mode === 'details') {
+            removeChilds(this.balanceElem);
+            if (item.src_id){
+                const balance = currencyModel.formatCurrency(item.src_result, item.src_curr);
+                this.balanceElem.appendChild(ce('span', { textContent: balance }));
+            }
+            if (item.dest_id){
+                const balance = currencyModel.formatCurrency(item.dest_result, item.dest_curr);
+                this.balanceElem.appendChild(ce('span', { textContent: balance }));
+            }
+
             removeChilds(this.dateElem);
             this.dateElem.appendChild(ce('span', { textContent: item.date }));
 
@@ -200,6 +171,12 @@ export class TransactionListItem extends Component {
                     textContent: item.comment,
                 }));
             }
+        }
+
+        if (state.selected) {
+            this.contentElem.classList.add('trans-list__item_selected');
+        } else {
+            this.contentElem.classList.remove('trans-list__item_selected');
         }
     }
 }

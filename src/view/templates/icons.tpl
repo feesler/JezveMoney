@@ -46,6 +46,32 @@
     </g>
 </symbol>
 
+<symbol id="mode-details" viewBox="0 0 24 24">
+<g transform="translate(-4.0016 -4.0097)" fill="#20a0ff" stroke-linejoin="round" stroke-width="0">
+<rect x="5" y="5" width="1.9839" height="2.0193"/>
+<rect x="9.0032" y="5" width="6.9791" height="2.0193"/>
+<rect x="18.002" y="5" width="8.9984" height="2.0193"/>
+<rect x="5" y="9.0032" width="1.9839" height="3.0113"/>
+<rect x="9.0032" y="9.0032" width="6.9791" height="3.0113"/>
+<rect x="18.002" y="9.0032" width="8.9984" height="3.0113"/>
+<rect x="5" y="13.998" width="1.9839" height="3.0113"/>
+<rect x="9.0032" y="13.998" width="6.9791" height="3.0113"/>
+<rect x="18.002" y="13.998" width="8.9984" height="3.0113"/>
+<rect x="5" y="18.994" width="1.9839" height="3.0113"/>
+<rect x="9.0032" y="18.994" width="6.9791" height="3.0113"/>
+<rect x="18.002" y="18.994" width="8.9984" height="3.0113"/>
+<rect x="5" y="23.989" width="1.9839" height="3.0113"/>
+<rect x="9.0032" y="23.989" width="6.9791" height="3.0113"/>
+<rect x="18.002" y="23.989" width="8.9984" height="3.0113"/>
+</g>
+</symbol>
+
+<symbol id="mode-list" viewBox="0 0 24 24">
+<path d="m1 1 22 5e-6v6l-22 5e-6z" fill="#20a0ff" stroke-linejoin="round" stroke-width="0"/>
+<path d="m1 9h22v6h-22z" fill="#20a0ff" stroke-linejoin="round" stroke-width="0"/>
+<path d="m1 17h22v6h-22z" fill="#20a0ff" stroke-linejoin="round" stroke-width="0"/>
+</symbol>
+
 <symbol id="update" viewBox="0 0 24 24">
     <path d="m6.0243 14.357-1.8944 5.5228 5.5984-1.781z" stroke-width="0"/>
     <path d="m7.1253 13.283 6.9499-7.0522 3.6506 3.6884-6.9388 7.0788z" stroke-width="0"/>

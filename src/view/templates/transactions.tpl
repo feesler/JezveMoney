@@ -131,6 +131,7 @@ include(TPL_PATH."commonhdr.tpl");
 <input id="deltrans" name="transactions" type="hidden" value="">
 </form>
 
+<?php	include(TPL_PATH."icons.tpl");	?>
 <?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

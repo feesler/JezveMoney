@@ -32,6 +32,7 @@ use JezveMoney\App\Template\Paginator;
 <?=Paginator::render($paginator)?>
     </div>
 <?php	}	?>
+    <div class="trans-list__loading hidden">Loading...</div>
 <?php	if ($showDetails) {	?>
     <table id="tritems" class="trans-list_details">
 <?php	} else {	?>

@@ -238,7 +238,7 @@ class Transactions extends TemplateController
         ];
         $data["viewData"] = JSON::encode([
             "profile" => $profileData,
-            "accounts" => $this->accModel->getData(["full" => true]),
+            "accounts" => $this->accModel->getData(["full" => true, "type" => "all"]),
             "persons" => $this->personMod->getData(["type" => "all"]),
             "currency" => $currArr,
             "transArr" => $transArr,

@@ -25,6 +25,7 @@ import {
     TRANSFER,
     DEBT,
     createMessage,
+    createIcon,
 } from '../../js/app.js';
 import { View } from '../../js/View.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
@@ -58,7 +59,6 @@ class TransactionListView extends View {
         }
 
         this.model = {
-            selection: new Selection(),
             selDateRange: null,
             currency: CurrencyList.create(this.props.currency),
         };
@@ -74,6 +74,9 @@ class TransactionListView extends View {
         this.state = {
             items: [...this.props.transArr],
             filter: { ...this.props.filterObj },
+            loading: false,
+            renderTime: Date.now(),
+            selectedItems: new Selection(),
         };
     }
 
@@ -129,6 +132,9 @@ class TransactionListView extends View {
             throw new Error('Failed to initialize Transaction List view');
         }
 
+        this.loadingIndicator = document.querySelector('.trans-list__loading');
+        this.modeSelector = document.querySelector('.mode-selector');
+
         this.trListSortable = null;
         this.listItems = ge('tritems');
         if (this.listItems) {
@@ -140,7 +146,7 @@ class TransactionListView extends View {
                 selector: '.trans-list__item-wrapper',
                 placeholderClass: 'trans-list__item-placeholder',
                 copyWidth: true,
-                table: (this.props.filterObj.mode === 'details'),
+                table: (this.state.filter.mode === 'details'),
             });
 
             /**
@@ -168,12 +174,25 @@ class TransactionListView extends View {
         });
     }
 
+    /** Set loading state and render view */
+    startLoading() {
+        this.state.loading = true;
+        this.render(this.state);
+    }
+
+    /** Remove loading state and render view */
+    stopLoading() {
+        this.state.loading = false;
+        this.state.renderTime = Date.now();
+        this.render(this.state);
+    }
+
     /**
      * Search for transaction by specified id
      * @param {number} transactionId - identifier of transaction
      */
     getTransaction(transactionId) {
-        return this.props.transArr.find((item) => item && item.id === transactionId);
+        return this.state.items.find((item) => item && item.id === transactionId);
     }
 
     /**
@@ -196,8 +215,8 @@ class TransactionListView extends View {
             return true;
         }
 
-        this.props.transArr.sort(posCompare);
-        this.props.transArr.forEach((transaction) => {
+        this.state.items.sort(posCompare);
+        this.state.items.forEach((transaction) => {
             const tr = transaction;
             if (tr.id === transactionId) {
                 tr.pos = pos;
@@ -227,11 +246,11 @@ class TransactionListView extends View {
             }
         });
 
-        // Sort array of  transaction by position again
-        this.props.transArr.sort(posCompare);
+        // Sort array of transaction by position again
+        this.state.items.sort(posCompare);
 
-        if (this.props.filterObj.mode === 'details') {
-            this.props.transArr.forEach((transaction) => {
+        if (this.state.filter.mode === 'details') {
+            this.state.items.forEach((transaction) => {
                 const tr = transaction;
                 const srcBalance = (tr.src_id !== 0 && tBalanceArr[tr.src_id] !== undefined)
                     ? tBalanceArr[tr.src_id]
@@ -358,25 +377,13 @@ class TransactionListView extends View {
             return;
         }
 
-        if (this.model.selection.isSelected(transactionId)) {
-            this.model.selection.deselect(transactionId);
-            listItemElem.classList.remove('trans-list__item_selected');
+        if (this.state.selectedItems.isSelected(transactionId)) {
+            this.state.selectedItems.deselect(transactionId);
         } else {
-            this.model.selection.select(transactionId);
-            listItemElem.classList.add('trans-list__item_selected');
+            this.state.selectedItems.select(transactionId);
         }
 
-        this.toolbar.updateBtn.show(this.model.selection.count() === 1);
-        this.toolbar.deleteBtn.show(this.model.selection.count() > 0);
-
-        const selArr = this.model.selection.getIdArray();
-        this.delTransInp.value = selArr.join();
-
-        if (this.model.selection.count() === 1) {
-            this.toolbar.updateBtn.setURL(`${baseURL}transactions/edit/${selArr[0]}`);
-        }
-
-        this.toolbar.show(this.model.selection.count() > 0);
+        this.render(this.state);
     }
 
     /**
@@ -456,7 +463,7 @@ class TransactionListView extends View {
      * @param {Element} elem - element to start looking from
      */
     findListItemElement(elem) {
-        const selector = (this.props.filterObj.mode === 'details') ? 'tr' : '.trans-list__item';
+        const selector = (this.state.filter.mode === 'details') ? 'tr' : '.trans-list__item';
 
         if (!elem) {
             return null;
@@ -519,7 +526,7 @@ class TransactionListView extends View {
      */
     buildAddress() {
         let newLocation = `${baseURL}transactions/`;
-        const locFilter = { ...this.props.filterObj };
+        const locFilter = { ...this.state.filter };
 
         if ('type' in locFilter) {
             if (!Array.isArray(locFilter.type)) {
@@ -560,18 +567,18 @@ class TransactionListView extends View {
 
         const selectedType = parseInt(itemElem.dataset.type, 10);
 
-        if (!('type' in this.props.filterObj)) {
-            this.props.filterObj.type = [];
+        if (!('type' in this.state.filter)) {
+            this.state.filter.type = [];
         }
-        if (!Array.isArray(this.props.filterObj.type)) {
-            this.props.filterObj.type = [this.props.filterObj.type];
+        if (!Array.isArray(this.state.filter.type)) {
+            this.state.filter.type = [this.state.filter.type];
         }
 
-        const ind = this.props.filterObj.type.indexOf(selectedType);
+        const ind = this.state.filter.type.indexOf(selectedType);
         if (ind === -1) {
-            this.props.filterObj.type.push(selectedType);
+            this.state.filter.type.push(selectedType);
         } else {
-            this.props.filterObj.type.splice(ind, 1);
+            this.state.filter.type.splice(ind, 1);
         }
 
         window.location = this.buildAddress();
@@ -588,14 +595,14 @@ class TransactionListView extends View {
             const id = parseInt(item.id, 10);
 
             return (
-                !this.props.filterObj.acc_id
-                || !this.props.filterObj.acc_id.includes(id)
+                !this.state.filter.acc_id
+                || !this.state.filter.acc_id.includes(id)
             );
         });
 
         // Check all currenlty selected accounts present in the new selection
         if (!reloadNeeded) {
-            reloadNeeded = this.props.filterObj.acc_id.some(
+            reloadNeeded = this.state.filter.acc_id.some(
                 (accountId) => !data.find((item) => item.id === accountId),
             );
         }
@@ -605,12 +612,12 @@ class TransactionListView extends View {
         }
 
         // Prepare parameters
-        this.props.filterObj.acc_id = data.map((item) => parseInt(item.id, 10));
+        this.state.filter.acc_id = data.map((item) => parseInt(item.id, 10));
 
         // Clear page number because list of transactions guaranteed to change
         // on change accounts filter
-        if ('page' in this.props.filterObj) {
-            delete this.props.filterObj.page;
+        if ('page' in this.state.filter) {
+            delete this.state.filter.page;
         }
 
         window.location = this.buildAddress();
@@ -628,15 +635,15 @@ class TransactionListView extends View {
         }
 
         if (this.searchInp.value.length) {
-            this.props.filterObj.search = this.searchInp.value;
-        } else if ('search' in this.props.filterObj) {
-            delete this.props.filterObj.search;
+            this.state.filter.search = this.searchInp.value;
+        } else if ('search' in this.state.filter) {
+            delete this.state.filter.search;
         }
 
         // Clear page number because list of transactions guaranteed to change
         // on change search query
-        if ('page' in this.props.filterObj) {
-            delete this.props.filterObj.page;
+        if ('page' in this.state.filter) {
+            delete this.state.filter.page;
         }
 
         window.location = this.buildAddress();
@@ -646,12 +653,11 @@ class TransactionListView extends View {
      * Create and show transaction delete warning popup
      */
     confirmDelete() {
-        const multi = (this.model.selection.count() > 1);
-
-        if (this.model.selection.count() === 0) {
+        if (this.state.selectedItems.count() === 0) {
             return;
         }
 
+        const multi = (this.state.selectedItems.count() > 1);
         ConfirmDialog.create({
             id: 'delete_warning',
             title: (multi) ? multiTransDeleteTitle : singleTransDeleteTitle,
@@ -688,17 +694,17 @@ class TransactionListView extends View {
         const newStartDate = formatDate(this.model.selDateRange.start);
         const newEndDate = formatDate(this.model.selDateRange.end);
 
-        if (this.props.filterObj.stdate === newStartDate
-            && this.props.filterObj.enddate === newEndDate) {
+        if (this.state.filter.stdate === newStartDate
+            && this.state.filter.enddate === newEndDate) {
             return;
         }
 
-        this.props.filterObj.stdate = newStartDate;
-        this.props.filterObj.enddate = newEndDate;
+        this.state.filter.stdate = newStartDate;
+        this.state.filter.enddate = newEndDate;
 
         // Clear page number because list of transactions guaranteed to change on change date range
-        if ('page' in this.props.filterObj) {
-            delete this.props.filterObj.page;
+        if ('page' in this.state.filter) {
+            delete this.state.filter.page;
         }
 
         window.location = this.buildAddress();
@@ -746,6 +752,8 @@ class TransactionListView extends View {
         };
         const apiReq = `${baseURL}api/transaction/list?${urlJoin(reqOptions)}`;
 
+        this.startLoading();
+
         ajax.get({
             url: apiReq,
             headers: { 'Content-Type': 'application/json' },
@@ -759,14 +767,63 @@ class TransactionListView extends View {
             return;
         }
 
+        const url = this.buildAddress();
+        history.replaceState({}, 'Jezve Moeny | Transactions', url);
+
+        this.state.selectedItems.clear();
         this.state.items = [...res.data];
-        this.render(this.state);
+        this.stopLoading();
+    }
+
+    renderModeSelectorItem(item) {
+        const tagName = item.active ? 'b' : 'a';
+
+        const elem = ce(tagName, { className: 'mode-selector__item' }, [
+            ce('span', { className: 'icon' }, createIcon(item.icon)),
+            ce('span', { textContent: item.title }),
+        ]);
+        if (!item.active) {
+            elem.href = item.url.toString();
+        }
+
+        return elem;
+    }
+
+    renderModeSelector(state) {
+        const modeUrl = new URL(this.buildAddress());
+        modeUrl.searchParams.set('page', state.filter.page);
+
+        const elems = [];
+
+        if (state.filter.mode === 'details') {
+            modeUrl.searchParams.delete('mode');
+
+            elems.push(
+                this.renderModeSelectorItem({ icon: 'mode-list', title: 'Classic', url: modeUrl }),
+                this.renderModeSelectorItem({ active: true, icon: 'mode-details', title: 'Details' }),
+            );
+        } else {
+            modeUrl.searchParams.set('mode', 'details');
+
+            elems.push(
+                this.renderModeSelectorItem({ active: true, icon: 'mode-list', title: 'Classic' }),
+                this.renderModeSelectorItem({ icon: 'mode-details', title: 'Details', url: modeUrl }),
+            );
+        }
+
+        removeChilds(this.modeSelector);
+        addChilds(this.modeSelector, elems);
     }
 
     render(state) {
+        if (state.loading) {
+            show(this.loadingIndicator, true);
+        }
+
         const elems = state.items.map((item) => {
             const tritem = TransactionListItem.create({
                 mode: state.filter.mode,
+                selected: state.selectedItems.isSelected(item.id),
                 item,
             });
             tritem.render(tritem.state);
@@ -775,9 +832,29 @@ class TransactionListView extends View {
 
         removeChilds(this.listItems);
         addChilds(this.listItems, elems);
+        this.listItems.dataset.time = state.renderTime;
 
         this.topPaginator.setPage(state.filter.page);
         this.bottomPaginator.setPage(state.filter.page);
+
+        this.renderModeSelector(state);
+
+        // toolbar
+        this.toolbar.updateBtn.show(state.selectedItems.count() === 1);
+        this.toolbar.deleteBtn.show(state.selectedItems.count() > 0);
+
+        const selArr = state.selectedItems.getIdArray();
+        this.delTransInp.value = selArr.join();
+
+        if (state.selectedItems.count() === 1) {
+            this.toolbar.updateBtn.setURL(`${baseURL}transactions/edit/${selArr[0]}`);
+        }
+
+        this.toolbar.show(state.selectedItems.count() > 0);
+
+        if (!state.loading) {
+            show(this.loadingIndicator, false);
+        }
     }
 }
 

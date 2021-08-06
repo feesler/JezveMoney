@@ -30,6 +30,11 @@
   padding: 0;
 }
 
+.mode-selector__item svg {
+  width: 24px;
+  height: 24px;
+}
+
 /* Paginator */
 .paginator-item {
   padding: 0.25rem 0.5rem;
