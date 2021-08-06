@@ -73,7 +73,10 @@ class TransactionListView extends View {
 
         this.state = {
             items: [...this.props.transArr],
-            filter: { ...this.props.filterObj },
+            filter: {
+                page: 1,
+                ...this.props.filterObj,
+            },
             loading: false,
             renderTime: Date.now(),
             selectedItems: new Selection(),
@@ -834,8 +837,10 @@ class TransactionListView extends View {
         addChilds(this.listItems, elems);
         this.listItems.dataset.time = state.renderTime;
 
-        this.topPaginator.setPage(state.filter.page);
-        this.bottomPaginator.setPage(state.filter.page);
+        if (this.topPaginator && this.bottomPaginator) {
+            this.topPaginator.setPage(state.filter.page);
+            this.bottomPaginator.setPage(state.filter.page);
+        }
 
         this.renderModeSelector(state);
 
