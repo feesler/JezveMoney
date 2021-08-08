@@ -1031,6 +1031,7 @@ class TransactionModel extends CachedTable
     //   endDate - end date of transactions filter. Default is empty
     //   desc - sort result descending
     //   onPage - count of transactions per page.
+    //   page - page to return. zero based
     public function getData($params = null)
     {
         if (is_null($params)) {

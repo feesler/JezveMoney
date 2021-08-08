@@ -30,6 +30,7 @@ import {
 import { View } from '../../js/View.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
+import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
@@ -73,10 +74,8 @@ class TransactionListView extends View {
 
         this.state = {
             items: [...this.props.transArr],
-            filter: {
-                page: 1,
-                ...this.props.filterObj,
-            },
+            filter: { ...this.props.filterObj },
+            pagination: { ...this.props.pagination },
             loading: false,
             renderTime: Date.now(),
             selectedItems: new Selection(),
@@ -87,11 +86,9 @@ class TransactionListView extends View {
      * View initialization
      */
     onStart() {
-        this.typeMenu = document.querySelector('.trtype-menu');
-        if (!this.typeMenu) {
-            throw new Error('Failed to initialize Transaction List view');
-        }
-        this.typeMenu.addEventListener('click', this.onToggleTransType.bind(this));
+        this.typeMenu = TransactionTypeMenu.fromElement(document.querySelector('.trtype-menu'), {
+            onChange: (sel) => this.onChangeTypeFilter(sel),
+        });
 
         this.accountDropDown = DropDown.create({
             input_id: 'acc_id',
@@ -559,32 +556,11 @@ class TransactionListView extends View {
     }
 
     /**
-     * Transaction type checkbox click event handler
-     * @param {Event} e - click event object
+     * Transaction type menu change event handler
      */
-    onToggleTransType(e) {
-        const itemElem = e.target.closest('.trtype-menu__item');
-        if (!itemElem || !itemElem.dataset) {
-            return;
-        }
-
-        const selectedType = parseInt(itemElem.dataset.type, 10);
-
-        if (!('type' in this.state.filter)) {
-            this.state.filter.type = [];
-        }
-        if (!Array.isArray(this.state.filter.type)) {
-            this.state.filter.type = [this.state.filter.type];
-        }
-
-        const ind = this.state.filter.type.indexOf(selectedType);
-        if (ind === -1) {
-            this.state.filter.type.push(selectedType);
-        } else {
-            this.state.filter.type.splice(ind, 1);
-        }
-
-        window.location = this.buildAddress();
+    onChangeTypeFilter(selected) {
+        this.state.filter.type = selected;
+        this.requestTransactions(this.state.filter);
     }
 
     /**
@@ -744,8 +720,10 @@ class TransactionListView extends View {
     }
 
     onChangePage(page) {
-        this.state.filter.page = page;
-        this.requestTransactions(this.state.filter);
+        this.requestTransactions({
+            ...this.state.filter,
+            page,
+        });
     }
 
     requestTransactions(options) {
@@ -774,7 +752,9 @@ class TransactionListView extends View {
         history.replaceState({}, 'Jezve Moeny | Transactions', url);
 
         this.state.selectedItems.clear();
-        this.state.items = [...res.data];
+        this.state.items = [...res.data.items];
+        this.state.pagination = { ...res.data.pagination };
+
         this.stopLoading();
     }
 
@@ -838,8 +818,10 @@ class TransactionListView extends View {
         this.listItems.dataset.time = state.renderTime;
 
         if (this.topPaginator && this.bottomPaginator) {
-            this.topPaginator.setPage(state.filter.page);
-            this.bottomPaginator.setPage(state.filter.page);
+            this.topPaginator.setPagesCount(state.pagination.pagesCount);
+            this.topPaginator.setPage(state.pagination.page);
+            this.bottomPaginator.setPagesCount(state.pagination.pagesCount);
+            this.bottomPaginator.setPage(state.pagination.page);
         }
 
         this.renderModeSelector(state);

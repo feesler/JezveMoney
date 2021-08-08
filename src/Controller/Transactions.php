@@ -61,6 +61,12 @@ class Transactions extends TemplateController
         ];
 
         $filterObj = new \stdClass();
+        $pagination = [
+            "onPage" => 10,
+            "page" => 1,
+            "pagesCount" => 0,
+            "total" => 0,
+        ];
         $trParams = [
             "onPage" => 10,
             "desc" => true
@@ -154,6 +160,7 @@ class Transactions extends TemplateController
 
         $transCount = $this->model->getTransCount($trParams);
         $data["transCount"] = $transCount;
+        $pagination["total"] = $transCount;
 
         $currArr = $this->currModel->getData();
 
@@ -204,7 +211,10 @@ class Transactions extends TemplateController
                 $urlParams = (array)$filterObj;
 
                 $pageCount = ceil($transCount / $trParams["onPage"]);
+                $pagination["pageCount"] = $pageCount;
                 $page_num = isset($trParams["page"]) ? intval($trParams["page"]) : 0;
+                $pagination["page"] = $page_num + 1;
+
                 $pagesArr = [];
                 if ($transCount > $trParams["onPage"]) {
                     $pagesArr = $this->model->getPaginatorArray($page_num, $pageCount);
@@ -242,7 +252,8 @@ class Transactions extends TemplateController
             "persons" => $this->personMod->getData(["type" => "all"]),
             "currency" => $currArr,
             "transArr" => $transArr,
-            "filterObj" => $filterObj
+            "filterObj" => $filterObj,
+            "pagination" => $pagination,
         ]);
 
         $this->cssArr[] = "TransactionListView.css";

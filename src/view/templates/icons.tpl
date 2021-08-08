@@ -72,6 +72,10 @@
 <path d="m1 17h22v6h-22z" fill="#20a0ff" stroke-linejoin="round" stroke-width="0"/>
 </symbol>
 
+<symbol id="check" viewBox="0 0 9.2604 9.2604">
+<path d="M1.08 4.93a.28.28 0 000 .4l2.35 2.34c.1.11.29.11.4 0l4.59-4.59a.28.28 0 000-.4l-.6-.6a.28.28 0 00-.4 0l-3.8 3.8-1.54-1.55a.28.28 0 00-.4 0z"/>
+</symbol>
+
 <symbol id="update" viewBox="0 0 24 24">
     <path d="m6.0243 14.357-1.8944 5.5228 5.5984-1.781z" stroke-width="0"/>
     <path d="m7.1253 13.283 6.9499-7.0522 3.6506 3.6884-6.9388 7.0788z" stroke-width="0"/>
