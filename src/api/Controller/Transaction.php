@@ -76,6 +76,9 @@ class Transaction extends ApiController
             "page" => 0
         ];
 
+        $res = new \stdClass();
+        $res->filter = [];
+
         // Obtain requested transaction type filter
         $typeFilter = [];
         if (isset($_GET["type"])) {
@@ -98,7 +101,7 @@ class Transaction extends ApiController
                 }
             }
             if (count($typeFilter) > 0) {
-                $params["type"] = $typeFilter;
+                $params["type"] = $res->filter["type"] = $typeFilter;
             }
         }
 
@@ -107,6 +110,7 @@ class Transaction extends ApiController
             is_string($_GET["order"]) &&
             strtolower($_GET["order"]) == "desc"
         ) {
+            $res->filter["desc"] = true;
             $params["desc"] = true;
         }
 
@@ -134,24 +138,32 @@ class Transaction extends ApiController
             }
 
             if (count($accFilter) > 0) {
-                $params["accounts"] = $accFilter;
+                $params["accounts"] = $res->filter["acc_id"] = $accFilter;
             }
         }
 
         if (isset($_GET["search"])) {
-            $params["search"] = $_GET["search"];
+            $params["search"] = $res->filter["search"] = $_GET["search"];
         }
 
         if (isset($_GET["stdate"]) && isset($_GET["enddate"])) {
-            $params["startDate"] = $_GET["stdate"];
-            $params["endDate"] = $_GET["enddate"];
+            $params["startDate"] = $res->filter["stdate"] = $_GET["stdate"];
+            $params["endDate"] = $res->filter["enddate"] = $_GET["enddate"];
         }
 
         $items = $this->model->getData($params);
-        $res = [];
+        $res->items = [];
         foreach ($items as $item) {
-            $res[] = new TransactionItem($item);
+            $res->items[] = new TransactionItem($item);
         }
+
+        $transCount = $this->model->getTransCount($params);
+        $res->pagination = [
+            "total" => $transCount,
+            "onPage" => $params["onPage"],
+            "pagesCount" => ceil($transCount / $params["onPage"]),
+            "page" => (isset($params["page"]) ? intval($params["page"]) : 0) + 1
+        ];
 
         $this->ok($res);
     }

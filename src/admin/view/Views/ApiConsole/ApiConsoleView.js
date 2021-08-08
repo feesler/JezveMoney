@@ -107,6 +107,9 @@ function isArrayOf(data, verifyFunc) {
     return data.every(verifyFunc);
 }
 
+/** Verify object is array of integers */
+function isIntArray(obj) { return isArrayOf(obj, isInt); }
+
 /** Verify object is date string in DD.MM.YYYY format */
 function isDateString(obj) {
     return checkDate(obj);
@@ -156,8 +159,43 @@ function isTransaction(obj) {
     });
 }
 
+/** Verify object is transactions filter */
+function isTransactionsFilter(obj) {
+    return verifyObject(obj, {}, {
+        type: isIntArray,
+        accounts: isIntArray,
+        stdate: isString,
+        enddate: isString,
+        search: isString,
+    });
+}
+
 /** Verify object is array of transactions */
 function isTransactionsArray(obj) { return isArrayOf(obj, isTransaction); }
+
+/** Verify object is list paginator */
+function isPaginator(obj) {
+    return verifyObject(obj, {
+        total: isInt,
+        onPage: isInt,
+        pagesCount: isInt,
+        page: isInt,
+    });
+}
+
+/** Verify object is transactions list response */
+function isTransactionsList(obj) {
+    return verifyObject(obj, {
+        items: isTransactionsArray,
+        filter: isTransactionsFilter,
+        paginator: isPaginator,
+    }, {
+        user_id: isInt,
+        createdate: isInt,
+        updatedate: isInt,
+    });
+}
+
 
 /** Verify object is import template */
 function isTemplateColumns(obj) {
@@ -1221,7 +1259,7 @@ class AdminApiConsoleView extends AdminView {
         this.apiGet({
             method: 'transaction/list',
             data: frmData,
-            verify: isTransactionsArray,
+            verify: isTransactionsList,
         });
 
         return false;

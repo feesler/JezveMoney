@@ -199,6 +199,6 @@ export async function filter(params) {
             throw new Error('Fail to read list of transactions');
         }
 
-        return checkObjValue(trList, expTransList.data);
+        return checkObjValue(trList.items, expTransList.data);
     });
 }
