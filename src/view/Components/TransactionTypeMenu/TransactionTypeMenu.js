@@ -22,8 +22,9 @@ const ITEM_CHECK_CLASS = 'trtype-menu__item-check';
 const ITEM_TITLE_CLASS = 'trtype-menu_item_title';
 
 const defaultProps = {
-    pageParam: 'type',
+    typeParam: 'type',
     url: window.location,
+    multiple: false,
 };
 
 /**
@@ -132,26 +133,28 @@ export class TransactionTypeMenu extends Component {
         this.render(this.state);
     }
 
-    renderItem(item) {
+    renderItem(item, state) {
         const elem = ce('span', { className: ITEM_CLASS });
         if (item.selected) {
             elem.classList.add(ITEM_SELECTED_CLASS);
         }
         elem.setAttribute('data-type', item.type);
 
-        if (item.type !== 0) {
+        if (state.multiple && item.type !== 0) {
             elem.appendChild(ce('span', { className: ITEM_CHECK_CLASS }, createIcon('check')));
         }
         const linkElem = ce('a', { textContent: item.title });
 
-        if (this.props.url) {
-            const url = new URL(this.props.url);
-            if (item.type){
-                url.searchParams.set(this.props.pageParam, item.type);
+        if (state.url) {
+            const paramName = (state.multiple) ? `${state.typeParam}[]` : state.typeParam;
+
+            const url = new URL(state.url);
+            if (item.type) {
+                url.searchParams.set(paramName, item.type);
             } else {
-                url.searchParams.delete(this.props.pageParam);
+                url.searchParams.delete(paramName);
             }
-            linkElem.href = url;
+            linkElem.href = url.toString();
         }
 
         elem.appendChild(ce('span', { className: ITEM_TITLE_CLASS }, linkElem));
@@ -160,7 +163,7 @@ export class TransactionTypeMenu extends Component {
     }
 
     render(state) {
-        const elems = state.items.map((item) => this.renderItem(item));
+        const elems = state.items.map((item) => this.renderItem(item, state));
         removeChilds(this.elem);
         addChilds(this.elem, elems);
 
