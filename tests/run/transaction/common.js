@@ -145,8 +145,7 @@ export async function runAction({ action, data }) {
     }
 
     if (action === 'changeDate') {
-        const fmtDate = formatDate(new Date(fixDate(data)));
-        testDescr = `Date (${fmtDate}) input`;
+        testDescr = `Date (${data}) input`;
     }
 
     if (action === 'inputComment') {
