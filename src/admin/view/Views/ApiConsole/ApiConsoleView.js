@@ -196,7 +196,6 @@ function isTransactionsList(obj) {
     });
 }
 
-
 /** Verify object is import template */
 function isTemplateColumns(obj) {
     return verifyObject(obj, {

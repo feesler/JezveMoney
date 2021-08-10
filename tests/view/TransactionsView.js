@@ -342,7 +342,7 @@ export class TransactionsView extends AppView {
 
         await this.waitForList(() => this.content.paginator.goToFirstPage());
 
-        return App.view.checkState(expected);
+        return this.checkState(expected);
     }
 
     async goToLastPage() {
@@ -354,7 +354,7 @@ export class TransactionsView extends AppView {
 
         await this.waitForList(() => this.content.paginator.goToLastPage());
 
-        return App.view.checkState(expected);
+        return this.checkState(expected);
     }
 
     async goToPrevPage() {
@@ -366,7 +366,7 @@ export class TransactionsView extends AppView {
 
         await this.waitForList(() => this.content.paginator.goToPrevPage());
 
-        return App.view.checkState(expected);
+        return this.checkState(expected);
     }
 
     async goToNextPage() {
@@ -378,7 +378,7 @@ export class TransactionsView extends AppView {
 
         await this.waitForList(() => this.content.paginator.goToNextPage());
 
-        return App.view.checkState(expected);
+        return this.checkState(expected);
     }
 
     async iteratePages() {
@@ -387,22 +387,18 @@ export class TransactionsView extends AppView {
             pages: [],
         };
 
-        if (!(App.view instanceof TransactionsView)) {
-            throw new Error('Not expected view');
-        }
-
-        if (!App.view.content.transList) {
+        if (!this.content.transList) {
             return res;
         }
 
-        if (!App.view.isFirstPage()) {
-            await App.view.goToFirstPage();
+        if (!this.isFirstPage()) {
+            await this.goToFirstPage();
         }
 
-        let pos = App.view.pagesCount() * App.config.transactionsOnPage;
-        while (App.view.content.transList.items.length) {
+        let pos = this.pagesCount() * App.config.transactionsOnPage;
+        while (this.content.transList.items.length) {
             const curPos = pos;
-            const pageItems = App.view.content.transList.items.map((item, ind) => ({
+            const pageItems = this.content.transList.items.map((item, ind) => ({
                 id: item.id,
                 accountTitle: item.accountTitle,
                 amountText: item.amountText,
@@ -415,11 +411,11 @@ export class TransactionsView extends AppView {
             res.pages.push(pageItems);
             res.items.push(...pageItems);
 
-            if (App.view.isLastPage()) {
+            if (this.isLastPage()) {
                 break;
             }
 
-            await App.view.goToNextPage();
+            await this.goToNextPage();
         }
 
         return res;
@@ -437,15 +433,15 @@ export class TransactionsView extends AppView {
         const expected = this.onFilterUpdate();
 
         if (newTypeSel.length === 1) {
-            await this.navigation(() => this.content.typeMenu.select(newTypeSel[0]));
+            await this.waitForList(() => this.content.typeMenu.select(newTypeSel[0]));
         } else {
-            await this.navigation(() => this.content.typeMenu.select(0));
+            await this.waitForList(() => this.content.typeMenu.select(0));
             for (const typeItem of newTypeSel) {
-                await App.view.navigation(() => App.view.content.typeMenu.toggle(typeItem));
+                await this.waitForList(() => App.view.content.typeMenu.toggle(typeItem));
             }
         }
 
-        return App.view.checkState(expected);
+        return this.checkState(expected);
     }
 
     /** Click on add button */

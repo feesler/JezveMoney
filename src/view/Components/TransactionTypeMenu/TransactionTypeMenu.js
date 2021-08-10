@@ -110,17 +110,25 @@ export class TransactionTypeMenu extends Component {
 
         const selectedType = parseInt(itemElem.dataset.type, 10);
 
-        const checkElem = e.target.closest(`.${ITEM_CHECK_CLASS}`);
-        const toggled = (checkElem && this.elem.contains(checkElem));
+        let toggled = false;
+        if (this.state.multiple) {
+            const checkElem = e.target.closest(`.${ITEM_CHECK_CLASS}`);
+            toggled = (checkElem && this.elem.contains(checkElem));
+        }
 
-        this.state.items = this.state.items.map((item) => ({
-            ...item,
-            selected: (
-                (toggled)
-                    ? ((item.type === selectedType) ? !item.selected : item.selected)
-                    : (item.type && item.type === selectedType)
-            ),
-        }));
+        this.state.items = this.state.items.map((item) => {
+            let selected;
+            if (toggled) {
+                selected = (item.type === selectedType) ? !item.selected : item.selected;
+            } else {
+                selected = item.type && item.type === selectedType;
+            }
+
+            return {
+                ...item,
+                selected,
+            };
+        });
 
         const selectedItems = this.state.items
             .filter((item) => item.type && item.selected)

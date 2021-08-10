@@ -749,7 +749,7 @@ class TransactionListView extends View {
         }
 
         const url = this.buildAddress();
-        history.replaceState({}, 'Jezve Moeny | Transactions', url);
+        window.history.replaceState({}, 'Jezve Moeny | Transactions', url);
 
         this.state.selectedItems.clear();
         this.state.items = [...res.data.items];
@@ -773,8 +773,14 @@ class TransactionListView extends View {
     }
 
     renderModeSelector(state) {
+        show(this.modeSelector, state.items.length > 0);
+        if (!state.items.length) {
+            removeChilds(this.modeSelector);
+            return;
+        }
+
         const modeUrl = new URL(this.buildAddress());
-        modeUrl.searchParams.set('page', state.filter.page);
+        modeUrl.searchParams.set('page', state.pagination.page);
 
         const elems = [];
 
@@ -814,7 +820,14 @@ class TransactionListView extends View {
         });
 
         removeChilds(this.listItems);
-        addChilds(this.listItems, elems);
+        if (elems.length) {
+            addChilds(this.listItems, elems);
+        } else {
+            this.listItems.appendChild(ce('span', {
+                className: 'nodata-message',
+                textContent: 'No transactions found.',
+            }));
+        }
         this.listItems.dataset.time = state.renderTime;
 
         if (this.topPaginator && this.bottomPaginator) {
