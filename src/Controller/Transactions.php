@@ -63,7 +63,7 @@ class Transactions extends TemplateController
         $pagination = [
             "onPage" => 10,
             "page" => 1,
-            "pagesCount" => 0,
+            "pagesCount" => 1,
             "total" => 0,
         ];
         $trParams = [
@@ -208,7 +208,7 @@ class Transactions extends TemplateController
             $urlParams = (array)$filterObj;
 
             $pageCount = ceil($transCount / $trParams["onPage"]);
-            $pagination["pageCount"] = $pageCount;
+            $pagination["pagesCount"] = $pageCount;
             $page_num = isset($trParams["page"]) ? intval($trParams["page"]) : 0;
             $pagination["page"] = $page_num + 1;
 
