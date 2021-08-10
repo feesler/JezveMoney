@@ -55,12 +55,11 @@ class Main extends TemplateController
 
             $trListData[] = $itemData;
         }
-        $transactionsData = [
+
+        $data["transactionsData"] = [
             "items" => $trListData,
-            "showPaginator" => false,
-            "showDetails" => false
+            "showDetails" => false,
         ];
-        $data["transactionsData"] = $transactionsData;
 
         $persArr = $this->personMod->getData();
         foreach ($persArr as $ind => $pData) {

@@ -62,11 +62,11 @@ export class TransactionsView extends AppView {
         res.loadingIndicator = { elem: await this.query(transList, '.trans-list__loading') };
         res.loadingIndicator.visible = await this.isVisible(res.loadingIndicator.elem, true);
 
-        res.modeSelector = await ModeSelector.create(this, await this.query(transList, '.mode-selector'));
-        res.paginator = await Paginator.create(this, await this.query(transList, '.paginator'));
+        res.modeSelector = await ModeSelector.create(this, await this.query('.mode-selector'));
+        res.paginator = await Paginator.create(this, await this.query('.paginator'));
 
         res.title = await this.prop(res.titleEl, 'textContent');
-        res.transList = await TransactionList.create(this, await this.query('#tritems'));
+        res.transList = await TransactionList.create(this, transList);
 
         if (
             res.transList

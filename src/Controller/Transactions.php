@@ -57,7 +57,6 @@ class Transactions extends TemplateController
             "titleString" => "Jezve Money | Transactions"
         ];
         $listData = [
-            "showPaginator" => true,
         ];
 
         $filterObj = new \stdClass();
@@ -159,7 +158,6 @@ class Transactions extends TemplateController
         $transArr = $this->model->getData($trParams);
 
         $transCount = $this->model->getTransCount($trParams);
-        $data["transCount"] = $transCount;
         $pagination["total"] = $transCount;
 
         $currArr = $this->currModel->getData();
@@ -199,37 +197,35 @@ class Transactions extends TemplateController
         $data["transMenu"] = $transMenu;
 
         // Prepare mode selector and paginator
-        if ($listData["showPaginator"] == true) {
-            // Prepare classic/details mode link
+        // Prepare classic/details mode link
+        $urlParams = (array)$filterObj;
+        $urlParams["mode"] = ($showDetails) ? "classic" : "details";
+
+        $data["modeLink"] = urlJoin(BASEURL . "transactions/", $urlParams);
+
+        // Build data for paginator
+        if ($trParams["onPage"] > 0) {
             $urlParams = (array)$filterObj;
-            $urlParams["mode"] = ($showDetails) ? "classic" : "details";
 
-            $listData["modeLink"] = urlJoin(BASEURL . "transactions/", $urlParams);
+            $pageCount = ceil($transCount / $trParams["onPage"]);
+            $pagination["pageCount"] = $pageCount;
+            $page_num = isset($trParams["page"]) ? intval($trParams["page"]) : 0;
+            $pagination["page"] = $page_num + 1;
 
-            // Build data for paginator
-            if ($trParams["onPage"] > 0) {
-                $urlParams = (array)$filterObj;
+            $pagesArr = [];
+            if ($transCount > $trParams["onPage"]) {
+                $pagesArr = $this->model->getPaginatorArray($page_num, $pageCount);
+            }
 
-                $pageCount = ceil($transCount / $trParams["onPage"]);
-                $pagination["pageCount"] = $pageCount;
-                $page_num = isset($trParams["page"]) ? intval($trParams["page"]) : 0;
-                $pagination["page"] = $page_num + 1;
+            foreach ($pagesArr as $ind => $item) {
+                if (isset($item["page"]) && !$item["active"]) {
+                    $urlParams["page"] = intval($item["page"]);
 
-                $pagesArr = [];
-                if ($transCount > $trParams["onPage"]) {
-                    $pagesArr = $this->model->getPaginatorArray($page_num, $pageCount);
-                }
-
-                foreach ($pagesArr as $ind => $item) {
-                    if (isset($item["page"]) && !$item["active"]) {
-                        $urlParams["page"] = intval($item["page"]);
-
-                        $pagesArr[$ind]["link"] = urlJoin(BASEURL . "transactions/", $urlParams);
-                    }
+                    $pagesArr[$ind]["link"] = urlJoin(BASEURL . "transactions/", $urlParams);
                 }
             }
-            $listData["paginator"] = ["pagesArr" => $pagesArr];
         }
+        $data["paginator"] = ["pagesArr" => $pagesArr];
 
         // Prepare data of transaction list items
         $trListData = [];

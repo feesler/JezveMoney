@@ -1,42 +1,12 @@
-<div id="trlist" class="trans-list">
-<?php
-
-use JezveMoney\App\Template\Paginator;
-
-        if (!count($items)) {	?>
-    <span class="nodata-message">No transactions found.</span>
-<?php	} else {		?>
-<?php	if ($showPaginator == TRUE) {		?>
-    <div class="paginator-row">
-        <div class="mode-selector">
-<?php		if ($showDetails) {		?>
-            <a class="mode-selector__item" href="<?=e($modeLink)?>">
-                <span class="icon"><?=svgIcon("list")?></span>
-                <span>Classic</span>
-            </a>
-            <b class="mode-selector__item">
-                <span class="icon"><?=svgIcon("details")?></span>
-                <span>Details</span>
-            </b>
-<?php		} else {		?>
-            <b class="mode-selector__item">
-                <span class="icon"><?=svgIcon("list")?></span>
-                <span>Classic</span>
-            </b>
-            <a class="mode-selector__item" href="<?=e($modeLink)?>">
-                <span class="icon"><?=svgIcon("details")?></span>
-                <span>Details</span>
-            </a>
-<?php		}	?>
-        </div>
-<?=Paginator::render($paginator)?>
+<?php   if (!count($items)) {	?>
+    <div id="tritems" class="trans-list">
+        <span class="nodata-message">No transactions found.</span>
     </div>
-<?php	}	?>
-    <div class="trans-list__loading hidden">Loading...</div>
+<?php	} else {		?>
 <?php	if ($showDetails) {	?>
-    <table id="tritems" class="trans-list_details">
+    <table id="tritems" class="trans-list trans-list_details">
 <?php	} else {	?>
-    <div id="tritems">
+    <div id="tritems" class="trans-list">
 <?php	}	?>
 <?php	foreach($items as $trItem) {	?>
 <?php	    if ($showDetails) {		?>
@@ -101,10 +71,4 @@ use JezveMoney\App\Template\Paginator;
 <?php	} else {	?>
     </div>
 <?php	}	?>
-<?php	if ($showPaginator == TRUE) {		?>
-    <div class="paginator-row">
-<?=Paginator::render($paginator)?>
-    </div>
 <?php	}	?>
-<?php	}	?>
-</div>
