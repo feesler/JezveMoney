@@ -158,10 +158,14 @@ class Transaction extends ApiController
         }
 
         $transCount = $this->model->getTransCount($params);
+        $pagesCount = ($params["onPage"] > 0)
+            ? ceil($transCount / $params["onPage"])
+            : 1;
+
         $res->pagination = [
             "total" => $transCount,
             "onPage" => $params["onPage"],
-            "pagesCount" => ceil($transCount / $params["onPage"]),
+            "pagesCount" => $pagesCount,
             "page" => (isset($params["page"]) ? intval($params["page"]) : 0) + 1
         ];
 
