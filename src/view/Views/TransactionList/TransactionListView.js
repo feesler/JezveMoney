@@ -136,12 +136,12 @@ class TransactionListView extends View {
         this.modeSelector = document.querySelector('.mode-selector');
 
         this.trListSortable = null;
-        this.listItems = ge('tritems');
+        this.listItems = document.querySelector('.trans-list');
         if (this.listItems) {
             this.trListSortable = new Sortable({
                 ondragstart: this.onTransDragStart.bind(this),
                 oninsertat: this.onTransPosChanged.bind(this),
-                container: 'tritems',
+                container: this.listItems,
                 group: 'transactions',
                 selector: '.trans-list__item-wrapper',
                 placeholderClass: 'trans-list__item-placeholder',
@@ -821,7 +821,11 @@ class TransactionListView extends View {
 
         removeChilds(this.listItems);
         if (elems.length) {
-            addChilds(this.listItems, elems);
+            const itemsContainer = (state.mode === 'details')
+                ? ce('table', { className: 'trans-list-items' }, elems)
+                : ce('div', { className: 'trans-list-items' }, elems);
+
+            this.listItems.appendChild(itemsContainer);
         } else {
             this.listItems.appendChild(ce('span', {
                 className: 'nodata-message',

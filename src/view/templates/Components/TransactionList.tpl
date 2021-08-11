@@ -1,12 +1,15 @@
+<?php	if ($showDetails) {	?>
+<div class="trans-list trans-list_details">
+<?php	} else {	?>
+<div class="trans-list">
+<?php	}	?>
 <?php   if (!count($items)) {	?>
-    <div id="tritems" class="trans-list">
         <span class="nodata-message">No transactions found.</span>
-    </div>
 <?php	} else {		?>
 <?php	if ($showDetails) {	?>
-    <table id="tritems" class="trans-list trans-list_details">
+    <table class="trans-list-items">
 <?php	} else {	?>
-    <div id="tritems" class="trans-list">
+    <div class="trans-list-items">
 <?php	}	?>
 <?php	foreach($items as $trItem) {	?>
 <?php	    if ($showDetails) {		?>
@@ -72,3 +75,4 @@
     </div>
 <?php	}	?>
 <?php	}	?>
+</div>
