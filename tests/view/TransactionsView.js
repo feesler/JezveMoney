@@ -123,7 +123,8 @@ export class TransactionsView extends AppView {
             };
         }
 
-        if (cont.modeSelector) {
+        const isModeSelectorVisible = await TestComponent.isVisible(cont.modeSelector)
+        if (isModeSelectorVisible) {
             res.detailsMode = cont.modeSelector.details;
         } else {
             const locURL = new URL(this.location);
@@ -210,7 +211,7 @@ export class TransactionsView extends AppView {
                 searchForm: true,
                 modeSelector: isItemsAvailable,
                 paginator: isItemsAvailable,
-                transList: isItemsAvailable,
+                transList: true,
             },
             values: {
                 typeMenu: { selectedTypes: this.model.filter.type },

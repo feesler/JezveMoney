@@ -874,8 +874,11 @@ class TransactionListView extends View {
         this.listItems.dataset.time = state.renderTime;
 
         if (this.topPaginator && this.bottomPaginator) {
+            this.topPaginator.show(elems.length > 0);
             this.topPaginator.setPagesCount(state.pagination.pagesCount);
             this.topPaginator.setPage(state.pagination.page);
+
+            this.bottomPaginator.show(elems.length > 0);
             this.bottomPaginator.setPagesCount(state.pagination.pagesCount);
             this.bottomPaginator.setPage(state.pagination.page);
         }

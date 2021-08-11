@@ -264,7 +264,7 @@ class ImportView extends View {
             return;
         }
 
-        this.model.transCache = jsondata.data;
+        this.model.transCache = jsondata.data.items;
         const importedItems = this.getImportedItems();
         importedItems.forEach((item) => {
             item.enable(true);
