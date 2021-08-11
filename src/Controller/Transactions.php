@@ -11,6 +11,7 @@ use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\IconModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\DebtModel;
+use JezveMoney\App\Item\TransactionItem;
 
 class Transactions extends TemplateController
 {
@@ -231,10 +232,12 @@ class Transactions extends TemplateController
 
         // Prepare data of transaction list items
         $trListData = [];
+        $trItems = [];
         foreach ($transArr as $trans) {
             $itemData = $this->model->getListItem($trans, $showDetails);
-
             $trListData[] = $itemData;
+
+            $trItems[] = new TransactionItem($trans);
         }
         $listData["items"] = $trListData;
 
@@ -249,7 +252,7 @@ class Transactions extends TemplateController
             "accounts" => $this->accModel->getData(["full" => true, "type" => "all"]),
             "persons" => $this->personMod->getData(["type" => "all"]),
             "currency" => $currArr,
-            "transArr" => $transArr,
+            "transArr" => $trItems,
             "filterObj" => $filterObj,
             "pagination" => $pagination,
             "mode" => $showDetails ? "details" : "classic",
