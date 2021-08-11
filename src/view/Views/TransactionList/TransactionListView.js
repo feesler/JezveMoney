@@ -76,6 +76,7 @@ class TransactionListView extends View {
             items: [...this.props.transArr],
             filter: { ...this.props.filterObj },
             pagination: { ...this.props.pagination },
+            mode: this.props.mode,
             loading: false,
             renderTime: Date.now(),
             selectedItems: new Selection(),
@@ -146,7 +147,7 @@ class TransactionListView extends View {
                 selector: '.trans-list__item-wrapper',
                 placeholderClass: 'trans-list__item-placeholder',
                 copyWidth: true,
-                table: (this.state.filter.mode === 'details'),
+                table: (this.state.mode === 'details'),
             });
 
             /**
@@ -159,19 +160,22 @@ class TransactionListView extends View {
         }
 
         const paginatorElems = document.querySelectorAll('.paginator');
-        if (paginatorElems.length === 2) {
-            const paginatorOptions = {
-                onChange: (page) => this.onChangePage(page),
-            };
-
-            this.topPaginator = Paginator.fromElement(paginatorElems[0], paginatorOptions);
-            this.bottomPaginator = Paginator.fromElement(paginatorElems[1], paginatorOptions);
+        if (paginatorElems.length !== 2) {
+            throw new Error('Failed to initialize Transaction List view');
         }
+        const paginatorOptions = {
+            onChange: (page) => this.onChangePage(page),
+        };
+
+        this.topPaginator = Paginator.fromElement(paginatorElems[0], paginatorOptions);
+        this.bottomPaginator = Paginator.fromElement(paginatorElems[1], paginatorOptions);
 
         this.toolbar = Toolbar.create({
             elem: 'toolbar',
             ondelete: () => this.confirmDelete(),
         });
+
+        this.render(this.state);
     }
 
     /** Set loading state and render view */
@@ -249,7 +253,7 @@ class TransactionListView extends View {
         // Sort array of transaction by position again
         this.state.items.sort(posCompare);
 
-        if (this.state.filter.mode === 'details') {
+        if (this.state.mode === 'details') {
             this.state.items.forEach((transaction) => {
                 const tr = transaction;
                 const srcBalance = (tr.src_id !== 0 && tBalanceArr[tr.src_id] !== undefined)
@@ -463,7 +467,7 @@ class TransactionListView extends View {
      * @param {Element} elem - element to start looking from
      */
     findListItemElement(elem) {
-        const selector = (this.state.filter.mode === 'details') ? 'tr' : '.trans-list__item';
+        const selector = (this.state.mode === 'details') ? 'tr' : '.trans-list__item';
 
         if (!elem) {
             return null;
@@ -595,11 +599,17 @@ class TransactionListView extends View {
 
         // Clear page number because list of transactions guaranteed to change
         // on change accounts filter
-        if ('page' in this.state.filter) {
+        /* if ('page' in this.state.filter) {
             delete this.state.filter.page;
-        }
+        } */
 
-        window.location = this.buildAddress();
+        const url = new URL(this.buildAddress());
+        if (this.state.mode === 'details') {
+            url.searchParams.set('mode', 'details');
+        } else {
+            url.searchParams.delete('mode');
+        }
+        window.location = url.toString();
     }
 
     /**
@@ -621,11 +631,17 @@ class TransactionListView extends View {
 
         // Clear page number because list of transactions guaranteed to change
         // on change search query
-        if ('page' in this.state.filter) {
+        /* if ('page' in this.state.filter) {
             delete this.state.filter.page;
-        }
+        } */
 
-        window.location = this.buildAddress();
+        const url = new URL(this.buildAddress());
+        if (this.state.mode === 'details') {
+            url.searchParams.set('mode', 'details');
+        } else {
+            url.searchParams.delete('mode');
+        }
+        window.location = url.toString();
     }
 
     /**
@@ -682,11 +698,17 @@ class TransactionListView extends View {
         this.state.filter.enddate = newEndDate;
 
         // Clear page number because list of transactions guaranteed to change on change date range
-        if ('page' in this.state.filter) {
+        /* if ('page' in this.state.filter) {
             delete this.state.filter.page;
-        }
+        } */
 
-        window.location = this.buildAddress();
+        const url = new URL(this.buildAddress());
+        if (this.state.mode === 'details') {
+            url.searchParams.set('mode', 'details');
+        } else {
+            url.searchParams.delete('mode');
+        }
+        window.location = url.toString();
     }
 
     /**
@@ -748,12 +770,19 @@ class TransactionListView extends View {
             return;
         }
 
-        const url = this.buildAddress();
-        window.history.replaceState({}, 'Jezve Moeny | Transactions', url);
-
         this.state.selectedItems.clear();
         this.state.items = [...res.data.items];
         this.state.pagination = { ...res.data.pagination };
+        this.state.filter = { ...res.data.filter };
+
+        const url = new URL(this.buildAddress());
+        url.searchParams.set('page', this.state.pagination.page);
+        if (this.state.mode === 'details') {
+            url.searchParams.set('mode', 'details');
+        } else {
+            url.searchParams.delete('mode');
+        }
+        history.replaceState({}, 'Jezve Money | Transactions', url);
 
         this.stopLoading();
     }
@@ -784,7 +813,7 @@ class TransactionListView extends View {
 
         const elems = [];
 
-        if (state.filter.mode === 'details') {
+        if (state.mode === 'details') {
             modeUrl.searchParams.delete('mode');
 
             elems.push(
@@ -809,9 +838,19 @@ class TransactionListView extends View {
             show(this.loadingIndicator, true);
         }
 
+        const filterUrl = new URL(this.buildAddress());
+        filterUrl.searchParams.delete('page');
+        if (state.mode === 'details') {
+            filterUrl.searchParams.set('mode', 'details');
+        } else {
+            filterUrl.searchParams.delete('mode');
+        }
+
+        this.typeMenu.setURL(filterUrl);
+
         const elems = state.items.map((item) => {
             const tritem = TransactionListItem.create({
-                mode: state.filter.mode,
+                mode: state.mode,
                 selected: state.selectedItems.isSelected(item.id),
                 item,
             });

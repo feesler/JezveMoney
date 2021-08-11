@@ -95,9 +95,9 @@ class Transactions extends TemplateController
 
         // Obtain requested page number
         if (isset($_GET["page"])) {
-            $filterObj->page = intval($_GET["page"]);
-            if ($filterObj->page > 1) {
-                $trParams["page"] = $filterObj->page - 1;
+            $page = intval($_GET["page"]);
+            if ($page > 1) {
+                $trParams["page"] = $page - 1;
             }
         }
 
@@ -147,7 +147,6 @@ class Transactions extends TemplateController
         $showDetails = false;
         if (isset($_GET["mode"]) && $_GET["mode"] == "details") {
             $showDetails = true;
-            $filterObj->mode = "details";
         }
         $listData["showDetails"] = $showDetails;
 
@@ -171,6 +170,8 @@ class Transactions extends TemplateController
         $baseUrl = BASEURL . "transactions/";
         foreach ($trTypes as $type_id => $trTypeName) {
             $urlParams = (array)$filterObj;
+
+            $urlParams["mode"] = ($showDetails) ? "classic" : "details";
 
             if ($type_id != 0) {
                 $urlParams["type"] = strtolower($trTypeName);
@@ -206,6 +207,7 @@ class Transactions extends TemplateController
         // Build data for paginator
         if ($trParams["onPage"] > 0) {
             $urlParams = (array)$filterObj;
+            $urlParams["mode"] = ($showDetails) ? "classic" : "details";
 
             $pageCount = ceil($transCount / $trParams["onPage"]);
             $pagination["pagesCount"] = $pageCount;
@@ -250,6 +252,7 @@ class Transactions extends TemplateController
             "transArr" => $transArr,
             "filterObj" => $filterObj,
             "pagination" => $pagination,
+            "mode" => $showDetails ? "details" : "classic",
         ]);
 
         $this->cssArr[] = "TransactionListView.css";

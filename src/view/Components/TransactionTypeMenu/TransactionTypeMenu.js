@@ -119,9 +119,14 @@ export class TransactionTypeMenu extends Component {
         this.state.items = this.state.items.map((item) => {
             let selected;
             if (toggled) {
-                selected = (item.type === selectedType) ? !item.selected : item.selected;
+                if (item.type) {
+                    selected = (item.type === selectedType) ? !item.selected : item.selected;
+                } else {
+                    selected = false;
+                }
+
             } else {
-                selected = item.type && item.type === selectedType;
+                selected = item.type === selectedType;
             }
 
             return {
@@ -138,6 +143,11 @@ export class TransactionTypeMenu extends Component {
             this.props.onChange(selectedItems);
         }
 
+        this.render(this.state);
+    }
+
+    setURL(url) {
+        this.state.url = url.toString();
         this.render(this.state);
     }
 

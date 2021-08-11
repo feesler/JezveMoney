@@ -110,8 +110,10 @@ class Transaction extends ApiController
             is_string($_GET["order"]) &&
             strtolower($_GET["order"]) == "desc"
         ) {
-            $res->filter["desc"] = true;
+            $res->order = "desc";
             $params["desc"] = true;
+        } else {
+            $res->order = "asc";
         }
 
         if (isset($_GET["count"]) && is_numeric($_GET["count"])) {
