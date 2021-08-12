@@ -118,9 +118,23 @@ export async function filterByDate({ start, end }) {
     await test('Correctness of transaction list', () => App.view.iteratePages());
 }
 
+export async function clearDateRange() {
+    await checkNavigation();
+
+    await test('Clear date range', () => App.view.clearDateRange());
+    await test('Correctness of transaction list', () => App.view.iteratePages());
+}
+
 export async function search(text) {
     await checkNavigation();
 
     await test(`Search (${text})`, () => App.view.search(text));
+    await test('Correctness of transaction list', () => App.view.iteratePages());
+}
+
+export async function clearSearchForm() {
+    await checkNavigation();
+
+    await test('Clear search form', () => App.view.clearSearch());
     await test('Correctness of transaction list', () => App.view.iteratePages());
 }

@@ -4,8 +4,9 @@ export class SearchForm extends TestComponent {
     async parse() {
         this.inputElem = await this.query(this.elem, '#search');
         this.submitBtn = await this.query(this.elem, 'button.search_btn');
-        if (!this.inputElem || !this.submitBtn) {
-            throw new Error('unexpected structure of search form');
+        this.clearBtn = await this.query(this.elem, '#nosearchbtn');
+        if (!this.inputElem || !this.submitBtn || !this.clearBtn) {
+            throw new Error('Unexpected structure of search form');
         }
 
         this.value = await this.prop(this.inputElem, 'value');
@@ -23,5 +24,9 @@ export class SearchForm extends TestComponent {
         await this.input(val);
 
         await this.submit();
+    }
+
+    async clear() {
+        await this.click(this.clearBtn);
     }
 }

@@ -256,11 +256,30 @@ export class TransactionsView extends AppView {
         return this.checkState(expected);
     }
 
+    async clearDateRange() {
+        this.model.filter.startDate = null;
+        this.model.filter.endDate = null;
+        const expected = this.onFilterUpdate();
+
+        await this.waitForList(() => this.content.dateFilter.clear());
+
+        return this.checkState(expected);
+    }
+
     async search(text) {
         this.model.filter.search = text;
         const expected = this.onFilterUpdate();
 
         await this.waitForList(() => this.content.searchForm.search(text));
+
+        return this.checkState(expected);
+    }
+
+    async clearSearch() {
+        this.model.filter.search = '';
+        const expected = this.onFilterUpdate();
+
+        await this.waitForList(() => this.content.searchForm.clear());
 
         return this.checkState(expected);
     }
