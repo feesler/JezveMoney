@@ -596,20 +596,7 @@ class TransactionListView extends View {
 
         // Prepare parameters
         this.state.filter.acc_id = data.map((item) => parseInt(item.id, 10));
-
-        // Clear page number because list of transactions guaranteed to change
-        // on change accounts filter
-        /* if ('page' in this.state.filter) {
-            delete this.state.filter.page;
-        } */
-
-        const url = new URL(this.buildAddress());
-        if (this.state.mode === 'details') {
-            url.searchParams.set('mode', 'details');
-        } else {
-            url.searchParams.delete('mode');
-        }
-        window.location = url.toString();
+        this.requestTransactions(this.state.filter);
     }
 
     /**
@@ -629,19 +616,7 @@ class TransactionListView extends View {
             delete this.state.filter.search;
         }
 
-        // Clear page number because list of transactions guaranteed to change
-        // on change search query
-        /* if ('page' in this.state.filter) {
-            delete this.state.filter.page;
-        } */
-
-        const url = new URL(this.buildAddress());
-        if (this.state.mode === 'details') {
-            url.searchParams.set('mode', 'details');
-        } else {
-            url.searchParams.delete('mode');
-        }
-        window.location = url.toString();
+        this.requestTransactions(this.state.filter);
     }
 
     /**
@@ -697,18 +672,7 @@ class TransactionListView extends View {
         this.state.filter.stdate = newStartDate;
         this.state.filter.enddate = newEndDate;
 
-        // Clear page number because list of transactions guaranteed to change on change date range
-        /* if ('page' in this.state.filter) {
-            delete this.state.filter.page;
-        } */
-
-        const url = new URL(this.buildAddress());
-        if (this.state.mode === 'details') {
-            url.searchParams.set('mode', 'details');
-        } else {
-            url.searchParams.delete('mode');
-        }
-        window.location = url.toString();
+        this.requestTransactions(this.state.filter);
     }
 
     /**

@@ -238,9 +238,9 @@ export class TransactionsView extends AppView {
         this.model.filter.accounts = accounts;
         const expected = this.onFilterUpdate();
 
-        await this.navigation(() => this.content.accDropDown.setSelection(accounts));
+        await this.waitForList(() => this.content.accDropDown.setSelection(accounts));
 
-        return App.view.checkState(expected);
+        return this.checkState(expected);
     }
 
     async selectDateRange(start, end) {
@@ -251,18 +251,18 @@ export class TransactionsView extends AppView {
         const startDate = new Date(fixDate(start));
         const endDate = new Date(fixDate(end));
 
-        await this.navigation(() => this.content.dateFilter.selectRange(startDate, endDate));
+        await this.waitForList(() => this.content.dateFilter.selectRange(startDate, endDate));
 
-        return App.view.checkState(expected);
+        return this.checkState(expected);
     }
 
     async search(text) {
         this.model.filter.search = text;
         const expected = this.onFilterUpdate();
 
-        await this.navigation(() => this.content.searchForm.search(text));
+        await this.waitForList(() => this.content.searchForm.search(text));
 
-        return App.view.checkState(expected);
+        return this.checkState(expected);
     }
 
     async setClassicMode() {
