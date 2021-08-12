@@ -10,6 +10,7 @@ import {
     prependChild,
     addChilds,
     removeChilds,
+    setEvents,
     setEmptyClick,
     ajax,
 } from 'jezvejs';
@@ -114,6 +115,12 @@ class TransactionListView extends View {
         }
         this.searchInp.inputMode = 'search';
 
+        this.noSearchBtn = ge('nosearchbtn');
+        if (!this.noSearchBtn) {
+            throw new Error('Failed to initialize Transaction List view');
+        }
+        setEvents(this.noSearchBtn, { click: () => this.onSearchClear() });
+
         this.datePickerBtn = IconLink.fromElement({
             elem: 'calendar_btn',
             onclick: () => this.showCalendar(),
@@ -126,6 +133,12 @@ class TransactionListView extends View {
             this.dateInputBtn.addEventListener('click', () => this.showCalendar());
         }
         this.dateInput = ge('date');
+
+        this.noDateBtn = ge('nodatebtn');
+        if (!this.noDateBtn) {
+            throw new Error('Failed to initialize Transaction List view');
+        }
+        setEvents(this.noDateBtn, { click: () => this.onDateClear() });
 
         this.delForm = ge('delform');
         this.delTransInp = ge('deltrans');
@@ -620,6 +633,18 @@ class TransactionListView extends View {
     }
 
     /**
+     * Clear search query
+     */
+    onSearchClear() {
+        if (!('search' in this.state.filter)) {
+            return;
+        }
+
+        delete this.state.filter.search;
+        this.requestTransactions(this.state.filter);
+    }
+
+    /**
      * Create and show transaction delete warning popup
      */
     confirmDelete() {
@@ -672,6 +697,19 @@ class TransactionListView extends View {
         this.state.filter.stdate = newStartDate;
         this.state.filter.enddate = newEndDate;
 
+        this.requestTransactions(this.state.filter);
+    }
+
+    /**
+     * Clear date range query
+     */
+    onDateClear() {
+        if (!('stdate' in this.state.filter) && !('enddate' in this.state.filter)) {
+            return;
+        }
+
+        delete this.state.filter.stdate;
+        delete this.state.filter.enddate;
         this.requestTransactions(this.state.filter);
     }
 
@@ -848,6 +886,19 @@ class TransactionListView extends View {
         }
 
         this.renderModeSelector(state);
+
+        // Date range
+        if (this.state.filter.stdate && this.state.filter.enddate) {
+            const start = this.state.filter.stdate;
+            const end = this.state.filter.enddate;
+
+            this.dateInput.value = `${start} - ${end}`;
+        } else {
+            this.dateInput.value = '';
+        }
+
+        // Search form
+        this.searchInp.value = (this.state.filter.search) ? this.state.filter.search : '';
 
         // toolbar
         this.toolbar.updateBtn.show(state.selectedItems.count() === 1);

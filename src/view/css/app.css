@@ -152,6 +152,8 @@ select {
 
 /* wrap for input with 100% width of parent */
 .stretch-input {
+  display: flex;
+  flex-flow: row nowrap;
   flex-basis: 100%;
   padding: 2px 5px;
   overflow: hidden;
@@ -177,6 +179,11 @@ select {
 /* text input controls with button on the right */
 .stretch-input.rbtn_input {
   border-width: 2px 0 2px 2px;
+}
+
+.input-group .close-btn {
+  background: none;
+  cursor: pointer;
 }
 
 /* Validation */

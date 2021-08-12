@@ -83,9 +83,14 @@ body.dark-theme,
   background-color: #202020;
 }
 
+/* Input group */
 .dark-theme .input-group__btn_inactive {
   color: #dddddd;
   background-color: #202020;
+}
+
+.dark-theme .input-group .close-btn:hover > svg {
+  fill: #ffffff;
 }
 
 /* DropDown  */

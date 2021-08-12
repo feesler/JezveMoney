@@ -81,6 +81,7 @@ include(TPL_PATH."commonhdr.tpl");
                                     <div class="input-group">
                                         <div class="stretch-input rbtn_input">
                                             <input id="date" name="date" type="text" value="<?=e($dateFmt)?>">
+                                            <button id="nodatebtn" class="close-btn" type="button"><?=svgIcon("close")?></button>
                                         </div>
                                         <button id="cal_rbtn" class="btn icon-btn" type="button"><?=svgIcon("cal")?></button>
                                     </div>
@@ -93,6 +94,7 @@ include(TPL_PATH."commonhdr.tpl");
                                 <div class="input-group search-form">
                                     <div class="stretch-input rbtn_input">
                                         <input id="search" name="search" type="text" value="<?=(is_null($searchReq) ? "" : e($searchReq))?>">
+                                        <button id="nosearchbtn" class="close-btn" type="button"><?=svgIcon("close")?></button>
                                     </div>
                                     <button class="btn icon-btn search_btn" type="submit"><?=svgIcon("search")?></button>
                                 </div>
