@@ -419,6 +419,10 @@ body.white-theme,
   color: #000000;
 }
 
+.white-theme .tile_header > .close-btn:hover > svg {
+  fill: #000000;
+}
+
 /* Transaction list mode selector */
 .white-theme .mode-selector > b > span {
   color: #000000;

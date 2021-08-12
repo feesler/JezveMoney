@@ -427,6 +427,10 @@ body.dark-theme,
   color: #dddddd;
 }
 
+.dark-theme .tile_header > .close-btn:hover > svg {
+  fill: #ffffff;
+}
+
 /* Transaction list mode selector */
 .dark-theme .mode-selector > b > span {
   color: #dddddd;
