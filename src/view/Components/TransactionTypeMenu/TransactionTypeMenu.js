@@ -124,7 +124,6 @@ export class TransactionTypeMenu extends Component {
                 } else {
                     selected = false;
                 }
-
             } else {
                 selected = item.type === selectedType;
             }

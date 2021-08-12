@@ -1,5 +1,4 @@
 import { isObject, copyObject } from 'jezvejs';
-import { formatDate } from 'jezvejs/DateUtils';
 import { test } from 'jezve-test';
 import { TransactionsView } from '../../view/TransactionsView.js';
 import { TransactionView } from '../../view/TransactionView.js';
@@ -8,7 +7,7 @@ import { Currency } from '../../model/Currency.js';
 import { Transaction } from '../../model/Transaction.js';
 import { AccountsList } from '../../model/AccountsList.js';
 import { App } from '../../Application.js';
-import { formatProps, fixDate } from '../../common.js';
+import { formatProps } from '../../common.js';
 
 export async function runAction({ action, data }) {
     let testDescr = null;

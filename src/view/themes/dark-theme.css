@@ -89,10 +89,6 @@ body.dark-theme,
   background-color: #202020;
 }
 
-.dark-theme .input-group .close-btn:hover > svg {
-  fill: #ffffff;
-}
-
 /* DropDown  */
 .dark-theme .dd__combo,
 .dark-theme .dd__input,
@@ -439,4 +435,9 @@ body.dark-theme,
 /* Transaction list mode selector */
 .dark-theme .mode-selector > b > span {
   color: #dddddd;
+}
+
+/* Input group close button */
+.dark-theme .input-group .close-btn:hover > svg {
+  fill: #ffffff;
 }

@@ -784,7 +784,7 @@ class TransactionListView extends View {
         } else {
             url.searchParams.delete('mode');
         }
-        history.replaceState({}, 'Jezve Money | Transactions', url);
+        window.history.replaceState({}, 'Jezve Money | Transactions', url);
 
         this.stopLoading();
     }

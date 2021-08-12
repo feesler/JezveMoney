@@ -123,7 +123,7 @@ export class TransactionsView extends AppView {
             };
         }
 
-        const isModeSelectorVisible = await TestComponent.isVisible(cont.modeSelector)
+        const isModeSelectorVisible = await TestComponent.isVisible(cont.modeSelector);
         if (isModeSelectorVisible) {
             res.detailsMode = cont.modeSelector.details;
         } else {

@@ -89,10 +89,6 @@ body.white-theme,
   background-color: #ffffff;
 }
 
-.white-theme .input-group .close-btn:hover > svg {
-  fill: #000000;
-}
-
 /* DropDown  */
 .white-theme .dd__combo,
 .white-theme .dd__input,
@@ -431,4 +427,9 @@ body.white-theme,
 /* Transaction list mode selector */
 .white-theme .mode-selector > b > span {
   color: #000000;
+}
+
+/* Input group close button */
+.white-theme .input-group .close-btn:hover > svg {
+  fill: #000000;
 }
