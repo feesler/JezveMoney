@@ -838,10 +838,12 @@ class TransactionListView extends View {
 
         if (this.topPaginator && this.bottomPaginator) {
             this.topPaginator.show(elems.length > 0);
+            this.topPaginator.setURL(filterUrl);
             this.topPaginator.setPagesCount(state.pagination.pagesCount);
             this.topPaginator.setPage(state.pagination.page);
 
             this.bottomPaginator.show(elems.length > 0);
+            this.bottomPaginator.setURL(filterUrl);
             this.bottomPaginator.setPagesCount(state.pagination.pagesCount);
             this.bottomPaginator.setPage(state.pagination.page);
         }
