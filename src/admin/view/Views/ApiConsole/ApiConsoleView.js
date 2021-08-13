@@ -2,6 +2,7 @@ import 'jezvejs/style';
 import {
     ge,
     ce,
+    setEvents,
     isObject,
     isFunction,
     isInt,
@@ -91,20 +92,21 @@ const isCreateResult = (obj) => verifyObject(obj, { id: isInt });
 const isString = (obj) => (typeof obj === 'string');
 
 /**
- * Verify object is array and each item of it pass verification
+ * Returns function to verify object is array and each item of it pass verification
  * @param {Object} data - object to verify
  * @param {Function} verifyFunc - item verification callback
  */
-function isArrayOf(data, verifyFunc) {
-    if (!Array.isArray(data) || !isFunction(verifyFunc)) {
-        return false;
+const isArrayOf = (verifyFunc) => {
+    if (!isFunction(verifyFunc)) {
+        throw new Error('Invalid verify function');
     }
 
-    return data.every(verifyFunc);
-}
+    return (obj) => Array.isArray(obj) && obj.every(verifyFunc);
+};
+
 
 /** Verify object is array of integers */
-const isIntArray = (obj) => isArrayOf(obj, isInt);
+const isIntArray = isArrayOf(isInt);
 
 /** Verify object is date string in DD.MM.YYYY format */
 const isDateString = (obj) => checkDate(obj);
@@ -126,7 +128,7 @@ const isAccount = (obj) => verifyObject(obj, {
 });
 
 /** Verify object is array of accounts */
-const isAccountsArray = (obj) => isArrayOf(obj, isAccount);
+const isAccountsArray = isArrayOf(isAccount);
 
 /** Verify object is transaction */
 const isTransaction = (obj) => verifyObject(obj, {
@@ -159,7 +161,7 @@ const isTransactionsFilter = (obj) => verifyObject(obj, {}, {
 });
 
 /** Verify object is array of transactions */
-const isTransactionsArray = (obj) => isArrayOf(obj, isTransaction);
+const isTransactionsArray = isArrayOf(isTransaction);
 
 /** Verify object is list paginator */
 const isPaginator = (obj) => verifyObject(obj, {
@@ -203,7 +205,7 @@ const isTemplate = (obj) => verifyObject(obj, {
 });
 
 /** Verify object is array of import templates */
-const isTemplatesArray = (obj) => isArrayOf(obj, isTemplate);
+const isTemplatesArray = isArrayOf(isTemplate);
 
 /** Verify object is import condition */
 const isImportCondition = (obj) => verifyObject(obj, {
@@ -220,7 +222,7 @@ const isImportCondition = (obj) => verifyObject(obj, {
 });
 
 /** Verify object is array of import conditions */
-const isConditionsArray = (obj) => isArrayOf(obj, isImportCondition);
+const isConditionsArray = isArrayOf(isImportCondition);
 
 /** Verify object is import action */
 const isImportAction = (obj) => verifyObject(obj, {
@@ -235,7 +237,7 @@ const isImportAction = (obj) => verifyObject(obj, {
 });
 
 /** Verify object is array of import conditions */
-const isActionsArray = (obj) => isArrayOf(obj, isImportAction);
+const isActionsArray = isArrayOf(isImportAction);
 
 /** Verify object is import rule */
 const isImportRule = (obj) => verifyObject(obj, {
@@ -250,7 +252,7 @@ const isImportRule = (obj) => verifyObject(obj, {
 });
 
 /** Verify object is array of import templates */
-const isImportRulesArray = (obj) => isArrayOf(obj, isImportRule);
+const isImportRulesArray = isArrayOf(isImportRule);
 
 /** Verify object is currency */
 const isCurrency = (obj) => verifyObject(obj, {
@@ -264,7 +266,7 @@ const isCurrency = (obj) => verifyObject(obj, {
 });
 
 /** Verify object is array of currencies */
-const isCurrenciesArray = (obj) => isArrayOf(obj, isCurrency);
+const isCurrenciesArray = isArrayOf(isCurrency);
 
 /** Verify object is icon */
 const isIcon = (obj) => verifyObject(obj, {
@@ -279,7 +281,7 @@ const isIcon = (obj) => verifyObject(obj, {
 
 
 /** Verify object is array of icons */
-const isIconsArray = (obj) => isArrayOf(obj, isIcon);
+const isIconsArray = isArrayOf(isIcon);
 
 /** Verify object is account of person */
 const isPersonAccount = (obj) => verifyObject(obj, {
@@ -298,7 +300,7 @@ const isPersonAccount = (obj) => verifyObject(obj, {
 });
 
 /** Verify object is array of accounts of person */
-const isPersonAccountsArray = (obj) => isArrayOf(obj, isPersonAccount);
+const isPersonAccountsArray = isArrayOf(isPersonAccount);
 
 /** Verify object is person */
 const isPerson = (obj) => verifyObject(obj, {
@@ -314,7 +316,7 @@ const isPerson = (obj) => verifyObject(obj, {
 
 
 /** Verify object is array of persons */
-const isPersonsArray = (obj) => isArrayOf(obj, isPerson);
+const isPersonsArray = isArrayOf(isPerson);
 
 /** Verify object is profile */
 const isProfile = (obj) => verifyObject(obj, {
@@ -347,7 +349,7 @@ class AdminApiConsoleView extends AdminView {
         if (!this.controllersList) {
             throw new Error('Fail to init view');
         }
-        this.controllersList.addEventListener('click', this.onContrClick.bind(this));
+        this.controllersList.addEventListener('click', (e) => this.onContrClick(e));
 
         this.activeForm = document.querySelector('.request-data-form.active');
         this.activeController = document.querySelector('#controllersList > li.active');
@@ -359,7 +361,7 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Fail to init view');
         }
 
-        this.clearResultsBtn.addEventListener('click', this.clearResults.bind(this));
+        this.clearResultsBtn.addEventListener('click', () => this.clearResults());
 
         this.initCommonForms();
         this.initAccountForms();
@@ -381,7 +383,7 @@ class AdminApiConsoleView extends AdminView {
         if (!readStateForm) {
             throw new Error('Fail to init view');
         }
-        readStateForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        readStateForm.addEventListener('submit', (e) => this.onFormSubmit(e));
     }
 
     /** Initialization of forms for Account API controller */
@@ -394,7 +396,7 @@ class AdminApiConsoleView extends AdminView {
 
         let checkboxes = listAccForm.querySelectorAll('input[type="checkbox"]');
         checkboxes = Array.from(checkboxes);
-        checkboxes.forEach((elem) => elem.addEventListener('change', this.onCheck.bind(this)));
+        checkboxes.forEach((elem) => setEvents(elem, { change: (e) => this.onCheck(e) }));
 
         const readaccbtn = ge('readaccbtn');
         if (!readaccbtn) {
@@ -415,7 +417,7 @@ class AdminApiConsoleView extends AdminView {
         if (!updateAccForm) {
             throw new Error('Fail to init view');
         }
-        updateAccForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        updateAccForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const delaccbtn = ge('delaccbtn');
         if (!delaccbtn) {
@@ -430,7 +432,7 @@ class AdminApiConsoleView extends AdminView {
         if (!resetAccForm) {
             throw new Error('Fail to init view');
         }
-        resetAccForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        resetAccForm.addEventListener('submit', (e) => this.onFormSubmit(e));
     }
 
     /** Initialization of forms for Person API controller */
@@ -443,7 +445,7 @@ class AdminApiConsoleView extends AdminView {
 
         let checkboxes = listPersonsForm.querySelectorAll('input[type="checkbox"]');
         checkboxes = Array.from(checkboxes);
-        checkboxes.forEach((elem) => elem.addEventListener('change', this.onCheck.bind(this)));
+        checkboxes.forEach((elem) => setEvents(elem, { change: (e) => this.onCheck(e) }));
 
         const readpersonbtn = ge('readpersonbtn');
         if (!readpersonbtn) {
@@ -464,7 +466,7 @@ class AdminApiConsoleView extends AdminView {
         if (!updatePersonForm) {
             throw new Error('Fail to init view');
         }
-        updatePersonForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        updatePersonForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const delpersonbtn = ge('delpersonbtn');
         if (!delpersonbtn) {
@@ -482,11 +484,10 @@ class AdminApiConsoleView extends AdminView {
         if (!listTrForm) {
             throw new Error('Fail to init view');
         }
-        listTrForm.addEventListener('submit', this.onListTransactionSubmit.bind(this));
+        listTrForm.addEventListener('submit', (e) => this.onListTransactionSubmit(e));
 
-        let checkboxes = listTrForm.querySelectorAll('input[type="checkbox"]');
-        checkboxes = Array.from(checkboxes);
-        checkboxes.forEach((elem) => elem.addEventListener('change', this.onCheck.bind(this)));
+        const checkboxes = [...listTrForm.querySelectorAll('input[type="checkbox"]')];
+        checkboxes.forEach((elem) => setEvents(elem, { change: (e) => this.onCheck(e) }));
 
         const readtransbtn = ge('readtransbtn');
         if (!readtransbtn) {
@@ -513,13 +514,13 @@ class AdminApiConsoleView extends AdminView {
         if (!updateTrForm) {
             throw new Error('Fail to init view');
         }
-        updateTrForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        updateTrForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const updateDebtForm = document.querySelector('#updateDebtForm > form');
         if (!updateDebtForm) {
             throw new Error('Fail to init view');
         }
-        updateDebtForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        updateDebtForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const deltransbtn = ge('deltransbtn');
         if (!deltransbtn) {
@@ -534,7 +535,7 @@ class AdminApiConsoleView extends AdminView {
         if (!setTrPosForm) {
             throw new Error('Fail to init view');
         }
-        setTrPosForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        setTrPosForm.addEventListener('submit', (e) => this.onFormSubmit(e));
     }
 
     /** Initialization of forms for Import template API controller */
@@ -564,7 +565,7 @@ class AdminApiConsoleView extends AdminView {
         if (!updateForm) {
             throw new Error('Fail to init view');
         }
-        updateForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        updateForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const delBtn = ge('deltplbtn');
         if (!delBtn) {
@@ -603,7 +604,7 @@ class AdminApiConsoleView extends AdminView {
         if (!updateForm) {
             throw new Error('Fail to init view');
         }
-        updateForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        updateForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const delBtn = ge('delrulebtn');
         if (!delBtn) {
@@ -625,7 +626,7 @@ class AdminApiConsoleView extends AdminView {
 
         let checkboxes = listForm.querySelectorAll('input[type="checkbox"]');
         checkboxes = Array.from(checkboxes);
-        checkboxes.forEach((elem) => elem.addEventListener('change', this.onCheck.bind(this)));
+        checkboxes.forEach((elem) => setEvents(elem, { change: (e) => this.onCheck(e) }));
 
         const readBtn = ge('readcondbtn');
         if (!readBtn) {
@@ -646,7 +647,7 @@ class AdminApiConsoleView extends AdminView {
         if (!updateForm) {
             throw new Error('Fail to init view');
         }
-        updateForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        updateForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const delBtn = ge('delcondbtn');
         if (!delBtn) {
@@ -668,7 +669,7 @@ class AdminApiConsoleView extends AdminView {
 
         let checkboxes = listForm.querySelectorAll('input[type="checkbox"]');
         checkboxes = Array.from(checkboxes);
-        checkboxes.forEach((elem) => elem.addEventListener('change', this.onCheck.bind(this)));
+        checkboxes.forEach((elem) => setEvents(elem, { change: (e) => this.onCheck(e) }));
 
         const readBtn = ge('readactbtn');
         if (!readBtn) {
@@ -689,7 +690,7 @@ class AdminApiConsoleView extends AdminView {
         if (!updateForm) {
             throw new Error('Fail to init view');
         }
-        updateForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        updateForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const delBtn = ge('delactbtn');
         if (!delBtn) {
@@ -728,7 +729,7 @@ class AdminApiConsoleView extends AdminView {
         if (!updateCurrForm) {
             throw new Error('Fail to init view');
         }
-        updateCurrForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        updateCurrForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const delCurrBtn = ge('delcurrbtn');
         if (!delCurrBtn) {
@@ -767,7 +768,7 @@ class AdminApiConsoleView extends AdminView {
         if (!updateIconForm) {
             throw new Error('Fail to init view');
         }
-        updateIconForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        updateIconForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const delIconBtn = ge('deliconbtn');
         if (!delIconBtn) {
@@ -785,19 +786,19 @@ class AdminApiConsoleView extends AdminView {
         if (!loginForm) {
             throw new Error('Fail to init view');
         }
-        loginForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        loginForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const logoutForm = document.querySelector('#logoutForm > form');
         if (!logoutForm) {
             throw new Error('Fail to init view');
         }
-        logoutForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        logoutForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const registerForm = document.querySelector('#registerForm > form');
         if (!registerForm) {
             throw new Error('Fail to init view');
         }
-        registerForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        registerForm.addEventListener('submit', (e) => this.onFormSubmit(e));
     }
 
     /** Initialization of forms for Profile API controller */
@@ -812,19 +813,19 @@ class AdminApiConsoleView extends AdminView {
         if (!changeNameForm) {
             throw new Error('Fail to init view');
         }
-        changeNameForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        changeNameForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const changePwdForm = document.querySelector('#changePwdForm > form');
         if (!changePwdForm) {
             throw new Error('Fail to init view');
         }
-        changePwdForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        changePwdForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const resetAllForm = document.querySelector('#resetAllForm > form');
         if (!resetAllForm) {
             throw new Error('Fail to init view');
         }
-        resetAllForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        resetAllForm.addEventListener('submit', (e) => this.onFormSubmit(e));
     }
 
     /**
