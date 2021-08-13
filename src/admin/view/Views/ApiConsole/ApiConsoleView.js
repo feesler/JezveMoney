@@ -85,14 +85,10 @@ function verifyObject(obj, expected, optional) {
 }
 
 /** Verify object is create result */
-function isCreateResult(obj) {
-    return verifyObject(obj, { id: isInt });
-}
+const isCreateResult = (obj) => verifyObject(obj, { id: isInt });
 
 /** Verify object is string */
-function isString(obj) {
-    return (typeof obj === 'string');
-}
+const isString = (obj) => (typeof obj === 'string');
 
 /**
  * Verify object is array and each item of it pass verification
@@ -108,255 +104,226 @@ function isArrayOf(data, verifyFunc) {
 }
 
 /** Verify object is array of integers */
-function isIntArray(obj) { return isArrayOf(obj, isInt); }
+const isIntArray = (obj) => isArrayOf(obj, isInt);
 
 /** Verify object is date string in DD.MM.YYYY format */
-function isDateString(obj) {
-    return checkDate(obj);
-}
+const isDateString = (obj) => checkDate(obj);
 
 /** Verify object is account */
-function isAccount(obj) {
-    return verifyObject(obj, {
-        id: isInt,
-        owner_id: isInt,
-        curr_id: isInt,
-        balance: isNum,
-        initbalance: isNum,
-        name: isString,
-        icon_id: isInt,
-        flags: isInt,
-    }, {
-        user_id: isInt,
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isAccount = (obj) => verifyObject(obj, {
+    id: isInt,
+    owner_id: isInt,
+    curr_id: isInt,
+    balance: isNum,
+    initbalance: isNum,
+    name: isString,
+    icon_id: isInt,
+    flags: isInt,
+}, {
+    user_id: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
 
 /** Verify object is array of accounts */
-function isAccountsArray(obj) { return isArrayOf(obj, isAccount); }
+const isAccountsArray = (obj) => isArrayOf(obj, isAccount);
 
 /** Verify object is transaction */
-function isTransaction(obj) {
-    return verifyObject(obj, {
-        id: isInt,
-        type: isInt,
-        src_id: isInt,
-        dest_id: isInt,
-        src_amount: isNum,
-        dest_amount: isNum,
-        src_curr: isInt,
-        dest_curr: isInt,
-        src_result: isNum,
-        dest_result: isNum,
-        date: isDateString,
-        comment: isString,
-        pos: isInt,
-    }, {
-        user_id: isInt,
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isTransaction = (obj) => verifyObject(obj, {
+    id: isInt,
+    type: isInt,
+    src_id: isInt,
+    dest_id: isInt,
+    src_amount: isNum,
+    dest_amount: isNum,
+    src_curr: isInt,
+    dest_curr: isInt,
+    src_result: isNum,
+    dest_result: isNum,
+    date: isDateString,
+    comment: isString,
+    pos: isInt,
+}, {
+    user_id: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
 
 /** Verify object is transactions filter */
-function isTransactionsFilter(obj) {
-    return verifyObject(obj, {}, {
-        type: isIntArray,
-        accounts: isIntArray,
-        stdate: isString,
-        enddate: isString,
-        search: isString,
-    });
-}
+const isTransactionsFilter = (obj) => verifyObject(obj, {}, {
+    type: isIntArray,
+    accounts: isIntArray,
+    stdate: isString,
+    enddate: isString,
+    search: isString,
+});
 
 /** Verify object is array of transactions */
-function isTransactionsArray(obj) { return isArrayOf(obj, isTransaction); }
+const isTransactionsArray = (obj) => isArrayOf(obj, isTransaction);
 
 /** Verify object is list paginator */
-function isPaginator(obj) {
-    return verifyObject(obj, {
-        total: isInt,
-        onPage: isInt,
-        pagesCount: isInt,
-        page: isInt,
-    });
-}
+const isPaginator = (obj) => verifyObject(obj, {
+    total: isInt,
+    onPage: isInt,
+    pagesCount: isInt,
+    page: isInt,
+});
 
 /** Verify object is transactions list response */
-function isTransactionsList(obj) {
-    return verifyObject(obj, {
-        items: isTransactionsArray,
-        filter: isTransactionsFilter,
-        paginator: isPaginator,
-    }, {
-        user_id: isInt,
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isTransactionsList = (obj) => verifyObject(obj, {
+    items: isTransactionsArray,
+    filter: isTransactionsFilter,
+    paginator: isPaginator,
+}, {
+    user_id: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
 
 /** Verify object is import template */
-function isTemplateColumns(obj) {
-    return verifyObject(obj, {
-        accountAmount: isInt,
-        accountCurrency: isInt,
-        transactionAmount: isInt,
-        transactionCurrency: isInt,
-        date: isInt,
-        comment: isInt,
-    });
-}
+const isTemplateColumns = (obj) => verifyObject(obj, {
+    accountAmount: isInt,
+    accountCurrency: isInt,
+    transactionAmount: isInt,
+    transactionCurrency: isInt,
+    date: isInt,
+    comment: isInt,
+});
 
 /** Verify object is import template */
-function isTemplate(obj) {
-    return verifyObject(obj, {
-        id: isInt,
-        name: isString,
-        type_id: isInt,
-        columns: isTemplateColumns,
-    }, {
-        user_id: isInt,
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isTemplate = (obj) => verifyObject(obj, {
+    id: isInt,
+    name: isString,
+    type_id: isInt,
+    columns: isTemplateColumns,
+}, {
+    user_id: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
 
 /** Verify object is array of import templates */
-function isTemplatesArray(obj) { return isArrayOf(obj, isTemplate); }
+const isTemplatesArray = (obj) => isArrayOf(obj, isTemplate);
 
 /** Verify object is import condition */
-function isImportCondition(obj) {
-    return verifyObject(obj, {
-        id: isInt,
-        rule_id: isInt,
-        field_id: isInt,
-        operator: isInt,
-        value: isString,
-        flags: isInt,
-    }, {
-        user_id: isInt,
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isImportCondition = (obj) => verifyObject(obj, {
+    id: isInt,
+    rule_id: isInt,
+    field_id: isInt,
+    operator: isInt,
+    value: isString,
+    flags: isInt,
+}, {
+    user_id: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
 
 /** Verify object is array of import conditions */
-function isConditionsArray(obj) { return isArrayOf(obj, isImportCondition); }
+const isConditionsArray = (obj) => isArrayOf(obj, isImportCondition);
 
 /** Verify object is import action */
-function isImportAction(obj) {
-    return verifyObject(obj, {
-        id: isInt,
-        rule_id: isInt,
-        action_id: isInt,
-        value: isString,
-    }, {
-        user_id: isInt,
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isImportAction = (obj) => verifyObject(obj, {
+    id: isInt,
+    rule_id: isInt,
+    action_id: isInt,
+    value: isString,
+}, {
+    user_id: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
 
 /** Verify object is array of import conditions */
-function isActionsArray(obj) { return isArrayOf(obj, isImportAction); }
+const isActionsArray = (obj) => isArrayOf(obj, isImportAction);
 
 /** Verify object is import rule */
-function isImportRule(obj) {
-    return verifyObject(obj, {
-        id: isInt,
-        flags: isInt,
-    }, {
-        user_id: isInt,
-        actions: isActionsArray,
-        conditions: isConditionsArray,
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isImportRule = (obj) => verifyObject(obj, {
+    id: isInt,
+    flags: isInt,
+}, {
+    user_id: isInt,
+    actions: isActionsArray,
+    conditions: isConditionsArray,
+    createdate: isInt,
+    updatedate: isInt,
+});
 
 /** Verify object is array of import templates */
-function isImportRulesArray(obj) { return isArrayOf(obj, isImportRule); }
+const isImportRulesArray = (obj) => isArrayOf(obj, isImportRule);
 
 /** Verify object is currency */
-function isCurrency(obj) {
-    return verifyObject(obj, {
-        id: isInt,
-        name: isString,
-        sign: isString,
-        flags: isInt,
-    }, {
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isCurrency = (obj) => verifyObject(obj, {
+    id: isInt,
+    name: isString,
+    sign: isString,
+    flags: isInt,
+}, {
+    createdate: isInt,
+    updatedate: isInt,
+});
 
 /** Verify object is array of currencies */
-function isCurrenciesArray(obj) { return isArrayOf(obj, isCurrency); }
+const isCurrenciesArray = (obj) => isArrayOf(obj, isCurrency);
 
 /** Verify object is icon */
-function isIcon(obj) {
-    return verifyObject(obj, {
-        id: isInt,
-        name: isString,
-        file: isString,
-        type: isInt,
-    }, {
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isIcon = (obj) => verifyObject(obj, {
+    id: isInt,
+    name: isString,
+    file: isString,
+    type: isInt,
+}, {
+    createdate: isInt,
+    updatedate: isInt,
+});
+
 
 /** Verify object is array of icons */
-function isIconsArray(obj) { return isArrayOf(obj, isIcon); }
+const isIconsArray = (obj) => isArrayOf(obj, isIcon);
 
 /** Verify object is account of person */
-function isPersonAccount(obj) {
-    return verifyObject(obj, {
-        id: isInt,
-        curr_id: isInt,
-        balance: isNum,
-    }, {
-        owner_id: isInt,
-        initbalance: isNum,
-        name: isString,
-        icon: isInt,
-        flags: isInt,
-        user_id: isInt,
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isPersonAccount = (obj) => verifyObject(obj, {
+    id: isInt,
+    curr_id: isInt,
+    balance: isNum,
+}, {
+    owner_id: isInt,
+    initbalance: isNum,
+    name: isString,
+    icon: isInt,
+    flags: isInt,
+    user_id: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
 
 /** Verify object is array of accounts of person */
-function isPersonAccountsArray(obj) { return isArrayOf(obj, isPersonAccount); }
+const isPersonAccountsArray = (obj) => isArrayOf(obj, isPersonAccount);
 
 /** Verify object is person */
-function isPerson(obj) {
-    return verifyObject(obj, {
-        id: isInt,
-        name: isString,
-        flags: isInt,
-    }, {
-        accounts: isPersonAccountsArray,
-        user_id: isInt,
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isPerson = (obj) => verifyObject(obj, {
+    id: isInt,
+    name: isString,
+    flags: isInt,
+}, {
+    accounts: isPersonAccountsArray,
+    user_id: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
+
 
 /** Verify object is array of persons */
-function isPersonsArray(obj) { return isArrayOf(obj, isPerson); }
+const isPersonsArray = (obj) => isArrayOf(obj, isPerson);
 
 /** Verify object is profile */
-function isProfile(obj) {
-    return verifyObject(obj, {
-        login: isString,
-        user_id: isInt,
-        owner_id: isInt,
-        name: isString,
-    });
-}
+const isProfile = (obj) => verifyObject(obj, {
+    login: isString,
+    user_id: isInt,
+    owner_id: isInt,
+    name: isString,
+});
+
 
 /**
  * Admin currecny list view
