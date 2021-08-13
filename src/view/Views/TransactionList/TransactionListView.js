@@ -8,7 +8,6 @@ import {
     isEmpty,
     insertAfter,
     prependChild,
-    addChilds,
     removeChilds,
     setEvents,
     setEmptyClick,
@@ -26,7 +25,6 @@ import {
     TRANSFER,
     DEBT,
     createMessage,
-    createIcon,
 } from '../../js/app.js';
 import { View } from '../../js/View.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
@@ -41,6 +39,7 @@ import '../../Components/TransactionTypeMenu/style.css';
 import '../../Components/TransactionsList/style.css';
 import './style.css';
 import { TransactionListItem } from '../../Components/TransactionListItem/TransactionListItem.js';
+import { ModeSelector } from '../../Components/ModeSelector/ModeSelector.js';
 
 const singleTransDeleteTitle = 'Delete transaction';
 const multiTransDeleteTitle = 'Delete transactions';
@@ -147,7 +146,9 @@ class TransactionListView extends View {
         }
 
         this.loadingIndicator = document.querySelector('.trans-list__loading');
-        this.modeSelector = document.querySelector('.mode-selector');
+        this.modeSelector = ModeSelector.fromElement(document.querySelector('.mode-selector'), {
+            onChange: (mode) => this.onModeChanged(mode),
+        });
 
         this.trListSortable = null;
         this.listItems = document.querySelector('.trans-list');
@@ -750,6 +751,12 @@ class TransactionListView extends View {
         });
     }
 
+    onModeChanged(mode) {
+        this.state.mode = mode;
+        this.state.renderTime = Date.now();
+        this.render(this.state);
+    }
+
     requestTransactions(options) {
         const reqOptions = {
             ...options,
@@ -787,52 +794,6 @@ class TransactionListView extends View {
         window.history.replaceState({}, 'Jezve Money | Transactions', url);
 
         this.stopLoading();
-    }
-
-    renderModeSelectorItem(item) {
-        const tagName = item.active ? 'b' : 'a';
-
-        const elem = ce(tagName, { className: 'mode-selector__item' }, [
-            ce('span', { className: 'icon' }, createIcon(item.icon)),
-            ce('span', { textContent: item.title }),
-        ]);
-        if (!item.active) {
-            elem.href = item.url.toString();
-        }
-
-        return elem;
-    }
-
-    renderModeSelector(state) {
-        show(this.modeSelector, state.items.length > 0);
-        if (!state.items.length) {
-            removeChilds(this.modeSelector);
-            return;
-        }
-
-        const modeUrl = new URL(this.buildAddress());
-        modeUrl.searchParams.set('page', state.pagination.page);
-
-        const elems = [];
-
-        if (state.mode === 'details') {
-            modeUrl.searchParams.delete('mode');
-
-            elems.push(
-                this.renderModeSelectorItem({ icon: 'mode-list', title: 'Classic', url: modeUrl }),
-                this.renderModeSelectorItem({ active: true, icon: 'mode-details', title: 'Details' }),
-            );
-        } else {
-            modeUrl.searchParams.set('mode', 'details');
-
-            elems.push(
-                this.renderModeSelectorItem({ active: true, icon: 'mode-list', title: 'Classic' }),
-                this.renderModeSelectorItem({ icon: 'mode-details', title: 'Details', url: modeUrl }),
-            );
-        }
-
-        removeChilds(this.modeSelector);
-        addChilds(this.modeSelector, elems);
     }
 
     render(state) {
@@ -885,7 +846,10 @@ class TransactionListView extends View {
             this.bottomPaginator.setPage(state.pagination.page);
         }
 
-        this.renderModeSelector(state);
+        this.modeSelector.show(elems.length > 0);
+        this.modeSelector.setMode(state.mode);
+        filterUrl.searchParams.set('page', state.pagination.page);
+        this.modeSelector.setURL(filterUrl);
 
         // Date range
         if (this.state.filter.stdate && this.state.filter.enddate) {

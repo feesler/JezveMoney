@@ -295,7 +295,7 @@ export class TransactionsView extends AppView {
         this.model.detailsMode = false;
         const expected = this.setExpectedState();
 
-        await this.navigation(() => this.content.modeSelector.setClassicMode());
+        await this.waitForList(() => this.content.modeSelector.setClassicMode());
 
         return App.view.checkState(expected);
     }
@@ -311,7 +311,7 @@ export class TransactionsView extends AppView {
         this.model.detailsMode = true;
         const expected = this.setExpectedState();
 
-        await this.navigation(() => this.content.modeSelector.setDetailsMode());
+        await this.waitForList(() => this.content.modeSelector.setDetailsMode());
 
         return App.view.checkState(expected);
     }

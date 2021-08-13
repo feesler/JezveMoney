@@ -106,20 +106,20 @@ include(TPL_PATH."commonhdr.tpl");
                             <div class="paginator-row">
                                 <div class="mode-selector">
 <?php   if ($listData["showDetails"]) {		?>
-                                    <a class="mode-selector__item" href="<?=e($modeLink)?>">
+                                    <a class="mode-selector__item" href="<?=e($modeLink)?>" data-mode="classic">
                                         <span class="icon"><?=svgIcon("list")?></span>
                                         <span>Classic</span>
                                     </a>
-                                    <b class="mode-selector__item">
+                                    <b class="mode-selector__item mode-selector__item__active" data-mode="details">
                                         <span class="icon"><?=svgIcon("details")?></span>
                                         <span>Details</span>
                                     </b>
 <?php   } else {		?>
-                                    <b class="mode-selector__item">
+                                    <b class="mode-selector__item mode-selector__item__active" data-mode="classic">
                                         <span class="icon"><?=svgIcon("list")?></span>
                                         <span>Classic</span>
                                     </b>
-                                    <a class="mode-selector__item" href="<?=e($modeLink)?>">
+                                    <a class="mode-selector__item" href="<?=e($modeLink)?>" data-mode="details">
                                         <span class="icon"><?=svgIcon("details")?></span>
                                         <span>Details</span>
                                     </a>

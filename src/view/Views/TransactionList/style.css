@@ -12,36 +12,6 @@
   justify-content: space-between;
 }
 
-/* Mode selector */
-.mode-selector {
-  display: inline-flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  padding: 5px 0;
-}
-
-.mode-selector__item {
-  display: inline-flex;
-  flex-flow: row nowrap;
-}
-
-.mode-selector__item span {
-  height: 22px;
-  line-height: 22px;
-  padding: 0 10px 0 5px;
-}
-
-.mode-selector__item .icon {
-  width: 24px;
-  height: 24px;
-  padding: 0;
-}
-
-.mode-selector__item svg {
-  width: 24px;
-  height: 24px;
-}
-
 /* Paginator */
 .paginator-item {
   padding: 0.25rem 0.5rem;
