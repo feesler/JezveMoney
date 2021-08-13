@@ -3,6 +3,7 @@
 namespace JezveMoney\App\Admin\Controller;
 
 use JezveMoney\Core\AdminController;
+use JezveMoney\Core\Template;
 use JezveMoney\Core\MySqlDB;
 
 class Query extends AdminController
@@ -19,23 +20,28 @@ class Query extends AdminController
 
     public function index()
     {
+        $this->template = new Template(ADMIN_TPL_PATH . "query.tpl");
+        $data = [
+            "titleString" => "Admin panel | DB queries",
+            "rows" => 0,
+            "cols" => 0,
+        ];
+
         $query = null;
-        $cols = 0;
-        $rows = 0;
         if (isset($_POST["query"]) && $_POST["query"] != "") {
             $query = $_POST["query"];
 
             if (isset($_POST["qtype"]) && $_POST["qtype"] == "1") {       // select query
                 $resArr = [];
                 $result = $this->db->rawQ($query);
-                $qerr_num = $this->db->getError();
-                $qerror = $this->db->getMessage();
+                $data["qerr_num"] = $this->db->getError();
+                $data["qerror"] = $this->db->getMessage();
                 if (
-                    $result &&
-                    $result !== true &&
-                    !is_null($result) &&
-                    !$qerr_num &&
-                    $this->db->rowsCount($result) > 0
+                    $result
+                    && $result !== true
+                    && !is_null($result)
+                    && !$data["qerr_num"]
+                    && $this->db->rowsCount($result) > 0
                 ) {
                     $this->saveQuery($query);
 
@@ -43,22 +49,20 @@ class Query extends AdminController
                         $resArr[] = $row;
                     }
 
-                    $rows = count($resArr);
-                    $cols = isset($resArr[0]) ? count($resArr[0]) : 0;
+                    $data["rows"] = count($resArr);
+                    $data["cols"] = isset($resArr[0]) ? count($resArr[0]) : 0;
                 }
+                $data["resArr"] = $resArr;
             }
         }
+        $data["query"] = $query;
 
-        $latestQueries = $this->getLatestQueries();
+        $data["latestQueries"] = $this->getLatestQueries();
 
         $this->menuItems["query"]["active"] = true;
-
-        $titleString = "Admin panel | DB queries";
-
         $this->cssAdmin[] = "QueriesView.css";
-        $this->buildCSS();
 
-        include(ADMIN_TPL_PATH . "query.tpl");
+        $this->render($data);
     }
 
 

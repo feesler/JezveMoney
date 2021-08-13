@@ -2,6 +2,7 @@
     use JezveMoney\Core\Message;
 ?>
 <script>
+    window.app = <?=(isset($viewData) ? $viewData : "{}")?>;
     var baseURL = '<?=BASEURL?>';
 <?php		Message::check();		?>
 </script>

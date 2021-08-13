@@ -3,6 +3,8 @@
 namespace JezveMoney\App\Admin\Controller;
 
 use JezveMoney\Core\AdminController;
+use JezveMoney\Core\Template;
+use JezveMoney\Core\JSON;
 use JezveMoney\App\Model\CurrencyModel;
 
 class Currency extends AdminController
@@ -18,19 +20,21 @@ class Currency extends AdminController
 
     public function index()
     {
-        $itemsData = $this->model->getData();
-        $viewData = [
-            "data" => $itemsData
+        $this->template = new Template(ADMIN_TPL_PATH . "currency.tpl");
+        $data = [
+            "titleString" => "Admin panel | Currency",
         ];
 
+        $itemsData = $this->model->getData();
+        $data["itemsData"] = $itemsData;
+        $data["viewData"] = JSON::encode([
+            "data" => $itemsData
+        ]);
+
         $this->menuItems["curr"]["active"] = true;
-
-        $titleString = "Admin panel | Currency";
-
         $this->cssAdmin[] = "AdminCurrencyView.css";
-        $this->buildCSS();
         $this->jsAdmin[] = "AdminCurrencyView.js";
 
-        include(ADMIN_TPL_PATH . "currency.tpl");
+        $this->render($data);
     }
 }

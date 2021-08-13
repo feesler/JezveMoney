@@ -7,6 +7,7 @@ abstract class AdminController extends TemplateController
     protected $cssAdmin = [];
     protected $jsAdmin = [];
     protected $jsAdminModule = [];
+    protected $themesPath = "admin/view/themes/";
 
     protected $menuItems = [
         "dbinstall" => [ "title" => "DB update", "link" => "dbinstall/" ],
@@ -35,13 +36,12 @@ abstract class AdminController extends TemplateController
     }
 
 
-    protected function buildCSS()
+    protected function render($data = [])
     {
-        $this->cssAdmin = (array)$this->cssAdmin;
+        $this->template->cssAdmin = (array)$this->cssAdmin;
+        $this->template->jsAdmin = (array)$this->jsAdmin;
+        $this->template->menuItems = $this->menuItems;
 
-        $this->userTheme = $this->uMod->getUserTheme();
-        $this->themes = getThemes("admin/view/themes/");
-        $this->themeStylesheet = $this->themes[$this->userTheme]["file"];
-        $this->themeClass = $this->themes[$this->userTheme]["className"];
+        parent::render($data);
     }
 }

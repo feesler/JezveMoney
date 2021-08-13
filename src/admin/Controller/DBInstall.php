@@ -3,6 +3,7 @@
 namespace JezveMoney\App\Admin\Controller;
 
 use JezveMoney\Core\AdminController;
+use JezveMoney\Core\Template;
 use JezveMoney\Core\DBVersion;
 
 class DBInstall extends AdminController
@@ -18,17 +19,17 @@ class DBInstall extends AdminController
 
     public function index()
     {
-        $currentDBVersion = $this->dbVer->getCurrentVersion();
-        $latestDBVersion = $this->dbVer->getLatestVersion();
+        $this->template = new Template(ADMIN_TPL_PATH . "dbinstall.tpl");
+        $data = [
+            "titleString" => "Admin panel | DB update",
+            "currentDBVersion" => $this->dbVer->getCurrentVersion(),
+            "latestDBVersion" => $this->dbVer->getLatestVersion(),
+        ];
 
         $this->menuItems["dbinstall"]["active"] = true;
-
-        $titleString = "Admin panel | DB update";
-
         $this->cssAdmin[] = "DBInstallView.css";
-        $this->buildCSS();
 
-        include(ADMIN_TPL_PATH . "dbinstall.tpl");
+        $this->render($data);
     }
 
 

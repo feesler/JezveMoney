@@ -3,30 +3,23 @@
 namespace JezveMoney\App\Admin\Controller;
 
 use JezveMoney\Core\AdminController;
-use JezveMoney\App\Model\CurrencyModel;
-use JezveMoney\App\Model\IconModel;
+use JezveMoney\Core\Template;
 use JezveMoney\Core\ApiResponse;
 
 class Tests extends AdminController
 {
     public function index()
     {
-        $titleString = "Admin panel | Tests";
+        $this->template = new Template(ADMIN_TPL_PATH . "tests.tpl");
+        $data = [
+            "titleString" => "Admin panel | Tests",
+        ];
 
         $this->menuItems["tests"]["active"] = true;
-
-        $currMod = CurrencyModel::getInstance();
-        $currArr = $currMod->getData();
-
-        $iconMod = IconModel::getInstance();
-        $icons = $iconMod->getData();
-
         $this->cssAdmin[] = "TestsView.css";
-        $this->buildCSS();
-
         $this->jsAdmin[] = "tests/index.js";
 
-        include(ADMIN_TPL_PATH . "tests.tpl");
+        $this->render($data);
     }
 
 

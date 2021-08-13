@@ -3,16 +3,19 @@
 namespace JezveMoney\App\Admin\Controller;
 
 use JezveMoney\Core\AdminController;
+use JezveMoney\Core\Template;
 
 class Main extends AdminController
 {
     public function index()
     {
-        $titleString = "Admin panel";
+        $this->template = new Template(ADMIN_TPL_PATH . "index.tpl");
+        $data = [
+            "titleString" => "Admin panel",
+        ];
 
         $this->cssAdmin[] = "AdminMainView.css";
-        $this->buildCSS();
 
-        include(ADMIN_TPL_PATH . "index.tpl");
+        $this->render($data);
     }
 }

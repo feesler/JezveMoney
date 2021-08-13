@@ -19,6 +19,7 @@ abstract class TemplateController extends Controller
     protected $user_name = null;
     protected $user_id = 0;
     protected $owner_id = 0;
+    protected $themesPath = "view/themes/";
 
 
     abstract public function index();
@@ -49,6 +50,17 @@ abstract class TemplateController extends Controller
     }
 
 
+    protected function setupThemes()
+    {
+        $userTheme = $this->uMod->getUserTheme();
+        $this->template->userTheme = $userTheme;
+        $themes = getThemes($this->themesPath);
+        $this->template->themes = $themes;
+        $this->template->themeStylesheet = $themes[$userTheme]["file"];
+        $this->template->themeClass = $themes[$userTheme]["className"];
+    }
+
+
     protected function render($data = [])
     {
         $this->template->action = $this->action;
@@ -60,12 +72,7 @@ abstract class TemplateController extends Controller
         $this->template->user_name = $this->user_name;
         $this->template->adminUser = $this->adminUser;
 
-        $userTheme = $this->uMod->getUserTheme();
-        $this->template->userTheme = $userTheme;
-        $themes = getThemes("view/themes/");
-        $this->template->themes = $themes;
-        $this->template->themeStylesheet = $themes[$userTheme]["file"];
-        $this->template->themeClass = $themes[$userTheme]["className"];
+        $this->setupThemes();
 
         echo $this->template->render($data);
     }

@@ -3,6 +3,7 @@
 namespace JezveMoney\App\Admin\Controller;
 
 use JezveMoney\Core\AdminController;
+use JezveMoney\Core\Template;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\TransactionModel;
 
@@ -10,11 +11,16 @@ class Balance extends AdminController
 {
     public function index()
     {
-        $srcAvailTypes = [ EXPENSE, TRANSFER, DEBT ];
-        $destAvailTypes = [ INCOME, TRANSFER, DEBT ];
+        $this->template = new Template(ADMIN_TPL_PATH . "balance.tpl");
+        $data = [
+            "titleString" => "Admin panel | Balance",
+        ];
+
+        $srcAvailTypes = [EXPENSE, TRANSFER, DEBT];
+        $destAvailTypes = [INCOME, TRANSFER, DEBT];
 
         $accModel = AccountModel::getInstance();
-        $accounts = $accModel->getData([ "full" => true ]);
+        $accounts = $accModel->getData(["full" => true]);
 
         $trModel = TransactionModel::getInstance();
         $resArr = $trModel->getData();
@@ -57,14 +63,11 @@ class Balance extends AdminController
 
             $transactions[] = $tr;
         }
+        $data["transactions"] = $transactions;
 
         $this->menuItems["balance"]["active"] = true;
-
-        $titleString = "Admin panel | Balance";
-
         $this->cssAdmin[] = "BalanceView.css";
-        $this->buildCSS();
 
-        include(ADMIN_TPL_PATH . "balance.tpl");
+        $this->render($data);
     }
 }

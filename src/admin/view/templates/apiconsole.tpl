@@ -1229,9 +1229,7 @@
         </div>
     </div>
 </div>
-<script>
-window.app = {};
-</script>
+
 <?php	include(ADMIN_TPL_PATH."footer.tpl");	?>
 </body>
 </html>
