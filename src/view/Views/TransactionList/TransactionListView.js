@@ -828,6 +828,11 @@ class TransactionListView extends View {
                 : ce('div', { className: 'trans-list-items' }, elems);
 
             this.listItems.appendChild(itemsContainer);
+            if (state.mode === 'details') {
+                this.listItems.classList.add('trans-list_details');
+            } else {
+                this.listItems.classList.remove('trans-list_details');
+            }
         } else {
             this.listItems.appendChild(ce('span', {
                 className: 'nodata-message',
