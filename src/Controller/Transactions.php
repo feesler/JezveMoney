@@ -3,12 +3,15 @@
 namespace JezveMoney\App\Controller;
 
 use JezveMoney\Core\TemplateController;
+use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
+use JezveMoney\Core\JSON;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\IconModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\DebtModel;
+use JezveMoney\App\Item\TransactionItem;
 
 class Transactions extends TemplateController
 {
@@ -50,7 +53,20 @@ class Transactions extends TemplateController
 
     public function index()
     {
+        $this->template = new Template(TPL_PATH . "transactions.tpl");
+        $data = [
+            "titleString" => "Jezve Money | Transactions"
+        ];
+        $listData = [
+        ];
+
         $filterObj = new \stdClass();
+        $pagination = [
+            "onPage" => 10,
+            "page" => 1,
+            "pagesCount" => 1,
+            "total" => 0,
+        ];
         $trParams = [
             "onPage" => 10,
             "desc" => true
@@ -80,9 +96,9 @@ class Transactions extends TemplateController
 
         // Obtain requested page number
         if (isset($_GET["page"])) {
-            $filterObj->page = intval($_GET["page"]);
-            if ($filterObj->page > 1) {
-                $trParams["page"] = $filterObj->page - 1;
+            $page = intval($_GET["page"]);
+            if ($page > 1) {
+                $trParams["page"] = $page - 1;
             }
         }
 
@@ -102,12 +118,14 @@ class Transactions extends TemplateController
                 $trParams["accounts"] = $filterObj->acc_id = $accFilter;
             }
         }
+        $data["accFilter"] = $accFilter;
 
         // Obtain requested search query
         $searchReq = (isset($_GET["search"]) ? $_GET["search"] : null);
         if (!is_null($searchReq)) {
             $trParams["search"] = $filterObj->search = $searchReq;
         }
+        $data["searchReq"] = $searchReq;
 
         // Obtain requested date range
         $stDate = (isset($_GET["stdate"]) ? $_GET["stdate"] : null);
@@ -124,22 +142,23 @@ class Transactions extends TemplateController
             $trParams["startDate"] = $filterObj->stdate = $stDate;
             $trParams["endDate"] = $filterObj->enddate = $endDate;
         }
+        $data["dateFmt"] = $dateFmt;
 
         // Obtain requested view mode
         $showDetails = false;
         if (isset($_GET["mode"]) && $_GET["mode"] == "details") {
             $showDetails = true;
-            $filterObj->mode = "details";
         }
+        $listData["showDetails"] = $showDetails;
 
-        $accArr = $this->accModel->getData();
-        $hiddenAccArr = $this->accModel->getData(["type" => "hidden"]);
-        $accounts = $this->accModel->getCount(["type" => "all"]);
+        $data["accArr"] = $this->accModel->getData();
+        $data["hiddenAccArr"] = $this->accModel->getData(["type" => "hidden"]);
+        $data["accounts"] = $this->accModel->getCount(["type" => "all"]);
 
-        $totalTrCount = $this->model->getCount();
+        $transArr = $this->model->getData($trParams);
 
-        $transArr = ($totalTrCount) ? $this->model->getData($trParams) : [];
         $transCount = $this->model->getTransCount($trParams);
+        $pagination["total"] = $transCount;
 
         $currArr = $this->currModel->getData();
 
@@ -152,6 +171,8 @@ class Transactions extends TemplateController
         $baseUrl = BASEURL . "transactions/";
         foreach ($trTypes as $type_id => $trTypeName) {
             $urlParams = (array)$filterObj;
+
+            $urlParams["mode"] = ($showDetails) ? "classic" : "details";
 
             if ($type_id != 0) {
                 $urlParams["type"] = strtolower($trTypeName);
@@ -175,53 +196,72 @@ class Transactions extends TemplateController
 
             $transMenu[] = $menuItem;
         }
-
-        $showPaginator = true;
+        $data["transMenu"] = $transMenu;
 
         // Prepare mode selector and paginator
-        if ($showPaginator == true) {
-            // Prepare classic/details mode link
+        // Prepare classic/details mode link
+        $urlParams = (array)$filterObj;
+        $urlParams["mode"] = ($showDetails) ? "classic" : "details";
+
+        $data["modeLink"] = urlJoin(BASEURL . "transactions/", $urlParams);
+
+        // Build data for paginator
+        if ($trParams["onPage"] > 0) {
             $urlParams = (array)$filterObj;
             $urlParams["mode"] = ($showDetails) ? "classic" : "details";
 
-            $linkStr = urlJoin(BASEURL . "transactions/", $urlParams);
+            $pageCount = ceil($transCount / $trParams["onPage"]);
+            $pagination["pagesCount"] = $pageCount;
+            $page_num = isset($trParams["page"]) ? intval($trParams["page"]) : 0;
+            $pagination["page"] = $page_num + 1;
 
-            // Build data for paginator
-            if ($trParams["onPage"] > 0) {
-                $urlParams = (array)$filterObj;
+            $pagesArr = [];
+            if ($transCount > $trParams["onPage"]) {
+                $pagesArr = $this->model->getPaginatorArray($page_num, $pageCount);
+            }
 
-                $pageCount = ceil($transCount / $trParams["onPage"]);
-                $page_num = isset($trParams["page"]) ? intval($trParams["page"]) : 0;
-                $pagesArr = [];
-                if ($transCount > $trParams["onPage"]) {
-                    $pagesArr = $this->model->getPaginatorArray($page_num, $pageCount);
-                }
+            foreach ($pagesArr as $ind => $item) {
+                if (isset($item["page"]) && !$item["active"]) {
+                    $urlParams["page"] = intval($item["page"]);
 
-                foreach ($pagesArr as $ind => $pageItem) {
-                    if (is_numeric($pageItem["text"]) && !$pageItem["active"]) {
-                        $urlParams["page"] = intval($pageItem["text"]);
-
-                        $pagesArr[$ind]["link"] = urlJoin(BASEURL . "transactions/", $urlParams);
-                    }
+                    $pagesArr[$ind]["link"] = urlJoin(BASEURL . "transactions/", $urlParams);
                 }
             }
         }
+        $data["paginator"] = ["pagesArr" => $pagesArr];
 
         // Prepare data of transaction list items
         $trListData = [];
+        $trItems = [];
         foreach ($transArr as $trans) {
             $itemData = $this->model->getListItem($trans, $showDetails);
-
             $trListData[] = $itemData;
-        }
 
-        $titleString = "Jezve Money | Transactions";
+            $trItems[] = new TransactionItem($trans);
+        }
+        $listData["items"] = $trListData;
+
+        $data["listData"] = $listData;
+        $profileData = [
+            "user_id" => $this->user_id,
+            "owner_id" => $this->owner_id,
+            "name" => $this->user_name,
+        ];
+        $data["viewData"] = JSON::encode([
+            "profile" => $profileData,
+            "accounts" => $this->accModel->getData(["full" => true, "type" => "all"]),
+            "persons" => $this->personMod->getData(["type" => "all"]),
+            "currency" => $currArr,
+            "transArr" => $trItems,
+            "filterObj" => $filterObj,
+            "pagination" => $pagination,
+            "mode" => $showDetails ? "details" : "classic",
+        ]);
 
         $this->cssArr[] = "TransactionListView.css";
-        $this->buildCSS();
         $this->jsArr[] = "TransactionListView.js";
 
-        include(TPL_PATH . "transactions.tpl");
+        $this->render($data);
     }
 
 
@@ -235,14 +275,30 @@ class Transactions extends TemplateController
     }
 
 
+    protected function getAccountTileData($account, $tileId, $balanceDiff = 0)
+    {
+        return [
+            "id" => $tileId,
+            "title" => $account->name,
+            "subtitle" => $this->currModel->format($account->balance + $balanceDiff, $account->curr_id),
+            "icon" => $this->accModel->getIconFile($account->id)
+        ];
+    }
+
+
     public function create()
     {
         if ($this->isPOST()) {
             $this->createTransaction();
         }
 
-        $action = "new";
+        $this->template = new Template(TPL_PATH . "transaction.tpl");
+        $data = [];
 
+        $action = "new";
+        $data["action"] = $action;
+
+        $iconModel = IconModel::getInstance();
         $defMsg = ERR_TRANS_CREATE;
 
         $tr = [
@@ -276,20 +332,17 @@ class Transactions extends TemplateController
         if (!$acc_id) {
             $this->fail($defMsg);
         }
+        $data["acc_id"] = $acc_id;
 
         $give = true;
         $person_id = 0;
         $person_acc_id = 0;
         $debtAcc = null;
-        $transAcc_id = 0;        // main transaction account id
-        $transAccCurr = 0;        // currency of transaction account
         $noAccount = false;
         $srcAmountCurr = 0;
         $destAmountCurr = 0;
 
         if ($tr["type"] == DEBT) {
-            $debtMod = DebtModel::getInstance();
-
             $debtAcc = $this->accModel->getItem($acc_id);
 
             // Prepare person account
@@ -298,12 +351,19 @@ class Transactions extends TemplateController
                 $person_id = $visiblePersons[0]->id;
             }
             $pObj = $this->personMod->getItem($person_id);
-            $person_name = ($pObj) ? $pObj->name : null;
-
             $person_acc = $this->accModel->getPersonAccount($person_id, $debtAcc->curr_id);
             $person_acc_id = ($person_acc) ? $person_acc->id : 0;
             $person_res_balance = ($person_acc) ? $person_acc->balance : 0.0;
             $person_balance = $person_res_balance;
+
+            $data["acc_id"] = ($debtAcc) ? $debtAcc->id : 0;
+
+            $data["personTile"] = [
+                "id" => "person_tile",
+                "title" => ($pObj) ? $pObj->name : null,
+                "subtitle" => $this->currModel->format($person_balance, $debtAcc->curr_id)
+            ];
+            $data["debtAccountTile"] = $this->getAccountTileData($debtAcc, "acc_tile");
 
             $tr["src_id"] = $person_acc_id;
             $tr["dest_id"] = $acc_id;
@@ -329,7 +389,6 @@ class Transactions extends TemplateController
 
             $tr["src_id"] = $src_id;
             $tr["dest_id"] = $dest_id;
-            $tr["comment"] = "";
             $tr["src_curr"] = 0;
             $tr["dest_curr"] = 0;
 
@@ -353,16 +412,25 @@ class Transactions extends TemplateController
                 $tr["src_curr"] = $tr["dest_curr"];
             }
         }
-
-        $acc_count = $this->accModel->getCount();
+        $data["tr"] = $tr;
+        $data["acc_count"] = $this->accModel->getCount();
 
         $src = null;
         $dest = null;
         if ($tr["type"] != DEBT) {
             // get information about source and destination accounts
             $src = $this->accModel->getItem($tr["src_id"]);
+            if ($src) {
+                $data["srcAccountTile"] = $this->getAccountTileData($src, "source_tile");
+            }
+
             $dest = $this->accModel->getItem($tr["dest_id"]);
+            if ($dest) {
+                $data["destAccountTile"] = $this->getAccountTileData($dest, "dest_tile");
+            }
         }
+        $data["src"] = $src;
+        $data["dest"] = $dest;
 
         // Prepare transaction types menu
         $trTypes = TransactionModel::getTypeNames();
@@ -382,8 +450,9 @@ class Transactions extends TemplateController
 
             $transMenu[] = $menuItem;
         }
+        $data["transMenu"] = $transMenu;
 
-        $formAction = BASEURL . "transactions/" . $action . "/";
+        $data["formAction"] = BASEURL . "transactions/" . $action . "/";
 
         if ($tr["type"] == EXPENSE || $tr["type"] == TRANSFER || $tr["type"] == DEBT) {
             $srcBalTitle = "Result balance";
@@ -392,6 +461,7 @@ class Transactions extends TemplateController
             } elseif ($tr["type"] == DEBT) {
                 $srcBalTitle .= ($give) ? " (Person)" : " (Account)";
             }
+            $data["srcBalTitle"] = $srcBalTitle;
 
             $balDiff = $tr["src_amount"];
             if ($tr["type"] != DEBT && !is_null($src)) {
@@ -407,6 +477,7 @@ class Transactions extends TemplateController
             } elseif ($tr["type"] == DEBT) {
                 $destBalTitle .= ($give) ? " (Account)" : " (Person)";
             }
+            $data["destBalTitle"] = $destBalTitle;
 
             $balDiff = $tr["dest_amount"];
             if ($tr["type"] != DEBT && !is_null($dest)) {
@@ -416,14 +487,6 @@ class Transactions extends TemplateController
         }
 
         if ($tr["type"] != DEBT) {
-            if ($tr["type"] == EXPENSE) {
-                $transCurr = $src ? $src->curr_id : 0;
-                $transAccCurr = $src ? $src->curr_id : 0;
-            } else {
-                $transCurr = $dest ? $dest->curr_id : 0;
-                $transAccCurr = $dest ? $dest->curr_id : 0;
-            }
-
             if (!is_null($src)) {
                 $srcAmountCurr = $src->curr_id;
             } elseif (!is_null($dest)) {
@@ -461,6 +524,10 @@ class Transactions extends TemplateController
             $showSrcAmount = true;
             $showDestAmount = false;
         }
+        $data["srcAmountCurr"] = $srcAmountCurr;
+        $data["showSrcAmount"] = $showSrcAmount;
+        $data["destAmountCurr"] = $destAmountCurr;
+        $data["showDestAmount"] = $showDestAmount;
 
         // Common arrays
         $profileData = [
@@ -468,49 +535,32 @@ class Transactions extends TemplateController
             "owner_id" => $this->owner_id,
             "name" => $this->user_name,
         ];
-        $currArr = $this->currModel->getData();
-        $iconModel = IconModel::getInstance();
-        $icons = $iconModel->getData();
 
-        $accArr = $this->accModel->getData(["type" => "all", "full" => true]);
-        if ($tr["type"] == DEBT) {
-            $persArr = $this->personMod->getData(["type" => "all"]);
-        }
-
-        $srcAmountLbl = ($showSrcAmount && $showDestAmount) ? "Source amount" : "Amount";
-        $destAmountLbl = ($showSrcAmount && $showDestAmount) ? "Destination amount" : "Amount";
+        $showBothAmounts = $showSrcAmount && $showDestAmount;
+        $data["srcAmountLbl"] = ($showBothAmounts) ? "Source amount" : "Amount";
+        $data["destAmountLbl"] = ($showBothAmounts) ? "Destination amount" : "Amount";
 
         if ($tr["type"] == DEBT) {
             if ($noAccount) {
-                $accLbl = "No account";
+                $data["accLbl"] = "No account";
             } else {
-                if ($give) {
-                    $accLbl = "Destination account";
-                } else {
-                    $accLbl = "Source account";
-                }
+                $data["accLbl"] = ($give)
+                    ? "Destination account"
+                    : "Source account";
             }
-
-            if ($debtAcc) {
-                $debtAcc->balfmt = $this->currModel->format($debtAcc->balance + $tr["dest_amount"], $debtAcc->curr_id);
-                $debtAcc->icon = $this->accModel->getIconFile($debtAcc->id);
-            }
-
-            $p_balfmt = $this->currModel->format($person_balance, $srcAmountCurr);
         }
 
         $currObj = $this->currModel->getItem($srcAmountCurr);
         $srcAmountSign = $currObj ? $currObj->sign : null;
+        $data["srcAmountSign"] = $srcAmountSign;
 
         $currObj = $this->currModel->getItem($destAmountCurr);
         $destAmountSign = $currObj ? $currObj->sign : null;
+        $data["destAmountSign"] = $destAmountSign;
 
-        $exchSign = $destAmountSign . "/" . $srcAmountSign;
-        $exchValue = 1;
+        $data["exchSign"] = $destAmountSign . "/" . $srcAmountSign;
+        $data["exchValue"] = 1;
 
-        $rtSrcAmount = $this->currModel->format($tr["src_amount"], $srcAmountCurr);
-        $rtDestAmount = $this->currModel->format($tr["dest_amount"], $destAmountCurr);
-        $rtExchange = $exchValue . " " . $exchSign;
         if ($tr["type"] != DEBT) {
             $srcResBalance = ($src) ? $src->balance : null;
             $destResBalance = ($dest) ? $dest->balance : null;
@@ -526,22 +576,65 @@ class Transactions extends TemplateController
             $rtSrcResBal = $this->currModel->format($srcResBalance, $srcAmountCurr);
             $rtDestResBal = $this->currModel->format($destResBalance, $destAmountCurr);
         }
+        $data["srcResBalance"] = $srcResBalance;
+        $data["destResBalance"] = $destResBalance;
 
-        $dateFmt = date("d.m.Y");
+        $data["srcAmountInfo"] = [
+            "id" => "src_amount_left",
+            "title" => $data["srcAmountLbl"],
+            "value" => $this->currModel->format($tr["src_amount"], $srcAmountCurr),
+            "hidden" => true
+        ];
+        $data["destAmountInfo"] = [
+            "id" => "dest_amount_left",
+            "title" => $data["destAmountLbl"],
+            "value" => $this->currModel->format($tr["dest_amount"], $destAmountCurr),
+            "hidden" => true
+        ];
+        $data["srcResultInfo"] = [
+            "id" => "src_res_balance_left",
+            "title" => "Result balance",
+            "value" => $rtSrcResBal,
+            "hidden" => false
+        ];
+        $data["destResultInfo"] = [
+            "id" => "dest_res_balance_left",
+            "title" => "Result balance",
+            "value" => $rtDestResBal,
+            "hidden" => false
+        ];
+        $data["exchangeInfo"] = [
+            "id" => "exch_left",
+            "title" => "Exchange rate",
+            "value" => $data["exchValue"] . " " . $data["exchSign"],
+            "hidden" => ($tr["src_curr"] == $tr["dest_curr"])
+        ];
 
-        $titleString = "Jezve Money | ";
+        $data["dateFmt"] = date("d.m.Y");
+
+        $data["headString"] = ($tr["type"] == DEBT)
+            ? "New debt"
+            : "New transaction";
+
+        $data["titleString"] = "Jezve Money | " . $data["headString"];
+
+        $viewData = [
+            "mode" => $this->action,
+            "profile" => $profileData,
+            "transaction" => $tr,
+            "accounts" => $this->accModel->getData(["type" => "all", "full" => true]),
+            "currency" => $this->currModel->getData(),
+            "icons" => $iconModel->getData()
+        ];
         if ($tr["type"] == DEBT) {
-            $headString = "New debt";
-        } else {
-            $headString = "New transaction";
+            $viewData["persons"] = $this->personMod->getData(["type" => "all"]);
         }
-        $titleString .= $headString;
+        $data["viewData"] = JSON::encode($viewData);
 
         $this->cssArr[] = "TransactionView.css";
-        $this->buildCSS();
         $this->jsArr[] = "TransactionView.js";
 
-        include(TPL_PATH . "transaction.tpl");
+        $this->render($data);
     }
 
 
@@ -551,8 +644,13 @@ class Transactions extends TemplateController
             $this->updateTransaction();
         }
 
-        $action = "edit";
+        $this->template = new Template(TPL_PATH . "transaction.tpl");
+        $data = [];
 
+        $action = "edit";
+        $data["action"] = $action;
+
+        $iconModel = IconModel::getInstance();
         $defMsg = ERR_TRANS_UPDATE;
 
         $trans_id = intval($this->actionParam);
@@ -569,19 +667,24 @@ class Transactions extends TemplateController
         }
         $tr = (array)$item;
 
-        if ($tr["type"] == DEBT) {
-            $debtMod = DebtModel::getInstance();
-        }
-
-        $acc_count = $this->accModel->getCount(["full" => ($tr["type"] == DEBT)]);
+        $data["acc_count"] = $this->accModel->getCount(["full" => ($tr["type"] == DEBT)]);
 
         $src = null;
         $dest = null;
         // get information about source and destination accounts
         if ($tr["type"] != DEBT) {
             $src = $this->accModel->getItem($tr["src_id"]);
+            if ($src) {
+                $data["srcAccountTile"] = $this->getAccountTileData($src, "source_tile", $tr["src_amount"]);
+            }
+
             $dest = $this->accModel->getItem($tr["dest_id"]);
+            if ($dest) {
+                $data["destAccountTile"] = $this->getAccountTileData($dest, "dest_tile", -$tr["dest_amount"]);
+            }
         }
+        $data["src"] = $src;
+        $data["dest"] = $dest;
 
         // Prepare transaction types menu
         $trTypes = TransactionModel::getTypeNames();
@@ -598,31 +701,20 @@ class Transactions extends TemplateController
 
             $transMenu[] = $menuItem;
         }
+        $data["transMenu"] = $transMenu;
 
-        $formAction = BASEURL . "transactions/" . $action . "/";
+        $data["formAction"] = BASEURL . "transactions/" . $action . "/";
 
         $srcBalTitle = "Result balance";
-        if ($src && $tr["type"] == EXPENSE || $tr["type"] == TRANSFER) {
-            if ($tr["type"] == TRANSFER) {
-                $srcBalTitle .= " (Source)";
-            }
-            $balDiff = $tr["src_amount"];
-            $src->balfmt = $this->currModel->format($src->balance + $balDiff, $src->curr_id);
-            $src->icon = $this->accModel->getIconFile($src->id);
+        if ($tr["type"] == TRANSFER) {
+            $srcBalTitle .= " (Source)";
         }
 
         $destBalTitle = "Result balance";
-        if ($dest && $tr["type"] == INCOME || $tr["type"] == TRANSFER) {
-            if ($tr["type"] == TRANSFER) {
-                $destBalTitle .= " (Destination)";
-            }
-            $balDiff = $tr["dest_amount"];
-            $dest->balfmt = $this->currModel->format($dest->balance - $balDiff, $dest->curr_id);
-            $dest->icon = $this->accModel->getIconFile($dest->id);
+        if ($tr["type"] == TRANSFER) {
+            $destBalTitle .= " (Destination)";
         }
 
-        $transAcc_id = 0;        // main transaction account id
-        $transAccCurr = 0;        // currency of transaction account
         $person_id = 0;
         $person_acc_id = 0;
         $acc_id = 0;
@@ -633,19 +725,6 @@ class Transactions extends TemplateController
         $showDestAmount = false;
 
         if ($tr["type"] != DEBT) {
-            if (
-                (($tr["type"] == EXPENSE && $tr["dest_id"] == 0) ||
-                    ($tr["type"] == TRANSFER && $tr["dest_id"] != 0)) &&
-                $tr["src_id"] != 0
-            ) {
-                $transAcc_id = $tr["src_id"];
-            } elseif ($tr["type"] == INCOME && $tr["dest_id"] != 0 && $tr["src_id"] == 0) {
-                $transAcc_id = $tr["dest_id"];
-            }
-
-            $accObj = $this->accModel->getItem($transAcc_id);
-            $transAccCurr = ($accObj) ? $accObj->curr_id : null;
-
             $srcAmountCurr = $tr["src_curr"];
             $destAmountCurr = $tr["dest_curr"];
 
@@ -682,7 +761,7 @@ class Transactions extends TemplateController
                 throw new \Error("Person not found");
             }
 
-            $person_name = $pObj->name;
+            $data["person_name"] = $pObj->name;
 
             $person_acc_id = ($give) ? $tr["src_id"] : $tr["dest_id"];
             $person_acc = $this->accModel->getItem($person_acc_id);
@@ -691,6 +770,12 @@ class Transactions extends TemplateController
 
             $debtAcc = $give ? $dest : $src;
             $noAccount = is_null($debtAcc);
+
+            $data["personTile"] = [
+                "id" => "person_tile",
+                "title" => $pObj->name,
+                "subtitle" => $this->currModel->format($person_balance, $person_acc->curr_id)
+            ];
 
             $srcAmountCurr = $tr["src_curr"];
             $destAmountCurr = $tr["dest_curr"];
@@ -708,10 +793,19 @@ class Transactions extends TemplateController
             $showDestAmount = false;
         }
 
+        $data["srcAmountCurr"] = $srcAmountCurr;
+        $data["showSrcAmount"] = $showSrcAmount;
+        $data["destAmountCurr"] = $destAmountCurr;
+        $data["showDestAmount"] = $showDestAmount;
+        $data["srcBalTitle"] = $srcBalTitle;
+        $data["destBalTitle"] = $destBalTitle;
+
         $tr["person_id"] = $person_id;
         $tr["debtType"] = $give;
         $tr["lastAcc_id"] = $acc_id;
         $tr["noAccount"] = $noAccount;
+
+        $data["tr"] = $tr;
 
         // Common arrays
         $profileData = [
@@ -719,60 +813,49 @@ class Transactions extends TemplateController
             "owner_id" => $this->owner_id,
             "name" => $this->user_name,
         ];
-        $currArr = $this->currModel->getData();
-        $iconModel = IconModel::getInstance();
-        $icons = $iconModel->getData();
 
-        $accArr = $this->accModel->getData(["type" => "all", "full" => true]);
-        if ($tr["type"] == DEBT) {
-            $persArr = $this->personMod->getData(["type" => "all"]);
-        }
-
-        $srcAmountLbl = ($showSrcAmount && $showDestAmount) ? "Source amount" : "Amount";
-        $destAmountLbl = ($showSrcAmount && $showDestAmount) ? "Destination amount" : "Amount";
+        $showBothAmounts = $showSrcAmount && $showDestAmount;
+        $data["srcAmountLbl"] = ($showBothAmounts) ? "Source amount" : "Amount";
+        $data["destAmountLbl"] = ($showBothAmounts) ? "Destination amount" : "Amount";
 
         $accLbl = null;
         if ($tr["type"] == DEBT) {
             if ($noAccount) {
                 $accLbl = "No account";
             } else {
-                if ($give) {
-                    $accLbl = "Destination account";
-                } else {
-                    $accLbl = "Source account";
-                }
+                $accLbl = ($give)
+                    ? "Destination account"
+                    : "Source account";
             }
 
             if ($debtAcc) {
-                $debtAccBalance = $debtAcc->balance;
+                $balanceDiff = 0;
                 if (!$noAccount) {
-                    $debtAccBalance += ($give) ? -$tr["dest_amount"] : $tr["src_amount"];
+                    $balanceDiff = ($give) ? -$tr["dest_amount"] : $tr["src_amount"];
                 }
 
-                $debtAcc->balfmt = $this->currModel->format($debtAccBalance, $debtAcc->curr_id);
-                $debtAcc->icon = $this->accModel->getIconFile($debtAcc->id);
+                $data["debtAccountTile"] = $this->getAccountTileData($debtAcc, "acc_tile", $balanceDiff);
             }
-
-            $p_balfmt = $this->currModel->format($person_balance, $srcAmountCurr);
+            $data["acc_id"] = ($debtAcc) ? $debtAcc->id : 0;
         }
+        $data["accLbl"] = $accLbl;
 
         $currObj = $this->currModel->getItem($srcAmountCurr);
-        $srcAmountSign = $currObj ? $currObj->sign : null;
+        $data["srcAmountSign"] = $currObj ? $currObj->sign : null;
 
         $currObj = $this->currModel->getItem($destAmountCurr);
-        $destAmountSign = $currObj ? $currObj->sign : null;
+        $data["destAmountSign"] = $currObj ? $currObj->sign : null;
 
-        $exchSign = $destAmountSign . "/" . $srcAmountSign;
-        $exchValue = round($tr["dest_amount"] / $tr["src_amount"], 5);
-        $backExchSign = $srcAmountSign . "/" . $destAmountSign;
+        $data["exchSign"] = $data["destAmountSign"] . "/" . $data["srcAmountSign"];
+        $data["exchValue"] = round($tr["dest_amount"] / $tr["src_amount"], 5);
+        $backExchSign = $data["srcAmountSign"] . "/" . $data["destAmountSign"];
         $backExchValue = round($tr["src_amount"] / $tr["dest_amount"], 5);
 
-        $rtSrcAmount = $this->currModel->format($tr["src_amount"], $srcAmountCurr);
-        $rtDestAmount = $this->currModel->format($tr["dest_amount"], $destAmountCurr);
-        $rtExchange = $exchValue . " " . $exchSign;
-        if ($exchValue != 1) {
+        $rtExchange = $data["exchValue"] . " " . $data["exchSign"];
+        if ($data["exchValue"] != 1) {
             $rtExchange .= " (" . $backExchValue . " " . $backExchSign . ")";
         }
+
         if ($tr["type"] != DEBT) {
             $srcResBalance = ($src) ? $src->balance : null;
             $destResBalance = ($dest) ? $dest->balance : null;
@@ -786,22 +869,65 @@ class Transactions extends TemplateController
             $rtSrcResBal = $this->currModel->format($srcResBalance, $srcAmountCurr);
             $rtDestResBal = $this->currModel->format($destResBalance, $destAmountCurr);
         }
+        $data["srcResBalance"] = $srcResBalance;
+        $data["destResBalance"] = $destResBalance;
 
-        $dateFmt = date("d.m.Y", $tr["date"]);
+        $data["srcAmountInfo"] = [
+            "id" => "src_amount_left",
+            "title" => $data["srcAmountLbl"],
+            "value" => $this->currModel->format($tr["src_amount"], $srcAmountCurr),
+            "hidden" => true
+        ];
+        $data["destAmountInfo"] = [
+            "id" => "dest_amount_left",
+            "title" => $data["destAmountLbl"],
+            "value" => $this->currModel->format($tr["dest_amount"], $destAmountCurr),
+            "hidden" => true
+        ];
+        $data["srcResultInfo"] = [
+            "id" => "src_res_balance_left",
+            "title" => "Result balance",
+            "value" => $rtSrcResBal,
+            "hidden" => false
+        ];
+        $data["destResultInfo"] = [
+            "id" => "dest_res_balance_left",
+            "title" => "Result balance",
+            "value" => $rtDestResBal,
+            "hidden" => false
+        ];
+        $data["exchangeInfo"] = [
+            "id" => "exch_left",
+            "title" => "Exchange rate",
+            "value" => $rtExchange,
+            "hidden" => ($tr["src_curr"] == $tr["dest_curr"])
+        ];
 
-        $titleString = "Jezve Money | ";
+        $data["dateFmt"] = date("d.m.Y", $tr["date"]);
+
+        $data["headString"] = ($tr["type"] == DEBT)
+            ? "Edit debt"
+            : "Edit transaction";
+
+        $data["titleString"] = "Jezve Money | " . $data["headString"];
+
+        $viewData = [
+            "mode" => $this->action,
+            "profile" => $profileData,
+            "transaction" => $tr,
+            "accounts" => $this->accModel->getData(["type" => "all", "full" => true]),
+            "currency" => $this->currModel->getData(),
+            "icons" => $iconModel->getData()
+        ];
         if ($tr["type"] == DEBT) {
-            $headString = "Edit debt";
-        } else {
-            $headString = "Edit transaction";
+            $viewData["persons"] = $this->personMod->getData(["type" => "all"]);
         }
-        $titleString .= $headString;
+        $data["viewData"] = JSON::encode($viewData);
 
         $this->cssArr[] = "TransactionView.css";
-        $this->buildCSS();
         $this->jsArr[] = "TransactionView.js";
 
-        include(TPL_PATH . "transaction.tpl");
+        $this->render($data);
     }
 
 

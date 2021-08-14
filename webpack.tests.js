@@ -18,9 +18,10 @@ export default {
                 test: /\.m?js$/,
                 include: [
                     resolve(__dirname, 'tests'),
+                    resolve('node_modules/jezvejs'),
                     resolve('node_modules/jezve-test'),
                 ],
-                exclude: /node_modules\/(?!(jezve-test)\/).*/,
+                exclude: /node_modules\/(?!(jezve-test|jezvejs)\/).*/,
                 use: [
                     {
                         loader: 'babel-loader',

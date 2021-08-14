@@ -1,6 +1,6 @@
 {
     "name": "henryfeesler/jezvemoney",
-    "version": "1.8.0",
+    "version": "1.9.0",
     "description": "",
 	"config": {
 		"vendor-dir": "vendor",
@@ -11,7 +11,7 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"JezveMoney\\Core\\": "system/",
+			"JezveMoney\\Core\\": "system/Engine/",
 			"JezveMoney\\App\\": "",
 			"JezveMoney\\App\\Admin\\": "admin/",
 			"JezveMoney\\App\\API\\": "api/",

@@ -1,9 +1,6 @@
-import {
-    test,
-    formatDate,
-    copyObject,
-    checkObjValue,
-} from 'jezve-test';
+import { copyObject } from 'jezvejs';
+import { formatDate } from 'jezvejs/DateUtils';
+import { test, checkObjValue } from 'jezve-test';
 import { api } from '../../model/api.js';
 import { ApiRequestError } from '../../error/ApiRequestError.js';
 import { Transaction } from '../../model/Transaction.js';
@@ -202,6 +199,6 @@ export async function filter(params) {
             throw new Error('Fail to read list of transactions');
         }
 
-        return checkObjValue(trList, expTransList.data);
+        return checkObjValue(trList.items, expTransList.data);
     });
 }

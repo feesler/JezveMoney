@@ -519,7 +519,7 @@ class MySqlDB
         if (!$this->errno && $rows == 1) {
             $row = mysqli_fetch_array($result);
             if ($row) {
-                $res = $row["cnt"];
+                $res = intval($row["cnt"]);
             }
         }
 

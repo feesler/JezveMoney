@@ -3,6 +3,8 @@
 namespace JezveMoney\App\Controller;
 
 use JezveMoney\Core\TemplateController;
+use JezveMoney\Core\Template;
+use JezveMoney\Core\JSON;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\TransactionModel;
@@ -11,14 +13,27 @@ class Main extends TemplateController
 {
     public function index()
     {
+        $this->template = new Template(TPL_PATH . "main.tpl");
+        $data = [
+            "titleString" => "Jezve Money"
+        ];
+
         $accMod = AccountModel::getInstance();
         $transMod = TransactionModel::getInstance();
         $currMod = CurrencyModel::getInstance();
 
-        $currArr = $currMod->getData();
-        $accArr = $accMod->getData();
+        $accounts = $accMod->getData();
+        $data["tilesArr"] = [];
+        foreach ($accounts as $account) {
+            $data["tilesArr"][] = [
+                "type" => "link",
+                "link" => BASEURL . "transactions/new/?acc_id=" . ($account->id),
+                "title" => $account->name,
+                "subtitle" => $currMod->format($account->balance, $account->curr_id),
+                "icon" => $accMod->getIconFile($account->id)
+            ];
+        }
 
-        $tilesArr = $accMod->getTilesArray();
         $totalsArr = $accMod->getTotalsArray();
         foreach ($totalsArr as $curr_id => $balance) {
             $currObj = $currMod->getItem($curr_id);
@@ -30,6 +45,7 @@ class Main extends TemplateController
 
             $totalsArr[$curr_id] = ["bal" => $balance, "balfmt" => $balfmt, "name" => $currObj->name];
         }
+        $data["totalsArr"] = $totalsArr;
 
         // Prepare data of transaction list items
         $latestArr = $transMod->getData(["desc" => true, "onPage" => 5]);
@@ -39,6 +55,11 @@ class Main extends TemplateController
 
             $trListData[] = $itemData;
         }
+
+        $data["transactionsData"] = [
+            "items" => $trListData,
+            "showDetails" => false,
+        ];
 
         $persArr = $this->personMod->getData();
         foreach ($persArr as $ind => $pData) {
@@ -56,7 +77,7 @@ class Main extends TemplateController
             $persArr[$ind]->nodebts = $noDebts;
             $persArr[$ind]->balfmt = $pBalance;
         }
-
+        $data["persArr"] = $persArr;
 
         $byCurrency = true;
         $curr_acc_id = $currMod->getIdByPos(0);
@@ -66,14 +87,15 @@ class Main extends TemplateController
 
         $groupType_id = 2;        // group by week
 
-        $statArr = $transMod->getHistogramSeries($byCurrency, $curr_acc_id, EXPENSE, $groupType_id, 5);
+        $data["statArr"] = $transMod->getHistogramSeries($byCurrency, $curr_acc_id, EXPENSE, $groupType_id, 5);
 
-        $titleString = "Jezve Money";
+        $data["viewData"] = JSON::encode([
+            "chartData" => $data["statArr"]
+        ]);
 
         $this->cssArr[] = "MainView.css";
-        $this->buildCSS();
         $this->jsArr[] = "MainView.js";
 
-        include(TPL_PATH . "main.tpl");
+        $this->render($data);
     }
 }

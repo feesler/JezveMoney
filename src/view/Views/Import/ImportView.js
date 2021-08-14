@@ -8,9 +8,10 @@ import {
     urlJoin,
     ajax,
 } from 'jezvejs';
+import { formatDate } from 'jezvejs/DateUtils';
 import { Sortable } from 'jezvejs/Sortable';
 import { DropDown } from 'jezvejs/DropDown';
-import { formatDate, timestampFromString, createMessage } from '../../js/app.js';
+import { timestampFromString, createMessage } from '../../js/app.js';
 import { View } from '../../js/View.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
@@ -263,7 +264,7 @@ class ImportView extends View {
             return;
         }
 
-        this.model.transCache = jsondata.data;
+        this.model.transCache = jsondata.data.items;
         const importedItems = this.getImportedItems();
         importedItems.forEach((item) => {
             item.enable(true);

@@ -3,11 +3,18 @@
 namespace JezveMoney\App\Admin\Controller;
 
 use JezveMoney\Core\AdminController;
+use JezveMoney\Core\Template;
+use JezveMoney\Core\JSON;
 
 class User extends AdminController
 {
     public function index()
     {
+        $this->template = new Template(ADMIN_TPL_PATH . "user.tpl");
+        $data = [
+            "titleString" => "Admin panel | Users",
+        ];
+
         $itemsData = $this->uMod->getData(["all" => true]);
 
         $accessLevels = [
@@ -22,18 +29,15 @@ class User extends AdminController
                 $userInfo->accessTitle = "Unknown access level: " . $userInfo->access;
             }
         }
-        $viewData = [
-            "data" => $itemsData
-        ];
+        $data["itemsData"] = $itemsData;
+        $data["viewData"] = JSON::encode([
+            "data" => $itemsData,
+        ]);
 
         $this->menuItems["users"]["active"] = true;
-
-        $titleString = "Admin panel | Users";
-
         $this->cssAdmin[] = "AdminUserView.css";
-        $this->buildCSS();
         $this->jsAdmin[] = "AdminUserView.js";
 
-        include(ADMIN_TPL_PATH . "user.tpl");
+        $this->render($data);
     }
 }

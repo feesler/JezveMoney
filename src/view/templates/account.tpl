@@ -1,7 +1,8 @@
 <?php
-    use JezveMoney\Core\JSON;
-?>
-<?php	include(TPL_PATH."commonhdr.tpl");	?>
+use JezveMoney\App\Template\Tile;
+use JezveMoney\App\Template\IconLink;
+
+include(TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body class="<?=($this->themeClass)?>">
 <div class="page">
@@ -13,12 +14,11 @@
                     <div class="heading">
                         <h1><?=e($headString)?></h1>
 <?php	if ($this->action == "update") {	?>
-                        <div id="del_btn" class="iconlink">
-                            <button type="button">
-                                <span class="iconlink__icon"><?=svgIcon("del")?></span>
-                                <span class="iconlink__content"><span>Delete</span></span>
-                            </button>
-                        </div>
+                        <?=IconLink::render([
+                            "id" => "del_btn",
+                            "title" => "Delete",
+                            "icon" => "del"
+                        ])?>
 <?php	}	?>
                     </div>
 
@@ -28,15 +28,7 @@
                         <input id="accid" name="id" type="hidden" value="<?=e($accInfo->id)?>">
 <?php	}	?>
                         <div class="view-row std_margin">
-                            <div id="acc_tile" class="tile">
-                                <button class="tilelink" type="button">
-                                    <span>
-                                        <span class="tile__subtitle"><?=e($accInfo->balfmt)?></span>
-                                        <span class="tile__icon"><?=useIcon($accInfo->icon, 60, 54)?></span>
-                                        <span class="tile__title"><?=e($tileAccName)?></span>
-                                    </span>
-                                </button>
-                            </div>
+                            <?=Tile::render($tile)?>
                         </div>
                         <div class="view-row std_margin">
                             <label for="icon">Icon</label>
@@ -107,13 +99,6 @@
 <?php	}	?>
 
 <?php	include(TPL_PATH."icons.tpl");	?>
-<script>
-window.app = {
-    account: <?=JSON::encode($accInfo)?>,
-    currency: <?=JSON::encode($currArr)?>,
-    icons: <?=JSON::encode($icons)?>
-};
-</script>
 <?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

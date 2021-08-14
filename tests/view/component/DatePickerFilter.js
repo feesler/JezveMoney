@@ -32,6 +32,11 @@ export class DatePickerFilter extends TestComponent {
         }
 
         this.datePicker = await DatePicker.create(this.parent, await this.query(this.elem, '.dp__container'));
+
+        this.clearBtn = await this.query(this.elem, '#nodatebtn');
+        if (!this.clearBtn) {
+            throw new Error('Clear button not found');
+        }
     }
 
     async selectDate(date) {
@@ -67,6 +72,15 @@ export class DatePickerFilter extends TestComponent {
             throw new Error('Date picker component not found');
         }
         await this.datePicker.selectRange(date1, date2);
+    }
+
+    async clear() {
+        if (await this.isVisible(this.iconLink.elem)) {
+            await this.iconLink.click();
+            await this.parse();
+        }
+
+        await this.click(this.clearBtn);
     }
 
     getSelectedRange() {

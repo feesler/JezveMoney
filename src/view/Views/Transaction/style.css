@@ -29,10 +29,6 @@
   fill: #888888;
 }
 
-.tile_header > .close-btn:hover > svg {
-  fill: #000000;
-}
-
 .tile-base {
   display: flex;
   flex-flow: row wrap;

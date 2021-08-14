@@ -1,9 +1,5 @@
-import {
-    test,
-    isObject,
-    copyObject,
-    formatDate,
-} from 'jezve-test';
+import { isObject, copyObject } from 'jezvejs';
+import { test } from 'jezve-test';
 import { TransactionsView } from '../../view/TransactionsView.js';
 import { TransactionView } from '../../view/TransactionView.js';
 import { MainView } from '../../view/MainView.js';
@@ -11,7 +7,7 @@ import { Currency } from '../../model/Currency.js';
 import { Transaction } from '../../model/Transaction.js';
 import { AccountsList } from '../../model/AccountsList.js';
 import { App } from '../../Application.js';
-import { formatProps, fixDate } from '../../common.js';
+import { formatProps } from '../../common.js';
 
 export async function runAction({ action, data }) {
     let testDescr = null;
@@ -148,8 +144,7 @@ export async function runAction({ action, data }) {
     }
 
     if (action === 'changeDate') {
-        const fmtDate = formatDate(new Date(fixDate(data)));
-        testDescr = `Date (${fmtDate}) input`;
+        testDescr = `Date (${data}) input`;
     }
 
     if (action === 'inputComment') {

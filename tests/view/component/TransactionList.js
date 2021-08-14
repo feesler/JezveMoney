@@ -4,8 +4,10 @@ import { asyncMap } from '../../common.js';
 
 export class TransactionList extends TestComponent {
     async parse() {
+        this.renderTime = await this.prop(this.elem, 'dataset.time');
+
         this.items = [];
-        this.details = (await this.prop(this.elem, 'tagName') === 'TABLE');
+        this.details = await this.hasClass(this.elem, 'trans-list_details');
         const itemSelector = (this.details) ? 'tr' : '.trans-list__item-wrapper > div';
         const listItems = await this.queryAll(this.elem, itemSelector);
         if (

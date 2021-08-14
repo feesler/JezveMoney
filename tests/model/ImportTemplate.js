@@ -1,4 +1,5 @@
-import { copyObject, formatDate } from 'jezve-test';
+import { copyObject } from 'jezvejs';
+import { formatDate } from 'jezvejs/DateUtils';
 import { fixFloat, fixDate } from '../common.js';
 import { Currency } from './Currency.js';
 import { ImportTransaction } from './ImportTransaction.js';

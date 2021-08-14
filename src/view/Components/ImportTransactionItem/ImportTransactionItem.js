@@ -8,11 +8,11 @@ import {
     addChilds,
     removeChilds,
 } from 'jezvejs';
+import { formatDate } from 'jezvejs/DateUtils';
 import { Component } from 'jezvejs/Component';
 import { DropDown } from 'jezvejs/DropDown';
 import {
     fixFloat,
-    formatDate,
     EXPENSE,
     INCOME,
     TRANSFER,

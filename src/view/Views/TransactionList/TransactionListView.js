@@ -6,15 +6,17 @@ import {
     isDate,
     urlJoin,
     isEmpty,
-    setParam,
     insertAfter,
     prependChild,
     removeChilds,
+    setEvents,
     setEmptyClick,
     ajax,
 } from 'jezvejs';
+import { formatDate } from 'jezvejs/DateUtils';
 import { DropDown } from 'jezvejs/DropDown';
 import { DatePicker } from 'jezvejs/DatePicker';
+import { Paginator } from 'jezvejs/Paginator';
 import { Sortable } from 'jezvejs/Sortable';
 import { Selection } from 'jezvejs/Selection';
 import {
@@ -27,12 +29,17 @@ import {
 import { View } from '../../js/View.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
+import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
+import { AccountList } from '../../js/model/AccountList.js';
+import { PersonList } from '../../js/model/PersonList.js';
 import '../../css/app.css';
 import '../../Components/TransactionTypeMenu/style.css';
 import '../../Components/TransactionsList/style.css';
 import './style.css';
+import { TransactionListItem } from '../../Components/TransactionListItem/TransactionListItem.js';
+import { ModeSelector } from '../../Components/ModeSelector/ModeSelector.js';
 
 const singleTransDeleteTitle = 'Delete transaction';
 const multiTransDeleteTitle = 'Delete transactions';
@@ -53,9 +60,26 @@ class TransactionListView extends View {
         }
 
         this.model = {
-            selection: new Selection(),
             selDateRange: null,
             currency: CurrencyList.create(this.props.currency),
+        };
+
+        if (!window.app.model) {
+            window.app.model = {};
+        }
+        window.app.model.currency = CurrencyList.create(this.props.currency);
+        window.app.model.account = AccountList.create(this.props.accounts);
+        window.app.model.person = PersonList.create(this.props.persons);
+        window.app.model.profile = { ...this.props.profile };
+
+        this.state = {
+            items: [...this.props.transArr],
+            filter: { ...this.props.filterObj },
+            pagination: { ...this.props.pagination },
+            mode: this.props.mode,
+            loading: false,
+            renderTime: Date.now(),
+            selectedItems: new Selection(),
         };
     }
 
@@ -63,11 +87,9 @@ class TransactionListView extends View {
      * View initialization
      */
     onStart() {
-        this.typeMenu = document.querySelector('.trtype-menu');
-        if (!this.typeMenu) {
-            throw new Error('Failed to initialize Transaction List view');
-        }
-        this.typeMenu.addEventListener('click', this.onToggleTransType.bind(this));
+        this.typeMenu = TransactionTypeMenu.fromElement(document.querySelector('.trtype-menu'), {
+            onChange: (sel) => this.onChangeTypeFilter(sel),
+        });
 
         this.accountDropDown = DropDown.create({
             input_id: 'acc_id',
@@ -92,6 +114,12 @@ class TransactionListView extends View {
         }
         this.searchInp.inputMode = 'search';
 
+        this.noSearchBtn = ge('nosearchbtn');
+        if (!this.noSearchBtn) {
+            throw new Error('Failed to initialize Transaction List view');
+        }
+        setEvents(this.noSearchBtn, { click: () => this.onSearchClear() });
+
         this.datePickerBtn = IconLink.fromElement({
             elem: 'calendar_btn',
             onclick: () => this.showCalendar(),
@@ -105,24 +133,35 @@ class TransactionListView extends View {
         }
         this.dateInput = ge('date');
 
+        this.noDateBtn = ge('nodatebtn');
+        if (!this.noDateBtn) {
+            throw new Error('Failed to initialize Transaction List view');
+        }
+        setEvents(this.noDateBtn, { click: () => this.onDateClear() });
+
         this.delForm = ge('delform');
         this.delTransInp = ge('deltrans');
         if (!this.delForm || !this.delTransInp) {
             throw new Error('Failed to initialize Transaction List view');
         }
 
+        this.loadingIndicator = document.querySelector('.trans-list__loading');
+        this.modeSelector = ModeSelector.fromElement(document.querySelector('.mode-selector'), {
+            onChange: (mode) => this.onModeChanged(mode),
+        });
+
         this.trListSortable = null;
-        this.listItems = ge('tritems');
+        this.listItems = document.querySelector('.trans-list');
         if (this.listItems) {
             this.trListSortable = new Sortable({
                 ondragstart: this.onTransDragStart.bind(this),
                 oninsertat: this.onTransPosChanged.bind(this),
-                container: 'tritems',
+                container: this.listItems,
                 group: 'transactions',
                 selector: '.trans-list__item-wrapper',
                 placeholderClass: 'trans-list__item-placeholder',
                 copyWidth: true,
-                table: (this.props.filterObj.mode === 'details'),
+                table: (this.state.mode === 'details'),
             });
 
             /**
@@ -134,10 +173,36 @@ class TransactionListView extends View {
             this.listItems.addEventListener('click', this.onTransClick.bind(this));
         }
 
+        const paginatorElems = document.querySelectorAll('.paginator');
+        if (paginatorElems.length !== 2) {
+            throw new Error('Failed to initialize Transaction List view');
+        }
+        const paginatorOptions = {
+            onChange: (page) => this.onChangePage(page),
+        };
+
+        this.topPaginator = Paginator.fromElement(paginatorElems[0], paginatorOptions);
+        this.bottomPaginator = Paginator.fromElement(paginatorElems[1], paginatorOptions);
+
         this.toolbar = Toolbar.create({
             elem: 'toolbar',
             ondelete: () => this.confirmDelete(),
         });
+
+        this.render(this.state);
+    }
+
+    /** Set loading state and render view */
+    startLoading() {
+        this.state.loading = true;
+        this.render(this.state);
+    }
+
+    /** Remove loading state and render view */
+    stopLoading() {
+        this.state.loading = false;
+        this.state.renderTime = Date.now();
+        this.render(this.state);
     }
 
     /**
@@ -145,7 +210,7 @@ class TransactionListView extends View {
      * @param {number} transactionId - identifier of transaction
      */
     getTransaction(transactionId) {
-        return this.props.transArr.find((item) => item && item.id === transactionId);
+        return this.state.items.find((item) => item && item.id === transactionId);
     }
 
     /**
@@ -168,8 +233,8 @@ class TransactionListView extends View {
             return true;
         }
 
-        this.props.transArr.sort(posCompare);
-        this.props.transArr.forEach((transaction) => {
+        this.state.items.sort(posCompare);
+        this.state.items.forEach((transaction) => {
             const tr = transaction;
             if (tr.id === transactionId) {
                 tr.pos = pos;
@@ -199,11 +264,11 @@ class TransactionListView extends View {
             }
         });
 
-        // Sort array of  transaction by position again
-        this.props.transArr.sort(posCompare);
+        // Sort array of transaction by position again
+        this.state.items.sort(posCompare);
 
-        if (this.props.filterObj.mode === 'details') {
-            this.props.transArr.forEach((transaction) => {
+        if (this.state.mode === 'details') {
+            this.state.items.forEach((transaction) => {
                 const tr = transaction;
                 const srcBalance = (tr.src_id !== 0 && tBalanceArr[tr.src_id] !== undefined)
                     ? tBalanceArr[tr.src_id]
@@ -281,11 +346,13 @@ class TransactionListView extends View {
 
         removeChilds(transBalanceItem);
 
+        const currencyModel = window.app.model.currency;
+
         if (tr.type === EXPENSE
             || tr.type === TRANSFER
             || (tr.type === DEBT && tr.src_id !== 0)) {
             const balSpan = ce('span');
-            balSpan.textContent = this.model.currency.formatCurrency(
+            balSpan.textContent = currencyModel.formatCurrency(
                 tr.src_result,
                 tr.src_curr,
             );
@@ -296,7 +363,7 @@ class TransactionListView extends View {
             || tr.type === TRANSFER
             || (tr.type === DEBT && tr.dest_id !== 0)) {
             const balSpan = ce('span');
-            balSpan.textContent = this.model.currency.formatCurrency(
+            balSpan.textContent = currencyModel.formatCurrency(
                 tr.dest_result,
                 tr.dest_curr,
             );
@@ -328,25 +395,13 @@ class TransactionListView extends View {
             return;
         }
 
-        if (this.model.selection.isSelected(transactionId)) {
-            this.model.selection.deselect(transactionId);
-            listItemElem.classList.remove('trans-list__item_selected');
+        if (this.state.selectedItems.isSelected(transactionId)) {
+            this.state.selectedItems.deselect(transactionId);
         } else {
-            this.model.selection.select(transactionId);
-            listItemElem.classList.add('trans-list__item_selected');
+            this.state.selectedItems.select(transactionId);
         }
 
-        this.toolbar.updateBtn.show(this.model.selection.count() === 1);
-        this.toolbar.deleteBtn.show(this.model.selection.count() > 0);
-
-        const selArr = this.model.selection.getIdArray();
-        this.delTransInp.value = selArr.join();
-
-        if (this.model.selection.count() === 1) {
-            this.toolbar.updateBtn.setURL(`${baseURL}transactions/edit/${selArr[0]}`);
-        }
-
-        this.toolbar.show(this.model.selection.count() > 0);
+        this.render(this.state);
     }
 
     /**
@@ -426,7 +481,7 @@ class TransactionListView extends View {
      * @param {Element} elem - element to start looking from
      */
     findListItemElement(elem) {
-        const selector = (this.props.filterObj.mode === 'details') ? 'tr' : '.trans-list__item';
+        const selector = (this.state.mode === 'details') ? 'tr' : '.trans-list__item';
 
         if (!elem) {
             return null;
@@ -489,9 +544,7 @@ class TransactionListView extends View {
      */
     buildAddress() {
         let newLocation = `${baseURL}transactions/`;
-        const locFilter = {};
-
-        setParam(locFilter, this.props.filterObj);
+        const locFilter = { ...this.state.filter };
 
         if ('type' in locFilter) {
             if (!Array.isArray(locFilter.type)) {
@@ -521,32 +574,11 @@ class TransactionListView extends View {
     }
 
     /**
-     * Transaction type checkbox click event handler
-     * @param {Event} e - click event object
+     * Transaction type menu change event handler
      */
-    onToggleTransType(e) {
-        const itemElem = e.target.closest('.trtype-menu__item');
-        if (!itemElem || !itemElem.dataset) {
-            return;
-        }
-
-        const selectedType = parseInt(itemElem.dataset.type, 10);
-
-        if (!('type' in this.props.filterObj)) {
-            this.props.filterObj.type = [];
-        }
-        if (!Array.isArray(this.props.filterObj.type)) {
-            this.props.filterObj.type = [this.props.filterObj.type];
-        }
-
-        const ind = this.props.filterObj.type.indexOf(selectedType);
-        if (ind === -1) {
-            this.props.filterObj.type.push(selectedType);
-        } else {
-            this.props.filterObj.type.splice(ind, 1);
-        }
-
-        window.location = this.buildAddress();
+    onChangeTypeFilter(selected) {
+        this.state.filter.type = selected;
+        this.requestTransactions(this.state.filter);
     }
 
     /**
@@ -560,14 +592,14 @@ class TransactionListView extends View {
             const id = parseInt(item.id, 10);
 
             return (
-                !this.props.filterObj.acc_id
-                || !this.props.filterObj.acc_id.includes(id)
+                !this.state.filter.acc_id
+                || !this.state.filter.acc_id.includes(id)
             );
         });
 
         // Check all currenlty selected accounts present in the new selection
         if (!reloadNeeded) {
-            reloadNeeded = this.props.filterObj.acc_id.some(
+            reloadNeeded = this.state.filter.acc_id.some(
                 (accountId) => !data.find((item) => item.id === accountId),
             );
         }
@@ -577,15 +609,8 @@ class TransactionListView extends View {
         }
 
         // Prepare parameters
-        this.props.filterObj.acc_id = data.map((item) => parseInt(item.id, 10));
-
-        // Clear page number because list of transactions guaranteed to change
-        // on change accounts filter
-        if ('page' in this.props.filterObj) {
-            delete this.props.filterObj.page;
-        }
-
-        window.location = this.buildAddress();
+        this.state.filter.acc_id = data.map((item) => parseInt(item.id, 10));
+        this.requestTransactions(this.state.filter);
     }
 
     /**
@@ -600,30 +625,35 @@ class TransactionListView extends View {
         }
 
         if (this.searchInp.value.length) {
-            this.props.filterObj.search = this.searchInp.value;
-        } else if ('search' in this.props.filterObj) {
-            delete this.props.filterObj.search;
+            this.state.filter.search = this.searchInp.value;
+        } else if ('search' in this.state.filter) {
+            delete this.state.filter.search;
         }
 
-        // Clear page number because list of transactions guaranteed to change
-        // on change search query
-        if ('page' in this.props.filterObj) {
-            delete this.props.filterObj.page;
+        this.requestTransactions(this.state.filter);
+    }
+
+    /**
+     * Clear search query
+     */
+    onSearchClear() {
+        if (!('search' in this.state.filter)) {
+            return;
         }
 
-        window.location = this.buildAddress();
+        delete this.state.filter.search;
+        this.requestTransactions(this.state.filter);
     }
 
     /**
      * Create and show transaction delete warning popup
      */
     confirmDelete() {
-        const multi = (this.model.selection.count() > 1);
-
-        if (this.model.selection.count() === 0) {
+        if (this.state.selectedItems.count() === 0) {
             return;
         }
 
+        const multi = (this.state.selectedItems.count() > 1);
         ConfirmDialog.create({
             id: 'delete_warning',
             title: (multi) ? multiTransDeleteTitle : singleTransDeleteTitle,
@@ -643,8 +673,8 @@ class TransactionListView extends View {
 
         this.model.selDateRange = range;
         this.datePicker.hide();
-        const start = DatePicker.format(range.start);
-        const end = DatePicker.format(range.end);
+        const start = formatDate(range.start);
+        const end = formatDate(range.end);
 
         this.dateInput.value = `${start} - ${end}`;
     }
@@ -657,23 +687,31 @@ class TransactionListView extends View {
             return;
         }
 
-        const newStartDate = DatePicker.format(this.model.selDateRange.start);
-        const newEndDate = DatePicker.format(this.model.selDateRange.end);
+        const newStartDate = formatDate(this.model.selDateRange.start);
+        const newEndDate = formatDate(this.model.selDateRange.end);
 
-        if (this.props.filterObj.stdate === newStartDate
-            && this.props.filterObj.enddate === newEndDate) {
+        if (this.state.filter.stdate === newStartDate
+            && this.state.filter.enddate === newEndDate) {
             return;
         }
 
-        this.props.filterObj.stdate = newStartDate;
-        this.props.filterObj.enddate = newEndDate;
+        this.state.filter.stdate = newStartDate;
+        this.state.filter.enddate = newEndDate;
 
-        // Clear page number because list of transactions guaranteed to change on change date range
-        if ('page' in this.props.filterObj) {
-            delete this.props.filterObj.page;
+        this.requestTransactions(this.state.filter);
+    }
+
+    /**
+     * Clear date range query
+     */
+    onDateClear() {
+        if (!('stdate' in this.state.filter) && !('enddate' in this.state.filter)) {
+            return;
         }
 
-        window.location = this.buildAddress();
+        delete this.state.filter.stdate;
+        delete this.state.filter.enddate;
+        this.requestTransactions(this.state.filter);
     }
 
     /**
@@ -684,6 +722,7 @@ class TransactionListView extends View {
             this.datePicker = DatePicker.create({
                 wrapper: this.datePickerWrapper,
                 relparent: this.datePickerWrapper.parentNode,
+                locales: 'en',
                 range: true,
                 onrangeselect: (range) => this.onRangeSelect(range),
                 onhide: () => this.onDatePickerHide(),
@@ -703,6 +742,151 @@ class TransactionListView extends View {
             this.datePickerBtn.elem,
             this.dateInputBtn,
         ]);
+    }
+
+    onChangePage(page) {
+        this.requestTransactions({
+            ...this.state.filter,
+            page,
+        });
+    }
+
+    onModeChanged(mode) {
+        this.state.mode = mode;
+        this.state.renderTime = Date.now();
+        this.render(this.state);
+    }
+
+    requestTransactions(options) {
+        const reqOptions = {
+            ...options,
+            order: 'desc',
+        };
+        const apiReq = `${baseURL}api/transaction/list?${urlJoin(reqOptions)}`;
+
+        this.startLoading();
+
+        ajax.get({
+            url: apiReq,
+            headers: { 'Content-Type': 'application/json' },
+            callback: (resp) => this.onTransactionsCallback(resp),
+        });
+    }
+
+    onTransactionsCallback(response) {
+        const res = JSON.parse(response);
+        if (!res || res.result !== 'ok') {
+            return;
+        }
+
+        this.state.selectedItems.clear();
+        this.state.items = [...res.data.items];
+        this.state.pagination = { ...res.data.pagination };
+        this.state.filter = { ...res.data.filter };
+
+        const url = new URL(this.buildAddress());
+        url.searchParams.set('page', this.state.pagination.page);
+        if (this.state.mode === 'details') {
+            url.searchParams.set('mode', 'details');
+        } else {
+            url.searchParams.delete('mode');
+        }
+        window.history.replaceState({}, 'Jezve Money | Transactions', url);
+
+        this.stopLoading();
+    }
+
+    render(state) {
+        if (state.loading) {
+            show(this.loadingIndicator, true);
+        }
+
+        const filterUrl = new URL(this.buildAddress());
+        filterUrl.searchParams.delete('page');
+        if (state.mode === 'details') {
+            filterUrl.searchParams.set('mode', 'details');
+        } else {
+            filterUrl.searchParams.delete('mode');
+        }
+
+        this.typeMenu.setURL(filterUrl);
+
+        const elems = state.items.map((item) => {
+            const tritem = TransactionListItem.create({
+                mode: state.mode,
+                selected: state.selectedItems.isSelected(item.id),
+                item,
+            });
+            tritem.render(tritem.state);
+            return tritem.elem;
+        });
+
+        removeChilds(this.listItems);
+        if (elems.length) {
+            const itemsContainer = (state.mode === 'details')
+                ? ce('table', { className: 'trans-list-items' }, elems)
+                : ce('div', { className: 'trans-list-items' }, elems);
+
+            this.listItems.appendChild(itemsContainer);
+            if (state.mode === 'details') {
+                this.listItems.classList.add('trans-list_details');
+            } else {
+                this.listItems.classList.remove('trans-list_details');
+            }
+        } else {
+            this.listItems.appendChild(ce('span', {
+                className: 'nodata-message',
+                textContent: 'No transactions found.',
+            }));
+        }
+        this.listItems.dataset.time = state.renderTime;
+
+        if (this.topPaginator && this.bottomPaginator) {
+            this.topPaginator.show(elems.length > 0);
+            this.topPaginator.setURL(filterUrl);
+            this.topPaginator.setPagesCount(state.pagination.pagesCount);
+            this.topPaginator.setPage(state.pagination.page);
+
+            this.bottomPaginator.show(elems.length > 0);
+            this.bottomPaginator.setURL(filterUrl);
+            this.bottomPaginator.setPagesCount(state.pagination.pagesCount);
+            this.bottomPaginator.setPage(state.pagination.page);
+        }
+
+        this.modeSelector.show(elems.length > 0);
+        this.modeSelector.setMode(state.mode);
+        filterUrl.searchParams.set('page', state.pagination.page);
+        this.modeSelector.setURL(filterUrl);
+
+        // Date range
+        if (this.state.filter.stdate && this.state.filter.enddate) {
+            const start = this.state.filter.stdate;
+            const end = this.state.filter.enddate;
+
+            this.dateInput.value = `${start} - ${end}`;
+        } else {
+            this.dateInput.value = '';
+        }
+
+        // Search form
+        this.searchInp.value = (this.state.filter.search) ? this.state.filter.search : '';
+
+        // toolbar
+        this.toolbar.updateBtn.show(state.selectedItems.count() === 1);
+        this.toolbar.deleteBtn.show(state.selectedItems.count() > 0);
+
+        const selArr = state.selectedItems.getIdArray();
+        this.delTransInp.value = selArr.join();
+
+        if (state.selectedItems.count() === 1) {
+            this.toolbar.updateBtn.setURL(`${baseURL}transactions/edit/${selArr[0]}`);
+        }
+
+        this.toolbar.show(state.selectedItems.count() > 0);
+
+        if (!state.loading) {
+            show(this.loadingIndicator, false);
+        }
     }
 }
 

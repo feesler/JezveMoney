@@ -1,4 +1,6 @@
-import { TestComponent, formatDate, copyObject } from 'jezve-test';
+import { copyObject } from 'jezvejs';
+import { formatDate } from 'jezvejs/DateUtils';
+import { TestComponent } from 'jezve-test';
 import { DropDown } from '../DropDown.js';
 import {
     EXPENSE,

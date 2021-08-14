@@ -2,6 +2,7 @@ import 'jezvejs/style';
 import {
     ge,
     ce,
+    setEvents,
     isObject,
     isFunction,
     isInt,
@@ -85,241 +86,246 @@ function verifyObject(obj, expected, optional) {
 }
 
 /** Verify object is create result */
-function isCreateResult(obj) {
-    return verifyObject(obj, { id: isInt });
-}
+const isCreateResult = (obj) => verifyObject(obj, { id: isInt });
 
 /** Verify object is string */
-function isString(obj) {
-    return (typeof obj === 'string');
-}
+const isString = (obj) => (typeof obj === 'string');
 
 /**
- * Verify object is array and each item of it pass verification
+ * Returns function to verify object is array and each item of it pass verification
  * @param {Object} data - object to verify
  * @param {Function} verifyFunc - item verification callback
  */
-function isArrayOf(data, verifyFunc) {
-    if (!Array.isArray(data) || !isFunction(verifyFunc)) {
-        return false;
+const isArrayOf = (verifyFunc) => {
+    if (!isFunction(verifyFunc)) {
+        throw new Error('Invalid verify function');
     }
 
-    return data.every(verifyFunc);
-}
+    return (obj) => Array.isArray(obj) && obj.every(verifyFunc);
+};
+
+
+/** Verify object is array of integers */
+const isIntArray = isArrayOf(isInt);
 
 /** Verify object is date string in DD.MM.YYYY format */
-function isDateString(obj) {
-    return checkDate(obj);
-}
+const isDateString = (obj) => checkDate(obj);
 
 /** Verify object is account */
-function isAccount(obj) {
-    return verifyObject(obj, {
-        id: isInt,
-        owner_id: isInt,
-        curr_id: isInt,
-        balance: isNum,
-        initbalance: isNum,
-        name: isString,
-        icon_id: isInt,
-        flags: isInt,
-    }, {
-        user_id: isInt,
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isAccount = (obj) => verifyObject(obj, {
+    id: isInt,
+    owner_id: isInt,
+    curr_id: isInt,
+    balance: isNum,
+    initbalance: isNum,
+    name: isString,
+    icon_id: isInt,
+    flags: isInt,
+}, {
+    user_id: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
 
 /** Verify object is array of accounts */
-function isAccountsArray(obj) { return isArrayOf(obj, isAccount); }
+const isAccountsArray = isArrayOf(isAccount);
 
 /** Verify object is transaction */
-function isTransaction(obj) {
-    return verifyObject(obj, {
-        id: isInt,
-        type: isInt,
-        src_id: isInt,
-        dest_id: isInt,
-        src_amount: isNum,
-        dest_amount: isNum,
-        src_curr: isInt,
-        dest_curr: isInt,
-        src_result: isNum,
-        dest_result: isNum,
-        date: isDateString,
-        comment: isString,
-        pos: isInt,
-    }, {
-        user_id: isInt,
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isTransaction = (obj) => verifyObject(obj, {
+    id: isInt,
+    type: isInt,
+    src_id: isInt,
+    dest_id: isInt,
+    src_amount: isNum,
+    dest_amount: isNum,
+    src_curr: isInt,
+    dest_curr: isInt,
+    src_result: isNum,
+    dest_result: isNum,
+    date: isDateString,
+    comment: isString,
+    pos: isInt,
+}, {
+    user_id: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
+
+/** Verify object is transactions filter */
+const isTransactionsFilter = (obj) => verifyObject(obj, {}, {
+    type: isIntArray,
+    accounts: isIntArray,
+    stdate: isString,
+    enddate: isString,
+    search: isString,
+});
 
 /** Verify object is array of transactions */
-function isTransactionsArray(obj) { return isArrayOf(obj, isTransaction); }
+const isTransactionsArray = isArrayOf(isTransaction);
+
+/** Verify object is list paginator */
+const isPaginator = (obj) => verifyObject(obj, {
+    total: isInt,
+    onPage: isInt,
+    pagesCount: isInt,
+    page: isInt,
+});
+
+/** Verify object is transactions list response */
+const isTransactionsList = (obj) => verifyObject(obj, {
+    items: isTransactionsArray,
+    filter: isTransactionsFilter,
+    paginator: isPaginator,
+}, {
+    user_id: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
 
 /** Verify object is import template */
-function isTemplateColumns(obj) {
-    return verifyObject(obj, {
-        accountAmount: isInt,
-        accountCurrency: isInt,
-        transactionAmount: isInt,
-        transactionCurrency: isInt,
-        date: isInt,
-        comment: isInt,
-    });
-}
+const isTemplateColumns = (obj) => verifyObject(obj, {
+    accountAmount: isInt,
+    accountCurrency: isInt,
+    transactionAmount: isInt,
+    transactionCurrency: isInt,
+    date: isInt,
+    comment: isInt,
+});
 
 /** Verify object is import template */
-function isTemplate(obj) {
-    return verifyObject(obj, {
-        id: isInt,
-        name: isString,
-        type_id: isInt,
-        columns: isTemplateColumns,
-    }, {
-        user_id: isInt,
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isTemplate = (obj) => verifyObject(obj, {
+    id: isInt,
+    name: isString,
+    type_id: isInt,
+    columns: isTemplateColumns,
+}, {
+    user_id: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
 
 /** Verify object is array of import templates */
-function isTemplatesArray(obj) { return isArrayOf(obj, isTemplate); }
+const isTemplatesArray = isArrayOf(isTemplate);
 
 /** Verify object is import condition */
-function isImportCondition(obj) {
-    return verifyObject(obj, {
-        id: isInt,
-        rule_id: isInt,
-        field_id: isInt,
-        operator: isInt,
-        value: isString,
-        flags: isInt,
-    }, {
-        user_id: isInt,
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isImportCondition = (obj) => verifyObject(obj, {
+    id: isInt,
+    rule_id: isInt,
+    field_id: isInt,
+    operator: isInt,
+    value: isString,
+    flags: isInt,
+}, {
+    user_id: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
 
 /** Verify object is array of import conditions */
-function isConditionsArray(obj) { return isArrayOf(obj, isImportCondition); }
+const isConditionsArray = isArrayOf(isImportCondition);
 
 /** Verify object is import action */
-function isImportAction(obj) {
-    return verifyObject(obj, {
-        id: isInt,
-        rule_id: isInt,
-        action_id: isInt,
-        value: isString,
-    }, {
-        user_id: isInt,
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isImportAction = (obj) => verifyObject(obj, {
+    id: isInt,
+    rule_id: isInt,
+    action_id: isInt,
+    value: isString,
+}, {
+    user_id: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
 
 /** Verify object is array of import conditions */
-function isActionsArray(obj) { return isArrayOf(obj, isImportAction); }
+const isActionsArray = isArrayOf(isImportAction);
 
 /** Verify object is import rule */
-function isImportRule(obj) {
-    return verifyObject(obj, {
-        id: isInt,
-        flags: isInt,
-    }, {
-        user_id: isInt,
-        actions: isActionsArray,
-        conditions: isConditionsArray,
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isImportRule = (obj) => verifyObject(obj, {
+    id: isInt,
+    flags: isInt,
+}, {
+    user_id: isInt,
+    actions: isActionsArray,
+    conditions: isConditionsArray,
+    createdate: isInt,
+    updatedate: isInt,
+});
 
 /** Verify object is array of import templates */
-function isImportRulesArray(obj) { return isArrayOf(obj, isImportRule); }
+const isImportRulesArray = isArrayOf(isImportRule);
 
 /** Verify object is currency */
-function isCurrency(obj) {
-    return verifyObject(obj, {
-        id: isInt,
-        name: isString,
-        sign: isString,
-        flags: isInt,
-    }, {
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isCurrency = (obj) => verifyObject(obj, {
+    id: isInt,
+    name: isString,
+    sign: isString,
+    flags: isInt,
+}, {
+    createdate: isInt,
+    updatedate: isInt,
+});
 
 /** Verify object is array of currencies */
-function isCurrenciesArray(obj) { return isArrayOf(obj, isCurrency); }
+const isCurrenciesArray = isArrayOf(isCurrency);
 
 /** Verify object is icon */
-function isIcon(obj) {
-    return verifyObject(obj, {
-        id: isInt,
-        name: isString,
-        file: isString,
-        type: isInt,
-    }, {
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isIcon = (obj) => verifyObject(obj, {
+    id: isInt,
+    name: isString,
+    file: isString,
+    type: isInt,
+}, {
+    createdate: isInt,
+    updatedate: isInt,
+});
+
 
 /** Verify object is array of icons */
-function isIconsArray(obj) { return isArrayOf(obj, isIcon); }
+const isIconsArray = isArrayOf(isIcon);
 
 /** Verify object is account of person */
-function isPersonAccount(obj) {
-    return verifyObject(obj, {
-        id: isInt,
-        curr_id: isInt,
-        balance: isNum,
-    }, {
-        owner_id: isInt,
-        initbalance: isNum,
-        name: isString,
-        icon: isInt,
-        flags: isInt,
-        user_id: isInt,
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isPersonAccount = (obj) => verifyObject(obj, {
+    id: isInt,
+    curr_id: isInt,
+    balance: isNum,
+}, {
+    owner_id: isInt,
+    initbalance: isNum,
+    name: isString,
+    icon: isInt,
+    flags: isInt,
+    user_id: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
 
 /** Verify object is array of accounts of person */
-function isPersonAccountsArray(obj) { return isArrayOf(obj, isPersonAccount); }
+const isPersonAccountsArray = isArrayOf(isPersonAccount);
 
 /** Verify object is person */
-function isPerson(obj) {
-    return verifyObject(obj, {
-        id: isInt,
-        name: isString,
-        flags: isInt,
-    }, {
-        accounts: isPersonAccountsArray,
-        user_id: isInt,
-        createdate: isInt,
-        updatedate: isInt,
-    });
-}
+const isPerson = (obj) => verifyObject(obj, {
+    id: isInt,
+    name: isString,
+    flags: isInt,
+}, {
+    accounts: isPersonAccountsArray,
+    user_id: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
+
 
 /** Verify object is array of persons */
-function isPersonsArray(obj) { return isArrayOf(obj, isPerson); }
+const isPersonsArray = isArrayOf(isPerson);
 
 /** Verify object is profile */
-function isProfile(obj) {
-    return verifyObject(obj, {
-        login: isString,
-        user_id: isInt,
-        owner_id: isInt,
-        name: isString,
-    });
-}
+const isProfile = (obj) => verifyObject(obj, {
+    login: isString,
+    user_id: isInt,
+    owner_id: isInt,
+    name: isString,
+});
+
 
 /**
  * Admin currecny list view
@@ -343,7 +349,7 @@ class AdminApiConsoleView extends AdminView {
         if (!this.controllersList) {
             throw new Error('Fail to init view');
         }
-        this.controllersList.addEventListener('click', this.onContrClick.bind(this));
+        this.controllersList.addEventListener('click', (e) => this.onContrClick(e));
 
         this.activeForm = document.querySelector('.request-data-form.active');
         this.activeController = document.querySelector('#controllersList > li.active');
@@ -355,7 +361,7 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Fail to init view');
         }
 
-        this.clearResultsBtn.addEventListener('click', this.clearResults.bind(this));
+        this.clearResultsBtn.addEventListener('click', () => this.clearResults());
 
         this.initCommonForms();
         this.initAccountForms();
@@ -371,13 +377,19 @@ class AdminApiConsoleView extends AdminView {
         this.initProfileForms();
     }
 
+    /** Initialization of checkboxes of specified form */
+    initCheckboxed(form) {
+        const checkboxes = Array.from(form.querySelectorAll('input[type="checkbox"]'));
+        checkboxes.forEach((elem) => setEvents(elem, { change: (e) => this.onCheck(e) }));
+    }
+
     /** Initialization of forms for State API controller */
     initCommonForms() {
         const readStateForm = document.querySelector('#readStateForm > form');
         if (!readStateForm) {
             throw new Error('Fail to init view');
         }
-        readStateForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        readStateForm.addEventListener('submit', (e) => this.onFormSubmit(e));
     }
 
     /** Initialization of forms for Account API controller */
@@ -387,10 +399,7 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Fail to init view');
         }
         listAccForm.addEventListener('submit', this.getVerifyHandler(isAccountsArray));
-
-        let checkboxes = listAccForm.querySelectorAll('input[type="checkbox"]');
-        checkboxes = Array.from(checkboxes);
-        checkboxes.forEach((elem) => elem.addEventListener('change', this.onCheck.bind(this)));
+        this.initCheckboxed(listAccForm);
 
         const readaccbtn = ge('readaccbtn');
         if (!readaccbtn) {
@@ -411,7 +420,7 @@ class AdminApiConsoleView extends AdminView {
         if (!updateAccForm) {
             throw new Error('Fail to init view');
         }
-        updateAccForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        updateAccForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const delaccbtn = ge('delaccbtn');
         if (!delaccbtn) {
@@ -426,7 +435,7 @@ class AdminApiConsoleView extends AdminView {
         if (!resetAccForm) {
             throw new Error('Fail to init view');
         }
-        resetAccForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        resetAccForm.addEventListener('submit', (e) => this.onFormSubmit(e));
     }
 
     /** Initialization of forms for Person API controller */
@@ -436,10 +445,7 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Fail to init view');
         }
         listPersonsForm.addEventListener('submit', this.getVerifyHandler(isPersonsArray));
-
-        let checkboxes = listPersonsForm.querySelectorAll('input[type="checkbox"]');
-        checkboxes = Array.from(checkboxes);
-        checkboxes.forEach((elem) => elem.addEventListener('change', this.onCheck.bind(this)));
+        this.initCheckboxed(listPersonsForm);
 
         const readpersonbtn = ge('readpersonbtn');
         if (!readpersonbtn) {
@@ -460,7 +466,7 @@ class AdminApiConsoleView extends AdminView {
         if (!updatePersonForm) {
             throw new Error('Fail to init view');
         }
-        updatePersonForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        updatePersonForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const delpersonbtn = ge('delpersonbtn');
         if (!delpersonbtn) {
@@ -478,11 +484,8 @@ class AdminApiConsoleView extends AdminView {
         if (!listTrForm) {
             throw new Error('Fail to init view');
         }
-        listTrForm.addEventListener('submit', this.onListTransactionSubmit.bind(this));
-
-        let checkboxes = listTrForm.querySelectorAll('input[type="checkbox"]');
-        checkboxes = Array.from(checkboxes);
-        checkboxes.forEach((elem) => elem.addEventListener('change', this.onCheck.bind(this)));
+        listTrForm.addEventListener('submit', (e) => this.onListTransactionSubmit(e));
+        this.initCheckboxed(listTrForm);
 
         const readtransbtn = ge('readtransbtn');
         if (!readtransbtn) {
@@ -509,13 +512,13 @@ class AdminApiConsoleView extends AdminView {
         if (!updateTrForm) {
             throw new Error('Fail to init view');
         }
-        updateTrForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        updateTrForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const updateDebtForm = document.querySelector('#updateDebtForm > form');
         if (!updateDebtForm) {
             throw new Error('Fail to init view');
         }
-        updateDebtForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        updateDebtForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const deltransbtn = ge('deltransbtn');
         if (!deltransbtn) {
@@ -530,7 +533,7 @@ class AdminApiConsoleView extends AdminView {
         if (!setTrPosForm) {
             throw new Error('Fail to init view');
         }
-        setTrPosForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        setTrPosForm.addEventListener('submit', (e) => this.onFormSubmit(e));
     }
 
     /** Initialization of forms for Import template API controller */
@@ -560,7 +563,7 @@ class AdminApiConsoleView extends AdminView {
         if (!updateForm) {
             throw new Error('Fail to init view');
         }
-        updateForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        updateForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const delBtn = ge('deltplbtn');
         if (!delBtn) {
@@ -599,7 +602,7 @@ class AdminApiConsoleView extends AdminView {
         if (!updateForm) {
             throw new Error('Fail to init view');
         }
-        updateForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        updateForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const delBtn = ge('delrulebtn');
         if (!delBtn) {
@@ -618,10 +621,7 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Fail to init view');
         }
         listForm.addEventListener('submit', this.getVerifyHandler(isConditionsArray));
-
-        let checkboxes = listForm.querySelectorAll('input[type="checkbox"]');
-        checkboxes = Array.from(checkboxes);
-        checkboxes.forEach((elem) => elem.addEventListener('change', this.onCheck.bind(this)));
+        this.initCheckboxed(listForm);
 
         const readBtn = ge('readcondbtn');
         if (!readBtn) {
@@ -642,7 +642,7 @@ class AdminApiConsoleView extends AdminView {
         if (!updateForm) {
             throw new Error('Fail to init view');
         }
-        updateForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        updateForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const delBtn = ge('delcondbtn');
         if (!delBtn) {
@@ -661,10 +661,7 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Fail to init view');
         }
         listForm.addEventListener('submit', this.getVerifyHandler(isActionsArray));
-
-        let checkboxes = listForm.querySelectorAll('input[type="checkbox"]');
-        checkboxes = Array.from(checkboxes);
-        checkboxes.forEach((elem) => elem.addEventListener('change', this.onCheck.bind(this)));
+        this.initCheckboxed(listForm);
 
         const readBtn = ge('readactbtn');
         if (!readBtn) {
@@ -685,7 +682,7 @@ class AdminApiConsoleView extends AdminView {
         if (!updateForm) {
             throw new Error('Fail to init view');
         }
-        updateForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        updateForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const delBtn = ge('delactbtn');
         if (!delBtn) {
@@ -724,7 +721,7 @@ class AdminApiConsoleView extends AdminView {
         if (!updateCurrForm) {
             throw new Error('Fail to init view');
         }
-        updateCurrForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        updateCurrForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const delCurrBtn = ge('delcurrbtn');
         if (!delCurrBtn) {
@@ -763,7 +760,7 @@ class AdminApiConsoleView extends AdminView {
         if (!updateIconForm) {
             throw new Error('Fail to init view');
         }
-        updateIconForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        updateIconForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const delIconBtn = ge('deliconbtn');
         if (!delIconBtn) {
@@ -781,19 +778,19 @@ class AdminApiConsoleView extends AdminView {
         if (!loginForm) {
             throw new Error('Fail to init view');
         }
-        loginForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        loginForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const logoutForm = document.querySelector('#logoutForm > form');
         if (!logoutForm) {
             throw new Error('Fail to init view');
         }
-        logoutForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        logoutForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const registerForm = document.querySelector('#registerForm > form');
         if (!registerForm) {
             throw new Error('Fail to init view');
         }
-        registerForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        registerForm.addEventListener('submit', (e) => this.onFormSubmit(e));
     }
 
     /** Initialization of forms for Profile API controller */
@@ -808,19 +805,19 @@ class AdminApiConsoleView extends AdminView {
         if (!changeNameForm) {
             throw new Error('Fail to init view');
         }
-        changeNameForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        changeNameForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const changePwdForm = document.querySelector('#changePwdForm > form');
         if (!changePwdForm) {
             throw new Error('Fail to init view');
         }
-        changePwdForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        changePwdForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         const resetAllForm = document.querySelector('#resetAllForm > form');
         if (!resetAllForm) {
             throw new Error('Fail to init view');
         }
-        resetAllForm.addEventListener('submit', this.onFormSubmit.bind(this));
+        resetAllForm.addEventListener('submit', (e) => this.onFormSubmit(e));
     }
 
     /**
@@ -1221,7 +1218,7 @@ class AdminApiConsoleView extends AdminView {
         this.apiGet({
             method: 'transaction/list',
             data: frmData,
-            verify: isTransactionsArray,
+            verify: isTransactionsList,
         });
 
         return false;

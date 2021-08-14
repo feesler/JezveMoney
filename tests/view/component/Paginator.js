@@ -11,25 +11,24 @@ export class Paginator extends TestComponent {
 
         let ellipsisBefore = false;
         let prevPageItem = null;
-        const elems = await this.queryAll(this.elem, ':scope > span');
+        const elems = await this.queryAll(this.elem, '.paginator-item');
         if (elems.length === 1) {
             throw new Error('Single item paginator control');
         }
 
         for (const itemElem of elems) {
-            const childElem = await this.query(itemElem, ':scope > *');
+            const isArrow = await this.hasClass(this.elem, 'paginator-arrow');
+            if (isArrow) {
+                continue;
+            }
 
-            // Check element with no child contain ellipsis and skip
-            if (!childElem) {
-                if (await this.prop(itemElem, 'textContent') !== '...') {
-                    throw new Error('Unexpected paginator item');
-                }
-
-                /**
-                Check ellipsis is between two page number items:
-                - ellipsis can't be first item
-                - ellipsis can't follow after ellipsis
-                 */
+            /*
+            Check ellipsis is between two page number items:
+            - ellipsis can't be first item
+            - ellipsis can't follow after ellipsis
+            */
+            const text = await this.prop(itemElem, 'textContent');
+            if (text === '...') {
                 if (!this.items.length || ellipsisBefore || !prevPageItem) {
                     throw new Error('Unexpected placement of paginator ellipsis');
                 }
@@ -39,25 +38,21 @@ export class Paginator extends TestComponent {
             }
 
             const item = { elem: itemElem };
+            item.isActive = await this.hasClass(itemElem, 'paginator-item__active');
 
-            const tagName = await this.prop(childElem, 'tagName');
+            const tagName = await this.prop(itemElem, 'tagName');
             if (tagName === 'A') {
-                item.linkElem = childElem;
-                item.link = await this.prop(childElem, 'href');
-                item.isActive = false;
-            } else if (tagName === 'B') {
-                item.isActive = true;
-            } else {
-                throw new Error('Unexpected stucture of paginator control');
+                item.linkElem = itemElem;
+                item.link = await this.prop(itemElem, 'href');
             }
 
-            item.title = await this.prop(childElem, 'textContent');
+            item.title = await this.prop(itemElem, 'textContent');
             item.num = parseInt(item.title, 10);
             if (!item.title || Number.isNaN(item.num) || item.num < 1) {
                 throw new Error('Unexpected title of paginator item');
             }
 
-            /**
+            /*
             Check correctnes of order:
             - First item must always be 1
             - Following items must be greater than previous

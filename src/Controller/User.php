@@ -3,6 +3,7 @@
 namespace JezveMoney\App\Controller;
 
 use JezveMoney\Core\TemplateController;
+use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
 
 class User extends TemplateController
@@ -32,13 +33,15 @@ class User extends TemplateController
             $this->loginUser();
         }
 
-        $titleString = "Jezve Money | Log in";
+        $this->template = new Template(TPL_PATH . "login.tpl");
+        $data = [
+            "titleString" => "Jezve Money | Log in"
+        ];
 
         $this->cssArr[] = "LoginView.css";
-        $this->buildCSS();
         $this->jsArr[] = "LoginView.js";
 
-        include(TPL_PATH . "login.tpl");
+        $this->render($data);
     }
 
 
@@ -75,13 +78,15 @@ class User extends TemplateController
             $this->registerUser();
         }
 
-        $titleString = "Jezve Money | Registration";
+        $this->template = new Template(TPL_PATH . "register.tpl");
+        $data = [
+            "titleString" => "Jezve Money | Registration"
+        ];
 
         $this->cssArr[] = "RegisterView.css";
-        $this->buildCSS();
         $this->jsArr[] = "RegisterView.js";
 
-        include(TPL_PATH . "register.tpl");
+        $this->render($data);
     }
 
 

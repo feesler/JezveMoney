@@ -1,11 +1,11 @@
 {
   "name": "jezve-money",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "lint-php": "dev-tools/vendor/bin/phpcs --standard=PSR12 ./src/admin/Controller/ ./src/admin/index.php ./src/api/ ./src/Controller/ ./src/Model/ ./src/system/ ./src/index.php",
+    "lint-php": "dev-tools/vendor/bin/phpcs --standard=PSR12 --extensions=php ./src/",
     "all": "npm-run-all lint test build",
     "test": "node ./tests/index.js",
     "lint": "npm-run-all lint-src lint-tests lint-css lint-php",
@@ -15,7 +15,7 @@
     "debug": "node --inspect-brk ./tests/index.js",
     "build": "npx webpack --config ./webpack.prod.js",
     "build-dev": "npx webpack --config ./webpack.dev.js",
-    "copy-server": "cp \"./src/Controller\",\"./src/Model\",\"./src/system\",\"./src/api\",\"./src/.htaccess\",\"./src/index.php\",\"./src/favicon.ico\",\"./src/manifest.webmanifest\",\"./composer.json\" -Destination ./dist -Force -Recurse",
+    "copy-server": "cp \"./src/Controller\",\"./src/Model\",\"./src/Template\",\"./src/system\",\"./src/api\",\"./src/.htaccess\",\"./src/index.php\",\"./src/favicon.ico\",\"./src/manifest.webmanifest\",\"./composer.json\" -Destination ./dist -Force -Recurse",
     "copy-admin": "cp \"./src/admin/Controller\",\"./src/admin/.htaccess\",\"./src/admin/index.php\" -Destination ./dist/admin/ -Force -Recurse",
     "copy-admin-view": "cp \"./src/admin/view/templates\",\"./src/admin/view/themes\" -Destination ./dist/admin/view -Force -Recurse",
     "copy-client": "cp \"./src/view/templates\",\"./src/view/img\",\"./src/view/themes\" -Destination ./dist/view -Force -Recurse",
@@ -50,7 +50,7 @@
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-import-resolver-webpack": "^0.13.0",
     "eslint-plugin-import": "^2.22.1",
-    "jezve-test": "^0.9.4",
+    "jezve-test": "^0.11.0",
     "mini-css-extract-plugin": "^2.1.0",
     "npm-run-all": "^4.1.5",
     "postcss-cli": "^8.3.1",
@@ -66,7 +66,7 @@
   "dependencies": {
     "@babel/runtime": "^7.13.9",
     "core-js": "^3.9.1",
-    "jezvejs": "^1.0.16",
+    "jezvejs": "^1.5.7",
     "whatwg-fetch": "^3.6.2"
   }
 }

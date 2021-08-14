@@ -3,6 +3,8 @@
 namespace JezveMoney\App\Admin\Controller;
 
 use JezveMoney\Core\AdminController;
+use JezveMoney\Core\Template;
+use JezveMoney\Core\JSON;
 use JezveMoney\App\Model\ImportTemplateModel;
 
 class ImportTemplate extends AdminController
@@ -18,19 +20,20 @@ class ImportTemplate extends AdminController
 
     public function index()
     {
-        $itemsData = $this->model->getData();
-        $viewData = [
-            "data" => $itemsData
+        $this->template = new Template(ADMIN_TPL_PATH . "importtpl.tpl");
+        $data = [
+            "titleString" => "Admin panel | Import templates",
+            "itemsData" => $this->model->getData(),
         ];
 
+        $data["viewData"] = JSON::encode([
+            "data" => $data["itemsData"],
+        ]);
+
         $this->menuItems["importtpl"]["active"] = true;
-
-        $titleString = "Admin panel | Import templates";
-
         $this->cssAdmin[] = "AdminImportTplView.css";
-        $this->buildCSS();
         $this->jsAdmin[] = "AdminImportTplView.js";
 
-        include(ADMIN_TPL_PATH . "importtpl.tpl");
+        $this->render($data);
     }
 }

@@ -36,7 +36,9 @@ export class AppView extends TestView {
         this.location = await this.url();
 
         this.header = await Header.create(this, await this.query('.page > .page_wrapper > .header'));
-        this.msgPopup = await MessagePopup.create(this, await this.query('.popup__content.msg'));
+
+        const msgElem = await this.query('.popup__content.msg');
+        this.msgPopup = (msgElem) ? await MessagePopup.create(this, msgElem) : null;
         this.content = await this.parseContent();
         await this.updateModel();
     }

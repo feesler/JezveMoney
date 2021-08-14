@@ -1,7 +1,8 @@
 <?php
-    use JezveMoney\Core\JSON;
-?>
-<?php	include(TPL_PATH."commonhdr.tpl");	?>
+use JezveMoney\App\Template\TransactionList;
+use JezveMoney\App\Template\Tile;
+
+include(TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body class="<?=($this->themeClass)?>">
 <div class="page">
@@ -21,16 +22,8 @@
 <?php   if (!count($tilesArr)) {	?>
                             <span class="nodata-message">You have no one account. Please create one.</span>
 <?php	} else {
-            foreach($tilesArr as $acc_id => $tile) {    ?>
-                            <div class="tile" data-id="<?=e($acc_id)?>">
-                                <a href="<?=BASEURL?>transactions/new/?acc_id=<?=e($acc_id)?>" class="tilelink">
-                                    <span>
-                                        <span class="tile__subtitle"><?=e($tile["balance"])?></span>
-                                        <span class="tile__icon"><?=useIcon($tile["icon"], 60, 54)?></span>
-                                        <span class="tile__title"><?=e($tile["name"])?></span>
-                                    </span>
-                                </a>
-                            </div>
+            foreach($tilesArr as $tile) {    ?>
+<?=Tile::render($tile)?>
 <?php       }
         }	?>
                         </div>
@@ -61,28 +54,7 @@
                                 <div class="glyph"><?=svgIcon("glyph")?></div>
                             </a>
                         </div>
-                        <div id="trlist" class="trans-list">
-<?php	if (!count($trListData)) {	?>
-                            <span class="nodata-message">You have no one transaction yet.</span>
-<?php	} else if (!count($tilesArr)) {	?>
-                            <span class="nodata-message">You have no one account. Please create one.</span>
-<?php	} else {	?>
-<?php		foreach($trListData as $trItem) {	?>
-                            <div class="trans-list__item-wrapper">
-                                <div class="trans-list__item" data-id="<?=e($trItem["id"])?>">
-                                    <div class="trans-list__item-title"><span><?=e($trItem["acc"])?></span></div>
-                                    <div class="trans-list__item-content"><span><?=e($trItem["amount"])?></span></div>
-                                    <div class="trans-list__item-details">
-                                        <span><?=e($trItem["date"])?></span>
-<?php		if ($trItem["comment"] != "") {		?>
-                                        <span class="trans-list__item-comment"><?=e($trItem["comment"])?></span>
-<?php		}	?>
-                                    </div>
-                                </div>
-                            </div>
-<?php		}	?>
-<?php	}	?>
-                        </div>
+<?=TransactionList::render($transactionsData)?>
                     </div>
 
                     <div class="widget">
@@ -130,11 +102,6 @@
 </div>
 
 <?php	include(TPL_PATH."icons.tpl");	?>
-<script>
-window.app = {
-    chartData: <?=JSON::encode($statArr)?>
-};
-</script>
 <?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

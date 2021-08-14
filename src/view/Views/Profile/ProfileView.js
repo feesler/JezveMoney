@@ -109,9 +109,9 @@ class ProfileView extends View {
         this.changePassForm.addEventListener('submit', this.onChangePassSubmit.bind(this));
 
         if (this.props.action) {
-            if (this.props.action === 'changepass') {
+            if (this.props.action === 'changePass') {
                 this.showChangePasswordPopup();
-            } else if (this.props.action === 'changename') {
+            } else if (this.props.action === 'changeName') {
                 this.showChangeNamePopup();
             }
         }
@@ -140,7 +140,9 @@ class ProfileView extends View {
 
     // Create and show change name popup
     showChangeNamePopup(e) {
-        e.preventDefault();
+        if (e) {
+            e.preventDefault();
+        }
 
         if (!this.changeNamePopup) {
             this.changeNamePopup = Popup.create({
@@ -232,7 +234,9 @@ class ProfileView extends View {
      * Show change password popup
      */
     showChangePasswordPopup(e) {
-        e.preventDefault();
+        if (e) {
+            e.preventDefault();
+        }
 
         if (!this.changePassPopup) {
             this.changePassPopup = Popup.create({

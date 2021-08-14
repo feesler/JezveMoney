@@ -1,7 +1,9 @@
 <?php
-    use JezveMoney\Core\JSON;
-?>
-<?php	include(TPL_PATH."commonhdr.tpl");	?>
+use JezveMoney\App\Template\Tile;
+use JezveMoney\App\Template\TileInfoItem;
+use JezveMoney\App\Template\IconLink;
+
+include(TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body class="<?=($this->themeClass)?>">
 <div class="page">
@@ -13,12 +15,11 @@
                     <div class="heading">
                         <h1><?=e($headString)?></h1>
 <?php	if ($action == "edit") {	?>
-                        <div id="del_btn" class="iconlink">
-                            <button type="button">
-                                <span class="iconlink__icon"><?=svgIcon("del")?></span>
-                                <span class="iconlink__content"><span>Delete</span></span>
-                            </button>
-                        </div>
+                        <?=IconLink::render([
+                            "id" => "del_btn",
+                            "icon" => "del",
+                            "title" => "Delete"
+                        ])?>
 <?php	}	?>
                     </div>
                     <div>
@@ -45,56 +46,25 @@
                         <span class="nodata-message">You need at least two active accounts for transfer.</span>
 <?php	} else if ($action == "new" && !$acc_count && $tr["type"] != TRANSFER) {		?>
                         <span class="nodata-message">You have no one active account. Please create one.</span>
-<?php	} else if ($action == "new" && !$person_id && $tr["type"] == DEBT) {		?>
+<?php	} else if ($action == "new" && $tr["type"] == DEBT && !$tr["person_id"]) {		?>
                         <span class="nodata-message">You have no one active person. Please create one for debts.</span>
 <?php	} else {		?>
 <?php	if ($tr["type"] == DEBT) {		?>
                         <div id="person" class="account-container">
-                            <input id="person_id" name="person_id" type="hidden" value="<?=e($person_id)?>">
+                            <input id="person_id" name="person_id" type="hidden" value="<?=e($tr["person_id"])?>">
                             <div class="tile_header"><label>Person name</label></div>
                             <div class="tile-base">
                                 <div class="tile_container">
-                                    <div id="person_tile" class="tile">
-                                        <div class="tilelink">
-                                            <span>
-                                                <span class="tile__subtitle"><?=e($p_balfmt)?></span>
-                                                <span class="tile__title"><?=e($person_name)?></span>
-                                            </span>
-                                        </div>
-                                    </div>
+                                    <?=Tile::render($personTile)?>
                                 </div>
 
                                 <div class="tile-info-block">
-                                    <div id="src_amount_left" class="hidden">
-                                        <span><?=e($srcAmountLbl)?></span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtSrcAmount)?></span></button>
-                                        </div>
-                                    </div>
-<?php		if ($srcAmountCurr != $destAmountCurr) {		?>
-                                    <div id="exch_left">
+                                    <?=TileInfoItem::render($srcAmountInfo)?>
+                                    <?=TileInfoItem::render($exchangeInfo)?>
+<?php		if ($tr["debtType"]) {		?>
+                                    <?=TileInfoItem::render($srcResultInfo)?>
 <?php		} else {	?>
-                                    <div id="exch_left" class="hidden">
-<?php		}	?>
-                                        <span>Exchange rate</span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtExchange)?></span></button>
-                                        </div>
-                                    </div>
-<?php		if ($give) {		?>
-                                    <div id="src_res_balance_left">
-                                        <span>Result balance</span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtSrcResBal)?></span></button>
-                                        </div>
-                                    </div>
-<?php		} else {	?>
-                                    <div id="dest_res_balance_left">
-                                        <span>Result balance</span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtDestResBal)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($destResultInfo)?>
 <?php		}	?>
                                 </div>
                             </div>
@@ -103,55 +73,32 @@
                         <div id="source" class="account-container">
                             <div class="tile_header">
                                 <label id="acclbl"><?=e($accLbl)?></label>
-<?php		if ($noAccount) {		?>
+<?php		if ($tr["noAccount"]) {		?>
                                 <button id="noacc_btn" class="close-btn hidden" type="button"><?=svgIcon("close")?></button>
 <?php		} else {	?>
                                 <button id="noacc_btn" class="close-btn" type="button"><?=svgIcon("close")?></button>
 <?php		}	?>
                             </div>
-<?php		if ($noAccount) {		?>
+<?php		if ($tr["noAccount"]) {		?>
                             <div class="tile-base hidden">
 <?php		} else {	?>
                             <div class="tile-base">
 <?php		}	?>
                                 <div class="tile_container">
-                                    <div id="acc_tile" class="tile">
-                                        <div class="tilelink">
-                                            <span>
-                                                <span class="tile__subtitle"><?=($debtAcc->balfmt)?></span>
-                                                <span class="tile__icon"><?=useIcon($debtAcc->icon, 60, 54)?></span>
-                                                <span class="tile__title"><?=($debtAcc->name)?></span>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <input id="acc_id" name="acc_id" type="hidden" value="<?=($debtAcc->id)?>">
+                                    <?=Tile::render($debtAccountTile)?>
+                                    <input id="acc_id" name="acc_id" type="hidden" value="<?=e($acc_id)?>">
                                 </div>
 
                                 <div class="tile-info-block">
-                                    <div id="dest_amount_left" class="hidden">
-                                        <span><?=e($destAmountLbl)?></span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtDestAmount)?></span></button>
-                                        </div>
-                                    </div>
-<?php		if ($give) { 		?>
-                                    <div id="dest_res_balance_left">
-                                        <span>Result balance</span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtDestResBal)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($destAmountInfo)?>
+<?php		if ($tr["debtType"]) { 		?>
+                                    <?=TileInfoItem::render($destResultInfo)?>
 <?php		} else {		?>
-                                    <div id="src_res_balance_left">
-                                        <span>Result balance</span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtSrcResBal)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($srcResultInfo)?>
 <?php		}		?>
                                 </div>
                             </div>
-<?php		if ($noAccount) {		?>
+<?php		if ($tr["noAccount"]) {		?>
                             <div id="selaccount" class="account-toggler">
 <?php		} else {	?>
                             <div id="selaccount" class="account-toggler hidden">
@@ -165,51 +112,19 @@
                             <div class="tile_header"><label>Source account</label></div>
                             <div class="tile-base">
                                 <div class="tile_container">
-                                    <div id="source_tile" class="tile">
-                                        <div class="tilelink">
-                                            <span>
-                                                <span class="tile__subtitle"><?=($src->balfmt)?></span>
-                                                <span class="tile__icon"><?=useIcon($src->icon, 60, 54)?></span>
-                                                <span class="tile__title"><?=($src->name)?></span>
-                                            </span>
-                                        </div>
-                                    </div>
+                                    <?=Tile::render($srcAccountTile)?>
                                     <input id="src_id" name="src_id" type="hidden" value="<?=e($tr["src_id"])?>">
                                 </div>
 
                                 <div class="tile-info-block">
 <?php	if ($tr["type"] == TRANSFER) {		?>
-                                    <div id="src_amount_left" class="hidden">
-                                        <span><?=e($srcAmountLbl)?></span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtSrcAmount)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($srcAmountInfo)?>
 <?php	}	?>
 <?php	if ($tr["type"] == EXPENSE) {		?>
-                                    <div id="dest_amount_left" class="hidden">
-                                        <span><?=e($destAmountLbl)?></span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtDestAmount)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($destAmountInfo)?>
 <?php	}	?>
-                                    <div id="src_res_balance_left">
-                                        <span>Result balance</span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtSrcResBal)?></span></button>
-                                        </div>
-                                    </div>
-<?php	if (($tr["type"] == TRANSFER && $src->curr_id == $dest->curr_id) || (($tr["type"] == EXPENSE || $tr["type"] == INCOME) && $tr["src_curr"] == $tr["dest_curr"])) {		?>
-                                    <div id="exch_left" class="hidden">
-<?php	} else {	?>
-                                    <div id="exch_left">
-<?php	}	?>
-                                        <span>Exchange rate</span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtExchange)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($srcResultInfo)?>
+                                    <?=TileInfoItem::render($exchangeInfo)?>
                                 </div>
                             </div>
                         </div>
@@ -222,50 +137,19 @@
                             <div class="tile_header"><label>Destination account</label></div>
                             <div class="tile-base">
                                 <div class="tile_container">
-                                    <div id="dest_tile" class="tile">
-                                        <div class="tilelink">
-                                            <span>
-                                                <span class="tile__subtitle"><?=($dest->balfmt)?></span>
-                                                <span class="tile__icon"><?=useIcon($dest->icon, 60, 54)?></span>
-                                                <span class="tile__title"><?=($dest->name)?></span>
-                                            </span>
-                                        </div>
-                                    </div>
+                                    <?=Tile::render($destAccountTile)?>
                                     <input id="dest_id" name="dest_id" type="hidden" value="<?=e($tr["dest_id"])?>">
                                 </div>
 
                                 <div class="tile-info-block">
 <?php	if ($tr["type"] == INCOME) {		?>
-                                    <div id="src_amount_left" class="hidden">
-                                        <span><?=e($srcAmountLbl)?></span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtSrcAmount)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($srcAmountInfo)?>
 <?php	}	?>
-                                    <div id="dest_amount_left" class="hidden">
-                                        <span><?=e($destAmountLbl)?></span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtDestAmount)?></span></button>
-                                        </div>
-                                    </div>
-                                    <div id="dest_res_balance_left">
-                                        <span>Result balance</span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtDestResBal)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($destAmountInfo)?>
+                                    <?=TileInfoItem::render($destResultInfo)?>
+
 <?php	if ($tr["type"] == INCOME) {		?>
-<?php		if ($tr["src_curr"] == $tr["dest_curr"]) {		?>
-                                    <div id="exch_left" class="hidden">
-<?php		} else {		?>
-                                    <div id="exch_left">
-<?php		}				?>
-                                        <span>Exchange rate</span>
-                                        <div>
-                                            <button class="dashed-btn" type="button"><span><?=e($rtExchange)?></span></button>
-                                        </div>
-                                    </div>
+                                    <?=TileInfoItem::render($exchangeInfo)?>
 <?php	}	?>
                                 </div>
                             </div>
@@ -277,8 +161,8 @@
                         <div id="operation" class="view-row">
                             <div><label>Operation</label></div>
                             <div class="debt-op-selector">
-                                <label><input id="debtgive" name="op" type="radio" value="1"<?=($give ? " checked" : "")?>><span>give</span></label>
-                                <label><input id="debttake" name="op" type="radio" value="2"<?=($give ? "" : " checked")?>><span>take</span></label>
+                                <label><input id="debtgive" name="op" type="radio" value="1"<?=($tr["debtType"] ? " checked" : "")?>><span>give</span></label>
+                                <label><input id="debttake" name="op" type="radio" value="2"<?=($tr["debtType"] ? "" : " checked")?>><span>take</span></label>
                             </div>
                         </div>
 <?php	}	?>
@@ -374,15 +258,13 @@
                         </div>
 <?php	}	?>
                         <div class="view-row">
-                            <div id="calendar_btn" class="iconlink std_margin">
-                                <button type="button">
-                                    <span class="iconlink__icon"><?=svgIcon("cal")?></span>
-                                    <span class="iconlink__content">
-                                        <span class="iconlink__title">Change date</span>
-                                        <span class="iconlink__subtitle"><?=e($dateFmt)?></span>
-                                    </span>
-                                </button>
-                            </div>
+                            <?=IconLink::render([
+                                "id" => "calendar_btn",
+                                "classNames" => "std_margin",
+                                "icon" => "cal",
+                                "title" => "Change date",
+                                "subtitle" => $dateFmt
+                            ])?>
                             <div id="date_block" class="validation-block hidden">
                                 <div><label for="date">Date</label></div>
                                 <div class="column-container std_margin">
@@ -399,21 +281,16 @@
                         </div>
 
                         <div class="view-row">
+                            <?=IconLink::render([
+                                "id" => "comm_btn",
+                                "classNames" => "std_margin",
+                                "icon" => "plus",
+                                "title" => "Add comment",
+                                "hidden" => !is_empty($tr["comment"])
+                            ])?>
 <?php	if (is_empty($tr["comment"])) {		?>
-                            <div id="comm_btn" class="iconlink std_margin">
-                                <button type="button">
-                                    <span class="iconlink__icon"><?=svgIcon("plus")?></span>
-                                    <span class="iconlink__content"><span>Add comment</span></span>
-                                </button>
-                            </div>
                             <div id="comment_block" class="hidden">
 <?php	} else {	?>
-                            <div id="comm_btn" class="iconlink std_margin hidden">
-                                <button type="button">
-                                    <span class="iconlink__icon"><?=svgIcon("plus")?></span>
-                                    <span class="iconlink__content"><span>Add comment</span></span>
-                                </button>
-                            </div>
                             <div id="comment_block">
 <?php	}	?>
                                 <div><label for="comm">Comment</label></div>
@@ -444,19 +321,6 @@
 <?php	}	?>
 
 <?php	include(TPL_PATH."icons.tpl");	?>
-<script>
-window.app = {
-    mode: '<?=(($action == "edit") ? "update" : "create")?>',
-    profile: <?=JSON::encode($profileData)?>,
-    transaction: <?=JSON::encode($tr)?>,
-    accounts: <?=JSON::encode($accArr)?>,
-    currency: <?=JSON::encode($currArr)?>,
-    icons: <?=JSON::encode($icons)?>,
-<?php	if ($tr["type"] == DEBT) {		?>
-    persons: <?=JSON::encode($persArr)?>
-<?php	}	?>
-};
-</script>
 <?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

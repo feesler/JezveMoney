@@ -9,6 +9,7 @@ import {
     checkDate,
     insertAfter,
 } from 'jezvejs';
+import { formatDate } from 'jezvejs/DateUtils';
 import { DropDown } from 'jezvejs/DropDown';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { DecimalInput } from 'jezvejs/DecimalInput';
@@ -30,6 +31,7 @@ import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TileInfoItem } from '../../Components/TileInfoItem/TileInfoItem.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import '../../css/app.css';
+import '../../Components/TransactionTypeMenu/style.css';
 import './style.css';
 
 const singleTransDeleteTitle = 'Delete transaction';
@@ -309,23 +311,33 @@ class TransactionView extends View {
             visiblePersons.forEach(
                 (person) => this.persDDList.addItem({ id: person.id, title: person.name }),
             );
-            this.persDDList.selectItem(parseInt(this.personIdInp.value, 10));
+
+            const personId = parseInt(this.personIdInp.value, 10);
+            this.appendHiddenPerson(this.persDDList, personId);
+            this.persDDList.selectItem(personId);
 
             if (!this.model.transaction.noAccount) {
                 this.initAccList();
             }
         } else {
+            const srcId = this.model.transaction.srcAcc();
+            const destId = this.model.transaction.destAcc();
+
             this.srcDDList = DropDown.create({
                 input_id: 'source_tile',
                 listAttach: true,
                 onitemselect: this.onSrcAccSel.bind(this),
                 editable: false,
             });
+
             if (this.srcDDList) {
                 this.model.visibleUserAccounts.forEach(
                     (acc) => this.srcDDList.addItem({ id: acc.id, title: acc.name }),
                 );
-                this.srcDDList.selectItem(this.model.transaction.srcAcc());
+
+                this.appendHiddenAccount(this.srcDDList, srcId);
+                this.appendHiddenAccount(this.srcDDList, destId);
+                this.srcDDList.selectItem(srcId);
             }
 
             this.destDDList = DropDown.create({
@@ -338,7 +350,10 @@ class TransactionView extends View {
                 this.model.visibleUserAccounts.forEach(
                     (acc) => this.destDDList.addItem({ id: acc.id, title: acc.name }),
                 );
-                this.destDDList.selectItem(this.model.transaction.destAcc());
+
+                this.appendHiddenAccount(this.destDDList, srcId);
+                this.appendHiddenAccount(this.destDDList, destId);
+                this.destDDList.selectItem(destId);
             }
         }
 
@@ -372,6 +387,38 @@ class TransactionView extends View {
     }
 
     /**
+     * Check account is hidden and then append it to the end of list
+     * @param {DropDown} dropDown
+     * @param {Number} accountId
+     */
+    appendHiddenAccount(dropDown, accountId) {
+        if (!accountId) {
+            return;
+        }
+
+        const account = this.model.accounts.find((item) => item.id === accountId);
+        if (account && !account.isVisible()) {
+            dropDown.addItem({ id: account.id, title: account.name });
+        }
+    }
+
+    /**
+     * Check person is hidden and then append it to the end of list
+     * @param {DropDown} dropDown
+     * @param {Number} personId
+     */
+    appendHiddenPerson(dropDown, personId) {
+        if (!personId) {
+            return;
+        }
+
+        const person = this.model.persons.find((item) => item.id === personId);
+        if (person && !person.isVisible()) {
+            dropDown.addItem({ id: person.id, title: person.name });
+        }
+    }
+
+    /**
      * Initialize DropDown for debt account tile
      */
     initAccList() {
@@ -389,7 +436,9 @@ class TransactionView extends View {
         this.model.visibleUserAccounts.forEach(
             (acc) => this.accDDList.addItem({ id: acc.id, title: acc.name }),
         );
-        this.accDDList.selectItem(this.debtAccount.id);
+        const accountId = this.debtAccount.id;
+        this.appendHiddenAccount(this.accDDList, accountId);
+        this.accDDList.selectItem(accountId);
     }
 
     /**
@@ -401,7 +450,7 @@ class TransactionView extends View {
             return;
         }
 
-        this.dateInput.value = DatePicker.format(date);
+        this.dateInput.value = formatDate(date);
 
         this.calendarObj.hide();
     }
@@ -414,7 +463,8 @@ class TransactionView extends View {
             this.calendarObj = DatePicker.create({
                 wrapper: this.datePickerWrapper,
                 relparent: this.datePickerWrapper.parentNode,
-                ondateselect: this.onSelectDate.bind(this),
+                locales: 'en',
+                ondateselect: (d) => this.onSelectDate(d),
             });
         }
         if (!this.calendarObj) {

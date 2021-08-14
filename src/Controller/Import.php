@@ -3,6 +3,8 @@
 namespace JezveMoney\App\Controller;
 
 use JezveMoney\Core\TemplateController;
+use JezveMoney\Core\Template;
+use JezveMoney\Core\JSON;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\ImportRuleModel;
@@ -21,29 +23,32 @@ class Import extends TemplateController
 
     public function index()
     {
+        $this->template = new Template(TPL_PATH . "import.tpl");
+        $this->template->testerUser =  $this->uMod->isTester($this->user_id);
+        $data = [];
+
         $accMod = AccountModel::getInstance();
-        $accArr = $accMod->getData();
+        $data["accArr"] = $accMod->getData();
         $currMod = CurrencyModel::getInstance();
         $currArr = $currMod->getData();
         $persArr = $this->personMod->getData();
-        $impTemplates = $this->templateModel->getData();
-        $tplColumnTypes = $this->templateModel->getColumnTypes();
-        $rulesData = $this->ruleModel->getData(["extended" => true]);
+        $data["impTemplates"] = $this->templateModel->getData();
+        $data["tplColumnTypes"] = $this->templateModel->getColumnTypes();
+        $data["rulesData"] = $this->ruleModel->getData(["extended" => true]);
 
-        $viewData = [
-            "accounts" => $accArr,
+        $data["viewData"] = JSON::encode([
+            "accounts" => $data["accArr"],
             "currencies" => $currArr,
             "persons" => $persArr,
-            "rules" => $rulesData,
-            "templates" => $impTemplates
-        ];
+            "rules" => $data["rulesData"],
+            "templates" => $data["impTemplates"]
+        ]);
 
         $this->cssArr[] = "ImportView.css";
-        $this->buildCSS();
         $this->jsArr[] = "ImportView.js";
 
-        $titleString = "Jezve Money | Import transactions";
+        $data["titleString"] = "Jezve Money | Import transactions";
 
-        include(TPL_PATH . "import.tpl");
+        $this->render($data);
     }
 }

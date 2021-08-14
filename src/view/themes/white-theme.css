@@ -83,6 +83,7 @@ body.white-theme,
   background-color: #ffffff;
 }
 
+/* Input group */
 .white-theme .input-group__btn_inactive {
   color: #000000;
   background-color: #ffffff;
@@ -185,9 +186,9 @@ body.white-theme,
 }
 
 /* Transaction list */
-
-.white-theme .paginator > span {
-  color: #000000;
+.dark-theme .paginator-item,
+.dark-theme a.paginator-arrow:hover {
+  border-color: #ffffff;
 }
 
 /* Transaction list item */
@@ -419,7 +420,16 @@ body.white-theme,
   color: #000000;
 }
 
+.white-theme .tile_header > .close-btn:hover > svg {
+  fill: #000000;
+}
+
 /* Transaction list mode selector */
 .white-theme .mode-selector > b > span {
   color: #000000;
+}
+
+/* Input group close button */
+.white-theme .input-group .close-btn:hover > svg {
+  fill: #000000;
 }

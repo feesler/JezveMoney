@@ -1,7 +1,7 @@
 <?php
-    use JezveMoney\Core\JSON;
-?>
-<?php	include(TPL_PATH."commonhdr.tpl");	?>
+use JezveMoney\App\Template\IconLink;
+
+include(TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body class="<?=($this->themeClass)?>">
 <div class="page">
@@ -89,24 +89,12 @@
                             </div>
 
                             <div class="filter-item std_margin">
-<?php	if (is_empty($dateFmt)) {		?>
-                                <div id="calendar_btn" class="iconlink">
-                                    <button type="button">
-                                        <span class="iconlink__icon"><?=svgIcon("cal")?></span>
-                                        <span class="iconlink__content"><span>Select range</span></span>
-                                    </button>
-                                </div>
-<?php	} else { 	?>
-                                <div id="calendar_btn" class="iconlink">
-                                    <button type="button">
-                                        <span class="iconlink__icon"><?=svgIcon("cal")?></span>
-                                        <span class="iconlink__content">
-                                            <span class="iconlink__title">Select range</span>
-                                            <span class="iconlink__subtitle"><?=e($dateFmt)?></span>
-                                        </span>
-                                    </button>
-                                </div>
-<?php	} 	?>
+                                <?=IconLink::render([
+                                    "id" => "calendar_btn",
+                                    "icon" => "cal",
+                                    "title" => "Select range",
+                                    "subtitle" => $dateFmt
+                                ])?>
                                 <div id="date_block" class="hidden">
                                     <div class="input-group">
                                         <div class="stretch-input rbtn_input">
@@ -131,14 +119,6 @@
     </div>
 </div>
 
-<script>
-window.app = {
-    currency: <?=JSON::encode($currArr)?>,
-    accountCurrency: <?=$accCurr?>,
-    filter: <?=JSON::encode($filterObj)?>,
-    chartData: <?=JSON::encode($statArr)?>
-};
-</script>
 <?php	include(TPL_PATH."footer.tpl");	?>
 </body>
 </html>

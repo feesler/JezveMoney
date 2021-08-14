@@ -1031,6 +1031,7 @@ class TransactionModel extends CachedTable
     //   endDate - end date of transactions filter. Default is empty
     //   desc - sort result descending
     //   onPage - count of transactions per page.
+    //   page - page to return. zero based
     public function getData($params = null)
     {
         if (is_null($params)) {
@@ -1353,31 +1354,31 @@ class TransactionModel extends CachedTable
             /*  1 2 3 4 5 ... 18  */
             if ($page_num < $groupLimit) {
                 for ($i = 0; $i < $breakLimit; $i++) {
-                    $res[] = ["text" => ($i + 1), "active" => ($i == $page_num)];
+                    $res[] = ["page" => ($i + 1), "active" => ($i == $page_num)];
                 }
-                $res[] = ["text" => "..."];
-                $res[] = ["text" => $pages_count, "active" => false];
+                $res[] = ["ellipsis" => true];
+                $res[] = ["page" => $pages_count, "active" => false];
                 /*  1 ... 14 15 16 ... 18  */
             } elseif ($page_num >= $groupLimit && $page_num < $pages_count - $groupLimit) {
-                $res[] = ["text" => 1, "active" => false];
-                $res[] = ["text" => "..."];
+                $res[] = ["page" => 1, "active" => false];
+                $res[] = ["ellipsis" => true];
                 for ($i = $page_num - ($groupLimit - 2); $i <= $page_num + ($groupLimit - 2); $i++) {
-                    $res[] = ["text" => ($i + 1), "active" => ($i == $page_num)];
+                    $res[] = ["page" => ($i + 1), "active" => ($i == $page_num)];
                 }
-                $res[] = ["text" => "..."];
-                $res[] = ["text" => $pages_count, "active" => false];
+                $res[] = ["ellipsis" => true];
+                $res[] = ["page" => $pages_count, "active" => false];
                 /*  1 ... 14 15 16 17 18  */
             } elseif ($page_num >= $groupLimit && $page_num >= $pages_count - $groupLimit) {
-                $res[] = ["text" => 1, "active" => false];
-                $res[] = ["text" => "..."];
+                $res[] = ["page" => 1, "active" => false];
+                $res[] = ["ellipsis" => true];
                 for ($i = $pages_count - $breakLimit; $i < $pages_count; $i++) {
-                    $res[] = ["text" => ($i + 1), "active" => ($i == $page_num)];
+                    $res[] = ["page" => ($i + 1), "active" => ($i == $page_num)];
                 }
             }
         } else {
             /*  1 2 3 4 5  */
             for ($i = 0; $i < $pages_count; $i++) {
-                $res[] = ["text" => ($i + 1), "active" => ($i == $page_num)];
+                $res[] = ["page" => ($i + 1), "active" => ($i == $page_num)];
             }
         }
 

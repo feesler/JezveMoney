@@ -1,5 +1,11 @@
-/* Transactions page content */
+/* Transactions list component */
 .trans-list {
+  display: flex;
+  flex-flow: column wrap;
+  align-items: stretch;
+}
+
+div.trans-list-items {
   display: flex;
   flex-flow: column wrap;
   align-items: stretch;
@@ -61,12 +67,13 @@ div.trans-list__item_selected {
 }
 
 /* Details mode */
-.trans-list_details {
+.trans-list_details .trans-list-items {
+  display: table;
   border-collapse: collapse;
   width: 100%;
 }
 
-.trans-list_details > tbody {
+.trans-list_details tbody {
   height: 43px;
 }
 

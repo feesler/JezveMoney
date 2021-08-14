@@ -3,6 +3,8 @@
 namespace JezveMoney\App\Admin\Controller;
 
 use JezveMoney\Core\AdminController;
+use JezveMoney\Core\Template;
+use JezveMoney\Core\JSON;
 use JezveMoney\App\Model\IconModel;
 
 class Icon extends AdminController
@@ -18,20 +20,21 @@ class Icon extends AdminController
 
     public function index()
     {
-        $itemsData = $this->model->getData();
-        $typesData = $this->model->getTypes();
-        $viewData = [
-            "data" => $itemsData
+        $this->template = new Template(ADMIN_TPL_PATH . "icon.tpl");
+        $data = [
+            "titleString" => "Admin panel | Icons",
+            "itemsData" => $this->model->getData(),
+            "typesData" => $this->model->getTypes(),
         ];
 
+        $data["viewData"] = JSON::encode([
+            "data" => $data["itemsData"],
+        ]);
+
         $this->menuItems["icon"]["active"] = true;
-
-        $titleString = "Admin panel | Icons";
-
         $this->cssAdmin[] = "AdminIconView.css";
-        $this->buildCSS();
         $this->jsAdmin[] = "AdminIconView.js";
 
-        include(ADMIN_TPL_PATH . "icon.tpl");
+        $this->render($data);
     }
 }

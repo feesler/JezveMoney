@@ -1985,6 +1985,11 @@ export class Scenario {
         ];
 
         await this.runner.runGroup(TransactionListTests.search, searchData);
+
+        await this.runner.runTasks([
+            { action: TransactionListTests.clearSearchForm },
+            { action: TransactionListTests.clearDateRange },
+        ]);
     }
 
     async deleteTransactionTests() {

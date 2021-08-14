@@ -1,6 +1,3 @@
-<?php
-    use JezveMoney\Core\JSON;
-?>
 <?php	include(ADMIN_TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body class="<?=($this->themeClass)?>">
@@ -97,9 +94,6 @@
     </div>
 </form>
 
-<script>
-window.app = <?=JSON::encode($viewData)?>;
-</script>
 <?php	include(ADMIN_TPL_PATH."footer.tpl");	?>
 </body>
 </html>

@@ -51,7 +51,7 @@ export class Tile extends TestComponent {
     static renderPerson(person) {
         const res = {
             name: person.name,
-            balance: '',
+            balance: null,
         };
 
         return res;

@@ -28,12 +28,19 @@ export class ModeSelector extends TestComponent {
             modeItem.isActive = (tagName === 'B');
         }
 
-        if (!this.listMode.elem || !this.detailsMode.elem) {
+        if (
+            (this.listMode.elem && !this.detailsMode.elem)
+            || (!this.listMode.elem && this.detailsMode.elem)
+        ) {
             throw new Error('Unexpected stucture of mode selector control');
         }
 
-        if ((this.listMode.isActive && this.detailsMode.isActive)
-            || (!this.listMode.isActive && !this.detailsMode.isActive)) {
+        if ((this.listMode.elem && this.detailsMode.elem)
+            && (
+                (this.listMode.isActive && this.detailsMode.isActive)
+                || (!this.listMode.isActive && !this.detailsMode.isActive)
+            )
+        ) {
             throw new Error('Invalid state of mode selector');
         }
 
@@ -41,6 +48,10 @@ export class ModeSelector extends TestComponent {
     }
 
     async setDetailsMode() {
+        if (!this.detailsMode.elem) {
+            throw new Error('Mode selector component is inactive');
+        }
+
         if (this.detailsMode.isActive) {
             return;
         }
@@ -49,6 +60,10 @@ export class ModeSelector extends TestComponent {
     }
 
     async setClassicMode() {
+        if (!this.listMode.elem) {
+            throw new Error('Mode selector component is inactive');
+        }
+
         if (this.listMode.isActive) {
             return;
         }
