@@ -31,7 +31,6 @@ export class TransactionModel {
         }
 
         this.props = props;
-        this.parent = this.props.parent;
 
         this.S1 = undefined; // balance before transaction
         this.sa = undefined; // source amount
@@ -178,7 +177,7 @@ export class TransactionModel {
             this.notifyChanged('dest_curr', newCurrency);
         }
 
-        const personAccount = this.parent.model.accounts.getPersonAccount(
+        const personAccount = window.app.model.accounts.getPersonAccount(
             this.person_id,
             newCurrency,
         );
@@ -355,7 +354,7 @@ export class TransactionModel {
      * @param {number} value - identifier of new account
      */
     onSrcAccUpdate(value) {
-        const acc = this.parent.model.accounts.getItem(value);
+        const acc = window.app.model.accounts.getItem(value);
 
         if (acc) {
             this.updateValue('src_curr', acc.curr_id);
@@ -374,7 +373,7 @@ export class TransactionModel {
      * @param {number} value - identifier of new account
      */
     onDestAccUpdate(value) {
-        const acc = this.parent.model.accounts.getItem(value);
+        const acc = window.app.model.accounts.getItem(value);
 
         if (acc) {
             this.updateValue('dest_curr', acc.curr_id);
@@ -436,7 +435,7 @@ export class TransactionModel {
      */
     onPersonUpdate(value) {
         const newCurrency = (this.debtType) ? this.src_curr : this.dest_curr;
-        const personAccount = this.parent.model.accounts.getPersonAccount(value, newCurrency);
+        const personAccount = window.app.model.accounts.getPersonAccount(value, newCurrency);
         const personBalance = (personAccount) ? personAccount.balance : 0;
 
         if (this.debtType) {

@@ -35,8 +35,12 @@ class AccountView extends View {
             this.model.data = copyObject(this.model.original);
         }
 
-        this.model.currency = CurrencyList.create(this.props.currency);
-        this.model.icons = IconList.create(this.props.icons);
+        if (!window.app.model) {
+            window.app.model = {};
+        }
+
+        window.app.model.currency = CurrencyList.create(this.props.currency);
+        window.app.model.icons = IconList.create(this.props.icons);
     }
 
     /**
@@ -205,7 +209,7 @@ class AccountView extends View {
      * Set currency sign
      */
     setCurrencySign(currencyId) {
-        const currencyObj = this.model.currency.getItem(currencyId);
+        const currencyObj = window.app.model.currency.getItem(currencyId);
         if (!currencyObj) {
             return;
         }

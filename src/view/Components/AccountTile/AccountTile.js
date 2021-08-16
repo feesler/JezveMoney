@@ -37,11 +37,11 @@ export class AccountTile extends Tile {
             throw new Error('Invalid account specified');
         }
 
-        const fmtBalance = this.parent.model.currency.formatCurrency(
+        const fmtBalance = window.app.model.currency.formatCurrency(
             account.balance,
             account.curr_id,
         );
-        const icon = this.parent.model.icons.getItem(account.icon_id);
+        const icon = window.app.model.icons.getItem(account.icon_id);
 
         this.setTitle(account.name);
         this.setSubTitle(fmtBalance);
