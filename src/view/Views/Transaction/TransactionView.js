@@ -116,8 +116,11 @@ class TransactionView extends View {
             this.destTileInfoBlock = this.destContainer.querySelector('.tile-info-block');
         }
 
-        this.srcTile = AccountTile.fromElement({ elem: 'source_tile', parent: this });
-        this.destTile = AccountTile.fromElement({ elem: 'dest_tile', parent: this });
+        const srcTileElem = ge('source_tile');
+        this.srcTile = (srcTileElem) ? AccountTile.fromElement({ elem: srcTileElem }) : null;
+
+        const destTileElem = ge('dest_tile');
+        this.destTile = (destTileElem) ? AccountTile.fromElement({ elem: destTileElem }) : null;
 
         this.srcAmountInfo = TileInfoItem.fromElement({
             elem: 'src_amount_left',
@@ -144,35 +147,35 @@ class TransactionView extends View {
         if (this.srcAmountRow) {
             this.srcAmountRowLabel = this.srcAmountRow.querySelector('label');
         }
-        this.srcAmountInput = DecimalInput.create({ elem: ge('src_amount'), oninput: this.onFInput.bind(this) });
+        this.srcAmountInput = DecimalInput.create({ elem: ge('src_amount'), oninput: (e) => this.onFInput(e) });
         this.srcAmountSign = ge('srcamountsign');
 
         this.destAmountRow = ge('dest_amount_row');
         if (this.destAmountRow) {
             this.destAmountRowLabel = this.destAmountRow.querySelector('label');
         }
-        this.destAmountInput = DecimalInput.create({ elem: ge('dest_amount'), oninput: this.onFInput.bind(this) });
+        this.destAmountInput = DecimalInput.create({ elem: ge('dest_amount'), oninput: (e) => this.onFInput(e) });
         this.destAmountSign = ge('destamountsign');
 
         this.srcResBalanceRow = ge('result_balance');
         if (this.srcResBalanceRow) {
             this.srcResBalanceRowLabel = this.srcResBalanceRow.querySelector('label');
         }
-        this.srcResBalanceInput = DecimalInput.create({ elem: ge('resbal'), oninput: this.onFInput.bind(this) });
+        this.srcResBalanceInput = DecimalInput.create({ elem: ge('resbal'), oninput: (e) => this.onFInput(e) });
         this.srcResBalanceSign = ge('res_currsign');
 
         this.destResBalanceRow = ge('result_balance_dest');
         if (this.destResBalanceRow) {
             this.destResBalanceRowLabel = this.destResBalanceRow.querySelector('label');
         }
-        this.destResBalanceInput = DecimalInput.create({ elem: ge('resbal_d'), oninput: this.onFInput.bind(this) });
+        this.destResBalanceInput = DecimalInput.create({ elem: ge('resbal_d'), oninput: (e) => this.onFInput(e) });
         this.destResBalanceSign = ge('res_currsign_d');
 
         this.exchangeRow = ge('exchange');
         if (this.exchangeRow) {
             this.exchangeRowLabel = this.exchangeRow.querySelector('label');
         }
-        this.exchangeInput = DecimalInput.create({ elem: ge('exchrate'), oninput: this.onFInput.bind(this) });
+        this.exchangeInput = DecimalInput.create({ elem: ge('exchrate'), oninput: (e) => this.onFInput(e) });
         this.exchangeSign = ge('exchcomm');
 
         this.datePickerBtn = IconLink.fromElement({

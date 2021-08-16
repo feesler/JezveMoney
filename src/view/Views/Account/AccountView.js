@@ -57,7 +57,7 @@ class AccountView extends View {
 
         this.iconSelect = DropDown.create({
             input_id: 'icon',
-            onitemselect: this.onIconSelect.bind(this),
+            onitemselect: (o) => this.onIconSelect(o),
             editable: false,
             extraClass: 'dd__fullwidth',
         });
@@ -67,7 +67,7 @@ class AccountView extends View {
 
         this.currencySelect = DropDown.create({
             input_id: 'currency',
-            onitemselect: this.onCurrencySelect.bind(this),
+            onitemselect: (o) => this.onCurrencySelect(o),
             editable: false,
             extraClass: 'dd__fullwidth',
         });
@@ -83,7 +83,7 @@ class AccountView extends View {
         this.balanceInp = ge('balance');
         this.initBalanceDecimalInput = DecimalInput.create({
             elem: this.balanceInp,
-            oninput: this.onInitBalanceInput.bind(this),
+            oninput: (e) => this.onInitBalanceInput(e),
         });
         if (!this.initBalanceDecimalInput) {
             throw new Error('Failed to initialize Account view');
@@ -105,14 +105,14 @@ class AccountView extends View {
         if (!this.form) {
             throw new Error('Invalid Account view');
         }
-        this.form.addEventListener('submit', this.onSubmit.bind(this));
+        this.form.addEventListener('submit', (e) => this.onSubmit(e));
 
         this.nameInp = ge('accname');
         if (!this.nameInp) {
             throw new Error('Invalid Account view');
         }
 
-        this.nameInp.addEventListener('input', this.onNameInput.bind(this));
+        this.nameInp.addEventListener('input', () => this.onNameInput());
     }
 
     /**

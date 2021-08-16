@@ -16,14 +16,8 @@ export class AccountTile extends Tile {
      * Create new Account Tile from specified element
      */
     static fromElement(props) {
-        let res;
-
-        try {
-            res = new AccountTile(props);
-            res.parse();
-        } catch (e) {
-            res = null;
-        }
+        const res = new AccountTile(props);
+        res.parse();
 
         return res;
     }
