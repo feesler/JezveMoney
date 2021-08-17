@@ -557,6 +557,10 @@ class TransactionView extends View {
             infoBlock.show(!toShow);
         }
 
+        if (this.state.transaction.type === EXPENSE) {
+            return;
+        }
+
         if (toShow && inputObj && inputObj.elem) {
             inputObj.elem.focus();
         }
@@ -853,6 +857,18 @@ class TransactionView extends View {
             } else if (this.state.id === 2) {
                 if (!this.state.isDiff) {
                     this.state.id = 0;
+
+                    const newSrcAmount = this.state.transaction.dest_amount;
+                    this.state.transaction.src_amount = newSrcAmount;
+                    this.state.form.sourceAmount = newSrcAmount;
+
+                    const srcResult = normalize(this.state.srcAccount.balance - newSrcAmount);
+                    this.state.form.sourceResult = srcResult;
+                    this.state.form.fSourceResult = srcResult;
+
+                    const exchange = this.calculateExchange(this.state);
+                    this.state.form.fExchange = exchange;
+                    this.state.form.exchange = exchange;
                 }
             }
 
@@ -1510,7 +1526,9 @@ class TransactionView extends View {
                 this.state.form.sourceAmount = e.target.value;
                 if (this.state.transaction.src_amount !== newValue) {
                     this.state.transaction.src_amount = newValue;
-                    this.state.form.sourceResult = normalize(this.state.srcAccount.balance - newValue);
+                    const srcResult = normalize(this.state.srcAccount.balance - newValue);
+                    this.state.form.sourceResult = srcResult;
+                    this.state.form.fSourceResult = srcResult;
 
                     const exchange = this.calculateExchange(this.state);
                     this.state.form.fExchange = exchange;
