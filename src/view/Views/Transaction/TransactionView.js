@@ -116,14 +116,32 @@ class TransactionView extends View {
             isDiff: this.props.transaction.src_curr !== this.props.transaction.dest_curr,
         };
 
+        if (this.state.transaction.id) {
+            this.state.form.sourceAmount = this.state.transaction.src_amount;
+            this.state.form.destAmount = this.state.transaction.dest_amount;
+        }
+
         if (this.state.srcAccount) {
-            this.state.form.sourceResult = this.state.srcAccount.balance;
-            this.state.form.fSourceResult = this.state.srcAccount.balance;
+            const srcResult = normalize(this.state.srcAccount.balance - this.state.transaction.src_amount);
+
+            this.state.form.sourceResult = srcResult;
+            this.state.form.fSourceResult = srcResult;
         }
+
         if (this.state.destAccount) {
-            this.state.form.destResult = this.state.destAccount.balance;
-            this.state.form.fDestResult = this.state.destAccount.balance;
+            const destResult = normalize(this.state.destAccount.balance + this.state.transaction.dest_amount);
+
+            this.state.form.destResult = destResult;
+            this.state.form.fDestResult = destResult;
         }
+
+        if (this.state.transaction.type === EXPENSE) {
+            this.state.id = (this.state.isDiff) ? 2 : 0;
+        }
+
+        const exchange = this.calculateExchange(this.state);
+        this.state.form.fExchange = exchange;
+        this.state.form.exchange = exchange;
     }
 
     /**
@@ -761,9 +779,32 @@ class TransactionView extends View {
             this.state.srcAccount = srcAccount;
             this.state.transaction.src_curr = srcAccount.curr_id;
             this.state.srcCurrency = window.app.model.currency.getItem(srcAccount.curr_id);
-            if (!this.state.isDiff) {
+            // If currencies are same before account was changed
+            // then copy source currency to destination
+            if (this.state.id === 0 || this.state.id === 1) {
                 this.state.transaction.dest_curr = srcAccount.curr_id;
                 this.state.destCurrency = this.state.srcCurrency;
+            }
+
+            // Update result balance of source
+            const srcResult = normalize(srcAccount.balance - this.state.transaction.src_amount);
+            if (this.state.form.fSourceResult !== srcResult) {
+                this.state.form.fSourceResult = srcResult;
+                this.state.form.sourceResult = srcResult;
+            }
+
+            const exchange = this.calculateExchange(this.state);
+            this.state.form.fExchange = exchange;
+            this.state.form.exchange = exchange;
+
+            this.state.isDiff = this.state.transaction.src_curr !== this.state.transaction.dest_curr;
+            if (!this.state.isDiff) {
+                if (this.state.id === 2 || this.state.id === 3 || this.state.id === 4) {
+                    const srcAmount = this.state.transaction.src_amount;
+                    this.state.transaction.dest_amount = srcAmount;
+                    this.state.form.destAmount = srcAmount;
+                    this.state.id = (this.state.id === 4) ? 1 : 0;
+                }
             }
 
             return this.render(this.state);
