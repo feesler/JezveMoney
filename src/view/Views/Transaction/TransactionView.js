@@ -139,7 +139,7 @@ class TransactionView extends View {
             this.state.id = (this.state.isDiff) ? 2 : 0;
         }
 
-        this.updateExchange();
+        this.updateStateExchange();
     }
 
     /**
@@ -791,7 +791,7 @@ class TransactionView extends View {
                 this.state.form.sourceResult = srcResult;
             }
 
-            this.updateExchange();
+            this.updateStateExchange();
 
             this.state.isDiff = this.state.transaction.src_curr !== this.state.transaction.dest_curr;
             if (!this.state.isDiff) {
@@ -823,6 +823,45 @@ class TransactionView extends View {
      * @param {object} obj - selected item
      */
     onDestAccSel(obj) {
+        if (this.state.transaction.type === INCOME) {
+            const accountId = parseInt(obj.id, 10);
+            if (this.state.transaction.dest_id === accountId) {
+                return;
+            }
+
+            this.state.transaction.dest_id = accountId;
+            const destAccount = window.app.model.accounts.getItem(accountId);
+            this.state.destAccount = destAccount;
+            this.state.transaction.dest_curr = destAccount.curr_id;
+            this.state.destCurrency = window.app.model.currency.getItem(destAccount.curr_id);
+            // If currencies are same before account was changed
+            // then copy destination currency to source
+            if (this.state.id === 0 || this.state.id === 1) {
+                this.state.transaction.src_curr = destAccount.curr_id;
+                this.state.srcCurrency = this.state.destCurrency;
+            }
+
+            // Update result balance of destination
+            const destResult = normalize(destAccount.balance + this.state.transaction.dest_amount);
+            if (this.state.form.fDestResult !== destResult) {
+                this.state.form.fDestResult = destResult;
+                this.state.form.sourceResult = destResult;
+            }
+
+            this.updateStateExchange();
+
+            this.state.isDiff = this.state.transaction.src_curr !== this.state.transaction.dest_curr;
+            if (!this.state.isDiff) {
+                if (this.state.id === 2 || this.state.id === 3 || this.state.id === 4) {
+                    this.setStateSourceAmount(this.state.transaction.dest_amount);
+                    this.state.id = (this.state.id === 4) ? 1 : 0;
+                }
+            }
+
+            this.render(this.state);
+        }
+
+
         if (!obj || !this.destIdInp) {
             return;
         }
@@ -866,6 +905,29 @@ class TransactionView extends View {
      * @param {object} obj - selected item
      */
     onSrcCurrencySel(obj) {
+        if (this.state.transaction.type === INCOME) {
+            const curr = window.app.model.currency.getItem(obj.id);
+            if (this.state.transaction.src_curr === curr.id) {
+                return;
+            }
+
+            this.state.srcCurrency = curr;
+            this.state.transaction.src_curr = curr.id;
+            this.state.isDiff = this.state.transaction.src_curr !== this.state.transaction.dest_curr;
+
+            if (this.state.isDiff && this.state.id === 0) {
+                this.state.id = 2;
+            } else if (this.state.id === 2 || this.state.id === 3 || this.state.id === 4) {
+                if (!this.state.isDiff) {
+                    this.setStateDestAmount(this.state.transaction.src_amount);
+                    this.updateStateExchange();
+                    this.state.id = (this.state.id === 4) ? 1 : 0;
+                }
+            }
+
+            return this.render(this.state);
+        }
+
         if (!obj || !this.srcCurrInp) {
             return;
         }
@@ -894,8 +956,8 @@ class TransactionView extends View {
             } else if (this.state.id === 2) {
                 if (!this.state.isDiff) {
                     this.state.id = 0;
-                    this.setSourceAmount(this.state.transaction.dest_amount);
-                    this.updateExchange();
+                    this.setStateSourceAmount(this.state.transaction.dest_amount);
+                    this.updateStateExchange();
                 }
             }
 
@@ -1529,17 +1591,28 @@ class TransactionView extends View {
     }
 
     /** Set new source amount and calculate source result balance */
-    setSourceAmount(amount) {
-        if (this.state.transaction.type === EXPENSE) {
-            this.state.transaction.src_amount = amount;
-            this.state.form.sourceAmount = amount;
+    setStateSourceAmount(amount) {
+        this.state.transaction.src_amount = amount;
+        this.state.form.sourceAmount = amount;
 
+        if (this.state.srcAccount) {
             const srcResult = normalize(this.state.srcAccount.balance - amount);
             this.state.form.sourceResult = srcResult;
             this.state.form.fSourceResult = srcResult;
         }
     }
 
+    /** Set new destination amount and calculate destination result balance */
+    setStateDestAmount(amount) {
+        this.state.transaction.dest_amount = amount;
+        this.state.form.destAmount = amount;
+
+        if (this.state.destAccount) {
+            const destResult = normalize(this.state.destAccount.balance + amount);
+            this.state.form.destResult = destResult;
+            this.state.form.fDestResult = destResult;
+        }
+    }
 
     calculateExchange(state) {
         const source = state.transaction.src_amount;
@@ -1552,7 +1625,7 @@ class TransactionView extends View {
         return normalizeExch(destination / source);
     }
 
-    updateExchange() {
+    updateStateExchange() {
         const exchange = this.calculateExchange(this.state);
         this.state.form.fExchange = exchange;
         this.state.form.exchange = exchange;
@@ -1563,20 +1636,22 @@ class TransactionView extends View {
      * @param {InputEvent} e - event object
      */
     onFInput(e) {
-        if (this.state.transaction.type === EXPENSE) {
-            const newValue = (e.target.id === 'exchrate')
-                ? normalizeExch(e.target.value)
-                : normalize(e.target.value);
+        const newValue = (e.target.id === 'exchrate')
+            ? normalizeExch(e.target.value)
+            : normalize(e.target.value);
 
+        if (this.state.transaction.type === EXPENSE) {
             if (e.target.id === 'src_amount') {
                 this.state.form.sourceAmount = e.target.value;
                 if (this.state.transaction.src_amount !== newValue) {
-                    this.state.transaction.src_amount = newValue;
-                    const srcResult = normalize(this.state.srcAccount.balance - newValue);
-                    this.state.form.sourceResult = srcResult;
-                    this.state.form.fSourceResult = srcResult;
-
-                    this.updateExchange();
+                    this.setStateSourceAmount(newValue);
+                    /*
+                                        this.state.transaction.src_amount = newValue;
+                                        const srcResult = normalize(this.state.srcAccount.balance - newValue);
+                                        this.state.form.sourceResult = srcResult;
+                                        this.state.form.fSourceResult = srcResult;
+                    */
+                    this.updateStateExchange();
                 }
             } else if (e.target.id === 'dest_amount') {
                 this.state.form.destAmount = e.target.value;
@@ -1584,10 +1659,10 @@ class TransactionView extends View {
                     this.state.transaction.dest_amount = newValue;
                     if (this.state.isDiff) {
                         if (isValidValue(this.state.form.sourceAmount)) {
-                            this.updateExchange();
+                            this.updateStateExchange();
                         }
                     } else {
-                        this.setSourceAmount(newValue);
+                        this.setStateSourceAmount(newValue);
                     }
                 }
             } else if (e.target.id === 'exchrate') {
@@ -1600,7 +1675,7 @@ class TransactionView extends View {
                         this.state.form.destAmount = destAmount;
                     } else if (isValidValue(this.state.form.destAmount)) {
                         const srcAmount = normalize(this.state.transaction.dest_amount / newValue);
-                        this.setSourceAmount(srcAmount);
+                        this.setStateSourceAmount(srcAmount);
                     }
                 }
             } else if (e.target.id === 'resbal') {
@@ -1613,10 +1688,70 @@ class TransactionView extends View {
                     this.state.form.sourceAmount = srcAmount;
 
                     if (this.state.isDiff) {
-                        this.updateExchange();
+                        this.updateStateExchange();
                     } else {
                         this.state.transaction.dest_amount = srcAmount;
                         this.state.form.destAmount = srcAmount;
+                    }
+                }
+            } else {
+                return;
+            }
+
+            return this.render(this.state);
+        }
+
+        if (this.state.transaction.type === INCOME) {
+            if (e.target.id === 'src_amount') {
+                this.state.form.sourceAmount = e.target.value;
+                if (this.state.transaction.src_amount !== newValue) {
+                    this.state.transaction.src_amount = newValue;
+
+                    if (this.state.isDiff) {
+                        if (isValidValue(this.state.form.destAmount)) {
+                            this.updateStateExchange();
+                        }
+                    } else {
+                        this.setStateDestAmount(newValue);
+                    }
+                }
+            } else if (e.target.id === 'dest_amount') {
+                this.state.form.destAmount = e.target.value;
+                if (this.state.transaction.dest_amount !== newValue) {
+                    this.setStateDestAmount(newValue);
+
+                    if (this.state.isDiff) {
+                        this.updateStateExchange();
+                    } else {
+                        this.setStateSourceAmount(newValue);
+                    }
+                }
+            } else if (e.target.id === 'exchrate') {
+                this.state.form.exchange = e.target.value;
+                if (this.state.form.fExchange !== newValue) {
+                    this.state.form.fExchange = newValue;
+                    if (isValidValue(this.state.form.sourceAmount)) {
+                        const destAmount = normalize(this.state.transaction.src_amount * newValue);
+                        this.state.transaction.dest_amount = destAmount;
+                        this.state.form.destAmount = destAmount;
+                    } else if (isValidValue(this.state.form.destAmount)) {
+                        const srcAmount = normalize(this.state.transaction.dest_amount / newValue);
+                        this.setStateSourceAmount(srcAmount);
+                    }
+                }
+            } else if (e.target.id === 'resbal_d') {
+                this.state.form.destResult = e.target.value;
+                if (this.state.form.fDestResult !== newValue) {
+                    this.state.form.fDestResult = newValue;
+
+                    const srcAmount = normalize(newValue - this.state.destAccount.balance);
+                    this.state.transaction.src_amount = srcAmount;
+                    this.state.form.sourceAmount = srcAmount;
+
+                    if (this.state.isDiff) {
+                        this.updateStateExchange();
+                    } else {
+                        this.setStateDestAmount(srcAmount);
                     }
                 }
             } else {
@@ -1924,8 +2059,65 @@ class TransactionView extends View {
             this.exchRateSwitch(false);
         }
 
+        this.setCurrActive(true, false); // set source currency inactive
+        this.setCurrActive(false, true); // set destination currency active
+    }
+
+    renderIncome(state) {
+        if (state.id === 0) {
+            this.srcAmountSwitch(true);
+            this.destAmountSwitch(false);
+            this.resBalanceSwitch(false);
+            this.resBalanceDestSwitch(false);
+            show(this.exchangeRow, false);
+            this.exchangeInfo.hide();
+        } else if (state.id === 1) {
+            this.srcAmountSwitch(false);
+            this.destAmountSwitch(false);
+            this.resBalanceSwitch(false);
+            this.resBalanceDestSwitch(true);
+            show(this.exchangeRow, false);
+            this.exchangeInfo.hide();
+        } else if (state.id === 2) {
+            this.srcAmountSwitch(true);
+            this.destAmountSwitch(true);
+            this.resBalanceSwitch(false);
+            this.resBalanceDestSwitch(false);
+            this.exchRateSwitch(false);
+        } else if (state.id === 3) {
+            this.srcAmountSwitch(true);
+            this.destAmountSwitch(false);
+            this.resBalanceSwitch(false);
+            this.resBalanceDestSwitch(false);
+            this.exchRateSwitch(true);
+        } else if (state.id === 4) {
+            this.srcAmountSwitch(true);
+            this.destAmountSwitch(false);
+            this.resBalanceSwitch(false);
+            this.resBalanceDestSwitch(true);
+            this.exchRateSwitch(false);
+        }
+
+        this.setCurrActive(true, true); // set source currency active
+        this.setCurrActive(false, false); // set destination currency inactive
+    }
+
+    render(state) {
+        if (!state) {
+            throw new Error('Invalid state');
+        }
+
+        if (state.transaction.type === EXPENSE) {
+            this.renderExpense(state);
+        } else if (state.transaction.type === INCOME) {
+            this.renderIncome(state);
+        }
+
         if (this.srcTile) {
             this.srcTile.render(state.srcAccount);
+        }
+        if (this.destTile) {
+            this.destTile.render(state.destAccount);
         }
 
         if (this.srcIdInp) {
@@ -1942,9 +2134,6 @@ class TransactionView extends View {
         this.setAmountInputLabel(false, state.isDiff);
         this.setAmountTileBlockLabel(true, state.isDiff);
         this.setAmountTileBlockLabel(false, state.isDiff);
-
-        this.setCurrActive(true, false); // set source currency inactive
-        this.setCurrActive(false, true); // set destination currency active
 
         this.setSign(this.destAmountSign, this.destCurrDDList, state.transaction.dest_curr);
         this.setSign(this.srcAmountSign, this.srcCurrDDList, state.transaction.src_curr);
@@ -1982,16 +2171,6 @@ class TransactionView extends View {
         if (this.destResBalanceInfo) {
             const title = state.destCurrency.formatValue(state.form.fDestResult);
             this.destResBalanceInfo.setTitle(title);
-        }
-    }
-
-    render(state) {
-        if (!state) {
-            throw new Error('Invalid state');
-        }
-
-        if (state.transaction.type === EXPENSE) {
-            return this.renderExpense(state);
         }
     }
 }
