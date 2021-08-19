@@ -22,7 +22,6 @@ import {
     isValidValue,
     normalize,
     normalizeExch,
-    correct,
 } from '../../js/app.js';
 import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
@@ -135,7 +134,8 @@ class TransactionView extends View {
             this.state.form.fDestResult = destResult;
         }
 
-        if (this.state.transaction.type === EXPENSE) {
+        if (this.state.transaction.type === EXPENSE
+            || this.state.transaction.type === INCOME) {
             this.state.id = (this.state.isDiff) ? 2 : 0;
         }
 
@@ -573,7 +573,8 @@ class TransactionView extends View {
             infoBlock.show(!toShow);
         }
 
-        if (this.state.transaction.type === EXPENSE) {
+        if (this.state.transaction.type === EXPENSE
+            || this.state.transaction.type === INCOME) {
             return;
         }
 
@@ -635,6 +636,14 @@ class TransactionView extends View {
      * Source amount static click event handler
      */
     onSrcAmountSelect() {
+        if (this.state.transaction.type === INCOME) {
+            if (this.state.id === 1) {
+                this.state.id = 0;
+            }
+
+            return this.render(this.state);
+        }
+
         this.srcAmountSwitch(true);
         this.resBalanceSwitch(false);
         if (!window.app.model.transaction.isDiff()) {
@@ -650,6 +659,13 @@ class TransactionView extends View {
             if (this.state.id === 1) {
                 this.state.id = 0;
             } else if (this.state.id === 3 || this.state.id === 4) {
+                this.state.id = 2;
+            }
+
+            return this.render(this.state);
+        }
+        if (this.state.transaction.type === INCOME) {
+            if (this.state.id === 3 || this.state.id === 4) {
                 this.state.id = 2;
             }
 
@@ -698,6 +714,16 @@ class TransactionView extends View {
      * Destination result balance static click event handler
      */
     onResBalanceDestSelect() {
+        if (this.state.transaction.type === INCOME) {
+            if (this.state.id === 0) {
+                this.state.id = 1;
+            } else if (this.state.id === 2 || this.state.id === 3) {
+                this.state.id = 4;
+            }
+
+            return this.render(this.state);
+        }
+
         this.resBalanceDestSwitch(true);
         if (window.app.model.transaction.isDiff()) {
             this.destAmountSwitch(false);
@@ -712,7 +738,8 @@ class TransactionView extends View {
      * Exchange rate static click event handler
      */
     onExchRateSelect() {
-        if (this.state.transaction.type === EXPENSE) {
+        if (this.state.transaction.type === EXPENSE
+            || this.state.transaction.type === INCOME) {
             this.state.id = 3;
 
             return this.render(this.state);
@@ -845,7 +872,7 @@ class TransactionView extends View {
             const destResult = normalize(destAccount.balance + this.state.transaction.dest_amount);
             if (this.state.form.fDestResult !== destResult) {
                 this.state.form.fDestResult = destResult;
-                this.state.form.sourceResult = destResult;
+                this.state.form.destResult = destResult;
             }
 
             this.updateStateExchange();
@@ -858,7 +885,7 @@ class TransactionView extends View {
                 }
             }
 
-            this.render(this.state);
+            return this.render(this.state);
         }
 
 
@@ -1645,12 +1672,6 @@ class TransactionView extends View {
                 this.state.form.sourceAmount = e.target.value;
                 if (this.state.transaction.src_amount !== newValue) {
                     this.setStateSourceAmount(newValue);
-                    /*
-                                        this.state.transaction.src_amount = newValue;
-                                        const srcResult = normalize(this.state.srcAccount.balance - newValue);
-                                        this.state.form.sourceResult = srcResult;
-                                        this.state.form.fSourceResult = srcResult;
-                    */
                     this.updateStateExchange();
                 }
             } else if (e.target.id === 'dest_amount') {
@@ -1671,8 +1692,7 @@ class TransactionView extends View {
                     this.state.form.fExchange = newValue;
                     if (isValidValue(this.state.form.sourceAmount)) {
                         const destAmount = normalize(this.state.transaction.src_amount * newValue);
-                        this.state.transaction.dest_amount = destAmount;
-                        this.state.form.destAmount = destAmount;
+                        this.setStateDestAmount(destAmount);
                     } else if (isValidValue(this.state.form.destAmount)) {
                         const srcAmount = normalize(this.state.transaction.dest_amount / newValue);
                         this.setStateSourceAmount(srcAmount);
@@ -1732,8 +1752,7 @@ class TransactionView extends View {
                     this.state.form.fExchange = newValue;
                     if (isValidValue(this.state.form.sourceAmount)) {
                         const destAmount = normalize(this.state.transaction.src_amount * newValue);
-                        this.state.transaction.dest_amount = destAmount;
-                        this.state.form.destAmount = destAmount;
+                        this.setStateDestAmount(destAmount);
                     } else if (isValidValue(this.state.form.destAmount)) {
                         const srcAmount = normalize(this.state.transaction.dest_amount / newValue);
                         this.setStateSourceAmount(srcAmount);
@@ -2066,14 +2085,16 @@ class TransactionView extends View {
     renderIncome(state) {
         if (state.id === 0) {
             this.srcAmountSwitch(true);
-            this.destAmountSwitch(false);
+            this.destAmountInfo.hide();
+            show(this.destAmountRow, false);
             this.resBalanceSwitch(false);
             this.resBalanceDestSwitch(false);
             show(this.exchangeRow, false);
             this.exchangeInfo.hide();
         } else if (state.id === 1) {
             this.srcAmountSwitch(false);
-            this.destAmountSwitch(false);
+            this.destAmountInfo.hide();
+            show(this.destAmountRow, false);
             this.resBalanceSwitch(false);
             this.resBalanceDestSwitch(true);
             show(this.exchangeRow, false);
