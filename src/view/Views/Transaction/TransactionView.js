@@ -137,6 +137,8 @@ class TransactionView extends View {
         if (this.state.transaction.type === EXPENSE
             || this.state.transaction.type === INCOME) {
             this.state.id = (this.state.isDiff) ? 2 : 0;
+        } else if (this.state.transaction.type === TRANSFER) {
+            this.state.id = (this.state.isDiff) ? 3 : 0;
         }
 
         this.updateStateExchange();
@@ -465,6 +467,7 @@ class TransactionView extends View {
         const account = window.app.model.accounts.find((item) => item.id === accountId);
         if (account && !account.isVisible()) {
             dropDown.addItem({ id: account.id, title: account.name });
+            // TODO : add to visibleUserAccounts
         }
     }
 
@@ -481,6 +484,7 @@ class TransactionView extends View {
         const person = window.app.model.persons.find((item) => item.id === personId);
         if (person && !person.isVisible()) {
             dropDown.addItem({ id: person.id, title: person.name });
+            // TODO : add to visiblePersons
         }
     }
 
@@ -573,8 +577,7 @@ class TransactionView extends View {
             infoBlock.show(!toShow);
         }
 
-        if (this.state.transaction.type === EXPENSE
-            || this.state.transaction.type === INCOME) {
+        if (this.state.transaction.type !== DEBT) {
             return;
         }
 
@@ -643,6 +646,19 @@ class TransactionView extends View {
 
             return this.render(this.state);
         }
+        if (this.state.transaction.type === TRANSFER) {
+            if (this.state.id === 1 || this.state.id === 2) {
+                this.state.id = 0;
+            } else if (this.model.state === 4) {
+                this.state.id = 3;
+            } else if (this.model.state === 6) {
+                this.state.id = 5;
+            } else if (this.model.state === 8) {
+                this.state.id = 7;
+            }
+
+            return this.render(this.state);
+        }
 
         this.srcAmountSwitch(true);
         this.resBalanceSwitch(false);
@@ -671,6 +687,15 @@ class TransactionView extends View {
 
             return this.render(this.state);
         }
+        if (this.state.transaction.type === TRANSFER) {
+            if (this.state.id === 5 || this.state.id === 7) {
+                this.state.id = 3;
+            } else if (this.state.id === 6 || this.state.id === 8) {
+                this.state.id = 4;
+            }
+
+            return this.render(this.state);
+        }
 
         this.destAmountSwitch(true);
         if (!window.app.model.transaction.isDiff() || window.app.model.transaction.isExpense()) {
@@ -691,6 +716,19 @@ class TransactionView extends View {
                 this.state.id = 1;
             } else if (this.state.id === 2 || this.state.id === 3) {
                 this.state.id = 4;
+            }
+
+            return this.render(this.state);
+        }
+        if (this.state.transaction.type === TRANSFER) {
+            if (this.state.id === 0 || this.state.id === 2) {
+                this.state.id = 1;
+            } else if (this.state.id === 3) {
+                this.state.id = 4;
+            } else if (this.state.id === 5) {
+                this.state.id = 6;
+            } else if (this.state.id === 7) {
+                this.state.id = 8;
             }
 
             return this.render(this.state);
@@ -723,6 +761,17 @@ class TransactionView extends View {
 
             return this.render(this.state);
         }
+        if (this.state.transaction.type === TRANSFER) {
+            if (this.state.id === 0 || this.state.id === 1) {
+                this.state.id = 2;
+            } else if (this.state.id === 3 || this.state.id === 7) {
+                this.state.id = 5;
+            } else if (this.state.id === 4 || this.state.id === 8) {
+                this.state.id = 6;
+            }
+
+            return this.render(this.state);
+        }
 
         this.resBalanceDestSwitch(true);
         if (window.app.model.transaction.isDiff()) {
@@ -741,6 +790,15 @@ class TransactionView extends View {
         if (this.state.transaction.type === EXPENSE
             || this.state.transaction.type === INCOME) {
             this.state.id = 3;
+
+            return this.render(this.state);
+        }
+        if (this.state.transaction.type === TRANSFER) {
+            if (this.state.id === 3 || this.state.id === 5) {
+                this.state.id = 7;
+            } else if (this.state.id === 4 || this.state.id === 6) {
+                this.state.id = 8;
+            }
 
             return this.render(this.state);
         }
@@ -832,6 +890,80 @@ class TransactionView extends View {
 
             return this.render(this.state);
         }
+        if (this.state.transaction.type === TRANSFER) {
+            const accountId = parseInt(obj.id, 10);
+            if (this.state.transaction.src_id === accountId) {
+                return;
+            }
+
+            this.state.transaction.src_id = accountId;
+            const srcAccount = window.app.model.accounts.getItem(accountId);
+            this.state.srcAccount = srcAccount;
+            this.state.transaction.src_curr = srcAccount.curr_id;
+            this.state.srcCurrency = window.app.model.currency.getItem(srcAccount.curr_id);
+
+            // Update result balance of source
+            const srcResult = normalize(srcAccount.balance - this.state.transaction.src_amount);
+            if (this.state.form.fSourceResult !== srcResult) {
+                this.state.form.fSourceResult = srcResult;
+                this.state.form.sourceResult = srcResult;
+            }
+
+            if (accountId === this.state.transaction.dest_id) {
+                const { visibleUserAccounts } = window.app.model;
+                const nextAccountId = visibleUserAccounts.getNextAccount(accountId);
+                const destAccount = window.app.model.accounts.getItem(nextAccountId);
+                if (!destAccount) {
+                    throw new Error('Next account not found');
+                }
+                this.state.destAccount = destAccount;
+                this.state.transaction.dest_id = destAccount.id;
+                this.state.transaction.dest_curr = destAccount.curr_id;
+                this.state.destCurrency = window.app.model.currency.getItem(destAccount.curr_id);
+
+                // Copy source amount to destination amount
+                /*
+                if (this.state.transaction.dest_amount !== this.state.transaction.src_amount) {
+                    this.state.form.destAmount = this.state.form.srcAmount;
+                }
+                this.state.transaction.dest_amount = this.state.transaction.src_amount;
+
+                // Update result balance of destination
+                const destResult = normalize(destAccount.balance + this.state.transaction.dest_amount);
+                if (this.state.form.fDestResult !== destResult) {
+                    this.state.form.fDestResult = destResult;
+                    this.state.form.destResult = destResult;
+                }
+                */
+            }
+
+            this.updateStateExchange();
+
+            this.state.isDiff = this.state.transaction.src_curr !== this.state.transaction.dest_curr;
+            if (this.state.isDiff) {
+                if (this.state.id === 0) {
+                    this.state.id = 3;
+                } else if (this.state.id === 1) {
+                    this.state.id = 4;
+                } else if (this.state.id === 2) {
+                    this.state.id = 5;
+                }
+            } else {
+                if (this.state.transaction.dest_amount !== this.state.transaction.src_amount) {
+                    this.setStateDestAmount(this.state.transaction.src_amount);
+                }
+
+                if (this.state.id === 3 || this.state.id === 7) {
+                    this.state.id = 0;
+                } else if (this.state.id === 4 || this.state.id === 6 || this.state.id === 8) {
+                    this.state.id = 1;
+                } else if (this.state.id === 5) {
+                    this.state.id = 2;
+                }
+            }
+
+            return this.render(this.state);
+        }
 
         if (!obj || !this.srcIdInp) {
             return;
@@ -882,6 +1014,80 @@ class TransactionView extends View {
                 if (this.state.id === 2 || this.state.id === 3 || this.state.id === 4) {
                     this.setStateSourceAmount(this.state.transaction.dest_amount);
                     this.state.id = (this.state.id === 4) ? 1 : 0;
+                }
+            }
+
+            return this.render(this.state);
+        }
+        if (this.state.transaction.type === TRANSFER) {
+            const accountId = parseInt(obj.id, 10);
+            if (this.state.transaction.dest_id === accountId) {
+                return;
+            }
+
+            this.state.transaction.dest_id = accountId;
+            const destAccount = window.app.model.accounts.getItem(accountId);
+            this.state.destAccount = destAccount;
+            this.state.transaction.dest_curr = destAccount.curr_id;
+            this.state.destCurrency = window.app.model.currency.getItem(destAccount.curr_id);
+
+            // Update result balance of destination
+            const destResult = normalize(destAccount.balance + this.state.transaction.dest_amount);
+            if (this.state.form.fDestResult !== destResult) {
+                this.state.form.fDestResult = destResult;
+                this.state.form.destResult = destResult;
+            }
+
+            if (accountId === this.state.transaction.src_id) {
+                const { visibleUserAccounts } = window.app.model;
+                const nextAccountId = visibleUserAccounts.getNextAccount(accountId);
+                const srcAccount = window.app.model.accounts.getItem(nextAccountId);
+                if (!srcAccount) {
+                    throw new Error('Next account not found');
+                }
+                this.state.srcAccount = srcAccount;
+                this.state.transaction.src_id = srcAccount.id;
+                this.state.transaction.src_curr = srcAccount.curr_id;
+                this.state.srcCurrency = window.app.model.currency.getItem(srcAccount.curr_id);
+
+                // Copy source amount to destination amount
+                /*
+                if (this.state.transaction.dest_amount !== this.state.transaction.src_amount) {
+                    this.state.form.srcAmount = this.state.form.destAmount;
+                }
+                this.state.transaction.src_amount = this.state.transaction.dest_amount;
+
+                // Update result balance of source
+                const sourceResult = normalize(srcAccount.balance - this.state.transaction.src_amount);
+                if (this.state.form.fSourceResult !== sourceResult) {
+                    this.state.form.fSourceResult = sourceResult;
+                    this.state.form.sourceResult = sourceResult;
+                }
+                */
+            }
+
+            this.updateStateExchange();
+
+            this.state.isDiff = this.state.transaction.src_curr !== this.state.transaction.dest_curr;
+            if (this.state.isDiff) {
+                if (this.state.id === 0) {
+                    this.state.id = 3;
+                } else if (this.state.id === 1) {
+                    this.state.id = 4;
+                } else if (this.state.id === 2) {
+                    this.state.id = 5;
+                }
+            } else {
+                if (this.state.transaction.dest_amount !== this.state.transaction.src_amount) {
+                    this.setStateDestAmount(this.state.transaction.src_amount);
+                }
+
+                if (this.state.id === 3 || this.state.id === 7) {
+                    this.state.id = 0;
+                } else if (this.state.id === 4 || this.state.id === 8) {
+                    this.state.id = 1;
+                } else if (this.state.id === 5 || this.state.id === 6) {
+                    this.state.id = 2;
                 }
             }
 
@@ -1780,6 +1986,78 @@ class TransactionView extends View {
             return this.render(this.state);
         }
 
+        if (this.state.transaction.type === TRANSFER) {
+            if (e.target.id === 'src_amount') {
+                this.state.form.sourceAmount = e.target.value;
+                if (this.state.transaction.src_amount !== newValue) {
+                    this.setStateSourceAmount(newValue);
+                    if (this.state.isDiff) {
+                        this.updateStateExchange();
+                    } else {
+                        this.setStateDestAmount(newValue);
+                    }
+                }
+            } else if (e.target.id === 'dest_amount') {
+                this.state.form.destAmount = e.target.value;
+                if (this.state.transaction.dest_amount !== newValue) {
+                    this.setStateDestAmount(newValue);
+                    if (this.state.isDiff) {
+                        this.updateStateExchange();
+                    } else {
+                        this.setStateSourceAmount(newValue);
+                    }
+                }
+            } else if (e.target.id === 'exchrate') {
+                this.state.form.exchange = e.target.value;
+                if (this.state.form.fExchange !== newValue) {
+                    this.state.form.fExchange = newValue;
+                    if (isValidValue(this.state.form.sourceAmount)) {
+                        const destAmount = normalize(this.state.transaction.src_amount * newValue);
+                        this.setStateDestAmount(destAmount);
+                    } else if (isValidValue(this.state.form.destAmount)) {
+                        const srcAmount = normalize(this.state.transaction.dest_amount / newValue);
+                        this.setStateSourceAmount(srcAmount);
+                    }
+                }
+            } else if (e.target.id === 'resbal') {
+                this.state.form.sourceResult = e.target.value;
+                if (this.state.form.fSourceResult !== newValue) {
+                    this.state.form.fSourceResult = newValue;
+
+                    const srcAmount = normalize(this.state.srcAccount.balance - newValue);
+                    this.state.transaction.src_amount = srcAmount;
+                    this.state.form.sourceAmount = srcAmount;
+
+                    if (this.state.isDiff) {
+                        this.updateStateExchange();
+                    } else {
+                        this.state.transaction.dest_amount = srcAmount;
+                        this.state.form.destAmount = srcAmount;
+                    }
+                }
+            } else if (e.target.id === 'resbal_d') {
+                this.state.form.destResult = e.target.value;
+                if (this.state.form.fDestResult !== newValue) {
+                    this.state.form.fDestResult = newValue;
+
+                    const destAmount = normalize(newValue - this.state.destAccount.balance);
+                    this.state.transaction.dest_amount = destAmount;
+                    this.state.form.destAmount = destAmount;
+
+                    if (this.state.isDiff) {
+                        this.updateStateExchange();
+                    } else {
+                        this.state.transaction.src_amount = destAmount;
+                        this.state.form.sourceAmount = destAmount;
+                    }
+                }
+            } else {
+                return;
+            }
+
+            return this.render(this.state);
+        }
+
         const trModel = window.app.model.transaction;
         const obj = e.target;
 
@@ -2123,6 +2401,72 @@ class TransactionView extends View {
         this.setCurrActive(false, false); // set destination currency inactive
     }
 
+    renderTransfer(state) {
+        if (state.id === 0) {
+            this.srcAmountSwitch(true);
+            this.destAmountInfo.hide();
+            show(this.destAmountRow, false);
+            this.resBalanceSwitch(false);
+            this.resBalanceDestSwitch(false);
+            show(this.exchangeRow, false);
+            this.exchangeInfo.hide();
+        } else if (state.id === 1) {
+            this.srcAmountSwitch(false);
+            this.destAmountInfo.hide();
+            show(this.destAmountRow, false);
+            this.resBalanceSwitch(true);
+            this.resBalanceDestSwitch(false);
+            show(this.exchangeRow, false);
+            this.exchangeInfo.hide();
+        } else if (state.id === 2) {
+            this.srcAmountSwitch(false);
+            this.destAmountSwitch(false);
+            this.resBalanceSwitch(false);
+            this.resBalanceDestSwitch(true);
+            show(this.exchangeRow, false);
+            this.exchangeInfo.hide();
+        } else if (state.id === 3) {
+            this.srcAmountSwitch(false);
+            this.destAmountSwitch(true);
+            this.resBalanceSwitch(false);
+            this.resBalanceDestSwitch(false);
+            this.exchRateSwitch(true);
+        } else if (state.id === 4) {
+            this.srcAmountSwitch(false);
+            this.destAmountSwitch(true);
+            this.resBalanceSwitch(true);
+            this.resBalanceDestSwitch(false);
+            this.exchRateSwitch(false);
+        } else if (state.id === 5) {
+            this.srcAmountSwitch(true);
+            this.destAmountSwitch(false);
+            this.resBalanceSwitch(false);
+            this.resBalanceDestSwitch(true);
+            this.exchRateSwitch(false);
+        } else if (state.id === 6) {
+            this.srcAmountSwitch(false);
+            this.destAmountSwitch(false);
+            this.resBalanceSwitch(true);
+            this.resBalanceDestSwitch(true);
+            this.exchRateSwitch(false);
+        } else if (state.id === 7) {
+            this.srcAmountSwitch(true);
+            this.destAmountSwitch(false);
+            this.resBalanceSwitch(false);
+            this.resBalanceDestSwitch(false);
+            this.exchRateSwitch(true);
+        } else if (state.id === 8) {
+            this.srcAmountSwitch(false);
+            this.destAmountSwitch(false);
+            this.resBalanceSwitch(true);
+            this.resBalanceDestSwitch(false);
+            this.exchRateSwitch(true);
+        }
+
+        this.setCurrActive(true, false); // set source currency inactive
+        this.setCurrActive(false, false); // set destination currency inactive
+    }
+
     render(state) {
         if (!state) {
             throw new Error('Invalid state');
@@ -2132,6 +2476,8 @@ class TransactionView extends View {
             this.renderExpense(state);
         } else if (state.transaction.type === INCOME) {
             this.renderIncome(state);
+        } else if (state.transaction.type === TRANSFER) {
+            this.renderTransfer(state);
         }
 
         if (this.srcTile) {
@@ -2146,6 +2492,13 @@ class TransactionView extends View {
         }
         if (this.destIdInp) {
             this.destIdInp.value = state.transaction.dest_id;
+        }
+
+        if (this.srcDDList) {
+            this.srcDDList.selectItem(state.transaction.src_id);
+        }
+        if (this.destDDList) {
+            this.destDDList.selectItem(state.transaction.dest_id);
         }
 
         this.srcCurrInp.value = state.transaction.src_curr;
