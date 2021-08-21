@@ -107,12 +107,14 @@ class TransactionView extends View {
             validation: {
                 sourceAmount: true,
                 destAmount: true,
+                date: true,
             },
             srcAccount: accountModel.getItem(this.props.transaction.src_id),
             destAccount: accountModel.getItem(this.props.transaction.dest_id),
             srcCurrency: currencyModel.getItem(this.props.transaction.src_curr),
             destCurrency: currencyModel.getItem(this.props.transaction.dest_curr),
             isDiff: this.props.transaction.src_curr !== this.props.transaction.dest_curr,
+            isUpdate: this.props.mode === 'update',
         };
 
         if (this.state.transaction.id) {
@@ -649,11 +651,11 @@ class TransactionView extends View {
         if (this.state.transaction.type === TRANSFER) {
             if (this.state.id === 1 || this.state.id === 2) {
                 this.state.id = 0;
-            } else if (this.model.state === 4) {
+            } else if (this.state.id === 4) {
                 this.state.id = 3;
-            } else if (this.model.state === 6) {
+            } else if (this.state.id === 6) {
                 this.state.id = 5;
-            } else if (this.model.state === 8) {
+            } else if (this.state.id === 8) {
                 this.state.id = 7;
             }
 
@@ -921,10 +923,10 @@ class TransactionView extends View {
                 this.state.transaction.dest_curr = destAccount.curr_id;
                 this.state.destCurrency = window.app.model.currency.getItem(destAccount.curr_id);
 
+                // TODO : investigate unconditional copying of amount for different currencies case
                 // Copy source amount to destination amount
-                /*
                 if (this.state.transaction.dest_amount !== this.state.transaction.src_amount) {
-                    this.state.form.destAmount = this.state.form.srcAmount;
+                    this.state.form.destAmount = this.state.form.sourceAmount;
                 }
                 this.state.transaction.dest_amount = this.state.transaction.src_amount;
 
@@ -934,7 +936,6 @@ class TransactionView extends View {
                     this.state.form.fDestResult = destResult;
                     this.state.form.destResult = destResult;
                 }
-                */
             }
 
             this.updateStateExchange();
@@ -1050,10 +1051,10 @@ class TransactionView extends View {
                 this.state.transaction.src_curr = srcAccount.curr_id;
                 this.state.srcCurrency = window.app.model.currency.getItem(srcAccount.curr_id);
 
+                // TODO : investigate unconditional copying of amount for different currencies case
                 // Copy source amount to destination amount
-                /*
                 if (this.state.transaction.dest_amount !== this.state.transaction.src_amount) {
-                    this.state.form.srcAmount = this.state.form.destAmount;
+                    this.state.form.sourceAmount = this.state.form.destAmount;
                 }
                 this.state.transaction.src_amount = this.state.transaction.dest_amount;
 
@@ -1063,9 +1064,12 @@ class TransactionView extends View {
                     this.state.form.fSourceResult = sourceResult;
                     this.state.form.sourceResult = sourceResult;
                 }
-                */
             }
 
+            // Copy source amount to destination amount
+            if (!this.state.isDiff) {
+                this.setStateSourceAmount(this.state.transaction.dest_amount);
+            }
             this.updateStateExchange();
 
             this.state.isDiff = this.state.transaction.src_curr !== this.state.transaction.dest_curr;
@@ -1593,7 +1597,7 @@ class TransactionView extends View {
 
         if (window.app.model.transaction.isDebt()) {
             this.onDebtSubmit(e);
-        } else if (window.app.model.transaction.isTransfer() && this.mode !== 'update') {
+        } else if (this.state.transaction.type === TRANSFER && this.state.isUpdate) {
             this.onTransferSubmit(e);
         } else {
             this.onSubmit(e);
@@ -1604,37 +1608,43 @@ class TransactionView extends View {
      * Expense/Income transaction 'submit' event handler
      */
     onSubmit(e) {
-        const srcAmount = this.srcAmountInput.value;
-        const destAmount = this.destAmountInput.value;
+        const { sourceAmount, destAmount } = this.state.form;
         let valid = true;
 
         if (isVisible(this.destAmountRow)) {
-            if (!destAmount || !destAmount.length || !isNum(fixFloat(destAmount))) {
-                this.invalidateBlock('dest_amount_row');
+            if (
+                this.state.transaction.dest_amount <= 0
+                || !isNum(fixFloat(destAmount))
+            ) {
+                this.state.validation.destAmount = false;
                 valid = false;
             }
         }
 
         if (isVisible(this.srcAmountRow)) {
-            if (!srcAmount || !srcAmount.length || !isNum(fixFloat(srcAmount))) {
-                this.invalidateBlock('src_amount_row');
+            if (
+                this.state.transaction.src_amount <= 0
+                || !isNum(fixFloat(sourceAmount))
+            ) {
+                this.state.validation.sourceAmount = false;
                 valid = false;
             }
         }
 
         if (!checkDate(this.dateInput.value)) {
-            this.invalidateBlock('date_block');
+            this.state.validation.date = false;
             valid = false;
         }
 
         if (valid) {
-            this.srcAmountInput.value = fixFloat(srcAmount);
+            this.srcAmountInput.value = fixFloat(sourceAmount);
             this.destAmountInput.value = fixFloat(destAmount);
 
             this.submitStarted = true;
             enable(this.submitBtn, false);
         } else {
             e.preventDefault();
+            this.render(this.state);
         }
     }
 
@@ -1642,37 +1652,40 @@ class TransactionView extends View {
      * Transfer transaction submit event handler
      */
     onTransferSubmit(e) {
-        const srcAmount = this.srcAmountInput.value;
-        const destAmount = this.destAmountInput.value;
+        const { sourceAmount, destAmount } = this.state.form;
         let valid = true;
 
-        if (!srcAmount || !srcAmount.length || !isNum(fixFloat(srcAmount))) {
+        if (
+            this.state.transaction.src_amount <= 0
+            || !isNum(fixFloat(sourceAmount))
+        ) {
             this.invalidateBlock('src_amount_row');
+            this.state.validation.sourceAmount = false;
             valid = false;
         }
 
-        if (window.app.model.transaction.isDiff()
+        if (this.state.isDiff
             && (
-                !destAmount
-                || !destAmount.length
+                this.state.transaction.dest_amount <= 0
                 || !isNum(fixFloat(destAmount))
             )) {
-            this.invalidateBlock('dest_amount_row');
+            this.state.validation.destAmount = false;
             valid = false;
         }
 
         if (!checkDate(this.dateInput.value)) {
-            this.invalidateBlock('date_block');
+            this.state.validation.date = false;
             valid = false;
         }
 
         if (valid) {
-            this.srcAmountInput.value = fixFloat(srcAmount);
+            this.srcAmountInput.value = fixFloat(sourceAmount);
             this.destAmountInput.value = fixFloat(destAmount);
             this.submitStarted = true;
             enable(this.submitBtn, false);
         } else {
             e.preventDefault();
+            this.render(this.state);
         }
     }
 
@@ -1825,11 +1838,12 @@ class TransactionView extends View {
 
     /** Set new source amount and calculate source result balance */
     setStateSourceAmount(amount) {
-        this.state.transaction.src_amount = amount;
+        const sourceAmount = normalize(amount);
+        this.state.transaction.src_amount = sourceAmount;
         this.state.form.sourceAmount = amount;
 
         if (this.state.srcAccount) {
-            const srcResult = normalize(this.state.srcAccount.balance - amount);
+            const srcResult = normalize(this.state.srcAccount.balance - sourceAmount);
             this.state.form.sourceResult = srcResult;
             this.state.form.fSourceResult = srcResult;
         }
@@ -1837,11 +1851,12 @@ class TransactionView extends View {
 
     /** Set new destination amount and calculate destination result balance */
     setStateDestAmount(amount) {
-        this.state.transaction.dest_amount = amount;
+        const destAmount = normalize(amount);
+        this.state.transaction.dest_amount = destAmount;
         this.state.form.destAmount = amount;
 
         if (this.state.destAccount) {
-            const destResult = normalize(this.state.destAccount.balance + amount);
+            const destResult = normalize(this.state.destAccount.balance + destAmount);
             this.state.form.destResult = destResult;
             this.state.form.fDestResult = destResult;
         }
@@ -1872,6 +1887,15 @@ class TransactionView extends View {
         const newValue = (e.target.id === 'exchrate')
             ? normalizeExch(e.target.value)
             : normalize(e.target.value);
+
+        if (this.state.transaction.type !== DEBT) {
+            if (e.target.id === 'src_amount') {
+                this.state.validation.sourceAmount = true;
+            }
+            if (e.target.id === 'dest_amount') {
+                this.state.validation.destAmount = true;
+            }
+        }
 
         if (this.state.transaction.type === EXPENSE) {
             if (e.target.id === 'src_amount') {
@@ -1990,7 +2014,7 @@ class TransactionView extends View {
             if (e.target.id === 'src_amount') {
                 this.state.form.sourceAmount = e.target.value;
                 if (this.state.transaction.src_amount !== newValue) {
-                    this.setStateSourceAmount(newValue);
+                    this.setStateSourceAmount(e.target.value);
                     if (this.state.isDiff) {
                         this.updateStateExchange();
                     } else {
@@ -2000,7 +2024,7 @@ class TransactionView extends View {
             } else if (e.target.id === 'dest_amount') {
                 this.state.form.destAmount = e.target.value;
                 if (this.state.transaction.dest_amount !== newValue) {
-                    this.setStateDestAmount(newValue);
+                    this.setStateDestAmount(e.target.value);
                     if (this.state.isDiff) {
                         this.updateStateExchange();
                     } else {
@@ -2031,8 +2055,7 @@ class TransactionView extends View {
                     if (this.state.isDiff) {
                         this.updateStateExchange();
                     } else {
-                        this.state.transaction.dest_amount = srcAmount;
-                        this.state.form.destAmount = srcAmount;
+                        this.setStateDestAmount(srcAmount);
                     }
                 }
             } else if (e.target.id === 'resbal_d') {
@@ -2047,8 +2070,7 @@ class TransactionView extends View {
                     if (this.state.isDiff) {
                         this.updateStateExchange();
                     } else {
-                        this.state.transaction.src_amount = destAmount;
-                        this.state.form.sourceAmount = destAmount;
+                        this.setStateSourceAmount(destAmount);
                     }
                 }
             } else {
@@ -2420,17 +2442,18 @@ class TransactionView extends View {
             this.exchangeInfo.hide();
         } else if (state.id === 2) {
             this.srcAmountSwitch(false);
-            this.destAmountSwitch(false);
+            this.destAmountInfo.hide();
+            show(this.destAmountRow, false);
             this.resBalanceSwitch(false);
             this.resBalanceDestSwitch(true);
             show(this.exchangeRow, false);
             this.exchangeInfo.hide();
         } else if (state.id === 3) {
-            this.srcAmountSwitch(false);
+            this.srcAmountSwitch(true);
             this.destAmountSwitch(true);
             this.resBalanceSwitch(false);
             this.resBalanceDestSwitch(false);
-            this.exchRateSwitch(true);
+            this.exchRateSwitch(false);
         } else if (state.id === 4) {
             this.srcAmountSwitch(false);
             this.destAmountSwitch(true);
@@ -2545,6 +2568,24 @@ class TransactionView extends View {
         if (this.destResBalanceInfo) {
             const title = state.destCurrency.formatValue(state.form.fDestResult);
             this.destResBalanceInfo.setTitle(title);
+        }
+
+        if (state.validation.sourceAmount) {
+            this.clearBlockValidation('src_amount_row');
+        } else {
+            this.invalidateBlock('src_amount_row');
+        }
+
+        if (state.validation.destAmount) {
+            this.clearBlockValidation('dest_amount_row');
+        } else {
+            this.invalidateBlock('dest_amount_row');
+        }
+
+        if (state.validation.date) {
+            this.clearBlockValidation('date_block');
+        } else {
+            this.invalidateBlock('date_block');
         }
     }
 }
