@@ -363,7 +363,7 @@ export class DebtTransactionView extends TransactionView {
             }
         }
 
-        if (newState === 0) {
+        if (newState === 0 || newState === 3) {
             Object.assign(res.visibility, {
                 src_amount_row: true,
                 src_amount_left: false,
@@ -372,7 +372,7 @@ export class DebtTransactionView extends TransactionView {
                 result_balance_dest_row: false,
                 dest_res_balance_left: true,
             });
-        } else if (newState === 1) {
+        } else if (newState === 1 || newState === 5) {
             Object.assign(res.visibility, {
                 src_amount_row: false,
                 src_amount_left: true,
@@ -381,7 +381,7 @@ export class DebtTransactionView extends TransactionView {
                 result_balance_dest_row: false,
                 dest_res_balance_left: true,
             });
-        } else if (newState === 2) {
+        } else if (newState === 2 || newState === 4) {
             Object.assign(res.visibility, {
                 src_amount_row: false,
                 src_amount_left: true,
@@ -389,33 +389,6 @@ export class DebtTransactionView extends TransactionView {
                 src_res_balance_left: true,
                 result_balance_dest_row: true,
                 dest_res_balance_left: false,
-            });
-        } else if (newState === 3) {
-            Object.assign(res.visibility, {
-                src_amount_row: true,
-                src_amount_left: false,
-                result_balance_row: false,
-                src_res_balance_left: true,
-                result_balance_dest_row: false,
-                dest_res_balance_left: true,
-            });
-        } else if (newState === 4) {
-            Object.assign(res.visibility, {
-                src_amount_row: false,
-                src_amount_left: true,
-                result_balance_row: false,
-                src_res_balance_left: true,
-                result_balance_dest_row: true,
-                dest_res_balance_left: false,
-            });
-        } else if (newState === 5) {
-            Object.assign(res.visibility, {
-                src_amount_row: false,
-                src_amount_left: true,
-                result_balance_row: true,
-                src_res_balance_left: false,
-                result_balance_dest_row: false,
-                dest_res_balance_left: true,
             });
         } else if (newState === 6) {
             Object.assign(res.visibility, {
