@@ -313,11 +313,13 @@ export class DebtTransactionView extends TransactionView {
             });
 
             // Check initial state
+/*
             if (this.model.noAccount && !this.model.lastAccount_id && this.model.destResBal === '') {
                 res.values.dest_res_balance_left = '';
             } else {
+*/
                 res.values.dest_res_balance_left = this.model.fmtDestResBal;
-            }
+//            }
 
             if (!this.model.noAccount) {
                 res.values.account = Object.assign(
@@ -344,11 +346,13 @@ export class DebtTransactionView extends TransactionView {
             });
 
             // Check initial state
+/*
             if (this.model.noAccount && !this.model.lastAccount_id && this.model.srcResBal === '') {
                 res.values.src_res_balance_left = '';
             } else {
-                res.values.src_res_balance_left = this.model.fmtSrcResBal;
-            }
+*/
+            res.values.src_res_balance_left = this.model.fmtSrcResBal;
+//            }
 
             if (!this.model.noAccount) {
                 res.values.account = Object.assign(

@@ -568,7 +568,7 @@ class Transactions extends TemplateController
             $rtSrcResBal = $src ? $this->currModel->format($src->balance, $src->curr_id) : null;
             $rtDestResBal = $dest ? $this->currModel->format($dest->balance, $dest->curr_id) : null;
         } else {
-            $acc_res_balance = ($debtAcc && !$noAccount) ? $debtAcc->balance : null;
+            $acc_res_balance = ($debtAcc) ? $debtAcc->balance : null;
 
             $srcResBalance = ($give) ? $person_res_balance : $acc_res_balance;
             $destResBalance = ($give) ? $acc_res_balance : $person_res_balance;
@@ -863,7 +863,7 @@ class Transactions extends TemplateController
             $rtSrcResBal = ($src) ? $this->currModel->format($src->balance, $src->curr_id) : null;
             $rtDestResBal = ($dest) ? $this->currModel->format($dest->balance, $dest->curr_id) : null;
         } else {
-            $acc_res_balance = ($debtAcc && !$noAccount) ? $debtAcc->balance : null;
+            $acc_res_balance = ($debtAcc) ? $debtAcc->balance : null;
             $srcResBalance = ($give) ? $person_res_balance : $acc_res_balance;
             $destResBalance = ($give) ? $acc_res_balance : $person_res_balance;
             $rtSrcResBal = $this->currModel->format($srcResBalance, $srcAmountCurr);
