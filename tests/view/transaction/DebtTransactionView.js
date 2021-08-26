@@ -177,7 +177,7 @@ export class DebtTransactionView extends TransactionView {
      * State 0, 1 or 2: source and destination currencies are the same
      * @param {number|string} val - new source amount value
      */
-    async setSrcAmount(val) {
+    setSrcAmount(val) {
         this.model.srcAmount = val;
 
         const newValue = isValidValue(val) ? normalize(val) : val;
@@ -202,7 +202,7 @@ export class DebtTransactionView extends TransactionView {
                         accBalance = lastAcc.balance;
                     }
 
-                    this.model.srcResBal = normalize(accBalance - this.model.fSrcAmount);
+                    this.model.srcResBal = normalize(accBalance);
                 }
             }
 
@@ -225,21 +225,23 @@ export class DebtTransactionView extends TransactionView {
             if (this.model.destAccount && !this.model.noAccount) {
                 const destRes = this.model.destAccount.balance + this.model.fDestAmount;
                 this.model.destResBal = normalize(destRes);
-            } else if (this.model.debtType) {
-                let accBalance = 0;
-                if (this.model.lastAccount_id) {
-                    const lastAcc = App.state.accounts.getItem(this.model.lastAccount_id);
-                    if (!lastAcc) {
-                        throw new Error('Last account not found');
+            } else if (this.model.noAccount) {
+                if (this.model.debtType) {
+                    let accBalance = 0;
+                    if (this.model.lastAccount_id) {
+                        const lastAcc = App.state.accounts.getItem(this.model.lastAccount_id);
+                        if (!lastAcc) {
+                            throw new Error('Last account not found');
+                        }
+
+                        accBalance = lastAcc.balance;
                     }
 
-                    accBalance = lastAcc.balance;
+                    this.model.destResBal = normalize(accBalance);
+                } else {
+                    const destRes = this.model.personAccount.balance + this.model.fDestAmount;
+                    this.model.destResBal = normalize(destRes);
                 }
-
-                this.model.destResBal = normalize(accBalance + this.model.fDestAmount);
-            } else {
-                const destRes = this.model.personAccount.balance + this.model.fDestAmount;
-                this.model.destResBal = normalize(destRes);
             }
 
             this.model.fmtDestResBal = this.model.destCurr.format(this.model.destResBal);
@@ -313,13 +315,7 @@ export class DebtTransactionView extends TransactionView {
             });
 
             // Check initial state
-/*
-            if (this.model.noAccount && !this.model.lastAccount_id && this.model.destResBal === '') {
-                res.values.dest_res_balance_left = '';
-            } else {
-*/
-                res.values.dest_res_balance_left = this.model.fmtDestResBal;
-//            }
+            res.values.dest_res_balance_left = this.model.fmtDestResBal;
 
             if (!this.model.noAccount) {
                 res.values.account = Object.assign(
@@ -346,13 +342,7 @@ export class DebtTransactionView extends TransactionView {
             });
 
             // Check initial state
-/*
-            if (this.model.noAccount && !this.model.lastAccount_id && this.model.srcResBal === '') {
-                res.values.src_res_balance_left = '';
-            } else {
-*/
             res.values.src_res_balance_left = this.model.fmtSrcResBal;
-//            }
 
             if (!this.model.noAccount) {
                 res.values.account = Object.assign(
@@ -469,7 +459,8 @@ export class DebtTransactionView extends TransactionView {
             );
 
             const destRes = this.model.destAccount.balance + this.model.fDestAmount;
-            this.model.destResBal = normalize(destRes);
+            this.model.fDestResBal = normalize(destRes);
+            this.model.destResBal = this.model.fDestResBal;
             this.model.fmtDestResBal = this.model.destCurr.format(this.model.destResBal);
         }
 
@@ -653,6 +644,16 @@ export class DebtTransactionView extends TransactionView {
         this.model.noAccount = !this.model.noAccount;
 
         if (this.model.noAccount) {
+            this.model.lastAccount_id = this.model.account.id;
+            if (this.model.debtType) {
+                this.model.fDestResBal = normalize(this.model.account.balance);
+                this.model.destResBal = this.model.fDestResBal;
+                this.model.fmtDestResBal = this.model.destCurr.format(this.model.destResBal);
+            } else {
+                this.model.srcResBal = normalize(this.model.account.balance);
+                this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.srcResBal);
+            }
+
             if (this.model.state === 0 || this.model.state === 2) {
                 this.setExpectedState(6); // Transition 25 or 41
             } else if (this.model.state === 1) {
@@ -664,8 +665,6 @@ export class DebtTransactionView extends TransactionView {
             } else {
                 throw new Error('Unexpected state');
             }
-
-            this.model.lastAccount_id = this.model.account.id;
         } else {
             if (this.model.lastAccount_id) {
                 this.model.account = App.state.accounts.getItem(this.model.lastAccount_id);

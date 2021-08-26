@@ -389,13 +389,13 @@ class TransactionView extends View {
         if (trModel.isDebt()) {
             this.noAccountBtn = ge('noacc_btn');
             if (this.noAccountBtn) {
-                this.noAccountBtn.addEventListener('click', this.toggleEnableAccount.bind(this));
+                this.noAccountBtn.addEventListener('click', () => this.toggleEnableAccount());
             }
             this.selectAccountBtn = ge('selaccount');
             if (this.selectAccountBtn) {
                 const accountToggleBtn = this.selectAccountBtn.querySelector('button');
                 if (accountToggleBtn) {
-                    accountToggleBtn.addEventListener('click', this.toggleEnableAccount.bind(this));
+                    accountToggleBtn.addEventListener('click', () => this.toggleEnableAccount());
                 }
             }
 
@@ -403,11 +403,11 @@ class TransactionView extends View {
 
             this.debtGiveRadio = ge('debtgive');
             if (this.debtGiveRadio) {
-                this.debtGiveRadio.addEventListener('change', this.onChangeDebtOp.bind(this));
+                this.debtGiveRadio.addEventListener('change', () => this.onChangeDebtOp());
             }
             this.debtTakeRadio = ge('debttake');
             if (this.debtTakeRadio) {
-                this.debtTakeRadio.addEventListener('change', this.onChangeDebtOp.bind(this));
+                this.debtTakeRadio.addEventListener('change', () => this.onChangeDebtOp());
             }
 
             this.personTile = Tile.fromElement({ elem: 'person_tile', parent: this });
@@ -550,7 +550,7 @@ class TransactionView extends View {
         window.app.model.visibleUserAccounts.forEach(
             (acc) => this.accDDList.addItem({ id: acc.id, title: acc.name }),
         );
-        const accountId = this.debtAccount.id;
+        const accountId = (this.state.account) ? this.state.account.id : 0;
         this.appendHiddenAccount(this.accDDList, accountId);
         this.accDDList.selectItem(accountId);
     }
@@ -1388,6 +1388,16 @@ class TransactionView extends View {
             }
 
             this.state.transaction.lastAcc_id = this.state.account.id;
+
+            if (this.state.transaction.debtType) {
+                const destResult = normalize(this.state.account.balance);
+                this.state.form.destResult = destResult;
+                this.state.form.fDestResult = destResult;
+            } else {
+                const sourceResult = normalize(this.state.account.balance);
+                this.state.form.sourceResult = sourceResult;
+                this.state.form.fSourceResult = sourceResult;
+            }
         } else {
             this.state.account = window.app.model.accounts.getItem(this.state.transaction.lastAcc_id);
             if (!this.state.account) {
@@ -1949,8 +1959,8 @@ class TransactionView extends View {
             this.state.srcAccount = this.state.account;
             this.state.destAccount = this.state.personAccount;
         }
-        this.state.transaction.src_id = this.state.srcAccount.id;
-        this.state.transaction.dest_id = this.state.destAccount.id;
+        this.state.transaction.src_id = (this.state.srcAccount) ? this.state.srcAccount.id : 0;
+        this.state.transaction.dest_id = (this.state.destAccount) ? this.state.destAccount.id : 0;
 
         if (this.state.srcAccount) {
             const sourceResult = normalize(this.state.srcAccount.balance - this.state.transaction.src_amount);
@@ -2098,7 +2108,7 @@ class TransactionView extends View {
                 } else {
                     const lastAcc = window.app.model.accounts.getItem(this.state.transaction.lastAcc_id);
                     const accBalance = (lastAcc) ? lastAcc.balance : 0;
-                    const sourceResult = normalize(accBalance - sourceAmount);
+                    const sourceResult = normalize(accBalance);
                     this.state.form.sourceResult = sourceResult;
                     this.state.form.fSourceResult = sourceResult;
                 }
@@ -2123,16 +2133,18 @@ class TransactionView extends View {
                 const destResult = normalize(this.state.destAccount.balance + destAmount);
                 this.state.form.destResult = destResult;
                 this.state.form.fDestResult = destResult;
-            } else if (this.state.transaction.debtType) {
-                const lastAcc = window.app.model.accounts.getItem(this.state.transaction.lastAcc_id);
-                const accBalance = (lastAcc) ? lastAcc.balance : 0;
-                const destResult = normalize(accBalance + destAmount);
-                this.state.form.destResult = destResult;
-                this.state.form.fDestResult = destResult;
-            } else {
-                const destResult = normalize(this.state.personAccount.balance + destAmount);
-                this.state.form.destResult = destResult;
-                this.state.form.fDestResult = destResult;
+            } else if (this.state.transaction.noAccount) {
+                if (this.state.transaction.debtType) {
+                    const lastAcc = window.app.model.accounts.getItem(this.state.transaction.lastAcc_id);
+                    const accBalance = (lastAcc) ? lastAcc.balance : 0;
+                    const destResult = normalize(accBalance);
+                    this.state.form.destResult = destResult;
+                    this.state.form.fDestResult = destResult;
+                } else {
+                    const destResult = normalize(this.state.personAccount.balance + destAmount);
+                    this.state.form.destResult = destResult;
+                    this.state.form.fDestResult = destResult;
+                }
             }
         }
     }
