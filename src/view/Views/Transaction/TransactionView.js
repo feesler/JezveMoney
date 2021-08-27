@@ -195,7 +195,7 @@ class TransactionView extends View {
         if (!this.form) {
             throw new Error('Failed to initialize Transaction view');
         }
-        this.form.addEventListener('submit', this.onFormSubmit.bind(this));
+        this.form.addEventListener('submit', (e) => this.onFormSubmit(e));
 
         if (this.state.isUpdate) {
             this.deleteBtn = IconLink.fromElement({
@@ -375,7 +375,7 @@ class TransactionView extends View {
             this.persDDList = DropDown.create({
                 input_id: 'person_tile',
                 listAttach: true,
-                onitemselect: this.onPersAccSel.bind(this),
+                onitemselect: (item) => this.onPersonSelect(item),
                 editable: false,
             });
 
@@ -395,7 +395,7 @@ class TransactionView extends View {
             this.srcDDList = DropDown.create({
                 input_id: 'source_tile',
                 listAttach: true,
-                onitemselect: this.onSrcAccSel.bind(this),
+                onitemselect: (item) => this.onSrcAccountSelect(item),
                 editable: false,
             });
 
@@ -412,7 +412,7 @@ class TransactionView extends View {
             this.destDDList = DropDown.create({
                 input_id: 'dest_tile',
                 listAttach: true,
-                onitemselect: this.onDestAccSel.bind(this),
+                onitemselect: (item) => this.onDestAccountSelect(item),
                 editable: false,
             });
             if (this.destDDList) {
@@ -430,7 +430,7 @@ class TransactionView extends View {
             this.srcCurrDDList = DropDown.create({
                 input_id: 'srcamountsign',
                 listAttach: true,
-                onitemselect: this.onSrcCurrencySel.bind(this),
+                onitemselect: (item) => this.onSrcCurrencySel(item),
                 editable: false,
             });
             window.app.model.currency.forEach(
@@ -443,7 +443,7 @@ class TransactionView extends View {
             this.destCurrDDList = DropDown.create({
                 input_id: 'destamountsign',
                 listAttach: true,
-                onitemselect: this.onDestCurrencySel.bind(this),
+                onitemselect: (item) => this.onDestCurrencySel(item),
                 editable: false,
             });
             window.app.model.currency.forEach(
@@ -496,7 +496,7 @@ class TransactionView extends View {
         this.accDDList = DropDown.create({
             input_id: 'acc_tile',
             listAttach: true,
-            onitemselect: this.onDebtAccSel.bind(this),
+            onitemselect: (item) => this.onDebtAccountSelect(item),
             editable: false,
         });
         // In case there is no persons, components will be not available
@@ -547,7 +547,7 @@ class TransactionView extends View {
         this.datePickerBtn.hide();
         show(this.dateBlock, true);
 
-        setEmptyClick(this.calendarObj.hide.bind(this.calendarObj), [
+        setEmptyClick(() => this.calendarObj.hide(), [
             this.datePickerWrapper,
             this.datePickerBtn.elem,
             this.dateInputBtn,
@@ -817,7 +817,7 @@ class TransactionView extends View {
      * Source account select callback
      * @param {object} obj - selected item
      */
-    onSrcAccSel(obj) {
+    onSrcAccountSelect(obj) {
         const { transaction } = this.state;
         if (transaction.type !== EXPENSE && transaction.type !== TRANSFER) {
             return;
@@ -930,7 +930,7 @@ class TransactionView extends View {
      * Destination account select callback
      * @param {object} obj - selected item
      */
-    onDestAccSel(obj) {
+    onDestAccountSelect(obj) {
         const { transaction } = this.state;
         if (transaction.type !== INCOME && transaction.type !== TRANSFER) {
             return;
@@ -1045,7 +1045,7 @@ class TransactionView extends View {
      * Debt account select callback
      * @param {object} obj - selected item
      */
-    onDebtAccSel(obj) {
+    onDebtAccountSelect(obj) {
         const { transaction } = this.state;
         if (transaction.type !== DEBT) {
             return;
@@ -1101,7 +1101,7 @@ class TransactionView extends View {
      * Person select callback
      * @param {object} obj - selected item
      */
-    onPersAccSel(obj) {
+    onPersonSelect(obj) {
         const { transaction } = this.state;
 
         if (transaction.type !== DEBT) {
