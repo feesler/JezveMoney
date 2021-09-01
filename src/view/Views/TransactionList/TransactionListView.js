@@ -88,6 +88,7 @@ class TransactionListView extends View {
      */
     onStart() {
         this.typeMenu = TransactionTypeMenu.fromElement(document.querySelector('.trtype-menu'), {
+            allowActiveLink: true,
             onChange: (sel) => this.onChangeTypeFilter(sel),
         });
 
