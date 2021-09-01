@@ -64,6 +64,9 @@ import {
 
 const singleTransDeleteTitle = 'Delete transaction';
 const singleTransDeleteMsg = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
+const SHOW_INFO = 0;
+const SHOW_INPUT = 1;
+const HIDE_BOTH = 2;
 
 /**
  * Create/update transaction view
@@ -607,64 +610,66 @@ class TransactionView extends View {
      * @param {string|Element} inputRow - input row element
      * @param {string|Element} infoBlock - info block element
      * @param {string|Element} inputObj - decimal input object
-     * @param {boolean} showInput - show/hide flag
+     * @param {Number} options - show/hide options
      */
-    commonSwitch(inputRow, infoBlock, inputObj, showInput) {
-        const toShow = !!showInput;
+    commonSwitch(inputRow, infoBlock, inputObj, options) {
+        const showInput = (options === SHOW_INPUT);
+        const showInfo = (options === SHOW_INFO);
 
-        show(inputRow, toShow);
+        show(inputRow, showInput);
         if (infoBlock) {
-            infoBlock.show(!toShow);
+            infoBlock.show(showInfo);
         }
     }
 
     /**
      * Show input control or static block for source amount value
-     * @param {boolean} showInput - if set ot true show input row, else show info block
+     * @param {Number} options - show/hide options
      */
-    srcAmountSwitch(showInput) {
-        this.commonSwitch(this.srcAmountRow, this.srcAmountInfo, this.srcAmountInput, showInput);
+    srcAmountSwitch(options) {
+        this.commonSwitch(this.srcAmountRow, this.srcAmountInfo, this.srcAmountInput, options);
     }
 
     /**
      * Show input control or static block for destination amount value
-     * @param {boolean} showInput - if set ot true show input row, else show info block
+     * @param {Number} options - show/hide options
      */
-    destAmountSwitch(showInput) {
-        this.commonSwitch(this.destAmountRow, this.destAmountInfo, this.destAmountInput, showInput);
+    destAmountSwitch(options) {
+        this.commonSwitch(this.destAmountRow, this.destAmountInfo, this.destAmountInput, options);
     }
 
     /**
      * Show input control or static block for source result balance value
-     * @param {boolean} showInput - if set ot true show input row, else show info block
+     * @param {Number} options - show/hide options
      */
-    resBalanceSwitch(showInput) {
+    resBalanceSwitch(options) {
         this.commonSwitch(
             this.srcResBalanceRow,
             this.srcResBalanceInfo,
             this.srcResBalanceInput,
-            showInput,
+            options,
         );
     }
 
     /**
      * Show input control or static block for destination result balance value
-     * @param {boolean} showInput - if set ot true show input row, else show info block
+     * @param {Number} options - show/hide options
      */
-    resBalanceDestSwitch(showInput) {
+    resBalanceDestSwitch(options) {
         this.commonSwitch(
             this.destResBalanceRow,
             this.destResBalanceInfo,
             this.destResBalanceInput,
-            showInput,
+            options,
         );
     }
 
     /**
      * Show input control or static block for exchange rate value
+     * @param {Number} options - show/hide options
      */
-    exchRateSwitch(showInput) {
-        this.commonSwitch(this.exchangeRow, this.exchangeInfo, this.exchangeInput, showInput);
+    exchRateSwitch(options) {
+        this.commonSwitch(this.exchangeRow, this.exchangeInfo, this.exchangeInput, options);
     }
 
     /**
@@ -753,47 +758,6 @@ class TransactionView extends View {
             currBtn.classList.add('input-group__btn_inactive');
             inputContainer.classList.add('trans_input');
             inputContainer.classList.remove('rbtn_input');
-        }
-    }
-
-    /**
-     * Set full/short text for source or destination input label
-     * @param {boolean} src - if true set source amount, else destination amount
-     * @param {boolean} full - if true set full amount label, else set short
-     */
-    setAmountInputLabel(src, full) {
-        const labelElem = (src) ? this.srcAmountRowLabel : this.destAmountRowLabel;
-        if (!labelElem) {
-            return;
-        }
-
-        if (full) {
-            labelElem.textContent = (src) ? 'Source amount' : 'Destination amount';
-        } else {
-            labelElem.textContent = 'Amount';
-        }
-    }
-
-    /**
-     * Set full/short text for source or destination amount tile block label
-     * @param {boolean} src - if true set source amount, else destination amount
-     * @param {boolean} full - if true set full amount label, else set short
-     */
-    setAmountTileBlockLabel(src, full) {
-        const amountBlock = (src) ? this.srcAmountInfo : this.destAmountInfo;
-        if (!amountBlock) {
-            return;
-        }
-
-        const labelElem = amountBlock.firstElementChild;
-        if (!labelElem) {
-            return;
-        }
-
-        if (full) {
-            labelElem.textContent = (src) ? 'Source amount' : 'Destination amount';
-        } else {
-            labelElem.textContent = 'Amount';
         }
     }
 
@@ -936,37 +900,35 @@ class TransactionView extends View {
 
     renderExpense(state) {
         if (state.id === 0) {
-            this.srcAmountSwitch(false);
-            this.destAmountSwitch(true);
-            this.resBalanceSwitch(false);
-            this.resBalanceDestSwitch(false);
-            show(this.exchangeRow, false);
-            this.exchangeInfo.hide();
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(HIDE_BOTH);
         } else if (state.id === 1) {
-            this.srcAmountSwitch(false);
-            this.destAmountSwitch(false);
-            this.resBalanceSwitch(true);
-            this.resBalanceDestSwitch(false);
-            show(this.exchangeRow, false);
-            this.exchangeInfo.hide();
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(HIDE_BOTH);
         } else if (state.id === 2) {
-            this.srcAmountSwitch(true);
-            this.destAmountSwitch(true);
-            this.resBalanceSwitch(false);
-            this.resBalanceDestSwitch(false);
-            this.exchRateSwitch(false);
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INFO);
         } else if (state.id === 3) {
-            this.srcAmountSwitch(true);
-            this.destAmountSwitch(false);
-            this.resBalanceSwitch(false);
-            this.resBalanceDestSwitch(false);
-            this.exchRateSwitch(true);
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INPUT);
         } else if (state.id === 4) {
-            this.srcAmountSwitch(true);
-            this.destAmountSwitch(false);
-            this.resBalanceSwitch(true);
-            this.resBalanceDestSwitch(false);
-            this.exchRateSwitch(false);
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INFO);
         }
 
         this.setCurrActive(true, false); // set source currency inactive
@@ -975,39 +937,35 @@ class TransactionView extends View {
 
     renderIncome(state) {
         if (state.id === 0) {
-            this.srcAmountSwitch(true);
-            this.destAmountInfo.hide();
-            show(this.destAmountRow, false);
-            this.resBalanceSwitch(false);
-            this.resBalanceDestSwitch(false);
-            show(this.exchangeRow, false);
-            this.exchangeInfo.hide();
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(HIDE_BOTH);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(HIDE_BOTH);
         } else if (state.id === 1) {
-            this.srcAmountSwitch(false);
-            this.destAmountInfo.hide();
-            show(this.destAmountRow, false);
-            this.resBalanceSwitch(false);
-            this.resBalanceDestSwitch(true);
-            show(this.exchangeRow, false);
-            this.exchangeInfo.hide();
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(HIDE_BOTH);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(HIDE_BOTH);
         } else if (state.id === 2) {
-            this.srcAmountSwitch(true);
-            this.destAmountSwitch(true);
-            this.resBalanceSwitch(false);
-            this.resBalanceDestSwitch(false);
-            this.exchRateSwitch(false);
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INFO);
         } else if (state.id === 3) {
-            this.srcAmountSwitch(true);
-            this.destAmountSwitch(false);
-            this.resBalanceSwitch(false);
-            this.resBalanceDestSwitch(false);
-            this.exchRateSwitch(true);
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INPUT);
         } else if (state.id === 4) {
-            this.srcAmountSwitch(true);
-            this.destAmountSwitch(false);
-            this.resBalanceSwitch(false);
-            this.resBalanceDestSwitch(true);
-            this.exchRateSwitch(false);
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(SHOW_INFO);
         }
 
         this.setCurrActive(true, true); // set source currency active
@@ -1016,65 +974,59 @@ class TransactionView extends View {
 
     renderTransfer(state) {
         if (state.id === 0) {
-            this.srcAmountSwitch(true);
-            this.destAmountInfo.hide();
-            show(this.destAmountRow, false);
-            this.resBalanceSwitch(false);
-            this.resBalanceDestSwitch(false);
-            show(this.exchangeRow, false);
-            this.exchangeInfo.hide();
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(HIDE_BOTH);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(HIDE_BOTH);
         } else if (state.id === 1) {
-            this.srcAmountSwitch(false);
-            this.destAmountInfo.hide();
-            show(this.destAmountRow, false);
-            this.resBalanceSwitch(true);
-            this.resBalanceDestSwitch(false);
-            show(this.exchangeRow, false);
-            this.exchangeInfo.hide();
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(HIDE_BOTH);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(HIDE_BOTH);
         } else if (state.id === 2) {
-            this.srcAmountSwitch(false);
-            this.destAmountInfo.hide();
-            show(this.destAmountRow, false);
-            this.resBalanceSwitch(false);
-            this.resBalanceDestSwitch(true);
-            show(this.exchangeRow, false);
-            this.exchangeInfo.hide();
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(HIDE_BOTH);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(HIDE_BOTH);
         } else if (state.id === 3) {
-            this.srcAmountSwitch(true);
-            this.destAmountSwitch(true);
-            this.resBalanceSwitch(false);
-            this.resBalanceDestSwitch(false);
-            this.exchRateSwitch(false);
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INFO);
         } else if (state.id === 4) {
-            this.srcAmountSwitch(false);
-            this.destAmountSwitch(true);
-            this.resBalanceSwitch(true);
-            this.resBalanceDestSwitch(false);
-            this.exchRateSwitch(false);
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INFO);
         } else if (state.id === 5) {
-            this.srcAmountSwitch(true);
-            this.destAmountSwitch(false);
-            this.resBalanceSwitch(false);
-            this.resBalanceDestSwitch(true);
-            this.exchRateSwitch(false);
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(SHOW_INFO);
         } else if (state.id === 6) {
-            this.srcAmountSwitch(false);
-            this.destAmountSwitch(false);
-            this.resBalanceSwitch(true);
-            this.resBalanceDestSwitch(true);
-            this.exchRateSwitch(false);
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(SHOW_INFO);
         } else if (state.id === 7) {
-            this.srcAmountSwitch(true);
-            this.destAmountSwitch(false);
-            this.resBalanceSwitch(false);
-            this.resBalanceDestSwitch(false);
-            this.exchRateSwitch(true);
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INPUT);
         } else if (state.id === 8) {
-            this.srcAmountSwitch(false);
-            this.destAmountSwitch(false);
-            this.resBalanceSwitch(true);
-            this.resBalanceDestSwitch(false);
-            this.exchRateSwitch(true);
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INPUT);
         }
 
         this.setCurrActive(true, false); // set source currency inactive
@@ -1082,43 +1034,37 @@ class TransactionView extends View {
     }
 
     renderDebt(state) {
-        this.destAmountInfo.hide();
-        show(this.destAmountRow, false);
-        show(this.exchangeRow, false);
-        this.exchangeInfo.hide();
+        this.destAmountSwitch(HIDE_BOTH);
+        this.exchRateSwitch(HIDE_BOTH);
 
         if (state.id === 0 || state.id === 3) {
-            this.srcAmountSwitch(true);
-            this.resBalanceSwitch(false);
-            this.resBalanceDestSwitch(false);
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
         } else if (state.id === 1 || state.id === 5) {
-            this.srcAmountSwitch(false);
-            this.resBalanceSwitch(true);
-            this.resBalanceDestSwitch(false);
+            this.srcAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(SHOW_INFO);
         } else if (state.id === 2 || state.id === 4) {
-            this.srcAmountSwitch(false);
-            this.resBalanceSwitch(false);
-            this.resBalanceDestSwitch(true);
+            this.srcAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INPUT);
         } else if (state.id === 6) {
-            this.srcAmountSwitch(true);
-            this.resBalanceSwitch(false);
-            show(this.destResBalanceRow, false);
-            this.destResBalanceInfo.hide();
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(HIDE_BOTH);
         } else if (state.id === 7) {
-            this.srcAmountSwitch(true);
-            show(this.srcResBalanceRow, false);
-            this.srcResBalanceInfo.hide();
-            this.resBalanceDestSwitch(false);
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(HIDE_BOTH);
+            this.resBalanceDestSwitch(SHOW_INFO);
         } else if (state.id === 8) {
-            this.srcAmountSwitch(false);
-            show(this.srcResBalanceRow, false);
-            this.srcResBalanceInfo.hide();
-            this.resBalanceDestSwitch(true);
+            this.srcAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(HIDE_BOTH);
+            this.resBalanceDestSwitch(SHOW_INPUT);
         } else if (state.id === 9) {
-            this.srcAmountSwitch(false);
-            this.resBalanceSwitch(true);
-            show(this.destResBalanceRow, false);
-            this.destResBalanceInfo.hide();
+            this.srcAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(HIDE_BOTH);
         }
 
         const { debtType, noAccount } = state.transaction;
@@ -1209,10 +1155,14 @@ class TransactionView extends View {
         this.srcCurrInp.value = transaction.src_curr;
         this.destCurrInp.value = transaction.dest_curr;
 
-        this.setAmountInputLabel(true, state.isDiff);
-        this.setAmountInputLabel(false, state.isDiff);
-        this.setAmountTileBlockLabel(true, state.isDiff);
-        this.setAmountTileBlockLabel(false, state.isDiff);
+        const sourceAmountLbl = (state.isDiff) ? 'Source amount' : 'Amount';
+        const destAmountLbl = (state.isDiff) ? 'Destination amount' : 'Amount';
+        if (this.srcAmountRowLabel) {
+            this.srcAmountRowLabel.textContent = sourceAmountLbl;
+        }
+        if (this.destAmountRowLabel) {
+            this.destAmountRowLabel.textContent = destAmountLbl;
+        }
 
         this.setSign(this.destAmountSign, this.destCurrDDList, transaction.dest_curr);
         this.setSign(this.srcAmountSign, this.srcCurrDDList, transaction.src_curr);
@@ -1239,11 +1189,13 @@ class TransactionView extends View {
         if (this.srcAmountInfo) {
             const title = srcCurrency.formatValue(transaction.src_amount);
             this.srcAmountInfo.setTitle(title);
+            this.srcAmountInfo.setLabel(sourceAmountLbl);
         }
 
         if (this.destAmountInfo) {
             const title = destCurrency.formatValue(transaction.dest_amount);
             this.destAmountInfo.setTitle(title);
+            this.destAmountInfo.setLabel(destAmountLbl);
         }
 
         if (this.srcResBalanceInfo) {
