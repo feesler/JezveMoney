@@ -132,10 +132,10 @@ class TransactionView extends View {
                 destAmount: true,
                 date: true,
             },
-            srcAccount: { ...accountModel.getItem(transaction.src_id) },
-            destAccount: { ...accountModel.getItem(transaction.dest_id) },
-            srcCurrency: { ...currencyModel.getItem(transaction.src_curr) },
-            destCurrency: { ...currencyModel.getItem(transaction.dest_curr) },
+            srcAccount: accountModel.getItem(transaction.src_id),
+            destAccount: accountModel.getItem(transaction.dest_id),
+            srcCurrency: currencyModel.getItem(transaction.src_curr),
+            destCurrency: currencyModel.getItem(transaction.dest_curr),
             isDiff: transaction.src_curr !== transaction.dest_curr,
             isUpdate: this.props.mode === 'update',
         };
@@ -214,7 +214,11 @@ class TransactionView extends View {
         initialState.form.exchange = exchange;
 
         this.store = createStore(reducer, initialState);
-        this.store.subscribe((state) => this.render(state));
+        this.store.subscribe((state, prevState) => {
+            if (state !== prevState) {
+                this.render(state);
+            }
+        });
     }
 
     /**

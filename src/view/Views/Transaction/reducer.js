@@ -341,7 +341,7 @@ const reduceSourceAccountChange = (state, accountId) => {
         // then copy source currency to destination
         if (state.id === 0 || state.id === 1) {
             transaction.dest_curr = srcAccount.curr_id;
-            newState.destCurrency = { ...srcCurrency };
+            newState.destCurrency = srcCurrency;
         }
 
         // Update result balance of source
@@ -457,7 +457,7 @@ const reduceDestAccountChange = (state, accountId) => {
         // then copy destination currency to source
         if (newState.id === 0 || newState.id === 1) {
             newState.transaction.src_curr = destAccount.curr_id;
-            newState.srcCurrency = { ...destCurrency };
+            newState.srcCurrency = destCurrency;
         }
 
         // Update result balance of destination
@@ -586,11 +586,11 @@ const reduceDebtAccountChange = (state, accountId) => {
     newState.destCurrency = currency;
 
     if (transaction.debtType) {
-        newState.srcAccount = { ...newState.personAccount };
-        newState.destAccount = { ...newState.account };
+        newState.srcAccount = newState.personAccount;
+        newState.destAccount = newState.account;
     } else {
-        newState.srcAccount = { ...newState.account };
-        newState.destAccount = { ...newState.personAccount };
+        newState.srcAccount = newState.account;
+        newState.destAccount = newState.personAccount;
     }
 
     const sourceResult = normalize(newState.srcAccount.balance - transaction.src_amount);
@@ -636,13 +636,13 @@ const reducePersonChange = (state, personId) => {
     }
 
     if (transaction.debtType) {
-        newState.srcAccount = { ...newState.personAccount };
+        newState.srcAccount = newState.personAccount;
 
         const sourceResult = normalize(newState.srcAccount.balance - transaction.src_amount);
         newState.form.sourceResult = sourceResult;
         newState.form.fSourceResult = sourceResult;
     } else {
-        newState.destAccount = { ...newState.personAccount };
+        newState.destAccount = newState.personAccount;
 
         const destResult = normalize(newState.destAccount.balance + transaction.dest_amount);
         newState.form.destResult = destResult;
@@ -758,13 +758,13 @@ const reduceToggleDebtAccount = (state) => {
         }
 
         if (transaction.debtType) {
-            newState.destAccount = { ...newState.account };
+            newState.destAccount = newState.account;
 
             const destResult = normalize(newState.account.balance + transaction.dest_amount);
             newState.form.destResult = destResult;
             newState.form.fDestResult = destResult;
         } else {
-            newState.srcAccount = { ...newState.account };
+            newState.srcAccount = newState.account;
 
             const sourceResult = normalize(newState.account.balance - transaction.src_amount);
             newState.form.sourceResult = sourceResult;
@@ -797,11 +797,11 @@ const reduceToggleDebtType = (state) => {
     const { transaction } = newState;
 
     if (debtType) {
-        newState.srcAccount = { ...state.personAccount };
-        newState.destAccount = { ...state.account };
+        newState.srcAccount = state.personAccount;
+        newState.destAccount = state.account;
     } else {
-        newState.srcAccount = { ...state.account };
-        newState.destAccount = { ...state.personAccount };
+        newState.srcAccount = state.account;
+        newState.destAccount = state.personAccount;
     }
     transaction.src_id = (newState.srcAccount) ? newState.srcAccount.id : 0;
     transaction.dest_id = (newState.destAccount) ? newState.destAccount.id : 0;
