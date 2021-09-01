@@ -35,6 +35,32 @@ import { IconLink } from '../../Components/IconLink/IconLink.js';
 import '../../css/app.css';
 import '../../Components/TransactionTypeMenu/style.css';
 import './style.css';
+import { createStore } from '../../js/store.js';
+import {
+    debtAccountChange,
+    destAccountChange,
+    destAmountChange,
+    destAmountClick,
+    destCurrencyChange,
+    destResultChange,
+    destResultClick,
+    exchangeChange,
+    exchangeClick,
+    invalidateSourceAmount,
+    invalidateDestAmount,
+    invalidateDate,
+    personChange,
+    sourceAccountChange,
+    sourceAmountChange,
+    sourceAmountClick,
+    sourceCurrencyChange,
+    sourceResultChange,
+    sourceResultClick,
+    toggleDebtAccount,
+    toggleDebtType,
+    calculateExchange,
+    reducer,
+} from './reducer.js';
 
 const singleTransDeleteTitle = 'Delete transaction';
 const singleTransDeleteMsg = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
@@ -87,7 +113,8 @@ class TransactionView extends View {
         window.app.model.visibleUserAccounts = AccountList.create(userAccounts.getVisible());
 
         const { transaction } = this.props;
-        this.state = {
+
+        const initialState = {
             id: 0,
             transaction: { ...transaction },
             form: {
@@ -105,51 +132,51 @@ class TransactionView extends View {
                 destAmount: true,
                 date: true,
             },
-            srcAccount: accountModel.getItem(transaction.src_id),
-            destAccount: accountModel.getItem(transaction.dest_id),
-            srcCurrency: currencyModel.getItem(transaction.src_curr),
-            destCurrency: currencyModel.getItem(transaction.dest_curr),
+            srcAccount: { ...accountModel.getItem(transaction.src_id) },
+            destAccount: { ...accountModel.getItem(transaction.dest_id) },
+            srcCurrency: { ...currencyModel.getItem(transaction.src_curr) },
+            destCurrency: { ...currencyModel.getItem(transaction.dest_curr) },
             isDiff: transaction.src_curr !== transaction.dest_curr,
             isUpdate: this.props.mode === 'update',
         };
 
         if (transaction.id) {
-            this.state.form.sourceAmount = transaction.src_amount;
-            this.state.form.destAmount = transaction.dest_amount;
+            initialState.form.sourceAmount = transaction.src_amount;
+            initialState.form.destAmount = transaction.dest_amount;
         }
 
-        if (this.state.srcAccount) {
-            const srcBalance = this.state.srcAccount.balance;
-            const srcResult = normalize(srcBalance - this.state.transaction.src_amount);
+        if (initialState.srcAccount) {
+            const srcBalance = initialState.srcAccount.balance;
+            const srcResult = normalize(srcBalance - initialState.transaction.src_amount);
 
-            this.state.form.sourceResult = srcResult;
-            this.state.form.fSourceResult = srcResult;
+            initialState.form.sourceResult = srcResult;
+            initialState.form.fSourceResult = srcResult;
         }
 
-        if (this.state.destAccount) {
-            const destBalance = this.state.destAccount.balance;
-            const destResult = normalize(destBalance + this.state.transaction.dest_amount);
+        if (initialState.destAccount) {
+            const destBalance = initialState.destAccount.balance;
+            const destResult = normalize(destBalance + initialState.transaction.dest_amount);
 
-            this.state.form.destResult = destResult;
-            this.state.form.fDestResult = destResult;
+            initialState.form.destResult = destResult;
+            initialState.form.fDestResult = destResult;
         }
 
         if (transaction.type === EXPENSE || transaction.type === INCOME) {
-            this.state.id = (this.state.isDiff) ? 2 : 0;
+            initialState.id = (initialState.isDiff) ? 2 : 0;
         } else if (transaction.type === TRANSFER) {
-            this.state.id = (this.state.isDiff) ? 3 : 0;
+            initialState.id = (initialState.isDiff) ? 3 : 0;
         } else if (transaction.type === DEBT) {
-            this.state.person = window.app.model.persons.getItem(transaction.person_id);
+            initialState.person = window.app.model.persons.getItem(transaction.person_id);
             const personAccountId = (transaction.debtType)
                 ? transaction.src_id
                 : transaction.dest_id;
             if (personAccountId) {
-                this.state.personAccount = accountModel.getItem(personAccountId);
+                initialState.personAccount = accountModel.getItem(personAccountId);
             } else {
                 const personAccountCurr = (transaction.debtType)
                     ? transaction.src_curr
                     : transaction.dest_curr;
-                this.state.personAccount = {
+                initialState.personAccount = {
                     id: 0,
                     balance: 0,
                     curr_id: personAccountCurr,
@@ -157,38 +184,46 @@ class TransactionView extends View {
             }
 
             if (transaction.debtType) {
-                this.state.srcAccount = this.state.personAccount;
-                this.state.account = this.state.destAccount;
+                initialState.srcAccount = initialState.personAccount;
+                initialState.account = initialState.destAccount;
 
-                this.state.id = (this.state.transaction.noAccount) ? 6 : 0;
+                initialState.id = (initialState.transaction.noAccount) ? 6 : 0;
             } else {
-                this.state.destAccount = this.state.personAccount;
-                this.state.account = this.state.srcAccount;
+                initialState.destAccount = initialState.personAccount;
+                initialState.account = initialState.srcAccount;
 
-                this.state.id = (transaction.noAccount) ? 7 : 3;
+                initialState.id = (transaction.noAccount) ? 7 : 3;
             }
 
             if (transaction.noAccount) {
                 const lastAcc = window.app.model.accounts.getItem(transaction.lastAcc_id);
                 if (transaction.debtType) {
                     const destResult = normalize(lastAcc.balance);
-                    this.state.form.destResult = destResult;
-                    this.state.form.fDestResult = destResult;
+                    initialState.form.destResult = destResult;
+                    initialState.form.fDestResult = destResult;
                 } else {
                     const sourceResult = normalize(lastAcc.balance);
-                    this.state.form.sourceResult = sourceResult;
-                    this.state.form.fSourceResult = sourceResult;
+                    initialState.form.sourceResult = sourceResult;
+                    initialState.form.fSourceResult = sourceResult;
                 }
             }
         }
 
-        this.updateStateExchange();
+        const exchange = calculateExchange(initialState);
+        initialState.form.fExchange = exchange;
+        initialState.form.exchange = exchange;
+
+        this.store = createStore(reducer, initialState);
+        this.store.subscribe((state) => this.render(state));
     }
 
     /**
      * View initialization
      */
     onStart() {
+        const state = this.store.getState();
+        const { transaction } = state;
+
         this.submitStarted = false;
         // Init form submit event handler
         this.form = ge('mainfrm');
@@ -197,7 +232,7 @@ class TransactionView extends View {
         }
         this.form.addEventListener('submit', (e) => this.onFormSubmit(e));
 
-        if (this.state.isUpdate) {
+        if (state.isUpdate) {
             this.deleteBtn = IconLink.fromElement({
                 elem: 'del_btn',
                 onclick: () => this.confirmDelete(),
@@ -227,23 +262,23 @@ class TransactionView extends View {
 
         this.srcAmountInfo = TileInfoItem.fromElement({
             elem: 'src_amount_left',
-            onclick: () => this.onSrcAmountSelect(),
+            onclick: () => this.store.dispatch(sourceAmountClick()),
         });
         this.destAmountInfo = TileInfoItem.fromElement({
             elem: 'dest_amount_left',
-            onclick: () => this.onDestAmountSelect(),
+            onclick: () => this.store.dispatch(destAmountClick()),
         });
         this.exchangeInfo = TileInfoItem.fromElement({
             elem: 'exch_left',
-            onclick: () => this.onExchRateSelect(),
+            onclick: () => this.store.dispatch(exchangeClick()),
         });
         this.srcResBalanceInfo = TileInfoItem.fromElement({
             elem: 'src_res_balance_left',
-            onclick: () => this.onResBalanceSelect(),
+            onclick: () => this.store.dispatch(sourceResultClick()),
         });
         this.destResBalanceInfo = TileInfoItem.fromElement({
             elem: 'dest_res_balance_left',
-            onclick: () => this.onResBalanceDestSelect(),
+            onclick: () => this.store.dispatch(destResultClick()),
         });
 
         this.srcAmountRow = ge('src_amount_row');
@@ -315,8 +350,6 @@ class TransactionView extends View {
         });
         this.commentBlock = ge('comment_block');
         this.commentInput = ge('comm');
-
-        const { transaction } = this.state;
 
         if (transaction.type === EXPENSE || transaction.type === TRANSFER) {
             this.srcIdInp = ge('src_id');
@@ -507,7 +540,9 @@ class TransactionView extends View {
         window.app.model.visibleUserAccounts.forEach(
             (acc) => this.accDDList.addItem({ id: acc.id, title: acc.name }),
         );
-        const accountId = (this.state.account) ? this.state.account.id : 0;
+
+        const state = this.store.getState();
+        const accountId = (state.account) ? state.account.id : 0;
         this.appendHiddenAccount(this.accDDList, accountId);
         this.accDDList.selectItem(accountId);
     }
@@ -629,301 +664,12 @@ class TransactionView extends View {
     }
 
     /**
-     * Source amount static click event handler
-     */
-    onSrcAmountSelect() {
-        if (this.state.transaction.type === INCOME) {
-            if (this.state.id === 1) {
-                this.state.id = 0;
-            }
-
-            this.render(this.state);
-            return;
-        }
-
-        if (this.state.transaction.type === TRANSFER) {
-            if (this.state.id === 1 || this.state.id === 2) {
-                this.state.id = 0;
-            } else if (this.state.id === 4) {
-                this.state.id = 3;
-            } else if (this.state.id === 6) {
-                this.state.id = 5;
-            } else if (this.state.id === 8) {
-                this.state.id = 7;
-            }
-
-            this.render(this.state);
-            return;
-        }
-
-        if (this.state.transaction.type === DEBT) {
-            if (this.state.id === 1 || this.state.id === 2) {
-                this.state.id = 0;
-            } else if (this.state.id === 4 || this.state.id === 5) {
-                this.state.id = 3;
-            } else if (this.state.id === 8) {
-                this.state.id = 7;
-            } else if (this.state.id === 9) {
-                this.state.id = 6;
-            }
-
-            this.render(this.state);
-        }
-    }
-
-    /**
-     * Destination amount static click event handler
-     */
-    onDestAmountSelect() {
-        if (this.state.transaction.type === EXPENSE) {
-            if (this.state.id === 1) {
-                this.state.id = 0;
-            } else if (this.state.id === 3 || this.state.id === 4) {
-                this.state.id = 2;
-            }
-
-            this.render(this.state);
-            return;
-        }
-
-        if (this.state.transaction.type === INCOME) {
-            if (this.state.id === 3 || this.state.id === 4) {
-                this.state.id = 2;
-            }
-
-            this.render(this.state);
-            return;
-        }
-
-        if (this.state.transaction.type === TRANSFER) {
-            if (this.state.id === 5 || this.state.id === 7) {
-                this.state.id = 3;
-            } else if (this.state.id === 6 || this.state.id === 8) {
-                this.state.id = 4;
-            }
-
-            this.render(this.state);
-        }
-    }
-
-    /**
-     * Source result balance static click event handler
-     */
-    onResBalanceSelect() {
-        if (this.state.transaction.type === EXPENSE) {
-            if (this.state.id === 0) {
-                this.state.id = 1;
-            } else if (this.state.id === 2 || this.state.id === 3) {
-                this.state.id = 4;
-            }
-
-            this.render(this.state);
-            return;
-        }
-
-        if (this.state.transaction.type === TRANSFER) {
-            if (this.state.id === 0 || this.state.id === 2) {
-                this.state.id = 1;
-            } else if (this.state.id === 3) {
-                this.state.id = 4;
-            } else if (this.state.id === 5) {
-                this.state.id = 6;
-            } else if (this.state.id === 7) {
-                this.state.id = 8;
-            }
-
-            this.render(this.state);
-            return;
-        }
-
-        if (this.state.transaction.type === DEBT) {
-            if (this.state.id === 0 || this.state.id === 2) {
-                this.state.id = 1;
-            } else if (this.state.id === 3 || this.state.id === 4) {
-                this.state.id = 5;
-            } else if (this.state.id === 6) {
-                this.state.id = 9;
-            }
-
-            this.render(this.state);
-        }
-    }
-
-    /**
-     * Destination result balance static click event handler
-     */
-    onResBalanceDestSelect() {
-        if (this.state.transaction.type === INCOME) {
-            if (this.state.id === 0) {
-                this.state.id = 1;
-            } else if (this.state.id === 2 || this.state.id === 3) {
-                this.state.id = 4;
-            }
-
-            this.render(this.state);
-            return;
-        }
-
-        if (this.state.transaction.type === TRANSFER) {
-            if (this.state.id === 0 || this.state.id === 1) {
-                this.state.id = 2;
-            } else if (this.state.id === 3 || this.state.id === 7) {
-                this.state.id = 5;
-            } else if (this.state.id === 4 || this.state.id === 8) {
-                this.state.id = 6;
-            }
-
-            this.render(this.state);
-            return;
-        }
-
-        if (this.state.transaction.type === DEBT) {
-            if (this.state.id === 0 || this.state.id === 1) {
-                this.state.id = 2;
-            } else if (this.state.id === 3 || this.state.id === 5) {
-                this.state.id = 4;
-            } else if (this.state.id === 7) {
-                this.state.id = 8;
-            }
-
-            this.render(this.state);
-        }
-    }
-
-    /**
-     * Exchange rate static click event handler
-     */
-    onExchRateSelect() {
-        if (this.state.transaction.type === EXPENSE
-            || this.state.transaction.type === INCOME) {
-            this.state.id = 3;
-
-            this.render(this.state);
-            return;
-        }
-
-        if (this.state.transaction.type === TRANSFER) {
-            if (this.state.id === 3 || this.state.id === 5) {
-                this.state.id = 7;
-            } else if (this.state.id === 4 || this.state.id === 6) {
-                this.state.id = 8;
-            }
-
-            this.render(this.state);
-        }
-    }
-
-    /**
      * Source account select callback
      * @param {object} obj - selected item
      */
     onSrcAccountSelect(obj) {
-        const { transaction } = this.state;
-        if (transaction.type !== EXPENSE && transaction.type !== TRANSFER) {
-            return;
-        }
-
         const accountId = parseInt(obj.id, 10);
-        if (transaction.src_id === accountId) {
-            return;
-        }
-
-        this.state.transaction.src_id = accountId;
-        const srcAccount = window.app.model.accounts.getItem(accountId);
-        this.state.srcAccount = srcAccount;
-        this.state.transaction.src_curr = srcAccount.curr_id;
-        this.state.srcCurrency = window.app.model.currency.getItem(srcAccount.curr_id);
-
-        if (transaction.type === EXPENSE) {
-            // If currencies are same before account was changed
-            // then copy source currency to destination
-            if (this.state.id === 0 || this.state.id === 1) {
-                this.state.transaction.dest_curr = srcAccount.curr_id;
-                this.state.destCurrency = this.state.srcCurrency;
-            }
-
-            // Update result balance of source
-            const srcResult = normalize(srcAccount.balance - transaction.src_amount);
-            if (this.state.form.fSourceResult !== srcResult) {
-                this.state.form.fSourceResult = srcResult;
-                this.state.form.sourceResult = srcResult;
-            }
-
-            this.updateStateExchange();
-
-            this.state.isDiff = transaction.src_curr !== transaction.dest_curr;
-            if (!this.state.isDiff) {
-                if (this.state.id === 2 || this.state.id === 3 || this.state.id === 4) {
-                    const srcAmount = transaction.src_amount;
-                    this.state.transaction.dest_amount = srcAmount;
-                    this.state.form.destAmount = srcAmount;
-                    this.state.id = (this.state.id === 4) ? 1 : 0;
-                }
-            }
-        }
-
-        if (transaction.type === TRANSFER) {
-            // Update result balance of source
-            const srcResult = normalize(srcAccount.balance - transaction.src_amount);
-            if (this.state.form.fSourceResult !== srcResult) {
-                this.state.form.fSourceResult = srcResult;
-                this.state.form.sourceResult = srcResult;
-            }
-
-            if (accountId === transaction.dest_id) {
-                const { visibleUserAccounts } = window.app.model;
-                const nextAccountId = visibleUserAccounts.getNextAccount(accountId);
-                const destAccount = window.app.model.accounts.getItem(nextAccountId);
-                if (!destAccount) {
-                    throw new Error('Next account not found');
-                }
-                this.state.destAccount = destAccount;
-                this.state.transaction.dest_id = destAccount.id;
-                this.state.transaction.dest_curr = destAccount.curr_id;
-                this.state.destCurrency = window.app.model.currency.getItem(destAccount.curr_id);
-
-                // TODO : investigate unconditional copying of amount for different currencies case
-                // Copy source amount to destination amount
-                if (transaction.dest_amount !== transaction.src_amount) {
-                    this.state.form.destAmount = this.state.form.sourceAmount;
-                }
-                this.state.transaction.dest_amount = transaction.src_amount;
-
-                // Update result balance of destination
-                const destResult = normalize(destAccount.balance + transaction.dest_amount);
-                if (this.state.form.fDestResult !== destResult) {
-                    this.state.form.fDestResult = destResult;
-                    this.state.form.destResult = destResult;
-                }
-            }
-
-            this.updateStateExchange();
-
-            this.state.isDiff = transaction.src_curr !== transaction.dest_curr;
-            if (this.state.isDiff) {
-                if (this.state.id === 0) {
-                    this.state.id = 3;
-                } else if (this.state.id === 1) {
-                    this.state.id = 4;
-                } else if (this.state.id === 2) {
-                    this.state.id = 5;
-                }
-            } else {
-                if (transaction.dest_amount !== transaction.src_amount) {
-                    this.setStateDestAmount(this.state.transaction.src_amount);
-                }
-
-                if (this.state.id === 3 || this.state.id === 7) {
-                    this.state.id = 0;
-                } else if (this.state.id === 4 || this.state.id === 6 || this.state.id === 8) {
-                    this.state.id = 1;
-                } else if (this.state.id === 5) {
-                    this.state.id = 2;
-                }
-            }
-        }
-
-        this.render(this.state);
+        this.store.dispatch(sourceAccountChange(accountId));
     }
 
     /**
@@ -931,114 +677,8 @@ class TransactionView extends View {
      * @param {object} obj - selected item
      */
     onDestAccountSelect(obj) {
-        const { transaction } = this.state;
-        if (transaction.type !== INCOME && transaction.type !== TRANSFER) {
-            return;
-        }
-
         const accountId = parseInt(obj.id, 10);
-        if (transaction.dest_id === accountId) {
-            return;
-        }
-
-        this.state.transaction.dest_id = accountId;
-        const destAccount = window.app.model.accounts.getItem(accountId);
-        this.state.destAccount = destAccount;
-        this.state.transaction.dest_curr = destAccount.curr_id;
-        this.state.destCurrency = window.app.model.currency.getItem(destAccount.curr_id);
-
-        if (transaction.type === INCOME) {
-            // If currencies are same before account was changed
-            // then copy destination currency to source
-            if (this.state.id === 0 || this.state.id === 1) {
-                this.state.transaction.src_curr = destAccount.curr_id;
-                this.state.srcCurrency = this.state.destCurrency;
-            }
-
-            // Update result balance of destination
-            const destResult = normalize(destAccount.balance + transaction.dest_amount);
-            if (this.state.form.fDestResult !== destResult) {
-                this.state.form.fDestResult = destResult;
-                this.state.form.destResult = destResult;
-            }
-
-            this.updateStateExchange();
-
-            this.state.isDiff = transaction.src_curr !== transaction.dest_curr;
-            if (!this.state.isDiff) {
-                if (this.state.id === 2 || this.state.id === 3 || this.state.id === 4) {
-                    this.setStateSourceAmount(transaction.dest_amount);
-                    this.state.id = (this.state.id === 4) ? 1 : 0;
-                }
-            }
-        }
-
-        if (transaction.type === TRANSFER) {
-            // Update result balance of destination
-            const destResult = normalize(destAccount.balance + transaction.dest_amount);
-            if (this.state.form.fDestResult !== destResult) {
-                this.state.form.fDestResult = destResult;
-                this.state.form.destResult = destResult;
-            }
-
-            if (accountId === this.state.transaction.src_id) {
-                const { visibleUserAccounts } = window.app.model;
-                const nextAccountId = visibleUserAccounts.getNextAccount(accountId);
-                const srcAccount = window.app.model.accounts.getItem(nextAccountId);
-                if (!srcAccount) {
-                    throw new Error('Next account not found');
-                }
-                this.state.srcAccount = srcAccount;
-                this.state.transaction.src_id = srcAccount.id;
-                this.state.transaction.src_curr = srcAccount.curr_id;
-                this.state.srcCurrency = window.app.model.currency.getItem(srcAccount.curr_id);
-
-                // TODO : investigate unconditional copying of amount for different currencies case
-                // Copy source amount to destination amount
-                if (transaction.dest_amount !== transaction.src_amount) {
-                    this.state.form.sourceAmount = this.state.form.destAmount;
-                }
-                this.state.transaction.src_amount = transaction.dest_amount;
-
-                // Update result balance of source
-                const sourceResult = normalize(srcAccount.balance - transaction.src_amount);
-                if (this.state.form.fSourceResult !== sourceResult) {
-                    this.state.form.fSourceResult = sourceResult;
-                    this.state.form.sourceResult = sourceResult;
-                }
-            }
-
-            // Copy source amount to destination amount
-            if (!this.state.isDiff) {
-                this.setStateSourceAmount(transaction.dest_amount);
-            }
-            this.updateStateExchange();
-
-            this.state.isDiff = transaction.src_curr !== transaction.dest_curr;
-            if (this.state.isDiff) {
-                if (this.state.id === 0) {
-                    this.state.id = 3;
-                } else if (this.state.id === 1) {
-                    this.state.id = 4;
-                } else if (this.state.id === 2) {
-                    this.state.id = 5;
-                }
-            } else {
-                if (transaction.dest_amount !== transaction.src_amount) {
-                    this.setStateDestAmount(transaction.src_amount);
-                }
-
-                if (this.state.id === 3 || this.state.id === 7) {
-                    this.state.id = 0;
-                } else if (this.state.id === 4 || this.state.id === 8) {
-                    this.state.id = 1;
-                } else if (this.state.id === 5 || this.state.id === 6) {
-                    this.state.id = 2;
-                }
-            }
-        }
-
-        this.render(this.state);
+        this.store.dispatch(destAccountChange(accountId));
     }
 
     /**
@@ -1046,55 +686,8 @@ class TransactionView extends View {
      * @param {object} obj - selected item
      */
     onDebtAccountSelect(obj) {
-        const { transaction } = this.state;
-        if (transaction.type !== DEBT) {
-            return;
-        }
-
-        const account = window.app.model.accounts.getItem(obj.id);
-        if (!account || (this.state.account && this.state.account.id === account.id)) {
-            return;
-        }
-
-        this.state.account = account;
-        // Request person account wtih the same currency as account
-        if (this.state.personAccount.curr_id !== account.curr_id) {
-            this.state.personAccount = window.app.model.accounts.getPersonAccount(
-                this.state.person.id,
-                account.curr_id,
-            );
-            if (!this.state.personAccount) {
-                this.state.personAccount = {
-                    id: 0,
-                    balance: 0,
-                    curr_id: account.curr_id,
-                };
-            }
-        }
-
-        this.state.transaction.src_curr = account.curr_id;
-        this.state.transaction.dest_curr = account.curr_id;
-        const currency = window.app.model.currency.getItem(account.curr_id);
-        this.state.srcCurrency = currency;
-        this.state.destCurrency = currency;
-
-        if (this.state.transaction.debtType) {
-            this.state.srcAccount = this.state.personAccount;
-            this.state.destAccount = this.state.account;
-        } else {
-            this.state.srcAccount = this.state.account;
-            this.state.destAccount = this.state.personAccount;
-        }
-
-        const sourceResult = normalize(this.state.srcAccount.balance - transaction.src_amount);
-        this.state.form.fSourceResult = sourceResult;
-        this.state.form.sourceResult = sourceResult;
-
-        const destResult = normalize(this.state.destAccount.balance + transaction.dest_amount);
-        this.state.form.fDestResult = destResult;
-        this.state.form.destResult = destResult;
-
-        this.render(this.state);
+        const accountId = parseInt(obj.id, 10);
+        this.store.dispatch(debtAccountChange(accountId));
     }
 
     /**
@@ -1102,44 +695,8 @@ class TransactionView extends View {
      * @param {object} obj - selected item
      */
     onPersonSelect(obj) {
-        const { transaction } = this.state;
-
-        if (transaction.type !== DEBT) {
-            return;
-        }
-
-        this.state.person = window.app.model.persons.getItem(obj.id);
-
-        const currencyId = (transaction.debtType)
-            ? transaction.src_curr
-            : transaction.dest_curr;
-        this.state.personAccount = window.app.model.accounts.getPersonAccount(
-            this.state.person.id,
-            currencyId,
-        );
-        if (!this.state.personAccount) {
-            this.state.personAccount = {
-                id: 0,
-                balance: 0,
-                curr_id: currencyId,
-            };
-        }
-
-        if (transaction.debtType) {
-            this.state.srcAccount = this.state.personAccount;
-
-            const sourceResult = normalize(this.state.srcAccount.balance - transaction.src_amount);
-            this.state.form.sourceResult = sourceResult;
-            this.state.form.fSourceResult = sourceResult;
-        } else {
-            this.state.destAccount = this.state.personAccount;
-
-            const destResult = normalize(this.state.destAccount.balance + transaction.dest_amount);
-            this.state.form.destResult = destResult;
-            this.state.form.fDestResult = destResult;
-        }
-
-        this.render(this.state);
+        const personId = parseInt(obj.id, 10);
+        this.store.dispatch(personChange(personId));
     }
 
     /**
@@ -1147,32 +704,8 @@ class TransactionView extends View {
      * @param {object} obj - selected item
      */
     onSrcCurrencySel(obj) {
-        const { transaction } = this.state;
-
-        if (transaction.type !== INCOME) {
-            return;
-        }
-
-        const curr = window.app.model.currency.getItem(obj.id);
-        if (transaction.src_curr === curr.id) {
-            return;
-        }
-
-        this.state.srcCurrency = curr;
-        this.state.transaction.src_curr = curr.id;
-        this.state.isDiff = transaction.src_curr !== transaction.dest_curr;
-
-        if (this.state.isDiff && this.state.id === 0) {
-            this.state.id = 2;
-        } else if (this.state.id === 2 || this.state.id === 3 || this.state.id === 4) {
-            if (!this.state.isDiff) {
-                this.setStateDestAmount(transaction.src_amount);
-                this.updateStateExchange();
-                this.state.id = (this.state.id === 4) ? 1 : 0;
-            }
-        }
-
-        this.render(this.state);
+        const currencyId = parseInt(obj.id, 10);
+        this.store.dispatch(sourceCurrencyChange(currencyId));
     }
 
     /**
@@ -1180,99 +713,15 @@ class TransactionView extends View {
      * @param {object} obj - selected item
      */
     onDestCurrencySel(obj) {
-        const { transaction } = this.state;
-
-        if (transaction.type !== EXPENSE) {
-            return;
-        }
-
-        const curr = window.app.model.currency.getItem(obj.id);
-        if (transaction.dest_curr === curr.id) {
-            return;
-        }
-
-        this.state.destCurrency = curr;
-        this.state.transaction.dest_curr = curr.id;
-        this.state.isDiff = transaction.src_curr !== transaction.dest_curr;
-
-        if (this.state.isDiff && this.state.id === 0) {
-            this.state.id = 2;
-        } else if (this.state.id === 2) {
-            if (!this.state.isDiff) {
-                this.state.id = 0;
-                this.setStateSourceAmount(transaction.dest_amount);
-                this.updateStateExchange();
-            }
-        }
-
-        this.render(this.state);
+        const currencyId = parseInt(obj.id, 10);
+        this.store.dispatch(destCurrencyChange(currencyId));
     }
 
     /**
      * Account disable button click event handler
      */
     toggleEnableAccount() {
-        const { transaction } = this.state;
-
-        if (transaction.type !== DEBT) {
-            return;
-        }
-
-        this.state.transaction.noAccount = !transaction.noAccount;
-        if (transaction.noAccount) {
-            if (this.state.id === 0 || this.state.id === 2) {
-                this.state.id = 6;
-            } else if (this.state.id === 1) {
-                this.state.id = 9;
-            } else if (this.state.id === 3 || this.state.id === 5) {
-                this.state.id = 7;
-            } else if (this.state.id === 4) {
-                this.state.id = 8;
-            }
-
-            this.state.transaction.lastAcc_id = this.state.account.id;
-
-            if (transaction.debtType) {
-                const destResult = normalize(this.state.account.balance);
-                this.state.form.destResult = destResult;
-                this.state.form.fDestResult = destResult;
-            } else {
-                const sourceResult = normalize(this.state.account.balance);
-                this.state.form.sourceResult = sourceResult;
-                this.state.form.fSourceResult = sourceResult;
-            }
-        } else {
-            this.state.account = window.app.model.accounts.getItem(transaction.lastAcc_id);
-            if (!this.state.account) {
-                throw new Error('Account not found');
-            }
-
-            if (transaction.debtType) {
-                this.state.destAccount = this.state.account;
-
-                const destResult = normalize(this.state.account.balance + transaction.dest_amount);
-                this.state.form.destResult = destResult;
-                this.state.form.fDestResult = destResult;
-            } else {
-                this.state.srcAccount = this.state.account;
-
-                const sourceResult = normalize(this.state.account.balance - transaction.src_amount);
-                this.state.form.sourceResult = sourceResult;
-                this.state.form.fSourceResult = sourceResult;
-            }
-
-            if (this.state.id === 6) {
-                this.state.id = 0;
-            } else if (this.state.id === 7) {
-                this.state.id = 3;
-            } else if (this.state.id === 8) {
-                this.state.id = 4;
-            } else if (this.state.id === 9) {
-                this.state.id = 1;
-            }
-        }
-
-        this.render(this.state);
+        this.store.dispatch(toggleDebtAccount());
     }
 
     /**
@@ -1377,28 +826,31 @@ class TransactionView extends View {
             return;
         }
 
-        const { sourceAmount, destAmount } = this.state.form;
+        const state = this.store.getState();
+        const { sourceAmount, destAmount } = state.form;
         let valid = true;
 
         if (
-            this.state.transaction.src_amount <= 0
+            state.transaction.src_amount <= 0
             || !isNum(fixFloat(sourceAmount))
         ) {
-            this.state.validation.sourceAmount = false;
+            this.store.dispatch(invalidateSourceAmount());
             valid = false;
         }
 
-        if (this.state.isDiff
+        if (
+            state.isDiff
             && (
-                this.state.transaction.dest_amount <= 0
+                state.transaction.dest_amount <= 0
                 || !isNum(fixFloat(destAmount))
-            )) {
-            this.state.validation.destAmount = false;
+            )
+        ) {
+            this.store.dispatch(invalidateDestAmount());
             valid = false;
         }
 
         if (!checkDate(this.dateInput.value)) {
-            this.state.validation.date = false;
+            this.store.dispatch(invalidateDate());
             valid = false;
         }
 
@@ -1409,7 +861,6 @@ class TransactionView extends View {
             enable(this.submitBtn, false);
         } else {
             e.preventDefault();
-            this.render(this.state);
         }
     }
 
@@ -1418,359 +869,31 @@ class TransactionView extends View {
      */
     onChangeDebtOp() {
         const debtType = this.debtGiveRadio.checked;
-        const { transaction } = this.state;
+        const state = this.store.getState();
 
-        if (transaction.debtType === debtType) {
-            return;
+        if (state.transaction.debtType !== debtType) {
+            this.store.dispatch(toggleDebtType());
         }
-
-        this.state.transaction.debtType = debtType;
-
-        if (debtType) {
-            this.state.srcAccount = this.state.personAccount;
-            this.state.destAccount = this.state.account;
-        } else {
-            this.state.srcAccount = this.state.account;
-            this.state.destAccount = this.state.personAccount;
-        }
-        this.state.transaction.src_id = (this.state.srcAccount) ? this.state.srcAccount.id : 0;
-        this.state.transaction.dest_id = (this.state.destAccount) ? this.state.destAccount.id : 0;
-
-        if (this.state.srcAccount) {
-            const sourceResult = normalize(this.state.srcAccount.balance - transaction.src_amount);
-            this.state.form.sourceResult = sourceResult;
-            this.state.form.fSourceResult = sourceResult;
-        } else if (this.state.transaction.noAccount && !debtType) {
-            const lastAcc = window.app.model.accounts.getItem(transaction.lastAcc_id);
-
-            const sourceResult = normalize(lastAcc.balance - transaction.src_amount);
-            this.state.form.sourceResult = sourceResult;
-            this.state.form.fSourceResult = sourceResult;
-        }
-
-        if (this.state.destAccount) {
-            const destResult = normalize(this.state.destAccount.balance + transaction.dest_amount);
-            this.state.form.destResult = destResult;
-            this.state.form.fDestResult = destResult;
-        } else if (this.state.transaction.noAccount && debtType) {
-            const lastAcc = window.app.model.accounts.getItem(transaction.lastAcc_id);
-
-            const destResult = normalize(lastAcc.balance + transaction.dest_amount);
-            this.state.form.destResult = destResult;
-            this.state.form.fDestResult = destResult;
-        }
-
-        if (debtType) {
-            if (this.state.id === 3) {
-                this.state.id = 0;
-            } else if (this.state.id === 4) {
-                this.state.id = 1;
-            } else if (this.state.id === 5) {
-                this.state.id = 2;
-            } else if (this.state.id === 7) {
-                this.state.id = 6;
-            } else if (this.state.id === 8) {
-                this.state.id = 9;
-            }
-        } else if (this.state.id === 0) {
-            this.state.id = 3;
-        } else if (this.state.id === 1) {
-            this.state.id = 4;
-        } else if (this.state.id === 2) {
-            this.state.id = 5;
-        } else if (this.state.id === 6) {
-            this.state.id = 7;
-        } else if (this.state.id === 9) {
-            this.state.id = 8;
-        }
-
-        this.render(this.state);
-    }
-
-    /** Set new source amount and calculate source result balance */
-    setStateSourceAmount(amount) {
-        const { transaction } = this.state;
-
-        const sourceAmount = normalize(amount);
-        this.state.transaction.src_amount = sourceAmount;
-        this.state.form.sourceAmount = amount;
-
-        if (transaction.type !== DEBT) {
-            if (this.state.srcAccount) {
-                const srcResult = normalize(this.state.srcAccount.balance - sourceAmount);
-                this.state.form.sourceResult = srcResult;
-                this.state.form.fSourceResult = srcResult;
-            }
-        } else if (this.state.srcAccount && !transaction.noAccount) {
-            const sourceResult = normalize(this.state.srcAccount.balance - sourceAmount);
-            this.state.form.sourceResult = sourceResult;
-            this.state.form.fSourceResult = sourceResult;
-        } else if (this.state.transaction.noAccount) {
-            if (this.state.transaction.debtType) {
-                const sourceResult = normalize(this.state.personAccount.balance - sourceAmount);
-                this.state.form.sourceResult = sourceResult;
-                this.state.form.fSourceResult = sourceResult;
-            } else {
-                const lastAcc = window.app.model.accounts.getItem(transaction.lastAcc_id);
-                const accBalance = (lastAcc) ? lastAcc.balance : 0;
-                const sourceResult = normalize(accBalance);
-                this.state.form.sourceResult = sourceResult;
-                this.state.form.fSourceResult = sourceResult;
-            }
-        }
-    }
-
-    /** Set new destination amount and calculate destination result balance */
-    setStateDestAmount(amount) {
-        const { transaction } = this.state;
-
-        const destAmount = normalize(amount);
-        this.state.transaction.dest_amount = destAmount;
-        this.state.form.destAmount = amount;
-
-        if (transaction.type !== DEBT) {
-            if (this.state.destAccount) {
-                const destResult = normalize(this.state.destAccount.balance + destAmount);
-                this.state.form.destResult = destResult;
-                this.state.form.fDestResult = destResult;
-            }
-        } else if (this.state.destAccount && !transaction.noAccount) {
-            const destResult = normalize(this.state.destAccount.balance + destAmount);
-            this.state.form.destResult = destResult;
-            this.state.form.fDestResult = destResult;
-        } else if (transaction.noAccount) {
-            if (transaction.debtType) {
-                const lastAcc = window.app.model.accounts.getItem(transaction.lastAcc_id);
-                const accBalance = (lastAcc) ? lastAcc.balance : 0;
-                const destResult = normalize(accBalance);
-                this.state.form.destResult = destResult;
-                this.state.form.fDestResult = destResult;
-            } else {
-                const destResult = normalize(this.state.personAccount.balance + destAmount);
-                this.state.form.destResult = destResult;
-                this.state.form.fDestResult = destResult;
-            }
-        }
-    }
-
-    calculateExchange(state) {
-        const source = state.transaction.src_amount;
-        const destination = state.transaction.dest_amount;
-
-        if (source === 0 || destination === 0) {
-            return 1;
-        }
-
-        return normalizeExch(destination / source);
-    }
-
-    updateStateExchange() {
-        const exchange = this.calculateExchange(this.state);
-        this.state.form.fExchange = exchange;
-        this.state.form.exchange = exchange;
     }
 
     onSourceAmountInput(e) {
-        this.state.validation.sourceAmount = true;
-        this.state.form.sourceAmount = e.target.value;
-        const newValue = normalize(e.target.value);
-        if (this.state.transaction.src_amount === newValue) {
-            this.render(this.state);
-            return;
-        }
-
-        this.state.transaction.src_amount = newValue;
-
-        if (this.state.transaction.type === EXPENSE) {
-            this.setStateSourceAmount(newValue);
-            this.updateStateExchange();
-        }
-
-        if (this.state.transaction.type === INCOME) {
-            if (this.state.isDiff) {
-                if (isValidValue(this.state.form.destAmount)) {
-                    this.updateStateExchange();
-                }
-            } else {
-                this.setStateDestAmount(newValue);
-            }
-        }
-
-        if (this.state.transaction.type === TRANSFER) {
-            this.setStateSourceAmount(e.target.value);
-            if (this.state.isDiff) {
-                this.updateStateExchange();
-            } else {
-                this.setStateDestAmount(newValue);
-            }
-        }
-
-        if (this.state.transaction.type === DEBT) {
-            this.setStateSourceAmount(e.target.value);
-            this.setStateDestAmount(newValue);
-        }
-
-        this.render(this.state);
+        this.store.dispatch(sourceAmountChange(e.target.value));
     }
 
     onDestAmountInput(e) {
-        if (this.state.transaction.type === DEBT) {
-            return;
-        }
-
-        this.state.form.destAmount = e.target.value;
-
-        const newValue = normalize(e.target.value);
-        this.state.validation.destAmount = true;
-        if (this.state.transaction.dest_amount === newValue) {
-            this.render(this.state);
-            return;
-        }
-
-        this.state.transaction.dest_amount = newValue;
-
-        if (this.state.transaction.type === EXPENSE) {
-            if (this.state.isDiff) {
-                if (isValidValue(this.state.form.sourceAmount)) {
-                    this.updateStateExchange();
-                }
-            } else {
-                this.setStateSourceAmount(newValue);
-            }
-        }
-
-        if (this.state.transaction.type === INCOME) {
-            this.setStateDestAmount(newValue);
-            if (this.state.isDiff) {
-                this.updateStateExchange();
-            } else {
-                this.setStateSourceAmount(newValue);
-            }
-        }
-
-        if (this.state.transaction.type === TRANSFER) {
-            this.setStateDestAmount(e.target.value);
-            if (this.state.isDiff) {
-                this.updateStateExchange();
-            } else {
-                this.setStateSourceAmount(newValue);
-            }
-        }
-
-        this.render(this.state);
+        this.store.dispatch(destAmountChange(e.target.value));
     }
 
     onExchangeInput(e) {
-        const { transaction } = this.state;
-
-        if (transaction.type === DEBT) {
-            return;
-        }
-
-        this.state.form.exchange = e.target.value;
-        const newValue = normalizeExch(e.target.value);
-
-        if (this.state.form.fExchange !== newValue) {
-            this.state.form.fExchange = newValue;
-            if (isValidValue(this.state.form.sourceAmount)) {
-                const destAmount = normalize(transaction.src_amount * newValue);
-                this.setStateDestAmount(destAmount);
-            } else if (isValidValue(this.state.form.destAmount)) {
-                const srcAmount = normalize(transaction.dest_amount / newValue);
-                this.setStateSourceAmount(srcAmount);
-            }
-        }
-
-        this.render(this.state);
+        this.store.dispatch(exchangeChange(e.target.value));
     }
 
     onSourceResultInput(e) {
-        if (this.state.transaction.type === INCOME) {
-            return;
-        }
-
-        this.state.form.sourceResult = e.target.value;
-        const newValue = normalize(e.target.value);
-        if (this.state.form.fSourceResult === newValue) {
-            this.render(this.state);
-            return;
-        }
-
-        this.state.form.fSourceResult = newValue;
-        const srcAmount = normalize(this.state.srcAccount.balance - newValue);
-        this.state.transaction.src_amount = srcAmount;
-        this.state.form.sourceAmount = srcAmount;
-
-        if (this.state.transaction.type === EXPENSE) {
-            if (this.state.isDiff) {
-                this.updateStateExchange();
-            } else {
-                this.state.transaction.dest_amount = srcAmount;
-                this.state.form.destAmount = srcAmount;
-            }
-        }
-
-        if (this.state.transaction.type === TRANSFER) {
-            if (this.state.isDiff) {
-                this.updateStateExchange();
-            } else {
-                this.setStateDestAmount(srcAmount);
-            }
-        }
-
-        if (this.state.transaction.type === DEBT) {
-            this.setStateDestAmount(srcAmount);
-        }
-
-        this.render(this.state);
+        this.store.dispatch(sourceResultChange(e.target.value));
     }
 
     onDestResultInput(e) {
-        if (this.state.transaction.type === EXPENSE) {
-            return;
-        }
-
-        this.state.form.destResult = e.target.value;
-        const newValue = normalize(e.target.value);
-        if (this.state.form.fDestResult === newValue) {
-            this.render(this.state);
-            return;
-        }
-
-        this.state.form.fDestResult = newValue;
-        if (this.state.transaction.type === INCOME) {
-            const srcAmount = normalize(newValue - this.state.destAccount.balance);
-            this.state.transaction.src_amount = srcAmount;
-            this.state.form.sourceAmount = srcAmount;
-
-            if (this.state.isDiff) {
-                this.updateStateExchange();
-            } else {
-                this.setStateDestAmount(srcAmount);
-            }
-        }
-
-        if (this.state.transaction.type === TRANSFER) {
-            const destAmount = normalize(newValue - this.state.destAccount.balance);
-            this.state.transaction.dest_amount = destAmount;
-            this.state.form.destAmount = destAmount;
-
-            if (this.state.isDiff) {
-                this.updateStateExchange();
-            } else {
-                this.setStateSourceAmount(destAmount);
-            }
-        }
-
-        if (this.state.transaction.type === DEBT) {
-            const destAmount = normalize(newValue - this.state.destAccount.balance);
-            this.state.transaction.dest_amount = destAmount;
-            this.state.form.destAmount = destAmount;
-
-            this.setStateSourceAmount(destAmount);
-        }
-
-        this.render(this.state);
+        this.store.dispatch(destResultChange(e.target.value));
     }
 
     /**
@@ -2023,7 +1146,9 @@ class TransactionView extends View {
 
         this.personIdInp.value = state.person.id;
 
-        const personBalance = state.srcCurrency.formatValue(state.personAccount.balance);
+        const currencyModel = window.app.model.currency;
+        const srcCurrency = currencyModel.getItem(state.transaction.src_curr);
+        const personBalance = srcCurrency.formatValue(state.personAccount.balance);
         this.personTile.render({
             title: state.person.name,
             subtitle: personBalance,
@@ -2044,13 +1169,15 @@ class TransactionView extends View {
             throw new Error('Invalid state');
         }
 
-        if (state.transaction.type === EXPENSE) {
+        const { transaction } = state;
+
+        if (transaction.type === EXPENSE) {
             this.renderExpense(state);
-        } else if (state.transaction.type === INCOME) {
+        } else if (transaction.type === INCOME) {
             this.renderIncome(state);
-        } else if (state.transaction.type === TRANSFER) {
+        } else if (transaction.type === TRANSFER) {
             this.renderTransfer(state);
-        } else if (state.transaction.type === DEBT) {
+        } else if (transaction.type === DEBT) {
             this.renderDebt(state);
         }
 
@@ -2062,31 +1189,31 @@ class TransactionView extends View {
         }
 
         if (this.srcIdInp) {
-            this.srcIdInp.value = state.transaction.src_id;
+            this.srcIdInp.value = transaction.src_id;
         }
         if (this.destIdInp) {
-            this.destIdInp.value = state.transaction.dest_id;
+            this.destIdInp.value = transaction.dest_id;
         }
 
         if (this.srcDDList) {
-            this.srcDDList.selectItem(state.transaction.src_id);
+            this.srcDDList.selectItem(transaction.src_id);
         }
         if (this.destDDList) {
-            this.destDDList.selectItem(state.transaction.dest_id);
+            this.destDDList.selectItem(transaction.dest_id);
         }
 
-        this.srcCurrInp.value = state.transaction.src_curr;
-        this.destCurrInp.value = state.transaction.dest_curr;
+        this.srcCurrInp.value = transaction.src_curr;
+        this.destCurrInp.value = transaction.dest_curr;
 
         this.setAmountInputLabel(true, state.isDiff);
         this.setAmountInputLabel(false, state.isDiff);
         this.setAmountTileBlockLabel(true, state.isDiff);
         this.setAmountTileBlockLabel(false, state.isDiff);
 
-        this.setSign(this.destAmountSign, this.destCurrDDList, state.transaction.dest_curr);
-        this.setSign(this.srcAmountSign, this.srcCurrDDList, state.transaction.src_curr);
-        this.setSign(this.srcResBalanceSign, null, state.transaction.src_curr);
-        this.setSign(this.destResBalanceSign, null, state.transaction.dest_curr);
+        this.setSign(this.destAmountSign, this.destCurrDDList, transaction.dest_curr);
+        this.setSign(this.srcAmountSign, this.srcCurrDDList, transaction.src_curr);
+        this.setSign(this.srcResBalanceSign, null, transaction.src_curr);
+        this.setSign(this.destResBalanceSign, null, transaction.dest_curr);
         this.renderExchangeRate(state);
 
         this.srcAmountInput.value = state.form.sourceAmount;
@@ -2101,23 +1228,27 @@ class TransactionView extends View {
             this.destResBalanceInput.value = state.form.destResult;
         }
 
+        const currencyModel = window.app.model.currency;
+        const srcCurrency = currencyModel.getItem(transaction.src_curr);
+        const destCurrency = currencyModel.getItem(transaction.dest_curr);
+
         if (this.srcAmountInfo) {
-            const title = state.srcCurrency.formatValue(state.transaction.src_amount);
+            const title = srcCurrency.formatValue(transaction.src_amount);
             this.srcAmountInfo.setTitle(title);
         }
 
         if (this.destAmountInfo) {
-            const title = state.destCurrency.formatValue(state.transaction.dest_amount);
+            const title = destCurrency.formatValue(transaction.dest_amount);
             this.destAmountInfo.setTitle(title);
         }
 
         if (this.srcResBalanceInfo) {
-            const title = state.srcCurrency.formatValue(state.form.fSourceResult);
+            const title = srcCurrency.formatValue(state.form.fSourceResult);
             this.srcResBalanceInfo.setTitle(title);
         }
 
         if (this.destResBalanceInfo) {
-            const title = state.destCurrency.formatValue(state.form.fDestResult);
+            const title = destCurrency.formatValue(state.form.fDestResult);
             this.destResBalanceInfo.setTitle(title);
         }
 
