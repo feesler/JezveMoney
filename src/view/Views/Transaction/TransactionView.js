@@ -29,6 +29,7 @@ import { AccountList } from '../../js/model/AccountList.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Tile } from '../../Components/Tile/Tile.js';
+import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TileInfoItem } from '../../Components/TileInfoItem/TileInfoItem.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
@@ -60,6 +61,7 @@ import {
     toggleDebtType,
     calculateExchange,
     reducer,
+    typeChange,
 } from './reducer.js';
 
 const singleTransDeleteTitle = 'Delete transaction';
@@ -232,6 +234,7 @@ class TransactionView extends View {
         const { transaction } = state;
 
         this.submitStarted = false;
+
         // Init form submit event handler
         this.form = ge('mainfrm');
         if (!this.form) {
@@ -246,6 +249,10 @@ class TransactionView extends View {
             });
             this.deleteForm = ge('delform');
         }
+
+        this.typeMenu = TransactionTypeMenu.fromElement(document.querySelector('.trtype-menu'), {
+            onChange: (sel) => this.onChangeType(sel),
+        });
 
         this.srcContainer = ge('source');
         if (this.srcContainer) {
@@ -446,7 +453,9 @@ class TransactionView extends View {
 
                 this.appendHiddenAccount(this.srcDDList, transaction.src_id);
                 this.appendHiddenAccount(this.srcDDList, transaction.dest_id);
-                this.srcDDList.selectItem(transaction.src_id);
+                if (transaction.src_id) {
+                    this.srcDDList.selectItem(transaction.src_id);
+                }
             }
 
             this.destDDList = DropDown.create({
@@ -462,7 +471,9 @@ class TransactionView extends View {
 
                 this.appendHiddenAccount(this.destDDList, transaction.src_id);
                 this.appendHiddenAccount(this.destDDList, transaction.dest_id);
-                this.destDDList.selectItem(transaction.dest_id);
+                if (transaction.dest_id) {
+                    this.destDDList.selectItem(transaction.dest_id);
+                }
             }
         }
 
@@ -550,8 +561,10 @@ class TransactionView extends View {
 
         const state = this.store.getState();
         const accountId = (state.account) ? state.account.id : 0;
-        this.appendHiddenAccount(this.accDDList, accountId);
-        this.accDDList.selectItem(accountId);
+        if (accountId) {
+            this.appendHiddenAccount(this.accDDList, accountId);
+            this.accDDList.selectItem(accountId);
+        }
     }
 
     /**
@@ -670,6 +683,10 @@ class TransactionView extends View {
      */
     exchRateSwitch(options) {
         this.commonSwitch(this.exchangeRow, this.exchangeInfo, this.exchangeInput, options);
+    }
+
+    onChangeType(type) {
+        this.store.dispatch(typeChange(type));
     }
 
     /**
@@ -899,6 +916,9 @@ class TransactionView extends View {
     }
 
     renderExpense(state) {
+        show(this.srcContainer, true);
+        show(this.destContainer, false);
+
         if (state.id === 0) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(SHOW_INPUT);
@@ -930,12 +950,20 @@ class TransactionView extends View {
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(SHOW_INFO);
         }
+
+        insertAfter(
+            this.exchangeInfo.elem,
+            this.srcResBalanceInfo.elem,
+        );
 
         this.setCurrActive(true, false); // set source currency inactive
         this.setCurrActive(false, true); // set destination currency active
     }
 
     renderIncome(state) {
+        show(this.srcContainer, false);
+        show(this.destContainer, true);
+
         if (state.id === 0) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(HIDE_BOTH);
@@ -967,6 +995,11 @@ class TransactionView extends View {
             this.resBalanceDestSwitch(SHOW_INPUT);
             this.exchRateSwitch(SHOW_INFO);
         }
+
+        insertAfter(
+            this.exchangeInfo.elem,
+            this.destResBalanceInfo.elem,
+        );
 
         this.setCurrActive(true, true); // set source currency active
         this.setCurrActive(false, false); // set destination currency inactive
@@ -1131,10 +1164,10 @@ class TransactionView extends View {
             this.renderDebt(state);
         }
 
-        if (this.srcTile) {
+        if (this.srcTile && state.srcAccount) {
             this.srcTile.render(state.srcAccount);
         }
-        if (this.destTile) {
+        if (this.destTile && state.destAccount) {
             this.destTile.render(state.destAccount);
         }
 
@@ -1145,10 +1178,10 @@ class TransactionView extends View {
             this.destIdInp.value = transaction.dest_id;
         }
 
-        if (this.srcDDList) {
+        if (this.srcDDList && transaction.src_id) {
             this.srcDDList.selectItem(transaction.src_id);
         }
-        if (this.destDDList) {
+        if (this.destDDList && transaction.dest_id) {
             this.destDDList.selectItem(transaction.dest_id);
         }
 

@@ -36,7 +36,9 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </span>
 <?php		} else {		?>
                             <span class="trtype-menu__item" data-type="<?=e($menuItem->type)?>">
-                                <a href="<?=e($menuItem->url)?>"><?=e($menuItem->title)?></a>
+                                <span class="trtype-menu_item_title">
+                                    <a href="<?=e($menuItem->url)?>"><?=e($menuItem->title)?></a>
+                                </span>
                             </span>
 <?php		}
         }	?>
@@ -107,8 +109,12 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
                         </div>
 <?php	}	/* if ($tr["type"] == DEBT) */	?>
-<?php	if ($tr["type"] == EXPENSE || $tr["type"] == TRANSFER) {		?>
+<?php	if ($tr["type"] == EXPENSE || $tr["type"] == INCOME || $tr["type"] == TRANSFER) {		?>
+<?php	    if ($tr["type"] == INCOME) {	?>
+                        <div id="source" class="account-container hidden">
+<?php	    } else {	?>
                         <div id="source" class="account-container">
+<?php	    }	?>
                             <div class="tile_header"><label>Source account</label></div>
                             <div class="tile-base">
                                 <div class="tile_container">
@@ -128,17 +134,19 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 </div>
                             </div>
                         </div>
-<?php	} else if ($tr["type"] == INCOME) {	?>
                         <input id="src_id" name="src_id" type="hidden" value="<?=e($tr["src_id"])?>">
 <?php	}	?>
 
-<?php	if ($tr["type"] == INCOME || $tr["type"] == TRANSFER) {		?>
+<?php	if ($tr["type"] == EXPENSE || $tr["type"] == INCOME || $tr["type"] == TRANSFER) {		?>
+<?php	    if ($tr["type"] == EXPENSE) {	?>
+                        <div id="destination" class="account-container hidden">
+<?php	    } else {	?>
                         <div id="destination" class="account-container">
+<?php	    }	?>
                             <div class="tile_header"><label>Destination account</label></div>
                             <div class="tile-base">
                                 <div class="tile_container">
                                     <?=Tile::render($destAccountTile)?>
-                                    <input id="dest_id" name="dest_id" type="hidden" value="<?=e($tr["dest_id"])?>">
                                 </div>
 
                                 <div class="tile-info-block">
@@ -154,7 +162,6 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 </div>
                             </div>
                         </div>
-<?php	} else if ($tr["type"] == EXPENSE) {	?>
                         <input id="dest_id" name="dest_id" type="hidden" value="<?=e($tr["dest_id"])?>">
 <?php	}	?>
 <?php	if ($tr["type"] == DEBT) {		?>

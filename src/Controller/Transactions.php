@@ -57,8 +57,7 @@ class Transactions extends TemplateController
         $data = [
             "titleString" => "Jezve Money | Transactions"
         ];
-        $listData = [
-        ];
+        $listData = [];
 
         $filterObj = new \stdClass();
         $pagination = [
@@ -275,13 +274,24 @@ class Transactions extends TemplateController
     }
 
 
+    protected function getHiddenAccountTileData($tileId)
+    {
+        return [
+            "id" => $tileId,
+            "title" => "",
+            "subtitle" => "",
+            "icon" => "",
+        ];
+    }
+
+
     protected function getAccountTileData($account, $tileId, $balanceDiff = 0)
     {
         return [
             "id" => $tileId,
             "title" => $account->name,
             "subtitle" => $this->currModel->format($account->balance + $balanceDiff, $account->curr_id),
-            "icon" => $this->accModel->getIconFile($account->id)
+            "icon" => $this->accModel->getIconFile($account->id),
         ];
     }
 
@@ -422,11 +432,15 @@ class Transactions extends TemplateController
             $src = $this->accModel->getItem($tr["src_id"]);
             if ($src) {
                 $data["srcAccountTile"] = $this->getAccountTileData($src, "source_tile");
+            } else {
+                $data["srcAccountTile"] = $this->getHiddenAccountTileData("source_tile");
             }
 
             $dest = $this->accModel->getItem($tr["dest_id"]);
             if ($dest) {
                 $data["destAccountTile"] = $this->getAccountTileData($dest, "dest_tile");
+            } else {
+                $data["destAccountTile"] = $this->getHiddenAccountTileData("dest_tile");
             }
         }
         $data["src"] = $src;

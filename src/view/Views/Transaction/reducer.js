@@ -30,6 +30,7 @@ const EXCHANGE_CHANGE = 'exchangeChange';
 const INVALIDATE_SOURCE_AMOUNT = 'invalidateSourceAmount';
 const INVALIDATE_DEST_AMOUNT = 'invalidateDestAmount';
 const INVALIDATE_DATE = 'invalidateDate';
+const TYPE_CHANGE = 'typeChange';
 
 // Action creators
 export const sourceAmountClick = () => ({ type: SOURCE_AMOUNT_CLICK });
@@ -68,6 +69,7 @@ export const exchangeChange = (value) => ({ type: EXCHANGE_CHANGE, payload: valu
 export const invalidateSourceAmount = () => ({ type: INVALIDATE_SOURCE_AMOUNT });
 export const invalidateDestAmount = () => ({ type: INVALIDATE_DEST_AMOUNT });
 export const invalidateDate = () => ({ type: INVALIDATE_DATE });
+export const typeChange = (type) => ({ type: TYPE_CHANGE, payload: type });
 
 // Tools
 
@@ -1121,6 +1123,80 @@ const reduceInvalidateDate = (state) => ({
     },
 });
 
+const reduceTypeChange = (state, type) => {
+    const newState = {
+        ...state,
+        transaction: {
+            ...state.transaction,
+            type,
+        },
+        form: {
+            ...state.form,
+        },
+    };
+    const { transaction } = newState;
+
+    const currentType = state.transaction.type;
+
+    if (type === EXPENSE) {
+        if (currentType === INCOME) {
+            transaction.src_id = state.transaction.dest_id;
+            transaction.dest_id = 0;
+            transaction.src_curr = state.transaction.dest_curr;
+            transaction.dest_curr = state.transaction.src_curr;
+
+            const srcAccount = window.app.model.accounts.getItem(transaction.src_id);
+            const srcCurrency = window.app.model.currency.getItem(transaction.src_curr);
+            const destCurrency = window.app.model.currency.getItem(srcAccount.curr_id);
+
+            newState.srcAccount = srcAccount;
+            newState.srcCurrency = srcCurrency;
+            newState.destAccount = null;
+            newState.destCurrency = destCurrency;
+
+            setStateSourceAmount(newState, state.form.destAmount);
+            setStateDestAmount(newState, state.form.sourceAmount);
+            updateStateExchange(newState);
+        } else {
+            throw new Error('Not implemented yet');
+        }
+    }
+
+    if (type === INCOME) {
+        if (currentType === EXPENSE) {
+            transaction.dest_id = state.transaction.src_id;
+            transaction.src_id = 0;
+            transaction.src_curr = state.transaction.dest_curr;
+            transaction.dest_curr = state.transaction.src_curr;
+
+            const destAccount = window.app.model.accounts.getItem(transaction.dest_id);
+            const srcCurrency = window.app.model.currency.getItem(transaction.src_curr);
+            const destCurrency = window.app.model.currency.getItem(transaction.dest_curr);
+
+            newState.srcAccount = null;
+            newState.srcCurrency = srcCurrency;
+            newState.destAccount = destAccount;
+            newState.destCurrency = destCurrency;
+
+            setStateSourceAmount(newState, state.form.destAmount);
+            setStateDestAmount(newState, state.form.sourceAmount);
+            updateStateExchange(newState);
+        } else {
+            throw new Error('Not implemented yet');
+        }
+    }
+
+    if (type === TRANSFER) {
+        throw new Error('Not implemented yet');
+    }
+
+    if (type === DEBT) {
+        throw new Error('Not implemented yet');
+    }
+
+    return newState;
+};
+
 const reducerMap = {
     [SOURCE_AMOUNT_CLICK]: reduceSourceAmountClick,
     [DEST_AMOUNT_CLICK]: reduceDestAmountClick,
@@ -1143,6 +1219,7 @@ const reducerMap = {
     [INVALIDATE_SOURCE_AMOUNT]: reduceInvalidateSourceAmount,
     [INVALIDATE_DEST_AMOUNT]: reduceInvalidateDestAmount,
     [INVALIDATE_DATE]: reduceInvalidateDate,
+    [TYPE_CHANGE]: reduceTypeChange,
 };
 
 export const reducer = (state, action) => {
