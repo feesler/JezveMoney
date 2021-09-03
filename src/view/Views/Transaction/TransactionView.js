@@ -1006,6 +1006,9 @@ class TransactionView extends View {
     }
 
     renderTransfer(state) {
+        show(this.srcContainer, true);
+        show(this.destContainer, true);
+
         if (state.id === 0) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(HIDE_BOTH);

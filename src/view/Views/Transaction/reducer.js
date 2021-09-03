@@ -145,6 +145,40 @@ const setStateDestAmount = (state, amount) => {
     return result;
 };
 
+const setStateNextSourceAccount = (state, accountId) => {
+    const { visibleUserAccounts } = window.app.model;
+    const accountModel = window.app.model.accounts;
+    const currencyModel = window.app.model.currency;
+    const result = state;
+
+    const nextAccountId = visibleUserAccounts.getNextAccount(accountId);
+    const srcAccount = accountModel.getItem(nextAccountId);
+    if (!srcAccount) {
+        throw new Error('Next account not found');
+    }
+    result.srcAccount = srcAccount;
+    result.transaction.src_id = srcAccount.id;
+    result.transaction.src_curr = srcAccount.curr_id;
+    result.srcCurrency = currencyModel.getItem(srcAccount.curr_id);
+};
+
+const setStateNextDestAccount = (state, accountId) => {
+    const { visibleUserAccounts } = window.app.model;
+    const accountModel = window.app.model.accounts;
+    const currencyModel = window.app.model.currency;
+    const result = state;
+
+    const nextAccountId = visibleUserAccounts.getNextAccount(accountId);
+    const destAccount = accountModel.getItem(nextAccountId);
+    if (!destAccount) {
+        throw new Error('Next account not found');
+    }
+    result.destAccount = destAccount;
+    result.transaction.dest_id = destAccount.id;
+    result.transaction.dest_curr = destAccount.curr_id;
+    result.destCurrency = currencyModel.getItem(destAccount.curr_id);
+};
+
 export const calculateExchange = (state) => {
     const source = state.transaction.src_amount;
     const destination = state.transaction.dest_amount;
@@ -1124,6 +1158,9 @@ const reduceInvalidateDate = (state) => ({
 });
 
 const reduceTypeChange = (state, type) => {
+    const accountModel = window.app.model.accounts;
+    const currencyModel = window.app.model.currency;
+
     const newState = {
         ...state,
         transaction: {
@@ -1145,9 +1182,9 @@ const reduceTypeChange = (state, type) => {
             transaction.src_curr = state.transaction.dest_curr;
             transaction.dest_curr = state.transaction.src_curr;
 
-            const srcAccount = window.app.model.accounts.getItem(transaction.src_id);
-            const srcCurrency = window.app.model.currency.getItem(transaction.src_curr);
-            const destCurrency = window.app.model.currency.getItem(srcAccount.curr_id);
+            const srcAccount = accountModel.getItem(transaction.src_id);
+            const srcCurrency = currencyModel.getItem(transaction.src_curr);
+            const destCurrency = currencyModel.getItem(srcAccount.curr_id);
 
             newState.srcAccount = srcAccount;
             newState.srcCurrency = srcCurrency;
@@ -1155,6 +1192,16 @@ const reduceTypeChange = (state, type) => {
             newState.destCurrency = destCurrency;
 
             setStateSourceAmount(newState, state.form.destAmount);
+            setStateDestAmount(newState, state.form.sourceAmount);
+            updateStateExchange(newState);
+        } else if (currentType === TRANSFER) {
+            transaction.dest_id = 0;
+            transaction.dest_curr = transaction.src_curr;
+
+            newState.destAccount = null;
+            newState.destCurrency = newState.srcCurrency;
+
+            setStateSourceAmount(newState, state.form.sourceAmount);
             setStateDestAmount(newState, state.form.sourceAmount);
             updateStateExchange(newState);
         } else {
@@ -1169,9 +1216,9 @@ const reduceTypeChange = (state, type) => {
             transaction.src_curr = state.transaction.dest_curr;
             transaction.dest_curr = state.transaction.src_curr;
 
-            const destAccount = window.app.model.accounts.getItem(transaction.dest_id);
-            const srcCurrency = window.app.model.currency.getItem(transaction.src_curr);
-            const destCurrency = window.app.model.currency.getItem(transaction.dest_curr);
+            const destAccount = accountModel.getItem(transaction.dest_id);
+            const srcCurrency = currencyModel.getItem(transaction.src_curr);
+            const destCurrency = currencyModel.getItem(transaction.dest_curr);
 
             newState.srcAccount = null;
             newState.srcCurrency = srcCurrency;
@@ -1181,17 +1228,73 @@ const reduceTypeChange = (state, type) => {
             setStateSourceAmount(newState, state.form.destAmount);
             setStateDestAmount(newState, state.form.sourceAmount);
             updateStateExchange(newState);
+        } else if (currentType === TRANSFER) {
+            transaction.src_id = 0;
+            transaction.src_curr = transaction.dest_curr;
+
+            newState.srcAccount = null;
+            newState.srcCurrency = newState.destCurrency;
+
+            setStateSourceAmount(newState, state.form.destAmount);
+            setStateDestAmount(newState, state.form.destAmount);
+            updateStateExchange(newState);
         } else {
             throw new Error('Not implemented yet');
         }
     }
 
     if (type === TRANSFER) {
-        throw new Error('Not implemented yet');
+        const { visibleUserAccounts } = window.app.model;
+
+        if (currentType === EXPENSE) {
+            setStateNextDestAccount(newState, transaction.src_id);
+        } else if (currentType === INCOME) {
+            setStateNextSourceAccount(newState, transaction.dest_id);
+        } else if (currentType === DEBT) {
+            if (state.account) {
+                if (transaction.debtType) {
+                    newState.destAccount = state.account;
+                    transaction.dest_id = state.account.id;
+                    transaction.dest_curr = state.account.curr_id;
+                    newState.destCurrency = currencyModel.getItem(state.account.curr_id);
+
+                    setStateNextSourceAccount(newState, transaction.dest_id);
+                } else {
+                    newState.srcAccount = state.account;
+                    transaction.src_id = state.account.id;
+                    transaction.src_curr = state.account.curr_id;
+                    newState.srcCurrency = currencyModel.getItem(state.account.curr_id);
+
+                    setStateNextDestAccount(newState, transaction.src_id);
+                }
+            } else {
+                const srcAccount = visibleUserAccounts.getItemByIndex(0);
+                newState.srcAccount = srcAccount;
+                transaction.src_id = srcAccount.id;
+                transaction.src_curr = srcAccount.curr_id;
+                newState.srcCurrency = currencyModel.getItem(srcAccount.curr_id);
+
+                setStateNextDestAccount(newState, transaction.src_id);
+            }
+        }
+
+        newState.isDiff = transaction.src_curr !== transaction.dest_curr;
+
+        setStateSourceAmount(newState, state.form.sourceAmount);
+        setStateDestAmount(newState, state.form.destAmount);
+        updateStateExchange(newState);
     }
 
     if (type === DEBT) {
         throw new Error('Not implemented yet');
+    }
+
+    // Delete Debt specific fields
+    if (currentType === DEBT) {
+        delete newState.account;
+        delete transaction.debtType;
+        delete transaction.noAccount;
+        delete transaction.lastAcc_id;
     }
 
     return newState;

@@ -119,7 +119,6 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <div class="tile-base">
                                 <div class="tile_container">
                                     <?=Tile::render($srcAccountTile)?>
-                                    <input id="src_id" name="src_id" type="hidden" value="<?=e($tr["src_id"])?>">
                                 </div>
 
                                 <div class="tile-info-block">
