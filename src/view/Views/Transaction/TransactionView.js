@@ -81,6 +81,7 @@ class TransactionView extends View {
         if (!('profile' in this.props)
             || !('currency' in this.props)
             || !('accounts' in this.props)
+            || !('persons' in this.props)
             || !('transaction' in this.props)
             || !('icons' in this.props)) {
             throw new Error('Invalid Transaction view properties');
@@ -99,10 +100,8 @@ class TransactionView extends View {
 
         const accountModel = AccountList.create(this.props.accounts);
         window.app.model.accounts = accountModel;
-
-        if (this.props.persons) {
-            window.app.model.persons = PersonList.create(this.props.persons);
-        }
+        const personModel = PersonList.create(this.props.persons);
+        window.app.model.persons = personModel;
 
         this.mode = this.props.mode;
         if (!availModes.includes(this.mode)) {
@@ -116,6 +115,7 @@ class TransactionView extends View {
             accountModel.getUserAccounts(window.app.model.profile.owner_id),
         );
         window.app.model.visibleUserAccounts = AccountList.create(userAccounts.getVisible());
+        window.app.model.visiblePersons = PersonList.create(personModel.getVisible());
 
         const { transaction } = this.props;
 
@@ -375,133 +375,128 @@ class TransactionView extends View {
         this.srcCurrInp = ge('src_curr');
         this.destCurrInp = ge('dest_curr');
 
-        if (transaction.type === DEBT) {
-            this.personIdInp = ge('person_id');
-            if (this.personIdInp) {
-                this.personAccount = window.app.model.accounts.getPersonAccount(
-                    this.personIdInp.value,
-                    transaction.src_curr,
-                );
-            }
+        this.personContainer = ge('person');
+        this.debtAccountContainer = ge('debtaccount');
+        this.debtOpControls = ge('operation');
 
-            this.debtAccountInp = ge('acc_id');
-            this.debtAccountTile = AccountTile.fromElement({ elem: 'acc_tile', parent: this });
-            if (!transaction.noAccount) {
-                if (this.debtAccountInp) {
-                    this.debtAccount = window.app.model.accounts.getItem(this.debtAccountInp.value);
-                }
+        this.personIdInp = ge('person_id');
+        if (this.personIdInp) {
+            this.personAccount = window.app.model.accounts.getPersonAccount(
+                this.personIdInp.value,
+                transaction.src_curr,
+            );
+        }
+
+        this.debtAccountInp = ge('acc_id');
+        this.debtAccountTile = AccountTile.fromElement({ elem: 'acc_tile', parent: this });
+        if (!transaction.noAccount) {
+            if (this.debtAccountInp) {
+                this.debtAccount = window.app.model.accounts.getItem(this.debtAccountInp.value);
             }
         }
 
-        if (transaction.type === DEBT) {
-            this.noAccountBtn = ge('noacc_btn');
-            if (this.noAccountBtn) {
-                this.noAccountBtn.addEventListener('click', () => this.toggleEnableAccount());
+        this.noAccountBtn = ge('noacc_btn');
+        if (this.noAccountBtn) {
+            this.noAccountBtn.addEventListener('click', () => this.toggleEnableAccount());
+        }
+        this.selectAccountBtn = ge('selaccount');
+        if (this.selectAccountBtn) {
+            const accountToggleBtn = this.selectAccountBtn.querySelector('button');
+            if (accountToggleBtn) {
+                accountToggleBtn.addEventListener('click', () => this.toggleEnableAccount());
             }
-            this.selectAccountBtn = ge('selaccount');
-            if (this.selectAccountBtn) {
-                const accountToggleBtn = this.selectAccountBtn.querySelector('button');
-                if (accountToggleBtn) {
-                    accountToggleBtn.addEventListener('click', () => this.toggleEnableAccount());
-                }
-            }
+        }
 
-            this.debtAccountLabel = ge('acclbl');
+        this.debtAccountLabel = ge('acclbl');
 
-            this.debtGiveRadio = ge('debtgive');
-            if (this.debtGiveRadio) {
-                this.debtGiveRadio.addEventListener('change', () => this.onChangeDebtOp());
-            }
-            this.debtTakeRadio = ge('debttake');
-            if (this.debtTakeRadio) {
-                this.debtTakeRadio.addEventListener('change', () => this.onChangeDebtOp());
-            }
+        this.debtGiveRadio = ge('debtgive');
+        if (this.debtGiveRadio) {
+            this.debtGiveRadio.addEventListener('change', () => this.onChangeDebtOp());
+        }
+        this.debtTakeRadio = ge('debttake');
+        if (this.debtTakeRadio) {
+            this.debtTakeRadio.addEventListener('change', () => this.onChangeDebtOp());
+        }
 
-            this.personTile = Tile.fromElement({ elem: 'person_tile', parent: this });
+        this.personTile = Tile.fromElement({ elem: 'person_tile', parent: this });
 
-            this.persDDList = DropDown.create({
-                input_id: 'person_tile',
-                listAttach: true,
-                onitemselect: (item) => this.onPersonSelect(item),
-                editable: false,
-            });
+        this.persDDList = DropDown.create({
+            input_id: 'person_tile',
+            listAttach: true,
+            onitemselect: (item) => this.onPersonSelect(item),
+            editable: false,
+        });
 
-            const visiblePersons = window.app.model.persons.getVisible();
-            visiblePersons.forEach(
-                (person) => this.persDDList.addItem({ id: person.id, title: person.name }),
+        window.app.model.visiblePersons.forEach(
+            (person) => this.persDDList.addItem({ id: person.id, title: person.name }),
+        );
+
+        const personId = parseInt(this.personIdInp.value, 10);
+        this.appendHiddenPerson(this.persDDList, personId);
+        this.persDDList.selectItem(personId);
+
+        if (!transaction.noAccount) {
+            this.initAccList();
+        }
+
+        this.srcDDList = DropDown.create({
+            input_id: 'source_tile',
+            listAttach: true,
+            onitemselect: (item) => this.onSrcAccountSelect(item),
+            editable: false,
+        });
+
+        if (this.srcDDList) {
+            window.app.model.visibleUserAccounts.forEach(
+                (acc) => this.srcDDList.addItem({ id: acc.id, title: acc.name }),
             );
 
-            const personId = parseInt(this.personIdInp.value, 10);
-            this.appendHiddenPerson(this.persDDList, personId);
-            this.persDDList.selectItem(personId);
-
-            if (!transaction.noAccount) {
-                this.initAccList();
-            }
-        } else {
-            this.srcDDList = DropDown.create({
-                input_id: 'source_tile',
-                listAttach: true,
-                onitemselect: (item) => this.onSrcAccountSelect(item),
-                editable: false,
-            });
-
-            if (this.srcDDList) {
-                window.app.model.visibleUserAccounts.forEach(
-                    (acc) => this.srcDDList.addItem({ id: acc.id, title: acc.name }),
-                );
-
-                this.appendHiddenAccount(this.srcDDList, transaction.src_id);
-                this.appendHiddenAccount(this.srcDDList, transaction.dest_id);
-                if (transaction.src_id) {
-                    this.srcDDList.selectItem(transaction.src_id);
-                }
-            }
-
-            this.destDDList = DropDown.create({
-                input_id: 'dest_tile',
-                listAttach: true,
-                onitemselect: (item) => this.onDestAccountSelect(item),
-                editable: false,
-            });
-            if (this.destDDList) {
-                window.app.model.visibleUserAccounts.forEach(
-                    (acc) => this.destDDList.addItem({ id: acc.id, title: acc.name }),
-                );
-
-                this.appendHiddenAccount(this.destDDList, transaction.src_id);
-                this.appendHiddenAccount(this.destDDList, transaction.dest_id);
-                if (transaction.dest_id) {
-                    this.destDDList.selectItem(transaction.dest_id);
-                }
+            this.appendHiddenAccount(this.srcDDList, transaction.src_id);
+            this.appendHiddenAccount(this.srcDDList, transaction.dest_id);
+            if (transaction.src_id) {
+                this.srcDDList.selectItem(transaction.src_id);
             }
         }
 
-        if (transaction.type === INCOME) {
-            this.srcCurrDDList = DropDown.create({
-                input_id: 'srcamountsign',
-                listAttach: true,
-                onitemselect: (item) => this.onSrcCurrencySel(item),
-                editable: false,
-            });
-            window.app.model.currency.forEach(
-                (curr) => this.srcCurrDDList.addItem({ id: curr.id, title: curr.name }),
+        this.destDDList = DropDown.create({
+            input_id: 'dest_tile',
+            listAttach: true,
+            onitemselect: (item) => this.onDestAccountSelect(item),
+            editable: false,
+        });
+        if (this.destDDList) {
+            window.app.model.visibleUserAccounts.forEach(
+                (acc) => this.destDDList.addItem({ id: acc.id, title: acc.name }),
             );
-            this.srcCurrDDList.selectItem(transaction.src_curr);
+
+            this.appendHiddenAccount(this.destDDList, transaction.src_id);
+            this.appendHiddenAccount(this.destDDList, transaction.dest_id);
+            if (transaction.dest_id) {
+                this.destDDList.selectItem(transaction.dest_id);
+            }
         }
 
-        if (transaction.type === EXPENSE) {
-            this.destCurrDDList = DropDown.create({
-                input_id: 'destamountsign',
-                listAttach: true,
-                onitemselect: (item) => this.onDestCurrencySel(item),
-                editable: false,
-            });
-            window.app.model.currency.forEach(
-                (curr) => this.destCurrDDList.addItem({ id: curr.id, title: curr.name }),
-            );
-            this.destCurrDDList.selectItem(transaction.dest_curr);
-        }
+        this.srcCurrDDList = DropDown.create({
+            input_id: 'srcamountsign',
+            listAttach: true,
+            onitemselect: (item) => this.onSrcCurrencySel(item),
+            editable: false,
+        });
+        window.app.model.currency.forEach(
+            (curr) => this.srcCurrDDList.addItem({ id: curr.id, title: curr.name }),
+        );
+        this.srcCurrDDList.selectItem(transaction.src_curr);
+
+        this.destCurrDDList = DropDown.create({
+            input_id: 'destamountsign',
+            listAttach: true,
+            onitemselect: (item) => this.onDestCurrencySel(item),
+            editable: false,
+        });
+        window.app.model.currency.forEach(
+            (curr) => this.destCurrDDList.addItem({ id: curr.id, title: curr.name }),
+        );
+        this.destCurrDDList.selectItem(transaction.dest_curr);
 
         this.submitBtn = ge('submitbtn');
     }
@@ -916,9 +911,6 @@ class TransactionView extends View {
     }
 
     renderExpense(state) {
-        show(this.srcContainer, true);
-        show(this.destContainer, false);
-
         if (state.id === 0) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(SHOW_INPUT);
@@ -961,9 +953,6 @@ class TransactionView extends View {
     }
 
     renderIncome(state) {
-        show(this.srcContainer, false);
-        show(this.destContainer, true);
-
         if (state.id === 0) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(HIDE_BOTH);
@@ -1006,9 +995,6 @@ class TransactionView extends View {
     }
 
     renderTransfer(state) {
-        show(this.srcContainer, true);
-        show(this.destContainer, true);
-
         if (state.id === 0) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(HIDE_BOTH);
@@ -1156,6 +1142,12 @@ class TransactionView extends View {
         }
 
         const { transaction } = state;
+
+        show(this.srcContainer, transaction.type === EXPENSE || transaction.type === TRANSFER);
+        show(this.destContainer, transaction.type === INCOME || transaction.type === TRANSFER);
+        show(this.personContainer, transaction.type === DEBT);
+        show(this.debtAccountContainer, transaction.type === DEBT);
+        show(this.debtOpControls, transaction.type === DEBT);
 
         if (transaction.type === EXPENSE) {
             this.renderExpense(state);

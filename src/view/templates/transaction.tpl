@@ -48,12 +48,11 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         <span class="nodata-message">You need at least two active accounts for transfer.</span>
 <?php	} else if ($action == "new" && !$acc_count && $tr["type"] != TRANSFER) {		?>
                         <span class="nodata-message">You have no one active account. Please create one.</span>
-<?php	} else if ($action == "new" && $tr["type"] == DEBT && !$tr["person_id"]) {		?>
+<?php	} else if ($action == "new" && $tr["type"] == DEBT && !$person_id) {		?>
                         <span class="nodata-message">You have no one active person. Please create one for debts.</span>
 <?php	} else {		?>
-<?php	if ($tr["type"] == DEBT) {		?>
-                        <div id="person" class="account-container">
-                            <input id="person_id" name="person_id" type="hidden" value="<?=e($tr["person_id"])?>">
+                        <div id="person" class="account-container<?=hidden($tr["type"] != DEBT)?>">
+                            <input id="person_id" name="person_id" type="hidden" value="<?=e($person_id)?>">
                             <div class="tile_header"><label>Person name</label></div>
                             <div class="tile-base">
                                 <div class="tile_container">
@@ -61,56 +60,49 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 </div>
 
                                 <div class="tile-info-block">
+<?php	if ($tr["type"] == DEBT) {		?>
                                     <?=TileInfoItem::render($srcAmountInfo)?>
                                     <?=TileInfoItem::render($exchangeInfo)?>
-<?php		if ($tr["debtType"]) {		?>
+<?php		if ($debtType) {		?>
                                     <?=TileInfoItem::render($srcResultInfo)?>
 <?php		} else {	?>
                                     <?=TileInfoItem::render($destResultInfo)?>
 <?php		}	?>
+<?php	}	?>
                                 </div>
                             </div>
                         </div>
 
-                        <div id="source" class="account-container">
+                        <div id="debtaccount" class="account-container<?=hidden($tr["type"] != DEBT)?>">
                             <div class="tile_header">
                                 <label id="acclbl"><?=e($accLbl)?></label>
-<?php		if ($tr["noAccount"]) {		?>
-                                <button id="noacc_btn" class="close-btn hidden" type="button"><?=svgIcon("close")?></button>
-<?php		} else {	?>
-                                <button id="noacc_btn" class="close-btn" type="button"><?=svgIcon("close")?></button>
-<?php		}	?>
+                                <button id="noacc_btn" class="close-btn<?=hidden($noAccount)?>" type="button">
+                                    <?=svgIcon("close")?>
+                                </button>
                             </div>
-<?php		if ($tr["noAccount"]) {		?>
-                            <div class="tile-base hidden">
-<?php		} else {	?>
-                            <div class="tile-base">
-<?php		}	?>
+                            <div class="tile-base<?=hidden($noAccount)?>">
                                 <div class="tile_container">
                                     <?=Tile::render($debtAccountTile)?>
                                     <input id="acc_id" name="acc_id" type="hidden" value="<?=e($acc_id)?>">
                                 </div>
 
                                 <div class="tile-info-block">
+<?php	if ($tr["type"] == DEBT) {		?>
                                     <?=TileInfoItem::render($destAmountInfo)?>
-<?php		if ($tr["debtType"]) { 		?>
+<?php		if ($debtType) { 		?>
                                     <?=TileInfoItem::render($destResultInfo)?>
 <?php		} else {		?>
                                     <?=TileInfoItem::render($srcResultInfo)?>
 <?php		}		?>
+<?php	}		?>
                                 </div>
                             </div>
-<?php		if ($tr["noAccount"]) {		?>
-                            <div id="selaccount" class="account-toggler">
-<?php		} else {	?>
-                            <div id="selaccount" class="account-toggler hidden">
-<?php		}	?>
+                            <div id="selaccount" class="account-toggler<?=hidden(!$noAccount)?>">
                                 <button class="dashed-btn" type="button"><span>Select account</span></button>
                             </div>
                         </div>
-<?php	}	/* if ($tr["type"] == DEBT) */	?>
-<?php	if ($tr["type"] == EXPENSE || $tr["type"] == INCOME || $tr["type"] == TRANSFER) {		?>
-<?php	    if ($tr["type"] == INCOME) {	?>
+
+<?php	    if ($tr["type"] == INCOME || $tr["type"] == DEBT) {	?>
                         <div id="source" class="account-container hidden">
 <?php	    } else {	?>
                         <div id="source" class="account-container">
@@ -134,14 +126,12 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
                         </div>
                         <input id="src_id" name="src_id" type="hidden" value="<?=e($tr["src_id"])?>">
-<?php	}	?>
 
-<?php	if ($tr["type"] == EXPENSE || $tr["type"] == INCOME || $tr["type"] == TRANSFER) {		?>
-<?php	    if ($tr["type"] == EXPENSE) {	?>
+<?php	if ($tr["type"] == EXPENSE || $tr["type"] == DEBT) {	?>
                         <div id="destination" class="account-container hidden">
-<?php	    } else {	?>
+<?php	} else {	?>
                         <div id="destination" class="account-container">
-<?php	    }	?>
+<?php	}	?>
                             <div class="tile_header"><label>Destination account</label></div>
                             <div class="tile-base">
                                 <div class="tile_container">
@@ -162,21 +152,16 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
                         </div>
                         <input id="dest_id" name="dest_id" type="hidden" value="<?=e($tr["dest_id"])?>">
-<?php	}	?>
-<?php	if ($tr["type"] == DEBT) {		?>
-                        <div id="operation" class="view-row">
+
+                        <div id="operation" class="view-row<?=hidden($tr["type"] != DEBT)?>">
                             <div><label>Operation</label></div>
                             <div class="debt-op-selector">
-                                <label><input id="debtgive" name="op" type="radio" value="1"<?=($tr["debtType"] ? " checked" : "")?>><span>give</span></label>
-                                <label><input id="debttake" name="op" type="radio" value="2"<?=($tr["debtType"] ? "" : " checked")?>><span>take</span></label>
+                                <label><input id="debtgive" name="op" type="radio" value="1"<?=checked($debtType)?>><span>give</span></label>
+                                <label><input id="debttake" name="op" type="radio" value="2"<?=checked(!$debtType)?>><span>take</span></label>
                             </div>
                         </div>
-<?php	}	?>
-<?php	if ($showSrcAmount) {		?>
-                        <div id="src_amount_row" class="validation-block view-row">
-<?php	} else {	?>
-                        <div id="src_amount_row" class="validation-block view-row hidden">
-<?php	}	?>
+
+                        <div id="src_amount_row" class="validation-block view-row<?=hidden(!$showSrcAmount)?>">
                             <div><label for="src_amount"><?=e($srcAmountLbl)?></label></div>
                             <div class="input-group std_margin">
                                 <input id="src_curr" name="src_curr" type="hidden" value="<?=e($srcAmountCurr)?>">
@@ -192,19 +177,17 @@ include(TPL_PATH."commonhdr.tpl");	?>
 <?php	}	?>
                                 </div>
 <?php	if ($tr["type"] != INCOME) {		?>
-                                <div class="btn input-group__btn input-group__btn_inactive"><div id="srcamountsign"><?=e($srcAmountSign)?></div></div>
+                                <div class="btn input-group__btn input-group__btn_inactive">
 <?php	} else {	?>
-                                <div class="btn input-group__btn"><div id="srcamountsign"><?=e($srcAmountSign)?></div></div>
+                                <div class="btn input-group__btn">
 <?php	}	?>
+                                    <div id="srcamountsign"><?=e($srcAmountSign)?></div>
+                                </div>
                             </div>
                             <div class="invalid-feedback">Please input correct amount.</div>
                         </div>
 
-<?php	if ($showDestAmount) {		?>
-                        <div id="dest_amount_row" class="validation-block view-row">
-<?php	} else {	?>
-                        <div id="dest_amount_row" class="validation-block view-row hidden">
-<?php	}	?>
+                        <div id="dest_amount_row" class="validation-block view-row<?=hidden(!$showDestAmount)?>">
                             <div><label for="dest_amount"><?=e($destAmountLbl)?></label></div>
                             <div class="input-group std_margin">
                                 <input id="dest_curr" name="dest_curr" type="hidden" value="<?=e($destAmountCurr)?>">
@@ -220,10 +203,12 @@ include(TPL_PATH."commonhdr.tpl");	?>
 <?php	}	?>
                                 </div>
 <?php	if ($tr["type"] == EXPENSE) {		?>
-                                <div class="btn input-group__btn"><div id="destamountsign"><?=e($destAmountSign)?></div></div>
+                                <div class="btn input-group__btn">
 <?php	} else {	?>
-                                <div class="btn input-group__btn input-group__btn_inactive"><div id="destamountsign"><?=e($destAmountSign)?></div></div>
+                                <div class="btn input-group__btn input-group__btn_inactive">
 <?php	}	?>
+                                    <div id="destamountsign"><?=e($destAmountSign)?></div>
+                                </div>
                             </div>
                             <div class="invalid-feedback">Please input correct amount.</div>
                         </div>
@@ -240,7 +225,6 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
                         </div>
 
-<?php	if ($tr["type"] == EXPENSE || $tr["type"] == TRANSFER || $tr["type"] == DEBT) {		?>
                         <div id="result_balance" class="view-row hidden">
                             <div><label for="resbal"><?=e($srcBalTitle)?></label></div>
                             <div class="input-group std_margin">
@@ -250,9 +234,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 <div class="btn input-group__btn input-group__btn_inactive"><div id="res_currsign"><?=e($srcAmountSign)?></div></div>
                             </div>
                         </div>
-<?php	}	?>
 
-<?php	if ($tr["type"] == INCOME || $tr["type"] == TRANSFER || $tr["type"] == DEBT) {		?>
                         <div id="result_balance_dest" class="view-row hidden">
                             <div><label for="resbal_d"><?=e($destBalTitle)?></label></div>
                             <div class="input-group std_margin">
@@ -262,7 +244,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 <div class="btn input-group__btn input-group__btn_inactive"><div id="res_currsign_d"><?=e($destAmountSign)?></div></div>
                             </div>
                         </div>
-<?php	}	?>
+
                         <div class="view-row">
                             <?=IconLink::render([
                                 "id" => "calendar_btn",
@@ -294,11 +276,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 "title" => "Add comment",
                                 "hidden" => !is_empty($tr["comment"])
                             ])?>
-<?php	if (is_empty($tr["comment"])) {		?>
-                            <div id="comment_block" class="hidden">
-<?php	} else {	?>
-                            <div id="comment_block">
-<?php	}	?>
+                            <div id="comment_block" class="<?=hidden(is_empty($tr["comment"]))?>">
                                 <div><label for="comm">Comment</label></div>
                                 <div class="std_margin">
                                     <div class="stretch-input">

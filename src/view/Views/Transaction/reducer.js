@@ -200,6 +200,24 @@ const updateStateExchange = (state) => {
     return result;
 };
 
+/** Search for person account in specified currency. Returns empty account object if not found */
+const getPersonAccount = (personId, currencyId) => {
+    const account = window.app.model.accounts.getPersonAccount(
+        personId,
+        currencyId,
+    );
+
+    if (account) {
+        return account;
+    }
+
+    return {
+        id: 0,
+        balance: 0,
+        curr_id: currencyId,
+    };
+};
+
 // Reducers
 const reduceSourceAmountClick = (state) => {
     let newId = state.id;
@@ -602,17 +620,7 @@ const reduceDebtAccountChange = (state, accountId) => {
 
     // Request person account wtih the same currency as account
     if (newState.personAccount.curr_id !== account.curr_id) {
-        newState.personAccount = window.app.model.accounts.getPersonAccount(
-            newState.person.id,
-            account.curr_id,
-        );
-        if (!newState.personAccount) {
-            newState.personAccount = {
-                id: 0,
-                balance: 0,
-                curr_id: account.curr_id,
-            };
-        }
+        newState.personAccount = getPersonAccount(newState.person.id, account.curr_id);
     }
 
     transaction.src_curr = account.curr_id;
@@ -659,17 +667,7 @@ const reducePersonChange = (state, personId) => {
     const currencyId = (transaction.debtType)
         ? transaction.src_curr
         : transaction.dest_curr;
-    newState.personAccount = window.app.model.accounts.getPersonAccount(
-        person.id,
-        currencyId,
-    );
-    if (!newState.personAccount) {
-        newState.personAccount = {
-            id: 0,
-            balance: 0,
-            curr_id: currencyId,
-        };
-    }
+    newState.personAccount = getPersonAccount(person.id, currencyId);
 
     if (transaction.debtType) {
         newState.srcAccount = newState.personAccount;
@@ -1161,6 +1159,10 @@ const reduceTypeChange = (state, type) => {
     const accountModel = window.app.model.accounts;
     const currencyModel = window.app.model.currency;
 
+    if (state.transaction.type === type) {
+        return state;
+    }
+
     const newState = {
         ...state,
         transaction: {
@@ -1286,12 +1288,40 @@ const reduceTypeChange = (state, type) => {
     }
 
     if (type === DEBT) {
-        throw new Error('Not implemented yet');
+        const personsModel = window.app.model.visiblePersons;
+
+        const person = personsModel.getItemByIndex(0);
+        newState.person = person;
+        transaction.person_id = person.id;
+
+        if (currentType === EXPENSE || currentType === TRANSFER) {
+            transaction.debtType = false;
+            newState.account = state.srcAccount;
+            transaction.src_id = state.srcAccount.id;
+            transaction.src_curr = state.srcAccount.curr_id;
+            transaction.dest_curr = state.srcAccount.curr_id;
+        } else if (currentType === INCOME) {
+            transaction.debtType = true;
+            newState.account = state.destAccount;
+            transaction.dest_id = state.destAccount.id;
+            transaction.src_curr = state.srcAccount.curr_id;
+            transaction.dest_curr = state.srcAccount.curr_id;
+        }
+
+        newState.personAccount = getPersonAccount(person.id, transaction.src_curr);
+        if (transaction.debtType) {
+            transaction.src_id = newState.personAccount.id;
+        } else {
+            transaction.dest_id = newState.personAccount.id;
+        }
+
+        transaction.noAccount = false;
     }
 
     // Delete Debt specific fields
     if (currentType === DEBT) {
         delete newState.account;
+        delete newState.personAccount;
         delete transaction.debtType;
         delete transaction.noAccount;
         delete transaction.lastAcc_id;
