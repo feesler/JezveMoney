@@ -74,6 +74,10 @@ export class TransactionTypeMenu extends Component {
         this.render(this.state);
     }
 
+    getItemType(item) {
+        return parseInt(item.dataset.type, 10);
+    }
+
     parse(elem) {
         if (!elem || !elem.classList || !elem.classList.contains(CONTAINER_CLASS)) {
             throw new Error('Invalid element');
@@ -93,7 +97,7 @@ export class TransactionTypeMenu extends Component {
             const title = (linkElem) ? linkElem.textContent : titleElem.textContent;
 
             return {
-                type: parseInt(item.dataset.type, 10),
+                type: this.getItemType(item),
                 selected: item.classList.contains(ITEM_SELECTED_CLASS),
                 title,
             };
@@ -116,7 +120,7 @@ export class TransactionTypeMenu extends Component {
 
         e.preventDefault();
 
-        const selectedType = parseInt(itemElem.dataset.type, 10);
+        const selectedType = this.getItemType(itemElem);
 
         let toggled = false;
         if (this.state.multiple) {

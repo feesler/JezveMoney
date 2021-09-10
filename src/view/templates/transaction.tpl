@@ -114,14 +114,16 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 </div>
 
                                 <div class="tile-info-block">
-<?php	if ($tr["type"] == TRANSFER) {		?>
+<?php	if ($tr["type"] != DEBT) {		?>
+<?php	    if ($tr["type"] == TRANSFER) {		?>
                                     <?=TileInfoItem::render($srcAmountInfo)?>
-<?php	}	?>
-<?php	if ($tr["type"] == EXPENSE) {		?>
+<?php	    }	?>
+<?php	    if ($tr["type"] == EXPENSE) {		?>
                                     <?=TileInfoItem::render($destAmountInfo)?>
-<?php	}	?>
+<?php	    }	?>
                                     <?=TileInfoItem::render($srcResultInfo)?>
                                     <?=TileInfoItem::render($exchangeInfo)?>
+<?php	}	?>
                                 </div>
                             </div>
                         </div>
@@ -139,14 +141,18 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 </div>
 
                                 <div class="tile-info-block">
-<?php	if ($tr["type"] == INCOME) {		?>
+<?php	if ($tr["type"] != DEBT) {		?>
+<?php	    if ($tr["type"] == EXPENSE || $tr["type"] == INCOME) {		?>
                                     <?=TileInfoItem::render($srcAmountInfo)?>
-<?php	}	?>
+<?php	    }	?>
+<?php	    if ($tr["type"] == INCOME || $tr["type"] == TRANSFER) {		?>
                                     <?=TileInfoItem::render($destAmountInfo)?>
+<?php	    }	?>
                                     <?=TileInfoItem::render($destResultInfo)?>
 
-<?php	if ($tr["type"] == INCOME) {		?>
+<?php	    if ($tr["type"] == INCOME) {		?>
                                     <?=TileInfoItem::render($exchangeInfo)?>
+<?php	    }	?>
 <?php	}	?>
                                 </div>
                             </div>

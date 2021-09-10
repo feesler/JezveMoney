@@ -1,7 +1,6 @@
 import { test } from 'jezve-test';
 import * as TransactionTests from './common.js';
 import { TRANSFER } from '../../model/Transaction.js';
-import { TransferTransactionView } from '../../view/transaction/TransferTransactionView.js';
 import { App } from '../../Application.js';
 
 export async function submit(params) {
@@ -57,13 +56,9 @@ export async function stateLoop() {
     ]);
 
     // Navigate to create income view
-    if (!(App.view instanceof TransferTransactionView)) {
-        await App.goToMainView();
-        await App.view.goToNewTransactionByAccount(0);
-        if (!App.view.content.typeMenu.isSingleSelected(TRANSFER)) {
-            await App.view.changeTransactionType(TRANSFER);
-        }
-    }
+    await App.goToMainView();
+    await App.view.goToNewTransactionByAccount(0);
+    await App.view.changeTransactionType(TRANSFER);
 
     App.view.setBlock('Transfer loop', 2);
     await test('Initial state of new transfer view', async () => App.view.setExpectedState(0));

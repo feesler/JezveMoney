@@ -1,7 +1,6 @@
 import { test } from 'jezve-test';
 import * as TransactionTests from './common.js';
 import { DEBT } from '../../model/Transaction.js';
-import { DebtTransactionView } from '../../view/transaction/DebtTransactionView.js';
 import { App } from '../../Application.js';
 
 export async function submit(params) {
@@ -64,14 +63,10 @@ export async function stateLoop() {
         'Maria', 'Johnny',
     ]);
 
-    // Navigate to create income view
-    if (!(App.view instanceof DebtTransactionView)) {
-        await App.goToMainView();
-        await App.view.goToNewTransactionByAccount(0);
-        if (!App.view.content.typeMenu.isSingleSelected(DEBT)) {
-            await App.view.changeTransactionType(DEBT);
-        }
-    }
+    // Navigate to create debt view
+    await App.goToMainView();
+    await App.view.goToNewTransactionByAccount(0);
+    await App.view.changeTransactionType(DEBT);
 
     App.view.setBlock('Debt loop', 2);
     await test('Initial state of new debt view', async () => App.view.setExpectedState(0));

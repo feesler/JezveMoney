@@ -2,7 +2,6 @@ import { test } from 'jezve-test';
 import * as TransactionTests from './common.js';
 import { Currency } from '../../model/Currency.js';
 import { EXPENSE } from '../../model/Transaction.js';
-import { ExpenseTransactionView } from '../../view/transaction/ExpenseTransactionView.js';
 import { App } from '../../Application.js';
 
 export async function submit(params) {
@@ -60,13 +59,9 @@ export async function stateLoop() {
     ]);
 
     // Navigate to create expense view
-    if (!(App.view instanceof ExpenseTransactionView)) {
-        await App.goToMainView();
-        await App.view.goToNewTransactionByAccount(0);
-        if (!App.view.content.typeMenu.isSingleSelected(EXPENSE)) {
-            await App.view.changeTransactionType(EXPENSE);
-        }
-    }
+    await App.goToMainView();
+    await App.view.goToNewTransactionByAccount(0);
+    await App.view.changeTransactionType(EXPENSE);
 
     // State 0
     App.view.setBlock('Expense loop', 2);

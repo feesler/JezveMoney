@@ -2,7 +2,6 @@ import { test } from 'jezve-test';
 import * as TransactionTests from './common.js';
 import { Currency } from '../../model/Currency.js';
 import { INCOME } from '../../model/Transaction.js';
-import { IncomeTransactionView } from '../../view/transaction/IncomeTransactionView.js';
 import { App } from '../../Application.js';
 
 export async function submit(params) {
@@ -60,13 +59,9 @@ export async function stateLoop() {
     ]);
 
     // Navigate to create income view
-    if (!(App.view instanceof IncomeTransactionView)) {
-        await App.goToMainView();
-        await App.view.goToNewTransactionByAccount(0);
-        if (!App.view.content.typeMenu.isSingleSelected(INCOME)) {
-            await App.view.changeTransactionType(INCOME);
-        }
-    }
+    await App.goToMainView();
+    await App.view.goToNewTransactionByAccount(0);
+    await App.view.changeTransactionType(INCOME);
 
     // State 0
     App.view.setBlock('Income loop', 2);

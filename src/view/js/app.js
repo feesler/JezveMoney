@@ -207,3 +207,32 @@ export function normalizeExch(val) {
 export function isValidValue(val) {
     return (typeof val !== 'undefined' && val !== null && !Number.isNaN(parseFloat(fixFloat(val))));
 }
+
+const availTransTypes = {
+    [EXPENSE]: 'expense',
+    [INCOME]: 'income',
+    [TRANSFER]: 'transfer',
+    [DEBT]: 'debt',
+};
+
+/** Return transaction type for specified string */
+export function getTransactionTypeFromString(str) {
+    const lstr = str.toLowerCase();
+    for (const type in availTransTypes) {
+        if (availTransTypes[type] === lstr) {
+            return type;
+        }
+    }
+
+    return 0;
+}
+
+/** Return string for specified transaction type */
+export function getTransactionTypeString(value) {
+    const type = parseInt(value, 10);
+    if (!availTransTypes[type]) {
+        return null;
+    }
+
+    return availTransTypes[type];
+}

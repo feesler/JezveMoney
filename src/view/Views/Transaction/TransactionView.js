@@ -6,7 +6,7 @@ import {
     enable,
     setEmptyClick,
     checkDate,
-    insertAfter,
+    addChilds,
 } from 'jezvejs';
 import { formatDate } from 'jezvejs/DateUtils';
 import { DropDown } from 'jezvejs/DropDown';
@@ -21,6 +21,7 @@ import {
     isValidValue,
     normalize,
     normalizeExch,
+    getTransactionTypeString,
 } from '../../js/app.js';
 import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
@@ -63,6 +64,8 @@ import {
     reducer,
     typeChange,
 } from './reducer.js';
+
+/* global baseURL */
 
 const singleTransDeleteTitle = 'Delete transaction';
 const singleTransDeleteMsg = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
@@ -255,18 +258,30 @@ class TransactionView extends View {
         });
 
         this.srcContainer = ge('source');
-        if (this.srcContainer) {
-            this.srcTileBase = this.srcContainer.querySelector('.tile-base');
-            this.srcTileContainer = this.srcContainer.querySelector('.tile_container');
-            this.srcTileInfoBlock = this.srcContainer.querySelector('.tile-info-block');
+        this.destContainer = ge('destination');
+        this.personContainer = ge('person');
+        this.debtAccountContainer = ge('debtaccount');
+        if (
+            !this.srcContainer
+            || !this.destContainer
+            || !this.personContainer
+            || !this.debtAccountContainer
+        ) {
+            throw new Error('Failed to initialize view');
         }
 
-        this.destContainer = ge('destination');
-        if (this.destContainer) {
-            this.destTileBase = this.destContainer.querySelector('.tile-base');
-            this.destTileContainer = this.destContainer.querySelector('.tile_container');
-            this.destTileInfoBlock = this.destContainer.querySelector('.tile-info-block');
-        }
+        this.srcTileBase = this.srcContainer.querySelector('.tile-base');
+        this.srcTileContainer = this.srcContainer.querySelector('.tile_container');
+        this.srcTileInfoBlock = this.srcContainer.querySelector('.tile-info-block');
+
+        this.destTileBase = this.destContainer.querySelector('.tile-base');
+        this.destTileContainer = this.destContainer.querySelector('.tile_container');
+        this.destTileInfoBlock = this.destContainer.querySelector('.tile-info-block');
+
+        this.personTileInfoBlock = this.personContainer.querySelector('.tile-info-block');
+
+        this.debtAccountTileBase = this.debtAccountContainer.querySelector('.tile-base');
+        this.debtAccTileInfoBlock = this.debtAccountContainer.querySelector('.tile-info-block');
 
         const srcTileElem = ge('source_tile');
         this.srcTile = (srcTileElem) ? AccountTile.fromElement({ elem: srcTileElem }) : null;
@@ -365,35 +380,16 @@ class TransactionView extends View {
         this.commentBlock = ge('comment_block');
         this.commentInput = ge('comm');
 
-        if (transaction.type === EXPENSE || transaction.type === TRANSFER) {
-            this.srcIdInp = ge('src_id');
-        }
-        if (transaction.type === INCOME || transaction.type === TRANSFER) {
-            this.destIdInp = ge('dest_id');
-        }
-
+        this.srcIdInp = ge('src_id');
+        this.destIdInp = ge('dest_id');
         this.srcCurrInp = ge('src_curr');
         this.destCurrInp = ge('dest_curr');
 
-        this.personContainer = ge('person');
-        this.debtAccountContainer = ge('debtaccount');
         this.debtOpControls = ge('operation');
 
         this.personIdInp = ge('person_id');
-        if (this.personIdInp) {
-            this.personAccount = window.app.model.accounts.getPersonAccount(
-                this.personIdInp.value,
-                transaction.src_curr,
-            );
-        }
-
         this.debtAccountInp = ge('acc_id');
         this.debtAccountTile = AccountTile.fromElement({ elem: 'acc_tile', parent: this });
-        if (!transaction.noAccount) {
-            if (this.debtAccountInp) {
-                this.debtAccount = window.app.model.accounts.getItem(this.debtAccountInp.value);
-            }
-        }
 
         this.noAccountBtn = ge('noacc_btn');
         if (this.noAccountBtn) {
@@ -420,83 +416,32 @@ class TransactionView extends View {
 
         this.personTile = Tile.fromElement({ elem: 'person_tile', parent: this });
 
-        this.persDDList = DropDown.create({
-            input_id: 'person_tile',
-            listAttach: true,
-            onitemselect: (item) => this.onPersonSelect(item),
-            editable: false,
-        });
+        if (transaction.type === DEBT) {
+            this.initPersonList();
 
-        window.app.model.visiblePersons.forEach(
-            (person) => this.persDDList.addItem({ id: person.id, title: person.name }),
-        );
+            const personId = parseInt(this.personIdInp.value, 10);
+            this.appendHiddenPerson(this.persDDList, personId);
+            this.persDDList.selectItem(personId);
 
-        const personId = parseInt(this.personIdInp.value, 10);
-        this.appendHiddenPerson(this.persDDList, personId);
-        this.persDDList.selectItem(personId);
-
-        if (!transaction.noAccount) {
-            this.initAccList();
-        }
-
-        this.srcDDList = DropDown.create({
-            input_id: 'source_tile',
-            listAttach: true,
-            onitemselect: (item) => this.onSrcAccountSelect(item),
-            editable: false,
-        });
-
-        if (this.srcDDList) {
-            window.app.model.visibleUserAccounts.forEach(
-                (acc) => this.srcDDList.addItem({ id: acc.id, title: acc.name }),
-            );
-
-            this.appendHiddenAccount(this.srcDDList, transaction.src_id);
-            this.appendHiddenAccount(this.srcDDList, transaction.dest_id);
-            if (transaction.src_id) {
-                this.srcDDList.selectItem(transaction.src_id);
+            if (!transaction.noAccount) {
+                this.initAccList();
             }
         }
 
-        this.destDDList = DropDown.create({
-            input_id: 'dest_tile',
-            listAttach: true,
-            onitemselect: (item) => this.onDestAccountSelect(item),
-            editable: false,
-        });
-        if (this.destDDList) {
-            window.app.model.visibleUserAccounts.forEach(
-                (acc) => this.destDDList.addItem({ id: acc.id, title: acc.name }),
-            );
-
-            this.appendHiddenAccount(this.destDDList, transaction.src_id);
-            this.appendHiddenAccount(this.destDDList, transaction.dest_id);
-            if (transaction.dest_id) {
-                this.destDDList.selectItem(transaction.dest_id);
-            }
+        if (transaction.type === EXPENSE || transaction.type === TRANSFER) {
+            this.initSrcAccList();
         }
 
-        this.srcCurrDDList = DropDown.create({
-            input_id: 'srcamountsign',
-            listAttach: true,
-            onitemselect: (item) => this.onSrcCurrencySel(item),
-            editable: false,
-        });
-        window.app.model.currency.forEach(
-            (curr) => this.srcCurrDDList.addItem({ id: curr.id, title: curr.name }),
-        );
-        this.srcCurrDDList.selectItem(transaction.src_curr);
+        if (transaction.type === INCOME || transaction.type === TRANSFER) {
+            this.initDestAccList();
+        }
 
-        this.destCurrDDList = DropDown.create({
-            input_id: 'destamountsign',
-            listAttach: true,
-            onitemselect: (item) => this.onDestCurrencySel(item),
-            editable: false,
-        });
-        window.app.model.currency.forEach(
-            (curr) => this.destCurrDDList.addItem({ id: curr.id, title: curr.name }),
-        );
-        this.destCurrDDList.selectItem(transaction.dest_curr);
+        if (transaction.type === INCOME) {
+            this.initSrcCurrList();
+        }
+        if (transaction.type === EXPENSE) {
+            this.initDestCurrList();
+        }
 
         this.submitBtn = ge('submitbtn');
     }
@@ -535,20 +480,88 @@ class TransactionView extends View {
         }
     }
 
-    /**
-     * Initialize DropDown for debt account tile
-     */
+    /** Initialize DropDown for source account tile */
+    initSrcAccList() {
+        if (this.srcDDList) {
+            return;
+        }
+
+        const state = this.store.getState();
+        const { transaction } = state;
+        this.srcDDList = DropDown.create({
+            input_id: 'source_tile',
+            listAttach: true,
+            onitemselect: (item) => this.onSrcAccountSelect(item),
+            editable: false,
+        });
+
+        window.app.model.visibleUserAccounts.forEach(
+            (acc) => this.srcDDList.addItem({ id: acc.id, title: acc.name }),
+        );
+
+        this.appendHiddenAccount(this.srcDDList, transaction.src_id);
+        this.appendHiddenAccount(this.srcDDList, transaction.dest_id);
+        if (transaction.src_id) {
+            this.srcDDList.selectItem(transaction.src_id);
+        }
+    }
+
+    /** Initialize DropDown for destination account tile */
+    initDestAccList() {
+        if (this.destDDList) {
+            return;
+        }
+
+        const state = this.store.getState();
+        const { transaction } = state;
+        this.destDDList = DropDown.create({
+            input_id: 'dest_tile',
+            listAttach: true,
+            onitemselect: (item) => this.onDestAccountSelect(item),
+            editable: false,
+        });
+
+        window.app.model.visibleUserAccounts.forEach(
+            (acc) => this.destDDList.addItem({ id: acc.id, title: acc.name }),
+        );
+
+        this.appendHiddenAccount(this.destDDList, transaction.src_id);
+        this.appendHiddenAccount(this.destDDList, transaction.dest_id);
+        if (transaction.dest_id) {
+            this.destDDList.selectItem(transaction.dest_id);
+        }
+    }
+
+    /** Initialize DropDown for debt account tile */
+    initPersonList() {
+        if (this.persDDList) {
+            return;
+        }
+
+        this.persDDList = DropDown.create({
+            input_id: 'person_tile',
+            listAttach: true,
+            onitemselect: (item) => this.onPersonSelect(item),
+            editable: false,
+        });
+
+        window.app.model.visiblePersons.forEach(
+            (person) => this.persDDList.addItem({ id: person.id, title: person.name }),
+        );
+    }
+
+    /** Initialize DropDown for debt account tile */
     initAccList() {
+        if (this.accDDList) {
+            return;
+        }
+
         this.accDDList = DropDown.create({
             input_id: 'acc_tile',
             listAttach: true,
             onitemselect: (item) => this.onDebtAccountSelect(item),
             editable: false,
         });
-        // In case there is no persons, components will be not available
-        if (!this.accDDList) {
-            return;
-        }
 
         window.app.model.visibleUserAccounts.forEach(
             (acc) => this.accDDList.addItem({ id: acc.id, title: acc.name }),
@@ -560,6 +573,44 @@ class TransactionView extends View {
             this.appendHiddenAccount(this.accDDList, accountId);
             this.accDDList.selectItem(accountId);
         }
+    }
+
+    /** Initialize DropDown for source currency */
+    initSrcCurrList() {
+        if (this.srcCurrDDList) {
+            return;
+        }
+
+        const state = this.store.getState();
+        this.srcCurrDDList = DropDown.create({
+            input_id: 'srcamountsign',
+            listAttach: true,
+            onitemselect: (item) => this.onSrcCurrencySel(item),
+            editable: false,
+        });
+        window.app.model.currency.forEach(
+            (curr) => this.srcCurrDDList.addItem({ id: curr.id, title: curr.name }),
+        );
+        this.srcCurrDDList.selectItem(state.transaction.src_curr);
+    }
+
+    /** Initialize DropDown for destination currency */
+    initDestCurrList() {
+        if (this.destCurrDDList) {
+            return;
+        }
+
+        const state = this.store.getState();
+        this.destCurrDDList = DropDown.create({
+            input_id: 'destamountsign',
+            listAttach: true,
+            onitemselect: (item) => this.onDestCurrencySel(item),
+            editable: false,
+        });
+        window.app.model.currency.forEach(
+            (curr) => this.destCurrDDList.addItem({ id: curr.id, title: curr.name }),
+        );
+        this.destCurrDDList.selectItem(state.transaction.dest_curr);
     }
 
     /**
@@ -888,6 +939,35 @@ class TransactionView extends View {
         });
     }
 
+    replaceHistory(state) {
+        const { transaction } = state;
+        const baseAddress = (state.isUpdate)
+            ? `${baseURL}transactions/edit/${transaction.id}`
+            : `${baseURL}transactions/new/`;
+
+        const url = new URL(baseAddress);
+        const typeStr = getTransactionTypeString(transaction.type);
+        url.searchParams.set('type', typeStr);
+
+        if (transaction.type === EXPENSE || transaction.type === TRANSFER) {
+            url.searchParams.set('acc_id', transaction.src_id);
+        } else if (transaction.type === INCOME) {
+            url.searchParams.set('acc_id', transaction.dest_id);
+        } else if (transaction.type === DEBT) {
+            if (transaction.noAccount) {
+                url.searchParams.delete('acc_id');
+            } else {
+                url.searchParams.set('acc_id', state.account.id);
+            }
+        }
+
+        const title = (state.isUpdate)
+            ? 'Jezve Money | Edit transaction'
+            : 'Jezve Money | New transaction';
+
+        window.history.replaceState({}, title, url);
+    }
+
     renderExchangeRate(state) {
         const srcCurr = state.srcCurrency;
         const destCurr = state.destCurrency;
@@ -911,42 +991,40 @@ class TransactionView extends View {
     }
 
     renderExpense(state) {
+        this.resBalanceDestSwitch(HIDE_BOTH);
+
         if (state.id === 0) {
-            this.srcAmountSwitch(SHOW_INFO);
+            this.srcAmountSwitch(HIDE_BOTH);
             this.destAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(SHOW_INFO);
-            this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(HIDE_BOTH);
         } else if (state.id === 1) {
-            this.srcAmountSwitch(SHOW_INFO);
+            this.srcAmountSwitch(HIDE_BOTH);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INPUT);
-            this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(HIDE_BOTH);
         } else if (state.id === 2) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(SHOW_INFO);
-            this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(SHOW_INFO);
         } else if (state.id === 3) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INFO);
-            this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(SHOW_INPUT);
         } else if (state.id === 4) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INPUT);
-            this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(SHOW_INFO);
         }
 
-        insertAfter(
-            this.exchangeInfo.elem,
+        addChilds(this.srcTileInfoBlock, [
+            this.destAmountInfo.elem,
             this.srcResBalanceInfo.elem,
-        );
+            this.exchangeInfo.elem,
+        ]);
 
         this.setCurrActive(true, false); // set source currency inactive
         this.setCurrActive(false, true); // set destination currency active
@@ -985,10 +1063,11 @@ class TransactionView extends View {
             this.exchRateSwitch(SHOW_INFO);
         }
 
-        insertAfter(
-            this.exchangeInfo.elem,
+        addChilds(this.destTileInfoBlock, [
+            this.destAmountInfo.elem,
             this.destResBalanceInfo.elem,
-        );
+            this.exchangeInfo.elem,
+        ]);
 
         this.setCurrActive(true, true); // set source currency active
         this.setCurrActive(false, false); // set destination currency inactive
@@ -1051,6 +1130,16 @@ class TransactionView extends View {
             this.exchRateSwitch(SHOW_INPUT);
         }
 
+        addChilds(this.srcTileInfoBlock, [
+            this.srcAmountInfo.elem,
+            this.srcResBalanceInfo.elem,
+            this.exchangeInfo.elem,
+        ]);
+        addChilds(this.destTileInfoBlock, [
+            this.destAmountInfo.elem,
+            this.destResBalanceInfo.elem,
+        ]);
+
         this.setCurrActive(true, false); // set source currency inactive
         this.setCurrActive(false, false); // set destination currency inactive
     }
@@ -1091,14 +1180,16 @@ class TransactionView extends View {
 
         const { debtType, noAccount } = state.transaction;
 
-        insertAfter(
-            this.srcResBalanceInfo.elem,
+        addChilds(this.personTileInfoBlock, [
+            this.srcAmountInfo.elem,
+            (debtType) ? this.srcResBalanceInfo.elem : this.destResBalanceInfo.elem,
             (debtType) ? this.exchangeInfo.elem : this.destAmountInfo.elem,
-        );
-        insertAfter(
-            this.destResBalanceInfo.elem,
+        ]);
+
+        addChilds(this.debtAccTileInfoBlock, [
+            (debtType) ? this.destResBalanceInfo.elem : this.srcResBalanceInfo.elem,
             (debtType) ? this.destAmountInfo.elem : this.exchangeInfo.elem,
-        );
+        ]);
 
         if (noAccount) {
             this.debtAccountLabel.textContent = 'No account';
@@ -1107,7 +1198,7 @@ class TransactionView extends View {
         }
 
         show(this.noAccountBtn, !noAccount);
-        show(this.srcTileBase, !noAccount);
+        show(this.debtAccountTileBase, !noAccount);
         show(this.selectAccountBtn, noAccount);
 
         this.srcResBalanceRowLabel.textContent = (debtType) ? 'Result balance (Person)' : 'Result balance (Account)';
@@ -1141,6 +1232,8 @@ class TransactionView extends View {
             throw new Error('Invalid state');
         }
 
+        this.replaceHistory(state);
+
         const { transaction } = state;
 
         show(this.srcContainer, transaction.type === EXPENSE || transaction.type === TRANSFER);
@@ -1173,15 +1266,28 @@ class TransactionView extends View {
             this.destIdInp.value = transaction.dest_id;
         }
 
-        if (this.srcDDList && transaction.src_id) {
-            this.srcDDList.selectItem(transaction.src_id);
+        if (transaction.type === EXPENSE || transaction.type === TRANSFER) {
+            this.initSrcAccList();
+            if (this.srcDDList && transaction.src_id) {
+                this.srcDDList.selectItem(transaction.src_id);
+            }
         }
-        if (this.destDDList && transaction.dest_id) {
-            this.destDDList.selectItem(transaction.dest_id);
+
+        if (transaction.type === INCOME || transaction.type === TRANSFER) {
+            this.initDestAccList();
+            if (this.destDDList && transaction.dest_id) {
+                this.destDDList.selectItem(transaction.dest_id);
+            }
         }
 
         this.srcCurrInp.value = transaction.src_curr;
         this.destCurrInp.value = transaction.dest_curr;
+        if (transaction.type === INCOME) {
+            this.initSrcCurrList();
+        }
+        if (transaction.type === EXPENSE) {
+            this.initDestCurrList();
+        }
 
         const sourceAmountLbl = (state.isDiff) ? 'Source amount' : 'Amount';
         const destAmountLbl = (state.isDiff) ? 'Destination amount' : 'Amount';
