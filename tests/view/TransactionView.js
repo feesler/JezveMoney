@@ -2,7 +2,9 @@ import { TestComponent } from 'jezve-test';
 import { AppView } from './AppView.js';
 import {
     convDate,
+    correct,
     correctExch,
+    normalize,
     isValidValue,
     normalizeExch,
 } from '../common.js';
@@ -15,7 +17,14 @@ import { CommentRow } from './component/CommentRow.js';
 import { TileInfoItem } from './component/TileInfoItem.js';
 import { TileBlock } from './component/TileBlock.js';
 import { Button } from './component/Button.js';
-import { DEBT, EXPENSE, INCOME, TRANSFER } from '../../src/view/js/app.js';
+import {
+    EXPENSE,
+    INCOME,
+    TRANSFER,
+    DEBT,
+} from '../model/Transaction.js';
+import { Currency } from '../model/Currency.js';
+import { App } from '../Application.js';
 
 /** Create or update transaction view class */
 export class TransactionView extends AppView {
@@ -428,13 +437,7 @@ export class TransactionView extends AppView {
         }
 
         const personAccountCurr = (res.debtType) ? res.src_curr_id : res.dest_curr_id;
-        res.personAccount = App.state.getPersonAccount(res.person.id, personAccountCurr);
-        if (!res.personAccount) {
-            res.personAccount = {
-                balance: 0,
-                curr_id: personAccountCurr,
-            };
-        }
+        res.personAccount = this.getPersonAccount(res.person.id, personAccountCurr);
 
         const isSelectAccountVisible = await TestComponent.isVisible(cont.selaccount);
         res.noAccount = isSelectAccountVisible;
@@ -575,13 +578,13 @@ export class TransactionView extends AppView {
 
     setExpectedState(val) {
         if (this.model.type === EXPENSE) {
-            setExpenseExpectedState(val);
+            this.setExpenseExpectedState(val);
         } else if (this.model.type === INCOME) {
-            setIncomeExpectedState(val);
+            this.setIncomeExpectedState(val);
         } else if (this.model.type === TRANSFER) {
-            setTransferExpectedState(val);
+            this.setTransferExpectedState(val);
         } else if (this.model.type === DEBT) {
-            setDebtExpectedState(val);
+            this.setDebtExpectedState(val);
         }
     }
 
@@ -1218,13 +1221,13 @@ export class TransactionView extends AppView {
      */
     setSrcAmount(val) {
         if (this.model.type === EXPENSE) {
-            setExpenseSrcAmount(val);
+            this.setExpenseSrcAmount(val);
         } else if (this.model.type === INCOME) {
-            setIncomeSrcAmount(val);
+            this.setIncomeSrcAmount(val);
         } else if (this.model.type === TRANSFER) {
-            setTransferSrcAmount(val);
+            this.setTransferSrcAmount(val);
         } else if (this.model.type === DEBT) {
-            setDebtSrcAmount(val);
+            this.setDebtSrcAmount(val);
         }
     }
 
@@ -1301,13 +1304,13 @@ export class TransactionView extends AppView {
      */
     setDestAmount(val) {
         if (this.model.type === EXPENSE) {
-            setExpenseDestAmount(val);
+            this.setExpenseDestAmount(val);
         } else if (this.model.type === INCOME) {
-            setIncomeDestAmount(val);
+            this.setIncomeDestAmount(val);
         } else if (this.model.type === TRANSFER) {
-            setTransferDestAmount(val);
+            this.setTransferDestAmount(val);
         } else if (this.model.type === DEBT) {
-            setDebtDestAmount(val);
+            this.setDebtDestAmount(val);
         }
     }
 
@@ -1418,53 +1421,227 @@ export class TransactionView extends AppView {
         this.model.fmtExch = `${this.model.fExchRate} ${exchText}`;
     }
 
+    setNextSourceAccount(accountId) {
+        const nextAccountId = App.state.accounts.getNext(accountId);
+        const newSrcAcc = App.state.accounts.getItem(nextAccountId);
+        if (!newSrcAcc) {
+            throw new Error('Next account not found');
+        }
+        this.model.srcAccount = newSrcAcc;
+        this.model.src_curr_id = this.model.srcAccount.curr_id;
+        this.model.srcCurr = Currency.getById(this.model.src_curr_id);
+        this.model.srcAccount.fmtBalance = this.model.srcCurr.format(
+            this.model.srcAccount.balance,
+        );
+
+        // Copy destination amount to source amount
+        if (this.model.fDestAmount !== this.model.fSrcAmount) {
+            this.model.srcAmount = this.model.destAmount;
+        }
+        this.model.fSrcAmount = this.model.fDestAmount;
+
+        // Update result balance of source
+        const newSrcResBal = normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
+        if (this.model.fSrcResBal !== newSrcResBal) {
+            this.model.srcResBal = newSrcResBal;
+            this.model.fSrcResBal = this.model.srcResBal;
+        }
+        this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.fSrcResBal);
+    }
+
+    setNextDestAccount(accountId) {
+        const nextAccountId = App.state.accounts.getNext(accountId);
+        if (!nextAccountId) {
+            throw new Error('Next account not found');
+        }
+
+        this.model.destAccount = App.state.accounts.getItem(nextAccountId);
+        this.model.dest_curr_id = this.model.destAccount.curr_id;
+        this.model.destCurr = Currency.getById(this.model.dest_curr_id);
+        this.model.destAccount.fmtBalance = this.model.destCurr.format(
+            this.model.destAccount.balance,
+        );
+
+        // Copy source amount to destination amount
+        if (this.model.fDestAmount !== this.model.fSrcAmount) {
+            this.model.destAmount = this.model.srcAmount;
+        }
+        this.model.fDestAmount = this.model.fSrcAmount;
+
+        // Update result balance of destination
+        const destRes = this.model.destAccount.balance + this.model.fDestAmount;
+        const newDestResBal = normalize(destRes);
+        if (this.model.fDestResBal !== newDestResBal) {
+            this.model.destResBal = newDestResBal;
+            this.model.fDestResBal = this.model.destResBal;
+        }
+        this.model.fmtDestResBal = this.model.destCurr.format(this.model.fDestResBal);
+    }
+
+    getPersonAccount(personId, currencyId) {
+        const personAccount = App.state.getPersonAccount(personId, currencyId);
+        if (personAccount) {
+            return personAccount;
+        }
+
+        return {
+            balance: 0,
+            curr_id: currencyId,
+        };
+    }
+
     async changeTransactionType(type) {
         const currentType = this.model.type;
 
         if (currentType === type) {
-            return;
+            return true;
         }
 
         this.model.type = type;
         if (type === EXPENSE) {
             if (currentType === INCOME) {
-                this.model.srcAccount = this.model.destAccount;
                 const srcCurrId = this.model.src_curr_id;
+                const { srcCurr, srcAmount, destAmount } = this.model;
+
+                this.model.srcAccount = this.model.destAccount;
                 this.model.src_curr_id = this.model.dest_curr_id;
                 this.model.dest_curr_id = srcCurrId;
-                const srcCurr = this.model.srcCurr;
                 this.model.srcCurr = this.model.destCurr;
-                this.model.destCurr = tCurr;
+                this.model.destCurr = srcCurr;
 
-                const { srcAmount, destAmount } = this.model;
                 this.setSrcAmount(destAmount);
                 this.setDestAmount(srcAmount);
                 this.updateExch();
             } else if (currentType === TRANSFER) {
+                const { srcAmount } = this.model;
+
                 this.model.state = 0;
                 this.model.dest_curr_id = this.model.src_curr_id;
                 this.model.destCurr = this.model.srcCurr;
 
-                const { srcAmount } = this.model;
                 this.setSrcAmount(srcAmount);
                 this.setDestAmount(srcAmount);
                 this.updateExch();
             } else if (currentType === DEBT) {
                 const fromAccount = (this.model.account)
                     ? this.model.account
-                    : App.state.accounts.getItemByIndex(0);
+                    : App.state.accounts.getItemByIndex(0); // TODO: use visible accounts
+
+                this.model.state = 0;
+                this.model.srcAccount = fromAccount;
+                this.model.src_curr_id = fromAccount.curr_id;
+                this.model.srcCurr = Currency.getById(fromAccount.curr_id);
+                this.model.destCurr = this.model.srcCurr;
             }
 
             this.model.destAccount = null;
         }
 
         if (type === INCOME) {
+            if (currentType === INCOME) {
+                const { srcCurr, srcAmount, destAmount } = this.model;
+                const srcCurrId = this.model.src_curr_id;
+
+                this.model.destAccount = this.model.srcAccount;
+                this.model.src_curr_id = this.model.dest_curr_id;
+                this.model.dest_curr_id = srcCurrId;
+                this.model.srcCurr = this.model.destCurr;
+                this.model.destCurr = srcCurr;
+
+                this.setSrcAmount(destAmount);
+                this.setDestAmount(srcAmount);
+                this.updateExch();
+            } else if (currentType === TRANSFER) {
+                const { destAmount } = this.model;
+
+                this.model.state = 0;
+                this.model.src_curr_id = this.model.dest_curr_id;
+                this.model.srcCurr = this.model.destCurr;
+
+                this.setSrcAmount(destAmount);
+                this.setDestAmount(destAmount);
+                this.updateExch();
+            } else if (currentType === DEBT) {
+                const fromAccount = (this.model.account)
+                    ? this.model.account
+                    : App.state.accounts.getItemByIndex(0); // TODO: use visible accounts
+
+                this.model.state = 0;
+                this.model.destAccount = fromAccount;
+                this.model.dest_curr_id = fromAccount.curr_id;
+                this.model.destCurr = Currency.getById(fromAccount.curr_id);
+                this.model.srcCurr = this.model.destCurr;
+            }
+
+            this.model.srcAccount = null;
         }
 
         if (type === TRANSFER) {
+            if (currentType === EXPENSE) {
+                this.setNextDestAccount(this.model.srcAccount.id);
+            } else if (currentType === INCOME) {
+                this.setNextSourceAccount(this.model.destAccount.id);
+            } else if (currentType === DEBT) {
+                if (this.model.account && this.model.debtType) {
+                    this.model.destAccount = this.model.account;
+                    this.model.dest_curr_id = this.model.account.curr_id;
+                    this.model.destCurr = Currency.getById(this.model.account.curr_id);
+
+                    this.setNextSourceAccount(this.model.destAccount.id);
+                } else {
+                    const scrAccount = (this.model.account)
+                        ? this.model.account
+                        : App.state.accounts.getItemByIndex(0); // TODO: use visible accounts
+
+                    this.model.srcAccount = scrAccount;
+                    this.model.src_curr_id = scrAccount.curr_id;
+                    this.model.srcCurr = Currency.getById(scrAccount.curr_id);
+                    this.setNextDestAccount(scrAccount.id);
+                }
+            }
+
+            this.model.isDiffCurr = (this.model.src_curr_id !== this.model.dest_curr_id);
+            this.model.state = (this.model.isDiffCurr) ? 3 : 0;
+
+            const { srcAmount, destAmount } = this.model;
+            this.setSrcAmount(srcAmount);
+            this.setDestAmount(destAmount);
+            this.updateExch();
         }
 
         if (type === DEBT) {
+            const person = App.state.persons.getItemByIndex(0); // TODO: use visible persons
+            this.model.person = person;
+
+            if (currentType === EXPENSE || currentType === TRANSFER) {
+                this.model.debtType = false;
+                this.model.account = this.model.srcAccount;
+                this.model.src_curr_id = this.model.srcAccount.curr_id;
+                this.model.dest_curr_id = this.model.src_curr_id;
+            } else if (currentType === INCOME) {
+                this.model.debtType = true;
+                this.model.account = this.model.destAccount;
+                this.model.dest_curr_id = this.model.destAccount.curr_id;
+                this.model.src_curr_id = this.model.dest_curr_id;
+            }
+
+            this.model.personAccount = this.getPersonAccount(
+                this.model.person.id,
+                this.model.src_curr_id,
+            );
+
+            this.model.noAccount = false;
+            this.model.state = (this.model.debtType) ? 0 : 3;
+        }
+
+        // Delete Debt specific fields
+        if (currentType === DEBT) {
+            delete this.model.account;
+            delete this.model.person;
+            delete this.model.personAccount;
+            delete this.model.debtType;
+            delete this.model.noAccount;
+            delete this.model.lastAcc_id;
         }
 
         await this.performAction(() => this.content.typeMenu.select(type));
@@ -1510,9 +1687,9 @@ export class TransactionView extends AppView {
 
     async changeSrcAccount(val) {
         if (this.model.type === EXPENSE) {
-            changeExpenseSrcAccount(val);
+            this.changeExpenseSrcAccount(val);
         } else if (this.model.type === TRANSFER) {
-            changeTransferSrcAccount(val);
+            this.changeTransferSrcAccount(val);
         } else {
             throw new Error('Unexpected action: can\'t change source account');
         }
@@ -1581,7 +1758,7 @@ export class TransactionView extends AppView {
         const newAcc = App.state.accounts.getItem(accountId);
 
         if (!this.model.srcAccount || !newAcc || newAcc.id === this.model.srcAccount.id) {
-            return true;
+            return;
         }
 
         this.model.srcAccount = newAcc;
@@ -1598,32 +1775,7 @@ export class TransactionView extends AppView {
         this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.fSrcResBal);
 
         if (newAcc.id === this.model.destAccount.id) {
-            const nextAccountId = App.state.accounts.getNext(newAcc.id);
-            if (!nextAccountId) {
-                throw new Error('Next account not found');
-            }
-
-            this.model.destAccount = App.state.accounts.getItem(nextAccountId);
-            this.model.dest_curr_id = this.model.destAccount.curr_id;
-            this.model.destCurr = Currency.getById(this.model.dest_curr_id);
-            this.model.destAccount.fmtBalance = this.model.destCurr.format(
-                this.model.destAccount.balance,
-            );
-
-            // Copy source amount to destination amount
-            if (this.model.fDestAmount !== this.model.fSrcAmount) {
-                this.model.destAmount = this.model.srcAmount;
-            }
-            this.model.fDestAmount = this.model.fSrcAmount;
-
-            // Update result balance of destination
-            const destRes = this.model.destAccount.balance + this.model.fDestAmount;
-            const newDestResBal = normalize(destRes);
-            if (this.model.fDestResBal !== newDestResBal) {
-                this.model.destResBal = newDestResBal;
-                this.model.fDestResBal = this.model.destResBal;
-            }
-            this.model.fmtDestResBal = this.model.destCurr.format(this.model.fDestResBal);
+            this.setNextDestAccount(newAcc.id);
         }
 
         // Update exchange rate
@@ -1676,9 +1828,9 @@ export class TransactionView extends AppView {
 
     async changeDestAccount(val) {
         if (this.model.type === INCOME) {
-            changeIncomeDestAccount(val);
+            this.changeIncomeDestAccount(val);
         } else if (this.model.type === TRANSFER) {
-            changeTransferDestAccount(val);
+            this.changeTransferDestAccount(val);
         } else {
             throw new Error('Unexpected action: can\'t change destination account');
         }
@@ -1692,7 +1844,7 @@ export class TransactionView extends AppView {
         const newAcc = App.state.accounts.getItem(accountId);
 
         if (!this.model.destAccount || !newAcc || newAcc.id === this.model.destAccount.id) {
-            return true;
+            return;
         }
 
         this.model.destAccount = newAcc;
@@ -1768,31 +1920,7 @@ export class TransactionView extends AppView {
         this.model.fmtDestResBal = this.model.destCurr.format(this.model.fDestResBal);
 
         if (newAcc.id === this.model.srcAccount.id) {
-            const nextAccountId = App.state.accounts.getNext(newAcc.id);
-            const newSrcAcc = App.state.accounts.getItem(nextAccountId);
-            if (!newSrcAcc) {
-                throw new Error('Next account not found');
-            }
-            this.model.srcAccount = newSrcAcc;
-            this.model.src_curr_id = this.model.srcAccount.curr_id;
-            this.model.srcCurr = Currency.getById(this.model.src_curr_id);
-            this.model.srcAccount.fmtBalance = this.model.srcCurr.format(
-                this.model.srcAccount.balance,
-            );
-
-            // Copy destination amount to source amount
-            if (this.model.fDestAmount !== this.model.fSrcAmount) {
-                this.model.srcAmount = this.model.destAmount;
-            }
-            this.model.fSrcAmount = this.model.fDestAmount;
-
-            // Update result balance of source
-            const newSrcResBal = normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
-            if (this.model.fSrcResBal !== newSrcResBal) {
-                this.model.srcResBal = newSrcResBal;
-                this.model.fSrcResBal = this.model.srcResBal;
-            }
-            this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.fSrcResBal);
+            this.setNextSourceAccount(newAcc.id);
         }
 
         // Update exchange rate
@@ -1845,13 +1973,13 @@ export class TransactionView extends AppView {
 
     async inputSrcAmount(val) {
         if (this.model.type === EXPENSE) {
-            inputExpenseSrcAmount(val);
+            this.inputExpenseSrcAmount(val);
         } else if (this.model.type === INCOME) {
-            inputIncomeSrcAmount(val);
+            this.inputIncomeSrcAmount(val);
         } else if (this.model.type === TRANSFER) {
-            inputTransferSrcAmount(val);
+            this.inputTransferSrcAmount(val);
         } else if (this.model.type === DEBT) {
-            inputDebtSrcAmount(val);
+            this.inputDebtSrcAmount(val);
         }
 
         await this.performAction(() => this.content.src_amount_row.input(val));
@@ -1922,8 +2050,6 @@ export class TransactionView extends AppView {
         }
 
         this.setExpectedState(this.model.state);
-
-        return super.inputSrcAmount(val);
     }
 
     inputDebtSrcAmount(val) {
@@ -1940,11 +2066,11 @@ export class TransactionView extends AppView {
 
     async clickSrcAmount() {
         if (this.model.type === INCOME) {
-            clickIncomeSrcAmount(val);
+            this.clickIncomeSrcAmount();
         } else if (this.model.type === TRANSFER) {
-            clickTransferSrcAmount(val);
+            this.clickTransferSrcAmount();
         } else if (this.model.type === DEBT) {
-            clickDebtSrcAmount(val);
+            this.clickDebtSrcAmount();
         } else {
             throw new Error('Unexpected action: can\'t click by source amount');
         }
@@ -1997,11 +2123,11 @@ export class TransactionView extends AppView {
 
     async inputDestAmount(val) {
         if (this.model.type === EXPENSE) {
-            inputExpenseDestAmount(val);
+            this.inputExpenseDestAmount(val);
         } else if (this.model.type === INCOME) {
-            inputIncomeDestAmount(val);
+            this.inputIncomeDestAmount(val);
         } else if (this.model.type === TRANSFER) {
-            inputTransferDestAmount(val);
+            this.inputTransferDestAmount(val);
         } else {
             throw new Error('Unexpected action: can\'t input destination amount');
         }
@@ -2065,11 +2191,11 @@ export class TransactionView extends AppView {
 
     async clickSrcResultBalance() {
         if (this.model.type === EXPENSE) {
-            clickExpenseSrcResultBalance(val);
+            this.clickExpenseSrcResultBalance();
         } else if (this.model.type === TRANSFER) {
-            clickTransferSrcResultBalance(val);
+            this.clickTransferSrcResultBalance();
         } else if (this.model.type === DEBT) {
-            clickDebtSrcResultBalance(val);
+            this.clickDebtSrcResultBalance();
         } else {
             throw new Error('Unexpected action: can\'t click by source result balance');
         }
@@ -2117,11 +2243,11 @@ export class TransactionView extends AppView {
 
     async clickDestResultBalance() {
         if (this.model.type === INCOME) {
-            clickIncomeDestResultBalance(val);
+            this.clickIncomeDestResultBalance();
         } else if (this.model.type === TRANSFER) {
-            clickTransferDestResultBalance(val);
+            this.clickTransferDestResultBalance();
         } else if (this.model.type === DEBT) {
-            clickDebtDestResultBalance(val);
+            this.clickDebtDestResultBalance();
         }
 
         await this.performAction(() => this.content.dest_res_balance_left.click());
@@ -2166,11 +2292,11 @@ export class TransactionView extends AppView {
 
     async clickDestAmount() {
         if (this.model.type === EXPENSE) {
-            clickExpenseDestAmount(val);
+            this.clickExpenseDestAmount();
         } else if (this.model.type === INCOME) {
-            clickIncomeDestAmount(val);
+            this.clickIncomeDestAmount();
         } else if (this.model.type === TRANSFER) {
-            clickTransferDestAmount(val);
+            this.clickTransferDestAmount();
         } else {
             throw new Error('Unexpected action: can\'t click by destination amount');
         }
@@ -2211,11 +2337,11 @@ export class TransactionView extends AppView {
 
     async inputResBalance(val) {
         if (this.model.type === EXPENSE) {
-            inputExpenseResBalance(val);
+            this.inputExpenseResBalance(val);
         } else if (this.model.type === TRANSFER) {
-            inputTransferResBalance(val);
+            this.inputTransferResBalance(val);
         } else if (this.model.type === DEBT) {
-            inputDebtResBalance(val);
+            this.inputDebtResBalance(val);
         } else {
             throw new Error('Unexpected action: can\'t input source result balance');
         }
@@ -2299,11 +2425,11 @@ export class TransactionView extends AppView {
 
     async inputDestResBalance(val) {
         if (this.model.type === INCOME) {
-            inputIncomeDestResBalance(val);
+            this.inputIncomeDestResBalance(val);
         } else if (this.model.type === TRANSFER) {
-            inputTransferDestResBalance(val);
+            this.inputTransferDestResBalance(val);
         } else if (this.model.type === DEBT) {
-            inputDebtDestResBalance(val);
+            this.inputDebtDestResBalance(val);
         } else {
             throw new Error('Unexpected action: can\'t input destination result balance');
         }
@@ -2388,7 +2514,7 @@ export class TransactionView extends AppView {
 
     async changeSourceCurrency(val) {
         if (this.model.type === INCOME) {
-            changeIncomeSourceCurrency(val);
+            this.changeIncomeSourceCurrency(val);
         } else {
             throw new Error('Unexpected action: can\'t change source currency');
         }
@@ -2436,7 +2562,7 @@ export class TransactionView extends AppView {
 
     async changeDestCurrency(val) {
         if (this.model.type === EXPENSE) {
-            changeExpenseDestCurrency(val);
+            this.changeExpenseDestCurrency(val);
         } else {
             throw new Error('Unexpected action: can\'t change destination currency');
         }
@@ -2476,11 +2602,11 @@ export class TransactionView extends AppView {
 
     async clickExchRate() {
         if (this.model.type === EXPENSE) {
-            clickExpenseExchRate(val);
+            this.clickExpenseExchRate();
         } else if (this.model.type === INCOME) {
-            clickIncomeExchRate(val);
+            this.clickIncomeExchRate();
         } else if (this.model.type === TRANSFER) {
-            clickTransferExchRate(val);
+            this.clickTransferExchRate();
         } else {
             throw new Error('Unexpected action: can\'t click by exchange rate');
         }
@@ -2511,11 +2637,11 @@ export class TransactionView extends AppView {
 
     async inputExchRate(val) {
         if (this.model.type === EXPENSE) {
-            inputExpenseExchRate(val);
+            this.inputExpenseExchRate(val);
         } else if (this.model.type === INCOME) {
-            inputIncomeExchRate(val);
+            this.inputIncomeExchRate(val);
         } else if (this.model.type === TRANSFER) {
-            inputTransferExchRate(val);
+            this.inputTransferExchRate(val);
         } else {
             throw new Error('Unexpected action: can\'t input exchange rate');
         }
@@ -2612,16 +2738,10 @@ export class TransactionView extends AppView {
         const personAccCurrencyId = (this.model.debtType)
             ? this.model.srcCurr.id
             : this.model.destCurr.id;
-        this.model.personAccount = App.state.getPersonAccount(
+        this.model.personAccount = this.getPersonAccount(
             this.model.person.id,
             personAccCurrencyId,
         );
-        if (!this.model.personAccount) {
-            this.model.personAccount = {
-                balance: 0,
-                curr_id: personAccCurrencyId,
-            };
-        }
 
         if (this.model.debtType) {
             this.model.srcAccount = this.model.personAccount;
@@ -2823,16 +2943,10 @@ export class TransactionView extends AppView {
         this.model.account = newAcc;
 
         if (this.model.personAccount.curr_id !== this.model.account.curr_id) {
-            this.model.personAccount = App.state.getPersonAccount(
+            this.model.personAccount = this.getPersonAccount(
                 this.model.person.id,
                 this.model.account.curr_id,
             );
-            if (!this.model.personAccount) {
-                this.model.personAccount = {
-                    balance: 0,
-                    curr_id: this.model.account.curr_id,
-                };
-            }
         }
 
         this.model.src_curr_id = this.model.account.curr_id;

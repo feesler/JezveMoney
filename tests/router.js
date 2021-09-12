@@ -7,6 +7,7 @@ import { AccountsView } from './view/AccountsView.js';
 import { PersonView } from './view/PersonView.js';
 import { PersonsView } from './view/PersonsView.js';
 import { TransactionsView } from './view/TransactionsView.js';
+import { TransactionView } from './view/TransactionView.js';
 import { ImportView } from './view/ImportView.js';
 import { StatisticsView } from './view/StatisticsView.js';
 

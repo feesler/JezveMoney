@@ -1270,24 +1270,18 @@ const reduceTypeChange = (state, type) => {
         } else if (currentType === INCOME) {
             setStateNextSourceAccount(newState, transaction.dest_id);
         } else if (currentType === DEBT) {
-            if (state.account) {
-                if (transaction.debtType) {
-                    newState.destAccount = state.account;
-                    transaction.dest_id = state.account.id;
-                    transaction.dest_curr = state.account.curr_id;
-                    newState.destCurrency = currencyModel.getItem(state.account.curr_id);
+            if (state.account && transaction.debtType) {
+                newState.destAccount = state.account;
+                transaction.dest_id = state.account.id;
+                transaction.dest_curr = state.account.curr_id;
+                newState.destCurrency = currencyModel.getItem(state.account.curr_id);
 
-                    setStateNextSourceAccount(newState, transaction.dest_id);
-                } else {
-                    newState.srcAccount = state.account;
-                    transaction.src_id = state.account.id;
-                    transaction.src_curr = state.account.curr_id;
-                    newState.srcCurrency = currencyModel.getItem(state.account.curr_id);
-
-                    setStateNextDestAccount(newState, transaction.src_id);
-                }
+                setStateNextSourceAccount(newState, transaction.dest_id);
             } else {
-                const srcAccount = visibleUserAccounts.getItemByIndex(0);
+                const srcAccount = (state.account)
+                    ? state.account
+                    : visibleUserAccounts.getItemByIndex(0);
+
                 newState.srcAccount = srcAccount;
                 transaction.src_id = srcAccount.id;
                 transaction.src_curr = srcAccount.curr_id;
@@ -1341,6 +1335,7 @@ const reduceTypeChange = (state, type) => {
     // Delete Debt specific fields
     if (currentType === DEBT) {
         delete newState.account;
+        delete newState.person;
         delete newState.personAccount;
         delete transaction.debtType;
         delete transaction.noAccount;

@@ -349,4 +349,3 @@ function checked($cond = true)
 {
     return ($cond) ? " checked" : "";
 }
-
