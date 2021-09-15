@@ -662,6 +662,10 @@ const reducePersonChange = (state, personId) => {
 
     const newState = {
         ...state,
+        transaction: {
+            ...state.transaction,
+            person_id: person.id,
+        },
         person,
     };
     const { transaction } = newState;
@@ -1322,14 +1326,20 @@ const reduceTypeChange = (state, type) => {
 
         newState.personAccount = getPersonAccount(person.id, transaction.src_curr);
         if (transaction.debtType) {
+            newState.srcAccount = newState.personAccount;
             transaction.src_id = newState.personAccount.id;
         } else {
+            newState.destAccount = newState.personAccount;
             transaction.dest_id = newState.personAccount.id;
         }
 
         transaction.noAccount = false;
 
         newState.id = (transaction.debtType) ? 0 : 3;
+
+        setStateSourceAmount(newState, state.form.sourceAmount);
+        setStateDestAmount(newState, state.form.destAmount);
+        updateStateExchange(newState);
     }
 
     // Delete Debt specific fields

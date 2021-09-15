@@ -4,7 +4,13 @@ import { TransactionsView } from '../../view/TransactionsView.js';
 import { TransactionView } from '../../view/TransactionView.js';
 import { MainView } from '../../view/MainView.js';
 import { Currency } from '../../model/Currency.js';
-import { Transaction } from '../../model/Transaction.js';
+import {
+    EXPENSE,
+    INCOME,
+    TRANSFER,
+    DEBT,
+    Transaction,
+} from '../../model/Transaction.js';
 import { AccountsList } from '../../model/AccountsList.js';
 import { App } from '../../Application.js';
 import { formatProps } from '../../common.js';
@@ -149,6 +155,10 @@ export async function runAction({ action, data }) {
 
     if (action === 'inputComment') {
         testDescr = `Comment (${data}) input`;
+    }
+
+    if (action === 'changeTransactionType') {
+        testDescr = `Change type to ${Transaction.typeToString(data)}`;
     }
 
     await test(testDescr, () => App.view.runAction(action, data));
@@ -349,4 +359,28 @@ export async function delFromUpdate(type, pos) {
     App.view.expectedState = MainView.render(App.state);
     await test('Main page widgets update', () => App.view.checkState());
     await test('App state', () => App.state.fetchAndTest());
+}
+
+
+export async function typeChangeLoop() {
+    App.view.setBlock(`Create transaction type tests`, 2);
+
+    await App.goToMainView();
+    await App.view.goToNewTransactionByAccount(0);
+
+    // Start from Expense type
+    await runActions([
+        { action: 'changeTransactionType', data: INCOME },
+        { action: 'changeTransactionType', data: EXPENSE },
+        { action: 'changeTransactionType', data: TRANSFER },
+        { action: 'changeTransactionType', data: EXPENSE },
+        { action: 'changeTransactionType', data: DEBT },
+        { action: 'changeTransactionType', data: INCOME },
+        { action: 'changeTransactionType', data: TRANSFER },
+        { action: 'changeTransactionType', data: INCOME },
+        { action: 'changeTransactionType', data: DEBT },
+        { action: 'changeTransactionType', data: TRANSFER },
+        { action: 'changeTransactionType', data: DEBT },
+        { action: 'changeTransactionType', data: EXPENSE },
+    ]);
 }

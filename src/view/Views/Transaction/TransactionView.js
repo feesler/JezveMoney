@@ -380,6 +380,7 @@ class TransactionView extends View {
         this.commentBlock = ge('comment_block');
         this.commentInput = ge('comm');
 
+        this.typeInp = ge('typeInp');
         this.srcIdInp = ge('src_id');
         this.destIdInp = ge('dest_id');
         this.srcCurrInp = ge('src_curr');
@@ -419,7 +420,7 @@ class TransactionView extends View {
         if (transaction.type === DEBT) {
             this.initPersonList();
 
-            const personId = parseInt(this.personIdInp.value, 10);
+            const personId = transaction.person_id;
             this.appendHiddenPerson(this.persDDList, personId);
             this.persDDList.selectItem(personId);
 
@@ -1026,6 +1027,9 @@ class TransactionView extends View {
             this.exchangeInfo.elem,
         ]);
 
+        this.srcResBalanceRowLabel.textContent = 'Result balance';
+        this.destResBalanceRowLabel.textContent = 'Result balance';
+
         this.setCurrActive(true, false); // set source currency inactive
         this.setCurrActive(false, true); // set destination currency active
     }
@@ -1068,6 +1072,9 @@ class TransactionView extends View {
             this.destResBalanceInfo.elem,
             this.exchangeInfo.elem,
         ]);
+
+        this.srcResBalanceRowLabel.textContent = 'Result balance';
+        this.destResBalanceRowLabel.textContent = 'Result balance';
 
         this.setCurrActive(true, true); // set source currency active
         this.setCurrActive(false, false); // set destination currency inactive
@@ -1140,6 +1147,9 @@ class TransactionView extends View {
             this.destResBalanceInfo.elem,
         ]);
 
+        this.srcResBalanceRowLabel.textContent = 'Result balance (Source)';
+        this.destResBalanceRowLabel.textContent = 'Result balance (Destination)';
+
         this.setCurrActive(true, false); // set source currency inactive
         this.setCurrActive(false, false); // set destination currency inactive
     }
@@ -1197,6 +1207,9 @@ class TransactionView extends View {
             this.debtAccountLabel.textContent = (debtType) ? 'Destination account' : 'Source account';
         }
 
+        this.debtGiveRadio.checked = debtType;
+        this.debtTakeRadio.checked = !debtType;
+
         show(this.noAccountBtn, !noAccount);
         show(this.debtAccountTileBase, !noAccount);
         show(this.selectAccountBtn, noAccount);
@@ -1218,6 +1231,11 @@ class TransactionView extends View {
         });
 
         this.debtAccountInp.value = (noAccount) ? 0 : state.account.id;
+
+        this.initPersonList();
+        const personId = state.transaction.person_id;
+        this.appendHiddenPerson(this.persDDList, personId);
+        this.persDDList.selectItem(personId);
 
         if (!noAccount) {
             this.debtAccountTile.render(state.account);
@@ -1252,21 +1270,11 @@ class TransactionView extends View {
             this.renderDebt(state);
         }
 
-        if (this.srcTile && state.srcAccount) {
-            this.srcTile.render(state.srcAccount);
-        }
-        if (this.destTile && state.destAccount) {
-            this.destTile.render(state.destAccount);
-        }
-
-        if (this.srcIdInp) {
-            this.srcIdInp.value = transaction.src_id;
-        }
-        if (this.destIdInp) {
-            this.destIdInp.value = transaction.dest_id;
-        }
-
         if (transaction.type === EXPENSE || transaction.type === TRANSFER) {
+            if (this.srcTile && state.srcAccount) {
+                this.srcTile.render(state.srcAccount);
+            }
+
             this.initSrcAccList();
             if (this.srcDDList && transaction.src_id) {
                 this.srcDDList.selectItem(transaction.src_id);
@@ -1274,12 +1282,25 @@ class TransactionView extends View {
         }
 
         if (transaction.type === INCOME || transaction.type === TRANSFER) {
+            if (this.destTile && state.destAccount) {
+                this.destTile.render(state.destAccount);
+            }
+
             this.initDestAccList();
             if (this.destDDList && transaction.dest_id) {
                 this.destDDList.selectItem(transaction.dest_id);
             }
         }
 
+        this.typeInp.value = transaction.type;
+
+        enable(this.srcIdInp, transaction.type !== DEBT);
+        enable(this.destIdInp, transaction.type !== DEBT);
+        enable(this.personIdInp, transaction.type === DEBT);
+        enable(this.debtAccountInp, transaction.type === DEBT);
+
+        this.srcIdInp.value = transaction.src_id;
+        this.destIdInp.value = transaction.dest_id;
         this.srcCurrInp.value = transaction.src_curr;
         this.destCurrInp.value = transaction.dest_curr;
         if (transaction.type === INCOME) {

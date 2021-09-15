@@ -19,11 +19,9 @@ export class InputRow extends TestComponent {
                 if (!this.currDropDown.isAttached) {
                     throw new Error('Currency drop down is not attached');
                 }
-                this.currSignElem = this.currDropDown.selectBtn;
-            } else {
-                this.currSignElem = await this.query(this.currElem, ':scope > *');
             }
 
+            this.currSignElem = await this.query(this.currElem, '.input-group__btn-title');
             this.currSign = await this.prop(this.currSignElem, 'textContent');
         } else {
             const datePickerContainer = await this.query('#calendar');

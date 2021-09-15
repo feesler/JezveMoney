@@ -27,7 +27,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
 <?php	if ($action == "edit") {	?>
                         <input name="id" type="hidden" value="<?=e($tr["id"])?>">
 <?php	}	?>
-                        <input name="type" type="hidden" value="<?=e($tr["type"])?>">
+                        <input id="typeInp" name="type" type="hidden" value="<?=e($tr["type"])?>">
                         <div class="trtype-menu">
 <?php	forEach($transMenu as $menuItem) {
             if ($menuItem->selected) {		?>
@@ -122,7 +122,9 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                     <?=TileInfoItem::render($destAmountInfo)?>
 <?php	    }	?>
                                     <?=TileInfoItem::render($srcResultInfo)?>
+<?php	    if ($tr["type"] == EXPENSE || $tr["type"] == TRANSFER) {		?>
                                     <?=TileInfoItem::render($exchangeInfo)?>
+<?php	    }	?>
 <?php	}	?>
                                 </div>
                             </div>
@@ -187,7 +189,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
 <?php	} else {	?>
                                 <div class="btn input-group__btn">
 <?php	}	?>
-                                    <div id="srcamountsign"><?=e($srcAmountSign)?></div>
+                                    <div id="srcamountsign" class="input-group__btn-title"><?=e($srcAmountSign)?></div>
                                 </div>
                             </div>
                             <div class="invalid-feedback">Please input correct amount.</div>
@@ -213,7 +215,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
 <?php	} else {	?>
                                 <div class="btn input-group__btn input-group__btn_inactive">
 <?php	}	?>
-                                    <div id="destamountsign"><?=e($destAmountSign)?></div>
+                                    <div id="destamountsign" class="input-group__btn-title"><?=e($destAmountSign)?></div>
                                 </div>
                             </div>
                             <div class="invalid-feedback">Please input correct amount.</div>
@@ -226,7 +228,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                     <input id="exchrate" class="amount-input" type="text" autocomplete="off" value="<?=e($exchValue)?>">
                                 </div>
                                 <div class="btn input-group__btn input-group__btn_inactive">
-                                    <div id="exchcomm"><?=e($exchSign)?></div>
+                                    <div id="exchcomm" class="input-group__btn-title"><?=e($exchSign)?></div>
                                 </div>
                             </div>
                         </div>
@@ -237,7 +239,9 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 <div class="stretch-input">
                                     <input id="resbal" class="amount-input" type="text" autocomplete="off" value="<?=e($srcResBalance)?>">
                                 </div>
-                                <div class="btn input-group__btn input-group__btn_inactive"><div id="res_currsign"><?=e($srcAmountSign)?></div></div>
+                                <div class="btn input-group__btn input-group__btn_inactive">
+                                    <div id="res_currsign" class="input-group__btn-title"><?=e($srcAmountSign)?></div>
+                                </div>
                             </div>
                         </div>
 
@@ -247,7 +251,9 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 <div class="stretch-input">
                                     <input id="resbal_d" class="amount-input" type="text" autocomplete="off" value="<?=e($destResBalance)?>">
                                 </div>
-                                <div class="btn input-group__btn input-group__btn_inactive"><div id="res_currsign_d"><?=e($destAmountSign)?></div></div>
+                                <div class="btn input-group__btn input-group__btn_inactive">
+                                    <div id="res_currsign_d" class="input-group__btn-title"><?=e($destAmountSign)?></div>
+                                </div>
                             </div>
                         </div>
 

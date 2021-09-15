@@ -44,7 +44,10 @@ export async function update(params) {
         const origTransaction = App.view.getExpectedTransaction();
         const isDiff = (origTransaction.src_curr !== origTransaction.dest_curr);
 
-        await test('Initial state of update income view', () => App.view.setExpectedState(isDiff ? 2 : 0));
+        await test('Initial state of update income view', () => {
+            App.view.setExpectedState(isDiff ? 2 : 0);
+            return App.view.checkState();
+        });
 
         return submit(submitParams);
     });
@@ -65,7 +68,10 @@ export async function stateLoop() {
 
     // State 0
     App.view.setBlock('Income loop', 2);
-    await test('Initial state of new income view', async () => App.view.setExpectedState(0));
+    await test('Initial state of new income view', () => {
+        App.view.setExpectedState(0);
+        return App.view.checkState();
+    });
 
     // Input source amount
     const saInputData = [

@@ -1651,6 +1651,8 @@ export class Scenario {
         await IncomeTransactionTests.stateLoop();
         await TransferTransactionTests.stateLoop();
         await DebtTransactionTests.stateLoop();
+
+        await TransactionTests.typeChangeLoop();
     }
 
     async createTransactionTests() {

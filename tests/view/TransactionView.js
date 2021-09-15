@@ -69,11 +69,11 @@ export class TransactionView extends AppView {
             res.person.id = parseInt(await this.prop(personIdInp, 'value'), 10);
         }
 
-        res.account = await TileBlock.create(this, await this.query('#source'));
+        res.account = await TileBlock.create(this, await this.query('#debtaccount'));
         if (res.account) {
             const accountIdInp = await this.query('#acc_id');
             res.account.id = parseInt(await this.prop(accountIdInp, 'value'), 10);
-            res.accTileContainer = { elem: await this.query('#source .tile_container') };
+            res.accTileContainer = { elem: await this.query('#debtaccount .tile_container') };
         }
 
         res.operation = await this.parseOperation(await this.query('#operation'));
@@ -600,6 +600,8 @@ export class TransactionView extends AppView {
                 delBtn: this.model.isUpdate,
                 source: true,
                 destination: false,
+                person: false,
+                account: false,
                 src_amount_left: false,
                 dest_res_balance_left: false,
                 result_balance_dest_row: false,
@@ -722,6 +724,8 @@ export class TransactionView extends AppView {
                 delBtn: this.model.isUpdate,
                 source: false,
                 destination: true,
+                person: false,
+                account: false,
                 result_balance_row: false,
                 src_res_balance_left: false,
             },
@@ -849,6 +853,8 @@ export class TransactionView extends AppView {
                 delBtn: this.model.isUpdate,
                 source: true,
                 destination: true,
+                person: false,
+                account: false,
             },
             values: {
                 typeMenu: { selectedTypes: [TRANSFER] },
@@ -1046,6 +1052,8 @@ export class TransactionView extends AppView {
             model: { state: newState },
             visibility: {
                 delBtn: this.model.isUpdate,
+                source: false,
+                destination: false,
                 person: true,
                 account: { tile: !this.model.noAccount },
                 selaccount: this.model.noAccount,
@@ -1632,6 +1640,10 @@ export class TransactionView extends AppView {
 
             this.model.noAccount = false;
             this.model.state = (this.model.debtType) ? 0 : 3;
+            const { srcAmount, destAmount } = this.model;
+            this.setSrcAmount(srcAmount);
+            this.setDestAmount(destAmount);
+            this.updateExch();
         }
 
         // Delete Debt specific fields

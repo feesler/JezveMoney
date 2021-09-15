@@ -42,7 +42,10 @@ export async function update(params) {
         const origTransaction = App.view.getExpectedTransaction();
         const isDiff = (origTransaction.src_curr !== origTransaction.dest_curr);
 
-        await test('Initial state of update transfer view', () => App.view.setExpectedState(isDiff ? 3 : 0));
+        await test('Initial state of update transfer view', () => {
+            App.view.setExpectedState(isDiff ? 3 : 0);
+            return App.view.checkState();
+        });
 
         return submit(submitParams);
     });
@@ -61,7 +64,10 @@ export async function stateLoop() {
     await App.view.changeTransactionType(TRANSFER);
 
     App.view.setBlock('Transfer loop', 2);
-    await test('Initial state of new transfer view', async () => App.view.setExpectedState(0));
+    await test('Initial state of new transfer view', () => {
+        App.view.setExpectedState(0);
+        return App.view.checkState();
+    });
 
     // Input source amount
     const saInputData = [
