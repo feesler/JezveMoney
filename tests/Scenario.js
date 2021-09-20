@@ -2292,7 +2292,7 @@ export class Scenario {
             [0, 1, 11, 13],
         ];
 
-        await this.runner.runGroup(TransactionTests.del.bind(null, EXPENSE), data);
+        await this.runner.runGroup((items) => TransactionTests.del(EXPENSE, items), data);
     }
 
     async runDeleteIncomeTests() {
@@ -2303,7 +2303,7 @@ export class Scenario {
             [0, 1, 2, 15],
         ];
 
-        await this.runner.runGroup(TransactionTests.del.bind(null, INCOME), data);
+        await this.runner.runGroup((items) => TransactionTests.del(INCOME, items), data);
     }
 
     async runDeleteTransferTests() {
@@ -2314,7 +2314,7 @@ export class Scenario {
             [0, 2],
         ];
 
-        await this.runner.runGroup(TransactionTests.del.bind(null, TRANSFER), data);
+        await this.runner.runGroup((items) => TransactionTests.del(TRANSFER, items), data);
     }
 
     async runDeleteDebtTests() {
@@ -2325,14 +2325,14 @@ export class Scenario {
             [0, 1],
         ];
 
-        await this.runner.runGroup(TransactionTests.del.bind(null, DEBT), data);
+        await this.runner.runGroup((items) => TransactionTests.del(DEBT, items), data);
     }
 
     async runDeleteFromUpdateTests() {
         this.environment.setBlock('Delete from update view tests', 2);
 
         const tasks = [{
-            action: TransactionTests.delFromUpdate.bind(null, DEBT),
+            action: (pos) => TransactionTests.delFromUpdate(DEBT, pos),
             data: 0,
         }, {
             action: AccountTests.delFromUpdate,

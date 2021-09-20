@@ -361,9 +361,8 @@ export async function delFromUpdate(type, pos) {
     await test('App state', () => App.state.fetchAndTest());
 }
 
-
 export async function typeChangeLoop() {
-    App.view.setBlock(`Create transaction type tests`, 2);
+    App.view.setBlock('Change transaction type tests', 2);
 
     await App.goToMainView();
     await App.view.goToNewTransactionByAccount(0);
