@@ -2,7 +2,6 @@ import { test } from 'jezve-test';
 import * as TransactionTests from './common.js';
 import { Currency } from '../../model/Currency.js';
 import { EXPENSE } from '../../model/Transaction.js';
-import { ExpenseTransactionView } from '../../view/transaction/ExpenseTransactionView.js';
 import { App } from '../../Application.js';
 
 export async function submit(params) {
@@ -45,7 +44,10 @@ export async function update(params) {
         const origTransaction = App.view.getExpectedTransaction();
         const isDiff = (origTransaction.src_curr !== origTransaction.dest_curr);
 
-        await test('Initial state of update expense view', () => App.view.setExpectedState(isDiff ? 2 : 0), App.view);
+        await test('Initial state of update expense view', () => {
+            App.view.setExpectedState(isDiff ? 2 : 0);
+            return App.view.checkState();
+        });
 
         return submit(submitParams);
     });
@@ -60,17 +62,16 @@ export async function stateLoop() {
     ]);
 
     // Navigate to create expense view
-    if (!(App.view instanceof ExpenseTransactionView)) {
-        await App.goToMainView();
-        await App.view.goToNewTransactionByAccount(0);
-        if (!App.view.content.typeMenu.isSingleSelected(EXPENSE)) {
-            await App.view.changeTransactionType(EXPENSE);
-        }
-    }
+    await App.goToMainView();
+    await App.view.goToNewTransactionByAccount(0);
+    await App.view.changeTransactionType(EXPENSE);
 
     // State 0
     App.view.setBlock('Expense loop', 2);
-    await test('Initial state of new expense view', () => App.view.setExpectedState(0));
+    await test('Initial state of new expense view', () => {
+        App.view.setExpectedState(0);
+        return App.view.checkState();
+    });
 
     // Input destination amount
     const daInputData = [

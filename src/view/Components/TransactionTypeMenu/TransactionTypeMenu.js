@@ -25,6 +25,7 @@ const defaultProps = {
     typeParam: 'type',
     url: window.location,
     multiple: false,
+    allowActiveLink: false,
 };
 
 /**
@@ -73,6 +74,10 @@ export class TransactionTypeMenu extends Component {
         this.render(this.state);
     }
 
+    getItemType(item) {
+        return parseInt(item.dataset.type, 10);
+    }
+
     parse(elem) {
         if (!elem || !elem.classList || !elem.classList.contains(CONTAINER_CLASS)) {
             throw new Error('Invalid element');
@@ -84,10 +89,17 @@ export class TransactionTypeMenu extends Component {
         const items = Array.from(elem.querySelectorAll(`.${ITEM_CLASS}`));
         this.state.items = items.map((item) => {
             const linkElem = item.querySelector(`.${ITEM_TITLE_CLASS} a`);
+            const titleElem = item.querySelector(`.${ITEM_TITLE_CLASS}`);
+            if (!linkElem && !titleElem) {
+                throw new Error('Invalid element');
+            }
+
+            const title = (linkElem) ? linkElem.textContent : titleElem.textContent;
+
             return {
-                type: parseInt(item.dataset.type, 10),
+                type: this.getItemType(item),
                 selected: item.classList.contains(ITEM_SELECTED_CLASS),
-                title: linkElem.textContent,
+                title,
             };
         });
 
@@ -108,7 +120,7 @@ export class TransactionTypeMenu extends Component {
 
         e.preventDefault();
 
-        const selectedType = parseInt(itemElem.dataset.type, 10);
+        const selectedType = this.getItemType(itemElem);
 
         let toggled = false;
         if (this.state.multiple) {
@@ -139,7 +151,8 @@ export class TransactionTypeMenu extends Component {
             .map((item) => item.type);
 
         if (isFunction(this.props.onChange)) {
-            this.props.onChange(selectedItems);
+            const data = (this.state.multiple) ? selectedItems : selectedItems[0];
+            this.props.onChange(data);
         }
 
         this.render(this.state);
@@ -160,21 +173,28 @@ export class TransactionTypeMenu extends Component {
         if (state.multiple && item.type !== 0) {
             elem.appendChild(ce('span', { className: ITEM_CHECK_CLASS }, createIcon('check')));
         }
-        const linkElem = ce('a', { textContent: item.title });
 
-        if (state.url) {
-            const paramName = (state.multiple) ? `${state.typeParam}[]` : state.typeParam;
+        const titleElem = ce('span', { className: ITEM_TITLE_CLASS });
+        if (!item.selected || state.allowActiveLink) {
+            const linkElem = ce('a', { textContent: item.title });
 
-            const url = new URL(state.url);
-            if (item.type) {
-                url.searchParams.set(paramName, item.type);
-            } else {
-                url.searchParams.delete(paramName);
+            if (state.url) {
+                const paramName = (state.multiple) ? `${state.typeParam}[]` : state.typeParam;
+
+                const url = new URL(state.url);
+                if (item.type) {
+                    url.searchParams.set(paramName, item.type);
+                } else {
+                    url.searchParams.delete(paramName);
+                }
+                linkElem.href = url.toString();
             }
-            linkElem.href = url.toString();
+            titleElem.appendChild(linkElem);
+        } else {
+            titleElem.textContent = item.title;
         }
 
-        elem.appendChild(ce('span', { className: ITEM_TITLE_CLASS }, linkElem));
+        elem.appendChild(titleElem);
 
         return elem;
     }

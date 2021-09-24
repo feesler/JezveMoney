@@ -35,8 +35,12 @@ class AccountView extends View {
             this.model.data = copyObject(this.model.original);
         }
 
-        this.model.currency = CurrencyList.create(this.props.currency);
-        this.model.icons = IconList.create(this.props.icons);
+        if (!window.app.model) {
+            window.app.model = {};
+        }
+
+        window.app.model.currency = CurrencyList.create(this.props.currency);
+        window.app.model.icons = IconList.create(this.props.icons);
     }
 
     /**
@@ -53,7 +57,7 @@ class AccountView extends View {
 
         this.iconSelect = DropDown.create({
             input_id: 'icon',
-            onitemselect: this.onIconSelect.bind(this),
+            onitemselect: (o) => this.onIconSelect(o),
             editable: false,
             extraClass: 'dd__fullwidth',
         });
@@ -63,7 +67,7 @@ class AccountView extends View {
 
         this.currencySelect = DropDown.create({
             input_id: 'currency',
-            onitemselect: this.onCurrencySelect.bind(this),
+            onitemselect: (o) => this.onCurrencySelect(o),
             editable: false,
             extraClass: 'dd__fullwidth',
         });
@@ -79,7 +83,7 @@ class AccountView extends View {
         this.balanceInp = ge('balance');
         this.initBalanceDecimalInput = DecimalInput.create({
             elem: this.balanceInp,
-            oninput: this.onInitBalanceInput.bind(this),
+            oninput: (e) => this.onInitBalanceInput(e),
         });
         if (!this.initBalanceDecimalInput) {
             throw new Error('Failed to initialize Account view');
@@ -101,14 +105,14 @@ class AccountView extends View {
         if (!this.form) {
             throw new Error('Invalid Account view');
         }
-        this.form.addEventListener('submit', this.onSubmit.bind(this));
+        this.form.addEventListener('submit', (e) => this.onSubmit(e));
 
         this.nameInp = ge('accname');
         if (!this.nameInp) {
             throw new Error('Invalid Account view');
         }
 
-        this.nameInp.addEventListener('input', this.onNameInput.bind(this));
+        this.nameInp.addEventListener('input', () => this.onNameInput());
     }
 
     /**
@@ -205,7 +209,7 @@ class AccountView extends View {
      * Set currency sign
      */
     setCurrencySign(currencyId) {
-        const currencyObj = this.model.currency.getItem(currencyId);
+        const currencyObj = window.app.model.currency.getItem(currencyId);
         if (!currencyObj) {
             return;
         }

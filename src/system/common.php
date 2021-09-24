@@ -331,3 +331,21 @@ function useIcon($name, $width = null, $height = null)
         "<use xlink:href=\"#$name\"></use>" .
         "</svg>";
 }
+
+// Returns 'hidden' string if condition is true
+function hidden($cond = true)
+{
+    return ($cond) ? " hidden" : "";
+}
+
+// Returns 'disabled' string if condition is true
+function disabled($cond = true)
+{
+    return ($cond) ? " disabled" : "";
+}
+
+// Returns 'checked' string if condition is true
+function checked($cond = true)
+{
+    return ($cond) ? " checked" : "";
+}

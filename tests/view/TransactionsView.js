@@ -453,9 +453,9 @@ export class TransactionsView extends AppView {
         const expected = this.onFilterUpdate();
 
         if (newTypeSel.length === 1) {
-            await this.waitForList(() => this.content.typeMenu.select(newTypeSel[0]));
+            await this.waitForList(() => App.view.content.typeMenu.select(newTypeSel[0]));
         } else {
-            await this.waitForList(() => this.content.typeMenu.select(0));
+            await this.waitForList(() => App.view.content.typeMenu.select(0));
             for (const typeItem of newTypeSel) {
                 await this.waitForList(() => App.view.content.typeMenu.toggle(typeItem));
             }

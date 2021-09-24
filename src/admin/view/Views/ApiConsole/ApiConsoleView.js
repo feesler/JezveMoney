@@ -104,7 +104,6 @@ const isArrayOf = (verifyFunc) => {
     return (obj) => Array.isArray(obj) && obj.every(verifyFunc);
 };
 
-
 /** Verify object is array of integers */
 const isIntArray = isArrayOf(isInt);
 
@@ -279,7 +278,6 @@ const isIcon = (obj) => verifyObject(obj, {
     updatedate: isInt,
 });
 
-
 /** Verify object is array of icons */
 const isIconsArray = isArrayOf(isIcon);
 
@@ -314,7 +312,6 @@ const isPerson = (obj) => verifyObject(obj, {
     updatedate: isInt,
 });
 
-
 /** Verify object is array of persons */
 const isPersonsArray = isArrayOf(isPerson);
 
@@ -325,7 +322,6 @@ const isProfile = (obj) => verifyObject(obj, {
     owner_id: isInt,
     name: isString,
 });
-
 
 /**
  * Admin currecny list view

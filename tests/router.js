@@ -7,10 +7,7 @@ import { AccountsView } from './view/AccountsView.js';
 import { PersonView } from './view/PersonView.js';
 import { PersonsView } from './view/PersonsView.js';
 import { TransactionsView } from './view/TransactionsView.js';
-import { ExpenseTransactionView } from './view/transaction/ExpenseTransactionView.js';
-import { IncomeTransactionView } from './view/transaction/IncomeTransactionView.js';
-import { TransferTransactionView } from './view/transaction/TransferTransactionView.js';
-import { DebtTransactionView } from './view/transaction/DebtTransactionView.js';
+import { TransactionView } from './view/TransactionView.js';
 import { ImportView } from './view/ImportView.js';
 import { StatisticsView } from './view/StatisticsView.js';
 
@@ -86,46 +83,8 @@ export async function route(env, url) {
             return TransactionsView;
         }
 
-        if (actPart === 'new') {
-            const trType = reqUrl.searchParams.get('type');
-            if (!trType || trType === 'expense') {
-                return ExpenseTransactionView;
-            }
-            if (trType === 'income') {
-                return IncomeTransactionView;
-            }
-            if (trType === 'transfer') {
-                return TransferTransactionView;
-            }
-            if (trType === 'debt') {
-                return DebtTransactionView;
-            }
-
-            throw new Error(`Unknown transaction type: ${trType}`);
-        }
-
-        if (actPart === 'edit') {
-            const selectedMenuItem = await env.query('.trtype-menu__item_selected');
-            if (!selectedMenuItem) {
-                throw new Error('Invalid transaction type menu');
-            }
-
-            const trTypeData = await env.prop(selectedMenuItem, 'dataset.type');
-            const trType = parseInt(trTypeData, 10);
-            if (trType === 1) {
-                return ExpenseTransactionView;
-            }
-            if (trType === 2) {
-                return IncomeTransactionView;
-            }
-            if (trType === 3) {
-                return TransferTransactionView;
-            }
-            if (trType === 4) {
-                return DebtTransactionView;
-            }
-
-            throw new Error(`Unknown transaction type: ${trType}`);
+        if (actPart === 'new' || actPart === 'edit') {
+            return TransactionView;
         }
 
         throw new Error(`Unknown route: ${reqUrl.pathname}`);

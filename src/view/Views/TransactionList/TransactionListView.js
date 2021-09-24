@@ -88,6 +88,7 @@ class TransactionListView extends View {
      */
     onStart() {
         this.typeMenu = TransactionTypeMenu.fromElement(document.querySelector('.trtype-menu'), {
+            allowActiveLink: true,
             onChange: (sel) => this.onChangeTypeFilter(sel),
         });
 
@@ -754,7 +755,19 @@ class TransactionListView extends View {
     onModeChanged(mode) {
         this.state.mode = mode;
         this.state.renderTime = Date.now();
+        this.replaceHistory();
         this.render(this.state);
+    }
+
+    replaceHistory() {
+        const url = new URL(this.buildAddress());
+        url.searchParams.set('page', this.state.pagination.page);
+        if (this.state.mode === 'details') {
+            url.searchParams.set('mode', 'details');
+        } else {
+            url.searchParams.delete('mode');
+        }
+        window.history.replaceState({}, 'Jezve Money | Transactions', url);
     }
 
     requestTransactions(options) {
@@ -784,14 +797,7 @@ class TransactionListView extends View {
         this.state.pagination = { ...res.data.pagination };
         this.state.filter = { ...res.data.filter };
 
-        const url = new URL(this.buildAddress());
-        url.searchParams.set('page', this.state.pagination.page);
-        if (this.state.mode === 'details') {
-            url.searchParams.set('mode', 'details');
-        } else {
-            url.searchParams.delete('mode');
-        }
-        window.history.replaceState({}, 'Jezve Money | Transactions', url);
+        this.replaceHistory();
 
         this.stopLoading();
     }

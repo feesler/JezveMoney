@@ -2,40 +2,76 @@ import 'jezvejs/style';
 import {
     ge,
     isNum,
-    isVisible,
     show,
     enable,
     setEmptyClick,
     checkDate,
-    insertAfter,
+    addChilds,
 } from 'jezvejs';
 import { formatDate } from 'jezvejs/DateUtils';
 import { DropDown } from 'jezvejs/DropDown';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import {
+    EXPENSE,
+    INCOME,
+    DEBT,
+    TRANSFER,
     fixFloat,
     isValidValue,
     normalize,
     normalizeExch,
+    getTransactionTypeString,
 } from '../../js/app.js';
 import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { IconList } from '../../js/model/IconList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { PersonList } from '../../js/model/PersonList.js';
-import { TransactionModel } from '../../js/model/TransactionModel.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Tile } from '../../Components/Tile/Tile.js';
+import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TileInfoItem } from '../../Components/TileInfoItem/TileInfoItem.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import '../../css/app.css';
 import '../../Components/TransactionTypeMenu/style.css';
 import './style.css';
+import { createStore } from '../../js/store.js';
+import {
+    debtAccountChange,
+    destAccountChange,
+    destAmountChange,
+    destAmountClick,
+    destCurrencyChange,
+    destResultChange,
+    destResultClick,
+    exchangeChange,
+    exchangeClick,
+    invalidateSourceAmount,
+    invalidateDestAmount,
+    invalidateDate,
+    personChange,
+    sourceAccountChange,
+    sourceAmountChange,
+    sourceAmountClick,
+    sourceCurrencyChange,
+    sourceResultChange,
+    sourceResultClick,
+    toggleDebtAccount,
+    toggleDebtType,
+    calculateExchange,
+    reducer,
+    typeChange,
+} from './reducer.js';
+
+/* global baseURL */
 
 const singleTransDeleteTitle = 'Delete transaction';
 const singleTransDeleteMsg = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
+const SHOW_INFO = 0;
+const SHOW_INPUT = 1;
+const HIDE_BOTH = 2;
 
 /**
  * Create/update transaction view
@@ -48,52 +84,168 @@ class TransactionView extends View {
         if (!('profile' in this.props)
             || !('currency' in this.props)
             || !('accounts' in this.props)
+            || !('persons' in this.props)
             || !('transaction' in this.props)
             || !('icons' in this.props)) {
             throw new Error('Invalid Transaction view properties');
         }
 
-        this.model = {};
-
-        this.model.profile = this.props.profile;
-        this.model.currency = CurrencyList.create(this.props.currency);
-        this.model.icons = IconList.create(this.props.icons);
-        this.model.accounts = AccountList.create(this.props.accounts);
-        if (this.props.persons) {
-            this.model.persons = PersonList.create(this.props.persons);
+        if (!window.app.model) {
+            window.app.model = {};
         }
-        this.model.transaction = new TransactionModel({
-            transaction: this.props.transaction,
-            parent: this,
-        });
+
+        window.app.model.profile = { ...this.props.profile };
+
+        const currencyModel = CurrencyList.create(this.props.currency);
+        window.app.model.currency = currencyModel;
+
+        window.app.model.icons = IconList.create(this.props.icons);
+
+        const accountModel = AccountList.create(this.props.accounts);
+        window.app.model.accounts = accountModel;
+        const personModel = PersonList.create(this.props.persons);
+        window.app.model.persons = personModel;
 
         this.mode = this.props.mode;
         if (!availModes.includes(this.mode)) {
             throw new Error(`Invalid Transaction view mode: ${this.mode}`);
         }
-        if (this.mode === 'update') {
-            this.model.accounts.cancelTransaction(this.props.transaction);
+        if (this.props.mode === 'update') {
+            accountModel.cancelTransaction(this.props.transaction);
         }
 
         const userAccounts = AccountList.create(
-            this.model.accounts.getUserAccounts(this.model.profile.owner_id),
+            accountModel.getUserAccounts(window.app.model.profile.owner_id),
         );
-        this.model.visibleUserAccounts = AccountList.create(userAccounts.getVisible());
+        window.app.model.visibleUserAccounts = AccountList.create(userAccounts.getVisible());
+        window.app.model.visiblePersons = PersonList.create(personModel.getVisible());
+
+        const { transaction } = this.props;
+
+        const initialState = {
+            id: 0,
+            transaction: { ...transaction },
+            form: {
+                sourceAmount: '',
+                destAmount: '',
+                sourceResult: '',
+                fSourceResult: 0,
+                destResult: '',
+                fDestResult: 0,
+                exchange: 1,
+                fExchange: 1,
+            },
+            validation: {
+                sourceAmount: true,
+                destAmount: true,
+                date: true,
+            },
+            srcAccount: accountModel.getItem(transaction.src_id),
+            destAccount: accountModel.getItem(transaction.dest_id),
+            srcCurrency: currencyModel.getItem(transaction.src_curr),
+            destCurrency: currencyModel.getItem(transaction.dest_curr),
+            isDiff: transaction.src_curr !== transaction.dest_curr,
+            isUpdate: this.props.mode === 'update',
+        };
+
+        if (transaction.id) {
+            initialState.form.sourceAmount = transaction.src_amount;
+            initialState.form.destAmount = transaction.dest_amount;
+        }
+
+        if (initialState.srcAccount) {
+            const srcBalance = initialState.srcAccount.balance;
+            const srcResult = normalize(srcBalance - initialState.transaction.src_amount);
+
+            initialState.form.sourceResult = srcResult;
+            initialState.form.fSourceResult = srcResult;
+        }
+
+        if (initialState.destAccount) {
+            const destBalance = initialState.destAccount.balance;
+            const destResult = normalize(destBalance + initialState.transaction.dest_amount);
+
+            initialState.form.destResult = destResult;
+            initialState.form.fDestResult = destResult;
+        }
+
+        if (transaction.type === EXPENSE || transaction.type === INCOME) {
+            initialState.id = (initialState.isDiff) ? 2 : 0;
+        } else if (transaction.type === TRANSFER) {
+            initialState.id = (initialState.isDiff) ? 3 : 0;
+        } else if (transaction.type === DEBT) {
+            initialState.person = window.app.model.persons.getItem(transaction.person_id);
+            const personAccountId = (transaction.debtType)
+                ? transaction.src_id
+                : transaction.dest_id;
+            if (personAccountId) {
+                initialState.personAccount = accountModel.getItem(personAccountId);
+            } else {
+                const personAccountCurr = (transaction.debtType)
+                    ? transaction.src_curr
+                    : transaction.dest_curr;
+                initialState.personAccount = {
+                    id: 0,
+                    balance: 0,
+                    curr_id: personAccountCurr,
+                };
+            }
+
+            if (transaction.debtType) {
+                initialState.srcAccount = initialState.personAccount;
+                initialState.account = initialState.destAccount;
+
+                initialState.id = (initialState.transaction.noAccount) ? 6 : 0;
+            } else {
+                initialState.destAccount = initialState.personAccount;
+                initialState.account = initialState.srcAccount;
+
+                initialState.id = (transaction.noAccount) ? 7 : 3;
+            }
+
+            if (transaction.noAccount) {
+                const lastAcc = window.app.model.accounts.getItem(transaction.lastAcc_id);
+                if (transaction.debtType) {
+                    const destResult = normalize(lastAcc.balance);
+                    initialState.form.destResult = destResult;
+                    initialState.form.fDestResult = destResult;
+                } else {
+                    const sourceResult = normalize(lastAcc.balance);
+                    initialState.form.sourceResult = sourceResult;
+                    initialState.form.fSourceResult = sourceResult;
+                }
+            }
+        }
+
+        const exchange = calculateExchange(initialState);
+        initialState.form.fExchange = exchange;
+        initialState.form.exchange = exchange;
+
+        this.store = createStore(reducer, initialState);
+        this.store.subscribe((state, prevState) => {
+            if (state !== prevState) {
+                this.render(state);
+            }
+        });
     }
 
     /**
      * View initialization
      */
     onStart() {
+        const state = this.store.getState();
+        const { transaction } = state;
+
         this.submitStarted = false;
+
         // Init form submit event handler
         this.form = ge('mainfrm');
         if (!this.form) {
             throw new Error('Failed to initialize Transaction view');
         }
-        this.form.addEventListener('submit', this.onFormSubmit.bind(this));
+        this.form.addEventListener('submit', (e) => this.onFormSubmit(e));
 
-        if (this.mode === 'update') {
+        if (state.isUpdate) {
             this.deleteBtn = IconLink.fromElement({
                 elem: 'del_btn',
                 onclick: () => this.confirmDelete(),
@@ -101,77 +253,111 @@ class TransactionView extends View {
             this.deleteForm = ge('delform');
         }
 
+        this.typeMenu = TransactionTypeMenu.fromElement(document.querySelector('.trtype-menu'), {
+            onChange: (sel) => this.onChangeType(sel),
+        });
+
         this.srcContainer = ge('source');
-        if (this.srcContainer) {
-            this.srcTileBase = this.srcContainer.querySelector('.tile-base');
-            this.srcTileContainer = this.srcContainer.querySelector('.tile_container');
-            this.srcTileInfoBlock = this.srcContainer.querySelector('.tile-info-block');
-        }
-
         this.destContainer = ge('destination');
-        if (this.destContainer) {
-            this.destTileBase = this.destContainer.querySelector('.tile-base');
-            this.destTileContainer = this.destContainer.querySelector('.tile_container');
-            this.destTileInfoBlock = this.destContainer.querySelector('.tile-info-block');
+        this.personContainer = ge('person');
+        this.debtAccountContainer = ge('debtaccount');
+        if (
+            !this.srcContainer
+            || !this.destContainer
+            || !this.personContainer
+            || !this.debtAccountContainer
+        ) {
+            throw new Error('Failed to initialize view');
         }
 
-        this.srcTile = AccountTile.fromElement({ elem: 'source_tile', parent: this });
-        this.destTile = AccountTile.fromElement({ elem: 'dest_tile', parent: this });
+        this.srcTileBase = this.srcContainer.querySelector('.tile-base');
+        this.srcTileContainer = this.srcContainer.querySelector('.tile_container');
+        this.srcTileInfoBlock = this.srcContainer.querySelector('.tile-info-block');
+
+        this.destTileBase = this.destContainer.querySelector('.tile-base');
+        this.destTileContainer = this.destContainer.querySelector('.tile_container');
+        this.destTileInfoBlock = this.destContainer.querySelector('.tile-info-block');
+
+        this.personTileInfoBlock = this.personContainer.querySelector('.tile-info-block');
+
+        this.debtAccountTileBase = this.debtAccountContainer.querySelector('.tile-base');
+        this.debtAccTileInfoBlock = this.debtAccountContainer.querySelector('.tile-info-block');
+
+        const srcTileElem = ge('source_tile');
+        this.srcTile = (srcTileElem) ? AccountTile.fromElement({ elem: srcTileElem }) : null;
+
+        const destTileElem = ge('dest_tile');
+        this.destTile = (destTileElem) ? AccountTile.fromElement({ elem: destTileElem }) : null;
 
         this.srcAmountInfo = TileInfoItem.fromElement({
             elem: 'src_amount_left',
-            onclick: () => this.onSrcAmountSelect(),
+            onclick: () => this.store.dispatch(sourceAmountClick()),
         });
         this.destAmountInfo = TileInfoItem.fromElement({
             elem: 'dest_amount_left',
-            onclick: () => this.onDestAmountSelect(),
+            onclick: () => this.store.dispatch(destAmountClick()),
         });
         this.exchangeInfo = TileInfoItem.fromElement({
             elem: 'exch_left',
-            onclick: () => this.onExchRateSelect(),
+            onclick: () => this.store.dispatch(exchangeClick()),
         });
         this.srcResBalanceInfo = TileInfoItem.fromElement({
             elem: 'src_res_balance_left',
-            onclick: () => this.onResBalanceSelect(),
+            onclick: () => this.store.dispatch(sourceResultClick()),
         });
         this.destResBalanceInfo = TileInfoItem.fromElement({
             elem: 'dest_res_balance_left',
-            onclick: () => this.onResBalanceDestSelect(),
+            onclick: () => this.store.dispatch(destResultClick()),
         });
 
         this.srcAmountRow = ge('src_amount_row');
         if (this.srcAmountRow) {
             this.srcAmountRowLabel = this.srcAmountRow.querySelector('label');
         }
-        this.srcAmountInput = DecimalInput.create({ elem: ge('src_amount'), oninput: this.onFInput.bind(this) });
+        this.srcAmountInput = DecimalInput.create({
+            elem: ge('src_amount'),
+            oninput: (e) => this.onSourceAmountInput(e),
+        });
         this.srcAmountSign = ge('srcamountsign');
 
         this.destAmountRow = ge('dest_amount_row');
         if (this.destAmountRow) {
             this.destAmountRowLabel = this.destAmountRow.querySelector('label');
         }
-        this.destAmountInput = DecimalInput.create({ elem: ge('dest_amount'), oninput: this.onFInput.bind(this) });
+        this.destAmountInput = DecimalInput.create({
+            elem: ge('dest_amount'),
+            oninput: (e) => this.onDestAmountInput(e),
+        });
         this.destAmountSign = ge('destamountsign');
 
         this.srcResBalanceRow = ge('result_balance');
         if (this.srcResBalanceRow) {
             this.srcResBalanceRowLabel = this.srcResBalanceRow.querySelector('label');
         }
-        this.srcResBalanceInput = DecimalInput.create({ elem: ge('resbal'), oninput: this.onFInput.bind(this) });
+        this.srcResBalanceInput = DecimalInput.create({
+            elem: ge('resbal'),
+            oninput: (e) => this.onSourceResultInput(e),
+        });
         this.srcResBalanceSign = ge('res_currsign');
 
         this.destResBalanceRow = ge('result_balance_dest');
         if (this.destResBalanceRow) {
             this.destResBalanceRowLabel = this.destResBalanceRow.querySelector('label');
         }
-        this.destResBalanceInput = DecimalInput.create({ elem: ge('resbal_d'), oninput: this.onFInput.bind(this) });
+        this.destResBalanceInput = DecimalInput.create({
+            elem: ge('resbal_d'),
+            oninput: (e) => this.onDestResultInput(e),
+        });
         this.destResBalanceSign = ge('res_currsign_d');
 
         this.exchangeRow = ge('exchange');
         if (this.exchangeRow) {
             this.exchangeRowLabel = this.exchangeRow.querySelector('label');
         }
-        this.exchangeInput = DecimalInput.create({ elem: ge('exchrate'), oninput: this.onFInput.bind(this) });
+        this.exchangeInput = DecimalInput.create({
+            elem: ge('exchrate'),
+            oninput: (e) => this.onExchangeInput(e),
+        });
         this.exchangeSign = ge('exchcomm');
 
         this.datePickerBtn = IconLink.fromElement({
@@ -194,193 +380,68 @@ class TransactionView extends View {
         this.commentBlock = ge('comment_block');
         this.commentInput = ge('comm');
 
-        this.srcAccount = null;
-        this.destAccount = null;
-
-        if (this.model.transaction.isExpense() || this.model.transaction.isTransfer()) {
-            this.srcIdInp = ge('src_id');
-            if (this.srcIdInp) {
-                this.model.transaction.setValue('src_id', this.srcIdInp.value);
-                this.srcAccount = this.model.accounts.getItem(this.srcIdInp.value);
-            }
-        }
-        if (this.model.transaction.isIncome() || this.model.transaction.isTransfer()) {
-            this.destIdInp = ge('dest_id');
-            if (this.destIdInp) {
-                this.model.transaction.setValue('dest_id', this.destIdInp.value);
-                this.destAccount = this.model.accounts.getItem(this.destIdInp.value);
-            }
-        }
-
+        this.typeInp = ge('typeInp');
+        this.srcIdInp = ge('src_id');
+        this.destIdInp = ge('dest_id');
         this.srcCurrInp = ge('src_curr');
         this.destCurrInp = ge('dest_curr');
 
-        if (this.exchangeInput) {
-            this.model.transaction.setValue('exchrate', this.exchangeInput.value);
+        this.debtOpControls = ge('operation');
+
+        this.personIdInp = ge('person_id');
+        this.debtAccountInp = ge('acc_id');
+        this.debtAccountTile = AccountTile.fromElement({ elem: 'acc_tile', parent: this });
+
+        this.noAccountBtn = ge('noacc_btn');
+        if (this.noAccountBtn) {
+            this.noAccountBtn.addEventListener('click', () => this.toggleEnableAccount());
         }
-        if (this.model.transaction.isExpense()) {
-            if (this.srcAccount) {
-                this.model.transaction.setValue('src_initbal', this.srcAccount.balance);
-            }
-        } else if (this.model.transaction.isIncome()) {
-            if (this.destAccount) {
-                this.model.transaction.setValue('dest_initbal', this.destAccount.balance);
-            }
-        } else if (this.model.transaction.isTransfer()) {
-            if (this.srcAccount) {
-                this.model.transaction.setValue('src_initbal', this.srcAccount.balance);
-            }
-            if (this.destAccount) {
-                this.model.transaction.setValue('dest_initbal', this.destAccount.balance);
-            }
-        } else if (this.model.transaction.isDebt()) {
-            this.personIdInp = ge('person_id');
-            if (this.personIdInp) {
-                this.personAccount = this.model.accounts.getPersonAccount(
-                    this.personIdInp.value,
-                    this.model.transaction.srcCurr(),
-                );
-            }
-
-            const personAccBalance = (this.personAccount) ? this.personAccount.balance : 0;
-            if (this.model.transaction.debtType) {
-                this.model.transaction.setValue('src_initbal', personAccBalance);
-            } else {
-                this.model.transaction.setValue('dest_initbal', personAccBalance);
-            }
-
-            this.debtAccountInp = ge('acc_id');
-            this.debtAccountTile = AccountTile.fromElement({ elem: 'acc_tile', parent: this });
-            if (!this.model.transaction.noAccount) {
-                if (this.debtAccountInp) {
-                    this.debtAccount = this.model.accounts.getItem(this.debtAccountInp.value);
-                }
-
-                if (this.debtAccount) {
-                    if (this.model.transaction.debtType) {
-                        this.model.transaction.setValue('dest_initbal', this.debtAccount.balance);
-                    } else {
-                        this.model.transaction.setValue('src_initbal', this.debtAccount.balance);
-                    }
-                }
+        this.selectAccountBtn = ge('selaccount');
+        if (this.selectAccountBtn) {
+            const accountToggleBtn = this.selectAccountBtn.querySelector('button');
+            if (accountToggleBtn) {
+                accountToggleBtn.addEventListener('click', () => this.toggleEnableAccount());
             }
         }
 
-        this.model.transaction.subscribe('src_amount', this.onValueChanged.bind(this, 'src_amount'));
-        this.model.transaction.subscribe('dest_amount', this.onValueChanged.bind(this, 'dest_amount'));
-        this.model.transaction.subscribe('exchrate', this.onValueChanged.bind(this, 'exchrate'));
-        this.model.transaction.subscribe('src_resbal', this.onValueChanged.bind(this, 'src_resbal'));
-        this.model.transaction.subscribe('dest_resbal', this.onValueChanged.bind(this, 'dest_resbal'));
-        this.model.transaction.subscribe('src_curr', this.onValueChanged.bind(this, 'src_curr'));
-        this.model.transaction.subscribe('dest_curr', this.onValueChanged.bind(this, 'dest_curr'));
+        this.debtAccountLabel = ge('acclbl');
 
-        if (this.model.transaction.isDebt()) {
-            this.noAccountBtn = ge('noacc_btn');
-            if (this.noAccountBtn) {
-                this.noAccountBtn.addEventListener('click', this.toggleEnableAccount.bind(this));
-            }
-            this.selectAccountBtn = ge('selaccount');
-            if (this.selectAccountBtn) {
-                const accountToggleBtn = this.selectAccountBtn.querySelector('button');
-                if (accountToggleBtn) {
-                    accountToggleBtn.addEventListener('click', this.toggleEnableAccount.bind(this));
-                }
-            }
+        this.debtGiveRadio = ge('debtgive');
+        if (this.debtGiveRadio) {
+            this.debtGiveRadio.addEventListener('change', () => this.onChangeDebtOp());
+        }
+        this.debtTakeRadio = ge('debttake');
+        if (this.debtTakeRadio) {
+            this.debtTakeRadio.addEventListener('change', () => this.onChangeDebtOp());
+        }
 
-            this.debtAccountLabel = ge('acclbl');
+        this.personTile = Tile.fromElement({ elem: 'person_tile', parent: this });
 
-            this.debtGiveRadio = ge('debtgive');
-            if (this.debtGiveRadio) {
-                this.debtGiveRadio.addEventListener('change', this.onChangeDebtOp.bind(this));
-            }
-            this.debtTakeRadio = ge('debttake');
-            if (this.debtTakeRadio) {
-                this.debtTakeRadio.addEventListener('change', this.onChangeDebtOp.bind(this));
-            }
+        if (transaction.type === DEBT) {
+            this.initPersonList();
 
-            this.personTile = Tile.fromElement({ elem: 'person_tile', parent: this });
-
-            this.persDDList = DropDown.create({
-                input_id: 'person_tile',
-                listAttach: true,
-                onitemselect: this.onPersAccSel.bind(this),
-                editable: false,
-            });
-
-            const visiblePersons = this.model.persons.getVisible();
-            visiblePersons.forEach(
-                (person) => this.persDDList.addItem({ id: person.id, title: person.name }),
-            );
-
-            const personId = parseInt(this.personIdInp.value, 10);
+            const personId = transaction.person_id;
             this.appendHiddenPerson(this.persDDList, personId);
             this.persDDList.selectItem(personId);
 
-            if (!this.model.transaction.noAccount) {
+            if (!transaction.noAccount) {
                 this.initAccList();
             }
-        } else {
-            const srcId = this.model.transaction.srcAcc();
-            const destId = this.model.transaction.destAcc();
-
-            this.srcDDList = DropDown.create({
-                input_id: 'source_tile',
-                listAttach: true,
-                onitemselect: this.onSrcAccSel.bind(this),
-                editable: false,
-            });
-
-            if (this.srcDDList) {
-                this.model.visibleUserAccounts.forEach(
-                    (acc) => this.srcDDList.addItem({ id: acc.id, title: acc.name }),
-                );
-
-                this.appendHiddenAccount(this.srcDDList, srcId);
-                this.appendHiddenAccount(this.srcDDList, destId);
-                this.srcDDList.selectItem(srcId);
-            }
-
-            this.destDDList = DropDown.create({
-                input_id: 'dest_tile',
-                listAttach: true,
-                onitemselect: this.onDestAccSel.bind(this),
-                editable: false,
-            });
-            if (this.destDDList) {
-                this.model.visibleUserAccounts.forEach(
-                    (acc) => this.destDDList.addItem({ id: acc.id, title: acc.name }),
-                );
-
-                this.appendHiddenAccount(this.destDDList, srcId);
-                this.appendHiddenAccount(this.destDDList, destId);
-                this.destDDList.selectItem(destId);
-            }
         }
 
-        if (this.model.transaction.isIncome()) {
-            this.srcCurrDDList = DropDown.create({
-                input_id: 'srcamountsign',
-                listAttach: true,
-                onitemselect: this.onSrcCurrencySel.bind(this),
-                editable: false,
-            });
-            this.model.currency.forEach(
-                (curr) => this.srcCurrDDList.addItem({ id: curr.id, title: curr.name }),
-            );
-            this.srcCurrDDList.selectItem(this.model.transaction.srcCurr());
+        if (transaction.type === EXPENSE || transaction.type === TRANSFER) {
+            this.initSrcAccList();
         }
 
-        if (this.model.transaction.isExpense()) {
-            this.destCurrDDList = DropDown.create({
-                input_id: 'destamountsign',
-                listAttach: true,
-                onitemselect: this.onDestCurrencySel.bind(this),
-                editable: false,
-            });
-            this.model.currency.forEach(
-                (curr) => this.destCurrDDList.addItem({ id: curr.id, title: curr.name }),
-            );
-            this.destCurrDDList.selectItem(this.model.transaction.destCurr());
+        if (transaction.type === INCOME || transaction.type === TRANSFER) {
+            this.initDestAccList();
+        }
+
+        if (transaction.type === INCOME) {
+            this.initSrcCurrList();
+        }
+        if (transaction.type === EXPENSE) {
+            this.initDestCurrList();
         }
 
         this.submitBtn = ge('submitbtn');
@@ -396,9 +457,10 @@ class TransactionView extends View {
             return;
         }
 
-        const account = this.model.accounts.find((item) => item.id === accountId);
+        const account = window.app.model.accounts.find((item) => item.id === accountId);
         if (account && !account.isVisible()) {
             dropDown.addItem({ id: account.id, title: account.name });
+            // TODO : add to visibleUserAccounts
         }
     }
 
@@ -412,33 +474,144 @@ class TransactionView extends View {
             return;
         }
 
-        const person = this.model.persons.find((item) => item.id === personId);
+        const person = window.app.model.persons.find((item) => item.id === personId);
         if (person && !person.isVisible()) {
             dropDown.addItem({ id: person.id, title: person.name });
+            // TODO : add to visiblePersons
         }
     }
 
-    /**
-     * Initialize DropDown for debt account tile
-     */
-    initAccList() {
-        this.accDDList = DropDown.create({
-            input_id: 'acc_tile',
-            listAttach: true,
-            onitemselect: this.onDebtAccSel.bind(this),
-            editable: false,
-        });
-        // In case there is no persons, components will be not available
-        if (!this.accDDList) {
+    /** Initialize DropDown for source account tile */
+    initSrcAccList() {
+        if (this.srcDDList) {
             return;
         }
 
-        this.model.visibleUserAccounts.forEach(
+        const state = this.store.getState();
+        const { transaction } = state;
+        this.srcDDList = DropDown.create({
+            input_id: 'source_tile',
+            listAttach: true,
+            onitemselect: (item) => this.onSrcAccountSelect(item),
+            editable: false,
+        });
+
+        window.app.model.visibleUserAccounts.forEach(
+            (acc) => this.srcDDList.addItem({ id: acc.id, title: acc.name }),
+        );
+
+        this.appendHiddenAccount(this.srcDDList, transaction.src_id);
+        this.appendHiddenAccount(this.srcDDList, transaction.dest_id);
+        if (transaction.src_id) {
+            this.srcDDList.selectItem(transaction.src_id);
+        }
+    }
+
+    /** Initialize DropDown for destination account tile */
+    initDestAccList() {
+        if (this.destDDList) {
+            return;
+        }
+
+        const state = this.store.getState();
+        const { transaction } = state;
+        this.destDDList = DropDown.create({
+            input_id: 'dest_tile',
+            listAttach: true,
+            onitemselect: (item) => this.onDestAccountSelect(item),
+            editable: false,
+        });
+
+        window.app.model.visibleUserAccounts.forEach(
+            (acc) => this.destDDList.addItem({ id: acc.id, title: acc.name }),
+        );
+
+        this.appendHiddenAccount(this.destDDList, transaction.src_id);
+        this.appendHiddenAccount(this.destDDList, transaction.dest_id);
+        if (transaction.dest_id) {
+            this.destDDList.selectItem(transaction.dest_id);
+        }
+    }
+
+    /** Initialize DropDown for debt account tile */
+    initPersonList() {
+        if (this.persDDList) {
+            return;
+        }
+
+        this.persDDList = DropDown.create({
+            input_id: 'person_tile',
+            listAttach: true,
+            onitemselect: (item) => this.onPersonSelect(item),
+            editable: false,
+        });
+
+        window.app.model.visiblePersons.forEach(
+            (person) => this.persDDList.addItem({ id: person.id, title: person.name }),
+        );
+    }
+
+    /** Initialize DropDown for debt account tile */
+    initAccList() {
+        if (this.accDDList) {
+            return;
+        }
+
+        this.accDDList = DropDown.create({
+            input_id: 'acc_tile',
+            listAttach: true,
+            onitemselect: (item) => this.onDebtAccountSelect(item),
+            editable: false,
+        });
+
+        window.app.model.visibleUserAccounts.forEach(
             (acc) => this.accDDList.addItem({ id: acc.id, title: acc.name }),
         );
-        const accountId = this.debtAccount.id;
-        this.appendHiddenAccount(this.accDDList, accountId);
-        this.accDDList.selectItem(accountId);
+
+        const state = this.store.getState();
+        const accountId = (state.account) ? state.account.id : 0;
+        if (accountId) {
+            this.appendHiddenAccount(this.accDDList, accountId);
+            this.accDDList.selectItem(accountId);
+        }
+    }
+
+    /** Initialize DropDown for source currency */
+    initSrcCurrList() {
+        if (this.srcCurrDDList) {
+            return;
+        }
+
+        const state = this.store.getState();
+        this.srcCurrDDList = DropDown.create({
+            input_id: 'srcamountsign',
+            listAttach: true,
+            onitemselect: (item) => this.onSrcCurrencySel(item),
+            editable: false,
+        });
+        window.app.model.currency.forEach(
+            (curr) => this.srcCurrDDList.addItem({ id: curr.id, title: curr.name }),
+        );
+        this.srcCurrDDList.selectItem(state.transaction.src_curr);
+    }
+
+    /** Initialize DropDown for destination currency */
+    initDestCurrList() {
+        if (this.destCurrDDList) {
+            return;
+        }
+
+        const state = this.store.getState();
+        this.destCurrDDList = DropDown.create({
+            input_id: 'destamountsign',
+            listAttach: true,
+            onitemselect: (item) => this.onDestCurrencySel(item),
+            editable: false,
+        });
+        window.app.model.currency.forEach(
+            (curr) => this.destCurrDDList.addItem({ id: curr.id, title: curr.name }),
+        );
+        this.destCurrDDList.selectItem(state.transaction.dest_curr);
     }
 
     /**
@@ -476,7 +649,7 @@ class TransactionView extends View {
         this.datePickerBtn.hide();
         show(this.dateBlock, true);
 
-        setEmptyClick(this.calendarObj.hide.bind(this.calendarObj), [
+        setEmptyClick(() => this.calendarObj.hide(), [
             this.datePickerWrapper,
             this.datePickerBtn.elem,
             this.dateInputBtn,
@@ -497,230 +670,106 @@ class TransactionView extends View {
      * @param {string|Element} inputRow - input row element
      * @param {string|Element} infoBlock - info block element
      * @param {string|Element} inputObj - decimal input object
-     * @param {boolean} showInput - show/hide flag
+     * @param {Number} options - show/hide options
      */
-    commonSwitch(inputRow, infoBlock, inputObj, showInput) {
-        const toShow = !!showInput;
+    commonSwitch(inputRow, infoBlock, inputObj, options) {
+        const showInput = (options === SHOW_INPUT);
+        const showInfo = (options === SHOW_INFO);
 
-        show(inputRow, toShow);
+        show(inputRow, showInput);
         if (infoBlock) {
-            infoBlock.show(!toShow);
-        }
-
-        if (toShow && inputObj && inputObj.elem) {
-            inputObj.elem.focus();
+            infoBlock.show(showInfo);
         }
     }
 
     /**
      * Show input control or static block for source amount value
-     * @param {boolean} showInput - if set ot true show input row, else show info block
+     * @param {Number} options - show/hide options
      */
-    srcAmountSwitch(showInput) {
-        this.commonSwitch(this.srcAmountRow, this.srcAmountInfo, this.srcAmountInput, showInput);
+    srcAmountSwitch(options) {
+        this.commonSwitch(this.srcAmountRow, this.srcAmountInfo, this.srcAmountInput, options);
     }
 
     /**
      * Show input control or static block for destination amount value
-     * @param {boolean} showInput - if set ot true show input row, else show info block
+     * @param {Number} options - show/hide options
      */
-    destAmountSwitch(showInput) {
-        this.commonSwitch(this.destAmountRow, this.destAmountInfo, this.destAmountInput, showInput);
+    destAmountSwitch(options) {
+        this.commonSwitch(this.destAmountRow, this.destAmountInfo, this.destAmountInput, options);
     }
 
     /**
      * Show input control or static block for source result balance value
-     * @param {boolean} showInput - if set ot true show input row, else show info block
+     * @param {Number} options - show/hide options
      */
-    resBalanceSwitch(showInput) {
+    resBalanceSwitch(options) {
         this.commonSwitch(
             this.srcResBalanceRow,
             this.srcResBalanceInfo,
             this.srcResBalanceInput,
-            showInput,
+            options,
         );
     }
 
     /**
      * Show input control or static block for destination result balance value
-     * @param {boolean} showInput - if set ot true show input row, else show info block
+     * @param {Number} options - show/hide options
      */
-    resBalanceDestSwitch(showInput) {
+    resBalanceDestSwitch(options) {
         this.commonSwitch(
             this.destResBalanceRow,
             this.destResBalanceInfo,
             this.destResBalanceInput,
-            showInput,
+            options,
         );
     }
 
     /**
      * Show input control or static block for exchange rate value
+     * @param {Number} options - show/hide options
      */
-    exchRateSwitch(showInput) {
-        this.commonSwitch(this.exchangeRow, this.exchangeInfo, this.exchangeInput, showInput);
+    exchRateSwitch(options) {
+        this.commonSwitch(this.exchangeRow, this.exchangeInfo, this.exchangeInput, options);
     }
 
-    /**
-     * Source amount static click event handler
-     */
-    onSrcAmountSelect() {
-        this.srcAmountSwitch(true);
-        this.resBalanceSwitch(false);
-        if (!this.model.transaction.isDiff()) {
-            this.resBalanceDestSwitch(false);
-        }
-    }
-
-    /**
-     * Destination amount static click event handler
-     */
-    onDestAmountSelect() {
-        this.destAmountSwitch(true);
-        if (!this.model.transaction.isDiff() || this.model.transaction.isExpense()) {
-            this.resBalanceSwitch(false);
-        }
-        this.resBalanceDestSwitch(false);
-        if (this.model.transaction.isDiff()) {
-            this.exchRateSwitch(false);
-        }
-    }
-
-    /**
-     * Source result balance static click event handler
-     */
-    onResBalanceSelect() {
-        this.resBalanceSwitch(true);
-        if (!this.model.transaction.isDiff()) {
-            this.resBalanceDestSwitch(false);
-        }
-        if (this.model.transaction.isTransfer() || this.model.transaction.isDebt()) {
-            this.srcAmountSwitch(false);
-        } else {
-            this.destAmountSwitch(false);
-        }
-        if (this.model.transaction.isExpense() && this.model.transaction.isDiff()) {
-            this.exchRateSwitch(false);
-        }
-    }
-
-    /**
-     * Destination result balance static click event handler
-     */
-    onResBalanceDestSelect() {
-        this.resBalanceDestSwitch(true);
-        if (this.model.transaction.isDiff()) {
-            this.destAmountSwitch(false);
-            this.exchRateSwitch(false);
-        } else {
-            this.resBalanceSwitch(false);
-            this.srcAmountSwitch(false);
-        }
-    }
-
-    /**
-     * Exchange rate static click event handler
-     */
-    onExchRateSelect() {
-        this.exchRateSwitch(true);
-        this.destAmountSwitch(false);
-        if (this.model.transaction.isDiff()) {
-            if (this.model.transaction.isExpense()) {
-                this.resBalanceSwitch(false);
-            } else if (this.model.transaction.isIncome() || this.model.transaction.isTransfer()) {
-                this.resBalanceDestSwitch(false);
-            }
-        }
-    }
-
-    /**
-     * Hide both source amount and exchange rate controls
-     */
-    hideSrcAmountAndExchange() {
-        show(this.srcAmountRow, false);
-        if (this.srcAmountInfo) {
-            this.srcAmountInfo.hide();
-        }
-
-        show(this.exchangeRow, false);
-        if (this.exchangeInfo) {
-            this.exchangeInfo.hide();
-        }
-    }
-
-    /**
-     * Hide both destination amount and exchange rate controls
-     */
-    hideDestAmountAndExchange() {
-        show(this.destAmountRow, false);
-        if (this.destAmountInfo) {
-            this.destAmountInfo.hide();
-        }
-
-        show(this.exchangeRow, false);
-        if (this.exchangeInfo) {
-            this.exchangeInfo.hide();
-        }
+    onChangeType(type) {
+        this.store.dispatch(typeChange(type));
     }
 
     /**
      * Source account select callback
      * @param {object} obj - selected item
      */
-    onSrcAccSel(obj) {
-        if (!obj || !this.srcIdInp) {
-            return;
-        }
-
-        this.srcIdInp.value = obj.id;
-        if (this.model.transaction.isTransfer()) {
-            this.onChangeSource();
-        } else {
-            this.onChangeAcc();
-        }
+    onSrcAccountSelect(obj) {
+        const accountId = parseInt(obj.id, 10);
+        this.store.dispatch(sourceAccountChange(accountId));
     }
 
     /**
      * Destination account select callback
      * @param {object} obj - selected item
      */
-    onDestAccSel(obj) {
-        if (!obj || !this.destIdInp) {
-            return;
-        }
-
-        this.destIdInp.value = obj.id;
-        if (this.model.transaction.isTransfer()) {
-            this.onChangeDest();
-        } else {
-            this.onChangeAcc();
-        }
+    onDestAccountSelect(obj) {
+        const accountId = parseInt(obj.id, 10);
+        this.store.dispatch(destAccountChange(accountId));
     }
 
     /**
      * Debt account select callback
      * @param {object} obj - selected item
      */
-    onDebtAccSel(obj) {
-        if (!obj || !this.debtAccountInp) {
-            return;
-        }
-
-        this.debtAccountInp.value = obj.id;
-        this.onChangeAcc();
+    onDebtAccountSelect(obj) {
+        const accountId = parseInt(obj.id, 10);
+        this.store.dispatch(debtAccountChange(accountId));
     }
 
     /**
      * Person select callback
      * @param {object} obj - selected item
      */
-    onPersAccSel(obj) {
-        if (!obj || !this.personIdInp) {
-            return;
-        }
-
-        this.personIdInp.value = obj.id;
-        this.onPersonSel();
+    onPersonSelect(obj) {
+        const personId = parseInt(obj.id, 10);
+        this.store.dispatch(personChange(personId));
     }
 
     /**
@@ -728,12 +777,8 @@ class TransactionView extends View {
      * @param {object} obj - selected item
      */
     onSrcCurrencySel(obj) {
-        if (!obj || !this.srcCurrInp) {
-            return;
-        }
-
-        this.srcCurrInp.value = obj.id;
-        this.onChangeSrcCurr();
+        const currencyId = parseInt(obj.id, 10);
+        this.store.dispatch(sourceCurrencyChange(currencyId));
     }
 
     /**
@@ -741,51 +786,15 @@ class TransactionView extends View {
      * @param {object} obj - selected item
      */
     onDestCurrencySel(obj) {
-        if (!obj || !this.destCurrInp) {
-            return;
-        }
-
-        this.destCurrInp.value = obj.id;
-        this.onChangeDestCurr();
+        const currencyId = parseInt(obj.id, 10);
+        this.store.dispatch(destCurrencyChange(currencyId));
     }
 
     /**
      * Account disable button click event handler
      */
     toggleEnableAccount() {
-        let currencyId;
-        let debtAccountLabel = 'No account';
-
-        if (this.model.transaction.noAccount) {
-            debtAccountLabel = (this.model.transaction.debtType) ? 'Destination account' : 'Source account';
-        }
-
-        this.debtAccountLabel.textContent = debtAccountLabel;
-
-        show(this.noAccountBtn, this.model.transaction.noAccount);
-        show(this.srcTileBase, this.model.transaction.noAccount);
-        show(this.selectAccountBtn, !this.model.transaction.noAccount);
-
-        this.model.transaction.updateValue('no_account', !this.model.transaction.noAccount);
-
-        if (this.model.transaction.noAccount) {
-            this.model.transaction.updateValue('last_acc', parseInt(this.debtAccountInp.value, 10));
-            this.debtAccountInp.value = 0;
-
-            currencyId = parseInt(this.srcCurrInp.value, 10);
-        } else {
-            this.debtAccount = this.model.accounts.getItem(this.model.transaction.lastAcc_id);
-            this.debtAccountInp.value = this.debtAccount.id;
-            currencyId = this.debtAccount.curr_id;
-        }
-        this.model.transaction.updateValue('src_curr', currencyId);
-        this.model.transaction.updateValue('dest_curr', currencyId);
-
-        this.onChangeAcc();
-
-        if (!this.model.transaction.noAccount && !this.accDDList) {
-            this.initAccList();
-        }
+        this.store.dispatch(toggleDebtAccount());
     }
 
     /**
@@ -817,237 +826,6 @@ class TransactionView extends View {
     }
 
     /**
-     * Set full/short text for source or destination input label
-     * @param {boolean} src - if true set source amount, else destination amount
-     * @param {boolean} full - if true set full amount label, else set short
-     */
-    setAmountInputLabel(src, full) {
-        const labelElem = (src) ? this.srcAmountRowLabel : this.destAmountRowLabel;
-        if (!labelElem) {
-            return;
-        }
-
-        if (full) {
-            labelElem.textContent = (src) ? 'Source amount' : 'Destination amount';
-        } else {
-            labelElem.textContent = 'Amount';
-        }
-    }
-
-    /**
-     * Set full/short text for source or destination amount tile block label
-     * @param {boolean} src - if true set source amount, else destination amount
-     * @param {boolean} full - if true set full amount label, else set short
-     */
-    setAmountTileBlockLabel(src, full) {
-        const amountBlock = (src) ? this.srcAmountInfo : this.destAmountInfo;
-        if (!amountBlock) {
-            return;
-        }
-
-        const labelElem = amountBlock.firstElementChild;
-        if (!labelElem) {
-            return;
-        }
-
-        if (full) {
-            labelElem.textContent = (src) ? 'Source amount' : 'Destination amount';
-        } else {
-            labelElem.textContent = 'Amount';
-        }
-    }
-
-    /**
-     * Set source amount value at View
-     * @param {*} val - source amount value
-     */
-    setSrcAmount(val) {
-        if (this.srcAmountInfo) {
-            const title = this.model.currency.formatCurrency(
-                (isValidValue(val) ? val : 0),
-                this.model.transaction.srcCurr(),
-            );
-            this.srcAmountInfo.setTitle(title);
-        }
-
-        if (typeof val === 'undefined') {
-            return;
-        }
-
-        if (this.srcAmountInput) {
-            const sa = this.srcAmountInput.value;
-            const savalid = isValidValue(sa);
-            const fsa = (savalid) ? normalize(sa) : sa;
-
-            if (fsa !== val) {
-                this.srcAmountInput.value = val;
-            }
-        }
-    }
-
-    /**
-     * Set destination amount value at View
-     * @param {*} val - destination amount value
-     */
-    setDestAmount(val) {
-        if (this.destAmountInfo) {
-            const title = this.model.currency.formatCurrency(
-                (isValidValue(val) ? val : 0),
-                this.model.transaction.destCurr(),
-            );
-            this.destAmountInfo.setTitle(title);
-        }
-
-        if (typeof val === 'undefined') {
-            return;
-        }
-
-        if (this.destAmountInput) {
-            const da = this.destAmountInput.value;
-            const davalid = isValidValue(da);
-            const fda = (davalid) ? normalize(da) : da;
-
-            if (fda !== val) {
-                this.destAmountInput.value = val;
-            }
-        }
-    }
-
-    /**
-     * Set exchange rate value at View
-     * @param {*} val - exchange rate value
-     */
-    setExchRate(val) {
-        if (typeof val === 'undefined') {
-            return;
-        }
-
-        const srcCurr = this.model.currency.getItem(this.model.transaction.srcCurr());
-        const destCurr = this.model.currency.getItem(this.model.transaction.destCurr());
-
-        if (this.exchangeInput) {
-            const e = this.exchangeInput.value;
-            const fe = (isValidValue(e)) ? normalizeExch(e) : e;
-
-            if (fe !== val) {
-                this.exchangeInput.value = val;
-            }
-        }
-
-        const normExch = normalizeExch(val);
-
-        const exchSigns = `${destCurr.sign}/${srcCurr.sign}`;
-        this.exchangeSign.textContent = exchSigns;
-
-        let exchText = exchSigns;
-        if (isValidValue(normExch) && normExch !== 1 && normExch !== 0) {
-            const fsa = this.model.transaction.srcAmount();
-            const fda = this.model.transaction.destAmount();
-            const invExch = parseFloat((fsa / fda).toFixed(5));
-
-            exchText += ` (${invExch} ${srcCurr.sign}/${destCurr.sign})`;
-        }
-
-        if (this.exchangeInfo) {
-            this.exchangeInfo.setTitle(`${normExch} ${exchText}`);
-        }
-    }
-
-    /**
-     * Set result balance of source value at View
-     * @param {*} val - source result balance value
-     * @param {boolean} valid - valid value flag
-     */
-    setSrcResultBalance(val, valid) {
-        if (typeof val === 'undefined' && typeof valid === 'undefined') {
-            return;
-        }
-
-        if (this.srcResBalanceInput) {
-            const s2Src = this.srcResBalanceInput.value;
-            const s2valid = isValidValue(s2Src);
-            const fs2Src = (s2valid) ? normalize(s2Src) : s2Src;
-
-            if (fs2Src !== val) {
-                this.srcResBalanceInput.value = val;
-            }
-        }
-
-        if (this.srcResBalanceInfo) {
-            const fmtBal = this.model.currency.formatCurrency(
-                isValidValue(val) ? val : valid,
-                this.model.transaction.srcCurr(),
-            );
-            this.srcResBalanceInfo.setTitle(fmtBal);
-        }
-    }
-
-    /**
-     * Set result balance of destination value at View
-     * @param {*} val - destination result balance value
-     * @param {boolean} valid - valid value flag
-     */
-    setDestResultBalance(val, valid) {
-        if ((typeof val === 'undefined' && typeof valid === 'undefined')
-            || this.model.transaction.isExpense()) {
-            return;
-        }
-
-        if (this.destResBalanceInput) {
-            const s2Dest = this.destResBalanceInput.value;
-            const s2valid = isValidValue(s2Dest);
-            const fs2Dest = (s2valid) ? normalize(s2Dest) : s2Dest;
-
-            if (fs2Dest !== val) {
-                this.destResBalanceInput.value = val;
-            }
-        }
-
-        if (this.destResBalanceInfo) {
-            const fmtBal = this.model.currency.formatCurrency(
-                isValidValue(val) ? val : valid,
-                this.model.transaction.destCurr(),
-            );
-            this.destResBalanceInfo.setTitle(fmtBal);
-        }
-    }
-
-    /**
-     * Update information on person tile on currency change
-     */
-    updatePersonTile() {
-        if (!this.model.transaction.isDebt() || !this.personTile) {
-            return;
-        }
-
-        const person = this.model.persons.getItem(this.personIdInp.value);
-        if (!person) {
-            return;
-        }
-
-        const currencyId = this.model.transaction.debtType
-            ? this.model.transaction.srcCurr()
-            : this.model.transaction.destCurr();
-        const personAccount = this.model.accounts.getPersonAccount(person.id, currencyId);
-        const personBalance = (personAccount) ? personAccount.balance : 0;
-
-        this.personTile.render({
-            title: person.name,
-            subtitle: this.model.currency.formatCurrency(personBalance, currencyId),
-        });
-    }
-
-    /**
-     * Update currency signs near to input fields
-     */
-    updateCurrSigns() {
-        this.setSign(this.destAmountSign, this.destCurrDDList, this.model.transaction.destCurr());
-        this.setSign(this.srcAmountSign, this.srcCurrDDList, this.model.transaction.srcCurr());
-        this.setSign(this.srcResBalanceSign, null, this.model.transaction.srcCurr());
-        this.setSign(this.destResBalanceSign, null, this.model.transaction.destCurr());
-    }
-
-    /**
      * Set currency sign for specified field
      * @param {string} obj - currency sign element id
      * @param {DropDown} ddown - DropDown object
@@ -1059,7 +837,7 @@ class TransactionView extends View {
             return;
         }
 
-        const curr = this.model.currency.getItem(currencyId);
+        const curr = window.app.model.currency.getItem(currencyId);
         if (!curr) {
             return;
         }
@@ -1072,57 +850,6 @@ class TransactionView extends View {
     }
 
     /**
-     * Change account event handler
-     */
-    onChangeAcc() {
-        let tile = null;
-        let accountInp = null;
-        const isDiff = this.model.transaction.isDiff();
-
-        if (this.model.transaction.isExpense()) {
-            accountInp = this.srcIdInp;
-            tile = this.srcTile;
-        } else if (this.model.transaction.isIncome()) {
-            accountInp = this.destIdInp;
-            tile = this.destTile;
-        } else if (this.model.transaction.isDebt()) {
-            accountInp = this.debtAccountInp;
-            tile = this.debtAccountTile;
-        }
-
-        const accountId = parseInt(accountInp.value, 10);
-        if (this.model.transaction.isExpense()
-            || (this.model.transaction.isDebt() && !this.model.transaction.debtType)) {
-            this.model.transaction.updateValue('src_id', accountId);
-            this.onSrcCurrChanged();
-            if (!isDiff) {
-                const copyCurrency = this.model.transaction.srcCurr();
-                this.model.transaction.updateValue('dest_curr', copyCurrency);
-                this.onDestCurrChanged(copyCurrency);
-            }
-        } else if (this.model.transaction.isIncome()
-            || (this.model.transaction.isDebt() && this.model.transaction.debtType)) {
-            this.model.transaction.updateValue('dest_id', accountId);
-            this.onDestCurrChanged();
-            if (!isDiff) {
-                const copyCurrency = this.model.transaction.destCurr();
-                this.model.transaction.updateValue('src_curr', copyCurrency);
-                this.onSrcCurrChanged(copyCurrency);
-            }
-        }
-
-        if (this.model.transaction.isDebt()) {
-            this.updatePersonTile();
-            const srcAmount = this.model.transaction.srcAmount();
-            this.setSrcAmount(isValidValue(srcAmount) ? srcAmount : '');
-        }
-
-        if (accountId) {
-            tile.render(this.model.accounts.getItem(accountId));
-        }
-    }
-
-    /**
      * Common transaction 'submit' event handler
      */
     onFormSubmit(e) {
@@ -1131,461 +858,74 @@ class TransactionView extends View {
             return;
         }
 
-        if (this.model.transaction.isDebt()) {
-            this.onDebtSubmit(e);
-        } else if (this.model.transaction.isTransfer() && this.mode !== 'update') {
-            this.onTransferSubmit(e);
-        } else {
-            this.onSubmit(e);
-        }
-    }
-
-    /**
-     * Expense/Income transaction 'submit' event handler
-     */
-    onSubmit(e) {
-        const srcAmount = this.srcAmountInput.value;
-        const destAmount = this.destAmountInput.value;
+        const state = this.store.getState();
+        const { sourceAmount, destAmount } = state.form;
         let valid = true;
 
-        if (isVisible(this.destAmountRow)) {
-            if (!destAmount || !destAmount.length || !isNum(fixFloat(destAmount))) {
-                this.invalidateBlock('dest_amount_row');
-                valid = false;
-            }
-        }
-
-        if (isVisible(this.srcAmountRow)) {
-            if (!srcAmount || !srcAmount.length || !isNum(fixFloat(srcAmount))) {
-                this.invalidateBlock('src_amount_row');
-                valid = false;
-            }
-        }
-
-        if (!checkDate(this.dateInput.value)) {
-            this.invalidateBlock('date_block');
+        if (
+            state.transaction.src_amount <= 0
+            || !isNum(fixFloat(sourceAmount))
+        ) {
+            this.store.dispatch(invalidateSourceAmount());
             valid = false;
         }
 
-        if (valid) {
-            this.srcAmountInput.value = fixFloat(srcAmount);
-            this.destAmountInput.value = fixFloat(destAmount);
-
-            this.submitStarted = true;
-            enable(this.submitBtn, false);
-        } else {
-            e.preventDefault();
-        }
-    }
-
-    /**
-     * Transfer transaction submit event handler
-     */
-    onTransferSubmit(e) {
-        const srcAmount = this.srcAmountInput.value;
-        const destAmount = this.destAmountInput.value;
-        let valid = true;
-
-        if (!srcAmount || !srcAmount.length || !isNum(fixFloat(srcAmount))) {
-            this.invalidateBlock('src_amount_row');
-            valid = false;
-        }
-
-        if (this.model.transaction.isDiff()
+        if (
+            state.isDiff
             && (
-                !destAmount
-                || !destAmount.length
+                state.transaction.dest_amount <= 0
                 || !isNum(fixFloat(destAmount))
-            )) {
-            this.invalidateBlock('dest_amount_row');
+            )
+        ) {
+            this.store.dispatch(invalidateDestAmount());
             valid = false;
         }
 
         if (!checkDate(this.dateInput.value)) {
-            this.invalidateBlock('date_block');
+            this.store.dispatch(invalidateDate());
             valid = false;
         }
 
         if (valid) {
-            this.srcAmountInput.value = fixFloat(srcAmount);
+            this.srcAmountInput.value = fixFloat(sourceAmount);
             this.destAmountInput.value = fixFloat(destAmount);
             this.submitStarted = true;
             enable(this.submitBtn, false);
         } else {
             e.preventDefault();
         }
-    }
-
-    /**
-     * Debt transaction submit event handler
-     */
-    onDebtSubmit(e) {
-        const srcAmount = this.srcAmountInput.value;
-        const destAmount = this.destAmountInput.value;
-        let valid = true;
-
-        if (this.model.transaction.noAccount) {
-            this.debtAccountInp.value = 0;
-        }
-
-        if (!srcAmount || !srcAmount.length || !isNum(fixFloat(srcAmount))) {
-            this.invalidateBlock('src_amount_row');
-            valid = false;
-        }
-
-        if (!destAmount || !destAmount.length || !isNum(fixFloat(destAmount))) {
-            this.invalidateBlock('dest_amount_row');
-            valid = false;
-        }
-
-        if (!checkDate(this.dateInput.value)) {
-            this.invalidateBlock('date_block');
-            valid = false;
-        }
-
-        if (valid) {
-            this.srcAmountInput.value = fixFloat(srcAmount);
-            this.destAmountInput.value = fixFloat(destAmount);
-            this.submitStarted = true;
-            enable(this.submitBtn, false);
-        } else {
-            e.preventDefault();
-        }
-    }
-
-    /**
-     * Person select event handler
-     */
-    onPersonSel() {
-        this.model.transaction.updateValue('person_id', this.personIdInp.value);
-        this.updatePersonTile();
     }
 
     /**
      * Debt operation type change event handler
      */
     onChangeDebtOp() {
-        const dType = this.debtGiveRadio.checked;
-        if (dType === this.model.transaction.debtType) {
-            return;
-        }
+        const debtType = this.debtGiveRadio.checked;
+        const state = this.store.getState();
 
-        insertAfter(
-            this.srcResBalanceInfo.elem,
-            (dType) ? this.exchangeInfo.elem : this.destAmountInfo.elem,
-        );
-        insertAfter(
-            this.destResBalanceInfo.elem,
-            (dType) ? this.destAmountInfo.elem : this.exchangeInfo.elem,
-        );
-
-        const rbv = isVisible(this.srcResBalanceRow);
-        if (rbv || isVisible(this.destResBalanceRow)) {
-            this.resBalanceSwitch(!rbv);
-            this.resBalanceDestSwitch(rbv);
-        }
-
-        this.model.transaction.updateValue('debt_type', dType);
-
-        if (!this.model.transaction.noAccount) {
-            this.debtAccountLabel.textContent = (dType) ? 'Destination account' : 'Source account';
-        }
-
-        this.srcResBalanceRowLabel.textContent = (dType) ? 'Result balance (Person)' : 'Result balance (Account)';
-        this.destResBalanceRowLabel.textContent = (dType) ? 'Result balance (Account)' : 'Result balance (Person)';
-    }
-
-    /**
-     * Source account change event handler
-     */
-    onChangeSource() {
-        this.model.transaction.updateValue('src_id', this.srcIdInp.value);
-        this.onSrcCurrChanged();
-
-        if (this.srcIdInp.value === this.destIdInp.value) {
-            const nextAccount = this.model.visibleUserAccounts.getNextAccount(this.destIdInp.value);
-            if (nextAccount !== 0) {
-                this.destIdInp.value = nextAccount;
-                this.model.transaction.updateValue('dest_id', nextAccount);
-                this.destDDList.selectItem(nextAccount);
-                this.onDestCurrChanged();
-            }
-        }
-
-        if (this.model.transaction.isDebt()) {
-            this.updatePersonTile();
-        } else {
-            if (this.srcTile) {
-                this.srcTile.render(
-                    this.model.accounts.getItem(this.model.transaction.srcAcc()),
-                );
-            }
-            if (this.destTile) {
-                this.destTile.render(
-                    this.model.accounts.getItem(this.model.transaction.destAcc()),
-                );
-            }
+        if (state.transaction.debtType !== debtType) {
+            this.store.dispatch(toggleDebtType());
         }
     }
 
-    /**
-     * Destination account change event handler
-     */
-    onChangeDest() {
-        this.model.transaction.updateValue('dest_id', this.destIdInp.value);
-        this.onDestCurrChanged();
-
-        if (this.srcIdInp.value === this.destIdInp.value) {
-            const nextAccount = this.model.visibleUserAccounts.getNextAccount(this.srcIdInp.value);
-            if (nextAccount !== 0) {
-                this.srcIdInp.value = nextAccount;
-                this.model.transaction.updateValue('src_id', nextAccount);
-                this.srcDDList.selectItem(nextAccount);
-                this.onSrcCurrChanged();
-            }
-        }
-
-        if (this.model.transaction.isDebt()) {
-            this.updatePersonTile();
-        } else {
-            if (this.srcTile) {
-                this.srcTile.render(this.model.accounts.getItem(this.model.transaction.srcAcc()));
-            }
-            if (this.destTile) {
-                this.destTile.render(this.model.accounts.getItem(this.model.transaction.destAcc()));
-            }
-        }
+    onSourceAmountInput(e) {
+        this.store.dispatch(sourceAmountChange(e.target.value));
     }
 
-    /**
-     * Field input event handler
-     * @param {InputEvent} e - event object
-     */
-    onFInput(e) {
-        const obj = e.target;
-
-        if (obj.id === 'src_amount') {
-            this.clearBlockValidation('src_amount_row');
-            this.model.transaction.updateValue('src_amount', obj.value);
-        } else if (obj.id === 'dest_amount') {
-            this.clearBlockValidation('dest_amount_row');
-            this.model.transaction.updateValue('dest_amount', obj.value);
-        } else if (obj.id === 'exchrate') {
-            this.model.transaction.updateValue('exchrate', obj.value);
-        } else if (obj.id === 'resbal') {
-            this.model.transaction.updateValue('src_resbal', obj.value);
-        } else if (obj.id === 'resbal_d') {
-            this.model.transaction.updateValue('dest_resbal', obj.value);
-        }
-
-        return true;
+    onDestAmountInput(e) {
+        this.store.dispatch(destAmountChange(e.target.value));
     }
 
-    /**
-     * Transaction model value changed notification callback
-     * @param {string} item - transaction model item name
-     * @param {*} value - new value of specified item
-     */
-    onValueChanged(item, value) {
-        if (item === 'src_amount') {
-            this.setSrcAmount(value);
-        } else if (item === 'dest_amount') {
-            this.setDestAmount(value);
-        } else if (item === 'exchrate') {
-            this.setExchRate(value);
-        } else if (item === 'src_resbal') {
-            this.setSrcResultBalance(value, 0);
-        } else if (item === 'dest_resbal') {
-            this.setDestResultBalance(value, 0);
-        } else if (item === 'src_curr') {
-            this.onSrcCurrChanged(value);
-        } else if (item === 'dest_curr') {
-            this.onDestCurrChanged(value);
-        }
+    onExchangeInput(e) {
+        this.store.dispatch(exchangeChange(e.target.value));
     }
 
-    /**
-     * Source currency change event handler
-     */
-    onChangeSrcCurr() {
-        const srcCurr = parseInt(this.srcCurrInp.value, 10);
-        this.model.transaction.updateValue('src_curr', srcCurr);
+    onSourceResultInput(e) {
+        this.store.dispatch(sourceResultChange(e.target.value));
     }
 
-    /**
-     * Update layout on source curency changed
-     * @param {number|undefined} value - new source currency value
-     */
-    onSrcCurrChanged(value) {
-        let toShowDestAmount = false;
-
-        if (typeof value !== 'undefined' && this.srcCurrInp) {
-            this.srcCurrInp.value = value;
-        }
-
-        const sAmVis = isVisible(this.srcAmountRow);
-        const sResVis = isVisible(this.srcResBalanceRow);
-        const dResVis = isVisible(this.destResBalanceRow);
-        const exchVis = isVisible(this.exchangeRow);
-
-        if (this.model.transaction.isDiff()) {
-            this.setAmountInputLabel(true, true);
-            this.setAmountTileBlockLabel(true, true);
-            this.setAmountInputLabel(false, true);
-            this.setAmountTileBlockLabel(false, true);
-            if (this.model.transaction.isIncome()) {
-                this.setCurrActive(true, true); // set source active
-                this.setCurrActive(false, false); // set destination inactive
-            }
-
-            if (this.model.transaction.isTransfer()) {
-                toShowDestAmount = !dResVis && !(sResVis && exchVis) && !(sAmVis && exchVis);
-            } else {
-                toShowDestAmount = !sResVis && !dResVis && !exchVis;
-            }
-            this.destAmountSwitch(toShowDestAmount);
-
-            if (this.model.transaction.isTransfer()) {
-                this.srcAmountSwitch(!sResVis);
-            }
-
-            if (!isVisible(this.exchangeRow)) {
-                this.exchRateSwitch(false);
-            }
-            this.setExchRate(this.model.transaction.exchRate());
-        } else {
-            this.setAmountInputLabel(true, false);
-            this.setAmountInputLabel(false, false);
-            this.setAmountTileBlockLabel(true, false);
-            this.setAmountTileBlockLabel(false, false);
-            if (this.model.transaction.isExpense()) {
-                this.hideSrcAmountAndExchange();
-            } else if (this.model.transaction.isIncome()
-                || this.model.transaction.isTransfer()
-                || this.model.transaction.isDebt()) {
-                this.hideDestAmountAndExchange();
-            }
-
-            if (this.model.transaction.isIncome()
-                || this.model.transaction.isTransfer()
-                || this.model.transaction.isDebt()) {
-                this.srcAmountSwitch(!dResVis && !sResVis);
-            }
-            if (this.model.transaction.isExpense()) {
-                this.destAmountSwitch(!sResVis);
-            }
-
-            if (this.model.transaction.isTransfer()) {
-                if (sResVis && dResVis) {
-                    this.resBalanceDestSwitch(false);
-                }
-            } else if (this.model.transaction.isDebt()) {
-                if (this.model.transaction.noAccount) {
-                    if (this.model.transaction.debtType) {
-                        this.resBalanceDestSwitch(false);
-                    } else {
-                        this.resBalanceSwitch(false);
-                    }
-                }
-            }
-        }
-
-        this.updateCurrSigns();
-        this.updatePersonTile();
-    }
-
-    /**
-     * Destination currency change event handler
-     */
-    onChangeDestCurr() {
-        const destCurr = parseInt(this.destCurrInp.value, 10);
-        this.model.transaction.updateValue('dest_curr', destCurr);
-    }
-
-    /**
-     * Update layout on destination curency changed
-     * @param {number|undefined} value - new destination currency value
-     */
-    onDestCurrChanged(value) {
-        let toShowSrcAmount = false;
-
-        if (typeof value !== 'undefined' && this.destCurrInp) {
-            this.destCurrInp.value = value;
-        }
-
-        const sAmVis = isVisible(this.srcAmountRow);
-        const dAmVis = isVisible(this.destAmountRow);
-        const sResVis = isVisible(this.srcResBalanceRow);
-        const dResVis = isVisible(this.destResBalanceRow);
-        const exchVis = isVisible(this.exchangeRow);
-
-        if (this.model.transaction.isDiff()) {
-            this.setAmountInputLabel(true, true);
-            this.setAmountTileBlockLabel(true, true);
-            this.setAmountInputLabel(false, true);
-            this.setAmountTileBlockLabel(false, true);
-            /** Set source active for Income and inactivate for other types */
-            if (this.model.transaction.isIncome()) {
-                this.setCurrActive(true, true); // set source active
-            } else {
-                this.setCurrActive(true, false); // set source inactive
-            }
-
-            /** set destination active for Expense and inactivate for other types */
-            if (this.model.transaction.isExpense()) {
-                this.setCurrActive(false, true);
-            } else {
-                this.setCurrActive(false, false);
-            }
-
-            if (this.model.transaction.isIncome()) {
-                toShowSrcAmount = (sAmVis && dAmVis) || (sAmVis && dResVis) || (sAmVis && exchVis);
-            } else if (this.model.transaction.isExpense()) {
-                toShowSrcAmount = true;
-            } else if (this.model.transaction.isTransfer()) {
-                toShowSrcAmount = !sResVis;
-            }
-            this.srcAmountSwitch(toShowSrcAmount);
-
-            if (this.model.transaction.isTransfer()) {
-                this.destAmountSwitch(!dResVis && !(sResVis && exchVis) && !(sAmVis && exchVis));
-            }
-
-            if (!isVisible(this.exchangeRow)) {
-                this.exchRateSwitch(false);
-            }
-            this.setExchRate(this.model.transaction.exchRate());
-        } else {
-            this.setAmountInputLabel(true, false);
-            this.setAmountInputLabel(false, false);
-            this.setAmountTileBlockLabel(true, false);
-            this.setAmountTileBlockLabel(false, false);
-
-            if (this.model.transaction.isExpense()) {
-                this.destAmountSwitch(!sResVis);
-                this.hideSrcAmountAndExchange();
-            } else {
-                this.srcAmountSwitch(!dResVis && !sResVis);
-                this.hideDestAmountAndExchange();
-            }
-
-            if (this.model.transaction.isTransfer()) {
-                if (sResVis && dResVis) {
-                    this.resBalanceSwitch(false);
-                }
-            } else if (this.model.transaction.isDebt()) {
-                if (this.model.transaction.noAccount) {
-                    if (this.model.transaction.debtType) {
-                        this.resBalanceDestSwitch(false);
-                    } else {
-                        this.resBalanceSwitch(false);
-                    }
-                }
-            }
-        }
-
-        this.updateCurrSigns();
-        this.updatePersonTile();
+    onDestResultInput(e) {
+        this.store.dispatch(destResultChange(e.target.value));
     }
 
     /**
@@ -1598,6 +938,448 @@ class TransactionView extends View {
             content: singleTransDeleteMsg,
             onconfirm: () => this.deleteForm.submit(),
         });
+    }
+
+    replaceHistory(state) {
+        const { transaction } = state;
+        const baseAddress = (state.isUpdate)
+            ? `${baseURL}transactions/edit/${transaction.id}`
+            : `${baseURL}transactions/new/`;
+
+        const url = new URL(baseAddress);
+        const typeStr = getTransactionTypeString(transaction.type);
+        url.searchParams.set('type', typeStr);
+
+        if (transaction.type === EXPENSE || transaction.type === TRANSFER) {
+            url.searchParams.set('acc_id', transaction.src_id);
+        } else if (transaction.type === INCOME) {
+            url.searchParams.set('acc_id', transaction.dest_id);
+        } else if (transaction.type === DEBT) {
+            if (transaction.noAccount) {
+                url.searchParams.delete('acc_id');
+            } else {
+                url.searchParams.set('acc_id', state.account.id);
+            }
+        }
+
+        const title = (state.isUpdate)
+            ? 'Jezve Money | Edit transaction'
+            : 'Jezve Money | New transaction';
+
+        window.history.replaceState({}, title, url);
+    }
+
+    renderExchangeRate(state) {
+        const srcCurr = state.srcCurrency;
+        const destCurr = state.destCurrency;
+
+        const exchSigns = `${destCurr.sign}/${srcCurr.sign}`;
+        this.exchangeSign.textContent = exchSigns;
+
+        let exchText = exchSigns;
+        const normExch = normalizeExch(state.form.exchange);
+        if (isValidValue(normExch) && normExch !== 1 && normExch !== 0) {
+            const fsa = state.transaction.src_amount;
+            const fda = state.transaction.dest_amount;
+            const invExch = parseFloat((fsa / fda).toFixed(5));
+
+            exchText += ` (${invExch} ${srcCurr.sign}/${destCurr.sign})`;
+        }
+
+        if (this.exchangeInfo) {
+            this.exchangeInfo.setTitle(`${normExch} ${exchText}`);
+        }
+    }
+
+    renderExpense(state) {
+        this.resBalanceDestSwitch(HIDE_BOTH);
+
+        if (state.id === 0) {
+            this.srcAmountSwitch(HIDE_BOTH);
+            this.destAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (state.id === 1) {
+            this.srcAmountSwitch(HIDE_BOTH);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (state.id === 2) {
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INFO);
+        } else if (state.id === 3) {
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INPUT);
+        } else if (state.id === 4) {
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.exchRateSwitch(SHOW_INFO);
+        }
+
+        addChilds(this.srcTileInfoBlock, [
+            this.destAmountInfo.elem,
+            this.srcResBalanceInfo.elem,
+            this.exchangeInfo.elem,
+        ]);
+
+        this.srcResBalanceRowLabel.textContent = 'Result balance';
+        this.destResBalanceRowLabel.textContent = 'Result balance';
+
+        this.setCurrActive(true, false); // set source currency inactive
+        this.setCurrActive(false, true); // set destination currency active
+    }
+
+    renderIncome(state) {
+        if (state.id === 0) {
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(HIDE_BOTH);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (state.id === 1) {
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(HIDE_BOTH);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (state.id === 2) {
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INFO);
+        } else if (state.id === 3) {
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INPUT);
+        } else if (state.id === 4) {
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(SHOW_INFO);
+        }
+
+        addChilds(this.destTileInfoBlock, [
+            this.destAmountInfo.elem,
+            this.destResBalanceInfo.elem,
+            this.exchangeInfo.elem,
+        ]);
+
+        this.srcResBalanceRowLabel.textContent = 'Result balance';
+        this.destResBalanceRowLabel.textContent = 'Result balance';
+
+        this.setCurrActive(true, true); // set source currency active
+        this.setCurrActive(false, false); // set destination currency inactive
+    }
+
+    renderTransfer(state) {
+        if (state.id === 0) {
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(HIDE_BOTH);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (state.id === 1) {
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(HIDE_BOTH);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (state.id === 2) {
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(HIDE_BOTH);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (state.id === 3) {
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INFO);
+        } else if (state.id === 4) {
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INFO);
+        } else if (state.id === 5) {
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(SHOW_INFO);
+        } else if (state.id === 6) {
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(SHOW_INFO);
+        } else if (state.id === 7) {
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INPUT);
+        } else if (state.id === 8) {
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INPUT);
+        }
+
+        addChilds(this.srcTileInfoBlock, [
+            this.srcAmountInfo.elem,
+            this.srcResBalanceInfo.elem,
+            this.exchangeInfo.elem,
+        ]);
+        addChilds(this.destTileInfoBlock, [
+            this.destAmountInfo.elem,
+            this.destResBalanceInfo.elem,
+        ]);
+
+        this.srcResBalanceRowLabel.textContent = 'Result balance (Source)';
+        this.destResBalanceRowLabel.textContent = 'Result balance (Destination)';
+
+        this.setCurrActive(true, false); // set source currency inactive
+        this.setCurrActive(false, false); // set destination currency inactive
+    }
+
+    renderDebt(state) {
+        this.destAmountSwitch(HIDE_BOTH);
+        this.exchRateSwitch(HIDE_BOTH);
+
+        if (state.id === 0 || state.id === 3) {
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+        } else if (state.id === 1 || state.id === 5) {
+            this.srcAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(SHOW_INFO);
+        } else if (state.id === 2 || state.id === 4) {
+            this.srcAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+        } else if (state.id === 6) {
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(HIDE_BOTH);
+        } else if (state.id === 7) {
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(HIDE_BOTH);
+            this.resBalanceDestSwitch(SHOW_INFO);
+        } else if (state.id === 8) {
+            this.srcAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(HIDE_BOTH);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+        } else if (state.id === 9) {
+            this.srcAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(HIDE_BOTH);
+        }
+
+        const { debtType, noAccount } = state.transaction;
+
+        addChilds(this.personTileInfoBlock, [
+            this.srcAmountInfo.elem,
+            (debtType) ? this.srcResBalanceInfo.elem : this.destResBalanceInfo.elem,
+            (debtType) ? this.exchangeInfo.elem : this.destAmountInfo.elem,
+        ]);
+
+        addChilds(this.debtAccTileInfoBlock, [
+            (debtType) ? this.destResBalanceInfo.elem : this.srcResBalanceInfo.elem,
+            (debtType) ? this.destAmountInfo.elem : this.exchangeInfo.elem,
+        ]);
+
+        if (noAccount) {
+            this.debtAccountLabel.textContent = 'No account';
+        } else {
+            this.debtAccountLabel.textContent = (debtType) ? 'Destination account' : 'Source account';
+        }
+
+        this.debtGiveRadio.checked = debtType;
+        this.debtTakeRadio.checked = !debtType;
+
+        show(this.noAccountBtn, !noAccount);
+        show(this.debtAccountTileBase, !noAccount);
+        show(this.selectAccountBtn, noAccount);
+
+        this.srcResBalanceRowLabel.textContent = (debtType) ? 'Result balance (Person)' : 'Result balance (Account)';
+        this.destResBalanceRowLabel.textContent = (debtType) ? 'Result balance (Account)' : 'Result balance (Person)';
+
+        this.setCurrActive(true, false); // set source currency inactive
+        this.setCurrActive(false, false); // set destination currency inactive
+
+        this.personIdInp.value = state.person.id;
+
+        const currencyModel = window.app.model.currency;
+        const srcCurrency = currencyModel.getItem(state.transaction.src_curr);
+        const personBalance = srcCurrency.formatValue(state.personAccount.balance);
+        this.personTile.render({
+            title: state.person.name,
+            subtitle: personBalance,
+        });
+
+        this.debtAccountInp.value = (noAccount) ? 0 : state.account.id;
+
+        this.initPersonList();
+        const personId = state.transaction.person_id;
+        this.appendHiddenPerson(this.persDDList, personId);
+        this.persDDList.selectItem(personId);
+
+        if (!noAccount) {
+            this.debtAccountTile.render(state.account);
+            if (!this.accDDList) {
+                this.initAccList();
+            }
+        }
+    }
+
+    render(state) {
+        if (!state) {
+            throw new Error('Invalid state');
+        }
+
+        this.replaceHistory(state);
+
+        const { transaction } = state;
+
+        show(this.srcContainer, transaction.type === EXPENSE || transaction.type === TRANSFER);
+        show(this.destContainer, transaction.type === INCOME || transaction.type === TRANSFER);
+        show(this.personContainer, transaction.type === DEBT);
+        show(this.debtAccountContainer, transaction.type === DEBT);
+        show(this.debtOpControls, transaction.type === DEBT);
+
+        if (transaction.type === EXPENSE) {
+            this.renderExpense(state);
+        } else if (transaction.type === INCOME) {
+            this.renderIncome(state);
+        } else if (transaction.type === TRANSFER) {
+            this.renderTransfer(state);
+        } else if (transaction.type === DEBT) {
+            this.renderDebt(state);
+        }
+
+        if (transaction.type === EXPENSE || transaction.type === TRANSFER) {
+            if (this.srcTile && state.srcAccount) {
+                this.srcTile.render(state.srcAccount);
+            }
+
+            this.initSrcAccList();
+            if (this.srcDDList && transaction.src_id) {
+                this.srcDDList.selectItem(transaction.src_id);
+            }
+        }
+
+        if (transaction.type === INCOME || transaction.type === TRANSFER) {
+            if (this.destTile && state.destAccount) {
+                this.destTile.render(state.destAccount);
+            }
+
+            this.initDestAccList();
+            if (this.destDDList && transaction.dest_id) {
+                this.destDDList.selectItem(transaction.dest_id);
+            }
+        }
+
+        this.typeInp.value = transaction.type;
+
+        enable(this.srcIdInp, transaction.type !== DEBT);
+        enable(this.destIdInp, transaction.type !== DEBT);
+        enable(this.personIdInp, transaction.type === DEBT);
+        enable(this.debtAccountInp, transaction.type === DEBT);
+
+        this.srcIdInp.value = transaction.src_id;
+        this.destIdInp.value = transaction.dest_id;
+        this.srcCurrInp.value = transaction.src_curr;
+        this.destCurrInp.value = transaction.dest_curr;
+        if (transaction.type === INCOME) {
+            this.initSrcCurrList();
+        }
+        if (transaction.type === EXPENSE) {
+            this.initDestCurrList();
+        }
+
+        const sourceAmountLbl = (state.isDiff) ? 'Source amount' : 'Amount';
+        const destAmountLbl = (state.isDiff) ? 'Destination amount' : 'Amount';
+        if (this.srcAmountRowLabel) {
+            this.srcAmountRowLabel.textContent = sourceAmountLbl;
+        }
+        if (this.destAmountRowLabel) {
+            this.destAmountRowLabel.textContent = destAmountLbl;
+        }
+
+        this.setSign(this.destAmountSign, this.destCurrDDList, transaction.dest_curr);
+        this.setSign(this.srcAmountSign, this.srcCurrDDList, transaction.src_curr);
+        this.setSign(this.srcResBalanceSign, null, transaction.src_curr);
+        this.setSign(this.destResBalanceSign, null, transaction.dest_curr);
+        this.renderExchangeRate(state);
+
+        this.srcAmountInput.value = state.form.sourceAmount;
+        this.destAmountInput.value = state.form.destAmount;
+        if (this.exchangeInput) {
+            this.exchangeInput.value = state.form.exchange;
+        }
+        if (this.srcResBalanceInput) {
+            this.srcResBalanceInput.value = state.form.sourceResult;
+        }
+        if (this.destResBalanceInput) {
+            this.destResBalanceInput.value = state.form.destResult;
+        }
+
+        const currencyModel = window.app.model.currency;
+        const srcCurrency = currencyModel.getItem(transaction.src_curr);
+        const destCurrency = currencyModel.getItem(transaction.dest_curr);
+
+        if (this.srcAmountInfo) {
+            const title = srcCurrency.formatValue(transaction.src_amount);
+            this.srcAmountInfo.setTitle(title);
+            this.srcAmountInfo.setLabel(sourceAmountLbl);
+        }
+
+        if (this.destAmountInfo) {
+            const title = destCurrency.formatValue(transaction.dest_amount);
+            this.destAmountInfo.setTitle(title);
+            this.destAmountInfo.setLabel(destAmountLbl);
+        }
+
+        if (this.srcResBalanceInfo) {
+            const title = srcCurrency.formatValue(state.form.fSourceResult);
+            this.srcResBalanceInfo.setTitle(title);
+        }
+
+        if (this.destResBalanceInfo) {
+            const title = destCurrency.formatValue(state.form.fDestResult);
+            this.destResBalanceInfo.setTitle(title);
+        }
+
+        if (state.validation.sourceAmount) {
+            this.clearBlockValidation('src_amount_row');
+        } else {
+            this.invalidateBlock('src_amount_row');
+        }
+
+        if (state.validation.destAmount) {
+            this.clearBlockValidation('dest_amount_row');
+        } else {
+            this.invalidateBlock('dest_amount_row');
+        }
+
+        if (state.validation.date) {
+            this.clearBlockValidation('date_block');
+        } else {
+            this.invalidateBlock('date_block');
+        }
     }
 }
 

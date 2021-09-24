@@ -29,6 +29,11 @@ export class TileInfoItem extends Component {
             throw new Error('Invalid element specified');
         }
 
+        this.labelElem = this.elem.firstElementChild;
+        if (this.labelElem) {
+            this.label = this.labelElem.textContent;
+        }
+
         this.buttonElem = this.elem.querySelector('button');
         if (this.buttonElem && isFunction(this.props.onclick)) {
             this.buttonElem.addEventListener('click', this.props.onclick);
@@ -38,6 +43,23 @@ export class TileInfoItem extends Component {
         if (this.titleElem) {
             this.title = this.titleElem.textContent;
         }
+    }
+
+    /**
+     * Set label of component
+     * @param {string|null} label - label to set
+     */
+    setLabel(label) {
+        if (typeof label !== 'string') {
+            throw new Error('Invalid label specified');
+        }
+
+        if (this.label === label) {
+            return;
+        }
+
+        this.label = label;
+        this.labelElem.textContent = this.label;
     }
 
     /**

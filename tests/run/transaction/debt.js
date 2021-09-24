@@ -1,7 +1,6 @@
 import { test } from 'jezve-test';
 import * as TransactionTests from './common.js';
 import { DEBT } from '../../model/Transaction.js';
-import { DebtTransactionView } from '../../view/transaction/DebtTransactionView.js';
 import { App } from '../../Application.js';
 
 export async function submit(params) {
@@ -47,7 +46,10 @@ export async function update(params) {
             expState = (App.view.model.debtType) ? 0 : 3;
         }
 
-        await test('Initial state of update debt view', () => App.view.setExpectedState(expState), App.view);
+        await test('Initial state of update debt view', () => {
+            App.view.setExpectedState(expState);
+            return App.view.checkState();
+        });
 
         return submit(submitParams);
     });
@@ -64,17 +66,17 @@ export async function stateLoop() {
         'Maria', 'Johnny',
     ]);
 
-    // Navigate to create income view
-    if (!(App.view instanceof DebtTransactionView)) {
-        await App.goToMainView();
-        await App.view.goToNewTransactionByAccount(0);
-        if (!App.view.content.typeMenu.isSingleSelected(DEBT)) {
-            await App.view.changeTransactionType(DEBT);
-        }
-    }
+    // Navigate to create debt view
+    await App.goToMainView();
+    await App.view.goToNewTransactionByAccount(0);
+    await App.view.changeTransactionType(DEBT);
 
     App.view.setBlock('Debt loop', 2);
-    await test('Initial state of new debt view', async () => App.view.setExpectedState(0));
+    const initialState = (App.view.model.debtType) ? 0 : 3;
+    await test('Initial state of new debt view', () => {
+        App.view.setExpectedState(initialState);
+        return App.view.checkState();
+    });
 
     // Input source amount
     const saInputData = [
@@ -114,6 +116,8 @@ export async function stateLoop() {
     await TransactionTests.runGroup('inputResBalance', srbInputData);
 
     await TransactionTests.runActions([
+        // Transition 8: Change debt type to "give" and move from State 3 to State 0
+        { action: 'toggleDebtType' },
         // Transition 2: Click by source amount and move from State 1 to State 0
         { action: 'clickSrcAmount' },
         // Transition 3: Click by destination result balance and move from State 0 to State 2

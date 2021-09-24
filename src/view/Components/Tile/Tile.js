@@ -14,14 +14,8 @@ export class Tile extends Component {
      * Create new Tile from specified element
      */
     static fromElement(props) {
-        let res;
-
-        try {
-            res = new Tile(props);
-            res.parse();
-        } catch {
-            return null;
-        }
+        const res = new Tile(props);
+        res.parse();
 
         return res;
     }
