@@ -35,20 +35,23 @@ export class AppView extends TestView {
     async parse() {
         this.location = await this.url();
 
-        this.header = await Header.create(this, await this.query('.page > .page_wrapper > .header'));
+
+        this.content = await this.parseContent();
+
+        this.content.header = await Header.create(this, await this.query('.page > .page_wrapper > .header'));
 
         const msgElem = await this.query('.popup__content.msg');
-        this.msgPopup = (msgElem) ? await MessagePopup.create(this, msgElem) : null;
-        this.content = await this.parseContent();
+        this.content.msgPopup = (msgElem) ? await MessagePopup.create(this, msgElem) : null;
+
         await this.updateModel();
     }
 
     async closeNotification() {
-        if (!this.msgPopup) {
+        if (!this.content.msgPopup) {
             return;
         }
 
-        await this.performAction(() => this.msgPopup.close());
+        await this.performAction(() => this.content.msgPopup.close());
     }
 
     /** Click on profile menu item and return navigation promise */
@@ -57,16 +60,16 @@ export class AppView extends TestView {
             throw new Error('User is not logged in');
         }
 
-        await this.click(this.header.user.menuBtn); // open user menu
+        await this.click(this.content.header.user.menuBtn); // open user menu
 
-        await this.navigation(() => this.click(this.header.user.profileBtn));
+        await this.navigation(() => this.click(this.content.header.user.profileBtn));
     }
 
     /** Click on logout link from user menu and return navigation promise */
     async logoutUser() {
-        await this.click(this.header.user.menuBtn);
+        await this.click(this.content.header.user.menuBtn);
 
-        await this.navigation(() => this.click(this.header.user.logoutBtn));
+        await this.navigation(() => this.click(this.content.header.user.logoutBtn));
     }
 
     async goToMainView() {
@@ -74,6 +77,22 @@ export class AppView extends TestView {
             throw new Error('User not logged in');
         }
 
-        await this.navigation(() => this.click(this.header.logo.linkElem));
+        await this.navigation(() => this.click(this.content.header.logo.linkElem));
+    }
+
+    async checkState(state) {
+        const stateObj = (typeof state === 'undefined') ? this.expectedState : state;
+        if (!stateObj) {
+            throw new Error('Invalid expected state object');
+        }
+
+        if (!stateObj.msgPopup) {
+            stateObj.msgPopup = null;
+        }
+
+        await this.checkVisibility(this.content, stateObj.visibility);
+        this.checkValues(stateObj.values);
+
+        return true;
     }
 }

@@ -569,7 +569,7 @@ export class ImportView extends AppView {
                 return true;
             }
 
-            const notification = await TestComponent.isVisible(this.msgPopup, true);
+            const notification = await TestComponent.isVisible(this.content.msgPopup, true);
             if (notification) {
                 return true;
             }
