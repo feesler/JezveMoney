@@ -1,37 +1,39 @@
-import { TestComponent } from 'jezve-test';
+import { AppComponent } from '../AppComponent.js';
 import { ImportCondition } from '../../../model/ImportCondition.js';
 import { Currency } from '../../../model/Currency.js';
 import { App } from '../../../Application.js';
 
-export class ImportConditionItem extends TestComponent {
-    async parse() {
+export class ImportConditionItem extends AppComponent {
+    async parseContent() {
         if (!this.elem) {
             throw new Error('Invalid import condition item');
         }
 
-        this.propertyTitle = { elem: await this.query(this.elem, '.cond-item__property') };
-        this.operatorTitle = { elem: await this.query(this.elem, '.cond-item__operator') };
-        this.valueTitle = { elem: await this.query(this.elem, '.cond-item__value') };
-        this.valuePropTitle = { elem: await this.query(this.elem, '.cond-item__value-property') };
+        const res = {
+            propertyTitle: { elem: await this.query(this.elem, '.cond-item__property') },
+            operatorTitle: { elem: await this.query(this.elem, '.cond-item__operator') },
+            valueTitle: { elem: await this.query(this.elem, '.cond-item__value') },
+            valuePropTitle: { elem: await this.query(this.elem, '.cond-item__value-property') },
+        };
 
         if (
-            !this.propertyTitle.elem
-            || !this.operatorTitle.elem
-            || (!this.valueTitle.elem && !this.valuePropTitle.elem)
+            !res.propertyTitle.elem
+            || !res.operatorTitle.elem
+            || (!res.valueTitle.elem && !res.valuePropTitle.elem)
         ) {
             throw new Error('Invalid structure of condition item');
         }
 
-        this.propertyTitle.value = await this.prop(this.propertyTitle.elem, 'textContent');
-        this.operatorTitle.value = await this.prop(this.operatorTitle.elem, 'textContent');
-        if (this.valueTitle.elem) {
-            this.valueTitle.value = await this.prop(this.valueTitle.elem, 'textContent');
+        res.propertyTitle.value = await this.prop(res.propertyTitle.elem, 'textContent');
+        res.operatorTitle.value = await this.prop(res.operatorTitle.elem, 'textContent');
+        if (res.valueTitle.elem) {
+            res.valueTitle.value = await this.prop(res.valueTitle.elem, 'textContent');
         }
-        if (this.valuePropTitle.elem) {
-            this.valuePropTitle.value = await this.prop(this.valuePropTitle.elem, 'textContent');
+        if (res.valuePropTitle.elem) {
+            res.valuePropTitle.value = await this.prop(res.valuePropTitle.elem, 'textContent');
         }
 
-        this.model = this.buildModel(this);
+        return res;
     }
 
     buildModel(cont) {

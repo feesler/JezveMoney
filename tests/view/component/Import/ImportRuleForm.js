@@ -1,4 +1,5 @@
-import { TestComponent, copyObject } from 'jezve-test';
+import { copyObject } from 'jezve-test';
+import { AppComponent } from '../AppComponent.js';
 import { Currency } from '../../../model/Currency.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import { ImportRule } from '../../../model/ImportRule.js';
@@ -12,89 +13,107 @@ import { ImportActionForm } from './ImportActionForm.js';
 import { asyncMap } from '../../../common.js';
 import { App } from '../../../Application.js';
 
-export class ImportRuleForm extends TestComponent {
-    async parse() {
+
+class ImportRuleAccordion extends AppComponent {
+    async parseContent() {
+        if (!this.elem) {
+            throw new Error('Invalid import rule accordion element');
+        }
+
+        const res = {
+            collapsed: !(await this.hasClass(this.elem, 'collapsible__expanded')),
+            headerElem: await this.query(this.elem, '.collapsible-header'),
+            labelElem: await this.query(this.elem, '.collapsible-header label'),
+            createBtn: await this.query(this.elem, '.collapsible-header .create-btn'),
+            toggleBtn: await this.query(this.elem, '.collapsible-header .toggle-btn'),
+            contentElem: await this.query(this.elem, '.collapsible-content'),
+        };
+
+        if (
+            !res.headerElem
+            || !res.labelElem
+            || !res.createBtn
+            || !res.toggleBtn
+            || !res.contentElem
+        ) {
+            throw new Error('Invalid structure of import rule accordion');
+        }
+
+        res.title = await this.prop(res.labelElem, 'textContent');
+
+        return res;
+    }
+
+    isCollapsed() {
+        return this.content.collapsed;
+    }
+
+    async toggle() {
+        await this.click(this.content.headerElem);
+    }
+
+    async create() {
+        await this.click(this.content.createBtn);
+    }
+}
+
+export class ImportRuleForm extends AppComponent {
+    async parseContent() {
+        const res = {};
+
         const accordionElems = await this.queryAll(this.elem, '.rule-form-collapse');
-        const accordionItems = await asyncMap(
-            accordionElems,
-            async (elem) => {
-                const res = {
-                    elem,
-                    collapsed: !(await this.hasClass(elem, 'collapsible__expanded')),
-                    headerElem: await this.query(elem, '.collapsible-header'),
-                    labelElem: await this.query(elem, '.collapsible-header label'),
-                    createBtn: await this.query(elem, '.collapsible-header .create-btn'),
-                    toggleBtn: await this.query(elem, '.collapsible-header .toggle-btn'),
-                    contentElem: await this.query(elem, '.collapsible-content'),
-                };
-
-                if (
-                    !res.elem
-                    || !res.headerElem
-                    || !res.labelElem
-                    || !res.createBtn
-                    || !res.toggleBtn
-                    || !res.contentElem
-                ) {
-                    throw new Error('Invalid structure of import rule form');
-                }
-
-                res.title = await this.prop(res.labelElem, 'textContent');
-
-                return res;
-            },
-        );
+        const accordionItems = await asyncMap(accordionElems, (elem) => ImportRuleAccordion.create(this, elem));
 
         accordionItems.forEach((item) => {
-            if (item.title === 'Conditions') {
-                this.conditionsList = item;
-            } else if (item.title === 'Actions') {
-                this.actionsList = item;
+            if (item.content.title === 'Conditions') {
+                res.conditionsList = item;
+            } else if (item.content.title === 'Actions') {
+                res.actionsList = item;
             } else {
-                throw new Error(`Unknown container: '${item.title}'`);
+                throw new Error(`Unknown container: '${item.content.title}'`);
             }
         });
 
-        this.idInput = { elem: await this.query(this.elem, 'input[type=hidden]') };
-        this.submitBtn = { elem: await this.query(this.elem, '.rule-form__controls .submit-btn') };
-        this.cancelBtn = { elem: await this.query(this.elem, '.rule-form__controls .cancel-btn') };
-        this.feedbackElem = { elem: await this.query(this.elem, '.rule-form__feedback .invalid-feedback') };
+        res.idInput = { elem: await this.query(this.elem, 'input[type=hidden]') };
+        res.submitBtn = { elem: await this.query(this.elem, '.rule-form__controls .submit-btn') };
+        res.cancelBtn = { elem: await this.query(this.elem, '.rule-form__controls .cancel-btn') };
+        res.feedbackElem = { elem: await this.query(this.elem, '.rule-form__feedback .invalid-feedback') };
         if (
-            !this.idInput.elem
-            || !this.conditionsList
-            || !this.conditionsList.elem
-            || !this.actionsList
-            || !this.actionsList.elem
-            || !this.submitBtn.elem
-            || !this.cancelBtn.elem
-            || !this.feedbackElem.elem
+            !res.idInput.elem
+            || !res.conditionsList
+            || !res.conditionsList.elem
+            || !res.actionsList
+            || !res.actionsList.elem
+            || !res.submitBtn.elem
+            || !res.cancelBtn.elem
+            || !res.feedbackElem.elem
         ) {
             throw new Error('Invalid structure of import rule from');
         }
 
-        this.idInput.value = await this.prop(this.idInput.elem, 'value');
+        res.idInput.value = await this.prop(res.idInput.elem, 'value');
 
-        const condFormElems = await this.queryAll(this.conditionsList.elem, '.cond-form');
-        this.conditionsList.items = await asyncMap(
+        const condFormElems = await this.queryAll(res.conditionsList.elem, '.cond-form');
+        res.conditionsList.content.items = await asyncMap(
             condFormElems,
             (elem) => ImportConditionForm.create(this, elem),
         );
 
-        const actElems = await this.queryAll(this.actionsList.elem, '.action-form');
-        this.actionsList.items = await asyncMap(
+        const actElems = await this.queryAll(res.actionsList.elem, '.action-form');
+        res.actionsList.content.items = await asyncMap(
             actElems,
             (elem) => ImportActionForm.create(this, elem),
         );
 
-        this.model = await this.buildModel(this);
+        return res;
     }
 
     async buildModel(cont) {
         const res = {
-            conditions: cont.conditionsList.items.map(
+            conditions: cont.conditionsList.content.items.map(
                 (item) => copyObject(item.model),
             ),
-            actions: cont.actionsList.items.map(
+            actions: cont.actionsList.content.items.map(
                 (item) => copyObject(item.model),
             ),
         };
@@ -179,8 +198,8 @@ export class ImportRuleForm extends TestComponent {
     }
 
     async openConditions() {
-        if (this.conditionsList.collapsed) {
-            await this.click(this.conditionsList.headerElem);
+        if (this.content.conditionsList.isCollapsed()) {
+            await this.content.conditionsList.toggle();
             await this.parse();
         }
     }
@@ -305,7 +324,7 @@ export class ImportRuleForm extends TestComponent {
 
         await this.openConditions();
 
-        await this.click(this.conditionsList.createBtn);
+        await this.content.conditionsList.create();
         await this.parse();
 
         await this.checkState();
@@ -313,7 +332,7 @@ export class ImportRuleForm extends TestComponent {
 
     async deleteCondition(index) {
         const ind = parseInt(index, 10);
-        if (Number.isNaN(ind) || ind < 0 || ind >= this.conditionsList.items.length) {
+        if (Number.isNaN(ind) || ind < 0 || ind >= this.content.conditionsList.content.items.length) {
             throw new Error(`Invalid condition index: ${index}`);
         }
 
@@ -322,7 +341,7 @@ export class ImportRuleForm extends TestComponent {
 
         await this.openConditions();
 
-        const item = this.conditionsList.items[index];
+        const item = this.content.conditionsList.content.items[index];
 
         await item.clickDelete();
         await this.parse();
@@ -332,20 +351,20 @@ export class ImportRuleForm extends TestComponent {
 
     async runOnCondition(index, { action, data }) {
         const ind = parseInt(index, 10);
-        if (Number.isNaN(ind) || ind < 0 || ind >= this.conditionsList.items.length) {
+        if (Number.isNaN(ind) || ind < 0 || ind >= this.content.conditionsList.content.items.length) {
             throw new Error(`Invalid condition index: ${index}`);
         }
 
         await this.openConditions();
 
-        const item = this.conditionsList.items[index];
+        const item = this.content.conditionsList.content.items[index];
         await item.runAction(action, data);
         await this.parse();
     }
 
     async openActions() {
-        if (this.actionsList.collapsed) {
-            await this.click(this.actionsList.headerElem);
+        if (this.content.actionsList.isCollapsed()) {
+            await this.content.actionsList.toggle();
             await this.parse();
         }
     }
@@ -361,7 +380,7 @@ export class ImportRuleForm extends TestComponent {
 
         await this.openActions();
 
-        await this.click(this.actionsList.createBtn);
+        await this.content.actionsList.create();
         await this.parse();
 
         return this.checkState();
@@ -369,7 +388,7 @@ export class ImportRuleForm extends TestComponent {
 
     async deleteAction(index) {
         const ind = parseInt(index, 10);
-        if (Number.isNaN(ind) || ind < 0 || ind >= this.actionsList.items.length) {
+        if (Number.isNaN(ind) || ind < 0 || ind >= this.content.actionsList.content.items.length) {
             throw new Error(`Invalid action index: ${index}`);
         }
 
@@ -378,7 +397,7 @@ export class ImportRuleForm extends TestComponent {
 
         await this.openActions();
 
-        const item = this.actionsList.items[index];
+        const item = this.content.actionsList.content.items[index];
 
         await item.clickDelete();
         await this.parse();
@@ -388,23 +407,23 @@ export class ImportRuleForm extends TestComponent {
 
     async runOnAction(index, { action, data }) {
         const ind = parseInt(index, 10);
-        if (Number.isNaN(ind) || ind < 0 || ind >= this.actionsList.items.length) {
+        if (Number.isNaN(ind) || ind < 0 || ind >= this.content.actionsList.content.items.length) {
             throw new Error(`Invalid action index: ${index}`);
         }
 
         await this.openActions();
 
-        const item = this.actionsList.items[index];
+        const item = this.content.actionsList.content.items[index];
         await item.runAction(action, data);
         await this.parse();
     }
 
     async submit() {
-        await this.click(this.submitBtn.elem);
+        await this.click(this.content.submitBtn.elem);
     }
 
     async cancel() {
-        await this.click(this.cancelBtn.elem);
+        await this.click(this.content.cancelBtn.elem);
     }
 
     /**

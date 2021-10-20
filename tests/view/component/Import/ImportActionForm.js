@@ -1,4 +1,4 @@
-import { TestComponent } from 'jezve-test';
+import { AppComponent } from '../AppComponent.js';
 import { DropDown } from '../DropDown.js';
 import {
     asyncMap,
@@ -30,26 +30,29 @@ const actionValueMap = {
 };
 
 /** Import action form */
-export class ImportActionForm extends TestComponent {
-    async parse() {
-        const fieldElems = await this.queryAll(this.elem, '.field');
-        await asyncMap(fieldElems, (field) => this.parseField(field));
+export class ImportActionForm extends AppComponent {
+    async parseContent() {
+        const res = {
+            deleteBtn: { elem: await this.query(this.elem, '.delete-btn') },
+        };
 
-        this.deleteBtn = { elem: await this.query(this.elem, '.delete-btn') };
+        const fieldElems = await this.queryAll(this.elem, '.field');
+        const fields = await asyncMap(fieldElems, (field) => this.parseField(field));
+        fields.forEach((field) => { res[field.name] = field.component });
 
         if (
-            !this.actionField
-            || !this.transTypeField
-            || !this.accountField
-            || !this.personField
-            || !this.amountField
-            || !this.textField
-            || !this.deleteBtn.elem
+            !res.actionField
+            || !res.transTypeField
+            || !res.accountField
+            || !res.personField
+            || !res.amountField
+            || !res.textField
+            || !res.deleteBtn.elem
         ) {
             throw new Error('Invalid structure of import action form');
         }
 
-        this.model = await this.buildModel(this);
+        return res;
     }
 
     mapField(field) {
@@ -68,8 +71,7 @@ export class ImportActionForm extends TestComponent {
 
         for (const fieldName in fieldsMap) {
             if (fieldsMap[fieldName] === field.title) {
-                this[fieldName] = field;
-                return;
+                return { name: fieldName, component: field };
             }
         }
 
@@ -111,9 +113,7 @@ export class ImportActionForm extends TestComponent {
             res.environment.inject(res);
         }
 
-        this.mapField(res);
-
-        return res;
+        return this.mapField(res);
     }
 
     static getStateName(model) {
@@ -180,7 +180,7 @@ export class ImportActionForm extends TestComponent {
         this.model.value = ImportActionForm.getStateValue(this.model);
         this.expectedState = ImportActionForm.getExpectedState(this.model);
 
-        await this.actionField.dropDown.selectItem(actionId);
+        await this.content.actionField.dropDown.selectItem(actionId);
         await this.parse();
 
         return this.checkState();
@@ -195,7 +195,7 @@ export class ImportActionForm extends TestComponent {
         this.model.value = ImportActionForm.getStateValue(this.model);
         this.expectedState = ImportActionForm.getExpectedState(this.model);
 
-        const control = this[`${name}Field`];
+        const control = this.content[`${name}Field`];
         if (control.dropDown) {
             await control.dropDown.selectItem(value);
         } else {
@@ -227,6 +227,6 @@ export class ImportActionForm extends TestComponent {
     }
 
     async clickDelete() {
-        return this.click(this.deleteBtn.elem);
+        return this.click(this.content.deleteBtn.elem);
     }
 }

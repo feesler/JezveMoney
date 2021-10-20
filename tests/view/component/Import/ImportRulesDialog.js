@@ -1,4 +1,5 @@
-import { TestComponent, copyObject } from 'jezve-test';
+import { copyObject } from 'jezve-test';
+import { AppComponent } from '../AppComponent.js';
 import { ImportRuleForm } from './ImportRuleForm.js';
 import { ImportRuleItem } from './ImportRuleItem.js';
 import { asyncMap } from '../../../common.js';
@@ -7,54 +8,56 @@ import { App } from '../../../Application.js';
 
 /* eslint-disable no-bitwise */
 
-export class ImportRulesDialog extends TestComponent {
-    async parse() {
+export class ImportRulesDialog extends AppComponent {
+    async parseContent() {
         if (!this.elem) {
             throw new Error('Invalid import rules dialog element');
         }
 
-        this.closeBtn = await this.query(this.elem, '.close-btn');
-
-        this.header = {
-            elem: await this.query('.rules-header'),
-            labelElem: await this.query('.rules-header label'),
-            createBtn: await this.query('#createRuleBtn'),
+        const res = {
+            closeBtn: await this.query(this.elem, '.close-btn'),
+            header: {
+                elem: await this.query('.rules-header'),
+                labelElem: await this.query('.rules-header label'),
+                createBtn: await this.query('#createRuleBtn'),
+            },
+            loadingIndicator: { elem: await this.query(this.elem, '.rules-dialog__loading') },
+            rulesList: { elem: await this.query(this.elem, '.rules-list') },
         };
-        this.loadingIndicator = { elem: await this.query(this.elem, '.rules-dialog__loading') };
-        this.rulesList = { elem: await this.query(this.elem, '.rules-list') };
+
         if (
-            !this.closeBtn
-            || !this.header.elem
-            || !this.header.labelElem
-            || !this.header.createBtn
-            || !this.loadingIndicator.elem
-            || !this.rulesList.elem
+            !res.closeBtn
+            || !res.header.elem
+            || !res.header.labelElem
+            || !res.header.createBtn
+            || !res.loadingIndicator.elem
+            || !res.rulesList.elem
         ) {
             throw new Error('Failed to initialize import rules dialog');
         }
 
-        this.rulesList.renderTime = await this.prop(this.rulesList.elem, 'dataset.time');
-        this.header.title = await this.prop(this.header.labelElem, 'textContent');
+        res.rulesList.renderTime = await this.prop(res.rulesList.elem, 'dataset.time');
+        res.header.title = await this.prop(res.header.labelElem, 'textContent');
 
-        const listItems = await this.queryAll(this.rulesList.elem, '.rule-item');
-        this.items = await asyncMap(
+        const listItems = await this.queryAll(res.rulesList.elem, '.rule-item');
+        res.items = await asyncMap(
             listItems,
             (item) => ImportRuleItem.create(this.parent, item),
         );
 
-        this.loadingIndicator.visible = await this.isVisible(this.loadingIndicator.elem, true);
-        this.rulesList.visible = await this.isVisible(this.rulesList.elem, true);
+        res.loadingIndicator.visible = await this.isVisible(res.loadingIndicator.elem, true);
+        res.rulesList.visible = await this.isVisible(res.rulesList.elem, true);
 
         const ruleFormElem = await this.query(this.elem, '.rule-form');
         if (ruleFormElem) {
-            this.ruleForm = await ImportRuleForm.create(this.parent, ruleFormElem);
+            res.ruleForm = await ImportRuleForm.create(this.parent, ruleFormElem);
         }
 
-        this.ruleDeletePopupId = '#rule_delete_warning';
-        const popupElem = await this.query(this.ruleDeletePopupId);
-        this.delete_warning = await WarningPopup.create(this, popupElem);
+        res.ruleDeletePopupId = '#rule_delete_warning';
+        const popupElem = await this.query(res.ruleDeletePopupId);
+        res.delete_warning = await WarningPopup.create(this, popupElem);
 
-        this.model = this.buildModel(this);
+        return res;
     }
 
     buildModel(cont) {
@@ -124,7 +127,7 @@ export class ImportRulesDialog extends TestComponent {
             throw new Error('Invalid state');
         }
 
-        return this.ruleForm.getExpectedRule();
+        return this.content.ruleForm.getExpectedRule();
     }
 
     /** Return validation result for expected import rule */
@@ -133,11 +136,11 @@ export class ImportRulesDialog extends TestComponent {
             throw new Error('Invalid state');
         }
 
-        return this.ruleForm.isValid();
+        return this.content.ruleForm.isValid();
     }
 
     async close() {
-        await this.click(this.closeBtn);
+        await this.click(this.content.closeBtn);
     }
 
     async createRule() {
@@ -152,7 +155,7 @@ export class ImportRulesDialog extends TestComponent {
         };
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.click(this.header.createBtn);
+        await this.click(this.content.header.createBtn);
         await this.waitForFunction(async () => {
             await this.parse();
             return this.model.state === 'create';
@@ -163,7 +166,7 @@ export class ImportRulesDialog extends TestComponent {
 
     async updateRule(index) {
         const ind = parseInt(index, 10);
-        if (Number.isNaN(ind) || ind < 0 || ind >= this.items.length) {
+        if (Number.isNaN(ind) || ind < 0 || ind >= this.content.items.length) {
             throw new Error(`Invalid rule index: ${index}`);
         }
 
@@ -190,7 +193,7 @@ export class ImportRulesDialog extends TestComponent {
         };
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.items[ind].clickUpdate();
+        await this.content.items[ind].clickUpdate();
         await this.waitForFunction(async () => {
             await this.parse();
             return this.model.state === 'update';
@@ -205,28 +208,28 @@ export class ImportRulesDialog extends TestComponent {
         }
 
         const ind = parseInt(index, 10);
-        if (Number.isNaN(ind) || ind < 0 || ind >= this.items.length) {
+        if (Number.isNaN(ind) || ind < 0 || ind >= this.content.items.length) {
             throw new Error(`Invalid rule index: ${index}`);
         }
 
         this.model.rules.splice(ind, 1);
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.items[ind].clickDelete();
-        await this.wait(this.ruleDeletePopupId, { visible: true });
+        await this.content.items[ind].clickDelete();
+        await this.wait(this.content.ruleDeletePopupId, { visible: true });
         await this.parse();
 
-        if (!await TestComponent.isVisible(this.delete_warning)) {
+        if (!await AppComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Delete template warning popup not appear');
         }
-        if (!this.delete_warning.okBtn) {
+        if (!this.content.delete_warning.okBtn) {
             throw new Error('OK button not found');
         }
 
         const prevTime = this.model.renderTime;
 
-        await this.click(this.delete_warning.okBtn);
-        await this.wait(this.ruleDeletePopupId, { hidden: true });
+        await this.click(this.content.delete_warning.okBtn);
+        await this.wait(this.content.ruleDeletePopupId, { hidden: true });
         await this.waitForFunction(async () => {
             await this.parse();
             return (
@@ -244,7 +247,7 @@ export class ImportRulesDialog extends TestComponent {
             throw new Error('Invalid state');
         }
 
-        const valid = this.ruleForm.isValid();
+        const valid = this.content.ruleForm.isValid();
         if (valid) {
             if (this.model.state === 'create') {
                 this.model.rules.push(this.model.rule);
@@ -261,7 +264,7 @@ export class ImportRulesDialog extends TestComponent {
 
         const prevTime = this.model.renderTime;
 
-        await this.ruleForm.submit();
+        await this.content.ruleForm.submit();
         await this.waitForFunction(async () => {
             await this.parse();
             return !valid || (
@@ -282,7 +285,7 @@ export class ImportRulesDialog extends TestComponent {
         this.model.state = 'list';
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.ruleForm.cancel();
+        await this.content.ruleForm.cancel();
         await this.waitForFunction(async () => {
             await this.parse();
             return !this.model.loading && this.isListState();

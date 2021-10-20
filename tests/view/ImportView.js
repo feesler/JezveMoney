@@ -379,7 +379,7 @@ export class ImportView extends AppView {
     async addRuleCondition() {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog;
+        const { ruleForm } = this.content.rulesDialog.content;
         await this.performAction(() => ruleForm.addCondition());
 
         return true;
@@ -388,7 +388,7 @@ export class ImportView extends AppView {
     async deleteRuleCondition(index) {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog;
+        const { ruleForm } = this.content.rulesDialog.content;
         await this.performAction(() => ruleForm.deleteCondition(index));
 
         return true;
@@ -397,7 +397,7 @@ export class ImportView extends AppView {
     async runOnRuleCondition(index, action) {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog;
+        const { ruleForm } = this.content.rulesDialog.content;
         await this.performAction(() => ruleForm.runOnCondition(index, action));
 
         return true;
@@ -406,21 +406,21 @@ export class ImportView extends AppView {
     getRuleConditions() {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog;
+        const { ruleForm } = this.content.rulesDialog.content;
         return copyObject(ruleForm.model.conditions);
     }
 
     getRuleActions() {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog;
+        const { ruleForm } = this.content.rulesDialog.content;
         return copyObject(ruleForm.model.actions);
     }
 
     async addRuleAction() {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog;
+        const { ruleForm } = this.content.rulesDialog.content;
         await this.performAction(() => ruleForm.addAction());
 
         return true;
@@ -429,7 +429,7 @@ export class ImportView extends AppView {
     async deleteRuleAction(index) {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog;
+        const { ruleForm } = this.content.rulesDialog.content;
         await this.performAction(() => ruleForm.deleteAction(index));
 
         return true;
@@ -438,7 +438,7 @@ export class ImportView extends AppView {
     async runOnRuleAction(index, action) {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog;
+        const { ruleForm } = this.content.rulesDialog.content;
         await this.performAction(() => ruleForm.runOnAction(index, action));
 
         return true;

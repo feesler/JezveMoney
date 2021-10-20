@@ -92,7 +92,11 @@ export class AppComponent {
             const control = controls[countrolName];
 
             if (isObject(expVisible)) {
-                res = await this.checkVisibility(control, expVisible);
+                if (control && isFunction(control.checkVisibility)) {
+                    res = await control.checkVisibility(control.content, expVisible);
+                } else {
+                    res = await this.checkVisibility(control, expVisible);
+                }
             } else {
                 factVisible = !!control && await this.isVisible(control.elem, true);
                 res = (expVisible === factVisible);
@@ -106,7 +110,7 @@ export class AppComponent {
         return true;
     }
 
-    checkValues(controls) {
+    checkValues(controls, ret = false) {
         let res = true;
 
         for (const countrolName in controls) {
@@ -121,10 +125,34 @@ export class AppComponent {
             const control = this.content[countrolName];
             const isObj = isObject(control);
 
-            if (isObject(expected) || Array.isArray(expected)) {
-                res = checkObjValue(control, expected, true);
+            if (isObject(expected)) {
+                if (control && isFunction(control.checkValues)) {
+                    res = control.checkValues(expected, true);
+                } else {
+                    res = checkObjValue(control, expected, true);
+                }
                 if (res !== true) {
                     res.key = `${countrolName}.${res.key}`;
+                    break;
+                }
+            } else if (Array.isArray(expected)) {
+                const arrayRes = expected.every((expectedArrayItem, ind) => {
+                    const controlArrayItem = control[ind];
+
+                    if (controlArrayItem && isFunction(controlArrayItem.checkValues)) {
+                        res = controlArrayItem.checkValues(expectedArrayItem, true);
+                    } else {
+                        res = checkObjValue(controlArrayItem, expectedArrayItem, true);
+                    }
+
+                    if (res !== true) {
+                        res.key = `${countrolName}.${res.key}`;
+                    }
+
+                    return res === true;
+                });
+
+                if (!arrayRes) {
                     break;
                 }
             } else if (
@@ -140,7 +168,7 @@ export class AppComponent {
             }
         }
 
-        if (res !== true) {
+        if (res !== true && !ret) {
             let msg;
             if ('expected' in res) {
                 msg = `Not expected value "${res.value}" for (${res.key}) "${res.expected}" is expected`;
