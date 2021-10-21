@@ -32,6 +32,10 @@ const actionValueMap = {
 /** Import action form */
 export class ImportActionForm extends AppComponent {
     async parseContent() {
+        if (!this.elem) {
+            throw new Error('Invalid import action form');
+        }
+
         const res = {
             deleteBtn: { elem: await this.query(this.elem, '.delete-btn') },
         };
