@@ -67,14 +67,13 @@ export class TransactionView extends AppView {
         res.person = await TileBlock.create(this, await this.query('#person'));
         if (res.person) {
             const personIdInp = await this.query('#person_id');
-            res.person.id = parseInt(await this.prop(personIdInp, 'value'), 10);
+            res.person.content.id = parseInt(await this.prop(personIdInp, 'value'), 10);
         }
 
         res.account = await TileBlock.create(this, await this.query('#debtaccount'));
         if (res.account) {
             const accountIdInp = await this.query('#acc_id');
-            res.account.id = parseInt(await this.prop(accountIdInp, 'value'), 10);
-            res.accTileContainer = { elem: await this.query('#debtaccount .tile_container') };
+            res.account.content.id = parseInt(await this.prop(accountIdInp, 'value'), 10);
         }
 
         res.operation = await this.parseOperation(await this.query('#operation'));
@@ -277,7 +276,11 @@ export class TransactionView extends AppView {
         }
 
         if (res.type === DEBT) {
-            res.person = App.state.persons.getItem(cont.person.id);
+            res.person = App.state.persons.getItem(cont.person.content.id);
+            if (!res.person) {
+                throw new Error('Person not found');
+            }
+
             res.debtType = cont.operation.type;
 
             if (res.isDiffCurr) {
@@ -290,7 +293,7 @@ export class TransactionView extends AppView {
             const isSelectAccountVisible = await TestComponent.isVisible(cont.selaccount);
             res.noAccount = isSelectAccountVisible;
 
-            res.account = App.state.accounts.getItem(cont.account.id);
+            res.account = App.state.accounts.getItem(cont.account.content.id);
             if (!res.account && !res.noAccount) {
                 throw new Error('Account not found');
             }
@@ -1430,7 +1433,7 @@ export class TransactionView extends AppView {
     }
 
     async changeSrcAccountByPos(pos) {
-        return this.changeSrcAccount(this.content.source.dropDown.items[pos].id);
+        return this.changeSrcAccount(this.content.source.content.dropDown.items[pos].id);
     }
 
     async changeDestAccount(val) {
@@ -1533,7 +1536,7 @@ export class TransactionView extends AppView {
     }
 
     async changeDestAccountByPos(pos) {
-        return this.changeDestAccount(this.content.destination.dropDown.items[pos].id);
+        return this.changeDestAccount(this.content.destination.content.dropDown.items[pos].id);
     }
 
     async inputSrcAmount(val) {
@@ -2015,7 +2018,7 @@ export class TransactionView extends AppView {
     }
 
     async changePersonByPos(pos) {
-        return this.changePerson(this.content.person.dropDown.items[pos].id);
+        return this.changePerson(this.content.person.content.dropDown.items[pos].id);
     }
 
     async toggleDebtType() {
@@ -2236,6 +2239,6 @@ export class TransactionView extends AppView {
     }
 
     changeAccountByPos(pos) {
-        return this.changeAccount(this.content.account.dropDown.items[pos].id);
+        return this.changeAccount(this.content.account.content.dropDown.items[pos].id);
     }
 }
