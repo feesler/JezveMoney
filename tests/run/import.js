@@ -265,7 +265,7 @@ export async function submitUploaded(params) {
         let itemsList;
         if (params.account) {
             itemsList = {};
-            itemsList.items = App.view.content.itemsList.items.map(
+            itemsList.items = App.view.content.itemsList.content.items.map(
                 (item) => {
                     const model = item.onChangeMainAccount(item.model, params.account);
                     return copyObject(item.getExpectedState(model).values);
@@ -310,7 +310,7 @@ export async function changeMainAccount(accountId) {
         await checkNavigation();
 
         const skipList = [];
-        const itemsData = App.view.content.itemsList.items.map((item) => {
+        const itemsData = App.view.content.itemsList.content.items.map((item) => {
             // Reapply rules
             if (item.model.original && App.view.isRulesEnabled()) {
                 /* eslint-disable-next-line no-param-reassign */
@@ -376,7 +376,7 @@ export async function enableRules(value = true) {
 
         // Apply rules or restore original import data according to enable flag
         // and convert to expected state of ImportListItem component
-        const itemsData = App.view.content.itemsList.items.map((item) => {
+        const itemsData = App.view.content.itemsList.content.items.map((item) => {
             let model;
 
             if (item.model.original) {

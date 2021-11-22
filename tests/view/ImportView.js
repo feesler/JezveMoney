@@ -95,7 +95,7 @@ export class ImportView extends AppView {
         res.rulesCount = parseInt(cont.rulesCount.value, 10);
         res.renderTime = cont.renderTime;
         res.items = cont.itemsList.getItems();
-        res.invalidated = cont.itemsList.invalidated;
+        res.invalidated = cont.itemsList.model.invalidated;
 
         return res;
     }
@@ -280,7 +280,7 @@ export class ImportView extends AppView {
         await this.waitForFunction(async () => {
             await this.parse();
             return (
-                !this.content.itemsList.isLoading
+                !this.content.itemsList.model.isLoading
                 && prevTime !== this.content.renderTime
             );
         });
@@ -309,7 +309,7 @@ export class ImportView extends AppView {
         await this.waitForFunction(async () => {
             await this.parse();
             return (
-                !this.content.itemsList.isLoading
+                !this.content.itemsList.model.isLoading
                 && prevTime !== this.content.renderTime
             );
         });
