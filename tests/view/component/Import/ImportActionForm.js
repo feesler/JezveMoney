@@ -42,7 +42,7 @@ export class ImportActionForm extends AppComponent {
 
         const fieldElems = await this.queryAll(this.elem, '.field');
         const fields = await asyncMap(fieldElems, (field) => this.parseField(field));
-        fields.forEach((field) => { res[field.name] = field.component });
+        fields.forEach((field) => { res[field.name] = field.component; });
 
         if (
             !res.actionField

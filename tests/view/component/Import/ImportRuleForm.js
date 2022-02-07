@@ -9,60 +9,20 @@ import {
 } from '../../../model/ImportCondition.js';
 import { ImportAction } from '../../../model/ImportAction.js';
 import { ImportConditionForm } from './ImportConditionForm.js';
+import { ImportRuleAccordion } from './ImportRuleAccordion.js';
 import { ImportActionForm } from './ImportActionForm.js';
 import { asyncMap } from '../../../common.js';
 import { App } from '../../../Application.js';
-
-
-class ImportRuleAccordion extends AppComponent {
-    async parseContent() {
-        if (!this.elem) {
-            throw new Error('Invalid import rule accordion element');
-        }
-
-        const res = {
-            collapsed: !(await this.hasClass(this.elem, 'collapsible__expanded')),
-            headerElem: await this.query(this.elem, '.collapsible-header'),
-            labelElem: await this.query(this.elem, '.collapsible-header label'),
-            createBtn: await this.query(this.elem, '.collapsible-header .create-btn'),
-            toggleBtn: await this.query(this.elem, '.collapsible-header .toggle-btn'),
-            contentElem: await this.query(this.elem, '.collapsible-content'),
-        };
-
-        if (
-            !res.headerElem
-            || !res.labelElem
-            || !res.createBtn
-            || !res.toggleBtn
-            || !res.contentElem
-        ) {
-            throw new Error('Invalid structure of import rule accordion');
-        }
-
-        res.title = await this.prop(res.labelElem, 'textContent');
-
-        return res;
-    }
-
-    isCollapsed() {
-        return this.content.collapsed;
-    }
-
-    async toggle() {
-        await this.click(this.content.headerElem);
-    }
-
-    async create() {
-        await this.click(this.content.createBtn);
-    }
-}
 
 export class ImportRuleForm extends AppComponent {
     async parseContent() {
         const res = {};
 
         const accordionElems = await this.queryAll(this.elem, '.rule-form-collapse');
-        const accordionItems = await asyncMap(accordionElems, (elem) => ImportRuleAccordion.create(this, elem));
+        const accordionItems = await asyncMap(
+            accordionElems,
+            (elem) => ImportRuleAccordion.create(this, elem),
+        );
 
         accordionItems.forEach((item) => {
             if (item.content.title === 'Conditions') {
@@ -332,7 +292,11 @@ export class ImportRuleForm extends AppComponent {
 
     async deleteCondition(index) {
         const ind = parseInt(index, 10);
-        if (Number.isNaN(ind) || ind < 0 || ind >= this.content.conditionsList.content.items.length) {
+        if (
+            Number.isNaN(ind)
+            || ind < 0
+            || ind >= this.content.conditionsList.content.items.length
+        ) {
             throw new Error(`Invalid condition index: ${index}`);
         }
 
@@ -351,7 +315,11 @@ export class ImportRuleForm extends AppComponent {
 
     async runOnCondition(index, { action, data }) {
         const ind = parseInt(index, 10);
-        if (Number.isNaN(ind) || ind < 0 || ind >= this.content.conditionsList.content.items.length) {
+        if (
+            Number.isNaN(ind)
+            || ind < 0
+            || ind >= this.content.conditionsList.content.items.length
+        ) {
             throw new Error(`Invalid condition index: ${index}`);
         }
 
@@ -388,7 +356,11 @@ export class ImportRuleForm extends AppComponent {
 
     async deleteAction(index) {
         const ind = parseInt(index, 10);
-        if (Number.isNaN(ind) || ind < 0 || ind >= this.content.actionsList.content.items.length) {
+        if (
+            Number.isNaN(ind)
+            || ind < 0
+            || ind >= this.content.actionsList.content.items.length
+        ) {
             throw new Error(`Invalid action index: ${index}`);
         }
 
@@ -407,7 +379,11 @@ export class ImportRuleForm extends AppComponent {
 
     async runOnAction(index, { action, data }) {
         const ind = parseInt(index, 10);
-        if (Number.isNaN(ind) || ind < 0 || ind >= this.content.actionsList.content.items.length) {
+        if (
+            Number.isNaN(ind)
+            || ind < 0
+            || ind >= this.content.actionsList.content.items.length
+        ) {
             throw new Error(`Invalid action index: ${index}`);
         }
 
