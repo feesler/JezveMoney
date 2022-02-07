@@ -269,20 +269,28 @@ export class ImportView extends AppView {
         await this.performAction(() => this.content.uploadDialog.cancelTemplate());
     }
 
-    /** Submit converted file data */
-    async submitUploaded() {
-        this.checkUploadState();
-
+    /** Run action and wait until list finish to load */
+    async waitForList(action) {
         const prevTime = this.model.renderTime;
 
-        await this.performAction(() => this.content.uploadDialog.submit());
-        await this.performAction(() => this.wait(this.uploadPopupId, { hidden: true }));
+        await action.call(this);
+
         await this.waitForFunction(async () => {
             await this.parse();
             return (
                 !this.content.itemsList.model.isLoading
                 && prevTime !== this.content.renderTime
             );
+        });
+    }
+
+    /** Submit converted file data */
+    async submitUploaded() {
+        this.checkUploadState();
+
+        await this.waitForList(async () => {
+            await this.content.uploadDialog.submit();
+            await this.wait(this.uploadPopupId, { hidden: true });
         });
     }
 
@@ -303,16 +311,9 @@ export class ImportView extends AppView {
     async selectMainAccount(val) {
         this.checkMainState();
 
-        const prevTime = this.model.renderTime;
-
-        await this.performAction(() => this.content.mainAccountSelect.selectItem(val));
-        await this.waitForFunction(async () => {
-            await this.parse();
-            return (
-                !this.content.itemsList.model.isLoading
-                && prevTime !== this.content.renderTime
-            );
-        });
+        await this.waitForList(
+            () => this.content.mainAccountSelect.selectItem(val),
+        );
     }
 
     checkRulesFormState() {
