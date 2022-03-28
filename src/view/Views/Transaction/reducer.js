@@ -569,10 +569,6 @@ const reduceDestAccountChange = (state, accountId) => {
             }
         }
 
-        // Copy source amount to destination amount
-        if (!newState.isDiff) {
-            setStateSourceAmount(newState, transaction.dest_amount);
-        }
         updateStateExchange(newState);
 
         newState.isDiff = transaction.src_curr !== transaction.dest_curr;
