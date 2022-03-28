@@ -2381,6 +2381,8 @@ export class Scenario {
         this.environment.setBlock('Delete all items', 2);
         await ImportTests.deleteAllItems();
 
+        // Enable/disable rules
+        this.environment.setBlock('Enable/disable rules', 2);
         // Upload again
         await ImportTests.uploadFile({
             filename: this.uploadFilename,
@@ -2388,8 +2390,6 @@ export class Scenario {
         });
         await ImportTests.submitUploaded({ data: this.csvStatement, account: this.ACC_RUB });
 
-        // Enable/disable rules
-        this.environment.setBlock('Enable/disable rules', 2);
         await ImportTests.enableRules(false);
         await ImportTests.enableRules(true);
 
