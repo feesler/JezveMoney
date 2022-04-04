@@ -1,10 +1,10 @@
-import { TestComponent } from 'jezve-test';
+import { AppComponent } from './AppComponent.js';
 import { Tile } from './Tile.js';
 import { AccountsList } from '../../model/AccountsList.js';
 import { PersonsList } from '../../model/PersonsList.js';
 import { asyncMap } from '../../common.js';
 
-export class TilesList extends TestComponent {
+export class TilesList extends AppComponent {
     constructor(parent, elem, tileClass) {
         super(parent, elem);
 
@@ -15,19 +15,23 @@ export class TilesList extends TestComponent {
         this.tileClass = tileClass;
     }
 
-    async parse() {
-        this.items = [];
+    async parseContent() {
+        const res = {
+            items: [],
+        };
         const listItems = await this.queryAll(this.elem, ':scope > *');
         if (
             !listItems
             || !listItems.length
             || (listItems.length === 1 && await this.hasClass(listItems[0], 'nodata-message'))
         ) {
-            return;
+            return res;
         }
 
-        this.items = await asyncMap(listItems, (item) => this.tileClass.create(this.parent, item));
-        this.items.sort((a, b) => a.id - b.id);
+        res.items = await asyncMap(listItems, (item) => this.tileClass.create(this.parent, item));
+        res.items.sort((a, b) => a.id - b.id);
+
+        return res;
     }
 
     getItemData(item) {
@@ -36,23 +40,27 @@ export class TilesList extends TestComponent {
         }
 
         return {
-            id: item.id,
-            balance: item.balance,
-            name: item.name,
-            isActive: item.isActive,
-            icon_id: item.icon_id,
+            id: item.content.id,
+            balance: item.content.balance,
+            name: item.content.name,
+            isActive: item.content.isActive,
+            icon_id: item.content.icon_id,
         };
     }
 
+    itemsCount() {
+        return this.content.items.length;
+    }
+
     getItems() {
-        return this.items.map(this.getItemData);
+        return this.content.items.map(this.getItemData);
     }
 
     /**
      * @returns {array} active items
      */
     getActive() {
-        return this.items.filter((item) => item.isActive)
+        return this.content.items.filter((item) => item.content.isActive)
             .map(this.getItemData);
     }
 
@@ -60,8 +68,8 @@ export class TilesList extends TestComponent {
      * @returns {number[]} indexes of active items
      */
     getSelectedIndexes() {
-        return this.items.filter((item) => item.isActive)
-            .map((item) => this.items.indexOf(item));
+        return this.content.items.filter((item) => item.content.isActive)
+            .map((item) => this.content.items.indexOf(item));
     }
 
     static renderAccounts(accountsList) {

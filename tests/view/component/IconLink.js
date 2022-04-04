@@ -1,40 +1,45 @@
-import { TestComponent } from 'jezve-test';
+import { AppComponent } from './AppComponent.js';
 
-export class IconLink extends TestComponent {
-    async parse() {
+export class IconLink extends AppComponent {
+    async parseContent() {
         if (!this.elem) {
-            return;
+            return {};
         }
 
         if (!await this.hasClass(this.elem, 'iconlink')) {
             throw new Error('Wrong icon link');
         }
 
-        this.linkElem = await this.query(this.elem, ':scope > *');
-        if (!this.linkElem) {
+        const res = {
+            linkElem: await this.query(this.elem, ':scope > *'),
+        };
+
+        if (!res.linkElem) {
             throw new Error('Link element not found');
         }
 
-        const tagName = await this.prop(this.linkElem, 'tagName');
+        const tagName = await this.prop(res.linkElem, 'tagName');
         if (tagName === 'A') {
-            this.link = await this.prop(this.linkElem, 'href');
+            res.link = await this.prop(res.linkElem, 'href');
         }
 
-        this.titleElem = await this.query(this.linkElem, '.iconlink__content');
-        const titleInner = await this.query(this.titleElem, ':scope > *');
+        res.titleElem = await this.query(res.linkElem, '.iconlink__content');
+        const titleInner = await this.query(res.titleElem, ':scope > *');
         if (!titleInner) {
             throw new Error('Title element not found');
         }
-        this.title = await this.prop(titleInner, 'textContent');
+        res.title = await this.prop(titleInner, 'textContent');
 
         // Subtitle is optional
-        this.subTitleElem = await this.query(this.titleElem, '.iconlink__subtitle');
-        if (this.subTitleElem) {
-            this.subtitle = await this.prop(this.subTitleElem, 'textContent');
+        res.subTitleElem = await this.query(res.titleElem, '.iconlink__subtitle');
+        if (res.subTitleElem) {
+            res.subtitle = await this.prop(res.subTitleElem, 'textContent');
         }
+
+        return res;
     }
 
     async click() {
-        return this.environment.click(this.linkElem);
+        return this.environment.click(this.content.linkElem);
     }
 }

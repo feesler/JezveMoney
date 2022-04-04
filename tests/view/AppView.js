@@ -64,16 +64,16 @@ export class AppView {
             throw new Error('User is not logged in');
         }
 
-        await this.click(this.content.header.user.menuBtn); // open user menu
+        await this.click(this.content.header.content.user.menuBtn); // open user menu
 
-        await this.navigation(() => this.click(this.content.header.user.profileBtn));
+        await this.navigation(() => this.click(this.content.header.content.user.profileBtn));
     }
 
     /** Click on logout link from user menu and return navigation promise */
     async logoutUser() {
-        await this.click(this.content.header.user.menuBtn);
+        await this.click(this.content.header.content.user.menuBtn);
 
-        await this.navigation(() => this.click(this.content.header.user.logoutBtn));
+        await this.navigation(() => this.click(this.content.header.content.user.logoutBtn));
     }
 
     async goToMainView() {
@@ -81,7 +81,7 @@ export class AppView {
             throw new Error('User not logged in');
         }
 
-        await this.navigation(() => this.click(this.content.header.logo.linkElem));
+        await this.navigation(() => this.click(this.content.header.content.logo.linkElem));
     }
 
     async performAction(action) {
@@ -185,7 +185,7 @@ export class AppView {
             const control = this.content[countrolName];
             const isObj = isObject(control);
 
-            if (isObject(expected) || Array.isArray(expected)) {
+            if (isObject(expected)) {
                 if (control && isFunction(control.checkValues)) {
                     res = control.checkValues(expected, true);
                 } else {
@@ -195,13 +195,29 @@ export class AppView {
                     res.key = `${countrolName}.${res.key}`;
                     break;
                 }
+            } else if (Array.isArray(expected)) {
+                for (let ind = 0; ind < expected.length; ind += 1) {
+                    const expectedArrayItem = expected[ind];
+                    const controlArrayItem = control[ind];
+
+                    if (controlArrayItem && isFunction(controlArrayItem.checkValues)) {
+                        res = controlArrayItem.checkValues(expectedArrayItem, true);
+                    } else {
+                        res = checkObjValue(controlArrayItem, expectedArrayItem, true);
+                    }
+
+                    if (res !== true) {
+                        res.key = `${countrolName}[${ind}].${res.key}`;
+                        break;
+                    }
+                }
             } else if (
-                (isObj && control.value !== expected)
+                (isObj && control.content && control.content.value !== expected)
                 || (!isObj && control !== expected)
             ) {
                 res = {
                     key: countrolName,
-                    value: (isObj) ? control.value : control,
+                    value: (isObj) ? control.content.value : control,
                     expected,
                 };
                 break;

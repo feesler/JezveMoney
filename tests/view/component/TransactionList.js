@@ -1,27 +1,31 @@
-import { TestComponent } from 'jezve-test';
+import { AppComponent } from './AppComponent.js';
 import { TransactionListItem } from './TransactionListItem.js';
 import { asyncMap } from '../../common.js';
 
-export class TransactionList extends TestComponent {
-    async parse() {
-        this.renderTime = await this.prop(this.elem, 'dataset.time');
+export class TransactionList extends AppComponent {
+    async parseContent() {
+        const res = {
+            renderTime: await this.prop(this.elem, 'dataset.time'),
+        };
 
-        this.items = [];
-        this.details = await this.hasClass(this.elem, 'trans-list_details');
-        const itemSelector = (this.details) ? 'tr' : '.trans-list__item-wrapper > div';
+        res.items = [];
+        res.details = await this.hasClass(this.elem, 'trans-list_details');
+        const itemSelector = (res.details) ? 'tr' : '.trans-list__item-wrapper > div';
         const listItems = await this.queryAll(this.elem, itemSelector);
         if (
             !listItems
             || !listItems.length
             || (listItems.length === 1 && await this.hasClass(listItems[0], 'nodata-message'))
         ) {
-            return;
+            return res;
         }
 
-        this.items = await asyncMap(
+        res.items = await asyncMap(
             listItems,
             (item) => TransactionListItem.create(this.parent, item),
         );
+
+        return res;
     }
 
     getItemData(item) {
@@ -30,20 +34,20 @@ export class TransactionList extends TestComponent {
         }
 
         return {
-            selected: item.selected,
-            amountText: item.amountText,
-            amountTitle: item.amountTitle,
-            dateFmt: item.dateFmt,
-            comment: item.comment,
+            selected: item.content.selected,
+            amountText: item.content.amountText,
+            amountTitle: item.content.amountTitle,
+            dateFmt: item.content.dateFmt,
+            comment: item.content.comment,
         };
     }
 
     getItems() {
-        return this.items.map(this.getItemData);
+        return this.content.items.map(this.getItemData);
     }
 
     getSelectedItems() {
-        return this.items.filter((item) => item.selected)
+        return this.content.items.filter((item) => item.content.selected)
             .map(this.getItemData);
     }
 
@@ -51,8 +55,8 @@ export class TransactionList extends TestComponent {
      * @returns {number[]} indexes of active items
      */
     getSelectedIndexes() {
-        return this.items.filter((item) => item.isActive)
-            .map((item) => this.items.indexOf(item));
+        return this.content.items.filter((item) => item.content.isActive)
+            .map((item) => this.content.items.indexOf(item));
     }
 
     static render(transactions, state) {

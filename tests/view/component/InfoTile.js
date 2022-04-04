@@ -1,18 +1,22 @@
-import { TestComponent } from 'jezve-test';
+import { AppComponent } from './AppComponent.js';
 import { Currency } from '../../model/Currency.js';
 
-export class InfoTile extends TestComponent {
-    async parse() {
+export class InfoTile extends AppComponent {
+    async parseContent() {
         if (!this.elem || !await this.hasClass(this.elem, 'info-tile')) {
             throw new Error('Wrong info tile structure');
         }
 
-        this.titleEl = await this.query(this.elem, '.info-tile__title');
-        this.subtitleEl = await this.query(this.elem, '.info-tile__subtitle');
+        const res = {
+            titleEl: await this.query(this.elem, '.info-tile__title'),
+            subtitleEl: await this.query(this.elem, '.info-tile__subtitle'),
+        };
 
-        this.title = await this.prop(this.titleEl, 'textContent');
-        this.subtitle = await this.prop(this.subtitleEl, 'innerText');
-        this.subtitle = this.subtitle.split('\r\n').join('\n');
+        res.title = await this.prop(res.titleEl, 'textContent');
+        res.subtitle = await this.prop(res.subtitleEl, 'innerText');
+        res.subtitle = res.subtitle.split('\r\n').join('\n');
+
+        return res;
     }
 
     // Format non-zero balances of person accounts

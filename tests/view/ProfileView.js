@@ -1,4 +1,4 @@
-import { TestComponent } from 'jezve-test';
+import { AppComponent } from './component/AppComponent.js';
 import { AppView } from './AppView.js';
 import { LoginView } from './LoginView.js';
 import { App } from '../Application.js';
@@ -126,14 +126,14 @@ export class ProfileView extends AppView {
 
         await this.performAction(() => this.click(this.content.resetBtn));
 
-        if (!await TestComponent.isVisible(this.content.reset_warning)) {
+        if (!await AppComponent.isVisible(this.content.reset_warning)) {
             throw new Error('Warning popup not appear');
         }
-        if (!this.content.reset_warning.okBtn) {
+        if (!this.content.reset_warning.content.okBtn) {
             throw new Error('Confirm button not found');
         }
 
-        await this.navigation(() => this.click(this.content.reset_warning.okBtn));
+        await this.navigation(() => this.click(this.content.reset_warning.content.okBtn));
     }
 
     async resetAll() {
@@ -143,14 +143,14 @@ export class ProfileView extends AppView {
 
         await this.performAction(() => this.click(this.content.resetAllBtn));
 
-        if (!await TestComponent.isVisible(this.content.reset_all_warning)) {
+        if (!await AppComponent.isVisible(this.content.reset_all_warning)) {
             throw new Error('Warning popup not appear');
         }
-        if (!this.content.reset_all_warning.okBtn) {
+        if (!this.content.reset_all_warning.content.okBtn) {
             throw new Error('Confirm button not found');
         }
 
-        await this.navigation(() => this.click(this.content.reset_all_warning.okBtn));
+        await this.navigation(() => this.click(this.content.reset_all_warning.content.okBtn));
     }
 
     async deleteProfile() {
@@ -160,14 +160,14 @@ export class ProfileView extends AppView {
 
         await this.performAction(() => this.click(this.content.deleteProfileBtn));
 
-        if (!await TestComponent.isVisible(this.content.delete_warning)) {
+        if (!await AppComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Warning popup not appear');
         }
-        if (!this.content.delete_warning.okBtn) {
+        if (!this.content.delete_warning.content.okBtn) {
             throw new Error('Confirm button not found');
         }
 
-        await this.navigation(() => this.click(this.content.delete_warning.okBtn));
+        await this.navigation(() => this.click(this.content.delete_warning.content.okBtn));
         if (!(App.view instanceof LoginView)) {
             throw new Error('Unexpected page');
         }

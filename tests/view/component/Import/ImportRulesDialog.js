@@ -222,13 +222,13 @@ export class ImportRulesDialog extends AppComponent {
         if (!await AppComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Delete template warning popup not appear');
         }
-        if (!this.content.delete_warning.okBtn) {
+        if (!this.content.delete_warning.content.okBtn) {
             throw new Error('OK button not found');
         }
 
         const prevTime = this.model.renderTime;
 
-        await this.click(this.content.delete_warning.okBtn);
+        await this.click(this.content.delete_warning.content.okBtn);
         await this.wait(this.content.ruleDeletePopupId, { hidden: true });
         await this.waitForFunction(async () => {
             await this.parse();

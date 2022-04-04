@@ -1,4 +1,5 @@
-import { TestComponent, copyObject } from 'jezve-test';
+import { copyObject } from 'jezvejs';
+import { AppComponent } from './component/AppComponent.js';
 import { AppView } from './AppView.js';
 import { Currency } from '../model/Currency.js';
 import { Icon } from '../model/Icon.js';
@@ -26,11 +27,11 @@ export class AccountView extends AppView {
         }
 
         // Name
-        res.name = cont.name.value;
+        res.name = cont.name.content.value;
         res.nameTyped = this.nameTyped;
 
         // Iniital balance
-        res.initbalance = cont.balance.value;
+        res.initbalance = cont.balance.content.value;
         res.fInitBalance = isValidValue(res.initbalance)
             ? normalize(res.initbalance)
             : res.initbalance;
@@ -44,7 +45,7 @@ export class AccountView extends AppView {
         res.fBalance = res.balance;
 
         // Currency
-        const selectedCurr = cont.currDropDown.textValue;
+        const selectedCurr = cont.currDropDown.content.textValue;
         res.currObj = Currency.findByName(selectedCurr);
         if (!res.currObj) {
             throw new Error(`Currency '${selectedCurr}' not found`);
@@ -53,7 +54,7 @@ export class AccountView extends AppView {
         res.curr_id = res.currObj.id;
 
         // Icon
-        let iconObj = Icon.findByName(cont.iconDropDown.textValue);
+        let iconObj = Icon.findByName(cont.iconDropDown.content.textValue);
         if (!iconObj) {
             iconObj = Icon.noIcon();
         }
@@ -131,8 +132,8 @@ export class AccountView extends AppView {
             },
             values: {
                 tile: accTile,
-                name: this.model.name.toString(),
-                balance: this.model.initbalance.toString(),
+                name: { value: this.model.name.toString() },
+                balance: { value: this.model.initbalance.toString() },
                 currDropDown: { textValue: this.model.currObj.name },
                 iconDropDown: { textValue: this.model.tileIcon.name },
             },
@@ -223,14 +224,14 @@ export class AccountView extends AppView {
     async deleteSelfItem() {
         await this.clickDeleteButton();
 
-        if (!await TestComponent.isVisible(this.content.delete_warning)) {
+        if (!await AppComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Delete transaction warning popup not appear');
         }
-        if (!this.content.delete_warning.okBtn) {
+        if (!this.content.delete_warning.content.okBtn) {
             throw new Error('OK button not found');
         }
 
-        await this.navigation(() => this.click(this.content.delete_warning.okBtn));
+        await this.navigation(() => this.click(this.content.delete_warning.content.okBtn));
     }
 
     async inputName(val) {

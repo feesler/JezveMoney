@@ -30,9 +30,9 @@ export class RegisterView extends AppView {
     async buildModel(cont) {
         const res = {};
 
-        res.login = cont.loginInp.value;
-        res.name = cont.nameInp.value;
-        res.password = cont.passwordInp.value;
+        res.login = cont.loginInp.content.value;
+        res.name = cont.nameInp.content.value;
+        res.password = cont.passwordInp.content.value;
 
         return res;
     }

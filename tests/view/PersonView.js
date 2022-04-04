@@ -1,4 +1,4 @@
-import { TestComponent } from 'jezve-test';
+import { AppComponent } from './component/AppComponent.js';
 import { AppView } from './AppView.js';
 import { InputRow } from './component/InputRow.js';
 import { IconLink } from './component/IconLink.js';
@@ -62,7 +62,7 @@ export class PersonView extends AppView {
             res.id = cont.id;
         }
 
-        res.name = cont.name.value;
+        res.name = cont.name.content.value;
         res.flags = cont.flags;
 
         return res;
@@ -97,14 +97,14 @@ export class PersonView extends AppView {
     async deleteSelfItem() {
         await this.clickDeleteButton();
 
-        if (!await TestComponent.isVisible(this.content.delete_warning)) {
+        if (!await AppComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Delete transaction warning popup not appear');
         }
-        if (!this.content.delete_warning.okBtn) {
+        if (!this.content.delete_warning.content.okBtn) {
             throw new Error('OK button not found');
         }
 
-        await this.navigation(() => this.click(this.content.delete_warning.okBtn));
+        await this.navigation(() => this.click(this.content.delete_warning.content.okBtn));
     }
 
     async inputName(val) {

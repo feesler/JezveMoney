@@ -1,4 +1,4 @@
-import { TestComponent } from 'jezve-test';
+import { AppComponent } from './AppComponent.js';
 import { Currency } from '../../model/Currency.js';
 import {
     EXPENSE,
@@ -7,32 +7,36 @@ import {
     DEBT,
 } from '../../model/Transaction.js';
 
-export class TransactionListItem extends TestComponent {
-    async parse() {
-        this.id = parseInt(await this.prop(this.elem, 'dataset.id'), 10);
-        this.selected = await this.hasClass(this.elem, 'trans-list__item_selected');
+export class TransactionListItem extends AppComponent {
+    async parseContent() {
+        const res = {};
+
+        res.id = parseInt(await this.prop(this.elem, 'dataset.id'), 10);
+        res.selected = await this.hasClass(this.elem, 'trans-list__item_selected');
 
         const titleElem = await this.query(this.elem, '.trans-list__item-title > span');
         if (!titleElem) {
             throw new Error('Account title not found');
         }
-        this.accountTitle = await this.prop(titleElem, 'textContent');
+        res.accountTitle = await this.prop(titleElem, 'textContent');
 
         const amountElem = await this.query(this.elem, '.trans-list__item-content > span');
         if (!amountElem) {
             throw new Error('Amount text not found');
         }
-        this.amountText = await this.prop(amountElem, 'textContent');
+        res.amountText = await this.prop(amountElem, 'textContent');
 
         const dateElem = await this.query(this.elem, '.trans-list__item-details > *');
         if (!dateElem || await this.prop(dateElem, 'tagName') !== 'SPAN') {
             throw new Error('Date element not found');
         }
 
-        this.dateFmt = await this.prop(dateElem, 'textContent');
+        res.dateFmt = await this.prop(dateElem, 'textContent');
 
         const commentElem = await this.query(this.elem, '.trans-list__item-comment');
-        this.comment = (commentElem) ? await this.prop(commentElem, 'textContent') : '';
+        res.comment = (commentElem) ? await this.prop(commentElem, 'textContent') : '';
+
+        return res;
     }
 
     async click() {

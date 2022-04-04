@@ -136,7 +136,8 @@ export class AppComponent {
                     break;
                 }
             } else if (Array.isArray(expected)) {
-                const arrayRes = expected.every((expectedArrayItem, ind) => {
+                for (let ind = 0; ind < expected.length; ind += 1) {
+                    const expectedArrayItem = expected[ind];
                     const controlArrayItem = control[ind];
 
                     if (controlArrayItem && isFunction(controlArrayItem.checkValues)) {
@@ -146,17 +147,12 @@ export class AppComponent {
                     }
 
                     if (res !== true) {
-                        res.key = `${countrolName}.${res.key}`;
+                        res.key = `${countrolName}[${ind}].${res.key}`;
+                        break;
                     }
-
-                    return res === true;
-                });
-
-                if (!arrayRes) {
-                    break;
                 }
             } else if (
-                (isObj && control.value !== expected)
+                (isObj && control.content && control.content.value !== expected)
                 || (!isObj && control !== expected)
             ) {
                 res = {

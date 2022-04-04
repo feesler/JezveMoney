@@ -91,7 +91,7 @@ export class StatisticsView extends AppView {
             throw new Error('Account drop down control not found');
         }
 
-        await this.selectAccount(this.content.accountsDropDown.items[pos].id);
+        await this.selectAccount(this.content.accountsDropDown.content.items[pos].id);
     }
 
     async selectCurrency(currencyId) {
@@ -104,7 +104,7 @@ export class StatisticsView extends AppView {
 
     async selectCurrencyByPos(pos) {
         if (this.content.currencyDropDown) {
-            await this.selectCurrency(this.content.currencyDropDown.items[pos].id);
+            await this.selectCurrency(this.content.currencyDropDown.content.items[pos].id);
         }
     }
 

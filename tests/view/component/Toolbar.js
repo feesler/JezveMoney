@@ -1,38 +1,42 @@
-import { TestComponent } from 'jezve-test';
+import { AppComponent } from './AppComponent.js';
 import { IconLink } from './IconLink.js';
 
-export class Toolbar extends TestComponent {
-    async parse() {
+export class Toolbar extends AppComponent {
+    async parseContent() {
         if (!this.elem) {
-            return;
+            return {};
         }
 
-        this.buttons = {};
+        const res = {
+            buttons: {},
+        };
 
-        this.editBtn = await IconLink.create(this, await this.query('#edit_btn'));
-        if (this.editBtn) {
-            this.buttons.update = this.editBtn;
+        res.editBtn = await IconLink.create(this, await this.query('#edit_btn'));
+        if (res.editBtn) {
+            res.buttons.update = res.editBtn;
         }
 
-        this.exportBtn = await IconLink.create(this, await this.query('#export_btn'));
-        if (this.exportBtn) {
-            this.buttons.export = this.exportBtn;
+        res.exportBtn = await IconLink.create(this, await this.query('#export_btn'));
+        if (res.exportBtn) {
+            res.buttons.export = res.exportBtn;
         }
 
-        this.delBtn = await IconLink.create(this, await this.query('#del_btn'));
-        if (this.delBtn) {
-            this.buttons.del = this.delBtn;
+        res.delBtn = await IconLink.create(this, await this.query('#del_btn'));
+        if (res.delBtn) {
+            res.buttons.del = res.delBtn;
         }
 
-        this.showBtn = await IconLink.create(this, await this.query('#show_btn'));
-        if (this.showBtn) {
-            this.buttons.show = this.showBtn;
+        res.showBtn = await IconLink.create(this, await this.query('#show_btn'));
+        if (res.showBtn) {
+            res.buttons.show = res.showBtn;
         }
 
-        this.hideBtn = await IconLink.create(this, await this.query('#hide_btn'));
-        if (this.hideBtn) {
-            this.buttons.hide = this.hideBtn;
+        res.hideBtn = await IconLink.create(this, await this.query('#hide_btn'));
+        if (res.hideBtn) {
+            res.buttons.hide = res.hideBtn;
         }
+
+        return res;
     }
 
     async checkVisibility(button) {
@@ -45,11 +49,11 @@ export class Toolbar extends TestComponent {
 
     getItemByName(name) {
         const key = name.toLowerCase();
-        if (!(key in this.buttons)) {
+        if (!(key in this.content.buttons)) {
             return null;
         }
 
-        return this.buttons[key];
+        return this.content.buttons[key];
     }
 
     async isButtonVisible(name) {
@@ -75,6 +79,6 @@ export class Toolbar extends TestComponent {
             throw new Error(`Button ${name} not found`);
         }
 
-        return button.link;
+        return button.content.link;
     }
 }

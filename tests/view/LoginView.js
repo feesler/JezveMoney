@@ -24,8 +24,8 @@ export class LoginView extends AppView {
     async buildModel(cont) {
         const res = {};
 
-        res.login = cont.loginInp.value;
-        res.password = cont.passwordInp.value;
+        res.login = cont.loginInp.content.value;
+        res.password = cont.passwordInp.content.value;
 
         return res;
     }

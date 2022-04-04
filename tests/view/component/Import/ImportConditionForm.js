@@ -109,8 +109,8 @@ export class ImportConditionForm extends AppComponent {
             if (!res.dropDown) {
                 throw new Error('Invalid structure of field element');
             }
-            res.disabled = res.dropDown.disabled;
-            res.value = res.dropDown.value;
+            res.disabled = res.dropDown.content.disabled;
+            res.value = res.dropDown.content.value;
         } else {
             res.inputElem = await this.query(elem, ':scope > div > *');
             if (!res.inputElem) {

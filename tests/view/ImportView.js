@@ -1,5 +1,6 @@
-import { TestComponent, copyObject } from 'jezve-test';
+import { copyObject } from 'jezvejs';
 import { AppView } from './AppView.js';
+import { AppComponent } from './component/AppComponent.js';
 import { IconLink } from './component/IconLink.js';
 import { ImportList } from './component/Import/ImportList.js';
 import { ImportUploadDialog } from './component/Import/ImportUploadDialog.js';
@@ -57,7 +58,7 @@ export class ImportView extends AppView {
         const rowsContainer = await this.query('#rowsContainer');
         res.renderTime = await this.prop(rowsContainer, 'dataset.time');
 
-        const mainAccountId = res.mainAccountSelect.value;
+        const mainAccountId = res.mainAccountSelect.content.value;
         res.itemsList = await ImportList.create(this, rowsContainer, mainAccountId);
         if (!res.itemsList) {
             throw new Error('Invalid structure of import view');
@@ -75,8 +76,8 @@ export class ImportView extends AppView {
     async buildModel(cont) {
         const res = {};
 
-        const uploadVisible = await TestComponent.isVisible(cont.uploadDialog);
-        const rulesVisible = await TestComponent.isVisible(cont.rulesDialog);
+        const uploadVisible = await AppComponent.isVisible(cont.uploadDialog);
+        const rulesVisible = await AppComponent.isVisible(cont.rulesDialog);
         if (uploadVisible && !rulesVisible) {
             res.state = 'upload';
         } else if (!uploadVisible && rulesVisible) {
@@ -90,7 +91,7 @@ export class ImportView extends AppView {
         res.title = cont.title.value;
         res.totalCount = parseInt(cont.totalCount.value, 10);
         res.enabledCount = parseInt(cont.enabledCount.value, 10);
-        res.mainAccount = parseInt(cont.mainAccountSelect.value, 10);
+        res.mainAccount = parseInt(cont.mainAccountSelect.content.value, 10);
         res.rulesEnabled = cont.rulesCheck.checked;
         res.rulesCount = parseInt(cont.rulesCount.value, 10);
         res.renderTime = cont.renderTime;
@@ -166,7 +167,7 @@ export class ImportView extends AppView {
         await this.performAction(() => this.content.uploadBtn.click());
         await this.performAction(() => this.wait(this.uploadPopupId, { visible: true }));
 
-        if (!await TestComponent.isVisible(this.content.uploadDialog)) {
+        if (!await AppComponent.isVisible(this.content.uploadDialog)) {
             throw new Error('File upload dialog not appear');
         }
     }
@@ -177,7 +178,7 @@ export class ImportView extends AppView {
         await this.performAction(() => this.content.uploadDialog.close());
         await this.performAction(() => this.wait(this.uploadPopupId, { visible: true }));
 
-        if (await TestComponent.isVisible(this.content.uploadDialog)) {
+        if (await AppComponent.isVisible(this.content.uploadDialog)) {
             throw new Error('File upload dialog not closed');
         }
     }
@@ -570,7 +571,7 @@ export class ImportView extends AppView {
                 return true;
             }
 
-            const notification = await TestComponent.isVisible(this.content.msgPopup, true);
+            const notification = await AppComponent.isVisible(this.content.msgPopup, true);
             if (notification) {
                 return true;
             }

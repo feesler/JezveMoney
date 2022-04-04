@@ -1,4 +1,5 @@
-import { copyObject, TestComponent } from 'jezve-test';
+import { copyObject } from 'jezvejs';
+import { AppComponent } from './component/AppComponent.js';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
 import { DropDown } from './component/DropDown.js';
@@ -27,8 +28,8 @@ export class TransactionsView extends AppView {
             !res.titleEl
             || !res.addBtn
             || !res.toolbar
-            || !res.toolbar.editBtn
-            || !res.toolbar.delBtn
+            || !res.toolbar.content.editBtn
+            || !res.toolbar.content.delBtn
         ) {
             throw new Error('Invalid structure of transactions view');
         }
@@ -70,16 +71,16 @@ export class TransactionsView extends AppView {
 
         if (
             res.transList
-            && res.transList.items
-            && res.transList.items.length
+            && res.transList.content.items
+            && res.transList.content.items.length
             && !res.modeSelector
         ) {
             throw new Error('Mode selector not found');
         }
         if (
             res.transList
-            && res.transList.items
-            && res.transList.items.length
+            && res.transList.content.items
+            && res.transList.content.items.length
             && !res.paginator
         ) {
             throw new Error('Paginator not found');
@@ -98,7 +99,7 @@ export class TransactionsView extends AppView {
         res.filter = {
             type: cont.typeMenu.getSelectedTypes(),
             accounts: cont.accDropDown.getSelectedValues().map((item) => parseInt(item, 10)),
-            search: cont.searchForm.value,
+            search: cont.searchForm.content.value,
         };
         const dateRange = cont.dateFilter.getSelectedRange();
         if (dateRange && dateRange.startDate && dateRange.endDate) {
@@ -110,11 +111,11 @@ export class TransactionsView extends AppView {
 
         if (cont.paginator && cont.transList) {
             res.list = {
-                page: cont.paginator.active,
+                page: cont.paginator.content.active,
                 pages: cont.paginator.getPages(),
                 items: cont.transList.getItems(),
             };
-            res.renderTime = cont.transList.renderTime;
+            res.renderTime = cont.transList.content.renderTime;
         } else {
             res.list = {
                 page: 0,
@@ -123,9 +124,9 @@ export class TransactionsView extends AppView {
             };
         }
 
-        const isModeSelectorVisible = await TestComponent.isVisible(cont.modeSelector);
+        const isModeSelectorVisible = await AppComponent.isVisible(cont.modeSelector);
         if (isModeSelectorVisible) {
-            res.detailsMode = cont.modeSelector.details;
+            res.detailsMode = cont.modeSelector.content.details;
         } else {
             const locURL = new URL(this.location);
             res.detailsMode = locURL.searchParams.has('mode') && locURL.searchParams.get('mode') === 'details';
@@ -288,7 +289,7 @@ export class TransactionsView extends AppView {
         if (!this.content.modeSelector) {
             return false;
         }
-        if (this.content.modeSelector.listMode.isActive) {
+        if (this.content.modeSelector.content.listMode.isActive) {
             return false;
         }
 
@@ -304,7 +305,7 @@ export class TransactionsView extends AppView {
         if (!this.content.modeSelector) {
             return false;
         }
-        if (this.content.modeSelector.detailsMode.isActive) {
+        if (this.content.modeSelector.content.detailsMode.isActive) {
             return false;
         }
 
@@ -317,16 +318,16 @@ export class TransactionsView extends AppView {
     }
 
     currentPage() {
-        return (this.content.paginator) ? this.content.paginator.active : 1;
+        return (this.content.paginator) ? this.content.paginator.content.active : 1;
     }
 
     pagesCount() {
         if (
             this.content.paginator
-            && this.content.paginator.items
-            && this.content.paginator.items.length
+            && this.content.paginator.content.items
+            && this.content.paginator.content.items.length
         ) {
-            return this.content.paginator.items.length;
+            return this.content.paginator.content.items.length;
         }
         return 1;
     }
@@ -416,14 +417,14 @@ export class TransactionsView extends AppView {
         }
 
         let pos = this.pagesCount() * App.config.transactionsOnPage;
-        while (this.content.transList.items.length) {
+        while (this.content.transList.content.items.length) {
             const curPos = pos;
-            const pageItems = this.content.transList.items.map((item, ind) => ({
-                id: item.id,
-                accountTitle: item.accountTitle,
-                amountText: item.amountText,
-                dateFmt: item.dateFmt,
-                comment: item.comment,
+            const pageItems = this.content.transList.content.items.map((item, ind) => ({
+                id: item.content.id,
+                accountTitle: item.content.accountTitle,
+                amountText: item.content.amountText,
+                dateFmt: item.content.dateFmt,
+                comment: item.content.comment,
                 pos: curPos - ind,
             }));
             pos -= pageItems.length;
@@ -488,12 +489,12 @@ export class TransactionsView extends AppView {
         const selectedItems = this.getSelectedItems();
         let selectedCount = selectedItems.length;
         for (const num of transactions) {
-            if (num < 0 || num >= this.content.transList.items.length) {
+            if (num < 0 || num >= this.content.transList.content.items.length) {
                 throw new Error('Wrong transaction number');
             }
 
-            const isSelected = this.content.transList.items[num].selected;
-            await this.performAction(() => this.content.transList.items[num].click());
+            const isSelected = this.content.transList.content.items[num].content.selected;
+            await this.performAction(() => this.content.transList.content.items[num].click());
             selectedCount += (isSelected ? -1 : 1);
 
             const updIsVisible = await this.content.toolbar.isButtonVisible('update');
@@ -531,13 +532,13 @@ export class TransactionsView extends AppView {
 
         await this.performAction(() => this.content.toolbar.clickButton('del'));
 
-        if (!await TestComponent.isVisible(this.content.delete_warning)) {
+        if (!await AppComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Delete transaction warning popup not appear');
         }
-        if (!this.content.delete_warning.okBtn) {
+        if (!this.content.delete_warning.content.okBtn) {
             throw new Error('OK button not found');
         }
 
-        await this.navigation(() => this.click(this.content.delete_warning.okBtn));
+        await this.navigation(() => this.click(this.content.delete_warning.content.okBtn));
     }
 }

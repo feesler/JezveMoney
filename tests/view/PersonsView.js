@@ -1,4 +1,4 @@
-import { TestComponent } from 'jezve-test';
+import { AppComponent } from './component/AppComponent.js';
 import { AppView } from './AppView.js';
 import { TilesList } from './component/TilesList.js';
 import { Tile } from './component/Tile.js';
@@ -19,8 +19,8 @@ export class PersonsView extends AppView {
             !res.titleEl
             || !res.addBtn
             || !res.toolbar
-            || !res.toolbar.editBtn
-            || !res.toolbar.delBtn
+            || !res.toolbar.content.editBtn
+            || !res.toolbar.content.delBtn
         ) {
             throw new Error('Invalid structure of persons view');
         }
@@ -53,8 +53,8 @@ export class PersonsView extends AppView {
 
         const persons = Array.isArray(data) ? data : [data];
 
-        const visibleTiles = this.content.tiles.items.length;
-        const hiddenTiles = this.content.hiddenTiles.items.length;
+        const visibleTiles = this.content.tiles.itemsCount();
+        const hiddenTiles = this.content.hiddenTiles.itemsCount();
         const totalTiles = visibleTiles + hiddenTiles;
         const activeTiles = this.content.tiles.getActive();
         const activeHiddenTiles = this.content.hiddenTiles.getActive();
@@ -66,13 +66,13 @@ export class PersonsView extends AppView {
             }
 
             if (num < visibleTiles) {
-                const item = this.content.tiles.items[num];
-                const isSelected = item.isActive;
+                const item = this.content.tiles.content.items[num];
+                const isSelected = item.content.isActive;
                 await this.performAction(() => item.click());
                 selectedCount += (isSelected ? -1 : 1);
             } else {
-                const item = this.content.hiddenTiles.items[num - visibleTiles];
-                const isSelected = item.isActive;
+                const item = this.content.hiddenTiles.content.items[num - visibleTiles];
+                const isSelected = item.content.isActive;
                 await this.performAction(() => item.click());
                 selectedHiddenCount += (isSelected ? -1 : 1);
             }
@@ -112,11 +112,11 @@ export class PersonsView extends AppView {
 
         await this.performAction(() => this.content.toolbar.clickButton('del'));
 
-        if (!await TestComponent.isVisible(this.content.delete_warning)) {
+        if (!await AppComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Delete person(s) warning popup not appear');
         }
 
-        await this.navigation(() => this.click(this.content.delete_warning.okBtn));
+        await this.navigation(() => this.click(this.content.delete_warning.content.okBtn));
     }
 
     /** Show secified accounts */
