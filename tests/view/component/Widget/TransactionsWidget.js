@@ -1,5 +1,6 @@
 import { Widget } from './Widget.js';
 import { TransactionList } from '../TransactionList.js';
+import { query } from '../../../env.js';
 
 export class TransactionsWidget extends Widget {
     async parseContent() {
@@ -9,7 +10,7 @@ export class TransactionsWidget extends Widget {
             throw new Error('Invalid widget');
         }
 
-        const transactions = await TransactionList.create(this, await this.query(this.elem, '.trans-list'));
+        const transactions = await TransactionList.create(this, await query(this.elem, '.trans-list'));
         if (!transactions) {
             throw new Error('Invalid transactions widget');
         }

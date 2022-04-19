@@ -2,6 +2,7 @@ import { AppComponent } from '../AppComponent.js';
 import { ImportCondition } from '../../../model/ImportCondition.js';
 import { Currency } from '../../../model/Currency.js';
 import { App } from '../../../Application.js';
+import { query, prop } from '../../../env.js';
 
 export class ImportConditionItem extends AppComponent {
     async parseContent() {
@@ -10,10 +11,10 @@ export class ImportConditionItem extends AppComponent {
         }
 
         const res = {
-            propertyTitle: { elem: await this.query(this.elem, '.cond-item__property') },
-            operatorTitle: { elem: await this.query(this.elem, '.cond-item__operator') },
-            valueTitle: { elem: await this.query(this.elem, '.cond-item__value') },
-            valuePropTitle: { elem: await this.query(this.elem, '.cond-item__value-property') },
+            propertyTitle: { elem: await query(this.elem, '.cond-item__property') },
+            operatorTitle: { elem: await query(this.elem, '.cond-item__operator') },
+            valueTitle: { elem: await query(this.elem, '.cond-item__value') },
+            valuePropTitle: { elem: await query(this.elem, '.cond-item__value-property') },
         };
 
         if (
@@ -24,13 +25,13 @@ export class ImportConditionItem extends AppComponent {
             throw new Error('Invalid structure of condition item');
         }
 
-        res.propertyTitle.value = await this.prop(res.propertyTitle.elem, 'textContent');
-        res.operatorTitle.value = await this.prop(res.operatorTitle.elem, 'textContent');
+        res.propertyTitle.value = await prop(res.propertyTitle.elem, 'textContent');
+        res.operatorTitle.value = await prop(res.operatorTitle.elem, 'textContent');
         if (res.valueTitle.elem) {
-            res.valueTitle.value = await this.prop(res.valueTitle.elem, 'textContent');
+            res.valueTitle.value = await prop(res.valueTitle.elem, 'textContent');
         }
         if (res.valuePropTitle.elem) {
-            res.valuePropTitle.value = await this.prop(res.valuePropTitle.elem, 'textContent');
+            res.valuePropTitle.value = await prop(res.valuePropTitle.elem, 'textContent');
         }
 
         return res;

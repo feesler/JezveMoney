@@ -3,6 +3,7 @@ import {
     isObject,
 } from 'jezvejs';
 import { checkObjValue } from 'jezve-test';
+import { isVisible } from '../../env.js';
 
 export class AppComponent {
     constructor(parent, elem) {
@@ -15,11 +16,6 @@ export class AppComponent {
 
         this.elem = elem;
         this.parent = parent;
-
-        this.environment = parent.environment;
-        if (this.environment) {
-            this.environment.inject(this);
-        }
     }
 
     async parseContent() {
@@ -51,11 +47,11 @@ export class AppComponent {
     }
 
     static async isVisible(item) {
-        if (!item || !item.elem || !item.environment) {
+        if (!item || !item.elem) {
             return false;
         }
 
-        return item.environment.isVisible(item.elem, true);
+        return isVisible(item.elem, true);
     }
 
     isActionAvailable(action) {
@@ -98,7 +94,7 @@ export class AppComponent {
                     res = await this.checkVisibility(control, expVisible);
                 }
             } else {
-                factVisible = !!control && await this.isVisible(control.elem, true);
+                factVisible = !!control && await isVisible(control.elem, true);
                 res = (expVisible === factVisible);
             }
 

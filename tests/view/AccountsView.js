@@ -5,14 +5,21 @@ import { Tile } from './component/Tile.js';
 import { IconLink } from './component/IconLink.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { Toolbar } from './component/Toolbar.js';
+import {
+    query,
+    prop,
+    navigation,
+    click,
+    httpReq,
+} from '../env.js';
 
 /** List of accounts view class */
 export class AccountsView extends AppView {
     async parseContent() {
         const res = {
-            titleEl: await this.query('.content_wrap > .heading > h1'),
-            addBtn: await IconLink.create(this, await this.query('#add_btn')),
-            toolbar: await Toolbar.create(this, await this.query('#toolbar')),
+            titleEl: await query('.content_wrap > .heading > h1'),
+            addBtn: await IconLink.create(this, await query('#add_btn')),
+            toolbar: await Toolbar.create(this, await query('#toolbar')),
         };
 
         if (
@@ -26,11 +33,11 @@ export class AccountsView extends AppView {
             throw new Error('Invalid structure of accounts view');
         }
 
-        res.title = await this.prop(res.titleEl, 'textContent');
-        res.tiles = await TilesList.create(this, await this.query('#tilesContainer'), Tile);
-        res.hiddenTiles = await TilesList.create(this, await this.query('#hiddenTilesContainer'), Tile);
+        res.title = await prop(res.titleEl, 'textContent');
+        res.tiles = await TilesList.create(this, await query('#tilesContainer'), Tile);
+        res.hiddenTiles = await TilesList.create(this, await query('#hiddenTilesContainer'), Tile);
 
-        res.delete_warning = await WarningPopup.create(this, await this.query('#delete_warning'));
+        res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
         return res;
     }
@@ -44,14 +51,14 @@ export class AccountsView extends AppView {
 
     /** Click on add button and return navigation promise */
     goToCreateAccount() {
-        return this.navigation(() => this.content.addBtn.click());
+        return navigation(() => this.content.addBtn.click());
     }
 
     /** Select specified account, click on edit button and return navigation promise */
     async goToUpdateAccount(num) {
         await this.selectAccounts(num);
 
-        await this.navigation(() => this.content.toolbar.clickButton('update'));
+        await navigation(() => this.content.toolbar.clickButton('update'));
     }
 
     async selectAccounts(data) {
@@ -137,14 +144,14 @@ export class AccountsView extends AppView {
             throw new Error('OK button not found');
         }
 
-        await this.navigation(() => this.click(this.content.delete_warning.content.okBtn));
+        await navigation(() => click(this.content.delete_warning.content.okBtn));
     }
 
     /** Show secified accounts */
     async showAccounts(acc, val = true) {
         await this.selectAccounts(acc);
 
-        await this.navigation(() => this.content.toolbar.clickButton(val ? 'show' : 'hide'));
+        await navigation(() => this.content.toolbar.clickButton(val ? 'show' : 'hide'));
     }
 
     /** Hide secified accounts and return navigation promise */
@@ -161,7 +168,7 @@ export class AccountsView extends AppView {
             throw new Error('Invalid export URL');
         }
 
-        const exportResp = await this.httpReq('GET', downloadURL);
+        const exportResp = await httpReq('GET', downloadURL);
         if (!exportResp || exportResp.status !== 200) {
             throw new Error('Invalid response');
         }

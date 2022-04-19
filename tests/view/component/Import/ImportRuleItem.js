@@ -4,6 +4,7 @@ import { ImportRuleItemConditions } from './ImportRuleItemConditions.js';
 import { ImportConditionItem } from './ImportConditionItem.js';
 import { ImportRuleItemActions } from './ImportRuleItemActions.js';
 import { ImportActionItem } from './ImportActionItem.js';
+import { query, prop, click } from '../../../env.js';
 
 export class ImportRuleItem extends AppComponent {
     constructor(parent, elem, mainAccount) {
@@ -20,24 +21,24 @@ export class ImportRuleItem extends AppComponent {
         }
 
         const res = {
-            ruleId: await this.prop(this.elem, 'dataset.id'),
-            propertyElem: await this.query(this.elem, '.rule-item__property'),
-            operatorElem: await this.query(this.elem, '.rule-item__operator'),
-            valueElem: await this.query(this.elem, '.rule-item__value'),
-            infoElem: await this.query(this.elem, '.rule-item__info'),
-            updateBtn: await this.query(this.elem, '.update-btn'),
-            deleteBtn: await this.query(this.elem, '.delete-btn'),
-            toggleBtn: await this.query(this.elem, '.toggle-btn'),
+            ruleId: await prop(this.elem, 'dataset.id'),
+            propertyElem: await query(this.elem, '.rule-item__property'),
+            operatorElem: await query(this.elem, '.rule-item__operator'),
+            valueElem: await query(this.elem, '.rule-item__value'),
+            infoElem: await query(this.elem, '.rule-item__info'),
+            updateBtn: await query(this.elem, '.update-btn'),
+            deleteBtn: await query(this.elem, '.delete-btn'),
+            toggleBtn: await query(this.elem, '.toggle-btn'),
         };
 
         if (!res.valueElem) {
-            res.valueElem = await this.query(this.elem, '.rule-item__value-property');
+            res.valueElem = await query(this.elem, '.rule-item__value-property');
         }
 
-        const conditionsElem = await this.query(this.elem, '.rule-item__conditions');
+        const conditionsElem = await query(this.elem, '.rule-item__conditions');
         res.conditions = await ImportRuleItemConditions.create(this, conditionsElem);
 
-        const actionsElem = await this.query(this.elem, '.rule-item__actions');
+        const actionsElem = await query(this.elem, '.rule-item__actions');
         res.actions = await ImportRuleItemActions.create(this, actionsElem);
 
         if (
@@ -103,15 +104,15 @@ export class ImportRuleItem extends AppComponent {
     }
 
     async toggleExpand() {
-        return this.click(this.content.toggleBtn);
+        return click(this.content.toggleBtn);
     }
 
     async clickUpdate() {
-        return this.click(this.content.updateBtn);
+        return click(this.content.updateBtn);
     }
 
     async clickDelete() {
-        return this.click(this.content.deleteBtn);
+        return click(this.content.deleteBtn);
     }
 
     /**

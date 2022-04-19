@@ -5,14 +5,16 @@ import {
 import { checkObjValue } from 'jezve-test';
 import { Header } from './component/Header.js';
 import { MessagePopup } from './component/MessagePopup.js';
+import {
+    url,
+    navigation,
+    query,
+    click,
+    isVisible,
+} from '../env.js';
 
 export class AppView {
-    constructor({ environment }) {
-        this.environment = environment;
-        if (this.environment) {
-            this.environment.inject(this);
-        }
-
+    constructor() {
         this.model = {};
     }
 
@@ -42,11 +44,11 @@ export class AppView {
     }
 
     async postParse() {
-        this.location = await this.url();
+        this.location = await url();
 
-        this.content.header = await Header.create(this, await this.query('.page > .page_wrapper > .header'));
+        this.content.header = await Header.create(this, await query('.page > .page_wrapper > .header'));
 
-        const msgElem = await this.query('.popup__content.msg');
+        const msgElem = await query('.popup__content.msg');
         this.content.msgPopup = (msgElem) ? await MessagePopup.create(this, msgElem) : null;
     }
 
@@ -64,16 +66,16 @@ export class AppView {
             throw new Error('User is not logged in');
         }
 
-        await this.click(this.content.header.content.user.menuBtn); // open user menu
+        await click(this.content.header.content.user.menuBtn); // open user menu
 
-        await this.navigation(() => this.click(this.content.header.content.user.profileBtn));
+        await navigation(() => click(this.content.header.content.user.profileBtn));
     }
 
     /** Click on logout link from user menu and return navigation promise */
     async logoutUser() {
-        await this.click(this.content.header.content.user.menuBtn);
+        await click(this.content.header.content.user.menuBtn);
 
-        await this.navigation(() => this.click(this.content.header.content.user.logoutBtn));
+        await navigation(() => click(this.content.header.content.user.logoutBtn));
     }
 
     async goToMainView() {
@@ -81,7 +83,7 @@ export class AppView {
             throw new Error('User not logged in');
         }
 
-        await this.navigation(() => this.click(this.content.header.content.logo.linkElem));
+        await navigation(() => click(this.content.header.content.logo.linkElem));
     }
 
     async performAction(action) {
@@ -158,7 +160,7 @@ export class AppView {
                     res = await this.checkVisibility(control, expVisible);
                 }
             } else {
-                factVisible = !!(control && await this.isVisible(control.elem, true));
+                factVisible = !!(control && await isVisible(control.elem, true));
                 res = (expVisible === factVisible);
             }
 

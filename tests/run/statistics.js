@@ -1,5 +1,6 @@
 import { test } from 'jezve-test';
 import { App } from '../Application.js';
+import { setBlock } from '../env.js';
 import {
     EXPENSE,
     INCOME,
@@ -8,7 +9,7 @@ import {
 } from '../model/Transaction.js';
 
 export async function run() {
-    App.view.setBlock('Statistics', 1);
+    setBlock('Statistics', 1);
 
     await App.goToMainView();
     await App.view.goToStatistics();

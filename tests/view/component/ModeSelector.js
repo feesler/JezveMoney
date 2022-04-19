@@ -1,8 +1,9 @@
 import { AppComponent } from './AppComponent.js';
+import { queryAll, hasClass, prop } from '../../env.js';
 
 export class ModeSelector extends AppComponent {
     async parseContent() {
-        if (!await this.hasClass(this.elem, 'mode-selector')) {
+        if (!await hasClass(this.elem, 'mode-selector')) {
             throw new Error('Unexpected stucture of mode selector control');
         }
 
@@ -11,10 +12,10 @@ export class ModeSelector extends AppComponent {
         res.listMode = {};
         res.detailsMode = {};
 
-        const modeElements = await this.queryAll(this.elem, '.mode-selector__item');
+        const modeElements = await queryAll(this.elem, '.mode-selector__item');
         for (const elem of modeElements) {
-            const tagName = await this.prop(elem, 'tagName');
-            let text = await this.prop(elem, 'textContent');
+            const tagName = await prop(elem, 'tagName');
+            let text = await prop(elem, 'textContent');
             text = text.trim().toLowerCase();
 
             let modeItem;

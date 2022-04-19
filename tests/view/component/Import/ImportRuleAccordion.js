@@ -1,4 +1,10 @@
 import { AppComponent } from '../AppComponent.js';
+import {
+    query,
+    hasClass,
+    prop,
+    click,
+} from '../../../env.js';
 
 export class ImportRuleAccordion extends AppComponent {
     async parseContent() {
@@ -7,12 +13,12 @@ export class ImportRuleAccordion extends AppComponent {
         }
 
         const res = {
-            collapsed: !(await this.hasClass(this.elem, 'collapsible__expanded')),
-            headerElem: await this.query(this.elem, '.collapsible-header'),
-            labelElem: await this.query(this.elem, '.collapsible-header label'),
-            createBtn: await this.query(this.elem, '.collapsible-header .create-btn'),
-            toggleBtn: await this.query(this.elem, '.collapsible-header .toggle-btn'),
-            contentElem: await this.query(this.elem, '.collapsible-content'),
+            collapsed: !(await hasClass(this.elem, 'collapsible__expanded')),
+            headerElem: await query(this.elem, '.collapsible-header'),
+            labelElem: await query(this.elem, '.collapsible-header label'),
+            createBtn: await query(this.elem, '.collapsible-header .create-btn'),
+            toggleBtn: await query(this.elem, '.collapsible-header .toggle-btn'),
+            contentElem: await query(this.elem, '.collapsible-content'),
         };
 
         if (
@@ -25,7 +31,7 @@ export class ImportRuleAccordion extends AppComponent {
             throw new Error('Invalid structure of import rule accordion');
         }
 
-        res.title = await this.prop(res.labelElem, 'textContent');
+        res.title = await prop(res.labelElem, 'textContent');
 
         return res;
     }
@@ -35,10 +41,10 @@ export class ImportRuleAccordion extends AppComponent {
     }
 
     async toggle() {
-        await this.click(this.content.headerElem);
+        await click(this.content.headerElem);
     }
 
     async create() {
-        await this.click(this.content.createBtn);
+        await click(this.content.createBtn);
     }
 }

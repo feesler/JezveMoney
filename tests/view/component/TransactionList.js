@@ -1,21 +1,22 @@
 import { AppComponent } from './AppComponent.js';
 import { TransactionListItem } from './TransactionListItem.js';
 import { asyncMap } from '../../common.js';
+import { queryAll, prop, hasClass } from '../../env.js';
 
 export class TransactionList extends AppComponent {
     async parseContent() {
         const res = {
-            renderTime: await this.prop(this.elem, 'dataset.time'),
+            renderTime: await prop(this.elem, 'dataset.time'),
         };
 
         res.items = [];
-        res.details = await this.hasClass(this.elem, 'trans-list_details');
+        res.details = await hasClass(this.elem, 'trans-list_details');
         const itemSelector = (res.details) ? 'tr' : '.trans-list__item-wrapper > div';
-        const listItems = await this.queryAll(this.elem, itemSelector);
+        const listItems = await queryAll(this.elem, itemSelector);
         if (
             !listItems
             || !listItems.length
-            || (listItems.length === 1 && await this.hasClass(listItems[0], 'nodata-message'))
+            || (listItems.length === 1 && await hasClass(listItems[0], 'nodata-message'))
         ) {
             return res;
         }

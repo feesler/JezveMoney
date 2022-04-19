@@ -1,14 +1,15 @@
 import { AppComponent } from './AppComponent.js';
+import { query, prop } from '../../env.js';
 
 export class WarningPopup extends AppComponent {
     async parseContent() {
         const res = {
-            titleElem: await this.query(this.elem, '.popup__title'),
-            title: await this.prop(this.titleElem, 'textContent'),
-            messageElem: await this.query(this.elem, '.popup__message > div'),
-            message: await this.prop(this.messageElem, 'textContent'),
-            okBtn: await this.query(this.elem, '.popup__controls > .btn.submit-btn'),
-            cancelBtn: await this.query(this.elem, '.popup__controls > .btn.cancel-btn'),
+            titleElem: await query(this.elem, '.popup__title'),
+            title: await prop(this.titleElem, 'textContent'),
+            messageElem: await query(this.elem, '.popup__message > div'),
+            message: await prop(this.messageElem, 'textContent'),
+            okBtn: await query(this.elem, '.popup__controls > .btn.submit-btn'),
+            cancelBtn: await query(this.elem, '.popup__controls > .btn.cancel-btn'),
         };
 
         return res;

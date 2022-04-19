@@ -3,6 +3,7 @@ import { Tile } from './Tile.js';
 import { AccountsList } from '../../model/AccountsList.js';
 import { PersonsList } from '../../model/PersonsList.js';
 import { asyncMap } from '../../common.js';
+import { queryAll, hasClass } from '../../env.js';
 
 export class TilesList extends AppComponent {
     constructor(parent, elem, tileClass) {
@@ -19,11 +20,11 @@ export class TilesList extends AppComponent {
         const res = {
             items: [],
         };
-        const listItems = await this.queryAll(this.elem, ':scope > *');
+        const listItems = await queryAll(this.elem, ':scope > *');
         if (
             !listItems
             || !listItems.length
-            || (listItems.length === 1 && await this.hasClass(listItems[0], 'nodata-message'))
+            || (listItems.length === 1 && await hasClass(listItems[0], 'nodata-message'))
         ) {
             return res;
         }

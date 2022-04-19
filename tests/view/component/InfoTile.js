@@ -1,19 +1,24 @@
 import { AppComponent } from './AppComponent.js';
 import { Currency } from '../../model/Currency.js';
+import {
+    query,
+    prop,
+    hasClass,
+} from '../../env.js';
 
 export class InfoTile extends AppComponent {
     async parseContent() {
-        if (!this.elem || !await this.hasClass(this.elem, 'info-tile')) {
+        if (!this.elem || !await hasClass(this.elem, 'info-tile')) {
             throw new Error('Wrong info tile structure');
         }
 
         const res = {
-            titleEl: await this.query(this.elem, '.info-tile__title'),
-            subtitleEl: await this.query(this.elem, '.info-tile__subtitle'),
+            titleEl: await query(this.elem, '.info-tile__title'),
+            subtitleEl: await query(this.elem, '.info-tile__subtitle'),
         };
 
-        res.title = await this.prop(res.titleEl, 'textContent');
-        res.subtitle = await this.prop(res.subtitleEl, 'innerText');
+        res.title = await prop(res.titleEl, 'textContent');
+        res.subtitle = await prop(res.subtitleEl, 'innerText');
         res.subtitle = res.subtitle.split('\r\n').join('\n');
 
         return res;

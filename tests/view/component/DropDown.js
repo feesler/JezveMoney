@@ -1,16 +1,25 @@
 import { AppComponent } from './AppComponent.js';
 import { asyncMap } from '../../common.js';
+import {
+    query,
+    queryAll,
+    hasClass,
+    prop,
+    isVisible,
+    click,
+    closest,
+} from '../../env.js';
 
 export class DropDown extends AppComponent {
     /** Find for closest parent DropDown container of element */
-    static async getParentContainer(env, elem) {
+    static async getParentContainer(elem) {
         if (!elem) {
             throw new Error('Invalid element');
         }
 
-        let container = await env.closest(elem, '.dd__container');
+        let container = await closest(elem, '.dd__container');
         if (!container) {
-            container = await env.closest(elem, '.dd__container_attached');
+            container = await closest(elem, '.dd__container_attached');
         }
 
         return container;
@@ -22,7 +31,7 @@ export class DropDown extends AppComponent {
             throw new Error('Invalid parameters');
         }
 
-        const container = await DropDown.getParentContainer(parent.environment, elem);
+        const container = await DropDown.getParentContainer(elem);
         if (!container) {
             throw new Error('Container not found');
         }
@@ -33,80 +42,80 @@ export class DropDown extends AppComponent {
     async parseContent() {
         if (
             !this.elem
-            || (!await this.hasClass(this.elem, 'dd__container')
-                && !await this.hasClass(this.elem, 'dd__container_attached'))
+            || (!await hasClass(this.elem, 'dd__container')
+                && !await hasClass(this.elem, 'dd__container_attached'))
         ) {
             throw new Error('Invalid drop down element');
         }
 
         const res = {};
 
-        res.isAttached = await this.hasClass(this.elem, 'dd__container_attached');
+        res.isAttached = await hasClass(this.elem, 'dd__container_attached');
         if (res.isAttached) {
-            res.selectBtn = await this.query(this.elem, ':scope > *');
+            res.selectBtn = await query(this.elem, ':scope > *');
         } else {
-            res.selectBtn = await this.query(this.elem, '.dd__toggle-btn');
+            res.selectBtn = await query(this.elem, '.dd__toggle-btn');
         }
         if (!res.selectBtn) {
             throw new Error('Select button not found');
         }
 
-        res.disabled = await this.hasClass(this.elem, 'dd__container_disabled');
+        res.disabled = await hasClass(this.elem, 'dd__container_disabled');
 
         if (!res.isAttached) {
-            res.statSel = await this.query(this.elem, '.dd__single-selection');
+            res.statSel = await query(this.elem, '.dd__single-selection');
             if (!res.statSel) {
                 throw new Error('Static select element not found');
             }
-            res.inputElem = await this.query(this.elem, 'input[type="text"]');
+            res.inputElem = await query(this.elem, 'input[type="text"]');
             if (!res.inputElem) {
                 throw new Error('Input element not found');
             }
 
-            res.editable = await this.isVisible(res.inputElem);
+            res.editable = await isVisible(res.inputElem);
             if (res.editable) {
-                res.textValue = await this.prop(res.inputElem, 'value');
+                res.textValue = await prop(res.inputElem, 'value');
             } else {
-                res.textValue = await this.prop(res.statSel, 'textContent');
+                res.textValue = await prop(res.statSel, 'textContent');
             }
         }
 
-        res.selectElem = await this.query(this.elem, 'select');
-        res.isMulti = await this.prop(res.selectElem, 'multiple');
+        res.selectElem = await query(this.elem, 'select');
+        res.isMulti = await prop(res.selectElem, 'multiple');
         if (res.isMulti) {
-            const selItemElems = await this.queryAll(this.elem, '.dd__selection > .dd__selection-item');
+            const selItemElems = await queryAll(this.elem, '.dd__selection > .dd__selection-item');
             res.selectedItems = await asyncMap(selItemElems, async (el) => {
-                const deselectBtn = await this.query(el, '.dd__del-selection-item-btn');
+                const deselectBtn = await query(el, '.dd__del-selection-item-btn');
 
-                let title = await this.prop(el, 'textContent');
+                let title = await prop(el, 'textContent');
                 const ind = title.indexOf('×');
                 if (ind !== -1) {
                     title = title.substr(0, ind);
                 }
 
-                const id = await this.prop(el, 'dataset.id');
+                const id = await prop(el, 'dataset.id');
 
                 return { id, title, deselectBtn };
             });
 
             res.value = res.selectedItems;
         } else {
-            res.value = await this.prop(res.selectElem, 'value');
+            res.value = await prop(res.selectElem, 'value');
         }
 
-        const selectOptions = await this.queryAll(res.selectElem, 'option');
+        const selectOptions = await queryAll(res.selectElem, 'option');
         const optionsData = await asyncMap(selectOptions, async (item) => ({
-            id: await this.prop(item, 'value'),
-            title: await this.prop(item, 'textContent'),
-            selected: await this.prop(item, 'selected'),
+            id: await prop(item, 'value'),
+            title: await prop(item, 'textContent'),
+            selected: await prop(item, 'selected'),
         }));
 
-        res.listContainer = await this.query(this.elem, '.dd__list');
+        res.listContainer = await query(this.elem, '.dd__list');
         if (res.listContainer) {
-            const listItems = await this.queryAll(this.elem, '.dd__list li > div');
+            const listItems = await queryAll(this.elem, '.dd__list li > div');
             res.items = await asyncMap(listItems, async (item) => {
                 const listItem = {
-                    text: await this.prop(item, 'textContent'),
+                    text: await prop(item, 'textContent'),
                     elem: item,
                 };
 
@@ -136,12 +145,12 @@ export class DropDown extends AppComponent {
     }
 
     async showList(show = true) {
-        const listVisible = await this.isVisible(this.content.listContainer);
+        const listVisible = await isVisible(this.content.listContainer);
         if (show === listVisible) {
             return;
         }
 
-        await this.click(this.content.selectBtn);
+        await click(this.content.selectBtn);
     }
 
     async toggleItem(itemId) {
@@ -172,7 +181,7 @@ export class DropDown extends AppComponent {
         }
 
         await this.showList();
-        await this.click(li.elem);
+        await click(li.elem);
     }
 
     async deselectItem(itemId) {
@@ -190,7 +199,7 @@ export class DropDown extends AppComponent {
         }
 
         await this.showList();
-        await this.click(li.elem);
+        await click(li.elem);
     }
 
     async deselectItemByTag(itemId) {
@@ -203,7 +212,7 @@ export class DropDown extends AppComponent {
             throw new Error(`Selected item ${itemId} not found`);
         }
 
-        await this.click(selItem.deselectBtn);
+        await click(selItem.deselectBtn);
         await this.parse();
     }
 

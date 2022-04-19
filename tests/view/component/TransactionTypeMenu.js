@@ -1,15 +1,16 @@
 import { AppComponent } from './AppComponent.js';
 import { MenuItem } from './MenuItem.js';
+import { queryAll, hasClass } from '../../env.js';
 
 export class TransactionTypeMenu extends AppComponent {
     async parseContent() {
         const res = {
             items: [],
             selectedTypes: [],
-            multi: await this.hasClass(this.elem, 'trtype-menu-multi'),
+            multi: await hasClass(this.elem, 'trtype-menu-multi'),
         };
 
-        const menuItems = await this.queryAll(this.elem, '.trtype-menu__item');
+        const menuItems = await queryAll(this.elem, '.trtype-menu__item');
         for (const item of menuItems) {
             const menuItemObj = await MenuItem.create(this.parent, item);
 

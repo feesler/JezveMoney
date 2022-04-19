@@ -1,4 +1,10 @@
 import { AppComponent } from './AppComponent.js';
+import {
+    query,
+    prop,
+    hasClass,
+    click,
+} from '../../env.js';
 
 export class MessagePopup extends AppComponent {
     static async create(...args) {
@@ -24,17 +30,17 @@ export class MessagePopup extends AppComponent {
     async parseContent() {
         const res = {};
 
-        res.success = await this.hasClass(this.elem, 'msg_success')
-            && !(await this.hasClass(this.elem, 'msg_error'));
+        res.success = await hasClass(this.elem, 'msg_success')
+            && !(await hasClass(this.elem, 'msg_error'));
 
-        res.messageElem = await this.query(this.elem, '.popup__message');
+        res.messageElem = await query(this.elem, '.popup__message');
         if (!res.messageElem) {
             throw new Error('Wrong structure of message popup');
         }
 
-        res.message = await this.prop(res.messageElem, 'textContent');
+        res.message = await prop(res.messageElem, 'textContent');
         res.message = res.message.trim();
-        res.closeBtn = await this.query(this.elem, '.close-btn');
+        res.closeBtn = await query(this.elem, '.close-btn');
 
         if (!res.success) {
             console.log(`Error popup appear: ${res.message}`);
@@ -44,6 +50,6 @@ export class MessagePopup extends AppComponent {
     }
 
     async close() {
-        return this.click(this.content.closeBtn);
+        return click(this.content.closeBtn);
     }
 }

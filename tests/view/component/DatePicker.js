@@ -1,5 +1,14 @@
 import { copyObject, isDate } from 'jezvejs';
 import { AppComponent } from './AppComponent.js';
+import {
+    query,
+    queryAll,
+    hasClass,
+    prop,
+    isVisible,
+    click,
+    wait,
+} from '../../env.js';
 
 const shortMonthTitles = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 const monthTitles = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
@@ -7,33 +16,33 @@ const monthTitles = ['january', 'february', 'march', 'april', 'may', 'june', 'ju
 export class DatePicker extends AppComponent {
     async parseContent() {
         const res = {
-            wrapper: await this.query(this.elem, '.dp__wrapper'),
+            wrapper: await query(this.elem, '.dp__wrapper'),
         };
 
-        res.prevBtn = await this.query(res.wrapper, '.dp__header .dp__header_nav:first-child');
-        res.nextBtn = await this.query(res.wrapper, '.dp__header .dp__header_nav:last-child');
-        res.titleElem = await this.query(res.wrapper, '.dp__header .dp__header_title');
-        res.title = await this.prop(res.titleElem, 'textContent');
+        res.prevBtn = await query(res.wrapper, '.dp__header .dp__header_nav:first-child');
+        res.nextBtn = await query(res.wrapper, '.dp__header .dp__header_nav:last-child');
+        res.titleElem = await query(res.wrapper, '.dp__header .dp__header_title');
+        res.title = await prop(res.titleElem, 'textContent');
 
         res.cells = [];
         res.viewType = 'month';
-        const elems = await this.queryAll(res.wrapper, '.dp__view-container .dp__cell');
+        const elems = await queryAll(res.wrapper, '.dp__view-container .dp__cell');
         for (const elem of elems) {
-            if (await this.hasClass(elem, 'dp__year-view__cell')) {
+            if (await hasClass(elem, 'dp__year-view__cell')) {
                 res.viewType = 'year';
-            } else if (await this.hasClass(elem, 'dp__year-range-view__cell')) {
+            } else if (await hasClass(elem, 'dp__year-range-view__cell')) {
                 res.viewType = 'yearRange';
             }
 
-            if (await this.hasClass(elem, 'dp__other-month-cell')) {
+            if (await hasClass(elem, 'dp__other-month-cell')) {
                 continue;
             }
 
             const cell = {
                 elem,
-                title: await this.prop(elem, 'textContent'),
-                active: await this.hasClass(elem, 'dp__cell_act'),
-                highlighted: await this.hasClass(elem, 'dp__cell_hl'),
+                title: await prop(elem, 'textContent'),
+                active: await hasClass(elem, 'dp__cell_act'),
+                highlighted: await hasClass(elem, 'dp__cell_hl'),
             };
 
             res.cells.push(cell);
@@ -69,7 +78,7 @@ export class DatePicker extends AppComponent {
     }
 
     async selectCell(val) {
-        if (!await this.isVisible(this.content.wrapper)) {
+        if (!await isVisible(this.content.wrapper)) {
             throw new Error('DatePicker is not visible');
         }
 
@@ -79,35 +88,35 @@ export class DatePicker extends AppComponent {
             throw new Error('Specified cell not found');
         }
 
-        await this.click(cell.elem);
+        await click(cell.elem);
     }
 
     async isTitleChanged() {
-        const titleElem = await this.query(this.elem, '.dp__wrapper .dp__header_title');
+        const titleElem = await query(this.elem, '.dp__wrapper .dp__header_title');
         if (!titleElem) {
             return false;
         }
 
-        const title = await this.prop(titleElem, 'textContent');
+        const title = await prop(titleElem, 'textContent');
 
         return title !== this.title;
     }
 
     async navigateToPrevious() {
-        await this.click(this.content.prevBtn);
-        await this.wait(() => this.isTitleChanged());
+        await click(this.content.prevBtn);
+        await wait(() => this.isTitleChanged());
         await this.parse();
     }
 
     async navigateToNext() {
-        await this.click(this.content.nextBtn);
-        await this.wait(() => this.isTitleChanged());
+        await click(this.content.nextBtn);
+        await wait(() => this.isTitleChanged());
         await this.parse();
     }
 
     async zoomOut() {
-        await this.click(this.content.titleElem);
-        await this.wait(() => this.isTitleChanged());
+        await click(this.content.titleElem);
+        await wait(() => this.isTitleChanged());
         await this.parse();
     }
 
@@ -125,7 +134,7 @@ export class DatePicker extends AppComponent {
         }
 
         await this.selectCell(year);
-        await this.wait(() => this.isTitleChanged());
+        await wait(() => this.isTitleChanged());
         await this.parse();
     }
 
@@ -151,7 +160,7 @@ export class DatePicker extends AppComponent {
         }
 
         await this.selectCell(shortMonthTitles[month]);
-        await this.wait(() => this.isTitleChanged());
+        await wait(() => this.isTitleChanged());
         await this.parse();
     }
 

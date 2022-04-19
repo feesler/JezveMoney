@@ -3,6 +3,7 @@ import * as TransactionTests from './common.js';
 import { Currency } from '../../model/Currency.js';
 import { INCOME } from '../../model/Transaction.js';
 import { App } from '../../Application.js';
+import { setBlock } from '../../env.js';
 
 export async function submit(params) {
     if ('destAcc' in params) {
@@ -67,7 +68,7 @@ export async function stateLoop() {
     await App.view.changeTransactionType(INCOME);
 
     // State 0
-    App.view.setBlock('Income loop', 2);
+    setBlock('Income loop', 2);
     await test('Initial state of new income view', () => {
         App.view.setExpectedState(0);
         return App.view.checkState();

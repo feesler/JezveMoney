@@ -17,6 +17,15 @@ import {
     fixFloat,
 } from '../../../common.js';
 import { App } from '../../../Application.js';
+import {
+    query,
+    queryAll,
+    prop,
+    click,
+    input,
+    onChange,
+    isVisible,
+} from '../../../env.js';
 
 export class ImportListItem extends AppComponent {
     constructor(parent, elem, mainAccount) {
@@ -59,13 +68,13 @@ export class ImportListItem extends AppComponent {
             throw new Error('Invalid field element');
         }
 
-        res.labelElem = await this.query(elem, ':scope > label');
+        res.labelElem = await query(elem, ':scope > label');
         if (!res.labelElem) {
             throw new Error('Invalid structure of field element');
         }
-        res.title = await this.prop(res.labelElem, 'textContent');
+        res.title = await prop(res.labelElem, 'textContent');
 
-        const dropDownElem = await this.query(elem, '.dd__container');
+        const dropDownElem = await query(elem, '.dd__container');
         if (dropDownElem) {
             res.dropDown = await DropDown.create(this, dropDownElem);
             if (!res.dropDown) {
@@ -74,17 +83,12 @@ export class ImportListItem extends AppComponent {
             res.disabled = res.dropDown.content.disabled;
             res.value = res.dropDown.content.value;
         } else {
-            res.inputElem = await this.query(elem, ':scope > div > *');
+            res.inputElem = await query(elem, ':scope > div > *');
             if (!res.inputElem) {
                 throw new Error('Invalid structure of field element');
             }
-            res.disabled = await this.prop(res.inputElem, 'disabled');
-            res.value = await this.prop(res.inputElem, 'value');
-        }
-
-        res.environment = this.environment;
-        if (res.environment) {
-            res.environment.inject(res);
+            res.disabled = await prop(res.inputElem, 'disabled');
+            res.value = await prop(res.inputElem, 'value');
         }
 
         return this.mapField(res);
@@ -106,20 +110,20 @@ export class ImportListItem extends AppComponent {
             date: 'Date',
         };
 
-        const dataValues = await this.queryAll(cont.origDataTable, '.data-value');
+        const dataValues = await queryAll(cont.origDataTable, '.data-value');
         for (const dataValueElem of dataValues) {
-            const labelElem = await this.query(dataValueElem, 'label');
-            const valueElem = await this.query(dataValueElem, 'div');
+            const labelElem = await query(dataValueElem, 'label');
+            const valueElem = await query(dataValueElem, 'div');
             if (!labelElem || !valueElem) {
                 throw new Error('Invalid structure of import item');
             }
 
-            const label = await this.prop(labelElem, 'textContent');
-            const value = await this.prop(valueElem, 'textContent');
-            const prop = Object.keys(labelsMap).find((key) => label === labelsMap[key]);
+            const label = await prop(labelElem, 'textContent');
+            const value = await prop(valueElem, 'textContent');
+            const property = Object.keys(labelsMap).find((key) => label === labelsMap[key]);
 
-            if (prop) {
-                res[prop] = value;
+            if (property) {
+                res[property] = value;
             } else {
                 throw new Error(`Invalid label: '${label}'`);
             }
@@ -135,21 +139,21 @@ export class ImportListItem extends AppComponent {
 
     async parseContent() {
         const res = {
-            enableCheck: await this.query(this.elem, '.enable-check input[type="checkbox"]'),
+            enableCheck: await query(this.elem, '.enable-check input[type="checkbox"]'),
         };
         if (!res.enableCheck) {
             throw new Error('Invalid structure of import item');
         }
-        res.enabled = await this.prop(res.enableCheck, 'checked');
+        res.enabled = await prop(res.enableCheck, 'checked');
 
-        const fieldElems = await this.queryAll(this.elem, '.field');
+        const fieldElems = await queryAll(this.elem, '.field');
         const fields = await asyncMap(fieldElems, (field) => this.parseField(field));
         fields.forEach((field) => { res[field.name] = field.component; });
 
-        res.invFeedback = { elem: await this.query(this.elem, '.invalid-feedback') };
-        res.deleteBtn = await this.query(this.elem, '.delete-btn');
-        res.toggleBtn = await this.query(this.elem, '.toggle-btn');
-        res.origDataTable = await this.query(this.elem, '.orig-data-table');
+        res.invFeedback = { elem: await query(this.elem, '.invalid-feedback') };
+        res.deleteBtn = await query(this.elem, '.delete-btn');
+        res.toggleBtn = await query(this.elem, '.toggle-btn');
+        res.origDataTable = await query(this.elem, '.orig-data-table');
 
         if (
             !res.typeField
@@ -228,8 +232,8 @@ export class ImportListItem extends AppComponent {
 
         res.isDifferent = this.isDifferentCurrencies(res);
 
-        res.invalidated = await this.isVisible(cont.invFeedback.elem, true);
-        res.imported = await this.isVisible(cont.toggleBtn, true);
+        res.invalidated = await isVisible(cont.invFeedback.elem, true);
+        res.imported = await isVisible(cont.toggleBtn, true);
         if (cont.originalData) {
             res.original = {
                 ...cont.originalData,
@@ -458,8 +462,8 @@ export class ImportListItem extends AppComponent {
         this.model.enabled = !this.model.enabled;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.click(this.content.enableCheck);
-        await this.onChange(this.content.enableCheck);
+        await click(this.content.enableCheck);
+        await onChange(this.content.enableCheck);
         await this.parse();
 
         return this.checkState();
@@ -599,7 +603,7 @@ export class ImportListItem extends AppComponent {
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.input(this.content.amountField.inputElem, value);
+        await input(this.content.amountField.inputElem, value);
         await this.parse();
 
         return this.checkState();
@@ -612,7 +616,7 @@ export class ImportListItem extends AppComponent {
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.input(this.content.destAmountField.inputElem, value);
+        await input(this.content.destAmountField.inputElem, value);
         await this.parse();
 
         return this.checkState();
@@ -640,7 +644,7 @@ export class ImportListItem extends AppComponent {
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.input(this.content.dateField.inputElem, value);
+        await input(this.content.dateField.inputElem, value);
         await this.parse();
 
         return this.checkState();
@@ -652,14 +656,14 @@ export class ImportListItem extends AppComponent {
         this.model.comment = value;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.input(this.content.commentField.inputElem, value);
+        await input(this.content.commentField.inputElem, value);
         await this.parse();
 
         return this.checkState();
     }
 
     async clickDelete() {
-        return this.click(this.content.deleteBtn);
+        return click(this.content.deleteBtn);
     }
 
     /**

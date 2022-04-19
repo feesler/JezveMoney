@@ -1,6 +1,7 @@
 import { AppComponent } from '../AppComponent.js';
 import { ImportActionItem } from './ImportActionItem.js';
 import { asyncMap } from '../../../common.js';
+import { queryAll } from '../../../env.js';
 
 export class ImportRuleItemActions extends AppComponent {
     async parseContent() {
@@ -10,7 +11,7 @@ export class ImportRuleItemActions extends AppComponent {
 
         const res = {
             items: await asyncMap(
-                await this.queryAll(this.elem, '.action-item'),
+                await queryAll(this.elem, '.action-item'),
                 async (elem) => ImportActionItem.create(this, elem),
             ),
         };

@@ -12,6 +12,14 @@ import {
     IMPORT_COND_FIELD_COMMENT,
     ImportCondition,
 } from '../../../model/ImportCondition.js';
+import {
+    query,
+    queryAll,
+    prop,
+    click,
+    input,
+    onChange,
+} from '../../../env.js';
 
 const fieldValueTypes = [
     'property',
@@ -49,12 +57,12 @@ export class ImportConditionForm extends AppComponent {
     async parseContent() {
         const res = {};
 
-        const fieldElems = await this.queryAll(this.elem, '.field');
+        const fieldElems = await queryAll(this.elem, '.field');
         const fields = await asyncMap(fieldElems, (field) => this.parseField(field));
         fields.forEach((field) => { res[field.name] = field.component; });
 
-        res.fieldValueCheck = { elem: await this.query(this.elem, '.value-field .checkwrap input[type=checkbox]') };
-        res.deleteBtn = { elem: await this.query(this.elem, '.delete-btn') };
+        res.fieldValueCheck = { elem: await query(this.elem, '.value-field .checkwrap input[type=checkbox]') };
+        res.deleteBtn = { elem: await query(this.elem, '.delete-btn') };
 
         if (
             !res.fieldTypeField
@@ -71,7 +79,7 @@ export class ImportConditionForm extends AppComponent {
             throw new Error('Invalid structure of import condition form');
         }
 
-        res.fieldValueCheck.checked = await this.prop(res.fieldValueCheck.elem, 'checked');
+        res.fieldValueCheck.checked = await prop(res.fieldValueCheck.elem, 'checked');
 
         return res;
     }
@@ -97,13 +105,13 @@ export class ImportConditionForm extends AppComponent {
             throw new Error('Invalid field element');
         }
 
-        res.labelElem = await this.query(elem, ':scope > label');
+        res.labelElem = await query(elem, ':scope > label');
         if (!res.labelElem) {
             throw new Error('Invalid structure of field element');
         }
-        res.title = await this.prop(res.labelElem, 'textContent');
+        res.title = await prop(res.labelElem, 'textContent');
 
-        const dropDownElem = await this.query(elem, '.dd__container');
+        const dropDownElem = await query(elem, '.dd__container');
         if (dropDownElem) {
             res.dropDown = await DropDown.create(this, dropDownElem);
             if (!res.dropDown) {
@@ -112,17 +120,12 @@ export class ImportConditionForm extends AppComponent {
             res.disabled = res.dropDown.content.disabled;
             res.value = res.dropDown.content.value;
         } else {
-            res.inputElem = await this.query(elem, ':scope > div > *');
+            res.inputElem = await query(elem, ':scope > div > *');
             if (!res.inputElem) {
                 throw new Error('Invalid structure of field element');
             }
-            res.disabled = await this.prop(res.inputElem, 'disabled');
-            res.value = await this.prop(res.inputElem, 'value');
-        }
-
-        res.environment = this.environment;
-        if (res.environment) {
-            res.environment.inject(res);
+            res.disabled = await prop(res.inputElem, 'disabled');
+            res.value = await prop(res.inputElem, 'value');
         }
 
         return this.mapField(res);
@@ -225,7 +228,7 @@ export class ImportConditionForm extends AppComponent {
         if (control.dropDown) {
             await control.dropDown.selectItem(parseInt(value, 10));
         } else {
-            await this.input(control.inputElem, value.toString());
+            await input(control.inputElem, value.toString());
         }
         await this.parse();
 
@@ -265,8 +268,8 @@ export class ImportConditionForm extends AppComponent {
         this.model.value = ImportConditionForm.getStateValue(this.model);
         this.expectedState = ImportConditionForm.getExpectedState(this.model);
 
-        await this.click(this.content.fieldValueCheck.elem);
-        await this.onChange(this.content.fieldValueCheck.elem);
+        await click(this.content.fieldValueCheck.elem);
+        await onChange(this.content.fieldValueCheck.elem);
         await this.parse();
 
         return this.checkState();
@@ -281,6 +284,6 @@ export class ImportConditionForm extends AppComponent {
     }
 
     async clickDelete() {
-        return this.click(this.content.deleteBtn.elem);
+        return click(this.content.deleteBtn.elem);
     }
 }

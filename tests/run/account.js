@@ -5,6 +5,7 @@ import { Transaction } from '../model/Transaction.js';
 import { Currency } from '../model/Currency.js';
 import { formatProps, createCSV } from '../common.js';
 import { App } from '../Application.js';
+import { setBlock } from '../env.js';
 import { AccountView } from '../view/AccountView.js';
 
 /** Navigate to accounts list page */
@@ -16,7 +17,7 @@ async function checkNavigation() {
 }
 
 export async function stateLoop() {
-    App.view.setBlock('View state loop', 2);
+    setBlock('View state loop', 2);
 
     // Navigate to create account view
     await checkNavigation();

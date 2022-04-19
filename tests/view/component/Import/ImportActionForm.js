@@ -11,6 +11,13 @@ import {
     IMPORT_ACTION_SET_DEST_AMOUNT,
     IMPORT_ACTION_SET_COMMENT,
 } from '../../../model/ImportAction.js';
+import {
+    query,
+    queryAll,
+    prop,
+    click,
+    input,
+} from '../../../env.js';
 
 const actionValueTypes = [
     'transType',
@@ -37,10 +44,10 @@ export class ImportActionForm extends AppComponent {
         }
 
         const res = {
-            deleteBtn: { elem: await this.query(this.elem, '.delete-btn') },
+            deleteBtn: { elem: await query(this.elem, '.delete-btn') },
         };
 
-        const fieldElems = await this.queryAll(this.elem, '.field');
+        const fieldElems = await queryAll(this.elem, '.field');
         const fields = await asyncMap(fieldElems, (field) => this.parseField(field));
         fields.forEach((field) => { res[field.name] = field.component; });
 
@@ -89,13 +96,13 @@ export class ImportActionForm extends AppComponent {
             throw new Error('Invalid field element');
         }
 
-        res.labelElem = await this.query(elem, ':scope > label');
+        res.labelElem = await query(elem, ':scope > label');
         if (!res.labelElem) {
             throw new Error('Invalid structure of field element');
         }
-        res.title = await this.prop(res.labelElem, 'textContent');
+        res.title = await prop(res.labelElem, 'textContent');
 
-        const dropDownElem = await this.query(elem, '.dd__container');
+        const dropDownElem = await query(elem, '.dd__container');
         if (dropDownElem) {
             res.dropDown = await DropDown.create(this, dropDownElem);
             if (!res.dropDown) {
@@ -104,17 +111,12 @@ export class ImportActionForm extends AppComponent {
             res.disabled = res.dropDown.content.disabled;
             res.value = res.dropDown.content.value;
         } else {
-            res.inputElem = await this.query(elem, ':scope > div > *');
+            res.inputElem = await query(elem, ':scope > div > *');
             if (!res.inputElem) {
                 throw new Error('Invalid structure of field element');
             }
-            res.disabled = await this.prop(res.inputElem, 'disabled');
-            res.value = await this.prop(res.inputElem, 'value');
-        }
-
-        res.environment = this.environment;
-        if (res.environment) {
-            res.environment.inject(res);
+            res.disabled = await prop(res.inputElem, 'disabled');
+            res.value = await prop(res.inputElem, 'value');
         }
 
         return this.mapField(res);
@@ -203,7 +205,7 @@ export class ImportActionForm extends AppComponent {
         if (control.dropDown) {
             await control.dropDown.selectItem(value);
         } else {
-            await this.input(control.inputElem, value.toString());
+            await input(control.inputElem, value.toString());
         }
         await this.parse();
 
@@ -231,6 +233,6 @@ export class ImportActionForm extends AppComponent {
     }
 
     async clickDelete() {
-        return this.click(this.content.deleteBtn.elem);
+        return click(this.content.deleteBtn.elem);
     }
 }

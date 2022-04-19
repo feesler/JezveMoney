@@ -6,41 +6,47 @@ import {
     TRANSFER,
     DEBT,
 } from '../../model/Transaction.js';
+import {
+    query,
+    prop,
+    hasClass,
+    click,
+} from '../../env.js';
 
 export class TransactionListItem extends AppComponent {
     async parseContent() {
         const res = {};
 
-        res.id = parseInt(await this.prop(this.elem, 'dataset.id'), 10);
-        res.selected = await this.hasClass(this.elem, 'trans-list__item_selected');
+        res.id = parseInt(await prop(this.elem, 'dataset.id'), 10);
+        res.selected = await hasClass(this.elem, 'trans-list__item_selected');
 
-        const titleElem = await this.query(this.elem, '.trans-list__item-title > span');
+        const titleElem = await query(this.elem, '.trans-list__item-title > span');
         if (!titleElem) {
             throw new Error('Account title not found');
         }
-        res.accountTitle = await this.prop(titleElem, 'textContent');
+        res.accountTitle = await prop(titleElem, 'textContent');
 
-        const amountElem = await this.query(this.elem, '.trans-list__item-content > span');
+        const amountElem = await query(this.elem, '.trans-list__item-content > span');
         if (!amountElem) {
             throw new Error('Amount text not found');
         }
-        res.amountText = await this.prop(amountElem, 'textContent');
+        res.amountText = await prop(amountElem, 'textContent');
 
-        const dateElem = await this.query(this.elem, '.trans-list__item-details > *');
-        if (!dateElem || await this.prop(dateElem, 'tagName') !== 'SPAN') {
+        const dateElem = await query(this.elem, '.trans-list__item-details > *');
+        if (!dateElem || await prop(dateElem, 'tagName') !== 'SPAN') {
             throw new Error('Date element not found');
         }
 
-        res.dateFmt = await this.prop(dateElem, 'textContent');
+        res.dateFmt = await prop(dateElem, 'textContent');
 
-        const commentElem = await this.query(this.elem, '.trans-list__item-comment');
-        res.comment = (commentElem) ? await this.prop(commentElem, 'textContent') : '';
+        const commentElem = await query(this.elem, '.trans-list__item-comment');
+        res.comment = (commentElem) ? await prop(commentElem, 'textContent') : '';
 
         return res;
     }
 
     async click() {
-        return this.environment.click(this.elem);
+        return click(this.elem);
     }
 
     static render(transaction, state) {

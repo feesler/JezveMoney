@@ -2,6 +2,7 @@ import { copyObject } from 'jezvejs';
 import { AppComponent } from '../AppComponent.js';
 import { ImportListItem } from './ImportListItem.js';
 import { asyncMap } from '../../../common.js';
+import { query, queryAll, isVisible } from '../../../env.js';
 
 export class ImportList extends AppComponent {
     constructor(parent, elem, mainAccount) {
@@ -16,21 +17,21 @@ export class ImportList extends AppComponent {
             invalidated: false,
         };
 
-        const listItems = await this.queryAll(this.elem, '.import-item');
+        const listItems = await queryAll(this.elem, '.import-item');
         if (listItems) {
             res.items = await asyncMap(
                 listItems,
                 (item) => ImportListItem.create(this.parent, item, this.mainAccount),
             );
         } else {
-            const noDataMsg = await this.query(this.elem, '.nodata-message');
-            const visible = await this.isVisible(noDataMsg);
+            const noDataMsg = await query(this.elem, '.nodata-message');
+            const visible = await isVisible(noDataMsg);
             if (!visible) {
                 throw new Error('No data message is not visible');
             }
         }
 
-        res.loadingIndicator = await this.query(this.elem, '.data-container__loading');
+        res.loadingIndicator = await query(this.elem, '.data-container__loading');
 
         return res;
     }
@@ -39,7 +40,7 @@ export class ImportList extends AppComponent {
         const res = {
             items: cont.items.map((item) => this.getItemData(item)),
             invalidated: cont.items.some((item) => item.model.invalidated),
-            isLoading: await this.isVisible(cont.loadingIndicator),
+            isLoading: await isVisible(cont.loadingIndicator),
         };
 
         return res;

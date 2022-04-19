@@ -1,6 +1,7 @@
 import { Widget } from './Widget.js';
 import { TilesList } from '../TilesList.js';
 import { InfoTile } from '../InfoTile.js';
+import { query } from '../../../env.js';
 
 export class PersonsWidget extends Widget {
     async parseContent() {
@@ -10,7 +11,7 @@ export class PersonsWidget extends Widget {
             throw new Error('Invalid widget');
         }
 
-        const infoTiles = await TilesList.create(this, await this.query(this.elem, '.info-tiles'), InfoTile);
+        const infoTiles = await TilesList.create(this, await query(this.elem, '.info-tiles'), InfoTile);
         if (!infoTiles) {
             throw new Error('Invalid persons widget');
         }

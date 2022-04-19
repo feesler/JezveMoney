@@ -1,60 +1,67 @@
 import { AppView } from './AppView.js';
 import { DropDown } from './component/DropDown.js';
 import { TransactionTypeMenu } from './component/TransactionTypeMenu.js';
+import {
+    query,
+    queryAll,
+    prop,
+    navigation,
+    isVisible,
+} from '../env.js';
 
 /** Statistics view class */
 export class StatisticsView extends AppView {
     async parseContent() {
         const res = {
-            titleEl: await this.query('.content_wrap > .heading > h1'),
+            titleEl: await query('.content_wrap > .heading > h1'),
         };
 
         if (!res.titleEl) {
             throw new Error('Wrong statistics view structure');
         }
 
-        res.typeMenu = await TransactionTypeMenu.create(this, await this.query('.trtype-menu'));
-        res.title = await this.prop(res.titleEl, 'textContent');
+        res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
+        res.title = await prop(res.titleEl, 'textContent');
 
-        const filtersList = await this.queryAll('.filters-container .filter-item');
+        const filtersList = await queryAll('.filters-container .filter-item');
         if (!filtersList || filtersList.length !== 5) {
             throw new Error('Invalid structure of statistics view');
         }
 
-        res.filterByDropDown = await DropDown.createFromChild(this, await this.query('#filter_type'));
+        res.filterByDropDown = await DropDown.createFromChild(this, await query('#filter_type'));
 
         res.accountsDropDown = null;
-        if (await this.isVisible(filtersList[1])) {
-            res.accountsDropDown = await DropDown.createFromChild(this, await this.query('#acc_id'));
+        if (await isVisible(filtersList[1])) {
+            res.accountsDropDown = await DropDown.createFromChild(this, await query('#acc_id'));
         }
 
         res.currencyDropDown = null;
-        if (await this.isVisible(filtersList[2])) {
-            res.currencyDropDown = await DropDown.createFromChild(this, await this.query('#curr_id'));
+        if (await isVisible(filtersList[2])) {
+            res.currencyDropDown = await DropDown.createFromChild(this, await query('#curr_id'));
         }
 
-        res.groupDropDown = await DropDown.createFromChild(this, await this.query('#groupsel'));
+        res.groupDropDown = await DropDown.createFromChild(this, await query('#groupsel'));
 
         res.chart = {
-            elem: await this.query('#chart'),
+            elem: await query('#chart'),
             bars: [],
         };
         if (!res.chart) {
             throw new Error('Invalid statistics view structure');
         }
 
-        const chartChild = await this.query(res.chart.elem, '.nodata-message');
+        const chartChild = await query(res.chart.elem, '.nodata-message');
         if (chartChild) {
             return res;
         }
 
-        const bars = await this.queryAll(res.chart.elem, 'svg > rect');
+        const bars = await queryAll(res.chart.elem, 'svg > rect');
         for (const bar of bars) {
-            const nodeOpacity = await this.prop(bar, 'attributes.fill-opacity.nodeValue');
+            const nodeOpacity = await prop(bar, 'attributes.fill-opacity.nodeValue');
             if (nodeOpacity === '1') {
                 res.chart.bars.push({
                     elem: bar,
-                    height: await this.prop(bar, 'attributes.height.nodeValue'),
+                    height: await prop(bar, 'attributes.height.nodeValue'),
                 });
             }
         }
@@ -67,15 +74,15 @@ export class StatisticsView extends AppView {
             return;
         }
 
-        await this.navigation(() => this.content.typeMenu.select(type));
+        await navigation(() => this.content.typeMenu.select(type));
     }
 
     async byAccounts() {
-        await this.navigation(() => this.content.filterByDropDown.setSelection(0));
+        await navigation(() => this.content.filterByDropDown.setSelection(0));
     }
 
     async byCurrencies() {
-        await this.navigation(() => this.content.filterByDropDown.setSelection(1));
+        await navigation(() => this.content.filterByDropDown.setSelection(1));
     }
 
     async selectAccount(accountId) {
@@ -83,7 +90,7 @@ export class StatisticsView extends AppView {
             throw new Error('Account drop down control not found');
         }
 
-        await this.navigation(() => this.content.accountsDropDown.setSelection(accountId));
+        await navigation(() => this.content.accountsDropDown.setSelection(accountId));
     }
 
     async selectAccountByPos(pos) {
@@ -99,7 +106,7 @@ export class StatisticsView extends AppView {
             throw new Error('Currency drop down control not found');
         }
 
-        await this.navigation(() => this.content.currencyDropDown.setSelection(currencyId));
+        await navigation(() => this.content.currencyDropDown.setSelection(currencyId));
     }
 
     async selectCurrencyByPos(pos) {
@@ -109,7 +116,7 @@ export class StatisticsView extends AppView {
     }
 
     async groupBy(group) {
-        await this.navigation(() => this.content.groupDropDown.setSelection(group));
+        await navigation(() => this.content.groupDropDown.setSelection(group));
     }
 
     async noGroup() {

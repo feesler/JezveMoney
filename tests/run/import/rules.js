@@ -1,5 +1,6 @@
 import { test } from 'jezve-test';
 import { App } from '../../Application.js';
+import { setBlock } from '../../env.js';
 import { Currency } from '../../model/Currency.js';
 import { ImportTransaction } from '../../model/ImportTransaction.js';
 import { ImportCondition } from '../../model/ImportCondition.js';
@@ -193,7 +194,7 @@ export async function addRuleCondition() {
 
 /** Create new import rule condition */
 export async function createRuleCondition(params) {
-    App.view.setBlock('Create rule condition', 2);
+    setBlock('Create rule condition', 2);
 
     await addRuleCondition();
 
@@ -212,7 +213,7 @@ export async function updateRuleCondition(params) {
         throw new Error('Invalid parameters');
     }
 
-    App.view.setBlock(`Update rule condition [${params.pos}]`, 2);
+    setBlock(`Update rule condition [${params.pos}]`, 2);
 
     await runOnRuleCondition(params);
 }
@@ -315,7 +316,7 @@ export async function addRuleAction() {
 
 /** Create new import rule action */
 export async function createRuleAction(params) {
-    App.view.setBlock('Create rule action', 2);
+    setBlock('Create rule action', 2);
 
     await addRuleAction();
 
@@ -333,7 +334,7 @@ export async function updateRuleAction(params) {
         throw new Error('Invalid parameters');
     }
 
-    App.view.setBlock(`Update rule action [${params.pos}]`, 2);
+    setBlock(`Update rule action [${params.pos}]`, 2);
 
     await runOnRuleAction(params);
 }

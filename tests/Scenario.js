@@ -55,6 +55,7 @@ import * as ImportRuleApiTests from './run/api/importrule.js';
 
 import { api } from './model/api.js';
 import { App } from './Application.js';
+import { setBlock } from './env.js';
 
 export class Scenario {
     constructor(environment) {
@@ -137,7 +138,7 @@ export class Scenario {
     }
 
     async securityTests() {
-        this.environment.setBlock('Security tests', 1);
+        setBlock('Security tests', 1);
 
         await this.runner.runGroup(SecurityTests.checkAccess, [
             'system',
@@ -193,8 +194,8 @@ export class Scenario {
     }
 
     async apiTests() {
-        this.environment.setBlock('API tests', 1);
-        this.environment.setBlock('User', 2);
+        setBlock('API tests', 1);
+        setBlock('User', 2);
 
         // Register API test user and prepare data for security tests
         await ApiTests.registerAndLogin(App.config.apiTestUser);
@@ -217,7 +218,7 @@ export class Scenario {
         await ApiTests.loginTest(App.config.testUser);
         await App.setupUser();
 
-        this.environment.setBlock('Accounts', 2);
+        setBlock('Accounts', 2);
 
         await ApiTests.resetAccounts();
 
@@ -249,7 +250,7 @@ export class Scenario {
     }
 
     async prepareApiSecurityTests() {
-        this.environment.setBlock('Prepare data for security tests', 2);
+        setBlock('Prepare data for security tests', 2);
 
         const { RUB, USD } = this;
 
@@ -293,7 +294,7 @@ export class Scenario {
     }
 
     async apiAccountsSecurity() {
-        this.environment.setBlock('Accounts security', 2);
+        setBlock('Accounts security', 2);
 
         const { EUR } = this;
 
@@ -309,7 +310,7 @@ export class Scenario {
     }
 
     async apiPersonsSecurity() {
-        this.environment.setBlock('Persons security', 2);
+        setBlock('Persons security', 2);
 
         await PersonApiTests.update({
             id: this.API_USER_PERSON,
@@ -320,7 +321,7 @@ export class Scenario {
     }
 
     async apiTransactionsSecurity() {
-        this.environment.setBlock('Transaction security', 2);
+        setBlock('Transaction security', 2);
 
         await this.apiCreateTransactionSecurity();
         await this.apiUpdateTransactionSecurity();
@@ -328,7 +329,7 @@ export class Scenario {
     }
 
     async apiCreateTransactionSecurity() {
-        this.environment.setBlock('Create', 3);
+        setBlock('Create', 3);
 
         const { RUB } = this;
         const data = [{
@@ -370,7 +371,7 @@ export class Scenario {
     }
 
     async apiUpdateTransactionSecurity() {
-        this.environment.setBlock('Update', 3);
+        setBlock('Update', 3);
 
         const { RUB } = this;
 
@@ -413,7 +414,7 @@ export class Scenario {
     }
 
     async apiDeleteTransactionSecurity() {
-        this.environment.setBlock('Delete', 3);
+        setBlock('Delete', 3);
 
         const data = [
             [this.API_USER_TRANSACTION],
@@ -571,7 +572,7 @@ export class Scenario {
     }
 
     async apiCreateTransactions() {
-        this.environment.setBlock('Create', 3);
+        setBlock('Create', 3);
 
         const { RUB, USD, EUR } = this;
 
@@ -741,7 +742,7 @@ export class Scenario {
     }
 
     async apiUpdateTransactions() {
-        this.environment.setBlock('Update', 3);
+        setBlock('Update', 3);
 
         const {
             RUB,
@@ -866,7 +867,7 @@ export class Scenario {
     }
 
     async apiFilterTransactions() {
-        this.environment.setBlock('Filter transactions', 2);
+        setBlock('Filter transactions', 2);
 
         const data = [{
             order: 'desc',
@@ -908,7 +909,7 @@ export class Scenario {
     }
 
     async apiImportTemplateTests() {
-        this.environment.setBlock('Import template', 2);
+        setBlock('Import template', 2);
 
         await this.apiCreateImportTemplateTests();
         await this.apiUpdateImportTemplateTests();
@@ -916,7 +917,7 @@ export class Scenario {
     }
 
     async apiCreateImportTemplateTests() {
-        this.environment.setBlock('Create import template', 2);
+        setBlock('Create import template', 2);
 
         const data = [{
             name: 'Template 1',
@@ -975,7 +976,7 @@ export class Scenario {
     }
 
     async apiUpdateImportTemplateTests() {
-        this.environment.setBlock('Update import template', 2);
+        setBlock('Update import template', 2);
 
         const data = [{
             id: this.TEMPLATE_1,
@@ -994,7 +995,7 @@ export class Scenario {
     }
 
     async apiDeleteImportTemplateTests() {
-        this.environment.setBlock('Delete import template', 2);
+        setBlock('Delete import template', 2);
 
         const data = [
             [this.TEMPLATE_3],
@@ -1005,7 +1006,7 @@ export class Scenario {
     }
 
     async apiImportRuleTests() {
-        this.environment.setBlock('Import rule', 2);
+        setBlock('Import rule', 2);
 
         await this.apiCreateImportRuleTests();
         await this.apiUpdateImportRuleTests();
@@ -1013,7 +1014,7 @@ export class Scenario {
     }
 
     async apiCreateImportRuleTests() {
-        this.environment.setBlock('Create import rule', 2);
+        setBlock('Create import rule', 2);
 
         const taxiCondition = {
             field_id: IMPORT_COND_FIELD_COMMENT,
@@ -1202,7 +1203,7 @@ export class Scenario {
     }
 
     async apiUpdateImportRuleTests() {
-        this.environment.setBlock('Update import rule', 2);
+        setBlock('Update import rule', 2);
 
         const diffAmountCondition = {
             field_id: IMPORT_COND_FIELD_TR_AMOUNT,
@@ -1262,7 +1263,7 @@ export class Scenario {
     }
 
     async apiDeleteImportRuleTests() {
-        this.environment.setBlock('Delete import rule', 2);
+        setBlock('Delete import rule', 2);
 
         const data = [
             [this.RULE_3],
@@ -1273,7 +1274,7 @@ export class Scenario {
     }
 
     async apiProfile() {
-        this.environment.setBlock('Profile', 2);
+        setBlock('Profile', 2);
 
         const tasks = [{
             action: ApiTests.loginTest,
@@ -1297,7 +1298,7 @@ export class Scenario {
     }
 
     async profileTests() {
-        this.environment.setBlock('Profile tests', 1);
+        setBlock('Profile tests', 1);
 
         await App.state.fetch();
 
@@ -1370,7 +1371,7 @@ export class Scenario {
     }
 
     async accountTests() {
-        this.environment.setBlock('Accounts', 1);
+        setBlock('Accounts', 1);
 
         await AccountTests.stateLoop();
 
@@ -1388,7 +1389,7 @@ export class Scenario {
     }
 
     async createAccountTests() {
-        this.environment.setBlock('Create accounts', 2);
+        setBlock('Create accounts', 2);
 
         const { RUB, EUR } = this;
 
@@ -1414,7 +1415,7 @@ export class Scenario {
     }
 
     async updateAccountTests() {
-        this.environment.setBlock('Update accounts', 2);
+        setBlock('Update accounts', 2);
 
         const { RUB, USD } = this;
         const data = [{
@@ -1430,7 +1431,7 @@ export class Scenario {
     }
 
     async deleteAccountTests() {
-        this.environment.setBlock('Delete accounts', 2);
+        setBlock('Delete accounts', 2);
 
         const data = [
             [0, 1],
@@ -1440,7 +1441,7 @@ export class Scenario {
     }
 
     async hideAccountsTest() {
-        this.environment.setBlock('Hide accounts', 2);
+        setBlock('Hide accounts', 2);
 
         const data = [
             [0],
@@ -1451,7 +1452,7 @@ export class Scenario {
     }
 
     async showAccountsTest() {
-        this.environment.setBlock('Show accounts', 2);
+        setBlock('Show accounts', 2);
 
         const data = [
             [5],
@@ -1462,7 +1463,7 @@ export class Scenario {
     }
 
     async exportAccountsTest() {
-        this.environment.setBlock('Export accounts', 2);
+        setBlock('Export accounts', 2);
 
         const data = [
             [0],
@@ -1473,7 +1474,7 @@ export class Scenario {
     }
 
     async toggleAccountsTest() {
-        this.environment.setBlock('Toggle select accounts', 2);
+        setBlock('Toggle select accounts', 2);
 
         const data = [
             [0],
@@ -1484,7 +1485,7 @@ export class Scenario {
     }
 
     async personTests() {
-        this.environment.setBlock('Persons', 1);
+        setBlock('Persons', 1);
 
         await this.createPersonTests();
         await this.hidePersonsTest();
@@ -1495,7 +1496,7 @@ export class Scenario {
     }
 
     async createPersonTests() {
-        this.environment.setBlock('Create persons', 2);
+        setBlock('Create persons', 2);
 
         const data = [
             { name: '&&<div>' },
@@ -1511,7 +1512,7 @@ export class Scenario {
     }
 
     async updatePersonTests() {
-        this.environment.setBlock('Update persons', 2);
+        setBlock('Update persons', 2);
 
         const data = [{
             pos: 4,
@@ -1526,7 +1527,7 @@ export class Scenario {
     }
 
     async deletePersonTests() {
-        this.environment.setBlock('Delete persons', 2);
+        setBlock('Delete persons', 2);
 
         const data = [
             [0],
@@ -1537,7 +1538,7 @@ export class Scenario {
     }
 
     async hidePersonsTest() {
-        this.environment.setBlock('Hide persons', 2);
+        setBlock('Hide persons', 2);
 
         const data = [
             [0],
@@ -1548,7 +1549,7 @@ export class Scenario {
     }
 
     async showPersonsTest() {
-        this.environment.setBlock('Show persons', 2);
+        setBlock('Show persons', 2);
 
         const data = [
             [2],
@@ -1559,7 +1560,7 @@ export class Scenario {
     }
 
     async togglePersonsTest() {
-        this.environment.setBlock('Toggle select persons', 2);
+        setBlock('Toggle select persons', 2);
 
         const data = [
             [0],
@@ -1632,7 +1633,7 @@ export class Scenario {
     }
 
     async transactionTests() {
-        this.environment.setBlock('Transactions', 1);
+        setBlock('Transactions', 1);
 
         await this.prepareTransactionTests();
 
@@ -1645,7 +1646,7 @@ export class Scenario {
     }
 
     async transactionStateLoopTests() {
-        this.environment.setBlock('Transaction view state loops', 1);
+        setBlock('Transaction view state loops', 1);
 
         await ExpenseTransactionTests.stateLoop();
         await IncomeTransactionTests.stateLoop();
@@ -1656,7 +1657,7 @@ export class Scenario {
     }
 
     async createTransactionTests() {
-        this.environment.setBlock('Create transaction', 1);
+        setBlock('Create transaction', 1);
 
         await this.runCreateExpenseTests();
         await this.runCreateIncomeTests();
@@ -1665,7 +1666,7 @@ export class Scenario {
     }
 
     async updateTransactionTests() {
-        this.environment.setBlock('Update transaction', 1);
+        setBlock('Update transaction', 1);
 
         await this.runUpdateExpenseTests();
         await this.runUpdateIncomeTests();
@@ -1936,7 +1937,7 @@ export class Scenario {
     }
 
     async transactionsListTests() {
-        this.environment.setBlock('Transaction List view', 1);
+        setBlock('Transaction List view', 1);
 
         const data = await this.prepareTrListData();
 
@@ -1995,7 +1996,7 @@ export class Scenario {
     }
 
     async deleteTransactionTests() {
-        this.environment.setBlock('Delete transaction', 1);
+        setBlock('Delete transaction', 1);
 
         await this.runDeleteExpenseTests();
         await this.runDeleteIncomeTests();
@@ -2006,7 +2007,7 @@ export class Scenario {
     }
 
     async runCreateExpenseTests() {
-        this.environment.setBlock('Create expense transactions', 1);
+        setBlock('Create expense transactions', 1);
 
         const { RUB, KRW } = this;
         const data = [{
@@ -2047,7 +2048,7 @@ export class Scenario {
     }
 
     async runCreateIncomeTests() {
-        this.environment.setBlock('Create income transactions', 1);
+        setBlock('Create income transactions', 1);
 
         const { USD, KRW } = this;
         const data = [{
@@ -2090,7 +2091,7 @@ export class Scenario {
     }
 
     async runCreateTransferTests() {
-        this.environment.setBlock('Create transfer transactions', 1);
+        setBlock('Create transfer transactions', 1);
 
         const data = [{
             srcAmount: '1000',
@@ -2129,7 +2130,7 @@ export class Scenario {
     }
 
     async runCreateDebtTests() {
-        this.environment.setBlock('Create debt transactions', 1);
+        setBlock('Create debt transactions', 1);
 
         const data = [{
             srcAmount: '1000',
@@ -2170,7 +2171,7 @@ export class Scenario {
     }
 
     async runUpdateExpenseTests() {
-        this.environment.setBlock('Update expense transactions', 2);
+        setBlock('Update expense transactions', 2);
 
         const { RUB } = this;
         const data = [{
@@ -2196,7 +2197,7 @@ export class Scenario {
     }
 
     async runUpdateIncomeTests() {
-        this.environment.setBlock('Update income transactions', 2);
+        setBlock('Update income transactions', 2);
 
         const { RUB } = this;
         const data = [{
@@ -2221,7 +2222,7 @@ export class Scenario {
     }
 
     async runUpdateTransferTests() {
-        this.environment.setBlock('Update transfer transactions', 2);
+        setBlock('Update transfer transactions', 2);
 
         const data = [{
             pos: 0,
@@ -2250,7 +2251,7 @@ export class Scenario {
     }
 
     async runUpdateDebtTests() {
-        this.environment.setBlock('Update debt transactions', 2);
+        setBlock('Update debt transactions', 2);
 
         const data = [{
             pos: 0,
@@ -2285,7 +2286,7 @@ export class Scenario {
     }
 
     async runDeleteExpenseTests() {
-        this.environment.setBlock('Delete expense transactions', 2);
+        setBlock('Delete expense transactions', 2);
 
         const data = [
             [0],
@@ -2296,7 +2297,7 @@ export class Scenario {
     }
 
     async runDeleteIncomeTests() {
-        this.environment.setBlock('Delete income transactions', 2);
+        setBlock('Delete income transactions', 2);
 
         const data = [
             [0],
@@ -2307,7 +2308,7 @@ export class Scenario {
     }
 
     async runDeleteTransferTests() {
-        this.environment.setBlock('Delete transfer transactions', 2);
+        setBlock('Delete transfer transactions', 2);
 
         const data = [
             [1],
@@ -2318,7 +2319,7 @@ export class Scenario {
     }
 
     async runDeleteDebtTests() {
-        this.environment.setBlock('Delete debt transactions', 2);
+        setBlock('Delete debt transactions', 2);
 
         const data = [
             [0],
@@ -2329,7 +2330,7 @@ export class Scenario {
     }
 
     async runDeleteFromUpdateTests() {
-        this.environment.setBlock('Delete from update view tests', 2);
+        setBlock('Delete from update view tests', 2);
 
         const tasks = [{
             action: (pos) => TransactionTests.delFromUpdate(DEBT, pos),
@@ -2346,7 +2347,7 @@ export class Scenario {
     }
 
     async importTests() {
-        this.environment.setBlock('Import', 1);
+        setBlock('Import', 1);
 
         const accIndexes = App.state.getAccountIndexesByNames([
             'acc_3', 'acc RUB', 'acc USD', 'acc EUR',
@@ -2367,7 +2368,7 @@ export class Scenario {
         await this.runCreateImportItemTests();
 
         // Upload CSV file
-        this.environment.setBlock('Upload CSV', 2);
+        setBlock('Upload CSV', 2);
         await ImportTests.uploadFile({
             filename: this.uploadFilename,
             data: this.csvStatement,
@@ -2378,11 +2379,11 @@ export class Scenario {
         // Submit converted transactions
         await ImportTests.submitUploaded({ data: this.csvStatement, account: this.ACC_RUB });
         // Delete all
-        this.environment.setBlock('Delete all items', 2);
+        setBlock('Delete all items', 2);
         await ImportTests.deleteAllItems();
 
         // Enable/disable rules
-        this.environment.setBlock('Enable/disable rules', 2);
+        setBlock('Enable/disable rules', 2);
         // Upload again
         await ImportTests.uploadFile({
             filename: this.uploadFilename,
@@ -2406,10 +2407,10 @@ export class Scenario {
     async runSubmitImportTests() {
         await ImportTests.submit();
         // Verify submit is disabled for empty list
-        this.environment.setBlock('Verify submit is disabled for empty list', 2);
+        setBlock('Verify submit is disabled for empty list', 2);
         await ImportTests.submit();
 
-        this.environment.setBlock('Verify invalid items are not submitted', 2);
+        setBlock('Verify invalid items are not submitted', 2);
         // Empty amount
         await ImportTests.addItem();
         await ImportTests.submit();
@@ -2453,7 +2454,7 @@ export class Scenario {
         await ImportTests.submit();
 
         // Verify submit is disabled for list with no enabled items
-        this.environment.setBlock('Verify submit is disabled for list with no enabled items', 2);
+        setBlock('Verify submit is disabled for list with no enabled items', 2);
         await ImportTests.uploadFile({
             filename: this.uploadFilename,
             data: this.csvStatement,
@@ -2470,7 +2471,7 @@ export class Scenario {
     }
 
     async runCreateImportItemTests() {
-        this.environment.setBlock('Add item', 2);
+        setBlock('Add item', 2);
 
         await ImportTests.addItem();
         await ImportTests.updateItem({
@@ -2489,7 +2490,7 @@ export class Scenario {
     async runImportItemStateLoop() {
         const { RUB, USD } = this;
 
-        this.environment.setBlock('Import item state loop', 2);
+        setBlock('Import item state loop', 2);
 
         await ImportTests.changeMainAccount(this.ACC_3);
 
@@ -2668,7 +2669,7 @@ export class Scenario {
 
     // Create import template tests
     async runCreateImportTemplateTests() {
-        this.environment.setBlock('Create import template', 2);
+        setBlock('Create import template', 2);
         // Select columns for template
         await this.runner.runGroup(ImportTests.selectTemplateColumn, [
             { column: 'accountAmount', index: 11 },
@@ -2698,7 +2699,7 @@ export class Scenario {
 
     // Update import template tests
     async runUpdateImportTemplateTests() {
-        this.environment.setBlock('Update import template', 2);
+        setBlock('Update import template', 2);
 
         await ImportTests.selectTemplateByIndex(0);
         await ImportTests.updateTemplate();
@@ -2712,7 +2713,7 @@ export class Scenario {
 
     // Delete import template tests
     async runDeleteImportTemplateTests() {
-        this.environment.setBlock('Delete import template', 2);
+        setBlock('Delete import template', 2);
 
         await ImportTests.selectTemplateByIndex(0);
         await ImportTests.deleteTemplate();
@@ -2720,7 +2721,7 @@ export class Scenario {
 
     // Import rules
     async runImportRuleTests() {
-        this.environment.setBlock('Import rules', 1);
+        setBlock('Import rules', 1);
         await ImportTests.openRulesDialog();
 
         await this.runImportRuleValidationTests();
@@ -2733,13 +2734,13 @@ export class Scenario {
 
     // Import rule validation tests
     async runImportRuleValidationTests() {
-        this.environment.setBlock('Import rule validation', 1);
+        setBlock('Import rule validation', 1);
 
-        this.environment.setBlock('Submit empty rule', 2);
+        setBlock('Submit empty rule', 2);
         await ImportTests.createRule();
         await ImportTests.submitRule();
 
-        this.environment.setBlock('Submit rule without actions', 2);
+        setBlock('Submit rule without actions', 2);
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
             { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
@@ -2747,7 +2748,7 @@ export class Scenario {
         ]);
         await ImportTests.submitRule();
 
-        this.environment.setBlock('Submit condition with empty amount', 2);
+        setBlock('Submit condition with empty amount', 2);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
             { action: 'inputValue', data: 'Ba' },
@@ -2763,7 +2764,7 @@ export class Scenario {
         });
         await ImportTests.submitRule();
 
-        this.environment.setBlock('Submit duplicate conditions', 2);
+        setBlock('Submit duplicate conditions', 2);
         await ImportTests.updateRuleCondition({
             pos: 1,
             action: [
@@ -2778,7 +2779,7 @@ export class Scenario {
         ]);
         await ImportTests.submitRule();
 
-        this.environment.setBlock('Submit conditions with non-intersecting value regions', 2);
+        setBlock('Submit conditions with non-intersecting value regions', 2);
         await ImportTests.updateRuleCondition({
             pos: 2,
             action: { action: 'changeOperator', data: IMPORT_COND_OP_LESS },
@@ -2796,14 +2797,14 @@ export class Scenario {
         await ImportTests.submitRule();
         await ImportTests.deleteRuleCondition(3);
 
-        this.environment.setBlock('Submit duplicate actions', 2);
+        setBlock('Submit duplicate actions', 2);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
             { action: 'inputValue', data: 'New comment' },
         ]);
         await ImportTests.submitRule();
 
-        this.environment.setBlock('Submit empty amount action', 2);
+        setBlock('Submit empty amount action', 2);
         await ImportTests.updateRuleAction({
             pos: 1,
             action: { action: 'changeAction', data: IMPORT_ACTION_SET_SRC_AMOUNT },
@@ -2815,7 +2816,7 @@ export class Scenario {
         });
         await ImportTests.submitRule();
 
-        this.environment.setBlock('Submit zero amount action', 2);
+        setBlock('Submit zero amount action', 2);
         await ImportTests.updateRuleAction({
             pos: 1,
             action: { action: 'inputAmount', data: '0.' },
@@ -2827,7 +2828,7 @@ export class Scenario {
         });
         await ImportTests.submitRule();
 
-        this.environment.setBlock('Submit negative amount action', 2);
+        setBlock('Submit negative amount action', 2);
         await ImportTests.updateRuleAction({
             pos: 1,
             action: { action: 'inputAmount', data: '-10.' },
@@ -2840,20 +2841,20 @@ export class Scenario {
         await ImportTests.submitRule();
         await ImportTests.deleteRuleAction(1);
 
-        this.environment.setBlock('Submit rule without conditions', 2);
+        setBlock('Submit rule without conditions', 2);
         await ImportTests.deleteRuleCondition(2);
         await ImportTests.deleteRuleCondition(1);
         await ImportTests.deleteRuleCondition(0);
         await ImportTests.submitRule();
 
-        this.environment.setBlock('Submit `Comment includes` condition with empty value', 2);
+        setBlock('Submit `Comment includes` condition with empty value', 2);
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
             { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
         ]);
         await ImportTests.submitRule();
 
-        this.environment.setBlock('Submit date condition with empty value', 2);
+        setBlock('Submit date condition with empty value', 2);
         await ImportTests.updateRuleCondition({
             pos: 0,
             action: [
@@ -2862,7 +2863,7 @@ export class Scenario {
             ],
         });
 
-        this.environment.setBlock('Submit Date condition with invalid value', 2);
+        setBlock('Submit Date condition with invalid value', 2);
         await ImportTests.updateRuleCondition({
             pos: 0,
             action: { action: 'inputValue', data: '01xx' },
@@ -2874,9 +2875,9 @@ export class Scenario {
 
     // Create import rule tests
     async runCreateImportRuleTests() {
-        this.environment.setBlock('Create import rules', 1);
+        setBlock('Create import rules', 1);
 
-        this.environment.setBlock('Create import rule #1', 2);
+        setBlock('Create import rule #1', 2);
         await ImportTests.createRule();
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
@@ -2889,7 +2890,7 @@ export class Scenario {
         ]);
         await ImportTests.submitRule();
 
-        this.environment.setBlock('Create import rule #2', 2);
+        setBlock('Create import rule #2', 2);
         await ImportTests.createRule();
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_TR_AMOUNT },
@@ -2906,7 +2907,7 @@ export class Scenario {
         ]);
         await ImportTests.submitRule();
 
-        this.environment.setBlock('Create import rule #3', 2);
+        setBlock('Create import rule #3', 2);
         await ImportTests.createRule();
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
@@ -2932,7 +2933,7 @@ export class Scenario {
         ]);
         await ImportTests.submitRule();
 
-        this.environment.setBlock('Create import rule #4', 2);
+        setBlock('Create import rule #4', 2);
         await ImportTests.createRule();
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
@@ -2963,7 +2964,7 @@ export class Scenario {
         ]);
         await ImportTests.submitRule();
 
-        this.environment.setBlock('Create import rule #5', 2);
+        setBlock('Create import rule #5', 2);
         await ImportTests.createRule();
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
@@ -2980,7 +2981,7 @@ export class Scenario {
         ]);
         await ImportTests.submitRule();
 
-        this.environment.setBlock('Create import rule #6', 2);
+        setBlock('Create import rule #6', 2);
         await ImportTests.createRule();
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
@@ -3011,9 +3012,9 @@ export class Scenario {
 
     // Update import rule tests
     async runUpdateImportRuleTests() {
-        this.environment.setBlock('Update import rules', 1);
+        setBlock('Update import rules', 1);
 
-        this.environment.setBlock('Update import rule #1', 2);
+        setBlock('Update import rule #1', 2);
         await ImportTests.updateRule(0);
         await ImportTests.createRuleCondition([
             { action: 'changeFieldType', data: IMPORT_COND_FIELD_MAIN_ACCOUNT },
@@ -3026,7 +3027,7 @@ export class Scenario {
         ]);
         await ImportTests.submitRule();
 
-        this.environment.setBlock('Update import rule #4', 2);
+        setBlock('Update import rule #4', 2);
         await ImportTests.updateRule(3);
         await ImportTests.updateRuleCondition({
             pos: 1,
@@ -3042,7 +3043,7 @@ export class Scenario {
         });
         await ImportTests.submitRule();
 
-        this.environment.setBlock('Update import rule #6', 2);
+        setBlock('Update import rule #6', 2);
         await ImportTests.updateRule(5);
         await ImportTests.deleteRuleCondition(0);
         await ImportTests.deleteRuleAction(0);
@@ -3051,7 +3052,7 @@ export class Scenario {
 
     // Delete import rule tests
     async runDeleteImportRuleTests() {
-        this.environment.setBlock('Delete import rules', 1);
+        setBlock('Delete import rules', 1);
         // Delete rule #3
         await ImportTests.deleteRule(2);
     }

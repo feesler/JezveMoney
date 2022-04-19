@@ -13,15 +13,24 @@ import { SearchForm } from './component/SearchForm.js';
 import { TransactionList } from './component/TransactionList.js';
 import { fixDate } from '../common.js';
 import { Toolbar } from './component/Toolbar.js';
+import {
+    query,
+    prop,
+    parentNode,
+    navigation,
+    isVisible,
+    click,
+    waitForFunction,
+} from '../env.js';
 
 /** List of transactions view class */
 export class TransactionsView extends AppView {
     async parseContent() {
         const res = {
-            titleEl: await this.query('.content_wrap > .heading > h1'),
-            addBtn: await IconLink.create(this, await this.query('#add_btn')),
-            importBtn: await IconLink.create(this, await this.query('#import_btn')),
-            toolbar: await Toolbar.create(this, await this.query('#toolbar')),
+            titleEl: await query('.content_wrap > .heading > h1'),
+            addBtn: await IconLink.create(this, await query('#add_btn')),
+            importBtn: await IconLink.create(this, await query('#import_btn')),
+            toolbar: await Toolbar.create(this, await query('#toolbar')),
         };
 
         if (
@@ -34,39 +43,39 @@ export class TransactionsView extends AppView {
             throw new Error('Invalid structure of transactions view');
         }
 
-        res.typeMenu = await TransactionTypeMenu.create(this, await this.query('.trtype-menu'));
+        res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
         if (!res.typeMenu) {
             throw new Error('Search form not found');
         }
 
-        res.accDropDown = await DropDown.createFromChild(this, await this.query('#acc_id'));
+        res.accDropDown = await DropDown.createFromChild(this, await query('#acc_id'));
         if (!res.accDropDown) {
             throw new Error('Account filter control not found');
         }
 
-        const calendarBtn = await this.query('#calendar_btn');
-        res.dateFilter = await DatePickerFilter.create(this, await this.parentNode(calendarBtn));
+        const calendarBtn = await query('#calendar_btn');
+        res.dateFilter = await DatePickerFilter.create(this, await parentNode(calendarBtn));
         if (!res.dateFilter) {
             throw new Error('Date filter not found');
         }
 
-        res.searchForm = await SearchForm.create(this, await this.query('#searchFrm'));
+        res.searchForm = await SearchForm.create(this, await query('#searchFrm'));
         if (!res.searchForm) {
             throw new Error('Search form not found');
         }
 
-        const transList = await this.query('.trans-list');
+        const transList = await query('.trans-list');
         if (!transList) {
             throw new Error('List of transactions not found');
         }
 
-        res.loadingIndicator = { elem: await this.query(transList, '.trans-list__loading') };
-        res.loadingIndicator.visible = await this.isVisible(res.loadingIndicator.elem, true);
+        res.loadingIndicator = { elem: await query(transList, '.trans-list__loading') };
+        res.loadingIndicator.visible = await isVisible(res.loadingIndicator.elem, true);
 
-        res.modeSelector = await ModeSelector.create(this, await this.query('.mode-selector'));
-        res.paginator = await Paginator.create(this, await this.query('.paginator'));
+        res.modeSelector = await ModeSelector.create(this, await query('.mode-selector'));
+        res.paginator = await Paginator.create(this, await query('.paginator'));
 
-        res.title = await this.prop(res.titleEl, 'textContent');
+        res.title = await prop(res.titleEl, 'textContent');
         res.transList = await TransactionList.create(this, transList);
 
         if (
@@ -86,7 +95,7 @@ export class TransactionsView extends AppView {
             throw new Error('Paginator not found');
         }
 
-        res.delete_warning = await WarningPopup.create(this, await this.query('#delete_warning'));
+        res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
         return res;
     }
@@ -345,7 +354,7 @@ export class TransactionsView extends AppView {
 
         await action();
 
-        await this.waitForFunction(async () => {
+        await waitForFunction(async () => {
             await this.parse();
             return (
                 !this.model.loading
@@ -467,12 +476,12 @@ export class TransactionsView extends AppView {
 
     /** Click on add button */
     async goToCreateTransaction() {
-        await this.navigation(() => this.content.addBtn.click());
+        await navigation(() => this.content.addBtn.click());
     }
 
     /** Click on import button */
     async goToImportView() {
-        await this.navigation(() => this.content.importBtn.click());
+        await navigation(() => this.content.importBtn.click());
     }
 
     async selectTransactions(data) {
@@ -518,7 +527,7 @@ export class TransactionsView extends AppView {
 
         await this.selectTransactions(pos);
 
-        return this.navigation(() => this.content.toolbar.clickButton('update'));
+        return navigation(() => this.content.toolbar.clickButton('update'));
     }
 
     /** Delete specified transactions */
@@ -539,6 +548,6 @@ export class TransactionsView extends AppView {
             throw new Error('OK button not found');
         }
 
-        await this.navigation(() => this.click(this.content.delete_warning.content.okBtn));
+        await navigation(() => click(this.content.delete_warning.content.okBtn));
     }
 }

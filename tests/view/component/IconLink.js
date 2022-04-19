@@ -1,4 +1,10 @@
 import { AppComponent } from './AppComponent.js';
+import {
+    query,
+    prop,
+    hasClass,
+    click,
+} from '../../env.js';
 
 export class IconLink extends AppComponent {
     async parseContent() {
@@ -6,40 +12,40 @@ export class IconLink extends AppComponent {
             return {};
         }
 
-        if (!await this.hasClass(this.elem, 'iconlink')) {
+        if (!await hasClass(this.elem, 'iconlink')) {
             throw new Error('Wrong icon link');
         }
 
         const res = {
-            linkElem: await this.query(this.elem, ':scope > *'),
+            linkElem: await query(this.elem, ':scope > *'),
         };
 
         if (!res.linkElem) {
             throw new Error('Link element not found');
         }
 
-        const tagName = await this.prop(res.linkElem, 'tagName');
+        const tagName = await prop(res.linkElem, 'tagName');
         if (tagName === 'A') {
-            res.link = await this.prop(res.linkElem, 'href');
+            res.link = await prop(res.linkElem, 'href');
         }
 
-        res.titleElem = await this.query(res.linkElem, '.iconlink__content');
-        const titleInner = await this.query(res.titleElem, ':scope > *');
+        res.titleElem = await query(res.linkElem, '.iconlink__content');
+        const titleInner = await query(res.titleElem, ':scope > *');
         if (!titleInner) {
             throw new Error('Title element not found');
         }
-        res.title = await this.prop(titleInner, 'textContent');
+        res.title = await prop(titleInner, 'textContent');
 
         // Subtitle is optional
-        res.subTitleElem = await this.query(res.titleElem, '.iconlink__subtitle');
+        res.subTitleElem = await query(res.titleElem, '.iconlink__subtitle');
         if (res.subTitleElem) {
-            res.subtitle = await this.prop(res.subTitleElem, 'textContent');
+            res.subtitle = await prop(res.subTitleElem, 'textContent');
         }
 
         return res;
     }
 
     async click() {
-        return this.environment.click(this.content.linkElem);
+        return click(this.content.linkElem);
     }
 }

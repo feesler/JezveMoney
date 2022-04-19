@@ -1,4 +1,10 @@
 import { AppComponent } from './AppComponent.js';
+import {
+    queryAll,
+    prop,
+    hasClass,
+    click,
+} from '../../env.js';
 
 export class Paginator extends AppComponent {
     async parseContent() {
@@ -7,19 +13,19 @@ export class Paginator extends AppComponent {
         res.items = [];
         res.activeItem = null;
 
-        if (!await this.hasClass(this.elem, 'paginator')) {
+        if (!await hasClass(this.elem, 'paginator')) {
             throw new Error('Unexpected stucture of paginator control');
         }
 
         let ellipsisBefore = false;
         let prevPageItem = null;
-        const elems = await this.queryAll(this.elem, '.paginator-item');
+        const elems = await queryAll(this.elem, '.paginator-item');
         if (elems.length === 1) {
             throw new Error('Single item paginator control');
         }
 
         for (const itemElem of elems) {
-            const isArrow = await this.hasClass(this.elem, 'paginator-arrow');
+            const isArrow = await hasClass(this.elem, 'paginator-arrow');
             if (isArrow) {
                 continue;
             }
@@ -29,7 +35,7 @@ export class Paginator extends AppComponent {
             - ellipsis can't be first item
             - ellipsis can't follow after ellipsis
             */
-            const text = await this.prop(itemElem, 'textContent');
+            const text = await prop(itemElem, 'textContent');
             if (text === '...') {
                 if (!res.items.length || ellipsisBefore || !prevPageItem) {
                     throw new Error('Unexpected placement of paginator ellipsis');
@@ -40,15 +46,15 @@ export class Paginator extends AppComponent {
             }
 
             const item = { elem: itemElem };
-            item.isActive = await this.hasClass(itemElem, 'paginator-item__active');
+            item.isActive = await hasClass(itemElem, 'paginator-item__active');
 
-            const tagName = await this.prop(itemElem, 'tagName');
+            const tagName = await prop(itemElem, 'tagName');
             if (tagName === 'A') {
                 item.linkElem = itemElem;
-                item.link = await this.prop(itemElem, 'href');
+                item.link = await prop(itemElem, 'href');
             }
 
-            item.title = await this.prop(itemElem, 'textContent');
+            item.title = await prop(itemElem, 'textContent');
             item.num = parseInt(item.title, 10);
             if (!item.title || Number.isNaN(item.num) || item.num < 1) {
                 throw new Error('Unexpected title of paginator item');
@@ -128,7 +134,7 @@ export class Paginator extends AppComponent {
             return;
         }
 
-        await this.click(item.linkElem);
+        await click(item.linkElem);
     }
 
     async goToPrevPage() {
@@ -141,7 +147,7 @@ export class Paginator extends AppComponent {
             return;
         }
 
-        await this.click(item.linkElem);
+        await click(item.linkElem);
     }
 
     async goToNextPage() {
@@ -154,7 +160,7 @@ export class Paginator extends AppComponent {
             return;
         }
 
-        await this.click(item.linkElem);
+        await click(item.linkElem);
     }
 
     async goToLastPage() {
@@ -167,6 +173,6 @@ export class Paginator extends AppComponent {
             return;
         }
 
-        await this.click(item.linkElem);
+        await click(item.linkElem);
     }
 }

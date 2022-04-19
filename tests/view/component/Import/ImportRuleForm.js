@@ -13,12 +13,18 @@ import { ImportRuleAccordion } from './ImportRuleAccordion.js';
 import { ImportActionForm } from './ImportActionForm.js';
 import { asyncMap } from '../../../common.js';
 import { App } from '../../../Application.js';
+import {
+    query,
+    queryAll,
+    prop,
+    click,
+} from '../../../env.js';
 
 export class ImportRuleForm extends AppComponent {
     async parseContent() {
         const res = {};
 
-        const accordionElems = await this.queryAll(this.elem, '.rule-form-collapse');
+        const accordionElems = await queryAll(this.elem, '.rule-form-collapse');
         const accordionItems = await asyncMap(
             accordionElems,
             (elem) => ImportRuleAccordion.create(this, elem),
@@ -34,10 +40,10 @@ export class ImportRuleForm extends AppComponent {
             }
         });
 
-        res.idInput = { elem: await this.query(this.elem, 'input[type=hidden]') };
-        res.submitBtn = { elem: await this.query(this.elem, '.rule-form__controls .submit-btn') };
-        res.cancelBtn = { elem: await this.query(this.elem, '.rule-form__controls .cancel-btn') };
-        res.feedbackElem = { elem: await this.query(this.elem, '.rule-form__feedback .invalid-feedback') };
+        res.idInput = { elem: await query(this.elem, 'input[type=hidden]') };
+        res.submitBtn = { elem: await query(this.elem, '.rule-form__controls .submit-btn') };
+        res.cancelBtn = { elem: await query(this.elem, '.rule-form__controls .cancel-btn') };
+        res.feedbackElem = { elem: await query(this.elem, '.rule-form__feedback .invalid-feedback') };
         if (
             !res.idInput.elem
             || !res.conditionsList
@@ -51,15 +57,15 @@ export class ImportRuleForm extends AppComponent {
             throw new Error('Invalid structure of import rule from');
         }
 
-        res.idInput.value = await this.prop(res.idInput.elem, 'value');
+        res.idInput.value = await prop(res.idInput.elem, 'value');
 
-        const condFormElems = await this.queryAll(res.conditionsList.elem, '.cond-form');
+        const condFormElems = await queryAll(res.conditionsList.elem, '.cond-form');
         res.conditionsList.content.items = await asyncMap(
             condFormElems,
             (elem) => ImportConditionForm.create(this, elem),
         );
 
-        const actElems = await this.queryAll(res.actionsList.elem, '.action-form');
+        const actElems = await queryAll(res.actionsList.elem, '.action-form');
         res.actionsList.content.items = await asyncMap(
             actElems,
             (elem) => ImportActionForm.create(this, elem),
@@ -395,11 +401,11 @@ export class ImportRuleForm extends AppComponent {
     }
 
     async submit() {
-        await this.click(this.content.submitBtn.elem);
+        await click(this.content.submitBtn.elem);
     }
 
     async cancel() {
-        await this.click(this.content.cancelBtn.elem);
+        await click(this.content.cancelBtn.elem);
     }
 
     /**

@@ -1,5 +1,6 @@
 import { test, copyObject } from 'jezve-test';
 import { App } from '../Application.js';
+import { baseUrl, httpReq, setBlock } from '../env.js';
 import { Currency } from '../model/Currency.js';
 import { ImportTemplate } from '../model/ImportTemplate.js';
 import { ImportTransaction } from '../model/ImportTransaction.js';
@@ -97,12 +98,12 @@ function findSimilar(transaction, skipList) {
 
 /** Admin access required */
 export async function putFile(data) {
-    const baseURL = App.environment.baseUrl();
+    const baseURL = baseUrl();
     const uploadURL = `${baseURL}admin/tests/upload`;
     const defErrorMessage = 'Request failed';
 
     try {
-        const response = await App.environment.httpReq(
+        const response = await httpReq(
             'POST',
             uploadURL,
             data.toString(),
@@ -127,14 +128,14 @@ export async function putFile(data) {
 
 /** Admin access required */
 export async function removeFile(filename) {
-    const baseURL = App.environment.baseUrl();
+    const baseURL = baseUrl();
     const removeURL = `${baseURL}admin/tests/remove`;
     const defErrorMessage = 'Request failed';
 
     try {
         const data = { filename };
 
-        const response = await App.environment.httpReq(
+        const response = await httpReq(
             'POST',
             removeURL,
             data,
@@ -458,7 +459,7 @@ export async function updateItem(params) {
         throw new Error('Invalid parameters');
     }
 
-    App.view.setBlock(`Update item [${params.pos}]`, 2);
+    setBlock(`Update item [${params.pos}]`, 2);
 
     await checkNavigation();
 

@@ -2,22 +2,29 @@ import { copyObject, isDate } from 'jezvejs';
 import { AppComponent } from './AppComponent.js';
 import { IconLink } from './IconLink.js';
 import { DatePicker } from './DatePicker.js';
+import {
+    query,
+    prop,
+    isVisible,
+    click,
+    input,
+} from '../../env.js';
 
 export class DatePickerFilter extends AppComponent {
     async parseContent() {
         const res = {
-            iconLink: await IconLink.create(this.parent, await this.query(this.elem, '.iconlink')),
+            iconLink: await IconLink.create(this.parent, await query(this.elem, '.iconlink')),
         };
         if (!res.iconLink) {
             throw new Error('Iconlink of date picker not found');
         }
 
-        res.inputElem = await this.query(this.elem, '.stretch-input > input');
+        res.inputElem = await query(this.elem, '.stretch-input > input');
         if (!res.inputElem) {
             throw new Error('Input element not found');
         }
 
-        let dateValue = await this.prop(res.inputElem, 'value');
+        let dateValue = await prop(res.inputElem, 'value');
         if (!dateValue) {
             dateValue = '';
         }
@@ -29,14 +36,14 @@ export class DatePickerFilter extends AppComponent {
             res.value = { startDate: dates[0], endDate: dates[1] };
         }
 
-        res.datePickerBtn = await this.query(this.elem, '#cal_rbtn');
+        res.datePickerBtn = await query(this.elem, '#cal_rbtn');
         if (!res.datePickerBtn) {
             throw new Error('Date picker button not found');
         }
 
-        res.datePicker = await DatePicker.create(this.parent, await this.query(this.elem, '.dp__container'));
+        res.datePicker = await DatePicker.create(this.parent, await query(this.elem, '.dp__container'));
 
-        res.clearBtn = await this.query(this.elem, '#nodatebtn');
+        res.clearBtn = await query(this.elem, '#nodatebtn');
         if (!res.clearBtn) {
             throw new Error('Clear button not found');
         }
@@ -49,7 +56,7 @@ export class DatePickerFilter extends AppComponent {
             throw new Error('Invalid parameter');
         }
 
-        if (await this.isVisible(this.content.iconLink.elem)) {
+        if (await isVisible(this.content.iconLink.elem)) {
             await this.content.iconLink.click();
             await this.parse();
         }
@@ -66,10 +73,10 @@ export class DatePickerFilter extends AppComponent {
             throw new Error('Invalid parameters');
         }
 
-        if (await this.isVisible(this.content.iconLink.elem)) {
+        if (await isVisible(this.content.iconLink.elem)) {
             await this.content.iconLink.click();
         } else {
-            await this.click(this.content.datePickerBtn);
+            await click(this.content.datePickerBtn);
         }
         await this.parse();
 
@@ -80,12 +87,12 @@ export class DatePickerFilter extends AppComponent {
     }
 
     async clear() {
-        if (await this.isVisible(this.content.iconLink.elem)) {
+        if (await isVisible(this.content.iconLink.elem)) {
             await this.content.iconLink.click();
             await this.parse();
         }
 
-        await this.click(this.content.clearBtn);
+        await click(this.content.clearBtn);
     }
 
     getSelectedRange() {
@@ -93,11 +100,11 @@ export class DatePickerFilter extends AppComponent {
     }
 
     async input(val) {
-        if (await this.isVisible(this.content.iconLink.elem)) {
+        if (await isVisible(this.content.iconLink.elem)) {
             await this.content.iconLink.click();
-            await this.parent.performAction(() => this.click(this.content.datePickerBtn));
+            await this.parent.performAction(() => click(this.content.datePickerBtn));
         }
 
-        return this.environment.input(this.content.inputElem, val);
+        return input(this.content.inputElem, val);
     }
 }

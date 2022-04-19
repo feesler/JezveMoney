@@ -1,5 +1,5 @@
 import { test } from 'jezve-test';
-import { App } from '../Application.js';
+import { baseUrl, httpReq } from '../env.js';
 
 export async function checkAccess(url) {
     await test(`Check access to ${url}`, async () => {
@@ -8,12 +8,12 @@ export async function checkAccess(url) {
             (location) => url.startsWith(location),
         );
 
-        const base = App.environment.baseUrl();
+        const base = baseUrl();
         let requestURL = base + url;
-        let resp = await App.environment.httpReq('GET', requestURL);
+        let resp = await httpReq('GET', requestURL);
         while (resp && resp.status > 300 && resp.status < 400 && 'location' in resp.headers) {
             requestURL = resp.headers.location;
-            resp = await App.environment.httpReq('GET', requestURL);
+            resp = await httpReq('GET', requestURL);
         }
 
         if (isInvalidLocation) {

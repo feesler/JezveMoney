@@ -5,6 +5,15 @@ import { ImportRuleItem } from './ImportRuleItem.js';
 import { asyncMap } from '../../../common.js';
 import { WarningPopup } from '../WarningPopup.js';
 import { App } from '../../../Application.js';
+import {
+    query,
+    queryAll,
+    prop,
+    click,
+    isVisible,
+    wait,
+    waitForFunction,
+} from '../../../env.js';
 
 /* eslint-disable no-bitwise */
 
@@ -15,14 +24,14 @@ export class ImportRulesDialog extends AppComponent {
         }
 
         const res = {
-            closeBtn: await this.query(this.elem, '.close-btn'),
+            closeBtn: await query(this.elem, '.close-btn'),
             header: {
-                elem: await this.query('.rules-header'),
-                labelElem: await this.query('.rules-header label'),
-                createBtn: await this.query('#createRuleBtn'),
+                elem: await query('.rules-header'),
+                labelElem: await query('.rules-header label'),
+                createBtn: await query('#createRuleBtn'),
             },
-            loadingIndicator: { elem: await this.query(this.elem, '.rules-dialog__loading') },
-            rulesList: { elem: await this.query(this.elem, '.rules-list') },
+            loadingIndicator: { elem: await query(this.elem, '.rules-dialog__loading') },
+            rulesList: { elem: await query(this.elem, '.rules-list') },
         };
 
         if (
@@ -36,25 +45,25 @@ export class ImportRulesDialog extends AppComponent {
             throw new Error('Failed to initialize import rules dialog');
         }
 
-        res.rulesList.renderTime = await this.prop(res.rulesList.elem, 'dataset.time');
-        res.header.title = await this.prop(res.header.labelElem, 'textContent');
+        res.rulesList.renderTime = await prop(res.rulesList.elem, 'dataset.time');
+        res.header.title = await prop(res.header.labelElem, 'textContent');
 
-        const listItems = await this.queryAll(res.rulesList.elem, '.rule-item');
+        const listItems = await queryAll(res.rulesList.elem, '.rule-item');
         res.items = await asyncMap(
             listItems,
             (item) => ImportRuleItem.create(this.parent, item),
         );
 
-        res.loadingIndicator.visible = await this.isVisible(res.loadingIndicator.elem, true);
-        res.rulesList.visible = await this.isVisible(res.rulesList.elem, true);
+        res.loadingIndicator.visible = await isVisible(res.loadingIndicator.elem, true);
+        res.rulesList.visible = await isVisible(res.rulesList.elem, true);
 
-        const ruleFormElem = await this.query(this.elem, '.rule-form');
+        const ruleFormElem = await query(this.elem, '.rule-form');
         if (ruleFormElem) {
             res.ruleForm = await ImportRuleForm.create(this.parent, ruleFormElem);
         }
 
         res.ruleDeletePopupId = '#rule_delete_warning';
-        const popupElem = await this.query(res.ruleDeletePopupId);
+        const popupElem = await query(res.ruleDeletePopupId);
         res.delete_warning = await WarningPopup.create(this, popupElem);
 
         return res;
@@ -140,7 +149,7 @@ export class ImportRulesDialog extends AppComponent {
     }
 
     async close() {
-        await this.click(this.content.closeBtn);
+        await click(this.content.closeBtn);
     }
 
     async createRule() {
@@ -155,8 +164,8 @@ export class ImportRulesDialog extends AppComponent {
         };
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.click(this.content.header.createBtn);
-        await this.waitForFunction(async () => {
+        await click(this.content.header.createBtn);
+        await waitForFunction(async () => {
             await this.parse();
             return this.model.state === 'create';
         });
@@ -194,7 +203,7 @@ export class ImportRulesDialog extends AppComponent {
         this.expectedState = this.getExpectedState(this.model);
 
         await this.content.items[ind].clickUpdate();
-        await this.waitForFunction(async () => {
+        await waitForFunction(async () => {
             await this.parse();
             return this.model.state === 'update';
         });
@@ -216,7 +225,7 @@ export class ImportRulesDialog extends AppComponent {
         this.expectedState = this.getExpectedState(this.model);
 
         await this.content.items[ind].clickDelete();
-        await this.wait(this.content.ruleDeletePopupId, { visible: true });
+        await wait(this.content.ruleDeletePopupId, { visible: true });
         await this.parse();
 
         if (!await AppComponent.isVisible(this.content.delete_warning)) {
@@ -228,9 +237,9 @@ export class ImportRulesDialog extends AppComponent {
 
         const prevTime = this.model.renderTime;
 
-        await this.click(this.content.delete_warning.content.okBtn);
-        await this.wait(this.content.ruleDeletePopupId, { hidden: true });
-        await this.waitForFunction(async () => {
+        await click(this.content.delete_warning.content.okBtn);
+        await wait(this.content.ruleDeletePopupId, { hidden: true });
+        await waitForFunction(async () => {
             await this.parse();
             return (
                 !this.model.loading
@@ -265,7 +274,7 @@ export class ImportRulesDialog extends AppComponent {
         const prevTime = this.model.renderTime;
 
         await this.content.ruleForm.submit();
-        await this.waitForFunction(async () => {
+        await waitForFunction(async () => {
             await this.parse();
             return !valid || (
                 !this.model.loading
@@ -286,7 +295,7 @@ export class ImportRulesDialog extends AppComponent {
         this.expectedState = this.getExpectedState(this.model);
 
         await this.content.ruleForm.cancel();
-        await this.waitForFunction(async () => {
+        await waitForFunction(async () => {
             await this.parse();
             return !this.model.loading && this.isListState();
         });

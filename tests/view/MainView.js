@@ -7,11 +7,12 @@ import { Widget } from './component/Widget/Widget.js';
 import { AccountsWidget } from './component/Widget/AccountsWidget.js';
 import { PersonsWidget } from './component/Widget/PersonsWidget.js';
 import { TransactionsWidget } from './component/Widget/TransactionsWidget.js';
+import { navigation, queryAll } from '../env.js';
 
 /** Main view class */
 export class MainView extends AppView {
     async parseContent() {
-        const widgets = await this.queryAll('.widget');
+        const widgets = await queryAll('.widget');
         if (!widgets || widgets.length !== App.config.widgetsCount) {
             throw new Error('Fail to parse main view widgets');
         }
@@ -51,7 +52,7 @@ export class MainView extends AppView {
             throw new Error('Accounts widget not found');
         }
 
-        await this.navigation(() => this.content.accountsWidget.clickByTitle());
+        await navigation(() => this.content.accountsWidget.clickByTitle());
     }
 
     async goToNewTransactionByAccount(accNum) {
@@ -59,7 +60,7 @@ export class MainView extends AppView {
             throw new Error('Accounts widget not found');
         }
 
-        await this.navigation(() => this.content.accountsWidget.clickAccountByIndex(accNum));
+        await navigation(() => this.content.accountsWidget.clickAccountByIndex(accNum));
     }
 
     async goToTransactions() {
@@ -67,7 +68,7 @@ export class MainView extends AppView {
             throw new Error('Transactions widget not found');
         }
 
-        await this.navigation(() => this.content.transactionsWidget.clickByTitle());
+        await navigation(() => this.content.transactionsWidget.clickByTitle());
     }
 
     async goToPersons() {
@@ -75,7 +76,7 @@ export class MainView extends AppView {
             throw new Error('Persons widget not found');
         }
 
-        await this.navigation(() => this.content.personsWidget.clickByTitle());
+        await navigation(() => this.content.personsWidget.clickByTitle());
     }
 
     async goToStatistics() {
@@ -83,7 +84,7 @@ export class MainView extends AppView {
             throw new Error('Statistics widget not found');
         }
 
-        await this.navigation(() => this.content.statisticsWidget.clickByTitle());
+        await navigation(() => this.content.statisticsWidget.clickByTitle());
     }
 
     static render(state) {

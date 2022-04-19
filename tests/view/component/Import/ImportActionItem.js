@@ -2,6 +2,7 @@ import { AppComponent } from '../AppComponent.js';
 import { ImportAction } from '../../../model/ImportAction.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import { App } from '../../../Application.js';
+import { query, prop } from '../../../env.js';
 
 export class ImportActionItem extends AppComponent {
     async parseContent() {
@@ -10,16 +11,16 @@ export class ImportActionItem extends AppComponent {
         }
 
         const res = {
-            typeTitle: { elem: await this.query(this.elem, '.action-item__type') },
-            valueTitle: { elem: await this.query(this.elem, '.action-item__value') },
+            typeTitle: { elem: await query(this.elem, '.action-item__type') },
+            valueTitle: { elem: await query(this.elem, '.action-item__value') },
         };
 
         if (!res.typeTitle.elem || !res.valueTitle.elem) {
             throw new Error('Invalid structure of action item');
         }
 
-        res.typeTitle.value = await this.prop(res.typeTitle.elem, 'textContent');
-        res.valueTitle.value = await this.prop(res.valueTitle.elem, 'textContent');
+        res.typeTitle.value = await prop(res.typeTitle.elem, 'textContent');
+        res.valueTitle.value = await prop(res.valueTitle.elem, 'textContent');
 
         return res;
     }

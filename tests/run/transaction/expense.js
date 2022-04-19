@@ -3,6 +3,7 @@ import * as TransactionTests from './common.js';
 import { Currency } from '../../model/Currency.js';
 import { EXPENSE } from '../../model/Transaction.js';
 import { App } from '../../Application.js';
+import { setBlock } from '../../env.js';
 
 export async function submit(params) {
     if ('srcAcc' in params) {
@@ -67,7 +68,7 @@ export async function stateLoop() {
     await App.view.changeTransactionType(EXPENSE);
 
     // State 0
-    App.view.setBlock('Expense loop', 2);
+    setBlock('Expense loop', 2);
     await test('Initial state of new expense view', () => {
         App.view.setExpectedState(0);
         return App.view.checkState();

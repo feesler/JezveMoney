@@ -9,6 +9,12 @@ import { DropDown } from './component/DropDown.js';
 import { InputRow } from './component/InputRow.js';
 import { IconLink } from './component/IconLink.js';
 import { WarningPopup } from './component/WarningPopup.js';
+import {
+    query,
+    prop,
+    navigation,
+    click,
+} from '../env.js';
 
 /** Create or update account view class */
 export class AccountView extends AppView {
@@ -147,23 +153,23 @@ export class AccountView extends AppView {
     async parseContent() {
         const res = {};
 
-        res.heading = { elem: await this.query('.heading > h1') };
+        res.heading = { elem: await query('.heading > h1') };
         if (!res.heading.elem) {
             throw new Error('Heading element not found');
         }
-        res.heading.text = await this.prop(res.heading.elem, 'textContent');
-        res.delBtn = await IconLink.create(this, await this.query('#del_btn'));
-        res.tile = await Tile.create(this, await this.query('#acc_tile'));
+        res.heading.text = await prop(res.heading.elem, 'textContent');
+        res.delBtn = await IconLink.create(this, await query('#del_btn'));
+        res.tile = await Tile.create(this, await query('#acc_tile'));
 
-        res.formElem = await this.query('form');
+        res.formElem = await query('form');
         if (!res.formElem) {
             throw new Error('Form element not found');
         }
 
-        const hiddenEl = await this.query('#accid');
+        const hiddenEl = await query('#accid');
         res.isUpdate = (!!hiddenEl);
         if (res.isUpdate) {
-            res.id = parseInt(await this.prop(hiddenEl, 'value'), 10);
+            res.id = parseInt(await prop(hiddenEl, 'value'), 10);
             if (!res.id) {
                 throw new Error('Wrong account id');
             }
@@ -171,37 +177,37 @@ export class AccountView extends AppView {
 
         let curChildren = (res.isUpdate) ? 3 : 2;
 
-        res.iconDropDown = await DropDown.createFromChild(this, await this.query('#icon'));
+        res.iconDropDown = await DropDown.createFromChild(this, await query('#icon'));
 
         curChildren += 1;
-        let elem = await this.query(`form > *:nth-child(${curChildren})`);
+        let elem = await query(`form > *:nth-child(${curChildren})`);
         res.name = await InputRow.create(this, elem);
         if (!res.name) {
             throw new Error('Account name input not found');
         }
 
         curChildren += 1;
-        res.currDropDown = await DropDown.createFromChild(this, await this.query('#currency'));
+        res.currDropDown = await DropDown.createFromChild(this, await query('#currency'));
 
         curChildren += 1;
-        elem = await this.query(`form > *:nth-child(${curChildren})`);
+        elem = await query(`form > *:nth-child(${curChildren})`);
 
         res.balance = await InputRow.create(this, elem);
 
-        res.flagsInp = await this.query('#flags');
-        res.flags = parseInt(await this.prop(res.flagsInp, 'value'), 10);
+        res.flagsInp = await query('#flags');
+        res.flags = parseInt(await prop(res.flagsInp, 'value'), 10);
 
-        res.submitBtn = await this.query('.acc_controls .submit-btn');
+        res.submitBtn = await query('.acc_controls .submit-btn');
         if (!res.submitBtn) {
             throw new Error('Submit button not found');
         }
 
-        res.cancelBtn = await this.query('.acc_controls .cancel-btn');
+        res.cancelBtn = await query('.acc_controls .cancel-btn');
         if (!res.cancelBtn) {
             throw new Error('Cancel button not found');
         }
 
-        res.delete_warning = await WarningPopup.create(this, await this.query('#delete_warning'));
+        res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
         return res;
     }
@@ -231,7 +237,7 @@ export class AccountView extends AppView {
             throw new Error('OK button not found');
         }
 
-        await this.navigation(() => this.click(this.content.delete_warning.content.okBtn));
+        await navigation(() => click(this.content.delete_warning.content.okBtn));
     }
 
     async inputName(val) {
@@ -290,16 +296,16 @@ export class AccountView extends AppView {
     }
 
     async submit() {
-        const action = () => this.click(this.content.submitBtn);
+        const action = () => click(this.content.submitBtn);
 
         if (this.isValid()) {
-            await this.navigation(action);
+            await navigation(action);
         } else {
             await this.performAction(action);
         }
     }
 
     async cancel() {
-        await this.navigation(() => this.click(this.content.cancelBtn));
+        await navigation(() => click(this.content.cancelBtn));
     }
 }

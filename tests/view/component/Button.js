@@ -1,9 +1,10 @@
 import { AppComponent } from './AppComponent.js';
+import { query, click } from '../../env.js';
 
 export class Button extends AppComponent {
     async parseContent() {
         const res = {
-            btnElem: await this.query(this.elem, ':scope > *'),
+            btnElem: await query(this.elem, ':scope > *'),
         };
         if (!res.btnElem) {
             throw new Error('Invalid button component');
@@ -13,6 +14,6 @@ export class Button extends AppComponent {
     }
 
     async click() {
-        return this.environment.click(this.content.btnElem);
+        return click(this.content.btnElem);
     }
 }

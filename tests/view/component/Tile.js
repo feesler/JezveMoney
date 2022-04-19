@@ -1,30 +1,36 @@
 import { AppComponent } from './AppComponent.js';
 import { Icon } from '../../model/Icon.js';
 import { Currency } from '../../model/Currency.js';
+import {
+    query,
+    prop,
+    hasClass,
+    click,
+} from '../../env.js';
 
 export class Tile extends AppComponent {
     async parseContent() {
-        if (!this.elem || !await this.hasClass(this.elem, 'tile')) {
+        if (!this.elem || !await hasClass(this.elem, 'tile')) {
             throw new Error('Wrong tile structure');
         }
 
         const res = {
-            linkElem: await this.query(this.elem, '.tilelink'),
-            balanceEL: await this.query(this.elem, '.tile__subtitle'),
-            nameEL: await this.query(this.elem, '.tile__title'),
-            id: parseInt(await this.prop(this.elem, 'dataset.id'), 10),
+            linkElem: await query(this.elem, '.tilelink'),
+            balanceEL: await query(this.elem, '.tile__subtitle'),
+            nameEL: await query(this.elem, '.tile__title'),
+            id: parseInt(await prop(this.elem, 'dataset.id'), 10),
         };
 
-        res.balance = await this.prop(res.balanceEL, 'textContent');
-        res.name = await this.prop(res.nameEL, 'textContent');
+        res.balance = await prop(res.balanceEL, 'textContent');
+        res.name = await prop(res.nameEL, 'textContent');
 
-        res.isActive = await this.hasClass(this.elem, 'tile_selected');
+        res.isActive = await hasClass(this.elem, 'tile_selected');
 
-        res.iconElem = await this.query(this.elem, '.tile__icon > svg');
+        res.iconElem = await query(this.elem, '.tile__icon > svg');
         if (res.iconElem) {
-            const svgUseElem = await this.query(res.iconElem, 'use');
+            const svgUseElem = await query(res.iconElem, 'use');
 
-            let iconHRef = await this.prop(svgUseElem, 'href.baseVal');
+            let iconHRef = await prop(svgUseElem, 'href.baseVal');
             if (typeof iconHRef === 'string' && iconHRef.startsWith('#')) {
                 iconHRef = iconHRef.substr(1);
             }
@@ -39,7 +45,7 @@ export class Tile extends AppComponent {
     }
 
     async click() {
-        await this.environment.click(this.content.linkElem);
+        await click(this.content.linkElem);
     }
 
     static renderAccount(account) {
