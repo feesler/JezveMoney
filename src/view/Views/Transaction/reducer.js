@@ -73,14 +73,12 @@ export const typeChange = (type) => ({ type: TYPE_CHANGE, payload: type });
 
 // Tools
 
-/** Set new source amount and calculate source result balance */
-const setStateSourceAmount = (state, amount) => {
+/** Calculate source result balance */
+const calculateSourceResult = (state) => {
     const result = state;
     const { transaction } = result;
 
-    const sourceAmount = normalize(amount);
-    result.transaction.src_amount = sourceAmount;
-    result.form.sourceAmount = amount;
+    const sourceAmount = result.transaction.src_amount;
 
     if (transaction.type !== DEBT) {
         if (result.srcAccount) {
@@ -109,14 +107,12 @@ const setStateSourceAmount = (state, amount) => {
     return result;
 };
 
-/** Set new destination amount and calculate destination result balance */
-const setStateDestAmount = (state, amount) => {
+/** Calculate destination result balance */
+const calculateDestResult = (state) => {
     const result = state;
     const { transaction } = result;
 
-    const destAmount = normalize(amount);
-    result.transaction.dest_amount = destAmount;
-    result.form.destAmount = amount;
+    const destAmount = result.transaction.dest_amount;
 
     if (transaction.type !== DEBT) {
         if (result.destAccount) {
@@ -143,6 +139,28 @@ const setStateDestAmount = (state, amount) => {
     }
 
     return result;
+};
+
+/** Set new source amount and calculate source result balance */
+const setStateSourceAmount = (state, amount) => {
+    const result = state;
+
+    const sourceAmount = normalize(amount);
+    result.transaction.src_amount = sourceAmount;
+    result.form.sourceAmount = amount;
+
+    return calculateSourceResult(result);
+};
+
+/** Set new destination amount and calculate destination result balance */
+const setStateDestAmount = (state, amount) => {
+    const result = state;
+
+    const destAmount = normalize(amount);
+    result.transaction.dest_amount = destAmount;
+    result.form.destAmount = amount;
+
+    return calculateDestResult(result);
 };
 
 const setStateNextSourceAccount = (state, accountId) => {
@@ -914,7 +932,7 @@ const reduceSourceAmountChange = (state, value) => {
     newState.transaction.src_amount = newValue;
 
     if (newState.transaction.type === EXPENSE) {
-        setStateSourceAmount(newState, newValue);
+        calculateSourceResult(newState);
         updateStateExchange(newState);
     }
 
@@ -929,7 +947,7 @@ const reduceSourceAmountChange = (state, value) => {
     }
 
     if (newState.transaction.type === TRANSFER) {
-        setStateSourceAmount(newState, value);
+        calculateSourceResult(newState);
         if (newState.isDiff) {
             updateStateExchange(newState);
         } else {
@@ -938,7 +956,7 @@ const reduceSourceAmountChange = (state, value) => {
     }
 
     if (newState.transaction.type === DEBT) {
-        setStateSourceAmount(newState, value);
+        calculateSourceResult(newState);
         setStateDestAmount(newState, newValue);
     }
 
@@ -980,7 +998,7 @@ const reduceDestAmountChange = (state, value) => {
     }
 
     if (newState.transaction.type === INCOME) {
-        setStateDestAmount(newState, newValue);
+        calculateDestResult(newState);
         if (newState.isDiff) {
             updateStateExchange(newState);
         } else {
@@ -989,7 +1007,7 @@ const reduceDestAmountChange = (state, value) => {
     }
 
     if (newState.transaction.type === TRANSFER) {
-        setStateDestAmount(newState, value);
+        calculateDestResult(newState);
         if (newState.isDiff) {
             updateStateExchange(newState);
         } else {

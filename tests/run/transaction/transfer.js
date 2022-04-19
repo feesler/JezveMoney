@@ -82,6 +82,7 @@ export async function stateLoop() {
         '.',
         '.0',
         '.09',
+        '',
     ];
     await TransactionTests.runGroup('inputSrcAmount', saInputData);
 
