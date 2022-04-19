@@ -508,27 +508,25 @@ export class TransactionView extends AppView {
             }
 
             if (newState === 0 || newState === 1) {
-                Object.assign(res.values, {
-                    src_amount_row: { label: 'Amount' },
-                    dest_amount_row: { label: 'Amount' },
-                });
+                res.values.src_amount_row.label = 'Amount';
+                res.values.dest_amount_row.label = 'Amount';
             } else {
-                Object.assign(res.values, {
-                    src_amount_row: { label: 'Source amount' },
-                    dest_amount_row: { label: 'Destination amount' },
-                });
+                res.values.src_amount_row.label = 'Source amount';
+                res.values.dest_amount_row.label = 'Destination amount';
             }
 
             res.values.result_balance_row.label = 'Result balance';
 
-            Object.assign(res.visibility, {
+            res.visibility = {
+                ...res.visibility,
                 src_amount_left: false,
                 dest_res_balance_left: false,
                 result_balance_dest_row: false,
-            });
+            };
 
             if (newState === 0) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     dest_amount_left: false,
                     src_res_balance_left: true,
                     exch_left: false,
@@ -536,9 +534,10 @@ export class TransactionView extends AppView {
                     dest_amount_row: true,
                     exchange_row: false,
                     result_balance_row: false,
-                });
+                };
             } else if (newState === 1) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     dest_amount_left: true,
                     src_res_balance_left: false,
                     exch_left: false,
@@ -546,9 +545,10 @@ export class TransactionView extends AppView {
                     dest_amount_row: false,
                     exchange_row: false,
                     result_balance_row: true,
-                });
+                };
             } else if (newState === 2) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     dest_amount_left: false,
                     src_res_balance_left: true,
                     exch_left: true,
@@ -556,9 +556,10 @@ export class TransactionView extends AppView {
                     dest_amount_row: true,
                     exchange_row: false,
                     result_balance_row: false,
-                });
+                };
             } else if (newState === 3) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     dest_amount_left: true,
                     src_res_balance_left: true,
                     exch_left: false,
@@ -566,9 +567,10 @@ export class TransactionView extends AppView {
                     dest_amount_row: false,
                     exchange_row: true,
                     result_balance_row: false,
-                });
+                };
             } else if (newState === 4) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     dest_amount_left: true,
                     src_res_balance_left: false,
                     exch_left: true,
@@ -576,7 +578,7 @@ export class TransactionView extends AppView {
                     dest_amount_row: false,
                     exchange_row: false,
                     result_balance_row: true,
-                });
+                };
             }
         }
 
@@ -585,27 +587,25 @@ export class TransactionView extends AppView {
                 throw new Error('Wrong state specified');
             }
 
-            Object.assign(res.visibility, {
+            res.visibility = {
+                ...res.visibility,
                 dest_res_balance_left: false,
                 result_balance_dest_row: false,
-            });
+            };
 
             res.values.result_balance_dest_row.label = 'Result balance';
 
             if (newState === 0 || newState === 1) {
-                Object.assign(res.values, {
-                    src_amount_row: { label: 'Amount' },
-                    dest_amount_row: { label: 'Amount' },
-                });
+                res.values.src_amount_row.label = 'Amount';
+                res.values.dest_amount_row.label = 'Amount';
             } else {
-                Object.assign(res.values, {
-                    src_amount_row: { label: 'Source amount' },
-                    dest_amount_row: { label: 'Destination amount' },
-                });
+                res.values.src_amount_row.label = 'Source amount';
+                res.values.dest_amount_row.label = 'Destination amount';
             }
 
             if (newState === 0) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_left: false,
                     dest_amount_left: false,
                     dest_res_balance_left: true,
@@ -614,9 +614,10 @@ export class TransactionView extends AppView {
                     dest_amount_row: false,
                     result_balance_dest_row: false,
                     exchange_row: false,
-                });
+                };
             } else if (newState === 1) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_left: true,
                     dest_amount_left: false,
                     dest_res_balance_left: false,
@@ -625,9 +626,10 @@ export class TransactionView extends AppView {
                     dest_amount_row: false,
                     result_balance_dest_row: true,
                     exchange_row: false,
-                });
+                };
             } else if (newState === 2) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_left: false,
                     dest_amount_left: false,
                     dest_res_balance_left: true,
@@ -636,9 +638,10 @@ export class TransactionView extends AppView {
                     dest_amount_row: true,
                     exchange_row: false,
                     result_balance_dest_row: false,
-                });
+                };
             } else if (newState === 3) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_left: false,
                     dest_amount_left: true,
                     dest_res_balance_left: true,
@@ -647,9 +650,10 @@ export class TransactionView extends AppView {
                     dest_amount_row: false,
                     exchange_row: true,
                     result_balance_dest_row: false,
-                });
+                };
             } else if (newState === 4) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_left: false,
                     dest_amount_left: true,
                     dest_res_balance_left: false,
@@ -658,7 +662,7 @@ export class TransactionView extends AppView {
                     dest_amount_row: false,
                     exchange_row: false,
                     result_balance_dest_row: true,
-                });
+                };
             }
         }
 
@@ -667,25 +671,20 @@ export class TransactionView extends AppView {
                 throw new Error('Wrong state specified');
             }
 
-            Object.assign(res.values, {
-                result_balance_row: { label: 'Result balance (Source)' },
-                result_balance_dest_row: { label: 'Result balance (Destination)' },
-            });
+            res.values.result_balance_row.label = 'Result balance (Source)';
+            res.values.result_balance_dest_row.label = 'Result balance (Destination)';
 
             if (newState === 0 || newState === 1 || newState === 2) {
-                Object.assign(res.values, {
-                    src_amount_row: { label: 'Amount' },
-                    dest_amount_row: { label: 'Amount' },
-                });
+                res.values.src_amount_row.label = 'Amount';
+                res.values.dest_amount_row.label = 'Amount';
             } else {
-                Object.assign(res.values, {
-                    src_amount_row: { label: 'Source amount' },
-                    dest_amount_row: { label: 'Destination amount' },
-                });
+                res.values.src_amount_row.label = 'Source amount';
+                res.values.dest_amount_row.label = 'Destination amount';
             }
 
             if (newState === 0) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_left: false,
                     dest_amount_left: false,
                     src_res_balance_left: true,
@@ -696,9 +695,10 @@ export class TransactionView extends AppView {
                     result_balance_row: false,
                     result_balance_dest_row: false,
                     exchange_row: false,
-                });
+                };
             } else if (newState === 1) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_left: true,
                     dest_amount_left: false,
                     src_res_balance_left: false,
@@ -709,9 +709,10 @@ export class TransactionView extends AppView {
                     result_balance_row: true,
                     result_balance_dest_row: false,
                     exchange_row: false,
-                });
+                };
             } else if (newState === 2) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_left: true,
                     dest_amount_left: false,
                     src_res_balance_left: true,
@@ -722,9 +723,10 @@ export class TransactionView extends AppView {
                     result_balance_row: false,
                     result_balance_dest_row: true,
                     exchange_row: false,
-                });
+                };
             } else if (newState === 3) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_left: false,
                     dest_amount_left: false,
                     src_res_balance_left: true,
@@ -735,9 +737,10 @@ export class TransactionView extends AppView {
                     result_balance_row: false,
                     result_balance_dest_row: false,
                     exchange_row: false,
-                });
+                };
             } else if (newState === 4) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_left: true,
                     dest_amount_left: false,
                     src_res_balance_left: false,
@@ -748,9 +751,10 @@ export class TransactionView extends AppView {
                     result_balance_row: true,
                     result_balance_dest_row: false,
                     exchange_row: false,
-                });
+                };
             } else if (newState === 5) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_left: false,
                     dest_amount_left: true,
                     src_res_balance_left: true,
@@ -761,9 +765,10 @@ export class TransactionView extends AppView {
                     result_balance_row: false,
                     result_balance_dest_row: true,
                     exchange_row: false,
-                });
+                };
             } else if (newState === 6) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_left: true,
                     dest_amount_left: true,
                     src_res_balance_left: false,
@@ -774,9 +779,10 @@ export class TransactionView extends AppView {
                     result_balance_row: true,
                     result_balance_dest_row: true,
                     exchange_row: false,
-                });
+                };
             } else if (newState === 7) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_left: false,
                     dest_amount_left: true,
                     src_res_balance_left: true,
@@ -787,9 +793,10 @@ export class TransactionView extends AppView {
                     result_balance_row: false,
                     result_balance_dest_row: false,
                     exchange_row: true,
-                });
+                };
             } else if (newState === 8) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_left: true,
                     dest_amount_left: true,
                     src_res_balance_left: false,
@@ -800,7 +807,7 @@ export class TransactionView extends AppView {
                     result_balance_row: true,
                     result_balance_dest_row: false,
                     exchange_row: true,
-                });
+                };
             }
         }
 
@@ -809,7 +816,8 @@ export class TransactionView extends AppView {
                 throw new Error('Wrong state specified');
             }
 
-            Object.assign(res.visibility, {
+            res.visibility = {
+                ...res.visibility,
                 account: { tile: !this.model.noAccount },
                 selaccount: this.model.noAccount,
                 noacc_btn: !this.model.noAccount,
@@ -817,27 +825,33 @@ export class TransactionView extends AppView {
                 dest_amount_left: false,
                 exchange_row: false,
                 exch_left: false,
-            });
+            };
 
             res.values.src_amount_row.label = 'Amount';
 
             if (this.model.debtType) {
-                Object.assign(res.values, {
-                    person: {
-                        tile: {
-                            name: this.model.person.name,
-                            balance: this.model.srcAccount.fmtBalance,
-                        },
+                res.values.person = {
+                    tile: {
+                        name: this.model.person.name,
+                        balance: this.model.srcAccount.fmtBalance,
                     },
-                    src_res_balance_left: this.model.fmtSrcResBal,
-                    result_balance_row: { label: 'Result balance (Person)' },
-                    result_balance_dest_row: { label: 'Result balance (Account)' },
-                });
+                };
+                res.values.src_res_balance_left = this.model.fmtSrcResBal;
+
+                res.values.result_balance_row.label = 'Result balance (Person)';
+                res.values.result_balance_dest_row.label = 'Result balance (Account)';
 
                 // Check initial state
                 res.values.dest_res_balance_left = this.model.fmtDestResBal;
 
                 if (!this.model.noAccount) {
+                    res.values.account = {
+                        tile: {
+                            name: this.model.destAccount.name,
+                            balance: this.model.destAccount.fmtBalance,
+                        },
+                    };
+                    /*
                     res.values.account = Object.assign(
                         (res.values.account) ? res.values.account : {},
                         {
@@ -847,24 +861,31 @@ export class TransactionView extends AppView {
                             },
                         },
                     );
+                    */
                 }
             } else {
-                Object.assign(res.values, {
-                    person: {
-                        tile: {
-                            name: this.model.person.name,
-                            balance: this.model.destAccount.fmtBalance,
-                        },
+                res.values.person = {
+                    tile: {
+                        name: this.model.person.name,
+                        balance: this.model.destAccount.fmtBalance,
                     },
-                    dest_res_balance_left: this.model.fmtDestResBal,
-                    result_balance_row: { label: 'Result balance (Account)' },
-                    result_balance_dest_row: { label: 'Result balance (Person)' },
-                });
+                };
+                res.values.dest_res_balance_left = this.model.fmtDestResBal;
+
+                res.values.result_balance_row.label = 'Result balance (Account)';
+                res.values.result_balance_dest_row.label = 'Result balance (Person)';
 
                 // Check initial state
                 res.values.src_res_balance_left = this.model.fmtSrcResBal;
 
                 if (!this.model.noAccount) {
+                    res.values.account = {
+                        tile: {
+                            name: this.model.srcAccount.name,
+                            balance: this.model.srcAccount.fmtBalance,
+                        },
+                    };
+                    /*
                     res.values.account = Object.assign(
                         (res.values.account) ? res.values.account : {},
                         {
@@ -874,72 +895,80 @@ export class TransactionView extends AppView {
                             },
                         },
                     );
+                    */
                 }
             }
 
             if (newState === 0 || newState === 3) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_row: true,
                     src_amount_left: false,
                     result_balance_row: false,
                     src_res_balance_left: true,
                     result_balance_dest_row: false,
                     dest_res_balance_left: true,
-                });
+                };
             } else if (newState === 1 || newState === 5) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_row: false,
                     src_amount_left: true,
                     result_balance_row: true,
                     src_res_balance_left: false,
                     result_balance_dest_row: false,
                     dest_res_balance_left: true,
-                });
+                };
             } else if (newState === 2 || newState === 4) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_row: false,
                     src_amount_left: true,
                     result_balance_row: false,
                     src_res_balance_left: true,
                     result_balance_dest_row: true,
                     dest_res_balance_left: false,
-                });
+                };
             } else if (newState === 6) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_row: true,
                     src_amount_left: false,
                     result_balance_row: false,
                     src_res_balance_left: true,
                     result_balance_dest_row: false,
                     dest_res_balance_left: false,
-                });
+                };
             } else if (newState === 7) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_row: true,
                     src_amount_left: false,
                     result_balance_row: false,
                     src_res_balance_left: false,
                     result_balance_dest_row: false,
                     dest_res_balance_left: true,
-                });
+                };
             } else if (newState === 8) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_row: false,
                     src_amount_left: true,
                     result_balance_row: false,
                     src_res_balance_left: false,
                     result_balance_dest_row: true,
                     dest_res_balance_left: false,
-                });
+                };
             } else if (newState === 9) {
-                Object.assign(res.visibility, {
+                res.visibility = {
+                    ...res.visibility,
                     src_amount_row: false,
                     src_amount_left: true,
                     result_balance_row: true,
                     src_res_balance_left: false,
                     result_balance_dest_row: false,
                     dest_res_balance_left: false,
-                });
+                };
             }
         }
 
