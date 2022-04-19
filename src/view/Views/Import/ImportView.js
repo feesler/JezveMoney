@@ -27,6 +27,7 @@ import { ImportTransactionItem } from '../../Components/ImportTransactionItem/Im
 
 /* eslint no-bitwise: "off" */
 /* global baseURL */
+const SUBMIT_LIMIT = 100;
 
 /**
  * Import view constructor
@@ -481,7 +482,7 @@ class ImportView extends View {
             return;
         }
 
-        const requestObj = enabledList.map((item) => {
+        const itemsData = enabledList.map((item) => {
             const res = item.getData();
             if (!res) {
                 throw new Error('Invalid transaction object');
@@ -490,9 +491,23 @@ class ImportView extends View {
             return res;
         });
 
+        // Split list of items to chunks
+        this.submitQueue = [];
+        while (itemsData.length > 0) {
+            const chunkSize = Math.min(itemsData.length, SUBMIT_LIMIT);
+            const chunk = itemsData.splice(0, chunkSize);
+            this.submitQueue.push(chunk);
+        }
+
+        this.submitChunk();
+    }
+
+    submitChunk() {
+        const chunk = this.submitQueue.pop();
+
         ajax.post({
             url: `${baseURL}api/transaction/createMultiple/`,
-            data: JSON.stringify(requestObj),
+            data: JSON.stringify(chunk),
             headers: { 'Content-Type': 'application/json' },
             callback: this.onSubmitResult.bind(this),
         });
@@ -510,8 +525,13 @@ class ImportView extends View {
             const respObj = JSON.parse(response);
             status = (respObj && respObj.result === 'ok');
             if (status) {
-                message = 'All transactions have been successfully imported';
-                this.removeAllItems();
+                if (this.submitQueue.length === 0) {
+                    message = 'All transactions have been successfully imported';
+                    this.removeAllItems();
+                } else {
+                    this.submitChunk();
+                    return;
+                }
             } else if (respObj && respObj.msg) {
                 message = respObj.msg;
             }
