@@ -193,6 +193,7 @@ body.white-theme,
 
 /* Transaction list item */
 .white-theme .trans-list_details td > div,
+.white-theme table.trans-list-items td > div,
 .white-theme .trans-list_details tr.trans-list__item_selected > td > div {
   background-color: #f0f0f0;
 }
@@ -216,7 +217,8 @@ body.white-theme,
   border-left-color: #808080;
 }
 
-.white-theme .trans-list_details .trans-list__item-comment {
+.white-theme .trans-list_details .trans-list__item-comment,
+.white-theme table.trans-list-items .trans-list__item-comment {
   color: #808080;
 }
 

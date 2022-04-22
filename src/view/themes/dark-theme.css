@@ -201,6 +201,7 @@ body.dark-theme,
 
 /* Transaction list item */
 .dark-theme .trans-list_details td > div,
+.dark-theme table.trans-list-items td > div,
 .dark-theme .trans-list_details tr.trans-list__item_selected > td > div {
   background-color: #505050;
 }
@@ -209,7 +210,8 @@ body.dark-theme,
   border-left-color: #b0b0b0;
 }
 
-.dark-theme .trans-list_details .trans-list__item-comment {
+.dark-theme .trans-list_details .trans-list__item-comment,
+.dark-theme table.trans-list-items .trans-list__item-comment {
   color: #dddddd;
 }
 

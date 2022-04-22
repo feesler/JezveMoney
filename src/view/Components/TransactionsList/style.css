@@ -67,39 +67,46 @@ div.trans-list__item_selected {
 }
 
 /* Details mode */
-.trans-list_details .trans-list-items {
+.trans-list_details .trans-list-items,
+table.trans-list-items {
   display: table;
   border-collapse: collapse;
   width: 100%;
 }
 
-.trans-list_details tbody {
+.trans-list_details tbody,
+table.trans-list-items tbody {
   height: 43px;
 }
 
-.trans-list_details td {
+.trans-list_details td,
+table.trans-list-items  td {
   padding: 2px 0;
 }
 
-.trans-list_details span {
+.trans-list_details span,
+table.trans-list-items  span {
   font-size: 14px;
   height: 23px;
   line-height: 23px;
 }
 
-.trans-list_details .trans-list__item-content {
+.trans-list_details .trans-list__item-content,
+table.trans-list-items  .trans-list__item-content {
   color: #0080b0;
   white-space: nowrap;
   text-align: right;
 }
 
-.trans-list_details .trans-list__item-comment {
+.trans-list_details .trans-list__item-comment,
+table.trans-list-items  .trans-list__item-comment {
   margin: 0;
   padding: 0;
   border: 0 none;
 }
 
-.trans-list_details .tritem_balance {
+.trans-list_details .tritem_balance,
+table.trans-list-items  .tritem_balance {
   text-align: right;
   white-space: nowrap;
 }
@@ -135,7 +142,8 @@ div.trans-list__item_selected {
   font-size: 14px;
 }
 
-.trans-list_details td > div {
+.trans-list_details td > div,
+table.trans-list-items td > div {
   height: 39px;
   padding: 8px;
   box-sizing: border-box;
