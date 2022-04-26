@@ -6,16 +6,28 @@ import { checkObjValue } from 'jezve-test';
 import { isVisible } from '../../env.js';
 
 export class AppComponent {
-    constructor(parent, elem) {
-        if (!parent) {
-            throw new Error('Invalid parent specified');
-        }
-        if (!elem) {
-            throw new Error('Invalid element specified');
+    constructor(...args) {
+        this.model = {};
+
+        const parentSpecified = (args.length > 0);
+        if (parentSpecified) {
+            const parent = args[0];
+            if (!parent) {
+                throw new Error('Invalid parent specified');
+            }
+
+            this.parent = parent;
         }
 
-        this.elem = elem;
-        this.parent = parent;
+        const elemSpecified = (args.length > 1);
+        if (elemSpecified) {
+            const elem = args[1];
+            if (!elem) {
+                throw new Error('Invalid element specified');
+            }
+
+            this.elem = elem;
+        }
     }
 
     async parseContent() {
@@ -32,7 +44,13 @@ export class AppComponent {
 
     async parse() {
         this.content = await this.parseContent();
+        await this.postParse();
+
         await this.updateModel();
+    }
+
+    /* eslint-disable-next-line no-empty-function */
+    async postParse() {
     }
 
     static async create(...args) {
@@ -66,6 +84,40 @@ export class AppComponent {
         return this[action].call(this, data);
     }
 
+    async performAction(action) {
+        if (!isFunction(action)) {
+            throw new Error('Wrong action specified');
+        }
+
+        if (!this.content) {
+            await this.parse();
+        }
+
+        await action.call(this);
+
+        await this.parse();
+    }
+
+    /**
+     * Compare visibiliy of specified controls with expected mask
+     * In the controls object each value must be an object with 'elem' property containing pointer
+     *  to DOM element
+     * In the expected object each value must be a boolean value
+     * For false expected control may be null or invisible
+     * Both controls and expected object may contain nested objects
+     * Example:
+     *     controls : {
+     *         control_1 : { elem : Element },
+     *         control_2 : { childControl : { elem : Element } }
+     *     }
+     *     expected : {
+     *         control_1 : true,
+     *         control_2 : { childControl : true, invControl : false },
+     *         control_3 : false
+     *     }
+     * @param {Object} controls
+     * @param {Object} expected
+     */
     async checkVisibility(controls, expected) {
         let res;
 
@@ -94,7 +146,7 @@ export class AppComponent {
                     res = await this.checkVisibility(control, expVisible);
                 }
             } else {
-                factVisible = !!control && await isVisible(control.elem, true);
+                factVisible = !!(control && await isVisible(control.elem, true));
                 res = (expVisible === factVisible);
             }
 
@@ -153,7 +205,7 @@ export class AppComponent {
             ) {
                 res = {
                     key: countrolName,
-                    value: (isObj) ? control.value : control,
+                    value: (isObj) ? control.content.value : control,
                     expected,
                 };
                 break;
