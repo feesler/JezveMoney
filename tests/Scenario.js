@@ -55,7 +55,7 @@ import * as ImportRuleApiTests from './run/api/importrule.js';
 
 import { api } from './model/api.js';
 import { App } from './Application.js';
-import { setBlock } from './env.js';
+import { setBlock, isFullScenario } from './env.js';
 
 export class Scenario {
     constructor(environment) {
@@ -85,9 +85,8 @@ export class Scenario {
     }
 
     async run() {
-        this.fullTest = true;
-
-        if (this.fullTest) {
+        const fullTest = isFullScenario();
+        if (fullTest) {
             await this.runFullScenario();
         } else {
             await this.runTestScenario();
@@ -95,6 +94,8 @@ export class Scenario {
     }
 
     async runTestScenario() {
+        setBlock('Running partial test scenario', 1);
+
         await ApiTests.loginTest(App.config.testAdminUser);
         await this.prepareImportTests();
 
@@ -122,6 +123,8 @@ export class Scenario {
     }
 
     async runFullScenario() {
+        setBlock('Running full test scenario', 1);
+
         await this.securityTests();
         await this.prepareTests();
 

@@ -4,6 +4,8 @@ export const baseUrl = () => App.environment.baseUrl();
 
 export const url = () => App.environment.url();
 
+export const isFullScenario = () => App.environment.isFullScenario();
+
 export const navigation = (action) => App.environment.navigation(action);
 
 export const setErrorHandler = () => App.environment.setErrorHandler();
