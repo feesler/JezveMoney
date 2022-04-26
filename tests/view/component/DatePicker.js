@@ -99,7 +99,7 @@ export class DatePicker extends AppComponent {
 
         const title = await prop(titleElem, 'textContent');
 
-        return title !== this.title;
+        return title !== this.content.title;
     }
 
     async navigateToPrevious() {
