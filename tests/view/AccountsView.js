@@ -1,4 +1,4 @@
-import { AppComponent } from './component/AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { TilesList } from './component/TilesList.js';
 import { Tile } from './component/Tile.js';
@@ -136,7 +136,7 @@ export class AccountsView extends AppView {
         await this.selectAccounts(data);
 
         await this.performAction(() => this.content.toolbar.clickButton('del'));
-        if (!await AppComponent.isVisible(this.content.delete_warning)) {
+        if (!await TestComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Delete account warning popup not appear');
         }
 

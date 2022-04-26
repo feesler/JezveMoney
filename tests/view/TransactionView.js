@@ -1,4 +1,4 @@
-import { AppComponent } from './component/AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { AppView } from './AppView.js';
 import {
     convDate,
@@ -207,8 +207,8 @@ export class TransactionView extends AppView {
                 throw new Error('Source account not found');
             }
 
-            const isResBalRowVisible = await AppComponent.isVisible(cont.result_balance_row);
-            const exchRowVisible = await AppComponent.isVisible(cont.exchange_row);
+            const isResBalRowVisible = await TestComponent.isVisible(cont.result_balance_row);
+            const exchRowVisible = await TestComponent.isVisible(cont.exchange_row);
 
             if (res.isDiffCurr) {
                 if (exchRowVisible) {
@@ -226,8 +226,8 @@ export class TransactionView extends AppView {
                 throw new Error('Destination account not found');
             }
 
-            const destResRowVisible = await AppComponent.isVisible(cont.result_balance_dest_row);
-            const exchRowVisible = await AppComponent.isVisible(cont.exchange_row);
+            const destResRowVisible = await TestComponent.isVisible(cont.result_balance_dest_row);
+            const exchRowVisible = await TestComponent.isVisible(cont.exchange_row);
 
             if (res.isDiffCurr) {
                 if (exchRowVisible) {
@@ -248,11 +248,11 @@ export class TransactionView extends AppView {
                 throw new Error('Destination account not found');
             }
 
-            const srcAmountRowVisible = await AppComponent.isVisible(cont.src_amount_row);
-            const destAmountRowVisible = await AppComponent.isVisible(cont.dest_amount_row);
-            const srcResRowVisible = await AppComponent.isVisible(cont.result_balance_row);
-            const destResRowVisible = await AppComponent.isVisible(cont.result_balance_dest_row);
-            const exchRowVisible = await AppComponent.isVisible(cont.exchange_row);
+            const srcAmountRowVisible = await TestComponent.isVisible(cont.src_amount_row);
+            const destAmountRowVisible = await TestComponent.isVisible(cont.dest_amount_row);
+            const srcResRowVisible = await TestComponent.isVisible(cont.result_balance_row);
+            const destResRowVisible = await TestComponent.isVisible(cont.result_balance_dest_row);
+            const exchRowVisible = await TestComponent.isVisible(cont.exchange_row);
 
             if (res.isDiffCurr) {
                 if (srcAmountRowVisible && destAmountRowVisible) {
@@ -298,7 +298,7 @@ export class TransactionView extends AppView {
             const personAccountCurr = (res.debtType) ? res.src_curr_id : res.dest_curr_id;
             res.personAccount = this.getPersonAccount(res.person.id, personAccountCurr);
 
-            const isSelectAccountVisible = await AppComponent.isVisible(cont.selaccount);
+            const isSelectAccountVisible = await TestComponent.isVisible(cont.selaccount);
             res.noAccount = isSelectAccountVisible;
 
             res.account = App.state.accounts.getItem(cont.account.content.id);
@@ -329,9 +329,9 @@ export class TransactionView extends AppView {
                 throw new Error('Source and destination amount are different');
             }
 
-            const srcAmountRowVisible = await AppComponent.isVisible(cont.src_amount_row);
-            const srcResRowVisible = await AppComponent.isVisible(cont.result_balance_row);
-            const destResRowVisible = await AppComponent.isVisible(cont.result_balance_dest_row);
+            const srcAmountRowVisible = await TestComponent.isVisible(cont.src_amount_row);
+            const srcResRowVisible = await TestComponent.isVisible(cont.result_balance_row);
+            const destResRowVisible = await TestComponent.isVisible(cont.result_balance_dest_row);
 
             if (res.noAccount) {
                 if (srcAmountRowVisible) {
@@ -378,13 +378,13 @@ export class TransactionView extends AppView {
     }
 
     async isValid() {
-        if (await AppComponent.isVisible(this.content.src_amount_row)) {
+        if (await TestComponent.isVisible(this.content.src_amount_row)) {
             if (!this.model.srcAmount.length || !isValidValue(this.model.srcAmount)) {
                 return false;
             }
         }
 
-        if (await AppComponent.isVisible(this.content.dest_amount_row)) {
+        if (await TestComponent.isVisible(this.content.dest_amount_row)) {
             if (!this.model.destAmount.length || !isValidValue(this.model.destAmount)) {
                 return false;
             }
@@ -1348,7 +1348,7 @@ export class TransactionView extends AppView {
     async deleteSelfItem() {
         await this.clickDeleteButton();
 
-        if (!await AppComponent.isVisible(this.content.delete_warning)) {
+        if (!await TestComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Delete transaction warning popup not appear');
         }
         if (!this.content.delete_warning.content.okBtn) {

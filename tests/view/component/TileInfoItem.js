@@ -1,7 +1,7 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { query, prop, click } from '../../env.js';
 
-export class TileInfoItem extends AppComponent {
+export class TileInfoItem extends TestComponent {
     async parseContent() {
         const res = {};
 

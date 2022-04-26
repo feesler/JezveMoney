@@ -1,10 +1,10 @@
 import { copyObject } from 'jezvejs';
-import { AppComponent } from '../AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { ImportListItem } from './ImportListItem.js';
 import { asyncMap } from '../../../common.js';
 import { query, queryAll, isVisible } from '../../../env.js';
 
-export class ImportList extends AppComponent {
+export class ImportList extends TestComponent {
     constructor(parent, elem, mainAccount) {
         super(parent, elem);
 

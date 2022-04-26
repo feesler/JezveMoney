@@ -1,4 +1,4 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { Currency } from '../../model/Currency.js';
 import {
     query,
@@ -6,7 +6,7 @@ import {
     hasClass,
 } from '../../env.js';
 
-export class InfoTile extends AppComponent {
+export class InfoTile extends TestComponent {
     async parseContent() {
         if (!this.elem || !await hasClass(this.elem, 'info-tile')) {
             throw new Error('Wrong info tile structure');

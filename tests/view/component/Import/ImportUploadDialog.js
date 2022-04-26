@@ -1,5 +1,5 @@
 import { isNum, copyObject } from 'jezvejs';
-import { AppComponent } from '../AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { DropDown } from '../DropDown.js';
 import { App } from '../../../Application.js';
 import { asyncMap, fixFloat } from '../../../common.js';
@@ -24,7 +24,7 @@ export const RAW_DATA_STATE = 3;
 export const CREATE_TPL_STATE = 4;
 export const UPDATE_TPL_STATE = 5;
 
-export class ImportUploadDialog extends AppComponent {
+export class ImportUploadDialog extends TestComponent {
     async parseContent() {
         if (!this.elem) {
             throw new Error('Invalid import upload dialog element');
@@ -499,7 +499,7 @@ export class ImportUploadDialog extends AppComponent {
         await click(this.content.deleteTplBtn.elem);
         await this.parse();
 
-        if (!await AppComponent.isVisible(this.content.delete_warning)) {
+        if (!await TestComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Delete template warning popup not appear');
         }
         if (!this.content.delete_warning.content.okBtn) {

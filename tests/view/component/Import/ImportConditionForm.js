@@ -1,4 +1,4 @@
-import { AppComponent } from '../AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { DropDown } from '../DropDown.js';
 import { asyncMap } from '../../../common.js';
 import {
@@ -53,7 +53,7 @@ const fieldValueMap = {
 };
 
 /** Import condition form */
-export class ImportConditionForm extends AppComponent {
+export class ImportConditionForm extends TestComponent {
     async parseContent() {
         const res = {};
 

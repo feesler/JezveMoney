@@ -1,5 +1,5 @@
 import { copyObject } from 'jezvejs';
-import { AppComponent } from './component/AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
 import { DropDown } from './component/DropDown.js';
@@ -133,7 +133,7 @@ export class TransactionsView extends AppView {
             };
         }
 
-        const isModeSelectorVisible = await AppComponent.isVisible(cont.modeSelector);
+        const isModeSelectorVisible = await TestComponent.isVisible(cont.modeSelector);
         if (isModeSelectorVisible) {
             res.detailsMode = cont.modeSelector.content.details;
         } else {
@@ -541,7 +541,7 @@ export class TransactionsView extends AppView {
 
         await this.performAction(() => this.content.toolbar.clickButton('del'));
 
-        if (!await AppComponent.isVisible(this.content.delete_warning)) {
+        if (!await TestComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Delete transaction warning popup not appear');
         }
         if (!this.content.delete_warning.content.okBtn) {

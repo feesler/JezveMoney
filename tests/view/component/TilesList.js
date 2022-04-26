@@ -1,11 +1,11 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { Tile } from './Tile.js';
 import { AccountsList } from '../../model/AccountsList.js';
 import { PersonsList } from '../../model/PersonsList.js';
 import { asyncMap } from '../../common.js';
 import { queryAll, hasClass } from '../../env.js';
 
-export class TilesList extends AppComponent {
+export class TilesList extends TestComponent {
     constructor(parent, elem, tileClass) {
         super(parent, elem);
 

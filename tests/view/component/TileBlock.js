@@ -1,9 +1,9 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { Tile } from './Tile.js';
 import { DropDown } from './DropDown.js';
 import { query, prop } from '../../env.js';
 
-export class TileBlock extends AppComponent {
+export class TileBlock extends TestComponent {
     async parseContent() {
         if (!this.elem) {
             throw new Error('Invalid tile block');

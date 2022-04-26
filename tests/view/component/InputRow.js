@@ -1,4 +1,4 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { DropDown } from './DropDown.js';
 import {
     query,
@@ -7,7 +7,7 @@ import {
     input,
 } from '../../env.js';
 
-export class InputRow extends AppComponent {
+export class InputRow extends TestComponent {
     async parseContent() {
         const res = {
             labelEl: await query(this.elem, 'label'),

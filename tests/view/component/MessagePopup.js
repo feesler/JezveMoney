@@ -1,4 +1,4 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import {
     query,
     prop,
@@ -6,7 +6,7 @@ import {
     click,
 } from '../../env.js';
 
-export class MessagePopup extends AppComponent {
+export class MessagePopup extends TestComponent {
     static async create(...args) {
         if (args.length < 2 || !args[1]) {
             return null;
@@ -15,7 +15,7 @@ export class MessagePopup extends AppComponent {
         let instance;
         try {
             instance = new this(...args);
-            if (!await AppComponent.isVisible(instance)) {
+            if (!await TestComponent.isVisible(instance)) {
                 return null;
             }
 

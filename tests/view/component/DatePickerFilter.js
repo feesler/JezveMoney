@@ -1,5 +1,5 @@
 import { copyObject, isDate } from 'jezvejs';
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { IconLink } from './IconLink.js';
 import { DatePicker } from './DatePicker.js';
 import {
@@ -10,7 +10,7 @@ import {
     input,
 } from '../../env.js';
 
-export class DatePickerFilter extends AppComponent {
+export class DatePickerFilter extends TestComponent {
     async parseContent() {
         const res = {
             iconLink: await IconLink.create(this.parent, await query(this.elem, '.iconlink')),

@@ -1,9 +1,4 @@
-import {
-    isFunction,
-    isObject,
-} from 'jezvejs';
-import { checkObjValue } from 'jezve-test';
-import { AppComponent } from './component/AppComponent.js';
+import { TestView } from 'jezve-test';
 import { Header } from './component/Header.js';
 import { MessagePopup } from './component/MessagePopup.js';
 import {
@@ -11,10 +6,9 @@ import {
     navigation,
     query,
     click,
-    isVisible,
 } from '../env.js';
 
-export class AppView extends AppComponent {
+export class AppView extends TestView {
     isUserLoggedIn() {
         const loggedOutLocations = ['login', 'register'];
 

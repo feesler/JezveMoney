@@ -1,4 +1,4 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import {
     query,
     prop,
@@ -6,7 +6,7 @@ import {
     click,
 } from '../../env.js';
 
-export class SearchForm extends AppComponent {
+export class SearchForm extends TestComponent {
     async parseContent() {
         const res = {
             inputElem: await query(this.elem, '#search'),

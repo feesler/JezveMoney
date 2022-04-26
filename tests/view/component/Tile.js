@@ -1,4 +1,4 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { Icon } from '../../model/Icon.js';
 import { Currency } from '../../model/Currency.js';
 import {
@@ -8,7 +8,7 @@ import {
     click,
 } from '../../env.js';
 
-export class Tile extends AppComponent {
+export class Tile extends TestComponent {
     async parseContent() {
         if (!this.elem || !await hasClass(this.elem, 'tile')) {
             throw new Error('Wrong tile structure');

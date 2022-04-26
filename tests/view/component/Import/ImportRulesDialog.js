@@ -1,5 +1,4 @@
-import { copyObject } from 'jezve-test';
-import { AppComponent } from '../AppComponent.js';
+import { copyObject, TestComponent } from 'jezve-test';
 import { ImportRuleForm } from './ImportRuleForm.js';
 import { ImportRuleItem } from './ImportRuleItem.js';
 import { asyncMap } from '../../../common.js';
@@ -17,7 +16,7 @@ import {
 
 /* eslint-disable no-bitwise */
 
-export class ImportRulesDialog extends AppComponent {
+export class ImportRulesDialog extends TestComponent {
     async parseContent() {
         if (!this.elem) {
             throw new Error('Invalid import rules dialog element');
@@ -228,7 +227,7 @@ export class ImportRulesDialog extends AppComponent {
         await wait(this.content.ruleDeletePopupId, { visible: true });
         await this.parse();
 
-        if (!await AppComponent.isVisible(this.content.delete_warning)) {
+        if (!await TestComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Delete template warning popup not appear');
         }
         if (!this.content.delete_warning.content.okBtn) {

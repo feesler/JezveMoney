@@ -1,8 +1,8 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { MenuItem } from './MenuItem.js';
 import { queryAll, hasClass } from '../../env.js';
 
-export class TransactionTypeMenu extends AppComponent {
+export class TransactionTypeMenu extends TestComponent {
     async parseContent() {
         const res = {
             items: [],

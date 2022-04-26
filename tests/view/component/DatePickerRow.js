@@ -1,11 +1,10 @@
-import { isDate } from 'jezve-test';
-import { AppComponent } from './AppComponent.js';
+import { isDate, TestComponent } from 'jezve-test';
 import { IconLink } from './IconLink.js';
 import { InputRow } from './InputRow.js';
 import { DatePicker } from './DatePicker.js';
 import { query, isVisible, click } from '../../env.js';
 
-export class DatePickerRow extends AppComponent {
+export class DatePickerRow extends TestComponent {
     async parseContent() {
         const res = {};
 

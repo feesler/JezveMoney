@@ -1,4 +1,4 @@
-import { AppComponent } from '../AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { DropDown } from '../DropDown.js';
 import {
     asyncMap,
@@ -37,7 +37,7 @@ const actionValueMap = {
 };
 
 /** Import action form */
-export class ImportActionForm extends AppComponent {
+export class ImportActionForm extends TestComponent {
     async parseContent() {
         if (!this.elem) {
             throw new Error('Invalid import action form');

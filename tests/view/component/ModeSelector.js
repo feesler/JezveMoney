@@ -1,7 +1,7 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { queryAll, hasClass, prop } from '../../env.js';
 
-export class ModeSelector extends AppComponent {
+export class ModeSelector extends TestComponent {
     async parseContent() {
         if (!await hasClass(this.elem, 'mode-selector')) {
             throw new Error('Unexpected stucture of mode selector control');

@@ -1,9 +1,9 @@
-import { AppComponent } from '../AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { ImportActionItem } from './ImportActionItem.js';
 import { asyncMap } from '../../../common.js';
 import { queryAll } from '../../../env.js';
 
-export class ImportRuleItemActions extends AppComponent {
+export class ImportRuleItemActions extends TestComponent {
     async parseContent() {
         if (!this.elem) {
             throw new Error('Invalid import rule item');

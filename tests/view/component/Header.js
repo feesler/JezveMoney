@@ -1,8 +1,8 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { asyncMap } from '../../common.js';
 import { query, queryAll, prop } from '../../env.js';
 
-export class Header extends AppComponent {
+export class Header extends TestComponent {
     async parseContent() {
         // no header is ok for login view
         if (!this.elem) {

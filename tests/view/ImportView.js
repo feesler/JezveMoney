@@ -1,6 +1,6 @@
 import { copyObject } from 'jezvejs';
+import { TestComponent } from 'jezve-test';
 import { AppView } from './AppView.js';
-import { AppComponent } from './component/AppComponent.js';
 import { IconLink } from './component/IconLink.js';
 import { ImportList } from './component/Import/ImportList.js';
 import { ImportUploadDialog } from './component/Import/ImportUploadDialog.js';
@@ -83,8 +83,8 @@ export class ImportView extends AppView {
     async buildModel(cont) {
         const res = {};
 
-        const uploadVisible = await AppComponent.isVisible(cont.uploadDialog);
-        const rulesVisible = await AppComponent.isVisible(cont.rulesDialog);
+        const uploadVisible = await TestComponent.isVisible(cont.uploadDialog);
+        const rulesVisible = await TestComponent.isVisible(cont.rulesDialog);
         if (uploadVisible && !rulesVisible) {
             res.state = 'upload';
         } else if (!uploadVisible && rulesVisible) {
@@ -174,7 +174,7 @@ export class ImportView extends AppView {
         await this.performAction(() => this.content.uploadBtn.click());
         await this.performAction(() => wait(this.uploadPopupId, { visible: true }));
 
-        if (!await AppComponent.isVisible(this.content.uploadDialog)) {
+        if (!await TestComponent.isVisible(this.content.uploadDialog)) {
             throw new Error('File upload dialog not appear');
         }
     }
@@ -185,7 +185,7 @@ export class ImportView extends AppView {
         await this.performAction(() => this.content.uploadDialog.close());
         await this.performAction(() => wait(this.uploadPopupId, { visible: true }));
 
-        if (await AppComponent.isVisible(this.content.uploadDialog)) {
+        if (await TestComponent.isVisible(this.content.uploadDialog)) {
             throw new Error('File upload dialog not closed');
         }
     }
@@ -578,7 +578,7 @@ export class ImportView extends AppView {
                 return true;
             }
 
-            const notification = await AppComponent.isVisible(this.content.msgPopup, true);
+            const notification = await TestComponent.isVisible(this.content.msgPopup, true);
             if (notification) {
                 return true;
             }

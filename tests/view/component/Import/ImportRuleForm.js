@@ -1,5 +1,4 @@
-import { copyObject } from 'jezve-test';
-import { AppComponent } from '../AppComponent.js';
+import { copyObject, TestComponent } from 'jezve-test';
 import { Currency } from '../../../model/Currency.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import { ImportRule } from '../../../model/ImportRule.js';
@@ -20,7 +19,7 @@ import {
     click,
 } from '../../../env.js';
 
-export class ImportRuleForm extends AppComponent {
+export class ImportRuleForm extends TestComponent {
     async parseContent() {
         const res = {};
 

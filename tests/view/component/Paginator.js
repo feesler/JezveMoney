@@ -1,4 +1,4 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import {
     queryAll,
     prop,
@@ -6,7 +6,7 @@ import {
     click,
 } from '../../env.js';
 
-export class Paginator extends AppComponent {
+export class Paginator extends TestComponent {
     async parseContent() {
         const res = {};
 

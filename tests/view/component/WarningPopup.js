@@ -1,7 +1,7 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { query, prop } from '../../env.js';
 
-export class WarningPopup extends AppComponent {
+export class WarningPopup extends TestComponent {
     async parseContent() {
         const res = {
             titleElem: await query(this.elem, '.popup__title'),

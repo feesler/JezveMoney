@@ -1,5 +1,5 @@
 import { copyObject, isDate } from 'jezvejs';
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import {
     query,
     queryAll,
@@ -13,7 +13,7 @@ import {
 const shortMonthTitles = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 const monthTitles = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
 
-export class DatePicker extends AppComponent {
+export class DatePicker extends TestComponent {
     async parseContent() {
         const res = {
             wrapper: await query(this.elem, '.dp__wrapper'),

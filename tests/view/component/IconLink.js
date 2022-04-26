@@ -1,4 +1,4 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import {
     query,
     prop,
@@ -6,7 +6,7 @@ import {
     click,
 } from '../../env.js';
 
-export class IconLink extends AppComponent {
+export class IconLink extends TestComponent {
     async parseContent() {
         if (!this.elem) {
             return {};

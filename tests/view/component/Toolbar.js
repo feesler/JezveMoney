@@ -1,8 +1,8 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { IconLink } from './IconLink.js';
 import { query, isVisible } from '../../env.js';
 
-export class Toolbar extends AppComponent {
+export class Toolbar extends TestComponent {
     async parseContent() {
         if (!this.elem) {
             return {};

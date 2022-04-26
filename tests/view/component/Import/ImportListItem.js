@@ -1,6 +1,6 @@
 import { copyObject } from 'jezvejs';
 import { formatDate } from 'jezvejs/DateUtils';
-import { AppComponent } from '../AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { DropDown } from '../DropDown.js';
 import {
     EXPENSE,
@@ -27,7 +27,7 @@ import {
     isVisible,
 } from '../../../env.js';
 
-export class ImportListItem extends AppComponent {
+export class ImportListItem extends TestComponent {
     constructor(parent, elem, mainAccount) {
         super(parent, elem);
 

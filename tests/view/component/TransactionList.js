@@ -1,9 +1,9 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { TransactionListItem } from './TransactionListItem.js';
 import { asyncMap } from '../../common.js';
 import { queryAll, prop, hasClass } from '../../env.js';
 
-export class TransactionList extends AppComponent {
+export class TransactionList extends TestComponent {
     async parseContent() {
         const res = {
             renderTime: await prop(this.elem, 'dataset.time'),

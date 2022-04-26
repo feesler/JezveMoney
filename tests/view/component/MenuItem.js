@@ -1,4 +1,4 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import {
     query,
     prop,
@@ -6,7 +6,7 @@ import {
     click,
 } from '../../env.js';
 
-export class MenuItem extends AppComponent {
+export class MenuItem extends TestComponent {
     async parseContent() {
         if (!this.elem) {
             throw new Error('Wrong structure of menu item');

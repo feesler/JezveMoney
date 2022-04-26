@@ -1,10 +1,10 @@
-import { AppComponent } from '../AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { ImportAction } from '../../../model/ImportAction.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import { App } from '../../../Application.js';
 import { query, prop } from '../../../env.js';
 
-export class ImportActionItem extends AppComponent {
+export class ImportActionItem extends TestComponent {
     async parseContent() {
         if (!this.elem) {
             throw new Error('Invalid import action item');

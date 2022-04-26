@@ -1,4 +1,4 @@
-import { AppComponent } from '../AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import {
     query,
     hasClass,
@@ -6,7 +6,7 @@ import {
     click,
 } from '../../../env.js';
 
-export class ImportRuleAccordion extends AppComponent {
+export class ImportRuleAccordion extends TestComponent {
     async parseContent() {
         if (!this.elem) {
             throw new Error('Invalid import rule accordion element');

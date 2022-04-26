@@ -1,4 +1,4 @@
-import { AppComponent } from '../AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import {
     query,
     hasClass,
@@ -6,7 +6,7 @@ import {
     click,
 } from '../../../env.js';
 
-export class Widget extends AppComponent {
+export class Widget extends TestComponent {
     async parseContent() {
         if (!this.elem || !await hasClass(this.elem, 'widget')) {
             throw new Error('Wrong widget structure');

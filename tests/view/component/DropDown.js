@@ -1,4 +1,4 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { asyncMap } from '../../common.js';
 import {
     query,
@@ -10,7 +10,7 @@ import {
     closest,
 } from '../../env.js';
 
-export class DropDown extends AppComponent {
+export class DropDown extends TestComponent {
     /** Find for closest parent DropDown container of element */
     static async getParentContainer(elem) {
         if (!elem) {

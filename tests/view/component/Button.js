@@ -1,7 +1,7 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { query, click } from '../../env.js';
 
-export class Button extends AppComponent {
+export class Button extends TestComponent {
     async parseContent() {
         const res = {
             btnElem: await query(this.elem, ':scope > *'),

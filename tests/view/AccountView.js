@@ -1,5 +1,5 @@
 import { copyObject } from 'jezvejs';
-import { AppComponent } from './component/AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { Currency } from '../model/Currency.js';
 import { Icon } from '../model/Icon.js';
@@ -230,7 +230,7 @@ export class AccountView extends AppView {
     async deleteSelfItem() {
         await this.clickDeleteButton();
 
-        if (!await AppComponent.isVisible(this.content.delete_warning)) {
+        if (!await TestComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Delete transaction warning popup not appear');
         }
         if (!this.content.delete_warning.content.okBtn) {

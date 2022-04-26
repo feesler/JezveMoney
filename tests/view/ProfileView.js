@@ -1,4 +1,4 @@
-import { AppComponent } from './component/AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { LoginView } from './LoginView.js';
 import { App } from '../Application.js';
@@ -135,7 +135,7 @@ export class ProfileView extends AppView {
 
         await this.performAction(() => click(this.content.resetBtn));
 
-        if (!await AppComponent.isVisible(this.content.reset_warning)) {
+        if (!await TestComponent.isVisible(this.content.reset_warning)) {
             throw new Error('Warning popup not appear');
         }
         if (!this.content.reset_warning.content.okBtn) {
@@ -152,7 +152,7 @@ export class ProfileView extends AppView {
 
         await this.performAction(() => click(this.content.resetAllBtn));
 
-        if (!await AppComponent.isVisible(this.content.reset_all_warning)) {
+        if (!await TestComponent.isVisible(this.content.reset_all_warning)) {
             throw new Error('Warning popup not appear');
         }
         if (!this.content.reset_all_warning.content.okBtn) {
@@ -169,7 +169,7 @@ export class ProfileView extends AppView {
 
         await this.performAction(() => click(this.content.deleteProfileBtn));
 
-        if (!await AppComponent.isVisible(this.content.delete_warning)) {
+        if (!await TestComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Warning popup not appear');
         }
         if (!this.content.delete_warning.content.okBtn) {

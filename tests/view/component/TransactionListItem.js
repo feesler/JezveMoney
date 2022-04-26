@@ -1,4 +1,4 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { Currency } from '../../model/Currency.js';
 import {
     EXPENSE,
@@ -13,7 +13,7 @@ import {
     click,
 } from '../../env.js';
 
-export class TransactionListItem extends AppComponent {
+export class TransactionListItem extends TestComponent {
     async parseContent() {
         const res = {};
 

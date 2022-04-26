@@ -1,9 +1,9 @@
-import { AppComponent } from './AppComponent.js';
+import { TestComponent } from 'jezve-test';
 import { IconLink } from './IconLink.js';
 import { InputRow } from './InputRow.js';
 import { query, isVisible } from '../../env.js';
 
-export class CommentRow extends AppComponent {
+export class CommentRow extends TestComponent {
     async parseContent() {
         const res = {};
 
