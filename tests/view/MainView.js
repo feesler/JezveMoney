@@ -60,7 +60,7 @@ export class MainView extends AppView {
             throw new Error('Accounts widget not found');
         }
 
-        await navigation(() => this.content.accountsWidget.clickAccountByIndex(accNum));
+        await this.content.accountsWidget.clickAccountByIndex(accNum);
     }
 
     async goToTransactions() {
