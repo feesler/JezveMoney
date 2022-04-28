@@ -5,7 +5,7 @@ import { config } from './config.js';
 import { AppState } from './model/AppState.js';
 import { Currency } from './model/Currency.js';
 import { Icon } from './model/Icon.js';
-import { Scenario } from './Scenario.js';
+import { Scenario } from './scenario/index.js';
 
 class Application extends TestApplication {
     constructor() {
