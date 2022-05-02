@@ -9,6 +9,7 @@ import { ImportListItem } from '../view/component/Import/ImportListItem.js';
 import { ImportView } from '../view/ImportView.js';
 import { TransactionsView } from '../view/TransactionsView.js';
 import { ImportViewSubmitError } from '../error/ImportViewSubmitError.js';
+import { assert } from '../assert.js';
 
 /** Reexport import templates and import rules runners */
 export * from './import/templates.js';
@@ -536,9 +537,7 @@ export async function deleteItems(indexes) {
         itemInds.sort();
         for (const ind of itemInds) {
             const index = parseInt(ind, 10);
-            if (Number.isNaN(index) || index < 0 || index > itemsList.items.length) {
-                throw new Error(`Invalid item index: ${ind}`);
-            }
+            assert.arrayIndex(itemsList.items, index);
 
             expected.splice(ind - removed, 1);
             removed += 1;

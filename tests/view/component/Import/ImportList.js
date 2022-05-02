@@ -2,6 +2,7 @@ import { copyObject } from 'jezvejs';
 import { TestComponent } from 'jezve-test';
 import { ImportListItem } from './ImportListItem.js';
 import { asyncMap } from '../../../common.js';
+import { assert } from '../../../assert.js';
 import { query, queryAll, isVisible } from '../../../env.js';
 
 export class ImportList extends TestComponent {
@@ -48,9 +49,7 @@ export class ImportList extends TestComponent {
 
     getItem(index) {
         const ind = parseInt(index, 10);
-        if (Number.isNaN(ind) || ind < 0 || ind >= this.content.items.length) {
-            throw new Error(`Invalid index of item: ${index}`);
-        }
+        assert.arrayIndex(this.content.items, ind);
 
         return this.content.items[ind];
     }

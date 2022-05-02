@@ -7,6 +7,7 @@ import { formatProps, createCSV } from '../common.js';
 import { App } from '../Application.js';
 import { setBlock } from '../env.js';
 import { AccountView } from '../view/AccountView.js';
+import { assert } from '../assert.js';
 
 /** Navigate to accounts list page */
 async function checkNavigation() {
@@ -314,9 +315,8 @@ export async function toggleSelect(accounts) {
         const indexes = [];
         for (const pos of itemIds) {
             const ind = parseInt(pos, 10);
-            if (Number.isNaN(ind) || ind < 0 || ind > origItems.length) {
-                throw new Error(`Invalid item index ${pos}`);
-            }
+            assert.arrayIndex(origItems, ind);
+
             indexes.push(ind);
         }
 

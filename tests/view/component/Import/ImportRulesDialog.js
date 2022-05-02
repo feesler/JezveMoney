@@ -4,6 +4,7 @@ import { ImportRuleItem } from './ImportRuleItem.js';
 import { asyncMap } from '../../../common.js';
 import { WarningPopup } from '../WarningPopup.js';
 import { App } from '../../../Application.js';
+import { assert } from '../../../assert.js';
 import {
     query,
     queryAll,
@@ -174,9 +175,7 @@ export class ImportRulesDialog extends TestComponent {
 
     async updateRule(index) {
         const ind = parseInt(index, 10);
-        if (Number.isNaN(ind) || ind < 0 || ind >= this.content.items.length) {
-            throw new Error(`Invalid rule index: ${index}`);
-        }
+        assert.arrayIndex(this.content.items, ind);
 
         if (!this.isListState()) {
             throw new Error('Invalid state');
@@ -216,9 +215,7 @@ export class ImportRulesDialog extends TestComponent {
         }
 
         const ind = parseInt(index, 10);
-        if (Number.isNaN(ind) || ind < 0 || ind >= this.content.items.length) {
-            throw new Error(`Invalid rule index: ${index}`);
-        }
+        assert.arrayIndex(this.content.items, ind);
 
         this.model.rules.splice(ind, 1);
         this.expectedState = this.getExpectedState(this.model);

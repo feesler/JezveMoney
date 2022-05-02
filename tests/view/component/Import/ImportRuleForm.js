@@ -12,6 +12,7 @@ import { ImportRuleAccordion } from './ImportRuleAccordion.js';
 import { ImportActionForm } from './ImportActionForm.js';
 import { asyncMap } from '../../../common.js';
 import { App } from '../../../Application.js';
+import { assert } from '../../../assert.js';
 import {
     query,
     queryAll,
@@ -297,13 +298,7 @@ export class ImportRuleForm extends TestComponent {
 
     async deleteCondition(index) {
         const ind = parseInt(index, 10);
-        if (
-            Number.isNaN(ind)
-            || ind < 0
-            || ind >= this.content.conditionsList.content.items.length
-        ) {
-            throw new Error(`Invalid condition index: ${index}`);
-        }
+        assert.arrayIndex(this.content.conditionsList.content.items, ind);
 
         this.model.conditions.splice(ind, 1);
         this.expectedState = ImportRuleForm.getExpectedState(this.model);
@@ -320,13 +315,7 @@ export class ImportRuleForm extends TestComponent {
 
     async runOnCondition(index, { action, data }) {
         const ind = parseInt(index, 10);
-        if (
-            Number.isNaN(ind)
-            || ind < 0
-            || ind >= this.content.conditionsList.content.items.length
-        ) {
-            throw new Error(`Invalid condition index: ${index}`);
-        }
+        assert.arrayIndex(this.content.conditionsList.content.items, ind);
 
         await this.openConditions();
 
@@ -361,13 +350,7 @@ export class ImportRuleForm extends TestComponent {
 
     async deleteAction(index) {
         const ind = parseInt(index, 10);
-        if (
-            Number.isNaN(ind)
-            || ind < 0
-            || ind >= this.content.actionsList.content.items.length
-        ) {
-            throw new Error(`Invalid action index: ${index}`);
-        }
+        assert.arrayIndex(this.content.actionsList.content.items, ind);
 
         this.model.actions.splice(ind, 1);
         this.expectedState = ImportRuleForm.getExpectedState(this.model);
@@ -384,13 +367,7 @@ export class ImportRuleForm extends TestComponent {
 
     async runOnAction(index, { action, data }) {
         const ind = parseInt(index, 10);
-        if (
-            Number.isNaN(ind)
-            || ind < 0
-            || ind >= this.content.actionsList.content.items.length
-        ) {
-            throw new Error(`Invalid action index: ${index}`);
-        }
+        assert.arrayIndex(this.content.actionsList.content.items, ind);
 
         await this.openActions();
 

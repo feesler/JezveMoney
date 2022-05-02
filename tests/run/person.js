@@ -8,6 +8,7 @@ import { PersonsView } from '../view/PersonsView.js';
 import { PersonView } from '../view/PersonView.js';
 import { MainView } from '../view/MainView.js';
 import { App } from '../Application.js';
+import { assert } from '../assert.js';
 
 /** Navigate to persons list page */
 async function checkNavigation() {
@@ -197,9 +198,8 @@ export async function toggleSelect(persons) {
         const indexes = [];
         for (const pos of itemIds) {
             const ind = parseInt(pos, 10);
-            if (Number.isNaN(ind) || ind < 0 || ind > origItems.length) {
-                throw new Error(`Invalid item index ${pos}`);
-            }
+            assert.arrayIndex(origItems, ind);
+
             indexes.push(ind);
         }
 

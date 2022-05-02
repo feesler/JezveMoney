@@ -13,6 +13,7 @@ import { SearchForm } from './component/SearchForm.js';
 import { TransactionList } from './component/TransactionList.js';
 import { fixDate } from '../common.js';
 import { Toolbar } from './component/Toolbar.js';
+import { assert } from '../assert.js';
 import {
     query,
     prop,
@@ -498,9 +499,7 @@ export class TransactionsView extends AppView {
         const selectedItems = this.getSelectedItems();
         let selectedCount = selectedItems.length;
         for (const num of transactions) {
-            if (num < 0 || num >= this.content.transList.content.items.length) {
-                throw new Error('Wrong transaction number');
-            }
+            assert.arrayIndex(this.content.transList.content.items, num);
 
             const isSelected = this.content.transList.content.items[num].content.selected;
             await this.performAction(() => this.content.transList.content.items[num].click());
