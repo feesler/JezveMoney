@@ -1,5 +1,5 @@
 import { isNum, copyObject } from 'jezvejs';
-import { TestComponent } from 'jezve-test';
+import { TestComponent, assert } from 'jezve-test';
 import { DropDown } from '../DropDown.js';
 import { App } from '../../../Application.js';
 import { asyncMap, fixFloat } from '../../../common.js';
@@ -226,9 +226,7 @@ export class ImportUploadDialog extends TestComponent {
         const rowsToShow = 2;
         const headerRow = data.slice(0, 1)[0];
         const ind = parseInt(index, 10);
-        if (Number.isNaN(ind) || ind < 0 || ind > headerRow.length) {
-            throw new Error(`Invalid column index: ${index}`);
-        }
+        assert.arrayIndex(headerRow, ind);
 
         const res = {
             title: headerRow[ind],
@@ -542,9 +540,8 @@ export class ImportUploadDialog extends TestComponent {
         await this.parse();
 
         const ind = parseInt(index, 10);
-        if (Number.isNaN(ind) || ind < 1 || ind > this.content.columns.length) {
-            throw new Error(`Invalid index: ${index}`);
-        }
+        assert.arrayIndex(this.content.columns, ind - 1);
+
         await click(this.content.columns[ind - 1].elem);
         await this.parse();
 

@@ -1,14 +1,13 @@
 import {
     test,
     copyObject,
-    checkObjValue,
+    assert,
 } from 'jezve-test';
 import { formatProps } from '../common.js';
 import { PersonsView } from '../view/PersonsView.js';
 import { PersonView } from '../view/PersonView.js';
 import { MainView } from '../view/MainView.js';
 import { App } from '../Application.js';
-import { assert } from '../assert.js';
 
 /** Navigate to persons list page */
 async function checkNavigation() {
@@ -214,13 +213,13 @@ export async function toggleSelect(persons) {
 
         await App.view.selectPersons(indexes);
         let items = App.view.getItems();
-        checkObjValue(items, expectedItems);
+        assert.deepMeet(items, expectedItems);
 
         // Click by items again to inverse selection
         expectedItems = origItems;
         await App.view.selectPersons(indexes);
         items = App.view.getItems();
-        checkObjValue(items, expectedItems);
+        assert.deepMeet(items, expectedItems);
 
         return true;
     });

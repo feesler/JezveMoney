@@ -1,4 +1,4 @@
-import { copyObject, TestComponent } from 'jezve-test';
+import { copyObject, TestComponent, assert } from 'jezve-test';
 import { Currency } from '../../../model/Currency.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import { ImportRule } from '../../../model/ImportRule.js';
@@ -12,7 +12,6 @@ import { ImportRuleAccordion } from './ImportRuleAccordion.js';
 import { ImportActionForm } from './ImportActionForm.js';
 import { asyncMap } from '../../../common.js';
 import { App } from '../../../Application.js';
-import { assert } from '../../../assert.js';
 import {
     query,
     queryAll,

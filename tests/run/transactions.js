@@ -1,12 +1,11 @@
 import { copyObject } from 'jezvejs';
 import { formatDate } from 'jezvejs/DateUtils';
-import { test, checkObjValue } from 'jezve-test';
+import { test, assert } from 'jezve-test';
 import { App } from '../Application.js';
 import { fixDate } from '../common.js';
 import { TransactionsView } from '../view/TransactionsView.js';
 import { MainView } from '../view/MainView.js';
 import { availTransTypes, Transaction } from '../model/Transaction.js';
-import { assert } from '../assert.js';
 
 /** Navigate to transactions list page */
 async function checkNavigation() {
@@ -67,13 +66,13 @@ export async function toggleSelect(transactions) {
 
         await App.view.selectTransactions(indexes);
         let items = App.view.getItems();
-        checkObjValue(items, expectedItems);
+        assert.deepMeet(items, expectedItems);
 
         // Click by items again to inverse selection
         expectedItems = origItems;
         await App.view.selectTransactions(indexes);
         items = App.view.getItems();
-        checkObjValue(items, expectedItems);
+        assert.deepMeet(items, expectedItems);
 
         return true;
     });

@@ -1,10 +1,9 @@
-import { copyObject, TestComponent } from 'jezve-test';
+import { copyObject, TestComponent, assert } from 'jezve-test';
 import { ImportRuleForm } from './ImportRuleForm.js';
 import { ImportRuleItem } from './ImportRuleItem.js';
 import { asyncMap } from '../../../common.js';
 import { WarningPopup } from '../WarningPopup.js';
 import { App } from '../../../Application.js';
-import { assert } from '../../../assert.js';
 import {
     query,
     queryAll,

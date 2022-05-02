@@ -1,4 +1,4 @@
-import { test, copyObject, checkObjValue } from 'jezve-test';
+import { test, copyObject, assert } from 'jezve-test';
 import { MainView } from '../view/MainView.js';
 import { AccountsView } from '../view/AccountsView.js';
 import { Transaction } from '../model/Transaction.js';
@@ -7,7 +7,6 @@ import { formatProps, createCSV } from '../common.js';
 import { App } from '../Application.js';
 import { setBlock } from '../env.js';
 import { AccountView } from '../view/AccountView.js';
-import { assert } from '../assert.js';
 
 /** Navigate to accounts list page */
 async function checkNavigation() {
@@ -299,7 +298,7 @@ export async function exportTest(accounts) {
         const expectedContent = createCSV({ header, data });
         const content = await App.view.exportAccounts(itemIds);
 
-        return checkObjValue(content.trim(), expectedContent.trim());
+        return assert.deepMeet(content.trim(), expectedContent.trim());
     });
 }
 
@@ -331,13 +330,13 @@ export async function toggleSelect(accounts) {
 
         await App.view.selectAccounts(indexes);
         let items = App.view.getItems();
-        checkObjValue(items, expectedItems);
+        assert.deepMeet(items, expectedItems);
 
         // Click by items again to inverse selection
         expectedItems = origItems;
         await App.view.selectAccounts(indexes);
         items = App.view.getItems();
-        checkObjValue(items, expectedItems);
+        assert.deepMeet(items, expectedItems);
 
         return true;
     });

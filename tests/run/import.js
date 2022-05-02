@@ -1,4 +1,4 @@
-import { test, copyObject } from 'jezve-test';
+import { test, copyObject, assert } from 'jezve-test';
 import { App } from '../Application.js';
 import { baseUrl, httpReq, setBlock } from '../env.js';
 import { Currency } from '../model/Currency.js';
@@ -9,7 +9,6 @@ import { ImportListItem } from '../view/component/Import/ImportListItem.js';
 import { ImportView } from '../view/ImportView.js';
 import { TransactionsView } from '../view/TransactionsView.js';
 import { ImportViewSubmitError } from '../error/ImportViewSubmitError.js';
-import { assert } from '../assert.js';
 
 /** Reexport import templates and import rules runners */
 export * from './import/templates.js';

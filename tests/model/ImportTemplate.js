@@ -1,9 +1,9 @@
 import { copyObject } from 'jezvejs';
+import { assert } from 'jezve-test';
 import { formatDate } from 'jezvejs/DateUtils';
 import { fixFloat, fixDate } from '../common.js';
 import { Currency } from './Currency.js';
 import { ImportTransaction } from './ImportTransaction.js';
-import { assert } from '../assert.js';
 
 /** Import template model */
 export class ImportTemplate {

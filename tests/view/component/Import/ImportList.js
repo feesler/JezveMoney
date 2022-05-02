@@ -1,8 +1,7 @@
 import { copyObject } from 'jezvejs';
-import { TestComponent } from 'jezve-test';
+import { TestComponent, assert } from 'jezve-test';
 import { ImportListItem } from './ImportListItem.js';
 import { asyncMap } from '../../../common.js';
-import { assert } from '../../../assert.js';
 import { query, queryAll, isVisible } from '../../../env.js';
 
 export class ImportList extends TestComponent {

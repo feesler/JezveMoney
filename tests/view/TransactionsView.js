@@ -1,5 +1,5 @@
 import { copyObject } from 'jezvejs';
-import { TestComponent } from 'jezve-test';
+import { TestComponent, assert } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
 import { DropDown } from './component/DropDown.js';
@@ -13,7 +13,6 @@ import { SearchForm } from './component/SearchForm.js';
 import { TransactionList } from './component/TransactionList.js';
 import { fixDate } from '../common.js';
 import { Toolbar } from './component/Toolbar.js';
-import { assert } from '../assert.js';
 import {
     query,
     prop,
