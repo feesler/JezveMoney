@@ -66,6 +66,10 @@ div.trans-list__item_selected {
   border-left-style: solid;
 }
 
+.tritem_balance span {
+  margin: 0 10px 0 0;
+}
+
 /* Details mode */
 .trans-list_details .trans-list-items,
 table.trans-list-items {
@@ -80,39 +84,35 @@ table.trans-list-items tbody {
 }
 
 .trans-list_details td,
-table.trans-list-items  td {
+table.trans-list-items td {
   padding: 2px 0;
 }
 
 .trans-list_details span,
-table.trans-list-items  span {
+table.trans-list-items span {
   font-size: 14px;
   height: 23px;
   line-height: 23px;
 }
 
 .trans-list_details .trans-list__item-content,
-table.trans-list-items  .trans-list__item-content {
+table.trans-list-items .trans-list__item-content {
   color: #0080b0;
   white-space: nowrap;
   text-align: right;
 }
 
 .trans-list_details .trans-list__item-comment,
-table.trans-list-items  .trans-list__item-comment {
+table.trans-list-items .trans-list__item-comment {
   margin: 0;
   padding: 0;
   border: 0 none;
 }
 
 .trans-list_details .tritem_balance,
-table.trans-list-items  .tritem_balance {
+table.trans-list-items .tritem_balance {
   text-align: right;
   white-space: nowrap;
-}
-
-.tritem_balance > span {
-  margin: 0 10px 0 0;
 }
 
 /* Ellipsis cell */
