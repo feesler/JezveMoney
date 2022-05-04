@@ -279,8 +279,6 @@ async function prepareTrListData() {
 export async function transactionsListTests() {
     setBlock('Transaction List view', 1);
 
-    scenario = this;
-
     const data = await prepareTrListData();
 
     await scenario.runner.runTasks([
@@ -335,4 +333,9 @@ export async function transactionsListTests() {
         { action: TransactionListTests.clearSearchForm },
         { action: TransactionListTests.clearDateRange },
     ]);
+}
+
+/** Initialize tests */
+export function initTransactionListTests(scenarioInstance) {
+    scenario = scenarioInstance;
 }

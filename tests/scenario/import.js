@@ -681,21 +681,19 @@ async function runImportRuleTests() {
 export async function importTests() {
     setBlock('Import', 1);
 
-    scenario = this;
-
     const accIndexes = App.state.getAccountIndexesByNames([
         'acc_3', 'acc RUB', 'acc USD', 'acc EUR',
     ]);
     [
-        this.ACC_3,
-        this.ACC_RUB,
-        this.ACC_USD,
-        this.ACC_EUR,
+        scenario.ACC_3,
+        scenario.ACC_RUB,
+        scenario.ACC_USD,
+        scenario.ACC_EUR,
     ] = App.state.getAccountsByIndexes(accIndexes);
     const personIndexes = App.state.getPersonIndexesByNames([
         'Maria', 'Alex',
     ]);
-    [this.MARIA, this.ALEX] = App.state.getPersonsByIndexes(personIndexes);
+    [scenario.MARIA, scenario.ALEX] = App.state.getPersonsByIndexes(personIndexes);
 
     await ImportTests.checkInitialState();
     await runImportRuleTests();
@@ -704,14 +702,14 @@ export async function importTests() {
     // Upload CSV file
     setBlock('Upload CSV', 2);
     await ImportTests.uploadFile({
-        filename: this.uploadFilename,
-        data: this.csvStatement,
+        filename: scenario.uploadFilename,
+        data: scenario.csvStatement,
     });
 
     await runImportTemplateTests();
 
     // Submit converted transactions
-    await ImportTests.submitUploaded({ data: this.csvStatement, account: this.ACC_RUB });
+    await ImportTests.submitUploaded({ data: scenario.csvStatement, account: scenario.ACC_RUB });
     // Delete all
     setBlock('Delete all items', 2);
     await ImportTests.deleteAllItems();
@@ -720,10 +718,10 @@ export async function importTests() {
     setBlock('Enable/disable rules', 2);
     // Upload again
     await ImportTests.uploadFile({
-        filename: this.uploadFilename,
-        data: this.csvStatement,
+        filename: scenario.uploadFilename,
+        data: scenario.csvStatement,
     });
-    await ImportTests.submitUploaded({ data: this.csvStatement, account: this.ACC_RUB });
+    await ImportTests.submitUploaded({ data: scenario.csvStatement, account: scenario.ACC_RUB });
 
     await ImportTests.enableRules(false);
     await ImportTests.enableRules(true);
@@ -736,4 +734,9 @@ export async function importTests() {
     await runDeleteImportItemTests();
     await runSubmitImportTests();
     await runImportItemStateLoop();
+}
+
+/** Initialize tests */
+export function initImportTests(scenarioInstance) {
+    scenario = scenarioInstance;
 }

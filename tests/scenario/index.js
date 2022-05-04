@@ -6,8 +6,12 @@ import { generateCSV } from '../model/import.js';
 import { apiTests } from './api.js';
 import { accountTests, postTransactionAccountTests } from './account.js';
 import { personTests } from './person.js';
-import { transactionTests, prepareTransactionTests } from './transaction.js';
-import { importTests } from './import.js';
+import {
+    transactionTests,
+    prepareTransactionTests,
+    initTransactionTests,
+} from './transaction.js';
+import { importTests, initImportTests } from './import.js';
 
 import * as ApiTests from '../run/api.js';
 import * as SecurityTests from '../run/security.js';
@@ -83,9 +87,11 @@ export class Scenario {
             await api.importtemplate.del(templateIds);
         }
 
+        initTransactionTests(this);
         await prepareTransactionTests();
 
-        await importTests.call(this);
+        initImportTests(this);
+        await importTests();
     }
 
     async runFullScenario() {
@@ -99,7 +105,10 @@ export class Scenario {
         await this.profileTests();
         await accountTests.call(this);
         await personTests.call(this);
-        await transactionTests.call(this);
+
+        initTransactionTests(this);
+        await transactionTests();
+
         await this.runDeleteFromUpdateTests();
         await postTransactionAccountTests();
         await StatisticsTests.run();

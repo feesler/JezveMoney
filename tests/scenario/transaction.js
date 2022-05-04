@@ -10,8 +10,8 @@ import * as ExpenseTransactionTests from '../run/transaction/expense.js';
 import * as IncomeTransactionTests from '../run/transaction/income.js';
 import * as TransferTransactionTests from '../run/transaction/transfer.js';
 import * as DebtTransactionTests from '../run/transaction/debt.js';
-import { transactionsListTests } from './transactionList.js';
-import { importTests } from './import.js';
+import { transactionsListTests, initTransactionListTests } from './transactionList.js';
+import { importTests, initImportTests } from './import.js';
 import { App } from '../Application.js';
 import { setBlock } from '../env.js';
 
@@ -445,14 +445,22 @@ export async function prepareTransactionTests() {
 export async function transactionTests() {
     setBlock('Transactions', 1);
 
-    scenario = this;
-
     await prepareTransactionTests();
 
     await transactionStateLoopTests();
     await createTransactionTests();
     await updateTransactionTests();
-    await transactionsListTests.call(this);
-    await importTests.call(this);
+
+    initTransactionListTests(scenario);
+    await transactionsListTests();
+
+    initImportTests(scenario);
+    await importTests();
+
     await deleteTransactionTests();
+}
+
+/** Initialize tests */
+export function initTransactionTests(scenarioInstance) {
+    scenario = scenarioInstance;
 }
