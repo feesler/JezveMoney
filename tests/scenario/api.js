@@ -1082,61 +1082,72 @@ async function apiProfile() {
     return scenario.runner.runTasks(tasks);
 }
 
-/** Run API tests */
-export async function apiTests() {
-    setBlock('API tests', 1);
-    setBlock('User', 2);
+export const apiTests = {
+    /** Initialize tests */
+    init(scenarioInstance) {
+        scenario = scenarioInstance;
+    },
 
-    scenario = this;
+    /** Run API tests */
+    async run() {
+        setBlock('API tests', 1);
+        setBlock('User', 2);
 
-    // Register API test user and prepare data for security tests
-    await ApiTests.registerAndLogin(App.config.apiTestUser);
-    await App.setupUser();
-    this.setupCurrencies();
-    await prepareApiSecurityTests();
+        // Register API test user and prepare data for security tests
+        await ApiTests.registerAndLogin(App.config.apiTestUser);
+        await App.setupUser();
+        scenario.setupCurrencies();
+        await prepareApiSecurityTests();
 
-    await ApiTests.loginTest({ login: '', password: App.config.testUser.password });
-    await ApiTests.loginTest({ login: App.config.testUser.login, password: '' });
+        await ApiTests.loginTest({ login: '', password: App.config.testUser.password });
+        await ApiTests.loginTest({ login: App.config.testUser.login, password: '' });
 
-    // Register and login main test user
-    await ApiTests.registerAndLogin(App.config.testUser);
-    // Set 'Tester' access level for test user
-    const testUserId = App.state.profile.user_id;
-    await ApiTests.loginTest(App.config.testAdminUser);
-    const testUserData = copyObject(App.config.testUser);
-    testUserData.id = testUserId;
-    testUserData.access = 2;
-    await api.user.update(testUserData);
-    await ApiTests.loginTest(App.config.testUser);
-    await App.setupUser();
+        // Register and login main test user
+        await ApiTests.registerAndLogin(App.config.testUser);
+        // Set 'Tester' access level for test user
+        const testUserId = App.state.profile.user_id;
+        await ApiTests.loginTest(App.config.testAdminUser);
+        const testUserData = copyObject(App.config.testUser);
+        testUserData.id = testUserId;
+        testUserData.access = 2;
+        await api.user.update(testUserData);
+        await ApiTests.loginTest(App.config.testUser);
+        await App.setupUser();
 
-    setBlock('Accounts', 2);
+        setBlock('Accounts', 2);
 
-    await ApiTests.resetAccounts();
+        await ApiTests.resetAccounts();
 
-    await apiCreateAccounts();
-    await apiCreatePersons();
-    await apiCreateTransactions();
+        await apiCreateAccounts();
+        await apiCreatePersons();
+        await apiCreateTransactions();
 
-    await apiSecurityTests();
+        await apiSecurityTests();
 
-    await apiUpdateTransactions();
-    await apiSetTransactionPos();
+        await apiUpdateTransactions();
+        await apiSetTransactionPos();
 
-    await apiImportTemplateTests();
-    await apiImportRuleTests();
+        await apiImportTemplateTests();
+        await apiImportRuleTests();
 
-    await apiFilterTransactions();
+        await apiFilterTransactions();
 
-    await apiUpdateAccounts();
-    await apiDeleteAccounts();
+        await apiUpdateAccounts();
+        await apiDeleteAccounts();
 
-    await apiUpdatePersons();
-    await apiDeletePersons();
+        await apiUpdatePersons();
+        await apiDeletePersons();
 
-    await apiDeleteTransactions();
+        await apiDeleteTransactions();
 
-    await apiProfile();
+        await apiProfile();
 
-    await api.user.login(App.config.testUser);
-}
+        await api.user.login(App.config.testUser);
+    },
+
+    /** Initialize and run tests */
+    async initAndRun(scenarioInstance) {
+        this.init(scenarioInstance);
+        await this.run();
+    },
+};

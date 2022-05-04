@@ -276,66 +276,75 @@ async function prepareTrListData() {
     return res;
 }
 
-export async function transactionsListTests() {
-    setBlock('Transaction List view', 1);
-
-    const data = await prepareTrListData();
-
-    await scenario.runner.runTasks([
-        { action: TransactionListTests.checkInitialState },
-        { action: TransactionListTests.goToNextPage },
-        { action: TransactionListTests.setDetailsMode },
-        { action: TransactionListTests.goToNextPage },
-    ]);
-
-    const toggleSelectData = [
-        0,
-        [1, 2],
-    ];
-
-    await scenario.runner.runGroup(TransactionListTests.toggleSelect, toggleSelectData);
-
-    await scenario.runner.runGroup(TransactionListTests.filterByType, availTransTypes);
-
-    await scenario.runner.runTasks([{
-        action: TransactionListTests.filterByAccounts,
-        data: data.accounts[2],
-    }, {
-        action: TransactionListTests.filterByAccounts,
-        data: [data.accounts[2], data.accounts[3]],
-    }, {
-        action: TransactionListTests.filterByType,
-        data: 0,
-    }, {
-        action: TransactionListTests.filterByType,
-        data: EXPENSE,
-    }, {
-        action: TransactionListTests.filterByType,
-        data: [INCOME, DEBT],
-    }, {
-        action: TransactionListTests.filterByDate,
-        data: { start: App.dates.weekAgo, end: App.dates.now },
+export const transactionsListTests = {
+    /** Initialize tests */
+    init(scenarioInstance) {
+        scenario = scenarioInstance;
     },
-    {
-        action: TransactionListTests.filterByDate,
-        data: { start: App.dates.yearAgo, end: App.dates.monthAgo },
-    }]);
 
-    const searchData = [
-        '1',
-        'la',
-        'кк',
-    ];
+    /** Run transactions list view tests */
+    async run() {
+        setBlock('Transaction List view', 1);
 
-    await scenario.runner.runGroup(TransactionListTests.search, searchData);
+        const data = await prepareTrListData();
 
-    await scenario.runner.runTasks([
-        { action: TransactionListTests.clearSearchForm },
-        { action: TransactionListTests.clearDateRange },
-    ]);
-}
+        await scenario.runner.runTasks([
+            { action: TransactionListTests.checkInitialState },
+            { action: TransactionListTests.goToNextPage },
+            { action: TransactionListTests.setDetailsMode },
+            { action: TransactionListTests.goToNextPage },
+        ]);
 
-/** Initialize tests */
-export function initTransactionListTests(scenarioInstance) {
-    scenario = scenarioInstance;
-}
+        const toggleSelectData = [
+            0,
+            [1, 2],
+        ];
+
+        await scenario.runner.runGroup(TransactionListTests.toggleSelect, toggleSelectData);
+
+        await scenario.runner.runGroup(TransactionListTests.filterByType, availTransTypes);
+
+        await scenario.runner.runTasks([{
+            action: TransactionListTests.filterByAccounts,
+            data: data.accounts[2],
+        }, {
+            action: TransactionListTests.filterByAccounts,
+            data: [data.accounts[2], data.accounts[3]],
+        }, {
+            action: TransactionListTests.filterByType,
+            data: 0,
+        }, {
+            action: TransactionListTests.filterByType,
+            data: EXPENSE,
+        }, {
+            action: TransactionListTests.filterByType,
+            data: [INCOME, DEBT],
+        }, {
+            action: TransactionListTests.filterByDate,
+            data: { start: App.dates.weekAgo, end: App.dates.now },
+        },
+        {
+            action: TransactionListTests.filterByDate,
+            data: { start: App.dates.yearAgo, end: App.dates.monthAgo },
+        }]);
+
+        const searchData = [
+            '1',
+            'la',
+            'кк',
+        ];
+
+        await scenario.runner.runGroup(TransactionListTests.search, searchData);
+
+        await scenario.runner.runTasks([
+            { action: TransactionListTests.clearSearchForm },
+            { action: TransactionListTests.clearDateRange },
+        ]);
+    },
+
+    /** Initialize and run tests */
+    async initAndRun(scenarioInstance) {
+        this.init(scenarioInstance);
+        await this.run();
+    },
+};

@@ -10,14 +10,14 @@ import * as ExpenseTransactionTests from '../run/transaction/expense.js';
 import * as IncomeTransactionTests from '../run/transaction/income.js';
 import * as TransferTransactionTests from '../run/transaction/transfer.js';
 import * as DebtTransactionTests from '../run/transaction/debt.js';
-import { transactionsListTests, initTransactionListTests } from './transactionList.js';
-import { importTests, initImportTests } from './import.js';
+import { transactionsListTests } from './transactionList.js';
+import { importTests } from './import.js';
 import { App } from '../Application.js';
 import { setBlock } from '../env.js';
 
 let scenario = null;
 
-async function runCreateExpenseTests() {
+async function createExpenseTests() {
     setBlock('Create expense transactions', 1);
 
     const { RUB, KRW } = scenario;
@@ -58,7 +58,7 @@ async function runCreateExpenseTests() {
     await scenario.runner.runGroup(ExpenseTransactionTests.create, data);
 }
 
-async function runCreateIncomeTests() {
+async function createIncomeTests() {
     setBlock('Create income transactions', 1);
 
     const { USD, KRW } = scenario;
@@ -101,7 +101,7 @@ async function runCreateIncomeTests() {
     await scenario.runner.runGroup(IncomeTransactionTests.create, data);
 }
 
-async function runCreateTransferTests() {
+async function createTransferTests() {
     setBlock('Create transfer transactions', 1);
 
     const data = [{
@@ -140,7 +140,7 @@ async function runCreateTransferTests() {
     await scenario.runner.runGroup(TransferTransactionTests.create, data);
 }
 
-async function runCreateDebtTests() {
+async function createDebtTests() {
     setBlock('Create debt transactions', 1);
 
     const data = [{
@@ -181,7 +181,7 @@ async function runCreateDebtTests() {
     await scenario.runner.runGroup(DebtTransactionTests.create, data);
 }
 
-async function runUpdateExpenseTests() {
+async function updateExpenseTests() {
     setBlock('Update expense transactions', 2);
 
     const { RUB } = scenario;
@@ -207,7 +207,7 @@ async function runUpdateExpenseTests() {
     await scenario.runner.runGroup(ExpenseTransactionTests.update, data);
 }
 
-async function runUpdateIncomeTests() {
+async function updateIncomeTests() {
     setBlock('Update income transactions', 2);
 
     const { RUB } = scenario;
@@ -232,7 +232,7 @@ async function runUpdateIncomeTests() {
     await scenario.runner.runGroup(IncomeTransactionTests.update, data);
 }
 
-async function runUpdateTransferTests() {
+async function updateTransferTests() {
     setBlock('Update transfer transactions', 2);
 
     const data = [{
@@ -261,7 +261,7 @@ async function runUpdateTransferTests() {
     await scenario.runner.runGroup(TransferTransactionTests.update, data);
 }
 
-async function runUpdateDebtTests() {
+async function updateDebtTests() {
     setBlock('Update debt transactions', 2);
 
     const data = [{
@@ -296,7 +296,7 @@ async function runUpdateDebtTests() {
     await scenario.runner.runGroup(DebtTransactionTests.update, data);
 }
 
-async function runDeleteExpenseTests() {
+async function deleteExpenseTests() {
     setBlock('Delete expense transactions', 2);
 
     const data = [
@@ -307,7 +307,7 @@ async function runDeleteExpenseTests() {
     await scenario.runner.runGroup((items) => TransactionTests.del(EXPENSE, items), data);
 }
 
-async function runDeleteIncomeTests() {
+async function deleteIncomeTests() {
     setBlock('Delete income transactions', 2);
 
     const data = [
@@ -318,7 +318,7 @@ async function runDeleteIncomeTests() {
     await scenario.runner.runGroup((items) => TransactionTests.del(INCOME, items), data);
 }
 
-async function runDeleteTransferTests() {
+async function deleteTransferTests() {
     setBlock('Delete transfer transactions', 2);
 
     const data = [
@@ -329,7 +329,7 @@ async function runDeleteTransferTests() {
     await scenario.runner.runGroup((items) => TransactionTests.del(TRANSFER, items), data);
 }
 
-async function runDeleteDebtTests() {
+async function deleteDebtTests() {
     setBlock('Delete debt transactions', 2);
 
     const data = [
@@ -340,7 +340,7 @@ async function runDeleteDebtTests() {
     await scenario.runner.runGroup((items) => TransactionTests.del(DEBT, items), data);
 }
 
-async function transactionStateLoopTests() {
+async function stateLoopTests() {
     setBlock('Transaction view state loops', 1);
 
     await ExpenseTransactionTests.stateLoop();
@@ -351,116 +351,135 @@ async function transactionStateLoopTests() {
     await TransactionTests.typeChangeLoop();
 }
 
-async function createTransactionTests() {
+async function createTests() {
     setBlock('Create transaction', 1);
 
-    await runCreateExpenseTests();
-    await runCreateIncomeTests();
-    await runCreateTransferTests();
-    await runCreateDebtTests();
+    await createExpenseTests();
+    await createIncomeTests();
+    await createTransferTests();
+    await createDebtTests();
 }
 
-async function updateTransactionTests() {
+async function updateTests() {
     setBlock('Update transaction', 1);
 
-    await runUpdateExpenseTests();
-    await runUpdateIncomeTests();
-    await runUpdateTransferTests();
-    await runUpdateDebtTests();
+    await updateExpenseTests();
+    await updateIncomeTests();
+    await updateTransferTests();
+    await updateDebtTests();
 }
 
-async function deleteTransactionTests() {
+async function deleteTests() {
     setBlock('Delete transaction', 1);
 
-    await runDeleteExpenseTests();
-    await runDeleteIncomeTests();
-    await runDeleteTransferTests();
-    await runDeleteDebtTests();
+    await deleteExpenseTests();
+    await deleteIncomeTests();
+    await deleteTransferTests();
+    await deleteDebtTests();
 }
 
-/** Create accounts and persons required for transaction view tests */
-export async function prepareTransactionTests() {
-    const { RUB, USD, EUR } = scenario;
+async function deleteFromUpdateTests() {
+    setBlock('Delete transaction from update view', 2);
 
-    const accList = [{
-        name: 'acc_3',
-        curr_id: RUB,
-        initbalance: '500.99',
-        icon_id: 2,
-        flags: 0,
-    }, {
-        name: 'acc RUB',
-        curr_id: RUB,
-        initbalance: '500.99',
-        icon_id: 5,
-        flags: 0,
-    }, {
-        name: 'acc USD',
-        curr_id: USD,
-        initbalance: '500.99',
-        icon_id: 4,
-        flags: 0,
-    }, {
-        name: 'acc EUR',
-        curr_id: EUR,
-        initbalance: '10000.99',
-        icon_id: 3,
-        flags: 0,
-    }, {
-        name: 'card RUB',
-        curr_id: RUB,
-        initbalance: '35000.40',
-        icon_id: 3,
-        flags: 0,
-    }];
+    const data = [
+        0,
+    ];
 
-    for (const account of accList) {
-        if (App.state.accounts.findByName(account.name)) {
-            continue;
+    await scenario.runner.runGroup(
+        (pos) => TransactionTests.delFromUpdate(DEBT, pos),
+        data,
+    );
+}
+
+export const transactionTests = {
+    /** Initialize tests */
+    init(scenarioInstance) {
+        scenario = scenarioInstance;
+    },
+
+    /** Create accounts and persons required for transaction view tests */
+    async prepare() {
+        const { RUB, USD, EUR } = scenario;
+
+        const accList = [{
+            name: 'acc_3',
+            curr_id: RUB,
+            initbalance: '500.99',
+            icon_id: 2,
+            flags: 0,
+        }, {
+            name: 'acc RUB',
+            curr_id: RUB,
+            initbalance: '500.99',
+            icon_id: 5,
+            flags: 0,
+        }, {
+            name: 'acc USD',
+            curr_id: USD,
+            initbalance: '500.99',
+            icon_id: 4,
+            flags: 0,
+        }, {
+            name: 'acc EUR',
+            curr_id: EUR,
+            initbalance: '10000.99',
+            icon_id: 3,
+            flags: 0,
+        }, {
+            name: 'card RUB',
+            curr_id: RUB,
+            initbalance: '35000.40',
+            icon_id: 3,
+            flags: 0,
+        }];
+
+        for (const account of accList) {
+            if (App.state.accounts.findByName(account.name)) {
+                continue;
+            }
+
+            await api.account.create(account);
         }
 
-        await api.account.create(account);
-    }
+        const personsList = [{
+            name: 'Maria',
+            flags: 0,
+        }, {
+            name: 'Ivan<',
+            flags: 0,
+        }];
 
-    const personsList = [{
-        name: 'Maria',
-        flags: 0,
-    }, {
-        name: 'Ivan<',
-        flags: 0,
-    }];
+        for (const person of personsList) {
+            if (App.state.persons.findByName(person.name)) {
+                continue;
+            }
 
-    for (const person of personsList) {
-        if (App.state.persons.findByName(person.name)) {
-            continue;
+            await api.person.create(person);
         }
 
-        await api.person.create(person);
-    }
+        await App.state.fetch();
+    },
 
-    await App.state.fetch();
-}
+    /** Run transaction view tests */
+    async run() {
+        setBlock('Transactions', 1);
 
-/** Run transaction view tests */
-export async function transactionTests() {
-    setBlock('Transactions', 1);
+        await this.prepare();
 
-    await prepareTransactionTests();
+        await stateLoopTests();
+        await createTests();
+        await updateTests();
 
-    await transactionStateLoopTests();
-    await createTransactionTests();
-    await updateTransactionTests();
+        await transactionsListTests.initAndRun(scenario);
+        await importTests.initAndRun(scenario);
 
-    initTransactionListTests(scenario);
-    await transactionsListTests();
+        await deleteTests();
+        await deleteFromUpdateTests();
+    },
 
-    initImportTests(scenario);
-    await importTests();
-
-    await deleteTransactionTests();
-}
-
-/** Initialize tests */
-export function initTransactionTests(scenarioInstance) {
-    scenario = scenarioInstance;
-}
+    /** Initialize and run tests */
+    async initAndRun(scenarioInstance) {
+        this.init(scenarioInstance);
+        await this.run();
+    },
+};

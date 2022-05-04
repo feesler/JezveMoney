@@ -29,7 +29,7 @@ async function createAccountTests() {
     await scenario.runner.runGroup(AccountTests.create, data);
 }
 
-async function updateAccountTests() {
+async function updateTests() {
     setBlock('Update accounts', 2);
 
     const { RUB, USD } = scenario;
@@ -45,7 +45,7 @@ async function updateAccountTests() {
     await scenario.runner.runGroup(AccountTests.update, data);
 }
 
-async function deleteAccountTests() {
+async function deleteTests() {
     setBlock('Delete accounts', 2);
 
     const data = [
@@ -55,7 +55,17 @@ async function deleteAccountTests() {
     await scenario.runner.runGroup(AccountTests.del, data);
 }
 
-async function hideAccountsTest() {
+async function deleteFromUpdateTests() {
+    setBlock('Delete account from update view', 2);
+
+    const data = [
+        0,
+    ];
+
+    await scenario.runner.runGroup(AccountTests.delFromUpdate, data);
+}
+
+async function hideTest() {
     setBlock('Hide accounts', 2);
 
     const data = [
@@ -66,18 +76,18 @@ async function hideAccountsTest() {
     await scenario.runner.runGroup(AccountTests.hide, data);
 }
 
-async function showAccountsTest() {
+async function showTest() {
     setBlock('Show accounts', 2);
 
     const data = [
-        [5],
-        [0, 6],
+        [6],
+        [0, 7],
     ];
 
     await scenario.runner.runGroup(AccountTests.show, data);
 }
 
-async function exportAccountsTest() {
+async function exportTest() {
     setBlock('Export accounts', 2);
 
     const data = [
@@ -88,7 +98,7 @@ async function exportAccountsTest() {
     await scenario.runner.runGroup(AccountTests.exportTest, data);
 }
 
-async function toggleAccountsTest() {
+async function toggleTest() {
     setBlock('Toggle select accounts', 2);
 
     const data = [
@@ -99,22 +109,36 @@ async function toggleAccountsTest() {
     await scenario.runner.runGroup(AccountTests.toggleSelect, data);
 }
 
-export async function accountTests() {
-    setBlock('Accounts', 1);
+export const accountTests = {
+    /** Initialize tests */
+    init(scenarioInstance) {
+        scenario = scenarioInstance;
+    },
 
-    scenario = this;
+    /** Run account view tests */
+    async run() {
+        setBlock('Accounts', 1);
 
-    await AccountTests.stateLoop();
+        await AccountTests.stateLoop();
 
-    await createAccountTests();
-    await deleteAccountTests();
-}
+        await createAccountTests();
+        await deleteTests();
+    },
 
-export async function postTransactionAccountTests() {
-    await hideAccountsTest();
-    await toggleAccountsTest();
-    await showAccountsTest();
-    await exportAccountsTest();
-    await updateAccountTests();
-    await deleteAccountTests();
-}
+    /** Run account view tests with transactions */
+    async runPostTransaction() {
+        await hideTest();
+        await toggleTest();
+        await showTest();
+        await exportTest();
+        await updateTests();
+        await deleteTests();
+        await deleteFromUpdateTests();
+    },
+
+    /** Initialize and run tests */
+    async initAndRun(scenarioInstance) {
+        this.init(scenarioInstance);
+        await this.run();
+    },
+};

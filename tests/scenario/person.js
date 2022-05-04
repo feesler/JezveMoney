@@ -3,7 +3,7 @@ import { setBlock } from '../env.js';
 
 let scenario = null;
 
-async function createPersonTests() {
+async function createTests() {
     setBlock('Create persons', 2);
 
     const data = [
@@ -19,7 +19,7 @@ async function createPersonTests() {
     await scenario.runner.runGroup(PersonTests.create, data);
 }
 
-async function updatePersonTests() {
+async function updateTests() {
     setBlock('Update persons', 2);
 
     const data = [{
@@ -34,7 +34,7 @@ async function updatePersonTests() {
     await scenario.runner.runGroup(PersonTests.update, data);
 }
 
-async function deletePersonTests() {
+async function deleteTests() {
     setBlock('Delete persons', 2);
 
     const data = [
@@ -45,7 +45,17 @@ async function deletePersonTests() {
     await scenario.runner.runGroup(PersonTests.del, data);
 }
 
-async function hidePersonsTest() {
+async function deleteFromUpdateTests() {
+    setBlock('Delete person from update view', 2);
+
+    const data = [
+        0,
+    ];
+
+    await scenario.runner.runGroup(PersonTests.delFromUpdate, data);
+}
+
+async function hideTests() {
     setBlock('Hide persons', 2);
 
     const data = [
@@ -56,7 +66,7 @@ async function hidePersonsTest() {
     await scenario.runner.runGroup(PersonTests.hide, data);
 }
 
-async function showPersonsTest() {
+async function showTests() {
     setBlock('Show persons', 2);
 
     const data = [
@@ -67,7 +77,7 @@ async function showPersonsTest() {
     await scenario.runner.runGroup(PersonTests.show, data);
 }
 
-async function togglePersonsTest() {
+async function toggleTests() {
     setBlock('Toggle select persons', 2);
 
     const data = [
@@ -78,15 +88,32 @@ async function togglePersonsTest() {
     await scenario.runner.runGroup(PersonTests.toggleSelect, data);
 }
 
-export async function personTests() {
-    setBlock('Persons', 1);
+export const personTests = {
+    /** Initialize tests */
+    init(scenarioInstance) {
+        scenario = scenarioInstance;
+    },
 
-    scenario = this;
+    /** Run person view tests */
+    async run() {
+        setBlock('Persons', 1);
 
-    await createPersonTests();
-    await hidePersonsTest();
-    await togglePersonsTest();
-    await showPersonsTest();
-    await updatePersonTests();
-    await deletePersonTests();
-}
+        await createTests();
+        await hideTests();
+        await toggleTests();
+        await showTests();
+        await updateTests();
+        await deleteTests();
+    },
+
+    /** Run person view tests with transactions */
+    async runPostTransaction() {
+        await deleteFromUpdateTests();
+    },
+
+    /** Initialize and run tests */
+    async initAndRun(scenarioInstance) {
+        this.init(scenarioInstance);
+        await this.run();
+    },
+};

@@ -18,11 +18,15 @@ import {
     IMPORT_ACTION_SET_DEST_AMOUNT,
     IMPORT_ACTION_SET_COMMENT,
 } from '../model/ImportAction.js';
+import { generateCSV } from '../model/import.js';
+import * as ApiTests from '../run/api.js';
 import * as ImportTests from '../run/import.js';
 import { App } from '../Application.js';
 import { setBlock } from '../env.js';
 
 let scenario = null;
+let csvStatement = null;
+let uploadFilename = null;
 
 async function runSubmitImportTests() {
     await ImportTests.submit();
@@ -76,11 +80,11 @@ async function runSubmitImportTests() {
     // Verify submit is disabled for list with no enabled items
     setBlock('Verify submit is disabled for list with no enabled items', 2);
     await ImportTests.uploadFile({
-        filename: scenario.uploadFilename,
-        data: scenario.csvStatement,
+        filename: uploadFilename,
+        data: csvStatement,
     });
     await ImportTests.submitUploaded({
-        data: scenario.csvStatement,
+        data: csvStatement,
         template: 0,
     });
     await ImportTests.enableItems({
@@ -677,66 +681,123 @@ async function runImportRuleTests() {
     await ImportTests.closeRulesDialog();
 }
 
-/** Run import view tests */
-export async function importTests() {
-    setBlock('Import', 1);
+export const importTests = {
+    /** Initialize tests */
+    init(scenarioInstance) {
+        scenario = scenarioInstance;
+    },
 
-    const accIndexes = App.state.getAccountIndexesByNames([
-        'acc_3', 'acc RUB', 'acc USD', 'acc EUR',
-    ]);
-    [
-        scenario.ACC_3,
-        scenario.ACC_RUB,
-        scenario.ACC_USD,
-        scenario.ACC_EUR,
-    ] = App.state.getAccountsByIndexes(accIndexes);
-    const personIndexes = App.state.getPersonIndexesByNames([
-        'Maria', 'Alex',
-    ]);
-    [scenario.MARIA, scenario.ALEX] = App.state.getPersonsByIndexes(personIndexes);
+    /** Upload CSV file for import tests */
+    async prepare() {
+        // Login as admin to upload CSV file
+        await ApiTests.loginTest(App.config.testAdminUser);
 
-    await ImportTests.checkInitialState();
-    await runImportRuleTests();
-    await runCreateImportItemTests();
+        const now = new Date();
+        csvStatement = generateCSV([
+            [now, 'MOBILE', 'MOSKVA', 'RU', 'RUB', '-500.00'],
+            [now, 'SALON', 'SANKT-PETERBU', 'RU', 'RUB', '-80.00'],
+            [now, 'OOO SIGMA', 'MOSKVA', 'RU', 'RUB', '-128.00'],
+            [now, 'TAXI', 'MOSKVA', 'RU', 'RUB', '-188.00'],
+            [now, 'TAXI', 'MOSKVA', 'RU', 'RUB', '-306.00'],
+            [now, 'MAGAZIN', 'SANKT-PETERBU', 'RU', 'RUB', '-443.00'],
+            [now, 'BAR', 'SANKT-PETERBU', 'RU', 'RUB', '-443.00'],
+            [now, 'DOSTAVKA', 'SANKT-PETERBU', 'RU', 'RUB', '-688.00'],
+            [now, 'PRODUCTY', 'SANKT-PETERBU', 'RU', 'RUB', '-550.5'],
+            [now, 'BOOKING', 'AMSTERDAM', 'NL', 'EUR', '-500.00', 'RUB', '-50750.35'],
+            [now, 'SALARY', 'MOSKVA', 'RU', 'RUB', '100000.00'],
+            [now, 'INTEREST', 'SANKT-PETERBU', 'RU', 'RUB', '23.16'],
+            [now, 'RBA R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-5000.00'],
+            [now, 'C2C R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-10000.00'],
+        ]);
 
-    // Upload CSV file
-    setBlock('Upload CSV', 2);
-    await ImportTests.uploadFile({
-        filename: scenario.uploadFilename,
-        data: scenario.csvStatement,
-    });
+        uploadFilename = await ImportTests.putFile(csvStatement);
+        if (!uploadFilename) {
+            throw new Error('Fail to put file');
+        }
 
-    await runImportTemplateTests();
+        await ApiTests.loginTest(App.config.testUser);
+    },
 
-    // Submit converted transactions
-    await ImportTests.submitUploaded({ data: scenario.csvStatement, account: scenario.ACC_RUB });
-    // Delete all
-    setBlock('Delete all items', 2);
-    await ImportTests.deleteAllItems();
+    /** Remove previously uploaded file */
+    async clean() {
+        await ApiTests.loginTest(App.config.testAdminUser);
+        await ImportTests.removeFile(uploadFilename);
+        uploadFilename = null;
+        await ApiTests.loginTest(App.config.testUser);
+    },
 
-    // Enable/disable rules
-    setBlock('Enable/disable rules', 2);
-    // Upload again
-    await ImportTests.uploadFile({
-        filename: scenario.uploadFilename,
-        data: scenario.csvStatement,
-    });
-    await ImportTests.submitUploaded({ data: scenario.csvStatement, account: scenario.ACC_RUB });
+    /** Run import view tests */
+    async run() {
+        setBlock('Import', 1);
 
-    await ImportTests.enableRules(false);
-    await ImportTests.enableRules(true);
+        await this.prepare();
 
-    // Disable all items except 0 and 1
-    await ImportTests.enableItems({
-        index: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
-        value: false,
-    });
-    await runDeleteImportItemTests();
-    await runSubmitImportTests();
-    await runImportItemStateLoop();
-}
+        const accIndexes = App.state.getAccountIndexesByNames([
+            'acc_3', 'acc RUB', 'acc USD', 'acc EUR',
+        ]);
+        [
+            scenario.ACC_3,
+            scenario.ACC_RUB,
+            scenario.ACC_USD,
+            scenario.ACC_EUR,
+        ] = App.state.getAccountsByIndexes(accIndexes);
+        const personIndexes = App.state.getPersonIndexesByNames([
+            'Maria', 'Alex',
+        ]);
+        [scenario.MARIA, scenario.ALEX] = App.state.getPersonsByIndexes(personIndexes);
 
-/** Initialize tests */
-export function initImportTests(scenarioInstance) {
-    scenario = scenarioInstance;
-}
+        await ImportTests.checkInitialState();
+        await runImportRuleTests();
+        await runCreateImportItemTests();
+
+        // Upload CSV file
+        setBlock('Upload CSV', 2);
+        await ImportTests.uploadFile({
+            filename: uploadFilename,
+            data: csvStatement,
+        });
+
+        await runImportTemplateTests();
+
+        // Submit converted transactions
+        await ImportTests.submitUploaded({
+            data: csvStatement,
+            account: scenario.ACC_RUB,
+        });
+        // Delete all
+        setBlock('Delete all items', 2);
+        await ImportTests.deleteAllItems();
+
+        // Enable/disable rules
+        setBlock('Enable/disable rules', 2);
+        // Upload again
+        await ImportTests.uploadFile({
+            filename: uploadFilename,
+            data: csvStatement,
+        });
+        await ImportTests.submitUploaded({
+            data: csvStatement,
+            account: scenario.ACC_RUB,
+        });
+
+        await ImportTests.enableRules(false);
+        await ImportTests.enableRules(true);
+
+        // Disable all items except 0 and 1
+        await ImportTests.enableItems({
+            index: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+            value: false,
+        });
+        await runDeleteImportItemTests();
+        await runSubmitImportTests();
+        await runImportItemStateLoop();
+
+        await this.clean();
+    },
+
+    /** Initialize and run tests */
+    async initAndRun(scenarioInstance) {
+        this.init(scenarioInstance);
+        await this.run();
+    },
+};
