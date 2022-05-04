@@ -88,9 +88,11 @@ export class ImportUploadDialog extends Component {
         this.initialAccField = ge('initialAccField');
         this.controlsBlock = this.elem.querySelector('.upload-dialog-controls');
         this.submitUploadedBtn = ge('submitUploadedBtn');
+        this.uploadProgress = ge('uploadProgress');
         if (!this.initialAccField
             || !this.accountDropDown
             || !this.controlsBlock
+            || !this.uploadProgress
             || !this.submitUploadedBtn) {
             throw new Error('Failed to initialize upload file dialog');
         }
@@ -101,6 +103,7 @@ export class ImportUploadDialog extends Component {
     /** Show/hide dialog */
     show(val) {
         this.popup.show(val);
+        show(this.uploadProgress, false);
     }
 
     /** Hide dialog */
@@ -189,6 +192,13 @@ export class ImportUploadDialog extends Component {
 
     /** Submit event handler */
     onSubmit() {
+        show(this.uploadProgress, true);
+
+        setTimeout(() => this.processItems(), 100);
+    }
+
+    /** Convert uploaded data to import items */
+    processItems() {
         try {
             this.importedItems = this.tplManager.applyTemplate();
         } catch (e) {

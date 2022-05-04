@@ -39,6 +39,7 @@ export class ImportUploadDialog extends TestComponent {
         res.templateSel = await DropDown.createFromChild(this, await query(this.elem, '#templateSel'));
         res.isEncodeCheck = { elem: await query(this.elem, '#isEncodeCheck') };
         res.submitBtn = { elem: await query(this.elem, '#submitUploadedBtn') };
+        res.uploadProgress = { elem: await query(this.elem, '#uploadProgress') };
 
         res.useServerCheck = { elem: await query('#useServerCheck') };
         res.serverAddressBlock = { elem: await query('#serverAddressBlock') };
@@ -149,6 +150,8 @@ export class ImportUploadDialog extends TestComponent {
             res.state = BROWSE_FILE_STATE;
         }
 
+        res.uploadInProgress = await isVisible(res.uploadProgress.elem, true);
+
         res.delete_warning = await WarningPopup.create(this, await query('#tpl_delete_warning'));
 
         return res;
@@ -158,6 +161,7 @@ export class ImportUploadDialog extends TestComponent {
         const res = {};
 
         res.state = cont.state;
+        res.uploadInProgress = cont.uploadInProgress;
         res.isTplLoading = cont.isTplLoading;
 
         res.uploadCollapsed = cont.uploadCollapsed;
@@ -620,6 +624,9 @@ export class ImportUploadDialog extends TestComponent {
 
     async submit() {
         await click(this.content.submitBtn.elem);
-        await this.parse();
+        await waitForFunction(async () => {
+            await this.parse();
+            return !this.model.uploadInProgress;
+        });
     }
 }

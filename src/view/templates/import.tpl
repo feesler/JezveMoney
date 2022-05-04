@@ -165,6 +165,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
     <div class="upload-dialog-controls hidden">
         <input id="submitUploadedBtn" class="btn submit-btn" type="button" value="Ok">
     </div>
+    <div id="uploadProgress" class="upload-dialog__loading hidden">Loading...</div>
 </div>
 
 <div id="rulesDialog" class="rules-dialog hidden">
