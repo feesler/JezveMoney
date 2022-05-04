@@ -76,7 +76,7 @@ export class ImportRuleForm extends Component {
             'button',
             { className: 'btn link-btn create-btn', type: 'button', textContent: 'Create' },
             null,
-            { click: this.onCreateConditionClick.bind(this) },
+            { click: (e) => this.onCreateConditionClick(e) },
         );
         this.toggleCondBtn = ce(
             'button',
@@ -100,7 +100,7 @@ export class ImportRuleForm extends Component {
             'button',
             { className: 'btn link-btn create-btn', type: 'button', textContent: 'Create' },
             null,
-            { click: this.onCreateActionClick.bind(this) },
+            { click: (e) => this.onCreateActionClick(e) },
         );
         this.toggleActionsBtn = ce(
             'button',
@@ -124,13 +124,13 @@ export class ImportRuleForm extends Component {
             'button',
             { className: 'btn submit-btn', type: 'button', textContent: 'Ok' },
             null,
-            { click: this.onSubmit.bind(this) },
+            { click: () => this.onSubmit() },
         );
         this.cancelBtn = ce(
             'button',
             { className: 'btn link-btn cancel-btn', type: 'button', textContent: 'Cancel' },
             null,
-            { click: this.onCancel.bind(this) },
+            { click: () => this.onCancel() },
         );
 
         // Invalid feedback message
@@ -467,8 +467,8 @@ export class ImportRuleForm extends Component {
                 currencyModel: this.model.currency,
                 accountModel: this.model.accounts,
                 personModel: this.model.persons,
-                update: this.onActionUpdate.bind(this, index),
-                remove: this.onActionDelete.bind(this, index),
+                update: (data) => this.onActionUpdate(index, data),
+                remove: () => this.onActionDelete(index),
             };
 
             if (
@@ -494,8 +494,8 @@ export class ImportRuleForm extends Component {
                 currencyModel: this.model.currency,
                 accountModel: this.model.accounts,
                 personModel: this.model.persons,
-                update: this.onConditionUpdate.bind(this, index),
-                remove: this.onConditionDelete.bind(this, index),
+                update: (data) => this.onConditionUpdate(index, data),
+                remove: () => this.onConditionDelete(index),
             };
 
             if (state.validation

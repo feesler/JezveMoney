@@ -70,7 +70,7 @@ class ImportView extends View {
 
         this.accountDropDown = DropDown.create({
             input_id: 'acc_id',
-            onchange: this.onMainAccChange.bind(this),
+            onchange: () => this.onMainAccChange(),
             editable: false,
             extraClass: 'dd__fullwidth',
         });
@@ -95,9 +95,9 @@ class ImportView extends View {
             throw new Error('Failed to initialize Import view');
         }
 
-        this.submitBtn.addEventListener('click', this.onSubmitClick.bind(this));
-        this.rulesCheck.addEventListener('change', this.onToggleEnableRules.bind(this));
-        this.rulesBtn.addEventListener('click', this.onRulesClick.bind(this));
+        this.submitBtn.addEventListener('click', () => this.onSubmitClick());
+        this.rulesCheck.addEventListener('change', () => this.onToggleEnableRules());
+        this.rulesBtn.addEventListener('click', () => this.onRulesClick());
 
         this.noDataMsg = this.rowsContainer.querySelector('.nodata-message');
         this.loadingInd = this.rowsContainer.querySelector('.data-container__loading');
@@ -106,7 +106,7 @@ class ImportView extends View {
         }
 
         this.trListSortable = new Sortable({
-            oninsertat: this.onTransPosChanged.bind(this),
+            oninsertat: (orig, replaced) => this.onTransPosChanged(orig, replaced),
             container: 'rowsContainer',
             group: 'transactions',
             selector: '.import-item',
@@ -145,8 +145,8 @@ class ImportView extends View {
                 tplModel: this.model.templates,
                 mainAccount: this.model.mainAccount,
                 elem: 'uploadDialog',
-                onaccountchange: this.onUploadAccChange.bind(this),
-                onuploaddone: this.onImportDone.bind(this),
+                onaccountchange: (accountId) => this.onUploadAccChange(accountId),
+                onuploaddone: (items) => this.onImportDone(items),
             });
         }
 
@@ -242,7 +242,7 @@ class ImportView extends View {
         // Send request
         ajax.get({
             url: `${baseURL}api/transaction/list/?${reqParams}`,
-            callback: this.onTrCacheResult.bind(this),
+            callback: (response) => this.onTrCacheResult(response),
         });
     }
 
@@ -276,6 +276,24 @@ class ImportView extends View {
                 item.enable(false);
             }
             item.render();
+        });
+
+        /* Print imported items with no similar trasaction */
+        console.log('Not picked import items:');
+        importedItems.forEach((item) => {
+            if (item.state.enabled) {
+                const dateFmt = formatDate(new Date(item.data.date));
+
+                console.log(`tr_amount: ${item.data.transactionAmount} acc_amount: ${item.data.accountAmount} date: ${dateFmt} comment: ${item.data.comment}`);
+            }
+        });
+
+        /* Print transactions not matched to imported list */
+        console.log('Not picked transactions:');
+        this.model.transCache.forEach((tr) => {
+            if (!tr.picked) {
+                console.log(`id: ${tr.id} src_amount: ${tr.src_amount} dest_amount: ${tr.dest_amount} date: ${tr.date} comment: ${tr.comment}`);
+            }
         });
 
         show(this.loadingInd, false);
@@ -509,7 +527,7 @@ class ImportView extends View {
             url: `${baseURL}api/transaction/createMultiple/`,
             data: JSON.stringify(chunk),
             headers: { 'Content-Type': 'application/json' },
-            callback: this.onSubmitResult.bind(this),
+            callback: (response) => this.onSubmitResult(response),
         });
     }
 

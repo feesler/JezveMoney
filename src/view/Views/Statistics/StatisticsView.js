@@ -57,15 +57,15 @@ class StatisticsView extends View {
             elem: 'chart',
             data: this.model.chartData,
             autoScale: true,
-            onitemclick: this.onBarClick.bind(this),
-            onscroll: this.onChartsScroll.bind(this),
-            onitemover: this.onBarOver.bind(this),
-            onitemout: this.onBarOut.bind(this),
+            onitemclick: (e, rect) => this.onBarClick(e, rect),
+            onscroll: () => this.onChartsScroll(),
+            onitemover: (e, bar) => this.onBarOver(e, bar),
+            onitemout: (e, bar) => this.onBarOut(e, bar),
         });
 
         this.filterTypeDropDown = DropDown.create({
             input_id: 'filter_type',
-            onitemselect: this.onFilterSel.bind(this),
+            onitemselect: (obj) => this.onFilterSel(obj),
             editable: false,
             extraClass: 'dd__fullwidth',
         });
@@ -73,14 +73,14 @@ class StatisticsView extends View {
         if (this.model.filter.filter === 'currency') {
             this.currencyDropDown = DropDown.create({
                 input_id: 'curr_id',
-                onitemselect: this.onCurrencySel.bind(this),
+                onitemselect: (obj) => this.onCurrencySel(obj),
                 editable: false,
                 extraClass: 'dd__fullwidth',
             });
         } else {
             this.accountDropDown = DropDown.create({
                 input_id: 'acc_id',
-                onitemselect: this.onAccountSel.bind(this),
+                onitemselect: (obj) => this.onAccountSel(obj),
                 editable: false,
                 extraClass: 'dd__fullwidth',
             });
@@ -88,7 +88,7 @@ class StatisticsView extends View {
 
         this.groupDropDown = DropDown.create({
             input_id: 'groupsel',
-            onitemselect: this.onGroupSel.bind(this),
+            onitemselect: (obj) => this.onGroupSel(obj),
             editable: false,
             extraClass: 'dd__fullwidth',
         });
@@ -102,7 +102,7 @@ class StatisticsView extends View {
 
         this.dateInputBtn = ge('cal_rbtn');
         if (this.dateInputBtn) {
-            this.dateInputBtn.addEventListener('click', this.showCalendar.bind(this));
+            this.dateInputBtn.addEventListener('click', () => this.showCalendar());
         }
         this.dateInput = ge('date');
     }

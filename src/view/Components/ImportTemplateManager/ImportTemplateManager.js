@@ -62,7 +62,7 @@ export class ImportTemplateManager extends Component {
 
         this.templateDropDown = DropDown.create({
             input_id: 'templateSel',
-            onchange: this.onTemplateChange.bind(this),
+            onchange: (tpl) => this.onTemplateChange(tpl),
             editable: false,
         });
         this.columnDropDown = DropDown.create({
@@ -107,12 +107,12 @@ export class ImportTemplateManager extends Component {
             throw new Error('Failed to initialize upload file dialog');
         }
 
-        this.tplNameInp.addEventListener('input', this.onTemplateNameInput.bind(this));
-        this.createTplBtn.addEventListener('click', this.onCreateTemplateClick.bind(this));
-        this.updateTplBtn.addEventListener('click', this.onUpdateTemplateClick.bind(this));
-        this.deleteTplBtn.addEventListener('click', this.onDeleteTemplateClick.bind(this));
-        this.submitTplBtn.addEventListener('click', this.onSubmitTemplateClick.bind(this));
-        this.cancelTplBtn.addEventListener('click', this.onCancelTemplateClick.bind(this));
+        this.tplNameInp.addEventListener('input', () => this.onTemplateNameInput());
+        this.createTplBtn.addEventListener('click', () => this.onCreateTemplateClick());
+        this.updateTplBtn.addEventListener('click', () => this.onUpdateTemplateClick());
+        this.deleteTplBtn.addEventListener('click', () => this.onDeleteTemplateClick());
+        this.submitTplBtn.addEventListener('click', () => this.onSubmitTemplateClick());
+        this.cancelTplBtn.addEventListener('click', () => this.onCancelTemplateClick());
 
         this.reset();
     }
@@ -263,7 +263,7 @@ export class ImportTemplateManager extends Component {
                     url: `${baseURL}api/importtpl/delete`,
                     data: JSON.stringify(requestObj),
                     headers: { 'Content-Type': 'application/json' },
-                    callback: this.onTemplateRequestResult.bind(this),
+                    callback: (response) => this.onTemplateRequestResult(response),
                 });
             },
         });
@@ -301,7 +301,7 @@ export class ImportTemplateManager extends Component {
             url: reqURL,
             data: JSON.stringify(requestObj),
             headers: { 'Content-Type': 'application/json' },
-            callback: this.onTemplateRequestResult.bind(this),
+            callback: (response) => this.onTemplateRequestResult(response),
         });
     }
 
@@ -332,7 +332,7 @@ export class ImportTemplateManager extends Component {
     requestTemplatesList() {
         ajax.get({
             url: `${baseURL}api/importtpl/list/`,
-            callback: this.onTemplateListResult.bind(this),
+            callback: (response) => this.onTemplateListResult(response),
         });
     }
 
@@ -372,7 +372,7 @@ export class ImportTemplateManager extends Component {
     requestRulesList() {
         ajax.get({
             url: `${baseURL}api/importrule/list/?extended=true`,
-            callback: this.onRulesListResult.bind(this),
+            callback: (response) => this.onRulesListResult(response),
         });
     }
 
@@ -622,7 +622,7 @@ export class ImportTemplateManager extends Component {
                 'div',
                 { className: 'raw-data-column' },
                 [tplElem, headElem].concat(columnData),
-                { click: this.onDataColumnClick.bind(this, columnInd) },
+                { click: () => this.onDataColumnClick(columnInd) },
             );
         }, this);
 

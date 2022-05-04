@@ -83,7 +83,7 @@ export class ImportConditionForm extends Component {
         this.amountInput = ce('input', { type: 'text' });
         this.decAmountInput = DecimalInput.create({
             elem: this.amountInput,
-            oninput: this.onValueChange.bind(this),
+            oninput: () => this.onValueChange(),
         });
         this.amountField = createField('Amount', this.amountInput);
         // Create text value input element
@@ -91,7 +91,7 @@ export class ImportConditionForm extends Component {
             'input',
             { type: 'text' },
             null,
-            { input: this.onValueChange.bind(this) },
+            { input: () => this.onValueChange() },
         );
         this.valueField = createField('Value', this.valueInput);
 
@@ -102,7 +102,7 @@ export class ImportConditionForm extends Component {
             null,
             { change: () => this.onFieldValueChecked() },
         );
-        this.fieldValueCheck.addEventListener('change', this.onFieldValueChecked.bind(this));
+        this.fieldValueCheck.addEventListener('change', () => this.onFieldValueChecked());
         this.valueFieldBlock = createContainer('value-field', [
             this.accountField,
             this.templateField,
@@ -152,7 +152,7 @@ export class ImportConditionForm extends Component {
 
         this.propertyDropDown = DropDown.create({
             input_id: selectElem,
-            onchange: this.onPropertyChange.bind(this),
+            onchange: (property) => this.onPropertyChange(property),
             editable: false,
         });
 
@@ -170,7 +170,7 @@ export class ImportConditionForm extends Component {
 
         this.operatorDropDown = DropDown.create({
             input_id: selectElem,
-            onchange: this.onOperatorChange.bind(this),
+            onchange: (operator) => this.onOperatorChange(operator),
             editable: false,
         });
         this.operatorDropDown.append(operatorItems);
@@ -188,7 +188,7 @@ export class ImportConditionForm extends Component {
 
         this.accountDropDown = DropDown.create({
             input_id: selectElem,
-            onchange: this.onValueChange.bind(this),
+            onchange: () => this.onValueChange(),
             editable: false,
         });
         this.accountDropDown.append(accountItems);
@@ -206,7 +206,7 @@ export class ImportConditionForm extends Component {
 
         this.templateDropDown = DropDown.create({
             input_id: selectElem,
-            onchange: this.onValueChange.bind(this),
+            onchange: () => this.onValueChange(),
             editable: false,
         });
         this.templateDropDown.append(templateItems);
@@ -226,7 +226,7 @@ export class ImportConditionForm extends Component {
 
         this.currencyDropDown = DropDown.create({
             input_id: selectElem,
-            onchange: this.onValueChange.bind(this),
+            onchange: () => this.onValueChange(),
             editable: false,
         });
         this.currencyDropDown.append(currencyItems);
@@ -244,7 +244,7 @@ export class ImportConditionForm extends Component {
 
         this.valuePropDropDown = DropDown.create({
             input_id: selectElem,
-            onchange: this.onValueChange.bind(this),
+            onchange: () => this.onValueChange(),
             editable: false,
         });
         this.valuePropDropDown.append(items);

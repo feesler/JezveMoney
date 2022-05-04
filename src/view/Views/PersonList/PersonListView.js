@@ -43,13 +43,13 @@ class PersonListView extends View {
         if (!this.tilesContainer) {
             throw new Error('Failed to initialize Person List view');
         }
-        this.tilesContainer.addEventListener('click', this.onTileClick.bind(this));
+        this.tilesContainer.addEventListener('click', (e) => this.onTileClick(e));
 
         this.hiddenTilesContainer = ge('hiddenTilesContainer');
         if (!this.hiddenTilesContainer) {
             throw new Error('Failed to initialize Person List view');
         }
-        this.hiddenTilesContainer.addEventListener('click', this.onTileClick.bind(this));
+        this.hiddenTilesContainer.addEventListener('click', (e) => this.onTileClick(e));
 
         this.showForm = ge('showform');
         this.showPersonsInp = ge('showpersons');

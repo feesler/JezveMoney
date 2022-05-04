@@ -270,7 +270,8 @@ export class ImportUploadDialog extends TestComponent {
                 throw new Error('Invalid model: expected template');
             }
 
-            Object.assign(res.visibility, {
+            res.visibility = {
+                ...res.visibility,
                 templateBlock: true,
                 loadingIndicator: false,
                 tplField: false,
@@ -281,7 +282,7 @@ export class ImportUploadDialog extends TestComponent {
                 deleteTplBtn: false,
                 submitTplBtn: true,
                 tplFeedback: true,
-            });
+            };
 
             res.visibility.cancelTplBtn = (model.state === CREATE_TPL_STATE)
                 ? (App.state.templates.length > 0)
@@ -289,7 +290,8 @@ export class ImportUploadDialog extends TestComponent {
 
             res.values.tplNameInp = (model.template) ? model.template.name : '';
         } else if (model.state === RAW_DATA_STATE) {
-            Object.assign(res.visibility, {
+            res.visibility = {
+                ...res.visibility,
                 templateBlock: true,
                 loadingIndicator: false,
                 tplField: true,
@@ -301,9 +303,10 @@ export class ImportUploadDialog extends TestComponent {
                 submitTplBtn: false,
                 cancelTplBtn: false,
                 tplFeedback: true,
-            });
+            };
         } else if (model.state === LOADING_STATE) {
-            Object.assign(res.visibility, {
+            res.visibility = {
+                ...res.visibility,
                 templateBlock: true,
                 loadingIndicator: true,
                 nameField: false,
@@ -314,9 +317,10 @@ export class ImportUploadDialog extends TestComponent {
                 submitTplBtn: false,
                 cancelTplBtn: false,
                 tplFeedback: false,
-            });
+            };
         } else if (model.state === BROWSE_FILE_STATE) {
-            Object.assign(res.visibility, {
+            res.visibility = {
+                ...res.visibility,
                 templateBlock: false,
                 loadingIndicator: false,
                 nameField: false,
@@ -327,7 +331,7 @@ export class ImportUploadDialog extends TestComponent {
                 submitTplBtn: false,
                 cancelTplBtn: false,
                 tplFeedback: false,
-            });
+            };
         }
 
         if ([CREATE_TPL_STATE, UPDATE_TPL_STATE, RAW_DATA_STATE].includes(model.state)) {

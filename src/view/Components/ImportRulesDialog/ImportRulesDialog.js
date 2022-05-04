@@ -55,7 +55,7 @@ export class ImportRulesDialog extends Component {
         this.popup = Popup.create({
             id: 'rules_popup',
             content: this.elem,
-            onclose: this.onClose.bind(this),
+            onclose: () => this.onClose(),
             btn: {
                 closeBtn: true,
             },
@@ -73,7 +73,7 @@ export class ImportRulesDialog extends Component {
             throw new Error('Failed to initialize import rules dialog');
         }
 
-        this.createRuleBtn.addEventListener('click', this.onCreateRuleClick.bind(this));
+        this.createRuleBtn.addEventListener('click', () => this.onCreateRuleClick());
 
         this.reset();
         this.render(this.state);
@@ -192,7 +192,7 @@ export class ImportRulesDialog extends Component {
             url: reqURL,
             data: JSON.stringify(data),
             headers: { 'Content-Type': 'application/json' },
-            callback: this.onRuleRequestResult.bind(this),
+            callback: (response) => this.onRuleRequestResult(response),
         });
     }
 
@@ -212,7 +212,7 @@ export class ImportRulesDialog extends Component {
             url: reqURL,
             data: JSON.stringify(data),
             headers: { 'Content-Type': 'application/json' },
-            callback: this.onRuleRequestResult.bind(this),
+            callback: (response) => this.onRuleRequestResult(response),
         });
     }
 
@@ -245,7 +245,7 @@ export class ImportRulesDialog extends Component {
     requestRulesList() {
         ajax.get({
             url: `${baseURL}api/importrule/list/?extended=true`,
-            callback: this.onRulesListResult.bind(this),
+            callback: (response) => this.onRulesListResult(response),
         });
     }
 
@@ -288,8 +288,8 @@ export class ImportRulesDialog extends Component {
                 currencyModel: this.model.currency,
                 accountModel: this.model.accounts,
                 personModel: this.model.persons,
-                update: this.onUpdateItem.bind(this),
-                remove: this.onDeleteItem.bind(this),
+                update: (ruleId) => this.onUpdateItem(ruleId),
+                remove: (ruleId) => this.onDeleteItem(ruleId),
             })
         ));
 
@@ -323,8 +323,8 @@ export class ImportRulesDialog extends Component {
             currencyModel: this.model.currency,
             accountModel: this.model.accounts,
             personModel: this.model.persons,
-            submit: this.onSubmitItem.bind(this),
-            cancel: this.onCancelItem.bind(this),
+            submit: (data) => this.onSubmitItem(data),
+            cancel: () => this.onCancelItem(),
         });
 
         insertAfter(this.formContainer.elem, this.listContainer);

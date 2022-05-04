@@ -33,7 +33,7 @@ export class ImportFileUploader extends Component {
             throw new Error('Failed to initialize import file uploader');
         }
 
-        this.inputElem.addEventListener('change', this.onChangeUploadFile.bind(this));
+        this.inputElem.addEventListener('change', () => this.onChangeUploadFile());
 
         this.initUploadExtras();
     }
@@ -117,9 +117,9 @@ export class ImportFileUploader extends Component {
         const uploader = new Uploader(
             file,
             { template: 0, encode: isEncoded },
-            this.onImportSuccess.bind(this),
-            this.onImportError.bind(this),
-            this.onImportProgress.bind(this),
+            (resp) => this.onImportSuccess(resp),
+            () => this.onImportError(),
+            () => this.onImportProgress(),
         );
         uploader.upload();
 
@@ -143,9 +143,9 @@ export class ImportFileUploader extends Component {
             return;
         }
 
-        this.formElem.addEventListener('reset', this.onResetUploadAdmin.bind(this));
-        this.useServerCheck.addEventListener('change', this.onCheckServer.bind(this));
-        this.uploadBtn.addEventListener('click', this.uploadFromServer.bind(this));
+        this.formElem.addEventListener('reset', () => this.onResetUploadAdmin());
+        this.useServerCheck.addEventListener('change', () => this.onCheckServer());
+        this.uploadBtn.addEventListener('click', () => this.uploadFromServer());
     }
 
     /** Upload form 'reset' event handler */
@@ -198,7 +198,7 @@ export class ImportFileUploader extends Component {
         ajax.post({
             url: `${baseURL}api/import/upload/`,
             data: urlJoin(reqObj),
-            callback: this.onImportSuccess.bind(this),
+            callback: (response) => this.onImportSuccess(response),
         });
 
         if (isFunction(this.uploadStartHandler)) {

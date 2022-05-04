@@ -31,14 +31,14 @@ class PersonView extends View {
         if (!this.form) {
             throw new Error('Failed to initialize Person view');
         }
-        this.form.addEventListener('submit', this.onSubmit.bind(this));
+        this.form.addEventListener('submit', (e) => this.onSubmit(e));
 
         this.nameInp = ge('pname');
         if (!this.nameInp) {
             throw new Error('Failed to initialize Person view');
         }
 
-        this.nameInp.addEventListener('input', this.onNameInput.bind(this));
+        this.nameInp.addEventListener('input', () => this.onNameInput());
 
         // Update mode
         if (this.model.original.id) {
