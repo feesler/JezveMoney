@@ -350,6 +350,8 @@ export class TransactionsView extends AppView {
     }
 
     async waitForList(action) {
+        await this.parse();
+
         const prevTime = this.model.renderTime;
 
         await action();
