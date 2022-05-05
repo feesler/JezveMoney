@@ -345,7 +345,7 @@ class UserModel extends CachedTable
     }
 
 
-    protected function checkParams($params, $isUpdate = false)
+    protected function validateParams($params, $isUpdate = false)
     {
         $avFields = ["login", "password", "name"];
         $res = [];
@@ -391,7 +391,7 @@ class UserModel extends CachedTable
 
     protected function preCreate($params, $isMultiple = false)
     {
-        $res = $this->checkParams($params);
+        $res = $this->validateParams($params);
         if (is_null($res)) {
             return null;
         }
@@ -430,7 +430,7 @@ class UserModel extends CachedTable
             return null;
         }
 
-        $res = $this->checkParams($params, true);
+        $res = $this->validateParams($params, true);
         if (is_null($res)) {
             return null;
         }

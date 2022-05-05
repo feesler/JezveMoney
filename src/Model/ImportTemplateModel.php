@@ -69,7 +69,7 @@ class ImportTemplateModel extends CachedTable
     }
 
 
-    protected function checkParams($params, $isUpdate = false)
+    protected function validateParams($params, $isUpdate = false)
     {
         $columnFields = [
             "date_col",
@@ -123,7 +123,7 @@ class ImportTemplateModel extends CachedTable
     // Preparations for item create
     protected function preCreate($params, $isMultiple = false)
     {
-        $res = $this->checkParams($params);
+        $res = $this->validateParams($params);
         if (is_null($res)) {
             return null;
         }
@@ -164,7 +164,7 @@ class ImportTemplateModel extends CachedTable
             return false;
         }
 
-        $res = $this->checkParams($params, true);
+        $res = $this->validateParams($params, true);
         if (is_null($res)) {
             return null;
         }

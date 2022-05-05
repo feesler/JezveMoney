@@ -85,7 +85,7 @@ class TransactionModel extends CachedTable
     }
 
 
-    protected function checkParams($params, $isUpdate = false)
+    protected function validateParams($params, $isUpdate = false)
     {
         $avFields = [
             "type",
@@ -228,7 +228,7 @@ class TransactionModel extends CachedTable
         foreach ($this->affectedTransactions as $item_id => $item) {
             $item = (array)$item;
 
-            $res = $this->checkParams($item);
+            $res = $this->validateParams($item);
             if (is_null($res)) {
                 return false;
             }
@@ -314,7 +314,7 @@ class TransactionModel extends CachedTable
     // Preparations for item create
     protected function preCreate($params, $isMultiple = false)
     {
-        $res = $this->checkParams($params);
+        $res = $this->validateParams($params);
         if (is_null($res)) {
             return null;
         }
@@ -461,7 +461,7 @@ class TransactionModel extends CachedTable
             return false;
         }
 
-        $res = $this->checkParams($params, true);
+        $res = $this->validateParams($params, true);
         if (is_null($res)) {
             return null;
         }
