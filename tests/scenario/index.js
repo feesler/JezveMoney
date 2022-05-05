@@ -11,7 +11,6 @@ import { importTests } from './import.js';
 
 import * as ApiTests from '../run/api.js';
 import * as ProfileTests from '../run/profile.js';
-import * as ImportTests from '../run/import.js';
 import * as StatisticsTests from '../run/statistics.js';
 
 import { api } from '../model/api.js';
@@ -112,6 +111,5 @@ export class Scenario {
     async finishTests() {
         await ApiTests.loginTest(App.config.testAdminUser);
         await App.setupUser();
-        await ImportTests.removeFile(this.uploadFilename);
     }
 }
