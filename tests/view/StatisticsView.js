@@ -55,15 +55,12 @@ export class StatisticsView extends AppView {
             return res;
         }
 
-        const bars = await queryAll(res.chart.elem, 'svg > rect');
+        const bars = await queryAll(res.chart.elem, 'svg > rect.histogram__bar');
         for (const bar of bars) {
-            const nodeOpacity = await prop(bar, 'attributes.fill-opacity.nodeValue');
-            if (nodeOpacity === '1') {
-                res.chart.bars.push({
-                    elem: bar,
-                    height: await prop(bar, 'attributes.height.nodeValue'),
-                });
-            }
+            res.chart.bars.push({
+                elem: bar,
+                height: await prop(bar, 'attributes.height.nodeValue'),
+            });
         }
 
         return res;
