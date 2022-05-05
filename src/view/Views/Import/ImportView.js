@@ -82,6 +82,8 @@ class ImportView extends View {
         this.rulesBtn = ge('rulesBtn');
         this.rulesCountElem = ge('rulescount');
         this.rowsContainer = ge('rowsContainer');
+        this.submitProgress = ge('submitProgress');
+        this.submitProgressIndicator = ge('submitProgressIndicator');
         if (!this.newItemBtn
             || !this.uploadBtn
             || !this.submitBtn
@@ -91,7 +93,9 @@ class ImportView extends View {
             || !this.rulesCheck
             || !this.rulesBtn
             || !this.rulesCountElem
-            || !this.rowsContainer) {
+            || !this.rowsContainer
+            || !this.submitProgress
+            || !this.submitProgressIndicator) {
             throw new Error('Failed to initialize Import view');
         }
 
@@ -490,6 +494,8 @@ class ImportView extends View {
 
     /** Submit buttom 'click' event handler */
     onSubmitClick() {
+        show(this.submitProgress, true);
+
         const enabledList = this.getEnabledItems();
         if (!Array.isArray(enabledList) || !enabledList.length) {
             throw new Error('Invalid list of items');
@@ -497,6 +503,7 @@ class ImportView extends View {
 
         const valid = enabledList.every((item) => item.validate());
         if (!valid) {
+            show(this.submitProgress, false);
             return;
         }
 
@@ -509,6 +516,10 @@ class ImportView extends View {
             return res;
         });
 
+        this.submitDone = 0;
+        this.submitTotal = itemsData.length;
+        this.renderSubmitProgress();
+
         // Split list of items to chunks
         this.submitQueue = [];
         while (itemsData.length > 0) {
@@ -518,6 +529,10 @@ class ImportView extends View {
         }
 
         this.submitChunk();
+    }
+
+    renderSubmitProgress() {
+        this.submitProgressIndicator.textContent = `${this.submitDone} / ${this.submitTotal}`;
     }
 
     submitChunk() {
@@ -543,6 +558,9 @@ class ImportView extends View {
             const respObj = JSON.parse(response);
             status = (respObj && respObj.result === 'ok');
             if (status) {
+                this.submitDone = Math.min(this.submitDone + SUBMIT_LIMIT, this.submitTotal);
+                this.renderSubmitProgress();
+
                 if (this.submitQueue.length === 0) {
                     message = 'All transactions have been successfully imported';
                     this.removeAllItems();
@@ -557,6 +575,7 @@ class ImportView extends View {
             message = e.message;
         }
 
+        show(this.submitProgress, false);
         createMessage(message, (status ? 'msg_success' : 'msg_error'));
     }
 

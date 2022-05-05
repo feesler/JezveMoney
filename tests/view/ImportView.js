@@ -37,6 +37,7 @@ export class ImportView extends AppView {
             rulesBtn: { elem: await query('#rulesBtn') },
             rulesCount: { elem: await query('#rulescount') },
             submitBtn: await query('#submitbtn'),
+            submitProgress: { elem: await query('#submitProgress') },
         };
 
         res.title.value = await prop(res.title.elem, 'textContent');
@@ -55,6 +56,7 @@ export class ImportView extends AppView {
             || !res.rulesBtn.elem
             || !res.rulesCount.elem
             || !res.submitBtn
+            || !res.submitProgress.elem
         ) {
             throw new Error('Invalid structure of import view');
         }
@@ -76,6 +78,8 @@ export class ImportView extends AppView {
 
         const rulesDialogPopup = await query(this.rulesPopupId);
         res.rulesDialog = await ImportRulesDialog.create(this, rulesDialogPopup);
+
+        res.submitProgress.visible = await TestComponent.isVisible(res.submitProgress.elem);
 
         return res;
     }
@@ -104,6 +108,7 @@ export class ImportView extends AppView {
         res.renderTime = cont.renderTime;
         res.items = cont.itemsList.getItems();
         res.invalidated = cont.itemsList.model.invalidated;
+        res.submitInProgress = cont.submitProgress.visible;
 
         return res;
     }
@@ -579,7 +584,7 @@ export class ImportView extends AppView {
             }
 
             const notification = await TestComponent.isVisible(this.content.msgPopup, true);
-            if (notification) {
+            if (notification && !this.model.submitInProgress) {
                 return true;
             }
 
