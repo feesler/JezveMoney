@@ -124,7 +124,7 @@ class PersonListView extends View {
         this.delPersonsInp.value = totalSelArr.join();
 
         if (totalSelCount === 1) {
-            this.toolbar.updateBtn.setURL(`${baseURL}persons/edit/${totalSelArr[0]}`);
+            this.toolbar.updateBtn.setURL(`${baseURL}persons/update/${totalSelArr[0]}`);
         }
 
         this.toolbar.show(totalSelCount > 0);

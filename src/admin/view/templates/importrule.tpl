@@ -31,7 +31,7 @@
                             </table>
 
                             <div class="acc_controls">
-                                <input id="createbtn" class="adm_act_btn" type="button" value="new">
+                                <input id="createbtn" class="adm_act_btn" type="button" value="create">
                                 <input id="updbtn" class="adm_act_btn hidden" type="button" value="update">
                                 <input id="del_btn" class="adm_act_btn hidden" type="button" value="delete">
                             </div>
@@ -56,7 +56,7 @@
                             </table>
 
                             <div class="acc_controls">
-                                <input id="createcondbtn" class="adm_act_btn" type="button" value="new">
+                                <input id="createcondbtn" class="adm_act_btn" type="button" value="create">
                                 <input id="updcondbtn" class="adm_act_btn hidden" type="button" value="update">
                                 <input id="delcondbtn" class="adm_act_btn hidden" type="button" value="delete">
                             </div>
@@ -78,7 +78,7 @@
                             </table>
 
                             <div class="acc_controls">
-                                <input id="createactbtn" class="adm_act_btn" type="button" value="new">
+                                <input id="createactbtn" class="adm_act_btn" type="button" value="create">
                                 <input id="updactbtn" class="adm_act_btn hidden" type="button" value="update">
                                 <input id="delactbtn" class="adm_act_btn hidden" type="button" value="delete">
                             </div>
@@ -90,7 +90,7 @@
     </div>
 </div>
 
-<form id="item-frm" class="hidden" method="post" action="<?=BASEURL?>api/importrule/new">
+<form id="item-frm" class="hidden" method="post" action="<?=BASEURL?>api/importrule/create">
     <input id="item_id" name="id" type="hidden">
     <div class="view-row">
         <label for="item_flags">Flags</label>
@@ -102,7 +102,7 @@
     </div>
 </form>
 
-<form id="condition-frm" class="hidden" method="post" action="<?=BASEURL?>api/importcond/new">
+<form id="condition-frm" class="hidden" method="post" action="<?=BASEURL?>api/importcond/create">
     <input id="cond_id" name="id" type="hidden">
     <div class="view-row">
         <label for="cond_rule">Parent Rule ID</label>
@@ -155,7 +155,7 @@
     </div>
 </form>
 
-<form id="action-frm" class="hidden" method="post" action="<?=BASEURL?>api/importaction/new">
+<form id="action-frm" class="hidden" method="post" action="<?=BASEURL?>api/importaction/create">
     <input id="action_id" name="id" type="hidden">
     <div class="view-row">
         <label for="item_rule">Rule ID</label>

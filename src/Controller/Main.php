@@ -27,7 +27,7 @@ class Main extends TemplateController
         foreach ($accounts as $account) {
             $data["tilesArr"][] = [
                 "type" => "link",
-                "link" => BASEURL . "transactions/new/?acc_id=" . ($account->id),
+                "link" => BASEURL . "transactions/create/?acc_id=" . ($account->id),
                 "title" => $account->name,
                 "subtitle" => $currMod->format($account->balance, $account->curr_id),
                 "icon" => $accMod->getIconFile($account->id)

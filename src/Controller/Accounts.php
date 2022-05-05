@@ -71,8 +71,8 @@ class Accounts extends TemplateController
 
         $this->template = new Template(TPL_PATH . "account.tpl");
         $data = [
-            "headString" => "New account",
-            "titleString" => "Jezve Money | New account"
+            "headString" => "Create account",
+            "titleString" => "Jezve Money | Create account"
         ];
 
         $currMod = CurrencyModel::getInstance();

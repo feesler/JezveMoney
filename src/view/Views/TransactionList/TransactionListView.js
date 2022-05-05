@@ -885,7 +885,7 @@ class TransactionListView extends View {
         this.delTransInp.value = selArr.join();
 
         if (state.selectedItems.count() === 1) {
-            this.toolbar.updateBtn.setURL(`${baseURL}transactions/edit/${selArr[0]}`);
+            this.toolbar.updateBtn.setURL(`${baseURL}transactions/update/${selArr[0]}`);
         }
 
         this.toolbar.show(state.selectedItems.count() > 0);

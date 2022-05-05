@@ -30,7 +30,7 @@
                     </table>
 
                     <div class="acc_controls">
-                        <input id="createbtn" class="adm_act_btn" type="button" value="new">
+                        <input id="createbtn" class="adm_act_btn" type="button" value="create">
                         <input id="updbtn" class="adm_act_btn hidden" type="button" value="update">
                         <input id="passbtn" class="adm_act_btn hidden" type="button" value="set password">
                         <input id="del_btn" class="adm_act_btn hidden" type="button" value="delete">

@@ -57,7 +57,7 @@ export async function route(env, url) {
             return AccountsView;
         }
 
-        if (actPart === 'new' || actPart === 'edit') {
+        if (actPart === 'create' || actPart === 'update') {
             return AccountView;
         }
 
@@ -70,7 +70,7 @@ export async function route(env, url) {
             return PersonsView;
         }
 
-        if (actPart === 'new' || actPart === 'edit') {
+        if (actPart === 'create' || actPart === 'update') {
             return PersonView;
         }
 
@@ -83,7 +83,7 @@ export async function route(env, url) {
             return TransactionsView;
         }
 
-        if (actPart === 'new' || actPart === 'edit') {
+        if (actPart === 'create' || actPart === 'update') {
             return TransactionView;
         }
 

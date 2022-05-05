@@ -46,7 +46,7 @@ export class TransactionView extends AppView {
     async parseContent() {
         const res = {};
 
-        res.isUpdate = (await url()).includes('/edit/');
+        res.isUpdate = (await url()).includes('/update/');
 
         if (res.isUpdate) {
             const hiddenEl = await query('input[name="id"]');
