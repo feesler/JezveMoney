@@ -128,21 +128,15 @@ export class AccountView extends AppView {
             accTile.name = 'New account';
         }
 
+        accTile.visible = true;
+
         const res = {
-            visibility: {
-                heading: true,
-                tile: true,
-                iconDropDown: true,
-                name: true,
-                currDropDown: true,
-            },
-            values: {
-                tile: accTile,
-                name: { value: this.model.name.toString() },
-                balance: { value: this.model.initbalance.toString() },
-                currDropDown: { textValue: this.model.currObj.name },
-                iconDropDown: { textValue: this.model.tileIcon.name },
-            },
+            heading: { visible: true },
+            tile: accTile,
+            name: { value: this.model.name.toString(), visible: true },
+            balance: { value: this.model.initbalance.toString(), visible: true },
+            currDropDown: { textValue: this.model.currObj.name, visible: true },
+            iconDropDown: { textValue: this.model.tileIcon.name, visible: true },
         };
 
         this.expectedState = res;

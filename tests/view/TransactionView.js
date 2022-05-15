@@ -432,74 +432,71 @@ export class TransactionView extends AppView {
         }
 
         const res = {
-            model: { state: newState },
-            visibility: {
-                delBtn: this.model.isUpdate,
-                source: (this.model.type === EXPENSE || this.model.type === TRANSFER),
-                destination: (this.model.type === INCOME || this.model.type === TRANSFER),
-                person: this.model.type === DEBT,
-                account: this.model.type === DEBT,
+            typeMenu: { selectedTypes: [this.model.type] },
+            person: { visible: this.model.type === DEBT, tile: {} },
+            account: { visible: this.model.type === DEBT, tile: {} },
+            source: { visible: (this.model.type === EXPENSE || this.model.type === TRANSFER) },
+            destination: { visible: (this.model.type === INCOME || this.model.type === TRANSFER) },
+            src_amount_row: {
+                value: this.model.srcAmount.toString(),
+                currSign: this.model.srcCurr.sign,
+                isCurrActive: this.model.type === INCOME,
             },
-            values: {
-                typeMenu: { selectedTypes: [this.model.type] },
-                src_amount_row: {
-                    value: this.model.srcAmount.toString(),
-                    currSign: this.model.srcCurr.sign,
-                    isCurrActive: this.model.type === INCOME,
-                },
-                dest_amount_row: {
-                    value: this.model.destAmount.toString(),
-                    currSign: this.model.destCurr.sign,
-                    isCurrActive: this.model.type === EXPENSE,
-                },
-                exchange_row: {
-                    value: this.model.exchRate.toString(),
-                    currSign: this.model.exchSign,
-                },
-                exch_left: this.model.fmtExch,
+            dest_amount_row: {
+                value: this.model.destAmount.toString(),
+                currSign: this.model.destCurr.sign,
+                isCurrActive: this.model.type === EXPENSE,
             },
+            result_balance_row: {},
+            result_balance_dest_row: {},
+            exchange_row: {
+                value: this.model.exchRate.toString(),
+                currSign: this.model.exchSign,
+            },
+            src_amount_left: {},
+            dest_amount_left: {},
+            src_res_balance_left: {},
+            dest_res_balance_left: {},
+            exch_left: { value: this.model.fmtExch },
         };
 
         if (this.model.isUpdate) {
-            res.values.delBtn = { title: 'Delete' };
+            res.delBtn = {
+                title: 'Delete',
+                visible: true,
+            };
         }
 
         if (this.model.type === EXPENSE || this.model.type === TRANSFER) {
-            res.values.source = {
-                tile: {
-                    name: this.model.srcAccount.name,
-                    balance: this.model.srcAccount.fmtBalance,
-                },
+            res.source.tile = {
+                name: this.model.srcAccount.name,
+                balance: this.model.srcAccount.fmtBalance,
+                visible: true,
             };
-            res.values.src_res_balance_left = this.model.fmtSrcResBal;
+            res.src_res_balance_left.value = this.model.fmtSrcResBal;
         }
 
         if (this.model.type === INCOME || this.model.type === TRANSFER) {
-            res.values.destination = {
-                tile: {
-                    name: this.model.destAccount.name,
-                    balance: this.model.destAccount.fmtBalance,
-                },
+            res.destination.tile = {
+                name: this.model.destAccount.name,
+                balance: this.model.destAccount.fmtBalance,
+                visible: true,
             };
-            res.values.dest_res_balance_left = this.model.fmtDestResBal;
+            res.dest_res_balance_left.value = this.model.fmtDestResBal;
         }
 
         if (this.model.type !== INCOME) {
-            res.values.result_balance_row = {
-                value: this.model.srcResBal.toString(),
-                isCurrActive: false,
-            };
+            res.result_balance_row.value = this.model.srcResBal.toString();
+            res.result_balance_row.isCurrActive = false;
         }
 
         if (this.model.type !== EXPENSE) {
-            res.values.src_amount_left = this.model.srcCurr.format(this.model.fSrcAmount);
-            res.values.result_balance_dest_row = {
-                value: this.model.destResBal.toString(),
-                isCurrActive: false,
-            };
+            res.src_amount_left.value = this.model.srcCurr.format(this.model.fSrcAmount);
+            res.result_balance_dest_row.value = this.model.destResBal.toString();
+            res.result_balance_dest_row.isCurrActive = false;
         }
         if (this.model.type !== DEBT) {
-            res.values.dest_amount_left = this.model.destCurr.format(this.model.fDestAmount);
+            res.dest_amount_left.value = this.model.destCurr.format(this.model.fDestAmount);
         }
 
         if (this.model.type === EXPENSE) {
@@ -508,77 +505,59 @@ export class TransactionView extends AppView {
             }
 
             if (newState === 0 || newState === 1) {
-                res.values.src_amount_row.label = 'Amount';
-                res.values.dest_amount_row.label = 'Amount';
+                res.src_amount_row.label = 'Amount';
+                res.dest_amount_row.label = 'Amount';
             } else {
-                res.values.src_amount_row.label = 'Source amount';
-                res.values.dest_amount_row.label = 'Destination amount';
+                res.src_amount_row.label = 'Source amount';
+                res.dest_amount_row.label = 'Destination amount';
             }
 
-            res.values.result_balance_row.label = 'Result balance';
+            res.result_balance_row.label = 'Result balance';
 
-            res.visibility = {
-                ...res.visibility,
-                src_amount_left: false,
-                dest_res_balance_left: false,
-                result_balance_dest_row: false,
-            };
+            res.src_amount_left.visible = false;
+            res.dest_res_balance_left.visible = false;
+            res.result_balance_dest_row.visible = false;
 
             if (newState === 0) {
-                res.visibility = {
-                    ...res.visibility,
-                    dest_amount_left: false,
-                    src_res_balance_left: true,
-                    exch_left: false,
-                    src_amount_row: false,
-                    dest_amount_row: true,
-                    exchange_row: false,
-                    result_balance_row: false,
-                };
+                res.dest_amount_left.visible = false;
+                res.src_res_balance_left.visible = true;
+                res.exch_left.visible = false;
+                res.src_amount_row.visible = false;
+                res.dest_amount_row.visible = true;
+                res.exchange_row.visible = false;
+                res.result_balance_row.visible = false;
             } else if (newState === 1) {
-                res.visibility = {
-                    ...res.visibility,
-                    dest_amount_left: true,
-                    src_res_balance_left: false,
-                    exch_left: false,
-                    src_amount_row: false,
-                    dest_amount_row: false,
-                    exchange_row: false,
-                    result_balance_row: true,
-                };
+                res.dest_amount_left.visible = true;
+                res.src_res_balance_left.visible = false;
+                res.exch_left.visible = false;
+                res.src_amount_row.visible = false;
+                res.dest_amount_row.visible = false;
+                res.exchange_row.visible = false;
+                res.result_balance_row.visible = true;
             } else if (newState === 2) {
-                res.visibility = {
-                    ...res.visibility,
-                    dest_amount_left: false,
-                    src_res_balance_left: true,
-                    exch_left: true,
-                    src_amount_row: true,
-                    dest_amount_row: true,
-                    exchange_row: false,
-                    result_balance_row: false,
-                };
+                res.dest_amount_left.visible = false;
+                res.src_res_balance_left.visible = true;
+                res.exch_left.visible = true;
+                res.src_amount_row.visible = true;
+                res.dest_amount_row.visible = true;
+                res.exchange_row.visible = false;
+                res.result_balance_row.visible = false;
             } else if (newState === 3) {
-                res.visibility = {
-                    ...res.visibility,
-                    dest_amount_left: true,
-                    src_res_balance_left: true,
-                    exch_left: false,
-                    src_amount_row: true,
-                    dest_amount_row: false,
-                    exchange_row: true,
-                    result_balance_row: false,
-                };
+                res.dest_amount_left.visible = true;
+                res.src_res_balance_left.visible = true;
+                res.exch_left.visible = false;
+                res.src_amount_row.visible = true;
+                res.dest_amount_row.visible = false;
+                res.exchange_row.visible = true;
+                res.result_balance_row.visible = false;
             } else if (newState === 4) {
-                res.visibility = {
-                    ...res.visibility,
-                    dest_amount_left: true,
-                    src_res_balance_left: false,
-                    exch_left: true,
-                    src_amount_row: true,
-                    dest_amount_row: false,
-                    exchange_row: false,
-                    result_balance_row: true,
-                };
+                res.dest_amount_left.visible = true;
+                res.src_res_balance_left.visible = false;
+                res.exch_left.visible = true;
+                res.src_amount_row.visible = true;
+                res.dest_amount_row.visible = false;
+                res.exchange_row.visible = false;
+                res.result_balance_row.visible = true;
             }
         }
 
@@ -587,82 +566,63 @@ export class TransactionView extends AppView {
                 throw new Error('Wrong state specified');
             }
 
-            res.visibility = {
-                ...res.visibility,
-                dest_res_balance_left: false,
-                result_balance_dest_row: false,
-            };
-
-            res.values.result_balance_dest_row.label = 'Result balance';
+            res.dest_res_balance_left.visible = false;
+            res.result_balance_dest_row.visible = false;
+            res.result_balance_dest_row.label = 'Result balance';
 
             if (newState === 0 || newState === 1) {
-                res.values.src_amount_row.label = 'Amount';
-                res.values.dest_amount_row.label = 'Amount';
+                res.src_amount_row.label = 'Amount';
+                res.dest_amount_row.label = 'Amount';
             } else {
-                res.values.src_amount_row.label = 'Source amount';
-                res.values.dest_amount_row.label = 'Destination amount';
+                res.src_amount_row.label = 'Source amount';
+                res.dest_amount_row.label = 'Destination amount';
             }
 
             if (newState === 0) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_left: false,
-                    dest_amount_left: false,
-                    dest_res_balance_left: true,
-                    exch_left: false,
-                    src_amount_row: true,
-                    dest_amount_row: false,
-                    result_balance_dest_row: false,
-                    exchange_row: false,
-                };
+                res.src_amount_left.visible = false;
+                res.dest_amount_left.visible = false;
+                res.dest_res_balance_left.visible = true;
+                res.exch_left.visible = false;
+                res.src_amount_row.visible = true;
+                res.dest_amount_row.visible = false;
+                res.result_balance_dest_row.visible = false;
+                res.exchange_row.visible = false;
             } else if (newState === 1) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_left: true,
-                    dest_amount_left: false,
-                    dest_res_balance_left: false,
-                    exch_left: false,
-                    src_amount_row: false,
-                    dest_amount_row: false,
-                    result_balance_dest_row: true,
-                    exchange_row: false,
-                };
+                res.src_amount_left.visible = true;
+                res.dest_amount_left.visible = false;
+                res.dest_res_balance_left.visible = false;
+                res.exch_left.visible = false;
+                res.src_amount_row.visible = false;
+                res.dest_amount_row.visible = false;
+                res.result_balance_dest_row.visible = true;
+                res.exchange_row.visible = false;
             } else if (newState === 2) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_left: false,
-                    dest_amount_left: false,
-                    dest_res_balance_left: true,
-                    exch_left: true,
-                    src_amount_row: true,
-                    dest_amount_row: true,
-                    exchange_row: false,
-                    result_balance_dest_row: false,
-                };
+                res.src_amount_left.visible = false;
+                res.dest_amount_left.visible = false;
+                res.dest_res_balance_left.visible = true;
+                res.exch_left.visible = true;
+                res.src_amount_row.visible = true;
+                res.dest_amount_row.visible = true;
+                res.exchange_row.visible = false;
+                res.result_balance_dest_row.visible = false;
             } else if (newState === 3) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_left: false,
-                    dest_amount_left: true,
-                    dest_res_balance_left: true,
-                    exch_left: false,
-                    src_amount_row: true,
-                    dest_amount_row: false,
-                    exchange_row: true,
-                    result_balance_dest_row: false,
-                };
+                res.src_amount_left.visible = false;
+                res.dest_amount_left.visible = true;
+                res.dest_res_balance_left.visible = true;
+                res.exch_left.visible = false;
+                res.src_amount_row.visible = true;
+                res.dest_amount_row.visible = false;
+                res.exchange_row.visible = true;
+                res.result_balance_dest_row.visible = false;
             } else if (newState === 4) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_left: false,
-                    dest_amount_left: true,
-                    dest_res_balance_left: false,
-                    exch_left: true,
-                    src_amount_row: true,
-                    dest_amount_row: false,
-                    exchange_row: false,
-                    result_balance_dest_row: true,
-                };
+                res.src_amount_left.visible = false;
+                res.dest_amount_left.visible = true;
+                res.dest_res_balance_left.visible = false;
+                res.exch_left.visible = true;
+                res.src_amount_row.visible = true;
+                res.dest_amount_row.visible = false;
+                res.exchange_row.visible = false;
+                res.result_balance_dest_row.visible = true;
             }
         }
 
@@ -671,143 +631,116 @@ export class TransactionView extends AppView {
                 throw new Error('Wrong state specified');
             }
 
-            res.values.result_balance_row.label = 'Result balance (Source)';
-            res.values.result_balance_dest_row.label = 'Result balance (Destination)';
+            res.result_balance_row.label = 'Result balance (Source)';
+            res.result_balance_dest_row.label = 'Result balance (Destination)';
 
             if (newState === 0 || newState === 1 || newState === 2) {
-                res.values.src_amount_row.label = 'Amount';
-                res.values.dest_amount_row.label = 'Amount';
+                res.src_amount_row.label = 'Amount';
+                res.dest_amount_row.label = 'Amount';
             } else {
-                res.values.src_amount_row.label = 'Source amount';
-                res.values.dest_amount_row.label = 'Destination amount';
+                res.src_amount_row.label = 'Source amount';
+                res.dest_amount_row.label = 'Destination amount';
             }
 
             if (newState === 0) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_left: false,
-                    dest_amount_left: false,
-                    src_res_balance_left: true,
-                    dest_res_balance_left: true,
-                    exch_left: false,
-                    src_amount_row: true,
-                    dest_amount_row: false,
-                    result_balance_row: false,
-                    result_balance_dest_row: false,
-                    exchange_row: false,
-                };
+                res.src_amount_left.visible = false;
+                res.dest_amount_left.visible = false;
+                res.src_res_balance_left.visible = true;
+                res.dest_res_balance_left.visible = true;
+                res.exch_left.visible = false;
+                res.src_amount_row.visible = true;
+                res.dest_amount_row.visible = false;
+                res.result_balance_row.visible = false;
+                res.result_balance_dest_row.visible = false;
+                res.exchange_row.visible = false;
             } else if (newState === 1) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_left: true,
-                    dest_amount_left: false,
-                    src_res_balance_left: false,
-                    dest_res_balance_left: true,
-                    exch_left: false,
-                    src_amount_row: false,
-                    dest_amount_row: false,
-                    result_balance_row: true,
-                    result_balance_dest_row: false,
-                    exchange_row: false,
-                };
+                res.src_amount_left.visible = true;
+                res.dest_amount_left.visible = false;
+                res.src_res_balance_left.visible = false;
+                res.dest_res_balance_left.visible = true;
+                res.exch_left.visible = false;
+                res.src_amount_row.visible = false;
+                res.dest_amount_row.visible = false;
+                res.result_balance_row.visible = true;
+                res.result_balance_dest_row.visible = false;
+                res.exchange_row.visible = false;
             } else if (newState === 2) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_left: true,
-                    dest_amount_left: false,
-                    src_res_balance_left: true,
-                    dest_res_balance_left: false,
-                    exch_left: false,
-                    src_amount_row: false,
-                    dest_amount_row: false,
-                    result_balance_row: false,
-                    result_balance_dest_row: true,
-                    exchange_row: false,
-                };
+                res.src_amount_left.visible = true;
+                res.dest_amount_left.visible = false;
+                res.src_res_balance_left.visible = true;
+                res.dest_res_balance_left.visible = false;
+                res.exch_left.visible = false;
+                res.src_amount_row.visible = false;
+                res.dest_amount_row.visible = false;
+                res.result_balance_row.visible = false;
+                res.result_balance_dest_row.visible = true;
+                res.exchange_row.visible = false;
             } else if (newState === 3) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_left: false,
-                    dest_amount_left: false,
-                    src_res_balance_left: true,
-                    dest_res_balance_left: true,
-                    exch_left: true,
-                    src_amount_row: true,
-                    dest_amount_row: true,
-                    result_balance_row: false,
-                    result_balance_dest_row: false,
-                    exchange_row: false,
-                };
+                res.src_amount_left.visible = false;
+                res.dest_amount_left.visible = false;
+                res.src_res_balance_left.visible = true;
+                res.dest_res_balance_left.visible = true;
+                res.exch_left.visible = true;
+                res.src_amount_row.visible = true;
+                res.dest_amount_row.visible = true;
+                res.result_balance_row.visible = false;
+                res.result_balance_dest_row.visible = false;
+                res.exchange_row.visible = false;
             } else if (newState === 4) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_left: true,
-                    dest_amount_left: false,
-                    src_res_balance_left: false,
-                    dest_res_balance_left: true,
-                    exch_left: true,
-                    src_amount_row: false,
-                    dest_amount_row: true,
-                    result_balance_row: true,
-                    result_balance_dest_row: false,
-                    exchange_row: false,
-                };
+                res.src_amount_left.visible = true;
+                res.dest_amount_left.visible = false;
+                res.src_res_balance_left.visible = false;
+                res.dest_res_balance_left.visible = true;
+                res.exch_left.visible = true;
+                res.src_amount_row.visible = false;
+                res.dest_amount_row.visible = true;
+                res.result_balance_row.visible = true;
+                res.result_balance_dest_row.visible = false;
+                res.exchange_row.visible = false;
             } else if (newState === 5) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_left: false,
-                    dest_amount_left: true,
-                    src_res_balance_left: true,
-                    dest_res_balance_left: false,
-                    exch_left: true,
-                    src_amount_row: true,
-                    dest_amount_row: false,
-                    result_balance_row: false,
-                    result_balance_dest_row: true,
-                    exchange_row: false,
-                };
+                res.src_amount_left.visible = false;
+                res.dest_amount_left.visible = true;
+                res.src_res_balance_left.visible = true;
+                res.dest_res_balance_left.visible = false;
+                res.exch_left.visible = true;
+                res.src_amount_row.visible = true;
+                res.dest_amount_row.visible = false;
+                res.result_balance_row.visible = false;
+                res.result_balance_dest_row.visible = true;
+                res.exchange_row.visible = false;
             } else if (newState === 6) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_left: true,
-                    dest_amount_left: true,
-                    src_res_balance_left: false,
-                    dest_res_balance_left: false,
-                    exch_left: true,
-                    src_amount_row: false,
-                    dest_amount_row: false,
-                    result_balance_row: true,
-                    result_balance_dest_row: true,
-                    exchange_row: false,
-                };
+                res.src_amount_left.visible = true;
+                res.dest_amount_left.visible = true;
+                res.src_res_balance_left.visible = false;
+                res.dest_res_balance_left.visible = false;
+                res.exch_left.visible = true;
+                res.src_amount_row.visible = false;
+                res.dest_amount_row.visible = false;
+                res.result_balance_row.visible = true;
+                res.result_balance_dest_row.visible = true;
+                res.exchange_row.visible = false;
             } else if (newState === 7) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_left: false,
-                    dest_amount_left: true,
-                    src_res_balance_left: true,
-                    dest_res_balance_left: true,
-                    exch_left: false,
-                    src_amount_row: true,
-                    dest_amount_row: false,
-                    result_balance_row: false,
-                    result_balance_dest_row: false,
-                    exchange_row: true,
-                };
+                res.src_amount_left.visible = false;
+                res.dest_amount_left.visible = true;
+                res.src_res_balance_left.visible = true;
+                res.dest_res_balance_left.visible = true;
+                res.exch_left.visible = false;
+                res.src_amount_row.visible = true;
+                res.dest_amount_row.visible = false;
+                res.result_balance_row.visible = false;
+                res.result_balance_dest_row.visible = false;
+                res.exchange_row.visible = true;
             } else if (newState === 8) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_left: true,
-                    dest_amount_left: true,
-                    src_res_balance_left: false,
-                    dest_res_balance_left: true,
-                    exch_left: false,
-                    src_amount_row: false,
-                    dest_amount_row: false,
-                    result_balance_row: true,
-                    result_balance_dest_row: false,
-                    exchange_row: true,
-                };
+                res.src_amount_left.visible = true;
+                res.dest_amount_left.visible = true;
+                res.src_res_balance_left.visible = false;
+                res.dest_res_balance_left.visible = true;
+                res.exch_left.visible = false;
+                res.src_amount_row.visible = false;
+                res.dest_amount_row.visible = false;
+                res.result_balance_row.visible = true;
+                res.result_balance_dest_row.visible = false;
+                res.exchange_row.visible = true;
             }
         }
 
@@ -816,159 +749,117 @@ export class TransactionView extends AppView {
                 throw new Error('Wrong state specified');
             }
 
-            res.visibility = {
-                ...res.visibility,
-                account: { tile: !this.model.noAccount },
-                selaccount: this.model.noAccount,
-                noacc_btn: !this.model.noAccount,
-                dest_amount_row: false,
-                dest_amount_left: false,
-                exchange_row: false,
-                exch_left: false,
-            };
+            res.account.tile.visible = !this.model.noAccount;
+            res.selaccount = { visible: this.model.noAccount };
+            res.noacc_btn = { visible: !this.model.noAccount };
+            res.dest_amount_row.visible = false;
+            res.dest_amount_left.visible = false;
+            res.exchange_row.visible = false;
+            res.exch_left.visible = false;
 
-            res.values.src_amount_row.label = 'Amount';
+            res.src_amount_row.label = 'Amount';
 
             if (this.model.debtType) {
-                res.values.person = {
+                res.person = {
                     tile: {
                         name: this.model.person.name,
                         balance: this.model.srcAccount.fmtBalance,
+                        visible: true,
                     },
                 };
-                res.values.src_res_balance_left = this.model.fmtSrcResBal;
+                res.src_res_balance_left.value = this.model.fmtSrcResBal;
 
-                res.values.result_balance_row.label = 'Result balance (Person)';
-                res.values.result_balance_dest_row.label = 'Result balance (Account)';
+                res.result_balance_row.label = 'Result balance (Person)';
+                res.result_balance_dest_row.label = 'Result balance (Account)';
 
                 // Check initial state
-                res.values.dest_res_balance_left = this.model.fmtDestResBal;
+                res.dest_res_balance_left.value = this.model.fmtDestResBal;
 
                 if (!this.model.noAccount) {
-                    res.values.account = {
+                    res.account = {
                         tile: {
                             name: this.model.destAccount.name,
                             balance: this.model.destAccount.fmtBalance,
+                            visible: true,
                         },
                     };
-                    /*
-                    res.values.account = Object.assign(
-                        (res.values.account) ? res.values.account : {},
-                        {
-                            tile: {
-                                name: this.model.destAccount.name,
-                                balance: this.model.destAccount.fmtBalance,
-                            },
-                        },
-                    );
-                    */
                 }
             } else {
-                res.values.person = {
+                res.person = {
                     tile: {
                         name: this.model.person.name,
                         balance: this.model.destAccount.fmtBalance,
+                        visible: true,
                     },
                 };
-                res.values.dest_res_balance_left = this.model.fmtDestResBal;
+                res.dest_res_balance_left.value = this.model.fmtDestResBal;
 
-                res.values.result_balance_row.label = 'Result balance (Account)';
-                res.values.result_balance_dest_row.label = 'Result balance (Person)';
+                res.result_balance_row.label = 'Result balance (Account)';
+                res.result_balance_dest_row.label = 'Result balance (Person)';
 
                 // Check initial state
-                res.values.src_res_balance_left = this.model.fmtSrcResBal;
+                res.src_res_balance_left.value = this.model.fmtSrcResBal;
 
                 if (!this.model.noAccount) {
-                    res.values.account = {
+                    res.account = {
                         tile: {
                             name: this.model.srcAccount.name,
                             balance: this.model.srcAccount.fmtBalance,
+                            visible: true,
                         },
                     };
-                    /*
-                    res.values.account = Object.assign(
-                        (res.values.account) ? res.values.account : {},
-                        {
-                            tile: {
-                                name: this.model.srcAccount.name,
-                                balance: this.model.srcAccount.fmtBalance,
-                            },
-                        },
-                    );
-                    */
                 }
             }
 
             if (newState === 0 || newState === 3) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_row: true,
-                    src_amount_left: false,
-                    result_balance_row: false,
-                    src_res_balance_left: true,
-                    result_balance_dest_row: false,
-                    dest_res_balance_left: true,
-                };
+                res.src_amount_row.visible = true;
+                res.src_amount_left.visible = false;
+                res.result_balance_row.visible = false;
+                res.src_res_balance_left.visible = true;
+                res.result_balance_dest_row.visible = false;
+                res.dest_res_balance_left.visible = true;
             } else if (newState === 1 || newState === 5) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_row: false,
-                    src_amount_left: true,
-                    result_balance_row: true,
-                    src_res_balance_left: false,
-                    result_balance_dest_row: false,
-                    dest_res_balance_left: true,
-                };
+                res.src_amount_row.visible = false;
+                res.src_amount_left.visible = true;
+                res.result_balance_row.visible = true;
+                res.src_res_balance_left.visible = false;
+                res.result_balance_dest_row.visible = false;
+                res.dest_res_balance_left.visible = true;
             } else if (newState === 2 || newState === 4) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_row: false,
-                    src_amount_left: true,
-                    result_balance_row: false,
-                    src_res_balance_left: true,
-                    result_balance_dest_row: true,
-                    dest_res_balance_left: false,
-                };
+                res.src_amount_row.visible = false;
+                res.src_amount_left.visible = true;
+                res.result_balance_row.visible = false;
+                res.src_res_balance_left.visible = true;
+                res.result_balance_dest_row.visible = true;
+                res.dest_res_balance_left.visible = false;
             } else if (newState === 6) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_row: true,
-                    src_amount_left: false,
-                    result_balance_row: false,
-                    src_res_balance_left: true,
-                    result_balance_dest_row: false,
-                    dest_res_balance_left: false,
-                };
+                res.src_amount_row.visible = true;
+                res.src_amount_left.visible = false;
+                res.result_balance_row.visible = false;
+                res.src_res_balance_left.visible = true;
+                res.result_balance_dest_row.visible = false;
+                res.dest_res_balance_left.visible = false;
             } else if (newState === 7) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_row: true,
-                    src_amount_left: false,
-                    result_balance_row: false,
-                    src_res_balance_left: false,
-                    result_balance_dest_row: false,
-                    dest_res_balance_left: true,
-                };
+                res.src_amount_row.visible = true;
+                res.src_amount_left.visible = false;
+                res.result_balance_row.visible = false;
+                res.src_res_balance_left.visible = false;
+                res.result_balance_dest_row.visible = false;
+                res.dest_res_balance_left.visible = true;
             } else if (newState === 8) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_row: false,
-                    src_amount_left: true,
-                    result_balance_row: false,
-                    src_res_balance_left: false,
-                    result_balance_dest_row: true,
-                    dest_res_balance_left: false,
-                };
+                res.src_amount_row.visible = false;
+                res.src_amount_left.visible = true;
+                res.result_balance_row.visible = false;
+                res.src_res_balance_left.visible = false;
+                res.result_balance_dest_row.visible = true;
+                res.dest_res_balance_left.visible = false;
             } else if (newState === 9) {
-                res.visibility = {
-                    ...res.visibility,
-                    src_amount_row: false,
-                    src_amount_left: true,
-                    result_balance_row: true,
-                    src_res_balance_left: false,
-                    result_balance_dest_row: false,
-                    dest_res_balance_left: false,
-                };
+                res.src_amount_row.visible = false;
+                res.src_amount_left.visible = true;
+                res.result_balance_row.visible = true;
+                res.src_res_balance_left.visible = false;
+                res.result_balance_dest_row.visible = false;
+                res.dest_res_balance_left.visible = false;
             }
         }
 

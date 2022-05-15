@@ -101,16 +101,10 @@ export class ImportConditionItem extends TestComponent {
 
     static getExpectedState(model) {
         const res = {
-            visibility: {
-                propertyTitle: true,
-                operatorElem: true,
-                valueTitle: !model.isFieldValue,
-                valuePropTitle: model.isFieldValue,
-            },
-            values: {
-                propertyTitle: {},
-                operatorTitle: {},
-            },
+            propertyTitle: { visible: true },
+            operatorTitle: { visible: true },
+            valueTitle: { visible: !model.isFieldValue },
+            valuePropTitle: { visible: model.isFieldValue },
         };
 
         // Condition field type
@@ -118,14 +112,14 @@ export class ImportConditionItem extends TestComponent {
         if (!fieldType) {
             throw new Error(`Invalid property type: '${model.fieldType}'`);
         }
-        res.values.propertyTitle.value = fieldType.title;
+        res.propertyTitle.value = fieldType.title;
 
         // Condition operator
         const operator = ImportCondition.getOperatorById(model.operator);
         if (!operator) {
             throw new Error(`Operator not found: '${model.operator}'`);
         }
-        res.values.operatorTitle.value = operator.title;
+        res.operatorTitle.value = operator.title;
 
         // Condition value
         let value;
@@ -135,7 +129,7 @@ export class ImportConditionItem extends TestComponent {
                 throw new Error(`Invalid property type: '${model.value}'`);
             }
 
-            res.values.valuePropTitle = { value: valueProp.title };
+            res.valuePropTitle.value = valueProp.title;
         } else if (ImportCondition.isAccountField(model.fieldType)) {
             const account = App.state.accounts.getItem(model.value);
             if (!account) {
@@ -162,7 +156,7 @@ export class ImportConditionItem extends TestComponent {
         }
 
         if (!model.isFieldValue) {
-            res.values.valueTitle = { value };
+            res.valueTitle.value = value;
         }
 
         return res;

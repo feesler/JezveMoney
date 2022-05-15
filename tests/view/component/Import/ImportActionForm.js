@@ -157,22 +157,22 @@ export class ImportActionForm extends TestComponent {
 
     static getExpectedState(model) {
         const res = {
-            visibility: {
-                actionField: true,
-                deleteBtn: true,
-            },
-            values: {
-                actionField: { value: model.actionType.toString() },
-            },
+            actionField: { value: model.actionType.toString(), visible: true },
+            deleteBtn: { visible: true },
         };
+
+        const state = ImportActionForm.getStateName(model);
 
         actionValueTypes.forEach((fieldName) => {
             const controlName = `${fieldName}Field`;
-            const visible = model.state === fieldName;
+            const visible = state === fieldName;
 
-            res.visibility[controlName] = visible;
+            if (!res[controlName]) {
+                res[controlName] = {};
+            }
+            res[controlName].visible = visible;
             if (visible) {
-                res.values[controlName] = { value: model.value.toString() };
+                res[controlName].value = model.value.toString();
             }
         });
 

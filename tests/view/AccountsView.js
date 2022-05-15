@@ -182,10 +182,8 @@ export class AccountsView extends AppView {
         const userAccounts = state.accounts.getUserAccounts();
 
         const res = {
-            values: {
-                tiles: TilesList.renderAccounts(userAccounts),
-                hiddenTiles: TilesList.renderHiddenAccounts(userAccounts),
-            },
+            tiles: TilesList.renderAccounts(userAccounts),
+            hiddenTiles: TilesList.renderHiddenAccounts(userAccounts),
         };
 
         return res;

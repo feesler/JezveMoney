@@ -19,6 +19,7 @@ import {
     click,
     input,
     onChange,
+    isVisible,
 } from '../../../env.js';
 
 const fieldValueTypes = [
@@ -128,6 +129,8 @@ export class ImportConditionForm extends TestComponent {
             res.value = await prop(res.inputElem, 'value');
         }
 
+        res.visible = await isVisible(elem);
+
         return this.mapField(res);
     }
 
@@ -173,25 +176,24 @@ export class ImportConditionForm extends TestComponent {
 
     static getExpectedState(model) {
         const res = {
-            visibility: {
-                fieldTypeField: true,
-                operatorField: true,
-                deleteBtn: true,
-            },
-            values: {
-                fieldTypeField: { value: model.fieldType.toString() },
-                operatorField: { value: model.operator.toString() },
-                fieldValueCheck: { checked: model.isFieldValue },
-            },
+            fieldTypeField: { value: model.fieldType.toString(), visible: true },
+            operatorField: { value: model.operator.toString(), visible: true },
+            fieldValueCheck: { checked: model.isFieldValue, visible: true },
+            deleteBtn: { visible: true },
         };
+
+        const state = ImportConditionForm.getStateName(model);
 
         fieldValueTypes.forEach((fieldName) => {
             const controlName = `${fieldName}Field`;
-            const visible = model.state === fieldName;
+            const visible = state === fieldName;
 
-            res.visibility[controlName] = visible;
+            if (!res[controlName]) {
+                res[controlName] = {};
+            }
+            res[controlName].visible = visible;
             if (visible) {
-                res.values[controlName] = { value: model.value.toString() };
+                res[controlName].value = model.value.toString();
             }
         });
 

@@ -74,7 +74,7 @@ export class ImportList extends TestComponent {
     getExpectedState() {
         return {
             items: this.content.items.map(
-                (item) => copyObject(item.getExpectedState(item.model).values),
+                (item) => copyObject(item.getExpectedState(item.model)),
             ),
         };
     }

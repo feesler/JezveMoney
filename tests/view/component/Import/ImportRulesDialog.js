@@ -92,26 +92,21 @@ export class ImportRulesDialog extends TestComponent {
     getExpectedState(model) {
         const isForm = this.isFormState(model);
         const res = {
-            visibility: {
-                rulesList: model.state === 'list',
-                ruleForm: isForm,
-            },
-            values: {
-                header: {},
-            },
+            header: {},
+            rulesList: { visible: model.state === 'list' },
         };
 
         if (model.state === 'list') {
-            res.values.header.title = 'Import rules';
-            res.values.items = model.rules.map(
-                (rule) => ImportRuleItem.getExpectedState(rule).values,
+            res.header.title = 'Import rules';
+            res.items = model.rules.map(
+                (rule) => ImportRuleItem.getExpectedState(rule),
             );
         } else if (isForm) {
-            res.values.header.title = (model.state === 'create')
+            res.header.title = (model.state === 'create')
                 ? 'Create import rule'
                 : 'Update import rule';
 
-            res.values.ruleForm = ImportRuleForm.getExpectedState(model.rule).values;
+            res.ruleForm = ImportRuleForm.getExpectedState(model.rule);
         }
 
         return res;

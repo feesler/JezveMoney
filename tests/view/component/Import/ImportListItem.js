@@ -250,96 +250,84 @@ export class ImportListItem extends TestComponent {
 
     getExpectedState(model) {
         const res = {
-            visibility: {
-                typeField: true,
-                amountField: true,
-                currencyField: true,
-                dateField: true,
-                commentField: true,
-                invFeedback: model.invalidated,
+            enabled: model.enabled,
+            typeField: {
+                value: model.type.toString(),
+                disabled: !model.enabled,
+                visible: true,
             },
-            values: {
-                enabled: model.enabled,
-                typeField: {
-                    value: model.type.toString(),
-                    disabled: !model.enabled,
-                },
-                amountField: {
-                    value: model.amount.toString(),
-                    disabled: !model.enabled,
-                },
-                destAmountField: {
-                    value: model.destAmount.toString(),
-                    disabled: !model.enabled,
-                },
-                destAccountField: {
-                    value: model.destId.toString(),
-                    disabled: !model.enabled,
-                },
-                currencyField: {
-                    value: model.currId.toString(),
-                    disabled: !model.enabled,
-                },
-                personField: {
-                    value: model.personId.toString(),
-                },
-                dateField: {
-                    value: model.date.toString(),
-                    disabled: !model.enabled,
-                },
-                commentField: {
-                    value: model.comment.toString(),
-                    disabled: !model.enabled,
-                },
+            amountField: {
+                value: model.amount.toString(),
+                disabled: !model.enabled,
+                visible: true,
             },
+            destAmountField: {
+                value: model.destAmount.toString(),
+                disabled: !model.enabled,
+            },
+            destAccountField: {
+                value: model.destId.toString(),
+                disabled: !model.enabled,
+            },
+            currencyField: {
+                value: model.currId.toString(),
+                disabled: !model.enabled,
+                visible: true,
+            },
+            personField: {
+                value: model.personId.toString(),
+            },
+            dateField: {
+                value: model.date.toString(),
+                disabled: !model.enabled,
+                visible: true,
+            },
+            commentField: {
+                value: model.comment.toString(),
+                disabled: !model.enabled,
+                visible: true,
+            },
+            invFeedback: { visible: model.invalidated },
         };
 
         if (model.type === 'expense') {
-            Object.assign(res.visibility, {
-                destAmountField: model.isDifferent,
-                destAccountField: false,
-                personField: false,
-            });
+            res.destAmountField.visible = model.isDifferent;
+            res.destAccountField.visible = false;
+            res.personField.visible = false;
 
-            res.values.destAccountField.disabled = true;
-            res.values.personField.disabled = true;
+            res.destAccountField.disabled = true;
+            res.personField.disabled = true;
         } else if (model.type === 'income') {
-            Object.assign(res.visibility, {
-                destAmountField: model.isDifferent,
-                destAccountField: false,
-                personField: false,
-            });
+            res.destAmountField.visible = model.isDifferent;
+            res.destAccountField.visible = false;
+            res.personField.visible = false;
 
-            res.values.destAccountField.disabled = true;
-            res.values.personField.disabled = true;
+            res.destAccountField.disabled = true;
+            res.personField.disabled = true;
         } else if (model.type === 'transferfrom' || model.type === 'transferto') {
-            Object.assign(res.visibility, {
-                destAmountField: model.isDifferent,
-                destAccountField: true,
-                personField: false,
-            });
+            res.destAmountField.visible = model.isDifferent;
+            res.destAccountField.visible = true;
+            res.personField.visible = false;
 
             if (model.enabled) {
-                res.values.destAccountField.disabled = false;
+                res.destAccountField.disabled = false;
             }
-            res.values.currencyField.disabled = true;
-            res.values.personField.disabled = true;
+            res.currencyField.disabled = true;
+            res.personField.disabled = true;
         } else if (model.type === 'debtfrom' || model.type === 'debtto') {
-            Object.assign(res.visibility, {
-                destAmountField: false,
-                destAccountField: false,
-                personField: true,
-            });
+            res.destAmountField.visible = false;
+            res.destAccountField.visible = false;
+            res.personField.visible = true;
 
-            res.values.destAccountField.disabled = true;
-            res.values.currencyField.disabled = true;
+            res.destAccountField.disabled = true;
+            res.currencyField.disabled = true;
         }
 
         if (model.enabled) {
             if (!model.isDifferent) {
-                res.values.destAmountField = { value: '', disabled: true };
+                res.destAmountField = { value: '', disabled: true };
             } else {
-                res.values.destAmountField.disabled = !model.isDifferent;
+                res.destAmountField.disabled = !model.isDifferent;
             }
         }
 

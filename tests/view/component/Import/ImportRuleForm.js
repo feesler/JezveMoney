@@ -104,22 +104,16 @@ export class ImportRuleForm extends TestComponent {
 
     static getExpectedState(model) {
         const res = {
-            visibility: {
-                conditionsList: true,
-                actionsList: true,
-            },
-            values: {
-                conditionsList: {},
-                actionsList: {},
-            },
+            conditionsList: { visible: true },
+            actionsList: { visible: true },
         };
 
-        res.values.conditionsList.items = model.conditions.map(
-            (item) => ImportConditionForm.getExpectedState(item).values,
+        res.conditionsList.items = model.conditions.map(
+            (item) => ImportConditionForm.getExpectedState(item),
         );
 
-        res.values.actionsList.items = model.actions.map(
-            (item) => ImportActionForm.getExpectedState(item).values,
+        res.actionsList.items = model.actions.map(
+            (item) => ImportActionForm.getExpectedState(item),
         );
 
         return res;

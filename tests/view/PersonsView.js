@@ -139,10 +139,8 @@ export class PersonsView extends AppView {
 
     static render(state) {
         const res = {
-            values: {
-                tiles: TilesList.renderPersons(state.persons),
-                hiddenTiles: TilesList.renderHiddenPersons(state.persons),
-            },
+            tiles: TilesList.renderPersons(state.persons),
+            hiddenTiles: TilesList.renderHiddenPersons(state.persons),
         };
 
         return res;

@@ -73,21 +73,15 @@ export class ImportActionItem extends TestComponent {
 
     static getExpectedState(model) {
         const res = {
-            visibility: {
-                typeTitle: true,
-                valueTitle: true,
-            },
-            values: {
-                typeTitle: {},
-                valueTitle: {},
-            },
+            typeTitle: { visible: true },
+            valueTitle: { visible: true },
         };
 
         const actionType = ImportAction.getActionById(model.actionType);
         if (!actionType) {
             throw new Error(`Unknown action type: '${model.actionType}'`);
         }
-        res.values.typeTitle.value = actionType.title;
+        res.typeTitle.value = actionType.title;
 
         let value;
         if (ImportAction.isTransactionTypeValue(actionType.id)) {
@@ -121,7 +115,7 @@ export class ImportActionItem extends TestComponent {
         } else {
             value = model.value;
         }
-        res.values.valueTitle.value = value.toString();
+        res.valueTitle.value = value.toString();
 
         return res;
     }

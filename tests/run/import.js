@@ -181,9 +181,7 @@ export async function addItem() {
 
         await App.view.addItem();
 
-        App.view.expectedState = {
-            values: { itemsList },
-        };
+        App.view.expectedState = { itemsList };
         return App.view.checkState();
     });
 }
@@ -269,7 +267,7 @@ export async function submitUploaded(params) {
             itemsList.items = App.view.content.itemsList.content.items.map(
                 (item) => {
                     const model = item.onChangeMainAccount(item.model, params.account);
-                    return copyObject(item.getExpectedState(model).values);
+                    return copyObject(item.getExpectedState(model));
                 },
             );
         } else {
@@ -291,9 +289,7 @@ export async function submitUploaded(params) {
 
         await App.view.submitUploaded();
 
-        App.view.expectedState = {
-            values: { itemsList },
-        };
+        App.view.expectedState = { itemsList };
 
         return App.view.checkState();
     });
@@ -348,16 +344,14 @@ export async function changeMainAccount(accountId) {
             /* eslint-disable-next-line no-param-reassign */
             item.model = item.onChangeMainAccount(item.model, accountId);
 
-            return copyObject(item.getExpectedState(item.model).values);
+            return copyObject(item.getExpectedState(item.model));
         });
 
         await App.view.selectMainAccount(accountId);
 
         App.view.expectedState = {
-            values: {
-                itemsList: {
-                    items: itemsData,
-                },
+            itemsList: {
+                items: itemsData,
             },
         };
         return App.view.checkState();
@@ -411,17 +405,15 @@ export async function enableRules(value = true) {
                 model = item.model;
             }
 
-            const result = item.getExpectedState(model).values;
+            const result = item.getExpectedState(model);
             return copyObject(result);
         });
 
         await App.view.enableRules(enable);
 
         App.view.expectedState = {
-            values: {
-                itemsList: {
-                    items: itemsData,
-                },
+            itemsList: {
+                items: itemsData,
             },
         };
 
@@ -444,9 +436,7 @@ export async function enableItems({ index, value = true }) {
         await App.view.enableItems(index, enable);
 
         App.view.expectedState = {
-            values: {
-                itemsList: App.view.content.itemsList.getExpectedState(),
-            },
+            itemsList: App.view.content.itemsList.getExpectedState(),
         };
 
         return App.view.checkState();
@@ -513,9 +503,7 @@ export async function updateItem(params) {
      * because ImportList.render() method use transaction data objects
      */
     App.view.expectedState = {
-        values: {
-            itemsList: App.view.content.itemsList.getExpectedState(),
-        },
+        itemsList: App.view.content.itemsList.getExpectedState(),
     };
     await test('View state', () => App.view.checkState());
 }
@@ -545,7 +533,7 @@ export async function deleteItems(indexes) {
         await App.view.deleteItem(itemInds);
 
         App.view.expectedState = {
-            values: { itemsList: { items: expected } },
+            itemsList: { items: expected },
         };
 
         return App.view.checkState();
@@ -562,7 +550,7 @@ export async function deleteAllItems() {
         await App.view.deleteAllItems();
 
         App.view.expectedState = {
-            values: { itemsList: { items: [] } },
+            itemsList: { items: [] },
         };
 
         return App.view.checkState();
@@ -594,15 +582,11 @@ export async function submit() {
             if (isValid) {
                 App.view.expectedState = {
                     msgPopup: okNotification,
-                    values: {
-                        itemsList: { items: [] },
-                    },
+                    itemsList: { items: [] },
                 };
             } else {
                 App.view.expectedState = {
-                    values: {
-                        itemsList: App.view.content.itemsList.getExpectedState(),
-                    },
+                    itemsList: App.view.content.itemsList.getExpectedState(),
                 };
             }
             await App.view.checkState();

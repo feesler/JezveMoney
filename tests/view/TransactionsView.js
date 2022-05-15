@@ -215,30 +215,25 @@ export class TransactionsView extends AppView {
         const isItemsAvailable = (this.model.filtered.length > 0);
 
         const res = {
-            visibility: {
-                typeMenu: true,
-                accDropDown: true,
-                searchForm: true,
-                modeSelector: isItemsAvailable,
-                paginator: isItemsAvailable,
-                transList: true,
-            },
-            values: {
-                typeMenu: { selectedTypes: this.model.filter.type },
-                searchForm: { value: this.model.filter.search },
-            },
+            typeMenu: { selectedTypes: this.model.filter.type, visible: true },
+            accDropDown: { visible: true },
+            searchForm: { value: this.model.filter.search, visible: true },
+            modeSelector: { visible: isItemsAvailable },
+            paginator: { visible: isItemsAvailable },
+            transList: { visible: true },
         };
 
         if (isItemsAvailable) {
-            Object.assign(res.values, {
-                paginator: {
-                    pages: this.model.list.pages,
-                    active: this.model.list.page,
-                },
-                modeSelector: {
-                    details: this.model.detailsMode,
-                },
-            });
+            res.paginator = {
+                ...res.paginator,
+                pages: this.model.list.pages,
+                active: this.model.list.page,
+            };
+
+            res.modeSelector = {
+                ...res.modeSelector,
+                details: this.model.detailsMode,
+            };
         }
 
         return res;

@@ -251,18 +251,14 @@ export class ImportUploadDialog extends TestComponent {
 
     getExpectedState(model) {
         const res = {
-            visibility: {
-                uploadFormBrowser: true,
-                isEncodeCheck: true,
-                serverAddressBlock: model.useServerAddress,
-            },
-            values: {
-                columns: null,
-                initialAccount: model.initialAccount.id.toString(),
-            },
+            uploadFormBrowser: { visible: true },
+            isEncodeCheck: { visible: true },
+            serverAddressBlock: { visible: model.useServerAddress },
+            columns: null,
+            initialAccount: { value: model.initialAccount.id.toString() },
         };
 
-        res.values.fileName = model.uploadFilename;
+        res.fileName = model.uploadFilename;
 
         if (model.state === CREATE_TPL_STATE
             || model.state === UPDATE_TPL_STATE) {
@@ -270,73 +266,62 @@ export class ImportUploadDialog extends TestComponent {
                 throw new Error('Invalid model: expected template');
             }
 
-            res.visibility = {
-                ...res.visibility,
-                templateBlock: true,
-                loadingIndicator: false,
-                tplField: false,
-                nameField: true,
-                columnField: true,
-                rawDataTable: true,
-                updateTplBtn: false,
-                deleteTplBtn: false,
-                submitTplBtn: true,
-                tplFeedback: true,
-            };
+            res.templateBlock = { visible: true };
+            res.loadingIndicator = { visible: false };
+            res.tplField = { visible: false };
+            res.nameField = { visible: true };
+            res.columnField = { visible: true };
+            res.rawDataTable = { visible: true };
+            res.updateTplBtn = { visible: false };
+            res.deleteTplBtn = { visible: false };
+            res.submitTplBtn = { visible: true };
+            res.tplFeedback = { visible: true };
 
-            res.visibility.cancelTplBtn = (model.state === CREATE_TPL_STATE)
+            const showCancelBtn = (model.state === CREATE_TPL_STATE)
                 ? (App.state.templates.length > 0)
                 : true;
-
-            res.values.tplNameInp = (model.template) ? model.template.name : '';
+            res.cancelTplBtn = { visible: showCancelBtn };
+            const tplName = (model.template) ? model.template.name : '';
+            res.tplNameInp = { value: tplName };
         } else if (model.state === RAW_DATA_STATE) {
-            res.visibility = {
-                ...res.visibility,
-                templateBlock: true,
-                loadingIndicator: false,
-                tplField: true,
-                nameField: false,
-                columnField: false,
-                rawDataTable: false,
-                updateTplBtn: true,
-                deleteTplBtn: true,
-                submitTplBtn: false,
-                cancelTplBtn: false,
-                tplFeedback: true,
-            };
+            res.templateBlock = { visible: true };
+            res.loadingIndicator = { visible: false };
+            res.tplField = { visible: true };
+            res.nameField = { visible: false };
+            res.columnField = { visible: false };
+            res.rawDataTable = { visible: false };
+            res.updateTplBtn = { visible: true };
+            res.deleteTplBtn = { visible: true };
+            res.submitTplBtn = { visible: false };
+            res.cancelTplBtn = { visible: false };
+            res.tplFeedback = { visible: true };
         } else if (model.state === LOADING_STATE) {
-            res.visibility = {
-                ...res.visibility,
-                templateBlock: true,
-                loadingIndicator: true,
-                nameField: false,
-                columnField: false,
-                rawDataTable: false,
-                updateTplBtn: true,
-                deleteTplBtn: true,
-                submitTplBtn: false,
-                cancelTplBtn: false,
-                tplFeedback: false,
-            };
+            res.templateBlock = { visible: true };
+            res.loadingIndicator = { visible: true };
+            res.nameField = { visible: false };
+            res.columnField = { visible: false };
+            res.rawDataTable = { visible: false };
+            res.updateTplBtn = { visible: true };
+            res.deleteTplBtn = { visible: true };
+            res.submitTplBtn = { visible: false };
+            res.cancelTplBtn = { visible: false };
+            res.tplFeedback = { visible: false };
         } else if (model.state === BROWSE_FILE_STATE) {
-            res.visibility = {
-                ...res.visibility,
-                templateBlock: false,
-                loadingIndicator: false,
-                nameField: false,
-                columnField: false,
-                rawDataTable: false,
-                updateTplBtn: false,
-                deleteTplBtn: false,
-                submitTplBtn: false,
-                cancelTplBtn: false,
-                tplFeedback: false,
-            };
+            res.templateBlock = { visible: false };
+            res.loadingIndicator = { visible: false };
+            res.nameField = { visible: false };
+            res.columnField = { visible: false };
+            res.rawDataTable = { visible: false };
+            res.updateTplBtn = { visible: false };
+            res.deleteTplBtn = { visible: false };
+            res.submitTplBtn = { visible: false };
+            res.cancelTplBtn = { visible: false };
+            res.tplFeedback = { visible: false };
         }
 
         if ([CREATE_TPL_STATE, UPDATE_TPL_STATE, RAW_DATA_STATE].includes(model.state)) {
             const rawDataHeader = this.parent.fileData.slice(0, 1)[0];
-            res.values.columns = rawDataHeader.map(
+            res.columns = rawDataHeader.map(
                 (item, ind) => this.getColumn(this.parent.fileData, ind),
             );
         }

@@ -22,17 +22,17 @@ export class ImportRuleItem extends TestComponent {
 
         const res = {
             ruleId: await prop(this.elem, 'dataset.id'),
-            propertyElem: await query(this.elem, '.rule-item__property'),
-            operatorElem: await query(this.elem, '.rule-item__operator'),
-            valueElem: await query(this.elem, '.rule-item__value'),
-            infoElem: await query(this.elem, '.rule-item__info'),
-            updateBtn: await query(this.elem, '.update-btn'),
-            deleteBtn: await query(this.elem, '.delete-btn'),
-            toggleBtn: await query(this.elem, '.toggle-btn'),
+            propertyElem: { elem: await query(this.elem, '.rule-item__property') },
+            operatorElem: { elem: await query(this.elem, '.rule-item__operator') },
+            valueElem: { elem: await query(this.elem, '.rule-item__value') },
+            infoElem: { elem: await query(this.elem, '.rule-item__info') },
+            updateBtn: { elem: await query(this.elem, '.update-btn') },
+            deleteBtn: { elem: await query(this.elem, '.delete-btn') },
+            toggleBtn: { elem: await query(this.elem, '.toggle-btn') },
         };
 
-        if (!res.valueElem) {
-            res.valueElem = await query(this.elem, '.rule-item__value-property');
+        if (!res.valueElem.elem) {
+            res.valueElem.elem = await query(this.elem, '.rule-item__value-property');
         }
 
         const conditionsElem = await query(this.elem, '.rule-item__conditions');
@@ -42,13 +42,13 @@ export class ImportRuleItem extends TestComponent {
         res.actions = await ImportRuleItemActions.create(this, actionsElem);
 
         if (
-            !res.propertyElem
-            || !res.operatorElem
-            || !res.valueElem
-            || !res.infoElem
-            || !res.updateBtn
-            || !res.deleteBtn
-            || !res.toggleBtn
+            !res.propertyElem.elem
+            || !res.operatorElem.elem
+            || !res.valueElem.elem
+            || !res.infoElem.elem
+            || !res.updateBtn.elem
+            || !res.deleteBtn.elem
+            || !res.toggleBtn.elem
             || !res.conditions.elem
             || !res.actions.elem
         ) {
@@ -74,45 +74,41 @@ export class ImportRuleItem extends TestComponent {
 
     static getExpectedState(model) {
         const res = {
-            visibility: {
-                propertyElem: true,
-                operatorElem: true,
-                valueElem: true,
-                infoElem: true,
-                updateBtn: true,
-                deleteBtn: true,
-            },
-            values: {
-                conditions: {},
-                actions: {},
-            },
+            propertyElem: { visible: true },
+            operatorElem: { visible: true },
+            valueElem: { visible: true },
+            infoElem: { visible: true },
+            updateBtn: { visible: true },
+            deleteBtn: { visible: true },
+            conditions: {},
+            actions: {},
         };
 
         if (model.id) {
-            res.values.ruleId = model.id.toString();
+            res.ruleId = model.id.toString();
         }
 
-        res.values.conditions.items = model.conditions.map(
-            (item) => ImportConditionItem.getExpectedState(item).values,
+        res.conditions.items = model.conditions.map(
+            (item) => ImportConditionItem.getExpectedState(item),
         );
 
-        res.values.actions.items = model.actions.map(
-            (item) => ImportActionItem.getExpectedState(item).values,
+        res.actions.items = model.actions.map(
+            (item) => ImportActionItem.getExpectedState(item),
         );
 
         return res;
     }
 
     async toggleExpand() {
-        return click(this.content.toggleBtn);
+        return click(this.content.toggleBtn.elem);
     }
 
     async clickUpdate() {
-        return click(this.content.updateBtn);
+        return click(this.content.updateBtn.elem);
     }
 
     async clickDelete() {
-        return click(this.content.deleteBtn);
+        return click(this.content.deleteBtn.elem);
     }
 
     /**

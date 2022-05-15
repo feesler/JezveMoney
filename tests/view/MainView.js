@@ -88,12 +88,10 @@ export class MainView extends AppView {
     }
 
     static render(state) {
-        const res = {
-            values: {},
-        };
+        const res = {};
 
         // Accounts widget
-        res.values.accountsWidget = {
+        res.accountsWidget = {
             tiles: TilesList.renderAccounts(state.accounts.getUserAccounts()),
         };
 
@@ -103,10 +101,10 @@ export class MainView extends AppView {
             App.config.latestTransactions,
         );
         const transWidget = TransactionList.renderWidget(latestTransactionsList, state);
-        res.values.transactionsWidget = transWidget;
+        res.transactionsWidget = transWidget;
 
         // Persons widget
-        res.values.personsWidget = {
+        res.personsWidget = {
             infoTiles: TilesList.renderPersons(state.persons, InfoTile),
         };
 

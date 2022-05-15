@@ -94,8 +94,10 @@ export async function update(params) {
 
         // Check initial state of view
         App.view.expectedState = {
-            visibility: { name: true },
-            values: { name: expectedPerson.name },
+            name: {
+                value: expectedPerson.name,
+                visible: true,
+            },
         };
         await App.view.checkState();
 

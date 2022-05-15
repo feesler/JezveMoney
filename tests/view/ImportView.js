@@ -36,7 +36,7 @@ export class ImportView extends AppView {
             rulesCheck: { elem: await query('#rulesCheck') },
             rulesBtn: { elem: await query('#rulesBtn') },
             rulesCount: { elem: await query('#rulescount') },
-            submitBtn: await query('#submitbtn'),
+            submitBtn: { elem: await query('#submitbtn') },
             submitProgress: { elem: await query('#submitProgress') },
         };
 
@@ -46,16 +46,16 @@ export class ImportView extends AppView {
 
         if (
             !res.title.elem
-            || !res.uploadBtn
+            || !res.uploadBtn.elem
             || !res.mainAccountSelect
-            || !res.addBtn
-            || !res.clearBtn
+            || !res.addBtn.elem
+            || !res.clearBtn.elem
             || !res.totalCount.elem
             || !res.enabledCount.elem
             || !res.rulesCheck.elem
             || !res.rulesBtn.elem
             || !res.rulesCount.elem
-            || !res.submitBtn
+            || !res.submitBtn.elem
             || !res.submitProgress.elem
         ) {
             throw new Error('Invalid structure of import view');
@@ -79,16 +79,14 @@ export class ImportView extends AppView {
         const rulesDialogPopup = await query(this.rulesPopupId);
         res.rulesDialog = await ImportRulesDialog.create(this, rulesDialogPopup);
 
-        res.submitProgress.visible = await TestComponent.isVisible(res.submitProgress.elem);
-
         return res;
     }
 
     async buildModel(cont) {
         const res = {};
 
-        const uploadVisible = await TestComponent.isVisible(cont.uploadDialog);
-        const rulesVisible = await TestComponent.isVisible(cont.rulesDialog);
+        const uploadVisible = !!cont.uploadDialog?.content?.visible;
+        const rulesVisible = !!cont.rulesDialog?.content?.visible;
         if (uploadVisible && !rulesVisible) {
             res.state = 'upload';
         } else if (!uploadVisible && rulesVisible) {
@@ -115,24 +113,16 @@ export class ImportView extends AppView {
 
     getExpectedState(model) {
         const res = {
-            visibility: {
-                uploadBtn: true,
-                mainAccountSelect: true,
-                addBtn: true,
-                clearBtn: true,
-                totalCount: true,
-                enabledCount: true,
-                rulesCount: true,
-                itemsList: true,
-            },
-            values: {
-                title: model.title.toString(),
-                mainAccountSelect: model.mainAccount.toString(),
-                totalCount: model.totalCount.toString(),
-                enabledCount: model.enabledCount.toString(),
-                rulesCheck: { checked: model.rulesEnabled },
-                rulesCount: model.rulesCount.toString(),
-            },
+            addBtn: { visible: true },
+            clearBtn: { visible: true },
+            uploadBtn: { visible: true },
+            title: { value: model.title.toString(), visible: true },
+            mainAccountSelect: { value: model.mainAccount.toString(), visible: true },
+            totalCount: { value: model.totalCount.toString(), visible: true },
+            enabledCount: { value: model.enabledCount.toString(), visible: true },
+            rulesCheck: { checked: model.rulesEnabled },
+            rulesCount: { value: model.rulesCount.toString(), visible: true },
+            itemsList: { visible: true },
         };
 
         return res;
@@ -570,12 +560,12 @@ export class ImportView extends AppView {
     async submit() {
         this.checkMainState();
 
-        const disabled = await prop(this.content.submitBtn, 'disabled');
+        const disabled = await prop(this.content.submitBtn.elem, 'disabled');
         if (disabled) {
             throw new ImportViewSubmitError('Submit is not available');
         }
 
-        await this.performAction(() => click(this.content.submitBtn));
+        await this.performAction(() => click(this.content.submitBtn.elem));
         await waitForFunction(async () => {
             await this.parse();
 
