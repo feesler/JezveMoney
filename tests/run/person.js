@@ -3,11 +3,12 @@ import {
     copyObject,
     assert,
 } from 'jezve-test';
-import { formatProps } from '../common.js';
+import { formatProps, generateId } from '../common.js';
 import { PersonsView } from '../view/PersonsView.js';
 import { PersonView } from '../view/PersonView.js';
 import { MainView } from '../view/MainView.js';
 import { App } from '../Application.js';
+import { setBlock, baseUrl, goTo } from '../env.js';
 
 /** Navigate to persons list page */
 async function checkNavigation() {
@@ -222,6 +223,34 @@ export async function toggleSelect(persons) {
         await App.view.selectPersons(indexes);
         items = App.view.getItems();
         assert.deepMeet(items, expectedItems);
+
+        return true;
+    });
+}
+
+/** Check navigation to update not existing person */
+export async function securityTests() {
+    setBlock('Person security', 2);
+
+    let personId;
+
+    do {
+        personId = generateId();
+    } while (App.state.persons.getItem(personId) != null);
+
+    const requestURL = `${baseUrl()}persons/update/${personId}`;
+
+    await test('Access to not existing person', async () => {
+        await goTo(requestURL);
+        if (!(App.view instanceof PersonsView)) {
+            throw new Error('Invalid view');
+        }
+
+        App.view.expectedState = {
+            msgPopup: { success: false, message: 'Fail to update person.' },
+        };
+        await App.view.checkState();
+        await App.view.closeNotification();
 
         return true;
     });

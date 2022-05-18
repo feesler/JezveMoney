@@ -3,9 +3,9 @@ import { MainView } from '../view/MainView.js';
 import { AccountsView } from '../view/AccountsView.js';
 import { Transaction } from '../model/Transaction.js';
 import { Currency } from '../model/Currency.js';
-import { formatProps, createCSV } from '../common.js';
+import { formatProps, createCSV, generateId } from '../common.js';
 import { App } from '../Application.js';
-import { setBlock } from '../env.js';
+import { setBlock, baseUrl, goTo } from '../env.js';
 import { AccountView } from '../view/AccountView.js';
 
 /** Navigate to accounts list page */
@@ -337,6 +337,34 @@ export async function toggleSelect(accounts) {
         await App.view.selectAccounts(indexes);
         items = App.view.getItems();
         assert.deepMeet(items, expectedItems);
+
+        return true;
+    });
+}
+
+/** Check navigation to update not existing account */
+export async function securityTests() {
+    setBlock('Account security', 2);
+
+    let accountId;
+
+    do {
+        accountId = generateId();
+    } while (App.state.accounts.getItem(accountId) != null);
+
+    const requestURL = `${baseUrl()}accounts/update/${accountId}`;
+
+    await test('Access to not existing account', async () => {
+        await goTo(requestURL);
+        if (!(App.view instanceof AccountsView)) {
+            throw new Error('Invalid view');
+        }
+
+        App.view.expectedState = {
+            msgPopup: { success: false, message: 'Fail to update account.' },
+        };
+        await App.view.checkState();
+        await App.view.closeNotification();
 
         return true;
     });

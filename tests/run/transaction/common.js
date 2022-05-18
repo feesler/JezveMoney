@@ -13,8 +13,8 @@ import {
 } from '../../model/Transaction.js';
 import { AccountsList } from '../../model/AccountsList.js';
 import { App } from '../../Application.js';
-import { setBlock } from '../../env.js';
-import { formatProps } from '../../common.js';
+import { setBlock, baseUrl, goTo } from '../../env.js';
+import { formatProps, generateId } from '../../common.js';
 
 export async function runAction({ action, data }) {
     let testDescr = null;
@@ -383,4 +383,32 @@ export async function typeChangeLoop() {
         { action: 'changeTransactionType', data: DEBT },
         { action: 'changeTransactionType', data: EXPENSE },
     ]);
+}
+
+/** Check navigation to update not existing transaction */
+export async function securityTests() {
+    setBlock('Transaction security', 2);
+
+    let transactionId;
+
+    do {
+        transactionId = generateId();
+    } while (App.state.transactions.getItem(transactionId) != null);
+
+    const requestURL = `${baseUrl()}transactions/update/${transactionId}`;
+
+    await test('Access to not existing transaction', async () => {
+        await goTo(requestURL);
+        if (!(App.view instanceof MainView)) {
+            throw new Error('Invalid view');
+        }
+
+        App.view.expectedState = {
+            msgPopup: { success: false, message: 'Fail to update transaction.' },
+        };
+        await App.view.checkState();
+        await App.view.closeNotification();
+
+        return true;
+    });
 }

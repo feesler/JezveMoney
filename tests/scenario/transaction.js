@@ -466,6 +466,7 @@ export const transactionTests = {
 
         await this.prepare();
 
+        await TransactionTests.securityTests();
         await stateLoopTests();
         await createTests();
         await updateTests();

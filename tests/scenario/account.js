@@ -119,6 +119,7 @@ export const accountTests = {
     async run() {
         setBlock('Accounts', 1);
 
+        await AccountTests.securityTests();
         await AccountTests.stateLoop();
 
         await createAccountTests();

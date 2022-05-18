@@ -152,6 +152,9 @@ class Accounts extends TemplateController
         $data["acc_id"] = $acc_id;
 
         $accInfo = $this->model->getItem($acc_id);
+        if (!$accInfo) {
+            $this->fail(ERR_ACCOUNT_UPDATE);
+        }
 
         $currObj = $currMod->getItem($accInfo->curr_id);
         $accInfo->sign = ($currObj) ? $currObj->sign : null;

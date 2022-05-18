@@ -98,6 +98,8 @@ export const personTests = {
     async run() {
         setBlock('Persons', 1);
 
+        await PersonTests.securityTests();
+
         await createTests();
         await hideTests();
         await toggleTests();
