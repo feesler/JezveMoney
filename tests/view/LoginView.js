@@ -3,15 +3,16 @@ import { MainView } from './MainView.js';
 import { RegisterView } from './RegisterView.js';
 import { App } from '../Application.js';
 import { InputRow } from './component/InputRow.js';
+import { navigation, query, click } from '../env.js';
 
 /** Log in view class */
 export class LoginView extends AppView {
     async parseContent() {
         const res = {
-            loginInp: await InputRow.create(this, await this.query('#login-inp-block')),
-            passwordInp: await InputRow.create(this, await this.query('#pwd-inp-block')),
-            submitBtn: await this.query('.form-controls .btn.submit-btn'),
-            registerLink: await this.query('.form-controls .alter_link > a'),
+            loginInp: await InputRow.create(this, await query('#login-inp-block')),
+            passwordInp: await InputRow.create(this, await query('#pwd-inp-block')),
+            submitBtn: await query('.form-controls .btn.submit-btn'),
+            registerLink: await query('.form-controls .alter_link > a'),
         };
 
         if (!res.loginInp || !res.passwordInp || !res.submitBtn || !res.registerLink) {
@@ -24,8 +25,8 @@ export class LoginView extends AppView {
     async buildModel(cont) {
         const res = {};
 
-        res.login = cont.loginInp.value;
-        res.password = cont.passwordInp.value;
+        res.login = cont.loginInp.content.value;
+        res.password = cont.passwordInp.content.value;
 
         return res;
     }
@@ -46,10 +47,10 @@ export class LoginView extends AppView {
     }
 
     async submit() {
-        const action = () => this.click(this.content.submitBtn);
+        const action = () => click(this.content.submitBtn);
 
         if (this.isValid()) {
-            await this.navigation(action);
+            await navigation(action);
             if (!(App.view instanceof MainView)) {
                 throw new Error('Fail to login');
             }
@@ -59,7 +60,7 @@ export class LoginView extends AppView {
     }
 
     async goToRegistration() {
-        await this.navigation(() => this.click(this.content.registerLink));
+        await navigation(() => click(this.content.registerLink));
 
         if (!(App.view instanceof RegisterView)) {
             throw new Error('Unexpected page');

@@ -51,8 +51,8 @@ export class ImportUploadDialog extends Component {
         this.uploader = new ImportFileUploader({
             elem: 'fileBlock',
             parent: this.parent,
-            uploadStarted: this.onUploadStart.bind(this),
-            uploaded: this.onUploaded.bind(this),
+            uploadStarted: () => this.onUploadStart(),
+            uploaded: (data) => this.onUploaded(data),
         });
         this.tplManager = new ImportTemplateManager({
             elem: 'templateBlock',
@@ -60,47 +60,50 @@ export class ImportUploadDialog extends Component {
             currencyModel: this.props.currencyModel,
             tplModel: this.props.tplModel,
             rulesModel: this.model.rules,
-            templateStatus: this.onTemplateStatus.bind(this),
+            templateStatus: (status) => this.onTemplateStatus(status),
         });
 
         this.popup = Popup.create({
             id: 'fileupload_popup',
             title: 'Upload',
             content: this.elem,
-            onclose: this.onClose.bind(this),
+            onclose: () => this.onClose(),
             btn: {
                 closeBtn: true,
             },
             additional: 'upload-popup',
         });
 
-        this.elem.addEventListener('dragenter', this.onDragEnter.bind(this), false);
-        this.elem.addEventListener('dragleave', this.onDragLeave.bind(this), false);
-        this.elem.addEventListener('dragover', this.onDragOver.bind(this), false);
-        this.elem.addEventListener('drop', this.onDrop.bind(this), false);
+        this.elem.addEventListener('dragenter', (e) => this.onDragEnter(e), false);
+        this.elem.addEventListener('dragleave', (e) => this.onDragLeave(e), false);
+        this.elem.addEventListener('dragover', (e) => this.onDragOver(e), false);
+        this.elem.addEventListener('drop', (e) => this.onDrop(e), false);
 
         this.accountDropDown = DropDown.create({
             input_id: 'initialAccount',
-            onchange: this.onAccountChange.bind(this),
+            onchange: (account) => this.onAccountChange(account),
             editable: false,
         });
 
         this.initialAccField = ge('initialAccField');
         this.controlsBlock = this.elem.querySelector('.upload-dialog-controls');
         this.submitUploadedBtn = ge('submitUploadedBtn');
+        this.uploadProgress = ge('uploadProgress');
         if (!this.initialAccField
             || !this.accountDropDown
             || !this.controlsBlock
+            || !this.uploadProgress
             || !this.submitUploadedBtn) {
             throw new Error('Failed to initialize upload file dialog');
         }
 
-        this.submitUploadedBtn.addEventListener('click', this.onSubmit.bind(this));
+        this.submitUploadedBtn.addEventListener('click', () => this.onSubmit());
     }
 
     /** Show/hide dialog */
     show(val) {
         this.popup.show(val);
+        show(this.uploadProgress, false);
     }
 
     /** Hide dialog */
@@ -189,6 +192,13 @@ export class ImportUploadDialog extends Component {
 
     /** Submit event handler */
     onSubmit() {
+        show(this.uploadProgress, true);
+
+        setTimeout(() => this.processItems(), 100);
+    }
+
+    /** Convert uploaded data to import items */
+    processItems() {
         try {
             this.importedItems = this.tplManager.applyTemplate();
         } catch (e) {

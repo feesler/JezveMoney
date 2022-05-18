@@ -123,7 +123,7 @@ class AccountListView extends View {
         this.delAccountsInp.value = totalSelArr.join();
 
         if (totalSelCount === 1) {
-            this.toolbar.updateBtn.setURL(`${baseURL}accounts/edit/${totalSelArr[0]}`);
+            this.toolbar.updateBtn.setURL(`${baseURL}accounts/update/${totalSelArr[0]}`);
         }
 
         if (totalSelCount > 0) {

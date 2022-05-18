@@ -12,6 +12,15 @@ import {
     IMPORT_COND_FIELD_COMMENT,
     ImportCondition,
 } from '../../../model/ImportCondition.js';
+import {
+    query,
+    queryAll,
+    prop,
+    click,
+    input,
+    onChange,
+    isVisible,
+} from '../../../env.js';
 
 const fieldValueTypes = [
     'property',
@@ -46,31 +55,34 @@ const fieldValueMap = {
 
 /** Import condition form */
 export class ImportConditionForm extends TestComponent {
-    async parse() {
-        const fieldElems = await this.queryAll(this.elem, '.field');
-        await asyncMap(fieldElems, (field) => this.parseField(field));
+    async parseContent() {
+        const res = {};
 
-        this.fieldValueCheck = { elem: await this.query(this.elem, '.value-field .checkwrap input[type=checkbox]') };
-        this.deleteBtn = { elem: await this.query(this.elem, '.delete-btn') };
+        const fieldElems = await queryAll(this.elem, '.field');
+        const fields = await asyncMap(fieldElems, (field) => this.parseField(field));
+        fields.forEach((field) => { res[field.name] = field.component; });
+
+        res.fieldValueCheck = { elem: await query(this.elem, '.value-field .checkwrap input[type=checkbox]') };
+        res.deleteBtn = { elem: await query(this.elem, '.delete-btn') };
 
         if (
-            !this.fieldTypeField
-            || !this.operatorField
-            || !this.amountField
-            || !this.accountField
-            || !this.templateField
-            || !this.currencyField
-            || !this.propertyField
-            || !this.textField
-            || !this.fieldValueCheck.elem
-            || !this.deleteBtn.elem
+            !res.fieldTypeField
+            || !res.operatorField
+            || !res.amountField
+            || !res.accountField
+            || !res.templateField
+            || !res.currencyField
+            || !res.propertyField
+            || !res.textField
+            || !res.fieldValueCheck.elem
+            || !res.deleteBtn.elem
         ) {
             throw new Error('Invalid structure of import condition form');
         }
 
-        this.fieldValueCheck.checked = await this.prop(this.fieldValueCheck.elem, 'checked');
+        res.fieldValueCheck.checked = await prop(res.fieldValueCheck.elem, 'checked');
 
-        this.model = this.buildModel(this);
+        return res;
     }
 
     mapField(field) {
@@ -80,8 +92,7 @@ export class ImportConditionForm extends TestComponent {
 
         for (const name in fieldsMap) {
             if (fieldsMap[name] === field.title) {
-                this[`${name}Field`] = field;
-                return;
+                return { name: `${name}Field`, component: field };
             }
         }
 
@@ -95,37 +106,32 @@ export class ImportConditionForm extends TestComponent {
             throw new Error('Invalid field element');
         }
 
-        res.labelElem = await this.query(elem, ':scope > label');
+        res.labelElem = await query(elem, ':scope > label');
         if (!res.labelElem) {
             throw new Error('Invalid structure of field element');
         }
-        res.title = await this.prop(res.labelElem, 'textContent');
+        res.title = await prop(res.labelElem, 'textContent');
 
-        const dropDownElem = await this.query(elem, '.dd__container');
+        const dropDownElem = await query(elem, '.dd__container');
         if (dropDownElem) {
             res.dropDown = await DropDown.create(this, dropDownElem);
             if (!res.dropDown) {
                 throw new Error('Invalid structure of field element');
             }
-            res.disabled = res.dropDown.disabled;
-            res.value = res.dropDown.value;
+            res.disabled = res.dropDown.content.disabled;
+            res.value = res.dropDown.content.value;
         } else {
-            res.inputElem = await this.query(elem, ':scope > div > *');
+            res.inputElem = await query(elem, ':scope > div > *');
             if (!res.inputElem) {
                 throw new Error('Invalid structure of field element');
             }
-            res.disabled = await this.prop(res.inputElem, 'disabled');
-            res.value = await this.prop(res.inputElem, 'value');
+            res.disabled = await prop(res.inputElem, 'disabled');
+            res.value = await prop(res.inputElem, 'value');
         }
 
-        res.environment = this.environment;
-        if (res.environment) {
-            res.environment.inject(res);
-        }
+        res.visible = await isVisible(elem);
 
-        this.mapField(res);
-
-        return res;
+        return this.mapField(res);
     }
 
     static getStateName(model) {
@@ -170,25 +176,24 @@ export class ImportConditionForm extends TestComponent {
 
     static getExpectedState(model) {
         const res = {
-            visibility: {
-                fieldTypeField: true,
-                operatorField: true,
-                deleteBtn: true,
-            },
-            values: {
-                fieldTypeField: { value: model.fieldType.toString() },
-                operatorField: { value: model.operator.toString() },
-                fieldValueCheck: { checked: model.isFieldValue },
-            },
+            fieldTypeField: { value: model.fieldType.toString(), visible: true },
+            operatorField: { value: model.operator.toString(), visible: true },
+            fieldValueCheck: { checked: model.isFieldValue, visible: true },
+            deleteBtn: { visible: true },
         };
+
+        const state = ImportConditionForm.getStateName(model);
 
         fieldValueTypes.forEach((fieldName) => {
             const controlName = `${fieldName}Field`;
-            const visible = model.state === fieldName;
+            const visible = state === fieldName;
 
-            res.visibility[controlName] = visible;
+            if (!res[controlName]) {
+                res[controlName] = {};
+            }
+            res[controlName].visible = visible;
             if (visible) {
-                res.values[controlName] = { value: model.value.toString() };
+                res[controlName].value = model.value.toString();
             }
         });
 
@@ -206,7 +211,7 @@ export class ImportConditionForm extends TestComponent {
         this.model.value = ImportConditionForm.getStateValue(this.model);
         this.expectedState = ImportConditionForm.getExpectedState(this.model);
 
-        await this.fieldTypeField.dropDown.selectItem(fieldId);
+        await this.content.fieldTypeField.dropDown.selectItem(fieldId);
         await this.parse();
 
         return this.checkState();
@@ -221,11 +226,11 @@ export class ImportConditionForm extends TestComponent {
         this.model.value = ImportConditionForm.getStateValue(this.model);
         this.expectedState = ImportConditionForm.getExpectedState(this.model);
 
-        const control = this[`${name}Field`];
+        const control = this.content[`${name}Field`];
         if (control.dropDown) {
             await control.dropDown.selectItem(parseInt(value, 10));
         } else {
-            await this.input(control.inputElem, value.toString());
+            await input(control.inputElem, value.toString());
         }
         await this.parse();
 
@@ -237,7 +242,7 @@ export class ImportConditionForm extends TestComponent {
         this.model.value = ImportConditionForm.getStateValue(this.model);
         this.expectedState = ImportConditionForm.getExpectedState(this.model);
 
-        await this.operatorField.dropDown.selectItem(value);
+        await this.content.operatorField.dropDown.selectItem(value);
         await this.parse();
 
         return this.checkState();
@@ -265,8 +270,8 @@ export class ImportConditionForm extends TestComponent {
         this.model.value = ImportConditionForm.getStateValue(this.model);
         this.expectedState = ImportConditionForm.getExpectedState(this.model);
 
-        await this.click(this.fieldValueCheck.elem);
-        await this.onChange(this.fieldValueCheck.elem);
+        await click(this.content.fieldValueCheck.elem);
+        await onChange(this.content.fieldValueCheck.elem);
         await this.parse();
 
         return this.checkState();
@@ -281,6 +286,6 @@ export class ImportConditionForm extends TestComponent {
     }
 
     async clickDelete() {
-        return this.click(this.deleteBtn.elem);
+        return click(this.content.deleteBtn.elem);
     }
 }

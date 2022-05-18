@@ -2,6 +2,7 @@ import { test } from 'jezve-test';
 import * as TransactionTests from './common.js';
 import { TRANSFER } from '../../model/Transaction.js';
 import { App } from '../../Application.js';
+import { setBlock } from '../../env.js';
 
 export async function submit(params) {
     if ('srcAcc' in params) {
@@ -63,7 +64,7 @@ export async function stateLoop() {
     await App.view.goToNewTransactionByAccount(0);
     await App.view.changeTransactionType(TRANSFER);
 
-    App.view.setBlock('Transfer loop', 2);
+    setBlock('Transfer loop', 2);
     await test('Initial state of new transfer view', () => {
         App.view.setExpectedState(0);
         return App.view.checkState();
@@ -81,6 +82,7 @@ export async function stateLoop() {
         '.',
         '.0',
         '.09',
+        '',
     ];
     await TransactionTests.runGroup('inputSrcAmount', saInputData);
 

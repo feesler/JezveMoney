@@ -2,6 +2,7 @@ import { test } from 'jezve-test';
 import * as TransactionTests from './common.js';
 import { DEBT } from '../../model/Transaction.js';
 import { App } from '../../Application.js';
+import { setBlock } from '../../env.js';
 
 export async function submit(params) {
     if ('acc' in params) {
@@ -71,7 +72,7 @@ export async function stateLoop() {
     await App.view.goToNewTransactionByAccount(0);
     await App.view.changeTransactionType(DEBT);
 
-    App.view.setBlock('Debt loop', 2);
+    setBlock('Debt loop', 2);
     const initialState = (App.view.model.debtType) ? 0 : 3;
     await test('Initial state of new debt view', () => {
         App.view.setExpectedState(initialState);

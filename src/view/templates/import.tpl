@@ -70,6 +70,10 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <input id="submitbtn" class="btn submit-btn" type="button" value="ok" disabled>
                         </div>
                     </div>
+                    <div id="submitProgress" class="submit-progress hidden">
+                        <div>Saving items...</div>
+                        <div id="submitProgressIndicator"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -165,6 +169,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
     <div class="upload-dialog-controls hidden">
         <input id="submitUploadedBtn" class="btn submit-btn" type="button" value="Ok">
     </div>
+    <div id="uploadProgress" class="upload-dialog__loading hidden">Loading...</div>
 </div>
 
 <div id="rulesDialog" class="rules-dialog hidden">

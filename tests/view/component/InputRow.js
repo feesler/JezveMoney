@@ -1,56 +1,67 @@
 import { TestComponent } from 'jezve-test';
 import { DropDown } from './DropDown.js';
+import {
+    query,
+    prop,
+    hasClass,
+    input,
+} from '../../env.js';
 
 export class InputRow extends TestComponent {
-    async parse() {
-        this.labelEl = await this.query(this.elem, 'label');
-        if (!this.labelEl) {
+    async parseContent() {
+        const res = {
+            labelEl: await query(this.elem, 'label'),
+        };
+
+        if (!res.labelEl) {
             throw new Error('Label element not found');
         }
-        this.label = await this.prop(this.labelEl, 'textContent');
+        res.label = await prop(res.labelEl, 'textContent');
 
-        this.currElem = await this.query(this.elem, '.btn.input-group__btn');
-        this.isCurrActive = false;
-        if (this.currElem) {
-            this.isCurrActive = !await this.hasClass(this.currElem, 'input-group__btn_inactive');
-            if (this.isCurrActive) {
-                const ddElem = await this.query(this.currElem, ':scope > *');
-                this.currDropDown = await DropDown.create(this.parent, ddElem);
-                if (!this.currDropDown.isAttached) {
+        res.currElem = await query(this.elem, '.btn.input-group__btn');
+        res.isCurrActive = false;
+        if (res.currElem) {
+            res.isCurrActive = !await hasClass(res.currElem, 'input-group__btn_inactive');
+            if (res.isCurrActive) {
+                const ddElem = await query(res.currElem, ':scope > *');
+                res.currDropDown = await DropDown.create(this.parent, ddElem);
+                if (!res.currDropDown.content.isAttached) {
                     throw new Error('Currency drop down is not attached');
                 }
             }
 
-            this.currSignElem = await this.query(this.currElem, '.input-group__btn-title');
-            this.currSign = await this.prop(this.currSignElem, 'textContent');
+            res.currSignElem = await query(res.currElem, '.input-group__btn-title');
+            res.currSign = await prop(res.currSignElem, 'textContent');
         } else {
-            const datePickerContainer = await this.query('#calendar');
+            const datePickerContainer = await query('#calendar');
             if (datePickerContainer) {
-                this.datePickerBtn = await this.query(this.elem, '.btn.icon-btn');
+                res.datePickerBtn = await query(this.elem, '.btn.icon-btn');
             }
         }
 
-        const hiddenInpElem = await this.query(this.elem, 'input[type="hidden"]');
+        const hiddenInpElem = await query(this.elem, 'input[type="hidden"]');
         if (hiddenInpElem) {
-            this.hiddenValue = await this.prop(hiddenInpElem, 'value');
+            res.hiddenValue = await prop(hiddenInpElem, 'value');
         }
 
-        this.valueInput = await this.query(this.elem, '.stretch-input > input');
-        this.value = await this.prop(this.valueInput, 'value');
+        res.valueInput = await query(this.elem, '.stretch-input > input');
+        res.value = await prop(res.valueInput, 'value');
 
-        this.validationEnabled = await this.hasClass(this.elem, 'validation-block');
-        if (this.validationEnabled) {
-            this.isInvalid = await this.hasClass(this.elem, 'invalid-block');
-            this.feedBackElem = await this.query(this.elem, '.invalid-feedback');
-            if (!this.feedBackElem) {
+        res.validationEnabled = await hasClass(this.elem, 'validation-block');
+        if (res.validationEnabled) {
+            res.isInvalid = await hasClass(this.elem, 'invalid-block');
+            res.feedBackElem = await query(this.elem, '.invalid-feedback');
+            if (!res.feedBackElem) {
                 throw new Error('Validation feedback element not found');
             }
-            this.feedbackText = await this.prop(this.feedBackElem, 'textContent');
+            res.feedbackText = await prop(res.feedBackElem, 'textContent');
         }
+
+        return res;
     }
 
     async input(val) {
-        return this.environment.input(this.valueInput, val.toString());
+        return input(this.content.valueInput, val.toString());
     }
 
     async selectCurr(currencyId) {
@@ -58,8 +69,8 @@ export class InputRow extends TestComponent {
             throw new Error('Invalid currency id');
         }
 
-        if (this.isCurrActive && this.currDropDown) {
-            await this.currDropDown.setSelection(currencyId);
+        if (this.content.isCurrActive && this.content.currDropDown) {
+            await this.content.currDropDown.setSelection(currencyId);
         }
     }
 }

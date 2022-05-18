@@ -1,56 +1,60 @@
 import { TestComponent } from 'jezve-test';
 import { asyncMap } from '../../common.js';
+import { query, queryAll, prop } from '../../env.js';
 
 export class Header extends TestComponent {
-    async parse() {
+    async parseContent() {
         // no header is ok for login view
         if (!this.elem) {
-            return;
+            return {};
         }
 
-        this.logo = {};
-        this.logo.elem = await this.query(this.elem, '.logo');
-        if (!this.logo.elem) {
+        const res = {
+            logo: { elem: await query(this.elem, '.logo') },
+        };
+
+        if (!res.logo.elem) {
             throw new Error('Logo element not found');
         }
 
-        this.logo.linkElem = await this.query(this.logo.elem, 'a');
-        if (!this.logo.linkElem) {
+        res.logo.linkElem = await query(res.logo.elem, 'a');
+        if (!res.logo.linkElem) {
             throw new Error('Logo link element not found');
         }
 
-        this.user = {};
-        this.user.elem = await this.query(this.elem, '.user-block');
-        if (this.user.elem) {
-            this.user.menuBtn = await this.query(this.elem, 'button.user-menu-btn');
-            if (!this.user.menuBtn) {
+        res.user = { elem: await query(this.elem, '.user-block') };
+        if (res.user.elem) {
+            res.user.menuBtn = await query(this.elem, 'button.user-menu-btn');
+            if (!res.user.menuBtn) {
                 throw new Error('User button not found');
             }
-            const el = await this.query(this.user.menuBtn, '.user__title');
+            const el = await query(res.user.menuBtn, '.user__title');
             if (!el) {
                 throw new Error('User title element not found');
             }
-            this.user.name = await this.prop(el, 'textContent');
+            res.user.name = await prop(el, 'textContent');
 
-            this.user.menuEl = await this.query(this.elem, '.user-menu');
-            if (!this.user.menuEl) {
+            res.user.menuEl = await query(this.elem, '.user-menu');
+            if (!res.user.menuEl) {
                 throw new Error('Menu element not found');
             }
 
-            const menuLinks = await this.queryAll(this.user.menuEl, 'ul > li > a');
-            this.user.menuItems = await asyncMap(menuLinks, async (elem) => ({
+            const menuLinks = await queryAll(res.user.menuEl, 'ul > li > a');
+            res.user.menuItems = await asyncMap(menuLinks, async (elem) => ({
                 elem,
-                link: await this.prop(elem, 'href'),
-                text: await this.prop(elem, 'textContent'),
+                link: await prop(elem, 'href'),
+                text: await prop(elem, 'textContent'),
             }));
-            if (this.user.menuItems.length < 2) {
+            if (res.user.menuItems.length < 2) {
                 throw new Error('Invalid user menu');
             }
 
-            const itemShift = (this.user.menuItems.length > 2) ? 1 : 0;
+            const itemShift = (res.user.menuItems.length > 2) ? 1 : 0;
 
-            this.user.profileBtn = this.user.menuItems[itemShift].elem;
-            this.user.logoutBtn = this.user.menuItems[itemShift + 1].elem;
+            res.user.profileBtn = res.user.menuItems[itemShift].elem;
+            res.user.logoutBtn = res.user.menuItems[itemShift + 1].elem;
         }
+
+        return res;
     }
 }

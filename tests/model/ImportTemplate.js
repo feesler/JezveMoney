@@ -1,4 +1,5 @@
 import { copyObject } from 'jezvejs';
+import { assert } from 'jezve-test';
 import { formatDate } from 'jezvejs/DateUtils';
 import { fixFloat, fixDate } from '../common.js';
 import { Currency } from './Currency.js';
@@ -36,14 +37,8 @@ export class ImportTemplate {
 
     /** Extract specified column data from raw data row */
     static getColumn(row, colInd) {
-        if (!Array.isArray(row)) {
-            throw new Error('Invalid row');
-        }
-
         const col = parseInt(colInd, 10);
-        if (Number.isNaN(col) || col < 1 || col > row.length) {
-            throw new Error(`Invalid column ${colInd}. Total columns: ${row.length}`);
-        }
+        assert.arrayIndex(row, col - 1, `Invalid column ${colInd}. Total columns: ${row.length}`);
 
         return row[col - 1];
     }

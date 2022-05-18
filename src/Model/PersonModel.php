@@ -58,7 +58,7 @@ class PersonModel extends CachedTable
     }
 
 
-    protected function checkParams($params, $isUpdate = false)
+    protected function validateParams($params, $isUpdate = false)
     {
         $avFields = ["name", "flags"];
         $res = [];
@@ -104,7 +104,7 @@ class PersonModel extends CachedTable
     // Preparations for item create
     protected function preCreate($params, $isMultiple = false)
     {
-        $res = $this->checkParams($params);
+        $res = $this->validateParams($params);
         if (is_null($res)) {
             return null;
         }
@@ -149,7 +149,7 @@ class PersonModel extends CachedTable
             return false;
         }
 
-        $res = $this->checkParams($params, true);
+        $res = $this->validateParams($params, true);
         if (is_null($res)) {
             return null;
         }

@@ -1,5 +1,6 @@
-import { test, copyObject } from 'jezve-test';
+import { test, copyObject, assert } from 'jezve-test';
 import { App } from '../Application.js';
+import { baseUrl, httpReq, setBlock } from '../env.js';
 import { Currency } from '../model/Currency.js';
 import { ImportTemplate } from '../model/ImportTemplate.js';
 import { ImportTransaction } from '../model/ImportTransaction.js';
@@ -97,12 +98,12 @@ function findSimilar(transaction, skipList) {
 
 /** Admin access required */
 export async function putFile(data) {
-    const baseURL = App.environment.baseUrl();
+    const baseURL = baseUrl();
     const uploadURL = `${baseURL}admin/tests/upload`;
     const defErrorMessage = 'Request failed';
 
     try {
-        const response = await App.environment.httpReq(
+        const response = await httpReq(
             'POST',
             uploadURL,
             data.toString(),
@@ -127,14 +128,14 @@ export async function putFile(data) {
 
 /** Admin access required */
 export async function removeFile(filename) {
-    const baseURL = App.environment.baseUrl();
+    const baseURL = baseUrl();
     const removeURL = `${baseURL}admin/tests/remove`;
     const defErrorMessage = 'Request failed';
 
     try {
         const data = { filename };
 
-        const response = await App.environment.httpReq(
+        const response = await httpReq(
             'POST',
             removeURL,
             data,
@@ -180,9 +181,7 @@ export async function addItem() {
 
         await App.view.addItem();
 
-        App.view.expectedState = {
-            values: { itemsList },
-        };
+        App.view.expectedState = { itemsList };
         return App.view.checkState();
     });
 }
@@ -265,10 +264,10 @@ export async function submitUploaded(params) {
         let itemsList;
         if (params.account) {
             itemsList = {};
-            itemsList.items = App.view.content.itemsList.items.map(
+            itemsList.items = App.view.content.itemsList.content.items.map(
                 (item) => {
                     const model = item.onChangeMainAccount(item.model, params.account);
-                    return copyObject(item.getExpectedState(model).values);
+                    return copyObject(item.getExpectedState(model));
                 },
             );
         } else {
@@ -290,9 +289,7 @@ export async function submitUploaded(params) {
 
         await App.view.submitUploaded();
 
-        App.view.expectedState = {
-            values: { itemsList },
-        };
+        App.view.expectedState = { itemsList };
 
         return App.view.checkState();
     });
@@ -310,7 +307,7 @@ export async function changeMainAccount(accountId) {
         await checkNavigation();
 
         const skipList = [];
-        const itemsData = App.view.content.itemsList.items.map((item) => {
+        const itemsData = App.view.content.itemsList.content.items.map((item) => {
             // Reapply rules
             if (item.model.original && App.view.isRulesEnabled()) {
                 /* eslint-disable-next-line no-param-reassign */
@@ -347,16 +344,14 @@ export async function changeMainAccount(accountId) {
             /* eslint-disable-next-line no-param-reassign */
             item.model = item.onChangeMainAccount(item.model, accountId);
 
-            return copyObject(item.getExpectedState(item.model).values);
+            return copyObject(item.getExpectedState(item.model));
         });
 
         await App.view.selectMainAccount(accountId);
 
         App.view.expectedState = {
-            values: {
-                itemsList: {
-                    items: itemsData,
-                },
+            itemsList: {
+                items: itemsData,
             },
         };
         return App.view.checkState();
@@ -376,7 +371,7 @@ export async function enableRules(value = true) {
 
         // Apply rules or restore original import data according to enable flag
         // and convert to expected state of ImportListItem component
-        const itemsData = App.view.content.itemsList.items.map((item) => {
+        const itemsData = App.view.content.itemsList.content.items.map((item) => {
             let model;
 
             if (item.model.original) {
@@ -410,17 +405,15 @@ export async function enableRules(value = true) {
                 model = item.model;
             }
 
-            const result = item.getExpectedState(model).values;
+            const result = item.getExpectedState(model);
             return copyObject(result);
         });
 
         await App.view.enableRules(enable);
 
         App.view.expectedState = {
-            values: {
-                itemsList: {
-                    items: itemsData,
-                },
+            itemsList: {
+                items: itemsData,
             },
         };
 
@@ -443,9 +436,7 @@ export async function enableItems({ index, value = true }) {
         await App.view.enableItems(index, enable);
 
         App.view.expectedState = {
-            values: {
-                itemsList: App.view.content.itemsList.getExpectedState(),
-            },
+            itemsList: App.view.content.itemsList.getExpectedState(),
         };
 
         return App.view.checkState();
@@ -458,7 +449,7 @@ export async function updateItem(params) {
         throw new Error('Invalid parameters');
     }
 
-    App.view.setBlock(`Update item [${params.pos}]`, 2);
+    setBlock(`Update item [${params.pos}]`, 2);
 
     await checkNavigation();
 
@@ -512,9 +503,7 @@ export async function updateItem(params) {
      * because ImportList.render() method use transaction data objects
      */
     App.view.expectedState = {
-        values: {
-            itemsList: App.view.content.itemsList.getExpectedState(),
-        },
+        itemsList: App.view.content.itemsList.getExpectedState(),
     };
     await test('View state', () => App.view.checkState());
 }
@@ -535,9 +524,7 @@ export async function deleteItems(indexes) {
         itemInds.sort();
         for (const ind of itemInds) {
             const index = parseInt(ind, 10);
-            if (Number.isNaN(index) || index < 0 || index > itemsList.items.length) {
-                throw new Error(`Invalid item index: ${ind}`);
-            }
+            assert.arrayIndex(itemsList.items, index);
 
             expected.splice(ind - removed, 1);
             removed += 1;
@@ -546,7 +533,7 @@ export async function deleteItems(indexes) {
         await App.view.deleteItem(itemInds);
 
         App.view.expectedState = {
-            values: { itemsList: { items: expected } },
+            itemsList: { items: expected },
         };
 
         return App.view.checkState();
@@ -563,7 +550,7 @@ export async function deleteAllItems() {
         await App.view.deleteAllItems();
 
         App.view.expectedState = {
-            values: { itemsList: { items: [] } },
+            itemsList: { items: [] },
         };
 
         return App.view.checkState();
@@ -595,15 +582,11 @@ export async function submit() {
             if (isValid) {
                 App.view.expectedState = {
                     msgPopup: okNotification,
-                    values: {
-                        itemsList: { items: [] },
-                    },
+                    itemsList: { items: [] },
                 };
             } else {
                 App.view.expectedState = {
-                    values: {
-                        itemsList: App.view.content.itemsList.getExpectedState(),
-                    },
+                    itemsList: App.view.content.itemsList.getExpectedState(),
                 };
             }
             await App.view.checkState();

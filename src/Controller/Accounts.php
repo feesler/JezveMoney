@@ -71,8 +71,8 @@ class Accounts extends TemplateController
 
         $this->template = new Template(TPL_PATH . "account.tpl");
         $data = [
-            "headString" => "New account",
-            "titleString" => "Jezve Money | New account"
+            "headString" => "Create account",
+            "titleString" => "Jezve Money | Create account"
         ];
 
         $currMod = CurrencyModel::getInstance();
@@ -152,6 +152,9 @@ class Accounts extends TemplateController
         $data["acc_id"] = $acc_id;
 
         $accInfo = $this->model->getItem($acc_id);
+        if (!$accInfo) {
+            $this->fail(ERR_ACCOUNT_UPDATE);
+        }
 
         $currObj = $currMod->getItem($accInfo->curr_id);
         $accInfo->sign = ($currObj) ? $currObj->sign : null;

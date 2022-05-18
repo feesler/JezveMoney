@@ -109,6 +109,12 @@ body.white-theme,
   color: #202020;
 }
 
+.white-theme .dd__container.dd__container_disabled .dd__combo {
+  color: #a0a0a0;
+  border-color: #ffffff;
+  background-color: #ffffff;
+}
+
 .white-theme .dd__list {
   background-color: #ffffff;
   border-right-color: #000000;
@@ -186,15 +192,25 @@ body.white-theme,
 }
 
 /* Transaction list */
-.dark-theme .paginator-item,
-.dark-theme a.paginator-arrow:hover {
+.white-theme .paginator-item,
+.white-theme a.paginator-arrow:hover {
   border-color: #ffffff;
 }
 
 /* Transaction list item */
 .white-theme .trans-list_details td > div,
+.white-theme table.trans-list-items td > div,
 .white-theme .trans-list_details tr.trans-list__item_selected > td > div {
   background-color: #f0f0f0;
+}
+
+.white-theme .trans-list__item-comment {
+  border-left-color: #808080;
+}
+
+.white-theme .trans-list_details .trans-list__item-comment,
+.white-theme table.trans-list-items .trans-list__item-comment {
+  color: #808080;
 }
 
 .white-theme .trans-list__item,
@@ -209,14 +225,6 @@ body.white-theme,
 }
 
 .white-theme .trans-list__item-details {
-  color: #808080;
-}
-
-.white-theme .trans-list__item-comment {
-  border-left-color: #808080;
-}
-
-.white-theme .trans-list_details .trans-list__item-comment {
   color: #808080;
 }
 

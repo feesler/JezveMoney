@@ -1,7 +1,10 @@
-import { TestComponent, copyObject } from 'jezve-test';
+import { copyObject } from 'jezvejs';
+import { TestComponent } from 'jezve-test';
+import { ImportRuleItemConditions } from './ImportRuleItemConditions.js';
 import { ImportConditionItem } from './ImportConditionItem.js';
+import { ImportRuleItemActions } from './ImportRuleItemActions.js';
 import { ImportActionItem } from './ImportActionItem.js';
-import { asyncMap } from '../../../common.js';
+import { query, prop, click } from '../../../env.js';
 
 export class ImportRuleItem extends TestComponent {
     constructor(parent, elem, mainAccount) {
@@ -12,57 +15,56 @@ export class ImportRuleItem extends TestComponent {
         this.model = {};
     }
 
-    async parse() {
-        this.ruleId = await this.prop(this.elem, 'dataset.id');
-
-        this.propertyElem = await this.query(this.elem, '.rule-item__property');
-        this.operatorElem = await this.query(this.elem, '.rule-item__operator');
-        this.valueElem = await this.query(this.elem, '.rule-item__value');
-        if (!this.valueElem) {
-            this.valueElem = await this.query(this.elem, '.rule-item__value-property');
+    async parseContent() {
+        if (!this.elem) {
+            throw new Error('Invalid import rule item');
         }
-        this.infoElem = await this.query(this.elem, '.rule-item__info');
 
-        this.updateBtn = await this.query(this.elem, '.update-btn');
-        this.deleteBtn = await this.query(this.elem, '.delete-btn');
-        this.toggleBtn = await this.query(this.elem, '.toggle-btn');
+        const res = {
+            ruleId: await prop(this.elem, 'dataset.id'),
+            propertyElem: { elem: await query(this.elem, '.rule-item__property') },
+            operatorElem: { elem: await query(this.elem, '.rule-item__operator') },
+            valueElem: { elem: await query(this.elem, '.rule-item__value') },
+            infoElem: { elem: await query(this.elem, '.rule-item__info') },
+            updateBtn: { elem: await query(this.elem, '.update-btn') },
+            deleteBtn: { elem: await query(this.elem, '.delete-btn') },
+            toggleBtn: { elem: await query(this.elem, '.toggle-btn') },
+        };
 
-        this.conditions = { elem: await this.query(this.elem, '.rule-item__conditions') };
-        this.actions = { elem: await this.query(this.elem, '.rule-item__actions') };
+        if (!res.valueElem.elem) {
+            res.valueElem.elem = await query(this.elem, '.rule-item__value-property');
+        }
+
+        const conditionsElem = await query(this.elem, '.rule-item__conditions');
+        res.conditions = await ImportRuleItemConditions.create(this, conditionsElem);
+
+        const actionsElem = await query(this.elem, '.rule-item__actions');
+        res.actions = await ImportRuleItemActions.create(this, actionsElem);
+
         if (
-            !this.propertyElem
-            || !this.operatorElem
-            || !this.valueElem
-            || !this.infoElem
-            || !this.updateBtn
-            || !this.deleteBtn
-            || !this.toggleBtn
-            || !this.conditions.elem
-            || !this.actions.elem
+            !res.propertyElem.elem
+            || !res.operatorElem.elem
+            || !res.valueElem.elem
+            || !res.infoElem.elem
+            || !res.updateBtn.elem
+            || !res.deleteBtn.elem
+            || !res.toggleBtn.elem
+            || !res.conditions.elem
+            || !res.actions.elem
         ) {
             throw new Error('Invalid structure of import item');
         }
 
-        this.conditions.items = await asyncMap(
-            await this.queryAll(this.conditions.elem, '.cond-item'),
-            async (elem) => ImportConditionItem.create(this, elem),
-        );
-
-        this.actions.items = await asyncMap(
-            await this.queryAll(this.elem, '.action-item'),
-            async (elem) => ImportActionItem.create(this, elem),
-        );
-
-        this.model = this.buildModel(this);
+        return res;
     }
 
     buildModel(cont) {
         const res = {
             id: parseInt(cont.ruleId, 10),
-            conditions: cont.conditions.items.map(
+            conditions: cont.conditions.content.items.map(
                 (item) => copyObject(item.model),
             ),
-            actions: cont.actions.items.map(
+            actions: cont.actions.content.items.map(
                 (item) => copyObject(item.model),
             ),
         };
@@ -72,45 +74,41 @@ export class ImportRuleItem extends TestComponent {
 
     static getExpectedState(model) {
         const res = {
-            visibility: {
-                propertyElem: true,
-                operatorElem: true,
-                valueElem: true,
-                infoElem: true,
-                updateBtn: true,
-                deleteBtn: true,
-            },
-            values: {
-                conditions: {},
-                actions: {},
-            },
+            propertyElem: { visible: true },
+            operatorElem: { visible: true },
+            valueElem: { visible: true },
+            infoElem: { visible: true },
+            updateBtn: { visible: true },
+            deleteBtn: { visible: true },
+            conditions: {},
+            actions: {},
         };
 
         if (model.id) {
-            res.values.ruleId = model.id.toString();
+            res.ruleId = model.id.toString();
         }
 
-        res.values.conditions.items = model.conditions.map(
-            (item) => ImportConditionItem.getExpectedState(item).values,
+        res.conditions.items = model.conditions.map(
+            (item) => ImportConditionItem.getExpectedState(item),
         );
 
-        res.values.actions.items = model.actions.map(
-            (item) => ImportActionItem.getExpectedState(item).values,
+        res.actions.items = model.actions.map(
+            (item) => ImportActionItem.getExpectedState(item),
         );
 
         return res;
     }
 
     async toggleExpand() {
-        return this.click(this.toggleBtn);
+        return click(this.content.toggleBtn.elem);
     }
 
     async clickUpdate() {
-        return this.click(this.updateBtn);
+        return click(this.content.updateBtn.elem);
     }
 
     async clickDelete() {
-        return this.click(this.deleteBtn);
+        return click(this.content.deleteBtn.elem);
     }
 
     /**

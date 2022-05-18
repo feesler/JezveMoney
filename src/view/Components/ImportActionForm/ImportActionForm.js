@@ -76,7 +76,7 @@ export class ImportActionForm extends Component {
         this.amountInput = ce('input', { type: 'text' });
         this.decAmountInput = DecimalInput.create({
             elem: this.amountInput,
-            oninput: this.onValueChange.bind(this),
+            oninput: () => this.onValueChange(),
         });
         this.amountField = createField('Amount', this.amountInput);
         // Create value input element
@@ -84,7 +84,7 @@ export class ImportActionForm extends Component {
             'input',
             { type: 'text' },
             null,
-            { input: this.onValueChange.bind(this) },
+            { input: () => this.onValueChange() },
         );
         this.valueField = createField('Value', this.valueInput);
         // Form fields container
@@ -108,7 +108,7 @@ export class ImportActionForm extends Component {
             'button',
             { className: 'btn icon-btn delete-btn right-align', type: 'button' },
             createIcon('del'),
-            { click: this.onDelete.bind(this) },
+            { click: () => this.onDelete() },
         );
 
         this.controls = createContainer('action-form__controls', [
@@ -130,7 +130,7 @@ export class ImportActionForm extends Component {
 
         this.actionDropDown = DropDown.create({
             input_id: selectElem,
-            onchange: this.onActionTypeChange.bind(this),
+            onchange: (action) => this.onActionTypeChange(action),
             editable: false,
         });
         this.actionDropDown.append(items);
@@ -145,7 +145,7 @@ export class ImportActionForm extends Component {
 
         this.trTypeDropDown = DropDown.create({
             input_id: selectElem,
-            onchange: this.onValueChange.bind(this),
+            onchange: () => this.onValueChange(),
             editable: false,
         });
         this.trTypeDropDown.append(items);
@@ -163,7 +163,7 @@ export class ImportActionForm extends Component {
 
         this.accountDropDown = DropDown.create({
             input_id: selectElem,
-            onchange: this.onValueChange.bind(this),
+            onchange: () => this.onValueChange(),
             editable: false,
         });
         this.accountDropDown.append(items);
@@ -179,7 +179,7 @@ export class ImportActionForm extends Component {
 
         this.personDropDown = DropDown.create({
             input_id: selectElem,
-            onchange: this.onValueChange.bind(this),
+            onchange: () => this.onValueChange(),
             editable: false,
         });
         this.personDropDown.append(items);

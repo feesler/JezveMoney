@@ -1,10 +1,11 @@
-import { test, copyObject, checkObjValue } from 'jezve-test';
+import { test, copyObject, assert } from 'jezve-test';
 import { MainView } from '../view/MainView.js';
 import { AccountsView } from '../view/AccountsView.js';
 import { Transaction } from '../model/Transaction.js';
 import { Currency } from '../model/Currency.js';
-import { formatProps, createCSV } from '../common.js';
+import { formatProps, createCSV, generateId } from '../common.js';
 import { App } from '../Application.js';
+import { setBlock, baseUrl, goTo } from '../env.js';
 import { AccountView } from '../view/AccountView.js';
 
 /** Navigate to accounts list page */
@@ -16,7 +17,7 @@ async function checkNavigation() {
 }
 
 export async function stateLoop() {
-    App.view.setBlock('View state loop', 2);
+    setBlock('View state loop', 2);
 
     // Navigate to create account view
     await checkNavigation();
@@ -297,7 +298,7 @@ export async function exportTest(accounts) {
         const expectedContent = createCSV({ header, data });
         const content = await App.view.exportAccounts(itemIds);
 
-        return checkObjValue(content.trim(), expectedContent.trim());
+        return assert.deepMeet(content.trim(), expectedContent.trim());
     });
 }
 
@@ -313,9 +314,8 @@ export async function toggleSelect(accounts) {
         const indexes = [];
         for (const pos of itemIds) {
             const ind = parseInt(pos, 10);
-            if (Number.isNaN(ind) || ind < 0 || ind > origItems.length) {
-                throw new Error(`Invalid item index ${pos}`);
-            }
+            assert.arrayIndex(origItems, ind);
+
             indexes.push(ind);
         }
 
@@ -330,13 +330,41 @@ export async function toggleSelect(accounts) {
 
         await App.view.selectAccounts(indexes);
         let items = App.view.getItems();
-        checkObjValue(items, expectedItems);
+        assert.deepMeet(items, expectedItems);
 
         // Click by items again to inverse selection
         expectedItems = origItems;
         await App.view.selectAccounts(indexes);
         items = App.view.getItems();
-        checkObjValue(items, expectedItems);
+        assert.deepMeet(items, expectedItems);
+
+        return true;
+    });
+}
+
+/** Check navigation to update not existing account */
+export async function securityTests() {
+    setBlock('Account security', 2);
+
+    let accountId;
+
+    do {
+        accountId = generateId();
+    } while (App.state.accounts.getItem(accountId) != null);
+
+    const requestURL = `${baseUrl()}accounts/update/${accountId}`;
+
+    await test('Access to not existing account', async () => {
+        await goTo(requestURL);
+        if (!(App.view instanceof AccountsView)) {
+            throw new Error('Invalid view');
+        }
+
+        App.view.expectedState = {
+            msgPopup: { success: false, message: 'Fail to update account.' },
+        };
+        await App.view.checkState();
+        await App.view.closeNotification();
 
         return true;
     });

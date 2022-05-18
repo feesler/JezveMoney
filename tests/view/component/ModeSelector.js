@@ -1,25 +1,28 @@
 import { TestComponent } from 'jezve-test';
+import { queryAll, hasClass, prop } from '../../env.js';
 
 export class ModeSelector extends TestComponent {
-    async parse() {
-        if (!await this.hasClass(this.elem, 'mode-selector')) {
+    async parseContent() {
+        if (!await hasClass(this.elem, 'mode-selector')) {
             throw new Error('Unexpected stucture of mode selector control');
         }
 
-        this.listMode = {};
-        this.detailsMode = {};
+        const res = {};
 
-        const modeElements = await this.queryAll(this.elem, '.mode-selector__item');
+        res.listMode = {};
+        res.detailsMode = {};
+
+        const modeElements = await queryAll(this.elem, '.mode-selector__item');
         for (const elem of modeElements) {
-            const tagName = await this.prop(elem, 'tagName');
-            let text = await this.prop(elem, 'textContent');
+            const tagName = await prop(elem, 'tagName');
+            let text = await prop(elem, 'textContent');
             text = text.trim().toLowerCase();
 
             let modeItem;
             if (text === 'classic') {
-                modeItem = this.listMode;
+                modeItem = res.listMode;
             } else if (text === 'details') {
-                modeItem = this.detailsMode;
+                modeItem = res.detailsMode;
             } else {
                 throw new Error(`Unknown mode ${text}`);
             }
@@ -29,45 +32,47 @@ export class ModeSelector extends TestComponent {
         }
 
         if (
-            (this.listMode.elem && !this.detailsMode.elem)
-            || (!this.listMode.elem && this.detailsMode.elem)
+            (res.listMode.elem && !res.detailsMode.elem)
+            || (!res.listMode.elem && res.detailsMode.elem)
         ) {
             throw new Error('Unexpected stucture of mode selector control');
         }
 
-        if ((this.listMode.elem && this.detailsMode.elem)
+        if ((res.listMode.elem && res.detailsMode.elem)
             && (
-                (this.listMode.isActive && this.detailsMode.isActive)
-                || (!this.listMode.isActive && !this.detailsMode.isActive)
+                (res.listMode.isActive && res.detailsMode.isActive)
+                || (!res.listMode.isActive && !res.detailsMode.isActive)
             )
         ) {
             throw new Error('Invalid state of mode selector');
         }
 
-        this.details = this.detailsMode.isActive;
+        res.details = res.detailsMode.isActive;
+
+        return res;
     }
 
     async setDetailsMode() {
-        if (!this.detailsMode.elem) {
+        if (!this.content.detailsMode.elem) {
             throw new Error('Mode selector component is inactive');
         }
 
-        if (this.detailsMode.isActive) {
+        if (this.content.detailsMode.isActive) {
             return;
         }
 
-        await this.detailsMode.elem.click();
+        await this.content.detailsMode.elem.click();
     }
 
     async setClassicMode() {
-        if (!this.listMode.elem) {
+        if (!this.content.listMode.elem) {
             throw new Error('Mode selector component is inactive');
         }
 
-        if (this.listMode.isActive) {
+        if (this.content.listMode.isActive) {
             return;
         }
 
-        await this.listMode.elem.click();
+        await this.content.listMode.elem.click();
     }
 }

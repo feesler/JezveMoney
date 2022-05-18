@@ -13,7 +13,8 @@ import {
 } from '../../model/Transaction.js';
 import { AccountsList } from '../../model/AccountsList.js';
 import { App } from '../../Application.js';
-import { formatProps } from '../../common.js';
+import { setBlock, baseUrl, goTo } from '../../env.js';
+import { formatProps, generateId } from '../../common.js';
 
 export async function runAction({ action, data }) {
     let testDescr = null;
@@ -191,7 +192,7 @@ export async function submit() {
 }
 
 export async function create(type, params, submitHandler) {
-    App.view.setBlock(`Create ${Transaction.typeToString(type)} (${formatProps(params)})`, 2);
+    setBlock(`Create ${Transaction.typeToString(type)} (${formatProps(params)})`, 2);
 
     // Navigate to create transaction page
     const accNum = ('fromAccount' in params) ? params.fromAccount : 0;
@@ -227,7 +228,7 @@ export async function update(type, params, submitHandler) {
     }
     delete props.pos;
 
-    App.view.setBlock(`Update ${Transaction.typeToString(type)} [${pos}] (${formatProps(props)})`, 2);
+    setBlock(`Update ${Transaction.typeToString(type)} [${pos}] (${formatProps(props)})`, 2);
 
     await App.goToMainView();
     await App.view.goToTransactions();
@@ -262,7 +263,7 @@ export async function update(type, params, submitHandler) {
 }
 
 export async function del(type, transactions) {
-    App.view.setBlock(`Delete transactions [${transactions.join()}]`, 3);
+    setBlock(`Delete transactions [${transactions.join()}]`, 3);
 
     await App.goToMainView();
 
@@ -332,7 +333,7 @@ export async function delFromUpdate(type, pos) {
         throw new Error('Position of transaction not specified');
     }
 
-    App.view.setBlock(`Delete ${Transaction.typeToString(type)} from update view [${ind}]`, 2);
+    setBlock(`Delete ${Transaction.typeToString(type)} from update view [${ind}]`, 2);
 
     const expectedState = App.state.clone();
     const ids = expectedState.transactions.filterByType(type).indexesToIds(ind);
@@ -362,7 +363,7 @@ export async function delFromUpdate(type, pos) {
 }
 
 export async function typeChangeLoop() {
-    App.view.setBlock('Change transaction type tests', 2);
+    setBlock('Change transaction type tests', 2);
 
     await App.goToMainView();
     await App.view.goToNewTransactionByAccount(0);
@@ -382,4 +383,32 @@ export async function typeChangeLoop() {
         { action: 'changeTransactionType', data: DEBT },
         { action: 'changeTransactionType', data: EXPENSE },
     ]);
+}
+
+/** Check navigation to update not existing transaction */
+export async function securityTests() {
+    setBlock('Transaction security', 2);
+
+    let transactionId;
+
+    do {
+        transactionId = generateId();
+    } while (App.state.transactions.getItem(transactionId) != null);
+
+    const requestURL = `${baseUrl()}transactions/update/${transactionId}`;
+
+    await test('Access to not existing transaction', async () => {
+        await goTo(requestURL);
+        if (!(App.view instanceof MainView)) {
+            throw new Error('Invalid view');
+        }
+
+        App.view.expectedState = {
+            msgPopup: { success: false, message: 'Fail to update transaction.' },
+        };
+        await App.view.checkState();
+        await App.view.closeNotification();
+
+        return true;
+    });
 }

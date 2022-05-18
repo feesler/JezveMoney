@@ -14,7 +14,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                 <div class="content_wrap">
                     <div class="heading">
                         <h1><?=e($headString)?></h1>
-<?php	if ($action == "edit") {	?>
+<?php	if ($action == "update") {	?>
                         <?=IconLink::render([
                             "id" => "del_btn",
                             "icon" => "del",
@@ -24,7 +24,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                     </div>
                     <div>
                         <form id="mainfrm" method="post" action="<?=e($formAction)?>">
-<?php	if ($action == "edit") {	?>
+<?php	if ($action == "update") {	?>
                         <input name="id" type="hidden" value="<?=e($tr["id"])?>">
 <?php	}	?>
                         <input id="typeInp" name="type" type="hidden" value="<?=e($tr["type"])?>">
@@ -44,11 +44,11 @@ include(TPL_PATH."commonhdr.tpl");	?>
         }	?>
                         </div>
 
-<?php	if ($action == "new" && $acc_count < 2 && $tr["type"] == TRANSFER) {	?>
+<?php	if ($action == "create" && $acc_count < 2 && $tr["type"] == TRANSFER) {	?>
                         <span class="nodata-message">You need at least two active accounts for transfer.</span>
-<?php	} else if ($action == "new" && !$acc_count && $tr["type"] != TRANSFER) {		?>
+<?php	} else if ($action == "create" && !$acc_count && $tr["type"] != TRANSFER) {		?>
                         <span class="nodata-message">You have no one active account. Please create one.</span>
-<?php	} else if ($action == "new" && $tr["type"] == DEBT && !$person_id) {		?>
+<?php	} else if ($action == "create" && $tr["type"] == DEBT && !$person_id) {		?>
                         <span class="nodata-message">You have no one active person. Please create one for debts.</span>
 <?php	} else {		?>
                         <div id="person" class="account-container<?=hidden($tr["type"] != DEBT)?>">
@@ -178,7 +178,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
 <?php	} else {	?>
                                 <div class="stretch-input rbtn_input">
 <?php	}	?>
-<?php	if ($action == "edit") {	?>
+<?php	if ($action == "update") {	?>
                                     <input id="src_amount" name="src_amount" class="amount-input" type="text" autocomplete="off" value="<?=e($tr["src_amount"])?>">
 <?php	} else {	?>
                                     <input id="src_amount" name="src_amount" class="amount-input" type="text" autocomplete="off" value="">
@@ -204,7 +204,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
 <?php	} else {	?>
                                 <div class="stretch-input">
 <?php	}	?>
-<?php	if ($action == "edit") {	?>
+<?php	if ($action == "update") {	?>
                                     <input id="dest_amount" name="dest_amount" class="amount-input" type="text" autocomplete="off" value="<?=e($tr["dest_amount"])?>">
 <?php	} else {	?>
                                     <input id="dest_amount" name="dest_amount" class="amount-input" type="text" autocomplete="off" value="">
@@ -310,7 +310,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
         </div>
     </div>
 </div>
-<?php	if ($action == "edit") {	?>
+<?php	if ($action == "update") {	?>
 <form id="delform" method="post" action="<?=BASEURL?>transactions/del/">
 <input name="transactions" type="hidden" value="<?=e($tr["id"])?>">
 </form>

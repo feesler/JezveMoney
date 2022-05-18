@@ -1,6 +1,6 @@
 import { copyObject } from 'jezvejs';
 import { formatDate } from 'jezvejs/DateUtils';
-import { test, checkObjValue } from 'jezve-test';
+import { test, assert } from 'jezve-test';
 import { App } from '../Application.js';
 import { fixDate } from '../common.js';
 import { TransactionsView } from '../view/TransactionsView.js';
@@ -50,9 +50,8 @@ export async function toggleSelect(transactions) {
         const indexes = [];
         for (const pos of itemIds) {
             const ind = parseInt(pos, 10);
-            if (Number.isNaN(ind) || ind < 0 || ind > origItems.length) {
-                throw new Error(`Invalid item index ${pos}`);
-            }
+            assert.arrayIndex(origItems, ind);
+
             indexes.push(ind);
         }
 
@@ -67,13 +66,13 @@ export async function toggleSelect(transactions) {
 
         await App.view.selectTransactions(indexes);
         let items = App.view.getItems();
-        checkObjValue(items, expectedItems);
+        assert.deepMeet(items, expectedItems);
 
         // Click by items again to inverse selection
         expectedItems = origItems;
         await App.view.selectTransactions(indexes);
         items = App.view.getItems();
-        checkObjValue(items, expectedItems);
+        assert.deepMeet(items, expectedItems);
 
         return true;
     });

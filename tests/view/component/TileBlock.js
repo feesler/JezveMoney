@@ -1,27 +1,36 @@
 import { TestComponent } from 'jezve-test';
 import { Tile } from './Tile.js';
 import { DropDown } from './DropDown.js';
+import { query, prop } from '../../env.js';
 
 export class TileBlock extends TestComponent {
-    async parse() {
-        const lbl = await this.query(this.elem, 'div > label');
+    async parseContent() {
+        if (!this.elem) {
+            throw new Error('Invalid tile block');
+        }
+
+        const res = {};
+
+        const lbl = await query(this.elem, 'div > label');
         if (!lbl) {
             throw new Error('Tile block label not found');
         }
-        this.label = await this.prop(lbl, 'textContent');
+        res.label = await prop(lbl, 'textContent');
 
-        this.tile = await Tile.create(this.parent, await this.query(this.elem, '.tile'));
-        if (!this.tile) {
+        res.tile = await Tile.create(this.parent, await query(this.elem, '.tile'));
+        if (!res.tile) {
             throw new Error('Tile not found');
         }
 
-        const ddElem = await this.query(this.elem, '.dd__container_attached');
-        this.dropDown = await DropDown.create(this.parent, ddElem);
+        const ddElem = await query(this.elem, '.dd__container_attached');
+        res.dropDown = await DropDown.create(this.parent, ddElem);
+
+        return res;
     }
 
     async selectAccount(accountId) {
-        if (this.dropDown) {
-            await this.dropDown.setSelection(accountId);
+        if (this.content.dropDown) {
+            await this.content.dropDown.setSelection(accountId);
         }
     }
 }

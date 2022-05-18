@@ -47,19 +47,19 @@ class ProfileView extends View {
         if (!this.changeNameBtn) {
             throw new Error('Failed to initialize Profile view');
         }
-        this.changeNameBtn.addEventListener('click', this.showChangeNamePopup.bind(this));
+        this.changeNameBtn.addEventListener('click', (e) => this.showChangeNamePopup(e));
 
         this.changePassBtn = ge('changePassBtn');
         if (!this.changePassBtn) {
             throw new Error('Failed to initialize Profile view');
         }
-        this.changePassBtn.addEventListener('click', this.showChangePasswordPopup.bind(this));
+        this.changePassBtn.addEventListener('click', (e) => this.showChangePasswordPopup(e));
 
         this.resetAccBtn = ge('resetAccBtn');
         if (!this.resetAccBtn) {
             throw new Error('Failed to initialize Profile view');
         }
-        this.resetAccBtn.addEventListener('click', this.confirmResetAccounts.bind(this));
+        this.resetAccBtn.addEventListener('click', () => this.confirmResetAccounts());
 
         this.resetAccForm = ge('resetacc_form');
         if (!this.resetAccForm) {
@@ -70,7 +70,7 @@ class ProfileView extends View {
         if (!this.resetAllBtn) {
             throw new Error('Failed to initialize Profile view');
         }
-        this.resetAllBtn.addEventListener('click', this.confirmResetAll.bind(this));
+        this.resetAllBtn.addEventListener('click', () => this.confirmResetAll());
 
         this.resetAllForm = ge('resetall_form');
         if (!this.resetAllForm) {
@@ -81,7 +81,7 @@ class ProfileView extends View {
         if (!this.delProfileBtn) {
             throw new Error('Failed to initialize Profile view');
         }
-        this.delProfileBtn.addEventListener('click', this.confirmDelete.bind(this));
+        this.delProfileBtn.addEventListener('click', () => this.confirmDelete());
 
         this.deleteForm = ge('delete_form');
         if (!this.deleteForm) {
@@ -96,7 +96,7 @@ class ProfileView extends View {
         if (!this.changeNameForm) {
             throw new Error('Failed to initialize Profile view');
         }
-        this.changeNameForm.addEventListener('submit', this.onChangeNameSubmit.bind(this));
+        this.changeNameForm.addEventListener('submit', (e) => this.onChangeNameSubmit(e));
 
         this.changePassContent = ge('changepass');
         if (!this.changePassContent) {
@@ -106,7 +106,7 @@ class ProfileView extends View {
         if (!this.changePassForm) {
             throw new Error('Failed to initialize Profile view');
         }
-        this.changePassForm.addEventListener('submit', this.onChangePassSubmit.bind(this));
+        this.changePassForm.addEventListener('submit', (e) => this.onChangePassSubmit(e));
 
         if (this.props.action) {
             if (this.props.action === 'changePass') {
@@ -153,7 +153,7 @@ class ProfileView extends View {
             });
 
             this.changeNamePopup.setControls({
-                okBtn: { onclick: this.onChangeNameSubmit.bind(this) },
+                okBtn: { onclick: (ev) => this.onChangeNameSubmit(ev) },
                 closeBtn: true,
             });
 
@@ -163,7 +163,7 @@ class ProfileView extends View {
                 throw new Error('Failed to initialize change name dialog');
             }
 
-            this.newNameInp.addEventListener('input', this.onNewNameInput.bind(this));
+            this.newNameInp.addEventListener('input', () => this.onNewNameInput());
         }
 
         this.newNameInp.value = this.model.data.name;
@@ -225,7 +225,7 @@ class ProfileView extends View {
                     new: this.newPassInp.value,
                 }),
                 headers: { 'Content-Type': 'application/json' },
-                callback: this.onChangePasswordResult.bind(this),
+                callback: (response) => this.onChangePasswordResult(response),
             });
         }
     }
@@ -247,7 +247,7 @@ class ProfileView extends View {
             });
 
             this.changePassPopup.setControls({
-                okBtn: { onclick: this.onChangePassSubmit.bind(this) },
+                okBtn: { onclick: (ev) => this.onChangePassSubmit(ev) },
                 closeBtn: true,
             });
 
@@ -260,8 +260,8 @@ class ProfileView extends View {
                 throw new Error('Failed to initialize change password dialog');
             }
 
-            this.oldPassInp.addEventListener('input', this.onOldPasswordInput.bind(this));
-            this.newPassInp.addEventListener('input', this.onNewPasswordInput.bind(this));
+            this.oldPassInp.addEventListener('input', () => this.onOldPasswordInput());
+            this.newPassInp.addEventListener('input', () => this.onNewPasswordInput());
         }
 
         this.changePassPopup.show();
@@ -318,7 +318,7 @@ class ProfileView extends View {
                     name: this.newNameInp.value,
                 }),
                 headers: { 'Content-Type': 'application/json' },
-                callback: this.onChangeNameResult.bind(this),
+                callback: (response) => this.onChangeNameResult(response),
             });
         }
     }

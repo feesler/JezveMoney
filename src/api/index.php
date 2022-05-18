@@ -30,8 +30,6 @@ $router->setAliases([
 ]);
 
 $router->setActionsMap([
-    "new" => "create",
-    "edit" => "update",
     "delete" => "del",
     "list" => "getList"
 ]);

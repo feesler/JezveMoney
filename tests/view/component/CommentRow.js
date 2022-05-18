@@ -1,32 +1,37 @@
 import { TestComponent } from 'jezve-test';
 import { IconLink } from './IconLink.js';
 import { InputRow } from './InputRow.js';
+import { query, isVisible } from '../../env.js';
 
 export class CommentRow extends TestComponent {
-    async parse() {
-        const iconLinkElem = await this.query(this.elem, '.iconlink');
+    async parseContent() {
+        const res = {};
 
-        this.iconLink = await IconLink.create(this.parent, iconLinkElem);
-        if (!this.iconLink) {
+        const iconLinkElem = await query(this.elem, '.iconlink');
+
+        res.iconLink = await IconLink.create(this.parent, iconLinkElem);
+        if (!res.iconLink) {
             throw new Error('Iconlink of comment not found');
         }
 
-        this.inputRow = await InputRow.create(
+        res.inputRow = await InputRow.create(
             this.parent,
-            await this.query(this.elem, '#comment_block'),
+            await query(this.elem, '#comment_block'),
         );
-        if (!this.inputRow) {
+        if (!res.inputRow) {
             throw new Error('Input row of comment not found');
         }
 
-        this.value = this.inputRow.value;
+        res.value = res.inputRow.content.value;
+
+        return res;
     }
 
     async input(val) {
-        if (await this.isVisible(this.iconLink.elem)) {
-            await this.iconLink.click();
+        if (await isVisible(this.content.iconLink.elem)) {
+            await this.content.iconLink.click();
         }
 
-        return this.inputRow.input(val);
+        return this.content.inputRow.input(val);
     }
 }

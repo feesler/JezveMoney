@@ -20,6 +20,9 @@
                             </table>
                             <input id="toggleresbtn" class="adm_act_btn toggle-res-btn" type="button" value="Show">
                         </div>
+                        <div class="checkbox-wrap">
+                            <label><input id="fulltestscheck" type="checkbox" checked>Run full scenario</label>
+                        </div>
                         <div class="results-container"><table><tbody id="restbl"></tbody></table></div>
                     </div>
                     <div class="test-view"><iframe id="viewframe" src="<?=BASEURL?>"></iframe></div>

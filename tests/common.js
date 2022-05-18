@@ -226,3 +226,8 @@ export function checkPHPerrors(content) {
         throw new Error('PHP error signature found');
     }
 }
+
+/** Returns random integer id */
+export function generateId() {
+    return Math.round(Math.random() * 10000);
+}

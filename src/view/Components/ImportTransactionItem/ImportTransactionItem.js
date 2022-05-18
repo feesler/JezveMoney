@@ -79,7 +79,7 @@ export class ImportTransactionItem extends Component {
 
         // Row enable checkbox
         this.enableCheck = ce('input', { type: 'checkbox' });
-        this.enableCheck.addEventListener('change', this.onRowChecked.bind(this));
+        this.enableCheck.addEventListener('change', () => this.onRowChecked());
 
         this.createCurrencyField();
         this.createTypeField();
@@ -92,7 +92,7 @@ export class ImportTransactionItem extends Component {
             name: 'amount[]',
             placeholder: 'Amount',
             autocomplete: 'off',
-        }, null, { input: this.onAmountInput.bind(this) });
+        }, null, { input: () => this.onAmountInput() });
         this.amountField = createField('Amount', this.amountInp, 'amount-field');
 
         this.destAmountInp = ce('input', {
@@ -101,7 +101,7 @@ export class ImportTransactionItem extends Component {
             disabled: true,
             placeholder: 'Destination amount',
             autocomplete: 'off',
-        }, null, { input: this.onDestAmountInput.bind(this) });
+        }, null, { input: () => this.onDestAmountInput() });
         this.destAmountField = createField('Destination amount', this.destAmountInp, 'amount-field');
         // Date field
         this.dateInp = ce('input', {
@@ -109,7 +109,7 @@ export class ImportTransactionItem extends Component {
             name: 'date[]',
             placeholder: 'Date',
             autocomplete: 'off',
-        }, null, { input: this.onDateInput.bind(this) });
+        }, null, { input: () => this.onDateInput() });
         this.dateField = createField('Date', this.dateInp, 'date-field');
         // Comment field
         this.commInp = ce('input', {
@@ -117,21 +117,21 @@ export class ImportTransactionItem extends Component {
             name: 'comment[]',
             placeholder: 'Comment',
             autocomplete: 'off',
-        }, null, { input: this.onCommentInput.bind(this) });
+        }, null, { input: () => this.onCommentInput() });
         this.commentField = createField('Comment', this.commInp, 'comment-field');
         // Delete button
         this.delBtn = ce(
             'button',
             { className: 'btn delete-btn', type: 'button' },
             createIcon('del'),
-            { click: this.remove.bind(this) },
+            { click: () => this.remove() },
         );
         // Toggle expand/collapse
         this.toggleExtBtn = ce(
             'button',
             { className: 'btn toggle-btn hidden', type: 'button' },
             createIcon('toggle-ext'),
-            { click: this.toggleCollapse.bind(this) },
+            { click: () => this.toggleCollapse() },
         );
 
         this.topRow = createContainer('form-row', [
@@ -208,7 +208,7 @@ export class ImportTransactionItem extends Component {
 
         this.typeDropDown = DropDown.create({
             input_id: selectElem,
-            onchange: this.onTrTypeChanged.bind(this),
+            onchange: (type) => this.onTrTypeChanged(type),
             editable: false,
         });
         typeItems.forEach((typeItem) => {
@@ -230,7 +230,7 @@ export class ImportTransactionItem extends Component {
         this.destAccDropDown = DropDown.create({
             input_id: selectElem,
             disabled: true,
-            onchange: this.onDestChanged.bind(this),
+            onchange: (account) => this.onDestChanged(account),
             editable: false,
         });
 
@@ -249,7 +249,7 @@ export class ImportTransactionItem extends Component {
         this.personDropDown = DropDown.create({
             input_id: selectElem,
             disabled: true,
-            onchange: this.onPersonChanged.bind(this),
+            onchange: (person) => this.onPersonChanged(person),
             editable: false,
         });
 
@@ -266,7 +266,7 @@ export class ImportTransactionItem extends Component {
 
         this.currencyDropDown = DropDown.create({
             input_id: selectElem,
-            onchange: this.onCurrChanged.bind(this),
+            onchange: (currency) => this.onCurrChanged(currency),
             editable: false,
         });
 

@@ -31,13 +31,13 @@ export class Header extends Component {
         this.menuPopup = ge('menupopup');
         this.userBtn = ge('userbtn');
         if (this.userBtn) {
-            this.userBtn.addEventListener('click', this.onUserClick.bind(this));
+            this.userBtn.addEventListener('click', () => this.onUserClick());
         }
         this.themeCheck = ge('theme-check');
         if (!this.themeCheck) {
             throw new Error('Invalid structure of header');
         }
-        this.themeCheck.addEventListener('change', this.onToggleTheme.bind(this));
+        this.themeCheck.addEventListener('change', (e) => this.onToggleTheme(e));
 
         this.userNameElem = this.elem.querySelector('.user__title');
         if (this.userNameElem) {
@@ -53,7 +53,7 @@ export class Header extends Component {
             this.hidePopup();
         } else {
             show(this.menuPopup, true);
-            setEmptyClick(this.hidePopup.bind(this), [this.menuPopup, this.userBtn]);
+            setEmptyClick(() => this.hidePopup(), [this.menuPopup, this.userBtn]);
         }
     }
 

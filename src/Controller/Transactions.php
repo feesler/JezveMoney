@@ -305,7 +305,7 @@ class Transactions extends TemplateController
         $this->template = new Template(TPL_PATH . "transaction.tpl");
         $data = [];
 
-        $action = "new";
+        $action = "create";
         $data["action"] = $action;
 
         $iconModel = IconModel::getInstance();
@@ -455,7 +455,7 @@ class Transactions extends TemplateController
         // Prepare transaction types menu
         $trTypes = TransactionModel::getTypeNames();
         $transMenu = [];
-        $baseUrl = BASEURL . "transactions/new/";
+        $baseUrl = BASEURL . "transactions/create/";
         foreach ($trTypes as $type_id => $trTypeName) {
             $params = ["type" => strtolower($trTypeName)];
             if ($acc_id != 0) {
@@ -624,7 +624,7 @@ class Transactions extends TemplateController
 
         $data["dateFmt"] = date("d.m.Y");
 
-        $data["headString"] = "New transaction";
+        $data["headString"] = "Create transaction";
         $data["titleString"] = "Jezve Money | " . $data["headString"];
 
         $viewData = [
@@ -654,7 +654,7 @@ class Transactions extends TemplateController
         $this->template = new Template(TPL_PATH . "transaction.tpl");
         $data = [];
 
-        $action = "edit";
+        $action = "update";
         $data["action"] = $action;
 
         $iconModel = IconModel::getInstance();
@@ -697,7 +697,7 @@ class Transactions extends TemplateController
         // Prepare transaction types menu
         $trTypes = TransactionModel::getTypeNames();
         $transMenu = [];
-        $baseUrl = BASEURL . "transactions/new/";
+        $baseUrl = BASEURL . "transactions/create/";
         foreach ($trTypes as $type_id => $trTypeName) {
             $params = ["type" => strtolower($trTypeName)];
 

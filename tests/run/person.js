@@ -1,13 +1,14 @@
 import {
     test,
     copyObject,
-    checkObjValue,
+    assert,
 } from 'jezve-test';
-import { formatProps } from '../common.js';
+import { formatProps, generateId } from '../common.js';
 import { PersonsView } from '../view/PersonsView.js';
 import { PersonView } from '../view/PersonView.js';
 import { MainView } from '../view/MainView.js';
 import { App } from '../Application.js';
+import { setBlock, baseUrl, goTo } from '../env.js';
 
 /** Navigate to persons list page */
 async function checkNavigation() {
@@ -94,8 +95,10 @@ export async function update(params) {
 
         // Check initial state of view
         App.view.expectedState = {
-            visibility: { name: true },
-            values: { name: expectedPerson.name },
+            name: {
+                value: expectedPerson.name,
+                visible: true,
+            },
         };
         await App.view.checkState();
 
@@ -197,9 +200,8 @@ export async function toggleSelect(persons) {
         const indexes = [];
         for (const pos of itemIds) {
             const ind = parseInt(pos, 10);
-            if (Number.isNaN(ind) || ind < 0 || ind > origItems.length) {
-                throw new Error(`Invalid item index ${pos}`);
-            }
+            assert.arrayIndex(origItems, ind);
+
             indexes.push(ind);
         }
 
@@ -214,13 +216,41 @@ export async function toggleSelect(persons) {
 
         await App.view.selectPersons(indexes);
         let items = App.view.getItems();
-        checkObjValue(items, expectedItems);
+        assert.deepMeet(items, expectedItems);
 
         // Click by items again to inverse selection
         expectedItems = origItems;
         await App.view.selectPersons(indexes);
         items = App.view.getItems();
-        checkObjValue(items, expectedItems);
+        assert.deepMeet(items, expectedItems);
+
+        return true;
+    });
+}
+
+/** Check navigation to update not existing person */
+export async function securityTests() {
+    setBlock('Person security', 2);
+
+    let personId;
+
+    do {
+        personId = generateId();
+    } while (App.state.persons.getItem(personId) != null);
+
+    const requestURL = `${baseUrl()}persons/update/${personId}`;
+
+    await test('Access to not existing person', async () => {
+        await goTo(requestURL);
+        if (!(App.view instanceof PersonsView)) {
+            throw new Error('Invalid view');
+        }
+
+        App.view.expectedState = {
+            msgPopup: { success: false, message: 'Fail to update person.' },
+        };
+        await App.view.checkState();
+        await App.view.closeNotification();
 
         return true;
     });

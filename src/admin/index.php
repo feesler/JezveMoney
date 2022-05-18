@@ -24,8 +24,6 @@ $router->setRoutes([
 ]);
 
 $router->setActionsMap([
-    "new" => "create",
-    "edit" => "update",
     "chpwd" => "changePassword"
 ]);
 

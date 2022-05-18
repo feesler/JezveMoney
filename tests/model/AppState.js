@@ -2,7 +2,7 @@ import {
     isObject,
     isInt,
     copyObject,
-    checkObjValue,
+    assert,
 } from 'jezve-test';
 import {
     checkDate,
@@ -169,12 +169,12 @@ export class AppState {
     }
 
     meetExpectation(expected) {
-        const res = checkObjValue(this.accounts.data, expected.accounts.data)
-            && checkObjValue(this.transactions.data, expected.transactions.data)
-            && checkObjValue(this.persons.data, expected.persons.data)
-            && checkObjValue(this.templates.data, expected.templates.data)
-            && checkObjValue(this.rules.data, expected.rules.data)
-            && checkObjValue(this.profile, expected.profile);
+        const res = assert.deepMeet(this.accounts.data, expected.accounts.data)
+            && assert.deepMeet(this.transactions.data, expected.transactions.data)
+            && assert.deepMeet(this.persons.data, expected.persons.data)
+            && assert.deepMeet(this.templates.data, expected.templates.data)
+            && assert.deepMeet(this.rules.data, expected.rules.data)
+            && assert.deepMeet(this.profile, expected.profile);
         return res;
     }
 

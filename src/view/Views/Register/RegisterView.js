@@ -26,10 +26,10 @@ class RegisterView extends View {
             throw new Error('Failed to initialize Login view');
         }
 
-        this.loginInp.addEventListener('input', this.onLoginInput.bind(this));
-        this.passwordInp.addEventListener('input', this.onPasswordInput.bind(this));
-        this.nameInp.addEventListener('input', this.onNameInput.bind(this));
-        this.form.addEventListener('submit', this.onSubmit.bind(this));
+        this.loginInp.addEventListener('input', () => this.onLoginInput());
+        this.passwordInp.addEventListener('input', () => this.onPasswordInput());
+        this.nameInp.addEventListener('input', () => this.onNameInput());
+        this.form.addEventListener('submit', (e) => this.onSubmit(e));
     }
 
     /**

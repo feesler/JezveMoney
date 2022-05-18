@@ -1,36 +1,46 @@
 import { TestComponent } from 'jezve-test';
+import {
+    query,
+    prop,
+    hasClass,
+    click,
+} from '../../env.js';
 
 export class MenuItem extends TestComponent {
-    async parse() {
+    async parseContent() {
         if (!this.elem) {
             throw new Error('Wrong structure of menu item');
         }
 
-        const typeId = await this.prop(this.elem, 'dataset.type');
-        this.type = parseInt(typeId, 10);
-        if (Number.isNaN(this.type)) {
+        const res = {};
+
+        const typeId = await prop(this.elem, 'dataset.type');
+        res.type = parseInt(typeId, 10);
+        if (Number.isNaN(res.type)) {
             throw new Error(`Invalid transaction type ${typeId}`);
         }
 
-        this.titleElem = await this.query(this.elem, '.trtype-menu_item_title');
-        this.text = await this.prop(this.titleElem, 'textContent');
+        res.titleElem = await query(this.elem, '.trtype-menu_item_title');
+        res.text = await prop(res.titleElem, 'textContent');
 
-        this.isActive = await this.hasClass(this.elem, 'trtype-menu__item_selected');
+        res.isActive = await hasClass(this.elem, 'trtype-menu__item_selected');
 
-        this.checkElem = await this.query(this.elem, '.trtype-menu__item-check');
-        this.linkElem = await this.query(this.elem, 'a');
-        this.link = await this.prop(this.linkElem, 'href');
+        res.checkElem = await query(this.elem, '.trtype-menu__item-check');
+        res.linkElem = await query(this.elem, 'a');
+        res.link = await prop(res.linkElem, 'href');
+
+        return res;
     }
 
     async toggle() {
-        if (!this.checkElem) {
+        if (!this.content.checkElem) {
             throw new Error('Check not available');
         }
 
-        await this.environment.click(this.checkElem);
+        await click(this.content.checkElem);
     }
 
     async click() {
-        await this.environment.click(this.linkElem);
+        await click(this.content.linkElem);
     }
 }

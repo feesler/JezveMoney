@@ -943,8 +943,8 @@ class TransactionView extends View {
     replaceHistory(state) {
         const { transaction } = state;
         const baseAddress = (state.isUpdate)
-            ? `${baseURL}transactions/edit/${transaction.id}`
-            : `${baseURL}transactions/new/`;
+            ? `${baseURL}transactions/update/${transaction.id}`
+            : `${baseURL}transactions/create/`;
 
         const url = new URL(baseAddress);
         const typeStr = getTransactionTypeString(transaction.type);

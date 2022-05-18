@@ -2,23 +2,27 @@ import { TestComponent } from 'jezve-test';
 import { ImportAction } from '../../../model/ImportAction.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import { App } from '../../../Application.js';
+import { query, prop } from '../../../env.js';
 
 export class ImportActionItem extends TestComponent {
-    async parse() {
+    async parseContent() {
         if (!this.elem) {
             throw new Error('Invalid import action item');
         }
 
-        this.typeTitle = { elem: await this.query(this.elem, '.action-item__type') };
-        this.valueTitle = { elem: await this.query(this.elem, '.action-item__value') };
-        if (!this.typeTitle.elem || !this.valueTitle.elem) {
+        const res = {
+            typeTitle: { elem: await query(this.elem, '.action-item__type') },
+            valueTitle: { elem: await query(this.elem, '.action-item__value') },
+        };
+
+        if (!res.typeTitle.elem || !res.valueTitle.elem) {
             throw new Error('Invalid structure of action item');
         }
 
-        this.typeTitle.value = await this.prop(this.typeTitle.elem, 'textContent');
-        this.valueTitle.value = await this.prop(this.valueTitle.elem, 'textContent');
+        res.typeTitle.value = await prop(res.typeTitle.elem, 'textContent');
+        res.valueTitle.value = await prop(res.valueTitle.elem, 'textContent');
 
-        this.model = this.buildModel(this);
+        return res;
     }
 
     buildModel(cont) {
@@ -69,21 +73,15 @@ export class ImportActionItem extends TestComponent {
 
     static getExpectedState(model) {
         const res = {
-            visibility: {
-                typeTitle: true,
-                valueTitle: true,
-            },
-            values: {
-                typeTitle: {},
-                valueTitle: {},
-            },
+            typeTitle: { visible: true },
+            valueTitle: { visible: true },
         };
 
         const actionType = ImportAction.getActionById(model.actionType);
         if (!actionType) {
             throw new Error(`Unknown action type: '${model.actionType}'`);
         }
-        res.values.typeTitle.value = actionType.title;
+        res.typeTitle.value = actionType.title;
 
         let value;
         if (ImportAction.isTransactionTypeValue(actionType.id)) {
@@ -117,7 +115,7 @@ export class ImportActionItem extends TestComponent {
         } else {
             value = model.value;
         }
-        res.values.valueTitle.value = value.toString();
+        res.valueTitle.value = value.toString();
 
         return res;
     }

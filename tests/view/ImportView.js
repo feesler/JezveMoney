@@ -1,4 +1,5 @@
-import { TestComponent, copyObject } from 'jezve-test';
+import { copyObject } from 'jezvejs';
+import { TestComponent } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { IconLink } from './component/IconLink.js';
 import { ImportList } from './component/Import/ImportList.js';
@@ -6,6 +7,13 @@ import { ImportUploadDialog } from './component/Import/ImportUploadDialog.js';
 import { ImportRulesDialog } from './component/Import/ImportRulesDialog.js';
 import { DropDown } from './component/DropDown.js';
 import { ImportViewSubmitError } from '../error/ImportViewSubmitError.js';
+import {
+    query,
+    prop,
+    click,
+    wait,
+    waitForFunction,
+} from '../env.js';
 
 /** Import view class */
 export class ImportView extends AppView {
@@ -18,55 +26,57 @@ export class ImportView extends AppView {
 
     async parseContent() {
         const res = {
-            title: { elem: await this.query('.content_wrap > .heading > h1') },
-            uploadBtn: await IconLink.create(this, await this.query('#uploadBtn')),
-            mainAccountSelect: await DropDown.createFromChild(this, await this.query('#acc_id')),
-            addBtn: await IconLink.create(this, await this.query('#newItemBtn')),
-            clearBtn: await IconLink.create(this, await this.query('#clearFormBtn')),
-            totalCount: { elem: await this.query('#trcount') },
-            enabledCount: { elem: await this.query('#entrcount') },
-            rulesCheck: { elem: await this.query('#rulesCheck') },
-            rulesBtn: { elem: await this.query('#rulesBtn') },
-            rulesCount: { elem: await this.query('#rulescount') },
-            submitBtn: await this.query('#submitbtn'),
+            title: { elem: await query('.content_wrap > .heading > h1') },
+            uploadBtn: await IconLink.create(this, await query('#uploadBtn')),
+            mainAccountSelect: await DropDown.createFromChild(this, await query('#acc_id')),
+            addBtn: await IconLink.create(this, await query('#newItemBtn')),
+            clearBtn: await IconLink.create(this, await query('#clearFormBtn')),
+            totalCount: { elem: await query('#trcount') },
+            enabledCount: { elem: await query('#entrcount') },
+            rulesCheck: { elem: await query('#rulesCheck') },
+            rulesBtn: { elem: await query('#rulesBtn') },
+            rulesCount: { elem: await query('#rulescount') },
+            submitBtn: { elem: await query('#submitbtn') },
+            submitProgress: { elem: await query('#submitProgress') },
         };
 
-        res.title.value = await this.prop(res.title.elem, 'textContent');
-        res.totalCount.value = await this.prop(res.totalCount.elem, 'textContent');
-        res.enabledCount.value = await this.prop(res.enabledCount.elem, 'textContent');
+        res.title.value = await prop(res.title.elem, 'textContent');
+        res.totalCount.value = await prop(res.totalCount.elem, 'textContent');
+        res.enabledCount.value = await prop(res.enabledCount.elem, 'textContent');
 
         if (
             !res.title.elem
-            || !res.uploadBtn
+            || !res.uploadBtn.elem
             || !res.mainAccountSelect
-            || !res.addBtn
-            || !res.clearBtn
+            || !res.addBtn.elem
+            || !res.clearBtn.elem
             || !res.totalCount.elem
             || !res.enabledCount.elem
             || !res.rulesCheck.elem
             || !res.rulesBtn.elem
             || !res.rulesCount.elem
-            || !res.submitBtn
+            || !res.submitBtn.elem
+            || !res.submitProgress.elem
         ) {
             throw new Error('Invalid structure of import view');
         }
 
-        res.rulesCheck.checked = await this.prop(res.rulesCheck.elem, 'checked');
-        res.rulesCount.value = await this.prop(res.rulesCount.elem, 'textContent');
+        res.rulesCheck.checked = await prop(res.rulesCheck.elem, 'checked');
+        res.rulesCount.value = await prop(res.rulesCount.elem, 'textContent');
 
-        const rowsContainer = await this.query('#rowsContainer');
-        res.renderTime = await this.prop(rowsContainer, 'dataset.time');
+        const rowsContainer = await query('#rowsContainer');
+        res.renderTime = await prop(rowsContainer, 'dataset.time');
 
-        const mainAccountId = res.mainAccountSelect.value;
+        const mainAccountId = res.mainAccountSelect.content.value;
         res.itemsList = await ImportList.create(this, rowsContainer, mainAccountId);
         if (!res.itemsList) {
             throw new Error('Invalid structure of import view');
         }
 
-        const uploadDialogPopup = await this.query(this.uploadPopupId);
+        const uploadDialogPopup = await query(this.uploadPopupId);
         res.uploadDialog = await ImportUploadDialog.create(this, uploadDialogPopup);
 
-        const rulesDialogPopup = await this.query(this.rulesPopupId);
+        const rulesDialogPopup = await query(this.rulesPopupId);
         res.rulesDialog = await ImportRulesDialog.create(this, rulesDialogPopup);
 
         return res;
@@ -75,8 +85,8 @@ export class ImportView extends AppView {
     async buildModel(cont) {
         const res = {};
 
-        const uploadVisible = await TestComponent.isVisible(cont.uploadDialog);
-        const rulesVisible = await TestComponent.isVisible(cont.rulesDialog);
+        const uploadVisible = !!cont.uploadDialog?.content?.visible;
+        const rulesVisible = !!cont.rulesDialog?.content?.visible;
         if (uploadVisible && !rulesVisible) {
             res.state = 'upload';
         } else if (!uploadVisible && rulesVisible) {
@@ -90,36 +100,29 @@ export class ImportView extends AppView {
         res.title = cont.title.value;
         res.totalCount = parseInt(cont.totalCount.value, 10);
         res.enabledCount = parseInt(cont.enabledCount.value, 10);
-        res.mainAccount = parseInt(cont.mainAccountSelect.value, 10);
+        res.mainAccount = parseInt(cont.mainAccountSelect.content.value, 10);
         res.rulesEnabled = cont.rulesCheck.checked;
         res.rulesCount = parseInt(cont.rulesCount.value, 10);
         res.renderTime = cont.renderTime;
         res.items = cont.itemsList.getItems();
-        res.invalidated = cont.itemsList.invalidated;
+        res.invalidated = cont.itemsList.model.invalidated;
+        res.submitInProgress = cont.submitProgress.visible;
 
         return res;
     }
 
     getExpectedState(model) {
         const res = {
-            visibility: {
-                uploadBtn: true,
-                mainAccountSelect: true,
-                addBtn: true,
-                clearBtn: true,
-                totalCount: true,
-                enabledCount: true,
-                rulesCount: true,
-                itemsList: true,
-            },
-            values: {
-                title: model.title.toString(),
-                mainAccountSelect: model.mainAccount.toString(),
-                totalCount: model.totalCount.toString(),
-                enabledCount: model.enabledCount.toString(),
-                rulesCheck: { checked: model.rulesEnabled },
-                rulesCount: model.rulesCount.toString(),
-            },
+            addBtn: { visible: true },
+            clearBtn: { visible: true },
+            uploadBtn: { visible: true },
+            title: { value: model.title.toString(), visible: true },
+            mainAccountSelect: { value: model.mainAccount.toString(), visible: true },
+            totalCount: { value: model.totalCount.toString(), visible: true },
+            enabledCount: { value: model.enabledCount.toString(), visible: true },
+            rulesCheck: { checked: model.rulesEnabled },
+            rulesCount: { value: model.rulesCount.toString(), visible: true },
+            itemsList: { visible: true },
         };
 
         return res;
@@ -157,14 +160,14 @@ export class ImportView extends AppView {
         if (value === this.isRulesEnabled()) {
             throw new Error(value ? 'Rules already enabled' : 'Result already disabled');
         }
-        await this.performAction(() => this.click(this.content.rulesCheck.elem));
+        await this.performAction(() => click(this.content.rulesCheck.elem));
     }
 
     async launchUploadDialog() {
         this.checkMainState();
 
         await this.performAction(() => this.content.uploadBtn.click());
-        await this.performAction(() => this.wait(this.uploadPopupId, { visible: true }));
+        await this.performAction(() => wait(this.uploadPopupId, { visible: true }));
 
         if (!await TestComponent.isVisible(this.content.uploadDialog)) {
             throw new Error('File upload dialog not appear');
@@ -175,7 +178,7 @@ export class ImportView extends AppView {
         this.checkUploadState();
 
         await this.performAction(() => this.content.uploadDialog.close());
-        await this.performAction(() => this.wait(this.uploadPopupId, { visible: true }));
+        await this.performAction(() => wait(this.uploadPopupId, { visible: true }));
 
         if (await TestComponent.isVisible(this.content.uploadDialog)) {
             throw new Error('File upload dialog not closed');
@@ -269,20 +272,28 @@ export class ImportView extends AppView {
         await this.performAction(() => this.content.uploadDialog.cancelTemplate());
     }
 
+    /** Run action and wait until list finish to load */
+    async waitForList(action) {
+        const prevTime = this.model.renderTime;
+
+        await action.call(this);
+
+        await waitForFunction(async () => {
+            await this.parse();
+            return (
+                !this.content.itemsList.model.isLoading
+                && prevTime !== this.content.renderTime
+            );
+        });
+    }
+
     /** Submit converted file data */
     async submitUploaded() {
         this.checkUploadState();
 
-        const prevTime = this.model.renderTime;
-
-        await this.performAction(() => this.content.uploadDialog.submit());
-        await this.performAction(() => this.wait(this.uploadPopupId, { hidden: true }));
-        await this.waitForFunction(async () => {
-            await this.parse();
-            return (
-                !this.content.itemsList.isLoading
-                && prevTime !== this.content.renderTime
-            );
+        await this.waitForList(async () => {
+            await this.content.uploadDialog.submit();
+            await wait(this.uploadPopupId, { hidden: true });
         });
     }
 
@@ -303,16 +314,9 @@ export class ImportView extends AppView {
     async selectMainAccount(val) {
         this.checkMainState();
 
-        const prevTime = this.model.renderTime;
-
-        await this.performAction(() => this.content.mainAccountSelect.selectItem(val));
-        await this.waitForFunction(async () => {
-            await this.parse();
-            return (
-                !this.content.itemsList.isLoading
-                && prevTime !== this.content.renderTime
-            );
-        });
+        await this.waitForList(
+            () => this.content.mainAccountSelect.selectItem(val),
+        );
     }
 
     checkRulesFormState() {
@@ -332,8 +336,8 @@ export class ImportView extends AppView {
     async launchRulesDialog() {
         this.checkMainState();
 
-        await this.performAction(() => this.click(this.content.rulesBtn.elem));
-        await this.performAction(() => this.wait(this.rulesPopupId, { visible: true }));
+        await this.performAction(() => click(this.content.rulesBtn.elem));
+        await this.performAction(() => wait(this.rulesPopupId, { visible: true }));
 
         this.checkRulesListState();
 
@@ -344,7 +348,7 @@ export class ImportView extends AppView {
         this.checkRulesState();
 
         await this.performAction(() => this.content.rulesDialog.close());
-        await this.performAction(() => this.wait(this.rulesPopupId, { hidden: true }));
+        await this.performAction(() => wait(this.rulesPopupId, { hidden: true }));
 
         this.checkMainState();
 
@@ -379,7 +383,7 @@ export class ImportView extends AppView {
     async addRuleCondition() {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog;
+        const { ruleForm } = this.content.rulesDialog.content;
         await this.performAction(() => ruleForm.addCondition());
 
         return true;
@@ -388,7 +392,7 @@ export class ImportView extends AppView {
     async deleteRuleCondition(index) {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog;
+        const { ruleForm } = this.content.rulesDialog.content;
         await this.performAction(() => ruleForm.deleteCondition(index));
 
         return true;
@@ -397,7 +401,7 @@ export class ImportView extends AppView {
     async runOnRuleCondition(index, action) {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog;
+        const { ruleForm } = this.content.rulesDialog.content;
         await this.performAction(() => ruleForm.runOnCondition(index, action));
 
         return true;
@@ -406,21 +410,21 @@ export class ImportView extends AppView {
     getRuleConditions() {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog;
+        const { ruleForm } = this.content.rulesDialog.content;
         return copyObject(ruleForm.model.conditions);
     }
 
     getRuleActions() {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog;
+        const { ruleForm } = this.content.rulesDialog.content;
         return copyObject(ruleForm.model.actions);
     }
 
     async addRuleAction() {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog;
+        const { ruleForm } = this.content.rulesDialog.content;
         await this.performAction(() => ruleForm.addAction());
 
         return true;
@@ -429,7 +433,7 @@ export class ImportView extends AppView {
     async deleteRuleAction(index) {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog;
+        const { ruleForm } = this.content.rulesDialog.content;
         await this.performAction(() => ruleForm.deleteAction(index));
 
         return true;
@@ -438,7 +442,7 @@ export class ImportView extends AppView {
     async runOnRuleAction(index, action) {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog;
+        const { ruleForm } = this.content.rulesDialog.content;
         await this.performAction(() => ruleForm.runOnAction(index, action));
 
         return true;
@@ -556,21 +560,21 @@ export class ImportView extends AppView {
     async submit() {
         this.checkMainState();
 
-        const disabled = await this.prop(this.content.submitBtn, 'disabled');
+        const disabled = await prop(this.content.submitBtn.elem, 'disabled');
         if (disabled) {
             throw new ImportViewSubmitError('Submit is not available');
         }
 
-        await this.performAction(() => this.click(this.content.submitBtn));
-        await this.waitForFunction(async () => {
+        await this.performAction(() => click(this.content.submitBtn.elem));
+        await waitForFunction(async () => {
             await this.parse();
 
             if (this.model.invalidated) {
                 return true;
             }
 
-            const notification = await TestComponent.isVisible(this.msgPopup, true);
-            if (notification) {
+            const notification = await TestComponent.isVisible(this.content.msgPopup, true);
+            if (notification && !this.model.submitInProgress) {
                 return true;
             }
 

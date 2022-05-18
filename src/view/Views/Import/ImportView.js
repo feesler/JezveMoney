@@ -27,6 +27,7 @@ import { ImportTransactionItem } from '../../Components/ImportTransactionItem/Im
 
 /* eslint no-bitwise: "off" */
 /* global baseURL */
+const SUBMIT_LIMIT = 100;
 
 /**
  * Import view constructor
@@ -69,7 +70,7 @@ class ImportView extends View {
 
         this.accountDropDown = DropDown.create({
             input_id: 'acc_id',
-            onchange: this.onMainAccChange.bind(this),
+            onchange: () => this.onMainAccChange(),
             editable: false,
             extraClass: 'dd__fullwidth',
         });
@@ -81,6 +82,8 @@ class ImportView extends View {
         this.rulesBtn = ge('rulesBtn');
         this.rulesCountElem = ge('rulescount');
         this.rowsContainer = ge('rowsContainer');
+        this.submitProgress = ge('submitProgress');
+        this.submitProgressIndicator = ge('submitProgressIndicator');
         if (!this.newItemBtn
             || !this.uploadBtn
             || !this.submitBtn
@@ -90,13 +93,15 @@ class ImportView extends View {
             || !this.rulesCheck
             || !this.rulesBtn
             || !this.rulesCountElem
-            || !this.rowsContainer) {
+            || !this.rowsContainer
+            || !this.submitProgress
+            || !this.submitProgressIndicator) {
             throw new Error('Failed to initialize Import view');
         }
 
-        this.submitBtn.addEventListener('click', this.onSubmitClick.bind(this));
-        this.rulesCheck.addEventListener('change', this.onToggleEnableRules.bind(this));
-        this.rulesBtn.addEventListener('click', this.onRulesClick.bind(this));
+        this.submitBtn.addEventListener('click', () => this.onSubmitClick());
+        this.rulesCheck.addEventListener('change', () => this.onToggleEnableRules());
+        this.rulesBtn.addEventListener('click', () => this.onRulesClick());
 
         this.noDataMsg = this.rowsContainer.querySelector('.nodata-message');
         this.loadingInd = this.rowsContainer.querySelector('.data-container__loading');
@@ -105,7 +110,7 @@ class ImportView extends View {
         }
 
         this.trListSortable = new Sortable({
-            oninsertat: this.onTransPosChanged.bind(this),
+            oninsertat: (orig, replaced) => this.onTransPosChanged(orig, replaced),
             container: 'rowsContainer',
             group: 'transactions',
             selector: '.import-item',
@@ -144,8 +149,8 @@ class ImportView extends View {
                 tplModel: this.model.templates,
                 mainAccount: this.model.mainAccount,
                 elem: 'uploadDialog',
-                onaccountchange: this.onUploadAccChange.bind(this),
-                onuploaddone: this.onImportDone.bind(this),
+                onaccountchange: (accountId) => this.onUploadAccChange(accountId),
+                onuploaddone: (items) => this.onImportDone(items),
             });
         }
 
@@ -241,7 +246,7 @@ class ImportView extends View {
         // Send request
         ajax.get({
             url: `${baseURL}api/transaction/list/?${reqParams}`,
-            callback: this.onTrCacheResult.bind(this),
+            callback: (response) => this.onTrCacheResult(response),
         });
     }
 
@@ -275,6 +280,24 @@ class ImportView extends View {
                 item.enable(false);
             }
             item.render();
+        });
+
+        /* Print imported items with no similar trasaction */
+        console.log('Not picked import items:');
+        importedItems.forEach((item) => {
+            if (item.state.enabled) {
+                const dateFmt = formatDate(new Date(item.data.date));
+
+                console.log(`tr_amount: ${item.data.transactionAmount} acc_amount: ${item.data.accountAmount} date: ${dateFmt} comment: ${item.data.comment}`);
+            }
+        });
+
+        /* Print transactions not matched to imported list */
+        console.log('Not picked transactions:');
+        this.model.transCache.forEach((tr) => {
+            if (!tr.picked) {
+                console.log(`id: ${tr.id} src_amount: ${tr.src_amount} dest_amount: ${tr.dest_amount} date: ${tr.date} comment: ${tr.comment}`);
+            }
         });
 
         show(this.loadingInd, false);
@@ -471,6 +494,8 @@ class ImportView extends View {
 
     /** Submit buttom 'click' event handler */
     onSubmitClick() {
+        show(this.submitProgress, true);
+
         const enabledList = this.getEnabledItems();
         if (!Array.isArray(enabledList) || !enabledList.length) {
             throw new Error('Invalid list of items');
@@ -478,10 +503,11 @@ class ImportView extends View {
 
         const valid = enabledList.every((item) => item.validate());
         if (!valid) {
+            show(this.submitProgress, false);
             return;
         }
 
-        const requestObj = enabledList.map((item) => {
+        const itemsData = enabledList.map((item) => {
             const res = item.getData();
             if (!res) {
                 throw new Error('Invalid transaction object');
@@ -490,11 +516,33 @@ class ImportView extends View {
             return res;
         });
 
+        this.submitDone = 0;
+        this.submitTotal = itemsData.length;
+        this.renderSubmitProgress();
+
+        // Split list of items to chunks
+        this.submitQueue = [];
+        while (itemsData.length > 0) {
+            const chunkSize = Math.min(itemsData.length, SUBMIT_LIMIT);
+            const chunk = itemsData.splice(0, chunkSize);
+            this.submitQueue.push(chunk);
+        }
+
+        this.submitChunk();
+    }
+
+    renderSubmitProgress() {
+        this.submitProgressIndicator.textContent = `${this.submitDone} / ${this.submitTotal}`;
+    }
+
+    submitChunk() {
+        const chunk = this.submitQueue.pop();
+
         ajax.post({
             url: `${baseURL}api/transaction/createMultiple/`,
-            data: JSON.stringify(requestObj),
+            data: JSON.stringify(chunk),
             headers: { 'Content-Type': 'application/json' },
-            callback: this.onSubmitResult.bind(this),
+            callback: (response) => this.onSubmitResult(response),
         });
     }
 
@@ -510,8 +558,16 @@ class ImportView extends View {
             const respObj = JSON.parse(response);
             status = (respObj && respObj.result === 'ok');
             if (status) {
-                message = 'All transactions have been successfully imported';
-                this.removeAllItems();
+                this.submitDone = Math.min(this.submitDone + SUBMIT_LIMIT, this.submitTotal);
+                this.renderSubmitProgress();
+
+                if (this.submitQueue.length === 0) {
+                    message = 'All transactions have been successfully imported';
+                    this.removeAllItems();
+                } else {
+                    this.submitChunk();
+                    return;
+                }
             } else if (respObj && respObj.msg) {
                 message = respObj.msg;
             }
@@ -519,6 +575,7 @@ class ImportView extends View {
             message = e.message;
         }
 
+        show(this.submitProgress, false);
         createMessage(message, (status ? 'msg_success' : 'msg_error'));
     }
 

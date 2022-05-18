@@ -82,12 +82,20 @@
 
 /* Rule item content */
 .rule-item .collapsible-content {
+  display: flex;
   flex-flow: column nowrap;
-  padding: 8px;
-  margin: 0 1px;
+  height: 0;
+  padding: 0;
+  overflow-y: auto;
   border: 0 none;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
+}
+
+.rule-item.collapsible__expanded > .collapsible-content {
+  height: auto;
+  padding: 8px;
+  margin: 0 1px;
 }
 
 .rule-item__header {

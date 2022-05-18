@@ -1,54 +1,35 @@
 import { TestView } from 'jezve-test';
 import { Header } from './component/Header.js';
 import { MessagePopup } from './component/MessagePopup.js';
+import {
+    url,
+    navigation,
+    query,
+    click,
+} from '../env.js';
 
 export class AppView extends TestView {
-    constructor({ environment }) {
-        super({ environment });
-
-        this.environment = environment;
-        if (this.environment) {
-            this.environment.inject(this);
-        }
-
-        this.model = {};
-    }
-
     isUserLoggedIn() {
         const loggedOutLocations = ['login', 'register'];
 
         return loggedOutLocations.every((item) => !this.location.includes(`/${item}`));
     }
 
-    async parseContent() {
-        return {};
-    }
+    async postParse() {
+        this.location = await url();
 
-    async buildModel() {
-        return {};
-    }
+        this.content.header = await Header.create(this, await query('.page > .page_wrapper > .header'));
 
-    async updateModel() {
-        this.model = await this.buildModel(this.content);
-    }
-
-    async parse() {
-        this.location = await this.url();
-
-        this.header = await Header.create(this, await this.query('.page > .page_wrapper > .header'));
-
-        const msgElem = await this.query('.popup__content.msg');
-        this.msgPopup = (msgElem) ? await MessagePopup.create(this, msgElem) : null;
-        this.content = await this.parseContent();
-        await this.updateModel();
+        const msgElem = await query('.popup__content.msg');
+        this.content.msgPopup = (msgElem) ? await MessagePopup.create(this, msgElem) : null;
     }
 
     async closeNotification() {
-        if (!this.msgPopup) {
+        if (!this.content.msgPopup) {
             return;
         }
 
-        await this.performAction(() => this.msgPopup.close());
+        await this.performAction(() => this.content.msgPopup.close());
     }
 
     /** Click on profile menu item and return navigation promise */
@@ -57,16 +38,16 @@ export class AppView extends TestView {
             throw new Error('User is not logged in');
         }
 
-        await this.click(this.header.user.menuBtn); // open user menu
+        await click(this.content.header.content.user.menuBtn); // open user menu
 
-        await this.navigation(() => this.click(this.header.user.profileBtn));
+        await navigation(() => click(this.content.header.content.user.profileBtn));
     }
 
     /** Click on logout link from user menu and return navigation promise */
     async logoutUser() {
-        await this.click(this.header.user.menuBtn);
+        await click(this.content.header.content.user.menuBtn);
 
-        await this.navigation(() => this.click(this.header.user.logoutBtn));
+        await navigation(() => click(this.content.header.content.user.logoutBtn));
     }
 
     async goToMainView() {
@@ -74,6 +55,6 @@ export class AppView extends TestView {
             throw new Error('User not logged in');
         }
 
-        await this.navigation(() => this.click(this.header.logo.linkElem));
+        await navigation(() => click(this.content.header.content.logo.linkElem));
     }
 }

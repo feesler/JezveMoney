@@ -1,23 +1,31 @@
 import { TestComponent } from 'jezve-test';
+import {
+    queryAll,
+    prop,
+    hasClass,
+    click,
+} from '../../env.js';
 
 export class Paginator extends TestComponent {
-    async parse() {
-        this.items = [];
-        this.activeItem = null;
+    async parseContent() {
+        const res = {};
 
-        if (!await this.hasClass(this.elem, 'paginator')) {
+        res.items = [];
+        res.activeItem = null;
+
+        if (!await hasClass(this.elem, 'paginator')) {
             throw new Error('Unexpected stucture of paginator control');
         }
 
         let ellipsisBefore = false;
         let prevPageItem = null;
-        const elems = await this.queryAll(this.elem, '.paginator-item');
+        const elems = await queryAll(this.elem, '.paginator-item');
         if (elems.length === 1) {
             throw new Error('Single item paginator control');
         }
 
         for (const itemElem of elems) {
-            const isArrow = await this.hasClass(this.elem, 'paginator-arrow');
+            const isArrow = await hasClass(this.elem, 'paginator-arrow');
             if (isArrow) {
                 continue;
             }
@@ -27,9 +35,9 @@ export class Paginator extends TestComponent {
             - ellipsis can't be first item
             - ellipsis can't follow after ellipsis
             */
-            const text = await this.prop(itemElem, 'textContent');
+            const text = await prop(itemElem, 'textContent');
             if (text === '...') {
-                if (!this.items.length || ellipsisBefore || !prevPageItem) {
+                if (!res.items.length || ellipsisBefore || !prevPageItem) {
                     throw new Error('Unexpected placement of paginator ellipsis');
                 }
 
@@ -38,15 +46,15 @@ export class Paginator extends TestComponent {
             }
 
             const item = { elem: itemElem };
-            item.isActive = await this.hasClass(itemElem, 'paginator-item__active');
+            item.isActive = await hasClass(itemElem, 'paginator-item__active');
 
-            const tagName = await this.prop(itemElem, 'tagName');
+            const tagName = await prop(itemElem, 'tagName');
             if (tagName === 'A') {
                 item.linkElem = itemElem;
-                item.link = await this.prop(itemElem, 'href');
+                item.link = await prop(itemElem, 'href');
             }
 
-            item.title = await this.prop(itemElem, 'textContent');
+            item.title = await prop(itemElem, 'textContent');
             item.num = parseInt(item.title, 10);
             if (!item.title || Number.isNaN(item.num) || item.num < 1) {
                 throw new Error('Unexpected title of paginator item');
@@ -59,24 +67,24 @@ export class Paginator extends TestComponent {
             - Sequential items must increase only by 1
              */
             if (
-                (!this.items.length && item.num !== 1)
-                || (this.items.length && (!prevPageItem || item.num <= prevPageItem.num))
-                || (this.items.length && !ellipsisBefore && item.num !== prevPageItem.num + 1)
+                (!res.items.length && item.num !== 1)
+                || (res.items.length && (!prevPageItem || item.num <= prevPageItem.num))
+                || (res.items.length && !ellipsisBefore && item.num !== prevPageItem.num + 1)
             ) {
                 throw new Error('Unexpected order of paginator item');
             }
 
             if (item.isActive) {
-                if (this.activeItem) {
+                if (res.activeItem) {
                     throw new Error('More than one active paginator item');
                 }
 
-                this.activeItem = item;
-                this.active = item.num;
+                res.activeItem = item;
+                res.active = item.num;
             }
 
-            item.ind = this.items.length;
-            this.items.push(item);
+            item.ind = res.items.length;
+            res.items.push(item);
             prevPageItem = item;
             ellipsisBefore = false;
         }
@@ -87,41 +95,46 @@ export class Paginator extends TestComponent {
         }
 
         // Check active item present is paginator is visible(2 or more pages)
-        if (this.items.length && !this.activeItem) {
+        if (res.items.length && !res.activeItem) {
             throw new Error('Active paginator item not found');
         }
 
-        if (this.items.length) {
-            this.pages = this.items[this.items.length - 1].num;
+        if (res.items.length) {
+            res.pages = res.items[res.items.length - 1].num;
         } else {
-            this.pages = 1;
-            this.active = 1;
+            res.pages = 1;
+            res.active = 1;
         }
+
+        return res;
     }
 
     getPages() {
-        return this.pages;
+        return this.content.pages;
     }
 
     isFirstPage() {
-        return (!this.activeItem || this.activeItem.ind === 0);
+        return (!this.content.activeItem || this.content.activeItem.ind === 0);
     }
 
     isLastPage() {
-        return (!this.activeItem || this.activeItem.ind === this.items.length - 1);
+        return (
+            !this.content.activeItem
+            || this.content.activeItem.ind === this.content.items.length - 1
+        );
     }
 
     async goToFirstPage() {
-        if (!this.items.length) {
+        if (!this.content.items.length) {
             return;
         }
 
-        const item = this.items[0];
+        const item = this.content.items[0];
         if (item.isActive) {
             return;
         }
 
-        await this.click(item.linkElem);
+        await click(item.linkElem);
     }
 
     async goToPrevPage() {
@@ -129,12 +142,12 @@ export class Paginator extends TestComponent {
             return;
         }
 
-        const item = this.items[this.activeItem.ind - 1];
+        const item = this.content.items[this.content.activeItem.ind - 1];
         if (item.isActive) {
             return;
         }
 
-        await this.click(item.linkElem);
+        await click(item.linkElem);
     }
 
     async goToNextPage() {
@@ -142,24 +155,24 @@ export class Paginator extends TestComponent {
             return;
         }
 
-        const item = this.items[this.activeItem.ind + 1];
+        const item = this.content.items[this.content.activeItem.ind + 1];
         if (item.isActive) {
             return;
         }
 
-        await this.click(item.linkElem);
+        await click(item.linkElem);
     }
 
     async goToLastPage() {
-        if (!this.items.length) {
+        if (!this.content.items.length) {
             return;
         }
 
-        const item = this.items[this.items.length - 1];
+        const item = this.content.items[this.content.items.length - 1];
         if (item.isActive) {
             return;
         }
 
-        await this.click(item.linkElem);
+        await click(item.linkElem);
     }
 }

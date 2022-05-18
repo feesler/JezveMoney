@@ -33,6 +33,9 @@ $phpPath = "$osPanelPath\modules\php\PHP_7.4"
 1. Generate certificates
 2. Run PowerShell as Administrator and open generated DOMAIN-rootCA.crt
 3. Install Certificate > Current User > Trusted Root Certification Authorities > Local Computer
+4. Edit userdata\config\Apache_2.4-PHP_8.0_vhost.conf file:
+    SSLCertificateFile          "%sprogdir%/userdata/config/cert_files/testsrv/testsrv.pem"
+    SSLCertificateKeyFile       "%sprogdir%/userdata/config/cert_files/testsrv/testsrv-key.pem"
 
 
 - PowerShell browserify access rights issue:

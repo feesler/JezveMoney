@@ -1,46 +1,56 @@
-import { TestComponent, copyObject } from 'jezve-test';
+import { copyObject } from 'jezvejs';
+import { TestComponent, assert } from 'jezve-test';
 import { ImportListItem } from './ImportListItem.js';
 import { asyncMap } from '../../../common.js';
+import { query, queryAll, isVisible } from '../../../env.js';
 
 export class ImportList extends TestComponent {
     constructor(parent, elem, mainAccount) {
         super(parent, elem);
 
         this.mainAccount = mainAccount;
-
-        this.model = {};
     }
 
-    async parse() {
-        this.items = [];
-        this.invalidated = false;
+    async parseContent() {
+        const res = {
+            items: [],
+            invalidated: false,
+        };
 
-        const listItems = await this.queryAll(this.elem, '.import-item');
+        const listItems = await queryAll(this.elem, '.import-item');
         if (listItems) {
-            this.items = await asyncMap(
+            res.items = await asyncMap(
                 listItems,
                 (item) => ImportListItem.create(this.parent, item, this.mainAccount),
             );
-            this.invalidated = this.items.some((item) => item.model.invalidated);
         } else {
-            const noDataMsg = await this.query(this.elem, '.nodata-message');
-            const visible = await this.isVisible(noDataMsg);
+            const noDataMsg = await query(this.elem, '.nodata-message');
+            const visible = await isVisible(noDataMsg);
             if (!visible) {
                 throw new Error('No data message is not visible');
             }
         }
 
-        const loadingIndicator = await this.query(this.elem, '.data-container__loading');
-        this.isLoading = await this.isVisible(loadingIndicator);
+        res.loadingIndicator = await query(this.elem, '.data-container__loading');
+
+        return res;
+    }
+
+    async buildModel(cont) {
+        const res = {
+            items: cont.items.map((item) => this.getItemData(item)),
+            invalidated: cont.items.some((item) => item.model.invalidated),
+            isLoading: await isVisible(cont.loadingIndicator),
+        };
+
+        return res;
     }
 
     getItem(index) {
         const ind = parseInt(index, 10);
-        if (Number.isNaN(ind) || ind < 0 || ind >= this.items.length) {
-            throw new Error(`Invalid index of item: ${index}`);
-        }
+        assert.arrayIndex(this.content.items, ind);
 
-        return this.items[ind];
+        return this.content.items[ind];
     }
 
     getItemData(item) {
@@ -54,17 +64,17 @@ export class ImportList extends TestComponent {
     }
 
     getItems() {
-        return this.items.map((item) => this.getItemData(item));
+        return this.content.items.map((item) => this.getItemData(item));
     }
 
     getEnabledItems() {
-        return this.items.filter((item) => item.model.enabled);
+        return this.content.items.filter((item) => item.model.enabled);
     }
 
     getExpectedState() {
         return {
-            items: this.items.map(
-                (item) => copyObject(item.getExpectedState(item.model).values),
+            items: this.content.items.map(
+                (item) => copyObject(item.getExpectedState(item.model)),
             ),
         };
     }

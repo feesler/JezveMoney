@@ -5,31 +5,37 @@ import { Tile } from './component/Tile.js';
 import { IconLink } from './component/IconLink.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { Toolbar } from './component/Toolbar.js';
+import {
+    query,
+    prop,
+    navigation,
+    click,
+} from '../env.js';
 
 /** List of persons view class */
 export class PersonsView extends AppView {
     async parseContent() {
         const res = {
-            titleEl: await this.query('.content_wrap > .heading > h1'),
-            addBtn: await IconLink.create(this, await this.query('#add_btn')),
-            toolbar: await Toolbar.create(this, await this.query('#toolbar')),
+            titleEl: await query('.content_wrap > .heading > h1'),
+            addBtn: await IconLink.create(this, await query('#add_btn')),
+            toolbar: await Toolbar.create(this, await query('#toolbar')),
         };
 
         if (
             !res.titleEl
             || !res.addBtn
             || !res.toolbar
-            || !res.toolbar.editBtn
-            || !res.toolbar.delBtn
+            || !res.toolbar.content.editBtn
+            || !res.toolbar.content.delBtn
         ) {
             throw new Error('Invalid structure of persons view');
         }
 
-        res.title = this.prop(res.titleEl, 'textContent');
-        res.tiles = await TilesList.create(this, await this.query('#tilesContainer'), Tile);
-        res.hiddenTiles = await TilesList.create(this, await this.query('#hiddenTilesContainer'), Tile);
+        res.title = prop(res.titleEl, 'textContent');
+        res.tiles = await TilesList.create(this, await query('#tilesContainer'), Tile);
+        res.hiddenTiles = await TilesList.create(this, await query('#hiddenTilesContainer'), Tile);
 
-        res.delete_warning = await WarningPopup.create(this, await this.query('#delete_warning'));
+        res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
         return res;
     }
@@ -43,7 +49,7 @@ export class PersonsView extends AppView {
 
     /** Click on add button */
     async goToCreatePerson() {
-        await this.navigation(() => this.content.addBtn.click());
+        await navigation(() => this.content.addBtn.click());
     }
 
     async selectPersons(data) {
@@ -53,8 +59,8 @@ export class PersonsView extends AppView {
 
         const persons = Array.isArray(data) ? data : [data];
 
-        const visibleTiles = this.content.tiles.items.length;
-        const hiddenTiles = this.content.hiddenTiles.items.length;
+        const visibleTiles = this.content.tiles.itemsCount();
+        const hiddenTiles = this.content.hiddenTiles.itemsCount();
         const totalTiles = visibleTiles + hiddenTiles;
         const activeTiles = this.content.tiles.getActive();
         const activeHiddenTiles = this.content.hiddenTiles.getActive();
@@ -66,13 +72,13 @@ export class PersonsView extends AppView {
             }
 
             if (num < visibleTiles) {
-                const item = this.content.tiles.items[num];
-                const isSelected = item.isActive;
+                const item = this.content.tiles.content.items[num];
+                const isSelected = item.content.isActive;
                 await this.performAction(() => item.click());
                 selectedCount += (isSelected ? -1 : 1);
             } else {
-                const item = this.content.hiddenTiles.items[num - visibleTiles];
-                const isSelected = item.isActive;
+                const item = this.content.hiddenTiles.content.items[num - visibleTiles];
+                const isSelected = item.content.isActive;
                 await this.performAction(() => item.click());
                 selectedHiddenCount += (isSelected ? -1 : 1);
             }
@@ -104,7 +110,7 @@ export class PersonsView extends AppView {
     async goToUpdatePerson(num) {
         await this.selectPersons(num);
 
-        await this.navigation(() => this.content.toolbar.clickButton('update'));
+        await navigation(() => this.content.toolbar.clickButton('update'));
     }
 
     async deletePersons(persons) {
@@ -116,14 +122,14 @@ export class PersonsView extends AppView {
             throw new Error('Delete person(s) warning popup not appear');
         }
 
-        await this.navigation(() => this.click(this.content.delete_warning.okBtn));
+        await navigation(() => click(this.content.delete_warning.content.okBtn));
     }
 
     /** Show secified accounts */
     async showPersons(persons, val = true) {
         await this.selectPersons(persons);
 
-        await this.navigation(() => this.content.toolbar.clickButton(val ? 'show' : 'hide'));
+        await navigation(() => this.content.toolbar.clickButton(val ? 'show' : 'hide'));
     }
 
     /** Hide secified accounts */
@@ -133,10 +139,8 @@ export class PersonsView extends AppView {
 
     static render(state) {
         const res = {
-            values: {
-                tiles: TilesList.renderPersons(state.persons),
-                hiddenTiles: TilesList.renderHiddenPersons(state.persons),
-            },
+            tiles: TilesList.renderPersons(state.persons),
+            hiddenTiles: TilesList.renderHiddenPersons(state.persons),
         };
 
         return res;

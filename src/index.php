@@ -24,11 +24,6 @@ $router->setAliases([
     "register" => "user/register",
 ]);
 
-$router->setActionsMap([
-    "new" => "create",
-    "edit" => "update"
-]);
-
 $router->onStart(function ($controller, $contrStr, $routeParts) {
     // Check correct user authentication for controller
     $loggedOutControllers = ["user/login", "user/register"];

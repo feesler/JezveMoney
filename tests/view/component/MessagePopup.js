@@ -1,4 +1,10 @@
 import { TestComponent } from 'jezve-test';
+import {
+    query,
+    prop,
+    hasClass,
+    click,
+} from '../../env.js';
 
 export class MessagePopup extends TestComponent {
     static async create(...args) {
@@ -21,25 +27,29 @@ export class MessagePopup extends TestComponent {
         return instance;
     }
 
-    async parse() {
-        this.success = await this.hasClass(this.elem, 'msg_success')
-            && !(await this.hasClass(this.elem, 'msg_error'));
+    async parseContent() {
+        const res = {};
 
-        this.messageElem = await this.query(this.elem, '.popup__message');
-        if (!this.messageElem) {
+        res.success = await hasClass(this.elem, 'msg_success')
+            && !(await hasClass(this.elem, 'msg_error'));
+
+        res.messageElem = await query(this.elem, '.popup__message');
+        if (!res.messageElem) {
             throw new Error('Wrong structure of message popup');
         }
 
-        this.message = await this.prop(this.messageElem, 'textContent');
-        this.message = this.message.trim();
-        this.closeBtn = await this.query(this.elem, '.close-btn');
+        res.message = await prop(res.messageElem, 'textContent');
+        res.message = res.message.trim();
+        res.closeBtn = await query(this.elem, '.close-btn');
 
-        if (!this.success) {
-            console.log(`Error popup appear: ${this.message}`);
+        if (!res.success) {
+            console.log(`Error popup appear: ${res.message}`);
         }
+
+        return res;
     }
 
     async close() {
-        return this.click(this.closeBtn);
+        return click(this.content.closeBtn);
     }
 }

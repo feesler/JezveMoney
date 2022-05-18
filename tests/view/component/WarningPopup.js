@@ -1,12 +1,17 @@
 import { TestComponent } from 'jezve-test';
+import { query, prop } from '../../env.js';
 
 export class WarningPopup extends TestComponent {
-    async parse() {
-        this.titleElem = await this.query(this.elem, '.popup__title');
-        this.title = await this.prop(this.titleElem, 'textContent');
-        this.messageElem = await this.query(this.elem, '.popup__message > div');
-        this.message = await this.prop(this.messageElem, 'textContent');
-        this.okBtn = await this.query(this.elem, '.popup__controls > .btn.submit-btn');
-        this.cancelBtn = await this.query(this.elem, '.popup__controls > .btn.cancel-btn');
+    async parseContent() {
+        const res = {
+            titleElem: await query(this.elem, '.popup__title'),
+            title: await prop(this.titleElem, 'textContent'),
+            messageElem: await query(this.elem, '.popup__message > div'),
+            message: await prop(this.messageElem, 'textContent'),
+            okBtn: await query(this.elem, '.popup__controls > .btn.submit-btn'),
+            cancelBtn: await query(this.elem, '.popup__controls > .btn.cancel-btn'),
+        };
+
+        return res;
     }
 }

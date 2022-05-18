@@ -1,15 +1,11 @@
 import { copyObject } from 'jezve-test';
 import { urlJoin } from '../common.js';
 import { ApiRequestError } from '../error/ApiRequestError.js';
-import { App } from '../Application.js';
+import { baseUrl, httpReq } from '../env.js';
 
 async function apiRequest(method, url, data = null) {
-    if (!App.environment) {
-        throw new Error('Environment not set up');
-    }
-
-    const reqUrl = `${App.environment.baseUrl()}api/${url}`;
-    const response = await App.environment.httpReq(method, reqUrl, data);
+    const reqUrl = `${baseUrl()}api/${url}`;
+    const response = await httpReq(method, reqUrl, data);
     if (response.status !== 200) {
         console.log(`Invalid status code: ${response.status}`);
         return false;

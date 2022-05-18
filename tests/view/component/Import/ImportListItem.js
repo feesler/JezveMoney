@@ -17,6 +17,15 @@ import {
     fixFloat,
 } from '../../../common.js';
 import { App } from '../../../Application.js';
+import {
+    query,
+    queryAll,
+    prop,
+    click,
+    input,
+    onChange,
+    isVisible,
+} from '../../../env.js';
 
 export class ImportListItem extends TestComponent {
     constructor(parent, elem, mainAccount) {
@@ -45,8 +54,7 @@ export class ImportListItem extends TestComponent {
 
         for (const fieldName in fieldsMap) {
             if (fieldsMap[fieldName] === field.title) {
-                this[fieldName] = field;
-                return;
+                return { name: fieldName, component: field };
             }
         }
 
@@ -60,45 +68,38 @@ export class ImportListItem extends TestComponent {
             throw new Error('Invalid field element');
         }
 
-        res.labelElem = await this.query(elem, ':scope > label');
+        res.labelElem = await query(elem, ':scope > label');
         if (!res.labelElem) {
             throw new Error('Invalid structure of field element');
         }
-        res.title = await this.prop(res.labelElem, 'textContent');
+        res.title = await prop(res.labelElem, 'textContent');
 
-        const dropDownElem = await this.query(elem, '.dd__container');
+        const dropDownElem = await query(elem, '.dd__container');
         if (dropDownElem) {
             res.dropDown = await DropDown.create(this, dropDownElem);
             if (!res.dropDown) {
                 throw new Error('Invalid structure of field element');
             }
-            res.disabled = res.dropDown.disabled;
-            res.value = res.dropDown.value;
+            res.disabled = res.dropDown.content.disabled;
+            res.value = res.dropDown.content.value;
         } else {
-            res.inputElem = await this.query(elem, ':scope > div > *');
+            res.inputElem = await query(elem, ':scope > div > *');
             if (!res.inputElem) {
                 throw new Error('Invalid structure of field element');
             }
-            res.disabled = await this.prop(res.inputElem, 'disabled');
-            res.value = await this.prop(res.inputElem, 'value');
+            res.disabled = await prop(res.inputElem, 'disabled');
+            res.value = await prop(res.inputElem, 'value');
         }
 
-        res.environment = this.environment;
-        if (res.environment) {
-            res.environment.inject(res);
-        }
-
-        this.mapField(res);
-
-        return res;
+        return this.mapField(res);
     }
 
-    async parseOriginalData() {
-        if (!this.origDataTable) {
-            this.originalData = null;
-            return;
+    async parseOriginalData(cont) {
+        if (!cont.origDataTable) {
+            return null;
         }
-        this.originalData = {};
+
+        const res = {};
         const labelsMap = {
             mainAccount: 'Main account',
             transactionAmount: 'Tr. amount',
@@ -109,64 +110,74 @@ export class ImportListItem extends TestComponent {
             date: 'Date',
         };
 
-        const dataValues = await this.queryAll(this.origDataTable, '.data-value');
+        const dataValues = await queryAll(cont.origDataTable, '.data-value');
         for (const dataValueElem of dataValues) {
-            const labelElem = await this.query(dataValueElem, 'label');
-            const valueElem = await this.query(dataValueElem, 'div');
+            const labelElem = await query(dataValueElem, 'label');
+            const valueElem = await query(dataValueElem, 'div');
             if (!labelElem || !valueElem) {
                 throw new Error('Invalid structure of import item');
             }
 
-            const label = await this.prop(labelElem, 'textContent');
-            const value = await this.prop(valueElem, 'textContent');
-            const prop = Object.keys(labelsMap).find((key) => label === labelsMap[key]);
+            const label = await prop(labelElem, 'textContent');
+            const value = await prop(valueElem, 'textContent');
+            const property = Object.keys(labelsMap).find((key) => label === labelsMap[key]);
 
-            if (prop) {
-                this.originalData[prop] = value;
+            if (property) {
+                res[property] = value;
             } else {
                 throw new Error(`Invalid label: '${label}'`);
             }
         }
 
-        const valid = Object.keys(labelsMap).every((key) => key in this.originalData);
+        const valid = Object.keys(labelsMap).every((key) => key in res);
         if (!valid) {
             throw new Error('Invalid structure of import item');
         }
+
+        return res;
     }
 
-    async parse() {
-        this.enableCheck = await this.query(this.elem, '.enable-check input[type="checkbox"]');
-        if (!this.enableCheck) {
+    async parseContent() {
+        const res = {
+            enableCheck: await query(this.elem, '.enable-check input[type="checkbox"]'),
+        };
+        if (!res.enableCheck) {
             throw new Error('Invalid structure of import item');
         }
-        this.enabled = await this.prop(this.enableCheck, 'checked');
+        res.enabled = await prop(res.enableCheck, 'checked');
 
-        const fieldElems = await this.queryAll(this.elem, '.field');
-        await asyncMap(fieldElems, (field) => this.parseField(field));
+        const fieldElems = await queryAll(this.elem, '.field');
+        const fields = await asyncMap(fieldElems, (field) => this.parseField(field));
+        fields.forEach((field) => { res[field.name] = field.component; });
 
-        this.invFeedback = { elem: await this.query(this.elem, '.invalid-feedback') };
-        this.deleteBtn = await this.query(this.elem, '.delete-btn');
-        this.toggleBtn = await this.query(this.elem, '.toggle-btn');
-        this.origDataTable = await this.query(this.elem, '.orig-data-table');
+        res.invFeedback = { elem: await query(this.elem, '.invalid-feedback') };
+        res.deleteBtn = await query(this.elem, '.delete-btn');
+        res.toggleBtn = await query(this.elem, '.toggle-btn');
+        res.origDataTable = await query(this.elem, '.orig-data-table');
 
         if (
-            !this.typeField
-            || !this.amountField
-            || !this.destAmountField
-            || !this.destAccountField
-            || !this.personField
-            || !this.currencyField
-            || !this.dateField
-            || !this.commentField
-            || !this.invFeedback.elem
-            || !this.deleteBtn
+            !res.typeField
+            || !res.amountField
+            || !res.destAmountField
+            || !res.destAccountField
+            || !res.personField
+            || !res.currencyField
+            || !res.dateField
+            || !res.commentField
+            || !res.invFeedback.elem
+            || !res.deleteBtn
         ) {
             throw new Error('Invalid structure of import item');
         }
 
-        await this.parseOriginalData();
+        res.originalData = await this.parseOriginalData(res);
 
-        this.model = await this.buildModel();
+        return res;
+    }
+
+    async updateModel() {
+        await super.updateModel();
+
         this.data = this.getExpectedTransaction(this.model);
         if (this.data) {
             this.data.enabled = this.model.enabled;
@@ -194,7 +205,7 @@ export class ImportListItem extends TestComponent {
         throw new Error('Invalid transaction type');
     }
 
-    async buildModel() {
+    async buildModel(cont) {
         const res = {};
 
         res.mainAccount = App.state.accounts.getItem(this.mainAccount);
@@ -202,34 +213,34 @@ export class ImportListItem extends TestComponent {
             throw new Error('Main account not found');
         }
 
-        res.enabled = this.enabled;
-        res.type = this.typeField.value;
-        res.amount = this.amountField.value;
-        res.destAmount = this.destAmountField.value;
+        res.enabled = cont.enabled;
+        res.type = cont.typeField.value;
+        res.amount = cont.amountField.value;
+        res.destAmount = cont.destAmountField.value;
 
-        res.destId = this.destAccountField.value;
+        res.destId = cont.destAccountField.value;
         res.destAccount = App.state.accounts.getItem(res.destId);
 
-        res.personId = this.personField.value;
+        res.personId = cont.personField.value;
         res.person = App.state.persons.getItem(res.personId);
 
-        res.currId = this.currencyField.value;
+        res.currId = cont.currencyField.value;
         res.currency = Currency.getById(res.currId);
 
-        res.date = this.dateField.value;
-        res.comment = this.commentField.value;
+        res.date = cont.dateField.value;
+        res.comment = cont.commentField.value;
 
         res.isDifferent = this.isDifferentCurrencies(res);
 
-        res.invalidated = await this.isVisible(this.invFeedback.elem, true);
-        res.imported = await this.isVisible(this.toggleBtn, true);
-        if (this.originalData) {
+        res.invalidated = await isVisible(cont.invFeedback.elem, true);
+        res.imported = await isVisible(cont.toggleBtn, true);
+        if (cont.originalData) {
             res.original = {
-                ...this.originalData,
-                accountAmount: ImportTemplate.amountFix(this.originalData.accountAmount),
-                transactionAmount: ImportTemplate.amountFix(this.originalData.transactionAmount),
+                ...cont.originalData,
+                accountAmount: ImportTemplate.amountFix(cont.originalData.accountAmount),
+                transactionAmount: ImportTemplate.amountFix(cont.originalData.transactionAmount),
                 date: formatDate(
-                    ImportTemplate.dateFromString(this.originalData.date),
+                    ImportTemplate.dateFromString(cont.originalData.date),
                 ),
             };
         }
@@ -239,96 +250,84 @@ export class ImportListItem extends TestComponent {
 
     getExpectedState(model) {
         const res = {
-            visibility: {
-                typeField: true,
-                amountField: true,
-                currencyField: true,
-                dateField: true,
-                commentField: true,
-                invFeedback: model.invalidated,
+            enabled: model.enabled,
+            typeField: {
+                value: model.type.toString(),
+                disabled: !model.enabled,
+                visible: true,
             },
-            values: {
-                enabled: model.enabled,
-                typeField: {
-                    value: model.type.toString(),
-                    disabled: !model.enabled,
-                },
-                amountField: {
-                    value: model.amount.toString(),
-                    disabled: !model.enabled,
-                },
-                destAmountField: {
-                    value: model.destAmount.toString(),
-                    disabled: !model.enabled,
-                },
-                destAccountField: {
-                    value: model.destId.toString(),
-                    disabled: !model.enabled,
-                },
-                currencyField: {
-                    value: model.currId.toString(),
-                    disabled: !model.enabled,
-                },
-                personField: {
-                    value: model.personId.toString(),
-                },
-                dateField: {
-                    value: model.date.toString(),
-                    disabled: !model.enabled,
-                },
-                commentField: {
-                    value: model.comment.toString(),
-                    disabled: !model.enabled,
-                },
+            amountField: {
+                value: model.amount.toString(),
+                disabled: !model.enabled,
+                visible: true,
             },
+            destAmountField: {
+                value: model.destAmount.toString(),
+                disabled: !model.enabled,
+            },
+            destAccountField: {
+                value: model.destId.toString(),
+                disabled: !model.enabled,
+            },
+            currencyField: {
+                value: model.currId.toString(),
+                disabled: !model.enabled,
+                visible: true,
+            },
+            personField: {
+                value: model.personId.toString(),
+            },
+            dateField: {
+                value: model.date.toString(),
+                disabled: !model.enabled,
+                visible: true,
+            },
+            commentField: {
+                value: model.comment.toString(),
+                disabled: !model.enabled,
+                visible: true,
+            },
+            invFeedback: { visible: model.invalidated },
         };
 
         if (model.type === 'expense') {
-            Object.assign(res.visibility, {
-                destAmountField: model.isDifferent,
-                destAccountField: false,
-                personField: false,
-            });
+            res.destAmountField.visible = model.isDifferent;
+            res.destAccountField.visible = false;
+            res.personField.visible = false;
 
-            res.values.destAccountField.disabled = true;
-            res.values.personField.disabled = true;
+            res.destAccountField.disabled = true;
+            res.personField.disabled = true;
         } else if (model.type === 'income') {
-            Object.assign(res.visibility, {
-                destAmountField: model.isDifferent,
-                destAccountField: false,
-                personField: false,
-            });
+            res.destAmountField.visible = model.isDifferent;
+            res.destAccountField.visible = false;
+            res.personField.visible = false;
 
-            res.values.destAccountField.disabled = true;
-            res.values.personField.disabled = true;
+            res.destAccountField.disabled = true;
+            res.personField.disabled = true;
         } else if (model.type === 'transferfrom' || model.type === 'transferto') {
-            Object.assign(res.visibility, {
-                destAmountField: model.isDifferent,
-                destAccountField: true,
-                personField: false,
-            });
+            res.destAmountField.visible = model.isDifferent;
+            res.destAccountField.visible = true;
+            res.personField.visible = false;
 
             if (model.enabled) {
-                res.values.destAccountField.disabled = false;
+                res.destAccountField.disabled = false;
             }
-            res.values.currencyField.disabled = true;
-            res.values.personField.disabled = true;
+            res.currencyField.disabled = true;
+            res.personField.disabled = true;
         } else if (model.type === 'debtfrom' || model.type === 'debtto') {
-            Object.assign(res.visibility, {
-                destAmountField: false,
-                destAccountField: false,
-                personField: true,
-            });
+            res.destAmountField.visible = false;
+            res.destAccountField.visible = false;
+            res.personField.visible = true;
 
-            res.values.destAccountField.disabled = true;
-            res.values.currencyField.disabled = true;
+            res.destAccountField.disabled = true;
+            res.currencyField.disabled = true;
         }
 
         if (model.enabled) {
             if (!model.isDifferent) {
-                res.values.destAmountField = { value: '', disabled: true };
+                res.destAmountField = { value: '', disabled: true };
             } else {
-                res.values.destAmountField.disabled = !model.isDifferent;
+                res.destAmountField.disabled = !model.isDifferent;
             }
         }
 
@@ -451,8 +450,8 @@ export class ImportListItem extends TestComponent {
         this.model.enabled = !this.model.enabled;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.click(this.enableCheck);
-        await this.onChange(this.enableCheck);
+        await click(this.content.enableCheck);
+        await onChange(this.content.enableCheck);
         await this.parse();
 
         return this.checkState();
@@ -499,7 +498,7 @@ export class ImportListItem extends TestComponent {
     }
 
     async changeType(value) {
-        this.checkEnabled(this.typeField);
+        this.checkEnabled(this.content.typeField);
 
         const typeBefore = this.model.type;
         const isDiffBefore = this.model.isDifferent;
@@ -540,14 +539,14 @@ export class ImportListItem extends TestComponent {
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.typeField.dropDown.selectItem(value);
+        await this.content.typeField.dropDown.selectItem(value);
         await this.parse();
 
         return this.checkState();
     }
 
     async changeDestAccount(value) {
-        this.checkEnabled(this.destAccountField);
+        this.checkEnabled(this.content.destAccountField);
 
         const accountId = parseInt(value, 10);
         if (!accountId) {
@@ -565,54 +564,54 @@ export class ImportListItem extends TestComponent {
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.destAccountField.dropDown.selectItem(value);
+        await this.content.destAccountField.dropDown.selectItem(value);
         await this.parse();
 
         return this.checkState();
     }
 
     async changePerson(value) {
-        this.checkEnabled(this.personField);
+        this.checkEnabled(this.content.personField);
 
         this.model.personId = value;
         this.model.person = App.state.persons.getItem(value);
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.personField.dropDown.selectItem(value);
+        await this.content.personField.dropDown.selectItem(value);
         await this.parse();
 
         return this.checkState();
     }
 
     async inputAmount(value) {
-        this.checkEnabled(this.amountField);
+        this.checkEnabled(this.content.amountField);
 
         this.model.amount = value;
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.input(this.amountField.inputElem, value);
+        await input(this.content.amountField.inputElem, value);
         await this.parse();
 
         return this.checkState();
     }
 
     async inputDestAmount(value) {
-        this.checkEnabled(this.destAmountField);
+        this.checkEnabled(this.content.destAmountField);
 
         this.model.destAmount = value;
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.input(this.destAmountField.inputElem, value);
+        await input(this.content.destAmountField.inputElem, value);
         await this.parse();
 
         return this.checkState();
     }
 
     async changeCurrency(value) {
-        this.checkEnabled(this.currencyField);
+        this.checkEnabled(this.content.currencyField);
 
         this.model.currId = value;
         this.model.currency = Currency.getById(value);
@@ -620,39 +619,39 @@ export class ImportListItem extends TestComponent {
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.currencyField.dropDown.selectItem(value);
+        await this.content.currencyField.dropDown.selectItem(value);
         await this.parse();
 
         return this.checkState();
     }
 
     async inputDate(value) {
-        this.checkEnabled(this.dateField);
+        this.checkEnabled(this.content.dateField);
 
         this.model.date = value;
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.input(this.dateField.inputElem, value);
+        await input(this.content.dateField.inputElem, value);
         await this.parse();
 
         return this.checkState();
     }
 
     async inputComment(value) {
-        this.checkEnabled(this.commentField);
+        this.checkEnabled(this.content.commentField);
 
         this.model.comment = value;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.input(this.commentField.inputElem, value);
+        await input(this.content.commentField.inputElem, value);
         await this.parse();
 
         return this.checkState();
     }
 
     async clickDelete() {
-        return this.click(this.deleteBtn);
+        return click(this.content.deleteBtn);
     }
 
     /**

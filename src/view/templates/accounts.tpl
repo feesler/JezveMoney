@@ -16,8 +16,8 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         <?=IconLink::render([
                             "id" => "add_btn",
                             "type" => "link",
-                            "link" => BASEURL . "accounts/new/",
-                            "title" => "New",
+                            "link" => BASEURL . "accounts/create/",
+                            "title" => "Create",
                             "icon" => "plus"
                         ])?>
                     </div>

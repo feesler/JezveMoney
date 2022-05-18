@@ -95,7 +95,7 @@ class TransactionListView extends View {
         this.accountDropDown = DropDown.create({
             input_id: 'acc_id',
             placeholder: 'Select account',
-            onchange: this.onAccountChange.bind(this),
+            onchange: (obj) => this.onAccountChange(obj),
             editable: false,
             extraClass: 'dd__fullwidth',
         });
@@ -107,7 +107,7 @@ class TransactionListView extends View {
         if (!this.searchFrm) {
             throw new Error('Failed to initialize Transaction List view');
         }
-        this.searchFrm.addEventListener('submit', this.onSearchSubmit.bind(this));
+        this.searchFrm.addEventListener('submit', (e) => this.onSearchSubmit(e));
 
         this.searchInp = ge('search');
         if (!this.searchInp) {
@@ -155,8 +155,8 @@ class TransactionListView extends View {
         this.listItems = document.querySelector('.trans-list');
         if (this.listItems) {
             this.trListSortable = new Sortable({
-                ondragstart: this.onTransDragStart.bind(this),
-                oninsertat: this.onTransPosChanged.bind(this),
+                ondragstart: (elem) => this.onTransDragStart(elem),
+                oninsertat: (elem, ref) => this.onTransPosChanged(elem, ref),
                 container: this.listItems,
                 group: 'transactions',
                 selector: '.trans-list__item-wrapper',
@@ -171,7 +171,7 @@ class TransactionListView extends View {
              */
             this.trListSortable.dragFrom = -1;
 
-            this.listItems.addEventListener('click', this.onTransClick.bind(this));
+            this.listItems.addEventListener('click', (e) => this.onTransClick(e));
         }
 
         const paginatorElems = document.querySelectorAll('.paginator');
@@ -738,7 +738,7 @@ class TransactionListView extends View {
         this.datePickerBtn.hide();
         show(this.dateBlock, true);
 
-        setEmptyClick(this.datePicker.hide.bind(this.datePicker), [
+        setEmptyClick(() => this.datePicker.hide(), [
             this.datePickerWrapper,
             this.datePickerBtn.elem,
             this.dateInputBtn,
@@ -885,7 +885,7 @@ class TransactionListView extends View {
         this.delTransInp.value = selArr.join();
 
         if (state.selectedItems.count() === 1) {
-            this.toolbar.updateBtn.setURL(`${baseURL}transactions/edit/${selArr[0]}`);
+            this.toolbar.updateBtn.setURL(`${baseURL}transactions/update/${selArr[0]}`);
         }
 
         this.toolbar.show(state.selectedItems.count() > 0);

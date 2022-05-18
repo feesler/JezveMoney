@@ -1,4 +1,5 @@
-import { TestComponent, copyObject } from 'jezve-test';
+import { copyObject } from 'jezvejs';
+import { TestComponent } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { Currency } from '../model/Currency.js';
 import { Icon } from '../model/Icon.js';
@@ -8,6 +9,12 @@ import { DropDown } from './component/DropDown.js';
 import { InputRow } from './component/InputRow.js';
 import { IconLink } from './component/IconLink.js';
 import { WarningPopup } from './component/WarningPopup.js';
+import {
+    query,
+    prop,
+    navigation,
+    click,
+} from '../env.js';
 
 /** Create or update account view class */
 export class AccountView extends AppView {
@@ -26,11 +33,11 @@ export class AccountView extends AppView {
         }
 
         // Name
-        res.name = cont.name.value;
+        res.name = cont.name.content.value;
         res.nameTyped = this.nameTyped;
 
         // Iniital balance
-        res.initbalance = cont.balance.value;
+        res.initbalance = cont.balance.content.value;
         res.fInitBalance = isValidValue(res.initbalance)
             ? normalize(res.initbalance)
             : res.initbalance;
@@ -44,7 +51,7 @@ export class AccountView extends AppView {
         res.fBalance = res.balance;
 
         // Currency
-        const selectedCurr = cont.currDropDown.textValue;
+        const selectedCurr = cont.currDropDown.content.textValue;
         res.currObj = Currency.findByName(selectedCurr);
         if (!res.currObj) {
             throw new Error(`Currency '${selectedCurr}' not found`);
@@ -53,7 +60,7 @@ export class AccountView extends AppView {
         res.curr_id = res.currObj.id;
 
         // Icon
-        let iconObj = Icon.findByName(cont.iconDropDown.textValue);
+        let iconObj = Icon.findByName(cont.iconDropDown.content.textValue);
         if (!iconObj) {
             iconObj = Icon.noIcon();
         }
@@ -121,21 +128,15 @@ export class AccountView extends AppView {
             accTile.name = 'New account';
         }
 
+        accTile.visible = true;
+
         const res = {
-            visibility: {
-                heading: true,
-                tile: true,
-                iconDropDown: true,
-                name: true,
-                currDropDown: true,
-            },
-            values: {
-                tile: accTile,
-                name: this.model.name.toString(),
-                balance: this.model.initbalance.toString(),
-                currDropDown: { textValue: this.model.currObj.name },
-                iconDropDown: { textValue: this.model.tileIcon.name },
-            },
+            heading: { visible: true },
+            tile: accTile,
+            name: { value: this.model.name.toString(), visible: true },
+            balance: { value: this.model.initbalance.toString(), visible: true },
+            currDropDown: { textValue: this.model.currObj.name, visible: true },
+            iconDropDown: { textValue: this.model.tileIcon.name, visible: true },
         };
 
         this.expectedState = res;
@@ -146,23 +147,23 @@ export class AccountView extends AppView {
     async parseContent() {
         const res = {};
 
-        res.heading = { elem: await this.query('.heading > h1') };
+        res.heading = { elem: await query('.heading > h1') };
         if (!res.heading.elem) {
             throw new Error('Heading element not found');
         }
-        res.heading.text = await this.prop(res.heading.elem, 'textContent');
-        res.delBtn = await IconLink.create(this, await this.query('#del_btn'));
-        res.tile = await Tile.create(this, await this.query('#acc_tile'));
+        res.heading.text = await prop(res.heading.elem, 'textContent');
+        res.delBtn = await IconLink.create(this, await query('#del_btn'));
+        res.tile = await Tile.create(this, await query('#acc_tile'));
 
-        res.formElem = await this.query('form');
+        res.formElem = await query('form');
         if (!res.formElem) {
             throw new Error('Form element not found');
         }
 
-        const hiddenEl = await this.query('#accid');
+        const hiddenEl = await query('#accid');
         res.isUpdate = (!!hiddenEl);
         if (res.isUpdate) {
-            res.id = parseInt(await this.prop(hiddenEl, 'value'), 10);
+            res.id = parseInt(await prop(hiddenEl, 'value'), 10);
             if (!res.id) {
                 throw new Error('Wrong account id');
             }
@@ -170,37 +171,37 @@ export class AccountView extends AppView {
 
         let curChildren = (res.isUpdate) ? 3 : 2;
 
-        res.iconDropDown = await DropDown.createFromChild(this, await this.query('#icon'));
+        res.iconDropDown = await DropDown.createFromChild(this, await query('#icon'));
 
         curChildren += 1;
-        let elem = await this.query(`form > *:nth-child(${curChildren})`);
+        let elem = await query(`form > *:nth-child(${curChildren})`);
         res.name = await InputRow.create(this, elem);
         if (!res.name) {
             throw new Error('Account name input not found');
         }
 
         curChildren += 1;
-        res.currDropDown = await DropDown.createFromChild(this, await this.query('#currency'));
+        res.currDropDown = await DropDown.createFromChild(this, await query('#currency'));
 
         curChildren += 1;
-        elem = await this.query(`form > *:nth-child(${curChildren})`);
+        elem = await query(`form > *:nth-child(${curChildren})`);
 
         res.balance = await InputRow.create(this, elem);
 
-        res.flagsInp = await this.query('#flags');
-        res.flags = parseInt(await this.prop(res.flagsInp, 'value'), 10);
+        res.flagsInp = await query('#flags');
+        res.flags = parseInt(await prop(res.flagsInp, 'value'), 10);
 
-        res.submitBtn = await this.query('.acc_controls .submit-btn');
+        res.submitBtn = await query('.acc_controls .submit-btn');
         if (!res.submitBtn) {
             throw new Error('Submit button not found');
         }
 
-        res.cancelBtn = await this.query('.acc_controls .cancel-btn');
+        res.cancelBtn = await query('.acc_controls .cancel-btn');
         if (!res.cancelBtn) {
             throw new Error('Cancel button not found');
         }
 
-        res.delete_warning = await WarningPopup.create(this, await this.query('#delete_warning'));
+        res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
         return res;
     }
@@ -226,11 +227,11 @@ export class AccountView extends AppView {
         if (!await TestComponent.isVisible(this.content.delete_warning)) {
             throw new Error('Delete transaction warning popup not appear');
         }
-        if (!this.content.delete_warning.okBtn) {
+        if (!this.content.delete_warning.content.okBtn) {
             throw new Error('OK button not found');
         }
 
-        await this.navigation(() => this.click(this.content.delete_warning.okBtn));
+        await navigation(() => click(this.content.delete_warning.content.okBtn));
     }
 
     async inputName(val) {
@@ -289,16 +290,16 @@ export class AccountView extends AppView {
     }
 
     async submit() {
-        const action = () => this.click(this.content.submitBtn);
+        const action = () => click(this.content.submitBtn);
 
         if (this.isValid()) {
-            await this.navigation(action);
+            await navigation(action);
         } else {
             await this.performAction(action);
         }
     }
 
     async cancel() {
-        await this.navigation(() => this.click(this.content.cancelBtn));
+        await navigation(() => click(this.content.cancelBtn));
     }
 }

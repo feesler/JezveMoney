@@ -11,6 +11,13 @@ import {
     IMPORT_ACTION_SET_DEST_AMOUNT,
     IMPORT_ACTION_SET_COMMENT,
 } from '../../../model/ImportAction.js';
+import {
+    query,
+    queryAll,
+    prop,
+    click,
+    input,
+} from '../../../env.js';
 
 const actionValueTypes = [
     'transType',
@@ -31,25 +38,32 @@ const actionValueMap = {
 
 /** Import action form */
 export class ImportActionForm extends TestComponent {
-    async parse() {
-        const fieldElems = await this.queryAll(this.elem, '.field');
-        await asyncMap(fieldElems, (field) => this.parseField(field));
+    async parseContent() {
+        if (!this.elem) {
+            throw new Error('Invalid import action form');
+        }
 
-        this.deleteBtn = { elem: await this.query(this.elem, '.delete-btn') };
+        const res = {
+            deleteBtn: { elem: await query(this.elem, '.delete-btn') },
+        };
+
+        const fieldElems = await queryAll(this.elem, '.field');
+        const fields = await asyncMap(fieldElems, (field) => this.parseField(field));
+        fields.forEach((field) => { res[field.name] = field.component; });
 
         if (
-            !this.actionField
-            || !this.transTypeField
-            || !this.accountField
-            || !this.personField
-            || !this.amountField
-            || !this.textField
-            || !this.deleteBtn.elem
+            !res.actionField
+            || !res.transTypeField
+            || !res.accountField
+            || !res.personField
+            || !res.amountField
+            || !res.textField
+            || !res.deleteBtn.elem
         ) {
             throw new Error('Invalid structure of import action form');
         }
 
-        this.model = await this.buildModel(this);
+        return res;
     }
 
     mapField(field) {
@@ -68,8 +82,7 @@ export class ImportActionForm extends TestComponent {
 
         for (const fieldName in fieldsMap) {
             if (fieldsMap[fieldName] === field.title) {
-                this[fieldName] = field;
-                return;
+                return { name: fieldName, component: field };
             }
         }
 
@@ -83,37 +96,30 @@ export class ImportActionForm extends TestComponent {
             throw new Error('Invalid field element');
         }
 
-        res.labelElem = await this.query(elem, ':scope > label');
+        res.labelElem = await query(elem, ':scope > label');
         if (!res.labelElem) {
             throw new Error('Invalid structure of field element');
         }
-        res.title = await this.prop(res.labelElem, 'textContent');
+        res.title = await prop(res.labelElem, 'textContent');
 
-        const dropDownElem = await this.query(elem, '.dd__container');
+        const dropDownElem = await query(elem, '.dd__container');
         if (dropDownElem) {
             res.dropDown = await DropDown.create(this, dropDownElem);
             if (!res.dropDown) {
                 throw new Error('Invalid structure of field element');
             }
-            res.disabled = res.dropDown.disabled;
-            res.value = res.dropDown.value;
+            res.disabled = res.dropDown.content.disabled;
+            res.value = res.dropDown.content.value;
         } else {
-            res.inputElem = await this.query(elem, ':scope > div > *');
+            res.inputElem = await query(elem, ':scope > div > *');
             if (!res.inputElem) {
                 throw new Error('Invalid structure of field element');
             }
-            res.disabled = await this.prop(res.inputElem, 'disabled');
-            res.value = await this.prop(res.inputElem, 'value');
+            res.disabled = await prop(res.inputElem, 'disabled');
+            res.value = await prop(res.inputElem, 'value');
         }
 
-        res.environment = this.environment;
-        if (res.environment) {
-            res.environment.inject(res);
-        }
-
-        this.mapField(res);
-
-        return res;
+        return this.mapField(res);
     }
 
     static getStateName(model) {
@@ -151,22 +157,22 @@ export class ImportActionForm extends TestComponent {
 
     static getExpectedState(model) {
         const res = {
-            visibility: {
-                actionField: true,
-                deleteBtn: true,
-            },
-            values: {
-                actionField: { value: model.actionType.toString() },
-            },
+            actionField: { value: model.actionType.toString(), visible: true },
+            deleteBtn: { visible: true },
         };
+
+        const state = ImportActionForm.getStateName(model);
 
         actionValueTypes.forEach((fieldName) => {
             const controlName = `${fieldName}Field`;
-            const visible = model.state === fieldName;
+            const visible = state === fieldName;
 
-            res.visibility[controlName] = visible;
+            if (!res[controlName]) {
+                res[controlName] = {};
+            }
+            res[controlName].visible = visible;
             if (visible) {
-                res.values[controlName] = { value: model.value.toString() };
+                res[controlName].value = model.value.toString();
             }
         });
 
@@ -180,7 +186,7 @@ export class ImportActionForm extends TestComponent {
         this.model.value = ImportActionForm.getStateValue(this.model);
         this.expectedState = ImportActionForm.getExpectedState(this.model);
 
-        await this.actionField.dropDown.selectItem(actionId);
+        await this.content.actionField.dropDown.selectItem(actionId);
         await this.parse();
 
         return this.checkState();
@@ -195,11 +201,11 @@ export class ImportActionForm extends TestComponent {
         this.model.value = ImportActionForm.getStateValue(this.model);
         this.expectedState = ImportActionForm.getExpectedState(this.model);
 
-        const control = this[`${name}Field`];
+        const control = this.content[`${name}Field`];
         if (control.dropDown) {
             await control.dropDown.selectItem(value);
         } else {
-            await this.input(control.inputElem, value.toString());
+            await input(control.inputElem, value.toString());
         }
         await this.parse();
 
@@ -227,6 +233,6 @@ export class ImportActionForm extends TestComponent {
     }
 
     async clickDelete() {
-        return this.click(this.deleteBtn.elem);
+        return click(this.content.deleteBtn.elem);
     }
 }

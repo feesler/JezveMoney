@@ -39,21 +39,21 @@ export class Toolbar extends Component {
             throw new Error('Invalid element specified');
         }
 
-        this.elem.addEventListener('click', this.onClick.bind(this));
+        this.elem.addEventListener('click', () => this.onClick());
 
         this.updateBtn = IconLink.fromElement({ elem: 'edit_btn' });
         this.exportBtn = IconLink.fromElement({ elem: 'export_btn' });
         this.showBtn = IconLink.fromElement({
             elem: 'show_btn',
-            onclick: this.onShowClick.bind(this),
+            onclick: () => this.onShowClick(),
         });
         this.hideBtn = IconLink.fromElement({
             elem: 'hide_btn',
-            onclick: this.onHideClick.bind(this),
+            onclick: () => this.onHideClick(),
         });
         this.deleteBtn = IconLink.fromElement({
             elem: 'del_btn',
-            onclick: this.onDeleteClick.bind(this),
+            onclick: () => this.onDeleteClick(),
         });
     }
 
