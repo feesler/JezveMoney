@@ -339,6 +339,12 @@ export const transactionsListTests = {
         await scenario.runner.runTasks([
             { action: TransactionListTests.clearSearchForm },
             { action: TransactionListTests.clearDateRange },
+            { action: TransactionListTests.search, data: '1' },
+            {
+                action: TransactionListTests.filterByDate,
+                data: { start: App.dates.yearAgo, end: App.dates.monthAgo },
+            },
+            { action: TransactionListTests.clearAllFilters },
         ]);
     },
 

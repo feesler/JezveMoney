@@ -78,6 +78,13 @@ export async function toggleSelect(transactions) {
     });
 }
 
+export async function clearAllFilters() {
+    await checkNavigation();
+
+    await test('Clear all filters', () => App.view.clearAllFilters());
+    await test('Correctness of transaction list', () => App.view.iteratePages());
+}
+
 export async function filterByType(type) {
     await checkNavigation();
 

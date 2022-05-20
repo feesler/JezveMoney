@@ -30,12 +30,15 @@ export class TransactionsView extends AppView {
             titleEl: await query('.content_wrap > .heading > h1'),
             addBtn: await IconLink.create(this, await query('#add_btn')),
             importBtn: await IconLink.create(this, await query('#import_btn')),
+            clearAllBtn: { elem: await query('#clearall_btn') },
             toolbar: await Toolbar.create(this, await query('#toolbar')),
         };
 
         if (
             !res.titleEl
             || !res.addBtn
+            || !res.importBtn
+            || !res.clearAllBtn.elem
             || !res.toolbar
             || !res.toolbar.content.editBtn
             || !res.toolbar.content.delBtn
@@ -216,7 +219,13 @@ export class TransactionsView extends AppView {
 
         const res = {
             typeMenu: { selectedTypes: this.model.filter.type, visible: true },
-            accDropDown: { visible: true },
+            accDropDown: {
+                isMulti: true,
+                visible: true,
+                selectedItems: this.model.filter.accounts.map(
+                    (accountId) => ({ id: accountId.toString() }),
+                ),
+            },
             searchForm: { value: this.model.filter.search, visible: true },
             modeSelector: { visible: isItemsAvailable },
             paginator: { visible: isItemsAvailable },
@@ -446,6 +455,19 @@ export class TransactionsView extends AppView {
         }
 
         return res;
+    }
+
+    async clearAllFilters() {
+        this.model.filter = {
+            type: [],
+            accounts: [],
+            search: '',
+        };
+        const expected = this.onFilterUpdate();
+
+        await this.waitForList(() => click(this.content.clearAllBtn.elem));
+
+        return this.checkState(expected);
     }
 
     async filterByType(type) {

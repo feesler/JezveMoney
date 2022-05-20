@@ -87,6 +87,9 @@ class TransactionListView extends View {
      * View initialization
      */
     onStart() {
+        this.clearAllBtn = ge('clearall_btn');
+        this.clearAllBtn.addEventListener('click', (e) => this.onClearAllFilters(e));
+
         this.typeMenu = TransactionTypeMenu.fromElement(document.querySelector('.trtype-menu'), {
             allowActiveLink: true,
             onChange: (sel) => this.onChangeTypeFilter(sel),
@@ -575,6 +578,19 @@ class TransactionListView extends View {
     }
 
     /**
+     * Clear all filters
+     * @param {Event} e - click event object
+     */
+    onClearAllFilters(e) {
+        e.preventDefault();
+
+        this.state.filter = {};
+        this.state.pagination.page = 1;
+
+        this.requestTransactions(this.state.filter);
+    }
+
+    /**
      * Transaction type menu change event handler
      */
     onChangeTypeFilter(selected) {
@@ -733,7 +749,12 @@ class TransactionListView extends View {
             return;
         }
 
-        this.datePicker.show(!this.datePicker.visible());
+        const isVisible = this.datePicker.visible();
+        if (!isVisible) {
+            this.datePicker.setSelection(this.state.filter.stdate, this.state.filter.enddate);
+        }
+
+        this.datePicker.show(!isVisible);
 
         this.datePickerBtn.hide();
         show(this.dateBlock, true);
@@ -816,7 +837,33 @@ class TransactionListView extends View {
         }
 
         this.typeMenu.setURL(filterUrl);
+        this.typeMenu.setSelection(state.filter.type);
 
+        // Render accounts selection
+        const selectedAccounts = this.accountDropDown.getSelectedItems();
+        const selectedIds = [];
+        const idsToSelect = Array.isArray(state.filter.acc_id) ? state.filter.acc_id : [];
+        selectedAccounts.forEach((accountItem) => {
+            const itemId = parseInt(accountItem.id, 10);
+            selectedIds.push(itemId);
+
+            if (!idsToSelect.includes(itemId)) {
+                this.accountDropDown.deselectItem(accountItem.id);
+            }
+        });
+        idsToSelect.forEach((accountId) => {
+            if (!selectedIds.includes(accountId)) {
+                this.accountDropDown.selectItem(accountId.toString());
+            }
+        });
+
+        // Render date
+        const dateSubtitle = (state.filter.stdate && state.filter.enddate)
+            ? `${state.filter.stdate} - ${state.filter.enddate}`
+            : null;
+        this.datePickerBtn.setSubtitle(dateSubtitle);
+
+        // Render list
         const elems = state.items.map((item) => {
             const tritem = TransactionListItem.create({
                 mode: state.mode,

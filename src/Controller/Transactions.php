@@ -54,8 +54,10 @@ class Transactions extends TemplateController
     public function index()
     {
         $this->template = new Template(TPL_PATH . "transactions.tpl");
+        $baseUrl = BASEURL . "transactions/";
         $data = [
-            "titleString" => "Jezve Money | Transactions"
+            "titleString" => "Jezve Money | Transactions",
+            "clearAllURL" => $baseUrl
         ];
         $listData = [];
 
@@ -167,7 +169,6 @@ class Transactions extends TemplateController
         array_push($trTypes, ...$availTypes);
 
         $transMenu = [];
-        $baseUrl = BASEURL . "transactions/";
         foreach ($trTypes as $type_id => $trTypeName) {
             $urlParams = (array)$filterObj;
 
