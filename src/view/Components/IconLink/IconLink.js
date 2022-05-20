@@ -1,6 +1,14 @@
-import { isFunction } from 'jezvejs';
+import {
+    isFunction,
+    ce,
+    addChilds,
+    removeChilds,
+} from 'jezvejs';
 import { Component } from 'jezvejs/Component';
 import './style.css';
+
+const TITLE_CLASS = 'iconlink__title';
+const SUBTITLE_CLASS = 'iconlink__subtitle';
 
 /**
  * IconLink component
@@ -30,12 +38,14 @@ export class IconLink extends Component {
             throw new Error('Invalid element specified');
         }
 
+        this.state = {};
+
         this.buttonElem = this.elem.querySelector('button,a');
         if (this.buttonElem && isFunction(this.props.onclick)) {
             this.buttonElem.addEventListener('click', this.props.onclick);
         }
         if (this.buttonElem.tagName === 'A') {
-            this.url = this.buttonElem.href;
+            this.state.url = this.buttonElem.href;
         }
 
         this.iconElem = this.buttonElem.querySelector('.iconlink__icon');
@@ -44,28 +54,33 @@ export class IconLink extends Component {
             throw new Error('Invalid structure of iconlink element');
         }
 
-        this.titleElem = this.contentElem.querySelector('.iconlink__title');
+        this.titleElem = this.contentElem.querySelector(`.${TITLE_CLASS}`);
         if (this.titleElem) {
-            this.title = this.titleElem.textContent;
+            this.state.title = this.titleElem.textContent.trim();
         } else {
-            this.title = this.contentElem.textContent;
+            this.state.title = this.contentElem.textContent.trim();
         }
 
-        this.subtitleElem = this.contentElem.querySelector('.iconlink__subtitle');
+        this.subtitleElem = this.contentElem.querySelector(`.${SUBTITLE_CLASS}`);
         if (this.subtitleElem) {
-            this.subtitle = this.subtitleElem.textContent;
+            this.state.subtitle = this.subtitleElem.textContent.trim();
+        } else {
+            this.state.subtitle = null;
         }
+
+        const disabledAttr = this.elem.getAttribute('disabled');
+        this.state.enabled = disabledAttr == null;
     }
 
     /** Set title text */
     enable(value) {
-        if (value) {
-            this.elem.removeAttribute('disabled');
-            this.buttonElem.removeAttribute('disabled');
-        } else {
-            this.elem.setAttribute('disabled', '');
-            this.buttonElem.setAttribute('disabled', '');
+        const enable = !!value;
+        if (this.state.enabled === enable) {
+            return;
         }
+
+        this.state.enabled = enable;
+        this.render(this.state);
     }
 
     /** Set title text */
@@ -74,12 +89,26 @@ export class IconLink extends Component {
             throw new Error('Invalid title specified');
         }
 
-        if (this.title === title) {
+        if (this.state.title === title) {
             return;
         }
 
-        this.title = title;
-        this.titleElem.textContent = this.title;
+        this.state.title = title;
+        this.render(this.state);
+    }
+
+    /** Set subtitle text */
+    setSubtitle(subtitle) {
+        if (subtitle && typeof subtitle !== 'string') {
+            throw new Error('Invalid subtitle specified');
+        }
+
+        if (this.state.subtitle === subtitle) {
+            return;
+        }
+
+        this.state.subtitle = subtitle;
+        this.render(this.state);
     }
 
     /** Set URL for link element */
@@ -88,11 +117,40 @@ export class IconLink extends Component {
             throw new Error('Invalid URL specified');
         }
 
-        if (this.buttonElem.tagName !== 'A' || this.url === url) {
+        if (this.state.url === url) {
             return;
         }
 
-        this.url = url;
-        this.buttonElem.href = this.url;
+        this.state.url = url;
+        this.render(this.state);
+    }
+
+    /** Render component */
+    render(state) {
+        removeChilds(this.contentElem);
+
+        if (state.enabled) {
+            this.elem.removeAttribute('disabled');
+            this.buttonElem.removeAttribute('disabled');
+        } else {
+            this.elem.setAttribute('disabled', '');
+            this.buttonElem.setAttribute('disabled', '');
+        }
+
+        if (this.buttonElem.tagName === 'A') {
+            this.buttonElem.href = state.url;
+        }
+
+        if (state.subtitle) {
+            this.titleElem = ce('span', { className: SUBTITLE_CLASS, textContent: state.title });
+            this.subtitleElem = ce('span', {
+                className: SUBTITLE_CLASS,
+                textContent: state.subtitle,
+            });
+        } else {
+            this.titleElem = ce('span', { textContent: state.title });
+            this.subtitleElem = null;
+        }
+        addChilds(this.contentElem, [this.titleElem, this.subtitleElem]);
     }
 }
