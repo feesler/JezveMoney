@@ -112,6 +112,25 @@ export class TransactionTypeMenu extends Component {
         setEvents(this.elem, { click: (e) => this.onSelectItem(e) });
     }
 
+    setSelection(selectedItems) {
+        const showAll = (
+            !Array.isArray(selectedItems)
+            || selectedItems.length === 0
+            || selectedItems.includes(0)
+        );
+        const items = Array.isArray(selectedItems) ? selectedItems : [selectedItems];
+
+        this.state.items = this.state.items.map((item) => ({
+            ...item,
+            selected: (
+                (showAll && item.type === 0)
+                || items.includes(item.type)
+            ),
+        }));
+
+        this.render(this.state);
+    }
+
     onSelectItem(e) {
         const itemElem = e.target.closest(`.${ITEM_CLASS}`);
         if (!itemElem || !itemElem.dataset) {
