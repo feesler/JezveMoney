@@ -495,6 +495,12 @@ async function apiCreateTransactions() {
         dest_id: scenario.ACC_RUB,
         src_amount: 100,
     }, {
+        type: TRANSFER,
+        src_id: scenario.ACC_RUB,
+        dest_id: scenario.ACC_RUB,
+        src_amount: 6500,
+        dest_amount: 100,
+    }, {
         type: DEBT,
         op: 0,
         person_id: scenario.PERSON_X,
@@ -614,6 +620,9 @@ async function apiUpdateTransactions() {
         id: scenario.TR_TRANSFER_1,
         dest_id: scenario.ACC_USD,
         dest_curr: PLN,
+    }, {
+        id: scenario.TR_TRANSFER_1,
+        dest_id: scenario.ACC_RUB,
     }, {
         id: scenario.TR_TRANSFER_2,
         dest_id: scenario.CASH_RUB,

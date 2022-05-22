@@ -157,6 +157,12 @@ class TransactionModel extends CachedTable
             }
         }
 
+        // Check source and destination are not the same
+        if ($res["src_id"] && $res["dest_id"] && $res["src_id"] == $res["dest_id"]) {
+            wlog("Source and destination are the same.");
+            return null;
+        }
+
         if (isset($params["src_amount"])) {
             $res["src_amount"] = floatval($params["src_amount"]);
             if ($res["src_amount"] == 0.0) {
