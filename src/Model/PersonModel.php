@@ -316,6 +316,16 @@ class PersonModel extends CachedTable
             return false;
         }
 
+        // delete import rules
+        $userPersons = $this->getData(["full" => true, "type" => "all"]);
+        $personsToDelete = [];
+        foreach ($userPersons as $person) {
+            $personsToDelete[] = $person->id;
+        }
+
+        $ruleModel = ImportRuleModel::getInstance();
+        $ruleModel->onPersonDelete($personsToDelete);
+
         $condArr = ["user_id=" . self::$user_id, "id<>" . self::$owner_id];
         if (!$this->dbObj->deleteQ($this->tbl_name, $condArr)) {
             return false;

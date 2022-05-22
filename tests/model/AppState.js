@@ -347,8 +347,7 @@ export class AppState {
     }
 
     resetAccounts() {
-        this.accounts.data = [];
-        this.transactions.data = [];
+        this.deleteAccounts(this.accounts.getIds());
 
         return true;
     }

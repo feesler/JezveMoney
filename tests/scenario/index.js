@@ -96,6 +96,7 @@ export class Scenario {
         await accountTests.runPostTransaction();
         await personTests.runPostTransaction();
         await StatisticsTests.run();
+        await profileTests.runPostTransaction();
 
         await this.finishTests();
     }

@@ -221,4 +221,21 @@ class ImportRuleModel extends CachedTable
 
         return $res;
     }
+
+    // Delete all import rules of user
+    public function reset()
+    {
+        if (!self::$user_id) {
+            return false;
+        }
+
+        $condArr = ["user_id=" . self::$user_id];
+        if (!$this->dbObj->deleteQ($this->tbl_name, $condArr)) {
+            return false;
+        }
+
+        $this->cleanCache();
+
+        return true;
+    }
 }

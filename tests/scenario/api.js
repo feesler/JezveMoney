@@ -1062,6 +1062,10 @@ async function apiProfile() {
     setBlock('Profile', 2);
 
     const tasks = [{
+        action: ApiTests.resetAccounts,
+    }, {
+        action: ApiTests.resetAll,
+    }, {
         action: ApiTests.loginTest,
         data: App.config.apiTestUser,
     }, {

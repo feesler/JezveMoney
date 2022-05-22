@@ -84,6 +84,14 @@ export const profileTests = {
         }]);
     },
 
+    /** Run profile tests with transactions */
+    async runPostTransaction() {
+        setBlock('Profile with transactions tests', 1);
+
+        await ProfileTests.resetAccounts();
+        await ProfileTests.resetAll();
+    },
+
     /** Initialize and run tests */
     async initAndRun(scenarioInstance) {
         this.init(scenarioInstance);

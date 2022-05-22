@@ -7,6 +7,8 @@ use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
 use JezveMoney\Core\JSON;
 use JezveMoney\App\Model\AccountModel;
+use JezveMoney\App\Model\ImportRuleModel;
+use JezveMoney\App\Model\ImportTemplateModel;
 
 class Profile extends TemplateController
 {
@@ -156,6 +158,16 @@ class Profile extends TemplateController
         }
 
         if (!$this->personMod->reset()) {
+            $this->fail($defMsg);
+        }
+
+        $ruleMod = ImportRuleModel::getInstance();
+        if (!$ruleMod->reset()) {
+            $this->fail($defMsg);
+        }
+
+        $tplModel = ImportTemplateModel::getInstance();
+        if (!$tplModel->reset()) {
             $this->fail($defMsg);
         }
 
