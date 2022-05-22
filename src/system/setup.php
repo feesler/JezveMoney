@@ -36,5 +36,6 @@ JezveMoney\Core\MySqlDB::setup($dbConfig);
 date_default_timezone_set("Europe/Moscow");
 
 require_once(APP_ROOT . "system/Engine/Message.php");
+require_once(APP_ROOT . "system/msg_defines.php");
 require_once(APP_ROOT . "system/messages.php");
 wlog("==================================================");
