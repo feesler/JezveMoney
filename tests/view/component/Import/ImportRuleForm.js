@@ -205,7 +205,7 @@ export class ImportRuleForm extends TestComponent {
         }
 
         if (ImportCondition.isAccountField(fieldType)) {
-            const account = App.state.accounts.getUserVisible().getItemByIndex(0);
+            const account = App.state.accounts.getItemByIndex(0);
             if (!account) {
                 throw new Error('No accounts available');
             }
@@ -246,7 +246,7 @@ export class ImportRuleForm extends TestComponent {
         }
 
         if (ImportAction.isAccountValue(type)) {
-            const account = App.state.accounts.getUserVisible().getItemByIndex(0);
+            const account = App.state.accounts.getItemByIndex(0);
             if (!account) {
                 throw new Error('No accounts available');
             }
@@ -255,7 +255,7 @@ export class ImportRuleForm extends TestComponent {
         }
 
         if (ImportAction.isPersonValue(type)) {
-            const person = App.state.persons.getVisible().getItemByIndex(0);
+            const person = App.state.persons.getItemByIndex(0);
             if (!person) {
                 throw new Error('No persons available');
             }

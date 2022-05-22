@@ -28,10 +28,10 @@ class Import extends TemplateController
         $data = [];
 
         $accMod = AccountModel::getInstance();
-        $data["accArr"] = $accMod->getData();
+        $data["accArr"] = $accMod->getData(["type" => "all"]);
         $currMod = CurrencyModel::getInstance();
         $currArr = $currMod->getData();
-        $persArr = $this->personMod->getData();
+        $persArr = $this->personMod->getData(["type" => "all"]);
         $data["impTemplates"] = $this->templateModel->getData();
         $data["tplColumnTypes"] = $this->templateModel->getColumnTypes();
         $data["rulesData"] = $this->ruleModel->getData(["extended" => true]);

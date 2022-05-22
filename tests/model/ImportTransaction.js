@@ -182,8 +182,7 @@ export class ImportTransaction {
             }
         } else if (value === 'debtfrom' || value === 'debtto') {
             if (before.type !== 'debtfrom' && before.type !== 'debtto') {
-                const [personId] = App.state.getPersonsByIndexes(0);
-                const person = App.state.persons.getItem(personId);
+                const person = App.state.persons.getItemByIndex(0);
                 if (!person) {
                     throw new Error('Failed to find person');
                 }
