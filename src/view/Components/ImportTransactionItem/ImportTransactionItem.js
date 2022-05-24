@@ -705,6 +705,12 @@ export class ImportTransactionItem extends Component {
         if (this.state.secondAccountId === account.id) {
             return this.state;
         }
+
+        // Can't set second account same as main account
+        if (this.model.mainAccount.id === account.id) {
+            throw new Error('Can\'t set second account same as main account');
+        }
+
         const state = copyObject(this.state);
 
         state.secondAccountId = account.id;

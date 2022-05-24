@@ -481,6 +481,33 @@ async function runImportRuleValidationTests() {
     });
     await ImportTests.submitRule();
 
+    setBlock('Submit `Set person` action without set transaction type to debt', 2);
+    await ImportTests.updateRuleAction({
+        pos: 0,
+        action: [
+            { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
+            { action: 'changePerson', data: scenario.MARIA },
+        ],
+    });
+    await ImportTests.submitRule();
+
+    setBlock('Submit `Set account` action without set transaction type to transfer', 2);
+    await ImportTests.updateRuleAction({
+        pos: 0,
+        action: [
+            { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
+            { action: 'changeAccount', data: scenario.ACC_3 },
+        ],
+    });
+    await ImportTests.submitRule();
+
+    setBlock('Submit rule without guard condition for `Set account` action', 2);
+    await ImportTests.createRuleAction([
+        { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
+        { action: 'changeTransactionType', data: 'transferfrom' },
+    ]);
+    await ImportTests.submitRule();
+
     await ImportTests.cancelRule();
 }
 
@@ -504,6 +531,11 @@ async function runCreateImportRuleTests() {
     setBlock('Create import rule #2', 2);
     await ImportTests.createRule();
     await ImportTests.createRuleCondition([
+        { action: 'changeFieldType', data: IMPORT_COND_FIELD_MAIN_ACCOUNT },
+        { action: 'changeOperator', data: IMPORT_COND_OP_NOT_EQUAL },
+        { action: 'changeAccount', data: scenario.ACC_EUR },
+    ]);
+    await ImportTests.createRuleCondition([
         { action: 'changeFieldType', data: IMPORT_COND_FIELD_TR_AMOUNT },
         { action: 'changeOperator', data: IMPORT_COND_OP_EQUAL },
         { action: 'inputAmount', data: '80' },
@@ -520,6 +552,11 @@ async function runCreateImportRuleTests() {
 
     setBlock('Create import rule #3', 2);
     await ImportTests.createRule();
+    await ImportTests.createRuleCondition([
+        { action: 'changeFieldType', data: IMPORT_COND_FIELD_MAIN_ACCOUNT },
+        { action: 'changeOperator', data: IMPORT_COND_OP_NOT_EQUAL },
+        { action: 'changeAccount', data: scenario.ACC_USD },
+    ]);
     await ImportTests.createRuleCondition([
         { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
         { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },

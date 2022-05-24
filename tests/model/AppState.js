@@ -658,6 +658,10 @@ export class AppState {
             } else if (params.type === INCOME || params.type === TRANSFER) {
                 return false;
             }
+
+            if (params.src_id === params.dest_id) {
+                return false;
+            }
         }
 
         if ('date' in params && !checkDate(params.date)) {
