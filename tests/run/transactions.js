@@ -81,8 +81,10 @@ export async function toggleSelect(transactions) {
 export async function clearAllFilters() {
     await checkNavigation();
 
-    await test('Clear all filters', () => App.view.clearAllFilters());
-    await test('Correctness of transaction list', () => App.view.iteratePages());
+    await test('Clear all filters', async () => {
+        await App.view.clearAllFilters();
+        return App.view.iteratePages();
+    });
 }
 
 export async function filterByType(type) {
@@ -96,8 +98,10 @@ export async function filterByType(type) {
     const descr = (types.length)
         ? `Filter by [${typeNames.join()}]`
         : 'Show all types of transactions';
-    await test(descr, () => App.view.filterByType(type));
-    await test('Correctness of transaction list', () => App.view.iteratePages());
+    await test(descr, async () => {
+        await App.view.filterByType(type);
+        return App.view.iteratePages();
+    });
 }
 
 export async function filterByAccounts(accounts) {
@@ -110,8 +114,10 @@ export async function filterByAccounts(accounts) {
         return (item) ? item.name : `(${accountId})`;
     });
 
-    await test(`Filter by accounts [${accountNames.join()}]`, () => App.view.filterByAccounts(itemIds));
-    await test('Correctness of transaction list', () => App.view.iteratePages());
+    await test(`Filter by accounts [${accountNames.join()}]`, async () => {
+        await App.view.filterByAccounts(itemIds);
+        return App.view.iteratePages();
+    });
 }
 
 export async function filterByDate({ start, end }) {
@@ -120,27 +126,35 @@ export async function filterByDate({ start, end }) {
     const startDateFmt = formatDate(new Date(fixDate(start)));
     const endDateFmt = formatDate(new Date(fixDate(end)));
 
-    await test(`Select date range (${startDateFmt} - ${endDateFmt})`, () => App.view.selectDateRange(start, end));
-    await test('Correctness of transaction list', () => App.view.iteratePages());
+    await test(`Select date range (${startDateFmt} - ${endDateFmt})`, async () => {
+        await App.view.selectDateRange(start, end);
+        return App.view.iteratePages();
+    });
 }
 
 export async function clearDateRange() {
     await checkNavigation();
 
-    await test('Clear date range', () => App.view.clearDateRange());
-    await test('Correctness of transaction list', () => App.view.iteratePages());
+    await test('Clear date range', async () => {
+        await App.view.clearDateRange();
+        return App.view.iteratePages();
+    });
 }
 
 export async function search(text) {
     await checkNavigation();
 
-    await test(`Search (${text})`, () => App.view.search(text));
-    await test('Correctness of transaction list', () => App.view.iteratePages());
+    await test(`Search (${text})`, async () => {
+        await App.view.search(text);
+        return App.view.iteratePages();
+    });
 }
 
 export async function clearSearchForm() {
     await checkNavigation();
 
-    await test('Clear search form', () => App.view.clearSearch());
-    await test('Correctness of transaction list', () => App.view.iteratePages());
+    await test('Clear search form', async () => {
+        await App.view.clearSearch();
+        return App.view.iteratePages();
+    });
 }

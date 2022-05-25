@@ -211,9 +211,11 @@ export async function create(type, params, submitHandler) {
         await App.view.cancel();
     }
 
-    App.view.expectedState = MainView.render(App.state);
-    await test('Main page widgets update', () => App.view.checkState());
-    await test('App state', () => App.state.fetchAndTest());
+    await test('Submit result', async () => {
+        App.view.expectedState = MainView.render(App.state);
+        App.view.checkState();
+        return App.state.fetchAndTest();
+    });
 }
 
 export async function update(type, params, submitHandler) {
@@ -255,11 +257,12 @@ export async function update(type, params, submitHandler) {
         App.state.setState(expectedState);
     }
 
-    await App.goToMainView();
-
-    App.view.expectedState = MainView.render(App.state);
-    await test('Main page widgets update', () => App.view.checkState());
-    await test('App state', () => App.state.fetchAndTest());
+    await test('Submit result', async () => {
+        await App.goToMainView();
+        App.view.expectedState = MainView.render(App.state);
+        App.view.checkState();
+        return App.state.fetchAndTest();
+    });
 }
 
 export async function del(type, transactions) {
@@ -319,12 +322,13 @@ export async function del(type, transactions) {
         }
     }
 
-    await App.goToMainView();
-
-    App.state.setState(expectedState);
-    App.view.expectedState = MainView.render(App.state);
-    await test('Main page widgets update', () => App.view.checkState());
-    await test('App state', () => App.state.fetchAndTest());
+    await test('Submit result', async () => {
+        await App.goToMainView();
+        App.state.setState(expectedState);
+        App.view.expectedState = MainView.render(App.state);
+        App.view.checkState();
+        return App.state.fetchAndTest();
+    });
 }
 
 export async function delFromUpdate(type, pos) {
@@ -354,12 +358,13 @@ export async function delFromUpdate(type, pos) {
 
     await App.view.deleteSelfItem();
 
-    await App.goToMainView();
-
-    App.state.setState(expectedState);
-    App.view.expectedState = MainView.render(App.state);
-    await test('Main page widgets update', () => App.view.checkState());
-    await test('App state', () => App.state.fetchAndTest());
+    await test('Submit result', async () => {
+        await App.goToMainView();
+        App.state.setState(expectedState);
+        App.view.expectedState = MainView.render(App.state);
+        App.view.checkState();
+        return App.state.fetchAndTest();
+    });
 }
 
 export async function typeChangeLoop() {
