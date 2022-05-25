@@ -25,6 +25,32 @@ import {
 import { AccountList } from '../../js/model/AccountList.js';
 import './style.css';
 
+/** Fields */
+const TITLE_FIELD_AMOUNT = 'Amount';
+const PH_FIELD_AMOUNT = 'Amount';
+const TITLE_FIELD_DEST_AMOUNT = 'Destination amount';
+const PH_FIELD_DEST_AMOUNT = 'Destination amount';
+const TITLE_FIELD_DATE = 'Date';
+const PH_FIELD_DATE = 'Date';
+const TITLE_FIELD_COMMENT = 'Comment';
+const PH_FIELD_COMMENT = 'Comment';
+const TITLE_FIELD_DEST_ACCOUNT = 'Destination account';
+const TITLE_FIELD_PERSON = 'Person';
+const TITLE_FIELD_CURRENCY = 'Currency';
+/** Original data table */
+const TITLE_ORIGINAL_DATA = 'Original imported data';
+const COL_MAIN = 'Main account';
+const COL_DATE = 'Date';
+const COL_COMMENT = 'Comment';
+const COL_TR_AMOUNT = 'Tr. amount';
+const COL_TR_CURRENCY = 'Tr. currency';
+const COL_ACC_AMOUNT = 'Acc. amount';
+const COL_ACC_CURRENCY = 'Acc. currency';
+/** Validation messages */
+const MSG_INCORRECT_AMOUNT = 'Please input correct amount';
+const MSG_INCORRECT_SEC_AMOUNT = 'Please input correct second amount';
+const MSG_INVALID_DATE = 'Please input correct date';
+
 /**
  * ImportTransactionItem component
  */
@@ -90,35 +116,35 @@ export class ImportTransactionItem extends Component {
         this.amountInp = ce('input', {
             type: 'text',
             name: 'amount[]',
-            placeholder: 'Amount',
+            placeholder: PH_FIELD_AMOUNT,
             autocomplete: 'off',
         }, null, { input: () => this.onAmountInput() });
-        this.amountField = createField('Amount', this.amountInp, 'amount-field');
+        this.amountField = createField(TITLE_FIELD_AMOUNT, this.amountInp, 'amount-field');
 
         this.destAmountInp = ce('input', {
             type: 'text',
             name: 'dest_amount[]',
             disabled: true,
-            placeholder: 'Destination amount',
+            placeholder: PH_FIELD_DEST_AMOUNT,
             autocomplete: 'off',
         }, null, { input: () => this.onDestAmountInput() });
-        this.destAmountField = createField('Destination amount', this.destAmountInp, 'amount-field');
+        this.destAmountField = createField(TITLE_FIELD_DEST_AMOUNT, this.destAmountInp, 'amount-field');
         // Date field
         this.dateInp = ce('input', {
             type: 'text',
             name: 'date[]',
-            placeholder: 'Date',
+            placeholder: PH_FIELD_DATE,
             autocomplete: 'off',
         }, null, { input: () => this.onDateInput() });
-        this.dateField = createField('Date', this.dateInp, 'date-field');
+        this.dateField = createField(TITLE_FIELD_DATE, this.dateInp, 'date-field');
         // Comment field
         this.commInp = ce('input', {
             type: 'text',
             name: 'comment[]',
-            placeholder: 'Comment',
+            placeholder: PH_FIELD_COMMENT,
             autocomplete: 'off',
         }, null, { input: () => this.onCommentInput() });
-        this.commentField = createField('Comment', this.commInp, 'comment-field');
+        this.commentField = createField(TITLE_FIELD_COMMENT, this.commInp, 'comment-field');
         // Delete button
         this.delBtn = ce(
             'button',
@@ -225,7 +251,7 @@ export class ImportTransactionItem extends Component {
             .map((account) => ({ id: account.id, title: account.name }));
 
         const selectElem = ce('select');
-        this.destAccountField = createField('Destination account', selectElem);
+        this.destAccountField = createField(TITLE_FIELD_DEST_ACCOUNT, selectElem);
 
         this.destAccDropDown = DropDown.create({
             input_id: selectElem,
@@ -244,7 +270,7 @@ export class ImportTransactionItem extends Component {
             .map((person) => ({ id: person.id, title: person.name }));
 
         const selectElem = ce('select');
-        this.personField = createField('Person', selectElem);
+        this.personField = createField(TITLE_FIELD_PERSON, selectElem);
 
         this.personDropDown = DropDown.create({
             input_id: selectElem,
@@ -262,7 +288,7 @@ export class ImportTransactionItem extends Component {
             .map((currency) => ({ id: currency.id, title: currency.name }));
 
         const selectElem = ce('select');
-        this.currField = createField('Currency', selectElem);
+        this.currField = createField(TITLE_FIELD_CURRENCY, selectElem);
 
         this.currencyDropDown = DropDown.create({
             input_id: selectElem,
@@ -299,15 +325,15 @@ export class ImportTransactionItem extends Component {
         const dateFmt = formatDate(new Date(data.date));
 
         return createContainer('orig-data', [
-            ce('h3', { textContent: 'Original imported data' }),
+            ce('h3', { textContent: TITLE_ORIGINAL_DATA }),
             createContainer('orig-data-table', [
-                this.createDataValue('Main account', mainAccount.name),
-                this.createDataValue('Date', dateFmt),
-                this.createDataValue('Tr. amount', data.transactionAmount),
-                this.createDataValue('Tr. currency', data.transactionCurrency),
-                this.createDataValue('Acc. amount', data.accountAmount),
-                this.createDataValue('Acc. currency', data.accountCurrency),
-                this.createDataValue('Comment', data.comment, 'comment-value'),
+                this.createDataValue(COL_MAIN, mainAccount.name),
+                this.createDataValue(COL_DATE, dateFmt),
+                this.createDataValue(COL_TR_AMOUNT, data.transactionAmount),
+                this.createDataValue(COL_TR_CURRENCY, data.transactionCurrency),
+                this.createDataValue(COL_ACC_AMOUNT, data.accountAmount),
+                this.createDataValue(COL_ACC_CURRENCY, data.accountCurrency),
+                this.createDataValue(COL_COMMENT, data.comment, 'comment-value'),
             ]),
         ]);
     }
@@ -852,7 +878,7 @@ export class ImportTransactionItem extends Component {
         const amountVal = parseFloat(fixFloat(state.amount));
         if (Number.isNaN(amountVal) || amountVal <= 0) {
             this.parent.invalidateBlock(this.amountField);
-            this.setFeedback('Please input correct amount');
+            this.setFeedback(MSG_INCORRECT_AMOUNT);
             return false;
         }
 
@@ -860,14 +886,14 @@ export class ImportTransactionItem extends Component {
             const secondAmountVal = parseFloat(fixFloat(state.secondAmount));
             if (Number.isNaN(secondAmountVal) || secondAmountVal <= 0) {
                 this.parent.invalidateBlock(this.destAmountField);
-                this.setFeedback('Please input correct second amount');
+                this.setFeedback(MSG_INCORRECT_SEC_AMOUNT);
                 return false;
             }
         }
 
         if (!checkDate(state.date)) {
             this.parent.invalidateBlock(this.dateField);
-            this.setFeedback('Please input correct date');
+            this.setFeedback(MSG_INVALID_DATE);
             return false;
         }
 

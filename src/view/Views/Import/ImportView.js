@@ -28,6 +28,10 @@ import { ImportTransactionItem } from '../../Components/ImportTransactionItem/Im
 /* eslint no-bitwise: "off" */
 /* global baseURL */
 const SUBMIT_LIMIT = 100;
+/** Messages */
+const MSG_IMPORT_SUCCESS = 'All transactions have been successfully imported';
+const MSG_IMPORT_FAIL = 'Fail to import transactions';
+const MSG_NO_TRANSACTIONS = 'No transactions to import';
 
 /**
  * Import view constructor
@@ -388,7 +392,7 @@ class ImportView extends View {
             this.noDataMsg = null;
         } else {
             if (!this.noDataMsg) {
-                this.noDataMsg = ce('span', { className: 'nodata-message', textContent: 'No transactions to import' });
+                this.noDataMsg = ce('span', { className: 'nodata-message', textContent: MSG_NO_TRANSACTIONS });
             }
             this.rowsContainer.appendChild(this.noDataMsg);
         }
@@ -552,7 +556,7 @@ class ImportView extends View {
      */
     onSubmitResult(response) {
         let status = false;
-        let message = 'Fail to import transactions';
+        let message = MSG_IMPORT_FAIL;
 
         try {
             const respObj = JSON.parse(response);
@@ -562,7 +566,7 @@ class ImportView extends View {
                 this.renderSubmitProgress();
 
                 if (this.submitQueue.length === 0) {
-                    message = 'All transactions have been successfully imported';
+                    message = MSG_IMPORT_SUCCESS;
                     this.removeAllItems();
                 } else {
                     this.submitChunk();

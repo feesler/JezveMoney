@@ -111,4 +111,6 @@ export class ImportConditionList extends List {
             && !(item.getConditionValue({}) > value)
         ));
     }
+
+    // TODO : add hasAccountGuardCondition method
 }

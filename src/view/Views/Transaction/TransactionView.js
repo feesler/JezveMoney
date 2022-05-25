@@ -67,8 +67,8 @@ import {
 
 /* global baseURL */
 
-const singleTransDeleteTitle = 'Delete transaction';
-const singleTransDeleteMsg = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
+const TITLE_TRANS_DELETE = 'Delete transaction';
+const MSG_TRANS_DELETE = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
 const SHOW_INFO = 0;
 const SHOW_INPUT = 1;
 const HIDE_BOTH = 2;
@@ -934,8 +934,8 @@ class TransactionView extends View {
     confirmDelete() {
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: singleTransDeleteTitle,
-            content: singleTransDeleteMsg,
+            title: TITLE_TRANS_DELETE,
+            content: MSG_TRANS_DELETE,
             onconfirm: () => this.deleteForm.submit(),
         });
     }

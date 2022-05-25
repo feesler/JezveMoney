@@ -12,6 +12,21 @@ export const IMPORT_ACTION_SET_SRC_AMOUNT = 4;
 export const IMPORT_ACTION_SET_DEST_AMOUNT = 5;
 export const IMPORT_ACTION_SET_COMMENT = 6;
 
+/** Action types */
+const TITLE_ACTION_SET_TR_TYPE = 'Set transaction type';
+const TITLE_ACTION_SET_ACCOUNT = 'Set account';
+const TITLE_ACTION_SET_PERSON = 'Set person';
+const TITLE_ACTION_SET_SRC_AMOUNT = 'Set source amount';
+const TITLE_ACTION_SET_DEST_AMOUNT = 'Set destination amount';
+const TITLE_ACTION_SET_COMMENT = 'Set comment';
+/** Transaction types */
+const TITLE_TRANS_EXPENSE = 'Expense';
+const TITLE_TRANS_INCOME = 'Income';
+const TITLE_TRANS_TRANSFER_FROM = 'Transfer from';
+const TITLE_TRANS_TRANSFER_TO = 'Transfer to';
+const TITLE_TRANS_DEBT_FROM = 'Debt from';
+const TITLE_TRANS_DEBT_TO = 'Debt to';
+
 /**
  * @constructor Import action class
  * @param {object} props - properties of instance
@@ -19,12 +34,12 @@ export const IMPORT_ACTION_SET_COMMENT = 6;
 export class ImportAction extends ListItem {
     /** List of available action types */
     static actionTypes = [
-        { id: IMPORT_ACTION_SET_TR_TYPE, title: 'Set transaction type' },
-        { id: IMPORT_ACTION_SET_ACCOUNT, title: 'Set account' },
-        { id: IMPORT_ACTION_SET_PERSON, title: 'Set person' },
-        { id: IMPORT_ACTION_SET_SRC_AMOUNT, title: 'Set source amount' },
-        { id: IMPORT_ACTION_SET_DEST_AMOUNT, title: 'Set destination amount' },
-        { id: IMPORT_ACTION_SET_COMMENT, title: 'Set comment' },
+        { id: IMPORT_ACTION_SET_TR_TYPE, title: TITLE_ACTION_SET_TR_TYPE },
+        { id: IMPORT_ACTION_SET_ACCOUNT, title: TITLE_ACTION_SET_ACCOUNT },
+        { id: IMPORT_ACTION_SET_PERSON, title: TITLE_ACTION_SET_PERSON },
+        { id: IMPORT_ACTION_SET_SRC_AMOUNT, title: TITLE_ACTION_SET_SRC_AMOUNT },
+        { id: IMPORT_ACTION_SET_DEST_AMOUNT, title: TITLE_ACTION_SET_DEST_AMOUNT },
+        { id: IMPORT_ACTION_SET_COMMENT, title: TITLE_ACTION_SET_COMMENT },
     ];
 
     /** List of action types requires select value from list */
@@ -42,12 +57,12 @@ export class ImportAction extends ListItem {
 
     /** List of available transaction types */
     static transactionTypes = [
-        { id: 'expense', title: 'Expense' },
-        { id: 'income', title: 'Income' },
-        { id: 'transferfrom', title: 'Transfer from' },
-        { id: 'transferto', title: 'Transfer to' },
-        { id: 'debtfrom', title: 'Debt from' },
-        { id: 'debtto', title: 'Debt to' },
+        { id: 'expense', title: TITLE_TRANS_EXPENSE },
+        { id: 'income', title: TITLE_TRANS_INCOME },
+        { id: 'transferfrom', title: TITLE_TRANS_TRANSFER_FROM },
+        { id: 'transferto', title: TITLE_TRANS_TRANSFER_TO },
+        { id: 'debtfrom', title: TITLE_TRANS_DEBT_FROM },
+        { id: 'debtto', title: TITLE_TRANS_DEBT_TO },
     ];
 
     /** Return array of available action types */

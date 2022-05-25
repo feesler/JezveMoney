@@ -19,6 +19,17 @@ import {
 } from '../../js/app.js';
 import './style.css';
 
+/** Strings */
+const TITLE_FIELD_AMOUNT = 'Amount';
+const TITLE_FIELD_VALUE = 'Value';
+const LABEL_PROPERTY_CMP = 'Compare with another property';
+const TITLE_FIELD_PROPERTY = 'Property';
+const TITLE_FIELD_OPERATOR = 'Operator';
+const TITLE_FIELD_ACCOUNT = 'Account';
+const TITLE_FIELD_TEMPLATE = 'Template';
+const TITLE_FIELD_CURRENCY = 'Currency';
+const TITLE_FIELD_VALUE_PROPERTY = 'Value property';
+
 /**
  * ImportConditionForm component constructor
  */
@@ -85,7 +96,7 @@ export class ImportConditionForm extends Component {
             elem: this.amountInput,
             oninput: () => this.onValueChange(),
         });
-        this.amountField = createField('Amount', this.amountInput);
+        this.amountField = createField(TITLE_FIELD_AMOUNT, this.amountInput);
         // Create text value input element
         this.valueInput = ce(
             'input',
@@ -93,7 +104,7 @@ export class ImportConditionForm extends Component {
             null,
             { input: () => this.onValueChange() },
         );
-        this.valueField = createField('Value', this.valueInput);
+        this.valueField = createField(TITLE_FIELD_VALUE, this.valueInput);
 
         // Field value checkbox
         this.fieldValueCheck = ce(
@@ -110,7 +121,7 @@ export class ImportConditionForm extends Component {
             this.amountField,
             this.valueField,
             this.valuePropField,
-            createCheck(this.fieldValueCheck, 'checkwrap', 'Compare with another property'),
+            createCheck(this.fieldValueCheck, 'checkwrap', LABEL_PROPERTY_CMP),
         ]);
 
         this.fields = createContainer('cond-form__fields', [
@@ -148,7 +159,7 @@ export class ImportConditionForm extends Component {
             .map((fieldType) => ({ id: fieldType.id, title: fieldType.title }));
 
         const selectElem = ce('select');
-        this.propertyField = createField('Property', selectElem);
+        this.propertyField = createField(TITLE_FIELD_PROPERTY, selectElem);
 
         this.propertyDropDown = DropDown.create({
             input_id: selectElem,
@@ -166,7 +177,7 @@ export class ImportConditionForm extends Component {
             .map((operatorType) => ({ id: operatorType.id, title: operatorType.title }));
 
         const selectElem = ce('select');
-        this.operatorField = createField('Operator', selectElem);
+        this.operatorField = createField(TITLE_FIELD_OPERATOR, selectElem);
 
         this.operatorDropDown = DropDown.create({
             input_id: selectElem,
@@ -184,7 +195,7 @@ export class ImportConditionForm extends Component {
         );
 
         const selectElem = ce('select');
-        this.accountField = createField('Account', selectElem);
+        this.accountField = createField(TITLE_FIELD_ACCOUNT, selectElem);
 
         this.accountDropDown = DropDown.create({
             input_id: selectElem,
@@ -202,7 +213,7 @@ export class ImportConditionForm extends Component {
         );
 
         const selectElem = ce('select');
-        this.templateField = createField('Template', selectElem);
+        this.templateField = createField(TITLE_FIELD_TEMPLATE, selectElem);
 
         this.templateDropDown = DropDown.create({
             input_id: selectElem,
@@ -222,7 +233,7 @@ export class ImportConditionForm extends Component {
         );
 
         const selectElem = ce('select');
-        this.currencyField = createField('Currency', selectElem);
+        this.currencyField = createField(TITLE_FIELD_CURRENCY, selectElem);
 
         this.currencyDropDown = DropDown.create({
             input_id: selectElem,
@@ -240,7 +251,7 @@ export class ImportConditionForm extends Component {
             .map((fieldType) => ({ id: fieldType.id, title: fieldType.title }));
 
         const selectElem = ce('select');
-        this.valuePropField = createField('Value property', selectElem);
+        this.valuePropField = createField(TITLE_FIELD_VALUE_PROPERTY, selectElem);
 
         this.valuePropDropDown = DropDown.create({
             input_id: selectElem,

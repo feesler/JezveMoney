@@ -16,8 +16,9 @@ import { IconLink } from '../../Components/IconLink/IconLink.js';
 import '../../css/app.css';
 import '../../Components/Tile/style.css';
 
-const singleAccDeleteTitle = 'Delete account';
-const singleAccDeleteMsg = 'Are you sure want to delete selected account?<br>All income and expense transactions history will be lost. Transfer to this account will be changed to expense. Transfer from this account will be changed to income.';
+const TITLE_ACCOUNT_DELETE = 'Delete account';
+const MSG_ACCOUNT_DELETE = 'Are you sure want to delete selected account?<br>All income and expense transactions history will be lost. Transfer to this account will be changed to expense. Transfer from this account will be changed to income.';
+const TITLE_NEW_ACCOUNT = 'New account';
 
 /**
  * Create/update account view
@@ -199,8 +200,8 @@ class AccountView extends View {
 
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: singleAccDeleteTitle,
-            content: singleAccDeleteMsg,
+            title: TITLE_ACCOUNT_DELETE,
+            content: MSG_ACCOUNT_DELETE,
             onconfirm: () => this.delForm.submit(),
         });
     }
@@ -226,7 +227,7 @@ class AccountView extends View {
             + this.model.data.initbalance - this.model.original.initbalance;
 
         if (!this.model.original.id && !this.model.nameChanged) {
-            tileTitle = 'New account';
+            tileTitle = TITLE_NEW_ACCOUNT;
         }
 
         this.tile.render({

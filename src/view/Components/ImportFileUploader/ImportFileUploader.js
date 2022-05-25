@@ -9,6 +9,9 @@ import { Component } from 'jezvejs/Component';
 import { createMessage } from '../../js/app.js';
 import { Uploader } from '../../js/component/uploader.js';
 
+/** Strings */
+const MSG_JSON_PARSE = 'Fail to parse server response';
+const MSG_UPLOAD_FAIL = 'Fail to process file';
 /* global baseURL */
 
 /**
@@ -74,20 +77,17 @@ export class ImportFileUploader extends Component {
      * @param {string} response - data for import request
      */
     onImportSuccess(response) {
-        const jsonParseErrorMessage = 'Fail to parse server response';
-        const defErrorMessage = 'Fail to process file';
-
         let jsonData;
         try {
             jsonData = JSON.parse(response);
         } catch (e) {
-            createMessage(jsonParseErrorMessage, 'msg_error');
+            createMessage(MSG_JSON_PARSE, 'msg_error');
             return;
         }
 
         try {
             if (!jsonData || jsonData.result !== 'ok' || !Array.isArray(jsonData.data)) {
-                throw new Error((jsonData && 'msg' in jsonData) ? jsonData.msg : defErrorMessage);
+                throw new Error((jsonData && 'msg' in jsonData) ? jsonData.msg : MSG_UPLOAD_FAIL);
             }
 
             if (isFunction(this.uploadedHandler)) {

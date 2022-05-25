@@ -1,6 +1,13 @@
 import { amountFix, timestampFromString } from '../app.js';
 import { ListItem } from './ListItem.js';
 
+const TITLE_ACCOUNT_AMOUNT = 'Account amount';
+const TITLE_ACCOUNT_CURRENCY = 'Account currency';
+const TITLE_TRANS_AMOUNT = 'Transaction amount';
+const TITLE_TRANS_CURRENCY = 'Transaction currency';
+const TITLE_DATE = 'Date';
+const TITLE_COMMENT = 'Comment';
+
 /**
  * Import template class
  * @param {object} props - properties of instance
@@ -23,12 +30,12 @@ export class ImportTemplate extends ListItem {
      */
     getColumnsByIndex(index) {
         const tplColumns = {
-            accountAmount: { title: 'Account amount' },
-            accountCurrency: { title: 'Account currency' },
-            transactionAmount: { title: 'Transaction amount' },
-            transactionCurrency: { title: 'Transaction currency' },
-            date: { title: 'Date' },
-            comment: { title: 'Comment' },
+            accountAmount: { title: TITLE_ACCOUNT_AMOUNT },
+            accountCurrency: { title: TITLE_ACCOUNT_CURRENCY },
+            transactionAmount: { title: TITLE_TRANS_AMOUNT },
+            transactionCurrency: { title: TITLE_TRANS_CURRENCY },
+            date: { title: TITLE_DATE },
+            comment: { title: TITLE_COMMENT },
         };
 
         const res = Object.keys(tplColumns)

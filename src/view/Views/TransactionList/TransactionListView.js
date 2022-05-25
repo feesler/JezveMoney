@@ -41,10 +41,13 @@ import './style.css';
 import { TransactionListItem } from '../../Components/TransactionListItem/TransactionListItem.js';
 import { ModeSelector } from '../../Components/ModeSelector/ModeSelector.js';
 
-const singleTransDeleteTitle = 'Delete transaction';
-const multiTransDeleteTitle = 'Delete transactions';
-const multiTransDeleteMsg = 'Are you sure want to delete selected transactions?<br>Changes in the balance of affected accounts will be canceled.';
-const singleTransDeleteMsg = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
+const PAGE_TITLE = 'Jezve Money | Transactions';
+const MSG_NO_TRANSACTIONS = 'No transactions found.';
+const MSG_SET_POS_FAIL = 'Fail to change position of transaction.';
+const TITLE_SINGLE_TRANS_DELETE = 'Delete transaction';
+const TITLE_MULTI_TRANS_DELETE = 'Delete transactions';
+const MSG_MULTI_TRANS_DELETE = 'Are you sure want to delete selected transactions?<br>Changes in the balance of affected accounts will be canceled.';
+const MSG_SINGLE_TRANS_DELETE = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
 
 /* global baseURL */
 
@@ -477,7 +480,7 @@ class TransactionListView extends View {
             insertAfter(origWrap, trBeforeWrap);
         }
 
-        createMessage('Fail to change position of transaction.', 'msg_error');
+        createMessage(MSG_SET_POS_FAIL, 'msg_error');
     }
 
     /**
@@ -673,8 +676,8 @@ class TransactionListView extends View {
         const multi = (this.state.selectedItems.count() > 1);
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: (multi) ? multiTransDeleteTitle : singleTransDeleteTitle,
-            content: (multi) ? multiTransDeleteMsg : singleTransDeleteMsg,
+            title: (multi) ? TITLE_MULTI_TRANS_DELETE : TITLE_SINGLE_TRANS_DELETE,
+            content: (multi) ? MSG_MULTI_TRANS_DELETE : MSG_SINGLE_TRANS_DELETE,
             onconfirm: () => this.delForm.submit(),
         });
     }
@@ -788,7 +791,7 @@ class TransactionListView extends View {
         } else {
             url.searchParams.delete('mode');
         }
-        window.history.replaceState({}, 'Jezve Money | Transactions', url);
+        window.history.replaceState({}, PAGE_TITLE, url);
     }
 
     requestTransactions(options) {
@@ -889,7 +892,7 @@ class TransactionListView extends View {
         } else {
             this.listItems.appendChild(ce('span', {
                 className: 'nodata-message',
-                textContent: 'No transactions found.',
+                textContent: MSG_NO_TRANSACTIONS,
             }));
         }
         this.listItems.dataset.time = state.renderTime;

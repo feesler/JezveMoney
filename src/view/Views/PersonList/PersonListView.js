@@ -9,10 +9,10 @@ import '../../css/app.css';
 import '../../Components/Tile/style.css';
 import '../../Components/IconLink/style.css';
 
-const singlePersonDeleteTitle = 'Delete person';
-const multiPersonsDeleteTitle = 'Delete persons';
-const multiPersonsDeleteMsg = 'Are you sure want to delete selected persons?<br>Debt operations will be converted into expense or income.';
-const singlePersonDeleteMsg = 'Are you sure want to delete selected person?<br>Debt operations will be converted into expense or income.';
+const TITLE_SINGLE_PERSON_DELETE = 'Delete person';
+const TITLE_MULTI_PERSON_DELETE = 'Delete persons';
+const MSG_MULTI_PERSON_DELETE = 'Are you sure want to delete selected persons?<br>Debt operations will be converted into expense or income.';
+const MSG_SINGLE_PERSON_DELETE = 'Are you sure want to delete selected person?<br>Debt operations will be converted into expense or income.';
 
 /* global baseURL */
 
@@ -142,8 +142,8 @@ class PersonListView extends View {
 
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: (totalSelCount > 1) ? multiPersonsDeleteTitle : singlePersonDeleteTitle,
-            content: (totalSelCount > 1) ? multiPersonsDeleteMsg : singlePersonDeleteMsg,
+            title: (totalSelCount > 1) ? TITLE_MULTI_PERSON_DELETE : TITLE_SINGLE_PERSON_DELETE,
+            content: (totalSelCount > 1) ? MSG_MULTI_PERSON_DELETE : MSG_SINGLE_PERSON_DELETE,
             onconfirm: () => this.delForm.submit(),
         });
     }

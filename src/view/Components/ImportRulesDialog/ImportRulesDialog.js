@@ -16,6 +16,15 @@ import { ImportRuleItem } from '../ImportRuleItem/ImportRuleItem.js';
 import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog.js';
 import './style.css';
 
+/** Strings */
+const TITLE_RULE_DELETE = 'Delete import rule';
+const MSG_RULE_DELETE = 'Are you sure to delete this import rule?';
+const MSG_RULE_SUBMIT_FAIL = 'Fail to submit import rule request';
+const MSG_RULE_LIST_REQUEST_FAIL = 'Fail to read list of import rules';
+const MSG_NO_RULES = 'No rules';
+const TITLE_RULES_LIST = 'Import rules';
+const TITLE_CREATE_RULE = 'Create import rule';
+const TITLE_UPDATE_RULE = 'Update import rule';
 /* global baseURL */
 
 /**
@@ -36,9 +45,6 @@ export class ImportRulesDialog extends Component {
         ) {
             throw new Error('Invalid props');
         }
-
-        this.ruleDeleteTitle = 'Delete import rule';
-        this.ruleDeleteMsg = 'Are you sure to delete this import rule?';
 
         this.model = {
             template: this.props.tplModel,
@@ -171,8 +177,8 @@ export class ImportRulesDialog extends Component {
     onDeleteItem(ruleId) {
         ConfirmDialog.create({
             id: 'rule_delete_warning',
-            title: this.ruleDeleteTitle,
-            content: this.ruleDeleteMsg,
+            title: TITLE_RULE_DELETE,
+            content: MSG_RULE_DELETE,
             onconfirm: () => this.deleteRule(ruleId),
         });
     }
@@ -218,8 +224,6 @@ export class ImportRulesDialog extends Component {
 
     /** API response handler for rule create/update/delete requests */
     onRuleRequestResult(response) {
-        const defErrorMessage = 'Fail to submit import rule request';
-
         let jsondata;
         try {
             jsondata = JSON.parse(response);
@@ -231,7 +235,7 @@ export class ImportRulesDialog extends Component {
 
         try {
             if (!jsondata || jsondata.result !== 'ok') {
-                throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : defErrorMessage);
+                throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : MSG_RULE_SUBMIT_FAIL);
             }
 
             this.requestRulesList();
@@ -251,8 +255,6 @@ export class ImportRulesDialog extends Component {
 
     /** API response handler for rules list request */
     onRulesListResult(response) {
-        const defErrorMessage = 'Fail to read list of import rules';
-
         let jsondata;
         try {
             jsondata = JSON.parse(response);
@@ -264,7 +266,7 @@ export class ImportRulesDialog extends Component {
 
         try {
             if (!jsondata || jsondata.result !== 'ok' || !Array.isArray(jsondata.data)) {
-                throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : defErrorMessage);
+                throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : MSG_RULE_LIST_REQUEST_FAIL);
             }
 
             this.model.rules.setData(jsondata.data);
@@ -296,7 +298,7 @@ export class ImportRulesDialog extends Component {
         this.listContainer.dataset.time = state.renderTime;
         removeChilds(this.listContainer);
         if (!ruleItems.length) {
-            this.noDataMsg = ce('span', { className: 'nodata-message', textContent: 'No rules' });
+            this.noDataMsg = ce('span', { className: 'nodata-message', textContent: MSG_NO_RULES });
             this.listContainer.appendChild(this.noDataMsg);
         } else {
             ruleItems.forEach((item) => this.listContainer.appendChild(item.elem));
@@ -341,13 +343,13 @@ export class ImportRulesDialog extends Component {
         }
 
         if (state.id === this.LIST_STATE) {
-            this.titleElem.textContent = 'Import rules';
+            this.titleElem.textContent = TITLE_RULES_LIST;
 
             this.renderList(state);
         } else if (state.id === this.CREATE_STATE || state.id === this.UPDATE_STATE) {
             this.titleElem.textContent = (state.id === this.CREATE_STATE)
-                ? 'Create import rule'
-                : 'Update import rule';
+                ? TITLE_CREATE_RULE
+                : TITLE_UPDATE_RULE;
 
             this.renderForm(state);
         }
