@@ -25,7 +25,6 @@ const MSG_NO_RULES = 'No rules';
 const TITLE_RULES_LIST = 'Import rules';
 const TITLE_CREATE_RULE = 'Create import rule';
 const TITLE_UPDATE_RULE = 'Update import rule';
-/* global baseURL */
 
 /**
  * ImportRulesDialog component constructor
@@ -189,6 +188,7 @@ export class ImportRulesDialog extends Component {
             throw new Error('Invalid data');
         }
 
+        const { baseURL } = window.app;
         let reqURL = `${baseURL}api/importrule/`;
         reqURL += (data.id) ? 'update' : 'create';
 
@@ -205,6 +205,7 @@ export class ImportRulesDialog extends Component {
     /** Send delete import rule request to API */
     deleteRule(ruleId) {
         const data = {};
+        const { baseURL } = window.app;
         const reqURL = `${baseURL}api/importrule/del`;
 
         data.id = parseInt(ruleId, 10);
@@ -247,6 +248,8 @@ export class ImportRulesDialog extends Component {
 
     /** Send API request to obain list of import rules */
     requestRulesList() {
+        const { baseURL } = window.app;
+
         ajax.get({
             url: `${baseURL}api/importrule/list/?extended=true`,
             callback: (response) => this.onRulesListResult(response),

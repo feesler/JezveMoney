@@ -16,7 +16,6 @@ import { ImportTemplate } from '../../js/model/ImportTemplate.js';
 import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog.js';
 import './style.css';
 
-/* global baseURL */
 /** Strings */
 const TITLE_CREATE_TEMPLATE = 'Create template';
 const TITLE_UPDATE_TEMPLATE = 'Update template';
@@ -270,6 +269,8 @@ export class ImportTemplateManager extends Component {
             title: TITLE_TEMPLATE_DELETE,
             content: MSG_TEMPLATE_DELETE,
             onconfirm: () => {
+                const { baseURL } = window.app;
+
                 this.state.listLoading = true;
                 this.render(this.state);
                 ajax.post({
@@ -300,6 +301,7 @@ export class ImportTemplateManager extends Component {
             return;
         }
 
+        const { baseURL } = window.app;
         let reqURL = `${baseURL}api/importtpl/`;
         if (this.state.template.id) {
             reqURL += 'update';
@@ -341,6 +343,8 @@ export class ImportTemplateManager extends Component {
 
     /** Send API request to obain list of import templates */
     requestTemplatesList() {
+        const { baseURL } = window.app;
+
         ajax.get({
             url: `${baseURL}api/importtpl/list/`,
             callback: (response) => this.onTemplateListResult(response),
@@ -379,6 +383,8 @@ export class ImportTemplateManager extends Component {
 
     /** Send API request to obain list of import rules */
     requestRulesList() {
+        const { baseURL } = window.app;
+
         ajax.get({
             url: `${baseURL}api/importrule/list/?extended=true`,
             callback: (response) => this.onRulesListResult(response),

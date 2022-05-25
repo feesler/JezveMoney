@@ -65,8 +65,6 @@ import {
     typeChange,
 } from './reducer.js';
 
-/* global baseURL */
-
 const TITLE_TRANS_DELETE = 'Delete transaction';
 const MSG_TRANS_DELETE = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
 const SHOW_INFO = 0;
@@ -941,6 +939,7 @@ class TransactionView extends View {
     }
 
     replaceHistory(state) {
+        const { baseURL } = window.app;
         const { transaction } = state;
         const baseAddress = (state.isUpdate)
             ? `${baseURL}transactions/update/${transaction.id}`

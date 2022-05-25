@@ -18,8 +18,6 @@ const MSG_RESET_ALL = 'Are you sure to reset all your data?<br>Everything will b
 const TITLE_PROFILE_DELETE = 'Delete profile';
 const MSG_PROFILE_DELETE = 'Are you sure to completely delete your profile?<br>This operation can not be undone.';
 
-/* global baseURL */
-
 /**
  * User profile view
  */
@@ -202,6 +200,7 @@ class ProfileView extends View {
      * Change password form submit event handler
      */
     onChangePassSubmit(e) {
+        const { baseURL } = window.app;
         let valid = true;
 
         e.preventDefault();
@@ -315,6 +314,7 @@ class ProfileView extends View {
         if (valid) {
             show(this.changeNameLoading, true);
 
+            const { baseURL } = window.app;
             ajax.post({
                 url: `${baseURL}api/profile/changename`,
                 data: JSON.stringify({

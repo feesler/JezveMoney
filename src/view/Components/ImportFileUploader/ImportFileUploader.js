@@ -12,7 +12,6 @@ import { Uploader } from '../Uploader/Uploader.js';
 /** Strings */
 const MSG_JSON_PARSE = 'Fail to parse server response';
 const MSG_UPLOAD_FAIL = 'Fail to process file';
-/* global baseURL */
 
 /**
  * ImportFileUploader component constructor
@@ -195,6 +194,7 @@ export class ImportFileUploader extends Component {
         this.state.collapsed = true;
         this.render(this.state);
 
+        const { baseURL } = window.app;
         ajax.post({
             url: `${baseURL}api/import/upload/`,
             data: urlJoin(reqObj),

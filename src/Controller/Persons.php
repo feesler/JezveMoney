@@ -5,7 +5,6 @@ namespace JezveMoney\App\Controller;
 use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
-use JezveMoney\Core\JSON;
 
 class Persons extends TemplateController
 {
@@ -32,9 +31,9 @@ class Persons extends TemplateController
             ];
         }
 
-        $data["viewData"] = JSON::encode([
+        $data["viewData"] = [
             "persons" => $personsData
-        ]);
+        ];
 
         $this->cssArr[] = "PersonListView.css";
         $this->jsArr[] = "PersonListView.js";
@@ -72,9 +71,9 @@ class Persons extends TemplateController
         $pInfo->flags = 0;
         $data["pInfo"] = $pInfo;
 
-        $data["viewData"] = JSON::encode([
+        $data["viewData"] = [
             "person" => $pInfo
-        ]);
+        ];
 
         $this->cssArr[] = "PersonView.css";
         $this->jsArr[] = "PersonView.js";
@@ -106,9 +105,9 @@ class Persons extends TemplateController
         }
         $data["pInfo"] = $pInfo;
 
-        $data["viewData"] = JSON::encode([
+        $data["viewData"] = [
             "person" => $pInfo
-        ]);
+        ];
 
         $this->cssArr[] = "PersonView.css";
         $this->jsArr[] = "PersonView.js";

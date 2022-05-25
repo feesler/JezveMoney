@@ -10,7 +10,6 @@ import {
 import { AdminListView } from '../../js/AdminListView.js';
 import { List } from '../../../../view/js/model/List.js';
 
-/* global baseURL */
 /* eslint no-bitwise: "off" */
 
 export const IMPORT_COND_OP_FIELD_FLAG = 0x01;
@@ -168,6 +167,7 @@ export class AdminImportConditionListView extends AdminListView {
      * Request list of items from API
      */
     requestList() {
+        const { baseURL } = window.app;
         const options = {
             full: true,
             rule: this.parentRule,

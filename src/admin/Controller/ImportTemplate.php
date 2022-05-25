@@ -4,7 +4,6 @@ namespace JezveMoney\App\Admin\Controller;
 
 use JezveMoney\Core\AdminController;
 use JezveMoney\Core\Template;
-use JezveMoney\Core\JSON;
 use JezveMoney\App\Model\ImportTemplateModel;
 
 class ImportTemplate extends AdminController
@@ -26,9 +25,9 @@ class ImportTemplate extends AdminController
             "itemsData" => $this->model->getData(),
         ];
 
-        $data["viewData"] = JSON::encode([
+        $data["viewData"] = [
             "data" => $data["itemsData"],
-        ]);
+        ];
 
         $this->menuItems["importtpl"]["active"] = true;
         $this->cssAdmin[] = "AdminImportTplView.css";

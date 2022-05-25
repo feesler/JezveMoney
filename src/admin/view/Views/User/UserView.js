@@ -9,8 +9,6 @@ import { AdminListView } from '../../js/AdminListView.js';
 import '../../../../view/css/app.css';
 import '../../css/admin.css';
 
-/* global baseURL */
-
 /**
  * Admin currecny list view
  */
@@ -133,6 +131,7 @@ class AdminUserListView extends AdminListView {
         enable(this.testerRadio, false);
         enable(this.defaultRadio, false);
 
+        const { baseURL } = window.app;
         this.itemForm.action = `${baseURL}api/${this.apiController}/changePassword`;
 
         this.dialogPopup.show();

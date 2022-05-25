@@ -4,7 +4,6 @@ namespace JezveMoney\App\Admin\Controller;
 
 use JezveMoney\Core\AdminController;
 use JezveMoney\Core\Template;
-use JezveMoney\Core\JSON;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\ImportConditionModel;
 use JezveMoney\App\Model\ImportActionModel;
@@ -31,12 +30,12 @@ class ImportRule extends AdminController
             "operatorsData" => ImportConditionModel::getOperators(),
         ];
 
-        $data["viewData"] = JSON::encode([
+        $data["viewData"] = [
             "data" => $data["itemsData"],
             "actionTypes" => $data["actTypeData"],
             "fields" => $data["fieldsData"],
             "operators" => $data["operatorsData"],
-        ]);
+        ];
 
         $this->menuItems["importrule"]["active"] = true;
         $this->cssAdmin[] = "AdminImportRuleView.css";

@@ -26,7 +26,6 @@ import { ImportRulesDialog } from '../../Components/ImportRulesDialog/ImportRule
 import { ImportTransactionItem } from '../../Components/ImportTransactionItem/ImportTransactionItem.js';
 
 /* eslint no-bitwise: "off" */
-/* global baseURL */
 const SUBMIT_LIMIT = 100;
 /** Messages */
 const MSG_IMPORT_SUCCESS = 'All transactions have been successfully imported';
@@ -241,6 +240,7 @@ class ImportView extends View {
             }
         });
         // Prepare request data
+        const { baseURL } = window.app;
         const reqParams = urlJoin({
             count: 0,
             stdate: formatDate(new Date(importedDateRange.start)),
@@ -540,6 +540,7 @@ class ImportView extends View {
     }
 
     submitChunk() {
+        const { baseURL } = window.app;
         const chunk = this.submitQueue.pop();
 
         ajax.post({

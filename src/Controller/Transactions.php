@@ -5,7 +5,6 @@ namespace JezveMoney\App\Controller;
 use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
-use JezveMoney\Core\JSON;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\IconModel;
@@ -247,7 +246,7 @@ class Transactions extends TemplateController
             "owner_id" => $this->owner_id,
             "name" => $this->user_name,
         ];
-        $data["viewData"] = JSON::encode([
+        $data["viewData"] = [
             "profile" => $profileData,
             "accounts" => $this->accModel->getData(["full" => true, "type" => "all"]),
             "persons" => $this->personMod->getData(["type" => "all"]),
@@ -256,7 +255,7 @@ class Transactions extends TemplateController
             "filterObj" => $filterObj,
             "pagination" => $pagination,
             "mode" => $showDetails ? "details" : "classic",
-        ]);
+        ];
 
         $this->cssArr[] = "TransactionListView.css";
         $this->jsArr[] = "TransactionListView.js";
@@ -637,7 +636,7 @@ class Transactions extends TemplateController
             "icons" => $iconModel->getData(),
             "persons" => $this->personMod->getData(["type" => "all"]),
         ];
-        $data["viewData"] = JSON::encode($viewData);
+        $data["viewData"] = $viewData;
 
         $this->cssArr[] = "TransactionView.css";
         $this->jsArr[] = "TransactionView.js";
@@ -937,7 +936,7 @@ class Transactions extends TemplateController
             "icons" => $iconModel->getData(),
             "persons" => $this->personMod->getData(["type" => "all"]),
         ];
-        $data["viewData"] = JSON::encode($viewData);
+        $data["viewData"] = $viewData;
 
         $this->cssArr[] = "TransactionView.css";
         $this->jsArr[] = "TransactionView.js";

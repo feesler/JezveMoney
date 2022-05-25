@@ -8,8 +8,6 @@ import {
 import { Component } from 'jezvejs/Component';
 import './style.css';
 
-/* global baseURL, themes */
-
 // Theme constants
 export const WHITE_THEME = 0;
 export const DARK_THEME = 1;
@@ -70,6 +68,7 @@ export class Header extends Component {
      * @param {Event} e - event object
      */
     onToggleTheme(e) {
+        const { baseURL, themes } = window.app;
         const newTheme = e.target.checked ? DARK_THEME : WHITE_THEME;
 
         const linkElem = ge('theme-style');

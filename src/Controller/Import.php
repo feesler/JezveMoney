@@ -4,7 +4,6 @@ namespace JezveMoney\App\Controller;
 
 use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Template;
-use JezveMoney\Core\JSON;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\ImportRuleModel;
@@ -36,13 +35,13 @@ class Import extends TemplateController
         $data["tplColumnTypes"] = $this->templateModel->getColumnTypes();
         $data["rulesData"] = $this->ruleModel->getData(["extended" => true]);
 
-        $data["viewData"] = JSON::encode([
+        $data["viewData"] = [
             "accounts" => $data["accArr"],
             "currencies" => $currArr,
             "persons" => $persArr,
             "rules" => $data["rulesData"],
             "templates" => $data["impTemplates"]
-        ]);
+        ];
 
         $this->cssArr[] = "ImportView.css";
         $this->jsArr[] = "ImportView.js";

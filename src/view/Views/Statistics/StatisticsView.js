@@ -22,8 +22,6 @@ import '../../css/app.css';
 import '../../Components/TransactionTypeMenu/style.css';
 import './style.css';
 
-/* global baseURL */
-
 /**
  * Statistics view
  */
@@ -111,6 +109,7 @@ class StatisticsView extends View {
      * Build new location address from current filter object
      */
     buildAddress() {
+        const { baseURL } = window.app;
         let newLocation = `${baseURL}statistics/`;
         const locFilter = { ...this.model.filter };
 

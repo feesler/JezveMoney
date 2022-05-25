@@ -49,8 +49,6 @@ const TITLE_MULTI_TRANS_DELETE = 'Delete transactions';
 const MSG_MULTI_TRANS_DELETE = 'Are you sure want to delete selected transactions?<br>Changes in the balance of affected accounts will be canceled.';
 const MSG_SINGLE_TRANS_DELETE = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
 
-/* global baseURL */
-
 /**
  * List of transactions view
  */
@@ -417,6 +415,8 @@ class TransactionListView extends View {
      * @param {number} newPos  - new position of transaction
      */
     sendChangePosRequest(transactionId, newPos) {
+        const { baseURL } = window.app;
+
         ajax.post({
             url: `${baseURL}api/transaction/setpos`,
             data: JSON.stringify({
@@ -550,6 +550,7 @@ class TransactionListView extends View {
      * Build new location address from current filterObj
      */
     buildAddress() {
+        const { baseURL } = window.app;
         let newLocation = `${baseURL}transactions/`;
         const locFilter = { ...this.state.filter };
 
@@ -795,6 +796,7 @@ class TransactionListView extends View {
     }
 
     requestTransactions(options) {
+        const { baseURL } = window.app;
         const reqOptions = {
             ...options,
             order: 'desc',
@@ -935,6 +937,7 @@ class TransactionListView extends View {
         this.delTransInp.value = selArr.join();
 
         if (state.selectedItems.count() === 1) {
+            const { baseURL } = window.app;
             this.toolbar.updateBtn.setURL(`${baseURL}transactions/update/${selArr[0]}`);
         }
 
