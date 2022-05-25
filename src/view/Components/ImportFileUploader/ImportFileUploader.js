@@ -7,7 +7,7 @@ import {
 } from 'jezvejs';
 import { Component } from 'jezvejs/Component';
 import { createMessage } from '../../js/app.js';
-import { Uploader } from '../../js/component/uploader.js';
+import { Uploader } from '../Uploader/Uploader.js';
 
 /** Strings */
 const MSG_JSON_PARSE = 'Fail to parse server response';
