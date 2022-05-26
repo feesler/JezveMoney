@@ -136,7 +136,7 @@ export class TransactionsView extends AppView {
             };
         }
 
-        const isModeSelectorVisible = await TestComponent.isVisible(cont.modeSelector);
+        const isModeSelectorVisible = cont.modeSelector?.content?.visible;
         if (isModeSelectorVisible) {
             res.detailsMode = cont.modeSelector.content.details;
         } else {
@@ -523,12 +523,12 @@ export class TransactionsView extends AppView {
             await this.performAction(() => this.content.transList.content.items[num].click());
             selectedCount += (isSelected ? -1 : 1);
 
-            const updIsVisible = await this.content.toolbar.isButtonVisible('update');
+            const updIsVisible = this.content.toolbar.isButtonVisible('update');
             if ((selectedCount === 1) !== updIsVisible) {
                 throw new Error(`Unexpected visibility (${updIsVisible}) of Update button while ${selectedCount} items selected`);
             }
 
-            const delIsVisible = await this.content.toolbar.isButtonVisible('del');
+            const delIsVisible = this.content.toolbar.isButtonVisible('del');
             if ((selectedCount > 0) !== delIsVisible) {
                 throw new Error(`Unexpected visibility (${delIsVisible}) of Delete button while ${selectedCount} items selected`);
             }
@@ -558,7 +558,7 @@ export class TransactionsView extends AppView {
 
         await this.performAction(() => this.content.toolbar.clickButton('del'));
 
-        if (!await TestComponent.isVisible(this.content.delete_warning)) {
+        if (!this.content.delete_warning?.content?.visible) {
             throw new Error('Delete transaction warning popup not appear');
         }
         if (!this.content.delete_warning.content.okBtn) {

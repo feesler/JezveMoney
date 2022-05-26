@@ -83,23 +83,23 @@ export class PersonsView extends AppView {
                 selectedHiddenCount += (isSelected ? -1 : 1);
             }
 
-            const showIsVisible = await this.content.toolbar.isButtonVisible('show');
+            const showIsVisible = this.content.toolbar.isButtonVisible('show');
             if ((selectedHiddenCount > 0) !== showIsVisible) {
                 throw new Error(`Unexpected visibility (${showIsVisible}) of Show button while ${selectedHiddenCount} hidden items selected`);
             }
 
-            const hideIsVisible = await this.content.toolbar.isButtonVisible('hide');
+            const hideIsVisible = this.content.toolbar.isButtonVisible('hide');
             if ((selectedCount > 0) !== hideIsVisible) {
                 throw new Error(`Unexpected visibility (${hideIsVisible}) of Hide button while ${selectedCount} visible items selected`);
             }
 
             const totalSelected = selectedCount + selectedHiddenCount;
-            const updIsVisible = await this.content.toolbar.isButtonVisible('update');
+            const updIsVisible = this.content.toolbar.isButtonVisible('update');
             if ((totalSelected === 1) !== updIsVisible) {
                 throw new Error(`Unexpected visibility (${updIsVisible}) of Update button while ${totalSelected} items selected`);
             }
 
-            const delIsVisible = await this.content.toolbar.isButtonVisible('del');
+            const delIsVisible = this.content.toolbar.isButtonVisible('del');
             if ((totalSelected > 0) !== delIsVisible) {
                 throw new Error(`Unexpected visibility (${delIsVisible}) of Delete button while ${totalSelected} items selected`);
             }
@@ -118,7 +118,7 @@ export class PersonsView extends AppView {
 
         await this.performAction(() => this.content.toolbar.clickButton('del'));
 
-        if (!await TestComponent.isVisible(this.content.delete_warning)) {
+        if (!this.content.delete_warning?.content?.visible) {
             throw new Error('Delete person(s) warning popup not appear');
         }
 

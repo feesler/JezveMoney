@@ -169,7 +169,7 @@ export class ImportView extends AppView {
         await this.performAction(() => this.content.uploadBtn.click());
         await this.performAction(() => wait(this.uploadPopupId, { visible: true }));
 
-        if (!await TestComponent.isVisible(this.content.uploadDialog)) {
+        if (!this.content.uploadDialog?.content?.visible) {
             throw new Error('File upload dialog not appear');
         }
     }
@@ -180,7 +180,7 @@ export class ImportView extends AppView {
         await this.performAction(() => this.content.uploadDialog.close());
         await this.performAction(() => wait(this.uploadPopupId, { visible: true }));
 
-        if (await TestComponent.isVisible(this.content.uploadDialog)) {
+        if (this.content.uploadDialog?.content?.visible) {
             throw new Error('File upload dialog not closed');
         }
     }
@@ -573,7 +573,7 @@ export class ImportView extends AppView {
                 return true;
             }
 
-            const notification = await TestComponent.isVisible(this.content.msgPopup, true);
+            const notification = this.content.msgPopup?.content?.visible;
             if (notification && !this.model.submitInProgress) {
                 return true;
             }

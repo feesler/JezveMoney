@@ -490,7 +490,7 @@ export class ImportUploadDialog extends TestComponent {
         await click(this.content.deleteTplBtn.elem);
         await this.parse();
 
-        if (!await TestComponent.isVisible(this.content.delete_warning)) {
+        if (!this.content.delete_warning?.content?.visible) {
             throw new Error('Delete template warning popup not appear');
         }
         if (!this.content.delete_warning.content.okBtn) {

@@ -40,14 +40,6 @@ export class Toolbar extends TestComponent {
         return res;
     }
 
-    async checkVisibility(button) {
-        if (!button) {
-            return false;
-        }
-
-        return isVisible(button.elem);
-    }
-
     getItemByName(name) {
         const key = name.toLowerCase();
         if (!(key in this.content.buttons)) {
@@ -57,8 +49,9 @@ export class Toolbar extends TestComponent {
         return this.content.buttons[key];
     }
 
-    async isButtonVisible(name) {
-        return this.checkVisibility(this.getItemByName(name));
+    isButtonVisible(name) {
+        const button = this.getItemByName(name);
+        return button?.content?.visible;
     }
 
     async clickButton(name) {
@@ -67,7 +60,7 @@ export class Toolbar extends TestComponent {
             throw new Error(`Button ${name} not found`);
         }
 
-        if (!await this.checkVisibility(button)) {
+        if (!button?.content?.visible) {
             throw new Error(`Button ${name} not visible`);
         }
 

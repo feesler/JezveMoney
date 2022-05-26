@@ -218,7 +218,7 @@ export class ImportRulesDialog extends TestComponent {
         await wait(this.content.ruleDeletePopupId, { visible: true });
         await this.parse();
 
-        if (!await TestComponent.isVisible(this.content.delete_warning)) {
+        if (!this.content.delete_warning?.content?.visible) {
             throw new Error('Delete template warning popup not appear');
         }
         if (!this.content.delete_warning.content.okBtn) {
