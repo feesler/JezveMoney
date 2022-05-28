@@ -12,6 +12,10 @@ use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\DebtModel;
 use JezveMoney\App\Item\TransactionItem;
 
+const MSG_ACCOUNT_NOT_AVAILABLE = "You have no one active account. Please create one.";
+const MSG_TRANSFER_NOT_AVAILABLE = "You need at least two active accounts for transfer.";
+const MSG_DEBT_NOT_AVAILABLE = "You have no one active person. Please create one for debts.";
+
 class Transactions extends TemplateController
 {
     protected $requiredFields = [
@@ -308,6 +312,11 @@ class Transactions extends TemplateController
         $action = "create";
         $data["action"] = $action;
 
+        $visibleAccounts = $this->accModel->getData();
+        $acc_count = count($visibleAccounts);
+        $data["acc_count"] = $acc_count;
+
+        $visiblePersons = $this->personMod->getData();
         $iconModel = IconModel::getInstance();
         $defMsg = ERR_TRANS_CREATE;
 
@@ -329,6 +338,21 @@ class Transactions extends TemplateController
             }
         }
 
+        // Check availability of selected type of transaction
+        $noDataMessage = null;
+        if ($tr["type"] == EXPENSE || $tr["type"] == INCOME) {
+            $trAvailable = $acc_count > 0;
+            $noDataMessage = MSG_ACCOUNT_NOT_AVAILABLE;
+        } elseif ($tr["type"] == TRANSFER) {
+            $trAvailable = $acc_count > 1;
+            $noDataMessage = MSG_TRANSFER_NOT_AVAILABLE;
+        } elseif ($tr["type"] == DEBT) {
+            $trAvailable = is_array($visiblePersons) && count($visiblePersons) > 0;
+            $noDataMessage = MSG_DEBT_NOT_AVAILABLE;
+        }
+        $data["trAvailable"] = $trAvailable;
+        $data["noDataMessage"] = $noDataMessage;
+
         // Check specified account
         $acc_id = 0;
         if (isset($_GET["acc_id"])) {
@@ -340,26 +364,24 @@ class Transactions extends TemplateController
         }
         // Use first account if nothing is specified
         if (!$acc_id) {
-            $acc_id = $this->accModel->getIdByPos(0);
-        }
-        if (!$acc_id) {
-            $this->fail($defMsg);
+            $acc_id = (is_array($visibleAccounts) && count($visibleAccounts) > 0)
+                ? $visibleAccounts[0]->id
+                : 0;
         }
         $data["acc_id"] = $acc_id;
 
         $debtType = true;
-        $noAccount = false;
+        $noAccount = $acc_id == 0;
         $srcAmountCurr = 0;
         $destAmountCurr = 0;
         $debtAcc = $this->accModel->getItem($acc_id);
 
         // Prepare person account
-        $visiblePersons = $this->personMod->getData();
         $person_id = (is_array($visiblePersons) && count($visiblePersons) > 0)
             ? $visiblePersons[0]->id
             : 0;
         $pObj = $this->personMod->getItem($person_id);
-        $person_curr = $debtAcc->curr_id;
+        $person_curr = ($debtAcc) ? $debtAcc->curr_id : $this->currModel->getIdByPos(0);
         $person_acc = $this->accModel->getPersonAccount($person_id, $person_curr);
         $person_acc_id = ($person_acc) ? $person_acc->id : 0;
         $person_res_balance = ($person_acc) ? $person_acc->balance : 0.0;
@@ -377,7 +399,7 @@ class Transactions extends TemplateController
             "subtitle" => $this->currModel->format($person_balance, $person_curr)
         ];
 
-        if ($tr["type"] == DEBT) {
+        if ($tr["type"] == DEBT && $debtAcc) {
             $data["debtAccountTile"] = $this->getAccountTileData($debtAcc, "acc_tile");
         } else {
             $data["debtAccountTile"] = $this->getHiddenAccountTileData("acc_tile");
@@ -386,8 +408,8 @@ class Transactions extends TemplateController
         if ($tr["type"] == DEBT) {
             $tr["src_id"] = $person_acc_id;
             $tr["dest_id"] = $acc_id;
-            $tr["src_curr"] = $debtAcc->curr_id;
-            $tr["dest_curr"] = $debtAcc->curr_id;
+            $tr["src_curr"] = ($debtAcc) ? $debtAcc->curr_id : $person_curr;
+            $tr["dest_curr"] = ($debtAcc) ? $debtAcc->curr_id : $person_curr;
             $tr["person_id"] = $person_id;
             $tr["debtType"] = $debtType;
             $tr["lastAcc_id"] = $acc_id;
@@ -430,9 +452,12 @@ class Transactions extends TemplateController
             } elseif ($tr["type"] == INCOME) {
                 $tr["src_curr"] = $tr["dest_curr"];
             }
+
+            if ($tr["type"] == TRANSFER && !$trAvailable) {
+                $tr["dest_curr"] = $tr["src_curr"];
+            }
         }
         $data["tr"] = $tr;
-        $data["acc_count"] = $this->accModel->getCount();
 
         // get information about source and destination accounts
         $src = $this->accModel->getItem($tr["src_id"]);
@@ -534,8 +559,8 @@ class Transactions extends TemplateController
         } else {
             $tr["src_id"] = $person_acc_id;
 
-            $srcAmountCurr = $debtAcc ? $debtAcc->curr_id : 0;
-            $destAmountCurr = $debtAcc ? $debtAcc->curr_id : 0;
+            $srcAmountCurr = ($debtAcc) ? $debtAcc->curr_id : $person_curr;
+            $destAmountCurr = ($debtAcc) ? $debtAcc->curr_id : $person_curr;
 
             $showSrcAmount = true;
             $showDestAmount = false;
@@ -580,7 +605,7 @@ class Transactions extends TemplateController
             $rtSrcResBal = $src ? $this->currModel->format($src->balance, $src->curr_id) : null;
             $rtDestResBal = $dest ? $this->currModel->format($dest->balance, $dest->curr_id) : null;
         } else {
-            $acc_res_balance = ($debtAcc) ? $debtAcc->balance : null;
+            $acc_res_balance = ($debtAcc) ? $debtAcc->balance : 0;
 
             $srcResBalance = ($debtType) ? $person_res_balance : $acc_res_balance;
             $destResBalance = ($debtType) ? $acc_res_balance : $person_res_balance;
@@ -631,6 +656,7 @@ class Transactions extends TemplateController
             "mode" => $this->action,
             "profile" => $profileData,
             "transaction" => $tr,
+            "trAvailable" => $trAvailable,
             "accounts" => $this->accModel->getData(["type" => "all", "full" => true]),
             "currency" => $this->currModel->getData(),
             "icons" => $iconModel->getData(),
@@ -657,6 +683,7 @@ class Transactions extends TemplateController
         $action = "update";
         $data["action"] = $action;
 
+        $visiblePersons = $this->personMod->getData();
         $iconModel = IconModel::getInstance();
         $defMsg = ERR_TRANS_UPDATE;
 
@@ -675,6 +702,9 @@ class Transactions extends TemplateController
         $tr = (array)$item;
 
         $data["acc_count"] = $this->accModel->getCount(["full" => ($tr["type"] == DEBT)]);
+
+        $trAvailable = true;
+        $data["trAvailable"] = $trAvailable;
 
         // get information about source and destination accounts
         $src = $this->accModel->getItem($tr["src_id"]);
@@ -780,7 +810,6 @@ class Transactions extends TemplateController
             $acc_id = $this->accModel->getIdByPos(0);
             $debtAcc = $this->accModel->getItem($acc_id);
 
-            $visiblePersons = $this->personMod->getData();
             $person_id = (is_array($visiblePersons) && count($visiblePersons) > 0)
                 ? $visiblePersons[0]->id
                 : 0;
@@ -931,6 +960,7 @@ class Transactions extends TemplateController
             "mode" => $this->action,
             "profile" => $profileData,
             "transaction" => $tr,
+            "trAvailable" => $trAvailable,
             "accounts" => $this->accModel->getData(["type" => "all", "full" => true]),
             "currency" => $this->currModel->getData(),
             "icons" => $iconModel->getData(),

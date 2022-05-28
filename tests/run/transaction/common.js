@@ -417,3 +417,52 @@ export async function securityTests() {
         return true;
     });
 }
+
+/** Navigate to create transaction view and check form availability according to current state */
+export async function checkTransactionAvailable(type, directNavigate = false) {
+    await test(`${Transaction.typeToString(type)} transaction availability`, async () => {
+        if (directNavigate) {
+            const requestURL = `${baseUrl()}transactions/create/?type=${type}`;
+
+            await goTo(requestURL);
+        } else {
+            await App.goToMainView();
+            await App.view.goToTransactions();
+            await App.view.goToCreateTransaction();
+            if (!(App.view instanceof TransactionView)) {
+                throw new Error('Invalid view');
+            }
+
+            if (!App.view.content.typeMenu.isSingleSelected(type)) {
+                await App.view.changeTransactionType(type);
+            }
+        }
+
+        let stateId = -1;
+        const userVisibleAccounts = App.state.accounts.getUserVisible();
+        const visiblePersons = App.state.persons.getVisible();
+
+        if (type === EXPENSE || type === INCOME) {
+            if (userVisibleAccounts.length > 0) {
+                stateId = 0;
+            }
+        } else if (type === TRANSFER) {
+            if (userVisibleAccounts.length > 1) {
+                const srcAccount = userVisibleAccounts.getItemByIndex(0);
+                const destAccount = userVisibleAccounts.getItemByIndex(1);
+                const isDiff = srcAccount.curr_id !== destAccount.curr_id;
+
+                stateId = (isDiff) ? 3 : 0;
+            }
+        } else if (type === DEBT) {
+            if (visiblePersons.length > 0) {
+                stateId = (userVisibleAccounts.length > 0) ? 0 : 6;
+            }
+        }
+
+        App.view.setExpectedState(stateId);
+        await App.view.checkState();
+
+        return true;
+    });
+}

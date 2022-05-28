@@ -391,6 +391,87 @@ async function deleteFromUpdateTests() {
     );
 }
 
+async function availabilityTests(directNavigate) {
+    const { RUB } = scenario;
+
+    if (directNavigate) {
+        setBlock('Transaction availability: direct navigation', 1);
+    } else {
+        setBlock('Transaction availability: manual navigation', 1);
+    }
+
+    // Remove all accounts and persons
+    await api.account.reset();
+    const personIds = App.state.persons.getIds();
+    if (personIds.length > 0) {
+        await api.person.del(personIds);
+    }
+
+    // Create 2 account and 1 person
+    await api.account.create({
+        name: 'Account 1',
+        curr_id: RUB,
+        initbalance: '1',
+        icon_id: 1,
+        flags: 0,
+    });
+    await api.account.create({
+        name: 'Account 2',
+        curr_id: RUB,
+        initbalance: '2',
+        icon_id: 1,
+        flags: 0,
+    });
+    await api.person.create({
+        name: 'Person 1',
+        flags: 0,
+    });
+
+    await App.state.fetch();
+    const [account1, account2] = App.state.accounts.getIds();
+    const [person1] = App.state.persons.getIds();
+
+    setBlock('2 accounts and 1 person', 2);
+    // All transaction types must be available
+    await TransactionTests.checkTransactionAvailable(EXPENSE, directNavigate);
+    await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
+    await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
+    await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
+
+    // Remove account, here should be only 1 account
+    await api.account.del(account2);
+    await App.state.fetch();
+
+    setBlock('1 account and 1 person', 2);
+    // Expense, Income and Debt must be available
+    await TransactionTests.checkTransactionAvailable(EXPENSE, directNavigate);
+    await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
+    await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
+    await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
+
+    // Remove account, here should be no accounts
+    await api.account.del(account1);
+    await App.state.fetch();
+
+    setBlock('No accounts and 1 person', 2);
+    // Only Debt must be available
+    await TransactionTests.checkTransactionAvailable(EXPENSE, directNavigate);
+    await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
+    await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
+    await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
+
+    // Remove person, here should be no persons
+    await api.person.del(person1);
+    await App.state.fetch();
+
+    setBlock('No accounts and no persons', 2);
+    // Expected no transaction available
+    await TransactionTests.checkTransactionAvailable(EXPENSE, directNavigate);
+    await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
+    await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
+    await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
+}
+
 export const transactionTests = {
     /** Initialize tests */
     init(scenarioInstance) {
@@ -476,6 +557,11 @@ export const transactionTests = {
 
         await deleteTests();
         await deleteFromUpdateTests();
+    },
+
+    async runAvailabilityTests() {
+        await availabilityTests(false);
+        await availabilityTests(true);
     },
 
     /** Initialize and run tests */

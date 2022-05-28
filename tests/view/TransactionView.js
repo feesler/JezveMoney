@@ -71,6 +71,12 @@ export class TransactionView extends AppView {
             throw new Error('Invalid transaction type menu');
         }
 
+        res.notAvailMsg = { elem: await query('#notavailmsg') };
+        if (!res.notAvailMsg.elem) {
+            throw new Error('No available transaction message element not found');
+        }
+        res.notAvailMsg.message = await prop(res.notAvailMsg.elem, 'textContent');
+
         res.person = await TileBlock.create(this, await query('#person'));
         if (res.person) {
             const personIdInp = await query('#person_id');
@@ -155,6 +161,8 @@ export class TransactionView extends AppView {
         }
 
         [res.type] = selectedTypes;
+        res.isAvailable = !cont.notAvailMsg.visible;
+
         res.isUpdate = cont.isUpdate;
         if (res.isUpdate) {
             res.id = cont.id;
@@ -175,11 +183,11 @@ export class TransactionView extends AppView {
             : 0;
 
         res.srcCurr = Currency.getById(res.src_curr_id);
-        if (!res.srcCurr) {
+        if (res.isAvailable && !res.srcCurr) {
             throw new Error('Source currency not found');
         }
         res.destCurr = Currency.getById(res.dest_curr_id);
-        if (!res.destCurr) {
+        if (res.isAvailable && !res.destCurr) {
             throw new Error('Destination currency not found');
         }
         res.isDiffCurr = (res.src_curr_id !== res.dest_curr_id);
@@ -192,24 +200,26 @@ export class TransactionView extends AppView {
 
         res.srcResBal = cont.result_balance_row.content.value;
         res.fSrcResBal = isValidValue(res.srcResBal) ? normalize(res.srcResBal) : res.srcResBal;
-        res.fmtSrcResBal = res.srcCurr.format(res.fSrcResBal);
+        res.fmtSrcResBal = (res.srcCurr) ? res.srcCurr.format(res.fSrcResBal) : '';
 
         res.destResBal = cont.result_balance_dest_row.content.value;
         res.fDestResBal = isValidValue(res.destResBal) ? normalize(res.destResBal) : res.destResBal;
-        res.fmtDestResBal = res.destCurr.format(res.fDestResBal);
+        res.fmtDestResBal = (res.destCurr) ? res.destCurr.format(res.fDestResBal) : '';
 
         res.exchRate = cont.exchange_row.content.value;
         this.updateExch();
 
         if (res.type === EXPENSE) {
-            if (!res.srcAccount) {
+            if (res.isAvailable && !res.srcAccount) {
                 throw new Error('Source account not found');
             }
 
             const isResBalRowVisible = cont.result_balance_row?.content?.visible;
             const exchRowVisible = cont.exchange_row?.content?.visible;
 
-            if (res.isDiffCurr) {
+            if (!res.isAvailable) {
+                res.state = -1;
+            } else if (res.isDiffCurr) {
                 if (exchRowVisible) {
                     res.state = 3;
                 } else {
@@ -221,14 +231,16 @@ export class TransactionView extends AppView {
         }
 
         if (res.type === INCOME) {
-            if (!res.destAccount) {
+            if (res.isAvailable && !res.destAccount) {
                 throw new Error('Destination account not found');
             }
 
             const destResRowVisible = cont.result_balance_dest_row?.content?.visible;
             const exchRowVisible = cont.exchange_row?.content?.visible;
 
-            if (res.isDiffCurr) {
+            if (!res.isAvailable) {
+                res.state = -1;
+            } else if (res.isDiffCurr) {
                 if (exchRowVisible) {
                     res.state = 3;
                 } else {
@@ -240,10 +252,10 @@ export class TransactionView extends AppView {
         }
 
         if (res.type === TRANSFER) {
-            if (!res.srcAccount) {
+            if (res.isAvailable && !res.srcAccount) {
                 throw new Error('Source account not found');
             }
-            if (!res.destAccount) {
+            if (res.isAvailable && !res.destAccount) {
                 throw new Error('Destination account not found');
             }
 
@@ -253,7 +265,9 @@ export class TransactionView extends AppView {
             const destResRowVisible = cont.result_balance_dest_row?.content?.visible;
             const exchRowVisible = cont.exchange_row?.content?.visible;
 
-            if (res.isDiffCurr) {
+            if (!res.isAvailable) {
+                res.state = -1;
+            } else if (res.isDiffCurr) {
                 if (srcAmountRowVisible && destAmountRowVisible) {
                     res.state = 3;
                 } else if (destAmountRowVisible && srcResRowVisible) {
@@ -284,7 +298,7 @@ export class TransactionView extends AppView {
 
         if (res.type === DEBT) {
             res.person = App.state.persons.getItem(cont.person.content.id);
-            if (!res.person) {
+            if (res.isAvailable && !res.person) {
                 throw new Error('Person not found');
             }
 
@@ -295,13 +309,13 @@ export class TransactionView extends AppView {
             }
 
             const personAccountCurr = (res.debtType) ? res.src_curr_id : res.dest_curr_id;
-            res.personAccount = this.getPersonAccount(res.person.id, personAccountCurr);
+            res.personAccount = this.getPersonAccount(res.person?.id, personAccountCurr);
 
             const isSelectAccountVisible = cont.selaccount?.content?.visible;
             res.noAccount = isSelectAccountVisible;
 
             res.account = App.state.accounts.getItem(cont.account.content.id);
-            if (!res.account && !res.noAccount) {
+            if (res.isAvailable && !res.account && !res.noAccount) {
                 throw new Error('Account not found');
             }
             if (
@@ -332,7 +346,9 @@ export class TransactionView extends AppView {
             const srcResRowVisible = cont.result_balance_row?.content?.visible;
             const destResRowVisible = cont.result_balance_dest_row?.content?.visible;
 
-            if (res.noAccount) {
+            if (!res.isAvailable) {
+                res.state = -1;
+            } else if (res.noAccount) {
                 if (srcAmountRowVisible) {
                     res.state = (res.debtType) ? 6 : 7;
                 } else if (srcResRowVisible && res.debtType) {
@@ -355,14 +371,14 @@ export class TransactionView extends AppView {
             }
         }
 
-        if (res.srcAccount) {
+        if (res.isAvailable && res.srcAccount) {
             if (res.srcAccount.curr_id !== res.src_curr_id) {
                 throw new Error(`Unexpected destination currency ${res.dest_curr_id}(${res.destAccount.curr_id} is expected)`);
             }
 
             res.srcAccount.fmtBalance = res.srcCurr.format(res.srcAccount.balance);
         }
-        if (res.destAccount) {
+        if (res.isAvailable && res.destAccount) {
             if (res.destAccount.curr_id !== res.dest_curr_id) {
                 throw new Error(`Unexpected destination currency ${res.dest_curr_id}(${res.destAccount.curr_id} is expected)`);
             }
@@ -432,31 +448,44 @@ export class TransactionView extends AppView {
 
         const res = {
             typeMenu: { selectedTypes: [this.model.type] },
-            person: { visible: this.model.type === DEBT, tile: {} },
-            account: { visible: this.model.type === DEBT, tile: {} },
-            source: { visible: (this.model.type === EXPENSE || this.model.type === TRANSFER) },
-            destination: { visible: (this.model.type === INCOME || this.model.type === TRANSFER) },
+            person: {
+                tile: {},
+                visible: this.model.isAvailable && this.model.type === DEBT,
+            },
+            account: {
+                tile: {},
+                visible: this.model.isAvailable && this.model.type === DEBT,
+            },
+            source: {
+                visible: (
+                    this.model.isAvailable
+                    && (this.model.type === EXPENSE || this.model.type === TRANSFER)
+                ),
+            },
+            destination: {
+                visible: (
+                    this.model.isAvailable
+                    && (this.model.type === INCOME || this.model.type === TRANSFER)
+                ),
+            },
             src_amount_row: {
                 value: this.model.srcAmount.toString(),
-                currSign: this.model.srcCurr.sign,
-                isCurrActive: this.model.type === INCOME,
+                currSign: (this.model.srcCurr) ? this.model.srcCurr.sign : '',
             },
             dest_amount_row: {
                 value: this.model.destAmount.toString(),
-                currSign: this.model.destCurr.sign,
-                isCurrActive: this.model.type === EXPENSE,
+                currSign: (this.model.destCurr) ? this.model.destCurr.sign : '',
             },
             result_balance_row: {},
             result_balance_dest_row: {},
             exchange_row: {
                 value: this.model.exchRate.toString(),
-                currSign: this.model.exchSign,
             },
             src_amount_left: {},
             dest_amount_left: {},
             src_res_balance_left: {},
             dest_res_balance_left: {},
-            exch_left: { value: this.model.fmtExch },
+            exch_left: {},
         };
 
         if (this.model.isUpdate) {
@@ -466,22 +495,37 @@ export class TransactionView extends AppView {
             };
         }
 
+        if (this.model.isAvailable) {
+            res.src_amount_row.isCurrActive = (this.model.type === INCOME);
+            res.dest_amount_row.isCurrActive = (this.model.type === EXPENSE);
+            res.exchange_row.currSign = this.model.exchSign;
+            res.exch_left.value = this.model.fmtExch;
+        }
+
         if (this.model.type === EXPENSE || this.model.type === TRANSFER) {
             res.source.tile = {
-                name: this.model.srcAccount.name,
-                balance: this.model.srcAccount.fmtBalance,
-                visible: true,
+                visible: this.model.isAvailable,
             };
+
+            if (this.model.isAvailable) {
+                res.source.tile.name = (this.model.srcAccount) ? this.model.srcAccount.name : '';
+                res.source.tile.balance = (this.model.srcAccount) ? this.model.srcAccount.fmtBalance : '';
+            }
+
             res.src_res_balance_left.value = this.model.fmtSrcResBal;
         }
 
         if (this.model.type === INCOME || this.model.type === TRANSFER) {
             res.destination.tile = {
-                name: this.model.destAccount.name,
-                balance: this.model.destAccount.fmtBalance,
-                visible: true,
+                visible: this.model.isAvailable,
             };
-            res.dest_res_balance_left.value = this.model.fmtDestResBal;
+
+            if (this.model.isAvailable) {
+                res.destination.tile.name = (this.model.destAccount) ? this.model.destAccount.name : '';
+                res.destination.tile.balance = (this.model.destAccount) ? this.model.destAccount.fmtBalance : '';
+            }
+
+            res.dest_res_balance_left.value = (this.model.isAvailable) ? this.model.fmtDestResBal : '';
         }
 
         if (this.model.type !== INCOME) {
@@ -490,34 +534,44 @@ export class TransactionView extends AppView {
         }
 
         if (this.model.type !== EXPENSE) {
-            res.src_amount_left.value = this.model.srcCurr.format(this.model.fSrcAmount);
+            res.src_amount_left.value = (this.model.srcCurr) ? this.model.srcCurr.format(this.model.fSrcAmount) : '';
             res.result_balance_dest_row.value = this.model.destResBal.toString();
             res.result_balance_dest_row.isCurrActive = false;
         }
         if (this.model.type !== DEBT) {
-            res.dest_amount_left.value = this.model.destCurr.format(this.model.fDestAmount);
+            res.dest_amount_left.value = (this.model.destCurr) ? this.model.destCurr.format(this.model.fDestAmount) : '';
         }
 
         if (this.model.type === EXPENSE) {
-            if (newState < 0 || newState > 4) {
+            if (newState < -1 || newState > 4) {
                 throw new Error('Wrong state specified');
             }
 
-            if (newState === 0 || newState === 1) {
-                res.src_amount_row.label = 'Amount';
-                res.dest_amount_row.label = 'Amount';
-            } else {
-                res.src_amount_row.label = 'Source amount';
-                res.dest_amount_row.label = 'Destination amount';
-            }
+            if (this.model.isAvailable) {
+                if (newState === 0 || newState === 1) {
+                    res.src_amount_row.label = 'Amount';
+                    res.dest_amount_row.label = 'Amount';
+                } else {
+                    res.src_amount_row.label = 'Source amount';
+                    res.dest_amount_row.label = 'Destination amount';
+                }
 
-            res.result_balance_row.label = 'Result balance';
+                res.result_balance_row.label = 'Result balance';
+            }
 
             res.src_amount_left.visible = false;
             res.dest_res_balance_left.visible = false;
             res.result_balance_dest_row.visible = false;
 
-            if (newState === 0) {
+            if (newState === -1) {
+                res.dest_amount_left.visible = false;
+                res.src_res_balance_left.visible = false;
+                res.exch_left.visible = false;
+                res.src_amount_row.visible = false;
+                res.dest_amount_row.visible = false;
+                res.exchange_row.visible = false;
+                res.result_balance_row.visible = false;
+            } else if (newState === 0) {
                 res.dest_amount_left.visible = false;
                 res.src_res_balance_left.visible = true;
                 res.exch_left.visible = false;
@@ -561,23 +615,35 @@ export class TransactionView extends AppView {
         }
 
         if (this.model.type === INCOME) {
-            if (newState < 0 || newState > 4) {
+            if (newState < -1 || newState > 4) {
                 throw new Error('Wrong state specified');
+            }
+
+            if (this.model.isAvailable) {
+                res.result_balance_dest_row.label = 'Result balance';
+
+                if (newState === 0 || newState === 1) {
+                    res.src_amount_row.label = 'Amount';
+                    res.dest_amount_row.label = 'Amount';
+                } else {
+                    res.src_amount_row.label = 'Source amount';
+                    res.dest_amount_row.label = 'Destination amount';
+                }
             }
 
             res.dest_res_balance_left.visible = false;
             res.result_balance_dest_row.visible = false;
-            res.result_balance_dest_row.label = 'Result balance';
 
-            if (newState === 0 || newState === 1) {
-                res.src_amount_row.label = 'Amount';
-                res.dest_amount_row.label = 'Amount';
-            } else {
-                res.src_amount_row.label = 'Source amount';
-                res.dest_amount_row.label = 'Destination amount';
-            }
-
-            if (newState === 0) {
+            if (newState === -1) {
+                res.src_amount_left.visible = false;
+                res.dest_amount_left.visible = false;
+                res.dest_res_balance_left.visible = false;
+                res.exch_left.visible = false;
+                res.src_amount_row.visible = false;
+                res.dest_amount_row.visible = false;
+                res.result_balance_dest_row.visible = false;
+                res.exchange_row.visible = false;
+            } else if (newState === 0) {
                 res.src_amount_left.visible = false;
                 res.dest_amount_left.visible = false;
                 res.dest_res_balance_left.visible = true;
@@ -626,22 +692,35 @@ export class TransactionView extends AppView {
         }
 
         if (this.model.type === TRANSFER) {
-            if (newState < 0 || newState > 8) {
+            if (newState < -1 || newState > 8) {
                 throw new Error('Wrong state specified');
             }
 
-            res.result_balance_row.label = 'Result balance (Source)';
-            res.result_balance_dest_row.label = 'Result balance (Destination)';
+            if (this.model.isAvailable) {
+                res.result_balance_row.label = 'Result balance (Source)';
+                res.result_balance_dest_row.label = 'Result balance (Destination)';
 
-            if (newState === 0 || newState === 1 || newState === 2) {
-                res.src_amount_row.label = 'Amount';
-                res.dest_amount_row.label = 'Amount';
-            } else {
-                res.src_amount_row.label = 'Source amount';
-                res.dest_amount_row.label = 'Destination amount';
+                if (newState === 0 || newState === 1 || newState === 2) {
+                    res.src_amount_row.label = 'Amount';
+                    res.dest_amount_row.label = 'Amount';
+                } else {
+                    res.src_amount_row.label = 'Source amount';
+                    res.dest_amount_row.label = 'Destination amount';
+                }
             }
 
-            if (newState === 0) {
+            if (newState === -1) {
+                res.src_amount_left.visible = false;
+                res.dest_amount_left.visible = false;
+                res.src_res_balance_left.visible = false;
+                res.dest_res_balance_left.visible = false;
+                res.exch_left.visible = false;
+                res.src_amount_row.visible = false;
+                res.dest_amount_row.visible = false;
+                res.result_balance_row.visible = false;
+                res.result_balance_dest_row.visible = false;
+                res.exchange_row.visible = false;
+            } else if (newState === 0) {
                 res.src_amount_left.visible = false;
                 res.dest_amount_left.visible = false;
                 res.src_res_balance_left.visible = true;
@@ -744,32 +823,41 @@ export class TransactionView extends AppView {
         }
 
         if (this.model.type === DEBT) {
-            if (newState < 0 || newState > 9) {
+            if (newState < -1 || newState > 9) {
                 throw new Error('Wrong state specified');
             }
 
-            res.account.tile.visible = !this.model.noAccount;
-            res.selaccount = { visible: this.model.noAccount };
-            res.noacc_btn = { visible: !this.model.noAccount };
+            res.account.tile.visible = this.model.isAvailable && !this.model.noAccount;
+            res.selaccount = { visible: this.model.isAvailable && this.model.noAccount };
+            res.noacc_btn = { visible: this.model.isAvailable && !this.model.noAccount };
             res.dest_amount_row.visible = false;
             res.dest_amount_left.visible = false;
             res.exchange_row.visible = false;
             res.exch_left.visible = false;
 
-            res.src_amount_row.label = 'Amount';
+            if (this.model.isAvailable) {
+                res.src_amount_row.label = 'Amount';
+                res.result_balance_row.label = (this.model.debtType)
+                    ? 'Result balance (Person)'
+                    : 'Result balance (Account)';
+                res.result_balance_dest_row.label = (this.model.debtType)
+                    ? 'Result balance (Account)'
+                    : 'Result balance (Person)';
+            }
 
             if (this.model.debtType) {
                 res.person = {
                     tile: {
-                        name: this.model.person.name,
-                        balance: this.model.srcAccount.fmtBalance,
-                        visible: true,
+                        visible: this.model.isAvailable,
                     },
                 };
-                res.src_res_balance_left.value = this.model.fmtSrcResBal;
 
-                res.result_balance_row.label = 'Result balance (Person)';
-                res.result_balance_dest_row.label = 'Result balance (Account)';
+                if (this.model.isAvailable) {
+                    res.person.tile.name = (this.model.person) ? this.model.person.name : '';
+                    res.person.tile.balance = (this.model.srcAccount) ? this.model.srcAccount.fmtBalance : '';
+                }
+
+                res.src_res_balance_left.value = this.model.fmtSrcResBal;
 
                 // Check initial state
                 res.dest_res_balance_left.value = this.model.fmtDestResBal;
@@ -777,24 +865,28 @@ export class TransactionView extends AppView {
                 if (!this.model.noAccount) {
                     res.account = {
                         tile: {
-                            name: this.model.destAccount.name,
-                            balance: this.model.destAccount.fmtBalance,
-                            visible: true,
+                            visible: this.model.isAvailable,
                         },
                     };
+
+                    if (this.model.isAvailable) {
+                        res.account.tile.name = (this.model.destAccount) ? this.model.destAccount.name : '';
+                        res.account.tile.balance = (this.model.destAccount) ? this.model.destAccount.fmtBalance : '';
+                    }
                 }
             } else {
                 res.person = {
                     tile: {
-                        name: this.model.person.name,
-                        balance: this.model.destAccount.fmtBalance,
-                        visible: true,
+                        visible: this.model.isAvailable,
                     },
                 };
-                res.dest_res_balance_left.value = this.model.fmtDestResBal;
 
-                res.result_balance_row.label = 'Result balance (Account)';
-                res.result_balance_dest_row.label = 'Result balance (Person)';
+                if (this.model.isAvailable) {
+                    res.person.tile.name = (this.model.person) ? this.model.person.name : '';
+                    res.person.tile.balance = (this.model.destAccount) ? this.model.destAccount.fmtBalance : '';
+                }
+
+                res.dest_res_balance_left.value = this.model.fmtDestResBal;
 
                 // Check initial state
                 res.src_res_balance_left.value = this.model.fmtSrcResBal;
@@ -802,15 +894,25 @@ export class TransactionView extends AppView {
                 if (!this.model.noAccount) {
                     res.account = {
                         tile: {
-                            name: this.model.srcAccount.name,
-                            balance: this.model.srcAccount.fmtBalance,
-                            visible: true,
+                            visible: this.model.isAvailable,
                         },
                     };
+
+                    if (this.model.isAvailable) {
+                        res.account.tile.name = (this.model.srcAccount) ? this.model.srcAccount.name : '';
+                        res.account.tile.balance = (this.model.srcAccount) ? this.model.srcAccount.fmtBalance : '';
+                    }
                 }
             }
 
-            if (newState === 0 || newState === 3) {
+            if (newState === -1) {
+                res.src_amount_row.visible = false;
+                res.src_amount_left.visible = false;
+                res.result_balance_row.visible = false;
+                res.src_res_balance_left.visible = false;
+                res.result_balance_dest_row.visible = false;
+                res.dest_res_balance_left.visible = false;
+            } else if (newState === 0 || newState === 3) {
                 res.src_amount_row.visible = true;
                 res.src_amount_left.visible = false;
                 res.result_balance_row.visible = false;
@@ -1063,6 +1165,17 @@ export class TransactionView extends AppView {
         };
     }
 
+    async getFirstCurrency() {
+        const currencies = await Currency.getList();
+        if (!currencies || currencies.length === 0) {
+            return null;
+        }
+
+        const [first] = currencies;
+
+        return first;
+    }
+
     async changeTransactionType(type) {
         const currentType = this.model.type;
 
@@ -1071,8 +1184,12 @@ export class TransactionView extends AppView {
         }
 
         this.model.type = type;
+        this.model.isAvailable = App.state.isAvailableTransactionType(type);
+
         if (type === EXPENSE) {
-            if (currentType === INCOME) {
+            if (!this.model.isAvailable) {
+                this.model.state = -1;
+            } else if (currentType === INCOME) {
                 const srcCurrId = this.model.src_curr_id;
                 const { srcCurr, srcAmount, destAmount } = this.model;
 
@@ -1111,7 +1228,9 @@ export class TransactionView extends AppView {
         }
 
         if (type === INCOME) {
-            if (currentType === INCOME) {
+            if (!this.model.isAvailable) {
+                this.model.state = -1;
+            } else if (currentType === INCOME) {
                 const { srcCurr, srcAmount, destAmount } = this.model;
                 const srcCurrId = this.model.src_curr_id;
 
@@ -1150,7 +1269,9 @@ export class TransactionView extends AppView {
         }
 
         if (type === TRANSFER) {
-            if (currentType === EXPENSE) {
+            if (!this.model.isAvailable) {
+                this.model.state = -1;
+            } else if (currentType === EXPENSE) {
                 this.setNextDestAccount(this.model.srcAccount.id);
             } else if (currentType === INCOME) {
                 this.setNextSourceAccount(this.model.destAccount.id);
@@ -1186,24 +1307,37 @@ export class TransactionView extends AppView {
             const person = App.state.persons.getItemByIndex(0); // TODO: use visible persons
             this.model.person = person;
 
-            if (currentType === EXPENSE || currentType === TRANSFER) {
+            if (!this.model.isAvailable) {
+                this.model.state = -1;
+            } else if (currentType === EXPENSE || currentType === TRANSFER) {
                 this.model.debtType = false;
                 this.model.account = this.model.srcAccount;
-                this.model.src_curr_id = this.model.srcAccount.curr_id;
+                if (this.model.srcAccount) {
+                    this.model.src_curr_id = this.model.srcAccount.curr_id;
+                } else {
+                    const firstCurrency = await this.getFirstCurrency();
+                    this.model.src_curr_id = firstCurrency.id;
+                }
+
                 this.model.dest_curr_id = this.model.src_curr_id;
             } else if (currentType === INCOME) {
                 this.model.debtType = true;
                 this.model.account = this.model.destAccount;
-                this.model.dest_curr_id = this.model.destAccount.curr_id;
+                if (this.model.srcAccount) {
+                    this.model.dest_curr_id = this.model.destAccount.curr_id;
+                } else {
+                    const firstCurrency = await this.getFirstCurrency();
+                    this.model.src_curr_id = firstCurrency.id;
+                }
                 this.model.src_curr_id = this.model.dest_curr_id;
             }
 
             this.model.personAccount = this.getPersonAccount(
-                this.model.person.id,
+                this.model.person?.id,
                 this.model.src_curr_id,
             );
 
-            this.model.noAccount = false;
+            this.model.noAccount = (this.model.account == null);
             this.model.state = (this.model.debtType) ? 0 : 3;
             const { srcAmount, destAmount } = this.model;
             this.setSrcAmount(srcAmount);

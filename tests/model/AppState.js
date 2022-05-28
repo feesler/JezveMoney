@@ -854,6 +854,27 @@ export class AppState {
         return true;
     }
 
+    isAvailableTransactionType(type) {
+        if (!availTransTypes.includes(type)) {
+            throw new Error('Invalid transaction type');
+        }
+
+        const userVisibleAccounts = this.accounts.getUserVisible();
+
+        if (type === EXPENSE || type === INCOME) {
+            return (userVisibleAccounts.length > 0);
+        }
+        if (type === TRANSFER) {
+            return (userVisibleAccounts.length > 1);
+        }
+        if (type === DEBT) {
+            const visiblePersons = this.persons.getVisible();
+            return (visiblePersons.length > 0);
+        }
+
+        throw new Error('Invalid transaction type');
+    }
+
     /**
      * Import templates
      */
