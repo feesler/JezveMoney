@@ -131,7 +131,19 @@ export class ImportActionForm extends Component {
 
     /** Create action type field */
     createActionTypeField() {
-        const items = this.actionTypes.map((type) => ({ id: type.id, title: type.title }));
+        const items = this.actionTypes
+            .filter((type) => {
+                // Remove `Set person` action if no persons available
+                if (
+                    type.id === IMPORT_ACTION_SET_PERSON
+                    && this.model.persons.length === 0
+                ) {
+                    return false;
+                }
+
+                return true;
+            })
+            .map((type) => ({ id: type.id, title: type.title }));
 
         const selectElem = ce('select');
         this.actionTypeField = createField(TITLE_FIELD_ACTION, selectElem);
@@ -175,7 +187,9 @@ export class ImportActionForm extends Component {
             editable: false,
         });
         this.accountDropDown.append(items);
-        this.accountDropDown.selectItem(items[0].id);
+        if (items.length > 0) {
+            this.accountDropDown.selectItem(items[0].id);
+        }
     }
 
     /** Create person field */
@@ -191,7 +205,9 @@ export class ImportActionForm extends Component {
             editable: false,
         });
         this.personDropDown.append(items);
-        this.personDropDown.selectItem(items[0].id);
+        if (items.length > 0) {
+            this.personDropDown.selectItem(items[0].id);
+        }
     }
 
     /** Set data for component */

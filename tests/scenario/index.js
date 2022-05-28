@@ -99,6 +99,7 @@ export class Scenario {
         await profileTests.runPostTransaction();
 
         await transactionTests.runAvailabilityTests();
+        await importTests.runNoPersonsTest();
 
         await this.finishTests();
     }

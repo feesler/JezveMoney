@@ -192,6 +192,11 @@ export const importTests = {
         await this.clean();
     },
 
+    async runNoPersonsTest() {
+        importRuleTests.init(scenario);
+        await importRuleTests.runNoPersonsTest();
+    },
+
     /** Initialize and run tests */
     async initAndRun(scenarioInstance) {
         this.init(scenarioInstance);

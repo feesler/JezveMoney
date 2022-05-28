@@ -20,8 +20,43 @@ import {
 } from '../../model/ImportAction.js';
 import * as ImportTests from '../../run/import.js';
 import { setBlock } from '../../env.js';
+import { api } from '../../model/api.js';
+import { App } from '../../Application.js';
 
 let scenario = null;
+
+// Import rule action form test for no persons
+async function noPersonTests() {
+    const { RUB } = scenario;
+
+    setBlock('No persons test', 1);
+
+    // Create at least one account
+    await api.account.create({
+        name: 'Test Account 1',
+        curr_id: RUB,
+        initbalance: '1',
+        icon_id: 1,
+        flags: 0,
+    });
+    // Remove all persons
+    const personIds = App.state.persons.getIds();
+    if (personIds.length > 0) {
+        await api.person.del(personIds);
+    }
+    await App.state.fetch();
+
+    await App.goToMainView();
+    await App.view.goToTransactions();
+    await App.view.goToImportView();
+
+    await ImportTests.openRulesDialog();
+
+    await ImportTests.createRule();
+    await ImportTests.addRuleAction();
+
+    await ImportTests.closeRulesDialog();
+}
 
 // Import rule validation tests
 async function runValidationTests() {
@@ -402,6 +437,10 @@ export const importRuleTests = {
         await runDeleteImportRuleTests();
 
         await ImportTests.closeRulesDialog();
+    },
+
+    async runNoPersonsTest() {
+        await noPersonTests();
     },
 
     /** Initialize and run tests */
