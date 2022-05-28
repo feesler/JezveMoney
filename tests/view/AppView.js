@@ -5,7 +5,6 @@ import {
     url,
     navigation,
     query,
-    click,
 } from '../env.js';
 
 export class AppView extends TestView {

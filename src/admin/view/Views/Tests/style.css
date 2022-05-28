@@ -1,7 +1,6 @@
 button,
 input[type="button"],
 input[type="submit"] {
-  -webkit-appearance: button;
   appearance: button;
   overflow: visible;
 }
