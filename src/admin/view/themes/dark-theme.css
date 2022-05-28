@@ -5,16 +5,20 @@ body.dark-theme {
 
 .dark-theme .admin-tbl,
 .dark-theme .admin-tbl th,
-.dark-theme .admin-tbl td {
+.dark-theme .admin-tbl td,
+.dark-theme .test-tbl,
+.dark-theme .test-tbl th,
+.dark-theme .test-tbl td {
   border-color: #dddddd;
 }
 
 /* Tests */
-.dark-theme .results-container td {
+.dark-theme .test-results-container td {
   border-color: #dddddd;
 }
 
-.dark-theme .admin-tbl tr:hover td {
+.dark-theme .admin-tbl tr:hover td,
+.dark-theme .test-tbl tr:hover td {
   background-color: #444444;
 }
 

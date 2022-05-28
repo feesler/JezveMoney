@@ -1,4 +1,12 @@
-.tests-content {
+button,
+input[type="button"],
+input[type="submit"] {
+  -webkit-appearance: button;
+  appearance: button;
+  overflow: visible;
+}
+
+.test-content {
   height: 100%;
   display: -ms-flexbox;
   display: flex;
@@ -6,8 +14,48 @@
   align-items: stretch;
 }
 
+/* Button */
+.test-btn {
+  padding: 3px 10px;
+  background-color: #44aaff;
+  color: #ffffff;
+}
+
+.test-btn:disabled {
+  background-color: #708290;
+}
+
+/* Checkbox wrapper */
+.checkbox-wrap {
+  height: 20px;
+  padding: 5px 0;
+}
+
+.checkbox-wrap > input[type="checkbox"] {
+  display: inline;
+  height: 20px;
+  line-height: 20px;
+}
+
+.checkbox-wrap > label {
+  display: inline;
+  padding: 0 5px;
+  font-size: 16px;
+  height: 20px;
+  line-height: 20px;
+}
+
+.checkbox-wrap label > input {
+  margin-right: 8px;
+}
+
+.checkbox-wrap.checkbox-wrap_inline {
+  display: inline-block;
+  margin-right: 10px;
+}
+
 /* Results */
-.results {
+.test-results {
   margin: 0 0 10px 0;
   display: -ms-flexbox;
   display: flex;
@@ -15,12 +63,12 @@
   max-height: 70vh;
 }
 
-.results-container {
+.test-results-container {
   display: none;
   overflow-y: auto;
 }
 
-.results-expanded .results-container {
+.test-results-expanded .test-results-container {
   display: block;
 }
 
@@ -28,7 +76,19 @@
   padding: 0 0 10px 0;
 }
 
-.admin-tbl.counter-tbl {
+/* Admin table */
+.test-tbl {
+  border-collapse: collapse;
+  border: 1px solid;
+}
+
+.test-tbl th,
+.test-tbl td {
+  border: 1px solid;
+  padding: 5px;
+}
+
+.test-tbl.counter-tbl {
   display: inline;
   border: 0 none;
 }
@@ -47,11 +107,11 @@
   border-bottom: 0 none;
 }
 
-.results-container table {
+.test-results-container table {
   border-collapse: collapse;
 }
 
-.results-container td {
+.test-results-container td {
   border: 1px solid;
   padding: 5px;
 }
@@ -84,18 +144,18 @@
 
 /* Desktop */
 @media (min-width: 768px) {
-  .tests-content {
+  .test-content {
     flex-flow: row nowrap;
   }
 
   /* Results table */
-  .results {
+  .test-results {
     flex-grow: 0;
     flex-basis: 35%;
     margin: 0 10px 0 0;
   }
 
-  .results-container {
+  .test-results-container {
     display: block;
   }
 

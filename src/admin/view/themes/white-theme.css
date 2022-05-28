@@ -3,18 +3,22 @@ body.white-theme  {
   background-color: #ffffff;
 }
 
-.white-theme .admin-tbl,
-.white-theme .admin-tbl th,
-.white-theme .admin-tbl td {
+.dark-theme .admin-tbl,
+.dark-theme .admin-tbl th,
+.dark-theme .admin-tbl td,
+.dark-theme .test-tbl,
+.dark-theme .test-tbl th,
+.dark-theme .test-tbl td {
   border-color: #000000;
 }
 
 /* Tests */
-.white-theme .results-container td {
+.white-theme .test-results-container td {
   border-color: #000000;
 }
 
-.white-theme .admin-tbl tr:hover td {
+.dark-theme .admin-tbl tr:hover td,
+.dark-theme .test-tbl tr:hover td {
   background-color: #bbbbbb;
 }
 
