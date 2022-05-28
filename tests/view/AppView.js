@@ -32,22 +32,24 @@ export class AppView extends TestView {
         await this.performAction(() => this.content.msgPopup.close());
     }
 
-    /** Click on profile menu item and return navigation promise */
     async goToProfile() {
         if (!this.isUserLoggedIn()) {
             throw new Error('User is not logged in');
         }
 
-        await click(this.content.header.content.user.menuBtn); // open user menu
-
-        await navigation(() => click(this.content.header.content.user.profileBtn));
+        await navigation(() => this.content.header.clickProfileMenuItem());
     }
 
-    /** Click on logout link from user menu and return navigation promise */
-    async logoutUser() {
-        await click(this.content.header.content.user.menuBtn);
+    async goToAbout() {
+        if (!this.isUserLoggedIn()) {
+            throw new Error('User is not logged in');
+        }
 
-        await navigation(() => click(this.content.header.content.user.logoutBtn));
+        await navigation(() => this.content.header.clickAboutMenuItem());
+    }
+
+    async logoutUser() {
+        await navigation(() => this.content.header.clickLogoutMenuItem());
     }
 
     async goToMainView() {
@@ -55,6 +57,6 @@ export class AppView extends TestView {
             throw new Error('User not logged in');
         }
 
-        await navigation(() => click(this.content.header.content.logo.linkElem));
+        await navigation(() => this.content.header.clickLogo());
     }
 }

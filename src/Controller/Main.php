@@ -97,4 +97,20 @@ class Main extends TemplateController
 
         $this->render($data);
     }
+
+    public function about()
+    {
+        $this->template = new Template(TPL_PATH . "about.tpl");
+        $data = [
+            "titleString" => "Jezve Money"
+        ];
+
+        $data["year"] = date("Y");
+        $data["version"] = APP_VERSION;
+
+        $this->cssArr[] = "AboutView.css";
+        $this->jsArr[] = "AboutView.js";
+
+        $this->render($data);
+    }
 }

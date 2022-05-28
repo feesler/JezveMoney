@@ -2,6 +2,7 @@ import { MainView } from './view/MainView.js';
 import { LoginView } from './view/LoginView.js';
 import { RegisterView } from './view/RegisterView.js';
 import { ProfileView } from './view/ProfileView.js';
+import { AboutView } from './view/AboutView.js';
 import { AccountView } from './view/AccountView.js';
 import { AccountsView } from './view/AccountsView.js';
 import { PersonView } from './view/PersonView.js';
@@ -49,6 +50,10 @@ export async function route(env, url) {
 
     if (part === 'profile') {
         return ProfileView;
+    }
+
+    if (part === 'about') {
+        return AboutView;
     }
 
     if (part === 'accounts') {

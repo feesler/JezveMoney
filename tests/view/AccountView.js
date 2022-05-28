@@ -15,7 +15,7 @@ import {
     click,
 } from '../env.js';
 
-/** Create or update account view class */
+/** Account view class */
 export class AccountView extends AppView {
     constructor(...args) {
         super(...args);

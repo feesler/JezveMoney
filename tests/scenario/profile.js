@@ -57,6 +57,8 @@ export const profileTests = {
 
         await ProfileTests.resetAll();
 
+        await ProfileTests.openAbout();
+
         // Change name tests
         await scenario.runner.runGroup(ProfileTests.changeName, [
             '',

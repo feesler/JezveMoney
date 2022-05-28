@@ -2,8 +2,10 @@ import { test } from 'jezve-test';
 import { LoginView } from '../view/LoginView.js';
 import { MainView } from '../view/MainView.js';
 import { App } from '../Application.js';
+import { navigation } from '../env.js';
 import { RegisterView } from '../view/RegisterView.js';
 import { ProfileView } from '../view/ProfileView.js';
+import { AboutView } from '../view/AboutView.js';
 
 async function checkLoginNavigation() {
     if (App.view.isUserLoggedIn()) {
@@ -176,4 +178,15 @@ export async function deleteProfile() {
     await test('Delete profile', () => App.view.checkState());
 
     await App.view.closeNotification();
+}
+
+export async function openAbout() {
+    await test('About page', async () => {
+        await App.view.goToAbout();
+        if (!(App.view instanceof AboutView)) {
+            throw new Error('Invalid view');
+        }
+
+        return true;
+    });
 }

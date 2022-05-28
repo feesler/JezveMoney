@@ -22,6 +22,7 @@ $router->setAliases([
     "login" => "user/login",
     "logout" => "user/logout",
     "register" => "user/register",
+    "about" => "main/about",
 ]);
 
 $router->onStart(function ($controller, $contrStr, $routeParts) {
