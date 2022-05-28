@@ -1,6 +1,6 @@
 import { TestComponent } from 'jezve-test';
 import { IconLink } from './IconLink.js';
-import { query, isVisible } from '../../env.js';
+import { query } from '../../env.js';
 
 export class Toolbar extends TestComponent {
     async parseContent() {

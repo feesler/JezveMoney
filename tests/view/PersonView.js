@@ -1,4 +1,3 @@
-import { TestComponent } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { InputRow } from './component/InputRow.js';
 import { IconLink } from './component/IconLink.js';

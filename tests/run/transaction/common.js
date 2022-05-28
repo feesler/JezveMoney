@@ -178,7 +178,7 @@ export async function runGroup(action, data) {
 }
 
 export async function submit() {
-    const validInput = await App.view.isValid();
+    const validInput = App.view.isValid();
 
     const res = (validInput) ? App.view.getExpectedTransaction() : null;
 

@@ -1,5 +1,5 @@
 import { copyObject } from 'jezvejs';
-import { TestComponent, assert } from 'jezve-test';
+import { assert } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
 import { DropDown } from './component/DropDown.js';

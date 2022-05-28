@@ -1,5 +1,4 @@
 import { copyObject } from 'jezvejs';
-import { TestComponent } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { Currency } from '../model/Currency.js';
 import { Icon } from '../model/Icon.js';

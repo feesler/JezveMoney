@@ -65,6 +65,8 @@ import {
     typeChange,
 } from './reducer.js';
 
+const PAGE_TITLE_UPDATE = 'Jezve Money | Edit transaction';
+const PAGE_TITLE_CREATE = 'Jezve Money | New transaction';
 const TITLE_TRANS_DELETE = 'Delete transaction';
 const MSG_TRANS_DELETE = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
 const SHOW_INFO = 0;
@@ -961,9 +963,7 @@ class TransactionView extends View {
             }
         }
 
-        const title = (state.isUpdate)
-            ? 'Jezve Money | Edit transaction'
-            : 'Jezve Money | New transaction';
+        const title = (state.isUpdate) ? PAGE_TITLE_UPDATE : PAGE_TITLE_CREATE;
 
         window.history.replaceState({}, title, url);
     }

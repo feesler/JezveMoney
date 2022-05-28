@@ -1,4 +1,3 @@
-import { TestComponent } from 'jezve-test';
 import { AppView } from './AppView.js';
 import {
     convDate,
@@ -377,7 +376,7 @@ export class TransactionView extends AppView {
         return res;
     }
 
-    async isValid() {
+    isValid() {
         if (this.content.src_amount_row?.content?.visible) {
             if (!this.model.srcAmount.length || !isValidValue(this.model.srcAmount)) {
                 return false;
@@ -1252,7 +1251,7 @@ export class TransactionView extends AppView {
     async submit() {
         const action = () => click(this.content.submitBtn);
 
-        if (await this.isValid()) {
+        if (this.isValid()) {
             await navigation(action);
         } else {
             await this.performAction(action);

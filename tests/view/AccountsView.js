@@ -1,4 +1,3 @@
-import { TestComponent } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { TilesList } from './component/TilesList.js';
 import { Tile } from './component/Tile.js';
