@@ -351,6 +351,10 @@ class ImportView extends View {
 
     /** Initial account of upload change callback */
     onUploadAccChange(accountId) {
+        if (this.model.mainAccount.id === accountId) {
+            return;
+        }
+
         this.accountDropDown.selectItem(accountId.toString());
         this.onMainAccChange();
     }
@@ -474,6 +478,10 @@ class ImportView extends View {
         );
 
         this.reApplyRules();
+
+        if (this.uploadDialog) {
+            this.uploadDialog.setMainAccount(this.model.mainAccount);
+        }
 
         if (!this.uploadDialog || !this.uploadDialog.isVisible()) {
             this.requestSimilar();

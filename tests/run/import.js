@@ -28,6 +28,28 @@ async function checkNavigation() {
     await App.view.goToImportView();
 }
 
+/** Navigate to specified state of import view */
+async function checkViewState(targetState) {
+    const { state } = App.view.model;
+
+    if (state === targetState) {
+        return;
+    }
+
+    if (state === 'upload') {
+        await App.view.closeUploadDialog();
+    }
+    if (state === 'rules') {
+        await App.view.closeRulesDialog();
+    }
+    if (targetState === 'upload') {
+        await App.view.launchUploadDialog();
+    }
+    if (targetState === 'rules') {
+        await App.view.launchRulesDialog();
+    }
+}
+
 /** Check initial state of import view */
 export async function checkInitialState() {
     await checkNavigation();
@@ -115,6 +137,7 @@ export async function removeFile(filename) {
 export async function addItem() {
     await test('Add import item', async () => {
         await checkNavigation();
+        await checkViewState('main');
 
         const itemsList = App.view.content.itemsList.getExpectedState();
         const mainAccount = App.state.accounts.getItem(App.view.model.mainAccount);
@@ -250,6 +273,7 @@ export async function changeMainAccount(accountId) {
             return copyObject(item.getExpectedState(item.model));
         });
 
+        await checkViewState('main');
         await App.view.selectMainAccount(accountId);
 
         App.view.expectedState = {
@@ -267,6 +291,7 @@ export async function enableRules(value = true) {
 
     await test(`${descr}`, async () => {
         await checkNavigation();
+        await checkViewState('main');
 
         if (enable === App.view.isRulesEnabled()) {
             throw new Error(`Import rules already ${enable ? 'enabled' : 'disabled'}`);
@@ -335,6 +360,7 @@ export async function enableItems({ index, value = true }) {
         }
 
         await checkNavigation();
+        await checkViewState('main');
 
         await App.view.enableItems(index, enable);
 
@@ -355,6 +381,7 @@ export async function updateItem(params) {
     setBlock(`Update item [${params.pos}]`, 2);
 
     await checkNavigation();
+    await checkViewState('main');
 
     const actDescr = {
         changeType: 'Change transaction type',
@@ -420,6 +447,7 @@ export async function deleteItems(indexes) {
 
     await test(`Delete import item(s) [${itemInds.join()}]`, async () => {
         await checkNavigation();
+        await checkViewState('main');
 
         const itemsList = App.view.content.itemsList.getExpectedState();
         const expected = copyObject(itemsList.items);
@@ -449,6 +477,7 @@ export async function deleteItems(indexes) {
 export async function deleteAllItems() {
     await test('Delete all import items', async () => {
         await checkNavigation();
+        await checkViewState('main');
 
         await App.view.deleteAllItems();
 
@@ -464,6 +493,7 @@ export async function deleteAllItems() {
 export async function submit() {
     await test('Submit items', async () => {
         await checkNavigation();
+        await checkViewState('main');
 
         await App.state.fetch();
 

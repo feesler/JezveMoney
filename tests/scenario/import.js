@@ -163,10 +163,16 @@ export const importTests = {
             account: scenario.ACC_USD,
         });
 
+        // Change account to check it updated even after close upload dialog
+        await ImportTests.changeMainAccount(scenario.ACC_RUB);
+
         // Convert transactions
+        await ImportTests.uploadFile({
+            filename: uploadFilename,
+            data: csvStatement,
+        });
         await ImportTests.submitUploaded({
             data: csvStatement,
-            account: scenario.ACC_RUB,
         });
         // Delete all
         setBlock('Delete all items', 2);

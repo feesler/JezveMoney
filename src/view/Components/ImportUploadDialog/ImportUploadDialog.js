@@ -173,6 +173,20 @@ export class ImportUploadDialog extends Component {
         show(this.controlsBlock, !!val);
     }
 
+    /** Main account update handler */
+    setMainAccount(account) {
+        if (!account) {
+            throw new Error('Invalid account');
+        }
+
+        if (this.model.mainAccount.id === account.id) {
+            return;
+        }
+
+        this.accountDropDown.selectItem(account.id.toString());
+        this.onAccountChange(account);
+    }
+
     /** Initial account select 'change' event handler */
     onAccountChange(selectedAccount) {
         let account = null;

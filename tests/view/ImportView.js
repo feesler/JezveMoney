@@ -191,19 +191,23 @@ export class ImportView extends AppView {
     async launchUploadDialog() {
         this.checkMainState();
 
+        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState.uploadDialog = {
+            visible: true,
+            initialAccount: { value: this.model.mainAccount.toString() },
+        };
+
         await this.performAction(() => this.content.uploadBtn.click());
         await this.performAction(() => wait(this.uploadPopupId, { visible: true }));
 
-        if (!this.content.uploadDialog?.content?.visible) {
-            throw new Error('File upload dialog not appear');
-        }
+        return this.checkState();
     }
 
     async closeUploadDialog() {
         this.checkUploadState();
 
         await this.performAction(() => this.content.uploadDialog.close());
-        await this.performAction(() => wait(this.uploadPopupId, { visible: true }));
+        await this.performAction(() => wait(this.uploadPopupId, { hidden: true }));
 
         if (this.content.uploadDialog?.content?.visible) {
             throw new Error('File upload dialog not closed');
@@ -331,8 +335,6 @@ export class ImportView extends AppView {
 
         const expectedUpload = this.content.uploadDialog.getExpectedUploadResult(importData);
         const isValid = expectedUpload != null;
-        console.log('submitUploaded() isValid: ', isValid);
-
         if (isValid) {
             // Apply rules if enabled
             if (this.isRulesEnabled()) {
