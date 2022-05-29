@@ -6,6 +6,7 @@ import { ImportUploadDialog } from './component/Import/ImportUploadDialog.js';
 import { ImportRulesDialog } from './component/Import/ImportRulesDialog.js';
 import { DropDown } from './component/DropDown.js';
 import { ImportViewSubmitError } from '../error/ImportViewSubmitError.js';
+import { findSimilarTransaction } from '../model/import.js';
 import {
     query,
     prop,
@@ -14,6 +15,7 @@ import {
     wait,
     waitForFunction,
 } from '../env.js';
+import { App } from '../Application.js';
 
 /** Import view class */
 export class ImportView extends AppView {
@@ -139,7 +141,7 @@ export class ImportView extends AppView {
             enabledCount: { value: model.enabledCount.toString(), visible: model.enabled },
             rulesCheck: { checked: model.rulesEnabled, visible: model.enabled },
             rulesCount: { value: model.rulesCount.toString(), visible: model.enabled },
-            submitBtn: { visible: model.enabled }
+            submitBtn: { visible: model.enabled },
         };
 
         if (model.enabled) {
@@ -232,7 +234,20 @@ export class ImportView extends AppView {
     async selectUploadAccount(val) {
         this.checkUploadState();
 
+        this.model.mainAccount = parseInt(val, 10);
+        this.expectedState = this.getExpectedState(this.model);
+
+        this.expectedState.itemsList = {};
+        this.expectedState.itemsList.items = this.content.itemsList.content.items.map(
+            (item) => {
+                const model = item.onChangeMainAccount(item.model, val);
+                return copyObject(item.getExpectedState(model));
+            },
+        );
+
         await this.performAction(() => this.content.uploadDialog.selectAccount(val));
+
+        return this.checkState();
     }
 
     async selectUploadEncoding(val) {
@@ -311,13 +326,61 @@ export class ImportView extends AppView {
     }
 
     /** Submit converted file data */
-    async submitUploaded() {
+    async submitUploaded(importData) {
         this.checkUploadState();
 
-        await this.waitForList(async () => {
-            await this.content.uploadDialog.submit();
-            await wait(this.uploadPopupId, { hidden: true });
-        });
+        const expectedUpload = this.content.uploadDialog.getExpectedUploadResult(importData);
+        const isValid = expectedUpload != null;
+        console.log('submitUploaded() isValid: ', isValid);
+
+        if (isValid) {
+            // Apply rules if enabled
+            if (this.isRulesEnabled()) {
+                for (const item of expectedUpload) {
+                    App.state.rules.applyTo(item);
+                }
+            }
+
+            // Disable transactions similar to already existing
+            const skipList = [];
+            for (const item of expectedUpload) {
+                const tr = findSimilarTransaction(item, skipList);
+                if (tr) {
+                    skipList.push(tr.id);
+                    item.enabled = false;
+                }
+            }
+        }
+
+        // Prepare expected state of previously created import items
+        const expectedList = this.content.itemsList.getExpectedState();
+        // Append uploaded items if valid
+        if (isValid) {
+            const uploadedItems = ImportList.render(expectedUpload, App.state);
+            expectedList.items = expectedList.items.concat(uploadedItems.items);
+
+            this.model.items = this.model.items.concat(expectedUpload);
+        }
+
+        this.model.totalCount = expectedList.items.length;
+        const enabledItems = expectedList.items.filter((item) => item.enabled);
+        this.model.enabledCount = enabledItems.length;
+
+        this.expectedState = this.getExpectedState(this.model);
+
+        this.expectedState.itemsList = expectedList;
+        this.expectedState.uploadDialog = { visible: !isValid };
+
+        if (isValid) {
+            await this.waitForList(async () => {
+                await this.content.uploadDialog.submit();
+                await wait(this.uploadPopupId, { hidden: true });
+            });
+        } else {
+            await this.performAction(() => this.content.uploadDialog.submit());
+        }
+
+        return this.checkState();
     }
 
     /** Return current state of upload dialog */

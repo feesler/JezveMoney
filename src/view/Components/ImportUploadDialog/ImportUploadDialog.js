@@ -60,6 +60,7 @@ export class ImportUploadDialog extends Component {
             currencyModel: this.props.currencyModel,
             tplModel: this.props.tplModel,
             rulesModel: this.model.rules,
+            mainAccount: this.model.mainAccount,
             templateStatus: (status) => this.onTemplateStatus(status),
         });
 
@@ -185,6 +186,8 @@ export class ImportUploadDialog extends Component {
 
         this.model.mainAccount = account;
 
+        this.tplManager.setMainAccount(account);
+
         if (isFunction(this.accountChangeHandler)) {
             this.accountChangeHandler(account.id);
         }
@@ -204,6 +207,11 @@ export class ImportUploadDialog extends Component {
         } catch (e) {
             createMessage(e.message, 'msg_error');
             this.importedItems = null;
+        }
+
+        if (!this.importedItems) {
+            show(this.uploadProgress, false);
+            return;
         }
 
         this.importDone();

@@ -12,6 +12,7 @@ import {
 import { Component } from 'jezvejs/Component';
 import { DropDown } from 'jezvejs/DropDown';
 import { createMessage } from '../../js/app.js';
+import { ImportTemplateError } from '../../js/error/ImportTemplateError.js';
 import { ImportTemplate } from '../../js/model/ImportTemplate.js';
 import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog.js';
 import './style.css';
@@ -44,6 +45,7 @@ export class ImportTemplateManager extends Component {
         if (
             !this.parent
             || !this.props
+            || !this.props.mainAccount
             || !this.props.currencyModel
             || !this.props.tplModel
             || !this.props.rulesModel
@@ -52,6 +54,7 @@ export class ImportTemplateManager extends Component {
         }
 
         this.model = {
+            mainAccount: this.props.mainAccount,
             currency: this.props.currencyModel,
             template: this.props.tplModel,
             rules: this.props.rulesModel,
@@ -160,7 +163,22 @@ export class ImportTemplateManager extends Component {
 
         const data = this.getDataRows(this.state, false);
 
-        return data.map((item) => this.state.template.applyTo(item, this.model.currency));
+        try {
+            const res = data.map(
+                (item) => (
+                    this.state.template.applyTo(item, this.model.currency, this.model.mainAccount)
+                ),
+            );
+            return res;
+        } catch (e) {
+            if (!(e instanceof ImportTemplateError)) {
+                throw e;
+            }
+
+            this.setTemplateFeedback(e.message);
+
+            return null;
+        }
     }
 
     /** Reset component state */
@@ -197,6 +215,15 @@ export class ImportTemplateManager extends Component {
         } else {
             this.setCreateTemplateState();
         }
+    }
+
+    /** Main account update handler */
+    setMainAccount(account) {
+        if (!account) {
+            throw new Error('Invalid account');
+        }
+
+        this.model.mainAccount = account;
     }
 
     /** Import template select 'change' event handler */

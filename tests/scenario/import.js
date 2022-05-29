@@ -157,7 +157,13 @@ export const importTests = {
 
         await importTemplateTests.initAndRun(scenario);
 
-        // Submit converted transactions
+        // Convert transactions with invalid main account
+        await ImportTests.submitUploaded({
+            data: csvStatement,
+            account: scenario.ACC_USD,
+        });
+
+        // Convert transactions
         await ImportTests.submitUploaded({
             data: csvStatement,
             account: scenario.ACC_RUB,

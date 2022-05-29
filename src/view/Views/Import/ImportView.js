@@ -308,8 +308,8 @@ class ImportView extends View {
             }
         });
 
-        show(this.loadingInd, false);
         this.updateItemsCount();
+        show(this.loadingInd, false);
         this.setRenderTime();
     }
 

@@ -17,6 +17,7 @@ import {
     wait,
     waitForFunction,
 } from '../../../env.js';
+import { ImportTemplate } from '../../../model/ImportTemplate.js';
 
 export const BROWSE_FILE_STATE = 1;
 export const LOADING_STATE = 2;
@@ -609,6 +610,12 @@ export class ImportUploadDialog extends TestComponent {
 
         await click(this.content.isEncodeCheck.elem);
         await this.parse();
+    }
+
+    getExpectedUploadResult(importData) {
+        const tpl = new ImportTemplate(this.model.template);
+
+        return tpl.applyTo(importData, this.model.initialAccount);
     }
 
     async submit() {

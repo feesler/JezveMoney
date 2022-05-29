@@ -2,7 +2,7 @@ import { test, copyObject, assert } from 'jezve-test';
 import { App } from '../Application.js';
 import { baseUrl, httpReq, setBlock } from '../env.js';
 import { Currency } from '../model/Currency.js';
-import { ImportTemplate } from '../model/ImportTemplate.js';
+import { findSimilarTransaction } from '../model/import.js';
 import { ImportTransaction } from '../model/ImportTransaction.js';
 import { ImportList } from '../view/component/Import/ImportList.js';
 import { ImportListItem } from '../view/component/Import/ImportListItem.js';
@@ -45,53 +45,6 @@ function parseCSV(data) {
         const length = val.length - start - (val.endsWith('"') ? 1 : 0);
         return val.substr(start, length);
     }));
-
-    return res;
-}
-
-/**
- * Check specified transaction have same proporties as reference
- * @param {Object} item - transaction object from API
- * @param {Object} reference - transaction item to compare
- */
-function isSimilarTransaction(item, reference) {
-    if (!item || !reference) {
-        throw new Error('Invalid parameters');
-    }
-
-    // Check date, source and destination accounts
-    if (item.src_id !== reference.src_id
-        || item.dest_id !== reference.dest_id
-        || item.date !== reference.date) {
-        return false;
-    }
-
-    // Check amounts
-    // Source and destination amount can be swapped
-    const refSrcAmount = Math.abs(reference.src_amount);
-    const refDestAmount = Math.abs(reference.dest_amount);
-    if ((item.src_amount !== refSrcAmount && item.src_amount !== refDestAmount)
-        || (item.dest_amount !== refDestAmount && item.dest_amount !== refSrcAmount)) {
-        return false;
-    }
-
-    return true;
-}
-
-function findSimilar(transaction, skipList) {
-    if (
-        !transaction
-        || !transaction.mainAccount
-        || !transaction.mainAccount.id
-    ) {
-        throw new Error('Invalid transaction');
-    }
-
-    const res = App.state.transactions.find((item) => (
-        [item.src_id, item.dest_id].includes(transaction.mainAccount.id)
-        && !skipList.includes(item.id)
-        && isSimilarTransaction(item, transaction)
-    ));
 
     return res;
 }
@@ -229,54 +182,6 @@ export async function submitUploaded(params) {
 
         const importData = parseCSV(params.data);
 
-        let mainAccountId;
-        if (params.account) {
-            mainAccountId = params.account;
-        } else {
-            mainAccountId = App.view.model.mainAccount;
-        }
-        const mainAccount = App.state.accounts.getItem(mainAccountId);
-        if (!mainAccount) {
-            throw new Error('Main account not found');
-        }
-
-        const templateData = (params.template)
-            ? App.state.templates.getItemByIndex(params.template)
-            : App.view.getExpectedTemplate();
-        const template = new ImportTemplate(templateData);
-
-        const importTransactions = template.applyTo(importData, mainAccount);
-        if (App.view.isRulesEnabled()) {
-            for (const item of importTransactions) {
-                App.state.rules.applyTo(item);
-            }
-        }
-
-        const skipList = [];
-        for (const item of importTransactions) {
-            const tr = findSimilar(item, skipList);
-            if (tr) {
-                skipList.push(tr.id);
-                item.enabled = false;
-            }
-        }
-
-        let itemsList;
-        if (params.account) {
-            itemsList = {};
-            itemsList.items = App.view.content.itemsList.content.items.map(
-                (item) => {
-                    const model = item.onChangeMainAccount(item.model, params.account);
-                    return copyObject(item.getExpectedState(model));
-                },
-            );
-        } else {
-            itemsList = App.view.content.itemsList.getExpectedState();
-        }
-
-        const importedItems = ImportList.render(importTransactions, App.state);
-        itemsList.items = itemsList.items.concat(importedItems.items);
-
         if (params.template) {
             await App.view.selectUploadTemplate(params.template);
         }
@@ -287,9 +192,7 @@ export async function submitUploaded(params) {
             await App.view.selectUploadEncoding(params.encode);
         }
 
-        await App.view.submitUploaded();
-
-        App.view.expectedState = { itemsList };
+        await App.view.submitUploaded(importData);
 
         return App.view.checkState();
     });
@@ -331,7 +234,7 @@ export async function changeMainAccount(accountId) {
                 App.state.rules.applyTo(importTrans);
 
                 importTrans.enabled = true;
-                const tr = findSimilar(importTrans, skipList);
+                const tr = findSimilarTransaction(importTrans, skipList);
                 if (tr) {
                     skipList.push(tr.id);
                     importTrans.enabled = false;
