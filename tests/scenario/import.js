@@ -1,4 +1,5 @@
 import { generateCSV } from '../model/import.js';
+import { api } from '../model/api.js';
 import * as ApiTests from '../run/api.js';
 import * as ImportTests from '../run/import.js';
 import { App } from '../Application.js';
@@ -190,6 +191,17 @@ export const importTests = {
         await importItemsTests.stateLoopTests();
 
         await this.clean();
+    },
+
+    async runNoAccountsTest() {
+        setBlock('Import view with no accounts', 2);
+
+        const accountIds = App.state.accounts.getIds();
+        if (accountIds.length) {
+            await api.account.del(accountIds);
+        }
+
+        await ImportTests.checkInitialState();
     },
 
     async runNoPersonsTest() {

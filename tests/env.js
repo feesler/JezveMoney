@@ -34,6 +34,8 @@ export const onBlur = (elem) => App.environment.onBlur(elem);
 
 export const prop = (elem, property) => App.environment.prop(elem, property);
 
+export const attr = (elem, attribute) => App.environment.attr(elem, attribute);
+
 export const waitForSelector = (selector, options) => (
     App.environment.waitForSelector(selector, options)
 );

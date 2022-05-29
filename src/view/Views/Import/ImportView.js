@@ -57,6 +57,10 @@ class ImportView extends View {
      * View initialization
      */
     onStart() {
+        if (this.model.accounts.length === 0) {
+            return;
+        }
+
         this.newItemBtn = IconLink.fromElement({
             elem: 'newItemBtn',
             onclick: () => this.createItem(),

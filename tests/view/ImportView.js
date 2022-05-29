@@ -9,6 +9,7 @@ import { ImportViewSubmitError } from '../error/ImportViewSubmitError.js';
 import {
     query,
     prop,
+    attr,
     click,
     wait,
     waitForFunction,
@@ -27,7 +28,7 @@ export class ImportView extends AppView {
         const res = {
             title: { elem: await query('.content_wrap > .heading > h1') },
             uploadBtn: await IconLink.create(this, await query('#uploadBtn')),
-            mainAccountSelect: await DropDown.createFromChild(this, await query('#acc_id')),
+            notAvailMsg: { elem: await query('#notavailmsg') },
             addBtn: await IconLink.create(this, await query('#newItemBtn')),
             clearBtn: await IconLink.create(this, await query('#clearFormBtn')),
             totalCount: { elem: await query('#trcount') },
@@ -39,14 +40,9 @@ export class ImportView extends AppView {
             submitProgress: { elem: await query('#submitProgress') },
         };
 
-        res.title.value = await prop(res.title.elem, 'textContent');
-        res.totalCount.value = await prop(res.totalCount.elem, 'textContent');
-        res.enabledCount.value = await prop(res.enabledCount.elem, 'textContent');
-
         if (
             !res.title.elem
             || !res.uploadBtn.elem
-            || !res.mainAccountSelect
             || !res.addBtn.elem
             || !res.clearBtn.elem
             || !res.totalCount.elem
@@ -60,16 +56,34 @@ export class ImportView extends AppView {
             throw new Error('Invalid structure of import view');
         }
 
+        const importEnabled = !res.notAvailMsg.elem;
+
+        res.title.value = await prop(res.title.elem, 'textContent');
+
+        const disabledAttr = await attr(res.uploadBtn.elem, 'disabled');
+        res.uploadBtn.content.disabled = disabledAttr != null;
+        res.totalCount.value = await prop(res.totalCount.elem, 'textContent');
+        res.enabledCount.value = await prop(res.enabledCount.elem, 'textContent');
         res.rulesCheck.checked = await prop(res.rulesCheck.elem, 'checked');
         res.rulesCount.value = await prop(res.rulesCount.elem, 'textContent');
+        res.submitBtn.disabled = await prop(res.submitBtn.elem, 'disabled');
+
+        if (importEnabled) {
+            res.mainAccountSelect = await DropDown.createFromChild(this, await query('#acc_id'));
+            if (!res.mainAccountSelect) {
+                throw new Error('Invalid structure of import view');
+            }
+        }
 
         const rowsContainer = await query('#rowsContainer');
         res.renderTime = await prop(rowsContainer, 'dataset.time');
 
-        const mainAccountId = res.mainAccountSelect.content.value;
-        res.itemsList = await ImportList.create(this, rowsContainer, mainAccountId);
-        if (!res.itemsList) {
-            throw new Error('Invalid structure of import view');
+        if (importEnabled) {
+            const mainAccountId = res.mainAccountSelect.content.value;
+            res.itemsList = await ImportList.create(this, rowsContainer, mainAccountId);
+            if (!res.itemsList) {
+                throw new Error('Invalid structure of import view');
+            }
         }
 
         const uploadDialogPopup = await query(this.uploadPopupId);
@@ -82,11 +96,15 @@ export class ImportView extends AppView {
     }
 
     async buildModel(cont) {
-        const res = {};
+        const res = {
+            enabled: !cont.notAvailMsg.visible,
+        };
 
         const uploadVisible = !!cont.uploadDialog?.content?.visible;
         const rulesVisible = !!cont.rulesDialog?.content?.visible;
-        if (uploadVisible && !rulesVisible) {
+        if (!res.enabled) {
+            res.state = 'notavailable';
+        } else if (uploadVisible && !rulesVisible) {
             res.state = 'upload';
         } else if (!uploadVisible && rulesVisible) {
             res.state = 'rules';
@@ -97,14 +115,14 @@ export class ImportView extends AppView {
         }
 
         res.title = cont.title.value;
-        res.totalCount = parseInt(cont.totalCount.value, 10);
-        res.enabledCount = parseInt(cont.enabledCount.value, 10);
-        res.mainAccount = parseInt(cont.mainAccountSelect.content.value, 10);
+        res.totalCount = (res.enabled) ? parseInt(cont.totalCount.value, 10) : 0;
+        res.enabledCount = (res.enabled) ? parseInt(cont.enabledCount.value, 10) : 0;
+        res.mainAccount = (res.enabled) ? parseInt(cont.mainAccountSelect.content.value, 10) : 0;
         res.rulesEnabled = cont.rulesCheck.checked;
-        res.rulesCount = parseInt(cont.rulesCount.value, 10);
+        res.rulesCount = (res.enabled) ? parseInt(cont.rulesCount.value, 10) : 0;
         res.renderTime = cont.renderTime;
-        res.items = cont.itemsList.getItems();
-        res.invalidated = cont.itemsList.model.invalidated;
+        res.items = (cont.itemsList) ? cont.itemsList.getItems() : [];
+        res.invalidated = (cont.itemsList) ? cont.itemsList.model.invalidated : false;
         res.submitInProgress = cont.submitProgress.visible;
 
         return res;
@@ -112,17 +130,23 @@ export class ImportView extends AppView {
 
     getExpectedState(model) {
         const res = {
-            addBtn: { visible: true },
-            clearBtn: { visible: true },
-            uploadBtn: { visible: true },
+            notAvailMsg: { visible: !model.enabled },
+            addBtn: { visible: model.enabled },
+            clearBtn: { visible: model.enabled },
+            uploadBtn: { visible: true, disabled: !model.enabled },
             title: { value: model.title.toString(), visible: true },
-            mainAccountSelect: { value: model.mainAccount.toString(), visible: true },
-            totalCount: { value: model.totalCount.toString(), visible: true },
-            enabledCount: { value: model.enabledCount.toString(), visible: true },
-            rulesCheck: { checked: model.rulesEnabled },
-            rulesCount: { value: model.rulesCount.toString(), visible: true },
-            itemsList: { visible: true },
+            totalCount: { value: model.totalCount.toString(), visible: model.enabled },
+            enabledCount: { value: model.enabledCount.toString(), visible: model.enabled },
+            rulesCheck: { checked: model.rulesEnabled, visible: model.enabled },
+            rulesCount: { value: model.rulesCount.toString(), visible: model.enabled },
+            submitBtn: { visible: model.enabled }
         };
+
+        if (model.enabled) {
+            res.mainAccountSelect = { value: model.mainAccount.toString(), visible: true };
+            res.itemsList = { visible: true };
+            res.submitBtn.disabled = !model.items.some((item) => item.enabled);
+        }
 
         return res;
     }
