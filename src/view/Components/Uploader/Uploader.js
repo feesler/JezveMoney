@@ -1,6 +1,5 @@
 import { isFunction } from 'jezvejs';
 
-/* global baseURL */
 /* eslint no-bitwise: "off" */
 
 /**
@@ -60,6 +59,8 @@ export class Uploader {
     }
 
     send() {
+        const { baseURL } = window.app;
+
         this.xhrUpload = new XMLHttpRequest();
         this.xhrUpload.onload = () => {
             if (this.xhrUpload.status === 200) {
@@ -102,6 +103,8 @@ export class Uploader {
     }
 
     upload() {
+        const { baseURL } = window.app;
+
         this.xhrStatus = new XMLHttpRequest();
 
         this.xhrStatus.onload = () => {

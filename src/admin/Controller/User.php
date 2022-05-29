@@ -4,7 +4,6 @@ namespace JezveMoney\App\Admin\Controller;
 
 use JezveMoney\Core\AdminController;
 use JezveMoney\Core\Template;
-use JezveMoney\Core\JSON;
 
 class User extends AdminController
 {
@@ -30,9 +29,9 @@ class User extends AdminController
             }
         }
         $data["itemsData"] = $itemsData;
-        $data["viewData"] = JSON::encode([
+        $data["viewData"] = [
             "data" => $itemsData,
-        ]);
+        ];
 
         $this->menuItems["users"]["active"] = true;
         $this->cssAdmin[] = "AdminUserView.css";

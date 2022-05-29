@@ -22,6 +22,22 @@ export const IMPORT_COND_OP_GREATER = 5;
 /** Condition flags */
 export const IMPORT_COND_OP_FIELD_FLAG = 0x01;
 
+/** Field names */
+const TITLE_FIELD_MAIN_ACCOUNT = 'Main account';
+const TITLE_FIELD_TEMPLATE = 'Template';
+const TITLE_FIELD_TRANS_AMOUNT = 'Transaction amount';
+const TITLE_FIELD_TRANS_CURRENCY = 'Transaction currency';
+const TITLE_FIELD_ACC_AMOUNT = 'Account amount';
+const TITLE_FIELD_ACC_CURRENCY = 'Account currency';
+const TITLE_FIELD_DATE = 'Date';
+const TITLE_FIELD_COMMENT = 'Comment';
+/** Operator names */
+const TITLE_OP_INCLUDES = 'Includes';
+const TITLE_OP_EQUAL = 'Equal to';
+const TITLE_OP_NOT_EQUAL = 'Not equal to';
+const TITLE_OP_LESS = 'Less than';
+const TITLE_OP_GREATER = 'Greater than';
+
 /**
  * Import condition class
  * @param {object} props - properties of instance
@@ -74,53 +90,53 @@ export class ImportCondition extends ListItem {
     static fieldTypes = [
         {
             id: IMPORT_COND_FIELD_MAIN_ACCOUNT,
-            title: 'Main account',
+            title: TITLE_FIELD_MAIN_ACCOUNT,
             operators: ImportCondition.itemOperators,
         },
         {
             id: IMPORT_COND_FIELD_TPL,
-            title: 'Template',
+            title: TITLE_FIELD_TEMPLATE,
             operators: ImportCondition.itemOperators,
         },
         {
             id: IMPORT_COND_FIELD_TR_AMOUNT,
-            title: 'Transaction amount',
+            title: TITLE_FIELD_TRANS_AMOUNT,
             operators: ImportCondition.numOperators,
         },
         {
             id: IMPORT_COND_FIELD_TR_CURRENCY,
-            title: 'Transaction currency',
+            title: TITLE_FIELD_TRANS_CURRENCY,
             operators: ImportCondition.itemOperators,
         },
         {
             id: IMPORT_COND_FIELD_ACC_AMOUNT,
-            title: 'Account amount',
+            title: TITLE_FIELD_ACC_AMOUNT,
             operators: ImportCondition.numOperators,
         },
         {
             id: IMPORT_COND_FIELD_ACC_CURRENCY,
-            title: 'Account currency',
+            title: TITLE_FIELD_ACC_CURRENCY,
             operators: ImportCondition.itemOperators,
         },
         {
             id: IMPORT_COND_FIELD_DATE,
-            title: 'Date',
+            title: TITLE_FIELD_DATE,
             operators: ImportCondition.numOperators,
         },
         {
             id: IMPORT_COND_FIELD_COMMENT,
-            title: 'Comment',
+            title: TITLE_FIELD_COMMENT,
             operators: ImportCondition.stringOperators,
         },
     ];
 
     /** List of available condition operator types */
     static operatorTypes = [
-        { id: IMPORT_COND_OP_STRING_INCLUDES, title: 'Includes' },
-        { id: IMPORT_COND_OP_EQUAL, title: 'Equal to' },
-        { id: IMPORT_COND_OP_NOT_EQUAL, title: 'Not equal to' },
-        { id: IMPORT_COND_OP_LESS, title: 'Less than' },
-        { id: IMPORT_COND_OP_GREATER, title: 'Greater than' },
+        { id: IMPORT_COND_OP_STRING_INCLUDES, title: TITLE_OP_INCLUDES },
+        { id: IMPORT_COND_OP_EQUAL, title: TITLE_OP_EQUAL },
+        { id: IMPORT_COND_OP_NOT_EQUAL, title: TITLE_OP_NOT_EQUAL },
+        { id: IMPORT_COND_OP_LESS, title: TITLE_OP_LESS },
+        { id: IMPORT_COND_OP_GREATER, title: TITLE_OP_GREATER },
     ];
 
     /** Field type to data property name map */

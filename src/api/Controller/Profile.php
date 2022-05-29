@@ -6,6 +6,8 @@ use JezveMoney\Core\ApiController;
 use JezveMoney\Core\Message;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\PersonModel;
+use JezveMoney\App\Model\ImportRuleModel;
+use JezveMoney\App\Model\ImportTemplateModel;
 
 class Profile extends ApiController
 {
@@ -108,6 +110,16 @@ class Profile extends ApiController
         }
 
         if (!$this->personMod->reset()) {
+            throw new \Error($defMsg);
+        }
+
+        $ruleMod = ImportRuleModel::getInstance();
+        if (!$ruleMod->reset()) {
+            throw new \Error($defMsg);
+        }
+
+        $tplModel = ImportTemplateModel::getInstance();
+        if (!$tplModel->reset()) {
             throw new \Error($defMsg);
         }
 

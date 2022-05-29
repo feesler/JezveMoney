@@ -12,22 +12,22 @@ include(TPL_PATH."commonhdr.tpl");	?>
                 <div class="content_wrap">
                     <div class="heading">
                         <h1>Import transactions</h1>
-                        <?=IconLink::render([
-                            "id" => "uploadBtn",
-                            "title" => "Upload file",
-                            "icon" => "import"
-                        ])?>
+                        <?=IconLink::render($uploadBtn)?>
                     </div>
 
-                    <div class="data-form">
+<?php   if (!$importAvailable) { ?>
+                    <span id="notavailmsg" class="nodata-message"><?=e($importNotAvailableMessage)?></span>
+<?php   }   ?>
+
+                    <div class="data-form<?=hidden(!$importAvailable)?>">
                         <div class="data-header">
                             <div class="header-field account-field">
                                 <label>Main account</label>
                                 <div class="header-field__content">
                                     <select id="acc_id">
-<?php foreach($accArr as $accObj) {	?>
+<?php   foreach($accArr as $accObj) {	?>
                                         <option value="<?=e($accObj->id)?>"><?=e($accObj->name)?></option>
-<?php }	?>
+<?php   }   ?>
                                     </select>
                                 </div>
                             </div>

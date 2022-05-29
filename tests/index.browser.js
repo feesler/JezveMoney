@@ -12,6 +12,8 @@ onReady(() => {
             envOptions.appPath = '/money/';
         }
 
+        envOptions.container = document.getElementById('testscontainer');
+
         environment.init(envOptions);
     });
 });

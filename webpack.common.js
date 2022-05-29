@@ -39,6 +39,10 @@ export default {
             import: './src/view/Views/Profile/ProfileView.js',
             filename: 'view/js/[name].js',
         },
+        AboutView: {
+            import: './src/view/Views/About/AboutView.js',
+            filename: 'view/js/[name].js',
+        },
         TransactionListView: {
             import: './src/view/Views/TransactionList/TransactionListView.js',
             filename: 'view/js/[name].js',

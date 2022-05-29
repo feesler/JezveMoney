@@ -12,11 +12,28 @@ import {
 import { Component } from 'jezvejs/Component';
 import { DropDown } from 'jezvejs/DropDown';
 import { createMessage } from '../../js/app.js';
+import { ImportTemplateError } from '../../js/error/ImportTemplateError.js';
 import { ImportTemplate } from '../../js/model/ImportTemplate.js';
 import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog.js';
 import './style.css';
 
-/* global baseURL */
+/** Strings */
+const TITLE_CREATE_TEMPLATE = 'Create template';
+const TITLE_UPDATE_TEMPLATE = 'Update template';
+const MSG_JSON_PARSE_ERROR = 'Fail to parse server response';
+const TITLE_TEMPLATE_DELETE = 'Delete import template';
+const MSG_TEMPLATE_DELETE = 'Are you sure to delete this import template?';
+const MSG_SEL_ACC_AMOUNT = 'Please select decimal column for account amount';
+const MSG_SEL_ACC_CURRENCY = 'Please select correct column for account currency';
+const MSG_SEL_TR_AMOUNT = 'Please select decimal column for transaction amount';
+const MSG_SEL_TR_CURRENCY = 'Please select correct column for transaction currency';
+const MSG_SEL_DATE = 'Please select column for date';
+const MSG_SEL_COMMENT = 'Please select column for comment';
+const MSG_TPL_REQUEST_FAIL = 'Import template request failed';
+const MSG_TPL_LIST_REQUEST_FAIL = 'Fail to read list of import templates';
+const MSG_RULES_LIST_REQUEST_FAIL = 'Fail to read list of import rules';
+const MSG_VALID_TEMPLATE = 'Valid template';
+const MSG_NOT_MATCHED_TEMPLATE = 'Template does not match data';
 
 /**
  * ImportTemplateManager component constructor
@@ -28,6 +45,7 @@ export class ImportTemplateManager extends Component {
         if (
             !this.parent
             || !this.props
+            || !this.props.mainAccount
             || !this.props.currencyModel
             || !this.props.tplModel
             || !this.props.rulesModel
@@ -36,22 +54,19 @@ export class ImportTemplateManager extends Component {
         }
 
         this.model = {
+            mainAccount: this.props.mainAccount,
             currency: this.props.currencyModel,
             template: this.props.tplModel,
             rules: this.props.rulesModel,
         };
 
-        this.jsonParseErrorMessage = 'Fail to parse server response';
-        this.templateDeleteTitle = 'Delete import template';
-        this.templateDeleteMsg = 'Are you sure to delete this import template?';
-
         this.columnFeedback = {
-            accountAmount: { msg: 'Please select decimal column for account amount' },
-            accountCurrency: { msg: 'Please select correct column for account currency' },
-            transactionAmount: { msg: 'Please select decimal column for transaction amount' },
-            transactionCurrency: { msg: 'Please select correct column for transaction currency' },
-            date: { msg: 'Please select column for date' },
-            comment: { msg: 'Please select column for comment' },
+            accountAmount: { msg: MSG_SEL_ACC_AMOUNT },
+            accountCurrency: { msg: MSG_SEL_ACC_CURRENCY },
+            transactionAmount: { msg: MSG_SEL_TR_AMOUNT },
+            transactionCurrency: { msg: MSG_SEL_TR_CURRENCY },
+            date: { msg: MSG_SEL_DATE },
+            comment: { msg: MSG_SEL_COMMENT },
         };
 
         this.LOADING_STATE = 1;
@@ -148,7 +163,22 @@ export class ImportTemplateManager extends Component {
 
         const data = this.getDataRows(this.state, false);
 
-        return data.map((item) => this.state.template.applyTo(item, this.model.currency));
+        try {
+            const res = data.map(
+                (item) => (
+                    this.state.template.applyTo(item, this.model.currency, this.model.mainAccount)
+                ),
+            );
+            return res;
+        } catch (e) {
+            if (!(e instanceof ImportTemplateError)) {
+                throw e;
+            }
+
+            this.setTemplateFeedback(e.message);
+
+            return null;
+        }
     }
 
     /** Reset component state */
@@ -185,6 +215,15 @@ export class ImportTemplateManager extends Component {
         } else {
             this.setCreateTemplateState();
         }
+    }
+
+    /** Main account update handler */
+    setMainAccount(account) {
+        if (!account) {
+            throw new Error('Invalid account');
+        }
+
+        this.model.mainAccount = account;
     }
 
     /** Import template select 'change' event handler */
@@ -254,9 +293,11 @@ export class ImportTemplateManager extends Component {
 
         ConfirmDialog.create({
             id: 'tpl_delete_warning',
-            title: this.templateDeleteTitle,
-            content: this.templateDeleteMsg,
+            title: TITLE_TEMPLATE_DELETE,
+            content: MSG_TEMPLATE_DELETE,
             onconfirm: () => {
+                const { baseURL } = window.app;
+
                 this.state.listLoading = true;
                 this.render(this.state);
                 ajax.post({
@@ -287,6 +328,7 @@ export class ImportTemplateManager extends Component {
             return;
         }
 
+        const { baseURL } = window.app;
         let reqURL = `${baseURL}api/importtpl/`;
         if (this.state.template.id) {
             reqURL += 'update';
@@ -307,19 +349,17 @@ export class ImportTemplateManager extends Component {
 
     /** API response handler for template create/update/delete request */
     onTemplateRequestResult(response) {
-        const defErrorMessage = 'Import template request failed';
-
         let jsondata;
         try {
             jsondata = JSON.parse(response);
         } catch (e) {
-            createMessage(this.jsonParseErrorMessage, 'msg_error');
+            createMessage(MSG_JSON_PARSE_ERROR, 'msg_error');
             return;
         }
 
         try {
             if (!jsondata || jsondata.result !== 'ok') {
-                throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : defErrorMessage);
+                throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : MSG_TPL_REQUEST_FAIL);
             }
 
             this.requestTemplatesList();
@@ -330,6 +370,8 @@ export class ImportTemplateManager extends Component {
 
     /** Send API request to obain list of import templates */
     requestTemplatesList() {
+        const { baseURL } = window.app;
+
         ajax.get({
             url: `${baseURL}api/importtpl/list/`,
             callback: (response) => this.onTemplateListResult(response),
@@ -338,19 +380,17 @@ export class ImportTemplateManager extends Component {
 
     /** API response handler for templates list request */
     onTemplateListResult(response) {
-        const defErrorMessage = 'Fail to read list of import templates';
-
         let jsondata;
         try {
             jsondata = JSON.parse(response);
         } catch (e) {
-            createMessage(this.jsonParseErrorMessage, 'msg_error');
+            createMessage(MSG_JSON_PARSE_ERROR, 'msg_error');
             return;
         }
 
         try {
             if (!jsondata || jsondata.result !== 'ok' || !Array.isArray(jsondata.data)) {
-                throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : defErrorMessage);
+                throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : MSG_TPL_LIST_REQUEST_FAIL);
             }
 
             this.state.listLoading = false;
@@ -370,6 +410,8 @@ export class ImportTemplateManager extends Component {
 
     /** Send API request to obain list of import rules */
     requestRulesList() {
+        const { baseURL } = window.app;
+
         ajax.get({
             url: `${baseURL}api/importrule/list/?extended=true`,
             callback: (response) => this.onRulesListResult(response),
@@ -378,19 +420,17 @@ export class ImportTemplateManager extends Component {
 
     /** API response handler for rules list request */
     onRulesListResult(response) {
-        const defErrorMessage = 'Fail to read list of import rules';
-
         let jsondata;
         try {
             jsondata = JSON.parse(response);
         } catch (e) {
-            createMessage(this.jsonParseErrorMessage, 'msg_error');
+            createMessage(MSG_JSON_PARSE_ERROR, 'msg_error');
             return;
         }
 
         try {
             if (!jsondata || jsondata.result !== 'ok' || !Array.isArray(jsondata.data)) {
-                throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : defErrorMessage);
+                throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : MSG_RULES_LIST_REQUEST_FAIL);
             }
 
             this.model.rules.setData(jsondata.data);
@@ -554,8 +594,8 @@ export class ImportTemplateManager extends Component {
             show(this.tplControls, false);
         } else if (state.id === this.TPL_UPDATE_STATE) {
             this.tplStateLbl.textContent = (state.template && state.template.id)
-                ? 'Update template'
-                : 'Create template';
+                ? TITLE_UPDATE_TEMPLATE
+                : TITLE_CREATE_TEMPLATE;
 
             show(this.noTplLabel, false);
             show(this.tplStateLbl, true);
@@ -641,11 +681,11 @@ export class ImportTemplateManager extends Component {
             isValid = this.validateTemplate(state);
             if (isValid) {
                 enable(this.submitTplBtn, true);
-                this.setTemplateFeedback('Valid template');
+                this.setTemplateFeedback(MSG_VALID_TEMPLATE);
             } else {
                 enable(this.submitTplBtn, false);
                 if (state.id === this.RAW_DATA_STATE) {
-                    this.setTemplateFeedback('Template does not match data');
+                    this.setTemplateFeedback(MSG_NOT_MATCHED_TEMPLATE);
                 }
             }
         }

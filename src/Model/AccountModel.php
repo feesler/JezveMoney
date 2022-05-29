@@ -419,6 +419,16 @@ class AccountModel extends CachedTable
             return true;
         }
 
+        // delete import rules
+        $userAccounts = $this->getData(["full" => true, "type" => "all"]);
+        $accountsToDelete = [];
+        foreach ($userAccounts as $account) {
+            $accountsToDelete[] = $account->id;
+        }
+
+        $ruleModel = ImportRuleModel::getInstance();
+        $ruleModel->onAccountDelete($accountsToDelete);
+
         // delete all transactions of user
         if (!$this->dbObj->deleteQ("transactions", "user_id" . $setCond)) {
             return false;
@@ -545,7 +555,7 @@ class AccountModel extends CachedTable
             $itemsData = $this->cache;
         }
 
-        foreach ($itemsData as $acc_id => $item) {
+        foreach ($itemsData as $item) {
             if ($person_id && $item->owner_id != $person_id) {
                 continue;
             }

@@ -31,6 +31,14 @@ include(TPL_PATH."commonhdr.tpl");
                         ])?>
                     </div>
 
+                    <div class="filters-heading">
+                        <h2>Filters</h2>
+                        <a id="clearall_btn" class="clear-all-btn" href="<?=e($clearAllURL)?>">
+                            <?=svgIcon("close")?>
+                            <span>Clear all</span>
+                        </a>
+                    </div>
+
                     <div>
                         <div class="trtype-menu trtype-menu-multi">
 <?php	foreach($transMenu as $menuItem) {

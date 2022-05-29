@@ -13,8 +13,6 @@ import { createMessage } from '../../../view/js/app.js';
 import { ConfirmDialog } from '../../../view/Components/ConfirmDialog/ConfirmDialog.js';
 import { AdminView } from './AdminView.js';
 
-/* global baseURL */
-
 /**
  * Admin list view constructor
  */
@@ -105,6 +103,8 @@ export class AdminListView extends AdminView {
      * @param {*} id - item identificator
      */
     selectItem(id) {
+        const { baseURL } = window.app;
+
         this.selectedItem = this.getItem(id);
         if (this.selectedItem) {
             this.itemForm.action = `${baseURL}api/${this.apiController}/update`;
@@ -126,6 +126,8 @@ export class AdminListView extends AdminView {
      * Show create new item dialog
      */
     createItem() {
+        const { baseURL } = window.app;
+
         this.preCreateItem();
         this.itemForm.action = `${baseURL}api/${this.apiController}/create`;
         this.setItemValues(null);
@@ -163,7 +165,7 @@ export class AdminListView extends AdminView {
             title: 'Delete',
             content: popupContent,
             onconfirm: () => ajax.post({
-                url: `${baseURL}api/${this.apiController}/del`,
+                url: `${window.app.baseURL}api/${this.apiController}/del`,
                 data: JSON.stringify({ id: this.selectedItem.id }),
                 headers: { 'Content-Type': 'application/json' },
                 callback: this.onSubmitResult.bind(this),
@@ -239,6 +241,8 @@ export class AdminListView extends AdminView {
      * Request list of items from API
      */
     requestList() {
+        const { baseURL } = window.app;
+
         show(this.itemsListElem, false);
         ajax.get({
             url: `${baseURL}api/${this.apiController}/list`,

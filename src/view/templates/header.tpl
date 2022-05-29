@@ -30,6 +30,8 @@
 <?php	}		?>
                     <li><a href="<?=BASEURL?>profile/">profile</a></li>
                     <li><a href="<?=BASEURL?>logout/">logout</a></li>
+                    <li class="separator"></li>
+                    <li><a href="<?=BASEURL?>about/">about</a></li>
                 </ul>
             </div>
         </div>

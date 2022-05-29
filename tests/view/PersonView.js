@@ -1,4 +1,3 @@
-import { TestComponent } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { InputRow } from './component/InputRow.js';
 import { IconLink } from './component/IconLink.js';
@@ -103,7 +102,7 @@ export class PersonView extends AppView {
     async deleteSelfItem() {
         await this.clickDeleteButton();
 
-        if (!await TestComponent.isVisible(this.content.delete_warning)) {
+        if (!this.content.delete_warning?.content?.visible) {
             throw new Error('Delete transaction warning popup not appear');
         }
         if (!this.content.delete_warning.content.okBtn) {

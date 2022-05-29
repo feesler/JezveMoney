@@ -5,8 +5,9 @@ namespace JezveMoney\App\Controller;
 use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
-use JezveMoney\Core\JSON;
 use JezveMoney\App\Model\AccountModel;
+use JezveMoney\App\Model\ImportRuleModel;
+use JezveMoney\App\Model\ImportTemplateModel;
 
 class Profile extends TemplateController
 {
@@ -47,7 +48,7 @@ class Profile extends TemplateController
             $viewData["action"] = $this->action;
         }
 
-        $data["viewData"] = JSON::encode($viewData);
+        $data["viewData"] = $viewData;
 
         $this->cssArr[] = "ProfileView.css";
         $this->jsArr[] = "ProfileView.js";
@@ -156,6 +157,16 @@ class Profile extends TemplateController
         }
 
         if (!$this->personMod->reset()) {
+            $this->fail($defMsg);
+        }
+
+        $ruleMod = ImportRuleModel::getInstance();
+        if (!$ruleMod->reset()) {
+            $this->fail($defMsg);
+        }
+
+        $tplModel = ImportTemplateModel::getInstance();
+        if (!$tplModel->reset()) {
             $this->fail($defMsg);
         }
 

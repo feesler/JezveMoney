@@ -135,7 +135,7 @@ export class ProfileView extends AppView {
 
         await this.performAction(() => click(this.content.resetBtn));
 
-        if (!await TestComponent.isVisible(this.content.reset_warning)) {
+        if (!this.content.reset_warning?.content?.visible) {
             throw new Error('Warning popup not appear');
         }
         if (!this.content.reset_warning.content.okBtn) {
@@ -152,7 +152,7 @@ export class ProfileView extends AppView {
 
         await this.performAction(() => click(this.content.resetAllBtn));
 
-        if (!await TestComponent.isVisible(this.content.reset_all_warning)) {
+        if (!this.content.reset_all_warning?.content?.visible) {
             throw new Error('Warning popup not appear');
         }
         if (!this.content.reset_all_warning.content.okBtn) {

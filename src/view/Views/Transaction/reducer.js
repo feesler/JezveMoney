@@ -866,8 +866,9 @@ const reduceToggleDebtType = (state) => {
         newState.form.fSourceResult = sourceResult;
     } else if (transaction.noAccount && !debtType) {
         const lastAcc = window.app.model.accounts.getItem(transaction.lastAcc_id);
+        const lastAccBalance = (lastAcc) ? lastAcc.balance : 0;
 
-        const sourceResult = normalize(lastAcc.balance - transaction.src_amount);
+        const sourceResult = normalize(lastAccBalance - transaction.src_amount);
         newState.form.sourceResult = sourceResult;
         newState.form.fSourceResult = sourceResult;
     }
@@ -878,8 +879,9 @@ const reduceToggleDebtType = (state) => {
         newState.form.fDestResult = destResult;
     } else if (transaction.noAccount && debtType) {
         const lastAcc = window.app.model.accounts.getItem(transaction.lastAcc_id);
+        const lastAccBalance = (lastAcc) ? lastAcc.balance : 0;
 
-        const destResult = normalize(lastAcc.balance + transaction.dest_amount);
+        const destResult = normalize(lastAccBalance + transaction.dest_amount);
         newState.form.destResult = destResult;
         newState.form.fDestResult = destResult;
     }
@@ -1178,7 +1180,7 @@ const reduceInvalidateDate = (state) => ({
 const reduceTypeChange = (state, type) => {
     const accountModel = window.app.model.accounts;
     const currencyModel = window.app.model.currency;
-    const { visibleUserAccounts } = window.app.model;
+    const { visibleUserAccounts, visiblePersons } = window.app.model;
 
     if (state.transaction.type === type) {
         return state;
@@ -1196,13 +1198,44 @@ const reduceTypeChange = (state, type) => {
     };
     const { transaction } = newState;
 
+    // Check availability of selected type of transaction
+    if (type === EXPENSE || type === INCOME) {
+        newState.isAvailable = visibleUserAccounts.length > 0;
+    } else if (type === TRANSFER) {
+        newState.isAvailable = visibleUserAccounts.length > 1;
+    } else if (type === DEBT) {
+        newState.isAvailable = visiblePersons.length > 0;
+    }
+
+    if (!newState.isAvailable) {
+        return newState;
+    }
+
     const currentType = state.transaction.type;
 
     if (type === EXPENSE) {
         transaction.dest_id = 0;
         newState.destAccount = null;
 
-        if (currentType === INCOME) {
+        if (!state.isAvailable) {
+            newState.id = 0;
+
+            const srcAccount = visibleUserAccounts.getItemByIndex(0);
+            const srcCurrency = currencyModel.getItem(srcAccount.curr_id);
+            const destCurrency = currencyModel.getItem(srcAccount.curr_id);
+
+            transaction.src_id = srcAccount.id;
+            transaction.src_curr = srcCurrency.id;
+            transaction.dest_curr = srcCurrency.id;
+
+            newState.srcAccount = srcAccount;
+            newState.srcCurrency = srcCurrency;
+            newState.destCurrency = destCurrency;
+
+            setStateSourceAmount(newState, state.form.sourceAmount);
+            setStateDestAmount(newState, state.form.destAmountz);
+            updateStateExchange(newState);
+        } else if (currentType === INCOME) {
             transaction.src_id = state.transaction.dest_id;
             transaction.src_curr = state.transaction.dest_curr;
             transaction.dest_curr = state.transaction.src_curr;
@@ -1238,13 +1271,33 @@ const reduceTypeChange = (state, type) => {
             newState.srcCurrency = currencyModel.getItem(fromAccount.curr_id);
             newState.destCurrency = newState.srcCurrency;
         }
+
+        newState.isDiff = transaction.src_curr !== transaction.dest_curr;
     }
 
     if (type === INCOME) {
         transaction.src_id = 0;
         newState.srcAccount = null;
 
-        if (currentType === EXPENSE) {
+        if (!state.isAvailable) {
+            newState.id = 0;
+
+            const destAccount = visibleUserAccounts.getItemByIndex(0);
+            const srcCurrency = currencyModel.getItem(destAccount.curr_id);
+            const destCurrency = currencyModel.getItem(destAccount.curr_id);
+
+            transaction.dest_id = destAccount.id;
+            transaction.src_curr = srcCurrency.id;
+            transaction.dest_curr = destCurrency.id;
+
+            newState.destAccount = destAccount;
+            newState.srcCurrency = srcCurrency;
+            newState.destCurrency = destCurrency;
+
+            setStateSourceAmount(newState, state.form.sourceAmount);
+            setStateDestAmount(newState, state.form.sourceAmount);
+            updateStateExchange(newState);
+        } else if (currentType === EXPENSE) {
             transaction.dest_id = state.transaction.src_id;
             transaction.src_curr = state.transaction.dest_curr;
             transaction.dest_curr = state.transaction.src_curr;
@@ -1257,8 +1310,8 @@ const reduceTypeChange = (state, type) => {
             newState.destAccount = destAccount;
             newState.destCurrency = destCurrency;
 
-            setStateSourceAmount(newState, state.form.destAmount);
-            setStateDestAmount(newState, state.form.sourceAmount);
+            setStateSourceAmount(newState, state.form.sourceAmount);
+            setStateDestAmount(newState, state.form.destAmount);
             updateStateExchange(newState);
         } else if (currentType === TRANSFER) {
             newState.id = 0;
@@ -1280,6 +1333,8 @@ const reduceTypeChange = (state, type) => {
             newState.destCurrency = currencyModel.getItem(fromAccount.curr_id);
             newState.srcCurrency = newState.destCurrency;
         }
+
+        newState.isDiff = transaction.src_curr !== transaction.dest_curr;
     }
 
     if (type === TRANSFER) {
@@ -1288,7 +1343,18 @@ const reduceTypeChange = (state, type) => {
         } else if (currentType === INCOME) {
             setStateNextSourceAccount(newState, transaction.dest_id);
         } else if (currentType === DEBT) {
-            if (state.account && transaction.debtType) {
+            if (!state.isAvailable) {
+                const srcAccount = visibleUserAccounts.getItemByIndex(0);
+                const srcCurrency = currencyModel.getItem(srcAccount.curr_id);
+
+                transaction.src_id = srcAccount.id;
+                transaction.src_curr = srcCurrency.id;
+
+                newState.srcAccount = srcAccount;
+                newState.srcCurrency = srcCurrency;
+
+                setStateNextDestAccount(newState, transaction.src_id);
+            } else if (state.account && transaction.debtType) {
                 newState.destAccount = state.account;
                 transaction.dest_id = state.account.id;
                 transaction.dest_curr = state.account.curr_id;
@@ -1318,24 +1384,37 @@ const reduceTypeChange = (state, type) => {
     }
 
     if (type === DEBT) {
-        const personsModel = window.app.model.visiblePersons;
-
-        const person = personsModel.getItemByIndex(0);
+        const person = visiblePersons.getItemByIndex(0);
         newState.person = person;
         transaction.person_id = person.id;
 
-        if (currentType === EXPENSE || currentType === TRANSFER) {
+        if (!state.isAvailable) {
+            transaction.debtType = true;
+            const srcCurrency = currencyModel.getItemByIndex(0);
+            newState.srcCurrency = srcCurrency;
+            newState.destCurrency = srcCurrency;
+
+            transaction.src_curr = srcCurrency.id;
+            transaction.dest_curr = srcCurrency.id;
+
+            newState.account = null;
+            transaction.noAccount = true;
+        } else if (currentType === EXPENSE || currentType === TRANSFER) {
             transaction.debtType = false;
             newState.account = state.srcAccount;
             transaction.src_id = state.srcAccount.id;
             transaction.src_curr = state.srcAccount.curr_id;
             transaction.dest_curr = state.srcAccount.curr_id;
+
+            transaction.noAccount = false;
         } else if (currentType === INCOME) {
             transaction.debtType = true;
             newState.account = state.destAccount;
             transaction.dest_id = state.destAccount.id;
             transaction.src_curr = state.destAccount.curr_id;
             transaction.dest_curr = state.destAccount.curr_id;
+
+            transaction.noAccount = false;
         }
 
         newState.personAccount = getPersonAccount(person.id, transaction.src_curr);
@@ -1347,9 +1426,11 @@ const reduceTypeChange = (state, type) => {
             transaction.dest_id = newState.personAccount.id;
         }
 
-        transaction.noAccount = false;
-
-        newState.id = (transaction.debtType) ? 0 : 3;
+        if (transaction.noAccount) {
+            newState.id = (transaction.debtType) ? 6 : 7;
+        } else {
+            newState.id = (transaction.debtType) ? 0 : 3;
+        }
 
         setStateSourceAmount(newState, state.form.sourceAmount);
         setStateDestAmount(newState, state.form.destAmount);

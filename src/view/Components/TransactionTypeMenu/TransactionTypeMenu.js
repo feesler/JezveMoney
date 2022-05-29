@@ -21,6 +21,13 @@ const ITEM_SELECTED_CLASS = 'trtype-menu__item_selected';
 const ITEM_CHECK_CLASS = 'trtype-menu__item-check';
 const ITEM_TITLE_CLASS = 'trtype-menu_item_title';
 
+/** Strings */
+const TITLE_SHOW_ALL = 'Show all';
+const TITLE_EXPENSE = 'Expense';
+const TITLE_INCOME = 'Income';
+const TITLE_TRANSFER = 'Transfer';
+const TITLE_DEBT = 'Debt';
+
 const defaultProps = {
     typeParam: 'type',
     url: window.location,
@@ -62,11 +69,11 @@ export class TransactionTypeMenu extends Component {
         }
 
         this.state.items = [
-            { type: 0, title: 'Show all' },
-            { type: EXPENSE, title: 'Expense' },
-            { type: INCOME, title: 'Income' },
-            { type: TRANSFER, title: 'Transfer' },
-            { type: DEBT, title: 'Debt' },
+            { type: 0, title: TITLE_SHOW_ALL },
+            { type: EXPENSE, title: TITLE_EXPENSE },
+            { type: INCOME, title: TITLE_INCOME },
+            { type: TRANSFER, title: TITLE_TRANSFER },
+            { type: DEBT, title: TITLE_DEBT },
         ];
 
         this.setHandlers();
@@ -110,6 +117,25 @@ export class TransactionTypeMenu extends Component {
 
     setHandlers() {
         setEvents(this.elem, { click: (e) => this.onSelectItem(e) });
+    }
+
+    setSelection(selectedItems) {
+        const showAll = (
+            !Array.isArray(selectedItems)
+            || selectedItems.length === 0
+            || selectedItems.includes(0)
+        );
+        const items = Array.isArray(selectedItems) ? selectedItems : [selectedItems];
+
+        this.state.items = this.state.items.map((item) => ({
+            ...item,
+            selected: (
+                (showAll && item.type === 0)
+                || items.includes(item.type)
+            ),
+        }));
+
+        this.render(this.state);
     }
 
     onSelectItem(e) {

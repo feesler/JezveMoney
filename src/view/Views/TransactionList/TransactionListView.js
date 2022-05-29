@@ -41,12 +41,13 @@ import './style.css';
 import { TransactionListItem } from '../../Components/TransactionListItem/TransactionListItem.js';
 import { ModeSelector } from '../../Components/ModeSelector/ModeSelector.js';
 
-const singleTransDeleteTitle = 'Delete transaction';
-const multiTransDeleteTitle = 'Delete transactions';
-const multiTransDeleteMsg = 'Are you sure want to delete selected transactions?<br>Changes in the balance of affected accounts will be canceled.';
-const singleTransDeleteMsg = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
-
-/* global baseURL */
+const PAGE_TITLE = 'Jezve Money | Transactions';
+const MSG_NO_TRANSACTIONS = 'No transactions found.';
+const MSG_SET_POS_FAIL = 'Fail to change position of transaction.';
+const TITLE_SINGLE_TRANS_DELETE = 'Delete transaction';
+const TITLE_MULTI_TRANS_DELETE = 'Delete transactions';
+const MSG_MULTI_TRANS_DELETE = 'Are you sure want to delete selected transactions?<br>Changes in the balance of affected accounts will be canceled.';
+const MSG_SINGLE_TRANS_DELETE = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
 
 /**
  * List of transactions view
@@ -87,6 +88,9 @@ class TransactionListView extends View {
      * View initialization
      */
     onStart() {
+        this.clearAllBtn = ge('clearall_btn');
+        this.clearAllBtn.addEventListener('click', (e) => this.onClearAllFilters(e));
+
         this.typeMenu = TransactionTypeMenu.fromElement(document.querySelector('.trtype-menu'), {
             allowActiveLink: true,
             onChange: (sel) => this.onChangeTypeFilter(sel),
@@ -411,6 +415,8 @@ class TransactionListView extends View {
      * @param {number} newPos  - new position of transaction
      */
     sendChangePosRequest(transactionId, newPos) {
+        const { baseURL } = window.app;
+
         ajax.post({
             url: `${baseURL}api/transaction/setpos`,
             data: JSON.stringify({
@@ -474,7 +480,7 @@ class TransactionListView extends View {
             insertAfter(origWrap, trBeforeWrap);
         }
 
-        createMessage('Fail to change position of transaction.', 'msg_error');
+        createMessage(MSG_SET_POS_FAIL, 'msg_error');
     }
 
     /**
@@ -544,6 +550,7 @@ class TransactionListView extends View {
      * Build new location address from current filterObj
      */
     buildAddress() {
+        const { baseURL } = window.app;
         let newLocation = `${baseURL}transactions/`;
         const locFilter = { ...this.state.filter };
 
@@ -572,6 +579,19 @@ class TransactionListView extends View {
         }
 
         return newLocation;
+    }
+
+    /**
+     * Clear all filters
+     * @param {Event} e - click event object
+     */
+    onClearAllFilters(e) {
+        e.preventDefault();
+
+        this.state.filter = {};
+        this.state.pagination.page = 1;
+
+        this.requestTransactions(this.state.filter);
     }
 
     /**
@@ -657,8 +677,8 @@ class TransactionListView extends View {
         const multi = (this.state.selectedItems.count() > 1);
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: (multi) ? multiTransDeleteTitle : singleTransDeleteTitle,
-            content: (multi) ? multiTransDeleteMsg : singleTransDeleteMsg,
+            title: (multi) ? TITLE_MULTI_TRANS_DELETE : TITLE_SINGLE_TRANS_DELETE,
+            content: (multi) ? MSG_MULTI_TRANS_DELETE : MSG_SINGLE_TRANS_DELETE,
             onconfirm: () => this.delForm.submit(),
         });
     }
@@ -733,7 +753,12 @@ class TransactionListView extends View {
             return;
         }
 
-        this.datePicker.show(!this.datePicker.visible());
+        const isVisible = this.datePicker.visible();
+        if (!isVisible) {
+            this.datePicker.setSelection(this.state.filter.stdate, this.state.filter.enddate);
+        }
+
+        this.datePicker.show(!isVisible);
 
         this.datePickerBtn.hide();
         show(this.dateBlock, true);
@@ -767,10 +792,11 @@ class TransactionListView extends View {
         } else {
             url.searchParams.delete('mode');
         }
-        window.history.replaceState({}, 'Jezve Money | Transactions', url);
+        window.history.replaceState({}, PAGE_TITLE, url);
     }
 
     requestTransactions(options) {
+        const { baseURL } = window.app;
         const reqOptions = {
             ...options,
             order: 'desc',
@@ -816,7 +842,33 @@ class TransactionListView extends View {
         }
 
         this.typeMenu.setURL(filterUrl);
+        this.typeMenu.setSelection(state.filter.type);
 
+        // Render accounts selection
+        const selectedAccounts = this.accountDropDown.getSelectedItems();
+        const selectedIds = [];
+        const idsToSelect = Array.isArray(state.filter.acc_id) ? state.filter.acc_id : [];
+        selectedAccounts.forEach((accountItem) => {
+            const itemId = parseInt(accountItem.id, 10);
+            selectedIds.push(itemId);
+
+            if (!idsToSelect.includes(itemId)) {
+                this.accountDropDown.deselectItem(accountItem.id);
+            }
+        });
+        idsToSelect.forEach((accountId) => {
+            if (!selectedIds.includes(accountId)) {
+                this.accountDropDown.selectItem(accountId.toString());
+            }
+        });
+
+        // Render date
+        const dateSubtitle = (state.filter.stdate && state.filter.enddate)
+            ? `${state.filter.stdate} - ${state.filter.enddate}`
+            : null;
+        this.datePickerBtn.setSubtitle(dateSubtitle);
+
+        // Render list
         const elems = state.items.map((item) => {
             const tritem = TransactionListItem.create({
                 mode: state.mode,
@@ -842,7 +894,7 @@ class TransactionListView extends View {
         } else {
             this.listItems.appendChild(ce('span', {
                 className: 'nodata-message',
-                textContent: 'No transactions found.',
+                textContent: MSG_NO_TRANSACTIONS,
             }));
         }
         this.listItems.dataset.time = state.renderTime;
@@ -885,6 +937,7 @@ class TransactionListView extends View {
         this.delTransInp.value = selArr.join();
 
         if (state.selectedItems.count() === 1) {
+            const { baseURL } = window.app;
             this.toolbar.updateBtn.setURL(`${baseURL}transactions/update/${selArr[0]}`);
         }
 

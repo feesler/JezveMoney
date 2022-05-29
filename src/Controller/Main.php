@@ -4,7 +4,6 @@ namespace JezveMoney\App\Controller;
 
 use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Template;
-use JezveMoney\Core\JSON;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\TransactionModel;
@@ -89,12 +88,28 @@ class Main extends TemplateController
 
         $data["statArr"] = $transMod->getHistogramSeries($byCurrency, $curr_acc_id, EXPENSE, $groupType_id, 5);
 
-        $data["viewData"] = JSON::encode([
+        $data["viewData"] = [
             "chartData" => $data["statArr"]
-        ]);
+        ];
 
         $this->cssArr[] = "MainView.css";
         $this->jsArr[] = "MainView.js";
+
+        $this->render($data);
+    }
+
+    public function about()
+    {
+        $this->template = new Template(TPL_PATH . "about.tpl");
+        $data = [
+            "titleString" => "Jezve Money"
+        ];
+
+        $data["year"] = date("Y");
+        $data["version"] = APP_VERSION;
+
+        $this->cssArr[] = "AboutView.css";
+        $this->jsArr[] = "AboutView.js";
 
         $this->render($data);
     }

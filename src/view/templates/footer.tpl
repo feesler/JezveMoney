@@ -9,8 +9,6 @@ use JezveMoney\Core\Message;
             window.parent.postMessage(e.error, '*');
         }
     }, true);
-    var baseURL = '<?=BASEURL?>';
-    var themes = <?=JSON::encode((object)$this->themes)?>;
 <?php		Message::check();		?>
 </script>
 <?php	foreach($this->jsArr as $jsFile) {	?>

@@ -4,7 +4,6 @@ namespace JezveMoney\App\Admin\Controller;
 
 use JezveMoney\Core\AdminController;
 use JezveMoney\Core\Template;
-use JezveMoney\Core\JSON;
 use JezveMoney\App\Model\IconModel;
 
 class Icon extends AdminController
@@ -27,9 +26,9 @@ class Icon extends AdminController
             "typesData" => $this->model->getTypes(),
         ];
 
-        $data["viewData"] = JSON::encode([
+        $data["viewData"] = [
             "data" => $data["itemsData"],
-        ]);
+        ];
 
         $this->menuItems["icon"]["active"] = true;
         $this->cssAdmin[] = "AdminIconView.css";

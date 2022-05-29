@@ -4,6 +4,7 @@ import { formatDate } from 'jezvejs/DateUtils';
 import { fixFloat, fixDate } from '../common.js';
 import { Currency } from './Currency.js';
 import { ImportTransaction } from './ImportTransaction.js';
+import { ImportTemplateError } from '../error/ImportTemplateError.js';
 
 /** Import template model */
 export class ImportTemplate {
@@ -65,39 +66,58 @@ export class ImportTemplate {
         }
 
         const res = [];
-        data.forEach((row, ind) => {
-            if (ind < skipRows) {
-                return;
+        try {
+            data.forEach((row, ind) => {
+                if (ind < skipRows) {
+                    return;
+                }
+
+                const original = { mainAccount };
+                columns.forEach((column) => {
+                    if (!(column in this.columns)) {
+                        throw new Error(`Column '${column}' not found`);
+                    }
+
+                    let value = ImportTemplate.getColumn(row, this.columns[column]);
+
+                    if (['accountAmount', 'transactionAmount'].includes(column)) {
+                        value = ImportTemplate.amountFix(value);
+                    } else if (column === 'date') {
+                        value = formatDate(ImportTemplate.dateFromString(value));
+                    }
+
+                    original[column] = value;
+                });
+
+                const accCurrency = Currency.findByName(original.accountCurrency);
+                original.accountCurrencyId = accCurrency ? accCurrency.id : null;
+                if (original.accountCurrencyId !== mainAccount.curr_id) {
+                    throw new ImportTemplateError();
+                }
+
+                const trCurrency = Currency.findByName(original.transactionCurrency);
+                original.transactionCurrencyId = trCurrency ? trCurrency.id : null;
+
+                if (Number.isNaN(original.accountAmount) || original.accountAmount === 0) {
+                    throw new ImportTemplateError();
+                }
+                if (Number.isNaN(original.transactionAmount) || original.transactionAmount === 0) {
+                    throw new ImportTemplateError();
+                }
+
+                const item = ImportTransaction.fromImportData(original, mainAccount);
+
+                res.push(item);
+            });
+        } catch (e) {
+            if (!(e instanceof ImportTemplateError)) {
+                throw e;
             }
 
-            const original = { mainAccount };
-            columns.forEach((column) => {
-                if (!(column in this.columns)) {
-                    throw new Error(`Column '${column}' not found`);
-                }
-
-                let value = ImportTemplate.getColumn(row, this.columns[column]);
-
-                if (['accountAmount', 'transactionAmount'].includes(column)) {
-                    value = ImportTemplate.amountFix(value);
-                } else if (column === 'date') {
-                    value = formatDate(ImportTemplate.dateFromString(value));
-                }
-
-                original[column] = value;
-            });
-
-            const accCurrency = Currency.findByName(original.accountCurrency);
-            original.accountCurrencyId = accCurrency ? accCurrency.id : null;
-
-            const trCurrency = Currency.findByName(original.transactionCurrency);
-            original.transactionCurrencyId = trCurrency ? trCurrency.id : null;
-
-            const item = ImportTransaction.fromImportData(original, mainAccount);
-
-            res.push(item);
-        });
+            return null;
+        }
 
         return res;
     }
 }
+

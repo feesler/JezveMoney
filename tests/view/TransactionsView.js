@@ -1,5 +1,5 @@
 import { copyObject } from 'jezvejs';
-import { TestComponent, assert } from 'jezve-test';
+import { assert } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
 import { DropDown } from './component/DropDown.js';
@@ -30,12 +30,15 @@ export class TransactionsView extends AppView {
             titleEl: await query('.content_wrap > .heading > h1'),
             addBtn: await IconLink.create(this, await query('#add_btn')),
             importBtn: await IconLink.create(this, await query('#import_btn')),
+            clearAllBtn: { elem: await query('#clearall_btn') },
             toolbar: await Toolbar.create(this, await query('#toolbar')),
         };
 
         if (
             !res.titleEl
             || !res.addBtn
+            || !res.importBtn
+            || !res.clearAllBtn.elem
             || !res.toolbar
             || !res.toolbar.content.editBtn
             || !res.toolbar.content.delBtn
@@ -133,7 +136,7 @@ export class TransactionsView extends AppView {
             };
         }
 
-        const isModeSelectorVisible = await TestComponent.isVisible(cont.modeSelector);
+        const isModeSelectorVisible = cont.modeSelector?.content?.visible;
         if (isModeSelectorVisible) {
             res.detailsMode = cont.modeSelector.content.details;
         } else {
@@ -216,7 +219,13 @@ export class TransactionsView extends AppView {
 
         const res = {
             typeMenu: { selectedTypes: this.model.filter.type, visible: true },
-            accDropDown: { visible: true },
+            accDropDown: {
+                isMulti: true,
+                visible: true,
+                selectedItems: this.model.filter.accounts.map(
+                    (accountId) => ({ id: accountId.toString() }),
+                ),
+            },
             searchForm: { value: this.model.filter.search, visible: true },
             modeSelector: { visible: isItemsAvailable },
             paginator: { visible: isItemsAvailable },
@@ -448,6 +457,19 @@ export class TransactionsView extends AppView {
         return res;
     }
 
+    async clearAllFilters() {
+        this.model.filter = {
+            type: [],
+            accounts: [],
+            search: '',
+        };
+        const expected = this.onFilterUpdate();
+
+        await this.waitForList(() => click(this.content.clearAllBtn.elem));
+
+        return this.checkState(expected);
+    }
+
     async filterByType(type) {
         const newTypeSel = Array.isArray(type) ? type : [type];
         newTypeSel.sort();
@@ -501,12 +523,12 @@ export class TransactionsView extends AppView {
             await this.performAction(() => this.content.transList.content.items[num].click());
             selectedCount += (isSelected ? -1 : 1);
 
-            const updIsVisible = await this.content.toolbar.isButtonVisible('update');
+            const updIsVisible = this.content.toolbar.isButtonVisible('update');
             if ((selectedCount === 1) !== updIsVisible) {
                 throw new Error(`Unexpected visibility (${updIsVisible}) of Update button while ${selectedCount} items selected`);
             }
 
-            const delIsVisible = await this.content.toolbar.isButtonVisible('del');
+            const delIsVisible = this.content.toolbar.isButtonVisible('del');
             if ((selectedCount > 0) !== delIsVisible) {
                 throw new Error(`Unexpected visibility (${delIsVisible}) of Delete button while ${selectedCount} items selected`);
             }
@@ -536,7 +558,7 @@ export class TransactionsView extends AppView {
 
         await this.performAction(() => this.content.toolbar.clickButton('del'));
 
-        if (!await TestComponent.isVisible(this.content.delete_warning)) {
+        if (!this.content.delete_warning?.content?.visible) {
             throw new Error('Delete transaction warning popup not appear');
         }
         if (!this.content.delete_warning.content.okBtn) {

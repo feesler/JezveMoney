@@ -57,6 +57,8 @@ export const profileTests = {
 
         await ProfileTests.resetAll();
 
+        await ProfileTests.openAbout();
+
         // Change name tests
         await scenario.runner.runGroup(ProfileTests.changeName, [
             '',
@@ -82,6 +84,14 @@ export const profileTests = {
             oldPassword: tmpPassword,
             newPassword: App.config.testUser.password,
         }]);
+    },
+
+    /** Run profile tests with transactions */
+    async runPostTransaction() {
+        setBlock('Profile with transactions tests', 1);
+
+        await ProfileTests.resetAccounts();
+        await ProfileTests.resetAll();
     },
 
     /** Initialize and run tests */

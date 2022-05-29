@@ -26,8 +26,11 @@ import { ImportRulesDialog } from '../../Components/ImportRulesDialog/ImportRule
 import { ImportTransactionItem } from '../../Components/ImportTransactionItem/ImportTransactionItem.js';
 
 /* eslint no-bitwise: "off" */
-/* global baseURL */
 const SUBMIT_LIMIT = 100;
+/** Messages */
+const MSG_IMPORT_SUCCESS = 'All transactions have been successfully imported';
+const MSG_IMPORT_FAIL = 'Fail to import transactions';
+const MSG_NO_TRANSACTIONS = 'No transactions to import';
 
 /**
  * Import view constructor
@@ -54,6 +57,10 @@ class ImportView extends View {
      * View initialization
      */
     onStart() {
+        if (this.model.accounts.length === 0) {
+            return;
+        }
+
         this.newItemBtn = IconLink.fromElement({
             elem: 'newItemBtn',
             onclick: () => this.createItem(),
@@ -237,6 +244,7 @@ class ImportView extends View {
             }
         });
         // Prepare request data
+        const { baseURL } = window.app;
         const reqParams = urlJoin({
             count: 0,
             stdate: formatDate(new Date(importedDateRange.start)),
@@ -300,8 +308,8 @@ class ImportView extends View {
             }
         });
 
-        show(this.loadingInd, false);
         this.updateItemsCount();
+        show(this.loadingInd, false);
         this.setRenderTime();
     }
 
@@ -343,6 +351,10 @@ class ImportView extends View {
 
     /** Initial account of upload change callback */
     onUploadAccChange(accountId) {
+        if (this.model.mainAccount.id === accountId) {
+            return;
+        }
+
         this.accountDropDown.selectItem(accountId.toString());
         this.onMainAccChange();
     }
@@ -388,7 +400,7 @@ class ImportView extends View {
             this.noDataMsg = null;
         } else {
             if (!this.noDataMsg) {
-                this.noDataMsg = ce('span', { className: 'nodata-message', textContent: 'No transactions to import' });
+                this.noDataMsg = ce('span', { className: 'nodata-message', textContent: MSG_NO_TRANSACTIONS });
             }
             this.rowsContainer.appendChild(this.noDataMsg);
         }
@@ -467,6 +479,10 @@ class ImportView extends View {
 
         this.reApplyRules();
 
+        if (this.uploadDialog) {
+            this.uploadDialog.setMainAccount(this.model.mainAccount);
+        }
+
         if (!this.uploadDialog || !this.uploadDialog.isVisible()) {
             this.requestSimilar();
         } else {
@@ -536,6 +552,7 @@ class ImportView extends View {
     }
 
     submitChunk() {
+        const { baseURL } = window.app;
         const chunk = this.submitQueue.pop();
 
         ajax.post({
@@ -552,7 +569,7 @@ class ImportView extends View {
      */
     onSubmitResult(response) {
         let status = false;
-        let message = 'Fail to import transactions';
+        let message = MSG_IMPORT_FAIL;
 
         try {
             const respObj = JSON.parse(response);
@@ -562,7 +579,7 @@ class ImportView extends View {
                 this.renderSubmitProgress();
 
                 if (this.submitQueue.length === 0) {
-                    message = 'All transactions have been successfully imported';
+                    message = MSG_IMPORT_SUCCESS;
                     this.removeAllItems();
                 } else {
                     this.submitChunk();

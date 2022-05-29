@@ -1,5 +1,4 @@
 import { copyObject } from 'jezvejs';
-import { TestComponent } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { IconLink } from './component/IconLink.js';
 import { ImportList } from './component/Import/ImportList.js';
@@ -7,13 +6,16 @@ import { ImportUploadDialog } from './component/Import/ImportUploadDialog.js';
 import { ImportRulesDialog } from './component/Import/ImportRulesDialog.js';
 import { DropDown } from './component/DropDown.js';
 import { ImportViewSubmitError } from '../error/ImportViewSubmitError.js';
+import { findSimilarTransaction } from '../model/import.js';
 import {
     query,
     prop,
+    attr,
     click,
     wait,
     waitForFunction,
 } from '../env.js';
+import { App } from '../Application.js';
 
 /** Import view class */
 export class ImportView extends AppView {
@@ -28,7 +30,7 @@ export class ImportView extends AppView {
         const res = {
             title: { elem: await query('.content_wrap > .heading > h1') },
             uploadBtn: await IconLink.create(this, await query('#uploadBtn')),
-            mainAccountSelect: await DropDown.createFromChild(this, await query('#acc_id')),
+            notAvailMsg: { elem: await query('#notavailmsg') },
             addBtn: await IconLink.create(this, await query('#newItemBtn')),
             clearBtn: await IconLink.create(this, await query('#clearFormBtn')),
             totalCount: { elem: await query('#trcount') },
@@ -40,14 +42,9 @@ export class ImportView extends AppView {
             submitProgress: { elem: await query('#submitProgress') },
         };
 
-        res.title.value = await prop(res.title.elem, 'textContent');
-        res.totalCount.value = await prop(res.totalCount.elem, 'textContent');
-        res.enabledCount.value = await prop(res.enabledCount.elem, 'textContent');
-
         if (
             !res.title.elem
             || !res.uploadBtn.elem
-            || !res.mainAccountSelect
             || !res.addBtn.elem
             || !res.clearBtn.elem
             || !res.totalCount.elem
@@ -61,16 +58,34 @@ export class ImportView extends AppView {
             throw new Error('Invalid structure of import view');
         }
 
+        const importEnabled = !res.notAvailMsg.elem;
+
+        res.title.value = await prop(res.title.elem, 'textContent');
+
+        const disabledAttr = await attr(res.uploadBtn.elem, 'disabled');
+        res.uploadBtn.content.disabled = disabledAttr != null;
+        res.totalCount.value = await prop(res.totalCount.elem, 'textContent');
+        res.enabledCount.value = await prop(res.enabledCount.elem, 'textContent');
         res.rulesCheck.checked = await prop(res.rulesCheck.elem, 'checked');
         res.rulesCount.value = await prop(res.rulesCount.elem, 'textContent');
+        res.submitBtn.disabled = await prop(res.submitBtn.elem, 'disabled');
+
+        if (importEnabled) {
+            res.mainAccountSelect = await DropDown.createFromChild(this, await query('#acc_id'));
+            if (!res.mainAccountSelect) {
+                throw new Error('Invalid structure of import view');
+            }
+        }
 
         const rowsContainer = await query('#rowsContainer');
         res.renderTime = await prop(rowsContainer, 'dataset.time');
 
-        const mainAccountId = res.mainAccountSelect.content.value;
-        res.itemsList = await ImportList.create(this, rowsContainer, mainAccountId);
-        if (!res.itemsList) {
-            throw new Error('Invalid structure of import view');
+        if (importEnabled) {
+            const mainAccountId = res.mainAccountSelect.content.value;
+            res.itemsList = await ImportList.create(this, rowsContainer, mainAccountId);
+            if (!res.itemsList) {
+                throw new Error('Invalid structure of import view');
+            }
         }
 
         const uploadDialogPopup = await query(this.uploadPopupId);
@@ -83,11 +98,15 @@ export class ImportView extends AppView {
     }
 
     async buildModel(cont) {
-        const res = {};
+        const res = {
+            enabled: !cont.notAvailMsg.visible,
+        };
 
         const uploadVisible = !!cont.uploadDialog?.content?.visible;
         const rulesVisible = !!cont.rulesDialog?.content?.visible;
-        if (uploadVisible && !rulesVisible) {
+        if (!res.enabled) {
+            res.state = 'notavailable';
+        } else if (uploadVisible && !rulesVisible) {
             res.state = 'upload';
         } else if (!uploadVisible && rulesVisible) {
             res.state = 'rules';
@@ -98,14 +117,14 @@ export class ImportView extends AppView {
         }
 
         res.title = cont.title.value;
-        res.totalCount = parseInt(cont.totalCount.value, 10);
-        res.enabledCount = parseInt(cont.enabledCount.value, 10);
-        res.mainAccount = parseInt(cont.mainAccountSelect.content.value, 10);
+        res.totalCount = (res.enabled) ? parseInt(cont.totalCount.value, 10) : 0;
+        res.enabledCount = (res.enabled) ? parseInt(cont.enabledCount.value, 10) : 0;
+        res.mainAccount = (res.enabled) ? parseInt(cont.mainAccountSelect.content.value, 10) : 0;
         res.rulesEnabled = cont.rulesCheck.checked;
-        res.rulesCount = parseInt(cont.rulesCount.value, 10);
+        res.rulesCount = (res.enabled) ? parseInt(cont.rulesCount.value, 10) : 0;
         res.renderTime = cont.renderTime;
-        res.items = cont.itemsList.getItems();
-        res.invalidated = cont.itemsList.model.invalidated;
+        res.items = (cont.itemsList) ? cont.itemsList.getItems() : [];
+        res.invalidated = (cont.itemsList) ? cont.itemsList.model.invalidated : false;
         res.submitInProgress = cont.submitProgress.visible;
 
         return res;
@@ -113,17 +132,23 @@ export class ImportView extends AppView {
 
     getExpectedState(model) {
         const res = {
-            addBtn: { visible: true },
-            clearBtn: { visible: true },
-            uploadBtn: { visible: true },
+            notAvailMsg: { visible: !model.enabled },
+            addBtn: { visible: model.enabled },
+            clearBtn: { visible: model.enabled },
+            uploadBtn: { visible: true, disabled: !model.enabled },
             title: { value: model.title.toString(), visible: true },
-            mainAccountSelect: { value: model.mainAccount.toString(), visible: true },
-            totalCount: { value: model.totalCount.toString(), visible: true },
-            enabledCount: { value: model.enabledCount.toString(), visible: true },
-            rulesCheck: { checked: model.rulesEnabled },
-            rulesCount: { value: model.rulesCount.toString(), visible: true },
-            itemsList: { visible: true },
+            totalCount: { value: model.totalCount.toString(), visible: model.enabled },
+            enabledCount: { value: model.enabledCount.toString(), visible: model.enabled },
+            rulesCheck: { checked: model.rulesEnabled, visible: model.enabled },
+            rulesCount: { value: model.rulesCount.toString(), visible: model.enabled },
+            submitBtn: { visible: model.enabled },
         };
+
+        if (model.enabled) {
+            res.mainAccountSelect = { value: model.mainAccount.toString(), visible: true };
+            res.itemsList = { visible: true };
+            res.submitBtn.disabled = !model.items.some((item) => item.enabled);
+        }
 
         return res;
     }
@@ -166,21 +191,25 @@ export class ImportView extends AppView {
     async launchUploadDialog() {
         this.checkMainState();
 
+        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState.uploadDialog = {
+            visible: true,
+            initialAccount: { value: this.model.mainAccount.toString() },
+        };
+
         await this.performAction(() => this.content.uploadBtn.click());
         await this.performAction(() => wait(this.uploadPopupId, { visible: true }));
 
-        if (!await TestComponent.isVisible(this.content.uploadDialog)) {
-            throw new Error('File upload dialog not appear');
-        }
+        return this.checkState();
     }
 
     async closeUploadDialog() {
         this.checkUploadState();
 
         await this.performAction(() => this.content.uploadDialog.close());
-        await this.performAction(() => wait(this.uploadPopupId, { visible: true }));
+        await this.performAction(() => wait(this.uploadPopupId, { hidden: true }));
 
-        if (await TestComponent.isVisible(this.content.uploadDialog)) {
+        if (this.content.uploadDialog?.content?.visible) {
             throw new Error('File upload dialog not closed');
         }
     }
@@ -209,7 +238,20 @@ export class ImportView extends AppView {
     async selectUploadAccount(val) {
         this.checkUploadState();
 
+        this.model.mainAccount = parseInt(val, 10);
+        this.expectedState = this.getExpectedState(this.model);
+
+        this.expectedState.itemsList = {};
+        this.expectedState.itemsList.items = this.content.itemsList.content.items.map(
+            (item) => {
+                const model = item.onChangeMainAccount(item.model, val);
+                return copyObject(item.getExpectedState(model));
+            },
+        );
+
         await this.performAction(() => this.content.uploadDialog.selectAccount(val));
+
+        return this.checkState();
     }
 
     async selectUploadEncoding(val) {
@@ -288,13 +330,59 @@ export class ImportView extends AppView {
     }
 
     /** Submit converted file data */
-    async submitUploaded() {
+    async submitUploaded(importData) {
         this.checkUploadState();
 
-        await this.waitForList(async () => {
-            await this.content.uploadDialog.submit();
-            await wait(this.uploadPopupId, { hidden: true });
-        });
+        const expectedUpload = this.content.uploadDialog.getExpectedUploadResult(importData);
+        const isValid = expectedUpload != null;
+        if (isValid) {
+            // Apply rules if enabled
+            if (this.isRulesEnabled()) {
+                for (const item of expectedUpload) {
+                    App.state.rules.applyTo(item);
+                }
+            }
+
+            // Disable transactions similar to already existing
+            const skipList = [];
+            for (const item of expectedUpload) {
+                const tr = findSimilarTransaction(item, skipList);
+                if (tr) {
+                    skipList.push(tr.id);
+                    item.enabled = false;
+                }
+            }
+        }
+
+        // Prepare expected state of previously created import items
+        const expectedList = this.content.itemsList.getExpectedState();
+        // Append uploaded items if valid
+        if (isValid) {
+            const uploadedItems = ImportList.render(expectedUpload, App.state);
+            expectedList.items = expectedList.items.concat(uploadedItems.items);
+
+            this.model.items = this.model.items.concat(expectedUpload);
+        }
+
+        this.model.totalCount = expectedList.items.length;
+        const enabledItems = expectedList.items.filter((item) => item.enabled);
+        this.model.enabledCount = enabledItems.length;
+
+        this.expectedState = this.getExpectedState(this.model);
+
+        this.expectedState.itemsList = expectedList;
+        this.expectedState.uploadDialog = { visible: !isValid };
+
+        if (isValid) {
+            await this.waitForList(async () => {
+                await this.content.uploadDialog.submit();
+                await wait(this.uploadPopupId, { hidden: true });
+            });
+        } else {
+            await this.performAction(() => this.content.uploadDialog.submit());
+        }
+
+        return this.checkState();
     }
 
     /** Return current state of upload dialog */
@@ -573,7 +661,7 @@ export class ImportView extends AppView {
                 return true;
             }
 
-            const notification = await TestComponent.isVisible(this.content.msgPopup, true);
+            const notification = this.content.msgPopup?.content?.visible;
             if (notification && !this.model.submitInProgress) {
                 return true;
             }

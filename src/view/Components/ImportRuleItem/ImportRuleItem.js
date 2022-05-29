@@ -16,6 +16,12 @@ import { ImportActionItem } from '../ImportActionItem/ImportActionItem.js';
 import { createContainer, createIcon } from '../../js/app.js';
 import './style.css';
 
+/** Strings */
+const TITLE_CONDITIONS = 'Conditions';
+const TITLE_ACTIONS = 'Actions';
+const TITLE_NO_ACTIONS = 'No actions.';
+const TITLE_NO_CONDITIONS = 'No conditions';
+
 /**
  * ImportRuleItem component constructor
  * @param {Object} props
@@ -109,10 +115,10 @@ export class ImportRuleItem extends Component {
             this.toggleExtBtn,
         ]);
 
-        this.conditionsHeader = ce('label', { className: 'rule-item__header', textContent: 'Conditions' });
+        this.conditionsHeader = ce('label', { className: 'rule-item__header', textContent: TITLE_CONDITIONS });
         this.conditionsContainer = createContainer('rule-item__conditions', []);
 
-        this.actionsHeader = ce('label', { className: 'rule-item__header', textContent: 'Actions' });
+        this.actionsHeader = ce('label', { className: 'rule-item__header', textContent: TITLE_ACTIONS });
         this.actionsContainer = createContainer('rule-item__actions', []);
 
         this.collapse = new Collapsible({
@@ -229,7 +235,7 @@ export class ImportRuleItem extends Component {
 
         const actionsTitle = (state.actions.length > 0)
             ? `${state.actions.length} action(s).`
-            : 'No actions.';
+            : TITLE_NO_ACTIONS;
 
         if (conditionItems.length > 0) {
             const firstCondition = conditionItems[0];
@@ -247,7 +253,7 @@ export class ImportRuleItem extends Component {
 
             this.valueLabel.textContent = firstCondition.valueLabel.textContent;
         } else {
-            this.propertyLabel.textContent = 'No conditions';
+            this.propertyLabel.textContent = TITLE_NO_CONDITIONS;
         }
 
         if (conditionItems.length > 1) {

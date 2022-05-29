@@ -15,6 +15,17 @@ import { View } from '../../js/View.js';
 import { createContainer, createIcon } from '../../js/app.js';
 import './style.css';
 
+/** Strings */
+const BTN_CREATE_CONDITION = 'Create';
+const TITLE_CONDITIONS = 'Conditions';
+const BTN_CREATE_ACTION = 'Create';
+const TITLE_ACTIONS = 'Actions';
+const BTN_SAVE = 'Ok';
+const BTN_CANCEL = 'Cancel';
+const MSG_NO_DATA = 'No data';
+const MSG_NO_ACTIONS = 'No actions';
+const MSG_NO_CONDITIONS = 'No conditions';
+
 /**
  * ImportRuleForm component constructor
  */
@@ -74,7 +85,7 @@ export class ImportRuleForm extends Component {
         // Conditions
         this.createCondBtn = ce(
             'button',
-            { className: 'btn link-btn create-btn', type: 'button', textContent: 'Create' },
+            { className: 'btn link-btn create-btn', type: 'button', textContent: BTN_CREATE_CONDITION },
             null,
             { click: (e) => this.onCreateConditionClick(e) },
         );
@@ -87,7 +98,7 @@ export class ImportRuleForm extends Component {
         this.conditionsCollapse = new Collapsible({
             className: 'rule-form-collapse',
             header: [
-                ce('label', { textContent: 'Conditions' }),
+                ce('label', { textContent: TITLE_CONDITIONS }),
                 this.createCondBtn,
                 this.toggleCondBtn,
             ],
@@ -98,7 +109,7 @@ export class ImportRuleForm extends Component {
         // Actions
         this.createActionBtn = ce(
             'button',
-            { className: 'btn link-btn create-btn', type: 'button', textContent: 'Create' },
+            { className: 'btn link-btn create-btn', type: 'button', textContent: BTN_CREATE_ACTION },
             null,
             { click: (e) => this.onCreateActionClick(e) },
         );
@@ -111,7 +122,7 @@ export class ImportRuleForm extends Component {
         this.actionsCollapse = new Collapsible({
             className: 'rule-form-collapse',
             header: [
-                ce('label', { textContent: 'Actions' }),
+                ce('label', { textContent: TITLE_ACTIONS }),
                 this.createActionBtn,
                 this.toggleActionsBtn,
             ],
@@ -122,13 +133,13 @@ export class ImportRuleForm extends Component {
         // Controls
         this.saveBtn = ce(
             'button',
-            { className: 'btn submit-btn', type: 'button', textContent: 'Ok' },
+            { className: 'btn submit-btn', type: 'button', textContent: BTN_SAVE },
             null,
             { click: () => this.onSubmit() },
         );
         this.cancelBtn = ce(
             'button',
-            { className: 'btn link-btn cancel-btn', type: 'button', textContent: 'Cancel' },
+            { className: 'btn link-btn cancel-btn', type: 'button', textContent: BTN_CANCEL },
             null,
             { click: () => this.onCancel() },
         );
@@ -419,7 +430,7 @@ export class ImportRuleForm extends Component {
 
         const message = (typeof noDataMessage === 'string')
             ? noDataMessage
-            : 'No data';
+            : MSG_NO_DATA;
 
         if (Array.isArray(data) && data.length > 0) {
             const dataItems = data.map((item) => item.elem);
@@ -482,7 +493,7 @@ export class ImportRuleForm extends Component {
 
             return new ImportActionForm(props);
         });
-        this.setListContainerData(this.actionsCollapse, actionItems, 'No actions');
+        this.setListContainerData(this.actionsCollapse, actionItems, MSG_NO_ACTIONS);
 
         // Conditions
         const conditionItems = state.rule.conditions.map((condition, index) => {
@@ -507,6 +518,6 @@ export class ImportRuleForm extends Component {
 
             return new ImportConditionForm(props);
         });
-        this.setListContainerData(this.conditionsCollapse, conditionItems, 'No conditions');
+        this.setListContainerData(this.conditionsCollapse, conditionItems, MSG_NO_CONDITIONS);
     }
 }

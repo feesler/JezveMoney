@@ -44,14 +44,9 @@ include(TPL_PATH."commonhdr.tpl");	?>
         }	?>
                         </div>
 
-<?php	if ($action == "create" && $acc_count < 2 && $tr["type"] == TRANSFER) {	?>
-                        <span class="nodata-message">You need at least two active accounts for transfer.</span>
-<?php	} else if ($action == "create" && !$acc_count && $tr["type"] != TRANSFER) {		?>
-                        <span class="nodata-message">You have no one active account. Please create one.</span>
-<?php	} else if ($action == "create" && $tr["type"] == DEBT && !$person_id) {		?>
-                        <span class="nodata-message">You have no one active person. Please create one for debts.</span>
-<?php	} else {		?>
-                        <div id="person" class="account-container<?=hidden($tr["type"] != DEBT)?>">
+                        <span id="notavailmsg" class="nodata-message<?=hidden($trAvailable)?>"><?=e($noDataMessage)?></span>
+
+                        <div id="person" class="account-container<?=hidden(!$trAvailable || $tr["type"] != DEBT)?>">
                             <input id="person_id" name="person_id" type="hidden" value="<?=e($person_id)?>">
                             <div class="tile_header"><label>Person name</label></div>
                             <div class="tile-base">
@@ -73,7 +68,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
                         </div>
 
-                        <div id="debtaccount" class="account-container<?=hidden($tr["type"] != DEBT)?>">
+                        <div id="debtaccount" class="account-container<?=hidden(!$trAvailable || $tr["type"] != DEBT)?>">
                             <div class="tile_header">
                                 <label id="acclbl"><?=e($accLbl)?></label>
                                 <button id="noacc_btn" class="close-btn<?=hidden($noAccount)?>" type="button">
@@ -102,7 +97,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
                         </div>
 
-<?php	    if ($tr["type"] == INCOME || $tr["type"] == DEBT) {	?>
+<?php	    if (!$trAvailable || $tr["type"] == INCOME || $tr["type"] == DEBT) {	?>
                         <div id="source" class="account-container hidden">
 <?php	    } else {	?>
                         <div id="source" class="account-container">
@@ -131,7 +126,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         </div>
                         <input id="src_id" name="src_id" type="hidden" value="<?=e($tr["src_id"])?>">
 
-<?php	if ($tr["type"] == EXPENSE || $tr["type"] == DEBT) {	?>
+<?php	if (!$trAvailable || $tr["type"] == EXPENSE || $tr["type"] == DEBT) {	?>
                         <div id="destination" class="account-container hidden">
 <?php	} else {	?>
                         <div id="destination" class="account-container">
@@ -161,7 +156,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         </div>
                         <input id="dest_id" name="dest_id" type="hidden" value="<?=e($tr["dest_id"])?>">
 
-                        <div id="operation" class="view-row<?=hidden($tr["type"] != DEBT)?>">
+                        <div id="operation" class="view-row<?=hidden(!$trAvailable || $tr["type"] != DEBT)?>">
                             <div><label>Operation</label></div>
                             <div class="debt-op-selector">
                                 <label><input id="debtgive" name="op" type="radio" value="1"<?=checked($debtType)?>><span>give</span></label>
@@ -169,7 +164,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
                         </div>
 
-                        <div id="src_amount_row" class="validation-block view-row<?=hidden(!$showSrcAmount)?>">
+                        <div id="src_amount_row" class="validation-block view-row<?=hidden(!$trAvailable || !$showSrcAmount)?>">
                             <div><label for="src_amount"><?=e($srcAmountLbl)?></label></div>
                             <div class="input-group std_margin">
                                 <input id="src_curr" name="src_curr" type="hidden" value="<?=e($srcAmountCurr)?>">
@@ -195,7 +190,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <div class="invalid-feedback">Please input correct amount.</div>
                         </div>
 
-                        <div id="dest_amount_row" class="validation-block view-row<?=hidden(!$showDestAmount)?>">
+                        <div id="dest_amount_row" class="validation-block view-row<?=hidden(!$trAvailable || !$showDestAmount)?>">
                             <div><label for="dest_amount"><?=e($destAmountLbl)?></label></div>
                             <div class="input-group std_margin">
                                 <input id="dest_curr" name="dest_curr" type="hidden" value="<?=e($destAmountCurr)?>">
@@ -257,7 +252,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
                         </div>
 
-                        <div class="view-row">
+                        <div id="date_row" class="view-row<?=hidden(!$trAvailable)?>">
                             <?=IconLink::render([
                                 "id" => "calendar_btn",
                                 "classNames" => "std_margin",
@@ -280,7 +275,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
                         </div>
 
-                        <div class="view-row">
+                        <div id="comment_row" class="view-row<?=hidden(!$trAvailable)?>">
                             <?=IconLink::render([
                                 "id" => "comm_btn",
                                 "classNames" => "std_margin",
@@ -298,11 +293,10 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
                         </div>
 
-                        <div class="acc_controls">
+                        <div id="submit_controls" class="acc_controls<?=hidden(!$trAvailable)?>">
                             <input id="submitbtn" class="btn submit-btn" type="submit" value="ok">
                             <a class="btn cancel-btn" href="<?=BASEURL?>">cancel</a>
                         </div>
-<?php	}	?>
                         </form>
                     </div>
                 </div>

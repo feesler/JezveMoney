@@ -128,6 +128,8 @@ export const accountTests = {
 
     /** Run account view tests with transactions */
     async runPostTransaction() {
+        setBlock('Accounts with transactions', 1);
+
         await hideTest();
         await toggleTest();
         await showTest();

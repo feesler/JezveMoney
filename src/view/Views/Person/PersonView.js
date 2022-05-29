@@ -5,8 +5,8 @@ import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import '../../css/app.css';
 
-const singlePersonDeleteTitle = 'Delete person';
-const singlePersonDeleteMsg = 'Are you sure want to delete selected person?<br>Debt operations will be converted into expense or income.';
+const TITLE_PERSON_DELETE = 'Delete person';
+const MSG_PERSON_DELETE = 'Are you sure want to delete selected person?<br>Debt operations will be converted into expense or income.';
 
 /**
  * Create/update person view
@@ -87,8 +87,8 @@ class PersonView extends View {
 
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: singlePersonDeleteTitle,
-            content: singlePersonDeleteMsg,
+            title: TITLE_PERSON_DELETE,
+            content: MSG_PERSON_DELETE,
             onconfirm: () => this.delForm.submit(),
         });
     }

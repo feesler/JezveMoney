@@ -17,8 +17,6 @@ import '../../../../view/css/app.css';
 import '../../css/admin.css';
 import './style.css';
 
-/* global baseURL */
-
 /**
  * Verify fields of specified object
  * @param {Object} obj - object to check
@@ -972,6 +970,7 @@ class AdminApiConsoleView extends AdminView {
 
     /** Create new request item object */
     addRequestItem(reqData) {
+        const { baseURL } = window.app;
         const reqItem = {
             view: this,
         };
@@ -1090,6 +1089,7 @@ class AdminApiConsoleView extends AdminView {
      * @param {boolean} isPOST - if set to true POST request method is assumed
      */
     getRequestItem(request, isPOST) {
+        const { baseURL } = window.app;
         const prefix = `${baseURL}api/`;
         const res = {};
 

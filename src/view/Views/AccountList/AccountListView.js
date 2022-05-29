@@ -9,12 +9,10 @@ import '../../css/app.css';
 import '../../Components/Tile/style.css';
 import '../../Components/IconLink/style.css';
 
-const singleAccDeleteTitle = 'Delete account';
-const multiAccDeleteTitle = 'Delete accounts';
-const multiAccDeleteMsg = 'Are you sure want to delete selected accounts?<br>All income and expense transactions history will be lost. Transfer to this accounts will be changed to expense. Transfer from this accounts will be changed to income.';
-const singleAccDeleteMsg = 'Are you sure want to delete selected account?<br>All income and expense transactions history will be lost. Transfer to this account will be changed to expense. Transfer from this account will be changed to income.';
-
-/* global baseURL */
+const TITLE_SINGLE_ACC_DELETE = 'Delete account';
+const TITLE_MULTI_ACC_DELETE = 'Delete accounts';
+const MSG_MULTI_ACC_DELETE = 'Are you sure want to delete selected accounts?<br>All income and expense transactions history will be lost. Transfer to this accounts will be changed to expense. Transfer from this accounts will be changed to income.';
+const MSG_SINGLE_ACC_DELETE = 'Are you sure want to delete selected account?<br>All income and expense transactions history will be lost. Transfer to this account will be changed to expense. Transfer from this account will be changed to income.';
 
 /**
  * List of accounts view
@@ -122,6 +120,7 @@ class AccountListView extends View {
         this.hideAccountsInp.value = totalSelArr.join();
         this.delAccountsInp.value = totalSelArr.join();
 
+        const { baseURL } = window.app;
         if (totalSelCount === 1) {
             this.toolbar.updateBtn.setURL(`${baseURL}accounts/update/${totalSelArr[0]}`);
         }
@@ -151,8 +150,8 @@ class AccountListView extends View {
 
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: (totalSelCount > 1) ? multiAccDeleteTitle : singleAccDeleteTitle,
-            content: (totalSelCount > 1) ? multiAccDeleteMsg : singleAccDeleteMsg,
+            title: (totalSelCount > 1) ? TITLE_MULTI_ACC_DELETE : TITLE_SINGLE_ACC_DELETE,
+            content: (totalSelCount > 1) ? MSG_MULTI_ACC_DELETE : MSG_SINGLE_ACC_DELETE,
             onconfirm: () => this.delForm.submit(),
         });
     }

@@ -19,6 +19,9 @@ const ITEM_CLASS = 'mode-selector__item';
 const ACTIVE_ITEM_CLASS = 'mode-selector__item__active';
 const availModes = ['classic', 'details'];
 
+const TITLE_CLASSIC = 'Classic';
+const TITLE_DETAILS = 'Details';
+
 /**
  * Mode selector component
  */
@@ -159,14 +162,14 @@ export class ModeSelector extends Component {
                 this.renderItem({
                     mode: 'classic',
                     icon: 'mode-list',
-                    title: 'Classic',
+                    title: TITLE_CLASSIC,
                     url: modeUrl,
                 }),
                 this.renderItem({
                     mode: 'details',
                     active: true,
                     icon: 'mode-details',
-                    title: 'Details',
+                    title: TITLE_DETAILS,
                 }),
             );
         } else {
@@ -177,12 +180,12 @@ export class ModeSelector extends Component {
                     mode: 'classic',
                     active: true,
                     icon: 'mode-list',
-                    title: 'Classic',
+                    title: TITLE_CLASSIC,
                 }),
                 this.renderItem({
                     mode: 'details',
                     icon: 'mode-details',
-                    title: 'Details',
+                    title: TITLE_DETAILS,
                     url: modeUrl,
                 }),
             );

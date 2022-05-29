@@ -16,6 +16,14 @@ import { View } from '../../js/View.js';
 import { createField, createContainer, createIcon } from '../../js/app.js';
 import './style.css';
 
+/** Strings */
+const TITLE_FIELD_AMOUNT = 'Amount';
+const TITLE_FIELD_VALUE = 'Value';
+const TITLE_FIELD_ACTION = 'Action';
+const TITLE_FIELD_TR_TYPE = 'Transaction type';
+const TITLE_FIELD_ACCOUNT = 'Account';
+const TITLE_FIELD_PERSON = 'Person';
+
 /**
  * ImportActionForm component
  */
@@ -78,7 +86,7 @@ export class ImportActionForm extends Component {
             elem: this.amountInput,
             oninput: () => this.onValueChange(),
         });
-        this.amountField = createField('Amount', this.amountInput);
+        this.amountField = createField(TITLE_FIELD_AMOUNT, this.amountInput);
         // Create value input element
         this.valueInput = ce(
             'input',
@@ -86,7 +94,7 @@ export class ImportActionForm extends Component {
             null,
             { input: () => this.onValueChange() },
         );
-        this.valueField = createField('Value', this.valueInput);
+        this.valueField = createField(TITLE_FIELD_VALUE, this.valueInput);
         // Form fields container
         this.fieldsContainer = createContainer('action-form__fields', [
             this.actionTypeField,
@@ -123,10 +131,22 @@ export class ImportActionForm extends Component {
 
     /** Create action type field */
     createActionTypeField() {
-        const items = this.actionTypes.map((type) => ({ id: type.id, title: type.title }));
+        const items = this.actionTypes
+            .filter((type) => {
+                // Remove `Set person` action if no persons available
+                if (
+                    type.id === IMPORT_ACTION_SET_PERSON
+                    && this.model.persons.length === 0
+                ) {
+                    return false;
+                }
+
+                return true;
+            })
+            .map((type) => ({ id: type.id, title: type.title }));
 
         const selectElem = ce('select');
-        this.actionTypeField = createField('Action', selectElem);
+        this.actionTypeField = createField(TITLE_FIELD_ACTION, selectElem);
 
         this.actionDropDown = DropDown.create({
             input_id: selectElem,
@@ -141,7 +161,7 @@ export class ImportActionForm extends Component {
         const items = this.transactionTypes.map((type) => ({ id: type.id, title: type.title }));
 
         const selectElem = ce('select');
-        this.transTypeField = createField('Transaction type', selectElem);
+        this.transTypeField = createField(TITLE_FIELD_TR_TYPE, selectElem);
 
         this.trTypeDropDown = DropDown.create({
             input_id: selectElem,
@@ -159,7 +179,7 @@ export class ImportActionForm extends Component {
         );
 
         const selectElem = ce('select');
-        this.accountField = createField('Account', selectElem);
+        this.accountField = createField(TITLE_FIELD_ACCOUNT, selectElem);
 
         this.accountDropDown = DropDown.create({
             input_id: selectElem,
@@ -167,7 +187,9 @@ export class ImportActionForm extends Component {
             editable: false,
         });
         this.accountDropDown.append(items);
-        this.accountDropDown.selectItem(items[0].id);
+        if (items.length > 0) {
+            this.accountDropDown.selectItem(items[0].id);
+        }
     }
 
     /** Create person field */
@@ -175,7 +197,7 @@ export class ImportActionForm extends Component {
         const items = this.model.persons.map((person) => ({ id: person.id, title: person.name }));
 
         const selectElem = ce('select');
-        this.personField = createField('Person', selectElem);
+        this.personField = createField(TITLE_FIELD_PERSON, selectElem);
 
         this.personDropDown = DropDown.create({
             input_id: selectElem,
@@ -183,7 +205,9 @@ export class ImportActionForm extends Component {
             editable: false,
         });
         this.personDropDown.append(items);
-        this.personDropDown.selectItem(items[0].id);
+        if (items.length > 0) {
+            this.personDropDown.selectItem(items[0].id);
+        }
     }
 
     /** Set data for component */

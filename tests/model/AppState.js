@@ -347,8 +347,7 @@ export class AppState {
     }
 
     resetAccounts() {
-        this.accounts.data = [];
-        this.transactions.data = [];
+        this.deleteAccounts(this.accounts.getIds());
 
         return true;
     }
@@ -659,6 +658,10 @@ export class AppState {
             } else if (params.type === INCOME || params.type === TRANSFER) {
                 return false;
             }
+
+            if (params.src_id === params.dest_id) {
+                return false;
+            }
         }
 
         if ('date' in params && !checkDate(params.date)) {
@@ -849,6 +852,27 @@ export class AppState {
         this.transactions.updateResults(this.accounts);
 
         return true;
+    }
+
+    isAvailableTransactionType(type) {
+        if (!availTransTypes.includes(type)) {
+            throw new Error('Invalid transaction type');
+        }
+
+        const userVisibleAccounts = this.accounts.getUserVisible();
+
+        if (type === EXPENSE || type === INCOME) {
+            return (userVisibleAccounts.length > 0);
+        }
+        if (type === TRANSFER) {
+            return (userVisibleAccounts.length > 1);
+        }
+        if (type === DEBT) {
+            const visiblePersons = this.persons.getVisible();
+            return (visiblePersons.length > 0);
+        }
+
+        throw new Error('Invalid transaction type');
     }
 
     /**

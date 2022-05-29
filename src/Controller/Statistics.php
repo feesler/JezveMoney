@@ -8,7 +8,6 @@ use JezveMoney\Core\Message;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\TransactionModel;
-use JezveMoney\Core\JSON;
 
 class Statistics extends TemplateController
 {
@@ -165,12 +164,12 @@ class Statistics extends TemplateController
 
         $data["titleString"] = "Jezve Money | Statistics";
 
-        $data["viewData"] = JSON::encode([
+        $data["viewData"] = [
             "currency" => $data["currArr"],
             "accountCurrency" => $accCurr,
             "filter" => $filterObj,
             "chartData" => $statArr
-        ]);
+        ];
 
         $this->cssArr[] = "StatisticsView.css";
         $this->jsArr[] = "StatisticsView.js";

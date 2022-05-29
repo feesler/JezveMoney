@@ -1,6 +1,13 @@
 import { TestComponent } from 'jezve-test';
 import { asyncMap } from '../../common.js';
-import { query, queryAll, prop } from '../../env.js';
+import {
+    query,
+    queryAll,
+    prop,
+    click,
+} from '../../env.js';
+
+const DEFAULT_USER_MENU_ITEMS = 3;
 
 export class Header extends TestComponent {
     async parseContent() {
@@ -45,16 +52,40 @@ export class Header extends TestComponent {
                 link: await prop(elem, 'href'),
                 text: await prop(elem, 'textContent'),
             }));
-            if (res.user.menuItems.length < 2) {
+            if (res.user.menuItems.length < DEFAULT_USER_MENU_ITEMS) {
                 throw new Error('Invalid user menu');
             }
 
-            const itemShift = (res.user.menuItems.length > 2) ? 1 : 0;
+            const itemShift = (res.user.menuItems.length > DEFAULT_USER_MENU_ITEMS) ? 1 : 0;
 
             res.user.profileBtn = res.user.menuItems[itemShift].elem;
             res.user.logoutBtn = res.user.menuItems[itemShift + 1].elem;
+            res.user.aboutBtn = res.user.menuItems[itemShift + 2].elem;
         }
 
         return res;
+    }
+
+    async clickLogo() {
+        await click(this.content.logo.linkElem);
+    }
+
+    async clickMenuButton() {
+        await click(this.content.user.menuBtn);
+    }
+
+    async clickProfileMenuItem() {
+        await this.clickMenuButton();
+        await click(this.content.user.profileBtn);
+    }
+
+    async clickLogoutMenuItem() {
+        await this.clickMenuButton();
+        await click(this.content.user.logoutBtn);
+    }
+
+    async clickAboutMenuItem() {
+        await this.clickMenuButton();
+        await click(this.content.user.aboutBtn);
     }
 }

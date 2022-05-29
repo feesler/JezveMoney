@@ -11,11 +11,12 @@ import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import '../../css/app.css';
 import './style.css';
 
-const resetAccMsg = 'Are you sure want to reset all your accounts?<br>All accounts and transactions will be lost.';
-const resetAllMsg = 'Are you sure to reset all your data?<br>Everything will be lost.';
-const deleteMsg = 'Are you sure to completely delete your profile?<br>This operation can not be undone.';
-
-/* global baseURL */
+const TITLE_RESET_ACC = 'Reset accounts';
+const MSG_RESET_ACC = 'Are you sure want to reset all your accounts?<br>All accounts and transactions will be lost.';
+const TITLE_RESET_ALL = 'Reset all data';
+const MSG_RESET_ALL = 'Are you sure to reset all your data?<br>Everything will be lost.';
+const TITLE_PROFILE_DELETE = 'Delete profile';
+const MSG_PROFILE_DELETE = 'Are you sure to completely delete your profile?<br>This operation can not be undone.';
 
 /**
  * User profile view
@@ -199,6 +200,7 @@ class ProfileView extends View {
      * Change password form submit event handler
      */
     onChangePassSubmit(e) {
+        const { baseURL } = window.app;
         let valid = true;
 
         e.preventDefault();
@@ -312,6 +314,7 @@ class ProfileView extends View {
         if (valid) {
             show(this.changeNameLoading, true);
 
+            const { baseURL } = window.app;
             ajax.post({
                 url: `${baseURL}api/profile/changename`,
                 data: JSON.stringify({
@@ -329,8 +332,8 @@ class ProfileView extends View {
     confirmResetAccounts() {
         ConfirmDialog.create({
             id: 'reset_warning',
-            title: 'Reset accounts',
-            content: resetAccMsg,
+            title: TITLE_RESET_ACC,
+            content: MSG_RESET_ACC,
             onconfirm: () => this.resetAccForm.submit(),
         });
     }
@@ -341,8 +344,8 @@ class ProfileView extends View {
     confirmResetAll() {
         ConfirmDialog.create({
             id: 'reset_all_warning',
-            title: 'Reset all data',
-            content: resetAllMsg,
+            title: TITLE_RESET_ALL,
+            content: MSG_RESET_ALL,
             onconfirm: () => this.resetAllForm.submit(),
         });
     }
@@ -353,8 +356,8 @@ class ProfileView extends View {
     confirmDelete() {
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: 'Delete profile',
-            content: deleteMsg,
+            title: TITLE_PROFILE_DELETE,
+            content: MSG_PROFILE_DELETE,
             onconfirm: () => this.deleteForm.submit(),
         });
     }

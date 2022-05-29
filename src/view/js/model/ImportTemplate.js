@@ -1,5 +1,17 @@
-import { amountFix, timestampFromString } from '../app.js';
+import { amountFix, fixFloat, timestampFromString } from '../app.js';
+import { ImportTemplateError } from '../error/ImportTemplateError.js';
 import { ListItem } from './ListItem.js';
+
+const TITLE_ACCOUNT_AMOUNT = 'Account amount';
+const TITLE_ACCOUNT_CURRENCY = 'Account currency';
+const TITLE_TRANS_AMOUNT = 'Transaction amount';
+const TITLE_TRANS_CURRENCY = 'Transaction currency';
+const TITLE_DATE = 'Date';
+const TITLE_COMMENT = 'Comment';
+
+const MSG_INVALID_ACCOUNT_CURRENCY = 'Failed to convert data. Account currency must match the main account currency.';
+const MSG_INVALID_ACCOUNT_AMOUNT = 'Failed to convert data. Invalid account amount value.';
+const MSG_INVALID_TRANSACTION_AMOUNT = 'Failed to convert data. Invalid transaction amount value';
 
 /**
  * Import template class
@@ -23,12 +35,12 @@ export class ImportTemplate extends ListItem {
      */
     getColumnsByIndex(index) {
         const tplColumns = {
-            accountAmount: { title: 'Account amount' },
-            accountCurrency: { title: 'Account currency' },
-            transactionAmount: { title: 'Transaction amount' },
-            transactionCurrency: { title: 'Transaction currency' },
-            date: { title: 'Date' },
-            comment: { title: 'Comment' },
+            accountAmount: { title: TITLE_ACCOUNT_AMOUNT },
+            accountCurrency: { title: TITLE_ACCOUNT_CURRENCY },
+            transactionAmount: { title: TITLE_TRANS_AMOUNT },
+            transactionCurrency: { title: TITLE_TRANS_CURRENCY },
+            date: { title: TITLE_DATE },
+            comment: { title: TITLE_COMMENT },
         };
 
         const res = Object.keys(tplColumns)
@@ -139,7 +151,7 @@ export class ImportTemplate extends ListItem {
     }
 
     /** Apply import template to specified data row */
-    applyTo(data, currencyModel) {
+    applyTo(data, currencyModel, mainAccount) {
         const res = {
             accountAmount: this.getAccountAmount(data),
             accountCurrency: this.getAccountCurrency(data),
@@ -153,8 +165,23 @@ export class ImportTemplate extends ListItem {
         const accCurrency = currencyModel.findByName(res.accountCurrency);
         res.accountCurrencyId = (accCurrency) ? accCurrency.id : null;
 
+        // Check account currency is same as at main account
+        if (res.accountCurrencyId !== mainAccount.curr_id) {
+            throw new ImportTemplateError(MSG_INVALID_ACCOUNT_CURRENCY, 'accountCurrency');
+        }
+
         const trCurrency = currencyModel.findByName(res.transactionCurrency);
         res.transactionCurrencyId = (trCurrency) ? trCurrency.id : null;
+
+        const amount = parseFloat(fixFloat(res.accountAmount));
+        if (Number.isNaN(amount) || amount === 0) {
+            throw new ImportTemplateError(MSG_INVALID_ACCOUNT_AMOUNT, 'accountAmount');
+        }
+
+        const trAmount = parseFloat(fixFloat(res.transactionAmount));
+        if (Number.isNaN(trAmount) || trAmount === 0) {
+            throw new ImportTemplateError(MSG_INVALID_TRANSACTION_AMOUNT, 'accountAmount');
+        }
 
         return res;
     }

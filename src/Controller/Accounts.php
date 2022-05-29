@@ -5,7 +5,6 @@ namespace JezveMoney\App\Controller;
 use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Message;
 use JezveMoney\Core\Template;
-use JezveMoney\Core\JSON;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\IconModel;
@@ -51,9 +50,9 @@ class Accounts extends TemplateController
             ];
         }
 
-        $data["viewData"] = JSON::encode([
+        $data["viewData"] = [
             "accounts" => $accountsData
-        ]);
+        ];
 
         $this->cssArr[] = "AccountListView.css";
         $this->jsArr[] = "AccountListView.js";
@@ -107,11 +106,11 @@ class Accounts extends TemplateController
         $iconModel = IconModel::getInstance();
         $data["icons"] = $iconModel->getData();
 
-        $data["viewData"] = JSON::encode([
+        $data["viewData"] = [
             "account" => $accInfo,
             "currency" => $data["currArr"],
             "icons" => $data["icons"]
-        ]);
+        ];
 
         $this->cssArr[] = "AccountView.css";
         $this->jsArr[] = "AccountView.js";
@@ -174,11 +173,11 @@ class Accounts extends TemplateController
         $iconModel = IconModel::getInstance();
         $data["icons"] = $iconModel->getData();
 
-        $data["viewData"] = JSON::encode([
+        $data["viewData"] = [
             "account" => $accInfo,
             "currency" => $data["currArr"],
             "icons" => $data["icons"]
-        ]);
+        ];
 
         $this->cssArr[] = "AccountView.css";
         $this->jsArr[] = "AccountView.js";

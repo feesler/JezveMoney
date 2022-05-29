@@ -13,7 +13,6 @@ import '../../../../view/css/app.css';
 import '../../css/admin.css';
 import './style.css';
 
-/* global baseURL */
 /* eslint no-bitwise: "off" */
 
 /**
@@ -111,6 +110,8 @@ class AdminImportRuleListView extends AdminListView {
      * Request list of items from API
      */
     requestList() {
+        const { baseURL } = window.app;
+
         ajax.get({
             url: `${baseURL}api/${this.apiController}/list?full=true`,
             callback: this.onListResult.bind(this),
