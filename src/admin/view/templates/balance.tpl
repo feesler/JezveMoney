@@ -9,6 +9,17 @@
             <div class="content">
                 <div class="content_wrap admin_cont_wrap">
                     <h2>Transactions result balance</h2>
+                    <div>
+                        <select id="acc_id" name="acc_id" multiple>
+<?php	foreach($accounts as $account) {
+            if (in_array($account->id, $accFilter)) {		?>
+                            <option value="<?=e($account->id)?>" selected><?=e($account->name)?></option>
+<?php		} else {		?>
+                            <option value="<?=e($account->id)?>"><?=e($account->name)?></option>
+<?php		}
+        }   ?>
+                        </select>
+                    </div>
 
                     <table class="admin-tbl">
                         <tr>
