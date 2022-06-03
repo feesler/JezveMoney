@@ -18,6 +18,8 @@ async function runCreateTests() {
 }
 
 async function runDeleteTests() {
+    setBlock('Delete import items', 2);
+
     await ImportTests.deleteItems([3, 5]);
 }
 
