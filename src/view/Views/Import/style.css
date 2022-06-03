@@ -1,3 +1,8 @@
+/* Import view */
+.import-view .heading {
+  padding: 10px 0 0 0;
+}
+
 /* Import file form */
 .upload-popup .popup__content-box {
   max-width: 600px;
@@ -27,12 +32,18 @@
   text-align: center;
   font-size: 18px;
   font-weight: 400;
-  z-index: 10;
+  z-index: 100;
   background-color: rgb(50 50 50 / 70%);
   border-radius: 10px;
 }
 
-/* Transactions list */
+/* Sticky header */
+.content-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: 10px 0;
+}
 
 /* Header */
 .data-header {
@@ -97,12 +108,13 @@
 .rules-container {
   display: flex;
   flex-flow: row nowrap;
-  margin: 4px 0;
 }
 
 .rules-container .btn {
   font-size: 16px;
 }
+
+/* Transactions list */
 
 /* Transaction items container */
 .data-container {
@@ -124,7 +136,7 @@
   text-align: center;
   font-size: 18px;
   font-weight: 400;
-  z-index: 10;
+  z-index: 1000;
   background-color: rgb(50 50 50 / 70%);
   border-radius: 10px;
 }
@@ -158,6 +170,6 @@
   text-align: center;
   font-size: 18px;
   font-weight: 400;
-  z-index: 10;
+  z-index: 1000;
   background-color: rgb(50 50 50 / 70%);
 }
