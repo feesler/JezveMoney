@@ -96,8 +96,8 @@ export class TransactionView extends AppView {
             throw new Error('Select account button not found');
         }
 
-        res.noacc_btn = await Button.create(this, await query('#noacc_btn'));
-        if (!res.noacc_btn) {
+        res.noacc_btn = { elem: await query('#noacc_btn') };
+        if (!res.noacc_btn.elem) {
             throw new Error('Disable account button not found');
         }
 
@@ -2234,11 +2234,11 @@ export class TransactionView extends AppView {
             }
         }
 
-        const clickTarget = (this.model.noAccount)
-            ? this.content.noacc_btn
-            : this.content.selaccount;
+        const action = (this.model.noAccount)
+            ? () => click(this.content.noacc_btn.elem)
+            : () => this.content.selaccount.click();
 
-        await this.performAction(() => clickTarget.click());
+        await this.performAction(action);
 
         return this.checkState();
     }
