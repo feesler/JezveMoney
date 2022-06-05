@@ -28,12 +28,14 @@ import './style.css';
 /** Fields */
 const TITLE_FIELD_AMOUNT = 'Amount';
 const PH_FIELD_AMOUNT = 'Amount';
+const TITLE_FIELD_SRC_AMOUNT = 'Source amount';
 const TITLE_FIELD_DEST_AMOUNT = 'Destination amount';
 const PH_FIELD_DEST_AMOUNT = 'Destination amount';
 const TITLE_FIELD_DATE = 'Date';
 const PH_FIELD_DATE = 'Date';
 const TITLE_FIELD_COMMENT = 'Comment';
 const PH_FIELD_COMMENT = 'Comment';
+const TITLE_FIELD_SRC_ACCOUNT = 'Source account';
 const TITLE_FIELD_DEST_ACCOUNT = 'Destination account';
 const TITLE_FIELD_PERSON = 'Person';
 const TITLE_FIELD_CURRENCY = 'Currency';
@@ -129,6 +131,7 @@ export class ImportTransactionItem extends Component {
             autocomplete: 'off',
         }, null, { input: () => this.onDestAmountInput() });
         this.destAmountField = createField(TITLE_FIELD_DEST_AMOUNT, this.destAmountInp, 'amount-field');
+        this.destAmountLabel = this.destAmountField.querySelector('label');
         // Date field
         this.dateInp = ce('input', {
             type: 'text',
@@ -252,6 +255,7 @@ export class ImportTransactionItem extends Component {
 
         const selectElem = ce('select');
         this.destAccountField = createField(TITLE_FIELD_DEST_ACCOUNT, selectElem);
+        this.destAccountLabel = this.destAccountField.querySelector('label');
 
         this.destAccDropDown = DropDown.create({
             input_id: selectElem,
@@ -995,7 +999,6 @@ export class ImportTransactionItem extends Component {
         this.typeDropDown.enable(state.enabled);
         enable(this.amountInp, state.enabled);
         this.currencyDropDown.enable(state.enabled && isExpenseOrIncome);
-        this.destAccDropDown.enable(state.enabled && isTransfer);
         this.personDropDown.enable(state.enabled && isDebt);
         enable(this.destAmountInp, state.enabled && state.isDiff);
         enable(this.dateInp, state.enabled);
@@ -1012,13 +1015,29 @@ export class ImportTransactionItem extends Component {
         show(this.bottomRow, showBottom);
 
         // Second account field
+        this.destAccDropDown.enable(state.enabled && isTransfer);
         this.syncDestAccountSelect(state);
         this.destAccDropDown.selectItem(state.secondAccountId);
         show(this.destAccountField, state.secondAccountVisible);
+        if (state.secondAccountVisible) {
+            const accountLabel = (state.type === 'transferto')
+                ? TITLE_FIELD_SRC_ACCOUNT
+                : TITLE_FIELD_DEST_ACCOUNT;
+
+            this.destAccountLabel.textContent = accountLabel;
+        }
 
         // Second amount field
         this.destAmountInp.value = state.secondAmount;
         show(this.destAmountField, state.isDiff);
+        if (state.isDiff) {
+            const amountLabel = (state.type === 'transferto')
+                ? TITLE_FIELD_SRC_AMOUNT
+                : TITLE_FIELD_DEST_AMOUNT;
+
+            this.destAmountInp.placeholder = amountLabel;
+            this.destAmountLabel.textContent = amountLabel;
+        }
 
         // Person field
         this.personDropDown.selectItem(state.personId);
