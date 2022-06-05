@@ -2,6 +2,7 @@ import { copyObject } from 'jezvejs';
 import { formatDate } from 'jezvejs/DateUtils';
 import { test, assert } from 'jezve-test';
 import { App } from '../Application.js';
+import { baseUrl, goTo } from '../env.js';
 import { fixDate } from '../common.js';
 import { TransactionsView } from '../view/TransactionsView.js';
 import { MainView } from '../view/MainView.js';
@@ -20,23 +21,33 @@ async function checkNavigation() {
     await App.view.goToTransactions();
 }
 
-export async function checkInitialState() {
-    await checkNavigation();
+export async function checkInitialState(directNavigate = false) {
+    if (directNavigate) {
+        const requestURL = `${baseUrl()}transactions/`;
+
+        await goTo(requestURL);
+    } else {
+        await checkNavigation();
+    }
 
     App.view.expectedState = App.view.setExpectedState();
     await test('Initial state of transaction list view', () => App.view.checkState());
 }
 
-export async function goToNextPage() {
-    await checkNavigation();
+export async function goToNextPage(directNavigate = false) {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
 
-    await test('Navigate to next page', () => App.view.goToNextPage());
+    await test('Navigate to next page', () => App.view.goToNextPage(directNavigate));
 }
 
-export async function setDetailsMode() {
-    await checkNavigation();
+export async function setDetailsMode(directNavigate = false) {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
 
-    await test('Change list mode to details', () => App.view.setDetailsMode());
+    await test('Change list mode to details', () => App.view.setDetailsMode(directNavigate));
 }
 
 export async function toggleSelect(transactions) {
@@ -78,17 +89,21 @@ export async function toggleSelect(transactions) {
     });
 }
 
-export async function clearAllFilters() {
-    await checkNavigation();
+export async function clearAllFilters(directNavigate = false) {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
 
     await test('Clear all filters', async () => {
-        await App.view.clearAllFilters();
+        await App.view.clearAllFilters(directNavigate);
         return App.view.iteratePages();
     });
 }
 
-export async function filterByType(type) {
-    await checkNavigation();
+export async function filterByType({ type, directNavigate = false }) {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
 
     let types = Array.isArray(type) ? type : [type];
     types = types.filter((item) => availTransTypes.includes(item));
@@ -99,15 +114,17 @@ export async function filterByType(type) {
         ? `Filter by [${typeNames.join()}]`
         : 'Show all types of transactions';
     await test(descr, async () => {
-        await App.view.filterByType(type);
+        await App.view.filterByType(type, directNavigate);
         return App.view.iteratePages();
     });
 }
 
-export async function filterByAccounts(accounts) {
+export async function filterByAccounts({ accounts, directNavigate = false }) {
     const itemIds = Array.isArray(accounts) ? accounts : [accounts];
 
-    await checkNavigation();
+    if (!directNavigate) {
+        await checkNavigation();
+    }
 
     const accountNames = itemIds.map((accountId) => {
         const item = App.state.accounts.getItem(accountId);
@@ -115,46 +132,54 @@ export async function filterByAccounts(accounts) {
     });
 
     await test(`Filter by accounts [${accountNames.join()}]`, async () => {
-        await App.view.filterByAccounts(itemIds);
+        await App.view.filterByAccounts(itemIds, directNavigate);
         return App.view.iteratePages();
     });
 }
 
-export async function filterByDate({ start, end }) {
-    await checkNavigation();
+export async function filterByDate({ start, end, directNavigate = false }) {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
 
     const startDateFmt = formatDate(new Date(fixDate(start)));
     const endDateFmt = formatDate(new Date(fixDate(end)));
 
     await test(`Select date range (${startDateFmt} - ${endDateFmt})`, async () => {
-        await App.view.selectDateRange(start, end);
+        await App.view.selectDateRange(start, end, directNavigate);
         return App.view.iteratePages();
     });
 }
 
-export async function clearDateRange() {
-    await checkNavigation();
+export async function clearDateRange(directNavigate = false) {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
 
     await test('Clear date range', async () => {
-        await App.view.clearDateRange();
+        await App.view.clearDateRange(directNavigate);
         return App.view.iteratePages();
     });
 }
 
-export async function search(text) {
-    await checkNavigation();
+export async function search({ text, directNavigate = false }) {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
 
     await test(`Search (${text})`, async () => {
-        await App.view.search(text);
+        await App.view.search(text, directNavigate);
         return App.view.iteratePages();
     });
 }
 
-export async function clearSearchForm() {
-    await checkNavigation();
+export async function clearSearchForm(directNavigate = false) {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
 
     await test('Clear search form', async () => {
-        await App.view.clearSearch();
+        await App.view.clearSearch(directNavigate);
         return App.view.iteratePages();
     });
 }

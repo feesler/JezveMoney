@@ -1,4 +1,4 @@
-import { copyObject } from 'jezvejs';
+import { copyObject, urlJoin, isEmpty } from 'jezvejs';
 import { assert } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
@@ -21,6 +21,8 @@ import {
     isVisible,
     click,
     waitForFunction,
+    goTo,
+    baseUrl,
 } from '../env.js';
 
 /** List of transactions view class */
@@ -194,6 +196,42 @@ export class TransactionsView extends AppView {
         return this.setExpectedState();
     }
 
+    getExpectedURL() {
+        let res = `${baseUrl()}transactions/`;
+        const params = {};
+
+        if (this.model.filter.type.length > 0) {
+            params.type = this.model.filter.type;
+        }
+
+        if (this.model.filter.accounts.length > 0) {
+            params.acc_id = this.model.filter.accounts;
+        }
+
+        if (this.model.filter.search.length > 0) {
+            params.search = this.model.filter.search;
+        }
+
+        if (this.model.filter.startDate && this.model.filter.endDate) {
+            params.stdate = this.model.filter.startDate;
+            params.enddate = this.model.filter.endDate;
+        }
+
+        if (this.model.list.page !== 0) {
+            params.page = this.model.list.page;
+        }
+
+        if (this.model.detailsMode) {
+            params.mode = 'details';
+        }
+
+        if (!isEmpty(params)) {
+            res += `?${urlJoin(params)}`;
+        }
+
+        return res;
+    }
+
     setModelPage(model, page) {
         if (page < 1 || page > model.list.pages) {
             throw new Error(`Invalid page number ${page}`);
@@ -248,16 +286,20 @@ export class TransactionsView extends AppView {
         return res;
     }
 
-    async filterByAccounts(accounts) {
+    async filterByAccounts(accounts, directNavigate = false) {
         this.model.filter.accounts = accounts;
         const expected = this.onFilterUpdate();
 
-        await this.waitForList(() => this.content.accDropDown.setSelection(accounts));
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.accDropDown.setSelection(accounts));
+        }
 
-        return this.checkState(expected);
+        return App.view.checkState(expected);
     }
 
-    async selectDateRange(start, end) {
+    async selectDateRange(start, end, directNavigate = false) {
         this.model.filter.startDate = start;
         this.model.filter.endDate = end;
         const expected = this.onFilterUpdate();
@@ -265,40 +307,56 @@ export class TransactionsView extends AppView {
         const startDate = new Date(fixDate(start));
         const endDate = new Date(fixDate(end));
 
-        await this.waitForList(() => this.content.dateFilter.selectRange(startDate, endDate));
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.dateFilter.selectRange(startDate, endDate));
+        }
 
-        return this.checkState(expected);
+        return App.view.checkState(expected);
     }
 
-    async clearDateRange() {
+    async clearDateRange(directNavigate = false) {
         this.model.filter.startDate = null;
         this.model.filter.endDate = null;
         const expected = this.onFilterUpdate();
 
-        await this.waitForList(() => this.content.dateFilter.clear());
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.dateFilter.clear());
+        }
 
-        return this.checkState(expected);
+        return App.view.checkState(expected);
     }
 
-    async search(text) {
+    async search(text, directNavigate = false) {
         this.model.filter.search = text;
         const expected = this.onFilterUpdate();
 
-        await this.waitForList(() => this.content.searchForm.search(text));
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.searchForm.search(text));
+        }
 
-        return this.checkState(expected);
+        return App.view.checkState(expected);
     }
 
-    async clearSearch() {
+    async clearSearch(directNavigate = false) {
         this.model.filter.search = '';
         const expected = this.onFilterUpdate();
 
-        await this.waitForList(() => this.content.searchForm.clear());
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.searchForm.clear());
+        }
 
-        return this.checkState(expected);
+        return App.view.checkState(expected);
     }
 
-    async setClassicMode() {
+    async setClassicMode(directNavigate = false) {
         if (!this.content.modeSelector) {
             return false;
         }
@@ -309,12 +367,16 @@ export class TransactionsView extends AppView {
         this.model.detailsMode = false;
         const expected = this.setExpectedState();
 
-        await this.waitForList(() => this.content.modeSelector.setClassicMode());
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.modeSelector.setClassicMode());
+        }
 
         return App.view.checkState(expected);
     }
 
-    async setDetailsMode() {
+    async setDetailsMode(directNavigate = false) {
         if (!this.content.modeSelector) {
             return false;
         }
@@ -325,7 +387,11 @@ export class TransactionsView extends AppView {
         this.model.detailsMode = true;
         const expected = this.setExpectedState();
 
-        await this.waitForList(() => this.content.modeSelector.setDetailsMode());
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.modeSelector.setDetailsMode());
+        }
 
         return App.view.checkState(expected);
     }
@@ -369,52 +435,68 @@ export class TransactionsView extends AppView {
         });
     }
 
-    async goToFirstPage() {
+    async goToFirstPage(directNavigate = false) {
         if (this.isFirstPage()) {
             return this;
         }
 
         const expected = this.onPageChanged(1);
 
-        await this.waitForList(() => this.content.paginator.goToFirstPage());
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.paginator.goToFirstPage());
+        }
 
-        return this.checkState(expected);
+        return App.view.checkState(expected);
     }
 
-    async goToLastPage() {
+    async goToLastPage(directNavigate = false) {
         if (this.isLastPage()) {
             return true;
         }
 
         const expected = this.onPageChanged(this.pagesCount());
 
-        await this.waitForList(() => this.content.paginator.goToLastPage());
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.paginator.goToLastPage());
+        }
 
-        return this.checkState(expected);
+        return App.view.checkState(expected);
     }
 
-    async goToPrevPage() {
+    async goToPrevPage(directNavigate = false) {
         if (this.isFirstPage()) {
             throw new Error('Can\'t go to previous page');
         }
 
         const expected = this.onPageChanged(this.currentPage() - 1);
 
-        await this.waitForList(() => this.content.paginator.goToPrevPage());
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.paginator.goToPrevPage());
+        }
 
-        return this.checkState(expected);
+        return App.view.checkState(expected);
     }
 
-    async goToNextPage() {
+    async goToNextPage(directNavigate = false) {
         if (this.isLastPage()) {
             throw new Error('Can\'t go to next page');
         }
 
         const expected = this.onPageChanged(this.currentPage() + 1);
 
-        await this.waitForList(() => this.content.paginator.goToNextPage());
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.paginator.goToNextPage());
+        }
 
-        return this.checkState(expected);
+        return App.view.checkState(expected);
     }
 
     async iteratePages() {
@@ -457,7 +539,7 @@ export class TransactionsView extends AppView {
         return res;
     }
 
-    async clearAllFilters() {
+    async clearAllFilters(directNavigate = false) {
         this.model.filter = {
             type: [],
             accounts: [],
@@ -465,12 +547,16 @@ export class TransactionsView extends AppView {
         };
         const expected = this.onFilterUpdate();
 
-        await this.waitForList(() => click(this.content.clearAllBtn.elem));
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => click(this.content.clearAllBtn.elem));
+        }
 
-        return this.checkState(expected);
+        return App.view.checkState(expected);
     }
 
-    async filterByType(type) {
+    async filterByType(type, directNavigate = false) {
         const newTypeSel = Array.isArray(type) ? type : [type];
         newTypeSel.sort();
 
@@ -481,7 +567,9 @@ export class TransactionsView extends AppView {
         this.model.filter.type = newTypeSel;
         const expected = this.onFilterUpdate();
 
-        if (newTypeSel.length === 1) {
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else if (newTypeSel.length === 1) {
             await this.waitForList(() => App.view.content.typeMenu.select(newTypeSel[0]));
         } else {
             await this.waitForList(() => App.view.content.typeMenu.select(0));
@@ -490,7 +578,7 @@ export class TransactionsView extends AppView {
             }
         }
 
-        return this.checkState(expected);
+        return App.view.checkState(expected);
     }
 
     /** Click on add button */
