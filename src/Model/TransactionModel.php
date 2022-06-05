@@ -1027,6 +1027,116 @@ class TransactionModel extends CachedTable
         return "type" . $setCond;
     }
 
+    // Convert request object to transaction request parameters
+    public function getRequestFilters($request, $defaults = [], $throw = false)
+    {
+        $res = $defaults;
+
+        // Type filter
+        $typeFilter = [];
+        if (isset($request["type"])) {
+            $typeReq = $request["type"];
+            if (!is_array($typeReq)) {
+                $typeReq = [$typeReq];
+            }
+
+            foreach ($typeReq as $type_str) {
+                $type_id = intval($type_str);
+                if (!$type_id) {
+                    $type_id = self::stringToType($type_str);
+                }
+                if (is_null($type_id) && $throw) {
+                    throw new \Error("Invalid type '$type_str'");
+                }
+                if ($type_id) {
+                    $typeFilter[] = $type_id;
+                }
+            }
+            if (count($typeFilter) > 0) {
+                $res["type"] = $typeFilter;
+            }
+        }
+
+        // Accounts filter
+        $accFilter = [];
+        if (isset($request["acc_id"])) {
+            $accountsReq = $request["acc_id"];
+            if (!is_array($accountsReq)) {
+                $accountsReq = [$accountsReq];
+            }
+            foreach ($accountsReq as $acc_id) {
+                if ($this->accModel->isExist($acc_id)) {
+                    $accFilter[] = intval($acc_id);
+                } elseif ($throw) {
+                    throw new \Error("Invalid account '$acc_id'");
+                }
+            }
+            if (count($accFilter) > 0) {
+                $res["accounts"] = $accFilter;
+            }
+        }
+
+        // Search query
+        if (isset($request["search"]) && !is_null($request["search"])) {
+            $res["search"] = $request["search"];
+        }
+
+        // Date range filter
+        $stDate = (isset($_GET["stdate"]) ? $_GET["stdate"] : null);
+        $endDate = (isset($_GET["enddate"]) ? $_GET["enddate"] : null);
+        if (!is_null($stDate) && !is_null($endDate)) {
+            $res["startDate"] = $stDate;
+            $res["endDate"] = $endDate;
+        }
+
+        // Page
+        if (isset($request["page"])) {
+            $page = intval($request["page"]);
+            if ($page > 1) {
+                $res["page"] = $page - 1;
+            }
+        }
+
+        return $res;
+    }
+
+    // Conver filter parameters to filter object
+    public function getFilterObject($params)
+    {
+        $res = [];
+
+        // Type
+        if (
+            isset($params["type"]) &&
+            is_array($params["type"]) &&
+            count($params["type"]) > 0
+        ) {
+            $res["type"] = $params["type"];
+        }
+
+        // Accounts
+        if (
+            isset($params["accounts"]) &&
+            is_array($params["accounts"]) &&
+            count($params["accounts"]) > 0
+        ) {
+            $res["acc_id"] = $params["accounts"];
+        }
+
+        // Date range
+        if (isset($params["startDate"]) && $params["endDate"]) {
+            $res["stdate"] = $params["startDate"];
+            $res["enddate"] = $params["endDate"];
+        }
+
+        // Search query
+        if (isset($params["search"])) {
+            $res["search"] = $params["search"];
+        }
+
+        return $res;
+    }
+
 
     // Returns array of DB conditions
     private function getDBCondition($params = null)

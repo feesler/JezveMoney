@@ -69,42 +69,16 @@ class Transaction extends ApiController
 
     public function getList()
     {
-        $accMod = AccountModel::getInstance();
-
-        $params = [
+        $defaultParams = [
             "onPage" => 10,
             "page" => 0
         ];
 
         $res = new \stdClass();
-        $res->filter = [];
+        $params = $this->model->getRequestFilters($_GET, $defaultParams, true);
+        $res->filter = $this->model->getFilterObject($params);
 
-        // Obtain requested transaction type filter
-        $typeFilter = [];
-        if (isset($_GET["type"])) {
-            $typeReq = $_GET["type"];
-            if (!is_array($typeReq)) {
-                $typeReq = [$typeReq];
-            }
-
-            foreach ($typeReq as $type_str) {
-                $type_id = intval($type_str);
-                if (!$type_id) {
-                    $type_id = TransactionModel::stringToType($type_str);
-                }
-                if (is_null($type_id)) {
-                    throw new \Error("Invalid type '$type_str'");
-                }
-
-                if ($type_id) {
-                    $typeFilter[] = $type_id;
-                }
-            }
-            if (count($typeFilter) > 0) {
-                $params["type"] = $res->filter["type"] = $typeFilter;
-            }
-        }
-
+        // Order request is available only from API
         if (
             isset($_GET["order"]) &&
             is_string($_GET["order"]) &&
@@ -118,39 +92,6 @@ class Transaction extends ApiController
 
         if (isset($_GET["count"]) && is_numeric($_GET["count"])) {
             $params["onPage"] = intval($_GET["count"]);
-        }
-
-        if (isset($_GET["page"]) && is_numeric($_GET["page"])) {
-            $params["page"] = intval($_GET["page"]) - 1;
-        }
-
-        // Prepare array of requested accounts filter
-        $accFilter = [];
-        if (isset($_GET["acc_id"])) {
-            $accountsReq = $_GET["acc_id"];
-            if (!is_array($accountsReq)) {
-                $accountsReq = [$accountsReq];
-            }
-            foreach ($accountsReq as $acc_id) {
-                if (!$accMod->isExist($acc_id)) {
-                    throw new \Error("Invalid account '$acc_id'");
-                }
-
-                $accFilter[] = intval($acc_id);
-            }
-
-            if (count($accFilter) > 0) {
-                $params["accounts"] = $res->filter["acc_id"] = $accFilter;
-            }
-        }
-
-        if (isset($_GET["search"])) {
-            $params["search"] = $res->filter["search"] = $_GET["search"];
-        }
-
-        if (isset($_GET["stdate"]) && isset($_GET["enddate"])) {
-            $params["startDate"] = $res->filter["stdate"] = $_GET["stdate"];
-            $params["endDate"] = $res->filter["enddate"] = $_GET["enddate"];
         }
 
         $items = $this->model->getData($params);
