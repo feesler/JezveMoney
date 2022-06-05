@@ -1,4 +1,4 @@
-import * as ImportTests from '../../run/import.js';
+import * as ImportTests from '../../run/import/index.js';
 import { setBlock } from '../../env.js';
 
 let scenario = null;

@@ -9,7 +9,7 @@ import { personTests } from './person.js';
 import { transactionTests } from './transaction.js';
 import { importTests } from './import.js';
 
-import * as ApiTests from '../run/api.js';
+import * as ApiTests from '../run/api/index.js';
 import * as ProfileTests from '../run/profile.js';
 import * as StatisticsTests from '../run/statistics.js';
 

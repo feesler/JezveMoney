@@ -1,5 +1,5 @@
 import { test } from 'jezve-test';
-import * as TransactionTests from './common.js';
+import * as TransactionTests from './index.js';
 import { TRANSFER } from '../../model/Transaction.js';
 import { App } from '../../Application.js';
 import { setBlock } from '../../env.js';

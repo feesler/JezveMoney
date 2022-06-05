@@ -20,7 +20,7 @@ import {
     IMPORT_ACTION_SET_COMMENT,
 } from '../model/ImportAction.js';
 import { api } from '../model/api.js';
-import * as ApiTests from '../run/api.js';
+import * as ApiTests from '../run/api/index.js';
 import * as AccountApiTests from '../run/api/account.js';
 import * as PersonApiTests from '../run/api/person.js';
 import * as TransactionApiTests from '../run/api/transaction.js';

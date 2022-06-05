@@ -5,7 +5,7 @@ import {
     DEBT,
 } from '../model/Transaction.js';
 import { api } from '../model/api.js';
-import * as TransactionTests from '../run/transaction/common.js';
+import * as TransactionTests from '../run/transaction/index.js';
 import * as ExpenseTransactionTests from '../run/transaction/expense.js';
 import * as IncomeTransactionTests from '../run/transaction/income.js';
 import * as TransferTransactionTests from '../run/transaction/transfer.js';
