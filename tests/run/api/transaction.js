@@ -50,10 +50,67 @@ export async function create(params) {
     return transactionId;
 }
 
+/**
+ * Create multiple transaction with specified params and check expected state of app
+ */
+export async function createMultiple(params) {
+    let ids = [];
+
+    await test('Create multiple transactions', async () => {
+        let expectedResult = false;
+        if (Array.isArray(params)) {
+            expectedResult = [];
+            for (const trParam of params) {
+                const resExpected = App.state.createTransaction(trParam);
+                if (!resExpected) {
+                    App.state.deleteTransactions(expectedResult);
+                    expectedResult = false;
+                    break;
+                }
+
+                expectedResult.push(resExpected);
+            }
+        }
+
+        // Send API sequest to server
+        let createRes;
+        try {
+            createRes = await api.transaction.createMultiple(params);
+            if (expectedResult && (!createRes || !createRes.ids)) {
+                return false;
+            }
+        } catch (e) {
+            if (!(e instanceof ApiRequestError) || expectedResult) {
+                throw e;
+            }
+        }
+
+        ids = (createRes) ? createRes.ids : expectedResult;
+
+        return App.state.fetchAndTest();
+    });
+
+    return ids;
+}
+
 export async function extractAndCreate(data) {
     const extracted = Transaction.extract(data, App.state);
 
     return create(extracted);
+}
+
+export async function extractAndCreateMultiple(data) {
+    const extracted = Array.isArray(data)
+        ? data.map((item) => {
+            try {
+                return Transaction.extract(item, App.state)
+            } catch (e) {
+                return null;
+            }
+        })
+        : data;
+
+    return createMultiple(extracted);
 }
 
 /**

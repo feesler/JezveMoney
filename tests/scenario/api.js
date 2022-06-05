@@ -532,6 +532,67 @@ async function apiCreateTransactions() {
     await scenario.runner.runGroup(TransactionApiTests.create, invData);
 }
 
+async function apiCreateMultipleTransactions() {
+    setBlock('Create multiple', 3);
+
+    const { RUB, EUR } = scenario;
+
+    const data = [{
+        type: EXPENSE,
+        src_id: scenario.ACC_RUB,
+        src_amount: 7608,
+        dest_amount: 100,
+        dest_curr: EUR,
+        date: App.dates.yesterday,
+        comment: 'multiple expense',
+    }, {
+        type: INCOME,
+        dest_id: scenario.ACC_USD,
+        src_amount: 6500,
+        dest_amount: 100,
+        src_curr: RUB,
+        comment: 'multiple income',
+    }, {
+        type: TRANSFER,
+        src_id: scenario.ACC_RUB,
+        dest_id: scenario.CASH_RUB,
+        src_amount: 500,
+        dest_amount: 500,
+        comment: 'multiple transfer',
+    }, {
+        type: DEBT,
+        op: 1,
+        person_id: scenario.PERSON_X,
+        acc_id: 0,
+        src_amount: 500,
+        src_curr: RUB,
+        comment: 'multiple debt',
+    }];
+
+    await TransactionApiTests.extractAndCreateMultiple(data);
+
+    const invData = [
+        null,
+        [null],
+        [null, null],
+        [{
+            type: EXPENSE,
+            src_id: 0,
+            src_amount: 100,
+        }, {
+            type: EXPENSE,
+            src_id: scenario.ACC_RUB,
+            src_amount: 100,
+        }],
+        [{
+            type: EXPENSE,
+            src_id: scenario.ACC_RUB,
+            src_amount: 100,
+        }, null],
+    ];
+    await scenario.runner.runGroup(TransactionApiTests.extractAndCreateMultiple, invData);
+}
+
 async function apiUpdateTransactions() {
     setBlock('Update', 3);
 
@@ -1134,6 +1195,7 @@ export const apiTests = {
         await apiCreateAccounts();
         await apiCreatePersons();
         await apiCreateTransactions();
+        await apiCreateMultipleTransactions();
 
         await apiSecurityTests();
 
