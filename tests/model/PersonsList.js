@@ -1,8 +1,6 @@
-import { copyObject } from 'jezve-test';
+import { copyObject, hasFlag } from 'jezve-test';
 import { List } from './List.js';
 import { api } from './api.js';
-
-/* eslint-disable no-bitwise */
 
 export const PERSON_HIDDEN = 1;
 
@@ -36,7 +34,7 @@ export class PersonsList extends List {
             throw new Error('Invalid person');
         }
 
-        return (item.flags & PERSON_HIDDEN) === PERSON_HIDDEN;
+        return hasFlag(item.flags, PERSON_HIDDEN);
     }
 
     getVisible(returnRaw = false) {

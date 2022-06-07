@@ -1,4 +1,10 @@
-import { copyObject, TestComponent, assert } from 'jezve-test';
+import {
+    copyObject,
+    TestComponent,
+    assert,
+    hasFlag,
+} from 'jezve-test';
+import { IMPORT_COND_OP_FIELD_FLAG } from '../../../model/ImportCondition.js';
 import { ImportRuleForm } from './ImportRuleForm.js';
 import { ImportRuleItem } from './ImportRuleItem.js';
 import { asyncMap } from '../../../common.js';
@@ -13,8 +19,6 @@ import {
     wait,
     waitForFunction,
 } from '../../../env.js';
-
-/* eslint-disable no-bitwise */
 
 export class ImportRulesDialog extends TestComponent {
     async parseContent() {
@@ -181,7 +185,7 @@ export class ImportRulesDialog extends TestComponent {
             fieldType: item.field_id,
             operator: item.operator,
             value: item.value,
-            isFieldValue: (item.flags & 1) === 1,
+            isFieldValue: hasFlag(item.flags, IMPORT_COND_OP_FIELD_FLAG),
         }));
         const ruleActions = ruleItem.actions.map((item) => ({
             actionType: item.action_id,

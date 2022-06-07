@@ -6,11 +6,10 @@ import {
     ajax,
     selectByValue,
     urlJoin,
+    hasFlag,
 } from 'jezvejs';
 import { AdminListView } from '../../js/AdminListView.js';
 import { List } from '../../../../view/js/model/List.js';
-
-/* eslint no-bitwise: "off" */
 
 export const IMPORT_COND_OP_FIELD_FLAG = 0x01;
 
@@ -102,7 +101,7 @@ export class AdminImportConditionListView extends AdminListView {
             throw new Error('Invalid flags value');
         }
 
-        return (flags & IMPORT_COND_OP_FIELD_FLAG) === IMPORT_COND_OP_FIELD_FLAG;
+        return hasFlag(flags, IMPORT_COND_OP_FIELD_FLAG);
     }
 
     /**
@@ -140,6 +139,7 @@ export class AdminImportConditionListView extends AdminListView {
 
         res.flags = 0;
         if (this.fieldFlagCheck.checked) {
+            /* eslint-disable-next-line no-bitwise */
             res.flags |= IMPORT_COND_OP_FIELD_FLAG;
             res.value = this.fieldValueSel.value;
         } else {

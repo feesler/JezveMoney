@@ -4,8 +4,6 @@ import {
     IMPORT_ACTION_SET_TR_TYPE,
 } from './ImportAction.js';
 
-/* eslint no-bitwise: "off" */
-
 /**
  * Import actions list class
  * @param {object[]} props - array of import action

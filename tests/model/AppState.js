@@ -26,8 +26,6 @@ import { TransactionsList } from './TransactionsList.js';
 import { ImportRuleList } from './ImportRuleList.js';
 import { api } from './api.js';
 
-/* eslint-disable no-bitwise */
-
 /**
  * Accounts
  */
@@ -325,6 +323,7 @@ export class AppState {
         return true;
     }
 
+    /* eslint-disable no-bitwise */
     showAccounts(ids, show = true) {
         const itemIds = Array.isArray(ids) ? ids : [ids];
 
@@ -345,6 +344,7 @@ export class AppState {
 
         return true;
     }
+    /* eslint-enable no-bitwise */
 
     resetAccounts() {
         this.deleteAccounts(this.accounts.getIds());
@@ -485,6 +485,7 @@ export class AppState {
         return true;
     }
 
+    /* eslint-disable no-bitwise */
     showPersons(ids, show = true) {
         const itemIds = Array.isArray(ids) ? ids : [ids];
         for (const personId of itemIds) {
@@ -504,6 +505,7 @@ export class AppState {
 
         return true;
     }
+    /* eslint-enable no-bitwise */
 
     getPersonAccount(personId, currencyId) {
         const pId = parseInt(personId, 10);

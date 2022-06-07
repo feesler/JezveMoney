@@ -9,8 +9,6 @@ import {
 import { AdminListView } from '../../js/AdminListView.js';
 import { List } from '../../../../view/js/model/List.js';
 
-/* eslint no-bitwise: "off" */
-
 /**
  * Admin import rule list view
  */

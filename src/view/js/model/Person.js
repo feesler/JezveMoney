@@ -1,6 +1,5 @@
+import { hasFlag } from 'jezvejs';
 import { ListItem } from './ListItem.js';
-
-/* eslint no-bitwise: "off" */
 
 /** Person flags */
 export const PERSON_HIDDEN = 1;
@@ -28,6 +27,6 @@ export class Person extends ListItem {
             throw new Error('Invalid person');
         }
 
-        return (this.flags & PERSON_HIDDEN) === 0;
+        return !hasFlag(this.flags, PERSON_HIDDEN);
     }
 }

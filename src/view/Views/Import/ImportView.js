@@ -25,7 +25,6 @@ import { ImportUploadDialog } from '../../Components/ImportUploadDialog/ImportUp
 import { ImportRulesDialog } from '../../Components/ImportRulesDialog/ImportRulesDialog.js';
 import { ImportTransactionItem } from '../../Components/ImportTransactionItem/ImportTransactionItem.js';
 
-/* eslint no-bitwise: "off" */
 const SUBMIT_LIMIT = 100;
 /** Messages */
 const MSG_IMPORT_SUCCESS = 'All transactions have been successfully imported';

@@ -103,7 +103,7 @@ export async function extractAndCreateMultiple(data) {
     const extracted = Array.isArray(data)
         ? data.map((item) => {
             try {
-                return Transaction.extract(item, App.state)
+                return Transaction.extract(item, App.state);
             } catch (e) {
                 return null;
             }

@@ -13,8 +13,6 @@ import '../../../../view/css/app.css';
 import '../../css/admin.css';
 import './style.css';
 
-/* eslint no-bitwise: "off" */
-
 /**
  * Admin import rule list view
  */
