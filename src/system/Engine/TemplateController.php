@@ -79,6 +79,13 @@ abstract class TemplateController extends Controller
         }
         $data["viewData"]["baseURL"] = BASEURL;
         $data["viewData"]["themes"] = (object)$this->template->themes;
+
+        // Check message
+        $message = Message::check();
+        if (!is_null($message)) {
+            $data["viewData"]["message"] = $message;
+        }
+
         $data["viewData"] = JSON::encode($data["viewData"]);
 
         echo $this->template->render($data);
