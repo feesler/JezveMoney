@@ -23,7 +23,7 @@ import {
     prop,
     click,
     input,
-    onChange,
+    check,
     isVisible,
 } from '../../../env.js';
 
@@ -460,8 +460,7 @@ export class ImportListItem extends TestComponent {
         this.model.enabled = !this.model.enabled;
         this.expectedState = this.getExpectedState(this.model);
 
-        await click(this.content.enableCheck);
-        await onChange(this.content.enableCheck);
+        await check(this.content.enableCheck);
         await this.parse();
 
         return this.checkState();

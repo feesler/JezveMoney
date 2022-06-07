@@ -18,7 +18,7 @@ import {
     prop,
     click,
     input,
-    onChange,
+    check,
     isVisible,
 } from '../../../env.js';
 
@@ -270,8 +270,7 @@ export class ImportConditionForm extends TestComponent {
         this.model.value = ImportConditionForm.getStateValue(this.model);
         this.expectedState = ImportConditionForm.getExpectedState(this.model);
 
-        await click(this.content.fieldValueCheck.elem);
-        await onChange(this.content.fieldValueCheck.elem);
+        await check(this.content.fieldValueCheck.elem);
         await this.parse();
 
         return this.checkState();
