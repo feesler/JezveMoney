@@ -1,5 +1,6 @@
 import 'jezvejs/style';
 import { ge, ce } from 'jezvejs';
+import { Application } from '../../../../view/js/Application.js';
 import { AdminListView } from '../../js/AdminListView.js';
 import '../../../../view/css/app.css';
 import '../../css/admin.css';
@@ -66,4 +67,5 @@ class AdminCurrencyListView extends AdminListView {
     }
 }
 
-window.view = new AdminCurrencyListView(window.app);
+window.app = new Application(window.appProps);
+window.app.createView(AdminCurrencyListView);

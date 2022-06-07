@@ -36,22 +36,9 @@ export class ImportRulesDialog extends Component {
         if (
             !this.parent
             || !this.props
-            || !this.props.tplModel
-            || !this.props.currencyModel
-            || !this.props.accountModel
-            || !this.props.personModel
-            || !this.props.rulesModel
         ) {
             throw new Error('Invalid props');
         }
-
-        this.model = {
-            template: this.props.tplModel,
-            currency: this.props.currencyModel,
-            accounts: this.props.accountModel,
-            persons: this.props.personModel,
-            rules: this.props.rulesModel,
-        };
 
         this.LIST_STATE = 1;
         this.CREATE_STATE = 2;
@@ -141,7 +128,7 @@ export class ImportRulesDialog extends Component {
 
     /** Set update rule state */
     setUpdateRuleState(ruleId) {
-        const item = this.model.rules.getItem(ruleId);
+        const item = window.app.model.rules.getItem(ruleId);
         if (!item) {
             throw new Error('Rule not found');
         }
@@ -272,7 +259,7 @@ export class ImportRulesDialog extends Component {
                 throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : MSG_RULE_LIST_REQUEST_FAIL);
             }
 
-            this.model.rules.setData(jsondata.data);
+            window.app.model.rules.setData(jsondata.data);
             this.state.id = this.LIST_STATE;
             delete this.state.rule;
             this.stopLoading();
@@ -285,14 +272,10 @@ export class ImportRulesDialog extends Component {
 
     /** Render list state of component */
     renderList(state) {
-        const ruleItems = this.model.rules.map((rule) => (
+        const ruleItems = window.app.model.rules.map((rule) => (
             new ImportRuleItem({
                 parent: this.parent,
                 data: rule,
-                tplModel: this.model.template,
-                currencyModel: this.model.currency,
-                accountModel: this.model.accounts,
-                personModel: this.model.persons,
                 update: (ruleId) => this.onUpdateItem(ruleId),
                 remove: (ruleId) => this.onDeleteItem(ruleId),
             })
@@ -324,10 +307,6 @@ export class ImportRulesDialog extends Component {
         this.formContainer = new ImportRuleForm({
             parent: this.parent,
             data: state.rule,
-            tplModel: this.model.template,
-            currencyModel: this.model.currency,
-            accountModel: this.model.accounts,
-            personModel: this.model.persons,
             submit: (data) => this.onSubmitItem(data),
             cancel: () => this.onCancelItem(),
         });

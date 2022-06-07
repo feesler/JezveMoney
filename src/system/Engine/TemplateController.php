@@ -74,19 +74,19 @@ abstract class TemplateController extends Controller
 
         $this->setupThemes();
 
-        if (!isset($data["viewData"])) {
-            $data["viewData"] = [];
+        if (!isset($data["appProps"])) {
+            $data["appProps"] = [];
         }
-        $data["viewData"]["baseURL"] = BASEURL;
-        $data["viewData"]["themes"] = (object)$this->template->themes;
+        $data["appProps"]["baseURL"] = BASEURL;
+        $data["appProps"]["themes"] = (object)$this->template->themes;
 
         // Check message
         $message = Message::check();
         if (!is_null($message)) {
-            $data["viewData"]["message"] = $message;
+            $data["appProps"]["message"] = $message;
         }
 
-        $data["viewData"] = JSON::encode($data["viewData"]);
+        $data["appProps"] = JSON::encode($data["appProps"]);
 
         echo $this->template->render($data);
     }

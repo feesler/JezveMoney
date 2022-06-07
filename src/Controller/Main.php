@@ -88,8 +88,10 @@ class Main extends TemplateController
 
         $data["statArr"] = $transMod->getHistogramSeries($byCurrency, $curr_acc_id, EXPENSE, $groupType_id, 5);
 
-        $data["viewData"] = [
-            "chartData" => $data["statArr"]
+        $data["appProps"] = [
+            "view" => [
+                "chartData" => $data["statArr"]
+            ]
         ];
 
         $this->cssArr[] = "MainView.css";

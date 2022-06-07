@@ -1,5 +1,5 @@
 <script>
-    window.app = <?=(isset($viewData) ? $viewData : "{}")?>;
+    window.appProps = <?=(isset($appProps) ? $appProps : "{}")?>;
 </script>
 <?php	foreach($this->jsArr as $jsFile) {	?>
 <script type="text/javascript" src="<?=e(BASEURL.auto_version("view/js/".$jsFile))?>"></script>

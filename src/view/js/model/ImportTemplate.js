@@ -151,7 +151,8 @@ export class ImportTemplate extends ListItem {
     }
 
     /** Apply import template to specified data row */
-    applyTo(data, currencyModel, mainAccount) {
+    applyTo(data, mainAccount) {
+        const currencyModel = window.app.model.currency;
         const res = {
             accountAmount: this.getAccountAmount(data),
             accountCurrency: this.getAccountCurrency(data),

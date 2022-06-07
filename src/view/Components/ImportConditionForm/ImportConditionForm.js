@@ -41,10 +41,6 @@ export class ImportConditionForm extends Component {
             !this.parent
             || !this.props
             || !this.props.data
-            || !this.props.tplModel
-            || !this.props.currencyModel
-            || !this.props.accountModel
-            || !this.props.personModel
         ) {
             throw new Error('Invalid props');
         }
@@ -55,13 +51,6 @@ export class ImportConditionForm extends Component {
 
         this.updateHandler = this.props.update;
         this.deleteHandler = this.props.remove;
-
-        this.model = {
-            template: this.props.tplModel,
-            currency: this.props.currencyModel,
-            accounts: this.props.accountModel,
-            persons: this.props.personModel,
-        };
 
         if (!(this.props.data instanceof ImportCondition)) {
             throw new Error('Invalid condition item');
@@ -190,7 +179,7 @@ export class ImportConditionForm extends Component {
 
     /** Create account field */
     createAccountField() {
-        const accountItems = this.model.accounts.map(
+        const accountItems = window.app.model.accounts.map(
             (account) => ({ id: account.id, title: account.name }),
         );
 
@@ -208,7 +197,7 @@ export class ImportConditionForm extends Component {
 
     /** Create template field */
     createTemplateField() {
-        const templateItems = this.model.template.map(
+        const templateItems = window.app.model.templates.map(
             (template) => ({ id: template.id, title: template.name }),
         );
 
@@ -228,7 +217,7 @@ export class ImportConditionForm extends Component {
 
     /** Create currency field */
     createCurrencyField() {
-        const currencyItems = this.model.currency.map(
+        const currencyItems = window.app.model.currency.map(
             (currency) => ({ id: currency.id, title: currency.name }),
         );
 

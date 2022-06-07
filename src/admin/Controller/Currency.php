@@ -26,8 +26,10 @@ class Currency extends AdminController
 
         $itemsData = $this->model->getData();
         $data["itemsData"] = $itemsData;
-        $data["viewData"] = [
-            "data" => $itemsData
+        $data["appProps"] = [
+            "view" => [
+                "data" => $itemsData,
+            ],
         ];
 
         $this->menuItems["curr"]["active"] = true;

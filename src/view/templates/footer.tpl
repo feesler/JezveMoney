@@ -1,5 +1,5 @@
 <script>
-    window.app = <?=(isset($viewData) ? $viewData : "{}")?>;
+    window.appProps = <?=(isset($appProps) ? $appProps : "{}")?>;
     window.addEventListener('error', function(e) {
         if (window.parent) {
             window.parent.postMessage(e.error, '*');

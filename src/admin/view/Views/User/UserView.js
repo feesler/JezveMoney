@@ -5,6 +5,7 @@ import {
     show,
     enable,
 } from 'jezvejs';
+import { Application } from '../../../../view/js/Application.js';
 import { AdminListView } from '../../js/AdminListView.js';
 import '../../../../view/css/app.css';
 import '../../css/admin.css';
@@ -171,4 +172,5 @@ class AdminUserListView extends AdminListView {
     }
 }
 
-window.view = new AdminUserListView(window.app);
+window.app = new Application(window.appProps);
+window.app.createView(AdminUserListView);

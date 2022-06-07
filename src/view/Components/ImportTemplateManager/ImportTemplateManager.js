@@ -46,18 +46,12 @@ export class ImportTemplateManager extends Component {
             !this.parent
             || !this.props
             || !this.props.mainAccount
-            || !this.props.currencyModel
-            || !this.props.tplModel
-            || !this.props.rulesModel
         ) {
             throw new Error('Failed to initialize upload file dialog');
         }
 
         this.model = {
             mainAccount: this.props.mainAccount,
-            currency: this.props.currencyModel,
-            template: this.props.tplModel,
-            rules: this.props.rulesModel,
         };
 
         this.columnFeedback = {
@@ -166,7 +160,7 @@ export class ImportTemplateManager extends Component {
         try {
             const res = data.map(
                 (item) => (
-                    this.state.template.applyTo(item, this.model.currency, this.model.mainAccount)
+                    this.state.template.applyTo(item, this.model.mainAccount)
                 ),
             );
             return res;
@@ -204,7 +198,7 @@ export class ImportTemplateManager extends Component {
     setRawData(data) {
         this.state.rawData = copyObject(data);
 
-        if (this.model.template.length > 0) {
+        if (window.app.model.templates.length > 0) {
             this.state.id = this.RAW_DATA_STATE;
             const selectedTemplate = this.templateDropDown.getSelectionData();
             if (!selectedTemplate) {
@@ -244,7 +238,7 @@ export class ImportTemplateManager extends Component {
      * @param {number} value - import template id
      */
     setTemplate(value) {
-        const template = this.model.template.getItem(value);
+        const template = window.app.model.templates.getItem(value);
         if (template) {
             this.state.template = new ImportTemplate(template);
         } else {
@@ -394,8 +388,8 @@ export class ImportTemplateManager extends Component {
             }
 
             this.state.listLoading = false;
-            this.model.template.setData(jsondata.data);
-            if (this.model.template.length > 0) {
+            window.app.model.templates.setData(jsondata.data);
+            if (window.app.model.templates.length > 0) {
                 this.state.id = this.RAW_DATA_STATE;
                 this.renderTemplateSelect();
             } else {
@@ -433,7 +427,7 @@ export class ImportTemplateManager extends Component {
                 throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : MSG_RULES_LIST_REQUEST_FAIL);
             }
 
-            this.model.rules.setData(jsondata.data);
+            window.app.model.rules.setData(jsondata.data);
             this.parent.onUpdateRules();
         } catch (e) {
             createMessage(e.message, 'msg_error');
@@ -446,13 +440,13 @@ export class ImportTemplateManager extends Component {
 
         // Find template with same name as currently selected
         if (this.state.template) {
-            selectedTemplate = this.model.template
+            selectedTemplate = window.app.model.templates
                 .find((item) => item.name === this.state.template.name);
         }
 
         this.templateDropDown.removeAll();
 
-        const templateItems = this.model.template
+        const templateItems = window.app.model.templates
             .map((item) => ({ id: item.id, title: item.name }));
         this.templateDropDown.append(templateItems);
 
@@ -545,13 +539,13 @@ export class ImportTemplateManager extends Component {
         }
         // Account currency
         value = state.template.getProperty('accountCurrency', data, true);
-        let currency = this.model.currency.findByName(value);
+        let currency = window.app.model.currency.findByName(value);
         if (!currency) {
             return this.onInvalidPropertyValue(state, 'accountCurrency');
         }
         // Transaction currency
         value = state.template.getProperty('transactionCurrency', data, true);
-        currency = this.model.currency.findByName(value);
+        currency = window.app.model.currency.findByName(value);
         if (!currency) {
             return this.onInvalidPropertyValue(state, 'transactionCurrency');
         }
@@ -571,7 +565,7 @@ export class ImportTemplateManager extends Component {
 
     /** Render component */
     render(state) {
-        const templateAvail = (this.model.template.length > 0);
+        const templateAvail = (window.app.model.templates.length > 0);
         if (state.id === this.LOADING_STATE) {
             show(this.loadingIndicator, true);
             show(this.tableDescr, false);

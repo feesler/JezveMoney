@@ -93,9 +93,11 @@ class Balance extends AdminController
         }
         $data["transactions"] = $transactions;
 
-        $data["viewData"] = [
-            "accounts" => $accounts,
-            "filter" => $filter,
+        $data["appProps"] = [
+            "view" => [
+                "accounts" => $accounts,
+                "filter" => $filter,
+            ],
         ];
 
         $this->menuItems["balance"]["active"] = true;

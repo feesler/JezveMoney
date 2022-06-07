@@ -31,7 +31,7 @@ class Persons extends TemplateController
             ];
         }
 
-        $data["viewData"] = [
+        $data["appProps"] = [
             "persons" => $personsData
         ];
 
@@ -71,8 +71,10 @@ class Persons extends TemplateController
         $pInfo->flags = 0;
         $data["pInfo"] = $pInfo;
 
-        $data["viewData"] = [
-            "person" => $pInfo
+        $data["appProps"] = [
+            "view" => [
+                "person" => $pInfo
+            ]
         ];
 
         $this->cssArr[] = "PersonView.css";
@@ -105,8 +107,10 @@ class Persons extends TemplateController
         }
         $data["pInfo"] = $pInfo;
 
-        $data["viewData"] = [
-            "person" => $pInfo
+        $data["appProps"] = [
+            "view" => [
+                "person" => $pInfo,
+            ],
         ];
 
         $this->cssArr[] = "PersonView.css";

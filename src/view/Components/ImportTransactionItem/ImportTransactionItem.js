@@ -64,17 +64,11 @@ export class ImportTransactionItem extends Component {
             !this.parent
             || !this.props
             || !this.props.mainAccount
-            || !this.props.currencyModel
-            || !this.props.accountModel
-            || !this.props.personModel
         ) {
             throw new Error('Invalid props');
         }
 
         this.model = {
-            currency: this.props.currencyModel,
-            accounts: this.props.accountModel,
-            persons: this.props.personModel,
             mainAccount: this.props.mainAccount,
         };
 
@@ -221,8 +215,8 @@ export class ImportTransactionItem extends Component {
 
     /** Create transaction type field */
     createTypeField() {
-        const transferDisabled = this.model.accounts.length < 2;
-        const debtDisabled = !this.model.persons.length;
+        const transferDisabled = window.app.model.accounts.length < 2;
+        const debtDisabled = !window.app.model.persons.length;
         const typeItems = [
             { id: 'expense', title: 'Expense' },
             { id: 'income', title: 'Income' },
@@ -250,7 +244,7 @@ export class ImportTransactionItem extends Component {
 
     /** Create destination(second) account field */
     createAccountField() {
-        const accountItems = this.model.accounts
+        const accountItems = window.app.model.accounts
             .map((account) => ({ id: account.id, title: account.name }));
 
         const selectElem = ce('select');
@@ -270,7 +264,7 @@ export class ImportTransactionItem extends Component {
 
     /** Create person field */
     createPersonField() {
-        const personItems = this.model.persons
+        const personItems = window.app.model.persons
             .map((person) => ({ id: person.id, title: person.name }));
 
         const selectElem = ce('select');
@@ -288,7 +282,7 @@ export class ImportTransactionItem extends Component {
 
     /** Create currency field */
     createCurrencyField() {
-        const currencyItems = this.model.currency
+        const currencyItems = window.app.model.currency
             .map((currency) => ({ id: currency.id, title: currency.name }));
 
         const selectElem = ce('select');
@@ -469,7 +463,7 @@ export class ImportTransactionItem extends Component {
      * @param {Object} state - state object
      */
     getFirstAvailAccount(state) {
-        const userAccountsData = this.model.accounts
+        const userAccountsData = window.app.model.accounts
             .getUserAccounts(this.model.mainAccount.owner_id);
         const userAccounts = new AccountList(userAccountsData);
         const visibleAccounts = userAccounts.getVisible();
@@ -487,7 +481,7 @@ export class ImportTransactionItem extends Component {
      * @param {number} accountId - account id to find next account for
      */
     getNextAccount(accountId) {
-        const userAccountsData = this.model.accounts
+        const userAccountsData = window.app.model.accounts
             .getUserAccounts(this.model.mainAccount.owner_id);
         const userAccounts = new AccountList(userAccountsData);
         const visibleAccountsData = userAccounts.getVisible();
@@ -622,7 +616,7 @@ export class ImportTransactionItem extends Component {
             state.secondAccountVisible = false;
             state.personVisible = true;
             if (!state.personId) {
-                state.personId = this.model.persons.data[0].id;
+                state.personId = window.app.model.persons.data[0].id; // TODO: fix me
             }
             state.currId = state.accountCurrId;
         }
@@ -685,7 +679,7 @@ export class ImportTransactionItem extends Component {
 
     /** Set main account */
     setMainAccount(value) {
-        const account = this.model.accounts.getItem(value);
+        const account = window.app.model.accounts.getItem(value);
         if (!account) {
             throw new Error('Account not found');
         }
@@ -727,7 +721,7 @@ export class ImportTransactionItem extends Component {
 
     /** Set second account */
     setSecondAccount(value) {
-        const account = this.model.accounts.getItem(value);
+        const account = window.app.model.accounts.getItem(value);
         if (!account) {
             throw new Error('Account not found');
         }
@@ -758,7 +752,7 @@ export class ImportTransactionItem extends Component {
 
     /** Set person */
     setPerson(value) {
-        const person = this.model.persons.getItem(value);
+        const person = window.app.model.persons.getItem(value);
         if (!person) {
             throw new Error('Person not found');
         }
@@ -913,8 +907,8 @@ export class ImportTransactionItem extends Component {
     getData() {
         const { state } = this;
 
-        const secondAcc = this.model.accounts.getItem(state.secondAccountId);
-        const person = this.model.persons.getItem(state.personId);
+        const secondAcc = window.app.model.accounts.getItem(state.secondAccountId);
+        const person = window.app.model.persons.getItem(state.personId);
         const amountVal = parseFloat(fixFloat(state.amount));
         const secondAmountVal = parseFloat(fixFloat(state.secondAmount));
         const selectedCurr = parseInt(state.currId, 10);

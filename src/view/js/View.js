@@ -18,8 +18,10 @@ export class View {
     onReady() {
         this.header = Header.create();
         this.onStart();
-        if (this.props.message) {
-            createMessage(this.props.message.title, this.props.message.type);
+
+        const {message} = window.app;
+        if (message) {
+            createMessage(message.title, message.type);
         }
     }
 

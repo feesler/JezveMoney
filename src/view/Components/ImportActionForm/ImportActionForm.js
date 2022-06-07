@@ -35,9 +35,6 @@ export class ImportActionForm extends Component {
             !this.parent
             || !this.props
             || !this.props.data
-            || !this.props.currencyModel
-            || !this.props.accountModel
-            || !this.props.personModel
         ) {
             throw new Error('Invalid props');
         }
@@ -48,12 +45,6 @@ export class ImportActionForm extends Component {
 
         this.updateHandler = this.props.update;
         this.deleteHandler = this.props.remove;
-
-        this.model = {
-            currency: this.props.currencyModel,
-            accounts: this.props.accountModel,
-            persons: this.props.personModel,
-        };
 
         if (!(this.props.data instanceof ImportAction)) {
             throw new Error('Invalid action item');
@@ -136,7 +127,7 @@ export class ImportActionForm extends Component {
                 // Remove `Set person` action if no persons available
                 if (
                     type.id === IMPORT_ACTION_SET_PERSON
-                    && this.model.persons.length === 0
+                    && window.app.model.persons.length === 0
                 ) {
                     return false;
                 }
@@ -174,7 +165,7 @@ export class ImportActionForm extends Component {
 
     /** Create account field */
     createAccountField() {
-        const items = this.model.accounts.map(
+        const items = window.app.model.accounts.map(
             (account) => ({ id: account.id, title: account.name }),
         );
 
@@ -194,7 +185,9 @@ export class ImportActionForm extends Component {
 
     /** Create person field */
     createPersonField() {
-        const items = this.model.persons.map((person) => ({ id: person.id, title: person.name }));
+        const items = window.app.model.persons.map(
+            (person) => ({ id: person.id, title: person.name }),
+        );
 
         const selectElem = ce('select');
         this.personField = createField(TITLE_FIELD_PERSON, selectElem);

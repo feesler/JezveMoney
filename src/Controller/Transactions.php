@@ -191,15 +191,17 @@ class Transactions extends TemplateController
             "owner_id" => $this->owner_id,
             "name" => $this->user_name,
         ];
-        $data["viewData"] = [
+        $data["appProps"] = [
             "profile" => $profileData,
             "accounts" => $this->accModel->getData(["full" => true, "type" => "all"]),
             "persons" => $this->personMod->getData(["type" => "all"]),
             "currency" => $currArr,
-            "transArr" => $trItems,
-            "filterObj" => $filterObj,
-            "pagination" => $pagination,
-            "mode" => $showDetails ? "details" : "classic",
+            "view" => [
+                "transArr" => $trItems,
+                "filterObj" => $filterObj,
+                "pagination" => $pagination,
+                "mode" => $showDetails ? "details" : "classic",
+            ],
         ];
 
         $this->cssArr[] = "TransactionListView.css";
@@ -593,17 +595,18 @@ class Transactions extends TemplateController
         $data["headString"] = "Create transaction";
         $data["titleString"] = "Jezve Money | " . $data["headString"];
 
-        $viewData = [
-            "mode" => $this->action,
+        $data["appProps"] = [
             "profile" => $profileData,
-            "transaction" => $tr,
-            "trAvailable" => $trAvailable,
             "accounts" => $this->accModel->getData(["type" => "all", "full" => true]),
             "currency" => $this->currModel->getData(),
             "icons" => $iconModel->getData(),
             "persons" => $this->personMod->getData(["type" => "all"]),
+            "view" => [
+                "mode" => $this->action,
+                "transaction" => $tr,
+                "trAvailable" => $trAvailable,
+            ],
         ];
-        $data["viewData"] = $viewData;
 
         $this->cssArr[] = "TransactionView.css";
         $this->jsArr[] = "TransactionView.js";
@@ -897,17 +900,18 @@ class Transactions extends TemplateController
         $data["headString"] = "Edit transaction";
         $data["titleString"] = "Jezve Money | " . $data["headString"];
 
-        $viewData = [
-            "mode" => $this->action,
+        $data["appProps"] = [
             "profile" => $profileData,
-            "transaction" => $tr,
-            "trAvailable" => $trAvailable,
             "accounts" => $this->accModel->getData(["type" => "all", "full" => true]),
             "currency" => $this->currModel->getData(),
             "icons" => $iconModel->getData(),
             "persons" => $this->personMod->getData(["type" => "all"]),
+            "view" => [
+                "mode" => $this->action,
+                "transaction" => $tr,
+                "trAvailable" => $trAvailable,
+            ],
         ];
-        $data["viewData"] = $viewData;
 
         $this->cssArr[] = "TransactionView.css";
         $this->jsArr[] = "TransactionView.js";

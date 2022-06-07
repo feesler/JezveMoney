@@ -6,6 +6,7 @@ import {
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
 import { createMessage } from '../../js/app.js';
+import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import '../../css/app.css';
@@ -22,16 +23,6 @@ const MSG_PROFILE_DELETE = 'Are you sure to completely delete your profile?<br>T
  * User profile view
  */
 class ProfileView extends View {
-    constructor(...args) {
-        super(...args);
-
-        this.model = {};
-
-        if (this.props.profile) {
-            this.model.data = this.props.profile;
-        }
-    }
-
     /**
      * View initialization
      */
@@ -167,7 +158,7 @@ class ProfileView extends View {
             this.newNameInp.addEventListener('input', () => this.onNewNameInput());
         }
 
-        this.newNameInp.value = this.model.data.name;
+        this.newNameInp.value = window.app.model.profile.name;
 
         this.changeNamePopup.show();
     }
@@ -284,9 +275,9 @@ class ProfileView extends View {
         const success = (res.result === 'ok');
         if (success) {
             this.changeNamePopup.close();
-            this.model.data.name = res.data.name;
-            this.nameElem.textContent = this.model.data.name;
-            this.header.setUserName(this.model.data.name);
+            window.app.model.profile.name = res.data.name;
+            this.nameElem.textContent = window.app.model.profile.name;
+            this.header.setUserName(window.app.model.profile.name);
         }
 
         if (res.msg) {
@@ -306,7 +297,7 @@ class ProfileView extends View {
 
         if (!this.newNameInp.value
             || this.newNameInp.value.length < 1
-            || this.newNameInp.value === this.model.data.name) {
+            || this.newNameInp.value === window.app.model.profile.name) {
             this.invalidateBlock('name-inp-block');
             valid = false;
         }
@@ -363,4 +354,5 @@ class ProfileView extends View {
     }
 }
 
-window.view = new ProfileView(window.app);
+window.app = new Application(window.appProps);
+window.app.createView(ProfileView);

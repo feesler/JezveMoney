@@ -4,6 +4,7 @@ import {
     isEmpty,
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
+import { Application } from '../../../../view/js/Application.js';
 import { View } from '../../../../view/js/View.js';
 import '../../../../view/css/app.css';
 import '../../css/admin.css';
@@ -97,4 +98,5 @@ class AdminBalanceView extends View {
     }
 }
 
-window.view = new AdminBalanceView(window.app);
+window.app = new Application(window.appProps);
+window.app.createView(AdminBalanceView);

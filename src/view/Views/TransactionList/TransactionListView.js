@@ -26,14 +26,12 @@ import {
     DEBT,
     createMessage,
 } from '../../js/app.js';
+import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { CurrencyList } from '../../js/model/CurrencyList.js';
-import { AccountList } from '../../js/model/AccountList.js';
-import { PersonList } from '../../js/model/PersonList.js';
 import '../../css/app.css';
 import '../../Components/TransactionTypeMenu/style.css';
 import '../../Components/TransactionsList/style.css';
@@ -56,22 +54,9 @@ class TransactionListView extends View {
     constructor(...args) {
         super(...args);
 
-        if (!('currency' in this.props)) {
-            throw new Error('Invalid Transaction List view properties');
-        }
-
         this.model = {
             selDateRange: null,
-            currency: CurrencyList.create(this.props.currency),
         };
-
-        if (!window.app.model) {
-            window.app.model = {};
-        }
-        window.app.model.currency = CurrencyList.create(this.props.currency);
-        window.app.model.account = AccountList.create(this.props.accounts);
-        window.app.model.person = PersonList.create(this.props.persons);
-        window.app.model.profile = { ...this.props.profile };
 
         this.state = {
             items: [...this.props.transArr],
@@ -949,4 +934,5 @@ class TransactionListView extends View {
     }
 }
 
-window.view = new TransactionListView(window.app);
+window.app = new Application(window.appProps);
+window.app.createView(TransactionListView);

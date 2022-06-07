@@ -7,8 +7,7 @@ import {
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { normalize } from '../../js/app.js';
-import { CurrencyList } from '../../js/model/CurrencyList.js';
-import { IconList } from '../../js/model/IconList.js';
+import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
@@ -35,13 +34,6 @@ class AccountView extends View {
             this.model.original = this.props.account;
             this.model.data = copyObject(this.model.original);
         }
-
-        if (!window.app.model) {
-            window.app.model = {};
-        }
-
-        window.app.model.currency = CurrencyList.create(this.props.currency);
-        window.app.model.icons = IconList.create(this.props.icons);
     }
 
     /**
@@ -239,4 +231,5 @@ class AccountView extends View {
     }
 }
 
-window.view = new AccountView(window.app);
+window.app = new Application(window.appProps);
+window.app.createView(AccountView);

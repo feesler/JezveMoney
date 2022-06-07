@@ -25,8 +25,10 @@ class ImportTemplate extends AdminController
             "itemsData" => $this->model->getData(),
         ];
 
-        $data["viewData"] = [
-            "data" => $data["itemsData"],
+        $data["appProps"] = [
+            "view" => [
+                "data" => $data["itemsData"],
+            ],
         ];
 
         $this->menuItems["importtpl"]["active"] = true;

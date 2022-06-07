@@ -23,20 +23,11 @@ export class ImportUploadDialog extends Component {
             !this.parent
             || !this.props
             || !this.props.mainAccount
-            || !this.props.currencyModel
-            || !this.props.accountModel
-            || !this.props.personModel
-            || !this.props.rulesModel
-            || !this.props.tplModel
         ) {
             throw new Error('Invalid props');
         }
 
         this.model = {
-            currency: this.props.currencyModel,
-            accounts: this.props.accountModel,
-            persons: this.props.personModel,
-            rules: this.props.rulesModel,
             mainAccount: this.props.mainAccount,
         };
 
@@ -57,9 +48,6 @@ export class ImportUploadDialog extends Component {
         this.tplManager = new ImportTemplateManager({
             elem: 'templateBlock',
             parent: this.parent,
-            currencyModel: this.props.currencyModel,
-            tplModel: this.props.tplModel,
-            rulesModel: this.model.rules,
             mainAccount: this.model.mainAccount,
             templateStatus: (status) => this.onTemplateStatus(status),
         });
@@ -192,7 +180,7 @@ export class ImportUploadDialog extends Component {
         let account = null;
 
         if (selectedAccount) {
-            account = this.model.accounts.getItem(selectedAccount.id);
+            account = window.app.model.accounts.getItem(selectedAccount.id);
         }
         if (!account) {
             throw new Error('Account not found');

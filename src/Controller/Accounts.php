@@ -50,7 +50,7 @@ class Accounts extends TemplateController
             ];
         }
 
-        $data["viewData"] = [
+        $data["appProps"] = [
             "accounts" => $accountsData
         ];
 
@@ -106,10 +106,12 @@ class Accounts extends TemplateController
         $iconModel = IconModel::getInstance();
         $data["icons"] = $iconModel->getData();
 
-        $data["viewData"] = [
-            "account" => $accInfo,
+        $data["appProps"] = [
             "currency" => $data["currArr"],
-            "icons" => $data["icons"]
+            "icons" => $data["icons"],
+            "view" => [
+                "account" => $accInfo,
+            ],
         ];
 
         $this->cssArr[] = "AccountView.css";
@@ -173,10 +175,12 @@ class Accounts extends TemplateController
         $iconModel = IconModel::getInstance();
         $data["icons"] = $iconModel->getData();
 
-        $data["viewData"] = [
-            "account" => $accInfo,
+        $data["appProps"] = [
             "currency" => $data["currArr"],
-            "icons" => $data["icons"]
+            "icons" => $data["icons"],
+            "view" => [
+                "account" => $accInfo,
+            ],
         ];
 
         $this->cssArr[] = "AccountView.css";
