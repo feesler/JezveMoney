@@ -165,13 +165,15 @@ export class ImportTransactionItem extends Component {
         ]);
 
         this.bottomRow = createContainer('form-row hidden', [
-            this.destAccountField,
-            this.personField,
             this.destAmountField,
         ]);
 
         this.formContainer = createContainer('form-container', [
-            this.trTypeField,
+            createContainer('form-rows', [
+                this.trTypeField,
+                this.destAccountField,
+                this.personField,
+            ]),
             createContainer('form-rows', [
                 this.topRow,
                 this.bottomRow,
