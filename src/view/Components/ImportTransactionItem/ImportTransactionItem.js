@@ -609,6 +609,9 @@ export class ImportTransactionItem extends Component {
             state.secondAccountVisible = true;
             if (!state.secondAccountId) {
                 const secondAccount = this.getFirstAvailAccount(state);
+                if (!secondAccount) {
+                    throw new Error('Account not found');
+                }
                 state.secondAccountId = secondAccount.id;
                 state.secondAccountCurrId = secondAccount.curr_id;
             }
@@ -618,7 +621,11 @@ export class ImportTransactionItem extends Component {
             state.secondAccountVisible = false;
             state.personVisible = true;
             if (!state.personId) {
-                state.personId = window.app.model.persons.data[0].id; // TODO: fix me
+                const person = window.app.model.persons.getItemByIndex(0);
+                if (!person) {
+                    throw new Error('Person not found');
+                }
+                state.personId = person.id;
             }
             state.currId = state.accountCurrId;
         }

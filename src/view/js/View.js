@@ -19,7 +19,7 @@ export class View {
         this.header = Header.create();
         this.onStart();
 
-        const {message} = window.app;
+        const { message } = window.app;
         if (message) {
             createMessage(message.title, message.type);
         }
