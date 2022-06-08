@@ -1417,6 +1417,9 @@ const reduceTypeChange = (state, type) => {
             transaction.noAccount = false;
         }
 
+        newState.srcCurrency = currencyModel.getItem(transaction.src_curr);
+        newState.destCurrency = currencyModel.getItem(transaction.dest_curr);
+
         newState.personAccount = getPersonAccount(person.id, transaction.src_curr);
         if (transaction.debtType) {
             newState.srcAccount = newState.personAccount;
@@ -1426,6 +1429,7 @@ const reduceTypeChange = (state, type) => {
             transaction.dest_id = newState.personAccount.id;
         }
 
+        newState.isDiff = transaction.src_curr !== transaction.dest_curr;
         if (transaction.noAccount) {
             newState.id = (transaction.debtType) ? 6 : 7;
         } else {
