@@ -17,7 +17,7 @@ import { setBlock, baseUrl, goTo } from '../../env.js';
 import { formatProps, generateId } from '../../common.js';
 import * as AccountTests from '../account.js';
 
-export async function runAction({ action, data }) {
+export const runAction = async ({ action, data }) => {
     let testDescr = null;
 
     if (!(App.view instanceof TransactionView)) {
@@ -164,21 +164,21 @@ export async function runAction({ action, data }) {
     }
 
     await test(testDescr, () => App.view.runAction(action, data));
-}
+};
 
-export async function runActions(actions) {
+export const runActions = async (actions) => {
     for (const action of actions) {
         await runAction(action);
     }
-}
+};
 
-export async function runGroup(action, data) {
+export const runGroup = async (action, data) => {
     for (const item of data) {
         await runAction({ action, data: item });
     }
-}
+};
 
-export async function submit() {
+export const submit = async () => {
     const validInput = App.view.isValid();
 
     const res = (validInput) ? App.view.getExpectedTransaction() : null;
@@ -190,9 +190,9 @@ export async function submit() {
     }
 
     return res;
-}
+};
 
-export async function create(type, params, submitHandler) {
+export const create = async (type, params, submitHandler) => {
     setBlock(`Create ${Transaction.typeToString(type)} (${formatProps(params)})`, 2);
 
     // Navigate to create transaction page
@@ -217,9 +217,9 @@ export async function create(type, params, submitHandler) {
         App.view.checkState();
         return App.state.fetchAndTest();
     });
-}
+};
 
-export async function update(type, params, submitHandler) {
+export const update = async (type, params, submitHandler) => {
     if (!isObject(params)) {
         throw new Error('Parameters not specified');
     }
@@ -264,9 +264,9 @@ export async function update(type, params, submitHandler) {
         App.view.checkState();
         return App.state.fetchAndTest();
     });
-}
+};
 
-export async function del(type, transactions) {
+export const del = async (type, transactions) => {
     setBlock(`Delete transactions [${transactions.join()}]`, 3);
 
     await App.goToMainView();
@@ -330,9 +330,9 @@ export async function del(type, transactions) {
         App.view.checkState();
         return App.state.fetchAndTest();
     });
-}
+};
 
-export async function delFromUpdate(type, pos) {
+export const delFromUpdate = async (type, pos) => {
     const ind = parseInt(pos, 10);
     if (Number.isNaN(ind) || ind < 0) {
         throw new Error('Position of transaction not specified');
@@ -366,9 +366,9 @@ export async function delFromUpdate(type, pos) {
         App.view.checkState();
         return App.state.fetchAndTest();
     });
-}
+};
 
-export async function typeChangeLoop() {
+export const typeChangeLoop = async () => {
     setBlock('Change transaction type tests', 2);
 
     // Hide first account
@@ -402,10 +402,10 @@ export async function typeChangeLoop() {
     const userHiddenAccounts = App.state.accounts.getUserHidden();
     const index = userHiddenAccounts.getIndexById(account.id);
     await AccountTests.show(userVisibleAccounts.length + index);
-}
+};
 
 /** Check navigation to update not existing transaction */
-export async function securityTests() {
+export const securityTests = async () => {
     setBlock('Transaction security', 2);
 
     let transactionId;
@@ -430,10 +430,10 @@ export async function securityTests() {
 
         return true;
     });
-}
+};
 
 /** Check navigation to create transaction with hidden account */
-export async function createFromHiddenAccount({ type, accountId }) {
+export const createFromHiddenAccount = async ({ type, accountId }) => {
     const typeString = Transaction.typeToString(type);
     await test(`Create ${typeString} transaction from hidden account`, async () => {
         const userAccounts = App.state.accounts.getUserAccounts();
@@ -460,10 +460,10 @@ export async function createFromHiddenAccount({ type, accountId }) {
 
         return true;
     });
-}
+};
 
 /** Navigate to create transaction view and check form availability according to current state */
-export async function checkTransactionAvailable(type, directNavigate = false) {
+export const checkTransactionAvailable = async (type, directNavigate = false) => {
     await test(`${Transaction.typeToString(type)} transaction availability`, async () => {
         if (directNavigate) {
             const requestURL = `${baseUrl()}transactions/create/?type=${type}`;
@@ -509,4 +509,4 @@ export async function checkTransactionAvailable(type, directNavigate = false) {
 
         return true;
     });
-}
+};

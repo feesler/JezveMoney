@@ -20,7 +20,7 @@ import { App } from '../../Application.js';
  * @param {string} params.date - date of transaction
  * @param {string} params.comment - comment
  */
-export async function create(params) {
+export const create = async (params) => {
     let transactionId = 0;
 
     const titleParams = copyObject(params);
@@ -48,12 +48,12 @@ export async function create(params) {
     });
 
     return transactionId;
-}
+};
 
 /**
  * Create multiple transaction with specified params and check expected state of app
  */
-export async function createMultiple(params) {
+export const createMultiple = async (params) => {
     let ids = [];
 
     await test('Create multiple transactions', async () => {
@@ -91,15 +91,15 @@ export async function createMultiple(params) {
     });
 
     return ids;
-}
+};
 
-export async function extractAndCreate(data) {
+export const extractAndCreate = async (data) => {
     const extracted = Transaction.extract(data, App.state);
 
     return create(extracted);
-}
+};
 
-export async function extractAndCreateMultiple(data) {
+export const extractAndCreateMultiple = async (data) => {
     const extracted = Array.isArray(data)
         ? data.map((item) => {
             try {
@@ -111,7 +111,7 @@ export async function extractAndCreateMultiple(data) {
         : data;
 
     return createMultiple(extracted);
-}
+};
 
 /**
  * Update transaction with specified params and check expected state of app
@@ -126,7 +126,7 @@ export async function extractAndCreateMultiple(data) {
  * @param {string} params.date - date of transaction
  * @param {string} params.comment - comment
  */
-export async function update(params) {
+export const update = async (params) => {
     let updateRes;
 
     await test(`Update transaction (${formatProps(params)})`, async () => {
@@ -159,13 +159,13 @@ export async function update(params) {
     });
 
     return updateRes;
-}
+};
 
 /**
  * Delete specified transaction(s) and check expected state of app
  * @param {number[]} ids - array of transaction identificators
  */
-export async function del(ids) {
+export const del = async (ids) => {
     let deleteRes;
 
     await test(`Delete transaction (${ids})`, async () => {
@@ -187,10 +187,10 @@ export async function del(ids) {
     });
 
     return deleteRes;
-}
+};
 
 // Set new position for specified transaction
-export async function setPos(params) {
+export const setPos = async (params) => {
     let result;
 
     await test(`Set position of transaction (${formatProps(params)})`, async () => {
@@ -212,10 +212,10 @@ export async function setPos(params) {
     });
 
     return result;
-}
+};
 
 // Filter list of transaction by specified params
-export async function filter(params) {
+export const filter = async (params) => {
     await test(`Filter transactions (${formatProps(params)})`, async () => {
         const transactions = App.state.transactions.clone();
         let expTransList = transactions.applyFilter(params);
@@ -258,4 +258,4 @@ export async function filter(params) {
 
         return assert.deepMeet(trList.items, expTransList.data);
     });
-}
+};

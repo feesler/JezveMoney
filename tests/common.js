@@ -5,7 +5,7 @@ import {
     isObject,
 } from 'jezve-test';
 
-export async function asyncMap(data, func) {
+export const asyncMap = async (data, func) => {
     if (!Array.isArray(data)) {
         throw new Error('Invalid data type');
     }
@@ -15,10 +15,10 @@ export async function asyncMap(data, func) {
 
     const tasks = data.map(func);
     return Promise.all(tasks);
-}
+};
 
 /** Convert date string from DD.MM.YYYY to timestamp */
-export function convDate(dateStr) {
+export const convDate = (dateStr) => {
     if (typeof dateStr !== 'string') {
         return null;
     }
@@ -29,19 +29,19 @@ export function convDate(dateStr) {
     }
 
     return res;
-}
+};
 
 /** Return timestamp for the start of the day */
-export function cutDate(date) {
+export const cutDate = (date) => {
     if (!isDate(date)) {
         return null;
     }
 
     return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
-}
+};
 
 // Convert Date object, timestamp or DD.MM.YYYY string to the timestamp of the start of day
-export function fixDate(date) {
+export const fixDate = (date) => {
     if (isDate(date)) {
         return cutDate(date);
     }
@@ -51,10 +51,10 @@ export function fixDate(date) {
     }
 
     return convDate(date);
-}
+};
 
 /** Check string is correct date in dd.mm.yyyy format */
-export function checkDate(str) {
+export const checkDate = (str) => {
     if (typeof str !== 'string' || !str.length) {
         return false;
     }
@@ -79,19 +79,17 @@ export function checkDate(str) {
     }
 
     return true;
-}
+};
 
 /** Format specified value */
-export function formatValue(val) {
-    return val.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ');
-}
+export const formatValue = (val) => val.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ');
 
 /*
 * Normalized decimal calculations
 */
 
 /** Fix string to correct float number format */
-export function fixFloat(str) {
+export const fixFloat = (str) => {
     if (typeof str === 'string') {
         let res = str.replace(/,/g, '.');
         if (res.startsWith('.') || !res.length) {
@@ -105,43 +103,33 @@ export function fixFloat(str) {
     }
 
     return null;
-}
+};
 
 /** Correct calculated value */
-export function correct(val, prec = 2) {
-    return parseFloat(parseFloat(val).toFixed(prec));
-}
+export const correct = (val, prec = 2) => parseFloat(parseFloat(val).toFixed(prec));
 
 /** Correct calculated exchange rate value */
-export function correctExch(val) {
-    return correct(val, 5);
-}
+export const correctExch = (val) => correct(val, 5);
 
 /** Normalize monetary value from string */
-export function normalize(val, prec = 2) {
-    return parseFloat(parseFloat(fixFloat(val)).toFixed(prec));
-}
+export const normalize = (val, prec = 2) => parseFloat(parseFloat(fixFloat(val)).toFixed(prec));
 
 /** Normalize exchange rate value from string */
-export function normalizeExch(val) {
-    return normalize(val, 5);
-}
+export const normalizeExch = (val) => normalize(val, 5);
 
 /** Check value is valid */
-export function isValidValue(val) {
-    return (typeof val !== 'undefined' && val !== null && !Number.isNaN(parseFloat(fixFloat(val))));
-}
+export const isValidValue = (val) => (typeof val !== 'undefined' && val !== null && !Number.isNaN(parseFloat(fixFloat(val))));
 
 /*
 * Other
 */
 
 /** Quote string for CSV */
-function quoteString(str) {
+const quoteString = (str) => {
     const escaped = str.toString().split('"').join('\\"');
 
     return `"${escaped}"`;
-}
+};
 
 /** Return CSV */
 export function createCSV({
@@ -172,7 +160,7 @@ export function createCSV({
 }
 
 /** Join parameters and values of object to URL */
-export function urlJoin(obj) {
+export const urlJoin = (obj) => {
     if (!isObject(obj)) {
         return '';
     }
@@ -201,15 +189,15 @@ export function urlJoin(obj) {
     });
 
     return arr.join('&');
-}
+};
 
-export function formatProps(params) {
+export const formatProps = (params) => {
     const res = Object.keys(params).map((key) => `${key}: ${params[key]}`);
 
     return res.join(', ');
-}
+};
 
-export function checkPHPerrors(content) {
+export const checkPHPerrors = (content) => {
     const errSignatures = [
         '<b>Notice</b>',
         '<b>Parse error</b>',
@@ -225,9 +213,7 @@ export function checkPHPerrors(content) {
     if (found) {
         throw new Error('PHP error signature found');
     }
-}
+};
 
 /** Returns random integer id */
-export function generateId() {
-    return Math.round(Math.random() * 10000);
-}
+export const generateId = () => Math.round(Math.random() * 10000);

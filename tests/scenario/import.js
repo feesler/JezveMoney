@@ -12,7 +12,7 @@ let scenario = null;
 let csvStatement = null;
 let uploadFilename = null;
 
-async function runSubmitImportTests() {
+const runSubmitImportTests = async () => {
     await ImportTests.submit();
     // Verify submit is disabled for empty list
     setBlock('Verify submit is disabled for empty list', 2);
@@ -76,7 +76,7 @@ async function runSubmitImportTests() {
         value: false,
     });
     await ImportTests.submit();
-}
+};
 
 export const importTests = {
     /** Initialize tests */

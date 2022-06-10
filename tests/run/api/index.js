@@ -3,19 +3,19 @@ import { api } from '../../model/api.js';
 import { ApiRequestError } from '../../error/ApiRequestError.js';
 import { App } from '../../Application.js';
 
-export async function deleteUserIfExist({ login }) {
+export const deleteUserIfExist = async ({ login }) => {
     const users = await api.user.list();
     const user = users.find((item) => item.login === login);
     if (user) {
         await api.user.del(user.id);
     }
-}
+};
 
 /**
  * Register new user and try to login
  * @param {Object} userData - user data object: { login, password, name }
  */
-export async function registerAndLogin(userData) {
+export const registerAndLogin = async (userData) => {
     await test('User registration', async () => {
         await api.user.logout();
 
@@ -31,13 +31,13 @@ export async function registerAndLogin(userData) {
         App.state.resetAll();
         return App.state.fetchAndTest();
     });
-}
+};
 
 /**
  * Try to login user
  * @param {Object} userData - user data object: { login, password }
  */
-export async function loginTest(userData) {
+export const loginTest = async (userData) => {
     await test('Login user', async () => {
         const resExpected = (userData.login.length > 0 && userData.password.length > 0);
         try {
@@ -55,10 +55,10 @@ export async function loginTest(userData) {
 
         return true;
     });
-}
+};
 
 /** Change user name and check update in profile */
-export async function changeName(name) {
+export const changeName = async (name) => {
     await test('Change user name', async () => {
         const resExpected = name.length > 0 && name !== App.state.profile.name;
 
@@ -80,9 +80,9 @@ export async function changeName(name) {
 
         return true;
     });
-}
+};
 
-export async function changePassword({ user, newPassword }) {
+export const changePassword = async ({ user, newPassword }) => {
     await test('Change user password', async () => {
         await api.profile.changePassword({ oldPassword: user.password, newPassword });
 
@@ -94,31 +94,31 @@ export async function changePassword({ user, newPassword }) {
 
         return api.profile.changePassword({ oldPassword: newPassword, newPassword: user.password });
     });
-}
+};
 
-export async function resetAccounts() {
+export const resetAccounts = async () => {
     await test('Reset accounts', async () => {
         await api.account.reset();
 
         App.state.resetAccounts();
         return true;
     });
-}
+};
 
-export async function resetAll() {
+export const resetAll = async () => {
     await test('Reset all', async () => {
         await api.profile.reset();
 
         App.state.resetAll();
         return true;
     });
-}
+};
 
-export async function deleteProfile() {
+export const deleteProfile = async () => {
     await test('Delete user profile', async () => {
         await api.profile.del();
 
         App.state.deleteProfile();
         return true;
     });
-}
+};

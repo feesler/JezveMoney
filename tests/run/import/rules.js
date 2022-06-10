@@ -9,7 +9,7 @@ import { ImportView } from '../../view/ImportView.js';
 import { TransactionsView } from '../../view/TransactionsView.js';
 
 /** Navigate to import page */
-async function checkNavigation() {
+const checkNavigation = async () => {
     if (App.view instanceof ImportView) {
         return;
     }
@@ -20,19 +20,19 @@ async function checkNavigation() {
     }
 
     await App.view.goToImportView();
-}
+};
 
 /** Check rules dialog is open */
-async function checkRulesDialog() {
+const checkRulesDialog = async () => {
     await checkNavigation();
 
     if (!App.view.isRulesState()) {
         await App.view.launchRulesDialog();
     }
-}
+};
 
 /** Open import rules dialog */
-export async function openRulesDialog() {
+export const openRulesDialog = async () => {
     await test('Open rules dialog', async () => {
         await checkNavigation();
 
@@ -41,10 +41,10 @@ export async function openRulesDialog() {
         App.view.expectedState = App.view.getExpectedState(App.view.model);
         return App.view.checkState();
     });
-}
+};
 
 /** Close import rules dialog */
-export async function closeRulesDialog() {
+export const closeRulesDialog = async () => {
     await test('Close rules dialog', async () => {
         await checkNavigation();
 
@@ -53,10 +53,10 @@ export async function closeRulesDialog() {
         App.view.expectedState = App.view.getExpectedState(App.view.model);
         return App.view.checkState();
     });
-}
+};
 
 /** Click by create import rule button */
-export async function createRule() {
+export const createRule = async () => {
     await test('Create rule', async () => {
         await checkRulesDialog();
 
@@ -65,10 +65,10 @@ export async function createRule() {
         App.view.expectedState = App.view.getExpectedState(App.view.model);
         return App.view.checkState();
     });
-}
+};
 
 /** Click by update import rule button */
-export async function updateRule(index) {
+export const updateRule = async (index) => {
     const ind = parseInt(index, 10);
     if (Number.isNaN(ind)) {
         throw new Error('Invalid rule index');
@@ -82,10 +82,10 @@ export async function updateRule(index) {
         App.view.expectedState = App.view.getExpectedState(App.view.model);
         return App.view.checkState();
     });
-}
+};
 
 /** Click by delete import rule button */
-export async function deleteRule(index) {
+export const deleteRule = async (index) => {
     const ind = parseInt(index, 10);
     if (Number.isNaN(ind)) {
         throw new Error('Invalid rule index');
@@ -99,10 +99,10 @@ export async function deleteRule(index) {
         App.view.expectedState = App.view.getExpectedState(App.view.model);
         return App.view.checkState();
     });
-}
+};
 
 /** Run set of actions on specified rule condition item */
-async function runOnRuleCondition(params) {
+const runOnRuleCondition = async (params) => {
     if (!params || !('pos' in params) || !('action' in params)) {
         throw new Error('Invalid parameters');
     }
@@ -176,10 +176,10 @@ async function runOnRuleCondition(params) {
 
         await test(descr, () => App.view.runOnRuleCondition(params.pos, action));
     }
-}
+};
 
 /** Click by create import condition button */
-export async function addRuleCondition() {
+export const addRuleCondition = async () => {
     await test('Add rule condition', async () => {
         if (!(App.view instanceof ImportView)) {
             throw new Error('Invalid view instance');
@@ -190,10 +190,10 @@ export async function addRuleCondition() {
         App.view.expectedState = App.view.getExpectedState(App.view.model);
         return App.view.checkState();
     });
-}
+};
 
 /** Create new import rule condition */
-export async function createRuleCondition(params) {
+export const createRuleCondition = async (params) => {
     setBlock('Create rule condition', 2);
 
     await addRuleCondition();
@@ -205,10 +205,10 @@ export async function createRuleCondition(params) {
             action: params,
         });
     }
-}
+};
 
 /** Update rule condition */
-export async function updateRuleCondition(params) {
+export const updateRuleCondition = async (params) => {
     if (!params || !('pos' in params) || !('action' in params)) {
         throw new Error('Invalid parameters');
     }
@@ -216,10 +216,10 @@ export async function updateRuleCondition(params) {
     setBlock(`Update rule condition [${params.pos}]`, 2);
 
     await runOnRuleCondition(params);
-}
+};
 
 /** Click by delete import condition button */
-export async function deleteRuleCondition(index) {
+export const deleteRuleCondition = async (index) => {
     const ind = parseInt(index, 10);
     if (Number.isNaN(ind)) {
         throw new Error('Invalid index');
@@ -235,10 +235,10 @@ export async function deleteRuleCondition(index) {
         App.view.expectedState = App.view.getExpectedState(App.view.model);
         return App.view.checkState();
     });
-}
+};
 
 /** Run set of actions on specified rule action item */
-async function runOnRuleAction(params) {
+const runOnRuleAction = async (params) => {
     if (!params || !('pos' in params) || !('action' in params)) {
         throw new Error('Invalid parameters');
     }
@@ -297,10 +297,10 @@ async function runOnRuleAction(params) {
 
         await test(descr, () => App.view.runOnRuleAction(params.pos, action));
     }
-}
+};
 
 /** Click by create import action button */
-export async function addRuleAction() {
+export const addRuleAction = async () => {
     await test('Add rule action', async () => {
         if (!(App.view instanceof ImportView)) {
             throw new Error('Invalid view instance');
@@ -312,10 +312,10 @@ export async function addRuleAction() {
 
         return App.view.checkState();
     });
-}
+};
 
 /** Create new import rule action */
-export async function createRuleAction(params) {
+export const createRuleAction = async (params) => {
     setBlock('Create rule action', 2);
 
     await addRuleAction();
@@ -327,9 +327,9 @@ export async function createRuleAction(params) {
             action: params,
         });
     }
-}
+};
 
-export async function updateRuleAction(params) {
+export const updateRuleAction = async (params) => {
     if (!params || !('pos' in params) || !('action' in params)) {
         throw new Error('Invalid parameters');
     }
@@ -337,10 +337,10 @@ export async function updateRuleAction(params) {
     setBlock(`Update rule action [${params.pos}]`, 2);
 
     await runOnRuleAction(params);
-}
+};
 
 /** Click by delete import action button */
-export async function deleteRuleAction(index) {
+export const deleteRuleAction = async (index) => {
     const ind = parseInt(index, 10);
     if (Number.isNaN(ind)) {
         throw new Error('Invalid index');
@@ -357,10 +357,10 @@ export async function deleteRuleAction(index) {
 
         return App.view.checkState();
     });
-}
+};
 
 /** Submit import rule */
-export async function submitRule() {
+export const submitRule = async () => {
     await test('Submit import rule', async () => {
         if (!(App.view instanceof ImportView)) {
             throw new Error('Invalid view instance');
@@ -385,10 +385,10 @@ export async function submitRule() {
         // Check app state
         return App.state.fetchAndTest();
     });
-}
+};
 
 /** Cancel import rule form */
-export async function cancelRule() {
+export const cancelRule = async () => {
     await test('Cancel import rule', async () => {
         if (!(App.view instanceof ImportView)) {
             throw new Error('Invalid view instance');
@@ -399,4 +399,4 @@ export async function cancelRule() {
         // Check app state
         return App.state.fetchAndTest();
     });
-}
+};

@@ -16,7 +16,7 @@ import { App } from '../../Application.js';
  * @param {number} params.date_col
  * @param {number} params.comment_col
  */
-export async function create(params) {
+export const create = async (params) => {
     let result = 0;
 
     await test(`Create import template (${formatProps(params)})`, async () => {
@@ -40,7 +40,7 @@ export async function create(params) {
     });
 
     return result;
-}
+};
 
 /**
  * Update import template with specified params and check expected state of app
@@ -54,7 +54,7 @@ export async function create(params) {
  * @param {number} params.date_col
  * @param {number} params.comment_col
  */
-export async function update(params) {
+export const update = async (params) => {
     let result = false;
     const props = copyObject(params);
 
@@ -87,13 +87,13 @@ export async function update(params) {
     });
 
     return result;
-}
+};
 
 /**
  * Delete specified import template(s) and check expected state of app
  * @param {number[]} ids - array of template identifiers
  */
-export async function del(ids) {
+export const del = async (ids) => {
     let result = false;
 
     await test(`Delete import template(s) (${ids})`, async () => {
@@ -115,4 +115,4 @@ export async function del(ids) {
     });
 
     return result;
-}
+};

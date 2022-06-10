@@ -9,14 +9,14 @@ import { setBlock, baseUrl, goTo } from '../env.js';
 import { AccountView } from '../view/AccountView.js';
 
 /** Navigate to accounts list page */
-async function checkNavigation() {
+const checkNavigation = async () => {
     if (!(App.view instanceof AccountsView)) {
         await App.goToMainView();
         await App.view.goToAccounts();
     }
-}
+};
 
-export async function stateLoop() {
+export const stateLoop = async () => {
     setBlock('View state loop', 2);
 
     // Navigate to create account view
@@ -61,9 +61,9 @@ export async function stateLoop() {
     await test('Input (1000.01) balance', () => App.view.inputBalance('1000.01'));
 
     await App.view.cancel();
-}
+};
 
-export async function submitAccount(params) {
+export const submitAccount = async (params) => {
     if (!(App.view instanceof AccountView)) {
         throw new Error('Invalid view');
     }
@@ -98,9 +98,9 @@ export async function submitAccount(params) {
     }
 
     return res;
-}
+};
 
-export async function create(params) {
+export const create = async (params) => {
     if (!params) {
         throw new Error('No params specified');
     }
@@ -135,9 +135,9 @@ export async function create(params) {
         // Check app state
         return App.state.fetchAndTest();
     });
-}
+};
 
-export async function update(params) {
+export const update = async (params) => {
     if (!params) {
         throw new Error('No params specified');
     }
@@ -182,9 +182,9 @@ export async function update(params) {
         // Check app state
         return App.state.fetchAndTest();
     });
-}
+};
 
-export async function del(accounts) {
+export const del = async (accounts) => {
     const itemIds = Array.isArray(accounts) ? accounts : [accounts];
 
     await test(`Delete account(s) [${itemIds.join()}]`, async () => {
@@ -202,9 +202,9 @@ export async function del(accounts) {
         // Check app state
         return App.state.fetchAndTest();
     });
-}
+};
 
-export async function delFromUpdate(pos) {
+export const delFromUpdate = async (pos) => {
     const ind = parseInt(pos, 10);
     if (Number.isNaN(ind) || ind < 0) {
         throw new Error('Invalid position of account specified');
@@ -230,9 +230,9 @@ export async function delFromUpdate(pos) {
         // Check app state
         return App.state.fetchAndTest();
     });
-}
+};
 
-export async function show(accounts, val = true) {
+export const show = async (accounts, val = true) => {
     const itemIds = Array.isArray(accounts) ? accounts : [accounts];
     const actVerb = (val) ? 'Show' : 'Hide';
 
@@ -255,13 +255,11 @@ export async function show(accounts, val = true) {
         // Check app state
         return App.state.fetchAndTest();
     });
-}
+};
 
-export async function hide(accounts) {
-    return show(accounts, false);
-}
+export const hide = async (accounts) => show(accounts, false);
 
-export async function exportTest(accounts) {
+export const exportTest = async (accounts) => {
     const itemIds = Array.isArray(accounts) ? accounts : [accounts];
 
     await test(`Export accounts [${itemIds.join()}]`, async () => {
@@ -300,9 +298,9 @@ export async function exportTest(accounts) {
 
         return assert.deepMeet(content.trim(), expectedContent.trim());
     });
-}
+};
 
-export async function toggleSelect(accounts) {
+export const toggleSelect = async (accounts) => {
     const itemIds = Array.isArray(accounts) ? accounts : [accounts];
 
     await test(`Toggle select items [${itemIds.join()}]`, async () => {
@@ -340,10 +338,10 @@ export async function toggleSelect(accounts) {
 
         return true;
     });
-}
+};
 
 /** Check navigation to update not existing account */
-export async function securityTests() {
+export const securityTests = async () => {
     setBlock('Account security', 2);
 
     let accountId;
@@ -368,4 +366,4 @@ export async function securityTests() {
 
         return true;
     });
-}
+};

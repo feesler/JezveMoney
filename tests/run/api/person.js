@@ -9,7 +9,7 @@ import { App } from '../../Application.js';
  * @param {Object} params
  * @param {string} params.name - name of person
  */
-export async function create(params) {
+export const create = async (params) => {
     let personId = 0;
 
     await test(`Create person (${formatProps(params)})`, async () => {
@@ -32,7 +32,7 @@ export async function create(params) {
     });
 
     return personId;
-}
+};
 
 /**
  * Update person with specified params and check expected state of app
@@ -40,7 +40,7 @@ export async function create(params) {
  * @param {string} params.id - person identifier
  * @param {string} params.name - name of person
  */
-export async function update(params) {
+export const update = async (params) => {
     let updateRes = false;
 
     await test(`Update person (${formatProps(params)})`, async () => {
@@ -62,13 +62,13 @@ export async function update(params) {
     });
 
     return updateRes;
-}
+};
 
 /**
  * Delete specified person(s) and check expected state of app
  * @param {number[]} ids - array of person identificators
  */
-export async function del(ids) {
+export const del = async (ids) => {
     let deleteRes = false;
 
     await test(`Delete person (${ids})`, async () => {
@@ -90,4 +90,4 @@ export async function del(ids) {
     });
 
     return deleteRes;
-}
+};

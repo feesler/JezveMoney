@@ -12,7 +12,7 @@ import { App } from '../../Application.js';
  * @param {number} params.initbalance - initial balance of account
  * @param {number} params.icon_id - icon identifier
  */
-export async function create(params) {
+export const create = async (params) => {
     let accountId = 0;
 
     await test(`Create account (${formatProps(params)})`, async () => {
@@ -36,7 +36,7 @@ export async function create(params) {
     });
 
     return accountId;
-}
+};
 
 /**
  * Update account with specified params and check expected state of app
@@ -47,7 +47,7 @@ export async function create(params) {
  * @param {number} params.initbalance - initial balance of account
  * @param {number} params.icon_id - icon identifier
  */
-export async function update(params) {
+export const update = async (params) => {
     let updateRes = false;
     const props = copyObject(params);
 
@@ -80,13 +80,13 @@ export async function update(params) {
     });
 
     return updateRes;
-}
+};
 
 /**
  * Delete specified account(s) and check expected state of app
  * @param {number[]} ids - array of account identificators
  */
-export async function del(ids) {
+export const del = async (ids) => {
     let deleteRes = false;
 
     await test(`Delete account (${ids})`, async () => {
@@ -108,4 +108,4 @@ export async function del(ids) {
     });
 
     return deleteRes;
-}
+};

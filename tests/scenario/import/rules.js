@@ -26,7 +26,7 @@ import { App } from '../../Application.js';
 let scenario = null;
 
 // Import rule action form test for no persons
-async function noPersonTests() {
+const noPersonTests = async () => {
     const { RUB } = scenario;
 
     setBlock('No persons test', 1);
@@ -56,10 +56,10 @@ async function noPersonTests() {
     await ImportTests.addRuleAction();
 
     await ImportTests.closeRulesDialog();
-}
+};
 
 // Import rule validation tests
-async function runValidationTests() {
+const runValidationTests = async () => {
     setBlock('Import rule validation', 1);
 
     setBlock('Submit empty rule', 2);
@@ -224,10 +224,10 @@ async function runValidationTests() {
     await ImportTests.submitRule();
 
     await ImportTests.cancelRule();
-}
+};
 
 // Create import rule tests
-async function runCreateTests() {
+const runCreateTests = async () => {
     setBlock('Create import rules', 1);
 
     setBlock('Create import rule #1', 2);
@@ -371,10 +371,10 @@ async function runCreateTests() {
         { action: 'inputAmount', data: '500.5' },
     ]);
     await ImportTests.submitRule();
-}
+};
 
 // Update import rule tests
-async function runUpdateImportRuleTests() {
+const runUpdateImportRuleTests = async () => {
     setBlock('Update import rules', 1);
 
     setBlock('Update import rule #1', 2);
@@ -411,14 +411,14 @@ async function runUpdateImportRuleTests() {
     await ImportTests.deleteRuleCondition(0);
     await ImportTests.deleteRuleAction(0);
     await ImportTests.submitRule();
-}
+};
 
 // Delete import rule tests
-async function runDeleteImportRuleTests() {
+const runDeleteImportRuleTests = async () => {
     setBlock('Delete import rules', 1);
     // Delete rule #3
     await ImportTests.deleteRule(2);
-}
+};
 
 export const importRuleTests = {
     /** Initialize tests */

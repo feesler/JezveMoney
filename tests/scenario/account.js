@@ -3,7 +3,7 @@ import { setBlock } from '../env.js';
 
 let scenario = null;
 
-async function createAccountTests() {
+const createAccountTests = async () => {
     setBlock('Create accounts', 2);
 
     const { RUB, EUR } = scenario;
@@ -27,9 +27,9 @@ async function createAccountTests() {
     }];
 
     await scenario.runner.runGroup(AccountTests.create, data);
-}
+};
 
-async function updateTests() {
+const updateTests = async () => {
     setBlock('Update accounts', 2);
 
     const { RUB, USD } = scenario;
@@ -43,9 +43,9 @@ async function updateTests() {
     }];
 
     await scenario.runner.runGroup(AccountTests.update, data);
-}
+};
 
-async function deleteTests() {
+const deleteTests = async () => {
     setBlock('Delete accounts', 2);
 
     const data = [
@@ -53,9 +53,9 @@ async function deleteTests() {
     ];
 
     await scenario.runner.runGroup(AccountTests.del, data);
-}
+};
 
-async function deleteFromUpdateTests() {
+const deleteFromUpdateTests = async () => {
     setBlock('Delete account from update view', 2);
 
     const data = [
@@ -63,9 +63,9 @@ async function deleteFromUpdateTests() {
     ];
 
     await scenario.runner.runGroup(AccountTests.delFromUpdate, data);
-}
+};
 
-async function hideTest() {
+const hideTest = async () => {
     setBlock('Hide accounts', 2);
 
     const data = [
@@ -74,9 +74,9 @@ async function hideTest() {
     ];
 
     await scenario.runner.runGroup(AccountTests.hide, data);
-}
+};
 
-async function showTest() {
+const showTest = async () => {
     setBlock('Show accounts', 2);
 
     const data = [
@@ -85,9 +85,9 @@ async function showTest() {
     ];
 
     await scenario.runner.runGroup(AccountTests.show, data);
-}
+};
 
-async function exportTest() {
+const exportTest = async () => {
     setBlock('Export accounts', 2);
 
     const data = [
@@ -96,9 +96,9 @@ async function exportTest() {
     ];
 
     await scenario.runner.runGroup(AccountTests.exportTest, data);
-}
+};
 
-async function toggleTest() {
+const toggleTest = async () => {
     setBlock('Toggle select accounts', 2);
 
     const data = [
@@ -107,7 +107,7 @@ async function toggleTest() {
     ];
 
     await scenario.runner.runGroup(AccountTests.toggleSelect, data);
-}
+};
 
 export const accountTests = {
     /** Initialize tests */

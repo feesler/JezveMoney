@@ -11,14 +11,14 @@ import { App } from '../Application.js';
 import { setBlock, baseUrl, goTo } from '../env.js';
 
 /** Navigate to persons list page */
-async function checkNavigation() {
+const checkNavigation = async () => {
     if (!(App.view instanceof PersonsView)) {
         await App.goToMainView();
         await App.view.goToPersons();
     }
-}
+};
 
-async function submitPerson(params) {
+const submitPerson = async (params) => {
     if (!(App.view instanceof PersonView)) {
         throw new Error('Invalid view');
     }
@@ -38,14 +38,14 @@ async function submitPerson(params) {
     }
 
     return res;
-}
+};
 
 /**
  * From persons list view go to new person view, input name and submit
  * Next check name result and callback
  * @param {Object} params
  */
-export async function create(params) {
+export const create = async (params) => {
     await test(`Create person ({${formatProps(params)} })`, async () => {
         // Navigate to create person view
         await checkNavigation();
@@ -63,9 +63,9 @@ export async function create(params) {
 
         return App.state.fetchAndTest();
     });
-}
+};
 
-export async function update(params) {
+export const update = async (params) => {
     if (!params) {
         throw new Error('No params specified');
     }
@@ -116,9 +116,9 @@ export async function update(params) {
 
         return App.state.fetchAndTest();
     });
-}
+};
 
-export async function del(persons) {
+export const del = async (persons) => {
     await test(`Delete persons [${persons.join()}]`, async () => {
         // Navigate to persons list view
         await checkNavigation();
@@ -133,9 +133,9 @@ export async function del(persons) {
 
         return App.state.fetchAndTest();
     });
-}
+};
 
-export async function delFromUpdate(pos) {
+export const delFromUpdate = async (pos) => {
     const ind = parseInt(pos, 10);
     if (Number.isNaN(ind) || ind < 0) {
         throw new Error('Position of person not specified');
@@ -160,9 +160,9 @@ export async function delFromUpdate(pos) {
         // Check app state
         return App.state.fetchAndTest();
     });
-}
+};
 
-export async function show(persons, val = true) {
+export const show = async (persons, val = true) => {
     const itemIds = Array.isArray(persons) ? persons : [persons];
 
     const actVerb = (val) ? 'Show' : 'Hide';
@@ -182,13 +182,11 @@ export async function show(persons, val = true) {
         // Check app state
         return App.state.fetchAndTest();
     });
-}
+};
 
-export async function hide(persons) {
-    return show(persons, false);
-}
+export const hide = async (persons) => show(persons, false);
 
-export async function toggleSelect(persons) {
+export const toggleSelect = async (persons) => {
     const itemIds = Array.isArray(persons) ? persons : [persons];
 
     await test(`Toggle select items [${itemIds.join()}]`, async () => {
@@ -226,10 +224,10 @@ export async function toggleSelect(persons) {
 
         return true;
     });
-}
+};
 
 /** Check navigation to update not existing person */
-export async function securityTests() {
+export const securityTests = async () => {
     setBlock('Person security', 2);
 
     let personId;
@@ -254,4 +252,4 @@ export async function securityTests() {
 
         return true;
     });
-}
+};

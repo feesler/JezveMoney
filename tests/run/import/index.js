@@ -15,7 +15,7 @@ export * from './templates.js';
 export * from './rules.js';
 
 /** Navigate to transactions list page */
-async function checkNavigation() {
+const checkNavigation = async () => {
     if (App.view instanceof ImportView) {
         return;
     }
@@ -26,10 +26,10 @@ async function checkNavigation() {
     }
 
     await App.view.goToImportView();
-}
+};
 
 /** Navigate to specified state of import view */
-async function checkViewState(targetState) {
+const checkViewState = async (targetState) => {
     const { state } = App.view.model;
 
     if (state === targetState) {
@@ -48,15 +48,15 @@ async function checkViewState(targetState) {
     if (targetState === 'rules') {
         await App.view.launchRulesDialog();
     }
-}
+};
 
 /** Check initial state of import view */
-export async function checkInitialState() {
+export const checkInitialState = async () => {
     await checkNavigation();
 
     App.view.expectedState = App.view.getExpectedState(App.view.model);
     await test('Initial state of import view', () => App.view.checkState());
-}
+};
 
 function parseCSV(data) {
     const content = data.toString().trim();
@@ -72,7 +72,7 @@ function parseCSV(data) {
 }
 
 /** Admin access required */
-export async function putFile(data) {
+export const putFile = async (data) => {
     const baseURL = baseUrl();
     const uploadURL = `${baseURL}admin/tests/upload`;
     const defErrorMessage = 'Request failed';
@@ -99,10 +99,10 @@ export async function putFile(data) {
         console.log(e.message);
         return null;
     }
-}
+};
 
 /** Admin access required */
-export async function removeFile(filename) {
+export const removeFile = async (filename) => {
     const baseURL = baseUrl();
     const removeURL = `${baseURL}admin/tests/remove`;
     const defErrorMessage = 'Request failed';
@@ -131,10 +131,10 @@ export async function removeFile(filename) {
     }
 
     return true;
-}
+};
 
 /** Test manual add new import item */
-export async function addItem() {
+export const addItem = async () => {
     await test('Add import item', async () => {
         await checkNavigation();
         await checkViewState('main');
@@ -160,10 +160,10 @@ export async function addItem() {
         App.view.expectedState = { itemsList };
         return App.view.checkState();
     });
-}
+};
 
 /** Test file upload */
-export async function uploadFile(params) {
+export const uploadFile = async (params) => {
     await test('Upload file', async () => {
         if (!params || !params.data || !params.filename) {
             throw new Error('Invalid parameters');
@@ -192,10 +192,10 @@ export async function uploadFile(params) {
 
         return App.view.checkState();
     });
-}
+};
 
 /** Submit uploaded file with current options */
-export async function submitUploaded(params) {
+export const submitUploaded = async (params) => {
     await test('Submit file', async () => {
         if (!(App.view instanceof ImportView)) {
             throw new Error('Invalid view instance');
@@ -219,10 +219,10 @@ export async function submitUploaded(params) {
 
         return App.view.checkState();
     });
-}
+};
 
 /** Change main account */
-export async function changeMainAccount(accountId) {
+export const changeMainAccount = async (accountId) => {
     const userAccounts = App.state.accounts.getUserVisible();
     const account = userAccounts.getItem(accountId);
     if (!account) {
@@ -283,9 +283,9 @@ export async function changeMainAccount(accountId) {
         };
         return App.view.checkState();
     });
-}
+};
 
-export async function enableRules(value = true) {
+export const enableRules = async (value = true) => {
     const enable = !!value;
     const descr = enable ? 'Enable rules' : 'Disable rules';
 
@@ -347,10 +347,10 @@ export async function enableRules(value = true) {
 
         return App.view.checkState();
     });
-}
+};
 
 /** Enable/disable items */
-export async function enableItems({ index, value = true }) {
+export const enableItems = async ({ index, value = true }) => {
     const enable = !!value;
     const descr = enable ? 'Enable items' : 'Disable items';
 
@@ -370,10 +370,10 @@ export async function enableItems({ index, value = true }) {
 
         return App.view.checkState();
     });
-}
+};
 
 /** Update item */
-export async function updateItem(params) {
+export const updateItem = async (params) => {
     if (!params || !('pos' in params)) {
         throw new Error('Invalid parameters');
     }
@@ -436,13 +436,13 @@ export async function updateItem(params) {
         itemsList: App.view.content.itemsList.getExpectedState(),
     };
     await test('View state', () => App.view.checkState());
-}
+};
 
 /**
  * Click by delete button of items specified by indexes
  * @param {number|number[]} indexes - index or array of indexes of items to delete
  */
-export async function deleteItems(indexes) {
+export const deleteItems = async (indexes) => {
     const itemInds = Array.isArray(indexes) ? indexes : [indexes];
 
     await test(`Delete import item(s) [${itemInds.join()}]`, async () => {
@@ -469,12 +469,12 @@ export async function deleteItems(indexes) {
 
         return App.view.checkState();
     });
-}
+};
 
 /**
  * Click by delete all items button test
  */
-export async function deleteAllItems() {
+export const deleteAllItems = async () => {
     await test('Delete all import items', async () => {
         await checkNavigation();
         await checkViewState('main');
@@ -487,10 +487,10 @@ export async function deleteAllItems() {
 
         return App.view.checkState();
     });
-}
+};
 
 /** Submit */
-export async function submit() {
+export const submit = async () => {
     await test('Submit items', async () => {
         await checkNavigation();
         await checkViewState('main');
@@ -532,4 +532,4 @@ export async function submit() {
 
         return App.state.fetchAndTest();
     });
-}
+};

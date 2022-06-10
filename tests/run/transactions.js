@@ -9,7 +9,7 @@ import { MainView } from '../view/MainView.js';
 import { availTransTypes, Transaction } from '../model/Transaction.js';
 
 /** Navigate to transactions list page */
-async function checkNavigation() {
+const checkNavigation = async () => {
     if (App.view instanceof TransactionsView) {
         return;
     }
@@ -19,9 +19,9 @@ async function checkNavigation() {
     }
 
     await App.view.goToTransactions();
-}
+};
 
-export async function checkInitialState(directNavigate = false) {
+export const checkInitialState = async (directNavigate = false) => {
     if (directNavigate) {
         const requestURL = `${baseUrl()}transactions/`;
 
@@ -32,25 +32,25 @@ export async function checkInitialState(directNavigate = false) {
 
     App.view.expectedState = App.view.setExpectedState();
     await test('Initial state of transaction list view', () => App.view.checkState());
-}
+};
 
-export async function goToNextPage(directNavigate = false) {
+export const goToNextPage = async (directNavigate = false) => {
     if (!directNavigate) {
         await checkNavigation();
     }
 
     await test('Navigate to next page', () => App.view.goToNextPage(directNavigate));
-}
+};
 
-export async function setDetailsMode(directNavigate = false) {
+export const setDetailsMode = async (directNavigate = false) => {
     if (!directNavigate) {
         await checkNavigation();
     }
 
     await test('Change list mode to details', () => App.view.setDetailsMode(directNavigate));
-}
+};
 
-export async function toggleSelect(transactions) {
+export const toggleSelect = async (transactions) => {
     const itemIds = Array.isArray(transactions) ? transactions : [transactions];
 
     await test(`Toggle select items [${itemIds.join()}]`, async () => {
@@ -87,9 +87,9 @@ export async function toggleSelect(transactions) {
 
         return true;
     });
-}
+};
 
-export async function clearAllFilters(directNavigate = false) {
+export const clearAllFilters = async (directNavigate = false) => {
     if (!directNavigate) {
         await checkNavigation();
     }
@@ -98,9 +98,9 @@ export async function clearAllFilters(directNavigate = false) {
         await App.view.clearAllFilters(directNavigate);
         return App.view.iteratePages();
     });
-}
+};
 
-export async function filterByType({ type, directNavigate = false }) {
+export const filterByType = async ({ type, directNavigate = false }) => {
     if (!directNavigate) {
         await checkNavigation();
     }
@@ -117,9 +117,9 @@ export async function filterByType({ type, directNavigate = false }) {
         await App.view.filterByType(type, directNavigate);
         return App.view.iteratePages();
     });
-}
+};
 
-export async function filterByAccounts({ accounts, directNavigate = false }) {
+export const filterByAccounts = async ({ accounts, directNavigate = false }) => {
     const itemIds = Array.isArray(accounts) ? accounts : [accounts];
 
     if (!directNavigate) {
@@ -135,9 +135,9 @@ export async function filterByAccounts({ accounts, directNavigate = false }) {
         await App.view.filterByAccounts(itemIds, directNavigate);
         return App.view.iteratePages();
     });
-}
+};
 
-export async function filterByDate({ start, end, directNavigate = false }) {
+export const filterByDate = async ({ start, end, directNavigate = false }) => {
     if (!directNavigate) {
         await checkNavigation();
     }
@@ -149,9 +149,9 @@ export async function filterByDate({ start, end, directNavigate = false }) {
         await App.view.selectDateRange(start, end, directNavigate);
         return App.view.iteratePages();
     });
-}
+};
 
-export async function clearDateRange(directNavigate = false) {
+export const clearDateRange = async (directNavigate = false) => {
     if (!directNavigate) {
         await checkNavigation();
     }
@@ -160,9 +160,9 @@ export async function clearDateRange(directNavigate = false) {
         await App.view.clearDateRange(directNavigate);
         return App.view.iteratePages();
     });
-}
+};
 
-export async function search({ text, directNavigate = false }) {
+export const search = async ({ text, directNavigate = false }) => {
     if (!directNavigate) {
         await checkNavigation();
     }
@@ -171,9 +171,9 @@ export async function search({ text, directNavigate = false }) {
         await App.view.search(text, directNavigate);
         return App.view.iteratePages();
     });
-}
+};
 
-export async function clearSearchForm(directNavigate = false) {
+export const clearSearchForm = async (directNavigate = false) => {
     if (!directNavigate) {
         await checkNavigation();
     }
@@ -182,4 +182,4 @@ export async function clearSearchForm(directNavigate = false) {
         await App.view.clearSearch(directNavigate);
         return App.view.iteratePages();
     });
-}
+};

@@ -3,7 +3,7 @@ import { setBlock } from '../env.js';
 
 let scenario = null;
 
-async function createTests() {
+const createTests = async () => {
     setBlock('Create persons', 2);
 
     const data = [
@@ -17,9 +17,9 @@ async function createTests() {
     ];
 
     await scenario.runner.runGroup(PersonTests.create, data);
-}
+};
 
-async function updateTests() {
+const updateTests = async () => {
     setBlock('Update persons', 2);
 
     const data = [{
@@ -32,9 +32,9 @@ async function updateTests() {
     }];
 
     await scenario.runner.runGroup(PersonTests.update, data);
-}
+};
 
-async function deleteTests() {
+const deleteTests = async () => {
     setBlock('Delete persons', 2);
 
     const data = [
@@ -43,9 +43,9 @@ async function deleteTests() {
     ];
 
     await scenario.runner.runGroup(PersonTests.del, data);
-}
+};
 
-async function deleteFromUpdateTests() {
+const deleteFromUpdateTests = async () => {
     setBlock('Delete person from update view', 2);
 
     const data = [
@@ -53,9 +53,9 @@ async function deleteFromUpdateTests() {
     ];
 
     await scenario.runner.runGroup(PersonTests.delFromUpdate, data);
-}
+};
 
-async function hideTests() {
+const hideTests = async () => {
     setBlock('Hide persons', 2);
 
     const data = [
@@ -64,9 +64,9 @@ async function hideTests() {
     ];
 
     await scenario.runner.runGroup(PersonTests.hide, data);
-}
+};
 
-async function showTests() {
+const showTests = async () => {
     setBlock('Show persons', 2);
 
     const data = [
@@ -75,9 +75,9 @@ async function showTests() {
     ];
 
     await scenario.runner.runGroup(PersonTests.show, data);
-}
+};
 
-async function toggleTests() {
+const toggleTests = async () => {
     setBlock('Toggle select persons', 2);
 
     const data = [
@@ -86,7 +86,7 @@ async function toggleTests() {
     ];
 
     await scenario.runner.runGroup(PersonTests.toggleSelect, data);
-}
+};
 
 export const personTests = {
     /** Initialize tests */

@@ -8,7 +8,7 @@ import {
     DEBT,
 } from '../model/Transaction.js';
 
-export async function run() {
+export const run = async () => {
     setBlock('Statistics', 1);
 
     await App.goToMainView();
@@ -63,4 +63,4 @@ export async function run() {
     // Filter by currencies
     await App.view.byCurrencies();
     await test('Filter by currencies', () => App.view.checkState(expected));
-}
+};

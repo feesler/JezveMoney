@@ -15,7 +15,7 @@ import { setBlock } from '../env.js';
 let scenario = null;
 let testData = null;
 
-async function setupAccounts() {
+const setupAccounts = async () => {
     const { RUB, USD, EUR } = scenario;
     const data = [{
         name: 'acc_4',
@@ -57,9 +57,9 @@ async function setupAccounts() {
     }
 
     return res;
-}
+};
 
-async function setupPersons() {
+const setupPersons = async () => {
     const data = [{
         name: 'Alex',
         flags: 0,
@@ -82,9 +82,9 @@ async function setupPersons() {
     }
 
     return res;
-}
+};
 
-async function setupTransactions(accountIds, personIds) {
+const setupTransactions = async (accountIds, personIds) => {
     const [ACC_4, ACC_5, CASH_USD, CASH_EUR] = accountIds;
     const [ALEX, NONAME] = personIds;
     const {
@@ -257,9 +257,9 @@ async function setupTransactions(accountIds, personIds) {
     }
 
     return api.transaction.createMultiple(multi);
-}
+};
 
-async function prepareTrListData() {
+const prepareTrListData = async () => {
     await api.user.login(App.config.testUser);
     await App.state.fetch();
 
@@ -276,9 +276,9 @@ async function prepareTrListData() {
     };
 
     return res;
-}
+};
 
-async function runTests(directNavigate = false) {
+const runTests = async (directNavigate = false) => {
     if (directNavigate) {
         setBlock('Transaction List view: direct navigation', 1);
     } else {
@@ -346,7 +346,7 @@ async function runTests(directNavigate = false) {
         },
         { action: TransactionListTests.clearAllFilters, directNavigate },
     ]);
-}
+};
 
 export const transactionsListTests = {
     /** Initialize tests */

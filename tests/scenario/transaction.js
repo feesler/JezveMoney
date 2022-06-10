@@ -18,7 +18,7 @@ import { ACCOUNT_HIDDEN } from '../model/AccountsList.js';
 
 let scenario = null;
 
-async function createExpenseTests() {
+const createExpenseTests = async () => {
     setBlock('Create expense transactions', 1);
 
     const { RUB, KRW } = scenario;
@@ -57,9 +57,9 @@ async function createExpenseTests() {
     }];
 
     await scenario.runner.runGroup(ExpenseTransactionTests.create, data);
-}
+};
 
-async function createIncomeTests() {
+const createIncomeTests = async () => {
     setBlock('Create income transactions', 1);
 
     const { USD, KRW } = scenario;
@@ -100,9 +100,9 @@ async function createIncomeTests() {
     }];
 
     await scenario.runner.runGroup(IncomeTransactionTests.create, data);
-}
+};
 
-async function createTransferTests() {
+const createTransferTests = async () => {
     setBlock('Create transfer transactions', 1);
 
     const data = [{
@@ -139,9 +139,9 @@ async function createTransferTests() {
     }];
 
     await scenario.runner.runGroup(TransferTransactionTests.create, data);
-}
+};
 
-async function createDebtTests() {
+const createDebtTests = async () => {
     setBlock('Create debt transactions', 1);
 
     const data = [{
@@ -180,9 +180,9 @@ async function createDebtTests() {
     }];
 
     await scenario.runner.runGroup(DebtTransactionTests.create, data);
-}
+};
 
-async function updateExpenseTests() {
+const updateExpenseTests = async () => {
     setBlock('Update expense transactions', 2);
 
     const { RUB } = scenario;
@@ -206,9 +206,9 @@ async function updateExpenseTests() {
     }];
 
     await scenario.runner.runGroup(ExpenseTransactionTests.update, data);
-}
+};
 
-async function updateIncomeTests() {
+const updateIncomeTests = async () => {
     setBlock('Update income transactions', 2);
 
     const { RUB } = scenario;
@@ -231,9 +231,9 @@ async function updateIncomeTests() {
     }];
 
     await scenario.runner.runGroup(IncomeTransactionTests.update, data);
-}
+};
 
-async function updateTransferTests() {
+const updateTransferTests = async () => {
     setBlock('Update transfer transactions', 2);
 
     const data = [{
@@ -260,9 +260,9 @@ async function updateTransferTests() {
     }];
 
     await scenario.runner.runGroup(TransferTransactionTests.update, data);
-}
+};
 
-async function updateDebtTests() {
+const updateDebtTests = async () => {
     setBlock('Update debt transactions', 2);
 
     const data = [{
@@ -295,9 +295,9 @@ async function updateDebtTests() {
     }];
 
     await scenario.runner.runGroup(DebtTransactionTests.update, data);
-}
+};
 
-async function deleteExpenseTests() {
+const deleteExpenseTests = async () => {
     setBlock('Delete expense transactions', 2);
 
     const data = [
@@ -306,9 +306,9 @@ async function deleteExpenseTests() {
     ];
 
     await scenario.runner.runGroup((items) => TransactionTests.del(EXPENSE, items), data);
-}
+};
 
-async function deleteIncomeTests() {
+const deleteIncomeTests = async () => {
     setBlock('Delete income transactions', 2);
 
     const data = [
@@ -317,9 +317,9 @@ async function deleteIncomeTests() {
     ];
 
     await scenario.runner.runGroup((items) => TransactionTests.del(INCOME, items), data);
-}
+};
 
-async function deleteTransferTests() {
+const deleteTransferTests = async () => {
     setBlock('Delete transfer transactions', 2);
 
     const data = [
@@ -328,9 +328,9 @@ async function deleteTransferTests() {
     ];
 
     await scenario.runner.runGroup((items) => TransactionTests.del(TRANSFER, items), data);
-}
+};
 
-async function deleteDebtTests() {
+const deleteDebtTests = async () => {
     setBlock('Delete debt transactions', 2);
 
     const data = [
@@ -339,9 +339,9 @@ async function deleteDebtTests() {
     ];
 
     await scenario.runner.runGroup((items) => TransactionTests.del(DEBT, items), data);
-}
+};
 
-async function stateLoopTests() {
+const stateLoopTests = async () => {
     setBlock('Transaction view state loops', 1);
 
     await ExpenseTransactionTests.stateLoop();
@@ -350,36 +350,36 @@ async function stateLoopTests() {
     await DebtTransactionTests.stateLoop();
 
     await TransactionTests.typeChangeLoop();
-}
+};
 
-async function createTests() {
+const createTests = async () => {
     setBlock('Create transaction', 1);
 
     await createExpenseTests();
     await createIncomeTests();
     await createTransferTests();
     await createDebtTests();
-}
+};
 
-async function updateTests() {
+const updateTests = async () => {
     setBlock('Update transaction', 1);
 
     await updateExpenseTests();
     await updateIncomeTests();
     await updateTransferTests();
     await updateDebtTests();
-}
+};
 
-async function deleteTests() {
+const deleteTests = async () => {
     setBlock('Delete transaction', 1);
 
     await deleteExpenseTests();
     await deleteIncomeTests();
     await deleteTransferTests();
     await deleteDebtTests();
-}
+};
 
-async function deleteFromUpdateTests() {
+const deleteFromUpdateTests = async () => {
     setBlock('Delete transaction from update view', 2);
 
     const data = [
@@ -390,9 +390,9 @@ async function deleteFromUpdateTests() {
         (pos) => TransactionTests.delFromUpdate(DEBT, pos),
         data,
     );
-}
+};
 
-async function createFromHiddenAccount() {
+const createFromHiddenAccount = async () => {
     setBlock('Create transaction from hidden account', 2);
 
     const { RUB } = scenario;
@@ -430,9 +430,9 @@ async function createFromHiddenAccount() {
         { type: DEBT, accountId: account1 },
     ];
     await scenario.runner.runGroup(TransactionTests.createFromHiddenAccount, data);
-}
+};
 
-async function availabilityTests(directNavigate) {
+const availabilityTests = async (directNavigate) => {
     const { RUB } = scenario;
 
     if (directNavigate) {
@@ -545,7 +545,7 @@ async function availabilityTests(directNavigate) {
     await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
     await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
     await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
-}
+};
 
 export const transactionTests = {
     /** Initialize tests */
