@@ -407,7 +407,7 @@ async function availabilityTests(directNavigate) {
         await api.person.del(personIds);
     }
 
-    // Create 2 account and 1 person
+    // Create first account
     await api.account.create({
         name: 'Account 1',
         curr_id: RUB,
@@ -415,6 +415,25 @@ async function availabilityTests(directNavigate) {
         icon_id: 1,
         flags: 0,
     });
+    await App.state.fetch();
+    const [account1] = App.state.accounts.getIds();
+
+    setBlock('1 account and no person', 2);
+    // Only Expense and Income must be available
+    await TransactionTests.checkTransactionAvailable(EXPENSE, directNavigate);
+    await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
+    await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
+    await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
+
+    if (!directNavigate) {
+        // Navigate from not available Debt to available Expense
+        await TransactionTests.checkTransactionAvailable(EXPENSE, directNavigate);
+        await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
+        // Navigate from not available Debt to available Income
+        await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
+    }
+
+    // Create second account
     await api.account.create({
         name: 'Account 2',
         curr_id: RUB,
@@ -422,13 +441,27 @@ async function availabilityTests(directNavigate) {
         icon_id: 1,
         flags: 0,
     });
+    await App.state.fetch();
+    const [, account2] = App.state.accounts.getIds();
+
+    setBlock('2 accounts and no person', 2);
+    // Expense, Income and Transfer must be available
+    await TransactionTests.checkTransactionAvailable(EXPENSE, directNavigate);
+    await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
+    await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
+    await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
+
+    if (!directNavigate) {
+        // Navigate from not available Debt to available Transfer
+        await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
+    }
+
+    // Create person
     await api.person.create({
         name: 'Person 1',
         flags: 0,
     });
-
     await App.state.fetch();
-    const [account1, account2] = App.state.accounts.getIds();
     const [person1] = App.state.persons.getIds();
 
     setBlock('2 accounts and 1 person', 2);
@@ -438,7 +471,7 @@ async function availabilityTests(directNavigate) {
     await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
     await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
 
-    // Remove account, here should be only 1 account
+    // Remove account
     await api.account.del(account2);
     await App.state.fetch();
 
@@ -449,7 +482,7 @@ async function availabilityTests(directNavigate) {
     await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
     await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
 
-    // Remove account, here should be no accounts
+    // Remove account
     await api.account.del(account1);
     await App.state.fetch();
 
@@ -458,9 +491,10 @@ async function availabilityTests(directNavigate) {
     await TransactionTests.checkTransactionAvailable(EXPENSE, directNavigate);
     await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
     await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
+    // Navigate from not available Transfer to available Debt
     await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
 
-    // Remove person, here should be no persons
+    // Remove person
     await api.person.del(person1);
     await App.state.fetch();
 
