@@ -5,7 +5,7 @@ import {
     DEBT,
 } from '../model/Transaction.js';
 import { api } from '../model/api.js';
-import * as TransactionTests from '../run/transaction/common.js';
+import * as TransactionTests from '../run/transaction/index.js';
 import * as ExpenseTransactionTests from '../run/transaction/expense.js';
 import * as IncomeTransactionTests from '../run/transaction/income.js';
 import * as TransferTransactionTests from '../run/transaction/transfer.js';
@@ -14,10 +14,11 @@ import { transactionsListTests } from './transactionList.js';
 import { importTests } from './import.js';
 import { App } from '../Application.js';
 import { setBlock } from '../env.js';
+import { ACCOUNT_HIDDEN } from '../model/AccountsList.js';
 
 let scenario = null;
 
-async function createExpenseTests() {
+const createExpenseTests = async () => {
     setBlock('Create expense transactions', 1);
 
     const { RUB, KRW } = scenario;
@@ -56,9 +57,9 @@ async function createExpenseTests() {
     }];
 
     await scenario.runner.runGroup(ExpenseTransactionTests.create, data);
-}
+};
 
-async function createIncomeTests() {
+const createIncomeTests = async () => {
     setBlock('Create income transactions', 1);
 
     const { USD, KRW } = scenario;
@@ -99,9 +100,9 @@ async function createIncomeTests() {
     }];
 
     await scenario.runner.runGroup(IncomeTransactionTests.create, data);
-}
+};
 
-async function createTransferTests() {
+const createTransferTests = async () => {
     setBlock('Create transfer transactions', 1);
 
     const data = [{
@@ -138,9 +139,9 @@ async function createTransferTests() {
     }];
 
     await scenario.runner.runGroup(TransferTransactionTests.create, data);
-}
+};
 
-async function createDebtTests() {
+const createDebtTests = async () => {
     setBlock('Create debt transactions', 1);
 
     const data = [{
@@ -179,9 +180,9 @@ async function createDebtTests() {
     }];
 
     await scenario.runner.runGroup(DebtTransactionTests.create, data);
-}
+};
 
-async function updateExpenseTests() {
+const updateExpenseTests = async () => {
     setBlock('Update expense transactions', 2);
 
     const { RUB } = scenario;
@@ -205,9 +206,9 @@ async function updateExpenseTests() {
     }];
 
     await scenario.runner.runGroup(ExpenseTransactionTests.update, data);
-}
+};
 
-async function updateIncomeTests() {
+const updateIncomeTests = async () => {
     setBlock('Update income transactions', 2);
 
     const { RUB } = scenario;
@@ -230,9 +231,9 @@ async function updateIncomeTests() {
     }];
 
     await scenario.runner.runGroup(IncomeTransactionTests.update, data);
-}
+};
 
-async function updateTransferTests() {
+const updateTransferTests = async () => {
     setBlock('Update transfer transactions', 2);
 
     const data = [{
@@ -259,9 +260,9 @@ async function updateTransferTests() {
     }];
 
     await scenario.runner.runGroup(TransferTransactionTests.update, data);
-}
+};
 
-async function updateDebtTests() {
+const updateDebtTests = async () => {
     setBlock('Update debt transactions', 2);
 
     const data = [{
@@ -294,9 +295,9 @@ async function updateDebtTests() {
     }];
 
     await scenario.runner.runGroup(DebtTransactionTests.update, data);
-}
+};
 
-async function deleteExpenseTests() {
+const deleteExpenseTests = async () => {
     setBlock('Delete expense transactions', 2);
 
     const data = [
@@ -305,9 +306,9 @@ async function deleteExpenseTests() {
     ];
 
     await scenario.runner.runGroup((items) => TransactionTests.del(EXPENSE, items), data);
-}
+};
 
-async function deleteIncomeTests() {
+const deleteIncomeTests = async () => {
     setBlock('Delete income transactions', 2);
 
     const data = [
@@ -316,9 +317,9 @@ async function deleteIncomeTests() {
     ];
 
     await scenario.runner.runGroup((items) => TransactionTests.del(INCOME, items), data);
-}
+};
 
-async function deleteTransferTests() {
+const deleteTransferTests = async () => {
     setBlock('Delete transfer transactions', 2);
 
     const data = [
@@ -327,9 +328,9 @@ async function deleteTransferTests() {
     ];
 
     await scenario.runner.runGroup((items) => TransactionTests.del(TRANSFER, items), data);
-}
+};
 
-async function deleteDebtTests() {
+const deleteDebtTests = async () => {
     setBlock('Delete debt transactions', 2);
 
     const data = [
@@ -338,9 +339,9 @@ async function deleteDebtTests() {
     ];
 
     await scenario.runner.runGroup((items) => TransactionTests.del(DEBT, items), data);
-}
+};
 
-async function stateLoopTests() {
+const stateLoopTests = async () => {
     setBlock('Transaction view state loops', 1);
 
     await ExpenseTransactionTests.stateLoop();
@@ -349,36 +350,36 @@ async function stateLoopTests() {
     await DebtTransactionTests.stateLoop();
 
     await TransactionTests.typeChangeLoop();
-}
+};
 
-async function createTests() {
+const createTests = async () => {
     setBlock('Create transaction', 1);
 
     await createExpenseTests();
     await createIncomeTests();
     await createTransferTests();
     await createDebtTests();
-}
+};
 
-async function updateTests() {
+const updateTests = async () => {
     setBlock('Update transaction', 1);
 
     await updateExpenseTests();
     await updateIncomeTests();
     await updateTransferTests();
     await updateDebtTests();
-}
+};
 
-async function deleteTests() {
+const deleteTests = async () => {
     setBlock('Delete transaction', 1);
 
     await deleteExpenseTests();
     await deleteIncomeTests();
     await deleteTransferTests();
     await deleteDebtTests();
-}
+};
 
-async function deleteFromUpdateTests() {
+const deleteFromUpdateTests = async () => {
     setBlock('Delete transaction from update view', 2);
 
     const data = [
@@ -389,9 +390,49 @@ async function deleteFromUpdateTests() {
         (pos) => TransactionTests.delFromUpdate(DEBT, pos),
         data,
     );
-}
+};
 
-async function availabilityTests(directNavigate) {
+const createFromHiddenAccount = async () => {
+    setBlock('Create transaction from hidden account', 2);
+
+    const { RUB } = scenario;
+
+    // Remove all accounts and persons
+    await api.account.reset();
+    const personIds = App.state.persons.getIds();
+    if (personIds.length > 0) {
+        await api.person.del(personIds);
+    }
+
+    // Create hidden account
+    await api.account.create({
+        name: 'Account 1',
+        curr_id: RUB,
+        initbalance: '1',
+        icon_id: 1,
+        flags: ACCOUNT_HIDDEN,
+    });
+    // Create visible account
+    await api.account.create({
+        name: 'Account 2',
+        curr_id: RUB,
+        initbalance: '2',
+        icon_id: 1,
+        flags: 0,
+    });
+    await App.state.fetch();
+    const [account1] = App.state.accounts.getIds();
+
+    const data = [
+        { type: EXPENSE, accountId: account1 },
+        { type: INCOME, accountId: account1 },
+        { type: TRANSFER, accountId: account1 },
+        { type: DEBT, accountId: account1 },
+    ];
+    await scenario.runner.runGroup(TransactionTests.createFromHiddenAccount, data);
+};
+
+const availabilityTests = async (directNavigate) => {
     const { RUB } = scenario;
 
     if (directNavigate) {
@@ -407,7 +448,7 @@ async function availabilityTests(directNavigate) {
         await api.person.del(personIds);
     }
 
-    // Create 2 account and 1 person
+    // Create first account
     await api.account.create({
         name: 'Account 1',
         curr_id: RUB,
@@ -415,6 +456,25 @@ async function availabilityTests(directNavigate) {
         icon_id: 1,
         flags: 0,
     });
+    await App.state.fetch();
+    const [account1] = App.state.accounts.getIds();
+
+    setBlock('1 account and no person', 2);
+    // Only Expense and Income must be available
+    await TransactionTests.checkTransactionAvailable(EXPENSE, directNavigate);
+    await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
+    await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
+    await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
+
+    if (!directNavigate) {
+        // Navigate from not available Debt to available Expense
+        await TransactionTests.checkTransactionAvailable(EXPENSE, directNavigate);
+        await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
+        // Navigate from not available Debt to available Income
+        await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
+    }
+
+    // Create second account
     await api.account.create({
         name: 'Account 2',
         curr_id: RUB,
@@ -422,13 +482,27 @@ async function availabilityTests(directNavigate) {
         icon_id: 1,
         flags: 0,
     });
+    await App.state.fetch();
+    const [, account2] = App.state.accounts.getIds();
+
+    setBlock('2 accounts and no person', 2);
+    // Expense, Income and Transfer must be available
+    await TransactionTests.checkTransactionAvailable(EXPENSE, directNavigate);
+    await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
+    await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
+    await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
+
+    if (!directNavigate) {
+        // Navigate from not available Debt to available Transfer
+        await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
+    }
+
+    // Create person
     await api.person.create({
         name: 'Person 1',
         flags: 0,
     });
-
     await App.state.fetch();
-    const [account1, account2] = App.state.accounts.getIds();
     const [person1] = App.state.persons.getIds();
 
     setBlock('2 accounts and 1 person', 2);
@@ -438,7 +512,7 @@ async function availabilityTests(directNavigate) {
     await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
     await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
 
-    // Remove account, here should be only 1 account
+    // Remove account
     await api.account.del(account2);
     await App.state.fetch();
 
@@ -449,7 +523,7 @@ async function availabilityTests(directNavigate) {
     await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
     await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
 
-    // Remove account, here should be no accounts
+    // Remove account
     await api.account.del(account1);
     await App.state.fetch();
 
@@ -458,9 +532,10 @@ async function availabilityTests(directNavigate) {
     await TransactionTests.checkTransactionAvailable(EXPENSE, directNavigate);
     await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
     await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
+    // Navigate from not available Transfer to available Debt
     await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
 
-    // Remove person, here should be no persons
+    // Remove person
     await api.person.del(person1);
     await App.state.fetch();
 
@@ -470,7 +545,7 @@ async function availabilityTests(directNavigate) {
     await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
     await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
     await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
-}
+};
 
 export const transactionTests = {
     /** Initialize tests */
@@ -560,6 +635,7 @@ export const transactionTests = {
     },
 
     async runAvailabilityTests() {
+        await createFromHiddenAccount();
         await availabilityTests(false);
         await availabilityTests(true);
     },

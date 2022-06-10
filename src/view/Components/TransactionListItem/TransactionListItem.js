@@ -68,7 +68,7 @@ export class TransactionListItem extends Component {
             throw new Error('Invalid transaction');
         }
 
-        const accountModel = window.app.model.account;
+        const accountModel = window.app.model.accounts;
         const srcAcc = accountModel.getItem(item.src_id);
         const destAcc = accountModel.getItem(item.dest_id);
 
@@ -89,7 +89,7 @@ export class TransactionListItem extends Component {
         }
 
         const { profile } = window.app.model;
-        const personModel = window.app.model.person;
+        const personModel = window.app.model.persons;
         const debtType = (srcAcc && srcAcc.owner_id !== profile.owner_id);
         const personAcc = (debtType) ? srcAcc : destAcc;
         const person = personModel.getItem(personAcc.owner_id);
@@ -130,7 +130,7 @@ export class TransactionListItem extends Component {
 
         if (item.type === DEBT) {
             const { profile } = window.app.model;
-            const accountModel = window.app.model.account;
+            const accountModel = window.app.model.accounts;
             const srcAcc = accountModel.getItem(item.src_id);
             const debtType = (!!srcAcc && srcAcc.owner_id !== profile.owner_id);
             const acc = (debtType) ? item.dest_id : item.src_id;

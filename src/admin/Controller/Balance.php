@@ -20,10 +20,39 @@ class Balance extends AdminController
         $destAvailTypes = [INCOME, TRANSFER, DEBT];
 
         $accModel = AccountModel::getInstance();
-        $accounts = $accModel->getData(["full" => true]);
+        $visibleAccounts = $accModel->getData(["type" => "visible"]);
+        $hiddenAccounts = $accModel->getData(["type" => "hidden"]);
+        $accounts = [...$visibleAccounts, ...$hiddenAccounts];
+        $data["accounts"] = $accounts;
+
+        $filter = new \stdClass();
+        $trParams = [
+            "onPage" => 0,
+            "desc" => false
+        ];
+        // Prepare array of requested accounts filter
+        $accFilter = [];
+        if (isset($_GET["accounts"])) {
+            $accountsReq = $_GET["accounts"];
+            if (!is_array($accountsReq)) {
+                $accountsReq = [$accountsReq];
+            }
+            foreach ($accountsReq as $acc_id) {
+                if ($accModel->isExist($acc_id)) {
+                    $accFilter[] = intval($acc_id);
+                }
+            }
+        }
+        $trParams["accounts"] = $filter->accounts = $accFilter;
+        $data["accFilter"] = $accFilter;
 
         $trModel = TransactionModel::getInstance();
-        $resArr = $trModel->getData();
+
+        if (count($accFilter)) {
+            $resArr = $trModel->getData($trParams);
+        } else {
+            $resArr = [];
+        }
         $transactions = [];
         $results = [];
         foreach ($resArr as $tr) {
@@ -45,7 +74,6 @@ class Balance extends AdminController
                 $tr->exp_src_result = 0;
             }
 
-
             if ($tr->dest_id && in_array($tr->type, $destAvailTypes)) {
                 if (!isset($results[$tr->dest_id])) {
                     $accObj = $accModel->getItem($tr->dest_id);
@@ -65,8 +93,16 @@ class Balance extends AdminController
         }
         $data["transactions"] = $transactions;
 
+        $data["appProps"] = [
+            "view" => [
+                "accounts" => $accounts,
+                "filter" => $filter,
+            ],
+        ];
+
         $this->menuItems["balance"]["active"] = true;
         $this->cssAdmin[] = "BalanceView.css";
+        $this->jsAdmin[] = "BalanceView.js";
 
         $this->render($data);
     }

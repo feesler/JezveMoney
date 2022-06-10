@@ -256,6 +256,10 @@ body.white-theme,
 }
 
 /* Import view */
+.white-theme .content-header {
+  background-color: #ffffff;
+}
+
 .white-theme .import-item {
   background-color: #dddddd;
 }

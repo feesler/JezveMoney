@@ -64,87 +64,30 @@ class Transactions extends TemplateController
         ];
         $listData = [];
 
-        $filterObj = new \stdClass();
         $pagination = [
             "onPage" => 10,
             "page" => 1,
             "pagesCount" => 1,
             "total" => 0,
         ];
-        $trParams = [
+        $trParamsDefault = [
             "onPage" => 10,
             "desc" => true
         ];
 
-        // Obtain requested transaction type filter
-        $typeFilter = [];
-        if (isset($_GET["type"])) {
-            $typeReq = $_GET["type"];
-            if (!is_array($typeReq)) {
-                $typeReq = [$typeReq];
-            }
+        $trParams = $this->model->getRequestFilters($_GET, $trParamsDefault);
+        $filterObj = $this->model->getFilterObject($trParams);
 
-            foreach ($typeReq as $type_str) {
-                $type_id = intval($type_str);
-                if (!$type_id) {
-                    $type_id = TransactionModel::stringToType($type_str);
-                }
-                if ($type_id) {
-                    $typeFilter[] = $type_id;
-                }
-            }
-            if (count($typeFilter) > 0) {
-                $trParams["type"] = $filterObj->type = $typeFilter;
-            }
-        }
-
-        // Obtain requested page number
-        if (isset($_GET["page"])) {
-            $page = intval($_GET["page"]);
-            if ($page > 1) {
-                $trParams["page"] = $page - 1;
-            }
-        }
-
-        // Prepare array of requested accounts filter
-        $accFilter = [];
-        if (isset($_GET["acc_id"])) {
-            $accountsReq = $_GET["acc_id"];
-            if (!is_array($accountsReq)) {
-                $accountsReq = [$accountsReq];
-            }
-            foreach ($accountsReq as $acc_id) {
-                if ($this->accModel->isExist($acc_id)) {
-                    $accFilter[] = intval($acc_id);
-                }
-            }
-            if (count($accFilter) > 0) {
-                $trParams["accounts"] = $filterObj->acc_id = $accFilter;
-            }
-        }
-        $data["accFilter"] = $accFilter;
-
-        // Obtain requested search query
-        $searchReq = (isset($_GET["search"]) ? $_GET["search"] : null);
-        if (!is_null($searchReq)) {
-            $trParams["search"] = $filterObj->search = $searchReq;
-        }
-        $data["searchReq"] = $searchReq;
-
-        // Obtain requested date range
-        $stDate = (isset($_GET["stdate"]) ? $_GET["stdate"] : null);
-        $endDate = (isset($_GET["enddate"]) ? $_GET["enddate"] : null);
+        $data["accFilter"] = isset($trParams["accounts"]) ? $trParams["accounts"] : [];
+        $data["searchReq"] = isset($trParams["search"]) ? $trParams["search"] : null;
 
         $dateFmt = "";
-        if (!is_null($stDate) && !is_null($endDate)) {
-            $sdate = strtotime($stDate);
-            $edate = strtotime($endDate);
+        if (isset($trParams["startDate"]) && $trParams["endDate"]) {
+            $sdate = strtotime($trParams["startDate"]);
+            $edate = strtotime($trParams["endDate"]);
             if ($sdate != -1 && $edate != -1) {
                 $dateFmt = date("d.m.Y", $sdate) . " - " . date("d.m.Y", $edate);
             }
-
-            $trParams["startDate"] = $filterObj->stdate = $stDate;
-            $trParams["endDate"] = $filterObj->enddate = $endDate;
         }
         $data["dateFmt"] = $dateFmt;
 
@@ -173,8 +116,7 @@ class Transactions extends TemplateController
 
         $transMenu = [];
         foreach ($trTypes as $type_id => $trTypeName) {
-            $urlParams = (array)$filterObj;
-
+            $urlParams = $filterObj;
             $urlParams["mode"] = ($showDetails) ? "classic" : "details";
 
             if ($type_id != 0) {
@@ -191,9 +133,9 @@ class Transactions extends TemplateController
             $menuItem->title = $trTypeName;
 
             if ($type_id == 0) {
-                $menuItem->selected = !isset($filterObj->type) || !count($filterObj->type);
+                $menuItem->selected = !isset($filterObj["type"]) || !count($filterObj["type"]);
             } else {
-                $menuItem->selected = isset($filterObj->type) && in_array($type_id, $filterObj->type);
+                $menuItem->selected = isset($filterObj["type"]) && in_array($type_id, $filterObj["type"]);
             }
             $menuItem->url = urlJoin($baseUrl, $urlParams);
 
@@ -203,14 +145,13 @@ class Transactions extends TemplateController
 
         // Prepare mode selector and paginator
         // Prepare classic/details mode link
-        $urlParams = (array)$filterObj;
+        $urlParams = $filterObj;
         $urlParams["mode"] = ($showDetails) ? "classic" : "details";
-
         $data["modeLink"] = urlJoin(BASEURL . "transactions/", $urlParams);
 
         // Build data for paginator
         if ($trParams["onPage"] > 0) {
-            $urlParams = (array)$filterObj;
+            $urlParams = $filterObj;
             $urlParams["mode"] = ($showDetails) ? "classic" : "details";
 
             $pageCount = ceil($transCount / $trParams["onPage"]);
@@ -250,15 +191,17 @@ class Transactions extends TemplateController
             "owner_id" => $this->owner_id,
             "name" => $this->user_name,
         ];
-        $data["viewData"] = [
+        $data["appProps"] = [
             "profile" => $profileData,
             "accounts" => $this->accModel->getData(["full" => true, "type" => "all"]),
             "persons" => $this->personMod->getData(["type" => "all"]),
             "currency" => $currArr,
-            "transArr" => $trItems,
-            "filterObj" => $filterObj,
-            "pagination" => $pagination,
-            "mode" => $showDetails ? "details" : "classic",
+            "view" => [
+                "transArr" => $trItems,
+                "filterObj" => $filterObj,
+                "pagination" => $pagination,
+                "mode" => $showDetails ? "details" : "classic",
+            ],
         ];
 
         $this->cssArr[] = "TransactionListView.css";
@@ -358,9 +301,12 @@ class Transactions extends TemplateController
         if (isset($_GET["acc_id"])) {
             $acc_id = intval($_GET["acc_id"]);
         }
-        // Redirect if invalid account is specified
-        if ($acc_id && !$this->accModel->isExist($acc_id)) {
-            $this->fail($defMsg);
+        // Redirect if invalid or hidden account is specified
+        if ($acc_id) {
+            $account = $this->accModel->getItem($acc_id);
+            if (!$account || $this->accModel->isHidden($account)) {
+                $this->fail($defMsg);
+            }
         }
         // Use first account if nothing is specified
         if (!$acc_id) {
@@ -652,17 +598,18 @@ class Transactions extends TemplateController
         $data["headString"] = "Create transaction";
         $data["titleString"] = "Jezve Money | " . $data["headString"];
 
-        $viewData = [
-            "mode" => $this->action,
+        $data["appProps"] = [
             "profile" => $profileData,
-            "transaction" => $tr,
-            "trAvailable" => $trAvailable,
             "accounts" => $this->accModel->getData(["type" => "all", "full" => true]),
             "currency" => $this->currModel->getData(),
             "icons" => $iconModel->getData(),
             "persons" => $this->personMod->getData(["type" => "all"]),
+            "view" => [
+                "mode" => $this->action,
+                "transaction" => $tr,
+                "trAvailable" => $trAvailable,
+            ],
         ];
-        $data["viewData"] = $viewData;
 
         $this->cssArr[] = "TransactionView.css";
         $this->jsArr[] = "TransactionView.js";
@@ -956,17 +903,18 @@ class Transactions extends TemplateController
         $data["headString"] = "Edit transaction";
         $data["titleString"] = "Jezve Money | " . $data["headString"];
 
-        $viewData = [
-            "mode" => $this->action,
+        $data["appProps"] = [
             "profile" => $profileData,
-            "transaction" => $tr,
-            "trAvailable" => $trAvailable,
             "accounts" => $this->accModel->getData(["type" => "all", "full" => true]),
             "currency" => $this->currModel->getData(),
             "icons" => $iconModel->getData(),
             "persons" => $this->personMod->getData(["type" => "all"]),
+            "view" => [
+                "mode" => $this->action,
+                "transaction" => $tr,
+                "trAvailable" => $trAvailable,
+            ],
         ];
-        $data["viewData"] = $viewData;
 
         $this->cssArr[] = "TransactionView.css";
         $this->jsArr[] = "TransactionView.js";

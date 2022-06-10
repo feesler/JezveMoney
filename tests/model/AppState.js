@@ -26,8 +26,6 @@ import { TransactionsList } from './TransactionsList.js';
 import { ImportRuleList } from './ImportRuleList.js';
 import { api } from './api.js';
 
-/* eslint-disable no-bitwise */
-
 /**
  * Accounts
  */
@@ -325,6 +323,7 @@ export class AppState {
         return true;
     }
 
+    /* eslint-disable no-bitwise */
     showAccounts(ids, show = true) {
         const itemIds = Array.isArray(ids) ? ids : [ids];
 
@@ -345,6 +344,7 @@ export class AppState {
 
         return true;
     }
+    /* eslint-enable no-bitwise */
 
     resetAccounts() {
         this.deleteAccounts(this.accounts.getIds());
@@ -384,7 +384,7 @@ export class AppState {
 
     getAccountIndexesByNames(accounts) {
         const accNames = Array.isArray(accounts) ? accounts : [accounts];
-        const userAccounts = this.accounts.getUserAccounts().getVisible();
+        const userAccounts = this.accounts.getUserVisible();
 
         return accNames.map((name) => {
             const acc = userAccounts.findByName(name);
@@ -394,6 +394,11 @@ export class AppState {
 
             return userAccounts.getIndexById(acc.id);
         });
+    }
+
+    getVisibleAccountByIndex(index) {
+        const userAccounts = this.accounts.getUserVisible();
+        return userAccounts.getItemByIndex(index);
     }
 
     /**
@@ -485,6 +490,7 @@ export class AppState {
         return true;
     }
 
+    /* eslint-disable no-bitwise */
     showPersons(ids, show = true) {
         const itemIds = Array.isArray(ids) ? ids : [ids];
         for (const personId of itemIds) {
@@ -504,6 +510,7 @@ export class AppState {
 
         return true;
     }
+    /* eslint-enable no-bitwise */
 
     getPersonAccount(personId, currencyId) {
         const pId = parseInt(personId, 10);
@@ -584,6 +591,11 @@ export class AppState {
 
             return visibleList.getIndexById(person.id);
         });
+    }
+
+    getVisiblePersonByIndex(index) {
+        const visibleList = this.persons.getVisible();
+        return visibleList.getItemByIndex(index);
     }
 
     /**

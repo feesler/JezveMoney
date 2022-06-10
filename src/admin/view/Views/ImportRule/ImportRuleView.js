@@ -6,14 +6,13 @@ import {
     copyObject,
     ajax,
 } from 'jezvejs';
+import { Application } from '../../../../view/js/Application.js';
 import { AdminListView } from '../../js/AdminListView.js';
 import { AdminImportConditionListView } from './ImportConditionView.js';
 import { AdminImportActionListView } from './ImportActionView.js';
 import '../../../../view/css/app.css';
 import '../../css/admin.css';
 import './style.css';
-
-/* eslint no-bitwise: "off" */
 
 /**
  * Admin import rule list view
@@ -135,4 +134,5 @@ class AdminImportRuleListView extends AdminListView {
     }
 }
 
-window.view = new AdminImportRuleListView(window.app);
+window.app = new Application(window.appProps);
+window.app.createView(AdminImportRuleListView);

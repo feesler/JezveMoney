@@ -1,7 +1,7 @@
 import { generateCSV } from '../model/import.js';
 import { api } from '../model/api.js';
-import * as ApiTests from '../run/api.js';
-import * as ImportTests from '../run/import.js';
+import * as ApiTests from '../run/api/index.js';
+import * as ImportTests from '../run/import/index.js';
 import { App } from '../Application.js';
 import { setBlock } from '../env.js';
 import { importItemsTests } from './import/items.js';
@@ -12,7 +12,7 @@ let scenario = null;
 let csvStatement = null;
 let uploadFilename = null;
 
-async function runSubmitImportTests() {
+const runSubmitImportTests = async () => {
     await ImportTests.submit();
     // Verify submit is disabled for empty list
     setBlock('Verify submit is disabled for empty list', 2);
@@ -76,7 +76,7 @@ async function runSubmitImportTests() {
         value: false,
     });
     await ImportTests.submit();
-}
+};
 
 export const importTests = {
     /** Initialize tests */

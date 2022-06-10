@@ -12,6 +12,7 @@ import {
     urlJoin,
     ajax,
 } from 'jezvejs';
+import { Application } from '../../../../view/js/Application.js';
 import { AdminView } from '../../js/AdminView.js';
 import '../../../../view/css/app.css';
 import '../../css/admin.css';
@@ -1221,4 +1222,5 @@ class AdminApiConsoleView extends AdminView {
     }
 }
 
-window.view = new AdminApiConsoleView(window.app);
+window.app = new Application(window.appProps);
+window.app.createView(AdminApiConsoleView);

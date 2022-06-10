@@ -23,7 +23,7 @@ import {
     prop,
     click,
     input,
-    onChange,
+    check,
     isVisible,
 } from '../../../env.js';
 
@@ -40,8 +40,14 @@ export class ImportListItem extends TestComponent {
         const fieldsMap = {
             typeField: 'Type',
             amountField: 'Amount',
-            destAmountField: 'Destination amount',
-            destAccountField: 'Destination account',
+            destAmountField: [
+                'Source amount',
+                'Destination amount',
+            ],
+            destAccountField: [
+                'Source account',
+                'Destination account',
+            ],
             personField: 'Person',
             currencyField: 'Currency',
             dateField: 'Date',
@@ -52,8 +58,12 @@ export class ImportListItem extends TestComponent {
             throw new Error('Invalid field');
         }
 
-        for (const fieldName in fieldsMap) {
-            if (fieldsMap[fieldName] === field.title) {
+        for (const fieldName of Object.keys(fieldsMap)) {
+            const fieldLabel = fieldsMap[fieldName];
+            if (
+                (typeof fieldLabel === 'string' && fieldLabel === field.title)
+                || (fieldLabel.includes(field.title))
+            ) {
                 return { name: fieldName, component: field };
             }
         }
@@ -450,8 +460,7 @@ export class ImportListItem extends TestComponent {
         this.model.enabled = !this.model.enabled;
         this.expectedState = this.getExpectedState(this.model);
 
-        await click(this.content.enableCheck);
-        await onChange(this.content.enableCheck);
+        await check(this.content.enableCheck);
         await this.parse();
 
         return this.checkState();

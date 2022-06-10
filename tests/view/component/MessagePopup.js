@@ -42,10 +42,6 @@ export class MessagePopup extends TestComponent {
         res.message = res.message.trim();
         res.closeBtn = await query(this.elem, '.close-btn');
 
-        if (!res.success) {
-            console.log(`Error popup appear: ${res.message}`);
-        }
-
         return res;
     }
 

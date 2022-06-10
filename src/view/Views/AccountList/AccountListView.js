@@ -1,10 +1,10 @@
 import 'jezvejs/style';
 import { ge, urlJoin } from 'jezvejs';
 import { Selection } from 'jezvejs/Selection';
+import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
-import { AccountList } from '../../js/model/AccountList.js';
 import '../../css/app.css';
 import '../../Components/Tile/style.css';
 import '../../Components/IconLink/style.css';
@@ -27,10 +27,6 @@ class AccountListView extends View {
                 hidden: new Selection(),
             },
         };
-
-        if (this.props.accounts) {
-            this.model.accounts = AccountList.create(this.props.accounts);
-        }
     }
 
     /**
@@ -88,7 +84,7 @@ class AccountListView extends View {
         }
 
         const accountId = parseInt(tile.dataset.id, 10);
-        const account = this.model.accounts.getItem(accountId);
+        const account = window.app.model.accounts.getItem(accountId);
         if (!account) {
             return;
         }
@@ -157,4 +153,5 @@ class AccountListView extends View {
     }
 }
 
-window.view = new AccountListView(window.app);
+window.app = new Application(window.appProps);
+window.app.createView(AccountListView);

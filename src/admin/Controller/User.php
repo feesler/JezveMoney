@@ -29,8 +29,10 @@ class User extends AdminController
             }
         }
         $data["itemsData"] = $itemsData;
-        $data["viewData"] = [
-            "data" => $itemsData,
+        $data["appProps"] = [
+            "view" => [
+                "data" => $itemsData,
+            ],
         ];
 
         $this->menuItems["users"]["active"] = true;

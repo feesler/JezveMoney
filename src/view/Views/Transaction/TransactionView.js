@@ -23,9 +23,8 @@ import {
     normalizeExch,
     getTransactionTypeString,
 } from '../../js/app.js';
+import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
-import { CurrencyList } from '../../js/model/CurrencyList.js';
-import { IconList } from '../../js/model/IconList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
@@ -84,30 +83,13 @@ class TransactionView extends View {
         super(...args);
         const availModes = ['create', 'update'];
 
-        if (!('profile' in this.props)
-            || !('currency' in this.props)
-            || !('accounts' in this.props)
-            || !('persons' in this.props)
-            || !('transaction' in this.props)
-            || !('icons' in this.props)) {
+        if (!('transaction' in this.props)) {
             throw new Error('Invalid Transaction view properties');
         }
 
-        if (!window.app.model) {
-            window.app.model = {};
-        }
-
-        window.app.model.profile = { ...this.props.profile };
-
-        const currencyModel = CurrencyList.create(this.props.currency);
-        window.app.model.currency = currencyModel;
-
-        window.app.model.icons = IconList.create(this.props.icons);
-
-        const accountModel = AccountList.create(this.props.accounts);
-        window.app.model.accounts = accountModel;
-        const personModel = PersonList.create(this.props.persons);
-        window.app.model.persons = personModel;
+        const currencyModel = window.app.model.currency;
+        const accountModel = window.app.model.accounts;
+        const personModel = window.app.model.persons;
 
         this.mode = this.props.mode;
         if (!availModes.includes(this.mode)) {
@@ -1438,4 +1420,5 @@ class TransactionView extends View {
     }
 }
 
-window.view = new TransactionView(window.app);
+window.app = new Application(window.appProps);
+window.app.createView(TransactionView);

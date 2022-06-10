@@ -1,11 +1,10 @@
 import { isFunction } from 'jezvejs';
 
-/* eslint no-bitwise: "off" */
-
 /**
 * Obtain 32-bit integer from string
 * @param {string} str - string to create hash from
 */
+/* eslint-disable no-bitwise */
 function hashCode(str) {
     let hash = 0;
 
@@ -21,6 +20,7 @@ function hashCode(str) {
 
     return Math.abs(hash);
 }
+/* eslint-enable no-bitwise */
 
 /** Uploader constructor */
 export class Uploader {

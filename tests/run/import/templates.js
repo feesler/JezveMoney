@@ -4,7 +4,7 @@ import { ImportView } from '../../view/ImportView.js';
 import { CREATE_TPL_STATE } from '../../view/component/Import/ImportUploadDialog.js';
 
 /** Test selection of import template by id */
-export async function selectTemplateById(value) {
+export const selectTemplateById = async (value) => {
     await test(`Select upload template [${value}]`, async () => {
         if (!(App.view instanceof ImportView)) {
             throw new Error('Invalid view instance');
@@ -14,10 +14,10 @@ export async function selectTemplateById(value) {
         await App.view.selectUploadTemplateById(value);
         return App.view.checkState();
     });
-}
+};
 
 /** Test selection of import template by index */
-export async function selectTemplateByIndex(value) {
+export const selectTemplateByIndex = async (value) => {
     await test(`Select upload template by index [${value}]`, async () => {
         if (!(App.view instanceof ImportView)) {
             throw new Error('Invalid view instance');
@@ -27,10 +27,10 @@ export async function selectTemplateByIndex(value) {
         await App.view.selectUploadTemplateByIndex(value);
         return App.view.checkState();
     });
-}
+};
 
 /** Test input import template name on create/update state */
-export async function inputTemplateName(value) {
+export const inputTemplateName = async (value) => {
     await test(`Input template name (${value})`, async () => {
         if (!(App.view instanceof ImportView)) {
             throw new Error('Invalid view instance');
@@ -40,10 +40,10 @@ export async function inputTemplateName(value) {
         await App.view.inputTemplateName(value);
         return App.view.checkState();
     });
-}
+};
 
 /** Select column of import template */
-export async function selectTemplateColumn({ column, index }) {
+export const selectTemplateColumn = async ({ column, index }) => {
     await test(`Select template column [${column} => ${index}]`, async () => {
         if (!(App.view instanceof ImportView)) {
             throw new Error('Invalid view instance');
@@ -53,10 +53,10 @@ export async function selectTemplateColumn({ column, index }) {
         await App.view.selectTemplateColumn(column, index);
         return App.view.checkState();
     });
-}
+};
 
 /** Go to create import template state */
-export async function createTemplate() {
+export const createTemplate = async () => {
     await test('Create template', async () => {
         if (!(App.view instanceof ImportView)) {
             throw new Error('Invalid view instance');
@@ -66,10 +66,10 @@ export async function createTemplate() {
         await App.view.createTemplate();
         return App.view.checkState();
     });
-}
+};
 
 /** Update currently selected template */
-export async function updateTemplate() {
+export const updateTemplate = async () => {
     await test('Update template', async () => {
         if (!(App.view instanceof ImportView)) {
             throw new Error('Invalid view instance');
@@ -79,10 +79,10 @@ export async function updateTemplate() {
         await App.view.updateTemplate();
         return App.view.checkState();
     });
-}
+};
 
 /** Delete currently selected template */
-export async function deleteTemplate() {
+export const deleteTemplate = async () => {
     await test('Delete template', async () => {
         if (!(App.view instanceof ImportView)) {
             throw new Error('Invalid view instance');
@@ -98,10 +98,10 @@ export async function deleteTemplate() {
 
         return App.state.fetchAndTest();
     });
-}
+};
 
 /** Submit current template */
-export async function submitTemplate() {
+export const submitTemplate = async () => {
     await test('Submit template', async () => {
         if (!(App.view instanceof ImportView)) {
             throw new Error('Invalid view instance');
@@ -123,10 +123,10 @@ export async function submitTemplate() {
         // Check app state
         return App.state.fetchAndTest();
     });
-}
+};
 
 /** Cancel create/update template */
-export async function cancelTemplate() {
+export const cancelTemplate = async () => {
     await test('Cancel template', async () => {
         if (!(App.view instanceof ImportView)) {
             throw new Error('Invalid view instance');
@@ -136,4 +136,4 @@ export async function cancelTemplate() {
         await App.view.cancelTemplate();
         return App.view.checkState();
     });
-}
+};

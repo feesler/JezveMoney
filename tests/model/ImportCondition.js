@@ -1,7 +1,5 @@
-import { isFunction, isObject } from 'jezve-test';
+import { isFunction, isObject, hasFlag } from 'jezve-test';
 import { convDate, fixFloat } from '../common.js';
-
-/* eslint-disable no-bitwise */
 
 /** Condition field types */
 export const IMPORT_COND_FIELD_MAIN_ACCOUNT = 1;
@@ -242,7 +240,7 @@ export class ImportCondition {
             throw new Error('Invalid flags value');
         }
 
-        return (flags & IMPORT_COND_OP_FIELD_FLAG) === IMPORT_COND_OP_FIELD_FLAG;
+        return hasFlag(flags, IMPORT_COND_OP_FIELD_FLAG);
     }
 
     /** Check field type of condition is account */

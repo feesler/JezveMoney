@@ -26,8 +26,10 @@ class Icon extends AdminController
             "typesData" => $this->model->getTypes(),
         ];
 
-        $data["viewData"] = [
-            "data" => $data["itemsData"],
+        $data["appProps"] = [
+            "view" => [
+                "data" => $data["itemsData"],
+            ],
         ];
 
         $this->menuItems["icon"]["active"] = true;

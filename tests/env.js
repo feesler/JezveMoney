@@ -24,9 +24,9 @@ export const hasClass = (elem, className) => App.environment.hasClass(elem, clas
 
 export const isVisible = (elem, recursive) => App.environment.isVisible(elem, recursive);
 
-export const selectByValue = (elem, value, bool) => (
-    App.environment.selectByValue(elem, value, bool)
-);
+export const select = (elem, value, bool) => App.environment.select(elem, value, bool);
+
+export const check = (elem) => App.environment.check(elem);
 
 export const onChange = (elem) => App.environment.onChange(elem);
 

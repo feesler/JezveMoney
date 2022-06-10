@@ -1,11 +1,11 @@
 import { test } from 'jezve-test';
-import * as TransactionTests from './common.js';
+import * as TransactionTests from './index.js';
 import { Currency } from '../../model/Currency.js';
 import { INCOME } from '../../model/Transaction.js';
 import { App } from '../../Application.js';
 import { setBlock } from '../../env.js';
 
-export async function submit(params) {
+export const submit = async (params) => {
     if ('destAcc' in params) {
         await TransactionTests.runAction({ action: 'changeDestAccountByPos', data: params.destAcc });
     }
@@ -33,14 +33,14 @@ export async function submit(params) {
     }
 
     return TransactionTests.submit();
-}
+};
 
-export async function create(params) {
+export const create = async (params) => {
     await TransactionTests.create(INCOME, params, submit);
-}
+};
 
 /** Update income transaction and check results */
-export async function update(params) {
+export const update = async (params) => {
     await TransactionTests.update(INCOME, params, async (submitParams) => {
         const origTransaction = App.view.getExpectedTransaction();
         const isDiff = (origTransaction.src_curr !== origTransaction.dest_curr);
@@ -52,9 +52,9 @@ export async function update(params) {
 
         return submit(submitParams);
     });
-}
+};
 
-export async function stateLoop() {
+export const stateLoop = async () => {
     await App.state.fetch();
 
     const [RUB, USD, EUR] = Currency.getItemsByNames(['RUB', 'USD', 'EUR']);
@@ -199,4 +199,4 @@ export async function stateLoop() {
         { action: 'clickDestResultBalance' }, // move from State 2 to State 4
         { action: 'changeSourceCurrency', data: RUB },
     ]);
-}
+};

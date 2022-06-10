@@ -4,7 +4,7 @@ use JezveMoney\App\Template\IconLink;
 include(TPL_PATH."commonhdr.tpl");	?>
 </head>
 <body class="<?=($this->themeClass)?>">
-<div class="page">
+<div class="page import-view">
     <div class="page_wrapper">
 <?php	require_once(TPL_PATH."header.tpl");		?>
         <div class="container centered">
@@ -19,7 +19,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                     <span id="notavailmsg" class="nodata-message"><?=e($importNotAvailableMessage)?></span>
 <?php   }   ?>
 
-                    <div class="data-form<?=hidden(!$importAvailable)?>">
+                    <div class="content-header<?=hidden(!$importAvailable)?>">
                         <div class="data-header">
                             <div class="header-field account-field">
                                 <label>Main account</label>
@@ -61,7 +61,9 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </label>
                             <button id="rulesBtn" class="btn link-btn" type="button">Rules (<span id="rulescount"><?=count($rulesData)?></span>)</button>
                         </div>
+                    </div>
 
+                    <div class="data-form<?=hidden(!$importAvailable)?>">
                         <div id="rowsContainer" class="data-container">
                             <span class="nodata-message">No transactions to import</span>
                             <div class="data-container__loading hidden">Loading...</div>

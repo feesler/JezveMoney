@@ -21,18 +21,9 @@ export class ImportActionItem extends Component {
             !this.parent
             || !this.props
             || !this.props.data
-            || !this.props.currencyModel
-            || !this.props.accountModel
-            || !this.props.personModel
         ) {
             throw new Error('Invalid props');
         }
-
-        this.model = {
-            currency: this.props.currencyModel,
-            accounts: this.props.accountModel,
-            persons: this.props.personModel,
-        };
 
         this.actionTypes = ImportAction.getTypes();
         this.transactionTypes = ImportAction.getTransactionTypes();
@@ -116,14 +107,14 @@ export class ImportActionItem extends Component {
 
             value = item.title;
         } else if (state.actionType === IMPORT_ACTION_SET_ACCOUNT) {
-            const item = this.model.accounts.getItem(state.value);
+            const item = window.app.model.accounts.getItem(state.value);
             if (!item) {
                 throw new Error('Account not found');
             }
 
             value = item.name;
         } else if (state.actionType === IMPORT_ACTION_SET_PERSON) {
-            const item = this.model.persons.getItem(state.value);
+            const item = window.app.model.persons.getItem(state.value);
             if (!item) {
                 throw new Error('Person not found');
             }

@@ -1,8 +1,8 @@
 import 'jezvejs/style';
 import { ge } from 'jezvejs';
 import { Selection } from 'jezvejs/Selection';
+import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
-import { PersonList } from '../../js/model/PersonList.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import '../../css/app.css';
@@ -27,10 +27,6 @@ class PersonListView extends View {
                 hidden: new Selection(),
             },
         };
-
-        if (this.props.persons) {
-            this.model.persons = PersonList.create(this.props.persons);
-        }
     }
 
     /**
@@ -90,7 +86,7 @@ class PersonListView extends View {
         }
 
         const personId = parseInt(tile.dataset.id, 10);
-        const person = this.model.persons.getItem(personId);
+        const person = window.app.model.persons.getItem(personId);
         if (!person) {
             return;
         }
@@ -148,4 +144,5 @@ class PersonListView extends View {
     }
 }
 
-window.view = new PersonListView(window.app);
+window.app = new Application(window.appProps);
+window.app.createView(PersonListView);

@@ -1,5 +1,6 @@
 import 'jezvejs/style';
 import { ge, copyObject } from 'jezvejs';
+import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
@@ -94,4 +95,5 @@ class PersonView extends View {
     }
 }
 
-window.view = new PersonView(window.app);
+window.app = new Application(window.appProps);
+window.app.createView(PersonView);

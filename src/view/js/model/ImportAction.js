@@ -2,8 +2,6 @@ import { copyObject } from 'jezvejs';
 import { ListItem } from './ListItem.js';
 import { ImportTransactionItem } from '../../Components/ImportTransactionItem/ImportTransactionItem.js';
 
-/* eslint no-bitwise: "off" */
-
 /** Action types */
 export const IMPORT_ACTION_SET_TR_TYPE = 1;
 export const IMPORT_ACTION_SET_ACCOUNT = 2;

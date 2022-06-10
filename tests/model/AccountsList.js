@@ -1,10 +1,8 @@
-import { copyObject } from 'jezve-test';
+import { copyObject, hasFlag } from 'jezve-test';
 import { normalize } from '../common.js';
 import { api } from './api.js';
 import { List } from './List.js';
 import { App } from '../Application.js';
-
-/* eslint-disable no-bitwise */
 
 export const ACCOUNT_HIDDEN = 1;
 
@@ -153,7 +151,7 @@ export class AccountsList extends List {
             throw new Error('Invalid account');
         }
 
-        return (account.flags & ACCOUNT_HIDDEN) === ACCOUNT_HIDDEN;
+        return hasFlag(account.flags, ACCOUNT_HIDDEN);
     }
 
     getVisible(returnRaw = false) {
@@ -179,6 +177,11 @@ export class AccountsList extends List {
     /** Return visible user accounts */
     getUserVisible(returnRaw = false) {
         return this.getUserAccounts().getVisible(returnRaw);
+    }
+
+    /** Return hidden user accounts */
+    getUserHidden(returnRaw = false) {
+        return this.getUserAccounts().getHidden(returnRaw);
     }
 
     /**

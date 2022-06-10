@@ -22,10 +22,6 @@ export class ImportConditionItem extends Component {
             !this.parent
             || !this.props
             || !this.props.data
-            || !this.props.tplModel
-            || !this.props.currencyModel
-            || !this.props.accountModel
-            || !this.props.personModel
         ) {
             throw new Error('Invalid props');
         }
@@ -34,13 +30,6 @@ export class ImportConditionItem extends Component {
         this.cancelHandler = this.props.cancel;
         this.updateHandler = this.props.update;
         this.deleteHandler = this.props.remove;
-
-        this.model = {
-            templates: this.props.tplModel,
-            currency: this.props.currencyModel,
-            accounts: this.props.accountModel,
-            persons: this.props.personModel,
-        };
 
         if (!(this.props.data instanceof ImportCondition)) {
             throw new Error('Invalid rule item');
@@ -122,7 +111,7 @@ export class ImportConditionItem extends Component {
             state.fieldType === IMPORT_COND_FIELD_TR_CURRENCY
             || state.fieldType === IMPORT_COND_FIELD_ACC_CURRENCY
         ) {
-            const valueItem = this.model.currency.getItem(state.value);
+            const valueItem = window.app.model.currency.getItem(state.value);
             if (!valueItem) {
                 throw new Error('Invalid currency');
             }
@@ -131,7 +120,7 @@ export class ImportConditionItem extends Component {
         }
 
         if (state.fieldType === IMPORT_COND_FIELD_MAIN_ACCOUNT) {
-            const valueItem = this.model.accounts.getItem(state.value);
+            const valueItem = window.app.model.accounts.getItem(state.value);
             if (!valueItem) {
                 throw new Error('Invalid account');
             }
@@ -140,7 +129,7 @@ export class ImportConditionItem extends Component {
         }
 
         if (state.fieldType === IMPORT_COND_FIELD_TPL) {
-            const valueItem = this.model.templates.getItem(state.value);
+            const valueItem = window.app.model.templates.getItem(state.value);
             if (!valueItem) {
                 throw new Error('Invalid template');
             }

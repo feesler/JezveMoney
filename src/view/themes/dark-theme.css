@@ -258,6 +258,10 @@ body.dark-theme,
 }
 
 /* Import view */
+.dark-theme .content-header {
+  background-color: #202020;
+}
+
 .dark-theme .import-item {
   background-color: #505050;
 }

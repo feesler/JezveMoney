@@ -1,10 +1,10 @@
-import * as ImportTests from '../../run/import.js';
+import * as ImportTests from '../../run/import/index.js';
 import { setBlock } from '../../env.js';
 
 let scenario = null;
 
 // Create import template tests
-async function runCreateTests() {
+const runCreateTests = async () => {
     setBlock('Create import template', 2);
     // Select columns for template
     await scenario.runner.runGroup(ImportTests.selectTemplateColumn, [
@@ -31,10 +31,10 @@ async function runCreateTests() {
     ]);
     await ImportTests.inputTemplateName('Template_dup');
     await ImportTests.submitTemplate();
-}
+};
 
 // Update import template tests
-async function runUpdateTests() {
+const runUpdateTests = async () => {
     setBlock('Update import template', 2);
 
     await ImportTests.selectTemplateByIndex(0);
@@ -45,15 +45,15 @@ async function runUpdateTests() {
         { column: 'transactionCurrency', index: 10 },
     ]);
     await ImportTests.submitTemplate();
-}
+};
 
 // Delete import template tests
-async function runDeleteTests() {
+const runDeleteTests = async () => {
     setBlock('Delete import template', 2);
 
     await ImportTests.selectTemplateByIndex(0);
     await ImportTests.deleteTemplate();
-}
+};
 
 export const importTemplateTests = {
     /** Initialize tests */

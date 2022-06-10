@@ -1,5 +1,6 @@
 import 'jezvejs/style';
 import { Histogram } from 'jezvejs/Histogram';
+import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import '../../Components/IconLink/style.css';
 import '../../css/app.css';
@@ -11,12 +12,6 @@ import './style.css';
  * Main view
  */
 class MainView extends View {
-    constructor(...args) {
-        super(...args);
-
-        this.model = {};
-    }
-
     /**
      * View initialization
      */
@@ -29,4 +24,5 @@ class MainView extends View {
     }
 }
 
-window.view = new MainView(window.app);
+window.app = new Application(window.appProps);
+window.app.createView(MainView);

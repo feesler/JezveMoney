@@ -1,10 +1,10 @@
 import { test } from 'jezve-test';
-import * as TransactionTests from './common.js';
+import * as TransactionTests from './index.js';
 import { TRANSFER } from '../../model/Transaction.js';
 import { App } from '../../Application.js';
 import { setBlock } from '../../env.js';
 
-export async function submit(params) {
+export const submit = async (params) => {
     if ('srcAcc' in params) {
         await TransactionTests.runAction({ action: 'changeSrcAccountByPos', data: params.srcAcc });
     }
@@ -31,14 +31,14 @@ export async function submit(params) {
     }
 
     return TransactionTests.submit();
-}
+};
 
-export async function create(params) {
+export const create = async (params) => {
     await TransactionTests.create(TRANSFER, params, submit);
-}
+};
 
 /** Update transfer transaction and check results */
-export async function update(params) {
+export const update = async (params) => {
     await TransactionTests.update(TRANSFER, params, async (submitParams) => {
         const origTransaction = App.view.getExpectedTransaction();
         const isDiff = (origTransaction.src_curr !== origTransaction.dest_curr);
@@ -50,9 +50,9 @@ export async function update(params) {
 
         return submit(submitParams);
     });
-}
+};
 
-export async function stateLoop() {
+export const stateLoop = async () => {
     await App.state.fetch();
 
     const [ACC_3, ACC_RUB, ACC_USD, ACC_EUR, CARD_RUB] = App.state.getAccountIndexesByNames([
@@ -296,4 +296,4 @@ export async function stateLoop() {
         { action: 'clickDestResultBalance' }, // move from State 4 to State 6
         { action: 'changeDestAccountByPos', data: ACC_RUB },
     ]);
-}
+};

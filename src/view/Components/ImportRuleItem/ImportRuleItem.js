@@ -34,10 +34,6 @@ export class ImportRuleItem extends Component {
             !this.parent
             || !this.props
             || !this.props.data
-            || !this.props.tplModel
-            || !this.props.currencyModel
-            || !this.props.accountModel
-            || !this.props.personModel
         ) {
             throw new Error('Invalid props');
         }
@@ -46,13 +42,6 @@ export class ImportRuleItem extends Component {
         this.cancelHandler = this.props.cancel;
         this.updateHandler = this.props.update;
         this.deleteHandler = this.props.remove;
-
-        this.model = {
-            templates: this.props.tplModel,
-            currency: this.props.currencyModel,
-            accounts: this.props.accountModel,
-            persons: this.props.personModel,
-        };
 
         if (!(this.props.data instanceof ImportRule)) {
             throw new Error('Invalid rule item');
@@ -221,10 +210,6 @@ export class ImportRuleItem extends Component {
             (item) => (new ImportConditionItem({
                 parent: this,
                 data: item,
-                tplModel: this.model.templates,
-                currencyModel: this.model.currency,
-                accountModel: this.model.accounts,
-                personModel: this.model.persons,
             })),
         );
         show(this.conditionsHeader, (conditionItems.length > 0));
@@ -269,9 +254,6 @@ export class ImportRuleItem extends Component {
             (item) => (new ImportActionItem({
                 parent: this,
                 data: item,
-                currencyModel: this.model.currency,
-                accountModel: this.model.accounts,
-                personModel: this.model.persons,
             })),
         );
         show(this.actionsHeader, (actionItems.length > 0));

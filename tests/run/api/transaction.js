@@ -20,7 +20,7 @@ import { App } from '../../Application.js';
  * @param {string} params.date - date of transaction
  * @param {string} params.comment - comment
  */
-export async function create(params) {
+export const create = async (params) => {
     let transactionId = 0;
 
     const titleParams = copyObject(params);
@@ -48,13 +48,70 @@ export async function create(params) {
     });
 
     return transactionId;
-}
+};
 
-export async function extractAndCreate(data) {
+/**
+ * Create multiple transaction with specified params and check expected state of app
+ */
+export const createMultiple = async (params) => {
+    let ids = [];
+
+    await test('Create multiple transactions', async () => {
+        let expectedResult = false;
+        if (Array.isArray(params)) {
+            expectedResult = [];
+            for (const trParam of params) {
+                const resExpected = App.state.createTransaction(trParam);
+                if (!resExpected) {
+                    App.state.deleteTransactions(expectedResult);
+                    expectedResult = false;
+                    break;
+                }
+
+                expectedResult.push(resExpected);
+            }
+        }
+
+        // Send API sequest to server
+        let createRes;
+        try {
+            createRes = await api.transaction.createMultiple(params);
+            if (expectedResult && (!createRes || !createRes.ids)) {
+                return false;
+            }
+        } catch (e) {
+            if (!(e instanceof ApiRequestError) || expectedResult) {
+                throw e;
+            }
+        }
+
+        ids = (createRes) ? createRes.ids : expectedResult;
+
+        return App.state.fetchAndTest();
+    });
+
+    return ids;
+};
+
+export const extractAndCreate = async (data) => {
     const extracted = Transaction.extract(data, App.state);
 
     return create(extracted);
-}
+};
+
+export const extractAndCreateMultiple = async (data) => {
+    const extracted = Array.isArray(data)
+        ? data.map((item) => {
+            try {
+                return Transaction.extract(item, App.state);
+            } catch (e) {
+                return null;
+            }
+        })
+        : data;
+
+    return createMultiple(extracted);
+};
 
 /**
  * Update transaction with specified params and check expected state of app
@@ -69,7 +126,7 @@ export async function extractAndCreate(data) {
  * @param {string} params.date - date of transaction
  * @param {string} params.comment - comment
  */
-export async function update(params) {
+export const update = async (params) => {
     let updateRes;
 
     await test(`Update transaction (${formatProps(params)})`, async () => {
@@ -102,13 +159,13 @@ export async function update(params) {
     });
 
     return updateRes;
-}
+};
 
 /**
  * Delete specified transaction(s) and check expected state of app
  * @param {number[]} ids - array of transaction identificators
  */
-export async function del(ids) {
+export const del = async (ids) => {
     let deleteRes;
 
     await test(`Delete transaction (${ids})`, async () => {
@@ -130,10 +187,10 @@ export async function del(ids) {
     });
 
     return deleteRes;
-}
+};
 
 // Set new position for specified transaction
-export async function setPos(params) {
+export const setPos = async (params) => {
     let result;
 
     await test(`Set position of transaction (${formatProps(params)})`, async () => {
@@ -155,10 +212,10 @@ export async function setPos(params) {
     });
 
     return result;
-}
+};
 
 // Filter list of transaction by specified params
-export async function filter(params) {
+export const filter = async (params) => {
     await test(`Filter transactions (${formatProps(params)})`, async () => {
         const transactions = App.state.transactions.clone();
         let expTransList = transactions.applyFilter(params);
@@ -201,4 +258,4 @@ export async function filter(params) {
 
         return assert.deepMeet(trList.items, expTransList.data);
     });
-}
+};

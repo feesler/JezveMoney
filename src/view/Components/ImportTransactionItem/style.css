@@ -16,6 +16,7 @@
   display: flex;
   flex-flow: column nowrap;
   flex-grow: 1;
+  align-items: normal;
 }
 
 .import-item .form-row {
@@ -97,6 +98,19 @@
 .import-item .dd__combo,
 .import-item .dd__container.dd__container_disabled .dd__combo {
   border: 1px solid;
+}
+
+.import-item .dd__list {
+  border-left-width: 1px;
+  border-right-width: 1px;
+}
+
+.import-item .dd__list_drop-down {
+  border-top-width: 1px;
+}
+
+.import-item .dd__list_drop-up {
+  border-top-width: 1px;
 }
 
 .import-item input[type="text"] {

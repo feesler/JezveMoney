@@ -1,5 +1,6 @@
 import 'jezvejs/style';
 import { ge } from 'jezvejs';
+import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import '../../css/app.css';
 import './style.css';
@@ -8,12 +9,6 @@ import './style.css';
  * User log in view
  */
 class LoginView extends View {
-    constructor(...args) {
-        super(...args);
-
-        this.model = {};
-    }
-
     /**
      * View initialization
      */
@@ -66,4 +61,5 @@ class LoginView extends View {
     }
 }
 
-window.view = new LoginView(window.app);
+window.app = new Application(window.appProps);
+window.app.createView(LoginView);

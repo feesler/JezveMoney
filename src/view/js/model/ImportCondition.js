@@ -1,8 +1,6 @@
-import { copyObject, isObject } from 'jezvejs';
+import { copyObject, isObject, hasFlag } from 'jezvejs';
 import { timestampFromString } from '../app.js';
 import { ListItem } from './ListItem.js';
-
-/* eslint no-bitwise: "off" */
 
 /** Condition field types */
 export const IMPORT_COND_FIELD_MAIN_ACCOUNT = 1;
@@ -285,7 +283,7 @@ export class ImportCondition extends ListItem {
             throw new Error('Invalid flags value');
         }
 
-        return (res & IMPORT_COND_OP_FIELD_FLAG) === IMPORT_COND_OP_FIELD_FLAG;
+        return hasFlag(res, IMPORT_COND_OP_FIELD_FLAG);
     }
 
     /**

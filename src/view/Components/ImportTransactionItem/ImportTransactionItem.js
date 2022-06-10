@@ -28,12 +28,14 @@ import './style.css';
 /** Fields */
 const TITLE_FIELD_AMOUNT = 'Amount';
 const PH_FIELD_AMOUNT = 'Amount';
+const TITLE_FIELD_SRC_AMOUNT = 'Source amount';
 const TITLE_FIELD_DEST_AMOUNT = 'Destination amount';
 const PH_FIELD_DEST_AMOUNT = 'Destination amount';
 const TITLE_FIELD_DATE = 'Date';
 const PH_FIELD_DATE = 'Date';
 const TITLE_FIELD_COMMENT = 'Comment';
 const PH_FIELD_COMMENT = 'Comment';
+const TITLE_FIELD_SRC_ACCOUNT = 'Source account';
 const TITLE_FIELD_DEST_ACCOUNT = 'Destination account';
 const TITLE_FIELD_PERSON = 'Person';
 const TITLE_FIELD_CURRENCY = 'Currency';
@@ -62,17 +64,11 @@ export class ImportTransactionItem extends Component {
             !this.parent
             || !this.props
             || !this.props.mainAccount
-            || !this.props.currencyModel
-            || !this.props.accountModel
-            || !this.props.personModel
         ) {
             throw new Error('Invalid props');
         }
 
         this.model = {
-            currency: this.props.currencyModel,
-            accounts: this.props.accountModel,
-            persons: this.props.personModel,
             mainAccount: this.props.mainAccount,
         };
 
@@ -129,6 +125,7 @@ export class ImportTransactionItem extends Component {
             autocomplete: 'off',
         }, null, { input: () => this.onDestAmountInput() });
         this.destAmountField = createField(TITLE_FIELD_DEST_AMOUNT, this.destAmountInp, 'amount-field');
+        this.destAmountLabel = this.destAmountField.querySelector('label');
         // Date field
         this.dateInp = ce('input', {
             type: 'text',
@@ -168,13 +165,15 @@ export class ImportTransactionItem extends Component {
         ]);
 
         this.bottomRow = createContainer('form-row hidden', [
-            this.destAccountField,
-            this.personField,
             this.destAmountField,
         ]);
 
         this.formContainer = createContainer('form-container', [
-            this.trTypeField,
+            createContainer('form-rows', [
+                this.trTypeField,
+                this.destAccountField,
+                this.personField,
+            ]),
             createContainer('form-rows', [
                 this.topRow,
                 this.bottomRow,
@@ -218,8 +217,8 @@ export class ImportTransactionItem extends Component {
 
     /** Create transaction type field */
     createTypeField() {
-        const transferDisabled = this.model.accounts.length < 2;
-        const debtDisabled = !this.model.persons.length;
+        const transferDisabled = window.app.model.accounts.length < 2;
+        const debtDisabled = !window.app.model.persons.length;
         const typeItems = [
             { id: 'expense', title: 'Expense' },
             { id: 'income', title: 'Income' },
@@ -247,11 +246,12 @@ export class ImportTransactionItem extends Component {
 
     /** Create destination(second) account field */
     createAccountField() {
-        const accountItems = this.model.accounts
+        const accountItems = window.app.model.accounts
             .map((account) => ({ id: account.id, title: account.name }));
 
         const selectElem = ce('select');
         this.destAccountField = createField(TITLE_FIELD_DEST_ACCOUNT, selectElem);
+        this.destAccountLabel = this.destAccountField.querySelector('label');
 
         this.destAccDropDown = DropDown.create({
             input_id: selectElem,
@@ -266,7 +266,7 @@ export class ImportTransactionItem extends Component {
 
     /** Create person field */
     createPersonField() {
-        const personItems = this.model.persons
+        const personItems = window.app.model.persons
             .map((person) => ({ id: person.id, title: person.name }));
 
         const selectElem = ce('select');
@@ -284,7 +284,7 @@ export class ImportTransactionItem extends Component {
 
     /** Create currency field */
     createCurrencyField() {
-        const currencyItems = this.model.currency
+        const currencyItems = window.app.model.currency
             .map((currency) => ({ id: currency.id, title: currency.name }));
 
         const selectElem = ce('select');
@@ -465,7 +465,7 @@ export class ImportTransactionItem extends Component {
      * @param {Object} state - state object
      */
     getFirstAvailAccount(state) {
-        const userAccountsData = this.model.accounts
+        const userAccountsData = window.app.model.accounts
             .getUserAccounts(this.model.mainAccount.owner_id);
         const userAccounts = new AccountList(userAccountsData);
         const visibleAccounts = userAccounts.getVisible();
@@ -483,7 +483,7 @@ export class ImportTransactionItem extends Component {
      * @param {number} accountId - account id to find next account for
      */
     getNextAccount(accountId) {
-        const userAccountsData = this.model.accounts
+        const userAccountsData = window.app.model.accounts
             .getUserAccounts(this.model.mainAccount.owner_id);
         const userAccounts = new AccountList(userAccountsData);
         const visibleAccountsData = userAccounts.getVisible();
@@ -609,6 +609,9 @@ export class ImportTransactionItem extends Component {
             state.secondAccountVisible = true;
             if (!state.secondAccountId) {
                 const secondAccount = this.getFirstAvailAccount(state);
+                if (!secondAccount) {
+                    throw new Error('Account not found');
+                }
                 state.secondAccountId = secondAccount.id;
                 state.secondAccountCurrId = secondAccount.curr_id;
             }
@@ -618,7 +621,11 @@ export class ImportTransactionItem extends Component {
             state.secondAccountVisible = false;
             state.personVisible = true;
             if (!state.personId) {
-                state.personId = this.model.persons.data[0].id;
+                const person = window.app.model.persons.getItemByIndex(0);
+                if (!person) {
+                    throw new Error('Person not found');
+                }
+                state.personId = person.id;
             }
             state.currId = state.accountCurrId;
         }
@@ -681,7 +688,7 @@ export class ImportTransactionItem extends Component {
 
     /** Set main account */
     setMainAccount(value) {
-        const account = this.model.accounts.getItem(value);
+        const account = window.app.model.accounts.getItem(value);
         if (!account) {
             throw new Error('Account not found');
         }
@@ -723,7 +730,7 @@ export class ImportTransactionItem extends Component {
 
     /** Set second account */
     setSecondAccount(value) {
-        const account = this.model.accounts.getItem(value);
+        const account = window.app.model.accounts.getItem(value);
         if (!account) {
             throw new Error('Account not found');
         }
@@ -754,7 +761,7 @@ export class ImportTransactionItem extends Component {
 
     /** Set person */
     setPerson(value) {
-        const person = this.model.persons.getItem(value);
+        const person = window.app.model.persons.getItem(value);
         if (!person) {
             throw new Error('Person not found');
         }
@@ -909,8 +916,8 @@ export class ImportTransactionItem extends Component {
     getData() {
         const { state } = this;
 
-        const secondAcc = this.model.accounts.getItem(state.secondAccountId);
-        const person = this.model.persons.getItem(state.personId);
+        const secondAcc = window.app.model.accounts.getItem(state.secondAccountId);
+        const person = window.app.model.persons.getItem(state.personId);
         const amountVal = parseFloat(fixFloat(state.amount));
         const secondAmountVal = parseFloat(fixFloat(state.secondAmount));
         const selectedCurr = parseInt(state.currId, 10);
@@ -995,7 +1002,6 @@ export class ImportTransactionItem extends Component {
         this.typeDropDown.enable(state.enabled);
         enable(this.amountInp, state.enabled);
         this.currencyDropDown.enable(state.enabled && isExpenseOrIncome);
-        this.destAccDropDown.enable(state.enabled && isTransfer);
         this.personDropDown.enable(state.enabled && isDebt);
         enable(this.destAmountInp, state.enabled && state.isDiff);
         enable(this.dateInp, state.enabled);
@@ -1012,13 +1018,29 @@ export class ImportTransactionItem extends Component {
         show(this.bottomRow, showBottom);
 
         // Second account field
+        this.destAccDropDown.enable(state.enabled && isTransfer);
         this.syncDestAccountSelect(state);
         this.destAccDropDown.selectItem(state.secondAccountId);
         show(this.destAccountField, state.secondAccountVisible);
+        if (state.secondAccountVisible) {
+            const accountLabel = (state.type === 'transferto')
+                ? TITLE_FIELD_SRC_ACCOUNT
+                : TITLE_FIELD_DEST_ACCOUNT;
+
+            this.destAccountLabel.textContent = accountLabel;
+        }
 
         // Second amount field
         this.destAmountInp.value = state.secondAmount;
         show(this.destAmountField, state.isDiff);
+        if (state.isDiff) {
+            const amountLabel = (state.type === 'transferto')
+                ? TITLE_FIELD_SRC_AMOUNT
+                : TITLE_FIELD_DEST_AMOUNT;
+
+            this.destAmountInp.placeholder = amountLabel;
+            this.destAmountLabel.textContent = amountLabel;
+        }
 
         // Person field
         this.personDropDown.selectItem(state.personId);

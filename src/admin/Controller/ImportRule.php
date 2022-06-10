@@ -30,11 +30,13 @@ class ImportRule extends AdminController
             "operatorsData" => ImportConditionModel::getOperators(),
         ];
 
-        $data["viewData"] = [
-            "data" => $data["itemsData"],
-            "actionTypes" => $data["actTypeData"],
-            "fields" => $data["fieldsData"],
-            "operators" => $data["operatorsData"],
+        $data["appProps"] = [
+            "view" => [
+                "data" => $data["itemsData"],
+                "actionTypes" => $data["actTypeData"],
+                "fields" => $data["fieldsData"],
+                "operators" => $data["operatorsData"],
+            ],
         ];
 
         $this->menuItems["importrule"]["active"] = true;

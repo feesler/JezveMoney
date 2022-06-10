@@ -15,8 +15,8 @@ import { formatDate } from 'jezvejs/DateUtils';
 import { Histogram } from 'jezvejs/Histogram';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { DropDown } from 'jezvejs/DropDown';
+import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
-import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import '../../css/app.css';
 import '../../Components/TransactionTypeMenu/style.css';
@@ -29,9 +29,10 @@ class StatisticsView extends View {
     constructor(...args) {
         super(...args);
 
-        if (!('currency' in this.props)
-            || !('accountCurrency' in this.props)
-            || !('chartData' in this.props)) {
+        if (
+            !('accountCurrency' in this.props)
+            || !('chartData' in this.props)
+        ) {
             throw new Error('Invalid Statistics view properties');
         }
 
@@ -43,7 +44,6 @@ class StatisticsView extends View {
             chartData: this.props.chartData,
         };
 
-        this.model.currency = CurrencyList.create(this.props.currency);
         this.model.filter = ('filter' in this.props) ? this.props.filter : {};
     }
 
@@ -291,7 +291,7 @@ class StatisticsView extends View {
 
             chartsWrapper.style.position = 'relative';
 
-            this.popup.textContent = this.model.currency.formatCurrency(
+            this.popup.textContent = window.app.model.currency.formatCurrency(
                 barRect.value,
                 this.model.accountCurrency,
             );
@@ -342,4 +342,5 @@ class StatisticsView extends View {
     }
 }
 
-window.view = new StatisticsView(window.app);
+window.app = new Application(window.appProps);
+window.app.createView(StatisticsView);

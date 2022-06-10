@@ -40,15 +40,15 @@ class Profile extends TemplateController
         }
         $data["titleString"] = $titleString;
 
-        $viewData = [
-            "profile" => $profileInfo
-        ];
-
+        $viewProps = [];
         if ($this->action == "changePass" || $this->action == "changeName") {
-            $viewData["action"] = $this->action;
+            $viewProps["action"] = $this->action;
         }
 
-        $data["viewData"] = $viewData;
+        $data["appProps"] = [
+            "profile" => $profileInfo,
+            "view" => $viewProps,
+        ];
 
         $this->cssArr[] = "ProfileView.css";
         $this->jsArr[] = "ProfileView.js";

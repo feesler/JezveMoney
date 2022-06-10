@@ -11,7 +11,7 @@ import { App } from '../../Application.js';
  * @param {Object[]} params.conditions
  * @param {Object[]} params.actions
  */
-export async function create(params) {
+export const create = async (params) => {
     let result = 0;
 
     await test(`Create import rule (${formatProps(params)})`, async () => {
@@ -35,13 +35,13 @@ export async function create(params) {
     });
 
     return result;
-}
+};
 
 /**
  * Update import rule with specified params and check expected state of app
  * @param {Object} params
  */
-export async function update(params) {
+export const update = async (params) => {
     let result = false;
     const props = copyObject(params);
 
@@ -76,13 +76,13 @@ export async function update(params) {
     });
 
     return result;
-}
+};
 
 /**
  * Delete specified import rule(s) and check expected state of app
  * @param {number[]} ids - array of template identifiers
  */
-export async function del(ids) {
+export const del = async (ids) => {
     let result = false;
 
     await test(`Delete import rule(s) (${ids})`, async () => {
@@ -104,4 +104,4 @@ export async function del(ids) {
     });
 
     return result;
-}
+};

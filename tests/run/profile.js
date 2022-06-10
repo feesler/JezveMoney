@@ -6,7 +6,7 @@ import { RegisterView } from '../view/RegisterView.js';
 import { ProfileView } from '../view/ProfileView.js';
 import { AboutView } from '../view/AboutView.js';
 
-async function checkLoginNavigation() {
+const checkLoginNavigation = async () => {
     if (App.view.isUserLoggedIn()) {
         await App.view.logoutUser();
     }
@@ -14,16 +14,16 @@ async function checkLoginNavigation() {
     if (!(App.view instanceof LoginView)) {
         throw new Error('Wrong page');
     }
-}
+};
 
-async function checkProfileNavigation() {
+const checkProfileNavigation = async () => {
     await App.view.goToProfile();
     if (!(App.view instanceof ProfileView)) {
         throw new Error('Wrong page');
     }
-}
+};
 
-export async function relogin({ login, password }) {
+export const relogin = async ({ login, password }) => {
     await checkLoginNavigation();
 
     await App.view.inputLogin(login);
@@ -42,9 +42,9 @@ export async function relogin({ login, password }) {
     } else {
         await test('User login with invalid data', () => App.view instanceof LoginView);
     }
-}
+};
 
-export async function register({ login, name, password }) {
+export const register = async ({ login, name, password }) => {
     await checkLoginNavigation();
     await App.view.goToRegistration();
 
@@ -74,9 +74,9 @@ export async function register({ login, name, password }) {
         await test('User registration with invalid data', () => App.view instanceof RegisterView);
         await App.view.goToLogin();
     }
-}
+};
 
-export async function resetAccounts() {
+export const resetAccounts = async () => {
     App.state.resetAccounts();
 
     await App.view.goToProfile();
@@ -92,9 +92,9 @@ export async function resetAccounts() {
 
     App.view.expectedState = MainView.render(App.state);
     await test('Main view update', () => App.view.checkState());
-}
+};
 
-export async function resetAll() {
+export const resetAll = async () => {
     App.state.resetAll();
 
     await App.view.goToProfile();
@@ -110,9 +110,9 @@ export async function resetAll() {
 
     App.view.expectedState = MainView.render(App.state);
     await test('Main view update', () => App.view.checkState());
-}
+};
 
-export async function changeName(newName) {
+export const changeName = async (newName) => {
     await test(`Change user name ('${newName}')`, async () => {
         await checkProfileNavigation();
 
@@ -134,9 +134,9 @@ export async function changeName(newName) {
 
         return App.state.fetchAndTest();
     });
-}
+};
 
-export async function changePass({ oldPassword, newPassword }) {
+export const changePass = async ({ oldPassword, newPassword }) => {
     await test(`Change password ('${oldPassword}' > '${newPassword}')`, async () => {
         await checkProfileNavigation();
 
@@ -165,9 +165,9 @@ export async function changePass({ oldPassword, newPassword }) {
 
         return App.view instanceof ProfileView;
     });
-}
+};
 
-export async function deleteProfile() {
+export const deleteProfile = async () => {
     await App.view.goToProfile();
 
     await App.view.deleteProfile();
@@ -177,9 +177,9 @@ export async function deleteProfile() {
     await test('Delete profile', () => App.view.checkState());
 
     await App.view.closeNotification();
-}
+};
 
-export async function openAbout() {
+export const openAbout = async () => {
     await test('About page', async () => {
         await App.view.goToAbout();
         if (!(App.view instanceof AboutView)) {
@@ -188,4 +188,4 @@ export async function openAbout() {
 
         return true;
     });
-}
+};

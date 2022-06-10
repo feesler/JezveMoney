@@ -11,8 +11,7 @@ import {
     prop,
     click,
     input,
-    selectByValue,
-    onChange,
+    select,
     isVisible,
     wait,
     waitForFunction,
@@ -529,8 +528,7 @@ export class ImportUploadDialog extends TestComponent {
         this.model.template.columns[name] = index;
         this.expectedState = this.getExpectedState(this.model);
 
-        await selectByValue(this.content.columnSel.elem, name.toString());
-        await onChange(this.content.columnSel.elem);
+        await select(this.content.columnSel.elem, name.toString());
         await this.parse();
 
         const ind = parseInt(index, 10);

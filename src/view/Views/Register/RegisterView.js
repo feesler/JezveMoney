@@ -1,5 +1,6 @@
 import 'jezvejs/style';
 import { ge } from 'jezvejs';
+import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import '../../css/app.css';
 import './style.css';
@@ -8,12 +9,6 @@ import './style.css';
  * User registration view
  */
 class RegisterView extends View {
-    constructor(...args) {
-        super(...args);
-
-        this.model = {};
-    }
-
     /**
      * View initialization
      */
@@ -80,4 +75,5 @@ class RegisterView extends View {
     }
 }
 
-window.view = new RegisterView(window.app);
+window.app = new Application(window.appProps);
+window.app.createView(RegisterView);

@@ -20,7 +20,7 @@ import {
     IMPORT_ACTION_SET_COMMENT,
 } from '../model/ImportAction.js';
 import { api } from '../model/api.js';
-import * as ApiTests from '../run/api.js';
+import * as ApiTests from '../run/api/index.js';
 import * as AccountApiTests from '../run/api/account.js';
 import * as PersonApiTests from '../run/api/person.js';
 import * as TransactionApiTests from '../run/api/transaction.js';
@@ -31,7 +31,7 @@ import { setBlock } from '../env.js';
 
 let scenario = null;
 
-async function prepareApiSecurityTests() {
+const prepareApiSecurityTests = async () => {
     setBlock('Prepare data for security tests', 2);
 
     const { RUB, USD } = scenario;
@@ -67,9 +67,9 @@ async function prepareApiSecurityTests() {
         src_id: scenario.API_USER_ACC_RUB,
         src_amount: 100,
     }]);
-}
+};
 
-async function apiAccountsSecurity() {
+const apiAccountsSecurity = async () => {
     setBlock('Accounts security', 2);
 
     const { EUR } = scenario;
@@ -83,9 +83,9 @@ async function apiAccountsSecurity() {
         flags: 0,
     });
     await AccountApiTests.del(scenario.API_USER_ACC_RUB);
-}
+};
 
-async function apiPersonsSecurity() {
+const apiPersonsSecurity = async () => {
     setBlock('Persons security', 2);
 
     await PersonApiTests.update({
@@ -94,9 +94,9 @@ async function apiPersonsSecurity() {
         flags: 0,
     });
     await PersonApiTests.del(scenario.API_USER_PERSON);
-}
+};
 
-async function apiCreateTransactionSecurity() {
+const apiCreateTransactionSecurity = async () => {
     setBlock('Create', 3);
 
     const { RUB } = scenario;
@@ -136,9 +136,9 @@ async function apiCreateTransactionSecurity() {
     }];
 
     await scenario.runner.runGroup(TransactionApiTests.create, data);
-}
+};
 
-async function apiUpdateTransactionSecurity() {
+const apiUpdateTransactionSecurity = async () => {
     setBlock('Update', 3);
 
     const { RUB } = scenario;
@@ -179,9 +179,9 @@ async function apiUpdateTransactionSecurity() {
     }];
 
     await scenario.runner.runGroup(TransactionApiTests.update, data);
-}
+};
 
-async function apiDeleteTransactionSecurity() {
+const apiDeleteTransactionSecurity = async () => {
     setBlock('Delete', 3);
 
     const data = [
@@ -189,23 +189,23 @@ async function apiDeleteTransactionSecurity() {
     ];
 
     await scenario.runner.runGroup(TransactionApiTests.del, data);
-}
+};
 
-async function apiTransactionsSecurity() {
+const apiTransactionsSecurity = async () => {
     setBlock('Transaction security', 2);
 
     await apiCreateTransactionSecurity();
     await apiUpdateTransactionSecurity();
     await apiDeleteTransactionSecurity();
-}
+};
 
-async function apiSecurityTests() {
+const apiSecurityTests = async () => {
     await apiAccountsSecurity();
     await apiPersonsSecurity();
     await apiTransactionsSecurity();
-}
+};
 
-async function apiCreateAccounts() {
+const apiCreateAccounts = async () => {
     const { RUB, USD } = scenario;
 
     const data = [{
@@ -277,9 +277,9 @@ async function apiCreateAccounts() {
         scenario.CASH_RUB,
         scenario.ACC_USD,
     ] = await scenario.runner.runGroup(AccountApiTests.create, data);
-}
+};
 
-async function apiUpdateAccounts() {
+const apiUpdateAccounts = async () => {
     const { USD } = scenario;
 
     const data = [{
@@ -295,17 +295,17 @@ async function apiUpdateAccounts() {
     }];
 
     return scenario.runner.runGroup(AccountApiTests.update, data);
-}
+};
 
-async function apiDeleteAccounts() {
+const apiDeleteAccounts = async () => {
     const data = [
         [scenario.ACC_USD, scenario.CASH_RUB],
     ];
 
     return scenario.runner.runGroup(AccountApiTests.del, data);
-}
+};
 
-async function apiCreatePersons() {
+const apiCreatePersons = async () => {
     const data = [{
         name: 'Person X',
         flags: 0,
@@ -334,9 +334,9 @@ async function apiCreatePersons() {
         scenario.PERSON_X,
         scenario.PERSON_Y,
     ] = await scenario.runner.runGroup(PersonApiTests.create, data);
-}
+};
 
-async function apiUpdatePersons() {
+const apiUpdatePersons = async () => {
     const data = [
         { id: scenario.PERSON_X, name: 'XX!' },
         // Try to update name of person to an existing one
@@ -345,18 +345,18 @@ async function apiUpdatePersons() {
     ];
 
     return scenario.runner.runGroup(PersonApiTests.update, data);
-}
+};
 
-async function apiDeletePersons() {
+const apiDeletePersons = async () => {
     const data = [
         [scenario.PERSON_Y],
         [],
     ];
 
     return scenario.runner.runGroup(PersonApiTests.del, data);
-}
+};
 
-async function apiCreateTransactions() {
+const apiCreateTransactions = async () => {
     setBlock('Create', 3);
 
     const { RUB, USD, EUR } = scenario;
@@ -530,9 +530,70 @@ async function apiCreateTransactions() {
         src_curr: 9999,
     }];
     await scenario.runner.runGroup(TransactionApiTests.create, invData);
-}
+};
 
-async function apiUpdateTransactions() {
+const apiCreateMultipleTransactions = async () => {
+    setBlock('Create multiple', 3);
+
+    const { RUB, EUR } = scenario;
+
+    const data = [{
+        type: EXPENSE,
+        src_id: scenario.ACC_RUB,
+        src_amount: 7608,
+        dest_amount: 100,
+        dest_curr: EUR,
+        date: App.dates.yesterday,
+        comment: 'multiple expense',
+    }, {
+        type: INCOME,
+        dest_id: scenario.ACC_USD,
+        src_amount: 6500,
+        dest_amount: 100,
+        src_curr: RUB,
+        comment: 'multiple income',
+    }, {
+        type: TRANSFER,
+        src_id: scenario.ACC_RUB,
+        dest_id: scenario.CASH_RUB,
+        src_amount: 500,
+        dest_amount: 500,
+        comment: 'multiple transfer',
+    }, {
+        type: DEBT,
+        op: 1,
+        person_id: scenario.PERSON_X,
+        acc_id: 0,
+        src_amount: 500,
+        src_curr: RUB,
+        comment: 'multiple debt',
+    }];
+
+    await TransactionApiTests.extractAndCreateMultiple(data);
+
+    const invData = [
+        null,
+        [null],
+        [null, null],
+        [{
+            type: EXPENSE,
+            src_id: 0,
+            src_amount: 100,
+        }, {
+            type: EXPENSE,
+            src_id: scenario.ACC_RUB,
+            src_amount: 100,
+        }],
+        [{
+            type: EXPENSE,
+            src_id: scenario.ACC_RUB,
+            src_amount: 100,
+        }, null],
+    ];
+    await scenario.runner.runGroup(TransactionApiTests.extractAndCreateMultiple, invData);
+};
+
+const apiUpdateTransactions = async () => {
     setBlock('Update', 3);
 
     const {
@@ -642,25 +703,21 @@ async function apiUpdateTransactions() {
     }];
 
     await scenario.runner.runGroup(TransactionApiTests.update, invData);
-}
+};
 
-async function apiDeleteTransactions() {
-    return scenario.runner.runGroup(TransactionApiTests.del, [
-        [scenario.TR_EXPENSE_2, scenario.TR_TRANSFER_1, scenario.TR_DEBT_3],
-        [],
-        [9999],
-    ]);
-}
+const apiDeleteTransactions = async () => scenario.runner.runGroup(TransactionApiTests.del, [
+    [scenario.TR_EXPENSE_2, scenario.TR_TRANSFER_1, scenario.TR_DEBT_3],
+    [],
+    [9999],
+]);
 
-async function apiSetTransactionPos() {
-    return scenario.runner.runGroup(TransactionApiTests.setPos, [
-        { id: scenario.TR_EXPENSE_2, pos: 5 },
-        { id: scenario.TR_INCOME_2, pos: 10 },
-        { id: scenario.TR_TRANSFER_1, pos: 100 },
-    ]);
-}
+const apiSetTransactionPos = async () => scenario.runner.runGroup(TransactionApiTests.setPos, [
+    { id: scenario.TR_EXPENSE_2, pos: 5 },
+    { id: scenario.TR_INCOME_2, pos: 10 },
+    { id: scenario.TR_TRANSFER_1, pos: 100 },
+]);
 
-async function apiFilterTransactions() {
+const apiFilterTransactions = async () => {
     setBlock('Filter transactions', 2);
 
     const data = [{
@@ -700,9 +757,9 @@ async function apiFilterTransactions() {
     }];
 
     return scenario.runner.runGroup(TransactionApiTests.filter, data);
-}
+};
 
-async function apiCreateImportTemplateTests() {
+const apiCreateImportTemplateTests = async () => {
     setBlock('Create import template', 2);
 
     const data = [{
@@ -759,9 +816,9 @@ async function apiCreateImportTemplateTests() {
         scenario.TEMPLATE_2,
         scenario.TEMPLATE_3,
     ] = await scenario.runner.runGroup(ImportTemplateApiTests.create, data);
-}
+};
 
-async function apiUpdateImportTemplateTests() {
+const apiUpdateImportTemplateTests = async () => {
     setBlock('Update import template', 2);
 
     const data = [{
@@ -778,9 +835,9 @@ async function apiUpdateImportTemplateTests() {
     }];
 
     await scenario.runner.runGroup(ImportTemplateApiTests.update, data);
-}
+};
 
-async function apiDeleteImportTemplateTests() {
+const apiDeleteImportTemplateTests = async () => {
     setBlock('Delete import template', 2);
 
     const data = [
@@ -789,17 +846,17 @@ async function apiDeleteImportTemplateTests() {
     ];
 
     await scenario.runner.runGroup(ImportTemplateApiTests.del, data);
-}
+};
 
-async function apiImportTemplateTests() {
+const apiImportTemplateTests = async () => {
     setBlock('Import template', 2);
 
     await apiCreateImportTemplateTests();
     await apiUpdateImportTemplateTests();
     await apiDeleteImportTemplateTests();
-}
+};
 
-async function apiCreateImportRuleTests() {
+const apiCreateImportRuleTests = async () => {
     setBlock('Create import rule', 2);
 
     const taxiCondition = {
@@ -986,9 +1043,9 @@ async function apiCreateImportRuleTests() {
         scenario.RULE_2,
         scenario.RULE_3,
     ] = await scenario.runner.runGroup(ImportRuleApiTests.create, data);
-}
+};
 
-async function apiUpdateImportRuleTests() {
+const apiUpdateImportRuleTests = async () => {
     setBlock('Update import rule', 2);
 
     const diffAmountCondition = {
@@ -1046,9 +1103,9 @@ async function apiUpdateImportRuleTests() {
     }];
 
     await scenario.runner.runGroup(ImportRuleApiTests.update, data);
-}
+};
 
-async function apiDeleteImportRuleTests() {
+const apiDeleteImportRuleTests = async () => {
     setBlock('Delete import rule', 2);
 
     const data = [
@@ -1057,17 +1114,17 @@ async function apiDeleteImportRuleTests() {
     ];
 
     await scenario.runner.runGroup(ImportRuleApiTests.del, data);
-}
+};
 
-async function apiImportRuleTests() {
+const apiImportRuleTests = async () => {
     setBlock('Import rule', 2);
 
     await apiCreateImportRuleTests();
     await apiUpdateImportRuleTests();
     await apiDeleteImportRuleTests();
-}
+};
 
-async function apiProfile() {
+const apiProfile = async () => {
     setBlock('Profile', 2);
 
     const tasks = [{
@@ -1093,7 +1150,7 @@ async function apiProfile() {
     }];
 
     return scenario.runner.runTasks(tasks);
-}
+};
 
 export const apiTests = {
     /** Initialize tests */
@@ -1134,6 +1191,7 @@ export const apiTests = {
         await apiCreateAccounts();
         await apiCreatePersons();
         await apiCreateTransactions();
+        await apiCreateMultipleTransactions();
 
         await apiSecurityTests();
 

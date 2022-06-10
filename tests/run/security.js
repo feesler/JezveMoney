@@ -1,7 +1,7 @@
 import { test } from 'jezve-test';
 import { baseUrl, httpReq } from '../env.js';
 
-export async function checkAccess(url) {
+export const checkAccess = async (url) => {
     await test(`Check access to ${url}`, async () => {
         const restrictedLocations = ['Controller', 'Model', 'view', 'system', 'vendor'];
         const isInvalidLocation = restrictedLocations.some(
@@ -29,4 +29,4 @@ export async function checkAccess(url) {
 
         return true;
     });
-}
+};

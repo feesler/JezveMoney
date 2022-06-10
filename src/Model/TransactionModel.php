@@ -1027,6 +1027,169 @@ class TransactionModel extends CachedTable
         return "type" . $setCond;
     }
 
+    // Convert request object to transaction request parameters
+    public function getRequestFilters($request, $defaults = [], $throw = false)
+    {
+        $res = $defaults;
+
+        // Type filter
+        $typeFilter = [];
+        if (isset($request["type"])) {
+            $typeReq = $request["type"];
+            if (!is_array($typeReq)) {
+                $typeReq = [$typeReq];
+            }
+
+            foreach ($typeReq as $type_str) {
+                $type_id = intval($type_str);
+                if (!$type_id) {
+                    $type_id = self::stringToType($type_str);
+                }
+                if (is_null($type_id) && $throw) {
+                    throw new \Error("Invalid type '$type_str'");
+                }
+                if ($type_id) {
+                    $typeFilter[] = $type_id;
+                }
+            }
+            if (count($typeFilter) > 0) {
+                $res["type"] = $typeFilter;
+            }
+        }
+
+        // Accounts filter
+        $accFilter = [];
+        if (isset($request["acc_id"])) {
+            $accountsReq = $request["acc_id"];
+            if (!is_array($accountsReq)) {
+                $accountsReq = [$accountsReq];
+            }
+            foreach ($accountsReq as $acc_id) {
+                if ($this->accModel->isExist($acc_id)) {
+                    $accFilter[] = intval($acc_id);
+                } elseif ($throw) {
+                    throw new \Error("Invalid account '$acc_id'");
+                }
+            }
+            if (count($accFilter) > 0) {
+                $res["accounts"] = $accFilter;
+            }
+        }
+
+        // Search query
+        if (isset($request["search"]) && !is_null($request["search"])) {
+            $res["search"] = $request["search"];
+        }
+
+        // Date range filter
+        $stDate = (isset($_GET["stdate"]) ? $_GET["stdate"] : null);
+        $endDate = (isset($_GET["enddate"]) ? $_GET["enddate"] : null);
+        if (!is_null($stDate) && !is_null($endDate)) {
+            $res["startDate"] = $stDate;
+            $res["endDate"] = $endDate;
+        }
+
+        // Page
+        if (isset($request["page"])) {
+            $page = intval($request["page"]);
+            if ($page > 1) {
+                $res["page"] = $page - 1;
+            }
+        }
+
+        return $res;
+    }
+
+    // Conver filter parameters to filter object
+    public function getFilterObject($params)
+    {
+        $res = [];
+
+        // Type
+        if (
+            isset($params["type"]) &&
+            is_array($params["type"]) &&
+            count($params["type"]) > 0
+        ) {
+            $res["type"] = $params["type"];
+        }
+
+        // Accounts
+        if (
+            isset($params["accounts"]) &&
+            is_array($params["accounts"]) &&
+            count($params["accounts"]) > 0
+        ) {
+            $res["acc_id"] = $params["accounts"];
+        }
+
+        // Date range
+        if (isset($params["startDate"]) && $params["endDate"]) {
+            $res["stdate"] = $params["startDate"];
+            $res["enddate"] = $params["endDate"];
+        }
+
+        // Search query
+        if (isset($params["search"])) {
+            $res["search"] = $params["search"];
+        }
+
+        return $res;
+    }
+
+
+    // Returns array of DB conditions
+    private function getDBCondition($params = null)
+    {
+        if (is_null($params)) {
+            $params = [];
+        }
+
+        $res = ["user_id=" . self::$user_id];
+
+        // Transaction type condition
+        if (isset($params["type"])) {
+            $typeCond = $this->getTypeCondition($params["type"]);
+            if (!is_empty($typeCond)) {
+                $res[] = $typeCond;
+            }
+        }
+
+        // Accounts filter condition
+        if (isset($params["accounts"]) && !is_null($params["accounts"])) {
+            $accCond = $this->getAccCondition($params["accounts"]);
+            if (!is_empty($accCond)) {
+                $res[] = $accCond;
+            }
+        }
+
+        // Search condition
+        if (isset($params["search"]) && !is_null($params["search"])) {
+            $sReq = $this->dbObj->escape($params["search"]);
+            if (!is_empty($sReq)) {
+                $res[] = "comment LIKE '%" . $sReq . "%'";
+            }
+        }
+
+        // Date range condition
+        if (
+            isset($params["startDate"]) && !is_null($params["startDate"]) &&
+            isset($params["endDate"]) && !is_null($params["endDate"])
+        ) {
+            $stdate = strtotime($params["startDate"]);
+            $enddate = strtotime($params["endDate"]);
+            if ($stdate != -1 && $enddate != -1) {
+                $fstdate = date("Y-m-d H:i:s", $stdate);
+                $fenddate = date("Y-m-d H:i:s", $enddate);
+
+                $res[] = "date >= " . qnull($fstdate);
+                $res[] = "date <= " . qnull($fenddate);
+            }
+        }
+
+        return $res;
+    }
+
 
     // Return array of transactions
     // Params:
@@ -1070,47 +1233,7 @@ class TransactionModel extends CachedTable
             return $res;
         }
 
-        $condArr = ["user_id=" . self::$user_id];
-
-        // Transaction type condition
-        if (isset($params["type"])) {
-            $typeCond = $this->getTypeCondition($params["type"]);
-            if (!is_empty($typeCond)) {
-                $condArr[] = $typeCond;
-            }
-        }
-
-        // Accounts filter condition
-        if (isset($params["accounts"])) {
-            $accCond = $this->getAccCondition($params["accounts"]);
-            if (!is_empty($accCond)) {
-                $condArr[] = $accCond;
-            }
-        }
-
-        // Search condition
-        if (isset($params["search"])) {
-            $sReq = $this->dbObj->escape($params["search"]);
-            if (!is_empty($sReq)) {
-                $condArr[] = "comment LIKE '%" . $sReq . "%'";
-            }
-        }
-
-        // Date range condition
-        if (
-            isset($params["startDate"]) && !is_null($params["startDate"]) &&
-            isset($params["endDate"]) && !is_null($params["endDate"])
-        ) {
-            $stdate = strtotime($params["startDate"]);
-            $enddate = strtotime($params["endDate"]);
-            if ($stdate != -1 && $enddate != -1) {
-                $fstdate = date("Y-m-d H:i:s", $stdate);
-                $fenddate = date("Y-m-d H:i:s", $enddate);
-
-                $condArr[] = "date >= " . qnull($fstdate);
-                $condArr[] = "date <= " . qnull($fenddate);
-            }
-        }
+        $condArr = $this->getDBCondition($params);
 
         // Sort order condition
         $isDesc = (isset($params["desc"]) && $params["desc"] == true);
@@ -1153,48 +1276,7 @@ class TransactionModel extends CachedTable
             return 0;
         }
 
-        $condArr = ["user_id=" . self::$user_id];
-
-        if (is_null($params)) {
-            $params = [];
-        }
-
-        // Transaction type condition
-        if (isset($params["type"])) {
-            $typeCond = $this->getTypeCondition($params["type"]);
-            if (!is_empty($typeCond)) {
-                $condArr[] = $typeCond;
-            }
-        }
-
-        if (isset($params["accounts"]) && !is_null($params["accounts"])) {
-            $accCond = $this->getAccCondition($params["accounts"]);
-            if (!is_empty($accCond)) {
-                $condArr[] = $accCond;
-            }
-        }
-
-        if (isset($params["search"])) {
-            $sReq = $this->dbObj->escape($params["search"]);
-            if (!is_empty($sReq)) {
-                $condArr[] = "comment LIKE '%" . $sReq . "%'";
-            }
-        }
-
-        if (
-            isset($params["startDate"]) && !is_null($params["startDate"]) &&
-            isset($params["endDate"]) && !is_null($params["endDate"])
-        ) {
-            $stdate = strtotime($params["startDate"]);
-            $enddate = strtotime($params["endDate"]);
-            if ($stdate != -1 && $enddate != -1) {
-                $fstdate = date("Y-m-d H:i:s", $stdate);
-                $fenddate = date("Y-m-d H:i:s", $enddate);
-
-                $condArr[] = "date >= " . qnull($fstdate);
-                $condArr[] = "date <= " . qnull($fenddate);
-            }
-        }
+        $condArr = $this->getDBCondition($params);
 
         return $this->dbObj->countQ($this->tbl_name, $condArr);
     }

@@ -1,10 +1,10 @@
-import * as ImportTests from '../../run/import.js';
+import * as ImportTests from '../../run/import/index.js';
 import { setBlock } from '../../env.js';
 import { App } from '../../Application.js';
 
 let scenario = null;
 
-async function runCreateTests() {
+const runCreateTests = async () => {
     setBlock('Add item', 2);
 
     await ImportTests.addItem();
@@ -15,13 +15,15 @@ async function runCreateTests() {
             { action: 'inputDate', data: App.dates.now },
         ],
     });
-}
+};
 
-async function runDeleteTests() {
+const runDeleteTests = async () => {
+    setBlock('Delete import items', 2);
+
     await ImportTests.deleteItems([3, 5]);
-}
+};
 
-async function runStateLoopTests() {
+const runStateLoopTests = async () => {
     const { RUB, USD } = scenario;
 
     setBlock('Import item state loop', 2);
@@ -192,7 +194,7 @@ async function runStateLoopTests() {
     });
 
     await ImportTests.submit();
-}
+};
 
 export const importItemsTests = {
     /** Initialize tests */

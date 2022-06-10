@@ -12,12 +12,8 @@ import { formatDate } from 'jezvejs/DateUtils';
 import { Sortable } from 'jezvejs/Sortable';
 import { DropDown } from 'jezvejs/DropDown';
 import { timestampFromString, createMessage } from '../../js/app.js';
+import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
-import { AccountList } from '../../js/model/AccountList.js';
-import { CurrencyList } from '../../js/model/CurrencyList.js';
-import { PersonList } from '../../js/model/PersonList.js';
-import { ImportRuleList } from '../../js/model/ImportRuleList.js';
-import { ImportTemplateList } from '../../js/model/ImportTemplateList.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import '../../css/app.css';
 import './style.css';
@@ -25,7 +21,6 @@ import { ImportUploadDialog } from '../../Components/ImportUploadDialog/ImportUp
 import { ImportRulesDialog } from '../../Components/ImportRulesDialog/ImportRulesDialog.js';
 import { ImportTransactionItem } from '../../Components/ImportTransactionItem/ImportTransactionItem.js';
 
-/* eslint no-bitwise: "off" */
 const SUBMIT_LIMIT = 100;
 /** Messages */
 const MSG_IMPORT_SUCCESS = 'All transactions have been successfully imported';
@@ -45,19 +40,13 @@ class ImportView extends View {
             transCache: null,
             rulesEnabled: true,
         };
-
-        this.model.accounts = AccountList.create(this.props.accounts);
-        this.model.currency = CurrencyList.create(this.props.currencies);
-        this.model.persons = PersonList.create(this.props.persons);
-        this.model.rules = ImportRuleList.create(this.props.rules);
-        this.model.templates = ImportTemplateList.create(this.props.templates);
     }
 
     /**
      * View initialization
      */
     onStart() {
-        if (this.model.accounts.length === 0) {
+        if (window.app.model.accounts.length === 0) {
             return;
         }
 
@@ -137,7 +126,7 @@ class ImportView extends View {
 
     /** Import rules 'update' event handler */
     onUpdateRules() {
-        const rulesCount = this.model.rules.length;
+        const rulesCount = window.app.model.rules.length;
 
         this.rulesCountElem.textContent = rulesCount;
 
@@ -149,11 +138,6 @@ class ImportView extends View {
         if (!this.uploadDialog) {
             this.uploadDialog = new ImportUploadDialog({
                 parent: this,
-                currencyModel: this.model.currency,
-                accountModel: this.model.accounts,
-                personModel: this.model.persons,
-                rulesModel: this.model.rules,
-                tplModel: this.model.templates,
                 mainAccount: this.model.mainAccount,
                 elem: 'uploadDialog',
                 onaccountchange: (accountId) => this.onUploadAccChange(accountId),
@@ -204,15 +188,12 @@ class ImportView extends View {
 
         const item = new ImportTransactionItem({
             parent: this,
-            currencyModel: this.model.currency,
-            accountModel: this.model.accounts,
-            personModel: this.model.persons,
             mainAccount: this.model.mainAccount,
             originalData: data,
         });
 
         if (this.model.rulesEnabled) {
-            this.model.rules.applyTo(item);
+            window.app.model.rules.applyTo(item);
         }
         item.render();
 
@@ -365,7 +346,7 @@ class ImportView extends View {
 
         const selectedAccount = this.accountDropDown.getSelectionData();
         if (selectedAccount) {
-            account = this.model.accounts.getItem(selectedAccount.id);
+            account = window.app.model.accounts.getItem(selectedAccount.id);
         }
         if (!account) {
             throw new Error('Account not found');
@@ -449,9 +430,6 @@ class ImportView extends View {
 
         const item = ImportTransactionItem.create({
             parent: this,
-            currencyModel: this.model.currency,
-            accountModel: this.model.accounts,
-            personModel: this.model.persons,
             mainAccount: this.model.mainAccount,
         });
         item.enable(true);
@@ -605,7 +583,7 @@ class ImportView extends View {
         const importedItems = this.getImportedItems();
         importedItems.forEach((item) => {
             item.restoreOriginal();
-            const applied = this.model.rules.applyTo(item);
+            const applied = window.app.model.rules.applyTo(item);
             if (applied) {
                 item.render();
             }
@@ -620,7 +598,7 @@ class ImportView extends View {
         const importedItems = this.getImportedItems();
         importedItems.forEach(function (item) {
             if (this.model.rulesEnabled) {
-                this.model.rules.applyTo(item);
+                window.app.model.rules.applyTo(item);
             } else {
                 item.restoreOriginal();
             }
@@ -642,11 +620,6 @@ class ImportView extends View {
         if (!this.rulesDialog) {
             this.rulesDialog = new ImportRulesDialog({
                 parent: this,
-                tplModel: this.model.templates,
-                currencyModel: this.model.currency,
-                accountModel: this.model.accounts,
-                personModel: this.model.persons,
-                rulesModel: this.model.rules,
                 elem: 'rulesDialog',
             });
         }
@@ -688,4 +661,5 @@ class ImportView extends View {
     }
 }
 
-window.view = new ImportView(window.app);
+window.app = new Application(window.appProps);
+window.app.createView(ImportView);

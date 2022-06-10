@@ -13,8 +13,9 @@ import { App } from '../Application.js';
 import { setBlock } from '../env.js';
 
 let scenario = null;
+let testData = null;
 
-async function setupAccounts() {
+const setupAccounts = async () => {
     const { RUB, USD, EUR } = scenario;
     const data = [{
         name: 'acc_4',
@@ -56,9 +57,9 @@ async function setupAccounts() {
     }
 
     return res;
-}
+};
 
-async function setupPersons() {
+const setupPersons = async () => {
     const data = [{
         name: 'Alex',
         flags: 0,
@@ -81,9 +82,9 @@ async function setupPersons() {
     }
 
     return res;
-}
+};
 
-async function setupTransactions(accountIds, personIds) {
+const setupTransactions = async (accountIds, personIds) => {
     const [ACC_4, ACC_5, CASH_USD, CASH_EUR] = accountIds;
     const [ALEX, NONAME] = personIds;
     const {
@@ -241,6 +242,7 @@ async function setupTransactions(accountIds, personIds) {
     const trList = App.state.transactions.applyFilter({
         accounts: accountIds.concat(personsAccounts),
     });
+    // TODO : use isSimilarTransaction()
     if (trList.length === data.length * App.dateList.length) {
         return trList.getIds();
     }
@@ -255,9 +257,9 @@ async function setupTransactions(accountIds, personIds) {
     }
 
     return api.transaction.createMultiple(multi);
-}
+};
 
-async function prepareTrListData() {
+const prepareTrListData = async () => {
     await api.user.login(App.config.testUser);
     await App.state.fetch();
 
@@ -274,7 +276,77 @@ async function prepareTrListData() {
     };
 
     return res;
-}
+};
+
+const runTests = async (directNavigate = false) => {
+    if (directNavigate) {
+        setBlock('Transaction List view: direct navigation', 1);
+    } else {
+        setBlock('Transaction List view: manual navigation', 1);
+    }
+
+    await scenario.runner.runTasks([
+        { action: TransactionListTests.checkInitialState, data: directNavigate },
+        { action: TransactionListTests.goToNextPage, data: directNavigate },
+        { action: TransactionListTests.setDetailsMode, data: directNavigate },
+        { action: TransactionListTests.goToNextPage, data: directNavigate },
+    ]);
+
+    const toggleSelectData = [
+        0,
+        [1, 2],
+    ];
+
+    await scenario.runner.runGroup(TransactionListTests.toggleSelect, toggleSelectData);
+
+    await scenario.runner.runGroup(
+        TransactionListTests.filterByType,
+        availTransTypes.map((type) => ({ type, directNavigate })),
+    );
+
+    await scenario.runner.runTasks([{
+        action: TransactionListTests.filterByAccounts,
+        data: { accounts: testData.accounts[2] },
+    }, {
+        action: TransactionListTests.filterByAccounts,
+        data: { accounts: [testData.accounts[2], testData.accounts[3]], directNavigate },
+    }, {
+        action: TransactionListTests.filterByType,
+        data: { type: 0, directNavigate },
+    }, {
+        action: TransactionListTests.filterByType,
+        data: { type: EXPENSE, directNavigate },
+    }, {
+        action: TransactionListTests.filterByType,
+        data: { type: [INCOME, DEBT], directNavigate },
+    }, {
+        action: TransactionListTests.filterByDate,
+        data: { start: App.dates.weekAgo, end: App.dates.now, directNavigate },
+    },
+    {
+        action: TransactionListTests.filterByDate,
+        data: { start: App.dates.yearAgo, end: App.dates.monthAgo, directNavigate },
+    }]);
+
+    const searchData = [
+        { text: '1', directNavigate },
+        { text: 'la', directNavigate },
+        { text: 'кк', directNavigate },
+    ];
+
+    await scenario.runner.runGroup(TransactionListTests.search, searchData);
+
+    await scenario.runner.runTasks([
+        { action: TransactionListTests.clearSearchForm, data: directNavigate },
+        { action: TransactionListTests.clearDateRange },
+        { action: TransactionListTests.search, data: { text: '1', directNavigate } },
+        {
+            action: TransactionListTests.filterByDate,
+            data: { start: App.dates.yearAgo, end: App.dates.monthAgo, directNavigate },
+        },
+        { action: TransactionListTests.clearAllFilters, directNavigate },
+    ]);
+};
 
 export const transactionsListTests = {
     /** Initialize tests */
@@ -284,68 +356,10 @@ export const transactionsListTests = {
 
     /** Run transactions list view tests */
     async run() {
-        setBlock('Transaction List view', 1);
+        testData = await prepareTrListData();
 
-        const data = await prepareTrListData();
-
-        await scenario.runner.runTasks([
-            { action: TransactionListTests.checkInitialState },
-            { action: TransactionListTests.goToNextPage },
-            { action: TransactionListTests.setDetailsMode },
-            { action: TransactionListTests.goToNextPage },
-        ]);
-
-        const toggleSelectData = [
-            0,
-            [1, 2],
-        ];
-
-        await scenario.runner.runGroup(TransactionListTests.toggleSelect, toggleSelectData);
-
-        await scenario.runner.runGroup(TransactionListTests.filterByType, availTransTypes);
-
-        await scenario.runner.runTasks([{
-            action: TransactionListTests.filterByAccounts,
-            data: data.accounts[2],
-        }, {
-            action: TransactionListTests.filterByAccounts,
-            data: [data.accounts[2], data.accounts[3]],
-        }, {
-            action: TransactionListTests.filterByType,
-            data: 0,
-        }, {
-            action: TransactionListTests.filterByType,
-            data: EXPENSE,
-        }, {
-            action: TransactionListTests.filterByType,
-            data: [INCOME, DEBT],
-        }, {
-            action: TransactionListTests.filterByDate,
-            data: { start: App.dates.weekAgo, end: App.dates.now },
-        },
-        {
-            action: TransactionListTests.filterByDate,
-            data: { start: App.dates.yearAgo, end: App.dates.monthAgo },
-        }]);
-
-        const searchData = [
-            '1',
-            'la',
-            'кк',
-        ];
-
-        await scenario.runner.runGroup(TransactionListTests.search, searchData);
-
-        await scenario.runner.runTasks([
-            { action: TransactionListTests.clearSearchForm },
-            { action: TransactionListTests.clearDateRange },
-            { action: TransactionListTests.search, data: '1' },
-            {
-                action: TransactionListTests.filterByDate,
-                data: { start: App.dates.yearAgo, end: App.dates.monthAgo },
-            },
-            { action: TransactionListTests.clearAllFilters },
-        ]);
+        await runTests(false);
+        await runTests(true);
     },
 
     /** Initialize and run tests */

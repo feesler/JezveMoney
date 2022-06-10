@@ -1,4 +1,5 @@
 import 'jezvejs/style';
+import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import '../../css/app.css';
 
@@ -13,4 +14,5 @@ class AboutView extends View {
     }
 }
 
-window.view = new AboutView(window.app);
+window.app = new Application(window.appProps);
+window.app.createView(AboutView);

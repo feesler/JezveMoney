@@ -1,6 +1,5 @@
+import { hasFlag } from 'jezvejs';
 import { ListItem } from './ListItem.js';
-
-/* eslint no-bitwise: "off" */
 
 /** Account flags */
 export const ACCOUNT_HIDDEN = 1;
@@ -30,6 +29,6 @@ export class Account extends ListItem {
             throw new Error('Invalid account');
         }
 
-        return (this.flags & ACCOUNT_HIDDEN) === 0;
+        return !hasFlag(this.flags, ACCOUNT_HIDDEN);
     }
 }

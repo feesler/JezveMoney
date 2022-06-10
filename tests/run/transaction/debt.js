@@ -1,10 +1,10 @@
 import { test } from 'jezve-test';
-import * as TransactionTests from './common.js';
+import * as TransactionTests from './index.js';
 import { DEBT } from '../../model/Transaction.js';
 import { App } from '../../Application.js';
 import { setBlock } from '../../env.js';
 
-export async function submit(params) {
+export const submit = async (params) => {
     if ('acc' in params) {
         await TransactionTests.runAction({ action: 'changeAccountByPos', data: params.acc });
     }
@@ -32,13 +32,13 @@ export async function submit(params) {
     }
 
     return TransactionTests.submit();
-}
+};
 
-export async function create(params) {
+export const create = async (params) => {
     await TransactionTests.create(DEBT, params, submit);
-}
+};
 
-export async function update(params) {
+export const update = async (params) => {
     await TransactionTests.update(DEBT, params, async (submitParams) => {
         let expState;
         if (App.view.model.noAccount) {
@@ -54,9 +54,9 @@ export async function update(params) {
 
         return submit(submitParams);
     });
-}
+};
 
-export async function stateLoop() {
+export const stateLoop = async () => {
     await App.state.fetch();
 
     const [ACC_3, ACC_RUB, ACC_USD, ACC_EUR, CARD_RUB] = App.state.getAccountIndexesByNames([
@@ -266,4 +266,4 @@ export async function stateLoop() {
         { action: 'toggleDebtType' }, // move from State 2 to State 5
         { action: 'toggleAccount' },
     ]);
-}
+};

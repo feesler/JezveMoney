@@ -84,19 +84,19 @@ class Message
         sessionStart();
 
         if (!isset($_SESSION["msg"])) {
-            return;
+            return null;
         }
 
         $msg_id = intval($_SESSION["msg"]);
         if ($msg_id == MSG_NONE || !isset(self::$msgArray[$msg_id])) {
-            return;
+            return null;
         }
 
         $msgParam = self::$msgArray[$msg_id];
         $msgType = $msgParam[0];
         if ($msgType == MSG_TYPE_NONE) {
             $_SESSION["msg"] = MSG_NONE;
-            return;
+            return null;
         }
 
         $msgMessage = $msgParam[1];
@@ -108,8 +108,13 @@ class Message
             $msgClass = "msg_error";
         }
 
-        include(TPL_PATH . "message.tpl");
-
         $_SESSION["msg"] = MSG_NONE;
+
+        $res = [
+            "title" => $msgMessage,
+            "type" => $msgClass,
+        ];
+
+        return $res;
     }
 }

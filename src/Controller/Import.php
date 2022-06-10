@@ -49,9 +49,9 @@ class Import extends TemplateController
             $data["uploadBtn"]["attributes"] = ["disabled" => !$importAvailable];
         }
 
-        $data["viewData"] = [
+        $data["appProps"] = [
             "accounts" => $data["accArr"],
-            "currencies" => $currArr,
+            "currency" => $currArr,
             "persons" => $persArr,
             "rules" => $data["rulesData"],
             "templates" => $data["impTemplates"]

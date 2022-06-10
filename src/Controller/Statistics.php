@@ -164,11 +164,13 @@ class Statistics extends TemplateController
 
         $data["titleString"] = "Jezve Money | Statistics";
 
-        $data["viewData"] = [
+        $data["appProps"] = [
             "currency" => $data["currArr"],
-            "accountCurrency" => $accCurr,
-            "filter" => $filterObj,
-            "chartData" => $statArr
+            "view" => [
+                "accountCurrency" => $accCurr,
+                "filter" => $filterObj,
+                "chartData" => $statArr,
+            ],
         ];
 
         $this->cssArr[] = "StatisticsView.css";

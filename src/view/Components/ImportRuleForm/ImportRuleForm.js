@@ -37,10 +37,6 @@ export class ImportRuleForm extends Component {
             !this.parent
             || !this.props
             || !this.props.data
-            || !this.props.tplModel
-            || !this.props.currencyModel
-            || !this.props.accountModel
-            || !this.props.personModel
         ) {
             throw new Error('Invalid props');
         }
@@ -53,13 +49,6 @@ export class ImportRuleForm extends Component {
         this.cancelHandler = this.props.cancel;
         this.updateHandler = this.props.update;
         this.deleteHandler = this.props.remove;
-
-        this.model = {
-            template: this.props.tplModel,
-            currency: this.props.currencyModel,
-            accounts: this.props.accountModel,
-            persons: this.props.personModel,
-        };
 
         if (!(this.props.data instanceof ImportRule)) {
             throw new Error('Invalid rule item');
@@ -205,7 +194,7 @@ export class ImportRuleForm extends Component {
         }
 
         if (ImportAction.isAccountValue(actionType)) {
-            const item = this.model.accounts.getItemByIndex(0);
+            const item = window.app.model.accounts.getItemByIndex(0);
             if (!item) {
                 throw new Error('No accounts available');
             }
@@ -214,7 +203,7 @@ export class ImportRuleForm extends Component {
         }
 
         if (ImportAction.isPersonValue(actionType)) {
-            const item = this.model.persons.getItemByIndex(0);
+            const item = window.app.model.persons.getItemByIndex(0);
             if (!item) {
                 throw new Error('No persons available');
             }
@@ -273,7 +262,7 @@ export class ImportRuleForm extends Component {
         }
 
         if (ImportCondition.isAccountField(fieldType)) {
-            const item = this.model.accounts.getItemByIndex(0);
+            const item = window.app.model.accounts.getItemByIndex(0);
             if (!item) {
                 throw new Error('No accounts available');
             }
@@ -282,7 +271,7 @@ export class ImportRuleForm extends Component {
         }
 
         if (ImportCondition.isTemplateField(fieldType)) {
-            const item = this.model.template.getItemByIndex(0);
+            const item = window.app.model.templates.getItemByIndex(0);
             if (!item) {
                 throw new Error('No template available');
             }
@@ -291,7 +280,7 @@ export class ImportRuleForm extends Component {
         }
 
         if (ImportCondition.isCurrencyField(fieldType)) {
-            const item = this.model.currency.getItemByIndex(0);
+            const item = window.app.model.currency.getItemByIndex(0);
             if (!item) {
                 throw new Error('No currency available');
             }
@@ -475,9 +464,6 @@ export class ImportRuleForm extends Component {
                 parent: this,
                 data: action,
                 isValid: true,
-                currencyModel: this.model.currency,
-                accountModel: this.model.accounts,
-                personModel: this.model.persons,
                 update: (data) => this.onActionUpdate(index, data),
                 remove: () => this.onActionDelete(index),
             };
@@ -501,10 +487,6 @@ export class ImportRuleForm extends Component {
                 parent: this,
                 data: condition,
                 isValid: true,
-                tplModel: this.model.template,
-                currencyModel: this.model.currency,
-                accountModel: this.model.accounts,
-                personModel: this.model.persons,
                 update: (data) => this.onConditionUpdate(index, data),
                 remove: () => this.onConditionDelete(index),
             };
