@@ -805,6 +805,8 @@ const reduceToggleDebtAccount = (state) => {
             newState.form.sourceResult = sourceResult;
             newState.form.fSourceResult = sourceResult;
         }
+
+        newState.account = null;
     } else {
         newState.account = window.app.model.accounts.getItem(transaction.lastAcc_id);
         if (!newState.account) {
@@ -1250,7 +1252,6 @@ const reduceTypeChange = (state, type) => {
 
             setStateSourceAmount(newState, state.form.destAmount);
             setStateDestAmount(newState, state.form.sourceAmount);
-            updateStateExchange(newState);
         } else if (currentType === TRANSFER) {
             newState.id = 0;
             transaction.dest_curr = transaction.src_curr;
@@ -1258,7 +1259,6 @@ const reduceTypeChange = (state, type) => {
 
             setStateSourceAmount(newState, state.form.sourceAmount);
             setStateDestAmount(newState, state.form.sourceAmount);
-            updateStateExchange(newState);
         } else if (currentType === DEBT) {
             const fromAccount = (state.account)
                 ? state.account
@@ -1268,8 +1268,15 @@ const reduceTypeChange = (state, type) => {
             newState.srcAccount = fromAccount;
             transaction.src_id = fromAccount.id;
             transaction.src_curr = fromAccount.curr_id;
+            transaction.dest_curr = fromAccount.curr_id;
             newState.srcCurrency = currencyModel.getItem(fromAccount.curr_id);
             newState.destCurrency = newState.srcCurrency;
+
+            calculateSourceResult(newState);
+        }
+
+        if (state.isAvailable) {
+            updateStateExchange(newState);
         }
 
         newState.isDiff = transaction.src_curr !== transaction.dest_curr;
@@ -1312,7 +1319,6 @@ const reduceTypeChange = (state, type) => {
 
             setStateSourceAmount(newState, state.form.sourceAmount);
             setStateDestAmount(newState, state.form.destAmount);
-            updateStateExchange(newState);
         } else if (currentType === TRANSFER) {
             newState.id = 0;
             transaction.src_curr = transaction.dest_curr;
@@ -1320,7 +1326,6 @@ const reduceTypeChange = (state, type) => {
 
             setStateSourceAmount(newState, state.form.destAmount);
             setStateDestAmount(newState, state.form.destAmount);
-            updateStateExchange(newState);
         } else if (currentType === DEBT) {
             const fromAccount = (state.account)
                 ? state.account
@@ -1330,8 +1335,15 @@ const reduceTypeChange = (state, type) => {
             newState.destAccount = fromAccount;
             transaction.dest_id = fromAccount.id;
             transaction.dest_curr = fromAccount.curr_id;
+            transaction.src_curr = fromAccount.curr_id;
             newState.destCurrency = currencyModel.getItem(fromAccount.curr_id);
             newState.srcCurrency = newState.destCurrency;
+
+            calculateDestResult(newState);
+        }
+
+        if (state.isAvailable) {
+            updateStateExchange(newState);
         }
 
         newState.isDiff = transaction.src_curr !== transaction.dest_curr;

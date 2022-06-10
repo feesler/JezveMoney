@@ -200,11 +200,9 @@ export class TransactionView extends AppView {
 
         res.srcResBal = cont.result_balance_row.content.value;
         res.fSrcResBal = isValidValue(res.srcResBal) ? normalize(res.srcResBal) : res.srcResBal;
-        res.fmtSrcResBal = (res.srcCurr) ? res.srcCurr.format(res.fSrcResBal) : '';
 
         res.destResBal = cont.result_balance_dest_row.content.value;
         res.fDestResBal = isValidValue(res.destResBal) ? normalize(res.destResBal) : res.destResBal;
-        res.fmtDestResBal = (res.destCurr) ? res.destCurr.format(res.fDestResBal) : '';
 
         res.exchRate = cont.exchange_row.content.value;
         this.updateExch();
@@ -375,15 +373,11 @@ export class TransactionView extends AppView {
             if (res.srcAccount.curr_id !== res.src_curr_id) {
                 throw new Error(`Unexpected destination currency ${res.dest_curr_id}(${res.destAccount.curr_id} is expected)`);
             }
-
-            res.srcAccount.fmtBalance = res.srcCurr.format(res.srcAccount.balance);
         }
         if (res.isAvailable && res.destAccount) {
             if (res.destAccount.curr_id !== res.dest_curr_id) {
                 throw new Error(`Unexpected destination currency ${res.dest_curr_id}(${res.destAccount.curr_id} is expected)`);
             }
-
-            res.destAccount.fmtBalance = res.destCurr.format(res.destAccount.balance);
         }
 
         res.date = cont.datePicker.content.date;
@@ -453,7 +447,13 @@ export class TransactionView extends AppView {
                 visible: this.model.isAvailable && this.model.type === DEBT,
             },
             account: {
-                tile: {},
+                tile: {
+                    visible: (
+                        this.model.isAvailable
+                        && this.model.type === DEBT
+                        && !this.model.noAccount
+                    ),
+                },
                 visible: this.model.isAvailable && this.model.type === DEBT,
             },
             source: {
@@ -468,19 +468,11 @@ export class TransactionView extends AppView {
                     && (this.model.type === INCOME || this.model.type === TRANSFER)
                 ),
             },
-            src_amount_row: {
-                value: this.model.srcAmount.toString(),
-                currSign: (this.model.srcCurr) ? this.model.srcCurr.sign : '',
-            },
-            dest_amount_row: {
-                value: this.model.destAmount.toString(),
-                currSign: (this.model.destCurr) ? this.model.destCurr.sign : '',
-            },
+            src_amount_row: {},
+            dest_amount_row: {},
             result_balance_row: {},
             result_balance_dest_row: {},
-            exchange_row: {
-                value: this.model.exchRate.toString(),
-            },
+            exchange_row: {},
             src_amount_left: {},
             dest_amount_left: {},
             src_res_balance_left: {},
@@ -496,8 +488,15 @@ export class TransactionView extends AppView {
         }
 
         if (this.model.isAvailable) {
+            res.src_amount_row.value = this.model.srcAmount.toString();
+            res.src_amount_row.currSign = (this.model.srcCurr) ? this.model.srcCurr.sign : '';
             res.src_amount_row.isCurrActive = (this.model.type === INCOME);
+
+            res.dest_amount_row.value = this.model.destAmount.toString();
+            res.dest_amount_row.currSign = (this.model.destCurr) ? this.model.destCurr.sign : '';
             res.dest_amount_row.isCurrActive = (this.model.type === EXPENSE);
+
+            res.exchange_row.value = this.model.exchRate.toString();
             res.exchange_row.currSign = this.model.exchSign;
             res.exch_left.value = this.model.fmtExch;
         }
@@ -509,10 +508,10 @@ export class TransactionView extends AppView {
 
             if (this.model.isAvailable) {
                 res.source.tile.name = (this.model.srcAccount) ? this.model.srcAccount.name : '';
-                res.source.tile.balance = (this.model.srcAccount) ? this.model.srcAccount.fmtBalance : '';
+                res.source.tile.balance = (this.model.srcAccount)
+                    ? this.model.srcCurr.format(this.model.srcAccount.balance)
+                    : '';
             }
-
-            res.src_res_balance_left.value = this.model.fmtSrcResBal;
         }
 
         if (this.model.type === INCOME || this.model.type === TRANSFER) {
@@ -522,23 +521,31 @@ export class TransactionView extends AppView {
 
             if (this.model.isAvailable) {
                 res.destination.tile.name = (this.model.destAccount) ? this.model.destAccount.name : '';
-                res.destination.tile.balance = (this.model.destAccount) ? this.model.destAccount.fmtBalance : '';
+                res.destination.tile.balance = (this.model.destAccount)
+                    ? this.model.destCurr.format(this.model.destAccount.balance)
+                    : '';
             }
-
-            res.dest_res_balance_left.value = (this.model.isAvailable) ? this.model.fmtDestResBal : '';
         }
 
-        if (this.model.type !== INCOME) {
+        if (this.model.type !== INCOME && this.model.isAvailable) {
             res.result_balance_row.value = this.model.srcResBal.toString();
             res.result_balance_row.isCurrActive = false;
+
+            res.src_res_balance_left.value = (this.model.srcCurr)
+                ? this.model.srcCurr.format(this.model.fSrcResBal)
+                : '';
         }
 
-        if (this.model.type !== EXPENSE) {
+        if (this.model.type !== EXPENSE && this.model.isAvailable) {
             res.src_amount_left.value = (this.model.srcCurr) ? this.model.srcCurr.format(this.model.fSrcAmount) : '';
             res.result_balance_dest_row.value = this.model.destResBal.toString();
             res.result_balance_dest_row.isCurrActive = false;
+
+            res.dest_res_balance_left.value = (this.model.destCurr && this.model.isAvailable)
+                ? this.model.destCurr.format(this.model.fDestResBal)
+                : '';
         }
-        if (this.model.type !== DEBT) {
+        if (this.model.type !== DEBT && this.model.isAvailable) {
             res.dest_amount_left.value = (this.model.destCurr) ? this.model.destCurr.format(this.model.fDestAmount) : '';
         }
 
@@ -827,7 +834,6 @@ export class TransactionView extends AppView {
                 throw new Error('Wrong state specified');
             }
 
-            res.account.tile.visible = this.model.isAvailable && !this.model.noAccount;
             res.selaccount = { visible: this.model.isAvailable && this.model.noAccount };
             res.noacc_btn = { visible: this.model.isAvailable && !this.model.noAccount };
             res.dest_amount_row.visible = false;
@@ -846,61 +852,35 @@ export class TransactionView extends AppView {
             }
 
             if (this.model.debtType) {
-                res.person = {
-                    tile: {
-                        visible: this.model.isAvailable,
-                    },
-                };
-
                 if (this.model.isAvailable) {
                     res.person.tile.name = (this.model.person) ? this.model.person.name : '';
-                    res.person.tile.balance = (this.model.srcAccount) ? this.model.srcAccount.fmtBalance : '';
+                    res.person.tile.balance = (this.model.srcAccount)
+                        ? this.model.srcCurr.format(this.model.srcAccount.balance)
+                        : '';
                 }
 
-                res.src_res_balance_left.value = this.model.fmtSrcResBal;
-
-                // Check initial state
-                res.dest_res_balance_left.value = this.model.fmtDestResBal;
-
                 if (!this.model.noAccount) {
-                    res.account = {
-                        tile: {
-                            visible: this.model.isAvailable,
-                        },
-                    };
-
                     if (this.model.isAvailable) {
                         res.account.tile.name = (this.model.destAccount) ? this.model.destAccount.name : '';
-                        res.account.tile.balance = (this.model.destAccount) ? this.model.destAccount.fmtBalance : '';
+                        res.account.tile.balance = (this.model.destAccount)
+                            ? this.model.destCurr.format(this.model.destAccount.balance)
+                            : '';
                     }
                 }
             } else {
-                res.person = {
-                    tile: {
-                        visible: this.model.isAvailable,
-                    },
-                };
-
                 if (this.model.isAvailable) {
                     res.person.tile.name = (this.model.person) ? this.model.person.name : '';
-                    res.person.tile.balance = (this.model.destAccount) ? this.model.destAccount.fmtBalance : '';
+                    res.person.tile.balance = (this.model.destAccount)
+                        ? this.model.destCurr.format(this.model.destAccount.balance)
+                        : '';
                 }
 
-                res.dest_res_balance_left.value = this.model.fmtDestResBal;
-
-                // Check initial state
-                res.src_res_balance_left.value = this.model.fmtSrcResBal;
-
                 if (!this.model.noAccount) {
-                    res.account = {
-                        tile: {
-                            visible: this.model.isAvailable,
-                        },
-                    };
-
                     if (this.model.isAvailable) {
                         res.account.tile.name = (this.model.srcAccount) ? this.model.srcAccount.name : '';
-                        res.account.tile.balance = (this.model.srcAccount) ? this.model.srcAccount.fmtBalance : '';
+                        res.account.tile.balance = (this.model.srcAccount)
+                            ? this.model.srcCurr.format(this.model.srcAccount.balance)
+                            : '';
                     }
                 }
             }
@@ -970,91 +950,104 @@ export class TransactionView extends AppView {
     }
 
     /**
-     * Set source amount value
+     * Set source amount value and calculate source result
      * @param {number|string} val - new source amount value
      */
     setSrcAmount(val) {
         this.model.srcAmount = val;
-        const newValue = isValidValue(val) ? normalize(val) : val;
-        if (this.model.fSrcAmount === newValue) {
-            return;
-        }
-
-        this.model.fSrcAmount = newValue;
-
-        if (this.model.type === EXPENSE || this.model.type === TRANSFER) {
-            const srcRes = this.model.srcAccount.balance - newValue;
-            this.model.srcResBal = normalize(srcRes);
-            this.model.fmtSrcResBal = this.model.srcCurr.format(srcRes);
-        } else if (this.model.type === DEBT) {
-            if (this.model.srcAccount && !this.model.noAccount) {
-                const srcRes = this.model.srcAccount.balance - newValue;
-                this.model.srcResBal = normalize(srcRes);
-            } else if (this.model.noAccount) {
-                if (this.model.debtType) {
-                    const srcRes = this.model.personAccount.balance - newValue;
-                    this.model.srcResBal = normalize(srcRes);
-                } else {
-                    let accBalance = 0;
-                    if (this.model.lastAccount_id) {
-                        const lastAcc = App.state.accounts.getItem(this.model.lastAccount_id);
-                        if (!lastAcc) {
-                            throw new Error('Last account not found');
-                        }
-
-                        accBalance = lastAcc.balance;
-                    }
-
-                    this.model.srcResBal = normalize(accBalance);
-                }
-            }
-
-            this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.srcResBal);
-        }
+        this.model.fSrcAmount = normalize(val);
+        this.calculateSourceResult();
     }
 
     /**
-     * Set destination amount value
+     * Set destination amount value and destination source result
      * @param {number|string} val - new destination amount value
      */
     setDestAmount(val) {
         this.model.destAmount = val;
-        const newValue = isValidValue(val) ? normalize(val) : val;
-        if (this.model.fDestAmount === newValue) {
+        this.model.fDestAmount = normalize(val);
+        this.calculateDestResult();
+    }
+
+    /**
+     * Set source result value
+     * @param {number|string} val - new source result value
+     */
+    setSourceResult(val) {
+        this.model.srcResBal = val;
+        this.model.fSrcResBal = normalize(val);
+    }
+
+    /**
+     * Set destination result value
+     * @param {number|string} val - new destination result value
+     */
+    setDestResult(val) {
+        this.model.destResBal = val;
+        this.model.fDestResBal = normalize(val);
+    }
+
+    getLastAccountBalance() {
+        if (!this.model.lastAccount_id) {
+            return 0;
+        }
+
+        const account = App.state.accounts.getItem(this.model.lastAccount_id);
+        if (!account) {
+            throw new Error('Last account not found');
+        }
+
+        return account.balance;
+    }
+
+    calculateSourceResult() {
+        if (this.model.type === INCOME || !this.model.isAvailable) {
             return;
         }
 
-        this.model.fDestAmount = newValue;
+        const sourceAmount = this.model.fSrcAmount;
+        let sourceResult;
 
-        if (this.model.type === INCOME || this.model.type === TRANSFER) {
-            const destRes = this.model.destAccount.balance + newValue;
-            this.model.destResBal = normalize(destRes);
-            this.model.fmtDestResBal = this.model.destCurr.format(destRes);
+        if (this.model.type === EXPENSE || this.model.type === TRANSFER) {
+            sourceResult = this.model.srcAccount.balance - sourceAmount;
         } else if (this.model.type === DEBT) {
-            if (this.model.destAccount && !this.model.noAccount) {
-                const destRes = this.model.destAccount.balance + this.model.fDestAmount;
-                this.model.destResBal = normalize(destRes);
+            if (this.model.srcAccount && !this.model.noAccount) {
+                sourceResult = this.model.srcAccount.balance - sourceAmount;
             } else if (this.model.noAccount) {
                 if (this.model.debtType) {
-                    let accBalance = 0;
-                    if (this.model.lastAccount_id) {
-                        const lastAcc = App.state.accounts.getItem(this.model.lastAccount_id);
-                        if (!lastAcc) {
-                            throw new Error('Last account not found');
-                        }
-
-                        accBalance = lastAcc.balance;
-                    }
-
-                    this.model.destResBal = normalize(accBalance);
+                    sourceResult = this.model.personAccount.balance - sourceAmount;
                 } else {
-                    const destRes = this.model.personAccount.balance + this.model.fDestAmount;
-                    this.model.destResBal = normalize(destRes);
+                    sourceResult = this.getLastAccountBalance();
                 }
             }
-
-            this.model.fmtDestResBal = this.model.destCurr.format(this.model.destResBal);
         }
+
+        this.setSourceResult(normalize(sourceResult));
+    }
+
+    calculateDestResult() {
+        if (this.model.type === EXPENSE || !this.model.isAvailable) {
+            return;
+        }
+
+        const destAmount = this.model.fDestAmount;
+        let destResult;
+
+        if (this.model.type === INCOME || this.model.type === TRANSFER) {
+            destResult = this.model.destAccount.balance + destAmount;
+        } else if (this.model.type === DEBT) {
+            if (this.model.destAccount && !this.model.noAccount) {
+                destResult = this.model.destAccount.balance + destAmount;
+            } else if (this.model.noAccount) {
+                if (this.model.debtType) {
+                    destResult = this.getLastAccountBalance();
+                } else {
+                    destResult = this.model.personAccount.balance + destAmount;
+                }
+            }
+        }
+
+        this.setDestResult(normalize(destResult));
     }
 
     calcExchByAmounts() {
@@ -1105,9 +1098,6 @@ export class TransactionView extends AppView {
         this.model.srcAccount = newSrcAcc;
         this.model.src_curr_id = this.model.srcAccount.curr_id;
         this.model.srcCurr = Currency.getById(this.model.src_curr_id);
-        this.model.srcAccount.fmtBalance = this.model.srcCurr.format(
-            this.model.srcAccount.balance,
-        );
 
         // Copy destination amount to source amount
         if (this.model.fDestAmount !== this.model.fSrcAmount) {
@@ -1118,10 +1108,8 @@ export class TransactionView extends AppView {
         // Update result balance of source
         const newSrcResBal = normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
         if (this.model.fSrcResBal !== newSrcResBal) {
-            this.model.srcResBal = newSrcResBal;
-            this.model.fSrcResBal = this.model.srcResBal;
+            this.setSourceResult(newSrcResBal);
         }
-        this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.fSrcResBal);
     }
 
     setNextDestAccount(accountId) {
@@ -1133,9 +1121,6 @@ export class TransactionView extends AppView {
         this.model.destAccount = App.state.accounts.getItem(nextAccountId);
         this.model.dest_curr_id = this.model.destAccount.curr_id;
         this.model.destCurr = Currency.getById(this.model.dest_curr_id);
-        this.model.destAccount.fmtBalance = this.model.destCurr.format(
-            this.model.destAccount.balance,
-        );
 
         // Copy source amount to destination amount
         if (this.model.fDestAmount !== this.model.fSrcAmount) {
@@ -1144,16 +1129,18 @@ export class TransactionView extends AppView {
         this.model.fDestAmount = this.model.fSrcAmount;
 
         // Update result balance of destination
-        const destRes = this.model.destAccount.balance + this.model.fDestAmount;
-        const newDestResBal = normalize(destRes);
+        const newDestResBal = normalize(this.model.destAccount.balance + this.model.fDestAmount);
         if (this.model.fDestResBal !== newDestResBal) {
-            this.model.destResBal = newDestResBal;
-            this.model.fDestResBal = this.model.destResBal;
+            this.setDestResult(newDestResBal);
         }
-        this.model.fmtDestResBal = this.model.destCurr.format(this.model.fDestResBal);
     }
 
     getPersonAccount(personId, currencyId) {
+        const currency = Currency.getById(currencyId);
+        if (!currency) {
+            return null;
+        }
+
         const personAccount = App.state.getPersonAccount(personId, currencyId);
         if (personAccount) {
             return personAccount;
@@ -1178,6 +1165,7 @@ export class TransactionView extends AppView {
 
     async changeTransactionType(type) {
         const currentType = this.model.type;
+        const isAvailableBefore = this.model.isAvailable;
 
         if (currentType === type) {
             return true;
@@ -1201,7 +1189,6 @@ export class TransactionView extends AppView {
 
                 this.setSrcAmount(destAmount);
                 this.setDestAmount(srcAmount);
-                this.updateExch();
             } else if (currentType === TRANSFER) {
                 const { srcAmount } = this.model;
 
@@ -1211,17 +1198,23 @@ export class TransactionView extends AppView {
 
                 this.setSrcAmount(srcAmount);
                 this.setDestAmount(srcAmount);
-                this.updateExch();
             } else if (currentType === DEBT) {
                 const fromAccount = (this.model.account)
                     ? this.model.account
-                    : App.state.accounts.getItemByIndex(0); // TODO: use visible accounts
+                    : App.state.getVisibleAccountByIndex(0);
 
                 this.model.state = 0;
                 this.model.srcAccount = fromAccount;
                 this.model.src_curr_id = fromAccount.curr_id;
+                this.model.dest_curr_id = fromAccount.curr_id;
                 this.model.srcCurr = Currency.getById(fromAccount.curr_id);
                 this.model.destCurr = this.model.srcCurr;
+
+                this.calculateSourceResult();
+            }
+
+            if (this.model.isAvailable) {
+                this.updateExch();
             }
 
             this.model.destAccount = null;
@@ -1230,7 +1223,7 @@ export class TransactionView extends AppView {
         if (type === INCOME) {
             if (!this.model.isAvailable) {
                 this.model.state = -1;
-            } else if (currentType === INCOME) {
+            } else if (currentType === EXPENSE) {
                 const { srcCurr, srcAmount, destAmount } = this.model;
                 const srcCurrId = this.model.src_curr_id;
 
@@ -1242,7 +1235,6 @@ export class TransactionView extends AppView {
 
                 this.setSrcAmount(destAmount);
                 this.setDestAmount(srcAmount);
-                this.updateExch();
             } else if (currentType === TRANSFER) {
                 const { destAmount } = this.model;
 
@@ -1252,17 +1244,23 @@ export class TransactionView extends AppView {
 
                 this.setSrcAmount(destAmount);
                 this.setDestAmount(destAmount);
-                this.updateExch();
             } else if (currentType === DEBT) {
                 const fromAccount = (this.model.account)
                     ? this.model.account
-                    : App.state.accounts.getItemByIndex(0); // TODO: use visible accounts
+                    : App.state.getVisibleAccountByIndex(0);
 
                 this.model.state = 0;
                 this.model.destAccount = fromAccount;
                 this.model.dest_curr_id = fromAccount.curr_id;
+                this.model.src_curr_id = fromAccount.curr_id;
                 this.model.destCurr = Currency.getById(fromAccount.curr_id);
                 this.model.srcCurr = this.model.destCurr;
+
+                this.calculateDestResult();
+            }
+
+            if (this.model.isAvailable) {
+                this.updateExch();
             }
 
             this.model.srcAccount = null;
@@ -1285,17 +1283,20 @@ export class TransactionView extends AppView {
                 } else {
                     const scrAccount = (this.model.account)
                         ? this.model.account
-                        : App.state.accounts.getItemByIndex(0); // TODO: use visible accounts
+                        : App.state.getVisibleAccountByIndex(0);
 
                     this.model.srcAccount = scrAccount;
                     this.model.src_curr_id = scrAccount.curr_id;
                     this.model.srcCurr = Currency.getById(scrAccount.curr_id);
+
                     this.setNextDestAccount(scrAccount.id);
                 }
             }
 
             this.model.isDiffCurr = (this.model.src_curr_id !== this.model.dest_curr_id);
-            this.model.state = (this.model.isDiffCurr) ? 3 : 0;
+            if (this.model.isAvailable) {
+                this.model.state = (this.model.isDiffCurr) ? 3 : 0;
+            }
 
             const { srcAmount, destAmount } = this.model;
             this.setSrcAmount(srcAmount);
@@ -1304,10 +1305,19 @@ export class TransactionView extends AppView {
         }
 
         if (type === DEBT) {
-            const person = App.state.persons.getItemByIndex(0); // TODO: use visible persons
+            const person = App.state.getVisiblePersonByIndex(0);
             this.model.person = person;
 
-            if (!this.model.isAvailable) {
+            if (!isAvailableBefore) {
+                this.model.debtType = true;
+                this.model.srcCurr = await this.getFirstCurrency();
+                this.model.src_curr_id = this.model.srcCurr.id;
+
+                this.model.dest_curr_id = this.model.src_curr_id;
+                this.model.destCurr = this.model.srcCurr;
+
+                this.model.account = null;
+            } else if (!this.model.isAvailable) {
                 this.model.state = -1;
             } else if (currentType === EXPENSE || currentType === TRANSFER) {
                 this.model.debtType = false;
@@ -1315,21 +1325,24 @@ export class TransactionView extends AppView {
                 if (this.model.srcAccount) {
                     this.model.src_curr_id = this.model.srcAccount.curr_id;
                 } else {
-                    const firstCurrency = await this.getFirstCurrency();
-                    this.model.src_curr_id = firstCurrency.id;
+                    this.model.srcCurr = await this.getFirstCurrency();
+                    this.model.src_curr_id = this.model.srcCurr.id;
                 }
 
                 this.model.dest_curr_id = this.model.src_curr_id;
+                this.model.destCurr = this.model.srcCurr;
             } else if (currentType === INCOME) {
                 this.model.debtType = true;
                 this.model.account = this.model.destAccount;
-                if (this.model.srcAccount) {
+                if (this.model.destAccount) {
                     this.model.dest_curr_id = this.model.destAccount.curr_id;
                 } else {
-                    const firstCurrency = await this.getFirstCurrency();
-                    this.model.src_curr_id = firstCurrency.id;
+                    this.model.destCurr = await this.getFirstCurrency();
+                    this.model.dest_curr_id = this.model.destCurr.id;
                 }
+
                 this.model.src_curr_id = this.model.dest_curr_id;
+                this.model.srcCurr = this.model.destCurr;
             }
 
             this.model.personAccount = this.getPersonAccount(
@@ -1337,8 +1350,21 @@ export class TransactionView extends AppView {
                 this.model.src_curr_id,
             );
 
+            if (this.model.debtType) {
+                this.model.srcAccount = this.model.personAccount;
+            } else {
+                this.model.destAccount = this.model.personAccount;
+            }
+
+            this.model.isDiffCurr = (this.model.src_curr_id !== this.model.dest_curr_id);
             this.model.noAccount = (this.model.account == null);
-            this.model.state = (this.model.debtType) ? 0 : 3;
+            if (this.model.isAvailable) {
+                if (this.model.noAccount) {
+                    this.model.state = (this.model.debtType) ? 6 : 7;
+                } else {
+                    this.model.state = (this.model.debtType) ? 0 : 3;
+                }
+            }
             const { srcAmount, destAmount } = this.model;
             this.setSrcAmount(srcAmount);
             this.setDestAmount(destAmount);
@@ -1354,6 +1380,8 @@ export class TransactionView extends AppView {
             delete this.model.noAccount;
             delete this.model.lastAcc_id;
         }
+
+        this.setExpectedState(this.model.state);
 
         await this.performAction(() => this.content.typeMenu.select(type));
 
@@ -1405,15 +1433,12 @@ export class TransactionView extends AppView {
         this.model.srcAccount = newAcc;
         this.model.src_curr_id = this.model.srcAccount.curr_id;
         this.model.srcCurr = Currency.getById(this.model.src_curr_id);
-        this.model.srcAccount.fmtBalance = this.model.srcCurr.format(this.model.srcAccount.balance);
 
         // Update result balance of source
         const newSrcResBal = normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
         if (this.model.fSrcResBal !== newSrcResBal) {
-            this.model.srcResBal = newSrcResBal;
-            this.model.fSrcResBal = this.model.srcResBal;
+            this.setSourceResult(newSrcResBal);
         }
-        this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.fSrcResBal);
 
         // Copy source currency to destination currency if needed
         // Transition 1 or 12
@@ -1511,17 +1536,12 @@ export class TransactionView extends AppView {
         this.model.destAccount = newAcc;
         this.model.dest_curr_id = this.model.destAccount.curr_id;
         this.model.destCurr = Currency.getById(this.model.dest_curr_id);
-        this.model.destAccount.fmtBalance = this.model.destCurr.format(
-            this.model.destAccount.balance,
-        );
 
         // Update result balance of destination
         const newDestResBal = normalize(this.model.destAccount.balance + this.model.fDestAmount);
         if (this.model.fDestResBal !== newDestResBal) {
-            this.model.destResBal = newDestResBal;
-            this.model.fDestResBal = this.model.destResBal;
+            this.setDestResult(newDestResBal);
         }
-        this.model.fmtDestResBal = this.model.destCurr.format(this.model.fDestResBal);
 
         // Copy destination currency to source currency if needed
         // Transition 1 or 23
@@ -1829,7 +1849,6 @@ export class TransactionView extends AppView {
         this.model.srcResBal = val;
         if (this.model.fSrcResBal !== fNewValue) {
             this.model.fSrcResBal = fNewValue;
-            this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.srcResBal);
 
             const newSrcAmount = normalize(this.model.srcAccount.balance - fNewValue);
             this.model.srcAmount = newSrcAmount;
@@ -1860,7 +1879,6 @@ export class TransactionView extends AppView {
         const valueChanged = this.model.fDestResBal !== fNewValue;
         if (valueChanged) {
             this.model.fDestResBal = fNewValue;
-            this.model.fmtDestResBal = this.model.destCurr.format(this.model.destResBal);
 
             if (this.model.type === INCOME) {
                 const newSrcAmount = normalize(fNewValue - this.model.destAccount.balance);
@@ -2055,22 +2073,12 @@ export class TransactionView extends AppView {
 
         if (this.model.debtType) {
             this.model.srcAccount = this.model.personAccount;
-            this.model.srcAccount.fmtBalance = this.model.srcCurr.format(
-                this.model.srcAccount.balance,
-            );
-
-            this.model.srcResBal = normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
-            this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.srcResBal);
+            const srcResult = normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
+            this.setSourceResult(srcResult);
         } else {
             this.model.destAccount = this.model.personAccount;
-            this.model.destAccount.fmtBalance = this.model.destCurr.format(
-                this.model.destAccount.balance,
-            );
-
-            const destRes = this.model.destAccount.balance + this.model.fDestAmount;
-            this.model.fDestResBal = normalize(destRes);
-            this.model.destResBal = this.model.fDestResBal;
-            this.model.fmtDestResBal = this.model.destCurr.format(this.model.destResBal);
+            const destRes = normalize(this.model.destAccount.balance + this.model.fDestAmount);
+            this.setDestResult(destRes);
         }
 
         this.setExpectedState(this.model.state);
@@ -2096,30 +2104,30 @@ export class TransactionView extends AppView {
         }
 
         if (this.model.srcAccount) {
-            this.model.srcResBal = normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
+            const srcResult = normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
+            this.setSourceResult(srcResult);
         } else if (this.model.noAccount && !newValue) {
             const lastAcc = App.state.accounts.getItem(this.model.lastAccount_id);
             if (!lastAcc) {
                 throw new Error('Last account not found');
             }
 
-            this.model.srcResBal = normalize(lastAcc.balance - this.model.fSrcAmount);
+            const srcResult = normalize(lastAcc.balance - this.model.fSrcAmount);
+            this.setSourceResult(srcResult);
         }
-        this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.srcResBal);
 
         if (this.model.destAccount) {
-            const destRes = this.model.destAccount.balance + this.model.fDestAmount;
-            this.model.destResBal = normalize(destRes);
+            const destRes = normalize(this.model.destAccount.balance + this.model.fDestAmount);
+            this.setDestResult(destRes);
         } else if (this.model.noAccount && newValue) {
             const lastAcc = App.state.accounts.getItem(this.model.lastAccount_id);
             if (!lastAcc) {
                 throw new Error('Last account not found');
             }
 
-            this.model.destResBal = normalize(lastAcc.balance + this.model.fDestAmount);
+            const destRes = normalize(lastAcc.balance + this.model.fDestAmount);
+            this.setDestResult(destRes);
         }
-
-        this.model.fmtDestResBal = this.model.destCurr.format(this.model.destResBal);
 
         if (this.model.debtType) {
             this.model.debtType = newValue;
@@ -2169,13 +2177,13 @@ export class TransactionView extends AppView {
         if (this.model.noAccount) {
             this.model.lastAccount_id = this.model.account.id;
             if (this.model.debtType) {
-                this.model.fDestResBal = normalize(this.model.account.balance);
-                this.model.destResBal = this.model.fDestResBal;
-                this.model.fmtDestResBal = this.model.destCurr.format(this.model.destResBal);
+                const destRes = normalize(this.model.account.balance);
+                this.setDestResult(destRes);
             } else {
-                this.model.srcResBal = normalize(this.model.account.balance);
-                this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.srcResBal);
+                const srcRes = normalize(this.model.account.balance);
+                this.setSourceResult(srcRes);
             }
+            this.model.account = null;
 
             if (this.model.state === 0 || this.model.state === 2) {
                 this.setExpectedState(6); // Transition 25 or 41
@@ -2199,26 +2207,13 @@ export class TransactionView extends AppView {
             if (this.model.debtType) {
                 this.model.destAccount = this.model.account;
 
-                const destRes = this.model.destAccount.balance + this.model.fDestAmount;
-                this.model.destResBal = normalize(destRes);
-                this.model.fmtDestResBal = this.model.destCurr.format(this.model.destResBal);
+                const destRes = normalize(this.model.destAccount.balance + this.model.fDestAmount);
+                this.setDestResult(destRes);
             } else {
                 this.model.srcAccount = this.model.account;
 
-                const srcRes = this.model.srcAccount.balance - this.model.fSrcAmount;
-                this.model.srcResBal = normalize(srcRes);
-                this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.srcResBal);
-            }
-
-            if (this.model.srcAccount) {
-                this.model.srcAccount.fmtBalance = this.model.srcCurr.format(
-                    this.model.srcAccount.balance,
-                );
-            }
-            if (this.model.destAccount) {
-                this.model.destAccount.fmtBalance = this.model.destCurr.format(
-                    this.model.destAccount.balance,
-                );
+                const srcRes = normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
+                this.setSourceResult(srcRes);
             }
 
             if (this.model.state === 6) {
@@ -2272,25 +2267,15 @@ export class TransactionView extends AppView {
             this.model.destAccount = this.model.personAccount;
         }
 
-        this.model.srcAccount.fmtBalance = this.model.srcCurr.format(
-            this.model.srcAccount.balance,
-        );
         const newSrcResBal = normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
         if (this.model.fSrcResBal !== newSrcResBal) {
-            this.model.srcResBal = newSrcResBal;
-            this.model.fSrcResBal = this.model.srcResBal;
+            this.setSourceResult(newSrcResBal);
         }
-        this.model.fmtSrcResBal = this.model.srcCurr.format(this.model.srcResBal);
 
-        this.model.destAccount.fmtBalance = this.model.destCurr.format(
-            this.model.destAccount.balance,
-        );
         const newDestResBal = normalize(this.model.destAccount.balance + this.model.fDestAmount);
         if (this.model.fDestResBal !== newDestResBal) {
-            this.model.destResBal = newDestResBal;
-            this.model.fDestResBal = this.model.destResBal;
+            this.setDestResult(newDestResBal);
         }
-        this.model.fmtDestResBal = this.model.destCurr.format(this.model.destResBal);
 
         this.updateExch();
 

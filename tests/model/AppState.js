@@ -384,7 +384,7 @@ export class AppState {
 
     getAccountIndexesByNames(accounts) {
         const accNames = Array.isArray(accounts) ? accounts : [accounts];
-        const userAccounts = this.accounts.getUserAccounts().getVisible();
+        const userAccounts = this.accounts.getUserVisible();
 
         return accNames.map((name) => {
             const acc = userAccounts.findByName(name);
@@ -394,6 +394,11 @@ export class AppState {
 
             return userAccounts.getIndexById(acc.id);
         });
+    }
+
+    getVisibleAccountByIndex(index) {
+        const userAccounts = this.accounts.getUserVisible();
+        return userAccounts.getItemByIndex(index);
     }
 
     /**
@@ -586,6 +591,11 @@ export class AppState {
 
             return visibleList.getIndexById(person.id);
         });
+    }
+
+    getVisiblePersonByIndex(index) {
+        const visibleList = this.persons.getVisible();
+        return visibleList.getItemByIndex(index);
     }
 
     /**

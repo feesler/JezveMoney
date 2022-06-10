@@ -179,6 +179,11 @@ export class AccountsList extends List {
         return this.getUserAccounts().getVisible(returnRaw);
     }
 
+    /** Return hidden user accounts */
+    getUserHidden(returnRaw = false) {
+        return this.getUserAccounts().getHidden(returnRaw);
+    }
+
     /**
      * Return another visible user account id if possible
      * Return first account if no id specified
