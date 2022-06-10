@@ -14,6 +14,7 @@ import { transactionsListTests } from './transactionList.js';
 import { importTests } from './import.js';
 import { App } from '../Application.js';
 import { setBlock } from '../env.js';
+import { ACCOUNT_HIDDEN } from '../model/AccountsList.js';
 
 let scenario = null;
 
@@ -391,6 +392,46 @@ async function deleteFromUpdateTests() {
     );
 }
 
+async function createFromHiddenAccount() {
+    setBlock('Create transaction from hidden account', 2);
+
+    const { RUB } = scenario;
+
+    // Remove all accounts and persons
+    await api.account.reset();
+    const personIds = App.state.persons.getIds();
+    if (personIds.length > 0) {
+        await api.person.del(personIds);
+    }
+
+    // Create hidden account
+    await api.account.create({
+        name: 'Account 1',
+        curr_id: RUB,
+        initbalance: '1',
+        icon_id: 1,
+        flags: ACCOUNT_HIDDEN,
+    });
+    // Create visible account
+    await api.account.create({
+        name: 'Account 2',
+        curr_id: RUB,
+        initbalance: '2',
+        icon_id: 1,
+        flags: 0,
+    });
+    await App.state.fetch();
+    const [account1] = App.state.accounts.getIds();
+
+    const data = [
+        { type: EXPENSE, accountId: account1 },
+        { type: INCOME, accountId: account1 },
+        { type: TRANSFER, accountId: account1 },
+        { type: DEBT, accountId: account1 },
+    ];
+    await scenario.runner.runGroup(TransactionTests.createFromHiddenAccount, data);
+}
+
 async function availabilityTests(directNavigate) {
     const { RUB } = scenario;
 
@@ -594,6 +635,7 @@ export const transactionTests = {
     },
 
     async runAvailabilityTests() {
+        await createFromHiddenAccount();
         await availabilityTests(false);
         await availabilityTests(true);
     },

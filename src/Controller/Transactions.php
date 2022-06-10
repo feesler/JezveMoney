@@ -301,9 +301,12 @@ class Transactions extends TemplateController
         if (isset($_GET["acc_id"])) {
             $acc_id = intval($_GET["acc_id"]);
         }
-        // Redirect if invalid account is specified
-        if ($acc_id && !$this->accModel->isExist($acc_id)) {
-            $this->fail($defMsg);
+        // Redirect if invalid or hidden account is specified
+        if ($acc_id) {
+            $account = $this->accModel->getItem($acc_id);
+            if (!$account || $this->accModel->isHidden($account)) {
+                $this->fail($defMsg);
+            }
         }
         // Use first account if nothing is specified
         if (!$acc_id) {

@@ -432,6 +432,36 @@ export async function securityTests() {
     });
 }
 
+/** Check navigation to create transaction with hidden account */
+export async function createFromHiddenAccount({ type, accountId }) {
+    const typeString = Transaction.typeToString(type);
+    await test(`Create ${typeString} transaction from hidden account`, async () => {
+        const userAccounts = App.state.accounts.getUserAccounts();
+        const account = userAccounts.getItem(accountId);
+        if (!account) {
+            throw new Error(`Account ${accountId} not found`);
+        }
+        if (!userAccounts.isHidden(account)) {
+            throw new Error('Hidden account is expected');
+        }
+
+        const requestType = typeString.toLowerCase();
+        const requestURL = `${baseUrl()}transactions/create/?acc_id=${accountId}&type=${requestType}`;
+        await goTo(requestURL);
+        if (!(App.view instanceof MainView)) {
+            throw new Error('Invalid view');
+        }
+
+        App.view.expectedState = {
+            msgPopup: { success: false, message: 'Fail to create new transaction.' },
+        };
+        await App.view.checkState();
+        await App.view.closeNotification();
+
+        return true;
+    });
+}
+
 /** Navigate to create transaction view and check form availability according to current state */
 export async function checkTransactionAvailable(type, directNavigate = false) {
     await test(`${Transaction.typeToString(type)} transaction availability`, async () => {
