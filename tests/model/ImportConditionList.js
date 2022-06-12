@@ -1,5 +1,9 @@
 import { List } from './List.js';
-import { ImportCondition } from './ImportCondition.js';
+import {
+    IMPORT_COND_OP_NOT_EQUAL,
+    IMPORT_COND_OP_EQUAL,
+    ImportCondition,
+} from './ImportCondition.js';
 
 export class ImportConditionList extends List {
     setData(data) {
@@ -96,6 +100,30 @@ export class ImportConditionList extends List {
             && !item.isPropertyValue()
             && item.field_id === condition.field_id
             && !(item.getConditionValue({}) > value)
+        ));
+    }
+
+    /**
+     * Check list of conditions has guard condition for Main account:
+     * Main account not equal accountId or Main account equal not accountId
+     * @param {ImportCondition} condition
+     */
+    hasAccountGuardCondition(accountId) {
+        if (!accountId) {
+            throw new Error('Invalid account id');
+        }
+
+        return this.find((condition) => (
+            condition.isAccountField()
+            && (
+                (
+                    condition.operator === IMPORT_COND_OP_NOT_EQUAL
+                    && parseInt(condition.value, 10) === accountId
+                ) || (
+                    condition.operator === IMPORT_COND_OP_EQUAL
+                    && parseInt(condition.value, 10) !== accountId
+                )
+            )
         ));
     }
 }

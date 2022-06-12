@@ -146,22 +146,7 @@ export class ImportRule {
             // Check main account guard condition for 'Set account' action
             if (action.isAccountValue()) {
                 const accountId = parseInt(action.value, 10);
-
-                // Guard condition for action 'Set account A' is:
-                // Main account not equal A or
-                // Main account equal not A
-                const found = this.conditions.find((condition) => (
-                    condition.isAccountField()
-                    && (
-                        (
-                            condition.operator === IMPORT_COND_OP_NOT_EQUAL
-                            && parseInt(condition.value, 10) === accountId
-                        ) || (
-                            condition.operator === IMPORT_COND_OP_EQUAL
-                            && parseInt(condition.value, 10) !== accountId
-                        )
-                    )
-                ));
+                const found = this.conditions.hasAccountGuardCondition(accountId);
                 if (!found) {
                     return false;
                 }
