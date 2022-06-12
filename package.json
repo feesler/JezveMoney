@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "lint-php": "dev-tools/vendor/bin/phpcs --standard=PSR12 --extensions=php ./src/",
-    "all": "npm-run-all lint test build",
+    "all": "npm-run-all lint build test",
     "test": "node ./tests/index.js",
     "test-partial": "node ./tests/index.js -p",
     "lint": "npm-run-all lint-src lint-tests lint-css lint-php",
