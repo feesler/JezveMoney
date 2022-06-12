@@ -1,5 +1,9 @@
-import { TestComponent } from 'jezve-test';
-import { query, prop, click } from '../../env.js';
+import {
+    TestComponent,
+    query,
+    prop,
+    click,
+} from 'jezve-test';
 
 export class TileInfoItem extends TestComponent {
     async parseContent() {

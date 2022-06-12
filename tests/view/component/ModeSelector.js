@@ -1,5 +1,9 @@
-import { TestComponent } from 'jezve-test';
-import { queryAll, hasClass, prop } from '../../env.js';
+import {
+    TestComponent,
+    queryAll,
+    hasClass,
+    prop,
+} from 'jezve-test';
 
 export class ModeSelector extends TestComponent {
     async parseContent() {

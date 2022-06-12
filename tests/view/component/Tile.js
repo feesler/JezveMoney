@@ -1,12 +1,12 @@
-import { TestComponent } from 'jezve-test';
-import { Icon } from '../../model/Icon.js';
-import { Currency } from '../../model/Currency.js';
 import {
+    TestComponent,
     query,
     prop,
     hasClass,
     click,
-} from '../../env.js';
+} from 'jezve-test';
+import { Icon } from '../../model/Icon.js';
+import { Currency } from '../../model/Currency.js';
 
 export class Tile extends TestComponent {
     async parseContent() {

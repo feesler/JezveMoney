@@ -1,6 +1,5 @@
-import { test } from 'jezve-test';
+import { test, setBlock } from 'jezve-test';
 import { App } from '../../Application.js';
-import { setBlock } from '../../env.js';
 import { Currency } from '../../model/Currency.js';
 import { ImportTransaction } from '../../model/ImportTransaction.js';
 import { ImportCondition } from '../../model/ImportCondition.js';

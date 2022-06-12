@@ -1,3 +1,4 @@
+import { navigation, queryAll } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
 import { TransactionList } from './component/TransactionList.js';
@@ -7,7 +8,6 @@ import { Widget } from './component/Widget/Widget.js';
 import { AccountsWidget } from './component/Widget/AccountsWidget.js';
 import { PersonsWidget } from './component/Widget/PersonsWidget.js';
 import { TransactionsWidget } from './component/Widget/TransactionsWidget.js';
-import { navigation, queryAll } from '../env.js';
 
 /** Main view class */
 export class MainView extends AppView {

@@ -1,4 +1,12 @@
-import { copyObject, TestComponent, assert } from 'jezve-test';
+import {
+    copyObject,
+    TestComponent,
+    assert,
+    query,
+    queryAll,
+    prop,
+    click,
+} from 'jezve-test';
 import { Currency } from '../../../model/Currency.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import { ImportRule } from '../../../model/ImportRule.js';
@@ -12,12 +20,6 @@ import { ImportRuleAccordion } from './ImportRuleAccordion.js';
 import { ImportActionForm } from './ImportActionForm.js';
 import { asyncMap } from '../../../common.js';
 import { App } from '../../../Application.js';
-import {
-    query,
-    queryAll,
-    prop,
-    click,
-} from '../../../env.js';
 
 export class ImportRuleForm extends TestComponent {
     async parseContent() {

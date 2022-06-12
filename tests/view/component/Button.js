@@ -1,5 +1,4 @@
-import { TestComponent } from 'jezve-test';
-import { query, click } from '../../env.js';
+import { TestComponent, query, click } from 'jezve-test';
 
 export class Button extends TestComponent {
     async parseContent() {

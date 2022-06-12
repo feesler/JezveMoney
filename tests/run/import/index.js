@@ -1,6 +1,12 @@
-import { test, copyObject, assert } from 'jezve-test';
+import {
+    test,
+    copyObject,
+    assert,
+    baseUrl,
+    httpReq,
+    setBlock,
+} from 'jezve-test';
 import { App } from '../../Application.js';
-import { baseUrl, httpReq, setBlock } from '../../env.js';
 import { Currency } from '../../model/Currency.js';
 import { findSimilarTransaction } from '../../model/import.js';
 import { ImportTransaction } from '../../model/ImportTransaction.js';

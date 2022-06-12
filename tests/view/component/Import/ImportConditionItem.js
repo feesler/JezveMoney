@@ -1,8 +1,7 @@
-import { TestComponent } from 'jezve-test';
+import { TestComponent, query, prop } from 'jezve-test';
 import { ImportCondition } from '../../../model/ImportCondition.js';
 import { Currency } from '../../../model/Currency.js';
 import { App } from '../../../Application.js';
-import { query, prop } from '../../../env.js';
 
 export class ImportConditionItem extends TestComponent {
     async parseContent() {

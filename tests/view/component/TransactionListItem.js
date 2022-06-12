@@ -1,4 +1,10 @@
-import { TestComponent } from 'jezve-test';
+import {
+    TestComponent,
+    query,
+    prop,
+    hasClass,
+    click,
+} from 'jezve-test';
 import { Currency } from '../../model/Currency.js';
 import {
     EXPENSE,
@@ -6,12 +12,6 @@ import {
     TRANSFER,
     DEBT,
 } from '../../model/Transaction.js';
-import {
-    query,
-    prop,
-    hasClass,
-    click,
-} from '../../env.js';
 
 export class TransactionListItem extends TestComponent {
     async parseContent() {

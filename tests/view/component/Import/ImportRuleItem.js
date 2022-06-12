@@ -1,10 +1,14 @@
+import {
+    TestComponent,
+    query,
+    prop,
+    click,
+} from 'jezve-test';
 import { copyObject } from 'jezvejs';
-import { TestComponent } from 'jezve-test';
 import { ImportRuleItemConditions } from './ImportRuleItemConditions.js';
 import { ImportConditionItem } from './ImportConditionItem.js';
 import { ImportRuleItemActions } from './ImportRuleItemActions.js';
 import { ImportActionItem } from './ImportActionItem.js';
-import { query, prop, click } from '../../../env.js';
 
 export class ImportRuleItem extends TestComponent {
     constructor(parent, elem, mainAccount) {

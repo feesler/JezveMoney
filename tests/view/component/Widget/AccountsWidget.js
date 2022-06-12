@@ -1,7 +1,7 @@
+import { query, navigation } from 'jezve-test';
 import { Widget } from './Widget.js';
 import { TilesList } from '../TilesList.js';
 import { Tile } from '../Tile.js';
-import { query, navigation } from '../../../env.js';
 
 export class AccountsWidget extends Widget {
     async parseContent() {

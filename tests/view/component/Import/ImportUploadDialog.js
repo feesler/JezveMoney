@@ -1,10 +1,6 @@
-import { isNum, copyObject } from 'jezvejs';
-import { TestComponent, assert } from 'jezve-test';
-import { DropDown } from '../DropDown.js';
-import { App } from '../../../Application.js';
-import { asyncMap, fixFloat } from '../../../common.js';
-import { WarningPopup } from '../WarningPopup.js';
 import {
+    TestComponent,
+    assert,
     query,
     queryAll,
     hasClass,
@@ -15,7 +11,12 @@ import {
     isVisible,
     wait,
     waitForFunction,
-} from '../../../env.js';
+} from 'jezve-test';
+import { isNum, copyObject } from 'jezvejs';
+import { DropDown } from '../DropDown.js';
+import { App } from '../../../Application.js';
+import { asyncMap, fixFloat } from '../../../common.js';
+import { WarningPopup } from '../WarningPopup.js';
 import { ImportTemplate } from '../../../model/ImportTemplate.js';
 
 export const BROWSE_FILE_STATE = 1;

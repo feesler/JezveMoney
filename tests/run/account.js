@@ -1,11 +1,17 @@
-import { test, copyObject, assert } from 'jezve-test';
+import {
+    test,
+    copyObject,
+    assert,
+    setBlock,
+    baseUrl,
+    goTo,
+} from 'jezve-test';
 import { MainView } from '../view/MainView.js';
 import { AccountsView } from '../view/AccountsView.js';
 import { Transaction } from '../model/Transaction.js';
 import { Currency } from '../model/Currency.js';
 import { formatProps, createCSV, generateId } from '../common.js';
 import { App } from '../Application.js';
-import { setBlock, baseUrl, goTo } from '../env.js';
 import { AccountView } from '../view/AccountView.js';
 
 /** Navigate to accounts list page */

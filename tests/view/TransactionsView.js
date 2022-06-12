@@ -1,5 +1,16 @@
+import {
+    assert,
+    query,
+    prop,
+    parentNode,
+    navigation,
+    isVisible,
+    click,
+    waitForFunction,
+    goTo,
+    baseUrl,
+} from 'jezve-test';
 import { copyObject, urlJoin, isEmpty } from 'jezvejs';
-import { assert } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
 import { DropDown } from './component/DropDown.js';
@@ -13,17 +24,6 @@ import { SearchForm } from './component/SearchForm.js';
 import { TransactionList } from './component/TransactionList.js';
 import { fixDate } from '../common.js';
 import { Toolbar } from './component/Toolbar.js';
-import {
-    query,
-    prop,
-    parentNode,
-    navigation,
-    isVisible,
-    click,
-    waitForFunction,
-    goTo,
-    baseUrl,
-} from '../env.js';
 
 /** List of transactions view class */
 export class TransactionsView extends AppView {

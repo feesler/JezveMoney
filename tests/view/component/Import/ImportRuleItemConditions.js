@@ -1,7 +1,6 @@
-import { TestComponent } from 'jezve-test';
+import { TestComponent, queryAll } from 'jezve-test';
 import { ImportConditionItem } from './ImportConditionItem.js';
 import { asyncMap } from '../../../common.js';
-import { queryAll } from '../../../env.js';
 
 export class ImportRuleItemConditions extends TestComponent {
     async parseContent() {

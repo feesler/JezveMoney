@@ -1,9 +1,8 @@
-import { TestComponent } from 'jezve-test';
+import { TestComponent, queryAll, hasClass } from 'jezve-test';
 import { Tile } from './Tile.js';
 import { AccountsList } from '../../model/AccountsList.js';
 import { PersonsList } from '../../model/PersonsList.js';
 import { asyncMap } from '../../common.js';
-import { queryAll, hasClass } from '../../env.js';
 
 export class TilesList extends TestComponent {
     constructor(parent, elem, tileClass) {

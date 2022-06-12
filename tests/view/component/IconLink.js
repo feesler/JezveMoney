@@ -1,10 +1,10 @@
-import { TestComponent } from 'jezve-test';
 import {
+    TestComponent,
     query,
     prop,
     hasClass,
     click,
-} from '../../env.js';
+} from 'jezve-test';
 
 export class IconLink extends TestComponent {
     async parseContent() {

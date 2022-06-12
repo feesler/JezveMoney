@@ -1,11 +1,11 @@
-import { TestView } from 'jezve-test';
-import { Header } from './component/Header.js';
-import { MessagePopup } from './component/MessagePopup.js';
 import {
+    TestView,
     url,
     navigation,
     query,
-} from '../env.js';
+} from 'jezve-test';
+import { Header } from './component/Header.js';
+import { MessagePopup } from './component/MessagePopup.js';
 
 export class AppView extends TestView {
     isUserLoggedIn() {

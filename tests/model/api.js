@@ -1,7 +1,6 @@
-import { copyObject } from 'jezve-test';
+import { copyObject, baseUrl, httpReq } from 'jezve-test';
 import { urlJoin } from '../common.js';
 import { ApiRequestError } from '../error/ApiRequestError.js';
-import { baseUrl, httpReq } from '../env.js';
 
 async function apiRequest(method, url, data = null) {
     const reqUrl = `${baseUrl()}api/${url}`;

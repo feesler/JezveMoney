@@ -1,13 +1,13 @@
-import { AppView } from './AppView.js';
-import { InputRow } from './component/InputRow.js';
-import { IconLink } from './component/IconLink.js';
-import { WarningPopup } from './component/WarningPopup.js';
 import {
     query,
     prop,
     navigation,
     click,
-} from '../env.js';
+} from 'jezve-test';
+import { AppView } from './AppView.js';
+import { InputRow } from './component/InputRow.js';
+import { IconLink } from './component/IconLink.js';
+import { WarningPopup } from './component/WarningPopup.js';
 
 /** Create or update account view tests */
 export class PersonView extends AppView {

@@ -1,3 +1,11 @@
+import {
+    url,
+    query,
+    prop,
+    parentNode,
+    navigation,
+    click,
+} from 'jezve-test';
 import { AppView } from './AppView.js';
 import {
     convDate,
@@ -25,14 +33,6 @@ import {
 } from '../model/Transaction.js';
 import { Currency } from '../model/Currency.js';
 import { App } from '../Application.js';
-import {
-    url,
-    query,
-    prop,
-    parentNode,
-    navigation,
-    click,
-} from '../env.js';
 
 /** Create or update transaction view class */
 export class TransactionView extends AppView {

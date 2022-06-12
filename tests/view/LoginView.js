@@ -1,9 +1,9 @@
+import { navigation, query, click } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { MainView } from './MainView.js';
 import { RegisterView } from './RegisterView.js';
 import { App } from '../Application.js';
 import { InputRow } from './component/InputRow.js';
-import { navigation, query, click } from '../env.js';
 
 /** Log in view class */
 export class LoginView extends AppView {

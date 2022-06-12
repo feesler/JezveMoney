@@ -1,3 +1,11 @@
+import {
+    query,
+    prop,
+    attr,
+    click,
+    wait,
+    waitForFunction,
+} from 'jezve-test';
 import { copyObject } from 'jezvejs';
 import { AppView } from './AppView.js';
 import { IconLink } from './component/IconLink.js';
@@ -7,14 +15,6 @@ import { ImportRulesDialog } from './component/Import/ImportRulesDialog.js';
 import { DropDown } from './component/DropDown.js';
 import { ImportViewSubmitError } from '../error/ImportViewSubmitError.js';
 import { findSimilarTransaction } from '../model/import.js';
-import {
-    query,
-    prop,
-    attr,
-    click,
-    wait,
-    waitForFunction,
-} from '../env.js';
 import { App } from '../Application.js';
 
 /** Import view class */

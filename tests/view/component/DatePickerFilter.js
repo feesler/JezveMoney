@@ -1,14 +1,14 @@
-import { copyObject, isDate } from 'jezvejs';
-import { TestComponent } from 'jezve-test';
-import { IconLink } from './IconLink.js';
-import { DatePicker } from './DatePicker.js';
 import {
+    TestComponent,
     query,
     prop,
     isVisible,
     click,
     input,
-} from '../../env.js';
+} from 'jezve-test';
+import { copyObject, isDate } from 'jezvejs';
+import { IconLink } from './IconLink.js';
+import { DatePicker } from './DatePicker.js';
 
 export class DatePickerFilter extends TestComponent {
     async parseContent() {

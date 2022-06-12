@@ -1,10 +1,10 @@
-import { TestComponent } from 'jezve-test';
-import { Currency } from '../../model/Currency.js';
 import {
+    TestComponent,
     query,
     prop,
     hasClass,
-} from '../../env.js';
+} from 'jezve-test';
+import { Currency } from '../../model/Currency.js';
 
 export class InfoTile extends TestComponent {
     async parseContent() {

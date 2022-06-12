@@ -1,7 +1,11 @@
-import { TestComponent } from 'jezve-test';
+import {
+    TestComponent,
+    queryAll,
+    prop,
+    hasClass,
+} from 'jezve-test';
 import { TransactionListItem } from './TransactionListItem.js';
 import { asyncMap } from '../../common.js';
-import { queryAll, prop, hasClass } from '../../env.js';
 
 export class TransactionList extends TestComponent {
     async parseContent() {

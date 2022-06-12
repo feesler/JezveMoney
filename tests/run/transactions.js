@@ -1,8 +1,12 @@
 import { copyObject } from 'jezvejs';
 import { formatDate } from 'jezvejs/DateUtils';
-import { test, assert } from 'jezve-test';
+import {
+    test,
+    assert,
+    baseUrl,
+    goTo,
+} from 'jezve-test';
 import { App } from '../Application.js';
-import { baseUrl, goTo } from '../env.js';
 import { fixDate } from '../common.js';
 import { TransactionsView } from '../view/TransactionsView.js';
 import { MainView } from '../view/MainView.js';

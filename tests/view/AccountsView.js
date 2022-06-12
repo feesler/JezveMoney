@@ -1,16 +1,16 @@
-import { AppView } from './AppView.js';
-import { TilesList } from './component/TilesList.js';
-import { Tile } from './component/Tile.js';
-import { IconLink } from './component/IconLink.js';
-import { WarningPopup } from './component/WarningPopup.js';
-import { Toolbar } from './component/Toolbar.js';
 import {
     query,
     prop,
     navigation,
     click,
     httpReq,
-} from '../env.js';
+} from 'jezve-test';
+import { AppView } from './AppView.js';
+import { TilesList } from './component/TilesList.js';
+import { Tile } from './component/Tile.js';
+import { IconLink } from './component/IconLink.js';
+import { WarningPopup } from './component/WarningPopup.js';
+import { Toolbar } from './component/Toolbar.js';
 
 /** List of accounts view class */
 export class AccountsView extends AppView {

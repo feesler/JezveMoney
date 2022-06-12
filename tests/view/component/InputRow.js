@@ -1,11 +1,11 @@
-import { TestComponent } from 'jezve-test';
-import { DropDown } from './DropDown.js';
 import {
+    TestComponent,
     query,
     prop,
     hasClass,
     input,
-} from '../../env.js';
+} from 'jezve-test';
+import { DropDown } from './DropDown.js';
 
 export class InputRow extends TestComponent {
     async parseContent() {

@@ -1,3 +1,4 @@
+import { setBlock } from 'jezve-test';
 import {
     EXPENSE,
     INCOME,
@@ -13,7 +14,6 @@ import * as DebtTransactionTests from '../run/transaction/debt.js';
 import { transactionsListTests } from './transactionList.js';
 import { importTests } from './import.js';
 import { App } from '../Application.js';
-import { setBlock } from '../env.js';
 import { ACCOUNT_HIDDEN } from '../model/AccountsList.js';
 
 let scenario = null;

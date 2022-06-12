@@ -2,13 +2,15 @@ import {
     test,
     copyObject,
     assert,
+    setBlock,
+    baseUrl,
+    goTo,
 } from 'jezve-test';
 import { formatProps, generateId } from '../common.js';
 import { PersonsView } from '../view/PersonsView.js';
 import { PersonView } from '../view/PersonView.js';
 import { MainView } from '../view/MainView.js';
 import { App } from '../Application.js';
-import { setBlock, baseUrl, goTo } from '../env.js';
 
 /** Navigate to persons list page */
 const checkNavigation = async () => {

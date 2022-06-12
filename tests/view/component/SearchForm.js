@@ -1,10 +1,10 @@
-import { TestComponent } from 'jezve-test';
 import {
+    TestComponent,
     query,
     prop,
     input,
     click,
-} from '../../env.js';
+} from 'jezve-test';
 
 export class SearchForm extends TestComponent {
     async parseContent() {

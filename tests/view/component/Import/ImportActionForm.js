@@ -1,4 +1,11 @@
-import { TestComponent } from 'jezve-test';
+import {
+    TestComponent,
+    query,
+    queryAll,
+    prop,
+    click,
+    input,
+} from 'jezve-test';
 import { DropDown } from '../DropDown.js';
 import {
     asyncMap,
@@ -11,13 +18,6 @@ import {
     IMPORT_ACTION_SET_DEST_AMOUNT,
     IMPORT_ACTION_SET_COMMENT,
 } from '../../../model/ImportAction.js';
-import {
-    query,
-    queryAll,
-    prop,
-    click,
-    input,
-} from '../../../env.js';
 
 const actionValueTypes = [
     'transType',

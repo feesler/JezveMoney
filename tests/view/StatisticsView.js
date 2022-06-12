@@ -1,13 +1,13 @@
-import { AppView } from './AppView.js';
-import { DropDown } from './component/DropDown.js';
-import { TransactionTypeMenu } from './component/TransactionTypeMenu.js';
 import {
     query,
     queryAll,
     prop,
     navigation,
     isVisible,
-} from '../env.js';
+} from 'jezve-test';
+import { AppView } from './AppView.js';
+import { DropDown } from './component/DropDown.js';
+import { TransactionTypeMenu } from './component/TransactionTypeMenu.js';
 
 /** Statistics view class */
 export class StatisticsView extends AppView {

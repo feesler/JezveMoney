@@ -1,5 +1,10 @@
 import { isObject, copyObject } from 'jezvejs';
-import { test } from 'jezve-test';
+import {
+    test,
+    setBlock,
+    baseUrl,
+    goTo,
+} from 'jezve-test';
 import { TransactionsView } from '../../view/TransactionsView.js';
 import { TransactionView } from '../../view/TransactionView.js';
 import { MainView } from '../../view/MainView.js';
@@ -13,7 +18,6 @@ import {
 } from '../../model/Transaction.js';
 import { AccountsList } from '../../model/AccountsList.js';
 import { App } from '../../Application.js';
-import { setBlock, baseUrl, goTo } from '../../env.js';
 import { formatProps, generateId } from '../../common.js';
 import * as AccountTests from '../account.js';
 

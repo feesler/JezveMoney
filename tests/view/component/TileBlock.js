@@ -1,7 +1,6 @@
-import { TestComponent } from 'jezve-test';
+import { TestComponent, query, prop } from 'jezve-test';
 import { Tile } from './Tile.js';
 import { DropDown } from './DropDown.js';
-import { query, prop } from '../../env.js';
 
 export class TileBlock extends TestComponent {
     async parseContent() {

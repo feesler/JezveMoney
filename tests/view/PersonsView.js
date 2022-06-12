@@ -1,15 +1,15 @@
+import {
+    query,
+    prop,
+    navigation,
+    click,
+} from 'jezve-test';
 import { AppView } from './AppView.js';
 import { TilesList } from './component/TilesList.js';
 import { Tile } from './component/Tile.js';
 import { IconLink } from './component/IconLink.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { Toolbar } from './component/Toolbar.js';
-import {
-    query,
-    prop,
-    navigation,
-    click,
-} from '../env.js';
 
 /** List of persons view class */
 export class PersonsView extends AppView {

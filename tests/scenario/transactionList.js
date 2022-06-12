@@ -1,4 +1,4 @@
-import { copyObject } from 'jezve-test';
+import { copyObject, setBlock } from 'jezve-test';
 import {
     EXPENSE,
     INCOME,
@@ -10,7 +10,6 @@ import {
 import { api } from '../model/api.js';
 import * as TransactionListTests from '../run/transactions.js';
 import { App } from '../Application.js';
-import { setBlock } from '../env.js';
 
 let scenario = null;
 let testData = null;

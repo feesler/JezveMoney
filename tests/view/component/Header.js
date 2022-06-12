@@ -1,11 +1,11 @@
-import { TestComponent } from 'jezve-test';
-import { asyncMap } from '../../common.js';
 import {
+    TestComponent,
     query,
     queryAll,
     prop,
     click,
-} from '../../env.js';
+} from 'jezve-test';
+import { asyncMap } from '../../common.js';
 
 const DEFAULT_USER_MENU_ITEMS = 3;
 

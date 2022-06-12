@@ -1,10 +1,10 @@
-import { TestComponent } from 'jezve-test';
 import {
+    TestComponent,
     queryAll,
     prop,
     hasClass,
     click,
-} from '../../env.js';
+} from 'jezve-test';
 
 export class Paginator extends TestComponent {
     async parseContent() {

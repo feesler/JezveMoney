@@ -3,14 +3,6 @@ import {
     TestComponent,
     assert,
     hasFlag,
-} from 'jezve-test';
-import { IMPORT_COND_OP_FIELD_FLAG } from '../../../model/ImportCondition.js';
-import { ImportRuleForm } from './ImportRuleForm.js';
-import { ImportRuleItem } from './ImportRuleItem.js';
-import { asyncMap } from '../../../common.js';
-import { WarningPopup } from '../WarningPopup.js';
-import { App } from '../../../Application.js';
-import {
     query,
     queryAll,
     prop,
@@ -18,7 +10,13 @@ import {
     isVisible,
     wait,
     waitForFunction,
-} from '../../../env.js';
+} from 'jezve-test';
+import { IMPORT_COND_OP_FIELD_FLAG } from '../../../model/ImportCondition.js';
+import { ImportRuleForm } from './ImportRuleForm.js';
+import { ImportRuleItem } from './ImportRuleItem.js';
+import { asyncMap } from '../../../common.js';
+import { WarningPopup } from '../WarningPopup.js';
+import { App } from '../../../Application.js';
 
 export class ImportRulesDialog extends TestComponent {
     async parseContent() {

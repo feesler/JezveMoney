@@ -1,3 +1,9 @@
+import {
+    query,
+    prop,
+    navigation,
+    click,
+} from 'jezve-test';
 import { copyObject } from 'jezvejs';
 import { AppView } from './AppView.js';
 import { Currency } from '../model/Currency.js';
@@ -8,12 +14,6 @@ import { DropDown } from './component/DropDown.js';
 import { InputRow } from './component/InputRow.js';
 import { IconLink } from './component/IconLink.js';
 import { WarningPopup } from './component/WarningPopup.js';
-import {
-    query,
-    prop,
-    navigation,
-    click,
-} from '../env.js';
 
 /** Account view class */
 export class AccountView extends AppView {

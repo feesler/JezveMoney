@@ -1,10 +1,5 @@
-import { TestComponent } from 'jezve-test';
-import { AppView } from './AppView.js';
-import { LoginView } from './LoginView.js';
-import { App } from '../Application.js';
-import { WarningPopup } from './component/WarningPopup.js';
-import { InputRow } from './component/InputRow.js';
 import {
+    TestComponent,
     query,
     queryAll,
     prop,
@@ -12,7 +7,12 @@ import {
     click,
     wait,
     isVisible,
-} from '../env.js';
+} from 'jezve-test';
+import { AppView } from './AppView.js';
+import { LoginView } from './LoginView.js';
+import { App } from '../Application.js';
+import { WarningPopup } from './component/WarningPopup.js';
+import { InputRow } from './component/InputRow.js';
 
 // Profile view class
 export class ProfileView extends AppView {

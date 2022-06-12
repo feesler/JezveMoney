@@ -1,6 +1,6 @@
+import { query } from 'jezve-test';
 import { Widget } from './Widget.js';
 import { TransactionList } from '../TransactionList.js';
-import { query } from '../../../env.js';
 
 export class TransactionsWidget extends Widget {
     async parseContent() {

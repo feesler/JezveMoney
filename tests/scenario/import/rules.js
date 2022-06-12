@@ -1,3 +1,4 @@
+import { setBlock } from 'jezve-test';
 import {
     IMPORT_COND_FIELD_MAIN_ACCOUNT,
     IMPORT_COND_FIELD_ACC_AMOUNT,
@@ -19,7 +20,6 @@ import {
     IMPORT_ACTION_SET_COMMENT,
 } from '../../model/ImportAction.js';
 import * as ImportTests from '../../run/import/index.js';
-import { setBlock } from '../../env.js';
 import { api } from '../../model/api.js';
 import { App } from '../../Application.js';
 

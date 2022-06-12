@@ -1,7 +1,6 @@
-import { TestComponent } from 'jezve-test';
+import { TestComponent, query, isVisible } from 'jezve-test';
 import { IconLink } from './IconLink.js';
 import { InputRow } from './InputRow.js';
-import { query, isVisible } from '../../env.js';
 
 export class CommentRow extends TestComponent {
     async parseContent() {

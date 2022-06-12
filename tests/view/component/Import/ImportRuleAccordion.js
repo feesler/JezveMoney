@@ -1,10 +1,10 @@
-import { TestComponent } from 'jezve-test';
 import {
+    TestComponent,
     query,
     hasClass,
     prop,
     click,
-} from '../../../env.js';
+} from 'jezve-test';
 
 export class ImportRuleAccordion extends TestComponent {
     async parseContent() {

@@ -1,6 +1,5 @@
-import { copyObject, isDate } from 'jezvejs';
-import { TestComponent } from 'jezve-test';
 import {
+    TestComponent,
     query,
     queryAll,
     hasClass,
@@ -8,7 +7,8 @@ import {
     isVisible,
     click,
     wait,
-} from '../../env.js';
+} from 'jezve-test';
+import { copyObject, isDate } from 'jezvejs';
 
 const shortMonthTitles = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 const monthTitles = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];

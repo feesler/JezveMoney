@@ -1,6 +1,5 @@
-import { TestComponent } from 'jezve-test';
-import { asyncMap } from '../../common.js';
 import {
+    TestComponent,
     query,
     queryAll,
     hasClass,
@@ -8,7 +7,8 @@ import {
     isVisible,
     click,
     closest,
-} from '../../env.js';
+} from 'jezve-test';
+import { asyncMap } from '../../common.js';
 
 export class DropDown extends TestComponent {
     /** Find for closest parent DropDown container of element */

@@ -1,8 +1,13 @@
+import {
+    TestComponent,
+    assert,
+    query,
+    queryAll,
+    isVisible,
+} from 'jezve-test';
 import { copyObject } from 'jezvejs';
-import { TestComponent, assert } from 'jezve-test';
 import { ImportListItem } from './ImportListItem.js';
 import { asyncMap } from '../../../common.js';
-import { query, queryAll, isVisible } from '../../../env.js';
 
 export class ImportList extends TestComponent {
     constructor(parent, elem, mainAccount) {

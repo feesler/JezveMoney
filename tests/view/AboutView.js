@@ -1,5 +1,5 @@
+import { query, prop } from 'jezve-test';
 import { AppView } from './AppView.js';
-import { query, prop } from '../env.js';
 
 /** About view class */
 export class AboutView extends AppView {

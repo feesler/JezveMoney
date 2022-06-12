@@ -1,4 +1,4 @@
-import { Runner } from 'jezve-test';
+import { Runner, setBlock, isFullScenario } from 'jezve-test';
 import { Currency } from '../model/Currency.js';
 
 import { securityTests } from './security.js';
@@ -15,7 +15,6 @@ import * as StatisticsTests from '../run/statistics.js';
 
 import { api } from '../model/api.js';
 import { App } from '../Application.js';
-import { setBlock, isFullScenario } from '../env.js';
 
 export class Scenario {
     constructor(environment) {

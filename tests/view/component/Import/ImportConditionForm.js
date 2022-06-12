@@ -1,4 +1,13 @@
-import { TestComponent } from 'jezve-test';
+import {
+    TestComponent,
+    query,
+    queryAll,
+    prop,
+    click,
+    input,
+    check,
+    isVisible,
+} from 'jezve-test';
 import { DropDown } from '../DropDown.js';
 import { asyncMap } from '../../../common.js';
 import {
@@ -12,15 +21,6 @@ import {
     IMPORT_COND_FIELD_COMMENT,
     ImportCondition,
 } from '../../../model/ImportCondition.js';
-import {
-    query,
-    queryAll,
-    prop,
-    click,
-    input,
-    check,
-    isVisible,
-} from '../../../env.js';
 
 const fieldValueTypes = [
     'property',

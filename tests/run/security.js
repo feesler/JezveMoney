@@ -1,5 +1,4 @@
-import { test } from 'jezve-test';
-import { baseUrl, httpReq } from '../env.js';
+import { test, baseUrl, httpReq } from 'jezve-test';
 
 export const checkAccess = async (url) => {
     await test(`Check access to ${url}`, async () => {
