@@ -796,7 +796,7 @@ class Transactions extends TemplateController
 
         $data["personTile"] = [
             "id" => "person_tile",
-            "title" => $pObj->name,
+            "title" => ($pObj) ? $pObj->name : null,
             "subtitle" => $this->currModel->format($person_balance, $person_curr),
         ];
 
