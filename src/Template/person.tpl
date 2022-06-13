@@ -30,7 +30,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <div class="stretch-input std_margin">
                                 <input id="pname" name="name" type="text" autocomplete="off" value="<?=e($pInfo->name)?>">
                             </div>
-                            <div class="invalid-feedback">Please input name of person.</div>
+                            <div id="namefeedback" class="invalid-feedback"></div>
                         </div>
 
                         <div class="acc_controls">

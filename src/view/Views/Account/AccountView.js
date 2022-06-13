@@ -17,6 +17,8 @@ import '../../Components/Tile/style.css';
 const TITLE_ACCOUNT_DELETE = 'Delete account';
 const MSG_ACCOUNT_DELETE = 'Are you sure want to delete selected account?<br>All income and expense transactions history will be lost. Transfer to this account will be changed to expense. Transfer from this account will be changed to income.';
 const TITLE_NEW_ACCOUNT = 'New account';
+const MSG_EMPTY_NAME = 'Please input name of account.';
+const MSG_EXISTING_NAME = 'Account with this name already exist.';
 
 /**
  * Create/update account view
@@ -108,8 +110,12 @@ class AccountView extends View {
         if (!this.nameInp) {
             throw new Error('Invalid Account view');
         }
-
         this.nameInp.addEventListener('input', () => this.onNameInput());
+
+        this.nameFeedback = ge('namefeedback');
+        if (!this.nameFeedback) {
+            throw new Error('Invalid Account view');
+        }
     }
 
     /**
@@ -168,9 +174,16 @@ class AccountView extends View {
         let valid = true;
 
         if (name.length === 0) {
-            this.state.validation.name = false;
+            this.state.validation.name = MSG_EMPTY_NAME;
             this.nameInp.focus();
             valid = false;
+        } else {
+            const account = window.app.model.accounts.findByName(name);
+            if (account && this.state.original.id !== account.id) {
+                this.state.validation.name = MSG_EXISTING_NAME;
+                this.nameInp.focus();
+                valid = false;
+            }
         }
 
         if (initbalance.length === 0 || !isNum(initbalance)) {
@@ -231,9 +244,10 @@ class AccountView extends View {
         this.currencySign.textContent = currencyObj.sign;
 
         // Name input
-        if (state.validation.name) {
+        if (state.validation.name === true) {
             this.clearBlockValidation('name-inp-block');
         } else {
+            this.nameFeedback.textContent = state.validation.name;
             this.invalidateBlock('name-inp-block');
         }
 

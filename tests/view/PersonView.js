@@ -9,6 +9,7 @@ import { AppView } from './AppView.js';
 import { InputRow } from './component/InputRow.js';
 import { IconLink } from './component/IconLink.js';
 import { WarningPopup } from './component/WarningPopup.js';
+import { App } from '../Application.js';
 
 /** Create or update account view tests */
 export class PersonView extends AppView {
@@ -76,7 +77,13 @@ export class PersonView extends AppView {
     }
 
     isValid() {
-        return (this.model.name && this.model.name.length > 0);
+        // Check empty name
+        if (this.model.name.length === 0) {
+            return false;
+        }
+        // Check same name exists
+        const person = App.state.persons.findByName(this.model.name);
+        return !person || this.model.id === person.id;
     }
 
     async clickDeleteButton() {

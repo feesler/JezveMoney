@@ -15,6 +15,7 @@ import { DropDown } from './component/DropDown.js';
 import { InputRow } from './component/InputRow.js';
 import { IconLink } from './component/IconLink.js';
 import { WarningPopup } from './component/WarningPopup.js';
+import { App } from '../Application.js';
 
 /** Account view class */
 export class AccountView extends AppView {
@@ -191,9 +192,20 @@ export class AccountView extends AppView {
     }
 
     isValid() {
-        return (this.model.name.length > 0)
-            && this.model.initbalance.length
-            && isValidValue(this.model.initbalance);
+        // Check empty name
+        if (this.model.name.length === 0) {
+            return false;
+        }
+        // Check same name exists
+        const account = App.state.accounts.findByName(this.model.name);
+        if (account && this.model.id !== account.id) {
+            return false;
+        }
+
+        return (
+            this.model.initbalance.length > 0
+            && isValidValue(this.model.initbalance)
+        );
     }
 
     async clickDeleteButton() {

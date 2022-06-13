@@ -54,7 +54,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <div class="stretch-input std_margin">
                                 <input id="accname" name="name" type="text" autocomplete="off" value="<?=e($accInfo->name)?>">
                             </div>
-                            <div class="invalid-feedback">Please input name of account.</div>
+                            <div id="namefeedback" class="invalid-feedback"></div>
                         </div>
                         <div class="view-row std_margin">
                             <label for="currency">Currency</label>

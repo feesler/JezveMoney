@@ -25,4 +25,18 @@ export class PersonList extends List {
     getVisible() {
         return this.filter((item) => item && item.isVisible());
     }
+
+    /** Search person with specified name */
+    findByName(name, caseSens = false) {
+        if (typeof name !== 'string' || name.length === 0) {
+            return null;
+        }
+
+        const lookupName = (caseSens) ? name : name.toLowerCase();
+        return this.find((person) => (
+            (caseSens)
+                ? (person.name === lookupName)
+                : (person.name.toLowerCase() === lookupName)
+        ));
+    }
 }

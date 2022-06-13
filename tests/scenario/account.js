@@ -21,6 +21,10 @@ const createAccountTests = async () => {
         name: '',
         initbalance: '100',
     }, {
+        // Try to submit account with existing name
+        name: 'Acc_1',
+        initbalance: '1000',
+    }, {
         // Try to submit account with empty initial balance
         name: 'acc',
         initbalance: '',
@@ -40,6 +44,18 @@ const updateTests = async () => {
     }, {
         pos: 0,
         curr_id: RUB,
+    }, {
+        // Try to submit account with empty name
+        pos: 0,
+        name: '',
+    }, {
+        // Try to submit account with existing name
+        pos: 1,
+        name: 'Acc_1',
+    }, {
+        // Try to update case in account name
+        pos: 0,
+        name: 'Acc_1',
     }];
 
     await scenario.runner.runGroup(AccountTests.update, data);
