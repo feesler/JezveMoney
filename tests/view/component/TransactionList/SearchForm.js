@@ -1,5 +1,6 @@
 import {
     TestComponent,
+    assert,
     query,
     prop,
     input,
@@ -13,9 +14,12 @@ export class SearchForm extends TestComponent {
             submitBtn: await query(this.elem, 'button.search_btn'),
             clearBtn: await query(this.elem, '#nosearchbtn'),
         };
-        if (!res.inputElem || !res.submitBtn || !res.clearBtn) {
-            throw new Error('Unexpected structure of search form');
-        }
+        assert(
+            res.inputElem
+            && res.submitBtn
+            && res.clearBtn,
+            'Unexpected structure of search form',
+        );
 
         res.value = await prop(res.inputElem, 'value');
 

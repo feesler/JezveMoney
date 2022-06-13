@@ -1,4 +1,4 @@
-import { copyObject } from 'jezve-test';
+import { copyObject, assert } from 'jezve-test';
 
 export class List {
     constructor(data = []) {
@@ -90,9 +90,10 @@ export class List {
     /** Return id of item with specified index(absolute position) in list */
     indexToId(pos) {
         const ind = parseInt(pos, 10);
-        if (Number.isNaN(ind) || ind < 0 || ind >= this.length) {
-            throw new Error(`Invalid position ${pos} specified`);
-        }
+        assert(
+            !Number.isNaN(ind) && ind >= 0 && ind < this.length,
+            `Invalid position ${pos} specified`,
+        );
 
         const item = this.data[ind];
         return item.id;
@@ -129,9 +130,7 @@ export class List {
      * @param {Object} item - item data
      */
     addItem(item) {
-        if (!item) {
-            throw new Error('Invalid item');
-        }
+        assert(item, 'Invalid item');
 
         const res = this.length;
         this.data.push(item);
@@ -145,9 +144,7 @@ export class List {
      * @param {Object} item - item data
      */
     create(item) {
-        if (!item) {
-            throw new Error('Invalid item');
-        }
+        assert(item, 'Invalid item');
 
         const itemObj = this.createItem(item);
 
@@ -166,9 +163,7 @@ export class List {
      * @param {Object} item - item data
      */
     update(item) {
-        if (!item || !item.id) {
-            throw new Error('Invalid item');
-        }
+        assert(item?.id, 'Invalid item');
 
         const ind = this.getIndexById(item.id);
         if (ind === -1) {
@@ -189,9 +184,8 @@ export class List {
     }
 
     static deleteByIds(list, ids) {
-        if (!Array.isArray(list) || !ids) {
-            throw new Error('Unexpected input');
-        }
+        assert.isArray(list, 'Invalid parameters');
+        assert(ids, 'Invalid parameters');
 
         let itemIds = Array.isArray(ids) ? ids : [ids];
         itemIds = itemIds

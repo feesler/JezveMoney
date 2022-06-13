@@ -1,13 +1,16 @@
-import { TestComponent, query, click } from 'jezve-test';
+import {
+    TestComponent,
+    assert,
+    query,
+    click,
+} from 'jezve-test';
 
 export class Button extends TestComponent {
     async parseContent() {
         const res = {
             btnElem: await query(this.elem, ':scope > *'),
         };
-        if (!res.btnElem) {
-            throw new Error('Invalid button component');
-        }
+        assert(res.btnElem, 'Invalid button component');
 
         return res;
     }

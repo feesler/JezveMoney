@@ -1,5 +1,6 @@
 import {
     TestComponent,
+    assert,
     query,
     prop,
     hasClass,
@@ -8,9 +9,8 @@ import { Currency } from '../../model/Currency.js';
 
 export class InfoTile extends TestComponent {
     async parseContent() {
-        if (!this.elem || !await hasClass(this.elem, 'info-tile')) {
-            throw new Error('Wrong info tile structure');
-        }
+        const validClass = await hasClass(this.elem, 'info-tile');
+        assert(validClass, 'Invalid structure of info tile');
 
         const res = {
             titleEl: await query(this.elem, '.info-tile__title'),
@@ -32,9 +32,7 @@ export class InfoTile extends TestComponent {
      * @param {Account[]} accounts - array of person accounts
      */
     static filterPersonDebts(accounts) {
-        if (!Array.isArray(accounts)) {
-            throw new Error('Unexpected input');
-        }
+        assert.isArray(accounts, 'Unexpected input');
 
         const res = accounts.filter((item) => item.balance !== 0)
             .map((item) => Currency.format(item.curr_id, item.balance));
@@ -43,9 +41,7 @@ export class InfoTile extends TestComponent {
     }
 
     static renderPerson(person) {
-        if (!person) {
-            throw new Error('Invalid person');
-        }
+        assert(person, 'Invalid person');
 
         const res = {
             title: person.name,

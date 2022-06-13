@@ -36,43 +36,32 @@ export class TransactionsView extends AppView {
             toolbar: await Toolbar.create(this, await query('#toolbar')),
         };
 
-        if (
-            !res.titleEl
-            || !res.addBtn
-            || !res.importBtn
-            || !res.clearAllBtn.elem
-            || !res.toolbar
-            || !res.toolbar.content.editBtn
-            || !res.toolbar.content.delBtn
-        ) {
-            throw new Error('Invalid structure of transactions view');
-        }
+        assert(
+            res.titleEl
+            && res.addBtn
+            && res.importBtn
+            && res.clearAllBtn.elem
+            && res.toolbar
+            && res.toolbar.content.editBtn
+            && res.toolbar.content.delBtn,
+            'Invalid structure of transactions view',
+        );
 
         res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
-        if (!res.typeMenu) {
-            throw new Error('Search form not found');
-        }
+        assert(res.typeMenu, 'Search form not found');
 
         res.accDropDown = await DropDown.createFromChild(this, await query('#acc_id'));
-        if (!res.accDropDown) {
-            throw new Error('Account filter control not found');
-        }
+        assert(res.accDropDown, 'Account filter control not found');
 
         const calendarBtn = await query('#calendar_btn');
         res.dateFilter = await DatePickerFilter.create(this, await parentNode(calendarBtn));
-        if (!res.dateFilter) {
-            throw new Error('Date filter not found');
-        }
+        assert(res.dateFilter, 'Date filter not found');
 
         res.searchForm = await SearchForm.create(this, await query('#searchFrm'));
-        if (!res.searchForm) {
-            throw new Error('Search form not found');
-        }
+        assert(res.searchForm, 'Search form not found');
 
         const transList = await query('.trans-list');
-        if (!transList) {
-            throw new Error('List of transactions not found');
-        }
+        assert(transList, 'List of transactions not found');
 
         res.loadingIndicator = { elem: await query(transList, '.trans-list__loading') };
         res.loadingIndicator.visible = await isVisible(res.loadingIndicator.elem, true);
@@ -83,21 +72,9 @@ export class TransactionsView extends AppView {
         res.title = await prop(res.titleEl, 'textContent');
         res.transList = await TransactionList.create(this, transList);
 
-        if (
-            res.transList
-            && res.transList.content.items
-            && res.transList.content.items.length
-            && !res.modeSelector
-        ) {
-            throw new Error('Mode selector not found');
-        }
-        if (
-            res.transList
-            && res.transList.content.items
-            && res.transList.content.items.length
-            && !res.paginator
-        ) {
-            throw new Error('Paginator not found');
+        if (res.transList?.content?.items?.length > 0) {
+            assert(res.modeSelector, 'Mode selector not found');
+            assert(res.paginator, 'Paginator not found');
         }
 
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
@@ -233,9 +210,7 @@ export class TransactionsView extends AppView {
     }
 
     setModelPage(model, page) {
-        if (page < 1 || page > model.list.pages) {
-            throw new Error(`Invalid page number ${page}`);
-        }
+        assert(page >= 1 && page <= model.list.pages, `Invalid page number ${page}`);
 
         const res = this.cloneModel(model);
 
@@ -468,9 +443,7 @@ export class TransactionsView extends AppView {
     }
 
     async goToPrevPage(directNavigate = false) {
-        if (this.isFirstPage()) {
-            throw new Error('Can\'t go to previous page');
-        }
+        assert(!this.isFirstPage(), 'Can\'t go to previous page');
 
         const expected = this.onPageChanged(this.currentPage() - 1);
 
@@ -484,9 +457,7 @@ export class TransactionsView extends AppView {
     }
 
     async goToNextPage(directNavigate = false) {
-        if (this.isLastPage()) {
-            throw new Error('Can\'t go to next page');
-        }
+        assert(!this.isLastPage(), 'Can\'t go to next page');
 
         const expected = this.onPageChanged(this.currentPage() + 1);
 
@@ -592,15 +563,11 @@ export class TransactionsView extends AppView {
     }
 
     async selectTransactions(data) {
-        if (typeof data === 'undefined') {
-            throw new Error('No transactions specified');
-        }
+        assert(typeof data !== 'undefined', 'No transactions specified');
 
         const transactions = Array.isArray(data) ? data : [data];
 
-        if (!this.content.transList) {
-            throw new Error('No transactions available to select');
-        }
+        assert(this.content.transList, 'No transactions available to select');
 
         const selectedItems = this.getSelectedItems();
         let selectedCount = selectedItems.length;
@@ -612,23 +579,23 @@ export class TransactionsView extends AppView {
             selectedCount += (isSelected ? -1 : 1);
 
             const updIsVisible = this.content.toolbar.isButtonVisible('update');
-            if ((selectedCount === 1) !== updIsVisible) {
-                throw new Error(`Unexpected visibility (${updIsVisible}) of Update button while ${selectedCount} items selected`);
-            }
+            assert(
+                (selectedCount === 1) === updIsVisible,
+                `Unexpected visibility (${updIsVisible}) of Update button while ${selectedCount} items selected`,
+            );
 
             const delIsVisible = this.content.toolbar.isButtonVisible('del');
-            if ((selectedCount > 0) !== delIsVisible) {
-                throw new Error(`Unexpected visibility (${delIsVisible}) of Delete button while ${selectedCount} items selected`);
-            }
+            assert(
+                (selectedCount > 0) === delIsVisible,
+                `Unexpected visibility (${delIsVisible}) of Delete button while ${selectedCount} items selected`,
+            );
         }
     }
 
     /** Select specified transaction, click on edit button */
     async goToUpdateTransaction(num) {
         const pos = parseInt(num, 10);
-        if (Number.isNaN(pos)) {
-            throw new Error('Invalid position of transaction');
-        }
+        assert(!Number.isNaN(pos), 'Invalid position of transaction');
 
         await this.selectTransactions(pos);
 
@@ -637,21 +604,15 @@ export class TransactionsView extends AppView {
 
     /** Delete specified transactions */
     async deleteTransactions(data) {
-        if (!data) {
-            throw new Error('No transactions specified');
-        }
+        assert(data, 'No transactions specified');
 
         const transactions = Array.isArray(data) ? data : [data];
         await this.selectTransactions(transactions);
 
         await this.performAction(() => this.content.toolbar.clickButton('del'));
 
-        if (!this.content.delete_warning?.content?.visible) {
-            throw new Error('Delete transaction warning popup not appear');
-        }
-        if (!this.content.delete_warning.content.okBtn) {
-            throw new Error('OK button not found');
-        }
+        assert(this.content.delete_warning?.content?.visible, 'Delete transaction warning popup not appear');
+        assert(this.content.delete_warning.content.okBtn, 'OK button not found');
 
         await navigation(() => click(this.content.delete_warning.content.okBtn));
     }

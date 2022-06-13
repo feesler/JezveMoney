@@ -1,3 +1,4 @@
+import { assert } from 'jezve-test';
 import {
     IMPORT_COND_OP_EQUAL,
     IMPORT_COND_OP_LESS,
@@ -10,13 +11,7 @@ import { ImportActionList } from './ImportActionList.js';
 /** Import rule model */
 export class ImportRule {
     constructor(data) {
-        if (
-            !data
-            || !data.conditions
-            || !data.actions
-        ) {
-            throw new Error('Invalid properties');
-        }
+        assert(data?.conditions && data?.actions, 'Invalid properties');
 
         this.flags = data.flags;
         if (data.id) {

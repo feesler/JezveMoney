@@ -1,17 +1,13 @@
 import {
-    isFunction,
     isDate,
     isNum,
     isObject,
+    assert,
 } from 'jezve-test';
 
 export const asyncMap = async (data, func) => {
-    if (!Array.isArray(data)) {
-        throw new Error('Invalid data type');
-    }
-    if (!isFunction(func)) {
-        throw new Error('Invalid function type');
-    }
+    assert.isArray(data, 'Invalid data type');
+    assert.isFunction(func, 'Invalid function type');
 
     const tasks = data.map(func);
     return Promise.all(tasks);
@@ -140,11 +136,9 @@ export function createCSV({
 }) {
     let rows = [];
 
-    if (typeof delimiter !== 'string'
-        || typeof newLine !== 'string'
-        || !Array.isArray(data)) {
-        throw new Error('Invalid parameters');
-    }
+    assert.isString(delimiter, 'Invalid parameters');
+    assert.isString(newLine, 'Invalid parameters');
+    assert.isArray(data, 'Invalid parameters');
 
     if (Array.isArray(header)) {
         rows.push(header);
@@ -210,9 +204,7 @@ export const checkPHPerrors = (content) => {
     }
 
     const found = errSignatures.some((item) => content.includes(item));
-    if (found) {
-        throw new Error('PHP error signature found');
-    }
+    assert(!found, 'PHP error signature found');
 };
 
 /** Returns random integer id */

@@ -1,5 +1,6 @@
 import {
     TestComponent,
+    assert,
     query,
     prop,
     hasClass,
@@ -8,17 +9,13 @@ import {
 
 export class MenuItem extends TestComponent {
     async parseContent() {
-        if (!this.elem) {
-            throw new Error('Wrong structure of menu item');
-        }
+        assert(this.elem, 'Wrong structure of menu item');
 
         const res = {};
 
         const typeId = await prop(this.elem, 'dataset.type');
         res.type = parseInt(typeId, 10);
-        if (Number.isNaN(res.type)) {
-            throw new Error(`Invalid transaction type ${typeId}`);
-        }
+        assert(!Number.isNaN(res.type), `Invalid transaction type ${typeId}`);
 
         res.titleElem = await query(this.elem, '.trtype-menu_item_title');
         res.text = await prop(res.titleElem, 'textContent');
@@ -33,9 +30,7 @@ export class MenuItem extends TestComponent {
     }
 
     async toggle() {
-        if (!this.content.checkElem) {
-            throw new Error('Check not available');
-        }
+        assert(this.content.checkElem, 'Check not available');
 
         await click(this.content.checkElem);
     }

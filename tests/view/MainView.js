@@ -1,4 +1,4 @@
-import { navigation, queryAll } from 'jezve-test';
+import { assert, navigation, queryAll } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
@@ -13,9 +13,10 @@ import { TransactionsWidget } from './component/Widget/TransactionsWidget.js';
 export class MainView extends AppView {
     async parseContent() {
         const widgets = await queryAll('.widget');
-        if (!widgets || widgets.length !== App.config.widgetsCount) {
-            throw new Error('Fail to parse main view widgets');
-        }
+        assert(
+            widgets?.length === App.config.widgetsCount,
+            'Fail to parse main view widgets',
+        );
 
         const res = {};
 
@@ -48,41 +49,31 @@ export class MainView extends AppView {
     }
 
     async goToAccounts() {
-        if (!this.content.accountsWidget) {
-            throw new Error('Accounts widget not found');
-        }
+        assert(this.content.accountsWidget, 'Accounts widget not found');
 
         await navigation(() => this.content.accountsWidget.clickByTitle());
     }
 
     async goToNewTransactionByAccount(accNum) {
-        if (!this.content.accountsWidget) {
-            throw new Error('Accounts widget not found');
-        }
+        assert(this.content.accountsWidget, 'Accounts widget not found');
 
         await this.content.accountsWidget.clickAccountByIndex(accNum);
     }
 
     async goToTransactions() {
-        if (!this.content.transactionsWidget) {
-            throw new Error('Transactions widget not found');
-        }
+        assert(this.content.transactionsWidget, 'Transactions widget not found');
 
         await navigation(() => this.content.transactionsWidget.clickByTitle());
     }
 
     async goToPersons() {
-        if (!this.content.personsWidget) {
-            throw new Error('Persons widget not found');
-        }
+        assert(this.content.personsWidget, 'Persons widget not found');
 
         await navigation(() => this.content.personsWidget.clickByTitle());
     }
 
     async goToStatistics() {
-        if (!this.content.statisticsWidget) {
-            throw new Error('Statistics widget not found');
-        }
+        assert(this.content.statisticsWidget, 'Statistics widget not found');
 
         await navigation(() => this.content.statisticsWidget.clickByTitle());
     }

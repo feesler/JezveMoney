@@ -1,4 +1,4 @@
-import { isDate } from 'jezvejs';
+import { assert } from 'jezve-test';
 import { formatDate } from 'jezvejs/DateUtils';
 import { createCSV } from '../common.js';
 import { App } from '../Application.js';
@@ -16,9 +16,7 @@ function createDummyTransaction(data) {
         accAmount = trAmount,
     ] = data;
 
-    if (!isDate(date)) {
-        throw new Error('Invalid date object');
-    }
+    assert.isDate(date, 'Invalid date object');
 
     const confirmDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 3);
 
@@ -53,9 +51,7 @@ export function generateCSV(data) {
         'Amount in account currency',
     ];
 
-    if (!Array.isArray(data)) {
-        throw new Error('Invalid data');
-    }
+    assert.isArray(data, 'Invalid data');
 
     const rows = data.map((item) => createDummyTransaction(item));
 
@@ -68,9 +64,7 @@ export function generateCSV(data) {
  * @param {Object} reference - transaction item to compare
  */
 function isSimilarTransaction(item, reference) {
-    if (!item || !reference) {
-        throw new Error('Invalid parameters');
-    }
+    assert(item && reference, 'Invalid parameters');
 
     // Check date, source and destination accounts
     if (item.src_id !== reference.src_id
@@ -93,13 +87,7 @@ function isSimilarTransaction(item, reference) {
 
 /** Search for transaction with same amounts, date and accounts */
 export function findSimilarTransaction(transaction, skipList) {
-    if (
-        !transaction
-        || !transaction.mainAccount
-        || !transaction.mainAccount.id
-    ) {
-        throw new Error('Invalid transaction');
-    }
+    assert(transaction?.mainAccount?.id, 'Invalid transaction');
 
     const res = App.state.transactions.find((item) => (
         [item.src_id, item.dest_id].includes(transaction.mainAccount.id)

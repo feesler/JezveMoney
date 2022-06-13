@@ -1,12 +1,10 @@
-import { TestComponent, queryAll } from 'jezve-test';
+import { TestComponent, queryAll, assert } from 'jezve-test';
 import { ImportConditionItem } from './ImportConditionItem.js';
 import { asyncMap } from '../../../common.js';
 
 export class ImportRuleItemConditions extends TestComponent {
     async parseContent() {
-        if (!this.elem) {
-            throw new Error('Invalid import rule item');
-        }
+        assert(this.elem, 'Invalid import rule item');
 
         const res = {
             items: await asyncMap(

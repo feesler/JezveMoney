@@ -1,5 +1,6 @@
 import {
     TestComponent,
+    assert,
     query,
     prop,
     hasClass,
@@ -13,9 +14,7 @@ export class InputRow extends TestComponent {
             labelEl: await query(this.elem, 'label'),
         };
 
-        if (!res.labelEl) {
-            throw new Error('Label element not found');
-        }
+        assert(res.labelEl, 'Label element not found');
         res.label = await prop(res.labelEl, 'textContent');
 
         res.currElem = await query(this.elem, '.btn.input-group__btn');
@@ -25,9 +24,7 @@ export class InputRow extends TestComponent {
             if (res.isCurrActive) {
                 const ddElem = await query(res.currElem, ':scope > *');
                 res.currDropDown = await DropDown.create(this.parent, ddElem);
-                if (!res.currDropDown.content.isAttached) {
-                    throw new Error('Currency drop down is not attached');
-                }
+                assert(res.currDropDown.content.isAttached, 'Currency drop down is not attached');
             }
 
             res.currSignElem = await query(res.currElem, '.input-group__btn-title');
@@ -51,9 +48,7 @@ export class InputRow extends TestComponent {
         if (res.validationEnabled) {
             res.isInvalid = await hasClass(this.elem, 'invalid-block');
             res.feedBackElem = await query(this.elem, '.invalid-feedback');
-            if (!res.feedBackElem) {
-                throw new Error('Validation feedback element not found');
-            }
+            assert(res.feedBackElem, 'Validation feedback element not found');
             res.feedbackText = await prop(res.feedBackElem, 'textContent');
         }
 
@@ -65,9 +60,7 @@ export class InputRow extends TestComponent {
     }
 
     async selectCurr(currencyId) {
-        if (typeof currencyId === 'undefined' || !currencyId) {
-            throw new Error('Invalid currency id');
-        }
+        assert(currencyId, 'Invalid currency id');
 
         if (this.content.isCurrActive && this.content.currDropDown) {
             await this.content.currDropDown.setSelection(currencyId);

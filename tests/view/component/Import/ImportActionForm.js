@@ -1,5 +1,6 @@
 import {
     TestComponent,
+    assert,
     query,
     queryAll,
     prop,
@@ -39,9 +40,7 @@ const actionValueMap = {
 /** Import action form */
 export class ImportActionForm extends TestComponent {
     async parseContent() {
-        if (!this.elem) {
-            throw new Error('Invalid import action form');
-        }
+        assert(this.elem, 'Invalid import action form');
 
         const res = {
             deleteBtn: { elem: await query(this.elem, '.delete-btn') },
@@ -51,17 +50,16 @@ export class ImportActionForm extends TestComponent {
         const fields = await asyncMap(fieldElems, (field) => this.parseField(field));
         fields.forEach((field) => { res[field.name] = field.component; });
 
-        if (
-            !res.actionField
-            || !res.transTypeField
-            || !res.accountField
-            || !res.personField
-            || !res.amountField
-            || !res.textField
-            || !res.deleteBtn.elem
-        ) {
-            throw new Error('Invalid structure of import action form');
-        }
+        assert(
+            res.actionField
+            && res.transTypeField
+            && res.accountField
+            && res.personField
+            && res.amountField
+            && res.textField
+            && res.deleteBtn.elem,
+            'Invalid structure of import action form',
+        );
 
         return res;
     }
@@ -76,45 +74,38 @@ export class ImportActionForm extends TestComponent {
             textField: 'Value',
         };
 
-        if (!field || !field.title) {
-            throw new Error('Invalid field');
-        }
+        assert(field?.title, 'Invalid field');
 
+        let res = null;
         for (const fieldName in fieldsMap) {
             if (fieldsMap[fieldName] === field.title) {
-                return { name: fieldName, component: field };
+                res = { name: fieldName, component: field };
+                break;
             }
         }
 
-        throw new Error(`Unknown field '${field.title}'`);
+        assert(res, `Unknown field '${field.title}'`);
+        return res;
     }
 
     async parseField(elem) {
         const res = { elem };
 
-        if (!res.elem) {
-            throw new Error('Invalid field element');
-        }
+        assert(res.elem, 'Invalid field element');
 
         res.labelElem = await query(elem, ':scope > label');
-        if (!res.labelElem) {
-            throw new Error('Invalid structure of field element');
-        }
+        assert(res.labelElem, 'Invalid structure of field element');
         res.title = await prop(res.labelElem, 'textContent');
 
         const dropDownElem = await query(elem, '.dd__container');
         if (dropDownElem) {
             res.dropDown = await DropDown.create(this, dropDownElem);
-            if (!res.dropDown) {
-                throw new Error('Invalid structure of field element');
-            }
+            assert(res.dropDown, 'Invalid structure of field element');
             res.disabled = res.dropDown.content.disabled;
             res.value = res.dropDown.content.value;
         } else {
             res.inputElem = await query(elem, ':scope > div > *');
-            if (!res.inputElem) {
-                throw new Error('Invalid structure of field element');
-            }
+            assert(res.inputElem, 'Invalid structure of field element');
             res.disabled = await prop(res.inputElem, 'disabled');
             res.value = await prop(res.inputElem, 'value');
         }
@@ -123,18 +114,14 @@ export class ImportActionForm extends TestComponent {
     }
 
     static getStateName(model) {
-        if (!(model.actionType in actionValueMap)) {
-            throw new Error(`Invalid action type: ${model.actionType}`);
-        }
+        assert(model.actionType in actionValueMap, `Invalid action type: ${model.actionType}`);
 
         return actionValueMap[model.actionType];
     }
 
     static getStateValue(model) {
         const actionValue = this.getStateName(model);
-        if (!(actionValue in model)) {
-            throw new Error(`Invalid action value: ${actionValue}`);
-        }
+        assert(actionValue in model, `Invalid action value: ${actionValue}`);
 
         return model[actionValue];
     }
@@ -193,9 +180,7 @@ export class ImportActionForm extends TestComponent {
     }
 
     async changeValue(name, value) {
-        if (this.model.state !== name) {
-            throw new Error('Invalid state');
-        }
+        assert(this.model.state === name, 'Invalid state');
 
         this.model[name] = value;
         this.model.value = ImportActionForm.getStateValue(this.model);

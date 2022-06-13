@@ -1,4 +1,4 @@
-import { query, navigation } from 'jezve-test';
+import { assert, query, navigation } from 'jezve-test';
 import { Widget } from './Widget.js';
 import { TilesList } from '../TilesList.js';
 import { Tile } from '../Tile.js';
@@ -6,27 +6,24 @@ import { Tile } from '../Tile.js';
 export class AccountsWidget extends Widget {
     async parseContent() {
         const res = await super.parseContent();
-
-        if (res.title !== 'Accounts') {
-            throw new Error('Invalid widget');
-        }
+        assert(res.title === 'Accounts', 'Invalid accounts widget');
 
         const tiles = await TilesList.create(this, await query(this.elem, '.tiles'), Tile);
-        if (!tiles) {
-            throw new Error('Invalid accounts widget');
-        }
+        assert(tiles, 'Invalid accounts widget');
 
         res.tiles = tiles;
 
         return res;
     }
 
-    async clickAccountByIndex(index) {
-        if (!this.content.tiles || this.content.tiles.itemsCount() <= index) {
-            throw new Error(`Tile ${index} not found`);
-        }
+    get tiles() {
+        return this.content.tiles;
+    }
 
-        const tile = this.content.tiles.content.items[index];
+    async clickAccountByIndex(index) {
+        assert.arrayIndex(this.tiles.content.items, index, `Tile ${index} not found`);
+
+        const tile = this.tiles.content.items[index];
 
         await navigation(() => tile.click());
     }

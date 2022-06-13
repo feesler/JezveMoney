@@ -252,9 +252,7 @@ export const filter = async (params) => {
 
         // Send API sequest to server
         const trList = await api.transaction.list(reqParams);
-        if (!trList) {
-            throw new Error('Fail to read list of transactions');
-        }
+        assert(trList, 'Fail to read list of transactions');
 
         return assert.deepMeet(trList.items, expTransList.data);
     });

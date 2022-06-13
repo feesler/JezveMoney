@@ -1,4 +1,4 @@
-import { copyObject, hasFlag } from 'jezve-test';
+import { copyObject, hasFlag, assert } from 'jezve-test';
 import { normalize } from '../common.js';
 import { api } from './api.js';
 import { List } from './List.js';
@@ -20,12 +20,8 @@ export class AccountsList extends List {
 
     /** Apply transaction to accounts */
     static applyTransaction(accounts, transaction) {
-        if (!Array.isArray(accounts)) {
-            throw new Error('Invalid accounts list specified');
-        }
-        if (!transaction) {
-            throw new Error('Invalid transaction specified');
-        }
+        assert.isArray(accounts, 'Invalid accounts list specified');
+        assert(transaction, 'Invalid transaction specified');
 
         const res = copyObject(accounts);
 
@@ -48,12 +44,8 @@ export class AccountsList extends List {
 
     /** Cancel transaction from accounts */
     static cancelTransaction(accounts, transaction) {
-        if (!Array.isArray(accounts)) {
-            throw new Error('Invalid accounts list specified');
-        }
-        if (!transaction) {
-            throw new Error('Invalid transaction specified');
-        }
+        assert.isArray(accounts, 'Invalid accounts list specified');
+        assert(transaction, 'Invalid transaction specified');
 
         const res = copyObject(accounts);
 
@@ -147,9 +139,7 @@ export class AccountsList extends List {
     }
 
     isHidden(account) {
-        if (!account) {
-            throw new Error('Invalid account');
-        }
+        assert(account, 'Invalid account');
 
         return hasFlag(account.flags, ACCOUNT_HIDDEN);
     }

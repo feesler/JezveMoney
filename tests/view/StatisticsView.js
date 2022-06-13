@@ -1,4 +1,5 @@
 import {
+    assert,
     query,
     queryAll,
     prop,
@@ -16,17 +17,13 @@ export class StatisticsView extends AppView {
             titleEl: await query('.content_wrap > .heading > h1'),
         };
 
-        if (!res.titleEl) {
-            throw new Error('Wrong statistics view structure');
-        }
+        assert(res.titleEl, 'Wrong statistics view structure');
 
         res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
         res.title = await prop(res.titleEl, 'textContent');
 
         const filtersList = await queryAll('.filters-container .filter-item');
-        if (!filtersList || filtersList.length !== 5) {
-            throw new Error('Invalid structure of statistics view');
-        }
+        assert(filtersList?.length === 5, 'Invalid structure of statistics view');
 
         res.filterByDropDown = await DropDown.createFromChild(this, await query('#filter_type'));
 
@@ -46,9 +43,7 @@ export class StatisticsView extends AppView {
             elem: await query('#chart'),
             bars: [],
         };
-        if (!res.chart) {
-            throw new Error('Invalid statistics view structure');
-        }
+        assert(res.chart, 'Invalid statistics view structure');
 
         const chartChild = await query(res.chart.elem, '.nodata-message');
         if (chartChild) {
@@ -83,25 +78,19 @@ export class StatisticsView extends AppView {
     }
 
     async selectAccount(accountId) {
-        if (!this.content.accountsDropDown) {
-            throw new Error('Account drop down control not found');
-        }
+        assert(this.content.accountsDropDown, 'Account drop down control not found');
 
         await navigation(() => this.content.accountsDropDown.setSelection(accountId));
     }
 
     async selectAccountByPos(pos) {
-        if (!this.content.accountsDropDown) {
-            throw new Error('Account drop down control not found');
-        }
+        assert(this.content.accountsDropDown, 'Account drop down control not found');
 
         await this.selectAccount(this.content.accountsDropDown.content.items[pos].id);
     }
 
     async selectCurrency(currencyId) {
-        if (!this.content.currencyDropDown) {
-            throw new Error('Currency drop down control not found');
-        }
+        assert(this.content.currencyDropDown, 'Currency drop down control not found');
 
         await navigation(() => this.content.currencyDropDown.setSelection(currencyId));
     }

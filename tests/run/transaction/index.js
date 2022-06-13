@@ -1,6 +1,7 @@
-import { isObject, copyObject } from 'jezvejs';
+import { copyObject } from 'jezvejs';
 import {
     test,
+    assert,
     setBlock,
     baseUrl,
     goTo,
@@ -24,24 +25,16 @@ import * as AccountTests from '../account.js';
 export const runAction = async ({ action, data }) => {
     let testDescr = null;
 
-    if (!(App.view instanceof TransactionView)) {
-        throw new Error('Invalid view');
-    }
+    assert.instanceOf(App.view, TransactionView, 'Invalid view');
 
-    if (!App.view.isActionAvailable(action)) {
-        throw new Error('Invalid action specified');
-    }
+    assert(App.view.isActionAvailable(action), 'Invalid action specified');
 
     if (action === 'changeSrcAccountByPos' || action === 'changeDestAccountByPos') {
         const ids = App.state.getAccountsByIndexes(data);
-        if (!Array.isArray(ids) || !ids.length) {
-            throw new Error(`Account (${data}) not found`);
-        }
+        assert(Array.isArray(ids) && ids.length > 0, `Account (${data}) not found`);
 
         const acc = App.state.accounts.getItem(ids[0]);
-        if (!acc) {
-            throw new Error(`Account (${data}) not found`);
-        }
+        assert(acc, `Account (${data}) not found`);
 
         if (action === 'changeSrcAccountByPos') {
             testDescr = `Change source account to (${acc.name})`;
@@ -52,14 +45,10 @@ export const runAction = async ({ action, data }) => {
 
     if (action === 'changePersonByPos') {
         const ids = App.state.getPersonsByIndexes(data);
-        if (!Array.isArray(ids) || !ids.length) {
-            throw new Error(`Person (${data}) not found`);
-        }
+        assert(Array.isArray(ids) && ids.length > 0, `Person (${data}) not found`);
 
         const person = App.state.persons.getItem(ids[0]);
-        if (!person) {
-            throw new Error(`Person (${data}) not found`);
-        }
+        assert(person, `Person (${data}) not found`);
 
         testDescr = `Change person to (${person.name})`;
     }
@@ -80,14 +69,10 @@ export const runAction = async ({ action, data }) => {
             }
 
             const ids = App.state.getAccountsByIndexes(data);
-            if (!Array.isArray(ids) || !ids.length) {
-                throw new Error(`Account (${data}) not found`);
-            }
+            assert(Array.isArray(ids) && ids.length > 0, `Account (${data}) not found`);
 
             const acc = App.state.accounts.getItem(ids[0]);
-            if (!acc) {
-                throw new Error(`Account (${data}) not found`);
-            }
+            assert(acc, `Account (${data}) not found`);
 
             testDescr = `Change account to (${acc.name})`;
         }
@@ -104,9 +89,7 @@ export const runAction = async ({ action, data }) => {
 
     if (action === 'changeSourceCurrency' || action === 'changeDestCurrency') {
         const curr = Currency.getById(data);
-        if (!curr) {
-            throw new Error(`Currency (${data}) not found`);
-        }
+        assert(curr, `Currency (${data}) not found`);
 
         if (action === 'changeSourceCurrency') {
             testDescr = `Change source currency to ${curr.name}`;
@@ -189,8 +172,8 @@ export const submit = async () => {
 
     await App.view.submit();
 
-    if (validInput && (App.view instanceof TransactionView)) {
-        throw new Error('Fail to submit transaction');
+    if (validInput) {
+        assert(!(App.view instanceof TransactionView), 'Fail to submit transaction');
     }
 
     return res;
@@ -224,15 +207,11 @@ export const create = async (type, params, submitHandler) => {
 };
 
 export const update = async (type, params, submitHandler) => {
-    if (!isObject(params)) {
-        throw new Error('Parameters not specified');
-    }
+    assert.isObject(params, 'Parameters not specified');
     const props = copyObject(params);
 
     const pos = parseInt(props.pos, 10);
-    if (Number.isNaN(pos) || pos < 0) {
-        throw new Error('Position of transaction not specified');
-    }
+    assert(!Number.isNaN(pos) && pos >= 0, 'Position of transaction not specified');
     delete props.pos;
 
     setBlock(`Update ${Transaction.typeToString(type)} [${pos}] (${formatProps(props)})`, 2);
@@ -317,11 +296,8 @@ export const del = async (type, transactions) => {
             const shiftSize = trOnCurrentPage.length;
             tr = tr.map((ind) => ind - shiftSize);
         } else if (App.view.isLastPage()) {
-            if (tr.length) {
-                throw new Error(`Transaction(s) ${tr.join()} can not be removed`);
-            } else {
-                break;
-            }
+            assert(tr.length === 0, `Transaction(s) ${tr.join()} can not be removed`);
+            break;
         } else {
             await App.view.goToNextPage();
         }
@@ -338,9 +314,7 @@ export const del = async (type, transactions) => {
 
 export const delFromUpdate = async (type, pos) => {
     const ind = parseInt(pos, 10);
-    if (Number.isNaN(ind) || ind < 0) {
-        throw new Error('Position of transaction not specified');
-    }
+    assert(!Number.isNaN(ind) && ind >= 0, 'Position of transaction not specified');
 
     setBlock(`Delete ${Transaction.typeToString(type)} from update view [${ind}]`, 2);
 
@@ -422,9 +396,7 @@ export const securityTests = async () => {
 
     await test('Access to not existing transaction', async () => {
         await goTo(requestURL);
-        if (!(App.view instanceof MainView)) {
-            throw new Error('Invalid view');
-        }
+        assert.instanceOf(App.view, MainView, 'Invalid view');
 
         App.view.expectedState = {
             msgPopup: { success: false, message: 'Fail to update transaction.' },
@@ -442,19 +414,13 @@ export const createFromHiddenAccount = async ({ type, accountId }) => {
     await test(`Create ${typeString} transaction from hidden account`, async () => {
         const userAccounts = App.state.accounts.getUserAccounts();
         const account = userAccounts.getItem(accountId);
-        if (!account) {
-            throw new Error(`Account ${accountId} not found`);
-        }
-        if (!userAccounts.isHidden(account)) {
-            throw new Error('Hidden account is expected');
-        }
+        assert(account, `Account ${accountId} not found`);
+        assert(userAccounts.isHidden(account), 'Hidden account is expected');
 
         const requestType = typeString.toLowerCase();
         const requestURL = `${baseUrl()}transactions/create/?acc_id=${accountId}&type=${requestType}`;
         await goTo(requestURL);
-        if (!(App.view instanceof MainView)) {
-            throw new Error('Invalid view');
-        }
+        assert.instanceOf(App.view, MainView, 'Invalid view');
 
         App.view.expectedState = {
             msgPopup: { success: false, message: 'Fail to create new transaction.' },
@@ -477,9 +443,7 @@ export const checkTransactionAvailable = async (type, directNavigate = false) =>
             await App.goToMainView();
             await App.view.goToTransactions();
             await App.view.goToCreateTransaction();
-            if (!(App.view instanceof TransactionView)) {
-                throw new Error('Invalid view');
-            }
+            assert.instanceOf(App.view, TransactionView, 'Invalid view');
 
             if (!App.view.content.typeMenu.isSingleSelected(type)) {
                 await App.view.changeTransactionType(type);

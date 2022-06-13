@@ -1,5 +1,6 @@
 import {
     TestComponent,
+    assert,
     query,
     prop,
     hasClass,
@@ -10,9 +11,8 @@ import { Currency } from '../../model/Currency.js';
 
 export class Tile extends TestComponent {
     async parseContent() {
-        if (!this.elem || !await hasClass(this.elem, 'tile')) {
-            throw new Error('Wrong tile structure');
-        }
+        const validClass = await hasClass(this.elem, 'tile');
+        assert(validClass, 'Invalid structure of tile');
 
         const res = {
             linkElem: await query(this.elem, '.tilelink'),

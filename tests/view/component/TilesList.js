@@ -1,4 +1,9 @@
-import { TestComponent, queryAll, hasClass } from 'jezve-test';
+import {
+    TestComponent,
+    queryAll,
+    hasClass,
+    assert,
+} from 'jezve-test';
 import { Tile } from './Tile.js';
 import { AccountsList } from '../../model/AccountsList.js';
 import { PersonsList } from '../../model/PersonsList.js';
@@ -8,9 +13,7 @@ export class TilesList extends TestComponent {
     constructor(parent, elem, tileClass) {
         super(parent, elem);
 
-        if (!tileClass) {
-            throw new Error('Invalid tile constructor specified');
-        }
+        assert(tileClass, 'Invalid tile constructor specified');
 
         this.tileClass = tileClass;
     }
@@ -35,9 +38,7 @@ export class TilesList extends TestComponent {
     }
 
     getItemData(item) {
-        if (!item) {
-            throw new Error('Invalid item');
-        }
+        assert(item, 'Invalid item');
 
         return {
             id: item.content.id,
@@ -73,9 +74,7 @@ export class TilesList extends TestComponent {
     }
 
     static renderAccounts(accountsList) {
-        if (!(accountsList instanceof AccountsList)) {
-            throw new Error('Invalid data');
-        }
+        assert.instanceOf(accountsList, AccountsList, 'Invalid data');
 
         const visibleAccounts = accountsList.getVisible(true);
         const res = {
@@ -86,9 +85,7 @@ export class TilesList extends TestComponent {
     }
 
     static renderHiddenAccounts(accountsList) {
-        if (!(accountsList instanceof AccountsList)) {
-            throw new Error('Invalid data');
-        }
+        assert.instanceOf(accountsList, AccountsList, 'Invalid data');
 
         const hiddenAccounts = accountsList.getHidden(true);
         const res = {
@@ -99,12 +96,8 @@ export class TilesList extends TestComponent {
     }
 
     static renderPersons(personsList, tileClass = Tile) {
-        if (!(personsList instanceof PersonsList)) {
-            throw new Error('Invalid data');
-        }
-        if (!tileClass) {
-            throw new Error('Invalid tile constructor specified');
-        }
+        assert.instanceOf(personsList, PersonsList, 'Invalid data');
+        assert(tileClass, 'Invalid tile constructor specified');
 
         const visiblePersons = personsList.getVisible(true);
         const res = {
@@ -115,12 +108,8 @@ export class TilesList extends TestComponent {
     }
 
     static renderHiddenPersons(personsList, tileClass = Tile) {
-        if (!(personsList instanceof PersonsList)) {
-            throw new Error('Invalid data');
-        }
-        if (!tileClass) {
-            throw new Error('Invalid tile constructor specified');
-        }
+        assert.instanceOf(personsList, PersonsList, 'Invalid data');
+        assert(tileClass, 'Invalid tile constructor specified');
 
         const hiddenPersons = personsList.getHidden(true);
         const res = {

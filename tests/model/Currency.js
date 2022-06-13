@@ -1,3 +1,4 @@
+import { assert } from 'jezve-test';
 import { normalize, formatValue } from '../common.js';
 import { api } from './api.js';
 
@@ -41,9 +42,7 @@ export class Currency {
 
     // Return currency object for specified id
     static getById(currId) {
-        if (!this.currencies) {
-            throw new Error('List of currencies not initialized');
-        }
+        assert(this.currencies, 'List of currencies not initialized');
         const id = parseInt(currId, 10);
         if (Number.isNaN(id)) {
             return null;
@@ -58,9 +57,7 @@ export class Currency {
     }
 
     static findByName(name) {
-        if (!this.currencies) {
-            throw new Error('List of currencies not initialized');
-        }
+        assert(this.currencies, 'List of currencies not initialized');
 
         const qName = name.toUpperCase();
         const currObj = this.currencies.find((item) => item.name.toUpperCase() === qName);
@@ -76,9 +73,7 @@ export class Currency {
 
         return itemNames.map((name) => {
             const item = this.findByName(name);
-            if (!item) {
-                throw new Error(`Currency '${name}' not found`);
-            }
+            assert(item, `Currency '${name}' not found`);
 
             return item.id;
         });
@@ -86,14 +81,10 @@ export class Currency {
 
     /** Format curency value without access to the instance of class */
     static format(currId, val) {
-        if (!this.currencies) {
-            throw new Error('List of currencies not initialized');
-        }
+        assert(this.currencies, 'List of currencies not initialized');
 
         const currObj = this.currencies.find((item) => item.id === currId);
-        if (!currObj) {
-            throw new Error(`Currency ${currId} not found`);
-        }
+        assert(currObj, `Currency ${currId} not found`);
 
         return currObj.format(val);
     }

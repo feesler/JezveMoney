@@ -1,5 +1,5 @@
 import { formatDate } from 'jezvejs/DateUtils';
-import { TestApplication, setupTest } from 'jezve-test';
+import { TestApplication, setupTest, assert } from 'jezve-test';
 import { api } from './model/api.js';
 import { config } from './config.js';
 import { AppState } from './model/AppState.js';
@@ -48,9 +48,7 @@ class Application extends TestApplication {
 
     async setupUser() {
         const userProfile = await api.profile.read();
-        if (!userProfile || !userProfile.user_id) {
-            throw new Error('Fail to read user profile');
-        }
+        assert(userProfile?.user_id, 'Fail to read user profile');
 
         this.user_id = userProfile.user_id;
         this.owner_id = userProfile.owner_id;

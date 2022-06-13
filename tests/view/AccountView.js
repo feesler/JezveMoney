@@ -1,4 +1,5 @@
 import {
+    assert,
     query,
     prop,
     navigation,
@@ -52,9 +53,7 @@ export class AccountView extends AppView {
         // Currency
         const selectedCurr = cont.currDropDown.content.textValue;
         res.currObj = Currency.findByName(selectedCurr);
-        if (!res.currObj) {
-            throw new Error(`Currency '${selectedCurr}' not found`);
-        }
+        assert(res.currObj, `Currency '${selectedCurr}' not found`);
 
         res.curr_id = res.currObj.id;
 
@@ -84,9 +83,7 @@ export class AccountView extends AppView {
         this.model.fBalance = account.balance;
 
         this.model.currObj = Currency.getById(account.curr_id);
-        if (!this.model.currObj) {
-            throw new Error(`Unexpected currency ${account.curr_id}`);
-        }
+        assert(this.model.currObj, `Unexpected currency ${account.curr_id}`);
 
         this.model.curr_id = this.model.currObj.id;
         this.model.icon_id = account.icon_id;
@@ -147,25 +144,19 @@ export class AccountView extends AppView {
         const res = {};
 
         res.heading = { elem: await query('.heading > h1') };
-        if (!res.heading.elem) {
-            throw new Error('Heading element not found');
-        }
+        assert(res.heading.elem, 'Heading element not found');
         res.heading.text = await prop(res.heading.elem, 'textContent');
         res.delBtn = await IconLink.create(this, await query('#del_btn'));
         res.tile = await Tile.create(this, await query('#acc_tile'));
 
         res.formElem = await query('form');
-        if (!res.formElem) {
-            throw new Error('Form element not found');
-        }
+        assert(res.formElem, 'Form element not found');
 
         const hiddenEl = await query('#accid');
         res.isUpdate = (!!hiddenEl);
         if (res.isUpdate) {
             res.id = parseInt(await prop(hiddenEl, 'value'), 10);
-            if (!res.id) {
-                throw new Error('Wrong account id');
-            }
+            assert(res.id, 'Wrong account id');
         }
 
         let curChildren = (res.isUpdate) ? 3 : 2;
@@ -175,9 +166,7 @@ export class AccountView extends AppView {
         curChildren += 1;
         let elem = await query(`form > *:nth-child(${curChildren})`);
         res.name = await InputRow.create(this, elem);
-        if (!res.name) {
-            throw new Error('Account name input not found');
-        }
+        assert(res.name, 'Account name input not found');
 
         curChildren += 1;
         res.currDropDown = await DropDown.createFromChild(this, await query('#currency'));
@@ -191,14 +180,10 @@ export class AccountView extends AppView {
         res.flags = parseInt(await prop(res.flagsInp, 'value'), 10);
 
         res.submitBtn = await query('.acc_controls .submit-btn');
-        if (!res.submitBtn) {
-            throw new Error('Submit button not found');
-        }
+        assert(res.submitBtn, 'Submit button not found');
 
         res.cancelBtn = await query('.acc_controls .cancel-btn');
-        if (!res.cancelBtn) {
-            throw new Error('Cancel button not found');
-        }
+        assert(res.cancelBtn, 'Cancel button not found');
 
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
@@ -212,9 +197,7 @@ export class AccountView extends AppView {
     }
 
     async clickDeleteButton() {
-        if (!this.content.isUpdate || !this.content.delBtn) {
-            throw new Error('Unexpected action clickDeleteButton');
-        }
+        assert(this.content.isUpdate && this.content.delBtn, 'Unexpected action clickDeleteButton');
 
         return this.performAction(() => this.content.delBtn.click());
     }
@@ -223,12 +206,8 @@ export class AccountView extends AppView {
     async deleteSelfItem() {
         await this.clickDeleteButton();
 
-        if (!this.content.delete_warning?.content?.visible) {
-            throw new Error('Delete transaction warning popup not appear');
-        }
-        if (!this.content.delete_warning.content.okBtn) {
-            throw new Error('OK button not found');
-        }
+        assert(this.content.delete_warning?.content?.visible, 'Delete transaction warning popup not appear');
+        assert(this.content.delete_warning.content.okBtn, 'OK button not found');
 
         await navigation(() => click(this.content.delete_warning.content.okBtn));
     }
@@ -259,9 +238,7 @@ export class AccountView extends AppView {
     async changeCurrency(val) {
         const currencyId = parseInt(val, 10);
         this.model.currObj = Currency.getById(currencyId);
-        if (!this.model.currObj) {
-            throw new Error(`Unexpected currency ${val}`);
-        }
+        assert(this.model.currObj, `Unexpected currency ${val}`);
 
         this.model.curr_id = this.model.currObj.id;
         this.setExpectedState();
@@ -272,8 +249,8 @@ export class AccountView extends AppView {
 
     async changeIcon(val) {
         let iconObj = Icon.getItem(val);
-        if (val && !iconObj) {
-            throw new Error(`Icon ${val} not found`);
+        if (val) {
+            assert(iconObj, `Icon ${val} not found`);
         }
 
         if (!val) {

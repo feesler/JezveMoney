@@ -1,4 +1,9 @@
-import { TestComponent, query, isVisible } from 'jezve-test';
+import {
+    TestComponent,
+    assert,
+    query,
+    isVisible,
+} from 'jezve-test';
 import { IconLink } from './IconLink.js';
 import { InputRow } from './InputRow.js';
 
@@ -9,17 +14,13 @@ export class CommentRow extends TestComponent {
         const iconLinkElem = await query(this.elem, '.iconlink');
 
         res.iconLink = await IconLink.create(this.parent, iconLinkElem);
-        if (!res.iconLink) {
-            throw new Error('Iconlink of comment not found');
-        }
+        assert(res.iconLink, 'Iconlink of comment not found');
 
         res.inputRow = await InputRow.create(
             this.parent,
             await query(this.elem, '#comment_block'),
         );
-        if (!res.inputRow) {
-            throw new Error('Input row of comment not found');
-        }
+        assert(res.inputRow, 'Input row of comment not found');
 
         res.value = res.inputRow.content.value;
 

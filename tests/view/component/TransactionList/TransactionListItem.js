@@ -4,6 +4,7 @@ import {
     prop,
     hasClass,
     click,
+    assert,
 } from 'jezve-test';
 import { Currency } from '../../../model/Currency.js';
 import {
@@ -21,21 +22,17 @@ export class TransactionListItem extends TestComponent {
         res.selected = await hasClass(this.elem, 'trans-list__item_selected');
 
         const titleElem = await query(this.elem, '.trans-list__item-title > span');
-        if (!titleElem) {
-            throw new Error('Account title not found');
-        }
+        assert(titleElem, 'Account title not found');
         res.accountTitle = await prop(titleElem, 'textContent');
 
         const amountElem = await query(this.elem, '.trans-list__item-content > span');
-        if (!amountElem) {
-            throw new Error('Amount text not found');
-        }
+        assert(amountElem, 'Amount text not found');
         res.amountText = await prop(amountElem, 'textContent');
 
         const dateElem = await query(this.elem, '.trans-list__item-details > *');
-        if (!dateElem || await prop(dateElem, 'tagName') !== 'SPAN') {
-            throw new Error('Date element not found');
-        }
+
+        const tagName = await prop(dateElem, 'tagName');
+        assert(dateElem && tagName === 'SPAN', 'Date element not found');
 
         res.dateFmt = await prop(dateElem, 'textContent');
 
@@ -52,12 +49,8 @@ export class TransactionListItem extends TestComponent {
     static render(transaction, state) {
         const res = {};
 
-        if (!transaction) {
-            throw new Error('Invalid transaction object');
-        }
-        if (!state) {
-            throw new Error('Invalid state object');
-        }
+        assert(transaction, 'Invalid transaction object');
+        assert(state, 'Invalid state object');
 
         const srcAcc = state.accounts.getItem(transaction.src_id);
         const destAcc = state.accounts.getItem(transaction.dest_id);
@@ -90,9 +83,7 @@ export class TransactionListItem extends TestComponent {
             const debtType = (!!srcAcc && srcAcc.owner_id !== state.profile.owner_id);
             const personAcc = debtType ? srcAcc : destAcc;
             const person = state.persons.getItem(personAcc.owner_id);
-            if (!person) {
-                throw new Error(`Person ${personAcc.owner_id} not found`);
-            }
+            assert(person, `Person ${personAcc.owner_id} not found`);
 
             const acc = (debtType) ? destAcc : srcAcc;
 

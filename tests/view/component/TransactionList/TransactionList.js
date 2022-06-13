@@ -3,6 +3,7 @@ import {
     queryAll,
     prop,
     hasClass,
+    assert,
 } from 'jezve-test';
 import { TransactionListItem } from './TransactionListItem.js';
 import { asyncMap } from '../../../common.js';
@@ -34,9 +35,7 @@ export class TransactionList extends TestComponent {
     }
 
     getItemData(item) {
-        if (!item) {
-            throw new Error('Invalid item');
-        }
+        assert(item, 'Invalid item');
 
         return {
             selected: item.content.selected,
@@ -73,9 +72,7 @@ export class TransactionList extends TestComponent {
     }
 
     static renderWidget(transactions, state) {
-        if (!Array.isArray(transactions)) {
-            throw new Error('Invalid data');
-        }
+        assert.isArray(transactions, 'Invalid data');
 
         const res = {
             title: 'Transactions',

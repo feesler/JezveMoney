@@ -3,6 +3,7 @@ import {
     query,
     prop,
     click,
+    assert,
 } from 'jezve-test';
 import { copyObject } from 'jezvejs';
 import { ImportRuleItemConditions } from './ImportRuleItemConditions.js';
@@ -20,9 +21,7 @@ export class ImportRuleItem extends TestComponent {
     }
 
     async parseContent() {
-        if (!this.elem) {
-            throw new Error('Invalid import rule item');
-        }
+        assert(this.elem, 'Invalid import rule item');
 
         const res = {
             ruleId: await prop(this.elem, 'dataset.id'),
@@ -45,19 +44,18 @@ export class ImportRuleItem extends TestComponent {
         const actionsElem = await query(this.elem, '.rule-item__actions');
         res.actions = await ImportRuleItemActions.create(this, actionsElem);
 
-        if (
-            !res.propertyElem.elem
-            || !res.operatorElem.elem
-            || !res.valueElem.elem
-            || !res.infoElem.elem
-            || !res.updateBtn.elem
-            || !res.deleteBtn.elem
-            || !res.toggleBtn.elem
-            || !res.conditions.elem
-            || !res.actions.elem
-        ) {
-            throw new Error('Invalid structure of import item');
-        }
+        assert(
+            res.propertyElem.elem
+            && res.operatorElem.elem
+            && res.valueElem.elem
+            && res.infoElem.elem
+            && res.updateBtn.elem
+            && res.deleteBtn.elem
+            && res.toggleBtn.elem
+            && res.conditions.elem
+            && res.actions.elem,
+            'Invalid structure of import item',
+        );
 
         return res;
     }
@@ -121,8 +119,6 @@ export class ImportRuleItem extends TestComponent {
      * @param {AppState} state - application state
      */
     static render(item, state) {
-        if (!item || !state) {
-            throw new Error('Invalid parameters');
-        }
+        assert(item && state, 'Invalid parameters');
     }
 }

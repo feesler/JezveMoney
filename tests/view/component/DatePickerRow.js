@@ -1,6 +1,6 @@
 import {
-    isDate,
     TestComponent,
+    assert,
     query,
     isVisible,
     click,
@@ -14,17 +14,17 @@ export class DatePickerRow extends TestComponent {
         const res = {};
 
         res.iconLink = await IconLink.create(this.parent, await query(this.elem, '.iconlink'));
-        if (!res.iconLink) {
-            throw new Error('Iconlink of date picker not found');
-        }
+        assert(res.iconLink, 'Iconlink of date picker not found');
 
         res.inputRow = await InputRow.create(
             this.parent,
             await query(this.elem, '.iconlink + *'),
         );
-        if (!res.inputRow || !res.inputRow.content.datePickerBtn) {
-            throw new Error('Unexpected structure of date picker input row');
-        }
+        assert(
+            res.inputRow
+            && res.inputRow.content.datePickerBtn,
+            'Unexpected structure of date picker input row',
+        );
         res.date = res.inputRow.content.value;
 
         res.datePicker = await DatePicker.create(
@@ -36,18 +36,14 @@ export class DatePickerRow extends TestComponent {
     }
 
     async selectDate(date) {
-        if (!isDate(date)) {
-            throw new Error('Invalid parameter');
-        }
+        assert.isDate(date, 'Invalid parameter');
 
         if (await isVisible(this.content.iconLink.elem)) {
             await this.content.iconLink.click();
             await this.parse();
         }
 
-        if (!this.content.datePicker) {
-            throw new Error('Date picker component not found');
-        }
+        assert(this.content.datePicker, 'Date picker component not found');
 
         await this.content.datePicker.selectDate(date);
     }

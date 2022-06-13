@@ -1,4 +1,4 @@
-import { test } from 'jezve-test';
+import { test, assert } from 'jezve-test';
 import { api } from '../../model/api.js';
 import { ApiRequestError } from '../../error/ApiRequestError.js';
 import { App } from '../../Application.js';
@@ -19,13 +19,11 @@ export const registerAndLogin = async (userData) => {
     await test('User registration', async () => {
         await api.user.logout();
 
-        if (!await api.user.register(userData)) {
-            throw new Error('Fail to register user');
-        }
+        const registerResult = await api.user.register(userData);
+        assert(registerResult, 'Fail to register user');
 
-        if (!await api.user.login(userData)) {
-            throw new Error('Fail to register user');
-        }
+        const loginResult = await api.user.login(userData);
+        assert(loginResult, 'Fail to register user');
 
         App.state.setUserProfile(userData);
         App.state.resetAll();

@@ -1,4 +1,4 @@
-import { test, setBlock } from 'jezve-test';
+import { test, setBlock, assert } from 'jezve-test';
 import * as TransactionTests from './index.js';
 import { TRANSFER } from '../../model/Transaction.js';
 import { App } from '../../Application.js';
@@ -11,9 +11,7 @@ export const submit = async (params) => {
         await TransactionTests.runAction({ action: 'changeDestAccountByPos', data: params.destAcc });
     }
 
-    if (!('srcAmount' in params)) {
-        throw new Error('Source amount value not specified');
-    }
+    assert('srcAmount' in params, 'Source amount value not specified');
 
     await TransactionTests.runAction({ action: 'inputSrcAmount', data: params.srcAmount });
 

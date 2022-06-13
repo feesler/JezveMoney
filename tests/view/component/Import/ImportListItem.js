@@ -7,6 +7,7 @@ import {
     input,
     check,
     isVisible,
+    assert,
 } from 'jezve-test';
 import { copyObject } from 'jezvejs';
 import { formatDate } from 'jezvejs/DateUtils';
@@ -54,49 +55,42 @@ export class ImportListItem extends TestComponent {
             commentField: 'Comment',
         };
 
-        if (!field || !field.title) {
-            throw new Error('Invalid field');
-        }
+        assert(field?.title, 'Invalid field');
 
+        let res = null;
         for (const fieldName of Object.keys(fieldsMap)) {
             const fieldLabel = fieldsMap[fieldName];
             if (
                 (typeof fieldLabel === 'string' && fieldLabel === field.title)
                 || (fieldLabel.includes(field.title))
             ) {
-                return { name: fieldName, component: field };
+                res = { name: fieldName, component: field };
+                break;
             }
         }
 
-        throw new Error(`Unknown field '${field.title}'`);
+        assert(res, `Unknown field '${field.title}'`);
+        return res;
     }
 
     async parseField(elem) {
         const res = { elem };
 
-        if (!res.elem) {
-            throw new Error('Invalid field element');
-        }
+        assert(res.elem, 'Invalid field element');
 
         res.labelElem = await query(elem, ':scope > label');
-        if (!res.labelElem) {
-            throw new Error('Invalid structure of field element');
-        }
+        assert(res.labelElem, 'Invalid structure of field element');
         res.title = await prop(res.labelElem, 'textContent');
 
         const dropDownElem = await query(elem, '.dd__container');
         if (dropDownElem) {
             res.dropDown = await DropDown.create(this, dropDownElem);
-            if (!res.dropDown) {
-                throw new Error('Invalid structure of field element');
-            }
+            assert(res.dropDown, 'Invalid structure of field element');
             res.disabled = res.dropDown.content.disabled;
             res.value = res.dropDown.content.value;
         } else {
             res.inputElem = await query(elem, ':scope > div > *');
-            if (!res.inputElem) {
-                throw new Error('Invalid structure of field element');
-            }
+            assert(res.inputElem, 'Invalid structure of field element');
             res.disabled = await prop(res.inputElem, 'disabled');
             res.value = await prop(res.inputElem, 'value');
         }
@@ -124,25 +118,19 @@ export class ImportListItem extends TestComponent {
         for (const dataValueElem of dataValues) {
             const labelElem = await query(dataValueElem, 'label');
             const valueElem = await query(dataValueElem, 'div');
-            if (!labelElem || !valueElem) {
-                throw new Error('Invalid structure of import item');
-            }
+            assert(labelElem && valueElem, 'Invalid structure of import item');
 
             const label = await prop(labelElem, 'textContent');
             const value = await prop(valueElem, 'textContent');
             const property = Object.keys(labelsMap).find((key) => label === labelsMap[key]);
 
-            if (property) {
-                res[property] = value;
-            } else {
-                throw new Error(`Invalid label: '${label}'`);
-            }
+            assert(property, `Invalid label: '${label}'`);
+
+            res[property] = value;
         }
 
         const valid = Object.keys(labelsMap).every((key) => key in res);
-        if (!valid) {
-            throw new Error('Invalid structure of import item');
-        }
+        assert(valid, 'Invalid structure of import item');
 
         return res;
     }
@@ -151,9 +139,7 @@ export class ImportListItem extends TestComponent {
         const res = {
             enableCheck: await query(this.elem, '.enable-check input[type="checkbox"]'),
         };
-        if (!res.enableCheck) {
-            throw new Error('Invalid structure of import item');
-        }
+        assert(res.enableCheck, 'Invalid structure of import item');
         res.enabled = await prop(res.enableCheck, 'checked');
 
         const fieldElems = await queryAll(this.elem, '.field');
@@ -165,20 +151,19 @@ export class ImportListItem extends TestComponent {
         res.toggleBtn = await query(this.elem, '.toggle-btn');
         res.origDataTable = await query(this.elem, '.orig-data-table');
 
-        if (
-            !res.typeField
-            || !res.amountField
-            || !res.destAmountField
-            || !res.destAccountField
-            || !res.personField
-            || !res.currencyField
-            || !res.dateField
-            || !res.commentField
-            || !res.invFeedback.elem
-            || !res.deleteBtn
-        ) {
-            throw new Error('Invalid structure of import item');
-        }
+        assert(
+            res.typeField
+            && res.amountField
+            && res.destAmountField
+            && res.destAccountField
+            && res.personField
+            && res.currencyField
+            && res.dateField
+            && res.commentField
+            && res.invFeedback.elem
+            && res.deleteBtn,
+            'Invalid structure of import item',
+        );
 
         res.originalData = await this.parseOriginalData(res);
 
@@ -196,6 +181,8 @@ export class ImportListItem extends TestComponent {
     }
 
     isDifferentCurrencies(model) {
+        assert(ImportTransaction.getTypeById(model.type), 'Invalid transaction type');
+
         if (model.type === 'expense' || model.type === 'income') {
             if (!model.currency) {
                 return false;
@@ -208,20 +195,15 @@ export class ImportListItem extends TestComponent {
             return (model.mainAccount.curr_id !== model.destAccount.curr_id);
         }
 
-        if (model.type === 'debtfrom' || model.type === 'debtto') {
-            return false;
-        }
-
-        throw new Error('Invalid transaction type');
+        // 'debtfrom' or 'debtto'
+        return false;
     }
 
     async buildModel(cont) {
         const res = {};
 
         res.mainAccount = App.state.accounts.getItem(this.mainAccount);
-        if (!res.mainAccount) {
-            throw new Error('Main account not found');
-        }
+        assert(res.mainAccount, 'Main account not found');
 
         res.enabled = cont.enabled;
         res.type = cont.typeField.value;
@@ -372,9 +354,7 @@ export class ImportListItem extends TestComponent {
                 res.src_amount = res.dest_amount;
             }
         } else if (res.type === TRANSFER) {
-            if (!model.destAccount) {
-                throw new Error('Account not found');
-            }
+            assert(model.destAccount, 'Account not found');
 
             const isFrom = (model.type === 'transferfrom');
             const srcAccount = (isFrom) ? model.mainAccount : model.destAccount;
@@ -396,9 +376,7 @@ export class ImportListItem extends TestComponent {
                     : res.dest_amount;
             }
         } else if (res.type === DEBT) {
-            if (!model.person) {
-                throw new Error('Person not found');
-            }
+            assert(model.person, 'Person not found');
 
             res.acc_id = model.mainAccount.id;
             res.person_id = model.person.id;
@@ -416,16 +394,12 @@ export class ImportListItem extends TestComponent {
     }
 
     restoreOriginal() {
-        if (!this.model.original) {
-            throw new Error('Original data not found');
-        }
+        assert(this.model.original, 'Original data not found');
 
         const res = copyObject(this.model);
 
         res.mainAccount = App.state.accounts.findByName(res.original.mainAccount);
-        if (!res.mainAccount) {
-            throw new Error(`Account ${res.original.mainAccount} not found`);
-        }
+        assert(res.mainAccount, `Account ${res.original.mainAccount} not found`);
 
         const amount = parseFloat(fixFloat(res.original.accountAmount));
         const destAmount = parseFloat(fixFloat(res.original.transactionAmount));
@@ -438,9 +412,7 @@ export class ImportListItem extends TestComponent {
             res.destAmount = '';
         } else {
             const currency = Currency.findByName(res.original.transactionCurrency);
-            if (!currency) {
-                throw new Error(`Currency ${res.original.transactionCurrency} not found`);
-            }
+            assert(currency, `Currency ${res.original.transactionCurrency} not found`);
             res.currId = currency.id;
             res.destAmount = Math.abs(destAmount);
         }
@@ -467,26 +439,17 @@ export class ImportListItem extends TestComponent {
     }
 
     checkEnabled(field) {
-        if (!field) {
-            throw new Error('Invalid field');
-        }
-
-        if (field.disabled) {
-            throw new Error(`'${field.title}' field is disabled`);
-        }
+        assert(field, 'Invalid field');
+        assert(!field.disabled, `'${field.title}' field is disabled`);
     }
 
     onChangeMainAccount(model, value) {
-        if (!model) {
-            throw new Error('Invalid model specified');
-        }
+        assert(model, 'Invalid model specified');
 
         const res = copyObject(model);
 
         res.mainAccount = App.state.accounts.getItem(value);
-        if (!res.mainAccount) {
-            throw new Error(`Invalid account ${value}`);
-        }
+        assert(res.mainAccount, `Invalid account ${value}`);
 
         if (((res.type === 'expense' || res.type === 'income')
             && !res.isDifferent)
@@ -558,12 +521,8 @@ export class ImportListItem extends TestComponent {
         this.checkEnabled(this.content.destAccountField);
 
         const accountId = parseInt(value, 10);
-        if (!accountId) {
-            throw new Error(`Invalid account id: ${value}`);
-        }
-        if (this.model.mainAccount.id === accountId) {
-            throw new Error(`Can't select same account as main: ${value}`);
-        }
+        assert(accountId, `Invalid account id: ${value}`);
+        assert(this.model.mainAccount.id !== accountId, `Can't select same account as main: ${value}`);
 
         this.model.destId = value;
         this.model.destAccount = App.state.accounts.getItem(value);
@@ -670,16 +629,10 @@ export class ImportListItem extends TestComponent {
      * @param {AppState} state - application state
      */
     static render(item, state) {
-        if (!item || !state) {
-            throw new Error('Invalid parameters');
-        }
-        if (!item.mainAccount) {
-            throw new Error('Main account not defined');
-        }
+        assert(item && state, 'Invalid parameters');
+        assert(item.mainAccount, 'Main account not defined');
         const trType = ImportTransaction.getTypeById(item.type);
-        if (!trType) {
-            throw new Error(`Unknown import transaction type: ${item.type}`);
-        }
+        assert(trType, `Unknown import transaction type: ${item.type}`);
 
         const isDifferent = (item.src_curr !== item.dest_curr);
         const res = {

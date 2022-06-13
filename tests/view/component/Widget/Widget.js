@@ -1,5 +1,6 @@
 import {
     TestComponent,
+    assert,
     query,
     hasClass,
     prop,
@@ -8,9 +9,8 @@ import {
 
 export class Widget extends TestComponent {
     async parseContent() {
-        if (!this.elem || !await hasClass(this.elem, 'widget')) {
-            throw new Error('Wrong widget structure');
-        }
+        const classIsSet = this.elem && await hasClass(this.elem, 'widget');
+        assert(classIsSet, 'Invalid structur of widget');
 
         const res = {
             titleElem: await query(this.elem, '.widget_title'),

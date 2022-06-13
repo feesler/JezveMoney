@@ -1,4 +1,9 @@
-import { copyObject, baseUrl, httpReq } from 'jezve-test';
+import {
+    copyObject,
+    baseUrl,
+    httpReq,
+    assert,
+} from 'jezve-test';
 import { urlJoin } from '../common.js';
 import { ApiRequestError } from '../error/ApiRequestError.js';
 
@@ -19,17 +24,13 @@ async function apiRequest(method, url, data = null) {
 }
 
 async function apiGet(method) {
-    if (!method) {
-        throw new Error('Method not specified');
-    }
+    assert(method, 'Method not specified');
 
     return apiRequest('GET', method);
 }
 
 async function apiPost(method, data = {}) {
-    if (!method) {
-        throw new Error('Method not specified');
-    }
+    assert(method, 'Method not specified');
 
     return apiRequest('POST', method, data);
 }

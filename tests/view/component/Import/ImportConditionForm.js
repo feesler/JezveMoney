@@ -1,5 +1,6 @@
 import {
     TestComponent,
+    assert,
     query,
     queryAll,
     prop,
@@ -65,20 +66,19 @@ export class ImportConditionForm extends TestComponent {
         res.fieldValueCheck = { elem: await query(this.elem, '.value-field .checkwrap input[type=checkbox]') };
         res.deleteBtn = { elem: await query(this.elem, '.delete-btn') };
 
-        if (
-            !res.fieldTypeField
-            || !res.operatorField
-            || !res.amountField
-            || !res.accountField
-            || !res.templateField
-            || !res.currencyField
-            || !res.propertyField
-            || !res.textField
-            || !res.fieldValueCheck.elem
-            || !res.deleteBtn.elem
-        ) {
-            throw new Error('Invalid structure of import condition form');
-        }
+        assert(
+            res.fieldTypeField
+            && res.operatorField
+            && res.amountField
+            && res.accountField
+            && res.templateField
+            && res.currencyField
+            && res.propertyField
+            && res.textField
+            && res.fieldValueCheck.elem
+            && res.deleteBtn.elem,
+            'Invalid structure of import condition form',
+        );
 
         res.fieldValueCheck.checked = await prop(res.fieldValueCheck.elem, 'checked');
 
@@ -86,45 +86,38 @@ export class ImportConditionForm extends TestComponent {
     }
 
     mapField(field) {
-        if (!field || !field.title) {
-            throw new Error('Invalid field');
-        }
+        assert(field?.title, 'Invalid field');
 
+        let res = null;
         for (const name in fieldsMap) {
             if (fieldsMap[name] === field.title) {
-                return { name: `${name}Field`, component: field };
+                res = { name: `${name}Field`, component: field };
+                break;
             }
         }
 
-        throw new Error(`Unknown field '${field.title}'`);
+        assert(res, `Unknown field '${field.title}'`);
+        return res;
     }
 
     async parseField(elem) {
         const res = { elem };
 
-        if (!res.elem) {
-            throw new Error('Invalid field element');
-        }
+        assert(res.elem, 'Invalid field element');
 
         res.labelElem = await query(elem, ':scope > label');
-        if (!res.labelElem) {
-            throw new Error('Invalid structure of field element');
-        }
+        assert(res.labelElem, 'Invalid structure of field element');
         res.title = await prop(res.labelElem, 'textContent');
 
         const dropDownElem = await query(elem, '.dd__container');
         if (dropDownElem) {
             res.dropDown = await DropDown.create(this, dropDownElem);
-            if (!res.dropDown) {
-                throw new Error('Invalid structure of field element');
-            }
+            assert(res.dropDown, 'Invalid structure of field element');
             res.disabled = res.dropDown.content.disabled;
             res.value = res.dropDown.content.value;
         } else {
             res.inputElem = await query(elem, ':scope > div > *');
-            if (!res.inputElem) {
-                throw new Error('Invalid structure of field element');
-            }
+            assert(res.inputElem, 'Invalid structure of field element');
             res.disabled = await prop(res.inputElem, 'disabled');
             res.value = await prop(res.inputElem, 'value');
         }
@@ -139,18 +132,14 @@ export class ImportConditionForm extends TestComponent {
             return 'property';
         }
 
-        if (!(model.fieldType in fieldValueMap)) {
-            throw new Error(`Invalid field type: ${model.fieldType}`);
-        }
+        assert(model.fieldType in fieldValueMap, `Invalid field type: ${model.fieldType}`);
 
         return fieldValueMap[model.fieldType];
     }
 
     static getStateValue(model) {
         const name = this.getStateName(model);
-        if (!(name in model)) {
-            throw new Error(`Invalid property: '${name}'`);
-        }
+        assert(name in model, `Invalid property: '${name}'`);
 
         return model[name];
     }
@@ -218,9 +207,7 @@ export class ImportConditionForm extends TestComponent {
     }
 
     async changeValue(name, value) {
-        if (this.model.state !== name) {
-            throw new Error(`Invalid state ${this.model.state} expected ${name}`);
-        }
+        assert(this.model.state === name, `Invalid state ${this.model.state} expected ${name}`);
 
         this.model[name] = value;
         this.model.value = ImportConditionForm.getStateValue(this.model);

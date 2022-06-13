@@ -1,4 +1,9 @@
-import { test, baseUrl, httpReq } from 'jezve-test';
+import {
+    test,
+    assert,
+    baseUrl,
+    httpReq,
+} from 'jezve-test';
 
 export const checkAccess = async (url) => {
     await test(`Check access to ${url}`, async () => {
@@ -19,11 +24,11 @@ export const checkAccess = async (url) => {
             const isRestricted = restrictedLocations.some(
                 (location) => resp.url.startsWith(base + location),
             );
-            if (resp.status >= 200 && resp.status < 300 && isRestricted) {
-                throw new Error(`Invalid location: ${resp.url}`);
+            if (isRestricted) {
+                assert(resp.status >= 300, `Invalid location: ${resp.url}`);
             }
-        } else if (resp.status !== 200) {
-            throw new Error(`Invalid response status: ${resp.status}. 200 is expected`);
+        } else {
+            assert(resp.status === 200, `Invalid response status: ${resp.status}. 200 is expected`);
         }
 
         return true;

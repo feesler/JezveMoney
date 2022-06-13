@@ -1,4 +1,9 @@
-import { query, navigation, click } from 'jezve-test';
+import {
+    assert,
+    query,
+    navigation,
+    click,
+} from 'jezve-test';
 import { AppView } from './AppView.js';
 import { LoginView } from './LoginView.js';
 import { App } from '../Application.js';
@@ -15,15 +20,14 @@ export class RegisterView extends AppView {
             loginLink: await query('.form-controls .alter_link > a'),
         };
 
-        if (
-            !res.loginInp
-            || !res.nameInp
-            || !res.passwordInp
-            || !res.submitBtn
-            || !res.loginLink
-        ) {
-            throw new Error('Invalid structure of register view');
-        }
+        assert(
+            res.loginInp
+            && res.nameInp
+            && res.passwordInp
+            && res.submitBtn
+            && res.loginLink,
+            'Invalid structure of register view',
+        );
 
         return res;
     }
@@ -65,9 +69,7 @@ export class RegisterView extends AppView {
 
         if (this.isValid()) {
             await navigation(action);
-            if (!(App.view instanceof LoginView)) {
-                throw new Error('Unexpected view');
-            }
+            assert.instanceOf(App.view, LoginView, 'Unexpected view');
         } else {
             await this.performAction(action);
         }
@@ -76,8 +78,6 @@ export class RegisterView extends AppView {
     async goToLogin() {
         await navigation(() => click(this.content.loginLink));
 
-        if (!(App.view instanceof LoginView)) {
-            throw new Error('Unexpected page');
-        }
+        assert.instanceOf(App.view, LoginView, 'Unexpected page');
     }
 }

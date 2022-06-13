@@ -1,5 +1,6 @@
 import {
     TestView,
+    assert,
     url,
     navigation,
     query,
@@ -32,17 +33,13 @@ export class AppView extends TestView {
     }
 
     async goToProfile() {
-        if (!this.isUserLoggedIn()) {
-            throw new Error('User is not logged in');
-        }
+        assert(this.isUserLoggedIn(), 'User is not logged in');
 
         await navigation(() => this.content.header.clickProfileMenuItem());
     }
 
     async goToAbout() {
-        if (!this.isUserLoggedIn()) {
-            throw new Error('User is not logged in');
-        }
+        assert(this.isUserLoggedIn(), 'User is not logged in');
 
         await navigation(() => this.content.header.clickAboutMenuItem());
     }
@@ -52,9 +49,7 @@ export class AppView extends TestView {
     }
 
     async goToMainView() {
-        if (!this.isUserLoggedIn()) {
-            throw new Error('User not logged in');
-        }
+        assert(this.isUserLoggedIn(), 'User not logged in');
 
         await navigation(() => this.content.header.clickLogo());
     }

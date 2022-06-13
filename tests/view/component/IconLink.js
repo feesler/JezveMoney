@@ -1,5 +1,6 @@
 import {
     TestComponent,
+    assert,
     query,
     prop,
     hasClass,
@@ -12,17 +13,14 @@ export class IconLink extends TestComponent {
             return {};
         }
 
-        if (!await hasClass(this.elem, 'iconlink')) {
-            throw new Error('Wrong icon link');
-        }
+        const validClass = await hasClass(this.elem, 'iconlink');
+        assert(validClass, 'Wrong icon link');
 
         const res = {
             linkElem: await query(this.elem, ':scope > *'),
         };
 
-        if (!res.linkElem) {
-            throw new Error('Link element not found');
-        }
+        assert(res.linkElem, 'Link element not found');
 
         const tagName = await prop(res.linkElem, 'tagName');
         if (tagName === 'A') {
@@ -31,9 +29,7 @@ export class IconLink extends TestComponent {
 
         res.titleElem = await query(res.linkElem, '.iconlink__content');
         const titleInner = await query(res.titleElem, ':scope > *');
-        if (!titleInner) {
-            throw new Error('Title element not found');
-        }
+        assert(titleInner, 'Title element not found');
         res.title = await prop(titleInner, 'textContent');
 
         // Subtitle is optional
