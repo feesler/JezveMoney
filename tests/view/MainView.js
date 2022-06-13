@@ -1,7 +1,7 @@
 import { navigation, queryAll } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
-import { TransactionList } from './component/TransactionList.js';
+import { TransactionList } from './component/TransactionList/TransactionList.js';
 import { TilesList } from './component/TilesList.js';
 import { InfoTile } from './component/InfoTile.js';
 import { Widget } from './component/Widget/Widget.js';

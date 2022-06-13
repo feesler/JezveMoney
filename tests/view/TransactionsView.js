@@ -19,9 +19,9 @@ import { WarningPopup } from './component/WarningPopup.js';
 import { TransactionTypeMenu } from './component/TransactionTypeMenu.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
 import { Paginator } from './component/Paginator.js';
-import { ModeSelector } from './component/ModeSelector.js';
-import { SearchForm } from './component/SearchForm.js';
-import { TransactionList } from './component/TransactionList.js';
+import { ModeSelector } from './component/TransactionList/ModeSelector.js';
+import { SearchForm } from './component/TransactionList/SearchForm.js';
+import { TransactionList } from './component/TransactionList/TransactionList.js';
 import { fixDate } from '../common.js';
 import { Toolbar } from './component/Toolbar.js';
 

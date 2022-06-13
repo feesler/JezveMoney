@@ -8,7 +8,7 @@ import {
     availTransTypes,
 } from '../model/Transaction.js';
 import { api } from '../model/api.js';
-import * as TransactionListTests from '../run/transactions.js';
+import * as TransactionListTests from '../run/transactionList.js';
 import { App } from '../Application.js';
 
 let scenario = null;

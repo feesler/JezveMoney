@@ -5,7 +5,7 @@ import {
     hasClass,
 } from 'jezve-test';
 import { TransactionListItem } from './TransactionListItem.js';
-import { asyncMap } from '../../common.js';
+import { asyncMap } from '../../../common.js';
 
 export class TransactionList extends TestComponent {
     async parseContent() {

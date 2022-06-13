@@ -5,13 +5,13 @@ import {
     hasClass,
     click,
 } from 'jezve-test';
-import { Currency } from '../../model/Currency.js';
+import { Currency } from '../../../model/Currency.js';
 import {
     EXPENSE,
     INCOME,
     TRANSFER,
     DEBT,
-} from '../../model/Transaction.js';
+} from '../../../model/Transaction.js';
 
 export class TransactionListItem extends TestComponent {
     async parseContent() {
