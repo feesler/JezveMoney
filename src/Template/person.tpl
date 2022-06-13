@@ -1,5 +1,5 @@
 <?php
-use JezveMoney\App\Template\IconLink;
+use JezveMoney\App\Template\Component\IconLink;
 
 include(TPL_PATH."commonhdr.tpl");	?>
 </head>

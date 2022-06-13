@@ -1,7 +1,7 @@
 <?php
-use JezveMoney\App\Template\TransactionList;
-use JezveMoney\App\Template\IconLink;
-use JezveMoney\App\Template\Paginator;
+use JezveMoney\App\Template\Component\TransactionList;
+use JezveMoney\App\Template\Component\IconLink;
+use JezveMoney\App\Template\Component\Paginator;
 
 include(TPL_PATH."commonhdr.tpl");
 ?>

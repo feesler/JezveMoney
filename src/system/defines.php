@@ -104,8 +104,8 @@ function defineHostConstants()
 
     define("BASEURL", APP_PROTOCOL . APP_HOST . APP_PATH);
 
-    define("TPL_PATH", pathJoin(APP_ROOT, "view", "templates"));
-    define("ADMIN_TPL_PATH", pathJoin(APP_ROOT, "admin", "view", "templates"));
+    define("TPL_PATH", pathJoin(APP_ROOT, "Template"));
+    define("ADMIN_TPL_PATH", pathJoin(APP_ROOT, "admin", "Template"));
     define("UPLOAD_PATH", pathJoin(APP_ROOT, "system", "uploads"));
     define("LOGS_PATH", pathJoin(APP_ROOT, "system", "logs"));
 }

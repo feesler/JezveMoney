@@ -1,6 +1,6 @@
 <?php
-use JezveMoney\App\Template\TransactionList;
-use JezveMoney\App\Template\Tile;
+use JezveMoney\App\Template\Component\TransactionList;
+use JezveMoney\App\Template\Component\Tile;
 
 include(TPL_PATH."commonhdr.tpl");	?>
 </head>
