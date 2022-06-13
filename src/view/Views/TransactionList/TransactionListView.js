@@ -6,8 +6,6 @@ import {
     isDate,
     urlJoin,
     isEmpty,
-    insertAfter,
-    prependChild,
     removeChilds,
     setEvents,
     setEmptyClick,
@@ -19,13 +17,7 @@ import { DatePicker } from 'jezvejs/DatePicker';
 import { Paginator } from 'jezvejs/Paginator';
 import { Sortable } from 'jezvejs/Sortable';
 import { Selection } from 'jezvejs/Selection';
-import {
-    EXPENSE,
-    INCOME,
-    TRANSFER,
-    DEBT,
-    createMessage,
-} from '../../js/app.js';
+import { createMessage } from '../../js/app.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
@@ -141,7 +133,6 @@ class TransactionListView extends View {
         this.listItems = document.querySelector('.trans-list');
         if (this.listItems) {
             this.trListSortable = new Sortable({
-                ondragstart: (elem) => this.onTransDragStart(elem),
                 oninsertat: (elem, ref) => this.onTransPosChanged(elem, ref),
                 container: this.listItems,
                 group: 'transactions',
@@ -150,12 +141,6 @@ class TransactionListView extends View {
                 copyWidth: true,
                 table: (this.state.mode === 'details'),
             });
-
-            /**
-             * dragFrom is transaction id before transaction started to drag
-             * 0 if drag first transaction, -1 if no draggin currently
-             */
-            this.trListSortable.dragFrom = -1;
 
             this.listItems.addEventListener('click', (e) => this.onTransClick(e));
         }
@@ -206,7 +191,8 @@ class TransactionListView extends View {
      * @param {number} pos - new position of specified transaction
      */
     setPosition(transactionId, pos) {
-        const posCompare = (a, b) => a.pos - b.pos;
+        const posCompareAsc = (a, b) => a.pos - b.pos;
+        const posCompareDesc = (a, b) => b.pos - a.pos;
         const initBalArr = [];
         const tBalanceArr = [];
 
@@ -220,7 +206,7 @@ class TransactionListView extends View {
             return true;
         }
 
-        this.state.items.sort(posCompare);
+        this.state.items.sort(posCompareAsc);
         this.state.items.forEach((transaction) => {
             const tr = transaction;
             if (tr.id === transactionId) {
@@ -252,7 +238,7 @@ class TransactionListView extends View {
         });
 
         // Sort array of transaction by position again
-        this.state.items.sort(posCompare);
+        this.state.items.sort(posCompareAsc);
 
         if (this.state.mode === 'details') {
             this.state.items.forEach((transaction) => {
@@ -285,6 +271,9 @@ class TransactionListView extends View {
                 tBalanceArr[tr.dest_id] = tr.dest_result;
             });
         }
+
+        this.state.items.sort(posCompareDesc);
+        this.render(this.state);
 
         return true;
     }
@@ -321,49 +310,6 @@ class TransactionListView extends View {
         } else {
             tr.dest_result = 0;
         }
-
-        const transItemElem = this.findListItemById(tr.id);
-        if (!transItemElem) {
-            return;
-        }
-        const transBalanceItem = transItemElem.querySelector('.tritem_balance');
-        if (!transBalanceItem) {
-            return;
-        }
-
-        removeChilds(transBalanceItem);
-
-        const currencyModel = window.app.model.currency;
-
-        if (tr.type === EXPENSE
-            || tr.type === TRANSFER
-            || (tr.type === DEBT && tr.src_id !== 0)) {
-            const balSpan = ce('span');
-            balSpan.textContent = currencyModel.formatCurrency(
-                tr.src_result,
-                tr.src_curr,
-            );
-            transBalanceItem.appendChild(balSpan);
-        }
-
-        if (tr.type === INCOME
-            || tr.type === TRANSFER
-            || (tr.type === DEBT && tr.dest_id !== 0)) {
-            const balSpan = ce('span');
-            balSpan.textContent = currencyModel.formatCurrency(
-                tr.dest_result,
-                tr.dest_curr,
-            );
-            transBalanceItem.appendChild(balSpan);
-        }
-    }
-
-    /**
-     * Look for list item with specified identifier
-     * @param {number} id - transaction identifier
-     */
-    findListItemById(id) {
-        return this.listItems.querySelector(`[data-id="${id}"]`);
     }
 
     /**
@@ -439,28 +385,8 @@ class TransactionListView extends View {
      * Cancel local changes on transaction position update fail
      * @param {number} trans_id - identifier of transaction
      */
-    cancelPosChange(transactionId) {
-        if (!this.trListSortable || this.trListSortable.dragFrom === -1) {
-            return;
-        }
-
-        const origTr = this.findListItemById(transactionId);
-        if (!origTr || !origTr.parentNode) {
-            return;
-        }
-
-        const origWrap = origTr.parentNode;
-        if (this.trListSortable.dragFrom === 0) {
-            prependChild(origWrap.parentNode, origWrap);
-        } else {
-            const trBefore = this.findListItemById(this.trListSortable.dragFrom);
-            if (!trBefore || !trBefore.parentNode) {
-                return;
-            }
-
-            const trBeforeWrap = trBefore.parentNode;
-            insertAfter(origWrap, trBeforeWrap);
-        }
+    cancelPosChange() {
+        this.render(this.state);
 
         createMessage(MSG_SET_POS_FAIL, 'msg_error');
     }
@@ -495,19 +421,6 @@ class TransactionListView extends View {
         }
 
         return parseInt(listItemElem.dataset.id, 10);
-    }
-
-    /**
-     * Transaction drag start event handler
-     * @param {Element} elem - transaction list item element
-     */
-    onTransDragStart(elem) {
-        if (!this.trListSortable || !elem) {
-            return;
-        }
-
-        const prevElem = elem.previousElementSibling;
-        this.trListSortable.dragFrom = this.transIdFromElem(prevElem);
     }
 
     /**
