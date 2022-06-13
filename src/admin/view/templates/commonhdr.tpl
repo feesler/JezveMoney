@@ -11,4 +11,4 @@
 <?php	foreach($this->cssAdmin as $cssFile) {	?>
 <link rel="stylesheet" type="text/css" href="<?=e(BASEURL.auto_version("admin/view/css/".$cssFile))?>">
 <?php	}	?>
-<link rel="stylesheet" type="text/css" href="<?=e(BASEURL."admin/view/themes/".$this->themeStylesheet)?>">
+<link rel="stylesheet" type="text/css" href="<?=e(BASEURL."admin/view/css/themes/".$this->themeStylesheet)?>">

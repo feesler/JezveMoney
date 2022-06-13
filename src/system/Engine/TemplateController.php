@@ -19,7 +19,7 @@ abstract class TemplateController extends Controller
     protected $user_name = null;
     protected $user_id = 0;
     protected $owner_id = 0;
-    protected $themesPath = "view/themes/";
+    protected $themesPath = "view/css/themes/";
 
 
     abstract public function index();

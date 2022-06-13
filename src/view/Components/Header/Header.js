@@ -73,7 +73,7 @@ export class Header extends Component {
 
         const linkElem = ge('theme-style');
         if (linkElem) {
-            linkElem.href = `${baseURL}view/themes/${themes[newTheme].file}`;
+            linkElem.href = `${baseURL}view/css/themes/${themes[newTheme].file}`;
         }
 
         document.body.className = themes[newTheme].className;
