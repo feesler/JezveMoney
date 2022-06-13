@@ -1,7 +1,6 @@
 import 'jezvejs/style';
 import {
     ge,
-    copyObject,
     isNum,
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
@@ -26,13 +25,18 @@ class AccountView extends View {
     constructor(...args) {
         super(...args);
 
-        this.model = {
+        this.state = {
             nameChanged: false,
+            validation: {
+                initbalance: true,
+                name: true,
+            },
         };
 
         if (this.props.account) {
-            this.model.original = this.props.account;
-            this.model.data = copyObject(this.model.original);
+            this.state.original = this.props.account;
+            this.state.data = { ...this.state.original };
+            this.state.data.fInitBalance = normalize(this.state.data.initbalance);
         }
     }
 
@@ -83,7 +87,7 @@ class AccountView extends View {
         }
 
         // Update mode
-        if (this.model.original.id) {
+        if (this.state.original.id) {
             this.deleteBtn = IconLink.fromElement({
                 elem: 'del_btn',
                 onclick: () => this.confirmDelete(),
@@ -116,8 +120,8 @@ class AccountView extends View {
             return;
         }
 
-        this.model.data.icon_id = obj.id;
-        this.updateAccountTile();
+        this.state.data.icon_id = obj.id;
+        this.render(this.state);
     }
 
     /**
@@ -128,9 +132,8 @@ class AccountView extends View {
             return;
         }
 
-        this.model.data.curr_id = obj.id;
-        this.setCurrencySign(this.model.data.curr_id);
-        this.updateAccountTile();
+        this.state.data.curr_id = obj.id;
+        this.render(this.state);
     }
 
     /**
@@ -141,44 +144,44 @@ class AccountView extends View {
             return;
         }
 
-        this.clearBlockValidation('initbal-inp-block');
-        this.model.data.initbalance = normalize(e.target.value);
-        this.updateAccountTile();
+        this.state.validation.initbalance = true;
+        this.state.data.initbalance = e.target.value;
+        this.state.data.fInitBalance = normalize(e.target.value);
+        this.render(this.state);
     }
 
     /**
      * Account name input event handler
      */
     onNameInput() {
-        this.clearBlockValidation('name-inp-block');
-
-        this.model.nameChanged = true;
-        this.model.data.name = this.nameInp.value;
-        this.updateAccountTile();
+        this.state.nameChanged = true;
+        this.state.validation.name = true;
+        this.state.data.name = this.nameInp.value;
+        this.render(this.state);
     }
 
     /**
      * Form submit event handler
      */
     onSubmit(e) {
+        const { name, initbalance } = this.state.data;
         let valid = true;
 
-        if (!this.nameInp.value || this.nameInp.value.length < 1) {
-            this.invalidateBlock('name-inp-block');
+        if (name.length === 0) {
+            this.state.validation.name = false;
             this.nameInp.focus();
             valid = false;
         }
 
-        if (!this.balanceInp.value
-            || this.balanceInp.value.length < 1
-            || !isNum(this.balanceInp.value)) {
-            this.invalidateBlock('initbal-inp-block');
+        if (initbalance.length === 0 || !isNum(initbalance)) {
+            this.state.validation.initbalance = false;
             this.balanceInp.focus();
             valid = false;
         }
 
         if (!valid) {
             e.preventDefault();
+            this.render(this.state);
         }
     }
 
@@ -186,7 +189,7 @@ class AccountView extends View {
      * Show account delete confirmation popup
      */
     confirmDelete() {
-        if (!this.model.data.id) {
+        if (!this.state.data.id) {
             return;
         }
 
@@ -198,36 +201,48 @@ class AccountView extends View {
         });
     }
 
-    /**
-     * Set currency sign
-     */
-    setCurrencySign(currencyId) {
-        const currencyObj = window.app.model.currency.getItem(currencyId);
-        if (!currencyObj) {
-            return;
+    render(state) {
+        if (!state) {
+            throw new Error('Invalid state');
         }
 
-        this.currencySign.textContent = currencyObj.sign;
-    }
+        // Render account tile
+        let tileTitle = state.data.name;
+        const bal = state.original.balance
+            + state.data.fInitBalance - state.original.initbalance;
 
-    /**
-     * Render account tile with the current model data
-     */
-    updateAccountTile() {
-        let tileTitle = this.model.data.name;
-        const bal = this.model.original.balance
-            + this.model.data.initbalance - this.model.original.initbalance;
-
-        if (!this.model.original.id && !this.model.nameChanged) {
+        if (!state.original.id && !state.nameChanged) {
             tileTitle = TITLE_NEW_ACCOUNT;
         }
 
         this.tile.render({
             name: tileTitle,
             balance: bal,
-            curr_id: this.model.data.curr_id,
-            icon_id: this.model.data.icon_id,
+            curr_id: state.data.curr_id,
+            icon_id: state.data.icon_id,
         });
+
+        // Currency sign
+        const currencyObj = window.app.model.currency.getItem(state.data.curr_id);
+        if (!currencyObj) {
+            throw new Error('Currency not found');
+        }
+
+        this.currencySign.textContent = currencyObj.sign;
+
+        // Name input
+        if (state.validation.name) {
+            this.clearBlockValidation('name-inp-block');
+        } else {
+            this.invalidateBlock('name-inp-block');
+        }
+
+        // Initial balance input
+        if (state.validation.initbalance) {
+            this.clearBlockValidation('initbal-inp-block');
+        } else {
+            this.invalidateBlock('initbal-inp-block');
+        }
     }
 }
 

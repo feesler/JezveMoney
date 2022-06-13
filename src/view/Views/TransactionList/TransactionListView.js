@@ -54,10 +54,6 @@ class TransactionListView extends View {
     constructor(...args) {
         super(...args);
 
-        this.model = {
-            selDateRange: null,
-        };
-
         this.state = {
             items: [...this.props.transArr],
             filter: { ...this.props.filterObj },
@@ -66,6 +62,7 @@ class TransactionListView extends View {
             loading: false,
             renderTime: Date.now(),
             selectedItems: new Selection(),
+            selDateRange: null,
         };
     }
 
@@ -677,7 +674,7 @@ class TransactionListView extends View {
             return;
         }
 
-        this.model.selDateRange = range;
+        this.state.selDateRange = range;
         this.datePicker.hide();
         const start = formatDate(range.start);
         const end = formatDate(range.end);
@@ -689,12 +686,12 @@ class TransactionListView extends View {
      * Date picker hide callback
      */
     onDatePickerHide() {
-        if (!this.model.selDateRange) {
+        if (!this.state.selDateRange) {
             return;
         }
 
-        const newStartDate = formatDate(this.model.selDateRange.start);
-        const newEndDate = formatDate(this.model.selDateRange.end);
+        const newStartDate = formatDate(this.state.selDateRange.start);
+        const newEndDate = formatDate(this.state.selDateRange.end);
 
         if (this.state.filter.stdate === newStartDate
             && this.state.filter.enddate === newEndDate) {

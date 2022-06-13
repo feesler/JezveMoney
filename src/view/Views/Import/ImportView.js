@@ -34,7 +34,7 @@ class ImportView extends View {
     constructor(...args) {
         super(...args);
 
-        this.model = {
+        this.state = {
             transactionRows: [],
             mainAccount: null,
             transCache: null,
@@ -138,7 +138,7 @@ class ImportView extends View {
         if (!this.uploadDialog) {
             this.uploadDialog = new ImportUploadDialog({
                 parent: this,
-                mainAccount: this.model.mainAccount,
+                mainAccount: this.state.mainAccount,
                 elem: 'uploadDialog',
                 onaccountchange: (accountId) => this.onUploadAccChange(accountId),
                 onuploaddone: (items) => this.onImportDone(items),
@@ -154,7 +154,7 @@ class ImportView extends View {
 
         this.mapImportedItems(items);
 
-        this.updateItemsCount();
+        this.render(this.state);
     }
 
     /** Map data after template applied and request API for transactions in same date range */
@@ -169,8 +169,8 @@ class ImportView extends View {
                 throw new Error('Failed to map data row');
             }
 
-            item.pos = this.model.transactionRows.length;
-            this.model.transactionRows.push(item);
+            item.pos = this.state.transactionRows.length;
+            this.state.transactionRows.push(item);
             this.rowsContainer.appendChild(item.elem);
         });
 
@@ -188,11 +188,11 @@ class ImportView extends View {
 
         const item = new ImportTransactionItem({
             parent: this,
-            mainAccount: this.model.mainAccount,
+            mainAccount: this.state.mainAccount,
             originalData: data,
         });
 
-        if (this.model.rulesEnabled) {
+        if (this.state.rulesEnabled) {
             window.app.model.rules.applyTo(item);
         }
         item.render();
@@ -230,7 +230,7 @@ class ImportView extends View {
             count: 0,
             stdate: formatDate(new Date(importedDateRange.start)),
             enddate: formatDate(new Date(importedDateRange.end)),
-            acc_id: this.model.mainAccount.id,
+            acc_id: this.state.mainAccount.id,
         });
         // Send request
         ajax.get({
@@ -258,7 +258,7 @@ class ImportView extends View {
             return;
         }
 
-        this.model.transCache = jsondata.data.items;
+        this.state.transCache = jsondata.data.items;
         const importedItems = this.getImportedItems();
         importedItems.forEach((item) => {
             item.enable(true);
@@ -283,13 +283,13 @@ class ImportView extends View {
 
         /* Print transactions not matched to imported list */
         console.log('Not picked transactions:');
-        this.model.transCache.forEach((tr) => {
+        this.state.transCache.forEach((tr) => {
             if (!tr.picked) {
                 console.log(`id: ${tr.id} src_amount: ${tr.src_amount} dest_amount: ${tr.dest_amount} date: ${tr.date} comment: ${tr.comment}`);
             }
         });
 
-        this.updateItemsCount();
+        this.render(this.state);
         show(this.loadingInd, false);
         this.setRenderTime();
     }
@@ -325,14 +325,14 @@ class ImportView extends View {
 
     /** Return first found transaction with same date and amount as reference */
     findSameTransaction(reference) {
-        return this.model.transCache.find(
+        return this.state.transCache.find(
             (item) => (item && !item.picked && this.isSameTransaction(item, reference)),
         );
     }
 
     /** Initial account of upload change callback */
     onUploadAccChange(accountId) {
-        if (this.model.mainAccount.id === accountId) {
+        if (this.state.mainAccount.id === accountId) {
             return;
         }
 
@@ -352,46 +352,25 @@ class ImportView extends View {
             throw new Error('Account not found');
         }
 
-        this.model.mainAccount = account;
+        this.state.mainAccount = account;
     }
 
     /** Set positions of rows as they follows */
     updateRowsPos() {
-        const updatedRows = this.model.transactionRows.map((item, ind) => {
+        const updatedRows = this.state.transactionRows.map((item, ind) => {
             const res = item;
             res.pos = ind;
             return res;
         });
 
-        this.model.transactionRows = updatedRows;
-    }
-
-    /** Update count of total/enabled import items and perform related actions */
-    updateItemsCount() {
-        const hasItems = (this.model.transactionRows.length > 0);
-        const enabledList = this.getEnabledItems();
-
-        enable(this.submitBtn, (enabledList.length > 0));
-        this.enabledTransCountElem.textContent = enabledList.length;
-        this.transCountElem.textContent = this.model.transactionRows.length;
-
-        this.clearFormBtn.enable(hasItems);
-        if (hasItems) {
-            re(this.noDataMsg);
-            this.noDataMsg = null;
-        } else {
-            if (!this.noDataMsg) {
-                this.noDataMsg = ce('span', { className: 'nodata-message', textContent: MSG_NO_TRANSACTIONS });
-            }
-            this.rowsContainer.appendChild(this.noDataMsg);
-        }
+        this.state.transactionRows = updatedRows;
     }
 
     /** Remove all transaction rows */
     removeAllItems() {
-        this.model.transactionRows.forEach((item) => re(item.elem));
-        this.model.transactionRows = [];
-        this.updateItemsCount();
+        this.state.transactionRows.forEach((item) => re(item.elem));
+        this.state.transactionRows = [];
+        this.render(this.state);
     }
 
     /** Transaction item enable/disable event handler */
@@ -400,7 +379,7 @@ class ImportView extends View {
             return;
         }
 
-        this.updateItemsCount();
+        this.render(this.state);
     }
 
     /**
@@ -414,9 +393,9 @@ class ImportView extends View {
         }
 
         const delPos = item.pos;
-        this.model.transactionRows.splice(delPos, 1);
+        this.state.transactionRows.splice(delPos, 1);
         this.updateRowsPos();
-        this.updateItemsCount();
+        this.render(this.state);
 
         return true;
     }
@@ -424,22 +403,22 @@ class ImportView extends View {
     /** Add new transaction row and insert it into list */
     createItem() {
         this.updMainAccObj();
-        if (!this.model.mainAccount) {
+        if (!this.state.mainAccount) {
             return;
         }
 
         const item = ImportTransactionItem.create({
             parent: this,
-            mainAccount: this.model.mainAccount,
+            mainAccount: this.state.mainAccount,
         });
         item.enable(true);
         item.render();
 
         this.rowsContainer.appendChild(item.elem);
-        item.pos = this.model.transactionRows.length;
-        this.model.transactionRows.push(item);
+        item.pos = this.state.transactionRows.length;
+        this.state.transactionRows.push(item);
 
-        this.updateItemsCount();
+        this.render(this.state);
     }
 
     /**
@@ -447,18 +426,18 @@ class ImportView extends View {
      */
     onMainAccChange() {
         this.updMainAccObj();
-        if (!this.model.mainAccount) {
+        if (!this.state.mainAccount) {
             return;
         }
 
-        this.model.transactionRows.forEach(
-            (item) => item.onMainAccountChanged(this.model.mainAccount.id),
+        this.state.transactionRows.forEach(
+            (item) => item.onMainAccountChanged(this.state.mainAccount.id),
         );
 
         this.reApplyRules();
 
         if (this.uploadDialog) {
-            this.uploadDialog.setMainAccount(this.model.mainAccount);
+            this.uploadDialog.setMainAccount(this.state.mainAccount);
         }
 
         if (!this.uploadDialog || !this.uploadDialog.isVisible()) {
@@ -470,20 +449,20 @@ class ImportView extends View {
 
     /** Filter imported transaction items */
     getImportedItems() {
-        if (!this.model || !Array.isArray(this.model.transactionRows)) {
+        if (!this.state || !Array.isArray(this.state.transactionRows)) {
             throw new Error('Invalid state');
         }
 
-        return this.model.transactionRows.filter((item) => item.getOriginal() !== null);
+        return this.state.transactionRows.filter((item) => item.getOriginal() !== null);
     }
 
     /** Filter enabled transaction items */
     getEnabledItems() {
-        if (!this.model || !Array.isArray(this.model.transactionRows)) {
+        if (!this.state || !Array.isArray(this.state.transactionRows)) {
             throw new Error('Invalid state');
         }
 
-        return this.model.transactionRows.filter((item) => item.isEnabled());
+        return this.state.transactionRows.filter((item) => item.isEnabled());
     }
 
     /** Submit buttom 'click' event handler */
@@ -576,7 +555,7 @@ class ImportView extends View {
 
     /** Apply rules to imported items */
     reApplyRules() {
-        if (!this.model.rulesEnabled) {
+        if (!this.state.rulesEnabled) {
             return;
         }
 
@@ -592,23 +571,23 @@ class ImportView extends View {
 
     /** Rules checkbox 'change' event handler */
     onToggleEnableRules() {
-        this.model.rulesEnabled = !!this.rulesCheck.checked;
-        enable(this.rulesBtn, this.model.rulesEnabled);
+        this.state.rulesEnabled = !!this.rulesCheck.checked;
+        enable(this.rulesBtn, this.state.rulesEnabled);
 
         const importedItems = this.getImportedItems();
-        importedItems.forEach(function (item) {
-            if (this.model.rulesEnabled) {
+        importedItems.forEach((item) => {
+            if (this.state.rulesEnabled) {
                 window.app.model.rules.applyTo(item);
             } else {
                 item.restoreOriginal();
             }
             item.render();
-        }, this);
+        });
     }
 
     /** Rules button 'click' event handler */
     onRulesClick() {
-        if (!this.model.rulesEnabled) {
+        if (!this.state.rulesEnabled) {
             return;
         }
 
@@ -632,7 +611,7 @@ class ImportView extends View {
      * @param {Element} rowEl - row root element
      */
     getRowByElem(rowEl) {
-        return this.model.transactionRows.find((rowObj) => (rowEl === rowObj.elem));
+        return this.state.transactionRows.find((rowObj) => (rowEl === rowObj.elem));
     }
 
     /**
@@ -641,7 +620,7 @@ class ImportView extends View {
      * @param {Object} replaced - new item object
      */
     onTransPosChanged(original, replaced) {
-        if (this.model.transactionRows.length < 2) {
+        if (this.state.transactionRows.length < 2) {
             return;
         }
 
@@ -654,10 +633,34 @@ class ImportView extends View {
         if (!replacedItem) {
             return;
         }
-        const cutItem = this.model.transactionRows.splice(origItem.pos, 1)[0];
-        this.model.transactionRows.splice(replacedItem.pos, 0, cutItem);
+        const cutItem = this.state.transactionRows.splice(origItem.pos, 1)[0];
+        this.state.transactionRows.splice(replacedItem.pos, 0, cutItem);
 
         this.updateRowsPos();
+    }
+
+    render(state) {
+        if (!state) {
+            throw new Error('Invalid state');
+        }
+
+        const hasItems = (state.transactionRows.length > 0);
+        const enabledList = this.getEnabledItems();
+
+        enable(this.submitBtn, (enabledList.length > 0));
+        this.enabledTransCountElem.textContent = enabledList.length;
+        this.transCountElem.textContent = state.transactionRows.length;
+
+        this.clearFormBtn.enable(hasItems);
+        if (hasItems) {
+            re(this.noDataMsg);
+            this.noDataMsg = null;
+        } else {
+            if (!this.noDataMsg) {
+                this.noDataMsg = ce('span', { className: 'nodata-message', textContent: MSG_NO_TRANSACTIONS });
+            }
+            this.rowsContainer.appendChild(this.noDataMsg);
+        }
     }
 }
 
