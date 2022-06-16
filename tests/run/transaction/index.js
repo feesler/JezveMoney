@@ -183,9 +183,14 @@ export const create = async (type, params, submitHandler) => {
     setBlock(`Create ${Transaction.typeToString(type)} (${formatProps(params)})`, 2);
 
     // Navigate to create transaction page
-    const accNum = ('fromAccount' in params) ? params.fromAccount : 0;
     await App.goToMainView();
-    await App.view.goToNewTransactionByAccount(accNum);
+
+    if ('fromPerson' in params) {
+        await App.view.goToNewTransactionByPerson(params.fromPerson);
+    } else {
+        const accNum = ('fromAccount' in params) ? params.fromAccount : 0;
+        await App.view.goToNewTransactionByAccount(accNum);
+    }
 
     if (!App.view.content.typeMenu.isSingleSelected(type)) {
         await App.view.changeTransactionType(type);

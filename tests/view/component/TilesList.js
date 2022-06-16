@@ -18,6 +18,10 @@ export class TilesList extends TestComponent {
         this.tileClass = tileClass;
     }
 
+    get items() {
+        return this.content.items;
+    }
+
     async parseContent() {
         const res = {
             items: [],
@@ -95,25 +99,23 @@ export class TilesList extends TestComponent {
         return res;
     }
 
-    static renderPersons(personsList, tileClass = Tile) {
+    static renderPersons(personsList, withDebts) {
         assert.instanceOf(personsList, PersonsList, 'Invalid data');
-        assert(tileClass, 'Invalid tile constructor specified');
 
         const visiblePersons = personsList.getVisible(true);
         const res = {
-            items: visiblePersons.map(tileClass.renderPerson),
+            items: visiblePersons.map((p) => Tile.renderPerson(p, withDebts)),
         };
 
         return res;
     }
 
-    static renderHiddenPersons(personsList, tileClass = Tile) {
+    static renderHiddenPersons(personsList) {
         assert.instanceOf(personsList, PersonsList, 'Invalid data');
-        assert(tileClass, 'Invalid tile constructor specified');
 
         const hiddenPersons = personsList.getHidden(true);
         const res = {
-            items: hiddenPersons.map(tileClass.renderPerson),
+            items: hiddenPersons.map((p) => Tile.renderPerson(p, false)),
         };
 
         return res;

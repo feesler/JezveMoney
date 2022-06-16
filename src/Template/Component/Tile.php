@@ -26,6 +26,14 @@ class Tile extends TemplateComponent
             $data["type"] = "none";
         }
 
+        if (isset($data["subtitle"])) {
+            if (is_array($data["subtitle"])) {
+                $data["subtitle"] = implode("<br>", array_map("e", $data["subtitle"]));
+            } else {
+                $data["subtitle"] = e($data["subtitle"]);
+            }
+        }
+
         return self::renderTemplate($data);
     }
 }

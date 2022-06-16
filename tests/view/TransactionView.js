@@ -1688,7 +1688,7 @@ export class TransactionView extends AppView {
 
         if (this.model.type === EXPENSE) {
             const availStates = [0, 2, 3];
-            assert(availStates.includes(this.model.state), 'Unexpected state');
+            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
 
             if (this.model.state === 0) {
                 this.setExpectedState(1);
@@ -1697,7 +1697,7 @@ export class TransactionView extends AppView {
             }
         } else if (this.model.type === TRANSFER) {
             const availStates = [0, 2, 3, 5, 7];
-            assert(availStates.includes(this.model.state), 'Unexpected state');
+            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
 
             if (this.model.state === 0 || this.model.state === 2) {
                 this.setExpectedState(1); // Transition 1 or 10
@@ -1710,7 +1710,7 @@ export class TransactionView extends AppView {
             }
         } else if (this.model.type === DEBT) {
             const availStates = [0, 2, 3, 4, 6];
-            assert(availStates.includes(this.model.state), 'Unexpected state');
+            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
 
             if (this.model.state === 0 || this.model.state === 2) {
                 this.setExpectedState(1); // Transition 1 or 4
@@ -1750,7 +1750,7 @@ export class TransactionView extends AppView {
             }
         } else if (this.model.type === DEBT) {
             const availStates = [0, 1, 3, 5, 7];
-            assert(availStates.includes(this.model.state), 'Unexpected state');
+            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
 
             if (this.model.state === 0 || this.model.state === 1) { // Transition 3 or 5
                 this.setExpectedState(2);
@@ -2076,7 +2076,7 @@ export class TransactionView extends AppView {
 
         if (this.model.debtType) {
             const availStates = [0, 1, 2, 6, 9];
-            assert(availStates.includes(this.model.state), 'Unexpected state');
+            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
 
             this.model.debtType = newValue;
 
@@ -2093,7 +2093,7 @@ export class TransactionView extends AppView {
             }
         } else {
             const availStates = [3, 4, 5, 7, 8];
-            assert(availStates.includes(this.model.state), 'Unexpected state');
+            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
 
             this.model.debtType = newValue;
             if (this.model.state === 3) { // Transition 8
@@ -2132,7 +2132,7 @@ export class TransactionView extends AppView {
             this.model.account = null;
 
             const availStates = [0, 2, 1, 3, 5, 4];
-            assert(availStates.includes(this.model.state), 'Unexpected state');
+            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
 
             if (this.model.state === 0 || this.model.state === 2) {
                 this.setExpectedState(6); // Transition 25 or 41
@@ -2162,7 +2162,7 @@ export class TransactionView extends AppView {
             }
 
             const availStates = [6, 7, 8, 9];
-            assert(availStates.includes(this.model.state), 'Unexpected state');
+            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
 
             if (this.model.state === 6) {
                 this.setExpectedState(0); // Transition 26

@@ -145,8 +145,10 @@ const createDebtTests = async () => {
     setBlock('Create debt transactions', 1);
 
     const data = [{
+        fromPerson: 0,
         srcAmount: '1000',
     }, {
+        fromPerson: 0,
         debtType: false,
         acc: 2,
         srcAmount: '200',
@@ -156,8 +158,8 @@ const createDebtTests = async () => {
         acc: 3,
         srcAmount: '100.0101',
     }, {
+        fromPerson: 1,
         debtType: false,
-        person: 1,
         acc: 3,
         srcAmount: '10',
         date: App.dates.yesterday,
@@ -166,8 +168,8 @@ const createDebtTests = async () => {
         srcAmount: '105',
         date: App.dates.yesterday,
     }, {
+        fromPerson: 1,
         debtType: false,
-        person: 1,
         acc: null,
         srcAmount: '105',
     }, {

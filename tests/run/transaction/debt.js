@@ -66,8 +66,7 @@ export const stateLoop = async () => {
 
     // Navigate to create debt view
     await App.goToMainView();
-    await App.view.goToNewTransactionByAccount(0);
-    await App.view.changeTransactionType(DEBT);
+    await App.view.goToNewTransactionByPerson(0);
 
     setBlock('Debt loop', 2);
     const initialState = (App.view.model.debtType) ? 0 : 3;
@@ -114,8 +113,6 @@ export const stateLoop = async () => {
     await TransactionTests.runGroup('inputResBalance', srbInputData);
 
     await TransactionTests.runActions([
-        // Transition 8: Change debt type to "give" and move from State 3 to State 0
-        { action: 'toggleDebtType' },
         // Transition 2: Click by source amount and move from State 1 to State 0
         { action: 'clickSrcAmount' },
         // Transition 3: Click by destination result balance and move from State 0 to State 2

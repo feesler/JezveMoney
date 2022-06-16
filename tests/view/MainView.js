@@ -3,10 +3,8 @@ import { AppView } from './AppView.js';
 import { App } from '../Application.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
 import { TilesList } from './component/TilesList.js';
-import { InfoTile } from './component/InfoTile.js';
 import { Widget } from './component/Widget/Widget.js';
-import { AccountsWidget } from './component/Widget/AccountsWidget.js';
-import { PersonsWidget } from './component/Widget/PersonsWidget.js';
+import { TilesWidget } from './component/Widget/TilesWidget.js';
 import { TransactionsWidget } from './component/Widget/TransactionsWidget.js';
 
 /** Main view class */
@@ -20,7 +18,7 @@ export class MainView extends AppView {
 
         const res = {};
 
-        res.accountsWidget = await AccountsWidget.create(
+        res.accountsWidget = await TilesWidget.create(
             this,
             widgets[App.config.AccountsWidgetPos],
         );
@@ -35,7 +33,7 @@ export class MainView extends AppView {
             widgets[App.config.LatestWidgetPos],
         );
 
-        res.personsWidget = await PersonsWidget.create(
+        res.personsWidget = await TilesWidget.create(
             this,
             widgets[App.config.PersonsWidgetPos],
         );
@@ -54,10 +52,10 @@ export class MainView extends AppView {
         await navigation(() => this.content.accountsWidget.clickByTitle());
     }
 
-    async goToNewTransactionByAccount(accNum) {
+    async goToNewTransactionByAccount(index) {
         assert(this.content.accountsWidget, 'Accounts widget not found');
 
-        await this.content.accountsWidget.clickAccountByIndex(accNum);
+        await this.content.accountsWidget.clickTileByIndex(index);
     }
 
     async goToTransactions() {
@@ -72,6 +70,12 @@ export class MainView extends AppView {
         await navigation(() => this.content.personsWidget.clickByTitle());
     }
 
+    async goToNewTransactionByPerson(index) {
+        assert(this.content.personsWidget, 'Persons widget not found');
+
+        await this.content.personsWidget.clickTileByIndex(index);
+    }
+
     async goToStatistics() {
         assert(this.content.statisticsWidget, 'Statistics widget not found');
 
@@ -83,6 +87,7 @@ export class MainView extends AppView {
 
         // Accounts widget
         res.accountsWidget = {
+            title: 'Accounts',
             tiles: TilesList.renderAccounts(state.accounts.getUserAccounts()),
         };
 
@@ -96,7 +101,8 @@ export class MainView extends AppView {
 
         // Persons widget
         res.personsWidget = {
-            infoTiles: TilesList.renderPersons(state.persons, InfoTile),
+            title: 'Persons',
+            tiles: TilesList.renderPersons(state.persons, true),
         };
 
         return res;

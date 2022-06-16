@@ -139,22 +139,6 @@ class TransactionView extends View {
             initialState.form.destAmount = transaction.dest_amount;
         }
 
-        if (initialState.srcAccount) {
-            const srcBalance = initialState.srcAccount.balance;
-            const srcResult = normalize(srcBalance - initialState.transaction.src_amount);
-
-            initialState.form.sourceResult = srcResult;
-            initialState.form.fSourceResult = srcResult;
-        }
-
-        if (initialState.destAccount) {
-            const destBalance = initialState.destAccount.balance;
-            const destResult = normalize(destBalance + initialState.transaction.dest_amount);
-
-            initialState.form.destResult = destResult;
-            initialState.form.fDestResult = destResult;
-        }
-
         if (transaction.type === EXPENSE || transaction.type === INCOME) {
             initialState.id = (initialState.isDiff) ? 2 : 0;
         } else if (transaction.type === TRANSFER) {
@@ -203,6 +187,22 @@ class TransactionView extends View {
                     }
                 }
             }
+        }
+
+        if (initialState.srcAccount) {
+            const srcBalance = initialState.srcAccount.balance;
+            const srcResult = normalize(srcBalance - initialState.transaction.src_amount);
+
+            initialState.form.sourceResult = srcResult;
+            initialState.form.fSourceResult = srcResult;
+        }
+
+        if (initialState.destAccount) {
+            const destBalance = initialState.destAccount.balance;
+            const destResult = normalize(destBalance + initialState.transaction.dest_amount);
+
+            initialState.form.destResult = destResult;
+            initialState.form.fDestResult = destResult;
         }
 
         const exchange = calculateExchange(initialState);
@@ -956,6 +956,7 @@ class TransactionView extends View {
             } else if (transaction.type === INCOME) {
                 url.searchParams.set('acc_id', transaction.dest_id);
             } else if (transaction.type === DEBT) {
+                url.searchParams.set('person_id', state.person.id);
                 if (transaction.noAccount) {
                     url.searchParams.delete('acc_id');
                 } else {
