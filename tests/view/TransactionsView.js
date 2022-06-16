@@ -53,6 +53,9 @@ export class TransactionsView extends AppView {
         res.accDropDown = await DropDown.createFromChild(this, await query('#acc_id'));
         assert(res.accDropDown, 'Account filter control not found');
 
+        res.personDropDown = await DropDown.createFromChild(this, await query('#person_id'));
+        assert(res.personDropDown, 'Person filter control not found');
+
         const calendarBtn = await query('#calendar_btn');
         res.dateFilter = await DatePickerFilter.create(this, await parentNode(calendarBtn));
         assert(res.dateFilter, 'Date filter not found');
@@ -90,6 +93,7 @@ export class TransactionsView extends AppView {
         res.filter = {
             type: cont.typeMenu.getSelectedTypes(),
             accounts: cont.accDropDown.getSelectedValues().map((item) => parseInt(item, 10)),
+            persons: cont.personDropDown.getSelectedValues().map((item) => parseInt(item, 10)),
             search: cont.searchForm.content.value,
         };
         const dateRange = cont.dateFilter.getSelectedRange();
@@ -185,6 +189,10 @@ export class TransactionsView extends AppView {
             params.acc_id = this.model.filter.accounts;
         }
 
+        if (this.model.filter.persons.length > 0) {
+            params.person_id = this.model.filter.persons;
+        }
+
         if (this.model.filter.search.length > 0) {
             params.search = this.model.filter.search;
         }
@@ -239,6 +247,13 @@ export class TransactionsView extends AppView {
                     (accountId) => ({ id: accountId.toString() }),
                 ),
             },
+            personDropDown: {
+                isMulti: true,
+                visible: true,
+                selectedItems: this.model.filter.persons.map(
+                    (personId) => ({ id: personId.toString() }),
+                ),
+            },
             searchForm: { value: this.model.filter.search, visible: true },
             modeSelector: { visible: isItemsAvailable },
             paginator: { visible: isItemsAvailable },
@@ -269,6 +284,19 @@ export class TransactionsView extends AppView {
             await goTo(this.getExpectedURL());
         } else {
             await this.waitForList(() => this.content.accDropDown.setSelection(accounts));
+        }
+
+        return App.view.checkState(expected);
+    }
+
+    async filterByPersons(persons, directNavigate = false) {
+        this.model.filter.persons = persons;
+        const expected = this.onFilterUpdate();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.personDropDown.setSelection(persons));
         }
 
         return App.view.checkState(expected);
@@ -514,6 +542,7 @@ export class TransactionsView extends AppView {
         this.model.filter = {
             type: [],
             accounts: [],
+            persons: [],
             search: '',
         };
         const expected = this.onFilterUpdate();

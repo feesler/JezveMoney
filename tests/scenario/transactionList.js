@@ -229,14 +229,9 @@ const setupTransactions = async (accountIds, personIds) => {
     }];
 
     // Check transactions already exists
-    const personsAccounts = personIds.flatMap((personId) => {
-        const person = App.state.persons.getItem(personId);
-        if (person && Array.isArray(person.accounts)) {
-            return person.accounts.map((item) => item.id);
-        }
-
-        return [];
-    });
+    const personsAccounts = personIds.flatMap(
+        (personId) => App.state.getPersonAccounts(personId),
+    );
 
     const trList = App.state.transactions.applyFilter({
         accounts: accountIds.concat(personsAccounts),
@@ -309,6 +304,9 @@ const runTests = async (directNavigate = false) => {
     }, {
         action: TransactionListTests.filterByAccounts,
         data: { accounts: [testData.accounts[2], testData.accounts[3]], directNavigate },
+    }, {
+        action: TransactionListTests.filterByPersons,
+        data: { persons: testData.persons[0], directNavigate },
     }, {
         action: TransactionListTests.filterByType,
         data: { type: 0, directNavigate },

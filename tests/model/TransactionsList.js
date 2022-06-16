@@ -306,8 +306,32 @@ export class TransactionsList extends List {
         if ('type' in params) {
             res = this.getItemsByType(res, params.type);
         }
-        if ('accounts' in params) {
-            res = this.getItemsByAccounts(res, params.accounts);
+        if ('accounts' in params || 'persons' in params) {
+            const filterAccounts = [];
+            if ('persons' in params) {
+                const personsFilter = Array.isArray(params.persons)
+                    ? params.persons
+                    : [params.persons];
+
+                personsFilter.forEach((personId) => {
+                    const personAccounts = App.state.getPersonAccounts(personId);
+                    if (personAccounts.length > 0) {
+                        filterAccounts.push(...personAccounts);
+                    } else {
+                        filterAccounts.push(-1);
+                    }
+                });
+            }
+
+            if ('accounts' in params) {
+                const accountsFilter = Array.isArray(params.accounts)
+                    ? params.accounts
+                    : [params.accounts];
+
+                filterAccounts.push(...accountsFilter);
+            }
+
+            res = this.getItemsByAccounts(res, filterAccounts);
         }
         if ('startDate' in params && 'endDate' in params) {
             res = this.getItemsByDate(res, params.startDate, params.endDate);

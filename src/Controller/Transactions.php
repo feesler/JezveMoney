@@ -79,6 +79,7 @@ class Transactions extends TemplateController
         $filterObj = $this->model->getFilterObject($trParams);
 
         $data["accFilter"] = isset($trParams["accounts"]) ? $trParams["accounts"] : [];
+        $data["personFilter"] = isset($trParams["persons"]) ? $trParams["persons"] : [];
         $data["searchReq"] = isset($trParams["search"]) ? $trParams["search"] : null;
 
         $dateFmt = "";
@@ -100,7 +101,9 @@ class Transactions extends TemplateController
 
         $data["accArr"] = $this->accModel->getData();
         $data["hiddenAccArr"] = $this->accModel->getData(["type" => "hidden"]);
-        $data["accounts"] = $this->accModel->getCount(["type" => "all"]);
+
+        $data["personArr"] = $this->personMod->getData();
+        $data["hiddenPersonArr"] = $this->personMod->getData(["type" => "hidden"]);
 
         $transArr = $this->model->getData($trParams);
 

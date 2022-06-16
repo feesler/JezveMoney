@@ -508,6 +508,15 @@ export class AppState {
     }
     /* eslint-enable no-bitwise */
 
+    getPersonAccounts(personId) {
+        const person = this.persons.getItem(personId);
+        if (person && Array.isArray(person.accounts)) {
+            return person.accounts.map((item) => item.id);
+        }
+
+        return [];
+    }
+
     getPersonAccount(personId, currencyId) {
         const pId = parseInt(personId, 10);
         const currId = parseInt(currencyId, 10);

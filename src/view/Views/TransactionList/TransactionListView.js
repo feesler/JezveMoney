@@ -81,6 +81,17 @@ class TransactionListView extends View {
             throw new Error('Failed to initialize Transaction List view');
         }
 
+        this.personDropDown = DropDown.create({
+            input_id: 'person_id',
+            placeholder: 'Select person',
+            onchange: (obj) => this.onPersonChange(obj),
+            editable: false,
+            extraClass: 'dd__fullwidth',
+        });
+        if (!this.personDropDown) {
+            throw new Error('Failed to initialize Transaction List view');
+        }
+
         this.searchFrm = ge('searchFrm');
         if (!this.searchFrm) {
             throw new Error('Failed to initialize Transaction List view');
@@ -469,6 +480,16 @@ class TransactionListView extends View {
             }
         }
 
+        if ('person_id' in locFilter) {
+            if (!Array.isArray(locFilter.person_id)) {
+                locFilter.person_id = [locFilter.person_id];
+            }
+
+            if (!locFilter.person_id.length) {
+                delete locFilter.person_id;
+            }
+        }
+
         if (!isEmpty(locFilter)) {
             newLocation += `?${urlJoin(locFilter)}`;
         }
@@ -526,6 +547,38 @@ class TransactionListView extends View {
 
         // Prepare parameters
         this.state.filter.acc_id = data.map((item) => parseInt(item.id, 10));
+        this.requestTransactions(this.state.filter);
+    }
+
+    /**
+     * Persons filter change event handler
+     * @param {object} obj - selection object
+     */
+    onPersonChange(obj) {
+        // Check all persons from the new selection present in current selection
+        const data = Array.isArray(obj) ? obj : [obj];
+        let reloadNeeded = data.some((item) => {
+            const id = parseInt(item.id, 10);
+
+            return (
+                !this.state.filter.person_id
+                || !this.state.filter.person_id.includes(id)
+            );
+        });
+
+        // Check all currenlty selected persons present in the new selection
+        if (!reloadNeeded) {
+            reloadNeeded = this.state.filter.person_id.some(
+                (personId) => !data.find((item) => item.id === personId),
+            );
+        }
+
+        if (!reloadNeeded) {
+            return;
+        }
+
+        // Prepare parameters
+        this.state.filter.person_id = data.map((item) => parseInt(item.id, 10));
         this.requestTransactions(this.state.filter);
     }
 
@@ -723,23 +776,8 @@ class TransactionListView extends View {
         this.stopLoading();
     }
 
-    render(state) {
-        if (state.loading) {
-            show(this.loadingIndicator, true);
-        }
-
-        const filterUrl = new URL(this.buildAddress());
-        filterUrl.searchParams.delete('page');
-        if (state.mode === 'details') {
-            filterUrl.searchParams.set('mode', 'details');
-        } else {
-            filterUrl.searchParams.delete('mode');
-        }
-
-        this.typeMenu.setURL(filterUrl);
-        this.typeMenu.setSelection(state.filter.type);
-
-        // Render accounts selection
+    /** Render accounts selection */
+    renderAccountsFilter(state) {
         const selectedAccounts = this.accountDropDown.getSelectedItems();
         const selectedIds = [];
         const idsToSelect = Array.isArray(state.filter.acc_id) ? state.filter.acc_id : [];
@@ -756,6 +794,46 @@ class TransactionListView extends View {
                 this.accountDropDown.selectItem(accountId.toString());
             }
         });
+    }
+
+    /** Render persons selection */
+    renderPersonsFilter(state) {
+        const selectedPersons = this.personDropDown.getSelectedItems();
+        const selectedIds = [];
+        const idsToSelect = Array.isArray(state.filter.person_id) ? state.filter.person_id : [];
+        selectedPersons.forEach((personItem) => {
+            const itemId = parseInt(personItem.id, 10);
+            selectedIds.push(itemId);
+
+            if (!idsToSelect.includes(itemId)) {
+                this.personDropDown.deselectItem(personItem.id);
+            }
+        });
+        idsToSelect.forEach((personId) => {
+            if (!selectedIds.includes(personId)) {
+                this.personDropDown.selectItem(personId.toString());
+            }
+        });
+    }
+
+    render(state) {
+        if (state.loading) {
+            show(this.loadingIndicator, true);
+        }
+
+        const filterUrl = new URL(this.buildAddress());
+        filterUrl.searchParams.delete('page');
+        if (state.mode === 'details') {
+            filterUrl.searchParams.set('mode', 'details');
+        } else {
+            filterUrl.searchParams.delete('mode');
+        }
+
+        this.typeMenu.setURL(filterUrl);
+        this.typeMenu.setSelection(state.filter.type);
+
+        this.renderAccountsFilter(state);
+        this.renderPersonsFilter(state);
 
         // Render date
         const dateSubtitle = (state.filter.stdate && state.filter.enddate)

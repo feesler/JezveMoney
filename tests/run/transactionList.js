@@ -141,6 +141,24 @@ export const filterByAccounts = async ({ accounts, directNavigate = false }) => 
     });
 };
 
+export const filterByPersons = async ({ persons, directNavigate = false }) => {
+    const itemIds = Array.isArray(persons) ? persons : [persons];
+
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    const personsNames = itemIds.map((personId) => {
+        const item = App.state.persons.getItem(personId);
+        return (item) ? item.name : `(${personId})`;
+    });
+
+    await test(`Filter by persons [${personsNames.join()}]`, async () => {
+        await App.view.filterByPersons(itemIds, directNavigate);
+        return App.view.iteratePages();
+    });
+};
+
 export const filterByDate = async ({ start, end, directNavigate = false }) => {
     if (!directNavigate) {
         await checkNavigation();
