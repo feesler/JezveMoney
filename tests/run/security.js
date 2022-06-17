@@ -5,9 +5,18 @@ import {
     httpReq,
 } from 'jezve-test';
 
+const restrictedLocations = [
+    'Controller',
+    'Model',
+    'view',
+    'system',
+    'vendor',
+    'composer.',
+    '.htaccess',
+];
+
 export const checkAccess = async (url) => {
     await test(`Check access to ${url}`, async () => {
-        const restrictedLocations = ['Controller', 'Model', 'view', 'system', 'vendor'];
         const isInvalidLocation = restrictedLocations.some(
             (location) => url.startsWith(location),
         );

@@ -14,6 +14,10 @@ export const securityTests = {
         setBlock('Security tests', 1);
 
         await scenario.runner.runGroup(SecurityTests.checkAccess, [
+            '.htaccess',
+            'composer.json',
+            'composer.lock',
+            'manifest.webmanifest',
             'system',
             'system/logs/log.txt',
             'Model/',
