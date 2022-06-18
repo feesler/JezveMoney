@@ -63,6 +63,9 @@ $phpPath = "$osPanelPath\modules\php\PHP_7.4"
 	npm update
 
 - Composer
+Build and navigate to dist directory
+    npm run build
+    cd dist
 Update packages:
 	composer update --no-dev
 Optimize autoload:

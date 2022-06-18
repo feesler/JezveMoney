@@ -2,13 +2,15 @@ import {
     test,
     copyObject,
     assert,
+    setBlock,
+    baseUrl,
+    goTo,
 } from 'jezve-test';
 import { formatProps, generateId } from '../common.js';
 import { PersonsView } from '../view/PersonsView.js';
 import { PersonView } from '../view/PersonView.js';
 import { MainView } from '../view/MainView.js';
 import { App } from '../Application.js';
-import { setBlock, baseUrl, goTo } from '../env.js';
 
 /** Navigate to persons list page */
 const checkNavigation = async () => {
@@ -19,9 +21,7 @@ const checkNavigation = async () => {
 };
 
 const submitPerson = async (params) => {
-    if (!(App.view instanceof PersonView)) {
-        throw new Error('Invalid view');
-    }
+    assert.instanceOf(App.view, PersonView, 'Invalid view');
 
     // Input account name
     if ('name' in params) {
@@ -33,8 +33,8 @@ const submitPerson = async (params) => {
 
     await App.view.submit();
 
-    if (validInput && !(App.view instanceof PersonsView)) {
-        throw new Error('Fail to submit person');
+    if (validInput) {
+        assert.instanceOf(App.view, PersonsView, 'Fail to submit person');
     }
 
     return res;
@@ -66,9 +66,7 @@ export const create = async (params) => {
 };
 
 export const update = async (params) => {
-    if (!params) {
-        throw new Error('No params specified');
-    }
+    assert(params, 'No params specified');
     const props = copyObject(params);
 
     let pos;
@@ -76,9 +74,7 @@ export const update = async (params) => {
         pos = App.state.persons.getIndexById(props.id);
     } else {
         pos = parseInt(props.pos, 10);
-        if (Number.isNaN(pos)) {
-            throw new Error('Position of person not specified');
-        }
+        assert(!Number.isNaN(pos), 'Position of person not specified');
         delete props.pos;
     }
 
@@ -89,9 +85,7 @@ export const update = async (params) => {
 
         const ids = App.state.getPersonsByIndexes(pos);
         const expectedPerson = App.state.persons.getItem(ids[0]);
-        if (!expectedPerson) {
-            throw new Error('Can not find specified person');
-        }
+        assert(expectedPerson, 'Can not find specified person');
 
         // Check initial state of view
         App.view.expectedState = {
@@ -137,9 +131,7 @@ export const del = async (persons) => {
 
 export const delFromUpdate = async (pos) => {
     const ind = parseInt(pos, 10);
-    if (Number.isNaN(ind) || ind < 0) {
-        throw new Error('Position of person not specified');
-    }
+    assert(!Number.isNaN(ind) && ind >= 0, 'Position of person not specified');
 
     await test(`Delete person from update view [${ind}]`, async () => {
         // Navigate to persons list view
@@ -240,9 +232,7 @@ export const securityTests = async () => {
 
     await test('Access to not existing person', async () => {
         await goTo(requestURL);
-        if (!(App.view instanceof PersonsView)) {
-            throw new Error('Invalid view');
-        }
+        assert(!(App.view instanceof PersonView), 'Invalid view');
 
         App.view.expectedState = {
             msgPopup: { success: false, message: 'Fail to update person.' },

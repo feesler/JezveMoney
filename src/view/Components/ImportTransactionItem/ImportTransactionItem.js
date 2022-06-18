@@ -68,10 +68,6 @@ export class ImportTransactionItem extends Component {
             throw new Error('Invalid props');
         }
 
-        this.model = {
-            mainAccount: this.props.mainAccount,
-        };
-
         this.transTypeMap = {
             expense: EXPENSE,
             income: INCOME,
@@ -81,15 +77,18 @@ export class ImportTransactionItem extends Component {
             debtto: DEBT,
         };
 
+        const { mainAccount } = this.props;
+
         this.state = {
+            mainAccount,
             enabled: true,
             type: 'expense',
-            accountId: this.model.mainAccount.id,
-            accountCurrId: this.model.mainAccount.curr_id,
+            accountId: mainAccount.id,
+            accountCurrId: mainAccount.curr_id,
             secondAccountId: 0,
             secondAccountCurrId: 0,
             secondAccountVisible: false,
-            currId: this.model.mainAccount.curr_id,
+            currId: mainAccount.curr_id,
             isDiff: false,
             amount: '',
             secondAmount: '',
@@ -201,7 +200,7 @@ export class ImportTransactionItem extends Component {
         if (this.props.originalData) {
             this.setOriginal(this.props.originalData);
             this.setExtendedContent(
-                this.createOrigDataContainer(this.props.originalData, this.model.mainAccount),
+                this.createOrigDataContainer(this.props.originalData, mainAccount),
             );
         }
 
@@ -363,11 +362,11 @@ export class ImportTransactionItem extends Component {
 
         if (data !== this.data) {
             this.data = copyObject(data);
-            this.data.origAccount = copyObject(this.model.mainAccount);
+            this.data.origAccount = { ...this.state.mainAccount };
         }
-        this.data.mainAccount = this.model.mainAccount.id;
+        this.data.mainAccount = this.state.mainAccount.id;
 
-        if (this.data.accountCurrencyId !== this.model.mainAccount.curr_id) {
+        if (this.data.accountCurrencyId !== this.state.mainAccount.curr_id) {
             throw new Error('Currency must be the same as main account');
         }
 
@@ -466,7 +465,7 @@ export class ImportTransactionItem extends Component {
      */
     getFirstAvailAccount(state) {
         const userAccountsData = window.app.model.accounts
-            .getUserAccounts(this.model.mainAccount.owner_id);
+            .getUserAccounts(this.state.mainAccount.owner_id);
         const userAccounts = new AccountList(userAccountsData);
         const visibleAccounts = userAccounts.getVisible();
         let [res] = visibleAccounts;
@@ -484,7 +483,7 @@ export class ImportTransactionItem extends Component {
      */
     getNextAccount(accountId) {
         const userAccountsData = window.app.model.accounts
-            .getUserAccounts(this.model.mainAccount.owner_id);
+            .getUserAccounts(this.state.mainAccount.owner_id);
         const userAccounts = new AccountList(userAccountsData);
         const visibleAccountsData = userAccounts.getVisible();
         const userVisible = new AccountList(visibleAccountsData);
@@ -696,14 +695,16 @@ export class ImportTransactionItem extends Component {
         if (this.state.accountId === account.id) {
             return this.state;
         }
-        const state = copyObject(this.state);
+        const state = {
+            ...this.state,
+            mainAccount: account,
+            accountId: account.id,
+            accountCurrId: account.curr_id,
+        };
 
-        this.model.mainAccount = account;
         if (this.data) {
             this.data.mainAccount = account.id;
         }
-        state.accountId = account.id;
-        state.accountCurrId = account.curr_id;
 
         if (state.type === 'expense' || state.type === 'income') {
             if (!state.isDiff) {
@@ -740,15 +741,16 @@ export class ImportTransactionItem extends Component {
         }
 
         // Can't set second account same as main account
-        if (this.model.mainAccount.id === account.id) {
+        if (this.state.mainAccount.id === account.id) {
             throw new Error('Can\'t set second account same as main account');
         }
 
-        const state = copyObject(this.state);
-
-        state.secondAccountId = account.id;
-        state.secondAccountCurrId = account.curr_id;
-        state.currId = state.secondAccountCurrId;
+        const state = {
+            ...this.state,
+            secondAccountId: account.id,
+            secondAccountCurrId: account.curr_id,
+            currId: account.curr_id,
+        };
         state.isDiff = state.accountCurrId !== state.currId;
         if (!state.isDiff) {
             state.secondAmount = '';

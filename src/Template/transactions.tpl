@@ -1,7 +1,7 @@
 <?php
-use JezveMoney\App\Template\TransactionList;
-use JezveMoney\App\Template\IconLink;
-use JezveMoney\App\Template\Paginator;
+use JezveMoney\App\Template\Component\TransactionList;
+use JezveMoney\App\Template\Component\IconLink;
+use JezveMoney\App\Template\Component\Paginator;
 
 include(TPL_PATH."commonhdr.tpl");
 ?>
@@ -68,13 +68,41 @@ include(TPL_PATH."commonhdr.tpl");
                                     <option value="<?=e($accData->id)?>"><?=e($accData->name)?></option>
 <?php		}
         }
-        foreach($hiddenAccArr as $accData) {
-            if (in_array($accData->id, $accFilter)) {		?>
-                                    <option value="<?=e($accData->id)?>" selected><?=e($accData->name)?></option>
+        if (count($hiddenAccArr) > 0) {     ?>
+                                    <optgroup label="Hidden">
+<?php   foreach($hiddenAccArr as $accData) {
+                if (in_array($accData->id, $accFilter)) {		?>
+                                        <option value="<?=e($accData->id)?>" selected><?=e($accData->name)?></option>
+<?php	    	} else {		?>
+                                        <option value="<?=e($accData->id)?>"><?=e($accData->name)?></option>
+<?php		    }
+            }	?>
+                                    </optgroup>
+<?php   }	?>
+                                </select>
+                            </div>
+
+                            <div class="filter-item std_margin">
+                                <select id="person_id" name="person_id" multiple>
+                                    <option value="0">All</option>
+<?php	foreach($personArr as $person) {
+            if (in_array($person->id, $personFilter)) {		?>
+                                    <option value="<?=e($person->id)?>" selected><?=e($person->name)?></option>
 <?php		} else {		?>
-                                    <option value="<?=e($accData->id)?>"><?=e($accData->name)?></option>
+                                    <option value="<?=e($person->id)?>"><?=e($person->name)?></option>
 <?php		}
-        }	?>
+        }
+        if (count($hiddenPersonArr) > 0) {     ?>
+                                    <optgroup label="Hidden">
+<?php   foreach($hiddenPersonArr as $person) {
+                if (in_array($person->id, $personFilter)) {		?>
+                                        <option value="<?=e($person->id)?>" selected><?=e($person->name)?></option>
+<?php	    	} else {		?>
+                                        <option value="<?=e($person->id)?>"><?=e($person->name)?></option>
+<?php		    }
+            }	?>
+                                    </optgroup>
+<?php   }	?>
                                 </select>
                             </div>
 

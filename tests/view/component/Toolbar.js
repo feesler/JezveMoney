@@ -1,6 +1,5 @@
-import { TestComponent } from 'jezve-test';
+import { TestComponent, query, assert } from 'jezve-test';
 import { IconLink } from './IconLink.js';
-import { query } from '../../env.js';
 
 export class Toolbar extends TestComponent {
     async parseContent() {
@@ -56,22 +55,15 @@ export class Toolbar extends TestComponent {
 
     async clickButton(name) {
         const button = this.getItemByName(name);
-        if (!button) {
-            throw new Error(`Button ${name} not found`);
-        }
-
-        if (!button?.content?.visible) {
-            throw new Error(`Button ${name} not visible`);
-        }
+        assert(button, `Button ${name} not found`);
+        assert(button?.content?.visible, `Button ${name} not visible`);
 
         return button.click();
     }
 
     getButtonLink(name) {
         const button = this.getItemByName(name);
-        if (!button) {
-            throw new Error(`Button ${name} not found`);
-        }
+        assert(button, `Button ${name} not found`);
 
         return button.content.link;
     }

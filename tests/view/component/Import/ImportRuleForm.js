@@ -1,4 +1,12 @@
-import { copyObject, TestComponent, assert } from 'jezve-test';
+import {
+    copyObject,
+    TestComponent,
+    assert,
+    query,
+    queryAll,
+    prop,
+    click,
+} from 'jezve-test';
 import { Currency } from '../../../model/Currency.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import { ImportRule } from '../../../model/ImportRule.js';
@@ -12,12 +20,9 @@ import { ImportRuleAccordion } from './ImportRuleAccordion.js';
 import { ImportActionForm } from './ImportActionForm.js';
 import { asyncMap } from '../../../common.js';
 import { App } from '../../../Application.js';
-import {
-    query,
-    queryAll,
-    prop,
-    click,
-} from '../../../env.js';
+
+const availAccordionTitles = ['Conditions', 'Actions'];
+const isAvailableTitle = (title) => availAccordionTitles.includes(title);
 
 export class ImportRuleForm extends TestComponent {
     async parseContent() {
@@ -30,12 +35,12 @@ export class ImportRuleForm extends TestComponent {
         );
 
         accordionItems.forEach((item) => {
+            assert(isAvailableTitle(item.content.title), `Unknown container: '${item.content.title}'`);
+
             if (item.content.title === 'Conditions') {
                 res.conditionsList = item;
             } else if (item.content.title === 'Actions') {
                 res.actionsList = item;
-            } else {
-                throw new Error(`Unknown container: '${item.content.title}'`);
             }
         });
 
@@ -43,18 +48,17 @@ export class ImportRuleForm extends TestComponent {
         res.submitBtn = { elem: await query(this.elem, '.rule-form__controls .submit-btn') };
         res.cancelBtn = { elem: await query(this.elem, '.rule-form__controls .cancel-btn') };
         res.feedbackElem = { elem: await query(this.elem, '.rule-form__feedback .invalid-feedback') };
-        if (
-            !res.idInput.elem
-            || !res.conditionsList
-            || !res.conditionsList.elem
-            || !res.actionsList
-            || !res.actionsList.elem
-            || !res.submitBtn.elem
-            || !res.cancelBtn.elem
-            || !res.feedbackElem.elem
-        ) {
-            throw new Error('Invalid structure of import rule from');
-        }
+        assert(
+            res.idInput.elem
+            && res.conditionsList
+            && res.conditionsList.elem
+            && res.actionsList
+            && res.actionsList.elem
+            && res.submitBtn.elem
+            && res.cancelBtn.elem
+            && res.feedbackElem.elem,
+            'Invalid structure of import rule from',
+        );
 
         res.idInput.value = await prop(res.idInput.elem, 'value');
 
@@ -165,9 +169,7 @@ export class ImportRuleForm extends TestComponent {
 
     /** Search for first condition field type not used in rule */
     getNextAvailProperty(model) {
-        if (!model) {
-            throw new Error('Invalid model');
-        }
+        assert(model, 'Invalid model');
 
         // Obtain condition field types currently used by rule
         const ruleFieldTypes = model.conditions.map((condition) => condition.fieldType);
@@ -186,9 +188,7 @@ export class ImportRuleForm extends TestComponent {
 
     /** Search for first action type not used in rule */
     getNextAvailAction(model) {
-        if (!model) {
-            throw new Error('Invalid model');
-        }
+        assert(model, 'Invalid model');
 
         // Obtain action types currently used by rule
         const ruleActionTypes = model.actions.map((action) => action.actionType);
@@ -200,33 +200,25 @@ export class ImportRuleForm extends TestComponent {
 
     getDefaultValue(fieldId) {
         const fieldType = parseInt(fieldId, 10);
-        if (!fieldType) {
-            throw new Error('Invalid field type');
-        }
+        assert(fieldType, 'Invalid field type');
 
         if (ImportCondition.isAccountField(fieldType)) {
             const account = App.state.accounts.getItemByIndex(0);
-            if (!account) {
-                throw new Error('No accounts available');
-            }
+            assert(account, 'No accounts available');
 
             return account.id;
         }
 
         if (ImportCondition.isTemplateField(fieldType)) {
             const template = App.state.template.getItemByIndex(0);
-            if (!template) {
-                throw new Error('No template available');
-            }
+            assert(template, 'No template available');
 
             return template.id;
         }
 
         if (ImportCondition.isCurrencyField(fieldType)) {
             const currency = Currency.getItemByIndex(0);
-            if (!currency) {
-                throw new Error('No currency available');
-            }
+            assert(currency, 'No currency available');
 
             return currency.id;
         }
@@ -236,9 +228,7 @@ export class ImportRuleForm extends TestComponent {
 
     getActionDefaultValue(actionType) {
         const type = parseInt(actionType, 10);
-        if (!type) {
-            throw new Error('Invalid action type');
-        }
+        assert(type, 'Invalid action type');
 
         if (ImportAction.isTransactionTypeValue(type)) {
             const [transType] = ImportTransaction.availTypes;
@@ -247,18 +237,14 @@ export class ImportRuleForm extends TestComponent {
 
         if (ImportAction.isAccountValue(type)) {
             const account = App.state.accounts.getItemByIndex(0);
-            if (!account) {
-                throw new Error('No accounts available');
-            }
+            assert(account, 'No accounts available');
 
             return account.id;
         }
 
         if (ImportAction.isPersonValue(type)) {
             const person = App.state.persons.getItemByIndex(0);
-            if (!person) {
-                throw new Error('No persons available');
-            }
+            assert(person, 'No persons available');
 
             return person.id;
         }
@@ -383,8 +369,6 @@ export class ImportRuleForm extends TestComponent {
      * @param {AppState} state - application state
      */
     static render(item, state) {
-        if (!item || !state) {
-            throw new Error('Invalid parameters');
-        }
+        assert(item && state, 'Invalid parameters');
     }
 }

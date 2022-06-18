@@ -3,14 +3,6 @@ import {
     TestComponent,
     assert,
     hasFlag,
-} from 'jezve-test';
-import { IMPORT_COND_OP_FIELD_FLAG } from '../../../model/ImportCondition.js';
-import { ImportRuleForm } from './ImportRuleForm.js';
-import { ImportRuleItem } from './ImportRuleItem.js';
-import { asyncMap } from '../../../common.js';
-import { WarningPopup } from '../WarningPopup.js';
-import { App } from '../../../Application.js';
-import {
     query,
     queryAll,
     prop,
@@ -18,13 +10,17 @@ import {
     isVisible,
     wait,
     waitForFunction,
-} from '../../../env.js';
+} from 'jezve-test';
+import { IMPORT_COND_OP_FIELD_FLAG } from '../../../model/ImportCondition.js';
+import { ImportRuleForm } from './ImportRuleForm.js';
+import { ImportRuleItem } from './ImportRuleItem.js';
+import { asyncMap } from '../../../common.js';
+import { WarningPopup } from '../WarningPopup.js';
+import { App } from '../../../Application.js';
 
 export class ImportRulesDialog extends TestComponent {
     async parseContent() {
-        if (!this.elem) {
-            throw new Error('Invalid import rules dialog element');
-        }
+        assert(this.elem, 'Invalid import rules dialog element');
 
         const res = {
             closeBtn: await query(this.elem, '.close-btn'),
@@ -37,16 +33,15 @@ export class ImportRulesDialog extends TestComponent {
             rulesList: { elem: await query(this.elem, '.rules-list') },
         };
 
-        if (
-            !res.closeBtn
-            || !res.header.elem
-            || !res.header.labelElem
-            || !res.header.createBtn
-            || !res.loadingIndicator.elem
-            || !res.rulesList.elem
-        ) {
-            throw new Error('Failed to initialize import rules dialog');
-        }
+        assert(
+            res.closeBtn
+            && res.header.elem
+            && res.header.labelElem
+            && res.header.createBtn
+            && res.loadingIndicator.elem
+            && res.rulesList.elem,
+            'Failed to initialize import rules dialog',
+        );
 
         res.rulesList.renderTime = await prop(res.rulesList.elem, 'dataset.time');
         res.header.title = await prop(res.header.labelElem, 'textContent');
@@ -130,18 +125,14 @@ export class ImportRulesDialog extends TestComponent {
 
     /** Return expected import rule object */
     getExpectedRule() {
-        if (!this.isFormState()) {
-            throw new Error('Invalid state');
-        }
+        assert(this.isFormState(), 'Invalid state');
 
         return this.content.ruleForm.getExpectedRule();
     }
 
     /** Return validation result for expected import rule */
     isValidRule() {
-        if (!this.isFormState()) {
-            throw new Error('Invalid state');
-        }
+        assert(this.isFormState(), 'Invalid state');
 
         return this.content.ruleForm.isValid();
     }
@@ -151,9 +142,7 @@ export class ImportRulesDialog extends TestComponent {
     }
 
     async createRule() {
-        if (!this.isListState()) {
-            throw new Error('Invalid state');
-        }
+        assert(this.isListState(), 'Invalid state');
 
         this.model.state = 'create';
         this.model.rule = {
@@ -175,9 +164,7 @@ export class ImportRulesDialog extends TestComponent {
         const ind = parseInt(index, 10);
         assert.arrayIndex(this.content.items, ind);
 
-        if (!this.isListState()) {
-            throw new Error('Invalid state');
-        }
+        assert(this.isListState(), 'Invalid state');
 
         this.model.state = 'update';
         const ruleItem = App.state.rules.getItemByIndex(ind);
@@ -208,9 +195,7 @@ export class ImportRulesDialog extends TestComponent {
     }
 
     async deleteRule(index) {
-        if (this.model.state !== 'list') {
-            throw new Error('Invalid state');
-        }
+        assert(this.model.state === 'list', 'Invalid state');
 
         const ind = parseInt(index, 10);
         assert.arrayIndex(this.content.items, ind);
@@ -222,12 +207,8 @@ export class ImportRulesDialog extends TestComponent {
         await wait(this.content.ruleDeletePopupId, { visible: true });
         await this.parse();
 
-        if (!this.content.delete_warning?.content?.visible) {
-            throw new Error('Delete template warning popup not appear');
-        }
-        if (!this.content.delete_warning.content.okBtn) {
-            throw new Error('OK button not found');
-        }
+        assert(this.content.delete_warning?.content?.visible, 'Delete template warning popup not appear');
+        assert(this.content.delete_warning.content.okBtn, 'OK button not found');
 
         const prevTime = this.model.renderTime;
 
@@ -246,9 +227,7 @@ export class ImportRulesDialog extends TestComponent {
     }
 
     async submitRule() {
-        if (!this.isFormState()) {
-            throw new Error('Invalid state');
-        }
+        assert(this.isFormState(), 'Invalid state');
 
         const valid = this.content.ruleForm.isValid();
         if (valid) {
@@ -256,9 +235,7 @@ export class ImportRulesDialog extends TestComponent {
                 this.model.rules.push(this.model.rule);
             } else {
                 const index = this.model.rules.findIndex((rule) => rule.id === this.model.rule.id);
-                if (index === -1) {
-                    throw new Error('Invalid state');
-                }
+                assert(index !== -1, 'Invalid state');
                 this.model.rules[index] = this.model.rule;
             }
             this.model.state = 'list';
@@ -281,9 +258,7 @@ export class ImportRulesDialog extends TestComponent {
     }
 
     async cancelRule() {
-        if (!this.isFormState()) {
-            throw new Error('Invalid state');
-        }
+        assert(this.isFormState(), 'Invalid state');
 
         this.model.state = 'list';
         this.expectedState = this.getExpectedState(this.model);

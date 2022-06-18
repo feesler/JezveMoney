@@ -1,10 +1,11 @@
-import { TestComponent } from 'jezve-test';
 import {
+    TestComponent,
+    assert,
     queryAll,
     prop,
     hasClass,
     click,
-} from '../../env.js';
+} from 'jezve-test';
 
 export class Paginator extends TestComponent {
     async parseContent() {
@@ -13,16 +14,13 @@ export class Paginator extends TestComponent {
         res.items = [];
         res.activeItem = null;
 
-        if (!await hasClass(this.elem, 'paginator')) {
-            throw new Error('Unexpected stucture of paginator control');
-        }
+        const validClass = await hasClass(this.elem, 'paginator');
+        assert(validClass, 'Unexpected stucture of paginator control');
 
         let ellipsisBefore = false;
         let prevPageItem = null;
         const elems = await queryAll(this.elem, '.paginator-item');
-        if (elems.length === 1) {
-            throw new Error('Single item paginator control');
-        }
+        assert(elems.length !== 1, 'Single item paginator control');
 
         for (const itemElem of elems) {
             const isArrow = await hasClass(this.elem, 'paginator-arrow');
@@ -37,9 +35,10 @@ export class Paginator extends TestComponent {
             */
             const text = await prop(itemElem, 'textContent');
             if (text === '...') {
-                if (!res.items.length || ellipsisBefore || !prevPageItem) {
-                    throw new Error('Unexpected placement of paginator ellipsis');
-                }
+                assert(
+                    res.items.length > 0 && !ellipsisBefore && prevPageItem,
+                    'Unexpected placement of paginator ellipsis',
+                );
 
                 ellipsisBefore = true;
                 continue;
@@ -56,9 +55,10 @@ export class Paginator extends TestComponent {
 
             item.title = await prop(itemElem, 'textContent');
             item.num = parseInt(item.title, 10);
-            if (!item.title || Number.isNaN(item.num) || item.num < 1) {
-                throw new Error('Unexpected title of paginator item');
-            }
+            assert(
+                item.title && !Number.isNaN(item.num) && item.num >= 1,
+                'Unexpected title of paginator item',
+            );
 
             /*
             Check correctnes of order:
@@ -66,18 +66,17 @@ export class Paginator extends TestComponent {
             - Following items must be greater than previous
             - Sequential items must increase only by 1
              */
-            if (
-                (!res.items.length && item.num !== 1)
-                || (res.items.length && (!prevPageItem || item.num <= prevPageItem.num))
-                || (res.items.length && !ellipsisBefore && item.num !== prevPageItem.num + 1)
-            ) {
-                throw new Error('Unexpected order of paginator item');
-            }
+            assert(
+                !(
+                    (!res.items.length && item.num !== 1)
+                    || (res.items.length && (!prevPageItem || item.num <= prevPageItem.num))
+                    || (res.items.length && !ellipsisBefore && item.num !== prevPageItem.num + 1)
+                ),
+                'Unexpected order of paginator item',
+            );
 
             if (item.isActive) {
-                if (res.activeItem) {
-                    throw new Error('More than one active paginator item');
-                }
+                assert(!res.activeItem, 'More than one active paginator item');
 
                 res.activeItem = item;
                 res.active = item.num;
@@ -90,13 +89,11 @@ export class Paginator extends TestComponent {
         }
 
         // Check ellipsis is not the last item
-        if (ellipsisBefore) {
-            throw new Error('Unexpected placement of paginator ellipsis');
-        }
+        assert(!ellipsisBefore, 'Unexpected placement of paginator ellipsis');
 
         // Check active item present is paginator is visible(2 or more pages)
-        if (res.items.length && !res.activeItem) {
-            throw new Error('Active paginator item not found');
+        if (res.items.length > 0) {
+            assert(res.activeItem, 'Active paginator item not found');
         }
 
         if (res.items.length) {

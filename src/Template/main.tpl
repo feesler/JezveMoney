@@ -1,6 +1,6 @@
 <?php
-use JezveMoney\App\Template\TransactionList;
-use JezveMoney\App\Template\Tile;
+use JezveMoney\App\Template\Component\TransactionList;
+use JezveMoney\App\Template\Component\Tile;
 
 include(TPL_PATH."commonhdr.tpl");	?>
 </head>
@@ -64,19 +64,12 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 <div class="glyph"><?=svgIcon("glyph")?></div>
                             </a>
                         </div>
-                        <div class="info-tiles">
-<?php	if (!count($persArr)) {		?>
+                        <div class="tiles">
+<?php	if (!count($persons)) {		?>
                             <span class="nodata-message">No persons here.</span>
 <?php	} else {	?>
-<?php		foreach($persArr as $pData) {	?>
-                            <div class="info-tile">
-                                <span class="info-tile__title"><?=e($pData->name)?></span>
-<?php			if ($pData->nodebts) {		?>
-                                <span class="info-tile__subtitle">No debts</span>
-<?php			} else {	?>
-                                <span class="info-tile__subtitle"><?=implode("<br>", array_map("e", $pData->balfmt))?></span>
-<?php			}	?>
-                            </div>
+<?php		foreach($persons as $personTile) {	?>
+<?=Tile::render($personTile)?>
 <?php		}	?>
 <?php	}	?>
                         </div>

@@ -1,5 +1,5 @@
 import 'jezvejs/style';
-import { ge, copyObject } from 'jezvejs';
+import { ge } from 'jezvejs';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
@@ -8,6 +8,8 @@ import '../../css/app.css';
 
 const TITLE_PERSON_DELETE = 'Delete person';
 const MSG_PERSON_DELETE = 'Are you sure want to delete selected person?<br>Debt operations will be converted into expense or income.';
+const MSG_EMPTY_NAME = 'Please input name of person.';
+const MSG_EXISTING_NAME = 'Person with this name already exist.';
 
 /**
  * Create/update person view
@@ -16,11 +18,15 @@ class PersonView extends View {
     constructor(...args) {
         super(...args);
 
-        this.model = {};
+        this.state = {
+            validation: {
+                name: true,
+            },
+        };
 
         if (this.props.person) {
-            this.model.original = this.props.person;
-            this.model.data = copyObject(this.model.original);
+            this.state.original = this.props.person;
+            this.state.data = { ...this.state.original };
         }
     }
 
@@ -41,8 +47,13 @@ class PersonView extends View {
 
         this.nameInp.addEventListener('input', () => this.onNameInput());
 
+        this.nameFeedback = ge('namefeedback');
+        if (!this.nameFeedback) {
+            throw new Error('Invalid Person view');
+        }
+
         // Update mode
-        if (this.model.original.id) {
+        if (this.state.original.id) {
             this.deleteBtn = IconLink.fromElement({
                 elem: 'del_btn',
                 onclick: () => this.confirmDelete(),
@@ -58,23 +69,34 @@ class PersonView extends View {
      * Person name input event handler
      */
     onNameInput() {
-        this.clearBlockValidation('name-inp-block');
+        this.state.validation.name = true;
+        this.state.data.name = this.nameInp.value;
+        this.render(this.state);
     }
 
     /**
      * Form submit event handler
      */
     onSubmit(e) {
+        const { name } = this.state.data;
         let valid = true;
 
-        if (!this.nameInp.value || this.nameInp.value.length < 1) {
-            this.invalidateBlock('name-inp-block');
+        if (name.length === 0) {
+            this.state.validation.name = MSG_EMPTY_NAME;
             this.nameInp.focus();
             valid = false;
+        } else {
+            const person = window.app.model.persons.findByName(name);
+            if (person && this.state.original.id !== person.id) {
+                this.state.validation.name = MSG_EXISTING_NAME;
+                this.nameInp.focus();
+                valid = false;
+            }
         }
 
         if (!valid) {
             e.preventDefault();
+            this.render(this.state);
         }
     }
 
@@ -82,7 +104,7 @@ class PersonView extends View {
      * Show person delete confirmation popup
      */
     confirmDelete() {
-        if (!this.model.data.id) {
+        if (!this.state.data.id) {
             return;
         }
 
@@ -92,6 +114,20 @@ class PersonView extends View {
             content: MSG_PERSON_DELETE,
             onconfirm: () => this.delForm.submit(),
         });
+    }
+
+    render(state) {
+        if (!state) {
+            throw new Error('Invalid state');
+        }
+
+        // Name input
+        if (state.validation.name === true) {
+            this.clearBlockValidation('name-inp-block');
+        } else {
+            this.nameFeedback.textContent = state.validation.name;
+            this.invalidateBlock('name-inp-block');
+        }
     }
 }
 

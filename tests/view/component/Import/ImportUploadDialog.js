@@ -1,10 +1,6 @@
-import { isNum, copyObject } from 'jezvejs';
-import { TestComponent, assert } from 'jezve-test';
-import { DropDown } from '../DropDown.js';
-import { App } from '../../../Application.js';
-import { asyncMap, fixFloat } from '../../../common.js';
-import { WarningPopup } from '../WarningPopup.js';
 import {
+    TestComponent,
+    assert,
     query,
     queryAll,
     hasClass,
@@ -15,7 +11,12 @@ import {
     isVisible,
     wait,
     waitForFunction,
-} from '../../../env.js';
+} from 'jezve-test';
+import { isNum, copyObject } from 'jezvejs';
+import { DropDown } from '../DropDown.js';
+import { App } from '../../../Application.js';
+import { asyncMap, fixFloat } from '../../../common.js';
+import { WarningPopup } from '../WarningPopup.js';
 import { ImportTemplate } from '../../../model/ImportTemplate.js';
 
 export const BROWSE_FILE_STATE = 1;
@@ -24,11 +25,11 @@ export const RAW_DATA_STATE = 3;
 export const CREATE_TPL_STATE = 4;
 export const UPDATE_TPL_STATE = 5;
 
+const TPL_FORM_STATES = [CREATE_TPL_STATE, UPDATE_TPL_STATE];
+
 export class ImportUploadDialog extends TestComponent {
     async parseContent() {
-        if (!this.elem) {
-            throw new Error('Invalid import upload dialog element');
-        }
+        assert(this.elem, 'Invalid import upload dialog element');
 
         const res = {};
 
@@ -63,36 +64,36 @@ export class ImportUploadDialog extends TestComponent {
         res.cancelTplBtn = { elem: await query('#cancelTplBtn') };
         res.tplFeedback = { elem: await query('#tplFeedback') };
         res.initialAccount = await DropDown.createFromChild(this, await query('#initialAccount'));
-        if (
-            !res.closeBtn
-            || !res.uploadFormBrowser.elem
-            || !res.fileNameElem.elem
-            || !res.templateSel
-            || !res.isEncodeCheck.elem
-            || !res.useServerCheck.elem
-            || !res.serverAddressBlock.elem
-            || !res.serverAddressInput.elem
-            || !res.serverUploadBtn.elem
-            || !res.templateBlock.elem
-            || !res.tplHeading.elem
-            || !res.tplStateLbl.elem
-            || !res.tplField.elem
-            || !res.nameField.elem
-            || !res.tplNameInp.elem
-            || !res.columnField.elem
-            || !res.columnSel.elem
-            || !res.loadingIndicator.elem
-            || !res.rawDataTable.elem
-            || !res.createTplBtn.elem
-            || !res.updateTplBtn.elem
-            || !res.deleteTplBtn.elem
-            || !res.submitTplBtn.elem
-            || !res.cancelTplBtn.elem
-            || !res.tplFeedback.elem
-            || !res.initialAccount
-        ) {
-            throw new Error('Failed to initialize extras of file upload dialog');
-        }
+
+        assert(
+            res.closeBtn
+            && res.uploadFormBrowser.elem
+            && res.fileNameElem.elem
+            && res.templateSel
+            && res.isEncodeCheck.elem
+            && res.useServerCheck.elem
+            && res.serverAddressBlock.elem
+            && res.serverAddressInput.elem
+            && res.serverUploadBtn.elem
+            && res.templateBlock.elem
+            && res.tplHeading.elem
+            && res.tplStateLbl.elem
+            && res.tplField.elem
+            && res.nameField.elem
+            && res.tplNameInp.elem
+            && res.columnField.elem
+            && res.columnSel.elem
+            && res.loadingIndicator.elem
+            && res.rawDataTable.elem
+            && res.createTplBtn.elem
+            && res.updateTplBtn.elem
+            && res.deleteTplBtn.elem
+            && res.submitTplBtn.elem
+            && res.cancelTplBtn.elem
+            && res.tplFeedback.elem
+            && res.initialAccount,
+            'Failed to initialize extras of file upload dialog',
+        );
 
         res.isTplLoading = res.templateSel.content.disabled;
 
@@ -219,9 +220,7 @@ export class ImportUploadDialog extends TestComponent {
         }
 
         res.initialAccount = App.state.accounts.getItem(cont.initialAccount.content.value);
-        if (!res.initialAccount) {
-            throw new Error('Initial account not found');
-        }
+        assert(res.initialAccount, 'Initial account not found');
 
         return res;
     }
@@ -262,8 +261,8 @@ export class ImportUploadDialog extends TestComponent {
 
         if (model.state === CREATE_TPL_STATE
             || model.state === UPDATE_TPL_STATE) {
-            if (model.state === UPDATE_TPL_STATE && !model.template) {
-                throw new Error('Invalid model: expected template');
+            if (model.state === UPDATE_TPL_STATE) {
+                assert(model.template, 'Invalid model: expected template');
             }
 
             res.templateBlock = { visible: true };
@@ -379,9 +378,7 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async setFile(filename) {
-        if (typeof filename !== 'string') {
-            throw new Error('Invalid parameter');
-        }
+        assert.isString(filename, 'Invalid parameter');
 
         if (!this.content.useServerAddress) {
             await this.toggleServerAddress();
@@ -419,9 +416,7 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async selectTemplateById(val) {
-        if (this.model.state !== RAW_DATA_STATE) {
-            throw new Error('Invalid state');
-        }
+        assert(this.model.state === RAW_DATA_STATE, 'Invalid state');
 
         this.model.template = App.state.templates.getItem(val);
         this.expectedState = this.getExpectedState(this.model);
@@ -438,9 +433,7 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async createTemplate() {
-        if (this.model.state !== RAW_DATA_STATE) {
-            throw new Error('Invalid state');
-        }
+        assert(this.model.state === RAW_DATA_STATE, 'Invalid state');
 
         this.model.state = CREATE_TPL_STATE;
         this.model.template = null;
@@ -453,9 +446,7 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async updateTemplate() {
-        if (this.model.state !== RAW_DATA_STATE) {
-            throw new Error('Invalid state');
-        }
+        assert(this.model.state === RAW_DATA_STATE, 'Invalid state');
 
         this.model.state = UPDATE_TPL_STATE;
         this.model.template = App.state.templates.getItem(this.content.templateSel.content.value);
@@ -468,9 +459,7 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async deleteTemplate() {
-        if (this.model.state !== RAW_DATA_STATE) {
-            throw new Error('Invalid state');
-        }
+        assert(this.model.state === RAW_DATA_STATE, 'Invalid state');
 
         if (this.content.templateSel.content.items.length === 1) {
             this.model.state = CREATE_TPL_STATE;
@@ -490,12 +479,8 @@ export class ImportUploadDialog extends TestComponent {
         await click(this.content.deleteTplBtn.elem);
         await this.parse();
 
-        if (!this.content.delete_warning?.content?.visible) {
-            throw new Error('Delete template warning popup not appear');
-        }
-        if (!this.content.delete_warning.content.okBtn) {
-            throw new Error('OK button not found');
-        }
+        assert(this.content.delete_warning?.content?.visible, 'Delete template warning popup not appear');
+        assert(this.content.delete_warning.content.okBtn, 'OK button not found');
 
         await click(this.content.delete_warning.content.okBtn);
         await waitForFunction(async () => {
@@ -507,9 +492,7 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async inputTemplateName(val) {
-        if (this.model.state !== CREATE_TPL_STATE && this.model.state !== UPDATE_TPL_STATE) {
-            throw new Error('Invalid state');
-        }
+        assert(TPL_FORM_STATES.includes(this.model.state), 'Invalid state');
 
         this.model.template.name = val;
         this.expectedState = this.getExpectedState(this.model);
@@ -521,9 +504,7 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async selectTemplateColumn(name, index) {
-        if (this.model.state !== CREATE_TPL_STATE && this.model.state !== UPDATE_TPL_STATE) {
-            throw new Error('Invalid state');
-        }
+        assert(TPL_FORM_STATES.includes(this.model.state), 'Invalid state');
 
         this.model.template.columns[name] = index;
         this.expectedState = this.getExpectedState(this.model);
@@ -542,9 +523,7 @@ export class ImportUploadDialog extends TestComponent {
 
     async submitTemplate() {
         const disabled = await prop(this.content.submitTplBtn.elem, 'disabled');
-        if (disabled) {
-            throw new Error('Submit template button is disabled');
-        }
+        assert(!disabled, 'Submit template button is disabled');
 
         const isValid = this.isValidTemplate(this.model.template);
         if (isValid) {
@@ -578,9 +557,7 @@ export class ImportUploadDialog extends TestComponent {
     async cancelTemplate() {
         const visible = await isVisible(this.content.cancelTplBtn.elem, true);
         const disabled = await prop(this.content.cancelTplBtn.elem, 'disabled');
-        if (!visible || disabled) {
-            throw new Error('Cancel template button is invisible or disabled');
-        }
+        assert(visible && !disabled, 'Cancel template button is invisible or disabled');
 
         this.model.state = RAW_DATA_STATE;
         this.expectedState = this.getExpectedState(this.model);

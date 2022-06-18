@@ -1,3 +1,4 @@
+import { assert } from 'jezve-test';
 import { api } from './api.js';
 
 /** Icon object */
@@ -25,9 +26,7 @@ export class Icon {
 
     /** Find item by id */
     static getItem(itemId) {
-        if (!Array.isArray(this.data)) {
-            throw new Error('List of icons not initialized');
-        }
+        assert.isArray(this.data, 'List of icons not initialized');
 
         const res = this.data.find((item) => item.id === itemId);
         if (!res) {
@@ -43,9 +42,7 @@ export class Icon {
     * @return {Icon}
     */
     static findByName(name) {
-        if (!Array.isArray(this.data)) {
-            throw new Error('List of icons not initialized');
-        }
+        assert.isArray(this.data, 'List of icons not initialized');
 
         const qName = name.toUpperCase();
         const res = this.data.find((item) => item.name && item.name.toUpperCase() === qName);
@@ -62,9 +59,7 @@ export class Icon {
     * @return {Icon}
     */
     static findByFile(val) {
-        if (!Array.isArray(this.data)) {
-            throw new Error('List of icons not initialized');
-        }
+        assert.isArray(this.data, 'List of icons not initialized');
 
         if (typeof val !== 'string') {
             return null;

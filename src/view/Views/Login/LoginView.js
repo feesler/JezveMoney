@@ -9,6 +9,21 @@ import './style.css';
  * User log in view
  */
 class LoginView extends View {
+    constructor(...args) {
+        super(...args);
+
+        this.state = {
+            form: {
+                login: '',
+                password: '',
+            },
+            validation: {
+                login: true,
+                password: true,
+            },
+        };
+    }
+
     /**
      * View initialization
      */
@@ -29,34 +44,60 @@ class LoginView extends View {
      * Login field input event handler
      */
     onLoginInput() {
-        this.clearBlockValidation('login-inp-block');
+        this.state.form.login = this.loginInp.value;
+        this.state.validation.login = true;
+        this.render(this.state);
     }
 
     /**
      * Password field input event handler
      */
     onPasswordInput() {
-        this.clearBlockValidation('pwd-inp-block');
+        this.state.form.password = this.passwordInp.value;
+        this.state.validation.password = true;
+        this.render(this.state);
     }
 
     /**
      * Log in form submit event handler
      */
     onSubmit(e) {
+        const { login, password } = this.state.form;
         let valid = true;
 
-        if (!this.loginInp.value || this.loginInp.value.length < 1) {
-            this.invalidateBlock('login-inp-block');
+        if (login.length === 0) {
+            this.state.validation.login = false;
             valid = false;
         }
 
-        if (!this.passwordInp.value || this.passwordInp.value.length < 1) {
-            this.invalidateBlock('pwd-inp-block');
+        if (password.length === 0) {
+            this.state.validation.password = false;
             valid = false;
         }
 
         if (!valid) {
             e.preventDefault();
+            this.render(this.state);
+        }
+    }
+
+    render(state) {
+        if (!state) {
+            throw new Error('Invalid state');
+        }
+
+        // Login input
+        if (state.validation.login) {
+            this.clearBlockValidation('login-inp-block');
+        } else {
+            this.invalidateBlock('login-inp-block');
+        }
+
+        // Password input
+        if (state.validation.password) {
+            this.clearBlockValidation('pwd-inp-block');
+        } else {
+            this.invalidateBlock('pwd-inp-block');
         }
     }
 }

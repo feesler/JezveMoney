@@ -61,22 +61,26 @@ class Main extends TemplateController
         ];
 
         $persArr = $this->personMod->getData();
-        foreach ($persArr as $ind => $pData) {
-            $noDebts = true;
+        $data["persons"] = [];
+        foreach ($persArr as $person) {
             $pBalance = [];
-            if (isset($pData->accounts) && is_array($pData->accounts)) {
-                foreach ($pData->accounts as $pAcc) {
+            if (isset($person->accounts) && is_array($person->accounts)) {
+                foreach ($person->accounts as $pAcc) {
                     if ($pAcc->balance != 0.0) {
-                        $noDebts = false;
                         $pBalance[] = $currMod->format($pAcc->balance, $pAcc->curr_id);
                     }
                 }
             }
 
-            $persArr[$ind]->nodebts = $noDebts;
-            $persArr[$ind]->balfmt = $pBalance;
+            $subtitle = (count($pBalance) > 0) ? $pBalance : "No debts";
+
+            $data["persons"][] = [
+                "type" => "link",
+                "link" => BASEURL . "transactions/create/?type=debt&person_id=" . ($person->id),
+                "title" => $person->name,
+                "subtitle" => $subtitle,
+            ];
         }
-        $data["persArr"] = $persArr;
 
         $byCurrency = true;
         $curr_acc_id = $currMod->getIdByPos(0);

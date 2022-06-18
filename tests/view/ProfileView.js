@@ -1,18 +1,18 @@
-import { TestComponent } from 'jezve-test';
-import { AppView } from './AppView.js';
-import { LoginView } from './LoginView.js';
-import { App } from '../Application.js';
-import { WarningPopup } from './component/WarningPopup.js';
-import { InputRow } from './component/InputRow.js';
 import {
+    TestComponent,
+    assert,
     query,
     queryAll,
     prop,
     navigation,
     click,
     wait,
-    isVisible,
-} from '../env.js';
+} from 'jezve-test';
+import { AppView } from './AppView.js';
+import { LoginView } from './LoginView.js';
+import { App } from '../Application.js';
+import { WarningPopup } from './component/WarningPopup.js';
+import { InputRow } from './component/InputRow.js';
 
 // Profile view class
 export class ProfileView extends AppView {
@@ -20,25 +20,26 @@ export class ProfileView extends AppView {
         const res = {};
 
         const blocks = await queryAll('.content_wrap > .profile_block');
-        if (blocks.length !== 4) {
-            throw new Error('Invalid profile view structure');
-        }
+        assert(blocks.length === 4, 'Invalid profile view structure');
 
         res.loginElem = await query(blocks[0], 'span');
         res.nameElem = await query('#namestatic');
         res.nameLinkElem = await query(blocks[1], 'div > a');
         res.changePassLinkElem = await query(blocks[2], 'div > a');
-        if (!res.loginElem || !res.nameElem || !res.nameLinkElem || !res.changePassLinkElem) {
-            throw new Error('Invalid profile view structure');
-        }
+        assert(
+            res.loginElem
+            && res.nameElem
+            && res.nameLinkElem
+            && res.changePassLinkElem,
+            'Invalid profile view structure',
+        );
 
         res.login = await prop(res.loginElem, 'textContent');
         res.name = await prop(res.nameElem, 'textContent');
 
         const buttons = await queryAll(blocks[3], 'input[type="button"]');
-        if (!buttons || buttons.length !== 3) {
-            throw new Error('Invalid profile view structure');
-        }
+        assert(buttons?.length === 3, 'Invalid profile view structure');
+
         [res.resetBtn, res.resetAllBtn, res.deleteProfileBtn] = buttons;
 
         res.changeNamePopup = {
@@ -76,15 +77,9 @@ export class ProfileView extends AppView {
 
     async changeName(newName) {
         await this.performAction(() => click(this.content.nameLinkElem));
-
         await this.performAction(() => wait('.popup__content.chname_popup', { visible: true }));
 
-        if (
-            !this.content.changeNamePopup
-            || !(await isVisible(this.content.changeNamePopup.elem))
-        ) {
-            throw new Error('Change name popup not appear');
-        }
+        assert(this.content.changeNamePopup?.visible, 'Change name popup not appear');
 
         const validInput = (newName && newName !== this.content.name && newName.length > 0);
 
@@ -102,12 +97,7 @@ export class ProfileView extends AppView {
         await this.performAction(() => click(this.content.changePassLinkElem));
         await this.performAction(() => wait('.popup__content.chpass_popup', { visible: true }));
 
-        if (
-            !this.content.changePassPopup
-            || !(await isVisible(this.content.changePassPopup.elem))
-        ) {
-            throw new Error('Change password popup not appear');
-        }
+        assert(this.content.changePassPopup?.visible, 'Change password popup not appear');
 
         const validInput = (
             oldPass
@@ -129,56 +119,37 @@ export class ProfileView extends AppView {
     }
 
     async resetAccounts() {
-        if (!this.content.resetBtn) {
-            throw new Error('Reset accounts button not found');
-        }
+        assert(this.content.resetBtn, 'Reset accounts button not found');
 
         await this.performAction(() => click(this.content.resetBtn));
 
-        if (!this.content.reset_warning?.content?.visible) {
-            throw new Error('Warning popup not appear');
-        }
-        if (!this.content.reset_warning.content.okBtn) {
-            throw new Error('Confirm button not found');
-        }
+        assert(this.content.reset_warning?.content?.visible, 'Warning popup not appear');
+        assert(this.content.reset_warning.content.okBtn, 'Confirm button not found');
 
         await navigation(() => click(this.content.reset_warning.content.okBtn));
     }
 
     async resetAll() {
-        if (!this.content.resetAllBtn) {
-            throw new Error('Reset all button not found');
-        }
+        assert(this.content.resetAllBtn, 'Reset all button not found');
 
         await this.performAction(() => click(this.content.resetAllBtn));
 
-        if (!this.content.reset_all_warning?.content?.visible) {
-            throw new Error('Warning popup not appear');
-        }
-        if (!this.content.reset_all_warning.content.okBtn) {
-            throw new Error('Confirm button not found');
-        }
+        assert(this.content.reset_all_warning?.content?.visible, 'Warning popup not appear');
+        assert(this.content.reset_all_warning.content.okBtn, 'Confirm button not found');
 
         await navigation(() => click(this.content.reset_all_warning.content.okBtn));
     }
 
     async deleteProfile() {
-        if (!this.content.deleteProfileBtn) {
-            throw new Error('Delete button not found');
-        }
+        assert(this.content.deleteProfileBtn, 'Delete button not found');
 
         await this.performAction(() => click(this.content.deleteProfileBtn));
 
-        if (!await TestComponent.isVisible(this.content.delete_warning)) {
-            throw new Error('Warning popup not appear');
-        }
-        if (!this.content.delete_warning.content.okBtn) {
-            throw new Error('Confirm button not found');
-        }
+        const warningVisible = await TestComponent.isVisible(this.content.delete_warning);
+        assert(warningVisible, 'Warning popup not appear');
+        assert(this.content.delete_warning.content.okBtn, 'Confirm button not found');
 
         await navigation(() => click(this.content.delete_warning.content.okBtn));
-        if (!(App.view instanceof LoginView)) {
-            throw new Error('Unexpected page');
-        }
+        assert.instanceOf(App.view, LoginView, 'Unexpected page');
     }
 }

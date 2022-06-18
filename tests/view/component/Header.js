@@ -1,11 +1,12 @@
-import { TestComponent } from 'jezve-test';
-import { asyncMap } from '../../common.js';
 import {
+    TestComponent,
+    assert,
     query,
     queryAll,
     prop,
     click,
-} from '../../env.js';
+} from 'jezve-test';
+import { asyncMap } from '../../common.js';
 
 const DEFAULT_USER_MENU_ITEMS = 3;
 
@@ -20,31 +21,21 @@ export class Header extends TestComponent {
             logo: { elem: await query(this.elem, '.logo') },
         };
 
-        if (!res.logo.elem) {
-            throw new Error('Logo element not found');
-        }
+        assert(res.logo.elem, 'Logo element not found');
 
         res.logo.linkElem = await query(res.logo.elem, 'a');
-        if (!res.logo.linkElem) {
-            throw new Error('Logo link element not found');
-        }
+        assert(res.logo.linkElem, 'Logo link element not found');
 
         res.user = { elem: await query(this.elem, '.user-block') };
         if (res.user.elem) {
             res.user.menuBtn = await query(this.elem, 'button.user-menu-btn');
-            if (!res.user.menuBtn) {
-                throw new Error('User button not found');
-            }
+            assert(res.user.menuBtn, 'User button not found');
             const el = await query(res.user.menuBtn, '.user__title');
-            if (!el) {
-                throw new Error('User title element not found');
-            }
+            assert(el, 'User title element not found');
             res.user.name = await prop(el, 'textContent');
 
             res.user.menuEl = await query(this.elem, '.user-menu');
-            if (!res.user.menuEl) {
-                throw new Error('Menu element not found');
-            }
+            assert(res.user.menuEl, 'Menu element not found');
 
             const menuLinks = await queryAll(res.user.menuEl, 'ul > li > a');
             res.user.menuItems = await asyncMap(menuLinks, async (elem) => ({
@@ -52,9 +43,7 @@ export class Header extends TestComponent {
                 link: await prop(elem, 'href'),
                 text: await prop(elem, 'textContent'),
             }));
-            if (res.user.menuItems.length < DEFAULT_USER_MENU_ITEMS) {
-                throw new Error('Invalid user menu');
-            }
+            assert(res.user.menuItems.length >= DEFAULT_USER_MENU_ITEMS, 'Invalid user menu');
 
             const itemShift = (res.user.menuItems.length > DEFAULT_USER_MENU_ITEMS) ? 1 : 0;
 

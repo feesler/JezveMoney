@@ -1,6 +1,12 @@
-import { test, copyObject, assert } from 'jezve-test';
+import {
+    test,
+    copyObject,
+    assert,
+    baseUrl,
+    httpReq,
+    setBlock,
+} from 'jezve-test';
 import { App } from '../../Application.js';
-import { baseUrl, httpReq, setBlock } from '../../env.js';
 import { Currency } from '../../model/Currency.js';
 import { findSimilarTransaction } from '../../model/import.js';
 import { ImportTransaction } from '../../model/ImportTransaction.js';
@@ -90,9 +96,10 @@ export const putFile = async (data) => {
         }
 
         const res = JSON.parse(response.body);
-        if (!res || res.result !== 'ok' || !res.data) {
-            throw new Error((res.msg) ? res.msg : defErrorMessage);
-        }
+        assert(
+            res?.result === 'ok' && res?.data,
+            (res.msg) ? res.msg : defErrorMessage,
+        );
 
         return res.data.filename;
     } catch (e) {
@@ -122,9 +129,7 @@ export const removeFile = async (filename) => {
         }
 
         const res = JSON.parse(response.body);
-        if (!res || res.result !== 'ok') {
-            throw new Error((res.msg) ? res.msg : defErrorMessage);
-        }
+        assert(res?.result === 'ok', (res.msg) ? res.msg : defErrorMessage);
     } catch (e) {
         console.log(e.message);
         return false;
@@ -165,9 +170,7 @@ export const addItem = async () => {
 /** Test file upload */
 export const uploadFile = async (params) => {
     await test('Upload file', async () => {
-        if (!params || !params.data || !params.filename) {
-            throw new Error('Invalid parameters');
-        }
+        assert(params && params.data && params.filename, 'Invalid parameters');
 
         await checkNavigation();
 
@@ -176,9 +179,7 @@ export const uploadFile = async (params) => {
         const importData = parseCSV(params.data);
 
         // Perform actions on view
-        if (!params.filename) {
-            throw new Error('Invalid file name');
-        }
+        assert(params.filename, 'Invalid file name');
 
         await App.view.launchUploadDialog();
 
@@ -197,9 +198,7 @@ export const uploadFile = async (params) => {
 /** Submit uploaded file with current options */
 export const submitUploaded = async (params) => {
     await test('Submit file', async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
         App.view.checkUploadState();
 
@@ -220,14 +219,12 @@ export const submitUploaded = async (params) => {
         return App.view.checkState();
     });
 };
-
 /** Change main account */
+
 export const changeMainAccount = async (accountId) => {
     const userAccounts = App.state.accounts.getUserVisible();
     const account = userAccounts.getItem(accountId);
-    if (!account) {
-        throw new Error(`Invalid account id ${accountId}`);
-    }
+    assert(account, `Invalid account id ${accountId}`);
 
     await test(`Change main account to '${account.name}'`, async () => {
         await checkNavigation();
@@ -293,9 +290,10 @@ export const enableRules = async (value = true) => {
         await checkNavigation();
         await checkViewState('main');
 
-        if (enable === App.view.isRulesEnabled()) {
-            throw new Error(`Import rules already ${enable ? 'enabled' : 'disabled'}`);
-        }
+        assert(
+            enable !== App.view.isRulesEnabled(),
+            `Import rules already ${enable ? 'enabled' : 'disabled'}`,
+        );
 
         // Apply rules or restore original import data according to enable flag
         // and convert to expected state of ImportListItem component
@@ -355,9 +353,7 @@ export const enableItems = async ({ index, value = true }) => {
     const descr = enable ? 'Enable items' : 'Disable items';
 
     await test(`${descr} [${index}]`, async () => {
-        if (!Array.isArray(index)) {
-            throw new Error('Invalid parameters');
-        }
+        assert.isArray(index, 'Invalid parameters');
 
         await checkNavigation();
         await checkViewState('main');
@@ -374,9 +370,7 @@ export const enableItems = async ({ index, value = true }) => {
 
 /** Update item */
 export const updateItem = async (params) => {
-    if (!params || !('pos' in params)) {
-        throw new Error('Invalid parameters');
-    }
+    assert(params && ('pos' in params), 'Invalid parameters');
 
     setBlock(`Update item [${params.pos}]`, 2);
 
@@ -400,25 +394,19 @@ export const updateItem = async (params) => {
 
         if (action.action === 'changeCurrency') {
             const currency = Currency.getById(action.data);
-            if (!currency) {
-                throw new Error(`Currency (${action.data}) not found`);
-            }
+            assert(currency, `Currency (${action.data}) not found`);
 
             descr = `${actDescr[action.action]} to '${currency.name}'`;
         } else if (action.action === 'changeDestAccount') {
             const userAccounts = App.state.accounts.getUserVisible();
             const account = userAccounts.getItem(action.data);
-            if (!account) {
-                throw new Error(`Account (${action.data}) not found`);
-            }
+            assert(account, `Account (${action.data}) not found`);
 
             descr = `${actDescr[action.action]} to '${account.name}'`;
         } else if (action.action === 'changePerson') {
             const persons = App.state.persons.getVisible();
             const person = persons.getItem(action.data);
-            if (!person) {
-                throw new Error(`Person (${action.data}) not found`);
-            }
+            assert(person, `Person (${action.data}) not found`);
 
             descr = `${actDescr[action.action]} to '${person.name}'`;
         } else {

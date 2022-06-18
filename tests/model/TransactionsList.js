@@ -1,4 +1,4 @@
-import { copyObject } from 'jezve-test';
+import { copyObject, assert } from 'jezve-test';
 import { convDate, fixDate } from '../common.js';
 import { App } from '../Application.js';
 import { api } from './api.js';
@@ -51,22 +51,16 @@ export class TransactionsList extends List {
 
     updatePosById(itemId, pos) {
         const ind = this.getIndexById(itemId);
-        if (ind === -1) {
-            throw new Error(`Transaction ${itemId} not found`);
-        }
+        assert(ind !== -1, `Transaction ${itemId} not found`);
 
         return this.updatePos(ind, pos);
     }
 
     updatePos(ind, pos) {
-        if (ind < 0 || ind >= this.length) {
-            throw new Error(`Wrong transaction index: ${ind}`);
-        }
+        assert(ind >= 0 && ind < this.length, `Wrong transaction index: ${ind}`);
 
         const trObj = this.data[ind];
-        if (!trObj) {
-            throw new Error('Transaction not found');
-        }
+        assert(trObj, 'Transaction not found');
 
         const oldPos = trObj.pos;
         if (oldPos === pos) {
@@ -144,9 +138,7 @@ export class TransactionsList extends List {
     }
 
     updateResults(accountsList) {
-        if (!(accountsList instanceof AccountsList)) {
-            throw new Error('Invalid accounts list specified');
-        }
+        assert.instanceOf(accountsList, AccountsList, 'Invalid accounts list specified');
 
         const accounts = accountsList.toInitial();
         const list = this.sortAsc();
@@ -196,9 +188,7 @@ export class TransactionsList extends List {
     }
 
     getItemsByAccounts(list, ids) {
-        if (!ids) {
-            throw new Error('Invalid account ids specified');
-        }
+        assert(ids, 'Invalid account ids specified');
 
         const accounts = Array.isArray(ids) ? ids : [ids];
         if (!accounts.length) {
@@ -281,9 +271,7 @@ export class TransactionsList extends List {
         const pageLimit = (typeof limit !== 'undefined') ? limit : App.config.transactionsOnPage;
 
         const totalPages = this.getExpectedPages(list, pageLimit);
-        if (num < 1 || num > totalPages) {
-            throw new Error(`Invalid page number: ${num}`);
-        }
+        assert(num >= 1 && num <= totalPages, `Invalid page number: ${num}`);
 
         const offset = (num - 1) * pageLimit;
 
@@ -318,8 +306,32 @@ export class TransactionsList extends List {
         if ('type' in params) {
             res = this.getItemsByType(res, params.type);
         }
-        if ('accounts' in params) {
-            res = this.getItemsByAccounts(res, params.accounts);
+        if ('accounts' in params || 'persons' in params) {
+            const filterAccounts = [];
+            if ('persons' in params) {
+                const personsFilter = Array.isArray(params.persons)
+                    ? params.persons
+                    : [params.persons];
+
+                personsFilter.forEach((personId) => {
+                    const personAccounts = App.state.getPersonAccounts(personId);
+                    if (personAccounts.length > 0) {
+                        filterAccounts.push(...personAccounts);
+                    } else {
+                        filterAccounts.push(-1);
+                    }
+                });
+            }
+
+            if ('accounts' in params) {
+                const accountsFilter = Array.isArray(params.accounts)
+                    ? params.accounts
+                    : [params.accounts];
+
+                filterAccounts.push(...accountsFilter);
+            }
+
+            res = this.getItemsByAccounts(res, filterAccounts);
         }
         if ('startDate' in params && 'endDate' in params) {
             res = this.getItemsByDate(res, params.startDate, params.endDate);
@@ -341,9 +353,7 @@ export class TransactionsList extends List {
     }
 
     sortItems(list, desc = false) {
-        if (!Array.isArray(list)) {
-            throw new Error('Invalid list specified');
-        }
+        assert.isArray(list, 'Invalid list specified');
 
         const res = copyObject(list);
 
@@ -379,9 +389,7 @@ export class TransactionsList extends List {
     // Return expected list of transactions after update specified account
     onUpdateAccount(list, accList, account) {
         const origAcc = accList.find((item) => item.id === account.id);
-        if (!origAcc) {
-            throw new Error('Specified account not found in the original list');
-        }
+        assert(origAcc, 'Specified account not found in the original list');
 
         if (origAcc.curr_id === account.curr_id) {
             return list;

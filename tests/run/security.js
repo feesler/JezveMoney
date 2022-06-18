@@ -1,9 +1,22 @@
-import { test } from 'jezve-test';
-import { baseUrl, httpReq } from '../env.js';
+import {
+    test,
+    assert,
+    baseUrl,
+    httpReq,
+} from 'jezve-test';
+
+const restrictedLocations = [
+    'Controller',
+    'Model',
+    'view',
+    'system',
+    'vendor',
+    'composer.',
+    '.htaccess',
+];
 
 export const checkAccess = async (url) => {
     await test(`Check access to ${url}`, async () => {
-        const restrictedLocations = ['Controller', 'Model', 'view', 'system', 'vendor'];
         const isInvalidLocation = restrictedLocations.some(
             (location) => url.startsWith(location),
         );
@@ -20,11 +33,11 @@ export const checkAccess = async (url) => {
             const isRestricted = restrictedLocations.some(
                 (location) => resp.url.startsWith(base + location),
             );
-            if (resp.status >= 200 && resp.status < 300 && isRestricted) {
-                throw new Error(`Invalid location: ${resp.url}`);
+            if (isRestricted) {
+                assert(resp.status >= 300, `Invalid location: ${resp.url}`);
             }
-        } else if (resp.status !== 200) {
-            throw new Error(`Invalid response status: ${resp.status}. 200 is expected`);
+        } else {
+            assert(resp.status === 200, `Invalid response status: ${resp.status}. 200 is expected`);
         }
 
         return true;

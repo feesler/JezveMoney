@@ -1,4 +1,4 @@
-import { isFunction } from 'jezve-test';
+import { assert } from 'jezve-test';
 import { fixFloat } from '../common.js';
 import { App } from '../Application.js';
 import { ImportTransaction } from './ImportTransaction.js';
@@ -16,14 +16,10 @@ export class ImportAction {
     constructor(data) {
         const requiredProps = ['action_id', 'value'];
 
-        if (!data) {
-            throw new Error('Invalid data');
-        }
+        assert(data, 'Invalid data');
 
         requiredProps.forEach((propName) => {
-            if (!(propName in data)) {
-                throw new Error(`Property '${propName}' not found.`);
-            }
+            assert(propName in data, `Property '${propName}' not found.`);
 
             this[propName] = data[propName];
         });
@@ -123,18 +119,14 @@ export class ImportAction {
     /** Search action type by id */
     static getActionById(value) {
         const id = parseInt(value, 10);
-        if (!id) {
-            throw new Error('Invalid parameter');
-        }
+        assert(id, 'Invalid parameter');
 
         return this.actionTypes.find((item) => item.id === id);
     }
 
     /** Search action type by name (case insensitive) */
     static findActionByName(name) {
-        if (typeof name !== 'string') {
-            throw new Error('Invalid parameter');
-        }
+        assert.isString(name, 'Invalid parameter');
 
         const lcName = name.toLowerCase();
         return this.actionTypes.find((item) => item.title.toLowerCase() === lcName);
@@ -165,17 +157,11 @@ export class ImportAction {
     * @param {ImportTransaction} context - import transaction object
     */
     execute(context) {
-        if (!(context instanceof ImportTransaction)) {
-            throw new Error('Invalid import item');
-        }
-        if (!(this.action_id in ImportAction.actionsMap)) {
-            throw new Error('Invalid action');
-        }
+        assert.instanceOf(context, ImportTransaction, 'Invalid import item');
+        assert(this.action_id in ImportAction.actionsMap, 'Invalid action');
 
         const actionName = ImportAction.actionsMap[this.action_id];
-        if (!isFunction(context[actionName])) {
-            throw new Error('Invalid action');
-        }
+        assert.isFunction(context[actionName], 'Invalid action');
 
         context[actionName](this.value);
     }

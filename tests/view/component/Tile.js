@@ -1,18 +1,18 @@
-import { TestComponent } from 'jezve-test';
-import { Icon } from '../../model/Icon.js';
-import { Currency } from '../../model/Currency.js';
 import {
+    TestComponent,
+    assert,
     query,
     prop,
     hasClass,
     click,
-} from '../../env.js';
+} from 'jezve-test';
+import { Icon } from '../../model/Icon.js';
+import { Currency } from '../../model/Currency.js';
 
 export class Tile extends TestComponent {
     async parseContent() {
-        if (!this.elem || !await hasClass(this.elem, 'tile')) {
-            throw new Error('Wrong tile structure');
-        }
+        const validClass = await hasClass(this.elem, 'tile');
+        assert(validClass, 'Invalid structure of tile');
 
         const res = {
             linkElem: await query(this.elem, '.tilelink'),
@@ -21,7 +21,11 @@ export class Tile extends TestComponent {
             id: parseInt(await prop(this.elem, 'dataset.id'), 10),
         };
 
-        res.balance = await prop(res.balanceEL, 'textContent');
+        const balanceText = await prop(res.balanceEL, 'innerText');
+        res.balance = (balanceText)
+            ? balanceText.split('\r\n').join('\n')
+            : null;
+
         res.name = await prop(res.nameEL, 'textContent');
 
         res.isActive = await hasClass(this.elem, 'tile_selected');
@@ -58,11 +62,33 @@ export class Tile extends TestComponent {
         return res;
     }
 
-    static renderPerson(person) {
+    /**
+     * Format non-zero balances of person accounts
+     * Return array of strings
+     * @param {Account[]} accounts - array of person accounts
+     */
+    static filterPersonDebts(accounts) {
+        assert.isArray(accounts, 'Unexpected input');
+
+        const res = accounts.filter((item) => item.balance !== 0)
+            .map((item) => Currency.format(item.curr_id, item.balance));
+
+        return res;
+    }
+
+    static renderPerson(person, withDebts) {
+        assert(person, 'Invalid person');
+
         const res = {
             name: person.name,
-            balance: null,
         };
+
+        if (withDebts) {
+            const debtAccounts = Tile.filterPersonDebts(person.accounts);
+            res.balance = (debtAccounts.length) ? debtAccounts.join('\n') : 'No debts';
+        } else {
+            res.balance = null;
+        }
 
         return res;
     }

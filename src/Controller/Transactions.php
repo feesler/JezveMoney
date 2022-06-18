@@ -79,6 +79,7 @@ class Transactions extends TemplateController
         $filterObj = $this->model->getFilterObject($trParams);
 
         $data["accFilter"] = isset($trParams["accounts"]) ? $trParams["accounts"] : [];
+        $data["personFilter"] = isset($trParams["persons"]) ? $trParams["persons"] : [];
         $data["searchReq"] = isset($trParams["search"]) ? $trParams["search"] : null;
 
         $dateFmt = "";
@@ -100,7 +101,9 @@ class Transactions extends TemplateController
 
         $data["accArr"] = $this->accModel->getData();
         $data["hiddenAccArr"] = $this->accModel->getData(["type" => "hidden"]);
-        $data["accounts"] = $this->accModel->getCount(["type" => "all"]);
+
+        $data["personArr"] = $this->personMod->getData();
+        $data["hiddenPersonArr"] = $this->personMod->getData(["type" => "hidden"]);
 
         $transArr = $this->model->getData($trParams);
 
@@ -316,6 +319,24 @@ class Transactions extends TemplateController
         }
         $data["acc_id"] = $acc_id;
 
+        // Check person parameter
+        $person_id = 0;
+        $pObj = null;
+        if (isset($_GET["person_id"]) && $tr["type"] == DEBT) {
+            $person_id = intval($_GET["person_id"]);
+        }
+        if ($person_id) {
+            $pObj = $this->personMod->getItem($person_id);
+            if (!$pObj || $this->personMod->isHidden($pObj)) {
+                $this->fail($defMsg);
+            }
+        } else {
+            $person_id = (is_array($visiblePersons) && count($visiblePersons) > 0)
+                ? $visiblePersons[0]->id
+                : 0;
+            $pObj = $this->personMod->getItem($person_id);
+        }
+
         $debtType = true;
         $noAccount = $acc_id == 0;
         $srcAmountCurr = 0;
@@ -323,10 +344,6 @@ class Transactions extends TemplateController
         $debtAcc = $this->accModel->getItem($acc_id);
 
         // Prepare person account
-        $person_id = (is_array($visiblePersons) && count($visiblePersons) > 0)
-            ? $visiblePersons[0]->id
-            : 0;
-        $pObj = $this->personMod->getItem($person_id);
         $person_curr = ($debtAcc) ? $debtAcc->curr_id : $this->currModel->getIdByPos(0);
         $person_acc = $this->accModel->getPersonAccount($person_id, $person_curr);
         $person_acc_id = ($person_acc) ? $person_acc->id : 0;
@@ -796,7 +813,7 @@ class Transactions extends TemplateController
 
         $data["personTile"] = [
             "id" => "person_tile",
-            "title" => $pObj->name,
+            "title" => ($pObj) ? $pObj->name : null,
             "subtitle" => $this->currModel->format($person_balance, $person_curr),
         ];
 

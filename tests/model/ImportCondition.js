@@ -1,4 +1,9 @@
-import { isFunction, isObject, hasFlag } from 'jezve-test';
+import {
+    isFunction,
+    isObject,
+    hasFlag,
+    assert,
+} from 'jezve-test';
 import { convDate, fixFloat } from '../common.js';
 
 /** Condition field types */
@@ -24,14 +29,10 @@ export class ImportCondition {
     constructor(data) {
         const requiredProps = ['field_id', 'operator', 'value', 'flags'];
 
-        if (!data) {
-            throw new Error('Invalid data');
-        }
+        assert(data, 'Invalid data');
 
         requiredProps.forEach((propName) => {
-            if (!(propName in data)) {
-                throw new Error(`Property '${propName}' not found.`);
-            }
+            assert(propName in data, `Property '${propName}' not found.`);
 
             this[propName] = data[propName];
         });
@@ -128,12 +129,8 @@ export class ImportCondition {
     */
     static getFieldValue(fieldId, data) {
         const field = parseInt(fieldId, 10);
-        if (!field || !(field in this.fieldsMap)) {
-            throw new Error(`Invalid field id: ${fieldId}`);
-        }
-        if (!isObject(data)) {
-            throw new Error('Invalid transaction data');
-        }
+        assert(field && (field in this.fieldsMap), `Invalid field id: ${fieldId}`);
+        assert.isObject(data, 'Invalid transaction data');
 
         const mapper = this.fieldsMap[field];
         if (isFunction(mapper)) {
@@ -181,18 +178,14 @@ export class ImportCondition {
     /** Search condition field type by id */
     static getFieldTypeById(value) {
         const id = parseInt(value, 10);
-        if (!id) {
-            throw new Error('Invalid parameter');
-        }
+        assert(id, 'Invalid parameter');
 
         return this.fieldTypes.find((item) => item.id === id);
     }
 
     /** Search condition field type by name (case insensitive) */
     static findFieldTypeByName(name) {
-        if (typeof name !== 'string') {
-            throw new Error('Invalid parameter');
-        }
+        assert.isString(name, 'Invalid parameter');
 
         const lcName = name.toLowerCase();
         return this.fieldTypes.find((item) => item.title.toLowerCase() === lcName);
@@ -201,18 +194,14 @@ export class ImportCondition {
     /** Search condition operator by id */
     static getOperatorById(value) {
         const id = parseInt(value, 10);
-        if (!id) {
-            throw new Error('Invalid parameter');
-        }
+        assert(id, 'Invalid parameter');
 
         return this.operatorTypes.find((item) => item.id === id);
     }
 
     /** Search condition operator by name (case insensitive) */
     static findOperatorByName(name) {
-        if (typeof name !== 'string') {
-            throw new Error('Invalid parameter');
-        }
+        assert.isString(name, 'Invalid parameter');
 
         const lcName = name.toLowerCase();
         return this.operatorTypes.find((item) => item.title.toLowerCase() === lcName);
@@ -236,9 +225,7 @@ export class ImportCondition {
     /** Check field value flag */
     static isPropertyValueFlag(value) {
         const flags = parseInt(value, 10);
-        if (Number.isNaN(flags)) {
-            throw new Error('Invalid flags value');
-        }
+        assert.isNumber(flags, 'Invalid flags value');
 
         return hasFlag(flags, IMPORT_COND_OP_FIELD_FLAG);
     }
@@ -347,16 +334,12 @@ export class ImportCondition {
     * @param {number} rightVal - value on the right to operator
     */
     applyOperator(leftVal, rightVal) {
-        if (typeof leftVal === 'undefined') {
-            throw new Error('Invalid parameters');
-        }
+        assert.isDefined(leftVal, 'Invalid parameters');
 
         const left = leftVal;
         const right = (typeof left === 'string') ? rightVal.toString() : rightVal;
 
-        if (!(this.operator in ImportCondition.operatorsMap)) {
-            throw new Error(`Unknown operator '${this.operator}'`);
-        }
+        assert((this.operator in ImportCondition.operatorsMap), `Unknown operator '${this.operator}'`);
 
         const operatorFunction = ImportCondition.operatorsMap[this.operator];
         return operatorFunction(left, right);
@@ -375,9 +358,7 @@ export class ImportCondition {
     * @param {string} field - field name to check
     */
     getConditionValue(data) {
-        if (!isObject(data)) {
-            throw new Error('Invalid transaction data');
-        }
+        assert(isObject(data), 'Invalid transaction data');
 
         if (this.isPropertyValue()) {
             return ImportCondition.getFieldValue(this.value, data);
@@ -399,9 +380,7 @@ export class ImportCondition {
     * Check specified data is meet condition
     */
     meet(data) {
-        if (!data) {
-            throw new Error('Invalid parameters');
-        }
+        assert(data, 'Invalid parameters');
 
         const fieldValue = this.getFieldValue(data);
         const conditionValue = this.getConditionValue(data);

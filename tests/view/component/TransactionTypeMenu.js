@@ -1,6 +1,10 @@
-import { TestComponent } from 'jezve-test';
+import {
+    TestComponent,
+    assert,
+    queryAll,
+    hasClass,
+} from 'jezve-test';
 import { MenuItem } from './MenuItem.js';
-import { queryAll, hasClass } from '../../env.js';
 
 export class TransactionTypeMenu extends TestComponent {
     async parseContent() {
@@ -50,17 +54,13 @@ export class TransactionTypeMenu extends TestComponent {
     }
 
     async select(type) {
-        if (!this.content.items[type]) {
-            throw new Error(`MenuItem of type '${type}' not found`);
-        }
+        assert(this.content.items[type], `MenuItem of type '${type}' not found`);
 
         return this.content.items[type].click();
     }
 
     async toggle(type) {
-        if (!this.content.items[type]) {
-            throw new Error(`MenuItem of type '${type}' not found`);
-        }
+        assert(this.content.items[type], `MenuItem of type '${type}' not found`);
 
         return this.content.items[type].toggle();
     }

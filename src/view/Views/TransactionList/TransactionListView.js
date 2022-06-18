@@ -6,8 +6,6 @@ import {
     isDate,
     urlJoin,
     isEmpty,
-    insertAfter,
-    prependChild,
     removeChilds,
     setEvents,
     setEmptyClick,
@@ -19,13 +17,7 @@ import { DatePicker } from 'jezvejs/DatePicker';
 import { Paginator } from 'jezvejs/Paginator';
 import { Sortable } from 'jezvejs/Sortable';
 import { Selection } from 'jezvejs/Selection';
-import {
-    EXPENSE,
-    INCOME,
-    TRANSFER,
-    DEBT,
-    createMessage,
-} from '../../js/app.js';
+import { createMessage } from '../../js/app.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
@@ -54,10 +46,6 @@ class TransactionListView extends View {
     constructor(...args) {
         super(...args);
 
-        this.model = {
-            selDateRange: null,
-        };
-
         this.state = {
             items: [...this.props.transArr],
             filter: { ...this.props.filterObj },
@@ -66,6 +54,7 @@ class TransactionListView extends View {
             loading: false,
             renderTime: Date.now(),
             selectedItems: new Selection(),
+            selDateRange: null,
         };
     }
 
@@ -89,6 +78,17 @@ class TransactionListView extends View {
             extraClass: 'dd__fullwidth',
         });
         if (!this.accountDropDown) {
+            throw new Error('Failed to initialize Transaction List view');
+        }
+
+        this.personDropDown = DropDown.create({
+            input_id: 'person_id',
+            placeholder: 'Select person',
+            onchange: (obj) => this.onPersonChange(obj),
+            editable: false,
+            extraClass: 'dd__fullwidth',
+        });
+        if (!this.personDropDown) {
             throw new Error('Failed to initialize Transaction List view');
         }
 
@@ -144,7 +144,6 @@ class TransactionListView extends View {
         this.listItems = document.querySelector('.trans-list');
         if (this.listItems) {
             this.trListSortable = new Sortable({
-                ondragstart: (elem) => this.onTransDragStart(elem),
                 oninsertat: (elem, ref) => this.onTransPosChanged(elem, ref),
                 container: this.listItems,
                 group: 'transactions',
@@ -153,12 +152,6 @@ class TransactionListView extends View {
                 copyWidth: true,
                 table: (this.state.mode === 'details'),
             });
-
-            /**
-             * dragFrom is transaction id before transaction started to drag
-             * 0 if drag first transaction, -1 if no draggin currently
-             */
-            this.trListSortable.dragFrom = -1;
 
             this.listItems.addEventListener('click', (e) => this.onTransClick(e));
         }
@@ -209,7 +202,8 @@ class TransactionListView extends View {
      * @param {number} pos - new position of specified transaction
      */
     setPosition(transactionId, pos) {
-        const posCompare = (a, b) => a.pos - b.pos;
+        const posCompareAsc = (a, b) => a.pos - b.pos;
+        const posCompareDesc = (a, b) => b.pos - a.pos;
         const initBalArr = [];
         const tBalanceArr = [];
 
@@ -223,7 +217,7 @@ class TransactionListView extends View {
             return true;
         }
 
-        this.state.items.sort(posCompare);
+        this.state.items.sort(posCompareAsc);
         this.state.items.forEach((transaction) => {
             const tr = transaction;
             if (tr.id === transactionId) {
@@ -255,7 +249,7 @@ class TransactionListView extends View {
         });
 
         // Sort array of transaction by position again
-        this.state.items.sort(posCompare);
+        this.state.items.sort(posCompareAsc);
 
         if (this.state.mode === 'details') {
             this.state.items.forEach((transaction) => {
@@ -288,6 +282,9 @@ class TransactionListView extends View {
                 tBalanceArr[tr.dest_id] = tr.dest_result;
             });
         }
+
+        this.state.items.sort(posCompareDesc);
+        this.render(this.state);
 
         return true;
     }
@@ -324,49 +321,6 @@ class TransactionListView extends View {
         } else {
             tr.dest_result = 0;
         }
-
-        const transItemElem = this.findListItemById(tr.id);
-        if (!transItemElem) {
-            return;
-        }
-        const transBalanceItem = transItemElem.querySelector('.tritem_balance');
-        if (!transBalanceItem) {
-            return;
-        }
-
-        removeChilds(transBalanceItem);
-
-        const currencyModel = window.app.model.currency;
-
-        if (tr.type === EXPENSE
-            || tr.type === TRANSFER
-            || (tr.type === DEBT && tr.src_id !== 0)) {
-            const balSpan = ce('span');
-            balSpan.textContent = currencyModel.formatCurrency(
-                tr.src_result,
-                tr.src_curr,
-            );
-            transBalanceItem.appendChild(balSpan);
-        }
-
-        if (tr.type === INCOME
-            || tr.type === TRANSFER
-            || (tr.type === DEBT && tr.dest_id !== 0)) {
-            const balSpan = ce('span');
-            balSpan.textContent = currencyModel.formatCurrency(
-                tr.dest_result,
-                tr.dest_curr,
-            );
-            transBalanceItem.appendChild(balSpan);
-        }
-    }
-
-    /**
-     * Look for list item with specified identifier
-     * @param {number} id - transaction identifier
-     */
-    findListItemById(id) {
-        return this.listItems.querySelector(`[data-id="${id}"]`);
     }
 
     /**
@@ -442,28 +396,8 @@ class TransactionListView extends View {
      * Cancel local changes on transaction position update fail
      * @param {number} trans_id - identifier of transaction
      */
-    cancelPosChange(transactionId) {
-        if (!this.trListSortable || this.trListSortable.dragFrom === -1) {
-            return;
-        }
-
-        const origTr = this.findListItemById(transactionId);
-        if (!origTr || !origTr.parentNode) {
-            return;
-        }
-
-        const origWrap = origTr.parentNode;
-        if (this.trListSortable.dragFrom === 0) {
-            prependChild(origWrap.parentNode, origWrap);
-        } else {
-            const trBefore = this.findListItemById(this.trListSortable.dragFrom);
-            if (!trBefore || !trBefore.parentNode) {
-                return;
-            }
-
-            const trBeforeWrap = trBefore.parentNode;
-            insertAfter(origWrap, trBeforeWrap);
-        }
+    cancelPosChange() {
+        this.render(this.state);
 
         createMessage(MSG_SET_POS_FAIL, 'msg_error');
     }
@@ -498,19 +432,6 @@ class TransactionListView extends View {
         }
 
         return parseInt(listItemElem.dataset.id, 10);
-    }
-
-    /**
-     * Transaction drag start event handler
-     * @param {Element} elem - transaction list item element
-     */
-    onTransDragStart(elem) {
-        if (!this.trListSortable || !elem) {
-            return;
-        }
-
-        const prevElem = elem.previousElementSibling;
-        this.trListSortable.dragFrom = this.transIdFromElem(prevElem);
     }
 
     /**
@@ -556,6 +477,16 @@ class TransactionListView extends View {
 
             if (!locFilter.acc_id.length) {
                 delete locFilter.acc_id;
+            }
+        }
+
+        if ('person_id' in locFilter) {
+            if (!Array.isArray(locFilter.person_id)) {
+                locFilter.person_id = [locFilter.person_id];
+            }
+
+            if (!locFilter.person_id.length) {
+                delete locFilter.person_id;
             }
         }
 
@@ -620,6 +551,38 @@ class TransactionListView extends View {
     }
 
     /**
+     * Persons filter change event handler
+     * @param {object} obj - selection object
+     */
+    onPersonChange(obj) {
+        // Check all persons from the new selection present in current selection
+        const data = Array.isArray(obj) ? obj : [obj];
+        let reloadNeeded = data.some((item) => {
+            const id = parseInt(item.id, 10);
+
+            return (
+                !this.state.filter.person_id
+                || !this.state.filter.person_id.includes(id)
+            );
+        });
+
+        // Check all currenlty selected persons present in the new selection
+        if (!reloadNeeded) {
+            reloadNeeded = this.state.filter.person_id.some(
+                (personId) => !data.find((item) => item.id === personId),
+            );
+        }
+
+        if (!reloadNeeded) {
+            return;
+        }
+
+        // Prepare parameters
+        this.state.filter.person_id = data.map((item) => parseInt(item.id, 10));
+        this.requestTransactions(this.state.filter);
+    }
+
+    /**
      * Transaction search form submit event handler
      * @param {Event} e - submit event
      */
@@ -677,7 +640,7 @@ class TransactionListView extends View {
             return;
         }
 
-        this.model.selDateRange = range;
+        this.state.selDateRange = range;
         this.datePicker.hide();
         const start = formatDate(range.start);
         const end = formatDate(range.end);
@@ -689,12 +652,12 @@ class TransactionListView extends View {
      * Date picker hide callback
      */
     onDatePickerHide() {
-        if (!this.model.selDateRange) {
+        if (!this.state.selDateRange) {
             return;
         }
 
-        const newStartDate = formatDate(this.model.selDateRange.start);
-        const newEndDate = formatDate(this.model.selDateRange.end);
+        const newStartDate = formatDate(this.state.selDateRange.start);
+        const newEndDate = formatDate(this.state.selDateRange.end);
 
         if (this.state.filter.stdate === newStartDate
             && this.state.filter.enddate === newEndDate) {
@@ -813,23 +776,8 @@ class TransactionListView extends View {
         this.stopLoading();
     }
 
-    render(state) {
-        if (state.loading) {
-            show(this.loadingIndicator, true);
-        }
-
-        const filterUrl = new URL(this.buildAddress());
-        filterUrl.searchParams.delete('page');
-        if (state.mode === 'details') {
-            filterUrl.searchParams.set('mode', 'details');
-        } else {
-            filterUrl.searchParams.delete('mode');
-        }
-
-        this.typeMenu.setURL(filterUrl);
-        this.typeMenu.setSelection(state.filter.type);
-
-        // Render accounts selection
+    /** Render accounts selection */
+    renderAccountsFilter(state) {
         const selectedAccounts = this.accountDropDown.getSelectedItems();
         const selectedIds = [];
         const idsToSelect = Array.isArray(state.filter.acc_id) ? state.filter.acc_id : [];
@@ -846,6 +794,46 @@ class TransactionListView extends View {
                 this.accountDropDown.selectItem(accountId.toString());
             }
         });
+    }
+
+    /** Render persons selection */
+    renderPersonsFilter(state) {
+        const selectedPersons = this.personDropDown.getSelectedItems();
+        const selectedIds = [];
+        const idsToSelect = Array.isArray(state.filter.person_id) ? state.filter.person_id : [];
+        selectedPersons.forEach((personItem) => {
+            const itemId = parseInt(personItem.id, 10);
+            selectedIds.push(itemId);
+
+            if (!idsToSelect.includes(itemId)) {
+                this.personDropDown.deselectItem(personItem.id);
+            }
+        });
+        idsToSelect.forEach((personId) => {
+            if (!selectedIds.includes(personId)) {
+                this.personDropDown.selectItem(personId.toString());
+            }
+        });
+    }
+
+    render(state) {
+        if (state.loading) {
+            show(this.loadingIndicator, true);
+        }
+
+        const filterUrl = new URL(this.buildAddress());
+        filterUrl.searchParams.delete('page');
+        if (state.mode === 'details') {
+            filterUrl.searchParams.set('mode', 'details');
+        } else {
+            filterUrl.searchParams.delete('mode');
+        }
+
+        this.typeMenu.setURL(filterUrl);
+        this.typeMenu.setSelection(state.filter.type);
+
+        this.renderAccountsFilter(state);
+        this.renderPersonsFilter(state);
 
         // Render date
         const dateSubtitle = (state.filter.stdate && state.filter.enddate)

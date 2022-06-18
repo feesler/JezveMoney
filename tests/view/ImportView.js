@@ -1,3 +1,12 @@
+import {
+    assert,
+    query,
+    prop,
+    attr,
+    click,
+    wait,
+    waitForFunction,
+} from 'jezve-test';
 import { copyObject } from 'jezvejs';
 import { AppView } from './AppView.js';
 import { IconLink } from './component/IconLink.js';
@@ -7,14 +16,6 @@ import { ImportRulesDialog } from './component/Import/ImportRulesDialog.js';
 import { DropDown } from './component/DropDown.js';
 import { ImportViewSubmitError } from '../error/ImportViewSubmitError.js';
 import { findSimilarTransaction } from '../model/import.js';
-import {
-    query,
-    prop,
-    attr,
-    click,
-    wait,
-    waitForFunction,
-} from '../env.js';
 import { App } from '../Application.js';
 
 /** Import view class */
@@ -42,21 +43,20 @@ export class ImportView extends AppView {
             submitProgress: { elem: await query('#submitProgress') },
         };
 
-        if (
-            !res.title.elem
-            || !res.uploadBtn.elem
-            || !res.addBtn.elem
-            || !res.clearBtn.elem
-            || !res.totalCount.elem
-            || !res.enabledCount.elem
-            || !res.rulesCheck.elem
-            || !res.rulesBtn.elem
-            || !res.rulesCount.elem
-            || !res.submitBtn.elem
-            || !res.submitProgress.elem
-        ) {
-            throw new Error('Invalid structure of import view');
-        }
+        assert(
+            res.title.elem
+            && res.uploadBtn.elem
+            && res.addBtn.elem
+            && res.clearBtn.elem
+            && res.totalCount.elem
+            && res.enabledCount.elem
+            && res.rulesCheck.elem
+            && res.rulesBtn.elem
+            && res.rulesCount.elem
+            && res.submitBtn.elem
+            && res.submitProgress.elem,
+            'Invalid structure of import view',
+        );
 
         const importEnabled = !res.notAvailMsg.elem;
 
@@ -72,9 +72,7 @@ export class ImportView extends AppView {
 
         if (importEnabled) {
             res.mainAccountSelect = await DropDown.createFromChild(this, await query('#acc_id'));
-            if (!res.mainAccountSelect) {
-                throw new Error('Invalid structure of import view');
-            }
+            assert(res.mainAccountSelect, 'Invalid structure of import view');
         }
 
         const rowsContainer = await query('#rowsContainer');
@@ -83,9 +81,7 @@ export class ImportView extends AppView {
         if (importEnabled) {
             const mainAccountId = res.mainAccountSelect.content.value;
             res.itemsList = await ImportList.create(this, rowsContainer, mainAccountId);
-            if (!res.itemsList) {
-                throw new Error('Invalid structure of import view');
-            }
+            assert(res.itemsList, 'Invalid structure of import view');
         }
 
         const uploadDialogPopup = await query(this.uploadPopupId);
@@ -162,9 +158,7 @@ export class ImportView extends AppView {
     }
 
     assertStateId(state) {
-        if (this.model.state !== state) {
-            throw new Error('Invalid state of import view');
-        }
+        assert(this.model.state === state, 'Invalid state of import view');
     }
 
     checkMainState() {
@@ -182,9 +176,10 @@ export class ImportView extends AppView {
     async enableRules(value) {
         this.checkMainState();
 
-        if (value === this.isRulesEnabled()) {
-            throw new Error(value ? 'Rules already enabled' : 'Result already disabled');
-        }
+        assert(
+            value !== this.isRulesEnabled(),
+            value ? 'Rules already enabled' : 'Result already disabled',
+        );
         await this.performAction(() => click(this.content.rulesCheck.elem));
     }
 
@@ -209,9 +204,7 @@ export class ImportView extends AppView {
         await this.performAction(() => this.content.uploadDialog.close());
         await this.performAction(() => wait(this.uploadPopupId, { hidden: true }));
 
-        if (this.content.uploadDialog?.content?.visible) {
-            throw new Error('File upload dialog not closed');
-        }
+        assert(!this.content.uploadDialog?.content?.visible, 'File upload dialog not closed');
     }
 
     async setUploadFile(name, data) {
@@ -409,16 +402,12 @@ export class ImportView extends AppView {
 
     checkRulesFormState() {
         this.checkRulesState();
-        if (!this.content.rulesDialog.isFormState()) {
-            throw new Error('Invalid state');
-        }
+        assert(this.content.rulesDialog.isFormState(), 'Invalid state');
     }
 
     checkRulesListState() {
         this.checkRulesState();
-        if (!this.content.rulesDialog.isListState()) {
-            throw new Error('Invalid state');
-        }
+        assert(this.content.rulesDialog.isListState(), 'Invalid state');
     }
 
     async launchRulesDialog() {
@@ -596,25 +585,19 @@ export class ImportView extends AppView {
     async enableItems(index, value) {
         this.checkMainState();
 
-        if (typeof index === 'undefined') {
-            throw new Error('No items specified');
-        }
+        assert(typeof index !== 'undefined', 'No items specified');
 
         const items = Array.isArray(index) ? index : [index];
         const enable = !!value;
 
-        if (!this.content.itemsList) {
-            throw new Error('No items available');
-        }
+        assert(this.content.itemsList, 'No items available');
 
         await this.performAction(async () => {
             for (const ind of items) {
                 const item = this.content.itemsList.getItem(ind);
-                if (item.model.enabled !== enable) {
-                    await item.toggleEnable();
-                } else {
-                    throw new Error(`Item ${ind} already ${enable ? 'enabled' : 'disabled'}`);
-                }
+                assert(item.model.enabled !== enable, `Item ${ind} already ${enable ? 'enabled' : 'disabled'}`);
+
+                await item.toggleEnable();
             }
         });
     }
@@ -632,9 +615,7 @@ export class ImportView extends AppView {
     async deleteItem(index) {
         this.checkMainState();
 
-        if (typeof index === 'undefined') {
-            throw new Error('No items specified');
-        }
+        assert(typeof index !== 'undefined', 'No items specified');
 
         const items = Array.isArray(index) ? index : [index];
         items.sort();

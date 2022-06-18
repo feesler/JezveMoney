@@ -1,16 +1,15 @@
-import { TestComponent } from 'jezve-test';
 import {
+    TestComponent,
     query,
     hasClass,
     prop,
     click,
-} from '../../../env.js';
+    assert,
+} from 'jezve-test';
 
 export class ImportRuleAccordion extends TestComponent {
     async parseContent() {
-        if (!this.elem) {
-            throw new Error('Invalid import rule accordion element');
-        }
+        assert(this.elem, 'Invalid import rule accordion element');
 
         const res = {
             collapsed: !(await hasClass(this.elem, 'collapsible__expanded')),
@@ -21,15 +20,14 @@ export class ImportRuleAccordion extends TestComponent {
             contentElem: await query(this.elem, '.collapsible-content'),
         };
 
-        if (
-            !res.headerElem
-            || !res.labelElem
-            || !res.createBtn
-            || !res.toggleBtn
-            || !res.contentElem
-        ) {
-            throw new Error('Invalid structure of import rule accordion');
-        }
+        assert(
+            res.headerElem
+            && res.labelElem
+            && res.createBtn
+            && res.toggleBtn
+            && res.contentElem,
+            'Invalid structure of import rule accordion',
+        );
 
         res.title = await prop(res.labelElem, 'textContent');
 

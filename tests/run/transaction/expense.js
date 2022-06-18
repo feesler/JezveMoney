@@ -1,9 +1,8 @@
-import { test } from 'jezve-test';
+import { test, setBlock, assert } from 'jezve-test';
 import * as TransactionTests from './index.js';
 import { Currency } from '../../model/Currency.js';
 import { EXPENSE } from '../../model/Transaction.js';
 import { App } from '../../Application.js';
-import { setBlock } from '../../env.js';
 
 export const submit = async (params) => {
     if ('srcAcc' in params) {
@@ -14,9 +13,7 @@ export const submit = async (params) => {
         await TransactionTests.runAction({ action: 'changeDestCurrency', data: params.destCurr });
     }
 
-    if (!('destAmount' in params)) {
-        throw new Error('Destination amount value not specified');
-    }
+    assert('destAmount' in params, 'Destination amount value not specified');
 
     await TransactionTests.runAction({ action: 'inputDestAmount', data: params.destAmount });
 

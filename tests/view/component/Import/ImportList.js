@@ -1,8 +1,13 @@
+import {
+    TestComponent,
+    assert,
+    query,
+    queryAll,
+    isVisible,
+} from 'jezve-test';
 import { copyObject } from 'jezvejs';
-import { TestComponent, assert } from 'jezve-test';
 import { ImportListItem } from './ImportListItem.js';
 import { asyncMap } from '../../../common.js';
-import { query, queryAll, isVisible } from '../../../env.js';
 
 export class ImportList extends TestComponent {
     constructor(parent, elem, mainAccount) {
@@ -26,9 +31,7 @@ export class ImportList extends TestComponent {
         } else {
             const noDataMsg = await query(this.elem, '.nodata-message');
             const visible = await isVisible(noDataMsg);
-            if (!visible) {
-                throw new Error('No data message is not visible');
-            }
+            assert(visible, 'No data message is not visible');
         }
 
         res.loadingIndicator = await query(this.elem, '.data-container__loading');
@@ -54,9 +57,7 @@ export class ImportList extends TestComponent {
     }
 
     getItemData(item) {
-        if (!item) {
-            throw new Error('Invalid item');
-        }
+        assert(item, 'Invalid item');
 
         const res = copyObject(item.data);
 
@@ -80,9 +81,7 @@ export class ImportList extends TestComponent {
     }
 
     static render(transactions, state) {
-        if (!Array.isArray(transactions)) {
-            throw new Error('Invalid data');
-        }
+        assert.isArray(transactions, 'Invalid data');
 
         return {
             items: transactions.map((item) => ImportListItem.render(item, state)),

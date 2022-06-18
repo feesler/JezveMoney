@@ -1,24 +1,23 @@
-import { TestComponent } from 'jezve-test';
-import { query, prop, click } from '../../env.js';
+import {
+    TestComponent,
+    assert,
+    query,
+    prop,
+    click,
+} from 'jezve-test';
 
 export class TileInfoItem extends TestComponent {
     async parseContent() {
         const res = {};
 
         res.titleElem = await query(this.elem, ':scope > *');
-        if (!res.titleElem) {
-            throw new Error('Title element not found');
-        }
+        assert(res.titleElem, 'Title element not found');
         res.title = await prop(res.titleElem, 'textContent');
 
         res.buttonElem = await query(this.elem, 'button');
-        if (!res.buttonElem) {
-            throw new Error('Button element not found');
-        }
+        assert(res.buttonElem, 'Button element not found');
         const buttonInner = await query(res.buttonElem, 'span');
-        if (!buttonInner) {
-            throw new Error('Wrong structure of tile info block');
-        }
+        assert(buttonInner, 'Wrong structure of tile info block');
         res.value = await prop(buttonInner, 'textContent');
 
         return res;

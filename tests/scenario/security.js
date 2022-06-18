@@ -1,5 +1,5 @@
+import { setBlock } from 'jezve-test';
 import * as SecurityTests from '../run/security.js';
-import { setBlock } from '../env.js';
 
 let scenario = null;
 
@@ -14,6 +14,10 @@ export const securityTests = {
         setBlock('Security tests', 1);
 
         await scenario.runner.runGroup(SecurityTests.checkAccess, [
+            '.htaccess',
+            'composer.json',
+            'composer.lock',
+            'manifest.webmanifest',
             'system',
             'system/logs/log.txt',
             'Model/',

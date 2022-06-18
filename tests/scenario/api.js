@@ -1,4 +1,4 @@
-import { copyObject } from 'jezve-test';
+import { copyObject, setBlock } from 'jezve-test';
 import {
     EXPENSE,
     INCOME,
@@ -27,7 +27,6 @@ import * as TransactionApiTests from '../run/api/transaction.js';
 import * as ImportTemplateApiTests from '../run/api/importtemplate.js';
 import * as ImportRuleApiTests from '../run/api/importrule.js';
 import { App } from '../Application.js';
-import { setBlock } from '../env.js';
 
 let scenario = null;
 

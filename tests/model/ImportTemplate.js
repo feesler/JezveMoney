@@ -9,9 +9,7 @@ import { ImportTemplateError } from '../error/ImportTemplateError.js';
 /** Import template model */
 export class ImportTemplate {
     constructor(data) {
-        if (!data) {
-            throw new Error('Invalid data');
-        }
+        assert(data, 'Invalid data');
 
         this.name = data.name;
         this.type_id = data.type_id;
@@ -61,9 +59,8 @@ export class ImportTemplate {
         ];
         const skipRows = 1;
 
-        if (!Array.isArray(data) || !mainAccount) {
-            throw new Error('Invalid parameters');
-        }
+        assert.isArray(data, 'Invalid parameters');
+        assert(mainAccount, 'Invalid parameters');
 
         const res = [];
         try {
@@ -74,9 +71,7 @@ export class ImportTemplate {
 
                 const original = { mainAccount };
                 columns.forEach((column) => {
-                    if (!(column in this.columns)) {
-                        throw new Error(`Column '${column}' not found`);
-                    }
+                    assert(column in this.columns, `Column '${column}' not found`);
 
                     let value = ImportTemplate.getColumn(row, this.columns[column]);
 

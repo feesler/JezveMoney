@@ -1,10 +1,11 @@
-import { TestComponent } from 'jezve-test';
 import {
+    TestComponent,
+    assert,
     query,
     prop,
     hasClass,
     click,
-} from '../../env.js';
+} from 'jezve-test';
 
 export class MessagePopup extends TestComponent {
     static async create(...args) {
@@ -34,9 +35,7 @@ export class MessagePopup extends TestComponent {
             && !(await hasClass(this.elem, 'msg_error'));
 
         res.messageElem = await query(this.elem, '.popup__message');
-        if (!res.messageElem) {
-            throw new Error('Wrong structure of message popup');
-        }
+        assert(res.messageElem, 'Wrong structure of message popup');
 
         res.message = await prop(res.messageElem, 'textContent');
         res.message = res.message.trim();

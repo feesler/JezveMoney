@@ -1,5 +1,5 @@
+import { setBlock } from 'jezve-test';
 import * as PersonTests from '../run/person.js';
-import { setBlock } from '../env.js';
 
 let scenario = null;
 
@@ -14,6 +14,8 @@ const createTests = async () => {
         { name: 'Иван' },
         // Try to submit person with empty name
         { name: '' },
+        // Try to submit person with existing name
+        { name: 'Alex' },
     ];
 
     await scenario.runner.runGroup(PersonTests.create, data);
@@ -29,6 +31,14 @@ const updateTests = async () => {
         // Try to submit person with empty name
         pos: 0,
         name: '',
+    }, {
+        // Try to submit person with existing name
+        pos: 0,
+        name: 'Alex',
+    }, {
+        // Try to update case in person name
+        pos: 2,
+        name: 'MARIA',
     }];
 
     await scenario.runner.runGroup(PersonTests.update, data);

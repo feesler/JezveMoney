@@ -1,28 +1,25 @@
-import { copyObject, isDate } from 'jezvejs';
-import { TestComponent } from 'jezve-test';
-import { IconLink } from './IconLink.js';
-import { DatePicker } from './DatePicker.js';
 import {
+    TestComponent,
+    assert,
     query,
     prop,
     isVisible,
     click,
     input,
-} from '../../env.js';
+} from 'jezve-test';
+import { copyObject } from 'jezvejs';
+import { IconLink } from './IconLink.js';
+import { DatePicker } from './DatePicker.js';
 
 export class DatePickerFilter extends TestComponent {
     async parseContent() {
         const res = {
             iconLink: await IconLink.create(this.parent, await query(this.elem, '.iconlink')),
         };
-        if (!res.iconLink) {
-            throw new Error('Iconlink of date picker not found');
-        }
+        assert(res.iconLink, 'Iconlink of date picker not found');
 
         res.inputElem = await query(this.elem, '.stretch-input > input');
-        if (!res.inputElem) {
-            throw new Error('Input element not found');
-        }
+        assert(res.inputElem, 'Input element not found');
 
         let dateValue = await prop(res.inputElem, 'value');
         if (!dateValue) {
@@ -37,41 +34,32 @@ export class DatePickerFilter extends TestComponent {
         }
 
         res.datePickerBtn = await query(this.elem, '#cal_rbtn');
-        if (!res.datePickerBtn) {
-            throw new Error('Date picker button not found');
-        }
+        assert(res.datePickerBtn, 'Date picker button not found');
 
         res.datePicker = await DatePicker.create(this.parent, await query(this.elem, '.dp__container'));
 
         res.clearBtn = await query(this.elem, '#nodatebtn');
-        if (!res.clearBtn) {
-            throw new Error('Clear button not found');
-        }
+        assert(res.clearBtn, 'Clear button not found');
 
         return res;
     }
 
     async selectDate(date) {
-        if (!isDate(date)) {
-            throw new Error('Invalid parameter');
-        }
+        assert.isDate(date, 'Invalid parameter');
 
         if (await isVisible(this.content.iconLink.elem)) {
             await this.content.iconLink.click();
             await this.parse();
         }
 
-        if (!this.content.datePicker) {
-            throw new Error('Date picker component not found');
-        }
+        assert(this.content.datePicker, 'Date picker component not found');
 
         await this.content.datePicker.selectDate(date);
     }
 
     async selectRange(date1, date2) {
-        if (!isDate(date1) || !isDate(date2)) {
-            throw new Error('Invalid parameters');
-        }
+        assert.isDate(date1, 'Invalid parameters');
+        assert.isDate(date2, 'Invalid parameters');
 
         if (await isVisible(this.content.iconLink.elem)) {
             await this.content.iconLink.click();
@@ -80,9 +68,7 @@ export class DatePickerFilter extends TestComponent {
         }
         await this.parse();
 
-        if (!this.content.datePicker) {
-            throw new Error('Date picker component not found');
-        }
+        assert(this.content.datePicker, 'Date picker component not found');
         await this.content.datePicker.selectRange(date1, date2);
     }
 

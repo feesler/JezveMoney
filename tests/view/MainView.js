@@ -1,25 +1,24 @@
+import { assert, navigation, queryAll } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
-import { TransactionList } from './component/TransactionList.js';
+import { TransactionList } from './component/TransactionList/TransactionList.js';
 import { TilesList } from './component/TilesList.js';
-import { InfoTile } from './component/InfoTile.js';
 import { Widget } from './component/Widget/Widget.js';
-import { AccountsWidget } from './component/Widget/AccountsWidget.js';
-import { PersonsWidget } from './component/Widget/PersonsWidget.js';
+import { TilesWidget } from './component/Widget/TilesWidget.js';
 import { TransactionsWidget } from './component/Widget/TransactionsWidget.js';
-import { navigation, queryAll } from '../env.js';
 
 /** Main view class */
 export class MainView extends AppView {
     async parseContent() {
         const widgets = await queryAll('.widget');
-        if (!widgets || widgets.length !== App.config.widgetsCount) {
-            throw new Error('Fail to parse main view widgets');
-        }
+        assert(
+            widgets?.length === App.config.widgetsCount,
+            'Fail to parse main view widgets',
+        );
 
         const res = {};
 
-        res.accountsWidget = await AccountsWidget.create(
+        res.accountsWidget = await TilesWidget.create(
             this,
             widgets[App.config.AccountsWidgetPos],
         );
@@ -34,7 +33,7 @@ export class MainView extends AppView {
             widgets[App.config.LatestWidgetPos],
         );
 
-        res.personsWidget = await PersonsWidget.create(
+        res.personsWidget = await TilesWidget.create(
             this,
             widgets[App.config.PersonsWidgetPos],
         );
@@ -48,41 +47,37 @@ export class MainView extends AppView {
     }
 
     async goToAccounts() {
-        if (!this.content.accountsWidget) {
-            throw new Error('Accounts widget not found');
-        }
+        assert(this.content.accountsWidget, 'Accounts widget not found');
 
         await navigation(() => this.content.accountsWidget.clickByTitle());
     }
 
-    async goToNewTransactionByAccount(accNum) {
-        if (!this.content.accountsWidget) {
-            throw new Error('Accounts widget not found');
-        }
+    async goToNewTransactionByAccount(index) {
+        assert(this.content.accountsWidget, 'Accounts widget not found');
 
-        await this.content.accountsWidget.clickAccountByIndex(accNum);
+        await this.content.accountsWidget.clickTileByIndex(index);
     }
 
     async goToTransactions() {
-        if (!this.content.transactionsWidget) {
-            throw new Error('Transactions widget not found');
-        }
+        assert(this.content.transactionsWidget, 'Transactions widget not found');
 
         await navigation(() => this.content.transactionsWidget.clickByTitle());
     }
 
     async goToPersons() {
-        if (!this.content.personsWidget) {
-            throw new Error('Persons widget not found');
-        }
+        assert(this.content.personsWidget, 'Persons widget not found');
 
         await navigation(() => this.content.personsWidget.clickByTitle());
     }
 
+    async goToNewTransactionByPerson(index) {
+        assert(this.content.personsWidget, 'Persons widget not found');
+
+        await this.content.personsWidget.clickTileByIndex(index);
+    }
+
     async goToStatistics() {
-        if (!this.content.statisticsWidget) {
-            throw new Error('Statistics widget not found');
-        }
+        assert(this.content.statisticsWidget, 'Statistics widget not found');
 
         await navigation(() => this.content.statisticsWidget.clickByTitle());
     }
@@ -92,6 +87,7 @@ export class MainView extends AppView {
 
         // Accounts widget
         res.accountsWidget = {
+            title: 'Accounts',
             tiles: TilesList.renderAccounts(state.accounts.getUserAccounts()),
         };
 
@@ -105,7 +101,8 @@ export class MainView extends AppView {
 
         // Persons widget
         res.personsWidget = {
-            infoTiles: TilesList.renderPersons(state.persons, InfoTile),
+            title: 'Persons',
+            tiles: TilesList.renderPersons(state.persons, true),
         };
 
         return res;

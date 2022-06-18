@@ -8,7 +8,7 @@
 <?php   } ?>
         <span>
 <?php   if (isset($subtitle)) { ?>
-            <span class="tile__subtitle"><?=e($subtitle)?></span>
+            <span class="tile__subtitle"><?=$subtitle?></span>
 <?php   }
         if (isset($icon)) { ?>
             <span class="tile__icon"><?=useIcon($icon, 60, 54)?></span>

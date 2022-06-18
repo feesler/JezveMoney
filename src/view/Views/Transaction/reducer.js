@@ -408,19 +408,19 @@ const reduceSourceAccountChange = (state, accountId) => {
     };
     const { transaction } = newState;
 
+    // Update result balance of source
+    const srcResult = normalize(srcAccount.balance - transaction.src_amount);
+    if (newState.form.fSourceResult !== srcResult) {
+        newState.form.fSourceResult = srcResult;
+        newState.form.sourceResult = srcResult;
+    }
+
     if (transaction.type === EXPENSE) {
         // If currencies are same before account was changed
         // then copy source currency to destination
         if (state.id === 0 || state.id === 1) {
             transaction.dest_curr = srcAccount.curr_id;
             newState.destCurrency = srcCurrency;
-        }
-
-        // Update result balance of source
-        const srcResult = normalize(srcAccount.balance - transaction.src_amount);
-        if (newState.form.fSourceResult !== srcResult) {
-            newState.form.fSourceResult = srcResult;
-            newState.form.sourceResult = srcResult;
         }
 
         updateStateExchange(newState);
@@ -437,13 +437,6 @@ const reduceSourceAccountChange = (state, accountId) => {
     }
 
     if (transaction.type === TRANSFER) {
-        // Update result balance of source
-        const srcResult = normalize(srcAccount.balance - transaction.src_amount);
-        if (newState.form.fSourceResult !== srcResult) {
-            newState.form.fSourceResult = srcResult;
-            newState.form.sourceResult = srcResult;
-        }
-
         if (accountId === transaction.dest_id) {
             const { visibleUserAccounts } = window.app.model;
             // TODO: use here setStateNextDestAccount
@@ -525,19 +518,19 @@ const reduceDestAccountChange = (state, accountId) => {
     };
     const { transaction } = newState;
 
+    // Update result balance of destination
+    const destResult = normalize(destAccount.balance + transaction.dest_amount);
+    if (newState.form.fDestResult !== destResult) {
+        newState.form.fDestResult = destResult;
+        newState.form.destResult = destResult;
+    }
+
     if (transaction.type === INCOME) {
         // If currencies are same before account was changed
         // then copy destination currency to source
         if (newState.id === 0 || newState.id === 1) {
             newState.transaction.src_curr = destAccount.curr_id;
             newState.srcCurrency = destCurrency;
-        }
-
-        // Update result balance of destination
-        const destResult = normalize(destAccount.balance + transaction.dest_amount);
-        if (newState.form.fDestResult !== destResult) {
-            newState.form.fDestResult = destResult;
-            newState.form.destResult = destResult;
         }
 
         updateStateExchange(newState);
@@ -552,13 +545,6 @@ const reduceDestAccountChange = (state, accountId) => {
     }
 
     if (transaction.type === TRANSFER) {
-        // Update result balance of destination
-        const destResult = normalize(destAccount.balance + transaction.dest_amount);
-        if (newState.form.fDestResult !== destResult) {
-            newState.form.fDestResult = destResult;
-            newState.form.destResult = destResult;
-        }
-
         if (accountId === newState.transaction.src_id) {
             const { visibleUserAccounts } = window.app.model;
             // TODO: use here setStateNextSourceAccount
@@ -654,12 +640,16 @@ const reduceDebtAccountChange = (state, accountId) => {
     }
 
     const sourceResult = normalize(newState.srcAccount.balance - transaction.src_amount);
-    newState.form.fSourceResult = sourceResult;
-    newState.form.sourceResult = sourceResult;
+    if (newState.form.fSourceResult !== sourceResult) {
+        newState.form.fSourceResult = sourceResult;
+        newState.form.sourceResult = sourceResult;
+    }
 
     const destResult = normalize(newState.destAccount.balance + transaction.dest_amount);
-    newState.form.fDestResult = destResult;
-    newState.form.destResult = destResult;
+    if (newState.form.fDestResult !== destResult) {
+        newState.form.fDestResult = destResult;
+        newState.form.destResult = destResult;
+    }
 
     return newState;
 };

@@ -1,4 +1,4 @@
-import { test } from 'jezve-test';
+import { test, assert } from 'jezve-test';
 import { LoginView } from '../view/LoginView.js';
 import { MainView } from '../view/MainView.js';
 import { App } from '../Application.js';
@@ -11,16 +11,12 @@ const checkLoginNavigation = async () => {
         await App.view.logoutUser();
     }
 
-    if (!(App.view instanceof LoginView)) {
-        throw new Error('Wrong page');
-    }
+    assert.instanceOf(App.view, LoginView, 'Invalid view');
 };
 
 const checkProfileNavigation = async () => {
     await App.view.goToProfile();
-    if (!(App.view instanceof ProfileView)) {
-        throw new Error('Wrong page');
-    }
+    assert.instanceOf(App.view, ProfileView, 'Invalid view');
 };
 
 export const relogin = async ({ login, password }) => {
@@ -182,9 +178,7 @@ export const deleteProfile = async () => {
 export const openAbout = async () => {
     await test('About page', async () => {
         await App.view.goToAbout();
-        if (!(App.view instanceof AboutView)) {
-            throw new Error('Invalid view');
-        }
+        assert.instanceOf(App.view, AboutView, 'Invalid view');
 
         return true;
     });

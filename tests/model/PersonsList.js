@@ -1,4 +1,4 @@
-import { copyObject, hasFlag } from 'jezve-test';
+import { copyObject, hasFlag, assert } from 'jezve-test';
 import { List } from './List.js';
 import { api } from './api.js';
 
@@ -30,9 +30,7 @@ export class PersonsList extends List {
     }
 
     isHidden(item) {
-        if (!item) {
-            throw new Error('Invalid person');
-        }
+        assert(item, 'Invalid person');
 
         return hasFlag(item.flags, PERSON_HIDDEN);
     }

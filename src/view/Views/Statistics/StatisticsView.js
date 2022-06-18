@@ -38,13 +38,13 @@ class StatisticsView extends View {
 
         this.groupTypes = [null, 'day', 'week', 'month', 'year'];
 
-        this.model = {
+        this.state = {
             selDateRange: null,
             accountCurrency: this.props.accountCurrency,
             chartData: this.props.chartData,
         };
 
-        this.model.filter = ('filter' in this.props) ? this.props.filter : {};
+        this.state.filter = ('filter' in this.props) ? this.props.filter : {};
     }
 
     /**
@@ -53,7 +53,7 @@ class StatisticsView extends View {
     onStart() {
         this.histogram = Histogram.create({
             elem: 'chart',
-            data: this.model.chartData,
+            data: this.state.chartData,
             autoScale: true,
             onitemclick: (e, rect) => this.onBarClick(e, rect),
             onscroll: () => this.onChartsScroll(),
@@ -68,7 +68,7 @@ class StatisticsView extends View {
             extraClass: 'dd__fullwidth',
         });
 
-        if (this.model.filter.filter === 'currency') {
+        if (this.state.filter.filter === 'currency') {
             this.currencyDropDown = DropDown.create({
                 input_id: 'curr_id',
                 onitemselect: (obj) => this.onCurrencySel(obj),
@@ -111,7 +111,7 @@ class StatisticsView extends View {
     buildAddress() {
         const { baseURL } = window.app;
         let newLocation = `${baseURL}statistics/`;
-        const locFilter = { ...this.model.filter };
+        const locFilter = { ...this.state.filter };
 
         if (!isEmpty(locFilter)) {
             newLocation += `?${urlJoin(locFilter)}`;
@@ -144,8 +144,8 @@ class StatisticsView extends View {
             return;
         }
 
-        this.model.filter.stdate = formatDate(this.selDateRange.start);
-        this.model.filter.enddate = formatDate(this.selDateRange.end);
+        this.state.filter.stdate = formatDate(this.selDateRange.start);
+        this.state.filter.enddate = formatDate(this.selDateRange.end);
 
         window.location = this.buildAddress();
     }
@@ -191,9 +191,9 @@ class StatisticsView extends View {
 
         const filterType = (parseInt(obj.id, 10) === 1) ? 'currency' : null;
         if (filterType) {
-            this.model.filter.filter = filterType;
-        } else if ('filter' in this.model.filter) {
-            delete this.model.filter.filter;
+            this.state.filter.filter = filterType;
+        } else if ('filter' in this.state.filter) {
+            delete this.state.filter.filter;
         }
 
         window.location = this.buildAddress();
@@ -208,7 +208,7 @@ class StatisticsView extends View {
             return;
         }
 
-        this.model.filter.acc_id = obj.id;
+        this.state.filter.acc_id = obj.id;
         window.location = this.buildAddress();
     }
 
@@ -221,7 +221,7 @@ class StatisticsView extends View {
             return;
         }
 
-        this.model.filter.curr_id = obj.id;
+        this.state.filter.curr_id = obj.id;
         window.location = this.buildAddress();
     }
 
@@ -237,9 +237,9 @@ class StatisticsView extends View {
         const groupId = parseInt(obj.id, 10);
         const group = (groupId < this.groupTypes.length) ? this.groupTypes[groupId] : null;
         if (group) {
-            this.model.filter.group = group;
-        } else if ('group' in this.model.filter) {
-            delete this.model.filter.group;
+            this.state.filter.group = group;
+        } else if ('group' in this.state.filter) {
+            delete this.state.filter.group;
         }
 
         window.location = this.buildAddress();
@@ -293,7 +293,7 @@ class StatisticsView extends View {
 
             this.popup.textContent = window.app.model.currency.formatCurrency(
                 barRect.value,
-                this.model.accountCurrency,
+                this.state.accountCurrency,
             );
 
             const rectBBox = barRect.elem.getBBox();

@@ -93,4 +93,18 @@ export class AccountList extends List {
         // check person have account in specified currency
         return this.find((item) => item && item.owner_id === pId && item.curr_id === currId);
     }
+
+    /** Search account with specified name */
+    findByName(name, caseSens = false) {
+        if (typeof name !== 'string' || name.length === 0) {
+            return null;
+        }
+
+        const lookupName = (caseSens) ? name : name.toLowerCase();
+        return this.find((account) => (
+            (caseSens)
+                ? (account.name === lookupName)
+                : (account.name.toLowerCase() === lookupName)
+        ));
+    }
 }

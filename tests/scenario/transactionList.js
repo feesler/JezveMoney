@@ -1,4 +1,4 @@
-import { copyObject } from 'jezve-test';
+import { copyObject, setBlock } from 'jezve-test';
 import {
     EXPENSE,
     INCOME,
@@ -8,9 +8,8 @@ import {
     availTransTypes,
 } from '../model/Transaction.js';
 import { api } from '../model/api.js';
-import * as TransactionListTests from '../run/transactions.js';
+import * as TransactionListTests from '../run/transactionList.js';
 import { App } from '../Application.js';
-import { setBlock } from '../env.js';
 
 let scenario = null;
 let testData = null;
@@ -230,14 +229,9 @@ const setupTransactions = async (accountIds, personIds) => {
     }];
 
     // Check transactions already exists
-    const personsAccounts = personIds.flatMap((personId) => {
-        const person = App.state.persons.getItem(personId);
-        if (person && Array.isArray(person.accounts)) {
-            return person.accounts.map((item) => item.id);
-        }
-
-        return [];
-    });
+    const personsAccounts = personIds.flatMap(
+        (personId) => App.state.getPersonAccounts(personId),
+    );
 
     const trList = App.state.transactions.applyFilter({
         accounts: accountIds.concat(personsAccounts),
@@ -310,6 +304,9 @@ const runTests = async (directNavigate = false) => {
     }, {
         action: TransactionListTests.filterByAccounts,
         data: { accounts: [testData.accounts[2], testData.accounts[3]], directNavigate },
+    }, {
+        action: TransactionListTests.filterByPersons,
+        data: { persons: testData.persons[0], directNavigate },
     }, {
         action: TransactionListTests.filterByType,
         data: { type: 0, directNavigate },

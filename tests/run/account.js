@@ -1,11 +1,17 @@
-import { test, copyObject, assert } from 'jezve-test';
+import {
+    test,
+    copyObject,
+    assert,
+    setBlock,
+    baseUrl,
+    goTo,
+} from 'jezve-test';
 import { MainView } from '../view/MainView.js';
 import { AccountsView } from '../view/AccountsView.js';
 import { Transaction } from '../model/Transaction.js';
 import { Currency } from '../model/Currency.js';
 import { formatProps, createCSV, generateId } from '../common.js';
 import { App } from '../Application.js';
-import { setBlock, baseUrl, goTo } from '../env.js';
 import { AccountView } from '../view/AccountView.js';
 
 /** Navigate to accounts list page */
@@ -64,9 +70,7 @@ export const stateLoop = async () => {
 };
 
 export const submitAccount = async (params) => {
-    if (!(App.view instanceof AccountView)) {
-        throw new Error('Invalid view');
-    }
+    assert.instanceOf(App.view, AccountView, 'Invalid view');
 
     // Input account name
     if ('name' in params) {
@@ -93,17 +97,15 @@ export const submitAccount = async (params) => {
 
     await App.view.submit();
 
-    if (validInput && !(App.view instanceof AccountsView)) {
-        throw new Error('Fail to submit account');
+    if (validInput) {
+        assert.instanceOf(App.view, AccountsView, 'Fail to submit account');
     }
 
     return res;
 };
 
 export const create = async (params) => {
-    if (!params) {
-        throw new Error('No params specified');
-    }
+    assert(params, 'No params specified');
 
     await test(`Create account (${formatProps(params)})`, async () => {
         // Navigate to create account view
@@ -138,9 +140,7 @@ export const create = async (params) => {
 };
 
 export const update = async (params) => {
-    if (!params) {
-        throw new Error('No params specified');
-    }
+    assert(params, 'No params specified');
     const props = copyObject(params);
 
     // Check initial state
@@ -151,9 +151,7 @@ export const update = async (params) => {
         pos = App.state.accounts.getIndexById(props.id);
     } else {
         pos = parseInt(props.pos, 10);
-        if (Number.isNaN(pos)) {
-            throw new Error('Position of account not specified');
-        }
+        assert(!Number.isNaN(pos), 'Position of account not specified');
         delete props.pos;
     }
 
@@ -164,9 +162,7 @@ export const update = async (params) => {
         // Prepare expected state
         const [accountId] = App.state.getAccountsByIndexes(pos);
         let expAccount = App.state.accounts.getItem(accountId);
-        if (!expAccount) {
-            throw new Error('Can not find specified account');
-        }
+        assert(expAccount, 'Can not find specified account');
         App.view.setExpectedAccount(expAccount);
         await App.view.checkState();
 
@@ -206,9 +202,7 @@ export const del = async (accounts) => {
 
 export const delFromUpdate = async (pos) => {
     const ind = parseInt(pos, 10);
-    if (Number.isNaN(ind) || ind < 0) {
-        throw new Error('Invalid position of account specified');
-    }
+    assert(!Number.isNaN(ind) && ind >= 0, 'Invalid position of account specified');
 
     await test(`Delete account from update view [${ind}]`, async () => {
         // Navigate to update account view
@@ -354,9 +348,7 @@ export const securityTests = async () => {
 
     await test('Access to not existing account', async () => {
         await goTo(requestURL);
-        if (!(App.view instanceof AccountsView)) {
-            throw new Error('Invalid view');
-        }
+        assert.instanceOf(App.view, AccountsView, 'Invalid view');
 
         App.view.expectedState = {
             msgPopup: { success: false, message: 'Fail to update account.' },

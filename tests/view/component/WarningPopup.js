@@ -1,5 +1,4 @@
-import { TestComponent } from 'jezve-test';
-import { query, prop } from '../../env.js';
+import { TestComponent, query, prop } from 'jezve-test';
 
 export class WarningPopup extends TestComponent {
     async parseContent() {

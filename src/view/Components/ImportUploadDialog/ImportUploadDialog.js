@@ -27,8 +27,9 @@ export class ImportUploadDialog extends Component {
             throw new Error('Invalid props');
         }
 
-        this.model = {
+        this.state = {
             mainAccount: this.props.mainAccount,
+            importedItems: null,
         };
 
         if (!isFunction(this.props.onuploaddone)) {
@@ -36,8 +37,6 @@ export class ImportUploadDialog extends Component {
         }
         this.uploadDoneHandler = this.props.onuploaddone;
         this.accountChangeHandler = this.props.onaccountchange;
-
-        this.importedItems = null;
 
         this.uploader = new ImportFileUploader({
             elem: 'fileBlock',
@@ -48,7 +47,7 @@ export class ImportUploadDialog extends Component {
         this.tplManager = new ImportTemplateManager({
             elem: 'templateBlock',
             parent: this.parent,
-            mainAccount: this.model.mainAccount,
+            mainAccount: this.state.mainAccount,
             templateStatus: (status) => this.onTemplateStatus(status),
         });
 
@@ -106,7 +105,7 @@ export class ImportUploadDialog extends Component {
         this.tplManager.reset();
         this.enableUpload(false);
 
-        this.importedItems = null;
+        this.state.importedItems = null;
     }
 
     /** Hide dialog */
@@ -167,7 +166,7 @@ export class ImportUploadDialog extends Component {
             throw new Error('Invalid account');
         }
 
-        if (this.model.mainAccount.id === account.id) {
+        if (this.state.mainAccount.id === account.id) {
             return;
         }
 
@@ -186,7 +185,7 @@ export class ImportUploadDialog extends Component {
             throw new Error('Account not found');
         }
 
-        this.model.mainAccount = account;
+        this.state.mainAccount = account;
 
         this.tplManager.setMainAccount(account);
 
@@ -205,13 +204,13 @@ export class ImportUploadDialog extends Component {
     /** Convert uploaded data to import items */
     processItems() {
         try {
-            this.importedItems = this.tplManager.applyTemplate();
+            this.state.importedItems = this.tplManager.applyTemplate();
         } catch (e) {
             createMessage(e.message, 'msg_error');
-            this.importedItems = null;
+            this.state.importedItems = null;
         }
 
-        if (!this.importedItems) {
+        if (!this.state.importedItems) {
             show(this.uploadProgress, false);
             return;
         }
@@ -241,7 +240,7 @@ export class ImportUploadDialog extends Component {
             this.tplManager.setRawData(data);
         } catch (e) {
             createMessage(e.message, 'msg_error');
-            this.importedItems = null;
+            this.state.importedItems = null;
             this.importDone();
         }
     }
@@ -256,7 +255,7 @@ export class ImportUploadDialog extends Component {
 
     /** Hide import file form */
     importDone() {
-        this.uploadDoneHandler(this.importedItems);
+        this.uploadDoneHandler(this.state.importedItems);
         this.reset();
     }
 }

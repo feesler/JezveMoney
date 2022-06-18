@@ -1,5 +1,5 @@
+import { setBlock } from 'jezve-test';
 import * as ImportTests from '../../run/import/index.js';
-import { setBlock } from '../../env.js';
 
 let scenario = null;
 

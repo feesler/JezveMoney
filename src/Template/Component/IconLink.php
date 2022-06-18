@@ -1,6 +1,6 @@
 <?php
 
-namespace JezveMoney\App\Template;
+namespace JezveMoney\App\Template\Component;
 
 use JezveMoney\Core\TemplateComponent;
 

@@ -1,15 +1,16 @@
+import {
+    assert,
+    query,
+    prop,
+    navigation,
+    click,
+} from 'jezve-test';
 import { AppView } from './AppView.js';
 import { TilesList } from './component/TilesList.js';
 import { Tile } from './component/Tile.js';
 import { IconLink } from './component/IconLink.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { Toolbar } from './component/Toolbar.js';
-import {
-    query,
-    prop,
-    navigation,
-    click,
-} from '../env.js';
 
 /** List of persons view class */
 export class PersonsView extends AppView {
@@ -20,15 +21,14 @@ export class PersonsView extends AppView {
             toolbar: await Toolbar.create(this, await query('#toolbar')),
         };
 
-        if (
-            !res.titleEl
-            || !res.addBtn
-            || !res.toolbar
-            || !res.toolbar.content.editBtn
-            || !res.toolbar.content.delBtn
-        ) {
-            throw new Error('Invalid structure of persons view');
-        }
+        assert(
+            res.titleEl
+            && res.addBtn
+            && res.toolbar
+            && res.toolbar.content.editBtn
+            && res.toolbar.content.delBtn,
+            'Invalid structure of persons view',
+        );
 
         res.title = prop(res.titleEl, 'textContent');
         res.tiles = await TilesList.create(this, await query('#tilesContainer'), Tile);
@@ -52,9 +52,7 @@ export class PersonsView extends AppView {
     }
 
     async selectPersons(data) {
-        if (typeof data === 'undefined') {
-            throw new Error('No persons specified');
-        }
+        assert(typeof data !== 'undefined', 'No persons specified');
 
         const persons = Array.isArray(data) ? data : [data];
 
@@ -66,9 +64,7 @@ export class PersonsView extends AppView {
         let selectedCount = activeTiles.length;
         let selectedHiddenCount = activeHiddenTiles.length;
         for (const num of persons) {
-            if (num < 0 || num >= totalTiles) {
-                throw new Error('Invalid person number');
-            }
+            assert(num >= 0 && num < totalTiles, 'Invalid person number');
 
             if (num < visibleTiles) {
                 const item = this.content.tiles.content.items[num];
@@ -83,25 +79,29 @@ export class PersonsView extends AppView {
             }
 
             const showIsVisible = this.content.toolbar.isButtonVisible('show');
-            if ((selectedHiddenCount > 0) !== showIsVisible) {
-                throw new Error(`Unexpected visibility (${showIsVisible}) of Show button while ${selectedHiddenCount} hidden items selected`);
-            }
+            assert(
+                (selectedHiddenCount > 0) === showIsVisible,
+                `Unexpected visibility (${showIsVisible}) of Show button while ${selectedHiddenCount} hidden items selected`,
+            );
 
             const hideIsVisible = this.content.toolbar.isButtonVisible('hide');
-            if ((selectedCount > 0) !== hideIsVisible) {
-                throw new Error(`Unexpected visibility (${hideIsVisible}) of Hide button while ${selectedCount} visible items selected`);
-            }
+            assert(
+                (selectedCount > 0) === hideIsVisible,
+                `Unexpected visibility (${hideIsVisible}) of Hide button while ${selectedCount} visible items selected`,
+            );
 
             const totalSelected = selectedCount + selectedHiddenCount;
             const updIsVisible = this.content.toolbar.isButtonVisible('update');
-            if ((totalSelected === 1) !== updIsVisible) {
-                throw new Error(`Unexpected visibility (${updIsVisible}) of Update button while ${totalSelected} items selected`);
-            }
+            assert(
+                (totalSelected === 1) === updIsVisible,
+                `Unexpected visibility (${updIsVisible}) of Update button while ${totalSelected} items selected`,
+            );
 
             const delIsVisible = this.content.toolbar.isButtonVisible('del');
-            if ((totalSelected > 0) !== delIsVisible) {
-                throw new Error(`Unexpected visibility (${delIsVisible}) of Delete button while ${totalSelected} items selected`);
-            }
+            assert(
+                (totalSelected > 0) === delIsVisible,
+                `Unexpected visibility (${delIsVisible}) of Delete button while ${totalSelected} items selected`,
+            );
         }
     }
 
@@ -117,9 +117,7 @@ export class PersonsView extends AppView {
 
         await this.performAction(() => this.content.toolbar.clickButton('del'));
 
-        if (!this.content.delete_warning?.content?.visible) {
-            throw new Error('Delete person(s) warning popup not appear');
-        }
+        assert(this.content.delete_warning?.content?.visible, 'Delete person(s) warning popup not appear');
 
         await navigation(() => click(this.content.delete_warning.content.okBtn));
     }
@@ -138,7 +136,7 @@ export class PersonsView extends AppView {
 
     static render(state) {
         const res = {
-            tiles: TilesList.renderPersons(state.persons),
+            tiles: TilesList.renderPersons(state.persons, false),
             hiddenTiles: TilesList.renderHiddenPersons(state.persons),
         };
 

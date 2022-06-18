@@ -1,3 +1,4 @@
+import { assert } from 'jezve-test';
 import { App } from '../Application.js';
 import {
     fixFloat,
@@ -36,13 +37,12 @@ export class ImportTransaction {
 
     /** Convert import data to transaction object */
     static fromImportData(data, mainAccount) {
-        if (!data || !mainAccount) {
-            throw new Error('Invalid data');
-        }
+        assert(data && mainAccount, 'Invalid data');
 
-        if (mainAccount.curr_id !== data.accountCurrencyId) {
-            throw new Error(`Invalid currency ${data.accountCurrencyId} Expected ${mainAccount.curr_id}`);
-        }
+        assert(
+            mainAccount.curr_id === data.accountCurrencyId,
+            `Invalid currency ${data.accountCurrencyId} Expected ${mainAccount.curr_id}`,
+        );
 
         const res = new ImportTransaction({
             enabled: true,
@@ -82,9 +82,7 @@ export class ImportTransaction {
 
     /** Search import transaction type by name (case insensitive) */
     static findTypeByName(name) {
-        if (typeof name !== 'string') {
-            throw new Error('Invalid parameter');
-        }
+        assert.isString(name, 'Invalid parameter');
 
         const lcName = name.toLowerCase();
         return this.availTypes.find((item) => item.title.toLowerCase() === lcName);
@@ -92,14 +90,10 @@ export class ImportTransaction {
 
     /** Return normal type of transaction by import type name */
     static typeFromString(str) {
-        if (typeof str !== 'string') {
-            throw new Error('Invalid parameter');
-        }
+        assert.isString(str, 'Invalid parameter');
 
         const lstr = str.toLowerCase();
-        if (!(lstr in this.typesMap)) {
-            throw new Error(`Unknown import transaction type: ${str}`);
-        }
+        assert((lstr in this.typesMap), `Unknown import transaction type: ${str}`);
 
         return this.typesMap[lstr];
     }
@@ -109,9 +103,7 @@ export class ImportTransaction {
     }
 
     setTransactionType(value) {
-        if (!(value in ImportTransaction.typesMap)) {
-            throw new Error(`Unknown import transaction type: ${value}`);
-        }
+        assert((value in ImportTransaction.typesMap), `Unknown import transaction type: ${value}`);
 
         if (this.type === value) {
             return;
@@ -168,9 +160,7 @@ export class ImportTransaction {
             if (before.type !== 'debtfrom' && before.type !== 'debtto') {
                 const accountId = App.state.accounts.getNext(this.mainAccount.id);
                 const nextAccount = App.state.accounts.getItem(accountId);
-                if (!nextAccount) {
-                    throw new Error('Failed to find next account');
-                }
+                assert(nextAccount, 'Failed to find next account');
 
                 if (value === 'transferfrom') {
                     this.dest_id = nextAccount.id;
@@ -183,9 +173,7 @@ export class ImportTransaction {
         } else if (value === 'debtfrom' || value === 'debtto') {
             if (before.type !== 'debtfrom' && before.type !== 'debtto') {
                 const person = App.state.persons.getItemByIndex(0);
-                if (!person) {
-                    throw new Error('Failed to find person');
-                }
+                assert(person, 'Failed to find person');
                 this.person_id = person.id;
             }
 
@@ -211,13 +199,13 @@ export class ImportTransaction {
     }
 
     setAccount(value) {
-        if (this.type !== 'transferfrom' && this.type !== 'transferto') {
-            throw new Error(`Invalid transaction type to set second account: ${this.type}`);
-        }
+        assert(
+            this.type === 'transferfrom' || this.type === 'transferto',
+            `Invalid transaction type to set second account: ${this.type}`,
+        );
+
         const account = App.state.accounts.getItem(value);
-        if (!account) {
-            throw new Error(`Account not found: ${value}`);
-        }
+        assert(account, `Account not found: ${value}`);
 
         if (this.type === 'transferfrom') {
             this.dest_id = account.id;
@@ -235,22 +223,20 @@ export class ImportTransaction {
     }
 
     setPerson(value) {
-        if (this.type !== 'debtfrom' && this.type !== 'debtto') {
-            throw new Error(`Invalid transaction type to set person: ${this.type}`);
-        }
+        assert(
+            this.type === 'debtfrom' || this.type === 'debtto',
+            `Invalid transaction type to set person: ${this.type}`,
+        );
+
         const person = App.state.persons.getItem(value);
-        if (!person) {
-            throw new Error(`Person not found: ${value}`);
-        }
+        assert(person, `Person not found: ${value}`);
 
         this.person_id = person.id;
     }
 
     setAmount(value) {
         const amount = parseFloat(fixFloat(value));
-        if (Number.isNaN(amount)) {
-            throw new Error('Invalid amount value');
-        }
+        assert(!Number.isNaN(amount), 'Invalid amount value');
 
         if (amount < 0) {
             this.invertTransactionType();
@@ -266,9 +252,7 @@ export class ImportTransaction {
 
     setSecondAmount(value) {
         const amount = parseFloat(fixFloat(value));
-        if (Number.isNaN(amount)) {
-            throw new Error('Invalid amount value');
-        }
+        assert(!Number.isNaN(amount), 'Invalid amount value');
 
         this.dest_amount = Math.abs(amount);
     }

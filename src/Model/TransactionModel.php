@@ -1016,6 +1016,32 @@ class TransactionModel extends CachedTable
     }
 
 
+    // Return list of accounts of specified persons
+    private function getPersonAccounts($persons = null)
+    {
+        if (is_null($persons)) {
+            return null;
+        }
+
+        if (!is_array($persons)) {
+            $persons = [$persons];
+        }
+        $res = [];
+        foreach ($persons as $personId) {
+            $accounts = $this->accModel->getData(["person" => $personId]);
+            if (count($accounts) > 0) {
+                foreach ($accounts as $account) {
+                    $res[] = $account->id;
+                }
+            } else {
+                $res[] = -1;
+            }
+        }
+
+        return $res;
+    }
+
+
     // Return condition string for list of types
     private function getTypeCondition($types = null)
     {
@@ -1076,6 +1102,26 @@ class TransactionModel extends CachedTable
             }
         }
 
+        // Persons filter
+        $personModel = PersonModel::getInstance();
+        $personFilter = [];
+        if (isset($request["person_id"])) {
+            $personsReq = $request["person_id"];
+            if (!is_array($personsReq)) {
+                $personsReq = [$personsReq];
+            }
+            foreach ($personsReq as $person_id) {
+                if ($personModel->isExist($person_id)) {
+                    $personFilter[] = intval($person_id);
+                } elseif ($throw) {
+                    throw new \Error("Invalid person '$person_id'");
+                }
+            }
+            if (count($personFilter) > 0) {
+                $res["persons"] = $personFilter;
+            }
+        }
+
         // Search query
         if (isset($request["search"]) && !is_null($request["search"])) {
             $res["search"] = $request["search"];
@@ -1123,6 +1169,15 @@ class TransactionModel extends CachedTable
             $res["acc_id"] = $params["accounts"];
         }
 
+        // Persons
+        if (
+            isset($params["persons"]) &&
+            is_array($params["persons"]) &&
+            count($params["persons"]) > 0
+        ) {
+            $res["person_id"] = $params["persons"];
+        }
+
         // Date range
         if (isset($params["startDate"]) && $params["endDate"]) {
             $res["stdate"] = $params["startDate"];
@@ -1155,9 +1210,28 @@ class TransactionModel extends CachedTable
             }
         }
 
+        $accountsToFilter = [];
+
+        // Persons filter condition
+        if (isset($params["persons"]) && !is_null($params["persons"])) {
+            $personAccounts = $this->getPersonAccounts($params["persons"]);
+            if (!is_null($personAccounts)) {
+                $accountsToFilter = $personAccounts;
+            }
+        }
+
         // Accounts filter condition
         if (isset($params["accounts"]) && !is_null($params["accounts"])) {
-            $accCond = $this->getAccCondition($params["accounts"]);
+            $userAccounts = $params["accounts"];
+            if (!is_array($userAccounts)) {
+                $userAccounts = [$userAccounts];
+            }
+
+            array_push($accountsToFilter, ...$userAccounts);
+        }
+
+        if (count($accountsToFilter) > 0) {
+            $accCond = $this->getAccCondition($accountsToFilter);
             if (!is_empty($accCond)) {
                 $res[] = $accCond;
             }

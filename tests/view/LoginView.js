@@ -1,9 +1,14 @@
+import {
+    assert,
+    navigation,
+    query,
+    click,
+} from 'jezve-test';
 import { AppView } from './AppView.js';
 import { MainView } from './MainView.js';
 import { RegisterView } from './RegisterView.js';
 import { App } from '../Application.js';
 import { InputRow } from './component/InputRow.js';
-import { navigation, query, click } from '../env.js';
 
 /** Log in view class */
 export class LoginView extends AppView {
@@ -15,9 +20,13 @@ export class LoginView extends AppView {
             registerLink: await query('.form-controls .alter_link > a'),
         };
 
-        if (!res.loginInp || !res.passwordInp || !res.submitBtn || !res.registerLink) {
-            throw new Error('Invalid structure of login view');
-        }
+        assert(
+            res.loginInp
+            && res.passwordInp
+            && res.submitBtn
+            && res.registerLink,
+            'Invalid structure of login view',
+        );
 
         return res;
     }
@@ -51,9 +60,7 @@ export class LoginView extends AppView {
 
         if (this.isValid()) {
             await navigation(action);
-            if (!(App.view instanceof MainView)) {
-                throw new Error('Fail to login');
-            }
+            assert.instanceOf(App.view, MainView, 'Fail to login');
         } else {
             await this.performAction(action);
         }
@@ -62,8 +69,6 @@ export class LoginView extends AppView {
     async goToRegistration() {
         await navigation(() => click(this.content.registerLink));
 
-        if (!(App.view instanceof RegisterView)) {
-            throw new Error('Unexpected page');
-        }
+        assert.instanceOf(App.view, RegisterView, 'Unexpected page');
     }
 }

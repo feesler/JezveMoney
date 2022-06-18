@@ -1,9 +1,9 @@
+import { setBlock, assert } from 'jezve-test';
 import { generateCSV } from '../model/import.js';
 import { api } from '../model/api.js';
 import * as ApiTests from '../run/api/index.js';
 import * as ImportTests from '../run/import/index.js';
 import { App } from '../Application.js';
-import { setBlock } from '../env.js';
 import { importItemsTests } from './import/items.js';
 import { importRuleTests } from './import/rules.js';
 import { importTemplateTests } from './import/templates.js';
@@ -108,9 +108,7 @@ export const importTests = {
         ]);
 
         uploadFilename = await ImportTests.putFile(csvStatement);
-        if (!uploadFilename) {
-            throw new Error('Fail to put file');
-        }
+        assert(uploadFilename, 'Fail to put file');
 
         await ApiTests.loginTest(App.config.testUser);
     },

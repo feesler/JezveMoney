@@ -1,8 +1,12 @@
 import { copyObject } from 'jezvejs';
 import { formatDate } from 'jezvejs/DateUtils';
-import { test, assert } from 'jezve-test';
+import {
+    test,
+    assert,
+    baseUrl,
+    goTo,
+} from 'jezve-test';
 import { App } from '../Application.js';
-import { baseUrl, goTo } from '../env.js';
 import { fixDate } from '../common.js';
 import { TransactionsView } from '../view/TransactionsView.js';
 import { MainView } from '../view/MainView.js';
@@ -133,6 +137,24 @@ export const filterByAccounts = async ({ accounts, directNavigate = false }) => 
 
     await test(`Filter by accounts [${accountNames.join()}]`, async () => {
         await App.view.filterByAccounts(itemIds, directNavigate);
+        return App.view.iteratePages();
+    });
+};
+
+export const filterByPersons = async ({ persons, directNavigate = false }) => {
+    const itemIds = Array.isArray(persons) ? persons : [persons];
+
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    const personsNames = itemIds.map((personId) => {
+        const item = App.state.persons.getItem(personId);
+        return (item) ? item.name : `(${personId})`;
+    });
+
+    await test(`Filter by persons [${personsNames.join()}]`, async () => {
+        await App.view.filterByPersons(itemIds, directNavigate);
         return App.view.iteratePages();
     });
 };

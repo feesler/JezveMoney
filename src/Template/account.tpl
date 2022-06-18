@@ -1,6 +1,6 @@
 <?php
-use JezveMoney\App\Template\Tile;
-use JezveMoney\App\Template\IconLink;
+use JezveMoney\App\Template\Component\Tile;
+use JezveMoney\App\Template\Component\IconLink;
 
 include(TPL_PATH."commonhdr.tpl");	?>
 </head>
@@ -54,7 +54,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <div class="stretch-input std_margin">
                                 <input id="accname" name="name" type="text" autocomplete="off" value="<?=e($accInfo->name)?>">
                             </div>
-                            <div class="invalid-feedback">Please input name of account.</div>
+                            <div id="namefeedback" class="invalid-feedback"></div>
                         </div>
                         <div class="view-row std_margin">
                             <label for="currency">Currency</label>

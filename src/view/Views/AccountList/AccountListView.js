@@ -21,7 +21,7 @@ class AccountListView extends View {
     constructor(...args) {
         super(...args);
 
-        this.model = {
+        this.state = {
             selected: {
                 visible: new Selection(),
                 hidden: new Selection(),
@@ -38,12 +38,14 @@ class AccountListView extends View {
             throw new Error('Failed to initialize Account List view');
         }
         this.tilesContainer.addEventListener('click', (e) => this.onTileClick(e));
+        this.visibleTiles = Array.from(this.tilesContainer.querySelectorAll('.tile'));
 
         this.hiddenTilesContainer = ge('hiddenTilesContainer');
         if (!this.hiddenTilesContainer) {
             throw new Error('Failed to initialize Account List view');
         }
         this.hiddenTilesContainer.addEventListener('click', (e) => this.onTileClick(e));
+        this.hiddenTiles = Array.from(this.hiddenTilesContainer.querySelectorAll('.tile'));
 
         this.showForm = ge('showform');
         this.showAccountsInp = ge('showaccounts');
@@ -90,18 +92,64 @@ class AccountListView extends View {
         }
 
         const currentSelection = account.isVisible()
-            ? this.model.selected.visible
-            : this.model.selected.hidden;
+            ? this.state.selected.visible
+            : this.state.selected.hidden;
         if (currentSelection.isSelected(accountId)) {
             currentSelection.deselect(accountId);
-            tile.classList.remove('tile_selected');
         } else {
             currentSelection.select(accountId);
-            tile.classList.add('tile_selected');
         }
 
-        const selCount = this.model.selected.visible.count();
-        const hiddenSelCount = this.model.selected.hidden.count();
+        this.render(this.state);
+    }
+
+    /**
+     * Show account(s) delete confirmation popup
+     */
+    confirmDelete() {
+        const totalSelCount = this.state.selected.visible.count()
+            + this.state.selected.hidden.count();
+        if (!totalSelCount) {
+            return;
+        }
+
+        ConfirmDialog.create({
+            id: 'delete_warning',
+            title: (totalSelCount > 1) ? TITLE_MULTI_ACC_DELETE : TITLE_SINGLE_ACC_DELETE,
+            content: (totalSelCount > 1) ? MSG_MULTI_ACC_DELETE : MSG_SINGLE_ACC_DELETE,
+            onconfirm: () => this.delForm.submit(),
+        });
+    }
+
+    render(state) {
+        if (!state) {
+            throw new Error('Invalid state');
+        }
+
+        // Render visible accounts
+        this.visibleTiles.forEach((tile) => {
+            const accountId = parseInt(tile.dataset.id, 10);
+
+            if (state.selected.visible.isSelected(accountId)) {
+                tile.classList.add('tile_selected');
+            } else {
+                tile.classList.remove('tile_selected');
+            }
+        });
+
+        // Render hidden accounts
+        this.hiddenTiles.forEach((tile) => {
+            const accountId = parseInt(tile.dataset.id, 10);
+
+            if (state.selected.hidden.isSelected(accountId)) {
+                tile.classList.add('tile_selected');
+            } else {
+                tile.classList.remove('tile_selected');
+            }
+        });
+
+        const selCount = state.selected.visible.count();
+        const hiddenSelCount = state.selected.hidden.count();
         const totalSelCount = selCount + hiddenSelCount;
         this.toolbar.updateBtn.show(totalSelCount === 1);
         this.toolbar.exportBtn.show(totalSelCount > 0);
@@ -109,8 +157,8 @@ class AccountListView extends View {
         this.toolbar.hideBtn.show(selCount > 0);
         this.toolbar.deleteBtn.show(totalSelCount > 0);
 
-        const selArr = this.model.selected.visible.getIdArray();
-        const hiddenSelArr = this.model.selected.hidden.getIdArray();
+        const selArr = state.selected.visible.getIdArray();
+        const hiddenSelArr = state.selected.hidden.getIdArray();
         const totalSelArr = selArr.concat(hiddenSelArr);
         this.showAccountsInp.value = totalSelArr.join();
         this.hideAccountsInp.value = totalSelArr.join();
@@ -132,24 +180,6 @@ class AccountListView extends View {
         }
 
         this.toolbar.show(totalSelCount > 0);
-    }
-
-    /**
-     * Show account(s) delete confirmation popup
-     */
-    confirmDelete() {
-        const totalSelCount = this.model.selected.visible.count()
-            + this.model.selected.hidden.count();
-        if (!totalSelCount) {
-            return;
-        }
-
-        ConfirmDialog.create({
-            id: 'delete_warning',
-            title: (totalSelCount > 1) ? TITLE_MULTI_ACC_DELETE : TITLE_SINGLE_ACC_DELETE,
-            content: (totalSelCount > 1) ? MSG_MULTI_ACC_DELETE : MSG_SINGLE_ACC_DELETE,
-            onconfirm: () => this.delForm.submit(),
-        });
     }
 }
 

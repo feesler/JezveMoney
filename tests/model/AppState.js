@@ -77,12 +77,9 @@ function checkFields(fields, expFields) {
  * @param {Object} expFields - expected object
  */
 function copyFields(fields, expFields) {
+    assert(fields && expFields, 'Invalid parameters');
+
     const res = {};
-
-    if (!fields || !expFields) {
-        throw new Error('Invalid parameters');
-    }
-
     for (const f of expFields) {
         if (f in fields) {
             res[f] = copyObject(fields[f]);
@@ -354,11 +351,12 @@ export class AppState {
 
     getAccountByIndex(ind, visibleAccList, hiddenAccList) {
         const index = parseInt(ind, 10);
-        if (Number.isNaN(index)
-            || index < 0
-            || index > visibleAccList.length + hiddenAccList.length) {
-            throw new Error(`Invalid account index ${ind}`);
-        }
+        assert.isNumber(index);
+        assert(
+            index >= 0
+            && index < visibleAccList.length + hiddenAccList.length,
+            `Invalid account index ${ind}`,
+        );
 
         if (index < visibleAccList.length) {
             return visibleAccList[index].id;
@@ -388,9 +386,7 @@ export class AppState {
 
         return accNames.map((name) => {
             const acc = userAccounts.findByName(name);
-            if (!acc) {
-                throw new Error(`Account '${name}' not found`);
-            }
+            assert(acc, `Account '${name}' not found`);
 
             return userAccounts.getIndexById(acc.id);
         });
@@ -512,6 +508,15 @@ export class AppState {
     }
     /* eslint-enable no-bitwise */
 
+    getPersonAccounts(personId) {
+        const person = this.persons.getItem(personId);
+        if (person && Array.isArray(person.accounts)) {
+            return person.accounts.map((item) => item.id);
+        }
+
+        return [];
+    }
+
     getPersonAccount(personId, currencyId) {
         const pId = parseInt(personId, 10);
         const currId = parseInt(currencyId, 10);
@@ -558,9 +563,10 @@ export class AppState {
     }
 
     getPersonByIndex(ind, visibleList, hiddenList) {
-        if (ind < 0 || ind > visibleList.length + hiddenList.length) {
-            throw new Error(`Invalid person index ${ind}`);
-        }
+        assert(
+            ind >= 0 && ind < visibleList.length + hiddenList.length,
+            `Invalid person index ${ind}`,
+        );
 
         if (ind < visibleList.length) {
             return visibleList[ind].id;
@@ -585,9 +591,7 @@ export class AppState {
 
         return names.map((name) => {
             const person = visibleList.findByName(name);
-            if (!person) {
-                throw new Error(`Person '${name}' not found`);
-            }
+            assert(person, `Person '${name}' not found`);
 
             return visibleList.getIndexById(person.id);
         });
@@ -867,9 +871,7 @@ export class AppState {
     }
 
     isAvailableTransactionType(type) {
-        if (!availTransTypes.includes(type)) {
-            throw new Error('Invalid transaction type');
-        }
+        assert(availTransTypes.includes(type), 'Invalid transaction type');
 
         const userVisibleAccounts = this.accounts.getUserVisible();
 
@@ -879,12 +881,10 @@ export class AppState {
         if (type === TRANSFER) {
             return (userVisibleAccounts.length > 1);
         }
-        if (type === DEBT) {
-            const visiblePersons = this.persons.getVisible();
-            return (visiblePersons.length > 0);
-        }
 
-        throw new Error('Invalid transaction type');
+        // DEBT
+        const visiblePersons = this.persons.getVisible();
+        return (visiblePersons.length > 0);
     }
 
     /**
@@ -983,9 +983,7 @@ export class AppState {
     }
 
     prepareConditions(conditions) {
-        if (!Array.isArray(conditions)) {
-            throw new Error('Invalid conditions parameter');
-        }
+        assert.isArray(conditions, 'Invalid conditions parameter');
 
         return conditions.map((condition) => ({
             ...condition,
@@ -994,9 +992,7 @@ export class AppState {
     }
 
     prepareActions(actions) {
-        if (!Array.isArray(actions)) {
-            throw new Error('Invalid actions parameter');
-        }
+        assert.isArray(actions, 'Invalid actions parameter');
 
         return actions.map((action) => ({
             ...action,

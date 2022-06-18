@@ -1,6 +1,5 @@
-import { test } from 'jezve-test';
+import { test, setBlock, assert } from 'jezve-test';
 import { App } from '../../Application.js';
-import { setBlock } from '../../env.js';
 import { Currency } from '../../model/Currency.js';
 import { ImportTransaction } from '../../model/ImportTransaction.js';
 import { ImportCondition } from '../../model/ImportCondition.js';
@@ -70,9 +69,7 @@ export const createRule = async () => {
 /** Click by update import rule button */
 export const updateRule = async (index) => {
     const ind = parseInt(index, 10);
-    if (Number.isNaN(ind)) {
-        throw new Error('Invalid rule index');
-    }
+    assert(!Number.isNaN(ind), 'Invalid rule index');
 
     await test(`Update rule [${ind}]`, async () => {
         await checkRulesDialog();
@@ -87,9 +84,7 @@ export const updateRule = async (index) => {
 /** Click by delete import rule button */
 export const deleteRule = async (index) => {
     const ind = parseInt(index, 10);
-    if (Number.isNaN(ind)) {
-        throw new Error('Invalid rule index');
-    }
+    assert(!Number.isNaN(ind), 'Invalid rule index');
 
     await test(`Delete rule [${ind}]`, async () => {
         await checkRulesDialog();
@@ -103,13 +98,12 @@ export const deleteRule = async (index) => {
 
 /** Run set of actions on specified rule condition item */
 const runOnRuleCondition = async (params) => {
-    if (!params || !('pos' in params) || !('action' in params)) {
-        throw new Error('Invalid parameters');
-    }
+    assert(
+        params && ('pos' in params) && ('action' in params),
+        'Invalid parameters',
+    );
 
-    if (!(App.view instanceof ImportView)) {
-        throw new Error('Invalid view instance');
-    }
+    assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
     const actDescr = {
         changeFieldType: 'Change field type',
@@ -127,45 +121,33 @@ const runOnRuleCondition = async (params) => {
     for (const action of actions) {
         let descr;
 
-        if (!(action.action in actDescr)) {
-            throw new Error(`Unknown action (${action.action})`);
-        }
+        assert(action.action in actDescr, `Unknown action (${action.action})`);
 
         if (action.action === 'changeFieldType'
             || action.action === 'changeProperty') {
             const property = ImportCondition.getFieldTypeById(action.data);
-            if (!property) {
-                throw new Error(`Property (${action.data}) not found`);
-            }
+            assert(property, `Property (${action.data}) not found`);
 
             descr = `${actDescr[action.action]} to '${property.title}'`;
         } else if (action.action === 'changeOperator') {
             const operator = ImportCondition.getOperatorById(action.data);
-            if (!operator) {
-                throw new Error(`Operator (${action.data}) not found`);
-            }
+            assert(operator, `Operator (${action.data}) not found`);
 
             descr = `${actDescr[action.action]} to '${operator.title}'`;
         } else if (action.action === 'changeTemplate') {
             const template = App.state.templates.getItem(action.data);
-            if (!template) {
-                throw new Error(`Template (${action.data}) not found`);
-            }
+            assert(template, `Template (${action.data}) not found`);
 
             descr = `${actDescr[action.action]} to '${template.name}'`;
         } else if (action.action === 'changeAccount') {
             const userAccounts = App.state.accounts.getUserVisible();
             const account = userAccounts.getItem(action.data);
-            if (!account) {
-                throw new Error(`Account (${action.data}) not found`);
-            }
+            assert(account, `Account (${action.data}) not found`);
 
             descr = `${actDescr[action.action]} to '${account.name}'`;
         } else if (action.action === 'changeCurrency') {
             const currency = Currency.getById(action.data);
-            if (!currency) {
-                throw new Error(`Currency (${action.data}) not found`);
-            }
+            assert(currency, `Currency (${action.data}) not found`);
 
             descr = `${actDescr[action.action]} to '${currency.name}'`;
         } else if (action.action === 'togglePropValue') {
@@ -181,9 +163,7 @@ const runOnRuleCondition = async (params) => {
 /** Click by create import condition button */
 export const addRuleCondition = async () => {
     await test('Add rule condition', async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
         await App.view.addRuleCondition();
 
@@ -209,9 +189,10 @@ export const createRuleCondition = async (params) => {
 
 /** Update rule condition */
 export const updateRuleCondition = async (params) => {
-    if (!params || !('pos' in params) || !('action' in params)) {
-        throw new Error('Invalid parameters');
-    }
+    assert(
+        params && ('pos' in params) && ('action' in params),
+        'Invalid parameters',
+    );
 
     setBlock(`Update rule condition [${params.pos}]`, 2);
 
@@ -221,14 +202,10 @@ export const updateRuleCondition = async (params) => {
 /** Click by delete import condition button */
 export const deleteRuleCondition = async (index) => {
     const ind = parseInt(index, 10);
-    if (Number.isNaN(ind)) {
-        throw new Error('Invalid index');
-    }
+    assert(!Number.isNaN(ind), 'Invalid index');
 
     await test(`Delete rule condition [${ind}]`, async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
         await App.view.deleteRuleCondition(ind);
 
@@ -239,13 +216,12 @@ export const deleteRuleCondition = async (index) => {
 
 /** Run set of actions on specified rule action item */
 const runOnRuleAction = async (params) => {
-    if (!params || !('pos' in params) || !('action' in params)) {
-        throw new Error('Invalid parameters');
-    }
+    assert(
+        params && ('pos' in params) && ('action' in params),
+        'Invalid parameters',
+    );
 
-    if (!(App.view instanceof ImportView)) {
-        throw new Error('Invalid view instance');
-    }
+    assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
     const actDescr = {
         changeAction: 'Change action',
@@ -262,31 +238,23 @@ const runOnRuleAction = async (params) => {
 
         if (action.action === 'changeAction') {
             const actionType = ImportAction.getActionById(action.data);
-            if (!actionType) {
-                throw new Error(`Property (${action.data}) not found`);
-            }
+            assert(actionType, `Property (${action.data}) not found`);
 
             descr = `${actDescr[action.action]} to '${actionType.title}'`;
         } else if (action.action === 'changeTransactionType') {
             const transType = ImportTransaction.getTypeById(action.data);
-            if (!transType) {
-                throw new Error(`Transaction type (${action.data}) not found`);
-            }
+            assert(transType, `Transaction type (${action.data}) not found`);
 
             descr = `${actDescr[action.action]} to '${transType.title}'`;
         } else if (action.action === 'changeAccount') {
             const userAccounts = App.state.accounts.getUserVisible();
             const account = userAccounts.getItem(action.data);
-            if (!account) {
-                throw new Error(`Account (${action.data}) not found`);
-            }
+            assert(account, `Account (${action.data}) not found`);
 
             descr = `${actDescr[action.action]} to '${account.name}'`;
         } else if (action.action === 'changePerson') {
             const person = App.state.persons.getItem(action.data);
-            if (!person) {
-                throw new Error(`Person (${action.data}) not found`);
-            }
+            assert(person, `Person (${action.data}) not found`);
 
             descr = `${actDescr[action.action]} to '${person.name}'`;
         } else if (action.action === 'togglePropValue') {
@@ -302,9 +270,7 @@ const runOnRuleAction = async (params) => {
 /** Click by create import action button */
 export const addRuleAction = async () => {
     await test('Add rule action', async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
         await App.view.addRuleAction();
 
@@ -330,9 +296,10 @@ export const createRuleAction = async (params) => {
 };
 
 export const updateRuleAction = async (params) => {
-    if (!params || !('pos' in params) || !('action' in params)) {
-        throw new Error('Invalid parameters');
-    }
+    assert(
+        params && ('pos' in params) && ('action' in params),
+        'Invalid parameters',
+    );
 
     setBlock(`Update rule action [${params.pos}]`, 2);
 
@@ -342,14 +309,10 @@ export const updateRuleAction = async (params) => {
 /** Click by delete import action button */
 export const deleteRuleAction = async (index) => {
     const ind = parseInt(index, 10);
-    if (Number.isNaN(ind)) {
-        throw new Error('Invalid index');
-    }
+    assert(!Number.isNaN(ind), 'Invalid index');
 
     await test(`Delete rule action [${ind}]`, async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
         await App.view.deleteRuleAction(ind);
 
@@ -362,21 +325,22 @@ export const deleteRuleAction = async (index) => {
 /** Submit import rule */
 export const submitRule = async () => {
     await test('Submit import rule', async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
         // Prepare expected content
         const validInput = App.view.isValidRule();
         if (validInput) {
             const expectedRule = App.view.getExpectedRule();
             const dialogState = App.view.getRulesState();
+            assert(
+                ['create', 'update'].includes(dialogState),
+                'Invalid state of rules dialog',
+            );
+
             if (dialogState === 'create') {
                 App.state.createRule(expectedRule);
             } else if (dialogState === 'update') {
                 App.state.updateRule(expectedRule);
-            } else {
-                throw new Error('Invalid state of rules dialog');
             }
         }
 
@@ -390,9 +354,7 @@ export const submitRule = async () => {
 /** Cancel import rule form */
 export const cancelRule = async () => {
     await test('Cancel import rule', async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
         await App.view.cancelRule();
 

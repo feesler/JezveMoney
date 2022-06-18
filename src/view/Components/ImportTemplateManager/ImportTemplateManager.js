@@ -50,7 +50,7 @@ export class ImportTemplateManager extends Component {
             throw new Error('Failed to initialize upload file dialog');
         }
 
-        this.model = {
+        this.state = {
             mainAccount: this.props.mainAccount,
         };
 
@@ -160,7 +160,7 @@ export class ImportTemplateManager extends Component {
         try {
             const res = data.map(
                 (item) => (
-                    this.state.template.applyTo(item, this.model.mainAccount)
+                    this.state.template.applyTo(item, this.state.mainAccount)
                 ),
             );
             return res;
@@ -177,13 +177,16 @@ export class ImportTemplateManager extends Component {
 
     /** Reset component state */
     reset() {
-        this.state = {
+        const newState = {
             id: this.LOADING_STATE,
             rawData: null,
             startFromRow: 2,
             rowsToShow: 3,
             listLoading: false,
+            mainAccount: this.state.mainAccount,
         };
+
+        this.state = newState;
         this.render(this.state);
         this.hide();
     }
@@ -217,7 +220,7 @@ export class ImportTemplateManager extends Component {
             throw new Error('Invalid account');
         }
 
-        this.model.mainAccount = account;
+        this.state.mainAccount = account;
     }
 
     /** Import template select 'change' event handler */

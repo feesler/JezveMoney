@@ -1,4 +1,4 @@
-import { copyObject } from 'jezve-test';
+import { copyObject, assert } from 'jezve-test';
 import { App } from '../Application.js';
 
 /** Types of transactions */
@@ -19,9 +19,7 @@ export class Transaction {
             [DEBT]: 'Debt',
         };
 
-        if (!type || !(type in typesMap)) {
-            throw new Error(`Unknown transaction type ${type}`);
-        }
+        assert(type && (type in typesMap), `Unknown transaction type ${type}`);
 
         return typesMap[type];
     }
@@ -54,9 +52,7 @@ export class Transaction {
             [DEBT]: Transaction.debt,
         };
 
-        if (!params || !params.type || !(params.type in extractMap)) {
-            throw new Error('Invalid data specified');
-        }
+        assert(params?.type && (params.type in extractMap), 'Invalid data specified');
 
         const extractor = extractMap[params.type];
         const res = extractor(params, state);
@@ -71,9 +67,7 @@ export class Transaction {
     }
 
     static expense(params, state) {
-        if (!params.src_id) {
-            throw new Error('Source account not specified');
-        }
+        assert(params.src_id, 'Source account not specified');
 
         const res = copyObject(params);
 
@@ -85,9 +79,7 @@ export class Transaction {
         }
 
         const acc = state.accounts.getItem(res.src_id);
-        if (!acc) {
-            throw new Error('Account not found');
-        }
+        assert(acc, 'Account not found');
         res.src_curr = acc.curr_id;
 
         if (!res.dest_curr) {
@@ -98,9 +90,7 @@ export class Transaction {
     }
 
     static income(params, state) {
-        if (!params.dest_id) {
-            throw new Error('Destination account not specified');
-        }
+        assert(params.dest_id, 'Destination account not specified');
 
         const res = copyObject(params);
 
@@ -112,9 +102,7 @@ export class Transaction {
         }
 
         const acc = state.accounts.getItem(res.dest_id);
-        if (!acc) {
-            throw new Error('Account not found');
-        }
+        assert(acc, 'Account not found');
         res.dest_curr = acc.curr_id;
 
         if (!res.src_curr) {
@@ -125,12 +113,8 @@ export class Transaction {
     }
 
     static transfer(params, state) {
-        if (!params.src_id) {
-            throw new Error('Source account not specified');
-        }
-        if (!params.dest_id) {
-            throw new Error('Destination account not specified');
-        }
+        assert(params.src_id, 'Source account not specified');
+        assert(params.dest_id, 'Destination account not specified');
 
         const res = copyObject(params);
 
@@ -141,15 +125,11 @@ export class Transaction {
         }
 
         const srcAcc = state.accounts.getItem(res.src_id);
-        if (!srcAcc) {
-            throw new Error('Account not found');
-        }
+        assert(srcAcc, 'Account not found');
         res.src_curr = srcAcc.curr_id;
 
         const destAcc = state.accounts.getItem(res.dest_id);
-        if (!destAcc) {
-            throw new Error('Account not found');
-        }
+        assert(destAcc, 'Account not found');
         res.dest_curr = destAcc.curr_id;
 
         if (!res.src_curr) {
@@ -160,9 +140,7 @@ export class Transaction {
     }
 
     static debt(params, state) {
-        if (!params.person_id) {
-            throw new Error('Person not specified');
-        }
+        assert(params.person_id, 'Person not specified');
 
         const res = copyObject(params);
 

@@ -1,4 +1,4 @@
-import { test } from 'jezve-test';
+import { test, assert } from 'jezve-test';
 import { App } from '../../Application.js';
 import { ImportView } from '../../view/ImportView.js';
 import { CREATE_TPL_STATE } from '../../view/component/Import/ImportUploadDialog.js';
@@ -6,9 +6,7 @@ import { CREATE_TPL_STATE } from '../../view/component/Import/ImportUploadDialog
 /** Test selection of import template by id */
 export const selectTemplateById = async (value) => {
     await test(`Select upload template [${value}]`, async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
         await App.state.fetch();
         await App.view.selectUploadTemplateById(value);
@@ -19,9 +17,7 @@ export const selectTemplateById = async (value) => {
 /** Test selection of import template by index */
 export const selectTemplateByIndex = async (value) => {
     await test(`Select upload template by index [${value}]`, async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
         await App.state.fetch();
         await App.view.selectUploadTemplateByIndex(value);
@@ -32,9 +28,7 @@ export const selectTemplateByIndex = async (value) => {
 /** Test input import template name on create/update state */
 export const inputTemplateName = async (value) => {
     await test(`Input template name (${value})`, async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
         await App.state.fetch();
         await App.view.inputTemplateName(value);
@@ -45,9 +39,7 @@ export const inputTemplateName = async (value) => {
 /** Select column of import template */
 export const selectTemplateColumn = async ({ column, index }) => {
     await test(`Select template column [${column} => ${index}]`, async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
         await App.state.fetch();
         await App.view.selectTemplateColumn(column, index);
@@ -58,9 +50,7 @@ export const selectTemplateColumn = async ({ column, index }) => {
 /** Go to create import template state */
 export const createTemplate = async () => {
     await test('Create template', async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
         await App.state.fetch();
         await App.view.createTemplate();
@@ -71,9 +61,7 @@ export const createTemplate = async () => {
 /** Update currently selected template */
 export const updateTemplate = async () => {
     await test('Update template', async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
         await App.state.fetch();
         await App.view.updateTemplate();
@@ -84,9 +72,7 @@ export const updateTemplate = async () => {
 /** Delete currently selected template */
 export const deleteTemplate = async () => {
     await test('Delete template', async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
         // Prepare expected content
         await App.state.fetch();
         const expectedTpl = App.view.getExpectedTemplate();
@@ -103,9 +89,7 @@ export const deleteTemplate = async () => {
 /** Submit current template */
 export const submitTemplate = async () => {
     await test('Submit template', async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
         // Prepare expected content
         await App.state.fetch();
@@ -128,9 +112,7 @@ export const submitTemplate = async () => {
 /** Cancel create/update template */
 export const cancelTemplate = async () => {
     await test('Cancel template', async () => {
-        if (!(App.view instanceof ImportView)) {
-            throw new Error('Invalid view instance');
-        }
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
         await App.state.fetch();
         await App.view.cancelTemplate();

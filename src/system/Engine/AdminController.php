@@ -7,7 +7,7 @@ abstract class AdminController extends TemplateController
     protected $cssAdmin = [];
     protected $jsAdmin = [];
     protected $jsAdminModule = [];
-    protected $themesPath = "admin/view/themes/";
+    protected $themesPath = "admin/view/css/themes/";
 
     protected $menuItems = [
         "dbinstall" => [ "title" => "DB update", "link" => "dbinstall/" ],

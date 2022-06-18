@@ -1,14 +1,16 @@
-import { TestComponent } from 'jezve-test';
+import {
+    TestComponent,
+    query,
+    prop,
+    assert,
+} from 'jezve-test';
 import { ImportCondition } from '../../../model/ImportCondition.js';
 import { Currency } from '../../../model/Currency.js';
 import { App } from '../../../Application.js';
-import { query, prop } from '../../../env.js';
 
 export class ImportConditionItem extends TestComponent {
     async parseContent() {
-        if (!this.elem) {
-            throw new Error('Invalid import condition item');
-        }
+        assert(this.elem, 'Invalid import condition item');
 
         const res = {
             propertyTitle: { elem: await query(this.elem, '.cond-item__property') },
@@ -17,13 +19,12 @@ export class ImportConditionItem extends TestComponent {
             valuePropTitle: { elem: await query(this.elem, '.cond-item__value-property') },
         };
 
-        if (
-            !res.propertyTitle.elem
-            || !res.operatorTitle.elem
-            || (!res.valueTitle.elem && !res.valuePropTitle.elem)
-        ) {
-            throw new Error('Invalid structure of condition item');
-        }
+        assert(
+            res.propertyTitle.elem
+            && res.operatorTitle.elem
+            && (res.valueTitle.elem || res.valuePropTitle.elem),
+            'Invalid structure of condition item',
+        );
 
         res.propertyTitle.value = await prop(res.propertyTitle.elem, 'textContent');
         res.operatorTitle.value = await prop(res.operatorTitle.elem, 'textContent');
@@ -43,26 +44,20 @@ export class ImportConditionItem extends TestComponent {
         // Condition field type
         const fieldName = cont.propertyTitle.value;
         const field = ImportCondition.findFieldTypeByName(fieldName);
-        if (!field) {
-            throw new Error(`Invalid property title: '${fieldName}'`);
-        }
+        assert(field, `Invalid property title: '${fieldName}'`);
         res.fieldType = field.id;
 
         // Condition operator
         const operatorName = cont.operatorTitle.value;
         const operator = ImportCondition.findOperatorByName(operatorName);
-        if (!operator) {
-            throw new Error(`Invalid operator title: '${operatorName}'`);
-        }
+        assert(operator, `Invalid operator title: '${operatorName}'`);
         res.operator = operator.id;
 
         // Condition value
         if (cont.valuePropTitle.elem) {
             const valuePropName = cont.valuePropTitle.value;
             const valueProp = ImportCondition.findFieldTypeByName(valuePropName);
-            if (!valueProp) {
-                throw new Error(`Invalid value property: '${valuePropName}'`);
-            }
+            assert(valueProp, `Invalid value property: '${valuePropName}'`);
 
             res.isFieldValue = true;
             res.value = valueProp.id;
@@ -72,23 +67,17 @@ export class ImportConditionItem extends TestComponent {
 
             if (ImportCondition.isAccountField(field.id)) {
                 const account = App.state.accounts.findByName(value);
-                if (!account) {
-                    throw new Error(`Account not found: '${value}'`);
-                }
+                assert(account, `Account not found: '${value}'`);
 
                 res.value = account.id;
             } else if (ImportCondition.isTemplateField(field.id)) {
                 const template = App.state.templates.findByName(value);
-                if (!template) {
-                    throw new Error(`Template not found: '${value}'`);
-                }
+                assert(template, `Template not found: '${value}'`);
 
                 res.value = template.id;
             } else if (ImportCondition.isCurrencyField(field.id)) {
                 const currency = Currency.findByName(value);
-                if (!currency) {
-                    throw new Error(`Currency not found: '${value}'`);
-                }
+                assert(currency, `Currency not found: '${value}'`);
 
                 res.value = currency.id;
             } else {
@@ -109,46 +98,34 @@ export class ImportConditionItem extends TestComponent {
 
         // Condition field type
         const fieldType = ImportCondition.getFieldTypeById(model.fieldType);
-        if (!fieldType) {
-            throw new Error(`Invalid property type: '${model.fieldType}'`);
-        }
+        assert(fieldType, `Invalid property type: '${model.fieldType}'`);
         res.propertyTitle.value = fieldType.title;
 
         // Condition operator
         const operator = ImportCondition.getOperatorById(model.operator);
-        if (!operator) {
-            throw new Error(`Operator not found: '${model.operator}'`);
-        }
+        assert(operator, `Operator not found: '${model.operator}'`);
         res.operatorTitle.value = operator.title;
 
         // Condition value
         let value;
         if (model.isFieldValue) {
             const valueProp = ImportCondition.getFieldTypeById(model.value);
-            if (!valueProp) {
-                throw new Error(`Invalid property type: '${model.value}'`);
-            }
+            assert(valueProp, `Invalid property type: '${model.value}'`);
 
             res.valuePropTitle.value = valueProp.title;
         } else if (ImportCondition.isAccountField(model.fieldType)) {
             const account = App.state.accounts.getItem(model.value);
-            if (!account) {
-                throw new Error(`Account not found: '${model.value}'`);
-            }
+            assert(account, `Account not found: '${model.value}'`);
 
             value = account.name;
         } else if (ImportCondition.isTemplateField(model.fieldType)) {
             const template = App.state.templates.getItem(model.value);
-            if (!template) {
-                throw new Error(`Template not found: '${model.value}'`);
-            }
+            assert(template, `Template not found: '${model.value}'`);
 
             value = template.name;
         } else if (ImportCondition.isCurrencyField(model.fieldType)) {
             const currency = Currency.getById(model.value);
-            if (!currency) {
-                throw new Error(`Currency not found: '${model.value}'`);
-            }
+            assert(currency, `Currency not found: '${model.value}'`);
 
             value = currency.name;
         } else {

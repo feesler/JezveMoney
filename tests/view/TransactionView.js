@@ -1,3 +1,12 @@
+import {
+    assert,
+    url,
+    query,
+    prop,
+    parentNode,
+    navigation,
+    click,
+} from 'jezve-test';
 import { AppView } from './AppView.js';
 import {
     convDate,
@@ -25,14 +34,6 @@ import {
 } from '../model/Transaction.js';
 import { Currency } from '../model/Currency.js';
 import { App } from '../Application.js';
-import {
-    url,
-    query,
-    prop,
-    parentNode,
-    navigation,
-    click,
-} from '../env.js';
 
 /** Create or update transaction view class */
 export class TransactionView extends AppView {
@@ -49,14 +50,10 @@ export class TransactionView extends AppView {
 
         if (res.isUpdate) {
             const hiddenEl = await query('input[name="id"]');
-            if (!hiddenEl) {
-                throw new Error('Transaction id field not found');
-            }
+            assert(hiddenEl, 'Transaction id field not found');
 
             res.id = parseInt(await prop(hiddenEl, 'value'), 10);
-            if (!res.id) {
-                throw new Error('Wrong transaction id');
-            }
+            assert(res.id, 'Wrong transaction id');
         }
 
         res.heading = { elem: await query('.heading > h1') };
@@ -67,14 +64,10 @@ export class TransactionView extends AppView {
         res.delBtn = await IconLink.create(this, await query('#del_btn'));
 
         res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
-        if (res.typeMenu.multi) {
-            throw new Error('Invalid transaction type menu');
-        }
+        assert(!res.typeMenu.multi, 'Invalid transaction type menu');
 
         res.notAvailMsg = { elem: await query('#notavailmsg') };
-        if (!res.notAvailMsg.elem) {
-            throw new Error('No available transaction message element not found');
-        }
+        assert(res.notAvailMsg.elem, 'No available transaction message element not found');
         res.notAvailMsg.message = await prop(res.notAvailMsg.elem, 'textContent');
 
         res.person = await TileBlock.create(this, await query('#person'));
@@ -92,14 +85,10 @@ export class TransactionView extends AppView {
         res.operation = await this.parseOperation(await query('#operation'));
 
         res.selaccount = await Button.create(this, await query('#selaccount'));
-        if (!res.selaccount) {
-            throw new Error('Select account button not found');
-        }
+        assert(res.selaccount, 'Select account button not found');
 
         res.noacc_btn = { elem: await query('#noacc_btn') };
-        if (!res.noacc_btn.elem) {
-            throw new Error('Disable account button not found');
-        }
+        assert(res.noacc_btn.elem, 'Disable account button not found');
 
         res.source = await TileBlock.create(this, await query('#source'));
         if (res.source) {
@@ -156,9 +145,10 @@ export class TransactionView extends AppView {
         const res = this.model;
 
         const selectedTypes = cont.typeMenu.getSelectedTypes();
-        if (selectedTypes.length !== 1 || !availTransTypes.includes(selectedTypes[0])) {
-            throw new Error('Invalid type selected');
-        }
+        assert(
+            selectedTypes.length === 1 && availTransTypes.includes(selectedTypes[0]),
+            'Invalid type selected',
+        );
 
         [res.type] = selectedTypes;
         res.isAvailable = !cont.notAvailMsg.visible;
@@ -183,12 +173,10 @@ export class TransactionView extends AppView {
             : 0;
 
         res.srcCurr = Currency.getById(res.src_curr_id);
-        if (res.isAvailable && !res.srcCurr) {
-            throw new Error('Source currency not found');
-        }
         res.destCurr = Currency.getById(res.dest_curr_id);
-        if (res.isAvailable && !res.destCurr) {
-            throw new Error('Destination currency not found');
+        if (res.isAvailable) {
+            assert(res.srcCurr, 'Source currency not found');
+            assert(res.destCurr, 'Destination currency not found');
         }
         res.isDiffCurr = (res.src_curr_id !== res.dest_curr_id);
 
@@ -208,8 +196,8 @@ export class TransactionView extends AppView {
         this.updateExch();
 
         if (res.type === EXPENSE) {
-            if (res.isAvailable && !res.srcAccount) {
-                throw new Error('Source account not found');
+            if (res.isAvailable) {
+                assert(res.srcAccount, 'Source account not found');
             }
 
             const isResBalRowVisible = cont.result_balance_row?.content?.visible;
@@ -229,8 +217,8 @@ export class TransactionView extends AppView {
         }
 
         if (res.type === INCOME) {
-            if (res.isAvailable && !res.destAccount) {
-                throw new Error('Destination account not found');
+            if (res.isAvailable) {
+                assert(res.destAccount, 'Destination account not found');
             }
 
             const destResRowVisible = cont.result_balance_dest_row?.content?.visible;
@@ -250,11 +238,9 @@ export class TransactionView extends AppView {
         }
 
         if (res.type === TRANSFER) {
-            if (res.isAvailable && !res.srcAccount) {
-                throw new Error('Source account not found');
-            }
-            if (res.isAvailable && !res.destAccount) {
-                throw new Error('Destination account not found');
+            if (res.isAvailable) {
+                assert(res.srcAccount, 'Source account not found');
+                assert(res.destAccount, 'Destination account not found');
             }
 
             const srcAmountRowVisible = cont.src_amount_row?.content?.visible;
@@ -296,15 +282,13 @@ export class TransactionView extends AppView {
 
         if (res.type === DEBT) {
             res.person = App.state.persons.getItem(cont.person.content.id);
-            if (res.isAvailable && !res.person) {
-                throw new Error('Person not found');
+            if (res.isAvailable) {
+                assert(res.person, 'Person not found');
             }
 
             res.debtType = cont.operation.type;
 
-            if (res.isDiffCurr) {
-                throw new Error('Source and destination currencies are not the same');
-            }
+            assert(!res.isDiffCurr, 'Source and destination currencies are not the same');
 
             const personAccountCurr = (res.debtType) ? res.src_curr_id : res.dest_curr_id;
             res.personAccount = this.getPersonAccount(res.person?.id, personAccountCurr);
@@ -313,16 +297,17 @@ export class TransactionView extends AppView {
             res.noAccount = isSelectAccountVisible;
 
             res.account = App.state.accounts.getItem(cont.account.content.id);
-            if (res.isAvailable && !res.account && !res.noAccount) {
-                throw new Error('Account not found');
+            if (res.isAvailable && !res.noAccount) {
+                assert(res.account, 'Account not found');
             }
-            if (
-                !res.noAccount
-                && res.account
-                && res.account.curr_id !== ((res.debtType) ? res.src_curr_id : res.dest_curr_id)
-            ) {
-                throw new Error('Wrong currency of account');
-            }
+            assert(
+                !(
+                    !res.noAccount
+                    && res.account
+                    && res.account.curr_id !== ((res.debtType) ? res.src_curr_id : res.dest_curr_id)
+                ),
+                'Wrong currency of account',
+            );
 
             if (this.model && this.model.lastAccount_id) {
                 res.lastAccount_id = this.model.lastAccount_id;
@@ -336,9 +321,7 @@ export class TransactionView extends AppView {
                 res.destAccount = res.personAccount;
             }
 
-            if (res.fSrcAmount !== res.fDestAmount) {
-                throw new Error('Source and destination amount are different');
-            }
+            assert(res.fSrcAmount === res.fDestAmount, 'Source and destination amount are different');
 
             const srcAmountRowVisible = cont.src_amount_row?.content?.visible;
             const srcResRowVisible = cont.result_balance_row?.content?.visible;
@@ -370,14 +353,16 @@ export class TransactionView extends AppView {
         }
 
         if (res.isAvailable && res.srcAccount) {
-            if (res.srcAccount.curr_id !== res.src_curr_id) {
-                throw new Error(`Unexpected destination currency ${res.dest_curr_id}(${res.destAccount.curr_id} is expected)`);
-            }
+            assert(
+                res.srcAccount.curr_id === res.src_curr_id,
+                `Unexpected destination currency ${res.dest_curr_id}(${res.srcAccount.curr_id} is expected)`,
+            );
         }
         if (res.isAvailable && res.destAccount) {
-            if (res.destAccount.curr_id !== res.dest_curr_id) {
-                throw new Error(`Unexpected destination currency ${res.dest_curr_id}(${res.destAccount.curr_id} is expected)`);
-            }
+            assert(
+                res.destAccount.curr_id === res.dest_curr_id,
+                `Unexpected destination currency ${res.dest_curr_id}(${res.destAccount.curr_id} is expected)`,
+            );
         }
 
         res.date = cont.datePicker.content.date;
@@ -436,9 +421,7 @@ export class TransactionView extends AppView {
 
     setExpectedState(stateId) {
         const newState = parseInt(stateId, 10);
-        if (Number.isNaN(newState)) {
-            throw new Error('Invalid state specified');
-        }
+        assert(!Number.isNaN(newState), 'Invalid state specified');
 
         const res = {
             typeMenu: { selectedTypes: [this.model.type] },
@@ -550,9 +533,7 @@ export class TransactionView extends AppView {
         }
 
         if (this.model.type === EXPENSE) {
-            if (newState < -1 || newState > 4) {
-                throw new Error('Wrong state specified');
-            }
+            assert(newState >= -1 && newState <= 4, 'Invalid state specified');
 
             if (this.model.isAvailable) {
                 if (newState === 0 || newState === 1) {
@@ -622,9 +603,7 @@ export class TransactionView extends AppView {
         }
 
         if (this.model.type === INCOME) {
-            if (newState < -1 || newState > 4) {
-                throw new Error('Wrong state specified');
-            }
+            assert(newState >= -1 && newState <= 4, 'Invalid state specified');
 
             if (this.model.isAvailable) {
                 res.result_balance_dest_row.label = 'Result balance';
@@ -699,9 +678,7 @@ export class TransactionView extends AppView {
         }
 
         if (this.model.type === TRANSFER) {
-            if (newState < -1 || newState > 8) {
-                throw new Error('Wrong state specified');
-            }
+            assert(newState >= -1 && newState <= 8, 'Invalid state specified');
 
             if (this.model.isAvailable) {
                 res.result_balance_row.label = 'Result balance (Source)';
@@ -830,9 +807,7 @@ export class TransactionView extends AppView {
         }
 
         if (this.model.type === DEBT) {
-            if (newState < -1 || newState > 9) {
-                throw new Error('Wrong state specified');
-            }
+            assert(newState >= -1 && newState <= 9, 'Invalid state specified');
 
             res.selaccount = { visible: this.model.isAvailable && this.model.noAccount };
             res.noacc_btn = { visible: this.model.isAvailable && !this.model.noAccount };
@@ -993,9 +968,7 @@ export class TransactionView extends AppView {
         }
 
         const account = App.state.accounts.getItem(this.model.lastAccount_id);
-        if (!account) {
-            throw new Error('Last account not found');
-        }
+        assert(account, 'Last account not found');
 
         return account.balance;
     }
@@ -1092,9 +1065,7 @@ export class TransactionView extends AppView {
     setNextSourceAccount(accountId) {
         const nextAccountId = App.state.accounts.getNext(accountId);
         const newSrcAcc = App.state.accounts.getItem(nextAccountId);
-        if (!newSrcAcc) {
-            throw new Error('Next account not found');
-        }
+        assert(newSrcAcc, 'Next account not found');
         this.model.srcAccount = newSrcAcc;
         this.model.src_curr_id = this.model.srcAccount.curr_id;
         this.model.srcCurr = Currency.getById(this.model.src_curr_id);
@@ -1114,9 +1085,7 @@ export class TransactionView extends AppView {
 
     setNextDestAccount(accountId) {
         const nextAccountId = App.state.accounts.getNext(accountId);
-        if (!nextAccountId) {
-            throw new Error('Next account not found');
-        }
+        assert(nextAccountId, 'Next account not found');
 
         this.model.destAccount = App.state.accounts.getItem(nextAccountId);
         this.model.dest_curr_id = this.model.destAccount.curr_id;
@@ -1389,9 +1358,7 @@ export class TransactionView extends AppView {
     }
 
     async clickDeleteButton() {
-        if (!this.content.isUpdate || !this.content.delBtn) {
-            throw new Error('Unexpected action clickDeleteButton');
-        }
+        assert(this.content.isUpdate && this.content.delBtn, 'Unexpected action clickDeleteButton');
 
         await this.performAction(() => this.content.delBtn.click());
     }
@@ -1400,12 +1367,8 @@ export class TransactionView extends AppView {
     async deleteSelfItem() {
         await this.clickDeleteButton();
 
-        if (!this.content.delete_warning?.content?.visible) {
-            throw new Error('Delete transaction warning popup not appear');
-        }
-        if (!this.content.delete_warning.content.okBtn) {
-            throw new Error('OK button not found');
-        }
+        assert(this.content.delete_warning?.content?.visible, 'Delete transaction warning popup not appear');
+        assert(this.content.delete_warning.content.okBtn, 'OK button not found');
 
         await navigation(() => click(this.content.delete_warning.content.okBtn));
     }
@@ -1425,6 +1388,11 @@ export class TransactionView extends AppView {
     }
 
     async changeSrcAccount(val) {
+        assert(
+            this.model.type === EXPENSE || this.model.type === TRANSFER,
+            'Unexpected action: can\'t change source account',
+        );
+
         const newAcc = App.state.accounts.getItem(val);
         if (!this.model.srcAccount || !newAcc || newAcc.id === this.model.srcAccount.id) {
             return true;
@@ -1460,9 +1428,7 @@ export class TransactionView extends AppView {
         if (this.model.type === EXPENSE) {
             if (this.model.isDiffCurr) {
                 const sameStates = [2, 3, 4]; // Transition 5, 17 or 10
-                if (!sameStates.includes(this.model.state)) {
-                    throw new Error(`Unexpected state ${this.model.state} with different currencies`);
-                }
+                assert(sameStates.includes(this.model.state), `Unexpected state ${this.model.state} with different currencies`);
             } else if (!this.model.isDiffCurr) {
                 const sameStates = [0, 1]; // Transition 1 or 12
 
@@ -1472,8 +1438,8 @@ export class TransactionView extends AppView {
                 } else if (this.model.state === 4) {
                     this.setDestAmount(this.model.srcAmount);
                     this.model.state = 1; // Transition 11
-                } else if (!sameStates.includes(this.model.state)) {
-                    throw new Error(`changeSrcAccount(): Unexpected state ${this.model.state} with same currencies`);
+                } else {
+                    assert(sameStates.includes(this.model.state), `changeSrcAccount(): Unexpected state ${this.model.state} with same currencies`);
                 }
             }
         } else if (this.model.type === TRANSFER) {
@@ -1486,8 +1452,8 @@ export class TransactionView extends AppView {
                     this.model.state = 4; // Transition 12
                 } else if (this.model.state === 2) {
                     this.model.state = 5; // Transition 16
-                } else if (!sameStates.includes(this.model.state)) {
-                    throw new Error(`changeSrcAccount(): Unexpected state ${this.model.state} with different currencies`);
+                } else {
+                    assert(sameStates.includes(this.model.state), `changeSrcAccount(): Unexpected state ${this.model.state} with different currencies`);
                 }
             } else {
                 const sameStates = [0, 1, 2]; // Transition 5, 11 or 15
@@ -1503,12 +1469,10 @@ export class TransactionView extends AppView {
                     this.model.state = 1; // Transition 37, 50 or 52
                 } else if (this.model.state === 5) {
                     this.model.state = 2; // Transition 27
-                } else if (!sameStates.includes(this.model.state)) {
-                    throw new Error(`changeSrcAccount(): Unexpected state ${this.model.state} with same currencies`);
+                } else {
+                    assert(sameStates.includes(this.model.state), `changeSrcAccount(): Unexpected state ${this.model.state} with same currencies`);
                 }
             }
-        } else {
-            throw new Error('Unexpected action: can\'t change source account');
         }
 
         this.setExpectedState(this.model.state);
@@ -1524,9 +1488,7 @@ export class TransactionView extends AppView {
 
     async changeDestAccount(val) {
         const availTypes = [INCOME, TRANSFER];
-        if (!availTypes.includes(this.model.type)) {
-            throw new Error('Unexpected action: can\'t change destination account');
-        }
+        assert(availTypes.includes(this.model.type), 'Unexpected action: can\'t change destination account');
 
         const newAcc = App.state.accounts.getItem(val);
         if (!this.model.destAccount || !newAcc || newAcc.id === this.model.destAccount.id) {
@@ -1562,9 +1524,7 @@ export class TransactionView extends AppView {
         if (this.model.type === INCOME) {
             if (this.model.isDiffCurr) {
                 const sameStates = [2, 3, 4]; // Transition 5, 11 or 17
-                if (!sameStates.includes(this.model.state)) {
-                    throw new Error(`Unexpected state ${this.model.state} with different currencies`);
-                }
+                assert(sameStates.includes(this.model.state), `Unexpected state ${this.model.state} with different currencies`);
             } else if (!this.model.isDiffCurr) {
                 const sameStates = [0, 1]; // Transition 1 or 23
                 if (this.model.state === 2 || this.model.state === 3) {
@@ -1573,8 +1533,8 @@ export class TransactionView extends AppView {
                 } else if (this.model.state === 4) {
                     this.setSrcAmount(this.model.destAmount);
                     this.model.state = 1; // Transition 18
-                } else if (!sameStates.includes(this.model.state)) {
-                    throw new Error(`changeDestAccount(): Unexpected state ${this.model.state} with different currencies`);
+                } else {
+                    assert(sameStates.includes(this.model.state), `changeDestAccount(): Unexpected state ${this.model.state} with different currencies`);
                 }
             }
         } else if (this.model.type === TRANSFER) {
@@ -1587,8 +1547,8 @@ export class TransactionView extends AppView {
                     this.model.state = 4; // Transition 14
                 } else if (this.model.state === 2) {
                     this.model.state = 5; // Transition 18
-                } else if (!sameStates.includes(this.model.state)) {
-                    throw new Error(`changeDestAccount(): Unexpected state ${this.model.state} with different currencies`);
+                } else {
+                    assert(sameStates.includes(this.model.state), `changeDestAccount(): Unexpected state ${this.model.state} with different currencies`);
                 }
             } else {
                 const sameStates = [0, 1, 2]; // Transition 7, 13 or 17
@@ -1603,8 +1563,8 @@ export class TransactionView extends AppView {
                     this.model.state = 1; // Transition 39 or 54
                 } else if (this.model.state === 5 || this.model.state === 6) {
                     this.model.state = 2; // Transition 29 or 48
-                } else if (!sameStates.includes(this.model.state)) {
-                    throw new Error(`changeDestAccount(): Unexpected state ${this.model.state} with same currencies`);
+                } else {
+                    assert(sameStates.includes(this.model.state), `changeDestAccount(): Unexpected state ${this.model.state} with same currencies`);
                 }
             }
         }
@@ -1623,12 +1583,15 @@ export class TransactionView extends AppView {
     }
 
     async inputSrcAmount(val) {
-        if (this.model.type === EXPENSE && !this.model.isDiffCurr) {
-            throw new Error(`Wrong state: can't input source amount on state ${this.model.state}`);
+        if (this.model.type === EXPENSE) {
+            assert(this.model.isDiffCurr, `Wrong state: can't input source amount on state ${this.model.state}`);
         }
         const trAvailStates = [0, 3, 4, 7];
-        if (this.model.type === TRANSFER && !trAvailStates.includes(this.model.state)) {
-            throw new Error(`Unexpected state ${this.model.state} to input source amount`);
+        if (this.model.type === TRANSFER) {
+            assert(
+                trAvailStates.includes(this.model.state),
+                `Unexpected state ${this.model.state} to input source amount`,
+            );
         }
 
         this.model.srcAmount = val;
@@ -1652,17 +1615,15 @@ export class TransactionView extends AppView {
     }
 
     async clickSrcAmount() {
-        if (this.model.type === EXPENSE) {
-            throw new Error('Unexpected action: can\'t click by source amount');
-        }
+        assert(this.model.type !== EXPENSE, 'Unexpected action: can\'t click by source amount');
 
         if (this.model.type === INCOME) {
-            if (this.model.state === 1) {
-                this.setExpectedState(0); // Transition 4
-            } else {
-                throw new Error(`Unexpected state ${this.model.state} for clickSrcAmount action`);
-            }
+            assert(this.model.state === 1, `Unexpected state ${this.model.state} for clickSrcAmount action`);
+            this.setExpectedState(0); // Transition 4
         } else if (this.model.type === TRANSFER) {
+            const availStates = [1, 2, 4, 6, 8];
+            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state} for clickSrcAmount action`);
+
             if (this.model.state === 1 || this.model.state === 2) {
                 this.setExpectedState(0); // Transition 2 or 4
             } else if (this.model.state === 4) {
@@ -1671,10 +1632,11 @@ export class TransactionView extends AppView {
                 this.setExpectedState(5); // Transition 20
             } else if (this.model.state === 8) {
                 this.setExpectedState(7); // Transition 23
-            } else {
-                throw new Error(`Unexpected state ${this.model.state} for clickSrcAmount action`);
             }
         } else if (this.model.type === DEBT) {
+            const availStates = [1, 2, 4, 5, 8, 9];
+            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state} for clickSrcAmount action`);
+
             if (this.model.state === 1 || this.model.state === 2) {
                 this.setExpectedState(0); // Transition 2 or 4
             } else if (this.model.state === 4 || this.model.state === 5) {
@@ -1683,8 +1645,6 @@ export class TransactionView extends AppView {
                 this.setExpectedState(7); // Transition 31
             } else if (this.model.state === 9) {
                 this.setExpectedState(6); // Transition 35
-            } else {
-                throw new Error(`Unexpected state ${this.model.state} for clickSrcAmount action`);
             }
         }
 
@@ -1694,12 +1654,13 @@ export class TransactionView extends AppView {
     }
 
     async inputDestAmount(val) {
-        if (this.model.type === DEBT) {
-            throw new Error('Unexpected action: can\'t input destination amount');
-        }
+        assert(this.model.type !== DEBT, 'Unexpected action: can\'t input destination amount');
         const trAvailStates = [3, 4];
-        if (this.model.type === TRANSFER && !trAvailStates.includes(this.model.state)) {
-            throw new Error(`Unexpected state ${this.model.state} to input destination amount`);
+        if (this.model.type === TRANSFER) {
+            assert(
+                trAvailStates.includes(this.model.state),
+                `Unexpected state ${this.model.state} to input destination amount`,
+            );
         }
 
         const fNewValue = (isValidValue(val)) ? normalize(val) : val;
@@ -1723,19 +1684,21 @@ export class TransactionView extends AppView {
     }
 
     async clickSrcResultBalance() {
-        if (this.model.type === INCOME) {
-            throw new Error('Unexpected action: can\'t click by source result balance');
-        }
+        assert(this.model.type !== INCOME, 'Unexpected action: can\'t click by source result balance');
 
         if (this.model.type === EXPENSE) {
+            const availStates = [0, 2, 3];
+            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
+
             if (this.model.state === 0) {
                 this.setExpectedState(1);
             } else if (this.model.state === 2 || this.model.state === 3) {
                 this.setExpectedState(4);
-            } else {
-                throw new Error('Unexpected state');
             }
         } else if (this.model.type === TRANSFER) {
+            const availStates = [0, 2, 3, 5, 7];
+            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
+
             if (this.model.state === 0 || this.model.state === 2) {
                 this.setExpectedState(1); // Transition 1 or 10
             } else if (this.model.state === 3) {
@@ -1744,18 +1707,17 @@ export class TransactionView extends AppView {
                 this.setExpectedState(6); // Transition 19
             } else if (this.model.state === 7) {
                 this.setExpectedState(8); // Transition 22
-            } else {
-                throw new Error('Unexpected state');
             }
         } else if (this.model.type === DEBT) {
+            const availStates = [0, 2, 3, 4, 6];
+            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
+
             if (this.model.state === 0 || this.model.state === 2) {
                 this.setExpectedState(1); // Transition 1 or 4
             } else if (this.model.state === 3 || this.model.state === 4) {
                 this.setExpectedState(5); // Transition 13 or 11
             } else if (this.model.state === 6) {
                 this.setExpectedState(9); // Transition 36
-            } else {
-                throw new Error('Unexpected state');
             }
         }
 
@@ -1765,9 +1727,7 @@ export class TransactionView extends AppView {
     }
 
     async clickDestResultBalance() {
-        if (this.model.type === EXPENSE) {
-            throw new Error('Unexpected action: can\'t click by destination result balance');
-        }
+        assert(this.model.type !== EXPENSE, 'Unexpected action: can\'t click by destination result balance');
 
         if (this.model.type === INCOME) {
             if (this.model.state === 0) {
@@ -1789,14 +1749,15 @@ export class TransactionView extends AppView {
                 this.setExpectedState(6);
             }
         } else if (this.model.type === DEBT) {
+            const availStates = [0, 1, 3, 5, 7];
+            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
+
             if (this.model.state === 0 || this.model.state === 1) { // Transition 3 or 5
                 this.setExpectedState(2);
             } else if (this.model.state === 3 || this.model.state === 5) { // Transition 9
                 this.setExpectedState(4);
             } else if (this.model.state === 7) {
                 this.setExpectedState(8); // Transition 32 or 46
-            } else {
-                throw new Error('Unexpected state');
             }
         }
 
@@ -1806,9 +1767,7 @@ export class TransactionView extends AppView {
     }
 
     async clickDestAmount() {
-        if (this.model.type === DEBT) {
-            throw new Error('Unexpected action: can\'t click by destination amount');
-        }
+        assert(this.model.type !== DEBT, 'Unexpected action: can\'t click by destination amount');
 
         if (this.model.type === EXPENSE) {
             if (this.model.state === 1) { // Transition 3
@@ -1818,20 +1777,22 @@ export class TransactionView extends AppView {
             }
         } else if (this.model.type === INCOME) {
             // Transition 13 or 19
-            if (this.model.state === 3 || this.model.state === 4) {
-                this.setExpectedState(2);
-            } else {
-                throw new Error(`Unexpected state ${this.model.state} for clickDestAmount action`);
-            }
+            assert(
+                this.model.state === 3 || this.model.state === 4,
+                `Unexpected state ${this.model.state} for clickDestAmount action`,
+            );
+
+            this.setExpectedState(2);
         } else if (this.model.type === TRANSFER) {
+            const availStates = [5, 7, 6, 8];
+            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state} for clickDestAmount action`);
+
             if (this.model.state === 5 || this.model.state === 7) {
                 // Transition 24 or 55
                 this.setExpectedState(3);
             } else if (this.model.state === 6 || this.model.state === 8) {
                 // Transition 33 or 35
                 this.setExpectedState(4);
-            } else {
-                throw new Error(`Unexpected state ${this.model.state} for clickDestAmount action`);
             }
         }
 
@@ -1841,9 +1802,7 @@ export class TransactionView extends AppView {
     }
 
     async inputResBalance(val) {
-        if (this.model.type === INCOME) {
-            throw new Error('Unexpected action: can\'t input source result balance');
-        }
+        assert(this.model.type !== INCOME, 'Unexpected action: can\'t input source result balance');
 
         const fNewValue = isValidValue(val) ? normalize(val) : val;
         this.model.srcResBal = val;
@@ -1870,9 +1829,7 @@ export class TransactionView extends AppView {
     }
 
     async inputDestResBalance(val) {
-        if (this.model.type === EXPENSE) {
-            throw new Error('Unexpected action: can\'t input destination result balance');
-        }
+        assert(this.model.type !== EXPENSE, 'Unexpected action: can\'t input destination result balance');
 
         const fNewValue = isValidValue(val) ? normalize(val) : val;
         this.model.destResBal = val;
@@ -1919,9 +1876,7 @@ export class TransactionView extends AppView {
     }
 
     async changeSourceCurrency(val) {
-        if (this.model.type !== INCOME) {
-            throw new Error('Unexpected action: can\'t change source currency');
-        }
+        assert(this.model.type === INCOME, 'Unexpected action: can\'t change source currency');
 
         if (this.model.src_curr_id === val) {
             return true;
@@ -1963,9 +1918,7 @@ export class TransactionView extends AppView {
     }
 
     async changeDestCurrency(val) {
-        if (this.model.type !== EXPENSE) {
-            throw new Error('Unexpected action: can\'t change destination currency');
-        }
+        assert(this.model.type === EXPENSE, 'Unexpected action: can\'t change destination currency');
 
         if (this.model.dest_curr_id === val) {
             return true;
@@ -1999,6 +1952,8 @@ export class TransactionView extends AppView {
     }
 
     async clickExchRate() {
+        assert(this.model.type !== DEBT, 'Unexpected action: can\'t click by exchange rate');
+
         if (this.model.type === EXPENSE || this.model.type === INCOME) {
             this.setExpectedState(3);
         } else if (this.model.type === TRANSFER) {
@@ -2009,8 +1964,6 @@ export class TransactionView extends AppView {
                 // Transition 34 or 45
                 this.setExpectedState(8);
             }
-        } else {
-            throw new Error('Unexpected action: can\'t click by exchange rate');
         }
 
         await this.performAction(() => this.content.exch_left.click());
@@ -2019,12 +1972,8 @@ export class TransactionView extends AppView {
     }
 
     async inputExchRate(val) {
-        if (this.model.type === DEBT) {
-            throw new Error('Unexpected action: can\'t input exchange rate');
-        }
-        if (this.model.state !== 3) {
-            throw new Error(`Unexpected state ${this.model.state} to input exchange rate`);
-        }
+        assert(this.model.type !== DEBT, 'Unexpected action: can\'t input exchange rate');
+        assert(this.model.state === 3, `Unexpected state ${this.model.state} to input exchange rate`);
 
         this.model.exchRate = val;
 
@@ -2108,9 +2057,7 @@ export class TransactionView extends AppView {
             this.setSourceResult(srcResult);
         } else if (this.model.noAccount && !newValue) {
             const lastAcc = App.state.accounts.getItem(this.model.lastAccount_id);
-            if (!lastAcc) {
-                throw new Error('Last account not found');
-            }
+            assert(lastAcc, 'Last account not found');
 
             const srcResult = normalize(lastAcc.balance - this.model.fSrcAmount);
             this.setSourceResult(srcResult);
@@ -2121,15 +2068,16 @@ export class TransactionView extends AppView {
             this.setDestResult(destRes);
         } else if (this.model.noAccount && newValue) {
             const lastAcc = App.state.accounts.getItem(this.model.lastAccount_id);
-            if (!lastAcc) {
-                throw new Error('Last account not found');
-            }
+            assert(lastAcc, 'Last account not found');
 
             const destRes = normalize(lastAcc.balance + this.model.fDestAmount);
             this.setDestResult(destRes);
         }
 
         if (this.model.debtType) {
+            const availStates = [0, 1, 2, 6, 9];
+            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
+
             this.model.debtType = newValue;
 
             if (this.model.state === 0) { // Transition 7
@@ -2142,12 +2090,12 @@ export class TransactionView extends AppView {
                 this.setExpectedState(7);
             } else if (this.model.state === 9) { // Transition 34
                 this.setExpectedState(8);
-            } else {
-                throw new Error('Unexpected state');
             }
         } else {
-            this.model.debtType = newValue;
+            const availStates = [3, 4, 5, 7, 8];
+            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
 
+            this.model.debtType = newValue;
             if (this.model.state === 3) { // Transition 8
                 this.setExpectedState(0);
             } else if (this.model.state === 4) { // Transition 16
@@ -2158,8 +2106,6 @@ export class TransactionView extends AppView {
                 this.setExpectedState(6);
             } else if (this.model.state === 8) { // Transition 33
                 this.setExpectedState(9);
-            } else {
-                throw new Error('Unexpected state');
             }
         }
 
@@ -2185,6 +2131,9 @@ export class TransactionView extends AppView {
             }
             this.model.account = null;
 
+            const availStates = [0, 2, 1, 3, 5, 4];
+            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
+
             if (this.model.state === 0 || this.model.state === 2) {
                 this.setExpectedState(6); // Transition 25 or 41
             } else if (this.model.state === 1) {
@@ -2193,16 +2142,12 @@ export class TransactionView extends AppView {
                 this.setExpectedState(7); // Transition 40 or 50
             } else if (this.model.state === 4) {
                 this.setExpectedState(8); // Transition 39
-            } else {
-                throw new Error('Unexpected state');
             }
         } else {
             if (this.model.lastAccount_id) {
                 this.model.account = App.state.accounts.getItem(this.model.lastAccount_id);
             }
-            if (!this.model.account) {
-                throw new Error('Account not found');
-            }
+            assert(this.model.account, 'Account not found');
 
             if (this.model.debtType) {
                 this.model.destAccount = this.model.account;
@@ -2216,6 +2161,9 @@ export class TransactionView extends AppView {
                 this.setSourceResult(srcRes);
             }
 
+            const availStates = [6, 7, 8, 9];
+            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
+
             if (this.model.state === 6) {
                 this.setExpectedState(0); // Transition 26
             } else if (this.model.state === 7) {
@@ -2224,8 +2172,6 @@ export class TransactionView extends AppView {
                 this.setExpectedState(4); // Transition 32
             } else if (this.model.state === 9) {
                 this.setExpectedState(1); // Transition 37
-            } else {
-                throw new Error('Unexpected state');
             }
         }
 
