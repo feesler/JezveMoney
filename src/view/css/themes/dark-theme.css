@@ -131,7 +131,8 @@ body.dark-theme,
   border-top-color: #dddddd;
 }
 
-.dark-theme .dd__list-item {
+.dark-theme .dd__list-item,
+.dark-theme .dd__list-group {
   color: #dddddd;
   background-color: #202020;
 }
