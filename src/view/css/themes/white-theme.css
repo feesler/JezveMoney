@@ -129,7 +129,8 @@ body.white-theme,
   border-top-color: #000000;
 }
 
-.white-theme .dd__list-item {
+.white-theme .dd__list-item,
+.white-theme .dd__list-group {
   color: #000000;
   background-color: #ffffff;
 }
