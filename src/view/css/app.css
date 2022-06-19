@@ -462,6 +462,21 @@ select {
 }
 
 /* DropDown */
+.dd__selection-item {
+  padding: 3px 3px 3px 10px;
+  align-items: center;
+}
+
+.dd__del-selection-item-btn {
+  padding-left: 7px;
+  font-size: 1.2rem;
+  font-weight: 900;
+}
+
+.dd__single-selection {
+  font-size: 0.9rem;
+}
+
 .dark-theme .dd__list-item.dd__list-item_active,
 .white-theme .dd__list-item.dd__list-item_active {
   color: #ffffff;
@@ -558,11 +573,21 @@ select {
 /* Filters */
 .filters-container {
   display: flex;
-  flex-flow: row wrap;
-  align-items: center;
+  flex-flow: column nowrap;
+  width: 100%;
 }
 
 .filter-item {
-  flex: 1 0 auto;
-  margin-right: 15px;
+  flex: 1 1 auto;
+  margin: 0 0 9px 0;
+}
+
+.filter-item__title {
+  font-size: 1rem;
+  font-weight: 400;
+  margin-bottom: 9px;
+}
+
+.filter-item .trtype-menu {
+  padding: 0;
 }

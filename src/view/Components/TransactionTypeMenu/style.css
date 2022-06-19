@@ -1,6 +1,7 @@
 /* Transaction types menu */
 .trtype-menu {
-  padding: 10px 0;
+  display: flex;
+  flex-flow: column nowrap;
   font-size: 16px;
 }
 
@@ -56,4 +57,11 @@
 /* Show selected items for multi select menu as normal links */
 .trtype-menu-multi .trtype-menu__item_selected {
   font-weight: normal;
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .trtype-menu {
+    flex-flow: row nowrap;
+  }
 }

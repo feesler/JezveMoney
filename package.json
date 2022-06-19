@@ -1,6 +1,6 @@
 {
   "name": "jezve-money",
-  "version": "1.14.1",
+  "version": "1.14.2",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -16,7 +16,7 @@
     "debug": "node --inspect-brk ./tests/index.js",
     "build": "npx webpack --config ./webpack.prod.js",
     "build-dev": "npx webpack --config ./webpack.dev.js",
-    "copy-server": "cp \"./src/Controller\",\"./src/Model\",\"./src/Template\",\"./src/system\",\"./src/api\",\"./src/.htaccess\",\"./src/index.php\",\"./src/favicon.ico\",\"./src/manifest.webmanifest\",\"./composer.json\" -Destination ./dist -Force -Recurse",
+    "copy-server": "cp \"./src/Controller\",\"./src/Model\",\"./src/Template\",\"./src/system\",\"./src/api\",\"./src/.htaccess\",\"./src/index.php\",\"./src/favicon.ico\",\"./src/manifest.webmanifest\" -Destination ./dist -Force -Recurse",
     "copy-admin": "cp \"./src/admin/Controller\",\"./src/admin/Template\",\"./src/admin/.htaccess\",\"./src/admin/index.php\" -Destination ./dist/admin/ -Force -Recurse",
     "copy-admin-themes": "cp ./src/admin/view/css/themes -Destination ./dist/admin/view/css -Force -Recurse",
     "copy-client": "cp \"./src/view/img\" -Destination ./dist/view -Force -Recurse",

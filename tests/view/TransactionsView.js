@@ -24,6 +24,7 @@ import { SearchForm } from './component/TransactionList/SearchForm.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
 import { fixDate } from '../common.js';
 import { Toolbar } from './component/Toolbar.js';
+import { FiltersAccordion } from './component/TransactionList/FiltersAccordion.js';
 
 /** List of transactions view class */
 export class TransactionsView extends AppView {
@@ -32,7 +33,6 @@ export class TransactionsView extends AppView {
             titleEl: await query('.content_wrap > .heading > h1'),
             addBtn: await IconLink.create(this, await query('#add_btn')),
             importBtn: await IconLink.create(this, await query('#import_btn')),
-            clearAllBtn: { elem: await query('#clearall_btn') },
             toolbar: await Toolbar.create(this, await query('#toolbar')),
         };
 
@@ -40,15 +40,17 @@ export class TransactionsView extends AppView {
             res.titleEl
             && res.addBtn
             && res.importBtn
-            && res.clearAllBtn.elem
             && res.toolbar
             && res.toolbar.content.editBtn
             && res.toolbar.content.delBtn,
             'Invalid structure of transactions view',
         );
 
+        res.filtersAccordion = await FiltersAccordion.create(this, await query('.filters-collapsible'));
+        assert(res.filtersAccordion, 'Filters not found');
+
         res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
-        assert(res.typeMenu, 'Search form not found');
+        assert(res.typeMenu, 'Types menu not found');
 
         res.accDropDown = await DropDown.createFromChild(this, await query('#acc_id'));
         assert(res.accDropDown, 'Account filter control not found');
@@ -90,6 +92,7 @@ export class TransactionsView extends AppView {
 
         res.data = App.state.transactions.clone();
 
+        res.filterCollapsed = cont.filtersAccordion.isCollapsed();
         res.filter = {
             type: cont.typeMenu.getSelectedTypes(),
             accounts: cont.accDropDown.getSelectedValues().map((item) => parseInt(item, 10)),
@@ -235,26 +238,33 @@ export class TransactionsView extends AppView {
         return this.setExpectedState();
     }
 
-    setExpectedState() {
-        const isItemsAvailable = (this.model.filtered.length > 0);
+    setExpectedState(model = this.model) {
+        const isItemsAvailable = (model.filtered.length > 0);
+        const isFiltersVisible = !model.filterCollapsed;
 
         const res = {
-            typeMenu: { selectedTypes: this.model.filter.type, visible: true },
+            typeMenu: {
+                selectedTypes: model.filter.type,
+                visible: isFiltersVisible,
+            },
             accDropDown: {
                 isMulti: true,
-                visible: true,
-                selectedItems: this.model.filter.accounts.map(
+                visible: isFiltersVisible,
+                selectedItems: model.filter.accounts.map(
                     (accountId) => ({ id: accountId.toString() }),
                 ),
             },
             personDropDown: {
                 isMulti: true,
-                visible: true,
-                selectedItems: this.model.filter.persons.map(
+                visible: isFiltersVisible,
+                selectedItems: model.filter.persons.map(
                     (personId) => ({ id: personId.toString() }),
                 ),
             },
-            searchForm: { value: this.model.filter.search, visible: true },
+            searchForm: {
+                value: model.filter.search,
+                visible: isFiltersVisible,
+            },
             modeSelector: { visible: isItemsAvailable },
             paginator: { visible: isItemsAvailable },
             transList: { visible: true },
@@ -263,20 +273,92 @@ export class TransactionsView extends AppView {
         if (isItemsAvailable) {
             res.paginator = {
                 ...res.paginator,
-                pages: this.model.list.pages,
-                active: this.model.list.page,
+                pages: model.list.pages,
+                active: model.list.page,
             };
 
             res.modeSelector = {
                 ...res.modeSelector,
-                details: this.model.detailsMode,
+                details: model.detailsMode,
             };
         }
 
         return res;
     }
 
+    async openFilters() {
+        if (!this.content.filtersAccordion.isCollapsed()) {
+            return true;
+        }
+
+        this.model.filterCollapsed = false;
+        const expected = this.setExpectedState();
+
+        await this.performAction(() => this.content.filtersAccordion.toggle());
+
+        return this.checkState(expected);
+    }
+
+    async clearAllFilters(directNavigate = false) {
+        if (!directNavigate) {
+            await this.openFilters();
+        }
+
+        this.model.filter = {
+            type: [],
+            accounts: [],
+            persons: [],
+            search: '',
+        };
+        const expected = this.onFilterUpdate();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.waitForList(() => this.content.filtersAccordion.clearAll());
+        }
+
+        return App.view.checkState(expected);
+    }
+
+    async filterByType(type, directNavigate = false) {
+        const newTypeSel = Array.isArray(type) ? type : [type];
+        newTypeSel.sort();
+
+        if (this.content.typeMenu.isSameSelected(newTypeSel)) {
+            return true;
+        }
+
+        if (directNavigate) {
+            this.model.filterCollapsed = true;
+        } else {
+            await this.openFilters();
+        }
+
+        this.model.filter.type = newTypeSel;
+        const expected = this.onFilterUpdate();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else if (newTypeSel.length === 1) {
+            await this.waitForList(() => App.view.content.typeMenu.select(newTypeSel[0]));
+        } else {
+            await this.waitForList(() => App.view.content.typeMenu.select(0));
+            for (const typeItem of newTypeSel) {
+                await this.waitForList(() => App.view.content.typeMenu.toggle(typeItem));
+            }
+        }
+
+        return App.view.checkState(expected);
+    }
+
     async filterByAccounts(accounts, directNavigate = false) {
+        if (directNavigate) {
+            this.model.filterCollapsed = true;
+        } else {
+            await this.openFilters();
+        }
+
         this.model.filter.accounts = accounts;
         const expected = this.onFilterUpdate();
 
@@ -290,6 +372,12 @@ export class TransactionsView extends AppView {
     }
 
     async filterByPersons(persons, directNavigate = false) {
+        if (directNavigate) {
+            this.model.filterCollapsed = true;
+        } else {
+            await this.openFilters();
+        }
+
         this.model.filter.persons = persons;
         const expected = this.onFilterUpdate();
 
@@ -303,6 +391,12 @@ export class TransactionsView extends AppView {
     }
 
     async selectDateRange(start, end, directNavigate = false) {
+        if (directNavigate) {
+            this.model.filterCollapsed = true;
+        } else {
+            await this.openFilters();
+        }
+
         this.model.filter.startDate = start;
         this.model.filter.endDate = end;
         const expected = this.onFilterUpdate();
@@ -320,6 +414,12 @@ export class TransactionsView extends AppView {
     }
 
     async clearDateRange(directNavigate = false) {
+        if (directNavigate) {
+            this.model.filterCollapsed = true;
+        } else {
+            await this.openFilters();
+        }
+
         this.model.filter.startDate = null;
         this.model.filter.endDate = null;
         const expected = this.onFilterUpdate();
@@ -334,6 +434,12 @@ export class TransactionsView extends AppView {
     }
 
     async search(text, directNavigate = false) {
+        if (directNavigate) {
+            this.model.filterCollapsed = true;
+        } else {
+            await this.openFilters();
+        }
+
         this.model.filter.search = text;
         const expected = this.onFilterUpdate();
 
@@ -347,6 +453,12 @@ export class TransactionsView extends AppView {
     }
 
     async clearSearch(directNavigate = false) {
+        if (directNavigate) {
+            this.model.filterCollapsed = true;
+        } else {
+            await this.openFilters();
+        }
+
         this.model.filter.search = '';
         const expected = this.onFilterUpdate();
 
@@ -367,6 +479,9 @@ export class TransactionsView extends AppView {
             return false;
         }
 
+        if (directNavigate) {
+            this.model.filterCollapsed = true;
+        }
         this.model.detailsMode = false;
         const expected = this.setExpectedState();
 
@@ -387,6 +502,9 @@ export class TransactionsView extends AppView {
             return false;
         }
 
+        if (directNavigate) {
+            this.model.filterCollapsed = true;
+        }
         this.model.detailsMode = true;
         const expected = this.setExpectedState();
 
@@ -443,6 +561,9 @@ export class TransactionsView extends AppView {
             return this;
         }
 
+        if (directNavigate) {
+            this.model.filterCollapsed = true;
+        }
         const expected = this.onPageChanged(1);
 
         if (directNavigate) {
@@ -459,6 +580,9 @@ export class TransactionsView extends AppView {
             return true;
         }
 
+        if (directNavigate) {
+            this.model.filterCollapsed = true;
+        }
         const expected = this.onPageChanged(this.pagesCount());
 
         if (directNavigate) {
@@ -473,6 +597,9 @@ export class TransactionsView extends AppView {
     async goToPrevPage(directNavigate = false) {
         assert(!this.isFirstPage(), 'Can\'t go to previous page');
 
+        if (directNavigate) {
+            this.model.filterCollapsed = true;
+        }
         const expected = this.onPageChanged(this.currentPage() - 1);
 
         if (directNavigate) {
@@ -487,6 +614,9 @@ export class TransactionsView extends AppView {
     async goToNextPage(directNavigate = false) {
         assert(!this.isLastPage(), 'Can\'t go to next page');
 
+        if (directNavigate) {
+            this.model.filterCollapsed = true;
+        }
         const expected = this.onPageChanged(this.currentPage() + 1);
 
         if (directNavigate) {
@@ -536,49 +666,6 @@ export class TransactionsView extends AppView {
         }
 
         return res;
-    }
-
-    async clearAllFilters(directNavigate = false) {
-        this.model.filter = {
-            type: [],
-            accounts: [],
-            persons: [],
-            search: '',
-        };
-        const expected = this.onFilterUpdate();
-
-        if (directNavigate) {
-            await goTo(this.getExpectedURL());
-        } else {
-            await this.waitForList(() => click(this.content.clearAllBtn.elem));
-        }
-
-        return App.view.checkState(expected);
-    }
-
-    async filterByType(type, directNavigate = false) {
-        const newTypeSel = Array.isArray(type) ? type : [type];
-        newTypeSel.sort();
-
-        if (this.content.typeMenu.isSameSelected(newTypeSel)) {
-            return true;
-        }
-
-        this.model.filter.type = newTypeSel;
-        const expected = this.onFilterUpdate();
-
-        if (directNavigate) {
-            await goTo(this.getExpectedURL());
-        } else if (newTypeSel.length === 1) {
-            await this.waitForList(() => App.view.content.typeMenu.select(newTypeSel[0]));
-        } else {
-            await this.waitForList(() => App.view.content.typeMenu.select(0));
-            for (const typeItem of newTypeSel) {
-                await this.waitForList(() => App.view.content.typeMenu.toggle(typeItem));
-            }
-        }
-
-        return App.view.checkState(expected);
     }
 
     /** Click on add button */
