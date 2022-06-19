@@ -11,6 +11,7 @@ import {
     setEmptyClick,
     ajax,
 } from 'jezvejs';
+import { Collapsible } from 'jezvejs/Collapsible';
 import { formatDate } from 'jezvejs/DateUtils';
 import { DropDown } from 'jezvejs/DropDown';
 import { DatePicker } from 'jezvejs/DatePicker';
@@ -62,6 +63,13 @@ class TransactionListView extends View {
      * View initialization
      */
     onStart() {
+        const collapse = new Collapsible({
+            header: [ge('filtershdr')],
+            content: ge('filters'),
+            className: 'filters-collapsible',
+        });
+        ge('filterscollapse').appendChild(collapse.elem);
+
         this.clearAllBtn = ge('clearall_btn');
         this.clearAllBtn.addEventListener('click', (e) => this.onClearAllFilters(e));
 
@@ -502,6 +510,7 @@ class TransactionListView extends View {
      * @param {Event} e - click event object
      */
     onClearAllFilters(e) {
+        e.stopPropagation();
         e.preventDefault();
 
         this.state.filter = {};

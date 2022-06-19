@@ -98,6 +98,11 @@ body.dark-theme,
   color: #dddddd;
 }
 
+.dark-theme .dd__single-selection {
+  background-color: #202020;
+  color: #888888;
+}
+
 .dark-theme .dd__combo {
   border-color: #dddddd;
 }
@@ -107,7 +112,6 @@ body.dark-theme,
 .dark-theme .dd__container_active .dd__single-selection,
 .dark-theme .dd__container_active .dd__toggle-btn {
   color: #dddddd;
-  border-color: #dddddd;
   background-color: #202020;
 }
 
@@ -192,6 +196,31 @@ body.dark-theme,
 .dark-theme .dp__day-cell:hover {
   background-color: #3198d4;
   color: #dddddd;
+}
+
+/* Collapsible */
+.dark-theme .rule-item .collapsible-header,
+.dark-theme .rule-form-collapse .collapsible-header {
+  color: #dddddd;
+  background-color: #202020;
+  border-color: #202020;
+}
+
+/* Filters */
+.dark-theme .filters-collapsible .collapsible-header {
+  background-color: #2e2e2e;
+}
+
+.dark-theme .filters-collapsible .collapsible-header:hover {
+  background-color: #3a3a3a;
+}
+
+.dark-theme .filters-heading label {
+  color: #dddddd;
+}
+
+.dark-theme .filters-heading__icon svg {
+  fill: #dddddd;
 }
 
 /* Transaction list */
@@ -348,13 +377,6 @@ body.dark-theme,
 /* Import rule */
 .dark-theme .rule-item .collapsible-content {
   background-color: #202020;
-}
-
-.dark-theme .rule-item .collapsible-header,
-.dark-theme .rule-form-collapse .collapsible-header {
-  color: #dddddd;
-  background-color: #202020;
-  border-color: #202020;
 }
 
 .dark-theme .rule-item .collapsible-header:hover,
