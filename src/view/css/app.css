@@ -588,5 +588,13 @@ select {
 }
 
 .filter-item .trtype-menu {
+  flex-flow: column nowrap;
   padding: 0;
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .filter-item .trtype-menu {
+    flex-flow: row nowrap;
+  }
 }
