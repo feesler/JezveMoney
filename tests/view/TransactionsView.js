@@ -32,14 +32,12 @@ export class TransactionsView extends AppView {
         const res = {
             titleEl: await query('.content_wrap > .heading > h1'),
             addBtn: await IconLink.create(this, await query('#add_btn')),
-            importBtn: await IconLink.create(this, await query('#import_btn')),
             toolbar: await Toolbar.create(this, await query('#toolbar')),
         };
 
         assert(
             res.titleEl
             && res.addBtn
-            && res.importBtn
             && res.toolbar
             && res.toolbar.content.editBtn
             && res.toolbar.content.delBtn,
@@ -671,11 +669,6 @@ export class TransactionsView extends AppView {
     /** Click on add button */
     async goToCreateTransaction() {
         await navigation(() => this.content.addBtn.click());
-    }
-
-    /** Click on import button */
-    async goToImportView() {
-        await navigation(() => this.content.importBtn.click());
     }
 
     async selectTransactions(data) {

@@ -177,7 +177,7 @@ export const deleteProfile = async () => {
 
 export const openAbout = async () => {
     await test('About page', async () => {
-        await App.view.goToAbout();
+        await App.view.navigateToAbout();
         assert.instanceOf(App.view, AboutView, 'Invalid view');
 
         return true;

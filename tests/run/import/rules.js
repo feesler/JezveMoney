@@ -5,7 +5,6 @@ import { ImportTransaction } from '../../model/ImportTransaction.js';
 import { ImportCondition } from '../../model/ImportCondition.js';
 import { ImportAction } from '../../model/ImportAction.js';
 import { ImportView } from '../../view/ImportView.js';
-import { TransactionsView } from '../../view/TransactionsView.js';
 
 /** Navigate to import page */
 const checkNavigation = async () => {
@@ -13,12 +12,7 @@ const checkNavigation = async () => {
         return;
     }
 
-    if (!(App.view instanceof TransactionsView)) {
-        await App.goToMainView();
-        await App.view.goToTransactions();
-    }
-
-    await App.view.goToImportView();
+    await App.view.navigateToImport();
 };
 
 /** Check rules dialog is open */

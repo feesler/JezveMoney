@@ -10,7 +10,7 @@ include(TPL_PATH."commonhdr.tpl");
 <div class="page">
     <div class="page_wrapper">
 <?php	require_once(TPL_PATH."header.tpl");	?>
-        <div class="container centered">
+        <div class="container">
             <div class="content">
                 <div class="content_wrap">
                     <div class="heading">
@@ -21,13 +21,6 @@ include(TPL_PATH."commonhdr.tpl");
                             "link" => BASEURL . "transactions/create/",
                             "title" => "Create",
                             "icon" => "plus"
-                        ])?>
-                        <?=IconLink::render([
-                            "id" => "import_btn",
-                            "type" => "link",
-                            "link" => BASEURL . "import/",
-                            "title" => "Import",
-                            "icon" => "import"
                         ])?>
                     </div>
 

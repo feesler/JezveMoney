@@ -12,6 +12,8 @@ import './style.css';
 export const WHITE_THEME = 0;
 export const DARK_THEME = 1;
 
+const NAV_CLOSED_CLASS = 'navigation_closed';
+
 /**
  * Header component constructor
  * @param {Object} props
@@ -22,8 +24,19 @@ export class Header extends Component {
      */
     parse() {
         this.elem = document.querySelector('.header');
-        if (!(this.elem instanceof Element)) {
+        if (!this.elem) {
             throw new Error('Invalid element specified');
+        }
+
+        this.navigation = document.querySelector('.navigation');
+        this.navigationContent = document.querySelector('.navigation-content');
+        this.navToggleBtn = this.elem.querySelector('.nav-toggle-btn');
+        if (this.navToggleBtn) {
+            this.navToggleBtn.addEventListener('click', () => this.onToggleNav());
+        }
+        this.closeNavBtn = document.querySelector('.navigation__close-btn');
+        if (this.closeNavBtn) {
+            this.closeNavBtn.addEventListener('click', () => this.hideNavigation());
         }
 
         this.menuPopup = ge('menupopup');
@@ -41,6 +54,22 @@ export class Header extends Component {
         if (this.userNameElem) {
             this.userName = this.userNameElem.textContent;
         }
+    }
+
+    /** Show navigation container */
+    onToggleNav() {
+        if (!this.navigation) {
+            return;
+        }
+
+        this.navigation.classList.remove(NAV_CLOSED_CLASS);
+        setEmptyClick(() => this.hidePopup(), [this.navigationContent]);
+    }
+
+    /** Hide navigation container */
+    hideNavigation() {
+        this.navigation.classList.add(NAV_CLOSED_CLASS);
+        setEmptyClick();
     }
 
     /**

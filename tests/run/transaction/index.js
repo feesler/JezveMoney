@@ -221,8 +221,7 @@ export const update = async (type, params, submitHandler) => {
 
     setBlock(`Update ${Transaction.typeToString(type)} [${pos}] (${formatProps(props)})`, 2);
 
-    await App.goToMainView();
-    await App.view.goToTransactions();
+    await App.view.navigateToTransactions();
 
     if (!App.view.content.typeMenu.isSingleSelected(type)) {
         await App.view.filterByType(type);
@@ -264,7 +263,7 @@ export const del = async (type, transactions) => {
     expectedState.deleteTransactions(ids);
 
     // Navigate to transactions view and filter by specified type of transaction
-    await App.view.goToTransactions();
+    await App.view.navigateToTransactions();
     await App.view.filterByType(type);
 
     let tr = copyObject(transactions);
@@ -328,10 +327,7 @@ export const delFromUpdate = async (type, pos) => {
     expectedState.deleteTransactions(ids);
 
     if (!(App.view instanceof TransactionsView)) {
-        if (!(App.view instanceof MainView)) {
-            await App.goToMainView();
-        }
-        await App.view.goToTransactions();
+        await App.view.navigateToTransactions();
     }
 
     if (!App.view.content.typeMenu.isSingleSelected(type)) {
@@ -445,8 +441,7 @@ export const checkTransactionAvailable = async (type, directNavigate = false) =>
 
             await goTo(requestURL);
         } else {
-            await App.goToMainView();
-            await App.view.goToTransactions();
+            await App.view.navigateToTransactions();
             await App.view.goToCreateTransaction();
             assert.instanceOf(App.view, TransactionView, 'Invalid view');
 

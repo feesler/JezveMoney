@@ -13,7 +13,6 @@ import { ImportTransaction } from '../../model/ImportTransaction.js';
 import { ImportList } from '../../view/component/Import/ImportList.js';
 import { ImportListItem } from '../../view/component/Import/ImportListItem.js';
 import { ImportView } from '../../view/ImportView.js';
-import { TransactionsView } from '../../view/TransactionsView.js';
 import { ImportViewSubmitError } from '../../error/ImportViewSubmitError.js';
 
 /** Reexport import templates and import rules runners */
@@ -26,12 +25,7 @@ const checkNavigation = async () => {
         return;
     }
 
-    if (!(App.view instanceof TransactionsView)) {
-        await App.goToMainView();
-        await App.view.goToTransactions();
-    }
-
-    await App.view.goToImportView();
+    await App.view.navigateToImport();
 };
 
 /** Navigate to specified state of import view */
