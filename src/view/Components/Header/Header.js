@@ -30,6 +30,10 @@ export class Header extends Component {
 
         this.navigation = document.querySelector('.navigation');
         this.navigationContent = document.querySelector('.navigation-content');
+        this.navigationBackground = document.querySelector('.navigation-bg');
+        if (this.navigationBackground) {
+            this.navigationBackground.addEventListener('click', () => this.hideNavigation());
+        }
         this.navToggleBtn = this.elem.querySelector('.nav-toggle-btn');
         if (this.navToggleBtn) {
             this.navToggleBtn.addEventListener('click', () => this.onToggleNav());
@@ -63,13 +67,11 @@ export class Header extends Component {
         }
 
         this.navigation.classList.remove(NAV_CLOSED_CLASS);
-        setEmptyClick(() => this.hidePopup(), [this.navigationContent]);
     }
 
     /** Hide navigation container */
     hideNavigation() {
         this.navigation.classList.add(NAV_CLOSED_CLASS);
-        setEmptyClick();
     }
 
     /**
@@ -80,7 +82,8 @@ export class Header extends Component {
             this.hidePopup();
         } else {
             show(this.menuPopup, true);
-            setEmptyClick(() => this.hidePopup(), [this.menuPopup, this.userBtn]);
+            this.emptyClickHandler = () => this.hidePopup();
+            setEmptyClick(this.emptyClickHandler, [this.menuPopup, this.userBtn]);
         }
     }
 
@@ -89,7 +92,7 @@ export class Header extends Component {
      */
     hidePopup() {
         show(this.menuPopup, false);
-        setEmptyClick();
+        removeEmptyClick(this.emptyClickHandler);
     }
 
     /**

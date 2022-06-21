@@ -1,7 +1,5 @@
 import {
     TestComponent,
-    assert,
-    query,
     queryAll,
     prop,
     click,
