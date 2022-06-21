@@ -8,7 +8,6 @@ import {
     isEmpty,
     removeChilds,
     setEvents,
-    setEmptyClick,
     ajax,
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
@@ -719,12 +718,6 @@ class TransactionListView extends View {
 
         this.datePickerBtn.hide();
         show(this.dateBlock, true);
-
-        setEmptyClick(() => this.datePicker.hide(), [
-            this.datePickerWrapper,
-            this.datePickerBtn.elem,
-            this.dateInputBtn,
-        ]);
     }
 
     onChangePage(page) {

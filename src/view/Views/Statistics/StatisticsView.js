@@ -7,6 +7,7 @@ import {
     show,
     setParam,
     setEmptyClick,
+    removeEmptyClick,
     urlJoin,
     px,
     isEmpty,
@@ -37,6 +38,8 @@ class StatisticsView extends View {
         }
 
         this.groupTypes = [null, 'day', 'week', 'month', 'year'];
+
+        this.emptyClickHandler = () => this.hideChartPopup();
 
         this.state = {
             selDateRange: null,
@@ -172,12 +175,6 @@ class StatisticsView extends View {
 
         this.datePickerBtn.hide();
         show(this.dateBlock, true);
-
-        setEmptyClick(() => this.datePicker.hide(), [
-            this.datePickerWrapper,
-            this.datePickerBtn.elem,
-            this.dateInputBtn,
-        ]);
     }
 
     /**
@@ -256,7 +253,7 @@ class StatisticsView extends View {
         show(this.popup, false);
         this.popup = null;
 
-        setEmptyClick();
+        removeEmptyClick(this.emptyClickHandler);
     }
 
     /**
@@ -312,7 +309,7 @@ class StatisticsView extends View {
             setParam(this.popup.style, { left: px(popupX), top: px(popupY) });
 
             setTimeout(
-                () => setEmptyClick(() => this.hideChartPopup(), [barRect.elem, this.popup]),
+                () => setEmptyClick(this.emptyClickHandler, [barRect.elem, this.popup]),
             );
         }
     }

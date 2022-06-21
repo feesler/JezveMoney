@@ -4,7 +4,6 @@ import {
     isNum,
     show,
     enable,
-    setEmptyClick,
     checkDate,
     addChilds,
 } from 'jezvejs';
@@ -647,12 +646,6 @@ class TransactionView extends View {
 
         this.datePickerBtn.hide();
         show(this.dateBlock, true);
-
-        setEmptyClick(() => this.calendarObj.hide(), [
-            this.datePickerWrapper,
-            this.datePickerBtn.elem,
-            this.dateInputBtn,
-        ]);
     }
 
     /**

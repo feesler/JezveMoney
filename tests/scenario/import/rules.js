@@ -46,9 +46,7 @@ const noPersonTests = async () => {
     }
     await App.state.fetch();
 
-    await App.goToMainView();
-    await App.view.goToTransactions();
-    await App.view.goToImportView();
+    await App.view.navigateToImport();
 
     await ImportTests.openRulesDialog();
 

@@ -10,8 +10,7 @@ import {
 export const run = async () => {
     setBlock('Statistics', 1);
 
-    await App.goToMainView();
-    await App.view.goToStatistics();
+    await App.view.navigateToStatistics();
 
     // Expense transactions filter
     const expected = { chart: { bars: { length: 2 } } };

@@ -6,6 +6,7 @@ import {
     query,
 } from 'jezve-test';
 import { Header } from './component/Header.js';
+import { Navigation } from './component/Navigation.js';
 import { MessagePopup } from './component/MessagePopup.js';
 
 export class AppView extends TestView {
@@ -19,6 +20,7 @@ export class AppView extends TestView {
         this.location = await url();
 
         this.content.header = await Header.create(this, await query('.page > .page_wrapper > .header'));
+        this.content.nav = await Navigation.create(this, await query('.page > .page_wrapper > .navigation'));
 
         const msgElem = await query('.popup__content.msg');
         this.content.msgPopup = (msgElem) ? await MessagePopup.create(this, msgElem) : null;
@@ -38,10 +40,33 @@ export class AppView extends TestView {
         await navigation(() => this.content.header.clickProfileMenuItem());
     }
 
-    async goToAbout() {
+    async navigateToAccounts() {
         assert(this.isUserLoggedIn(), 'User is not logged in');
+        await navigation(() => this.content.nav.goToAccounts());
+    }
 
-        await navigation(() => this.content.header.clickAboutMenuItem());
+    async navigateToPersons() {
+        assert(this.isUserLoggedIn(), 'User is not logged in');
+        await navigation(() => this.content.nav.goToPersons());
+    }
+
+    async navigateToTransactions() {
+        assert(this.isUserLoggedIn(), 'User is not logged in');
+        await navigation(() => this.content.nav.goToTransactions());
+    }
+
+    async navigateToStatistics() {
+        assert(this.isUserLoggedIn(), 'User is not logged in');
+        await navigation(() => this.content.nav.goToStatistics());
+    }
+
+    async navigateToImport() {
+        assert(this.isUserLoggedIn(), 'User is not logged in');
+        await navigation(() => this.content.nav.goToImport());
+    }
+
+    async navigateToAbout() {
+        await navigation(() => this.content.nav.goToAbout());
     }
 
     async logoutUser() {

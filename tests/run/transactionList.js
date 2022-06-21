@@ -9,7 +9,6 @@ import {
 import { App } from '../Application.js';
 import { fixDate } from '../common.js';
 import { TransactionsView } from '../view/TransactionsView.js';
-import { MainView } from '../view/MainView.js';
 import { availTransTypes, Transaction } from '../model/Transaction.js';
 
 /** Navigate to transactions list page */
@@ -18,11 +17,7 @@ const checkNavigation = async () => {
         return;
     }
 
-    if (!(App.view instanceof MainView)) {
-        await App.goToMainView();
-    }
-
-    await App.view.goToTransactions();
+    await App.view.navigateToTransactions();
 };
 
 export const checkInitialState = async (directNavigate = false) => {

@@ -15,8 +15,7 @@ import { App } from '../Application.js';
 /** Navigate to persons list page */
 const checkNavigation = async () => {
     if (!(App.view instanceof PersonsView)) {
-        await App.goToMainView();
-        await App.view.goToPersons();
+        await App.view.navigateToPersons();
     }
 };
 

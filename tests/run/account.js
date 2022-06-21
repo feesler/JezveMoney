@@ -17,8 +17,7 @@ import { AccountView } from '../view/AccountView.js';
 /** Navigate to accounts list page */
 const checkNavigation = async () => {
     if (!(App.view instanceof AccountsView)) {
-        await App.goToMainView();
-        await App.view.goToAccounts();
+        await App.view.navigateToAccounts();
     }
 };
 

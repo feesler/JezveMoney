@@ -8,7 +8,7 @@ import {
 } from 'jezve-test';
 import { asyncMap } from '../../common.js';
 
-const DEFAULT_USER_MENU_ITEMS = 3;
+const DEFAULT_USER_MENU_ITEMS = 2;
 
 export class Header extends TestComponent {
     async parseContent() {
@@ -49,7 +49,6 @@ export class Header extends TestComponent {
 
             res.user.profileBtn = res.user.menuItems[itemShift].elem;
             res.user.logoutBtn = res.user.menuItems[itemShift + 1].elem;
-            res.user.aboutBtn = res.user.menuItems[itemShift + 2].elem;
         }
 
         return res;
@@ -71,10 +70,5 @@ export class Header extends TestComponent {
     async clickLogoutMenuItem() {
         await this.clickMenuButton();
         await click(this.content.user.logoutBtn);
-    }
-
-    async clickAboutMenuItem() {
-        await this.clickMenuButton();
-        await click(this.content.user.aboutBtn);
     }
 }
