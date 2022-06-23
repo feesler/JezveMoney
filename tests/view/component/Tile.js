@@ -6,8 +6,7 @@ import {
     hasClass,
     click,
 } from 'jezve-test';
-import { Icon } from '../../model/Icon.js';
-import { Currency } from '../../model/Currency.js';
+import { App } from '../../Application.js';
 
 export class Tile extends TestComponent {
     async parseContent() {
@@ -39,7 +38,7 @@ export class Tile extends TestComponent {
                 iconHRef = iconHRef.substr(1);
             }
 
-            const iconObj = Icon.findByFile(iconHRef);
+            const iconObj = App.icons.findByFile(iconHRef);
             res.icon_id = (iconObj) ? iconObj.id : 0;
         } else {
             res.icon_id = 0;
@@ -55,7 +54,7 @@ export class Tile extends TestComponent {
     static renderAccount(account) {
         const res = {};
 
-        res.balance = Currency.format(account.curr_id, account.balance);
+        res.balance = App.currency.format(account.curr_id, account.balance);
         res.name = account.name;
         res.icon_id = account.icon_id;
 
@@ -71,7 +70,7 @@ export class Tile extends TestComponent {
         assert.isArray(accounts, 'Unexpected input');
 
         const res = accounts.filter((item) => item.balance !== 0)
-            .map((item) => Currency.format(item.curr_id, item.balance));
+            .map((item) => App.currency.format(item.curr_id, item.balance));
 
         return res;
     }

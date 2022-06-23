@@ -5,7 +5,6 @@ import {
     assert,
 } from 'jezve-test';
 import { ImportCondition } from '../../../model/ImportCondition.js';
-import { Currency } from '../../../model/Currency.js';
 import { App } from '../../../Application.js';
 
 export class ImportConditionItem extends TestComponent {
@@ -76,7 +75,7 @@ export class ImportConditionItem extends TestComponent {
 
                 res.value = template.id;
             } else if (ImportCondition.isCurrencyField(field.id)) {
-                const currency = Currency.findByName(value);
+                const currency = App.currency.findByName(value);
                 assert(currency, `Currency not found: '${value}'`);
 
                 res.value = currency.id;
@@ -124,7 +123,7 @@ export class ImportConditionItem extends TestComponent {
 
             value = template.name;
         } else if (ImportCondition.isCurrencyField(model.fieldType)) {
-            const currency = Currency.getById(model.value);
+            const currency = App.currency.getItem(model.value);
             assert(currency, `Currency not found: '${model.value}'`);
 
             value = currency.name;

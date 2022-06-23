@@ -1,6 +1,5 @@
 import { test, setBlock, assert } from 'jezve-test';
 import { App } from '../../Application.js';
-import { Currency } from '../../model/Currency.js';
 import { ImportTransaction } from '../../model/ImportTransaction.js';
 import { ImportCondition } from '../../model/ImportCondition.js';
 import { ImportAction } from '../../model/ImportAction.js';
@@ -140,7 +139,7 @@ const runOnRuleCondition = async (params) => {
 
             descr = `${actDescr[action.action]} to '${account.name}'`;
         } else if (action.action === 'changeCurrency') {
-            const currency = Currency.getById(action.data);
+            const currency = App.currency.getItem(action.data);
             assert(currency, `Currency (${action.data}) not found`);
 
             descr = `${actDescr[action.action]} to '${currency.name}'`;

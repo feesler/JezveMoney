@@ -7,7 +7,6 @@ import {
     setBlock,
 } from 'jezve-test';
 import { App } from '../../Application.js';
-import { Currency } from '../../model/Currency.js';
 import { findSimilarTransaction } from '../../model/import.js';
 import { ImportTransaction } from '../../model/ImportTransaction.js';
 import { ImportList } from '../../view/component/Import/ImportList.js';
@@ -387,7 +386,7 @@ export const updateItem = async (params) => {
         let descr;
 
         if (action.action === 'changeCurrency') {
-            const currency = Currency.getById(action.data);
+            const currency = App.currency.getItem(action.data);
             assert(currency, `Currency (${action.data}) not found`);
 
             descr = `${actDescr[action.action]} to '${currency.name}'`;

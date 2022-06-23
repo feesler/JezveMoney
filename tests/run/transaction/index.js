@@ -9,7 +9,6 @@ import {
 import { TransactionsView } from '../../view/TransactionsView.js';
 import { TransactionView } from '../../view/TransactionView.js';
 import { MainView } from '../../view/MainView.js';
-import { Currency } from '../../model/Currency.js';
 import {
     EXPENSE,
     INCOME,
@@ -88,7 +87,7 @@ export const runAction = async ({ action, data }) => {
     }
 
     if (action === 'changeSourceCurrency' || action === 'changeDestCurrency') {
-        const curr = Currency.getById(data);
+        const curr = App.currency.getItem(data);
         assert(curr, `Currency (${data}) not found`);
 
         if (action === 'changeSourceCurrency') {

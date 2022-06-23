@@ -9,7 +9,6 @@ import {
 import { MainView } from '../view/MainView.js';
 import { AccountsView } from '../view/AccountsView.js';
 import { Transaction } from '../model/Transaction.js';
-import { Currency } from '../model/Currency.js';
 import { formatProps, createCSV, generateId } from '../common.js';
 import { App } from '../Application.js';
 import { AccountView } from '../view/AccountView.js';
@@ -278,10 +277,10 @@ export const exportTest = async (accounts) => {
         const data = transactions.map((transaction) => [
             transaction.id,
             Transaction.typeToString(transaction.type),
-            Currency.format(transaction.src_curr, transaction.src_amount),
-            Currency.format(transaction.dest_curr, transaction.dest_amount),
-            Currency.format(transaction.src_curr, transaction.src_result),
-            Currency.format(transaction.dest_curr, transaction.dest_result),
+            App.currency.format(transaction.src_curr, transaction.src_amount),
+            App.currency.format(transaction.dest_curr, transaction.dest_amount),
+            App.currency.format(transaction.src_curr, transaction.src_result),
+            App.currency.format(transaction.dest_curr, transaction.dest_result),
             transaction.date,
             transaction.comment,
         ]);
