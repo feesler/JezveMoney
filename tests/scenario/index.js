@@ -1,5 +1,4 @@
 import { Runner, setBlock, isFullScenario } from 'jezve-test';
-import { Currency } from '../model/Currency.js';
 
 import { securityTests } from './security.js';
 import { apiTests } from './api.js';
@@ -40,7 +39,7 @@ export class Scenario {
             this.EUR,
             this.PLN,
             this.KRW,
-        ] = Currency.getItemsByNames(['RUB', 'USD', 'EUR', 'PLN', 'KRW']);
+        ] = App.currency.getItemsByNames(['RUB', 'USD', 'EUR', 'PLN', 'KRW']);
     }
 
     async run() {

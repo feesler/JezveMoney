@@ -146,8 +146,8 @@ export class TransactionsView extends AppView {
         return this.content.transList.getItems();
     }
 
-    getSelectedItems() {
-        return this.content.transList.getSelectedItems();
+    getSelectedItems(model = this.model) {
+        return model.list.items.filter((item) => item.selected);
     }
 
     updateModelFilter(model) {
@@ -239,6 +239,7 @@ export class TransactionsView extends AppView {
     setExpectedState(model = this.model) {
         const isItemsAvailable = (model.filtered.length > 0);
         const isFiltersVisible = !model.filterCollapsed;
+        const selected = this.getSelectedItems(model);
 
         const res = {
             typeMenu: {
@@ -266,6 +267,11 @@ export class TransactionsView extends AppView {
             modeSelector: { visible: isItemsAvailable },
             paginator: { visible: isItemsAvailable },
             transList: { visible: true },
+            toolbar: {
+                editBtn: { visible: (selected.length === 1) },
+                delBtn: { visible: (selected.length > 0) },
+                visible: selected.length > 0,
+            },
         };
 
         if (isItemsAvailable) {
@@ -678,26 +684,16 @@ export class TransactionsView extends AppView {
 
         assert(this.content.transList, 'No transactions available to select');
 
-        const selectedItems = this.getSelectedItems();
-        let selectedCount = selectedItems.length;
         for (const num of transactions) {
             assert.arrayIndex(this.content.transList.content.items, num);
 
-            const isSelected = this.content.transList.content.items[num].content.selected;
+            const item = this.model.list.items[num];
+            item.selected = !item.selected;
+            const expected = this.setExpectedState();
+
             await this.performAction(() => this.content.transList.content.items[num].click());
-            selectedCount += (isSelected ? -1 : 1);
 
-            const updIsVisible = this.content.toolbar.isButtonVisible('update');
-            assert(
-                (selectedCount === 1) === updIsVisible,
-                `Unexpected visibility (${updIsVisible}) of Update button while ${selectedCount} items selected`,
-            );
-
-            const delIsVisible = this.content.toolbar.isButtonVisible('del');
-            assert(
-                (selectedCount > 0) === delIsVisible,
-                `Unexpected visibility (${delIsVisible}) of Delete button while ${selectedCount} items selected`,
-            );
+            this.checkState(expected);
         }
     }
 

@@ -125,7 +125,7 @@ abstract class Model
 
         $updRes = $this->dbObj->updateQ($this->tbl_name, $prepareRes, "id=" . $item_id);
         if (!$updRes) {
-            return 0;
+            return false;
         }
 
         $this->postUpdate($item_id);

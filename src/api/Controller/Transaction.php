@@ -4,9 +4,7 @@ namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiController;
 use JezveMoney\Core\Message;
-use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\TransactionModel;
-use JezveMoney\App\Model\DebtModel;
 use JezveMoney\App\Item\TransactionItem;
 
 class Transaction extends ApiController
@@ -137,8 +135,7 @@ class Transaction extends ApiController
 
         $trans_id = 0;
         if ($trans_type == DEBT) {
-            $debtMod = DebtModel::getInstance();
-            $trans_id = $debtMod->create($reqData);
+            $trans_id = $this->model->createDebt($reqData);
         } else {
             $trans_id = $this->model->create($reqData);
         }
@@ -164,13 +161,9 @@ class Transaction extends ApiController
                 throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
             }
 
-            if ($item["type"] == DEBT) {
-                $debtModel = DebtModel::getInstance();
-                $debtTrans = $debtModel->prepareTransaction($item);
-                $transObj = (array)$debtTrans;
-            } else {
-                $transObj = $item;
-            }
+            $transObj = ($item["type"] == DEBT)
+                ? $this->model->prepareDebt($item)
+                : $item;
 
             $transactions[] = $transObj;
         }
@@ -205,8 +198,7 @@ class Transaction extends ApiController
         }
 
         if ($trans_type == DEBT) {
-            $debtMod = DebtModel::getInstance();
-            if (!$debtMod->update($trans_id, $reqData)) {
+            if (!$this->model->updateDebt($trans_id, $reqData)) {
                 throw new \Error(Message::get(ERR_DEBT_UPDATE));
             }
         } else {

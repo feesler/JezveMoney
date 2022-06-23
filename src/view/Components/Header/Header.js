@@ -3,6 +3,7 @@ import {
     isVisible,
     show,
     setEmptyClick,
+    removeEmptyClick,
     ajax,
 } from 'jezvejs';
 import { Component } from 'jezvejs/Component';

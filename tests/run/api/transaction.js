@@ -60,8 +60,8 @@ export const createMultiple = async (params) => {
         let expectedResult = false;
         if (Array.isArray(params)) {
             expectedResult = [];
-            for (const trParam of params) {
-                const resExpected = App.state.createTransaction(trParam);
+            for (const item of params) {
+                const resExpected = App.state.createTransaction(item);
                 if (!resExpected) {
                     App.state.deleteTransactions(expectedResult);
                     expectedResult = false;

@@ -32,7 +32,6 @@ import {
     DEBT,
     availTransTypes,
 } from '../model/Transaction.js';
-import { Currency } from '../model/Currency.js';
 import { App } from '../Application.js';
 
 /** Create or update transaction view class */
@@ -172,8 +171,8 @@ export class TransactionView extends AppView {
             ? parseInt(cont.dest_amount_row.content.hiddenValue, 10)
             : 0;
 
-        res.srcCurr = Currency.getById(res.src_curr_id);
-        res.destCurr = Currency.getById(res.dest_curr_id);
+        res.srcCurr = App.currency.getItem(res.src_curr_id);
+        res.destCurr = App.currency.getItem(res.dest_curr_id);
         if (res.isAvailable) {
             assert(res.srcCurr, 'Source currency not found');
             assert(res.destCurr, 'Destination currency not found');
@@ -1068,7 +1067,7 @@ export class TransactionView extends AppView {
         assert(newSrcAcc, 'Next account not found');
         this.model.srcAccount = newSrcAcc;
         this.model.src_curr_id = this.model.srcAccount.curr_id;
-        this.model.srcCurr = Currency.getById(this.model.src_curr_id);
+        this.model.srcCurr = App.currency.getItem(this.model.src_curr_id);
 
         // Copy destination amount to source amount
         if (this.model.fDestAmount !== this.model.fSrcAmount) {
@@ -1089,7 +1088,7 @@ export class TransactionView extends AppView {
 
         this.model.destAccount = App.state.accounts.getItem(nextAccountId);
         this.model.dest_curr_id = this.model.destAccount.curr_id;
-        this.model.destCurr = Currency.getById(this.model.dest_curr_id);
+        this.model.destCurr = App.currency.getItem(this.model.dest_curr_id);
 
         // Copy source amount to destination amount
         if (this.model.fDestAmount !== this.model.fSrcAmount) {
@@ -1105,7 +1104,7 @@ export class TransactionView extends AppView {
     }
 
     getPersonAccount(personId, currencyId) {
-        const currency = Currency.getById(currencyId);
+        const currency = App.currency.getItem(currencyId);
         if (!currency) {
             return null;
         }
@@ -1121,15 +1120,8 @@ export class TransactionView extends AppView {
         };
     }
 
-    async getFirstCurrency() {
-        const currencies = await Currency.getList();
-        if (!currencies || currencies.length === 0) {
-            return null;
-        }
-
-        const [first] = currencies;
-
-        return first;
+    getFirstCurrency() {
+        return App.currency.getItemByIndex(0);
     }
 
     async changeTransactionType(type) {
@@ -1176,7 +1168,7 @@ export class TransactionView extends AppView {
                 this.model.srcAccount = fromAccount;
                 this.model.src_curr_id = fromAccount.curr_id;
                 this.model.dest_curr_id = fromAccount.curr_id;
-                this.model.srcCurr = Currency.getById(fromAccount.curr_id);
+                this.model.srcCurr = App.currency.getItem(fromAccount.curr_id);
                 this.model.destCurr = this.model.srcCurr;
 
                 this.calculateSourceResult();
@@ -1222,7 +1214,7 @@ export class TransactionView extends AppView {
                 this.model.destAccount = fromAccount;
                 this.model.dest_curr_id = fromAccount.curr_id;
                 this.model.src_curr_id = fromAccount.curr_id;
-                this.model.destCurr = Currency.getById(fromAccount.curr_id);
+                this.model.destCurr = App.currency.getItem(fromAccount.curr_id);
                 this.model.srcCurr = this.model.destCurr;
 
                 this.calculateDestResult();
@@ -1246,7 +1238,7 @@ export class TransactionView extends AppView {
                 if (this.model.account && this.model.debtType) {
                     this.model.destAccount = this.model.account;
                     this.model.dest_curr_id = this.model.account.curr_id;
-                    this.model.destCurr = Currency.getById(this.model.account.curr_id);
+                    this.model.destCurr = App.currency.getItem(this.model.account.curr_id);
 
                     this.setNextSourceAccount(this.model.destAccount.id);
                 } else {
@@ -1256,7 +1248,7 @@ export class TransactionView extends AppView {
 
                     this.model.srcAccount = scrAccount;
                     this.model.src_curr_id = scrAccount.curr_id;
-                    this.model.srcCurr = Currency.getById(scrAccount.curr_id);
+                    this.model.srcCurr = App.currency.getItem(scrAccount.curr_id);
 
                     this.setNextDestAccount(scrAccount.id);
                 }
@@ -1279,7 +1271,7 @@ export class TransactionView extends AppView {
 
             if (!isAvailableBefore) {
                 this.model.debtType = true;
-                this.model.srcCurr = await this.getFirstCurrency();
+                this.model.srcCurr = this.getFirstCurrency();
                 this.model.src_curr_id = this.model.srcCurr.id;
 
                 this.model.dest_curr_id = this.model.src_curr_id;
@@ -1294,7 +1286,7 @@ export class TransactionView extends AppView {
                 if (this.model.srcAccount) {
                     this.model.src_curr_id = this.model.srcAccount.curr_id;
                 } else {
-                    this.model.srcCurr = await this.getFirstCurrency();
+                    this.model.srcCurr = this.getFirstCurrency();
                     this.model.src_curr_id = this.model.srcCurr.id;
                 }
 
@@ -1306,7 +1298,7 @@ export class TransactionView extends AppView {
                 if (this.model.destAccount) {
                     this.model.dest_curr_id = this.model.destAccount.curr_id;
                 } else {
-                    this.model.destCurr = await this.getFirstCurrency();
+                    this.model.destCurr = this.getFirstCurrency();
                     this.model.dest_curr_id = this.model.destCurr.id;
                 }
 
@@ -1400,7 +1392,7 @@ export class TransactionView extends AppView {
 
         this.model.srcAccount = newAcc;
         this.model.src_curr_id = this.model.srcAccount.curr_id;
-        this.model.srcCurr = Currency.getById(this.model.src_curr_id);
+        this.model.srcCurr = App.currency.getItem(this.model.src_curr_id);
 
         // Update result balance of source
         const newSrcResBal = normalize(this.model.srcAccount.balance - this.model.fSrcAmount);
@@ -1497,7 +1489,7 @@ export class TransactionView extends AppView {
 
         this.model.destAccount = newAcc;
         this.model.dest_curr_id = this.model.destAccount.curr_id;
-        this.model.destCurr = Currency.getById(this.model.dest_curr_id);
+        this.model.destCurr = App.currency.getItem(this.model.dest_curr_id);
 
         // Update result balance of destination
         const newDestResBal = normalize(this.model.destAccount.balance + this.model.fDestAmount);
@@ -1883,7 +1875,7 @@ export class TransactionView extends AppView {
         }
 
         this.model.src_curr_id = parseInt(val, 10);
-        this.model.srcCurr = Currency.getById(this.model.src_curr_id);
+        this.model.srcCurr = App.currency.getItem(this.model.src_curr_id);
 
         this.model.isDiffCurr = (this.model.src_curr_id !== this.model.dest_curr_id);
 
@@ -1925,7 +1917,7 @@ export class TransactionView extends AppView {
         }
 
         this.model.dest_curr_id = parseInt(val, 10);
-        this.model.destCurr = Currency.getById(this.model.dest_curr_id);
+        this.model.destCurr = App.currency.getItem(this.model.dest_curr_id);
 
         this.model.isDiffCurr = (this.model.src_curr_id !== this.model.dest_curr_id);
 
@@ -2202,8 +2194,8 @@ export class TransactionView extends AppView {
 
         this.model.src_curr_id = this.model.account.curr_id;
         this.model.dest_curr_id = this.model.src_curr_id;
-        this.model.srcCurr = Currency.getById(this.model.src_curr_id);
-        this.model.destCurr = Currency.getById(this.model.dest_curr_id);
+        this.model.srcCurr = App.currency.getItem(this.model.src_curr_id);
+        this.model.destCurr = App.currency.getItem(this.model.dest_curr_id);
 
         if (this.model.debtType) {
             this.model.srcAccount = this.model.personAccount;

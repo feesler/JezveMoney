@@ -17,8 +17,6 @@ import {
 } from './Transaction.js';
 import { App } from '../Application.js';
 import { List } from './List.js';
-import { Currency } from './Currency.js';
-import { Icon } from './Icon.js';
 import { ImportRule } from './ImportRule.js';
 import { ACCOUNT_HIDDEN, AccountsList } from './AccountsList.js';
 import { PERSON_HIDDEN, PersonsList } from './PersonsList.js';
@@ -229,12 +227,12 @@ export class AppState {
             return false;
         }
 
-        const currObj = Currency.getById(params.curr_id);
+        const currObj = App.currency.getItem(params.curr_id);
         if (!currObj) {
             return false;
         }
 
-        if (params.icon_id && !Icon.getItem(params.icon_id)) {
+        if (params.icon_id && !App.icons.getItem(params.icon_id)) {
             return false;
         }
 
@@ -619,11 +617,11 @@ export class AppState {
             return false;
         }
 
-        const srcCurr = Currency.getById(params.src_curr);
+        const srcCurr = App.currency.getItem(params.src_curr);
         if (!srcCurr) {
             return false;
         }
-        const destCurr = Currency.getById(params.dest_curr);
+        const destCurr = App.currency.getItem(params.dest_curr);
         if (!destCurr) {
             return false;
         }

@@ -7,7 +7,6 @@ import {
     prop,
     click,
 } from 'jezve-test';
-import { Currency } from '../../../model/Currency.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import { ImportRule } from '../../../model/ImportRule.js';
 import {
@@ -217,7 +216,7 @@ export class ImportRuleForm extends TestComponent {
         }
 
         if (ImportCondition.isCurrencyField(fieldType)) {
-            const currency = Currency.getItemByIndex(0);
+            const currency = App.currency.getItemByIndex(0);
             assert(currency, 'No currency available');
 
             return currency.id;

@@ -7,7 +7,6 @@ import {
 } from 'jezve-test';
 import { copyObject } from 'jezvejs';
 import { AppView } from './AppView.js';
-import { Currency } from '../model/Currency.js';
 import { Icon } from '../model/Icon.js';
 import { isValidValue, normalize } from '../common.js';
 import { Tile } from './component/Tile.js';
@@ -53,13 +52,13 @@ export class AccountView extends AppView {
 
         // Currency
         const selectedCurr = cont.currDropDown.content.textValue;
-        res.currObj = Currency.findByName(selectedCurr);
+        res.currObj = App.currency.findByName(selectedCurr);
         assert(res.currObj, `Currency '${selectedCurr}' not found`);
 
         res.curr_id = res.currObj.id;
 
         // Icon
-        let iconObj = Icon.findByName(cont.iconDropDown.content.textValue);
+        let iconObj = App.icons.findByName(cont.iconDropDown.content.textValue);
         if (!iconObj) {
             iconObj = Icon.noIcon();
         }
@@ -83,7 +82,7 @@ export class AccountView extends AppView {
         this.model.balance = account.balance.toString();
         this.model.fBalance = account.balance;
 
-        this.model.currObj = Currency.getById(account.curr_id);
+        this.model.currObj = App.currency.getItem(account.curr_id);
         assert(this.model.currObj, `Unexpected currency ${account.curr_id}`);
 
         this.model.curr_id = this.model.currObj.id;
@@ -249,7 +248,7 @@ export class AccountView extends AppView {
 
     async changeCurrency(val) {
         const currencyId = parseInt(val, 10);
-        this.model.currObj = Currency.getById(currencyId);
+        this.model.currObj = App.currency.getItem(currencyId);
         assert(this.model.currObj, `Unexpected currency ${val}`);
 
         this.model.curr_id = this.model.currObj.id;
@@ -260,7 +259,7 @@ export class AccountView extends AppView {
     }
 
     async changeIcon(val) {
-        let iconObj = Icon.getItem(val);
+        let iconObj = App.icons.getItem(val);
         if (val) {
             assert(iconObj, `Icon ${val} not found`);
         }

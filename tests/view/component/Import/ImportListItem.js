@@ -20,7 +20,6 @@ import {
 } from '../../../model/Transaction.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import { ImportTemplate } from '../../../model/ImportTemplate.js';
-import { Currency } from '../../../model/Currency.js';
 import {
     normalize,
     asyncMap,
@@ -217,7 +216,7 @@ export class ImportListItem extends TestComponent {
         res.person = App.state.persons.getItem(res.personId);
 
         res.currId = cont.currencyField.value;
-        res.currency = Currency.getById(res.currId);
+        res.currency = App.currency.getItem(res.currId);
 
         res.date = cont.dateField.value;
         res.comment = cont.commentField.value;
@@ -411,13 +410,13 @@ export class ImportListItem extends TestComponent {
             res.currId = res.mainAccount.curr_id;
             res.destAmount = '';
         } else {
-            const currency = Currency.findByName(res.original.transactionCurrency);
+            const currency = App.currency.findByName(res.original.transactionCurrency);
             assert(currency, `Currency ${res.original.transactionCurrency} not found`);
             res.currId = currency.id;
             res.destAmount = Math.abs(destAmount);
         }
 
-        res.currency = Currency.getById(res.currId);
+        res.currency = App.currency.getItem(res.currId);
         res.personId = 0;
         res.person = null;
         res.date = res.original.date;
@@ -463,7 +462,7 @@ export class ImportListItem extends TestComponent {
             res.destAccount = App.state.accounts.getItem(res.destId);
             res.currId = res.destAccount.curr_id;
         }
-        res.currency = Currency.getById(res.currId);
+        res.currency = App.currency.getItem(res.currId);
         res.isDifferent = this.isDifferentCurrencies(res);
 
         return res;
@@ -505,7 +504,7 @@ export class ImportListItem extends TestComponent {
             this.model.destAmount = '';
             this.model.currId = this.model.mainAccount.curr_id;
         }
-        this.model.currency = Currency.getById(this.model.currId);
+        this.model.currency = App.currency.getItem(this.model.currId);
         this.model.person = App.state.persons.getItem(this.model.personId);
         this.model.isDifferent = this.isDifferentCurrencies(this.model);
         this.model.invalidated = false;
@@ -527,7 +526,7 @@ export class ImportListItem extends TestComponent {
         this.model.destId = value;
         this.model.destAccount = App.state.accounts.getItem(value);
         this.model.currId = this.model.destAccount.curr_id;
-        this.model.currency = Currency.getById(this.model.currId);
+        this.model.currency = App.currency.getItem(this.model.currId);
         this.model.isDifferent = this.isDifferentCurrencies(this.model);
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
@@ -582,7 +581,7 @@ export class ImportListItem extends TestComponent {
         this.checkEnabled(this.content.currencyField);
 
         this.model.currId = value;
-        this.model.currency = Currency.getById(value);
+        this.model.currency = App.currency.getItem(value);
         this.model.isDifferent = this.isDifferentCurrencies(this.model);
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);

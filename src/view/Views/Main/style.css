@@ -1,14 +1,13 @@
 /* Main view */
 .main-view {
-  display: -ms-flexbox;
   display: inline-flex;
   flex-flow: row wrap;
+  box-sizing: border-box;
   width: 100%;
 }
 
 /* Main page widgets */
 .widget {
-  display: -ms-flexbox;
   display: inline-flex;
   flex-flow: column nowrap;
   min-width: 200px;

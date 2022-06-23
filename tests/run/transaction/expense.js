@@ -1,6 +1,5 @@
 import { test, setBlock, assert } from 'jezve-test';
 import * as TransactionTests from './index.js';
-import { Currency } from '../../model/Currency.js';
 import { EXPENSE } from '../../model/Transaction.js';
 import { App } from '../../Application.js';
 
@@ -54,7 +53,7 @@ export const update = async (params) => {
 export const stateLoop = async () => {
     await App.state.fetch();
 
-    const [RUB, USD, EUR] = Currency.getItemsByNames(['RUB', 'USD', 'EUR']);
+    const [RUB, USD, EUR] = App.currency.getItemsByNames(['RUB', 'USD', 'EUR']);
     const [ACC_3, ACC_RUB, ACC_USD, ACC_EUR] = App.state.getAccountIndexesByNames([
         'acc_3', 'acc RUB', 'acc USD', 'acc EUR',
     ]);

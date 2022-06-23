@@ -77,6 +77,22 @@ class Currency extends ApiController
     }
 
 
+    public function createMultiple()
+    {
+        if (!$this->isPOST()) {
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
+        }
+
+        $request = $this->getRequestData();
+        $ids = $this->model->createMultiple($request);
+        if (!$ids) {
+            throw new \Error(Message::get(ERR_CURRENCY_CREATE));
+        }
+
+        $this->ok(["ids" => $ids]);
+    }
+
+
     protected function update()
     {
         $defMsg = Message::get(ERR_CURRENCY_UPDATE);

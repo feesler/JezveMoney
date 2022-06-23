@@ -2,9 +2,9 @@ import { copyObject } from 'jezvejs';
 import { assert } from 'jezve-test';
 import { formatDate } from 'jezvejs/DateUtils';
 import { fixFloat, fixDate } from '../common.js';
-import { Currency } from './Currency.js';
 import { ImportTransaction } from './ImportTransaction.js';
 import { ImportTemplateError } from '../error/ImportTemplateError.js';
+import { App } from '../Application.js';
 
 /** Import template model */
 export class ImportTemplate {
@@ -84,13 +84,13 @@ export class ImportTemplate {
                     original[column] = value;
                 });
 
-                const accCurrency = Currency.findByName(original.accountCurrency);
+                const accCurrency = App.currency.findByName(original.accountCurrency);
                 original.accountCurrencyId = accCurrency ? accCurrency.id : null;
                 if (original.accountCurrencyId !== mainAccount.curr_id) {
                     throw new ImportTemplateError();
                 }
 
-                const trCurrency = Currency.findByName(original.transactionCurrency);
+                const trCurrency = App.currency.findByName(original.transactionCurrency);
                 original.transactionCurrencyId = trCurrency ? trCurrency.id : null;
 
                 if (Number.isNaN(original.accountAmount) || original.accountAmount === 0) {

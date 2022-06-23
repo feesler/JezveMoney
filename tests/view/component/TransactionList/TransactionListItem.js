@@ -6,13 +6,13 @@ import {
     click,
     assert,
 } from 'jezve-test';
-import { Currency } from '../../../model/Currency.js';
 import {
     EXPENSE,
     INCOME,
     TRANSFER,
     DEBT,
 } from '../../../model/Transaction.js';
+import { App } from '../../../Application.js';
 
 export class TransactionListItem extends TestComponent {
     async parseContent() {
@@ -54,8 +54,8 @@ export class TransactionListItem extends TestComponent {
 
         const srcAcc = state.accounts.getItem(transaction.src_id);
         const destAcc = state.accounts.getItem(transaction.dest_id);
-        const srcAmountFmt = Currency.format(transaction.src_curr, transaction.src_amount);
-        const destAmountFmt = Currency.format(transaction.dest_curr, transaction.dest_amount);
+        const srcAmountFmt = App.currency.format(transaction.src_curr, transaction.src_amount);
+        const destAmountFmt = App.currency.format(transaction.dest_curr, transaction.dest_amount);
 
         if (transaction.type === EXPENSE) {
             res.amountText = `- ${srcAmountFmt}`;
@@ -72,7 +72,7 @@ export class TransactionListItem extends TestComponent {
 
             res.accountTitle = destAcc.name;
         } else if (transaction.type === TRANSFER) {
-            res.amountText = Currency.format(transaction.src_curr, transaction.src_amount);
+            res.amountText = App.currency.format(transaction.src_curr, transaction.src_amount);
             if (transaction.src_curr !== transaction.dest_curr) {
                 res.amountText += ` (${destAmountFmt})`;
             }
@@ -101,7 +101,7 @@ export class TransactionListItem extends TestComponent {
                 res.amountText = (srcAcc) ? '- ' : '+ ';
             }
 
-            res.amountText += Currency.format(personAcc.curr_id, transaction.src_amount);
+            res.amountText += App.currency.format(personAcc.curr_id, transaction.src_amount);
         }
 
         res.dateFmt = transaction.date;
