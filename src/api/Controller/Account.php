@@ -87,6 +87,37 @@ class Account extends ApiController
     }
 
 
+    public function createMultiple()
+    {
+        if (!$this->isPOST()) {
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
+        }
+
+        $uObj = $this->uMod->getItem($this->user_id);
+        if (!$uObj) {
+            throw new \Error("User not found");
+        }
+
+        $request = $this->getRequestData();
+        $accounts = [];
+        foreach ($request as $item) {
+            if (!is_array($item)) {
+                throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
+            }
+
+            $item["owner_id"] = $uObj->owner_id;
+
+            $accounts[] = $item;
+        }
+        $ids = $this->model->createMultiple($accounts);
+        if (!$ids) {
+            throw new \Error(Message::get(ERR_ACCOUNT_CREATE));
+        }
+
+        $this->ok(["ids" => $ids]);
+    }
+
+
     public function update()
     {
         if (!$this->isPOST()) {

@@ -35,6 +35,49 @@ export const create = async (params) => {
 };
 
 /**
+ * Create multiple persons with specified params and check expected state of app
+ */
+export const createMultiple = async (params) => {
+    let ids = [];
+
+    await test('Create multiple persons', async () => {
+        let expectedResult = false;
+        if (Array.isArray(params)) {
+            expectedResult = [];
+            for (const item of params) {
+                const resExpected = App.state.createPerson(item);
+                if (!resExpected) {
+                    App.state.deletePersons(expectedResult);
+                    expectedResult = false;
+                    break;
+                }
+
+                expectedResult.push(resExpected);
+            }
+        }
+
+        // Send API sequest to server
+        let createRes;
+        try {
+            createRes = await api.person.createMultiple(params);
+            if (expectedResult && (!createRes || !createRes.ids)) {
+                return false;
+            }
+        } catch (e) {
+            if (!(e instanceof ApiRequestError) || expectedResult) {
+                throw e;
+            }
+        }
+
+        ids = (createRes) ? createRes.ids : expectedResult;
+
+        return App.state.fetchAndTest();
+    });
+
+    return ids;
+};
+
+/**
  * Update person with specified params and check expected state of app
  * @param {Object} params
  * @param {string} params.id - person identifier

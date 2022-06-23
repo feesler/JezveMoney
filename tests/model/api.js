@@ -72,6 +72,15 @@ export const api = {
             return apiRes.data;
         },
 
+        async createMultiple(data) {
+            const apiRes = await apiPost('currency/createMultiple', data);
+            if (!apiRes || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to create currencies');
+            }
+
+            return apiRes.data;
+        },
+
         async update(options) {
             const apiRes = await apiPost('currency/update', options);
             if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
@@ -117,6 +126,15 @@ export const api = {
             const apiRes = await apiPost('icon/create', options);
             if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
                 throw new ApiRequestError('Fail to create icon');
+            }
+
+            return apiRes.data;
+        },
+
+        async createMultiple(data) {
+            const apiRes = await apiPost('icon/createMultiple', data);
+            if (!apiRes || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to create persons');
             }
 
             return apiRes.data;
@@ -318,6 +336,15 @@ export const api = {
             return apiRes.data;
         },
 
+        async createMultiple(data) {
+            const apiRes = await apiPost('account/createMultiple', data);
+            if (!apiRes || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to create accounts');
+            }
+
+            return apiRes.data;
+        },
+
         async update(options) {
             const apiRes = await apiPost('account/update', options);
             if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
@@ -381,6 +408,15 @@ export const api = {
             return apiRes.data;
         },
 
+        async createMultiple(data) {
+            const apiRes = await apiPost('person/createMultiple', data);
+            if (!apiRes || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to create persons');
+            }
+
+            return apiRes.data;
+        },
+
         async update(options) {
             const apiRes = await apiPost('person/update', options);
             if (!apiRes || apiRes.result !== 'ok') {
@@ -431,8 +467,7 @@ export const api = {
         },
 
         async createMultiple(data) {
-            const transactions = Array.isArray(data) ? data : [data];
-            const apiRes = await apiPost('transaction/createMultiple', transactions);
+            const apiRes = await apiPost('transaction/createMultiple', data);
             if (!apiRes || apiRes.result !== 'ok') {
                 throw new ApiRequestError('Fail to create transactions');
             }
@@ -556,6 +591,15 @@ export const api = {
             return apiRes.data;
         },
 
+        async createMultiple(data) {
+            const apiRes = await apiPost('importcond/createMultiple', data);
+            if (!apiRes || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to create import conditions');
+            }
+
+            return apiRes.data;
+        },
+
         async update(options) {
             const apiRes = await apiPost('importcond/update', options);
             if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
@@ -606,6 +650,15 @@ export const api = {
             return apiRes.data;
         },
 
+        async createMultiple(data) {
+            const apiRes = await apiPost('importaction/createMultiple', data);
+            if (!apiRes || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to create import actions');
+            }
+
+            return apiRes.data;
+        },
+
         async update(options) {
             const apiRes = await apiPost('importaction/update', options);
             if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
@@ -651,6 +704,15 @@ export const api = {
             const apiRes = await apiPost('importtpl/create', options);
             if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
                 throw new ApiRequestError('Fail to create import template');
+            }
+
+            return apiRes.data;
+        },
+
+        async createMultiple(data) {
+            const apiRes = await apiPost('importtpl/createMultiple', data);
+            if (!apiRes || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to create import templates');
             }
 
             return apiRes.data;

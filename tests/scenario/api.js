@@ -278,6 +278,61 @@ const apiCreateAccounts = async () => {
     ] = await scenario.runner.runGroup(AccountApiTests.create, data);
 };
 
+const apiCreateMultipleAccounts = async () => {
+    setBlock('Create multiple', 3);
+
+    const { RUB, USD } = scenario;
+
+    const data = [{
+        name: 'Account 1',
+        curr_id: RUB,
+        initbalance: 100,
+        icon_id: 0,
+        flags: 0,
+    }, {
+        name: 'Account 2',
+        curr_id: RUB,
+        initbalance: 0,
+        icon_id: 4,
+        flags: 0,
+    }, {
+        name: 'Account 3',
+        curr_id: USD,
+        initbalance: 100,
+        icon_id: 5,
+        flags: 0,
+    }];
+
+    await AccountApiTests.createMultiple(data);
+
+    const invData = [
+        null,
+        [null],
+        [null, null],
+        [{
+            name: '',
+            curr_id: USD,
+            initbalance: 10.5,
+            icon_id: 5,
+            flags: 0,
+        }, {
+            name: 'Account 3',
+            curr_id: 999,
+            initbalance: 100,
+            icon_id: 5,
+            flags: 0,
+        }],
+        [{
+            name: 'Account 4',
+            curr_id: RUB,
+            initbalance: 0,
+            icon_id: 4,
+            flags: 0,
+        }, null],
+    ];
+    await scenario.runner.runGroup(AccountApiTests.createMultiple, invData);
+};
+
 const apiUpdateAccounts = async () => {
     const { USD } = scenario;
 
@@ -333,6 +388,41 @@ const apiCreatePersons = async () => {
         scenario.PERSON_X,
         scenario.PERSON_Y,
     ] = await scenario.runner.runGroup(PersonApiTests.create, data);
+};
+
+const apiCreateMultiplePersons = async () => {
+    setBlock('Create multiple', 3);
+
+    const data = [{
+        name: 'Person 1',
+        flags: 0,
+    }, {
+        name: 'Person 2',
+        flags: 0,
+    }, {
+        name: 'Person 3',
+        flags: 0,
+    }];
+
+    await PersonApiTests.createMultiple(data);
+
+    const invData = [
+        null,
+        [null],
+        [null, null],
+        [{
+            name: '',
+            flags: 0,
+        }, {
+            name: 'Person 2',
+            flags: 0,
+        }],
+        [{
+            name: 'Person 4',
+            flags: 0,
+        }, null],
+    ];
+    await scenario.runner.runGroup(PersonApiTests.createMultiple, invData);
 };
 
 const apiUpdatePersons = async () => {
@@ -817,6 +907,55 @@ const apiCreateImportTemplateTests = async () => {
     ] = await scenario.runner.runGroup(ImportTemplateApiTests.create, data);
 };
 
+const apiCreateMultipleImportTemplates = async () => {
+    setBlock('Create multiple', 3);
+
+    const data = [{
+        name: 'Template 10',
+        type: 0,
+        account_amount_col: 1,
+        account_curr_col: 2,
+        trans_amount_col: 3,
+        trans_curr_col: 4,
+        date_col: 5,
+        comment_col: 6,
+    }, {
+        name: 'Template 11',
+        type: 1,
+        account_amount_col: 7,
+        account_curr_col: 6,
+        trans_amount_col: 5,
+        trans_curr_col: 4,
+        date_col: 3,
+        comment_col: 2,
+    }];
+
+    await ImportTemplateApiTests.createMultiple(data);
+
+    const invData = [
+        null,
+        [null],
+        [null, null],
+        [{
+            // Invalid templates
+            name: 'Invalid template',
+        }, {
+            name: null,
+        }],
+        [{
+            name: 'Template 12',
+            type: 1,
+            account_amount_col: 7,
+            account_curr_col: 6,
+            trans_amount_col: 5,
+            trans_curr_col: 4,
+            date_col: 3,
+            comment_col: 2,
+        }, null],
+    ];
+    await scenario.runner.runGroup(ImportTemplateApiTests.createMultiple, invData);
+};
+
 const apiUpdateImportTemplateTests = async () => {
     setBlock('Update import template', 2);
 
@@ -851,6 +990,7 @@ const apiImportTemplateTests = async () => {
     setBlock('Import template', 2);
 
     await apiCreateImportTemplateTests();
+    await apiCreateMultipleImportTemplates();
     await apiUpdateImportTemplateTests();
     await apiDeleteImportTemplateTests();
 };
@@ -1188,7 +1328,9 @@ export const apiTests = {
         await ApiTests.resetAccounts();
 
         await apiCreateAccounts();
+        await apiCreateMultipleAccounts();
         await apiCreatePersons();
+        await apiCreateMultiplePersons();
         await apiCreateTransactions();
         await apiCreateMultipleTransactions();
 
