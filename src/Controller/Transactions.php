@@ -9,7 +9,6 @@ use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\IconModel;
 use JezveMoney\App\Model\TransactionModel;
-use JezveMoney\App\Model\DebtModel;
 use JezveMoney\App\Item\TransactionItem;
 
 const MSG_ACCOUNT_NOT_AVAILABLE = "You have no one active account. Please create one.";
@@ -960,8 +959,7 @@ class Transactions extends TemplateController
         }
 
         if ($trans_type == DEBT) {
-            $debtMod = DebtModel::getInstance();
-            if (!$debtMod->create($reqData)) {
+            if (!$this->model->createDebt($reqData)) {
                 $this->fail($defMsg);
             }
 
@@ -998,8 +996,7 @@ class Transactions extends TemplateController
         }
 
         if ($trans_type == DEBT) {
-            $debtMod = DebtModel::getInstance();
-            if (!$debtMod->update($_POST["id"], $reqData)) {
+            if (!$this->model->updateDebt($_POST["id"], $reqData)) {
                 $this->fail($defMsg);
             }
             Message::set(MSG_DEBT_UPDATE);
