@@ -9,11 +9,11 @@
         <button class="nav-toggle-btn"><?=svgIcon("menu")?></button>
 
         <div class="theme-switch">
-            <label class="switch">
+            <label id="theme-check" class="switch">
 <?php	if ($this->userTheme == DARK_THEME) {	?>
-                <input id="theme-check" type="checkbox" checked>
+                <input type="checkbox" checked>
 <?php	} else {	?>
-                <input id="theme-check" type="checkbox">
+                <input type="checkbox">
 <?php	}	?>
                 <div class="switch-slider"></div>
             </label>

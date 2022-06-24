@@ -7,6 +7,7 @@ import {
     ajax,
 } from 'jezvejs';
 import { Component } from 'jezvejs/Component';
+import { Switch } from 'jezvejs/Switch';
 import './style.css';
 
 // Theme constants
@@ -49,11 +50,10 @@ export class Header extends Component {
         if (this.userBtn) {
             this.userBtn.addEventListener('click', () => this.onUserClick());
         }
-        this.themeCheck = ge('theme-check');
-        if (!this.themeCheck) {
-            throw new Error('Invalid structure of header');
-        }
-        this.themeCheck.addEventListener('change', (e) => this.onToggleTheme(e));
+
+        Switch.fromElement(ge('theme-check'), {
+            onChange: (checked) => this.onToggleTheme(checked),
+        });
 
         this.userNameElem = this.elem.querySelector('.user__title');
         if (this.userNameElem) {
@@ -97,12 +97,12 @@ export class Header extends Component {
     }
 
     /**
-     * Theme switch 'click' handler
-     * @param {Event} e - event object
+     * Theme switch 'change' event handler
+     * @param {Boolean} checked - current state
      */
-    onToggleTheme(e) {
+    onToggleTheme(checked) {
         const { baseURL, themes } = window.app;
-        const newTheme = e.target.checked ? DARK_THEME : WHITE_THEME;
+        const newTheme = checked ? DARK_THEME : WHITE_THEME;
 
         const linkElem = ge('theme-style');
         if (linkElem) {
