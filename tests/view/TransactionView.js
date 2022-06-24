@@ -15,6 +15,7 @@ import {
     normalize,
     isValidValue,
     normalizeExch,
+    trimToDigitsLimit,
 } from '../common.js';
 import { TransactionTypeMenu } from './component/TransactionTypeMenu.js';
 import { InputRow } from './component/InputRow.js';
@@ -1586,10 +1587,11 @@ export class TransactionView extends AppView {
             );
         }
 
-        this.model.srcAmount = val;
-        const fNewValue = (isValidValue(val)) ? normalize(val) : val;
+        const cutVal = trimToDigitsLimit(val, 2);
+        this.model.srcAmount = cutVal;
+        const fNewValue = isValidValue(cutVal) ? normalize(cutVal) : cutVal;
         if (this.model.fSrcAmount !== fNewValue) {
-            this.setSrcAmount(val);
+            this.setSrcAmount(cutVal);
 
             if (this.model.isDiffCurr) {
                 this.calcExchByAmounts();
@@ -1655,10 +1657,11 @@ export class TransactionView extends AppView {
             );
         }
 
-        const fNewValue = (isValidValue(val)) ? normalize(val) : val;
-        this.model.destAmount = val;
+        const cutVal = trimToDigitsLimit(val, 2);
+        const fNewValue = (isValidValue(cutVal)) ? normalize(cutVal) : cutVal;
+        this.model.destAmount = cutVal;
         if (this.model.fDestAmount !== fNewValue) {
-            this.setDestAmount(val);
+            this.setDestAmount(cutVal);
 
             if (this.model.isDiffCurr) {
                 this.calcExchByAmounts();
@@ -1796,8 +1799,9 @@ export class TransactionView extends AppView {
     async inputResBalance(val) {
         assert(this.model.type !== INCOME, 'Unexpected action: can\'t input source result balance');
 
-        const fNewValue = isValidValue(val) ? normalize(val) : val;
-        this.model.srcResBal = val;
+        const cutVal = trimToDigitsLimit(val, 2);
+        const fNewValue = isValidValue(cutVal) ? normalize(cutVal) : cutVal;
+        this.model.srcResBal = cutVal;
         if (this.model.fSrcResBal !== fNewValue) {
             this.model.fSrcResBal = fNewValue;
 
@@ -1823,8 +1827,9 @@ export class TransactionView extends AppView {
     async inputDestResBalance(val) {
         assert(this.model.type !== EXPENSE, 'Unexpected action: can\'t input destination result balance');
 
-        const fNewValue = isValidValue(val) ? normalize(val) : val;
-        this.model.destResBal = val;
+        const cutVal = trimToDigitsLimit(val, 2);
+        const fNewValue = isValidValue(cutVal) ? normalize(cutVal) : cutVal;
+        this.model.destResBal = cutVal;
         const valueChanged = this.model.fDestResBal !== fNewValue;
         if (valueChanged) {
             this.model.fDestResBal = fNewValue;
@@ -1967,9 +1972,9 @@ export class TransactionView extends AppView {
         assert(this.model.type !== DEBT, 'Unexpected action: can\'t input exchange rate');
         assert(this.model.state === 3, `Unexpected state ${this.model.state} to input exchange rate`);
 
-        this.model.exchRate = val;
-
-        const fNewValue = isValidValue(val) ? normalizeExch(val) : val;
+        const cutVal = trimToDigitsLimit(val, 5);
+        this.model.exchRate = cutVal;
+        const fNewValue = isValidValue(cutVal) ? normalizeExch(cutVal) : cutVal;
         if (this.model.fExchRate !== fNewValue) {
             if (isValidValue(this.model.srcAmount)) {
                 const newDestAmount = correct(this.model.fSrcAmount * fNewValue);

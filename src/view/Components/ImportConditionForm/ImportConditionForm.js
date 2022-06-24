@@ -83,6 +83,7 @@ export class ImportConditionForm extends Component {
         this.amountInput = ce('input', { type: 'text' });
         this.decAmountInput = DecimalInput.create({
             elem: this.amountInput,
+            digits: 2,
             oninput: () => this.onValueChange(),
         });
         this.amountField = createField(TITLE_FIELD_AMOUNT, this.amountInput);

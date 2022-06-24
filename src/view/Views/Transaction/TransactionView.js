@@ -305,6 +305,7 @@ class TransactionView extends View {
         }
         this.srcAmountInput = DecimalInput.create({
             elem: ge('src_amount'),
+            digits: 2,
             oninput: (e) => this.onSourceAmountInput(e),
         });
         this.srcAmountSign = ge('srcamountsign');
@@ -315,6 +316,7 @@ class TransactionView extends View {
         }
         this.destAmountInput = DecimalInput.create({
             elem: ge('dest_amount'),
+            digits: 2,
             oninput: (e) => this.onDestAmountInput(e),
         });
         this.destAmountSign = ge('destamountsign');
@@ -325,6 +327,7 @@ class TransactionView extends View {
         }
         this.srcResBalanceInput = DecimalInput.create({
             elem: ge('resbal'),
+            digits: 2,
             oninput: (e) => this.onSourceResultInput(e),
         });
         this.srcResBalanceSign = ge('res_currsign');
@@ -335,6 +338,7 @@ class TransactionView extends View {
         }
         this.destResBalanceInput = DecimalInput.create({
             elem: ge('resbal_d'),
+            digits: 2,
             oninput: (e) => this.onDestResultInput(e),
         });
         this.destResBalanceSign = ge('res_currsign_d');
@@ -345,6 +349,7 @@ class TransactionView extends View {
         }
         this.exchangeInput = DecimalInput.create({
             elem: ge('exchrate'),
+            digits: 5,
             oninput: (e) => this.onExchangeInput(e),
         });
         this.exchangeSign = ge('exchcomm');
