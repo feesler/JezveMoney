@@ -86,19 +86,19 @@ export const formatValue = (val) => val.toString().replace(/(\d)(?=(\d{3})+(?!\d
 
 /** Fix string to correct float number format */
 export const fixFloat = (str) => {
-    if (typeof str === 'string') {
-        let res = str.replace(/,/g, '.');
-        if (res.startsWith('.') || !res.length) {
-            res = `0${res}`;
-        }
-        return res;
-    }
-
     if (typeof str === 'number') {
-        return str;
+        return str.toString();
     }
 
-    return null;
+    if (typeof str !== 'string') {
+        return null;
+    }
+
+    let res = str.replace(/,/g, '.');
+    if (res.startsWith('.') || !res.length) {
+        res = `0${res}`;
+    }
+    return res;
 };
 
 /** Correct calculated value */
@@ -115,6 +115,24 @@ export const normalizeExch = (val) => normalize(val, 5);
 
 /** Check value is valid */
 export const isValidValue = (val) => (typeof val !== 'undefined' && val !== null && !Number.isNaN(parseFloat(fixFloat(val))));
+
+/** Return number of digits after the decimal point */
+export const digitsAfterPoint = (val) => {
+    const fixed = fixFloat(val);
+    const float = parseFloat(fixed);
+    const intPart = Math.trunc(float).toString();
+    return fixed.length - intPart.length - 1;
+};
+
+/** Trim string value of decimal to specified number of digits after decimal point */
+export const trimToDigitsLimit = (val, limit) => {
+    const digits = digitsAfterPoint(val);
+    if (digits <= limit) {
+        return val;
+    }
+
+    return val.substring(0, val.length - (digits - limit));
+};
 
 /*
 * Other
@@ -194,6 +212,7 @@ export const formatProps = (params) => {
 export const checkPHPerrors = (content) => {
     const errSignatures = [
         '<b>Notice</b>',
+        '<b>Warning</b>',
         '<b>Parse error</b>',
         '<b>Fatal error</b>',
         'xdebug-error',

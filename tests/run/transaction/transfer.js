@@ -148,6 +148,9 @@ export const stateLoop = async () => {
         // Transition 26: Change source account to another one with different currency (EUR) and
         //  stay on State 5
         { action: 'changeSrcAccountByPos', data: ACC_EUR },
+        // Swap source and destination accounts
+        { action: 'swapSourceAndDest' },
+        { action: 'swapSourceAndDest' },
         // Transition 28: Change destination account to another one with different currency and
         //  stay on State 5
         { action: 'changeDestAccountByPos', data: ACC_3 },

@@ -10,6 +10,7 @@ import {
 import { DropDown } from '../DropDown.js';
 import {
     asyncMap,
+    trimToDigitsLimit,
 } from '../../../common.js';
 import {
     IMPORT_ACTION_SET_TR_TYPE,
@@ -182,7 +183,11 @@ export class ImportActionForm extends TestComponent {
     async changeValue(name, value) {
         assert(this.model.state === name, 'Invalid state');
 
-        this.model[name] = value;
+        if (name === 'amount') {
+            this.model[name] = trimToDigitsLimit(value, 2);
+        } else {
+            this.model[name] = value;
+        }
         this.model.value = ImportActionForm.getStateValue(this.model);
         this.expectedState = ImportActionForm.getExpectedState(this.model);
 

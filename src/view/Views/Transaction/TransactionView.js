@@ -1,6 +1,7 @@
 import 'jezvejs/style';
 import {
     ge,
+    insertAfter,
     isNum,
     show,
     enable,
@@ -18,7 +19,6 @@ import {
     TRANSFER,
     fixFloat,
     isValidValue,
-    normalize,
     normalizeExch,
     getTransactionTypeString,
 } from '../../js/app.js';
@@ -57,7 +57,9 @@ import {
     sourceResultChange,
     sourceResultClick,
     toggleDebtAccount,
-    toggleDebtType,
+    swapSourceAndDest,
+    calculateSourceResult,
+    calculateDestResult,
     calculateExchange,
     reducer,
     typeChange,
@@ -113,9 +115,9 @@ class TransactionView extends View {
                 sourceAmount: '',
                 destAmount: '',
                 sourceResult: '',
-                fSourceResult: 0,
+                fSourceResult: null,
                 destResult: '',
-                fDestResult: 0,
+                fDestResult: null,
                 exchange: 1,
                 fExchange: 1,
             },
@@ -171,38 +173,10 @@ class TransactionView extends View {
 
                 initialState.id = (transaction.noAccount) ? 7 : 3;
             }
-
-            if (transaction.noAccount) {
-                const lastAcc = window.app.model.accounts.getItem(transaction.lastAcc_id);
-                if (lastAcc) {
-                    if (transaction.debtType) {
-                        const destResult = normalize(lastAcc.balance);
-                        initialState.form.destResult = destResult;
-                        initialState.form.fDestResult = destResult;
-                    } else {
-                        const sourceResult = normalize(lastAcc.balance);
-                        initialState.form.sourceResult = sourceResult;
-                        initialState.form.fSourceResult = sourceResult;
-                    }
-                }
-            }
         }
 
-        if (initialState.srcAccount) {
-            const srcBalance = initialState.srcAccount.balance;
-            const srcResult = normalize(srcBalance - initialState.transaction.src_amount);
-
-            initialState.form.sourceResult = srcResult;
-            initialState.form.fSourceResult = srcResult;
-        }
-
-        if (initialState.destAccount) {
-            const destBalance = initialState.destAccount.balance;
-            const destResult = normalize(destBalance + initialState.transaction.dest_amount);
-
-            initialState.form.destResult = destResult;
-            initialState.form.fDestResult = destResult;
-        }
+        calculateSourceResult(initialState);
+        calculateDestResult(initialState);
 
         const exchange = calculateExchange(initialState);
         initialState.form.fExchange = exchange;
@@ -249,15 +223,22 @@ class TransactionView extends View {
         this.destContainer = ge('destination');
         this.personContainer = ge('person');
         this.debtAccountContainer = ge('debtaccount');
+        this.swapBtn = ge('swapBtn');
         if (
             !this.notAvailableMessage
             || !this.srcContainer
             || !this.destContainer
             || !this.personContainer
             || !this.debtAccountContainer
+            || !this.swapBtn
         ) {
             throw new Error('Failed to initialize view');
         }
+
+        this.swapBtn.addEventListener(
+            'click',
+            () => this.store.dispatch(swapSourceAndDest()),
+        );
 
         this.srcTileBase = this.srcContainer.querySelector('.tile-base');
         this.srcTileContainer = this.srcContainer.querySelector('.tile_container');
@@ -305,6 +286,7 @@ class TransactionView extends View {
         }
         this.srcAmountInput = DecimalInput.create({
             elem: ge('src_amount'),
+            digits: 2,
             oninput: (e) => this.onSourceAmountInput(e),
         });
         this.srcAmountSign = ge('srcamountsign');
@@ -315,6 +297,7 @@ class TransactionView extends View {
         }
         this.destAmountInput = DecimalInput.create({
             elem: ge('dest_amount'),
+            digits: 2,
             oninput: (e) => this.onDestAmountInput(e),
         });
         this.destAmountSign = ge('destamountsign');
@@ -325,6 +308,7 @@ class TransactionView extends View {
         }
         this.srcResBalanceInput = DecimalInput.create({
             elem: ge('resbal'),
+            digits: 2,
             oninput: (e) => this.onSourceResultInput(e),
         });
         this.srcResBalanceSign = ge('res_currsign');
@@ -335,6 +319,7 @@ class TransactionView extends View {
         }
         this.destResBalanceInput = DecimalInput.create({
             elem: ge('resbal_d'),
+            digits: 2,
             oninput: (e) => this.onDestResultInput(e),
         });
         this.destResBalanceSign = ge('res_currsign_d');
@@ -345,6 +330,7 @@ class TransactionView extends View {
         }
         this.exchangeInput = DecimalInput.create({
             elem: ge('exchrate'),
+            digits: 5,
             oninput: (e) => this.onExchangeInput(e),
         });
         this.exchangeSign = ge('exchcomm');
@@ -376,6 +362,7 @@ class TransactionView extends View {
         this.destIdInp = ge('dest_id');
         this.srcCurrInp = ge('src_curr');
         this.destCurrInp = ge('dest_curr');
+        this.debtOperationInp = ge('debtOperation');
 
         this.debtOpControls = ge('operation');
 
@@ -396,15 +383,6 @@ class TransactionView extends View {
         }
 
         this.debtAccountLabel = ge('acclbl');
-
-        this.debtGiveRadio = ge('debtgive');
-        if (this.debtGiveRadio) {
-            this.debtGiveRadio.addEventListener('change', () => this.onChangeDebtOp());
-        }
-        this.debtTakeRadio = ge('debttake');
-        if (this.debtTakeRadio) {
-            this.debtTakeRadio.addEventListener('change', () => this.onChangeDebtOp());
-        }
 
         this.personTile = Tile.fromElement({ elem: 'person_tile', parent: this });
 
@@ -888,18 +866,6 @@ class TransactionView extends View {
         }
     }
 
-    /**
-     * Debt operation type change event handler
-     */
-    onChangeDebtOp() {
-        const debtType = this.debtGiveRadio.checked;
-        const state = this.store.getState();
-
-        if (state.transaction.debtType !== debtType) {
-            this.store.dispatch(toggleDebtType());
-        }
-    }
-
     onSourceAmountInput(e) {
         this.store.dispatch(sourceAmountChange(e.target.value));
     }
@@ -1131,6 +1097,8 @@ class TransactionView extends View {
             this.exchRateSwitch(SHOW_INPUT);
         }
 
+        insertAfter(this.swapBtn, this.srcContainer);
+
         addChilds(this.srcTileInfoBlock, [
             this.srcAmountInfo.elem,
             this.srcResBalanceInfo.elem,
@@ -1184,6 +1152,15 @@ class TransactionView extends View {
 
         const { debtType, noAccount } = state.transaction;
 
+        this.debtOperationInp.value = (debtType) ? 1 : 2;
+        if (debtType) {
+            insertAfter(this.swapBtn, this.personContainer);
+            insertAfter(this.debtAccountContainer, this.swapBtn);
+        } else {
+            insertAfter(this.swapBtn, this.debtAccountContainer);
+            insertAfter(this.personContainer, this.swapBtn);
+        }
+
         addChilds(this.personTileInfoBlock, [
             this.srcAmountInfo.elem,
             (debtType) ? this.srcResBalanceInfo.elem : this.destResBalanceInfo.elem,
@@ -1200,9 +1177,6 @@ class TransactionView extends View {
         } else {
             this.debtAccountLabel.textContent = (debtType) ? 'Destination account' : 'Source account';
         }
-
-        this.debtGiveRadio.checked = debtType;
-        this.debtTakeRadio.checked = !debtType;
 
         show(this.noAccountBtn, !noAccount);
         show(this.debtAccountTileBase, !noAccount);
@@ -1275,6 +1249,10 @@ class TransactionView extends View {
         show(this.personContainer, state.isAvailable && transaction.type === DEBT);
         show(this.debtAccountContainer, state.isAvailable && transaction.type === DEBT);
         show(this.debtOpControls, state.isAvailable && transaction.type === DEBT);
+        show(
+            this.swapBtn,
+            state.isAvailable && (transaction.type === TRANSFER || transaction.type === DEBT),
+        );
 
         if (state.isAvailable) {
             if (transaction.type === EXPENSE) {

@@ -50,6 +50,7 @@ export const stateLoop = async () => {
     await test('Change currency', () => App.view.changeCurrency(2));
 
     await test('Input balance (100 000.01)', () => App.view.inputBalance('100000.01'));
+    await test('Input balance (100 000.012)', () => App.view.inputBalance('100000.012'));
 
     // Change currency back to RUB
     await test('Change currency back', () => App.view.changeCurrency(1));

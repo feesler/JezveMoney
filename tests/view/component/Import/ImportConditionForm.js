@@ -10,7 +10,7 @@ import {
     isVisible,
 } from 'jezve-test';
 import { DropDown } from '../DropDown.js';
-import { asyncMap } from '../../../common.js';
+import { asyncMap, trimToDigitsLimit } from '../../../common.js';
 import {
     IMPORT_COND_FIELD_MAIN_ACCOUNT,
     IMPORT_COND_FIELD_TPL,
@@ -209,7 +209,11 @@ export class ImportConditionForm extends TestComponent {
     async changeValue(name, value) {
         assert(this.model.state === name, `Invalid state ${this.model.state} expected ${name}`);
 
-        this.model[name] = value;
+        if (name === 'amount') {
+            this.model[name] = trimToDigitsLimit(value, 2);
+        } else {
+            this.model[name] = value;
+        }
         this.model.value = ImportConditionForm.getStateValue(this.model);
         this.expectedState = ImportConditionForm.getExpectedState(this.model);
 

@@ -410,6 +410,7 @@ select {
 
 /* No data message for lists & etc. */
 .nodata-message {
+  display: flex;
   text-align: center;
   padding: 12px 0;
 }

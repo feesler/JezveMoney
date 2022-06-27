@@ -1,3 +1,23 @@
+/* Swapn button */
+.swap-btn {
+  display: inline-flex;
+  height: 24px;
+  line-height: 24px;
+  background: none;
+  cursor: pointer;
+}
+
+.swap-btn > svg {
+  height: 24px;
+  width: 24px;
+  fill: #888888;
+}
+
+.swap-btn:hover > svg {
+  fill: #000000;
+}
+
+/* Tile block header */
 .tile_header {
   flex-basis: 100%;
   flex-grow: 2;

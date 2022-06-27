@@ -561,8 +561,8 @@ class Transactions extends TemplateController
         $data["exchValue"] = 1;
 
         if ($tr["type"] != DEBT) {
-            $srcResBalance = ($src) ? $src->balance : null;
-            $destResBalance = ($dest) ? $dest->balance : null;
+            $srcResBalance = ($src) ? $src->balance : 0;
+            $destResBalance = ($dest) ? $dest->balance : 0;
 
             $rtSrcResBal = $src ? $this->currModel->format($src->balance, $src->curr_id) : null;
             $rtDestResBal = $dest ? $this->currModel->format($dest->balance, $dest->curr_id) : null;
@@ -666,6 +666,8 @@ class Transactions extends TemplateController
 
         $data["acc_count"] = $this->accModel->getCount(["full" => ($tr["type"] == DEBT)]);
 
+        $noDataMessage = null;
+        $data["noDataMessage"] = $noDataMessage;
         $trAvailable = true;
         $data["trAvailable"] = $trAvailable;
 
@@ -868,13 +870,14 @@ class Transactions extends TemplateController
         }
 
         if ($tr["type"] != DEBT) {
-            $srcResBalance = ($src) ? $src->balance : null;
-            $destResBalance = ($dest) ? $dest->balance : null;
+            $srcResBalance = ($src) ? $src->balance : 0;
+            $destResBalance = ($dest) ? $dest->balance : 0;
 
             $rtSrcResBal = ($src) ? $this->currModel->format($src->balance, $src->curr_id) : null;
             $rtDestResBal = ($dest) ? $this->currModel->format($dest->balance, $dest->curr_id) : null;
         } else {
             $acc_res_balance = ($debtAcc) ? $debtAcc->balance : 0;
+            $acc_res_balance += ($debtType) ? $tr["dest_amount"] : -$tr["src_amount"];
             $srcResBalance = ($debtType) ? $person_res_balance : $acc_res_balance;
             $destResBalance = ($debtType) ? $acc_res_balance : $person_res_balance;
             $rtSrcResBal = $this->currModel->format($srcResBalance, $srcAmountCurr);

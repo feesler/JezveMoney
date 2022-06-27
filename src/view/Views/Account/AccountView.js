@@ -82,6 +82,7 @@ class AccountView extends View {
         this.balanceInp = ge('balance');
         this.initBalanceDecimalInput = DecimalInput.create({
             elem: this.balanceInp,
+            digits: 2,
             oninput: (e) => this.onInitBalanceInput(e),
         });
         if (!this.initBalanceDecimalInput) {

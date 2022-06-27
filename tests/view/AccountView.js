@@ -8,7 +8,7 @@ import {
 import { copyObject } from 'jezvejs';
 import { AppView } from './AppView.js';
 import { Icon } from '../model/Icon.js';
-import { isValidValue, normalize } from '../common.js';
+import { isValidValue, normalize, trimToDigitsLimit } from '../common.js';
 import { Tile } from './component/Tile.js';
 import { DropDown } from './component/DropDown.js';
 import { InputRow } from './component/InputRow.js';
@@ -237,8 +237,9 @@ export class AccountView extends AppView {
     }
 
     async inputBalance(val) {
-        const fNewValue = isValidValue(val) ? normalize(val) : val;
-        this.model.initbalance = val;
+        const decimal = trimToDigitsLimit(val, 2);
+        const fNewValue = isValidValue(decimal) ? normalize(decimal) : decimal;
+        this.model.initbalance = decimal;
         this.model.fInitBalance = fNewValue;
         this.setExpectedState();
 
