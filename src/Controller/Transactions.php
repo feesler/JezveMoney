@@ -666,6 +666,8 @@ class Transactions extends TemplateController
 
         $data["acc_count"] = $this->accModel->getCount(["full" => ($tr["type"] == DEBT)]);
 
+        $noDataMessage = null;
+        $data["noDataMessage"] = $noDataMessage;
         $trAvailable = true;
         $data["trAvailable"] = $trAvailable;
 
