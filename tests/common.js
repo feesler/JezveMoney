@@ -212,6 +212,7 @@ export const formatProps = (params) => {
 export const checkPHPerrors = (content) => {
     const errSignatures = [
         '<b>Notice</b>',
+        '<b>Warning</b>',
         '<b>Parse error</b>',
         '<b>Fatal error</b>',
         'xdebug-error',
