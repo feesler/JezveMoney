@@ -74,68 +74,68 @@ export const typeChange = (type) => ({ type: TYPE_CHANGE, payload: type });
 // Tools
 
 /** Calculate source result balance */
-const calculateSourceResult = (state) => {
+export const calculateSourceResult = (state) => {
     const result = state;
     const { transaction } = result;
 
-    const sourceAmount = result.transaction.src_amount;
+    const sourceAmount = transaction.src_amount;
+    let sourceResult = result.form.fSourceResult;
 
     if (transaction.type !== DEBT) {
-        if (result.srcAccount) {
-            const srcResult = normalize(result.srcAccount.balance - sourceAmount);
-            result.form.sourceResult = srcResult;
-            result.form.fSourceResult = srcResult;
+        if (!result.srcAccount) {
+            return result;
         }
+
+        sourceResult = normalize(result.srcAccount.balance - sourceAmount);
     } else if (result.srcAccount && !transaction.noAccount) {
-        const sourceResult = normalize(result.srcAccount.balance - sourceAmount);
-        result.form.sourceResult = sourceResult;
-        result.form.fSourceResult = sourceResult;
+        sourceResult = normalize(result.srcAccount.balance - sourceAmount);
     } else if (result.transaction.noAccount) {
         if (result.transaction.debtType) {
-            const sourceResult = normalize(result.personAccount.balance - sourceAmount);
-            result.form.sourceResult = sourceResult;
-            result.form.fSourceResult = sourceResult;
+            sourceResult = normalize(result.personAccount.balance - sourceAmount);
         } else {
             const lastAcc = window.app.model.accounts.getItem(transaction.lastAcc_id);
             const accBalance = (lastAcc) ? lastAcc.balance : 0;
-            const sourceResult = normalize(accBalance);
-            result.form.sourceResult = sourceResult;
-            result.form.fSourceResult = sourceResult;
+            sourceResult = normalize(accBalance - sourceAmount);
         }
+    }
+
+    if (result.form.fSourceResult !== sourceResult) {
+        result.form.sourceResult = sourceResult;
+        result.form.fSourceResult = sourceResult;
     }
 
     return result;
 };
 
 /** Calculate destination result balance */
-const calculateDestResult = (state) => {
+export const calculateDestResult = (state) => {
     const result = state;
     const { transaction } = result;
 
-    const destAmount = result.transaction.dest_amount;
+    const destAmount = transaction.dest_amount;
+    let destResult = result.form.fDestResult;
 
     if (transaction.type !== DEBT) {
-        if (result.destAccount) {
-            const destResult = normalize(result.destAccount.balance + destAmount);
-            result.form.destResult = destResult;
-            result.form.fDestResult = destResult;
+        if (!result.destAccount) {
+            return result;
         }
+
+        destResult = normalize(result.destAccount.balance + destAmount);
     } else if (result.destAccount && !transaction.noAccount) {
-        const destResult = normalize(result.destAccount.balance + destAmount);
-        result.form.destResult = destResult;
-        result.form.fDestResult = destResult;
+        destResult = normalize(result.destAccount.balance + destAmount);
     } else if (transaction.noAccount) {
         if (transaction.debtType) {
             const lastAcc = window.app.model.accounts.getItem(transaction.lastAcc_id);
             const accBalance = (lastAcc) ? lastAcc.balance : 0;
-            const destResult = normalize(accBalance);
-            result.form.destResult = destResult;
-            result.form.fDestResult = destResult;
+            destResult = normalize(accBalance + destAmount);
         } else {
-            const destResult = normalize(result.personAccount.balance + destAmount);
-            result.form.destResult = destResult;
-            result.form.fDestResult = destResult;
+            destResult = normalize(result.personAccount.balance + destAmount);
         }
+    }
+
+    if (result.form.fDestResult !== destResult) {
+        result.form.fDestResult = destResult;
+        result.form.destResult = destResult;
     }
 
     return result;
@@ -409,11 +409,7 @@ const reduceSourceAccountChange = (state, accountId) => {
     const { transaction } = newState;
 
     // Update result balance of source
-    const srcResult = normalize(srcAccount.balance - transaction.src_amount);
-    if (newState.form.fSourceResult !== srcResult) {
-        newState.form.fSourceResult = srcResult;
-        newState.form.sourceResult = srcResult;
-    }
+    calculateSourceResult(newState);
 
     if (transaction.type === EXPENSE) {
         // If currencies are same before account was changed
@@ -458,11 +454,7 @@ const reduceSourceAccountChange = (state, accountId) => {
             transaction.dest_amount = transaction.src_amount;
 
             // Update result balance of destination
-            const destResult = normalize(destAccount.balance + transaction.dest_amount);
-            if (newState.form.fDestResult !== destResult) {
-                newState.form.fDestResult = destResult;
-                newState.form.destResult = destResult;
-            }
+            calculateDestResult(newState);
         }
 
         updateStateExchange(newState);
@@ -519,11 +511,7 @@ const reduceDestAccountChange = (state, accountId) => {
     const { transaction } = newState;
 
     // Update result balance of destination
-    const destResult = normalize(destAccount.balance + transaction.dest_amount);
-    if (newState.form.fDestResult !== destResult) {
-        newState.form.fDestResult = destResult;
-        newState.form.destResult = destResult;
-    }
+    calculateDestResult(newState);
 
     if (transaction.type === INCOME) {
         // If currencies are same before account was changed
@@ -566,11 +554,7 @@ const reduceDestAccountChange = (state, accountId) => {
             transaction.src_amount = transaction.dest_amount;
 
             // Update result balance of source
-            const sourceResult = normalize(srcAccount.balance - transaction.src_amount);
-            if (newState.form.fSourceResult !== sourceResult) {
-                newState.form.fSourceResult = sourceResult;
-                newState.form.sourceResult = sourceResult;
-            }
+            calculateSourceResult(newState);
         }
 
         updateStateExchange(newState);
@@ -616,6 +600,8 @@ const reduceDebtAccountChange = (state, accountId) => {
     }
     const newState = {
         ...state,
+        transaction: { ...state.transaction },
+        form: { ...state.form },
         account,
     };
     const { transaction } = newState;
@@ -639,17 +625,8 @@ const reduceDebtAccountChange = (state, accountId) => {
         newState.destAccount = newState.personAccount;
     }
 
-    const sourceResult = normalize(newState.srcAccount.balance - transaction.src_amount);
-    if (newState.form.fSourceResult !== sourceResult) {
-        newState.form.fSourceResult = sourceResult;
-        newState.form.sourceResult = sourceResult;
-    }
-
-    const destResult = normalize(newState.destAccount.balance + transaction.dest_amount);
-    if (newState.form.fDestResult !== destResult) {
-        newState.form.fDestResult = destResult;
-        newState.form.destResult = destResult;
-    }
+    calculateSourceResult(newState);
+    calculateDestResult(newState);
 
     return newState;
 };
@@ -681,16 +658,10 @@ const reducePersonChange = (state, personId) => {
 
     if (transaction.debtType) {
         newState.srcAccount = newState.personAccount;
-
-        const sourceResult = normalize(newState.srcAccount.balance - transaction.src_amount);
-        newState.form.sourceResult = sourceResult;
-        newState.form.fSourceResult = sourceResult;
+        calculateSourceResult(newState);
     } else {
         newState.destAccount = newState.personAccount;
-
-        const destResult = normalize(newState.destAccount.balance + transaction.dest_amount);
-        newState.form.destResult = destResult;
-        newState.form.fDestResult = destResult;
+        calculateDestResult(newState);
     }
 
     return newState;
@@ -785,17 +756,6 @@ const reduceToggleDebtAccount = (state) => {
         }
 
         transaction.lastAcc_id = newState.account.id;
-
-        if (transaction.debtType) {
-            const destResult = normalize(newState.account.balance);
-            newState.form.destResult = destResult;
-            newState.form.fDestResult = destResult;
-        } else {
-            const sourceResult = normalize(newState.account.balance);
-            newState.form.sourceResult = sourceResult;
-            newState.form.fSourceResult = sourceResult;
-        }
-
         newState.account = null;
     } else {
         newState.account = window.app.model.accounts.getItem(transaction.lastAcc_id);
@@ -805,16 +765,8 @@ const reduceToggleDebtAccount = (state) => {
 
         if (transaction.debtType) {
             newState.destAccount = newState.account;
-
-            const destResult = normalize(newState.account.balance + transaction.dest_amount);
-            newState.form.destResult = destResult;
-            newState.form.fDestResult = destResult;
         } else {
             newState.srcAccount = newState.account;
-
-            const sourceResult = normalize(newState.account.balance - transaction.src_amount);
-            newState.form.sourceResult = sourceResult;
-            newState.form.fSourceResult = sourceResult;
         }
 
         if (newState.id === 6) {
@@ -828,6 +780,12 @@ const reduceToggleDebtAccount = (state) => {
         }
     }
 
+    if (transaction.debtType) {
+        calculateDestResult(newState);
+    } else {
+        calculateSourceResult(newState);
+    }
+
     return newState;
 };
 
@@ -838,6 +796,9 @@ const reduceToggleDebtType = (state) => {
         transaction: {
             ...state.transaction,
             debtType,
+        },
+        form: {
+            ...state.form,
         },
     };
     const { transaction } = newState;
@@ -852,31 +813,8 @@ const reduceToggleDebtType = (state) => {
     transaction.src_id = (newState.srcAccount) ? newState.srcAccount.id : 0;
     transaction.dest_id = (newState.destAccount) ? newState.destAccount.id : 0;
 
-    if (newState.srcAccount) {
-        const sourceResult = normalize(newState.srcAccount.balance - transaction.src_amount);
-        newState.form.sourceResult = sourceResult;
-        newState.form.fSourceResult = sourceResult;
-    } else if (transaction.noAccount && !debtType) {
-        const lastAcc = window.app.model.accounts.getItem(transaction.lastAcc_id);
-        const lastAccBalance = (lastAcc) ? lastAcc.balance : 0;
-
-        const sourceResult = normalize(lastAccBalance - transaction.src_amount);
-        newState.form.sourceResult = sourceResult;
-        newState.form.fSourceResult = sourceResult;
-    }
-
-    if (newState.destAccount) {
-        const destResult = normalize(newState.destAccount.balance + transaction.dest_amount);
-        newState.form.destResult = destResult;
-        newState.form.fDestResult = destResult;
-    } else if (transaction.noAccount && debtType) {
-        const lastAcc = window.app.model.accounts.getItem(transaction.lastAcc_id);
-        const lastAccBalance = (lastAcc) ? lastAcc.balance : 0;
-
-        const destResult = normalize(lastAccBalance + transaction.dest_amount);
-        newState.form.destResult = destResult;
-        newState.form.fDestResult = destResult;
-    }
+    calculateSourceResult(newState);
+    calculateDestResult(newState);
 
     if (debtType) {
         if (newState.id === 3) {

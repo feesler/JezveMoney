@@ -18,7 +18,6 @@ import {
     TRANSFER,
     fixFloat,
     isValidValue,
-    normalize,
     normalizeExch,
     getTransactionTypeString,
 } from '../../js/app.js';
@@ -58,6 +57,8 @@ import {
     sourceResultClick,
     toggleDebtAccount,
     toggleDebtType,
+    calculateSourceResult,
+    calculateDestResult,
     calculateExchange,
     reducer,
     typeChange,
@@ -113,9 +114,9 @@ class TransactionView extends View {
                 sourceAmount: '',
                 destAmount: '',
                 sourceResult: '',
-                fSourceResult: 0,
+                fSourceResult: null,
                 destResult: '',
-                fDestResult: 0,
+                fDestResult: null,
                 exchange: 1,
                 fExchange: 1,
             },
@@ -171,38 +172,10 @@ class TransactionView extends View {
 
                 initialState.id = (transaction.noAccount) ? 7 : 3;
             }
-
-            if (transaction.noAccount) {
-                const lastAcc = window.app.model.accounts.getItem(transaction.lastAcc_id);
-                if (lastAcc) {
-                    if (transaction.debtType) {
-                        const destResult = normalize(lastAcc.balance);
-                        initialState.form.destResult = destResult;
-                        initialState.form.fDestResult = destResult;
-                    } else {
-                        const sourceResult = normalize(lastAcc.balance);
-                        initialState.form.sourceResult = sourceResult;
-                        initialState.form.fSourceResult = sourceResult;
-                    }
-                }
-            }
         }
 
-        if (initialState.srcAccount) {
-            const srcBalance = initialState.srcAccount.balance;
-            const srcResult = normalize(srcBalance - initialState.transaction.src_amount);
-
-            initialState.form.sourceResult = srcResult;
-            initialState.form.fSourceResult = srcResult;
-        }
-
-        if (initialState.destAccount) {
-            const destBalance = initialState.destAccount.balance;
-            const destResult = normalize(destBalance + initialState.transaction.dest_amount);
-
-            initialState.form.destResult = destResult;
-            initialState.form.fDestResult = destResult;
-        }
+        calculateSourceResult(initialState);
+        calculateDestResult(initialState);
 
         const exchange = calculateExchange(initialState);
         initialState.form.fExchange = exchange;
