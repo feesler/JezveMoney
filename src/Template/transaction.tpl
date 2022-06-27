@@ -126,6 +126,10 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         </div>
                         <input id="src_id" name="src_id" type="hidden" value="<?=e($tr["src_id"])?>">
 
+                        <button id="swapBtn" class="swap-btn<?=hidden($tr["type"] == EXPENSE || $tr["type"] == INCOME)?>" type="button">
+                            <?=svgIcon("swap")?>
+                        </button>
+
 <?php	if (!$trAvailable || $tr["type"] == EXPENSE || $tr["type"] == DEBT) {	?>
                         <div id="destination" class="account-container hidden">
 <?php	} else {	?>

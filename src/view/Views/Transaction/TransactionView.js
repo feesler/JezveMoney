@@ -57,6 +57,7 @@ import {
     sourceResultClick,
     toggleDebtAccount,
     toggleDebtType,
+    swapSourceAndDest,
     calculateSourceResult,
     calculateDestResult,
     calculateExchange,
@@ -222,15 +223,22 @@ class TransactionView extends View {
         this.destContainer = ge('destination');
         this.personContainer = ge('person');
         this.debtAccountContainer = ge('debtaccount');
+        this.swapBtn = ge('swapBtn');
         if (
             !this.notAvailableMessage
             || !this.srcContainer
             || !this.destContainer
             || !this.personContainer
             || !this.debtAccountContainer
+            || !this.swapBtn
         ) {
             throw new Error('Failed to initialize view');
         }
+
+        this.swapBtn.addEventListener(
+            'click',
+            () => this.store.dispatch(swapSourceAndDest()),
+        );
 
         this.srcTileBase = this.srcContainer.querySelector('.tile-base');
         this.srcTileContainer = this.srcContainer.querySelector('.tile_container');
@@ -1253,6 +1261,10 @@ class TransactionView extends View {
         show(this.personContainer, state.isAvailable && transaction.type === DEBT);
         show(this.debtAccountContainer, state.isAvailable && transaction.type === DEBT);
         show(this.debtOpControls, state.isAvailable && transaction.type === DEBT);
+        show(
+            this.swapBtn,
+            state.isAvailable && (transaction.type === TRANSFER || transaction.type === DEBT),
+        );
 
         if (state.isAvailable) {
             if (transaction.type === EXPENSE) {

@@ -31,6 +31,7 @@ const INVALIDATE_SOURCE_AMOUNT = 'invalidateSourceAmount';
 const INVALIDATE_DEST_AMOUNT = 'invalidateDestAmount';
 const INVALIDATE_DATE = 'invalidateDate';
 const TYPE_CHANGE = 'typeChange';
+const SWAP_SOURCE_AND_DEST = 'swapSourceAndDest';
 
 // Action creators
 export const sourceAmountClick = () => ({ type: SOURCE_AMOUNT_CLICK });
@@ -70,6 +71,7 @@ export const invalidateSourceAmount = () => ({ type: INVALIDATE_SOURCE_AMOUNT })
 export const invalidateDestAmount = () => ({ type: INVALIDATE_DEST_AMOUNT });
 export const invalidateDate = () => ({ type: INVALIDATE_DATE });
 export const typeChange = (type) => ({ type: TYPE_CHANGE, payload: type });
+export const swapSourceAndDest = () => ({ type: SWAP_SOURCE_AND_DEST });
 
 // Tools
 
@@ -1394,6 +1396,76 @@ const reduceTypeChange = (state, type) => {
     return newState;
 };
 
+const reduceSwap = (state) => {
+    if (state.transaction.type === EXPENSE || state.transaction.type === INCOME) {
+        return state;
+    }
+
+    const newState = {
+        ...state,
+        transaction: {
+            ...state.transaction,
+        },
+        form: {
+            ...state.form,
+        },
+    };
+
+    newState.transaction.src_id = state.transaction.dest_id;
+    newState.transaction.src_curr = state.transaction.dest_curr;
+    newState.transaction.src_amount = state.transaction.dest_amount;
+    newState.form.sourceAmount = state.form.destAmount;
+    newState.srcAccount = state.destAccount;
+    newState.srcCurrency = state.destCurrency;
+
+    newState.transaction.dest_id = state.transaction.src_id;
+    newState.transaction.dest_curr = state.transaction.src_curr;
+    newState.transaction.dest_amount = state.transaction.src_amount;
+    newState.form.destAmount = state.form.sourceAmount;
+    newState.destAccount = state.srcAccount;
+    newState.destCurrency = state.srcCurrency;
+
+    if (newState.transaction.type === DEBT) {
+        const debtType = !state.transaction.debtType;
+        newState.transaction.debtType = debtType;
+        if (debtType) {
+            newState.account = state.srcAccount;
+        } else {
+            newState.account = state.destAccount;
+        }
+
+        if (debtType) {
+            if (newState.id === 3) {
+                newState.id = 0;
+            } else if (newState.id === 4) {
+                newState.id = 1;
+            } else if (newState.id === 5) {
+                newState.id = 2;
+            } else if (newState.id === 7) {
+                newState.id = 6;
+            } else if (newState.id === 8) {
+                newState.id = 9;
+            }
+        } else if (newState.id === 0) {
+            newState.id = 3;
+        } else if (newState.id === 1) {
+            newState.id = 4;
+        } else if (newState.id === 2) {
+            newState.id = 5;
+        } else if (newState.id === 6) {
+            newState.id = 7;
+        } else if (newState.id === 9) {
+            newState.id = 8;
+        }
+    }
+
+    calculateSourceResult(newState);
+    calculateDestResult(newState);
+    updateStateExchange(newState);
+
+    return newState;
+};
+
 const reducerMap = {
     [SOURCE_AMOUNT_CLICK]: reduceSourceAmountClick,
     [DEST_AMOUNT_CLICK]: reduceDestAmountClick,
@@ -1417,6 +1489,7 @@ const reducerMap = {
     [INVALIDATE_DEST_AMOUNT]: reduceInvalidateDestAmount,
     [INVALIDATE_DATE]: reduceInvalidateDate,
     [TYPE_CHANGE]: reduceTypeChange,
+    [SWAP_SOURCE_AND_DEST]: reduceSwap,
 };
 
 export const reducer = (state, action) => {
