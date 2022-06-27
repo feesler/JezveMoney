@@ -1,6 +1,7 @@
 import 'jezvejs/style';
 import {
     ge,
+    insertAfter,
     isNum,
     show,
     enable,
@@ -56,7 +57,6 @@ import {
     sourceResultChange,
     sourceResultClick,
     toggleDebtAccount,
-    toggleDebtType,
     swapSourceAndDest,
     calculateSourceResult,
     calculateDestResult,
@@ -362,6 +362,7 @@ class TransactionView extends View {
         this.destIdInp = ge('dest_id');
         this.srcCurrInp = ge('src_curr');
         this.destCurrInp = ge('dest_curr');
+        this.debtOperationInp = ge('debtOperation');
 
         this.debtOpControls = ge('operation');
 
@@ -382,15 +383,6 @@ class TransactionView extends View {
         }
 
         this.debtAccountLabel = ge('acclbl');
-
-        this.debtGiveRadio = ge('debtgive');
-        if (this.debtGiveRadio) {
-            this.debtGiveRadio.addEventListener('change', () => this.onChangeDebtOp());
-        }
-        this.debtTakeRadio = ge('debttake');
-        if (this.debtTakeRadio) {
-            this.debtTakeRadio.addEventListener('change', () => this.onChangeDebtOp());
-        }
 
         this.personTile = Tile.fromElement({ elem: 'person_tile', parent: this });
 
@@ -874,18 +866,6 @@ class TransactionView extends View {
         }
     }
 
-    /**
-     * Debt operation type change event handler
-     */
-    onChangeDebtOp() {
-        const debtType = this.debtGiveRadio.checked;
-        const state = this.store.getState();
-
-        if (state.transaction.debtType !== debtType) {
-            this.store.dispatch(toggleDebtType());
-        }
-    }
-
     onSourceAmountInput(e) {
         this.store.dispatch(sourceAmountChange(e.target.value));
     }
@@ -1117,6 +1097,8 @@ class TransactionView extends View {
             this.exchRateSwitch(SHOW_INPUT);
         }
 
+        insertAfter(this.swapBtn, this.srcContainer);
+
         addChilds(this.srcTileInfoBlock, [
             this.srcAmountInfo.elem,
             this.srcResBalanceInfo.elem,
@@ -1170,6 +1152,15 @@ class TransactionView extends View {
 
         const { debtType, noAccount } = state.transaction;
 
+        this.debtOperationInp.value = (debtType) ? 1 : 2;
+        if (debtType) {
+            insertAfter(this.swapBtn, this.personContainer);
+            insertAfter(this.debtAccountContainer, this.swapBtn);
+        } else {
+            insertAfter(this.swapBtn, this.debtAccountContainer);
+            insertAfter(this.personContainer, this.swapBtn);
+        }
+
         addChilds(this.personTileInfoBlock, [
             this.srcAmountInfo.elem,
             (debtType) ? this.srcResBalanceInfo.elem : this.destResBalanceInfo.elem,
@@ -1186,9 +1177,6 @@ class TransactionView extends View {
         } else {
             this.debtAccountLabel.textContent = (debtType) ? 'Destination account' : 'Source account';
         }
-
-        this.debtGiveRadio.checked = debtType;
-        this.debtTakeRadio.checked = !debtType;
 
         show(this.noAccountBtn, !noAccount);
         show(this.debtAccountTileBase, !noAccount);

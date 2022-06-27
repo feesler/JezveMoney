@@ -77,13 +77,8 @@ export const runAction = async ({ action, data }) => {
         }
     }
 
-    if (action === 'toggleDebtType') {
-        if (typeof data !== 'undefined' && !!data === App.view.model.debtType) {
-            return;
-        }
-
-        const debtTypeStr = App.view.model.debtType ? 'take' : 'give';
-        testDescr = `Change debt type (${debtTypeStr})`;
+    if (action === 'swapSourceAndDest') {
+        testDescr = 'Swap source and destination';
     }
 
     if (action === 'changeSourceCurrency' || action === 'changeDestCurrency') {

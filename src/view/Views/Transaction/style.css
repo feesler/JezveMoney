@@ -1,6 +1,6 @@
 /* Swapn button */
 .swap-btn {
-  display: flex;
+  display: inline-flex;
   height: 24px;
   line-height: 24px;
   background: none;

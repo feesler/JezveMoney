@@ -76,16 +76,20 @@ export class TransactionView extends AppView {
             res.person.content.id = parseInt(await prop(personIdInp, 'value'), 10);
         }
 
+        const debtOperationInp = await query('#debtOperation');
+        res.debtOperation = parseInt(await prop(debtOperationInp, 'value'), 10);
+
         res.account = await TileBlock.create(this, await query('#debtaccount'));
         if (res.account) {
             const accountIdInp = await query('#acc_id');
             res.account.content.id = parseInt(await prop(accountIdInp, 'value'), 10);
         }
 
-        res.operation = await this.parseOperation(await query('#operation'));
-
         res.selaccount = await Button.create(this, await query('#selaccount'));
         assert(res.selaccount, 'Select account button not found');
+
+        res.swapBtn = { elem: await query('#swapBtn') };
+        assert(res.swapBtn.elem, 'Swap button not found');
 
         res.noacc_btn = { elem: await query('#noacc_btn') };
         assert(res.noacc_btn.elem, 'Disable account button not found');
@@ -122,21 +126,6 @@ export class TransactionView extends AppView {
         res.cancelBtn = await query('#submitbtn + *');
 
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
-
-        return res;
-    }
-
-    async parseOperation(el) {
-        const res = { elem: el };
-
-        if (!res.elem) {
-            return null;
-        }
-
-        res.debtgive = await query('#debtgive');
-        res.debttake = await query('#debttake');
-
-        res.type = await prop(res.debtgive, 'checked');
 
         return res;
     }
@@ -286,7 +275,7 @@ export class TransactionView extends AppView {
                 assert(res.person, 'Person not found');
             }
 
-            res.debtType = cont.operation.type;
+            res.debtType = cont.debtOperation === 1;
 
             assert(!res.isDiffCurr, 'Source and destination currencies are not the same');
 
@@ -449,6 +438,12 @@ export class TransactionView extends AppView {
                 visible: (
                     this.model.isAvailable
                     && (this.model.type === INCOME || this.model.type === TRANSFER)
+                ),
+            },
+            swapBtn: {
+                visible: (
+                    this.model.isAvailable
+                    && (this.model.type === TRANSFER || this.model.type === DEBT)
                 ),
             },
             src_amount_row: {},
@@ -2028,61 +2023,6 @@ export class TransactionView extends AppView {
         return this.changePerson(this.content.person.content.dropDown.content.items[pos].id);
     }
 
-    async toggleDebtType() {
-        const debtType = !this.model.debtType;
-        this.model.debtType = debtType;
-
-        if (debtType) {
-            this.model.srcAccount = this.model.personAccount;
-            this.model.destAccount = this.model.account;
-        } else {
-            this.model.srcAccount = this.model.account;
-            this.model.destAccount = this.model.personAccount;
-        }
-
-        this.calculateSourceResult();
-        this.calculateDestResult();
-
-        if (!this.model.debtType) {
-            const availStates = [0, 1, 2, 6, 9];
-            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
-
-            if (this.model.state === 0) { // Transition 7
-                this.setExpectedState(3);
-            } else if (this.model.state === 1) { // Transition 16
-                this.setExpectedState(4);
-            } else if (this.model.state === 2) { // Transition 18
-                this.setExpectedState(5);
-            } else if (this.model.state === 6) { // Transition 27
-                this.setExpectedState(7);
-            } else if (this.model.state === 9) { // Transition 34
-                this.setExpectedState(8);
-            }
-        } else {
-            const availStates = [3, 4, 5, 7, 8];
-            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
-
-            if (this.model.state === 3) { // Transition 8
-                this.setExpectedState(0);
-            } else if (this.model.state === 4) { // Transition 16
-                this.setExpectedState(1);
-            } else if (this.model.state === 5) { // Transition 17
-                this.setExpectedState(2);
-            } else if (this.model.state === 7) { // Transition 28
-                this.setExpectedState(6);
-            } else if (this.model.state === 8) { // Transition 33
-                this.setExpectedState(9);
-            }
-        }
-
-        const opTypeCheck = (this.model.debtType)
-            ? this.content.operation.debtgive
-            : this.content.operation.debttake;
-        await this.performAction(() => click(opTypeCheck));
-
-        return this.checkState();
-    }
-
     async toggleAccount() {
         this.model.noAccount = !this.model.noAccount;
 
@@ -2186,5 +2126,71 @@ export class TransactionView extends AppView {
 
     changeAccountByPos(pos) {
         return this.changeAccount(this.content.account.content.dropDown.content.items[pos].id);
+    }
+
+    async swapSourceAndDest() {
+        assert(this.model.type === TRANSFER || this.model.type === DEBT, 'Invalid transaction type: can\'t swap source and destination');
+
+        const srcCurrId = this.model.src_curr_id;
+        const { srcAmount, fSrcAmount, srcAccount } = this.model;
+
+        this.model.srcAccount = this.model.destAccount;
+        this.model.destAccount = srcAccount;
+
+        this.model.src_curr_id = this.model.dest_curr_id;
+        this.model.dest_curr_id = srcCurrId;
+        this.model.srcCurr = App.currency.getItem(this.model.src_curr_id);
+        this.model.destCurr = App.currency.getItem(this.model.dest_curr_id);
+
+        this.model.srcAmount = this.model.destAmount;
+        this.model.fSrcAmount = this.model.fDestAmount;
+        this.model.destAmount = srcAmount;
+        this.model.fDestAmount = fSrcAmount;
+
+        if (this.model.type === DEBT) {
+            this.model.debtType = !this.model.debtType;
+
+            if (this.model.debtType) {
+                const availStates = [3, 4, 5, 7, 8];
+                assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
+
+                if (this.model.state === 3) { // Transition 8
+                    this.model.state = 0;
+                } else if (this.model.state === 4) { // Transition 16
+                    this.model.state = 1;
+                } else if (this.model.state === 5) { // Transition 17
+                    this.model.state = 2;
+                } else if (this.model.state === 7) { // Transition 28
+                    this.model.state = 6;
+                } else if (this.model.state === 8) { // Transition 33
+                    this.model.state = 9;
+                }
+            } else {
+                const availStates = [0, 1, 2, 6, 9];
+                assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
+
+                if (this.model.state === 0) { // Transition 7
+                    this.model.state = 3;
+                } else if (this.model.state === 1) { // Transition 16
+                    this.model.state = 4;
+                } else if (this.model.state === 2) { // Transition 18
+                    this.model.state = 5;
+                } else if (this.model.state === 6) { // Transition 27
+                    this.model.state = 7;
+                } else if (this.model.state === 9) { // Transition 34
+                    this.model.state = 8;
+                }
+            }
+        }
+
+        this.calculateSourceResult();
+        this.calculateDestResult();
+        this.updateExch();
+
+        this.setExpectedState(this.model.state);
+
+        await this.performAction(() => click(this.content.swapBtn.elem));
+
+        return this.checkState();
     }
 }

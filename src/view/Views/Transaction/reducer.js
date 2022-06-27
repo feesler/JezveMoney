@@ -21,7 +21,6 @@ const PERSON_CHANGE = 'personChange';
 const SOURCE_CURRENCY_CHANGE = 'sourceCurrencyChange';
 const DEST_CURRENCY_CHANGE = 'destCurrencyChange';
 const TOGGLE_DEBT_ACCOUNT = 'toggleDebtAccount';
-const TOGGLE_DEBT_TYPE = 'toggleDebtType';
 const SOURCE_AMOUNT_CHANGE = 'sourceAmountChange';
 const DEST_AMOUNT_CHANGE = 'destAmountChange';
 const SOURCE_RESULT_CHANGE = 'sourceResultChange';
@@ -61,7 +60,6 @@ export const destCurrencyChange = (currencyId) => ({
     payload: currencyId,
 });
 export const toggleDebtAccount = () => ({ type: TOGGLE_DEBT_ACCOUNT });
-export const toggleDebtType = () => ({ type: TOGGLE_DEBT_TYPE });
 export const sourceAmountChange = (value) => ({ type: SOURCE_AMOUNT_CHANGE, payload: value });
 export const destAmountChange = (value) => ({ type: DEST_AMOUNT_CHANGE, payload: value });
 export const sourceResultChange = (value) => ({ type: SOURCE_RESULT_CHANGE, payload: value });
@@ -791,60 +789,6 @@ const reduceToggleDebtAccount = (state) => {
     return newState;
 };
 
-const reduceToggleDebtType = (state) => {
-    const debtType = !state.transaction.debtType;
-    const newState = {
-        ...state,
-        transaction: {
-            ...state.transaction,
-            debtType,
-        },
-        form: {
-            ...state.form,
-        },
-    };
-    const { transaction } = newState;
-
-    if (debtType) {
-        newState.srcAccount = state.personAccount;
-        newState.destAccount = state.account;
-    } else {
-        newState.srcAccount = state.account;
-        newState.destAccount = state.personAccount;
-    }
-    transaction.src_id = (newState.srcAccount) ? newState.srcAccount.id : 0;
-    transaction.dest_id = (newState.destAccount) ? newState.destAccount.id : 0;
-
-    calculateSourceResult(newState);
-    calculateDestResult(newState);
-
-    if (debtType) {
-        if (newState.id === 3) {
-            newState.id = 0;
-        } else if (newState.id === 4) {
-            newState.id = 1;
-        } else if (newState.id === 5) {
-            newState.id = 2;
-        } else if (newState.id === 7) {
-            newState.id = 6;
-        } else if (newState.id === 8) {
-            newState.id = 9;
-        }
-    } else if (newState.id === 0) {
-        newState.id = 3;
-    } else if (newState.id === 1) {
-        newState.id = 4;
-    } else if (newState.id === 2) {
-        newState.id = 5;
-    } else if (newState.id === 6) {
-        newState.id = 7;
-    } else if (newState.id === 9) {
-        newState.id = 8;
-    }
-
-    return newState;
-};
-
 const reduceSourceAmountChange = (state, value) => {
     const newState = {
         ...state,
@@ -1428,11 +1372,6 @@ const reduceSwap = (state) => {
     if (newState.transaction.type === DEBT) {
         const debtType = !state.transaction.debtType;
         newState.transaction.debtType = debtType;
-        if (debtType) {
-            newState.account = state.srcAccount;
-        } else {
-            newState.account = state.destAccount;
-        }
 
         if (debtType) {
             if (newState.id === 3) {
@@ -1479,7 +1418,6 @@ const reducerMap = {
     [SOURCE_CURRENCY_CHANGE]: reduceSourceCurrencyChange,
     [DEST_CURRENCY_CHANGE]: reduceDestCurrencyChange,
     [TOGGLE_DEBT_ACCOUNT]: reduceToggleDebtAccount,
-    [TOGGLE_DEBT_TYPE]: reduceToggleDebtType,
     [SOURCE_AMOUNT_CHANGE]: reduceSourceAmountChange,
     [DEST_AMOUNT_CHANGE]: reduceDestAmountChange,
     [SOURCE_RESULT_CHANGE]: reduceSourceResultChange,

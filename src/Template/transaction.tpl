@@ -48,7 +48,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
 
                         <div id="person" class="account-container<?=hidden(!$trAvailable || $tr["type"] != DEBT)?>">
                             <input id="person_id" name="person_id" type="hidden" value="<?=e($person_id)?>">
-                            <div class="tile_header"><label>Person name</label></div>
+                            <div class="tile_header"><label>Person</label></div>
                             <div class="tile-base">
                                 <div class="tile_container">
                                     <?=Tile::render($personTile)?>
@@ -67,6 +67,12 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 </div>
                             </div>
                         </div>
+
+<?php	if ($tr["type"] == DEBT) {		?>
+                        <button id="swapBtn" class="swap-btn<?=hidden(!$trAvailable)?>" type="button">
+                            <?=svgIcon("swap")?>
+                        </button>
+<?php	}	?>
 
                         <div id="debtaccount" class="account-container<?=hidden(!$trAvailable || $tr["type"] != DEBT)?>">
                             <div class="tile_header">
@@ -126,9 +132,11 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         </div>
                         <input id="src_id" name="src_id" type="hidden" value="<?=e($tr["src_id"])?>">
 
-                        <button id="swapBtn" class="swap-btn<?=hidden($tr["type"] == EXPENSE || $tr["type"] == INCOME)?>" type="button">
+<?php	if ($tr["type"] != DEBT) {		?>
+                        <button id="swapBtn" class="swap-btn<?=hidden(!$trAvailable || $tr["type"] == EXPENSE || $tr["type"] == INCOME)?>" type="button">
                             <?=svgIcon("swap")?>
                         </button>
+<?php	}	?>
 
 <?php	if (!$trAvailable || $tr["type"] == EXPENSE || $tr["type"] == DEBT) {	?>
                         <div id="destination" class="account-container hidden">
@@ -160,13 +168,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         </div>
                         <input id="dest_id" name="dest_id" type="hidden" value="<?=e($tr["dest_id"])?>">
 
-                        <div id="operation" class="view-row<?=hidden(!$trAvailable || $tr["type"] != DEBT)?>">
-                            <div><label>Operation</label></div>
-                            <div class="debt-op-selector">
-                                <label><input id="debtgive" name="op" type="radio" value="1"<?=checked($debtType)?>><span>give</span></label>
-                                <label><input id="debttake" name="op" type="radio" value="2"<?=checked(!$debtType)?>><span>take</span></label>
-                            </div>
-                        </div>
+                        <input id="debtOperation" name="op" type="hidden" value="<?=($debtType ? "1" : "2")?>">
 
                         <div id="src_amount_row" class="validation-block view-row<?=hidden(!$trAvailable || !$showSrcAmount)?>">
                             <div><label for="src_amount"><?=e($srcAmountLbl)?></label></div>
