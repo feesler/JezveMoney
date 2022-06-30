@@ -304,6 +304,19 @@ body.dark-theme,
   color: #dddddd;
 }
 
+/* Swap button */
+.dark-theme .swap-btn {
+  border-color: #2e2e2e;
+}
+
+.dark-theme .swap-btn > svg {
+  fill: #888888;
+}
+
+.dark-theme .swap-btn:hover > svg {
+  fill: #dddddd;
+}
+
 /* Import view */
 .dark-theme .content-header {
   background-color: #202020;

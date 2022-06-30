@@ -46,126 +46,129 @@ include(TPL_PATH."commonhdr.tpl");	?>
 
                         <span id="notavailmsg" class="nodata-message<?=hidden($trAvailable)?>"><?=e($noDataMessage)?></span>
 
-                        <div id="person" class="account-container<?=hidden(!$trAvailable || $tr["type"] != DEBT)?>">
-                            <input id="person_id" name="person_id" type="hidden" value="<?=e($person_id)?>">
-                            <div class="tile_header"><label>Person</label></div>
-                            <div class="tile-base">
-                                <div class="tile_container">
-                                    <?=Tile::render($personTile)?>
-                                </div>
+                        <div class="accounts-section">
+                            <div id="person" class="account-container<?=hidden(!$trAvailable || $tr["type"] != DEBT)?>">
+                                <input id="person_id" name="person_id" type="hidden" value="<?=e($person_id)?>">
+                                <div class="tile_header"><label>Person</label></div>
+                                <div class="tile-base">
+                                    <div class="tile_container">
+                                        <?=Tile::render($personTile)?>
+                                    </div>
 
-                                <div class="tile-info-block">
+                                    <div class="tile-info-block">
 <?php	if ($tr["type"] == DEBT) {		?>
-                                    <?=TileInfoItem::render($srcAmountInfo)?>
-                                    <?=TileInfoItem::render($exchangeInfo)?>
+                                        <?=TileInfoItem::render($srcAmountInfo)?>
+                                        <?=TileInfoItem::render($exchangeInfo)?>
 <?php		if ($debtType) {		?>
-                                    <?=TileInfoItem::render($srcResultInfo)?>
+                                        <?=TileInfoItem::render($srcResultInfo)?>
 <?php		} else {	?>
-                                    <?=TileInfoItem::render($destResultInfo)?>
+                                        <?=TileInfoItem::render($destResultInfo)?>
 <?php		}	?>
 <?php	}	?>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
 <?php	if ($tr["type"] == DEBT) {		?>
-                        <button id="swapBtn" class="swap-btn<?=hidden(!$trAvailable)?>" type="button">
-                            <?=svgIcon("swap")?>
-                        </button>
+                            <button id="swapBtn" class="swap-btn<?=hidden(!$trAvailable)?>" type="button">
+                                <?=svgIcon("swap")?>
+                            </button>
 <?php	}	?>
 
-                        <div id="debtaccount" class="account-container<?=hidden(!$trAvailable || $tr["type"] != DEBT)?>">
-                            <div class="tile_header">
-                                <label id="acclbl"><?=e($accLbl)?></label>
-                                <button id="noacc_btn" class="close-btn<?=hidden($noAccount)?>" type="button">
-                                    <?=svgIcon("close")?>
-                                </button>
-                            </div>
-                            <div class="tile-base<?=hidden($noAccount)?>">
-                                <div class="tile_container">
-                                    <?=Tile::render($debtAccountTile)?>
-                                    <input id="acc_id" name="acc_id" type="hidden" value="<?=e($acc_id)?>">
+                            <div id="debtaccount" class="account-container<?=hidden(!$trAvailable || $tr["type"] != DEBT)?>">
+                                <div class="tile_header">
+                                    <label id="acclbl"><?=e($accLbl)?></label>
+                                    <button id="noacc_btn" class="close-btn<?=hidden($noAccount)?>" type="button">
+                                        <?=svgIcon("close")?>
+                                    </button>
                                 </div>
+                                <div class="tile-base<?=hidden($noAccount)?>">
+                                    <div class="tile_container">
+                                        <?=Tile::render($debtAccountTile)?>
+                                        <input id="acc_id" name="acc_id" type="hidden" value="<?=e($acc_id)?>">
+                                    </div>
 
-                                <div class="tile-info-block">
+                                    <div class="tile-info-block">
 <?php	if ($tr["type"] == DEBT) {		?>
-                                    <?=TileInfoItem::render($destAmountInfo)?>
+                                        <?=TileInfoItem::render($destAmountInfo)?>
 <?php		if ($debtType) { 		?>
-                                    <?=TileInfoItem::render($destResultInfo)?>
+                                        <?=TileInfoItem::render($destResultInfo)?>
 <?php		} else {		?>
-                                    <?=TileInfoItem::render($srcResultInfo)?>
+                                        <?=TileInfoItem::render($srcResultInfo)?>
 <?php		}		?>
 <?php	}		?>
+                                    </div>
+                                </div>
+                                <div id="selaccount" class="account-toggler<?=hidden(!$noAccount)?>">
+                                    <button class="dashed-btn" type="button"><span>Select account</span></button>
                                 </div>
                             </div>
-                            <div id="selaccount" class="account-toggler<?=hidden(!$noAccount)?>">
-                                <button class="dashed-btn" type="button"><span>Select account</span></button>
-                            </div>
-                        </div>
 
 <?php	    if (!$trAvailable || $tr["type"] == INCOME || $tr["type"] == DEBT) {	?>
-                        <div id="source" class="account-container hidden">
+                            <div id="source" class="account-container hidden">
 <?php	    } else {	?>
-                        <div id="source" class="account-container">
+                            <div id="source" class="account-container">
 <?php	    }	?>
-                            <div class="tile_header"><label>Source account</label></div>
-                            <div class="tile-base">
-                                <div class="tile_container">
-                                    <?=Tile::render($srcAccountTile)?>
-                                </div>
+                                <div class="tile_header"><label>Source account</label></div>
+                                <div class="tile-base">
+                                    <div class="tile_container">
+                                        <?=Tile::render($srcAccountTile)?>
+                                    </div>
 
-                                <div class="tile-info-block">
+                                    <div class="tile-info-block">
 <?php	if ($tr["type"] != DEBT) {		?>
 <?php	    if ($tr["type"] == TRANSFER) {		?>
-                                    <?=TileInfoItem::render($srcAmountInfo)?>
+                                        <?=TileInfoItem::render($srcAmountInfo)?>
 <?php	    }	?>
 <?php	    if ($tr["type"] == EXPENSE) {		?>
-                                    <?=TileInfoItem::render($destAmountInfo)?>
+                                        <?=TileInfoItem::render($destAmountInfo)?>
 <?php	    }	?>
-                                    <?=TileInfoItem::render($srcResultInfo)?>
+                                        <?=TileInfoItem::render($srcResultInfo)?>
 <?php	    if ($tr["type"] == EXPENSE || $tr["type"] == TRANSFER) {		?>
-                                    <?=TileInfoItem::render($exchangeInfo)?>
+                                        <?=TileInfoItem::render($exchangeInfo)?>
 <?php	    }	?>
 <?php	}	?>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <input id="src_id" name="src_id" type="hidden" value="<?=e($tr["src_id"])?>">
+                            <input id="src_id" name="src_id" type="hidden" value="<?=e($tr["src_id"])?>">
 
 <?php	if ($tr["type"] != DEBT) {		?>
-                        <button id="swapBtn" class="swap-btn<?=hidden(!$trAvailable || $tr["type"] == EXPENSE || $tr["type"] == INCOME)?>" type="button">
-                            <?=svgIcon("swap")?>
-                        </button>
+                            <button id="swapBtn" class="swap-btn<?=hidden(!$trAvailable || $tr["type"] == EXPENSE || $tr["type"] == INCOME)?>" type="button">
+                                <?=svgIcon("swap")?>
+                            </button>
 <?php	}	?>
 
 <?php	if (!$trAvailable || $tr["type"] == EXPENSE || $tr["type"] == DEBT) {	?>
-                        <div id="destination" class="account-container hidden">
+                            <div id="destination" class="account-container hidden">
 <?php	} else {	?>
-                        <div id="destination" class="account-container">
+                           <div id="destination" class="account-container">
 <?php	}	?>
-                            <div class="tile_header"><label>Destination account</label></div>
-                            <div class="tile-base">
-                                <div class="tile_container">
-                                    <?=Tile::render($destAccountTile)?>
-                                </div>
+                                <div class="tile_header"><label>Destination account</label></div>
+                                <div class="tile-base">
+                                    <div class="tile_container">
+                                        <?=Tile::render($destAccountTile)?>
+                                    </div>
 
-                                <div class="tile-info-block">
+                                    <div class="tile-info-block">
 <?php	if ($tr["type"] != DEBT) {		?>
 <?php	    if ($tr["type"] == EXPENSE || $tr["type"] == INCOME) {		?>
-                                    <?=TileInfoItem::render($srcAmountInfo)?>
+                                       <?=TileInfoItem::render($srcAmountInfo)?>
 <?php	    }	?>
 <?php	    if ($tr["type"] == INCOME || $tr["type"] == TRANSFER) {		?>
-                                    <?=TileInfoItem::render($destAmountInfo)?>
+                                       <?=TileInfoItem::render($destAmountInfo)?>
 <?php	    }	?>
-                                    <?=TileInfoItem::render($destResultInfo)?>
+                                     <?=TileInfoItem::render($destResultInfo)?>
 
 <?php	    if ($tr["type"] == INCOME) {		?>
-                                    <?=TileInfoItem::render($exchangeInfo)?>
+                                       <?=TileInfoItem::render($exchangeInfo)?>
 <?php	    }	?>
 <?php	}	?>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
                         <input id="dest_id" name="dest_id" type="hidden" value="<?=e($tr["dest_id"])?>">
 
                         <input id="debtOperation" name="op" type="hidden" value="<?=($debtType ? "1" : "2")?>">
