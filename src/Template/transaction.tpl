@@ -23,7 +23,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
 <?php	}	?>
                     </div>
                     <div>
-                        <form id="mainfrm" method="post" action="<?=e($formAction)?>">
+                        <form id="mainfrm" method="post" action="<?=e($form["action"])?>">
 <?php	if ($action == "update") {	?>
                         <input name="id" type="hidden" value="<?=e($tr["id"])?>">
 <?php	}	?>
@@ -179,18 +179,14 @@ include(TPL_PATH."commonhdr.tpl");	?>
 <?php	} else {	?>
                                 <div class="stretch-input rbtn_input">
 <?php	}	?>
-<?php	if ($action == "update") {	?>
-                                    <input id="src_amount" name="src_amount" class="amount-input" type="text" autocomplete="off" value="<?=e($tr["src_amount"])?>">
-<?php	} else {	?>
-                                    <input id="src_amount" name="src_amount" class="amount-input" type="text" autocomplete="off" value="">
-<?php	}	?>
+                                    <input id="src_amount" name="src_amount" class="amount-input" type="text" autocomplete="off" value="<?=e($form["src_amount"])?>">
                                 </div>
 <?php	if ($tr["type"] != INCOME) {		?>
                                 <div class="btn input-group__btn input-group__btn_inactive">
 <?php	} else {	?>
                                 <div class="btn input-group__btn">
 <?php	}	?>
-                                    <div id="srcamountsign" class="input-group__btn-title"><?=e($srcAmountSign)?></div>
+                                    <div id="srcamountsign" class="input-group__btn-title"><?=e($form["srcCurrSign"])?></div>
                                 </div>
                             </div>
                             <div class="invalid-feedback">Please input correct amount.</div>
@@ -205,18 +201,14 @@ include(TPL_PATH."commonhdr.tpl");	?>
 <?php	} else {	?>
                                 <div class="stretch-input">
 <?php	}	?>
-<?php	if ($action == "update") {	?>
-                                    <input id="dest_amount" name="dest_amount" class="amount-input" type="text" autocomplete="off" value="<?=e($tr["dest_amount"])?>">
-<?php	} else {	?>
-                                    <input id="dest_amount" name="dest_amount" class="amount-input" type="text" autocomplete="off" value="">
-<?php	}	?>
+                                    <input id="dest_amount" name="dest_amount" class="amount-input" type="text" autocomplete="off" value="<?=e($form["dest_amount"])?>">
                                 </div>
 <?php	if ($tr["type"] == EXPENSE) {		?>
                                 <div class="btn input-group__btn">
 <?php	} else {	?>
                                 <div class="btn input-group__btn input-group__btn_inactive">
 <?php	}	?>
-                                    <div id="destamountsign" class="input-group__btn-title"><?=e($destAmountSign)?></div>
+                                    <div id="destamountsign" class="input-group__btn-title"><?=e($form["destCurrSign"])?></div>
                                 </div>
                             </div>
                             <div class="invalid-feedback">Please input correct amount.</div>
@@ -226,10 +218,10 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <div><label for="exchrate">Exchange rate</label></div>
                             <div class="input-group std_margin">
                                 <div class="stretch-input">
-                                    <input id="exchrate" class="amount-input" type="text" autocomplete="off" value="<?=e($exchValue)?>">
+                                    <input id="exchrate" class="amount-input" type="text" autocomplete="off" value="<?=e($form["exchange"])?>">
                                 </div>
                                 <div class="btn input-group__btn input-group__btn_inactive">
-                                    <div id="exchcomm" class="input-group__btn-title"><?=e($exchSign)?></div>
+                                    <div id="exchcomm" class="input-group__btn-title"><?=e($form["exchSign"])?></div>
                                 </div>
                             </div>
                         </div>
@@ -238,10 +230,10 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <div><label for="resbal"><?=e($srcBalTitle)?></label></div>
                             <div class="input-group std_margin">
                                 <div class="stretch-input">
-                                    <input id="resbal" class="amount-input" type="text" autocomplete="off" value="<?=e($srcResBalance)?>">
+                                    <input id="resbal" class="amount-input" type="text" autocomplete="off" value="<?=e($form["srcResult"])?>">
                                 </div>
                                 <div class="btn input-group__btn input-group__btn_inactive">
-                                    <div id="res_currsign" class="input-group__btn-title"><?=e($srcAmountSign)?></div>
+                                    <div id="res_currsign" class="input-group__btn-title"><?=e($form["srcCurrSign"])?></div>
                                 </div>
                             </div>
                         </div>
@@ -250,10 +242,10 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <div><label for="resbal_d"><?=e($destBalTitle)?></label></div>
                             <div class="input-group std_margin">
                                 <div class="stretch-input">
-                                    <input id="resbal_d" class="amount-input" type="text" autocomplete="off" value="<?=e($destResBalance)?>">
+                                    <input id="resbal_d" class="amount-input" type="text" autocomplete="off" value="<?=e($form["destResult"])?>">
                                 </div>
                                 <div class="btn input-group__btn input-group__btn_inactive">
-                                    <div id="res_currsign_d" class="input-group__btn-title"><?=e($destAmountSign)?></div>
+                                    <div id="res_currsign_d" class="input-group__btn-title"><?=e($form["destCurrSign"])?></div>
                                 </div>
                             </div>
                         </div>
