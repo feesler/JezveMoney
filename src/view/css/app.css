@@ -487,9 +487,25 @@ svg * {
 }
 
 /* DropDown */
+.dd__combo {
+  padding: 0 24px 0 0.5rem;
+  border-radius: 3px;
+  border-style: solid;
+  border-width: 1px;
+  box-sizing: border-box;
+  color: #000000;
+  border-color: #b0b0b0;
+  background-color: #f2f2f2;
+}
+
 .dd__selection-item {
-  padding: 3px 3px 3px 10px;
+  padding: 0 6px 0 10px;
   align-items: center;
+  border-radius: 3px;
+}
+
+.dd__selection-item:last-child {
+  margin-right: 0.5rem;
 }
 
 .dd__del-selection-item-btn {
@@ -499,7 +515,40 @@ svg * {
 }
 
 .dd__single-selection {
+  padding: 0;
   font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.dd__list,
+.dd__container_attached .dd__list {
+  border-width: 1px;
+}
+
+.dd__container_attached .dd__list {
+  border-radius: 5px;
+}
+
+.dd__list_drop-down {
+  border-top-width: 1px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.dd__list_drop-up {
+  border-bottom-width: 1px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.dd__list_drop-down + .dd__combo {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.dd__list_drop-up + .dd__combo {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 
 .dark-theme .dd__list-item.dd__list-item_active,
@@ -512,6 +561,12 @@ svg * {
 .dd__fullwidth {
   display: -ms-flexbox;
   display: flex;
+}
+
+/* Datepicker */
+.dp__wrapper {
+  border-width: 1px;
+  border-radius: 3px;
 }
 
 /* Popup */

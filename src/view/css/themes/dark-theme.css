@@ -117,17 +117,17 @@ body.dark-theme,
 .dark-theme .dd__input,
 .dark-theme .dd__single-selection,
 .dark-theme .dd__toggle-btn {
-  background-color: #202020;
+  background-color: #181818;
   color: #dddddd;
 }
 
 .dark-theme .dd__single-selection {
-  background-color: #202020;
-  color: #888888;
+  background-color: #181818;
+  color: #dddddd;
 }
 
 .dark-theme .dd__combo {
-  border-color: #dddddd;
+  border-color: #2e2e2e;
 }
 
 .dark-theme .dd__container_active .dd__combo,
@@ -138,6 +138,10 @@ body.dark-theme,
   background-color: #202020;
 }
 
+.dark-theme .dd__container_active .dd__combo {
+  border-color: #d0d0d0;
+}
+
 .dark-theme .dd__container.dd__container_disabled .dd__combo {
   color: #707070;
   border-color: #202020;
@@ -146,16 +150,7 @@ body.dark-theme,
 
 .dark-theme .dd__list {
   background-color: #202020;
-  border-right-color: #dddddd;
-  border-left-color: #dddddd;
-}
-
-.dark-theme .dd__list_drop-down {
-  border-bottom-color: #dddddd;
-}
-
-.dark-theme .dd__list_drop-up {
-  border-top-color: #dddddd;
+  border-color: #d0d0d0;
 }
 
 .dark-theme .dd__list-item,
@@ -186,7 +181,7 @@ body.dark-theme,
 .dark-theme .dp__wrapper {
   background-color: #202020;
   color: #dddddd;
-  border-color: #dddddd;
+  border-color: #d0d0d0;
 }
 
 .dark-theme .dp__cell {

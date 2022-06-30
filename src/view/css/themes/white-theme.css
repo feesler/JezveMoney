@@ -117,17 +117,17 @@ body.white-theme,
 .white-theme .dd__input,
 .white-theme .dd__single-selection,
 .white-theme .dd__toggle-btn {
-  background-color: #ffffff;
+  background-color: #f2f2f2;
   color: #000000;
 }
 
-.dark-theme .dd__single-selection {
-  background-color: #ffffff;
-  color: #888888;
+.white-theme .dd__single-selection {
+  background-color: #f2f2f2;
+  color: #000000;
 }
 
 .white-theme .dd__combo {
-  border-color: #000000;
+  border-color: #b0b0b0;
 }
 
 .white-theme .dd__container_active .dd__combo,
@@ -135,7 +135,11 @@ body.white-theme,
 .white-theme .dd__container_active .dd__single-selection,
 .white-theme .dd__container_active .dd__toggle-btn {
   color: #202020;
-  background-color: #ffffff;
+  background-color: #f2f2f2;
+}
+
+.white-theme .dd__container_active .dd__combo {
+  border-color: #888888;
 }
 
 .white-theme .dd__container.dd__container_disabled .dd__combo {
@@ -145,23 +149,14 @@ body.white-theme,
 }
 
 .white-theme .dd__list {
-  background-color: #ffffff;
-  border-right-color: #000000;
-  border-left-color: #000000;
-}
-
-.white-theme .dd__list_drop-down {
-  border-bottom-color: #000000;
-}
-
-.white-theme .dd__list_drop-up {
-  border-top-color: #000000;
+  background-color: #f2f2f2;
+  border-color: #888888;
 }
 
 .white-theme .dd__list-item,
 .white-theme .dd__list-group {
   color: #000000;
-  background-color: #ffffff;
+  background-color: #f2f2f2;
 }
 
 .white-theme .dd__list-item > svg {
@@ -186,7 +181,7 @@ body.white-theme,
 .white-theme .dp__wrapper {
   background-color: #ffffff;
   color: #000000;
-  border-color: #000000;
+  border-color: #888888;
 }
 
 .white-theme .dp__cell {
