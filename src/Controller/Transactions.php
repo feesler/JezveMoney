@@ -245,6 +245,23 @@ class Transactions extends TemplateController
     }
 
 
+    protected function getRequestedType($request, $default)
+    {
+        if (!is_array($request) || !isset($request["type"])) {
+            return $default;
+        }
+        $res = intval($request["type"]);
+        if (!$res) {
+            $res = TransactionModel::stringToType($request["type"]);
+        }
+        if (!$res) {
+            $this->fail("Invalid transaction type");
+        }
+
+        return $res;
+    }
+
+
     protected function getTypeMenu($baseUrl, $selectedType, $params = [])
     {
         $trTypes = TransactionModel::getTypeNames();
@@ -287,22 +304,11 @@ class Transactions extends TemplateController
         $defMsg = ERR_TRANS_CREATE;
 
         $tr = [
-            "type" => EXPENSE,
+            "type" => $this->getRequestedType($_GET, EXPENSE),
             "src_amount" => 0,
             "dest_amount" => 0,
             "comment" => ""
         ];
-
-        // check predefined type of transaction
-        if (isset($_GET["type"])) {
-            $tr["type"] = intval($_GET["type"]);
-            if (!$tr["type"]) {
-                $tr["type"] = TransactionModel::stringToType($_GET["type"]);
-            }
-            if (!$tr["type"]) {
-                $this->fail("Invalid transaction type");
-            }
-        }
 
         // Check availability of selected type of transaction
         $noDataMessage = null;
@@ -656,6 +662,9 @@ class Transactions extends TemplateController
         }
         $tr = (array)$item;
 
+        // check type change request
+        $requestedType = $this->getRequestedType($_GET, $tr["type"]);
+
         $data["acc_count"] = $this->accModel->getCount(["full" => ($tr["type"] == DEBT)]);
 
         $noDataMessage = null;
@@ -910,6 +919,7 @@ class Transactions extends TemplateController
                 "mode" => $this->action,
                 "transaction" => $tr,
                 "trAvailable" => $trAvailable,
+                "requestedType" => $requestedType,
             ],
         ];
 

@@ -417,6 +417,11 @@ class TransactionView extends View {
 
         this.submitControls = ge('submit_controls');
         this.submitBtn = ge('submitbtn');
+
+        // Check type change request
+        if (state.isUpdate && transaction.type !== this.props.requestedType) {
+            this.onChangeType(this.props.requestedType);
+        }
     }
 
     /**
@@ -1248,6 +1253,8 @@ class TransactionView extends View {
             this.swapBtn,
             state.isAvailable && (transaction.type === TRANSFER || transaction.type === DEBT),
         );
+
+        this.typeMenu.setSelection(transaction.type);
 
         if (state.isAvailable) {
             if (transaction.type === EXPENSE) {
