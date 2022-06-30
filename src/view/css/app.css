@@ -436,6 +436,8 @@ svg * {
 /* No data message for lists & etc. */
 .nodata-message {
   display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   padding: 12px 0;
 }

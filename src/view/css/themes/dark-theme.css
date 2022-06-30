@@ -63,7 +63,6 @@ body.dark-theme,
 
 /* No data message for lists & etc. */
 .dark-theme .nodata-message {
-  background-color: #292929;
   color: #b0b0b0;
 }
 
