@@ -109,6 +109,7 @@ export class ImportTransactionItem extends Component {
 
         // Amount controls
         this.amountInp = ce('input', {
+            className: 'stretch-input',
             type: 'text',
             name: 'amount[]',
             placeholder: PH_FIELD_AMOUNT,
@@ -117,6 +118,7 @@ export class ImportTransactionItem extends Component {
         this.amountField = createField(TITLE_FIELD_AMOUNT, this.amountInp, 'amount-field');
 
         this.destAmountInp = ce('input', {
+            className: 'stretch-input',
             type: 'text',
             name: 'dest_amount[]',
             disabled: true,
@@ -127,6 +129,7 @@ export class ImportTransactionItem extends Component {
         this.destAmountLabel = this.destAmountField.querySelector('label');
         // Date field
         this.dateInp = ce('input', {
+            className: 'stretch-input',
             type: 'text',
             name: 'date[]',
             placeholder: PH_FIELD_DATE,
@@ -135,6 +138,7 @@ export class ImportTransactionItem extends Component {
         this.dateField = createField(TITLE_FIELD_DATE, this.dateInp, 'date-field');
         // Comment field
         this.commInp = ce('input', {
+            className: 'stretch-input',
             type: 'text',
             name: 'comment[]',
             placeholder: PH_FIELD_COMMENT,

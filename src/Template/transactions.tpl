@@ -120,13 +120,11 @@ include(TPL_PATH."commonhdr.tpl");
                             ])?>
                             <div id="date_block" class="column-container hidden">
                                 <div class="input-group">
-                                    <div class="stretch-input rbtn_input">
-                                        <input id="date" name="date" type="text" value="<?=e($dateFmt)?>">
-                                        <button id="nodatebtn" class="close-btn" type="button"><?=svgIcon("close")?></button>
-                                    </div>
-                                    <button id="cal_rbtn" class="btn icon-btn" type="button"><?=svgIcon("cal")?></button>
+                                    <input id="date" class="stretch-input input-group__item" name="date" type="text" value="<?=e($dateFmt)?>">
+                                    <button id="nodatebtn" class="close-btn input-group__btn input-group__item" type="button"><?=svgIcon("close")?></button>
+                                    <button id="cal_rbtn" class="btn icon-btn input-group__btn input-group__item" type="button"><?=svgIcon("cal")?></button>
                                 </div>
-                                <div id="calendar"></div>
+                                <div id="calendar" class="calendar"></div>
                             </div>
                         </div>
 
@@ -134,11 +132,9 @@ include(TPL_PATH."commonhdr.tpl");
                             <h3 class="filter-item__title">Search</h3>
                             <form id="searchFrm" method="get" action="<?=BASEURL?>transactions/">
                             <div class="input-group search-form">
-                                <div class="stretch-input rbtn_input">
-                                    <input id="search" name="search" type="text" value="<?=(is_null($searchReq) ? "" : e($searchReq))?>">
-                                    <button id="nosearchbtn" class="close-btn" type="button"><?=svgIcon("close")?></button>
-                                </div>
-                                <button class="btn icon-btn search_btn" type="submit"><?=svgIcon("search")?></button>
+                                <input id="search" class="stretch-input input-group__item" name="search" type="text" value="<?=(is_null($searchReq) ? "" : e($searchReq))?>">
+                                <button id="nosearchbtn" class="close-btn input-group__btn input-group__item" type="button"><?=svgIcon("close")?></button>
+                                <button class="btn icon-btn search_btn input-group__btn input-group__item" type="submit"><?=svgIcon("search")?></button>
                             </div>
                             </form>
                         </div>

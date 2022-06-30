@@ -94,7 +94,7 @@
     <input id="item_id" name="id" type="hidden">
     <div class="view-row">
         <label for="item_flags">Flags</label>
-        <div class="stretch-input"><input id="item_flags" name="flags" type="text" autocomplete="off"></div>
+        <input id="item_flags" class="stretch-input" name="flags" type="text" autocomplete="off">
     </div>
 
     <div class="popup__form-controls">
@@ -106,12 +106,12 @@
     <input id="cond_id" name="id" type="hidden">
     <div class="view-row">
         <label for="cond_rule">Parent Rule ID</label>
-        <div class="stretch-input"><input id="cond_rule" name="rule_id" type="text" autocomplete="off"></div>
+        <input id="cond_rule" class="stretch-input" name="rule_id" type="text" autocomplete="off">
     </div>
 
     <div class="view-row">
         <label for="cond_field_id">Field</label>
-        <select id="cond_field_id" class="admin-select" name="field_id">
+        <select id="cond_field_id" class="stretch-input admin-select" name="field_id">
             <option value="0">Select field type</option>
 <?php   foreach($fieldsData as $field) {   ?>
             <option value="<?=e($field->id)?>"><?=e($field->name)?></option>
@@ -121,7 +121,7 @@
 
     <div class="view-row">
         <label for="cond_operator">Operator</label>
-        <select id="cond_operator" class="admin-select" name="operator">
+        <select id="cond_operator" class="stretch-input admin-select" name="operator">
             <option value="0">Select operator</option>
 <?php   foreach($operatorsData as $operator) {   ?>
             <option value="<?=e($operator->id)?>"><?=e($operator->name)?></option>
@@ -137,12 +137,12 @@
 
     <div id="value_row" class="view-row">
         <label for="cond_value">Value</label>
-        <div class="stretch-input"><input id="cond_value" type="text" autocomplete="off"></div>
+        <input id="cond_value" class="stretch-input" type="text" autocomplete="off">
     </div>
 
     <div id="fieldvalue_row" class="view-row">
         <label for="cond_fieldvalue">Field</label>
-        <select id="cond_fieldvalue" class="admin-select">
+        <select id="cond_fieldvalue" class="stretch-input admin-select">
             <option value="0">Select field</option>
 <?php   foreach($fieldsData as $field) {   ?>
             <option value="<?=e($field->id)?>"><?=e($field->name)?></option>
@@ -159,12 +159,12 @@
     <input id="action_id" name="id" type="hidden">
     <div class="view-row">
         <label for="item_rule">Rule ID</label>
-        <div class="stretch-input"><input id="action_rule" name="rule_id" type="text" autocomplete="off"></div>
+        <input id="action_rule" class="stretch-input" name="rule_id" type="text" autocomplete="off">
     </div>
 
     <div class="view-row">
         <label for="action_type_id">Action type</label>
-        <select id="action_type_id" class="admin-select" name="action_id">
+        <select id="action_type_id" class="stretch-input admin-select" name="action_id">
             <option value="0">Select action type</option>
 <?php   foreach($actTypeData as $item) {   ?>
             <option value="<?=e($item->id)?>"><?=e($item->name)?></option>
@@ -174,7 +174,7 @@
 
     <div class="view-row">
         <label for="item_value">Value</label>
-        <div class="stretch-input"><input id="action_value" name="value" type="text" autocomplete="off"></div>
+        <input id="action_value" class="stretch-input" name="value" type="text" autocomplete="off">
     </div>
 
     <div class="popup__form-controls">

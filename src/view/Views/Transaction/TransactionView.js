@@ -779,19 +779,14 @@ class TransactionView extends View {
         }
 
         const currBtn = amountRow.querySelector('.input-group__btn');
-        const inputContainer = amountRow.querySelector('.stretch-input');
-        if (!currBtn || !inputContainer) {
+        if (!currBtn) {
             return;
         }
 
         if (act) {
             currBtn.classList.remove('input-group__btn_inactive');
-            inputContainer.classList.remove('trans_input');
-            inputContainer.classList.add('rbtn_input');
         } else {
             currBtn.classList.add('input-group__btn_inactive');
-            inputContainer.classList.add('trans_input');
-            inputContainer.classList.remove('rbtn_input');
         }
     }
 

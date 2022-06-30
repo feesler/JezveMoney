@@ -59,35 +59,35 @@
     <input id="item_id" name="id" type="hidden">
     <div class="view-row">
         <label for="item_name">Name</label>
-        <div class="stretch-input"><input id="item_name" name="name" type="text"></div>
+        <input id="item_name" class="stretch-input" name="name" type="text">
     </div>
     <div class="view-row">
         <label for="item_type_id">Type id</label>
-        <div class="stretch-input"><input id="item_type_id" name="type_id" type="text" autocomplete="off"></div>
+        <input id="item_type_id" class="stretch-input" name="type_id" type="text" autocomplete="off">
     </div>
     <div class="view-row">
         <label for="item_date_col">Date column index</label>
-        <div class="stretch-input"><input id="item_date_col" name="date_col" type="text" autocomplete="off"></div>
+        <input id="item_date_col" class="stretch-input" name="date_col" type="text" autocomplete="off">
     </div>
     <div class="view-row">
         <label for="item_comment_col">Comment column index</label>
-        <div class="stretch-input"><input id="item_comment_col" name="comment_col" type="text" autocomplete="off"></div>
+        <input id="item_comment_col" class="stretch-input" name="comment_col" type="text" autocomplete="off">
     </div>
     <div class="view-row">
         <label for="item_trans_curr_col">Currency of transaction column index</label>
-        <div class="stretch-input"><input id="item_trans_curr_col" name="trans_curr_col" type="text" autocomplete="off"></div>
+        <input id="item_trans_curr_col" class="stretch-input" name="trans_curr_col" type="text" autocomplete="off">
     </div>
     <div class="view-row">
         <label for="item_trans_amount_col">Amount of transaction column index</label>
-        <div class="stretch-input"><input id="item_trans_amount_col" name="trans_amount_col" type="text" autocomplete="off"></div>
+        <input id="item_trans_amount_col" class="stretch-input" name="trans_amount_col" type="text" autocomplete="off">
     </div>
     <div class="view-row">
         <label for="item_account_curr_col">Currency of account column index</label>
-        <div class="stretch-input"><input id="item_account_curr_col" name="account_curr_col" type="text" autocomplete="off"></div>
+        <input id="item_account_curr_col" class="stretch-input" name="account_curr_col" type="text" autocomplete="off">
     </div>
     <div class="view-row">
         <label for="item_account_amount_col">Amount of account column index</label>
-        <div class="stretch-input"><input id="item_account_amount_col" name="account_amount_col" type="text" autocomplete="off"></div>
+        <input id="item_account_amount_col" class="stretch-input" name="account_amount_col" type="text" autocomplete="off">
     </div>
     <div class="popup__form-controls">
         <input class="btn submit-btn" type="submit" value="Submit">

@@ -41,11 +41,11 @@
     <input id="curr_id" name="id" type="hidden">
     <div class="view-row">
         <label for="curr_name">Name</label>
-        <div class="stretch-input"><input id="curr_name" name="name" type="text"></div>
+        <input id="curr_name" class="stretch-input" name="name" type="text">
     </div>
     <div class="view-row">
         <label for="curr_sign">Sign</label>
-        <div class="stretch-input"><input id="curr_sign" name="sign" type="text"></div>
+        <input id="curr_sign" class="stretch-input" name="sign" type="text">
     </div>
     <div id="admin_block" class="view-row">
         <div id="admin_block" class="checkbox-wrap">

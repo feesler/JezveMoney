@@ -25,15 +25,6 @@ body.dark-theme,
   background-color: #202020;
 }
 
-/* Input controls color */
-.dark-theme input[type="text"],
-.dark-theme input[type="password"],
-.dark-theme select {
-  border-color: #dddddd;
-  background-color: #202020;
-  color: #dddddd;
-}
-
 /* Login/Register view */
 .dark-theme .login-layer,
 .dark-theme .register-layer {
@@ -93,15 +84,32 @@ body.dark-theme,
   color: #dddddd;
 }
 
+/* Input control */
 .dark-theme .stretch-input {
-  border-color: #dddddd;
-  background-color: #202020;
+  color: #dddddd;
+  border-color: #2e2e2e;
+  background-color: #181818;
+}
+
+.dark-theme .stretch-input:focus {
+  border-color: #d0d0d0;
 }
 
 /* Input group */
 .dark-theme .input-group__btn_inactive {
   color: #dddddd;
+  border-color: #2e2e2e;
   background-color: #202020;
+}
+
+/* Input group close button */
+.dark-theme .input-group .close-btn {
+  border-color: #2e2e2e;
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.dark-theme .input-group .stretch-input:focus + .close-btn {
+  border-color: #d0d0d0;
 }
 
 /* DropDown  */
@@ -325,7 +333,7 @@ body.dark-theme,
 
 .dark-theme .import-item select,
 .dark-theme .import-item input[type="text"] {
-  border-color: #dddddd;
+  border-color: #2e2e2e;
 }
 
 .dark-theme .import-item select[disabled],
@@ -482,6 +490,7 @@ body.dark-theme,
 }
 
 /* Input group close button */
-.dark-theme .input-group .close-btn:hover > svg {
+.dark-theme .input-group .close-btn:hover > svg,
+.dark-theme .input-group .close-btn:focus > svg {
   fill: #ffffff;
 }

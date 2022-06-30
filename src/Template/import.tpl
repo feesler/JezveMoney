@@ -99,7 +99,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
             </form>
 <?php	if ($this->adminUser || $this->testerUser) { ?>
             <div id="serverAddressBlock" class="row-container hidden">
-                <input id="serverAddress" type="text">
+                <input id="serverAddress" class="stretch-input" type="text">
                 <input id="serverUploadBtn" class="btn submit-btn" type="button" value="Upload">
             </div>
 <?php   }   ?>
@@ -135,7 +135,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                 </div>
                 <div id="nameField" class="tpl-form-field validation-block hidden">
                     <label for="tplNameInp">Name</label>
-                    <input id="tplNameInp" class="tpl-name-inp" type="text">
+                    <input id="tplNameInp" class="stretch-input tpl-name-inp" type="text">
                     <div class="invalid-feedback">Please input template name</div>
                 </div>
                 <input id="updateTplBtn" class="btn link-btn hidden" type="button" value="Update">

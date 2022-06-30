@@ -10,17 +10,17 @@
                 <h1>Registration</h1>
                 <div id="login-inp-block" class="validation-block std_margin">
                     <label for="login">Account name</label>
-                    <div class="stretch-input"><input id="login" name="login" type="text" autocomplete="off"></div>
+                    <input id="login" class="stretch-input" name="login" type="text" autocomplete="off">
                     <div class="invalid-feedback">Please input your login.</div>
                 </div>
                 <div id="name-inp-block" class="validation-block std_margin">
                     <label for="login">Name</label>
-                    <div class="stretch-input"><input id="name" name="name" type="text" autocomplete="off"></div>
+                    <input id="name" class="stretch-input" name="name" type="text" autocomplete="off">
                     <div class="invalid-feedback">Please input you name.</div>
                 </div>
                 <div id="pwd-inp-block" class="validation-block std_margin">
                     <label for="password">Password</label>
-                    <div class="stretch-input"><input id="password" name="password" type="password" autocomplete="off"></div>
+                    <input id="password" class="stretch-input" name="password" type="password" autocomplete="off">
                     <div class="invalid-feedback">Please input correct password.</div>
                 </div>
                 <div class="form-controls std_margin">

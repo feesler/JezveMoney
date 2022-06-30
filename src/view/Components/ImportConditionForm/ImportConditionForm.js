@@ -80,7 +80,7 @@ export class ImportConditionForm extends Component {
         this.createValuePropField();
 
         // Create amount input element
-        this.amountInput = ce('input', { type: 'text' });
+        this.amountInput = ce('input', { className: 'stretch-input', type: 'text' });
         this.decAmountInput = DecimalInput.create({
             elem: this.amountInput,
             digits: 2,
@@ -90,7 +90,7 @@ export class ImportConditionForm extends Component {
         // Create text value input element
         this.valueInput = ce(
             'input',
-            { type: 'text' },
+            { className: 'stretch-input', type: 'text' },
             null,
             { input: () => this.onValueChange() },
         );

@@ -173,54 +173,40 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         <div id="src_amount_row" class="validation-block view-row<?=hidden(!$trAvailable || !$showSrcAmount)?>">
                             <div><label for="src_amount"><?=e($srcAmountLbl)?></label></div>
                             <div class="input-group std_margin">
-                                <input id="src_curr" name="src_curr" type="hidden" value="<?=e($srcAmountCurr)?>">
+                                <input id="src_amount" name="src_amount" class="stretch-input amount-input input-group__item" type="text" autocomplete="off" value="<?=e($form["src_amount"])?>">
 <?php	if ($tr["type"] != INCOME) {		?>
-                                <div class="stretch-input">
+                                <button class="btn input-group__btn input-group__btn_inactive input-group__item" type="button">
 <?php	} else {	?>
-                                <div class="stretch-input rbtn_input">
-<?php	}	?>
-                                    <input id="src_amount" name="src_amount" class="amount-input" type="text" autocomplete="off" value="<?=e($form["src_amount"])?>">
-                                </div>
-<?php	if ($tr["type"] != INCOME) {		?>
-                                <div class="btn input-group__btn input-group__btn_inactive">
-<?php	} else {	?>
-                                <div class="btn input-group__btn">
+                                <button class="btn input-group__btn input-group__item" type="button">
 <?php	}	?>
                                     <div id="srcamountsign" class="input-group__btn-title"><?=e($form["srcCurrSign"])?></div>
-                                </div>
+                                </button>
                             </div>
                             <div class="invalid-feedback">Please input correct amount.</div>
+                            <input id="src_curr" name="src_curr" type="hidden" value="<?=e($tr["src_curr"])?>">
                         </div>
 
                         <div id="dest_amount_row" class="validation-block view-row<?=hidden(!$trAvailable || !$showDestAmount)?>">
                             <div><label for="dest_amount"><?=e($destAmountLbl)?></label></div>
                             <div class="input-group std_margin">
-                                <input id="dest_curr" name="dest_curr" type="hidden" value="<?=e($destAmountCurr)?>">
+                                <input id="dest_amount" name="dest_amount" class="stretch-input amount-input input-group__item" type="text" autocomplete="off" value="<?=e($form["dest_amount"])?>">
 <?php	if ($tr["type"] == EXPENSE) {		?>
-                                <div class="stretch-input rbtn_input">
+                                <button class="btn input-group__btn input-group__item" type="button">
 <?php	} else {	?>
-                                <div class="stretch-input">
-<?php	}	?>
-                                    <input id="dest_amount" name="dest_amount" class="amount-input" type="text" autocomplete="off" value="<?=e($form["dest_amount"])?>">
-                                </div>
-<?php	if ($tr["type"] == EXPENSE) {		?>
-                                <div class="btn input-group__btn">
-<?php	} else {	?>
-                                <div class="btn input-group__btn input-group__btn_inactive">
+                                <button class="btn input-group__btn input-group__btn_inactive input-group__item" type="button">
 <?php	}	?>
                                     <div id="destamountsign" class="input-group__btn-title"><?=e($form["destCurrSign"])?></div>
-                                </div>
+                                </button>
                             </div>
                             <div class="invalid-feedback">Please input correct amount.</div>
+                            <input id="dest_curr" name="dest_curr" type="hidden" value="<?=e($tr["dest_curr"])?>">
                         </div>
 
                         <div id="exchange" class="view-row hidden">
                             <div><label for="exchrate">Exchange rate</label></div>
                             <div class="input-group std_margin">
-                                <div class="stretch-input">
-                                    <input id="exchrate" class="amount-input" type="text" autocomplete="off" value="<?=e($form["exchange"])?>">
-                                </div>
-                                <div class="btn input-group__btn input-group__btn_inactive">
+                                <input id="exchrate" class="stretch-input amount-input input-group__item" type="text" autocomplete="off" value="<?=e($form["exchange"])?>">
+                                <div class="btn input-group__btn input-group__btn_inactive input-group__item">
                                     <div id="exchcomm" class="input-group__btn-title"><?=e($form["exchSign"])?></div>
                                 </div>
                             </div>
@@ -229,10 +215,8 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         <div id="result_balance" class="view-row hidden">
                             <div><label for="resbal"><?=e($srcBalTitle)?></label></div>
                             <div class="input-group std_margin">
-                                <div class="stretch-input">
-                                    <input id="resbal" class="amount-input" type="text" autocomplete="off" value="<?=e($form["srcResult"])?>">
-                                </div>
-                                <div class="btn input-group__btn input-group__btn_inactive">
+                                <input id="resbal" class="stretch-input amount-input input-group__item" type="text" autocomplete="off" value="<?=e($form["srcResult"])?>">
+                                <div class="btn input-group__btn input-group__btn_inactive input-group__item">
                                     <div id="res_currsign" class="input-group__btn-title"><?=e($form["srcCurrSign"])?></div>
                                 </div>
                             </div>
@@ -241,10 +225,8 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         <div id="result_balance_dest" class="view-row hidden">
                             <div><label for="resbal_d"><?=e($destBalTitle)?></label></div>
                             <div class="input-group std_margin">
-                                <div class="stretch-input">
-                                    <input id="resbal_d" class="amount-input" type="text" autocomplete="off" value="<?=e($form["destResult"])?>">
-                                </div>
-                                <div class="btn input-group__btn input-group__btn_inactive">
+                                <input id="resbal_d" class="stretch-input amount-input input-group__item" type="text" autocomplete="off" value="<?=e($form["destResult"])?>">
+                                <div class="btn input-group__btn input-group__btn_inactive input-group__item">
                                     <div id="res_currsign_d" class="input-group__btn-title"><?=e($form["destCurrSign"])?></div>
                                 </div>
                             </div>
@@ -262,12 +244,10 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 <div><label for="date">Date</label></div>
                                 <div class="column-container std_margin">
                                     <div class="input-group">
-                                        <div class="stretch-input rbtn_input">
-                                            <input id="date" name="date" type="text" autocomplete="off" value="<?=e($dateFmt)?>">
-                                        </div>
-                                        <button id="cal_rbtn" class="btn icon-btn" type="button"><?=svgIcon("cal")?></button>
+                                        <input id="date" class="stretch-input input-group__item" name="date" type="text" autocomplete="off" value="<?=e($dateFmt)?>">
+                                        <button id="cal_rbtn" class="btn icon-btn input-group__btn input-group__item" type="button"><?=svgIcon("cal")?></button>
                                     </div>
-                                    <div id="calendar"></div>
+                                    <div id="calendar" class="calendar"></div>
                                 </div>
                                 <div class="invalid-feedback">Please input correct date.</div>
                             </div>
@@ -284,9 +264,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <div id="comment_block" class="<?=hidden(is_empty($tr["comment"]))?>">
                                 <div><label for="comm">Comment</label></div>
                                 <div class="std_margin">
-                                    <div class="stretch-input">
-                                        <input id="comm" name="comment" type="text" value="<?=e($tr["comment"])?>">
-                                    </div>
+                                    <input id="comm" class="stretch-input" name="comment" type="text" value="<?=e($tr["comment"])?>">
                                 </div>
                             </div>
                         </div>

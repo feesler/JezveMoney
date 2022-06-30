@@ -97,12 +97,10 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 ])?>
                                 <div id="date_block" class="hidden">
                                     <div class="input-group">
-                                        <div class="stretch-input rbtn_input">
-                                            <input id="date" name="date" type="text" value="<?=e($dateFmt)?>">
-                                        </div>
-                                        <button id="cal_rbtn" class="btn icon-btn" type="button"><?=svgIcon("cal")?></button>
+                                        <input id="date" class="stretch-input input-group__item" name="date" type="text" value="<?=e($dateFmt)?>">
+                                        <button id="cal_rbtn" class="btn icon-btn input-group__btn input-group__item" type="button"><?=svgIcon("cal")?></button>
                                     </div>
-                                    <div id="calendar"></div>
+                                    <div id="calendar" class="calendar"></div>
                                 </div>
                             </div>
                         </div>

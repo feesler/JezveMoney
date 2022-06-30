@@ -25,15 +25,6 @@ body.white-theme,
   background-color: #ffffff;
 }
 
-/* Input controls color */
-.white-theme input[type="text"],
-.white-theme input[type="password"],
-.white-theme select {
-  border-color: #000000;
-  background-color: #ffffff;
-  color: #000000;
-}
-
 /* Login/Register view */
 .white-theme .login-layer,
 .white-theme .register-layer {
@@ -93,15 +84,32 @@ body.white-theme,
   color: #000000;
 }
 
+/* Input control */
 .white-theme .stretch-input {
-  border-color: #000000;
-  background-color: #ffffff;
+  color: #000000;
+  border-color: #b0b0b0;
+  background-color: #f2f2f2;
+}
+
+.white-theme .stretch-input:focus {
+  border-color: #888888;
 }
 
 /* Input group */
 .white-theme .input-group__btn_inactive {
   color: #000000;
+  border-color: #b0b0b0;
   background-color: #ffffff;
+}
+
+/* Input group close button */
+.white-theme .input-group .close-btn {
+  border-color: #b0b0b0;
+  background-color: #f2f2f2;
+}
+
+.white-theme .input-group .stretch-input:focus + .close-btn {
+  border-color: #888888;
 }
 
 /* DropDown  */
@@ -325,7 +333,7 @@ body.white-theme,
 
 .white-theme .import-item select,
 .white-theme .import-item input[type="text"] {
-  border-color: #000000;
+  border-color: #b0b0b0;
 }
 
 .white-theme .import-item select[disabled],
@@ -482,6 +490,7 @@ body.white-theme,
 }
 
 /* Input group close button */
-.white-theme .input-group .close-btn:hover > svg {
+.white-theme .input-group .close-btn:hover > svg,
+.white-theme .input-group .close-btn:focus > svg {
   fill: #000000;
 }
