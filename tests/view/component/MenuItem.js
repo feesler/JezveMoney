@@ -6,6 +6,7 @@ import {
     hasClass,
     click,
 } from 'jezve-test';
+import { Checkbox } from './Checkbox.js';
 
 export class MenuItem extends TestComponent {
     async parseContent() {
@@ -17,22 +18,36 @@ export class MenuItem extends TestComponent {
         res.type = parseInt(typeId, 10);
         assert(!Number.isNaN(res.type), `Invalid transaction type ${typeId}`);
 
-        res.titleElem = await query(this.elem, '.trtype-menu_item_title');
+        res.isCheckbox = await hasClass(this.elem, 'checkbox');
+        if (res.isCheckbox) {
+            res.checkbox = await Checkbox.create(this, this.elem);
+            res.isActive = res.checkbox.checked;
+            res.titleElem = res.checkbox.content.labelElem;
+        } else {
+            res.isActive = await hasClass(this.elem, 'trtype-menu__item_selected');
+            res.titleElem = await query(this.elem, '.trtype-menu_item_title');
+        }
+
         res.text = await prop(res.titleElem, 'textContent');
 
-        res.isActive = await hasClass(this.elem, 'trtype-menu__item_selected');
-
-        res.checkElem = await query(this.elem, '.trtype-menu__item-check');
         res.linkElem = await query(this.elem, 'a');
         res.link = await prop(res.linkElem, 'href');
 
         return res;
     }
 
-    async toggle() {
-        assert(this.content.checkElem, 'Check not available');
+    get type() {
+        return this.content.type;
+    }
 
-        await click(this.content.checkElem);
+    get isActive() {
+        return this.content.isActive;
+    }
+
+    async toggle() {
+        assert(this.content.checkbox, 'Check not available');
+
+        await this.content.checkbox.toggle();
     }
 
     async click() {

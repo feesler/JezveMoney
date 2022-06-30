@@ -141,10 +141,17 @@ body.dark-theme,
   border-color: #d0d0d0;
 }
 
-.dark-theme .dd__container.dd__container_disabled .dd__combo {
+.dark-theme .dd__container.dd__container_disabled .dd__combo,
+.dark-theme .dd__container.dd__container_disabled .dd__input,
+.dark-theme .dd__container.dd__container_disabled .dd__single-selection,
+.dark-theme .dd__container.dd__container_disabled .dd__toggle-btn {
   color: #707070;
   border-color: #202020;
   background-color: #202020;
+}
+
+.dark-theme .dd__container_disabled .dd__toggle-btn path {
+  fill: #707070;
 }
 
 .dark-theme .dd__list {

@@ -141,10 +141,17 @@ body.white-theme,
   border-color: #888888;
 }
 
-.white-theme .dd__container.dd__container_disabled .dd__combo {
+.white-theme .dd__container.dd__container_disabled .dd__combo,
+.white-theme .dd__container.dd__container_disabled .dd__input,
+.white-theme .dd__container.dd__container_disabled .dd__single-selection,
+.white-theme .dd__container.dd__container_disabled .dd__toggle-btn {
   color: #a0a0a0;
-  border-color: #ffffff;
-  background-color: #ffffff;
+  border-color: #eeeeee;
+  background-color: #eeeeee;
+}
+
+.white-theme .dd__container_disabled .dd__toggle-btn path {
+  fill: #707070;
 }
 
 .white-theme .dd__list {

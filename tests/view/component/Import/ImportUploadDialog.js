@@ -13,6 +13,7 @@ import {
     waitForFunction,
 } from 'jezve-test';
 import { isNum, copyObject } from 'jezvejs';
+import { Checkbox } from '../Checkbox.js';
 import { DropDown } from '../DropDown.js';
 import { App } from '../../../Application.js';
 import { asyncMap, fixFloat } from '../../../common.js';
@@ -38,11 +39,11 @@ export class ImportUploadDialog extends TestComponent {
         res.uploadFormBrowser = { elem: await query(this.elem, '.upload-form__browser') };
         res.fileNameElem = { elem: await query(this.elem, '.upload-form__filename') };
         res.templateSel = await DropDown.createFromChild(this, await query(this.elem, '#templateSel'));
-        res.isEncodeCheck = { elem: await query(this.elem, '#isEncodeCheck') };
+        res.isEncodeCheck = await Checkbox.create(this, await query(this.elem, '#isEncodeCheck'));
         res.submitBtn = { elem: await query(this.elem, '#submitUploadedBtn') };
         res.uploadProgress = { elem: await query(this.elem, '#uploadProgress') };
 
-        res.useServerCheck = { elem: await query('#useServerCheck') };
+        res.useServerCheck = await Checkbox.create(this, await query('#useServerCheck'));
         res.serverAddressBlock = { elem: await query('#serverAddressBlock') };
         res.serverAddressInput = { elem: await query('#serverAddress') };
         res.serverUploadBtn = { elem: await query('#serverUploadBtn') };
@@ -129,9 +130,9 @@ export class ImportUploadDialog extends TestComponent {
 
         res.uploadCollapsed = await hasClass(res.uploadFormBrowser.elem, 'upload-form__collapsed');
         res.fileName = await prop(res.fileNameElem.elem, 'value');
-        res.useServerAddress = await prop(res.useServerCheck.elem, 'checked');
+        res.useServerAddress = res.useServerCheck.checked;
         res.serverAddress = await prop(res.serverAddressInput.elem, 'value');
-        res.encode = await prop(res.isEncodeCheck.elem, 'checked');
+        res.encode = res.isEncodeCheck.checked;
         res.uploadFilename = (res.useServerAddress) ? res.serverAddress : res.fileName;
 
         res.tplNameInp.value = await prop(res.tplNameInp.elem, 'value');
@@ -373,7 +374,7 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async toggleServerAddress() {
-        await click(this.content.useServerCheck.elem);
+        await this.content.useServerCheck.toggle();
         await this.parse();
     }
 
@@ -583,7 +584,7 @@ export class ImportUploadDialog extends TestComponent {
             return;
         }
 
-        await click(this.content.isEncodeCheck.elem);
+        await this.content.isEncodeCheck.toggle();
         await this.parse();
     }
 

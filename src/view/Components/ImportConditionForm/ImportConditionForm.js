@@ -4,6 +4,7 @@ import {
     isFunction,
 } from 'jezvejs';
 import { Component } from 'jezvejs/Component';
+import { Checkbox } from 'jezvejs/Checkbox';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import {
@@ -15,7 +16,6 @@ import {
     createField,
     createContainer,
     createIcon,
-    createCheck,
 } from '../../js/app.js';
 import './style.css';
 
@@ -97,13 +97,11 @@ export class ImportConditionForm extends Component {
         this.valueField = createField(TITLE_FIELD_VALUE, this.valueInput);
 
         // Field value checkbox
-        this.fieldValueCheck = ce(
-            'input',
-            { type: 'checkbox' },
-            null,
-            { change: () => this.onFieldValueChecked() },
-        );
-        this.fieldValueCheck.addEventListener('change', () => this.onFieldValueChecked());
+        this.fieldValueCheck = Checkbox.create({
+            label: LABEL_PROPERTY_CMP,
+            onChange: () => this.onFieldValueChecked(),
+        });
+
         this.valueFieldBlock = createContainer('value-field', [
             this.accountField,
             this.templateField,
@@ -111,7 +109,7 @@ export class ImportConditionForm extends Component {
             this.amountField,
             this.valueField,
             this.valuePropField,
-            createCheck(this.fieldValueCheck, 'checkwrap', LABEL_PROPERTY_CMP),
+            this.fieldValueCheck.elem,
         ]);
 
         this.fields = createContainer('cond-form__fields', [
@@ -483,7 +481,7 @@ export class ImportConditionForm extends Component {
 
         this.propertyDropDown.selectItem(state.fieldType);
         this.renderOperator(state);
-        this.fieldValueCheck.checked = state.isFieldValue;
+        this.fieldValueCheck.check(state.isFieldValue);
 
         const isAccountValue = (
             !state.isFieldValue

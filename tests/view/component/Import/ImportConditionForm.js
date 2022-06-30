@@ -6,9 +6,9 @@ import {
     prop,
     click,
     input,
-    check,
     isVisible,
 } from 'jezve-test';
+import { Checkbox } from '../Checkbox.js';
 import { DropDown } from '../DropDown.js';
 import { asyncMap, trimToDigitsLimit } from '../../../common.js';
 import {
@@ -63,7 +63,8 @@ export class ImportConditionForm extends TestComponent {
         const fields = await asyncMap(fieldElems, (field) => this.parseField(field));
         fields.forEach((field) => { res[field.name] = field.component; });
 
-        res.fieldValueCheck = { elem: await query(this.elem, '.value-field .checkwrap input[type=checkbox]') };
+        res.fieldValueCheck = await Checkbox.create(this, await query(this.elem, '.value-field .checkbox'));
+
         res.deleteBtn = { elem: await query(this.elem, '.delete-btn') };
 
         assert(
@@ -79,8 +80,6 @@ export class ImportConditionForm extends TestComponent {
             && res.deleteBtn.elem,
             'Invalid structure of import condition form',
         );
-
-        res.fieldValueCheck.checked = await prop(res.fieldValueCheck.elem, 'checked');
 
         return res;
     }
@@ -261,7 +260,7 @@ export class ImportConditionForm extends TestComponent {
         this.model.value = ImportConditionForm.getStateValue(this.model);
         this.expectedState = ImportConditionForm.getExpectedState(this.model);
 
-        await check(this.content.fieldValueCheck.elem);
+        await this.content.fieldValueCheck.toggle();
         await this.parse();
 
         return this.checkState();

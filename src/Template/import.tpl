@@ -56,8 +56,9 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         </div>
 
                         <div class="rules-container">
-                            <label class="checkwrap">
-                                <input id="rulesCheck" type="checkbox" checked>
+                            <label id="rulesCheck" class="checkbox">
+                                <input type="checkbox" checked>
+                                <span class="checkbox__check"><?=svgIcon("check")?></span>
                             </label>
                             <button id="rulesBtn" class="btn link-btn" type="button">Rules (<span id="rulescount"><?=count($rulesData)?></span>)</button>
                         </div>
@@ -105,14 +106,16 @@ include(TPL_PATH."commonhdr.tpl");	?>
 <?php   }   ?>
         </div>
         <div class="upload-form__options">
-            <label class="checkwrap">
-                <input id="isEncodeCheck" name="encode" type="checkbox" checked>
-                <span>CP-1251 encoding</span>
+            <label id="isEncodeCheck" class="checkbox">
+                <input name="encode" type="checkbox" checked>
+                <span class="checkbox__check"><?=svgIcon("check")?></span>
+                <span class="checkbox__label">CP-1251 encoding</span>
             </label>
 <?php	if ($this->adminUser || $this->testerUser) { ?>
-            <label class="checkwrap">
-                <input id="useServerCheck" type="checkbox">
-                <span>Use address on server</span>
+            <label id="useServerCheck" class="checkbox">
+                <input type="checkbox">
+                <span class="checkbox__check"><?=svgIcon("check")?></span>
+                <span class="checkbox__label">Use address on server</span>
             </label>
 <?php   }   ?>
         </div>

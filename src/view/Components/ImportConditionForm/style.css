@@ -71,7 +71,7 @@
   flex-flow: column nowrap;
 }
 
-.value-field .checkwrap {
+.value-field .checkbox {
   margin-left: 20%;
 }
 
@@ -109,7 +109,7 @@
     text-align: left;
   }
 
-  .value-field .checkwrap {
+  .value-field .checkbox {
     margin-left: 0;
   }
 }

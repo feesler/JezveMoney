@@ -43,19 +43,24 @@ include(TPL_PATH."commonhdr.tpl");
                         <div class="filter-item">
                             <h3 class="filter-item__title">Type</h3>
                             <div class="trtype-menu trtype-menu-multi">
-<?php	foreach($transMenu as $menuItem) {
-            if ($menuItem->selected) {		?>
-                                <span class="trtype-menu__item trtype-menu__item_selected" data-type="<?=e($menuItem->type)?>">
+<?php	foreach($transMenu as $menuItem) {  ?>
+<?php       if ($menuItem->type == 0) {		?>
+<?php           if ($menuItem->selected) {		?>
+                                <span class="trtype-menu__item trtype-menu_item_title" data-type="<?=e($menuItem->type)?>">
+<?php		    } else {		?>
+                                <span class="trtype-menu__item trtype-menu_item_title trtype-menu__item_selected" data-type="<?=e($menuItem->type)?>">
+<?php	    	}				?>
+                                    <a href="<?=e($menuItem->url)?>"><?=e($menuItem->title)?></a>
+                                </span>
 <?php		} else {		?>
-                                <span class="trtype-menu__item" data-type="<?=e($menuItem->type)?>">
-<?php		}
-            if ($menuItem->type != 0) {		?>
-                                    <span class="trtype-menu__item-check"><?=svgIcon("check")?></span>
-<?php		}				?>
-                                    <span class="trtype-menu_item_title">
+                                <label class="checkbox trtype-menu__item" data-type="<?=e($menuItem->type)?>">
+                                    <input type="checkbox"<?=checked($menuItem->selected)?>>
+                                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                                    <span class="checkbox__label">
                                         <a href="<?=e($menuItem->url)?>"><?=e($menuItem->title)?></a>
                                     </span>
-                                </span>
+                                </label>
+<?php		}				?>
 <?php	}			?>
                             </div>
                         </div>
