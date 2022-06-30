@@ -95,7 +95,7 @@ body.dark-theme,
 }
 
 /* Input group */
-.dark-theme .input-group__btn_inactive {
+.dark-theme .input-group__item[disabled] {
   color: #dddddd;
   border-color: #2e2e2e;
   background-color: #202020;

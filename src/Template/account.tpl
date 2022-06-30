@@ -72,7 +72,9 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <label for="balance">Initial balance</label>
                             <div class="input-group std_margin">
                                 <input id="balance" class="stretch-input amount-input input-group__item" name="initbalance" type="text" autocomplete="off" value="<?=e($accInfo->initbalance)?>">
-                                <div class="btn input-group__btn input-group__btn_inactive input-group__item"><div id="currsign"><?=e($accInfo->sign)?></div></div>
+                                <div class="btn input-group__btn input-group__item" disabled>
+                                    <div id="currsign"><?=e($accInfo->sign)?></div>
+                                </div>
                             </div>
                             <div class="invalid-feedback">Please input correct initial balance.</div>
                         </div>

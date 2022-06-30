@@ -289,6 +289,7 @@ class TransactionView extends View {
             digits: 2,
             oninput: (e) => this.onSourceAmountInput(e),
         });
+        this.srcCurrBtn = this.srcAmountRow.querySelector('.input-group__btn');
         this.srcAmountSign = ge('srcamountsign');
 
         this.destAmountRow = ge('dest_amount_row');
@@ -300,6 +301,7 @@ class TransactionView extends View {
             digits: 2,
             oninput: (e) => this.onDestAmountInput(e),
         });
+        this.destCurrBtn = this.destAmountRow.querySelector('.input-group__btn');
         this.destAmountSign = ge('destamountsign');
 
         this.srcResBalanceRow = ge('result_balance');
@@ -778,20 +780,11 @@ class TransactionView extends View {
      * @param {boolean} act - if set to true activate currency, else inactivate
      */
     setCurrActive(src, act) {
-        const amountRow = (src) ? this.srcAmountRow : this.destAmountRow;
-        if (!amountRow) {
-            return;
-        }
-
-        const currBtn = amountRow.querySelector('.input-group__btn');
-        if (!currBtn) {
-            return;
-        }
-
+        const currBtn = (src) ? this.srcCurrBtn : this.destCurrBtn;
         if (act) {
-            currBtn.classList.remove('input-group__btn_inactive');
+            currBtn.removeAttribute('disabled');
         } else {
-            currBtn.classList.add('input-group__btn_inactive');
+            currBtn.setAttribute('disabled', true);
         }
     }
 

@@ -177,11 +177,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <div><label for="src_amount"><?=e($srcAmountLbl)?></label></div>
                             <div class="input-group std_margin">
                                 <input id="src_amount" name="src_amount" class="stretch-input amount-input input-group__item" type="text" autocomplete="off" value="<?=e($form["src_amount"])?>">
-<?php	if ($tr["type"] != INCOME) {		?>
-                                <button class="btn input-group__btn input-group__btn_inactive input-group__item" type="button">
-<?php	} else {	?>
-                                <button class="btn input-group__btn input-group__item" type="button">
-<?php	}	?>
+                                <button class="btn input-group__btn input-group__item" type="button"<?=disabled($tr["type"] != INCOME)?>>
                                     <div id="srcamountsign" class="input-group__btn-title"><?=e($form["srcCurrSign"])?></div>
                                 </button>
                             </div>
@@ -193,11 +189,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <div><label for="dest_amount"><?=e($destAmountLbl)?></label></div>
                             <div class="input-group std_margin">
                                 <input id="dest_amount" name="dest_amount" class="stretch-input amount-input input-group__item" type="text" autocomplete="off" value="<?=e($form["dest_amount"])?>">
-<?php	if ($tr["type"] == EXPENSE) {		?>
-                                <button class="btn input-group__btn input-group__item" type="button">
-<?php	} else {	?>
-                                <button class="btn input-group__btn input-group__btn_inactive input-group__item" type="button">
-<?php	}	?>
+                                <button class="btn input-group__btn input-group__item" type="button"<?=disabled($tr["type"] != EXPENSE)?>>
                                     <div id="destamountsign" class="input-group__btn-title"><?=e($form["destCurrSign"])?></div>
                                 </button>
                             </div>
@@ -209,7 +201,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <div><label for="exchrate">Exchange rate</label></div>
                             <div class="input-group std_margin">
                                 <input id="exchrate" class="stretch-input amount-input input-group__item" type="text" autocomplete="off" value="<?=e($form["exchange"])?>">
-                                <div class="btn input-group__btn input-group__btn_inactive input-group__item">
+                                <div class="btn input-group__btn input-group__item" disabled>
                                     <div id="exchcomm" class="input-group__btn-title"><?=e($form["exchSign"])?></div>
                                 </div>
                             </div>
@@ -219,7 +211,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <div><label for="resbal"><?=e($srcBalTitle)?></label></div>
                             <div class="input-group std_margin">
                                 <input id="resbal" class="stretch-input amount-input input-group__item" type="text" autocomplete="off" value="<?=e($form["srcResult"])?>">
-                                <div class="btn input-group__btn input-group__btn_inactive input-group__item">
+                                <div class="btn input-group__btn input-group__item" disabled>
                                     <div id="res_currsign" class="input-group__btn-title"><?=e($form["srcCurrSign"])?></div>
                                 </div>
                             </div>
@@ -229,7 +221,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <div><label for="resbal_d"><?=e($destBalTitle)?></label></div>
                             <div class="input-group std_margin">
                                 <input id="resbal_d" class="stretch-input amount-input input-group__item" type="text" autocomplete="off" value="<?=e($form["destResult"])?>">
-                                <div class="btn input-group__btn input-group__btn_inactive input-group__item">
+                                <div class="btn input-group__btn input-group__item" disabled>
                                     <div id="res_currsign_d" class="input-group__btn-title"><?=e($form["destCurrSign"])?></div>
                                 </div>
                             </div>
