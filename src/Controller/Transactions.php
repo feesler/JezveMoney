@@ -245,6 +245,27 @@ class Transactions extends TemplateController
     }
 
 
+    protected function getTypeMenu($baseUrl, $selectedType, $params = [])
+    {
+        $trTypes = TransactionModel::getTypeNames();
+        $res = [];
+        foreach ($trTypes as $type_id => $trTypeName) {
+            $urlParams = $params;
+            $urlParams["type"] = strtolower($trTypeName);
+
+            $menuItem = new \stdClass();
+            $menuItem->type = $type_id;
+            $menuItem->title = $trTypeName;
+            $menuItem->selected = ($type_id == $selectedType);
+            $menuItem->url = urlJoin($baseUrl, $urlParams);
+
+            $res[] = $menuItem;
+        }
+
+        return $res;
+    }
+
+
     public function create()
     {
         if ($this->isPOST()) {
@@ -438,24 +459,12 @@ class Transactions extends TemplateController
         $data["dest"] = $dest;
 
         // Prepare transaction types menu
-        $trTypes = TransactionModel::getTypeNames();
-        $transMenu = [];
-        $baseUrl = BASEURL . "transactions/create/";
-        foreach ($trTypes as $type_id => $trTypeName) {
-            $params = ["type" => strtolower($trTypeName)];
-            if ($acc_id != 0) {
-                $params["acc_id"] = $acc_id;
-            }
-
-            $menuItem = new \stdClass();
-            $menuItem->type = $type_id;
-            $menuItem->title = $trTypeName;
-            $menuItem->selected = ($type_id == $tr["type"]);
-            $menuItem->url = urlJoin($baseUrl, $params);
-
-            $transMenu[] = $menuItem;
+        $menuParams = [];
+        if ($acc_id != 0) {
+            $menuParams["acc_id"] = $acc_id;
         }
-        $data["transMenu"] = $transMenu;
+        $baseUrl = BASEURL . "transactions/create/";
+        $data["transMenu"] = $this->getTypeMenu($baseUrl, $tr["type"], $menuParams);
 
         $form["action"] = BASEURL . "transactions/" . $data["action"] . "/";
 
@@ -673,21 +682,8 @@ class Transactions extends TemplateController
         $data["dest"] = $dest;
 
         // Prepare transaction types menu
-        $trTypes = TransactionModel::getTypeNames();
-        $transMenu = [];
-        $baseUrl = BASEURL . "transactions/create/";
-        foreach ($trTypes as $type_id => $trTypeName) {
-            $params = ["type" => strtolower($trTypeName)];
-
-            $menuItem = new \stdClass();
-            $menuItem->type = $type_id;
-            $menuItem->title = $trTypeName;
-            $menuItem->selected = ($menuItem->type == $tr["type"]);
-            $menuItem->url = urlJoin($baseUrl, $params);
-
-            $transMenu[] = $menuItem;
-        }
-        $data["transMenu"] = $transMenu;
+        $baseUrl = $baseUrl = BASEURL . "transactions/update/" . $trans_id;
+        $data["transMenu"] = $this->getTypeMenu($baseUrl, $tr["type"]);
 
         $form["action"] = BASEURL . "transactions/" . $data["action"] . "/";
 
