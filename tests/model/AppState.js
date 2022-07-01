@@ -653,7 +653,11 @@ export class AppState {
                 }
 
                 const account = this.accounts.getItem(params.src_id);
-                if (!account || srcCurr.id !== account.curr_id) {
+                if (
+                    !account
+                    || srcCurr.id !== account.curr_id
+                    || account.owner_id !== this.profile.owner_id
+                ) {
                     return false;
                 }
             } else if (params.type === EXPENSE || params.type === TRANSFER) {
@@ -666,7 +670,11 @@ export class AppState {
                 }
 
                 const account = this.accounts.getItem(params.dest_id);
-                if (!account || destCurr.id !== account.curr_id) {
+                if (
+                    !account
+                    || destCurr.id !== account.curr_id
+                    || account.owner_id !== this.profile.owner_id
+                ) {
                     return false;
                 }
             } else if (params.type === INCOME || params.type === TRANSFER) {

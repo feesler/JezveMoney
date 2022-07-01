@@ -537,6 +537,10 @@ const apiCreateTransactions = async () => {
         scenario.TR_DEBT_3,
     ] = await scenario.runner.runGroup(TransactionApiTests.extractAndCreate, data);
 
+    // Find person account for invalid transaction
+    await App.state.fetch();
+    const personAccount = App.state.getPersonAccount(scenario.PERSON_Y, USD);
+
     const invData = [{
         type: EXPENSE,
         src_id: 0,
@@ -551,6 +555,10 @@ const apiCreateTransactions = async () => {
         dest_id: scenario.ACC_RUB,
         src_amount: 100,
     }, {
+        type: EXPENSE,
+        src_id: personAccount.id,
+        src_amount: 100,
+    }, {
         type: INCOME,
         dest_id: 0,
         dest_amount: 100,
@@ -563,6 +571,10 @@ const apiCreateTransactions = async () => {
         type: INCOME,
         dest_id: scenario.ACC_RUB,
         dest_amount: '',
+    }, {
+        type: INCOME,
+        dest_id: personAccount.id,
+        dest_amount: 100,
     }, {
         type: INCOME,
         dest_id: scenario.ACC_RUB,
@@ -589,6 +601,11 @@ const apiCreateTransactions = async () => {
         dest_id: scenario.ACC_RUB,
         src_amount: 6500,
         dest_amount: 100,
+    }, {
+        type: TRANSFER,
+        src_id: scenario.ACC_USD,
+        dest_id: personAccount.id,
+        src_amount: 100,
     }, {
         type: DEBT,
         op: 0,
@@ -737,9 +754,16 @@ const apiUpdateTransactions = async () => {
 
     await scenario.runner.runGroup(TransactionApiTests.update, data);
 
+    // Find person account for invalid transaction
+    await App.state.fetch();
+    const personAccount = App.state.getPersonAccount(scenario.PERSON_Y, USD);
+
     const invData = [{
         id: scenario.TR_EXPENSE_1,
         src_id: 0,
+    }, {
+        id: scenario.TR_EXPENSE_1,
+        src_id: personAccount.id,
     }, {
         id: scenario.TR_EXPENSE_2,
         dest_amount: 0,
@@ -751,6 +775,9 @@ const apiUpdateTransactions = async () => {
         id: scenario.TR_INCOME_1,
         dest_id: 0,
     }, {
+        id: scenario.TR_INCOME_1,
+        dest_id: personAccount.id,
+    }, {
         id: scenario.TR_INCOME_2,
         src_amount: 0,
         src_curr: EUR,
@@ -760,6 +787,9 @@ const apiUpdateTransactions = async () => {
     }, {
         id: scenario.TR_TRANSFER_1,
         dest_id: 0,
+    }, {
+        id: scenario.TR_TRANSFER_1,
+        dest_id: personAccount.id,
     }, {
         id: scenario.TR_TRANSFER_1,
         src_curr: 0,

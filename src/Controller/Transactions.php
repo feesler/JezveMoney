@@ -333,7 +333,11 @@ class Transactions extends TemplateController
         // Redirect if invalid or hidden account is specified
         if ($acc_id) {
             $account = $this->accModel->getItem($acc_id);
-            if (!$account || $this->accModel->isHidden($account)) {
+            if (
+                !$account
+                || $this->accModel->isHidden($account)
+                || $account->owner_id != $this->owner_id
+            ) {
                 $this->fail($defMsg);
             }
         }
