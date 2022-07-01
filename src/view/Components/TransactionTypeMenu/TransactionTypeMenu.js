@@ -6,20 +6,20 @@ import {
     setEvents,
 } from 'jezvejs';
 import { Component } from 'jezvejs/Component';
+import { Checkbox } from 'jezvejs/Checkbox';
 import {
     EXPENSE,
     INCOME,
     TRANSFER,
     DEBT,
-    createIcon,
 } from '../../js/app.js';
 
 const CONTAINER_CLASS = 'trtype-menu';
 const MULTI_CLASS = 'trtype-menu-multi';
 const ITEM_CLASS = 'trtype-menu__item';
 const ITEM_SELECTED_CLASS = 'trtype-menu__item_selected';
-const ITEM_CHECK_CLASS = 'trtype-menu__item-check';
 const ITEM_TITLE_CLASS = 'trtype-menu_item_title';
+const CHECKBOX_CLASS = 'checkbox';
 
 /** Strings */
 const TITLE_SHOW_ALL = 'Show all';
@@ -76,13 +76,46 @@ export class TransactionTypeMenu extends Component {
             { type: DEBT, title: TITLE_DEBT },
         ];
 
-        this.setHandlers();
-
         this.render(this.state);
     }
 
     getItemType(item) {
         return parseInt(item.dataset.type, 10);
+    }
+
+    parseCheckbox(elem) {
+        const type = this.getItemType(elem);
+
+        const checkbox = Checkbox.fromElement(
+            elem,
+            { onChange: () => this.onToggleItem(type) },
+        );
+
+        return {
+            type,
+            selected: checkbox.checked,
+            title: checkbox.label?.textContent,
+        };
+    }
+
+    parseItem(elem) {
+        const linkElem = elem.querySelector(`.${ITEM_TITLE_CLASS} a`);
+        const titleElem = elem.querySelector(`.${ITEM_TITLE_CLASS}`);
+        if (!linkElem && !titleElem) {
+            throw new Error('Invalid element');
+        }
+
+        const title = (linkElem) ? linkElem.textContent : titleElem.textContent;
+
+        if (linkElem) {
+            setEvents(linkElem, { click: (e) => this.onSelectItem(e) });
+        }
+
+        return {
+            type: this.getItemType(elem),
+            selected: elem.classList.contains(ITEM_SELECTED_CLASS),
+            title,
+        };
     }
 
     parse(elem) {
@@ -95,28 +128,19 @@ export class TransactionTypeMenu extends Component {
 
         const items = Array.from(elem.querySelectorAll(`.${ITEM_CLASS}`));
         this.state.items = items.map((item) => {
-            const linkElem = item.querySelector(`.${ITEM_TITLE_CLASS} a`);
-            const titleElem = item.querySelector(`.${ITEM_TITLE_CLASS}`);
-            if (!linkElem && !titleElem) {
+            const isCheckbox = item.classList.contains(CHECKBOX_CLASS);
+            if (isCheckbox && !this.state.multiple) {
                 throw new Error('Invalid element');
             }
 
-            const title = (linkElem) ? linkElem.textContent : titleElem.textContent;
+            if (isCheckbox) {
+                return this.parseCheckbox(item);
+            }
 
-            return {
-                type: this.getItemType(item),
-                selected: item.classList.contains(ITEM_SELECTED_CLASS),
-                title,
-            };
+            return this.parseItem(item);
         });
 
-        this.setHandlers();
-
         this.render(this.state);
-    }
-
-    setHandlers() {
-        setEvents(this.elem, { click: (e) => this.onSelectItem(e) });
     }
 
     setSelection(selectedItems) {
@@ -138,6 +162,36 @@ export class TransactionTypeMenu extends Component {
         this.render(this.state);
     }
 
+    sendChangeEvent() {
+        if (!isFunction(this.props.onChange)) {
+            return;
+        }
+
+        const selectedItems = this.state.items
+            .filter((item) => item.type && item.selected)
+            .map((item) => item.type);
+
+        const data = (this.state.multiple) ? selectedItems : selectedItems[0];
+        this.props.onChange(data);
+    }
+
+    onToggleItem(type) {
+        this.state.items = this.state.items.map((item) => {
+            let selected = false;
+            if (item.type) {
+                selected = (item.type === type) ? !item.selected : item.selected;
+            }
+
+            return {
+                ...item,
+                selected,
+            };
+        });
+
+        this.sendChangeEvent();
+        this.render(this.state);
+    }
+
     onSelectItem(e) {
         const itemElem = e.target.closest(`.${ITEM_CLASS}`);
         if (!itemElem || !itemElem.dataset) {
@@ -147,40 +201,12 @@ export class TransactionTypeMenu extends Component {
         e.preventDefault();
 
         const selectedType = this.getItemType(itemElem);
+        this.state.items = this.state.items.map((item) => ({
+            ...item,
+            selected: (item.type === selectedType),
+        }));
 
-        let toggled = false;
-        if (this.state.multiple) {
-            const checkElem = e.target.closest(`.${ITEM_CHECK_CLASS}`);
-            toggled = (checkElem && this.elem.contains(checkElem));
-        }
-
-        this.state.items = this.state.items.map((item) => {
-            let selected;
-            if (toggled) {
-                if (item.type) {
-                    selected = (item.type === selectedType) ? !item.selected : item.selected;
-                } else {
-                    selected = false;
-                }
-            } else {
-                selected = item.type === selectedType;
-            }
-
-            return {
-                ...item,
-                selected,
-            };
-        });
-
-        const selectedItems = this.state.items
-            .filter((item) => item.type && item.selected)
-            .map((item) => item.type);
-
-        if (isFunction(this.props.onChange)) {
-            const data = (this.state.multiple) ? selectedItems : selectedItems[0];
-            this.props.onChange(data);
-        }
-
+        this.sendChangeEvent();
         this.render(this.state);
     }
 
@@ -189,32 +215,68 @@ export class TransactionTypeMenu extends Component {
         this.render(this.state);
     }
 
+    getItemURL(item, state) {
+        if (!state.url) {
+            return null;
+        }
+        const paramName = (state.multiple) ? `${state.typeParam}[]` : state.typeParam;
+
+        const url = new URL(state.url);
+        if (item.type) {
+            url.searchParams.set(paramName, item.type);
+        } else {
+            url.searchParams.delete(paramName);
+        }
+
+        return url;
+    }
+
+    renderLinkElement(item, state) {
+        const res = ce('a', { textContent: item.title });
+        const url = this.getItemURL(item, state);
+        if (url) {
+            res.href = url.toString();
+        }
+        return res;
+    }
+
+    renderCheckboxItem(item, state) {
+        const isLink = (!item.selected || state.allowActiveLink);
+
+        let label = item.title;
+        if (isLink) {
+            const linkElem = this.renderLinkElement(item, state);
+            setEvents(linkElem, { click: (e) => this.onSelectItem(e) });
+            label = linkElem;
+        }
+
+        const checkbox = Checkbox.create({
+            className: ITEM_CLASS,
+            checked: item.selected,
+            label,
+            onChange: () => this.onToggleItem(item.type),
+        });
+
+        checkbox.elem.setAttribute('data-type', item.type);
+
+        return checkbox.elem;
+    }
+
     renderItem(item, state) {
+        if (state.multiple && item.type !== 0) {
+            return this.renderCheckboxItem(item, state);
+        }
+
         const elem = ce('span', { className: ITEM_CLASS });
         if (item.selected) {
             elem.classList.add(ITEM_SELECTED_CLASS);
         }
         elem.setAttribute('data-type', item.type);
 
-        if (state.multiple && item.type !== 0) {
-            elem.appendChild(ce('span', { className: ITEM_CHECK_CLASS }, createIcon('check')));
-        }
-
         const titleElem = ce('span', { className: ITEM_TITLE_CLASS });
         if (!item.selected || state.allowActiveLink) {
-            const linkElem = ce('a', { textContent: item.title });
-
-            if (state.url) {
-                const paramName = (state.multiple) ? `${state.typeParam}[]` : state.typeParam;
-
-                const url = new URL(state.url);
-                if (item.type) {
-                    url.searchParams.set(paramName, item.type);
-                } else {
-                    url.searchParams.delete(paramName);
-                }
-                linkElem.href = url.toString();
-            }
+            const linkElem = this.renderLinkElement(item, state);
+            setEvents(linkElem, { click: (e) => this.onSelectItem(e) });
             titleElem.appendChild(linkElem);
         } else {
             titleElem.textContent = item.title;

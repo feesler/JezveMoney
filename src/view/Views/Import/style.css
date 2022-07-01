@@ -112,6 +112,7 @@
 
 .rules-container .btn {
   font-size: 16px;
+  padding: 0;
 }
 
 /* Transactions list */
@@ -139,23 +140,6 @@
   z-index: 1000;
   background-color: rgb(50 50 50 / 70%);
   border-radius: 10px;
-}
-
-/* Checkbox or radiobutton wrapper */
-.checkwrap {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-}
-
-.checkwrap > span {
-  white-space: nowrap;
-  font-size: 14px;
-}
-
-.checkwrap > input[type="checkbox"],
-.checkwrap > input[type="radio"] {
-  margin: 0 5px 0 0;
 }
 
 .submit-progress {

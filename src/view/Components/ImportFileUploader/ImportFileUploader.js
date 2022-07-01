@@ -6,6 +6,7 @@ import {
     ajax,
 } from 'jezvejs';
 import { Component } from 'jezvejs/Component';
+import { Checkbox } from 'jezvejs/Checkbox';
 import { createMessage } from '../../js/app.js';
 import { Uploader } from '../Uploader/Uploader.js';
 
@@ -30,7 +31,7 @@ export class ImportFileUploader extends Component {
         this.formElem = ge('fileimportfrm');
         this.inputElem = ge('fileInp');
         this.filenameElem = this.elem.querySelector('.upload-form__filename');
-        this.isEncodeCheck = ge('isEncodeCheck');
+        this.isEncodeCheck = Checkbox.fromElement(ge('isEncodeCheck'));
         if (!this.formElem || !this.inputElem || !this.filenameElem || !this.isEncodeCheck) {
             throw new Error('Failed to initialize import file uploader');
         }
@@ -129,7 +130,10 @@ export class ImportFileUploader extends Component {
 
     /** Setup extra controls of file upload dialog */
     initUploadExtras() {
-        this.useServerCheck = ge('useServerCheck');
+        this.useServerCheck = Checkbox.fromElement(
+            ge('useServerCheck'),
+            { onChange: (checked) => this.onCheckServer(checked) },
+        );
         this.serverAddressBlock = ge('serverAddressBlock');
         this.serverAddressInput = ge('serverAddress');
         this.uploadBtn = ge('serverUploadBtn');
@@ -143,7 +147,6 @@ export class ImportFileUploader extends Component {
         }
 
         this.formElem.addEventListener('reset', () => this.onResetUploadAdmin());
-        this.useServerCheck.addEventListener('change', () => this.onCheckServer());
         this.uploadBtn.addEventListener('click', () => this.uploadFromServer());
     }
 
@@ -153,14 +156,12 @@ export class ImportFileUploader extends Component {
     }
 
     /** Use server checkbox 'change' event handler */
-    onCheckServer() {
-        const useServer = this.useServerCheck.checked;
-
+    onCheckServer(useServer) {
         this.setUseServerAddress(useServer);
     }
 
     setUseServerAddress(value) {
-        this.useServerCheck.checked = value;
+        this.useServerCheck.check(value);
 
         show(this.serverAddressBlock, value);
         if (value) {

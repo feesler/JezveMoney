@@ -3,6 +3,7 @@ import {
     assert,
     query,
     prop,
+    attr,
     hasClass,
     input,
 } from 'jezve-test';
@@ -17,22 +18,23 @@ export class InputRow extends TestComponent {
         assert(res.labelEl, 'Label element not found');
         res.label = await prop(res.labelEl, 'textContent');
 
-        res.currElem = await query(this.elem, '.btn.input-group__btn');
-        res.isCurrActive = false;
-        if (res.currElem) {
-            res.isCurrActive = !await hasClass(res.currElem, 'input-group__btn_inactive');
-            if (res.isCurrActive) {
-                const ddElem = await query(res.currElem, ':scope > *');
-                res.currDropDown = await DropDown.create(this.parent, ddElem);
-                assert(res.currDropDown.content.isAttached, 'Currency drop down is not attached');
-            }
-
-            res.currSignElem = await query(res.currElem, '.input-group__btn-title');
-            res.currSign = await prop(res.currSignElem, 'textContent');
+        const datePickerContainer = await query(this.elem, '.calendar');
+        if (datePickerContainer) {
+            res.datePickerBtn = await query(this.elem, '.btn.icon-btn');
         } else {
-            const datePickerContainer = await query('#calendar');
-            if (datePickerContainer) {
-                res.datePickerBtn = await query(this.elem, '.btn.icon-btn');
+            res.currElem = await query(this.elem, '.btn.input-group__btn');
+            res.isCurrActive = false;
+            if (res.currElem) {
+                const disabledAttr = await attr(res.currElem, 'disabled');
+                res.isCurrActive = disabledAttr == null;
+                if (res.isCurrActive) {
+                    const ddElem = await query(res.currElem, ':scope > *');
+                    res.currDropDown = await DropDown.create(this.parent, ddElem);
+                    assert(res.currDropDown.content.isAttached, 'Currency drop down is not attached');
+                }
+
+                res.currSignElem = await query(res.currElem, '.input-group__btn-title');
+                res.currSign = await prop(res.currSignElem, 'textContent');
             }
         }
 
@@ -41,7 +43,7 @@ export class InputRow extends TestComponent {
             res.hiddenValue = await prop(hiddenInpElem, 'value');
         }
 
-        res.valueInput = await query(this.elem, '.stretch-input > input');
+        res.valueInput = await query(this.elem, '.stretch-input');
         res.value = await prop(res.valueInput, 'value');
 
         res.validationEnabled = await hasClass(this.elem, 'validation-block');

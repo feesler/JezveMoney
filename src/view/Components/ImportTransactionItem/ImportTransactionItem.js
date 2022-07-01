@@ -10,6 +10,7 @@ import {
 } from 'jezvejs';
 import { formatDate } from 'jezvejs/DateUtils';
 import { Component } from 'jezvejs/Component';
+import { Checkbox } from 'jezvejs/Checkbox';
 import { DropDown } from 'jezvejs/DropDown';
 import {
     fixFloat,
@@ -20,7 +21,6 @@ import {
     createField,
     createContainer,
     createIcon,
-    createCheck,
 } from '../../js/app.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import './style.css';
@@ -99,8 +99,10 @@ export class ImportTransactionItem extends Component {
         };
 
         // Row enable checkbox
-        this.enableCheck = ce('input', { type: 'checkbox' });
-        this.enableCheck.addEventListener('change', () => this.onRowChecked());
+        this.enableCheck = Checkbox.create({
+            className: 'enable-check',
+            onChange: () => this.onRowChecked(),
+        });
 
         this.createCurrencyField();
         this.createTypeField();
@@ -109,6 +111,7 @@ export class ImportTransactionItem extends Component {
 
         // Amount controls
         this.amountInp = ce('input', {
+            className: 'stretch-input',
             type: 'text',
             name: 'amount[]',
             placeholder: PH_FIELD_AMOUNT,
@@ -117,6 +120,7 @@ export class ImportTransactionItem extends Component {
         this.amountField = createField(TITLE_FIELD_AMOUNT, this.amountInp, 'amount-field');
 
         this.destAmountInp = ce('input', {
+            className: 'stretch-input',
             type: 'text',
             name: 'dest_amount[]',
             disabled: true,
@@ -127,6 +131,7 @@ export class ImportTransactionItem extends Component {
         this.destAmountLabel = this.destAmountField.querySelector('label');
         // Date field
         this.dateInp = ce('input', {
+            className: 'stretch-input',
             type: 'text',
             name: 'date[]',
             placeholder: PH_FIELD_DATE,
@@ -135,6 +140,7 @@ export class ImportTransactionItem extends Component {
         this.dateField = createField(TITLE_FIELD_DATE, this.dateInp, 'date-field');
         // Comment field
         this.commInp = ce('input', {
+            className: 'stretch-input',
             type: 'text',
             name: 'comment[]',
             placeholder: PH_FIELD_COMMENT,
@@ -180,7 +186,7 @@ export class ImportTransactionItem extends Component {
         ]);
 
         this.mainContainer = createContainer('main-content', [
-            createCheck(this.enableCheck, 'enable-check'),
+            this.enableCheck.elem,
             this.formContainer,
             createContainer('row-container controls', [
                 this.delBtn,
@@ -1000,7 +1006,7 @@ export class ImportTransactionItem extends Component {
             this.elem.classList.add('import-item_disabled');
         }
 
-        this.enableCheck.checked = state.enabled;
+        this.enableCheck.check(state.enabled);
         this.typeDropDown.enable(state.enabled);
         enable(this.amountInp, state.enabled);
         this.currencyDropDown.enable(state.enabled && isExpenseOrIncome);

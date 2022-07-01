@@ -25,15 +25,6 @@ body.dark-theme,
   background-color: #202020;
 }
 
-/* Input controls color */
-.dark-theme input[type="text"],
-.dark-theme input[type="password"],
-.dark-theme select {
-  border-color: #dddddd;
-  background-color: #202020;
-  color: #dddddd;
-}
-
 /* Login/Register view */
 .dark-theme .login-layer,
 .dark-theme .register-layer {
@@ -72,7 +63,6 @@ body.dark-theme,
 
 /* No data message for lists & etc. */
 .dark-theme .nodata-message {
-  background-color: #292929;
   color: #b0b0b0;
 }
 
@@ -93,15 +83,32 @@ body.dark-theme,
   color: #dddddd;
 }
 
+/* Input control */
 .dark-theme .stretch-input {
-  border-color: #dddddd;
-  background-color: #202020;
+  color: #dddddd;
+  border-color: #2e2e2e;
+  background-color: #181818;
+}
+
+.dark-theme .stretch-input:focus {
+  border-color: #d0d0d0;
 }
 
 /* Input group */
-.dark-theme .input-group__btn_inactive {
+.dark-theme .input-group__item[disabled] {
   color: #dddddd;
+  border-color: #2e2e2e;
   background-color: #202020;
+}
+
+/* Input group close button */
+.dark-theme .input-group .close-btn {
+  border-color: #2e2e2e;
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.dark-theme .input-group .stretch-input:focus + .close-btn {
+  border-color: #d0d0d0;
 }
 
 /* DropDown  */
@@ -109,17 +116,17 @@ body.dark-theme,
 .dark-theme .dd__input,
 .dark-theme .dd__single-selection,
 .dark-theme .dd__toggle-btn {
-  background-color: #202020;
+  background-color: #181818;
   color: #dddddd;
 }
 
 .dark-theme .dd__single-selection {
-  background-color: #202020;
-  color: #888888;
+  background-color: #181818;
+  color: #dddddd;
 }
 
 .dark-theme .dd__combo {
-  border-color: #dddddd;
+  border-color: #2e2e2e;
 }
 
 .dark-theme .dd__container_active .dd__combo,
@@ -130,24 +137,26 @@ body.dark-theme,
   background-color: #202020;
 }
 
-.dark-theme .dd__container.dd__container_disabled .dd__combo {
+.dark-theme .dd__container_active .dd__combo {
+  border-color: #d0d0d0;
+}
+
+.dark-theme .dd__container.dd__container_disabled .dd__combo,
+.dark-theme .dd__container.dd__container_disabled .dd__input,
+.dark-theme .dd__container.dd__container_disabled .dd__single-selection,
+.dark-theme .dd__container.dd__container_disabled .dd__toggle-btn {
   color: #707070;
   border-color: #202020;
   background-color: #202020;
 }
 
+.dark-theme .dd__container_disabled .dd__toggle-btn path {
+  fill: #707070;
+}
+
 .dark-theme .dd__list {
   background-color: #202020;
-  border-right-color: #dddddd;
-  border-left-color: #dddddd;
-}
-
-.dark-theme .dd__list_drop-down {
-  border-bottom-color: #dddddd;
-}
-
-.dark-theme .dd__list_drop-up {
-  border-top-color: #dddddd;
+  border-color: #d0d0d0;
 }
 
 .dark-theme .dd__list-item,
@@ -178,7 +187,7 @@ body.dark-theme,
 .dark-theme .dp__wrapper {
   background-color: #202020;
   color: #dddddd;
-  border-color: #dddddd;
+  border-color: #d0d0d0;
 }
 
 .dark-theme .dp__cell {
@@ -302,6 +311,19 @@ body.dark-theme,
   color: #dddddd;
 }
 
+/* Swap button */
+.dark-theme .swap-btn {
+  border-color: #2e2e2e;
+}
+
+.dark-theme .swap-btn > svg {
+  fill: #888888;
+}
+
+.dark-theme .swap-btn:hover > svg {
+  fill: #dddddd;
+}
+
 /* Import view */
 .dark-theme .content-header {
   background-color: #202020;
@@ -325,7 +347,7 @@ body.dark-theme,
 
 .dark-theme .import-item select,
 .dark-theme .import-item input[type="text"] {
-  border-color: #dddddd;
+  border-color: #2e2e2e;
 }
 
 .dark-theme .import-item select[disabled],
@@ -482,6 +504,7 @@ body.dark-theme,
 }
 
 /* Input group close button */
-.dark-theme .input-group .close-btn:hover > svg {
+.dark-theme .input-group .close-btn:hover > svg,
+.dark-theme .input-group .close-btn:focus > svg {
   fill: #ffffff;
 }

@@ -434,6 +434,57 @@ const createFromHiddenAccount = async () => {
     await scenario.runner.runGroup(TransactionTests.createFromHiddenAccount, data);
 };
 
+const createFromPersonAccount = async () => {
+    setBlock('Create transaction from person account', 2);
+
+    const { RUB } = scenario;
+
+    // Remove all accounts and persons
+    await api.account.reset();
+    const personIds = App.state.persons.getIds();
+    if (personIds.length > 0) {
+        await api.person.del(personIds);
+    }
+
+    // Create user account
+    const account = await api.account.create({
+        name: 'Account 1',
+        curr_id: RUB,
+        initbalance: '1000',
+        icon_id: 1,
+        flags: 0,
+    });
+    // Create person
+    const person = await api.person.create({
+        name: 'Person 1',
+        flags: 0,
+    });
+    // Create debt transaction to obtain account of person
+    await api.transaction.create({
+        type: DEBT,
+        person_id: person.id,
+        acc_id: account.id,
+        op: 1,
+        src_amount: 111,
+        dest_amount: 111,
+        src_curr: RUB,
+        dest_curr: RUB,
+        date: '22.05.2022',
+        comment: '',
+    });
+
+    await App.state.fetch();
+    const personAccount = App.state.getPersonAccount(person.id, RUB);
+
+    const data = [
+        { type: EXPENSE, accountId: personAccount.id },
+        { type: INCOME, accountId: personAccount.id },
+        { type: TRANSFER, accountId: personAccount.id },
+        { type: DEBT, accountId: personAccount.id },
+    ];
+    await scenario.runner.runGroup(TransactionTests.createFromPersonAccount, data);
+};
+
 const availabilityTests = async (directNavigate) => {
     const { RUB } = scenario;
 
@@ -638,6 +689,7 @@ export const transactionTests = {
 
     async runAvailabilityTests() {
         await createFromHiddenAccount();
+        await createFromPersonAccount();
         await availabilityTests(false);
         await availabilityTests(true);
     },

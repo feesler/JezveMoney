@@ -58,9 +58,7 @@
 <form method="post" action="<?=BASEURL?>profile/changename/">
     <div id="name-inp-block" class="validation-block view-row">
         <label for="newname">New name</label>
-        <div class="stretch-input std_margin">
-            <input id="newname" name="name" type="text" autocomplete="off" value="<?=e($profileInfo->name)?>">
-        </div>
+        <input id="newname" class="stretch-input std_margin" name="name" type="text" autocomplete="off" value="<?=e($profileInfo->name)?>">
         <div class="invalid-feedback">Please input correct name.<br>New name must be different from the old.</div>
     </div>
     <div id="changeNameLoading" class="form__loading hidden">Loading...</div>
@@ -71,17 +69,13 @@
 <form method="post" action="<?=BASEURL?>profile/changepass/">
     <div id="old-pwd-inp-block" class="validation-block view-row">
         <label for="oldpwd">Current password</label>
-        <div class="stretch-input std_margin">
-            <input id="oldpwd" name="current" type="password" autocomplete="off">
-        </div>
+        <input id="oldpwd" class="stretch-input std_margin" name="current" type="password" autocomplete="off">
         <div class="invalid-feedback">Please input current password.</div>
     </div>
 
     <div id="new-pwd-inp-block" class="validation-block view-row">
         <label for="newpwd">New password</label>
-        <div class="stretch-input std_margin">
-            <input id="newpwd" name="new" type="password" autocomplete="off">
-        </div>
+        <input id="newpwd" class="stretch-input std_margin" name="new" type="password" autocomplete="off">
         <div class="invalid-feedback">Please input correct new password.<br>New password must be different from the old.</div>
     </div>
 

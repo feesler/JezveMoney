@@ -5,7 +5,6 @@ import {
     prop,
     click,
     input,
-    check,
     isVisible,
     assert,
 } from 'jezve-test';
@@ -26,6 +25,7 @@ import {
     fixFloat,
 } from '../../../common.js';
 import { App } from '../../../Application.js';
+import { Checkbox } from '../Checkbox.js';
 
 export class ImportListItem extends TestComponent {
     constructor(parent, elem, mainAccount) {
@@ -136,10 +136,11 @@ export class ImportListItem extends TestComponent {
 
     async parseContent() {
         const res = {
-            enableCheck: await query(this.elem, '.enable-check input[type="checkbox"]'),
+            enableCheck: await Checkbox.create(this, await query(this.elem, '.checkbox.enable-check')),
         };
+
         assert(res.enableCheck, 'Invalid structure of import item');
-        res.enabled = await prop(res.enableCheck, 'checked');
+        res.enabled = res.enableCheck.checked;
 
         const fieldElems = await queryAll(this.elem, '.field');
         const fields = await asyncMap(fieldElems, (field) => this.parseField(field));
@@ -431,7 +432,7 @@ export class ImportListItem extends TestComponent {
         this.model.enabled = !this.model.enabled;
         this.expectedState = this.getExpectedState(this.model);
 
-        await check(this.content.enableCheck);
+        await this.content.enableCheck.toggle();
         await this.parse();
 
         return this.checkState();

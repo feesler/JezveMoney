@@ -427,6 +427,29 @@ export const createFromHiddenAccount = async ({ type, accountId }) => {
     });
 };
 
+/** Check navigation to create transaction with person account */
+export const createFromPersonAccount = async ({ type, accountId }) => {
+    const typeString = Transaction.typeToString(type);
+    await test(`Create ${typeString} transaction from person account`, async () => {
+        const account = App.state.accounts.getItem(accountId);
+        assert(account, `Account ${accountId} not found`);
+        assert(account.owner_id !== App.owner_id, 'Account of person is expected');
+
+        const requestType = typeString.toLowerCase();
+        const requestURL = `${baseUrl()}transactions/create/?acc_id=${accountId}&type=${requestType}`;
+        await goTo(requestURL);
+        assert.instanceOf(App.view, MainView, 'Invalid view');
+
+        App.view.expectedState = {
+            msgPopup: { success: false, message: 'Fail to create new transaction.' },
+        };
+        await App.view.checkState();
+        await App.view.closeNotification();
+
+        return true;
+    });
+};
+
 /** Navigate to create transaction view and check form availability according to current state */
 export const checkTransactionAvailable = async (type, directNavigate = false) => {
     await test(`${Transaction.typeToString(type)} transaction availability`, async () => {

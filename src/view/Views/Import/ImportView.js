@@ -11,6 +11,7 @@ import {
 import { formatDate } from 'jezvejs/DateUtils';
 import { Sortable } from 'jezvejs/Sortable';
 import { DropDown } from 'jezvejs/DropDown';
+import { Checkbox } from 'jezvejs/Checkbox';
 import { timestampFromString, createMessage } from '../../js/app.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
@@ -71,10 +72,14 @@ class ImportView extends View {
             extraClass: 'dd__fullwidth',
         });
 
+        this.rulesCheck = Checkbox.fromElement(
+            ge('rulesCheck'),
+            { onChange: () => this.onToggleEnableRules() },
+        );
+
         this.submitBtn = ge('submitbtn');
         this.transCountElem = ge('trcount');
         this.enabledTransCountElem = ge('entrcount');
-        this.rulesCheck = ge('rulesCheck');
         this.rulesBtn = ge('rulesBtn');
         this.rulesCountElem = ge('rulescount');
         this.rowsContainer = ge('rowsContainer');
@@ -96,7 +101,6 @@ class ImportView extends View {
         }
 
         this.submitBtn.addEventListener('click', () => this.onSubmitClick());
-        this.rulesCheck.addEventListener('change', () => this.onToggleEnableRules());
         this.rulesBtn.addEventListener('click', () => this.onRulesClick());
 
         this.noDataMsg = this.rowsContainer.querySelector('.nodata-message');

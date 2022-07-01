@@ -56,8 +56,9 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         </div>
 
                         <div class="rules-container">
-                            <label class="checkwrap">
-                                <input id="rulesCheck" type="checkbox" checked>
+                            <label id="rulesCheck" class="checkbox">
+                                <input type="checkbox" checked>
+                                <span class="checkbox__check"><?=svgIcon("check")?></span>
                             </label>
                             <button id="rulesBtn" class="btn link-btn" type="button">Rules (<span id="rulescount"><?=count($rulesData)?></span>)</button>
                         </div>
@@ -99,20 +100,22 @@ include(TPL_PATH."commonhdr.tpl");	?>
             </form>
 <?php	if ($this->adminUser || $this->testerUser) { ?>
             <div id="serverAddressBlock" class="row-container hidden">
-                <input id="serverAddress" type="text">
+                <input id="serverAddress" class="stretch-input" type="text">
                 <input id="serverUploadBtn" class="btn submit-btn" type="button" value="Upload">
             </div>
 <?php   }   ?>
         </div>
         <div class="upload-form__options">
-            <label class="checkwrap">
-                <input id="isEncodeCheck" name="encode" type="checkbox" checked>
-                <span>CP-1251 encoding</span>
+            <label id="isEncodeCheck" class="checkbox">
+                <input name="encode" type="checkbox" checked>
+                <span class="checkbox__check"><?=svgIcon("check")?></span>
+                <span class="checkbox__label">CP-1251 encoding</span>
             </label>
 <?php	if ($this->adminUser || $this->testerUser) { ?>
-            <label class="checkwrap">
-                <input id="useServerCheck" type="checkbox">
-                <span>Use address on server</span>
+            <label id="useServerCheck" class="checkbox">
+                <input type="checkbox">
+                <span class="checkbox__check"><?=svgIcon("check")?></span>
+                <span class="checkbox__label">Use address on server</span>
             </label>
 <?php   }   ?>
         </div>
@@ -135,7 +138,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                 </div>
                 <div id="nameField" class="tpl-form-field validation-block hidden">
                     <label for="tplNameInp">Name</label>
-                    <input id="tplNameInp" class="tpl-name-inp" type="text">
+                    <input id="tplNameInp" class="stretch-input tpl-name-inp" type="text">
                     <div class="invalid-feedback">Please input template name</div>
                 </div>
                 <input id="updateTplBtn" class="btn link-btn hidden" type="button" value="Update">

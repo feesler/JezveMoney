@@ -17,6 +17,7 @@ import { DropDown } from './component/DropDown.js';
 import { ImportViewSubmitError } from '../error/ImportViewSubmitError.js';
 import { findSimilarTransaction } from '../model/import.js';
 import { App } from '../Application.js';
+import { Checkbox } from './component/Checkbox.js';
 
 /** Import view class */
 export class ImportView extends AppView {
@@ -36,7 +37,7 @@ export class ImportView extends AppView {
             clearBtn: await IconLink.create(this, await query('#clearFormBtn')),
             totalCount: { elem: await query('#trcount') },
             enabledCount: { elem: await query('#entrcount') },
-            rulesCheck: { elem: await query('#rulesCheck') },
+            rulesCheck: await Checkbox.create(this, await query('#rulesCheck')),
             rulesBtn: { elem: await query('#rulesBtn') },
             rulesCount: { elem: await query('#rulescount') },
             submitBtn: { elem: await query('#submitbtn') },
@@ -66,7 +67,6 @@ export class ImportView extends AppView {
         res.uploadBtn.content.disabled = disabledAttr != null;
         res.totalCount.value = await prop(res.totalCount.elem, 'textContent');
         res.enabledCount.value = await prop(res.enabledCount.elem, 'textContent');
-        res.rulesCheck.checked = await prop(res.rulesCheck.elem, 'checked');
         res.rulesCount.value = await prop(res.rulesCount.elem, 'textContent');
         res.submitBtn.disabled = await prop(res.submitBtn.elem, 'disabled');
 
@@ -180,7 +180,7 @@ export class ImportView extends AppView {
             value !== this.isRulesEnabled(),
             value ? 'Rules already enabled' : 'Result already disabled',
         );
-        await this.performAction(() => click(this.content.rulesCheck.elem));
+        await this.performAction(() => this.content.rulesCheck.toggle());
     }
 
     async launchUploadDialog() {

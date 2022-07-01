@@ -245,6 +245,44 @@ class Transactions extends TemplateController
     }
 
 
+    protected function getRequestedType($request, $default)
+    {
+        if (!is_array($request) || !isset($request["type"])) {
+            return $default;
+        }
+        $res = intval($request["type"]);
+        if (!$res) {
+            $res = TransactionModel::stringToType($request["type"]);
+        }
+        if (!$res) {
+            $this->fail("Invalid transaction type");
+        }
+
+        return $res;
+    }
+
+
+    protected function getTypeMenu($baseUrl, $selectedType, $params = [])
+    {
+        $trTypes = TransactionModel::getTypeNames();
+        $res = [];
+        foreach ($trTypes as $type_id => $trTypeName) {
+            $urlParams = $params;
+            $urlParams["type"] = strtolower($trTypeName);
+
+            $menuItem = new \stdClass();
+            $menuItem->type = $type_id;
+            $menuItem->title = $trTypeName;
+            $menuItem->selected = ($type_id == $selectedType);
+            $menuItem->url = urlJoin($baseUrl, $urlParams);
+
+            $res[] = $menuItem;
+        }
+
+        return $res;
+    }
+
+
     public function create()
     {
         if ($this->isPOST()) {
@@ -252,10 +290,10 @@ class Transactions extends TemplateController
         }
 
         $this->template = new Template(TPL_PATH . "transaction.tpl");
-        $data = [];
-
-        $action = "create";
-        $data["action"] = $action;
+        $data = [
+            "action" => "create",
+        ];
+        $form = [];
 
         $visibleAccounts = $this->accModel->getData();
         $acc_count = count($visibleAccounts);
@@ -266,22 +304,11 @@ class Transactions extends TemplateController
         $defMsg = ERR_TRANS_CREATE;
 
         $tr = [
-            "type" => EXPENSE,
+            "type" => $this->getRequestedType($_GET, EXPENSE),
             "src_amount" => 0,
             "dest_amount" => 0,
             "comment" => ""
         ];
-
-        // check predefined type of transaction
-        if (isset($_GET["type"])) {
-            $tr["type"] = intval($_GET["type"]);
-            if (!$tr["type"]) {
-                $tr["type"] = TransactionModel::stringToType($_GET["type"]);
-            }
-            if (!$tr["type"]) {
-                $this->fail("Invalid transaction type");
-            }
-        }
 
         // Check availability of selected type of transaction
         $noDataMessage = null;
@@ -306,7 +333,11 @@ class Transactions extends TemplateController
         // Redirect if invalid or hidden account is specified
         if ($acc_id) {
             $account = $this->accModel->getItem($acc_id);
-            if (!$account || $this->accModel->isHidden($account)) {
+            if (
+                !$account
+                || $this->accModel->isHidden($account)
+                || $account->owner_id != $this->owner_id
+            ) {
                 $this->fail($defMsg);
             }
         }
@@ -338,8 +369,6 @@ class Transactions extends TemplateController
 
         $debtType = true;
         $noAccount = $acc_id == 0;
-        $srcAmountCurr = 0;
-        $destAmountCurr = 0;
         $debtAcc = $this->accModel->getItem($acc_id);
 
         // Prepare person account
@@ -440,26 +469,14 @@ class Transactions extends TemplateController
         $data["dest"] = $dest;
 
         // Prepare transaction types menu
-        $trTypes = TransactionModel::getTypeNames();
-        $transMenu = [];
-        $baseUrl = BASEURL . "transactions/create/";
-        foreach ($trTypes as $type_id => $trTypeName) {
-            $params = ["type" => strtolower($trTypeName)];
-            if ($acc_id != 0) {
-                $params["acc_id"] = $acc_id;
-            }
-
-            $menuItem = new \stdClass();
-            $menuItem->type = $type_id;
-            $menuItem->title = $trTypeName;
-            $menuItem->selected = ($type_id == $tr["type"]);
-            $menuItem->url = urlJoin($baseUrl, $params);
-
-            $transMenu[] = $menuItem;
+        $menuParams = [];
+        if ($acc_id != 0) {
+            $menuParams["acc_id"] = $acc_id;
         }
-        $data["transMenu"] = $transMenu;
+        $baseUrl = BASEURL . "transactions/create/";
+        $data["transMenu"] = $this->getTypeMenu($baseUrl, $tr["type"], $menuParams);
 
-        $data["formAction"] = BASEURL . "transactions/" . $action . "/";
+        $form["action"] = BASEURL . "transactions/" . $data["action"] . "/";
 
         $srcBalTitle = "Result balance";
         if ($tr["type"] == TRANSFER) {
@@ -490,22 +507,6 @@ class Transactions extends TemplateController
         }
 
         if ($tr["type"] != DEBT) {
-            if (!is_null($src)) {
-                $srcAmountCurr = $src->curr_id;
-            } elseif (!is_null($dest)) {
-                $srcAmountCurr = $dest->curr_id;
-            } else {
-                $srcAmountCurr = 0;
-            }
-
-            if (!is_null($dest)) {
-                $destAmountCurr = $dest->curr_id;
-            } elseif (!is_null($src)) {
-                $destAmountCurr = $src->curr_id;
-            } else {
-                $destAmountCurr = 0;
-            }
-
             /**
              * Show destination amount input for expense and source amount input for income by default,
              * because it's amount with changing currency.
@@ -514,22 +515,21 @@ class Transactions extends TemplateController
              */
             $showSrcAmount = ($tr["type"] != EXPENSE);
             if ($tr["type"] == TRANSFER) {
-                $showDestAmount = ($srcAmountCurr != $destAmountCurr);
+                $showDestAmount = ($tr["src_curr"] != $tr["dest_curr"]);
             } else {
                 $showDestAmount = ($tr["type"] != INCOME);
             }
         } else {
             $tr["src_id"] = $person_acc_id;
 
-            $srcAmountCurr = ($debtAcc) ? $debtAcc->curr_id : $person_curr;
-            $destAmountCurr = ($debtAcc) ? $debtAcc->curr_id : $person_curr;
-
             $showSrcAmount = true;
             $showDestAmount = false;
         }
-        $data["srcAmountCurr"] = $srcAmountCurr;
+
+        $form["src_amount"] = "";
+        $form["dest_amount"] = "";
+
         $data["showSrcAmount"] = $showSrcAmount;
-        $data["destAmountCurr"] = $destAmountCurr;
         $data["showDestAmount"] = $showDestAmount;
 
         // Common arrays
@@ -549,16 +549,16 @@ class Transactions extends TemplateController
             $data["accLbl"] = ($debtType) ? "Destination account" : "Source account";
         }
 
-        $currObj = $this->currModel->getItem($srcAmountCurr);
+        $currObj = $this->currModel->getItem($tr["src_curr"]);
         $srcAmountSign = $currObj ? $currObj->sign : null;
-        $data["srcAmountSign"] = $srcAmountSign;
+        $form["srcCurrSign"] = $srcAmountSign;
 
-        $currObj = $this->currModel->getItem($destAmountCurr);
+        $currObj = $this->currModel->getItem($tr["dest_curr"]);
         $destAmountSign = $currObj ? $currObj->sign : null;
-        $data["destAmountSign"] = $destAmountSign;
+        $form["destCurrSign"] = $destAmountSign;
 
-        $data["exchSign"] = $destAmountSign . "/" . $srcAmountSign;
-        $data["exchValue"] = 1;
+        $form["exchSign"] = $destAmountSign . "/" . $srcAmountSign;
+        $form["exchange"] = 1;
 
         if ($tr["type"] != DEBT) {
             $srcResBalance = ($src) ? $src->balance : 0;
@@ -572,22 +572,24 @@ class Transactions extends TemplateController
             $srcResBalance = ($debtType) ? $person_res_balance : $acc_res_balance;
             $destResBalance = ($debtType) ? $acc_res_balance : $person_res_balance;
 
-            $rtSrcResBal = $this->currModel->format($srcResBalance, $srcAmountCurr);
-            $rtDestResBal = $this->currModel->format($destResBalance, $destAmountCurr);
+            $rtSrcResBal = $this->currModel->format($srcResBalance, $tr["src_curr"]);
+            $rtDestResBal = $this->currModel->format($destResBalance, $tr["dest_curr"]);
         }
-        $data["srcResBalance"] = $srcResBalance;
-        $data["destResBalance"] = $destResBalance;
+        $form["srcResult"] = $srcResBalance;
+        $form["destResult"] = $destResBalance;
+
+        $data["form"] = $form;
 
         $data["srcAmountInfo"] = [
             "id" => "src_amount_left",
             "title" => $data["srcAmountLbl"],
-            "value" => $this->currModel->format($tr["src_amount"], $srcAmountCurr),
+            "value" => $this->currModel->format($tr["src_amount"], $tr["src_curr"]),
             "hidden" => true
         ];
         $data["destAmountInfo"] = [
             "id" => "dest_amount_left",
             "title" => $data["destAmountLbl"],
-            "value" => $this->currModel->format($tr["dest_amount"], $destAmountCurr),
+            "value" => $this->currModel->format($tr["dest_amount"], $tr["dest_curr"]),
             "hidden" => true
         ];
         $data["srcResultInfo"] = [
@@ -605,7 +607,7 @@ class Transactions extends TemplateController
         $data["exchangeInfo"] = [
             "id" => "exch_left",
             "title" => "Exchange rate",
-            "value" => $data["exchValue"] . " " . $data["exchSign"],
+            "value" => $form["exchange"] . " " . $form["exchSign"],
             "hidden" => ($tr["src_curr"] == $tr["dest_curr"])
         ];
 
@@ -641,10 +643,10 @@ class Transactions extends TemplateController
         }
 
         $this->template = new Template(TPL_PATH . "transaction.tpl");
-        $data = [];
-
-        $action = "update";
-        $data["action"] = $action;
+        $data = [
+            "action" => "update",
+        ];
+        $form = [];
 
         $visiblePersons = $this->personMod->getData();
         $iconModel = IconModel::getInstance();
@@ -663,6 +665,9 @@ class Transactions extends TemplateController
             $this->fail($defMsg);
         }
         $tr = (array)$item;
+
+        // check type change request
+        $requestedType = $this->getRequestedType($_GET, $tr["type"]);
 
         $data["acc_count"] = $this->accModel->getCount(["full" => ($tr["type"] == DEBT)]);
 
@@ -690,28 +695,13 @@ class Transactions extends TemplateController
         $data["dest"] = $dest;
 
         // Prepare transaction types menu
-        $trTypes = TransactionModel::getTypeNames();
-        $transMenu = [];
-        $baseUrl = BASEURL . "transactions/create/";
-        foreach ($trTypes as $type_id => $trTypeName) {
-            $params = ["type" => strtolower($trTypeName)];
+        $baseUrl = $baseUrl = BASEURL . "transactions/update/" . $trans_id;
+        $data["transMenu"] = $this->getTypeMenu($baseUrl, $tr["type"]);
 
-            $menuItem = new \stdClass();
-            $menuItem->type = $type_id;
-            $menuItem->title = $trTypeName;
-            $menuItem->selected = ($menuItem->type == $tr["type"]);
-            $menuItem->url = urlJoin($baseUrl, $params);
+        $form["action"] = BASEURL . "transactions/" . $data["action"] . "/";
 
-            $transMenu[] = $menuItem;
-        }
-        $data["transMenu"] = $transMenu;
-
-        $data["formAction"] = BASEURL . "transactions/" . $action . "/";
-
-        $srcAmountCurr = $tr["src_curr"];
-        $destAmountCurr = $tr["dest_curr"];
         if ($tr["type"] != DEBT) {
-            if ($srcAmountCurr == $destAmountCurr) {
+            if ($tr["src_curr"] == $tr["dest_curr"]) {
                 if ($tr["type"] == EXPENSE) {
                     $showSrcAmount = false;
                     $showDestAmount = true;
@@ -753,8 +743,6 @@ class Transactions extends TemplateController
             $noAccount = is_null($debtAcc);
 
             if ($noAccount) {
-                $destAmountCurr = $person_acc->curr_id;
-
                 $acc_id = $this->accModel->getIdByPos(0);
                 $debtAcc = $this->accModel->getItem($acc_id);
                 if (!$debtAcc) {
@@ -801,9 +789,10 @@ class Transactions extends TemplateController
             $destBalTitle .= ($debtType) ? " (Account)" : " (Person)";
         }
 
-        $data["srcAmountCurr"] = $srcAmountCurr;
+        $form["src_amount"] = $tr["src_amount"];
+        $form["dest_amount"] = $tr["dest_amount"];
+
         $data["showSrcAmount"] = $showSrcAmount;
-        $data["destAmountCurr"] = $destAmountCurr;
         $data["showDestAmount"] = $showDestAmount;
         $data["srcBalTitle"] = $srcBalTitle;
         $data["destBalTitle"] = $destBalTitle;
@@ -853,19 +842,19 @@ class Transactions extends TemplateController
         $data["acc_id"] = ($debtAcc) ? $debtAcc->id : 0;
         $data["accLbl"] = $accLbl;
 
-        $currObj = $this->currModel->getItem($srcAmountCurr);
-        $data["srcAmountSign"] = $currObj ? $currObj->sign : null;
+        $currObj = $this->currModel->getItem($tr["src_curr"]);
+        $form["srcCurrSign"] = $currObj ? $currObj->sign : null;
 
-        $currObj = $this->currModel->getItem($destAmountCurr);
-        $data["destAmountSign"] = $currObj ? $currObj->sign : null;
+        $currObj = $this->currModel->getItem($tr["dest_curr"]);
+        $form["destCurrSign"] = $currObj ? $currObj->sign : null;
 
-        $data["exchSign"] = $data["destAmountSign"] . "/" . $data["srcAmountSign"];
-        $data["exchValue"] = round($tr["dest_amount"] / $tr["src_amount"], 5);
-        $backExchSign = $data["srcAmountSign"] . "/" . $data["destAmountSign"];
+        $form["exchSign"] = $form["destCurrSign"] . "/" . $form["srcCurrSign"];
+        $form["exchange"] = round($tr["dest_amount"] / $tr["src_amount"], 5);
+        $backExchSign = $form["srcCurrSign"] . "/" . $form["destCurrSign"];
         $backExchValue = round($tr["src_amount"] / $tr["dest_amount"], 5);
 
-        $rtExchange = $data["exchValue"] . " " . $data["exchSign"];
-        if ($data["exchValue"] != 1) {
+        $rtExchange = $form["exchange"] . " " . $form["exchSign"];
+        if ($form["exchange"] != 1) {
             $rtExchange .= " (" . $backExchValue . " " . $backExchSign . ")";
         }
 
@@ -873,29 +862,31 @@ class Transactions extends TemplateController
             $srcResBalance = ($src) ? $src->balance : 0;
             $destResBalance = ($dest) ? $dest->balance : 0;
 
-            $rtSrcResBal = ($src) ? $this->currModel->format($src->balance, $src->curr_id) : null;
-            $rtDestResBal = ($dest) ? $this->currModel->format($dest->balance, $dest->curr_id) : null;
+            $rtSrcResBal = ($src) ? $this->currModel->format($src->balance, $tr["src_curr"]) : null;
+            $rtDestResBal = ($dest) ? $this->currModel->format($dest->balance, $tr["dest_curr"]) : null;
         } else {
             $acc_res_balance = ($debtAcc) ? $debtAcc->balance : 0;
             $acc_res_balance += ($debtType) ? $tr["dest_amount"] : -$tr["src_amount"];
             $srcResBalance = ($debtType) ? $person_res_balance : $acc_res_balance;
             $destResBalance = ($debtType) ? $acc_res_balance : $person_res_balance;
-            $rtSrcResBal = $this->currModel->format($srcResBalance, $srcAmountCurr);
-            $rtDestResBal = $this->currModel->format($destResBalance, $destAmountCurr);
+            $rtSrcResBal = $this->currModel->format($srcResBalance, $tr["src_curr"]);
+            $rtDestResBal = $this->currModel->format($destResBalance, $tr["dest_curr"]);
         }
-        $data["srcResBalance"] = $srcResBalance;
-        $data["destResBalance"] = $destResBalance;
+        $form["srcResult"] = $srcResBalance;
+        $form["destResult"] = $destResBalance;
+
+        $data["form"] = $form;
 
         $data["srcAmountInfo"] = [
             "id" => "src_amount_left",
             "title" => $data["srcAmountLbl"],
-            "value" => $this->currModel->format($tr["src_amount"], $srcAmountCurr),
+            "value" => $this->currModel->format($tr["src_amount"], $tr["src_curr"]),
             "hidden" => true
         ];
         $data["destAmountInfo"] = [
             "id" => "dest_amount_left",
             "title" => $data["destAmountLbl"],
-            "value" => $this->currModel->format($tr["dest_amount"], $destAmountCurr),
+            "value" => $this->currModel->format($tr["dest_amount"], $tr["dest_curr"]),
             "hidden" => true
         ];
         $data["srcResultInfo"] = [
@@ -932,6 +923,7 @@ class Transactions extends TemplateController
                 "mode" => $this->action,
                 "transaction" => $tr,
                 "trAvailable" => $trAvailable,
+                "requestedType" => $requestedType,
             ],
         ];
 

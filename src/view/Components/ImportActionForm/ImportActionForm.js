@@ -72,7 +72,7 @@ export class ImportActionForm extends Component {
         this.createPersonField();
 
         // Create amount input element
-        this.amountInput = ce('input', { type: 'text' });
+        this.amountInput = ce('input', { className: 'stretch-input', type: 'text' });
         this.decAmountInput = DecimalInput.create({
             elem: this.amountInput,
             digits: 2,
@@ -82,7 +82,7 @@ export class ImportActionForm extends Component {
         // Create value input element
         this.valueInput = ce(
             'input',
-            { type: 'text' },
+            { className: 'stretch-input', type: 'text' },
             null,
             { input: () => this.onValueChange() },
         );

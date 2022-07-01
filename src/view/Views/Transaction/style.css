@@ -1,20 +1,21 @@
 /* Swapn button */
 .swap-btn {
   display: inline-flex;
-  height: 24px;
-  line-height: 24px;
+  position: absolute;
+  top: 50%;
+  margin-top: -18px;
   background: none;
+  padding: 5px;
+  align-self: flex-end;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 3px;
   cursor: pointer;
 }
 
 .swap-btn > svg {
   height: 24px;
   width: 24px;
-  fill: #888888;
-}
-
-.swap-btn:hover > svg {
-  fill: #000000;
 }
 
 /* Tile block header */
@@ -75,6 +76,14 @@
   padding: 8px 5px 8px 0;
 }
 
+.accounts-section {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: baseline;
+  position: relative;
+  max-width: 300px;
+}
+
 .account-container {
   min-width: 100px;
   max-width: 400px;
@@ -82,28 +91,16 @@
   flex-flow: column nowrap;
 }
 
-/* Debt operation type selector */
-.debt-op-selector {
-  margin: 2px 0 10px 0;
-  display: inline-flex;
-  flex-flow: row nowrap;
-  align-items: center;
-}
+/* Desktop */
+@media (min-width: 768px) {
+  .swap-btn {
+    position: static;
+    align-self: center;
+    margin: 0 8px;
+  }
 
-.debt-op-selector > label {
-  width: auto;
-  height: auto;
-  display: inline-flex;
-  flex-flow: row nowrap;
-  align-items: center;
-}
-
-.debt-op-selector input {
-  line-height: 22px;
-  height: 22px;
-}
-
-.debt-op-selector span {
-  line-height: 22px;
-  margin: 0 10px 0 5px;
+  .accounts-section {
+    flex-flow: row nowrap;
+    max-width: 100%;
+  }
 }

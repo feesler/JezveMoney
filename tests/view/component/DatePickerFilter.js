@@ -18,7 +18,7 @@ export class DatePickerFilter extends TestComponent {
         };
         assert(res.iconLink, 'Iconlink of date picker not found');
 
-        res.inputElem = await query(this.elem, '.stretch-input > input');
+        res.inputElem = await query(this.elem, '.stretch-input');
         assert(res.inputElem, 'Input element not found');
 
         let dateValue = await prop(res.inputElem, 'value');

@@ -131,11 +131,10 @@
 .import-item .enable-check {
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .import-item .enable-check input[type="checkbox"] {
-  margin: 0 8px;
-  width: 20px;
   pointer-events: all;
 }
 

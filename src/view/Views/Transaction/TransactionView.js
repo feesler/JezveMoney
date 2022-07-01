@@ -289,6 +289,7 @@ class TransactionView extends View {
             digits: 2,
             oninput: (e) => this.onSourceAmountInput(e),
         });
+        this.srcCurrBtn = this.srcAmountRow.querySelector('.input-group__btn');
         this.srcAmountSign = ge('srcamountsign');
 
         this.destAmountRow = ge('dest_amount_row');
@@ -300,6 +301,7 @@ class TransactionView extends View {
             digits: 2,
             oninput: (e) => this.onDestAmountInput(e),
         });
+        this.destCurrBtn = this.destAmountRow.querySelector('.input-group__btn');
         this.destAmountSign = ge('destamountsign');
 
         this.srcResBalanceRow = ge('result_balance');
@@ -417,6 +419,11 @@ class TransactionView extends View {
 
         this.submitControls = ge('submit_controls');
         this.submitBtn = ge('submitbtn');
+
+        // Check type change request
+        if (state.isUpdate && transaction.type !== this.props.requestedType) {
+            this.onChangeType(this.props.requestedType);
+        }
     }
 
     /**
@@ -773,25 +780,11 @@ class TransactionView extends View {
      * @param {boolean} act - if set to true activate currency, else inactivate
      */
     setCurrActive(src, act) {
-        const amountRow = (src) ? this.srcAmountRow : this.destAmountRow;
-        if (!amountRow) {
-            return;
-        }
-
-        const currBtn = amountRow.querySelector('.input-group__btn');
-        const inputContainer = amountRow.querySelector('.stretch-input');
-        if (!currBtn || !inputContainer) {
-            return;
-        }
-
+        const currBtn = (src) ? this.srcCurrBtn : this.destCurrBtn;
         if (act) {
-            currBtn.classList.remove('input-group__btn_inactive');
-            inputContainer.classList.remove('trans_input');
-            inputContainer.classList.add('rbtn_input');
+            currBtn.removeAttribute('disabled');
         } else {
-            currBtn.classList.add('input-group__btn_inactive');
-            inputContainer.classList.add('trans_input');
-            inputContainer.classList.remove('rbtn_input');
+            currBtn.setAttribute('disabled', true);
         }
     }
 
@@ -1253,6 +1246,8 @@ class TransactionView extends View {
             this.swapBtn,
             state.isAvailable && (transaction.type === TRANSFER || transaction.type === DEBT),
         );
+
+        this.typeMenu.setSelection(transaction.type);
 
         if (state.isAvailable) {
             if (transaction.type === EXPENSE) {

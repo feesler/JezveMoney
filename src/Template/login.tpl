@@ -15,12 +15,12 @@
                 <h1>Log in</h1>
                 <div id="login-inp-block" class="validation-block std_margin">
                     <label for="login">Username</label>
-                    <div class="stretch-input"><input id="login" name="login" type="text" autocomplete="off"></div>
+                    <input id="login" class="stretch-input" name="login" type="text" autocomplete="off">
                     <div class="invalid-feedback">Please input you login.</div>
                 </div>
                 <div id="pwd-inp-block" class="validation-block std_margin">
                     <label for="password">Password</label>
-                    <div class="stretch-input"><input id="password" name="password" type="password" autocomplete="off"></div>
+                    <input id="password" class="stretch-input" name="password" type="password" autocomplete="off">
                     <div class="invalid-feedback">Please input correct password.</div>
                 </div>
                 <div class="form-controls std_margin">

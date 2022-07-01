@@ -41,15 +41,15 @@
     <input id="icon_id" name="id" type="hidden">
     <div class="view-row">
         <label for="icon_name">Name</label>
-        <div class="stretch-input"><input id="icon_name" name="name" type="text"></div>
+        <input id="icon_name" class="stretch-input" name="name" type="text">
     </div>
     <div class="view-row">
         <label for="icon_file">File name</label>
-        <div class="stretch-input"><input id="icon_file" name="file" type="text"></div>
+        <input id="icon_file" class="stretch-input" name="file" type="text">
     </div>
     <div id="admin_block" class="view-row">
         <label for="icon_type">Type</label>
-        <select id="icon_type" class="admin-select" name="type">
+        <select id="icon_type" class="stretch-input admin-select" name="type">
             <option value="0">Select type</option>
     <?php	foreach($typesData as $type_id => $typeName) {		?>
             <option value="<?=e($type_id)?>"><?=e($typeName)?></option>

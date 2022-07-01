@@ -51,9 +51,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         </div>
                         <div id="name-inp-block" class="validation-block view-row std_margin">
                             <label for="accname">Account name</label>
-                            <div class="stretch-input std_margin">
-                                <input id="accname" name="name" type="text" autocomplete="off" value="<?=e($accInfo->name)?>">
-                            </div>
+                            <input id="accname" class="stretch-input std_margin" name="name" type="text" autocomplete="off" value="<?=e($accInfo->name)?>">
                             <div id="namefeedback" class="invalid-feedback"></div>
                         </div>
                         <div class="view-row std_margin">
@@ -73,10 +71,10 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         <div id="initbal-inp-block" class="validation-block view-row std_margin">
                             <label for="balance">Initial balance</label>
                             <div class="input-group std_margin">
-                                <div class="stretch-input">
-                                    <input class="amount-input" id="balance" name="initbalance" type="text" autocomplete="off" value="<?=e($accInfo->initbalance)?>">
+                                <input id="balance" class="stretch-input amount-input input-group__item" name="initbalance" type="text" autocomplete="off" value="<?=e($accInfo->initbalance)?>">
+                                <div class="btn input-group__btn input-group__item" disabled>
+                                    <div id="currsign"><?=e($accInfo->sign)?></div>
                                 </div>
-                                <div class="btn input-group__btn input-group__btn_inactive"><div id="currsign"><?=e($accInfo->sign)?></div></div>
                             </div>
                             <div class="invalid-feedback">Please input correct initial balance.</div>
                         </div>

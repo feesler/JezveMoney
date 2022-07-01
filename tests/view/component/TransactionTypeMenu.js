@@ -17,12 +17,11 @@ export class TransactionTypeMenu extends TestComponent {
         const menuItems = await queryAll(this.elem, '.trtype-menu__item');
         for (const item of menuItems) {
             const menuItemObj = await MenuItem.create(this.parent, item);
-
-            if (menuItemObj.content.isActive) {
-                res.selectedTypes.push(menuItemObj.content.type);
+            if (menuItemObj.isActive) {
+                res.selectedTypes.push(menuItemObj.type);
             }
 
-            res.items[menuItemObj.content.type] = menuItemObj;
+            res.items[menuItemObj.type] = menuItemObj;
         }
 
         return res;

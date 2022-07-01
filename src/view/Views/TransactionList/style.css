@@ -139,8 +139,3 @@ a.paginator-arrow:hover {
 .search-form {
   align-self: right;
 }
-
-.search_btn {
-  align-self: right;
-  flex-grow: 0;
-}
