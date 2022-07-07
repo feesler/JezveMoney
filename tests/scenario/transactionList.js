@@ -11,11 +11,10 @@ import { api } from '../model/api.js';
 import * as TransactionListTests from '../run/transactionList.js';
 import { App } from '../Application.js';
 
-let scenario = null;
 let testData = null;
 
 const setupAccounts = async () => {
-    const { RUB, USD, EUR } = scenario;
+    const { RUB, USD, EUR } = App.scenario;
     const data = [{
         name: 'acc_4',
         curr_id: RUB,
@@ -91,7 +90,7 @@ const setupTransactions = async (accountIds, personIds) => {
         USD,
         EUR,
         PLN,
-    } = scenario;
+    } = App.scenario;
 
     const data = [{
         type: EXPENSE,
@@ -279,7 +278,7 @@ const runTests = async (directNavigate = false) => {
         setBlock('Transaction List view: manual navigation', 1);
     }
 
-    await scenario.runner.runTasks([
+    await App.scenario.runner.runTasks([
         { action: TransactionListTests.checkInitialState, data: directNavigate },
         { action: TransactionListTests.goToNextPage, data: directNavigate },
         { action: TransactionListTests.setDetailsMode, data: directNavigate },
@@ -291,14 +290,14 @@ const runTests = async (directNavigate = false) => {
         [1, 2],
     ];
 
-    await scenario.runner.runGroup(TransactionListTests.toggleSelect, toggleSelectData);
+    await App.scenario.runner.runGroup(TransactionListTests.toggleSelect, toggleSelectData);
 
-    await scenario.runner.runGroup(
+    await App.scenario.runner.runGroup(
         TransactionListTests.filterByType,
         availTransTypes.map((type) => ({ type, directNavigate })),
     );
 
-    await scenario.runner.runTasks([{
+    await App.scenario.runner.runTasks([{
         action: TransactionListTests.filterByAccounts,
         data: { accounts: testData.accounts[2] },
     }, {
@@ -331,9 +330,9 @@ const runTests = async (directNavigate = false) => {
         { text: 'кк', directNavigate },
     ];
 
-    await scenario.runner.runGroup(TransactionListTests.search, searchData);
+    await App.scenario.runner.runGroup(TransactionListTests.search, searchData);
 
-    await scenario.runner.runTasks([
+    await App.scenario.runner.runTasks([
         { action: TransactionListTests.clearSearchForm, data: directNavigate },
         { action: TransactionListTests.clearDateRange },
         { action: TransactionListTests.search, data: { text: '1', directNavigate } },
@@ -346,22 +345,11 @@ const runTests = async (directNavigate = false) => {
 };
 
 export const transactionsListTests = {
-    /** Initialize tests */
-    init(scenarioInstance) {
-        scenario = scenarioInstance;
-    },
-
     /** Run transactions list view tests */
     async run() {
         testData = await prepareTrListData();
 
         await runTests(false);
         await runTests(true);
-    },
-
-    /** Initialize and run tests */
-    async initAndRun(scenarioInstance) {
-        this.init(scenarioInstance);
-        await this.run();
     },
 };

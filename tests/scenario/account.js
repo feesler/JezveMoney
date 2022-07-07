@@ -1,12 +1,11 @@
 import { setBlock } from 'jezve-test';
 import * as AccountTests from '../run/account.js';
-
-let scenario = null;
+import { App } from '../Application.js';
 
 const createAccountTests = async () => {
     setBlock('Create accounts', 2);
 
-    const { RUB, EUR } = scenario;
+    const { RUB, EUR } = App.scenario;
 
     const data = [{
         name: 'acc_1',
@@ -30,13 +29,13 @@ const createAccountTests = async () => {
         initbalance: '',
     }];
 
-    await scenario.runner.runGroup(AccountTests.create, data);
+    await App.scenario.runner.runGroup(AccountTests.create, data);
 };
 
 const updateTests = async () => {
     setBlock('Update accounts', 2);
 
-    const { RUB, USD } = scenario;
+    const { RUB, USD } = App.scenario;
     const data = [{
         pos: 0,
         icon_id: 1,
@@ -58,7 +57,7 @@ const updateTests = async () => {
         name: 'Acc_1',
     }];
 
-    await scenario.runner.runGroup(AccountTests.update, data);
+    await App.scenario.runner.runGroup(AccountTests.update, data);
 };
 
 const deleteTests = async () => {
@@ -68,7 +67,7 @@ const deleteTests = async () => {
         [0, 1],
     ];
 
-    await scenario.runner.runGroup(AccountTests.del, data);
+    await App.scenario.runner.runGroup(AccountTests.del, data);
 };
 
 const deleteFromUpdateTests = async () => {
@@ -78,7 +77,7 @@ const deleteFromUpdateTests = async () => {
         0,
     ];
 
-    await scenario.runner.runGroup(AccountTests.delFromUpdate, data);
+    await App.scenario.runner.runGroup(AccountTests.delFromUpdate, data);
 };
 
 const hideTest = async () => {
@@ -89,7 +88,7 @@ const hideTest = async () => {
         [0, 4],
     ];
 
-    await scenario.runner.runGroup(AccountTests.hide, data);
+    await App.scenario.runner.runGroup(AccountTests.hide, data);
 };
 
 const showTest = async () => {
@@ -100,7 +99,7 @@ const showTest = async () => {
         [0, 7],
     ];
 
-    await scenario.runner.runGroup(AccountTests.show, data);
+    await App.scenario.runner.runGroup(AccountTests.show, data);
 };
 
 const exportTest = async () => {
@@ -111,7 +110,7 @@ const exportTest = async () => {
         [0, 1],
     ];
 
-    await scenario.runner.runGroup(AccountTests.exportTest, data);
+    await App.scenario.runner.runGroup(AccountTests.exportTest, data);
 };
 
 const toggleTest = async () => {
@@ -122,15 +121,10 @@ const toggleTest = async () => {
         [1, 2],
     ];
 
-    await scenario.runner.runGroup(AccountTests.toggleSelect, data);
+    await App.scenario.runner.runGroup(AccountTests.toggleSelect, data);
 };
 
 export const accountTests = {
-    /** Initialize tests */
-    init(scenarioInstance) {
-        scenario = scenarioInstance;
-    },
-
     /** Run account view tests */
     async run() {
         setBlock('Accounts', 1);
@@ -153,11 +147,5 @@ export const accountTests = {
         await updateTests();
         await deleteTests();
         await deleteFromUpdateTests();
-    },
-
-    /** Initialize and run tests */
-    async initAndRun(scenarioInstance) {
-        this.init(scenarioInstance);
-        await this.run();
     },
 };

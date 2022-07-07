@@ -8,7 +8,6 @@ import { importItemsTests } from './import/items.js';
 import { importRuleTests } from './import/rules.js';
 import { importTemplateTests } from './import/templates.js';
 
-let scenario = null;
 let csvStatement = null;
 let uploadFilename = null;
 
@@ -35,7 +34,7 @@ const runSubmitImportTests = async () => {
         pos: 0,
         action: [
             { action: 'inputAmount', data: '1' },
-            { action: 'changeCurrency', data: scenario.USD },
+            { action: 'changeCurrency', data: App.scenario.USD },
         ],
     });
     await ImportTests.submit();
@@ -79,11 +78,6 @@ const runSubmitImportTests = async () => {
 };
 
 export const importTests = {
-    /** Initialize tests */
-    init(scenarioInstance) {
-        scenario = scenarioInstance;
-    },
-
     /** Upload CSV file for import tests */
     async prepare() {
         // Login as admin to upload CSV file
@@ -131,19 +125,18 @@ export const importTests = {
             'acc_3', 'acc RUB', 'acc USD', 'acc EUR',
         ]);
         [
-            scenario.ACC_3,
-            scenario.ACC_RUB,
-            scenario.ACC_USD,
-            scenario.ACC_EUR,
+            App.scenario.ACC_3,
+            App.scenario.ACC_RUB,
+            App.scenario.ACC_USD,
+            App.scenario.ACC_EUR,
         ] = App.state.getAccountsByIndexes(accIndexes);
         const personIndexes = App.state.getPersonIndexesByNames([
             'Maria', 'Alex',
         ]);
-        [scenario.MARIA, scenario.ALEX] = App.state.getPersonsByIndexes(personIndexes);
+        [App.scenario.MARIA, App.scenario.ALEX] = App.state.getPersonsByIndexes(personIndexes);
 
         await ImportTests.checkInitialState();
-        await importRuleTests.initAndRun(scenario);
-        await importItemsTests.init(scenario);
+        await importRuleTests.run();
         await importItemsTests.createTests();
 
         // Upload CSV file
@@ -153,16 +146,16 @@ export const importTests = {
             data: csvStatement,
         });
 
-        await importTemplateTests.initAndRun(scenario);
+        await importTemplateTests.run();
 
         // Convert transactions with invalid main account
         await ImportTests.submitUploaded({
             data: csvStatement,
-            account: scenario.ACC_USD,
+            account: App.scenario.ACC_USD,
         });
 
         // Change account to check it updated even after close upload dialog
-        await ImportTests.changeMainAccount(scenario.ACC_RUB);
+        await ImportTests.changeMainAccount(App.scenario.ACC_RUB);
 
         // Convert transactions
         await ImportTests.uploadFile({
@@ -185,7 +178,7 @@ export const importTests = {
         });
         await ImportTests.submitUploaded({
             data: csvStatement,
-            account: scenario.ACC_RUB,
+            account: App.scenario.ACC_RUB,
         });
 
         await ImportTests.enableRules(false);
@@ -215,13 +208,6 @@ export const importTests = {
     },
 
     async runNoPersonsTest() {
-        importRuleTests.init(scenario);
         await importRuleTests.runNoPersonsTest();
-    },
-
-    /** Initialize and run tests */
-    async initAndRun(scenarioInstance) {
-        this.init(scenarioInstance);
-        await this.run();
     },
 };

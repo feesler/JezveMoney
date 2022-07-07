@@ -16,12 +16,10 @@ import { importTests } from './import.js';
 import { App } from '../Application.js';
 import { ACCOUNT_HIDDEN } from '../model/AccountsList.js';
 
-let scenario = null;
-
 const createExpenseTests = async () => {
     setBlock('Create expense transactions', 1);
 
-    const { RUB, KRW } = scenario;
+    const { RUB, KRW } = App.scenario;
     const data = [{
         fromAccount: 0,
         destAmount: '123.7801',
@@ -56,13 +54,13 @@ const createExpenseTests = async () => {
         date: '01.01.69',
     }];
 
-    await scenario.runner.runGroup(ExpenseTransactionTests.create, data);
+    await App.scenario.runner.runGroup(ExpenseTransactionTests.create, data);
 };
 
 const createIncomeTests = async () => {
     setBlock('Create income transactions', 1);
 
-    const { USD, KRW } = scenario;
+    const { USD, KRW } = App.scenario;
     const data = [{
         fromAccount: 0,
         srcAmount: '10023.7801',
@@ -99,7 +97,7 @@ const createIncomeTests = async () => {
         date: '0921-dd.0',
     }];
 
-    await scenario.runner.runGroup(IncomeTransactionTests.create, data);
+    await App.scenario.runner.runGroup(IncomeTransactionTests.create, data);
 };
 
 const createTransferTests = async () => {
@@ -138,7 +136,7 @@ const createTransferTests = async () => {
         date: '',
     }];
 
-    await scenario.runner.runGroup(TransferTransactionTests.create, data);
+    await App.scenario.runner.runGroup(TransferTransactionTests.create, data);
 };
 
 const createDebtTests = async () => {
@@ -181,13 +179,13 @@ const createDebtTests = async () => {
         date: '0921-dd.0',
     }];
 
-    await scenario.runner.runGroup(DebtTransactionTests.create, data);
+    await App.scenario.runner.runGroup(DebtTransactionTests.create, data);
 };
 
 const updateExpenseTests = async () => {
     setBlock('Update expense transactions', 2);
 
-    const { RUB } = scenario;
+    const { RUB } = App.scenario;
     const data = [{
         pos: 3,
         destAmount: '124.7701',
@@ -207,13 +205,13 @@ const updateExpenseTests = async () => {
         date: App.dates.yesterday,
     }];
 
-    await scenario.runner.runGroup(ExpenseTransactionTests.update, data);
+    await App.scenario.runner.runGroup(ExpenseTransactionTests.update, data);
 };
 
 const updateIncomeTests = async () => {
     setBlock('Update income transactions', 2);
 
-    const { RUB } = scenario;
+    const { RUB } = App.scenario;
     const data = [{
         pos: 1,
         srcAmount: '100.001',
@@ -232,7 +230,7 @@ const updateIncomeTests = async () => {
         srcAmount: '99.9',
     }];
 
-    await scenario.runner.runGroup(IncomeTransactionTests.update, data);
+    await App.scenario.runner.runGroup(IncomeTransactionTests.update, data);
 };
 
 const updateTransferTests = async () => {
@@ -261,7 +259,7 @@ const updateTransferTests = async () => {
         srcAmount: '1050.01',
     }];
 
-    await scenario.runner.runGroup(TransferTransactionTests.update, data);
+    await App.scenario.runner.runGroup(TransferTransactionTests.update, data);
 };
 
 const updateDebtTests = async () => {
@@ -296,7 +294,7 @@ const updateDebtTests = async () => {
         date: App.dates.weekAgo,
     }];
 
-    await scenario.runner.runGroup(DebtTransactionTests.update, data);
+    await App.scenario.runner.runGroup(DebtTransactionTests.update, data);
 };
 
 const deleteExpenseTests = async () => {
@@ -307,7 +305,7 @@ const deleteExpenseTests = async () => {
         [0, 1, 11, 13],
     ];
 
-    await scenario.runner.runGroup((items) => TransactionTests.del(EXPENSE, items), data);
+    await App.scenario.runner.runGroup((items) => TransactionTests.del(EXPENSE, items), data);
 };
 
 const deleteIncomeTests = async () => {
@@ -318,7 +316,7 @@ const deleteIncomeTests = async () => {
         [0, 1, 2, 15],
     ];
 
-    await scenario.runner.runGroup((items) => TransactionTests.del(INCOME, items), data);
+    await App.scenario.runner.runGroup((items) => TransactionTests.del(INCOME, items), data);
 };
 
 const deleteTransferTests = async () => {
@@ -329,7 +327,7 @@ const deleteTransferTests = async () => {
         [0, 2],
     ];
 
-    await scenario.runner.runGroup((items) => TransactionTests.del(TRANSFER, items), data);
+    await App.scenario.runner.runGroup((items) => TransactionTests.del(TRANSFER, items), data);
 };
 
 const deleteDebtTests = async () => {
@@ -340,7 +338,7 @@ const deleteDebtTests = async () => {
         [0, 1],
     ];
 
-    await scenario.runner.runGroup((items) => TransactionTests.del(DEBT, items), data);
+    await App.scenario.runner.runGroup((items) => TransactionTests.del(DEBT, items), data);
 };
 
 const stateLoopTests = async () => {
@@ -388,7 +386,7 @@ const deleteFromUpdateTests = async () => {
         0,
     ];
 
-    await scenario.runner.runGroup(
+    await App.scenario.runner.runGroup(
         (pos) => TransactionTests.delFromUpdate(DEBT, pos),
         data,
     );
@@ -397,7 +395,7 @@ const deleteFromUpdateTests = async () => {
 const createFromHiddenAccount = async () => {
     setBlock('Create transaction from hidden account', 2);
 
-    const { RUB } = scenario;
+    const { RUB } = App.scenario;
 
     // Remove all accounts and persons
     await api.account.reset();
@@ -431,13 +429,13 @@ const createFromHiddenAccount = async () => {
         { type: TRANSFER, accountId: account1 },
         { type: DEBT, accountId: account1 },
     ];
-    await scenario.runner.runGroup(TransactionTests.createFromHiddenAccount, data);
+    await App.scenario.runner.runGroup(TransactionTests.createFromHiddenAccount, data);
 };
 
 const createFromPersonAccount = async () => {
     setBlock('Create transaction from person account', 2);
 
-    const { RUB } = scenario;
+    const { RUB } = App.scenario;
 
     // Remove all accounts and persons
     await api.account.reset();
@@ -482,11 +480,11 @@ const createFromPersonAccount = async () => {
         { type: TRANSFER, accountId: personAccount.id },
         { type: DEBT, accountId: personAccount.id },
     ];
-    await scenario.runner.runGroup(TransactionTests.createFromPersonAccount, data);
+    await App.scenario.runner.runGroup(TransactionTests.createFromPersonAccount, data);
 };
 
 const availabilityTests = async (directNavigate) => {
-    const { RUB } = scenario;
+    const { RUB } = App.scenario;
 
     if (directNavigate) {
         setBlock('Transaction availability: direct navigation', 1);
@@ -601,14 +599,9 @@ const availabilityTests = async (directNavigate) => {
 };
 
 export const transactionTests = {
-    /** Initialize tests */
-    init(scenarioInstance) {
-        scenario = scenarioInstance;
-    },
-
     /** Create accounts and persons required for transaction view tests */
     async prepare() {
-        const { RUB, USD, EUR } = scenario;
+        const { RUB, USD, EUR } = App.scenario;
 
         const accList = [{
             name: 'acc_3',
@@ -680,8 +673,8 @@ export const transactionTests = {
         await createTests();
         await updateTests();
 
-        await transactionsListTests.initAndRun(scenario);
-        await importTests.initAndRun(scenario);
+        await transactionsListTests.run();
+        await importTests.run();
 
         await deleteTests();
         await deleteFromUpdateTests();
@@ -692,11 +685,5 @@ export const transactionTests = {
         await createFromPersonAccount();
         await availabilityTests(false);
         await availabilityTests(true);
-    },
-
-    /** Initialize and run tests */
-    async initAndRun(scenarioInstance) {
-        this.init(scenarioInstance);
-        await this.run();
     },
 };

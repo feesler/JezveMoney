@@ -2,14 +2,7 @@ import { setBlock } from 'jezve-test';
 import * as ProfileTests from '../run/profile.js';
 import { App } from '../Application.js';
 
-let scenario = null;
-
 export const profileTests = {
-    /** Initialize tests */
-    init(scenarioInstance) {
-        scenario = scenarioInstance;
-    },
-
     /** Run account view tests */
     async run() {
         setBlock('Profile tests', 1);
@@ -23,7 +16,7 @@ export const profileTests = {
         await ProfileTests.register(App.config.newUser);
         await ProfileTests.deleteProfile();
 
-        await scenario.runner.runGroup(ProfileTests.register, [{
+        await App.scenario.runner.runGroup(ProfileTests.register, [{
             login: '',
             name: '',
             password: '',
@@ -42,7 +35,7 @@ export const profileTests = {
         }]);
 
         // Login tests
-        await scenario.runner.runGroup(ProfileTests.relogin, [{
+        await App.scenario.runner.runGroup(ProfileTests.relogin, [{
             login: App.config.testUser.login,
             password: '',
         }, {
@@ -60,7 +53,7 @@ export const profileTests = {
         await ProfileTests.openAbout();
 
         // Change name tests
-        await scenario.runner.runGroup(ProfileTests.changeName, [
+        await App.scenario.runner.runGroup(ProfileTests.changeName, [
             '',
             origUserName,
             '^^&&>>',
@@ -68,7 +61,7 @@ export const profileTests = {
         ]);
 
         // Change password tests
-        await scenario.runner.runGroup(ProfileTests.changePass, [{
+        await App.scenario.runner.runGroup(ProfileTests.changePass, [{
             oldPassword: '',
             newPassword: '',
         }, {
@@ -92,11 +85,5 @@ export const profileTests = {
 
         await ProfileTests.resetAccounts();
         await ProfileTests.resetAll();
-    },
-
-    /** Initialize and run tests */
-    async initAndRun(scenarioInstance) {
-        this.init(scenarioInstance);
-        await this.run();
     },
 };

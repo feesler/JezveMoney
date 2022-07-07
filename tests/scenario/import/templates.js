@@ -1,13 +1,12 @@
 import { setBlock } from 'jezve-test';
 import * as ImportTests from '../../run/import/index.js';
-
-let scenario = null;
+import { App } from '../../Application.js';
 
 // Create import template tests
 const runCreateTests = async () => {
     setBlock('Create import template', 2);
     // Select columns for template
-    await scenario.runner.runGroup(ImportTests.selectTemplateColumn, [
+    await App.scenario.runner.runGroup(ImportTests.selectTemplateColumn, [
         { column: 'accountAmount', index: 11 },
         { column: 'transactionAmount', index: 9 },
         { column: 'accountCurrency', index: 10 },
@@ -21,7 +20,7 @@ const runCreateTests = async () => {
 
     // Create another template
     await ImportTests.createTemplate();
-    await scenario.runner.runGroup(ImportTests.selectTemplateColumn, [
+    await App.scenario.runner.runGroup(ImportTests.selectTemplateColumn, [
         { column: 'accountAmount', index: 11 },
         { column: 'transactionAmount', index: 9 },
         { column: 'accountCurrency', index: 10 },
@@ -40,7 +39,7 @@ const runUpdateTests = async () => {
     await ImportTests.selectTemplateByIndex(0);
     await ImportTests.updateTemplate();
     await ImportTests.inputTemplateName('Template_2');
-    await scenario.runner.runGroup(ImportTests.selectTemplateColumn, [
+    await App.scenario.runner.runGroup(ImportTests.selectTemplateColumn, [
         { column: 'transactionAmount', index: 11 },
         { column: 'transactionCurrency', index: 10 },
     ]);
@@ -56,21 +55,10 @@ const runDeleteTests = async () => {
 };
 
 export const importTemplateTests = {
-    /** Initialize tests */
-    init(scenarioInstance) {
-        scenario = scenarioInstance;
-    },
-
     /** Run import template tests */
     async run() {
         await runCreateTests();
         await runUpdateTests();
         await runDeleteTests();
-    },
-
-    /** Initialize and run tests */
-    async initAndRun(scenarioInstance) {
-        this.init(scenarioInstance);
-        await this.run();
     },
 };

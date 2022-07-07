@@ -2,8 +2,6 @@ import { setBlock } from 'jezve-test';
 import * as ImportTests from '../../run/import/index.js';
 import { App } from '../../Application.js';
 
-let scenario = null;
-
 const runCreateTests = async () => {
     setBlock('Add item', 2);
 
@@ -24,11 +22,11 @@ const runDeleteTests = async () => {
 };
 
 const runStateLoopTests = async () => {
-    const { RUB, USD } = scenario;
+    const { RUB, USD } = App.scenario;
 
     setBlock('Import item state loop', 2);
 
-    await ImportTests.changeMainAccount(scenario.ACC_3);
+    await ImportTests.changeMainAccount(App.scenario.ACC_3);
 
     await ImportTests.updateItem({
         pos: 0,
@@ -76,23 +74,23 @@ const runStateLoopTests = async () => {
             { action: 'changeType', data: 'income' }, // 10-3
             { action: 'changeCurrency', data: USD }, // 3-4
             { action: 'changeType', data: 'transferfrom' }, // 4-5
-            { action: 'changeDestAccount', data: scenario.ACC_USD }, // 5-6
+            { action: 'changeDestAccount', data: App.scenario.ACC_USD }, // 5-6
             { action: 'changeType', data: 'expense' }, // 6-1
             { action: 'changeType', data: 'transferfrom' }, // 1-5
-            { action: 'changeDestAccount', data: scenario.ACC_USD }, // 5-6
+            { action: 'changeDestAccount', data: App.scenario.ACC_USD }, // 5-6
             { action: 'changeType', data: 'income' }, // 6-3
             { action: 'changeType', data: 'transferfrom' }, // 3-5
-            { action: 'changeDestAccount', data: scenario.ACC_USD }, // 5-6
-            { action: 'changeDestAccount', data: scenario.ACC_RUB }, // 6-5
-            { action: 'changeDestAccount', data: scenario.ACC_USD }, // 5-6
+            { action: 'changeDestAccount', data: App.scenario.ACC_USD }, // 5-6
+            { action: 'changeDestAccount', data: App.scenario.ACC_RUB }, // 6-5
+            { action: 'changeDestAccount', data: App.scenario.ACC_USD }, // 5-6
             { action: 'changeType', data: 'transferto' }, // 6-8
             { action: 'changeType', data: 'expense' }, // 8-1
             { action: 'changeType', data: 'transferto' }, // 1-7
-            { action: 'changeDestAccount', data: scenario.ACC_USD }, // 7-8
+            { action: 'changeDestAccount', data: App.scenario.ACC_USD }, // 7-8
             { action: 'changeType', data: 'income' }, // 8-3
             { action: 'changeCurrency', data: USD }, // 3-4
             { action: 'changeType', data: 'transferto' }, // 4-7
-            { action: 'changeDestAccount', data: scenario.ACC_USD }, // 7-8
+            { action: 'changeDestAccount', data: App.scenario.ACC_USD }, // 7-8
         ],
     });
 
@@ -124,7 +122,7 @@ const runStateLoopTests = async () => {
         pos: 5,
         action: [
             { action: 'changeType', data: 'transferfrom' }, // 1-5
-            { action: 'changeDestAccount', data: scenario.ACC_USD }, // 5-6
+            { action: 'changeDestAccount', data: App.scenario.ACC_USD }, // 5-6
             { action: 'inputDestAmount', data: '50.03' },
         ],
     });
@@ -136,32 +134,32 @@ const runStateLoopTests = async () => {
         pos: 7,
         action: [
             { action: 'changeType', data: 'debtfrom' }, // 1-9
-            { action: 'changePerson', data: scenario.ALEX },
+            { action: 'changePerson', data: App.scenario.ALEX },
         ],
     });
     await ImportTests.updateItem({
         pos: 8,
         action: { action: 'changeType', data: 'debtto' }, // 1-10
     });
-    await ImportTests.changeMainAccount(scenario.ACC_EUR);
+    await ImportTests.changeMainAccount(App.scenario.ACC_EUR);
     await ImportTests.updateItem({
         pos: 0,
         action: [
             { action: 'changeType', data: 'transferto' },
-            { action: 'changeDestAccount', data: scenario.ACC_3 }, // 8-8
+            { action: 'changeDestAccount', data: App.scenario.ACC_3 }, // 8-8
         ],
     });
-    await ImportTests.changeMainAccount(scenario.ACC_3); // for item 0: 8-1
+    await ImportTests.changeMainAccount(App.scenario.ACC_3); // for item 0: 8-1
     await ImportTests.updateItem({
         pos: 0,
         action: [
             { action: 'changeType', data: 'transferto' }, // 1-6
-            { action: 'changeDestAccount', data: scenario.ACC_USD }, // 7-8
+            { action: 'changeDestAccount', data: App.scenario.ACC_USD }, // 7-8
             { action: 'changeType', data: 'transferfrom' }, // 8-6
             { action: 'changeType', data: 'debtfrom' }, // 6-9
             { action: 'changeType', data: 'debtto' }, // 9-10
             { action: 'changeType', data: 'transferto' }, // 10-7
-            { action: 'changeDestAccount', data: scenario.ACC_USD }, // 7-8
+            { action: 'changeDestAccount', data: App.scenario.ACC_USD }, // 7-8
             { action: 'changeType', data: 'debtfrom' }, // 8-9
             { action: 'changeType', data: 'income' }, // 9-3
             { action: 'changeCurrency', data: USD }, // 3-4
@@ -171,10 +169,10 @@ const runStateLoopTests = async () => {
             { action: 'changeType', data: 'debtto' }, // 4-10
             { action: 'changeType', data: 'debtfrom' }, // 10-9
             { action: 'changeType', data: 'transferfrom' }, // 9-5
-            { action: 'changeDestAccount', data: scenario.ACC_USD }, // 5-6
+            { action: 'changeDestAccount', data: App.scenario.ACC_USD }, // 5-6
             { action: 'changeType', data: 'debtto' }, // 6-10
             { action: 'changeType', data: 'transferto' }, // 10-7
-            { action: 'changeDestAccount', data: scenario.ACC_USD }, // 7-8
+            { action: 'changeDestAccount', data: App.scenario.ACC_USD }, // 7-8
             { action: 'changeType', data: 'debtto' }, // 8-10
             { action: 'changeType', data: 'expense' }, // 10-1
             { action: 'changeCurrency', data: USD }, // 1-2
@@ -189,7 +187,7 @@ const runStateLoopTests = async () => {
         pos: 7,
         action: [
             { action: 'changeType', data: 'debtto' },
-            { action: 'changePerson', data: scenario.MARIA },
+            { action: 'changePerson', data: App.scenario.MARIA },
         ],
     });
 
@@ -197,11 +195,6 @@ const runStateLoopTests = async () => {
 };
 
 export const importItemsTests = {
-    /** Initialize tests */
-    init(scenarioInstance) {
-        scenario = scenarioInstance;
-    },
-
     /** Run import item create tests */
     async createTests() {
         await runCreateTests();
@@ -215,11 +208,5 @@ export const importItemsTests = {
     /** Run import item state loop tests */
     async stateLoopTests() {
         await runStateLoopTests();
-    },
-
-    /** Initialize and run tests */
-    async initAndRun(scenarioInstance) {
-        this.init(scenarioInstance);
-        await this.run();
     },
 };
