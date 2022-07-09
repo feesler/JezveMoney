@@ -6,8 +6,8 @@ import {
     navigation,
     isVisible,
 } from 'jezve-test';
+import { DropDown } from 'jezvejs/tests';
 import { AppView } from './AppView.js';
-import { DropDown } from './component/DropDown.js';
 import { TransactionTypeMenu } from './component/TransactionTypeMenu.js';
 
 /** Statistics view class */

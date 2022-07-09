@@ -8,8 +8,8 @@ import {
     input,
 } from 'jezve-test';
 import { copyObject } from 'jezvejs';
+import { DatePicker } from 'jezvejs/tests';
 import { IconLink } from './IconLink.js';
-import { DatePicker } from './DatePicker.js';
 
 export class DatePickerFilter extends TestComponent {
     async parseContent() {

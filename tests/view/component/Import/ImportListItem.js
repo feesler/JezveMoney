@@ -10,7 +10,7 @@ import {
 } from 'jezve-test';
 import { copyObject } from 'jezvejs';
 import { formatDate } from 'jezvejs/DateUtils';
-import { DropDown } from '../DropDown.js';
+import { Checkbox, DropDown } from 'jezvejs/tests';
 import {
     EXPENSE,
     INCOME,
@@ -25,7 +25,6 @@ import {
     fixFloat,
 } from '../../../common.js';
 import { App } from '../../../Application.js';
-import { Checkbox } from '../Checkbox.js';
 
 export class ImportListItem extends TestComponent {
     constructor(parent, elem, mainAccount) {

@@ -7,7 +7,7 @@ import {
     hasClass,
     input,
 } from 'jezve-test';
-import { DropDown } from './DropDown.js';
+import { DropDown } from 'jezvejs/tests';
 
 export class InputRow extends TestComponent {
     async parseContent() {
