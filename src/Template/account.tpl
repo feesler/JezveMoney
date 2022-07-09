@@ -32,7 +32,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         </div>
                         <div class="view-row std_margin">
                             <label for="icon">Icon</label>
-                            <div class="std_margin">
+                            <div>
                                 <select id="icon" name="icon_id">
 <?php	if ($accInfo->icon_id == 0) {	?>
                                     <option value="0" selected>No icon</option>
@@ -51,12 +51,12 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         </div>
                         <div id="name-inp-block" class="validation-block view-row std_margin">
                             <label for="accname">Account name</label>
-                            <input id="accname" class="stretch-input std_margin" name="name" type="text" autocomplete="off" value="<?=e($accInfo->name)?>">
+                            <input id="accname" class="stretch-input" name="name" type="text" autocomplete="off" value="<?=e($accInfo->name)?>">
                             <div id="namefeedback" class="invalid-feedback"></div>
                         </div>
                         <div class="view-row std_margin">
                             <label for="currency">Currency</label>
-                            <div class="std_margin">
+                            <div>
                                 <select id="currency" name="curr_id">
 <?php	foreach($currArr as $currInfo) {
             if ($currInfo->id == $accInfo->curr_id) {	?>
@@ -70,7 +70,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         </div>
                         <div id="initbal-inp-block" class="validation-block view-row std_margin">
                             <label for="balance">Initial balance</label>
-                            <div class="input-group std_margin">
+                            <div class="input-group">
                                 <input id="balance" class="stretch-input amount-input input-group__item" name="initbalance" type="text" autocomplete="off" value="<?=e($accInfo->initbalance)?>">
                                 <div class="btn input-group__btn input-group__item" disabled>
                                     <div id="currsign"><?=e($accInfo->sign)?></div>
