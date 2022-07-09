@@ -40,7 +40,7 @@
 /* Sticky header */
 .content-header {
   position: sticky;
-  top: 0;
+  top: 50px;
   z-index: 10;
   padding: 10px 0;
 }
@@ -156,4 +156,12 @@
   font-weight: 400;
   z-index: 1000;
   background-color: rgb(50 50 50 / 70%);
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  /* Sticky header */
+  .content-header {
+    top: 0;
+  }
 }
