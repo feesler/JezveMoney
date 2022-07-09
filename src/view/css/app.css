@@ -254,6 +254,12 @@ label {
 }
 
 .page_wrapper {
+  display: table;
+  height: 100%;
+  min-height: 100%;
+}
+
+.page-content {
   display: flex;
   flex-flow: row nowrap;
   min-height: 100%;
@@ -663,6 +669,10 @@ label {
 
 /* Desktop */
 @media (min-width: 768px) {
+  .content_wrap {
+    padding: 50px 12px 50px 212px;
+  }
+
   .filter-item .trtype-menu {
     flex-flow: row nowrap;
   }
