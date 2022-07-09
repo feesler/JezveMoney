@@ -333,11 +333,7 @@ class Transactions extends TemplateController
         // Redirect if invalid or hidden account is specified
         if ($acc_id) {
             $account = $this->accModel->getItem($acc_id);
-            if (
-                !$account
-                || $this->accModel->isHidden($account)
-                || $account->owner_id != $this->owner_id
-            ) {
+            if (!$account || $account->owner_id != $this->owner_id) {
                 $this->fail($defMsg);
             }
         }
@@ -357,7 +353,7 @@ class Transactions extends TemplateController
         }
         if ($person_id) {
             $pObj = $this->personMod->getItem($person_id);
-            if (!$pObj || $this->personMod->isHidden($pObj)) {
+            if (!$pObj) {
                 $this->fail($defMsg);
             }
         } else {
@@ -866,7 +862,9 @@ class Transactions extends TemplateController
             $rtDestResBal = ($dest) ? $this->currModel->format($dest->balance, $tr["dest_curr"]) : null;
         } else {
             $acc_res_balance = ($debtAcc) ? $debtAcc->balance : 0;
-            $acc_res_balance += ($debtType) ? $tr["dest_amount"] : -$tr["src_amount"];
+            if ($noAccount) {
+                $acc_res_balance += ($debtType) ? $tr["dest_amount"] : -$tr["src_amount"];
+            }
             $srcResBalance = ($debtType) ? $person_res_balance : $acc_res_balance;
             $destResBalance = ($debtType) ? $acc_res_balance : $person_res_balance;
             $rtSrcResBal = $this->currModel->format($srcResBalance, $tr["src_curr"]);

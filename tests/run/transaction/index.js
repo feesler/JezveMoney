@@ -403,30 +403,6 @@ export const securityTests = async () => {
     });
 };
 
-/** Check navigation to create transaction with hidden account */
-export const createFromHiddenAccount = async ({ type, accountId }) => {
-    const typeString = Transaction.typeToString(type);
-    await test(`Create ${typeString} transaction from hidden account`, async () => {
-        const userAccounts = App.state.accounts.getUserAccounts();
-        const account = userAccounts.getItem(accountId);
-        assert(account, `Account ${accountId} not found`);
-        assert(userAccounts.isHidden(account), 'Hidden account is expected');
-
-        const requestType = typeString.toLowerCase();
-        const requestURL = `${baseUrl()}transactions/create/?acc_id=${accountId}&type=${requestType}`;
-        await goTo(requestURL);
-        assert.instanceOf(App.view, MainView, 'Invalid view');
-
-        App.view.expectedState = {
-            msgPopup: { success: false, message: 'Fail to create new transaction.' },
-        };
-        await App.view.checkState();
-        await App.view.closeNotification();
-
-        return true;
-    });
-};
-
 /** Check navigation to create transaction with person account */
 export const createFromPersonAccount = async ({ type, accountId }) => {
     const typeString = Transaction.typeToString(type);

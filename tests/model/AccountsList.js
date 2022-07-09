@@ -175,31 +175,31 @@ export class AccountsList extends List {
     }
 
     /**
-     * Return another visible user account id if possible
+     * Return another user account id if possible
      * Return first account if no id specified
      * Return zero if no account found
      * @param {number} accountId - identifier of account
      */
     getNext(accountId = 0) {
-        const userVisible = this.getUserVisible();
-        if (!userVisible || !userVisible.length) {
+        const userAccounts = this.getUserAccounts();
+        if (!userAccounts || !userAccounts.length) {
             return 0;
         }
 
         if (!accountId) {
-            return userVisible.indexToId(0);
+            return userAccounts.indexToId(0);
         }
 
-        if (userVisible.length < 2) {
+        if (userAccounts.length < 2) {
             return 0;
         }
-        let ind = userVisible.getIndexById(accountId);
+        let ind = userAccounts.getIndexById(accountId);
         if (ind === -1) {
             return 0;
         }
 
-        ind = (ind === userVisible.length - 1) ? 0 : ind + 1;
+        ind = (ind === userAccounts.length - 1) ? 0 : ind + 1;
 
-        return userVisible.indexToId(ind);
+        return userAccounts.indexToId(ind);
     }
 }

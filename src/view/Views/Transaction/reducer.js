@@ -164,12 +164,12 @@ const setStateDestAmount = (state, amount) => {
 };
 
 const setStateNextSourceAccount = (state, accountId) => {
-    const { visibleUserAccounts } = window.app.model;
+    const { userAccounts } = window.app.model;
     const accountModel = window.app.model.accounts;
     const currencyModel = window.app.model.currency;
     const result = state;
 
-    const nextAccountId = visibleUserAccounts.getNextAccount(accountId);
+    const nextAccountId = userAccounts.getNextAccount(accountId);
     const srcAccount = accountModel.getItem(nextAccountId);
     if (!srcAccount) {
         throw new Error('Next account not found');
@@ -181,12 +181,12 @@ const setStateNextSourceAccount = (state, accountId) => {
 };
 
 const setStateNextDestAccount = (state, accountId) => {
-    const { visibleUserAccounts } = window.app.model;
+    const { userAccounts } = window.app.model;
     const accountModel = window.app.model.accounts;
     const currencyModel = window.app.model.currency;
     const result = state;
 
-    const nextAccountId = visibleUserAccounts.getNextAccount(accountId);
+    const nextAccountId = userAccounts.getNextAccount(accountId);
     const destAccount = accountModel.getItem(nextAccountId);
     if (!destAccount) {
         throw new Error('Next account not found');
@@ -434,17 +434,7 @@ const reduceSourceAccountChange = (state, accountId) => {
 
     if (transaction.type === TRANSFER) {
         if (accountId === transaction.dest_id) {
-            const { visibleUserAccounts } = window.app.model;
-            // TODO: use here setStateNextDestAccount
-            const nextAccountId = visibleUserAccounts.getNextAccount(accountId);
-            const destAccount = window.app.model.accounts.getItem(nextAccountId);
-            if (!destAccount) {
-                throw new Error('Next account not found');
-            }
-            newState.destAccount = destAccount;
-            transaction.dest_id = destAccount.id;
-            transaction.dest_curr = destAccount.curr_id;
-            newState.destCurrency = window.app.model.currency.getItem(destAccount.curr_id);
+            setStateNextDestAccount(newState, accountId);
 
             // TODO : investigate unconditional copying of amount for different currencies case
             // Copy source amount to destination amount
@@ -534,17 +524,7 @@ const reduceDestAccountChange = (state, accountId) => {
 
     if (transaction.type === TRANSFER) {
         if (accountId === newState.transaction.src_id) {
-            const { visibleUserAccounts } = window.app.model;
-            // TODO: use here setStateNextSourceAccount
-            const nextAccountId = visibleUserAccounts.getNextAccount(accountId);
-            const srcAccount = window.app.model.accounts.getItem(nextAccountId);
-            if (!srcAccount) {
-                throw new Error('Next account not found');
-            }
-            newState.srcAccount = srcAccount;
-            transaction.src_id = srcAccount.id;
-            transaction.src_curr = srcAccount.curr_id;
-            newState.srcCurrency = window.app.model.currency.getItem(srcAccount.curr_id);
+            setStateNextSourceAccount(newState, accountId);
 
             // TODO : investigate unconditional copying of amount for different currencies case
             // Copy source amount to destination amount
@@ -1056,7 +1036,7 @@ const reduceInvalidateDate = (state) => ({
 const reduceTypeChange = (state, type) => {
     const accountModel = window.app.model.accounts;
     const currencyModel = window.app.model.currency;
-    const { visibleUserAccounts, visiblePersons } = window.app.model;
+    const { userAccounts, persons } = window.app.model;
 
     if (state.transaction.type === type) {
         return state;
@@ -1076,11 +1056,11 @@ const reduceTypeChange = (state, type) => {
 
     // Check availability of selected type of transaction
     if (type === EXPENSE || type === INCOME) {
-        newState.isAvailable = visibleUserAccounts.length > 0;
+        newState.isAvailable = userAccounts.length > 0;
     } else if (type === TRANSFER) {
-        newState.isAvailable = visibleUserAccounts.length > 1;
+        newState.isAvailable = userAccounts.length > 1;
     } else if (type === DEBT) {
-        newState.isAvailable = visiblePersons.length > 0;
+        newState.isAvailable = persons.length > 0;
     }
 
     if (!newState.isAvailable) {
@@ -1096,7 +1076,7 @@ const reduceTypeChange = (state, type) => {
         if (!state.isAvailable) {
             newState.id = 0;
 
-            const srcAccount = visibleUserAccounts.getItemByIndex(0);
+            const srcAccount = userAccounts.getItemByIndex(0);
             const srcCurrency = currencyModel.getItem(srcAccount.curr_id);
             const destCurrency = currencyModel.getItem(srcAccount.curr_id);
 
@@ -1136,7 +1116,7 @@ const reduceTypeChange = (state, type) => {
         } else if (currentType === DEBT) {
             const fromAccount = (state.account)
                 ? state.account
-                : visibleUserAccounts.getItemByIndex(0);
+                : userAccounts.getItemByIndex(0);
 
             newState.id = 0;
             newState.srcAccount = fromAccount;
@@ -1163,7 +1143,7 @@ const reduceTypeChange = (state, type) => {
         if (!state.isAvailable) {
             newState.id = 0;
 
-            const destAccount = visibleUserAccounts.getItemByIndex(0);
+            const destAccount = userAccounts.getItemByIndex(0);
             const srcCurrency = currencyModel.getItem(destAccount.curr_id);
             const destCurrency = currencyModel.getItem(destAccount.curr_id);
 
@@ -1203,7 +1183,7 @@ const reduceTypeChange = (state, type) => {
         } else if (currentType === DEBT) {
             const fromAccount = (state.account)
                 ? state.account
-                : visibleUserAccounts.getItemByIndex(0);
+                : userAccounts.getItemByIndex(0);
 
             newState.id = 0;
             newState.destAccount = fromAccount;
@@ -1230,7 +1210,7 @@ const reduceTypeChange = (state, type) => {
             setStateNextSourceAccount(newState, transaction.dest_id);
         } else if (currentType === DEBT) {
             if (!state.isAvailable) {
-                const srcAccount = visibleUserAccounts.getItemByIndex(0);
+                const srcAccount = userAccounts.getItemByIndex(0);
                 const srcCurrency = currencyModel.getItem(srcAccount.curr_id);
 
                 transaction.src_id = srcAccount.id;
@@ -1250,7 +1230,7 @@ const reduceTypeChange = (state, type) => {
             } else {
                 const srcAccount = (state.account)
                     ? state.account
-                    : visibleUserAccounts.getItemByIndex(0);
+                    : userAccounts.getItemByIndex(0);
 
                 newState.srcAccount = srcAccount;
                 transaction.src_id = srcAccount.id;
@@ -1270,7 +1250,7 @@ const reduceTypeChange = (state, type) => {
     }
 
     if (type === DEBT) {
-        const person = visiblePersons.getItemByIndex(0);
+        const person = persons.getItemByIndex(0);
         newState.person = person;
         transaction.person_id = person.id;
 

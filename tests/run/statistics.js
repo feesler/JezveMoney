@@ -13,13 +13,13 @@ export const run = async () => {
     await App.view.navigateToStatistics();
 
     // Expense transactions filter
-    const expected = { chart: { bars: { length: 2 } } };
+    const expected = { chart: { bars: { length: 3 } } };
     await test('Expense statistics view', () => App.view.checkState(expected));
 
     // Income transactions filter
     await App.view.filterByType(INCOME);
 
-    expected.chart.bars.length = 3;
+    expected.chart.bars.length = 5;
     await test('Income statistics view', () => App.view.checkState(expected));
 
     // Transfer transactions filter
@@ -31,7 +31,7 @@ export const run = async () => {
     // Debt transactions filter
     await App.view.filterByType(DEBT);
 
-    expected.chart.bars.length = 1;
+    expected.chart.bars.length = 0;
     await test('Debt statistics view', () => App.view.checkState(expected));
 
     // Filter by accounts

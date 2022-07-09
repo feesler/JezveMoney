@@ -1,4 +1,4 @@
-import { setBlock } from 'jezve-test';
+import { setBlock, assert } from 'jezve-test';
 import {
     EXPENSE,
     INCOME,
@@ -15,11 +15,12 @@ import { transactionsListTests } from './transactionList.js';
 import { importTests } from './import.js';
 import { App } from '../Application.js';
 import { ACCOUNT_HIDDEN } from '../model/AccountsList.js';
+import { PERSON_HIDDEN } from '../model/PersonsList.js';
 
 const createExpenseTests = async () => {
     setBlock('Create expense transactions', 1);
-
     const { RUB, KRW } = App.scenario;
+
     const data = [{
         fromAccount: 0,
         destAmount: '123.7801',
@@ -38,6 +39,11 @@ const createExpenseTests = async () => {
         srcAcc: 4,
         destAmount: '99.99',
         date: App.dates.monthAgo,
+    }, {
+        // Check available to create transaction with hidden account
+        fromAccount: 0,
+        srcAcc: App.scenario.HIDDEN_ACCOUNT_IND,
+        destAmount: '0.01',
     }, {
         // Try to submit expense with invalid amount
         fromAccount: 0,
@@ -81,6 +87,11 @@ const createIncomeTests = async () => {
         srcAmount: '99.99',
         date: App.dates.monthAgo,
     }, {
+        // Check available to create transaction with hidden account
+        fromAccount: 0,
+        destAcc: App.scenario.HIDDEN_ACCOUNT_IND,
+        srcAmount: '0.01',
+    }, {
         // Try to submit income with invalid amount
         fromAccount: 0,
         srcAmount: '',
@@ -123,6 +134,13 @@ const createTransferTests = async () => {
         destAcc: 3,
         srcAmount: '10',
         destAmount: '9.50',
+    }, {
+        // Check available to create transaction with hidden account
+        fromAccount: 0,
+        srcAcc: 2,
+        destAcc: App.scenario.HIDDEN_ACCOUNT_IND,
+        srcAmount: '1',
+        destAmount: '75',
     }, {
         // Try to submit transfer with invalid amount
         srcAmount: '',
@@ -171,6 +189,16 @@ const createDebtTests = async () => {
         acc: null,
         srcAmount: '105',
     }, {
+        // Check available to create transaction with hidden person
+        fromPerson: 0,
+        person: App.scenario.HIDDEN_PERSON_IND,
+        srcAmount: '0.01',
+    }, {
+        // Check available to create transaction with hidden account
+        fromPerson: 1,
+        acc: App.scenario.HIDDEN_ACCOUNT_IND,
+        srcAmount: '105',
+    }, {
         // Try to submit debt with invalid amount
         srcAmount: '',
     }, {
@@ -185,7 +213,7 @@ const createDebtTests = async () => {
 const updateExpenseTests = async () => {
     setBlock('Update expense transactions', 2);
 
-    const { RUB } = App.scenario;
+    const { USD } = App.scenario;
     const data = [{
         pos: 3,
         destAmount: '124.7701',
@@ -193,7 +221,7 @@ const updateExpenseTests = async () => {
         pos: 0,
         srcAmount: '101',
         destAmount: '7065.30',
-        destCurr: RUB,
+        destCurr: USD,
     }, {
         pos: 2,
         destAmount: '0.02',
@@ -203,6 +231,11 @@ const updateExpenseTests = async () => {
         srcAcc: 3,
         destAmount: '99.9',
         date: App.dates.yesterday,
+    }, {
+        // Check available to update transaction with hidden account
+        pos: 4,
+        srcAcc: App.scenario.HIDDEN_ACCOUNT_IND,
+        destAmount: '99.9',
     }];
 
     await App.scenario.runner.runGroup(ExpenseTransactionTests.update, data);
@@ -211,7 +244,7 @@ const updateExpenseTests = async () => {
 const updateIncomeTests = async () => {
     setBlock('Update income transactions', 2);
 
-    const { RUB } = App.scenario;
+    const { USD } = App.scenario;
     const data = [{
         pos: 1,
         srcAmount: '100.001',
@@ -223,10 +256,15 @@ const updateIncomeTests = async () => {
         pos: 0,
         srcAmount: '7065.30',
         destAmount: '101',
-        srcCurr: RUB,
+        srcCurr: USD,
     }, {
         pos: 3,
         destAcc: 3,
+        srcAmount: '99.9',
+    }, {
+        // Check available to update transaction with hidden account
+        pos: 4,
+        destAcc: App.scenario.HIDDEN_ACCOUNT_IND,
         srcAmount: '99.9',
     }];
 
@@ -257,6 +295,11 @@ const updateTransferTests = async () => {
     }, {
         pos: 4,
         srcAmount: '1050.01',
+    }, {
+        // Check available to update transaction with hidden account
+        pos: 5,
+        srcAcc: App.scenario.HIDDEN_ACCOUNT_IND,
+        srcAmount: '1000',
     }];
 
     await App.scenario.runner.runGroup(TransferTransactionTests.update, data);
@@ -292,6 +335,16 @@ const updateDebtTests = async () => {
         pos: 2,
         srcAmount: '1001',
         date: App.dates.weekAgo,
+    }, {
+        // Check available to update transaction with hidden person
+        pos: 0,
+        acc: App.scenario.HIDDEN_PERSON_IND,
+        srcAmount: '105',
+    }, {
+        // Check available to update transaction with hidden account
+        pos: 1,
+        acc: App.scenario.HIDDEN_ACCOUNT_IND,
+        srcAmount: '105',
     }];
 
     await App.scenario.runner.runGroup(DebtTransactionTests.update, data);
@@ -390,46 +443,6 @@ const deleteFromUpdateTests = async () => {
         (pos) => TransactionTests.delFromUpdate(DEBT, pos),
         data,
     );
-};
-
-const createFromHiddenAccount = async () => {
-    setBlock('Create transaction from hidden account', 2);
-
-    const { RUB } = App.scenario;
-
-    // Remove all accounts and persons
-    await api.account.reset();
-    const personIds = App.state.persons.getIds();
-    if (personIds.length > 0) {
-        await api.person.del(personIds);
-    }
-
-    // Create hidden account
-    await api.account.create({
-        name: 'Account 1',
-        curr_id: RUB,
-        initbalance: '1',
-        icon_id: 1,
-        flags: ACCOUNT_HIDDEN,
-    });
-    // Create visible account
-    await api.account.create({
-        name: 'Account 2',
-        curr_id: RUB,
-        initbalance: '2',
-        icon_id: 1,
-        flags: 0,
-    });
-    await App.state.fetch();
-    const [account1] = App.state.accounts.getIds();
-
-    const data = [
-        { type: EXPENSE, accountId: account1 },
-        { type: INCOME, accountId: account1 },
-        { type: TRANSFER, accountId: account1 },
-        { type: DEBT, accountId: account1 },
-    ];
-    await App.scenario.runner.runGroup(TransactionTests.createFromHiddenAccount, data);
 };
 
 const createFromPersonAccount = async () => {
@@ -601,6 +614,8 @@ const availabilityTests = async (directNavigate) => {
 export const transactionTests = {
     /** Create accounts and persons required for transaction view tests */
     async prepare() {
+        const HIDDEN_ACCOUNT_NAME = 'Hidden acc';
+        const HIDDEN_PERSON_NAME = 'Hidden person';
         const { RUB, USD, EUR } = App.scenario;
 
         const accList = [{
@@ -633,6 +648,12 @@ export const transactionTests = {
             initbalance: '35000.40',
             icon_id: 3,
             flags: 0,
+        }, {
+            name: HIDDEN_ACCOUNT_NAME,
+            curr_id: RUB,
+            initbalance: '100',
+            icon_id: 0,
+            flags: ACCOUNT_HIDDEN,
         }];
 
         for (const account of accList) {
@@ -649,6 +670,9 @@ export const transactionTests = {
         }, {
             name: 'Ivan<',
             flags: 0,
+        }, {
+            name: HIDDEN_PERSON_NAME,
+            flags: PERSON_HIDDEN,
         }];
 
         for (const person of personsList) {
@@ -660,6 +684,13 @@ export const transactionTests = {
         }
 
         await App.state.fetch();
+
+        const [hiddenAccountInd] = App.state.getAccountIndexesByNames(HIDDEN_ACCOUNT_NAME);
+        assert(hiddenAccountInd !== -1, `Account '${HIDDEN_ACCOUNT_NAME}' not found`);
+        App.scenario.HIDDEN_ACCOUNT_IND = hiddenAccountInd;
+        const [hiddenPersonInd] = App.state.getPersonIndexesByNames(HIDDEN_PERSON_NAME);
+        assert(hiddenPersonInd !== -1, `Person '${HIDDEN_PERSON_NAME}' not found`);
+        App.scenario.HIDDEN_PERSON_IND = hiddenPersonInd;
     },
 
     /** Run transaction view tests */
@@ -681,7 +712,6 @@ export const transactionTests = {
     },
 
     async runAvailabilityTests() {
-        await createFromHiddenAccount();
         await createFromPersonAccount();
         await availabilityTests(false);
         await availabilityTests(true);

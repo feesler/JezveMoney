@@ -55,6 +55,11 @@ export class List {
         return this.data.some(...args);
     }
 
+    /** Wrap method for array sort() method */
+    sort(...args) {
+        return this.data.sort(...args);
+    }
+
     /**
      * Assign new data to the list
      * @param {Array} data - array of list items
