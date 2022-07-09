@@ -25,7 +25,7 @@
     "copy-admin-all": "npm-run-all copy-admin copy-admin-themes",
     "copy-client-all": "npm-run-all copy-server copy-client copy-themes copy-polyfills",
     "copy-dist": "npm-run-all copy-admin-all copy-client-all",
-    "update-composer": "powershell \"cp ./composer.json -Destination ./dist/; cd ./dist; composer update --no-dev; rm composer.lock,composer.json\"",
+    "update-composer": "powershell \"cp ./composer.json -Destination ./dist/; cd ./dist; composer update --no-dev; composer dump-autoload -a --no-dev; rm composer.lock,composer.json\"",
     "postbuild": "npm run copy-dist",
     "postbuild-dev": "npm run copy-dist",
     "build-tests": "npx webpack --config ./webpack.tests.js"

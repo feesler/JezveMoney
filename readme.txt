@@ -62,15 +62,8 @@ $phpPath = "$osPanelPath\modules\php\PHP_7.4"
 - Update Node.js packages:
 	npm update
 
-- Composer
-Build and navigate to dist directory
-    npm run build
-    cd dist
-Update packages:
-	composer update --no-dev
-Optimize autoload:
-	composer dump-autoload -a --no-dev
-
+- Update composer packages
+    npm run update-composer
 
 - Phan
 Run from app root:
