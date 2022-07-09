@@ -21,7 +21,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
 
                     <div class="content-header<?=hidden(!$importAvailable)?>">
                         <div class="data-header">
-                            <div class="header-field account-field">
+                            <div class="header-field account-field std_margin">
                                 <label>Main account</label>
                                 <div class="header-field__content">
                                     <select id="acc_id">
@@ -44,11 +44,11 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 ])?>
                             </div>
                             <div class="header-info">
-                                <div class="header-field">
+                                <div class="header-field std_margin">
                                     <label>Total</label>
                                     <div class="header-field__content"><span id="trcount">0</span></div>
                                 </div>
-                                <div class="header-field">
+                                <div class="header-field std_margin">
                                     <label>Enabled</label>
                                     <div class="header-field__content"><span id="entrcount">0</span></div>
                                 </div>

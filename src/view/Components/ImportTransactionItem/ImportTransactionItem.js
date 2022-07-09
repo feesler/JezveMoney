@@ -127,7 +127,7 @@ export class ImportTransactionItem extends Component {
             placeholder: PH_FIELD_DEST_AMOUNT,
             autocomplete: 'off',
         }, null, { input: () => this.onDestAmountInput() });
-        this.destAmountField = createField(TITLE_FIELD_DEST_AMOUNT, this.destAmountInp, 'amount-field');
+        this.destAmountField = createField(TITLE_FIELD_DEST_AMOUNT, this.destAmountInp, 'amount-field hidden');
         this.destAmountLabel = this.destAmountField.querySelector('label');
         // Date field
         this.dateInp = ce('input', {
@@ -163,25 +163,23 @@ export class ImportTransactionItem extends Component {
         );
 
         this.topRow = createContainer('form-row', [
-            this.amountField,
             this.currField,
             this.dateField,
             this.commentField,
         ]);
 
-        this.bottomRow = createContainer('form-row hidden', [
-            this.destAmountField,
-        ]);
-
         this.formContainer = createContainer('form-container', [
-            createContainer('form-rows', [
+            createContainer('form-rows type-col', [
                 this.trTypeField,
                 this.destAccountField,
                 this.personField,
             ]),
+            createContainer('form-rows amount-col', [
+                this.amountField,
+                this.destAmountField,
+            ]),
             createContainer('form-rows', [
                 this.topRow,
-                this.bottomRow,
             ]),
         ]);
 
@@ -998,7 +996,6 @@ export class ImportTransactionItem extends Component {
         const isExpenseOrIncome = ['expense', 'income'].includes(state.type);
         const isTransfer = ['transferfrom', 'transferto'].includes(state.type);
         const isDebt = ['debtfrom', 'debtto'].includes(state.type);
-        const showBottom = (!isExpenseOrIncome || state.isDiff);
 
         if (state.enabled) {
             this.elem.classList.remove('import-item_disabled');
@@ -1021,9 +1018,6 @@ export class ImportTransactionItem extends Component {
         this.amountInp.value = state.amount;
         // Currency field
         this.currencyDropDown.selectItem(state.currId);
-
-        // Bottom row
-        show(this.bottomRow, showBottom);
 
         // Second account field
         this.destAccDropDown.enable(state.enabled && isTransfer);

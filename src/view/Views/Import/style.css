@@ -71,16 +71,11 @@
   margin-left: 0;
 }
 
-.header-field label {
-  font-size: 14px;
-}
-
 .header-field__content {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   height: 34px;
-  margin: 9px 0;
 }
 
 /* Main account header field */
