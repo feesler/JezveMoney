@@ -40,7 +40,7 @@
 /* Sticky header */
 .content-header {
   position: sticky;
-  top: 0;
+  top: 50px;
   z-index: 10;
   padding: 10px 0;
 }
@@ -71,16 +71,11 @@
   margin-left: 0;
 }
 
-.header-field label {
-  font-size: 14px;
-}
-
 .header-field__content {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   height: 34px;
-  margin: 9px 0;
 }
 
 /* Main account header field */
@@ -156,4 +151,12 @@
   font-weight: 400;
   z-index: 1000;
   background-color: rgb(50 50 50 / 70%);
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  /* Sticky header */
+  .content-header {
+    top: 0;
+  }
 }

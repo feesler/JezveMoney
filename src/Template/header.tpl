@@ -59,7 +59,7 @@
             <a class="nav-link" href="<?=BASEURL?>import/">Import</a>
             <div class="nav-separator"></div>
 <?php	}		?>
-            <a class="nav-link" href="<?=BASEURL?>about/">About</a>
+            <a class="nav-link nav-bottom-link" href="<?=BASEURL?>about/">About</a>
         </ul>
     </nav>
     <div class="navigation-bg"></div>

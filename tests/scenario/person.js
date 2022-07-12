@@ -1,7 +1,6 @@
 import { setBlock } from 'jezve-test';
 import * as PersonTests from '../run/person.js';
-
-let scenario = null;
+import { App } from '../Application.js';
 
 const createTests = async () => {
     setBlock('Create persons', 2);
@@ -18,7 +17,7 @@ const createTests = async () => {
         { name: 'Alex' },
     ];
 
-    await scenario.runner.runGroup(PersonTests.create, data);
+    await App.scenario.runner.runGroup(PersonTests.create, data);
 };
 
 const updateTests = async () => {
@@ -41,7 +40,7 @@ const updateTests = async () => {
         name: 'MARIA',
     }];
 
-    await scenario.runner.runGroup(PersonTests.update, data);
+    await App.scenario.runner.runGroup(PersonTests.update, data);
 };
 
 const deleteTests = async () => {
@@ -52,7 +51,7 @@ const deleteTests = async () => {
         [0, 2],
     ];
 
-    await scenario.runner.runGroup(PersonTests.del, data);
+    await App.scenario.runner.runGroup(PersonTests.del, data);
 };
 
 const deleteFromUpdateTests = async () => {
@@ -62,7 +61,7 @@ const deleteFromUpdateTests = async () => {
         0,
     ];
 
-    await scenario.runner.runGroup(PersonTests.delFromUpdate, data);
+    await App.scenario.runner.runGroup(PersonTests.delFromUpdate, data);
 };
 
 const hideTests = async () => {
@@ -73,7 +72,7 @@ const hideTests = async () => {
         [0, 1],
     ];
 
-    await scenario.runner.runGroup(PersonTests.hide, data);
+    await App.scenario.runner.runGroup(PersonTests.hide, data);
 };
 
 const showTests = async () => {
@@ -84,7 +83,7 @@ const showTests = async () => {
         [0, 4],
     ];
 
-    await scenario.runner.runGroup(PersonTests.show, data);
+    await App.scenario.runner.runGroup(PersonTests.show, data);
 };
 
 const toggleTests = async () => {
@@ -95,15 +94,10 @@ const toggleTests = async () => {
         [1, 2],
     ];
 
-    await scenario.runner.runGroup(PersonTests.toggleSelect, data);
+    await App.scenario.runner.runGroup(PersonTests.toggleSelect, data);
 };
 
 export const personTests = {
-    /** Initialize tests */
-    init(scenarioInstance) {
-        scenario = scenarioInstance;
-    },
-
     /** Run person view tests */
     async run() {
         setBlock('Persons', 1);
@@ -121,11 +115,5 @@ export const personTests = {
     /** Run person view tests with transactions */
     async runPostTransaction() {
         await deleteFromUpdateTests();
-    },
-
-    /** Initialize and run tests */
-    async initAndRun(scenarioInstance) {
-        this.init(scenarioInstance);
-        await this.run();
     },
 };

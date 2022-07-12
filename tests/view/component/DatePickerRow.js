@@ -5,9 +5,9 @@ import {
     isVisible,
     click,
 } from 'jezve-test';
+import { DatePicker } from 'jezvejs/tests';
 import { IconLink } from './IconLink.js';
 import { InputRow } from './InputRow.js';
-import { DatePicker } from './DatePicker.js';
 
 export class DatePickerRow extends TestComponent {
     async parseContent() {

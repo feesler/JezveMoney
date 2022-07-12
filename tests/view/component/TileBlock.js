@@ -4,8 +4,8 @@ import {
     query,
     prop,
 } from 'jezve-test';
+import { DropDown } from 'jezvejs/tests';
 import { Tile } from './Tile.js';
-import { DropDown } from './DropDown.js';
 
 export class TileBlock extends TestComponent {
     async parseContent() {

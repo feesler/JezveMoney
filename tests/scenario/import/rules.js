@@ -23,11 +23,9 @@ import * as ImportTests from '../../run/import/index.js';
 import { api } from '../../model/api.js';
 import { App } from '../../Application.js';
 
-let scenario = null;
-
 // Import rule action form test for no persons
 const noPersonTests = async () => {
-    const { RUB } = scenario;
+    const { RUB } = App.scenario;
 
     setBlock('No persons test', 1);
 
@@ -199,7 +197,7 @@ const runValidationTests = async () => {
         pos: 0,
         action: [
             { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
-            { action: 'changePerson', data: scenario.MARIA },
+            { action: 'changePerson', data: App.scenario.MARIA },
         ],
     });
     await ImportTests.submitRule();
@@ -209,7 +207,7 @@ const runValidationTests = async () => {
         pos: 0,
         action: [
             { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
-            { action: 'changeAccount', data: scenario.ACC_3 },
+            { action: 'changeAccount', data: App.scenario.ACC_3 },
         ],
     });
     await ImportTests.submitRule();
@@ -246,7 +244,7 @@ const runCreateTests = async () => {
     await ImportTests.createRuleCondition([
         { action: 'changeFieldType', data: IMPORT_COND_FIELD_MAIN_ACCOUNT },
         { action: 'changeOperator', data: IMPORT_COND_OP_NOT_EQUAL },
-        { action: 'changeAccount', data: scenario.ACC_EUR },
+        { action: 'changeAccount', data: App.scenario.ACC_EUR },
     ]);
     await ImportTests.createRuleCondition([
         { action: 'changeFieldType', data: IMPORT_COND_FIELD_TR_AMOUNT },
@@ -259,7 +257,7 @@ const runCreateTests = async () => {
     ]);
     await ImportTests.createRuleAction([
         { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
-        { action: 'changeAccount', data: scenario.ACC_EUR },
+        { action: 'changeAccount', data: App.scenario.ACC_EUR },
     ]);
     await ImportTests.submitRule();
 
@@ -268,7 +266,7 @@ const runCreateTests = async () => {
     await ImportTests.createRuleCondition([
         { action: 'changeFieldType', data: IMPORT_COND_FIELD_MAIN_ACCOUNT },
         { action: 'changeOperator', data: IMPORT_COND_OP_NOT_EQUAL },
-        { action: 'changeAccount', data: scenario.ACC_USD },
+        { action: 'changeAccount', data: App.scenario.ACC_USD },
     ]);
     await ImportTests.createRuleCondition([
         { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
@@ -286,7 +284,7 @@ const runCreateTests = async () => {
     ]);
     await ImportTests.createRuleAction([
         { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
-        { action: 'changeAccount', data: scenario.ACC_USD },
+        { action: 'changeAccount', data: App.scenario.ACC_USD },
     ]);
     await ImportTests.createRuleAction([
         { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
@@ -317,7 +315,7 @@ const runCreateTests = async () => {
     ]);
     await ImportTests.createRuleAction([
         { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
-        { action: 'changePerson', data: scenario.MARIA },
+        { action: 'changePerson', data: App.scenario.MARIA },
     ]);
     await ImportTests.createRuleAction([
         { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
@@ -338,7 +336,7 @@ const runCreateTests = async () => {
     ]);
     await ImportTests.createRuleAction([
         { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
-        { action: 'changePerson', data: scenario.ALEX },
+        { action: 'changePerson', data: App.scenario.ALEX },
     ]);
     await ImportTests.submitRule();
 
@@ -380,7 +378,7 @@ const runUpdateImportRuleTests = async () => {
     await ImportTests.createRuleCondition([
         { action: 'changeFieldType', data: IMPORT_COND_FIELD_MAIN_ACCOUNT },
         { action: 'changeOperator', data: IMPORT_COND_OP_EQUAL },
-        { action: 'changeAccount', data: scenario.ACC_3 },
+        { action: 'changeAccount', data: App.scenario.ACC_3 },
     ]);
     await ImportTests.createRuleAction([
         { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
@@ -419,11 +417,6 @@ const runDeleteImportRuleTests = async () => {
 };
 
 export const importRuleTests = {
-    /** Initialize tests */
-    init(scenarioInstance) {
-        scenario = scenarioInstance;
-    },
-
     /** Run import rules tests */
     async run() {
         setBlock('Import rules', 1);
@@ -439,11 +432,5 @@ export const importRuleTests = {
 
     async runNoPersonsTest() {
         await noPersonTests();
-    },
-
-    /** Initialize and run tests */
-    async initAndRun(scenarioInstance) {
-        this.init(scenarioInstance);
-        await this.run();
     },
 };

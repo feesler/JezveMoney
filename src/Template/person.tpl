@@ -27,7 +27,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
 <?php	}	?>
                         <div id="name-inp-block" class="validation-block view-row std_margin">
                             <label for="pname">Person name</label>
-                            <input id="pname" class="stretch-input std_margin" name="name" type="text" autocomplete="off" value="<?=e($pInfo->name)?>">
+                            <input id="pname" class="stretch-input" name="name" type="text" autocomplete="off" value="<?=e($pInfo->name)?>">
                             <div id="namefeedback" class="invalid-feedback"></div>
                         </div>
 

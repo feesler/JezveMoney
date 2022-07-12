@@ -171,6 +171,11 @@
 /* Left side navigation */
 .navigation {
   display: flex;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
 }
 
 .navigation-content {
@@ -180,6 +185,7 @@
   left: 0;
   top: 0;
   bottom: 0;
+  box-sizing: border-box;
   z-index: 201;
   transition: transform 0.1s ease;
 }
@@ -243,6 +249,7 @@
   display: flex;
   flex-flow: column nowrap;
   padding: 0 24px;
+  height: 100%;
 }
 
 a.nav-link,
@@ -255,6 +262,10 @@ a.nav-link:visited {
 
 a.nav-link:hover {
   text-decoration: underline;
+}
+
+.nav-bottom-link {
+  margin-top: auto;
 }
 
 .nav-separator {
@@ -284,7 +295,8 @@ a.nav-link:hover {
   }
 
   .navigation-content {
-    position: static;
+    position: absolute;
+    width: 200px;
     padding: 32px 12px;
     margin: 50px 0 0 0;
   }

@@ -11,14 +11,13 @@ import {
     baseUrl,
 } from 'jezve-test';
 import { copyObject, urlJoin, isEmpty } from 'jezvejs';
+import { DropDown, Paginator } from 'jezvejs/tests';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
-import { DropDown } from './component/DropDown.js';
 import { IconLink } from './component/IconLink.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { TransactionTypeMenu } from './component/TransactionTypeMenu.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
-import { Paginator } from './component/Paginator.js';
 import { ModeSelector } from './component/TransactionList/ModeSelector.js';
 import { SearchForm } from './component/TransactionList/SearchForm.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';

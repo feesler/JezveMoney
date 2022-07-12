@@ -7,7 +7,7 @@ import {
     click,
     input,
 } from 'jezve-test';
-import { DropDown } from '../DropDown.js';
+import { DropDown } from 'jezvejs/tests';
 import {
     asyncMap,
     trimToDigitsLimit,

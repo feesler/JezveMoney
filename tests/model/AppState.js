@@ -367,26 +367,35 @@ export class AppState {
     getAccountsByIndexes(accounts) {
         const itemIndexes = Array.isArray(accounts) ? accounts : [accounts];
 
-        const userAccList = this.accounts.getUserAccounts();
-        const visibleAccList = userAccList.getVisible(true);
-        const hiddenAccList = userAccList.getHidden(true);
+        const userAccounts = this.accounts.getUserAccounts();
+        const visibleUserAccounts = userAccounts.getVisible(true);
+        const hiddenUserAccounts = userAccounts.getHidden(true);
 
         return itemIndexes.map((ind) => this.getAccountByIndex(
             ind,
-            visibleAccList,
-            hiddenAccList,
+            visibleUserAccounts,
+            hiddenUserAccounts,
         ));
     }
 
     getAccountIndexesByNames(accounts) {
         const accNames = Array.isArray(accounts) ? accounts : [accounts];
-        const userAccounts = this.accounts.getUserVisible();
+
+        const userAccounts = this.accounts.getUserAccounts();
+        const visibleUserAccounts = userAccounts.getVisible();
+        const hiddenUserAccounts = userAccounts.getHidden();
 
         return accNames.map((name) => {
             const acc = userAccounts.findByName(name);
             assert(acc, `Account '${name}' not found`);
 
-            return userAccounts.getIndexById(acc.id);
+            let ind = visibleUserAccounts.getIndexById(acc.id);
+            if (ind !== -1) {
+                return ind;
+            }
+
+            ind = hiddenUserAccounts.getIndexById(acc.id);
+            return (ind !== -1) ? ind + visibleUserAccounts.length : -1;
         });
     }
 
@@ -577,21 +586,28 @@ export class AppState {
     getPersonsByIndexes(persons) {
         const itemIndexes = Array.isArray(persons) ? persons : [persons];
 
-        const visibleList = this.persons.getVisible(true);
-        const hiddenList = this.persons.getHidden(true);
+        const visiblePersons = this.persons.getVisible(true);
+        const hiddenPersons = this.persons.getHidden(true);
 
-        return itemIndexes.map((ind) => this.getPersonByIndex(ind, visibleList, hiddenList));
+        return itemIndexes.map((ind) => this.getPersonByIndex(ind, visiblePersons, hiddenPersons));
     }
 
     getPersonIndexesByNames(persons) {
         const names = Array.isArray(persons) ? persons : [persons];
-        const visibleList = this.persons.getVisible();
+        const visiblePersons = this.persons.getVisible();
+        const hiddenPersons = this.persons.getHidden();
 
         return names.map((name) => {
-            const person = visibleList.findByName(name);
+            const person = this.persons.findByName(name);
             assert(person, `Person '${name}' not found`);
 
-            return visibleList.getIndexById(person.id);
+            let ind = visiblePersons.getIndexById(person.id);
+            if (ind !== -1) {
+                return ind;
+            }
+
+            ind = hiddenPersons.getIndexById(person.id);
+            return (ind !== -1) ? ind + visiblePersons.length : -1;
         });
     }
 

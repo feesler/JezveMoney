@@ -19,9 +19,7 @@ export class AccountList extends List {
         return new Account(obj);
     }
 
-    /**
-     * Return list of Accounts of user
-     */
+    /** Return list of Accounts of user */
     getUserAccounts(ownerId) {
         const owner = parseInt(ownerId, 10);
         if (!owner) {
@@ -31,11 +29,14 @@ export class AccountList extends List {
         return this.filter((item) => item && item.owner_id === ownerId);
     }
 
-    /**
-     * Return list of visible Accounts
-     */
+    /** Return list of visible Accounts */
     getVisible() {
         return this.filter((item) => item && item.isVisible());
+    }
+
+    /** Return list of hidden Accounts */
+    getHidden() {
+        return this.filter((item) => item && !item.isVisible());
     }
 
     /**

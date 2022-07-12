@@ -8,16 +8,15 @@ import {
     waitForFunction,
 } from 'jezve-test';
 import { copyObject } from 'jezvejs';
+import { DropDown, Checkbox } from 'jezvejs/tests';
 import { AppView } from './AppView.js';
 import { IconLink } from './component/IconLink.js';
 import { ImportList } from './component/Import/ImportList.js';
 import { ImportUploadDialog } from './component/Import/ImportUploadDialog.js';
 import { ImportRulesDialog } from './component/Import/ImportRulesDialog.js';
-import { DropDown } from './component/DropDown.js';
 import { ImportViewSubmitError } from '../error/ImportViewSubmitError.js';
 import { findSimilarTransaction } from '../model/import.js';
 import { App } from '../Application.js';
-import { Checkbox } from './component/Checkbox.js';
 
 /** Import view class */
 export class ImportView extends AppView {

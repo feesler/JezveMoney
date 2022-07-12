@@ -85,6 +85,14 @@ svg * {
   stroke-linejoin: round;
 }
 
+label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 400;
+  margin-bottom: 5px;
+  margin-left: 1px;
+}
+
 /* layered layout */
 .layer {
   position: absolute;
@@ -126,6 +134,7 @@ svg * {
   width: 100%;
   box-sizing: border-box;
   height: 2.3rem;
+  font-size: 0.9rem;
   border-width: 1px;
   border-style: solid;
   padding: 0 0.5rem;
@@ -245,6 +254,12 @@ svg * {
 }
 
 .page_wrapper {
+  display: table;
+  height: 100%;
+  min-height: 100%;
+}
+
+.page-content {
   display: flex;
   flex-flow: row nowrap;
   min-height: 100%;
@@ -641,9 +656,10 @@ svg * {
 }
 
 .filter-item__title {
-  font-size: 1rem;
+  font-size: 0.8rem;
   font-weight: 400;
-  margin-bottom: 9px;
+  margin-bottom: 5px;
+  margin-left: 1px;
 }
 
 .filter-item .trtype-menu {
@@ -653,6 +669,10 @@ svg * {
 
 /* Desktop */
 @media (min-width: 768px) {
+  .content_wrap {
+    padding: 50px 12px 50px 212px;
+  }
+
   .filter-item .trtype-menu {
     flex-flow: row nowrap;
   }

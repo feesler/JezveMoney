@@ -72,24 +72,23 @@ export class Scenario {
             await api.importtemplate.del(templateIds);
         }
 
-        transactionTests.init(this);
         await transactionTests.prepare();
 
-        await importTests.initAndRun(this);
+        await importTests.run();
     }
 
     async runFullScenario() {
         setBlock('Running full test scenario', 1);
 
-        await securityTests.initAndRun(this);
+        await securityTests.run();
         await this.prepareTests();
 
-        await apiTests.initAndRun(this);
+        await apiTests.run();
         await App.goToMainView();
-        await profileTests.initAndRun(this);
-        await accountTests.initAndRun(this);
-        await personTests.initAndRun(this);
-        await transactionTests.initAndRun(this);
+        await profileTests.run();
+        await accountTests.run();
+        await personTests.run();
+        await transactionTests.run();
 
         await accountTests.runPostTransaction();
         await personTests.runPostTransaction();

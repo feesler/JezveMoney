@@ -8,8 +8,7 @@ import {
     input,
     isVisible,
 } from 'jezve-test';
-import { Checkbox } from '../Checkbox.js';
-import { DropDown } from '../DropDown.js';
+import { Checkbox, DropDown } from 'jezvejs/tests';
 import { asyncMap, trimToDigitsLimit } from '../../../common.js';
 import {
     IMPORT_COND_FIELD_MAIN_ACCOUNT,
