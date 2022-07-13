@@ -8,7 +8,6 @@ import {
     isEmpty,
     removeChilds,
     setEvents,
-    ajax,
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { formatDate } from 'jezvejs/DateUtils';
@@ -360,34 +359,24 @@ class TransactionListView extends View {
      * @param {number} transactionId - identifier of transaction to change position
      * @param {number} newPos  - new position of transaction
      */
-    sendChangePosRequest(transactionId, newPos) {
+    async sendChangePosRequest(transactionId, newPos) {
         const { baseURL } = window.app;
 
-        ajax.post({
-            url: `${baseURL}api/transaction/setpos`,
-            data: JSON.stringify({
+        const response = await fetch(`${baseURL}api/transaction/setpos`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
                 id: transactionId,
                 pos: newPos,
             }),
-            headers: { 'Content-Type': 'application/json' },
-            callback: this.onChangePosCallback(transactionId, newPos),
         });
-    }
 
-    /**
-     * Return callback function for position change request
-     * @param {number} transactionId - identifier of transaction to change position
-     * @param {number} newPos - new position of transaction
-     */
-    onChangePosCallback(transactionId, newPos) {
-        return (response) => {
-            const res = JSON.parse(response);
-            if (res && res.result === 'ok') {
-                this.updateTransArrPos(transactionId, newPos);
-            } else {
-                this.cancelPosChange(transactionId);
-            }
-        };
+        const apiResult = await response.json();
+        if (apiResult && apiResult.result === 'ok') {
+            this.updateTransArrPos(transactionId, newPos);
+        } else {
+            this.cancelPosChange(transactionId);
+        }
     }
 
     /**
@@ -745,7 +734,7 @@ class TransactionListView extends View {
         window.history.replaceState({}, PAGE_TITLE, url);
     }
 
-    requestTransactions(options) {
+    async requestTransactions(options) {
         const { baseURL } = window.app;
         const reqOptions = {
             ...options,
@@ -755,23 +744,16 @@ class TransactionListView extends View {
 
         this.startLoading();
 
-        ajax.get({
-            url: apiReq,
-            headers: { 'Content-Type': 'application/json' },
-            callback: (resp) => this.onTransactionsCallback(resp),
-        });
-    }
-
-    onTransactionsCallback(response) {
-        const res = JSON.parse(response);
-        if (!res || res.result !== 'ok') {
+        const response = await fetch(apiReq);
+        const apiResult = await response.json();
+        if (!apiResult || apiResult.result !== 'ok') {
             return;
         }
 
         this.state.selectedItems.clear();
-        this.state.items = [...res.data.items];
-        this.state.pagination = { ...res.data.pagination };
-        this.state.filter = { ...res.data.filter };
+        this.state.items = [...apiResult.data.items];
+        this.state.pagination = { ...apiResult.data.pagination };
+        this.state.filter = { ...apiResult.data.filter };
 
         this.replaceHistory();
 

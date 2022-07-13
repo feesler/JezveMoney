@@ -1,9 +1,5 @@
 import 'jezvejs/style';
-import {
-    ge,
-    show,
-    ajax,
-} from 'jezvejs';
+import { ge, show } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
 import { createMessage } from '../../js/app.js';
 import { Application } from '../../js/Application.js';
@@ -164,34 +160,9 @@ class ProfileView extends View {
     }
 
     /**
-     * Change password request callback
-     * @param {string} response - text of response
-     */
-    onChangePasswordResult(response) {
-        show(this.changePassLoading, false);
-
-        const res = JSON.parse(response);
-        if (!res) {
-            return;
-        }
-
-        const success = (res.result === 'ok');
-        if (success) {
-            this.changePassPopup.close();
-        }
-
-        if (res.msg) {
-            createMessage(res.msg, (success) ? 'msg_success' : 'msg_error');
-        }
-
-        this.changePassForm.reset();
-    }
-
-    /**
      * Change password form submit event handler
      */
     onChangePassSubmit(e) {
-        const { baseURL } = window.app;
         let valid = true;
 
         e.preventDefault();
@@ -209,18 +180,42 @@ class ProfileView extends View {
         }
 
         if (valid) {
-            show(this.changePassLoading, true);
-
-            ajax.post({
-                url: `${baseURL}api/profile/changepass`,
-                data: JSON.stringify({
-                    current: this.oldPassInp.value,
-                    new: this.newPassInp.value,
-                }),
-                headers: { 'Content-Type': 'application/json' },
-                callback: (response) => this.onChangePasswordResult(response),
-            });
+            this.requestPasswordChange(this.oldPassInp.value, this.newPassInp.value);
         }
+    }
+
+    /** Request password change */
+    async requestPasswordChange(currentPassword, newPassword) {
+        const { baseURL } = window.app;
+
+        show(this.changePassLoading, true);
+
+        const response = await fetch(`${baseURL}api/profile/changepass`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                current: currentPassword,
+                new: newPassword,
+            }),
+        });
+        const apiResult = await response.json();
+
+        show(this.changePassLoading, false);
+
+        if (!apiResult) {
+            return;
+        }
+
+        const success = (apiResult.result === 'ok');
+        if (success) {
+            this.changePassPopup.close();
+        }
+
+        if (apiResult.msg) {
+            createMessage(apiResult.msg, (success) ? 'msg_success' : 'msg_error');
+        }
+
+        this.changePassForm.reset();
     }
 
     /**
@@ -261,33 +256,6 @@ class ProfileView extends View {
     }
 
     /**
-     * Change name request callback
-     * @param {String} response - response text
-     */
-    onChangeNameResult(response) {
-        show(this.changeNameLoading, false);
-
-        const res = JSON.parse(response);
-        if (!res) {
-            return;
-        }
-
-        const success = (res.result === 'ok');
-        if (success) {
-            this.changeNamePopup.close();
-            window.app.model.profile.name = res.data.name;
-            this.nameElem.textContent = window.app.model.profile.name;
-            this.header.setUserName(window.app.model.profile.name);
-        }
-
-        if (res.msg) {
-            createMessage(res.msg, (success) ? 'msg_success' : 'msg_error');
-        }
-
-        this.changeNameForm.reset();
-    }
-
-    /**
      * Change name form submit event handler
      */
     onChangeNameSubmit(e) {
@@ -303,18 +271,42 @@ class ProfileView extends View {
         }
 
         if (valid) {
-            show(this.changeNameLoading, true);
-
-            const { baseURL } = window.app;
-            ajax.post({
-                url: `${baseURL}api/profile/changename`,
-                data: JSON.stringify({
-                    name: this.newNameInp.value,
-                }),
-                headers: { 'Content-Type': 'application/json' },
-                callback: (response) => this.onChangeNameResult(response),
-            });
+            this.requestNameChange(this.newNameInp.value);
         }
+    }
+
+    /** Send request to API to change user name */
+    async requestNameChange(name) {
+        const { baseURL } = window.app;
+
+        show(this.changeNameLoading, true);
+
+        const response = await fetch(`${baseURL}api/profile/changename`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name }),
+        });
+        const apiResult = await response.json();
+
+        show(this.changeNameLoading, false);
+
+        if (!apiResult) {
+            return;
+        }
+
+        const success = (apiResult.result === 'ok');
+        if (success) {
+            this.changeNamePopup.close();
+            window.app.model.profile.name = apiResult.data.name;
+            this.nameElem.textContent = window.app.model.profile.name;
+            this.header.setUserName(window.app.model.profile.name);
+        }
+
+        if (apiResult.msg) {
+            createMessage(apiResult.msg, (success) ? 'msg_success' : 'msg_error');
+        }
+
+        this.changeNameForm.reset();
     }
 
     /**

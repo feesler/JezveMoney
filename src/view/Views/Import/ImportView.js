@@ -6,7 +6,6 @@ import {
     show,
     enable,
     urlJoin,
-    ajax,
 } from 'jezvejs';
 import { formatDate } from 'jezvejs/DateUtils';
 import { Sortable } from 'jezvejs/Sortable';
@@ -204,8 +203,12 @@ class ImportView extends View {
         return item;
     }
 
-    /** Send API request to obtain transactions similar to imported */
-    requestSimilar() {
+    /**
+     * Send API request to obtain transactions similar to imported.
+     * Compare list of import items with transactions already in DB
+     *  and disable import item if same(similar) transaction found
+     */
+    async requestSimilar() {
         show(this.loadingInd, true);
 
         // Obtain date region of imported transactions
@@ -236,34 +239,16 @@ class ImportView extends View {
             enddate: formatDate(new Date(importedDateRange.end)),
             acc_id: this.state.mainAccount.id,
         });
+
         // Send request
-        ajax.get({
-            url: `${baseURL}api/transaction/list/?${reqParams}`,
-            callback: (response) => this.onTrCacheResult(response),
-        });
-    }
-
-    /**
-     * Transactions list API request callback
-     * Compare list of import items with transactions already in DB
-     *  and disable import item if same(similar) transaction found
-     * @param {string} response - server response string
-     */
-    onTrCacheResult(response) {
-        let jsondata;
-
-        try {
-            jsondata = JSON.parse(response);
-            if (!jsondata || jsondata.result !== 'ok') {
-                throw new Error('Invalid server response');
-            }
-        } catch (e) {
+        const response = await fetch(`${baseURL}api/transaction/list/?${reqParams}`);
+        const apiResult = await response.json();
+        if (!apiResult || apiResult.result !== 'ok') {
             show(this.loadingInd, false);
             return;
         }
 
-        this.state.transCache = jsondata.data.items;
-        const importedItems = this.getImportedItems();
+        this.state.transCache = apiResult.data.items;
         importedItems.forEach((item) => {
             item.enable(true);
             const data = item.getData();
@@ -512,29 +497,29 @@ class ImportView extends View {
         this.submitProgressIndicator.textContent = `${this.submitDone} / ${this.submitTotal}`;
     }
 
-    submitChunk() {
+    async submitChunk() {
         const { baseURL } = window.app;
         const chunk = this.submitQueue.pop();
 
-        ajax.post({
-            url: `${baseURL}api/transaction/createMultiple/`,
-            data: JSON.stringify(chunk),
+        const response = await fetch(`${baseURL}api/transaction/createMultiple/`, {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            callback: (response) => this.onSubmitResult(response),
+            body: JSON.stringify(chunk),
         });
+        const apiResult = await response.json();
+        this.onSubmitResult(apiResult);
     }
 
     /**
      * Submit response handler
      * @param {String} response - response text
      */
-    onSubmitResult(response) {
+    onSubmitResult(apiResult) {
         let status = false;
         let message = MSG_IMPORT_FAIL;
 
         try {
-            const respObj = JSON.parse(response);
-            status = (respObj && respObj.result === 'ok');
+            status = (apiResult && apiResult.result === 'ok');
             if (status) {
                 this.submitDone = Math.min(this.submitDone + SUBMIT_LIMIT, this.submitTotal);
                 this.renderSubmitProgress();
@@ -546,8 +531,8 @@ class ImportView extends View {
                     this.submitChunk();
                     return;
                 }
-            } else if (respObj && respObj.msg) {
-                message = respObj.msg;
+            } else if (apiResult && apiResult.msg) {
+                message = apiResult.msg;
             }
         } catch (e) {
             message = e.message;

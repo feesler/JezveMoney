@@ -4,7 +4,6 @@ import {
     ce,
     show,
     copyObject,
-    ajax,
 } from 'jezvejs';
 import { Application } from '../../../../view/js/Application.js';
 import { AdminListView } from '../../js/AdminListView.js';
@@ -108,13 +107,11 @@ class AdminImportRuleListView extends AdminListView {
     /**
      * Request list of items from API
      */
-    requestList() {
+    async requestList() {
         const { baseURL } = window.app;
-
-        ajax.get({
-            url: `${baseURL}api/${this.apiController}/list?full=true`,
-            callback: this.onListResult.bind(this),
-        });
+        const response = await fetch(`${baseURL}api/${this.apiController}/list?full=true`);
+        const apiResult = await response.json();
+        this.onListResult(apiResult);
     }
 
     /**

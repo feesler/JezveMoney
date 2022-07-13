@@ -7,7 +7,6 @@ import {
     copyObject,
     show,
     enable,
-    ajax,
 } from 'jezvejs';
 import { Component } from 'jezvejs/Component';
 import { DropDown } from 'jezvejs/DropDown';
@@ -20,7 +19,6 @@ import './style.css';
 /** Strings */
 const TITLE_CREATE_TEMPLATE = 'Create template';
 const TITLE_UPDATE_TEMPLATE = 'Update template';
-const MSG_JSON_PARSE_ERROR = 'Fail to parse server response';
 const TITLE_TEMPLATE_DELETE = 'Delete import template';
 const MSG_TEMPLATE_DELETE = 'Are you sure to delete this import template?';
 const MSG_SEL_ACC_AMOUNT = 'Please select decimal column for account amount';
@@ -292,17 +290,19 @@ export class ImportTemplateManager extends Component {
             id: 'tpl_delete_warning',
             title: TITLE_TEMPLATE_DELETE,
             content: MSG_TEMPLATE_DELETE,
-            onconfirm: () => {
+            onconfirm: async () => {
                 const { baseURL } = window.app;
 
                 this.state.listLoading = true;
                 this.render(this.state);
-                ajax.post({
-                    url: `${baseURL}api/importtpl/delete`,
-                    data: JSON.stringify(requestObj),
+
+                const response = await fetch(`${baseURL}api/importtpl/delete`, {
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    callback: (response) => this.onTemplateRequestResult(response),
+                    body: JSON.stringify(requestObj),
                 });
+                const apiResult = await response.json();
+                this.onTemplateRequestResult(apiResult);
             },
         });
     }
@@ -325,38 +325,41 @@ export class ImportTemplateManager extends Component {
             return;
         }
 
-        const { baseURL } = window.app;
-        let reqURL = `${baseURL}api/importtpl/`;
         if (this.state.template.id) {
-            reqURL += 'update';
             requestObj.id = this.state.template.id;
-        } else {
-            reqURL += 'create';
         }
+
+        this.requestSubmitTemplate(requestObj);
+    }
+
+    /** Send API request to create/update template */
+    async requestSubmitTemplate(data) {
+        const { baseURL } = window.app;
+        const urlBase = `${baseURL}api/importtpl/`;
+        const reqURL = (data.id)
+            ? `${urlBase}update/`
+            : `${urlBase}create/`;
 
         this.state.listLoading = true;
         this.render(this.state);
-        ajax.post({
-            url: reqURL,
-            data: JSON.stringify(requestObj),
+
+        const response = await fetch(reqURL, {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            callback: (response) => this.onTemplateRequestResult(response),
+            body: JSON.stringify(data),
         });
+        const apiResult = await response.json();
+        this.onTemplateRequestResult(apiResult);
     }
 
     /** API response handler for template create/update/delete request */
-    onTemplateRequestResult(response) {
-        let jsondata;
+    onTemplateRequestResult(apiResult) {
         try {
-            jsondata = JSON.parse(response);
-        } catch (e) {
-            createMessage(MSG_JSON_PARSE_ERROR, 'msg_error');
-            return;
-        }
-
-        try {
-            if (!jsondata || jsondata.result !== 'ok') {
-                throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : MSG_TPL_REQUEST_FAIL);
+            if (!apiResult || apiResult.result !== 'ok') {
+                const errorMessage = (apiResult && 'msg' in apiResult)
+                    ? apiResult.msg
+                    : MSG_TPL_REQUEST_FAIL;
+                throw new Error(errorMessage);
             }
 
             this.requestTemplatesList();
@@ -366,32 +369,22 @@ export class ImportTemplateManager extends Component {
     }
 
     /** Send API request to obain list of import templates */
-    requestTemplatesList() {
+    async requestTemplatesList() {
         const { baseURL } = window.app;
 
-        ajax.get({
-            url: `${baseURL}api/importtpl/list/`,
-            callback: (response) => this.onTemplateListResult(response),
-        });
-    }
-
-    /** API response handler for templates list request */
-    onTemplateListResult(response) {
-        let jsondata;
-        try {
-            jsondata = JSON.parse(response);
-        } catch (e) {
-            createMessage(MSG_JSON_PARSE_ERROR, 'msg_error');
-            return;
-        }
+        const response = await fetch(`${baseURL}api/importtpl/list/`);
+        const apiResult = await response.json();
 
         try {
-            if (!jsondata || jsondata.result !== 'ok' || !Array.isArray(jsondata.data)) {
-                throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : MSG_TPL_LIST_REQUEST_FAIL);
+            if (!apiResult || apiResult.result !== 'ok' || !Array.isArray(apiResult.data)) {
+                const errorMessage = (apiResult && 'msg' in apiResult)
+                    ? apiResult.msg
+                    : MSG_TPL_LIST_REQUEST_FAIL;
+                throw new Error(errorMessage);
             }
 
             this.state.listLoading = false;
-            window.app.model.templates.setData(jsondata.data);
+            window.app.model.templates.setData(apiResult.data);
             if (window.app.model.templates.length > 0) {
                 this.state.id = this.RAW_DATA_STATE;
                 this.renderTemplateSelect();
@@ -406,31 +399,21 @@ export class ImportTemplateManager extends Component {
     }
 
     /** Send API request to obain list of import rules */
-    requestRulesList() {
+    async requestRulesList() {
         const { baseURL } = window.app;
 
-        ajax.get({
-            url: `${baseURL}api/importrule/list/?extended=true`,
-            callback: (response) => this.onRulesListResult(response),
-        });
-    }
-
-    /** API response handler for rules list request */
-    onRulesListResult(response) {
-        let jsondata;
-        try {
-            jsondata = JSON.parse(response);
-        } catch (e) {
-            createMessage(MSG_JSON_PARSE_ERROR, 'msg_error');
-            return;
-        }
+        const response = await fetch(`${baseURL}api/importrule/list/?extended=true`);
+        const apiResult = await response.json();
 
         try {
-            if (!jsondata || jsondata.result !== 'ok' || !Array.isArray(jsondata.data)) {
-                throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : MSG_RULES_LIST_REQUEST_FAIL);
+            if (!apiResult || apiResult.result !== 'ok' || !Array.isArray(apiResult.data)) {
+                const errorMessage = (apiResult && 'msg' in apiResult)
+                    ? apiResult.msg
+                    : MSG_RULES_LIST_REQUEST_FAIL;
+                throw new Error(errorMessage);
             }
 
-            window.app.model.rules.setData(jsondata.data);
+            window.app.model.rules.setData(apiResult.data);
             this.parent.onUpdateRules();
         } catch (e) {
             createMessage(e.message, 'msg_error');

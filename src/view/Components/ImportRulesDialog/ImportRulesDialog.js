@@ -5,7 +5,6 @@ import {
     removeChilds,
     show,
     insertAfter,
-    ajax,
 } from 'jezvejs';
 import { Component } from 'jezvejs/Component';
 import { Popup } from 'jezvejs/Popup';
@@ -170,7 +169,7 @@ export class ImportRulesDialog extends Component {
     }
 
     /** Send create/update import rule request to API */
-    submitRule(data) {
+    async submitRule(data) {
         if (!data) {
             throw new Error('Invalid data');
         }
@@ -181,16 +180,17 @@ export class ImportRulesDialog extends Component {
 
         this.startLoading();
 
-        ajax.post({
-            url: reqURL,
-            data: JSON.stringify(data),
+        const response = await fetch(reqURL, {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            callback: (response) => this.onRuleRequestResult(response),
+            body: JSON.stringify(data),
         });
+        const apiResult = await response.json();
+        this.onRuleRequestResult(apiResult);
     }
 
     /** Send delete import rule request to API */
-    deleteRule(ruleId) {
+    async deleteRule(ruleId) {
         const data = {};
         const { baseURL } = window.app;
         const reqURL = `${baseURL}api/importrule/del`;
@@ -202,28 +202,23 @@ export class ImportRulesDialog extends Component {
 
         this.startLoading();
 
-        ajax.post({
-            url: reqURL,
-            data: JSON.stringify(data),
+        const response = await fetch(reqURL, {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            callback: (response) => this.onRuleRequestResult(response),
+            body: JSON.stringify(data),
         });
+        const apiResult = await response.json();
+        this.onRuleRequestResult(apiResult);
     }
 
     /** API response handler for rule create/update/delete requests */
-    onRuleRequestResult(response) {
-        let jsondata;
+    onRuleRequestResult(apiResult) {
         try {
-            jsondata = JSON.parse(response);
-        } catch (e) {
-            createMessage(this.jsonParseErrorMessage, 'msg_error');
-            this.stopLoading();
-            return;
-        }
-
-        try {
-            if (!jsondata || jsondata.result !== 'ok') {
-                throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : MSG_RULE_SUBMIT_FAIL);
+            if (!apiResult || apiResult.result !== 'ok') {
+                const errorMessage = (apiResult && 'msg' in apiResult)
+                    ? apiResult.msg
+                    : MSG_RULE_SUBMIT_FAIL;
+                throw new Error(errorMessage);
             }
 
             this.requestRulesList();
@@ -234,32 +229,21 @@ export class ImportRulesDialog extends Component {
     }
 
     /** Send API request to obain list of import rules */
-    requestRulesList() {
+    async requestRulesList() {
         const { baseURL } = window.app;
 
-        ajax.get({
-            url: `${baseURL}api/importrule/list/?extended=true`,
-            callback: (response) => this.onRulesListResult(response),
-        });
-    }
-
-    /** API response handler for rules list request */
-    onRulesListResult(response) {
-        let jsondata;
         try {
-            jsondata = JSON.parse(response);
-        } catch (e) {
-            createMessage(this.jsonParseErrorMessage, 'msg_error');
-            this.stopLoading();
-            return;
-        }
+            const response = await fetch(`${baseURL}api/importrule/list/?extended=true`);
+            const apiResult = await response.json();
 
-        try {
-            if (!jsondata || jsondata.result !== 'ok' || !Array.isArray(jsondata.data)) {
-                throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : MSG_RULE_LIST_REQUEST_FAIL);
+            if (!apiResult || apiResult.result !== 'ok' || !Array.isArray(apiResult.data)) {
+                const errorMessage = (apiResult && 'msg' in apiResult)
+                    ? apiResult.msg
+                    : MSG_RULE_LIST_REQUEST_FAIL;
+                throw new Error(errorMessage);
             }
 
-            window.app.model.rules.setData(jsondata.data);
+            window.app.model.rules.setData(apiResult.data);
             this.state.id = this.LIST_STATE;
             delete this.state.rule;
             this.stopLoading();
