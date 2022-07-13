@@ -29,16 +29,21 @@
 Ex.: $osPanelPath = "c:\ospanel"
 $phpPath = "$osPanelPath\modules\php\PHP_7.4"
 
+
 - HTTPS setup with OpenServer
-1. Generate certificates
-2. Run PowerShell as Administrator and open generated DOMAIN-rootCA.crt
-3. Install Certificate > Current User > Trusted Root Certification Authorities > Local Computer
-4. Edit userdata\config\Apache_2.4-PHP_8.0_vhost.conf file:
+
+1. Download mkcert https://github.com/FiloSottile/mkcert/releases
+2. mkcert -install
+3. mkcert testsrv
+4. Copy testsrv.pem and testsrv-key.pem to $osPanelPath/userdata/config/cert_files/testsrv/
+5. Make copy testsrv.pem of as testsrv.crt and open it
+6. Install Certificate > Current User > Trusted Root Certification Authorities > Local Computer
+7. Edit userdata\config\Apache_2.4-PHP_8.0_vhost.conf file:
     SSLCertificateFile          "%sprogdir%/userdata/config/cert_files/testsrv/testsrv.pem"
     SSLCertificateKeyFile       "%sprogdir%/userdata/config/cert_files/testsrv/testsrv-key.pem"
 
 
-- PowerShell browserify access rights issue:
+- PowerShell access rights issue:
 
 1. Run powershell as Administrator
 2. Run command:
