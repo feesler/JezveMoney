@@ -5,7 +5,6 @@ import {
     ce,
     show,
     enable,
-    urlJoin,
 } from 'jezvejs';
 import { formatDate } from 'jezvejs/DateUtils';
 import { Sortable } from 'jezvejs/Sortable';
@@ -20,6 +19,7 @@ import './style.css';
 import { ImportUploadDialog } from '../../Components/ImportUploadDialog/ImportUploadDialog.js';
 import { ImportRulesDialog } from '../../Components/ImportRulesDialog/ImportRulesDialog.js';
 import { ImportTransactionItem } from '../../Components/ImportTransactionItem/ImportTransactionItem.js';
+import { API } from '../../js/API.js';
 
 const SUBMIT_LIMIT = 100;
 /** Messages */
@@ -232,23 +232,22 @@ class ImportView extends View {
             }
         });
         // Prepare request data
-        const { baseURL } = window.app;
-        const reqParams = urlJoin({
+        const reqParams = {
             count: 0,
             stdate: formatDate(new Date(importedDateRange.start)),
             enddate: formatDate(new Date(importedDateRange.end)),
             acc_id: this.state.mainAccount.id,
-        });
+        };
 
         // Send request
-        const response = await fetch(`${baseURL}api/transaction/list/?${reqParams}`);
-        const apiResult = await response.json();
-        if (!apiResult || apiResult.result !== 'ok') {
+        try {
+            const result = await API.transaction.list(reqParams);
+            this.state.transCache = result.data.items;
+        } catch (e) {
             show(this.loadingInd, false);
             return;
         }
 
-        this.state.transCache = apiResult.data.items;
         importedItems.forEach((item) => {
             item.enable(true);
             const data = item.getData();
@@ -498,16 +497,9 @@ class ImportView extends View {
     }
 
     async submitChunk() {
-        const { baseURL } = window.app;
         const chunk = this.submitQueue.pop();
-
-        const response = await fetch(`${baseURL}api/transaction/createMultiple/`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(chunk),
-        });
-        const apiResult = await response.json();
-        this.onSubmitResult(apiResult);
+        const result = await API.transaction.createMultiple(chunk);
+        this.onSubmitResult(result);
     }
 
     /**

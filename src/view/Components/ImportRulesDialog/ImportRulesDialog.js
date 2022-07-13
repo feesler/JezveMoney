@@ -9,6 +9,7 @@ import {
 import { Component } from 'jezvejs/Component';
 import { Popup } from 'jezvejs/Popup';
 import { createMessage } from '../../js/app.js';
+import { API } from '../../js/API.js';
 import { ImportRule } from '../../js/model/ImportRule.js';
 import { ImportRuleForm } from '../ImportRuleForm/ImportRuleForm.js';
 import { ImportRuleItem } from '../ImportRuleItem/ImportRuleItem.js';
@@ -18,7 +19,6 @@ import './style.css';
 /** Strings */
 const TITLE_RULE_DELETE = 'Delete import rule';
 const MSG_RULE_DELETE = 'Are you sure to delete this import rule?';
-const MSG_RULE_SUBMIT_FAIL = 'Fail to submit import rule request';
 const MSG_RULE_LIST_REQUEST_FAIL = 'Fail to read list of import rules';
 const MSG_NO_RULES = 'No rules';
 const TITLE_RULES_LIST = 'Import rules';
@@ -174,51 +174,13 @@ export class ImportRulesDialog extends Component {
             throw new Error('Invalid data');
         }
 
-        const { baseURL } = window.app;
-        let reqURL = `${baseURL}api/importrule/`;
-        reqURL += (data.id) ? 'update' : 'create';
-
         this.startLoading();
 
-        const response = await fetch(reqURL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-        const apiResult = await response.json();
-        this.onRuleRequestResult(apiResult);
-    }
-
-    /** Send delete import rule request to API */
-    async deleteRule(ruleId) {
-        const data = {};
-        const { baseURL } = window.app;
-        const reqURL = `${baseURL}api/importrule/del`;
-
-        data.id = parseInt(ruleId, 10);
-        if (!data.id) {
-            throw new Error('Invalid rule id');
-        }
-
-        this.startLoading();
-
-        const response = await fetch(reqURL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-        const apiResult = await response.json();
-        this.onRuleRequestResult(apiResult);
-    }
-
-    /** API response handler for rule create/update/delete requests */
-    onRuleRequestResult(apiResult) {
         try {
-            if (!apiResult || apiResult.result !== 'ok') {
-                const errorMessage = (apiResult && 'msg' in apiResult)
-                    ? apiResult.msg
-                    : MSG_RULE_SUBMIT_FAIL;
-                throw new Error(errorMessage);
+            if (data.id) {
+                await API.importRule.update(data);
+            } else {
+                await API.importRule.create(data);
             }
 
             this.requestRulesList();
@@ -228,22 +190,36 @@ export class ImportRulesDialog extends Component {
         }
     }
 
-    /** Send API request to obain list of import rules */
-    async requestRulesList() {
-        const { baseURL } = window.app;
+    /** Send delete import rule request to API */
+    async deleteRule(ruleId) {
+        const id = parseInt(ruleId, 10);
+        if (!id) {
+            throw new Error('Invalid rule id');
+        }
+
+        this.startLoading();
 
         try {
-            const response = await fetch(`${baseURL}api/importrule/list/?extended=true`);
-            const apiResult = await response.json();
+            await API.importRule.del(id);
+            this.requestRulesList();
+        } catch (e) {
+            createMessage(e.message, 'msg_error');
+            this.stopLoading();
+        }
+    }
 
-            if (!apiResult || apiResult.result !== 'ok' || !Array.isArray(apiResult.data)) {
-                const errorMessage = (apiResult && 'msg' in apiResult)
-                    ? apiResult.msg
+    /** Send API request to obain list of import rules */
+    async requestRulesList() {
+        try {
+            const result = await API.importRule.list({ extended: true });
+            if (!Array.isArray(result.data)) {
+                const errorMessage = (result && 'msg' in result)
+                    ? result.msg
                     : MSG_RULE_LIST_REQUEST_FAIL;
                 throw new Error(errorMessage);
             }
 
-            window.app.model.rules.setData(apiResult.data);
+            window.app.model.rules.setData(result.data);
             this.state.id = this.LIST_STATE;
             delete this.state.rule;
             this.stopLoading();

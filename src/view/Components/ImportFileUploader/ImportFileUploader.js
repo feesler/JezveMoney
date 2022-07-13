@@ -3,6 +3,7 @@ import { Component } from 'jezvejs/Component';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { createMessage } from '../../js/app.js';
 import { Uploader } from '../Uploader/Uploader.js';
+import { API } from '../../js/API.js';
 
 /** Strings */
 const MSG_UPLOAD_FAIL = 'Fail to process file';
@@ -165,7 +166,6 @@ export class ImportFileUploader extends Component {
     async uploadFromServer() {
         const useServer = this.useServerCheck.checked;
         const isEncoded = this.isEncodeCheck.checked;
-        const { baseURL } = window.app;
 
         if (!useServer) {
             return;
@@ -176,10 +176,11 @@ export class ImportFileUploader extends Component {
             return;
         }
 
-        const reqParams = new URLSearchParams();
-        reqParams.set('filename', filename);
-        reqParams.set('template', 0);
-        reqParams.set('encode', (isEncoded ? 1 : 0));
+        const reqParams = {
+            filename,
+            template: 0,
+            encode: isEncoded ? 1 : 0,
+        };
 
         this.state.collapsed = true;
         this.render(this.state);
@@ -188,12 +189,8 @@ export class ImportFileUploader extends Component {
             this.uploadStartHandler();
         }
 
-        const response = await fetch(`${baseURL}api/import/upload/`, {
-            method: 'POST',
-            body: reqParams,
-        });
-        const apiResult = await response.json();
-        this.onImportSuccess(apiResult);
+        const result = await API.import.upload(reqParams);
+        this.onImportSuccess(result);
     }
 
     /** Render component */

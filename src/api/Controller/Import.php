@@ -246,21 +246,22 @@ class Import extends ApiController
                 fwrite($fhnd, $file_cont);
                 fclose($fhnd);
             } else {
+                $request = $this->getRequestData();
                 if (
                     (!$this->uMod->isAdmin($this->user_id)
                         && !$this->uMod->isTester($this->user_id))
-                    || !isset($_POST["filename"])
-                    || !isset($_POST["template"])
-                    || !isset($_POST["encode"])
+                    || !isset($request["filename"])
+                    || !isset($request["template"])
+                    || !isset($request["encode"])
                 ) {
                     throw new \Error("Invalid request");
                 }
 
-                $fname = UPLOAD_PATH . $_POST["filename"];
+                $fname = UPLOAD_PATH . $request["filename"];
                 $fileExt = strrchr($fname, ".");
                 $fileType = ($fileExt === false) ? "" : substr($fileExt, 1);
-                $fileTemplate = intval($_POST["template"]);
-                $encodeCP1251 = (intval($_POST["encode"]) == 1);
+                $fileTemplate = intval($request["template"]);
+                $encodeCP1251 = (intval($request["encode"]) == 1);
 
                 if (!file_exists($fname) || !is_readable($fname)) {
                     throw new \Error("File not found");

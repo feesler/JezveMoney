@@ -7,6 +7,7 @@ import { View } from '../../js/View.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import '../../css/app.css';
 import './style.css';
+import { API } from '../../js/API.js';
 
 const TITLE_RESET_ACC = 'Reset accounts';
 const MSG_RESET_ACC = 'Are you sure want to reset all your accounts?<br>All accounts and transactions will be lost.';
@@ -186,33 +187,28 @@ class ProfileView extends View {
 
     /** Request password change */
     async requestPasswordChange(currentPassword, newPassword) {
-        const { baseURL } = window.app;
-
         show(this.changePassLoading, true);
 
-        const response = await fetch(`${baseURL}api/profile/changepass`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                current: currentPassword,
-                new: newPassword,
-            }),
-        });
-        const apiResult = await response.json();
+        let result;
+        try {
+            result = await API.profile.changePassword(currentPassword, newPassword);
+        } catch (e) {
+            result = null;
+        }
 
         show(this.changePassLoading, false);
 
-        if (!apiResult) {
+        if (!result) {
             return;
         }
 
-        const success = (apiResult.result === 'ok');
+        const success = (result.result === 'ok');
         if (success) {
             this.changePassPopup.close();
         }
 
-        if (apiResult.msg) {
-            createMessage(apiResult.msg, (success) ? 'msg_success' : 'msg_error');
+        if (result.msg) {
+            createMessage(result.msg, (success) ? 'msg_success' : 'msg_error');
         }
 
         this.changePassForm.reset();
@@ -277,33 +273,31 @@ class ProfileView extends View {
 
     /** Send request to API to change user name */
     async requestNameChange(name) {
-        const { baseURL } = window.app;
-
         show(this.changeNameLoading, true);
 
-        const response = await fetch(`${baseURL}api/profile/changename`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name }),
-        });
-        const apiResult = await response.json();
+        let result;
+        try {
+            result = await API.profile.changeName(name);
+        } catch (e) {
+            result = null;
+        }
 
         show(this.changeNameLoading, false);
 
-        if (!apiResult) {
+        if (!result) {
             return;
         }
 
-        const success = (apiResult.result === 'ok');
+        const success = (result.result === 'ok');
         if (success) {
             this.changeNamePopup.close();
-            window.app.model.profile.name = apiResult.data.name;
+            window.app.model.profile.name = result.data.name;
             this.nameElem.textContent = window.app.model.profile.name;
             this.header.setUserName(window.app.model.profile.name);
         }
 
-        if (apiResult.msg) {
-            createMessage(apiResult.msg, (success) ? 'msg_success' : 'msg_error');
+        if (result.msg) {
+            createMessage(result.msg, (success) ? 'msg_success' : 'msg_error');
         }
 
         this.changeNameForm.reset();

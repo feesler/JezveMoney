@@ -18,6 +18,7 @@ import { Sortable } from 'jezvejs/Sortable';
 import { Selection } from 'jezvejs/Selection';
 import { createMessage } from '../../js/app.js';
 import { Application } from '../../js/Application.js';
+import { API } from '../../js/API.js';
 import { View } from '../../js/View.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
@@ -360,21 +361,10 @@ class TransactionListView extends View {
      * @param {number} newPos  - new position of transaction
      */
     async sendChangePosRequest(transactionId, newPos) {
-        const { baseURL } = window.app;
-
-        const response = await fetch(`${baseURL}api/transaction/setpos`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                id: transactionId,
-                pos: newPos,
-            }),
-        });
-
-        const apiResult = await response.json();
-        if (apiResult && apiResult.result === 'ok') {
+        try {
+            await API.transaction.setPos(transactionId, newPos);
             this.updateTransArrPos(transactionId, newPos);
-        } else {
+        } catch (e) {
             this.cancelPosChange(transactionId);
         }
     }
@@ -735,28 +725,20 @@ class TransactionListView extends View {
     }
 
     async requestTransactions(options) {
-        const { baseURL } = window.app;
-        const reqOptions = {
-            ...options,
-            order: 'desc',
-        };
-        const apiReq = `${baseURL}api/transaction/list?${urlJoin(reqOptions)}`;
-
         this.startLoading();
 
-        const response = await fetch(apiReq);
-        const apiResult = await response.json();
-        if (!apiResult || apiResult.result !== 'ok') {
+        try {
+            const result = await API.transaction.list(options);
+
+            this.state.selectedItems.clear();
+            this.state.items = [...result.data.items];
+            this.state.pagination = { ...result.data.pagination };
+            this.state.filter = { ...result.data.filter };
+        } catch (e) {
             return;
         }
 
-        this.state.selectedItems.clear();
-        this.state.items = [...apiResult.data.items];
-        this.state.pagination = { ...apiResult.data.pagination };
-        this.state.filter = { ...apiResult.data.filter };
-
         this.replaceHistory();
-
         this.stopLoading();
     }
 

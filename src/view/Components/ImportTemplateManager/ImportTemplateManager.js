@@ -10,6 +10,7 @@ import {
 } from 'jezvejs';
 import { Component } from 'jezvejs/Component';
 import { DropDown } from 'jezvejs/DropDown';
+import { API } from '../../js/API.js';
 import { createMessage } from '../../js/app.js';
 import { ImportTemplateError } from '../../js/error/ImportTemplateError.js';
 import { ImportTemplate } from '../../js/model/ImportTemplate.js';
@@ -27,7 +28,6 @@ const MSG_SEL_TR_AMOUNT = 'Please select decimal column for transaction amount';
 const MSG_SEL_TR_CURRENCY = 'Please select correct column for transaction currency';
 const MSG_SEL_DATE = 'Please select column for date';
 const MSG_SEL_COMMENT = 'Please select column for comment';
-const MSG_TPL_REQUEST_FAIL = 'Import template request failed';
 const MSG_TPL_LIST_REQUEST_FAIL = 'Fail to read list of import templates';
 const MSG_RULES_LIST_REQUEST_FAIL = 'Fail to read list of import rules';
 const MSG_VALID_TEMPLATE = 'Valid template';
@@ -282,28 +282,11 @@ export class ImportTemplateManager extends Component {
 
     /** Delete template button 'click' event handler */
     onDeleteTemplateClick() {
-        const requestObj = {
-            id: this.state.template.id,
-        };
-
         ConfirmDialog.create({
             id: 'tpl_delete_warning',
             title: TITLE_TEMPLATE_DELETE,
             content: MSG_TEMPLATE_DELETE,
-            onconfirm: async () => {
-                const { baseURL } = window.app;
-
-                this.state.listLoading = true;
-                this.render(this.state);
-
-                const response = await fetch(`${baseURL}api/importtpl/delete`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(requestObj),
-                });
-                const apiResult = await response.json();
-                this.onTemplateRequestResult(apiResult);
-            },
+            onconfirm: () => this.requestDeleteTemplate(this.state.template.id),
         });
     }
 
@@ -334,32 +317,14 @@ export class ImportTemplateManager extends Component {
 
     /** Send API request to create/update template */
     async requestSubmitTemplate(data) {
-        const { baseURL } = window.app;
-        const urlBase = `${baseURL}api/importtpl/`;
-        const reqURL = (data.id)
-            ? `${urlBase}update/`
-            : `${urlBase}create/`;
-
         this.state.listLoading = true;
         this.render(this.state);
 
-        const response = await fetch(reqURL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-        const apiResult = await response.json();
-        this.onTemplateRequestResult(apiResult);
-    }
-
-    /** API response handler for template create/update/delete request */
-    onTemplateRequestResult(apiResult) {
         try {
-            if (!apiResult || apiResult.result !== 'ok') {
-                const errorMessage = (apiResult && 'msg' in apiResult)
-                    ? apiResult.msg
-                    : MSG_TPL_REQUEST_FAIL;
-                throw new Error(errorMessage);
+            if (data.id) {
+                await API.importTemplate.update(data);
+            } else {
+                await API.importTemplate.create(data);
             }
 
             this.requestTemplatesList();
@@ -368,23 +333,32 @@ export class ImportTemplateManager extends Component {
         }
     }
 
-    /** Send API request to obain list of import templates */
-    async requestTemplatesList() {
-        const { baseURL } = window.app;
-
-        const response = await fetch(`${baseURL}api/importtpl/list/`);
-        const apiResult = await response.json();
+    /** Send API request to delete template */
+    async requestDeleteTemplate(id) {
+        this.state.listLoading = true;
+        this.render(this.state);
 
         try {
-            if (!apiResult || apiResult.result !== 'ok' || !Array.isArray(apiResult.data)) {
-                const errorMessage = (apiResult && 'msg' in apiResult)
-                    ? apiResult.msg
+            await API.importTemplate.del(id);
+            this.requestTemplatesList();
+        } catch (e) {
+            createMessage(e.message, 'msg_error');
+        }
+    }
+
+    /** Send API request to obain list of import templates */
+    async requestTemplatesList() {
+        try {
+            const result = await API.importTemplate.list();
+            if (!Array.isArray(result.data)) {
+                const errorMessage = (result && 'msg' in result)
+                    ? result.msg
                     : MSG_TPL_LIST_REQUEST_FAIL;
                 throw new Error(errorMessage);
             }
 
             this.state.listLoading = false;
-            window.app.model.templates.setData(apiResult.data);
+            window.app.model.templates.setData(result.data);
             if (window.app.model.templates.length > 0) {
                 this.state.id = this.RAW_DATA_STATE;
                 this.renderTemplateSelect();
@@ -400,20 +374,16 @@ export class ImportTemplateManager extends Component {
 
     /** Send API request to obain list of import rules */
     async requestRulesList() {
-        const { baseURL } = window.app;
-
-        const response = await fetch(`${baseURL}api/importrule/list/?extended=true`);
-        const apiResult = await response.json();
-
         try {
-            if (!apiResult || apiResult.result !== 'ok' || !Array.isArray(apiResult.data)) {
-                const errorMessage = (apiResult && 'msg' in apiResult)
-                    ? apiResult.msg
+            const result = await API.importRule.list({ extended: true });
+            if (!Array.isArray(result.data)) {
+                const errorMessage = (result && 'msg' in result)
+                    ? result.msg
                     : MSG_RULES_LIST_REQUEST_FAIL;
                 throw new Error(errorMessage);
             }
 
-            window.app.model.rules.setData(apiResult.data);
+            window.app.model.rules.setData(result.data);
             this.parent.onUpdateRules();
         } catch (e) {
             createMessage(e.message, 'msg_error');
