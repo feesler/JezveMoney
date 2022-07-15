@@ -25,6 +25,10 @@
   margin: 0 6px 0 auto;
 }
 
+.theme-switch .switch {
+    margin: 0;
+}
+
 .theme-switch .switch-slider {
   background-color: #555555;
 }
