@@ -68,7 +68,6 @@ include(TPL_PATH."commonhdr.tpl");
                         <div class="filter-item">
                             <h3 class="filter-item__title">Accounts</h3>
                             <select id="acc_id" name="acc_id" multiple>
-                                <option value="0">All</option>
 <?php	foreach($accArr as $accData) {
             if (in_array($accData->id, $accFilter)) {		?>
                                 <option value="<?=e($accData->id)?>" selected><?=e($accData->name)?></option>
@@ -93,7 +92,6 @@ include(TPL_PATH."commonhdr.tpl");
                         <div class="filter-item">
                             <h3 class="filter-item__title">Persons</h3>
                             <select id="person_id" name="person_id" multiple>
-                                <option value="0">All</option>
 <?php	foreach($personArr as $person) {
             if (in_array($person->id, $personFilter)) {		?>
                                 <option value="<?=e($person->id)?>" selected><?=e($person->name)?></option>
