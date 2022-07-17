@@ -15,6 +15,7 @@ class Main extends AdminController
         ];
 
         $this->cssAdmin[] = "AdminMainView.css";
+        $this->jsAdmin[] = "AdminMainView.js";
 
         $this->render($data);
     }

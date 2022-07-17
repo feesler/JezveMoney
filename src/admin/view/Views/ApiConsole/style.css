@@ -14,31 +14,26 @@ h3 {
 
 .api-console {
   display: flex;
-  flex-flow: row nowrap;
+  flex-flow: row wrap;
   justify-content: space-between;
   align-items: flex-start;
   justify-items: flex-start;
 }
 
-.left-column {
-  display: inline-flex;
-  flex-flow: column nowrap;
-  width: 15%;
-  padding: 6px;
-}
-
 .center-column {
   display: inline-flex;
   flex-flow: column nowrap;
-  width: 35%;
-  padding: 0 2.5%;
+  min-width: 350px;
+  margin-right: 12px;
+  margin-bottom: 12px;
 }
 
 .right-column {
   display: inline-flex;
   flex-flow: column nowrap;
-  width: 45%;
   padding: 6px;
+  flex: 1 1 auto;
+  min-width: 350px;
 }
 
 /* Left menus */

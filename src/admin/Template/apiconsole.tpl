@@ -4,16 +4,18 @@
 <div class="page">
     <div class="page_wrapper">
 <?php	include(ADMIN_TPL_PATH."header.tpl");	?>
+<div class="navigation navigation_closed">
+    <nav class="navigation-content">
+        <div class="navigation-controls">
+            <button class="navigation__close-btn"><?=svgIcon("back")?></button>
+            <div class="navigation-logo">
+                <a class="logo__link" href="<?=BASEURL?>">
+                    <span class="logo__icon"><?=svgIcon("header_logo")?></span>
+                    <span class="logo__title">Jezve Money</span>
+                </a>
+            </div>
+        </div>
 
-        <div class="container">
-            <div class="content">
-                <div class="content_wrap admin_cont_wrap">
-                    <div class="heading">
-                        <h1>API test</h1>
-                    </div>
-
-<div class="api-console">
-    <div class="left-column">
         <ul id="controllersList" class="menu-list">
             <li>
                 <button>Common</button>
@@ -144,8 +146,18 @@
                 </ul>
             </li>
         </ul>
-    </div>
+    </nav>
+    <div class="navigation-bg"></div>
+</div>
 
+        <div class="container">
+            <div class="content">
+                <div class="content_wrap">
+                    <div class="heading">
+                        <h1>API test</h1>
+                    </div>
+
+<div class="api-console">
     <div class="center-column">
         <div id="readStateForm" class="request-data-form">
         <h3>Read state</h3>
