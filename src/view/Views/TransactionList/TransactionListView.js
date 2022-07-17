@@ -82,7 +82,7 @@ class TransactionListView extends View {
             placeholder: 'Select account',
             onchange: (obj) => this.onAccountChange(obj),
             editable: false,
-            extraClass: 'dd__fullwidth',
+            className: 'dd__fullwidth',
         });
         if (!this.accountDropDown) {
             throw new Error('Failed to initialize Transaction List view');
@@ -93,7 +93,7 @@ class TransactionListView extends View {
             placeholder: 'Select person',
             onchange: (obj) => this.onPersonChange(obj),
             editable: false,
-            extraClass: 'dd__fullwidth',
+            className: 'dd__fullwidth',
         });
         if (!this.personDropDown) {
             throw new Error('Failed to initialize Transaction List view');

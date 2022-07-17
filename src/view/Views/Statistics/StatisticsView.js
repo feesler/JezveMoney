@@ -68,7 +68,7 @@ class StatisticsView extends View {
             input_id: 'filter_type',
             onitemselect: (obj) => this.onFilterSel(obj),
             editable: false,
-            extraClass: 'dd__fullwidth',
+            className: 'dd__fullwidth',
         });
 
         if (this.state.filter.filter === 'currency') {
@@ -76,14 +76,14 @@ class StatisticsView extends View {
                 input_id: 'curr_id',
                 onitemselect: (obj) => this.onCurrencySel(obj),
                 editable: false,
-                extraClass: 'dd__fullwidth',
+                className: 'dd__fullwidth',
             });
         } else {
             this.accountDropDown = DropDown.create({
                 input_id: 'acc_id',
                 onitemselect: (obj) => this.onAccountSel(obj),
                 editable: false,
-                extraClass: 'dd__fullwidth',
+                className: 'dd__fullwidth',
             });
         }
 
@@ -91,7 +91,7 @@ class StatisticsView extends View {
             input_id: 'groupsel',
             onitemselect: (obj) => this.onGroupSel(obj),
             editable: false,
-            extraClass: 'dd__fullwidth',
+            className: 'dd__fullwidth',
         });
 
         this.datePickerBtn = IconLink.fromElement({

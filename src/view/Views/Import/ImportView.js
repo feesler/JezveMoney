@@ -68,7 +68,7 @@ class ImportView extends View {
             input_id: 'acc_id',
             onchange: () => this.onMainAccChange(),
             editable: false,
-            extraClass: 'dd__fullwidth',
+            className: 'dd__fullwidth',
         });
 
         this.rulesCheck = Checkbox.fromElement(
