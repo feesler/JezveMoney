@@ -171,11 +171,9 @@ const isPaginator = (obj) => verifyObject(obj, {
 const isTransactionsList = (obj) => verifyObject(obj, {
     items: isTransactionsArray,
     filter: isTransactionsFilter,
-    paginator: isPaginator,
+    pagination: isPaginator,
 }, {
-    user_id: isInt,
-    createdate: isInt,
-    updatedate: isInt,
+    order: isString,
 });
 
 /** Verify object is import template */
