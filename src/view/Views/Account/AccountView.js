@@ -117,6 +117,8 @@ class AccountView extends View {
         if (!this.nameFeedback) {
             throw new Error('Invalid Account view');
         }
+
+        this.nameInp.focus();
     }
 
     /**

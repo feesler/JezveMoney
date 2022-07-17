@@ -63,6 +63,8 @@ class PersonView extends View {
                 throw new Error('Failed to initialize Person view');
             }
         }
+
+        this.nameInp.focus();
     }
 
     /**
