@@ -263,6 +263,7 @@ export class ImportTransactionItem extends Component {
             editable: false,
         });
 
+        this.destAccDropDown.addItem({ id: 0, title: '', hidden: true });
         this.destAccDropDown.append(accountItems);
         this.destAccDropDown.enableItem(this.state.accountId, false);
     }
@@ -282,6 +283,7 @@ export class ImportTransactionItem extends Component {
             editable: false,
         });
 
+        this.personDropDown.addItem({ id: 0, title: '', hidden: true });
         this.personDropDown.append(personItems);
     }
 

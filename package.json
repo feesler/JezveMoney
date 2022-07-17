@@ -1,6 +1,6 @@
 {
   "name": "jezve-money",
-  "version": "1.17.0",
+  "version": "1.18.0",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -16,16 +16,16 @@
     "debug": "node --inspect-brk ./tests/index.js",
     "build": "npx webpack --config ./webpack.prod.js",
     "build-dev": "npx webpack --config ./webpack.dev.js",
-    "copy-server": "cp \"./src/Controller\",\"./src/Model\",\"./src/Template\",\"./src/system\",\"./src/api\",\"./src/.htaccess\",\"./src/index.php\",\"./src/favicon.ico\",\"./src/manifest.webmanifest\" -Destination ./dist -Force -Recurse",
-    "copy-admin": "cp \"./src/admin/Controller\",\"./src/admin/Template\",\"./src/admin/.htaccess\",\"./src/admin/index.php\" -Destination ./dist/admin/ -Force -Recurse",
-    "copy-admin-themes": "cp ./src/admin/view/css/themes -Destination ./dist/admin/view/css -Force -Recurse",
-    "copy-client": "cp \"./src/view/img\" -Destination ./dist/view -Force -Recurse",
-    "copy-themes": "cp ./src/view/css/themes -Destination ./dist/view/css -Force -Recurse",
-    "copy-polyfills": "cp ./src/view/js/polyfill -Destination ./dist/view/js -Force -Recurse",
+    "copy-server": "powershell -c \"cp ./src/Controller,./src/Model,./src/Template,./src/system,./src/api,./src/.htaccess,./src/index.php,./src/favicon.ico,./src/manifest.webmanifest -Destination ./dist -Force -Recurse",
+    "copy-admin": "powershell -c \"cp ./src/admin/Controller,./src/admin/Template,./src/admin/.htaccess,./src/admin/index.php -Destination ./dist/admin/ -Force -Recurse\"",
+    "copy-admin-themes": "powershell -c \"cp ./src/admin/view/css/themes -Destination ./dist/admin/view/css -Force -Recurse\"",
+    "copy-client": "powershell -c \"cp ./src/view/img -Destination ./dist/view -Force -Recurse\"",
+    "copy-themes": "powershell -c \"cp ./src/view/css/themes -Destination ./dist/view/css -Force -Recurse\"",
+    "copy-polyfills": "powershell -c \"cp ./src/view/js/polyfill -Destination ./dist/view/js -Force -Recurse\"",
     "copy-admin-all": "npm-run-all copy-admin copy-admin-themes",
     "copy-client-all": "npm-run-all copy-server copy-client copy-themes copy-polyfills",
     "copy-dist": "npm-run-all copy-admin-all copy-client-all",
-    "update-composer": "powershell \"cp ./composer.json -Destination ./dist/; cd ./dist; composer update --no-dev; composer dump-autoload -a --no-dev; rm composer.lock,composer.json\"",
+    "update-composer": "powershell -c \"cp ./composer.json -Destination ./dist/; cd ./dist; composer update --no-dev; composer dump-autoload -a --no-dev; rm composer.lock,composer.json\"",
     "postbuild": "npm run copy-dist",
     "postbuild-dev": "npm run copy-dist",
     "build-tests": "npx webpack --config ./webpack.tests.js"
@@ -71,7 +71,7 @@
   "dependencies": {
     "@babel/runtime": "^7.13.9",
     "core-js": "^3.9.1",
-    "jezvejs": "^1.12.1",
+    "jezvejs": "^1.14.2",
     "whatwg-fetch": "^3.6.2"
   }
 }

@@ -58,7 +58,7 @@ class AccountView extends View {
             input_id: 'icon',
             onitemselect: (o) => this.onIconSelect(o),
             editable: false,
-            extraClass: 'dd__fullwidth',
+            className: 'dd__fullwidth',
         });
         if (!this.iconSelect) {
             throw new Error('Failed to initialize Account view');
@@ -68,7 +68,7 @@ class AccountView extends View {
             input_id: 'currency',
             onitemselect: (o) => this.onCurrencySelect(o),
             editable: false,
-            extraClass: 'dd__fullwidth',
+            className: 'dd__fullwidth',
         });
         if (!this.currencySelect) {
             throw new Error('Failed to initialize Account view');

@@ -1,4 +1,8 @@
 import { isFunction } from 'jezvejs';
+import { createMessage } from '../../js/app.js';
+
+/** Strings */
+const MSG_JSON_PARSE = 'Fail to parse server response';
 
 /**
 * Obtain 32-bit integer from string
@@ -65,7 +69,12 @@ export class Uploader {
         this.xhrUpload.onload = () => {
             if (this.xhrUpload.status === 200) {
                 if (isFunction(this.onSuccess)) {
-                    this.onSuccess(this.xhrUpload.response);
+                    try {
+                        const jsonData = JSON.parse(this.xhrUpload.response);
+                        this.onSuccess(jsonData);
+                    } catch (e) {
+                        createMessage(MSG_JSON_PARSE, 'msg_error');
+                    }
                 }
             } else if (this.xhrUpload.status === 401) {
                 this.abort();

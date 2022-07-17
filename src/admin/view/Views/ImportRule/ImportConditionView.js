@@ -3,9 +3,7 @@ import {
     ce,
     show,
     copyObject,
-    ajax,
     selectByValue,
-    urlJoin,
     hasFlag,
 } from 'jezvejs';
 import { AdminListView } from '../../js/AdminListView.js';
@@ -166,18 +164,17 @@ export class AdminImportConditionListView extends AdminListView {
     /**
      * Request list of items from API
      */
-    requestList() {
+    async requestList() {
         const { baseURL } = window.app;
-        const options = {
-            full: true,
-            rule: this.parentRule,
-        };
+        const url = new URL(`${baseURL}api/${this.apiController}/list`);
+        url.searchParams.set('full', 1);
+        url.searchParams.set('rule', this.parentRule);
 
         show(this.itemsListElem, false);
-        ajax.get({
-            url: `${baseURL}api/${this.apiController}/list?${urlJoin(options)}`,
-            callback: this.onListResult.bind(this),
-        });
+
+        const response = await fetch(url);
+        const apiResult = await response.json();
+        this.onListResult(apiResult);
     }
 
     /**

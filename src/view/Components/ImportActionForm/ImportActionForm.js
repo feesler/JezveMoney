@@ -233,7 +233,8 @@ export class ImportActionForm extends Component {
             return;
         }
 
-        this.state.actionType = action.id;
+        const actionId = parseInt(action.id, 10);
+        this.state.actionType = actionId;
         this.state.value = this.getActionValue(this.state);
         this.state.isValid = true;
         this.render(this.state);

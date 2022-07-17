@@ -4,7 +4,6 @@ import {
     show,
     setEmptyClick,
     removeEmptyClick,
-    ajax,
 } from 'jezvejs';
 import { Component } from 'jezvejs/Component';
 import { Switch } from 'jezvejs/Switch';
@@ -111,9 +110,7 @@ export class Header extends Component {
 
         document.body.className = themes[newTheme].className;
 
-        ajax.get({
-            url: `${baseURL}main/setTheme/?theme=${newTheme}`,
-        });
+        fetch(`${baseURL}main/setTheme/?theme=${newTheme}`);
     }
 
     /**

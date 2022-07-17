@@ -115,12 +115,8 @@ body.white-theme,
 .white-theme .dd__combo,
 .white-theme .dd__input,
 .white-theme .dd__single-selection,
+.white-theme .dd__clear-btn,
 .white-theme .dd__toggle-btn {
-  background-color: #f2f2f2;
-  color: #000000;
-}
-
-.white-theme .dd__single-selection {
   background-color: #f2f2f2;
   color: #000000;
 }
@@ -132,6 +128,7 @@ body.white-theme,
 .white-theme .dd__container_active .dd__combo,
 .white-theme .dd__container_active .dd__input,
 .white-theme .dd__container_active .dd__single-selection,
+.white-theme .dd__container_active .dd__clear-btn,
 .white-theme .dd__container_active .dd__toggle-btn {
   color: #202020;
   background-color: #f2f2f2;
@@ -144,12 +141,14 @@ body.white-theme,
 .white-theme .dd__container.dd__container_disabled .dd__combo,
 .white-theme .dd__container.dd__container_disabled .dd__input,
 .white-theme .dd__container.dd__container_disabled .dd__single-selection,
+.white-theme .dd__container.dd__container_disabled .dd__clear-btn,
 .white-theme .dd__container.dd__container_disabled .dd__toggle-btn {
   color: #a0a0a0;
   border-color: #eeeeee;
   background-color: #eeeeee;
 }
 
+.white-theme .dd__container_disabled .dd__clear-btn path,
 .white-theme .dd__container_disabled .dd__toggle-btn path {
   fill: #707070;
 }
@@ -169,6 +168,7 @@ body.white-theme,
   fill: #000000;
 }
 
+.white-theme .dd__container_enabled .dd__clear-btn:hover path
 .white-theme .dd__container_enabled .dd__toggle-btn:hover path {
   fill: #000000;
 }

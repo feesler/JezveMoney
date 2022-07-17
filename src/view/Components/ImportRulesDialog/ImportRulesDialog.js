@@ -5,11 +5,11 @@ import {
     removeChilds,
     show,
     insertAfter,
-    ajax,
 } from 'jezvejs';
 import { Component } from 'jezvejs/Component';
 import { Popup } from 'jezvejs/Popup';
 import { createMessage } from '../../js/app.js';
+import { API } from '../../js/API.js';
 import { ImportRule } from '../../js/model/ImportRule.js';
 import { ImportRuleForm } from '../ImportRuleForm/ImportRuleForm.js';
 import { ImportRuleItem } from '../ImportRuleItem/ImportRuleItem.js';
@@ -19,7 +19,6 @@ import './style.css';
 /** Strings */
 const TITLE_RULE_DELETE = 'Delete import rule';
 const MSG_RULE_DELETE = 'Are you sure to delete this import rule?';
-const MSG_RULE_SUBMIT_FAIL = 'Fail to submit import rule request';
 const MSG_RULE_LIST_REQUEST_FAIL = 'Fail to read list of import rules';
 const MSG_NO_RULES = 'No rules';
 const TITLE_RULES_LIST = 'Import rules';
@@ -170,60 +169,18 @@ export class ImportRulesDialog extends Component {
     }
 
     /** Send create/update import rule request to API */
-    submitRule(data) {
+    async submitRule(data) {
         if (!data) {
             throw new Error('Invalid data');
         }
 
-        const { baseURL } = window.app;
-        let reqURL = `${baseURL}api/importrule/`;
-        reqURL += (data.id) ? 'update' : 'create';
-
         this.startLoading();
 
-        ajax.post({
-            url: reqURL,
-            data: JSON.stringify(data),
-            headers: { 'Content-Type': 'application/json' },
-            callback: (response) => this.onRuleRequestResult(response),
-        });
-    }
-
-    /** Send delete import rule request to API */
-    deleteRule(ruleId) {
-        const data = {};
-        const { baseURL } = window.app;
-        const reqURL = `${baseURL}api/importrule/del`;
-
-        data.id = parseInt(ruleId, 10);
-        if (!data.id) {
-            throw new Error('Invalid rule id');
-        }
-
-        this.startLoading();
-
-        ajax.post({
-            url: reqURL,
-            data: JSON.stringify(data),
-            headers: { 'Content-Type': 'application/json' },
-            callback: (response) => this.onRuleRequestResult(response),
-        });
-    }
-
-    /** API response handler for rule create/update/delete requests */
-    onRuleRequestResult(response) {
-        let jsondata;
         try {
-            jsondata = JSON.parse(response);
-        } catch (e) {
-            createMessage(this.jsonParseErrorMessage, 'msg_error');
-            this.stopLoading();
-            return;
-        }
-
-        try {
-            if (!jsondata || jsondata.result !== 'ok') {
-                throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : MSG_RULE_SUBMIT_FAIL);
+            if (data.id) {
+                await API.importRule.update(data);
+            } else {
+                await API.importRule.create(data);
             }
 
             this.requestRulesList();
@@ -233,33 +190,36 @@ export class ImportRulesDialog extends Component {
         }
     }
 
-    /** Send API request to obain list of import rules */
-    requestRulesList() {
-        const { baseURL } = window.app;
-
-        ajax.get({
-            url: `${baseURL}api/importrule/list/?extended=true`,
-            callback: (response) => this.onRulesListResult(response),
-        });
-    }
-
-    /** API response handler for rules list request */
-    onRulesListResult(response) {
-        let jsondata;
-        try {
-            jsondata = JSON.parse(response);
-        } catch (e) {
-            createMessage(this.jsonParseErrorMessage, 'msg_error');
-            this.stopLoading();
-            return;
+    /** Send delete import rule request to API */
+    async deleteRule(ruleId) {
+        const id = parseInt(ruleId, 10);
+        if (!id) {
+            throw new Error('Invalid rule id');
         }
 
+        this.startLoading();
+
         try {
-            if (!jsondata || jsondata.result !== 'ok' || !Array.isArray(jsondata.data)) {
-                throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : MSG_RULE_LIST_REQUEST_FAIL);
+            await API.importRule.del(id);
+            this.requestRulesList();
+        } catch (e) {
+            createMessage(e.message, 'msg_error');
+            this.stopLoading();
+        }
+    }
+
+    /** Send API request to obain list of import rules */
+    async requestRulesList() {
+        try {
+            const result = await API.importRule.list({ extended: true });
+            if (!Array.isArray(result.data)) {
+                const errorMessage = (result && 'msg' in result)
+                    ? result.msg
+                    : MSG_RULE_LIST_REQUEST_FAIL;
+                throw new Error(errorMessage);
             }
 
-            window.app.model.rules.setData(jsondata.data);
+            window.app.model.rules.setData(result.data);
             this.state.id = this.LIST_STATE;
             delete this.state.rule;
             this.stopLoading();

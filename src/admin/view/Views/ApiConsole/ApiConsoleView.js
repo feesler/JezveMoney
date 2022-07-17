@@ -9,8 +9,6 @@ import {
     isNum,
     checkDate,
     removeChilds,
-    urlJoin,
-    ajax,
 } from 'jezvejs';
 import { Application } from '../../../../view/js/Application.js';
 import { AdminView } from '../../js/AdminView.js';
@@ -173,11 +171,9 @@ const isPaginator = (obj) => verifyObject(obj, {
 const isTransactionsList = (obj) => verifyObject(obj, {
     items: isTransactionsArray,
     filter: isTransactionsFilter,
-    paginator: isPaginator,
+    pagination: isPaginator,
 }, {
-    user_id: isInt,
-    createdate: isInt,
-    updatedate: isInt,
+    order: isString,
 });
 
 /** Verify object is import template */
@@ -914,21 +910,18 @@ class AdminApiConsoleView extends AdminView {
         }
 
         const request = {
+            httpMethod: formEl.method,
             method: formEl.action,
             data: frmData,
+            verify: verifyCallback,
         };
 
-        if (formEl.method === 'get') {
-            this.apiGet(request, verifyCallback);
-        } else if (formEl.method === 'post') {
-            this.apiPost(request, verifyCallback);
-        }
+        this.apiRequest(request);
     }
 
     /**
      * Checkbox change event handler
      * @param {Event} e - submit event object
-     * @param {Function} verifyCallback - response verification callback
      */
     onCheck(e) {
         if (!e.target || !e.target.form) {
@@ -983,14 +976,15 @@ class AdminApiConsoleView extends AdminView {
             this.requestContainer.classList.toggle('collapsed');
         }.bind(reqItem));
 
-        let reqText = reqData.url;
-        if (reqText.indexOf(baseURL) === 0) {
+        let reqText = reqData.url.toString();
+        if (reqText.startsWith(baseURL)) {
             reqText = reqText.substr(baseURL.length);
         }
 
-        reqItem.requestContainer.append(ce('div', { className: 'title', textContent: `${reqData.method} ${reqText}` }));
-        if (reqData.data) {
-            reqItem.requestContainer.append(ce('div', { className: 'request-details', textContent: reqData.data }));
+        const method = (reqData.options?.method) ? reqData.options.method : 'GET';
+        reqItem.requestContainer.append(ce('div', { className: 'title', textContent: `${method} ${reqText}` }));
+        if (reqData.options?.body) {
+            reqItem.requestContainer.append(ce('div', { className: 'request-details', textContent: reqData.options?.body }));
         }
 
         reqItem.resultContainer = ce('div', { className: 'response-container response-container_pending', textContent: 'Pending...' });
@@ -1022,53 +1016,12 @@ class AdminApiConsoleView extends AdminView {
     }
 
     /**
-     * API request callback
-     * @param {string} text - response text
-     * @param {object} reqItem - request item object
-     * @param {Function} verifyCallback - verification function
-     */
-    ajaxCallback(text, reqItem, verifyCallback) {
-        let respObj;
-        let resText;
-        let res = true;
-
-        try {
-            respObj = JSON.parse(text);
-        } catch (e) {
-            console.log(e.message);
-            reqItem.addResult(false, 'Fail to parse response from server', null);
-            return;
-        }
-
-        if (respObj && respObj.result === 'ok') {
-            if (isFunction(verifyCallback)) {
-                res = verifyCallback(respObj.data);
-            }
-            resText = res ? 'Valid response' : 'Invalid response format';
-        } else {
-            res = false;
-            resText = 'Fail result';
-        }
-
-        reqItem.addResult(res, resText, text);
-    }
-
-    /**
-     * Convert data for POST request
-     * @param {object} data - request data object
-     */
-    postData(data) {
-        return JSON.stringify(data);
-    }
-
-    /**
      * Check request data is single id case { id : value | [ value ] }
      * @param {object} data - request data object
      * @returns id value if match and false overwise
      */
     singleIdData(data) {
         const keys = Object.keys(data);
-
         if (keys.length !== 1 && keys[0] !== 'id') {
             return false;
         }
@@ -1092,7 +1045,6 @@ class AdminApiConsoleView extends AdminView {
     getRequestItem(request, isPOST) {
         const { baseURL } = window.app;
         const prefix = `${baseURL}api/`;
-        const res = {};
 
         if (!isObject(request)) {
             throw new Error('Invalid request');
@@ -1101,30 +1053,34 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Invalid API request method');
         }
 
-        if (request.method.indexOf(prefix) === -1) {
-            res.url = prefix + request.method;
-        } else {
-            res.url = request.method;
-        }
+        const apiMethodURL = (request.method.includes(prefix))
+            ? request.method
+            : prefix + request.method;
 
-        res.headers = ('headers' in request) ? request.headers : {};
+        const singleId = (request.data && !isPOST)
+            ? this.singleIdData(request.data)
+            : false;
+
+        const requestURL = (singleId)
+            ? `${apiMethodURL}${singleId}`
+            : apiMethodURL;
+
+        const res = {
+            url: new URL(requestURL),
+            options: {
+                headers: ('headers' in request) ? request.headers : {},
+            },
+        };
 
         if (request.data) {
             if (isPOST) {
-                res.method = 'POST';
-                res.data = this.postData(request.data);
-                res.headers['Content-Type'] = 'application/json';
-            } else {
-                res.method = 'GET';
-                const id = this.singleIdData(request.data);
-                if (id) {
-                    res.url += id;
-                } else {
-                    const params = urlJoin(request.data);
-                    if (params.length) {
-                        res.url += `?${params}`;
-                    }
-                }
+                res.options.method = 'POST';
+                res.options.body = JSON.stringify(request.data);
+                res.options.headers['Content-Type'] = 'application/json';
+            } else if (!singleId) {
+                Object.entries(request.data).forEach(
+                    ([name, value]) => res.url.searchParams.set(name, value),
+                );
             }
         }
 
@@ -1132,31 +1088,40 @@ class AdminApiConsoleView extends AdminView {
     }
 
     /**
-     * Send GET request to API
-     * @param {object} request - API request object
-     * @param {Function} callback - user callback function
-     */
-    apiGet(request, callback) {
-        const requestItem = this.getRequestItem(request);
-        const reqContainer = this.addRequestItem(requestItem);
-
-        requestItem.callback = (text) => this.ajaxCallback(text, reqContainer, callback);
-
-        ajax.get(requestItem);
-    }
-
-    /**
      * Send POST request to API
      * @param {object} request - API request object
-     * @param {Function} callback - user callback function
      */
-    apiPost(request, callback) {
-        const requestItem = this.getRequestItem(request, true);
+    async apiRequest(request) {
+        const isPOST = request.httpMethod?.toLowerCase() === 'post';
+        const requestItem = this.getRequestItem(request, isPOST);
         const reqContainer = this.addRequestItem(requestItem);
 
-        requestItem.callback = (text) => this.ajaxCallback(text, reqContainer, callback);
+        const response = await fetch(requestItem.url, requestItem.options);
+        const text = await response.text();
 
-        ajax.post(requestItem);
+        let apiResult;
+        let resText;
+        let res = true;
+
+        try {
+            apiResult = JSON.parse(text);
+        } catch (e) {
+            console.log(e.message);
+            reqContainer.addResult(false, 'Fail to parse response from server', null);
+            return;
+        }
+
+        if (apiResult?.result === 'ok') {
+            if (isFunction(request.verify)) {
+                res = request.verify(apiResult.data);
+            }
+            resText = res ? 'Valid response' : 'Invalid response format';
+        } else {
+            res = false;
+            resText = 'Fail result';
+        }
+
+        reqContainer.addResult(res, resText, text);
     }
 
     /** Send read items request */
@@ -1171,7 +1136,7 @@ class AdminApiConsoleView extends AdminView {
             return;
         }
 
-        this.apiGet({
+        this.apiRequest({
             method,
             data: this.parseIds(itemsInp.value),
             verify: verifyFunc,
@@ -1190,7 +1155,8 @@ class AdminApiConsoleView extends AdminView {
             return;
         }
 
-        this.apiPost({
+        this.apiRequest({
+            httpMethod: 'POST',
             method,
             data: this.parseIds(itemsInp.value),
         });
@@ -1212,7 +1178,7 @@ class AdminApiConsoleView extends AdminView {
             frmData.acc_id = this.parseIds(frmData.acc_id).id;
         }
 
-        this.apiGet({
+        this.apiRequest({
             method: 'transaction/list',
             data: frmData,
             verify: isTransactionsList,

@@ -8,7 +8,6 @@ import {
     isEmpty,
     removeChilds,
     setEvents,
-    ajax,
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { formatDate } from 'jezvejs/DateUtils';
@@ -19,6 +18,7 @@ import { Sortable } from 'jezvejs/Sortable';
 import { Selection } from 'jezvejs/Selection';
 import { createMessage } from '../../js/app.js';
 import { Application } from '../../js/Application.js';
+import { API } from '../../js/API.js';
 import { View } from '../../js/View.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
@@ -82,7 +82,7 @@ class TransactionListView extends View {
             placeholder: 'Select account',
             onchange: (obj) => this.onAccountChange(obj),
             editable: false,
-            extraClass: 'dd__fullwidth',
+            className: 'dd__fullwidth',
         });
         if (!this.accountDropDown) {
             throw new Error('Failed to initialize Transaction List view');
@@ -93,7 +93,7 @@ class TransactionListView extends View {
             placeholder: 'Select person',
             onchange: (obj) => this.onPersonChange(obj),
             editable: false,
-            extraClass: 'dd__fullwidth',
+            className: 'dd__fullwidth',
         });
         if (!this.personDropDown) {
             throw new Error('Failed to initialize Transaction List view');
@@ -360,34 +360,13 @@ class TransactionListView extends View {
      * @param {number} transactionId - identifier of transaction to change position
      * @param {number} newPos  - new position of transaction
      */
-    sendChangePosRequest(transactionId, newPos) {
-        const { baseURL } = window.app;
-
-        ajax.post({
-            url: `${baseURL}api/transaction/setpos`,
-            data: JSON.stringify({
-                id: transactionId,
-                pos: newPos,
-            }),
-            headers: { 'Content-Type': 'application/json' },
-            callback: this.onChangePosCallback(transactionId, newPos),
-        });
-    }
-
-    /**
-     * Return callback function for position change request
-     * @param {number} transactionId - identifier of transaction to change position
-     * @param {number} newPos - new position of transaction
-     */
-    onChangePosCallback(transactionId, newPos) {
-        return (response) => {
-            const res = JSON.parse(response);
-            if (res && res.result === 'ok') {
-                this.updateTransArrPos(transactionId, newPos);
-            } else {
-                this.cancelPosChange(transactionId);
-            }
-        };
+    async sendChangePosRequest(transactionId, newPos) {
+        try {
+            await API.transaction.setPos(transactionId, newPos);
+            this.updateTransArrPos(transactionId, newPos);
+        } catch (e) {
+            this.cancelPosChange(transactionId);
+        }
     }
 
     /**
@@ -745,36 +724,21 @@ class TransactionListView extends View {
         window.history.replaceState({}, PAGE_TITLE, url);
     }
 
-    requestTransactions(options) {
-        const { baseURL } = window.app;
-        const reqOptions = {
-            ...options,
-            order: 'desc',
-        };
-        const apiReq = `${baseURL}api/transaction/list?${urlJoin(reqOptions)}`;
-
+    async requestTransactions(options) {
         this.startLoading();
 
-        ajax.get({
-            url: apiReq,
-            headers: { 'Content-Type': 'application/json' },
-            callback: (resp) => this.onTransactionsCallback(resp),
-        });
-    }
+        try {
+            const result = await API.transaction.list(options);
 
-    onTransactionsCallback(response) {
-        const res = JSON.parse(response);
-        if (!res || res.result !== 'ok') {
+            this.state.selectedItems.clear();
+            this.state.items = [...result.data.items];
+            this.state.pagination = { ...result.data.pagination };
+            this.state.filter = { ...result.data.filter };
+        } catch (e) {
             return;
         }
 
-        this.state.selectedItems.clear();
-        this.state.items = [...res.data.items];
-        this.state.pagination = { ...res.data.pagination };
-        this.state.filter = { ...res.data.filter };
-
         this.replaceHistory();
-
         this.stopLoading();
     }
 

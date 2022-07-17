@@ -7,10 +7,10 @@ import {
     copyObject,
     show,
     enable,
-    ajax,
 } from 'jezvejs';
 import { Component } from 'jezvejs/Component';
 import { DropDown } from 'jezvejs/DropDown';
+import { API } from '../../js/API.js';
 import { createMessage } from '../../js/app.js';
 import { ImportTemplateError } from '../../js/error/ImportTemplateError.js';
 import { ImportTemplate } from '../../js/model/ImportTemplate.js';
@@ -20,7 +20,6 @@ import './style.css';
 /** Strings */
 const TITLE_CREATE_TEMPLATE = 'Create template';
 const TITLE_UPDATE_TEMPLATE = 'Update template';
-const MSG_JSON_PARSE_ERROR = 'Fail to parse server response';
 const TITLE_TEMPLATE_DELETE = 'Delete import template';
 const MSG_TEMPLATE_DELETE = 'Are you sure to delete this import template?';
 const MSG_SEL_ACC_AMOUNT = 'Please select decimal column for account amount';
@@ -29,7 +28,6 @@ const MSG_SEL_TR_AMOUNT = 'Please select decimal column for transaction amount';
 const MSG_SEL_TR_CURRENCY = 'Please select correct column for transaction currency';
 const MSG_SEL_DATE = 'Please select column for date';
 const MSG_SEL_COMMENT = 'Please select column for comment';
-const MSG_TPL_REQUEST_FAIL = 'Import template request failed';
 const MSG_TPL_LIST_REQUEST_FAIL = 'Fail to read list of import templates';
 const MSG_RULES_LIST_REQUEST_FAIL = 'Fail to read list of import rules';
 const MSG_VALID_TEMPLATE = 'Valid template';
@@ -284,26 +282,11 @@ export class ImportTemplateManager extends Component {
 
     /** Delete template button 'click' event handler */
     onDeleteTemplateClick() {
-        const requestObj = {
-            id: this.state.template.id,
-        };
-
         ConfirmDialog.create({
             id: 'tpl_delete_warning',
             title: TITLE_TEMPLATE_DELETE,
             content: MSG_TEMPLATE_DELETE,
-            onconfirm: () => {
-                const { baseURL } = window.app;
-
-                this.state.listLoading = true;
-                this.render(this.state);
-                ajax.post({
-                    url: `${baseURL}api/importtpl/delete`,
-                    data: JSON.stringify(requestObj),
-                    headers: { 'Content-Type': 'application/json' },
-                    callback: (response) => this.onTemplateRequestResult(response),
-                });
-            },
+            onconfirm: () => this.requestDeleteTemplate(this.state.template.id),
         });
     }
 
@@ -325,38 +308,23 @@ export class ImportTemplateManager extends Component {
             return;
         }
 
-        const { baseURL } = window.app;
-        let reqURL = `${baseURL}api/importtpl/`;
         if (this.state.template.id) {
-            reqURL += 'update';
             requestObj.id = this.state.template.id;
-        } else {
-            reqURL += 'create';
         }
 
-        this.state.listLoading = true;
-        this.render(this.state);
-        ajax.post({
-            url: reqURL,
-            data: JSON.stringify(requestObj),
-            headers: { 'Content-Type': 'application/json' },
-            callback: (response) => this.onTemplateRequestResult(response),
-        });
+        this.requestSubmitTemplate(requestObj);
     }
 
-    /** API response handler for template create/update/delete request */
-    onTemplateRequestResult(response) {
-        let jsondata;
-        try {
-            jsondata = JSON.parse(response);
-        } catch (e) {
-            createMessage(MSG_JSON_PARSE_ERROR, 'msg_error');
-            return;
-        }
+    /** Send API request to create/update template */
+    async requestSubmitTemplate(data) {
+        this.state.listLoading = true;
+        this.render(this.state);
 
         try {
-            if (!jsondata || jsondata.result !== 'ok') {
-                throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : MSG_TPL_REQUEST_FAIL);
+            if (data.id) {
+                await API.importTemplate.update(data);
+            } else {
+                await API.importTemplate.create(data);
             }
 
             this.requestTemplatesList();
@@ -365,33 +333,32 @@ export class ImportTemplateManager extends Component {
         }
     }
 
-    /** Send API request to obain list of import templates */
-    requestTemplatesList() {
-        const { baseURL } = window.app;
+    /** Send API request to delete template */
+    async requestDeleteTemplate(id) {
+        this.state.listLoading = true;
+        this.render(this.state);
 
-        ajax.get({
-            url: `${baseURL}api/importtpl/list/`,
-            callback: (response) => this.onTemplateListResult(response),
-        });
+        try {
+            await API.importTemplate.del(id);
+            this.requestTemplatesList();
+        } catch (e) {
+            createMessage(e.message, 'msg_error');
+        }
     }
 
-    /** API response handler for templates list request */
-    onTemplateListResult(response) {
-        let jsondata;
+    /** Send API request to obain list of import templates */
+    async requestTemplatesList() {
         try {
-            jsondata = JSON.parse(response);
-        } catch (e) {
-            createMessage(MSG_JSON_PARSE_ERROR, 'msg_error');
-            return;
-        }
-
-        try {
-            if (!jsondata || jsondata.result !== 'ok' || !Array.isArray(jsondata.data)) {
-                throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : MSG_TPL_LIST_REQUEST_FAIL);
+            const result = await API.importTemplate.list();
+            if (!Array.isArray(result.data)) {
+                const errorMessage = (result && 'msg' in result)
+                    ? result.msg
+                    : MSG_TPL_LIST_REQUEST_FAIL;
+                throw new Error(errorMessage);
             }
 
             this.state.listLoading = false;
-            window.app.model.templates.setData(jsondata.data);
+            window.app.model.templates.setData(result.data);
             if (window.app.model.templates.length > 0) {
                 this.state.id = this.RAW_DATA_STATE;
                 this.renderTemplateSelect();
@@ -406,31 +373,17 @@ export class ImportTemplateManager extends Component {
     }
 
     /** Send API request to obain list of import rules */
-    requestRulesList() {
-        const { baseURL } = window.app;
-
-        ajax.get({
-            url: `${baseURL}api/importrule/list/?extended=true`,
-            callback: (response) => this.onRulesListResult(response),
-        });
-    }
-
-    /** API response handler for rules list request */
-    onRulesListResult(response) {
-        let jsondata;
+    async requestRulesList() {
         try {
-            jsondata = JSON.parse(response);
-        } catch (e) {
-            createMessage(MSG_JSON_PARSE_ERROR, 'msg_error');
-            return;
-        }
-
-        try {
-            if (!jsondata || jsondata.result !== 'ok' || !Array.isArray(jsondata.data)) {
-                throw new Error((jsondata && 'msg' in jsondata) ? jsondata.msg : MSG_RULES_LIST_REQUEST_FAIL);
+            const result = await API.importRule.list({ extended: true });
+            if (!Array.isArray(result.data)) {
+                const errorMessage = (result && 'msg' in result)
+                    ? result.msg
+                    : MSG_RULES_LIST_REQUEST_FAIL;
+                throw new Error(errorMessage);
             }
 
-            window.app.model.rules.setData(jsondata.data);
+            window.app.model.rules.setData(result.data);
             this.parent.onUpdateRules();
         } catch (e) {
             createMessage(e.message, 'msg_error');

@@ -3,6 +3,22 @@ body.white-theme  {
   background-color: #ffffff;
 }
 
+/* Navigation */
+.white-theme .navigation-content {
+  background-color: #f0f0f0;
+}
+
+/* Navigation items */
+.white-theme a.nav-link,
+.white-theme a.nav-link:visited {
+  color: #202020;
+}
+
+.white-theme a.nav-link:hover {
+  color: #000000;
+}
+
+/* Tables */
 .dark-theme .admin-tbl,
 .dark-theme .admin-tbl th,
 .dark-theme .admin-tbl td,

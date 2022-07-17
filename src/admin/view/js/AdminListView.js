@@ -5,8 +5,6 @@ import {
     addChilds,
     removeChilds,
     show,
-    urlJoin,
-    ajax,
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
 import { createMessage } from '../../../view/js/app.js';
@@ -164,12 +162,16 @@ export class AdminListView extends AdminView {
         ConfirmDialog.create({
             title: 'Delete',
             content: popupContent,
-            onconfirm: () => ajax.post({
-                url: `${window.app.baseURL}api/${this.apiController}/del`,
-                data: JSON.stringify({ id: this.selectedItem.id }),
-                headers: { 'Content-Type': 'application/json' },
-                callback: this.onSubmitResult.bind(this),
-            }),
+            onconfirm: async () => {
+                const reqURL = `${window.app.baseURL}api/${this.apiController}/del`;
+                const response = await fetch(reqURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: this.selectedItem.id }),
+                });
+                const apiResult = await response.json();
+                this.onSubmitResult(apiResult);
+            },
         });
     }
 
@@ -192,41 +194,34 @@ export class AdminListView extends AdminView {
         let els = this.getFormData(formEl);
         els = this.prepareRequestData(els);
 
-        if (formEl.method === 'get') {
-            const params = urlJoin(els);
-            let link = formEl.action;
-            if (params !== '') {
-                link += ((link.indexOf('?') !== -1) ? '&' : '?') + params;
-            }
-            ajax.get({
-                url: link,
-                callback: this.onSubmitResult.bind(this),
-            });
-        } else if (formEl.method === 'post') {
-            ajax.post({
-                url: formEl.action,
-                data: JSON.stringify(els),
-                headers: { 'Content-Type': 'application/json' },
-                callback: this.onSubmitResult.bind(this),
-            });
+        this.requestSubmit(formEl.method, formEl.action, els);
+    }
+
+    async requestSubmit(method, action, data) {
+        const options = { method };
+        const url = new URL(action);
+
+        if (method === 'post') {
+            options.headers = { 'Content-Type': 'application/json' };
+            options.body = JSON.stringify(data);
+        } else {
+            Object.entries(data).forEach(([name, value]) => url.searchParams.set(name, value));
         }
+
+        const response = await fetch(url, options);
+        const apiResult = await response.json();
+        this.onSubmitResult(apiResult);
     }
 
     /**
      * Show delete item confirmation
      */
-    onSubmitResult(response) {
+    onSubmitResult(apiResult) {
         let failMessage = 'Fail to submit request';
-        let res;
 
-        try {
-            const respObj = JSON.parse(response);
-            res = (respObj && respObj.result === 'ok');
-            if (!res && respObj && respObj.msg) {
-                failMessage = respObj.msg;
-            }
-        } catch (e) {
-            res = false;
+        const res = (apiResult && apiResult.result === 'ok');
+        if (!res && apiResult?.msg) {
+            failMessage = apiResult.msg;
         }
 
         if (!res) {
@@ -240,38 +235,28 @@ export class AdminListView extends AdminView {
     /**
      * Request list of items from API
      */
-    requestList() {
+    async requestList() {
         const { baseURL } = window.app;
 
         show(this.itemsListElem, false);
-        ajax.get({
-            url: `${baseURL}api/${this.apiController}/list`,
-            callback: this.onListResult.bind(this),
-        });
+
+        const response = await fetch(`${baseURL}api/${this.apiController}/list`);
+        const apiResult = await response.json();
+        this.onListResult(apiResult);
     }
 
     /**
      * List of items response handler
      * @param {string} response - API response string
      */
-    onListResult(response) {
-        let respObj;
-        let res;
-
-        try {
-            respObj = JSON.parse(response);
-            res = (respObj && respObj.result === 'ok');
-        } catch (e) {
-            res = false;
-        }
-
-        if (!res) {
+    onListResult(apiResult) {
+        if (!apiResult || apiResult.result !== 'ok') {
             return;
         }
 
-        this.setData(respObj.data);
+        this.setData(apiResult.data);
         removeChilds(this.itemsListElem);
-        const rows = respObj.data.map((item) => {
+        const rows = apiResult.data.map((item) => {
             const row = this.renderItem(item);
             row.dataset.id = item.id;
             return row;

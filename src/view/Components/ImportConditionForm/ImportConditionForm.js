@@ -324,11 +324,12 @@ export class ImportConditionForm extends Component {
             throw new Error('Invalid operator');
         }
 
-        if (this.state.operator === operator.id) {
+        const operatorId = parseInt(operator.id, 10);
+        if (this.state.operator === operatorId) {
             return;
         }
 
-        this.state.operator = operator.id;
+        this.state.operator = operatorId;
         this.state.isValid = true;
         this.render(this.state);
         this.sendUpdate();
