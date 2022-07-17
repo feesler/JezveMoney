@@ -1092,7 +1092,7 @@ class AdminApiConsoleView extends AdminView {
      * @param {object} request - API request object
      */
     async apiRequest(request) {
-        const isPOST = request.httpMethod.toLowerCase() === 'post';
+        const isPOST = request.httpMethod?.toLowerCase() === 'post';
         const requestItem = this.getRequestItem(request, isPOST);
         const reqContainer = this.addRequestItem(requestItem);
 
