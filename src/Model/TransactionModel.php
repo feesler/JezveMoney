@@ -1371,7 +1371,7 @@ class TransactionModel extends CachedTable
             $res["search"] = $params["search"];
         }
 
-        return (object)$res;
+        return $res;
     }
 
 

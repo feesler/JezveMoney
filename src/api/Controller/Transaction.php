@@ -74,7 +74,7 @@ class Transaction extends ApiController
 
         $res = new \stdClass();
         $params = $this->model->getRequestFilters($_GET, $defaultParams, true);
-        $res->filter = $this->model->getFilterObject($params);
+        $res->filter = (object)$this->model->getFilterObject($params);
 
         // Order request is available only from API
         if (

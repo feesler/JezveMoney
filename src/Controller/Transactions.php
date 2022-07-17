@@ -200,7 +200,7 @@ class Transactions extends TemplateController
             "currency" => $currArr,
             "view" => [
                 "transArr" => $trItems,
-                "filterObj" => $filterObj,
+                "filterObj" => (object)$filterObj,
                 "pagination" => $pagination,
                 "mode" => $showDetails ? "details" : "classic",
             ],
