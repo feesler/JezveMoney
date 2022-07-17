@@ -160,10 +160,18 @@
         <h3>List accounts</h3>
         <form action="<?=BASEURL?>api/account/list" method="list">
             <div class="std_margin">
-                <input name="full" type="checkbox" value="1"><label for="count">Include accounts of persons</label>
+                <label class="checkbox">
+                    <input name="full" type="checkbox" value="1">
+                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__label">Include accounts of persons</span>
+                </label>
             </div>
             <div class="std_margin">
-                <input type="checkbox" data-target="type"><label for="count">Type</label>
+                <label class="checkbox">
+                    <input type="checkbox" data-target="type">
+                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__label">Type</span>
+                </label>
                 <select name="type" class="stretch-input" disabled>
                     <option value="all">All</option>
                     <option value="visible" selected>Visible</option>
@@ -273,7 +281,11 @@
         <h3>List</h3>
         <form action="<?=BASEURL?>api/transaction/list" method="list">
             <div class="std_margin">
-                <input type="checkbox" data-target="order"><label>Order</label>
+                <label class="checkbox">
+                    <input type="checkbox" data-target="order">
+                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__label">Order</span>
+                </label>
                 <div id="admin_block" class="checkbox-wrap checkbox-wrap_inline">
                     <label for="list_trans_isasc"><input id="list_trans_isasc" name="order" type="radio" value="asc" checked disabled>Ascending</label>
                 </div>
@@ -282,31 +294,59 @@
                 </div>
             </div>
             <div class="std_margin">
-                <input type="checkbox" data-target="type"><label for="list_trans_type">Types</label>
+                <label class="checkbox">
+                    <input type="checkbox" data-target="type">
+                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__label">Types</span>
+                </label>
                 <input id="list_trans_type" class="stretch-input" name="type" type="text" value="0" disabled>
             </div>
             <div class="std_margin">
-                <input type="checkbox" data-target="count"><label for="list_trans_count">Max. count</label>
+                <label class="checkbox">
+                    <input type="checkbox" data-target="count">
+                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__label">Max. count</span>
+                </label>
                 <input id="list_trans_count" class="stretch-input" name="count" type="text" value="10" disabled>
             </div>
             <div class="std_margin">
-                <input type="checkbox" data-target="page"><label for="list_trans_page">Page number</label>
+                <label class="checkbox">
+                    <input type="checkbox" data-target="page">
+                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__label">Page number</span>
+                </label>
                 <input id="list_trans_page" class="stretch-input" name="page" type="text" value="0" disabled>
             </div>
             <div class="std_margin">
-                <input type="checkbox" data-target="acc_id"><label for="list_trans_accounts">Account ids</label>
+                <label class="checkbox">
+                    <input type="checkbox" data-target="acc_id">
+                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__label">Account ids</span>
+                </label>
                 <input id="list_trans_accounts" class="stretch-input" name="acc_id" type="text" value="0" disabled>
             </div>
             <div class="std_margin">
-                <input type="checkbox" data-target="stdate"><label for="list_trans_stdate">Start date</label>
+                <label class="checkbox">
+                    <input type="checkbox" data-target="stdate">
+                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__label">Start date</span>
+                </label>
                 <input id="list_trans_stdate" class="stretch-input" name="stdate" type="text" value="" disabled>
             </div>
             <div class="std_margin">
-                <input type="checkbox" data-target="enddate"><label for="list_trans_enddate">End date</label>
+                <label class="checkbox">
+                    <input type="checkbox" data-target="enddate">
+                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__label">End date</span>
+                </label>
                 <input id="list_trans_enddate" class="stretch-input" name="enddate" type="text" value="" disabled>
             </div>
             <div class="std_margin">
-                <input type="checkbox" data-target="search"><label for="list_trans_search">Search request</label>
+                <label class="checkbox">
+                    <input type="checkbox" data-target="search">
+                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__label">Search request</span>
+                </label>
                 <input id="list_trans_search" class="stretch-input" name="search" type="text" value="" disabled>
             </div>
             <div class="acc_controls">
@@ -653,10 +693,18 @@
         <h3>List import rules</h3>
         <form action="<?=BASEURL?>api/importrule/list" method="list">
             <div class="std_margin">
-                <input name="full" type="checkbox" value="true"><label for="count">List for all users</label>
+                <label class="checkbox">
+                    <input name="full" type="checkbox" value="true">
+                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__label">List for all users</span>
+                </label>
             </div>
             <div class="std_margin">
-                <input name="extended" type="checkbox" value="true"><label for="count">Extended</label>
+                <label class="checkbox">
+                    <input name="extended" type="checkbox" value="true">
+                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__label">Extended</span>
+                </label>
             </div>
             <div class="acc_controls">
                 <input class="adm_act_btn" type="submit" value="submit">
@@ -720,10 +768,18 @@
         <h3>List import conditions</h3>
         <form action="<?=BASEURL?>api/importcond/list" method="list">
             <div class="std_margin">
-                <input name="full" type="checkbox" value="true"><label for="count">List for all users</label>
+                <label class="checkbox">
+                    <input name="full" type="checkbox" value="true">
+                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__label">List for all users</span>
+                </label>
             </div>
             <div class="std_margin">
-                <input type="checkbox" data-target="rule"><label for="list_cond_rule">Import rule id</label>
+                <label class="checkbox">
+                    <input type="checkbox" data-target="rule">
+                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__label">Import rule id</span>
+                </label>
                 <input id="list_cond_rule" class="stretch-input" name="rule" type="text" value="0" disabled>
             </div>
             <div class="acc_controls">
@@ -820,10 +876,18 @@
         <h3>List import actions</h3>
         <form action="<?=BASEURL?>api/importaction/list" method="list">
             <div class="std_margin">
-                <input name="full" type="checkbox" value="true"><label for="count">List for all users</label>
+                <label class="checkbox">
+                    <input name="full" type="checkbox" value="true">
+                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__label">List for all users</span>
+                </label>
             </div>
             <div class="std_margin">
-                <input type="checkbox" data-target="rule"><label for="list_act_rule">Import rule id</label>
+                <label class="checkbox">
+                    <input type="checkbox" data-target="rule">
+                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__label">Import rule id</span>
+                </label>
                 <input id="list_act_rule" class="stretch-input" name="rule" type="text" value="0" disabled>
             </div>
             <div class="acc_controls">
@@ -904,7 +968,11 @@
         <h3>List persons</h3>
         <form action="<?=BASEURL?>api/person/list" method="list">
             <div class="std_margin">
-                <input type="checkbox" data-target="type"><label for="count">Type</label>
+                <label class="checkbox">
+                    <input type="checkbox" data-target="type">
+                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__label">Type</span>
+                </label>
                 <select class="stretch-input" name="type" disabled>
                     <option value="all">All</option>
                     <option value="visible" selected>Visible</option>
