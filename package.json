@@ -28,7 +28,8 @@
     "update-composer": "powershell -c \"cp ./composer.json -Destination ./dist/; cd ./dist; composer update --no-dev; composer dump-autoload -a --no-dev; rm composer.lock,composer.json\"",
     "postbuild": "npm run copy-dist",
     "postbuild-dev": "npm run copy-dist",
-    "build-tests": "npx webpack --config ./webpack.tests.js"
+    "build-tests": "npx webpack --config ./webpack.tests.js",
+    "build-all": "npm-run-all build build-tests copy-dist"
   },
   "keywords": [
     "money",
