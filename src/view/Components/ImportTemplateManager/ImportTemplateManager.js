@@ -15,6 +15,7 @@ import { createMessage } from '../../js/app.js';
 import { ImportTemplateError } from '../../js/error/ImportTemplateError.js';
 import { ImportTemplate } from '../../js/model/ImportTemplate.js';
 import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog.js';
+import { LoadingIndicator } from '../LoadingIndicator/LoadingIndicator.js';
 import './style.css';
 
 /** Strings */
@@ -89,7 +90,6 @@ export class ImportTemplateManager extends Component {
         this.tplControls = ge('tplControls');
         this.submitTplBtn = ge('submitTplBtn');
         this.cancelTplBtn = ge('cancelTplBtn');
-        this.loadingIndicator = ge('loadingIndicator');
         this.tableDescr = ge('tableDescr');
         this.rawDataTable = ge('rawDataTable');
         this.tplFeedback = ge('tplFeedback');
@@ -107,7 +107,6 @@ export class ImportTemplateManager extends Component {
             || !this.tplControls
             || !this.submitTplBtn
             || !this.cancelTplBtn
-            || !this.loadingIndicator
             || !this.tableDescr
             || !this.rawDataTable
             || !this.tplFeedback) {
@@ -120,6 +119,9 @@ export class ImportTemplateManager extends Component {
         this.deleteTplBtn.addEventListener('click', () => this.onDeleteTemplateClick());
         this.submitTplBtn.addEventListener('click', () => this.onSubmitTemplateClick());
         this.cancelTplBtn.addEventListener('click', () => this.onCancelTemplateClick());
+
+        this.loadingIndicator = LoadingIndicator.create({ fixed: false });
+        this.elem.append(this.loadingIndicator.elem);
 
         this.reset();
     }
@@ -523,7 +525,7 @@ export class ImportTemplateManager extends Component {
     render(state) {
         const templateAvail = (window.app.model.templates.length > 0);
         if (state.id === this.LOADING_STATE) {
-            show(this.loadingIndicator, true);
+            this.loadingIndicator.show();
             show(this.tableDescr, false);
             show(this.rawDataTable, false);
             show(this.tplControls, false);
@@ -532,7 +534,7 @@ export class ImportTemplateManager extends Component {
             show(this.noTplLabel, !templateAvail);
             show(this.tplHeading, true);
             show(this.tplStateLbl, false);
-            show(this.loadingIndicator, false);
+            this.loadingIndicator.hide();
             show(this.tableDescr, false);
             show(this.rawDataTable, false);
             show(this.nameField, false);
@@ -550,7 +552,7 @@ export class ImportTemplateManager extends Component {
             show(this.noTplLabel, false);
             show(this.tplStateLbl, true);
             show(this.tplHeading, true);
-            show(this.loadingIndicator, false);
+            this.loadingIndicator.hide();
             show(this.tableDescr, true);
             show(this.rawDataTable, true);
             show(this.tplField, false);

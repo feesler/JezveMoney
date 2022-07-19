@@ -1,0 +1,38 @@
+.loading-indicator {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  color: #dddddd;
+  background-color: rgb(50 50 50 / 70%);
+}
+
+.loading-indicator_fixed {
+  position: fixed;
+  top: 50px;
+}
+
+.loading-indicator__spinner {
+  border-top-color: #dddddd;
+  border-right-color: #dddddd;
+}
+
+.loading-indicator__title {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .loading-indicator_fixed {
+    left: 200px;
+  }
+}

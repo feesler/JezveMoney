@@ -3,7 +3,6 @@ import {
     ge,
     re,
     ce,
-    show,
     enable,
 } from 'jezvejs';
 import { formatDate } from 'jezvejs/DateUtils';
@@ -19,6 +18,7 @@ import './style.css';
 import { ImportUploadDialog } from '../../Components/ImportUploadDialog/ImportUploadDialog.js';
 import { ImportRulesDialog } from '../../Components/ImportRulesDialog/ImportRulesDialog.js';
 import { ImportTransactionItem } from '../../Components/ImportTransactionItem/ImportTransactionItem.js';
+import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { API } from '../../js/API.js';
 
 const SUBMIT_LIMIT = 100;
@@ -82,9 +82,8 @@ class ImportView extends View {
         this.rulesBtn = ge('rulesBtn');
         this.rulesCountElem = ge('rulescount');
         this.rowsContainer = ge('rowsContainer');
-        this.submitProgress = ge('submitProgress');
-        this.submitProgressIndicator = ge('submitProgressIndicator');
-        if (!this.newItemBtn
+        if (
+            !this.newItemBtn
             || !this.uploadBtn
             || !this.submitBtn
             || !this.transCountElem
@@ -94,19 +93,26 @@ class ImportView extends View {
             || !this.rulesBtn
             || !this.rulesCountElem
             || !this.rowsContainer
-            || !this.submitProgress
-            || !this.submitProgressIndicator) {
+        ) {
             throw new Error('Failed to initialize Import view');
         }
 
         this.submitBtn.addEventListener('click', () => this.onSubmitClick());
         this.rulesBtn.addEventListener('click', () => this.onRulesClick());
-
-        this.noDataMsg = this.rowsContainer.querySelector('.nodata-message');
-        this.loadingInd = this.rowsContainer.querySelector('.data-container__loading');
-        if (!this.loadingInd) {
+        // Submit progress indicator
+        this.submitProgress = LoadingIndicator.create({ title: 'Saving items...' });
+        this.submitProgressIndicator = ce('div');
+        this.submitProgress.elem.append(this.submitProgressIndicator);
+        const contentWrapper = document.querySelector('.content_wrap');
+        if (!contentWrapper) {
             throw new Error('Failed to initialize Import view');
         }
+        contentWrapper.append(this.submitProgress.elem);
+
+        this.noDataMsg = this.rowsContainer.querySelector('.nodata-message');
+        // Data loading indicator
+        this.loadingInd = LoadingIndicator.create({ fixed: false });
+        this.rowsContainer.append(this.loadingInd.elem);
 
         this.trListSortable = new Sortable({
             oninsertat: (orig, replaced) => this.onTransPosChanged(orig, replaced),
@@ -209,7 +215,7 @@ class ImportView extends View {
      *  and disable import item if same(similar) transaction found
      */
     async requestSimilar() {
-        show(this.loadingInd, true);
+        this.loadingInd.show();
 
         // Obtain date region of imported transactions
         const importedDateRange = { start: 0, end: 0 };
@@ -244,7 +250,7 @@ class ImportView extends View {
             const result = await API.transaction.list(reqParams);
             this.state.transCache = result.data.items;
         } catch (e) {
-            show(this.loadingInd, false);
+            this.loadingInd.hide();
             return;
         }
 
@@ -278,7 +284,7 @@ class ImportView extends View {
         });
 
         this.render(this.state);
-        show(this.loadingInd, false);
+        this.loadingInd.hide();
         this.setRenderTime();
     }
 
@@ -455,7 +461,7 @@ class ImportView extends View {
 
     /** Submit buttom 'click' event handler */
     onSubmitClick() {
-        show(this.submitProgress, true);
+        this.submitProgress.show();
 
         const enabledList = this.getEnabledItems();
         if (!Array.isArray(enabledList) || !enabledList.length) {
@@ -464,7 +470,7 @@ class ImportView extends View {
 
         const valid = enabledList.every((item) => item.validate());
         if (!valid) {
-            show(this.submitProgress, false);
+            this.submitProgress.hide();
             return;
         }
 
@@ -530,7 +536,7 @@ class ImportView extends View {
             message = e.message;
         }
 
-        show(this.submitProgress, false);
+        this.submitProgress.hide();
         createMessage(message, (status ? 'msg_success' : 'msg_error'));
     }
 

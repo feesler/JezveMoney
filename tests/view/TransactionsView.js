@@ -4,7 +4,6 @@ import {
     prop,
     parentNode,
     navigation,
-    isVisible,
     click,
     waitForFunction,
     goTo,
@@ -65,8 +64,7 @@ export class TransactionsView extends AppView {
         const transList = await query('.trans-list');
         assert(transList, 'List of transactions not found');
 
-        res.loadingIndicator = { elem: await query(transList, '.trans-list__loading') };
-        res.loadingIndicator.visible = await isVisible(res.loadingIndicator.elem, true);
+        res.loadingIndicator = { elem: await query(transList, '.loading-indicator') };
 
         res.modeSelector = await ModeSelector.create(this, await query('.mode-selector'));
         res.paginator = await Paginator.create(this, await query('.paginator'));

@@ -15,6 +15,7 @@ import { ImportRuleForm } from '../ImportRuleForm/ImportRuleForm.js';
 import { ImportRuleItem } from '../ImportRuleItem/ImportRuleItem.js';
 import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog.js';
 import './style.css';
+import { LoadingIndicator } from '../LoadingIndicator/LoadingIndicator.js';
 
 /** Strings */
 const TITLE_RULE_DELETE = 'Delete import rule';
@@ -55,16 +56,17 @@ export class ImportRulesDialog extends Component {
 
         this.createRuleBtn = ge('createRuleBtn');
         this.titleElem = this.elem.querySelector('.rules-header label');
-        this.loadingIndicator = this.elem.querySelector('.rules-dialog__loading');
         this.listContainer = this.elem.querySelector('.rules-list');
         if (!this.createRuleBtn
             || !this.titleElem
-            || !this.loadingIndicator
             || !this.listContainer) {
             throw new Error('Failed to initialize import rules dialog');
         }
 
         this.createRuleBtn.addEventListener('click', () => this.onCreateRuleClick());
+
+        this.loadingIndicator = LoadingIndicator.create({ fixed: false });
+        this.elem.append(this.loadingIndicator.elem);
 
         this.reset();
         this.render(this.state);

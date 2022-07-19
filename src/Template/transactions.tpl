@@ -175,8 +175,6 @@ include(TPL_PATH."commonhdr.tpl");
                         <div class="paginator-row">
                             <?=Paginator::render($paginator)?>
                         </div>
-
-                        <div class="trans-list__loading hidden">Loading...</div>
                     </div>
                 </div>
             </div>

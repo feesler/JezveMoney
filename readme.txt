@@ -81,3 +81,6 @@ Run from app root:
 
 PHP CS Fixer
 .\dev-tools\vendor\bin\php-cs-fixer fix --rules=@PSR2 <files to fix>
+
+Run tests in browser
+Run browser with --disable-ipc-flooding-protection flag

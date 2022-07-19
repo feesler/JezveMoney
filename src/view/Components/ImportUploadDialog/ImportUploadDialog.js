@@ -10,6 +10,7 @@ import { Popup } from 'jezvejs/Popup';
 import { createMessage } from '../../js/app.js';
 import { ImportFileUploader } from '../ImportFileUploader/ImportFileUploader.js';
 import { ImportTemplateManager } from '../ImportTemplateManager/ImportTemplateManager.js';
+import { LoadingIndicator } from '../LoadingIndicator/LoadingIndicator.js';
 import './style.css';
 
 /**
@@ -41,8 +42,9 @@ export class ImportUploadDialog extends Component {
         this.uploader = new ImportFileUploader({
             elem: 'fileBlock',
             parent: this.parent,
-            uploadStarted: () => this.onUploadStart(),
-            uploaded: (data) => this.onUploaded(data),
+            onUploadStart: () => this.onUploadStart(),
+            onUploadError: (message) => this.onUploadError(message),
+            onUploaded: (data) => this.onUploaded(data),
         });
         this.tplManager = new ImportTemplateManager({
             elem: 'templateBlock',
@@ -76,22 +78,23 @@ export class ImportUploadDialog extends Component {
         this.initialAccField = ge('initialAccField');
         this.controlsBlock = this.elem.querySelector('.upload-dialog-controls');
         this.submitUploadedBtn = ge('submitUploadedBtn');
-        this.uploadProgress = ge('uploadProgress');
         if (!this.initialAccField
             || !this.accountDropDown
             || !this.controlsBlock
-            || !this.uploadProgress
             || !this.submitUploadedBtn) {
             throw new Error('Failed to initialize upload file dialog');
         }
 
         this.submitUploadedBtn.addEventListener('click', () => this.onSubmit());
+
+        this.uploadProgress = LoadingIndicator.create({ fixed: false });
+        this.elem.append(this.uploadProgress.elem);
     }
 
     /** Show/hide dialog */
     show(val) {
         this.popup.show(val);
-        show(this.uploadProgress, false);
+        this.uploadProgress.hide();
     }
 
     /** Hide dialog */
@@ -196,7 +199,7 @@ export class ImportUploadDialog extends Component {
 
     /** Submit event handler */
     onSubmit() {
-        show(this.uploadProgress, true);
+        this.uploadProgress.show();
 
         setTimeout(() => this.processItems(), 100);
     }
@@ -211,20 +214,23 @@ export class ImportUploadDialog extends Component {
         }
 
         if (!this.state.importedItems) {
-            show(this.uploadProgress, false);
+            this.uploadProgress.hide();
             return;
         }
 
         this.importDone();
     }
 
-    /**
-     * Import data request callback
-     * @param {Array} data - data from uploader file
-     */
+    /** Upload started handler */
     onUploadStart() {
-        this.tplManager.setLoading(true);
+        this.tplManager.setLoading();
         this.tplManager.show();
+    }
+
+    /** Upload error handler */
+    onUploadError(message) {
+        this.tplManager.reset();
+        createMessage(message, 'msg_error');
     }
 
     /**
@@ -239,7 +245,7 @@ export class ImportUploadDialog extends Component {
 
             this.tplManager.setRawData(data);
         } catch (e) {
-            createMessage(e.message, 'msg_error');
+            this.onUploadError(e.message);
             this.state.importedItems = null;
             this.importDone();
         }

@@ -19,24 +19,6 @@
   margin-bottom: 12px;
 }
 
-/* Upload dialog progress indicator */
-.upload-dialog__loading {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 400;
-  z-index: 100;
-  background-color: rgb(50 50 50 / 70%);
-  border-radius: 10px;
-}
-
 /* Sticky header */
 .content-header {
   position: sticky;
@@ -118,39 +100,6 @@
   flex-flow: column nowrap;
   align-items: stretch;
   position: relative;
-}
-
-.data-container__loading {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 400;
-  z-index: 1000;
-  background-color: rgb(50 50 50 / 70%);
-  border-radius: 10px;
-}
-
-.submit-progress {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 400;
-  z-index: 1000;
-  background-color: rgb(50 50 50 / 70%);
 }
 
 /* Desktop */

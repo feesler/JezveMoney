@@ -29,7 +29,7 @@ export class ImportRulesDialog extends TestComponent {
                 labelElem: await query('.rules-header label'),
                 createBtn: await query('#createRuleBtn'),
             },
-            loadingIndicator: { elem: await query(this.elem, '.rules-dialog__loading') },
+            loadingIndicator: { elem: await query(this.elem, '.loading-indicator') },
             rulesList: { elem: await query(this.elem, '.rules-list') },
         };
 

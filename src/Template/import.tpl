@@ -67,15 +67,10 @@ include(TPL_PATH."commonhdr.tpl");	?>
                     <div class="data-form<?=hidden(!$importAvailable)?>">
                         <div id="rowsContainer" class="data-container">
                             <span class="nodata-message">No transactions to import</span>
-                            <div class="data-container__loading hidden">Loading...</div>
                         </div>
                         <div class="import-controls std_margin">
                             <input id="submitbtn" class="btn submit-btn" type="button" value="ok" disabled>
                         </div>
-                    </div>
-                    <div id="submitProgress" class="submit-progress hidden">
-                        <div>Saving items...</div>
-                        <div id="submitProgressIndicator"></div>
                     </div>
                 </div>
             </div>
@@ -154,7 +149,6 @@ include(TPL_PATH."commonhdr.tpl");	?>
                 </div>
             </div>
         </div>
-        <div id="loadingIndicator" class="tpl-form__loading hidden">Loading...</div>
         <div id="tableDescr" class="tpl-form__title">Column map</div>
         <div id="rawDataTable" class="tpl-form__block"></div>
         <div id="tplFeedback" class="invalid-feedback hidden"></div>
@@ -174,7 +168,6 @@ include(TPL_PATH."commonhdr.tpl");	?>
     <div class="upload-dialog-controls hidden">
         <input id="submitUploadedBtn" class="btn submit-btn" type="button" value="Ok">
     </div>
-    <div id="uploadProgress" class="upload-dialog__loading hidden">Loading...</div>
 </div>
 
 <div id="rulesDialog" class="rules-dialog hidden">
@@ -182,7 +175,6 @@ include(TPL_PATH."commonhdr.tpl");	?>
         <label>Import rules</label>
         <input id="createRuleBtn" class="btn link-btn create-btn" type="button" value="Create">
     </div>
-    <div class="rules-dialog__loading hidden">Loading...</div>
     <div class="rules-list"></div>
 </div>
 

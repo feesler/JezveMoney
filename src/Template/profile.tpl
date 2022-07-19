@@ -61,7 +61,6 @@
         <input id="newname" class="stretch-input" name="name" type="text" autocomplete="off" value="<?=e($profileInfo->name)?>">
         <div class="invalid-feedback">Please input correct name.<br>New name must be different from the old.</div>
     </div>
-    <div id="changeNameLoading" class="form__loading hidden">Loading...</div>
 </form>
 </div>
 
@@ -78,8 +77,6 @@
         <input id="newpwd" class="stretch-input" name="new" type="password" autocomplete="off">
         <div class="invalid-feedback">Please input correct new password.<br>New password must be different from the old.</div>
     </div>
-
-    <div id="changePassLoading" class="form__loading hidden">Loading...</div>
 </form>
 </div>
 

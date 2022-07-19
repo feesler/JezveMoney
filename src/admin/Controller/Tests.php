@@ -16,7 +16,8 @@ class Tests extends AdminController
         ];
 
         $this->menuItems["tests"]["active"] = true;
-        $this->cssAdmin[] = "TestsView.css";
+        $this->cssAdmin[] = "AdminTestsView.css";
+        $this->jsAdmin[] = "AdminTestsView.js";
         $this->jsAdmin[] = "tests/index.js";
 
         $this->render($data);

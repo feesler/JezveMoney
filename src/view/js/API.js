@@ -2,15 +2,17 @@
 const MSG_REQUEST_FAIL = 'API request failed';
 
 /** Send API request */
-const apiRequest = async (method, path, data = null) => {
+const apiRequest = async (method, path, data = null, headers = {}) => {
     const { baseURL } = window.app;
     const isPOST = method.toLowerCase() === 'post';
     const url = new URL(`${baseURL}api/${path}`);
-    const options = { method };
+    const options = { method, headers };
 
     if (isPOST) {
-        options.headers = { 'Content-Type': 'application/json' };
-        if (data) {
+        if (data instanceof FormData) {
+            options.body = data;
+        } else {
+            options.headers['Content-Type'] = 'application/json';
             options.body = JSON.stringify(data);
         }
     } else if (data) {
@@ -35,9 +37,9 @@ const apiRequest = async (method, path, data = null) => {
 };
 
 /** Send GET API request */
-const apiGet = async (...args) => apiRequest('GET', ...args);
+const apiGet = (...args) => apiRequest('GET', ...args);
 /** Send GET API request */
-const apiPost = async (...args) => apiRequest('POST', ...args);
+const apiPost = (...args) => apiRequest('POST', ...args);
 
 export const API = {
     profile: {
@@ -73,8 +75,8 @@ export const API = {
     },
 
     import: {
-        async upload(data) {
-            return apiPost('import/upload', data);
+        async upload(data, headers = {}) {
+            return apiPost('import/upload', data, headers);
         },
     },
 

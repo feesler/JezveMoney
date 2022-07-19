@@ -34,7 +34,7 @@ export class ImportList extends TestComponent {
             assert(visible, 'No data message is not visible');
         }
 
-        res.loadingIndicator = await query(this.elem, '.data-container__loading');
+        res.loadingIndicator = { elem: await query(this.elem, '.loading-indicator') };
 
         return res;
     }
@@ -43,7 +43,7 @@ export class ImportList extends TestComponent {
         const res = {
             items: cont.items.map((item) => this.getItemData(item)),
             invalidated: cont.items.some((item) => item.model.invalidated),
-            isLoading: await isVisible(cont.loadingIndicator),
+            isLoading: cont.loadingIndicator.visible,
         };
 
         return res;

@@ -40,7 +40,7 @@ export class ImportView extends AppView {
             rulesBtn: { elem: await query('#rulesBtn') },
             rulesCount: { elem: await query('#rulescount') },
             submitBtn: { elem: await query('#submitbtn') },
-            submitProgress: { elem: await query('#submitProgress') },
+            submitProgress: { elem: await query('.content_wrap > .loading-indicator') },
         };
 
         assert(

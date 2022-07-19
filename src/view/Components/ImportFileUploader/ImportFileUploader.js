@@ -1,8 +1,6 @@
 import { ge, show, isFunction } from 'jezvejs';
 import { Component } from 'jezvejs/Component';
 import { Checkbox } from 'jezvejs/Checkbox';
-import { createMessage } from '../../js/app.js';
-import { Uploader } from '../Uploader/Uploader.js';
 import { API } from '../../js/API.js';
 
 /** Strings */
@@ -15,8 +13,9 @@ export class ImportFileUploader extends Component {
     constructor(...args) {
         super(...args);
 
-        this.uploadStartHandler = this.props.uploadStarted;
-        this.uploadedHandler = this.props.uploaded;
+        this.uploadStartHandler = this.props.onUploadStart;
+        this.uploadErrorHandler = this.props.onUploadError;
+        this.uploadedHandler = this.props.onUploaded;
         this.state = {
             fileName: null,
             collapsed: false,
@@ -70,51 +69,46 @@ export class ImportFileUploader extends Component {
      * Import data request callback
      * @param {string} response - data for import request
      */
-    onImportSuccess(apiResult) {
+    onImportSuccess(data) {
         try {
-            if (!apiResult || apiResult.result !== 'ok' || !Array.isArray(apiResult.data)) {
-                const errorMessage = (apiResult && 'msg' in apiResult)
-                    ? apiResult.msg
-                    : MSG_UPLOAD_FAIL;
-                throw new Error(errorMessage);
+            if (!Array.isArray(data)) {
+                throw new Error(MSG_UPLOAD_FAIL);
             }
 
+            this.state.collapsed = true;
+            this.render(this.state);
+
             if (isFunction(this.uploadedHandler)) {
-                this.uploadedHandler(apiResult.data);
+                this.uploadedHandler(data);
             }
         } catch (e) {
-            createMessage(e.message, 'msg_error');
+            this.onImportError(e.message);
         }
     }
 
     /** Import error callback */
-    onImportError() {
-        this.importLoadCallback(null);
-    }
-
-    /** Import progress callback */
-    onImportProgress() {
+    onImportError(message) {
+        if (isFunction(this.uploadErrorHandler)) {
+            this.uploadErrorHandler(message);
+        }
     }
 
     /** Upload file to server */
-    uploadFile(file) {
+    async uploadFile(file) {
         if (!file) {
             return;
         }
 
         const isEncoded = this.isEncodeCheck.checked;
-        const uploader = new Uploader(
-            file,
-            { template: 0, encode: isEncoded },
-            (apiResult) => this.onImportSuccess(apiResult),
-            () => this.onImportError(),
-            () => this.onImportProgress(),
-        );
-        uploader.upload();
+        const fileType = file.name.substr(file.name.lastIndexOf('.') + 1);
+        const data = new FormData();
+        data.append('file', file);
 
-        if (isFunction(this.uploadStartHandler)) {
-            this.uploadStartHandler();
-        }
+        this.sendUploadRequst(data, {
+            'X-File-Type': fileType,
+            'X-File-Tpl': 0,
+            'X-File-Encode': isEncoded ? 1 : 0,
+        });
     }
 
     /** Setup extra controls of file upload dialog */
@@ -182,15 +176,20 @@ export class ImportFileUploader extends Component {
             encode: isEncoded ? 1 : 0,
         };
 
-        this.state.collapsed = true;
-        this.render(this.state);
+        this.sendUploadRequst(reqParams);
+    }
 
+    async sendUploadRequst(data, headers = {}) {
         if (isFunction(this.uploadStartHandler)) {
             this.uploadStartHandler();
         }
 
-        const result = await API.import.upload(reqParams);
-        this.onImportSuccess(result);
+        try {
+            const result = await API.import.upload(data, headers);
+            this.onImportSuccess(result.data);
+        } catch (e) {
+            this.onImportError(e.message);
+        }
     }
 
     /** Render component */
