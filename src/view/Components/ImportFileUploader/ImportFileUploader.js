@@ -1,7 +1,6 @@
 import { ge, show, isFunction } from 'jezvejs';
 import { Component } from 'jezvejs/Component';
 import { Checkbox } from 'jezvejs/Checkbox';
-import { Uploader } from '../Uploader/Uploader.js';
 import { API } from '../../js/API.js';
 
 /** Strings */
@@ -94,29 +93,22 @@ export class ImportFileUploader extends Component {
         }
     }
 
-    /** Import progress callback */
-    onImportProgress() {
-    }
-
     /** Upload file to server */
-    uploadFile(file) {
+    async uploadFile(file) {
         if (!file) {
             return;
         }
 
         const isEncoded = this.isEncodeCheck.checked;
-        const uploader = new Uploader(
-            file,
-            { template: 0, encode: isEncoded },
-            (data) => this.onImportSuccess(data),
-            (message) => this.onImportError(message),
-            () => this.onImportProgress(),
-        );
-        uploader.upload();
+        const fileType = file.name.substr(file.name.lastIndexOf('.') + 1);
+        const data = new FormData();
+        data.append('file', file);
 
-        if (isFunction(this.uploadStartHandler)) {
-            this.uploadStartHandler();
-        }
+        this.sendUploadRequst(data, {
+            'X-File-Type': fileType,
+            'X-File-Tpl': 0,
+            'X-File-Encode': isEncoded ? 1 : 0,
+        });
     }
 
     /** Setup extra controls of file upload dialog */
@@ -184,12 +176,16 @@ export class ImportFileUploader extends Component {
             encode: isEncoded ? 1 : 0,
         };
 
+        this.sendUploadRequst(reqParams);
+    }
+
+    async sendUploadRequst(data, headers = {}) {
         if (isFunction(this.uploadStartHandler)) {
             this.uploadStartHandler();
         }
 
         try {
-            const result = await API.import.upload(reqParams);
+            const result = await API.import.upload(data, headers);
             this.onImportSuccess(result.data);
         } catch (e) {
             this.onImportError(e.message);

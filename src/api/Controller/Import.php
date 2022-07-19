@@ -226,25 +226,11 @@ class Import extends ApiController
         }
 
         try {
-            if (isset($hdrs["x-file-id"])) {
-                $encodeCP1251 = false;
-                $file_cont = file_get_contents('php://input');
-                $fileId = $hdrs["x-file-id"];
+            if (isset($hdrs["x-file-type"])) {
                 $fileType = $hdrs["x-file-type"];
                 $fileTemplate = $hdrs["x-file-tpl"];
-                if (isset($hdrs["x-file-encode"]) && intval($hdrs["x-file-encode"]) == 1) {
-                    $encodeCP1251 = true;
-                }
-
-                $fname = UPLOAD_PATH . $fileId . "." . $fileType;
-
-                // Save uploaded content to file
-                $fhnd = fopen($fname, "a");
-                if ($fhnd === false) {
-                    throw new \Error("Fail to open file");
-                }
-                fwrite($fhnd, $file_cont);
-                fclose($fhnd);
+                $encodeCP1251 = (isset($hdrs["x-file-encode"]) && intval($hdrs["x-file-encode"]) == 1);
+                $fname = $_FILES["file"]["tmp_name"];
             } else {
                 $request = $this->getRequestData();
                 if (
@@ -279,10 +265,6 @@ class Import extends ApiController
             $this->setData($data);
         } catch (\Error $e) {
             throw new \Error($e->getMessage());
-        }
-
-        if (isset($hdrs["x-file-id"])) {
-            unlink($fname);
         }
 
         $this->ok();
