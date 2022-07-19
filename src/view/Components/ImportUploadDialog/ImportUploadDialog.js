@@ -42,8 +42,9 @@ export class ImportUploadDialog extends Component {
         this.uploader = new ImportFileUploader({
             elem: 'fileBlock',
             parent: this.parent,
-            uploadStarted: () => this.onUploadStart(),
-            uploaded: (data) => this.onUploaded(data),
+            onUploadStart: () => this.onUploadStart(),
+            onUploadError: (message) => this.onUploadError(message),
+            onUploaded: (data) => this.onUploaded(data),
         });
         this.tplManager = new ImportTemplateManager({
             elem: 'templateBlock',
@@ -220,13 +221,16 @@ export class ImportUploadDialog extends Component {
         this.importDone();
     }
 
-    /**
-     * Import data request callback
-     * @param {Array} data - data from uploader file
-     */
+    /** Upload started handler */
     onUploadStart() {
-        this.tplManager.setLoading(true);
+        this.tplManager.setLoading();
         this.tplManager.show();
+    }
+
+    /** Upload error handler */
+    onUploadError(message) {
+        this.tplManager.reset();
+        createMessage(message, 'msg_error');
     }
 
     /**
@@ -241,7 +245,7 @@ export class ImportUploadDialog extends Component {
 
             this.tplManager.setRawData(data);
         } catch (e) {
-            createMessage(e.message, 'msg_error');
+            this.onUploadError(e.message);
             this.state.importedItems = null;
             this.importDone();
         }

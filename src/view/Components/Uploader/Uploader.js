@@ -3,6 +3,7 @@ import { createMessage } from '../../js/app.js';
 
 /** Strings */
 const MSG_JSON_PARSE = 'Fail to parse server response';
+const MSG_UPLOAD_FAIL = 'Fail to upload file';
 
 /**
 * Obtain 32-bit integer from string
@@ -71,7 +72,12 @@ export class Uploader {
                 if (isFunction(this.onSuccess)) {
                     try {
                         const jsonData = JSON.parse(this.xhrUpload.response);
-                        this.onSuccess(jsonData);
+                        if (jsonData?.result === 'ok') {
+                            this.onSuccess(jsonData.data);
+                        } else {
+                            const message = (jsonData?.msg) ? jsonData.msg : MSG_UPLOAD_FAIL;
+                            this.onError(message);
+                        }
                     } catch (e) {
                         createMessage(MSG_JSON_PARSE, 'msg_error');
                     }
