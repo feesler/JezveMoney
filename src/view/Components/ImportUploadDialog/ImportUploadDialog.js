@@ -10,6 +10,7 @@ import { Popup } from 'jezvejs/Popup';
 import { createMessage } from '../../js/app.js';
 import { ImportFileUploader } from '../ImportFileUploader/ImportFileUploader.js';
 import { ImportTemplateManager } from '../ImportTemplateManager/ImportTemplateManager.js';
+import { LoadingIndicator } from '../LoadingIndicator/LoadingIndicator.js';
 import './style.css';
 
 /**
@@ -76,22 +77,23 @@ export class ImportUploadDialog extends Component {
         this.initialAccField = ge('initialAccField');
         this.controlsBlock = this.elem.querySelector('.upload-dialog-controls');
         this.submitUploadedBtn = ge('submitUploadedBtn');
-        this.uploadProgress = ge('uploadProgress');
         if (!this.initialAccField
             || !this.accountDropDown
             || !this.controlsBlock
-            || !this.uploadProgress
             || !this.submitUploadedBtn) {
             throw new Error('Failed to initialize upload file dialog');
         }
 
         this.submitUploadedBtn.addEventListener('click', () => this.onSubmit());
+
+        this.uploadProgress = LoadingIndicator.create({ fixed: false });
+        this.elem.append(this.uploadProgress.elem);
     }
 
     /** Show/hide dialog */
     show(val) {
         this.popup.show(val);
-        show(this.uploadProgress, false);
+        this.uploadProgress.hide();
     }
 
     /** Hide dialog */
@@ -196,7 +198,7 @@ export class ImportUploadDialog extends Component {
 
     /** Submit event handler */
     onSubmit() {
-        show(this.uploadProgress, true);
+        this.uploadProgress.show();
 
         setTimeout(() => this.processItems(), 100);
     }
@@ -211,7 +213,7 @@ export class ImportUploadDialog extends Component {
         }
 
         if (!this.state.importedItems) {
-            show(this.uploadProgress, false);
+            this.uploadProgress.hide();
             return;
         }
 

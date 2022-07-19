@@ -406,7 +406,7 @@ body.white-theme,
 }
 
 /* Import rules dialog */
-.white-theme .rules-dialog__loading {
+.white-theme .rules-dialog .loading-indicator {
   color: #000000;
   background-color: #d0d0d0;
 }

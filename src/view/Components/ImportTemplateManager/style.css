@@ -21,13 +21,6 @@
   margin-bottom: 12px;
 }
 
-/* Raw data loading indicator */
-.tpl-form__loading {
-  text-align: center;
-  padding: 12px 0;
-  color: #b0b0b0;
-}
-
 /* Raw data table title */
 .tpl-form__title {
   font-size: 14px;

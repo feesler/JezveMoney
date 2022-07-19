@@ -72,7 +72,7 @@
   "dependencies": {
     "@babel/runtime": "^7.13.9",
     "core-js": "^3.9.1",
-    "jezvejs": "^1.14.2",
+    "jezvejs": "^1.15.1",
     "whatwg-fetch": "^3.6.2"
   }
 }

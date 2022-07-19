@@ -406,7 +406,7 @@ body.dark-theme,
 }
 
 /* Import rules dialog */
-.dark-theme .rules-dialog__loading {
+.dark-theme .rules-dialog .loading-indicator {
   color: #dddddd;
   background-color: #303030;
 }

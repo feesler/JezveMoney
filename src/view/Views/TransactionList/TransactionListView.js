@@ -29,6 +29,7 @@ import '../../Components/TransactionTypeMenu/style.css';
 import '../../Components/TransactionsList/style.css';
 import './style.css';
 import { TransactionListItem } from '../../Components/TransactionListItem/TransactionListItem.js';
+import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { ModeSelector } from '../../Components/ModeSelector/ModeSelector.js';
 
 const PAGE_TITLE = 'Jezve Money | Transactions';
@@ -142,7 +143,10 @@ class TransactionListView extends View {
             throw new Error('Failed to initialize Transaction List view');
         }
 
-        this.loadingIndicator = document.querySelector('.trans-list__loading');
+        const listContainer = document.querySelector('.list-container');
+        this.loadingIndicator = LoadingIndicator.create();
+        listContainer.append(this.loadingIndicator.elem);
+
         this.modeSelector = ModeSelector.fromElement(document.querySelector('.mode-selector'), {
             onChange: (mode) => this.onModeChanged(mode),
         });
@@ -784,7 +788,7 @@ class TransactionListView extends View {
 
     render(state) {
         if (state.loading) {
-            show(this.loadingIndicator, true);
+            this.loadingIndicator.show();
         }
 
         const filterUrl = new URL(this.buildAddress());
@@ -883,7 +887,7 @@ class TransactionListView extends View {
         this.toolbar.show(state.selectedItems.count() > 0);
 
         if (!state.loading) {
-            show(this.loadingIndicator, false);
+            this.loadingIndicator.hide();
         }
     }
 }

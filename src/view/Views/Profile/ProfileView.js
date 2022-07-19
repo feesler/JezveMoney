@@ -1,10 +1,11 @@
 import 'jezvejs/style';
-import { ge, show } from 'jezvejs';
+import { ge } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
 import { createMessage } from '../../js/app.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
+import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import '../../css/app.css';
 import './style.css';
 import { API } from '../../js/API.js';
@@ -147,12 +148,13 @@ class ProfileView extends View {
             });
 
             this.newNameInp = ge('newname');
-            this.changeNameLoading = ge('changeNameLoading');
-            if (!this.newNameInp || !this.changeNameLoading) {
+            if (!this.newNameInp) {
                 throw new Error('Failed to initialize change name dialog');
             }
-
             this.newNameInp.addEventListener('input', () => this.onNewNameInput());
+
+            this.changeNameLoading = LoadingIndicator.create({ fixed: false });
+            this.changeNameContent.append(this.changeNameLoading.elem);
         }
 
         this.newNameInp.value = window.app.model.profile.name;
@@ -187,7 +189,7 @@ class ProfileView extends View {
 
     /** Request password change */
     async requestPasswordChange(currentPassword, newPassword) {
-        show(this.changePassLoading, true);
+        this.changePassLoading.show();
 
         let result;
         try {
@@ -196,7 +198,7 @@ class ProfileView extends View {
             result = null;
         }
 
-        show(this.changePassLoading, false);
+        this.changePassLoading.hide();
 
         if (!result) {
             return;
@@ -237,15 +239,15 @@ class ProfileView extends View {
 
             this.oldPassInp = ge('oldpwd');
             this.newPassInp = ge('newpwd');
-            this.changePassLoading = ge('changePassLoading');
-            if (!this.oldPassInp
-                || !this.newPassInp
-                || !this.changePassLoading) {
+            if (!this.oldPassInp || !this.newPassInp) {
                 throw new Error('Failed to initialize change password dialog');
             }
 
             this.oldPassInp.addEventListener('input', () => this.onOldPasswordInput());
             this.newPassInp.addEventListener('input', () => this.onNewPasswordInput());
+
+            this.changePassLoading = LoadingIndicator.create({ fixed: false });
+            this.changePassContent.append(this.changePassLoading.elem);
         }
 
         this.changePassPopup.show();
@@ -273,7 +275,7 @@ class ProfileView extends View {
 
     /** Send request to API to change user name */
     async requestNameChange(name) {
-        show(this.changeNameLoading, true);
+        this.changeNameLoading.show();
 
         let result;
         try {
@@ -282,7 +284,7 @@ class ProfileView extends View {
             result = null;
         }
 
-        show(this.changeNameLoading, false);
+        this.changeNameLoading.hide();
 
         if (!result) {
             return;
