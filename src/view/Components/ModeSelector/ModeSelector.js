@@ -86,17 +86,6 @@ export class ModeSelector extends Component {
         setEvents(this.elem, { click: (e) => this.onChangeMode(e) });
     }
 
-    setClassNames() {
-        if (!this.props.className) {
-            return;
-        }
-
-        if (!Array.isArray(this.props.className)) {
-            this.props.className = [this.props.className];
-        }
-        this.elem.classList.add(...this.props.className);
-    }
-
     onChangeMode(e) {
         if (!isFunction(this.props.onChange)) {
             return;
