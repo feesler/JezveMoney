@@ -6,7 +6,6 @@ import { TransactionList } from '../../Components/TransactionList/TransactionLis
 import '../../Components/IconLink/style.css';
 import '../../css/app.css';
 import '../../Components/Tile/style.css';
-import '../../Components/TransactionList/style.css';
 import './style.css';
 
 /**

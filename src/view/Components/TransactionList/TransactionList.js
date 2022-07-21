@@ -3,6 +3,7 @@ import { Component } from 'jezvejs/Component';
 import { Selection } from 'jezvejs/Selection';
 import { Sortable } from 'jezvejs/Sortable';
 import { TransactionListItem } from '../TransactionListItem/TransactionListItem.js';
+import './style.css';
 
 /** Strings */
 const MSG_NO_TRANSACTIONS = 'No transactions found.';
