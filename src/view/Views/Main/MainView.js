@@ -5,7 +5,7 @@ import { View } from '../../js/View.js';
 import '../../Components/IconLink/style.css';
 import '../../css/app.css';
 import '../../Components/Tile/style.css';
-import '../../Components/TransactionsList/style.css';
+import '../../Components/TransactionList/style.css';
 import './style.css';
 
 /**
