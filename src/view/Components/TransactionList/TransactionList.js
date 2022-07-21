@@ -15,6 +15,7 @@ const NO_DATA_CLASS = 'nodata-message';
 const defaultProps = {
     items: [],
     mode: 'classic',
+    selectable: false,
     onSelect: null,
     sortable: false,
     onSort: null,
@@ -51,7 +52,9 @@ export class TransactionList extends Component {
     }
 
     init() {
-        this.elem.addEventListener('click', (e) => this.onItemClick(e));
+        if (this.props.selectable) {
+            this.elem.addEventListener('click', (e) => this.onItemClick(e));
+        }
 
         if (this.props.sortable) {
             this.trListSortable = new Sortable({

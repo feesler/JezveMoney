@@ -54,7 +54,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 <div class="glyph"><?=svgIcon("glyph")?></div>
                             </a>
                         </div>
-<?=TransactionList::render($transactionsData)?>
+                        <div class="trans-list"></div>
                     </div>
 
                     <div class="widget">

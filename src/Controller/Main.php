@@ -7,6 +7,7 @@ use JezveMoney\Core\Template;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\TransactionModel;
+use JezveMoney\App\Item\TransactionItem;
 
 class Main extends TemplateController
 {
@@ -48,17 +49,10 @@ class Main extends TemplateController
 
         // Prepare data of transaction list items
         $latestArr = $transMod->getData(["desc" => true, "onPage" => 5]);
-        $trListData = [];
+        $transactions = [];
         foreach ($latestArr as $trans) {
-            $itemData = $transMod->getListItem($trans);
-
-            $trListData[] = $itemData;
+            $transactions[] = new TransactionItem($trans);
         }
-
-        $data["transactionsData"] = [
-            "items" => $trListData,
-            "showDetails" => false,
-        ];
 
         $persArr = $this->personMod->getData();
         $data["persons"] = [];
@@ -93,7 +87,16 @@ class Main extends TemplateController
         $data["statArr"] = $transMod->getHistogramSeries($byCurrency, $curr_acc_id, EXPENSE, $groupType_id, 5);
 
         $data["appProps"] = [
+            "profile" => [
+                "user_id" => $this->user_id,
+                "owner_id" => $this->owner_id,
+                "name" => $this->user_name,
+            ],
+            "accounts" => $accMod->getData(["full" => true, "type" => "all"]),
+            "persons" => $this->personMod->getData(["type" => "all"]),
+            "currency" => $currMod->getData(),
             "view" => [
+                "transactions" => $transactions,
                 "chartData" => $data["statArr"]
             ]
         ];

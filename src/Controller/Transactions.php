@@ -158,13 +158,12 @@ class Transactions extends TemplateController
             $trItems[] = new TransactionItem($trans);
         }
 
-        $profileData = [
-            "user_id" => $this->user_id,
-            "owner_id" => $this->owner_id,
-            "name" => $this->user_name,
-        ];
         $data["appProps"] = [
-            "profile" => $profileData,
+            "profile" => [
+                "user_id" => $this->user_id,
+                "owner_id" => $this->owner_id,
+                "name" => $this->user_name,
+            ],
             "accounts" => $this->accModel->getData(["full" => true, "type" => "all"]),
             "persons" => $this->personMod->getData(["type" => "all"]),
             "currency" => $currArr,

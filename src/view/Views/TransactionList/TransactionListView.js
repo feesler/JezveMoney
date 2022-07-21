@@ -144,6 +144,7 @@ class TransactionListView extends View {
 
         this.list = TransactionList.create({
             elem: document.querySelector('.trans-list'),
+            selectable: true,
             onSelect: () => this.render(this.state),
             sortable: true,
             onSort: (id, pos) => this.sendChangePosRequest(id, pos),
