@@ -15,9 +15,9 @@ import { View } from '../../js/View.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import '../../css/app.css';
 import './style.css';
-import { ImportUploadDialog } from '../../Components/ImportUploadDialog/ImportUploadDialog.js';
-import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from '../../Components/ImportRulesDialog/ImportRulesDialog.js';
-import { ImportTransactionItem } from '../../Components/ImportTransactionItem/ImportTransactionItem.js';
+import { ImportUploadDialog } from '../../Components/Import/UploadDialog/ImportUploadDialog.js';
+import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from '../../Components/Import/RulesDialog/ImportRulesDialog.js';
+import { ImportTransactionItem } from '../../Components/Import/TransactionItem/ImportTransactionItem.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { API } from '../../js/API.js';
 

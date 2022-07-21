@@ -10,13 +10,13 @@ import { DecimalInput } from 'jezvejs/DecimalInput';
 import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,
-} from '../../js/model/ImportCondition.js';
-import { View } from '../../js/View.js';
+} from '../../../js/model/ImportCondition.js';
+import { View } from '../../../js/View.js';
 import {
     createField,
     createContainer,
     createIcon,
-} from '../../js/app.js';
+} from '../../../js/app.js';
 import './style.css';
 
 /** Strings */

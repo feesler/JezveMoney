@@ -21,8 +21,8 @@ import {
     createField,
     createContainer,
     createIcon,
-} from '../../js/app.js';
-import { AccountList } from '../../js/model/AccountList.js';
+} from '../../../js/app.js';
+import { AccountList } from '../../../js/model/AccountList.js';
 import './style.css';
 
 /** Fields */

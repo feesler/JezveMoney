@@ -1,6 +1,6 @@
 import { copyObject } from 'jezvejs';
 import { ListItem } from './ListItem.js';
-import { ImportTransactionItem } from '../../Components/ImportTransactionItem/ImportTransactionItem.js';
+import { ImportTransactionItem } from '../../Components/Import/TransactionItem/ImportTransactionItem.js';
 
 /** Action types */
 export const IMPORT_ACTION_SET_TR_TYPE = 1;

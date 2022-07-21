@@ -7,14 +7,14 @@ import {
 } from 'jezvejs';
 import { Component } from 'jezvejs/Component';
 import { Popup } from 'jezvejs/Popup';
-import { createMessage } from '../../js/app.js';
-import { API } from '../../js/API.js';
-import { ImportRule } from '../../js/model/ImportRule.js';
-import { ImportRuleForm } from '../ImportRuleForm/ImportRuleForm.js';
-import { ImportRuleItem } from '../ImportRuleItem/ImportRuleItem.js';
-import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog.js';
+import { createMessage } from '../../../js/app.js';
+import { API } from '../../../js/API.js';
+import { ImportRule } from '../../../js/model/ImportRule.js';
+import { ImportRuleForm } from '../RuleForm/ImportRuleForm.js';
+import { ImportRuleItem } from '../RuleItem/ImportRuleItem.js';
+import { ConfirmDialog } from '../../ConfirmDialog/ConfirmDialog.js';
 import './style.css';
-import { LoadingIndicator } from '../LoadingIndicator/LoadingIndicator.js';
+import { LoadingIndicator } from '../../LoadingIndicator/LoadingIndicator.js';
 
 /** CSS classes */
 export const IMPORT_RULES_DIALOG_CLASS = 'rules-dialog';
