@@ -1677,59 +1677,6 @@ class TransactionModel extends CachedTable
     }
 
 
-    /**
-     * Build paginator for specified condition:
-     *
-     * @param int $page_num: zero based index of current page ;
-     * @param int $pages_count: total count of pages available ;
-     *
-     * @return array of paginator items:
-     *     - text (string) - title of paginator item ;
-     *     - active (boolean) - optional active flag ;
-     */
-    public function getPaginatorArray(int $page_num, int $pages_count)
-    {
-        $res = [];
-
-        $breakLimit = 5;
-        $groupLimit = 3;
-
-        if ($pages_count > $breakLimit) {
-            /*  1 2 3 4 5 ... 18  */
-            if ($page_num < $groupLimit) {
-                for ($i = 0; $i < $breakLimit; $i++) {
-                    $res[] = ["page" => ($i + 1), "active" => ($i == $page_num)];
-                }
-                $res[] = ["ellipsis" => true];
-                $res[] = ["page" => $pages_count, "active" => false];
-                /*  1 ... 14 15 16 ... 18  */
-            } elseif ($page_num >= $groupLimit && $page_num < $pages_count - $groupLimit) {
-                $res[] = ["page" => 1, "active" => false];
-                $res[] = ["ellipsis" => true];
-                for ($i = $page_num - ($groupLimit - 2); $i <= $page_num + ($groupLimit - 2); $i++) {
-                    $res[] = ["page" => ($i + 1), "active" => ($i == $page_num)];
-                }
-                $res[] = ["ellipsis" => true];
-                $res[] = ["page" => $pages_count, "active" => false];
-                /*  1 ... 14 15 16 17 18  */
-            } elseif ($page_num >= $groupLimit && $page_num >= $pages_count - $groupLimit) {
-                $res[] = ["page" => 1, "active" => false];
-                $res[] = ["ellipsis" => true];
-                for ($i = $pages_count - $breakLimit; $i < $pages_count; $i++) {
-                    $res[] = ["page" => ($i + 1), "active" => ($i == $page_num)];
-                }
-            }
-        } else {
-            /*  1 2 3 4 5  */
-            for ($i = 0; $i < $pages_count; $i++) {
-                $res[] = ["page" => ($i + 1), "active" => ($i == $page_num)];
-            }
-        }
-
-        return $res;
-    }
-
-
     // Convert transaction object to list item
     public function getListItem($transaction, $detailsMode = false)
     {
