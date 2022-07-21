@@ -1,5 +1,4 @@
 import {
-    ge,
     ce,
     re,
     removeChilds,
@@ -8,14 +7,18 @@ import {
 } from 'jezvejs';
 import { Component } from 'jezvejs/Component';
 import { Popup } from 'jezvejs/Popup';
-import { createMessage } from '../../js/app.js';
-import { API } from '../../js/API.js';
-import { ImportRule } from '../../js/model/ImportRule.js';
-import { ImportRuleForm } from '../ImportRuleForm/ImportRuleForm.js';
-import { ImportRuleItem } from '../ImportRuleItem/ImportRuleItem.js';
-import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog.js';
+import { createMessage } from '../../../js/app.js';
+import { API } from '../../../js/API.js';
+import { ImportRule } from '../../../js/model/ImportRule.js';
+import { ImportRuleForm } from '../RuleForm/ImportRuleForm.js';
+import { ImportRuleItem } from '../RuleItem/ImportRuleItem.js';
+import { ConfirmDialog } from '../../ConfirmDialog/ConfirmDialog.js';
 import './style.css';
-import { LoadingIndicator } from '../LoadingIndicator/LoadingIndicator.js';
+import { LoadingIndicator } from '../../LoadingIndicator/LoadingIndicator.js';
+
+/** CSS classes */
+export const IMPORT_RULES_DIALOG_CLASS = 'rules-dialog';
+const IMPORT_RULES_POPUP_CLASS = 'rules-popup';
 
 /** Strings */
 const TITLE_RULE_DELETE = 'Delete import rule';
@@ -51,10 +54,10 @@ export class ImportRulesDialog extends Component {
             btn: {
                 closeBtn: true,
             },
-            additional: 'rules-popup',
+            additional: IMPORT_RULES_POPUP_CLASS,
         });
 
-        this.createRuleBtn = ge('createRuleBtn');
+        this.createRuleBtn = this.elem.querySelector('.create-btn');
         this.titleElem = this.elem.querySelector('.rules-header label');
         this.listContainer = this.elem.querySelector('.rules-list');
         if (!this.createRuleBtn

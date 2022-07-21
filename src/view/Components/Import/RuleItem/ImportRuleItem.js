@@ -8,12 +8,12 @@ import {
 } from 'jezvejs';
 import { Component } from 'jezvejs/Component';
 import { Collapsible } from 'jezvejs/Collapsible';
-import { ImportRule } from '../../js/model/ImportRule.js';
-import { ImportConditionList } from '../../js/model/ImportConditionList.js';
-import { ImportActionList } from '../../js/model/ImportActionList.js';
-import { ImportConditionItem } from '../ImportConditionItem/ImportConditionItem.js';
-import { ImportActionItem } from '../ImportActionItem/ImportActionItem.js';
-import { createContainer, createIcon } from '../../js/app.js';
+import { ImportRule } from '../../../js/model/ImportRule.js';
+import { ImportConditionList } from '../../../js/model/ImportConditionList.js';
+import { ImportActionList } from '../../../js/model/ImportActionList.js';
+import { ImportConditionItem } from '../ConditionItem/ImportConditionItem.js';
+import { ImportActionItem } from '../ActionItem/ImportActionItem.js';
+import { createContainer, createIcon } from '../../../js/app.js';
 import './style.css';
 
 /** Strings */

@@ -6,13 +6,13 @@ import {
 } from 'jezvejs';
 import { Component } from 'jezvejs/Component';
 import { Collapsible } from 'jezvejs/Collapsible';
-import { ImportRule } from '../../js/model/ImportRule.js';
-import { ImportAction } from '../../js/model/ImportAction.js';
-import { ImportCondition } from '../../js/model/ImportCondition.js';
-import { ImportConditionForm } from '../ImportConditionForm/ImportConditionForm.js';
-import { ImportActionForm } from '../ImportActionForm/ImportActionForm.js';
-import { View } from '../../js/View.js';
-import { createContainer, createIcon } from '../../js/app.js';
+import { ImportRule } from '../../../js/model/ImportRule.js';
+import { ImportAction } from '../../../js/model/ImportAction.js';
+import { ImportCondition } from '../../../js/model/ImportCondition.js';
+import { ImportConditionForm } from '../ConditionForm/ImportConditionForm.js';
+import { ImportActionForm } from '../ActionForm/ImportActionForm.js';
+import { View } from '../../../js/View.js';
+import { createContainer, createIcon } from '../../../js/app.js';
 import './style.css';
 
 /** Strings */

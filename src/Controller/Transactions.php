@@ -61,7 +61,6 @@ class Transactions extends TemplateController
             "titleString" => "Jezve Money | Transactions",
             "clearAllURL" => $baseUrl
         ];
-        $listData = [];
 
         $pagination = [
             "onPage" => 10,
@@ -96,7 +95,7 @@ class Transactions extends TemplateController
         if (isset($_GET["mode"]) && $_GET["mode"] == "details") {
             $showDetails = true;
         }
-        $listData["showDetails"] = $showDetails;
+        $data["showDetails"] = $showDetails;
 
         $data["accArr"] = $this->accModel->getData();
         $data["hiddenAccArr"] = $this->accModel->getData(["type" => "hidden"]);
@@ -145,56 +144,26 @@ class Transactions extends TemplateController
         }
         $data["transMenu"] = $transMenu;
 
-        // Prepare mode selector and paginator
-        // Prepare classic/details mode link
-        $urlParams = $filterObj;
-        $urlParams["mode"] = ($showDetails) ? "classic" : "details";
-        $data["modeLink"] = urlJoin(BASEURL . "transactions/", $urlParams);
-
         // Build data for paginator
         if ($trParams["onPage"] > 0) {
-            $urlParams = $filterObj;
-            $urlParams["mode"] = ($showDetails) ? "classic" : "details";
-
             $pageCount = ceil($transCount / $trParams["onPage"]);
             $pagination["pagesCount"] = $pageCount;
             $page_num = isset($trParams["page"]) ? intval($trParams["page"]) : 0;
             $pagination["page"] = $page_num + 1;
-
-            $pagesArr = [];
-            if ($transCount > $trParams["onPage"]) {
-                $pagesArr = $this->model->getPaginatorArray($page_num, $pageCount);
-            }
-
-            foreach ($pagesArr as $ind => $item) {
-                if (isset($item["page"]) && !$item["active"]) {
-                    $urlParams["page"] = intval($item["page"]);
-
-                    $pagesArr[$ind]["link"] = urlJoin(BASEURL . "transactions/", $urlParams);
-                }
-            }
         }
-        $data["paginator"] = ["pagesArr" => $pagesArr];
 
         // Prepare data of transaction list items
-        $trListData = [];
         $trItems = [];
         foreach ($transArr as $trans) {
-            $itemData = $this->model->getListItem($trans, $showDetails);
-            $trListData[] = $itemData;
-
             $trItems[] = new TransactionItem($trans);
         }
-        $listData["items"] = $trListData;
 
-        $data["listData"] = $listData;
-        $profileData = [
-            "user_id" => $this->user_id,
-            "owner_id" => $this->owner_id,
-            "name" => $this->user_name,
-        ];
         $data["appProps"] = [
-            "profile" => $profileData,
+            "profile" => [
+                "user_id" => $this->user_id,
+                "owner_id" => $this->owner_id,
+                "name" => $this->user_name,
+            ],
             "accounts" => $this->accModel->getData(["full" => true, "type" => "all"]),
             "persons" => $this->personMod->getData(["type" => "all"]),
             "currency" => $currArr,

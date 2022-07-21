@@ -1,7 +1,5 @@
 <?php
-use JezveMoney\App\Template\Component\TransactionList;
 use JezveMoney\App\Template\Component\IconLink;
-use JezveMoney\App\Template\Component\Paginator;
 
 include(TPL_PATH."commonhdr.tpl");
 ?>
@@ -145,35 +143,14 @@ include(TPL_PATH."commonhdr.tpl");
 
                     <div class="list-container">
                         <div class="paginator-row">
-                            <div class="mode-selector">
-<?php   if ($listData["showDetails"]) {		?>
-                                <a class="mode-selector__item" href="<?=e($modeLink)?>" data-mode="classic">
-                                    <span class="icon"><?=svgIcon("list")?></span>
-                                    <span>Classic</span>
-                                </a>
-                                <b class="mode-selector__item mode-selector__item__active" data-mode="details">
-                                    <span class="icon"><?=svgIcon("details")?></span>
-                                    <span>Details</span>
-                                </b>
-<?php   } else {		?>
-                                <b class="mode-selector__item mode-selector__item__active" data-mode="classic">
-                                    <span class="icon"><?=svgIcon("list")?></span>
-                                    <span>Classic</span>
-                                </b>
-                                <a class="mode-selector__item" href="<?=e($modeLink)?>" data-mode="details">
-                                    <span class="icon"><?=svgIcon("details")?></span>
-                                    <span>Details</span>
-                                </a>
-<?php   }	?>
-                            </div>
-
-                            <?=Paginator::render($paginator)?>
+                            <div class="mode-selector"></div>
+                            <div class="paginator"></div>
                         </div>
 
-                        <?=TransactionList::render($listData)?>
+                        <div class="trans-list"></div>
 
                         <div class="paginator-row">
-                            <?=Paginator::render($paginator)?>
+                            <div class="paginator"></div>
                         </div>
                     </div>
                 </div>

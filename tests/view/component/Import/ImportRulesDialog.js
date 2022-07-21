@@ -25,9 +25,9 @@ export class ImportRulesDialog extends TestComponent {
         const res = {
             closeBtn: await query(this.elem, '.close-btn'),
             header: {
-                elem: await query('.rules-header'),
-                labelElem: await query('.rules-header label'),
-                createBtn: await query('#createRuleBtn'),
+                elem: await query(this.elem, '.rules-header'),
+                labelElem: await query(this.elem, '.rules-header label'),
+                createBtn: await query(this.elem, '.create-btn'),
             },
             loadingIndicator: { elem: await query(this.elem, '.loading-indicator') },
             rulesList: { elem: await query(this.elem, '.rules-list') },

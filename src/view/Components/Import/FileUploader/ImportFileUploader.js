@@ -1,7 +1,7 @@
 import { ge, show, isFunction } from 'jezvejs';
 import { Component } from 'jezvejs/Component';
 import { Checkbox } from 'jezvejs/Checkbox';
-import { API } from '../../js/API.js';
+import { API } from '../../../js/API.js';
 
 /** Strings */
 const MSG_UPLOAD_FAIL = 'Fail to process file';

@@ -1,12 +1,10 @@
 import 'jezvejs/style';
 import {
     ge,
-    ce,
     show,
     isDate,
     urlJoin,
     isEmpty,
-    removeChilds,
     setEvents,
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
@@ -14,8 +12,6 @@ import { formatDate } from 'jezvejs/DateUtils';
 import { DropDown } from 'jezvejs/DropDown';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { Paginator } from 'jezvejs/Paginator';
-import { Sortable } from 'jezvejs/Sortable';
-import { Selection } from 'jezvejs/Selection';
 import { createMessage } from '../../js/app.js';
 import { Application } from '../../js/Application.js';
 import { API } from '../../js/API.js';
@@ -24,16 +20,13 @@ import { IconLink } from '../../Components/IconLink/IconLink.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
+import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
 import '../../css/app.css';
-import '../../Components/TransactionTypeMenu/style.css';
-import '../../Components/TransactionsList/style.css';
 import './style.css';
-import { TransactionListItem } from '../../Components/TransactionListItem/TransactionListItem.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { ModeSelector } from '../../Components/ModeSelector/ModeSelector.js';
 
 const PAGE_TITLE = 'Jezve Money | Transactions';
-const MSG_NO_TRANSACTIONS = 'No transactions found.';
 const MSG_SET_POS_FAIL = 'Fail to change position of transaction.';
 const TITLE_SINGLE_TRANS_DELETE = 'Delete transaction';
 const TITLE_MULTI_TRANS_DELETE = 'Delete transactions';
@@ -53,8 +46,6 @@ class TransactionListView extends View {
             pagination: { ...this.props.pagination },
             mode: this.props.mode,
             loading: false,
-            renderTime: Date.now(),
-            selectedItems: new Selection(),
             selDateRange: null,
         };
     }
@@ -151,21 +142,13 @@ class TransactionListView extends View {
             onChange: (mode) => this.onModeChanged(mode),
         });
 
-        this.trListSortable = null;
-        this.listItems = document.querySelector('.trans-list');
-        if (this.listItems) {
-            this.trListSortable = new Sortable({
-                oninsertat: (elem, ref) => this.onTransPosChanged(elem, ref),
-                container: this.listItems,
-                group: 'transactions',
-                selector: '.trans-list__item-wrapper',
-                placeholderClass: 'trans-list__item-placeholder',
-                copyWidth: true,
-                table: (this.state.mode === 'details'),
-            });
-
-            this.listItems.addEventListener('click', (e) => this.onTransClick(e));
-        }
+        this.list = TransactionList.create({
+            elem: document.querySelector('.trans-list'),
+            selectable: true,
+            onSelect: () => this.render(this.state),
+            sortable: true,
+            onSort: (id, pos) => this.sendChangePosRequest(id, pos),
+        });
 
         const paginatorElems = document.querySelectorAll('.paginator');
         if (paginatorElems.length !== 2) {
@@ -195,167 +178,6 @@ class TransactionListView extends View {
     /** Remove loading state and render view */
     stopLoading() {
         this.state.loading = false;
-        this.state.renderTime = Date.now();
-        this.render(this.state);
-    }
-
-    /**
-     * Search for transaction by specified id
-     * @param {number} transactionId - identifier of transaction
-     */
-    getTransaction(transactionId) {
-        return this.state.items.find((item) => item && item.id === transactionId);
-    }
-
-    /**
-     * Set position of transaction and update position and result balance of related transactions
-     * @param {number} transactionId - identifier of transaction
-     * @param {number} pos - new position of specified transaction
-     */
-    setPosition(transactionId, pos) {
-        const posCompareAsc = (a, b) => a.pos - b.pos;
-        const posCompareDesc = (a, b) => b.pos - a.pos;
-        const initBalArr = [];
-        const tBalanceArr = [];
-
-        const trInfo = this.getTransaction(transactionId);
-        if (!trInfo) {
-            return false;
-        }
-
-        const oldPos = trInfo.pos;
-        if (oldPos === pos) {
-            return true;
-        }
-
-        this.state.items.sort(posCompareAsc);
-        this.state.items.forEach((transaction) => {
-            const tr = transaction;
-            if (tr.id === transactionId) {
-                tr.pos = pos;
-            } else if (oldPos === 0) {
-                /* insert with specified position */
-                if (tr.pos >= pos) {
-                    tr.pos += 1;
-                }
-            } else if (pos < oldPos) {
-                /* moving up */
-                if (tr.pos >= pos && tr.pos < oldPos) {
-                    tr.pos += 1;
-                }
-            } else if (pos > oldPos) {
-                /* moving down */
-                if (tr.pos > oldPos && tr.pos <= pos) {
-                    tr.pos -= 1;
-                }
-            }
-
-            if (tr.src_id && !(tr.src_id in initBalArr)) {
-                initBalArr[tr.src_id] = tr.src_result + tr.src_amount;
-            }
-
-            if (tr.dest_id && !(tr.dest_id in initBalArr)) {
-                initBalArr[tr.dest_id] = tr.dest_result - tr.dest_amount;
-            }
-        });
-
-        // Sort array of transaction by position again
-        this.state.items.sort(posCompareAsc);
-
-        if (this.state.mode === 'details') {
-            this.state.items.forEach((transaction) => {
-                const tr = transaction;
-                const srcBalance = (tr.src_id !== 0 && tBalanceArr[tr.src_id] !== undefined)
-                    ? tBalanceArr[tr.src_id]
-                    : initBalArr[tr.src_id];
-                const destBalance = (tr.dest_id !== 0 && tBalanceArr[tr.dest_id] !== undefined)
-                    ? tBalanceArr[tr.dest_id]
-                    : initBalArr[tr.dest_id];
-
-                if (oldPos === 0) {
-                    /* insert with specified position */
-                    if (tr.pos >= pos) {
-                        this.updateBalance(tr, srcBalance, destBalance);
-                    }
-                } else if (pos < oldPos) {
-                    /* moving up */
-                    if (tr.pos >= pos && tr.pos <= oldPos) {
-                        this.updateBalance(tr, srcBalance, destBalance);
-                    }
-                } else if (pos > oldPos) {
-                    /* moving down */
-                    if (tr.pos >= oldPos && tr.pos <= pos) {
-                        this.updateBalance(tr, srcBalance, destBalance);
-                    }
-                }
-
-                tBalanceArr[tr.src_id] = tr.src_result;
-                tBalanceArr[tr.dest_id] = tr.dest_result;
-            });
-        }
-
-        this.state.items.sort(posCompareDesc);
-        this.render(this.state);
-
-        return true;
-    }
-
-    /**
-     *
-     * @param {object} transaction - transaction object
-     * @param {number} srcBal - source balance
-     * @param {number} destBal - destination balance
-     */
-    updateBalance(transaction, srcBal, destBal) {
-        let sourceBalance = srcBal;
-        let destBalance = destBal;
-        const tr = transaction;
-
-        if (!tr) {
-            return;
-        }
-
-        if (tr.src_id !== 0) {
-            if (sourceBalance === null) {
-                sourceBalance = tr.src_result + tr.src_amount;
-            }
-            tr.src_result = sourceBalance - tr.src_amount;
-        } else {
-            tr.src_result = 0;
-        }
-
-        if (tr.dest_id !== 0) {
-            if (destBalance === null) {
-                destBalance = tr.dest_result - tr.dest_amount;
-            }
-            tr.dest_result = destBalance + tr.dest_amount;
-        } else {
-            tr.dest_result = 0;
-        }
-    }
-
-    /**
-     * Transaction block click event handler
-     * @param {Event} e - click event object
-     */
-    onTransClick(e) {
-        const listItemElem = this.findListItemElement(e.target);
-        if (!listItemElem || !listItemElem.dataset) {
-            return;
-        }
-
-        const transactionId = parseInt(listItemElem.dataset.id, 10);
-        const transaction = this.getTransaction(transactionId);
-        if (!transaction) {
-            return;
-        }
-
-        if (this.state.selectedItems.isSelected(transactionId)) {
-            this.state.selectedItems.deselect(transactionId);
-        } else {
-            this.state.selectedItems.select(transactionId);
-        }
-
         this.render(this.state);
     }
 
@@ -367,19 +189,10 @@ class TransactionListView extends View {
     async sendChangePosRequest(transactionId, newPos) {
         try {
             await API.transaction.setPos(transactionId, newPos);
-            this.updateTransArrPos(transactionId, newPos);
+            this.list.setPosition(transactionId, newPos);
         } catch (e) {
             this.cancelPosChange(transactionId);
         }
-    }
-
-    /**
-     * Update local transactions array on successfull result from server
-     * @param {number} transactionId - identifier of transaction to change position
-     * @param {number} newPos - new position of transaction
-     */
-    updateTransArrPos(transactionId, newPos) {
-        this.setPosition(transactionId, newPos);
     }
 
     /**
@@ -390,56 +203,6 @@ class TransactionListView extends View {
         this.render(this.state);
 
         createMessage(MSG_SET_POS_FAIL, 'msg_error');
-    }
-
-    /**
-     * Find closest list item element to specified
-     * @param {Element} elem - element to start looking from
-     */
-    findListItemElement(elem) {
-        const selector = (this.state.mode === 'details') ? 'tr' : '.trans-list__item';
-
-        if (!elem) {
-            return null;
-        }
-
-        const res = elem.querySelector(selector);
-        if (!res) {
-            return elem.closest(selector);
-        }
-
-        return res;
-    }
-
-    /**
-     * Return transaction id from transaction item element
-     * @param {Element} elem - target list item element
-     */
-    transIdFromElem(elem) {
-        const listItemElem = this.findListItemElement(elem);
-        if (!listItemElem || !listItemElem.dataset) {
-            return 0;
-        }
-
-        return parseInt(listItemElem.dataset.id, 10);
-    }
-
-    /**
-     * Transaction item drop callback
-     * @param {number} trans_id - identifier of moving transaction
-     * @param {number} retrans_id - identifier of replaced transaction
-     */
-    onTransPosChanged(elem, refElem) {
-        const transactionId = this.transIdFromElem(elem);
-        const refId = this.transIdFromElem(refElem);
-        if (!transactionId || !refId) {
-            return;
-        }
-
-        const replacedItem = this.getTransaction(refId);
-        if (replacedItem) {
-            this.sendChangePosRequest(transactionId, replacedItem.pos);
-        }
     }
 
     /**
@@ -609,11 +372,11 @@ class TransactionListView extends View {
      * Create and show transaction delete warning popup
      */
     confirmDelete() {
-        if (this.state.selectedItems.count() === 0) {
+        if (this.list.selectedItems.count() === 0) {
             return;
         }
 
-        const multi = (this.state.selectedItems.count() > 1);
+        const multi = (this.list.selectedItems.count() > 1);
         ConfirmDialog.create({
             id: 'delete_warning',
             title: (multi) ? TITLE_MULTI_TRANS_DELETE : TITLE_SINGLE_TRANS_DELETE,
@@ -712,7 +475,6 @@ class TransactionListView extends View {
 
     onModeChanged(mode) {
         this.state.mode = mode;
-        this.state.renderTime = Date.now();
         this.replaceHistory();
         this.render(this.state);
     }
@@ -734,7 +496,6 @@ class TransactionListView extends View {
         try {
             const result = await API.transaction.list(options);
 
-            this.state.selectedItems.clear();
             this.state.items = [...result.data.items];
             this.state.pagination = { ...result.data.pagination };
             this.state.filter = { ...result.data.filter };
@@ -812,49 +573,22 @@ class TransactionListView extends View {
         this.datePickerBtn.setSubtitle(dateSubtitle);
 
         // Render list
-        const elems = state.items.map((item) => {
-            const tritem = TransactionListItem.create({
-                mode: state.mode,
-                selected: state.selectedItems.isSelected(item.id),
-                item,
-            });
-            tritem.render(tritem.state);
-            return tritem.elem;
-        });
-
-        removeChilds(this.listItems);
-        if (elems.length) {
-            const itemsContainer = (state.mode === 'details')
-                ? ce('table', { className: 'trans-list-items' }, elems)
-                : ce('div', { className: 'trans-list-items' }, elems);
-
-            this.listItems.appendChild(itemsContainer);
-            if (state.mode === 'details') {
-                this.listItems.classList.add('trans-list_details');
-            } else {
-                this.listItems.classList.remove('trans-list_details');
-            }
-        } else {
-            this.listItems.appendChild(ce('span', {
-                className: 'nodata-message',
-                textContent: MSG_NO_TRANSACTIONS,
-            }));
-        }
-        this.listItems.dataset.time = state.renderTime;
+        this.list.setMode(state.mode);
+        this.list.setItems(state.items);
 
         if (this.topPaginator && this.bottomPaginator) {
-            this.topPaginator.show(elems.length > 0);
+            this.topPaginator.show(state.items.length > 0);
             this.topPaginator.setURL(filterUrl);
             this.topPaginator.setPagesCount(state.pagination.pagesCount);
             this.topPaginator.setPage(state.pagination.page);
 
-            this.bottomPaginator.show(elems.length > 0);
+            this.bottomPaginator.show(state.items.length > 0);
             this.bottomPaginator.setURL(filterUrl);
             this.bottomPaginator.setPagesCount(state.pagination.pagesCount);
             this.bottomPaginator.setPage(state.pagination.page);
         }
 
-        this.modeSelector.show(elems.length > 0);
+        this.modeSelector.show(state.items.length > 0);
         this.modeSelector.setMode(state.mode);
         filterUrl.searchParams.set('page', state.pagination.page);
         this.modeSelector.setURL(filterUrl);
@@ -873,18 +607,18 @@ class TransactionListView extends View {
         this.searchInp.value = (this.state.filter.search) ? this.state.filter.search : '';
 
         // toolbar
-        this.toolbar.updateBtn.show(state.selectedItems.count() === 1);
-        this.toolbar.deleteBtn.show(state.selectedItems.count() > 0);
+        this.toolbar.updateBtn.show(this.list.selectedItems.count() === 1);
+        this.toolbar.deleteBtn.show(this.list.selectedItems.count() > 0);
 
-        const selArr = state.selectedItems.getIdArray();
+        const selArr = this.list.selectedItems.getIdArray();
         this.delTransInp.value = selArr.join();
 
-        if (state.selectedItems.count() === 1) {
+        if (this.list.selectedItems.count() === 1) {
             const { baseURL } = window.app;
             this.toolbar.updateBtn.setURL(`${baseURL}transactions/update/${selArr[0]}`);
         }
 
-        this.toolbar.show(state.selectedItems.count() > 0);
+        this.toolbar.show(this.list.selectedItems.count() > 0);
 
         if (!state.loading) {
             this.loadingIndicator.hide();

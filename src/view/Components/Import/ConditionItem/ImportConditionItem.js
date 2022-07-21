@@ -7,8 +7,8 @@ import {
     IMPORT_COND_FIELD_ACC_CURRENCY,
     IMPORT_COND_FIELD_MAIN_ACCOUNT,
     IMPORT_COND_FIELD_TPL,
-} from '../../js/model/ImportCondition.js';
-import { createContainer } from '../../js/app.js';
+} from '../../../js/model/ImportCondition.js';
+import { createContainer } from '../../../js/app.js';
 import './style.css';
 
 /**

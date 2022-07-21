@@ -24,37 +24,39 @@ class Import extends TemplateController
 
     public function index()
     {
+        $accMod = AccountModel::getInstance();
+        $currMod = CurrencyModel::getInstance();
+
         $this->template = new Template(TPL_PATH . "import.tpl");
         $this->template->testerUser =  $this->uMod->isTester($this->user_id);
-        $data = [];
 
-        $accMod = AccountModel::getInstance();
-        $data["accArr"] = $accMod->getData(["type" => "all"]);
-        $importAvailable = count($data["accArr"]) > 0;
-        $data["importAvailable"] = $importAvailable;
-        $data["importNotAvailableMessage"] = MSG_NO_ACCOUNTS_AVAILABLE;
-        $currMod = CurrencyModel::getInstance();
-        $currArr = $currMod->getData();
-        $persArr = $this->personMod->getData(["type" => "all"]);
-        $data["impTemplates"] = $this->templateModel->getData();
-        $data["tplColumnTypes"] = $this->templateModel->getColumnTypes();
-        $data["rulesData"] = $this->ruleModel->getData(["extended" => true]);
+        $accounts = $accMod->getData(["type" => "all"]);
+        $importAvailable = count($accounts) > 0;
 
-        $data["uploadBtn"] = [
-            "id" => "uploadBtn",
-            "title" => "Upload file",
-            "icon" => "import"
+        $data = [
+            "accounts" => $accounts,
+            "importAvailable" => $importAvailable,
+            "importNotAvailableMessage" => MSG_NO_ACCOUNTS_AVAILABLE,
+            "importTemplates" => $this->templateModel->getData(),
+            "tplColumnTypes" => $this->templateModel->getColumnTypes(),
+            "importRules" => $this->ruleModel->getData(["extended" => true]),
+            "uploadBtn" => [
+                "id" => "uploadBtn",
+                "title" => "Upload file",
+                "icon" => "import"
+            ],
         ];
+
         if (!$importAvailable) {
             $data["uploadBtn"]["attributes"] = ["disabled" => !$importAvailable];
         }
 
         $data["appProps"] = [
-            "accounts" => $data["accArr"],
-            "currency" => $currArr,
-            "persons" => $persArr,
-            "rules" => $data["rulesData"],
-            "templates" => $data["impTemplates"]
+            "accounts" => $data["accounts"],
+            "currency" => $currMod->getData(),
+            "persons" => $this->personMod->getData(["type" => "all"]),
+            "rules" => $data["importRules"],
+            "templates" => $data["importTemplates"]
         ];
 
         $this->cssArr[] = "ImportView.css";

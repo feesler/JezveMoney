@@ -11,9 +11,9 @@ import {
     IMPORT_ACTION_SET_TR_TYPE,
     IMPORT_ACTION_SET_ACCOUNT,
     IMPORT_ACTION_SET_PERSON,
-} from '../../js/model/ImportAction.js';
-import { View } from '../../js/View.js';
-import { createField, createContainer, createIcon } from '../../js/app.js';
+} from '../../../js/model/ImportAction.js';
+import { View } from '../../../js/View.js';
+import { createField, createContainer, createIcon } from '../../../js/app.js';
 import './style.css';
 
 /** Strings */
