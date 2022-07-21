@@ -16,7 +16,7 @@ import { IconLink } from '../../Components/IconLink/IconLink.js';
 import '../../css/app.css';
 import './style.css';
 import { ImportUploadDialog } from '../../Components/ImportUploadDialog/ImportUploadDialog.js';
-import { ImportRulesDialog } from '../../Components/ImportRulesDialog/ImportRulesDialog.js';
+import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from '../../Components/ImportRulesDialog/ImportRulesDialog.js';
 import { ImportTransactionItem } from '../../Components/ImportTransactionItem/ImportTransactionItem.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { API } from '../../js/API.js';
@@ -586,7 +586,7 @@ class ImportView extends View {
         if (!this.rulesDialog) {
             this.rulesDialog = new ImportRulesDialog({
                 parent: this,
-                elem: 'rulesDialog',
+                elem: document.querySelector(`.${IMPORT_RULES_DIALOG_CLASS}`),
             });
         }
 
