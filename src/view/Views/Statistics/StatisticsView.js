@@ -65,7 +65,7 @@ class StatisticsView extends View {
         });
 
         this.filterTypeDropDown = DropDown.create({
-            input_id: 'filter_type',
+            elem: 'filter_type',
             onitemselect: (obj) => this.onFilterSel(obj),
             editable: false,
             className: 'dd__fullwidth',
@@ -73,14 +73,14 @@ class StatisticsView extends View {
 
         if (this.state.filter.filter === 'currency') {
             this.currencyDropDown = DropDown.create({
-                input_id: 'curr_id',
+                elem: 'curr_id',
                 onitemselect: (obj) => this.onCurrencySel(obj),
                 editable: false,
                 className: 'dd__fullwidth',
             });
         } else {
             this.accountDropDown = DropDown.create({
-                input_id: 'acc_id',
+                elem: 'acc_id',
                 onitemselect: (obj) => this.onAccountSel(obj),
                 editable: false,
                 className: 'dd__fullwidth',
@@ -88,7 +88,7 @@ class StatisticsView extends View {
         }
 
         this.groupDropDown = DropDown.create({
-            input_id: 'groupsel',
+            elem: 'groupsel',
             onitemselect: (obj) => this.onGroupSel(obj),
             editable: false,
             className: 'dd__fullwidth',

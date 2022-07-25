@@ -70,7 +70,7 @@ class TransactionListView extends View {
         });
 
         this.accountDropDown = DropDown.create({
-            input_id: 'acc_id',
+            elem: 'acc_id',
             placeholder: 'Select account',
             onchange: (obj) => this.onAccountChange(obj),
             editable: false,
@@ -81,7 +81,7 @@ class TransactionListView extends View {
         }
 
         this.personDropDown = DropDown.create({
-            input_id: 'person_id',
+            elem: 'person_id',
             placeholder: 'Select person',
             onchange: (obj) => this.onPersonChange(obj),
             editable: false,

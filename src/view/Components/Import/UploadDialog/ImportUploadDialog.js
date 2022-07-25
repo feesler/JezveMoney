@@ -70,7 +70,7 @@ export class ImportUploadDialog extends Component {
         this.elem.addEventListener('drop', (e) => this.onDrop(e), false);
 
         this.accountDropDown = DropDown.create({
-            input_id: 'initialAccount',
+            elem: 'initialAccount',
             onchange: (account) => this.onAccountChange(account),
             editable: false,
         });

@@ -141,7 +141,7 @@ export class ImportActionForm extends Component {
         this.actionTypeField = createField(TITLE_FIELD_ACTION, selectElem);
 
         this.actionDropDown = DropDown.create({
-            input_id: selectElem,
+            elem: selectElem,
             onchange: (action) => this.onActionTypeChange(action),
             editable: false,
         });
@@ -156,7 +156,7 @@ export class ImportActionForm extends Component {
         this.transTypeField = createField(TITLE_FIELD_TR_TYPE, selectElem);
 
         this.trTypeDropDown = DropDown.create({
-            input_id: selectElem,
+            elem: selectElem,
             onchange: () => this.onValueChange(),
             editable: false,
         });
@@ -174,7 +174,7 @@ export class ImportActionForm extends Component {
         this.accountField = createField(TITLE_FIELD_ACCOUNT, selectElem);
 
         this.accountDropDown = DropDown.create({
-            input_id: selectElem,
+            elem: selectElem,
             onchange: () => this.onValueChange(),
             editable: false,
         });
@@ -194,7 +194,7 @@ export class ImportActionForm extends Component {
         this.personField = createField(TITLE_FIELD_PERSON, selectElem);
 
         this.personDropDown = DropDown.create({
-            input_id: selectElem,
+            elem: selectElem,
             onchange: () => this.onValueChange(),
             editable: false,
         });
