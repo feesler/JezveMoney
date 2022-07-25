@@ -72,14 +72,6 @@ export default {
             import: './src/admin/view/Views/Icon/IconView.js',
             filename: 'admin/view/js/[name].js',
         },
-        AdminImportRuleView: {
-            import: './src/admin/view/Views/ImportRule/ImportRuleView.js',
-            filename: 'admin/view/js/[name].js',
-        },
-        AdminImportTplView: {
-            import: './src/admin/view/Views/ImportTpl/ImportTplView.js',
-            filename: 'admin/view/js/[name].js',
-        },
         AdminUserView: {
             import: './src/admin/view/Views/User/UserView.js',
             filename: 'admin/view/js/[name].js',
