@@ -7,9 +7,9 @@ import {
     copyObject,
     show,
     enable,
+    Component,
+    DropDown,
 } from 'jezvejs';
-import { Component } from 'jezvejs/Component';
-import { DropDown } from 'jezvejs/DropDown';
 import { API } from '../../../js/API.js';
 import { createMessage } from '../../../js/app.js';
 import { ImportTemplateError } from '../../../js/error/ImportTemplateError.js';

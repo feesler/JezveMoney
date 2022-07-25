@@ -2,10 +2,10 @@ import {
     ce,
     show,
     isFunction,
+    Component,
+    DropDown,
+    DecimalInput,
 } from 'jezvejs';
-import { Component } from 'jezvejs/Component';
-import { DropDown } from 'jezvejs/DropDown';
-import { DecimalInput } from 'jezvejs/DecimalInput';
 import {
     ImportAction,
     IMPORT_ACTION_SET_TR_TYPE,

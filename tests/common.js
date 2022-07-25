@@ -5,6 +5,15 @@ import {
     assert,
 } from 'jezve-test';
 
+/** Check object is empty */
+export const isEmpty = (obj) => {
+    if (typeof obj === 'object') {
+        return Object.keys(obj).length === 0;
+    }
+
+    return true;
+};
+
 export const asyncMap = async (data, func) => {
     assert.isArray(data, 'Invalid data type');
     assert.isFunction(func, 'Invalid function type');

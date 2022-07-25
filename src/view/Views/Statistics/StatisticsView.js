@@ -11,11 +11,11 @@ import {
     urlJoin,
     px,
     isEmpty,
+    formatDate,
+    Histogram,
+    DatePicker,
+    DropDown,
 } from 'jezvejs';
-import { formatDate } from 'jezvejs/DateUtils';
-import { Histogram } from 'jezvejs/Histogram';
-import { DatePicker } from 'jezvejs/DatePicker';
-import { DropDown } from 'jezvejs/DropDown';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';

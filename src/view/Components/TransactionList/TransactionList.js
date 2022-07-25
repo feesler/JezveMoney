@@ -1,7 +1,11 @@
-import { ce, isFunction, removeChilds } from 'jezvejs';
-import { Component } from 'jezvejs/Component';
-import { Selection } from 'jezvejs/Selection';
-import { Sortable } from 'jezvejs/Sortable';
+import {
+    ce,
+    isFunction,
+    removeChilds,
+    Component,
+    Selection,
+    Sortable,
+} from 'jezvejs';
 import { TransactionListItem } from '../TransactionListItem/TransactionListItem.js';
 import './style.css';
 

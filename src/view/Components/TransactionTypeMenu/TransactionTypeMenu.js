@@ -4,9 +4,9 @@ import {
     addChilds,
     removeChilds,
     setEvents,
+    Component,
+    Checkbox,
 } from 'jezvejs';
-import { Component } from 'jezvejs/Component';
-import { Checkbox } from 'jezvejs/Checkbox';
 import {
     EXPENSE,
     INCOME,

@@ -4,8 +4,8 @@ import {
     addChilds,
     removeChilds,
     setEvents,
+    Component,
 } from 'jezvejs';
-import { Component } from 'jezvejs/Component';
 import { createIcon } from '../../js/app.js';
 import './style.css';
 

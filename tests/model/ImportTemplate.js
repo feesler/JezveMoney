@@ -1,6 +1,4 @@
-import { copyObject } from 'jezvejs';
-import { assert } from 'jezve-test';
-import { formatDate } from 'jezvejs/DateUtils';
+import { assert, copyObject, formatDate } from 'jezve-test';
 import { fixFloat, fixDate } from '../common.js';
 import { ImportTransaction } from './ImportTransaction.js';
 import { ImportTemplateError } from '../error/ImportTemplateError.js';

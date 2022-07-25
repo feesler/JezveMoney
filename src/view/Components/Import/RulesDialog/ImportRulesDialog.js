@@ -4,9 +4,9 @@ import {
     removeChilds,
     show,
     insertAfter,
+    Component,
+    Popup,
 } from 'jezvejs';
-import { Component } from 'jezvejs/Component';
-import { Popup } from 'jezvejs/Popup';
 import { createMessage } from '../../../js/app.js';
 import { API } from '../../../js/API.js';
 import { ImportRule } from '../../../js/model/ImportRule.js';

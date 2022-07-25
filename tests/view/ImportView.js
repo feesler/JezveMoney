@@ -6,8 +6,8 @@ import {
     click,
     wait,
     waitForFunction,
+    copyObject,
 } from 'jezve-test';
-import { copyObject } from 'jezvejs';
 import { DropDown, Checkbox } from 'jezvejs/tests';
 import { AppView } from './AppView.js';
 import { IconLink } from './component/IconLink.js';

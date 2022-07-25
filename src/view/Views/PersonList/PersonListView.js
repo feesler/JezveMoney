@@ -1,6 +1,5 @@
 import 'jezvejs/style';
-import { ge } from 'jezvejs';
-import { Selection } from 'jezvejs/Selection';
+import { ge, Selection } from 'jezvejs';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';

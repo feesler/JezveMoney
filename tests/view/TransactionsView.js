@@ -8,8 +8,8 @@ import {
     waitForFunction,
     goTo,
     baseUrl,
+    copyObject,
 } from 'jezve-test';
-import { copyObject, urlJoin, isEmpty } from 'jezvejs';
 import { DropDown, Paginator } from 'jezvejs/tests';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
@@ -20,7 +20,7 @@ import { DatePickerFilter } from './component/DatePickerFilter.js';
 import { ModeSelector } from './component/TransactionList/ModeSelector.js';
 import { SearchForm } from './component/TransactionList/SearchForm.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
-import { fixDate } from '../common.js';
+import { fixDate, isEmpty, urlJoin } from '../common.js';
 import { Toolbar } from './component/Toolbar.js';
 import { FiltersAccordion } from './component/TransactionList/FiltersAccordion.js';
 

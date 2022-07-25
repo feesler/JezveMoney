@@ -4,8 +4,8 @@ import {
     prop,
     navigation,
     click,
+    copyObject,
 } from 'jezve-test';
-import { copyObject } from 'jezvejs';
 import { DropDown } from 'jezvejs/tests';
 import { AppView } from './AppView.js';
 import { Icon } from '../model/Icon.js';

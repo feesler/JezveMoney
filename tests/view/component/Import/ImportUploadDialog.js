@@ -11,8 +11,9 @@ import {
     isVisible,
     wait,
     waitForFunction,
+    isNum,
+    copyObject,
 } from 'jezve-test';
-import { isNum, copyObject } from 'jezvejs';
 import { Checkbox, DropDown } from 'jezvejs/tests';
 import { App } from '../../../Application.js';
 import { asyncMap, fixFloat } from '../../../common.js';

@@ -3,8 +3,8 @@ import {
     ce,
     addChilds,
     removeChilds,
+    Component,
 } from 'jezvejs';
-import { Component } from 'jezvejs/Component';
 import './style.css';
 
 const TITLE_CLASS = 'iconlink__title';

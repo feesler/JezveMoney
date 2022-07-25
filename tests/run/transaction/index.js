@@ -1,10 +1,10 @@
-import { copyObject } from 'jezvejs';
 import {
     test,
     assert,
     setBlock,
     baseUrl,
     goTo,
+    copyObject,
 } from 'jezve-test';
 import { TransactionsView } from '../../view/TransactionsView.js';
 import { TransactionView } from '../../view/TransactionView.js';

@@ -1,6 +1,9 @@
-import { ce, show } from 'jezvejs';
-import { Spinner } from 'jezvejs/Spinner';
-import { Component } from 'jezvejs/Component';
+import {
+    ce,
+    show,
+    Component,
+    Spinner,
+} from 'jezvejs';
 import './style.css';
 
 const defaultProps = {

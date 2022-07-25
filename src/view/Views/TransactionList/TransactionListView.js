@@ -6,12 +6,12 @@ import {
     urlJoin,
     isEmpty,
     setEvents,
+    formatDate,
+    Collapsible,
+    DropDown,
+    DatePicker,
+    Paginator,
 } from 'jezvejs';
-import { Collapsible } from 'jezvejs/Collapsible';
-import { formatDate } from 'jezvejs/DateUtils';
-import { DropDown } from 'jezvejs/DropDown';
-import { DatePicker } from 'jezvejs/DatePicker';
-import { Paginator } from 'jezvejs/Paginator';
 import { createMessage } from '../../js/app.js';
 import { Application } from '../../js/Application.js';
 import { API } from '../../js/API.js';
