@@ -277,7 +277,8 @@ class StatisticsView extends View {
         }
 
         if (!this.popup) {
-            this.popup = ce('div', { className: 'chart_popup hidden' });
+            this.popup = ce('div', { className: 'chart_popup' });
+            show(this.popup, false);
             chartsWrapper.appendChild(this.popup);
         }
 

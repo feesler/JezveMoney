@@ -1,5 +1,5 @@
 <?php   if (isset($hidden) && $hidden) {  ?>
-<div id="<?=e($id)?>" class="hidden">
+<div id="<?=e($id)?>" hidden>
 <?php   } else {    ?>
 <div id="<?=e($id)?>">
 <?php   }   ?>

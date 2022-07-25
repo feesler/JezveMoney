@@ -44,11 +44,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 </select>
                             </div>
 
-<?php	if ($byCurrency) {		?>
-                            <div id="acc_block" class="filter-item std_margin hidden">
-<?php	} else {	?>
-                            <div id="acc_block" class="filter-item std_margin">
-<?php	}	?>
+                            <div id="acc_block" class="filter-item std_margin"<?=hidden($byCurrency)?>>
                                 <select id="acc_id">
 <?php	foreach($accArr as $accInfo) {
             if ($accInfo->id == $acc_id) {	?>
@@ -60,11 +56,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 </select>
                             </div>
 
-<?php	if ($byCurrency) {		?>
-                            <div id="curr_block" class="filter-item std_margin">
-<?php	} else {	?>
-                            <div id="curr_block" class="filter-item std_margin hidden">
-<?php	}	?>
+                            <div id="curr_block" class="filter-item std_margin"<?=hidden(!$byCurrency)?>>
                                 <select id="curr_id">
 <?php	foreach($currArr as $currInfo) {
             if ($currInfo->id == $curr_id) {	?>
@@ -95,7 +87,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                     "title" => "Select range",
                                     "subtitle" => $dateFmt
                                 ])?>
-                                <div id="date_block" class="hidden">
+                                <div id="date_block" hidden>
                                     <div class="input-group">
                                         <input id="date" class="stretch-input input-group__item" name="date" type="text" value="<?=e($dateFmt)?>">
                                         <button id="cal_rbtn" class="btn icon-btn input-group__btn input-group__item" type="button"><?=svgIcon("cal")?></button>

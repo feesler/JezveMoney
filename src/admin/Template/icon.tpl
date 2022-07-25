@@ -28,8 +28,8 @@
 
                     <div class="acc_controls">
                         <input id="createbtn" class="adm_act_btn" type="button" value="create">
-                        <input id="updbtn" class="adm_act_btn hidden" type="button" value="update">
-                        <input id="del_btn" class="adm_act_btn hidden" type="button" value="delete">
+                        <input id="updbtn" class="adm_act_btn" type="button" value="update" hidden>
+                        <input id="del_btn" class="adm_act_btn" type="button" value="delete" hidden>
                     </div>
                 </div>
             </div>
@@ -37,7 +37,7 @@
     </div>
 </div>
 
-<form id="item-frm" class="hidden" method="post" action="<?=BASEURL?>api/icon/create">
+<form id="item-frm" method="post" action="<?=BASEURL?>api/icon/create" hidden>
     <input id="icon_id" name="id" type="hidden">
     <div class="view-row">
         <label for="icon_name">Name</label>

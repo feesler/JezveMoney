@@ -20,14 +20,14 @@ class IconLink extends TemplateComponent
         if (isset($data["id"])) {
             $attrs[] = "id=\"" . e($data["id"]) . "\"";
         }
+        if (isset($data["hidden"]) && $data["hidden"] == true) {
+            $attrs[] = "hidden";
+        }
         $data["attributes"] = implode(" ", $attrs);
 
         $classNames = ["iconlink"];
         if (isset($data["classNames"])) {
             array_push($classNames, ...asArray($data["classNames"]));
-        }
-        if (isset($data["hidden"]) && $data["hidden"] == true) {
-            $classNames[] = "hidden";
         }
         $data["classNames"] = implode(" ", $classNames);
 

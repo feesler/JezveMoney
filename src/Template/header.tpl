@@ -24,7 +24,7 @@
                 <span class="user__icon"><?=svgIcon("user")?></span>
                 <span class="user__title"><?=e($this->user_name)?></span>
             </button>
-            <div id="menupopup" class="user-menu hidden">
+            <div id="menupopup" class="user-menu" hidden>
                 <ul>
 <?php	if ($this->adminUser) {		?>
                     <li><a href="<?=BASEURL?>admin/">admin panel</a></li>

@@ -19,7 +19,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                     <span id="notavailmsg" class="nodata-message"><?=e($importNotAvailableMessage)?></span>
 <?php   }   ?>
 
-                    <div class="content-header<?=hidden(!$importAvailable)?>">
+                    <div class="content-header"<?=hidden(!$importAvailable)?>>
                         <div class="data-header">
                             <div class="header-field account-field std_margin">
                                 <label>Main account</label>
@@ -64,7 +64,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         </div>
                     </div>
 
-                    <div class="data-form<?=hidden(!$importAvailable)?>">
+                    <div class="data-form"<?=hidden(!$importAvailable)?>>
                         <div id="rowsContainer" class="data-container">
                             <span class="nodata-message">No transactions to import</span>
                         </div>

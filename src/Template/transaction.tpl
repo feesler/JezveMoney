@@ -44,10 +44,10 @@ include(TPL_PATH."commonhdr.tpl");	?>
         }	?>
                         </div>
 
-                        <span id="notavailmsg" class="nodata-message<?=hidden($trAvailable)?>"><?=e($noDataMessage)?></span>
+                        <span id="notavailmsg" class="nodata-message"<?=hidden($trAvailable)?>><?=e($noDataMessage)?></span>
 
                         <div class="accounts-section">
-                            <div id="person" class="account-container<?=hidden(!$trAvailable || $tr["type"] != DEBT)?>">
+                            <div id="person" class="account-container"<?=hidden(!$trAvailable || $tr["type"] != DEBT)?>>
                                 <input id="person_id" name="person_id" type="hidden" value="<?=e($person_id)?>">
                                 <div class="tile_header"><label>Person</label></div>
                                 <div class="tile-base">
@@ -70,19 +70,19 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
 
 <?php	if ($tr["type"] == DEBT) {		?>
-                            <button id="swapBtn" class="swap-btn<?=hidden(!$trAvailable)?>" type="button">
+                            <button id="swapBtn" class="swap-btn" type="button"<?=hidden(!$trAvailable)?>>
                                 <?=svgIcon("swap")?>
                             </button>
 <?php	}	?>
 
-                            <div id="debtaccount" class="account-container<?=hidden(!$trAvailable || $tr["type"] != DEBT)?>">
+                            <div id="debtaccount" class="account-container"<?=hidden(!$trAvailable || $tr["type"] != DEBT)?>>
                                 <div class="tile_header">
                                     <label id="acclbl"><?=e($accLbl)?></label>
-                                    <button id="noacc_btn" class="close-btn<?=hidden($noAccount)?>" type="button">
+                                    <button id="noacc_btn" class="close-btn" type="button"<?=hidden($noAccount)?>>
                                         <?=svgIcon("close")?>
                                     </button>
                                 </div>
-                                <div class="tile-base<?=hidden($noAccount)?>">
+                                <div class="tile-base"<?=hidden($noAccount)?>>
                                     <div class="tile_container">
                                         <?=Tile::render($debtAccountTile)?>
                                         <input id="acc_id" name="acc_id" type="hidden" value="<?=e($acc_id)?>">
@@ -99,16 +99,12 @@ include(TPL_PATH."commonhdr.tpl");	?>
 <?php	}		?>
                                     </div>
                                 </div>
-                                <div id="selaccount" class="account-toggler<?=hidden(!$noAccount)?>">
+                                <div id="selaccount" class="account-toggler"<?=hidden(!$noAccount)?>>
                                     <button class="dashed-btn" type="button"><span>Select account</span></button>
                                 </div>
                             </div>
 
-<?php	    if (!$trAvailable || $tr["type"] == INCOME || $tr["type"] == DEBT) {	?>
-                            <div id="source" class="account-container hidden">
-<?php	    } else {	?>
-                            <div id="source" class="account-container">
-<?php	    }	?>
+                            <div id="source" class="account-container"<?=hidden(!$trAvailable || $tr["type"] == INCOME || $tr["type"] == DEBT)?>>
                                 <div class="tile_header"><label>Source account</label></div>
                                 <div class="tile-base">
                                     <div class="tile_container">
@@ -134,16 +130,12 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <input id="src_id" name="src_id" type="hidden" value="<?=e($tr["src_id"])?>">
 
 <?php	if ($tr["type"] != DEBT) {		?>
-                            <button id="swapBtn" class="swap-btn<?=hidden(!$trAvailable || $tr["type"] == EXPENSE || $tr["type"] == INCOME)?>" type="button">
+                            <button id="swapBtn" class="swap-btn" type="button"<?=hidden(!$trAvailable || $tr["type"] == EXPENSE || $tr["type"] == INCOME)?>>
                                 <?=svgIcon("swap")?>
                             </button>
 <?php	}	?>
 
-<?php	if (!$trAvailable || $tr["type"] == EXPENSE || $tr["type"] == DEBT) {	?>
-                            <div id="destination" class="account-container hidden">
-<?php	} else {	?>
-                           <div id="destination" class="account-container">
-<?php	}	?>
+                            <div id="destination" class="account-container"<?=hidden(!$trAvailable || $tr["type"] == EXPENSE || $tr["type"] == DEBT)?>>
                                 <div class="tile_header"><label>Destination account</label></div>
                                 <div class="tile-base">
                                     <div class="tile_container">
@@ -173,7 +165,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
 
                         <input id="debtOperation" name="op" type="hidden" value="<?=($debtType ? "1" : "2")?>">
 
-                        <div id="src_amount_row" class="validation-block view-row std_margin<?=hidden(!$trAvailable || !$showSrcAmount)?>">
+                        <div id="src_amount_row" class="validation-block view-row std_margin"<?=hidden(!$trAvailable || !$showSrcAmount)?>>
                             <label for="src_amount"><?=e($srcAmountLbl)?></label>
                             <div class="input-group">
                                 <input id="src_amount" name="src_amount" class="stretch-input amount-input input-group__item" type="text" autocomplete="off" value="<?=e($form["src_amount"])?>">
@@ -185,7 +177,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <input id="src_curr" name="src_curr" type="hidden" value="<?=e($tr["src_curr"])?>">
                         </div>
 
-                        <div id="dest_amount_row" class="validation-block view-row std_margin<?=hidden(!$trAvailable || !$showDestAmount)?>">
+                        <div id="dest_amount_row" class="validation-block view-row std_margin"<?=hidden(!$trAvailable || !$showDestAmount)?>>
                             <label for="dest_amount"><?=e($destAmountLbl)?></label>
                             <div class="input-group">
                                 <input id="dest_amount" name="dest_amount" class="stretch-input amount-input input-group__item" type="text" autocomplete="off" value="<?=e($form["dest_amount"])?>">
@@ -197,7 +189,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <input id="dest_curr" name="dest_curr" type="hidden" value="<?=e($tr["dest_curr"])?>">
                         </div>
 
-                        <div id="exchange" class="view-row std_margin hidden">
+                        <div id="exchange" class="view-row std_margin" hidden>
                             <label for="exchrate">Exchange rate</label>
                             <div class="input-group">
                                 <input id="exchrate" class="stretch-input amount-input input-group__item" type="text" autocomplete="off" value="<?=e($form["exchange"])?>">
@@ -207,7 +199,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
                         </div>
 
-                        <div id="result_balance" class="view-row std_margin hidden">
+                        <div id="result_balance" class="view-row std_margin" hidden>
                             <label for="resbal"><?=e($srcBalTitle)?></label>
                             <div class="input-group">
                                 <input id="resbal" class="stretch-input amount-input input-group__item" type="text" autocomplete="off" value="<?=e($form["srcResult"])?>">
@@ -217,7 +209,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
                         </div>
 
-                        <div id="result_balance_dest" class="view-row std_margin hidden">
+                        <div id="result_balance_dest" class="view-row std_margin" hidden>
                             <label for="resbal_d"><?=e($destBalTitle)?></label>
                             <div class="input-group">
                                 <input id="resbal_d" class="stretch-input amount-input input-group__item" type="text" autocomplete="off" value="<?=e($form["destResult"])?>">
@@ -227,14 +219,14 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
                         </div>
 
-                        <div id="date_row" class="view-row std_margin<?=hidden(!$trAvailable)?>">
+                        <div id="date_row" class="view-row std_margin"<?=hidden(!$trAvailable)?>>
                             <?=IconLink::render([
                                 "id" => "calendar_btn",
                                 "icon" => "cal",
                                 "title" => "Change date",
                                 "subtitle" => $dateFmt
                             ])?>
-                            <div id="date_block" class="validation-block hidden">
+                            <div id="date_block" class="validation-block" hidden>
                                 <label for="date">Date</label>
                                 <div class="column-container">
                                     <div class="input-group">
@@ -247,20 +239,20 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
                         </div>
 
-                        <div id="comment_row" class="view-row std_margin<?=hidden(!$trAvailable)?>">
+                        <div id="comment_row" class="view-row std_margin"<?=hidden(!$trAvailable)?>>
                             <?=IconLink::render([
                                 "id" => "comm_btn",
                                 "icon" => "plus",
                                 "title" => "Add comment",
                                 "hidden" => !is_empty($tr["comment"])
                             ])?>
-                            <div id="comment_block" class="<?=hidden(is_empty($tr["comment"]))?>">
+                            <div id="comment_block"<?=hidden(is_empty($tr["comment"]))?>>
                                 <label for="comm">Comment</label>
                                 <input id="comm" class="stretch-input" name="comment" type="text" value="<?=e($tr["comment"])?>">
                             </div>
                         </div>
 
-                        <div id="submit_controls" class="acc_controls<?=hidden(!$trAvailable)?>">
+                        <div id="submit_controls" class="acc_controls"<?=hidden(!$trAvailable)?>>
                             <input id="submitbtn" class="btn submit-btn" type="submit" value="ok">
                             <a class="btn cancel-btn" href="<?=BASEURL?>">cancel</a>
                         </div>

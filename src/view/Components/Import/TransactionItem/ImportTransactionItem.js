@@ -127,7 +127,8 @@ export class ImportTransactionItem extends Component {
             placeholder: PH_FIELD_DEST_AMOUNT,
             autocomplete: 'off',
         }, null, { input: () => this.onDestAmountInput() });
-        this.destAmountField = createField(TITLE_FIELD_DEST_AMOUNT, this.destAmountInp, 'amount-field hidden');
+        this.destAmountField = createField(TITLE_FIELD_DEST_AMOUNT, this.destAmountInp, 'amount-field');
+        show(this.destAmountField, false);
         this.destAmountLabel = this.destAmountField.querySelector('label');
         // Date field
         this.dateInp = ce('input', {
@@ -157,10 +158,11 @@ export class ImportTransactionItem extends Component {
         // Toggle expand/collapse
         this.toggleExtBtn = ce(
             'button',
-            { className: 'btn toggle-btn hidden', type: 'button' },
+            { className: 'btn toggle-btn', type: 'button' },
             createIcon('toggle-ext'),
             { click: () => this.toggleCollapse() },
         );
+        show(this.toggleExtBtn, false);
 
         this.topRow = createContainer('form-row', [
             this.currField,
@@ -191,7 +193,8 @@ export class ImportTransactionItem extends Component {
                 this.toggleExtBtn,
             ]),
         ]);
-        this.feedbackElem = ce('div', { className: 'invalid-feedback hidden' });
+        this.feedbackElem = ce('div', { className: 'invalid-feedback' });
+        show(this.feedbackElem, false);
         this.extendedContainer = createContainer('extended-content');
 
         this.elem = createContainer('import-item', [

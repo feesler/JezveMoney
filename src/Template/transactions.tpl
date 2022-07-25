@@ -119,7 +119,7 @@ include(TPL_PATH."commonhdr.tpl");
                                 "title" => "Select range",
                                 "subtitle" => $dateFmt
                             ])?>
-                            <div id="date_block" class="column-container hidden">
+                            <div id="date_block" class="column-container" hidden>
                                 <div class="input-group">
                                     <input id="date" class="stretch-input input-group__item" name="date" type="text" value="<?=e($dateFmt)?>">
                                     <button id="nodatebtn" class="close-btn input-group__btn input-group__item" type="button"><?=svgIcon("close")?></button>
@@ -158,7 +158,7 @@ include(TPL_PATH."commonhdr.tpl");
         </div>
     </div>
 
-    <div id="toolbar" class="sidebar hidden">
+    <div id="toolbar" class="sidebar" hidden>
         <div class="siderbar__content">
             <div id="sbEllipsis" class="sidebar__ellipsis"><?=svgIcon("sbellipsis")?></div>
             <div id="sbButtons" class="sidebar__controls">
