@@ -13,7 +13,7 @@
                 <span class="user__icon"><?=svgIcon("user")?></span>
                 <span class="user__title"><?=e($this->user_name)?></span>
             </button>
-            <div id="menupopup" class="user-menu hidden">
+            <div id="menupopup" class="user-menu" hidden>
                 <ul>
                     <li><a href="<?=BASEURL?>">Index</a></li>
                     <li class="separator"></li>

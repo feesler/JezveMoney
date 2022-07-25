@@ -40,14 +40,14 @@ include(TPL_PATH."commonhdr.tpl");	?>
 <?php		}   ?>
                     </div>
 <?php	} else {	?>
-                    <div id="hiddenTilesContainer" class="tiles hidden"></div>
+                    <div id="hiddenTilesContainer" class="tiles" hidden></div>
 <?php	}	?>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="toolbar" class="sidebar hidden">
+    <div id="toolbar" class="sidebar" hidden>
         <div class="siderbar__content">
             <div id="sbEllipsis" class="sidebar__ellipsis"><?=svgIcon("sbellipsis")?></div>
             <div id="sbButtons" class="sidebar__controls">
