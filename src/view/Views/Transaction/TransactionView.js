@@ -467,7 +467,7 @@ class TransactionView extends View {
         const state = this.store.getState();
         const { transaction } = state;
         this.srcDDList = DropDown.create({
-            input_id: 'source_tile',
+            elem: 'source_tile',
             listAttach: true,
             onitemselect: (item) => this.onSrcAccountSelect(item),
             editable: false,
@@ -489,7 +489,7 @@ class TransactionView extends View {
         const state = this.store.getState();
         const { transaction } = state;
         this.destDDList = DropDown.create({
-            input_id: 'dest_tile',
+            elem: 'dest_tile',
             listAttach: true,
             onitemselect: (item) => this.onDestAccountSelect(item),
             editable: false,
@@ -509,7 +509,7 @@ class TransactionView extends View {
         }
 
         this.persDDList = DropDown.create({
-            input_id: 'person_tile',
+            elem: 'person_tile',
             listAttach: true,
             onitemselect: (item) => this.onPersonSelect(item),
             editable: false,
@@ -537,7 +537,7 @@ class TransactionView extends View {
         }
 
         this.accDDList = DropDown.create({
-            input_id: 'acc_tile',
+            elem: 'acc_tile',
             listAttach: true,
             onitemselect: (item) => this.onDebtAccountSelect(item),
             editable: false,
@@ -560,7 +560,7 @@ class TransactionView extends View {
 
         const state = this.store.getState();
         this.srcCurrDDList = DropDown.create({
-            input_id: 'srcamountsign',
+            elem: 'srcamountsign',
             listAttach: true,
             onitemselect: (item) => this.onSrcCurrencySel(item),
             editable: false,
@@ -581,7 +581,7 @@ class TransactionView extends View {
 
         const state = this.store.getState();
         this.destCurrDDList = DropDown.create({
-            input_id: 'destamountsign',
+            elem: 'destamountsign',
             listAttach: true,
             onitemselect: (item) => this.onDestCurrencySel(item),
             editable: false,

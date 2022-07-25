@@ -69,12 +69,12 @@ export class ImportTemplateManager extends Component {
         this.statusHandler = this.props.templateStatus;
 
         this.templateDropDown = DropDown.create({
-            input_id: 'templateSel',
+            elem: 'templateSel',
             onchange: (tpl) => this.onTemplateChange(tpl),
             editable: false,
         });
         this.columnDropDown = DropDown.create({
-            input_id: 'columnSel',
+            elem: 'columnSel',
             editable: false,
         });
 

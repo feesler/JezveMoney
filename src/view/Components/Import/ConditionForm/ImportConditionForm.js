@@ -150,7 +150,7 @@ export class ImportConditionForm extends Component {
         this.propertyField = createField(TITLE_FIELD_PROPERTY, selectElem);
 
         this.propertyDropDown = DropDown.create({
-            input_id: selectElem,
+            elem: selectElem,
             onchange: (property) => this.onPropertyChange(property),
             editable: false,
         });
@@ -168,7 +168,7 @@ export class ImportConditionForm extends Component {
         this.operatorField = createField(TITLE_FIELD_OPERATOR, selectElem);
 
         this.operatorDropDown = DropDown.create({
-            input_id: selectElem,
+            elem: selectElem,
             onchange: (operator) => this.onOperatorChange(operator),
             editable: false,
         });
@@ -186,7 +186,7 @@ export class ImportConditionForm extends Component {
         this.accountField = createField(TITLE_FIELD_ACCOUNT, selectElem);
 
         this.accountDropDown = DropDown.create({
-            input_id: selectElem,
+            elem: selectElem,
             onchange: () => this.onValueChange(),
             editable: false,
         });
@@ -204,7 +204,7 @@ export class ImportConditionForm extends Component {
         this.templateField = createField(TITLE_FIELD_TEMPLATE, selectElem);
 
         this.templateDropDown = DropDown.create({
-            input_id: selectElem,
+            elem: selectElem,
             onchange: () => this.onValueChange(),
             editable: false,
         });
@@ -224,7 +224,7 @@ export class ImportConditionForm extends Component {
         this.currencyField = createField(TITLE_FIELD_CURRENCY, selectElem);
 
         this.currencyDropDown = DropDown.create({
-            input_id: selectElem,
+            elem: selectElem,
             onchange: () => this.onValueChange(),
             editable: false,
         });
@@ -242,7 +242,7 @@ export class ImportConditionForm extends Component {
         this.valuePropField = createField(TITLE_FIELD_VALUE_PROPERTY, selectElem);
 
         this.valuePropDropDown = DropDown.create({
-            input_id: selectElem,
+            elem: selectElem,
             onchange: () => this.onValueChange(),
             editable: false,
         });

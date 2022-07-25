@@ -55,7 +55,7 @@ class AccountView extends View {
         }
 
         this.iconSelect = DropDown.create({
-            input_id: 'icon',
+            elem: 'icon',
             onitemselect: (o) => this.onIconSelect(o),
             editable: false,
             className: 'dd__fullwidth',
@@ -65,7 +65,7 @@ class AccountView extends View {
         }
 
         this.currencySelect = DropDown.create({
-            input_id: 'currency',
+            elem: 'currency',
             onitemselect: (o) => this.onCurrencySelect(o),
             editable: false,
             className: 'dd__fullwidth',

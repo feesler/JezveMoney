@@ -235,7 +235,7 @@ export class ImportTransactionItem extends Component {
         this.trTypeField = createField('Type', selectElem);
 
         this.typeDropDown = DropDown.create({
-            input_id: selectElem,
+            elem: selectElem,
             onchange: (type) => this.onTrTypeChanged(type),
             editable: false,
         });
@@ -257,7 +257,7 @@ export class ImportTransactionItem extends Component {
         this.destAccountLabel = this.destAccountField.querySelector('label');
 
         this.destAccDropDown = DropDown.create({
-            input_id: selectElem,
+            elem: selectElem,
             disabled: true,
             onchange: (account) => this.onDestChanged(account),
             editable: false,
@@ -277,7 +277,7 @@ export class ImportTransactionItem extends Component {
         this.personField = createField(TITLE_FIELD_PERSON, selectElem);
 
         this.personDropDown = DropDown.create({
-            input_id: selectElem,
+            elem: selectElem,
             disabled: true,
             onchange: (person) => this.onPersonChanged(person),
             editable: false,
@@ -296,7 +296,7 @@ export class ImportTransactionItem extends Component {
         this.currField = createField(TITLE_FIELD_CURRENCY, selectElem);
 
         this.currencyDropDown = DropDown.create({
-            input_id: selectElem,
+            elem: selectElem,
             onchange: (currency) => this.onCurrChanged(currency),
             editable: false,
         });
