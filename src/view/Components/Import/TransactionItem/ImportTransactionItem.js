@@ -7,11 +7,11 @@ import {
     copyObject,
     addChilds,
     removeChilds,
+    formatDate,
+    Component,
+    Checkbox,
+    DropDown,
 } from 'jezvejs';
-import { formatDate } from 'jezvejs/DateUtils';
-import { Component } from 'jezvejs/Component';
-import { Checkbox } from 'jezvejs/Checkbox';
-import { DropDown } from 'jezvejs/DropDown';
 import {
     fixFloat,
     EXPENSE,

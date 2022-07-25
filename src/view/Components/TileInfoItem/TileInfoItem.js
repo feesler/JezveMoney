@@ -1,5 +1,4 @@
-import { isFunction } from 'jezvejs';
-import { Component } from 'jezvejs/Component';
+import { isFunction, Component } from 'jezvejs';
 
 /**
  * TileInfoItem component

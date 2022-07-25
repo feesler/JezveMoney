@@ -4,11 +4,11 @@ import {
     re,
     ce,
     enable,
+    formatDate,
+    Sortable,
+    DropDown,
+    Checkbox,
 } from 'jezvejs';
-import { formatDate } from 'jezvejs/DateUtils';
-import { Sortable } from 'jezvejs/Sortable';
-import { DropDown } from 'jezvejs/DropDown';
-import { Checkbox } from 'jezvejs/Checkbox';
 import { timestampFromString, createMessage } from '../../js/app.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';

@@ -1,6 +1,5 @@
 import 'jezvejs/style';
-import { ge } from 'jezvejs';
-import { Popup } from 'jezvejs/Popup';
+import { ge, Popup } from 'jezvejs';
 import { createMessage } from '../../js/app.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';

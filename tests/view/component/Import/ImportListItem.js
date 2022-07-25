@@ -7,9 +7,9 @@ import {
     input,
     isVisible,
     assert,
+    copyObject,
+    formatDate,
 } from 'jezve-test';
-import { copyObject } from 'jezvejs';
-import { formatDate } from 'jezvejs/DateUtils';
 import { Checkbox, DropDown } from 'jezvejs/tests';
 import {
     EXPENSE,

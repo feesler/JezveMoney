@@ -6,8 +6,8 @@ import {
     isVisible,
     click,
     input,
+    copyObject,
 } from 'jezve-test';
-import { copyObject } from 'jezvejs';
 import { DatePicker } from 'jezvejs/tests';
 import { IconLink } from './IconLink.js';
 

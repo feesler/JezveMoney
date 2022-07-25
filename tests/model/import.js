@@ -1,5 +1,4 @@
-import { assert } from 'jezve-test';
-import { formatDate } from 'jezvejs/DateUtils';
+import { assert, formatDate } from 'jezve-test';
 import { createCSV } from '../common.js';
 import { App } from '../Application.js';
 

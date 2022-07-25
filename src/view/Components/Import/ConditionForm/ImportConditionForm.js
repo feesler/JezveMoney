@@ -2,11 +2,11 @@ import {
     ce,
     show,
     isFunction,
+    Component,
+    Checkbox,
+    DropDown,
+    DecimalInput,
 } from 'jezvejs';
-import { Component } from 'jezvejs/Component';
-import { Checkbox } from 'jezvejs/Checkbox';
-import { DropDown } from 'jezvejs/DropDown';
-import { DecimalInput } from 'jezvejs/DecimalInput';
 import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,

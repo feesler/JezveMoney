@@ -1,6 +1,10 @@
-import { ge, show, isFunction } from 'jezvejs';
-import { Component } from 'jezvejs/Component';
-import { Checkbox } from 'jezvejs/Checkbox';
+import {
+    ge,
+    show,
+    isFunction,
+    Component,
+    Checkbox,
+} from 'jezvejs';
 import { API } from '../../../js/API.js';
 
 /** Strings */

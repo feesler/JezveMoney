@@ -2,8 +2,8 @@ import {
     ce,
     svg,
     isDate,
+    Popup,
 } from 'jezvejs';
-import { Popup } from 'jezvejs/Popup';
 
 /** Types of transactions */
 export const EXPENSE = 1;

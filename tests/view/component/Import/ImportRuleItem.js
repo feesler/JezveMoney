@@ -4,8 +4,8 @@ import {
     prop,
     click,
     assert,
+    copyObject,
 } from 'jezve-test';
-import { copyObject } from 'jezvejs';
 import { ImportRuleItemConditions } from './ImportRuleItemConditions.js';
 import { ImportConditionItem } from './ImportConditionItem.js';
 import { ImportRuleItemActions } from './ImportRuleItemActions.js';

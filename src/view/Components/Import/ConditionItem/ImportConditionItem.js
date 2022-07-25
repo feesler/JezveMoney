@@ -1,5 +1,4 @@
-import { ce } from 'jezvejs';
-import { Component } from 'jezvejs/Component';
+import { ce, Component } from 'jezvejs';
 import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,

@@ -4,8 +4,8 @@ import {
     query,
     queryAll,
     isVisible,
+    copyObject,
 } from 'jezve-test';
-import { copyObject } from 'jezvejs';
 import { ImportListItem } from './ImportListItem.js';
 import { asyncMap } from '../../../common.js';
 

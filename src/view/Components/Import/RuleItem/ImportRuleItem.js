@@ -5,9 +5,9 @@ import {
     copyObject,
     addChilds,
     removeChilds,
+    Component,
+    Collapsible,
 } from 'jezvejs';
-import { Component } from 'jezvejs/Component';
-import { Collapsible } from 'jezvejs/Collapsible';
 import { ImportRule } from '../../../js/model/ImportRule.js';
 import { ImportConditionList } from '../../../js/model/ImportConditionList.js';
 import { ImportActionList } from '../../../js/model/ImportActionList.js';

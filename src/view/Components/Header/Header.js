@@ -4,9 +4,9 @@ import {
     show,
     setEmptyClick,
     removeEmptyClick,
+    Component,
+    Switch,
 } from 'jezvejs';
-import { Component } from 'jezvejs/Component';
-import { Switch } from 'jezvejs/Switch';
 import './style.css';
 
 // Theme constants

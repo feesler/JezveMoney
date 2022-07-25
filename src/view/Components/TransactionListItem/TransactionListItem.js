@@ -1,5 +1,9 @@
-import { ce, addChilds, removeChilds } from 'jezvejs';
-import { Component } from 'jezvejs/Component';
+import {
+    ce,
+    addChilds,
+    removeChilds,
+    Component,
+} from 'jezvejs';
 import {
     EXPENSE,
     INCOME,
