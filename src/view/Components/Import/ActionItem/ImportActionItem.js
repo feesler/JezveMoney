@@ -6,7 +6,7 @@ import {
     IMPORT_ACTION_SET_PERSON,
 } from '../../../js/model/ImportAction.js';
 import { createContainer } from '../../../js/app.js';
-import './style.css';
+import './style.scss';
 
 /**
  * ImportActionItem component

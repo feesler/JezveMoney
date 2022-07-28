@@ -3,10 +3,10 @@ import { Histogram } from 'jezvejs';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
-import '../../Components/IconLink/style.css';
-import '../../css/app.css';
-import '../../Components/Tile/style.css';
-import './style.css';
+import '../../Components/IconLink/style.scss';
+import '../../css/app.scss';
+import '../../Components/Tile/style.scss';
+import './style.scss';
 
 /**
  * Main view

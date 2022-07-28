@@ -1,34 +1,22 @@
 /* Filters collapsible */
 .filters-collapsible {
   margin: 0 0 9px 0;
-}
 
-.filters-collapsible .collapsible-header {
-  cursor: pointer;
+  .collapsible-header {
+    cursor: pointer;
+  }
 }
 
 /* Filters heading */
-.filters-heading {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  width: 100%;
-}
-
 .filters-heading__icon {
   height: 24px;
   width: 24px;
   margin: 0 9px 0 0;
-}
 
-.filters-heading__icon svg {
-  height: 24px;
-  width: 24px;
-}
-
-.filters-heading label {
-  margin: 0 30px 0 0;
-  font-size: 18px;
+  & > svg {
+    height: 24px;
+    width: 24px;
+  }
 }
 
 /* Clear all filters button */
@@ -47,24 +35,38 @@
   fill: #0072c6;
 }
 
-.collapsible__expanded .clear-all-btn {
-  display: inline-flex;
+.filters-heading {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  width: 100%;
+
+  label {
+    margin: 0 30px 0 0;
+    font-size: 18px;
+  }
+
+  /* Toggle expand/collapse button */
+  .toggle-btn,
+  .toggle-btn:active,
+  .toggle-btn:visited {
+    background: none;
+    cursor: pointer;
+  }
+
+  .toggle-btn svg {
+    height: 18px;
+  }
 }
 
-/* Toggle expand/collapse button */
-.filters-heading .toggle-btn,
-.filters-heading .toggle-btn:active,
-.filters-heading .toggle-btn:visited {
-  background: none;
-  cursor: pointer;
-}
+.collapsible__expanded {
+  .clear-all-btn {
+    display: inline-flex;
+  }
 
-.filters-heading .toggle-btn svg {
-  height: 18px;
-}
-
-.collapsible__expanded .filters-heading .toggle-btn svg {
-  transform: rotate(180deg);
+  .filters-heading .toggle-btn svg {
+    transform: rotate(180deg);
+  }
 }
 
 /* Transactions list, mode selector and paginators container */

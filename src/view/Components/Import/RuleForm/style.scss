@@ -1,0 +1,90 @@
+/* Import rule create/update form */
+.rule-form {
+  display: flex;
+  flex-flow: column nowrap;
+  max-height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+
+  /* Delete and toggle expand/collapse button */
+  .icon-btn,
+  .icon-btn:visited,
+  .icon-btn:active {
+    background: none;
+    cursor: pointer;
+  }
+
+  /* No data message */
+  .nodata-message {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background: none;
+  }
+}
+
+/* Collapsible container */
+.rule-form-collapse {
+  min-height: 40px;
+  margin-bottom: 9px;
+
+  .collapsible-header {
+    flex-flow: row wrap;
+    align-items: center;
+    flex: none;
+    padding: 2px 2px 2px 8px;
+    border-width: 1px;
+    border-style: solid;
+    cursor: pointer;
+  }
+
+  .collapsible-header label {
+    font-size: 18px;
+    margin-right: 12px;
+  }
+
+  &.collapsible__expanded .toggle-btn svg {
+    transform: rotate(180deg);
+    height: 18px;
+  }
+
+  /* Conditions/Actions list container */
+  .collapsible-content {
+    display: block;
+    flex: 1 1 auto;
+    height: 0;
+    overflow-y: auto;
+    padding: 0;
+    border: 0 none;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+
+  &.collapsible__expanded > .collapsible-content {
+    height: auto;
+    min-height: 48px;
+    padding: 6px;
+    margin: 0 1px;
+  }
+
+  .link-btn {
+    display: none;
+  }
+
+  &.collapsible__expanded .link-btn {
+    display: inline-block;
+  }
+}
+
+/* Validation feedback container */
+.rule-form__feedback {
+  margin-bottom: 9px;
+}
+
+/* From submit and cancel buttons */
+.rule-form__controls {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: baseline;
+  flex: none;
+}

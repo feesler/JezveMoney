@@ -137,11 +137,12 @@ export default {
                 ],
             },
             {
-                test: /\.css$/i,
+                test: /\.(scss|css)$/i,
                 use: [
                     MiniCssExtractPlugin.loader,
                     'css-loader',
                     'postcss-loader',
+                    'sass-loader',
                 ],
             },
             {

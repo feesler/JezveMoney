@@ -1,16 +1,16 @@
 /* Profile view */
 .profile_block {
   margin: 10px 0 20px 0;
-}
 
-.profile_block > h2 {
-  font-size: 18px;
-  font-weight: normal;
-  margin: 0;
-}
+  & > h2 {
+    font-size: 18px;
+    font-weight: normal;
+    margin: 0;
+  }
 
-.profile_block > span {
-  font-size: 16px;
+  & > span {
+    font-size: 16px;
+  }
 }
 
 .profile-form-container .loading-indicator {

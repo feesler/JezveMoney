@@ -19,9 +19,9 @@ import {
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
-import '../../css/app.css';
-import '../../Components/TransactionTypeMenu/style.css';
-import './style.css';
+import '../../css/app.scss';
+import '../../Components/TransactionTypeMenu/style.scss';
+import './style.scss';
 
 /**
  * Statistics view

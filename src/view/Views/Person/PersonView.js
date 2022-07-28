@@ -4,7 +4,7 @@ import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
-import '../../css/app.css';
+import '../../css/app.scss';
 
 const TITLE_PERSON_DELETE = 'Delete person';
 const MSG_PERSON_DELETE = 'Are you sure want to delete selected person?<br>Debt operations will be converted into expense or income.';

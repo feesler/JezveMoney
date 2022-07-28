@@ -4,7 +4,7 @@ import {
     svg,
     Component,
 } from 'jezvejs';
-import './style.css';
+import './style.scss';
 
 /**
  * Tile component

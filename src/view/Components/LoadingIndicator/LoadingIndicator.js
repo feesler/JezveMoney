@@ -4,7 +4,7 @@ import {
     Component,
     Spinner,
 } from 'jezvejs';
-import './style.css';
+import './style.scss';
 
 const defaultProps = {
     title: 'Loading...',

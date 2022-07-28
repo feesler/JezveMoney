@@ -7,7 +7,7 @@ import {
     Sortable,
 } from 'jezvejs';
 import { TransactionListItem } from '../TransactionListItem/TransactionListItem.js';
-import './style.css';
+import './style.scss';
 
 /** Strings */
 const MSG_NO_TRANSACTIONS = 'No transactions found.';

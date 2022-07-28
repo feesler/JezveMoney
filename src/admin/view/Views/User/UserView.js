@@ -7,8 +7,8 @@ import {
 } from 'jezvejs';
 import { Application } from '../../../../view/js/Application.js';
 import { AdminListView } from '../../js/AdminListView.js';
-import '../../../../view/css/app.css';
-import '../../css/admin.css';
+import '../../../../view/css/app.scss';
+import '../../css/admin.scss';
 
 /**
  * Admin currecny list view

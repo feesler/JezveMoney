@@ -1,0 +1,182 @@
+/* Transactions list component */
+.trans-list {
+  display: flex;
+  flex-flow: column wrap;
+  align-items: stretch;
+}
+
+div.trans-list-items {
+  display: flex;
+  flex-flow: column wrap;
+  align-items: stretch;
+}
+
+.trans-list__item-wrapper,
+.trans-list__item-placeholder {
+  width: 100%;
+  margin: 2px 0;
+  height: 85px;
+}
+
+.trans-list__item {
+  padding: 8px;
+  border: 0 none;
+}
+
+.trans-list__item-placeholder > .trans-list__item {
+  opacity: 0;
+}
+
+div.trans-list__item_selected {
+  padding: 5px;
+  border: 3px solid #0072c6;
+  cursor: pointer;
+}
+
+.trans-list__item > div {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trans-list__item-title {
+  font-size: 14px;
+}
+
+.trans-list__item .trans-list__item-title {
+  white-space: nowrap;
+}
+
+.trans-list__item-content {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.trans-list__item-details {
+  font-size: 12px;
+  clear: both;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.trans-list__item-comment {
+  margin: 0 0 0 5px;
+  padding: 0 0 0 5px;
+  border-left-width: 1px;
+  border-left-style: solid;
+}
+
+.tritem_balance span {
+  margin: 0 10px 0 0;
+}
+
+/* Ellipsis cell */
+.ellipsis-cell > div {
+  position: relative;
+  overflow: hidden;
+  height: 23px;
+
+  /* cell stretching content */
+  &::after {
+    content: attr(title);
+    overflow: hidden;
+    height: 0;
+    display: block;
+    font-size: 14px;
+  }
+}
+
+/* Details mode */
+.trans-list_details .trans-list-items,
+table.trans-list-items {
+  display: table;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.trans-list_details,
+table.trans-list-items {
+  tbody {
+    height: 43px;
+  }
+
+  td {
+    padding: 2px 0;
+  }
+
+  span {
+    font-size: 14px;
+    height: 23px;
+    line-height: 23px;
+  }
+
+  .trans-list__item-content {
+    color: #0080b0;
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  .trans-list__item-comment {
+    margin: 0;
+    padding: 0;
+    border: 0 none;
+  }
+
+  .tritem_balance {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  td > div {
+    height: 39px;
+    padding: 8px;
+    box-sizing: border-box;
+  }
+}
+
+/* visible content */
+.ellipsis-cell > div > span {
+  display: block;
+  position: absolute;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 23px; /* for vertical align of text */
+}
+
+/* Common height style of item elements */
+.trans-list__item > div > span,
+.trans-list__item_selected > div > span {
+  height: 23px;
+  line-height: 23px;
+}
+
+/* Drag'n'Drop placeholder */
+.trans-list_details {
+  .trans-list__item-placeholder td > div {
+    opacity: 0;
+  }
+
+  /* Active table row */
+  tr.trans-list__item_selected > td > div {
+    padding: 5px 8px;
+    border-top: 3px solid #0072c6;
+    border-bottom: 3px solid #0072c6;
+    cursor: pointer;
+  }
+
+  tr.trans-list__item_selected > td:first-child > div {
+    padding: 5px 8px 5px 5px;
+    border: 3px solid #0072c6;
+    border-right: 0 none;
+    cursor: pointer;
+  }
+
+  tr.trans-list__item_selected > td:last-child > div {
+    padding: 5px 5px 5px 8px;
+    border: 3px solid #0072c6;
+    border-left: 0 none;
+    cursor: pointer;
+  }
+}

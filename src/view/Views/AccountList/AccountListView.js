@@ -4,9 +4,9 @@ import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
-import '../../css/app.css';
-import '../../Components/Tile/style.css';
-import '../../Components/IconLink/style.css';
+import '../../css/app.scss';
+import '../../Components/Tile/style.scss';
+import '../../Components/IconLink/style.scss';
 
 const TITLE_SINGLE_ACC_DELETE = 'Delete account';
 const TITLE_MULTI_ACC_DELETE = 'Delete accounts';

@@ -1,6 +1,6 @@
 import { isFunction, Component } from 'jezvejs';
 import { IconLink } from '../IconLink/IconLink.js';
-import './style.css';
+import './style.scss';
 
 /**
  * Toolbar component

@@ -2,8 +2,8 @@ import 'jezvejs/style';
 import { ge } from 'jezvejs';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
-import '../../css/app.css';
-import './style.css';
+import '../../css/app.scss';
+import './style.scss';
 
 /**
  * User log in view

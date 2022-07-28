@@ -23,7 +23,7 @@ import {
     createIcon,
 } from '../../../js/app.js';
 import { AccountList } from '../../../js/model/AccountList.js';
-import './style.css';
+import './style.scss';
 
 /** Fields */
 const TITLE_FIELD_AMOUNT = 'Amount';

@@ -1,21 +1,44 @@
 /* Import rule item */
 .rule-item {
   margin-right: 3px;
-}
 
-.rule-item + .rule-item {
-  margin-top: 4px;
-}
+  + .rule-item {
+    margin-top: 4px;
+  }
 
-/* Main static view */
-.rule-item .collapsible-header {
-  flex-flow: row nowrap;
-  align-items: center;
-  font-size: 16px;
-  padding: 8px 4px 8px 8px;
-  border-width: 1px;
-  border-style: solid;
-  cursor: pointer;
+  /* Main static view */
+  .collapsible-header {
+    flex-flow: row nowrap;
+    align-items: center;
+    font-size: 16px;
+    padding: 8px 4px 8px 8px;
+    border-width: 1px;
+    border-style: solid;
+    cursor: pointer;
+  }
+
+  /* Delete and toggle expand/collapse button */
+  .icon-btn,
+  .icon-btn:visited,
+  .icon-btn:active {
+    background: none;
+    cursor: pointer;
+  }
+
+  .toggle-btn svg {
+    height: 18px;
+  }
+
+  .collapsible-content {
+    display: flex;
+    flex-flow: column nowrap;
+    height: 0;
+    padding: 0;
+    overflow-y: auto;
+    border: 0 none;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
 }
 
 .rule-item__main-info {
@@ -64,34 +87,11 @@
   flex-flow: row nowrap;
 }
 
-/* Delete and toggle expand/collapse button */
-.rule-item .icon-btn,
-.rule-item .icon-btn:visited,
-.rule-item .icon-btn:active {
-  background: none;
-  cursor: pointer;
-}
-
-.rule-item .toggle-btn svg {
-  height: 18px;
-}
-
 .rule-item.collapsible__expanded .toggle-btn svg {
   transform: rotate(180deg);
 }
 
 /* Rule item content */
-.rule-item .collapsible-content {
-  display: flex;
-  flex-flow: column nowrap;
-  height: 0;
-  padding: 0;
-  overflow-y: auto;
-  border: 0 none;
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
-}
-
 .rule-item.collapsible__expanded > .collapsible-content {
   height: auto;
   padding: 8px;

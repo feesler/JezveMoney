@@ -146,79 +146,79 @@ label {
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-}
 
-.input-group > .input-group__item,
-.input-group > .input-group__item:focus {
-  margin: 0;
-  border-radius: 0;
-  border-style: solid;
-  border-width: 1px 0;
-}
+  > .input-group__item,
+  > .input-group__item:focus {
+    margin: 0;
+    border-radius: 0;
+    border-style: solid;
+    border-width: 1px 0;
+  }
 
-.input-group .input-group__item:first-child {
-  border-left-width: 1px;
-  border-bottom-left-radius: 5px;
-  border-top-left-radius: 5px;
-}
+  .input-group__item:first-child {
+    border-left-width: 1px;
+    border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
+  }
 
-.input-group .input-group__item:last-child {
-  border-right-width: 1px;
-  border-bottom-right-radius: 5px;
-  border-top-right-radius: 5px;
-}
+  .input-group__item:last-child {
+    border-right-width: 1px;
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+  }
 
-.input-group .close-btn {
-  height: 2.3rem;
-  padding: 0 0.25rem;
-  background: none;
-  cursor: pointer;
-}
+  .close-btn {
+    height: 2.3rem;
+    padding: 0 0.25rem;
+    background: none;
+    cursor: pointer;
+  }
 
-/* Input group button */
-.input-group .input-group__btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  box-sizing: border-box;
-  height: 2.3rem;
-  min-width: 2.3rem;
-  margin: 0;
-  padding: 0;
-  color: #ffffff;
-  border-color: #0072c6;
-  background-color: #0072c6;
-  cursor: pointer;
-}
+  /* Input group button */
+  .input-group__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-sizing: border-box;
+    height: 2.3rem;
+    min-width: 2.3rem;
+    margin: 0;
+    padding: 0;
+    color: #ffffff;
+    border-color: #0072c6;
+    background-color: #0072c6;
+    cursor: pointer;
+  }
 
-.input-group .input-group__btn:focus {
-  border-color: #63bdff;
-}
+  .input-group__btn:focus {
+    border-color: #63bdff;
+  }
 
-.input-group .input-group__item[disabled] {
-  cursor: default;
-  pointer-events: none;
-}
+  .input-group__item[disabled] {
+    cursor: default;
+    pointer-events: none;
+  }
 
-.input-group .input-group__btn > div {
-  text-align: center;
-  height: 30px;
-  line-height: 30px;
-  white-space: nowrap;
-}
+  .input-group__btn > div {
+    text-align: center;
+    height: 30px;
+    line-height: 30px;
+    white-space: nowrap;
+  }
 
-/* Inner content of input group button */
-.input-group__btn-title {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 2.3rem;
-  box-sizing: border-box;
-}
+  /* Inner content of input group button */
+  .input-group__btn-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.3rem;
+    box-sizing: border-box;
+  }
 
-.input-group .input-group__btn .dd__container_active.dd__container_attached {
-  outline: 0 none;
+  .input-group__btn .dd__container_active.dd__container_attached {
+    outline: 0 none;
+  }
 }
 
 /* Validation */
@@ -316,22 +316,22 @@ label {
   display: flex;
   flex-flow: row wrap;
   padding: 10px 0;
-}
 
-.heading > h1 {
-  font-size: 26px;
-  font-weight: 300;
-  line-height: 32px;
-  height: 32px;
-  padding: 0;
-  margin-right: 30px;
-  margin-bottom: 8px;
-  vertical-align: middle;
-  white-space: nowrap;
-}
+  > h1 {
+    font-size: 26px;
+    font-weight: 300;
+    line-height: 32px;
+    height: 32px;
+    padding: 0;
+    margin-right: 30px;
+    margin-bottom: 8px;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
 
-.heading .iconlink + .iconlink {
-  margin-left: 16px;
+  .iconlink + .iconlink {
+    margin-left: 16px;
+  }
 }
 
 .amount-input {
@@ -432,20 +432,20 @@ label {
   cursor: pointer;
   background: none;
   font-size: 16px;
-}
 
-.dashed-btn > span {
-  color: #0072c6;
-  padding: 0;
-  margin-top: -10px;
-  border-top: 0 none;
-  border-right: 0 none;
-  border-left: 0 none;
-  border-bottom: 1px dashed #0072c6;
-}
+  > span {
+    color: #0072c6;
+    padding: 0;
+    margin-top: -10px;
+    border-top: 0 none;
+    border-right: 0 none;
+    border-left: 0 none;
+    border-bottom: 1px dashed #0072c6;
+  }
 
-.dashed-btn:hover > span {
-  border-bottom: 1px solid #0072c6;
+  &:hover > span {
+    border-bottom: 1px solid #0072c6;
+  }
 }
 
 /* No data message for lists & etc. */
