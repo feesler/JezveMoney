@@ -21,8 +21,8 @@ import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
-import '../../css/app.css';
-import './style.css';
+import '../../css/app.scss';
+import './style.scss';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { ModeSelector } from '../../Components/ModeSelector/ModeSelector.js';
 

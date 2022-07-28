@@ -11,7 +11,7 @@ import { createMessage } from '../../../js/app.js';
 import { ImportFileUploader } from '../FileUploader/ImportFileUploader.js';
 import { ImportTemplateManager } from '../TemplateManager/ImportTemplateManager.js';
 import { LoadingIndicator } from '../../LoadingIndicator/LoadingIndicator.js';
-import './style.css';
+import './style.scss';
 
 /**
  * ImportUploadDialog component

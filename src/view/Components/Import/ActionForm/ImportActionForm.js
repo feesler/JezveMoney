@@ -14,7 +14,7 @@ import {
 } from '../../../js/model/ImportAction.js';
 import { View } from '../../../js/View.js';
 import { createField, createContainer, createIcon } from '../../../js/app.js';
-import './style.css';
+import './style.scss';
 
 /** Strings */
 const TITLE_FIELD_AMOUNT = 'Amount';

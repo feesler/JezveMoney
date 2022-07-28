@@ -8,7 +8,7 @@ import {
     IMPORT_COND_FIELD_TPL,
 } from '../../../js/model/ImportCondition.js';
 import { createContainer } from '../../../js/app.js';
-import './style.css';
+import './style.scss';
 
 /**
  * ImportConditionItem component

@@ -5,8 +5,8 @@ import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import '../../css/app.css';
-import './style.css';
+import '../../css/app.scss';
+import './style.scss';
 import { API } from '../../js/API.js';
 
 const TITLE_RESET_ACC = 'Reset accounts';

@@ -11,6 +11,15 @@
   align-items: stretch;
   flex: 1 1 auto;
   min-height: 100px;
+
+  /* Create button */
+  .link-btn,
+  .link-btn:visited,
+  .link-btn:active {
+    pointer-events: all;
+    padding: 0;
+    cursor: pointer;
+  }
 }
 
 .rules-dialog .loading-indicator {
@@ -23,25 +32,16 @@
   flex-flow: row wrap;
   align-items: baseline;
   margin-bottom: 12px;
-}
 
-.rules-header label {
-  font-size: 24px;
-  font-weight: 300;
-  margin-right: 16px;
+  label {
+    font-size: 24px;
+    font-weight: 300;
+    margin-right: 16px;
+  }
 }
 
 .rules-list {
   display: flex;
   flex-flow: column nowrap;
   overflow-y: auto;
-}
-
-/* Create button */
-.rules-dialog .link-btn,
-.rules-dialog .link-btn:visited,
-.rules-dialog .link-btn:active {
-  pointer-events: all;
-  padding: 0;
-  cursor: pointer;
 }

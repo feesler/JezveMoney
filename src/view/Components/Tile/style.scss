@@ -29,7 +29,7 @@
   cursor: pointer;
 }
 
-button.tilelink {
+.tilelink {
   width: 100px;
   height: 100px;
   border: 0 none;
@@ -38,24 +38,21 @@ button.tilelink {
   margin: 0;
   text-transform: none;
   font-weight: normal;
-}
-
-a.tilelink {
   text-decoration: none;
-}
 
-.tilelink > span {
-  height: 100px;
-  width: 100px;
-  margin: 0;
-  padding: 0;
-  display: block;
-}
+  > span {
+    height: 100px;
+    width: 100px;
+    margin: 0;
+    padding: 0;
+    display: block;
+  }
 
-.tilelink > span > span {
-  position: absolute;
-  color: #ffffff;
-  white-space: nowrap;
+  > span > span {
+    position: absolute;
+    color: #ffffff;
+    white-space: nowrap;
+  }
 }
 
 .tile__title {

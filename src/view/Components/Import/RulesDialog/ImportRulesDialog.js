@@ -13,7 +13,7 @@ import { ImportRule } from '../../../js/model/ImportRule.js';
 import { ImportRuleForm } from '../RuleForm/ImportRuleForm.js';
 import { ImportRuleItem } from '../RuleItem/ImportRuleItem.js';
 import { ConfirmDialog } from '../../ConfirmDialog/ConfirmDialog.js';
-import './style.css';
+import './style.scss';
 import { LoadingIndicator } from '../../LoadingIndicator/LoadingIndicator.js';
 
 /** CSS classes */

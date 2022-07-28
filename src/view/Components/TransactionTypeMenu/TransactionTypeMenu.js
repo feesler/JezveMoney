@@ -13,6 +13,7 @@ import {
     TRANSFER,
     DEBT,
 } from '../../js/app.js';
+import './style.scss';
 
 const CONTAINER_CLASS = 'trtype-menu';
 const MULTI_CLASS = 'trtype-menu-multi';

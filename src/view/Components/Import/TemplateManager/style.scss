@@ -6,12 +6,12 @@
   flex-flow: row;
   align-items: baseline;
   margin: 6px 0;
-}
 
-.tpl-form-header label {
-  font-size: 24px;
-  font-weight: 100;
-  margin-right: 18px;
+  label {
+    font-size: 24px;
+    font-weight: 100;
+    margin-right: 18px;
+  }
 }
 
 .tpl-form {
@@ -45,18 +45,18 @@
   margin-bottom: 4px;
   margin-right: 18px;
   align-items: baseline;
-}
 
-.tpl-form-field label {
-  font-size: 14px;
-}
+  label {
+    font-size: 14px;
+  }
 
-.tpl-form-field input,
-.tpl-form-field select {
-  height: 34px;
-  font-size: 14px;
-  padding: 2px 5px;
-  box-sizing: border-box;
+  input,
+  select {
+    height: 34px;
+    font-size: 14px;
+    padding: 2px 5px;
+    box-sizing: border-box;
+  }
 }
 
 .validation-block.invalid-block .tpl-name-inp {

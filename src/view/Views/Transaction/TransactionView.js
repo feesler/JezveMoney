@@ -32,9 +32,8 @@ import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/Transa
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TileInfoItem } from '../../Components/TileInfoItem/TileInfoItem.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
-import '../../css/app.css';
-import '../../Components/TransactionTypeMenu/style.css';
-import './style.css';
+import '../../css/app.scss';
+import './style.scss';
 import { createStore } from '../../js/store.js';
 import {
     debtAccountChange,

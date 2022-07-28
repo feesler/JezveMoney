@@ -7,7 +7,7 @@ import {
     Component,
 } from 'jezvejs';
 import { createIcon } from '../../js/app.js';
-import './style.css';
+import './style.scss';
 
 const defaultProps = {
     mode: 'classic',

@@ -14,7 +14,7 @@ import { ImportActionList } from '../../../js/model/ImportActionList.js';
 import { ImportConditionItem } from '../ConditionItem/ImportConditionItem.js';
 import { ImportActionItem } from '../ActionItem/ImportActionItem.js';
 import { createContainer, createIcon } from '../../../js/app.js';
-import './style.css';
+import './style.scss';
 
 /** Strings */
 const TITLE_CONDITIONS = 'Conditions';

@@ -5,7 +5,7 @@ import {
     removeChilds,
     Component,
 } from 'jezvejs';
-import './style.css';
+import './style.scss';
 
 const TITLE_CLASS = 'iconlink__title';
 const SUBTITLE_CLASS = 'iconlink__subtitle';

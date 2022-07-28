@@ -17,7 +17,7 @@ import {
     createContainer,
     createIcon,
 } from '../../../js/app.js';
-import './style.css';
+import './style.scss';
 
 /** Strings */
 const TITLE_FIELD_AMOUNT = 'Amount';

@@ -4,9 +4,9 @@ import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import '../../css/app.css';
-import '../../Components/Tile/style.css';
-import '../../Components/IconLink/style.css';
+import '../../css/app.scss';
+import '../../Components/Tile/style.scss';
+import '../../Components/IconLink/style.scss';
 
 const TITLE_SINGLE_PERSON_DELETE = 'Delete person';
 const TITLE_MULTI_PERSON_DELETE = 'Delete persons';

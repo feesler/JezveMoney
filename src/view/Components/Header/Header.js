@@ -7,7 +7,7 @@ import {
     Component,
     Switch,
 } from 'jezvejs';
-import './style.css';
+import './style.scss';
 
 // Theme constants
 export const WHITE_THEME = 0;

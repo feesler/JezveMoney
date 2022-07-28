@@ -13,7 +13,7 @@ import { ImportConditionForm } from '../ConditionForm/ImportConditionForm.js';
 import { ImportActionForm } from '../ActionForm/ImportActionForm.js';
 import { View } from '../../../js/View.js';
 import { createContainer, createIcon } from '../../../js/app.js';
-import './style.css';
+import './style.scss';
 
 /** Strings */
 const BTN_CREATE_CONDITION = 'Create';

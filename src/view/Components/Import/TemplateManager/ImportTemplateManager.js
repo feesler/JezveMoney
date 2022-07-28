@@ -16,7 +16,7 @@ import { ImportTemplateError } from '../../../js/error/ImportTemplateError.js';
 import { ImportTemplate } from '../../../js/model/ImportTemplate.js';
 import { ConfirmDialog } from '../../ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../LoadingIndicator/LoadingIndicator.js';
-import './style.css';
+import './style.scss';
 
 /** Strings */
 const TITLE_CREATE_TEMPLATE = 'Create template';
