@@ -1,16 +1,28 @@
 /* Profile view */
 .profile_block {
   margin: 10px 0 20px 0;
+  min-width: 300px;
+  max-width: 600px;
 
-  & > h2 {
+  h2 {
     font-size: 18px;
     font-weight: normal;
     margin: 0;
   }
 
-  & > span {
+  span {
     font-size: 16px;
   }
+}
+
+.name-container {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+.change-name-link {
+  margin-left: 30px;
 }
 
 .profile-form-container .loading-indicator {

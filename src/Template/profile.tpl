@@ -8,18 +8,20 @@
             <div class="content">
                 <div class="content_wrap column-container">
                     <div class="heading">
-                        <h1>User profile</h1>
+                        <h1>Profile</h1>
                     </div>
 
                     <div class="profile_block">
-                        <h2>Account name</h2>
+                        <h2>Login</h2>
                         <span><?=e($user_login)?></span>
                     </div>
 
                     <div class="profile_block">
-                        <h2>User name</h2>
-                        <span id="namestatic"><?=e($profileInfo->name)?></span>
-                        <div><a id="changeNameBtn" href="<?=BASEURL?>profile/changeName/">Change</a></div>
+                        <h2>Name</h2>
+                        <div class="name-container">
+                            <span id="namestatic"><?=e($profileInfo->name)?></span>
+                            <a id="changeNameBtn" class="change-name-link" href="<?=BASEURL?>profile/changeName/">Change</a>
+                        </div>
                     </div>
 
                     <div class="profile_block">
@@ -45,7 +47,7 @@
                             <form id="delete_form" method="post" action="<?=BASEURL?>profile/del/">
                             </form>
                             <span>Completely delete profile and all related data.<br>
-                            <input id="delProfileBtn" class="btn submit-btn" type="button" value="Delete profile"></span>
+                            <input id="delProfileBtn" class="btn submit-btn warning-btn" type="button" value="Delete profile"></span>
                         </div>
                     </div>
                 </div>
