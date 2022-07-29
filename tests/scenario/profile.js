@@ -48,7 +48,13 @@ export const profileTests = {
             ...App.config.testUser,
         }]);
 
-        await ProfileTests.resetAll();
+        await ProfileTests.resetData({
+            accounts: true,
+            persons: true,
+            transactions: true,
+            importtpl: true,
+            importrules: true,
+        });
 
         await ProfileTests.openAbout();
 
@@ -83,7 +89,17 @@ export const profileTests = {
     async runPostTransaction() {
         setBlock('Profile with transactions tests', 1);
 
-        await ProfileTests.resetAccounts();
-        await ProfileTests.resetAll();
+        const resetAllOptions = {
+            accounts: true,
+            persons: true,
+            transactions: true,
+            importtpl: true,
+            importrules: true,
+        };
+
+        await App.scenario.runner.runGroup(ProfileTests.resetData, [
+            { accounts: true },
+            resetAllOptions,
+        ]);
     },
 };

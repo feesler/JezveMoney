@@ -6,6 +6,7 @@ use JezveMoney\Core\ApiController;
 use JezveMoney\Core\Message;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\PersonModel;
+use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\ImportTemplateModel;
 
@@ -98,32 +99,55 @@ class Profile extends ApiController
 
     public function reset()
     {
-        $defMsg = Message::get(ERR_PROFILE_PASSWORD);
+        $defMsg = Message::get(ERR_PROFILE_RESET);
 
         if (!$this->isPOST()) {
             throw new \Error("Invalid type of request");
         }
 
-        $accMod = AccountModel::getInstance();
-        if (!$accMod->reset($this->user_id)) {
-            throw new \Error($defMsg);
+        $resetOptions = ["accounts", "persons", "transactions", "keepbalance", "importtpl", "importrules"];
+        $request = $this->getRequestData();
+        foreach ($resetOptions as $opt) {
+            $request[$opt] = isset($request[$opt]);
         }
 
-        if (!$this->personMod->reset()) {
-            throw new \Error($defMsg);
+        if ($request["accounts"]) {
+            $accMod = AccountModel::getInstance();
+            if (!$accMod->reset(["deletePersons" => $request["persons"]])) {
+                $this->fail($defMsg);
+            }
         }
 
-        $ruleMod = ImportRuleModel::getInstance();
-        if (!$ruleMod->reset()) {
-            throw new \Error($defMsg);
+        if ($request["persons"]) {
+            if (!$this->personMod->reset()) {
+                $this->fail($defMsg);
+            }
         }
 
-        $tplModel = ImportTemplateModel::getInstance();
-        if (!$tplModel->reset()) {
-            throw new \Error($defMsg);
+        if ($request["transactions"]) {
+            $transMod = TransactionModel::getInstance();
+            if (!$transMod->reset($request["keepbalance"])) {
+                $this->fail($defMsg);
+            }
         }
 
-        $this->setMessage(Message::get(MSG_PROFILE_RESETALL));
+        if ($request["importtpl"]) {
+            $tplModel = ImportTemplateModel::getInstance();
+            if (!$tplModel->reset()) {
+                $this->fail($defMsg);
+            }
+        }
+
+        if ($request["importrules"]) {
+            $ruleMod = ImportRuleModel::getInstance();
+            if (!$ruleMod->reset()) {
+                $this->fail($defMsg);
+            }
+        }
+
+
+
+        $this->setMessage(Message::get(MSG_PROFILE_RESET));
         $this->ok();
     }
 

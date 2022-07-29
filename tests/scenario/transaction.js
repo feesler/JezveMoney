@@ -451,11 +451,7 @@ const createFromPersonAccount = async () => {
     const { RUB } = App.scenario;
 
     // Remove all accounts and persons
-    await api.account.reset();
-    const personIds = App.state.persons.getIds();
-    if (personIds.length > 0) {
-        await api.person.del(personIds);
-    }
+    await api.profile.resetData({ accounts: true, persons: true });
 
     // Create user account
     const account = await api.account.create({
@@ -506,11 +502,7 @@ const availabilityTests = async (directNavigate) => {
     }
 
     // Remove all accounts and persons
-    await api.account.reset();
-    const personIds = App.state.persons.getIds();
-    if (personIds.length > 0) {
-        await api.person.del(personIds);
-    }
+    await api.profile.resetData({ accounts: true, persons: true });
 
     // Create first account
     await api.account.create({

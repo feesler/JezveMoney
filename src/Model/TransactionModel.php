@@ -1015,6 +1015,36 @@ class TransactionModel extends CachedTable
     }
 
 
+    // Delete all transactions of user
+    public function reset($keepAccountBalance = false)
+    {
+        $setCond = inSetCondition(self::$user_id);
+        if (is_null($setCond)) {
+            return true;
+        }
+
+        // Prepare balance updates for accounts
+        $userAccounts = $this->accModel->getData(["full" => true, "type" => "all"]);
+        $balanceChanges = [];
+        foreach ($userAccounts as $account) {
+            if ($keepAccountBalance) {
+                $balanceChanges[$account->id] = $account->balance;
+            } else {
+                $balanceChanges[$account->id] = $account->initbalance;
+            }
+        }
+        $this->accModel->updateBalances($balanceChanges);
+
+        // delete all transactions of user
+        if (!$this->dbObj->deleteQ("transactions", "user_id" . $setCond)) {
+            return false;
+        }
+
+        $this->cleanCache();
+
+        return true;
+    }
+
     public function onAccountUpdate($acc_id)
     {
         $accObj = $this->accModel->getItem($acc_id);
@@ -1089,8 +1119,6 @@ class TransactionModel extends CachedTable
         if (!$this->checkCache()) {
             return 0;
         }
-
-        $curDate = date("Y-m-d H:i:s");
 
         $idsToRemove = [];
         foreach ($this->cache as $item_id => $item) {

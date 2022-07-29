@@ -151,4 +151,7 @@ export default {
             },
         ]
     },
+    cache: {
+        type: 'filesystem',
+    },
 };

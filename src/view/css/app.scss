@@ -127,6 +127,22 @@ label {
   flex-flow: column nowrap;
 }
 
+/* flat square button with icon */
+.icon-btn {
+  width: 34px;
+  height: 34px;
+  padding: 5px;
+  color: #ffffff;
+  background-color: #0072c6;
+  cursor: pointer;
+}
+
+.icon-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: #ffffff;
+}
+
 /* Input control fills all parent width */
 .stretch-input {
   display: flex;
@@ -167,11 +183,16 @@ label {
     border-top-right-radius: 5px;
   }
 
-  .close-btn {
+  .clear-input-btn {
     height: 2.3rem;
     padding: 0 0.25rem;
     background: none;
     cursor: pointer;
+  }
+
+  .clear-input-btn > svg {
+    width: 14px;
+    height: 14px;
   }
 
   /* Input group button */
@@ -389,6 +410,10 @@ label {
   background-color: #c0c0c0;
 }
 
+.warning-btn {
+  background-color: #c60000;
+}
+
 /* Underlined text button */
 .link-btn,
 .link-btn:visited {
@@ -407,22 +432,6 @@ label {
 .link-btn:disabled {
   color: #808080;
   pointer-events: none;
-}
-
-/* flat square button with icon */
-.icon-btn {
-  width: 34px;
-  height: 34px;
-  padding: 5px;
-  color: #ffffff;
-  background-color: #0072c6;
-  cursor: pointer;
-}
-
-.icon-btn svg {
-  width: 24px;
-  height: 24px;
-  fill: #ffffff;
 }
 
 /* dashed underline button */
@@ -504,15 +513,16 @@ label {
 }
 
 /* DropDown */
+.dd__container,
+.dd__container_attached {
+  --dd-border-width: 1px;
+}
+
 .dd__combo {
   padding: 0 24px 0 0.5rem;
   border-radius: 3px;
   border-style: solid;
-  border-width: 1px;
   box-sizing: border-box;
-  color: #000000;
-  border-color: #b0b0b0;
-  background-color: #f2f2f2;
 }
 
 .dd__selection-item {
@@ -537,23 +547,16 @@ label {
   cursor: pointer;
 }
 
-.dd__list,
-.dd__container_attached .dd__list {
-  border-width: 1px;
-}
-
 .dd__container_attached .dd__list {
   border-radius: 5px;
 }
 
 .dd__list_drop-down {
-  border-top-width: 1px;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
 }
 
 .dd__list_drop-up {
-  border-bottom-width: 1px;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }
@@ -635,7 +638,8 @@ label {
 
 /* Custom popup styles */
 .popup__title {
-  font-weight: lighter;
+  font-weight: 300;
+  font-size: 26px;
 }
 
 .popup .close-btn,

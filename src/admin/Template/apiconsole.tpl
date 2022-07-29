@@ -32,7 +32,6 @@
                     <li data-target="createAccForm">Create</li>
                     <li data-target="updateAccForm">Update</li>
                     <li data-target="delAccForm">Delete</li>
-                    <li data-target="resetAccForm">Reset</li>
                 </ul>
             </li>
 
@@ -142,7 +141,7 @@
                     <li data-target="readProfileForm">Read profile</li>
                     <li data-target="changeNameForm">Change name</li>
                     <li data-target="changePwdForm">Change password</li>
-                    <li data-target="resetAllForm">Reset all data</li>
+                    <li data-target="resetForm">Reset data</li>
                 </ul>
             </li>
         </ul>
@@ -278,15 +277,6 @@
         <div class="acc_controls">
             <input id="delaccbtn" class="adm_act_btn" type="button" value="submit">
         </div>
-        </div>
-
-        <div id="resetAccForm" class="request-data-form">
-        <h3>Reset accounts</h3>
-        <form action="<?=BASEURL?>api/account/reset" method="post">
-            <div class="acc_controls">
-                <input class="adm_act_btn" type="submit" value="submit">
-            </div>
-        </form>
         </div>
 
         <div id="listTrForm" class="request-data-form">
@@ -1301,9 +1291,45 @@
         </form>
         </div>
 
-        <div id="resetAllForm" class="request-data-form">
-        <h3>Reset all data</h3>
+        <div id="resetForm" class="request-data-form">
+        <h3>Reset data</h3>
         <form action="<?=BASEURL?>api/profile/reset" method="post">
+            <label class="checkbox std_margin">
+                <input type="checkbox" name="accounts">
+                <span class="checkbox__check"><?=svgIcon("check")?></span>
+                <span class="checkbox__label">Accounts</span>
+            </label>
+
+            <label class="checkbox std_margin">
+                <input type="checkbox" name="persons">
+                <span class="checkbox__check"><?=svgIcon("check")?></span>
+                <span class="checkbox__label">Persons</span>
+            </label>
+
+            <label class="checkbox std_margin">
+                <input type="checkbox" name="transactions">
+                <span class="checkbox__check"><?=svgIcon("check")?></span>
+                <span class="checkbox__label">Transactions</span>
+            </label>
+
+            <label class="checkbox std_margin" disabled>
+                <input type="checkbox" name="keepbalance">
+                <span class="checkbox__check"><?=svgIcon("check")?></span>
+                <span class="checkbox__label">Keep current balance of accounts</span>
+            </label>
+
+            <label class="checkbox std_margin">
+                <input type="checkbox" name="importtpl">
+                <span class="checkbox__check"><?=svgIcon("check")?></span>
+                <span class="checkbox__label">Import templates</span>
+            </label>
+
+            <label class="checkbox std_margin">
+                <input type="checkbox" name="importrules">
+                <span class="checkbox__check"><?=svgIcon("check")?></span>
+                <span class="checkbox__label">Import rules</span>
+            </label>
+
             <div class="acc_controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>

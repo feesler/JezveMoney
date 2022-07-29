@@ -13,8 +13,8 @@ Message::add(MSG_PROFILE_NAME, MSG_TYPE_SUCCESS, "User name successfully updated
 Message::add(ERR_PROFILE_NAME, MSG_TYPE_ERROR, "Fail to update user name.");
 Message::add(MSG_PROFILE_PASSWORD, MSG_TYPE_SUCCESS, "Password successfully updated.");
 Message::add(ERR_PROFILE_PASSWORD, MSG_TYPE_ERROR, "Fail to update password.");
-Message::add(MSG_PROFILE_RESETALL, MSG_TYPE_SUCCESS, "All data successfully reseted.");
-Message::add(ERR_PROFILE_RESETALL, MSG_TYPE_ERROR, "Fail to reset.");
+Message::add(MSG_PROFILE_RESET, MSG_TYPE_SUCCESS, "Data successfully reseted.");
+Message::add(ERR_PROFILE_RESET, MSG_TYPE_ERROR, "Fail to reset.");
 Message::add(MSG_PROFILE_DELETE, MSG_TYPE_SUCCESS, "Your profile is successfully deleted.");
 Message::add(ERR_PROFILE_DELETE, MSG_TYPE_ERROR, "Fail to delete profile.");
 
@@ -35,8 +35,6 @@ Message::add(MSG_ACCOUNT_HIDE);
 Message::add(ERR_ACCOUNT_HIDE, MSG_TYPE_ERROR, "Fail to hide account.");
 Message::add(MSG_ACCOUNT_DELETE);
 Message::add(ERR_ACCOUNT_DELETE, MSG_TYPE_ERROR, "Fail to delete account.");
-Message::add(MSG_ACCOUNTS_RESET, MSG_TYPE_SUCCESS, "Accounts successfully reseted");
-Message::add(ERR_ACCOUNTS_RESET, MSG_TYPE_ERROR, "Fail to reset.");
 
 Message::add(MSG_CURRENCY_CREATE, MSG_TYPE_SUCCESS, "Currency successfully created.");
 Message::add(ERR_CURRENCY_CREATE, MSG_TYPE_ERROR, "Fail to create new currency.");

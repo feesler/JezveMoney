@@ -732,7 +732,7 @@ class UserModel extends CachedTable
         }
 
         $accMod = AccountModel::getInstance();
-        if (!$accMod->reset($items)) {
+        if (!$accMod->reset(["users" => $items])) {
             return false;
         }
 
