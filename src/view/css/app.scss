@@ -127,6 +127,22 @@ label {
   flex-flow: column nowrap;
 }
 
+/* flat square button with icon */
+.icon-btn {
+  width: 34px;
+  height: 34px;
+  padding: 5px;
+  color: #ffffff;
+  background-color: #0072c6;
+  cursor: pointer;
+}
+
+.icon-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: #ffffff;
+}
+
 /* Input control fills all parent width */
 .stretch-input {
   display: flex;
@@ -416,22 +432,6 @@ label {
 .link-btn:disabled {
   color: #808080;
   pointer-events: none;
-}
-
-/* flat square button with icon */
-.icon-btn {
-  width: 34px;
-  height: 34px;
-  padding: 5px;
-  color: #ffffff;
-  background-color: #0072c6;
-  cursor: pointer;
-}
-
-.icon-btn svg {
-  width: 24px;
-  height: 24px;
-  fill: #ffffff;
 }
 
 /* dashed underline button */
