@@ -94,21 +94,12 @@ export const changePassword = async ({ user, newPassword }) => {
     });
 };
 
-export const resetAccounts = async () => {
-    await test('Reset accounts', async () => {
-        await api.account.reset();
+export const resetData = async (options = {}) => {
+    await test('Reset data', async () => {
+        await api.profile.resetData(options);
 
-        App.state.resetAccounts();
-        return true;
-    });
-};
-
-export const resetAll = async () => {
-    await test('Reset all', async () => {
-        await api.profile.reset();
-
-        App.state.resetAll();
-        return true;
+        App.state.resetData(options);
+        return App.state.fetchAndTest();
     });
 };
 

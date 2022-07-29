@@ -400,8 +400,19 @@ class AccountModel extends CachedTable
 
 
     // Delete all accounts of user
-    public function reset($users = null)
+    public function reset($params = null)
     {
+        if (!$this->checkCache()) {
+            return false;
+        }
+
+        if (!is_array($params)) {
+            $params = [];
+        }
+
+        $users = isset($params["users"]) ? $params["users"] : null;
+        $deletePersons = isset($params["deletePersons"]) ? $params["deletePersons"] : true;
+
         if (is_null($users)) {
             $users = self::$user_id;
         }
@@ -418,9 +429,10 @@ class AccountModel extends CachedTable
         if (is_null($setCond)) {
             return true;
         }
+        $condArr = ["user_id" . $setCond];
 
         // delete import rules
-        $userAccounts = $this->getData(["full" => true, "type" => "all"]);
+        $userAccounts = $this->getData(["full" => $deletePersons, "type" => "all"]);
         $accountsToDelete = [];
         foreach ($userAccounts as $account) {
             $accountsToDelete[] = $account->id;
@@ -429,13 +441,23 @@ class AccountModel extends CachedTable
         $ruleModel = ImportRuleModel::getInstance();
         $ruleModel->onAccountDelete($accountsToDelete);
 
-        // delete all transactions of user
-        if (!$this->dbObj->deleteQ("transactions", "user_id" . $setCond)) {
-            return false;
+        // if delete person accounts, then delete all transactions
+        if ($deletePersons) {
+            if (!$this->dbObj->deleteQ("transactions", $condArr)) {
+                return false;
+            }
+        } else {
+            $transMod = TransactionModel::getInstance();
+            $res = $transMod->onAccountDelete($userAccounts);
+            if (!$res) {
+                return false;
+            }
+
+            $condArr[] = "id" . inSetCondition($accountsToDelete);
         }
 
-        // delete all accounts of user
-        if (!$this->dbObj->deleteQ($this->tbl_name, "user_id" . $setCond)) {
+        // delete accounts
+        if (!$this->dbObj->deleteQ($this->tbl_name, $condArr)) {
             return false;
         }
 
@@ -463,14 +485,25 @@ class AccountModel extends CachedTable
     }
 
 
-    public function updateBalances($balanceChanges)
+    public function updateBalances($balanceChanges, $updateInitial = false)
     {
+        if (!is_array($balanceChanges)) {
+            return false;
+        }
+        if (count($balanceChanges) == 0) {
+            return true;
+        }
+
         $curDate = date("Y-m-d H:i:s");
         $accounts = [];
         foreach ($balanceChanges as $acc_id => $balance) {
             $accObj = $this->getItem($acc_id);
             if (!$accObj) {
                 return null;
+            }
+
+            if ($updateInitial) {
+                $accObj->initbalance = $balance;
             }
 
             $accObj->balance = $balance;
@@ -480,7 +513,7 @@ class AccountModel extends CachedTable
             $accounts[] = (array)$accObj;
         }
 
-        if (count($accounts) == 1) {
+        if (count($accounts) == 1 && !$updateInitial) {
             $account = $accounts[0];
             $this->setBalance($account["id"], $account["balance"]);
         } else {

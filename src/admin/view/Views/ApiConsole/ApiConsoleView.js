@@ -421,12 +421,6 @@ class AdminApiConsoleView extends AdminView {
             'click',
             (e) => this.onDeleteItemsSubmit(e, 'delaccounts', 'account/delete'),
         );
-
-        const resetAccForm = document.querySelector('#resetAccForm > form');
-        if (!resetAccForm) {
-            throw new Error('Fail to init view');
-        }
-        resetAccForm.addEventListener('submit', (e) => this.onFormSubmit(e));
     }
 
     /** Initialization of forms for Person API controller */
@@ -804,11 +798,11 @@ class AdminApiConsoleView extends AdminView {
         }
         changePwdForm.addEventListener('submit', (e) => this.onFormSubmit(e));
 
-        const resetAllForm = document.querySelector('#resetAllForm > form');
-        if (!resetAllForm) {
+        const resetForm = document.querySelector('#resetForm > form');
+        if (!resetForm) {
             throw new Error('Fail to init view');
         }
-        resetAllForm.addEventListener('submit', (e) => this.onFormSubmit(e));
+        resetForm.addEventListener('submit', (e) => this.onFormSubmit(e));
     }
 
     /**

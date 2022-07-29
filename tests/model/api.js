@@ -284,11 +284,11 @@ export const api = {
             return true;
         },
 
-        /** Reset all data of current user and return boolean result */
-        async reset() {
-            const apiRes = await apiPost('profile/reset');
+        /** Reset data of current user and return boolean result */
+        async resetData(options) {
+            const apiRes = await apiPost('profile/reset', options);
             if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to reset user profile');
+                throw new ApiRequestError('Fail to reset user data');
             }
 
             return true;
@@ -376,15 +376,6 @@ export const api = {
             }
 
             return jsonRes.data;
-        },
-
-        async reset() {
-            const jsonRes = await apiGet('account/reset');
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to reset accounts');
-            }
-
-            return true;
         },
     },
 

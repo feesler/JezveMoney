@@ -162,13 +162,14 @@ export class AppState {
     }
 
     meetExpectation(expected) {
-        const res = assert.deepMeet(this.accounts.data, expected.accounts.data)
-            && assert.deepMeet(this.transactions.data, expected.transactions.data)
-            && assert.deepMeet(this.persons.data, expected.persons.data)
-            && assert.deepMeet(this.templates.data, expected.templates.data)
-            && assert.deepMeet(this.rules.data, expected.rules.data)
-            && assert.deepMeet(this.profile, expected.profile);
-        return res;
+        assert.deepMeet(this.accounts.data, expected.accounts.data);
+        assert.deepMeet(this.transactions.data, expected.transactions.data);
+        assert.deepMeet(this.persons.data, expected.persons.data);
+        assert.deepMeet(this.templates.data, expected.templates.data);
+        assert.deepMeet(this.rules.data, expected.rules.data);
+        assert.deepMeet(this.profile, expected.profile);
+
+        return true;
     }
 
     /**
@@ -181,22 +182,48 @@ export class AppState {
         }
     }
 
+    resetData(options = {}) {
+        const resetPersons = 'persons' in options;
+        const keepAccountBalance = 'keepbalance' in options;
+
+        if ('accounts' in options) {
+            const accountsToDelete = (resetPersons)
+                ? this.accounts
+                : this.accounts.getUserAccounts();
+
+            const ids = accountsToDelete.getIds();
+            this.deleteAccounts(ids);
+        }
+
+        if (resetPersons) {
+            const ids = this.persons?.getIds();
+            this.deletePersons(ids);
+        }
+
+        if ('transactions' in options) {
+            this.transactions?.reset();
+
+            const accountsData = (keepAccountBalance)
+                ? this.accounts?.toCurrent(true)
+                : this.accounts?.toInitial(true);
+            this.accounts?.setData(accountsData);
+        }
+
+        if ('importtpl' in options) {
+            this.templates?.reset();
+        }
+
+        if ('importrules' in options) {
+            this.rules?.reset();
+        }
+    }
+
     resetAll() {
-        if (this.accounts) {
-            this.accounts.reset();
-        }
-        if (this.persons) {
-            this.persons.reset();
-        }
-        if (this.transactions) {
-            this.transactions.reset();
-        }
-        if (this.templates) {
-            this.templates.reset();
-        }
-        if (this.rules) {
-            this.rules.reset();
-        }
+        this.accounts?.reset();
+        this.persons?.reset();
+        this.transactions?.reset();
+        this.templates?.reset();
+        this.rules?.reset();
     }
 
     changeName(name) {
@@ -340,12 +367,6 @@ export class AppState {
         return true;
     }
     /* eslint-enable no-bitwise */
-
-    resetAccounts() {
-        this.deleteAccounts(this.accounts.getIds());
-
-        return true;
-    }
 
     getAccountByIndex(ind, visibleAccList, hiddenAccList) {
         const index = parseInt(ind, 10);

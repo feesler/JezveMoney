@@ -72,34 +72,16 @@ export const register = async ({ login, name, password }) => {
     }
 };
 
-export const resetAccounts = async () => {
-    App.state.resetAccounts();
+export const resetData = async (options = {}) => {
+    App.state.resetData(options);
 
     await App.view.goToProfile();
-    await App.view.resetAccounts();
+    await App.view.resetData(options);
 
     App.view.expectedState = {
-        msgPopup: { success: true, message: 'Accounts successfully reseted' },
+        msgPopup: { success: true, message: 'Data successfully reseted.' },
     };
-    await test('Reset accounts data', () => App.view.checkState());
-
-    await App.view.closeNotification();
-    await App.goToMainView();
-
-    App.view.expectedState = MainView.render(App.state);
-    await test('Main view update', () => App.view.checkState());
-};
-
-export const resetAll = async () => {
-    App.state.resetAll();
-
-    await App.view.goToProfile();
-    await App.view.resetAll();
-
-    App.view.expectedState = {
-        msgPopup: { success: true, message: 'All data successfully reseted.' },
-    };
-    await test('Reset all data', () => App.view.checkState());
+    await test('Reset data', () => App.view.checkState());
 
     await App.view.closeNotification();
     await App.goToMainView();

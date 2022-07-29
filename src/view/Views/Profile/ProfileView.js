@@ -1,5 +1,5 @@
 import 'jezvejs/style';
-import { ge, Popup } from 'jezvejs';
+import { ge, Popup, Checkbox } from 'jezvejs';
 import { createMessage } from '../../js/app.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
@@ -26,6 +26,7 @@ class ProfileView extends View {
     onStart() {
         this.changeNamePopup = null;
         this.changePassPopup = null;
+        this.resetPopup = null;
 
         this.nameElem = ge('namestatic');
         if (!this.nameElem) {
@@ -44,27 +45,11 @@ class ProfileView extends View {
         }
         this.changePassBtn.addEventListener('click', (e) => this.showChangePasswordPopup(e));
 
-        this.resetAccBtn = ge('resetAccBtn');
-        if (!this.resetAccBtn) {
+        this.resetBtn = ge('resetBtn');
+        if (!this.resetBtn) {
             throw new Error('Failed to initialize Profile view');
         }
-        this.resetAccBtn.addEventListener('click', () => this.confirmResetAccounts());
-
-        this.resetAccForm = ge('resetacc_form');
-        if (!this.resetAccForm) {
-            throw new Error('Failed to initialize Profile view');
-        }
-
-        this.resetAllBtn = ge('resetAllBtn');
-        if (!this.resetAllBtn) {
-            throw new Error('Failed to initialize Profile view');
-        }
-        this.resetAllBtn.addEventListener('click', () => this.confirmResetAll());
-
-        this.resetAllForm = ge('resetall_form');
-        if (!this.resetAllForm) {
-            throw new Error('Failed to initialize Profile view');
-        }
+        this.resetBtn.addEventListener('click', () => this.showResetPopup());
 
         this.delProfileBtn = ge('delProfileBtn');
         if (!this.delProfileBtn) {
@@ -97,6 +82,16 @@ class ProfileView extends View {
         }
         this.changePassForm.addEventListener('submit', (e) => this.onChangePassSubmit(e));
 
+        this.resetContent = ge('reset');
+        if (!this.resetContent) {
+            throw new Error('Failed to initialize Profile view');
+        }
+        this.resetForm = this.resetContent.querySelector('form');
+        if (!this.resetForm) {
+            throw new Error('Failed to initialize Profile view');
+        }
+        this.resetForm.addEventListener('submit', (e) => this.onResetSubmit(e));
+
         if (this.props.action) {
             if (this.props.action === 'changePass') {
                 this.showChangePasswordPopup();
@@ -127,7 +122,7 @@ class ProfileView extends View {
         this.clearBlockValidation('name-inp-block');
     }
 
-    // Create and show change name popup
+    /** Create and show change name popup */
     showChangeNamePopup(e) {
         if (e) {
             e.preventDefault();
@@ -302,6 +297,103 @@ class ProfileView extends View {
         }
 
         this.changeNameForm.reset();
+    }
+
+    /** Create and show reset popup */
+    showResetPopup(e) {
+        if (e) {
+            e.preventDefault();
+        }
+
+        if (!this.resetPopup) {
+            this.resetPopup = Popup.create({
+                id: 'reset_popup',
+                title: 'Reset data',
+                content: this.resetContent,
+                additional: 'reset-dialog',
+            });
+
+            this.resetPopup.setControls({
+                okBtn: { onclick: (ev) => this.onResetSubmit(ev) },
+                closeBtn: true,
+            });
+
+            this.resetAllCheck = Checkbox.fromElement(
+                ge('resetAllCheck'),
+                { onChange: () => this.onToggleResetAll() },
+            );
+
+            this.accountsCheck = Checkbox.fromElement(
+                ge('accountsCheck'),
+                { onChange: () => this.onResetFormChange() },
+            );
+
+            this.personsCheck = Checkbox.fromElement(
+                ge('personsCheck'),
+                { onChange: () => this.onResetFormChange() },
+            );
+
+            this.transactionsCheck = Checkbox.fromElement(
+                ge('transactionsCheck'),
+                { onChange: () => this.onResetFormChange() },
+            );
+
+            this.keepAccountsBalanceCheck = Checkbox.fromElement(
+                ge('keepAccountsBalanceCheck'),
+                { onChange: () => this.onResetFormChange() },
+            );
+
+            this.importTemplatesCheck = Checkbox.fromElement(
+                ge('importTemplatesCheck'),
+                { onChange: () => this.onResetFormChange() },
+            );
+
+            this.importRulesCheck = Checkbox.fromElement(
+                ge('importRulesCheck'),
+                { onChange: () => this.onResetFormChange() },
+            );
+
+            this.resetLoading = LoadingIndicator.create({ fixed: false });
+            this.resetContent.append(this.resetLoading.elem);
+        }
+
+        this.resetPopup.show();
+    }
+
+    onToggleResetAll() {
+        const resetAll = this.resetAllCheck.checked;
+
+        this.accountsCheck.check(resetAll);
+        this.personsCheck.check(resetAll);
+        this.transactionsCheck.check(resetAll);
+        if (resetAll) {
+            this.keepAccountsBalanceCheck.enable(false);
+        }
+
+        this.importTemplatesCheck.check(resetAll);
+        this.importRulesCheck.check(resetAll);
+    }
+
+    onResetFormChange() {
+        const resetAll = (
+            this.accountsCheck.checked
+            && this.personsCheck.checked
+            && this.transactionsCheck.checked
+            && this.importTemplatesCheck.checked
+            && this.importRulesCheck.checked
+        );
+
+        this.resetAllCheck.check(resetAll);
+
+        const enableKeepBalance = (
+            (!this.accountsCheck.checked || !this.personsCheck.checked)
+            && this.transactionsCheck.checked
+        );
+        this.keepAccountsBalanceCheck.enable(enableKeepBalance);
+    }
+
+    onResetSubmit() {
+        this.resetForm.submit();
     }
 
     /**

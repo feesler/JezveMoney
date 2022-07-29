@@ -1294,15 +1294,25 @@ const apiImportRuleTests = async () => {
 const apiProfile = async () => {
     setBlock('Profile', 2);
 
+    const resetAllOptions = {
+        accounts: true,
+        persons: true,
+        transactions: true,
+        importtpl: true,
+        importrules: true,
+    };
+
     const tasks = [{
-        action: ApiTests.resetAccounts,
+        action: ApiTests.resetData, data: { accounts: true },
     }, {
-        action: ApiTests.resetAll,
+        action: ApiTests.resetData,
+        data: resetAllOptions,
     }, {
         action: ApiTests.loginTest,
         data: App.config.apiTestUser,
     }, {
-        action: ApiTests.resetAll,
+        action: ApiTests.resetData,
+        data: resetAllOptions,
     }, {
         action: ApiTests.changeName,
         data: '',
@@ -1348,7 +1358,7 @@ export const apiTests = {
 
         setBlock('Accounts', 2);
 
-        await ApiTests.resetAccounts();
+        await ApiTests.resetData({});
 
         await apiCreateAccounts();
         await apiCreateMultipleAccounts();

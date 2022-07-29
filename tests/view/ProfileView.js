@@ -8,6 +8,7 @@ import {
     click,
     wait,
 } from 'jezve-test';
+import { Checkbox } from 'jezvejs/tests';
 import { AppView } from './AppView.js';
 import { LoginView } from './LoginView.js';
 import { App } from '../Application.js';
@@ -38,9 +39,9 @@ export class ProfileView extends AppView {
         res.name = await prop(res.nameElem, 'textContent');
 
         const buttons = await queryAll(blocks[3], 'input[type="button"]');
-        assert(buttons?.length === 3, 'Invalid profile view structure');
+        assert(buttons?.length === 2, 'Invalid profile view structure');
 
-        [res.resetBtn, res.resetAllBtn, res.deleteProfileBtn] = buttons;
+        [res.resetBtn, res.deleteProfileBtn] = buttons;
 
         res.changeNamePopup = {
             elem: await query('#chname_popup'),
@@ -68,8 +69,27 @@ export class ProfileView extends AppView {
             res.changePassPopup.closeBtn = await query(res.changePassPopup.elem, '.close-btn');
         }
 
+        res.resetDataPopup = {
+            elem: await query('#reset_popup'),
+            content: await query('#reset'),
+            resetAllCheck: await Checkbox.create(this, await query('#resetAllCheck')),
+            accountsCheck: await Checkbox.create(this, await query('#accountsCheck')),
+            personsCheck: await Checkbox.create(this, await query('#personsCheck')),
+            transactionsCheck: await Checkbox.create(this, await query('#transactionsCheck')),
+            keepAccountsBalanceCheck: await Checkbox.create(this, await query('#keepAccountsBalanceCheck')),
+            importTemplatesCheck: await Checkbox.create(this, await query('#importTemplatesCheck')),
+            importRulesCheck: await Checkbox.create(this, await query('#importRulesCheck')),
+        };
+
+        if (res.resetDataPopup.elem) {
+            res.resetDataPopup.okBtn = await query(
+                res.resetDataPopup.elem,
+                '.popup__controls > input.btn.submit-btn',
+            );
+            res.resetDataPopup.closeBtn = await query(res.resetDataPopup.elem, '.close-btn');
+        }
+
         res.reset_warning = await WarningPopup.create(this, await query('#reset_warning'));
-        res.reset_all_warning = await WarningPopup.create(this, await query('#reset_all_warning'));
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
         return res;
@@ -118,26 +138,51 @@ export class ProfileView extends AppView {
         }
     }
 
-    async resetAccounts() {
-        assert(this.content.resetBtn, 'Reset accounts button not found');
+    async resetData(options = {}) {
+        assert(this.content.resetBtn, 'Reset button not found');
 
         await this.performAction(() => click(this.content.resetBtn));
 
-        assert(this.content.reset_warning?.content?.visible, 'Warning popup not appear');
-        assert(this.content.reset_warning.content.okBtn, 'Confirm button not found');
+        assert(this.content.resetDataPopup?.visible, 'Change password popup not appear');
 
-        await navigation(() => click(this.content.reset_warning.content.okBtn));
-    }
+        // Deselect all options
+        await this.performAction(() => this.content.resetDataPopup.resetAllCheck.toggle());
+        if (this.content.resetDataPopup.resetAllCheck.checked) {
+            await this.performAction(() => this.content.resetDataPopup.resetAllCheck.toggle());
+        }
 
-    async resetAll() {
-        assert(this.content.resetAllBtn, 'Reset all button not found');
+        const { accountsCheck } = this.content.resetDataPopup;
+        if (('accounts' in options) && !accountsCheck.checked) {
+            await this.performAction(() => accountsCheck.toggle());
+        }
 
-        await this.performAction(() => click(this.content.resetAllBtn));
+        const { personsCheck } = this.content.resetDataPopup;
+        if (('persons' in options) && !personsCheck.checked) {
+            await this.performAction(() => personsCheck.toggle());
+        }
 
-        assert(this.content.reset_all_warning?.content?.visible, 'Warning popup not appear');
-        assert(this.content.reset_all_warning.content.okBtn, 'Confirm button not found');
+        const { transactionsCheck } = this.content.resetDataPopup;
+        if (('transactions' in options) && !transactionsCheck.checked) {
+            await this.performAction(() => transactionsCheck.toggle());
+        }
 
-        await navigation(() => click(this.content.reset_all_warning.content.okBtn));
+        const { keepAccountsBalanceCheck } = this.content.resetDataPopup;
+        if (('keepbalance' in options) && !keepAccountsBalanceCheck.checked) {
+            assert(!keepAccountsBalanceCheck.disabled, 'Keep accounts balance checkbox is disabled');
+            await this.performAction(() => keepAccountsBalanceCheck.toggle());
+        }
+
+        const { importTemplatesCheck } = this.content.resetDataPopup;
+        if (('importtpl' in options) && !importTemplatesCheck.checked) {
+            await this.performAction(() => importTemplatesCheck.toggle());
+        }
+
+        const { importRulesCheck } = this.content.resetDataPopup;
+        if (('importrules' in options) && !importRulesCheck.checked) {
+            await this.performAction(() => importRulesCheck.toggle());
+        }
+
+        await navigation(() => click(this.content.resetDataPopup.okBtn));
     }
 
     async deleteProfile() {

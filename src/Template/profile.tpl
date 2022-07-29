@@ -30,18 +30,10 @@
                     </div>
 
                     <div class="profile_block">
-                        <h2>Reset data</h2>
+                        <h2>User data</h2>
                         <div class="std_margin">
-                            <form id="resetacc_form" method="post" action="<?=BASEURL?>profile/reset/">
-                            </form>
-                            <span>You also may reset all your accounts data.<br>
-                            <input id="resetAccBtn" class="btn submit-btn" type="button" value="Reset"></span>
-                        </div>
-                        <div class="std_margin">
-                            <form id="resetall_form" method="post" action="<?=BASEURL?>profile/resetall/">
-                            </form>
-                            <span>You may also reset all your data and start from the scratch.<br>
-                            <input id="resetAllBtn" class="btn submit-btn" type="button" value="Reset all"></span>
+                            <span>You also may reset your data.<br>
+                            <input id="resetBtn" class="btn submit-btn" type="button" value="Reset data"></span>
                         </div>
                         <div class="std_margin">
                             <form id="delete_form" method="post" action="<?=BASEURL?>profile/del/">
@@ -78,6 +70,54 @@
         <label for="newpwd">New password</label>
         <input id="newpwd" class="stretch-input" name="new" type="password" autocomplete="off">
         <div class="invalid-feedback">Please input correct new password.<br>New password must be different from the old.</div>
+    </div>
+</form>
+</div>
+
+<div id="reset" class="profile-form-container" hidden>
+<form method="post" action="<?=BASEURL?>profile/reset/">
+    <div class="view-row">
+        <label id="resetAllCheck" class="checkbox std_margin">
+            <input type="checkbox">
+            <span class="checkbox__check"><?=svgIcon("check")?></span>
+            <span class="checkbox__label">All</span>
+        </label>
+
+        <label id="accountsCheck" class="checkbox std_margin">
+            <input type="checkbox" name="accounts">
+            <span class="checkbox__check"><?=svgIcon("check")?></span>
+            <span class="checkbox__label">Accounts</span>
+        </label>
+
+        <label id="personsCheck" class="checkbox std_margin">
+            <input type="checkbox" name="persons">
+            <span class="checkbox__check"><?=svgIcon("check")?></span>
+            <span class="checkbox__label">Persons</span>
+        </label>
+
+        <label id="transactionsCheck" class="checkbox std_margin">
+            <input type="checkbox" name="transactions">
+            <span class="checkbox__check"><?=svgIcon("check")?></span>
+            <span class="checkbox__label">Transactions</span>
+        </label>
+
+        <label id="keepAccountsBalanceCheck" class="checkbox std_margin suboption" disabled>
+            <input type="checkbox" name="keepbalance">
+            <span class="checkbox__check"><?=svgIcon("check")?></span>
+            <span class="checkbox__label">Keep current balance of accounts</span>
+        </label>
+
+        <label id="importTemplatesCheck" class="checkbox std_margin">
+            <input type="checkbox" name="importtpl">
+            <span class="checkbox__check"><?=svgIcon("check")?></span>
+            <span class="checkbox__label">Import templates</span>
+        </label>
+
+        <label id="importRulesCheck" class="checkbox std_margin">
+            <input type="checkbox" name="importrules">
+            <span class="checkbox__check"><?=svgIcon("check")?></span>
+            <span class="checkbox__label">Import rules</span>
+        </label>
     </div>
 </form>
 </div>

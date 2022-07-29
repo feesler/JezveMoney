@@ -159,14 +159,4 @@ class Account extends ApiController
 
         $this->ok();
     }
-
-
-    public function reset()
-    {
-        if (!$this->model->reset($this->user_id)) {
-            throw new \Error(Message::get(ERR_ACCOUNTS_RESET));
-        }
-
-        $this->ok();
-    }
 }

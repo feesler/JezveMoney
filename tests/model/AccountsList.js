@@ -102,6 +102,20 @@ export class AccountsList extends List {
         return new AccountsList(res);
     }
 
+    /** Reset initial balances of all accounts to current values */
+    toCurrent(returnRaw = false) {
+        const res = copyObject(this.data);
+        for (const acc of res) {
+            acc.initbalance = acc.balance;
+        }
+
+        if (returnRaw) {
+            return res;
+        }
+
+        return new AccountsList(res);
+    }
+
     /** Reset balance of all accounts to initial values */
     toInitial(returnRaw = false) {
         const res = copyObject(this.data);
@@ -130,6 +144,16 @@ export class AccountsList extends List {
 
     getUserAccounts(returnRaw = false) {
         const res = this.filter((item) => item.owner_id === App.owner_id);
+
+        if (returnRaw) {
+            return copyObject(res);
+        }
+
+        return new AccountsList(res);
+    }
+
+    getPersonsAccounts(returnRaw = false) {
+        const res = this.filter((item) => item.owner_id !== App.owner_id);
 
         if (returnRaw) {
             return copyObject(res);

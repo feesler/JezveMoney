@@ -6,6 +6,7 @@ use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
 use JezveMoney\App\Model\AccountModel;
+use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\ImportTemplateModel;
 
@@ -130,47 +131,49 @@ class Profile extends TemplateController
             setLocation(BASEURL . "profile/");
         }
 
-        $defMsg = ERR_ACCOUNTS_RESET;
+        $defMsg = ERR_PROFILE_RESET;
 
-        $accMod = AccountModel::getInstance();
-        if (!$accMod->reset()) {
-            $this->fail($defMsg);
+        $resetOptions = ["accounts", "persons", "transactions", "keepbalance", "importtpl", "importrules"];
+        $request = [];
+        foreach ($resetOptions as $opt) {
+            $request[$opt] = isset($_POST[$opt]);
         }
 
-        Message::set(MSG_ACCOUNTS_RESET);
-
-        setLocation(BASEURL . "profile/");
-    }
-
-
-    public function resetAll()
-    {
-        if (!$this->isPOST()) {
-            setLocation(BASEURL . "profile/");
+        if ($request["accounts"]) {
+            $accMod = AccountModel::getInstance();
+            if (!$accMod->reset(["deletePersons" => $request["persons"]])) {
+                $this->fail($defMsg);
+            }
         }
 
-        $defMsg = ERR_PROFILE_RESETALL;
-
-        $accMod = AccountModel::getInstance();
-        if (!$accMod->reset()) {
-            $this->fail($defMsg);
+        if ($request["persons"]) {
+            if (!$this->personMod->reset()) {
+                $this->fail($defMsg);
+            }
         }
 
-        if (!$this->personMod->reset()) {
-            $this->fail($defMsg);
+        if ($request["transactions"]) {
+            $transMod = TransactionModel::getInstance();
+            if (!$transMod->reset($request["keepbalance"])) {
+                $this->fail($defMsg);
+            }
         }
 
-        $ruleMod = ImportRuleModel::getInstance();
-        if (!$ruleMod->reset()) {
-            $this->fail($defMsg);
+        if ($request["importtpl"]) {
+            $tplModel = ImportTemplateModel::getInstance();
+            if (!$tplModel->reset()) {
+                $this->fail($defMsg);
+            }
         }
 
-        $tplModel = ImportTemplateModel::getInstance();
-        if (!$tplModel->reset()) {
-            $this->fail($defMsg);
+        if ($request["importrules"]) {
+            $ruleMod = ImportRuleModel::getInstance();
+            if (!$ruleMod->reset()) {
+                $this->fail($defMsg);
+            }
         }
 
-        Message::set(MSG_PROFILE_RESETALL);
+        Message::set(MSG_PROFILE_RESET);
 
         setLocation(BASEURL . "profile/");
     }
