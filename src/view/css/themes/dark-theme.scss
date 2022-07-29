@@ -1,26 +1,31 @@
 .dark-theme {
-  color: #dddddd;
-  background-color: #101010;
+  --main-text-color: #dddddd;
+  --hl-text-color: #ffffff;
+  --main-bg-color: #101010;
+  --alt-bg-color: #2a2a2a;
+
+  color: var(--main-text-color);
+  background-color: var(--main-bg-color);
 
   /* Page */
   .page_wrapper {
-    color: #dddddd;
-    background-color: #101010;
+    color: var(--main-text-color);
+    background-color: var(--main-bg-color);
   }
 
   /* Navigation */
   .navigation-content {
-    background-color: #2a2a2a;
+    background-color: var(--alt-bg-color);
   }
 
   /* Navigation items */
   a.nav-link,
   a.nav-link:visited {
-    color: #dddddd;
+    color: var(--main-text-color);
   }
 
   a.nav-link:hover {
-    color: #ffffff;
+    color: var(--hl-text-color);
   }
 
   /* Main content */
@@ -31,16 +36,16 @@
   /* Login/Register view */
   .login-layer,
   .register-layer {
-    background-color: #101010;
+    background-color: var(--main-bg-color);
   }
 
   .login-layer h1,
   .register-layer h1 {
-    color: #dddddd;
+    color: var(--main-text-color);
   }
 
   .heading {
-    color: #dddddd;
+    color: var(--main-text-color);
   }
 
   .iconlink .iconlink__icon {
@@ -56,12 +61,12 @@
   }
 
   .iconlink .iconlink__content {
-    color: #dddddd;
+    color: var(--main-text-color);
   }
 
   .iconlink > *:hover .iconlink__icon,
   .iconlink > *:hover .iconlink__content {
-    color: #dddddd;
+    color: var(--main-text-color);
   }
 
   /* No data message for lists & etc. */
@@ -74,7 +79,7 @@
   .widget_title > a,
   .widget_title > a:hover,
   .widget_title > a:visited {
-    color: #dddddd;
+    color: var(--main-text-color);
   }
 
   .widget_title .glyph svg * {
@@ -83,12 +88,12 @@
 
   /* Transaction type menu */
   .trtype-menu__item_selected {
-    color: #dddddd;
+    color: var(--main-text-color);
   }
 
   /* Input control */
   .stretch-input {
-    color: #dddddd;
+    color: var(--main-text-color);
     border-color: #2e2e2e;
     background-color: #181818;
   }
@@ -99,136 +104,79 @@
 
   /* Input group */
   .input-group__item[disabled] {
-    color: #dddddd;
+    color: var(--main-text-color);
     border-color: #2e2e2e;
     background-color: #202020;
   }
 
-  /* Input group close button */
-  .input-group .close-btn {
+  /* Clear input button */
+  .clear-input-btn {
     border-color: #2e2e2e;
     background-color: rgba(0, 0, 0, 0.25);
   }
 
-  .input-group .stretch-input:focus + .close-btn {
+  .clear-input-btn > svg {
+    fill: #888888;
+  }
+
+  .input-group .stretch-input:focus + .clear-input-btn {
     border-color: #d0d0d0;
   }
 
   /* DropDown  */
-  .dd__combo,
-  .dd__input,
-  .dd__single-selection,
-  .dd__clear-btn,
-  .dd__toggle-btn {
-    background-color: #181818;
-    color: #dddddd;
-  }
+  .dd__container,
+  .dd__container_attached {
+    --dd-bg-color: #181818;
+    --dd-selection-text: #dddddd;
+    --dd-border-color: #2e2e2e;
 
-  .dd__combo {
-    border-color: #2e2e2e;
-  }
+    /* Active component */
+    --dd-active-bg: #202020;
+    --dd-active-border: #d0d0d0;
 
-  .dd__container_active .dd__combo,
-  .dd__container_active .dd__input,
-  .dd__container_active .dd__single-selection,
-  .dd__container_active .dd__clear-btn,
-  .dd__container_active .dd__toggle-btn {
-    color: #dddddd;
-    background-color: #202020;
-  }
+    /* Clear and toggle buttons */
+    --dd-btn-fill: #888888;
+    --dd-btn-hover-fill: #dddddd;
 
-  .dd__container_active .dd__combo {
-    border-color: #d0d0d0;
-  }
+    /* Disabled component */
+    --dd-disabled-bg: #202020;
+    --dd-disabled-border: #202020;
+    --dd-disabled-selection-color: #707070;
+    --dd-disabled-input-text: #707070;
+    --dd-disabled-btn-fill: #707070;
+    --dd-disabled-selection-item-text: #707070;
+    --dd-disabled-selection-item-bg: #dfdfdf;
 
-  .dd__container.dd__container_disabled .dd__combo,
-  .dd__container.dd__container_disabled .dd__input,
-  .dd__container.dd__container_disabled .dd__single-selection,
-  .dd__container.dd__container_disabled .dd__clear-btn,
-  .dd__container.dd__container_disabled .dd__toggle-btn {
-    color: #707070;
-    border-color: #202020;
-    background-color: #202020;
-  }
+    /* List item */
+    --dd-list-item-text: #dddddd;
+    --dd-list-item-bg: #202020;
+    --dd-list-item-check: #dddddd;
 
-  .dd__container_disabled .dd__clear-btn path,
-  .dd__container_disabled .dd__toggle-btn path {
-    fill: #707070;
-  }
-
-  .dd__list {
-    background-color: #202020;
-    border-color: #d0d0d0;
-  }
-
-  .dd__list-item,
-  .dd__list-group {
-    color: #dddddd;
-    background-color: #202020;
-  }
-
-  .dd__list-item > svg {
-    fill: #dddddd;
-  }
-
-  .dd__container_enabled .dd__clear-btn:hover path,
-  .dd__container_enabled .dd__toggle-btn:hover path {
-    fill: #dddddd;
-  }
-
-  @media (max-width: 767px) {
-    .dd__container.dd__fullscreen.dd__open .dd__background {
-      background-color: #202020;
-    }
-
-    .dd__container.dd__fullscreen.dd__open .dd__list {
-      border-color: #dddddd;
-    }
+    /* List group */
+    --dd-list-group-text: #dddddd;
+    --dd-list-group-bg: #202020;
   }
 
   /* Date picker */
-  .dp__wrapper {
-    background-color: #202020;
-    color: #dddddd;
-    border-color: #d0d0d0;
-  }
-
-  .dp__cell {
-    color: #dddddd;
-    border-color: #202020;
-    background-color: #202020;
-  }
-
-  .dp__other-month-cell {
-    color: #505050;
-  }
-
-  .dp__today-cell,
-  .dp__cell_hl.dp__today-cell {
-    border: 1px dashed #00bef3;
-  }
-
-  .dp__cell_act {
-    border-color: #20d0ff;
-  }
-
-  .dp__cell_hl {
-    background-color: #005688;
-    border-color: #005688;
-    color: #ffffff;
-  }
-
-  .dp__year-range-view__cell:hover,
-  .dp__year-view__cell:hover,
-  .dp__day-cell:hover {
-    background-color: #3198d4;
-    color: #dddddd;
+  .dp__container {
+    --dp-bg-color: #202020;
+    --dp-border-color: #d0d0d0;
+    --dp-text-color: #dddddd;
+    --dp-other-text-color: #505050;
+    --dp-active-color: #20d0ff;
+    --dp-today-color: #00bef3;
+    --dp-hover-bg-color: #3198d4;
+    --dp-hover-color: #dddddd;
+    --dp-hl-bg-color: #005688;
+    --dp-hl-color: #ffffff;
+    --dp-nav-fill: #b0b0b0;
+    --dp-nav-hover-fill: #80d0ff;
   }
 
   /* Collapsible */
   .rule-item .collapsible-header,
   .rule-form-collapse .collapsible-header {
-    color: #dddddd;
+    color: var(--main-text-color);
     background-color: #202020;
     border-color: #202020;
   }
@@ -243,7 +191,7 @@
   }
 
   .filters-heading label {
-    color: #dddddd;
+    color: var(--main-text-color);
   }
 
   .filters-heading__icon svg {
@@ -269,7 +217,7 @@
 
   .trans-list_details .trans-list__item-comment,
   table.trans-list-items .trans-list__item-comment {
-    color: #dddddd;
+    color: var(--main-text-color);
   }
 
   .trans-list__item,
@@ -280,7 +228,7 @@
   .tritem_balance,
   .trans-list__item-title,
   .trans-list__item-content {
-    color: #dddddd;
+    color: var(--main-text-color);
   }
 
   .trans-list__item-details {
@@ -294,24 +242,24 @@
 
   /* Profile view */
   .profile_block {
-    color: #dddddd;
+    color: var(--main-text-color);
   }
 
   /* Popup */
   .popup__content .popup__content-box {
-    color: #dddddd;
+    color: var(--main-text-color);
     background-color: #303030;
   }
 
   .popup__title,
   .popup__message {
-    color: #dddddd;
+    color: var(--main-text-color);
   }
 
   /* Tiles list */
   .tiles > span,
   .info-tiles > span {
-    color: #dddddd;
+    color: var(--main-text-color);
   }
 
   /* Swap button */
@@ -325,6 +273,12 @@
 
   .swap-btn:hover > svg {
     fill: #dddddd;
+  }
+
+  /* Active clear input button */
+  .clear-input-btn:hover > svg,
+  .clear-input-btn:focus > svg {
+    fill: #ffffff;
   }
 
   /* Import view */
@@ -382,7 +336,7 @@
   .import-item .btn,
   .import-item .btn:visited,
   .import-item .btn:active {
-    color: #dddddd;
+    color: var(--main-text-color);
   }
 
   .import-item .btn:hover {
@@ -400,7 +354,7 @@
   }
 
   .import-controls {
-    color: #dddddd;
+    color: var(--main-text-color);
   }
 
   /* Upload dialog */
@@ -410,7 +364,7 @@
 
   /* Import rules dialog */
   .rules-dialog .loading-indicator {
-    color: #dddddd;
+    color: var(--main-text-color);
     background-color: #303030;
   }
 
@@ -479,13 +433,13 @@
 
   /* Statistics view */
   .stat-histogram > span {
-    color: #dddddd;
+    color: var(--main-text-color);
   }
 
   .chart_popup {
     border-color: #000000;
     background-color: #202020;
-    color: #dddddd;
+    color: var(--main-text-color);
   }
 
   .iconlink:hover .iconlink__icon svg * {
@@ -494,7 +448,7 @@
 
   /* Tile info block */
   .tile-info-block > div > span {
-    color: #dddddd;
+    color: var(--main-text-color);
   }
 
   .tile_header > .close-btn:hover > svg {
@@ -503,12 +457,6 @@
 
   /* Transaction list mode selector */
   .mode-selector > b > span {
-    color: #dddddd;
-  }
-
-  /* Input group close button */
-  .input-group .close-btn:hover > svg,
-  .input-group .close-btn:focus > svg {
-    fill: #ffffff;
+    color: var(--main-text-color);
   }
 }

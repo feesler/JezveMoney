@@ -504,15 +504,16 @@ label {
 }
 
 /* DropDown */
+.dd__container,
+.dd__container_attached {
+  --dd-border-width: 1px;
+}
+
 .dd__combo {
   padding: 0 24px 0 0.5rem;
   border-radius: 3px;
   border-style: solid;
-  border-width: 1px;
   box-sizing: border-box;
-  color: #000000;
-  border-color: #b0b0b0;
-  background-color: #f2f2f2;
 }
 
 .dd__selection-item {
@@ -537,23 +538,16 @@ label {
   cursor: pointer;
 }
 
-.dd__list,
-.dd__container_attached .dd__list {
-  border-width: 1px;
-}
-
 .dd__container_attached .dd__list {
   border-radius: 5px;
 }
 
 .dd__list_drop-down {
-  border-top-width: 1px;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
 }
 
 .dd__list_drop-up {
-  border-bottom-width: 1px;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }
