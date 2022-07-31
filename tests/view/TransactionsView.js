@@ -9,6 +9,7 @@ import {
     goTo,
     baseUrl,
     copyObject,
+    isVisible,
 } from 'jezve-test';
 import { DropDown, Paginator } from 'jezvejs/tests';
 import { AppView } from './AppView.js';
@@ -48,11 +49,17 @@ export class TransactionsView extends AppView {
         res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
         assert(res.typeMenu, 'Types menu not found');
 
-        res.accDropDown = await DropDown.createFromChild(this, await query('#acc_id'));
-        assert(res.accDropDown, 'Account filter control not found');
+        const accountsFilter = await query('#accountsFilter');
+        const accountsFilterVisible = await isVisible(accountsFilter);
+        if (accountsFilterVisible) {
+            res.accDropDown = await DropDown.createFromChild(this, await query('#acc_id'));
+        }
 
-        res.personDropDown = await DropDown.createFromChild(this, await query('#person_id'));
-        assert(res.personDropDown, 'Person filter control not found');
+        const personsFilter = await query('#personsFilter');
+        const personsFilterVisible = await isVisible(personsFilter);
+        if (personsFilterVisible) {
+            res.personDropDown = await DropDown.createFromChild(this, await query('#person_id'));
+        }
 
         const calendarBtn = await query('#calendar_btn');
         res.dateFilter = await DatePickerFilter.create(this, await parentNode(calendarBtn));
@@ -82,6 +89,12 @@ export class TransactionsView extends AppView {
         return res;
     }
 
+    getDropDownFilter(dropDown) {
+        return (dropDown)
+            ? dropDown.getSelectedValues().map((item) => parseInt(item, 10))
+            : [];
+    }
+
     async buildModel(cont) {
         const res = {};
 
@@ -90,8 +103,8 @@ export class TransactionsView extends AppView {
         res.filterCollapsed = cont.filtersAccordion.isCollapsed();
         res.filter = {
             type: cont.typeMenu.getSelectedTypes(),
-            accounts: cont.accDropDown.getSelectedValues().map((item) => parseInt(item, 10)),
-            persons: cont.personDropDown.getSelectedValues().map((item) => parseInt(item, 10)),
+            accounts: this.getDropDownFilter(cont.accDropDown),
+            persons: this.getDropDownFilter(cont.personDropDown),
             search: cont.searchForm.content.value,
         };
         const dateRange = cont.dateFilter.getSelectedRange();
@@ -235,6 +248,8 @@ export class TransactionsView extends AppView {
 
     setExpectedState(model = this.model) {
         const isItemsAvailable = (model.filtered.length > 0);
+        const isAccountsAvailable = App.state.accounts.length > 0;
+        const isPersonsAvailable = App.state.persons.length > 0;
         const isFiltersVisible = !model.filterCollapsed;
         const selected = this.getSelectedItems(model);
 
@@ -244,18 +259,10 @@ export class TransactionsView extends AppView {
                 visible: isFiltersVisible,
             },
             accDropDown: {
-                isMulti: true,
-                visible: isFiltersVisible,
-                selectedItems: model.filter.accounts.map(
-                    (accountId) => ({ id: accountId.toString() }),
-                ),
+                visible: isFiltersVisible && isAccountsAvailable,
             },
             personDropDown: {
-                isMulti: true,
-                visible: isFiltersVisible,
-                selectedItems: model.filter.persons.map(
-                    (personId) => ({ id: personId.toString() }),
-                ),
+                visible: isFiltersVisible && isPersonsAvailable,
             },
             searchForm: {
                 value: model.filter.search,
@@ -270,6 +277,20 @@ export class TransactionsView extends AppView {
                 visible: selected.length > 0,
             },
         };
+
+        if (isAccountsAvailable) {
+            res.accDropDown.isMulti = true;
+            res.accDropDown.selectedItems = model.filter.accounts.map(
+                (accountId) => ({ id: accountId.toString() }),
+            );
+        }
+
+        if (isPersonsAvailable) {
+            res.personDropDown.isMulti = true;
+            res.personDropDown.selectedItems = model.filter.persons.map(
+                (personId) => ({ id: personId.toString() }),
+            );
+        }
 
         if (isItemsAvailable) {
             res.paginator = {
@@ -354,6 +375,8 @@ export class TransactionsView extends AppView {
     }
 
     async filterByAccounts(accounts, directNavigate = false) {
+        assert(App.state.accounts.length > 0, 'No accounts available');
+
         if (directNavigate) {
             this.model.filterCollapsed = true;
         } else {
@@ -373,6 +396,8 @@ export class TransactionsView extends AppView {
     }
 
     async filterByPersons(persons, directNavigate = false) {
+        assert(App.state.persons.length > 0, 'No persons available');
+
         if (directNavigate) {
             this.model.filterCollapsed = true;
         } else {

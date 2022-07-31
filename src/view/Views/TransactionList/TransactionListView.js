@@ -69,26 +69,39 @@ class TransactionListView extends View {
             onChange: (sel) => this.onChangeTypeFilter(sel),
         });
 
-        this.accountDropDown = DropDown.create({
-            elem: 'acc_id',
-            placeholder: 'Select account',
-            onchange: (obj) => this.onAccountChange(obj),
-            editable: false,
-            className: 'dd__fullwidth',
-        });
-        if (!this.accountDropDown) {
-            throw new Error('Failed to initialize Transaction List view');
+        const accountsFilter = ge('accountsFilter');
+        if (window.app.model.accounts.length === 0) {
+            show(accountsFilter, false);
+        } else {
+            this.accountDropDown = DropDown.create({
+                elem: 'acc_id',
+                placeholder: 'Select account',
+                onchange: (obj) => this.onAccountChange(obj),
+                editable: false,
+                className: 'dd__fullwidth',
+            });
+            if (!this.accountDropDown) {
+                throw new Error('Failed to initialize Transaction List view');
+            }
         }
 
-        this.personDropDown = DropDown.create({
-            elem: 'person_id',
-            placeholder: 'Select person',
-            onchange: (obj) => this.onPersonChange(obj),
-            editable: false,
-            className: 'dd__fullwidth',
-        });
-        if (!this.personDropDown) {
-            throw new Error('Failed to initialize Transaction List view');
+        const personsFilter = ge('personsFilter');
+        if (window.app.model.persons.length === 0) {
+            show(personsFilter, false);
+        } else {
+            this.personDropDown = DropDown.create({
+                elem: 'person_id',
+                placeholder: 'Select person',
+                onchange: (obj) => this.onPersonChange(obj),
+                editable: false,
+                className: 'dd__fullwidth',
+            });
+            if (!this.personDropDown) {
+                throw new Error('Failed to initialize Transaction List view');
+            }
+            if (window.app.model.persons.length === 0) {
+                this.personDropDown.show(false);
+            }
         }
 
         this.searchFrm = ge('searchFrm');
@@ -557,8 +570,12 @@ class TransactionListView extends View {
         this.typeMenu.setURL(filterUrl);
         this.typeMenu.setSelection(state.filter.type);
 
-        this.renderAccountsFilter(state);
-        this.renderPersonsFilter(state);
+        if (window.app.model.accounts.length > 0) {
+            this.renderAccountsFilter(state);
+        }
+        if (window.app.model.persons.length > 0) {
+            this.renderPersonsFilter(state);
+        }
 
         // Render date
         const dateSubtitle = (state.filter.stdate && state.filter.enddate)

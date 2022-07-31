@@ -63,7 +63,7 @@ include(TPL_PATH."commonhdr.tpl");
                             </div>
                         </div>
 
-                        <div class="filter-item">
+                        <div id="accountsFilter" class="filter-item">
                             <h3 class="filter-item__title">Accounts</h3>
                             <select id="acc_id" name="acc_id" multiple>
 <?php	foreach($accArr as $accData) {
@@ -87,7 +87,7 @@ include(TPL_PATH."commonhdr.tpl");
                             </select>
                         </div>
 
-                        <div class="filter-item">
+                        <div id="personsFilter" class="filter-item">
                             <h3 class="filter-item__title">Persons</h3>
                             <select id="person_id" name="person_id" multiple>
 <?php	foreach($personArr as $person) {
