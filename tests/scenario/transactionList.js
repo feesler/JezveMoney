@@ -285,12 +285,16 @@ const runTests = async (directNavigate = false) => {
         { action: TransactionListTests.goToNextPage, data: directNavigate },
     ]);
 
-    const toggleSelectData = [
-        0,
-        [1, 2],
-    ];
+    if (!directNavigate) {
+        await TransactionListTests.checkEmptySelectionFilter();
 
-    await App.scenario.runner.runGroup(TransactionListTests.toggleSelect, toggleSelectData);
+        const toggleSelectData = [
+            0,
+            [1, 2],
+        ];
+
+        await App.scenario.runner.runGroup(TransactionListTests.toggleSelect, toggleSelectData);
+    }
 
     await App.scenario.runner.runGroup(
         TransactionListTests.filterByType,

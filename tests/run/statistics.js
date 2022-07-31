@@ -44,14 +44,15 @@ export const run = async () => {
     // Test grouping
     await App.view.filterByType(DEBT);
     await App.view.groupByDay();
-    expected.chart.bars.length = 3;
+    expected.chart.bars.length = 4;
     await test('Group statistics by day', () => App.view.checkState(expected));
 
     await App.view.groupByWeek();
+    expected.chart.bars.length = 3;
     await test('Group statistics by week', () => App.view.checkState(expected));
 
     await App.view.groupByMonth();
-    expected.chart.bars.length = 2;
+    expected.chart.bars.length = 1;
     await test('Group statistics by month', () => App.view.checkState(expected));
 
     await App.view.groupByYear();

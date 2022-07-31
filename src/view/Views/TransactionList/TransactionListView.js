@@ -282,15 +282,12 @@ class TransactionListView extends View {
         let reloadNeeded = data.some((item) => {
             const id = parseInt(item.id, 10);
 
-            return (
-                !this.state.filter.acc_id
-                || !this.state.filter.acc_id.includes(id)
-            );
+            return !this.state.filter.acc_id?.includes(id);
         });
 
         // Check all currenlty selected accounts present in the new selection
         if (!reloadNeeded) {
-            reloadNeeded = this.state.filter.acc_id.some(
+            reloadNeeded = this.state.filter.acc_id?.some(
                 (accountId) => !data.find((item) => item.id === accountId),
             );
         }
@@ -314,15 +311,12 @@ class TransactionListView extends View {
         let reloadNeeded = data.some((item) => {
             const id = parseInt(item.id, 10);
 
-            return (
-                !this.state.filter.person_id
-                || !this.state.filter.person_id.includes(id)
-            );
+            return !this.state.filter.person_id?.includes(id);
         });
 
         // Check all currenlty selected persons present in the new selection
         if (!reloadNeeded) {
-            reloadNeeded = this.state.filter.person_id.some(
+            reloadNeeded = this.state.filter.person_id?.some(
                 (personId) => !data.find((item) => item.id === personId),
             );
         }

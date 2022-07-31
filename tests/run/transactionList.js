@@ -200,3 +200,29 @@ export const clearSearchForm = async (directNavigate = false) => {
         return App.view.iteratePages();
     });
 };
+
+const checkEmptySelectionNotChanged = async (isAccounts) => {
+    const filterComponent = (isAccounts) ? 'accDropDown' : 'personDropDown';
+    const filter = (isAccounts) ? 'accounts' : 'persons';
+    const [itemId] = (isAccounts)
+        ? App.state.getAccountsByIndexes(0)
+        : App.state.getPersonsByIndexes(0);
+
+    await test(`Check ${filter} empty selection not changes`, async () => {
+        await checkNavigation();
+
+        await App.view.openFilters();
+        const expected = App.view.setExpectedState();
+
+        await App.view.performAction(() => App.view.content[filterComponent].selectItem(itemId));
+        await App.view.performAction(() => App.view.content[filterComponent].deselectItem(itemId));
+        await App.view.performAction(() => App.view.content[filterComponent].showList(false));
+
+        return App.view.checkState(expected);
+    });
+};
+
+export const checkEmptySelectionFilter = async () => {
+    await checkEmptySelectionNotChanged(true);
+    await checkEmptySelectionNotChanged(false);
+};
