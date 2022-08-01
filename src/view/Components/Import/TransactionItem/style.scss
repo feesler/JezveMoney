@@ -101,7 +101,7 @@
 
   .dd__combo,
   .dd__container.dd__container_disabled .dd__combo {
-    border: 1px solid;
+    border-width: 1px;
   }
 
   .dd__list {
@@ -119,7 +119,7 @@
 
   input[type="text"] {
     display: flex;
-    border: 1px solid;
+    border-width: 1px;
     padding: 5px;
     height: 34px;
     box-sizing: border-box;
@@ -270,41 +270,41 @@
       align-items: start;
       padding-top: 16px;
     }
-  }
 
-  .field {
-    flex-flow: column nowrap;
-    align-items: normal;
-    margin: 0 8px 0 0;
-    label {
-      width: auto;
-      min-width: auto;
-      font-size: 12px;
-      text-align: left;
-    }
-  }
-
-  .orig-data-table {
-    flex-flow: row nowrap;
-  }
-
-  .data-value {
-    flex-flow: column nowrap;
-
-    label {
-      padding: 2px 8px;
-      width: auto;
-      min-width: auto;
+    .field {
+      flex-flow: column nowrap;
+      align-items: normal;
+      margin: 0 8px 0 0;
+      label {
+        width: auto;
+        min-width: auto;
+        font-size: 12px;
+        text-align: left;
+      }
     }
 
-    div {
-      padding: 2px 8px;
-      min-width: auto;
-      text-align: right;
+    .orig-data-table {
+      flex-flow: row nowrap;
     }
 
-    &.comment-value div {
-      text-align: left;
+    .data-value {
+      flex-flow: column nowrap;
+
+      label {
+        padding: 2px 8px;
+        width: auto;
+        min-width: auto;
+      }
+
+      div {
+        padding: 2px 8px;
+        min-width: auto;
+        text-align: right;
+      }
+
+      &.comment-value div {
+        text-align: left;
+      }
     }
   }
 }

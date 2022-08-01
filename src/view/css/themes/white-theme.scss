@@ -332,6 +332,12 @@
     color: #dddddd;
   }
 
+  .import-item select:focus,
+  .import-item input[type="text"]:focus {
+    border-color: #888888;
+    background-color: #f2f2f2;
+  }
+
   .import-item .btn,
   .import-item .btn:visited,
   .import-item .btn:active {
