@@ -149,6 +149,7 @@ export default {
                     'postcss-loader',
                     'sass-loader',
                 ],
+                sideEffects: true,
             },
             {
                 test: /\.(png|svg|jpg|jpeg|gif)$/i,
