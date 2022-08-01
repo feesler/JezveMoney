@@ -27,8 +27,7 @@ abstract class AdminController extends TemplateController
         $this->cssArr = [];
         $this->cssAdmin = [];
         $this->jsArr = [
-            "polyfill/classList.min.js",
-            "polyfill/polyfill.min.js"
+            "polyfill/index.js",
         ];
         $this->jsAdmin = [];
     }
