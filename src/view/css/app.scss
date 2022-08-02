@@ -72,10 +72,6 @@ a:visited {
   color: #0072c6;
 }
 
-a:hover {
-  color: #1e82cc;
-}
-
 svg {
   display: block;
 }
@@ -388,10 +384,6 @@ label {
   background-color: #0072c6;
 }
 
-.submit-btn:hover {
-  background-color: #1e82cc;
-}
-
 .submit-btn:disabled {
   background-color: #5082aa;
   opacity: 0.3;
@@ -406,10 +398,6 @@ label {
   background-color: #b0b0b0;
 }
 
-.acc_controls .cancel-btn:hover {
-  background-color: #c0c0c0;
-}
-
 .warning-btn {
   background-color: #c60000;
 }
@@ -421,12 +409,6 @@ label {
   vertical-align: baseline;
   background: none;
   color: #0072c6;
-}
-
-.link-btn:hover {
-  text-decoration: underline;
-  cursor: pointer;
-  color: #1e82cc;
 }
 
 .link-btn:disabled {
@@ -450,10 +432,6 @@ label {
     border-right: 0 none;
     border-left: 0 none;
     border-bottom: 1px dashed #0072c6;
-  }
-
-  &:hover > span {
-    border-bottom: 1px solid #0072c6;
   }
 }
 
@@ -632,10 +610,6 @@ label {
   background: none;
 }
 
-.msg .close-btn:hover > svg {
-  fill: #ffffff;
-}
-
 /* Custom popup styles */
 .popup__title {
   font-weight: 300;
@@ -679,5 +653,33 @@ label {
 
   .filter-item .trtype-menu {
     flex-flow: row nowrap;
+  }
+}
+
+@media (hover: hover) {
+  a:hover {
+    color: #1e82cc;
+  }
+
+  .submit-btn:hover {
+    background-color: #1e82cc;
+  }
+
+  .acc_controls .cancel-btn:hover {
+    background-color: #c0c0c0;
+  }
+
+  .link-btn:hover {
+    text-decoration: underline;
+    cursor: pointer;
+    color: #1e82cc;
+  }
+
+  .dashed-btn:hover > span {
+    border-bottom: 1px solid #0072c6;
+  }
+
+  .msg .close-btn:hover > svg {
+    fill: #ffffff;
   }
 }

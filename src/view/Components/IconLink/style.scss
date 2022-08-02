@@ -17,14 +17,6 @@
   overflow: hidden;
 }
 
-.iconlink:hover .iconlink__icon {
-  background-color: #000000;
-}
-
-.iconlink:hover .iconlink__icon svg * {
-  fill: #ffffff;
-}
-
 .iconlink__content {
   height: 32px;
   color: #000000;
@@ -61,11 +53,6 @@
   white-space: nowrap;
 }
 
-.iconlink:hover .iconlink__icon,
-.iconlink:hover .iconlink__content {
-  color: #000000;
-}
-
 .iconlink > a {
   height: 32px;
   display: inline-flex;
@@ -87,4 +74,19 @@
 .iconlink[disabled] {
   pointer-events: none;
   opacity: 0.3;
+}
+
+@media (hover: hover) {
+  .iconlink:hover .iconlink__icon {
+    background-color: #000000;
+  }
+
+  .iconlink:hover .iconlink__icon svg * {
+    fill: #ffffff;
+  }
+
+  .iconlink:hover .iconlink__icon,
+  .iconlink:hover .iconlink__content {
+    color: #000000;
+  }
 }

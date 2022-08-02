@@ -12,46 +12,8 @@
   cursor: pointer;
 }
 
-.trtype-menu__item-check {
-  width: 14px;
-  height: 14px;
-  display: inline-block;
-  vertical-align: bottom;
-  border: 1px solid #cccccc;
-  padding: 2px;
-  margin: 0 6px 0 0;
-
-  svg {
-    width: 14px;
-    height: 14px;
-    visibility: hidden;
-  }
-
-  &:hover {
-    background-color: #1e82cc;
-  }
-
-  &:hover svg {
-    visibility: visible;
-    fill: #ffffff;
-  }
-}
-
-.trtype-menu__item .trtype-menu__item-check:hover {
-  background-color: #cccccc;
-}
-
-.trtype-menu__item .trtype-menu__item-check:active {
-  background-color: #1e82cc;
-}
-
 .trtype-menu__item_selected {
   font-weight: bold;
-
-  .trtype-menu__item-check svg {
-    visibility: visible;
-    fill: #5082aa;
-  }
 }
 
 /* Show selected items for multi select menu as normal links */
