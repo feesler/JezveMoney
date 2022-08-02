@@ -38,7 +38,13 @@ $phpPath = "$osPanelPath\modules\php\PHP_7.4"
 4. Copy testsrv.pem and testsrv-key.pem to $osPanelPath/userdata/config/cert_files/testsrv/
 5. Make copy testsrv.pem of as testsrv.crt and open it
 6. Install Certificate > Current User > Trusted Root Certification Authorities > Local Computer
-7. Edit userdata\config\Apache_2.4-PHP_8.0_vhost.conf file:
+7. Create directory for domain: $osPanelPath/domains/testsrv
+8. Create symbolic link www for real domain directory:
+    mklink /D $osPanelPath\domains\testsrv\www <domain directory>
+9. Copy $osPanelPath\userdata\config\Apache_2.4-PHP_8.0_vhost.conf to domain directory
+10. Edit Apache_2.4-PHP_8.0_vhost.conf file:
+    DocumentRoot    "%hostdir%/www"
+
     SSLCertificateFile          "%sprogdir%/userdata/config/cert_files/testsrv/testsrv.pem"
     SSLCertificateKeyFile       "%sprogdir%/userdata/config/cert_files/testsrv/testsrv-key.pem"
 
