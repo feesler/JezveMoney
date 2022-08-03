@@ -1,14 +1,9 @@
 import 'jezvejs/style';
 import {
     ge,
-    ce,
     isDate,
     show,
-    setParam,
-    setEmptyClick,
-    removeEmptyClick,
     urlJoin,
-    px,
     isEmpty,
     formatDate,
     Histogram,
@@ -38,8 +33,6 @@ class StatisticsView extends View {
 
         this.groupTypes = [null, 'day', 'week', 'month', 'year'];
 
-        this.emptyClickHandler = () => this.hideChartPopup();
-
         this.state = {
             selDateRange: null,
             accountCurrency: this.props.accountCurrency,
@@ -56,9 +49,11 @@ class StatisticsView extends View {
         this.histogram = Histogram.create({
             elem: 'chart',
             data: this.state.chartData,
+            height: 320,
+            marginTop: 35,
             autoScale: true,
-            onitemclick: (e, rect) => this.onBarClick(e, rect),
-            onscroll: () => this.onChartsScroll(),
+            showPopup: true,
+            renderPopup: (item) => this.renderPopupContent(item),
             onitemover: (e, bar) => this.onBarOver(e, bar),
             onitemout: (e, bar) => this.onBarOut(e, bar),
         });
@@ -241,73 +236,16 @@ class StatisticsView extends View {
         window.location = this.buildAddress();
     }
 
-    /**
-     * Hide chart popup
-     */
-    hideChartPopup() {
-        if (!this.popup) {
-            return;
+    /** Returns content of chart popup for specified item */
+    renderPopupContent(item) {
+        if (!item) {
+            return null;
         }
 
-        show(this.popup, false);
-        this.popup = null;
-
-        removeEmptyClick(this.emptyClickHandler);
-    }
-
-    /**
-     * Histogram scroll event handler
-     */
-    onChartsScroll() {
-        if (this.popup) {
-            this.hideChartPopup();
-        }
-    }
-
-    /**
-     * Histogram bar click callback
-     * @param {object} barRect - bar rectangle element
-     */
-    onBarClick(e, item) {
-        const chartsWrapper = this.histogram.getWrapObject();
-        const chartContent = this.histogram.getContent();
-        if (!chartsWrapper || !chartContent) {
-            return;
-        }
-
-        if (this.popup) {
-            removeEmptyClick(this.emptyClickHandler);
-        } else {
-            this.popup = ce('div', { className: 'chart_popup' });
-            show(this.popup, false);
-            chartsWrapper.appendChild(this.popup);
-        }
-
-        show(this.popup, true);
-
-        chartsWrapper.style.position = 'relative';
-
-        this.popup.textContent = window.app.model.currency.formatCurrency(
+        return window.app.model.currency.formatCurrency(
             item.value,
             this.state.accountCurrency,
         );
-
-        const rectBBox = item.elem.getBBox();
-        const chartsBRect = chartContent.getBoundingClientRect();
-        let popupX = rectBBox.x - chartContent.scrollLeft
-            + (rectBBox.width - this.popup.offsetWidth) / 2;
-        const popupY = rectBBox.y - this.popup.offsetHeight - 10;
-
-        if (popupX < 0) {
-            popupX = 0;
-        }
-        if (this.popup.offsetWidth + popupX > chartsBRect.width) {
-            popupX -= this.popup.offsetWidth + rectBBox.width + 20;
-        }
-
-        setParam(this.popup.style, { left: px(popupX), top: px(popupY) });
-
-        setEmptyClick(this.emptyClickHandler, [item.elem, this.popup]);
     }
 
     /**
