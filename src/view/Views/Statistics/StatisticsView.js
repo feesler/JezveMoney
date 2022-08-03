@@ -52,6 +52,7 @@ class StatisticsView extends View {
             height: 320,
             marginTop: 35,
             autoScale: true,
+            scrollThrottle: 100,
             showPopup: true,
             renderPopup: (item) => this.renderPopupContent(item),
             onitemover: (e, bar) => this.onBarOver(e, bar),
