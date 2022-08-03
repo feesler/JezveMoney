@@ -3,7 +3,6 @@ import {
     ge,
     ce,
     isDate,
-    isVisible,
     show,
     setParam,
     setEmptyClick,
@@ -269,50 +268,46 @@ class StatisticsView extends View {
      * Histogram bar click callback
      * @param {object} barRect - bar rectangle element
      */
-    onBarClick(e, barRect) {
+    onBarClick(e, item) {
         const chartsWrapper = this.histogram.getWrapObject();
         const chartContent = this.histogram.getContent();
         if (!chartsWrapper || !chartContent) {
             return;
         }
 
-        if (!this.popup) {
+        if (this.popup) {
+            removeEmptyClick(this.emptyClickHandler);
+        } else {
             this.popup = ce('div', { className: 'chart_popup' });
             show(this.popup, false);
             chartsWrapper.appendChild(this.popup);
         }
 
-        if (isVisible(this.popup)) {
-            this.hideChartPopup();
-        } else {
-            show(this.popup, true);
+        show(this.popup, true);
 
-            chartsWrapper.style.position = 'relative';
+        chartsWrapper.style.position = 'relative';
 
-            this.popup.textContent = window.app.model.currency.formatCurrency(
-                barRect.value,
-                this.state.accountCurrency,
-            );
+        this.popup.textContent = window.app.model.currency.formatCurrency(
+            item.value,
+            this.state.accountCurrency,
+        );
 
-            const rectBBox = barRect.elem.getBBox();
-            const chartsBRect = chartContent.getBoundingClientRect();
-            let popupX = rectBBox.x - chartContent.scrollLeft
-                + (rectBBox.width - this.popup.offsetWidth) / 2;
-            const popupY = rectBBox.y - this.popup.offsetHeight - 10;
+        const rectBBox = item.elem.getBBox();
+        const chartsBRect = chartContent.getBoundingClientRect();
+        let popupX = rectBBox.x - chartContent.scrollLeft
+            + (rectBBox.width - this.popup.offsetWidth) / 2;
+        const popupY = rectBBox.y - this.popup.offsetHeight - 10;
 
-            if (popupX < 0) {
-                popupX = 0;
-            }
-            if (this.popup.offsetWidth + popupX > chartsBRect.width) {
-                popupX -= this.popup.offsetWidth + rectBBox.width + 20;
-            }
-
-            setParam(this.popup.style, { left: px(popupX), top: px(popupY) });
-
-            setTimeout(
-                () => setEmptyClick(this.emptyClickHandler, [barRect.elem, this.popup]),
-            );
+        if (popupX < 0) {
+            popupX = 0;
         }
+        if (this.popup.offsetWidth + popupX > chartsBRect.width) {
+            popupX -= this.popup.offsetWidth + rectBBox.width + 20;
+        }
+
+        setParam(this.popup.style, { left: px(popupX), top: px(popupY) });
+
+        setEmptyClick(this.emptyClickHandler, [item.elem, this.popup]);
     }
 
     /**
