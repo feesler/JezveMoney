@@ -6,10 +6,16 @@ use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
 use JezveMoney\Core\CachedInstance;
-
 use function JezveMoney\Core\inSetCondition;
 use function JezveMoney\Core\orJoin;
 use function JezveMoney\Core\qnull;
+
+const NO_GROUP = 0;
+const GROUP_BY_DAY = 1;
+const GROUP_BY_WEEK = 2;
+const GROUP_BY_MONTH = 3;
+const GROUP_BY_YEAR = 4;
+
 
 class TransactionModel extends CachedTable
 {
@@ -1566,6 +1572,24 @@ class TransactionModel extends CachedTable
     }
 
 
+    protected function getLabel($time, $groupType)
+    {
+        if ($groupType == NO_GROUP || $groupType == GROUP_BY_DAY || $groupType == GROUP_BY_WEEK) {
+            return date("d.m.Y", $time);
+        }
+
+        if ($groupType == GROUP_BY_MONTH) {
+            return date("m.Y", $time);
+        }
+
+        if ($groupType == GROUP_BY_YEAR) {
+            return date("Y", $time);
+        }
+
+        return null;
+    }
+
+
     // Return series array of amounts and date of transactions for statistics histogram
     public function getHistogramSeries($byCurrency, $curr_acc_id, $trans_type, $group_type = 0, $limit = 0)
     {
@@ -1619,7 +1643,7 @@ class TransactionModel extends CachedTable
             $dateInfo = getdate($trans_time);
             $itemsInGroup++;
 
-            if ($group_type == 0) {        // no grouping
+            if ($group_type == NO_GROUP) {
                 if ($trans_type == EXPENSE) {
                     $amountArr[] = $item->src_amount;
                 } else {
@@ -1631,13 +1655,13 @@ class TransactionModel extends CachedTable
                     $itemsInGroup = 0;
                 }
                 $prevDate = $dateInfo["mday"];
-            } elseif ($group_type == 1) {    // group by day
+            } elseif ($group_type == GROUP_BY_DAY) {
                 $curDate = $dateInfo["mday"];
-            } elseif ($group_type == 2) {    // group by week
+            } elseif ($group_type == GROUP_BY_WEEK) {
                 $curDate = intval(date("W", $trans_time));
-            } elseif ($group_type == 3) {    // group by month
+            } elseif ($group_type == GROUP_BY_MONTH) {
                 $curDate = $dateInfo["mon"];
-            } elseif ($group_type == 4) {    // group by year
+            } elseif ($group_type == GROUP_BY_YEAR) {
                 $curDate = $dateInfo["year"];
             }
 
@@ -1647,7 +1671,9 @@ class TransactionModel extends CachedTable
                 $sumDate = $curDate;
                 $amountArr[] = $curSum;
                 $curSum = 0.0;
-                $groupArr[] = [date("d.m.Y", $trans_time), 1];
+
+                $label = $this->getLabel($trans_time, $group_type);
+                $groupArr[] = [$label, 1];
             }
 
             if ($trans_type == EXPENSE) {
@@ -1661,7 +1687,8 @@ class TransactionModel extends CachedTable
         if ($group_type != 0 && $curSum != 0.0) {
             if ($sumDate != null && $sumDate != $curDate) {
                 $amountArr[] = $curSum;
-                $groupArr[] = [date("d.m.Y", $trans_time), 1];
+                $label = $this->getLabel($trans_time, $group_type);
+                $groupArr[] = [$label, 1];
             } else {
                 if (!count($amountArr)) {
                     $amountArr[] = $curSum;
@@ -1670,7 +1697,8 @@ class TransactionModel extends CachedTable
                 }
 
                 if (!count($groupArr)) {
-                    $groupArr[] = [date("d.m.Y", $trans_time), 1];
+                    $label = $this->getLabel($trans_time, $group_type);
+                    $groupArr[] = [$label, 1];
                 } elseif ($group_type == 0) {
                     $groupArr[count($groupArr) - 1][1]++;
                 }
