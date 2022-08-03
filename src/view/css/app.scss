@@ -645,6 +645,11 @@ label {
   padding: 0;
 }
 
+/* Histogram bar item */
+.histogram__bar {
+  --historgam-bar-color: #20a0ff;
+}
+
 /* Desktop */
 @media (min-width: 768px) {
   .content_wrap {
