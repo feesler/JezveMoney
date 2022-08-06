@@ -6,6 +6,7 @@ use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
 use JezveMoney\Core\CachedInstance;
+
 use function JezveMoney\Core\inSetCondition;
 use function JezveMoney\Core\orJoin;
 use function JezveMoney\Core\qnull;
