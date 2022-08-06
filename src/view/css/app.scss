@@ -509,10 +509,6 @@ label {
   border-radius: 3px;
 }
 
-.dd__selection-item:last-child {
-  margin-right: 0.5rem;
-}
-
 .dd__del-selection-item-btn {
   padding-left: 7px;
   font-size: 1.2rem;
@@ -520,7 +516,6 @@ label {
 }
 
 .dd__single-selection {
-  padding: 0;
   font-size: 0.9rem;
   cursor: pointer;
 }
@@ -642,7 +637,12 @@ label {
 
 .filter-item .trtype-menu {
   flex-flow: column nowrap;
+  align-items: baseline;
   padding: 0;
+}
+
+.filter-item .trtype-menu__item {
+  margin-bottom: 6px;
 }
 
 /* Histogram bar item */
