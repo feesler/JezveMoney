@@ -2,6 +2,8 @@ import { isFunction, Component } from 'jezvejs';
 import { IconLink } from '../IconLink/IconLink.js';
 import './style.scss';
 
+const TOOLBAR_ACTIVE_CLASS = 'sidebar_active';
+
 /**
  * Toolbar component
  */
@@ -56,11 +58,19 @@ export class Toolbar extends Component {
         });
     }
 
+    show(value = true) {
+        super.show(value);
+
+        if (!value) {
+            this.elem.classList.remove(TOOLBAR_ACTIVE_CLASS);
+        }
+    }
+
     /**
      * Toolbar 'click' event handler
      */
     onClick() {
-        this.elem.classList.toggle('sidebar_active');
+        this.elem.classList.toggle(TOOLBAR_ACTIVE_CLASS);
     }
 
     /**

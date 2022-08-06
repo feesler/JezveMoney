@@ -34,16 +34,8 @@
       border-color: #ffffff;
     }
 
-    &:hover .iconlink__icon {
-      background-color: #ffffff;
-    }
-
     .iconlink__icon svg * {
       fill: #ffffff;
-    }
-
-    &:hover .iconlink__icon svg * {
-      fill: #404040;
     }
   }
 }
@@ -110,5 +102,17 @@
 
   .sidebar__ellipsis {
     display: none;
+  }
+}
+
+@media (hover: hover) {
+  .sidebar .sidebar__controls .iconlink {
+    &:hover .iconlink__icon {
+      background-color: #ffffff;
+    }
+
+    &:hover .iconlink__icon svg * {
+      fill: #404040;
+    }
   }
 }

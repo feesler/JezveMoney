@@ -6,6 +6,6 @@ export default merge(common, {
     mode: 'production',
     optimization: {
         minimize: true,
-        minimizer: [new CssMinimizerPlugin()],
+        minimizer: [new CssMinimizerPlugin(), '...'],
     },
 });

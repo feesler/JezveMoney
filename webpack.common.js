@@ -7,6 +7,11 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 export default {
     target: 'browserslist',
     entry: {
+        polyfills: {
+            import: './src/view/js/polyfill/index.js',
+            filename: 'view/js/polyfill/index.js',
+        },
+
         MainView: {
             import: './src/view/Views/Main/MainView.js',
             filename: 'view/js/[name].js',
@@ -144,6 +149,7 @@ export default {
                     'postcss-loader',
                     'sass-loader',
                 ],
+                sideEffects: true,
             },
             {
                 test: /\.(png|svg|jpg|jpeg|gif)$/i,

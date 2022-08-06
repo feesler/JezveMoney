@@ -510,6 +510,16 @@ export const api = {
 
             return true;
         },
+
+        async statistics(options = {}) {
+            const apiReq = `transaction/statistics?${urlJoin(options)}`;
+            const jsonRes = await apiGet(apiReq);
+            if (!jsonRes || jsonRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to obtain statistics data');
+            }
+
+            return jsonRes.data;
+        },
     },
 
     importrule: {

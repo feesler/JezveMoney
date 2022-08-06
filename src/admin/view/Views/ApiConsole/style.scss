@@ -14,7 +14,7 @@ h3 {
 
 .api-console {
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: column nowrap;
   justify-content: space-between;
   align-items: flex-start;
   justify-items: flex-start;
@@ -33,7 +33,9 @@ h3 {
   flex-flow: column nowrap;
   padding: 6px;
   flex: 1 1 auto;
-  min-width: 350px;
+  width: 100%;
+  min-width: 300px;
+  box-sizing: border-box;
 }
 
 /* Left menus */
@@ -77,10 +79,6 @@ h3 {
   font-style: italic;
 }
 
-.menu-list .sub-menu-list > li:hover {
-  text-decoration: underline;
-}
-
 /* View containers */
 .request-data-form {
   max-width: 400px;
@@ -115,78 +113,66 @@ h3 {
   margin: 5px 0;
   border: 1px solid;
   border-radius: 2px;
-}
 
-.request-item .request-container,
-.request-item .response-container {
-  margin: 5px 0;
-}
+  .request-container,
+  .response-container {
+    margin: 5px 0;
+  }
 
-/* Request */
-.request-item .request-container .title,
-.request-item .response-container .title {
-  font-size: 14px;
-  font-weight: bold;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: #ffffff;
-  background-color: #66a1f0;
-  cursor: pointer;
-  height: 25px;
-  line-height: 25px;
-}
+  /* Request */
+  .request-container .title,
+  .response-container .title {
+    font-size: 14px;
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #ffffff;
+    background-color: #66a1f0;
+    cursor: pointer;
+    height: 25px;
+    line-height: 25px;
+  }
 
-.request-item .request-container .title::before,
-.request-item .response-container .title::before {
-  content: "-";
-  padding: 0 10px;
-  display: inline-block;
-  width: 0.5rem;
-  text-align: center;
-}
+  .request-container .title::before,
+  .response-container .title::before {
+    content: "-";
+    padding: 0 10px;
+    display: inline-block;
+    width: 0.5rem;
+    text-align: center;
+  }
 
-.request-item .request-container .title:hover::before {
-  background-color: #95c3ff;
-}
+  .request-container.collapsed .title::before,
+  .response-container.collapsed .title::before {
+    content: "+";
+  }
 
-.request-item .request-container.collapsed .title::before,
-.request-item .response-container.collapsed .title::before {
-  content: "+";
-}
+  .request-container .request-details,
+  .response-container .response-details {
+    word-break: break-all;
+    font-size: 14px;
+    padding: 0 5px;
+  }
 
-.request-item .request-container .request-details,
-.request-item .response-container .response-details {
-  word-break: break-all;
-  font-size: 14px;
-  padding: 0 5px;
-}
+  .request-container.collapsed .request-details,
+  .response-container.collapsed .response-details {
+    display: none;
+  }
 
-.request-item .request-container.collapsed .request-details,
-.request-item .response-container.collapsed .response-details {
-  display: none;
-}
+  /* Result */
+  .response-container.response-container_pending {
+    background: none;
+    border: 1px dashed;
+  }
 
-/* Result */
-.request-item .response-container.response-container_pending {
-  background: none;
-  border: 1px dashed;
-}
+  .response-container.ok-result .title {
+    background-color: #65d458;
+  }
 
-.request-item .response-container.ok-result .title {
-  background-color: #65d458;
-}
-
-.request-item .response-container.fail-result .title {
-  background-color: #ff6666;
-}
-
-.request-item .response-container.ok-result .title:hover::before {
-  background-color: #59b74e;
-}
-
-.request-item .response-container.fail-result .title:hover::before {
-  background-color: #ff8a8a;
+  .response-container.fail-result .title {
+    background-color: #ff6666;
+  }
 }
 
 /* Requests log */
@@ -203,4 +189,31 @@ h3 {
 .request-log input[type="button"] {
   display: inline-flex;
   margin-left: auto;
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .api-console {
+    flex-flow: row nowrap;
+  }
+}
+
+@media (hover: hover) {
+  .menu-list .sub-menu-list > li:hover {
+    text-decoration: underline;
+  }
+
+  .request-item {
+    .request-container .title:hover::before {
+      background-color: #95c3ff;
+    }
+
+    .response-container.ok-result .title:hover::before {
+      background-color: #59b74e;
+    }
+
+    .response-container.fail-result .title:hover::before {
+      background-color: #ff8a8a;
+    }
+  }
 }

@@ -876,6 +876,23 @@ const apiFilterTransactions = async () => {
     return App.scenario.runner.runGroup(TransactionApiTests.filter, data);
 };
 
+const apiStatistics = async () => {
+    setBlock('Statistics', 2);
+
+    const { RUB } = App.scenario;
+
+    const data = [
+        {},
+        { filter: 'account', acc_id: App.scenario.ACC_RUB },
+        { filter: 'account', acc_id: App.scenario.ACC_RUB, type: 'income' },
+        { filter: 'currency', curr_id: RUB },
+        { filter: 'currency', curr_id: RUB, group: 'day' },
+        { filter: 'currency', curr_id: RUB, group: 'week' },
+    ];
+
+    return App.scenario.runner.runGroup(TransactionApiTests.statistics, data);
+};
+
 const apiCreateImportTemplateTests = async () => {
     setBlock('Create import template', 2);
 
@@ -1376,6 +1393,7 @@ export const apiTests = {
         await apiImportRuleTests();
 
         await apiFilterTransactions();
+        await apiStatistics();
 
         await apiUpdateAccounts();
         await apiDeleteAccounts();

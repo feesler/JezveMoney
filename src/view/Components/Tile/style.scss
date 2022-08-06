@@ -9,10 +9,6 @@
   cursor: pointer;
 }
 
-.tile:hover {
-  background-color: #1e82cc;
-}
-
 .tiles .tile {
   margin: 0 10px 10px 0;
 }
@@ -72,4 +68,10 @@
 .tile__icon {
   top: 23px;
   left: 20px;
+}
+
+@media (hover: hover) {
+  .tile:hover {
+    background-color: #1e82cc;
+  }
 }

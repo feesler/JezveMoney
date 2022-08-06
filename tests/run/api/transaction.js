@@ -260,3 +260,17 @@ export const filter = async (params) => {
         return assert.deepMeet(trList.items, expTransList.data);
     });
 };
+
+// Request statistics data
+export const statistics = async (params) => {
+    await test(`Statistics (${formatProps(params)})`, async () => {
+        const histogram = App.state.transactions.getStatistics(params);
+        const expected = { histogram };
+
+        // Send API sequest to server
+        const data = await api.transaction.statistics(params);
+        assert(data, 'Fail to obtain statistics data');
+
+        return assert.deepMeet(data, expected);
+    });
+};

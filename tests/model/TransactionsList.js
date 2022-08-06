@@ -1,5 +1,5 @@
-import { copyObject, assert } from 'jezve-test';
-import { convDate, fixDate } from '../common.js';
+import { copyObject, assert, formatDate } from 'jezve-test';
+import { convDate, fixDate, getWeek } from '../common.js';
 import { App } from '../Application.js';
 import { api } from './api.js';
 import { List } from './List.js';
@@ -488,5 +488,166 @@ export class TransactionsList extends List {
         const res = this.onDeleteAccounts(this.data, accList, ids);
 
         return new TransactionsList(res);
+    }
+
+    getStatisticsLabel(date, groupType) {
+        if (groupType === 'none' || groupType === 'day' || groupType === 'week') {
+            return formatDate(date);
+        }
+
+        if (groupType === 'month') {
+            const month = date.getMonth() + 1;
+            const monthStr = (month < 10) ? `0${month}` : month;
+            const yearStr = date.getFullYear();
+
+            return `${monthStr}.${yearStr}`;
+        }
+
+        if (groupType === 'year') {
+            return date.getFullYear().toString();
+        }
+
+        return null;
+    }
+
+    getStatistics(params) {
+        let amountArr = [];
+        let groupArr = [];
+        let sumDate = null;
+        let curDate = null;
+        let prevDate = null;
+        let curSum = 0;
+        let itemsInGroup = 0;
+        let transDate = null;
+        let currId = params.curr_id;
+        let accId = params.acc_id;
+
+        const byCurrency = params.filter === 'currency';
+        if (byCurrency) {
+            if (!currId) {
+                const curr = App.currency.getItemByIndex(0);
+                currId = curr?.id;
+            }
+            if (!currId) {
+                return null;
+            }
+        } else {
+            if (!accId) {
+                const [accountId] = App.state.getAccountsByIndexes(0);
+                accId = accountId;
+            }
+            if (!accId) {
+                return null;
+            }
+        }
+
+        const transType = params.type ?? EXPENSE;
+        if (!transType) {
+            return null;
+        }
+        const groupType = params.group ?? 'none';
+        const limit = params.limit ?? 0;
+
+        const list = this.sortAsc();
+        list.forEach((item) => {
+            if (item.type !== transType) {
+                return;
+            }
+
+            if (byCurrency) {
+                const transCurr = (transType === EXPENSE) ? item.src_curr : item.dest_curr;
+                if (transCurr !== currId) {
+                    return;
+                }
+            } else {
+                const transAcc = (transType === EXPENSE) ? item.src_id : item.dest_id;
+                if (transAcc !== accId) {
+                    return;
+                }
+            }
+
+            const time = convDate(item.date);
+            transDate = new Date(time);
+            itemsInGroup += 1;
+
+            if (groupType === 'none') {
+                if (transType === EXPENSE) {
+                    amountArr.push(item.src_amount);
+                } else {
+                    amountArr.push(item.dest_amount);
+                }
+
+                if (prevDate == null || prevDate !== transDate.getDate()) {
+                    groupArr.push([formatDate(transDate), itemsInGroup]);
+                    itemsInGroup = 0;
+                }
+                prevDate = transDate.getDate();
+            } else if (groupType === 'day') {
+                curDate = transDate.getDate();
+            } else if (groupType === 'week') {
+                curDate = getWeek(time);
+            } else if (groupType === 'month') {
+                curDate = transDate.getMonth();
+            } else if (groupType === 'year') {
+                curDate = transDate.getFullYear();
+            }
+
+            if (sumDate == null) {
+                sumDate = curDate;
+            } else if (sumDate != null && sumDate !== curDate) {
+                sumDate = curDate;
+                amountArr.push(curSum);
+                curSum = 0;
+                const label = this.getStatisticsLabel(transDate, groupType);
+                groupArr.push([label, 1]);
+            }
+
+            if (transType === EXPENSE) {
+                curSum += item.src_amount;
+            } else {
+                curSum += item.dest_amount;
+            }
+        });
+
+        // save remain value
+        if (groupType !== 'none') {
+            if (sumDate != null && sumDate !== curDate) {
+                amountArr.push(curSum);
+                const label = this.getStatisticsLabel(transDate, groupType);
+                groupArr.push([label, 1]);
+            } else {
+                if (amountArr.length === 0) {
+                    amountArr.push(curSum);
+                } else {
+                    amountArr[amountArr.length - 1] += curSum;
+                }
+
+                if (groupArr.length === 0) {
+                    const label = this.getStatisticsLabel(transDate, groupType);
+                    groupArr.push([label, 1]);
+                }
+            }
+        }
+
+        if (limit > 0) {
+            const limitCount = Math.min(amountArr.length, limit);
+            amountArr = amountArr.slice(-limitCount);
+
+            let newGroupsCount = 0;
+            let groupLimit = 0;
+            let i = groupArr.length - 1;
+            while (i >= 0 && groupLimit < limitCount) {
+                groupLimit += groupArr[i][1];
+                newGroupsCount += 1;
+                i -= 1;
+            }
+
+            groupArr = groupArr.slice(-newGroupsCount);
+        }
+
+        return {
+            values: amountArr,
+            series: groupArr,
+        };
     }
 }

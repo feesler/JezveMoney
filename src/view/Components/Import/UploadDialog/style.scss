@@ -61,10 +61,6 @@
   background-color: #5082aa;
 }
 
-.upload-form__file:hover .browse-btn {
-  background-color: #1e82cc;
-}
-
 .upload-form__filename {
   font-size: 14px;
   color: #7b7b7b;
@@ -104,5 +100,11 @@
 
   .upload-form__options {
     margin: 0;
+  }
+}
+
+@media (hover: hover) {
+  .upload-form__file:hover .browse-btn {
+    background-color: #1e82cc;
   }
 }
