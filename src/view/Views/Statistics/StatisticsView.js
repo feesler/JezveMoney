@@ -51,6 +51,7 @@ class StatisticsView extends View {
             data: this.state.chartData,
             height: 320,
             marginTop: 35,
+            scrollToEnd: true,
             autoScale: true,
             scrollThrottle: 100,
             showPopup: true,
