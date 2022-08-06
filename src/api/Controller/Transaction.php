@@ -4,6 +4,8 @@ namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiController;
 use JezveMoney\Core\Message;
+use JezveMoney\App\Model\AccountModel;
+use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Item\TransactionItem;
 
@@ -247,5 +249,86 @@ class Transaction extends ApiController
         }
 
         $this->ok();
+    }
+
+
+    public function statistics()
+    {
+        $currModel = CurrencyModel::getInstance();
+        $accModel = AccountModel::getInstance();
+        $res = new \stdClass();
+        $filterObj = new \stdClass();
+
+        // Filter type
+        $byCurrency = (isset($_GET["filter"]) && $_GET["filter"] == "currency");
+        $filterObj->filter = $byCurrency ? "currency" : "account";
+
+        // Transaction type
+        $trans_type = EXPENSE;
+        if (isset($_GET["type"])) {
+            $trans_type = TransactionModel::stringToType($_GET["type"]);
+            if (!$trans_type) {
+                throw new \Error("Invalid transaction type");
+            }
+        }
+        if ($trans_type) {
+            $filterObj->type = TransactionModel::typeToString($trans_type);
+        }
+
+        // Currency or account
+        if ($byCurrency) {
+            if (isset($_GET["curr_id"]) && is_numeric($_GET["curr_id"])) {
+                $curr_id = intval($_GET["curr_id"]);
+                if (!$currModel->isExist($curr_id)) {
+                    throw new \Error("Currency not found");
+                }
+            } else { // try to get first currency
+                $curr_id = $currModel->getIdByPos(0);
+                if (!$curr_id) {
+                    throw new \Error("No currencies available");
+                }
+            }
+            $filterObj->curr_id = $curr_id;
+        } else {
+            if (isset($_GET["acc_id"]) && is_numeric($_GET["acc_id"])) {
+                $acc_id = intval($_GET["acc_id"]);
+                if (!$accModel->isExist($acc_id)) {
+                    throw new \Error("Account not found");
+                }
+            } else { // try to get first account of user
+                $acc_id = $accModel->getIdByPos(0);
+                if (!$acc_id) {
+                    throw new \Error("No accounts available");
+                }
+            }
+            $filterObj->acc_id = $acc_id;
+        }
+
+        // Group type
+        $groupTypes = ["None", "Day", "Week", "Month", "Year"];
+        $groupType_id = 0;
+        if (isset($_GET["group"])) {
+            $requestedGroup = strtolower($_GET["group"]);
+            foreach ($groupTypes as $index => $grtype) {
+                if ($requestedGroup == strtolower($grtype)) {
+                    $groupType_id = $index;
+                    break;
+                }
+            }
+            if ($index != 0) {
+                $filterObj->group = $requestedGroup;
+            }
+        }
+
+        $res->histogram = $this->model->getHistogramSeries(
+            $byCurrency,
+            ($byCurrency ? $filterObj->curr_id : $filterObj->acc_id),
+            $trans_type,
+            $groupType_id
+        );
+
+        $res->filter = $filterObj;
+
+        $this->ok($res);
     }
 }

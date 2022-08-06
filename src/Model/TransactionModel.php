@@ -1619,24 +1619,14 @@ class TransactionModel extends CachedTable
             }
 
             if ($byCurrency) {
-                if ($trans_type == EXPENSE) {
-                    if ($item->src_curr != $curr_acc_id) {
-                        continue;
-                    }
-                } else {
-                    if ($item->dest_curr != $curr_acc_id) {
-                        continue;
-                    }
+                $transCurr = ($trans_type == EXPENSE) ? $item->src_curr : $item->dest_curr;
+                if ($transCurr != $curr_acc_id) {
+                    continue;
                 }
             } else {
-                if ($trans_type == EXPENSE) {
-                    if ($item->src_id != $curr_acc_id) {
-                        continue;
-                    }
-                } else {
-                    if ($item->dest_id != $curr_acc_id) {
-                        continue;
-                    }
+                $transAcc = ($trans_type == EXPENSE) ? $item->src_id : $item->dest_id;
+                if ($transAcc != $curr_acc_id) {
+                    continue;
                 }
             }
 
