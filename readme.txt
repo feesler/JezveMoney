@@ -77,6 +77,13 @@ $phpPath = "$osPanelPath\modules\php\PHP_7.4"
     npm run update-composer
 
 - Phan
+- Install php-ast extension
+1. Download latest release from https://windows.php.net/downloads/pecl/releases/ast/
+2. Copy php_ast.dll to $osPanelPath/modules/php/PHP_8.0/ext
+3. Add to $osPanelPath/userdata/config/PHP_8.0_php.ini fololowing line:
+extension=php_ast.dll
+4. Restart server
+
 Run from app root:
 .\dev-tools\vendor\bin\phan
 
