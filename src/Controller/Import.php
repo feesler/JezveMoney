@@ -62,7 +62,7 @@ class Import extends TemplateController
         $this->cssArr[] = "ImportView.css";
         $this->jsArr[] = "ImportView.js";
 
-        $data["titleString"] = "Jezve Money | Import transactions";
+        $data["titleString"] = "Jezve Money | Import";
 
         $this->render($data);
     }

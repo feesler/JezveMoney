@@ -430,12 +430,6 @@ class TransactionView extends View {
         if (state.isUpdate && transaction.type !== this.props.requestedType) {
             this.onChangeType(this.props.requestedType);
         }
-
-        if (transaction.type === EXPENSE && state.id === 0) {
-            this.destAmountInput.elem.focus();
-        } else {
-            this.srcAmountInput.elem.focus();
-        }
     }
 
     /** Initialize acconts DropDown */

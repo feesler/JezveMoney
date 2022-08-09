@@ -13,52 +13,38 @@ export const run = async () => {
     await App.view.navigateToStatistics();
 
     // Expense transactions filter
-    const expected = { chart: { bars: { length: 3 } } };
-    await test('Expense statistics view', () => App.view.checkState(expected));
+    await test('Expense statistics view', () => {
+        const expected = App.view.getExpectedState();
+        return App.view.checkState(expected);
+    });
 
     // Income transactions filter
-    await App.view.filterByType(INCOME);
-
-    expected.chart.bars.length = 5;
-    await test('Income statistics view', () => App.view.checkState(expected));
+    await test('Income statistics view', () => App.view.filterByType(INCOME));
 
     // Transfer transactions filter
-    await App.view.filterByType(TRANSFER);
-
-    expected.chart.bars.length = 0;
-    await test('Transfer statistics view', () => App.view.checkState(expected));
+    await test('Transfer statistics view', () => App.view.filterByType(TRANSFER));
 
     // Debt transactions filter
-    await App.view.filterByType(DEBT);
-
-    expected.chart.bars.length = 0;
-    await test('Debt statistics view', () => App.view.checkState(expected));
+    await test('Debt statistics view', () => App.view.filterByType(DEBT));
 
     // Filter by accounts
-    await App.view.filterByType(EXPENSE);
-    await App.view.selectAccountByPos(2);
-
-    expected.chart.bars.length = 10;
-    await test('Filter statistics by account', () => App.view.checkState(expected));
+    await test('Filter statistics by account', async () => {
+        await App.view.filterByType(EXPENSE);
+        return App.view.selectAccountByPos(2);
+    });
 
     // Test grouping
-    await App.view.filterByType(DEBT);
-    await App.view.groupByDay();
-    expected.chart.bars.length = 3;
-    await test('Group statistics by day', () => App.view.checkState(expected));
+    await test('Group statistics by day', async () => {
+        await App.view.filterByType(DEBT);
+        return App.view.groupByDay();
+    });
 
-    await App.view.groupByWeek();
-    await test('Group statistics by week', () => App.view.checkState(expected));
-
-    await App.view.groupByMonth();
-    expected.chart.bars.length = 2;
-    await test('Group statistics by month', () => App.view.checkState(expected));
-
-    await App.view.groupByYear();
-    expected.chart.bars.length = 1;
-    await test('Group statistics by year', () => App.view.checkState(expected));
+    await test('Group statistics by week', () => App.view.groupByWeek());
+    await test('Group statistics by month', () => App.view.groupByMonth());
+    await test('Group statistics by year', () => App.view.groupByYear());
 
     // Filter by currencies
-    await App.view.byCurrencies();
-    await test('Filter by currencies', () => App.view.checkState(expected));
+    await test('Filter by currencies', () => App.view.byCurrencies());
+    // Change transaction type when currencies filter is selected
+    await test('Change transaction type ', () => App.view.filterByType(EXPENSE));
 };

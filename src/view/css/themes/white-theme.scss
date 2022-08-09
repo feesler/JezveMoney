@@ -3,6 +3,11 @@
   --main-bg-color: #ffffff;
   --alt-bg-color: #f0f0f0;
 
+  /* Inputs */
+  --input-bg-color: #f2f2f2;
+  --input-border-color: #b0b0b0;
+  --active-input-border-color: #888888;
+
   color: var(--main-text-color);
   background-color: var(--main-bg-color);
 
@@ -69,7 +74,7 @@
   }
 
   .widget_title .glyph svg * {
-    fill: #000000;
+    fill: var(--main-text-color);
   }
 
   /* Transaction type menu */
@@ -80,12 +85,12 @@
   /* Input control */
   .stretch-input {
     color: var(--main-text-color);
-    border-color: #b0b0b0;
-    background-color: #f2f2f2;
+    border-color: var(--input-border-color);
+    background-color: var(--input-bg-color);
   }
 
   .stretch-input:focus {
-    border-color: #888888;
+    border-color: var(--active-input-border-color);
   }
 
   /* Input group */
@@ -106,19 +111,26 @@
   }
 
   .input-group .stretch-input:focus + .clear-input-btn {
-    border-color: #888888;
+    border-color: var(--active-input-border-color);
+  }
+
+  /* Checkbox */
+  .checkbox {
+    --checkbox-text: var(--main-text-color);
+    --checkbox-bg: var(--input-bg-color);
+    --checkbox-border: var(--input-border-color);
   }
 
   /* DropDown  */
   .dd__container,
   .dd__container_attached {
-    --dd-bg-color: #f2f2f2;
-    --dd-selection-text: #000000;
-    --dd-border-color: #b0b0b0;
+    --dd-bg-color: var(--input-bg-color);
+    --dd-selection-text: var(--main-text-color);
+    --dd-border-color: var(--input-border-color);
 
     /* Active component */
     --dd-active-bg: #f2f2f2;
-    --dd-active-border: #888888;
+    --dd-active-border: var(--active-input-border-color);
 
     /* Clear and toggle buttons */
     --dd-btn-fill: #888888;
@@ -134,12 +146,12 @@
     --dd-disabled-selection-item-bg: #dfdfdf;
 
     /* List item */
-    --dd-list-item-text: #000000;
+    --dd-list-item-text: var(--main-text-color);
     --dd-list-item-bg: #f2f2f2;
-    --dd-list-item-check: #000000;
+    --dd-list-item-check: var(--main-text-color);
 
     /* List group */
-    --dd-list-group-text: #000000;
+    --dd-list-group-text: var(--main-text-color);
     --dd-list-group-bg: #f2f2f2;
   }
 
@@ -147,7 +159,7 @@
   .dp__container {
     --dp-bg-color: #ffffff;
     --dp-border-color: #888888;
-    --dp-text-color: #000000;
+    --dp-text-color: var(--main-text-color);
     --dp-other-text-color: #b0b0b0;
     --dp-active-color: #20d0ff;
     --dp-today-color: #00bef3;
@@ -281,7 +293,7 @@
 
   .import-item select,
   .import-item input[type="text"] {
-    border-color: #b0b0b0;
+    border-color: var(--input-border-color);
   }
 
   .import-item select[disabled],
@@ -337,6 +349,10 @@
   }
 
   /* Upload dialog */
+  .upload-form__descr {
+    color: #4e4e4e;
+  }
+
   .upload-form__browser.drag-over {
     outline-color: #202020;
   }

@@ -16,12 +16,6 @@
   outline: 2px dashed;
 }
 
-.upload-form__header {
-  font-size: 18px;
-  font-weight: 400;
-  margin: 6px 0;
-}
-
 .upload-form__inner {
   display: flex;
   flex-flow: column nowrap;
@@ -31,6 +25,7 @@
 .upload-form__file {
   position: relative;
   height: 30px;
+  margin: 0;
   text-align: center;
 
   > input[type="file"] {
@@ -61,6 +56,10 @@
   background-color: #5082aa;
 }
 
+.upload-form__descr {
+  font-size: 14px;
+}
+
 .upload-form__filename {
   font-size: 14px;
   color: #7b7b7b;
@@ -76,19 +75,19 @@
 .upload-form__collapsed {
   align-items: normal;
 
-  .upload-form__header {
-    font-size: 24px;
-    font-weight: 100;
-  }
-
   .upload-form {
     flex-flow: row nowrap;
     overflow: hidden;
-    align-items: baseline;
+    align-items: center;
+    margin-bottom: 8px;
   }
 
   .upload-form__inner {
     flex-flow: row wrap;
+  }
+
+  .upload-form__descr {
+    display: none;
   }
 
   .upload-form__filename {
