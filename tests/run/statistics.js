@@ -45,4 +45,6 @@ export const run = async () => {
 
     // Filter by currencies
     await test('Filter by currencies', () => App.view.byCurrencies());
+    // Change transaction type when currencies filter is selected
+    await test('Change transaction type ', () => App.view.filterByType(EXPENSE));
 };

@@ -24,7 +24,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
 <?php		} else {		?>
                             <span class="trtype-menu__item" data-type="<?=e($menuItem->type)?>">
                                 <span class="trtype-menu_item_title">
-                                    <a href="<?=e($menuItem->link)?>"><?=e($menuItem->title)?></a>
+                                    <a href="<?=e($menuItem->url)?>"><?=e($menuItem->title)?></a>
                                 </span>
                             </span>
 <?php		}

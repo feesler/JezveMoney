@@ -71,37 +71,6 @@ class Statistics extends TemplateController
         $data["acc_id"] = $acc_id;
         $data["curr_id"] = $curr_id;
 
-        // Prepare transaction types menu
-        $trTypes = TransactionModel::getTypeNames();
-
-        $params = [];
-        if ($byCurrency) {
-            if ($curr_id) {
-                $params["curr_id"] = $curr_id;
-            }
-        } else {
-            if ($acc_id) {
-                $params["acc_id"] = $acc_id;
-            }
-        }
-
-        $transMenu = [];
-        $baseUrl = BASEURL . "statistics/";
-        foreach ($trTypes as $type_id => $trTypeName) {
-            if ($type_id) {
-                $params["type"] = strtolower($trTypeName);
-            }
-
-            $menuItem = new \stdClass();
-            $menuItem->type = $type_id;
-            $menuItem->title = $trTypeName;
-            $menuItem->selected = ($menuItem->type == $trans_type);
-            $menuItem->link = urlJoin($baseUrl, $params);
-
-            $transMenu[] = $menuItem;
-        }
-        $data["transMenu"] = $transMenu;
-
         $data["byCurrArr"] = [
             ["title" => "Accounts", "selected" => ($byCurrency == false)],
             ["title" => "Currencies", "selected" => ($byCurrency == true)]
@@ -143,6 +112,42 @@ class Statistics extends TemplateController
             }
         }
         $data["groupType_id"] = $groupType_id;
+
+        // Prepare transaction types menu
+        $trTypes = TransactionModel::getTypeNames();
+
+        $params = [];
+        if ($byCurrency) {
+            $params["filter"] = "currency";
+            if ($curr_id) {
+                $params["curr_id"] = $curr_id;
+            }
+        } else {
+            if ($acc_id) {
+                $params["acc_id"] = $acc_id;
+            }
+        }
+        if ($groupType_id) {
+            $params["group"] = $filterObj->group;
+        }
+
+        $transMenu = [];
+        $baseUrl = BASEURL . "statistics/";
+        foreach ($trTypes as $type_id => $trTypeName) {
+            $urlParams = $params;
+            if ($type_id) {
+                $urlParams["type"] = strtolower($trTypeName);
+            }
+
+            $menuItem = new \stdClass();
+            $menuItem->type = $type_id;
+            $menuItem->title = $trTypeName;
+            $menuItem->selected = ($menuItem->type == $trans_type);
+            $menuItem->url = urlJoin($baseUrl, $urlParams);
+
+            $transMenu[] = $menuItem;
+        }
+        $data["transMenu"] = $transMenu;
 
         $data["accArr"] = $accMod->getData();
         $data["currArr"] = $currMod->getData();
