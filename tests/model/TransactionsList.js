@@ -610,7 +610,7 @@ export class TransactionsList extends List {
         });
 
         // save remain value
-        if (groupType !== 'none') {
+        if (groupType !== 'none' && list.length > 0) {
             if (sumDate != null && sumDate !== curDate) {
                 amountArr.push(curSum);
                 const label = this.getStatisticsLabel(transDate, groupType);

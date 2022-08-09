@@ -24,6 +24,56 @@ export class AccountView extends AppView {
         this.nameTyped = false;
     }
 
+    async parseContent() {
+        const res = {};
+
+        res.heading = { elem: await query('.heading > h1') };
+        assert(res.heading.elem, 'Heading element not found');
+        res.heading.text = await prop(res.heading.elem, 'textContent');
+        res.delBtn = await IconLink.create(this, await query('#del_btn'));
+        res.tile = await Tile.create(this, await query('#acc_tile'));
+
+        res.formElem = await query('form');
+        assert(res.formElem, 'Form element not found');
+
+        const hiddenEl = await query('#accid');
+        res.isUpdate = (!!hiddenEl);
+        if (res.isUpdate) {
+            res.id = parseInt(await prop(hiddenEl, 'value'), 10);
+            assert(res.id, 'Wrong account id');
+        }
+
+        let curChildren = (res.isUpdate) ? 3 : 2;
+
+        res.iconDropDown = await DropDown.createFromChild(this, await query('#icon'));
+
+        curChildren += 1;
+        let elem = await query(`form > *:nth-child(${curChildren})`);
+        res.name = await InputRow.create(this, elem);
+        assert(res.name, 'Account name input not found');
+
+        curChildren += 1;
+        res.currDropDown = await DropDown.createFromChild(this, await query('#currency'));
+
+        curChildren += 1;
+        elem = await query(`form > *:nth-child(${curChildren})`);
+
+        res.balance = await InputRow.create(this, elem);
+
+        res.flagsInp = await query('#flags');
+        res.flags = parseInt(await prop(res.flagsInp, 'value'), 10);
+
+        res.submitBtn = await query('.acc_controls .submit-btn');
+        assert(res.submitBtn, 'Submit button not found');
+
+        res.cancelBtn = await query('.acc_controls .cancel-btn');
+        assert(res.cancelBtn, 'Cancel button not found');
+
+        res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
+
+        return res;
+    }
+
     async buildModel(cont) {
         const res = {};
 
@@ -136,56 +186,6 @@ export class AccountView extends AppView {
         };
 
         this.expectedState = res;
-
-        return res;
-    }
-
-    async parseContent() {
-        const res = {};
-
-        res.heading = { elem: await query('.heading > h1') };
-        assert(res.heading.elem, 'Heading element not found');
-        res.heading.text = await prop(res.heading.elem, 'textContent');
-        res.delBtn = await IconLink.create(this, await query('#del_btn'));
-        res.tile = await Tile.create(this, await query('#acc_tile'));
-
-        res.formElem = await query('form');
-        assert(res.formElem, 'Form element not found');
-
-        const hiddenEl = await query('#accid');
-        res.isUpdate = (!!hiddenEl);
-        if (res.isUpdate) {
-            res.id = parseInt(await prop(hiddenEl, 'value'), 10);
-            assert(res.id, 'Wrong account id');
-        }
-
-        let curChildren = (res.isUpdate) ? 3 : 2;
-
-        res.iconDropDown = await DropDown.createFromChild(this, await query('#icon'));
-
-        curChildren += 1;
-        let elem = await query(`form > *:nth-child(${curChildren})`);
-        res.name = await InputRow.create(this, elem);
-        assert(res.name, 'Account name input not found');
-
-        curChildren += 1;
-        res.currDropDown = await DropDown.createFromChild(this, await query('#currency'));
-
-        curChildren += 1;
-        elem = await query(`form > *:nth-child(${curChildren})`);
-
-        res.balance = await InputRow.create(this, elem);
-
-        res.flagsInp = await query('#flags');
-        res.flags = parseInt(await prop(res.flagsInp, 'value'), 10);
-
-        res.submitBtn = await query('.acc_controls .submit-btn');
-        assert(res.submitBtn, 'Submit button not found');
-
-        res.cancelBtn = await query('.acc_controls .cancel-btn');
-        assert(res.cancelBtn, 'Cancel button not found');
-
-        res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
         return res;
     }
