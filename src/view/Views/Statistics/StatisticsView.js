@@ -55,9 +55,8 @@ class StatisticsView extends View {
             autoScale: true,
             scrollThrottle: 100,
             showPopup: true,
+            activateOnHover: true,
             renderPopup: (item) => this.renderPopupContent(item),
-            onitemover: (e, bar) => this.onBarOver(e, bar),
-            onitemout: (e, bar) => this.onBarOut(e, bar),
         });
 
         this.filterTypeDropDown = DropDown.create({
@@ -248,30 +247,6 @@ class StatisticsView extends View {
             item.value,
             this.state.accountCurrency,
         );
-    }
-
-    /**
-     * Histogram bar mouse over callback
-     * @param {object} bar
-     */
-    onBarOver(e, bar) {
-        if (!bar || !bar.elem) {
-            return;
-        }
-
-        bar.elem.classList.add('bar_active');
-    }
-
-    /**
-     * Histogram bar mouse out callback
-     * @param {object} bar - bar rectangle element mouse leave from
-     */
-    onBarOut(e, bar) {
-        if (!bar || !bar.elem) {
-            return;
-        }
-
-        bar.elem.classList.remove('bar_active');
     }
 }
 
