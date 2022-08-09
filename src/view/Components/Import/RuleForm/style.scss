@@ -32,7 +32,7 @@
     flex-flow: row wrap;
     align-items: center;
     flex: none;
-    padding: 2px 2px 2px 8px;
+    padding: 2px 8px 2px 8px;
     border-width: 1px;
     border-style: solid;
     cursor: pointer;
@@ -40,12 +40,15 @@
 
   .collapsible-header label {
     font-size: 18px;
-    margin-right: 12px;
+    margin: 0 12px 0 0;
+  }
+
+  .toggle-btn svg {
+    height: 18px;
   }
 
   &.collapsible__expanded .toggle-btn svg {
     transform: rotate(180deg);
-    height: 18px;
   }
 
   /* Conditions/Actions list container */
