@@ -11,7 +11,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
             <div class="content">
                 <div class="content_wrap">
                     <div class="heading">
-                        <h1>Import transactions</h1>
+                        <h1>Import</h1>
                         <?=IconLink::render($uploadBtn)?>
                     </div>
 
