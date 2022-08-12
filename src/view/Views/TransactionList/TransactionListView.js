@@ -76,6 +76,7 @@ class TransactionListView extends View {
             this.accountDropDown = DropDown.create({
                 elem: 'acc_id',
                 placeholder: 'Select account',
+                onitemselect: (obj) => this.onAccountChange(obj),
                 onchange: (obj) => this.onAccountChange(obj),
                 editable: false,
                 className: 'dd__fullwidth',
@@ -92,6 +93,7 @@ class TransactionListView extends View {
             this.personDropDown = DropDown.create({
                 elem: 'person_id',
                 placeholder: 'Select person',
+                onitemselect: (obj) => this.onPersonChange(obj),
                 onchange: (obj) => this.onPersonChange(obj),
                 editable: false,
                 className: 'dd__fullwidth',
