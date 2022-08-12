@@ -492,7 +492,7 @@ export class TransactionsView extends AppView {
         if (directNavigate) {
             await goTo(this.getExpectedURL());
         } else {
-            await this.waitForList(() => this.content.searchForm.search(text));
+            await this.waitForSearch(() => this.content.searchForm.input(text), text);
         }
 
         return App.view.checkState(expected);
@@ -584,6 +584,23 @@ export class TransactionsView extends AppView {
 
     isLastPage() {
         return !this.content.paginator || this.content.paginator.isLastPage();
+    }
+
+    async waitForSearch(action, searchQuery) {
+        await this.parse();
+
+        const prevTime = this.model.renderTime;
+
+        await action();
+
+        await waitForFunction(async () => {
+            await this.parse();
+            return (
+                !this.model.loading
+                && prevTime !== this.model.renderTime
+                && searchQuery === this.model.filter.search
+            );
+        });
     }
 
     async waitForList(action) {

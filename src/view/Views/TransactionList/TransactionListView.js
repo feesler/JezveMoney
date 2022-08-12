@@ -7,6 +7,7 @@ import {
     isEmpty,
     setEvents,
     formatDate,
+    throttle,
     Collapsible,
     DropDown,
     DatePicker,
@@ -32,6 +33,7 @@ const TITLE_SINGLE_TRANS_DELETE = 'Delete transaction';
 const TITLE_MULTI_TRANS_DELETE = 'Delete transactions';
 const MSG_MULTI_TRANS_DELETE = 'Are you sure want to delete selected transactions?<br>Changes in the balance of affected accounts will be canceled.';
 const MSG_SINGLE_TRANS_DELETE = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
+const SEARCH_THROTTLE = 300;
 
 /**
  * List of transactions view
@@ -46,6 +48,7 @@ class TransactionListView extends View {
             pagination: { ...this.props.pagination },
             mode: this.props.mode,
             loading: false,
+            typingSearch: false,
             selDateRange: null,
         };
     }
@@ -117,6 +120,8 @@ class TransactionListView extends View {
             throw new Error('Failed to initialize Transaction List view');
         }
         this.searchInp.inputMode = 'search';
+        this.searchHandler = throttle((e) => this.onSearchInput(e), SEARCH_THROTTLE);
+        this.searchInp.addEventListener('input', this.searchHandler);
 
         this.noSearchBtn = ge('nosearchbtn');
         if (!this.noSearchBtn) {
@@ -334,15 +339,23 @@ class TransactionListView extends View {
     onSearchSubmit(e) {
         e.preventDefault();
 
-        if (!this.searchInp) {
+        this.onSearchInput();
+    }
+
+    /** Search field input event handler */
+    onSearchInput() {
+        const searchQuery = this.searchInp.value;
+        if (this.state.filter.search === searchQuery) {
             return;
         }
 
-        if (this.searchInp.value.length) {
-            this.state.filter.search = this.searchInp.value;
+        if (searchQuery.length > 0) {
+            this.state.filter.search = searchQuery;
         } else if ('search' in this.state.filter) {
             delete this.state.filter.search;
         }
+
+        this.state.typingSearch = true;
 
         this.requestTransactions(this.state.filter);
     }
@@ -496,6 +509,7 @@ class TransactionListView extends View {
 
         this.replaceHistory();
         this.stopLoading();
+        this.state.typingSearch = false;
     }
 
     /** Render accounts selection */
@@ -599,7 +613,9 @@ class TransactionListView extends View {
         }
 
         // Search form
-        this.searchInp.value = (this.state.filter.search) ? this.state.filter.search : '';
+        if (!this.state.typingSearch) {
+            this.searchInp.value = (this.state.filter.search) ? this.state.filter.search : '';
+        }
 
         // toolbar
         this.toolbar.updateBtn.show(this.list.selectedItems.count() === 1);
