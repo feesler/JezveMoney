@@ -509,10 +509,16 @@ label {
 }
 
 /* Messages */
-.msg {
+.popup.msg {
+  top: 70px;
+  right: 12px;
+  left: auto;
+  bottom: auto;
+  width: auto;
+  height: auto;
+
   .popup__content {
     background: none;
-    margin-top: 60px;
     align-self: baseline;
   }
 
@@ -525,7 +531,7 @@ label {
 
   .popup__header {
     position: absolute;
-    right: 15px;
+    right: 8px;
     top: 17px;
     width: 18px;
     height: 18px;
@@ -533,12 +539,12 @@ label {
   }
 
   .popup__message {
-    max-width: 300px;
+    max-width: 400px;
     min-width: 200px;
     color: #ffffff;
-    position: absolute;
     right: 0;
     padding: 15px 30px 15px 20px;
+    box-sizing: border-box;
   }
 
   &.msg_success .popup__message {
