@@ -71,8 +71,8 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         <div id="initbal-inp-block" class="validation-block view-row std_margin">
                             <label for="balance">Initial balance</label>
                             <div class="input-group">
-                                <input id="balance" class="stretch-input amount-input input-group__item" name="initbalance" type="text" autocomplete="off" value="<?=e($accInfo->initbalance)?>">
-                                <div class="btn input-group__btn input-group__item" disabled>
+                                <input id="balance" class="input-group__input stretch-input amount-input" name="initbalance" type="text" autocomplete="off" value="<?=e($accInfo->initbalance)?>">
+                                <div class="input-group__btn" disabled>
                                     <div id="currsign"><?=e($accInfo->sign)?></div>
                                 </div>
                             </div>

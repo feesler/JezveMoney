@@ -94,24 +94,16 @@
   }
 
   /* Input group */
-  .input-group__item[disabled] {
-    color: var(--main-text-color);
-    border-color: #b0b0b0;
-    background-color: var(--main-bg-color);
-  }
-
-  /* Clear input button */
-  .clear-input-btn {
-    border-color: #b0b0b0;
-    background-color: #f2f2f2;
-  }
-
-  .clear-input-btn > svg {
-    fill: #888888;
-  }
-
-  .input-group .stretch-input:focus + .clear-input-btn {
-    border-color: var(--active-input-border-color);
+  .input-group {
+    --ig-border-color: var(--input-border-color);
+    --ig-input-color: var(--main-text-color);
+    --ig-input-bg: var(--input-bg-color);
+    --ig-input-active-border: var(--active-input-border-color);
+    --ig-button-disabled-color: var(--main-text-color);
+    --ig-button-disabled-border: var(--input-border-color);
+    --ig-button-disabled-bg: var(--main-bg-color);
+    --ig-inner-button-color: #888888;
+    --ig-inner-button-active-color: #000000;
   }
 
   /* Checkbox */
@@ -263,11 +255,6 @@
 
   .swap-btn > svg {
     fill: #888888;
-  }
-
-  /* Active clear input button */
-  .clear-input-btn:focus > svg {
-    fill: #000000;
   }
 
   /* Import view */
@@ -444,11 +431,6 @@
 
     .filters-collapsible .collapsible-header:hover {
       background-color: #e8e8e8;
-    }
-
-    /* Active clear input button */
-    .clear-input-btn:hover > svg {
-      fill: #000000;
     }
 
     .swap-btn:hover > svg {
