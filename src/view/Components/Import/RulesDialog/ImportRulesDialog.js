@@ -54,7 +54,7 @@ export class ImportRulesDialog extends Component {
             btn: {
                 closeBtn: true,
             },
-            additional: IMPORT_RULES_POPUP_CLASS,
+            className: IMPORT_RULES_POPUP_CLASS,
         });
 
         this.createRuleBtn = this.elem.querySelector('.create-btn');

@@ -374,6 +374,26 @@ export class TransactionsView extends AppView {
         return App.view.checkState(expected);
     }
 
+    async setFilterSelection(dropDown, ids) {
+        const selection = this.content[dropDown].getSelectedValues();
+        if (selection.length === 0 && ids.length === 0) {
+            return;
+        }
+
+        if (selection.length > 0) {
+            await this.waitForList(() => this.content[dropDown].clearSelection());
+        }
+        if (ids.length === 0) {
+            return;
+        }
+
+        for (const id of ids) {
+            await this.waitForList(() => this.content[dropDown].selectItem(id));
+        }
+
+        await this.performAction(() => this.content[dropDown].showList(false));
+    }
+
     async filterByAccounts(accounts, directNavigate = false) {
         assert(App.state.accounts.length > 0, 'No accounts available');
 
@@ -389,7 +409,7 @@ export class TransactionsView extends AppView {
         if (directNavigate) {
             await goTo(this.getExpectedURL());
         } else {
-            await this.waitForList(() => this.content.accDropDown.setSelection(accounts));
+            await this.setFilterSelection('accDropDown', accounts);
         }
 
         return App.view.checkState(expected);
@@ -410,7 +430,7 @@ export class TransactionsView extends AppView {
         if (directNavigate) {
             await goTo(this.getExpectedURL());
         } else {
-            await this.waitForList(() => this.content.personDropDown.setSelection(persons));
+            await this.setFilterSelection('personDropDown', persons);
         }
 
         return App.view.checkState(expected);
@@ -472,7 +492,7 @@ export class TransactionsView extends AppView {
         if (directNavigate) {
             await goTo(this.getExpectedURL());
         } else {
-            await this.waitForList(() => this.content.searchForm.search(text));
+            await this.waitForSearch(() => this.content.searchForm.input(text), text);
         }
 
         return App.view.checkState(expected);
@@ -564,6 +584,23 @@ export class TransactionsView extends AppView {
 
     isLastPage() {
         return !this.content.paginator || this.content.paginator.isLastPage();
+    }
+
+    async waitForSearch(action, searchQuery) {
+        await this.parse();
+
+        const prevTime = this.model.renderTime;
+
+        await action();
+
+        await waitForFunction(async () => {
+            await this.parse();
+            return (
+                !this.model.loading
+                && prevTime !== this.model.renderTime
+                && searchQuery === this.model.filter.search
+            );
+        });
     }
 
     async waitForList(action) {

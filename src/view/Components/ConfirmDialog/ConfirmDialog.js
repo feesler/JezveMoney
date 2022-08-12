@@ -31,8 +31,8 @@ export class ConfirmDialog extends Component {
         if ('id' in this.props) {
             popupProps.id = this.props.id;
         }
-        if ('additional' in this.props) {
-            popupProps.additional = this.props.additional;
+        if ('className' in this.props) {
+            popupProps.className = this.props.className;
         }
 
         this.popup = Popup.create(popupProps);

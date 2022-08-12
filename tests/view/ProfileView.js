@@ -97,7 +97,7 @@ export class ProfileView extends AppView {
 
     async changeName(newName) {
         await this.performAction(() => click(this.content.nameLinkElem));
-        await this.performAction(() => wait('.popup__content.chname_popup', { visible: true }));
+        await this.performAction(() => wait('.popup.chname_popup', { visible: true }));
 
         assert(this.content.changeNamePopup?.visible, 'Change name popup not appear');
 
@@ -107,7 +107,7 @@ export class ProfileView extends AppView {
         await this.performAction(() => click(this.content.changeNamePopup.okBtn));
 
         if (validInput) {
-            await this.performAction(() => wait('.popup__content.msg', { visible: true }));
+            await this.performAction(() => wait('.popup.msg', { visible: true }));
         } else {
             await this.performAction(() => click(this.content.changeNamePopup.closeBtn));
         }
@@ -115,7 +115,7 @@ export class ProfileView extends AppView {
 
     async changePassword(oldPass, newPass) {
         await this.performAction(() => click(this.content.changePassLinkElem));
-        await this.performAction(() => wait('.popup__content.chpass_popup', { visible: true }));
+        await this.performAction(() => wait('.popup.chpass_popup', { visible: true }));
 
         assert(this.content.changePassPopup?.visible, 'Change password popup not appear');
 
@@ -132,7 +132,7 @@ export class ProfileView extends AppView {
         await this.performAction(() => click(this.content.changePassPopup.okBtn));
 
         if (validInput) {
-            await this.performAction(() => wait('.popup__content.msg', { visible: true }));
+            await this.performAction(() => wait('.popup.msg', { visible: true }));
         } else {
             await this.performAction(() => click(this.content.changePassPopup.closeBtn));
         }

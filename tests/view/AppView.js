@@ -20,9 +20,9 @@ export class AppView extends TestView {
         this.location = await url();
 
         this.content.header = await Header.create(this, await query('.page > .page_wrapper > .header'));
-        this.content.nav = await Navigation.create(this, await query('.page > .page_wrapper > .navigation'));
+        this.content.nav = await Navigation.create(this, await query('.offcanvas.navigation'));
 
-        const msgElem = await query('.popup__content.msg');
+        const msgElem = await query('.popup.msg');
         this.content.msgPopup = (msgElem) ? await MessagePopup.create(this, msgElem) : null;
     }
 

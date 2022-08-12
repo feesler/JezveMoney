@@ -64,7 +64,7 @@ export class TransactionList extends Component {
         if (this.props.sortable) {
             this.trListSortable = new Sortable({
                 oninsertat: (elem, ref) => this.onSort(elem, ref),
-                container: this.elem,
+                elem: this.elem,
                 group: 'transactions',
                 selector: '.trans-list__item-wrapper',
                 placeholderClass: 'trans-list__item-placeholder',

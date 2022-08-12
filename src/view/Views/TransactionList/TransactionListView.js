@@ -7,6 +7,7 @@ import {
     isEmpty,
     setEvents,
     formatDate,
+    throttle,
     Collapsible,
     DropDown,
     DatePicker,
@@ -32,6 +33,7 @@ const TITLE_SINGLE_TRANS_DELETE = 'Delete transaction';
 const TITLE_MULTI_TRANS_DELETE = 'Delete transactions';
 const MSG_MULTI_TRANS_DELETE = 'Are you sure want to delete selected transactions?<br>Changes in the balance of affected accounts will be canceled.';
 const MSG_SINGLE_TRANS_DELETE = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
+const SEARCH_THROTTLE = 300;
 
 /**
  * List of transactions view
@@ -46,6 +48,7 @@ class TransactionListView extends View {
             pagination: { ...this.props.pagination },
             mode: this.props.mode,
             loading: false,
+            typingSearch: false,
             selDateRange: null,
         };
     }
@@ -76,6 +79,7 @@ class TransactionListView extends View {
             this.accountDropDown = DropDown.create({
                 elem: 'acc_id',
                 placeholder: 'Select account',
+                onitemselect: (obj) => this.onAccountChange(obj),
                 onchange: (obj) => this.onAccountChange(obj),
                 editable: false,
                 className: 'dd__fullwidth',
@@ -92,6 +96,7 @@ class TransactionListView extends View {
             this.personDropDown = DropDown.create({
                 elem: 'person_id',
                 placeholder: 'Select person',
+                onitemselect: (obj) => this.onPersonChange(obj),
                 onchange: (obj) => this.onPersonChange(obj),
                 editable: false,
                 className: 'dd__fullwidth',
@@ -115,6 +120,8 @@ class TransactionListView extends View {
             throw new Error('Failed to initialize Transaction List view');
         }
         this.searchInp.inputMode = 'search';
+        this.searchHandler = throttle((e) => this.onSearchInput(e), SEARCH_THROTTLE);
+        this.searchInp.addEventListener('input', this.searchHandler);
 
         this.noSearchBtn = ge('nosearchbtn');
         if (!this.noSearchBtn) {
@@ -285,32 +292,25 @@ class TransactionListView extends View {
         this.requestTransactions(this.state.filter);
     }
 
+    isSameSelection(a, b) {
+        return a.length === b.length && a.every((id) => b.includes(id));
+    }
+
     /**
      * Account change event handler
      * @param {object} obj - selection object
      */
     onAccountChange(obj) {
-        // Check all accounts from the new selection present in current selection
         const data = Array.isArray(obj) ? obj : [obj];
-        let reloadNeeded = data.some((item) => {
-            const id = parseInt(item.id, 10);
+        const ids = data.map((item) => parseInt(item.id, 10));
+        const filterIds = this.state.filter.acc_id ?? [];
 
-            return !this.state.filter.acc_id?.includes(id);
-        });
-
-        // Check all currenlty selected accounts present in the new selection
-        if (!reloadNeeded) {
-            reloadNeeded = this.state.filter.acc_id?.some(
-                (accountId) => !data.find((item) => item.id === accountId),
-            );
-        }
-
-        if (!reloadNeeded) {
+        if (this.isSameSelection(ids, filterIds)) {
             return;
         }
 
         // Prepare parameters
-        this.state.filter.acc_id = data.map((item) => parseInt(item.id, 10));
+        this.state.filter.acc_id = ids;
         this.requestTransactions(this.state.filter);
     }
 
@@ -319,27 +319,16 @@ class TransactionListView extends View {
      * @param {object} obj - selection object
      */
     onPersonChange(obj) {
-        // Check all persons from the new selection present in current selection
         const data = Array.isArray(obj) ? obj : [obj];
-        let reloadNeeded = data.some((item) => {
-            const id = parseInt(item.id, 10);
+        const ids = data.map((item) => parseInt(item.id, 10));
+        const filterIds = this.state.filter.person_id ?? [];
 
-            return !this.state.filter.person_id?.includes(id);
-        });
-
-        // Check all currenlty selected persons present in the new selection
-        if (!reloadNeeded) {
-            reloadNeeded = this.state.filter.person_id?.some(
-                (personId) => !data.find((item) => item.id === personId),
-            );
-        }
-
-        if (!reloadNeeded) {
+        if (this.isSameSelection(ids, filterIds)) {
             return;
         }
 
         // Prepare parameters
-        this.state.filter.person_id = data.map((item) => parseInt(item.id, 10));
+        this.state.filter.person_id = ids;
         this.requestTransactions(this.state.filter);
     }
 
@@ -350,15 +339,23 @@ class TransactionListView extends View {
     onSearchSubmit(e) {
         e.preventDefault();
 
-        if (!this.searchInp) {
+        this.onSearchInput();
+    }
+
+    /** Search field input event handler */
+    onSearchInput() {
+        const searchQuery = this.searchInp.value;
+        if (this.state.filter.search === searchQuery) {
             return;
         }
 
-        if (this.searchInp.value.length) {
-            this.state.filter.search = this.searchInp.value;
+        if (searchQuery.length > 0) {
+            this.state.filter.search = searchQuery;
         } else if ('search' in this.state.filter) {
             delete this.state.filter.search;
         }
+
+        this.state.typingSearch = true;
 
         this.requestTransactions(this.state.filter);
     }
@@ -512,6 +509,7 @@ class TransactionListView extends View {
 
         this.replaceHistory();
         this.stopLoading();
+        this.state.typingSearch = false;
     }
 
     /** Render accounts selection */
@@ -615,7 +613,9 @@ class TransactionListView extends View {
         }
 
         // Search form
-        this.searchInp.value = (this.state.filter.search) ? this.state.filter.search : '';
+        if (!this.state.typingSearch) {
+            this.searchInp.value = (this.state.filter.search) ? this.state.filter.search : '';
+        }
 
         // toolbar
         this.toolbar.updateBtn.show(this.list.selectedItems.count() === 1);

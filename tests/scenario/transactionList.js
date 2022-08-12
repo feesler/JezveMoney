@@ -286,8 +286,6 @@ const runTests = async (directNavigate = false) => {
     ]);
 
     if (!directNavigate) {
-        await TransactionListTests.checkEmptySelectionFilter();
-
         const toggleSelectData = [
             0,
             [1, 2],

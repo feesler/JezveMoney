@@ -300,7 +300,7 @@ function convertToObjectArray($data)
 
 
 // Return content of specified SVG icon
-function svgIcon($name)
+function svgIcon($name, $className = null)
 {
     $fileName = APP_ROOT . "view/img/svg/$name.svg";
     if (!file_exists($fileName)) {
@@ -308,6 +308,10 @@ function svgIcon($name)
     }
 
     $content = file_get_contents($fileName);
+    if (!is_null($className)) {
+        $content = str_replace("<svg ", "<svg class=\"" . $className . "\" ", $content);
+    }
+
     return $content;
 }
 

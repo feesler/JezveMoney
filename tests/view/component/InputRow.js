@@ -20,9 +20,9 @@ export class InputRow extends TestComponent {
 
         const datePickerContainer = await query(this.elem, '.calendar');
         if (datePickerContainer) {
-            res.datePickerBtn = await query(this.elem, '.btn.icon-btn');
+            res.datePickerBtn = await query(this.elem, '.icon-btn');
         } else {
-            res.currElem = await query(this.elem, '.btn.input-group__btn');
+            res.currElem = await query(this.elem, '.input-group__btn');
             res.isCurrActive = false;
             if (res.currElem) {
                 const disabledAttr = await attr(res.currElem, 'disabled');

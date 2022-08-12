@@ -168,8 +168,8 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         <div id="src_amount_row" class="validation-block view-row std_margin"<?=hidden(!$trAvailable || !$showSrcAmount)?>>
                             <label for="src_amount"><?=e($srcAmountLbl)?></label>
                             <div class="input-group">
-                                <input id="src_amount" name="src_amount" class="stretch-input amount-input input-group__item" type="text" autocomplete="off" value="<?=e($form["src_amount"])?>">
-                                <button class="btn input-group__btn input-group__item" type="button"<?=disabled($tr["type"] != INCOME)?>>
+                                <input id="src_amount" name="src_amount" class="input-group__input stretch-input amount-input" type="text" autocomplete="off" value="<?=e($form["src_amount"])?>">
+                                <button class="input-group__btn" type="button"<?=disabled($tr["type"] != INCOME)?>>
                                     <div id="srcamountsign" class="input-group__btn-title"><?=e($form["srcCurrSign"])?></div>
                                 </button>
                             </div>
@@ -180,8 +180,8 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         <div id="dest_amount_row" class="validation-block view-row std_margin"<?=hidden(!$trAvailable || !$showDestAmount)?>>
                             <label for="dest_amount"><?=e($destAmountLbl)?></label>
                             <div class="input-group">
-                                <input id="dest_amount" name="dest_amount" class="stretch-input amount-input input-group__item" type="text" autocomplete="off" value="<?=e($form["dest_amount"])?>">
-                                <button class="btn input-group__btn input-group__item" type="button"<?=disabled($tr["type"] != EXPENSE)?>>
+                                <input id="dest_amount" name="dest_amount" class="input-group__input stretch-input amount-input" type="text" autocomplete="off" value="<?=e($form["dest_amount"])?>">
+                                <button class="input-group__btn" type="button"<?=disabled($tr["type"] != EXPENSE)?>>
                                     <div id="destamountsign" class="input-group__btn-title"><?=e($form["destCurrSign"])?></div>
                                 </button>
                             </div>
@@ -192,8 +192,8 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         <div id="exchange" class="view-row std_margin" hidden>
                             <label for="exchrate">Exchange rate</label>
                             <div class="input-group">
-                                <input id="exchrate" class="stretch-input amount-input input-group__item" type="text" autocomplete="off" value="<?=e($form["exchange"])?>">
-                                <div class="btn input-group__btn input-group__item" disabled>
+                                <input id="exchrate" class="input-group__input stretch-input amount-input" type="text" autocomplete="off" value="<?=e($form["exchange"])?>">
+                                <div class="input-group__btn" disabled>
                                     <div id="exchcomm" class="input-group__btn-title"><?=e($form["exchSign"])?></div>
                                 </div>
                             </div>
@@ -202,8 +202,8 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         <div id="result_balance" class="view-row std_margin" hidden>
                             <label for="resbal"><?=e($srcBalTitle)?></label>
                             <div class="input-group">
-                                <input id="resbal" class="stretch-input amount-input input-group__item" type="text" autocomplete="off" value="<?=e($form["srcResult"])?>">
-                                <div class="btn input-group__btn input-group__item" disabled>
+                                <input id="resbal" class="input-group__input stretch-input amount-input" type="text" autocomplete="off" value="<?=e($form["srcResult"])?>">
+                                <div class="input-group__btn" disabled>
                                     <div id="res_currsign" class="input-group__btn-title"><?=e($form["srcCurrSign"])?></div>
                                 </div>
                             </div>
@@ -212,8 +212,8 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         <div id="result_balance_dest" class="view-row std_margin" hidden>
                             <label for="resbal_d"><?=e($destBalTitle)?></label>
                             <div class="input-group">
-                                <input id="resbal_d" class="stretch-input amount-input input-group__item" type="text" autocomplete="off" value="<?=e($form["destResult"])?>">
-                                <div class="btn input-group__btn input-group__item" disabled>
+                                <input id="resbal_d" class="input-group__input stretch-input amount-input" type="text" autocomplete="off" value="<?=e($form["destResult"])?>">
+                                <div class="input-group__btn" disabled>
                                     <div id="res_currsign_d" class="input-group__btn-title"><?=e($form["destCurrSign"])?></div>
                                 </div>
                             </div>
@@ -230,8 +230,8 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 <label for="date">Date</label>
                                 <div class="column-container">
                                     <div class="input-group">
-                                        <input id="date" class="stretch-input input-group__item" name="date" type="text" autocomplete="off" value="<?=e($dateFmt)?>">
-                                        <button id="cal_rbtn" class="btn icon-btn input-group__btn input-group__item" type="button"><?=svgIcon("cal")?></button>
+                                        <input id="date" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?=e($dateFmt)?>">
+                                        <button id="cal_rbtn" class="icon-btn input-group__btn" type="button"><?=svgIcon("cal")?></button>
                                     </div>
                                     <div id="calendar" class="calendar"></div>
                                 </div>

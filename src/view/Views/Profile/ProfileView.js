@@ -133,7 +133,7 @@ class ProfileView extends View {
                 id: 'chname_popup',
                 title: 'Change name',
                 content: this.changeNameContent,
-                additional: 'chname_popup',
+                className: 'chname_popup',
             });
 
             this.changeNamePopup.setControls({
@@ -223,7 +223,7 @@ class ProfileView extends View {
                 id: 'chpass_popup',
                 title: 'Change password',
                 content: this.changePassContent,
-                additional: 'chpass_popup',
+                className: 'chpass_popup',
             });
 
             this.changePassPopup.setControls({
@@ -310,7 +310,7 @@ class ProfileView extends View {
                 id: 'reset_popup',
                 title: 'Reset data',
                 content: this.resetContent,
-                additional: 'reset-dialog',
+                className: 'reset-dialog',
             });
 
             this.resetPopup.setControls({
