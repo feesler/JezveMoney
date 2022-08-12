@@ -285,32 +285,25 @@ class TransactionListView extends View {
         this.requestTransactions(this.state.filter);
     }
 
+    isSameSelection(a, b) {
+        return a.length === b.length && a.every((id) => b.includes(id));
+    }
+
     /**
      * Account change event handler
      * @param {object} obj - selection object
      */
     onAccountChange(obj) {
-        // Check all accounts from the new selection present in current selection
         const data = Array.isArray(obj) ? obj : [obj];
-        let reloadNeeded = data.some((item) => {
-            const id = parseInt(item.id, 10);
+        const ids = data.map((item) => parseInt(item.id, 10));
+        const filterIds = this.state.filter.acc_id ?? [];
 
-            return !this.state.filter.acc_id?.includes(id);
-        });
-
-        // Check all currenlty selected accounts present in the new selection
-        if (!reloadNeeded) {
-            reloadNeeded = this.state.filter.acc_id?.some(
-                (accountId) => !data.find((item) => item.id === accountId),
-            );
-        }
-
-        if (!reloadNeeded) {
+        if (this.isSameSelection(ids, filterIds)) {
             return;
         }
 
         // Prepare parameters
-        this.state.filter.acc_id = data.map((item) => parseInt(item.id, 10));
+        this.state.filter.acc_id = ids;
         this.requestTransactions(this.state.filter);
     }
 
@@ -319,27 +312,16 @@ class TransactionListView extends View {
      * @param {object} obj - selection object
      */
     onPersonChange(obj) {
-        // Check all persons from the new selection present in current selection
         const data = Array.isArray(obj) ? obj : [obj];
-        let reloadNeeded = data.some((item) => {
-            const id = parseInt(item.id, 10);
+        const ids = data.map((item) => parseInt(item.id, 10));
+        const filterIds = this.state.filter.person_id ?? [];
 
-            return !this.state.filter.person_id?.includes(id);
-        });
-
-        // Check all currenlty selected persons present in the new selection
-        if (!reloadNeeded) {
-            reloadNeeded = this.state.filter.person_id?.some(
-                (personId) => !data.find((item) => item.id === personId),
-            );
-        }
-
-        if (!reloadNeeded) {
+        if (this.isSameSelection(ids, filterIds)) {
             return;
         }
 
         // Prepare parameters
-        this.state.filter.person_id = data.map((item) => parseInt(item.id, 10));
+        this.state.filter.person_id = ids;
         this.requestTransactions(this.state.filter);
     }
 
