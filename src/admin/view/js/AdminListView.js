@@ -65,7 +65,7 @@ export class AdminListView extends AdminView {
         this.dialogPopup = Popup.create({
             id: this.elements.dialogPopup,
             content: this.itemForm,
-            additional: 'item-form',
+            className: 'item-form',
             btn: { closeBtn: true },
         });
     }

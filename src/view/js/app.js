@@ -77,7 +77,7 @@ export function createMessage(message, msgClass) {
         id: 'notificationPopup',
         content: message,
         btn: { closeBtn: true },
-        additional: `msg ${msgClass}`,
+        className: ['msg', msgClass],
         nodim: true,
         closeOnEmptyClick: true,
     });

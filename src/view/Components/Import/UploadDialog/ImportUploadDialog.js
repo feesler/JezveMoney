@@ -61,7 +61,7 @@ export class ImportUploadDialog extends Component {
             btn: {
                 closeBtn: true,
             },
-            additional: 'upload-popup',
+            className: 'upload-popup',
         });
 
         this.elem.addEventListener('dragenter', (e) => this.onDragEnter(e), false);

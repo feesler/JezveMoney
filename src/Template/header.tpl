@@ -38,30 +38,30 @@
 <?php	}	?>
     </div>
 </div>
-<div class="navigation navigation_closed">
-    <nav class="navigation-content">
-        <div class="navigation-controls">
-            <button class="navigation__close-btn"><?=svgIcon("back")?></button>
-            <div class="navigation-logo">
-                <a class="logo__link" href="<?=BASEURL?>">
-                    <span class="logo__icon"><?=svgIcon("header_logo")?></span>
-                    <span class="logo__title">Jezve Money</span>
-                </a>
-            </div>
-        </div>
 
-        <ul class="nav-list">
+<nav class="navigation-content">
+    <div class="navigation-controls">
+        <button class="navigation__close-btn">
+            <?=svgIcon("back", "navigation__close-btn-icon")?>
+        </button>
+        <div class="navigation-logo">
+            <a class="logo__link" href="<?=BASEURL?>">
+                <span class="logo__icon"><?=svgIcon("header_logo")?></span>
+                <span class="logo__title">Jezve Money</span>
+            </a>
+        </div>
+    </div>
+
+    <ul class="nav-list">
 <?php	if ($this->user_id != 0) {		?>
-            <a class="nav-link" href="<?=BASEURL?>accounts/">Accounts</a>
-            <a class="nav-link" href="<?=BASEURL?>persons/">Persons</a>
-            <a class="nav-link" href="<?=BASEURL?>transactions/">Transactions</a>
-            <a class="nav-link" href="<?=BASEURL?>statistics/">Statistics</a>
-            <a class="nav-link" href="<?=BASEURL?>import/">Import</a>
-            <div class="nav-separator"></div>
+        <a class="nav-link" href="<?=BASEURL?>accounts/">Accounts</a>
+        <a class="nav-link" href="<?=BASEURL?>persons/">Persons</a>
+        <a class="nav-link" href="<?=BASEURL?>transactions/">Transactions</a>
+        <a class="nav-link" href="<?=BASEURL?>statistics/">Statistics</a>
+        <a class="nav-link" href="<?=BASEURL?>import/">Import</a>
+        <div class="nav-separator"></div>
 <?php	}		?>
-            <a class="nav-link nav-bottom-link" href="<?=BASEURL?>about/">About</a>
-        </ul>
-    </nav>
-    <div class="navigation-bg"></div>
-</div>
+        <a class="nav-link nav-bottom-link" href="<?=BASEURL?>about/">About</a>
+    </ul>
+</nav>
 
