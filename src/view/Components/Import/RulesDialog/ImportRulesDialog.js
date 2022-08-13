@@ -47,24 +47,28 @@ export class ImportRulesDialog extends Component {
         this.CREATE_STATE = 2;
         this.UPDATE_STATE = 3;
 
+        this.headerElem = this.elem.querySelector('.rules-header');
+        this.titleElem = this.headerElem?.querySelector('label');
+        this.createRuleBtn = this.headerElem?.querySelector('.create-btn');
+        this.listContainer = this.elem.querySelector('.rules-list');
+        if (
+            !this.createRuleBtn
+            || !this.titleElem
+            || !this.listContainer
+        ) {
+            throw new Error('Failed to initialize import rules dialog');
+        }
+
         this.popup = Popup.create({
             id: 'rules_popup',
             content: this.elem,
+            title: this.headerElem,
             onclose: () => this.onClose(),
             btn: {
                 closeBtn: true,
             },
             className: IMPORT_RULES_POPUP_CLASS,
         });
-
-        this.createRuleBtn = this.elem.querySelector('.create-btn');
-        this.titleElem = this.elem.querySelector('.rules-header label');
-        this.listContainer = this.elem.querySelector('.rules-list');
-        if (!this.createRuleBtn
-            || !this.titleElem
-            || !this.listContainer) {
-            throw new Error('Failed to initialize import rules dialog');
-        }
 
         this.createRuleBtn.addEventListener('click', () => this.onCreateRuleClick());
 
