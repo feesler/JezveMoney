@@ -410,6 +410,7 @@ class Transactions extends TemplateController
             }
         }
         $data["tr"] = $tr;
+        $isDiffCurr = ($tr["src_curr"] != $tr["dest_curr"]);
 
         // get information about source and destination accounts
         $src = $this->accModel->getItem($tr["src_id"]);
@@ -467,22 +468,19 @@ class Transactions extends TemplateController
             $dest->icon = $this->accModel->getIconFile($dest->id);
         }
 
-        if ($tr["type"] != DEBT) {
-            /**
-             * Show destination amount input for expense and source amount input for income by default,
-             * because it's amount with changing currency.
-             * Meanwhile source amount for expense and destination amount for income are
-             * always have the same currency as account.
-             */
-            $showSrcAmount = ($tr["type"] != EXPENSE);
-            if ($tr["type"] == TRANSFER) {
-                $showDestAmount = ($tr["src_curr"] != $tr["dest_curr"]);
-            } else {
-                $showDestAmount = ($tr["type"] != INCOME);
-            }
-        } else {
-            $tr["src_id"] = $person_acc_id;
-
+        /**
+         * Show destination amount input for expense and source amount input for income by default,
+         * because it's amount with changing currency.
+         * Meanwhile source amount for expense and destination amount for income are
+         * always have the same currency as account.
+         */
+        if ($tr["type"] == EXPENSE) {
+            $showSrcAmount = $isDiffCurr;
+            $showDestAmount = true;
+        } elseif ($tr["type"] == INCOME || $tr["type"] == TRANSFER) {
+            $showSrcAmount = true;
+            $showDestAmount = $isDiffCurr;
+        } elseif ($tr["type"] == DEBT) {
             $showSrcAmount = true;
             $showDestAmount = false;
         }
@@ -619,6 +617,7 @@ class Transactions extends TemplateController
             $this->fail($defMsg);
         }
         $tr = (array)$item;
+        $isDiffCurr = ($tr["src_curr"] != $tr["dest_curr"]);
 
         // check type change request
         $requestedType = $this->getRequestedType($_GET, $tr["type"]);
@@ -654,20 +653,13 @@ class Transactions extends TemplateController
 
         $form["action"] = BASEURL . "transactions/" . $data["action"] . "/";
 
-        if ($tr["type"] != DEBT) {
-            if ($tr["src_curr"] == $tr["dest_curr"]) {
-                if ($tr["type"] == EXPENSE) {
-                    $showSrcAmount = false;
-                    $showDestAmount = true;
-                } elseif ($tr["type"] == INCOME || $tr["type"] == TRANSFER) {
-                    $showSrcAmount = true;
-                    $showDestAmount = false;
-                }
-            } else {
-                $showSrcAmount = true;
-                $showDestAmount = true;
-            }
-        } else {
+        if ($tr["type"] == EXPENSE) {
+            $showSrcAmount = $isDiffCurr;
+            $showDestAmount = true;
+        } elseif ($tr["type"] == INCOME || $tr["type"] == TRANSFER) {
+            $showSrcAmount = true;
+            $showDestAmount = $isDiffCurr;
+        } elseif ($tr["type"] == DEBT) {
             $showSrcAmount = true;
             $showDestAmount = false;
         }
@@ -767,12 +759,10 @@ class Transactions extends TemplateController
         $data["srcAmountLbl"] = ($showBothAmounts) ? "Source amount" : "Amount";
         $data["destAmountLbl"] = ($showBothAmounts) ? "Destination amount" : "Amount";
 
-        $accLbl = null;
-
         if ($noAccount) {
-            $accLbl = "No account";
+            $data["accLbl"] = "No account";
         } else {
-            $accLbl = ($debtType) ? "Destination account" : "Source account";
+            $data["accLbl"] = ($debtType) ? "Destination account" : "Source account";
         }
 
         if ($tr["type"] == DEBT && $debtAcc) {
@@ -787,7 +777,6 @@ class Transactions extends TemplateController
         }
 
         $data["acc_id"] = ($debtAcc) ? $debtAcc->id : 0;
-        $data["accLbl"] = $accLbl;
 
         $currObj = $this->currModel->getItem($tr["src_curr"]);
         $form["srcCurrSign"] = $currObj ? $currObj->sign : null;
@@ -854,7 +843,7 @@ class Transactions extends TemplateController
             "id" => "exch_left",
             "title" => "Exchange rate",
             "value" => $rtExchange,
-            "hidden" => ($tr["src_curr"] == $tr["dest_curr"])
+            "hidden" => !$isDiffCurr
         ];
 
         $data["dateFmt"] = date("d.m.Y", $tr["date"]);
