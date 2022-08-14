@@ -86,6 +86,7 @@ export class ImportUploadDialog extends Component {
         }
 
         this.parent.initAccountsList(this.accountDropDown);
+        this.accountDropDown.selectItem(this.state.mainAccount.id.toString());
 
         this.submitUploadedBtn.addEventListener('click', () => this.onSubmit());
 
