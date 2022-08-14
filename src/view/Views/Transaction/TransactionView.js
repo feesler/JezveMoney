@@ -24,8 +24,6 @@ import {
 } from '../../js/app.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
-import { AccountList } from '../../js/model/AccountList.js';
-import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Tile } from '../../Components/Tile/Tile.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
@@ -66,7 +64,6 @@ import {
 
 const PAGE_TITLE_UPDATE = 'Jezve Money | Edit transaction';
 const PAGE_TITLE_CREATE = 'Jezve Money | New transaction';
-const HIDDEN_GROUP_TITLE = 'Hidden';
 const TITLE_TRANS_DELETE = 'Delete transaction';
 const MSG_TRANS_DELETE = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
 const MSG_ACCOUNT_NOT_AVAILABLE = 'You have no one active account. Please create one.';
@@ -90,7 +87,6 @@ class TransactionView extends View {
 
         const currencyModel = window.app.model.currency;
         const accountModel = window.app.model.accounts;
-        const personModel = window.app.model.persons;
 
         this.mode = this.props.mode;
         if (!availModes.includes(this.mode)) {
@@ -100,18 +96,8 @@ class TransactionView extends View {
             accountModel.cancelTransaction(this.props.transaction);
         }
 
-        const userAccounts = AccountList.create(
-            accountModel.getUserAccounts(window.app.model.profile.owner_id),
-        );
-        // Sort user accounts by visibility: [...visible, ...hidden]
-        userAccounts.sort((a, b) => a.flags - b.flags);
-        window.app.model.userAccounts = userAccounts;
-        window.app.model.visibleUserAccounts = AccountList.create(userAccounts.getVisible());
-        window.app.model.hiddenUserAccounts = AccountList.create(userAccounts.getHidden());
-        // Sort persons by visibility: [...visible, ...hidden]
-        personModel.sort((a, b) => a.flags - b.flags);
-        window.app.model.visiblePersons = PersonList.create(personModel.getVisible());
-        window.app.model.hiddenPersons = PersonList.create(personModel.getHidden());
+        window.app.checkUserAccountModels();
+        window.app.checkPersonModels();
 
         const { transaction } = this.props;
 
@@ -396,7 +382,7 @@ class TransactionView extends View {
         this.personTile = Tile.fromElement({ elem: 'person_tile', parent: this });
 
         if (transaction.type === DEBT) {
-            this.initPersonList();
+            this.initPersonsDropDown();
 
             const personId = transaction.person_id;
             if (personId) {
@@ -430,25 +416,6 @@ class TransactionView extends View {
         if (state.isUpdate && transaction.type !== this.props.requestedType) {
             this.onChangeType(this.props.requestedType);
         }
-    }
-
-    /** Initialize acconts DropDown */
-    initAccountsList(ddlist) {
-        window.app.model.visibleUserAccounts.forEach(
-            (item) => ddlist.addItem({ id: item.id, title: item.name }),
-        );
-        if (window.app.model.hiddenUserAccounts.length === 0) {
-            return;
-        }
-
-        const group = ddlist.addGroup(HIDDEN_GROUP_TITLE);
-        window.app.model.hiddenUserAccounts.forEach(
-            (item) => ddlist.addItem({
-                id: item.id,
-                title: item.name,
-                group,
-            }),
-        );
     }
 
     /** Initialize DropDown for source account tile */
@@ -496,7 +463,7 @@ class TransactionView extends View {
     }
 
     /** Initialize DropDown for debt account tile */
-    initPersonList() {
+    initPersonsDropDown() {
         if (this.persDDList) {
             return;
         }
@@ -508,19 +475,7 @@ class TransactionView extends View {
             editable: false,
         });
 
-        window.app.model.visiblePersons.forEach(
-            (person) => this.persDDList.addItem({ id: person.id, title: person.name }),
-        );
-        if (window.app.model.hiddenPersons.length > 0) {
-            const group = this.persDDList.addGroup(HIDDEN_GROUP_TITLE);
-            window.app.model.hiddenPersons.forEach(
-                (person) => this.persDDList.addItem({
-                    id: person.id,
-                    title: person.name,
-                    group,
-                }),
-            );
-        }
+        this.initPersonsList(this.persDDList);
     }
 
     /** Initialize DropDown for debt account tile */
@@ -1183,7 +1138,7 @@ class TransactionView extends View {
 
         this.debtAccountInp.value = (noAccount) ? 0 : state.account.id;
 
-        this.initPersonList();
+        this.initPersonsDropDown();
         const personId = state.transaction.person_id;
         if (personId) {
             this.persDDList.selectItem(personId);

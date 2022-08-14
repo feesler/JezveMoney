@@ -19,7 +19,7 @@
                     <div class="profile_block">
                         <h2>Name</h2>
                         <div class="name-container">
-                            <span id="namestatic"><?=e($profileInfo->name)?></span>
+                            <span id="namestatic"><?=e($profileInfo["name"])?></span>
                             <a id="changeNameBtn" class="change-name-link" href="<?=BASEURL?>profile/changeName/">Change</a>
                         </div>
                     </div>
@@ -52,7 +52,7 @@
 <form method="post" action="<?=BASEURL?>profile/changename/">
     <div id="name-inp-block" class="validation-block view-row">
         <label for="newname">New name</label>
-        <input id="newname" class="stretch-input" name="name" type="text" autocomplete="off" value="<?=e($profileInfo->name)?>">
+        <input id="newname" class="stretch-input" name="name" type="text" autocomplete="off" value="<?=e($profileInfo["name"])?>">
         <div class="invalid-feedback">Please input correct name.<br>New name must be different from the old.</div>
     </div>
 </form>

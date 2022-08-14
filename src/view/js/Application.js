@@ -61,4 +61,31 @@ export class Application {
     get message() {
         return this.props.message;
     }
+
+    checkUserAccountModels() {
+        if (this.model.userAccounts) {
+            return;
+        }
+
+        const userAccounts = AccountList.create(
+            this.model.accounts.getUserAccounts(this.model.profile.owner_id),
+        );
+        // Sort user accounts by visibility: [...visible, ...hidden]
+        userAccounts.sort((a, b) => a.flags - b.flags);
+        this.model.userAccounts = userAccounts;
+        this.model.visibleUserAccounts = AccountList.create(userAccounts.getVisible());
+        this.model.hiddenUserAccounts = AccountList.create(userAccounts.getHidden());
+    }
+
+    checkPersonModels() {
+        if (this.model.visiblePersons) {
+            return;
+        }
+
+        const personsList = PersonList.create(this.model.persons.data);
+        // Sort persons by visibility: [...visible, ...hidden]
+        personsList.sort((a, b) => a.flags - b.flags);
+        this.model.visiblePersons = PersonList.create(personsList.getVisible());
+        this.model.hiddenPersons = PersonList.create(personsList.getHidden());
+    }
 }

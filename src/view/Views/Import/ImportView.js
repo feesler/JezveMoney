@@ -97,6 +97,8 @@ class ImportView extends View {
             throw new Error('Failed to initialize Import view');
         }
 
+        this.initAccountsList(this.accountDropDown);
+
         this.submitBtn.addEventListener('click', () => this.onSubmitClick());
         this.rulesBtn.addEventListener('click', () => this.onRulesClick());
         // Submit progress indicator

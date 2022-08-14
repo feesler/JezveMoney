@@ -159,11 +159,7 @@ class Transactions extends TemplateController
         }
 
         $data["appProps"] = [
-            "profile" => [
-                "user_id" => $this->user_id,
-                "owner_id" => $this->owner_id,
-                "name" => $this->user_name,
-            ],
+            "profile" => $this->getProfileData(),
             "accounts" => $this->accModel->getData(["full" => true, "type" => "all"]),
             "persons" => $this->personMod->getData(["type" => "all"]),
             "currency" => $currArr,
@@ -497,13 +493,6 @@ class Transactions extends TemplateController
         $data["showSrcAmount"] = $showSrcAmount;
         $data["showDestAmount"] = $showDestAmount;
 
-        // Common arrays
-        $profileData = [
-            "user_id" => $this->user_id,
-            "owner_id" => $this->owner_id,
-            "name" => $this->user_name,
-        ];
-
         $showBothAmounts = $showSrcAmount && $showDestAmount;
         $data["srcAmountLbl"] = ($showBothAmounts) ? "Source amount" : "Amount";
         $data["destAmountLbl"] = ($showBothAmounts) ? "Destination amount" : "Amount";
@@ -582,7 +571,7 @@ class Transactions extends TemplateController
         $data["titleString"] = "Jezve Money | " . $data["headString"];
 
         $data["appProps"] = [
-            "profile" => $profileData,
+            "profile" => $this->getProfileData(),
             "accounts" => $this->accModel->getData(["type" => "all", "full" => true]),
             "currency" => $this->currModel->getData(),
             "icons" => $iconModel->getData(),
@@ -774,13 +763,6 @@ class Transactions extends TemplateController
 
         $data["tr"] = $tr;
 
-        // Common arrays
-        $profileData = [
-            "user_id" => $this->user_id,
-            "owner_id" => $this->owner_id,
-            "name" => $this->user_name,
-        ];
-
         $showBothAmounts = $showSrcAmount && $showDestAmount;
         $data["srcAmountLbl"] = ($showBothAmounts) ? "Source amount" : "Amount";
         $data["destAmountLbl"] = ($showBothAmounts) ? "Destination amount" : "Amount";
@@ -881,7 +863,7 @@ class Transactions extends TemplateController
         $data["titleString"] = "Jezve Money | " . $data["headString"];
 
         $data["appProps"] = [
-            "profile" => $profileData,
+            "profile" => $this->getProfileData(),
             "accounts" => $this->accModel->getData(["type" => "all", "full" => true]),
             "currency" => $this->currModel->getData(),
             "icons" => $iconModel->getData(),
