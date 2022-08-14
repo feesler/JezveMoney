@@ -572,7 +572,31 @@ export class ImportView extends AppView {
     async addItem() {
         this.checkMainState();
 
+        const expectedList = this.content.itemsList.getExpectedState();
+        const mainAccount = App.state.accounts.getItem(this.model.mainAccount);
+        const expectedItem = {
+            enabled: true,
+            typeField: { value: 'expense', disabled: false },
+            amountField: { value: '', disabled: false },
+            destAmountField: { value: '', disabled: true },
+            currencyField: { value: mainAccount.curr_id.toString(), disabled: false },
+            destAccountField: { disabled: true },
+            dateField: { value: '', disabled: false },
+            commentField: { value: '', disabled: false },
+            personField: { disabled: true },
+        };
+        expectedList.items.push(expectedItem);
+
+        this.model.totalCount += 1;
+        this.model.enabledCount += 1;
+
+        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState.itemsList = expectedList;
+        this.expectedState.submitBtn.disabled = false;
+
         await this.performAction(() => this.content.addBtn.click());
+
+        return this.checkState();
     }
 
     async deleteAllItems() {
