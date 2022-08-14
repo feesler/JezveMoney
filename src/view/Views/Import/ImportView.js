@@ -116,7 +116,7 @@ class ImportView extends View {
 
         this.trListSortable = new Sortable({
             oninsertat: (orig, replaced) => this.onTransPosChanged(orig, replaced),
-            container: 'rowsContainer',
+            elem: 'rowsContainer',
             group: 'transactions',
             selector: '.import-item',
             placeholderClass: 'import-item__placeholder',
