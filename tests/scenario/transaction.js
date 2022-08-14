@@ -12,7 +12,7 @@ import * as IncomeTransactionTests from '../run/transaction/income.js';
 import * as TransferTransactionTests from '../run/transaction/transfer.js';
 import * as DebtTransactionTests from '../run/transaction/debt.js';
 import { transactionsListTests } from './transactionList.js';
-import { importTests } from './import.js';
+import { importTests } from './import/index.js';
 import { App } from '../Application.js';
 import { ACCOUNT_HIDDEN } from '../model/AccountsList.js';
 import { PERSON_HIDDEN } from '../model/PersonsList.js';
