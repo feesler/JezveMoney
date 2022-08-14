@@ -82,10 +82,10 @@ export class Application {
             return;
         }
 
-        const personsList = PersonList.create(this.model.persons.data);
+        const { persons } = this.model;
         // Sort persons by visibility: [...visible, ...hidden]
-        personsList.sort((a, b) => a.flags - b.flags);
-        this.model.visiblePersons = PersonList.create(personsList.getVisible());
-        this.model.hiddenPersons = PersonList.create(personsList.getHidden());
+        persons.sort((a, b) => a.flags - b.flags);
+        this.model.visiblePersons = PersonList.create(persons.getVisible());
+        this.model.hiddenPersons = PersonList.create(persons.getHidden());
     }
 }
