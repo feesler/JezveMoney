@@ -240,33 +240,35 @@ export class ImportListItem extends TestComponent {
     }
 
     getExpectedState(model) {
+        const isExpenseOrIncome = (model.type === 'expense' || model.type === 'income');
+        const isTransfer = (model.type === 'transferfrom' || model.type === 'transferto');
+        const isDebt = (model.type === 'debtfrom' || model.type === 'debtto');
+
         const res = {
             enabled: model.enabled,
             typeField: {
-                value: model.type.toString(),
                 disabled: !model.enabled,
                 visible: true,
             },
             amountField: {
-                value: model.amount.toString(),
                 disabled: !model.enabled,
                 visible: true,
             },
             destAmountField: {
-                value: model.destAmount.toString(),
-                disabled: !model.enabled,
+                disabled: !(model.enabled && model.isDifferent && !isDebt),
+                visible: model.isDifferent && !isDebt,
             },
             destAccountField: {
-                value: model.destId.toString(),
-                disabled: !model.enabled,
+                disabled: !(model.enabled && isTransfer),
+                visible: isTransfer,
             },
             currencyField: {
-                value: model.currId.toString(),
-                disabled: !model.enabled,
+                disabled: !(model.enabled && isExpenseOrIncome),
                 visible: true,
             },
             personField: {
-                value: model.personId.toString(),
+                visible: isDebt,
+                disabled: !(model.enabled && isDebt),
             },
             dateField: {
                 value: model.date.toString(),
@@ -281,45 +283,23 @@ export class ImportListItem extends TestComponent {
             invFeedback: { visible: model.invalidated },
         };
 
-        if (model.type === 'expense') {
-            res.destAmountField.visible = model.isDifferent;
-            res.destAccountField.visible = false;
-            res.personField.visible = false;
-
-            res.destAccountField.disabled = true;
-            res.personField.disabled = true;
-        } else if (model.type === 'income') {
-            res.destAmountField.visible = model.isDifferent;
-            res.destAccountField.visible = false;
-            res.personField.visible = false;
-
-            res.destAccountField.disabled = true;
-            res.personField.disabled = true;
-        } else if (model.type === 'transferfrom' || model.type === 'transferto') {
-            res.destAmountField.visible = model.isDifferent;
-            res.destAccountField.visible = true;
-            res.personField.visible = false;
-
-            if (model.enabled) {
-                res.destAccountField.disabled = false;
-            }
-            res.currencyField.disabled = true;
-            res.personField.disabled = true;
-        } else if (model.type === 'debtfrom' || model.type === 'debtto') {
-            res.destAmountField.visible = false;
-            res.destAccountField.visible = false;
-            res.personField.visible = true;
-
-            res.destAccountField.disabled = true;
-            res.currencyField.disabled = true;
+        if (!res.typeField.disabled) {
+            res.typeField.value = model.type.toString();
         }
-
-        if (model.enabled) {
-            if (!model.isDifferent) {
-                res.destAmountField = { value: '', disabled: true };
-            } else {
-                res.destAmountField.disabled = !model.isDifferent;
-            }
+        if (!res.amountField.disabled) {
+            res.amountField.value = model.amount.toString();
+        }
+        if (!res.destAmountField.disabled) {
+            res.destAmountField.value = model.destAmount.toString();
+        }
+        if (!res.destAccountField.disabled) {
+            res.destAccountField.value = model.destId.toString();
+        }
+        if (!res.currencyField.disabled) {
+            res.currencyField.value = model.currId.toString();
+        }
+        if (!res.personField.disabled) {
+            res.personField.value = model.personId.toString();
         }
 
         return res;
@@ -651,81 +631,69 @@ export class ImportListItem extends TestComponent {
         res.typeField.value = item.type;
         if (item.type === 'expense') {
             res.amountField.value = item.src_amount.toString();
+
             res.destAmountField = {
-                value: (isDifferent) ? item.dest_amount.toString() : '',
                 disabled: (item.enabled) ? !isDifferent : true,
             };
-            res.destAccountField = {
-                value: item.dest_id.toString(),
-                disabled: true,
-            };
-            res.currencyField = {
-                value: item.dest_curr.toString(),
-                disabled: !item.enabled,
-            };
-            res.personField = {
-                value: '0',
-                disabled: true,
-            };
+            if (!res.destAmountField.disabled) {
+                res.destAmountField.value = (isDifferent) ? item.dest_amount.toString() : '';
+            }
+
+            res.destAccountField = { disabled: true };
+
+            res.currencyField = { disabled: !item.enabled };
+            if (!res.currencyField.disabled) {
+                res.currencyField.value = item.dest_curr.toString();
+            }
+
+            res.personField = { disabled: true };
         } else if (item.type === 'income') {
             res.amountField.value = item.dest_amount.toString();
             // Use destination account and amount fields as source for income
             res.destAmountField = {
-                value: (isDifferent) ? item.src_amount.toString() : '',
                 disabled: (item.enabled) ? !isDifferent : true,
             };
-            res.destAccountField = {
-                value: item.src_id.toString(),
-                disabled: true,
-            };
-            res.currencyField = {
-                value: item.src_curr.toString(),
-                disabled: !item.enabled,
-            };
-            res.personField = {
-                value: '0',
-                disabled: true,
-            };
+            if (!res.destAmountField.disabled) {
+                res.destAmountField.value = (isDifferent) ? item.src_amount.toString() : '';
+            }
+
+            res.destAccountField = { disabled: true };
+
+            res.currencyField = { disabled: !item.enabled };
+            if (!res.currencyField.disabled) {
+                res.currencyField.value = item.src_curr.toString();
+            }
+
+            res.personField = { disabled: true };
         } else if (item.type === 'transferfrom' || item.type === 'transferto') {
             const isFrom = (item.type === 'transferfrom');
 
             res.amountField.value = ((isFrom) ? item.src_amount : item.dest_amount).toString();
-            res.destAmountField = {
-                value: (isDifferent)
+
+            res.destAmountField = { disabled: (item.enabled) ? !isDifferent : true };
+            if (!res.destAmountField.disabled) {
+                res.destAmountField.value = (isDifferent)
                     ? ((isFrom) ? item.dest_amount : item.src_amount).toString()
-                    : '',
-                disabled: (item.enabled) ? !isDifferent : true,
-            };
-            res.destAccountField = {
-                value: ((isFrom) ? item.dest_id : item.src_id).toString(),
-                disabled: !item.enabled,
-            };
-            res.currencyField = {
-                value: ((isFrom) ? item.dest_curr : item.src_curr).toString(),
-                disabled: true,
-            };
-            res.personField = {
-                value: '0',
-                disabled: true,
-            };
+                    : '';
+            }
+
+            res.destAccountField = { disabled: !item.enabled };
+            if (!res.destAccountField.disabled) {
+                res.destAccountField.value = ((isFrom) ? item.dest_id : item.src_id).toString();
+            }
+
+            res.currencyField = { disabled: true };
+            res.personField = { disabled: true };
         } else if (item.type === 'debtfrom' || item.type === 'debtto') {
             res.amountField.value = item.src_amount.toString();
-            res.destAmountField = {
-                value: '',
-                disabled: true,
-            };
-            res.destAccountField = {
-                value: '0',
-                disabled: true,
-            };
-            res.currencyField = {
-                value: item.dest_curr.toString(),
-                disabled: true,
-            };
-            res.personField = {
-                value: item.person_id.toString(),
-                disabled: !item.enabled,
-            };
+            res.destAmountField = { disabled: true };
+            res.destAccountField = { disabled: true };
+            res.currencyField = { disabled: true };
+
+            res.personField = { disabled: !item.enabled };
+            if (!res.personField.disabled) {
+                res.personField.value = item.person_id.toString();
+            }
         }
 
         return res;

@@ -137,26 +137,7 @@ export const addItem = async () => {
         await checkNavigation();
         await checkViewState('main');
 
-        const itemsList = App.view.content.itemsList.getExpectedState();
-        const mainAccount = App.state.accounts.getItem(App.view.model.mainAccount);
-        const expectedItem = {
-            enabled: true,
-            typeField: { value: 'expense', disabled: false },
-            amountField: { value: '', disabled: false },
-            destAmountField: { value: '', disabled: true },
-            currencyField: { value: mainAccount.curr_id.toString(), disabled: false },
-            destAccountField: { value: '0', disabled: true },
-            dateField: { value: '', disabled: false },
-            commentField: { value: '', disabled: false },
-            personField: { value: '0', disabled: true },
-        };
-
-        itemsList.items.push(expectedItem);
-
-        await App.view.addItem();
-
-        App.view.expectedState = { itemsList };
-        return App.view.checkState();
+        return App.view.addItem();
     });
 };
 

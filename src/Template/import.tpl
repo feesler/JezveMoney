@@ -24,11 +24,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <div class="header-field account-field std_margin">
                                 <label>Main account</label>
                                 <div class="header-field__content">
-                                    <select id="acc_id">
-<?php   foreach($accounts as $account) {	?>
-                                        <option value="<?=e($account->id)?>"><?=e($account->name)?></option>
-<?php   }   ?>
-                                    </select>
+                                    <select id="acc_id"></select>
                                 </div>
                             </div>
                             <div class="header-actions">

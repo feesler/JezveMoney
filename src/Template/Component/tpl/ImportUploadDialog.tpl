@@ -77,11 +77,7 @@
     </div>
     <div id="initialAccField" class="upload-dialog-account tpl-form-field" hidden>
         <label>Main account</label>
-        <select id="initialAccount">
-<?php foreach($accounts as $account) {	?>
-            <option value="<?=e($account->id)?>"><?=e($account->name)?></option>
-<?php }	?>
-        </select>
+        <select id="initialAccount"></select>
     </div>
     <div class="upload-dialog-controls" hidden>
         <input id="submitUploadedBtn" class="btn submit-btn" type="button" value="Ok">

@@ -29,8 +29,7 @@ class Profile extends TemplateController
             throw new \Error("Person not found");
         }
 
-        $profileInfo = new \stdClass();
-        $profileInfo->name = $pObj->name;
+        $profileInfo = $this->getProfileData();
         $data["profileInfo"] = $profileInfo;
 
         $titleString = "Jezve Money | Profile";

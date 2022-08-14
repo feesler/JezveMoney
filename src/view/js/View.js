@@ -2,6 +2,8 @@ import { ge, copyObject, onReady } from 'jezvejs';
 import { Header } from '../Components/Header/Header.js';
 import { createMessage } from './app.js';
 
+const HIDDEN_GROUP_TITLE = 'Hidden';
+
 /**
  * Base View class
  */
@@ -77,5 +79,59 @@ export class View {
         }
 
         return res;
+    }
+
+    /** Initialize acconts DropDown */
+    initAccountsList(ddlist) {
+        if (!ddlist) {
+            return;
+        }
+
+        window.app.checkUserAccountModels();
+
+        const { visibleUserAccounts, hiddenUserAccounts } = window.app.model;
+
+        visibleUserAccounts.forEach(
+            (item) => ddlist.addItem({ id: item.id, title: item.name }),
+        );
+        if (hiddenUserAccounts.length === 0) {
+            return;
+        }
+
+        const group = ddlist.addGroup(HIDDEN_GROUP_TITLE);
+        hiddenUserAccounts.forEach(
+            (item) => ddlist.addItem({
+                id: item.id,
+                title: item.name,
+                group,
+            }),
+        );
+    }
+
+    /** Initialize DropDown for debt account tile */
+    initPersonsList(ddlist) {
+        if (!ddlist) {
+            return;
+        }
+
+        window.app.checkPersonModels();
+
+        const { visiblePersons, hiddenPersons } = window.app.model;
+
+        visiblePersons.forEach(
+            (person) => this.persDDList.addItem({ id: person.id, title: person.name }),
+        );
+        if (hiddenPersons.length === 0) {
+            return;
+        }
+
+        const group = this.persDDList.addGroup(HIDDEN_GROUP_TITLE);
+        hiddenPersons.forEach(
+            (person) => this.persDDList.addItem({
+                id: person.id,
+                title: person.name,
+                group,
+            }),
+        );
     }
 }

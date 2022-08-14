@@ -97,6 +97,8 @@ class ImportView extends View {
             throw new Error('Failed to initialize Import view');
         }
 
+        this.initAccountsList(this.accountDropDown);
+
         this.submitBtn.addEventListener('click', () => this.onSubmitClick());
         this.rulesBtn.addEventListener('click', () => this.onRulesClick());
         // Submit progress indicator
@@ -116,7 +118,7 @@ class ImportView extends View {
 
         this.trListSortable = new Sortable({
             oninsertat: (orig, replaced) => this.onTransPosChanged(orig, replaced),
-            container: 'rowsContainer',
+            elem: 'rowsContainer',
             group: 'transactions',
             selector: '.import-item',
             placeholderClass: 'import-item__placeholder',

@@ -52,6 +52,7 @@ class Import extends TemplateController
         }
 
         $data["appProps"] = [
+            "profile" => $this->getProfileData(),
             "accounts" => $data["accounts"],
             "currency" => $currMod->getData(),
             "persons" => $this->personMod->getData(["type" => "all"]),

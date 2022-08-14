@@ -118,13 +118,22 @@ abstract class TemplateController extends Controller
             } elseif ($adminOnly && !$this->uMod->isAdmin($this->user_id)) {
                 setLocation(BASEURL);
             }
-        } else // user should be logged out ot access
-        {
+        } else { // user should be logged out ot access
             if ($this->user_id != 0) {
                 setLocation(BASEURL);
             }
         }
 
         $this->onStart();
+    }
+
+    // Returns profile data for view
+    public function getProfileData()
+    {
+        return [
+            "user_id" => $this->user_id,
+            "owner_id" => $this->owner_id,
+            "name" => $this->user_name,
+        ];
     }
 }
