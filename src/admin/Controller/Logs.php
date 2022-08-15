@@ -17,6 +17,7 @@ class Logs extends AdminController
         ];
 
         $this->cssAdmin[] = "AdminLogsView.css";
+        $this->jsAdmin[] = "AdminLogsView.js";
 
         $this->render($data);
     }

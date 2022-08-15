@@ -27,6 +27,7 @@ class DBInstall extends AdminController
         ];
 
         $this->cssAdmin[] = "DBInstallView.css";
+        $this->jsAdmin[] = "DBInstallView.js";
 
         $this->render($data);
     }
