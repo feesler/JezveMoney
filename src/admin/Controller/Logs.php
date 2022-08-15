@@ -16,7 +16,6 @@ class Logs extends AdminController
             "contents" => Logger::read(),
         ];
 
-        $this->menuItems["log"]["active"] = true;
         $this->cssAdmin[] = "AdminLogsView.css";
 
         $this->render($data);

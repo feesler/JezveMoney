@@ -100,7 +100,6 @@ class Balance extends AdminController
             ],
         ];
 
-        $this->menuItems["balance"]["active"] = true;
         $this->cssAdmin[] = "BalanceView.css";
         $this->jsAdmin[] = "BalanceView.js";
 

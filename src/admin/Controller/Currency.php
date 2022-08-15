@@ -32,7 +32,6 @@ class Currency extends AdminController
             ],
         ];
 
-        $this->menuItems["curr"]["active"] = true;
         $this->cssAdmin[] = "AdminCurrencyView.css";
         $this->jsAdmin[] = "AdminCurrencyView.js";
 

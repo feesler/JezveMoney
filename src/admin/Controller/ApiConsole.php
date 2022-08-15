@@ -18,7 +18,6 @@ class ApiConsole extends AdminController
         $tplModel = ImportTemplateModel::getInstance();
         $data["tplColumns"] = $tplModel->getColumnTypes();
 
-        $this->menuItems["apiconsole"]["active"] = true;
         $this->cssAdmin[] = "ApiConsoleView.css";
         $this->jsAdmin[] = "ApiConsoleView.js";
 

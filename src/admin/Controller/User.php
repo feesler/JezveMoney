@@ -35,7 +35,6 @@ class User extends AdminController
             ],
         ];
 
-        $this->menuItems["users"]["active"] = true;
         $this->cssAdmin[] = "AdminUserView.css";
         $this->jsAdmin[] = "AdminUserView.js";
 

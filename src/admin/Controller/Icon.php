@@ -32,7 +32,6 @@ class Icon extends AdminController
             ],
         ];
 
-        $this->menuItems["icon"]["active"] = true;
         $this->cssAdmin[] = "AdminIconView.css";
         $this->jsAdmin[] = "AdminIconView.js";
 
