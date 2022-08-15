@@ -142,6 +142,10 @@ export class AccountsList extends List {
         return this.find((item) => item.name.toLowerCase() === lookupName);
     }
 
+    sortByVisibility() {
+        this.data.sort((a, b) => a.flags - b.flags);
+    }
+
     getUserAccounts(returnRaw = false) {
         const res = this.filter((item) => item.owner_id === App.owner_id);
 

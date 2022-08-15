@@ -54,4 +54,8 @@ export class PersonsList extends List {
 
         return new PersonsList(res);
     }
+
+    sortByVisibility() {
+        this.data.sort((a, b) => a.flags - b.flags);
+    }
 }
