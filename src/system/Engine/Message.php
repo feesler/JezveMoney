@@ -54,30 +54,6 @@ class Message
     }
 
 
-    // Check message is set
-    public static function isSet()
-    {
-        sessionStart();
-
-        if (!isset($_SESSION["msg"])) {
-            return false;
-        }
-
-        $msg_id = intval($_SESSION["msg"]);
-        if ($msg_id == MSG_NONE || !isset(self::$msgArray[$msg_id])) {
-            return false;
-        }
-
-        $msgParam = self::$msgArray[$msg_id];
-        $msgType = $msgParam[0];
-        if ($msgType == MSG_TYPE_NONE) {
-            return false;
-        }
-
-        return true;
-    }
-
-
     // Check message and show it if available
     public static function check()
     {

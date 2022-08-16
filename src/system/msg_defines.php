@@ -65,11 +65,6 @@ define("ERR_TRANS_DELETE", 605);
 define("MSG_TRANS_CHANGE_POS", 606);
 define("ERR_TRANS_CHANGE_POS", 607);
 
-define("MSG_DEBT_CREATE", 700);
-define("ERR_DEBT_CREATE", 701);
-define("MSG_DEBT_UPDATE", 702);
-define("ERR_DEBT_UPDATE", 703);
-
 define("MSG_ICON_CREATE", 800);
 define("ERR_ICON_CREATE", 801);
 define("MSG_ICON_UPDATE", 802);

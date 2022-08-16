@@ -2,19 +2,18 @@
 
 namespace JezveMoney\App\API\Controller;
 
-use JezveMoney\Core\ApiController;
+use JezveMoney\Core\ApiListController;
 use JezveMoney\Core\Message;
 use JezveMoney\App\Model\ImportActionModel;
 use JezveMoney\App\Item\ImportActionItem;
 
-class ImportAction extends ApiController
+class ImportAction extends ApiListController
 {
     protected $requiredFields = [
         "rule_id",
         "action_id",
         "value",
     ];
-    protected $model = null;
 
 
     public function initAPI()
@@ -22,128 +21,62 @@ class ImportAction extends ApiController
         parent::initAPI();
 
         $this->model = ImportActionModel::getInstance();
+        $this->createErrorMsg = Message::get(ERR_IMPORT_ACT_CREATE);
+        $this->updateErrorMsg = Message::get(ERR_IMPORT_ACT_UPDATE);
+        $this->deleteErrorMsg = Message::get(ERR_IMPORT_ACT_DELETE);
     }
 
 
-    public function index()
+    protected function prepareItem($item)
     {
-        $ids = $this->getRequestedIds();
-        if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            throw new \Error("No items specified");
-        }
+        return new ImportActionItem($item);
+    }
 
+
+    protected function prepareListRequest($request)
+    {
         $res = [];
-        foreach ($ids as $item_id) {
-            $item = $this->model->getItem($item_id);
-            if (!$item) {
-                throw new \Error("Item '$item_id' not found");
-            }
-
-            $res[] = new ImportActionItem($item);
+        if (isset($request["full"]) && $request["full"] == true) {
+            $res["full"] = true;
+        }
+        if (isset($request["rule"])) {
+            $res["rule"] = $request["rule"];
         }
 
-        $this->ok($res);
+        return $res;
     }
 
 
-    public function getList()
+    protected function getListItems($request)
     {
-        $params = [];
-        if (isset($_GET["full"]) && $_GET["full"] == true) {
-            $params["full"] = true;
-        }
-        if (isset($_GET["rule"])) {
-            $params["rule"] = $_GET["rule"];
-        }
-
-        $res = $this->model->getData($params);
-
-        $this->ok($res);
+        return $this->model->getData($request);
     }
 
 
-    protected function create()
+    public function create()
     {
-        $defMsg = Message::get(ERR_IMPORT_ACT_CREATE);
-
-        if (!$this->isPOST()) {
-            throw new \Error($defMsg);
-        }
-
-        $request = $this->getRequestData();
-        $reqData = checkFields($request, $this->requiredFields);
-        if ($reqData === false) {
-            throw new \Error($defMsg);
-        }
-
-        $item_id = $this->model->create($reqData);
-        if (!$item_id) {
-            throw new \Error($defMsg);
-        }
-
-        $this->ok([ "id" => $item_id ]);
+        $this->checkAdminAccess();
+        parent::create();
     }
 
 
     public function createMultiple()
     {
-        if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
-        }
-
-        $request = $this->getRequestData();
-        $ids = $this->model->createMultiple($request);
-        if (!$ids) {
-            throw new \Error(Message::get(ERR_IMPORT_ACT_CREATE));
-        }
-
-        $this->ok(["ids" => $ids]);
+        $this->checkAdminAccess();
+        parent::createMultiple();
     }
 
 
-    protected function update()
+    public function update()
     {
-        $defMsg = Message::get(ERR_IMPORT_ACT_UPDATE);
-
-        if (!$this->isPOST()) {
-            throw new \Error($defMsg);
-        }
-
-        $request = $this->getRequestData();
-        if (!$request || !isset($request["id"])) {
-            throw new \Error($defMsg);
-        }
-
-        $reqData = checkFields($request, $this->requiredFields);
-        if ($reqData === false) {
-            throw new \Error($defMsg);
-        }
-
-        if (!$this->model->update($request["id"], $reqData)) {
-            throw new \Error($defMsg);
-        }
-
-        $this->ok();
+        $this->checkAdminAccess();
+        parent::update();
     }
 
 
-    protected function del()
+    public function del()
     {
-        $defMsg = Message::get(ERR_IMPORT_ACT_DELETE);
-
-        if (!$this->isPOST()) {
-            throw new \Error($defMsg);
-        }
-
-        $ids = $this->getRequestedIds(true, $this->isJsonContent());
-        if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            throw new \Error("No item specified");
-        }
-
-        if (!$this->model->del($ids)) {
-            throw new \Error($defMsg);
-        }
-
-        $this->ok();
+        $this->checkAdminAccess();
+        parent::del();
     }
 }

@@ -65,11 +65,6 @@ Message::add(ERR_TRANS_DELETE, MSG_TYPE_ERROR, "Fail to delete transaction.");
 Message::add(MSG_TRANS_CHANGE_POS);
 Message::add(ERR_TRANS_CHANGE_POS, MSG_TYPE_ERROR, "Fail to change position of transaction.");
 
-Message::add(MSG_DEBT_CREATE);
-Message::add(ERR_DEBT_CREATE, MSG_TYPE_ERROR, "Fail to create new debt.");
-Message::add(MSG_DEBT_UPDATE);
-Message::add(ERR_DEBT_UPDATE, MSG_TYPE_ERROR, "Fail to update debt.");
-
 Message::add(MSG_ICON_CREATE, MSG_TYPE_SUCCESS, "Icon successfully created.");
 Message::add(ERR_ICON_CREATE, MSG_TYPE_ERROR, "Fail to create new icon.");
 Message::add(MSG_ICON_UPDATE, MSG_TYPE_SUCCESS, "Icon successfully updated.");

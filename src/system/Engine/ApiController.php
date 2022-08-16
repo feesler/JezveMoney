@@ -78,18 +78,19 @@ class ApiController extends Controller
         $this->response->ok();
     }
 
+    protected function checkAdminAccess()
+    {
+        if (!UserModel::isAdminUser()) {
+            header("HTTP/1.1 403 Forbidden", true, 403);
+            $this->fail("Access denied");
+        }
+    }
+
 
     public function __call($method, $parameters)
     {
-        wlog("call " . static::class . "::" . $method . "()");
-
         if (!method_exists($this, $method)) {
             header("HTTP/1.1 400 Bad Request", true, 400);
-            $this->fail("Access denied");
-        }
-
-        if (!UserModel::isAdminUser()) {
-            header("HTTP/1.1 403 Forbidden", true, 403);
             $this->fail("Access denied");
         }
 
@@ -130,8 +131,10 @@ class ApiController extends Controller
     {
         if ($this->isJsonContent()) {
             return $this->getJSONContent(true);
-        } else {
+        } elseif ($this->isPOST()) {
             return $_POST;
+        } else {
+            return $_GET;
         }
     }
 }

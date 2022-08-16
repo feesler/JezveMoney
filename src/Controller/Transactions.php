@@ -883,27 +883,20 @@ class Transactions extends TemplateController
         }
 
         $trans_type = intval($_POST["type"]);
-
-        $defMsg = ($trans_type == DEBT) ? ERR_DEBT_CREATE : ERR_TRANS_CREATE;
-
         $reqData = checkFields($_POST, ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields);
         if ($reqData === false) {
             $this->fail();
         }
 
-        if ($trans_type == DEBT) {
-            if (!$this->model->createDebt($reqData)) {
-                $this->fail($defMsg);
-            }
+        $itemData = ($trans_type == DEBT)
+            ? $this->model->prepareDebt($reqData)
+            : $reqData;
 
-            Message::set(MSG_DEBT_CREATE);
-        } else {
-            if (!$this->model->create($reqData)) {
-                $this->fail($defMsg);
-            }
-
-            Message::set(MSG_TRANS_CREATE);
+        if (!$this->model->create($itemData)) {
+            $this->fail(ERR_TRANS_CREATE);
         }
+
+        Message::set(MSG_TRANS_CREATE);
 
         setLocation(BASEURL);
     }
@@ -920,25 +913,19 @@ class Transactions extends TemplateController
         }
 
         $trans_type = intval($_POST["type"]);
-
-        $defMsg = ($trans_type == DEBT) ? ERR_DEBT_UPDATE : ERR_TRANS_UPDATE;
-
         $reqData = checkFields($_POST, ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields);
         if ($reqData === false) {
             $this->fail();
         }
 
-        if ($trans_type == DEBT) {
-            if (!$this->model->updateDebt($_POST["id"], $reqData)) {
-                $this->fail($defMsg);
-            }
-            Message::set(MSG_DEBT_UPDATE);
-        } else {
-            if (!$this->model->update($_POST["id"], $reqData)) {
-                $this->fail($defMsg);
-            }
-            Message::set(MSG_TRANS_UPDATE);
+        $itemData = ($trans_type == DEBT)
+            ? $this->model->prepareDebt($reqData)
+            : $reqData;
+
+        if (!$this->model->update($_POST["id"], $itemData)) {
+            $this->fail(ERR_TRANS_UPDATE);
         }
+        Message::set(MSG_TRANS_UPDATE);
 
         setLocation(BASEURL . "transactions/");
     }
