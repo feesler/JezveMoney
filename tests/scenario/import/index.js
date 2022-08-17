@@ -42,11 +42,14 @@ const runSubmitImportTests = async () => {
     // Empty date
     await ImportTests.updateItem({
         pos: 0,
-        action: { action: 'inputDestAmount', data: '2' },
+        action: [
+            { action: 'inputDestAmount', data: '2' },
+            { action: 'inputDate', data: '' },
+        ],
     });
     await ImportTests.submit();
 
-    // Invalida date
+    // Invalid date
     await ImportTests.updateItem({
         pos: 0,
         action: { action: 'inputDate', data: '2.ssa' },

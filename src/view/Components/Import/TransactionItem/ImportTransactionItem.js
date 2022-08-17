@@ -94,7 +94,7 @@ export class ImportTransactionItem extends Component {
             secondAmount: '',
             personId: 0,
             personVisible: false,
-            date: '',
+            date: formatDate(new Date()),
             comment: '',
         };
 
