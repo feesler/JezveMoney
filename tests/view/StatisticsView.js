@@ -31,18 +31,17 @@ export class StatisticsView extends AppView {
         res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
         res.title = await prop(res.titleEl, 'textContent');
 
-        const filtersList = await queryAll('.filters-container .filter-item');
-        assert(filtersList?.length === 5, 'Invalid structure of statistics view');
-
         res.filterByDropDown = await DropDown.createFromChild(this, await query('#filter_type'));
 
         res.accountsDropDown = null;
-        if (await isVisible(filtersList[1])) {
+        const accountsFilter = await query('#acc_block');
+        if (await isVisible(accountsFilter, true)) {
             res.accountsDropDown = await DropDown.createFromChild(this, await query('#acc_id'));
         }
 
         res.currencyDropDown = null;
-        if (await isVisible(filtersList[2])) {
+        const currencyFilter = await query('#curr_block');
+        if (await isVisible(currencyFilter)) {
             res.currencyDropDown = await DropDown.createFromChild(this, await query('#curr_id'));
         }
 
