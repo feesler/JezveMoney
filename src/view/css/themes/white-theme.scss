@@ -8,6 +8,11 @@
   --input-border-color: #b0b0b0;
   --active-input-border-color: #888888;
 
+  /* Disabled inputs */
+  --input-disabled-bg-color: #eeeeee;
+  --input-disabled-border-color: #eeeeee;
+  --input-disabled-text-color: #a0a0a0;
+
   color: var(--main-text-color);
   background-color: var(--main-bg-color);
 
@@ -129,12 +134,12 @@
     --dd-btn-hover-fill: #000000;
 
     /* Disabled component */
-    --dd-disabled-bg: #eeeeee;
-    --dd-disabled-border: #eeeeee;
-    --dd-disabled-selection-color: #a0a0a0;
-    --dd-disabled-input-text: #a0a0a0;
-    --dd-disabled-btn-fill: #707070;
-    --dd-disabled-selection-item-text: #707070;
+    --dd-disabled-bg: var(--input-disabled-bg-color);
+    --dd-disabled-border: var(--input-disabled-border-color);
+    --dd-disabled-selection-color: var(--input-disabled-text-color);
+    --dd-disabled-input-text: var(--input-disabled-text-color);
+    --dd-disabled-btn-fill: var(--input-disabled-text-color);
+    --dd-disabled-selection-item-text: var(--input-disabled-text-color);
     --dd-disabled-selection-item-bg: #dfdfdf;
 
     /* List item */
@@ -285,9 +290,9 @@
 
   .import-item select[disabled],
   .import-item input[disabled] {
-    color: #dddddd;
-    border-color: #dddddd;
-    background-color: #eeeeee;
+    color: var(--input-disabled-text-color);
+    border-color: var(--input-disabled-border-color);
+    background-color: var(--input-disabled-bg-color);
   }
 
   .import-item.import-item_disabled {
@@ -300,9 +305,9 @@
   .import-item_disabled select[disabled],
   .import-item_disabled input[type="text"],
   .import-item_disabled input[disabled] {
-    color: #dddddd;
-    border-color: #eeeeee;
-    background-color: #eeeeee;
+    color: var(--input-disabled-text-color);
+    border-color: var(--input-disabled-border-color);
+    background-color: var(--input-disabled-bg-color);
   }
 
   .import-item_disabled input::placeholder {
