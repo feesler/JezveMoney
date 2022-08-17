@@ -1,5 +1,7 @@
 /* Mode selector */
 .mode-selector {
+  --ms-focus-shadow: #0d6efd40;
+
   display: inline-flex;
   flex-flow: row nowrap;
   align-items: center;
@@ -9,6 +11,10 @@
 .mode-selector__item {
   display: inline-flex;
   flex-flow: row nowrap;
+
+  &:focus {
+    box-shadow: 0 0 0 0.25rem var(--ms-focus-shadow);
+  }
 
   span {
     height: 22px;
