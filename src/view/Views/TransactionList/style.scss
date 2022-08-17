@@ -84,10 +84,6 @@
 }
 
 /* Paginator */
-.paginator {
-  --pg-focus-shadow: #0d6efd40;
-}
-
 .paginator-item {
   padding: 0.25rem 0.5rem;
   margin: 0;
@@ -120,7 +116,7 @@
 a.paginator-item:focus,
 a.paginator-arrow:focus {
   z-index: 2;
-  box-shadow: 0 0 0 0.25rem var(--pg-focus-shadow);
+  box-shadow: 0 0 0 0.25rem var(--focus-shadow);
 }
 
 @media (hover: hover) {

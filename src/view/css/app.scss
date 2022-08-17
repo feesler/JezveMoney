@@ -45,6 +45,8 @@
 
 html,
 body {
+  --focus-shadow: #0d6efd40;
+
   width: 100%;
   height: 100%;
 }
@@ -161,6 +163,7 @@ label {
 /* DropDown attached to input group button */
 .input-group .input-group__btn .dd__container_active.dd__container_attached {
   outline: 0 none;
+  box-shadow: 0 0 0 0.25rem var(--focus-shadow);
 }
 
 /* Validation */

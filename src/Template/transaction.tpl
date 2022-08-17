@@ -169,7 +169,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <label for="src_amount"><?=e($srcAmountLbl)?></label>
                             <div class="input-group">
                                 <input id="src_amount" name="src_amount" class="input-group__input stretch-input amount-input" type="text" autocomplete="off" value="<?=e($form["src_amount"])?>">
-                                <button class="input-group__btn" type="button"<?=disabled($tr["type"] != INCOME)?>>
+                                <button class="input-group__btn" type="button"<?=disabled($tr["type"] != INCOME)?> tabindex="-1">
                                     <div id="srcamountsign" class="input-group__btn-title"><?=e($form["srcCurrSign"])?></div>
                                 </button>
                             </div>
@@ -181,7 +181,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <label for="dest_amount"><?=e($destAmountLbl)?></label>
                             <div class="input-group">
                                 <input id="dest_amount" name="dest_amount" class="input-group__input stretch-input amount-input" type="text" autocomplete="off" value="<?=e($form["dest_amount"])?>">
-                                <button class="input-group__btn" type="button"<?=disabled($tr["type"] != EXPENSE)?>>
+                                <button class="input-group__btn" type="button"<?=disabled($tr["type"] != EXPENSE)?> tabindex="-1">
                                     <div id="destamountsign" class="input-group__btn-title"><?=e($form["destCurrSign"])?></div>
                                 </button>
                             </div>
