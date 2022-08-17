@@ -90,7 +90,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 <div id="date_block" hidden>
                                     <div class="input-group">
                                         <input id="date" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?=e($dateFmt)?>">
-                                        <button id="cal_rbtn" class="icon-btn input-group__btn" type="button"><?=svgIcon("cal")?></button>
+                                        <button id="cal_rbtn" class="icon-btn input-group__btn" type="button"><?=svgIcon("cal", "icon calendar-icon")?></button>
                                     </div>
                                     <div id="calendar" class="calendar"></div>
                                 </div>

@@ -157,11 +157,6 @@
     cursor: pointer;
   }
 
-  .btn svg {
-    width: 24px;
-    height: 24px;
-  }
-
   /* Toggle expand/collapse button */
   .toggle-btn,
   .toggle-btn:visited,
@@ -169,9 +164,15 @@
     padding: 7px;
   }
 
-  .toggle-btn svg {
+  .toggle-icon {
     width: 18px;
     height: 18px;
+  }
+
+  /* Delete item button */
+  .delete-icon {
+    width: 24px;
+    height: 24px;
   }
 
   /* Container for transaction form */
@@ -212,7 +213,7 @@
   pointer-events: none;
 }
 
-.import-item_expanded .toggle-btn svg {
+.import-item_expanded .toggle-icon {
   transform: rotate(180deg);
 }
 

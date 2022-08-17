@@ -152,14 +152,14 @@ export class ImportTransactionItem extends Component {
         this.delBtn = ce(
             'button',
             { className: 'btn delete-btn', type: 'button' },
-            createIcon('del'),
+            createIcon('del', 'icon delete-icon'),
             { click: () => this.remove() },
         );
         // Toggle expand/collapse
         this.toggleExtBtn = ce(
             'button',
             { className: 'btn toggle-btn', type: 'button' },
-            createIcon('toggle-ext'),
+            createIcon('toggle-ext', 'icon toggle-icon'),
             { click: () => this.toggleCollapse() },
         );
         show(this.toggleExtBtn, false);

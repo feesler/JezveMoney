@@ -13,7 +13,7 @@
   cursor: pointer;
 }
 
-.swap-btn > svg {
+.swap-icon {
   height: 24px;
   width: 24px;
 }
@@ -26,28 +26,28 @@
   height: 20px;
   line-height: 20px;
   overflow: hidden;
-}
 
-.tile_header > label {
-  display: inline-flex;
-  font-size: 16px;
-  margin: 0 5px 0 0;
-}
+  label {
+    display: inline-flex;
+    font-size: 16px;
+    margin: 0 5px 0 0;
+  }
 
-.tile_header > .close-btn {
-  display: inline-flex;
-  padding: 1px;
-  margin: 0;
-  background: none;
-  cursor: pointer;
-  line-height: 20px;
-  height: 20px;
-}
+  .close-btn {
+    display: inline-flex;
+    padding: 1px;
+    margin: 0;
+    background: none;
+    cursor: pointer;
+    line-height: 20px;
+    height: 20px;
+  }
 
-.tile_header > .close-btn > svg {
-  height: 14px;
-  width: 14px;
-  fill: #888888;
+  .close-icon {
+    height: 14px;
+    width: 14px;
+    fill: #888888;
+  }
 }
 
 .tile-base {

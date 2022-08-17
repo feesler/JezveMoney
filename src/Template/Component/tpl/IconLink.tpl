@@ -4,7 +4,7 @@
 <?php   } else { ?>
     <button type="button">
 <?php   } ?>
-        <span class="iconlink__icon"><?=svgIcon($icon)?></span>
+        <span class="iconlink__icon"><?=svgIcon($icon, "iconlink__icon-content")?></span>
         <span class="iconlink__content">
 <?php   if (isset($subtitle) && !is_empty($subtitle)) { ?>
             <span class="iconlink__title"><?=e($title)?></span>

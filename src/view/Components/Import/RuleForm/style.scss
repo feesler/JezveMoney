@@ -10,6 +10,11 @@
   .icon-btn,
   .icon-btn:visited,
   .icon-btn:active {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    flex-flow: row nowrap;
+    justify-content: center;
     background: none;
     cursor: pointer;
   }
@@ -43,11 +48,11 @@
     margin: 0 12px 0 0;
   }
 
-  .toggle-btn svg {
+  .toggle-icon {
     height: 18px;
   }
 
-  &.collapsible__expanded .toggle-btn svg {
+  &.collapsible__expanded .toggle-icon {
     transform: rotate(180deg);
   }
 

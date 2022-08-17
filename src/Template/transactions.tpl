@@ -25,15 +25,15 @@ include(TPL_PATH."commonhdr.tpl");
                     <div id="filterscollapse"></div>
                     <div id="filtershdr" class="filters-heading">
                         <div class="filters-heading__icon">
-                            <?=svgIcon("filter")?>
+                            <?=svgIcon("filter", "filter-icon")?>
                         </div>
                         <label>Filters</label>
                         <a id="clearall_btn" class="clear-all-btn" href="<?=e($clearAllURL)?>">
-                            <?=svgIcon("close")?>
+                            <?=svgIcon("close", "clear-all-icon")?>
                             <span>Clear all</span>
                         </a>
                         <button class="btn icon-btn toggle-btn right-align" type="button">
-                            <svg><use href="#toggle-ext"></use></svg>
+                            <svg class="icon toggle-icon"><use href="#toggle-ext"></use></svg>
                         </button>
                     </div>
 
@@ -125,7 +125,7 @@ include(TPL_PATH."commonhdr.tpl");
                                     <button id="nodatebtn" class="input-group__inner-btn" type="button">
                                         <?=svgIcon("close", "input-group__inner-btn__icon")?>
                                     </button>
-                                    <button id="cal_rbtn" class="icon-btn input-group__btn" type="button"><?=svgIcon("cal")?></button>
+                                    <button id="cal_rbtn" class="icon-btn input-group__btn" type="button"><?=svgIcon("cal", "icon calendar-icon")?></button>
                                 </div>
                                 <div id="calendar" class="calendar"></div>
                             </div>
@@ -139,7 +139,7 @@ include(TPL_PATH."commonhdr.tpl");
                                 <button id="nosearchbtn" class="input-group__inner-btn" type="button">
                                     <?=svgIcon("close", "input-group__inner-btn__icon")?>
                                 </button>
-                                <button class="icon-btn search_btn input-group__btn" type="submit"><?=svgIcon("search")?></button>
+                                <button class="icon-btn search_btn input-group__btn" type="submit"><?=svgIcon("search", "icon search-icon")?></button>
                             </div>
                             </form>
                         </div>
@@ -164,7 +164,7 @@ include(TPL_PATH."commonhdr.tpl");
 
     <div id="toolbar" class="sidebar" hidden>
         <div class="siderbar__content">
-            <div id="sbEllipsis" class="sidebar__ellipsis"><?=svgIcon("sbellipsis")?></div>
+            <div id="sbEllipsis" class="sidebar__ellipsis"><?=svgIcon("sbellipsis", "icon")?></div>
             <div id="sbButtons" class="sidebar__controls">
                 <?=IconLink::render([
                     "id" => "edit_btn",

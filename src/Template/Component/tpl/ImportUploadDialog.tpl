@@ -21,13 +21,13 @@
         <div class="upload-form__options">
             <label id="isEncodeCheck" class="checkbox">
                 <input name="encode" type="checkbox" checked>
-                <span class="checkbox__check"><?=svgIcon("check")?></span>
+                <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                 <span class="checkbox__label">CP-1251 encoding</span>
             </label>
 <?php	if ($this->adminUser || $this->testerUser) { ?>
             <label id="useServerCheck" class="checkbox">
                 <input type="checkbox">
-                <span class="checkbox__check"><?=svgIcon("check")?></span>
+                <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                 <span class="checkbox__label">Use address on server</span>
             </label>
 <?php   }   ?>

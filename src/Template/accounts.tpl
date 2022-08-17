@@ -48,7 +48,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
     </div>
     <div id="toolbar" class="sidebar" hidden>
         <div class="siderbar__content">
-            <div id="sbEllipsis" class="sidebar__ellipsis"><?=svgIcon("sbellipsis")?></div>
+            <div id="sbEllipsis" class="sidebar__ellipsis"><?=svgIcon("sbellipsis", "icon")?></div>
             <div id="sbButtons" class="sidebar__controls">
                 <?=IconLink::render([
                     "id" => "edit_btn",

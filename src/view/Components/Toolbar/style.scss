@@ -34,7 +34,7 @@
       border-color: #ffffff;
     }
 
-    .iconlink__icon svg * {
+    .iconlink__icon-content {
       fill: #ffffff;
     }
   }
@@ -44,7 +44,7 @@
   width: 15px;
   height: 32px;
 
-  svg {
+  .icon {
     width: 15px;
     height: 32px;
     fill: #ffffff;
@@ -91,7 +91,7 @@
       padding: 0;
     }
 
-    .sidebar__controls .iconlink:hover .iconlink__icon svg * {
+    .sidebar__controls .iconlink:hover .iconlink__icon-content {
       fill: #44aaff;
     }
   }
@@ -111,7 +111,7 @@
       background-color: #ffffff;
     }
 
-    &:hover .iconlink__icon svg * {
+    &:hover .iconlink__icon-content {
       fill: #404040;
     }
   }

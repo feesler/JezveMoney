@@ -71,7 +71,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
 
 <?php	if ($tr["type"] == DEBT) {		?>
                             <button id="swapBtn" class="swap-btn" type="button"<?=hidden(!$trAvailable)?>>
-                                <?=svgIcon("swap")?>
+                                <?=svgIcon("swap", "swap-icon")?>
                             </button>
 <?php	}	?>
 
@@ -79,7 +79,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 <div class="tile_header">
                                     <label id="acclbl"><?=e($accLbl)?></label>
                                     <button id="noacc_btn" class="close-btn" type="button"<?=hidden($noAccount)?>>
-                                        <?=svgIcon("close")?>
+                                        <?=svgIcon("close", "close-icon")?>
                                     </button>
                                 </div>
                                 <div class="tile-base"<?=hidden($noAccount)?>>
@@ -131,7 +131,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
 
 <?php	if ($tr["type"] != DEBT) {		?>
                             <button id="swapBtn" class="swap-btn" type="button"<?=hidden(!$trAvailable || $tr["type"] == EXPENSE || $tr["type"] == INCOME)?>>
-                                <?=svgIcon("swap")?>
+                                <?=svgIcon("swap", "swap-icon")?>
                             </button>
 <?php	}	?>
 
@@ -231,7 +231,9 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 <div class="column-container">
                                     <div class="input-group">
                                         <input id="date" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?=e($dateFmt)?>">
-                                        <button id="cal_rbtn" class="icon-btn input-group__btn" type="button"><?=svgIcon("cal")?></button>
+                                        <button id="cal_rbtn" class="icon-btn input-group__btn" type="button">
+                                            <?=svgIcon("cal", "icon calendar-icon")?>
+                                        </button>
                                     </div>
                                     <div id="calendar" class="calendar"></div>
                                 </div>

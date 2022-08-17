@@ -58,7 +58,7 @@
     border-color: #dddddd;
   }
 
-  .iconlink .iconlink__icon svg * {
+  .iconlink .iconlink__icon-content {
     fill: #dddddd;
   }
 
@@ -79,7 +79,7 @@
     color: var(--main-text-color);
   }
 
-  .widget_title .glyph svg * {
+  .widget_title .glyph-icon {
     fill: var(--main-text-color);
   }
 
@@ -186,7 +186,7 @@
     color: var(--main-text-color);
   }
 
-  .filters-heading__icon svg {
+  .filter-icon {
     fill: #dddddd;
   }
 
@@ -259,7 +259,7 @@
     border-color: #2e2e2e;
   }
 
-  .swap-btn > svg {
+  .swap-icon {
     fill: #888888;
   }
 
@@ -327,7 +327,8 @@
     color: var(--main-text-color);
   }
 
-  .import-item .btn svg {
+  .import-item .delete-icon,
+  .import-item .toggle-icon {
     fill: #888888;
   }
 
@@ -365,8 +366,8 @@
     color: #808080;
   }
 
-  .rule-item .icon-btn svg,
-  .rule-form .icon-btn svg {
+  .rule-item .icon,
+  .rule-form .icon {
     fill: #888888;
   }
 
@@ -439,7 +440,7 @@
       background-color: #3a3a3a;
     }
 
-    .swap-btn:hover > svg {
+    .swap-btn:hover .swap-icon {
       fill: #dddddd;
     }
 
@@ -458,21 +459,21 @@
       background-color: #2e2e2e;
     }
 
-    .rule-item .icon-btn:hover svg,
-    .rule-form .icon-btn:hover svg {
+    .rule-item .icon-btn:hover .icon,
+    .rule-form .icon-btn:hover .icon {
       fill: #dddddd;
     }
 
     /* Import item */
-    .import-item .btn:hover svg {
+    .import-item .btn:hover .icon {
       fill: #dddddd;
     }
 
-    .iconlink:hover .iconlink__icon svg * {
+    .iconlink:hover .iconlink__icon-content {
       fill: #202020;
     }
 
-    .tile_header > .close-btn:hover > svg {
+    .tile_header .close-btn:hover .close-icon {
       fill: #ffffff;
     }
   }

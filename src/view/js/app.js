@@ -91,9 +91,12 @@ export function createContainer(elemClass, children, events) {
 }
 
 /** Create SVG icon element */
-export function createIcon(icon) {
+export function createIcon(icon, className = null) {
     const useElem = svg('use');
     const res = svg('svg', {}, useElem);
+    if (className) {
+        res.setAttribute('class', className);
+    }
 
     useElem.href.baseVal = (icon) ? `#${icon}` : '';
 

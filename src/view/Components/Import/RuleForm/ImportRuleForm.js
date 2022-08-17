@@ -81,7 +81,7 @@ export class ImportRuleForm extends Component {
         this.toggleCondBtn = ce(
             'button',
             { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
-            createIcon('toggle-ext'),
+            createIcon('toggle-ext', 'icon toggle-icon'),
         );
 
         this.conditionsCollapse = new Collapsible({
@@ -105,7 +105,7 @@ export class ImportRuleForm extends Component {
         this.toggleActionsBtn = ce(
             'button',
             { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
-            createIcon('toggle-ext'),
+            createIcon('toggle-ext', 'icon toggle-icon'),
         );
 
         this.actionsCollapse = new Collapsible({

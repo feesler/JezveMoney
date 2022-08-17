@@ -133,7 +133,7 @@ label {
   cursor: pointer;
 }
 
-.icon-btn svg {
+.icon-btn .icon {
   width: 24px;
   height: 24px;
   fill: #ffffff;
@@ -627,7 +627,7 @@ label {
     border-bottom: 1px solid #0072c6;
   }
 
-  .msg .close-btn:hover > svg {
+  .msg .close-btn:hover .close-btn__icon {
     fill: #ffffff;
   }
 }

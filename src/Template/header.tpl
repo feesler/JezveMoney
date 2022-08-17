@@ -2,11 +2,11 @@
     <div class="header__content">
         <div class="logo">
             <a class="logo__link" href="<?=BASEURL?>">
-                <span class="logo__icon"><?=svgIcon("header_logo")?></span>
+                <span class="logo__icon"><?=svgIcon("header_logo", "logo-icon")?></span>
                 <span class="logo__title">Jezve Money</span>
             </a>
         </div>
-        <button class="nav-toggle-btn"><?=svgIcon("menu")?></button>
+        <button class="nav-toggle-btn"><?=svgIcon("menu", "nav-toggle-icon")?></button>
 
         <div class="theme-switch">
             <label id="theme-check" class="switch">
@@ -21,7 +21,7 @@
 <?php	if ($this->user_id != 0) {		?>
         <div class="user-block">
             <button id="userbtn" class="user-menu-btn" type="button">
-                <span class="user__icon"><?=svgIcon("user")?></span>
+                <span class="user__icon"><?=svgIcon("user", "user-icon")?></span>
                 <span class="user__title"><?=e($this->user_name)?></span>
             </button>
             <div id="menupopup" class="user-menu" hidden>

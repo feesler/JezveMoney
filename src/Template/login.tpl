@@ -6,7 +6,7 @@
     <div class="layer-box">
         <div class="logo-container">
             <div class="login-logo row-container">
-                <span class="logo"><?=svgIcon("logo_u")?></span>
+                <span class="logo"><?=svgIcon("logo_u", "logo-icon")?></span>
                 <span class="title">Jezve Money</span>
             </div>
         </div>

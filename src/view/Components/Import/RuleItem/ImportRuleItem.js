@@ -67,21 +67,21 @@ export class ImportRuleItem extends Component {
         this.updateBtn = ce(
             'button',
             { className: 'btn icon-btn update-btn', type: 'button' },
-            createIcon('update'),
+            createIcon('update', 'icon update-icon'),
             { click: (e) => this.onUpdate(e) },
         );
         // Delete button
         this.delBtn = ce(
             'button',
             { className: 'btn icon-btn delete-btn', type: 'button' },
-            createIcon('del'),
+            createIcon('del', 'icon delete-icon'),
             { click: (e) => this.onDelete(e) },
         );
         // Toggle expand/collapse
         this.toggleExtBtn = ce(
             'button',
             { className: 'btn icon-btn toggle-btn', type: 'button' },
-            createIcon('toggle-ext'),
+            createIcon('toggle-ext', 'icon toggle-icon'),
         );
 
         this.topRow = createContainer('rule-item__main-top', [
