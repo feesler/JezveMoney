@@ -53,7 +53,7 @@ include(TPL_PATH."commonhdr.tpl");
 <?php		} else {		?>
                                 <label class="checkbox trtype-menu__item" data-type="<?=e($menuItem->type)?>">
                                     <input type="checkbox"<?=checked($menuItem->selected)?>>
-                                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                                     <span class="checkbox__label">
                                         <a href="<?=e($menuItem->url)?>"><?=e($menuItem->title)?></a>
                                     </span>

@@ -226,6 +226,12 @@ export const filter = async (params) => {
             const targetPage = ('page' in params) ? params.page : 1;
             expTransList = expTransList.getPage(targetPage, params.onPage);
         }
+        // Sort again if asc order was requested
+        // TODO: think how to avoid automatic sort at TransactionsList.setData()
+        const isDesc = params.order?.toLowerCase() === 'desc';
+        if (!isDesc) {
+            expTransList.data = expTransList.sortAsc();
+        }
 
         // Prepare request parameters
         const reqParams = {};

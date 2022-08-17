@@ -76,46 +76,46 @@
 
 <div id="reset" class="profile-form-container" hidden>
 <form method="post" action="<?=BASEURL?>profile/reset/">
-    <div class="view-row">
+    <div class="view-row column-container">
         <label id="resetAllCheck" class="checkbox std_margin">
             <input type="checkbox">
-            <span class="checkbox__check"><?=svgIcon("check")?></span>
+            <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
             <span class="checkbox__label">All</span>
         </label>
 
         <label id="accountsCheck" class="checkbox std_margin">
             <input type="checkbox" name="accounts">
-            <span class="checkbox__check"><?=svgIcon("check")?></span>
+            <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
             <span class="checkbox__label">Accounts</span>
         </label>
 
         <label id="personsCheck" class="checkbox std_margin">
             <input type="checkbox" name="persons">
-            <span class="checkbox__check"><?=svgIcon("check")?></span>
+            <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
             <span class="checkbox__label">Persons</span>
         </label>
 
         <label id="transactionsCheck" class="checkbox std_margin">
             <input type="checkbox" name="transactions">
-            <span class="checkbox__check"><?=svgIcon("check")?></span>
+            <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
             <span class="checkbox__label">Transactions</span>
         </label>
 
         <label id="keepAccountsBalanceCheck" class="checkbox std_margin suboption" disabled>
             <input type="checkbox" name="keepbalance">
-            <span class="checkbox__check"><?=svgIcon("check")?></span>
+            <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
             <span class="checkbox__label">Keep current balance of accounts</span>
         </label>
 
         <label id="importTemplatesCheck" class="checkbox std_margin">
             <input type="checkbox" name="importtpl">
-            <span class="checkbox__check"><?=svgIcon("check")?></span>
+            <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
             <span class="checkbox__label">Import templates</span>
         </label>
 
         <label id="importRulesCheck" class="checkbox std_margin">
             <input type="checkbox" name="importrules">
-            <span class="checkbox__check"><?=svgIcon("check")?></span>
+            <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
             <span class="checkbox__label">Import rules</span>
         </label>
     </div>

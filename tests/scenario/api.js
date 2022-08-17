@@ -888,6 +888,13 @@ const apiStatistics = async () => {
         { filter: 'currency', curr_id: RUB },
         { filter: 'currency', curr_id: RUB, group: 'day' },
         { filter: 'currency', curr_id: RUB, group: 'week' },
+        {
+            filter: 'currency',
+            curr_id: RUB,
+            group: 'week',
+            stdate: App.dates.monthAgo,
+            enddate: App.dates.now,
+        },
     ];
 
     return App.scenario.runner.runGroup(TransactionApiTests.statistics, data);

@@ -3,13 +3,16 @@ import {
     query,
     queryAll,
     prop,
+    parentNode,
     navigation,
     isVisible,
 } from 'jezve-test';
 import { DropDown } from 'jezvejs/tests';
 import { AppView } from './AppView.js';
+import { DatePickerFilter } from './component/DatePickerFilter.js';
 import { TransactionTypeMenu } from './component/TransactionTypeMenu.js';
 import { App } from '../Application.js';
+import { fixDate } from '../common.js';
 
 const NO_GROUP = 0;
 const GROUP_BY_DAY = 1;
@@ -47,6 +50,10 @@ export class StatisticsView extends AppView {
 
         res.groupDropDown = await DropDown.createFromChild(this, await query('#groupsel'));
 
+        const calendarBtn = await query('#calendar_btn');
+        res.dateFilter = await DatePickerFilter.create(this, await parentNode(calendarBtn));
+        assert(res.dateFilter, 'Date filter not found');
+
         res.chart = {
             elem: await query('#chart'),
             bars: [],
@@ -78,6 +85,11 @@ export class StatisticsView extends AppView {
             type: selectedType,
             byCurrency: selectedFilter === 'Currencies',
         };
+        const dateRange = cont.dateFilter.getSelectedRange();
+        if (dateRange && dateRange.startDate && dateRange.endDate) {
+            res.filter.startDate = dateRange.startDate;
+            res.filter.endDate = dateRange.endDate;
+        }
 
         if (res.filter.byCurrency) {
             const [selectedCurr] = cont.currencyDropDown.getSelectedValues();
@@ -128,6 +140,7 @@ export class StatisticsView extends AppView {
                 visible: true,
                 textValue: (byCurrency) ? 'Currencies' : 'Accounts',
             },
+            dateFilter: {},
         };
 
         if (byCurrency) {
@@ -154,6 +167,15 @@ export class StatisticsView extends AppView {
             params.curr_id = this.model.filter.curr_id;
         } else {
             params.acc_id = this.model.filter.acc_id;
+        }
+
+        if (this.model.filter.startDate && this.model.filter.endDate) {
+            params.startDate = this.model.filter.startDate;
+            params.endDate = this.model.filter.endDate;
+
+            res.dateFilter.value = { startDate: params.startDate, endDate: params.endDate };
+        } else {
+            res.dateFilter.value = { startDate: null, endDate: null };
         }
 
         const histogram = App.state.transactions.getStatistics(params);
@@ -274,5 +296,27 @@ export class StatisticsView extends AppView {
 
     groupByYear() {
         return this.groupBy(GROUP_BY_YEAR);
+    }
+
+    async selectDateRange(start, end) {
+        this.model.filter.startDate = start;
+        this.model.filter.endDate = end;
+        const expected = this.getExpectedState();
+
+        const startDate = new Date(fixDate(start));
+        const endDate = new Date(fixDate(end));
+        await navigation(() => this.content.dateFilter.selectRange(startDate, endDate));
+
+        return App.view.checkState(expected);
+    }
+
+    async clearDateRange() {
+        this.model.filter.startDate = null;
+        this.model.filter.endDate = null;
+        const expected = this.getExpectedState();
+
+        await navigation(() => this.content.dateFilter.clear());
+
+        return App.view.checkState(expected);
     }
 }

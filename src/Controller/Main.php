@@ -76,15 +76,18 @@ class Main extends TemplateController
             ];
         }
 
-        $byCurrency = true;
         $curr_acc_id = $currMod->getIdByPos(0);
         if (!$curr_acc_id) {
             throw new \Error("No currencies found");
         }
 
-        $groupType_id = 2;        // group by week
-
-        $data["statArr"] = $transMod->getHistogramSeries($byCurrency, $curr_acc_id, EXPENSE, $groupType_id, 5);
+        $data["statArr"] = $transMod->getHistogramSeries([
+            "filter" => "currency",
+            "curr_id" => $curr_acc_id,
+            "type" => EXPENSE,
+            "group" => 2, // group by week
+            "limit" => 5
+        ]);
 
         $data["appProps"] = [
             "profile" => [

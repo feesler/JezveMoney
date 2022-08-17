@@ -1487,11 +1487,33 @@ class TransactionModel extends CachedTable
 
 
     // Return series array of amounts and date of transactions for statistics histogram
-    public function getHistogramSeries($byCurrency, $curr_acc_id, $trans_type, $group_type = 0, $limit = 0)
+    public function getHistogramSeries($params = null)
     {
-        $curr_acc_id = intval($curr_acc_id);
-        $trans_type = intval($trans_type);
-        if (!self::$user_id || !$curr_acc_id || !$trans_type) {
+        if (is_null($params)) {
+            $params = [];
+        }
+
+        $byCurrency = (isset($params["filter"]) && $params["filter"] == "currency");
+        if ($byCurrency) {
+            if (!isset($params["curr_id"])) {
+                return null;
+            }
+
+            $curr_id = intval($params["curr_id"]);
+            $acc_id = 0;
+        } else {
+            if (!isset($params["acc_id"])) {
+                return null;
+            }
+
+            $acc_id = intval($params["acc_id"]);
+            $curr_id = 0;
+        }
+
+        $trans_type = (isset($params["type"])) ? intval($params["type"]) : EXPENSE;
+        $group_type = (isset($params["group"])) ? intval($params["group"]) : NO_GROUP;
+        $limit = (isset($params["limit"])) ? intval($params["limit"]) : 0;
+        if (!self::$user_id || !$trans_type) {
             return null;
         }
 
@@ -1504,23 +1526,34 @@ class TransactionModel extends CachedTable
         $itemsInGroup = 0;
         $trans_time = 0;
 
-        if (!$this->checkCache()) {
-            return null;
+        $dataParams = [
+            "type" => $trans_type,
+        ];
+        if ($acc_id) {
+            $dataParams["accounts"] = $acc_id;
+        }
+        if (
+            isset($params["startDate"]) && !is_null($params["startDate"]) &&
+            isset($params["endDate"]) && !is_null($params["endDate"])
+        ) {
+            $dataParams["startDate"] = $params["startDate"];
+            $dataParams["endDate"] = $params["endDate"];
         }
 
-        foreach ($this->cache as $item) {
+        $items = $this->getData($dataParams);
+        foreach ($items as $item) {
             if ($item->type != $trans_type) {
                 continue;
             }
 
             if ($byCurrency) {
                 $transCurr = ($trans_type == EXPENSE) ? $item->src_curr : $item->dest_curr;
-                if ($transCurr != $curr_acc_id) {
+                if ($transCurr != $curr_id) {
                     continue;
                 }
             } else {
                 $transAcc = ($trans_type == EXPENSE) ? $item->src_id : $item->dest_id;
-                if ($transAcc != $curr_acc_id) {
+                if ($transAcc != $acc_id) {
                     continue;
                 }
             }

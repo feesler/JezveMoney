@@ -1,11 +1,22 @@
-import { test, setBlock } from 'jezve-test';
+import { test, setBlock, formatDate } from 'jezve-test';
 import { App } from '../Application.js';
+import { fixDate } from '../common.js';
 import {
     EXPENSE,
     INCOME,
     TRANSFER,
     DEBT,
 } from '../model/Transaction.js';
+
+const selectDateRange = async ({ start, end }) => {
+    const startDateFmt = formatDate(new Date(fixDate(start)));
+    const endDateFmt = formatDate(new Date(fixDate(end)));
+
+    await test(
+        `Select date range (${startDateFmt} - ${endDateFmt})`,
+        () => App.view.selectDateRange(start, end),
+    );
+};
 
 export const run = async () => {
     setBlock('Statistics', 1);
@@ -46,5 +57,10 @@ export const run = async () => {
     // Filter by currencies
     await test('Filter by currencies', () => App.view.byCurrencies());
     // Change transaction type when currencies filter is selected
-    await test('Change transaction type ', () => App.view.filterByType(EXPENSE));
+    await test('Change transaction type', () => App.view.filterByType(EXPENSE));
+
+    await selectDateRange({ start: App.dates.yearAgo, end: App.dates.monthAgo });
+    await selectDateRange({ start: App.dates.weekAgo, end: App.dates.now });
+
+    await test('Clear date range', () => App.view.clearDateRange());
 };

@@ -163,7 +163,8 @@ class Transaction extends ApiListController
 
         // Filter type
         $byCurrency = (isset($_GET["filter"]) && $_GET["filter"] == "currency");
-        $filterObj->filter = $byCurrency ? "currency" : "account";
+        $params["filter"] = $byCurrency ? "currency" : "account";
+        $filterObj->filter = $params["filter"];
 
         // Transaction type
         $trans_type = EXPENSE;
@@ -173,9 +174,8 @@ class Transaction extends ApiListController
                 throw new \Error("Invalid transaction type");
             }
         }
-        if ($trans_type) {
-            $filterObj->type = TransactionModel::typeToString($trans_type);
-        }
+        $filterObj->type = TransactionModel::typeToString($trans_type);
+        $params["type"] = $trans_type;
 
         // Currency or account
         if ($byCurrency) {
@@ -190,6 +190,7 @@ class Transaction extends ApiListController
                     throw new \Error("No currencies available");
                 }
             }
+            $params["curr_id"] = $curr_id;
             $filterObj->curr_id = $curr_id;
         } else {
             if (isset($_GET["acc_id"]) && is_numeric($_GET["acc_id"])) {
@@ -203,6 +204,7 @@ class Transaction extends ApiListController
                     throw new \Error("No accounts available");
                 }
             }
+            $params["acc_id"] = $acc_id;
             $filterObj->acc_id = $acc_id;
         }
 
@@ -218,17 +220,21 @@ class Transaction extends ApiListController
                 }
             }
             if ($index != 0) {
+                $params["group"] = $groupType_id;
                 $filterObj->group = $requestedGroup;
             }
         }
 
-        $res->histogram = $this->model->getHistogramSeries(
-            $byCurrency,
-            ($byCurrency ? $filterObj->curr_id : $filterObj->acc_id),
-            $trans_type,
-            $groupType_id
-        );
+        $stDate = (isset($_GET["stdate"]) ? $_GET["stdate"] : null);
+        $endDate = (isset($_GET["enddate"]) ? $_GET["enddate"] : null);
+        if (!is_null($stDate) && !is_null($endDate)) {
+            $params["startDate"] = $stDate;
+            $params["endDate"] = $endDate;
+            $filterObj->stdate = $stDate;
+            $filterObj->enddate = $endDate;
+        }
 
+        $res->histogram = $this->model->getHistogramSeries($params);
         $res->filter = $filterObj;
 
         $this->ok($res);

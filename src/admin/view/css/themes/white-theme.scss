@@ -1,6 +1,14 @@
 .white-theme {
-  color: #000000;
-  background-color: #ffffff;
+  --main-text-color: #000000;
+  --main-bg-color: #ffffff;
+
+  /* Inputs */
+  --input-bg-color: #f2f2f2;
+  --input-border-color: #b0b0b0;
+  --active-input-border-color: #888888;
+
+  color: var(--main-text-color);
+  background-color: var(--main-bg-color);
 
   /* Navigation */
   .navigation-content {
@@ -32,6 +40,13 @@
     color: #000000;
     border-color: #000000;
     background-color: #ffffff;
+  }
+
+  /* Checkbox */
+  .checkbox {
+    --checkbox-text: var(--main-text-color);
+    --checkbox-bg: var(--input-bg-color);
+    --checkbox-border: var(--input-border-color);
   }
 
   /* Popup */
