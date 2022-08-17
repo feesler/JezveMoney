@@ -425,13 +425,13 @@ label {
 }
 
 .dd__combo {
-  padding: 0 24px 0 0.5rem;
   border-radius: 3px;
   border-style: solid;
   box-sizing: border-box;
 }
 
 .dd__selection-item {
+  margin: 2px 0 2px 2px;
   padding: 0 6px 0 10px;
   align-items: center;
   border-radius: 3px;
@@ -446,6 +446,7 @@ label {
 .dd__single-selection {
   font-size: 0.9rem;
   cursor: pointer;
+  min-height: 30px;
 }
 
 .dd__container_attached .dd__list {
