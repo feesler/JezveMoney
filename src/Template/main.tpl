@@ -15,7 +15,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         <div class="widget_title">
                             <a class="widget_title-link" href="<?=BASEURL?>accounts/">
                                 <span>Accounts</span>
-                                <div class="glyph"><?=svgIcon("glyph")?></div>
+                                <div class="glyph"><?=svgIcon("glyph", "glyph-icon")?></div>
                             </a>
                         </div>
                         <div class="tiles">
@@ -51,7 +51,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         <div class="widget_title">
                             <a class="widget_title-link" href="<?=BASEURL?>transactions/">
                                 <span>Transactions</span>
-                                <div class="glyph"><?=svgIcon("glyph")?></div>
+                                <div class="glyph"><?=svgIcon("glyph", "glyph-icon")?></div>
                             </a>
                         </div>
                         <div class="trans-list"></div>
@@ -61,7 +61,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         <div class="widget_title">
                             <a class="widget_title-link" href="<?=BASEURL?>persons/">
                                 <span>Persons</span>
-                                <div class="glyph"><?=svgIcon("glyph")?></div>
+                                <div class="glyph"><?=svgIcon("glyph", "glyph-icon")?></div>
                             </a>
                         </div>
                         <div class="tiles">
@@ -79,7 +79,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         <div class="widget_title">
                             <a class="widget_title-link" href="<?=BASEURL?>statistics/">
                                 <span>Statistics</span>
-                                <div class="glyph"><?=svgIcon("glyph")?></div>
+                                <div class="glyph"><?=svgIcon("glyph", "glyph-icon")?></div>
                             </a>
                         </div>
                         <div id="chart" class="widget_charts">

@@ -295,14 +295,9 @@ export class TransactionsList extends List {
         let res = list;
         const params = par || {};
 
-        if ('order' in params && typeof params.order === 'string') {
-            const lorder = params.order.toLowerCase();
-            if (lorder === 'asc') {
-                res = this.sortItems(res, false);
-            } else if (lorder === 'desc') {
-                res = this.sortItems(res, true);
-            }
-        }
+        const isDesc = params.order?.toLowerCase() === 'desc';
+        res = this.sortItems(res, isDesc);
+
         if ('type' in params) {
             res = this.getItemsByType(res, params.type);
         }
@@ -349,7 +344,15 @@ export class TransactionsList extends List {
             return this;
         }
 
-        return new TransactionsList(items);
+        const res = new TransactionsList(items);
+        // Sort again if asc order was requested
+        // TODO: think how to avoid automatic sort at setData()
+        const isDesc = params.order?.toLowerCase() === 'desc';
+        if (!isDesc) {
+            res.data = res.sortAsc();
+        }
+
+        return res;
     }
 
     sortItems(list, desc = false) {
@@ -548,7 +551,19 @@ export class TransactionsList extends List {
         const groupType = params.group ?? 'none';
         const limit = params.limit ?? 0;
 
-        const list = this.sortAsc();
+        const itemsFilter = {
+            order: 'asc',
+            type: transType,
+        };
+        if (accId) {
+            itemsFilter.accounts = accId;
+        }
+        if (params.startDate && params.endDate) {
+            itemsFilter.startDate = params.startDate;
+            itemsFilter.endDate = params.endDate;
+        }
+
+        const list = this.applyFilter(itemsFilter);
         list.forEach((item) => {
             if (item.type !== transType) {
                 return;

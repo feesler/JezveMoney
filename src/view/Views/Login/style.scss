@@ -16,25 +16,25 @@
   height: 62px;
   display: flex;
   flex-flow: row nowrap;
-}
 
-.login-logo > .logo {
-  width: 62px;
-}
+  .logo {
+    width: 62px;
+  }
 
-.login-logo > .logo > svg {
-  width: 62px;
-  height: 62px;
-}
+  .logo-icon {
+    width: 62px;
+    height: 62px;
+  }
 
-.login-logo > .title {
-  height: 62px;
-  line-height: 62px;
-  font-size: 32px;
-  font-weight: normal;
-  color: #ffffff;
-  white-space: nowrap;
-  margin: 0 0 0 12px;
+  .title {
+    height: 62px;
+    line-height: 62px;
+    font-size: 32px;
+    font-weight: normal;
+    color: #ffffff;
+    white-space: nowrap;
+    margin: 0 0 0 12px;
+  }
 }
 
 .login-form {

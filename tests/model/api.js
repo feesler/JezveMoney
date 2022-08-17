@@ -497,8 +497,6 @@ export const api = {
                 throw new ApiRequestError('Fail to obtain list of transactions');
             }
 
-            jsonRes.data.items.sort((a, b) => b.pos - a.pos);
-
             return jsonRes.data;
         },
 

@@ -54,7 +54,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         <div class="rules-container">
                             <label id="rulesCheck" class="checkbox">
                                 <input type="checkbox" checked>
-                                <span class="checkbox__check"><?=svgIcon("check")?></span>
+                                <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                             </label>
                             <button id="rulesBtn" class="btn link-btn" type="button">Rules (<span id="rulescount"><?=count($importRules)?></span>)</button>
                         </div>

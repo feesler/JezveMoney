@@ -8,6 +8,11 @@
   --input-border-color: #b0b0b0;
   --active-input-border-color: #888888;
 
+  /* Disabled inputs */
+  --input-disabled-bg-color: #eeeeee;
+  --input-disabled-border-color: #eeeeee;
+  --input-disabled-text-color: #a0a0a0;
+
   color: var(--main-text-color);
   background-color: var(--main-bg-color);
 
@@ -52,7 +57,7 @@
     border-color: #000000;
   }
 
-  .iconlink .iconlink__icon svg * {
+  .iconlink .iconlink__icon-content {
     fill: #000000;
   }
 
@@ -73,7 +78,7 @@
     color: var(--main-text-color);
   }
 
-  .widget_title .glyph svg * {
+  .widget_title .glyph-icon {
     fill: var(--main-text-color);
   }
 
@@ -129,12 +134,12 @@
     --dd-btn-hover-fill: #000000;
 
     /* Disabled component */
-    --dd-disabled-bg: #eeeeee;
-    --dd-disabled-border: #eeeeee;
-    --dd-disabled-selection-color: #a0a0a0;
-    --dd-disabled-input-text: #a0a0a0;
-    --dd-disabled-btn-fill: #707070;
-    --dd-disabled-selection-item-text: #707070;
+    --dd-disabled-bg: var(--input-disabled-bg-color);
+    --dd-disabled-border: var(--input-disabled-border-color);
+    --dd-disabled-selection-color: var(--input-disabled-text-color);
+    --dd-disabled-input-text: var(--input-disabled-text-color);
+    --dd-disabled-btn-fill: var(--input-disabled-text-color);
+    --dd-disabled-selection-item-text: var(--input-disabled-text-color);
     --dd-disabled-selection-item-bg: #dfdfdf;
 
     /* List item */
@@ -180,7 +185,7 @@
     color: var(--main-text-color);
   }
 
-  .filters-heading__icon svg {
+  .filter-icon {
     fill: #000000;
   }
 
@@ -253,7 +258,7 @@
     border-color: #b0b0b0;
   }
 
-  .swap-btn > svg {
+  .swap-icon {
     fill: #888888;
   }
 
@@ -285,9 +290,9 @@
 
   .import-item select[disabled],
   .import-item input[disabled] {
-    color: #dddddd;
-    border-color: #dddddd;
-    background-color: #eeeeee;
+    color: var(--input-disabled-text-color);
+    border-color: var(--input-disabled-border-color);
+    background-color: var(--input-disabled-bg-color);
   }
 
   .import-item.import-item_disabled {
@@ -300,9 +305,9 @@
   .import-item_disabled select[disabled],
   .import-item_disabled input[type="text"],
   .import-item_disabled input[disabled] {
-    color: #dddddd;
-    border-color: #eeeeee;
-    background-color: #eeeeee;
+    color: var(--input-disabled-text-color);
+    border-color: var(--input-disabled-border-color);
+    background-color: var(--input-disabled-bg-color);
   }
 
   .import-item_disabled input::placeholder {
@@ -321,7 +326,8 @@
     color: #202020;
   }
 
-  .import-item .btn svg {
+  .import-item .delete-icon,
+  .import-item .toggle-icon {
     fill: #a7a7a7;
   }
 
@@ -359,8 +365,8 @@
     color: #808080;
   }
 
-  .rule-item .icon-btn svg,
-  .rule-form .icon-btn svg {
+  .rule-item .icon,
+  .rule-form .icon {
     fill: #b0b0b0;
   }
 
@@ -433,7 +439,7 @@
       background-color: #e8e8e8;
     }
 
-    .swap-btn:hover > svg {
+    .swap-btn:hover .swap-icon {
       fill: #000000;
     }
 
@@ -452,21 +458,22 @@
       background-color: #cccccc;
     }
 
-    .rule-item .icon-btn:hover svg,
-    .rule-form .icon-btn:hover svg {
+    .rule-item .icon-btn:hover .icon,
+    .rule-form .icon-btn:hover .icon {
       fill: #ffffff;
     }
 
     /* Import item */
-    .import-item .btn:hover svg {
+    .import-item .btn:hover .delete-icon,
+    .import-item .btn:hover .toggle-icon {
       fill: #ffffff;
     }
 
-    .iconlink:hover .iconlink__icon svg * {
+    .iconlink:hover .iconlink__icon-content {
       fill: #ffffff;
     }
 
-    .tile_header > .close-btn:hover > svg {
+    .tile_header .close-btn:hover .close-icon {
       fill: #000000;
     }
   }

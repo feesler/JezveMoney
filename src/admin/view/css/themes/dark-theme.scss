@@ -1,6 +1,14 @@
 .dark-theme {
-  color: #dddddd;
-  background-color: #101010;
+  --main-text-color: #dddddd;
+  --main-bg-color: #101010;
+
+  /* Inputs */
+  --input-bg-color: #181818;
+  --input-border-color: #2e2e2e;
+  --active-input-border-color: #d0d0d0;
+
+  color: var(--main-text-color);
+  background-color: var(--main-bg-color);
 
   /* Navigation */
   .navigation-content {
@@ -32,6 +40,13 @@
     color: #dddddd;
     border-color: #dddddd;
     background-color: #202020;
+  }
+
+  /* Checkbox */
+  .checkbox {
+    --checkbox-text: var(--main-text-color);
+    --checkbox-bg: var(--input-bg-color);
+    --checkbox-border: var(--input-border-color);
   }
 
   /* Popup */

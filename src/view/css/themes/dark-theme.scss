@@ -9,6 +9,11 @@
   --input-border-color: #2e2e2e;
   --active-input-border-color: #d0d0d0;
 
+  /* Disabled inputs */
+  --input-disabled-bg-color: #202020;
+  --input-disabled-border-color: #202020;
+  --input-disabled-text-color: #707070;
+
   color: var(--main-text-color);
   background-color: var(--main-bg-color);
 
@@ -53,7 +58,7 @@
     border-color: #dddddd;
   }
 
-  .iconlink .iconlink__icon svg * {
+  .iconlink .iconlink__icon-content {
     fill: #dddddd;
   }
 
@@ -74,7 +79,7 @@
     color: var(--main-text-color);
   }
 
-  .widget_title .glyph svg * {
+  .widget_title .glyph-icon {
     fill: var(--main-text-color);
   }
 
@@ -130,12 +135,12 @@
     --dd-btn-hover-fill: #dddddd;
 
     /* Disabled component */
-    --dd-disabled-bg: #202020;
-    --dd-disabled-border: #202020;
-    --dd-disabled-selection-color: #707070;
-    --dd-disabled-input-text: #707070;
-    --dd-disabled-btn-fill: #707070;
-    --dd-disabled-selection-item-text: #707070;
+    --dd-disabled-bg: var(--input-disabled-bg-color);
+    --dd-disabled-border: var(--input-disabled-border-color);
+    --dd-disabled-selection-color: var(--input-disabled-text-color);
+    --dd-disabled-input-text: var(--input-disabled-text-color);
+    --dd-disabled-btn-fill: var(--input-disabled-text-color);
+    --dd-disabled-selection-item-text: var(--input-disabled-text-color);
     --dd-disabled-selection-item-bg: #dfdfdf;
 
     /* List item */
@@ -181,7 +186,7 @@
     color: var(--main-text-color);
   }
 
-  .filters-heading__icon svg {
+  .filter-icon {
     fill: #dddddd;
   }
 
@@ -254,7 +259,7 @@
     border-color: #2e2e2e;
   }
 
-  .swap-btn > svg {
+  .swap-icon {
     fill: #888888;
   }
 
@@ -286,9 +291,9 @@
 
   .import-item select[disabled],
   .import-item input[disabled] {
-    color: #808080;
-    border-color: #808080;
-    background-color: #202020;
+    color: var(--input-disabled-text-color);
+    border-color: var(--input-disabled-border-color);
+    background-color: var(--input-disabled-bg-color);
   }
 
   .import-item.import-item_disabled {
@@ -301,9 +306,9 @@
   .import-item_disabled select[disabled],
   .import-item_disabled input[type="text"],
   .import-item_disabled input[disabled] {
-    color: #707070;
-    border-color: #202020;
-    background-color: #202020;
+    color: var(--input-disabled-text-color);
+    border-color: var(--input-disabled-border-color);
+    background-color: var(--input-disabled-bg-color);
   }
 
   .import-item_disabled input::placeholder {
@@ -322,7 +327,8 @@
     color: var(--main-text-color);
   }
 
-  .import-item .btn svg {
+  .import-item .delete-icon,
+  .import-item .toggle-icon {
     fill: #888888;
   }
 
@@ -360,8 +366,8 @@
     color: #808080;
   }
 
-  .rule-item .icon-btn svg,
-  .rule-form .icon-btn svg {
+  .rule-item .icon,
+  .rule-form .icon {
     fill: #888888;
   }
 
@@ -434,7 +440,7 @@
       background-color: #3a3a3a;
     }
 
-    .swap-btn:hover > svg {
+    .swap-btn:hover .swap-icon {
       fill: #dddddd;
     }
 
@@ -453,21 +459,21 @@
       background-color: #2e2e2e;
     }
 
-    .rule-item .icon-btn:hover svg,
-    .rule-form .icon-btn:hover svg {
+    .rule-item .icon-btn:hover .icon,
+    .rule-form .icon-btn:hover .icon {
       fill: #dddddd;
     }
 
     /* Import item */
-    .import-item .btn:hover svg {
+    .import-item .btn:hover .icon {
       fill: #dddddd;
     }
 
-    .iconlink:hover .iconlink__icon svg * {
+    .iconlink:hover .iconlink__icon-content {
       fill: #202020;
     }
 
-    .tile_header > .close-btn:hover > svg {
+    .tile_header .close-btn:hover .close-icon {
       fill: #ffffff;
     }
   }

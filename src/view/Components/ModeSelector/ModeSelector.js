@@ -127,7 +127,7 @@ export class ModeSelector extends Component {
         const tagName = item.active ? 'b' : 'a';
 
         const elem = ce(tagName, { className: ITEM_CLASS }, [
-            ce('span', { className: 'icon' }, createIcon(item.icon)),
+            ce('span', { className: 'icon' }, createIcon(item.icon, 'icon-content')),
             ce('span', { textContent: item.title }),
         ]);
         elem.setAttribute('data-mode', item.mode);

@@ -368,55 +368,30 @@ export class AppState {
     }
     /* eslint-enable no-bitwise */
 
-    getAccountByIndex(ind, visibleAccList, hiddenAccList) {
-        const index = parseInt(ind, 10);
-        assert.isNumber(index);
-        assert(
-            index >= 0
-            && index < visibleAccList.length + hiddenAccList.length,
-            `Invalid account index ${ind}`,
-        );
-
-        if (index < visibleAccList.length) {
-            return visibleAccList[index].id;
-        }
-
-        const hiddenInd = index - visibleAccList.length;
-        return hiddenAccList[hiddenInd].id;
-    }
-
     getAccountsByIndexes(accounts) {
         const itemIndexes = Array.isArray(accounts) ? accounts : [accounts];
 
         const userAccounts = this.accounts.getUserAccounts();
-        const visibleUserAccounts = userAccounts.getVisible(true);
-        const hiddenUserAccounts = userAccounts.getHidden(true);
+        userAccounts.sortByVisibility();
 
-        return itemIndexes.map((ind) => this.getAccountByIndex(
-            ind,
-            visibleUserAccounts,
-            hiddenUserAccounts,
-        ));
+        return itemIndexes.map((ind) => {
+            const item = userAccounts.getItemByIndex(ind);
+            assert(item, `Invalid account index ${ind}`);
+            return item.id;
+        });
     }
 
     getAccountIndexesByNames(accounts) {
         const accNames = Array.isArray(accounts) ? accounts : [accounts];
 
         const userAccounts = this.accounts.getUserAccounts();
-        const visibleUserAccounts = userAccounts.getVisible();
-        const hiddenUserAccounts = userAccounts.getHidden();
+        userAccounts.sortByVisibility();
 
         return accNames.map((name) => {
             const acc = userAccounts.findByName(name);
             assert(acc, `Account '${name}' not found`);
 
-            let ind = visibleUserAccounts.getIndexById(acc.id);
-            if (ind !== -1) {
-                return ind;
-            }
-
-            ind = hiddenUserAccounts.getIndexById(acc.id);
-            return (ind !== -1) ? ind + visibleUserAccounts.length : -1;
+            return userAccounts.getIndexById(acc.id);
         });
     }
 
@@ -590,45 +565,29 @@ export class AppState {
         return this.accounts.getItemByIndex(ind);
     }
 
-    getPersonByIndex(ind, visibleList, hiddenList) {
-        assert(
-            ind >= 0 && ind < visibleList.length + hiddenList.length,
-            `Invalid person index ${ind}`,
-        );
-
-        if (ind < visibleList.length) {
-            return visibleList[ind].id;
-        }
-
-        const hiddenInd = ind - visibleList.length;
-        return hiddenList[hiddenInd].id;
-    }
-
     getPersonsByIndexes(persons) {
         const itemIndexes = Array.isArray(persons) ? persons : [persons];
 
-        const visiblePersons = this.persons.getVisible(true);
-        const hiddenPersons = this.persons.getHidden(true);
+        const personsList = this.persons.clone();
+        personsList.sortByVisibility();
 
-        return itemIndexes.map((ind) => this.getPersonByIndex(ind, visiblePersons, hiddenPersons));
+        return itemIndexes.map((ind) => {
+            const item = personsList.getItemByIndex(ind);
+            assert(item, `Invalid person index ${ind}`);
+            return item.id;
+        });
     }
 
     getPersonIndexesByNames(persons) {
         const names = Array.isArray(persons) ? persons : [persons];
-        const visiblePersons = this.persons.getVisible();
-        const hiddenPersons = this.persons.getHidden();
+        const personsList = this.persons.clone();
+        personsList.sortByVisibility();
 
         return names.map((name) => {
             const person = this.persons.findByName(name);
             assert(person, `Person '${name}' not found`);
 
-            let ind = visiblePersons.getIndexById(person.id);
-            if (ind !== -1) {
-                return ind;
-            }
-
-            ind = hiddenPersons.getIndexById(person.id);
-            return (ind !== -1) ? ind + visiblePersons.length : -1;
+            return personsList.getIndexById(person.id);
         });
     }
 

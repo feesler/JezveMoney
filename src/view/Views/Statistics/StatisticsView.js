@@ -1,6 +1,7 @@
 import 'jezvejs/style';
 import {
     ge,
+    setEvents,
     isDate,
     show,
     urlJoin,
@@ -101,6 +102,12 @@ class StatisticsView extends View {
             this.dateInputBtn.addEventListener('click', () => this.showCalendar());
         }
         this.dateInput = ge('date');
+
+        this.noDateBtn = ge('nodatebtn');
+        if (!this.noDateBtn) {
+            throw new Error('Failed to initialize Transaction List view');
+        }
+        setEvents(this.noDateBtn, { click: () => this.onDateClear() });
     }
 
     /**
@@ -128,6 +135,7 @@ class StatisticsView extends View {
         }
 
         this.selDateRange = range;
+        this.datePicker.hide();
         const start = formatDate(range.start);
         const end = formatDate(range.end);
 
@@ -170,6 +178,19 @@ class StatisticsView extends View {
 
         this.datePickerBtn.hide();
         show(this.dateBlock, true);
+    }
+
+    /**
+     * Clear date range query
+     */
+    onDateClear() {
+        if (!('stdate' in this.state.filter) && !('enddate' in this.state.filter)) {
+            return;
+        }
+
+        delete this.state.filter.stdate;
+        delete this.state.filter.enddate;
+        window.location = this.buildAddress();
     }
 
     /**

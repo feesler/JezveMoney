@@ -10,6 +10,10 @@
   display: inline-flex;
   flex-flow: row nowrap;
 
+  &:focus {
+    box-shadow: 0 0 0 0.25rem var(--focus-shadow);
+  }
+
   span {
     height: 22px;
     line-height: 22px;
@@ -22,7 +26,7 @@
     padding: 0;
   }
 
-  svg {
+  .icon-content {
     width: 24px;
     height: 24px;
   }

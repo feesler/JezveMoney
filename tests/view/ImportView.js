@@ -581,7 +581,7 @@ export class ImportView extends AppView {
             destAmountField: { value: '', disabled: true },
             currencyField: { value: mainAccount.curr_id.toString(), disabled: false },
             destAccountField: { disabled: true },
-            dateField: { value: '', disabled: false },
+            dateField: { value: App.dates.now, disabled: false },
             commentField: { value: '', disabled: false },
             personField: { disabled: true },
         };

@@ -107,7 +107,7 @@ export class ImportActionForm extends Component {
         this.delBtn = ce(
             'button',
             { className: 'btn icon-btn delete-btn right-align', type: 'button' },
-            createIcon('del'),
+            createIcon('del', 'icon delete-icon'),
             { click: () => this.onDelete() },
         );
 

@@ -2,19 +2,20 @@
 
 namespace JezveMoney\App\API\Controller;
 
-use JezveMoney\Core\ApiController;
+use JezveMoney\Core\ApiListController;
 use JezveMoney\Core\Message;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\ImportConditionModel;
 use JezveMoney\App\Model\ImportActionModel;
 use JezveMoney\App\Item\ImportRuleItem;
 
-class ImportRule extends ApiController
+class ImportRule extends ApiListController
 {
     protected $requiredFields = [
-        "flags"
+        "flags",
+        "conditions",
+        "actions"
     ];
-    protected $model = null;
 
 
     public function initAPI()
@@ -24,66 +25,59 @@ class ImportRule extends ApiController
         $this->model = ImportRuleModel::getInstance();
         $this->condModel = ImportConditionModel::getInstance();
         $this->actionModel = ImportActionModel::getInstance();
+        $this->createErrorMsg = Message::get(ERR_IMPORT_COND_CREATE);
+        $this->updateErrorMsg = Message::get(ERR_IMPORT_COND_UPDATE);
+        $this->deleteErrorMsg = Message::get(ERR_IMPORT_COND_DELETE);
     }
 
 
-    public function index()
+    protected function prepareItem($item)
     {
-        $ids = $this->getRequestedIds();
-        if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            throw new \Error("No items specified");
-        }
+        return new ImportRuleItem($item);
+    }
 
+
+    protected function prepareListRequest($request)
+    {
         $res = [];
-        foreach ($ids as $item_id) {
-            $item = $this->model->getItem($item_id);
-            if (!$item) {
-                throw new \Error("Item '$item_id' not found");
-            }
-
-            $res[] = new ImportRuleItem($item);
+        if (isset($request["full"]) && $request["full"] == true) {
+            $res["full"] = true;
+        }
+        if (isset($request["extended"]) && $request["extended"] == true) {
+            $res["extended"] = true;
         }
 
-        $this->ok($res);
+        return $res;
     }
 
 
-    public function getList()
+    protected function getListItems($request)
     {
-        $params = [];
-        if (isset($_GET["full"]) && $_GET["full"] == true) {
-            $params["full"] = true;
-        }
-        if (isset($_GET["extended"]) && $_GET["extended"] == true) {
-            $params["extended"] = true;
-        }
-
-        $res = $this->model->getData($params);
-
-        $this->ok($res);
+        return $this->model->getData($request);
     }
 
-    private function checkRuleData($data)
+
+    protected function verifyRequest($request)
     {
         if (
-            !is_array($data)
-            || !isset($data["conditions"])
-            || !is_array($data["conditions"])
-            || !count($data["conditions"])
-            || !isset($data["actions"])
-            || !is_array($data["actions"])
-            || !count($data["actions"])
+            !is_array($request)
+            || !isset($request["conditions"])
+            || !is_array($request["conditions"])
+            || !count($request["conditions"])
+            || !isset($request["actions"])
+            || !is_array($request["actions"])
+            || !count($request["actions"])
         ) {
             return false;
         }
 
-        foreach ($data["conditions"] as $condition) {
+        foreach ($request["conditions"] as $condition) {
             if (!is_array($condition)) {
                 return false;
             }
         }
 
-        foreach ($data["actions"] as $action) {
+        foreach ($request["actions"] as $action) {
             if (!is_array($action)) {
                 return false;
             }
@@ -91,6 +85,7 @@ class ImportRule extends ApiController
 
         return true;
     }
+
 
     private function setRuleData($ruleId, $data)
     {
@@ -115,85 +110,36 @@ class ImportRule extends ApiController
         return true;
     }
 
-    public function create()
+
+    protected function preCreate($request)
     {
-        $defMsg = Message::get(ERR_IMPORT_RULE_CREATE);
-
-        if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
-        }
-
-        $request = $this->getRequestData();
-        if (!$this->checkRuleData($request)) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
-        }
-        $reqData = checkFields($request, $this->requiredFields);
-        if ($reqData === false) {
+        if (!$this->verifyRequest($request)) {
             throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
         }
 
-        $item_id = $this->model->create($reqData);
-        if (!$item_id) {
-            throw new \Error($defMsg);
-        }
+        return $request;
+    }
 
+
+    protected function postCreate($item_id, $request)
+    {
         if (!$this->setRuleData($item_id, $request)) {
             $this->model->del($item_id);
-            throw new \Error($defMsg);
+            throw new \Error($this->createErrorMsg);
         }
-
-        $this->ok(["id" => $item_id]);
     }
 
 
-    public function update()
+    protected function preUpdate($request)
     {
-        $defMsg = Message::get(ERR_IMPORT_RULE_UPDATE);
+        return $this->preCreate($request);
+    }
 
-        if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
-        }
 
-        $request = $this->getRequestData();
-        if (!$request || !isset($request["id"])) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
-        }
-        if (!$this->checkRuleData($request)) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
-        }
-
-        $reqData = checkFields($request, $this->requiredFields);
-        if ($reqData === false) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
-        }
-
-        if (!$this->model->update($request["id"], $reqData)) {
-            throw new \Error($defMsg);
-        }
-
+    protected function postUpdate($request)
+    {
         if (!$this->setRuleData($request["id"], $request)) {
-            throw new \Error($defMsg);
+            throw new \Error($this->updateErrorMsg);
         }
-
-        $this->ok();
-    }
-
-
-    public function del()
-    {
-        if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
-        }
-
-        $ids = $this->getRequestedIds(true, $this->isJsonContent());
-        if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            throw new \Error("No item specified");
-        }
-
-        if (!$this->model->del($ids)) {
-            throw new \Error(Message::get(ERR_IMPORT_RULE_DELETE));
-        }
-
-        $this->ok();
     }
 }

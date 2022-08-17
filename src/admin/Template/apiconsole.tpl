@@ -173,14 +173,14 @@
             <div class="std_margin">
                 <label class="checkbox">
                     <input name="full" type="checkbox" value="1">
-                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Include accounts of persons</span>
                 </label>
             </div>
             <div class="std_margin">
                 <label class="checkbox">
                     <input type="checkbox" data-target="type">
-                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Type</span>
                 </label>
                 <select name="type" class="stretch-input" disabled>
@@ -282,10 +282,10 @@
         <div id="listTrForm" class="request-data-form">
         <h3>List</h3>
         <form action="<?=BASEURL?>api/transaction/list" method="list">
-            <div class="std_margin">
+            <div class="std_margin column-container">
                 <label class="checkbox">
                     <input type="checkbox" data-target="order">
-                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Order</span>
                 </label>
                 <div id="admin_block" class="checkbox-wrap checkbox-wrap_inline">
@@ -298,7 +298,7 @@
             <div class="std_margin">
                 <label class="checkbox">
                     <input type="checkbox" data-target="type">
-                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Types</span>
                 </label>
                 <input id="list_trans_type" class="stretch-input" name="type" type="text" value="0" disabled>
@@ -306,7 +306,7 @@
             <div class="std_margin">
                 <label class="checkbox">
                     <input type="checkbox" data-target="count">
-                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Max. count</span>
                 </label>
                 <input id="list_trans_count" class="stretch-input" name="count" type="text" value="10" disabled>
@@ -314,7 +314,7 @@
             <div class="std_margin">
                 <label class="checkbox">
                     <input type="checkbox" data-target="page">
-                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Page number</span>
                 </label>
                 <input id="list_trans_page" class="stretch-input" name="page" type="text" value="0" disabled>
@@ -322,7 +322,7 @@
             <div class="std_margin">
                 <label class="checkbox">
                     <input type="checkbox" data-target="acc_id">
-                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Account ids</span>
                 </label>
                 <input id="list_trans_accounts" class="stretch-input" name="acc_id" type="text" value="0" disabled>
@@ -330,7 +330,7 @@
             <div class="std_margin">
                 <label class="checkbox">
                     <input type="checkbox" data-target="stdate">
-                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Start date</span>
                 </label>
                 <input id="list_trans_stdate" class="stretch-input" name="stdate" type="text" value="" disabled>
@@ -338,7 +338,7 @@
             <div class="std_margin">
                 <label class="checkbox">
                     <input type="checkbox" data-target="enddate">
-                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">End date</span>
                 </label>
                 <input id="list_trans_enddate" class="stretch-input" name="enddate" type="text" value="" disabled>
@@ -346,7 +346,7 @@
             <div class="std_margin">
                 <label class="checkbox">
                     <input type="checkbox" data-target="search">
-                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Search request</span>
                 </label>
                 <input id="list_trans_search" class="stretch-input" name="search" type="text" value="" disabled>
@@ -697,14 +697,14 @@
             <div class="std_margin">
                 <label class="checkbox">
                     <input name="full" type="checkbox" value="true">
-                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">List for all users</span>
                 </label>
             </div>
             <div class="std_margin">
                 <label class="checkbox">
                     <input name="extended" type="checkbox" value="true">
-                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Extended</span>
                 </label>
             </div>
@@ -772,14 +772,14 @@
             <div class="std_margin">
                 <label class="checkbox">
                     <input name="full" type="checkbox" value="true">
-                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">List for all users</span>
                 </label>
             </div>
             <div class="std_margin">
                 <label class="checkbox">
                     <input type="checkbox" data-target="rule">
-                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Import rule id</span>
                 </label>
                 <input id="list_cond_rule" class="stretch-input" name="rule" type="text" value="0" disabled>
@@ -880,14 +880,14 @@
             <div class="std_margin">
                 <label class="checkbox">
                     <input name="full" type="checkbox" value="true">
-                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">List for all users</span>
                 </label>
             </div>
             <div class="std_margin">
                 <label class="checkbox">
                     <input type="checkbox" data-target="rule">
-                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Import rule id</span>
                 </label>
                 <input id="list_act_rule" class="stretch-input" name="rule" type="text" value="0" disabled>
@@ -972,7 +972,7 @@
             <div class="std_margin">
                 <label class="checkbox">
                     <input type="checkbox" data-target="type">
-                    <span class="checkbox__check"><?=svgIcon("check")?></span>
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Type</span>
                 </label>
                 <select class="stretch-input" name="type" disabled>
@@ -1296,37 +1296,37 @@
         <form action="<?=BASEURL?>api/profile/reset" method="post">
             <label class="checkbox std_margin">
                 <input type="checkbox" name="accounts">
-                <span class="checkbox__check"><?=svgIcon("check")?></span>
+                <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                 <span class="checkbox__label">Accounts</span>
             </label>
 
             <label class="checkbox std_margin">
                 <input type="checkbox" name="persons">
-                <span class="checkbox__check"><?=svgIcon("check")?></span>
+                <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                 <span class="checkbox__label">Persons</span>
             </label>
 
             <label class="checkbox std_margin">
                 <input type="checkbox" name="transactions">
-                <span class="checkbox__check"><?=svgIcon("check")?></span>
+                <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                 <span class="checkbox__label">Transactions</span>
             </label>
 
             <label class="checkbox std_margin" disabled>
                 <input type="checkbox" name="keepbalance">
-                <span class="checkbox__check"><?=svgIcon("check")?></span>
+                <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                 <span class="checkbox__label">Keep current balance of accounts</span>
             </label>
 
             <label class="checkbox std_margin">
                 <input type="checkbox" name="importtpl">
-                <span class="checkbox__check"><?=svgIcon("check")?></span>
+                <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                 <span class="checkbox__label">Import templates</span>
             </label>
 
             <label class="checkbox std_margin">
                 <input type="checkbox" name="importrules">
-                <span class="checkbox__check"><?=svgIcon("check")?></span>
+                <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                 <span class="checkbox__label">Import rules</span>
             </label>
 

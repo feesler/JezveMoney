@@ -15,6 +15,7 @@ class Statistics extends TemplateController
     {
         $this->template = new Template(TPL_PATH . "statistics.tpl");
         $data = [];
+        $params = [];
 
         $transMod = TransactionModel::getInstance();
         $accMod = AccountModel::getInstance();
@@ -23,7 +24,8 @@ class Statistics extends TemplateController
 
         $byCurrency = (isset($_GET["filter"]) && $_GET["filter"] == "currency");
         $data["byCurrency"] = $byCurrency;
-        $filterObj->filter = $byCurrency ? "currency" : "account";
+        $params["filter"] = $byCurrency ? "currency" : "account";
+        $filterObj->filter = $params["filter"];
 
         $trans_type = EXPENSE;
         if (isset($_GET["type"])) {
@@ -33,9 +35,8 @@ class Statistics extends TemplateController
             }
         }
 
-        if ($trans_type) {
-            $filterObj->type = TransactionModel::typeToString($trans_type);
-        }
+        $params["type"] = $trans_type;
+        $filterObj->type = TransactionModel::typeToString($trans_type);
 
         if ($byCurrency) {
             if (isset($_GET["curr_id"]) && is_numeric($_GET["curr_id"])) {
@@ -49,6 +50,7 @@ class Statistics extends TemplateController
                     $this->fail();
                 }
             }
+            $params["curr_id"] = $curr_id;
             $filterObj->curr_id = $curr_id;
 
             $acc_id = null;
@@ -64,6 +66,7 @@ class Statistics extends TemplateController
                     $this->fail();
                 }
             }
+            $params["acc_id"] = $acc_id;
             $filterObj->acc_id = $acc_id;
 
             $curr_id = null;
@@ -76,10 +79,9 @@ class Statistics extends TemplateController
             ["title" => "Currencies", "selected" => ($byCurrency == true)]
         ];
 
+        $dateFmt = "";
         $stDate = (isset($_GET["stdate"]) ? $_GET["stdate"] : null);
         $endDate = (isset($_GET["enddate"]) ? $_GET["enddate"] : null);
-
-        $dateFmt = "";
         if (!is_null($stDate) && !is_null($endDate)) {
             $sdate = strtotime($stDate);
             $edate = strtotime($endDate);
@@ -87,6 +89,8 @@ class Statistics extends TemplateController
                 $dateFmt = date("d.m.Y", $sdate) . " - " . date("d.m.Y", $edate);
             }
 
+            $params["startDate"] = $stDate;
+            $params["endDate"] = $endDate;
             $filterObj->stdate = $stDate;
             $filterObj->enddate = $endDate;
         }
@@ -108,6 +112,7 @@ class Statistics extends TemplateController
             if ($groupType_id != 0) {
                 $groupType = strtolower($groupTypes[$groupType_id]);
 
+                $params["group"] = $groupType_id;
                 $filterObj->group = $groupType;
             }
         }
@@ -116,34 +121,34 @@ class Statistics extends TemplateController
         // Prepare transaction types menu
         $trTypes = TransactionModel::getTypeNames();
 
-        $params = [];
+        $urlParams = [];
         if ($byCurrency) {
-            $params["filter"] = "currency";
+            $urlParams["filter"] = "currency";
             if ($curr_id) {
-                $params["curr_id"] = $curr_id;
+                $urlParams["curr_id"] = $curr_id;
             }
         } else {
             if ($acc_id) {
-                $params["acc_id"] = $acc_id;
+                $urlParams["acc_id"] = $acc_id;
             }
         }
         if ($groupType_id) {
-            $params["group"] = $filterObj->group;
+            $urlParams["group"] = $filterObj->group;
         }
 
         $transMenu = [];
         $baseUrl = BASEURL . "statistics/";
         foreach ($trTypes as $type_id => $trTypeName) {
-            $urlParams = $params;
+            $searchParams = $urlParams;
             if ($type_id) {
-                $urlParams["type"] = strtolower($trTypeName);
+                $searchParams["type"] = strtolower($trTypeName);
             }
 
             $menuItem = new \stdClass();
             $menuItem->type = $type_id;
             $menuItem->title = $trTypeName;
             $menuItem->selected = ($menuItem->type == $trans_type);
-            $menuItem->url = urlJoin($baseUrl, $urlParams);
+            $menuItem->url = urlJoin($baseUrl, $searchParams);
 
             $transMenu[] = $menuItem;
         }
@@ -159,12 +164,7 @@ class Statistics extends TemplateController
             $accCurr = ($accObj) ? $accObj->curr_id : 0;
         }
 
-        $statArr = $transMod->getHistogramSeries(
-            $byCurrency,
-            ($byCurrency ? $filterObj->curr_id : $filterObj->acc_id),
-            $trans_type,
-            $groupType_id
-        );
+        $statArr = $transMod->getHistogramSeries($params);
         $data["statArr"] = $statArr;
 
         $data["titleString"] = "Jezve Money | Statistics";

@@ -455,58 +455,6 @@ class TransactionModel extends CachedTable
         $this->commitAffected();
     }
 
-    // Create new debt transaction
-    public function createDebt($params)
-    {
-        $op = intval($params["op"]);
-
-        $account_id = intval($params["acc_id"]);
-        $person_id = intval($params["person_id"]);
-        $src_curr = intval($params["src_curr"]);
-        $dest_curr = intval($params["dest_curr"]);
-        $src_amount = floatval($params["src_amount"]);
-        $dest_amount = floatval($params["dest_amount"]);
-        $tr_date = $params["date"];
-        $comment = $params["comment"];
-        if (!$person_id || !$src_curr || !$dest_curr) {
-            return 0;
-        }
-
-        if ($op != 1 && $op != 2) {
-            return 0;
-        }
-
-        $personAccount = $this->accModel->getPersonAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
-        if (!$personAccount) {
-            $personAccount = $this->accModel->createPersonAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
-        }
-        if (!$personAccount) {
-            return 0;
-        }
-
-        if ($op == 1) {        // give
-            $src_id = $personAccount->id;
-            $dest_id = $account_id;
-        } elseif ($op == 2) {    // take
-            $src_id = $account_id;
-            $dest_id = $personAccount->id;
-        }
-
-        $trans_id = $this->create([
-            "type" => DEBT,
-            "src_id" => $src_id,
-            "dest_id" => $dest_id,
-            "src_amount" => $src_amount,
-            "dest_amount" => $dest_amount,
-            "src_curr" => $src_curr,
-            "dest_curr" => $dest_curr,
-            "date" => $tr_date,
-            "comment" => $comment
-        ]);
-
-        return $trans_id;
-    }
-
 
     protected function getAffectedAccount($account_id)
     {
@@ -668,59 +616,6 @@ class TransactionModel extends CachedTable
         $this->originalTrans = null;
 
         $this->commitAffected();
-    }
-
-
-    // Update debt transaction
-    public function updateDebt($trans_id, $params)
-    {
-        $tr_id = intval($trans_id);
-        $op = intval($params["op"]);
-        $account_id = intval($params["acc_id"]);
-        $person_id = intval($params["person_id"]);
-        $src_curr = intval($params["src_curr"]);
-        $dest_curr = intval($params["dest_curr"]);
-        $src_amount = floatval($params["src_amount"]);
-        $dest_amount = floatval($params["dest_amount"]);
-        $tr_date = $params["date"];
-        $comment = $params["comment"];
-        if (!$tr_id || !$person_id || !$src_curr || !$dest_curr) {
-            return false;
-        }
-
-        if ($op != 1 && $op != 2) {
-            return false;
-        }
-
-        $personAccount = $this->accModel->getPersonAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
-        if (!$personAccount) {
-            $personAccount = $this->accModel->createPersonAccount($person_id, ($op == 1) ? $src_curr : $dest_curr);
-        }
-        if (!$personAccount) {
-            return false;
-        }
-
-        if ($op == 1) {        // give
-            $src_id = $personAccount->id;
-            $dest_id = $account_id;
-        } elseif ($op == 2) {    // take
-            $src_id = $account_id;
-            $dest_id = $personAccount->id;
-        }
-
-        $res = $this->update($tr_id, [
-            "type" => DEBT,
-            "src_id" => $src_id,
-            "dest_id" => $dest_id,
-            "src_amount" => $src_amount,
-            "dest_amount" => $dest_amount,
-            "src_curr" => $src_curr,
-            "dest_curr" => $dest_curr,
-            "date" => $tr_date,
-            "comment" => $comment
-        ]);
-
-        return $res;
     }
 
 
@@ -1592,11 +1487,33 @@ class TransactionModel extends CachedTable
 
 
     // Return series array of amounts and date of transactions for statistics histogram
-    public function getHistogramSeries($byCurrency, $curr_acc_id, $trans_type, $group_type = 0, $limit = 0)
+    public function getHistogramSeries($params = null)
     {
-        $curr_acc_id = intval($curr_acc_id);
-        $trans_type = intval($trans_type);
-        if (!self::$user_id || !$curr_acc_id || !$trans_type) {
+        if (is_null($params)) {
+            $params = [];
+        }
+
+        $byCurrency = (isset($params["filter"]) && $params["filter"] == "currency");
+        if ($byCurrency) {
+            if (!isset($params["curr_id"])) {
+                return null;
+            }
+
+            $curr_id = intval($params["curr_id"]);
+            $acc_id = 0;
+        } else {
+            if (!isset($params["acc_id"])) {
+                return null;
+            }
+
+            $acc_id = intval($params["acc_id"]);
+            $curr_id = 0;
+        }
+
+        $trans_type = (isset($params["type"])) ? intval($params["type"]) : EXPENSE;
+        $group_type = (isset($params["group"])) ? intval($params["group"]) : NO_GROUP;
+        $limit = (isset($params["limit"])) ? intval($params["limit"]) : 0;
+        if (!self::$user_id || !$trans_type) {
             return null;
         }
 
@@ -1609,23 +1526,34 @@ class TransactionModel extends CachedTable
         $itemsInGroup = 0;
         $trans_time = 0;
 
-        if (!$this->checkCache()) {
-            return null;
+        $dataParams = [
+            "type" => $trans_type,
+        ];
+        if ($acc_id) {
+            $dataParams["accounts"] = $acc_id;
+        }
+        if (
+            isset($params["startDate"]) && !is_null($params["startDate"]) &&
+            isset($params["endDate"]) && !is_null($params["endDate"])
+        ) {
+            $dataParams["startDate"] = $params["startDate"];
+            $dataParams["endDate"] = $params["endDate"];
         }
 
-        foreach ($this->cache as $item) {
+        $items = $this->getData($dataParams);
+        foreach ($items as $item) {
             if ($item->type != $trans_type) {
                 continue;
             }
 
             if ($byCurrency) {
                 $transCurr = ($trans_type == EXPENSE) ? $item->src_curr : $item->dest_curr;
-                if ($transCurr != $curr_acc_id) {
+                if ($transCurr != $curr_id) {
                     continue;
                 }
             } else {
                 $transAcc = ($trans_type == EXPENSE) ? $item->src_id : $item->dest_id;
-                if ($transAcc != $curr_acc_id) {
+                if ($transAcc != $acc_id) {
                     continue;
                 }
             }

@@ -2,12 +2,22 @@
 
 namespace JezveMoney\App\API\Controller;
 
-use JezveMoney\Core\ApiController;
+use JezveMoney\Core\ApiListController;
 use JezveMoney\Core\Message;
 
-class User extends ApiController
+class User extends ApiListController
 {
-    protected $createRequiredFields = [ "login", "password", "name" ];
+    protected $createRequiredFields = [ "login", "password", "name", "access" ];
+
+    public function initAPI()
+    {
+        parent::initAPI();
+
+        $this->model = $this->uMod;
+        $this->createErrorMsg = Message::get(ERR_USER_CREATE);
+        $this->updateErrorMsg = Message::get(ERR_USER_UPDATE);
+        $this->deleteErrorMsg = Message::get(ERR_USER_DELETE);
+    }
 
 
     public function login()
@@ -51,6 +61,7 @@ class User extends ApiController
         }
 
         $request = $this->getRequestData();
+        $request["access"] = 0;
         $reqData = checkFields($request, $this->createRequiredFields);
         if ($reqData === false) {
             throw new \Error("Invalid request data");
@@ -64,71 +75,37 @@ class User extends ApiController
     }
 
 
-    protected function getList()
+    public function getList()
     {
-        $data = $this->uMod->getData();
-        $this->ok($data);
+        $this->checkAdminAccess();
+        parent::getList();
     }
 
 
-    protected function create()
+    protected function getExpectedFields($request)
     {
-        $defMsg = Message::get(ERR_USER_CREATE);
-
-        if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
-        }
-
-        $request = $this->getRequestData();
-        $reqData = checkFields($request, $this->createRequiredFields);
-        if ($reqData === false) {
-            throw new \Error($defMsg);
-        }
-
-        $reqData["access"] = isset($request["access"]) ? intval($request["access"]) : 0;
-
-        $new_user_id = $this->uMod->create($reqData);
-        if (!$new_user_id) {
-            throw new \Error($defMsg);
-        }
-
-        $this->setMessage(Message::get(MSG_USER_CREATE));
-        $this->ok([ "id" => $new_user_id ]);
+        return $this->createRequiredFields;
     }
 
 
-    protected function update()
+    public function create()
     {
-        if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
-        }
-
-        $request = $this->getRequestData();
-        if (!isset($request["id"])) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
-        }
-
-        $reqData = checkFields($request, $this->createRequiredFields);
-        if ($reqData === false) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
-        }
-
-        if (isset($request["access"])) {
-            $reqData["access"] = intval($request["access"]);
-        }
-
-        $updateRes = $this->uMod->update($request["id"], $reqData);
-        if (!$updateRes) {
-            throw new \Error(Message::get(ERR_USER_UPDATE));
-        }
-
-        $this->setMessage(Message::get(MSG_USER_UPDATE));
-        $this->ok();
+        $this->checkAdminAccess();
+        parent::create();
     }
 
 
-    protected function changePassword()
+    public function update()
     {
+        $this->checkAdminAccess();
+        parent::update();
+    }
+
+
+    public function changePassword()
+    {
+        $this->checkAdminAccess();
+
         $requiredFields = [ "id", "password" ];
         $defMsg = Message::get(ERR_PROFILE_PASSWORD);
 
@@ -156,24 +133,9 @@ class User extends ApiController
     }
 
 
-    protected function del()
+    public function del()
     {
-        $defMsg = Message::get(ERR_USER_DELETE);
-
-        if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
-        }
-
-        $ids = $this->getRequestedIds(true, $this->isJsonContent());
-        if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            throw new \Error("No account specified");
-        }
-
-        if (!$this->uMod->del($ids)) {
-            throw new \Error($defMsg);
-        }
-
-        $this->setMessage(Message::get(MSG_USER_DELETE));
-        $this->ok();
+        $this->checkAdminAccess();
+        parent::del();
     }
 }

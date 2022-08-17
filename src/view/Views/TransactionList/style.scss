@@ -13,7 +13,7 @@
   width: 24px;
   margin: 0 9px 0 0;
 
-  & > svg {
+  .filter-icon {
     height: 24px;
     width: 24px;
   }
@@ -28,7 +28,7 @@
   text-decoration: none;
 }
 
-.clear-all-btn svg {
+.clear-all-icon {
   height: 16px;
   width: 16px;
   margin: 0 6px 0 0;
@@ -54,7 +54,7 @@
     cursor: pointer;
   }
 
-  .toggle-btn svg {
+  .toggle-icon {
     height: 18px;
   }
 }
@@ -64,7 +64,7 @@
     display: inline-flex;
   }
 
-  .filters-heading .toggle-btn svg {
+  .filters-heading .toggle-icon {
     transform: rotate(180deg);
   }
 }
@@ -88,9 +88,10 @@
   padding: 0.25rem 0.5rem;
   margin: 0;
   text-decoration: none;
-  border: 1px solid #ffffff;
+  border: 1px solid #ffffff00;
   border-radius: 3px;
   color: #447fd6;
+  z-index: 1;
 }
 
 .paginator-item__active {
@@ -99,17 +100,9 @@
   color: #ffffff;
 }
 
-a.paginator-item:hover {
-  border-color: #93beff;
-}
-
 .paginator-arrow {
   fill: #93beff;
-}
-
-a.paginator-arrow:hover {
-  fill: #447fd6;
-  border-color: #ffffff;
+  z-index: 1;
 }
 
 .paginator-arrow[disabled] {
@@ -118,4 +111,21 @@ a.paginator-arrow:hover {
 
 .paginator-item + .paginator-item {
   margin-left: 2px;
+}
+
+a.paginator-item:focus,
+a.paginator-arrow:focus {
+  z-index: 2;
+  box-shadow: 0 0 0 0.25rem var(--focus-shadow);
+}
+
+@media (hover: hover) {
+  a.paginator-item:hover {
+    border-color: #93beff;
+  }
+
+  a.paginator-arrow:hover {
+    fill: #447fd6;
+    border-color: #ffffff;
+  }
 }

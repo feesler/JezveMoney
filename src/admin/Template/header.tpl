@@ -17,13 +17,15 @@
                 <ul>
                     <li><a href="<?=BASEURL?>">Index</a></li>
                     <li class="separator"></li>
-<?php	foreach($this->menuItems as $item_id => $m_item) {	?>
-<?php		if (isset($m_item["active"]) && $m_item["active"]) {		?>
-                    <li><b><?=e($m_item["title"])?></b></li>
-<?php		} else {		?>
-                    <li><a href="<?=BASEURL?>admin/<?=e($m_item["link"])?>"><?=e($m_item["title"])?></a></li>
-<?php		}		?>
-<?php	}	?>
+                    <li><a href="<?=BASEURL?>admin/dbinstall/">DB update</a></li>
+                    <li><a href="<?=BASEURL?>admin/currency/">Currencies</a></li>
+                    <li><a href="<?=BASEURL?>admin/icon/">Icons</a></li>
+                    <li><a href="<?=BASEURL?>admin/query/">Queries</a></li>
+                    <li><a href="<?=BASEURL?>admin/log/">Logs</a></li>
+                    <li><a href="<?=BASEURL?>admin/balance/">Balance</a></li>
+                    <li><a href="<?=BASEURL?>admin/tests/">Tests</a></li>
+                    <li><a href="<?=BASEURL?>admin/apiconsole/">API console</a></li>
+                    <li><a href="<?=BASEURL?>admin/user/">Users</a></li>
                 </ul>
             </div>
         </div>

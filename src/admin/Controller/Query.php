@@ -59,8 +59,8 @@ class Query extends AdminController
 
         $data["latestQueries"] = $this->getLatestQueries();
 
-        $this->menuItems["query"]["active"] = true;
         $this->cssAdmin[] = "QueriesView.css";
+        $this->jsAdmin[] = "QueriesView.js";
 
         $this->render($data);
     }

@@ -15,24 +15,28 @@ include(TPL_PATH."commonhdr.tpl");	?>
                     </div>
 
                     <div>
-                        <div class="trtype-menu">
-<?php	forEach($transMenu as $menuItem) {
-            if ($menuItem->selected) {		?>
-                            <span class="trtype-menu__item trtype-menu__item_selected" data-type="<?=e($menuItem->type)?>">
-                                <span class="trtype-menu_item_title"><?=e($menuItem->title)?></span>
-                            </span>
-<?php		} else {		?>
-                            <span class="trtype-menu__item" data-type="<?=e($menuItem->type)?>">
-                                <span class="trtype-menu_item_title">
-                                    <a href="<?=e($menuItem->url)?>"><?=e($menuItem->title)?></a>
-                                </span>
-                            </span>
-<?php		}
-        }	?>
-                        </div>
-
                         <div class="filters-container">
                             <div class="filter-item std_margin">
+                                <h3 class="filter-item__title">Type</h3>
+                                <div class="trtype-menu">
+<?php	forEach($transMenu as $menuItem) {
+            if ($menuItem->selected) {		?>
+                                    <span class="trtype-menu__item trtype-menu__item_selected" data-type="<?=e($menuItem->type)?>">
+                                        <span class="trtype-menu_item_title"><?=e($menuItem->title)?></span>
+                                    </span>
+<?php		} else {		?>
+                                    <span class="trtype-menu__item" data-type="<?=e($menuItem->type)?>">
+                                        <span class="trtype-menu_item_title">
+                                            <a href="<?=e($menuItem->url)?>"><?=e($menuItem->title)?></a>
+                                        </span>
+                                    </span>
+<?php		}
+        }	?>
+                                </div>
+                            </div>
+
+                            <div class="filter-item std_margin">
+                                <h3 class="filter-item__title">Filter by</h3>
                                 <select id="filter_type">
 <?php	foreach($byCurrArr as $ind => $byCurrItem) {	?>
 <?php		if ($byCurrItem["selected"]) {		?>
@@ -45,6 +49,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
 
                             <div id="acc_block" class="filter-item std_margin"<?=hidden($byCurrency)?>>
+                                <h3 class="filter-item__title">Account</h3>
                                 <select id="acc_id">
 <?php	foreach($accArr as $accInfo) {
             if ($accInfo->id == $acc_id) {	?>
@@ -57,6 +62,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
 
                             <div id="curr_block" class="filter-item std_margin"<?=hidden(!$byCurrency)?>>
+                                <h3 class="filter-item__title">Currency</h3>
                                 <select id="curr_id">
 <?php	foreach($currArr as $currInfo) {
             if ($currInfo->id == $curr_id) {	?>
@@ -69,6 +75,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
 
                             <div class="filter-item std_margin">
+                                <h3 class="filter-item__title">Type</h3>
                                 <select id="groupsel">
 <?php	foreach($groupTypes as $val => $grtype) {	?>
 <?php		if ($val == $groupType_id) {		?>
@@ -90,7 +97,10 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                 <div id="date_block" hidden>
                                     <div class="input-group">
                                         <input id="date" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?=e($dateFmt)?>">
-                                        <button id="cal_rbtn" class="icon-btn input-group__btn" type="button"><?=svgIcon("cal")?></button>
+                                        <button id="nodatebtn" class="input-group__inner-btn" type="button">
+                                            <?=svgIcon("close", "input-group__inner-btn__icon")?>
+                                        </button>
+                                        <button id="cal_rbtn" class="icon-btn input-group__btn" type="button"><?=svgIcon("cal", "icon calendar-icon")?></button>
                                     </div>
                                     <div id="calendar" class="calendar"></div>
                                 </div>

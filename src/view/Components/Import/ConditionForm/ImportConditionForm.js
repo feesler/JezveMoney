@@ -129,7 +129,7 @@ export class ImportConditionForm extends Component {
         this.delBtn = ce(
             'button',
             { className: 'btn icon-btn delete-btn', type: 'button' },
-            createIcon('del'),
+            createIcon('del', 'icon delete-icon'),
             { click: () => this.onDelete() },
         );
         this.controls = createContainer('cond-form__controls', this.delBtn);

@@ -2,14 +2,14 @@
 
 namespace JezveMoney\App\API\Controller;
 
-use JezveMoney\Core\ApiController;
+use JezveMoney\Core\ApiListController;
 use JezveMoney\Core\Message;
 use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Item\TransactionItem;
 
-class Transaction extends ApiController
+class Transaction extends ApiListController
 {
     protected $requiredFields = [
         "type",
@@ -35,200 +35,102 @@ class Transaction extends ApiController
         "comment"
     ];
 
-    protected $model = null;
-
 
     public function initAPI()
     {
         parent::initAPI();
 
         $this->model = TransactionModel::getInstance();
+        $this->createErrorMsg = Message::get(ERR_TRANS_CREATE);
+        $this->updateErrorMsg = Message::get(ERR_TRANS_UPDATE);
+        $this->deleteErrorMsg = Message::get(ERR_TRANS_DELETE);
     }
 
 
-    public function index()
+    protected function prepareItem($item)
     {
-        $ids = $this->getRequestedIds();
-        if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            throw new \Error("No transaction specified");
-        }
-
-        $res = [];
-        foreach ($ids as $trans_id) {
-            $item = $this->model->getItem($trans_id);
-            if (is_null($item)) {
-                throw new \Error("Transaction $trans_id not found");
-            }
-
-            $res[] = new TransactionItem($item);
-        }
-
-        $this->ok($res);
+        return new TransactionItem($item);
     }
 
 
-    public function getList()
+    protected function prepareListRequest($request)
     {
         $defaultParams = [
             "onPage" => 10,
             "page" => 0
         ];
 
-        $res = new \stdClass();
-        $params = $this->model->getRequestFilters($_GET, $defaultParams, true);
-        $res->filter = (object)$this->model->getFilterObject($params);
+        $res = $this->model->getRequestFilters($request, $defaultParams, true);
 
         // Order request is available only from API
         if (
-            isset($_GET["order"]) &&
-            is_string($_GET["order"]) &&
-            strtolower($_GET["order"]) == "desc"
+            isset($request["order"]) &&
+            is_string($request["order"]) &&
+            strtolower($request["order"]) == "desc"
         ) {
-            $res->order = "desc";
-            $params["desc"] = true;
-        } else {
-            $res->order = "asc";
+            $res["desc"] = true;
         }
 
-        if (isset($_GET["count"]) && is_numeric($_GET["count"])) {
-            $params["onPage"] = intval($_GET["count"]);
+        if (isset($request["count"]) && is_numeric($request["count"])) {
+            $res["onPage"] = intval($request["count"]);
         }
 
-        $items = $this->model->getData($params);
-        $res->items = [];
-        foreach ($items as $item) {
-            $res->items[] = new TransactionItem($item);
-        }
+        return $res;
+    }
 
-        $transCount = $this->model->getTransCount($params);
-        $pagesCount = ($params["onPage"] > 0)
-            ? ceil($transCount / $params["onPage"])
+
+    public function getList()
+    {
+        $res = new \stdClass();
+
+        $data = $this->getRequestData();
+        $request = $this->prepareListRequest($data);
+
+        $res->items = $this->getListItems($request);
+        $res->filter = (object)$this->model->getFilterObject($request);
+        $res->order = (isset($request["desc"]) && $request["desc"] === true)
+            ? "desc"
+            : "asc";
+
+        $transCount = $this->model->getTransCount($request);
+        $pagesCount = ($request["onPage"] > 0)
+            ? ceil($transCount / $request["onPage"])
             : 1;
 
+        $currentPage = (isset($request["page"]) ? intval($request["page"]) : 0) + 1;
         $res->pagination = [
             "total" => $transCount,
-            "onPage" => $params["onPage"],
+            "onPage" => $request["onPage"],
             "pagesCount" => $pagesCount,
-            "page" => (isset($params["page"]) ? intval($params["page"]) : 0) + 1
+            "page" => $currentPage
         ];
 
         $this->ok($res);
     }
 
 
-    public function create()
+    protected function getExpectedFields($request)
     {
-        if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
-        }
-
-        $request = $this->getRequestData();
-        if (!$request || !isset($request["type"])) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
-        }
-
         $trans_type = intval($request["type"]);
 
-        $fieldsToCheck = ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields;
-        $reqData = checkFields($request, $fieldsToCheck);
-        if ($reqData === false) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
-        }
-
-        $trans_id = 0;
-        if ($trans_type == DEBT) {
-            $trans_id = $this->model->createDebt($reqData);
-        } else {
-            $trans_id = $this->model->create($reqData);
-        }
-
-        if (!$trans_id) {
-            throw new \Error(Message::get(ERR_TRANS_CREATE));
-        }
-
-        $this->ok(["id" => $trans_id]);
+        return ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields;
     }
 
 
-    public function createMultiple()
+    protected function preCreate($request)
     {
-        if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
-        }
-
-        $request = $this->getRequestData();
-        $transactions = [];
-        foreach ($request as $item) {
-            if (!is_array($item)) {
-                throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
-            }
-
-            $transObj = ($item["type"] == DEBT)
-                ? $this->model->prepareDebt($item)
-                : $item;
-
-            $transactions[] = $transObj;
-        }
-
-        $trans_ids = $this->model->createMultiple($transactions);
-        if (!$trans_ids) {
-            throw new \Error(Message::get(ERR_TRANS_CREATE));
-        }
-
-        $this->ok(["ids" => $trans_ids]);
-    }
-
-
-    public function update()
-    {
-        if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
-        }
-
-        $request = $this->getRequestData();
-        if (!$request || !isset($request["id"])) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
-        }
-
-        $trans_id = intval($request["id"]);
         $trans_type = intval($request["type"]);
-
-        $fieldsToCheck = ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields;
-        $reqData = checkFields($request, $fieldsToCheck);
-        if ($reqData === false) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
-        }
-
         if ($trans_type == DEBT) {
-            if (!$this->model->updateDebt($trans_id, $reqData)) {
-                throw new \Error(Message::get(ERR_DEBT_UPDATE));
-            }
+            return $this->model->prepareDebt($request);
         } else {
-            if (!$this->model->update($trans_id, $reqData)) {
-                throw new \Error(Message::get(ERR_TRANS_UPDATE));
-            }
+            return $request;
         }
-
-        $this->ok();
     }
 
 
-    public function del()
+    protected function preUpdate($request)
     {
-        if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
-        }
-
-        $ids = $this->getRequestedIds(true, $this->isJsonContent());
-        if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            throw new \Error("No account specified");
-        }
-
-        if (!$this->model->del($ids)) {
-            throw new \Error(Message::get(ERR_TRANS_DELETE));
-        }
-
-        $this->ok();
+        return $this->preCreate($request);
     }
 
 
@@ -261,7 +163,8 @@ class Transaction extends ApiController
 
         // Filter type
         $byCurrency = (isset($_GET["filter"]) && $_GET["filter"] == "currency");
-        $filterObj->filter = $byCurrency ? "currency" : "account";
+        $params["filter"] = $byCurrency ? "currency" : "account";
+        $filterObj->filter = $params["filter"];
 
         // Transaction type
         $trans_type = EXPENSE;
@@ -271,9 +174,8 @@ class Transaction extends ApiController
                 throw new \Error("Invalid transaction type");
             }
         }
-        if ($trans_type) {
-            $filterObj->type = TransactionModel::typeToString($trans_type);
-        }
+        $filterObj->type = TransactionModel::typeToString($trans_type);
+        $params["type"] = $trans_type;
 
         // Currency or account
         if ($byCurrency) {
@@ -288,6 +190,7 @@ class Transaction extends ApiController
                     throw new \Error("No currencies available");
                 }
             }
+            $params["curr_id"] = $curr_id;
             $filterObj->curr_id = $curr_id;
         } else {
             if (isset($_GET["acc_id"]) && is_numeric($_GET["acc_id"])) {
@@ -301,6 +204,7 @@ class Transaction extends ApiController
                     throw new \Error("No accounts available");
                 }
             }
+            $params["acc_id"] = $acc_id;
             $filterObj->acc_id = $acc_id;
         }
 
@@ -316,17 +220,21 @@ class Transaction extends ApiController
                 }
             }
             if ($index != 0) {
+                $params["group"] = $groupType_id;
                 $filterObj->group = $requestedGroup;
             }
         }
 
-        $res->histogram = $this->model->getHistogramSeries(
-            $byCurrency,
-            ($byCurrency ? $filterObj->curr_id : $filterObj->acc_id),
-            $trans_type,
-            $groupType_id
-        );
+        $stDate = (isset($_GET["stdate"]) ? $_GET["stdate"] : null);
+        $endDate = (isset($_GET["enddate"]) ? $_GET["enddate"] : null);
+        if (!is_null($stDate) && !is_null($endDate)) {
+            $params["startDate"] = $stDate;
+            $params["endDate"] = $endDate;
+            $filterObj->stdate = $stDate;
+            $filterObj->enddate = $endDate;
+        }
 
+        $res->histogram = $this->model->getHistogramSeries($params);
         $res->filter = $filterObj;
 
         $this->ok($res);
