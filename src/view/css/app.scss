@@ -592,9 +592,19 @@ label {
 }
 
 /* Histogram bar item */
-.charts {
+.histogram__bar {
   --historgam-bar-color: #20a0ff;
   --historgam-active-bar-color: #00bfff;
+}
+
+.histogram--cat-1 {
+  --historgam-bar-color: #ff0077;
+  --historgam-active-bar-color: #ff3392;
+}
+
+.histogram--cat-2 {
+  --historgam-bar-color: #00d647;
+  --historgam-active-bar-color: #00ff55;
 }
 
 /* Desktop */

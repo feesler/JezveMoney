@@ -28,26 +28,33 @@ class Statistics extends TemplateController
         $filterObj->filter = $params["filter"];
 
         $trans_type = EXPENSE;
-        if (isset($_GET["type"])) {
-            $trans_type = TransactionModel::stringToType($_GET["type"]);
-            if (!$trans_type) {
-                $this->fail("Invalid transaction type");
-            }
+        $trans_type = (isset($_GET["type"])) ? $_GET["type"] : EXPENSE;
+        if (!is_array($trans_type)) {
+            $trans_type = [$trans_type];
         }
 
-        $params["type"] = $trans_type;
-        $filterObj->type = TransactionModel::typeToString($trans_type);
+        $transTypes = [];
+        foreach ($trans_type as $type) {
+            $intType = intval($type);
+            if (!$intType) {
+                $this->fail("Invalid transaction type");
+            }
+            $transTypes[] = $intType;
+        }
+        $filterObj->type = $transTypes;
+
+        $params["type"] = $transTypes;
 
         if ($byCurrency) {
             if (isset($_GET["curr_id"]) && is_numeric($_GET["curr_id"])) {
                 $curr_id = intval($_GET["curr_id"]);
                 if (!$currMod->isExist($curr_id)) {
-                    $this->fail();
+                    $this->fail("Currency not found");
                 }
             } else {        // try to get first currency
                 $curr_id = $currMod->getIdByPos(0);
                 if (!$curr_id) {
-                    $this->fail();
+                    $this->fail("No currencies available");
                 }
             }
             $params["curr_id"] = $curr_id;
@@ -58,12 +65,12 @@ class Statistics extends TemplateController
             if (isset($_GET["acc_id"]) && is_numeric($_GET["acc_id"])) {
                 $acc_id = intval($_GET["acc_id"]);
                 if (!$accMod->isExist($acc_id)) {
-                    $this->fail();
+                    $this->fail("Account not found");
                 }
             } else {    /* try to get first account of user */
                 $acc_id = $accMod->getIdByPos(0);
                 if (!$acc_id) {
-                    $this->fail();
+                    $this->fail("No accounts available");
                 }
             }
             $params["acc_id"] = $acc_id;
@@ -147,7 +154,7 @@ class Statistics extends TemplateController
             $menuItem = new \stdClass();
             $menuItem->type = $type_id;
             $menuItem->title = $trTypeName;
-            $menuItem->selected = ($menuItem->type == $trans_type);
+            $menuItem->selected = in_array($menuItem->type, $transTypes);
             $menuItem->url = urlJoin($baseUrl, $searchParams);
 
             $transMenu[] = $menuItem;

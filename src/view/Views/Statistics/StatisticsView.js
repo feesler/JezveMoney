@@ -14,6 +14,7 @@ import {
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
+import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import '../../css/app.scss';
 import '../../Components/TransactionTypeMenu/style.scss';
 import './style.scss';
@@ -58,6 +59,11 @@ class StatisticsView extends View {
             showPopup: true,
             activateOnHover: true,
             renderPopup: (item) => this.renderPopupContent(item),
+        });
+
+        this.typeMenu = TransactionTypeMenu.fromElement(document.querySelector('.trtype-menu'), {
+            allowActiveLink: true,
+            onChange: (sel) => this.onChangeTypeFilter(sel),
         });
 
         this.filterTypeDropDown = DropDown.create({
@@ -123,6 +129,14 @@ class StatisticsView extends View {
         }
 
         return newLocation;
+    }
+
+    /**
+     * Transaction type menu change event handler
+     */
+    onChangeTypeFilter(selected) {
+        this.state.filter.type = selected;
+        window.location = this.buildAddress();
     }
 
     /**
