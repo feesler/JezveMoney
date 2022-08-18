@@ -245,6 +245,9 @@ export const filter = async (params) => {
         if ('accounts' in params) {
             reqParams.acc_id = params.accounts;
         }
+        if ('persons' in params) {
+            reqParams.person_id = params.persons;
+        }
         if ('startDate' in params && 'endDate' in params) {
             reqParams.stdate = formatDate(new Date(fixDate(params.startDate)));
             reqParams.enddate = formatDate(new Date(fixDate(params.endDate)));

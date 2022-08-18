@@ -520,6 +520,13 @@ const apiCreateTransactions = async () => {
         acc_id: 0,
         src_amount: 1000,
         src_curr: USD,
+    }, {
+        type: DEBT,
+        op: 1,
+        person_id: App.scenario.PERSON_X,
+        acc_id: App.scenario.ACC_RUB,
+        src_amount: 100,
+        src_curr: RUB,
     }];
 
     [
@@ -855,6 +862,8 @@ const apiFilterTransactions = async () => {
     }, {
         type: DEBT,
         accounts: App.scenario.ACC_RUB,
+    }, {
+        persons: App.scenario.PERSON_X,
     }, {
         onPage: 10,
     }, {
