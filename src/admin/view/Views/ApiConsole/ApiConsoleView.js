@@ -2,6 +2,7 @@ import 'jezvejs/style';
 import {
     ge,
     ce,
+    enable,
     setEvents,
     isObject,
     isFunction,
@@ -519,6 +520,18 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Fail to init view');
         }
         setTrPosForm.addEventListener('submit', (e) => this.onFormSubmit(e));
+
+        const statisticsForm = document.querySelector('#statisticsForm > form');
+        if (!statisticsForm) {
+            throw new Error('Fail to init view');
+        }
+        statisticsForm.addEventListener('submit', (e) => this.onFormSubmit(e));
+        const statisticsFilter = ge('statistics-filter');
+        statisticsFilter.addEventListener('change', () => {
+            const isByCurrency = statisticsFilter.value === 'currency';
+            enable('statistics_curr', isByCurrency);
+            enable('statistics_acc', !isByCurrency);
+        });
     }
 
     /** Initialization of forms for Import template API controller */
