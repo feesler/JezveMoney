@@ -72,6 +72,10 @@ class AccountView extends View {
         if (!this.currencySelect) {
             throw new Error('Failed to initialize Account view');
         }
+        this.initCurrencyList(this.currencySelect);
+        if (this.state.original.curr_id) {
+            this.currencySelect.selectItem(this.state.original.curr_id);
+        }
 
         this.currencySign = ge('currsign');
         if (!this.currencySign) {

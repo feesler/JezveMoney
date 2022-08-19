@@ -1510,24 +1510,40 @@ class TransactionModel extends CachedTable
             $curr_id = 0;
         }
 
-        $trans_type = (isset($params["type"])) ? intval($params["type"]) : EXPENSE;
-        $group_type = (isset($params["group"])) ? intval($params["group"]) : NO_GROUP;
-        $limit = (isset($params["limit"])) ? intval($params["limit"]) : 0;
-        if (!self::$user_id || !$trans_type) {
-            return null;
-        }
-
         $amountArr = [];
         $groupArr = [];
         $sumDate = null;
         $curDate = null;
         $prevDate = null;
-        $curSum = 0.0;
+        $curSum = [];
         $itemsInGroup = 0;
         $trans_time = 0;
 
+        $typesReq = (isset($params["type"])) ? $params["type"] : EXPENSE;
+        if (!is_array($typesReq)) {
+            $typesReq = [$typesReq];
+        }
+
+        $transTypes = [];
+        foreach ($typesReq as $type) {
+            $intType = intval($type);
+            if (!$intType) {
+                return null;
+            }
+
+            $transTypes[] = $intType;
+            $amountArr[$intType] = [];
+            $curSum[$intType] = 0.0;
+        }
+
+        $group_type = (isset($params["group"])) ? intval($params["group"]) : NO_GROUP;
+        $limit = (isset($params["limit"])) ? intval($params["limit"]) : 0;
+        if (!self::$user_id || !count($transTypes)) {
+            return null;
+        }
+
         $dataParams = [
-            "type" => $trans_type,
+            "type" => $transTypes,
         ];
         if ($acc_id) {
             $dataParams["accounts"] = $acc_id;
@@ -1542,17 +1558,17 @@ class TransactionModel extends CachedTable
 
         $items = $this->getData($dataParams);
         foreach ($items as $item) {
-            if ($item->type != $trans_type) {
+            if (!in_array($item->type, $transTypes)) {
                 continue;
             }
 
             if ($byCurrency) {
-                $transCurr = ($trans_type == EXPENSE) ? $item->src_curr : $item->dest_curr;
+                $transCurr = ($item->type == EXPENSE) ? $item->src_curr : $item->dest_curr;
                 if ($transCurr != $curr_id) {
                     continue;
                 }
             } else {
-                $transAcc = ($trans_type == EXPENSE) ? $item->src_id : $item->dest_id;
+                $transAcc = ($item->type == EXPENSE) ? $item->src_id : $item->dest_id;
                 if ($transAcc != $acc_id) {
                     continue;
                 }
@@ -1563,10 +1579,10 @@ class TransactionModel extends CachedTable
             $itemsInGroup++;
 
             if ($group_type == NO_GROUP) {
-                if ($trans_type == EXPENSE) {
-                    $amountArr[] = $item->src_amount;
+                if ($item->type == EXPENSE) {
+                    $amountArr[$item->type][] = $item->src_amount;
                 } else {
-                    $amountArr[] = $item->dest_amount;
+                    $amountArr[$item->type][] = $item->dest_amount;
                 }
 
                 if ($prevDate == null || $prevDate != $dateInfo["mday"]) {
@@ -1588,31 +1604,39 @@ class TransactionModel extends CachedTable
                 $sumDate = $curDate;
             } elseif ($sumDate != null && $sumDate != $curDate) {
                 $sumDate = $curDate;
-                $amountArr[] = $curSum;
-                $curSum = 0.0;
+                foreach ($transTypes as $type) {
+                    $amountArr[$type][] = $curSum[$type];
+                    $curSum[$type] = 0.0;
+                }
 
                 $label = $this->getLabel($trans_time, $group_type);
                 $groupArr[] = [$label, 1];
             }
 
-            if ($trans_type == EXPENSE) {
-                $curSum += $item->src_amount;
+            if ($item->type == EXPENSE) {
+                $curSum[$item->type] += $item->src_amount;
             } else {
-                $curSum += $item->dest_amount;
+                $curSum[$item->type] += $item->dest_amount;
             }
         }
 
         // save remain value
-        if ($group_type != 0 && $curSum != 0.0) {
+        if ($group_type != 0 && array_sum($curSum) != 0.0) {
             if ($sumDate != null && $sumDate != $curDate) {
-                $amountArr[] = $curSum;
+                foreach ($transTypes as $type) {
+                    $amountArr[$type][] = $curSum[$type];
+                }
+
                 $label = $this->getLabel($trans_time, $group_type);
                 $groupArr[] = [$label, 1];
             } else {
-                if (!count($amountArr)) {
-                    $amountArr[] = $curSum;
-                } else {
-                    $amountArr[count($amountArr) - 1] += $curSum;
+                foreach ($transTypes as $type) {
+                    $length = count($amountArr[$type]);
+                    if (!$length) {
+                        $amountArr[$type][] = $curSum[$type];
+                    } else {
+                        $amountArr[$type][$length - 1] += $curSum[$type];
+                    }
                 }
 
                 if (!count($groupArr)) {
@@ -1625,9 +1649,18 @@ class TransactionModel extends CachedTable
         }
 
         if ($limit > 0) {
-            $amountCount = count($amountArr);
+            $amountCount = 0;
+            foreach ($amountArr as $type => $values) {
+                $amountCount = max(count($values), $amountCount);
+            }
+
             $limitCount = min($amountCount, $limit);
-            $amountArr = array_slice($amountArr, -$limitCount);
+
+            $trimAmounts = [];
+            foreach ($amountArr as $type => $values) {
+                $trimAmounts[$type] = array_slice($values, -$limitCount);
+            }
+            $amountArr = $trimAmounts;
 
             $groupCount = count($groupArr);
 
@@ -1644,8 +1677,16 @@ class TransactionModel extends CachedTable
             $groupArr = array_slice($groupArr, -$newGroupsCount);
         }
 
+        $resultValues = [];
+        foreach ($amountArr as $type => $values) {
+            $resultValues[] = ["data" => $values];
+        }
+        if (count($transTypes) == 1) {
+            $resultValues = $resultValues[0]["data"];
+        }
+
         $res = new \stdClass();
-        $res->values = $amountArr;
+        $res->values = $resultValues;
         $res->series = $groupArr;
 
         return $res;

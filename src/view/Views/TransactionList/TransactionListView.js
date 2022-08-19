@@ -87,6 +87,7 @@ class TransactionListView extends View {
             if (!this.accountDropDown) {
                 throw new Error('Failed to initialize Transaction List view');
             }
+            this.initAccountsList(this.accountDropDown);
         }
 
         const personsFilter = ge('personsFilter');
@@ -104,9 +105,7 @@ class TransactionListView extends View {
             if (!this.personDropDown) {
                 throw new Error('Failed to initialize Transaction List view');
             }
-            if (window.app.model.persons.length === 0) {
-                this.personDropDown.show(false);
-            }
+            this.initPersonsList(this.personDropDown);
         }
 
         this.searchFrm = ge('searchFrm');

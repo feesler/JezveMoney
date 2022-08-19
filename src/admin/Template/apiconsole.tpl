@@ -46,6 +46,7 @@
                     <li data-target="updateDebtForm">Update debt</li>
                     <li data-target="delTrForm">Delete</li>
                     <li data-target="setTrPosForm">Set position</li>
+                    <li data-target="statisticsForm">Statistics</li>
                 </ul>
             </li>
 
@@ -603,6 +604,61 @@
                 <label for="trans_pos_pos">Position</label>
                 <input id="trans_pos_pos" class="stretch-input" name="pos" type="text">
             </div>
+            <div class="acc_controls">
+                <input class="adm_act_btn" type="submit" value="submit">
+            </div>
+        </form>
+        </div>
+
+        <div id="statisticsForm" class="request-data-form">
+        <h3>Statistics</h3>
+        <form action="<?=BASEURL?>api/transaction/statistics" method="post">
+            <div class="std_margin">
+                <div class="std_margin">
+                    <label for="statistics_type">Type (1-4)</label>
+                    <input id="statistics_type" class="stretch-input" name="type" type="text">
+                </div>
+                <select id="statistics-filter" class="stretch-input" name="filter">
+                    <option value="account" selected>Account</option>
+                    <option value="currency">Currency</option>
+                </select>
+                <div class="std_margin">
+                    <label for="statistics_curr">Currency</label>
+                    <input id="statistics_curr" class="stretch-input" name="curr_id" type="text">
+                </div>
+                <div class="std_margin">
+                    <label for="statistics_acc">Account</label>
+                    <input id="statistics_acc" class="stretch-input" name="acc_id" type="text" disabled>
+                </div>
+                <div class="std_margin">
+                    <label for="statistics_group">Group by</label>
+                    <select id="statistics_group" class="stretch-input" name="group">
+                        <option value="none" selected>None</option>
+                        <option value="day">Day</option>
+                        <option value="week">Week</option>
+                        <option value="month">Month</option>
+                        <option value="year">Year</option>
+                    </select>
+                </div>
+
+                <div class="std_margin">
+                    <label class="checkbox">
+                        <input type="checkbox" data-target="stdate">
+                        <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
+                        <span class="checkbox__label">Start date</span>
+                    </label>
+                    <input id="statistics_stdate" class="stretch-input" name="stdate" type="text" value="" disabled>
+                </div>
+                <div class="std_margin">
+                    <label class="checkbox">
+                        <input type="checkbox" data-target="enddate">
+                        <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
+                        <span class="checkbox__label">End date</span>
+                    </label>
+                    <input id="statistics_enddate" class="stretch-input" name="enddate" type="text" value="" disabled>
+                </div>
+            </div>
+
             <div class="acc_controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>

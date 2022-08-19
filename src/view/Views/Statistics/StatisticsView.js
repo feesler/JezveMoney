@@ -1,6 +1,7 @@
 import 'jezvejs/style';
 import {
     ge,
+    ce,
     setEvents,
     isDate,
     show,
@@ -14,9 +15,15 @@ import {
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
+import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import '../../css/app.scss';
 import '../../Components/TransactionTypeMenu/style.scss';
 import './style.scss';
+
+/** CSS classes */
+const POPUP_LIST_CLASS = 'chart-popup-list';
+const POPUP_LIST_ITEM_CLASS = 'chart-popup-list__item';
+const POPUP_LIST_VALUE_CLASS = 'chart-popup-list__value';
 
 /**
  * Statistics view
@@ -57,7 +64,12 @@ class StatisticsView extends View {
             scrollThrottle: 100,
             showPopup: true,
             activateOnHover: true,
-            renderPopup: (item) => this.renderPopupContent(item),
+            renderPopup: (target) => this.renderPopupContent(target),
+        });
+
+        this.typeMenu = TransactionTypeMenu.fromElement(document.querySelector('.trtype-menu'), {
+            allowActiveLink: true,
+            onChange: (sel) => this.onChangeTypeFilter(sel),
         });
 
         this.filterTypeDropDown = DropDown.create({
@@ -74,6 +86,12 @@ class StatisticsView extends View {
                 editable: false,
                 className: 'dd__fullwidth',
             });
+
+            this.initCurrencyList(this.currencyDropDown);
+
+            if (this.state.filter.curr_id) {
+                this.currencyDropDown.selectItem(this.state.filter.curr_id);
+            }
         } else {
             this.accountDropDown = DropDown.create({
                 elem: 'acc_id',
@@ -81,6 +99,12 @@ class StatisticsView extends View {
                 editable: false,
                 className: 'dd__fullwidth',
             });
+
+            this.initAccountsList(this.accountDropDown);
+
+            if (this.state.filter.acc_id) {
+                this.accountDropDown.selectItem(this.state.filter.acc_id);
+            }
         }
 
         this.groupDropDown = DropDown.create({
@@ -123,6 +147,14 @@ class StatisticsView extends View {
         }
 
         return newLocation;
+    }
+
+    /**
+     * Transaction type menu change event handler
+     */
+    onChangeTypeFilter(selected) {
+        this.state.filter.type = selected;
+        window.location = this.buildAddress();
     }
 
     /**
@@ -258,16 +290,30 @@ class StatisticsView extends View {
         window.location = this.buildAddress();
     }
 
-    /** Returns content of chart popup for specified item */
-    renderPopupContent(item) {
-        if (!item) {
-            return null;
-        }
-
+    formatItemValue(item) {
         return window.app.model.currency.formatCurrency(
             item.value,
             this.state.accountCurrency,
         );
+    }
+
+    /** Returns content of chart popup for specified target */
+    renderPopupContent(target) {
+        if (!target) {
+            return null;
+        }
+
+        const items = target.group ?? [target.item];
+        const elems = items.map((item) => ce(
+            'li',
+            { className: POPUP_LIST_ITEM_CLASS },
+            ce('span', {
+                className: POPUP_LIST_VALUE_CLASS,
+                textContent: this.formatItemValue(item),
+            }),
+        ));
+
+        return ce('ul', { className: POPUP_LIST_CLASS }, elems);
     }
 }
 

@@ -57,15 +57,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         <div class="view-row std_margin">
                             <label for="currency">Currency</label>
                             <div>
-                                <select id="currency" name="curr_id">
-<?php	foreach($currArr as $currInfo) {
-            if ($currInfo->id == $accInfo->curr_id) {	?>
-                                    <option value="<?=e($currInfo->id)?>" selected><?=e($currInfo->name)?></option>
-<?php		} else {	?>
-                                    <option value="<?=e($currInfo->id)?>"><?=e($currInfo->name)?></option>
-<?php		}
-        }		?>
-                                </select>
+                                <select id="currency" name="curr_id"></select>
                             </div>
                         </div>
                         <div id="initbal-inp-block" class="validation-block view-row std_margin">

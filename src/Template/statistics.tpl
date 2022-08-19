@@ -18,20 +18,26 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         <div class="filters-container">
                             <div class="filter-item std_margin">
                                 <h3 class="filter-item__title">Type</h3>
-                                <div class="trtype-menu">
-<?php	forEach($transMenu as $menuItem) {
-            if ($menuItem->selected) {		?>
-                                    <span class="trtype-menu__item trtype-menu__item_selected" data-type="<?=e($menuItem->type)?>">
-                                        <span class="trtype-menu_item_title"><?=e($menuItem->title)?></span>
-                                    </span>
+                                <div class="trtype-menu trtype-menu-multi">
+<?php	foreach($transMenu as $menuItem) {  ?>
+<?php       if ($menuItem->type == 0) {		?>
+<?php           if ($menuItem->selected) {		?>
+                                <span class="trtype-menu__item trtype-menu_item_title" data-type="<?=e($menuItem->type)?>">
+<?php		    } else {		?>
+                                <span class="trtype-menu__item trtype-menu_item_title trtype-menu__item_selected" data-type="<?=e($menuItem->type)?>">
+<?php	    	}				?>
+                                    <a href="<?=e($menuItem->url)?>"><?=e($menuItem->title)?></a>
+                                </span>
 <?php		} else {		?>
-                                    <span class="trtype-menu__item" data-type="<?=e($menuItem->type)?>">
-                                        <span class="trtype-menu_item_title">
-                                            <a href="<?=e($menuItem->url)?>"><?=e($menuItem->title)?></a>
-                                        </span>
+                                <label class="checkbox trtype-menu__item" data-type="<?=e($menuItem->type)?>">
+                                    <input type="checkbox"<?=checked($menuItem->selected)?>>
+                                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
+                                    <span class="checkbox__label">
+                                        <a href="<?=e($menuItem->url)?>"><?=e($menuItem->title)?></a>
                                     </span>
-<?php		}
-        }	?>
+                                </label>
+<?php		}				?>
+<?php	}			?>
                                 </div>
                             </div>
 
@@ -50,28 +56,12 @@ include(TPL_PATH."commonhdr.tpl");	?>
 
                             <div id="acc_block" class="filter-item std_margin"<?=hidden($byCurrency)?>>
                                 <h3 class="filter-item__title">Account</h3>
-                                <select id="acc_id">
-<?php	foreach($accArr as $accInfo) {
-            if ($accInfo->id == $acc_id) {	?>
-                                    <option value="<?=e($accInfo->id)?>" selected><?=e($accInfo->name)?></option>
-<?php		} else {	?>
-                                    <option value="<?=e($accInfo->id)?>"><?=e($accInfo->name)?></option>
-<?php		}
-        }		?>
-                                </select>
+                                <select id="acc_id"></select>
                             </div>
 
                             <div id="curr_block" class="filter-item std_margin"<?=hidden(!$byCurrency)?>>
                                 <h3 class="filter-item__title">Currency</h3>
-                                <select id="curr_id">
-<?php	foreach($currArr as $currInfo) {
-            if ($currInfo->id == $curr_id) {	?>
-                                    <option value="<?=e($currInfo->id)?>" selected><?=e($currInfo->name)?></option>
-<?php		} else {	?>
-                                    <option value="<?=e($currInfo->id)?>"><?=e($currInfo->name)?></option>
-<?php		}
-        }		?>
-                                </select>
+                                <select id="curr_id"></select>
                             </div>
 
                             <div class="filter-item std_margin">
