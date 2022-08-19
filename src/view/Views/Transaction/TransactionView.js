@@ -513,9 +513,9 @@ class TransactionView extends View {
             onitemselect: (item) => this.onSrcCurrencySel(item),
             editable: false,
         });
-        window.app.model.currency.forEach(
-            (curr) => this.srcCurrDDList.addItem({ id: curr.id, title: curr.name }),
-        );
+
+        this.initCurrencyList(this.srcCurrDDList);
+
         if (state.transaction.src_curr) {
             this.srcCurrDDList.selectItem(state.transaction.src_curr);
         }
@@ -534,9 +534,9 @@ class TransactionView extends View {
             onitemselect: (item) => this.onDestCurrencySel(item),
             editable: false,
         });
-        window.app.model.currency.forEach(
-            (curr) => this.destCurrDDList.addItem({ id: curr.id, title: curr.name }),
-        );
+
+        this.initCurrencyList(this.destCurrDDList);
+
         if (state.transaction.dest_curr) {
             this.destCurrDDList.selectItem(state.transaction.dest_curr);
         }

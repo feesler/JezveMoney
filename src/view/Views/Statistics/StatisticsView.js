@@ -80,6 +80,12 @@ class StatisticsView extends View {
                 editable: false,
                 className: 'dd__fullwidth',
             });
+
+            this.initCurrencyList(this.currencyDropDown);
+
+            if (this.state.filter.curr_id) {
+                this.currencyDropDown.selectItem(this.state.filter.curr_id);
+            }
         } else {
             this.accountDropDown = DropDown.create({
                 elem: 'acc_id',
@@ -87,6 +93,12 @@ class StatisticsView extends View {
                 editable: false,
                 className: 'dd__fullwidth',
             });
+
+            this.initAccountsList(this.accountDropDown);
+
+            if (this.state.filter.acc_id) {
+                this.accountDropDown.selectItem(this.state.filter.acc_id);
+            }
         }
 
         this.groupDropDown = DropDown.create({

@@ -42,7 +42,6 @@ class Statistics extends TemplateController
             $transTypes[] = $intType;
         }
         $filterObj->type = $transTypes;
-
         $params["type"] = $transTypes;
 
         if ($byCurrency) {
@@ -78,8 +77,6 @@ class Statistics extends TemplateController
 
             $curr_id = null;
         }
-        $data["acc_id"] = $acc_id;
-        $data["curr_id"] = $curr_id;
 
         $data["byCurrArr"] = [
             ["title" => "Accounts", "selected" => ($byCurrency == false)],
@@ -161,14 +158,11 @@ class Statistics extends TemplateController
         }
         $data["transMenu"] = $transMenu;
 
-        $data["accArr"] = $accMod->getData();
-        $data["currArr"] = $currMod->getData();
-        $accObj = $accMod->getItem($acc_id);
-
         if ($byCurrency) {
             $accCurr = $curr_id;
         } else {
-            $accCurr = ($accObj) ? $accObj->curr_id : 0;
+            $account = $accMod->getItem($acc_id);
+            $accCurr = ($account) ? $account->curr_id : 0;
         }
 
         $statArr = $transMod->getHistogramSeries($params);
@@ -177,7 +171,9 @@ class Statistics extends TemplateController
         $data["titleString"] = "Jezve Money | Statistics";
 
         $data["appProps"] = [
-            "currency" => $data["currArr"],
+            "profile" => $this->getProfileData(),
+            "currency" => $currMod->getData(),
+            "accounts" => $accMod->getData(["type" => "all"]),
             "view" => [
                 "accountCurrency" => $accCurr,
                 "filter" => $filterObj,

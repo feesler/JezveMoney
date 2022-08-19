@@ -74,8 +74,6 @@ class Accounts extends TemplateController
             "titleString" => "Jezve Money | Create account"
         ];
 
-        $accountsData = $this->model->getData(["type" => "all"]);
-
         $currMod = CurrencyModel::getInstance();
 
         $accInfo = new \stdClass();
@@ -103,14 +101,12 @@ class Accounts extends TemplateController
             "icon" => $accInfo->icon
         ];
 
-        $data["currArr"] = $currMod->getData();
-
         $iconModel = IconModel::getInstance();
         $data["icons"] = $iconModel->getData();
 
         $data["appProps"] = [
-            "accounts" => $accountsData,
-            "currency" => $data["currArr"],
+            "accounts" => $this->model->getData(["type" => "all"]),
+            "currency" => $currMod->getData(),
             "icons" => $data["icons"],
             "view" => [
                 "account" => $accInfo,
@@ -147,8 +143,6 @@ class Accounts extends TemplateController
             "titleString" => "Jezve Money | Edit account"
         ];
 
-        $accountsData = $this->model->getData(["type" => "all"]);
-
         $currMod = CurrencyModel::getInstance();
 
         $acc_id = intval($this->actionParam);
@@ -175,14 +169,12 @@ class Accounts extends TemplateController
             "icon" => $accInfo->icon
         ];
 
-        $data["currArr"] = $currMod->getData();
-
         $iconModel = IconModel::getInstance();
         $data["icons"] = $iconModel->getData();
 
         $data["appProps"] = [
-            "accounts" => $accountsData,
-            "currency" => $data["currArr"],
+            "accounts" => $this->model->getData(["type" => "all"]),
+            "currency" => $currMod->getData(),
             "icons" => $data["icons"],
             "view" => [
                 "account" => $accInfo,

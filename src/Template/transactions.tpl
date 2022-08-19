@@ -65,50 +65,12 @@ include(TPL_PATH."commonhdr.tpl");
 
                         <div id="accountsFilter" class="filter-item">
                             <h3 class="filter-item__title">Accounts</h3>
-                            <select id="acc_id" name="acc_id" multiple>
-<?php	foreach($accArr as $accData) {
-            if (in_array($accData->id, $accFilter)) {		?>
-                                <option value="<?=e($accData->id)?>" selected><?=e($accData->name)?></option>
-<?php		} else {		?>
-                                <option value="<?=e($accData->id)?>"><?=e($accData->name)?></option>
-<?php		}
-        }
-        if (count($hiddenAccArr) > 0) {     ?>
-                                <optgroup label="Hidden">
-<?php       foreach($hiddenAccArr as $accData) {
-                if (in_array($accData->id, $accFilter)) {		?>
-                                    <option value="<?=e($accData->id)?>" selected><?=e($accData->name)?></option>
-<?php	    	} else {		?>
-                                    <option value="<?=e($accData->id)?>"><?=e($accData->name)?></option>
-<?php		    }
-            }	?>
-                                </optgroup>
-<?php   }	?>
-                            </select>
+                            <select id="acc_id" name="acc_id" multiple></select>
                         </div>
 
                         <div id="personsFilter" class="filter-item">
                             <h3 class="filter-item__title">Persons</h3>
-                            <select id="person_id" name="person_id" multiple>
-<?php	foreach($personArr as $person) {
-            if (in_array($person->id, $personFilter)) {		?>
-                                <option value="<?=e($person->id)?>" selected><?=e($person->name)?></option>
-<?php		} else {		?>
-                                <option value="<?=e($person->id)?>"><?=e($person->name)?></option>
-<?php		}
-        }
-        if (count($hiddenPersonArr) > 0) {     ?>
-                                <optgroup label="Hidden">
-<?php       foreach($hiddenPersonArr as $person) {
-                if (in_array($person->id, $personFilter)) {		?>
-                                    <option value="<?=e($person->id)?>" selected><?=e($person->name)?></option>
-<?php	    	} else {		?>
-                                    <option value="<?=e($person->id)?>"><?=e($person->name)?></option>
-<?php		    }
-            }	?>
-                                </optgroup>
-<?php   }	?>
-                            </select>
+                            <select id="person_id" name="person_id" multiple></select>
                         </div>
 
                         <div class="filter-item">

@@ -56,28 +56,12 @@ include(TPL_PATH."commonhdr.tpl");	?>
 
                             <div id="acc_block" class="filter-item std_margin"<?=hidden($byCurrency)?>>
                                 <h3 class="filter-item__title">Account</h3>
-                                <select id="acc_id">
-<?php	foreach($accArr as $accInfo) {
-            if ($accInfo->id == $acc_id) {	?>
-                                    <option value="<?=e($accInfo->id)?>" selected><?=e($accInfo->name)?></option>
-<?php		} else {	?>
-                                    <option value="<?=e($accInfo->id)?>"><?=e($accInfo->name)?></option>
-<?php		}
-        }		?>
-                                </select>
+                                <select id="acc_id"></select>
                             </div>
 
                             <div id="curr_block" class="filter-item std_margin"<?=hidden(!$byCurrency)?>>
                                 <h3 class="filter-item__title">Currency</h3>
-                                <select id="curr_id">
-<?php	foreach($currArr as $currInfo) {
-            if ($currInfo->id == $curr_id) {	?>
-                                    <option value="<?=e($currInfo->id)?>" selected><?=e($currInfo->name)?></option>
-<?php		} else {	?>
-                                    <option value="<?=e($currInfo->id)?>"><?=e($currInfo->name)?></option>
-<?php		}
-        }		?>
-                                </select>
+                                <select id="curr_id"></select>
                             </div>
 
                             <div class="filter-item std_margin">

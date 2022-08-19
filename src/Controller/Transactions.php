@@ -97,12 +97,6 @@ class Transactions extends TemplateController
         }
         $data["showDetails"] = $showDetails;
 
-        $data["accArr"] = $this->accModel->getData();
-        $data["hiddenAccArr"] = $this->accModel->getData(["type" => "hidden"]);
-
-        $data["personArr"] = $this->personMod->getData();
-        $data["hiddenPersonArr"] = $this->personMod->getData(["type" => "hidden"]);
-
         $transArr = $this->model->getData($trParams);
 
         $transCount = $this->model->getTransCount($trParams);
