@@ -592,19 +592,37 @@ label {
 }
 
 /* Histogram bar item */
+.charts {
+  --charts-color-1: #20a0ff;
+  --charts-color-2: #ff0077;
+  --charts-color-3: #00d647;
+  --charts-color-4: #e2de00;
+
+  /* Active chart item */
+  --charts-active-color-1: #00bfff;
+  --charts-active-color-2: #ff3392;
+  --charts-active-color-3: #00ff55;
+  --charts-active-color-4: #fcf93d;
+}
+
 .histogram__bar {
-  --historgam-bar-color: #20a0ff;
-  --historgam-active-bar-color: #00bfff;
+  --historgam-bar-color: var(--charts-color-1);
+  --historgam-active-bar-color: var(--charts-active-color-1);
 }
 
 .histogram--cat-1 {
-  --historgam-bar-color: #ff0077;
-  --historgam-active-bar-color: #ff3392;
+  --historgam-bar-color: var(--charts-color-2);
+  --historgam-active-bar-color: var(--charts-active-color-2);
 }
 
 .histogram--cat-2 {
-  --historgam-bar-color: #00d647;
-  --historgam-active-bar-color: #00ff55;
+  --historgam-bar-color: var(--charts-color-3);
+  --historgam-active-bar-color: var(--charts-active-color-3);
+}
+
+.histogram--cat-3 {
+  --historgam-bar-color: var(--charts-color-4);
+  --historgam-active-bar-color: var(--charts-active-color-4);
 }
 
 /* Desktop */

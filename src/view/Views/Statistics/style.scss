@@ -6,8 +6,37 @@
 /* Bar chart information popup */
 .chart__popup {
   position: absolute;
-  border: 1px solid #000000;
-  background-color: #ffffff;
-  padding: 5px;
+  border: 0 none;
+  border-radius: 5px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+  padding: 8px;
   white-space: nowrap;
+}
+
+.chart-popup-list {
+  display: flex;
+  flex-flow: column nowrap;
+  list-style-position: inside;
+  list-style-type: disc;
+}
+
+.chart-popup-list__value {
+  position: relative;
+  left: -5px;
+}
+
+.chart-popup-list__item:nth-child(1) {
+  color: var(--charts-color-1);
+}
+
+.chart-popup-list__item:nth-child(2) {
+  color: var(--charts-color-2);
+}
+
+.chart-popup-list__item:nth-child(3) {
+  color: var(--charts-color-3);
+}
+
+.chart-popup-list__item:nth-child(4) {
+  color: var(--charts-color-4);
 }

@@ -404,8 +404,11 @@
   }
 
   .chart__popup {
-    border-color: #000000;
-    background-color: var(--main-bg-color);
+    background-color: #ffffffe6;
+    color: var(--main-text-color);
+  }
+
+  .chart-popup-list__value {
     color: var(--main-text-color);
   }
 

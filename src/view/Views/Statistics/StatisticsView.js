@@ -1,6 +1,7 @@
 import 'jezvejs/style';
 import {
     ge,
+    ce,
     setEvents,
     isDate,
     show,
@@ -18,6 +19,11 @@ import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/Transa
 import '../../css/app.scss';
 import '../../Components/TransactionTypeMenu/style.scss';
 import './style.scss';
+
+/** CSS classes */
+const POPUP_LIST_CLASS = 'chart-popup-list';
+const POPUP_LIST_ITEM_CLASS = 'chart-popup-list__item';
+const POPUP_LIST_VALUE_CLASS = 'chart-popup-list__value';
 
 /**
  * Statistics view
@@ -58,7 +64,7 @@ class StatisticsView extends View {
             scrollThrottle: 100,
             showPopup: true,
             activateOnHover: true,
-            renderPopup: (item) => this.renderPopupContent(item),
+            renderPopup: (target) => this.renderPopupContent(target),
         });
 
         this.typeMenu = TransactionTypeMenu.fromElement(document.querySelector('.trtype-menu'), {
@@ -284,16 +290,30 @@ class StatisticsView extends View {
         window.location = this.buildAddress();
     }
 
-    /** Returns content of chart popup for specified item */
-    renderPopupContent(item) {
-        if (!item) {
-            return null;
-        }
-
+    formatItemValue(item) {
         return window.app.model.currency.formatCurrency(
             item.value,
             this.state.accountCurrency,
         );
+    }
+
+    /** Returns content of chart popup for specified target */
+    renderPopupContent(target) {
+        if (!target) {
+            return null;
+        }
+
+        const items = target.group ?? [target.item];
+        const elems = items.map((item) => ce(
+            'li',
+            { className: POPUP_LIST_ITEM_CLASS },
+            ce('span', {
+                className: POPUP_LIST_VALUE_CLASS,
+                textContent: this.formatItemValue(item),
+            }),
+        ));
+
+        return ce('ul', { className: POPUP_LIST_CLASS }, elems);
     }
 }
 
