@@ -31,7 +31,6 @@ class AdminBalanceView extends View {
             elem: 'acc_id',
             placeholder: 'Select account',
             onchange: (o) => this.onAccountChange(o),
-            editable: false,
             className: 'dd__fullwidth',
         });
     }

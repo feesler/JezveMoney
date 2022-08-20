@@ -152,7 +152,6 @@ export class ImportConditionForm extends Component {
         this.propertyDropDown = DropDown.create({
             elem: selectElem,
             onchange: (property) => this.onPropertyChange(property),
-            editable: false,
         });
 
         this.propertyDropDown.append(filedTypeItems);
@@ -170,7 +169,6 @@ export class ImportConditionForm extends Component {
         this.operatorDropDown = DropDown.create({
             elem: selectElem,
             onchange: (operator) => this.onOperatorChange(operator),
-            editable: false,
         });
         this.operatorDropDown.append(operatorItems);
         this.operatorDropDown.selectItem(operatorItems[0].id);
@@ -188,7 +186,6 @@ export class ImportConditionForm extends Component {
         this.accountDropDown = DropDown.create({
             elem: selectElem,
             onchange: () => this.onValueChange(),
-            editable: false,
         });
         this.accountDropDown.append(accountItems);
         this.accountDropDown.selectItem(accountItems[0].id);
@@ -206,7 +203,6 @@ export class ImportConditionForm extends Component {
         this.templateDropDown = DropDown.create({
             elem: selectElem,
             onchange: () => this.onValueChange(),
-            editable: false,
         });
         this.templateDropDown.append(templateItems);
         if (templateItems.length > 0) {
@@ -226,7 +222,6 @@ export class ImportConditionForm extends Component {
         this.currencyDropDown = DropDown.create({
             elem: selectElem,
             onchange: () => this.onValueChange(),
-            editable: false,
         });
         this.currencyDropDown.append(currencyItems);
         this.currencyDropDown.selectItem(currencyItems[0].id);
@@ -244,7 +239,6 @@ export class ImportConditionForm extends Component {
         this.valuePropDropDown = DropDown.create({
             elem: selectElem,
             onchange: () => this.onValueChange(),
-            editable: false,
         });
         this.valuePropDropDown.append(items);
         this.valuePropDropDown.selectItem(items[0].id);

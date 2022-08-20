@@ -3,7 +3,6 @@ import {
     url,
     query,
     prop,
-    parentNode,
     navigation,
     click,
 } from 'jezve-test';
@@ -117,10 +116,8 @@ export class TransactionView extends AppView {
         res.result_balance_row = await InputRow.create(this, await query('#result_balance'));
         res.result_balance_dest_row = await InputRow.create(this, await query('#result_balance_dest'));
 
-        const calendarBtn = await query('#calendar_btn');
-        res.datePicker = await DatePickerRow.create(this, await parentNode(calendarBtn));
-        const commentBtn = await query('#comm_btn');
-        res.comment_row = await CommentRow.create(this, await parentNode(commentBtn));
+        res.datePicker = await DatePickerRow.create(this, await query('#date_row'));
+        res.comment_row = await CommentRow.create(this, await query('#comment_row'));
 
         res.submitBtn = await query('#submitbtn');
         res.cancelBtn = await query('#submitbtn + *');

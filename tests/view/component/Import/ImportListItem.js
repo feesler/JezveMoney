@@ -48,7 +48,6 @@ export class ImportListItem extends TestComponent {
                 'Destination account',
             ],
             personField: 'Person',
-            currencyField: 'Currency',
             dateField: 'Date',
             commentField: 'Comment',
         };
@@ -77,18 +76,29 @@ export class ImportListItem extends TestComponent {
         assert(res.elem, 'Invalid field element');
 
         res.labelElem = await query(elem, ':scope > label');
-        assert(res.labelElem, 'Invalid structure of field element');
+        assert(res.labelElem, 'Invalid structure of field');
         res.title = await prop(res.labelElem, 'textContent');
 
-        const dropDownElem = await query(elem, '.dd__container');
+        const inputGroup = await query(elem, '.input-group');
+        const dropDownSelector = (inputGroup) ? '.dd__container_attached' : '.dd__container';
+        const dropDownElem = await query(elem, dropDownSelector);
         if (dropDownElem) {
             res.dropDown = await DropDown.create(this, dropDownElem);
-            assert(res.dropDown, 'Invalid structure of field element');
-            res.disabled = res.dropDown.content.disabled;
-            res.value = res.dropDown.content.value;
-        } else {
-            res.inputElem = await query(elem, ':scope > div > *');
-            assert(res.inputElem, 'Invalid structure of field element');
+            assert(res.dropDown, 'Invalid structure of field');
+
+            // If field is select only, then save values from DropDown
+            if (!inputGroup) {
+                res.disabled = res.dropDown.disabled;
+                res.value = res.dropDown.value;
+            }
+        }
+        if (inputGroup) {
+            assert(res.dropDown, 'Invalid structure of field');
+        }
+
+        if (!dropDownElem || inputGroup) {
+            res.inputElem = await query(elem, 'input[type=text]');
+            assert(res.inputElem, 'Invalid structure of field');
             res.disabled = await prop(res.inputElem, 'disabled');
             res.value = await prop(res.inputElem, 'value');
         }
@@ -156,7 +166,6 @@ export class ImportListItem extends TestComponent {
             && res.destAmountField
             && res.destAccountField
             && res.personField
-            && res.currencyField
             && res.dateField
             && res.commentField
             && res.invFeedback.elem
@@ -215,7 +224,7 @@ export class ImportListItem extends TestComponent {
         res.personId = cont.personField.value;
         res.person = App.state.persons.getItem(res.personId);
 
-        res.currId = cont.currencyField.value;
+        res.currId = cont.destAmountField.dropDown.value;
         res.currency = App.currency.getItem(res.currId);
 
         res.date = cont.dateField.value;
@@ -253,18 +262,20 @@ export class ImportListItem extends TestComponent {
             amountField: {
                 disabled: !model.enabled,
                 visible: true,
+                dropDown: {
+                    disabled: !(model.enabled && isExpenseOrIncome && !model.isDifferent),
+                },
             },
             destAmountField: {
                 disabled: !(model.enabled && model.isDifferent && !isDebt),
                 visible: model.isDifferent && !isDebt,
+                dropDown: {
+                    disabled: !(model.enabled && isExpenseOrIncome && model.isDifferent),
+                },
             },
             destAccountField: {
                 disabled: !(model.enabled && isTransfer),
                 visible: isTransfer,
-            },
-            currencyField: {
-                disabled: !(model.enabled && isExpenseOrIncome),
-                visible: true,
             },
             personField: {
                 visible: isDebt,
@@ -292,11 +303,11 @@ export class ImportListItem extends TestComponent {
         if (!res.destAmountField.disabled) {
             res.destAmountField.value = model.destAmount.toString();
         }
+        if (!res.destAmountField.dropDown.disabled) {
+            res.destAmountField.dropDown.value = model.currId.toString();
+        }
         if (!res.destAccountField.disabled) {
             res.destAccountField.value = model.destId.toString();
-        }
-        if (!res.currencyField.disabled) {
-            res.currencyField.value = model.currId.toString();
         }
         if (!res.personField.disabled) {
             res.personField.value = model.personId.toString();
@@ -558,7 +569,11 @@ export class ImportListItem extends TestComponent {
     }
 
     async changeCurrency(value) {
-        this.checkEnabled(this.content.currencyField);
+        const dropDown = (this.model.isDifferent)
+            ? this.content.destAmountField.dropDown
+            : this.content.amountField.dropDown;
+
+        this.checkEnabled(dropDown);
 
         this.model.currId = value;
         this.model.currency = App.currency.getItem(value);
@@ -566,7 +581,7 @@ export class ImportListItem extends TestComponent {
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.content.currencyField.dropDown.selectItem(value);
+        await dropDown.selectItem(value);
         await this.parse();
 
         return this.checkState();
@@ -617,7 +632,10 @@ export class ImportListItem extends TestComponent {
         const res = {
             enabled: item.enabled,
             typeField: { disabled: !item.enabled },
-            amountField: { disabled: !item.enabled },
+            amountField: {
+                disabled: !item.enabled,
+                dropDown: {},
+            },
             dateField: {
                 value: item.date,
                 disabled: !item.enabled,
@@ -634,17 +652,16 @@ export class ImportListItem extends TestComponent {
 
             res.destAmountField = {
                 disabled: (item.enabled) ? !isDifferent : true,
+                dropDown: {
+                    disabled: (item.enabled) ? !isDifferent : true,
+                },
             };
             if (!res.destAmountField.disabled) {
                 res.destAmountField.value = (isDifferent) ? item.dest_amount.toString() : '';
+                res.destAmountField.dropDown.value = item.dest_curr.toString();
             }
 
             res.destAccountField = { disabled: true };
-
-            res.currencyField = { disabled: !item.enabled };
-            if (!res.currencyField.disabled) {
-                res.currencyField.value = item.dest_curr.toString();
-            }
 
             res.personField = { disabled: true };
         } else if (item.type === 'income') {
@@ -652,17 +669,16 @@ export class ImportListItem extends TestComponent {
             // Use destination account and amount fields as source for income
             res.destAmountField = {
                 disabled: (item.enabled) ? !isDifferent : true,
+                dropDown: {
+                    disabled: (item.enabled) ? !isDifferent : true,
+                },
             };
             if (!res.destAmountField.disabled) {
                 res.destAmountField.value = (isDifferent) ? item.src_amount.toString() : '';
+                res.destAmountField.dropDown.value = item.src_curr.toString();
             }
 
             res.destAccountField = { disabled: true };
-
-            res.currencyField = { disabled: !item.enabled };
-            if (!res.currencyField.disabled) {
-                res.currencyField.value = item.src_curr.toString();
-            }
 
             res.personField = { disabled: true };
         } else if (item.type === 'transferfrom' || item.type === 'transferto') {
@@ -670,7 +686,12 @@ export class ImportListItem extends TestComponent {
 
             res.amountField.value = ((isFrom) ? item.src_amount : item.dest_amount).toString();
 
-            res.destAmountField = { disabled: (item.enabled) ? !isDifferent : true };
+            res.destAmountField = {
+                disabled: (item.enabled) ? !isDifferent : true,
+                dropDown: {
+                    disabled: true,
+                },
+            };
             if (!res.destAmountField.disabled) {
                 res.destAmountField.value = (isDifferent)
                     ? ((isFrom) ? item.dest_amount : item.src_amount).toString()
@@ -682,13 +703,16 @@ export class ImportListItem extends TestComponent {
                 res.destAccountField.value = ((isFrom) ? item.dest_id : item.src_id).toString();
             }
 
-            res.currencyField = { disabled: true };
             res.personField = { disabled: true };
         } else if (item.type === 'debtfrom' || item.type === 'debtto') {
             res.amountField.value = item.src_amount.toString();
-            res.destAmountField = { disabled: true };
+            res.destAmountField = {
+                disabled: true,
+                dropDown: {
+                    disabled: true,
+                },
+            };
             res.destAccountField = { disabled: true };
-            res.currencyField = { disabled: true };
 
             res.personField = { disabled: !item.enabled };
             if (!res.personField.disabled) {

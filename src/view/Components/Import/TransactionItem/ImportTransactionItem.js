@@ -11,6 +11,8 @@ import {
     Component,
     Checkbox,
     DropDown,
+    DecimalInput,
+    InputGroup,
 } from 'jezvejs';
 import {
     fixFloat,
@@ -38,7 +40,6 @@ const PH_FIELD_COMMENT = 'Comment';
 const TITLE_FIELD_SRC_ACCOUNT = 'Source account';
 const TITLE_FIELD_DEST_ACCOUNT = 'Destination account';
 const TITLE_FIELD_PERSON = 'Person';
-const TITLE_FIELD_CURRENCY = 'Currency';
 /** Original data table */
 const TITLE_ORIGINAL_DATA = 'Original imported data';
 const COL_MAIN = 'Main account';
@@ -104,32 +105,12 @@ export class ImportTransactionItem extends Component {
             onChange: () => this.onRowChecked(),
         });
 
-        this.createCurrencyField();
         this.createTypeField();
         this.createAccountField();
         this.createPersonField();
+        this.createAmountField();
+        this.createDestAmountField();
 
-        // Amount controls
-        this.amountInp = ce('input', {
-            className: 'stretch-input',
-            type: 'text',
-            name: 'amount[]',
-            placeholder: PH_FIELD_AMOUNT,
-            autocomplete: 'off',
-        }, null, { input: () => this.onAmountInput() });
-        this.amountField = createField(TITLE_FIELD_AMOUNT, this.amountInp, 'amount-field');
-
-        this.destAmountInp = ce('input', {
-            className: 'stretch-input',
-            type: 'text',
-            name: 'dest_amount[]',
-            disabled: true,
-            placeholder: PH_FIELD_DEST_AMOUNT,
-            autocomplete: 'off',
-        }, null, { input: () => this.onDestAmountInput() });
-        this.destAmountField = createField(TITLE_FIELD_DEST_AMOUNT, this.destAmountInp, 'amount-field');
-        show(this.destAmountField, false);
-        this.destAmountLabel = this.destAmountField.querySelector('label');
         // Date field
         this.dateInp = ce('input', {
             className: 'stretch-input',
@@ -165,7 +146,6 @@ export class ImportTransactionItem extends Component {
         show(this.toggleExtBtn, false);
 
         this.topRow = createContainer('form-row', [
-            this.currField,
             this.dateField,
             this.commentField,
         ]);
@@ -240,7 +220,6 @@ export class ImportTransactionItem extends Component {
         this.typeDropDown = DropDown.create({
             elem: selectElem,
             onchange: (type) => this.onTrTypeChanged(type),
-            editable: false,
         });
         typeItems.forEach((typeItem) => {
             this.typeDropDown.addItem(typeItem);
@@ -263,7 +242,6 @@ export class ImportTransactionItem extends Component {
             elem: selectElem,
             disabled: true,
             onchange: (account) => this.onDestChanged(account),
-            editable: false,
         });
 
         this.destAccDropDown.addItem({ id: 0, title: '', hidden: true });
@@ -283,28 +261,88 @@ export class ImportTransactionItem extends Component {
             elem: selectElem,
             disabled: true,
             onchange: (person) => this.onPersonChanged(person),
-            editable: false,
         });
 
         this.personDropDown.addItem({ id: 0, title: '', hidden: true });
         this.personDropDown.append(personItems);
     }
 
-    /** Create currency field */
-    createCurrencyField() {
-        const currencyItems = window.app.model.currency
-            .map((currency) => ({ id: currency.id, title: currency.name }));
-
-        const selectElem = ce('select');
-        this.currField = createField(TITLE_FIELD_CURRENCY, selectElem);
-
-        this.currencyDropDown = DropDown.create({
-            elem: selectElem,
-            onchange: (currency) => this.onCurrChanged(currency),
-            editable: false,
+    /** Create amount field */
+    createAmountField() {
+        this.amountInp = ce('input', {
+            className: 'input-group__input stretch-input amount-input',
+            type: 'text',
+            name: 'amount[]',
+            placeholder: PH_FIELD_AMOUNT,
+            autocomplete: 'off',
+        });
+        this.amountDecimalInput = DecimalInput.create({
+            elem: this.amountInp,
+            digits: 2,
+            oninput: () => this.onAmountInput(),
         });
 
-        this.currencyDropDown.append(currencyItems);
+        this.currencySign = ce('div', { className: 'input-group__btn-title' });
+        this.currencyBtn = ce('button', {
+            type: 'button',
+            className: 'input-group__btn',
+            tabIndex: -1,
+        }, this.currencySign);
+
+        this.currencyDropDown = DropDown.create({
+            elem: this.currencySign,
+            listAttach: true,
+            onchange: (currency) => this.onCurrChanged(currency),
+        });
+        window.app.view.initCurrencyList(this.currencyDropDown);
+
+        this.amountGroup = InputGroup.create({
+            children: [this.amountInp, this.currencyBtn],
+        });
+        this.amountField = createField(TITLE_FIELD_AMOUNT, this.amountGroup.elem, 'amount-field');
+    }
+
+    /** Create destination amount field */
+    createDestAmountField() {
+        this.destAmountInp = ce('input', {
+            className: 'input-group__input stretch-input amount-input',
+            type: 'text',
+            name: 'dest_amount[]',
+            disabled: true,
+            placeholder: PH_FIELD_DEST_AMOUNT,
+            autocomplete: 'off',
+        });
+        this.destAmountDecimalInput = DecimalInput.create({
+            elem: this.destAmountInp,
+            digits: 2,
+            oninput: () => this.onDestAmountInput(),
+        });
+
+        this.destCurrencySign = ce('div', { className: 'input-group__btn-title' });
+        this.destCurrencyBtn = ce('button', {
+            type: 'button',
+            className: 'input-group__btn',
+            tabIndex: -1,
+        }, this.destCurrencySign);
+
+        this.destCurrencyDropDown = DropDown.create({
+            elem: this.destCurrencySign,
+            listAttach: true,
+            onchange: (currency) => this.onCurrChanged(currency),
+        });
+        window.app.view.initCurrencyList(this.destCurrencyDropDown);
+
+        this.destAmountGroup = InputGroup.create({
+            children: [this.destAmountInp, this.destCurrencyBtn],
+        });
+
+        this.destAmountField = createField(
+            TITLE_FIELD_DEST_AMOUNT,
+            this.destAmountGroup.elem,
+            'amount-field',
+        );
+        show(this.destAmountField, false);
+        this.destAmountLabel = this.destAmountField.querySelector('label');
     }
 
     /** Create static data value element */
@@ -990,6 +1028,21 @@ export class ImportTransactionItem extends Component {
         return res;
     }
 
+    renderCurrency(elem, ddown, currencyId) {
+        const signElem = elem;
+        if (!signElem) {
+            return;
+        }
+
+        const curr = window.app.model.currency.getItem(currencyId);
+        if (!curr) {
+            return;
+        }
+
+        signElem.textContent = curr.sign;
+        ddown?.selectItem(currencyId);
+    }
+
     /** Render component */
     render() {
         const { state } = this;
@@ -1009,20 +1062,23 @@ export class ImportTransactionItem extends Component {
         }
 
         this.enableCheck.check(state.enabled);
-        this.typeDropDown.enable(state.enabled);
-        enable(this.amountInp, state.enabled);
-        this.currencyDropDown.enable(state.enabled && isExpenseOrIncome);
-        this.personDropDown.enable(state.enabled && isDebt);
-        enable(this.destAmountInp, state.enabled && state.isDiff);
-        enable(this.dateInp, state.enabled);
-        enable(this.commInp, state.enabled);
 
+        // Type field
+        this.typeDropDown.enable(state.enabled);
         this.typeDropDown.selectItem(state.type);
 
         // Amount field
+        enable(this.amountInp, state.enabled);
+        this.currencyDropDown.enable(state.enabled && isExpenseOrIncome && !state.isDiff);
+        enable(this.currencyBtn, state.enabled && isExpenseOrIncome && !state.isDiff);
         this.amountInp.value = state.amount;
-        // Currency field
-        this.currencyDropDown.selectItem(state.currId);
+        this.renderCurrency(this.currencySign, this.currencyDropDown, state.accountCurrId);
+
+        // Destination amount field
+        enable(this.destAmountInp, state.enabled && state.isDiff);
+        this.destCurrencyDropDown.enable(state.enabled && isExpenseOrIncome && state.isDiff);
+        enable(this.destCurrencyBtn, state.enabled && isExpenseOrIncome && state.isDiff);
+        this.renderCurrency(this.destCurrencySign, this.destCurrencyDropDown, state.currId);
 
         // Second account field
         this.destAccDropDown.enable(state.enabled && isTransfer);
@@ -1050,10 +1106,16 @@ export class ImportTransactionItem extends Component {
         }
 
         // Person field
+        this.personDropDown.enable(state.enabled && isDebt);
         this.personDropDown.selectItem(state.personId);
         show(this.personField, state.personVisible);
 
+        // Date filed
+        enable(this.dateInp, state.enabled);
         this.dateInp.value = state.date;
+
+        // Commend field
+        enable(this.commInp, state.enabled);
         this.commInp.value = state.comment;
     }
 }

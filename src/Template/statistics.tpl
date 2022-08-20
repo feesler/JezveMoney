@@ -78,6 +78,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
 
                             <div class="filter-item std_margin">
+                                <h3 class="filter-item__title">Date range</h3>
                                 <?=IconLink::render([
                                     "id" => "calendar_btn",
                                     "icon" => "cal",

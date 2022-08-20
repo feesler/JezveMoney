@@ -1,8 +1,9 @@
 /* Rule action item */
 .action-item {
   display: flex;
-  flex-flow: row nowrap;
+  flex-flow: row wrap;
   align-items: center;
+  overflow: hidden;
   padding: 8px;
 }
 
@@ -16,8 +17,10 @@
 }
 
 .action-item__value {
-  font-size: 14px;
   flex-grow: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-size: 14px;
   font-weight: 400;
 }
 

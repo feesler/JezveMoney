@@ -67,7 +67,6 @@ class ImportView extends View {
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
             onchange: () => this.onMainAccChange(),
-            editable: false,
             className: 'dd__fullwidth',
         });
 

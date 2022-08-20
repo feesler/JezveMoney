@@ -99,24 +99,6 @@
     box-sizing: border-box;
   }
 
-  .dd__combo,
-  .dd__container.dd__container_disabled .dd__combo {
-    border-width: 1px;
-  }
-
-  .dd__list {
-    border-left-width: 1px;
-    border-right-width: 1px;
-  }
-
-  .dd__list_drop-down {
-    border-top-width: 1px;
-  }
-
-  .dd__list_drop-up {
-    border-top-width: 1px;
-  }
-
   input[type="text"] {
     display: flex;
     border-width: 1px;
@@ -129,6 +111,10 @@
     width: 30px;
     border: 0 none;
     pointer-events: all;
+  }
+
+  .input-group {
+    --ig-height: 34px;
   }
 
   /* Enable/disable item checkbox container */

@@ -81,7 +81,6 @@ class TransactionListView extends View {
                 placeholder: 'Select account',
                 onitemselect: (obj) => this.onAccountChange(obj),
                 onchange: (obj) => this.onAccountChange(obj),
-                editable: false,
                 className: 'dd__fullwidth',
             });
             if (!this.accountDropDown) {
@@ -99,7 +98,6 @@ class TransactionListView extends View {
                 placeholder: 'Select person',
                 onitemselect: (obj) => this.onPersonChange(obj),
                 onchange: (obj) => this.onPersonChange(obj),
-                editable: false,
                 className: 'dd__fullwidth',
             });
             if (!this.personDropDown) {
@@ -446,13 +444,13 @@ class TransactionListView extends View {
     showCalendar() {
         if (!this.datePicker) {
             this.datePicker = DatePicker.create({
-                wrapper: this.datePickerWrapper,
                 relparent: this.datePickerWrapper.parentNode,
                 locales: 'en',
                 range: true,
                 onrangeselect: (range) => this.onRangeSelect(range),
                 onhide: () => this.onDatePickerHide(),
             });
+            this.datePickerWrapper.append(this.datePicker.elem);
         }
         if (!this.datePicker) {
             return;
