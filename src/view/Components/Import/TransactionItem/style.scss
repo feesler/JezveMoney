@@ -131,6 +131,10 @@
     pointer-events: all;
   }
 
+  .input-group {
+    --ig-height: 34px;
+  }
+
   /* Enable/disable item checkbox container */
   .enable-check {
     display: flex;

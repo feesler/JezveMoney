@@ -577,9 +577,15 @@ export class ImportView extends AppView {
         const expectedItem = {
             enabled: true,
             typeField: { value: 'expense', disabled: false },
-            amountField: { value: '', disabled: false },
+            amountField: {
+                value: '',
+                disabled: false,
+                dropDown: {
+                    value: mainAccount.curr_id.toString(),
+                    disabled: false,
+                },
+            },
             destAmountField: { value: '', disabled: true },
-            currencyField: { value: mainAccount.curr_id.toString(), disabled: false },
             destAccountField: { disabled: true },
             dateField: { value: App.dates.now, disabled: false },
             commentField: { value: '', disabled: false },
