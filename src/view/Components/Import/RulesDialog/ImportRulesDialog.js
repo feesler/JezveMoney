@@ -290,7 +290,7 @@ export class ImportRulesDialog extends Component {
     /** Render component state */
     render(state) {
         if (state.listLoading) {
-            show(this.loadingIndicator, true);
+            this.loadingIndicator.show();
         }
 
         if (state.id === this.LIST_STATE) {
@@ -306,7 +306,7 @@ export class ImportRulesDialog extends Component {
         }
 
         if (!state.listLoading) {
-            show(this.loadingIndicator, false);
+            this.loadingIndicator.hide();
         }
     }
 }
