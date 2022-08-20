@@ -194,13 +194,13 @@ class StatisticsView extends View {
     showCalendar() {
         if (!this.datePicker) {
             this.datePicker = DatePicker.create({
-                wrapper: this.datePickerWrapper,
                 relparent: this.datePickerWrapper.parentNode,
                 locales: 'en',
                 range: true,
                 onrangeselect: (range) => this.onRangeSelect(range),
                 onhide: () => this.onDatePickerHide(),
             });
+            this.datePickerWrapper.append(this.datePicker.elem);
         }
         if (!this.datePicker) {
             return;

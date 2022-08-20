@@ -553,26 +553,26 @@ class TransactionView extends View {
 
         this.dateInput.value = formatDate(date);
 
-        this.calendarObj.hide();
+        this.datePicker.hide();
     }
 
     /**
      * Show calendar block
      */
     showCalendar() {
-        if (!this.calendarObj) {
-            this.calendarObj = DatePicker.create({
-                wrapper: this.datePickerWrapper,
+        if (!this.datePicker) {
+            this.datePicker = DatePicker.create({
                 relparent: this.datePickerWrapper.parentNode,
                 locales: 'en',
                 ondateselect: (d) => this.onSelectDate(d),
             });
+            this.datePickerWrapper.append(this.datePicker.elem);
         }
-        if (!this.calendarObj) {
+        if (!this.datePicker) {
             return;
         }
 
-        this.calendarObj.show(!this.calendarObj.visible());
+        this.datePicker.show(!this.datePicker.visible());
 
         this.datePickerBtn.hide();
         show(this.dateBlock, true);
