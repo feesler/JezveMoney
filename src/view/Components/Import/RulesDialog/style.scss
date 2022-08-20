@@ -1,8 +1,25 @@
 /* Import rules dialog */
-.rules-popup .popup__content-box {
-  max-width: 600px;
-  width: 100%;
-  max-height: 100vh;
+.rules-popup {
+  overflow-y: hidden;
+
+  .popup__wrapper {
+    height: 100%;
+  }
+
+  .popup__content,
+  .popup__content-box {
+    max-height: 100%;
+    overflow: hidden;
+  }
+
+  .popup__content-box {
+    max-width: 600px;
+    width: 100%;
+  }
+
+  .popup__message {
+    overflow-y: auto;
+  }
 }
 
 .rules-dialog {
