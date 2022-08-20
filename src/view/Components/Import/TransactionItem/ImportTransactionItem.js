@@ -11,6 +11,7 @@ import {
     Component,
     Checkbox,
     DropDown,
+    DecimalInput,
 } from 'jezvejs';
 import {
     fixFloat,
@@ -111,22 +112,32 @@ export class ImportTransactionItem extends Component {
 
         // Amount controls
         this.amountInp = ce('input', {
-            className: 'stretch-input',
+            className: 'stretch-input amount-input',
             type: 'text',
             name: 'amount[]',
             placeholder: PH_FIELD_AMOUNT,
             autocomplete: 'off',
-        }, null, { input: () => this.onAmountInput() });
+        });
+        this.amountDecimalInput = DecimalInput.create({
+            elem: this.amountInp,
+            digits: 2,
+            oninput: () => this.onAmountInput(),
+        });
         this.amountField = createField(TITLE_FIELD_AMOUNT, this.amountInp, 'amount-field');
 
         this.destAmountInp = ce('input', {
-            className: 'stretch-input',
+            className: 'stretch-input amount-input',
             type: 'text',
             name: 'dest_amount[]',
             disabled: true,
             placeholder: PH_FIELD_DEST_AMOUNT,
             autocomplete: 'off',
-        }, null, { input: () => this.onDestAmountInput() });
+        });
+        this.destAmountDecimalInput = DecimalInput.create({
+            elem: this.destAmountInp,
+            digits: 2,
+            oninput: () => this.onDestAmountInput(),
+        });
         this.destAmountField = createField(TITLE_FIELD_DEST_AMOUNT, this.destAmountInp, 'amount-field');
         show(this.destAmountField, false);
         this.destAmountLabel = this.destAmountField.querySelector('label');
