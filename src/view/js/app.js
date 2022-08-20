@@ -103,25 +103,6 @@ export function createIcon(icon, className = null) {
     return res;
 }
 
-/**
- * Create checkbox container from given input element
- * @param {Element} input - checkbox input element
- * @param {string} elemClass - class for checkbox container element
- * @param {string} title - optional title
- */
-export function createCheck(input, elemClass, title) {
-    if (!input) {
-        throw new Error('Invalid input element');
-    }
-
-    const childs = [input];
-    if (typeof title === 'string') {
-        childs.push(ce('span', { textContent: title }));
-    }
-
-    return ce('label', { className: elemClass }, childs);
-}
-
 /** Create field element from given input element */
 export function createField(title, input, extraClass) {
     const elemClasses = ['field'];
