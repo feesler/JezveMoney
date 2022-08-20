@@ -81,7 +81,6 @@ class TransactionListView extends View {
                 placeholder: 'Select account',
                 onitemselect: (obj) => this.onAccountChange(obj),
                 onchange: (obj) => this.onAccountChange(obj),
-                editable: false,
                 className: 'dd__fullwidth',
             });
             if (!this.accountDropDown) {
@@ -99,7 +98,6 @@ class TransactionListView extends View {
                 placeholder: 'Select person',
                 onitemselect: (obj) => this.onPersonChange(obj),
                 onchange: (obj) => this.onPersonChange(obj),
-                editable: false,
                 className: 'dd__fullwidth',
             });
             if (!this.personDropDown) {

@@ -72,7 +72,6 @@ export class ImportUploadDialog extends Component {
         this.accountDropDown = DropDown.create({
             elem: 'initialAccount',
             onchange: (account) => this.onAccountChange(account),
-            editable: false,
         });
 
         this.initialAccField = ge('initialAccField');

@@ -71,11 +71,9 @@ export class ImportTemplateManager extends Component {
         this.templateDropDown = DropDown.create({
             elem: 'templateSel',
             onchange: (tpl) => this.onTemplateChange(tpl),
-            editable: false,
         });
         this.columnDropDown = DropDown.create({
             elem: 'columnSel',
-            editable: false,
         });
 
         this.tplHeading = ge('tplHeading');

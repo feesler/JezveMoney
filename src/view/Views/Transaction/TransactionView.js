@@ -430,7 +430,6 @@ class TransactionView extends View {
             elem: 'source_tile',
             listAttach: true,
             onitemselect: (item) => this.onSrcAccountSelect(item),
-            editable: false,
         });
 
         this.initAccountsList(this.srcDDList);
@@ -452,7 +451,6 @@ class TransactionView extends View {
             elem: 'dest_tile',
             listAttach: true,
             onitemselect: (item) => this.onDestAccountSelect(item),
-            editable: false,
         });
 
         this.initAccountsList(this.destDDList);
@@ -472,7 +470,6 @@ class TransactionView extends View {
             elem: 'person_tile',
             listAttach: true,
             onitemselect: (item) => this.onPersonSelect(item),
-            editable: false,
         });
 
         this.initPersonsList(this.persDDList);
@@ -488,7 +485,6 @@ class TransactionView extends View {
             elem: 'acc_tile',
             listAttach: true,
             onitemselect: (item) => this.onDebtAccountSelect(item),
-            editable: false,
         });
 
         this.initAccountsList(this.accDDList);
@@ -511,7 +507,6 @@ class TransactionView extends View {
             elem: 'srcamountsign',
             listAttach: true,
             onitemselect: (item) => this.onSrcCurrencySel(item),
-            editable: false,
         });
 
         this.initCurrencyList(this.srcCurrDDList);
@@ -532,7 +527,6 @@ class TransactionView extends View {
             elem: 'destamountsign',
             listAttach: true,
             onitemselect: (item) => this.onDestCurrencySel(item),
-            editable: false,
         });
 
         this.initCurrencyList(this.destCurrDDList);

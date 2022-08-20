@@ -143,7 +143,6 @@ export class ImportActionForm extends Component {
         this.actionDropDown = DropDown.create({
             elem: selectElem,
             onchange: (action) => this.onActionTypeChange(action),
-            editable: false,
         });
         this.actionDropDown.append(items);
     }
@@ -158,7 +157,6 @@ export class ImportActionForm extends Component {
         this.trTypeDropDown = DropDown.create({
             elem: selectElem,
             onchange: () => this.onValueChange(),
-            editable: false,
         });
         this.trTypeDropDown.append(items);
         this.trTypeDropDown.selectItem(items[0].id);
@@ -176,7 +174,6 @@ export class ImportActionForm extends Component {
         this.accountDropDown = DropDown.create({
             elem: selectElem,
             onchange: () => this.onValueChange(),
-            editable: false,
         });
         this.accountDropDown.append(items);
         if (items.length > 0) {
@@ -196,7 +193,6 @@ export class ImportActionForm extends Component {
         this.personDropDown = DropDown.create({
             elem: selectElem,
             onchange: () => this.onValueChange(),
-            editable: false,
         });
         this.personDropDown.append(items);
         if (items.length > 0) {

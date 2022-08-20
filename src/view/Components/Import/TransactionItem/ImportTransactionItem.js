@@ -251,7 +251,6 @@ export class ImportTransactionItem extends Component {
         this.typeDropDown = DropDown.create({
             elem: selectElem,
             onchange: (type) => this.onTrTypeChanged(type),
-            editable: false,
         });
         typeItems.forEach((typeItem) => {
             this.typeDropDown.addItem(typeItem);
@@ -274,7 +273,6 @@ export class ImportTransactionItem extends Component {
             elem: selectElem,
             disabled: true,
             onchange: (account) => this.onDestChanged(account),
-            editable: false,
         });
 
         this.destAccDropDown.addItem({ id: 0, title: '', hidden: true });
@@ -294,7 +292,6 @@ export class ImportTransactionItem extends Component {
             elem: selectElem,
             disabled: true,
             onchange: (person) => this.onPersonChanged(person),
-            editable: false,
         });
 
         this.personDropDown.addItem({ id: 0, title: '', hidden: true });
@@ -312,7 +309,6 @@ export class ImportTransactionItem extends Component {
         this.currencyDropDown = DropDown.create({
             elem: selectElem,
             onchange: (currency) => this.onCurrChanged(currency),
-            editable: false,
         });
 
         this.currencyDropDown.append(currencyItems);
