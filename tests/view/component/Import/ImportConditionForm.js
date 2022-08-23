@@ -62,7 +62,7 @@ export class ImportConditionForm extends TestComponent {
         const fields = await asyncMap(fieldElems, (field) => this.parseField(field));
         fields.forEach((field) => { res[field.name] = field.component; });
 
-        res.fieldValueCheck = await Checkbox.create(this, await query(this.elem, '.value-field .checkbox'));
+        res.fieldValueCheck = await Checkbox.create(this, await query(this.elem, '.cond-form__container .checkbox'));
 
         res.deleteBtn = { elem: await query(this.elem, '.delete-btn') };
 

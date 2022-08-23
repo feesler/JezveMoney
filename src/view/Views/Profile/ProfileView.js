@@ -1,5 +1,10 @@
 import 'jezvejs/style';
-import { ge, Popup, Checkbox } from 'jezvejs';
+import {
+    ge,
+    show,
+    Popup,
+    Checkbox,
+} from 'jezvejs';
 import { createMessage } from '../../js/app.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
@@ -135,6 +140,7 @@ class ProfileView extends View {
                 content: this.changeNameContent,
                 className: 'chname_popup',
             });
+            show(this.changeNameContent, true);
 
             this.changeNamePopup.setControls({
                 okBtn: { onclick: (ev) => this.onChangeNameSubmit(ev) },
@@ -225,6 +231,7 @@ class ProfileView extends View {
                 content: this.changePassContent,
                 className: 'chpass_popup',
             });
+            show(this.changePassContent, true);
 
             this.changePassPopup.setControls({
                 okBtn: { onclick: (ev) => this.onChangePassSubmit(ev) },
@@ -312,6 +319,7 @@ class ProfileView extends View {
                 content: this.resetContent,
                 className: 'reset-dialog',
             });
+            show(this.resetContent, true);
 
             this.resetPopup.setControls({
                 okBtn: { onclick: (ev) => this.onResetSubmit(ev) },

@@ -63,6 +63,7 @@ export class ImportUploadDialog extends Component {
             },
             className: 'upload-popup',
         });
+        show(this.elem, true);
 
         this.elem.addEventListener('dragenter', (e) => this.onDragEnter(e), false);
         this.elem.addEventListener('dragleave', (e) => this.onDragLeave(e), false);

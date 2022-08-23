@@ -70,6 +70,7 @@ export class ImportRulesDialog extends Component {
             },
             className: IMPORT_RULES_POPUP_CLASS,
         });
+        show(this.elem, true);
 
         this.createRuleBtn.addEventListener('click', () => this.onCreateRuleClick());
 

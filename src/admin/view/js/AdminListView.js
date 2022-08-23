@@ -68,6 +68,7 @@ export class AdminListView extends AdminView {
             className: 'item-form',
             btn: { closeBtn: true },
         });
+        show(this.itemForm, true);
     }
 
     /**

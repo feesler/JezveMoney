@@ -63,6 +63,12 @@
   max-height: 100%;
   flex: 1 1 auto;
   min-height: 0;
+  overflow: hidden;
+
+  .checkbox__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 /* Fields container */
@@ -74,9 +80,17 @@
   min-height: 0;
 }
 
+.property-field,
+.operator-field {
+  flex-grow: 1;
+  flex-shrink: 0;
+}
+
 .value-field {
   display: flex;
   flex-flow: column nowrap;
+  overflow: hidden;
+  flex-basis: 100%;
 }
 
 .value-field .checkbox {

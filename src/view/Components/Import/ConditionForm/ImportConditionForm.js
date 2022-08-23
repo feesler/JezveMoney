@@ -19,6 +19,17 @@ import {
 } from '../../../js/app.js';
 import './style.scss';
 
+/** CSS classes */
+const FORM_CLASS = 'cond-form';
+const CONTAINER_CLASS = 'cond-form__container';
+const PROP_FILED_CLASS = 'property-field';
+const OPERATOR_FILED_CLASS = 'operator-field';
+const VALUE_FIELD_CLASS = 'value-field';
+const COND_FIELDS_CLASS = 'cond-form__fields';
+const CONTROLS_CLASS = 'cond-form__controls';
+const VALIDATION_CLASS = 'validation-block';
+const INV_FEEDBACK_CLASS = 'invalid-feedback';
+
 /** Strings */
 const TITLE_FIELD_AMOUNT = 'Amount';
 const TITLE_FIELD_VALUE = 'Value';
@@ -102,26 +113,26 @@ export class ImportConditionForm extends Component {
             onChange: () => this.onFieldValueChecked(),
         });
 
-        this.valueFieldBlock = createContainer('value-field', [
+        this.valueFieldBlock = createContainer(VALUE_FIELD_CLASS, [
             this.accountField,
             this.templateField,
             this.currencyField,
             this.amountField,
             this.valueField,
             this.valuePropField,
-            this.fieldValueCheck.elem,
         ]);
 
-        this.fields = createContainer('cond-form__fields', [
+        this.fields = createContainer(COND_FIELDS_CLASS, [
             this.propertyField,
             this.operatorField,
             this.valueFieldBlock,
         ]);
 
         // Invalid feedback message
-        this.validFeedback = ce('div', { className: 'invalid-feedback' });
-        this.container = createContainer('cond-form__container validation-block', [
+        this.validFeedback = ce('div', { className: INV_FEEDBACK_CLASS });
+        this.container = createContainer(`${CONTAINER_CLASS} ${VALIDATION_CLASS}`, [
             this.fields,
+            this.fieldValueCheck.elem,
             this.validFeedback,
         ]);
 
@@ -132,9 +143,9 @@ export class ImportConditionForm extends Component {
             createIcon('del', 'icon delete-icon'),
             { click: () => this.onDelete() },
         );
-        this.controls = createContainer('cond-form__controls', this.delBtn);
+        this.controls = createContainer(CONTROLS_CLASS, this.delBtn);
 
-        this.elem = createContainer('cond-form', [
+        this.elem = createContainer(FORM_CLASS, [
             this.container,
             this.controls,
         ]);
@@ -147,7 +158,7 @@ export class ImportConditionForm extends Component {
             .map((fieldType) => ({ id: fieldType.id, title: fieldType.title }));
 
         const selectElem = ce('select');
-        this.propertyField = createField(TITLE_FIELD_PROPERTY, selectElem);
+        this.propertyField = createField(TITLE_FIELD_PROPERTY, selectElem, PROP_FILED_CLASS);
 
         this.propertyDropDown = DropDown.create({
             elem: selectElem,
@@ -164,7 +175,7 @@ export class ImportConditionForm extends Component {
             .map((operatorType) => ({ id: operatorType.id, title: operatorType.title }));
 
         const selectElem = ce('select');
-        this.operatorField = createField(TITLE_FIELD_OPERATOR, selectElem);
+        this.operatorField = createField(TITLE_FIELD_OPERATOR, selectElem, OPERATOR_FILED_CLASS);
 
         this.operatorDropDown = DropDown.create({
             elem: selectElem,
