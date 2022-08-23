@@ -63,6 +63,7 @@ export class ImportRulesDialog extends Component {
             id: 'rules_popup',
             content: this.elem,
             title: this.headerElem,
+            scrollMessage: true,
             onclose: () => this.onClose(),
             btn: {
                 closeBtn: true,
