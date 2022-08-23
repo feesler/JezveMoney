@@ -7,6 +7,9 @@ import {
 } from 'jezvejs';
 import { API } from '../../../js/API.js';
 
+/** CSS classes */
+const FORM_COLLAPSED_CLASS = 'upload-form__collapsed';
+
 /** Strings */
 const MSG_UPLOAD_FAIL = 'Fail to process file';
 
@@ -21,14 +24,18 @@ export class ImportFileUploader extends Component {
         this.uploadErrorHandler = this.props.onUploadError;
         this.uploadedHandler = this.props.onUploaded;
         this.state = {
-            fileName: null,
+            filename: null,
             collapsed: false,
+            isEncoded: true,
         };
 
         this.formElem = ge('fileimportfrm');
         this.inputElem = ge('fileInp');
         this.filenameElem = this.elem.querySelector('.upload-form__filename');
-        this.isEncodeCheck = Checkbox.fromElement(ge('isEncodeCheck'));
+        this.isEncodeCheck = Checkbox.fromElement(
+            ge('isEncodeCheck'),
+            { onChange: (checked) => this.onCheckEncode(checked) },
+        );
         if (!this.formElem || !this.inputElem || !this.filenameElem || !this.isEncodeCheck) {
             throw new Error('Failed to initialize import file uploader');
         }
@@ -36,6 +43,15 @@ export class ImportFileUploader extends Component {
         this.inputElem.addEventListener('change', () => this.onChangeUploadFile());
 
         this.initUploadExtras();
+    }
+
+    onCheckEncode(checked) {
+        if (this.state.isEncoded === checked) {
+            return;
+        }
+
+        this.state.isEncoded = checked;
+        this.render(this.state);
     }
 
     /**
@@ -52,8 +68,7 @@ export class ImportFileUploader extends Component {
             return;
         }
 
-        this.state.fileName = file.name;
-        this.state.collapsed = true;
+        this.state.filename = file.name;
         this.render(this.state);
 
         this.uploadFile(file);
@@ -63,7 +78,8 @@ export class ImportFileUploader extends Component {
     reset() {
         this.formElem.reset();
         this.state = {
-            fileName: null,
+            ...this.state,
+            filename: null,
             collapsed: false,
         };
         this.render(this.state);
@@ -92,6 +108,8 @@ export class ImportFileUploader extends Component {
 
     /** Import error callback */
     onImportError(message) {
+        this.reset();
+
         if (isFunction(this.uploadErrorHandler)) {
             this.uploadErrorHandler(message);
         }
@@ -103,12 +121,12 @@ export class ImportFileUploader extends Component {
             return;
         }
 
-        const isEncoded = this.isEncodeCheck.checked;
+        const { isEncoded } = this.state;
         const fileType = file.name.substr(file.name.lastIndexOf('.') + 1);
         const data = new FormData();
         data.append('file', file);
 
-        this.sendUploadRequst(data, {
+        this.sendUploadRequest(data, {
             'X-File-Type': fileType,
             'X-File-Tpl': 0,
             'X-File-Encode': isEncoded ? 1 : 0,
@@ -133,13 +151,13 @@ export class ImportFileUploader extends Component {
             return;
         }
 
-        this.formElem.addEventListener('reset', () => this.onResetUploadAdmin());
+        this.serverAddressInput.addEventListener('input', () => this.onInputServerAddress());
         this.uploadBtn.addEventListener('click', () => this.uploadFromServer());
-    }
 
-    /** Upload form 'reset' event handler */
-    onResetUploadAdmin() {
-        setTimeout(() => this.setUseServerAddress(false));
+        this.state = {
+            ...this.state,
+            useServer: false,
+        };
     }
 
     /** Use server checkbox 'change' event handler */
@@ -147,29 +165,27 @@ export class ImportFileUploader extends Component {
         this.setUseServerAddress(useServer);
     }
 
-    setUseServerAddress(value) {
-        this.useServerCheck.check(value);
+    onInputServerAddress() {
+        this.state.filename = this.serverAddressInput.value;
+        this.render(this.state);
+    }
 
-        show(this.serverAddressBlock, value);
-        if (value) {
-            show(this.formElem, false);
-            show(this.serverAddressBlock, true);
-        } else {
-            show(this.formElem, true);
-            show(this.serverAddressBlock, false);
+    setUseServerAddress(value) {
+        if (this.state.useServer === value) {
+            return;
         }
+        this.state.useServer = value;
+        this.render(this.state);
     }
 
     /** Send file upload request using address on server */
     async uploadFromServer() {
-        const useServer = this.useServerCheck.checked;
-        const isEncoded = this.isEncodeCheck.checked;
-
+        const { useServer, isEncoded } = this.state;
         if (!useServer) {
             return;
         }
 
-        const filename = this.serverAddressInput.value;
+        const { filename } = this.state;
         if (!filename.length) {
             return;
         }
@@ -180,10 +196,10 @@ export class ImportFileUploader extends Component {
             encode: isEncoded ? 1 : 0,
         };
 
-        this.sendUploadRequst(reqParams);
+        this.sendUploadRequest(reqParams);
     }
 
-    async sendUploadRequst(data, headers = {}) {
+    async sendUploadRequest(data, headers = {}) {
         if (isFunction(this.uploadStartHandler)) {
             this.uploadStartHandler();
         }
@@ -198,13 +214,27 @@ export class ImportFileUploader extends Component {
 
     /** Render component */
     render(state) {
-        const collapsedClass = 'upload-form__collapsed';
         if (state.collapsed) {
-            this.elem.classList.add(collapsedClass);
+            this.elem.classList.add(FORM_COLLAPSED_CLASS);
         } else {
-            this.elem.classList.remove(collapsedClass);
+            this.elem.classList.remove(FORM_COLLAPSED_CLASS);
         }
 
-        this.filenameElem.textContent = state.fileName ? state.fileName : '';
+        this.filenameElem.textContent = state.filename ? state.filename : '';
+
+        if (this.useServerCheck) {
+            this.useServerCheck.check(state.useServer);
+
+            show(this.serverAddressBlock, state.useServer);
+            if (state.useServer) {
+                show(this.formElem, false);
+                show(this.serverAddressBlock, true);
+                this.serverAddressInput.value = state.filename;
+            } else {
+                show(this.formElem, true);
+                show(this.serverAddressBlock, false);
+                this.serverAddressInput.value = '';
+            }
+        }
     }
 }
