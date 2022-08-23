@@ -187,10 +187,6 @@ export class ImportConditionForm extends Component {
 
     /** Create account field */
     createAccountField() {
-        const accountItems = window.app.model.accounts.map(
-            (account) => ({ id: account.id, title: account.name }),
-        );
-
         const selectElem = ce('select');
         this.accountField = createField(TITLE_FIELD_ACCOUNT, selectElem);
 
@@ -198,8 +194,7 @@ export class ImportConditionForm extends Component {
             elem: selectElem,
             onchange: () => this.onValueChange(),
         });
-        this.accountDropDown.append(accountItems);
-        this.accountDropDown.selectItem(accountItems[0].id);
+        window.app.view.initAccountsList(this.accountDropDown);
     }
 
     /** Create template field */
@@ -223,10 +218,6 @@ export class ImportConditionForm extends Component {
 
     /** Create currency field */
     createCurrencyField() {
-        const currencyItems = window.app.model.currency.map(
-            (currency) => ({ id: currency.id, title: currency.name }),
-        );
-
         const selectElem = ce('select');
         this.currencyField = createField(TITLE_FIELD_CURRENCY, selectElem);
 
@@ -234,8 +225,7 @@ export class ImportConditionForm extends Component {
             elem: selectElem,
             onchange: () => this.onValueChange(),
         });
-        this.currencyDropDown.append(currencyItems);
-        this.currencyDropDown.selectItem(currencyItems[0].id);
+        window.app.view.initCurrencyList(this.currencyDropDown);
     }
 
     /** Create value property field */

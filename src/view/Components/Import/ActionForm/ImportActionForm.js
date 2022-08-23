@@ -164,10 +164,6 @@ export class ImportActionForm extends Component {
 
     /** Create account field */
     createAccountField() {
-        const items = window.app.model.accounts.map(
-            (account) => ({ id: account.id, title: account.name }),
-        );
-
         const selectElem = ce('select');
         this.accountField = createField(TITLE_FIELD_ACCOUNT, selectElem);
 
@@ -175,18 +171,11 @@ export class ImportActionForm extends Component {
             elem: selectElem,
             onchange: () => this.onValueChange(),
         });
-        this.accountDropDown.append(items);
-        if (items.length > 0) {
-            this.accountDropDown.selectItem(items[0].id);
-        }
+        window.app.view.initAccountsList(this.accountDropDown);
     }
 
     /** Create person field */
     createPersonField() {
-        const items = window.app.model.persons.map(
-            (person) => ({ id: person.id, title: person.name }),
-        );
-
         const selectElem = ce('select');
         this.personField = createField(TITLE_FIELD_PERSON, selectElem);
 
@@ -194,10 +183,7 @@ export class ImportActionForm extends Component {
             elem: selectElem,
             onchange: () => this.onValueChange(),
         });
-        this.personDropDown.append(items);
-        if (items.length > 0) {
-            this.personDropDown.selectItem(items[0].id);
-        }
+        window.app.view.initPersonsList(this.personDropDown);
     }
 
     /** Set data for component */

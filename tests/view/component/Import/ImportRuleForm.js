@@ -235,17 +235,17 @@ export class ImportRuleForm extends TestComponent {
         }
 
         if (ImportAction.isAccountValue(type)) {
-            const account = App.state.accounts.getItemByIndex(0);
-            assert(account, 'No accounts available');
+            const [accountId] = App.state.getAccountsByIndexes(0);
+            assert(accountId, 'No accounts available');
 
-            return account.id;
+            return accountId;
         }
 
         if (ImportAction.isPersonValue(type)) {
-            const person = App.state.persons.getItemByIndex(0);
-            assert(person, 'No persons available');
+            const [personId] = App.state.getPersonsByIndexes(0);
+            assert(personId, 'No persons available');
 
-            return person.id;
+            return personId;
         }
 
         return '';

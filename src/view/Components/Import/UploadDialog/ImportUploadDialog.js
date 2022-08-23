@@ -85,7 +85,7 @@ export class ImportUploadDialog extends Component {
             throw new Error('Failed to initialize upload file dialog');
         }
 
-        this.parent.initAccountsList(this.accountDropDown);
+        window.app.view.initAccountsList(this.accountDropDown);
         this.accountDropDown.selectItem(this.state.mainAccount.id.toString());
 
         this.submitUploadedBtn.addEventListener('click', () => this.onSubmit());

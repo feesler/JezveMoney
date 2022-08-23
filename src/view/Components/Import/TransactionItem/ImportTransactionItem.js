@@ -231,9 +231,6 @@ export class ImportTransactionItem extends Component {
 
     /** Create destination(second) account field */
     createAccountField() {
-        const accountItems = window.app.model.accounts
-            .map((account) => ({ id: account.id, title: account.name }));
-
         const selectElem = ce('select');
         this.destAccountField = createField(TITLE_FIELD_DEST_ACCOUNT, selectElem);
         this.destAccountLabel = this.destAccountField.querySelector('label');
@@ -243,17 +240,11 @@ export class ImportTransactionItem extends Component {
             disabled: true,
             onchange: (account) => this.onDestChanged(account),
         });
-
-        this.destAccDropDown.addItem({ id: 0, title: '', hidden: true });
-        this.destAccDropDown.append(accountItems);
-        this.destAccDropDown.enableItem(this.state.accountId, false);
+        window.app.view.initAccountsList(this.destAccDropDown);
     }
 
     /** Create person field */
     createPersonField() {
-        const personItems = window.app.model.persons
-            .map((person) => ({ id: person.id, title: person.name }));
-
         const selectElem = ce('select');
         this.personField = createField(TITLE_FIELD_PERSON, selectElem);
 
@@ -262,9 +253,7 @@ export class ImportTransactionItem extends Component {
             disabled: true,
             onchange: (person) => this.onPersonChanged(person),
         });
-
-        this.personDropDown.addItem({ id: 0, title: '', hidden: true });
-        this.personDropDown.append(personItems);
+        window.app.view.initPersonsList(this.personDropDown);
     }
 
     /** Create amount field */
@@ -1083,7 +1072,9 @@ export class ImportTransactionItem extends Component {
         // Second account field
         this.destAccDropDown.enable(state.enabled && isTransfer);
         this.syncDestAccountSelect(state);
-        this.destAccDropDown.selectItem(state.secondAccountId);
+        if (state.secondAccountId) {
+            this.destAccDropDown.selectItem(state.secondAccountId);
+        }
         show(this.destAccountField, state.secondAccountVisible);
         if (state.secondAccountVisible) {
             const accountLabel = (state.type === 'transferto')
@@ -1107,7 +1098,9 @@ export class ImportTransactionItem extends Component {
 
         // Person field
         this.personDropDown.enable(state.enabled && isDebt);
-        this.personDropDown.selectItem(state.personId);
+        if (state.personId) {
+            this.personDropDown.selectItem(state.personId);
+        }
         show(this.personField, state.personVisible);
 
         // Date filed
