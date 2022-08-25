@@ -13,7 +13,6 @@ import {
     DatePicker,
     Paginator,
 } from 'jezvejs';
-import { createMessage } from '../../js/app.js';
 import { Application } from '../../js/Application.js';
 import { API } from '../../js/API.js';
 import { View } from '../../js/View.js';
@@ -219,7 +218,7 @@ class TransactionListView extends View {
     cancelPosChange() {
         this.render(this.state);
 
-        createMessage(MSG_SET_POS_FAIL, 'msg_error');
+        window.app.createMessage(MSG_SET_POS_FAIL, 'msg_error');
     }
 
     /**

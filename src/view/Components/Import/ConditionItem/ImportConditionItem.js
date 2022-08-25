@@ -7,7 +7,6 @@ import {
     IMPORT_COND_FIELD_MAIN_ACCOUNT,
     IMPORT_COND_FIELD_TPL,
 } from '../../../js/model/ImportCondition.js';
-import { createContainer } from '../../../js/app.js';
 import './style.scss';
 
 /**
@@ -49,7 +48,7 @@ export class ImportConditionItem extends Component {
         this.operatorLabel = ce('span', { className: 'cond-item__operator' });
         this.valueLabel = ce('span', { className: 'cond-item__value' });
 
-        this.elem = createContainer('cond-item', [
+        this.elem = window.app.createContainer('cond-item', [
             this.propertyLabel,
             this.operatorLabel,
             this.valueLabel,

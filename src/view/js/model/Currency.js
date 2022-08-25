@@ -1,4 +1,4 @@
-import { normalize } from '../app.js';
+import { normalize } from '../utils.js';
 import { ListItem } from './ListItem.js';
 
 /** Format specified number value */

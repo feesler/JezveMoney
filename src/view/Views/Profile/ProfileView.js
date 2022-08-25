@@ -5,7 +5,6 @@ import {
     Popup,
     Checkbox,
 } from 'jezvejs';
-import { createMessage } from '../../js/app.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
@@ -210,7 +209,7 @@ class ProfileView extends View {
         }
 
         if (result.msg) {
-            createMessage(result.msg, (success) ? 'msg_success' : 'msg_error');
+            window.app.createMessage(result.msg, (success) ? 'msg_success' : 'msg_error');
         }
 
         this.changePassForm.reset();
@@ -300,7 +299,7 @@ class ProfileView extends View {
         }
 
         if (result.msg) {
-            createMessage(result.msg, (success) ? 'msg_success' : 'msg_error');
+            window.app.createMessage(result.msg, (success) ? 'msg_success' : 'msg_error');
         }
 
         this.changeNameForm.reset();

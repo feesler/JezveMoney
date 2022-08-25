@@ -16,14 +16,13 @@ import {
 } from 'jezvejs';
 import {
     fixFloat,
+} from '../../../js/utils.js';
+import {
     EXPENSE,
     INCOME,
     TRANSFER,
     DEBT,
-    createField,
-    createContainer,
-    createIcon,
-} from '../../../js/app.js';
+} from '../../../js/model/Transaction.js';
 import { AccountList } from '../../../js/model/AccountList.js';
 import './style.scss';
 
@@ -119,7 +118,7 @@ export class ImportTransactionItem extends Component {
             placeholder: PH_FIELD_DATE,
             autocomplete: 'off',
         }, null, { input: () => this.onDateInput() });
-        this.dateField = createField(TITLE_FIELD_DATE, this.dateInp, 'date-field');
+        this.dateField = window.app.createField(TITLE_FIELD_DATE, this.dateInp, 'date-field');
         // Comment field
         this.commInp = ce('input', {
             className: 'stretch-input',
@@ -128,56 +127,56 @@ export class ImportTransactionItem extends Component {
             placeholder: PH_FIELD_COMMENT,
             autocomplete: 'off',
         }, null, { input: () => this.onCommentInput() });
-        this.commentField = createField(TITLE_FIELD_COMMENT, this.commInp, 'comment-field');
+        this.commentField = window.app.createField(TITLE_FIELD_COMMENT, this.commInp, 'comment-field');
         // Delete button
         this.delBtn = ce(
             'button',
             { className: 'btn delete-btn', type: 'button' },
-            createIcon('del', 'icon delete-icon'),
+            window.app.createIcon('del', 'icon delete-icon'),
             { click: () => this.remove() },
         );
         // Toggle expand/collapse
         this.toggleExtBtn = ce(
             'button',
             { className: 'btn toggle-btn', type: 'button' },
-            createIcon('toggle-ext', 'icon toggle-icon'),
+            window.app.createIcon('toggle-ext', 'icon toggle-icon'),
             { click: () => this.toggleCollapse() },
         );
         show(this.toggleExtBtn, false);
 
-        this.topRow = createContainer('form-row', [
+        this.topRow = window.app.createContainer('form-row', [
             this.dateField,
             this.commentField,
         ]);
 
-        this.formContainer = createContainer('form-container', [
-            createContainer('form-rows type-col', [
+        this.formContainer = window.app.createContainer('form-container', [
+            window.app.createContainer('form-rows type-col', [
                 this.trTypeField,
                 this.destAccountField,
                 this.personField,
             ]),
-            createContainer('form-rows amount-col', [
+            window.app.createContainer('form-rows amount-col', [
                 this.amountField,
                 this.destAmountField,
             ]),
-            createContainer('form-rows', [
+            window.app.createContainer('form-rows', [
                 this.topRow,
             ]),
         ]);
 
-        this.mainContainer = createContainer('main-content', [
+        this.mainContainer = window.app.createContainer('main-content', [
             this.enableCheck.elem,
             this.formContainer,
-            createContainer('row-container controls', [
+            window.app.createContainer('row-container controls', [
                 this.delBtn,
                 this.toggleExtBtn,
             ]),
         ]);
         this.feedbackElem = ce('div', { className: 'invalid-feedback' });
         show(this.feedbackElem, false);
-        this.extendedContainer = createContainer('extended-content');
+        this.extendedContainer = window.app.createContainer('extended-content');
 
-        this.elem = createContainer('import-item', [
+        this.elem = window.app.createContainer('import-item', [
             this.mainContainer,
             this.feedbackElem,
             this.extendedContainer,
@@ -215,7 +214,7 @@ export class ImportTransactionItem extends Component {
         ];
 
         const selectElem = ce('select');
-        this.trTypeField = createField('Type', selectElem);
+        this.trTypeField = window.app.createField('Type', selectElem);
 
         this.typeDropDown = DropDown.create({
             elem: selectElem,
@@ -232,7 +231,7 @@ export class ImportTransactionItem extends Component {
     /** Create destination(second) account field */
     createAccountField() {
         const selectElem = ce('select');
-        this.destAccountField = createField(TITLE_FIELD_DEST_ACCOUNT, selectElem);
+        this.destAccountField = window.app.createField(TITLE_FIELD_DEST_ACCOUNT, selectElem);
         this.destAccountLabel = this.destAccountField.querySelector('label');
 
         this.destAccDropDown = DropDown.create({
@@ -246,7 +245,7 @@ export class ImportTransactionItem extends Component {
     /** Create person field */
     createPersonField() {
         const selectElem = ce('select');
-        this.personField = createField(TITLE_FIELD_PERSON, selectElem);
+        this.personField = window.app.createField(TITLE_FIELD_PERSON, selectElem);
 
         this.personDropDown = DropDown.create({
             elem: selectElem,
@@ -288,7 +287,11 @@ export class ImportTransactionItem extends Component {
         this.amountGroup = InputGroup.create({
             children: [this.amountInp, this.currencyBtn],
         });
-        this.amountField = createField(TITLE_FIELD_AMOUNT, this.amountGroup.elem, 'amount-field');
+        this.amountField = window.app.createField(
+            TITLE_FIELD_AMOUNT,
+            this.amountGroup.elem,
+            'amount-field',
+        );
     }
 
     /** Create destination amount field */
@@ -325,7 +328,7 @@ export class ImportTransactionItem extends Component {
             children: [this.destAmountInp, this.destCurrencyBtn],
         });
 
-        this.destAmountField = createField(
+        this.destAmountField = window.app.createField(
             TITLE_FIELD_DEST_AMOUNT,
             this.destAmountGroup.elem,
             'amount-field',
@@ -359,9 +362,9 @@ export class ImportTransactionItem extends Component {
 
         const dateFmt = formatDate(new Date(data.date));
 
-        return createContainer('orig-data', [
+        return window.app.createContainer('orig-data', [
             ce('h3', { textContent: TITLE_ORIGINAL_DATA }),
-            createContainer('orig-data-table', [
+            window.app.createContainer('orig-data-table', [
                 this.createDataValue(COL_MAIN, mainAccount.name),
                 this.createDataValue(COL_DATE, dateFmt),
                 this.createDataValue(COL_TR_AMOUNT, data.transactionAmount),

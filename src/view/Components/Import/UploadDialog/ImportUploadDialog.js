@@ -7,7 +7,6 @@ import {
     DropDown,
     Popup,
 } from 'jezvejs';
-import { createMessage } from '../../../js/app.js';
 import { ImportFileUploader } from '../FileUploader/ImportFileUploader.js';
 import { ImportTemplateManager } from '../TemplateManager/ImportTemplateManager.js';
 import { LoadingIndicator } from '../../LoadingIndicator/LoadingIndicator.js';
@@ -212,7 +211,7 @@ export class ImportUploadDialog extends Component {
         try {
             this.state.importedItems = this.tplManager.applyTemplate();
         } catch (e) {
-            createMessage(e.message, 'msg_error');
+            window.app.createMessage(e.message, 'msg_error');
             this.state.importedItems = null;
         }
 
@@ -233,7 +232,7 @@ export class ImportUploadDialog extends Component {
     /** Upload error handler */
     onUploadError(message) {
         this.tplManager.reset();
-        createMessage(message, 'msg_error');
+        window.app.createMessage(message, 'msg_error');
     }
 
     /**

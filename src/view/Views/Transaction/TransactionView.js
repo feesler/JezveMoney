@@ -13,15 +13,17 @@ import {
     DecimalInput,
 } from 'jezvejs';
 import {
+    fixFloat,
+    isValidValue,
+    normalizeExch,
+} from '../../js/utils.js';
+import {
     EXPENSE,
     INCOME,
     DEBT,
     TRANSFER,
-    fixFloat,
-    isValidValue,
-    normalizeExch,
-    getTransactionTypeString,
-} from '../../js/app.js';
+    Transaction,
+} from '../../js/model/Transaction.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
@@ -838,7 +840,7 @@ class TransactionView extends View {
             : `${baseURL}transactions/create/`;
 
         const url = new URL(baseAddress);
-        const typeStr = getTransactionTypeString(transaction.type);
+        const typeStr = Transaction.getTypeString(transaction.type);
         url.searchParams.set('type', typeStr);
 
         if (state.isAvailable) {

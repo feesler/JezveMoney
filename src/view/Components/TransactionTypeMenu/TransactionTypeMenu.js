@@ -12,7 +12,7 @@ import {
     INCOME,
     TRANSFER,
     DEBT,
-} from '../../js/app.js';
+} from '../../js/model/Transaction.js';
 import './style.scss';
 
 const CONTAINER_CLASS = 'trtype-menu';

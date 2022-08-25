@@ -12,7 +12,6 @@ import { ImportCondition } from '../../../js/model/ImportCondition.js';
 import { ImportConditionForm } from '../ConditionForm/ImportConditionForm.js';
 import { ImportActionForm } from '../ActionForm/ImportActionForm.js';
 import { View } from '../../../js/View.js';
-import { createContainer, createIcon } from '../../../js/app.js';
 import './style.scss';
 
 /** Strings */
@@ -81,7 +80,7 @@ export class ImportRuleForm extends Component {
         this.toggleCondBtn = ce(
             'button',
             { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
-            createIcon('toggle-ext', 'icon toggle-icon'),
+            window.app.createIcon('toggle-ext', 'icon toggle-icon'),
         );
 
         this.conditionsCollapse = new Collapsible({
@@ -105,7 +104,7 @@ export class ImportRuleForm extends Component {
         this.toggleActionsBtn = ce(
             'button',
             { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
-            createIcon('toggle-ext', 'icon toggle-icon'),
+            window.app.createIcon('toggle-ext', 'icon toggle-icon'),
         );
 
         this.actionsCollapse = new Collapsible({
@@ -135,17 +134,17 @@ export class ImportRuleForm extends Component {
 
         // Invalid feedback message
         this.validFeedback = ce('div', { className: 'invalid-feedback' });
-        this.feedbackContainer = createContainer(
+        this.feedbackContainer = window.app.createContainer(
             'rule-form__feedback validation-block',
             this.validFeedback,
         );
 
-        this.controls = createContainer('rule-form__controls', [
+        this.controls = window.app.createContainer('rule-form__controls', [
             this.saveBtn,
             this.cancelBtn,
         ]);
 
-        this.elem = createContainer('rule-form', [
+        this.elem = window.app.createContainer('rule-form', [
             this.idInput,
             this.conditionsCollapse.elem,
             this.actionsCollapse.elem,

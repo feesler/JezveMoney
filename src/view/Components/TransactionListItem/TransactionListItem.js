@@ -9,7 +9,7 @@ import {
     INCOME,
     TRANSFER,
     DEBT,
-} from '../../js/app.js';
+} from '../../js/model/Transaction.js';
 
 /**
  * Transaction list item component

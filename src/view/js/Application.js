@@ -1,3 +1,8 @@
+import {
+    ce,
+    svg,
+    Popup,
+} from 'jezvejs';
 import { AccountList } from './model/AccountList.js';
 import { CurrencyList } from './model/CurrencyList.js';
 import { IconList } from './model/IconList.js';
@@ -46,6 +51,8 @@ export class Application {
         if (this.props.templates) {
             this.model.templates = ImportTemplateList.create(this.props.templates);
         }
+
+        this.messageBox = null;
     }
 
     createView(ViewClass) {
@@ -62,6 +69,60 @@ export class Application {
 
     get message() {
         return this.props.message;
+    }
+
+    /**
+     * Create notification message
+     * @param {string} message - notification text
+     * @param {string} msgClass - CSS class for message box
+     */
+    createMessage(message, msgClass) {
+        if (this.messageBox) {
+            this.messageBox.destroy();
+        }
+
+        this.messageBox = Popup.create({
+            id: 'notificationPopup',
+            content: message,
+            btn: { closeBtn: true },
+            className: ['msg', msgClass],
+            nodim: true,
+            closeOnEmptyClick: true,
+        });
+
+        this.messageBox.show();
+    }
+
+    /** Create simple container element */
+    createContainer(elemClass, children, events) {
+        return ce('div', { className: elemClass }, children, events);
+    }
+
+    /** Create SVG icon element */
+    createIcon(icon, className = null) {
+        const useElem = svg('use');
+        const res = svg('svg', {}, useElem);
+        if (className) {
+            res.setAttribute('class', className);
+        }
+
+        useElem.href.baseVal = (icon) ? `#${icon}` : '';
+
+        return res;
+    }
+
+    /** Create field element from given input element */
+    createField(title, input, extraClass) {
+        const elemClasses = ['field'];
+
+        if (typeof extraClass === 'string' && extraClass.length > 0) {
+            elemClasses.push(extraClass);
+        }
+
+        return ce('div', { className: elemClasses.join(' ') }, [
+            ce('label', { textContent: title }),
+            ce('div', {}, input),
+        ]);
     }
 
     checkUserAccountModels() {

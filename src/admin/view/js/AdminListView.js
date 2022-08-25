@@ -7,7 +7,6 @@ import {
     show,
     Popup,
 } from 'jezvejs';
-import { createMessage } from '../../../view/js/app.js';
 import { ConfirmDialog } from '../../../view/Components/ConfirmDialog/ConfirmDialog.js';
 import { AdminView } from './AdminView.js';
 
@@ -226,7 +225,7 @@ export class AdminListView extends AdminView {
         }
 
         if (!res) {
-            createMessage(failMessage, 'msg_error');
+            window.app.createMessage(failMessage, 'msg_error');
             return;
         }
 

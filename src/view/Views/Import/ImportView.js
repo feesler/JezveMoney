@@ -9,7 +9,7 @@ import {
     DropDown,
     Checkbox,
 } from 'jezvejs';
-import { timestampFromString, createMessage } from '../../js/app.js';
+import { timestampFromString } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
@@ -538,7 +538,7 @@ class ImportView extends View {
         }
 
         this.submitProgress.hide();
-        createMessage(message, (status ? 'msg_success' : 'msg_error'));
+        window.app.createMessage(message, (status ? 'msg_success' : 'msg_error'));
     }
 
     /** Apply rules to imported items */

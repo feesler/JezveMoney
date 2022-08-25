@@ -1,5 +1,5 @@
 import { copyObject, isObject, hasFlag } from 'jezvejs';
-import { timestampFromString } from '../app.js';
+import { timestampFromString } from '../utils.js';
 import { ListItem } from './ListItem.js';
 
 /** Condition field types */

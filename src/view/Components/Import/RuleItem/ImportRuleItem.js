@@ -13,7 +13,6 @@ import { ImportConditionList } from '../../../js/model/ImportConditionList.js';
 import { ImportActionList } from '../../../js/model/ImportActionList.js';
 import { ImportConditionItem } from '../ConditionItem/ImportConditionItem.js';
 import { ImportActionItem } from '../ActionItem/ImportActionItem.js';
-import { createContainer, createIcon } from '../../../js/app.js';
 import './style.scss';
 
 /** Strings */
@@ -67,48 +66,48 @@ export class ImportRuleItem extends Component {
         this.updateBtn = ce(
             'button',
             { className: 'btn icon-btn update-btn', type: 'button' },
-            createIcon('update', 'icon update-icon'),
+            window.app.createIcon('update', 'icon update-icon'),
             { click: (e) => this.onUpdate(e) },
         );
         // Delete button
         this.delBtn = ce(
             'button',
             { className: 'btn icon-btn delete-btn', type: 'button' },
-            createIcon('del', 'icon delete-icon'),
+            window.app.createIcon('del', 'icon delete-icon'),
             { click: (e) => this.onDelete(e) },
         );
         // Toggle expand/collapse
         this.toggleExtBtn = ce(
             'button',
             { className: 'btn icon-btn toggle-btn', type: 'button' },
-            createIcon('toggle-ext', 'icon toggle-icon'),
+            window.app.createIcon('toggle-ext', 'icon toggle-icon'),
         );
 
-        this.topRow = createContainer('rule-item__main-top', [
+        this.topRow = window.app.createContainer('rule-item__main-top', [
             this.propertyLabel,
             this.operatorLabel,
             this.valueLabel,
         ]);
-        this.bottomRow = createContainer('rule-item__main-bottom', [
+        this.bottomRow = window.app.createContainer('rule-item__main-bottom', [
             this.infoLabel,
         ]);
 
-        this.infoContainer = createContainer('rule-item__main-info', [
+        this.infoContainer = window.app.createContainer('rule-item__main-info', [
             this.topRow,
             this.bottomRow,
         ]);
 
-        this.controls = createContainer('rule-item__main-controls', [
+        this.controls = window.app.createContainer('rule-item__main-controls', [
             this.updateBtn,
             this.delBtn,
             this.toggleExtBtn,
         ]);
 
         this.conditionsHeader = ce('label', { className: 'rule-item__header', textContent: TITLE_CONDITIONS });
-        this.conditionsContainer = createContainer('rule-item__conditions', []);
+        this.conditionsContainer = window.app.createContainer('rule-item__conditions', []);
 
         this.actionsHeader = ce('label', { className: 'rule-item__header', textContent: TITLE_ACTIONS });
-        this.actionsContainer = createContainer('rule-item__actions', []);
+        this.actionsContainer = window.app.createContainer('rule-item__actions', []);
 
         this.collapse = new Collapsible({
             className: 'rule-item',

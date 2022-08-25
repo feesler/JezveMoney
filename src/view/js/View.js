@@ -1,6 +1,5 @@
 import { ge, copyObject, onReady } from 'jezvejs';
 import { Header } from '../Components/Header/Header.js';
-import { createMessage } from './app.js';
 
 /**
  * Base View class
@@ -21,7 +20,7 @@ export class View {
 
         const { message } = window.app;
         if (message) {
-            createMessage(message.title, message.type);
+            window.app.createMessage(message.title, message.type);
         }
     }
 

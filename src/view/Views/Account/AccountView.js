@@ -5,7 +5,7 @@ import {
     DropDown,
     DecimalInput,
 } from 'jezvejs';
-import { normalize } from '../../js/app.js';
+import { normalize } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
