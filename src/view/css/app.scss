@@ -152,7 +152,7 @@ label {
   border-width: 1px;
   border-style: solid;
   padding: 0 0.5rem;
-  border-radius: 3px;
+  border-radius: 5px;
 }
 
 /* Input group */
@@ -427,7 +427,7 @@ label {
 .dd__container,
 .dd__container_attached {
   --dd-border-width: 1px;
-  --dd-border-radius: 3px;
+  --dd-border-radius: 5px;
   --dd-list-border-radius: 5px;
   --dd-selection-item-border-radius: 3px;
 }
@@ -446,7 +446,7 @@ label {
 /* Datepicker */
 .dp__wrapper {
   border-width: 1px;
-  border-radius: 3px;
+  border-radius: 5px;
 }
 
 /* Popup */
