@@ -5,6 +5,8 @@ import { ImportRuleList } from './model/ImportRuleList.js';
 import { ImportTemplateList } from './model/ImportTemplateList.js';
 import { PersonList } from './model/PersonList.js';
 
+const HIDDEN_GROUP_TITLE = 'Hidden';
+
 export class Application {
     constructor(props = {}) {
         this.props = { ...props };
@@ -87,5 +89,70 @@ export class Application {
         persons.sort((a, b) => a.flags - b.flags);
         this.model.visiblePersons = PersonList.create(persons.getVisible());
         this.model.hiddenPersons = PersonList.create(persons.getHidden());
+    }
+
+    /** Initialize currency DropDown */
+    initCurrencyList(ddlist) {
+        if (!ddlist) {
+            return;
+        }
+
+        window.app.model.currency.forEach(
+            (curr) => ddlist.addItem({ id: curr.id, title: curr.name }),
+        );
+    }
+
+    /** Initialize acconts DropDown */
+    initAccountsList(ddlist) {
+        if (!ddlist) {
+            return;
+        }
+
+        window.app.checkUserAccountModels();
+
+        const { visibleUserAccounts, hiddenUserAccounts } = window.app.model;
+
+        visibleUserAccounts.forEach(
+            (item) => ddlist.addItem({ id: item.id, title: item.name }),
+        );
+        if (hiddenUserAccounts.length === 0) {
+            return;
+        }
+
+        const group = ddlist.addGroup(HIDDEN_GROUP_TITLE);
+        hiddenUserAccounts.forEach(
+            (item) => ddlist.addItem({
+                id: item.id,
+                title: item.name,
+                group,
+            }),
+        );
+    }
+
+    /** Initialize DropDown for debt account tile */
+    initPersonsList(ddlist) {
+        if (!ddlist) {
+            return;
+        }
+
+        window.app.checkPersonModels();
+
+        const { visiblePersons, hiddenPersons } = window.app.model;
+
+        visiblePersons.forEach(
+            (person) => ddlist.addItem({ id: person.id, title: person.name }),
+        );
+        if (hiddenPersons.length === 0) {
+            return;
+        }
+
+        const group = ddlist.addGroup(HIDDEN_GROUP_TITLE);
+        hiddenPersons.forEach(
+            (person) => ddlist.addItem({
+                id: person.id,
+                title: person.name,
+                group,
+            }),
+        );
     }
 }

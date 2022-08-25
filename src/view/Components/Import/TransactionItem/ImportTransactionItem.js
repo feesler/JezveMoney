@@ -240,7 +240,7 @@ export class ImportTransactionItem extends Component {
             disabled: true,
             onchange: (account) => this.onDestChanged(account),
         });
-        window.app.view.initAccountsList(this.destAccDropDown);
+        window.app.initAccountsList(this.destAccDropDown);
     }
 
     /** Create person field */
@@ -253,7 +253,7 @@ export class ImportTransactionItem extends Component {
             disabled: true,
             onchange: (person) => this.onPersonChanged(person),
         });
-        window.app.view.initPersonsList(this.personDropDown);
+        window.app.initPersonsList(this.personDropDown);
     }
 
     /** Create amount field */
@@ -283,7 +283,7 @@ export class ImportTransactionItem extends Component {
             listAttach: true,
             onchange: (currency) => this.onCurrChanged(currency),
         });
-        window.app.view.initCurrencyList(this.currencyDropDown);
+        window.app.initCurrencyList(this.currencyDropDown);
 
         this.amountGroup = InputGroup.create({
             children: [this.amountInp, this.currencyBtn],
@@ -319,7 +319,7 @@ export class ImportTransactionItem extends Component {
             listAttach: true,
             onchange: (currency) => this.onCurrChanged(currency),
         });
-        window.app.view.initCurrencyList(this.destCurrencyDropDown);
+        window.app.initCurrencyList(this.destCurrencyDropDown);
 
         this.destAmountGroup = InputGroup.create({
             children: [this.destAmountInp, this.destCurrencyBtn],

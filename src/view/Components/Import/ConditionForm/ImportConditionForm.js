@@ -194,7 +194,7 @@ export class ImportConditionForm extends Component {
             elem: selectElem,
             onchange: () => this.onValueChange(),
         });
-        window.app.view.initAccountsList(this.accountDropDown);
+        window.app.initAccountsList(this.accountDropDown);
     }
 
     /** Create template field */
@@ -225,7 +225,7 @@ export class ImportConditionForm extends Component {
             elem: selectElem,
             onchange: () => this.onValueChange(),
         });
-        window.app.view.initCurrencyList(this.currencyDropDown);
+        window.app.initCurrencyList(this.currencyDropDown);
     }
 
     /** Create value property field */

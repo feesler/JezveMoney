@@ -70,7 +70,7 @@ class AccountView extends View {
         if (!this.currencySelect) {
             throw new Error('Failed to initialize Account view');
         }
-        this.initCurrencyList(this.currencySelect);
+        window.app.initCurrencyList(this.currencySelect);
         if (this.state.original.curr_id) {
             this.currencySelect.selectItem(this.state.original.curr_id);
         }

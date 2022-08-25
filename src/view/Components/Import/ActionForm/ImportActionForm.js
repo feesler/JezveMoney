@@ -171,7 +171,7 @@ export class ImportActionForm extends Component {
             elem: selectElem,
             onchange: () => this.onValueChange(),
         });
-        window.app.view.initAccountsList(this.accountDropDown);
+        window.app.initAccountsList(this.accountDropDown);
     }
 
     /** Create person field */
@@ -183,7 +183,7 @@ export class ImportActionForm extends Component {
             elem: selectElem,
             onchange: () => this.onValueChange(),
         });
-        window.app.view.initPersonsList(this.personDropDown);
+        window.app.initPersonsList(this.personDropDown);
     }
 
     /** Set data for component */

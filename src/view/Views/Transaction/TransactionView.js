@@ -432,7 +432,7 @@ class TransactionView extends View {
             onitemselect: (item) => this.onSrcAccountSelect(item),
         });
 
-        this.initAccountsList(this.srcDDList);
+        window.app.initAccountsList(this.srcDDList);
 
         if (transaction.src_id) {
             this.srcDDList.selectItem(transaction.src_id);
@@ -453,7 +453,7 @@ class TransactionView extends View {
             onitemselect: (item) => this.onDestAccountSelect(item),
         });
 
-        this.initAccountsList(this.destDDList);
+        window.app.initAccountsList(this.destDDList);
 
         if (transaction.dest_id) {
             this.destDDList.selectItem(transaction.dest_id);
@@ -472,7 +472,7 @@ class TransactionView extends View {
             onitemselect: (item) => this.onPersonSelect(item),
         });
 
-        this.initPersonsList(this.persDDList);
+        window.app.initPersonsList(this.persDDList);
     }
 
     /** Initialize DropDown for debt account tile */
@@ -487,7 +487,7 @@ class TransactionView extends View {
             onitemselect: (item) => this.onDebtAccountSelect(item),
         });
 
-        this.initAccountsList(this.accDDList);
+        window.app.initAccountsList(this.accDDList);
 
         const state = this.store.getState();
         const accountId = (state.account) ? state.account.id : 0;
@@ -509,7 +509,7 @@ class TransactionView extends View {
             onitemselect: (item) => this.onSrcCurrencySel(item),
         });
 
-        this.initCurrencyList(this.srcCurrDDList);
+        window.app.initCurrencyList(this.srcCurrDDList);
 
         if (state.transaction.src_curr) {
             this.srcCurrDDList.selectItem(state.transaction.src_curr);
@@ -529,7 +529,7 @@ class TransactionView extends View {
             onitemselect: (item) => this.onDestCurrencySel(item),
         });
 
-        this.initCurrencyList(this.destCurrDDList);
+        window.app.initCurrencyList(this.destCurrDDList);
 
         if (state.transaction.dest_curr) {
             this.destCurrDDList.selectItem(state.transaction.dest_curr);
