@@ -3,7 +3,11 @@ import {
     ge,
     re,
     ce,
+    show,
+    setEvents,
     enable,
+    setEmptyClick,
+    removeEmptyClick,
     formatDate,
     Sortable,
     DropDown,
@@ -40,6 +44,8 @@ class ImportView extends View {
             transCache: null,
             rulesEnabled: true,
         };
+
+        this.menuEmptyClickHandler = () => this.hideActionsMenu();
     }
 
     /**
@@ -49,6 +55,10 @@ class ImportView extends View {
         if (window.app.model.accounts.length === 0) {
             return;
         }
+
+        this.actionsMenuBtn = ge('toggleActionsMenuBtn');
+        setEvents(this.actionsMenuBtn, { click: () => this.toggleActionsMenu() });
+        this.actionsList = ge('actionsList');
 
         this.newItemBtn = IconLink.fromElement({
             elem: 'newItemBtn',
@@ -67,7 +77,7 @@ class ImportView extends View {
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
             onchange: () => this.onMainAccChange(),
-            className: 'dd__fullwidth',
+            className: 'dd__main-account',
         });
 
         this.rulesCheck = Checkbox.fromElement(
@@ -79,7 +89,6 @@ class ImportView extends View {
         this.transCountElem = ge('trcount');
         this.enabledTransCountElem = ge('entrcount');
         this.rulesBtn = ge('rulesBtn');
-        this.rulesCountElem = ge('rulescount');
         this.rowsContainer = ge('rowsContainer');
         if (
             !this.newItemBtn
@@ -90,7 +99,6 @@ class ImportView extends View {
             || !this.accountDropDown
             || !this.rulesCheck
             || !this.rulesBtn
-            || !this.rulesCountElem
             || !this.rowsContainer
         ) {
             throw new Error('Failed to initialize Import view');
@@ -129,6 +137,20 @@ class ImportView extends View {
         this.setRenderTime();
     }
 
+    hideActionsMenu() {
+        show(this.actionsList, false);
+        removeEmptyClick(this.menuEmptyClickHandler);
+    }
+
+    toggleActionsMenu() {
+        if (this.actionsList.hasAttribute('hidden')) {
+            show(this.actionsList, true);
+            setEmptyClick(this.menuEmptyClickHandler);
+        } else {
+            this.hideActionsMenu();
+        }
+    }
+
     /** Update render time data attribute of list container */
     setRenderTime() {
         this.rowsContainer.dataset.time = Date.now();
@@ -136,10 +158,6 @@ class ImportView extends View {
 
     /** Import rules 'update' event handler */
     onUpdateRules() {
-        const rulesCount = window.app.model.rules.length;
-
-        this.rulesCountElem.textContent = rulesCount;
-
         this.reApplyRules();
     }
 

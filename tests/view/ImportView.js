@@ -31,6 +31,8 @@ export class ImportView extends AppView {
         const res = {
             title: { elem: await query('.content_wrap > .heading > h1') },
             uploadBtn: await IconLink.create(this, await query('#uploadBtn')),
+            actionsMenuBtn: { elem: await query('#toggleActionsMenuBtn') },
+            actionsList: { elem: await query('#actionsList') },
             notAvailMsg: { elem: await query('#notavailmsg') },
             addBtn: await IconLink.create(this, await query('#newItemBtn')),
             clearBtn: await IconLink.create(this, await query('#clearFormBtn')),
@@ -38,7 +40,6 @@ export class ImportView extends AppView {
             enabledCount: { elem: await query('#entrcount') },
             rulesCheck: await Checkbox.create(this, await query('#rulesCheck')),
             rulesBtn: { elem: await query('#rulesBtn') },
-            rulesCount: { elem: await query('#rulescount') },
             submitBtn: { elem: await query('#submitbtn') },
             submitProgress: { elem: await query('.content_wrap > .loading-indicator') },
         };
@@ -46,13 +47,13 @@ export class ImportView extends AppView {
         assert(
             res.title.elem
             && res.uploadBtn.elem
-            && res.addBtn.elem
+            && res.actionsMenuBtn.elem
+            && res.actionsList.elem
             && res.clearBtn.elem
             && res.totalCount.elem
             && res.enabledCount.elem
             && res.rulesCheck.elem
             && res.rulesBtn.elem
-            && res.rulesCount.elem
             && res.submitBtn.elem
             && res.submitProgress.elem,
             'Invalid structure of import view',
@@ -66,7 +67,6 @@ export class ImportView extends AppView {
         res.uploadBtn.content.disabled = disabledAttr != null;
         res.totalCount.value = await prop(res.totalCount.elem, 'textContent');
         res.enabledCount.value = await prop(res.enabledCount.elem, 'textContent');
-        res.rulesCount.value = await prop(res.rulesCount.elem, 'textContent');
         res.submitBtn.disabled = await prop(res.submitBtn.elem, 'disabled');
 
         if (importEnabled) {
@@ -95,6 +95,7 @@ export class ImportView extends AppView {
     async buildModel(cont) {
         const res = {
             enabled: !cont.notAvailMsg.visible,
+            menuOpen: cont.actionsList.visible,
         };
 
         const uploadVisible = !!cont.uploadDialog?.content?.visible;
@@ -116,7 +117,6 @@ export class ImportView extends AppView {
         res.enabledCount = (res.enabled) ? parseInt(cont.enabledCount.value, 10) : 0;
         res.mainAccount = (res.enabled) ? parseInt(cont.mainAccountSelect.content.value, 10) : 0;
         res.rulesEnabled = cont.rulesCheck.checked;
-        res.rulesCount = (res.enabled) ? parseInt(cont.rulesCount.value, 10) : 0;
         res.renderTime = cont.renderTime;
         res.items = (cont.itemsList) ? cont.itemsList.getItems() : [];
         res.invalidated = (cont.itemsList) ? cont.itemsList.model.invalidated : false;
@@ -126,16 +126,17 @@ export class ImportView extends AppView {
     }
 
     getExpectedState(model) {
+        const showMenuItems = model.enabled && model.menuOpen;
         const res = {
             notAvailMsg: { visible: !model.enabled },
-            addBtn: { visible: model.enabled },
-            clearBtn: { visible: model.enabled },
+            addBtn: { visible: showMenuItems },
+            clearBtn: { visible: showMenuItems },
             uploadBtn: { visible: true, disabled: !model.enabled },
             title: { value: model.title.toString(), visible: true },
             totalCount: { value: model.totalCount.toString(), visible: model.enabled },
             enabledCount: { value: model.enabledCount.toString(), visible: model.enabled },
-            rulesCheck: { checked: model.rulesEnabled, visible: model.enabled },
-            rulesCount: { value: model.rulesCount.toString(), visible: model.enabled },
+            rulesCheck: { checked: model.rulesEnabled, visible: showMenuItems },
+            rulesBtn: { visible: showMenuItems },
             submitBtn: { visible: model.enabled },
         };
 
@@ -172,13 +173,25 @@ export class ImportView extends AppView {
         this.assertStateId('rules');
     }
 
+    async openActionsMenu() {
+        if (this.model.menuOpen) {
+            return true;
+        }
+
+        this.model.menuOpen = true;
+        this.expectedState = this.getExpectedState(this.model);
+        await this.performAction(() => click(this.content.actionsMenuBtn.elem));
+
+        return this.checkState();
+    }
+
     async enableRules(value) {
         this.checkMainState();
-
         assert(
             value !== this.isRulesEnabled(),
             value ? 'Rules already enabled' : 'Result already disabled',
         );
+        await this.openActionsMenu();
         await this.performAction(() => this.content.rulesCheck.toggle());
     }
 
@@ -411,6 +424,7 @@ export class ImportView extends AppView {
 
     async launchRulesDialog() {
         this.checkMainState();
+        await this.openActionsMenu();
 
         await this.performAction(() => click(this.content.rulesBtn.elem));
         await this.performAction(() => wait(this.rulesPopupId, { visible: true }));
@@ -448,7 +462,6 @@ export class ImportView extends AppView {
     async deleteRule(index) {
         this.checkRulesListState();
 
-        this.model.rulesCount -= 1;
         this.expectedState = this.getExpectedState(this.model);
 
         await this.performAction(() => this.content.rulesDialog.deleteRule(index));
@@ -533,12 +546,6 @@ export class ImportView extends AppView {
     async submitRule() {
         this.checkRulesFormState();
 
-        if (this.isValidRule()) {
-            const rulesState = this.getRulesState();
-            if (rulesState === 'create') {
-                this.model.rulesCount += 1;
-            }
-        }
         this.expectedState = this.getExpectedState(this.model);
 
         await this.performAction(() => this.content.rulesDialog.submitRule());
@@ -571,6 +578,7 @@ export class ImportView extends AppView {
 
     async addItem() {
         this.checkMainState();
+        await this.openActionsMenu();
 
         const expectedList = this.content.itemsList.getExpectedState();
         const mainAccount = App.state.accounts.getItem(this.model.mainAccount);
@@ -595,6 +603,7 @@ export class ImportView extends AppView {
 
         this.model.totalCount += 1;
         this.model.enabledCount += 1;
+        this.model.menuOpen = false;
 
         this.expectedState = this.getExpectedState(this.model);
         this.expectedState.itemsList = expectedList;
@@ -607,6 +616,7 @@ export class ImportView extends AppView {
 
     async deleteAllItems() {
         this.checkMainState();
+        await this.openActionsMenu();
 
         await this.performAction(() => this.content.clearBtn.click());
     }

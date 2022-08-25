@@ -267,6 +267,16 @@
     background-color: var(--main-bg-color);
   }
 
+  .actions-menu-btn__icon {
+    fill: var(--main-text-color);
+  }
+
+  .actions-menu-list,
+  .actions-menu-list__separator {
+    background-color: #f2f2f2;
+    border-color: #b0b0b0;
+  }
+
   .import-item {
     background-color: #dddddd;
   }
@@ -338,7 +348,7 @@
   }
 
   .import-controls {
-    color: #ffffff;
+    color: var(--main-text-color);
   }
 
   /* Upload dialog */
