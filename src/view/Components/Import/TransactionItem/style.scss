@@ -10,6 +10,7 @@
     flex-flow: column nowrap;
     flex-grow: 1;
     align-items: normal;
+    gap: 8px;
   }
 
   .form-rows {
@@ -17,25 +18,24 @@
     flex-flow: column nowrap;
     flex-grow: 1;
     align-items: normal;
+    gap: 8px;
   }
 
   .form-row {
     display: flex;
     flex-flow: column nowrap;
+    gap: 8px;
   }
 
   /* Input field and label group */
   .field {
     display: flex;
-    flex-flow: row nowrap;
-    align-items: center;
-    margin: 0 0 4px 0;
+    flex-flow: column nowrap;
+    align-items: normal;
+    margin: 0;
 
     label {
-      width: 15%;
-      font-size: 14px;
-      min-width: 70px;
-      text-align: center;
+      font-size: 12px;
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
@@ -163,7 +163,7 @@
 
   /* Container for transaction form */
   .main-content {
-    padding: 4px 0 0 0;
+    padding: 4px 0;
     display: flex;
     flex-flow: row nowrap;
   }
@@ -256,18 +256,6 @@
     .controls {
       align-items: start;
       padding-top: 16px;
-    }
-
-    .field {
-      flex-flow: column nowrap;
-      align-items: normal;
-      margin: 0 8px 0 0;
-      label {
-        width: auto;
-        min-width: auto;
-        font-size: 12px;
-        text-align: left;
-      }
     }
 
     .orig-data-table {
