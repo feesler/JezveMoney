@@ -39,16 +39,6 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                     "icon" => "del"
                                 ])?>
                             </div>
-                            <div class="header-info">
-                                <div class="header-field std_margin">
-                                    <label>Total</label>
-                                    <div class="header-field__content"><span id="trcount">0</span></div>
-                                </div>
-                                <div class="header-field std_margin">
-                                    <label>Enabled</label>
-                                    <div class="header-field__content"><span id="entrcount">0</span></div>
-                                </div>
-                            </div>
                         </div>
 
                         <div class="rules-container">
@@ -58,14 +48,18 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </label>
                             <button id="rulesBtn" class="btn link-btn" type="button">Rules (<span id="rulescount"><?=count($importRules)?></span>)</button>
                         </div>
+
+                        <div class="import-controls std_margin">
+                            <div class="items-counter">
+                                <span><span id="entrcount">0</span>&nbsp;/&nbsp;<span id="trcount">0</span> enabled</span>
+                            </div>
+                            <button id="submitbtn" class="btn submit-btn" type="button" disabled>Submit</button>
+                        </div>
                     </div>
 
                     <div class="data-form"<?=hidden(!$importAvailable)?>>
                         <div id="rowsContainer" class="data-container">
                             <span class="nodata-message">No transactions to import</span>
-                        </div>
-                        <div class="import-controls std_margin">
-                            <input id="submitbtn" class="btn submit-btn" type="button" value="ok" disabled>
                         </div>
                     </div>
                 </div>

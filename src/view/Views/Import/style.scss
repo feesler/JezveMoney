@@ -73,13 +73,6 @@
   margin: 4px;
 }
 
-.header-info {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: flex-end;
-  flex: 0 1 auto;
-}
-
 /* Rules block */
 .rules-container {
   display: flex;
@@ -89,6 +82,17 @@
 .rules-container .btn {
   font-size: 16px;
   padding: 0;
+}
+
+/* Controls */
+.import-controls {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+.import-controls .submit-btn {
+  margin-left: auto;
 }
 
 /* Transactions list */
