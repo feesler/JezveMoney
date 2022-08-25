@@ -146,7 +146,6 @@ label {
   display: flex;
   flex-basis: 100%;
   width: 100%;
-  box-sizing: border-box;
   height: 2.3rem;
   font-size: 0.9rem;
   border-width: 1px;
@@ -507,7 +506,6 @@ label {
     color: #ffffff;
     right: 0;
     padding: 15px 30px 15px 20px;
-    box-sizing: border-box;
   }
 
   &.msg_success .popup__message {
