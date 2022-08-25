@@ -13,7 +13,6 @@ import {
     IMPORT_ACTION_SET_PERSON,
 } from '../../../js/model/ImportAction.js';
 import { View } from '../../../js/View.js';
-import { createField, createContainer, createIcon } from '../../../js/app.js';
 import './style.scss';
 
 /** Strings */
@@ -78,7 +77,7 @@ export class ImportActionForm extends Component {
             digits: 2,
             oninput: () => this.onValueChange(),
         });
-        this.amountField = createField(TITLE_FIELD_AMOUNT, this.amountInput);
+        this.amountField = window.app.createField(TITLE_FIELD_AMOUNT, this.amountInput);
         // Create value input element
         this.valueInput = ce(
             'input',
@@ -86,9 +85,9 @@ export class ImportActionForm extends Component {
             null,
             { input: () => this.onValueChange() },
         );
-        this.valueField = createField(TITLE_FIELD_VALUE, this.valueInput);
+        this.valueField = window.app.createField(TITLE_FIELD_VALUE, this.valueInput);
         // Form fields container
-        this.fieldsContainer = createContainer('action-form__fields', [
+        this.fieldsContainer = window.app.createContainer('action-form__fields', [
             this.actionTypeField,
             this.transTypeField,
             this.accountField,
@@ -98,7 +97,7 @@ export class ImportActionForm extends Component {
         ]);
         // Invalid feedback message
         this.validFeedback = ce('div', { className: 'invalid-feedback' });
-        this.container = createContainer('action-form__container validation-block', [
+        this.container = window.app.createContainer('action-form__container validation-block', [
             this.fieldsContainer,
             this.validFeedback,
         ]);
@@ -107,15 +106,15 @@ export class ImportActionForm extends Component {
         this.delBtn = ce(
             'button',
             { className: 'btn icon-btn delete-btn right-align', type: 'button' },
-            createIcon('del', 'icon delete-icon'),
+            window.app.createIcon('del', 'icon delete-icon'),
             { click: () => this.onDelete() },
         );
 
-        this.controls = createContainer('action-form__controls', [
+        this.controls = window.app.createContainer('action-form__controls', [
             this.delBtn,
         ]);
 
-        this.elem = createContainer('action-form', [
+        this.elem = window.app.createContainer('action-form', [
             this.container,
             this.controls,
         ]);
@@ -138,7 +137,7 @@ export class ImportActionForm extends Component {
             .map((type) => ({ id: type.id, title: type.title }));
 
         const selectElem = ce('select');
-        this.actionTypeField = createField(TITLE_FIELD_ACTION, selectElem);
+        this.actionTypeField = window.app.createField(TITLE_FIELD_ACTION, selectElem);
 
         this.actionDropDown = DropDown.create({
             elem: selectElem,
@@ -152,7 +151,7 @@ export class ImportActionForm extends Component {
         const items = this.transactionTypes.map((type) => ({ id: type.id, title: type.title }));
 
         const selectElem = ce('select');
-        this.transTypeField = createField(TITLE_FIELD_TR_TYPE, selectElem);
+        this.transTypeField = window.app.createField(TITLE_FIELD_TR_TYPE, selectElem);
 
         this.trTypeDropDown = DropDown.create({
             elem: selectElem,
@@ -164,40 +163,26 @@ export class ImportActionForm extends Component {
 
     /** Create account field */
     createAccountField() {
-        const items = window.app.model.accounts.map(
-            (account) => ({ id: account.id, title: account.name }),
-        );
-
         const selectElem = ce('select');
-        this.accountField = createField(TITLE_FIELD_ACCOUNT, selectElem);
+        this.accountField = window.app.createField(TITLE_FIELD_ACCOUNT, selectElem);
 
         this.accountDropDown = DropDown.create({
             elem: selectElem,
             onchange: () => this.onValueChange(),
         });
-        this.accountDropDown.append(items);
-        if (items.length > 0) {
-            this.accountDropDown.selectItem(items[0].id);
-        }
+        window.app.initAccountsList(this.accountDropDown);
     }
 
     /** Create person field */
     createPersonField() {
-        const items = window.app.model.persons.map(
-            (person) => ({ id: person.id, title: person.name }),
-        );
-
         const selectElem = ce('select');
-        this.personField = createField(TITLE_FIELD_PERSON, selectElem);
+        this.personField = window.app.createField(TITLE_FIELD_PERSON, selectElem);
 
         this.personDropDown = DropDown.create({
             elem: selectElem,
             onchange: () => this.onValueChange(),
         });
-        this.personDropDown.append(items);
-        if (items.length > 0) {
-            this.personDropDown.selectItem(items[0].id);
-        }
+        window.app.initPersonsList(this.personDropDown);
     }
 
     /** Set data for component */

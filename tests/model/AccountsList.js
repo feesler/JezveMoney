@@ -213,6 +213,7 @@ export class AccountsList extends List {
         if (!userAccounts || !userAccounts.length) {
             return 0;
         }
+        userAccounts.sortByVisibility();
 
         if (!accountId) {
             return userAccounts.indexToId(0);

@@ -7,7 +7,6 @@ import {
     Component,
     Popup,
 } from 'jezvejs';
-import { createMessage } from '../../../js/app.js';
 import { API } from '../../../js/API.js';
 import { ImportRule } from '../../../js/model/ImportRule.js';
 import { ImportRuleForm } from '../RuleForm/ImportRuleForm.js';
@@ -63,12 +62,14 @@ export class ImportRulesDialog extends Component {
             id: 'rules_popup',
             content: this.elem,
             title: this.headerElem,
+            scrollMessage: true,
             onclose: () => this.onClose(),
             btn: {
                 closeBtn: true,
             },
             className: IMPORT_RULES_POPUP_CLASS,
         });
+        show(this.elem, true);
 
         this.createRuleBtn.addEventListener('click', () => this.onCreateRuleClick());
 
@@ -194,7 +195,7 @@ export class ImportRulesDialog extends Component {
 
             this.requestRulesList();
         } catch (e) {
-            createMessage(e.message, 'msg_error');
+            window.app.createMessage(e.message, 'msg_error');
             this.stopLoading();
         }
     }
@@ -212,7 +213,7 @@ export class ImportRulesDialog extends Component {
             await API.importRule.del(id);
             this.requestRulesList();
         } catch (e) {
-            createMessage(e.message, 'msg_error');
+            window.app.createMessage(e.message, 'msg_error');
             this.stopLoading();
         }
     }
@@ -234,7 +235,7 @@ export class ImportRulesDialog extends Component {
             this.stopLoading();
             this.parent.onUpdateRules();
         } catch (e) {
-            createMessage(e.message, 'msg_error');
+            window.app.createMessage(e.message, 'msg_error');
             this.stopLoading();
         }
     }

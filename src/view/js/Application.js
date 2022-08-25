@@ -1,9 +1,16 @@
+import {
+    ce,
+    svg,
+    Popup,
+} from 'jezvejs';
 import { AccountList } from './model/AccountList.js';
 import { CurrencyList } from './model/CurrencyList.js';
 import { IconList } from './model/IconList.js';
 import { ImportRuleList } from './model/ImportRuleList.js';
 import { ImportTemplateList } from './model/ImportTemplateList.js';
 import { PersonList } from './model/PersonList.js';
+
+const HIDDEN_GROUP_TITLE = 'Hidden';
 
 export class Application {
     constructor(props = {}) {
@@ -44,6 +51,8 @@ export class Application {
         if (this.props.templates) {
             this.model.templates = ImportTemplateList.create(this.props.templates);
         }
+
+        this.messageBox = null;
     }
 
     createView(ViewClass) {
@@ -60,6 +69,60 @@ export class Application {
 
     get message() {
         return this.props.message;
+    }
+
+    /**
+     * Create notification message
+     * @param {string} message - notification text
+     * @param {string} msgClass - CSS class for message box
+     */
+    createMessage(message, msgClass) {
+        if (this.messageBox) {
+            this.messageBox.destroy();
+        }
+
+        this.messageBox = Popup.create({
+            id: 'notificationPopup',
+            content: message,
+            btn: { closeBtn: true },
+            className: ['msg', msgClass],
+            nodim: true,
+            closeOnEmptyClick: true,
+        });
+
+        this.messageBox.show();
+    }
+
+    /** Create simple container element */
+    createContainer(elemClass, children, events) {
+        return ce('div', { className: elemClass }, children, events);
+    }
+
+    /** Create SVG icon element */
+    createIcon(icon, className = null) {
+        const useElem = svg('use');
+        const res = svg('svg', {}, useElem);
+        if (className) {
+            res.setAttribute('class', className);
+        }
+
+        useElem.href.baseVal = (icon) ? `#${icon}` : '';
+
+        return res;
+    }
+
+    /** Create field element from given input element */
+    createField(title, input, extraClass) {
+        const elemClasses = ['field'];
+
+        if (typeof extraClass === 'string' && extraClass.length > 0) {
+            elemClasses.push(extraClass);
+        }
+
+        return ce('div', { className: elemClasses.join(' ') }, [
+            ce('label', { textContent: title }),
+            ce('div', {}, input),
+        ]);
     }
 
     checkUserAccountModels() {
@@ -87,5 +150,70 @@ export class Application {
         persons.sort((a, b) => a.flags - b.flags);
         this.model.visiblePersons = PersonList.create(persons.getVisible());
         this.model.hiddenPersons = PersonList.create(persons.getHidden());
+    }
+
+    /** Initialize currency DropDown */
+    initCurrencyList(ddlist) {
+        if (!ddlist) {
+            return;
+        }
+
+        window.app.model.currency.forEach(
+            (curr) => ddlist.addItem({ id: curr.id, title: curr.name }),
+        );
+    }
+
+    /** Initialize acconts DropDown */
+    initAccountsList(ddlist) {
+        if (!ddlist) {
+            return;
+        }
+
+        window.app.checkUserAccountModels();
+
+        const { visibleUserAccounts, hiddenUserAccounts } = window.app.model;
+
+        visibleUserAccounts.forEach(
+            (item) => ddlist.addItem({ id: item.id, title: item.name }),
+        );
+        if (hiddenUserAccounts.length === 0) {
+            return;
+        }
+
+        const group = ddlist.addGroup(HIDDEN_GROUP_TITLE);
+        hiddenUserAccounts.forEach(
+            (item) => ddlist.addItem({
+                id: item.id,
+                title: item.name,
+                group,
+            }),
+        );
+    }
+
+    /** Initialize DropDown for debt account tile */
+    initPersonsList(ddlist) {
+        if (!ddlist) {
+            return;
+        }
+
+        window.app.checkPersonModels();
+
+        const { visiblePersons, hiddenPersons } = window.app.model;
+
+        visiblePersons.forEach(
+            (person) => ddlist.addItem({ id: person.id, title: person.name }),
+        );
+        if (hiddenPersons.length === 0) {
+            return;
+        }
+
+        const group = ddlist.addGroup(HIDDEN_GROUP_TITLE);
+        hiddenPersons.forEach(
+            (person) => ddlist.addItem({
+                id: person.id,
+                title: person.name,
+                group,
+            }),
+        );
     }
 }

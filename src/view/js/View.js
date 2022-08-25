@@ -1,8 +1,5 @@
 import { ge, copyObject, onReady } from 'jezvejs';
 import { Header } from '../Components/Header/Header.js';
-import { createMessage } from './app.js';
-
-const HIDDEN_GROUP_TITLE = 'Hidden';
 
 /**
  * Base View class
@@ -23,7 +20,7 @@ export class View {
 
         const { message } = window.app;
         if (message) {
-            createMessage(message.title, message.type);
+            window.app.createMessage(message.title, message.type);
         }
     }
 
@@ -79,70 +76,5 @@ export class View {
         }
 
         return res;
-    }
-
-    /** Initialize currency DropDown */
-    initCurrencyList(ddlist) {
-        if (!ddlist) {
-            return;
-        }
-
-        window.app.model.currency.forEach(
-            (curr) => ddlist.addItem({ id: curr.id, title: curr.name }),
-        );
-    }
-
-    /** Initialize acconts DropDown */
-    initAccountsList(ddlist) {
-        if (!ddlist) {
-            return;
-        }
-
-        window.app.checkUserAccountModels();
-
-        const { visibleUserAccounts, hiddenUserAccounts } = window.app.model;
-
-        visibleUserAccounts.forEach(
-            (item) => ddlist.addItem({ id: item.id, title: item.name }),
-        );
-        if (hiddenUserAccounts.length === 0) {
-            return;
-        }
-
-        const group = ddlist.addGroup(HIDDEN_GROUP_TITLE);
-        hiddenUserAccounts.forEach(
-            (item) => ddlist.addItem({
-                id: item.id,
-                title: item.name,
-                group,
-            }),
-        );
-    }
-
-    /** Initialize DropDown for debt account tile */
-    initPersonsList(ddlist) {
-        if (!ddlist) {
-            return;
-        }
-
-        window.app.checkPersonModels();
-
-        const { visiblePersons, hiddenPersons } = window.app.model;
-
-        visiblePersons.forEach(
-            (person) => ddlist.addItem({ id: person.id, title: person.name }),
-        );
-        if (hiddenPersons.length === 0) {
-            return;
-        }
-
-        const group = ddlist.addGroup(HIDDEN_GROUP_TITLE);
-        hiddenPersons.forEach(
-            (person) => ddlist.addItem({
-                id: person.id,
-                title: person.name,
-                group,
-            }),
-        );
     }
 }

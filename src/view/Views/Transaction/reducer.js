@@ -1,12 +1,14 @@
 import {
-    EXPENSE,
-    INCOME,
-    TRANSFER,
-    DEBT,
     normalize,
     normalizeExch,
     isValidValue,
-} from '../../js/app.js';
+} from '../../js/utils.js';
+import {
+    EXPENSE,
+    INCOME,
+    DEBT,
+    TRANSFER,
+} from '../../js/model/Transaction.js';
 
 // Action types
 const SOURCE_AMOUNT_CLICK = 'sourceAmountClick';

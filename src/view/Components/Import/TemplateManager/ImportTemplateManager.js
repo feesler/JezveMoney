@@ -11,7 +11,6 @@ import {
     DropDown,
 } from 'jezvejs';
 import { API } from '../../../js/API.js';
-import { createMessage } from '../../../js/app.js';
 import { ImportTemplateError } from '../../../js/error/ImportTemplateError.js';
 import { ImportTemplate } from '../../../js/model/ImportTemplate.js';
 import { ConfirmDialog } from '../../ConfirmDialog/ConfirmDialog.js';
@@ -329,7 +328,7 @@ export class ImportTemplateManager extends Component {
 
             this.requestTemplatesList();
         } catch (e) {
-            createMessage(e.message, 'msg_error');
+            window.app.createMessage(e.message, 'msg_error');
         }
     }
 
@@ -342,7 +341,7 @@ export class ImportTemplateManager extends Component {
             await API.importTemplate.del(id);
             this.requestTemplatesList();
         } catch (e) {
-            createMessage(e.message, 'msg_error');
+            window.app.createMessage(e.message, 'msg_error');
         }
     }
 
@@ -368,7 +367,7 @@ export class ImportTemplateManager extends Component {
 
             this.requestRulesList();
         } catch (e) {
-            createMessage(e.message, 'msg_error');
+            window.app.createMessage(e.message, 'msg_error');
         }
     }
 
@@ -386,7 +385,7 @@ export class ImportTemplateManager extends Component {
             window.app.model.rules.setData(result.data);
             this.parent.onUpdateRules();
         } catch (e) {
-            createMessage(e.message, 'msg_error');
+            window.app.createMessage(e.message, 'msg_error');
         }
     }
 

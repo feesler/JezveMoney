@@ -159,8 +159,7 @@ export const update = async (params) => {
         await checkNavigation();
         await App.view.goToUpdateAccount(pos);
         // Prepare expected state
-        const [accountId] = App.state.getAccountsByIndexes(pos);
-        let expAccount = App.state.accounts.getItem(accountId);
+        let [expAccount] = App.state.getAccountsByIndexes(pos);
         assert(expAccount, 'Can not find specified account');
         App.view.setExpectedAccount(expAccount);
         await App.view.checkState();
@@ -180,17 +179,17 @@ export const update = async (params) => {
 };
 
 export const del = async (accounts) => {
-    const itemIds = Array.isArray(accounts) ? accounts : [accounts];
+    const indexes = Array.isArray(accounts) ? accounts : [accounts];
 
-    await test(`Delete account(s) [${itemIds.join()}]`, async () => {
+    await test(`Delete account(s) [${indexes.join()}]`, async () => {
         // Navigate to accounts list view
         await checkNavigation();
         // Prepare expected state
         await App.state.fetch();
-        const ids = App.state.getAccountsByIndexes(itemIds);
+        const ids = App.state.getAccountsByIndexes(indexes, true);
         App.state.deleteAccounts(ids);
         // Perform actions on view
-        await App.view.deleteAccounts(itemIds);
+        await App.view.deleteAccounts(indexes);
         // Check state of view
         App.view.expectedState = AccountsView.render(App.state);
         await App.view.checkState();
@@ -209,7 +208,7 @@ export const delFromUpdate = async (pos) => {
         await App.view.goToUpdateAccount(ind);
         // Prepare expected state
         await App.state.fetch();
-        const ids = App.state.getAccountsByIndexes(ind);
+        const ids = App.state.getAccountsByIndexes(ind, true);
         App.state.deleteAccounts(ids);
         // Perform actions on view
         await App.view.deleteSelfItem();
@@ -234,7 +233,7 @@ export const show = async (accounts, val = true) => {
         await checkNavigation();
         // Prepare expected state
         await App.state.fetch();
-        const ids = App.state.getAccountsByIndexes(itemIds);
+        const ids = App.state.getAccountsByIndexes(itemIds, true);
         App.state.showAccounts(ids, val);
         // Perform actions on view
         if (val) {
@@ -261,7 +260,7 @@ export const exportTest = async (accounts) => {
 
         // Prepare expected content
         await App.state.fetch();
-        const ids = App.state.getAccountsByIndexes(itemIds);
+        const ids = App.state.getAccountsByIndexes(itemIds, true);
         const trList = App.state.transactions.filterByAccounts(ids);
         const transactions = trList.sortAsc();
 

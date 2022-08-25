@@ -6,7 +6,6 @@ import {
     setEvents,
     Component,
 } from 'jezvejs';
-import { createIcon } from '../../js/app.js';
 import './style.scss';
 
 const defaultProps = {
@@ -127,7 +126,7 @@ export class ModeSelector extends Component {
         const tagName = item.active ? 'b' : 'a';
 
         const elem = ce(tagName, { className: ITEM_CLASS }, [
-            ce('span', { className: 'icon' }, createIcon(item.icon, 'icon-content')),
+            ce('span', { className: 'icon' }, window.app.createIcon(item.icon, 'icon-content')),
             ce('span', { textContent: item.title }),
         ]);
         elem.setAttribute('data-mode', item.mode);

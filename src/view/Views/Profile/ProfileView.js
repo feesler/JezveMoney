@@ -1,6 +1,10 @@
 import 'jezvejs/style';
-import { ge, Popup, Checkbox } from 'jezvejs';
-import { createMessage } from '../../js/app.js';
+import {
+    ge,
+    show,
+    Popup,
+    Checkbox,
+} from 'jezvejs';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
@@ -135,6 +139,7 @@ class ProfileView extends View {
                 content: this.changeNameContent,
                 className: 'chname_popup',
             });
+            show(this.changeNameContent, true);
 
             this.changeNamePopup.setControls({
                 okBtn: { onclick: (ev) => this.onChangeNameSubmit(ev) },
@@ -204,7 +209,7 @@ class ProfileView extends View {
         }
 
         if (result.msg) {
-            createMessage(result.msg, (success) ? 'msg_success' : 'msg_error');
+            window.app.createMessage(result.msg, (success) ? 'msg_success' : 'msg_error');
         }
 
         this.changePassForm.reset();
@@ -225,6 +230,7 @@ class ProfileView extends View {
                 content: this.changePassContent,
                 className: 'chpass_popup',
             });
+            show(this.changePassContent, true);
 
             this.changePassPopup.setControls({
                 okBtn: { onclick: (ev) => this.onChangePassSubmit(ev) },
@@ -293,7 +299,7 @@ class ProfileView extends View {
         }
 
         if (result.msg) {
-            createMessage(result.msg, (success) ? 'msg_success' : 'msg_error');
+            window.app.createMessage(result.msg, (success) ? 'msg_success' : 'msg_error');
         }
 
         this.changeNameForm.reset();
@@ -312,6 +318,7 @@ class ProfileView extends View {
                 content: this.resetContent,
                 className: 'reset-dialog',
             });
+            show(this.resetContent, true);
 
             this.resetPopup.setControls({
                 okBtn: { onclick: (ev) => this.onResetSubmit(ev) },

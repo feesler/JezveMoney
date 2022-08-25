@@ -256,7 +256,7 @@ export class ImportUploadDialog extends TestComponent {
             initialAccount: { value: model.initialAccount.id.toString() },
         };
 
-        res.fileName = model.uploadFilename;
+        res.uploadFilename = model.filename;
 
         if (model.state === CREATE_TPL_STATE
             || model.state === UPDATE_TPL_STATE) {

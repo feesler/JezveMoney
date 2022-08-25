@@ -47,6 +47,10 @@ $phpPath = "$osPanelPath\modules\php\PHP_7.4"
 
     SSLCertificateFile          "%sprogdir%/userdata/config/cert_files/testsrv/testsrv.pem"
     SSLCertificateKeyFile       "%sprogdir%/userdata/config/cert_files/testsrv/testsrv-key.pem"
+11. Allow symlinks in apache config:
+   1) Open $osPanelPath\userdata\config\Apache_2.4-PHP_8.0_server.conf
+   2) Go to <Directory />
+   3) Change -FollowSymLinks option to +FollowSymLinks
 
 
 - PowerShell access rights issue:

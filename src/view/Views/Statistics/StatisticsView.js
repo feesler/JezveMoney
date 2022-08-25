@@ -85,7 +85,7 @@ class StatisticsView extends View {
                 className: 'dd__fullwidth',
             });
 
-            this.initCurrencyList(this.currencyDropDown);
+            window.app.initCurrencyList(this.currencyDropDown);
 
             if (this.state.filter.curr_id) {
                 this.currencyDropDown.selectItem(this.state.filter.curr_id);
@@ -97,7 +97,7 @@ class StatisticsView extends View {
                 className: 'dd__fullwidth',
             });
 
-            this.initAccountsList(this.accountDropDown);
+            window.app.initAccountsList(this.accountDropDown);
 
             if (this.state.filter.acc_id) {
                 this.accountDropDown.selectItem(this.state.filter.acc_id);

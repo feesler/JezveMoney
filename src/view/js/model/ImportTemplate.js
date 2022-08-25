@@ -1,4 +1,4 @@
-import { amountFix, fixFloat, timestampFromString } from '../app.js';
+import { amountFix, fixFloat, timestampFromString } from '../utils.js';
 import { ImportTemplateError } from '../error/ImportTemplateError.js';
 import { ListItem } from './ListItem.js';
 

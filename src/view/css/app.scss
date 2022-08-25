@@ -146,29 +146,28 @@ label {
   display: flex;
   flex-basis: 100%;
   width: 100%;
-  box-sizing: border-box;
   height: 2.3rem;
   font-size: 0.9rem;
   border-width: 1px;
   border-style: solid;
   padding: 0 0.5rem;
-  border-radius: 3px;
+  border-radius: 5px;
 }
 
 /* Input group */
-.input-group .input-group__btn-title {
-  font-size: 1rem;
-  min-width: var(--ig-height);
-  height: var(--ig-height);
-  line-height: var(--ig-height);
-}
+.input-group {
+  .input-group__btn-title {
+    font-size: 1rem;
+    min-width: var(--ig-height);
+    height: var(--ig-height);
+    line-height: var(--ig-height);
+  }
 
-/* DropDown attached to input group button */
-.input-group
-  .input-group__btn
-  .dd__container_enabled.dd__container_active.dd__container_attached {
-  outline: 0 none;
-  box-shadow: 0 0 0 0.25rem var(--focus-shadow);
+  /* DropDown attached to input group button */
+  .input-group__btn .dd__container_active.dd__container_attached {
+    outline: 0 none;
+    box-shadow: 0 0 0 0.25rem var(--focus-shadow);
+  }
 }
 
 /* Validation */
@@ -427,55 +426,9 @@ label {
 .dd__container,
 .dd__container_attached {
   --dd-border-width: 1px;
-}
-
-.dd__combo {
-  border-radius: 3px;
-  border-style: solid;
-  box-sizing: border-box;
-}
-
-.dd__selection-item {
-  margin: 2px 0 2px 2px;
-  padding: 0 6px 0 10px;
-  align-items: center;
-  border-radius: 3px;
-}
-
-.dd__del-selection-item-btn {
-  padding-left: 7px;
-  font-size: 1.2rem;
-  font-weight: 900;
-}
-
-.dd__single-selection {
-  font-size: 0.9rem;
-  cursor: pointer;
-  min-height: 30px;
-}
-
-.dd__container_attached .dd__list {
-  border-radius: 5px;
-}
-
-.dd__list_drop-down {
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
-}
-
-.dd__list_drop-up {
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-}
-
-.dd__list_drop-down + .dd__combo {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.dd__list_drop-up + .dd__combo {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
+  --dd-border-radius: 5px;
+  --dd-list-border-radius: 5px;
+  --dd-selection-item-border-radius: 3px;
 }
 
 .dark-theme .dd__list-item.dd__list-item_active,
@@ -492,7 +445,7 @@ label {
 /* Datepicker */
 .dp__wrapper {
   border-width: 1px;
-  border-radius: 3px;
+  border-radius: 5px;
 }
 
 /* Popup */
@@ -553,7 +506,6 @@ label {
     color: #ffffff;
     right: 0;
     padding: 15px 30px 15px 20px;
-    box-sizing: border-box;
   }
 
   &.msg_success .popup__message {

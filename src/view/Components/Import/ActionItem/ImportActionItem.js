@@ -5,7 +5,6 @@ import {
     IMPORT_ACTION_SET_ACCOUNT,
     IMPORT_ACTION_SET_PERSON,
 } from '../../../js/model/ImportAction.js';
-import { createContainer } from '../../../js/app.js';
 import './style.scss';
 
 /**
@@ -49,7 +48,7 @@ export class ImportActionItem extends Component {
         this.actionTypeLabel = ce('span', { className: 'action-item__type' });
         this.valueLabel = ce('span', { className: 'action-item__value' });
 
-        this.elem = createContainer('action-item', [
+        this.elem = window.app.createContainer('action-item', [
             this.actionTypeLabel,
             this.valueLabel,
         ]);

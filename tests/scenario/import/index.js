@@ -132,11 +132,14 @@ export const importTests = {
             App.scenario.ACC_RUB,
             App.scenario.ACC_USD,
             App.scenario.ACC_EUR,
-        ] = App.state.getAccountsByIndexes(accIndexes);
+        ] = App.state.getAccountsByIndexes(accIndexes, true);
         const personIndexes = App.state.getPersonIndexesByNames([
             'Maria', 'Alex',
         ]);
-        [App.scenario.MARIA, App.scenario.ALEX] = App.state.getPersonsByIndexes(personIndexes);
+        [
+            App.scenario.MARIA,
+            App.scenario.ALEX,
+        ] = App.state.getPersonsByIndexes(personIndexes, true);
 
         await ImportTests.checkInitialState();
         await importRuleTests.run();

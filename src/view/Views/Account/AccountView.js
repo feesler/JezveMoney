@@ -5,7 +5,7 @@ import {
     DropDown,
     DecimalInput,
 } from 'jezvejs';
-import { normalize } from '../../js/app.js';
+import { normalize } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
@@ -70,7 +70,7 @@ class AccountView extends View {
         if (!this.currencySelect) {
             throw new Error('Failed to initialize Account view');
         }
-        this.initCurrencyList(this.currencySelect);
+        window.app.initCurrencyList(this.currencySelect);
         if (this.state.original.curr_id) {
             this.currencySelect.selectItem(this.state.original.curr_id);
         }

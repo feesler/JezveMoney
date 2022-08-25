@@ -12,7 +12,6 @@ include(TPL_PATH."commonhdr.tpl");	?>
                 <div class="content_wrap">
                     <div class="heading">
                         <h1>Import</h1>
-                        <?=IconLink::render($uploadBtn)?>
                     </div>
 
 <?php   if (!$importAvailable) { ?>
@@ -21,51 +20,60 @@ include(TPL_PATH."commonhdr.tpl");	?>
 
                     <div class="content-header"<?=hidden(!$importAvailable)?>>
                         <div class="data-header">
-                            <div class="header-field account-field std_margin">
+                            <div class="header-field account-field">
                                 <label>Main account</label>
                                 <div class="header-field__content">
                                     <select id="acc_id"></select>
                                 </div>
                             </div>
                             <div class="header-actions">
-                                <?=IconLink::render([
-                                    "id" => "newItemBtn",
-                                    "title" => "Add item",
-                                    "icon" => "plus"
-                                ])?>
-                                <?=IconLink::render([
-                                    "attributes" => ["id" => "clearFormBtn", "disabled" => true],
-                                    "title" => "Delete all",
-                                    "icon" => "del"
-                                ])?>
-                            </div>
-                            <div class="header-info">
-                                <div class="header-field std_margin">
-                                    <label>Total</label>
-                                    <div class="header-field__content"><span id="trcount">0</span></div>
-                                </div>
-                                <div class="header-field std_margin">
-                                    <label>Enabled</label>
-                                    <div class="header-field__content"><span id="entrcount">0</span></div>
+                                <?=IconLink::render($uploadBtn)?>
+
+                                <div class="actions-menu">
+                                    <button id="toggleActionsMenuBtn" class="actions-menu-btn" type="button">
+                                        <?=svgIcon("ellipsis", "actions-menu-btn__icon")?>
+                                    </button>
+                                    <div id="actionsList" class="actions-menu-list" hidden>
+                                        <?=IconLink::render([
+                                            "id" => "newItemBtn",
+                                            "classNames" => "action-iconlink",
+                                            "title" => "Add item",
+                                            "icon" => "plus"
+                                        ])?>
+                                        <?=IconLink::render([
+                                            "attributes" => ["id" => "clearFormBtn", "disabled" => true],
+                                            "classNames" => "action-iconlink",
+                                            "title" => "Delete all",
+                                            "icon" => "del"
+                                        ])?>
+                                        <div class="actions-menu-list__separator"></div>
+                                        <label id="rulesCheck" class="checkbox action-checkbox">
+                                            <input type="checkbox" checked>
+                                            <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
+                                            <span class="checkbox__label">Enable rules</span>
+                                        </label>
+                                        <?=IconLink::render([
+                                            "id" => "rulesBtn",
+                                            "classNames" => "action-iconlink",
+                                            "title" => "Edit rules",
+                                            "icon" => "edit"
+                                        ])?>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="rules-container">
-                            <label id="rulesCheck" class="checkbox">
-                                <input type="checkbox" checked>
-                                <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
-                            </label>
-                            <button id="rulesBtn" class="btn link-btn" type="button">Rules (<span id="rulescount"><?=count($importRules)?></span>)</button>
+                        <div class="import-controls">
+                            <div class="items-counter">
+                                <span><span id="entrcount">0</span>&nbsp;/&nbsp;<span id="trcount">0</span> enabled</span>
+                            </div>
+                            <button id="submitbtn" class="btn submit-btn" type="button" disabled>Submit</button>
                         </div>
                     </div>
 
                     <div class="data-form"<?=hidden(!$importAvailable)?>>
                         <div id="rowsContainer" class="data-container">
                             <span class="nodata-message">No transactions to import</span>
-                        </div>
-                        <div class="import-controls std_margin">
-                            <input id="submitbtn" class="btn submit-btn" type="button" value="ok" disabled>
                         </div>
                     </div>
                 </div>

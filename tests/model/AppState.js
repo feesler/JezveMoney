@@ -90,7 +90,9 @@ function copyFields(fields, expFields) {
 export class AppState {
     constructor() {
         this.accounts = null;
+        this.userAccountsCache = null;
         this.persons = null;
+        this.personsCache = null;
         this.transactions = null;
         this.templates = null;
         this.rules = null;
@@ -108,12 +110,14 @@ export class AppState {
         }
         this.accounts.setData(state.accounts.data);
         this.accounts.autoincrement = state.accounts.autoincrement;
+        this.userAccountsCache = null;
 
         if (!this.persons) {
             this.persons = new PersonsList();
         }
         this.persons.setData(state.persons.data);
         this.persons.autoincrement = state.persons.autoincrement;
+        this.personsCache = null;
 
         if (!this.transactions) {
             this.transactions = new TransactionsList();
@@ -220,7 +224,9 @@ export class AppState {
 
     resetAll() {
         this.accounts?.reset();
+        this.userAccountsCache = null;
         this.persons?.reset();
+        this.personsCache = null;
         this.transactions?.reset();
         this.templates?.reset();
         this.rules?.reset();
@@ -368,36 +374,41 @@ export class AppState {
     }
     /* eslint-enable no-bitwise */
 
-    getAccountsByIndexes(accounts) {
-        const itemIndexes = Array.isArray(accounts) ? accounts : [accounts];
+    cacheUserAccounts() {
+        if (this.userAccountsCache) {
+            return;
+        }
 
-        const userAccounts = this.accounts.getUserAccounts();
-        userAccounts.sortByVisibility();
+        this.userAccountsCache = this.accounts.getUserAccounts();
+        this.userAccountsCache.sortByVisibility();
+    }
+
+    getAccountsByIndexes(accounts, returnIds = false) {
+        const itemIndexes = Array.isArray(accounts) ? accounts : [accounts];
+        this.cacheUserAccounts();
 
         return itemIndexes.map((ind) => {
-            const item = userAccounts.getItemByIndex(ind);
+            const item = this.userAccountsCache.getItemByIndex(ind);
             assert(item, `Invalid account index ${ind}`);
-            return item.id;
+            return (returnIds) ? item.id : item;
         });
     }
 
     getAccountIndexesByNames(accounts) {
         const accNames = Array.isArray(accounts) ? accounts : [accounts];
-
-        const userAccounts = this.accounts.getUserAccounts();
-        userAccounts.sortByVisibility();
+        this.cacheUserAccounts();
 
         return accNames.map((name) => {
-            const acc = userAccounts.findByName(name);
+            const acc = this.userAccountsCache.findByName(name);
             assert(acc, `Account '${name}' not found`);
 
-            return userAccounts.getIndexById(acc.id);
+            return this.userAccountsCache.getIndexById(acc.id);
         });
     }
 
-    getVisibleAccountByIndex(index) {
-        const userAccounts = this.accounts.getUserVisible();
-        return userAccounts.getItemByIndex(index);
+    getFirstAccount() {
+        const [account] = this.getAccountsByIndexes(0);
+        return account;
     }
 
     /**
@@ -565,35 +576,41 @@ export class AppState {
         return this.accounts.getItemByIndex(ind);
     }
 
-    getPersonsByIndexes(persons) {
-        const itemIndexes = Array.isArray(persons) ? persons : [persons];
+    cachePersons() {
+        if (this.personsCache) {
+            return;
+        }
 
-        const personsList = this.persons.clone();
-        personsList.sortByVisibility();
+        this.personsCache = this.persons.clone();
+        this.personsCache.sortByVisibility();
+    }
+
+    getPersonsByIndexes(persons, returnIds = false) {
+        const itemIndexes = Array.isArray(persons) ? persons : [persons];
+        this.cachePersons();
 
         return itemIndexes.map((ind) => {
-            const item = personsList.getItemByIndex(ind);
+            const item = this.personsCache.getItemByIndex(ind);
             assert(item, `Invalid person index ${ind}`);
-            return item.id;
+            return (returnIds) ? item.id : item;
         });
     }
 
     getPersonIndexesByNames(persons) {
         const names = Array.isArray(persons) ? persons : [persons];
-        const personsList = this.persons.clone();
-        personsList.sortByVisibility();
+        this.cachePersons();
 
         return names.map((name) => {
-            const person = this.persons.findByName(name);
+            const person = this.personsCache.findByName(name);
             assert(person, `Person '${name}' not found`);
 
-            return personsList.getIndexById(person.id);
+            return this.personsCache.getIndexById(person.id);
         });
     }
 
-    getVisiblePersonByIndex(index) {
-        const visibleList = this.persons.getVisible();
-        return visibleList.getItemByIndex(index);
+    getFirstPerson() {
+        const [person] = this.getPersonsByIndexes(0);
+        return person;
     }
 
     /**

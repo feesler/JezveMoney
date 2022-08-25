@@ -199,21 +199,11 @@ export class StatisticsView extends AppView {
         return App.view.checkState(expected);
     }
 
-    getFirstAccount() {
-        const userAccounts = App.state.accounts.getUserAccounts();
-        if (userAccounts.length === 0) {
-            return null;
-        }
-
-        const [accountId] = App.state.getAccountsByIndexes(0);
-        return userAccounts.getItem(accountId);
-    }
-
     async byAccounts() {
         this.model.filter.byCurrency = false;
         delete this.model.filter.curr_id;
 
-        const account = this.getFirstAccount();
+        const account = App.state.getFirstAccount();
         this.model.filter.acc_id = account.id;
         const expected = this.getExpectedState();
 
