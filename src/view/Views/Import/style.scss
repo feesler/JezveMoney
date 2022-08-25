@@ -100,11 +100,3 @@
   align-items: stretch;
   position: relative;
 }
-
-/* Desktop */
-@media (min-width: 768px) {
-  /* Sticky header */
-  .content-header {
-    top: 0;
-  }
-}
