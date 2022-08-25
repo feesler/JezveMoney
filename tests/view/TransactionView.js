@@ -1111,25 +1111,6 @@ export class TransactionView extends AppView {
         };
     }
 
-    getFirstAccount() {
-        const userAccounts = App.state.accounts.getUserAccounts();
-        if (userAccounts.length === 0) {
-            return null;
-        }
-
-        const [accountId] = App.state.getAccountsByIndexes(0);
-        return userAccounts.getItem(accountId);
-    }
-
-    getFirstPerson() {
-        if (App.state.persons.length === 0) {
-            return null;
-        }
-
-        const [personId] = App.state.getPersonsByIndexes(0);
-        return App.state.persons.getItem(personId);
-    }
-
     getFirstCurrency() {
         return App.currency.getItemByIndex(0);
     }
@@ -1172,7 +1153,7 @@ export class TransactionView extends AppView {
             } else if (currentType === DEBT) {
                 let fromAccount = this.model.account;
                 if (!fromAccount) {
-                    fromAccount = this.getFirstAccount();
+                    fromAccount = App.state.getFirstAccount();
                 }
 
                 this.model.state = 0;
@@ -1219,7 +1200,7 @@ export class TransactionView extends AppView {
             } else if (currentType === DEBT) {
                 let fromAccount = this.model.account;
                 if (!fromAccount) {
-                    fromAccount = this.getFirstAccount();
+                    fromAccount = App.state.getFirstAccount();
                 }
 
                 this.model.state = 0;
@@ -1256,7 +1237,7 @@ export class TransactionView extends AppView {
                 } else {
                     let scrAccount = this.model.account;
                     if (!scrAccount) {
-                        scrAccount = this.getFirstAccount();
+                        scrAccount = App.state.getFirstAccount();
                     }
 
                     this.model.srcAccount = scrAccount;
@@ -1279,10 +1260,7 @@ export class TransactionView extends AppView {
         }
 
         if (type === DEBT) {
-            const person = this.getFirstPerson();
-            this.model.person = person;
-
-            if (!isAvailableBefore) {
+            if (!isAvailableBefore && this.model.isAvailable) {
                 this.model.debtType = true;
                 this.model.srcCurr = this.getFirstCurrency();
                 this.model.src_curr_id = this.model.srcCurr.id;
@@ -1319,10 +1297,16 @@ export class TransactionView extends AppView {
                 this.model.srcCurr = this.model.destCurr;
             }
 
-            this.model.personAccount = this.getPersonAccount(
-                this.model.person?.id,
-                this.model.src_curr_id,
-            );
+            if (this.model.isAvailable) {
+                this.model.person = App.state.getFirstPerson();
+                this.model.personAccount = this.getPersonAccount(
+                    this.model.person?.id,
+                    this.model.src_curr_id,
+                );
+            } else {
+                this.model.person = null;
+                this.model.personAccount = null;
+            }
 
             if (this.model.debtType) {
                 this.model.srcAccount = this.model.personAccount;

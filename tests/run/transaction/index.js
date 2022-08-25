@@ -29,10 +29,7 @@ export const runAction = async ({ action, data }) => {
     assert(App.view.isActionAvailable(action), 'Invalid action specified');
 
     if (action === 'changeSrcAccountByPos' || action === 'changeDestAccountByPos') {
-        const ids = App.state.getAccountsByIndexes(data);
-        assert(Array.isArray(ids) && ids.length > 0, `Account (${data}) not found`);
-
-        const acc = App.state.accounts.getItem(ids[0]);
+        const [acc] = App.state.getAccountsByIndexes(data);
         assert(acc, `Account (${data}) not found`);
 
         if (action === 'changeSrcAccountByPos') {
@@ -43,10 +40,7 @@ export const runAction = async ({ action, data }) => {
     }
 
     if (action === 'changePersonByPos') {
-        const ids = App.state.getPersonsByIndexes(data);
-        assert(Array.isArray(ids) && ids.length > 0, `Person (${data}) not found`);
-
-        const person = App.state.persons.getItem(ids[0]);
+        const [person] = App.state.getPersonsByIndexes(data);
         assert(person, `Person (${data}) not found`);
 
         testDescr = `Change person to (${person.name})`;
@@ -67,10 +61,7 @@ export const runAction = async ({ action, data }) => {
                 await test('Enable account', () => App.view.toggleAccount());
             }
 
-            const ids = App.state.getAccountsByIndexes(data);
-            assert(Array.isArray(ids) && ids.length > 0, `Account (${data}) not found`);
-
-            const acc = App.state.accounts.getItem(ids[0]);
+            const [acc] = App.state.getAccountsByIndexes(data);
             assert(acc, `Account (${data}) not found`);
 
             testDescr = `Change account to (${acc.name})`;

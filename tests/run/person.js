@@ -82,8 +82,7 @@ export const update = async (params) => {
         await checkNavigation();
         await App.view.goToUpdatePerson(pos);
 
-        const ids = App.state.getPersonsByIndexes(pos);
-        const expectedPerson = App.state.persons.getItem(ids[0]);
+        const [expectedPerson] = App.state.getPersonsByIndexes(pos);
         assert(expectedPerson, 'Can not find specified person');
 
         // Check initial state of view
@@ -116,7 +115,7 @@ export const del = async (persons) => {
         // Navigate to persons list view
         await checkNavigation();
         // Prepare expected state
-        const ids = App.state.getPersonsByIndexes(persons);
+        const ids = App.state.getPersonsByIndexes(persons, true);
         App.state.deletePersons(ids);
         // Perform actions on view
         await App.view.deletePersons(persons);
@@ -136,7 +135,7 @@ export const delFromUpdate = async (pos) => {
         // Navigate to persons list view
         await checkNavigation();
         // Prepare expected state
-        const ids = App.state.getPersonsByIndexes(ind);
+        const ids = App.state.getPersonsByIndexes(ind, true);
         App.state.deletePersons(ids);
         // Perform actions on view
         await App.view.goToUpdatePerson(ind);
@@ -163,7 +162,7 @@ export const show = async (persons, val = true) => {
 
         // Check initial state
         await App.state.fetch();
-        const ids = App.state.getPersonsByIndexes(itemIds);
+        const ids = App.state.getPersonsByIndexes(itemIds, true);
         App.state.showPersons(ids, val);
         // Perform actions on view
         await App.view.showPersons(itemIds, val);

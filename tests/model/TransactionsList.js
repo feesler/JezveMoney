@@ -536,8 +536,8 @@ export class TransactionsList extends List {
             }
         } else {
             if (!accId) {
-                const [accountId] = App.state.getAccountsByIndexes(0);
-                accId = accountId;
+                const [account] = App.state.getAccountsByIndexes(0);
+                accId = account.id;
             }
             if (!accId) {
                 return null;

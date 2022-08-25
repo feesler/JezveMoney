@@ -473,30 +473,30 @@ export class ImportListItem extends TestComponent {
                 this.model.currId = this.model.mainAccount.curr_id;
             }
             this.model.personId = 0;
+            this.model.person = null;
         } else if (value === 'transferfrom' || value === 'transferto') {
             // Get first available account if was not previously selected
             if (typeBefore !== 'transferfrom' && typeBefore !== 'transferto') {
                 this.model.destId = App.state.accounts.getNext();
-                this.model.destAccount = App.state.accounts.getItem(this.model.destId);
             }
             // Get next available account if selected same as main account
-            if (this.model.destAccount
-                && this.model.destAccount.id === this.model.mainAccount.id) {
+            if (this.model.destId === this.model.mainAccount.id) {
                 this.model.destId = App.state.accounts.getNext(this.model.destId);
             }
             this.model.destAccount = App.state.accounts.getItem(this.model.destId);
             this.model.currId = this.model.destAccount.curr_id;
             this.model.personId = 0;
+            this.model.person = null;
         } else if (value === 'debtfrom' || value === 'debtto') {
-            const [personId] = App.state.getPersonsByIndexes(0);
-            this.model.personId = personId;
+            const [person] = App.state.getPersonsByIndexes(0);
+            this.model.personId = person.id;
+            this.model.person = person;
             this.model.destId = 0;
             this.model.destAccount = null;
             this.model.destAmount = '';
             this.model.currId = this.model.mainAccount.curr_id;
         }
         this.model.currency = App.currency.getItem(this.model.currId);
-        this.model.person = App.state.persons.getItem(this.model.personId);
         this.model.isDifferent = this.isDifferentCurrencies(this.model);
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
