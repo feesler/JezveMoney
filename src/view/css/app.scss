@@ -427,55 +427,9 @@ label {
 .dd__container,
 .dd__container_attached {
   --dd-border-width: 1px;
-}
-
-.dd__combo {
-  border-radius: 3px;
-  border-style: solid;
-  box-sizing: border-box;
-}
-
-.dd__selection-item {
-  margin: 2px 0 2px 2px;
-  padding: 0 6px 0 10px;
-  align-items: center;
-  border-radius: 3px;
-}
-
-.dd__del-selection-item-btn {
-  padding-left: 7px;
-  font-size: 1.2rem;
-  font-weight: 900;
-}
-
-.dd__single-selection {
-  font-size: 0.9rem;
-  cursor: pointer;
-  min-height: 30px;
-}
-
-.dd__container_attached .dd__list {
-  border-radius: 5px;
-}
-
-.dd__list_drop-down {
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
-}
-
-.dd__list_drop-up {
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-}
-
-.dd__list_drop-down + .dd__combo {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.dd__list_drop-up + .dd__combo {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
+  --dd-border-radius: 3px;
+  --dd-list-border-radius: 5px;
+  --dd-selection-item-border-radius: 3px;
 }
 
 .dark-theme .dd__list-item.dd__list-item_active,
