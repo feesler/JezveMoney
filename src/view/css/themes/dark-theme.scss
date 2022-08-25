@@ -288,12 +288,6 @@
     background-color: #444444;
   }
 
-  .import-item.import-item_disabled .extended-content {
-    color: #707070;
-    border-color: #333333;
-    background-color: #232323;
-  }
-
   .import-item select,
   .import-item input[type="text"] {
     border-color: var(--input-border-color);
@@ -310,19 +304,31 @@
     background-color: #292929;
     color: #707070;
     border-color: #707070;
-  }
 
-  .import-item_disabled select,
-  .import-item_disabled select[disabled],
-  .import-item_disabled input[type="text"],
-  .import-item_disabled input[disabled] {
-    color: var(--input-disabled-text-color);
-    border-color: var(--input-disabled-border-color);
-    background-color: var(--input-disabled-bg-color);
-  }
+    select,
+    select[disabled],
+    input[type="text"],
+    input[disabled] {
+      color: var(--input-disabled-text-color);
+      border-color: var(--input-disabled-border-color);
+      background-color: var(--input-disabled-bg-color);
+    }
 
-  .import-item_disabled input::placeholder {
-    color: #707070;
+    input::placeholder {
+      color: #707070;
+    }
+
+    .input-group__btn {
+      color: var(--input-disabled-text-color);
+      border-color: var(--input-disabled-border-color);
+      background-color: var(--input-disabled-bg-color);
+    }
+
+    .extended-content {
+      color: #707070;
+      border-color: #333333;
+      background-color: #232323;
+    }
   }
 
   .import-item select:focus,

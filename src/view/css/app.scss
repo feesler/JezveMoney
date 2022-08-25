@@ -155,19 +155,19 @@ label {
 }
 
 /* Input group */
-.input-group .input-group__btn-title {
-  font-size: 1rem;
-  min-width: var(--ig-height);
-  height: var(--ig-height);
-  line-height: var(--ig-height);
-}
+.input-group {
+  .input-group__btn-title {
+    font-size: 1rem;
+    min-width: var(--ig-height);
+    height: var(--ig-height);
+    line-height: var(--ig-height);
+  }
 
-/* DropDown attached to input group button */
-.input-group
-  .input-group__btn
-  .dd__container_enabled.dd__container_active.dd__container_attached {
-  outline: 0 none;
-  box-shadow: 0 0 0 0.25rem var(--focus-shadow);
+  /* DropDown attached to input group button */
+  .input-group__btn .dd__container_active.dd__container_attached {
+    outline: 0 none;
+    box-shadow: 0 0 0 0.25rem var(--focus-shadow);
+  }
 }
 
 /* Validation */

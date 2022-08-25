@@ -287,12 +287,6 @@
     background-color: #cccccc;
   }
 
-  .import-item.import-item_disabled .extended-content {
-    color: #a0a0a0;
-    border-color: #d0d0d0;
-    background-color: #e0e0e0;
-  }
-
   .import-item select,
   .import-item input[type="text"] {
     border-color: var(--input-border-color);
@@ -309,19 +303,31 @@
     background-color: #e8e8e8;
     color: #808080;
     border-color: #e8e8e8;
-  }
 
-  .import-item_disabled select,
-  .import-item_disabled select[disabled],
-  .import-item_disabled input[type="text"],
-  .import-item_disabled input[disabled] {
-    color: var(--input-disabled-text-color);
-    border-color: var(--input-disabled-border-color);
-    background-color: var(--input-disabled-bg-color);
-  }
+    select,
+    select[disabled],
+    input[type="text"],
+    input[disabled] {
+      color: var(--input-disabled-text-color);
+      border-color: var(--input-disabled-border-color);
+      background-color: var(--input-disabled-bg-color);
+    }
 
-  .import-item_disabled input::placeholder {
-    color: #dddddd;
+    input::placeholder {
+      color: #dddddd;
+    }
+
+    .input-group__btn {
+      color: var(--input-disabled-text-color);
+      border-color: var(--input-disabled-border-color);
+      background-color: var(--input-disabled-bg-color);
+    }
+
+    .extended-content {
+      color: #a0a0a0;
+      border-color: #d0d0d0;
+      background-color: #e0e0e0;
+    }
   }
 
   .import-item select:focus,
