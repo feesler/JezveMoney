@@ -58,7 +58,11 @@
 .tile_container {
   width: 100px;
   height: 100px;
-  padding: 8px 5px 8px 0;
+  margin: 8px 5px 8px 0;
+
+  .dd__container_attached {
+    display: inline-flex;
+  }
 }
 
 .tile-info-block {
