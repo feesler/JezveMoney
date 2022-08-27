@@ -12,3 +12,12 @@
 <link rel="stylesheet" type="text/css" href="<?=e(BASEURL.auto_version("admin/view/css/".$cssFile))?>">
 <?php	}	?>
 <link rel="stylesheet" type="text/css" href="<?=e(BASEURL."admin/view/css/themes/".$this->themeStylesheet)?>">
+<script>
+    window.appProps = <?=(isset($appProps) ? $appProps : "{}")?>;
+</script>
+<?php	foreach($this->jsArr as $jsFile) {	?>
+<script defer="defer" type="text/javascript" src="<?=e(BASEURL.auto_version("view/js/".$jsFile))?>"></script>
+<?php	}	?>
+<?php	foreach($this->jsAdmin as $jsFile) {	?>
+<script defer="defer" type="text/javascript" src="<?=e(BASEURL.auto_version("admin/view/js/".$jsFile))?>"></script>
+<?php	}	?>
