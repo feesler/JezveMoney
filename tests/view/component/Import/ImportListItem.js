@@ -7,6 +7,7 @@ import {
     input,
     isVisible,
     assert,
+    isFunction,
     copyObject,
     formatDate,
 } from 'jezve-test';
@@ -26,6 +27,8 @@ import {
 } from '../../../common.js';
 import { App } from '../../../Application.js';
 
+const sourceTransactionTypes = ['expense', 'transferfrom', 'debtfrom'];
+
 export class ImportListItem extends TestComponent {
     constructor(parent, elem, mainAccount) {
         super(parent, elem);
@@ -38,12 +41,9 @@ export class ImportListItem extends TestComponent {
     mapField(field) {
         const fieldsMap = {
             typeField: 'Type',
-            amountField: 'Amount',
-            destAmountField: [
-                'Source amount',
-                'Destination amount',
-            ],
-            destAccountField: [
+            srcAmountField: (f) => f.name === 'src_amount[]',
+            destAmountField: (f) => f.name === 'dest_amount[]',
+            transferAccountField: [
                 'Source account',
                 'Destination account',
             ],
@@ -59,7 +59,8 @@ export class ImportListItem extends TestComponent {
             const fieldLabel = fieldsMap[fieldName];
             if (
                 (typeof fieldLabel === 'string' && fieldLabel === field.title)
-                || (fieldLabel.includes(field.title))
+                || (Array.isArray(fieldLabel) && fieldLabel.includes(field.title))
+                || (isFunction(fieldLabel) && fieldLabel(field))
             ) {
                 res = { name: fieldName, component: field };
                 break;
@@ -99,6 +100,7 @@ export class ImportListItem extends TestComponent {
         if (!dropDownElem || inputGroup) {
             res.inputElem = await query(elem, 'input[type=text]');
             assert(res.inputElem, 'Invalid structure of field');
+            res.name = await prop(res.inputElem, 'name');
             res.disabled = await prop(res.inputElem, 'disabled');
             res.value = await prop(res.inputElem, 'value');
         }
@@ -162,9 +164,9 @@ export class ImportListItem extends TestComponent {
 
         assert(
             res.typeField
-            && res.amountField
+            && res.srcAmountField
             && res.destAmountField
-            && res.destAccountField
+            && res.transferAccountField
             && res.personField
             && res.dateField
             && res.commentField
@@ -188,25 +190,6 @@ export class ImportListItem extends TestComponent {
         }
     }
 
-    isDifferentCurrencies(model) {
-        assert(ImportTransaction.getTypeById(model.type), 'Invalid transaction type');
-
-        if (model.type === 'expense' || model.type === 'income') {
-            if (!model.currency) {
-                return false;
-            }
-
-            return (model.mainAccount.curr_id !== model.currency.id);
-        }
-
-        if (model.type === 'transferfrom' || model.type === 'transferto') {
-            return (model.mainAccount.curr_id !== model.destAccount.curr_id);
-        }
-
-        // 'debtfrom' or 'debtto'
-        return false;
-    }
-
     async buildModel(cont) {
         const res = {};
 
@@ -215,22 +198,52 @@ export class ImportListItem extends TestComponent {
 
         res.enabled = cont.enabled;
         res.type = cont.typeField.value;
-        res.amount = cont.amountField.value;
+        res.srcAmount = cont.srcAmountField.value;
         res.destAmount = cont.destAmountField.value;
 
-        res.destId = cont.destAccountField.value;
-        res.destAccount = App.state.accounts.getItem(res.destId);
+        if (sourceTransactionTypes.includes(res.type)) {
+            res.sourceId = res.mainAccount.id;
+            res.srcCurrId = res.mainAccount.curr_id;
+        } else {
+            res.destId = res.mainAccount.id;
+            res.destCurrId = res.mainAccount.curr_id;
+        }
 
-        res.personId = cont.personField.value;
-        res.person = App.state.persons.getItem(res.personId);
+        if (res.type === 'expense') {
+            res.destCurrId = parseInt(cont.destAmountField.dropDown.value, 10);
+        } else if (res.type === 'income') {
+            res.srcCurrId = parseInt(cont.srcAmountField.dropDown.value, 10);
+        } else if (res.type === 'transferfrom' || res.type === 'transferto') {
+            const accId = cont.transferAccountField.value;
+            res.transferAccount = App.state.accounts.getItem(accId);
+            assert(res.transferAccount, 'Transfer account not found');
 
-        res.currId = cont.destAmountField.dropDown.value;
-        res.currency = App.currency.getItem(res.currId);
+            if (res.type === 'transferfrom') {
+                res.destId = res.transferAccount.id;
+                res.destCurrId = res.transferAccount.curr_id;
+            } else if (res.type === 'transferto') {
+                res.sourceId = res.transferAccount.id;
+                res.srcCurrId = res.transferAccount.curr_id;
+            }
+        } else if (res.type === 'debtfrom' || res.type === 'debtto') {
+            res.personId = cont.personField.value;
+            res.person = App.state.persons.getItem(res.personId);
+            assert(res.person, 'Person not found');
+
+            if (res.type === 'debtfrom') {
+                res.destCurrId = res.srcCurrId;
+            } else if (res.type === 'debtto') {
+                res.srcCurrId = res.destCurrId;
+            }
+        }
+
+        res.srcCurrency = App.currency.getItem(res.srcCurrId);
+        res.destCurrency = App.currency.getItem(res.destCurrId);
 
         res.date = cont.dateField.value;
         res.comment = cont.commentField.value;
 
-        res.isDifferent = this.isDifferentCurrencies(res);
+        res.isDifferent = (res.srcCurrId !== res.destCurrId);
 
         res.invalidated = await isVisible(cont.invFeedback.elem, true);
         res.imported = await isVisible(cont.toggleBtn, true);
@@ -249,9 +262,13 @@ export class ImportListItem extends TestComponent {
     }
 
     getExpectedState(model) {
-        const isExpenseOrIncome = (model.type === 'expense' || model.type === 'income');
+        const isExpense = (model.type === 'expense');
+        const isIncome = (model.type === 'income');
         const isTransfer = (model.type === 'transferfrom' || model.type === 'transferto');
         const isDebt = (model.type === 'debtfrom' || model.type === 'debtto');
+
+        const showSrcAmount = (isExpense && model.isDifferent) || !isExpense;
+        const showDestAmount = isExpense || (!isExpense && model.isDifferent);
 
         const res = {
             enabled: model.enabled,
@@ -259,21 +276,21 @@ export class ImportListItem extends TestComponent {
                 disabled: !model.enabled,
                 visible: true,
             },
-            amountField: {
-                disabled: !model.enabled,
-                visible: true,
+            srcAmountField: {
+                disabled: !(model.enabled && showSrcAmount),
+                visible: showSrcAmount,
                 dropDown: {
-                    disabled: !(model.enabled && isExpenseOrIncome && !model.isDifferent),
+                    disabled: !(model.enabled && isIncome),
                 },
             },
             destAmountField: {
-                disabled: !(model.enabled && model.isDifferent && !isDebt),
-                visible: model.isDifferent && !isDebt,
+                disabled: !(model.enabled && showDestAmount),
+                visible: showDestAmount,
                 dropDown: {
-                    disabled: !(model.enabled && isExpenseOrIncome && model.isDifferent),
+                    disabled: !(model.enabled && isExpense),
                 },
             },
-            destAccountField: {
+            transferAccountField: {
                 disabled: !(model.enabled && isTransfer),
                 visible: isTransfer,
             },
@@ -297,17 +314,23 @@ export class ImportListItem extends TestComponent {
         if (!res.typeField.disabled) {
             res.typeField.value = model.type.toString();
         }
-        if (!res.amountField.disabled) {
-            res.amountField.value = model.amount.toString();
+        if (!res.srcAmountField.disabled) {
+            res.srcAmountField.value = model.srcAmount.toString();
+        }
+        if (!res.srcAmountField.dropDown.disabled) {
+            res.srcAmountField.dropDown.value = model.srcCurrId.toString();
         }
         if (!res.destAmountField.disabled) {
             res.destAmountField.value = model.destAmount.toString();
         }
         if (!res.destAmountField.dropDown.disabled) {
-            res.destAmountField.dropDown.value = model.currId.toString();
+            res.destAmountField.dropDown.value = model.destCurrId.toString();
         }
-        if (!res.destAccountField.disabled) {
-            res.destAccountField.value = model.destId.toString();
+        if (!res.transferAccountField.disabled) {
+            const transferAccountId = (model.type === 'transferfrom')
+                ? model.destId
+                : model.sourceId;
+            res.transferAccountField.value = transferAccountId.toString();
         }
         if (!res.personField.disabled) {
             res.personField.value = model.personId.toString();
@@ -325,46 +348,39 @@ export class ImportListItem extends TestComponent {
             res.src_id = model.mainAccount.id;
             res.dest_id = 0;
             res.src_curr = model.mainAccount.curr_id;
-            res.dest_curr = model.currency.id;
-            res.src_amount = normalize(model.amount);
+            res.dest_curr = model.destCurrency.id;
+            res.dest_amount = normalize(model.destAmount);
+            if (model.isDifferent) {
+                res.src_amount = normalize(model.srcAmount);
+            } else {
+                res.src_amount = res.dest_amount;
+            }
+        } else if (res.type === INCOME) {
+            res.src_id = 0;
+            res.dest_id = model.mainAccount.id;
+            res.src_curr = model.srcCurrency.id;
+            res.dest_curr = model.mainAccount.curr_id;
+            res.src_amount = normalize(model.srcAmount);
             if (model.isDifferent) {
                 res.dest_amount = normalize(model.destAmount);
             } else {
                 res.dest_amount = res.src_amount;
             }
-        } else if (res.type === INCOME) {
-            res.src_id = 0;
-            res.dest_id = model.mainAccount.id;
-            res.src_curr = model.currency.id;
-            res.dest_curr = model.mainAccount.curr_id;
-            res.dest_amount = normalize(model.amount);
-            if (model.isDifferent) {
-                res.src_amount = normalize(model.destAmount);
-            } else {
-                res.src_amount = res.dest_amount;
-            }
         } else if (res.type === TRANSFER) {
-            assert(model.destAccount, 'Account not found');
+            assert(model.transferAccount, 'Account not found');
 
             const isFrom = (model.type === 'transferfrom');
-            const srcAccount = (isFrom) ? model.mainAccount : model.destAccount;
-            const destAccount = (isFrom) ? model.destAccount : model.mainAccount;
+            const srcAccount = (isFrom) ? model.mainAccount : model.transferAccount;
+            const destAccount = (isFrom) ? model.transferAccount : model.mainAccount;
 
             res.src_id = srcAccount.id;
             res.dest_id = destAccount.id;
             res.src_curr = srcAccount.curr_id;
             res.dest_curr = destAccount.curr_id;
-            if (isFrom) {
-                res.src_amount = normalize(model.amount);
-                res.dest_amount = (model.isDifferent)
-                    ? normalize(model.destAmount)
-                    : res.src_amount;
-            } else {
-                res.dest_amount = normalize(model.amount);
-                res.src_amount = (model.isDifferent)
-                    ? normalize(model.destAmount)
-                    : res.dest_amount;
-            }
+            res.src_amount = normalize(model.srcAmount);
+            res.dest_amount = (model.isDifferent)
+                ? normalize(model.destAmount)
+                : res.src_amount;
         } else if (res.type === DEBT) {
             assert(model.person, 'Person not found');
 
@@ -373,7 +389,7 @@ export class ImportListItem extends TestComponent {
             res.op = (model.type === 'debtto') ? 1 : 2;
             res.src_curr = model.mainAccount.curr_id;
             res.dest_curr = model.mainAccount.curr_id;
-            res.src_amount = normalize(model.amount);
+            res.src_amount = normalize(model.srcAmount);
             res.dest_amount = res.src_amount;
         }
 
@@ -390,29 +406,52 @@ export class ImportListItem extends TestComponent {
 
         res.mainAccount = App.state.accounts.findByName(res.original.mainAccount);
         assert(res.mainAccount, `Account ${res.original.mainAccount} not found`);
+        const mainAccountCurrency = App.currency.getItem(res.mainAccount.curr_id);
+        assert(mainAccountCurrency, `Currency ${res.mainAccount.curr_id} not found`);
 
-        const amount = parseFloat(fixFloat(res.original.accountAmount));
-        const destAmount = parseFloat(fixFloat(res.original.transactionAmount));
-        res.type = (amount > 0) ? 'income' : 'expense';
-        res.amount = Math.abs(amount);
-        res.destId = 0;
-        res.destAccount = null;
+        const accAmount = parseFloat(fixFloat(res.original.accountAmount));
+        const trAmount = parseFloat(fixFloat(res.original.transactionAmount));
+        res.type = (accAmount > 0) ? 'income' : 'expense';
+        if (res.type === 'expense') {
+            res.sourceId = res.mainAccount.id;
+            res.destId = 0;
+            res.destAmount = Math.abs(trAmount);
+            res.srcCurrId = mainAccountCurrency.id;
+        } else if (res.type === 'income') {
+            res.sourceId = 0;
+            res.destId = res.mainAccount.id;
+            res.srcAmount = Math.abs(trAmount);
+            res.destCurrId = mainAccountCurrency.id;
+        }
+
+        res.transferAccount = null;
         if (res.original.accountCurrency === res.original.transactionCurrency) {
-            res.currId = res.mainAccount.curr_id;
-            res.destAmount = '';
+            if (res.type === 'expense') {
+                res.destCurrId = mainAccountCurrency.id;
+                res.srcAmount = '';
+            } else if (res.type === 'income') {
+                res.srcCurrId = mainAccountCurrency.id;
+                res.destAmount = '';
+            }
         } else {
             const currency = App.currency.findByName(res.original.transactionCurrency);
             assert(currency, `Currency ${res.original.transactionCurrency} not found`);
-            res.currId = currency.id;
-            res.destAmount = Math.abs(destAmount);
+            if (res.type === 'expense') {
+                res.destCurrId = currency.id;
+                res.srcAmount = Math.abs(accAmount);
+            } else if (res.type === 'income') {
+                res.srcCurrId = currency.id;
+                res.destAmount = Math.abs(accAmount);
+            }
         }
 
-        res.currency = App.currency.getItem(res.currId);
+        res.srcCurrency = App.currency.getItem(res.srcCurrId);
+        res.destCurrency = App.currency.getItem(res.destCurrId);
         res.personId = 0;
         res.person = null;
         res.date = res.original.date;
         res.comment = res.original.comment;
-        res.isDifferent = this.isDifferentCurrencies(res);
+        res.isDifferent = (res.srcCurrId !== res.destCurrId);
         res.invalidated = false;
 
         return res;
@@ -440,21 +479,47 @@ export class ImportListItem extends TestComponent {
 
         res.mainAccount = App.state.accounts.getItem(value);
         assert(res.mainAccount, `Invalid account ${value}`);
+        const mainAccountCurrency = App.currency.getItem(res.mainAccount.curr_id);
+        assert(mainAccountCurrency, `Currency ${res.mainAccount.curr_id} not found`);
 
-        if (((res.type === 'expense' || res.type === 'income')
-            && !res.isDifferent)
-            || (res.type === 'debtfrom' || res.type === 'debtto')
-        ) {
-            res.currId = res.mainAccount.curr_id;
-        } else if (res.type === 'transferfrom' || res.type === 'transferto') {
-            if (res.destAccount && res.destAccount.id === res.mainAccount.id) {
-                res.destId = App.state.accounts.getNext(res.destId);
-            }
-            res.destAccount = App.state.accounts.getItem(res.destId);
-            res.currId = res.destAccount.curr_id;
+        if (sourceTransactionTypes.includes(res.type)) {
+            res.sourceId = res.mainAccount.id;
+            res.srcCurrId = res.mainAccount.curr_id;
+        } else {
+            res.destId = res.mainAccount.id;
+            res.destCurrId = res.mainAccount.curr_id;
         }
-        res.currency = App.currency.getItem(res.currId);
-        res.isDifferent = this.isDifferentCurrencies(res);
+
+        if (res.type === 'expense' && !res.isDifferent) {
+            res.destCurrId = res.srcCurrId;
+        }
+        if (res.type === 'income' && !res.isDifferent) {
+            res.srcCurrId = res.destCurrId;
+        }
+        if (res.type === 'transferfrom' || res.type === 'transferto') {
+            if (res.transferAccount && res.transferAccount.id === res.mainAccount.id) {
+                const accId = App.state.accounts.getNext(res.mainAccount.id);
+                res.transferAccount = App.state.accounts.getItem(accId);
+
+                if (res.type === 'transferfrom') {
+                    res.destId = res.transferAccount.id;
+                    res.destCurrId = res.transferAccount.curr_id;
+                } else {
+                    res.sourceId = res.transferAccount.id;
+                    res.srcCurrId = res.transferAccount.curr_id;
+                }
+            }
+        }
+        if (res.type === 'debtfrom') {
+            res.destCurrId = res.srcCurrId;
+        }
+        if (res.type === 'debtto') {
+            res.srcCurrId = res.destCurrId;
+        }
+
+        res.srcCurrency = App.currency.getItem(res.srcCurrId);
+        res.destCurrency = App.currency.getItem(res.destCurrId);
+        res.isDifferent = (res.srcCurrId !== res.destCurrId);
 
         return res;
     }
@@ -464,40 +529,113 @@ export class ImportListItem extends TestComponent {
 
         const typeBefore = this.model.type;
         const isDiffBefore = this.model.isDifferent;
+        const before = {
+            sourceId: this.model.sourceId,
+            destId: this.model.destId,
+            srcCurrId: this.model.srcCurrId,
+            destCurrId: this.model.destCurrId,
+        };
         this.model.type = value;
-        if (value === 'expense' || value === 'income') {
+
+        if (sourceTransactionTypes.includes(value)) {
+            this.model.sourceId = this.model.mainAccount.id;
+            this.model.srcCurrId = this.model.mainAccount.curr_id;
+        } else {
+            this.model.destId = this.model.mainAccount.id;
+            this.model.destCurrId = this.model.mainAccount.curr_id;
+        }
+
+        if (value === 'expense') {
             this.model.destId = 0;
-            this.model.destAccount = null;
-            this.model.destAmount = '';
-            if (!isDiffBefore || (typeBefore !== 'expense' && typeBefore !== 'income')) {
-                this.model.currId = this.model.mainAccount.curr_id;
+            this.model.transferAccount = null;
+
+            if (!(typeBefore === 'income' && isDiffBefore)) {
+                this.model.destAmount = this.model.srcAmount;
+                this.model.destCurrId = this.model.mainAccount.curr_id;
             }
+            if (typeBefore === 'income') {
+                this.model.destCurrId = before.srcCurrId;
+            }
+
             this.model.personId = 0;
             this.model.person = null;
-        } else if (value === 'transferfrom' || value === 'transferto') {
-            // Get first available account if was not previously selected
-            if (typeBefore !== 'transferfrom' && typeBefore !== 'transferto') {
-                this.model.destId = App.state.accounts.getNext();
+        } else if (value === 'income') {
+            this.model.sourceId = 0;
+            this.model.transferAccount = null;
+
+            if (typeBefore === 'expense' && !isDiffBefore) {
+                this.model.srcAmount = this.model.destAmount;
             }
-            // Get next available account if selected same as main account
-            if (this.model.destId === this.model.mainAccount.id) {
-                this.model.destId = App.state.accounts.getNext(this.model.destId);
+            if (typeBefore === 'expense') {
+                this.model.srcCurrId = before.destCurrId;
             }
-            this.model.destAccount = App.state.accounts.getItem(this.model.destId);
-            this.model.currId = this.model.destAccount.curr_id;
+            if (typeBefore !== 'expense' || !isDiffBefore) {
+                this.model.srcCurrId = this.model.mainAccount.curr_id;
+            }
+
+            this.model.personId = 0;
+            this.model.person = null;
+        } else if (value === 'transferfrom') {
+            if (typeBefore === 'expense') {
+                this.model.srcAmount = this.model.destAmount;
+            }
+
+            let accId = before.destId;
+            if (!accId) {
+                const account = App.state.getFirstAccount();
+                accId = account.id;
+            }
+            if (accId === this.model.mainAccount.id) {
+                accId = App.state.accounts.getNext(accId);
+            }
+            this.model.transferAccount = App.state.accounts.getItem(accId);
+
+            this.model.destId = this.model.transferAccount.id;
+            this.model.destCurrId = this.model.transferAccount.curr_id;
+
+            this.model.personId = 0;
+            this.model.person = null;
+        } else if (value === 'transferto') {
+            if (typeBefore === 'expense') {
+                this.model.srcAmount = this.model.destAmount;
+            }
+
+            let accId = before.sourceId;
+            if (!accId) {
+                const account = App.state.getFirstAccount();
+                accId = account.id;
+            }
+            if (accId === this.model.mainAccount.id) {
+                accId = App.state.accounts.getNext(accId);
+            }
+            this.model.transferAccount = App.state.accounts.getItem(accId);
+
+            this.model.sourceId = this.model.transferAccount.id;
+            this.model.srcCurrId = this.model.transferAccount.curr_id;
+
             this.model.personId = 0;
             this.model.person = null;
         } else if (value === 'debtfrom' || value === 'debtto') {
-            const [person] = App.state.getPersonsByIndexes(0);
+            if (typeBefore === 'expense') {
+                this.model.srcAmount = this.model.destAmount;
+            }
+
+            if (value === 'debtfrom') {
+                this.model.destId = 0;
+            } else {
+                this.model.sourceId = 0;
+            }
+
+            const person = App.state.getFirstPerson();
             this.model.personId = person.id;
             this.model.person = person;
-            this.model.destId = 0;
-            this.model.destAccount = null;
-            this.model.destAmount = '';
-            this.model.currId = this.model.mainAccount.curr_id;
+            this.model.srcCurrId = this.model.mainAccount.curr_id;
+            this.model.destCurrId = this.model.mainAccount.curr_id;
+            this.model.transferAccount = null;
         }
-        this.model.currency = App.currency.getItem(this.model.currId);
-        this.model.isDifferent = this.isDifferentCurrencies(this.model);
+        this.model.srcCurrency = App.currency.getItem(this.model.srcCurrId);
+        this.model.destCurrency = App.currency.getItem(this.model.destCurrId);
+        this.model.isDifferent = (this.model.srcCurrId !== this.model.destCurrId);
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
@@ -507,22 +645,33 @@ export class ImportListItem extends TestComponent {
         return this.checkState();
     }
 
-    async changeDestAccount(value) {
-        this.checkEnabled(this.content.destAccountField);
+    async changeTransferAccount(value) {
+        const transferTypes = ['transferfrom', 'transferto'];
+        assert(transferTypes.includes(this.model.type), `Invalid transaction type: ${this.model.type}`);
+
+        this.checkEnabled(this.content.transferAccountField);
 
         const accountId = parseInt(value, 10);
         assert(accountId, `Invalid account id: ${value}`);
         assert(this.model.mainAccount.id !== accountId, `Can't select same account as main: ${value}`);
 
-        this.model.destId = value;
-        this.model.destAccount = App.state.accounts.getItem(value);
-        this.model.currId = this.model.destAccount.curr_id;
-        this.model.currency = App.currency.getItem(this.model.currId);
-        this.model.isDifferent = this.isDifferentCurrencies(this.model);
+        this.model.transferAccount = App.state.accounts.getItem(value);
+
+        if (this.model.type === 'transferfrom') {
+            this.model.destId = this.model.transferAccount.id;
+            this.model.destCurrId = this.model.transferAccount.curr_id;
+        } else {
+            this.model.sourceId = this.model.transferAccount.id;
+            this.model.srcCurrId = this.model.transferAccount.curr_id;
+        }
+
+        this.model.srcCurrency = App.currency.getItem(this.model.srcCurrId);
+        this.model.destCurrency = App.currency.getItem(this.model.destCurrId);
+        this.model.isDifferent = (this.model.srcCurrId !== this.model.destCurrId);
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.content.destAccountField.dropDown.selectItem(value);
+        await this.content.transferAccountField.dropDown.selectItem(value);
         await this.parse();
 
         return this.checkState();
@@ -542,14 +691,14 @@ export class ImportListItem extends TestComponent {
         return this.checkState();
     }
 
-    async inputAmount(value) {
-        this.checkEnabled(this.content.amountField);
+    async inputSourceAmount(value) {
+        this.checkEnabled(this.content.srcAmountField);
 
-        this.model.amount = value;
+        this.model.srcAmount = value;
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
-        await input(this.content.amountField.inputElem, value);
+        await input(this.content.srcAmountField.inputElem, value);
         await this.parse();
 
         return this.checkState();
@@ -568,16 +717,33 @@ export class ImportListItem extends TestComponent {
         return this.checkState();
     }
 
-    async changeCurrency(value) {
-        const dropDown = (this.model.isDifferent)
-            ? this.content.destAmountField.dropDown
-            : this.content.amountField.dropDown;
+    async changeSourceCurrency(value) {
+        assert(this.model.type === 'income', `Invalid transaction type: ${this.model.type}`);
 
+        const { dropDown } = this.content.srcAmountField;
         this.checkEnabled(dropDown);
 
-        this.model.currId = value;
-        this.model.currency = App.currency.getItem(value);
-        this.model.isDifferent = this.isDifferentCurrencies(this.model);
+        this.model.srcCurrId = parseInt(value, 10);
+        this.model.srcCurrency = App.currency.getItem(value);
+        this.model.isDifferent = (this.model.srcCurrId !== this.model.destCurrId);
+        this.model.invalidated = false;
+        this.expectedState = this.getExpectedState(this.model);
+
+        await dropDown.selectItem(value);
+        await this.parse();
+
+        return this.checkState();
+    }
+
+    async changeDestCurrency(value) {
+        assert(this.model.type === 'expense', `Invalid transaction type: ${this.model.type}`);
+
+        const { dropDown } = this.content.destAmountField;
+        this.checkEnabled(dropDown);
+
+        this.model.destCurrId = parseInt(value, 10);
+        this.model.destCurrency = App.currency.getItem(value);
+        this.model.isDifferent = (this.model.srcCurrId !== this.model.destCurrId);
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
@@ -628,13 +794,39 @@ export class ImportListItem extends TestComponent {
         const trType = ImportTransaction.getTypeById(item.type);
         assert(trType, `Unknown import transaction type: ${item.type}`);
 
-        const isDifferent = (item.src_curr !== item.dest_curr);
+        const isExpense = (item.type === 'expense');
+        const isIncome = (item.type === 'income');
+        const isTransfer = (item.type === 'transferfrom' || item.type === 'transferto');
+        const isDebt = (item.type === 'debtfrom' || item.type === 'debtto');
+        const isDiff = (item.src_curr !== item.dest_curr);
+
+        const showSrcAmount = (isExpense && isDiff) || !isExpense;
+        const showDestAmount = isExpense || (!isExpense && isDiff);
+
         const res = {
             enabled: item.enabled,
             typeField: { disabled: !item.enabled },
-            amountField: {
-                disabled: !item.enabled,
-                dropDown: {},
+            srcAmountField: {
+                disabled: !(item.enabled && showSrcAmount),
+                visible: showSrcAmount,
+                dropDown: {
+                    disabled: !(item.enabled && isIncome),
+                },
+            },
+            destAmountField: {
+                disabled: !(item.enabled && showDestAmount),
+                visible: showDestAmount,
+                dropDown: {
+                    disabled: !(item.enabled && isExpense),
+                },
+            },
+            transferAccountField: {
+                disabled: !(item.enabled && isTransfer),
+                visible: isTransfer,
+            },
+            personField: {
+                visible: isDebt,
+                disabled: !(item.enabled && isDebt),
             },
             dateField: {
                 value: item.date,
@@ -646,78 +838,30 @@ export class ImportListItem extends TestComponent {
             },
         };
 
-        res.typeField.value = item.type;
-        if (item.type === 'expense') {
-            res.amountField.value = item.src_amount.toString();
+        if (!res.typeField.disabled) {
+            res.typeField.value = item.type.toString();
+        }
+        if (!res.srcAmountField.disabled) {
+            res.srcAmountField.value = item.src_amount.toString();
+        }
+        if (!res.srcAmountField.dropDown.disabled) {
+            res.srcAmountField.dropDown.value = item.src_curr.toString();
+        }
+        if (!res.destAmountField.disabled) {
+            res.destAmountField.value = item.dest_amount.toString();
+        }
+        if (!res.destAmountField.dropDown.disabled) {
+            res.destAmountField.dropDown.value = item.dest_curr.toString();
+        }
+        if (!res.transferAccountField.disabled) {
+            const transferAccountId = (item.type === 'transferfrom')
+                ? item.dest_id
+                : item.src_id;
 
-            res.destAmountField = {
-                disabled: (item.enabled) ? !isDifferent : true,
-                dropDown: {
-                    disabled: (item.enabled) ? !isDifferent : true,
-                },
-            };
-            if (!res.destAmountField.disabled) {
-                res.destAmountField.value = (isDifferent) ? item.dest_amount.toString() : '';
-                res.destAmountField.dropDown.value = item.dest_curr.toString();
-            }
-
-            res.destAccountField = { disabled: true };
-
-            res.personField = { disabled: true };
-        } else if (item.type === 'income') {
-            res.amountField.value = item.dest_amount.toString();
-            // Use destination account and amount fields as source for income
-            res.destAmountField = {
-                disabled: (item.enabled) ? !isDifferent : true,
-                dropDown: {
-                    disabled: (item.enabled) ? !isDifferent : true,
-                },
-            };
-            if (!res.destAmountField.disabled) {
-                res.destAmountField.value = (isDifferent) ? item.src_amount.toString() : '';
-                res.destAmountField.dropDown.value = item.src_curr.toString();
-            }
-
-            res.destAccountField = { disabled: true };
-
-            res.personField = { disabled: true };
-        } else if (item.type === 'transferfrom' || item.type === 'transferto') {
-            const isFrom = (item.type === 'transferfrom');
-
-            res.amountField.value = ((isFrom) ? item.src_amount : item.dest_amount).toString();
-
-            res.destAmountField = {
-                disabled: (item.enabled) ? !isDifferent : true,
-                dropDown: {
-                    disabled: true,
-                },
-            };
-            if (!res.destAmountField.disabled) {
-                res.destAmountField.value = (isDifferent)
-                    ? ((isFrom) ? item.dest_amount : item.src_amount).toString()
-                    : '';
-            }
-
-            res.destAccountField = { disabled: !item.enabled };
-            if (!res.destAccountField.disabled) {
-                res.destAccountField.value = ((isFrom) ? item.dest_id : item.src_id).toString();
-            }
-
-            res.personField = { disabled: true };
-        } else if (item.type === 'debtfrom' || item.type === 'debtto') {
-            res.amountField.value = item.src_amount.toString();
-            res.destAmountField = {
-                disabled: true,
-                dropDown: {
-                    disabled: true,
-                },
-            };
-            res.destAccountField = { disabled: true };
-
-            res.personField = { disabled: !item.enabled };
-            if (!res.personField.disabled) {
-                res.personField.value = item.person_id.toString();
-            }
+            res.transferAccountField.value = transferAccountId.toString();
+        }
+        if (!res.personField.disabled) {
+            res.personField.value = item.person_id.toString();
         }
 
         return res;

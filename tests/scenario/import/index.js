@@ -12,6 +12,7 @@ let csvStatement = null;
 let uploadFilename = null;
 
 const runSubmitImportTests = async () => {
+    setBlock('Submit import transactions', 1);
     await ImportTests.submit();
     // Verify submit is disabled for empty list
     setBlock('Verify submit is disabled for empty list', 2);
@@ -25,16 +26,16 @@ const runSubmitImportTests = async () => {
     // Zero amount
     await ImportTests.updateItem({
         pos: 0,
-        action: { action: 'inputAmount', data: '0' },
+        action: { action: 'inputDestAmount', data: '0' },
     });
     await ImportTests.submit();
 
-    // Valid amount, different currencies and empty dest amount
+    // Valid amount, different currencies and empty source amount
     await ImportTests.updateItem({
         pos: 0,
         action: [
-            { action: 'inputAmount', data: '1' },
-            { action: 'changeCurrency', data: App.scenario.USD },
+            { action: 'inputDestAmount', data: '1' },
+            { action: 'changeDestCurrency', data: App.scenario.USD },
         ],
     });
     await ImportTests.submit();
@@ -43,7 +44,7 @@ const runSubmitImportTests = async () => {
     await ImportTests.updateItem({
         pos: 0,
         action: [
-            { action: 'inputDestAmount', data: '2' },
+            { action: 'inputSourceAmount', data: '2' },
             { action: 'inputDate', data: '' },
         ],
     });
@@ -155,6 +156,7 @@ export const importTests = {
         await importTemplateTests.run();
 
         // Convert transactions with invalid main account
+        setBlock('Upload CSV with invalid account', 2);
         await ImportTests.submitUploaded({
             data: csvStatement,
             account: App.scenario.ACC_USD,

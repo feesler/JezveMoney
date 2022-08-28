@@ -209,7 +209,7 @@ export class ImportRuleForm extends TestComponent {
         }
 
         if (ImportCondition.isTemplateField(fieldType)) {
-            const template = App.state.template.getItemByIndex(0);
+            const template = App.state.templates.getItemByIndex(0);
             assert(template, 'No template available');
 
             return template.id;

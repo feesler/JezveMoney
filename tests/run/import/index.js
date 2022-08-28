@@ -188,9 +188,7 @@ export const submitUploaded = async (params) => {
             await App.view.selectUploadEncoding(params.encode);
         }
 
-        await App.view.submitUploaded(importData);
-
-        return App.view.checkState();
+        return App.view.submitUploaded(importData);
     });
 };
 /** Change main account */
@@ -353,11 +351,12 @@ export const updateItem = async (params) => {
 
     const actDescr = {
         changeType: 'Change transaction type',
-        changeDestAccount: 'Change second account',
+        changeTransferAccount: 'Change transfer account',
         changePerson: 'Change person',
-        inputAmount: 'Input amount',
-        inputDestAmount: 'Input second amount',
-        changeCurrency: 'Change currency',
+        inputSourceAmount: 'Input source amount',
+        inputDestAmount: 'Input destination amount',
+        changeSourceCurrency: 'Change source currency',
+        changeDestCurrency: 'Change destination currency',
         inputDate: 'Input date',
         inputComment: 'Input comment',
     };
@@ -366,12 +365,12 @@ export const updateItem = async (params) => {
     for (const action of actions) {
         let descr;
 
-        if (action.action === 'changeCurrency') {
+        if (action.action === 'changeSourceCurrency' || action.action === 'changeDestCurrency') {
             const currency = App.currency.getItem(action.data);
             assert(currency, `Currency (${action.data}) not found`);
 
             descr = `${actDescr[action.action]} to '${currency.name}'`;
-        } else if (action.action === 'changeDestAccount') {
+        } else if (action.action === 'changeTransferAccount') {
             const userAccounts = App.state.accounts.getUserVisible();
             const account = userAccounts.getItem(action.data);
             assert(account, `Account (${action.data}) not found`);
