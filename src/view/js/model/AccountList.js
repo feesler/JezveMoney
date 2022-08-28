@@ -40,23 +40,30 @@ export class AccountList extends List {
     }
 
     /**
-     * Return identifier of another account if possible
-     * Return zero account can't be found
+     * Returns another account if possible
+     * Returns null if account can't be found
      * @param {number} accountId - identifier of account to start looking from
      */
-    getNextAccount(accountId) {
-        if (!Array.isArray(this.data) || this.length < 2 || !accountId) {
-            return 0;
+    getNextAccount(accountId = 0) {
+        if (!Array.isArray(this.data) || this.length === 0) {
+            return null;
         }
 
-        let pos = this.getItemIndex(accountId);
-        if (pos === -1) {
-            return 0;
+        if (accountId === 0) {
+            return this.getItemByIndex(0);
+        }
+        if (this.length < 2) {
+            return null;
         }
 
-        pos = ((pos === this.length - 1) ? 0 : pos + 1);
+        let index = this.getItemIndex(accountId);
+        if (index === -1) {
+            return null;
+        }
 
-        return this.data[pos].id;
+        index = (index === this.length - 1) ? 0 : index + 1;
+
+        return this.getItemByIndex(index);
     }
 
     /**

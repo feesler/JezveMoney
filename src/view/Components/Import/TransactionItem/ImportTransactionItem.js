@@ -14,16 +14,13 @@ import {
     DecimalInput,
     InputGroup,
 } from 'jezvejs';
-import {
-    fixFloat,
-} from '../../../js/utils.js';
+import { fixFloat } from '../../../js/utils.js';
 import {
     EXPENSE,
     INCOME,
     TRANSFER,
     DEBT,
 } from '../../../js/model/Transaction.js';
-import { AccountList } from '../../../js/model/AccountList.js';
 import './style.scss';
 
 /** Fields */
@@ -504,59 +501,6 @@ export class ImportTransactionItem extends Component {
         this.render();
     }
 
-    /**
-     * Return for specified state first available user account different from main account
-     * @param {Object} state - state object
-     */
-    getFirstAvailAccount(state) {
-        const userAccountsData = window.app.model.accounts
-            .getUserAccounts(this.state.mainAccount.owner_id);
-        const userAccounts = new AccountList(userAccountsData);
-        const visibleAccounts = userAccounts.getVisible();
-        let [res] = visibleAccounts;
-
-        if (res.id === state.mainAccount.id) {
-            [, res] = visibleAccounts;
-        }
-
-        return res;
-    }
-
-    /**
-     * Return next available user account different from specified
-     * @param {number} accountId - account id to find next account for
-     */
-    getNextAccount(accountId) {
-        // TODO : refactor with userAccounts model of Application
-        const userAccountsData = window.app.model.accounts
-            .getUserAccounts(this.state.mainAccount.owner_id);
-        const userAccounts = new AccountList(userAccountsData);
-        const visibleAccountsData = userAccounts.getVisible();
-        const userVisible = new AccountList(visibleAccountsData);
-
-        if (!userVisible.length) {
-            return null;
-        }
-
-        if (!accountId) {
-            return userVisible.getItemByIndex(0);
-        }
-
-        if (userVisible.length < 2) {
-            return null;
-        }
-
-        const ind = userVisible.getItemIndex(accountId);
-        if (ind === -1 || ind === null) {
-            return null;
-        }
-
-        const resInd = (ind === userVisible.length - 1) ? 0 : ind + 1;
-        const res = userVisible.getItemByIndex(resInd);
-
-        return res;
-    }
-
     /** Transaction type select 'change' event handler */
     onTrTypeChanged(type) {
         this.setTransactionType(type.id);
@@ -660,6 +604,7 @@ export class ImportTransactionItem extends Component {
         if (this.state.type === value) {
             return this.state;
         }
+        const { userAccounts } = window.app.model;
         const state = copyObject(this.state);
         if (sourceTypes.includes(value)) {
             state.sourceAccountId = state.mainAccount.id;
@@ -707,26 +652,15 @@ export class ImportTransactionItem extends Component {
                 state.sourceAmount = this.state.destAmount;
             }
 
-            let transferAccountId = this.state.destAccountId;
-            let transferAccountCurrId = this.state.destCurrId;
-            if (!transferAccountId) {
-                const transferAccount = this.getFirstAvailAccount(state);
-                if (!transferAccount) {
-                    throw new Error('Account not found');
-                }
-                transferAccountId = transferAccount.id;
-                transferAccountCurrId = transferAccount.curr_id;
-            } else if (state.sourceAccountId === state.destAccountId) {
-                const nextAccount = this.getNextAccount(state.mainAccount.id);
-                if (!nextAccount) {
-                    throw new Error('Account not found');
-                }
-                transferAccountId = nextAccount.id;
-                transferAccountCurrId = nextAccount.curr_id;
+            let transferAccount = userAccounts.getItem(this.state.destAccountId);
+            if (!transferAccount) {
+                transferAccount = userAccounts.getNextAccount();
             }
-
-            state.destAccountId = transferAccountId;
-            state.destCurrId = transferAccountCurrId;
+            if (transferAccount.id === state.mainAccount.id) {
+                transferAccount = userAccounts.getNextAccount(transferAccount.id);
+            }
+            state.destAccountId = transferAccount.id;
+            state.destCurrId = transferAccount.curr_id;
         } else if (value === 'transferto') {
             state.personId = 0;
             // Copy destination amount to source amount
@@ -735,26 +669,15 @@ export class ImportTransactionItem extends Component {
                 state.sourceAmount = this.state.destAmount;
             }
 
-            let transferAccountId = this.state.sourceAccountId;
-            let transferAccountCurrId = this.state.srcCurrId;
-            if (!transferAccountId) {
-                const transferAccount = this.getFirstAvailAccount(state);
-                if (!transferAccount) {
-                    throw new Error('Account not found');
-                }
-                transferAccountId = transferAccount.id;
-                transferAccountCurrId = transferAccount.curr_id;
-            } else if (state.sourceAccountId === state.destAccountId) {
-                const nextAccount = this.getNextAccount(state.mainAccount.id);
-                if (!nextAccount) {
-                    throw new Error('Account not found');
-                }
-                transferAccountId = nextAccount.id;
-                transferAccountCurrId = nextAccount.curr_id;
+            let transferAccount = userAccounts.getItem(this.state.sourceAccountId);
+            if (!transferAccount) {
+                transferAccount = userAccounts.getNextAccount();
             }
-
-            state.sourceAccountId = transferAccountId;
-            state.srcCurrId = transferAccountCurrId;
+            if (transferAccount.id === state.mainAccount.id) {
+                transferAccount = userAccounts.getNextAccount(transferAccount.id);
+            }
+            state.sourceAccountId = transferAccount.id;
+            state.srcCurrId = transferAccount.curr_id;
         } else if (value === 'debtfrom' || value === 'debtto') {
             // Copy destination amount to source amount
             // if previous type was expense
@@ -888,7 +811,8 @@ export class ImportTransactionItem extends Component {
             }
         } else if (state.type === 'transferfrom' || state.type === 'transferto') {
             if (state.sourceAccountId === state.destAccountId) {
-                const nextAccount = this.getNextAccount(state.mainAccount.id);
+                const { userAccounts } = window.app.model;
+                const nextAccount = userAccounts.getNextAccount(state.mainAccount.id);
                 if (state.type === 'transferfrom') {
                     state.destAccountId = nextAccount.id;
                     state.destCurrId = nextAccount.curr_id;
