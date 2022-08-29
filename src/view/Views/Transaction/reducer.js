@@ -167,12 +167,10 @@ const setStateDestAmount = (state, amount) => {
 
 const setStateNextSourceAccount = (state, accountId) => {
     const { userAccounts } = window.app.model;
-    const accountModel = window.app.model.accounts;
     const currencyModel = window.app.model.currency;
     const result = state;
 
-    const nextAccountId = userAccounts.getNextAccount(accountId);
-    const srcAccount = accountModel.getItem(nextAccountId);
+    const srcAccount = userAccounts.getNextAccount(accountId);
     if (!srcAccount) {
         throw new Error('Next account not found');
     }
@@ -184,12 +182,10 @@ const setStateNextSourceAccount = (state, accountId) => {
 
 const setStateNextDestAccount = (state, accountId) => {
     const { userAccounts } = window.app.model;
-    const accountModel = window.app.model.accounts;
     const currencyModel = window.app.model.currency;
     const result = state;
 
-    const nextAccountId = userAccounts.getNextAccount(accountId);
-    const destAccount = accountModel.getItem(nextAccountId);
+    const destAccount = userAccounts.getNextAccount(accountId);
     if (!destAccount) {
         throw new Error('Next account not found');
     }

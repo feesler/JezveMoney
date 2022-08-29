@@ -110,7 +110,7 @@ export class List {
     getItemIndex(itemId) {
         const id = parseInt(itemId, 10);
         if (!id) {
-            return null;
+            return -1;
         }
 
         return this.data.findIndex((item) => item && item.id === id);

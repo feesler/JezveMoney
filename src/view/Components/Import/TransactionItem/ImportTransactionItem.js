@@ -14,24 +14,19 @@ import {
     DecimalInput,
     InputGroup,
 } from 'jezvejs';
-import {
-    fixFloat,
-} from '../../../js/utils.js';
+import { fixFloat } from '../../../js/utils.js';
 import {
     EXPENSE,
     INCOME,
     TRANSFER,
     DEBT,
 } from '../../../js/model/Transaction.js';
-import { AccountList } from '../../../js/model/AccountList.js';
 import './style.scss';
 
 /** Fields */
 const TITLE_FIELD_AMOUNT = 'Amount';
-const PH_FIELD_AMOUNT = 'Amount';
 const TITLE_FIELD_SRC_AMOUNT = 'Source amount';
 const TITLE_FIELD_DEST_AMOUNT = 'Destination amount';
-const PH_FIELD_DEST_AMOUNT = 'Destination amount';
 const TITLE_FIELD_DATE = 'Date';
 const PH_FIELD_DATE = 'Date';
 const TITLE_FIELD_COMMENT = 'Comment';
@@ -50,8 +45,9 @@ const COL_ACC_AMOUNT = 'Acc. amount';
 const COL_ACC_CURRENCY = 'Acc. currency';
 /** Validation messages */
 const MSG_INCORRECT_AMOUNT = 'Please input correct amount';
-const MSG_INCORRECT_SEC_AMOUNT = 'Please input correct second amount';
 const MSG_INVALID_DATE = 'Please input correct date';
+
+const sourceTypes = ['expense', 'transferfrom', 'debtfrom'];
 
 /**
  * ImportTransactionItem component
@@ -83,17 +79,14 @@ export class ImportTransactionItem extends Component {
             mainAccount,
             enabled: true,
             type: 'expense',
-            accountId: mainAccount.id,
-            accountCurrId: mainAccount.curr_id,
-            secondAccountId: 0,
-            secondAccountCurrId: 0,
-            secondAccountVisible: false,
-            currId: mainAccount.curr_id,
+            sourceAccountId: mainAccount.id,
+            destAccountId: 0,
+            srcCurrId: mainAccount.curr_id,
+            destCurrId: mainAccount.curr_id,
             isDiff: false,
-            amount: '',
-            secondAmount: '',
+            sourceAmount: '',
+            destAmount: '',
             personId: 0,
-            personVisible: false,
             date: formatDate(new Date()),
             comment: '',
         };
@@ -107,7 +100,7 @@ export class ImportTransactionItem extends Component {
         this.createTypeField();
         this.createAccountField();
         this.createPersonField();
-        this.createAmountField();
+        this.createSourceAmountField();
         this.createDestAmountField();
 
         // Date field
@@ -152,11 +145,11 @@ export class ImportTransactionItem extends Component {
         this.formContainer = window.app.createContainer('form-container', [
             window.app.createContainer('form-rows type-col', [
                 this.trTypeField,
-                this.destAccountField,
+                this.transferAccountField,
                 this.personField,
             ]),
             window.app.createContainer('form-rows amount-col', [
-                this.amountField,
+                this.srcAmountField,
                 this.destAmountField,
             ]),
             window.app.createContainer('form-rows', [
@@ -231,15 +224,15 @@ export class ImportTransactionItem extends Component {
     /** Create destination(second) account field */
     createAccountField() {
         const selectElem = ce('select');
-        this.destAccountField = window.app.createField(TITLE_FIELD_DEST_ACCOUNT, selectElem);
-        this.destAccountLabel = this.destAccountField.querySelector('label');
+        this.transferAccountField = window.app.createField(TITLE_FIELD_DEST_ACCOUNT, selectElem);
+        this.transferAccountLabel = this.transferAccountField.querySelector('label');
 
-        this.destAccDropDown = DropDown.create({
+        this.transferAccDropDown = DropDown.create({
             elem: selectElem,
             disabled: true,
-            onchange: (account) => this.onDestChanged(account),
+            onchange: (account) => this.onTransferAccountChanged(account),
         });
-        window.app.initAccountsList(this.destAccDropDown);
+        window.app.initAccountsList(this.transferAccDropDown);
     }
 
     /** Create person field */
@@ -255,43 +248,45 @@ export class ImportTransactionItem extends Component {
         window.app.initPersonsList(this.personDropDown);
     }
 
-    /** Create amount field */
-    createAmountField() {
-        this.amountInp = ce('input', {
+    /** Create source amount field */
+    createSourceAmountField() {
+        this.srcAmountInp = ce('input', {
             className: 'input-group__input stretch-input amount-input',
             type: 'text',
-            name: 'amount[]',
-            placeholder: PH_FIELD_AMOUNT,
+            name: 'src_amount[]',
+            disabled: true,
+            placeholder: TITLE_FIELD_AMOUNT,
             autocomplete: 'off',
         });
-        this.amountDecimalInput = DecimalInput.create({
-            elem: this.amountInp,
+        this.srcAmountDecimalInput = DecimalInput.create({
+            elem: this.srcAmountInp,
             digits: 2,
-            oninput: () => this.onAmountInput(),
+            oninput: () => this.onSrcAmountInput(),
         });
 
-        this.currencySign = ce('div', { className: 'input-group__btn-title' });
-        this.currencyBtn = ce('button', {
+        this.srcCurrencySign = ce('div', { className: 'input-group__btn-title' });
+        this.srcCurrencyBtn = ce('button', {
             type: 'button',
             className: 'input-group__btn',
             tabIndex: -1,
-        }, this.currencySign);
+        }, this.srcCurrencySign);
 
-        this.currencyDropDown = DropDown.create({
-            elem: this.currencySign,
+        this.srcCurrencyDropDown = DropDown.create({
+            elem: this.srcCurrencySign,
             listAttach: true,
-            onchange: (currency) => this.onCurrChanged(currency),
+            onchange: (currency) => this.onSrcCurrChanged(currency),
         });
-        window.app.initCurrencyList(this.currencyDropDown);
+        window.app.initCurrencyList(this.srcCurrencyDropDown);
 
-        this.amountGroup = InputGroup.create({
-            children: [this.amountInp, this.currencyBtn],
+        this.srcAmountGroup = InputGroup.create({
+            children: [this.srcAmountInp, this.srcCurrencyBtn],
         });
-        this.amountField = window.app.createField(
+        this.srcAmountField = window.app.createField(
             TITLE_FIELD_AMOUNT,
-            this.amountGroup.elem,
+            this.srcAmountGroup.elem,
             'amount-field',
         );
+        this.srcAmountLabel = this.srcAmountField.querySelector('label');
     }
 
     /** Create destination amount field */
@@ -300,8 +295,7 @@ export class ImportTransactionItem extends Component {
             className: 'input-group__input stretch-input amount-input',
             type: 'text',
             name: 'dest_amount[]',
-            disabled: true,
-            placeholder: PH_FIELD_DEST_AMOUNT,
+            placeholder: TITLE_FIELD_DEST_AMOUNT,
             autocomplete: 'off',
         });
         this.destAmountDecimalInput = DecimalInput.create({
@@ -320,7 +314,7 @@ export class ImportTransactionItem extends Component {
         this.destCurrencyDropDown = DropDown.create({
             elem: this.destCurrencySign,
             listAttach: true,
-            onchange: (currency) => this.onCurrChanged(currency),
+            onchange: (currency) => this.onDestCurrChanged(currency),
         });
         window.app.initCurrencyList(this.destCurrencyDropDown);
 
@@ -409,8 +403,8 @@ export class ImportTransactionItem extends Component {
             throw new Error('Currency must be the same as main account');
         }
 
-        const amount = parseFloat(fixFloat(data.accountAmount));
-        if (Number.isNaN(amount) || amount === 0) {
+        const accAmount = parseFloat(fixFloat(data.accountAmount));
+        if (Number.isNaN(accAmount) || accAmount === 0) {
             throw new Error('Invalid account amount value');
         }
         const trAmount = parseFloat(fixFloat(data.transactionAmount));
@@ -418,15 +412,24 @@ export class ImportTransactionItem extends Component {
             throw new Error('Invalid transaction amount value');
         }
 
-        if (amount > 0) {
+        if (accAmount > 0) {
             this.invertTransactionType();
         }
 
-        this.setAmount(Math.abs(amount));
-        if (this.data.transactionCurrencyId !== this.data.accountCurrencyId) {
-            this.setCurrency(this.data.transactionCurrencyId);
-            this.setSecondAmount(Math.abs(trAmount));
+        if (this.state.type === 'expense') {
+            this.setDestAmount(Math.abs(trAmount));
+            if (this.data.transactionCurrencyId !== this.data.accountCurrencyId) {
+                this.setDestCurrency(this.data.transactionCurrencyId);
+                this.setSourceAmount(Math.abs(accAmount));
+            }
+        } else if (this.state.type === 'income') {
+            this.setSourceAmount(Math.abs(trAmount));
+            if (this.data.transactionCurrencyId !== this.data.accountCurrencyId) {
+                this.setSourceCurrency(this.data.transactionCurrencyId);
+                this.setDestAmount(Math.abs(accAmount));
+            }
         }
+
         this.setDate(formatDate(new Date(this.data.date)));
         this.setComment(this.data.comment);
     }
@@ -437,8 +440,8 @@ export class ImportTransactionItem extends Component {
 
         this.setTransactionType('expense');
         this.setMainAccount(this.data.origAccount.id);
-        this.setCurrency(this.data.origAccount.curr_id);
-        this.setAmount(0);
+        this.setDestCurrency(this.data.origAccount.curr_id);
+        this.setSourceAmount(0);
 
         this.setOriginal(this.data);
 
@@ -498,58 +501,6 @@ export class ImportTransactionItem extends Component {
         this.render();
     }
 
-    /**
-     * Return for specified state first available user account different from main account
-     * @param {Object} state - state object
-     */
-    getFirstAvailAccount(state) {
-        const userAccountsData = window.app.model.accounts
-            .getUserAccounts(this.state.mainAccount.owner_id);
-        const userAccounts = new AccountList(userAccountsData);
-        const visibleAccounts = userAccounts.getVisible();
-        let [res] = visibleAccounts;
-
-        if (res.id === state.accountId) {
-            [, res] = visibleAccounts;
-        }
-
-        return res;
-    }
-
-    /**
-     * Return next available user account different from specified
-     * @param {number} accountId - account id to find next account for
-     */
-    getNextAccount(accountId) {
-        const userAccountsData = window.app.model.accounts
-            .getUserAccounts(this.state.mainAccount.owner_id);
-        const userAccounts = new AccountList(userAccountsData);
-        const visibleAccountsData = userAccounts.getVisible();
-        const userVisible = new AccountList(visibleAccountsData);
-
-        if (!userVisible.length) {
-            return null;
-        }
-
-        if (!accountId) {
-            return userVisible.getItemByIndex(0);
-        }
-
-        if (userVisible.length < 2) {
-            return null;
-        }
-
-        const ind = userVisible.getItemIndex(accountId);
-        if (ind === -1 || ind === null) {
-            return null;
-        }
-
-        const resInd = (ind === userVisible.length - 1) ? 0 : ind + 1;
-        const res = userVisible.getItemByIndex(resInd);
-
-        return res;
-    }
-
     /** Transaction type select 'change' event handler */
     onTrTypeChanged(type) {
         this.setTransactionType(type.id);
@@ -558,18 +509,18 @@ export class ImportTransactionItem extends Component {
     }
 
     /** Destination account select 'change' event handler */
-    onDestChanged(account) {
-        this.setSecondAccount(account.id);
+    onTransferAccountChanged(account) {
+        this.setTransferAccount(account.id);
         this.clearInvalid();
         this.render();
     }
 
-    /** Synchronize options of destination account select */
-    syncDestAccountSelect(state) {
-        const accountItems = this.destAccDropDown.getVisibleItems();
+    /** Synchronize options of transfer account select */
+    syncTransferAccountSelect(state) {
+        const accountItems = this.transferAccDropDown.getVisibleItems();
         accountItems.forEach((accountItem) => {
             const isMainAccount = accountItem.id === state.accountId;
-            this.destAccDropDown.enableItem(accountItem.id, !isMainAccount);
+            this.transferAccDropDown.enableItem(accountItem.id, !isMainAccount);
         });
     }
 
@@ -580,10 +531,10 @@ export class ImportTransactionItem extends Component {
         this.render();
     }
 
-    /** Amount field 'input' event handler */
-    onAmountInput() {
-        const { value } = this.amountInp;
-        this.setAmount(value);
+    /** Source amount field 'input' event handler */
+    onSrcAmountInput() {
+        const { value } = this.srcAmountInp;
+        this.setSourceAmount(value);
         this.clearInvalid();
         this.render();
     }
@@ -591,14 +542,21 @@ export class ImportTransactionItem extends Component {
     /** Destination amount field 'input' event handler */
     onDestAmountInput() {
         const { value } = this.destAmountInp;
-        this.setSecondAmount(value);
+        this.setDestAmount(value);
         this.clearInvalid();
         this.render();
     }
 
     /** Currency select 'change' event handler */
-    onCurrChanged(currency) {
-        this.setCurrency(currency.id);
+    onSrcCurrChanged(currency) {
+        this.setSourceCurrency(currency.id);
+        this.clearInvalid();
+        this.render();
+    }
+
+    /** Currency select 'change' event handler */
+    onDestCurrChanged(currency) {
+        this.setDestCurrency(currency.id);
         this.clearInvalid();
         this.render();
     }
@@ -619,6 +577,24 @@ export class ImportTransactionItem extends Component {
         this.render();
     }
 
+    /** Check currencies is different and return new state */
+    checkStateCurrencies(state) {
+        const res = {
+            ...state,
+            isDiff: state.srcCurrId !== state.destCurrId,
+        };
+
+        if (!res.isDiff) {
+            if (res.type === 'expense') {
+                res.sourceAmount = '';
+            } else {
+                res.destAmount = '';
+            }
+        }
+
+        return res;
+    }
+
     /** Set type of transaction */
     setTransactionType(value) {
         if (typeof value !== 'string' || !(value in this.transTypeMap)) {
@@ -628,36 +604,93 @@ export class ImportTransactionItem extends Component {
         if (this.state.type === value) {
             return this.state;
         }
+        const { userAccounts } = window.app.model;
         const state = copyObject(this.state);
+        if (sourceTypes.includes(value)) {
+            state.sourceAccountId = state.mainAccount.id;
+            state.srcCurrId = state.mainAccount.curr_id;
+        } else {
+            state.destAccountId = state.mainAccount.id;
+            state.destCurrId = state.mainAccount.curr_id;
+        }
 
-        if (value === 'expense' || value === 'income') {
+        if (value === 'expense') {
             state.personId = 0;
-            state.personVisible = false;
-            state.secondAccountId = 0;
-            state.secondAccountVisible = false;
+            state.destAccountId = 0;
+            // Copy source amount to destination amount if previous type was
+            // not income with different currencies
+            if (!(state.type === 'income' && state.isDiff)) {
+                state.destAmount = this.state.sourceAmount;
+                state.destCurrId = state.mainAccount.curr_id;
+            }
+            // Keep previous currencies from income
+            if (state.type === 'income') {
+                state.destCurrId = this.state.srcCurrId;
+            }
+        } else if (value === 'income') {
+            state.personId = 0;
+            state.sourceAccountId = 0;
+            // Copy destination amount to source amount
+            // if previous type was expense with same currencies
+            if (state.type === 'expense' && !state.isDiff) {
+                state.sourceAmount = this.state.destAmount;
+            }
+            // Keep currencies from expense
+            if (state.type === 'expense') {
+                state.srcCurrId = this.state.destCurrId;
+            }
+            // Set source currency same as main account if currencies was the same or
+            // previous type was not expense
+            if (state.type !== 'expense' || !state.isDiff) {
+                state.srcCurrId = state.mainAccount.curr_id;
+            }
+        } else if (value === 'transferfrom') {
+            state.personId = 0;
+            // Copy destination amount to source amount
+            // if previous type was expense
+            if (state.type === 'expense') {
+                state.sourceAmount = this.state.destAmount;
+            }
 
-            if (!state.isDiff
-                || (value === 'expense' && state.type !== 'income')
-                || (value === 'income' && state.type !== 'expense')) {
-                state.currId = state.accountCurrId;
+            let transferAccount = userAccounts.getItem(this.state.destAccountId);
+            if (!transferAccount) {
+                transferAccount = userAccounts.getNextAccount();
             }
-        } else if (value === 'transferfrom' || value === 'transferto') {
+            if (transferAccount.id === state.mainAccount.id) {
+                transferAccount = userAccounts.getNextAccount(transferAccount.id);
+            }
+            state.destAccountId = transferAccount.id;
+            state.destCurrId = transferAccount.curr_id;
+        } else if (value === 'transferto') {
             state.personId = 0;
-            state.personVisible = false;
-            state.secondAccountVisible = true;
-            if (!state.secondAccountId) {
-                const secondAccount = this.getFirstAvailAccount(state);
-                if (!secondAccount) {
-                    throw new Error('Account not found');
-                }
-                state.secondAccountId = secondAccount.id;
-                state.secondAccountCurrId = secondAccount.curr_id;
+            // Copy destination amount to source amount
+            // if previous type was expense
+            if (state.type === 'expense') {
+                state.sourceAmount = this.state.destAmount;
             }
-            state.currId = state.secondAccountCurrId;
+
+            let transferAccount = userAccounts.getItem(this.state.sourceAccountId);
+            if (!transferAccount) {
+                transferAccount = userAccounts.getNextAccount();
+            }
+            if (transferAccount.id === state.mainAccount.id) {
+                transferAccount = userAccounts.getNextAccount(transferAccount.id);
+            }
+            state.sourceAccountId = transferAccount.id;
+            state.srcCurrId = transferAccount.curr_id;
         } else if (value === 'debtfrom' || value === 'debtto') {
-            state.secondAccountId = 0;
-            state.secondAccountVisible = false;
-            state.personVisible = true;
+            // Copy destination amount to source amount
+            // if previous type was expense
+            if (state.type === 'expense') {
+                state.sourceAmount = this.state.destAmount;
+            }
+
+            if (value === 'debtfrom') {
+                state.destAccountId = 0;
+            } else {
+                state.sourceAccountId = 0;
+            }
+
             if (!state.personId) {
                 const person = window.app.model.persons.getItemByIndex(0);
                 if (!person) {
@@ -665,16 +698,14 @@ export class ImportTransactionItem extends Component {
                 }
                 state.personId = person.id;
             }
-            state.currId = state.accountCurrId;
-        }
-        state.isDiff = state.currId !== state.accountCurrId;
-        if (!state.isDiff) {
-            state.secondAmount = '';
+            state.srcCurrId = state.mainAccount.curr_id;
+            state.destCurrId = state.mainAccount.curr_id;
         }
         state.type = value;
 
-        this.state = state;
-        return state;
+        const res = this.checkStateCurrencies(state);
+        this.state = res;
+        return res;
     }
 
     /** Invert type of transaction */
@@ -699,29 +730,48 @@ export class ImportTransactionItem extends Component {
         return this.setTransactionType(typeValue);
     }
 
-    /** Set currency */
-    setCurrency(value) {
-        if (typeof value === 'undefined') {
-            throw new Error('Invalid currency value');
+    /** Set source currency */
+    setSourceCurrency(value) {
+        if (this.state.type !== 'income') {
+            throw new Error('Invalid state');
         }
+
         const selectedCurr = parseInt(value, 10);
         if (Number.isNaN(selectedCurr)) {
             throw new Error('Invalid currency selected');
         }
 
-        if (this.state.currId === selectedCurr) {
+        if (this.state.srcCurrId === selectedCurr) {
+            return this.state;
+        }
+        const state = copyObject(this.state);
+        state.srcCurrId = selectedCurr;
+
+        const res = this.checkStateCurrencies(state);
+        this.state = res;
+        return res;
+    }
+
+    /** Set destination currency */
+    setDestCurrency(value) {
+        if (this.state.type !== 'expense') {
+            throw new Error('Invalid state');
+        }
+
+        const selectedCurr = parseInt(value, 10);
+        if (Number.isNaN(selectedCurr)) {
+            throw new Error('Invalid currency selected');
+        }
+
+        if (this.state.destCurrId === selectedCurr) {
             return this.state;
         }
         const state = copyObject(this.state);
 
-        state.currId = selectedCurr;
-        state.isDiff = state.accountCurrId !== state.currId;
-        if (!state.isDiff) {
-            state.secondAmount = '';
-        }
-
-        this.state = state;
-        return state;
+        state.destCurrId = selectedCurr;
+        const res = this.checkStateCurrencies(state);
+        this.state = res;
+        return res;
     }
 
     /** Set main account */
@@ -737,9 +787,15 @@ export class ImportTransactionItem extends Component {
         const state = {
             ...this.state,
             mainAccount: account,
-            accountId: account.id,
-            accountCurrId: account.curr_id,
         };
+
+        if (sourceTypes.includes(state.type)) {
+            state.sourceAccountId = account.id;
+            state.srcCurrId = account.curr_id;
+        } else {
+            state.destAccountId = account.id;
+            state.destCurrId = account.curr_id;
+        }
 
         if (this.data) {
             this.data.mainAccount = account.id;
@@ -747,57 +803,69 @@ export class ImportTransactionItem extends Component {
 
         if (state.type === 'expense' || state.type === 'income') {
             if (!state.isDiff) {
-                state.currId = state.accountCurrId;
+                if (state.type === 'expense') {
+                    state.destCurrId = state.srcCurrId;
+                } else {
+                    state.srcCurrId = state.destCurrId;
+                }
             }
         } else if (state.type === 'transferfrom' || state.type === 'transferto') {
-            if (state.secondAccountId === state.accountId) {
-                const secondAccount = this.getNextAccount(state.secondAccountId);
-                state.secondAccountId = secondAccount.id;
-                state.secondAccountCurrId = secondAccount.curr_id;
+            if (state.sourceAccountId === state.destAccountId) {
+                const { userAccounts } = window.app.model;
+                const nextAccount = userAccounts.getNextAccount(state.mainAccount.id);
+                if (state.type === 'transferfrom') {
+                    state.destAccountId = nextAccount.id;
+                    state.destCurrId = nextAccount.curr_id;
+                } else {
+                    state.sourceAccountId = nextAccount.id;
+                    state.srcCurrId = nextAccount.curr_id;
+                }
             }
-            state.currId = state.secondAccountCurrId;
         } else if (state.type === 'debtfrom' || state.type === 'debtto') {
-            state.currId = state.accountCurrId;
-        }
-        state.isDiff = state.accountCurrId !== state.currId;
-        if (!state.isDiff) {
-            state.secondAmount = '';
+            if (state.type === 'debtfrom') {
+                state.destCurrId = state.srcCurrId;
+            } else {
+                state.srcCurrId = state.destCurrId;
+            }
         }
 
-        this.state = state;
-        return state;
+        const res = this.checkStateCurrencies(state);
+        this.state = res;
+        return res;
     }
 
-    /** Set second account */
-    setSecondAccount(value) {
+    /** Set transfer account */
+    setTransferAccount(value) {
         const account = window.app.model.accounts.getItem(value);
         if (!account) {
             throw new Error('Account not found');
         }
-
-        if (this.state.secondAccountId === account.id) {
+        const transferAccountId = (this.state.type === 'transferfrom')
+            ? this.state.destAccountId
+            : this.state.sourceAccountId;
+        if (transferAccountId === account.id) {
             return this.state;
         }
 
-        // Can't set second account same as main account
+        // Can't set transfer account same as main account
         if (this.state.mainAccount.id === account.id) {
             throw new Error('Can\'t set second account same as main account');
         }
 
         const state = {
             ...this.state,
-            secondAccountId: account.id,
-            secondAccountCurrId: account.curr_id,
-            currId: account.curr_id,
         };
-        state.isDiff = state.accountCurrId !== state.currId;
-        if (!state.isDiff) {
-            state.secondAmount = '';
+        if (state.type === 'transferfrom') {
+            state.destAccountId = account.id;
+            state.destCurrId = account.curr_id;
+        } else {
+            state.sourceAccountId = account.id;
+            state.srcCurrId = account.curr_id;
         }
 
-        this.state = state;
-
-        return state;
+        const res = this.checkStateCurrencies(state);
+        this.state = res;
+        return res;
     }
 
     /** Set person */
@@ -819,42 +887,35 @@ export class ImportTransactionItem extends Component {
     }
 
     /** Set source amount */
-    setAmount(value) {
-        if (typeof value === 'undefined') {
-            throw new Error('Invalid amount value');
-        }
+    setSourceAmount(value) {
         const res = parseFloat(fixFloat(value));
         if (Number.isNaN(res)) {
             throw new Error('Invalid amount value');
         }
 
-        if (this.state.amount === value) {
+        if (this.state.sourceAmount === value) {
             return this.state;
         }
         const state = copyObject(this.state);
-        state.amount = value;
+        state.sourceAmount = value;
 
         this.state = state;
 
         return state;
     }
 
-    /** Set second amount */
-    setSecondAmount(value) {
-        if (typeof value === 'undefined') {
-            throw new Error('Invalid amount value');
-        }
+    /** Set destination amount */
+    setDestAmount(value) {
         const res = parseFloat(fixFloat(value));
         if (Number.isNaN(res)) {
             throw new Error('Invalid amount value');
         }
 
-        if (!this.state.isDiff
-            || this.state.secondAmount === value) {
+        if (this.state.destAmount === value) {
             return this.state;
         }
         const state = copyObject(this.state);
-        state.secondAmount = value;
+        state.destAmount = value;
 
         this.state = state;
 
@@ -913,29 +974,59 @@ export class ImportTransactionItem extends Component {
 
     /** Remove all invalidated marks */
     clearInvalid() {
-        this.parent.clearBlockValidation(this.amountField);
+        this.parent.clearBlockValidation(this.srcAmountField);
         this.parent.clearBlockValidation(this.destAmountField);
         this.parent.clearBlockValidation(this.dateField);
         this.setFeedback();
+    }
+
+    validateSourceAmount(state) {
+        const amountValue = parseFloat(fixFloat(state.sourceAmount));
+        if (Number.isNaN(amountValue) || amountValue <= 0) {
+            this.parent.invalidateBlock(this.srcAmountField);
+            this.setFeedback(MSG_INCORRECT_AMOUNT);
+            return false;
+        }
+
+        return true;
+    }
+
+    validateDestAmount(state) {
+        const amountValue = parseFloat(fixFloat(state.destAmount));
+        if (Number.isNaN(amountValue) || amountValue <= 0) {
+            this.parent.invalidateBlock(this.destAmountField);
+            this.setFeedback(MSG_INCORRECT_AMOUNT);
+            return false;
+        }
+
+        return true;
     }
 
     /** Validate transaction object */
     validate() {
         const { state } = this;
 
-        const amountVal = parseFloat(fixFloat(state.amount));
-        if (Number.isNaN(amountVal) || amountVal <= 0) {
-            this.parent.invalidateBlock(this.amountField);
-            this.setFeedback(MSG_INCORRECT_AMOUNT);
-            return false;
-        }
-
-        if (state.isDiff) {
-            const secondAmountVal = parseFloat(fixFloat(state.secondAmount));
-            if (Number.isNaN(secondAmountVal) || secondAmountVal <= 0) {
-                this.parent.invalidateBlock(this.destAmountField);
-                this.setFeedback(MSG_INCORRECT_SEC_AMOUNT);
+        if (state.type === 'expense') {
+            const destAmountValid = this.validateDestAmount(state);
+            if (!destAmountValid) {
                 return false;
+            }
+            if (state.isDiff) {
+                const srcAmountValid = this.validateSourceAmount(state);
+                if (!srcAmountValid) {
+                    return false;
+                }
+            }
+        } else {
+            const srcAmountValid = this.validateSourceAmount(state);
+            if (!srcAmountValid) {
+                return false;
+            }
+            if (state.isDiff) {
+                const destAmountValid = this.validateDestAmount(state);
+                if (!destAmountValid) {
+                    return false;
+                }
             }
         }
 
@@ -955,63 +1046,69 @@ export class ImportTransactionItem extends Component {
 
     /** Return transaction object */
     getData() {
+        const { accounts, persons } = window.app.model;
         const { state } = this;
 
-        const secondAcc = window.app.model.accounts.getItem(state.secondAccountId);
-        const person = window.app.model.persons.getItem(state.personId);
-        const amountVal = parseFloat(fixFloat(state.amount));
-        const secondAmountVal = parseFloat(fixFloat(state.secondAmount));
-        const selectedCurr = parseInt(state.currId, 10);
+        const srcAmountVal = parseFloat(fixFloat(state.sourceAmount));
+        const destAmountVal = parseFloat(fixFloat(state.destAmount));
         const res = {};
-
-        if (!secondAcc && (state.type === 'transferfrom' || state.type === 'transferto')) {
-            throw new Error('Invalid transaction: Second account not set');
-        }
-        if (!person && (state.type === 'debtfrom' || state.type === 'debtto')) {
-            throw new Error('Invalid transaction: Person not set');
-        }
 
         if (state.type === 'expense') {
             res.type = EXPENSE;
-            res.src_id = state.accountId;
+            res.src_id = state.sourceAccountId;
             res.dest_id = 0;
-            res.src_curr = state.accountCurrId;
-            res.dest_curr = selectedCurr;
-            res.src_amount = amountVal;
-            res.dest_amount = (state.isDiff) ? secondAmountVal : amountVal;
+            res.src_curr = state.srcCurrId;
+            res.dest_curr = state.destCurrId;
+            res.src_amount = (state.isDiff) ? srcAmountVal : destAmountVal;
+            res.dest_amount = destAmountVal;
         } else if (state.type === 'income') {
             res.type = INCOME;
             res.src_id = 0;
-            res.dest_id = state.accountId;
-            res.src_curr = selectedCurr;
-            res.dest_curr = state.accountCurrId;
-            res.src_amount = (state.isDiff) ? secondAmountVal : amountVal;
-            res.dest_amount = amountVal;
+            res.dest_id = state.destAccountId;
+            res.src_curr = state.srcCurrId;
+            res.dest_curr = state.destCurrId;
+            res.src_amount = srcAmountVal;
+            res.dest_amount = (state.isDiff) ? destAmountVal : srcAmountVal;
         } else if (state.type === 'transferfrom') {
+            const transferAcc = accounts.getItem(state.destAccountId);
+            if (!transferAcc) {
+                throw new Error('Invalid transaction: Account not found');
+            }
+
             res.type = TRANSFER;
-            res.src_id = state.accountId;
-            res.dest_id = secondAcc.id;
-            res.src_curr = state.accountCurrId;
-            res.dest_curr = secondAcc.curr_id;
-            res.src_amount = amountVal;
-            res.dest_amount = (state.isDiff) ? secondAmountVal : amountVal;
+            res.src_id = state.sourceAccountId;
+            res.dest_id = state.destAccountId;
+            res.src_curr = state.srcCurrId;
+            res.dest_curr = state.destCurrId;
+            res.src_amount = srcAmountVal;
+            res.dest_amount = (state.isDiff) ? destAmountVal : srcAmountVal;
         } else if (state.type === 'transferto') {
+            const transferAcc = accounts.getItem(state.sourceAccountId);
+            if (!transferAcc) {
+                throw new Error('Invalid transaction: Account not found');
+            }
+
             res.type = TRANSFER;
-            res.src_id = secondAcc.id;
-            res.dest_id = state.accountId;
-            res.src_curr = secondAcc.curr_id;
-            res.dest_curr = state.accountCurrId;
-            res.src_amount = (state.isDiff) ? secondAmountVal : amountVal;
-            res.dest_amount = amountVal;
+            res.src_id = state.sourceAccountId;
+            res.dest_id = state.destAccountId;
+            res.src_curr = state.srcCurrId;
+            res.dest_curr = state.destCurrId;
+            res.src_amount = srcAmountVal;
+            res.dest_amount = (state.isDiff) ? destAmountVal : srcAmountVal;
         } else if (state.type === 'debtfrom' || state.type === 'debtto') {
+            const person = persons.getItem(state.personId);
+            if (!person) {
+                throw new Error('Invalid transaction: Person not found');
+            }
+
             res.type = DEBT;
             res.op = (state.type === 'debtto') ? 1 : 2;
             res.person_id = person.id;
-            res.acc_id = state.accountId;
-            res.src_curr = state.accountCurrId;
-            res.dest_curr = state.accountCurrId;
-            res.src_amount = amountVal;
-            res.dest_amount = amountVal;
+            res.acc_id = state.mainAccount.id;
+            res.src_curr = state.srcCurrId;
+            res.dest_curr = state.destCurrId;
+            res.src_amount = srcAmountVal;
+            res.dest_amount = srcAmountVal;
         }
 
         res.date = state.date;
@@ -1043,7 +1140,7 @@ export class ImportTransactionItem extends Component {
             throw new Error('Invalid state');
         }
 
-        const isExpenseOrIncome = ['expense', 'income'].includes(state.type);
+        const isIncome = state.type === 'income';
         const isTransfer = ['transferfrom', 'transferto'].includes(state.type);
         const isDebt = ['debtfrom', 'debtto'].includes(state.type);
 
@@ -1060,51 +1157,80 @@ export class ImportTransactionItem extends Component {
         this.typeDropDown.selectItem(state.type);
 
         // Amount field
-        enable(this.amountInp, state.enabled);
-        this.currencyDropDown.enable(state.enabled && isExpenseOrIncome && !state.isDiff);
-        enable(this.currencyBtn, state.enabled && isExpenseOrIncome && !state.isDiff);
-        this.amountInp.value = state.amount;
-        this.renderCurrency(this.currencySign, this.currencyDropDown, state.accountCurrId);
+        if (state.type === 'expense') {
+            // Destination amount field
+            this.destAmountInp.value = state.destAmount;
+            enable(this.destAmountInp, state.enabled);
+            this.destCurrencyDropDown.enable(state.enabled);
+            enable(this.destCurrencyBtn, state.enabled);
+            this.renderCurrency(this.destCurrencySign, this.destCurrencyDropDown, state.destCurrId);
+            show(this.destAmountField, true);
 
-        // Destination amount field
-        enable(this.destAmountInp, state.enabled && state.isDiff);
-        this.destCurrencyDropDown.enable(state.enabled && isExpenseOrIncome && state.isDiff);
-        enable(this.destCurrencyBtn, state.enabled && isExpenseOrIncome && state.isDiff);
-        this.renderCurrency(this.destCurrencySign, this.destCurrencyDropDown, state.currId);
+            const destAmountLabel = (state.isDiff) ? TITLE_FIELD_DEST_AMOUNT : TITLE_FIELD_AMOUNT;
+            this.destAmountInp.placeholder = destAmountLabel;
+            this.destAmountLabel.textContent = destAmountLabel;
+
+            // Source amount field
+            this.srcAmountInp.value = state.sourceAmount;
+            enable(this.srcAmountInp, state.enabled && state.isDiff);
+            this.srcCurrencyDropDown.enable(false);
+            enable(this.srcCurrencyBtn, false);
+            this.renderCurrency(this.srcCurrencySign, this.srcCurrencyDropDown, state.srcCurrId);
+            show(this.srcAmountField, state.isDiff);
+
+            this.srcAmountInp.placeholder = TITLE_FIELD_SRC_AMOUNT;
+            this.srcAmountLabel.textContent = TITLE_FIELD_SRC_AMOUNT;
+        } else {
+            // Source amount field
+            this.srcAmountInp.value = state.sourceAmount;
+            enable(this.srcAmountInp, state.enabled);
+            this.srcCurrencyDropDown.enable(state.enabled && isIncome);
+            enable(this.srcCurrencyBtn, state.enabled && isIncome);
+            this.renderCurrency(this.srcCurrencySign, this.srcCurrencyDropDown, state.srcCurrId);
+            show(this.srcAmountField, true);
+
+            const srcAmountLabel = (state.isDiff) ? TITLE_FIELD_SRC_AMOUNT : TITLE_FIELD_AMOUNT;
+            this.srcAmountInp.placeholder = srcAmountLabel;
+            this.srcAmountLabel.textContent = srcAmountLabel;
+
+            // Destination amount field
+            this.destAmountInp.value = state.destAmount;
+            enable(this.destAmountInp, state.enabled && state.isDiff);
+            this.destCurrencyDropDown.enable(false);
+            enable(this.destCurrencyBtn, false);
+            this.renderCurrency(this.destCurrencySign, this.destCurrencyDropDown, state.destCurrId);
+            show(this.destAmountField, state.isDiff);
+
+            this.destAmountInp.placeholder = TITLE_FIELD_DEST_AMOUNT;
+            this.destAmountLabel.textContent = TITLE_FIELD_DEST_AMOUNT;
+        }
 
         // Second account field
-        this.destAccDropDown.enable(state.enabled && isTransfer);
-        this.syncDestAccountSelect(state);
-        if (state.secondAccountId) {
-            this.destAccDropDown.selectItem(state.secondAccountId);
-        }
-        show(this.destAccountField, state.secondAccountVisible);
-        if (state.secondAccountVisible) {
+        this.transferAccDropDown.enable(state.enabled && isTransfer);
+        if (isTransfer) {
+            this.syncTransferAccountSelect(state);
+            const transferAccountId = (state.type === 'transferto')
+                ? state.sourceAccountId
+                : state.destAccountId;
+            if (transferAccountId) {
+                this.transferAccDropDown.selectItem(transferAccountId);
+            }
+            show(this.transferAccountField, true);
+
             const accountLabel = (state.type === 'transferto')
                 ? TITLE_FIELD_SRC_ACCOUNT
                 : TITLE_FIELD_DEST_ACCOUNT;
 
-            this.destAccountLabel.textContent = accountLabel;
+            this.transferAccountLabel.textContent = accountLabel;
         }
-
-        // Second amount field
-        this.destAmountInp.value = state.secondAmount;
-        show(this.destAmountField, state.isDiff);
-        if (state.isDiff) {
-            const amountLabel = (state.type === 'transferto')
-                ? TITLE_FIELD_SRC_AMOUNT
-                : TITLE_FIELD_DEST_AMOUNT;
-
-            this.destAmountInp.placeholder = amountLabel;
-            this.destAmountLabel.textContent = amountLabel;
-        }
+        show(this.transferAccountField, isTransfer);
 
         // Person field
         this.personDropDown.enable(state.enabled && isDebt);
         if (state.personId) {
             this.personDropDown.selectItem(state.personId);
         }
-        show(this.personField, state.personVisible);
+        show(this.personField, isDebt);
 
         // Date filed
         enable(this.dateInp, state.enabled);

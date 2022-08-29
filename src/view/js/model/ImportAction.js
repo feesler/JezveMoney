@@ -165,13 +165,13 @@ export class ImportAction extends ListItem {
         if (this.action_id === IMPORT_ACTION_SET_TR_TYPE) {
             context.setTransactionType(this.value);
         } else if (this.action_id === IMPORT_ACTION_SET_ACCOUNT) {
-            context.setSecondAccount(this.value);
+            context.setTransferAccount(this.value);
         } else if (this.action_id === IMPORT_ACTION_SET_PERSON) {
             context.setPerson(this.value);
         } else if (this.action_id === IMPORT_ACTION_SET_SRC_AMOUNT) {
-            context.setAmount(this.value);
+            context.setSourceAmount(this.value);
         } else if (this.action_id === IMPORT_ACTION_SET_DEST_AMOUNT) {
-            context.setSecondAmount(this.value);
+            context.setDestAmount(this.value);
         } else if (this.action_id === IMPORT_ACTION_SET_COMMENT) {
             context.setComment(this.value);
         } else {

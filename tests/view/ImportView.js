@@ -365,7 +365,6 @@ export class ImportView extends AppView {
         if (isValid) {
             const uploadedItems = ImportList.render(expectedUpload, App.state);
             expectedList.items = expectedList.items.concat(uploadedItems.items);
-
             this.model.items = this.model.items.concat(expectedUpload);
         }
 
@@ -585,7 +584,8 @@ export class ImportView extends AppView {
         const expectedItem = {
             enabled: true,
             typeField: { value: 'expense', disabled: false },
-            amountField: {
+            srcAmountField: { value: '', disabled: true },
+            destAmountField: {
                 value: '',
                 disabled: false,
                 dropDown: {
@@ -593,8 +593,7 @@ export class ImportView extends AppView {
                     disabled: false,
                 },
             },
-            destAmountField: { value: '', disabled: true },
-            destAccountField: { disabled: true },
+            transferAccountField: { disabled: true },
             dateField: { value: App.dates.now, disabled: false },
             commentField: { value: '', disabled: false },
             personField: { disabled: true },
