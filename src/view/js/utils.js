@@ -1,5 +1,16 @@
 import { isDate } from 'jezvejs';
 
+export const parseCookies = () => {
+    const entries = document.cookie.split(';');
+    return entries.map((entry) => {
+        const nameLength = entry.indexOf('=');
+        return {
+            name: entry.substring(0, nameLength),
+            value: entry.substring(nameLength + 1),
+        };
+    });
+};
+
 /* Convert number to string and prepend zero if value is less than 10 */
 export const leadZero = (val) => {
     const v = parseInt(val, 10);

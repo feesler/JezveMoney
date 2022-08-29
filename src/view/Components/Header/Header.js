@@ -8,11 +8,8 @@ import {
     Switch,
     Offcanvas,
 } from 'jezvejs';
+import { DARK_THEME } from '../../js/Application.js';
 import './style.scss';
-
-// Theme constants
-export const WHITE_THEME = 0;
-export const DARK_THEME = 1;
 
 /**
  * Header component constructor
@@ -49,9 +46,11 @@ export class Header extends Component {
             this.userBtn.addEventListener('click', () => this.onUserClick());
         }
 
-        Switch.fromElement(ge('theme-check'), {
+        this.themeSwitch = Switch.fromElement(ge('theme-check'), {
             onChange: (checked) => this.onToggleTheme(checked),
         });
+        const currentTheme = window.app.getCurrentTheme();
+        this.themeSwitch.check(currentTheme === DARK_THEME);
 
         this.userNameElem = this.elem.querySelector('.user__title');
         if (this.userNameElem) {
@@ -95,17 +94,7 @@ export class Header extends Component {
      * @param {Boolean} checked - current state
      */
     onToggleTheme(checked) {
-        const { baseURL, themes } = window.app;
-        const newTheme = checked ? DARK_THEME : WHITE_THEME;
-
-        const linkElem = ge('theme-style');
-        if (linkElem) {
-            linkElem.href = `${baseURL}view/css/themes/${themes[newTheme].file}`;
-        }
-
-        document.body.className = themes[newTheme].className;
-
-        fetch(`${baseURL}main/setTheme/?theme=${newTheme}`);
+        window.app.setTheme(checked);
     }
 
     /**

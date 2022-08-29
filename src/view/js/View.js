@@ -15,6 +15,8 @@ export class View {
      * Document ready event handler
      */
     onReady() {
+        window.app.setupTheme();
+
         this.header = Header.create();
         this.onStart();
 

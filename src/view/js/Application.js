@@ -1,14 +1,20 @@
 import {
+    ge,
     ce,
     svg,
     Popup,
 } from 'jezvejs';
+import { parseCookies } from './utils.js';
 import { AccountList } from './model/AccountList.js';
 import { CurrencyList } from './model/CurrencyList.js';
 import { IconList } from './model/IconList.js';
 import { ImportRuleList } from './model/ImportRuleList.js';
 import { ImportTemplateList } from './model/ImportTemplateList.js';
 import { PersonList } from './model/PersonList.js';
+
+// Theme constants
+export const WHITE_THEME = 0;
+export const DARK_THEME = 1;
 
 const HIDDEN_GROUP_TITLE = 'Hidden';
 
@@ -69,6 +75,56 @@ export class Application {
 
     get message() {
         return this.props.message;
+    }
+
+    getThemeCookie() {
+        const cookies = parseCookies();
+        return cookies.find((item) => item.name === 'theme');
+    }
+
+    isPrefersDarkTheme() {
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+
+    getCurrentTheme() {
+        const { themes } = this.props;
+
+        const themeId = Object.keys(themes).find((key) => {
+            const theme = themes[key];
+            return document.body.classList.contains(theme.className);
+        });
+
+        return (themeId) ? parseInt(themeId, 10) : WHITE_THEME;
+    }
+
+    setupTheme() {
+        const themeCookie = this.getThemeCookie();
+        if (themeCookie) {
+            return;
+        }
+
+        if (this.isPrefersDarkTheme()) {
+            this.setTheme(true);
+        }
+    }
+
+    setTheme(dark) {
+        const { baseURL, themes } = this.props;
+        const themeId = (dark) ? DARK_THEME : WHITE_THEME;
+        const theme = themes[themeId];
+
+        if (document.body.classList.contains(theme.className)) {
+            return;
+        }
+
+        const linkElem = ge('theme-style');
+        if (linkElem) {
+            linkElem.href = `${baseURL}view/css/themes/${theme.file}`;
+        }
+
+        document.body.className = theme.className;
+
+        fetch(`${baseURL}main/setTheme/?theme=${themeId}`);
     }
 
     /**
