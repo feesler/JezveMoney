@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "lint-php": "dev-tools/vendor/bin/phpcs --standard=PSR12 --extensions=php ./src/",
+    "lint-php": ".\\dev-tools\\vendor\\bin\\phpcs --standard=PSR12 --extensions=php ./src/",
     "all": "npm-run-all lint build test",
     "test": "node ./tests/index.js",
     "test-partial": "node ./tests/index.js -p",
