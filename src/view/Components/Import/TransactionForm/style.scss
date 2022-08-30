@@ -1,5 +1,5 @@
 /* Transaction item */
-.import-item {
+.import-form {
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
@@ -173,7 +173,7 @@
     overflow: hidden;
   }
 
-  &.import-item_expanded .extended-content {
+  &.import-form_expanded .extended-content {
     display: flex;
   }
 
@@ -190,13 +190,13 @@
 }
 
 /* Disabled transaction row */
-.import-item_disabled .dd__container,
-.import-item_disabled input[type="text"],
-.import-item_disabled input[disabled] {
+.import-form_disabled .dd__container,
+.import-form_disabled input[type="text"],
+.import-form_disabled input[disabled] {
   pointer-events: none;
 }
 
-.import-item_expanded .toggle-icon {
+.import-form_expanded .toggle-icon {
   transform: rotate(180deg);
 }
 
@@ -221,11 +221,11 @@
 }
 
 /* Placeholder */
-.import-item__placeholder {
+.import-form__placeholder {
   border: 1px dashed;
 }
 
-.import-item__placeholder * {
+.import-form__placeholder * {
   opacity: 0;
 }
 
@@ -235,7 +235,7 @@
 
 /* Desktop */
 @media (min-width: 768px) {
-  .import-item {
+  .import-form {
     .form-container {
       flex-flow: row nowrap;
     }

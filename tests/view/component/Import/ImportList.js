@@ -6,7 +6,7 @@ import {
     isVisible,
     copyObject,
 } from 'jezve-test';
-import { ImportListItem } from './ImportListItem.js';
+import { ImportTransactionForm } from './ImportTransactionForm.js';
 import { asyncMap } from '../../../common.js';
 
 export class ImportList extends TestComponent {
@@ -22,11 +22,11 @@ export class ImportList extends TestComponent {
             invalidated: false,
         };
 
-        const listItems = await queryAll(this.elem, '.import-item');
+        const listItems = await queryAll(this.elem, '.import-form');
         if (listItems) {
             res.items = await asyncMap(
                 listItems,
-                (item) => ImportListItem.create(this.parent, item, this.mainAccount),
+                (item) => ImportTransactionForm.create(this.parent, item, this.mainAccount),
             );
         } else {
             const noDataMsg = await query(this.elem, '.nodata-message');
@@ -84,7 +84,7 @@ export class ImportList extends TestComponent {
         assert.isArray(transactions, 'Invalid data');
 
         return {
-            items: transactions.map((item) => ImportListItem.render(item, state)),
+            items: transactions.map((item) => ImportTransactionForm.render(item, state)),
         };
     }
 }

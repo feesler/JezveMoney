@@ -21,7 +21,7 @@ import '../../css/app.scss';
 import './style.scss';
 import { ImportUploadDialog } from '../../Components/Import/UploadDialog/ImportUploadDialog.js';
 import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from '../../Components/Import/RulesDialog/ImportRulesDialog.js';
-import { ImportTransactionItem } from '../../Components/Import/TransactionItem/ImportTransactionItem.js';
+import { ImportTransactionForm } from '../../Components/Import/TransactionForm/ImportTransactionForm.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { API } from '../../js/API.js';
 
@@ -127,8 +127,8 @@ class ImportView extends View {
             oninsertat: (orig, replaced) => this.onTransPosChanged(orig, replaced),
             elem: 'rowsContainer',
             group: 'transactions',
-            selector: '.import-item',
-            placeholderClass: 'import-item__placeholder',
+            selector: '.import-form',
+            placeholderClass: 'import-form__placeholder',
             copyWidth: true,
             handles: [{ query: 'div' }, { query: 'label' }],
         });
@@ -214,7 +214,7 @@ class ImportView extends View {
             throw new Error('Invalid data');
         }
 
-        const item = new ImportTransactionItem({
+        const item = new ImportTransactionForm({
             parent: this,
             mainAccount: this.state.mainAccount,
             originalData: data,
@@ -398,7 +398,7 @@ class ImportView extends View {
     /**
      * Transaction item remove event handler
      * Return boolean result confirming remove action
-     * @param {ImportTransactionItem} item - item to remove
+     * @param {ImportTransactionForm} item - item to remove
      */
     onRemoveItem(item) {
         if (!item) {
@@ -420,7 +420,7 @@ class ImportView extends View {
             return;
         }
 
-        const item = ImportTransactionItem.create({
+        const item = ImportTransactionForm.create({
             parent: this,
             mainAccount: this.state.mainAccount,
         });

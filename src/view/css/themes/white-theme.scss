@@ -277,29 +277,29 @@
     border-color: #b0b0b0;
   }
 
-  .import-item {
+  .import-form {
     background-color: #dddddd;
   }
 
-  .import-item .extended-content {
+  .import-form .extended-content {
     color: #202020;
     border-color: #b0b0b0;
     background-color: #cccccc;
   }
 
-  .import-item select,
-  .import-item input[type="text"] {
+  .import-form select,
+  .import-form input[type="text"] {
     border-color: var(--input-border-color);
   }
 
-  .import-item select[disabled],
-  .import-item input[disabled] {
+  .import-form select[disabled],
+  .import-form input[disabled] {
     color: var(--input-disabled-text-color);
     border-color: var(--input-disabled-border-color);
     background-color: var(--input-disabled-bg-color);
   }
 
-  .import-item.import-item_disabled {
+  .import-form.import-form_disabled {
     background-color: #e8e8e8;
     color: #808080;
     border-color: #e8e8e8;
@@ -330,25 +330,25 @@
     }
   }
 
-  .import-item select:focus,
-  .import-item input[type="text"]:focus {
+  .import-form select:focus,
+  .import-form input[type="text"]:focus {
     border-color: #888888;
     background-color: #f2f2f2;
   }
 
-  .import-item .btn,
-  .import-item .btn:visited,
-  .import-item .btn:active {
+  .import-form .btn,
+  .import-form .btn:visited,
+  .import-form .btn:active {
     color: #202020;
   }
 
-  .import-item .delete-icon,
-  .import-item .toggle-icon {
+  .import-form .delete-icon,
+  .import-form .toggle-icon {
     fill: #a7a7a7;
   }
 
   /* Placeholder */
-  .import-item.import-item__placeholder {
+  .import-form.import-form__placeholder {
     border-color: #888888;
     background-color: var(--main-bg-color);
   }
@@ -462,7 +462,7 @@
       fill: #000000;
     }
 
-    .import-item .btn:hover {
+    .import-form .btn:hover {
       background-color: #808080;
     }
 
@@ -483,8 +483,8 @@
     }
 
     /* Import item */
-    .import-item .btn:hover .delete-icon,
-    .import-item .btn:hover .toggle-icon {
+    .import-form .btn:hover .delete-icon,
+    .import-form .btn:hover .toggle-icon {
       fill: #ffffff;
     }
 

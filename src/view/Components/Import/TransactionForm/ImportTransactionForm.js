@@ -48,9 +48,9 @@ const MSG_INVALID_DATE = 'Please input correct date';
 const sourceTypes = ['expense', 'transferfrom', 'debtfrom'];
 
 /**
- * ImportTransactionItem component
+ * ImportTransactionForm component
  */
-export class ImportTransactionItem extends Component {
+export class ImportTransactionForm extends Component {
     constructor(...args) {
         super(...args);
 
@@ -167,7 +167,7 @@ export class ImportTransactionItem extends Component {
         show(this.feedbackElem, false);
         this.extendedContainer = window.app.createContainer('extended-content');
 
-        this.elem = window.app.createContainer('import-item', [
+        this.elem = window.app.createContainer('import-form', [
             this.mainContainer,
             this.feedbackElem,
             this.extendedContainer,
@@ -185,10 +185,10 @@ export class ImportTransactionItem extends Component {
     }
 
     /**
-     * Create new ImportTransactionItem from specified element
+     * Create new ImportTransactionForm from specified element
      */
     static create(props) {
-        return new ImportTransactionItem(props);
+        return new ImportTransactionForm(props);
     }
 
     /** Create transaction type field */
@@ -379,7 +379,7 @@ export class ImportTransactionItem extends Component {
         if (content) {
             addChilds(this.extendedContainer, content);
         } else {
-            this.elem.classList.remove('import-item_expanded');
+            this.elem.classList.remove('import-form_expanded');
         }
 
         show(this.toggleExtBtn, content);
@@ -468,7 +468,7 @@ export class ImportTransactionItem extends Component {
 
     /** Toggle collapse/expand button 'click' event handler */
     toggleCollapse() {
-        this.elem.classList.toggle('import-item_expanded');
+        this.elem.classList.toggle('import-form_expanded');
     }
 
     /**
@@ -1143,9 +1143,9 @@ export class ImportTransactionItem extends Component {
         const isDebt = ['debtfrom', 'debtto'].includes(state.type);
 
         if (state.enabled) {
-            this.elem.classList.remove('import-item_disabled');
+            this.elem.classList.remove('import-form_disabled');
         } else {
-            this.elem.classList.add('import-item_disabled');
+            this.elem.classList.add('import-form_disabled');
         }
 
         this.enableCheck.check(state.enabled);

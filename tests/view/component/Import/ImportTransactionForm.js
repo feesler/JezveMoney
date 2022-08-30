@@ -29,7 +29,7 @@ import { App } from '../../../Application.js';
 
 const sourceTransactionTypes = ['expense', 'transferfrom', 'debtfrom'];
 
-export class ImportListItem extends TestComponent {
+export class ImportTransactionForm extends TestComponent {
     constructor(parent, elem, mainAccount) {
         super(parent, elem);
 

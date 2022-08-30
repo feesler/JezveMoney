@@ -10,7 +10,7 @@ import { App } from '../../Application.js';
 import { findSimilarTransaction } from '../../model/import.js';
 import { ImportTransaction } from '../../model/ImportTransaction.js';
 import { ImportList } from '../../view/component/Import/ImportList.js';
-import { ImportListItem } from '../../view/component/Import/ImportListItem.js';
+import { ImportTransactionForm } from '../../view/component/Import/ImportTransactionForm.js';
 import { ImportView } from '../../view/ImportView.js';
 import { ImportViewSubmitError } from '../../error/ImportViewSubmitError.js';
 
@@ -232,7 +232,7 @@ export const changeMainAccount = async (accountId) => {
                     importTrans.enabled = false;
                 }
 
-                const imported = ImportListItem.render(importTrans, App.state);
+                const imported = ImportTransactionForm.render(importTrans, App.state);
                 return copyObject(imported);
             }
 
@@ -268,7 +268,7 @@ export const enableRules = async (value = true) => {
         );
 
         // Apply rules or restore original import data according to enable flag
-        // and convert to expected state of ImportListItem component
+        // and convert to expected state of ImportTransactionForm component
         const itemsData = App.view.content.itemsList.content.items.map((item) => {
             let model;
 
