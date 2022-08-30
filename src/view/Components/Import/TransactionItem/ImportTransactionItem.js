@@ -28,9 +28,7 @@ const TITLE_FIELD_AMOUNT = 'Amount';
 const TITLE_FIELD_SRC_AMOUNT = 'Source amount';
 const TITLE_FIELD_DEST_AMOUNT = 'Destination amount';
 const TITLE_FIELD_DATE = 'Date';
-const PH_FIELD_DATE = 'Date';
 const TITLE_FIELD_COMMENT = 'Comment';
-const PH_FIELD_COMMENT = 'Comment';
 const TITLE_FIELD_SRC_ACCOUNT = 'Source account';
 const TITLE_FIELD_DEST_ACCOUNT = 'Destination account';
 const TITLE_FIELD_PERSON = 'Person';
@@ -108,7 +106,7 @@ export class ImportTransactionItem extends Component {
             className: 'stretch-input',
             type: 'text',
             name: 'date[]',
-            placeholder: PH_FIELD_DATE,
+            placeholder: TITLE_FIELD_DATE,
             autocomplete: 'off',
         }, null, { input: () => this.onDateInput() });
         this.dateField = window.app.createField(TITLE_FIELD_DATE, this.dateInp, 'date-field');
@@ -117,7 +115,7 @@ export class ImportTransactionItem extends Component {
             className: 'stretch-input',
             type: 'text',
             name: 'comment[]',
-            placeholder: PH_FIELD_COMMENT,
+            placeholder: TITLE_FIELD_COMMENT,
             autocomplete: 'off',
         }, null, { input: () => this.onCommentInput() });
         this.commentField = window.app.createField(TITLE_FIELD_COMMENT, this.commInp, 'comment-field');
