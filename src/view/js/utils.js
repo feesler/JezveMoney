@@ -1,5 +1,6 @@
 import { isDate } from 'jezvejs';
 
+/** Returns array of { name, value } cookie objects */
 export const parseCookies = () => {
     const entries = document.cookie.split(';');
     return entries.map((entry) => {
@@ -9,6 +10,11 @@ export const parseCookies = () => {
             value: entry.substring(nameLength + 1),
         };
     });
+};
+
+/** Set specified cookie */
+export const setCookie = (name, value) => {
+    document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}`;
 };
 
 /* Convert number to string and prepend zero if value is less than 10 */

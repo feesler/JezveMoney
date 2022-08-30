@@ -4,7 +4,7 @@ import {
     svg,
     Popup,
 } from 'jezvejs';
-import { parseCookies } from './utils.js';
+import { parseCookies, setCookie } from './utils.js';
 import { AccountList } from './model/AccountList.js';
 import { CurrencyList } from './model/CurrencyList.js';
 import { IconList } from './model/IconList.js';
@@ -86,13 +86,16 @@ export class Application {
         return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
 
+    isCurrentTheme(theme) {
+        return document.body.classList.contains(theme?.className);
+    }
+
     getCurrentTheme() {
         const { themes } = this.props;
 
-        const themeId = Object.keys(themes).find((key) => {
-            const theme = themes[key];
-            return document.body.classList.contains(theme.className);
-        });
+        const themeId = Object.keys(themes).find(
+            (key) => this.isCurrentTheme(themes[key]),
+        );
 
         return (themeId) ? parseInt(themeId, 10) : WHITE_THEME;
     }
@@ -113,7 +116,7 @@ export class Application {
         const themeId = (dark) ? DARK_THEME : WHITE_THEME;
         const theme = themes[themeId];
 
-        if (document.body.classList.contains(theme.className)) {
+        if (this.isCurrentTheme(theme)) {
             return;
         }
 
@@ -124,6 +127,7 @@ export class Application {
 
         document.body.className = theme.className;
 
+        setCookie('theme', themeId);
         fetch(`${baseURL}main/setTheme/?theme=${themeId}`);
     }
 
