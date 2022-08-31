@@ -3,16 +3,13 @@ import {
     re,
     show,
     enable,
-    checkDate,
     copyObject,
+    isFunction,
     addChilds,
     removeChilds,
     formatDate,
     Component,
     Checkbox,
-    DropDown,
-    DecimalInput,
-    InputGroup,
 } from 'jezvejs';
 import { fixFloat } from '../../../js/utils.js';
 import {
@@ -24,33 +21,35 @@ import {
 import './style.scss';
 
 /** CSS classes */
-const CONTAINER_CLASS = 'import-form';
-const EXPANDED_CLASS = 'import-form_expanded';
-const DISABLED_CLASS = 'import-form_disabled';
-const ENABLE_CHECK_CLASS = 'enable-check';
+const CONTAINER_CLASS = 'import-item';
+const EXPANDED_CLASS = 'import-item--expanded';
 const MAIN_CONTENT_CLASS = 'main-content';
-const INV_FEEDBACK_CLASS = 'invalid-feedback';
 const EXT_CONTENT_CLASS = 'extended-content';
-const FORM_CONTAINER_CLASS = 'form-container';
-const FORM_COLUMN_CLASS = 'form-rows';
+const ITEM_CONTAINER_CLASS = 'item-container';
+const COLUMN_CLASS = 'item-column';
+const ROW_CLASS = 'item-row';
 const AMOUNT_COLUMN_CLASS = 'amount-col';
 const TYPE_COLUMN_CLASS = 'type-col';
-const FORM_ROW_CLASS = 'form-row';
-const IG_INPUT_CLASS = 'input-group__input';
-const IG_BUTTON_CLASS = 'input-group__btn';
-const IG_BUTTON_TITLE_CLASS = 'input-group__btn-title';
-const DEFAULT_INPUT_CLASS = 'stretch-input';
-const AMOUNT_INPUT_CLASS = 'amount-input';
 /* Fields */
 const AMOUNT_FIELD_CLASS = 'amount-field';
 const DATE_FIELD_CLASS = 'date-field';
 const COMMENT_FIELD_CLASS = 'comment-field';
+/* Field values */
+const TYPE_CLASS = 'import-item__type';
+const ACCOUNT_CLASS = 'import-item__account';
+const PERSON_CLASS = 'import-item__person';
+const AMOUNT_CLASS = 'import-item__amount';
+const DATE_CLASS = 'import-item__date';
+const COMMENT_CLASS = 'import-item__comment';
 /* Controls */
+const ENABLE_CHECK_CLASS = 'enable-check';
 const CONTROLS_CLASS = 'controls';
 const DEFAULT_BUTTON_CLASS = 'btn';
+const UPDATE_BUTTON_CLASS = 'update-btn';
 const DEL_BUTTON_CLASS = 'delete-btn';
 const TOGGLE_BUTTON_CLASS = 'toggle-btn';
 const DEFAULT_ICON_CLASS = 'icon';
+const UPDATE_ICON_CLASS = 'update-icon';
 const DEL_ICON_CLASS = 'delete-icon';
 const TOGGLE_ICON_CLASS = 'toggle-icon';
 /* Original data */
@@ -59,15 +58,11 @@ const ORIG_DATA_CLASS = 'orig-data';
 const ORIG_DATA_TABLE_CLASS = 'orig-data-table';
 const COMMENT_VALUE_CLASS = 'comment-value';
 
-/** Fields */
-const TITLE_FIELD_AMOUNT = 'Amount';
-const TITLE_FIELD_SRC_AMOUNT = 'Source amount';
-const TITLE_FIELD_DEST_AMOUNT = 'Destination amount';
-const TITLE_FIELD_DATE = 'Date';
-const TITLE_FIELD_COMMENT = 'Comment';
+/** Strings */
 const TITLE_FIELD_SRC_ACCOUNT = 'Source account';
 const TITLE_FIELD_DEST_ACCOUNT = 'Destination account';
-const TITLE_FIELD_PERSON = 'Person';
+const TITLE_FIELD_AMOUNT = 'Amount';
+const TITLE_FIELD_SRC_AMOUNT = 'Source amount';
 /** Original data table */
 const TITLE_ORIGINAL_DATA = 'Original imported data';
 const COL_MAIN = 'Main account';
@@ -77,10 +72,15 @@ const COL_TR_AMOUNT = 'Tr. amount';
 const COL_TR_CURRENCY = 'Tr. currency';
 const COL_ACC_AMOUNT = 'Acc. amount';
 const COL_ACC_CURRENCY = 'Acc. currency';
-/** Validation messages */
-const MSG_INCORRECT_AMOUNT = 'Please input correct amount';
-const MSG_INVALID_DATE = 'Please input correct date';
 
+const typeStrings = {
+    expense: 'Expense',
+    income: 'Income',
+    transferfrom: 'Transfer from',
+    transferto: 'Transfer to',
+    debtfrom: 'Debt from',
+    debtto: 'Debt to',
+};
 const transTypeMap = {
     expense: EXPENSE,
     income: INCOME,
@@ -89,6 +89,7 @@ const transTypeMap = {
     debtfrom: DEBT,
     debtto: DEBT,
 };
+
 const sourceTypes = ['expense', 'transferfrom', 'debtfrom'];
 
 const defaultProps = {
@@ -99,19 +100,20 @@ const defaultProps = {
     srcCurrId: 0,
     destCurrId: 0,
     isDiff: false,
-    sourceAmount: '',
-    destAmount: '',
+    sourceAmount: 0,
+    destAmount: 0,
     personId: 0,
     date: formatDate(new Date()),
     comment: '',
+    onUpdate: null,
 };
 
 /**
  * ImportTransactionForm component
  */
-export class ImportTransactionForm extends Component {
+export class ImportTransactionItem extends Component {
     static create(props) {
-        return new ImportTransactionForm(props);
+        return new ImportTransactionItem(props);
     }
 
     constructor(...args) {
@@ -140,37 +142,9 @@ export class ImportTransactionForm extends Component {
         if (sourceTypes.includes(state.type)) {
             state.sourceAccountId = mainAccount.id;
             state.srcCurrId = mainAccount.curr_id;
-            if (!state.destCurrId) {
-                state.destCurrId = mainAccount.curr_id;
-            }
-
-            if (state.type === 'transferfrom') {
-                const account = this.getTransferAccount(state, state.destAccountId);
-                state.destAccountId = account.id;
-                state.destCurrId = account.curr_id;
-            }
         } else {
             state.destAccountId = mainAccount.id;
             state.destCurrId = mainAccount.curr_id;
-            if (!state.srcCurrId) {
-                state.srcCurrId = mainAccount.curr_id;
-            }
-
-            if (state.type === 'transferto') {
-                const account = this.getTransferAccount(state, state.sourceAccountId);
-                state.sourceAccountId = account.id;
-                state.srcCurrId = account.curr_id;
-            }
-        }
-
-        if (state.type === 'debtfrom' || state.type === 'debtto') {
-            if (!state.personId) {
-                const person = window.app.model.persons.getItemByIndex(0);
-                if (!person) {
-                    throw new Error('Person not found');
-                }
-                state.personId = person.id;
-            }
         }
 
         this.state = this.checkStateCurrencies(state);
@@ -185,33 +159,36 @@ export class ImportTransactionForm extends Component {
             onChange: () => this.onRowChecked(),
         });
 
-        this.createTypeField();
-        this.createAccountField();
-        this.createPersonField();
-        this.createSourceAmountField();
-        this.createDestAmountField();
+        this.trTypeTitle = ce('span', { className: TYPE_CLASS });
+        this.trTypeField = window.app.createField('Type', this.trTypeTitle);
 
-        // Date field
-        this.dateInp = ce('input', {
-            className: DEFAULT_INPUT_CLASS,
-            type: 'text',
-            name: 'date[]',
-            placeholder: TITLE_FIELD_DATE,
-            autocomplete: 'off',
-        }, null, { input: () => this.onDateInput() });
-        this.dateField = window.app.createField(TITLE_FIELD_DATE, this.dateInp, DATE_FIELD_CLASS);
-        // Comment field
-        this.commInp = ce('input', {
-            className: DEFAULT_INPUT_CLASS,
-            type: 'text',
-            name: 'comment[]',
-            placeholder: TITLE_FIELD_COMMENT,
-            autocomplete: 'off',
-        }, null, { input: () => this.onCommentInput() });
-        this.commentField = window.app.createField(
-            TITLE_FIELD_COMMENT,
-            this.commInp,
-            COMMENT_FIELD_CLASS,
+        this.accountTitle = ce('span', { className: ACCOUNT_CLASS });
+        this.accountField = window.app.createField('Account', this.accountTitle);
+        this.accountLabel = this.accountField.querySelector('label');
+
+        this.personTitle = ce('span', { className: PERSON_CLASS });
+        this.personField = window.app.createField('Person', this.personTitle);
+
+        this.srcAmountTitle = ce('span', { className: AMOUNT_CLASS });
+        this.srcAmountField = window.app.createField('Amount', this.srcAmountTitle, AMOUNT_FIELD_CLASS);
+        this.srcAmountLabel = this.srcAmountField.querySelector('label');
+
+        this.destAmountTitle = ce('span', { className: AMOUNT_CLASS });
+        this.destAmountField = window.app.createField('Destination amount', this.destAmountTitle, AMOUNT_FIELD_CLASS);
+        this.destAmountLabel = this.destAmountField.querySelector('label');
+
+        this.dateTitle = ce('span', { className: DATE_CLASS });
+        this.dateField = window.app.createField('Date', this.dateTitle, DATE_FIELD_CLASS);
+
+        this.commentTitle = ce('span', { className: COMMENT_CLASS });
+        this.commentField = window.app.createField('Comment', this.commentTitle, COMMENT_FIELD_CLASS);
+
+        // Update button
+        this.updateBtn = ce(
+            'button',
+            { className: `${DEFAULT_BUTTON_CLASS} ${UPDATE_BUTTON_CLASS}`, type: 'button' },
+            window.app.createIcon('update', `${DEFAULT_ICON_CLASS} ${UPDATE_ICON_CLASS}`),
+            { click: () => this.onUpdate() },
         );
         // Delete button
         this.delBtn = ce(
@@ -229,47 +206,46 @@ export class ImportTransactionForm extends Component {
         );
         show(this.toggleExtBtn, false);
 
-        this.topRow = window.app.createContainer(FORM_ROW_CLASS, [
+        this.topRow = window.app.createContainer(ROW_CLASS, [
             this.dateField,
             this.commentField,
         ]);
 
-        this.formContainer = window.app.createContainer(FORM_CONTAINER_CLASS, [
-            window.app.createContainer(`${FORM_COLUMN_CLASS} ${TYPE_COLUMN_CLASS}`, [
+        this.itemContainer = window.app.createContainer(ITEM_CONTAINER_CLASS, [
+            window.app.createContainer(`${COLUMN_CLASS} ${TYPE_COLUMN_CLASS}`, [
                 this.trTypeField,
-                this.transferAccountField,
+                this.accountField,
                 this.personField,
             ]),
-            window.app.createContainer(`${FORM_COLUMN_CLASS} ${AMOUNT_COLUMN_CLASS}`, [
+            window.app.createContainer(`${COLUMN_CLASS} ${AMOUNT_COLUMN_CLASS}`, [
                 this.srcAmountField,
                 this.destAmountField,
             ]),
-            window.app.createContainer(FORM_COLUMN_CLASS, [
+            window.app.createContainer(COLUMN_CLASS, [
                 this.topRow,
             ]),
         ]);
 
         this.mainContainer = window.app.createContainer(MAIN_CONTENT_CLASS, [
             this.enableCheck.elem,
-            this.formContainer,
+            this.itemContainer,
             window.app.createContainer(CONTROLS_CLASS, [
+                this.updateBtn,
                 this.delBtn,
                 this.toggleExtBtn,
             ]),
         ]);
-        this.feedbackElem = ce('div', { className: INV_FEEDBACK_CLASS });
-        show(this.feedbackElem, false);
-        this.extendedContainer = window.app.createContainer(EXT_CONTENT_CLASS);
 
         this.elem = window.app.createContainer(CONTAINER_CLASS, [
             this.mainContainer,
-            this.feedbackElem,
-            this.extendedContainer,
         ]);
 
         const { originalData } = this.props;
         this.data = null;
         if (originalData) {
+            this.extendedContainer = window.app.createContainer(EXT_CONTENT_CLASS);
+            this.elem.append(this.extendedContainer);
+
             this.setOriginal(originalData);
             this.setExtendedContent(
                 this.createOrigDataContainer(originalData, this.state.mainAccount),
@@ -277,144 +253,6 @@ export class ImportTransactionForm extends Component {
         }
 
         this.render();
-    }
-
-    /** Create transaction type field */
-    createTypeField() {
-        const transferDisabled = window.app.model.accounts.length < 2;
-        const debtDisabled = !window.app.model.persons.length;
-        const typeItems = [
-            { id: 'expense', title: 'Expense' },
-            { id: 'income', title: 'Income' },
-            { id: 'transferfrom', title: 'Transfer from', disabled: transferDisabled },
-            { id: 'transferto', title: 'Transfer to', disabled: transferDisabled },
-            { id: 'debtfrom', title: 'Debt from', disabled: debtDisabled },
-            { id: 'debtto', title: 'Debt to', disabled: debtDisabled },
-        ];
-
-        const selectElem = ce('select');
-        this.trTypeField = window.app.createField('Type', selectElem);
-
-        this.typeDropDown = DropDown.create({
-            elem: selectElem,
-            onchange: (type) => this.onTrTypeChanged(type),
-        });
-        typeItems.forEach((typeItem) => {
-            this.typeDropDown.addItem(typeItem);
-            if (typeItem.disabled) {
-                this.typeDropDown.enableItem(typeItem.id, false);
-            }
-        });
-    }
-
-    /** Create destination(second) account field */
-    createAccountField() {
-        const selectElem = ce('select');
-        this.transferAccountField = window.app.createField(TITLE_FIELD_DEST_ACCOUNT, selectElem);
-        this.transferAccountLabel = this.transferAccountField.querySelector('label');
-
-        this.transferAccDropDown = DropDown.create({
-            elem: selectElem,
-            disabled: true,
-            onchange: (account) => this.onTransferAccountChanged(account),
-        });
-        window.app.initAccountsList(this.transferAccDropDown);
-    }
-
-    /** Create person field */
-    createPersonField() {
-        const selectElem = ce('select');
-        this.personField = window.app.createField(TITLE_FIELD_PERSON, selectElem);
-
-        this.personDropDown = DropDown.create({
-            elem: selectElem,
-            disabled: true,
-            onchange: (person) => this.onPersonChanged(person),
-        });
-        window.app.initPersonsList(this.personDropDown);
-    }
-
-    /** Create source amount field */
-    createSourceAmountField() {
-        this.srcAmountInp = ce('input', {
-            className: `${IG_INPUT_CLASS} ${DEFAULT_INPUT_CLASS} ${AMOUNT_INPUT_CLASS}`,
-            type: 'text',
-            name: 'src_amount[]',
-            disabled: true,
-            placeholder: TITLE_FIELD_AMOUNT,
-            autocomplete: 'off',
-        });
-        this.srcAmountDecimalInput = DecimalInput.create({
-            elem: this.srcAmountInp,
-            digits: 2,
-            oninput: () => this.onSrcAmountInput(),
-        });
-
-        this.srcCurrencySign = ce('div', { className: IG_BUTTON_TITLE_CLASS });
-        this.srcCurrencyBtn = ce('button', {
-            type: 'button',
-            className: IG_BUTTON_CLASS,
-            tabIndex: -1,
-        }, this.srcCurrencySign);
-
-        this.srcCurrencyDropDown = DropDown.create({
-            elem: this.srcCurrencySign,
-            listAttach: true,
-            onchange: (currency) => this.onSrcCurrChanged(currency),
-        });
-        window.app.initCurrencyList(this.srcCurrencyDropDown);
-
-        this.srcAmountGroup = InputGroup.create({
-            children: [this.srcAmountInp, this.srcCurrencyBtn],
-        });
-        this.srcAmountField = window.app.createField(
-            TITLE_FIELD_AMOUNT,
-            this.srcAmountGroup.elem,
-            AMOUNT_FIELD_CLASS,
-        );
-        this.srcAmountLabel = this.srcAmountField.querySelector('label');
-    }
-
-    /** Create destination amount field */
-    createDestAmountField() {
-        this.destAmountInp = ce('input', {
-            className: `${IG_INPUT_CLASS} ${DEFAULT_INPUT_CLASS} ${AMOUNT_INPUT_CLASS}`,
-            type: 'text',
-            name: 'dest_amount[]',
-            placeholder: TITLE_FIELD_DEST_AMOUNT,
-            autocomplete: 'off',
-        });
-        this.destAmountDecimalInput = DecimalInput.create({
-            elem: this.destAmountInp,
-            digits: 2,
-            oninput: () => this.onDestAmountInput(),
-        });
-
-        this.destCurrencySign = ce('div', { className: IG_BUTTON_TITLE_CLASS });
-        this.destCurrencyBtn = ce('button', {
-            type: 'button',
-            className: IG_BUTTON_CLASS,
-            tabIndex: -1,
-        }, this.destCurrencySign);
-
-        this.destCurrencyDropDown = DropDown.create({
-            elem: this.destCurrencySign,
-            listAttach: true,
-            onchange: (currency) => this.onDestCurrChanged(currency),
-        });
-        window.app.initCurrencyList(this.destCurrencyDropDown);
-
-        this.destAmountGroup = InputGroup.create({
-            children: [this.destAmountInp, this.destCurrencyBtn],
-        });
-
-        this.destAmountField = window.app.createField(
-            TITLE_FIELD_DEST_AMOUNT,
-            this.destAmountGroup.elem,
-            AMOUNT_FIELD_CLASS,
-        );
-        show(this.destAmountField, false);
-        this.destAmountLabel = this.destAmountField.querySelector('label');
     }
 
     /** Create static data value element */
@@ -504,16 +342,12 @@ export class ImportTransactionForm extends Component {
 
         if (this.state.type === 'expense') {
             this.setDestAmount(Math.abs(trAmount));
-            if (this.data.transactionCurrencyId !== this.data.accountCurrencyId) {
-                this.setDestCurrency(this.data.transactionCurrencyId);
-                this.setSourceAmount(Math.abs(accAmount));
-            }
+            this.setDestCurrency(this.data.transactionCurrencyId);
+            this.setSourceAmount(Math.abs(accAmount));
         } else if (this.state.type === 'income') {
             this.setSourceAmount(Math.abs(trAmount));
-            if (this.data.transactionCurrencyId !== this.data.accountCurrencyId) {
-                this.setSourceCurrency(this.data.transactionCurrencyId);
-                this.setDestAmount(Math.abs(accAmount));
-            }
+            this.setSourceCurrency(this.data.transactionCurrencyId);
+            this.setDestAmount(Math.abs(accAmount));
         }
 
         this.setDate(formatDate(new Date(this.data.date)));
@@ -532,17 +366,6 @@ export class ImportTransactionForm extends Component {
         this.setOriginal(this.data);
 
         this.setMainAccount(currentMainAccount);
-    }
-
-    /**
-     * Remove item component
-     */
-    remove() {
-        if (!this.parent.onRemoveItem(this)) {
-            return;
-        }
-
-        re(this.elem);
     }
 
     /** Enable checkbox 'change' event handler */
@@ -576,6 +399,22 @@ export class ImportTransactionForm extends Component {
         return state;
     }
 
+    /** Update button 'click' event handler */
+    onUpdate() {
+        if (isFunction(this.props.onUpdate)) {
+            this.props.onUpdate(this);
+        }
+    }
+
+    /** Remove item */
+    remove() {
+        if (!this.parent.onRemoveItem(this)) {
+            return;
+        }
+
+        re(this.elem);
+    }
+
     /** Return component enabled status */
     isEnabled() {
         return this.state.enabled;
@@ -587,110 +426,12 @@ export class ImportTransactionForm extends Component {
         this.render();
     }
 
-    /** Transaction type select 'change' event handler */
-    onTrTypeChanged(type) {
-        this.setTransactionType(type.id);
-        this.clearInvalid();
-        this.render();
-    }
-
-    /** Destination account select 'change' event handler */
-    onTransferAccountChanged(account) {
-        this.setTransferAccount(account.id);
-        this.clearInvalid();
-        this.render();
-    }
-
-    /** Synchronize options of transfer account select */
-    syncTransferAccountSelect(state) {
-        const accountItems = this.transferAccDropDown.getVisibleItems();
-        accountItems.forEach((accountItem) => {
-            const isMainAccount = accountItem.id === state.accountId;
-            this.transferAccDropDown.enableItem(accountItem.id, !isMainAccount);
-        });
-    }
-
-    /** Person select 'change' event handler */
-    onPersonChanged(person) {
-        this.setPerson(person.id);
-        this.clearInvalid();
-        this.render();
-    }
-
-    /** Source amount field 'input' event handler */
-    onSrcAmountInput() {
-        const { value } = this.srcAmountInp;
-        this.setSourceAmount(value);
-        this.clearInvalid();
-        this.render();
-    }
-
-    /** Destination amount field 'input' event handler */
-    onDestAmountInput() {
-        const { value } = this.destAmountInp;
-        this.setDestAmount(value);
-        this.clearInvalid();
-        this.render();
-    }
-
-    /** Currency select 'change' event handler */
-    onSrcCurrChanged(currency) {
-        this.setSourceCurrency(currency.id);
-        this.clearInvalid();
-        this.render();
-    }
-
-    /** Currency select 'change' event handler */
-    onDestCurrChanged(currency) {
-        this.setDestCurrency(currency.id);
-        this.clearInvalid();
-        this.render();
-    }
-
-    /** Date field 'input' event handler */
-    onDateInput() {
-        const { value } = this.dateInp;
-        this.setDate(value);
-        this.clearInvalid();
-        this.render();
-    }
-
-    /** Comment field 'input' event handler */
-    onCommentInput() {
-        const { value } = this.commInp;
-        this.setComment(value);
-        this.clearInvalid();
-        this.render();
-    }
-
     /** Check currencies is different and return new state */
     checkStateCurrencies(state) {
         const res = {
             ...state,
             isDiff: state.srcCurrId !== state.destCurrId,
         };
-
-        if (!res.isDiff) {
-            if (res.type === 'expense') {
-                res.sourceAmount = '';
-            } else {
-                res.destAmount = '';
-            }
-        }
-
-        return res;
-    }
-
-    getTransferAccount(state, initialId) {
-        const { userAccounts } = window.app.model;
-
-        let res = userAccounts.getItem(initialId);
-        if (!res) {
-            res = userAccounts.getNextAccount();
-        }
-        if (res.id === state.mainAccount.id) {
-            res = userAccounts.getNextAccount(res.id);
-        }
 
         return res;
     }
@@ -704,7 +445,7 @@ export class ImportTransactionForm extends Component {
         if (this.state.type === value) {
             return this.state;
         }
-
+        const { userAccounts } = window.app.model;
         const state = copyObject(this.state);
         if (sourceTypes.includes(value)) {
             state.sourceAccountId = state.mainAccount.id;
@@ -752,9 +493,15 @@ export class ImportTransactionForm extends Component {
                 state.sourceAmount = this.state.destAmount;
             }
 
-            const account = this.getTransferAccount(state, this.state.destAccountId);
-            state.destAccountId = account.id;
-            state.destCurrId = account.curr_id;
+            let transferAccount = userAccounts.getItem(this.state.destAccountId);
+            if (!transferAccount) {
+                transferAccount = userAccounts.getNextAccount();
+            }
+            if (transferAccount.id === state.mainAccount.id) {
+                transferAccount = userAccounts.getNextAccount(transferAccount.id);
+            }
+            state.destAccountId = transferAccount.id;
+            state.destCurrId = transferAccount.curr_id;
         } else if (value === 'transferto') {
             state.personId = 0;
             // Copy destination amount to source amount
@@ -763,9 +510,15 @@ export class ImportTransactionForm extends Component {
                 state.sourceAmount = this.state.destAmount;
             }
 
-            const account = this.getTransferAccount(state, this.state.sourceAccountId);
-            state.sourceAccountId = account.id;
-            state.srcCurrId = account.curr_id;
+            let transferAccount = userAccounts.getItem(this.state.sourceAccountId);
+            if (!transferAccount) {
+                transferAccount = userAccounts.getNextAccount();
+            }
+            if (transferAccount.id === state.mainAccount.id) {
+                transferAccount = userAccounts.getNextAccount(transferAccount.id);
+            }
+            state.sourceAccountId = transferAccount.id;
+            state.srcCurrId = transferAccount.curr_id;
         } else if (value === 'debtfrom' || value === 'debtto') {
             // Copy destination amount to source amount
             // if previous type was expense
@@ -1049,89 +802,6 @@ export class ImportTransactionForm extends Component {
         return this.data;
     }
 
-    /** Validate transaction object */
-    setFeedback(value) {
-        if (typeof value === 'string' && value.length > 0) {
-            this.feedbackElem.textContent = value;
-            show(this.feedbackElem, true);
-        } else {
-            this.feedbackElem.textContent = '';
-            show(this.feedbackElem, false);
-        }
-    }
-
-    /** Remove all invalidated marks */
-    clearInvalid() {
-        this.parent.clearBlockValidation(this.srcAmountField);
-        this.parent.clearBlockValidation(this.destAmountField);
-        this.parent.clearBlockValidation(this.dateField);
-        this.setFeedback();
-    }
-
-    validateSourceAmount(state) {
-        const amountValue = parseFloat(fixFloat(state.sourceAmount));
-        if (Number.isNaN(amountValue) || amountValue <= 0) {
-            this.parent.invalidateBlock(this.srcAmountField);
-            this.setFeedback(MSG_INCORRECT_AMOUNT);
-            return false;
-        }
-
-        return true;
-    }
-
-    validateDestAmount(state) {
-        const amountValue = parseFloat(fixFloat(state.destAmount));
-        if (Number.isNaN(amountValue) || amountValue <= 0) {
-            this.parent.invalidateBlock(this.destAmountField);
-            this.setFeedback(MSG_INCORRECT_AMOUNT);
-            return false;
-        }
-
-        return true;
-    }
-
-    /** Validate transaction object */
-    validate() {
-        const { state } = this;
-
-        if (state.type === 'expense') {
-            const destAmountValid = this.validateDestAmount(state);
-            if (!destAmountValid) {
-                return false;
-            }
-            if (state.isDiff) {
-                const srcAmountValid = this.validateSourceAmount(state);
-                if (!srcAmountValid) {
-                    return false;
-                }
-            }
-        } else {
-            const srcAmountValid = this.validateSourceAmount(state);
-            if (!srcAmountValid) {
-                return false;
-            }
-            if (state.isDiff) {
-                const destAmountValid = this.validateDestAmount(state);
-                if (!destAmountValid) {
-                    return false;
-                }
-            }
-        }
-
-        if (!checkDate(state.date)) {
-            this.parent.invalidateBlock(this.dateField);
-            this.setFeedback(MSG_INVALID_DATE);
-            return false;
-        }
-
-        return true;
-    }
-
-    /** Return date string */
-    getDate() {
-        return this.state.date;
-    }
-
     /** Return transaction object */
     getData() {
         const { accounts, persons } = window.app.model;
@@ -1205,127 +875,61 @@ export class ImportTransactionForm extends Component {
         return res;
     }
 
-    renderCurrency(elem, ddown, currencyId) {
-        const signElem = elem;
-        if (!signElem) {
-            return;
-        }
-
-        const curr = window.app.model.currency.getItem(currencyId);
-        if (!curr) {
-            return;
-        }
-
-        signElem.textContent = curr.sign;
-        ddown?.selectItem(currencyId);
-    }
-
     /** Render component */
-    render() {
-        const { state } = this;
-
+    render(state = this.state) {
         if (!state) {
             throw new Error('Invalid state');
         }
 
-        const isIncome = state.type === 'income';
+        const { userAccounts, persons, currency } = window.app.model;
         const isTransfer = ['transferfrom', 'transferto'].includes(state.type);
         const isDebt = ['debtfrom', 'debtto'].includes(state.type);
 
-        if (state.enabled) {
-            this.elem.classList.remove(DISABLED_CLASS);
-        } else {
-            this.elem.classList.add(DISABLED_CLASS);
-        }
+        enable(this.elem, state.enabled);
 
         this.enableCheck.check(state.enabled);
 
-        // Type field
-        this.typeDropDown.enable(state.enabled);
-        this.typeDropDown.selectItem(state.type);
-
-        // Amount field
-        if (state.type === 'expense') {
-            // Destination amount field
-            this.destAmountInp.value = state.destAmount;
-            enable(this.destAmountInp, state.enabled);
-            this.destCurrencyDropDown.enable(state.enabled);
-            enable(this.destCurrencyBtn, state.enabled);
-            this.renderCurrency(this.destCurrencySign, this.destCurrencyDropDown, state.destCurrId);
-            show(this.destAmountField, true);
-
-            const destAmountLabel = (state.isDiff) ? TITLE_FIELD_DEST_AMOUNT : TITLE_FIELD_AMOUNT;
-            this.destAmountInp.placeholder = destAmountLabel;
-            this.destAmountLabel.textContent = destAmountLabel;
-
-            // Source amount field
-            this.srcAmountInp.value = state.sourceAmount;
-            enable(this.srcAmountInp, state.enabled && state.isDiff);
-            this.srcCurrencyDropDown.enable(false);
-            enable(this.srcCurrencyBtn, false);
-            this.renderCurrency(this.srcCurrencySign, this.srcCurrencyDropDown, state.srcCurrId);
-            show(this.srcAmountField, state.isDiff);
-
-            this.srcAmountInp.placeholder = TITLE_FIELD_SRC_AMOUNT;
-            this.srcAmountLabel.textContent = TITLE_FIELD_SRC_AMOUNT;
-        } else {
-            // Source amount field
-            this.srcAmountInp.value = state.sourceAmount;
-            enable(this.srcAmountInp, state.enabled);
-            this.srcCurrencyDropDown.enable(state.enabled && isIncome);
-            enable(this.srcCurrencyBtn, state.enabled && isIncome);
-            this.renderCurrency(this.srcCurrencySign, this.srcCurrencyDropDown, state.srcCurrId);
-            show(this.srcAmountField, true);
-
-            const srcAmountLabel = (state.isDiff) ? TITLE_FIELD_SRC_AMOUNT : TITLE_FIELD_AMOUNT;
-            this.srcAmountInp.placeholder = srcAmountLabel;
-            this.srcAmountLabel.textContent = srcAmountLabel;
-
-            // Destination amount field
-            this.destAmountInp.value = state.destAmount;
-            enable(this.destAmountInp, state.enabled && state.isDiff);
-            this.destCurrencyDropDown.enable(false);
-            enable(this.destCurrencyBtn, false);
-            this.renderCurrency(this.destCurrencySign, this.destCurrencyDropDown, state.destCurrId);
-            show(this.destAmountField, state.isDiff);
-
-            this.destAmountInp.placeholder = TITLE_FIELD_DEST_AMOUNT;
-            this.destAmountLabel.textContent = TITLE_FIELD_DEST_AMOUNT;
+        // Types field
+        if (!(state.type in typeStrings)) {
+            throw new Error('Invalid transaction type');
         }
+        this.trTypeTitle.textContent = typeStrings[state.type];
 
-        // Second account field
-        this.transferAccDropDown.enable(state.enabled && isTransfer);
+        // Account field
+        show(this.accountField, isTransfer);
         if (isTransfer) {
-            this.syncTransferAccountSelect(state);
-            const transferAccountId = (state.type === 'transferto')
-                ? state.sourceAccountId
-                : state.destAccountId;
-            if (transferAccountId) {
-                this.transferAccDropDown.selectItem(transferAccountId);
-            }
-            show(this.transferAccountField, true);
+            const isTransferFrom = state.type === 'transferfrom';
+            const accountId = (isTransferFrom) ? state.destAccountId : state.sourceAccountId;
+            const account = userAccounts.getItem(accountId);
+            this.accountTitle.textContent = account.name;
 
-            const accountLabel = (state.type === 'transferto')
-                ? TITLE_FIELD_SRC_ACCOUNT
-                : TITLE_FIELD_DEST_ACCOUNT;
-
-            this.transferAccountLabel.textContent = accountLabel;
+            this.accountLabel.textContent = (isTransferFrom)
+                ? TITLE_FIELD_DEST_ACCOUNT
+                : TITLE_FIELD_SRC_ACCOUNT;
         }
-        show(this.transferAccountField, isTransfer);
-
         // Person field
-        this.personDropDown.enable(state.enabled && isDebt);
-        if (state.personId) {
-            this.personDropDown.selectItem(state.personId);
-        }
         show(this.personField, isDebt);
+        if (isDebt) {
+            const person = persons.getItem(state.personId);
+            this.personTitle.textContent = person.name;
+        }
 
-        // Date filed
-        enable(this.dateInp, state.enabled);
-        this.dateInp.value = state.date;
+        // Amount fields
+        const srcAmountLabel = (state.isDiff) ? TITLE_FIELD_SRC_AMOUNT : TITLE_FIELD_AMOUNT;
+        this.srcAmountLabel.textContent = srcAmountLabel;
+        const srcAmount = currency.formatCurrency(state.sourceAmount, state.srcCurrId);
+        this.srcAmountTitle.textContent = srcAmount;
 
-        // Commend field
-        enable(this.commInp, state.enabled);
-        this.commInp.value = state.comment;
+        show(this.destAmountField, state.isDiff);
+        if (state.isDiff) {
+            const destAmount = currency.formatCurrency(state.destAmount, state.destCurrId);
+            this.destAmountTitle.textContent = destAmount;
+        }
+
+        // Date field
+        this.dateTitle.textContent = state.date;
+
+        // Comment field
+        this.commentTitle.textContent = state.comment;
     }
 }

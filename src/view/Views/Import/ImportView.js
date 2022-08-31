@@ -4,6 +4,7 @@ import {
     re,
     ce,
     show,
+    insertAfter,
     setEvents,
     enable,
     setEmptyClick,
@@ -24,6 +25,13 @@ import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from '../../Components/I
 import { ImportTransactionForm } from '../../Components/Import/TransactionForm/ImportTransactionForm.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { API } from '../../js/API.js';
+import { ImportTransactionItem } from '../../Components/Import/TransactionItem/ImportTransactionItem.js';
+import {
+    EXPENSE,
+    INCOME,
+    TRANSFER,
+    DEBT,
+} from '../../js/model/Transaction.js';
 
 const SUBMIT_LIMIT = 100;
 /** Messages */
@@ -40,6 +48,7 @@ class ImportView extends View {
 
         this.state = {
             transactionRows: [],
+            activeItemIndex: -1,
             mainAccount: null,
             transCache: null,
             rulesEnabled: true,
@@ -214,10 +223,11 @@ class ImportView extends View {
             throw new Error('Invalid data');
         }
 
-        const item = new ImportTransactionForm({
+        const item = ImportTransactionItem.create({
             parent: this,
             mainAccount: this.state.mainAccount,
             originalData: data,
+            onUpdate: (i) => this.onUpdateItem(i),
         });
 
         if (this.state.rulesEnabled) {
@@ -383,6 +393,7 @@ class ImportView extends View {
     removeAllItems() {
         this.state.transactionRows.forEach((item) => re(item.elem));
         this.state.transactionRows = [];
+        this.state.activeItemIndex = -1;
         this.render(this.state);
     }
 
@@ -407,8 +418,80 @@ class ImportView extends View {
 
         const delPos = item.pos;
         this.state.transactionRows.splice(delPos, 1);
+        if (this.state.activeItemIndex === delPos) {
+            this.state.activeItemIndex = -1;
+        } else if (delPos < this.state.activeItemIndex) {
+            this.state.activeItemIndex -= 1;
+        }
         this.updateRowsPos();
         this.render(this.state);
+
+        return true;
+    }
+
+    convertItemDataToProps(data) {
+        const { mainAccount } = this.state;
+        const res = {
+            sourceAmount: data.src_amount,
+            destAmount: data.dest_amount,
+            srcCurrId: data.src_curr,
+            destCurrId: data.dest_curr,
+            date: data.date,
+            comment: data.comment,
+        };
+
+        if (data.type === EXPENSE) {
+            res.type = 'expense';
+            res.sourceAccountId = data.src_id;
+        } else if (data.type === INCOME) {
+            res.type = 'income';
+            res.destAccountId = data.dest_id;
+        } else if (data.type === TRANSFER) {
+            const isTransferFrom = data.src_id === mainAccount.id;
+            res.type = (isTransferFrom) ? 'transferfrom' : 'transferto';
+            if (isTransferFrom) {
+                res.destAccountId = data.dest_id;
+            } else {
+                res.sourceAccountId = data.src_id;
+            }
+        } else if (data.type === DEBT) {
+            res.type = (data.op === 1) ? 'debtto' : 'debtfrom';
+            res.personId = data.person_id;
+        }
+
+        return res;
+    }
+
+    /** Save form data and replace it by item component */
+    saveItem() {
+        const { mainAccount, activeItemIndex } = this.state;
+
+        if (activeItemIndex === -1) {
+            return true;
+        }
+
+        const form = this.state.transactionRows[activeItemIndex];
+
+        const valid = form.validate();
+        if (!valid) {
+            return false;
+        }
+
+        const data = form.getData();
+        const itemProps = this.convertItemDataToProps(data);
+
+        const item = ImportTransactionItem.create({
+            parent: this,
+            mainAccount,
+            onUpdate: (i) => this.onUpdateItem(i),
+            ...itemProps,
+        });
+        item.pos = activeItemIndex;
+
+        insertAfter(item.elem, form.elem);
+        re(form.elem);
+        this.state.transactionRows.splice(activeItemIndex, 1, item);
+        this.state.activeItemIndex = -1;
 
         return true;
     }
@@ -420,18 +503,57 @@ class ImportView extends View {
             return;
         }
 
+        if (!this.saveItem()) {
+            return;
+        }
+
         const item = ImportTransactionForm.create({
             parent: this,
             mainAccount: this.state.mainAccount,
         });
-        item.enable(true);
-        item.render();
 
         this.rowsContainer.appendChild(item.elem);
         item.pos = this.state.transactionRows.length;
+        this.state.activeItemIndex = item.pos;
         this.state.transactionRows.push(item);
 
         this.render(this.state);
+    }
+
+    onUpdateItem(item) {
+        const { mainAccount, activeItemIndex } = this.state;
+        const index = this.getItemIndex(item);
+        if (index === -1 || index === activeItemIndex) {
+            return;
+        }
+
+        if (activeItemIndex !== -1) {
+            const saveResult = this.saveItem();
+            if (!saveResult) {
+                return;
+            }
+        }
+
+        let formProps;
+        const originalData = item.getOriginal();
+        if (originalData) {
+            formProps = { originalData };
+        } else {
+            const data = item.getData();
+            formProps = this.convertItemDataToProps(data);
+        }
+
+        const form = ImportTransactionForm.create({
+            parent: this,
+            mainAccount,
+            ...formProps,
+        });
+        form.pos = index;
+
+        insertAfter(form.elem, item.elem);
+        re(item.elem);
+        this.state.transactionRows.splice(index, 1, form);
+        this.state.activeItemIndex = index;
     }
 
     /**
@@ -482,15 +604,14 @@ class ImportView extends View {
     onSubmitClick() {
         this.submitProgress.show();
 
+        if (!this.saveItem()) {
+            this.submitProgress.hide();
+            return;
+        }
+
         const enabledList = this.getEnabledItems();
         if (!Array.isArray(enabledList) || !enabledList.length) {
             throw new Error('Invalid list of items');
-        }
-
-        const valid = enabledList.every((item) => item.validate());
-        if (!valid) {
-            this.submitProgress.hide();
-            return;
         }
 
         const itemsData = enabledList.map((item) => {
@@ -610,6 +731,11 @@ class ImportView extends View {
         }
 
         this.rulesDialog.show();
+    }
+
+    /** Returns item index in the list */
+    getItemIndex(item) {
+        return this.state.transactionRows.indexOf(item);
     }
 
     /**

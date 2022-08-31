@@ -1,0 +1,222 @@
+/* Transaction item */
+.import-item {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  margin: 2px 0;
+
+  .main-content {
+    padding: 4px 0;
+    display: flex;
+    flex-flow: row nowrap;
+  }
+
+  .item-container {
+    display: flex;
+    flex-flow: column nowrap;
+    flex-grow: 1;
+    align-items: normal;
+    gap: 8px;
+  }
+
+  .item-column {
+    display: flex;
+    flex-flow: column nowrap;
+    flex-grow: 1;
+    align-items: normal;
+    gap: 8px;
+  }
+
+  .item-row {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 8px;
+  }
+
+  /* Input field and label group */
+  .field {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: normal;
+    margin: 0;
+
+    label {
+      font-size: 12px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+  }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+  }
+
+  /* Enable/disable item checkbox container */
+  .enable-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 6px;
+
+    .checkbox__check {
+      margin: 0;
+    }
+
+    input[type="checkbox"] {
+      pointer-events: all;
+    }
+  }
+
+  /* Common buttons style */
+  .btn {
+    pointer-events: all;
+    background: none;
+    padding: 4px;
+    cursor: pointer;
+  }
+
+  /* Toggle expand/collapse button */
+  .toggle-btn {
+    padding: 7px;
+  }
+
+  .toggle-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .update-icon,
+  .delete-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .type-col,
+  .amount-col {
+    max-width: 300px;
+  }
+
+  .comment-field,
+  .comment-field div {
+    flex-grow: 1;
+  }
+
+  .import-item__date {
+    min-width: 50px;
+    max-width: 100px;
+  }
+
+  /* Container for extended content */
+  .extended-content {
+    display: none;
+    border-top: 1px solid;
+    padding: 8px;
+    overflow: hidden;
+  }
+
+  /* Original import data container */
+  .orig-data {
+    display: flex;
+    flex-flow: column nowrap;
+    width: 100%;
+
+    h3 {
+      font-size: 14px;
+      font-weight: 400;
+      margin-bottom: 8px;
+    }
+  }
+
+  /* Original import data table */
+  .orig-data-table {
+    display: flex;
+    flex-flow: column nowrap;
+    width: 100%;
+  }
+
+  /* Data value static element */
+  .data-value {
+    display: flex;
+    flex-flow: row nowrap;
+
+    label {
+      font-size: 14px;
+      font-weight: 800;
+      padding: 2px 8px;
+      width: 20%;
+      min-width: 120px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    div {
+      font-size: 16px;
+      padding: 2px 8px;
+    }
+  }
+
+  &.import-item--expanded {
+    .extended-content {
+      display: flex;
+    }
+
+    .toggle-icon {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+/* Placeholder */
+.import-item__placeholder {
+  border: 1px dashed;
+
+  * {
+    opacity: 0;
+  }
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .import-item {
+    .item-container {
+      flex-flow: row nowrap;
+    }
+
+    .item-row {
+      flex-flow: row nowrap;
+    }
+
+    .main-content {
+      padding: 4px 0 6px 0;
+    }
+
+    .orig-data-table {
+      flex-flow: row nowrap;
+    }
+
+    .data-value {
+      flex-flow: column nowrap;
+
+      label {
+        padding: 2px 8px;
+        width: auto;
+        min-width: auto;
+      }
+
+      div {
+        padding: 2px 8px;
+        min-width: auto;
+        text-align: right;
+      }
+
+      &.comment-value div {
+        text-align: left;
+      }
+    }
+  }
+}
