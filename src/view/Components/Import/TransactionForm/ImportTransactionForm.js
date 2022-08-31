@@ -81,12 +81,24 @@ const COL_ACC_CURRENCY = 'Acc. currency';
 const MSG_INCORRECT_AMOUNT = 'Please input correct amount';
 const MSG_INVALID_DATE = 'Please input correct date';
 
+const transTypeMap = {
+    expense: EXPENSE,
+    income: INCOME,
+    transferfrom: TRANSFER,
+    transferto: TRANSFER,
+    debtfrom: DEBT,
+    debtto: DEBT,
+};
 const sourceTypes = ['expense', 'transferfrom', 'debtfrom'];
 
 /**
  * ImportTransactionForm component
  */
 export class ImportTransactionForm extends Component {
+    static create(props) {
+        return new ImportTransactionForm(props);
+    }
+
     constructor(...args) {
         super(...args);
 
@@ -97,15 +109,6 @@ export class ImportTransactionForm extends Component {
         ) {
             throw new Error('Invalid props');
         }
-
-        this.transTypeMap = {
-            expense: EXPENSE,
-            income: INCOME,
-            transferfrom: TRANSFER,
-            transferto: TRANSFER,
-            debtfrom: DEBT,
-            debtto: DEBT,
-        };
 
         const { mainAccount } = this.props;
 
@@ -222,13 +225,6 @@ export class ImportTransactionForm extends Component {
         }
 
         this.render();
-    }
-
-    /**
-     * Create new ImportTransactionForm from specified element
-     */
-    static create(props) {
-        return new ImportTransactionForm(props);
     }
 
     /** Create transaction type field */
@@ -635,7 +631,7 @@ export class ImportTransactionForm extends Component {
 
     /** Set type of transaction */
     setTransactionType(value) {
-        if (typeof value !== 'string' || !(value in this.transTypeMap)) {
+        if (typeof value !== 'string' || !(value in transTypeMap)) {
             throw new Error('Invalid transaction type');
         }
 
