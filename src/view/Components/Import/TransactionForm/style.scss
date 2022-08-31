@@ -91,6 +91,8 @@
 
   /* Controls */
   .controls {
+    display: flex;
+    flex-flow: row nowrap;
     align-items: center;
   }
 
@@ -205,12 +207,12 @@
   display: flex;
   flex-flow: column nowrap;
   width: 100%;
-}
 
-.orig-data h3 {
-  font-size: 14px;
-  font-weight: 400;
-  margin-bottom: 8px;
+  h3 {
+    font-size: 14px;
+    font-weight: 400;
+    margin-bottom: 8px;
+  }
 }
 
 /* Original import data table */
@@ -223,10 +225,10 @@
 /* Placeholder */
 .import-form__placeholder {
   border: 1px dashed;
-}
 
-.import-form__placeholder * {
-  opacity: 0;
+  * {
+    opacity: 0;
+  }
 }
 
 .field.invalid-block label {

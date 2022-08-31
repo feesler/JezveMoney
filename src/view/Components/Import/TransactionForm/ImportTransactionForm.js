@@ -23,6 +23,42 @@ import {
 } from '../../../js/model/Transaction.js';
 import './style.scss';
 
+/** CSS classes */
+const CONTAINER_CLASS = 'import-form';
+const EXPANDED_CLASS = 'import-form_expanded';
+const DISABLED_CLASS = 'import-form_disabled';
+const ENABLE_CHECK_CLASS = 'enable-check';
+const MAIN_CONTENT_CLASS = 'main-content';
+const INV_FEEDBACK_CLASS = 'invalid-feedback';
+const EXT_CONTENT_CLASS = 'extended-content';
+const FORM_CONTAINER_CLASS = 'form-container';
+const FORM_COLUMN_CLASS = 'form-rows';
+const AMOUNT_COLUMN_CLASS = 'amount-col';
+const TYPE_COLUMN_CLASS = 'type-col';
+const FORM_ROW_CLASS = 'form-row';
+const IG_INPUT_CLASS = 'input-group__input';
+const IG_BUTTON_CLASS = 'input-group__btn';
+const IG_BUTTON_TITLE_CLASS = 'input-group__btn-title';
+const DEFAULT_INPUT_CLASS = 'stretch-input';
+const AMOUNT_INPUT_CLASS = 'amount-input';
+/* Fields */
+const AMOUNT_FIELD_CLASS = 'amount-field';
+const DATE_FIELD_CLASS = 'date-field';
+const COMMENT_FIELD_CLASS = 'comment-field';
+/* Controls */
+const CONTROLS_CLASS = 'controls';
+const DEFAULT_BUTTON_CLASS = 'btn';
+const DEL_BUTTON_CLASS = 'delete-btn';
+const TOGGLE_BUTTON_CLASS = 'toggle-btn';
+const DEFAULT_ICON_CLASS = 'icon';
+const DEL_ICON_CLASS = 'delete-icon';
+const TOGGLE_ICON_CLASS = 'toggle-icon';
+/* Original data */
+const DATA_VALUE_CLASS = 'data-value';
+const ORIG_DATA_CLASS = 'orig-data';
+const ORIG_DATA_TABLE_CLASS = 'orig-data-table';
+const COMMENT_VALUE_CLASS = 'comment-value';
+
 /** Fields */
 const TITLE_FIELD_AMOUNT = 'Amount';
 const TITLE_FIELD_SRC_AMOUNT = 'Source amount';
@@ -91,7 +127,7 @@ export class ImportTransactionForm extends Component {
 
         // Row enable checkbox
         this.enableCheck = Checkbox.create({
-            className: 'enable-check',
+            className: ENABLE_CHECK_CLASS,
             onChange: () => this.onRowChecked(),
         });
 
@@ -103,71 +139,75 @@ export class ImportTransactionForm extends Component {
 
         // Date field
         this.dateInp = ce('input', {
-            className: 'stretch-input',
+            className: DEFAULT_INPUT_CLASS,
             type: 'text',
             name: 'date[]',
             placeholder: TITLE_FIELD_DATE,
             autocomplete: 'off',
         }, null, { input: () => this.onDateInput() });
-        this.dateField = window.app.createField(TITLE_FIELD_DATE, this.dateInp, 'date-field');
+        this.dateField = window.app.createField(TITLE_FIELD_DATE, this.dateInp, DATE_FIELD_CLASS);
         // Comment field
         this.commInp = ce('input', {
-            className: 'stretch-input',
+            className: DEFAULT_INPUT_CLASS,
             type: 'text',
             name: 'comment[]',
             placeholder: TITLE_FIELD_COMMENT,
             autocomplete: 'off',
         }, null, { input: () => this.onCommentInput() });
-        this.commentField = window.app.createField(TITLE_FIELD_COMMENT, this.commInp, 'comment-field');
+        this.commentField = window.app.createField(
+            TITLE_FIELD_COMMENT,
+            this.commInp,
+            COMMENT_FIELD_CLASS,
+        );
         // Delete button
         this.delBtn = ce(
             'button',
-            { className: 'btn delete-btn', type: 'button' },
-            window.app.createIcon('del', 'icon delete-icon'),
+            { className: `${DEFAULT_BUTTON_CLASS} ${DEL_BUTTON_CLASS}`, type: 'button' },
+            window.app.createIcon('del', `${DEFAULT_ICON_CLASS} ${DEL_ICON_CLASS}`),
             { click: () => this.remove() },
         );
         // Toggle expand/collapse
         this.toggleExtBtn = ce(
             'button',
-            { className: 'btn toggle-btn', type: 'button' },
-            window.app.createIcon('toggle-ext', 'icon toggle-icon'),
+            { className: `${DEFAULT_BUTTON_CLASS} ${TOGGLE_BUTTON_CLASS}`, type: 'button' },
+            window.app.createIcon('toggle-ext', `${DEFAULT_ICON_CLASS} ${TOGGLE_ICON_CLASS}`),
             { click: () => this.toggleCollapse() },
         );
         show(this.toggleExtBtn, false);
 
-        this.topRow = window.app.createContainer('form-row', [
+        this.topRow = window.app.createContainer(FORM_ROW_CLASS, [
             this.dateField,
             this.commentField,
         ]);
 
-        this.formContainer = window.app.createContainer('form-container', [
-            window.app.createContainer('form-rows type-col', [
+        this.formContainer = window.app.createContainer(FORM_CONTAINER_CLASS, [
+            window.app.createContainer(`${FORM_COLUMN_CLASS} ${TYPE_COLUMN_CLASS}`, [
                 this.trTypeField,
                 this.transferAccountField,
                 this.personField,
             ]),
-            window.app.createContainer('form-rows amount-col', [
+            window.app.createContainer(`${FORM_COLUMN_CLASS} ${AMOUNT_COLUMN_CLASS}`, [
                 this.srcAmountField,
                 this.destAmountField,
             ]),
-            window.app.createContainer('form-rows', [
+            window.app.createContainer(FORM_COLUMN_CLASS, [
                 this.topRow,
             ]),
         ]);
 
-        this.mainContainer = window.app.createContainer('main-content', [
+        this.mainContainer = window.app.createContainer(MAIN_CONTENT_CLASS, [
             this.enableCheck.elem,
             this.formContainer,
-            window.app.createContainer('row-container controls', [
+            window.app.createContainer(CONTROLS_CLASS, [
                 this.delBtn,
                 this.toggleExtBtn,
             ]),
         ]);
-        this.feedbackElem = ce('div', { className: 'invalid-feedback' });
+        this.feedbackElem = ce('div', { className: INV_FEEDBACK_CLASS });
         show(this.feedbackElem, false);
-        this.extendedContainer = window.app.createContainer('extended-content');
+        this.extendedContainer = window.app.createContainer(EXT_CONTENT_CLASS);
 
-        this.elem = window.app.createContainer('import-form', [
+        this.elem = window.app.createContainer(CONTAINER_CLASS, [
             this.mainContainer,
             this.feedbackElem,
             this.extendedContainer,
@@ -249,7 +289,7 @@ export class ImportTransactionForm extends Component {
     /** Create source amount field */
     createSourceAmountField() {
         this.srcAmountInp = ce('input', {
-            className: 'input-group__input stretch-input amount-input',
+            className: `${IG_INPUT_CLASS} ${DEFAULT_INPUT_CLASS} ${AMOUNT_INPUT_CLASS}`,
             type: 'text',
             name: 'src_amount[]',
             disabled: true,
@@ -262,10 +302,10 @@ export class ImportTransactionForm extends Component {
             oninput: () => this.onSrcAmountInput(),
         });
 
-        this.srcCurrencySign = ce('div', { className: 'input-group__btn-title' });
+        this.srcCurrencySign = ce('div', { className: IG_BUTTON_TITLE_CLASS });
         this.srcCurrencyBtn = ce('button', {
             type: 'button',
-            className: 'input-group__btn',
+            className: IG_BUTTON_CLASS,
             tabIndex: -1,
         }, this.srcCurrencySign);
 
@@ -282,7 +322,7 @@ export class ImportTransactionForm extends Component {
         this.srcAmountField = window.app.createField(
             TITLE_FIELD_AMOUNT,
             this.srcAmountGroup.elem,
-            'amount-field',
+            AMOUNT_FIELD_CLASS,
         );
         this.srcAmountLabel = this.srcAmountField.querySelector('label');
     }
@@ -290,7 +330,7 @@ export class ImportTransactionForm extends Component {
     /** Create destination amount field */
     createDestAmountField() {
         this.destAmountInp = ce('input', {
-            className: 'input-group__input stretch-input amount-input',
+            className: `${IG_INPUT_CLASS} ${DEFAULT_INPUT_CLASS} ${AMOUNT_INPUT_CLASS}`,
             type: 'text',
             name: 'dest_amount[]',
             placeholder: TITLE_FIELD_DEST_AMOUNT,
@@ -302,10 +342,10 @@ export class ImportTransactionForm extends Component {
             oninput: () => this.onDestAmountInput(),
         });
 
-        this.destCurrencySign = ce('div', { className: 'input-group__btn-title' });
+        this.destCurrencySign = ce('div', { className: IG_BUTTON_TITLE_CLASS });
         this.destCurrencyBtn = ce('button', {
             type: 'button',
-            className: 'input-group__btn',
+            className: IG_BUTTON_CLASS,
             tabIndex: -1,
         }, this.destCurrencySign);
 
@@ -323,7 +363,7 @@ export class ImportTransactionForm extends Component {
         this.destAmountField = window.app.createField(
             TITLE_FIELD_DEST_AMOUNT,
             this.destAmountGroup.elem,
-            'amount-field',
+            AMOUNT_FIELD_CLASS,
         );
         show(this.destAmountField, false);
         this.destAmountLabel = this.destAmountField.querySelector('label');
@@ -331,7 +371,7 @@ export class ImportTransactionForm extends Component {
 
     /** Create static data value element */
     createDataValue(title, value, extraClass) {
-        const elemClasses = ['data-value'];
+        const elemClasses = [DATA_VALUE_CLASS];
 
         if (typeof extraClass === 'string' && extraClass.length > 0) {
             elemClasses.push(extraClass);
@@ -354,16 +394,16 @@ export class ImportTransactionForm extends Component {
 
         const dateFmt = formatDate(new Date(data.date));
 
-        return window.app.createContainer('orig-data', [
+        return window.app.createContainer(ORIG_DATA_CLASS, [
             ce('h3', { textContent: TITLE_ORIGINAL_DATA }),
-            window.app.createContainer('orig-data-table', [
+            window.app.createContainer(ORIG_DATA_TABLE_CLASS, [
                 this.createDataValue(COL_MAIN, mainAccount.name),
                 this.createDataValue(COL_DATE, dateFmt),
                 this.createDataValue(COL_TR_AMOUNT, data.transactionAmount),
                 this.createDataValue(COL_TR_CURRENCY, data.transactionCurrency),
                 this.createDataValue(COL_ACC_AMOUNT, data.accountAmount),
                 this.createDataValue(COL_ACC_CURRENCY, data.accountCurrency),
-                this.createDataValue(COL_COMMENT, data.comment, 'comment-value'),
+                this.createDataValue(COL_COMMENT, data.comment, COMMENT_VALUE_CLASS),
             ]),
         ]);
     }
@@ -379,7 +419,7 @@ export class ImportTransactionForm extends Component {
         if (content) {
             addChilds(this.extendedContainer, content);
         } else {
-            this.elem.classList.remove('import-form_expanded');
+            this.elem.classList.remove(EXPANDED_CLASS);
         }
 
         show(this.toggleExtBtn, content);
@@ -468,7 +508,7 @@ export class ImportTransactionForm extends Component {
 
     /** Toggle collapse/expand button 'click' event handler */
     toggleCollapse() {
-        this.elem.classList.toggle('import-form_expanded');
+        this.elem.classList.toggle(EXPANDED_CLASS);
     }
 
     /**
@@ -1143,9 +1183,9 @@ export class ImportTransactionForm extends Component {
         const isDebt = ['debtfrom', 'debtto'].includes(state.type);
 
         if (state.enabled) {
-            this.elem.classList.remove('import-form_disabled');
+            this.elem.classList.remove(DISABLED_CLASS);
         } else {
-            this.elem.classList.add('import-form_disabled');
+            this.elem.classList.add(DISABLED_CLASS);
         }
 
         this.enableCheck.check(state.enabled);
