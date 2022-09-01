@@ -26,7 +26,7 @@ import './style.scss';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'import-form';
-const EXPANDED_CLASS = 'import-form_expanded';
+const EXPANDED_CLASS = 'import-form--expanded';
 const ENABLE_CHECK_CLASS = 'enable-check';
 const MAIN_CONTENT_CLASS = 'main-content';
 const INV_FEEDBACK_CLASS = 'invalid-feedback';

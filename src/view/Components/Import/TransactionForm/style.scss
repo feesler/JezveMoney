@@ -175,7 +175,7 @@
     overflow: hidden;
   }
 
-  &.import-form_expanded .extended-content {
+  &.import-form--expanded .extended-content {
     display: flex;
   }
 
@@ -200,7 +200,7 @@
   }
 }
 
-.import-form_expanded .toggle-icon {
+.import-form--expanded .toggle-icon {
   transform: rotate(180deg);
 }
 

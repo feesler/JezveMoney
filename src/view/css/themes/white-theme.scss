@@ -280,36 +280,25 @@
   /* Import form */
   .import-form {
     background-color: #dddddd;
-  }
 
-  .import-form .extended-content {
-    color: #202020;
-    border-color: #b0b0b0;
-    background-color: #cccccc;
-  }
-
-  .import-form input[type="text"] {
-    border-color: var(--input-border-color);
-  }
-
-  .import-form input[disabled] {
-    color: var(--input-disabled-text-color);
-    border-color: var(--input-disabled-border-color);
-    background-color: var(--input-disabled-bg-color);
-  }
-
-  /* Import item */
-  .import-item {
-    background-color: #dddddd;
-
-    .field label {
-      color: #a7a7a7;
+    &.import-form__placeholder {
+      border-color: #888888;
+      background-color: var(--main-bg-color);
     }
 
-    .extended-content {
-      color: #202020;
-      border-color: #b0b0b0;
-      background-color: #cccccc;
+    input[type="text"] {
+      border-color: var(--input-border-color);
+    }
+
+    input[disabled] {
+      color: var(--input-disabled-text-color);
+      border-color: var(--input-disabled-border-color);
+      background-color: var(--input-disabled-bg-color);
+    }
+
+    input[type="text"]:focus {
+      border-color: #888888;
+      background-color: #f2f2f2;
     }
 
     .btn {
@@ -318,11 +307,6 @@
 
     .icon {
       fill: #a7a7a7;
-    }
-
-    &.import-item__placeholder {
-      border-color: #888888;
-      background-color: var(--main-bg-color);
     }
   }
 
@@ -348,44 +332,47 @@
       border-color: var(--input-disabled-border-color);
       background-color: var(--input-disabled-bg-color);
     }
+  }
 
-    .extended-content {
-      color: #a0a0a0;
-      border-color: #d0d0d0;
-      background-color: #e0e0e0;
+  /* Import item */
+  .import-item {
+    background-color: #dddddd;
+
+    &[disabled] {
+      background-color: #e8e8e8;
+      color: #808080;
+      border-color: #e8e8e8;
+    }
+
+    &.import-item__placeholder {
+      border-color: #888888;
+      background-color: var(--main-bg-color);
+    }
+
+    .field label {
+      color: #a7a7a7;
+    }
+
+    .btn {
+      color: #202020;
+    }
+
+    .icon {
+      fill: #a7a7a7;
     }
   }
 
-  .import-form input[type="text"]:focus {
-    border-color: #888888;
-    background-color: #f2f2f2;
-  }
-
-  .import-form .btn {
+  /* Original import data container */
+  .extended-content {
     color: #202020;
+    border-color: #b0b0b0;
+    background-color: #cccccc;
   }
 
-  .import-form .delete-icon,
-  .import-form .toggle-icon {
-    fill: #a7a7a7;
-  }
-
-  .import-form.import-form__placeholder {
-    border-color: #888888;
-    background-color: var(--main-bg-color);
-  }
-
-  /* Disabled Import item */
-  .import-item[disabled] {
-    background-color: #e8e8e8;
-    color: #808080;
-    border-color: #e8e8e8;
-
-    .extended-content {
-      color: #a0a0a0;
-      border-color: #d0d0d0;
-      background-color: #e0e0e0;
-    }
+  [disabled] .extended-content {
+    color: #a0a0a0;
+    border-color: #d0d0d0;
+    background-color: #e0e0e0;
   }
 
   .import-controls {
