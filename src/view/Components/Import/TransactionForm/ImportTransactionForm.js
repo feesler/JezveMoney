@@ -27,7 +27,6 @@ import './style.scss';
 /** CSS classes */
 const CONTAINER_CLASS = 'import-form';
 const EXPANDED_CLASS = 'import-form_expanded';
-const DISABLED_CLASS = 'import-form_disabled';
 const ENABLE_CHECK_CLASS = 'enable-check';
 const MAIN_CONTENT_CLASS = 'main-content';
 const INV_FEEDBACK_CLASS = 'invalid-feedback';
@@ -1245,11 +1244,7 @@ export class ImportTransactionForm extends Component {
         const isTransfer = ['transferfrom', 'transferto'].includes(state.type);
         const isDebt = ['debtfrom', 'debtto'].includes(state.type);
 
-        if (state.enabled) {
-            this.elem.classList.remove(DISABLED_CLASS);
-        } else {
-            this.elem.classList.add(DISABLED_CLASS);
-        }
+        enable(this.elem, state.enabled);
 
         this.enableCheck.check(state.enabled);
 

@@ -192,10 +192,12 @@
 }
 
 /* Disabled transaction row */
-.import-form_disabled .dd__container,
-.import-form_disabled input[type="text"],
-.import-form_disabled input[disabled] {
-  pointer-events: none;
+.import-form[disabled] {
+  .dd__container,
+  input[type="text"],
+  input[disabled] {
+    pointer-events: none;
+  }
 }
 
 .import-form_expanded .toggle-icon {

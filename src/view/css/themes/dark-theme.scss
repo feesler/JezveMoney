@@ -289,12 +289,10 @@
     background-color: #444444;
   }
 
-  .import-form select,
   .import-form input[type="text"] {
     border-color: var(--input-border-color);
   }
 
-  .import-form select[disabled],
   .import-form input[disabled] {
     color: var(--input-disabled-text-color);
     border-color: var(--input-disabled-border-color);
@@ -330,13 +328,11 @@
   }
 
   /* Disabled Import form */
-  .import-form.import-form_disabled {
+  .import-form[disabled] {
     background-color: #292929;
     color: #707070;
     border-color: #707070;
 
-    select,
-    select[disabled],
     input[type="text"],
     input[disabled] {
       color: var(--input-disabled-text-color);
@@ -361,7 +357,6 @@
     }
   }
 
-  .import-form select:focus,
   .import-form input[type="text"]:focus {
     border-color: #d0d0d0;
     background-color: #202020;
