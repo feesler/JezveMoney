@@ -388,6 +388,15 @@ export class ImportTransactionItem extends Component {
         this.setMainAccount(currentMainAccount);
     }
 
+    /** Remove item */
+    remove() {
+        if (isFunction(this.props.onRemove)) {
+            this.props.onRemove(this);
+        }
+
+        re(this.elem);
+    }
+
     /** Enable checkbox 'change' event handler */
     onRowChecked() {
         const value = this.enableCheck.checked;
@@ -428,15 +437,6 @@ export class ImportTransactionItem extends Component {
         }
     }
 
-    /** Remove item */
-    remove() {
-        if (isFunction(this.props.onRemove)) {
-            this.props.onRemove(this);
-        }
-
-        re(this.elem);
-    }
-
     /** Main account of transaction select 'change' event handler */
     onMainAccountChanged(value) {
         this.setMainAccount(value);
@@ -453,6 +453,20 @@ export class ImportTransactionItem extends Component {
         return res;
     }
 
+    getTransferAccount(state, initialId) {
+        const { userAccounts } = window.app.model;
+
+        let res = userAccounts.getItem(initialId);
+        if (!res) {
+            res = userAccounts.getNextAccount();
+        }
+        if (res.id === state.mainAccount.id) {
+            res = userAccounts.getNextAccount(res.id);
+        }
+
+        return res;
+    }
+
     /** Set type of transaction */
     setTransactionType(value) {
         if (typeof value !== 'string' || !(value in transTypeMap)) {
@@ -462,7 +476,7 @@ export class ImportTransactionItem extends Component {
         if (this.state.type === value) {
             return this.state;
         }
-        const { userAccounts } = window.app.model;
+
         const state = copyObject(this.state);
         if (sourceTypes.includes(value)) {
             state.sourceAccountId = state.mainAccount.id;
@@ -510,15 +524,9 @@ export class ImportTransactionItem extends Component {
                 state.sourceAmount = this.state.destAmount;
             }
 
-            let transferAccount = userAccounts.getItem(this.state.destAccountId);
-            if (!transferAccount) {
-                transferAccount = userAccounts.getNextAccount();
-            }
-            if (transferAccount.id === state.mainAccount.id) {
-                transferAccount = userAccounts.getNextAccount(transferAccount.id);
-            }
-            state.destAccountId = transferAccount.id;
-            state.destCurrId = transferAccount.curr_id;
+            const account = this.getTransferAccount(state, this.state.destAccountId);
+            state.destAccountId = account.id;
+            state.destCurrId = account.curr_id;
         } else if (value === 'transferto') {
             state.personId = 0;
             // Copy destination amount to source amount
@@ -527,15 +535,9 @@ export class ImportTransactionItem extends Component {
                 state.sourceAmount = this.state.destAmount;
             }
 
-            let transferAccount = userAccounts.getItem(this.state.sourceAccountId);
-            if (!transferAccount) {
-                transferAccount = userAccounts.getNextAccount();
-            }
-            if (transferAccount.id === state.mainAccount.id) {
-                transferAccount = userAccounts.getNextAccount(transferAccount.id);
-            }
-            state.sourceAccountId = transferAccount.id;
-            state.srcCurrId = transferAccount.curr_id;
+            const account = this.getTransferAccount(state, this.state.sourceAccountId);
+            state.sourceAccountId = account.id;
+            state.srcCurrId = account.curr_id;
         } else if (value === 'debtfrom' || value === 'debtto') {
             // Copy destination amount to source amount
             // if previous type was expense

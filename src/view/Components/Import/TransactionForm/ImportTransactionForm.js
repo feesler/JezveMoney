@@ -549,9 +549,7 @@ export class ImportTransactionForm extends Component {
         this.setMainAccount(currentMainAccount);
     }
 
-    /**
-     * Remove item component
-     */
+    /** Remove item */
     remove() {
         if (isFunction(this.props.onRemove)) {
             this.props.onRemove(this);
