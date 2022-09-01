@@ -161,6 +161,10 @@ export class ImportTransactionItem extends Component {
         this.init();
     }
 
+    get enabled() {
+        return this.state.enabled;
+    }
+
     init() {
         // Row enable checkbox
         this.enableCheck = Checkbox.create({
@@ -431,11 +435,6 @@ export class ImportTransactionItem extends Component {
         }
 
         re(this.elem);
-    }
-
-    /** Return component enabled status */
-    isEnabled() {
-        return this.state.enabled;
     }
 
     /** Main account of transaction select 'change' event handler */

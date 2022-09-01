@@ -600,7 +600,7 @@ class ImportView extends View {
             throw new Error('Invalid state');
         }
 
-        return this.state.transactionRows.filter((item) => item.isEnabled());
+        return this.state.transactionRows.filter((item) => item.enabled);
     }
 
     /** Submit buttom 'click' event handler */
