@@ -231,6 +231,7 @@ class ImportView extends View {
             onUpdate: (i) => this.onUpdateItem(i),
             onRemove: (i) => this.onRemoveItem(i),
         });
+        item.setOriginal(item.data);
 
         if (this.state.rulesEnabled) {
             window.app.model.rules.applyTo(item);
@@ -473,7 +474,6 @@ class ImportView extends View {
         }
 
         const form = this.state.transactionRows[activeItemIndex];
-
         const valid = form.validate();
         if (!valid) {
             return false;
@@ -486,6 +486,7 @@ class ImportView extends View {
             parent: this,
             mainAccount,
             ...itemProps,
+            originalData: form.getOriginal(),
             onEnable: (i) => this.onEnableItem(i),
             onUpdate: (i) => this.onUpdateItem(i),
             onRemove: (i) => this.onRemoveItem(i),
@@ -546,6 +547,7 @@ class ImportView extends View {
             parent: this,
             mainAccount,
             ...formProps,
+            originalData: item.getOriginal(),
             onEnable: (i) => this.onEnableItem(i),
             onRemove: (i) => this.onRemoveItem(i),
         });

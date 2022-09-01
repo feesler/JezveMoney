@@ -178,6 +178,11 @@ export class ImportTransactionForm extends Component {
 
         this.state = this.checkStateCurrencies(state);
 
+        this.data = null;
+        if (this.props.originalData) {
+            this.saveOriginal(this.props.originalData);
+        }
+
         this.init();
     }
 
@@ -271,9 +276,7 @@ export class ImportTransactionForm extends Component {
         ]);
 
         const { originalData } = this.props;
-        this.data = null;
         if (originalData) {
-            this.setOriginal(originalData);
             this.setExtendedContent(
                 this.createOrigDataContainer(originalData, this.state.mainAccount),
             );
@@ -476,8 +479,8 @@ export class ImportTransactionForm extends Component {
         show(this.toggleExtBtn, content);
     }
 
-    /** Apply import data to component */
-    setOriginal(data) {
+    /** Save original import data */
+    saveOriginal(data) {
         if (!data) {
             throw new Error('Invalid data');
         }
@@ -487,8 +490,11 @@ export class ImportTransactionForm extends Component {
             this.data.origAccount = { ...this.state.mainAccount };
         }
         this.data.mainAccount = this.state.mainAccount.id;
+    }
 
-        if (this.data.accountCurrencyId !== this.state.mainAccount.curr_id) {
+    /** Apply import data to component */
+    setOriginal(data) {
+        if (data.accountCurrencyId !== this.state.mainAccount.curr_id) {
             throw new Error('Currency must be the same as main account');
         }
 
@@ -507,20 +513,20 @@ export class ImportTransactionForm extends Component {
 
         if (this.state.type === 'expense') {
             this.setDestAmount(Math.abs(trAmount));
-            if (this.data.transactionCurrencyId !== this.data.accountCurrencyId) {
-                this.setDestCurrency(this.data.transactionCurrencyId);
+            if (data.transactionCurrencyId !== data.accountCurrencyId) {
+                this.setDestCurrency(data.transactionCurrencyId);
                 this.setSourceAmount(Math.abs(accAmount));
             }
         } else if (this.state.type === 'income') {
             this.setSourceAmount(Math.abs(trAmount));
-            if (this.data.transactionCurrencyId !== this.data.accountCurrencyId) {
-                this.setSourceCurrency(this.data.transactionCurrencyId);
+            if (data.transactionCurrencyId !== data.accountCurrencyId) {
+                this.setSourceCurrency(data.transactionCurrencyId);
                 this.setDestAmount(Math.abs(accAmount));
             }
         }
 
-        this.setDate(formatDate(new Date(this.data.date)));
-        this.setComment(this.data.comment);
+        this.setDate(formatDate(new Date(data.date)));
+        this.setComment(data.comment);
     }
 
     /** Restore original data */
