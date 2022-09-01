@@ -31,6 +31,9 @@ const ROW_CLASS = 'item-row';
 const AMOUNT_COLUMN_CLASS = 'amount-col';
 const TYPE_COLUMN_CLASS = 'type-col';
 /* Fields */
+const TYPE_FIELD_CLASS = 'type-field';
+const ACCOUNT_FIELD_CLASS = 'account-field';
+const PERSON_FIELD_CLASS = 'person-field';
 const AMOUNT_FIELD_CLASS = 'amount-field';
 const DATE_FIELD_CLASS = 'date-field';
 const COMMENT_FIELD_CLASS = 'comment-field';
@@ -162,14 +165,14 @@ export class ImportTransactionItem extends Component {
         });
 
         this.trTypeTitle = ce('span', { className: TYPE_CLASS });
-        this.trTypeField = window.app.createField('Type', this.trTypeTitle);
+        this.trTypeField = window.app.createField('Type', this.trTypeTitle, TYPE_FIELD_CLASS);
 
         this.accountTitle = ce('span', { className: ACCOUNT_CLASS });
-        this.accountField = window.app.createField('Account', this.accountTitle);
+        this.accountField = window.app.createField('Account', this.accountTitle, ACCOUNT_FIELD_CLASS);
         this.accountLabel = this.accountField.querySelector('label');
 
         this.personTitle = ce('span', { className: PERSON_CLASS });
-        this.personField = window.app.createField('Person', this.personTitle);
+        this.personField = window.app.createField('Person', this.personTitle, PERSON_FIELD_CLASS);
 
         this.srcAmountTitle = ce('span', { className: AMOUNT_CLASS });
         this.srcAmountField = window.app.createField('Amount', this.srcAmountTitle, AMOUNT_FIELD_CLASS);

@@ -1,5 +1,7 @@
 /* Transaction item */
 .import-item {
+  --ii-font-size: 0.9rem;
+
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
@@ -17,6 +19,7 @@
     flex-grow: 1;
     align-items: normal;
     gap: 8px;
+    overflow: hidden;
   }
 
   .item-column {
@@ -25,12 +28,13 @@
     flex-grow: 1;
     align-items: normal;
     gap: 8px;
+    overflow: hidden;
   }
 
   .item-row {
     display: flex;
-    flex-flow: column nowrap;
-    gap: 8px;
+    flex-flow: row nowrap;
+    gap: 16px;
   }
 
   /* Input field and label group */
@@ -39,9 +43,11 @@
     flex-flow: column nowrap;
     align-items: normal;
     margin: 0;
+    font-size: var(--ii-font-size);
 
     label {
       font-size: 12px;
+      margin-bottom: 1px;
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
@@ -89,20 +95,37 @@
     height: 18px;
   }
 
+  .type-col,
+  .amount-col {
+    flex-direction: row;
+    gap: 16px;
+  }
+
   .update-icon,
   .delete-icon {
     width: 24px;
     height: 24px;
   }
 
-  .type-col,
-  .amount-col {
-    max-width: 300px;
+  .account-field,
+  .person-field {
+    flex-shrink: 1;
+    flex-grow: 1;
+    overflow: hidden;
   }
 
   .comment-field,
   .comment-field div {
+    overflow: hidden;
     flex-grow: 1;
+    flex-shrink: 1;
+  }
+
+  .account-field div,
+  .person-field div,
+  .comment-field div {
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .import-item__date {
@@ -185,14 +208,34 @@
   .import-item {
     .item-container {
       flex-flow: row nowrap;
-    }
-
-    .item-row {
-      flex-flow: row nowrap;
+      gap: 16px;
     }
 
     .main-content {
       padding: 4px 0 6px 0;
+    }
+
+    .item-row {
+      gap: 8px;
+    }
+
+    .type-field,
+    .amount-field {
+      width: 120px;
+    }
+
+    .date-field {
+      width: 100px;
+      flex-shrink: 0;
+    }
+
+    .type-col,
+    .amount-col {
+      width: 120px;
+      flex-direction: column;
+      flex-shrink: 0;
+      flex-grow: 0;
+      gap: 8px;
     }
 
     .orig-data-table {
@@ -217,6 +260,26 @@
       &.comment-value div {
         text-align: left;
       }
+    }
+  }
+}
+
+/* Desktop */
+@media (min-width: 992px) {
+  .import-item {
+    --ii-font-size: 1rem;
+
+    .type-col,
+    .amount-col {
+      flex-direction: row;
+    }
+
+    .type-col {
+      width: 35%;
+    }
+
+    .amount-col {
+      width: 27%;
     }
   }
 }
