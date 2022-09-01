@@ -540,15 +540,8 @@ class ImportView extends View {
             }
         }
 
-        let formProps;
-        const originalData = item.getOriginal();
-        if (originalData) {
-            formProps = { originalData };
-        } else {
-            const data = item.getData();
-            formProps = this.convertItemDataToProps(data);
-        }
-
+        const data = item.getData();
+        const formProps = this.convertItemDataToProps(data);
         const form = ImportTransactionForm.create({
             parent: this,
             mainAccount,
