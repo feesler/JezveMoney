@@ -446,19 +446,22 @@ export class ImportTransactionForm extends Component {
             throw new Error('Invalid data');
         }
 
-        const dateFmt = formatDate(new Date(data.date));
+        const dataTable = [
+            [COL_MAIN, mainAccount.name],
+            [COL_DATE, formatDate(new Date(data.date))],
+            [COL_TR_AMOUNT, data.transactionAmount],
+            [COL_TR_CURRENCY, data.transactionCurrency],
+            [COL_ACC_AMOUNT, data.accountAmount],
+            [COL_ACC_CURRENCY, data.accountCurrency],
+            [COL_COMMENT, data.comment, COMMENT_VALUE_CLASS],
+        ];
 
         return window.app.createContainer(ORIG_DATA_CLASS, [
             ce('h3', { textContent: TITLE_ORIGINAL_DATA }),
-            window.app.createContainer(ORIG_DATA_TABLE_CLASS, [
-                this.createDataValue(COL_MAIN, mainAccount.name),
-                this.createDataValue(COL_DATE, dateFmt),
-                this.createDataValue(COL_TR_AMOUNT, data.transactionAmount),
-                this.createDataValue(COL_TR_CURRENCY, data.transactionCurrency),
-                this.createDataValue(COL_ACC_AMOUNT, data.accountAmount),
-                this.createDataValue(COL_ACC_CURRENCY, data.accountCurrency),
-                this.createDataValue(COL_COMMENT, data.comment, COMMENT_VALUE_CLASS),
-            ]),
+            window.app.createContainer(
+                ORIG_DATA_TABLE_CLASS,
+                dataTable.map((col) => this.createDataValue(...col)),
+            ),
         ]);
     }
 
@@ -494,6 +497,10 @@ export class ImportTransactionForm extends Component {
 
     /** Apply import data to component */
     setOriginal(data) {
+        if (!data) {
+            throw new Error('Invalid data');
+        }
+
         if (data.accountCurrencyId !== this.state.mainAccount.curr_id) {
             throw new Error('Currency must be the same as main account');
         }
@@ -513,16 +520,12 @@ export class ImportTransactionForm extends Component {
 
         if (this.state.type === 'expense') {
             this.setDestAmount(Math.abs(trAmount));
-            if (data.transactionCurrencyId !== data.accountCurrencyId) {
-                this.setDestCurrency(data.transactionCurrencyId);
-                this.setSourceAmount(Math.abs(accAmount));
-            }
+            this.setDestCurrency(data.transactionCurrencyId);
+            this.setSourceAmount(Math.abs(accAmount));
         } else if (this.state.type === 'income') {
             this.setSourceAmount(Math.abs(trAmount));
-            if (data.transactionCurrencyId !== data.accountCurrencyId) {
-                this.setSourceCurrency(data.transactionCurrencyId);
-                this.setDestAmount(Math.abs(accAmount));
-            }
+            this.setSourceCurrency(data.transactionCurrencyId);
+            this.setDestAmount(Math.abs(accAmount));
         }
 
         this.setDate(formatDate(new Date(data.date)));
