@@ -106,6 +106,8 @@ const defaultProps = {
     date: formatDate(new Date()),
     comment: '',
     onUpdate: null,
+    onEnable: null,
+    onRemove: null,
 };
 
 /**
@@ -374,7 +376,9 @@ export class ImportTransactionItem extends Component {
         this.enable(value);
         this.render();
 
-        this.parent.onEnableItem(this, this.enableCheck.checked);
+        if (isFunction(this.props.onEnable)) {
+            this.props.onEnable(this, value);
+        }
     }
 
     /** Toggle collapse/expand button 'click' event handler */
@@ -408,8 +412,8 @@ export class ImportTransactionItem extends Component {
 
     /** Remove item */
     remove() {
-        if (!this.parent.onRemoveItem(this)) {
-            return;
+        if (isFunction(this.props.onRemove)) {
+            this.props.onRemove(this);
         }
 
         re(this.elem);

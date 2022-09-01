@@ -227,7 +227,9 @@ class ImportView extends View {
             parent: this,
             mainAccount: this.state.mainAccount,
             originalData: data,
+            onEnable: (i) => this.onEnableItem(i),
             onUpdate: (i) => this.onUpdateItem(i),
+            onRemove: (i) => this.onRemoveItem(i),
         });
 
         if (this.state.rulesEnabled) {
@@ -483,8 +485,10 @@ class ImportView extends View {
         const item = ImportTransactionItem.create({
             parent: this,
             mainAccount,
-            onUpdate: (i) => this.onUpdateItem(i),
             ...itemProps,
+            onEnable: (i) => this.onEnableItem(i),
+            onUpdate: (i) => this.onUpdateItem(i),
+            onRemove: (i) => this.onRemoveItem(i),
         });
         item.pos = activeItemIndex;
 
@@ -507,15 +511,17 @@ class ImportView extends View {
             return;
         }
 
-        const item = ImportTransactionForm.create({
+        const form = ImportTransactionForm.create({
             parent: this,
             mainAccount: this.state.mainAccount,
+            onEnable: (i) => this.onEnableItem(i),
+            onRemove: (i) => this.onRemoveItem(i),
         });
 
-        this.rowsContainer.appendChild(item.elem);
-        item.pos = this.state.transactionRows.length;
-        this.state.activeItemIndex = item.pos;
-        this.state.transactionRows.push(item);
+        this.rowsContainer.appendChild(form.elem);
+        form.pos = this.state.transactionRows.length;
+        this.state.activeItemIndex = form.pos;
+        this.state.transactionRows.push(form);
 
         this.render(this.state);
     }
@@ -547,6 +553,8 @@ class ImportView extends View {
             parent: this,
             mainAccount,
             ...formProps,
+            onEnable: (i) => this.onEnableItem(i),
+            onRemove: (i) => this.onRemoveItem(i),
         });
         form.pos = index;
 

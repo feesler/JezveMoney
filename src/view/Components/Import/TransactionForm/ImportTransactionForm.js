@@ -5,6 +5,7 @@ import {
     enable,
     checkDate,
     copyObject,
+    isFunction,
     addChilds,
     removeChilds,
     formatDate,
@@ -104,6 +105,8 @@ const defaultProps = {
     personId: 0,
     date: formatDate(new Date()),
     comment: '',
+    onEnable: null,
+    onRemove: null,
 };
 
 /**
@@ -538,8 +541,8 @@ export class ImportTransactionForm extends Component {
      * Remove item component
      */
     remove() {
-        if (!this.parent.onRemoveItem(this)) {
-            return;
+        if (isFunction(this.props.onRemove)) {
+            this.props.onRemove(this);
         }
 
         re(this.elem);
@@ -551,7 +554,9 @@ export class ImportTransactionForm extends Component {
         this.enable(value);
         this.render();
 
-        this.parent.onEnableItem(this, this.enableCheck.checked);
+        if (isFunction(this.props.onEnable)) {
+            this.props.onEnable(this, value);
+        }
     }
 
     /** Toggle collapse/expand button 'click' event handler */
