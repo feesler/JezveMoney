@@ -77,7 +77,10 @@ export class ImportActionForm extends Component {
             digits: 2,
             oninput: () => this.onValueChange(),
         });
-        this.amountField = window.app.createField(TITLE_FIELD_AMOUNT, this.amountInput);
+        this.amountField = window.app.createField({
+            title: TITLE_FIELD_AMOUNT,
+            content: this.amountInput,
+        });
         // Create value input element
         this.valueInput = ce(
             'input',
@@ -85,15 +88,18 @@ export class ImportActionForm extends Component {
             null,
             { input: () => this.onValueChange() },
         );
-        this.valueField = window.app.createField(TITLE_FIELD_VALUE, this.valueInput);
+        this.valueField = window.app.createField({
+            title: TITLE_FIELD_VALUE,
+            content: this.valueInput,
+        });
         // Form fields container
         this.fieldsContainer = window.app.createContainer('action-form__fields', [
-            this.actionTypeField,
-            this.transTypeField,
-            this.accountField,
-            this.personField,
-            this.amountField,
-            this.valueField,
+            this.actionTypeField.elem,
+            this.transTypeField.elem,
+            this.accountField.elem,
+            this.personField.elem,
+            this.amountField.elem,
+            this.valueField.elem,
         ]);
         // Invalid feedback message
         this.validFeedback = ce('div', { className: 'invalid-feedback' });
@@ -137,7 +143,10 @@ export class ImportActionForm extends Component {
             .map((type) => ({ id: type.id, title: type.title }));
 
         const selectElem = ce('select');
-        this.actionTypeField = window.app.createField(TITLE_FIELD_ACTION, selectElem);
+        this.actionTypeField = window.app.createField({
+            title: TITLE_FIELD_ACTION,
+            content: selectElem,
+        });
 
         this.actionDropDown = DropDown.create({
             elem: selectElem,
@@ -151,7 +160,10 @@ export class ImportActionForm extends Component {
         const items = this.transactionTypes.map((type) => ({ id: type.id, title: type.title }));
 
         const selectElem = ce('select');
-        this.transTypeField = window.app.createField(TITLE_FIELD_TR_TYPE, selectElem);
+        this.transTypeField = window.app.createField({
+            title: TITLE_FIELD_TR_TYPE,
+            content: selectElem,
+        });
 
         this.trTypeDropDown = DropDown.create({
             elem: selectElem,
@@ -164,7 +176,10 @@ export class ImportActionForm extends Component {
     /** Create account field */
     createAccountField() {
         const selectElem = ce('select');
-        this.accountField = window.app.createField(TITLE_FIELD_ACCOUNT, selectElem);
+        this.accountField = window.app.createField({
+            title: TITLE_FIELD_ACCOUNT,
+            content: selectElem,
+        });
 
         this.accountDropDown = DropDown.create({
             elem: selectElem,
@@ -176,7 +191,10 @@ export class ImportActionForm extends Component {
     /** Create person field */
     createPersonField() {
         const selectElem = ce('select');
-        this.personField = window.app.createField(TITLE_FIELD_PERSON, selectElem);
+        this.personField = window.app.createField({
+            title: TITLE_FIELD_PERSON,
+            content: selectElem,
+        });
 
         this.personDropDown = DropDown.create({
             elem: selectElem,
@@ -330,11 +348,11 @@ export class ImportActionForm extends Component {
         const isAmountTarget = ImportAction.isAmountValue(state.actionType);
         this.actionDropDown.selectItem(state.actionType);
 
-        show(this.transTypeField, (state.actionType === IMPORT_ACTION_SET_TR_TYPE));
-        show(this.accountField, (state.actionType === IMPORT_ACTION_SET_ACCOUNT));
-        show(this.personField, (state.actionType === IMPORT_ACTION_SET_PERSON));
-        show(this.amountField, isAmountTarget);
-        show(this.valueField, !isSelectTarget && !isAmountTarget);
+        show(this.transTypeField.elem, (state.actionType === IMPORT_ACTION_SET_TR_TYPE));
+        show(this.accountField.elem, (state.actionType === IMPORT_ACTION_SET_ACCOUNT));
+        show(this.personField.elem, (state.actionType === IMPORT_ACTION_SET_PERSON));
+        show(this.amountField.elem, isAmountTarget);
+        show(this.valueField.elem, !isSelectTarget && !isAmountTarget);
 
         this.setActionValue(state);
     }

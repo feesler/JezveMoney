@@ -173,28 +173,53 @@ export class ImportTransactionItem extends Component {
         });
 
         this.trTypeTitle = ce('span', { className: TYPE_CLASS });
-        this.trTypeField = window.app.createField('Type', this.trTypeTitle, TYPE_FIELD_CLASS);
+        this.trTypeField = window.app.createField({
+            title: 'Type',
+            content: this.trTypeTitle,
+            className: TYPE_FIELD_CLASS,
+        });
 
         this.accountTitle = ce('span', { className: ACCOUNT_CLASS });
-        this.accountField = window.app.createField('Account', this.accountTitle, ACCOUNT_FIELD_CLASS);
-        this.accountLabel = this.accountField.querySelector('label');
+        this.accountField = window.app.createField({
+            title: 'Account',
+            content: this.accountTitle,
+            className: ACCOUNT_FIELD_CLASS,
+        });
 
         this.personTitle = ce('span', { className: PERSON_CLASS });
-        this.personField = window.app.createField('Person', this.personTitle, PERSON_FIELD_CLASS);
+        this.personField = window.app.createField({
+            title: 'Person',
+            content: this.personTitle,
+            className: PERSON_FIELD_CLASS,
+        });
 
         this.srcAmountTitle = ce('span', { className: AMOUNT_CLASS });
-        this.srcAmountField = window.app.createField('Amount', this.srcAmountTitle, AMOUNT_FIELD_CLASS);
-        this.srcAmountLabel = this.srcAmountField.querySelector('label');
+        this.srcAmountField = window.app.createField({
+            title: 'Amount',
+            content: this.srcAmountTitle,
+            className: AMOUNT_FIELD_CLASS,
+        });
 
         this.destAmountTitle = ce('span', { className: AMOUNT_CLASS });
-        this.destAmountField = window.app.createField('Destination amount', this.destAmountTitle, AMOUNT_FIELD_CLASS);
-        this.destAmountLabel = this.destAmountField.querySelector('label');
+        this.destAmountField = window.app.createField({
+            title: 'Destination amount',
+            content: this.destAmountTitle,
+            className: AMOUNT_FIELD_CLASS,
+        });
 
         this.dateTitle = ce('span', { className: DATE_CLASS });
-        this.dateField = window.app.createField('Date', this.dateTitle, DATE_FIELD_CLASS);
+        this.dateField = window.app.createField({
+            title: 'Date',
+            content: this.dateTitle,
+            className: DATE_FIELD_CLASS,
+        });
 
         this.commentTitle = ce('span', { className: COMMENT_CLASS });
-        this.commentField = window.app.createField('Comment', this.commentTitle, COMMENT_FIELD_CLASS);
+        this.commentField = window.app.createField({
+            title: 'Comment',
+            content: this.commentTitle,
+            className: COMMENT_FIELD_CLASS,
+        });
 
         // Update button
         this.updateBtn = ce(
@@ -220,19 +245,19 @@ export class ImportTransactionItem extends Component {
         show(this.toggleExtBtn, false);
 
         this.topRow = window.app.createContainer(ROW_CLASS, [
-            this.dateField,
-            this.commentField,
+            this.dateField.elem,
+            this.commentField.elem,
         ]);
 
         this.itemContainer = window.app.createContainer(ITEM_CONTAINER_CLASS, [
             window.app.createContainer(`${COLUMN_CLASS} ${TYPE_COLUMN_CLASS}`, [
-                this.trTypeField,
-                this.accountField,
-                this.personField,
+                this.trTypeField.elem,
+                this.accountField.elem,
+                this.personField.elem,
             ]),
             window.app.createContainer(`${COLUMN_CLASS} ${AMOUNT_COLUMN_CLASS}`, [
-                this.srcAmountField,
-                this.destAmountField,
+                this.srcAmountField.elem,
+                this.destAmountField.elem,
             ]),
             window.app.createContainer(COLUMN_CLASS, [
                 this.topRow,
@@ -915,19 +940,19 @@ export class ImportTransactionItem extends Component {
         this.trTypeTitle.textContent = typeStrings[state.type];
 
         // Account field
-        show(this.accountField, isTransfer);
+        show(this.accountField.elem, isTransfer);
         if (isTransfer) {
             const isTransferFrom = state.type === 'transferfrom';
             const accountId = (isTransferFrom) ? state.destAccountId : state.sourceAccountId;
             const account = userAccounts.getItem(accountId);
             this.accountTitle.textContent = account.name;
 
-            this.accountLabel.textContent = (isTransferFrom)
+            this.accountField.labelElem.textContent = (isTransferFrom)
                 ? TITLE_FIELD_DEST_ACCOUNT
                 : TITLE_FIELD_SRC_ACCOUNT;
         }
         // Person field
-        show(this.personField, isDebt);
+        show(this.personField.elem, isDebt);
         if (isDebt) {
             const person = persons.getItem(state.personId);
             this.personTitle.textContent = person.name;
@@ -935,11 +960,11 @@ export class ImportTransactionItem extends Component {
 
         // Amount fields
         const srcAmountLabel = (state.isDiff) ? TITLE_FIELD_SRC_AMOUNT : TITLE_FIELD_AMOUNT;
-        this.srcAmountLabel.textContent = srcAmountLabel;
+        this.srcAmountField.labelElem.textContent = srcAmountLabel;
         const srcAmount = currency.formatCurrency(state.sourceAmount, state.srcCurrId);
         this.srcAmountTitle.textContent = srcAmount;
 
-        show(this.destAmountField, state.isDiff);
+        show(this.destAmountField.elem, state.isDiff);
         if (state.isDiff) {
             const destAmount = currency.formatCurrency(state.destAmount, state.destCurrId);
             this.destAmountTitle.textContent = destAmount;

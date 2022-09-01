@@ -210,7 +210,11 @@ export class ImportTransactionForm extends Component {
             placeholder: TITLE_FIELD_DATE,
             autocomplete: 'off',
         }, null, { input: () => this.onDateInput() });
-        this.dateField = window.app.createField(TITLE_FIELD_DATE, this.dateInp, DATE_FIELD_CLASS);
+        this.dateField = window.app.createField({
+            title: TITLE_FIELD_DATE,
+            content: this.dateInp,
+            className: DATE_FIELD_CLASS,
+        });
         // Comment field
         this.commInp = ce('input', {
             className: DEFAULT_INPUT_CLASS,
@@ -219,11 +223,11 @@ export class ImportTransactionForm extends Component {
             placeholder: TITLE_FIELD_COMMENT,
             autocomplete: 'off',
         }, null, { input: () => this.onCommentInput() });
-        this.commentField = window.app.createField(
-            TITLE_FIELD_COMMENT,
-            this.commInp,
-            COMMENT_FIELD_CLASS,
-        );
+        this.commentField = window.app.createField({
+            title: TITLE_FIELD_COMMENT,
+            content: this.commInp,
+            className: COMMENT_FIELD_CLASS,
+        });
         // Delete button
         this.delBtn = ce(
             'button',
@@ -241,19 +245,19 @@ export class ImportTransactionForm extends Component {
         show(this.toggleExtBtn, false);
 
         this.topRow = window.app.createContainer(FORM_ROW_CLASS, [
-            this.dateField,
-            this.commentField,
+            this.dateField.elem,
+            this.commentField.elem,
         ]);
 
         this.formContainer = window.app.createContainer(FORM_CONTAINER_CLASS, [
             window.app.createContainer(`${FORM_COLUMN_CLASS} ${TYPE_COLUMN_CLASS}`, [
-                this.trTypeField,
-                this.transferAccountField,
-                this.personField,
+                this.trTypeField.elem,
+                this.transferAccountField.elem,
+                this.personField.elem,
             ]),
             window.app.createContainer(`${FORM_COLUMN_CLASS} ${AMOUNT_COLUMN_CLASS}`, [
-                this.srcAmountField,
-                this.destAmountField,
+                this.srcAmountField.elem,
+                this.destAmountField.elem,
             ]),
             window.app.createContainer(FORM_COLUMN_CLASS, [
                 this.topRow,
@@ -302,7 +306,10 @@ export class ImportTransactionForm extends Component {
         ];
 
         const selectElem = ce('select');
-        this.trTypeField = window.app.createField('Type', selectElem);
+        this.trTypeField = window.app.createField({
+            title: 'Type',
+            content: selectElem,
+        });
 
         this.typeDropDown = DropDown.create({
             elem: selectElem,
@@ -319,8 +326,10 @@ export class ImportTransactionForm extends Component {
     /** Create destination(second) account field */
     createAccountField() {
         const selectElem = ce('select');
-        this.transferAccountField = window.app.createField(TITLE_FIELD_DEST_ACCOUNT, selectElem);
-        this.transferAccountLabel = this.transferAccountField.querySelector('label');
+        this.transferAccountField = window.app.createField({
+            title: TITLE_FIELD_DEST_ACCOUNT,
+            content: selectElem,
+        });
 
         this.transferAccDropDown = DropDown.create({
             elem: selectElem,
@@ -333,7 +342,10 @@ export class ImportTransactionForm extends Component {
     /** Create person field */
     createPersonField() {
         const selectElem = ce('select');
-        this.personField = window.app.createField(TITLE_FIELD_PERSON, selectElem);
+        this.personField = window.app.createField({
+            title: TITLE_FIELD_PERSON,
+            content: selectElem,
+        });
 
         this.personDropDown = DropDown.create({
             elem: selectElem,
@@ -376,12 +388,11 @@ export class ImportTransactionForm extends Component {
         this.srcAmountGroup = InputGroup.create({
             children: [this.srcAmountInp, this.srcCurrencyBtn],
         });
-        this.srcAmountField = window.app.createField(
-            TITLE_FIELD_AMOUNT,
-            this.srcAmountGroup.elem,
-            AMOUNT_FIELD_CLASS,
-        );
-        this.srcAmountLabel = this.srcAmountField.querySelector('label');
+        this.srcAmountField = window.app.createField({
+            title: TITLE_FIELD_AMOUNT,
+            content: this.srcAmountGroup.elem,
+            className: AMOUNT_FIELD_CLASS,
+        });
     }
 
     /** Create destination amount field */
@@ -417,13 +428,12 @@ export class ImportTransactionForm extends Component {
             children: [this.destAmountInp, this.destCurrencyBtn],
         });
 
-        this.destAmountField = window.app.createField(
-            TITLE_FIELD_DEST_AMOUNT,
-            this.destAmountGroup.elem,
-            AMOUNT_FIELD_CLASS,
-        );
-        show(this.destAmountField, false);
-        this.destAmountLabel = this.destAmountField.querySelector('label');
+        this.destAmountField = window.app.createField({
+            title: TITLE_FIELD_DEST_AMOUNT,
+            content: this.destAmountGroup.elem,
+            className: AMOUNT_FIELD_CLASS,
+        });
+        show(this.destAmountField.elem, false);
     }
 
     /** Create static data value element */
@@ -1072,16 +1082,16 @@ export class ImportTransactionForm extends Component {
 
     /** Remove all invalidated marks */
     clearInvalid() {
-        this.parent.clearBlockValidation(this.srcAmountField);
-        this.parent.clearBlockValidation(this.destAmountField);
-        this.parent.clearBlockValidation(this.dateField);
+        this.parent.clearBlockValidation(this.srcAmountField.elem);
+        this.parent.clearBlockValidation(this.destAmountField.elem);
+        this.parent.clearBlockValidation(this.dateField.elem);
         this.setFeedback();
     }
 
     validateSourceAmount(state) {
         const amountValue = parseFloat(fixFloat(state.sourceAmount));
         if (Number.isNaN(amountValue) || amountValue <= 0) {
-            this.parent.invalidateBlock(this.srcAmountField);
+            this.parent.invalidateBlock(this.srcAmountField.elem);
             this.setFeedback(MSG_INCORRECT_AMOUNT);
             return false;
         }
@@ -1092,7 +1102,7 @@ export class ImportTransactionForm extends Component {
     validateDestAmount(state) {
         const amountValue = parseFloat(fixFloat(state.destAmount));
         if (Number.isNaN(amountValue) || amountValue <= 0) {
-            this.parent.invalidateBlock(this.destAmountField);
+            this.parent.invalidateBlock(this.destAmountField.elem);
             this.setFeedback(MSG_INCORRECT_AMOUNT);
             return false;
         }
@@ -1129,7 +1139,7 @@ export class ImportTransactionForm extends Component {
         }
 
         if (!checkDate(state.date)) {
-            this.parent.invalidateBlock(this.dateField);
+            this.parent.invalidateBlock(this.dateField.elem);
             this.setFeedback(MSG_INVALID_DATE);
             return false;
         }
@@ -1258,11 +1268,11 @@ export class ImportTransactionForm extends Component {
             this.destCurrencyDropDown.enable(state.enabled);
             enable(this.destCurrencyBtn, state.enabled);
             this.renderCurrency(this.destCurrencySign, this.destCurrencyDropDown, state.destCurrId);
-            show(this.destAmountField, true);
+            show(this.destAmountField.elem, true);
 
             const destAmountLabel = (state.isDiff) ? TITLE_FIELD_DEST_AMOUNT : TITLE_FIELD_AMOUNT;
             this.destAmountInp.placeholder = destAmountLabel;
-            this.destAmountLabel.textContent = destAmountLabel;
+            this.destAmountField.labelElem.textContent = destAmountLabel;
 
             // Source amount field
             this.srcAmountInp.value = state.sourceAmount;
@@ -1270,10 +1280,10 @@ export class ImportTransactionForm extends Component {
             this.srcCurrencyDropDown.enable(false);
             enable(this.srcCurrencyBtn, false);
             this.renderCurrency(this.srcCurrencySign, this.srcCurrencyDropDown, state.srcCurrId);
-            show(this.srcAmountField, state.isDiff);
+            show(this.srcAmountField.elem, state.isDiff);
 
             this.srcAmountInp.placeholder = TITLE_FIELD_SRC_AMOUNT;
-            this.srcAmountLabel.textContent = TITLE_FIELD_SRC_AMOUNT;
+            this.srcAmountField.labelElem.textContent = TITLE_FIELD_SRC_AMOUNT;
         } else {
             // Source amount field
             this.srcAmountInp.value = state.sourceAmount;
@@ -1281,11 +1291,11 @@ export class ImportTransactionForm extends Component {
             this.srcCurrencyDropDown.enable(state.enabled && isIncome);
             enable(this.srcCurrencyBtn, state.enabled && isIncome);
             this.renderCurrency(this.srcCurrencySign, this.srcCurrencyDropDown, state.srcCurrId);
-            show(this.srcAmountField, true);
+            show(this.srcAmountField.elem, true);
 
             const srcAmountLabel = (state.isDiff) ? TITLE_FIELD_SRC_AMOUNT : TITLE_FIELD_AMOUNT;
             this.srcAmountInp.placeholder = srcAmountLabel;
-            this.srcAmountLabel.textContent = srcAmountLabel;
+            this.srcAmountField.labelElem.textContent = srcAmountLabel;
 
             // Destination amount field
             this.destAmountInp.value = state.destAmount;
@@ -1293,10 +1303,10 @@ export class ImportTransactionForm extends Component {
             this.destCurrencyDropDown.enable(false);
             enable(this.destCurrencyBtn, false);
             this.renderCurrency(this.destCurrencySign, this.destCurrencyDropDown, state.destCurrId);
-            show(this.destAmountField, state.isDiff);
+            show(this.destAmountField.elem, state.isDiff);
 
             this.destAmountInp.placeholder = TITLE_FIELD_DEST_AMOUNT;
-            this.destAmountLabel.textContent = TITLE_FIELD_DEST_AMOUNT;
+            this.destAmountField.labelElem.textContent = TITLE_FIELD_DEST_AMOUNT;
         }
 
         // Second account field
@@ -1309,24 +1319,22 @@ export class ImportTransactionForm extends Component {
             if (transferAccountId) {
                 this.transferAccDropDown.selectItem(transferAccountId);
             }
-            show(this.transferAccountField, true);
 
             const accountLabel = (state.type === 'transferto')
                 ? TITLE_FIELD_SRC_ACCOUNT
                 : TITLE_FIELD_DEST_ACCOUNT;
-
-            this.transferAccountLabel.textContent = accountLabel;
+            this.transferAccountField.labelElem.textContent = accountLabel;
         }
-        show(this.transferAccountField, isTransfer);
+        show(this.transferAccountField.elem, isTransfer);
 
         // Person field
         this.personDropDown.enable(state.enabled && isDebt);
         if (state.personId) {
             this.personDropDown.selectItem(state.personId);
         }
-        show(this.personField, isDebt);
+        show(this.personField.elem, isDebt);
 
-        // Date filed
+        // Date field
         enable(this.dateInp, state.enabled);
         this.dateInp.value = state.date;
 

@@ -172,17 +172,21 @@ export class Application {
     }
 
     /** Create field element from given input element */
-    createField(title, input, extraClass) {
+    createField({ title, content, className = null }) {
         const elemClasses = ['field'];
-
-        if (typeof extraClass === 'string' && extraClass.length > 0) {
-            elemClasses.push(extraClass);
+        if (typeof className === 'string' && className.length > 0) {
+            elemClasses.push(className);
         }
 
-        return ce('div', { className: elemClasses.join(' ') }, [
-            ce('label', { textContent: title }),
-            ce('div', {}, input),
-        ]);
+        const labelElem = ce('label', { textContent: title });
+        const contentElem = ce('div', {}, content);
+        const res = {
+            elem: ce('div', { className: elemClasses.join(' ') }, [labelElem, contentElem]),
+            labelElem,
+            contentElem,
+        };
+
+        return res;
     }
 
     checkUserAccountModels() {
