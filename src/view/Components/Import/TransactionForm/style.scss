@@ -186,7 +186,7 @@
 
   .field.invalid-block input,
   .field.invalid-block .dd__combo {
-    border-color: #ff0000;
+    --input-border-color: #ff0000;
   }
 }
 
