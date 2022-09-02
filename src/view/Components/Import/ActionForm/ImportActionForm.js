@@ -82,6 +82,7 @@ export class ImportActionForm extends Component {
         this.valueField = Field.create({
             title: TITLE_FIELD_VALUE,
             content: this.valueInput,
+            className: 'action-value-field',
         });
         // Form fields container
         this.fieldsContainer = window.app.createContainer('action-form__fields', [
@@ -137,6 +138,7 @@ export class ImportActionForm extends Component {
         this.actionTypeField = Field.create({
             title: TITLE_FIELD_ACTION,
             content: selectElem,
+            className: 'action-type-field',
         });
 
         this.actionDropDown = DropDown.create({

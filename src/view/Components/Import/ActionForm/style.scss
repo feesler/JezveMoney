@@ -11,17 +11,12 @@
 
   /* Input field and label group */
   .field {
-    --field-title-font-size: 14px;
+    --field-title-font-size: 12px;
 
-    flex-direction: row;
-    align-items: center;
     margin: 0 0 4px 0;
   }
 
   .field__title {
-    width: 20%;
-    min-width: 70px;
-    text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -55,34 +50,21 @@
 /* Fields container */
 .action-form__fields {
   display: flex;
-  flex-flow: column nowrap;
+  flex-flow: row wrap;
   flex: 1 1 auto;
+  column-gap: 8px;
+}
+
+.action-type-field {
+  flex-grow: 0;
+  flex-shrink: 1;
+}
+
+.action-value-field {
+  flex-grow: 1;
 }
 
 .action-form__controls {
   display: flex;
   align-items: center;
-}
-
-/* Desktop */
-@media (min-width: 768px) {
-  .action-form__fields {
-    flex-flow: row nowrap;
-  }
-
-  .action-form {
-    .field {
-      --field-title-font-size: 12px;
-
-      flex-direction: column;
-      align-items: normal;
-      margin: 0 8px 0 0;
-    }
-
-    .field__title {
-      width: auto;
-      min-width: auto;
-      text-align: left;
-    }
-  }
 }
