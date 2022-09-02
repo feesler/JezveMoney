@@ -56,28 +56,6 @@
     width: 100%;
   }
 
-  /* Data value static element */
-  .data-value {
-    display: flex;
-    flex-flow: row nowrap;
-
-    label {
-      font-size: 14px;
-      font-weight: 800;
-      padding: 2px 8px;
-      width: 20%;
-      min-width: 120px;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-
-    div {
-      font-size: 16px;
-      padding: 2px 8px;
-    }
-  }
-
   .form-rows.type-col,
   .form-rows.amount-col {
     max-width: 300px;
@@ -203,26 +181,6 @@
   transform: rotate(180deg);
 }
 
-/* Original import data container */
-.orig-data {
-  display: flex;
-  flex-flow: column nowrap;
-  width: 100%;
-
-  h3 {
-    font-size: 14px;
-    font-weight: 400;
-    margin-bottom: 8px;
-  }
-}
-
-/* Original import data table */
-.orig-data-table {
-  display: flex;
-  flex-flow: column nowrap;
-  width: 100%;
-}
-
 /* Placeholder */
 .import-form__placeholder {
   border: 1px dashed;
@@ -254,30 +212,6 @@
     .controls {
       align-items: start;
       padding-top: 16px;
-    }
-
-    .orig-data-table {
-      flex-flow: row nowrap;
-    }
-
-    .data-value {
-      flex-flow: column nowrap;
-
-      label {
-        padding: 2px 8px;
-        width: auto;
-        min-width: auto;
-      }
-
-      div {
-        padding: 2px 8px;
-        min-width: auto;
-        text-align: right;
-      }
-
-      &.comment-value div {
-        text-align: left;
-      }
     }
   }
 }

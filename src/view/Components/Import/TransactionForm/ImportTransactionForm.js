@@ -22,8 +22,9 @@ import {
     TRANSFER,
     DEBT,
 } from '../../../js/model/Transaction.js';
-import './style.scss';
 import { Field } from '../Field/Field.js';
+import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
+import './style.scss';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'import-form';
@@ -54,11 +55,6 @@ const TOGGLE_BUTTON_CLASS = 'toggle-btn';
 const DEFAULT_ICON_CLASS = 'icon';
 const DEL_ICON_CLASS = 'delete-icon';
 const TOGGLE_ICON_CLASS = 'toggle-icon';
-/* Original data */
-const DATA_VALUE_CLASS = 'data-value';
-const ORIG_DATA_CLASS = 'orig-data';
-const ORIG_DATA_TABLE_CLASS = 'orig-data-table';
-const COMMENT_VALUE_CLASS = 'comment-value';
 
 /** Fields */
 const TITLE_FIELD_AMOUNT = 'Amount';
@@ -69,15 +65,6 @@ const TITLE_FIELD_COMMENT = 'Comment';
 const TITLE_FIELD_SRC_ACCOUNT = 'Source account';
 const TITLE_FIELD_DEST_ACCOUNT = 'Destination account';
 const TITLE_FIELD_PERSON = 'Person';
-/** Original data table */
-const TITLE_ORIGINAL_DATA = 'Original imported data';
-const COL_MAIN = 'Main account';
-const COL_DATE = 'Date';
-const COL_COMMENT = 'Comment';
-const COL_TR_AMOUNT = 'Tr. amount';
-const COL_TR_CURRENCY = 'Tr. currency';
-const COL_ACC_AMOUNT = 'Acc. amount';
-const COL_ACC_CURRENCY = 'Acc. currency';
 /** Validation messages */
 const MSG_INCORRECT_AMOUNT = 'Please input correct amount';
 const MSG_INVALID_DATE = 'Please input correct date';
@@ -285,9 +272,11 @@ export class ImportTransactionForm extends Component {
 
         const { originalData } = this.props;
         if (originalData) {
-            this.setExtendedContent(
-                this.createOrigDataContainer(originalData, this.state.mainAccount),
-            );
+            const origDataContainer = OriginalImportData.create({
+                ...originalData,
+                mainAccount: this.state.mainAccount,
+            });
+            this.setExtendedContent(origDataContainer.elem);
         }
 
         this.render();
@@ -435,48 +424,6 @@ export class ImportTransactionForm extends Component {
             className: AMOUNT_FIELD_CLASS,
         });
         this.destAmountField.hide();
-    }
-
-    /** Create static data value element */
-    createDataValue(title, value, extraClass) {
-        const elemClasses = [DATA_VALUE_CLASS];
-
-        if (typeof extraClass === 'string' && extraClass.length > 0) {
-            elemClasses.push(extraClass);
-        }
-
-        return ce('div', { className: elemClasses.join(' ') }, [
-            ce('label', { textContent: title }),
-            ce('div', { textContent: value }),
-        ]);
-    }
-
-    /**
-     * Create set of static data values for original transaction data
-     * @param {Object} data - import transaction object
-     */
-    createOrigDataContainer(data, mainAccount) {
-        if (!data || !mainAccount) {
-            throw new Error('Invalid data');
-        }
-
-        const dataTable = [
-            [COL_MAIN, mainAccount.name],
-            [COL_DATE, formatDate(new Date(data.date))],
-            [COL_TR_AMOUNT, data.transactionAmount],
-            [COL_TR_CURRENCY, data.transactionCurrency],
-            [COL_ACC_AMOUNT, data.accountAmount],
-            [COL_ACC_CURRENCY, data.accountCurrency],
-            [COL_COMMENT, data.comment, COMMENT_VALUE_CLASS],
-        ];
-
-        return window.app.createContainer(ORIG_DATA_CLASS, [
-            ce('h3', { textContent: TITLE_ORIGINAL_DATA }),
-            window.app.createContainer(
-                ORIG_DATA_TABLE_CLASS,
-                dataTable.map((col) => this.createDataValue(...col)),
-            ),
-        ]);
     }
 
     /**
