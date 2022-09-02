@@ -622,15 +622,6 @@ export class ImportTransactionForm extends Component {
         this.render();
     }
 
-    /** Synchronize options of transfer account select */
-    syncTransferAccountSelect(state) {
-        const accountItems = this.transferAccDropDown.getVisibleItems();
-        accountItems.forEach((accountItem) => {
-            const isMainAccount = accountItem.id === state.accountId;
-            this.transferAccDropDown.enableItem(accountItem.id, !isMainAccount);
-        });
-    }
-
     /** Person select 'change' event handler */
     onPersonChanged(person) {
         this.setPerson(person.id);
@@ -1313,7 +1304,13 @@ export class ImportTransactionForm extends Component {
         // Second account field
         this.transferAccDropDown.enable(state.enabled && isTransfer);
         if (isTransfer) {
-            this.syncTransferAccountSelect(state);
+            const strMainAccountId = state.mainAccount.id.toString();
+            const accountItems = this.transferAccDropDown.getVisibleItems();
+            accountItems.forEach((accountItem) => this.transferAccDropDown.enableItem(
+                accountItem.id,
+                accountItem.id !== strMainAccountId,
+            ));
+
             const transferAccountId = (state.type === 'transferto')
                 ? state.sourceAccountId
                 : state.destAccountId;
