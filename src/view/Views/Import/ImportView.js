@@ -206,7 +206,6 @@ class ImportView extends View {
                 throw new Error('Failed to map data row');
             }
 
-            item.pos = this.state.transactionRows.length;
             this.state.transactionRows.push(item);
             this.rowsContainer.appendChild(item.elem);
         });
@@ -381,17 +380,6 @@ class ImportView extends View {
         this.state.mainAccount = account;
     }
 
-    /** Set positions of rows as they follows */
-    updateRowsPos() {
-        const updatedRows = this.state.transactionRows.map((item, ind) => {
-            const res = item;
-            res.pos = ind;
-            return res;
-        });
-
-        this.state.transactionRows = updatedRows;
-    }
-
     /** Remove all transaction rows */
     removeAllItems() {
         this.state.transactionRows.forEach((item) => re(item.elem));
@@ -415,21 +403,19 @@ class ImportView extends View {
      * @param {ImportTransactionForm} item - item to remove
      */
     onRemoveItem(item) {
-        if (!item) {
-            return false;
+        const index = this.getItemIndex(item);
+        if (index === -1) {
+            return;
         }
 
-        const delPos = item.pos;
-        this.state.transactionRows.splice(delPos, 1);
-        if (this.state.activeItemIndex === delPos) {
+        this.state.transactionRows.splice(index, 1);
+        if (this.state.activeItemIndex === index) {
             this.state.activeItemIndex = -1;
-        } else if (delPos < this.state.activeItemIndex) {
+        } else if (index < this.state.activeItemIndex) {
             this.state.activeItemIndex -= 1;
         }
-        this.updateRowsPos();
-        this.render(this.state);
 
-        return true;
+        this.render(this.state);
     }
 
     convertItemDataToProps(data) {
@@ -491,7 +477,6 @@ class ImportView extends View {
             onUpdate: (i) => this.onUpdateItem(i),
             onRemove: (i) => this.onRemoveItem(i),
         });
-        item.pos = activeItemIndex;
 
         insertAfter(item.elem, form.elem);
         re(form.elem);
@@ -520,8 +505,7 @@ class ImportView extends View {
         });
 
         this.rowsContainer.appendChild(form.elem);
-        form.pos = this.state.transactionRows.length;
-        this.state.activeItemIndex = form.pos;
+        this.state.activeItemIndex = this.state.transactionRows.length;
         this.state.transactionRows.push(form);
 
         this.render(this.state);
@@ -551,7 +535,6 @@ class ImportView extends View {
             onEnable: (i) => this.onEnableItem(i),
             onRemove: (i) => this.onRemoveItem(i),
         });
-        form.pos = index;
 
         insertAfter(form.elem, item.elem);
         re(item.elem);
@@ -742,11 +725,11 @@ class ImportView extends View {
     }
 
     /**
-     * Search row object by specified element
-     * @param {Element} rowEl - row root element
+     * Search list item by specified element
+     * @param {Element} elem - item root element
      */
-    getRowByElem(rowEl) {
-        return this.state.transactionRows.find((rowObj) => (rowEl === rowObj.elem));
+    getItemIndexByElem(elem) {
+        return this.state.transactionRows.findIndex((item) => (elem === item.elem));
     }
 
     /**
@@ -759,19 +742,14 @@ class ImportView extends View {
             return;
         }
 
-        const origItem = this.getRowByElem(original);
-        if (!origItem || !replaced) {
+        const origIndex = this.getItemIndexByElem(original);
+        const replacedIndex = this.getItemIndexByElem(replaced);
+        if (origIndex === -1 || replacedIndex === -1) {
             return;
         }
 
-        const replacedItem = this.getRowByElem(replaced);
-        if (!replacedItem) {
-            return;
-        }
-        const cutItem = this.state.transactionRows.splice(origItem.pos, 1)[0];
-        this.state.transactionRows.splice(replacedItem.pos, 0, cutItem);
-
-        this.updateRowsPos();
+        const [cutItem] = this.state.transactionRows.splice(origIndex, 1);
+        this.state.transactionRows.splice(replacedIndex, 0, cutItem);
     }
 
     render(state) {
