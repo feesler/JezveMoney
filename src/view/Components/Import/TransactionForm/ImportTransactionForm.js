@@ -107,11 +107,7 @@ export class ImportTransactionForm extends Component {
     constructor(...args) {
         super(...args);
 
-        if (
-            !this.parent
-            || !this.props
-            || !this.props.mainAccount
-        ) {
+        if (!this.props?.mainAccount) {
             throw new Error('Invalid props');
         }
 
@@ -126,7 +122,7 @@ export class ImportTransactionForm extends Component {
             mainAccount,
             ...this.props,
         };
-        delete state.parent;
+
         if (sourceTypes.includes(state.type)) {
             state.sourceAccountId = mainAccount.id;
             state.srcCurrId = mainAccount.curr_id;

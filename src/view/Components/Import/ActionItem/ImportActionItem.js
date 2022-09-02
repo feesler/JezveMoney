@@ -12,14 +12,14 @@ import './style.scss';
  * @param {Object} props
  */
 export class ImportActionItem extends Component {
+    static create(props) {
+        return new ImportActionItem(props);
+    }
+
     constructor(...args) {
         super(...args);
 
-        if (
-            !this.parent
-            || !this.props
-            || !this.props.data
-        ) {
+        if (!this.props?.data) {
             throw new Error('Invalid props');
         }
 
@@ -28,19 +28,6 @@ export class ImportActionItem extends Component {
 
         this.init();
         this.setData(this.props.data);
-    }
-
-    /** Shortcut for ImportActionItem constructor */
-    static create(props) {
-        let res;
-
-        try {
-            res = new ImportActionItem(props);
-        } catch (e) {
-            res = null;
-        }
-
-        return res;
     }
 
     /** Component initialization */

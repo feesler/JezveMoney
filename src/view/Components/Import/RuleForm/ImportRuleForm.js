@@ -451,7 +451,6 @@ export class ImportRuleForm extends Component {
         // Actions
         const actionItems = state.rule.actions.map((action, index) => {
             const props = {
-                parent: this,
                 data: action,
                 isValid: true,
                 update: (data) => this.onActionUpdate(index, data),
@@ -474,7 +473,6 @@ export class ImportRuleForm extends Component {
         // Conditions
         const conditionItems = state.rule.conditions.map((condition, index) => {
             const props = {
-                parent: this,
                 data: condition,
                 isValid: true,
                 update: (data) => this.onConditionUpdate(index, data),

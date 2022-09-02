@@ -40,11 +40,7 @@ export class ImportTemplateManager extends Component {
     constructor(...args) {
         super(...args);
 
-        if (
-            !this.parent
-            || !this.props
-            || !this.props.mainAccount
-        ) {
+        if (!this.props?.mainAccount) {
             throw new Error('Failed to initialize upload file dialog');
         }
 
@@ -64,8 +60,6 @@ export class ImportTemplateManager extends Component {
         this.LOADING_STATE = 1;
         this.RAW_DATA_STATE = 2;
         this.TPL_UPDATE_STATE = 3;
-
-        this.statusHandler = this.props.templateStatus;
 
         this.templateDropDown = DropDown.create({
             elem: 'templateSel',
@@ -326,7 +320,7 @@ export class ImportTemplateManager extends Component {
                 await API.importTemplate.create(data);
             }
 
-            this.requestTemplatesList();
+            await this.requestTemplatesList();
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
         }
@@ -339,7 +333,7 @@ export class ImportTemplateManager extends Component {
 
         try {
             await API.importTemplate.del(id);
-            this.requestTemplatesList();
+            await this.requestTemplatesList();
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
         }
@@ -365,7 +359,11 @@ export class ImportTemplateManager extends Component {
                 this.setCreateTemplateState();
             }
 
-            this.requestRulesList();
+            await this.requestRulesList();
+
+            if (isFunction(this.props.onUpdate)) {
+                this.props.onUpdate();
+            }
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
         }
@@ -383,7 +381,6 @@ export class ImportTemplateManager extends Component {
             }
 
             window.app.model.rules.setData(result.data);
-            this.parent.onUpdateRules();
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
         }
@@ -639,8 +636,8 @@ export class ImportTemplateManager extends Component {
             }
         }
 
-        if (isFunction(this.statusHandler)) {
-            this.statusHandler(state.id === this.RAW_DATA_STATE && isValid);
+        if (isFunction(this.props.onStatus)) {
+            this.props.onStatus(state.id === this.RAW_DATA_STATE && isValid);
         }
     }
 }

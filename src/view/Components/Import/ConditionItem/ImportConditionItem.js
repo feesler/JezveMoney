@@ -13,14 +13,14 @@ import './style.scss';
  * ImportConditionItem component
  */
 export class ImportConditionItem extends Component {
+    static create(props) {
+        return new ImportConditionItem(props);
+    }
+
     constructor(...args) {
         super(...args);
 
-        if (
-            !this.parent
-            || !this.props
-            || !this.props.data
-        ) {
+        if (!this.props?.data) {
             throw new Error('Invalid props');
         }
 
@@ -35,11 +35,6 @@ export class ImportConditionItem extends Component {
 
         this.init();
         this.setData(this.props.data);
-    }
-
-    /** Shortcut for ImportConditionItem constructor */
-    static create(props) {
-        return new ImportConditionItem(props);
     }
 
     /** Main structure initialization */

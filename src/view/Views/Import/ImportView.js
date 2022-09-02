@@ -174,11 +174,11 @@ class ImportView extends View {
     showUploadDialog() {
         if (!this.uploadDialog) {
             this.uploadDialog = new ImportUploadDialog({
-                parent: this,
                 mainAccount: this.state.mainAccount,
                 elem: 'uploadDialog',
-                onaccountchange: (accountId) => this.onUploadAccChange(accountId),
-                onuploaddone: (items) => this.onImportDone(items),
+                onAccountChange: (accountId) => this.onUploadAccChange(accountId),
+                onUploadDone: (items) => this.onImportDone(items),
+                onTemplateUpdate: () => this.onUpdateRules(),
             });
         }
 
@@ -223,7 +223,6 @@ class ImportView extends View {
         }
 
         const item = ImportTransactionItem.create({
-            parent: this,
             mainAccount: this.state.mainAccount,
             originalData: data,
             onEnable: (i) => this.onEnableItem(i),
@@ -470,7 +469,6 @@ class ImportView extends View {
         const itemProps = this.convertItemDataToProps(data);
 
         const item = ImportTransactionItem.create({
-            parent: this,
             mainAccount,
             ...itemProps,
             originalData: form.getOriginal(),
@@ -499,7 +497,6 @@ class ImportView extends View {
         }
 
         const form = ImportTransactionForm.create({
-            parent: this,
             mainAccount: this.state.mainAccount,
             onEnable: (i) => this.onEnableItem(i),
             onRemove: (i) => this.onRemoveItem(i),
@@ -530,7 +527,6 @@ class ImportView extends View {
         const data = item.getData();
         const formProps = this.convertItemDataToProps(data);
         const form = ImportTransactionForm.create({
-            parent: this,
             mainAccount,
             ...formProps,
             originalData: item.getOriginal(),
@@ -713,8 +709,8 @@ class ImportView extends View {
     showRulesDialog() {
         if (!this.rulesDialog) {
             this.rulesDialog = new ImportRulesDialog({
-                parent: this,
                 elem: document.querySelector(`.${IMPORT_RULES_DIALOG_CLASS}`),
+                onUpdate: () => this.onUpdateRules(),
             });
         }
 
