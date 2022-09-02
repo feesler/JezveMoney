@@ -462,6 +462,7 @@ class ImportView extends View {
         const form = this.state.transactionRows[activeItemIndex];
         const valid = form.validate();
         if (!valid) {
+            form.elem.scrollIntoView();
             return false;
         }
 
@@ -503,8 +504,9 @@ class ImportView extends View {
             onEnable: (i) => this.onEnableItem(i),
             onRemove: (i) => this.onRemoveItem(i),
         });
+        this.rowsContainer.append(form.elem);
+        form.elem.scrollIntoView();
 
-        this.rowsContainer.appendChild(form.elem);
         this.state.activeItemIndex = this.state.transactionRows.length;
         this.state.transactionRows.push(form);
 
