@@ -136,7 +136,7 @@ class ImportView extends View {
             oninsertat: (orig, replaced) => this.onTransPosChanged(orig, replaced),
             elem: 'rowsContainer',
             group: 'transactions',
-            selector: '.import-form',
+            selector: '.import-item,.import-form',
             placeholderClass: 'import-form__placeholder',
             copyWidth: true,
             handles: [{ query: 'div' }, { query: 'label' }],
