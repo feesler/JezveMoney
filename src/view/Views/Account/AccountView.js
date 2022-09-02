@@ -247,17 +247,17 @@ class AccountView extends View {
 
         // Name input
         if (state.validation.name === true) {
-            this.clearBlockValidation('name-inp-block');
+            window.app.clearBlockValidation('name-inp-block');
         } else {
             this.nameFeedback.textContent = state.validation.name;
-            this.invalidateBlock('name-inp-block');
+            window.app.invalidateBlock('name-inp-block');
         }
 
         // Initial balance input
         if (state.validation.initbalance) {
-            this.clearBlockValidation('initbal-inp-block');
+            window.app.clearBlockValidation('initbal-inp-block');
         } else {
-            this.invalidateBlock('initbal-inp-block');
+            window.app.invalidateBlock('initbal-inp-block');
         }
     }
 }

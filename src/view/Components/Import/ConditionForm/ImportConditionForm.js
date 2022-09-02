@@ -11,7 +11,6 @@ import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,
 } from '../../../js/model/ImportCondition.js';
-import { View } from '../../../js/View.js';
 import './style.scss';
 
 /** CSS classes */
@@ -43,17 +42,9 @@ export class ImportConditionForm extends Component {
     constructor(...args) {
         super(...args);
 
-        if (
-            !this.parent
-            || !this.props
-            || !this.props.data
-        ) {
+        if (!this.props || !this.props.data) {
             throw new Error('Invalid props');
         }
-
-        this.parentView = (this.parent instanceof View)
-            ? this.parent
-            : this.parent.parentView;
 
         this.updateHandler = this.props.update;
         this.deleteHandler = this.props.remove;
@@ -490,10 +481,10 @@ export class ImportConditionForm extends Component {
 
         if (state.isValid) {
             this.validFeedback.textContent = '';
-            this.parentView.clearBlockValidation(this.container);
+            window.app.clearBlockValidation(this.container);
         } else {
             this.validFeedback.textContent = state.message;
-            this.parentView.invalidateBlock(this.container);
+            window.app.invalidateBlock(this.container);
         }
 
         this.propertyDropDown.selectItem(state.fieldType);

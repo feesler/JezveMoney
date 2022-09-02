@@ -12,7 +12,10 @@ import { ImportRuleList } from './model/ImportRuleList.js';
 import { ImportTemplateList } from './model/ImportTemplateList.js';
 import { PersonList } from './model/PersonList.js';
 
-// Theme constants
+/** CSS classes */
+const INVALID_BLOCK_CLASS = 'invalid-block';
+
+/** Theme constants */
 export const WHITE_THEME = 0;
 export const DARK_THEME = 1;
 
@@ -151,6 +154,24 @@ export class Application {
         });
 
         this.messageBox.show();
+    }
+
+    /**
+     * Clear validation state of block
+     * @param {string|Element} block - block to clear validation state
+     */
+    clearBlockValidation(block) {
+        const blockElem = (typeof block === 'string') ? ge(block) : block;
+        blockElem?.classList?.remove(INVALID_BLOCK_CLASS);
+    }
+
+    /**
+     * Set invalid state for block
+     * @param {string|Element} block - block to invalidate
+     */
+    invalidateBlock(block) {
+        const blockElem = (typeof block === 'string') ? ge(block) : block;
+        blockElem?.classList?.add(INVALID_BLOCK_CLASS);
     }
 
     /** Create simple container element */

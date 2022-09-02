@@ -11,7 +11,6 @@ import { ImportAction } from '../../../js/model/ImportAction.js';
 import { ImportCondition } from '../../../js/model/ImportCondition.js';
 import { ImportConditionForm } from '../ConditionForm/ImportConditionForm.js';
 import { ImportActionForm } from '../ActionForm/ImportActionForm.js';
-import { View } from '../../../js/View.js';
 import './style.scss';
 
 /** Strings */
@@ -32,17 +31,9 @@ export class ImportRuleForm extends Component {
     constructor(...args) {
         super(...args);
 
-        if (
-            !this.parent
-            || !this.props
-            || !this.props.data
-        ) {
+        if (!this.props || !this.props.data) {
             throw new Error('Invalid props');
         }
-
-        this.parentView = (this.parent instanceof View)
-            ? this.parent
-            : this.parent.parentView;
 
         this.submitHandler = this.props.submit;
         this.cancelHandler = this.props.cancel;
@@ -451,10 +442,10 @@ export class ImportRuleForm extends Component {
             && !('conditionIndex' in state.validation)
             && !('actionIndex' in state.validation)) {
             this.validFeedback.textContent = state.validation.message;
-            this.parentView.invalidateBlock(this.feedbackContainer);
+            window.app.invalidateBlock(this.feedbackContainer);
         } else {
             this.validFeedback.textContent = '';
-            this.parentView.clearBlockValidation(this.feedbackContainer);
+            window.app.clearBlockValidation(this.feedbackContainer);
         }
 
         // Actions

@@ -12,7 +12,6 @@ import {
     IMPORT_ACTION_SET_ACCOUNT,
     IMPORT_ACTION_SET_PERSON,
 } from '../../../js/model/ImportAction.js';
-import { View } from '../../../js/View.js';
 import './style.scss';
 
 /** Strings */
@@ -30,17 +29,9 @@ export class ImportActionForm extends Component {
     constructor(...args) {
         super(...args);
 
-        if (
-            !this.parent
-            || !this.props
-            || !this.props.data
-        ) {
+        if (!this.props || !this.props.data) {
             throw new Error('Invalid props');
         }
-
-        this.parentView = (this.parent instanceof View)
-            ? this.parent
-            : this.parent.parentView;
 
         this.updateHandler = this.props.update;
         this.deleteHandler = this.props.remove;
@@ -338,10 +329,10 @@ export class ImportActionForm extends Component {
 
         if (state.isValid) {
             this.validFeedback.textContent = '';
-            this.parentView.clearBlockValidation(this.container);
+            window.app.clearBlockValidation(this.container);
         } else {
             this.validFeedback.textContent = state.message;
-            this.parentView.invalidateBlock(this.container);
+            window.app.invalidateBlock(this.container);
         }
 
         const isSelectTarget = ImportAction.isSelectValue(state.actionType);

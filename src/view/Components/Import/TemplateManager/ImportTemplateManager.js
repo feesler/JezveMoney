@@ -252,7 +252,7 @@ export class ImportTemplateManager extends Component {
     onTemplateNameInput() {
         this.state.template.name = this.tplNameInp.value;
 
-        this.parent.clearBlockValidation(this.nameField);
+        window.app.clearBlockValidation(this.nameField);
     }
 
     /** Create template button 'click' event handler */
@@ -303,7 +303,7 @@ export class ImportTemplateManager extends Component {
         };
 
         if (!this.state.template.name.length) {
-            this.parent.invalidateBlock(this.nameField);
+            window.app.invalidateBlock(this.nameField);
             return;
         }
 
@@ -535,7 +535,7 @@ export class ImportTemplateManager extends Component {
             show(this.tableDescr, false);
             show(this.rawDataTable, false);
             show(this.nameField, false);
-            this.parent.clearBlockValidation(this.nameField);
+            window.app.clearBlockValidation(this.nameField);
             show(this.columnField, false);
             show(this.createTplBtn, templateAvail);
             show(this.updateTplBtn, !!state.template);

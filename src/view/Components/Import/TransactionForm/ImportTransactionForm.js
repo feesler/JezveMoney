@@ -1082,16 +1082,16 @@ export class ImportTransactionForm extends Component {
 
     /** Remove all invalidated marks */
     clearInvalid() {
-        this.parent.clearBlockValidation(this.srcAmountField.elem);
-        this.parent.clearBlockValidation(this.destAmountField.elem);
-        this.parent.clearBlockValidation(this.dateField.elem);
+        window.app.clearBlockValidation(this.srcAmountField.elem);
+        window.app.clearBlockValidation(this.destAmountField.elem);
+        window.app.clearBlockValidation(this.dateField.elem);
         this.setFeedback();
     }
 
     validateSourceAmount(state) {
         const amountValue = parseFloat(fixFloat(state.sourceAmount));
         if (Number.isNaN(amountValue) || amountValue <= 0) {
-            this.parent.invalidateBlock(this.srcAmountField.elem);
+            window.app.invalidateBlock(this.srcAmountField.elem);
             this.setFeedback(MSG_INCORRECT_AMOUNT);
             return false;
         }
@@ -1102,7 +1102,7 @@ export class ImportTransactionForm extends Component {
     validateDestAmount(state) {
         const amountValue = parseFloat(fixFloat(state.destAmount));
         if (Number.isNaN(amountValue) || amountValue <= 0) {
-            this.parent.invalidateBlock(this.destAmountField.elem);
+            window.app.invalidateBlock(this.destAmountField.elem);
             this.setFeedback(MSG_INCORRECT_AMOUNT);
             return false;
         }
@@ -1139,7 +1139,7 @@ export class ImportTransactionForm extends Component {
         }
 
         if (!checkDate(state.date)) {
-            this.parent.invalidateBlock(this.dateField.elem);
+            window.app.invalidateBlock(this.dateField.elem);
             this.setFeedback(MSG_INVALID_DATE);
             return false;
         }

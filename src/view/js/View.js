@@ -1,4 +1,4 @@
-import { ge, copyObject, onReady } from 'jezvejs';
+import { copyObject, onReady } from 'jezvejs';
 import { Header } from '../Components/Header/Header.js';
 
 /**
@@ -30,28 +30,6 @@ export class View {
      * View initialization event handler
      */
     onStart() { }
-
-    /**
-     * Clear validation state of block
-     * @param {string|Element} block - block to clear validation state
-     */
-    clearBlockValidation(block) {
-        const blockElem = (typeof block === 'string') ? ge(block) : block;
-        if (blockElem && blockElem.classList) {
-            blockElem.classList.remove('invalid-block');
-        }
-    }
-
-    /**
-     * Set invalid state for block
-     * @param {string|Element} block - block to invalidate
-     */
-    invalidateBlock(block) {
-        const blockElem = (typeof block === 'string') ? ge(block) : block;
-        if (blockElem && blockElem.classList) {
-            blockElem.classList.add('invalid-block');
-        }
-    }
 
     /**
      * Obtain request data of specified form element
