@@ -95,31 +95,39 @@
 .raw-data-column__tpl,
 .raw-data-column__header,
 .raw-data-column__cell {
+  --rdc-cell-height: 1.75rem;
+
   white-space: nowrap;
-  padding: 4px;
-  height: 1.25rem;
+  padding: 0 4px;
+  height: var(--rdc-cell-height);
+  line-height: var(--rdc-cell-height);
   border-bottom: 1px solid;
   border-color: #9b9b9b;
 }
 
 .raw-data-table__tpl-2 .raw-data-column__tpl {
-  height: 2.5rem;
+  height: calc(var(--rdc-cell-height) * 2);
 }
 
 .raw-data-table__tpl-3 .raw-data-column__tpl {
-  height: 3.75rem;
+  height: calc(var(--rdc-cell-height) * 3);
 }
 
 .raw-data-table__tpl-4 .raw-data-column__tpl {
-  height: 5rem;
+  height: calc(var(--rdc-cell-height) * 4);
 }
 
 .raw-data-table__tpl-5 .raw-data-column__tpl {
-  height: 6.25rem;
+  height: calc(var(--rdc-cell-height) * 5);
 }
 
 .raw-data-table__tpl-6 .raw-data-column__tpl {
-  height: 7.5rem;
+  height: calc(var(--rdc-cell-height) * 6);
+}
+
+.raw-data-column__tpl-prop {
+  height: var(--rdc-cell-height);
+  line-height: var(--rdc-cell-height);
 }
 
 /* Create/update template controls: Save, cancel buttons */
