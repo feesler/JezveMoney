@@ -9,7 +9,7 @@
     "all": "npm-run-all lint build test",
     "test": "node ./tests/index.js",
     "test-partial": "node ./tests/index.js -p",
-    "lint": "npm-run-all lint-src lint-tests lint-css lint-php",
+    "lint": "npm-run-all lint-src lint-css lint-php lint-tests",
     "lint-src": "eslint --quiet ./src/admin/view/ ./src/view/",
     "lint-tests": "eslint -c ./tests.eslintrc.json --quiet ./tests/",
     "lint-css": "npx stylelint src/view/**/*.scss src/admin/view/**/*.scss",
