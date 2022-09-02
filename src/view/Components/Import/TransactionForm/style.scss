@@ -29,17 +29,16 @@
 
   /* Input field and label group */
   .field {
-    display: flex;
+    --field-title-font-size: 12px;
+
     flex-flow: column nowrap;
     align-items: normal;
-    margin: 0;
+  }
 
-    label {
-      font-size: 12px;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      overflow: hidden;
-    }
+  .field__title {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
 
   .amount-field input {
@@ -233,7 +232,7 @@
   }
 }
 
-.field.invalid-block label {
+.field.invalid-block .field__title {
   color: #ff0000;
 }
 

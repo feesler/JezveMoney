@@ -1,6 +1,5 @@
 import {
     ce,
-    show,
     isFunction,
     Component,
     Checkbox,
@@ -11,6 +10,7 @@ import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,
 } from '../../../js/model/ImportCondition.js';
+import { Field } from '../Field/Field.js';
 import './style.scss';
 
 /** CSS classes */
@@ -83,7 +83,7 @@ export class ImportConditionForm extends Component {
             digits: 2,
             oninput: () => this.onValueChange(),
         });
-        this.amountField = window.app.createField({
+        this.amountField = Field.create({
             title: TITLE_FIELD_AMOUNT,
             content: this.amountInput,
         });
@@ -94,7 +94,7 @@ export class ImportConditionForm extends Component {
             null,
             { input: () => this.onValueChange() },
         );
-        this.valueField = window.app.createField({
+        this.valueField = Field.create({
             title: TITLE_FIELD_VALUE,
             content: this.valueInput,
         });
@@ -150,7 +150,7 @@ export class ImportConditionForm extends Component {
             .map((fieldType) => ({ id: fieldType.id, title: fieldType.title }));
 
         const selectElem = ce('select');
-        this.propertyField = window.app.createField({
+        this.propertyField = Field.create({
             title: TITLE_FIELD_PROPERTY,
             content: selectElem,
             className: PROP_FILED_CLASS,
@@ -171,7 +171,7 @@ export class ImportConditionForm extends Component {
             .map((operatorType) => ({ id: operatorType.id, title: operatorType.title }));
 
         const selectElem = ce('select');
-        this.operatorField = window.app.createField({
+        this.operatorField = Field.create({
             title: TITLE_FIELD_OPERATOR,
             content: selectElem,
             className: OPERATOR_FILED_CLASS,
@@ -188,7 +188,7 @@ export class ImportConditionForm extends Component {
     /** Create account field */
     createAccountField() {
         const selectElem = ce('select');
-        this.accountField = window.app.createField({
+        this.accountField = Field.create({
             title: TITLE_FIELD_ACCOUNT,
             content: selectElem,
         });
@@ -207,7 +207,7 @@ export class ImportConditionForm extends Component {
         );
 
         const selectElem = ce('select');
-        this.templateField = window.app.createField({
+        this.templateField = Field.create({
             title: TITLE_FIELD_TEMPLATE,
             content: selectElem,
         });
@@ -225,7 +225,7 @@ export class ImportConditionForm extends Component {
     /** Create currency field */
     createCurrencyField() {
         const selectElem = ce('select');
-        this.currencyField = window.app.createField({
+        this.currencyField = Field.create({
             title: TITLE_FIELD_CURRENCY,
             content: selectElem,
         });
@@ -244,7 +244,7 @@ export class ImportConditionForm extends Component {
             .map((fieldType) => ({ id: fieldType.id, title: fieldType.title }));
 
         const selectElem = ce('select');
-        this.valuePropField = window.app.createField({
+        this.valuePropField = Field.create({
             title: TITLE_FIELD_VALUE_PROPERTY,
             content: selectElem,
         });
@@ -515,12 +515,12 @@ export class ImportConditionForm extends Component {
             )
         );
 
-        show(this.accountField.elem, isAccountValue);
-        show(this.templateField.elem, isTplValue);
-        show(this.currencyField.elem, isCurrencyValue);
-        show(this.amountField.elem, isAmountValue);
-        show(this.valuePropField.elem, state.isFieldValue);
-        show(this.valueField.elem, isTextValue);
+        this.accountField.show(isAccountValue);
+        this.templateField.show(isTplValue);
+        this.currencyField.show(isCurrencyValue);
+        this.amountField.show(isAmountValue);
+        this.valuePropField.show(state.isFieldValue);
+        this.valueField.show(isTextValue);
 
         this.setConditionValue(state);
     }

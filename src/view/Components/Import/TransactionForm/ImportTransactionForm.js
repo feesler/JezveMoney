@@ -23,6 +23,7 @@ import {
     DEBT,
 } from '../../../js/model/Transaction.js';
 import './style.scss';
+import { Field } from '../Field/Field.js';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'import-form';
@@ -210,7 +211,7 @@ export class ImportTransactionForm extends Component {
             placeholder: TITLE_FIELD_DATE,
             autocomplete: 'off',
         }, null, { input: () => this.onDateInput() });
-        this.dateField = window.app.createField({
+        this.dateField = Field.create({
             title: TITLE_FIELD_DATE,
             content: this.dateInp,
             className: DATE_FIELD_CLASS,
@@ -223,7 +224,7 @@ export class ImportTransactionForm extends Component {
             placeholder: TITLE_FIELD_COMMENT,
             autocomplete: 'off',
         }, null, { input: () => this.onCommentInput() });
-        this.commentField = window.app.createField({
+        this.commentField = Field.create({
             title: TITLE_FIELD_COMMENT,
             content: this.commInp,
             className: COMMENT_FIELD_CLASS,
@@ -306,7 +307,7 @@ export class ImportTransactionForm extends Component {
         ];
 
         const selectElem = ce('select');
-        this.trTypeField = window.app.createField({
+        this.trTypeField = Field.create({
             title: 'Type',
             content: selectElem,
         });
@@ -326,7 +327,7 @@ export class ImportTransactionForm extends Component {
     /** Create destination(second) account field */
     createAccountField() {
         const selectElem = ce('select');
-        this.transferAccountField = window.app.createField({
+        this.transferAccountField = Field.create({
             title: TITLE_FIELD_DEST_ACCOUNT,
             content: selectElem,
         });
@@ -342,7 +343,7 @@ export class ImportTransactionForm extends Component {
     /** Create person field */
     createPersonField() {
         const selectElem = ce('select');
-        this.personField = window.app.createField({
+        this.personField = Field.create({
             title: TITLE_FIELD_PERSON,
             content: selectElem,
         });
@@ -388,7 +389,7 @@ export class ImportTransactionForm extends Component {
         this.srcAmountGroup = InputGroup.create({
             children: [this.srcAmountInp, this.srcCurrencyBtn],
         });
-        this.srcAmountField = window.app.createField({
+        this.srcAmountField = Field.create({
             title: TITLE_FIELD_AMOUNT,
             content: this.srcAmountGroup.elem,
             className: AMOUNT_FIELD_CLASS,
@@ -428,12 +429,12 @@ export class ImportTransactionForm extends Component {
             children: [this.destAmountInp, this.destCurrencyBtn],
         });
 
-        this.destAmountField = window.app.createField({
+        this.destAmountField = Field.create({
             title: TITLE_FIELD_DEST_AMOUNT,
             content: this.destAmountGroup.elem,
             className: AMOUNT_FIELD_CLASS,
         });
-        show(this.destAmountField.elem, false);
+        this.destAmountField.hide();
     }
 
     /** Create static data value element */
@@ -1268,11 +1269,11 @@ export class ImportTransactionForm extends Component {
             this.destCurrencyDropDown.enable(state.enabled);
             enable(this.destCurrencyBtn, state.enabled);
             this.renderCurrency(this.destCurrencySign, this.destCurrencyDropDown, state.destCurrId);
-            show(this.destAmountField.elem, true);
+            this.destAmountField.show();
 
             const destAmountLabel = (state.isDiff) ? TITLE_FIELD_DEST_AMOUNT : TITLE_FIELD_AMOUNT;
             this.destAmountInp.placeholder = destAmountLabel;
-            this.destAmountField.labelElem.textContent = destAmountLabel;
+            this.destAmountField.setTitle(destAmountLabel);
 
             // Source amount field
             this.srcAmountInp.value = state.sourceAmount;
@@ -1280,10 +1281,10 @@ export class ImportTransactionForm extends Component {
             this.srcCurrencyDropDown.enable(false);
             enable(this.srcCurrencyBtn, false);
             this.renderCurrency(this.srcCurrencySign, this.srcCurrencyDropDown, state.srcCurrId);
-            show(this.srcAmountField.elem, state.isDiff);
+            this.srcAmountField.show(state.isDiff);
 
             this.srcAmountInp.placeholder = TITLE_FIELD_SRC_AMOUNT;
-            this.srcAmountField.labelElem.textContent = TITLE_FIELD_SRC_AMOUNT;
+            this.srcAmountField.setTitle(TITLE_FIELD_SRC_AMOUNT);
         } else {
             // Source amount field
             this.srcAmountInp.value = state.sourceAmount;
@@ -1291,11 +1292,11 @@ export class ImportTransactionForm extends Component {
             this.srcCurrencyDropDown.enable(state.enabled && isIncome);
             enable(this.srcCurrencyBtn, state.enabled && isIncome);
             this.renderCurrency(this.srcCurrencySign, this.srcCurrencyDropDown, state.srcCurrId);
-            show(this.srcAmountField.elem, true);
+            this.srcAmountField.show();
 
             const srcAmountLabel = (state.isDiff) ? TITLE_FIELD_SRC_AMOUNT : TITLE_FIELD_AMOUNT;
             this.srcAmountInp.placeholder = srcAmountLabel;
-            this.srcAmountField.labelElem.textContent = srcAmountLabel;
+            this.srcAmountField.setTitle(srcAmountLabel);
 
             // Destination amount field
             this.destAmountInp.value = state.destAmount;
@@ -1303,10 +1304,10 @@ export class ImportTransactionForm extends Component {
             this.destCurrencyDropDown.enable(false);
             enable(this.destCurrencyBtn, false);
             this.renderCurrency(this.destCurrencySign, this.destCurrencyDropDown, state.destCurrId);
-            show(this.destAmountField.elem, state.isDiff);
+            this.destAmountField.show(state.isDiff);
 
             this.destAmountInp.placeholder = TITLE_FIELD_DEST_AMOUNT;
-            this.destAmountField.labelElem.textContent = TITLE_FIELD_DEST_AMOUNT;
+            this.destAmountField.setTitle(TITLE_FIELD_DEST_AMOUNT);
         }
 
         // Second account field
@@ -1323,16 +1324,16 @@ export class ImportTransactionForm extends Component {
             const accountLabel = (state.type === 'transferto')
                 ? TITLE_FIELD_SRC_ACCOUNT
                 : TITLE_FIELD_DEST_ACCOUNT;
-            this.transferAccountField.labelElem.textContent = accountLabel;
+            this.transferAccountField.setTitle(accountLabel);
         }
-        show(this.transferAccountField.elem, isTransfer);
+        this.transferAccountField.show(isTransfer);
 
         // Person field
         this.personDropDown.enable(state.enabled && isDebt);
         if (state.personId) {
             this.personDropDown.selectItem(state.personId);
         }
-        show(this.personField.elem, isDebt);
+        this.personField.show(isDebt);
 
         // Date field
         enable(this.dateInp, state.enabled);

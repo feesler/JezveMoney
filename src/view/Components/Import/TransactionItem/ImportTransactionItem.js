@@ -19,6 +19,7 @@ import {
     DEBT,
 } from '../../../js/model/Transaction.js';
 import './style.scss';
+import { Field } from '../Field/Field.js';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'import-item';
@@ -173,49 +174,49 @@ export class ImportTransactionItem extends Component {
         });
 
         this.trTypeTitle = ce('span', { className: TYPE_CLASS });
-        this.trTypeField = window.app.createField({
+        this.trTypeField = Field.create({
             title: 'Type',
             content: this.trTypeTitle,
             className: TYPE_FIELD_CLASS,
         });
 
         this.accountTitle = ce('span', { className: ACCOUNT_CLASS });
-        this.accountField = window.app.createField({
+        this.accountField = Field.create({
             title: 'Account',
             content: this.accountTitle,
             className: ACCOUNT_FIELD_CLASS,
         });
 
         this.personTitle = ce('span', { className: PERSON_CLASS });
-        this.personField = window.app.createField({
+        this.personField = Field.create({
             title: 'Person',
             content: this.personTitle,
             className: PERSON_FIELD_CLASS,
         });
 
         this.srcAmountTitle = ce('span', { className: AMOUNT_CLASS });
-        this.srcAmountField = window.app.createField({
+        this.srcAmountField = Field.create({
             title: 'Amount',
             content: this.srcAmountTitle,
             className: AMOUNT_FIELD_CLASS,
         });
 
         this.destAmountTitle = ce('span', { className: AMOUNT_CLASS });
-        this.destAmountField = window.app.createField({
+        this.destAmountField = Field.create({
             title: 'Destination amount',
             content: this.destAmountTitle,
             className: AMOUNT_FIELD_CLASS,
         });
 
         this.dateTitle = ce('span', { className: DATE_CLASS });
-        this.dateField = window.app.createField({
+        this.dateField = Field.create({
             title: 'Date',
             content: this.dateTitle,
             className: DATE_FIELD_CLASS,
         });
 
         this.commentTitle = ce('span', { className: COMMENT_CLASS });
-        this.commentField = window.app.createField({
+        this.commentField = Field.create({
             title: 'Comment',
             content: this.commentTitle,
             className: COMMENT_FIELD_CLASS,
@@ -940,19 +941,20 @@ export class ImportTransactionItem extends Component {
         this.trTypeTitle.textContent = typeStrings[state.type];
 
         // Account field
-        show(this.accountField.elem, isTransfer);
+        this.accountField.show(isTransfer);
         if (isTransfer) {
             const isTransferFrom = state.type === 'transferfrom';
             const accountId = (isTransferFrom) ? state.destAccountId : state.sourceAccountId;
             const account = userAccounts.getItem(accountId);
             this.accountTitle.textContent = account.name;
 
-            this.accountField.labelElem.textContent = (isTransferFrom)
+            const accountTitle = (isTransferFrom)
                 ? TITLE_FIELD_DEST_ACCOUNT
                 : TITLE_FIELD_SRC_ACCOUNT;
+            this.accountField.setTitle(accountTitle);
         }
         // Person field
-        show(this.personField.elem, isDebt);
+        this.personField.show(isDebt);
         if (isDebt) {
             const person = persons.getItem(state.personId);
             this.personTitle.textContent = person.name;
@@ -960,11 +962,11 @@ export class ImportTransactionItem extends Component {
 
         // Amount fields
         const srcAmountLabel = (state.isDiff) ? TITLE_FIELD_SRC_AMOUNT : TITLE_FIELD_AMOUNT;
-        this.srcAmountField.labelElem.textContent = srcAmountLabel;
+        this.srcAmountField.setTitle(srcAmountLabel);
         const srcAmount = currency.formatCurrency(state.sourceAmount, state.srcCurrId);
         this.srcAmountTitle.textContent = srcAmount;
 
-        show(this.destAmountField.elem, state.isDiff);
+        this.destAmountField.show(state.isDiff);
         if (state.isDiff) {
             const destAmount = currency.formatCurrency(state.destAmount, state.destCurrId);
             this.destAmountTitle.textContent = destAmount;

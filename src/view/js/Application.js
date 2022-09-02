@@ -192,24 +192,6 @@ export class Application {
         return res;
     }
 
-    /** Create field element from given input element */
-    createField({ title, content, className = null }) {
-        const elemClasses = ['field'];
-        if (typeof className === 'string' && className.length > 0) {
-            elemClasses.push(className);
-        }
-
-        const labelElem = ce('label', { textContent: title });
-        const contentElem = ce('div', {}, content);
-        const res = {
-            elem: ce('div', { className: elemClasses.join(' ') }, [labelElem, contentElem]),
-            labelElem,
-            contentElem,
-        };
-
-        return res;
-    }
-
     checkUserAccountModels() {
         if (this.model.userAccounts) {
             return;

@@ -1,0 +1,20 @@
+.field {
+  --field-title-font-size: 1rem;
+  --field-content-font-size: 1rem;
+
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: normal;
+}
+
+.field__title {
+  width: auto;
+  min-width: auto;
+  margin: 0 0 1px 1px;
+  font-size: var(--field-title-font-size);
+  text-align: left;
+}
+
+.field__content {
+  font-size: var(--field-content-font-size);
+}

@@ -39,19 +39,15 @@
 
   /* Input field and label group */
   .field {
-    display: flex;
-    flex-flow: column nowrap;
-    align-items: normal;
-    margin: 0;
-    font-size: var(--ii-font-size);
+    --field-content-font-size: var(--ii-font-size);
+    --field-title-font-size: 12px;
+  }
 
-    label {
-      font-size: 12px;
-      margin-bottom: 1px;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      overflow: hidden;
-    }
+  .field__title {
+    margin-bottom: 1px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
 
   /* Controls */
