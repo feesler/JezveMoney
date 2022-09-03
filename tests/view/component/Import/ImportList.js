@@ -3,10 +3,12 @@ import {
     assert,
     query,
     queryAll,
+    hasClass,
     isVisible,
     copyObject,
 } from 'jezve-test';
-import { ImportListItem } from './ImportListItem.js';
+import { ImportTransactionForm } from './ImportTransactionForm.js';
+import { ImportTransactionItem } from './ImportTransactionItem.js';
 import { asyncMap } from '../../../common.js';
 
 export class ImportList extends TestComponent {
@@ -22,11 +24,15 @@ export class ImportList extends TestComponent {
             invalidated: false,
         };
 
-        const listItems = await queryAll(this.elem, '.import-item');
+        const listItems = await queryAll(this.elem, '.import-form,.import-item');
         if (listItems) {
             res.items = await asyncMap(
                 listItems,
-                (item) => ImportListItem.create(this.parent, item, this.mainAccount),
+                async (item) => {
+                    const isForm = await hasClass(item, 'import-form');
+                    const ListItemClass = (isForm) ? ImportTransactionForm : ImportTransactionItem;
+                    return ListItemClass.create(this.parent, item, this.mainAccount);
+                },
             );
         } else {
             const noDataMsg = await query(this.elem, '.nodata-message');
@@ -39,12 +45,28 @@ export class ImportList extends TestComponent {
         return res;
     }
 
+    get items() {
+        return this.content.items;
+    }
+
     async buildModel(cont) {
         const res = {
-            items: cont.items.map((item) => this.getItemData(item)),
-            invalidated: cont.items.some((item) => item.model.invalidated),
+            items: [],
+            invalidated: false,
+            formIndex: -1,
             isLoading: cont.loadingIndicator.visible,
         };
+
+        cont.items.forEach((item, index) => {
+            res.items.push(this.getItemData(item));
+            res.invalidated = res.invalidated || item.model.invalidated;
+
+            if (item.content.isForm) {
+                assert(res.formIndex === -1, 'Invalid state: two or more Import transaction forms');
+
+                res.formIndex = index;
+            }
+        });
 
         return res;
     }
@@ -74,17 +96,24 @@ export class ImportList extends TestComponent {
 
     getExpectedState() {
         return {
-            items: this.content.items.map(
-                (item) => copyObject(item.getExpectedState(item.model)),
-            ),
+            items: this.content.items.map((item) => {
+                const res = (item.model.isForm)
+                    ? ImportTransactionForm.getExpectedState(item.model)
+                    : ImportTransactionItem.getExpectedState(item.model);
+                return copyObject(res);
+            }),
         };
     }
 
-    static render(transactions, state) {
+    static render(transactions, state, formIndex = -1) {
         assert.isArray(transactions, 'Invalid data');
 
         return {
-            items: transactions.map((item) => ImportListItem.render(item, state)),
+            items: transactions.map((item, index) => (
+                (formIndex === index)
+                    ? ImportTransactionForm.render(item, state)
+                    : ImportTransactionItem.render(item, state)
+            )),
         };
     }
 }

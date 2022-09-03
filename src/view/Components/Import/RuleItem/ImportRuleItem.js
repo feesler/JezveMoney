@@ -26,14 +26,14 @@ const TITLE_NO_CONDITIONS = 'No conditions';
  * @param {Object} props
  */
 export class ImportRuleItem extends Component {
+    static create(props) {
+        return new ImportRuleItem(props);
+    }
+
     constructor(...args) {
         super(...args);
 
-        if (
-            !this.parent
-            || !this.props
-            || !this.props.data
-        ) {
+        if (!this.props?.data) {
             throw new Error('Invalid props');
         }
 
@@ -48,11 +48,6 @@ export class ImportRuleItem extends Component {
 
         this.init();
         this.setData(this.props.data);
-    }
-
-    /** Shortcut for ImportRuleItem constructor */
-    static create(props) {
-        return new ImportRuleItem(props);
     }
 
     /** Main structure initialization */
@@ -206,10 +201,7 @@ export class ImportRuleItem extends Component {
 
         // Render conditions
         const conditionItems = state.conditions.map(
-            (item) => (new ImportConditionItem({
-                parent: this,
-                data: item,
-            })),
+            (data) => ImportConditionItem.create({ data }),
         );
         show(this.conditionsHeader, (conditionItems.length > 0));
         this.setListContainerData(this.conditionsContainer, conditionItems);
@@ -251,7 +243,6 @@ export class ImportRuleItem extends Component {
         // Render actions
         const actionItems = state.actions.map(
             (item) => (new ImportActionItem({
-                parent: this,
                 data: item,
             })),
         );

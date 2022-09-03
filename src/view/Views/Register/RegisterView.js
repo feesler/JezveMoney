@@ -106,23 +106,23 @@ class RegisterView extends View {
 
         // Login input
         if (state.validation.login) {
-            this.clearBlockValidation('login-inp-block');
+            window.app.clearBlockValidation('login-inp-block');
         } else {
-            this.invalidateBlock('login-inp-block');
+            window.app.invalidateBlock('login-inp-block');
         }
 
         // Name input
         if (state.validation.name) {
-            this.clearBlockValidation('name-inp-block');
+            window.app.clearBlockValidation('name-inp-block');
         } else {
-            this.invalidateBlock('name-inp-block');
+            window.app.invalidateBlock('name-inp-block');
         }
 
         // Password input
         if (state.validation.password) {
-            this.clearBlockValidation('pwd-inp-block');
+            window.app.clearBlockValidation('pwd-inp-block');
         } else {
-            this.invalidateBlock('pwd-inp-block');
+            window.app.invalidateBlock('pwd-inp-block');
         }
     }
 }

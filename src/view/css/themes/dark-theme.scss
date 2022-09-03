@@ -278,35 +278,45 @@
     border-color: #444444;
   }
 
-  .import-item {
+  /* Import form */
+  .import-form {
     background-color: #505050;
+
+    &.import-form__placeholder {
+      border-color: #888888;
+      background-color: #202020;
+    }
+
+    input[type="text"] {
+      border-color: var(--input-border-color);
+    }
+
+    input[disabled] {
+      color: var(--input-disabled-text-color);
+      border-color: var(--input-disabled-border-color);
+      background-color: var(--input-disabled-bg-color);
+    }
+
+    input[type="text"]:focus {
+      border-color: #d0d0d0;
+      background-color: #202020;
+    }
+
+    .btn {
+      color: var(--main-text-color);
+    }
+
+    .icon {
+      fill: #888888;
+    }
   }
 
-  .import-item .extended-content {
-    color: #bbbbbb;
-    border-color: #3c3c3c;
-    background-color: #444444;
-  }
-
-  .import-item select,
-  .import-item input[type="text"] {
-    border-color: var(--input-border-color);
-  }
-
-  .import-item select[disabled],
-  .import-item input[disabled] {
-    color: var(--input-disabled-text-color);
-    border-color: var(--input-disabled-border-color);
-    background-color: var(--input-disabled-bg-color);
-  }
-
-  .import-item.import-item_disabled {
+  /* Disabled Import form */
+  .import-form[disabled] {
     background-color: #292929;
     color: #707070;
     border-color: #707070;
 
-    select,
-    select[disabled],
     input[type="text"],
     input[disabled] {
       color: var(--input-disabled-text-color);
@@ -323,35 +333,34 @@
       border-color: var(--input-disabled-border-color);
       background-color: var(--input-disabled-bg-color);
     }
+  }
 
-    .extended-content {
+  /* Import item */
+  .import-item {
+    background-color: #505050;
+
+    &[disabled] {
+      background-color: #292929;
       color: #707070;
-      border-color: #333333;
-      background-color: #232323;
+      border-color: #707070;
     }
-  }
 
-  .import-item select:focus,
-  .import-item input[type="text"]:focus {
-    border-color: #d0d0d0;
-    background-color: #202020;
-  }
+    &.import-item__placeholder {
+      border-color: #888888;
+      background-color: #202020;
+    }
 
-  .import-item .btn,
-  .import-item .btn:visited,
-  .import-item .btn:active {
-    color: var(--main-text-color);
-  }
+    .field__title {
+      color: #858585;
+    }
 
-  .import-item .delete-icon,
-  .import-item .toggle-icon {
-    fill: #888888;
-  }
+    .btn {
+      color: var(--main-text-color);
+    }
 
-  /* Placeholder */
-  .import-item.import-item__placeholder {
-    border-color: #888888;
-    background-color: #202020;
+    .icon {
+      fill: #888888;
+    }
   }
 
   .import-controls {
@@ -374,10 +383,6 @@
   }
 
   /* Import rule */
-  .rule-item .collapsible-content {
-    background-color: #202020;
-  }
-
   .rule-item__operator {
     color: #808080;
   }
@@ -413,6 +418,22 @@
   .action-item,
   .action-form {
     background-color: #353535;
+  }
+
+  /* Original import data container */
+  .import-item,
+  .import-form {
+    .collapsible-content {
+      color: #bbbbbb;
+      border-color: #3c3c3c;
+      background-color: #444444;
+    }
+
+    &[disabled] .collapsible-content {
+      color: #707070;
+      border-color: #333333;
+      background-color: #232323;
+    }
   }
 
   /* Statistics view */
@@ -463,6 +484,7 @@
       fill: #dddddd;
     }
 
+    .import-form .btn:hover,
     .import-item .btn:hover {
       background-color: #303030;
     }
@@ -483,7 +505,8 @@
       fill: #dddddd;
     }
 
-    /* Import item */
+    /* Import form */
+    .import-form .btn:hover .icon,
     .import-item .btn:hover .icon {
       fill: #dddddd;
     }

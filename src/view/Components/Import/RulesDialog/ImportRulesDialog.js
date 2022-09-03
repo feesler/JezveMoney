@@ -4,6 +4,7 @@ import {
     removeChilds,
     show,
     insertAfter,
+    isFunction,
     Component,
     Popup,
 } from 'jezvejs';
@@ -32,15 +33,12 @@ const TITLE_UPDATE_RULE = 'Update import rule';
  * ImportRulesDialog component constructor
  */
 export class ImportRulesDialog extends Component {
+    static create(props) {
+        return new ImportRulesDialog(props);
+    }
+
     constructor(...args) {
         super(...args);
-
-        if (
-            !this.parent
-            || !this.props
-        ) {
-            throw new Error('Invalid props');
-        }
 
         this.LIST_STATE = 1;
         this.CREATE_STATE = 2;
@@ -233,7 +231,10 @@ export class ImportRulesDialog extends Component {
             this.state.id = this.LIST_STATE;
             delete this.state.rule;
             this.stopLoading();
-            this.parent.onUpdateRules();
+
+            if (isFunction(this.props.onUpdate)) {
+                this.props.onUpdate();
+            }
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
             this.stopLoading();
@@ -242,14 +243,11 @@ export class ImportRulesDialog extends Component {
 
     /** Render list state of component */
     renderList(state) {
-        const ruleItems = window.app.model.rules.map((rule) => (
-            new ImportRuleItem({
-                parent: this.parent,
-                data: rule,
-                update: (ruleId) => this.onUpdateItem(ruleId),
-                remove: (ruleId) => this.onDeleteItem(ruleId),
-            })
-        ));
+        const ruleItems = window.app.model.rules.map((rule) => ImportRuleItem.create({
+            data: rule,
+            update: (ruleId) => this.onUpdateItem(ruleId),
+            remove: (ruleId) => this.onDeleteItem(ruleId),
+        }));
 
         this.listContainer.dataset.time = state.renderTime;
         removeChilds(this.listContainer);
@@ -274,8 +272,7 @@ export class ImportRulesDialog extends Component {
             re(this.formContainer.elem);
         }
 
-        this.formContainer = new ImportRuleForm({
-            parent: this.parent,
+        this.formContainer = ImportRuleForm.create({
             data: state.rule,
             submit: (data) => this.onSubmitItem(data),
             cancel: () => this.onCancelItem(),

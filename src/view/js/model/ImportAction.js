@@ -1,5 +1,6 @@
 import { copyObject } from 'jezvejs';
 import { ListItem } from './ListItem.js';
+import { ImportTransactionForm } from '../../Components/Import/TransactionForm/ImportTransactionForm.js';
 import { ImportTransactionItem } from '../../Components/Import/TransactionItem/ImportTransactionItem.js';
 
 /** Action types */
@@ -155,10 +156,11 @@ export class ImportAction extends ListItem {
 
     /**
      * Execute import action
-     * @param {ImportTransactionItem} context - import item component
+     * @param {ImportTransactionForm} context - import item component
      */
     execute(context) {
-        if (!(context instanceof ImportTransactionItem)) {
+        if (!(context instanceof ImportTransactionForm)
+            && !(context instanceof ImportTransactionItem)) {
             throw new Error('Invalid import item');
         }
 

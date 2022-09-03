@@ -9,7 +9,6 @@ import {
     assert,
     isFunction,
     copyObject,
-    formatDate,
 } from 'jezve-test';
 import { Checkbox, DropDown } from 'jezvejs/tests';
 import {
@@ -19,17 +18,17 @@ import {
     DEBT,
 } from '../../../model/Transaction.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
-import { ImportTemplate } from '../../../model/ImportTemplate.js';
 import {
     normalize,
     asyncMap,
     fixFloat,
 } from '../../../common.js';
 import { App } from '../../../Application.js';
+import { OriginalImportData } from './OriginalImportData.js';
 
 const sourceTransactionTypes = ['expense', 'transferfrom', 'debtfrom'];
 
-export class ImportListItem extends TestComponent {
+export class ImportTransactionForm extends TestComponent {
     constructor(parent, elem, mainAccount) {
         super(parent, elem);
 
@@ -76,7 +75,7 @@ export class ImportListItem extends TestComponent {
 
         assert(res.elem, 'Invalid field element');
 
-        res.labelElem = await query(elem, ':scope > label');
+        res.labelElem = await query(elem, '.field__title');
         assert(res.labelElem, 'Invalid structure of field');
         res.title = await prop(res.labelElem, 'textContent');
 
@@ -108,45 +107,9 @@ export class ImportListItem extends TestComponent {
         return this.mapField(res);
     }
 
-    async parseOriginalData(cont) {
-        if (!cont.origDataTable) {
-            return null;
-        }
-
-        const res = {};
-        const labelsMap = {
-            mainAccount: 'Main account',
-            transactionAmount: 'Tr. amount',
-            transactionCurrency: 'Tr. currency',
-            accountAmount: 'Acc. amount',
-            accountCurrency: 'Acc. currency',
-            comment: 'Comment',
-            date: 'Date',
-        };
-
-        const dataValues = await queryAll(cont.origDataTable, '.data-value');
-        for (const dataValueElem of dataValues) {
-            const labelElem = await query(dataValueElem, 'label');
-            const valueElem = await query(dataValueElem, 'div');
-            assert(labelElem && valueElem, 'Invalid structure of import item');
-
-            const label = await prop(labelElem, 'textContent');
-            const value = await prop(valueElem, 'textContent');
-            const property = Object.keys(labelsMap).find((key) => label === labelsMap[key]);
-
-            assert(property, `Invalid label: '${label}'`);
-
-            res[property] = value;
-        }
-
-        const valid = Object.keys(labelsMap).every((key) => key in res);
-        assert(valid, 'Invalid structure of import item');
-
-        return res;
-    }
-
     async parseContent() {
         const res = {
+            isForm: true,
             enableCheck: await Checkbox.create(this, await query(this.elem, '.checkbox.enable-check')),
         };
 
@@ -175,7 +138,10 @@ export class ImportListItem extends TestComponent {
             'Invalid structure of import item',
         );
 
-        res.originalData = await this.parseOriginalData(res);
+        res.originalData = null;
+        if (res.origDataTable) {
+            res.originalData = await OriginalImportData.create(this, res.origDataTable);
+        }
 
         return res;
     }
@@ -191,7 +157,9 @@ export class ImportListItem extends TestComponent {
     }
 
     async buildModel(cont) {
-        const res = {};
+        const res = {
+            isForm: true,
+        };
 
         res.mainAccount = App.state.accounts.getItem(this.mainAccount);
         assert(res.mainAccount, 'Main account not found');
@@ -249,19 +217,14 @@ export class ImportListItem extends TestComponent {
         res.imported = await isVisible(cont.toggleBtn, true);
         if (cont.originalData) {
             res.original = {
-                ...cont.originalData,
-                accountAmount: ImportTemplate.amountFix(cont.originalData.accountAmount),
-                transactionAmount: ImportTemplate.amountFix(cont.originalData.transactionAmount),
-                date: formatDate(
-                    ImportTemplate.dateFromString(cont.originalData.date),
-                ),
+                ...cont.originalData.model,
             };
         }
 
         return res;
     }
 
-    getExpectedState(model) {
+    static getExpectedState(model) {
         const isExpense = (model.type === 'expense');
         const isIncome = (model.type === 'income');
         const isTransfer = (model.type === 'transferfrom' || model.type === 'transferto');
@@ -271,6 +234,7 @@ export class ImportListItem extends TestComponent {
         const showDestAmount = isExpense || (!isExpense && model.isDifferent);
 
         const res = {
+            isForm: true,
             enabled: model.enabled,
             typeField: {
                 disabled: !model.enabled,
@@ -308,7 +272,9 @@ export class ImportListItem extends TestComponent {
                 disabled: !model.enabled,
                 visible: true,
             },
-            invFeedback: { visible: model.invalidated },
+            invFeedback: {
+                visible: model.invalidated ?? false,
+            },
         };
 
         if (!res.typeField.disabled) {
@@ -337,6 +303,10 @@ export class ImportListItem extends TestComponent {
         }
 
         return res;
+    }
+
+    getExpectedState(model) {
+        return ImportTransactionForm.getExpectedState(model);
     }
 
     getExpectedTransaction(model) {
@@ -416,11 +386,13 @@ export class ImportListItem extends TestComponent {
             res.sourceId = res.mainAccount.id;
             res.destId = 0;
             res.destAmount = Math.abs(trAmount);
+            res.srcAmount = Math.abs(accAmount);
             res.srcCurrId = mainAccountCurrency.id;
         } else if (res.type === 'income') {
             res.sourceId = 0;
             res.destId = res.mainAccount.id;
             res.srcAmount = Math.abs(trAmount);
+            res.destAmount = Math.abs(accAmount);
             res.destCurrId = mainAccountCurrency.id;
         }
 
@@ -428,10 +400,8 @@ export class ImportListItem extends TestComponent {
         if (res.original.accountCurrency === res.original.transactionCurrency) {
             if (res.type === 'expense') {
                 res.destCurrId = mainAccountCurrency.id;
-                res.srcAmount = '';
             } else if (res.type === 'income') {
                 res.srcCurrId = mainAccountCurrency.id;
-                res.destAmount = '';
             }
         } else {
             const currency = App.currency.findByName(res.original.transactionCurrency);
@@ -695,6 +665,9 @@ export class ImportListItem extends TestComponent {
         this.checkEnabled(this.content.srcAmountField);
 
         this.model.srcAmount = value;
+        if (!this.model.isDifferent) {
+            this.model.destAmount = value;
+        }
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 
@@ -708,6 +681,9 @@ export class ImportListItem extends TestComponent {
         this.checkEnabled(this.content.destAmountField);
 
         this.model.destAmount = value;
+        if (!this.model.isDifferent) {
+            this.model.srcAmount = value;
+        }
         this.model.invalidated = false;
         this.expectedState = this.getExpectedState(this.model);
 

@@ -106,7 +106,7 @@
     --ig-input-active-border: var(--active-input-border-color);
     --ig-button-disabled-color: var(--main-text-color);
     --ig-button-disabled-border: var(--input-border-color);
-    --ig-button-disabled-bg: var(--main-bg-color);
+    --ig-button-disabled-bg: #e7e7e7;
     --ig-inner-button-color: #888888;
     --ig-inner-button-active-color: #000000;
   }
@@ -277,35 +277,45 @@
     border-color: #b0b0b0;
   }
 
-  .import-item {
+  /* Import form */
+  .import-form {
     background-color: #dddddd;
+
+    &.import-form__placeholder {
+      border-color: #888888;
+      background-color: var(--main-bg-color);
+    }
+
+    input[type="text"] {
+      border-color: var(--input-border-color);
+    }
+
+    input[disabled] {
+      color: var(--input-disabled-text-color);
+      border-color: var(--input-disabled-border-color);
+      background-color: var(--input-disabled-bg-color);
+    }
+
+    input[type="text"]:focus {
+      border-color: #888888;
+      background-color: #f2f2f2;
+    }
+
+    .btn {
+      color: #202020;
+    }
+
+    .icon {
+      fill: #a7a7a7;
+    }
   }
 
-  .import-item .extended-content {
-    color: #202020;
-    border-color: #b0b0b0;
-    background-color: #cccccc;
-  }
-
-  .import-item select,
-  .import-item input[type="text"] {
-    border-color: var(--input-border-color);
-  }
-
-  .import-item select[disabled],
-  .import-item input[disabled] {
-    color: var(--input-disabled-text-color);
-    border-color: var(--input-disabled-border-color);
-    background-color: var(--input-disabled-bg-color);
-  }
-
-  .import-item.import-item_disabled {
+  /* Disabled Import form */
+  .import-form[disabled] {
     background-color: #e8e8e8;
     color: #808080;
     border-color: #e8e8e8;
 
-    select,
-    select[disabled],
     input[type="text"],
     input[disabled] {
       color: var(--input-disabled-text-color);
@@ -322,35 +332,34 @@
       border-color: var(--input-disabled-border-color);
       background-color: var(--input-disabled-bg-color);
     }
+  }
 
-    .extended-content {
-      color: #a0a0a0;
-      border-color: #d0d0d0;
-      background-color: #e0e0e0;
+  /* Import item */
+  .import-item {
+    background-color: #dddddd;
+
+    &[disabled] {
+      background-color: #e8e8e8;
+      color: #808080;
+      border-color: #e8e8e8;
     }
-  }
 
-  .import-item select:focus,
-  .import-item input[type="text"]:focus {
-    border-color: #888888;
-    background-color: #f2f2f2;
-  }
+    &.import-item__placeholder {
+      border-color: #888888;
+      background-color: var(--main-bg-color);
+    }
 
-  .import-item .btn,
-  .import-item .btn:visited,
-  .import-item .btn:active {
-    color: #202020;
-  }
+    .field__title {
+      color: #a7a7a7;
+    }
 
-  .import-item .delete-icon,
-  .import-item .toggle-icon {
-    fill: #a7a7a7;
-  }
+    .btn {
+      color: #202020;
+    }
 
-  /* Placeholder */
-  .import-item.import-item__placeholder {
-    border-color: #888888;
-    background-color: var(--main-bg-color);
+    .icon {
+      fill: #a7a7a7;
+    }
   }
 
   .import-controls {
@@ -373,10 +382,6 @@
   }
 
   /* Import rule */
-  .rule-item .collapsible-content {
-    background-color: #dddddd;
-  }
-
   .rule-item__operator {
     color: #808080;
   }
@@ -412,6 +417,22 @@
   .action-item,
   .action-form {
     background-color: #cccccc;
+  }
+
+  /* Original import data container */
+  .import-item,
+  .import-form {
+    .collapsible-content {
+      color: #202020;
+      border-color: #b0b0b0;
+      background-color: #cccccc;
+    }
+
+    &[disabled] .collapsible-content {
+      color: #a0a0a0;
+      border-color: #d0d0d0;
+      background-color: #e0e0e0;
+    }
   }
 
   /* Statistics view */
@@ -462,6 +483,7 @@
       fill: #000000;
     }
 
+    .import-form .btn:hover,
     .import-item .btn:hover {
       background-color: #808080;
     }
@@ -483,8 +505,8 @@
     }
 
     /* Import item */
-    .import-item .btn:hover .delete-icon,
-    .import-item .btn:hover .toggle-icon {
+    .import-form .btn:hover .icon,
+    .import-item .btn:hover .icon {
       fill: #ffffff;
     }
 

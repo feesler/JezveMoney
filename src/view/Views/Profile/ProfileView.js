@@ -109,21 +109,21 @@ class ProfileView extends View {
      * Old password input at change password form event handler
      */
     onOldPasswordInput() {
-        this.clearBlockValidation('old-pwd-inp-block');
+        window.app.clearBlockValidation('old-pwd-inp-block');
     }
 
     /**
      * New password input at change password form event handler
      */
     onNewPasswordInput() {
-        this.clearBlockValidation('new-pwd-inp-block');
+        window.app.clearBlockValidation('new-pwd-inp-block');
     }
 
     /**
      * New name input at change name form event handler
      */
     onNewNameInput() {
-        this.clearBlockValidation('name-inp-block');
+        window.app.clearBlockValidation('name-inp-block');
     }
 
     /** Create and show change name popup */
@@ -170,14 +170,14 @@ class ProfileView extends View {
         e.preventDefault();
 
         if (!this.oldPassInp.value || this.oldPassInp.value.length < 1) {
-            this.invalidateBlock('old-pwd-inp-block');
+            window.app.invalidateBlock('old-pwd-inp-block');
             valid = false;
         }
 
         if (!this.newPassInp.value
             || this.newPassInp.value.length < 1
             || this.newPassInp.value === this.oldPassInp.value) {
-            this.invalidateBlock('new-pwd-inp-block');
+            window.app.invalidateBlock('new-pwd-inp-block');
             valid = false;
         }
 
@@ -264,7 +264,7 @@ class ProfileView extends View {
         if (!this.newNameInp.value
             || this.newNameInp.value.length < 1
             || this.newNameInp.value === window.app.model.profile.name) {
-            this.invalidateBlock('name-inp-block');
+            window.app.invalidateBlock('name-inp-block');
             valid = false;
         }
 

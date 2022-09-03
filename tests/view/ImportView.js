@@ -582,6 +582,7 @@ export class ImportView extends AppView {
         const expectedList = this.content.itemsList.getExpectedState();
         const mainAccount = App.state.accounts.getItem(this.model.mainAccount);
         const expectedItem = {
+            isForm: true,
             enabled: true,
             typeField: { value: 'expense', disabled: false },
             srcAmountField: { value: '', disabled: true },

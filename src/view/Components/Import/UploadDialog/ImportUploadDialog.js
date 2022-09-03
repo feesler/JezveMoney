@@ -19,12 +19,11 @@ export class ImportUploadDialog extends Component {
     constructor(...args) {
         super(...args);
 
-        if (
-            !this.parent
-            || !this.props
-            || !this.props.mainAccount
-        ) {
+        if (!this.props?.mainAccount) {
             throw new Error('Invalid props');
+        }
+        if (!isFunction(this.props.onUploadDone)) {
+            throw new Error('uploaddone handler not specified');
         }
 
         this.state = {
@@ -32,24 +31,17 @@ export class ImportUploadDialog extends Component {
             importedItems: null,
         };
 
-        if (!isFunction(this.props.onuploaddone)) {
-            throw new Error('uploaddone handler not specified');
-        }
-        this.uploadDoneHandler = this.props.onuploaddone;
-        this.accountChangeHandler = this.props.onaccountchange;
-
         this.uploader = new ImportFileUploader({
             elem: 'fileBlock',
-            parent: this.parent,
             onUploadStart: () => this.onUploadStart(),
             onUploadError: (message) => this.onUploadError(message),
             onUploaded: (data) => this.onUploaded(data),
         });
         this.tplManager = new ImportTemplateManager({
             elem: 'templateBlock',
-            parent: this.parent,
             mainAccount: this.state.mainAccount,
-            templateStatus: (status) => this.onTemplateStatus(status),
+            onStatus: (status) => this.onTemplateStatus(status),
+            onUpdate: () => this.onTemplateUpdate(),
         });
 
         this.popup = Popup.create({
@@ -194,8 +186,8 @@ export class ImportUploadDialog extends Component {
 
         this.tplManager.setMainAccount(account);
 
-        if (isFunction(this.accountChangeHandler)) {
-            this.accountChangeHandler(account.id);
+        if (isFunction(this.props.onAccountChange)) {
+            this.props.onAccountChange(account.id);
         }
     }
 
@@ -261,9 +253,16 @@ export class ImportUploadDialog extends Component {
         this.enableUpload(status);
     }
 
+    /** Template update handler */
+    onTemplateUpdate() {
+        if (isFunction(this.props.onTemplateUpdate)) {
+            this.props.onTemplateUpdate();
+        }
+    }
+
     /** Hide import file form */
     importDone() {
-        this.uploadDoneHandler(this.state.importedItems);
+        this.props.onUploadDone(this.state.importedItems);
         this.reset();
     }
 }

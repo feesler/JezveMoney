@@ -1305,21 +1305,21 @@ class TransactionView extends View {
             }
 
             if (state.validation.sourceAmount) {
-                this.clearBlockValidation('src_amount_row');
+                window.app.clearBlockValidation(this.srcAmountRow);
             } else {
-                this.invalidateBlock('src_amount_row');
+                window.app.invalidateBlock(this.srcAmountRow);
             }
 
             if (state.validation.destAmount) {
-                this.clearBlockValidation('dest_amount_row');
+                window.app.clearBlockValidation(this.destAmountRow);
             } else {
-                this.invalidateBlock('dest_amount_row');
+                window.app.invalidateBlock(this.destAmountRow);
             }
 
             if (state.validation.date) {
-                this.clearBlockValidation('date_block');
+                window.app.clearBlockValidation(this.dateBlock);
             } else {
-                this.invalidateBlock('date_block');
+                window.app.invalidateBlock(this.dateBlock);
             }
         }
 

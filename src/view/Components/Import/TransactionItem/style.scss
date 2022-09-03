@@ -1,117 +1,60 @@
 /* Transaction item */
 .import-item {
+  --ii-font-size: 0.9rem;
+
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
   margin: 2px 0;
 
-  .form-container {
+  .main-content {
+    padding: 4px 0;
+    display: flex;
+    flex-flow: row nowrap;
+  }
+
+  .item-container {
     display: flex;
     flex-flow: column nowrap;
     flex-grow: 1;
     align-items: normal;
     gap: 8px;
+    overflow: hidden;
   }
 
-  .form-rows {
+  .item-column {
     display: flex;
     flex-flow: column nowrap;
     flex-grow: 1;
     align-items: normal;
     gap: 8px;
+    overflow: hidden;
   }
 
-  .form-row {
+  .item-row {
     display: flex;
-    flex-flow: column nowrap;
-    gap: 8px;
+    flex-flow: row nowrap;
+    gap: 16px;
   }
 
   /* Input field and label group */
   .field {
-    display: flex;
-    flex-flow: column nowrap;
-    align-items: normal;
-    margin: 0;
-
-    label {
-      font-size: 12px;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      overflow: hidden;
-    }
+    --field-content-font-size: var(--ii-font-size);
+    --field-title-font-size: 12px;
   }
 
-  .amount-field input {
-    min-width: 50px;
-  }
-
-  .date-field input {
-    min-width: 50px;
-    max-width: 100px;
-  }
-
-  .amount-field input,
-  .date-field input,
-  .comment-field input {
-    width: 100%;
-  }
-
-  /* Data value static element */
-  .data-value {
-    display: flex;
-    flex-flow: row nowrap;
-
-    label {
-      font-size: 14px;
-      font-weight: 800;
-      padding: 2px 8px;
-      width: 20%;
-      min-width: 120px;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-
-    div {
-      font-size: 16px;
-      padding: 2px 8px;
-    }
-  }
-
-  .form-rows.type-col,
-  .form-rows.amount-col {
-    max-width: 300px;
-  }
-
-  .form-row .comment-field,
-  .form-row .comment-field div {
-    flex-grow: 1;
+  .field__title {
+    margin-bottom: 1px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
 
   /* Controls */
   .controls {
+    display: flex;
+    flex-flow: row nowrap;
     align-items: center;
-  }
-
-  .dd__container {
-    display: flex;
-  }
-
-  input[type="text"] {
-    display: flex;
-    padding: 5px;
-    height: 34px;
-  }
-
-  input[type="button"] {
-    width: 30px;
-    border: 0 none;
-    pointer-events: all;
-  }
-
-  .input-group {
-    --ig-height: 34px;
   }
 
   /* Enable/disable item checkbox container */
@@ -131,9 +74,7 @@
   }
 
   /* Common buttons style */
-  .btn,
-  .btn:visited,
-  .btn:active {
+  .btn {
     pointer-events: all;
     background: none;
     padding: 4px;
@@ -141,9 +82,7 @@
   }
 
   /* Toggle expand/collapse button */
-  .toggle-btn,
-  .toggle-btn:visited,
-  .toggle-btn:active {
+  .toggle-btn {
     padding: 7px;
   }
 
@@ -152,129 +91,117 @@
     height: 18px;
   }
 
-  /* Delete item button */
+  .type-col,
+  .amount-col {
+    flex-direction: row;
+    gap: 16px;
+  }
+
+  .update-icon,
   .delete-icon {
     width: 24px;
     height: 24px;
   }
 
-  /* Container for transaction form */
-  .main-content {
-    padding: 4px 0;
-    display: flex;
-    flex-flow: row nowrap;
+  .account-field,
+  .person-field {
+    flex-shrink: 1;
+    flex-grow: 1;
+    overflow: hidden;
   }
 
-  /* Container for extended content */
-  .extended-content {
-    display: none;
+  .comment-field,
+  .comment-field div {
+    overflow: hidden;
+    flex-grow: 1;
+    flex-shrink: 1;
+  }
+
+  .account-field div,
+  .person-field div,
+  .comment-field div {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .import-item__date {
+    min-width: 50px;
+    max-width: 100px;
+  }
+
+  .collapsible-content {
     border-top: 1px solid;
     padding: 8px;
     overflow: hidden;
   }
 
-  &.import-item_expanded .extended-content {
-    display: flex;
+  &.collapsible__expanded .toggle-icon {
+    transform: rotate(180deg);
   }
-
-  /* Validation */
-  .invalid-feedback {
-    padding: 4px 8px;
-    color: #ff0000;
-  }
-
-  .field.invalid-block input,
-  .field.invalid-block .dd__combo {
-    border-color: #ff0000;
-  }
-}
-
-/* Disabled transaction row */
-.import-item_disabled .dd__container,
-.import-item_disabled input[type="text"],
-.import-item_disabled input[disabled] {
-  pointer-events: none;
-}
-
-.import-item_expanded .toggle-icon {
-  transform: rotate(180deg);
-}
-
-/* Original import data container */
-.orig-data {
-  display: flex;
-  flex-flow: column nowrap;
-  width: 100%;
-}
-
-.orig-data h3 {
-  font-size: 14px;
-  font-weight: 400;
-  margin-bottom: 8px;
-}
-
-/* Original import data table */
-.orig-data-table {
-  display: flex;
-  flex-flow: column nowrap;
-  width: 100%;
 }
 
 /* Placeholder */
 .import-item__placeholder {
   border: 1px dashed;
-}
 
-.import-item__placeholder * {
-  opacity: 0;
-}
-
-.field.invalid-block label {
-  color: #ff0000;
+  * {
+    opacity: 0;
+  }
 }
 
 /* Desktop */
 @media (min-width: 768px) {
   .import-item {
-    .form-container {
+    .item-container {
       flex-flow: row nowrap;
-    }
-
-    .form-row {
-      flex-flow: row nowrap;
+      gap: 16px;
     }
 
     .main-content {
       padding: 4px 0 6px 0;
     }
 
-    .controls {
-      align-items: start;
-      padding-top: 16px;
+    .item-row {
+      gap: 8px;
     }
 
-    .orig-data-table {
-      flex-flow: row nowrap;
+    .type-field,
+    .amount-field {
+      width: 120px;
     }
 
-    .data-value {
-      flex-flow: column nowrap;
+    .date-field {
+      width: 100px;
+      flex-shrink: 0;
+    }
 
-      label {
-        padding: 2px 8px;
-        width: auto;
-        min-width: auto;
-      }
+    .type-col,
+    .amount-col {
+      width: 120px;
+      flex-direction: column;
+      flex-shrink: 0;
+      flex-grow: 0;
+      gap: 8px;
+    }
+  }
+}
 
-      div {
-        padding: 2px 8px;
-        min-width: auto;
-        text-align: right;
-      }
+/* Desktop */
+@media (min-width: 992px) {
+  .import-item {
+    --ii-font-size: 1rem;
 
-      &.comment-value div {
-        text-align: left;
-      }
+    .type-col,
+    .amount-col {
+      flex-direction: row;
+    }
+
+    .type-col {
+      width: 35%;
+    }
+
+    .amount-col {
+      width: 27%;
     }
   }
 }

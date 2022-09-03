@@ -92,6 +92,8 @@ const runStateLoopTests = async () => {
             { action: 'changeSourceCurrency', data: USD }, // 3-4
             { action: 'changeType', data: 'transferto' }, // 4-7
             { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 7-8
+            { action: 'inputSourceAmount', data: '100' },
+            { action: 'inputDestAmount', data: '6000' },
         ],
     });
 
@@ -101,6 +103,7 @@ const runStateLoopTests = async () => {
         action: [
             { action: 'changeDestCurrency', data: USD }, // 1-2
             { action: 'inputDestAmount', data: '50.03' },
+            { action: 'inputSourceAmount', data: '100' },
         ],
     });
     await ImportTests.updateItem({
@@ -113,6 +116,7 @@ const runStateLoopTests = async () => {
             { action: 'changeDestCurrency', data: USD }, // 1-2
             { action: 'changeType', data: 'income' }, // 2-4
             { action: 'inputDestAmount', data: '500' },
+            { action: 'inputSourceAmount', data: '9' },
         ],
     });
     await ImportTests.updateItem({
@@ -124,7 +128,8 @@ const runStateLoopTests = async () => {
         action: [
             { action: 'changeType', data: 'transferfrom' }, // 1-5
             { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 5-6
-            { action: 'inputDestAmount', data: '50.03' },
+            { action: 'inputDestAmount', data: '0.9' },
+            { action: 'inputSourceAmount', data: '50.03' },
         ],
     });
     await ImportTests.updateItem({

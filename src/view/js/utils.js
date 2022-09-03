@@ -1,5 +1,31 @@
 import { isDate } from 'jezvejs';
 
+/** Returns array of { name, value } cookie objects */
+export const parseCookies = () => {
+    const entries = document.cookie.split(';');
+    return entries.map((entry) => {
+        const nameLength = entry.indexOf('=');
+        return {
+            name: entry.substring(0, nameLength).trimStart(),
+            value: entry.substring(nameLength + 1),
+        };
+    });
+};
+
+/** Set specified cookie */
+export const setCookie = (name, value) => {
+    const msInYear = 315356e5;
+    const date = new Date(Date.now() + msInYear);
+    const parts = [
+        `${encodeURIComponent(name)}=${encodeURIComponent(value)}`,
+        'path=/',
+        `expires=${date.toUTCString()}`,
+        'secure',
+    ];
+
+    document.cookie = parts.join('; ');
+};
+
 /* Convert number to string and prepend zero if value is less than 10 */
 export const leadZero = (val) => {
     const v = parseInt(val, 10);

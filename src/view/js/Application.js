@@ -1,14 +1,23 @@
 import {
+    ge,
     ce,
     svg,
     Popup,
 } from 'jezvejs';
+import { parseCookies, setCookie } from './utils.js';
 import { AccountList } from './model/AccountList.js';
 import { CurrencyList } from './model/CurrencyList.js';
 import { IconList } from './model/IconList.js';
 import { ImportRuleList } from './model/ImportRuleList.js';
 import { ImportTemplateList } from './model/ImportTemplateList.js';
 import { PersonList } from './model/PersonList.js';
+
+/** CSS classes */
+const INVALID_BLOCK_CLASS = 'invalid-block';
+
+/** Theme constants */
+export const WHITE_THEME = 0;
+export const DARK_THEME = 1;
 
 const HIDDEN_GROUP_TITLE = 'Hidden';
 
@@ -71,6 +80,59 @@ export class Application {
         return this.props.message;
     }
 
+    getThemeCookie() {
+        const cookies = parseCookies();
+        return cookies.find((item) => item.name === 'theme');
+    }
+
+    isPrefersDarkTheme() {
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+
+    isCurrentTheme(theme) {
+        return document.body.classList.contains(theme?.className);
+    }
+
+    getCurrentTheme() {
+        const { themes } = this.props;
+
+        const themeId = Object.keys(themes).find(
+            (key) => this.isCurrentTheme(themes[key]),
+        );
+
+        return (themeId) ? parseInt(themeId, 10) : WHITE_THEME;
+    }
+
+    setupTheme() {
+        const themeCookie = this.getThemeCookie();
+        if (themeCookie) {
+            return;
+        }
+
+        if (this.isPrefersDarkTheme()) {
+            this.setTheme(true);
+        }
+    }
+
+    setTheme(dark) {
+        const { baseURL, themes } = this.props;
+        const themeId = (dark) ? DARK_THEME : WHITE_THEME;
+        const theme = themes[themeId];
+
+        if (this.isCurrentTheme(theme)) {
+            return;
+        }
+
+        const linkElem = ge('theme-style');
+        if (linkElem) {
+            linkElem.href = `${baseURL}view/css/themes/${theme.file}`;
+        }
+
+        document.body.className = theme.className;
+
+        setCookie('theme', themeId);
+    }
+
     /**
      * Create notification message
      * @param {string} message - notification text
@@ -93,6 +155,24 @@ export class Application {
         this.messageBox.show();
     }
 
+    /**
+     * Clear validation state of block
+     * @param {string|Element} block - block to clear validation state
+     */
+    clearBlockValidation(block) {
+        const blockElem = (typeof block === 'string') ? ge(block) : block;
+        blockElem?.classList?.remove(INVALID_BLOCK_CLASS);
+    }
+
+    /**
+     * Set invalid state for block
+     * @param {string|Element} block - block to invalidate
+     */
+    invalidateBlock(block) {
+        const blockElem = (typeof block === 'string') ? ge(block) : block;
+        blockElem?.classList?.add(INVALID_BLOCK_CLASS);
+    }
+
     /** Create simple container element */
     createContainer(elemClass, children, events) {
         return ce('div', { className: elemClass }, children, events);
@@ -109,20 +189,6 @@ export class Application {
         useElem.href.baseVal = (icon) ? `#${icon}` : '';
 
         return res;
-    }
-
-    /** Create field element from given input element */
-    createField(title, input, extraClass) {
-        const elemClasses = ['field'];
-
-        if (typeof extraClass === 'string' && extraClass.length > 0) {
-            elemClasses.push(extraClass);
-        }
-
-        return ce('div', { className: elemClasses.join(' ') }, [
-            ce('label', { textContent: title }),
-            ce('div', {}, input),
-        ]);
     }
 
     checkUserAccountModels() {

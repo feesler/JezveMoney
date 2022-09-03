@@ -251,3 +251,24 @@ export const checkPHPerrors = (content) => {
 
 /** Returns random integer id */
 export const generateId = () => Math.round(Math.random() * 10000);
+
+/** Returns copy of specified object with properties existing in expected object */
+export function getExpectedValues(control, expected) {
+    const res = {};
+
+    const expectedKeys = Object.getOwnPropertyNames(expected);
+    for (const key of expectedKeys) {
+        const expValue = expected[key];
+        const realValue = (control.checkValues)
+            ? control.content[key]
+            : control[key];
+
+        if (isObject(expValue)) {
+            res[key] = getExpectedValues(realValue, expValue);
+        } else {
+            res[key] = realValue;
+        }
+    }
+
+    return res;
+}
