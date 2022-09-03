@@ -6,7 +6,7 @@ export const parseCookies = () => {
     return entries.map((entry) => {
         const nameLength = entry.indexOf('=');
         return {
-            name: entry.substring(0, nameLength),
+            name: entry.substring(0, nameLength).trimStart(),
             value: entry.substring(nameLength + 1),
         };
     });
@@ -14,7 +14,16 @@ export const parseCookies = () => {
 
 /** Set specified cookie */
 export const setCookie = (name, value) => {
-    document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}`;
+    const msInYear = 315356e5;
+    const date = new Date(Date.now() + msInYear);
+    const parts = [
+        `${encodeURIComponent(name)}=${encodeURIComponent(value)}`,
+        'path=/',
+        `expires=${date.toUTCString()}`,
+        'secure',
+    ];
+
+    document.cookie = parts.join('; ');
 };
 
 /* Convert number to string and prepend zero if value is less than 10 */

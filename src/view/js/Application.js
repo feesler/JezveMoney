@@ -131,7 +131,6 @@ export class Application {
         document.body.className = theme.className;
 
         setCookie('theme', themeId);
-        fetch(`${baseURL}main/setTheme/?theme=${themeId}`);
     }
 
     /**

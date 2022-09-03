@@ -39,16 +39,6 @@ abstract class TemplateController extends Controller
     }
 
 
-    public function setTheme()
-    {
-        if (!isset($_GET["theme"])) {
-            return;
-        }
-
-        $this->uMod->setUserTheme($_GET["theme"]);
-    }
-
-
     protected function setupThemes()
     {
         $userTheme = $this->uMod->getUserTheme();
