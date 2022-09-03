@@ -753,6 +753,32 @@ class TransactionView extends View {
         }
     }
 
+    validateSourceAmount(state) {
+        const valid = (
+            state.transaction.src_amount
+            && isNum(fixFloat(state.form.sourceAmount))
+        );
+
+        if (!valid) {
+            this.store.dispatch(invalidateSourceAmount());
+        }
+
+        return valid;
+    }
+
+    validateDestAmount(state) {
+        const valid = (
+            state.transaction.dest_amount
+            && isNum(fixFloat(state.form.destAmount))
+        );
+
+        if (!valid) {
+            this.store.dispatch(invalidateDestAmount());
+        }
+
+        return valid;
+    }
+
     /**
      * Common transaction 'submit' event handler
      */
@@ -766,23 +792,14 @@ class TransactionView extends View {
         const { sourceAmount, destAmount } = state.form;
         let valid = true;
 
-        if (
-            state.transaction.src_amount <= 0
-            || !isNum(fixFloat(sourceAmount))
-        ) {
-            this.store.dispatch(invalidateSourceAmount());
-            valid = false;
-        }
-
-        if (
-            state.isDiff
-            && (
-                state.transaction.dest_amount <= 0
-                || !isNum(fixFloat(destAmount))
-            )
-        ) {
-            this.store.dispatch(invalidateDestAmount());
-            valid = false;
+        if (state.transaction.type === EXPENSE) {
+            const destValid = this.validateDestAmount(state);
+            const sourceValid = (state.isDiff) ? this.validateSourceAmount(state) : true;
+            valid = destValid && sourceValid;
+        } else {
+            const sourceValid = this.validateSourceAmount(state);
+            const destValid = (state.isDiff) ? this.validateDestAmount(state) : true;
+            valid = destValid && sourceValid;
         }
 
         if (!checkDate(this.dateInput.value)) {
