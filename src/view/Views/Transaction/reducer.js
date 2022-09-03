@@ -2,6 +2,7 @@ import {
     normalize,
     normalizeExch,
     isValidValue,
+    dateStringToTimestamp,
 } from '../../js/utils.js';
 import {
     EXPENSE,
@@ -28,6 +29,7 @@ const DEST_AMOUNT_CHANGE = 'destAmountChange';
 const SOURCE_RESULT_CHANGE = 'sourceResultChange';
 const DEST_RESULT_CHANGE = 'destResultChange';
 const EXCHANGE_CHANGE = 'exchangeChange';
+const DATE_CHANGE = 'dateChange';
 const INVALIDATE_SOURCE_AMOUNT = 'invalidateSourceAmount';
 const INVALIDATE_DEST_AMOUNT = 'invalidateDestAmount';
 const INVALIDATE_DATE = 'invalidateDate';
@@ -67,6 +69,7 @@ export const destAmountChange = (value) => ({ type: DEST_AMOUNT_CHANGE, payload:
 export const sourceResultChange = (value) => ({ type: SOURCE_RESULT_CHANGE, payload: value });
 export const destResultChange = (value) => ({ type: DEST_RESULT_CHANGE, payload: value });
 export const exchangeChange = (value) => ({ type: EXCHANGE_CHANGE, payload: value });
+export const dateChange = (value) => ({ type: DATE_CHANGE, payload: value });
 export const invalidateSourceAmount = () => ({ type: INVALIDATE_SOURCE_AMOUNT });
 export const invalidateDestAmount = () => ({ type: INVALIDATE_DEST_AMOUNT });
 export const invalidateDate = () => ({ type: INVALIDATE_DATE });
@@ -1007,6 +1010,22 @@ const reduceExchangeChange = (state, value) => {
     return newState;
 };
 
+const reduceDateChange = (state, value) => ({
+    ...state,
+    transaction: {
+        ...state.transaction,
+        date: dateStringToTimestamp(value),
+    },
+    form: {
+        ...state.form,
+        date: value,
+    },
+    validation: {
+        ...state.validation,
+        date: true,
+    },
+});
+
 const reduceInvalidateSourceAmount = (state) => ({
     ...state,
     validation: {
@@ -1401,6 +1420,7 @@ const reducerMap = {
     [SOURCE_RESULT_CHANGE]: reduceSourceResultChange,
     [DEST_RESULT_CHANGE]: reduceDestResultChange,
     [EXCHANGE_CHANGE]: reduceExchangeChange,
+    [DATE_CHANGE]: reduceDateChange,
     [INVALIDATE_SOURCE_AMOUNT]: reduceInvalidateSourceAmount,
     [INVALIDATE_DEST_AMOUNT]: reduceInvalidateDestAmount,
     [INVALIDATE_DATE]: reduceInvalidateDate,

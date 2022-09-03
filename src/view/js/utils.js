@@ -75,6 +75,12 @@ export const timestampFromString = (str) => {
     return fixDate(tmpDate);
 };
 
+/** Convert date string to timestamp in seconds */
+export const dateStringToTimestamp = (value) => {
+    const res = fixDate(value);
+    return (res) ? (res / 1000) : null;
+};
+
 /**
  * Fix string to correct float number format
  * @param {string} str - decimal value string
