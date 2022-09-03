@@ -73,8 +73,8 @@ export class ImportAction {
         [IMPORT_ACTION_SET_TR_TYPE]: 'setTransactionType',
         [IMPORT_ACTION_SET_ACCOUNT]: 'setAccount',
         [IMPORT_ACTION_SET_PERSON]: 'setPerson',
-        [IMPORT_ACTION_SET_SRC_AMOUNT]: 'setAmount',
-        [IMPORT_ACTION_SET_DEST_AMOUNT]: 'setSecondAmount',
+        [IMPORT_ACTION_SET_SRC_AMOUNT]: 'setSourceAmount',
+        [IMPORT_ACTION_SET_DEST_AMOUNT]: 'setDestAmount',
         [IMPORT_ACTION_SET_COMMENT]: 'setComment',
     };
 

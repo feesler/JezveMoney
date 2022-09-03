@@ -36,6 +36,7 @@ const runSubmitImportTests = async () => {
         action: [
             { action: 'inputDestAmount', data: '1' },
             { action: 'changeDestCurrency', data: App.scenario.USD },
+            { action: 'inputSourceAmount', data: '' },
         ],
     });
     await ImportTests.submit();

@@ -224,7 +224,10 @@ class ImportView extends View {
 
         const item = ImportTransactionItem.create({
             mainAccount: this.state.mainAccount,
-            originalData: data,
+            originalData: {
+                ...data,
+                origAccount: { ...this.state.mainAccount },
+            },
             onEnable: (i) => this.onEnableItem(i),
             onUpdate: (i) => this.onUpdateItem(i),
             onRemove: (i) => this.onRemoveItem(i),
@@ -293,24 +296,6 @@ class ImportView extends View {
                 item.enable(false);
             }
             item.render();
-        });
-
-        /* Print imported items with no similar trasaction */
-        console.log('Not picked import items:');
-        importedItems.forEach((item) => {
-            if (item.state.enabled) {
-                const dateFmt = formatDate(new Date(item.data.date));
-
-                console.log(`tr_amount: ${item.data.transactionAmount} acc_amount: ${item.data.accountAmount} date: ${dateFmt} comment: ${item.data.comment}`);
-            }
-        });
-
-        /* Print transactions not matched to imported list */
-        console.log('Not picked transactions:');
-        this.state.transCache.forEach((tr) => {
-            if (!tr.picked) {
-                console.log(`id: ${tr.id} src_amount: ${tr.src_amount} dest_amount: ${tr.dest_amount} date: ${tr.date} comment: ${tr.comment}`);
-            }
         });
 
         this.render(this.state);

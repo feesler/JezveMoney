@@ -234,7 +234,7 @@ export class ImportTransaction {
         this.person_id = person.id;
     }
 
-    setAmount(value) {
+    setSourceAmount(value) {
         const amount = parseFloat(fixFloat(value));
         assert(!Number.isNaN(amount), 'Invalid amount value');
 
@@ -243,18 +243,20 @@ export class ImportTransaction {
         }
 
         const absAmount = Math.abs(amount);
-        if (this.type === 'income') {
-            this.dest_amount = absAmount;
-        } else {
-            this.src_amount = absAmount;
+        this.src_amount = absAmount;
+        if (!this.isDiff()) {
+            this.dest_amount = this.src_amount;
         }
     }
 
-    setSecondAmount(value) {
+    setDestAmount(value) {
         const amount = parseFloat(fixFloat(value));
         assert(!Number.isNaN(amount), 'Invalid amount value');
 
         this.dest_amount = Math.abs(amount);
+        if (!this.isDiff()) {
+            this.src_amount = this.dest_amount;
+        }
     }
 
     setComment(value) {

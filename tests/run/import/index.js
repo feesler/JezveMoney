@@ -13,6 +13,7 @@ import { ImportList } from '../../view/component/Import/ImportList.js';
 import { ImportTransactionForm } from '../../view/component/Import/ImportTransactionForm.js';
 import { ImportView } from '../../view/ImportView.js';
 import { ImportViewSubmitError } from '../../error/ImportViewSubmitError.js';
+import { ImportTransactionItem } from '../../view/component/Import/ImportTransactionItem.js';
 
 /** Reexport import templates and import rules runners */
 export * from './templates.js';
@@ -232,7 +233,9 @@ export const changeMainAccount = async (accountId) => {
                     importTrans.enabled = false;
                 }
 
-                const imported = ImportTransactionForm.render(importTrans, App.state);
+                const imported = (item.model.isForm)
+                    ? ImportTransactionForm.render(importTrans, App.state)
+                    : ImportTransactionItem.render(importTrans, App.state);
                 return copyObject(imported);
             }
 
@@ -291,7 +294,11 @@ export const enableRules = async (value = true) => {
 
                     App.state.rules.applyTo(importTrans);
 
-                    const imported = ImportList.render([importTrans], App.state);
+                    const imported = ImportList.render(
+                        [importTrans],
+                        App.state,
+                        (item.model.isForm) ? 0 : -1,
+                    );
                     return copyObject(imported.items[0]);
                 }
 
@@ -360,6 +367,36 @@ export const updateItem = async (params) => {
         inputDate: 'Input date',
         inputComment: 'Input comment',
     };
+
+    const item = App.view.content.itemsList.getItem(params.pos);
+    if (!item.content.isForm) {
+        // Get current form
+        const { formIndex } = App.view.content.itemsList.model;
+        let isValid = true;
+        if (formIndex !== -1) {
+            const form = App.view.content.itemsList.getItem(formIndex);
+            const expectedTransaction = form.getExpectedTransaction(form.model);
+            isValid = App.state.checkTransactionCorrectness(expectedTransaction);
+
+            if (isValid) {
+                const currentForm = App.view.content.itemsList.getItem(formIndex);
+                currentForm.model.isForm = false;
+            }
+        }
+
+        if (isValid) {
+            const newForm = App.view.content.itemsList.getItem(params.pos);
+            newForm.model.isForm = true;
+        }
+
+        App.view.expectedState = {
+            itemsList: App.view.content.itemsList.getExpectedState(),
+        };
+
+        await App.view.runItemAction(params.pos, { action: 'clickUpdate' });
+
+        App.view.checkState();
+    }
 
     const actions = Array.isArray(params.action) ? params.action : [params.action];
     for (const action of actions) {

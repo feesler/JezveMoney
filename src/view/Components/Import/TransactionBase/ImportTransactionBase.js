@@ -73,10 +73,7 @@ export class ImportTransactionBase extends Component {
             throw new Error('Invalid data');
         }
 
-        if (data !== this.data) {
-            this.data = copyObject(data);
-            this.data.origAccount = { ...this.state.mainAccount };
-        }
+        this.data = copyObject(data);
         this.data.mainAccount = this.state.mainAccount.id;
     }
 
@@ -125,6 +122,7 @@ export class ImportTransactionBase extends Component {
         this.setMainAccount(this.data.origAccount.id);
         this.setDestCurrency(this.data.origAccount.curr_id);
         this.setSourceAmount(0);
+        this.setDestAmount(0);
 
         this.setOriginal(this.data);
 
@@ -185,14 +183,6 @@ export class ImportTransactionBase extends Component {
             ...state,
             isDiff: state.srcCurrId !== state.destCurrId,
         };
-
-        if (!res.isDiff) {
-            if (res.type === 'expense') {
-                res.sourceAmount = '';
-            } else {
-                res.destAmount = '';
-            }
-        }
 
         return res;
     }
@@ -385,7 +375,7 @@ export class ImportTransactionBase extends Component {
             throw new Error('Account not found');
         }
 
-        if (this.state.accountId === account.id) {
+        if (this.state.mainAccount.id === account.id) {
             return this.state;
         }
         const state = {
@@ -407,10 +397,20 @@ export class ImportTransactionBase extends Component {
 
         if (state.type === 'expense' || state.type === 'income') {
             if (!state.isDiff) {
+                // If currencies was the same before, then set source and destination currencies
+                // to as the currency of main account
                 if (state.type === 'expense') {
                     state.destCurrId = state.srcCurrId;
                 } else {
                     state.srcCurrId = state.destCurrId;
+                }
+            } else if (state.destCurrId === state.srcCurrId) {
+                // If currencies was different before, but now became same, then
+                // make source and destination amounts same value
+                if (state.type === 'expense') {
+                    state.sourceAmount = state.destAmount;
+                } else {
+                    state.destAmount = state.sourceAmount;
                 }
             }
         } else if (state.type === 'transferfrom' || state.type === 'transferto') {
@@ -502,6 +502,9 @@ export class ImportTransactionBase extends Component {
         }
         const state = copyObject(this.state);
         state.sourceAmount = value;
+        if (state.srcCurrId === state.destCurrId) {
+            state.sourceAmount = state.destAmount;
+        }
 
         this.state = state;
 
@@ -520,6 +523,10 @@ export class ImportTransactionBase extends Component {
         }
         const state = copyObject(this.state);
         state.destAmount = value;
+
+        if (state.srcCurrId === state.destCurrId) {
+            state.sourceAmount = state.destAmount;
+        }
 
         this.state = state;
 
@@ -636,5 +643,10 @@ export class ImportTransactionBase extends Component {
         res.comment = state.comment;
 
         return res;
+    }
+
+    /** Return date string */
+    getDate() {
+        return this.state.date;
     }
 }

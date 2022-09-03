@@ -283,11 +283,17 @@ export class ImportTransactionItem extends ImportTransactionBase {
         const srcAmount = currency.formatCurrency(state.sourceAmount, state.srcCurrId);
         this.srcAmountTitle.textContent = srcAmount;
 
+        this.srcAmountField.elem.dataset.amount = state.sourceAmount;
+        this.srcAmountField.elem.dataset.curr = state.srcCurrId;
+
         this.destAmountField.show(state.isDiff);
-        if (state.isDiff) {
-            const destAmount = currency.formatCurrency(state.destAmount, state.destCurrId);
-            this.destAmountTitle.textContent = destAmount;
-        }
+        const destAmount = (state.isDiff)
+            ? currency.formatCurrency(state.destAmount, state.destCurrId)
+            : '';
+        this.destAmountTitle.textContent = destAmount;
+
+        this.destAmountField.elem.dataset.amount = state.destAmount;
+        this.destAmountField.elem.dataset.curr = state.destCurrId;
 
         // Date field
         this.dateTitle.textContent = state.date;

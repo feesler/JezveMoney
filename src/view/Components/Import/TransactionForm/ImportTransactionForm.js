@@ -523,11 +523,6 @@ export class ImportTransactionForm extends ImportTransactionBase {
         return true;
     }
 
-    /** Return date string */
-    getDate() {
-        return this.state.date;
-    }
-
     renderCurrency(elem, ddown, currencyId) {
         const signElem = elem;
         if (!signElem) {
