@@ -1,6 +1,5 @@
 import {
     ce,
-    show,
     enable,
     isFunction,
     formatDate,
@@ -8,13 +7,11 @@ import {
 } from 'jezvejs';
 import { ImportTransactionBase, sourceTypes } from '../TransactionBase/ImportTransactionBase.js';
 import { Field } from '../Field/Field.js';
-import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import './style.scss';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'import-item';
 const MAIN_CONTENT_CLASS = 'main-content';
-const EXT_CONTENT_CLASS = 'extended-content';
 const ITEM_CONTAINER_CLASS = 'item-container';
 const COLUMN_CLASS = 'item-column';
 const ROW_CLASS = 'item-row';
@@ -40,11 +37,9 @@ const CONTROLS_CLASS = 'controls';
 const DEFAULT_BUTTON_CLASS = 'btn';
 const UPDATE_BUTTON_CLASS = 'update-btn';
 const DEL_BUTTON_CLASS = 'delete-btn';
-const TOGGLE_BUTTON_CLASS = 'toggle-btn';
 const DEFAULT_ICON_CLASS = 'icon';
 const UPDATE_ICON_CLASS = 'update-icon';
 const DEL_ICON_CLASS = 'delete-icon';
-const TOGGLE_ICON_CLASS = 'toggle-icon';
 
 /** Strings */
 const TITLE_FIELD_SRC_ACCOUNT = 'Source account';
@@ -198,14 +193,6 @@ export class ImportTransactionItem extends ImportTransactionBase {
             window.app.createIcon('del', `${DEFAULT_ICON_CLASS} ${DEL_ICON_CLASS}`),
             { click: () => this.remove() },
         );
-        // Toggle expand/collapse
-        this.toggleExtBtn = ce(
-            'button',
-            { className: `${DEFAULT_BUTTON_CLASS} ${TOGGLE_BUTTON_CLASS}`, type: 'button' },
-            window.app.createIcon('toggle-ext', `${DEFAULT_ICON_CLASS} ${TOGGLE_ICON_CLASS}`),
-            { click: () => this.toggleCollapse() },
-        );
-        show(this.toggleExtBtn, false);
 
         this.topRow = window.app.createContainer(ROW_CLASS, [
             this.dateField.elem,
@@ -227,31 +214,18 @@ export class ImportTransactionItem extends ImportTransactionBase {
             ]),
         ]);
 
+        this.controls = window.app.createContainer(CONTROLS_CLASS, [
+            this.updateBtn,
+            this.delBtn,
+        ]);
+
         this.mainContainer = window.app.createContainer(MAIN_CONTENT_CLASS, [
             this.enableCheck.elem,
             this.itemContainer,
-            window.app.createContainer(CONTROLS_CLASS, [
-                this.updateBtn,
-                this.delBtn,
-                this.toggleExtBtn,
-            ]),
+            this.controls,
         ]);
 
-        this.elem = window.app.createContainer(CONTAINER_CLASS, [
-            this.mainContainer,
-        ]);
-
-        const { originalData } = this.props;
-        if (originalData) {
-            this.extendedContainer = window.app.createContainer(EXT_CONTENT_CLASS);
-            this.elem.append(this.extendedContainer);
-
-            const origDataContainer = OriginalImportData.create({
-                ...originalData,
-                mainAccount: this.state.mainAccount,
-            });
-            this.setExtendedContent(origDataContainer.elem);
-        }
+        this.initContainer(CONTAINER_CLASS, [this.mainContainer]);
 
         this.render();
     }

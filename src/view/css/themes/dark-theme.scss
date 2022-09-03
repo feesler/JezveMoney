@@ -363,19 +363,6 @@
     }
   }
 
-  /* Original import data container */
-  .extended-content {
-    color: #bbbbbb;
-    border-color: #3c3c3c;
-    background-color: #444444;
-  }
-
-  [disabled] .extended-content {
-    color: #707070;
-    border-color: #333333;
-    background-color: #232323;
-  }
-
   .import-controls {
     color: var(--main-text-color);
   }
@@ -396,10 +383,6 @@
   }
 
   /* Import rule */
-  .rule-item .collapsible-content {
-    background-color: #202020;
-  }
-
   .rule-item__operator {
     color: #808080;
   }
@@ -435,6 +418,22 @@
   .action-item,
   .action-form {
     background-color: #353535;
+  }
+
+  /* Original import data container */
+  .import-item,
+  .import-form {
+    .collapsible-content {
+      color: #bbbbbb;
+      border-color: #3c3c3c;
+      background-color: #444444;
+    }
+
+    &[disabled] .collapsible-content {
+      color: #707070;
+      border-color: #333333;
+      background-color: #232323;
+    }
   }
 
   /* Statistics view */

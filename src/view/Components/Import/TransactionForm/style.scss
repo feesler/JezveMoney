@@ -144,16 +144,14 @@
     flex-flow: row nowrap;
   }
 
-  /* Container for extended content */
-  .extended-content {
-    display: none;
+  .collapsible-content {
     border-top: 1px solid;
     padding: 8px;
     overflow: hidden;
   }
 
-  &.expanded .extended-content {
-    display: flex;
+  &.collapsible__expanded .toggle-icon {
+    transform: rotate(180deg);
   }
 
   /* Validation */
@@ -175,10 +173,6 @@
   input[disabled] {
     pointer-events: none;
   }
-}
-
-.import-form--expanded .toggle-icon {
-  transform: rotate(180deg);
 }
 
 /* Placeholder */

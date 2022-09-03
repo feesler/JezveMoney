@@ -12,7 +12,6 @@ import {
 import { fixFloat } from '../../../js/utils.js';
 import { ImportTransactionBase, sourceTypes } from '../TransactionBase/ImportTransactionBase.js';
 import { Field } from '../Field/Field.js';
-import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import './style.scss';
 
 /** CSS classes */
@@ -20,7 +19,6 @@ const CONTAINER_CLASS = 'import-form';
 const ENABLE_CHECK_CLASS = 'enable-check';
 const MAIN_CONTENT_CLASS = 'main-content';
 const INV_FEEDBACK_CLASS = 'invalid-feedback';
-const EXT_CONTENT_CLASS = 'extended-content';
 const FORM_CONTAINER_CLASS = 'form-container';
 const FORM_COLUMN_CLASS = 'form-rows';
 const AMOUNT_COLUMN_CLASS = 'amount-col';
@@ -39,10 +37,8 @@ const COMMENT_FIELD_CLASS = 'comment-field';
 const CONTROLS_CLASS = 'controls';
 const DEFAULT_BUTTON_CLASS = 'btn';
 const DEL_BUTTON_CLASS = 'delete-btn';
-const TOGGLE_BUTTON_CLASS = 'toggle-btn';
 const DEFAULT_ICON_CLASS = 'icon';
 const DEL_ICON_CLASS = 'delete-icon';
-const TOGGLE_ICON_CLASS = 'toggle-icon';
 
 /** Fields */
 const TITLE_FIELD_AMOUNT = 'Amount';
@@ -197,14 +193,6 @@ export class ImportTransactionForm extends ImportTransactionBase {
             window.app.createIcon('del', `${DEFAULT_ICON_CLASS} ${DEL_ICON_CLASS}`),
             { click: () => this.remove() },
         );
-        // Toggle expand/collapse
-        this.toggleExtBtn = ce(
-            'button',
-            { className: `${DEFAULT_BUTTON_CLASS} ${TOGGLE_BUTTON_CLASS}`, type: 'button' },
-            window.app.createIcon('toggle-ext', `${DEFAULT_ICON_CLASS} ${TOGGLE_ICON_CLASS}`),
-            { click: () => this.toggleCollapse() },
-        );
-        show(this.toggleExtBtn, false);
 
         this.topRow = window.app.createContainer(FORM_ROW_CLASS, [
             this.dateField.elem,
@@ -226,32 +214,22 @@ export class ImportTransactionForm extends ImportTransactionBase {
             ]),
         ]);
 
+        this.controls = window.app.createContainer(CONTROLS_CLASS, [
+            this.delBtn,
+        ]);
+
         this.mainContainer = window.app.createContainer(MAIN_CONTENT_CLASS, [
             this.enableCheck.elem,
             this.formContainer,
-            window.app.createContainer(CONTROLS_CLASS, [
-                this.delBtn,
-                this.toggleExtBtn,
-            ]),
+            this.controls,
         ]);
         this.feedbackElem = ce('div', { className: INV_FEEDBACK_CLASS });
         show(this.feedbackElem, false);
-        this.extendedContainer = window.app.createContainer(EXT_CONTENT_CLASS);
 
-        this.elem = window.app.createContainer(CONTAINER_CLASS, [
+        this.initContainer(CONTAINER_CLASS, [
             this.mainContainer,
             this.feedbackElem,
-            this.extendedContainer,
         ]);
-
-        const { originalData } = this.props;
-        if (originalData) {
-            const origDataContainer = OriginalImportData.create({
-                ...originalData,
-                mainAccount: this.state.mainAccount,
-            });
-            this.setExtendedContent(origDataContainer.elem);
-        }
 
         this.render();
     }

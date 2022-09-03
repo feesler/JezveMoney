@@ -1,12 +1,11 @@
 import {
+    ce,
     re,
-    show,
     copyObject,
     isFunction,
-    addChilds,
-    removeChilds,
     formatDate,
     Component,
+    Collapsible,
 } from 'jezvejs';
 import { fixFloat } from '../../../js/utils.js';
 import {
@@ -15,9 +14,14 @@ import {
     TRANSFER,
     DEBT,
 } from '../../../js/model/Transaction.js';
+import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 
 /** CSS classes */
-const EXPANDED_CLASS = 'expanded';
+const DEFAULT_BUTTON_CLASS = 'btn';
+const TOGGLE_BUTTON_CLASS = 'toggle-btn';
+const DEFAULT_ICON_CLASS = 'icon';
+const TOGGLE_ICON_CLASS = 'toggle-icon';
+
 export const sourceTypes = ['expense', 'transferfrom', 'debtfrom'];
 const transTypeMap = {
     expense: EXPENSE,
@@ -30,21 +34,37 @@ const transTypeMap = {
 
 /** Base import transaction class */
 export class ImportTransactionBase extends Component {
-    /**
-     * Setup extended content of item
-     * If value is null content is removed and toggle button hidden
-     * @param {Element|null} content - value to set extended content
-     */
-    setExtendedContent(content) {
-        removeChilds(this.extendedContainer);
+    initContainer(className, children) {
+        const { originalData } = this.props;
+        if (originalData) {
+            const origDataContainer = OriginalImportData.create({
+                ...originalData,
+                mainAccount: this.state.mainAccount,
+            });
 
-        if (content) {
-            addChilds(this.extendedContainer, content);
+            this.toggleExtBtn = this.createToggleButton();
+            this.controls.append(this.toggleExtBtn);
+
+            this.collapse = Collapsible.create({
+                toggleOnClick: false,
+                className,
+                header: children,
+                content: origDataContainer.elem,
+            });
+            this.elem = this.collapse.elem;
         } else {
-            this.elem.classList.remove(EXPANDED_CLASS);
+            this.elem = window.app.createContainer(className, children);
         }
+    }
 
-        show(this.toggleExtBtn, content);
+    /** Returns toggle expand/collapse button */
+    createToggleButton() {
+        return ce(
+            'button',
+            { className: `${DEFAULT_BUTTON_CLASS} ${TOGGLE_BUTTON_CLASS}`, type: 'button' },
+            window.app.createIcon('toggle-ext', `${DEFAULT_ICON_CLASS} ${TOGGLE_ICON_CLASS}`),
+            { click: () => this.toggleCollapse() },
+        );
     }
 
     /** Save original import data */
@@ -133,7 +153,7 @@ export class ImportTransactionBase extends Component {
 
     /** Toggle collapse/expand button 'click' event handler */
     toggleCollapse() {
-        this.elem.classList.toggle(EXPANDED_CLASS);
+        this.collapse?.toggle();
     }
 
     /**
