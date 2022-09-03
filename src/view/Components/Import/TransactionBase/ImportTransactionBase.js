@@ -17,7 +17,7 @@ import {
 } from '../../../js/model/Transaction.js';
 
 /** CSS classes */
-const EXPANDED_CLASS = 'import-form--expanded';
+const EXPANDED_CLASS = 'expanded';
 export const sourceTypes = ['expense', 'transferfrom', 'debtfrom'];
 const transTypeMap = {
     expense: EXPENSE,
