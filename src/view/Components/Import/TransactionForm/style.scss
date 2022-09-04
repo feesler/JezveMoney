@@ -132,9 +132,23 @@
   }
 
   /* Delete item button */
+  .calendar-icon,
   .delete-icon {
     width: 24px;
     height: 24px;
+  }
+
+  .date-field {
+    /* Calendar button */
+    .icon.calendar-icon {
+      fill: var(--ig-button-color);
+    }
+
+    /* Date picker */
+    .dp__container {
+      width: 100%;
+      position: absolute;
+    }
   }
 
   /* Container for transaction form */

@@ -93,7 +93,9 @@ export class ImportTransactionForm extends TestComponent {
             }
         }
         if (inputGroup) {
-            assert(res.dropDown, 'Invalid structure of field');
+            if (!res.dropDown) {
+                res.button = await query(inputGroup, '.input-group__btn');
+            }
         }
 
         if (!dropDownElem || inputGroup) {
