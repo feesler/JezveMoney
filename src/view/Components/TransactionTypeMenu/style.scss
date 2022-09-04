@@ -13,10 +13,10 @@
 }
 
 .trtype-menu__item_selected {
-  font-weight: bold;
+  font-weight: 500;
 }
 
 /* Show selected items for multi select menu as normal links */
 .trtype-menu-multi .trtype-menu__item_selected {
-  font-weight: normal;
+  font-weight: 400;
 }
