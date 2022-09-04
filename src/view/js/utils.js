@@ -75,8 +75,8 @@ export const timestampFromString = (str) => {
     return fixDate(tmpDate);
 };
 
-/** Convert date string to timestamp in seconds */
-export const dateStringToTimestamp = (value) => {
+/** Convert date string to Unix timestamp in seconds */
+export const dateStringToTime = (value) => {
     const res = fixDate(value);
     return (res) ? (res / 1000) : null;
 };

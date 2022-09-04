@@ -2,7 +2,7 @@ import {
     normalize,
     normalizeExch,
     isValidValue,
-    dateStringToTimestamp,
+    dateStringToTime,
 } from '../../js/utils.js';
 import {
     EXPENSE,
@@ -1014,7 +1014,7 @@ const reduceDateChange = (state, value) => ({
     ...state,
     transaction: {
         ...state.transaction,
-        date: dateStringToTimestamp(value),
+        date: dateStringToTime(value),
     },
     form: {
         ...state.form,
