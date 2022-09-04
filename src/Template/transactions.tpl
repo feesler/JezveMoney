@@ -87,7 +87,9 @@ include(TPL_PATH."commonhdr.tpl");
                                     <button id="nodatebtn" class="input-group__inner-btn" type="button">
                                         <?=svgIcon("close", "input-group__inner-btn__icon")?>
                                     </button>
-                                    <button id="cal_rbtn" class="icon-btn input-group__btn" type="button"><?=svgIcon("cal", "icon calendar-icon")?></button>
+                                    <button id="cal_rbtn" class="icon-btn input-group__btn" type="button">
+                                        <svg class="icon calendar-icon"><use href="#calendar-icon"></use></svg>
+                                    </button>
                                 </div>
                                 <div id="calendar" class="calendar"></div>
                             </div>

@@ -92,7 +92,7 @@
     <path d="m1.0935 1.6138-.52039.52039 2.6019 2.6019 2.6019-2.6019-.52039-.52039-2.0815 2.0815z"/>
 </symbol>
 
-<symbol id="calendar" viewBox="0 0 24 24">
+<symbol id="calendar-icon" viewBox="0 0 24 24">
     <g transform="translate(-3.9921 -4.0088)" stroke-linejoin="round" stroke-width=".2">
         <path d="m7 8v16h18v-16zm.99212 2.0177h16.016v12.991h-16.016z"/>
         <rect x="8.9843" y="14.018" width="2.0197" height="1.9823"/>

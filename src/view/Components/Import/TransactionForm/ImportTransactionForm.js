@@ -380,7 +380,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         }, null, { input: () => this.onDateInput() });
 
         const dateIcon = window.app.createIcon(
-            'calendar',
+            'calendar-icon',
             `${DEFAULT_ICON_CLASS} ${CALENDAR_ICON_CLASS}`,
         );
         this.dateBtn = ce('button', {
