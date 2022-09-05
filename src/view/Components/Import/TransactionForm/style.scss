@@ -61,6 +61,18 @@
     max-width: 300px;
   }
 
+  .date-field {
+    min-width: 125px;
+
+    .icon.calendar-icon {
+      fill: var(--ig-button-color);
+    }
+
+    .dp__container {
+      width: 100%;
+    }
+  }
+
   .form-row .comment-field,
   .form-row .comment-field div {
     flex-grow: 1;
@@ -138,18 +150,6 @@
     height: 24px;
   }
 
-  .date-field {
-    min-width: 125px;
-
-    .icon.calendar-icon {
-      fill: var(--ig-button-color);
-    }
-
-    .dp__container {
-      width: 100%;
-    }
-  }
-
   /* Container for transaction form */
   .main-content {
     padding: 4px 0;
@@ -183,8 +183,13 @@
 .import-form[disabled] {
   .dd__container,
   input[type="text"],
+  .input-group__btn,
   input[disabled] {
     pointer-events: none;
+  }
+
+  .date-field .icon.calendar-icon {
+    fill: var(--input-disabled-text-color);
   }
 }
 

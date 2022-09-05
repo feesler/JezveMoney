@@ -681,6 +681,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.personField.show(isDebt);
 
         // Date field
+        enable(this.dateBtn, state.enabled);
         enable(this.dateInp, state.enabled);
         this.dateInp.value = state.date;
 
