@@ -51,7 +51,7 @@
                 </div>
                 <div id="nameField" class="tpl-form-field validation-block" hidden>
                     <label for="tplNameInp">Name</label>
-                    <input id="tplNameInp" class="stretch-input tpl-name-inp" type="text">
+                    <input id="tplNameInp" class="stretch-input tpl-name-inp" type="text" autocomplete="off">
                     <div class="invalid-feedback">Please input template name</div>
                 </div>
                 <input id="updateTplBtn" class="btn link-btn" type="button" value="Update" hidden>
