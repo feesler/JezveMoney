@@ -95,6 +95,7 @@ export class ImportTransactionForm extends TestComponent {
         if (inputGroup) {
             if (!res.dropDown) {
                 res.button = { elem: await query(inputGroup, '.input-group__btn') };
+                res.button.visible = await isVisible(res.button.elem);
                 if (res.button.elem) {
                     res.button.disabled = await prop(res.button.elem, 'disabled');
                 }
