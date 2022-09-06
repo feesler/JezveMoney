@@ -442,6 +442,21 @@ label {
   display: flex;
 }
 
+/** Single selection DropDown with ellipsis text overflow */
+.dd--ellipsis {
+  width: 100%;
+  overflow: hidden;
+
+  .dd__single-selection {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    display: inline-block;
+    flex-shrink: 1;
+    line-height: 30px;
+  }
+}
+
 /* Datepicker */
 .dp__wrapper {
   border-width: 1px;

@@ -63,6 +63,7 @@ export class ImportTemplateManager extends Component {
 
         this.templateDropDown = DropDown.create({
             elem: 'templateSel',
+            className: 'dd--ellipsis',
             onchange: (tpl) => this.onTemplateChange(tpl),
         });
         this.columnDropDown = DropDown.create({

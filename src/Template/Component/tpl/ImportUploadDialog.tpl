@@ -42,20 +42,22 @@
             </div>
             <label id="tplStateLbl" hidden>Create template</label>
             <div class="tpl-form-fields">
-                <div id="tplField" class="tpl-form-field">
-                    <select id="templateSel">
+                <div class="tpl-form__select-group">
+                    <div id="tplField" class="tpl-form-field">
+                        <select id="templateSel">
 <?php   foreach($importTemplates as $template) {     ?>
-                        <option value="<?=e($template->id)?>"><?=e($template->name)?></option>
+                            <option value="<?=e($template->id)?>"><?=e($template->name)?></option>
 <?php   }   ?>
-                    </select>
+                        </select>
+                    </div>
+                    <input id="updateTplBtn" class="btn link-btn" type="button" value="Update" hidden>
+                    <input id="deleteTplBtn" class="btn link-btn" type="button" value="Delete" hidden>
                 </div>
                 <div id="nameField" class="tpl-form-field validation-block" hidden>
                     <label for="tplNameInp">Name</label>
                     <input id="tplNameInp" class="stretch-input tpl-name-inp" type="text" autocomplete="off">
                     <div class="invalid-feedback">Please input template name</div>
                 </div>
-                <input id="updateTplBtn" class="btn link-btn" type="button" value="Update" hidden>
-                <input id="deleteTplBtn" class="btn link-btn" type="button" value="Delete" hidden>
                 <div id="columnField" class="tpl-form-field validation-block" hidden>
                     <label for="columnSel">Column</label>
                     <select id="columnSel">
