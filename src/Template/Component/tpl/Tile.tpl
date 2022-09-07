@@ -1,20 +1,17 @@
-<div <?=$attributes?> class="tile">
 <?php   if ($type == "link") { ?>
-    <a class="tilelink" href="<?=e($link)?>">
+    <a class="tile" href="<?=e($link)?>" <?=$attributes?>>
 <?php   } else if ($type == "button") { ?>
-    <button class="tilelink" type="button">
+    <button class="tile" type="button" <?=$attributes?>>
 <?php   } else { ?>
-    <div class="tilelink">
+    <div class="tile" <?=$attributes?>>
 <?php   } ?>
-        <span>
 <?php   if (isset($subtitle)) { ?>
-            <span class="tile__subtitle"><?=$subtitle?></span>
+        <span class="tile__subtitle"><?=$subtitle?></span>
 <?php   }
         if (isset($icon)) { ?>
-            <span class="tile__icon"><?=useIcon($icon, 60, 54)?></span>
+        <span class="tile__icon"><?=useIcon($icon, 60, 54)?></span>
 <?php   } ?>
-            <span class="tile__title"><?=e($title)?></span>
-        </span>
+        <span class="tile__title"><?=e($title)?></span>
 <?php   if ($type == "link") { ?>
     </a>
 <?php   } else if ($type == "button") { ?>
@@ -22,4 +19,3 @@
 <?php   } else { ?>
     </div>
 <?php   } ?>
-</div>

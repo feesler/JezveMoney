@@ -46,8 +46,8 @@ export class TilesList extends TestComponent {
 
         return {
             id: item.content.id,
-            balance: item.content.balance,
-            name: item.content.name,
+            subtitle: item.content.subtitle,
+            title: item.content.title,
             isActive: item.content.isActive,
             icon_id: item.content.icon_id,
         };

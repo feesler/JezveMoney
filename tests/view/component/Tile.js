@@ -14,20 +14,19 @@ export class Tile extends TestComponent {
         assert(validClass, 'Invalid structure of tile');
 
         const res = {
-            linkElem: await query(this.elem, '.tilelink'),
-            balanceEL: await query(this.elem, '.tile__subtitle'),
-            nameEL: await query(this.elem, '.tile__title'),
+            subtitleElem: await query(this.elem, '.tile__subtitle'),
+            titleElem: await query(this.elem, '.tile__title'),
             id: parseInt(await prop(this.elem, 'dataset.id'), 10),
         };
 
-        const balanceText = await prop(res.balanceEL, 'innerText');
-        res.balance = (balanceText)
-            ? balanceText.split('\r\n').join('\n')
+        const subtitleText = await prop(res.subtitleElem, 'innerText');
+        res.subtitle = (subtitleText)
+            ? subtitleText.split('\r\n').join('\n')
             : null;
 
-        res.name = await prop(res.nameEL, 'textContent');
+        res.title = await prop(res.titleElem, 'textContent');
 
-        res.isActive = await hasClass(this.elem, 'tile_selected');
+        res.isActive = await hasClass(this.elem, 'tile--selected');
 
         res.iconElem = await query(this.elem, '.tile__icon > svg');
         if (res.iconElem) {
@@ -48,14 +47,14 @@ export class Tile extends TestComponent {
     }
 
     async click() {
-        await click(this.content.linkElem);
+        await click(this.elem);
     }
 
     static renderAccount(account) {
         const res = {};
 
-        res.balance = App.currency.format(account.curr_id, account.balance);
-        res.name = account.name;
+        res.subtitle = App.currency.format(account.curr_id, account.balance);
+        res.title = account.name;
         res.icon_id = account.icon_id;
 
         return res;
@@ -79,14 +78,14 @@ export class Tile extends TestComponent {
         assert(person, 'Invalid person');
 
         const res = {
-            name: person.name,
+            title: person.name,
         };
 
         if (withDebts) {
             const debtAccounts = Tile.filterPersonDebts(person.accounts);
-            res.balance = (debtAccounts.length) ? debtAccounts.join('\n') : 'No debts';
+            res.subtitle = (debtAccounts.length) ? debtAccounts.join('\n') : 'No debts';
         } else {
-            res.balance = null;
+            res.subtitle = null;
         }
 
         return res;
