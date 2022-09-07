@@ -33,15 +33,12 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         <div class="widget_title">
                             <span>Total</span>
                         </div>
-                        <div class="info-tiles">
+                        <div class="total-list">
 <?php	if (!count($tilesArr)) {	?>
                             <span class="nodata-message">You have no one account. Please create one.</span>
 <?php	} else {	?>
 <?php		foreach($totalsArr as $curr_id => $currData) {	?>
-                            <div class="info-tile">
-                                <span class="info-tile__title"><?=e($currData["name"])?></span>
-                                <span class="info-tile__subtitle"><?=e($currData["balfmt"])?></span>
-                            </div>
+                            <div class="total-list__item"><?=e($currData["balfmt"])?></div>
 <?php		}	?>
 <?php	}	?>
                         </div>

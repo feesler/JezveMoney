@@ -242,9 +242,11 @@
   }
 
   /* Tiles list */
-  .tiles > span,
-  .info-tiles > span {
-    color: var(--main-text-color);
+  .tiles,
+  .total-list {
+    .nodata-message {
+      color: var(--main-text-color);
+    }
   }
 
   /* Swap button */
