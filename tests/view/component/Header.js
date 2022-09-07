@@ -18,7 +18,7 @@ export class Header extends TestComponent {
         }
 
         const res = {
-            logo: { elem: await query(this.elem, '.logo') },
+            logo: { elem: await query(this.elem, '.header-logo') },
         };
 
         assert(res.logo.elem, 'Logo element not found');

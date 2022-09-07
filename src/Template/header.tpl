@@ -1,9 +1,9 @@
 <div class="header">
     <div class="header__content">
-        <div class="logo">
-            <a class="logo__link" href="<?=BASEURL?>">
-                <span class="logo__icon"><?=svgIcon("header_logo", "logo-icon")?></span>
-                <span class="logo__title">Jezve Money</span>
+        <div class="header-logo">
+            <a class="header-logo__link" href="<?=BASEURL?>">
+                <span class="header-logo__icon"><?=svgIcon("header_logo", "logo-icon")?></span>
+                <span class="header-logo__title">Jezve Money</span>
             </a>
         </div>
         <button class="nav-toggle-btn"><?=svgIcon("menu", "nav-toggle-icon")?></button>
