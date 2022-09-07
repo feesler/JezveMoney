@@ -1,8 +1,11 @@
-.tile {
+:root {
+  --tile-gap: 10px;
   --tile-size: 100px;
   --tile-content-color: #ffffff;
   --tile-bg-color: #20a0ff;
+}
 
+.tile {
   width: var(--tile-size);
   height: var(--tile-size);
   background-color: var(--tile-bg-color);
@@ -16,6 +19,10 @@
   font-weight: normal;
   text-decoration: none;
   cursor: pointer;
+}
+
+.tile--wide {
+  width: calc(var(--tile-size) * 2 + var(--tile-gap));
 }
 
 .tile--selected::after {
@@ -64,6 +71,11 @@
   right: 0;
   top: 23px;
   fill: var(--tile-content-color);
+}
+
+.tile__icon-content {
+  width: 60px;
+  height: 54px;
 }
 
 @media (hover: hover) {

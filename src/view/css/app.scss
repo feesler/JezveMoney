@@ -384,8 +384,8 @@ label {
 .tiles {
   display: flex;
   flex-flow: row wrap;
-  gap: 10px;
-  max-width: 440px;
+  gap: var(--tile-gap);
+  max-width: calc((var(--tile-size) + var(--tile-gap)) * 4);
   overflow: hidden;
 }
 
