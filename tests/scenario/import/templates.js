@@ -54,11 +54,49 @@ const runDeleteTests = async () => {
     await ImportTests.deleteTemplate();
 };
 
+// Automatic select valid template
+const runAutoSelectTests = async (files) => {
+    setBlock('Automatically select valid template on upload', 2);
+
+    const [cardFile, accountFile] = files;
+
+    await ImportTests.uploadFile(accountFile);
+
+    await ImportTests.createTemplate();
+    // Select columns for template
+    await App.scenario.runner.runGroup(ImportTests.selectTemplateColumn, [
+        { column: 'accountAmount', index: 6 },
+        { column: 'transactionAmount', index: 4 },
+        { column: 'accountCurrency', index: 5 },
+        { column: 'transactionCurrency', index: 3 },
+        { column: 'date', index: 1 },
+        { column: 'comment', index: 2 },
+    ]);
+    // Input template name and save
+    await ImportTests.inputTemplateName('Template_Account');
+    await ImportTests.submitTemplate();
+
+    // Upload card file and check 1st template is selected
+    await ImportTests.uploadFile(cardFile);
+    // Upload accounts again and check 2nd template is selected
+    await ImportTests.uploadFile(accountFile);
+    await ImportTests.deleteTemplate();
+};
+
 export const importTemplateTests = {
     /** Run import template tests */
-    async run() {
+    async run({ files }) {
+        setBlock('Import templates', 1);
+
+        const [cardFile] = files;
+
+        setBlock('Upload card CSV', 2);
+        await ImportTests.uploadFile(cardFile);
+
         await runCreateTests();
         await runUpdateTests();
         await runDeleteTests();
+
+        await runAutoSelectTests(files);
     },
 };

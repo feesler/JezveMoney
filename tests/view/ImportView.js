@@ -158,7 +158,7 @@ export class ImportView extends AppView {
     }
 
     assertStateId(state) {
-        assert(this.model.state === state, 'Invalid state of import view');
+        assert(this.model.state === state, `Invalid state of import view: ${this.model.state}. ${state} is expected`);
     }
 
     checkMainState() {
@@ -225,7 +225,7 @@ export class ImportView extends AppView {
         this.uploadFilename = name;
         this.fileData = data;
 
-        await this.performAction(() => this.content.uploadDialog.setFile(name, data));
+        await this.performAction(() => this.content.uploadDialog.setFile(name));
     }
 
     async selectUploadTemplateById(val) {

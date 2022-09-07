@@ -148,6 +148,7 @@ export const uploadFile = async (params) => {
         assert(params && params.data && params.filename, 'Invalid parameters');
 
         await checkNavigation();
+        await checkViewState('main');
 
         await App.state.fetch();
 
@@ -192,8 +193,8 @@ export const submitUploaded = async (params) => {
         return App.view.submitUploaded(importData);
     });
 };
-/** Change main account */
 
+/** Change main account */
 export const changeMainAccount = async (accountId) => {
     const userAccounts = App.state.accounts.getUserVisible();
     const account = userAccounts.getItem(accountId);

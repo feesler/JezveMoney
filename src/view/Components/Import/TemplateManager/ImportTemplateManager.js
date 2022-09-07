@@ -195,12 +195,16 @@ export class ImportTemplateManager extends Component {
 
         if (window.app.model.templates.length > 0) {
             this.state.id = this.RAW_DATA_STATE;
-            const selectedTemplate = this.templateDropDown.getSelectionData();
-            if (!selectedTemplate) {
-                throw new Error('Invalid selection');
+
+            let template = this.findValidTemplate(this.state.rawData);
+            if (!template) {
+                template = this.templateDropDown.getSelectionData();
+                if (!template) {
+                    throw new Error('Invalid selection');
+                }
             }
 
-            this.setTemplate(selectedTemplate.id);
+            this.setTemplate(template.id);
         } else {
             this.setCreateTemplateState();
         }
@@ -470,50 +474,57 @@ export class ImportTemplateManager extends Component {
     }
 
     /** Validate current template on raw data */
-    validateTemplate(state) {
-        if (!state) {
-            throw new Error('Invalid state');
+    validateTemplate(template, rawData) {
+        if (!template) {
+            throw new Error('Invalid template');
+        }
+        if (!Array.isArray(rawData)) {
+            throw new Error('Invalid data');
         }
 
-        if (!state.template) {
-            return false;
-        }
-
-        const data = state.rawData.slice(1, 2)[0];
+        const [data] = rawData.slice(1, 2);
         // Account amount
-        let value = state.template.getProperty('accountAmount', data, true);
+        let value = template.getProperty('accountAmount', data, true);
         if (!value) {
-            return this.onInvalidPropertyValue(state, 'accountAmount');
+            return { valid: false, column: 'accountAmount' };
         }
         // Transaction amount
-        value = state.template.getProperty('transactionAmount', data, true);
+        value = template.getProperty('transactionAmount', data, true);
         if (!value) {
-            return this.onInvalidPropertyValue(state, 'transactionAmount');
+            return { valid: false, column: 'transactionAmount' };
         }
         // Account currency
-        value = state.template.getProperty('accountCurrency', data, true);
+        value = template.getProperty('accountCurrency', data, true);
         let currency = window.app.model.currency.findByName(value);
         if (!currency) {
-            return this.onInvalidPropertyValue(state, 'accountCurrency');
+            return { valid: false, column: 'accountCurrency' };
         }
         // Transaction currency
-        value = state.template.getProperty('transactionCurrency', data, true);
+        value = template.getProperty('transactionCurrency', data, true);
         currency = window.app.model.currency.findByName(value);
         if (!currency) {
-            return this.onInvalidPropertyValue(state, 'transactionCurrency');
+            return { valid: false, column: 'transactionCurrency' };
         }
         // Date
-        value = state.template.getProperty('date', data, true);
+        value = template.getProperty('date', data, true);
         if (!value) {
-            return this.onInvalidPropertyValue(state, 'date');
+            return { valid: false, column: 'date' };
         }
         // Comment
-        value = state.template.getProperty('comment', data, true);
+        value = template.getProperty('comment', data, true);
         if (!value) {
-            return this.onInvalidPropertyValue(state, 'comment');
+            return { valid: false, column: 'comment' };
         }
 
-        return true;
+        return { valid: true };
+    }
+
+    /** Find valid template for data */
+    findValidTemplate(rawData) {
+        return window.app.model.templates.find((template) => {
+            const { valid } = this.validateTemplate(template, rawData);
+            return valid;
+        });
     }
 
     /** Render component */
@@ -625,11 +636,17 @@ export class ImportTemplateManager extends Component {
         if (state.id === this.LOADING_STATE) {
             this.setTemplateFeedback();
         } else {
-            isValid = this.validateTemplate(state);
+            if (state.template.id) {
+                this.templateDropDown.selectItem(state.template.id);
+            }
+
+            const validateResult = this.validateTemplate(state.template, state.rawData);
+            isValid = validateResult.valid;
             if (isValid) {
                 enable(this.submitTplBtn, true);
                 this.setTemplateFeedback(MSG_VALID_TEMPLATE);
             } else {
+                this.onInvalidPropertyValue(state, validateResult.column);
                 enable(this.submitTplBtn, false);
                 if (state.id === this.RAW_DATA_STATE) {
                     this.setTemplateFeedback(MSG_NOT_MATCHED_TEMPLATE);
