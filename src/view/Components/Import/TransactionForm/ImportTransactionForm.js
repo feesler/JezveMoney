@@ -572,6 +572,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         if (!this.datePicker) {
             this.datePicker = DatePicker.create({
                 relparent: this.dateGroup.elem,
+                locales: 'en',
                 ondateselect: (date) => this.onDateSelect(date),
             });
             insertAfter(this.datePicker.elem, this.dateGroup.elem);
