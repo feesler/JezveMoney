@@ -17,12 +17,8 @@
 
 /* logo block */
 .header-logo {
-  display: none;
-}
-
-.header-logo__link {
   text-decoration: none;
-  display: flex;
+  display: none;
   flex-flow: row nowrap;
   align-items: center;
   padding: 0 12px 0 0;
@@ -40,7 +36,6 @@
   color: #ffffff;
   white-space: nowrap;
 }
-
 
 /* Theme switch */
 .theme-switch {
@@ -188,8 +183,8 @@
 }
 
 /* Link to main page with logo */
-.navigation-logo {
-  display: block;
+.navigation-content .header-logo {
+  display: flex;
 }
 
 /* Navigation items */
@@ -224,7 +219,7 @@ a.nav-link:visited {
   }
 
   .header-logo {
-    display: block;
+    display: flex;
   }
 
   .nav-toggle-btn {
@@ -279,7 +274,7 @@ a.nav-link:visited {
     color: #ffffff;
   }
 
-  .header-logo__link:hover {
+  .header-logo:hover {
     background-color: #606060;
   }
 

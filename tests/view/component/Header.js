@@ -23,9 +23,6 @@ export class Header extends TestComponent {
 
         assert(res.logo.elem, 'Logo element not found');
 
-        res.logo.linkElem = await query(res.logo.elem, 'a');
-        assert(res.logo.linkElem, 'Logo link element not found');
-
         res.user = { elem: await query(this.elem, '.user-block') };
         if (res.user.elem) {
             res.user.menuBtn = await query(this.elem, 'button.user-menu-btn');
@@ -55,7 +52,7 @@ export class Header extends TestComponent {
     }
 
     async clickLogo() {
-        await click(this.content.logo.linkElem);
+        await click(this.content.logo.elem);
     }
 
     async clickMenuButton() {

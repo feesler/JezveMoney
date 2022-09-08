@@ -1,11 +1,9 @@
 <div class="header">
     <div class="header__content">
-        <div class="header-logo">
-            <a class="header-logo__link" href="<?=BASEURL?>">
-                <span class="header-logo__icon"><?=svgIcon("header_logo", "logo-icon")?></span>
-                <span class="header-logo__title">Jezve Money</span>
-            </a>
-        </div>
+        <a class="header-logo" href="<?=BASEURL?>">
+            <span class="header-logo__icon"><?=svgIcon("header_logo", "logo-icon")?></span>
+            <span class="header-logo__title">Jezve Money</span>
+        </a>
         <button class="nav-toggle-btn"><?=svgIcon("menu", "nav-toggle-icon")?></button>
 
         <div class="theme-switch">
@@ -45,9 +43,9 @@
             <?=svgIcon("back", "navigation__close-btn-icon")?>
         </button>
         <div class="navigation-logo">
-            <a class="logo__link" href="<?=BASEURL?>">
-                <span class="logo__icon"><?=svgIcon("header_logo")?></span>
-                <span class="logo__title">Jezve Money</span>
+            <a class="header-logo" href="<?=BASEURL?>">
+                <span class="header-logo__icon"><?=svgIcon("header_logo")?></span>
+                <span class="header-logo__title">Jezve Money</span>
             </a>
         </div>
     </div>

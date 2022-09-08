@@ -1,12 +1,10 @@
 <div class="header">
     <div class="header__content">
-        <div class="logo">
-            <a class="logo__link" href="<?=BASEURL?>admin/">
-                <span class="logo__icon"><?=svgIcon("header_logo")?></span>
-                <span class="logo__title">Admin</span>
-            </a>
-        </div>
-        <button class="nav-toggle-btn"><?=svgIcon("menu")?></button>
+        <a class="header-logo" href="<?=BASEURL?>admin/">
+            <span class="header-logo__icon"><?=svgIcon("header_logo")?></span>
+            <span class="header-logo__title">Admin</span>
+        </a>
+        <button class="nav-toggle-btn"><?=svgIcon("menu", "nav-toggle-icon")?></button>
 
         <div class="user-block right-align">
             <button id="userbtn" class="user-menu-btn" type="button">
