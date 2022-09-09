@@ -84,10 +84,12 @@ include(TPL_PATH."commonhdr.tpl");
                             <div id="date_block" class="column-container" hidden>
                                 <div class="input-group">
                                     <input id="date" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?=e($dateFmt)?>">
-                                    <button id="nodatebtn" class="input-group__inner-btn" type="button">
+                                    <button id="nodatebtn" class="input-group__inner-btn" type="button"<?=hidden(is_empty($dateFmt))?>>
                                         <?=svgIcon("close", "input-group__inner-btn__icon")?>
                                     </button>
-                                    <button id="cal_rbtn" class="icon-btn input-group__btn" type="button"><?=svgIcon("cal", "icon calendar-icon")?></button>
+                                    <button id="cal_rbtn" class="icon-btn input-group__btn" type="button">
+                                        <svg class="icon calendar-icon"><use href="#calendar-icon"></use></svg>
+                                    </button>
                                 </div>
                                 <div id="calendar" class="calendar"></div>
                             </div>
@@ -98,7 +100,7 @@ include(TPL_PATH."commonhdr.tpl");
                             <form id="searchFrm" method="get" action="<?=BASEURL?>transactions/">
                             <div class="input-group">
                                 <input id="search" class="input-group__input stretch-input" name="search" type="text" autocomplete="off" value="<?=(is_null($searchReq) ? "" : e($searchReq))?>">
-                                <button id="nosearchbtn" class="input-group__inner-btn" type="button">
+                                <button id="nosearchbtn" class="input-group__inner-btn" type="button"<?=hidden(is_empty($searchReq))?>>
                                     <?=svgIcon("close", "input-group__inner-btn__icon")?>
                                 </button>
                                 <button class="icon-btn search_btn input-group__btn" type="submit"><?=svgIcon("search", "icon search-icon")?></button>

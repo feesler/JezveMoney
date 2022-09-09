@@ -2,9 +2,11 @@ import {
     ce,
     show,
     enable,
+    insertAfter,
     checkDate,
     formatDate,
     Checkbox,
+    DatePicker,
     DropDown,
     DecimalInput,
     InputGroup,
@@ -39,6 +41,7 @@ const DEFAULT_BUTTON_CLASS = 'btn';
 const DEL_BUTTON_CLASS = 'delete-btn';
 const DEFAULT_ICON_CLASS = 'icon';
 const DEL_ICON_CLASS = 'delete-icon';
+const CALENDAR_ICON_CLASS = 'calendar-icon';
 
 /** Fields */
 const TITLE_FIELD_AMOUNT = 'Amount';
@@ -159,20 +162,8 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.createPersonField();
         this.createSourceAmountField();
         this.createDestAmountField();
+        this.createDateField();
 
-        // Date field
-        this.dateInp = ce('input', {
-            className: DEFAULT_INPUT_CLASS,
-            type: 'text',
-            name: 'date[]',
-            placeholder: TITLE_FIELD_DATE,
-            autocomplete: 'off',
-        }, null, { input: () => this.onDateInput() });
-        this.dateField = Field.create({
-            title: TITLE_FIELD_DATE,
-            content: this.dateInp,
-            className: DATE_FIELD_CLASS,
-        });
         // Comment field
         this.commInp = ce('input', {
             className: DEFAULT_INPUT_CLASS,
@@ -378,6 +369,35 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.destAmountField.hide();
     }
 
+    /** Create date field */
+    createDateField() {
+        this.dateInp = ce('input', {
+            className: `${DEFAULT_INPUT_CLASS} ${IG_INPUT_CLASS}`,
+            type: 'text',
+            name: 'date[]',
+            placeholder: TITLE_FIELD_DATE,
+            autocomplete: 'off',
+        }, null, { input: () => this.onDateInput() });
+
+        const dateIcon = window.app.createIcon(
+            'calendar-icon',
+            `${DEFAULT_ICON_CLASS} ${CALENDAR_ICON_CLASS}`,
+        );
+        this.dateBtn = ce('button', {
+            type: 'button',
+            className: IG_BUTTON_CLASS,
+        }, dateIcon, { click: () => this.showDatePicker() });
+
+        this.dateGroup = InputGroup.create({
+            children: [this.dateInp, this.dateBtn],
+        });
+        this.dateField = Field.create({
+            title: TITLE_FIELD_DATE,
+            content: this.dateGroup.elem,
+            className: DATE_FIELD_CLASS,
+        });
+    }
+
     /** Transaction type select 'change' event handler */
     onTrTypeChanged(type) {
         this.setTransactionType(type.id);
@@ -433,6 +453,15 @@ export class ImportTransactionForm extends ImportTransactionBase {
     onDateInput() {
         const { value } = this.dateInp;
         this.setDate(value);
+        this.clearInvalid();
+        this.render();
+    }
+
+    /** DatePicker select event handler */
+    onDateSelect(date) {
+        const dateFmt = formatDate(date);
+        this.setDate(dateFmt);
+        this.datePicker.hide();
         this.clearInvalid();
         this.render();
     }
@@ -538,6 +567,20 @@ export class ImportTransactionForm extends ImportTransactionBase {
         ddown?.selectItem(currencyId);
     }
 
+    /** Show date pciker */
+    showDatePicker() {
+        if (!this.datePicker) {
+            this.datePicker = DatePicker.create({
+                relparent: this.dateGroup.elem,
+                locales: 'en',
+                ondateselect: (date) => this.onDateSelect(date),
+            });
+            insertAfter(this.datePicker.elem, this.dateGroup.elem);
+        }
+
+        this.datePicker.show(!this.datePicker.visible());
+    }
+
     /** Render component */
     render() {
         const { state } = this;
@@ -639,6 +682,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.personField.show(isDebt);
 
         // Date field
+        enable(this.dateBtn, state.enabled);
         enable(this.dateInp, state.enabled);
         this.dateInp.value = state.date;
 

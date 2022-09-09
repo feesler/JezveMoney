@@ -6,6 +6,16 @@ import {
 } from 'jezvejs';
 import './style.scss';
 
+/** CSS classes */
+const TILE_CLASS = 'tile';
+const WIDE_CLASS = 'tile--wide';
+const TITLE_CLASS = 'tile__title';
+const SUBTITLE_CLASS = 'tile__subtitle';
+const ICON_CLASS = 'tile__icon';
+const ICON_CONTENT_CLASS = 'tile__icon-content';
+
+const SUBTITLE_LIMIT = 13;
+
 /**
  * Tile component
  */
@@ -24,27 +34,21 @@ export class Tile extends Component {
      * Parse DOM to obtain child elements and build state of component
      */
     parse() {
-        if (
-            !(this.elem instanceof Element)
-            || !this.elem.classList
-            || !this.elem.classList.contains('tile')
-        ) {
+        if (!this.elem?.classList?.contains(TILE_CLASS)) {
             throw new Error('Invalid element specified');
         }
 
-        this.containerElem = this.elem.querySelector('.tilelink > span');
-
-        this.titleElem = this.elem.querySelector('.tile__title');
+        this.titleElem = this.elem.querySelector(`.${TITLE_CLASS}`);
         if (this.titleElem) {
             this.title = this.titleElem.textContent;
         }
 
-        this.subTitleElem = this.elem.querySelector('.tile__subtitle');
+        this.subTitleElem = this.elem.querySelector(`.${SUBTITLE_CLASS}`);
         if (this.subTitleElem) {
             this.subtitle = this.subTitleElem.textContent;
         }
 
-        this.iconElem = this.elem.querySelector('.tile__icon');
+        this.iconElem = this.elem.querySelector(`.${ICON_CLASS}`);
         if (this.iconElem) {
             this.iconUseElem = this.iconElem.querySelector('use');
         }
@@ -72,8 +76,8 @@ export class Tile extends Component {
         this.title = title;
 
         if (!this.titleElem) {
-            this.titleElem = ce('span', { className: 'tile__title' });
-            this.containerElem.appendChild(this.titleElem);
+            this.titleElem = ce('span', { className: TITLE_CLASS });
+            this.elem.appendChild(this.titleElem);
         }
 
         this.titleElem.textContent = this.title;
@@ -94,11 +98,17 @@ export class Tile extends Component {
         this.subtitle = subTitle;
 
         if (!this.subTitleElem) {
-            this.subTitleElem = ce('span', { className: 'tile__subtitle' });
-            this.containerElem.appendChild(this.subTitleElem);
+            this.subTitleElem = ce('span', { className: SUBTITLE_CLASS });
+            this.elem.appendChild(this.subTitleElem);
         }
 
         this.subTitleElem.textContent = this.subtitle;
+
+        if (this.subtitle.length > SUBTITLE_LIMIT) {
+            this.elem.classList.add(WIDE_CLASS);
+        } else {
+            this.elem.classList.remove(WIDE_CLASS);
+        }
     }
 
     /**
@@ -116,13 +126,13 @@ export class Tile extends Component {
         this.icon = icon;
 
         if (!this.iconElem) {
-            this.iconElem = ce('span', { className: 'tile__icon' });
-            this.containerElem.appendChild(this.iconElem);
+            this.iconElem = ce('span', { className: ICON_CLASS });
+            this.elem.appendChild(this.iconElem);
         }
 
         if (!this.iconUseElem) {
             this.iconUseElem = svg('use');
-            this.iconSVGElem = svg('svg', { width: '60px', height: '54px' }, this.iconUseElem);
+            this.iconSVGElem = svg('svg', { class: ICON_CONTENT_CLASS }, this.iconUseElem);
             this.iconElem.appendChild(this.iconSVGElem);
         }
 

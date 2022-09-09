@@ -93,7 +93,13 @@ export class ImportTransactionForm extends TestComponent {
             }
         }
         if (inputGroup) {
-            assert(res.dropDown, 'Invalid structure of field');
+            if (!res.dropDown) {
+                res.button = { elem: await query(inputGroup, '.input-group__btn') };
+                res.button.visible = await isVisible(res.button.elem);
+                if (res.button.elem) {
+                    res.button.disabled = await prop(res.button.elem, 'disabled');
+                }
+            }
         }
 
         if (!dropDownElem || inputGroup) {
@@ -266,6 +272,10 @@ export class ImportTransactionForm extends TestComponent {
                 value: model.date.toString(),
                 disabled: !model.enabled,
                 visible: true,
+                button: {
+                    visible: true,
+                    disabled: !model.enabled,
+                },
             },
             commentField: {
                 value: model.comment.toString(),

@@ -4,6 +4,15 @@ import { ImportTransaction } from './ImportTransaction.js';
 import { ImportTemplateError } from '../error/ImportTemplateError.js';
 import { App } from '../Application.js';
 
+const tplColumns = [
+    'accountAmount',
+    'accountCurrency',
+    'transactionAmount',
+    'transactionCurrency',
+    'date',
+    'comment',
+];
+
 /** Import template model */
 export class ImportTemplate {
     constructor(data) {
@@ -29,7 +38,7 @@ export class ImportTemplate {
         }
 
         const timestamp = fixDate(tmpDate);
-        return new Date(timestamp);
+        return (timestamp) ? (new Date(timestamp)) : null;
     }
 
     /** Extract specified column data from raw data row */
@@ -40,6 +49,57 @@ export class ImportTemplate {
         return row[col - 1];
     }
 
+    getRowData(row) {
+        const res = {};
+
+        tplColumns.forEach((column) => {
+            assert(column in this.columns, `Column '${column}' not found`);
+
+            let value = ImportTemplate.getColumn(row, this.columns[column]);
+
+            if (['accountAmount', 'transactionAmount'].includes(column)) {
+                value = ImportTemplate.amountFix(value);
+            } else if (column === 'date') {
+                value = formatDate(ImportTemplate.dateFromString(value));
+            }
+
+            res[column] = value;
+        });
+
+        return res;
+    }
+
+    isValid(data) {
+        assert.isArray(data, 'Invalid data');
+
+        try {
+            const [row] = data.slice(1, 2);
+            const rowData = this.getRowData(row);
+
+            const accCurrency = App.currency.findByName(rowData.accountCurrency);
+            if (!accCurrency) {
+                return false;
+            }
+            const trCurrency = App.currency.findByName(rowData.transactionCurrency);
+            if (!trCurrency) {
+                return false;
+            }
+            if (
+                Number.isNaN(rowData.accountAmount)
+                || rowData.accountAmount === 0
+                || Number.isNaN(rowData.transactionAmount)
+                || rowData.transactionAmount === 0
+                || rowData.date == null
+            ) {
+                return false;
+            }
+        } catch (e) {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
     * Apply import template to raw data of uploaded file and return
     * @param {string[][]} data - raw data from uploaded file
@@ -47,14 +107,6 @@ export class ImportTemplate {
     * @param {Account} mainAccount - main account object
     */
     applyTo(data, mainAccount) {
-        const columns = [
-            'accountAmount',
-            'accountCurrency',
-            'transactionAmount',
-            'transactionCurrency',
-            'date',
-            'comment',
-        ];
         const skipRows = 1;
 
         assert.isArray(data, 'Invalid parameters');
@@ -67,20 +119,8 @@ export class ImportTemplate {
                     return;
                 }
 
-                const original = { mainAccount };
-                columns.forEach((column) => {
-                    assert(column in this.columns, `Column '${column}' not found`);
-
-                    let value = ImportTemplate.getColumn(row, this.columns[column]);
-
-                    if (['accountAmount', 'transactionAmount'].includes(column)) {
-                        value = ImportTemplate.amountFix(value);
-                    } else if (column === 'date') {
-                        value = formatDate(ImportTemplate.dateFromString(value));
-                    }
-
-                    original[column] = value;
-                });
+                const rowData = this.getRowData(row);
+                const original = { mainAccount, ...rowData };
 
                 const accCurrency = App.currency.findByName(original.accountCurrency);
                 original.accountCurrencyId = accCurrency ? accCurrency.id : null;

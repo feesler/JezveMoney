@@ -45,6 +45,7 @@
   margin-bottom: 4px;
   margin-right: 18px;
   align-items: baseline;
+  overflow: hidden;
 
   label {
     font-size: 14px;
@@ -57,6 +58,13 @@
     padding: 2px 5px;
     flex: 0 0 auto;
   }
+}
+
+.tpl-form__select-group {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: baseline;
+  overflow: hidden;
 }
 
 .validation-block.invalid-block .tpl-name-inp {

@@ -215,6 +215,7 @@ class StatisticsView extends View {
         if (!('stdate' in this.state.filter) && !('enddate' in this.state.filter)) {
             return;
         }
+        this.datePicker?.hide();
 
         delete this.state.filter.stdate;
         delete this.state.filter.enddate;

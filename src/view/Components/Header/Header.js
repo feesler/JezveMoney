@@ -1,9 +1,5 @@
 import {
     ge,
-    isVisible,
-    show,
-    setEmptyClick,
-    removeEmptyClick,
     Component,
     Switch,
     Offcanvas,
@@ -40,53 +36,51 @@ export class Header extends Component {
             this.closeNavBtn.addEventListener('click', () => this.hideNavigation());
         }
 
-        this.menuPopup = ge('menupopup');
         this.userBtn = ge('userbtn');
-        if (this.userBtn) {
-            this.userBtn.addEventListener('click', () => this.onUserClick());
+        this.userBtn.addEventListener('click', () => this.showUserNavigation());
+        this.userNameElem = this.userBtn.querySelector('.user-btn__title');
+        if (this.userNameElem) {
+            this.userName = this.userNameElem.textContent;
         }
+
+        this.userNavContent = document.querySelector('.user-navigation-content');
+        this.userNavigation = Offcanvas.create({
+            content: this.userNavContent,
+            placement: 'right',
+            className: 'user-navigation',
+        });
+
+        this.navUserNameElem = this.userNavContent.querySelector('.user-btn__title');
+        this.closeUserNavBtn = this.userNavContent.querySelector('.user-navigation__close-btn');
+        this.closeUserNavBtn.addEventListener('click', () => this.hideUserNavigation());
 
         this.themeSwitch = Switch.fromElement(ge('theme-check'), {
             onChange: (checked) => this.onToggleTheme(checked),
         });
         const currentTheme = window.app.getCurrentTheme();
         this.themeSwitch.check(currentTheme === DARK_THEME);
-
-        this.userNameElem = this.elem.querySelector('.user__title');
-        if (this.userNameElem) {
-            this.userName = this.userNameElem.textContent;
-        }
     }
 
-    /** Show navigation container */
+    /** Show navigation */
     onToggleNav() {
+        this.hideUserNavigation();
         this.navigation?.open();
     }
 
-    /** Hide navigation container */
+    /** Hide navigation */
     hideNavigation() {
         this.navigation?.close();
     }
 
-    /**
-     * User button 'click' event handler
-     */
-    onUserClick() {
-        if (isVisible(this.menuPopup)) {
-            this.hidePopup();
-        } else {
-            show(this.menuPopup, true);
-            this.emptyClickHandler = () => this.hidePopup();
-            setEmptyClick(this.emptyClickHandler, [this.menuPopup, this.userBtn]);
-        }
+    /** Show user navigation */
+    showUserNavigation() {
+        this.hideNavigation();
+        this.userNavigation.open();
     }
 
-    /**
-     * Hide user menu drop down
-     */
-    hidePopup() {
-        show(this.menuPopup, false);
-        removeEmptyClick(this.emptyClickHandler);
+    /** Hide user navigation */
+    hideUserNavigation() {
+        this.userNavigation.close();
     }
 
     /**
@@ -112,6 +106,7 @@ export class Header extends Component {
 
         this.userName = name;
         this.userNameElem.textContent = this.userName;
+        this.navUserNameElem.textContent = this.userName;
     }
 
     /**

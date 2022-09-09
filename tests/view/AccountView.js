@@ -171,7 +171,7 @@ export class AccountView extends AppView {
         const accTile = Tile.renderAccount(account);
 
         if (!this.model.nameTyped && !this.model.isUpdate) {
-            accTile.name = 'New account';
+            accTile.title = 'New account';
         }
 
         accTile.visible = true;

@@ -232,7 +232,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                                     <div class="input-group">
                                         <input id="date" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?=e($dateFmt)?>">
                                         <button id="cal_rbtn" class="icon-btn input-group__btn" type="button">
-                                            <?=svgIcon("cal", "icon calendar-icon")?>
+                                            <svg class="icon calendar-icon"><use href="#calendar-icon"></use></svg>
                                         </button>
                                     </div>
                                     <div id="calendar" class="calendar"></div>

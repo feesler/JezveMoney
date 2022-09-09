@@ -103,7 +103,7 @@ export const changeName = async (newName) => {
 
             App.view.expectedState = {
                 msgPopup: { success: true, message: 'User name successfully updated.' },
-                header: { user: { name: newName } },
+                header: { userBtn: { title: newName } },
             };
 
             await App.view.checkState();

@@ -384,42 +384,27 @@ label {
 .tiles {
   display: flex;
   flex-flow: row wrap;
-  max-width: 440px;
+  gap: var(--tile-gap);
+  max-width: calc((var(--tile-size) + var(--tile-gap)) * 4);
   overflow: hidden;
 }
 
-/* Information tiles */
-.info-tiles {
+/* Total list */
+.total-list {
   display: flex;
   flex-flow: row wrap;
+  gap: 10px;
   min-width: 220px;
   max-width: 300px;
 }
 
-.info-tile {
+.total-list__item {
   display: inline-flex;
-  width: 80px;
-  height: 80px;
-  margin: 0 10px 10px 0;
   padding: 5px;
+  font-size: 16px;
+  white-space: nowrap;
   color: #000000;
   background-color: #d0d0d0;
-  position: relative;
-  overflow: hidden;
-}
-
-.info-tile__title {
-  font-size: 16px;
-  bottom: 5px;
-  position: absolute;
-}
-
-.info-tile__subtitle {
-  font-size: 12px;
-  text-align: right;
-  top: 5px;
-  right: 5px;
-  position: absolute;
 }
 
 /* DropDown */
@@ -440,6 +425,21 @@ label {
 /* Stretching DropDown */
 .dd__fullwidth {
   display: flex;
+}
+
+/** Single selection DropDown with ellipsis text overflow */
+.dd--ellipsis {
+  width: 100%;
+  overflow: hidden;
+
+  .dd__single-selection {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    display: inline-block;
+    flex-shrink: 1;
+    line-height: 30px;
+  }
 }
 
 /* Datepicker */

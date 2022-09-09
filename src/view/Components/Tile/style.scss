@@ -1,19 +1,31 @@
+:root {
+  --tile-gap: 10px;
+  --tile-size: 100px;
+  --tile-content-color: #ffffff;
+  --tile-bg-color: #20a0ff;
+}
+
 .tile {
-  width: 100px;
-  height: 100px;
-  background-color: #20a0ff;
+  width: var(--tile-size);
+  height: var(--tile-size);
+  background-color: var(--tile-bg-color);
+  border: 0 none;
   padding: 0;
+  margin: 0;
   display: inline-flex;
   position: relative;
   overflow: hidden;
+  text-transform: none;
+  font-weight: normal;
+  text-decoration: none;
   cursor: pointer;
 }
 
-.tiles .tile {
-  margin: 0 10px 10px 0;
+.tile--wide {
+  width: calc(var(--tile-size) * 2 + var(--tile-gap));
 }
 
-.tile_selected .tilelink::after {
+.tile--selected::after {
   content: "";
   display: block;
   position: absolute;
@@ -25,30 +37,16 @@
   cursor: pointer;
 }
 
-.tilelink {
-  width: 100px;
-  height: 100px;
-  border: 0 none;
-  background: none;
-  padding: 0;
-  margin: 0;
-  text-transform: none;
-  font-weight: normal;
-  text-decoration: none;
+.tile__title,
+.tile__subtitle,
+.tile__icon {
+  position: absolute;
+}
 
-  > span {
-    height: 100px;
-    width: 100px;
-    margin: 0;
-    padding: 0;
-    display: block;
-  }
-
-  > span > span {
-    position: absolute;
-    color: #ffffff;
-    white-space: nowrap;
-  }
+.tile__title,
+.tile__subtitle {
+  color: var(--tile-content-color);
+  white-space: nowrap;
 }
 
 .tile__title {
@@ -66,8 +64,18 @@
 }
 
 .tile__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  left: 0;
+  right: 0;
   top: 23px;
-  left: 20px;
+  fill: var(--tile-content-color);
+}
+
+.tile__icon-content {
+  width: 60px;
+  height: 54px;
 }
 
 @media (hover: hover) {

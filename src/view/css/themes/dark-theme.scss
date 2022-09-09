@@ -190,12 +190,6 @@
     fill: #dddddd;
   }
 
-  /* Transaction list */
-  .paginator-item,
-  a.paginator-arrow:hover {
-    border-color: #202020;
-  }
-
   /* Transaction list item */
   .trans-list_details td > div,
   table.trans-list-items td > div,
@@ -249,9 +243,11 @@
   }
 
   /* Tiles list */
-  .tiles > span,
-  .info-tiles > span {
-    color: var(--main-text-color);
+  .tiles,
+  .total-list {
+    .nodata-message {
+      color: var(--main-text-color);
+    }
   }
 
   /* Swap button */

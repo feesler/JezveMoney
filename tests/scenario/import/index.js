@@ -1,5 +1,5 @@
 import { setBlock, assert } from 'jezve-test';
-import { generateCSV } from '../../model/import.js';
+import { generateAccountCSV, generateCardCSV } from '../../model/import.js';
 import { api } from '../../model/api.js';
 import * as ApiTests from '../../run/api/index.js';
 import * as ImportTests from '../../run/import/index.js';
@@ -8,8 +8,10 @@ import { importItemsTests } from './items.js';
 import { importRuleTests } from './rules.js';
 import { importTemplateTests } from './templates.js';
 
-let csvStatement = null;
-let uploadFilename = null;
+let cardStatement = null;
+let cardUploadFilename = null;
+let accountStatement = null;
+let accountUploadFilename = null;
 
 const runSubmitImportTests = async () => {
     setBlock('Submit import transactions', 1);
@@ -68,11 +70,11 @@ const runSubmitImportTests = async () => {
     // Verify submit is disabled for list with no enabled items
     setBlock('Verify submit is disabled for list with no enabled items', 2);
     await ImportTests.uploadFile({
-        filename: uploadFilename,
-        data: csvStatement,
+        filename: cardUploadFilename,
+        data: cardStatement,
     });
     await ImportTests.submitUploaded({
-        data: csvStatement,
+        data: cardStatement,
         template: 0,
     });
     await ImportTests.enableItems({
@@ -82,32 +84,61 @@ const runSubmitImportTests = async () => {
     await ImportTests.submit();
 };
 
+const putCardCSV = async () => {
+    const now = new Date();
+    cardStatement = generateCardCSV([
+        [now, 'MOBILE', 'MOSKVA', 'RU', 'RUB', '-500.00'],
+        [now, 'SALON', 'SANKT-PETERBU', 'RU', 'RUB', '-80.00'],
+        [now, 'OOO SIGMA', 'MOSKVA', 'RU', 'RUB', '-128.00'],
+        [now, 'TAXI', 'MOSKVA', 'RU', 'RUB', '-188.00'],
+        [now, 'TAXI', 'MOSKVA', 'RU', 'RUB', '-306.00'],
+        [now, 'MAGAZIN', 'SANKT-PETERBU', 'RU', 'RUB', '-443.00'],
+        [now, 'BAR', 'SANKT-PETERBU', 'RU', 'RUB', '-443.00'],
+        [now, 'DOSTAVKA', 'SANKT-PETERBU', 'RU', 'RUB', '-688.00'],
+        [now, 'PRODUCTY', 'SANKT-PETERBU', 'RU', 'RUB', '-550.5'],
+        [now, 'BOOKING', 'AMSTERDAM', 'NL', 'EUR', '-500.00', 'RUB', '-50750.35'],
+        [now, 'SALARY', 'MOSKVA', 'RU', 'RUB', '100000.00'],
+        [now, 'INTEREST', 'SANKT-PETERBU', 'RU', 'RUB', '23.16'],
+        [now, 'RBA R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-5000.00'],
+        [now, 'C2C R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-10000.00'],
+    ]);
+
+    cardUploadFilename = await ImportTests.putFile(cardStatement);
+    assert(cardUploadFilename, 'Fail to put file');
+};
+
+const putAccountCSV = async () => {
+    const now = new Date();
+    accountStatement = generateAccountCSV([
+        [now, 'MOBILE', 'RUB', '-500.00'],
+        [now, 'SALON', 'RUB', '-80.00'],
+        [now, 'OOO SIGMA', 'RUB', '-128.00'],
+        [now, 'TAXI', 'RUB', '-188.00'],
+        [now, 'TAXI', 'RUB', '-306.00'],
+        [now, 'MAGAZIN', 'RUB', '-443.00'],
+        [now, 'BAR', 'RUB', '-443.00'],
+        [now, 'DOSTAVKA', 'RUB', '-688.00'],
+        [now, 'PRODUCTY', 'RUB', '-550.5'],
+        [now, 'BOOKING', 'EUR', '-500.00', 'RUB', '-50750.35'],
+        [now, 'SALARY', 'RUB', '100000.00'],
+        [now, 'CASHBACK', 'PLN', '136.50', 'RUB', '4257.11'],
+        [now, 'INTEREST', 'RUB', '23.16'],
+        [now, 'RBA R-BANK', 'RUB', '-5000.00'],
+        [now, 'C2C R-BANK', 'RUB', '-10000.00'],
+    ]);
+
+    accountUploadFilename = await ImportTests.putFile(accountStatement);
+    assert(accountUploadFilename, 'Fail to put file');
+};
+
 export const importTests = {
     /** Upload CSV file for import tests */
     async prepare() {
         // Login as admin to upload CSV file
         await ApiTests.loginTest(App.config.testAdminUser);
 
-        const now = new Date();
-        csvStatement = generateCSV([
-            [now, 'MOBILE', 'MOSKVA', 'RU', 'RUB', '-500.00'],
-            [now, 'SALON', 'SANKT-PETERBU', 'RU', 'RUB', '-80.00'],
-            [now, 'OOO SIGMA', 'MOSKVA', 'RU', 'RUB', '-128.00'],
-            [now, 'TAXI', 'MOSKVA', 'RU', 'RUB', '-188.00'],
-            [now, 'TAXI', 'MOSKVA', 'RU', 'RUB', '-306.00'],
-            [now, 'MAGAZIN', 'SANKT-PETERBU', 'RU', 'RUB', '-443.00'],
-            [now, 'BAR', 'SANKT-PETERBU', 'RU', 'RUB', '-443.00'],
-            [now, 'DOSTAVKA', 'SANKT-PETERBU', 'RU', 'RUB', '-688.00'],
-            [now, 'PRODUCTY', 'SANKT-PETERBU', 'RU', 'RUB', '-550.5'],
-            [now, 'BOOKING', 'AMSTERDAM', 'NL', 'EUR', '-500.00', 'RUB', '-50750.35'],
-            [now, 'SALARY', 'MOSKVA', 'RU', 'RUB', '100000.00'],
-            [now, 'INTEREST', 'SANKT-PETERBU', 'RU', 'RUB', '23.16'],
-            [now, 'RBA R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-5000.00'],
-            [now, 'C2C R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-10000.00'],
-        ]);
-
-        uploadFilename = await ImportTests.putFile(csvStatement);
-        assert(uploadFilename, 'Fail to put file');
+        await putCardCSV();
+        await putAccountCSV();
 
         await ApiTests.loginTest(App.config.testUser);
     },
@@ -115,8 +146,12 @@ export const importTests = {
     /** Remove previously uploaded file */
     async clean() {
         await ApiTests.loginTest(App.config.testAdminUser);
-        await ImportTests.removeFile(uploadFilename);
-        uploadFilename = null;
+
+        await ImportTests.removeFile(cardUploadFilename);
+        cardUploadFilename = null;
+        await ImportTests.removeFile(accountUploadFilename);
+        accountUploadFilename = null;
+
         await ApiTests.loginTest(App.config.testUser);
     },
 
@@ -147,19 +182,24 @@ export const importTests = {
         await importRuleTests.run();
         await importItemsTests.createTests();
 
-        // Upload CSV file
-        setBlock('Upload CSV', 2);
-        await ImportTests.uploadFile({
-            filename: uploadFilename,
-            data: csvStatement,
+        await importTemplateTests.run({
+            files: [{
+                filename: cardUploadFilename,
+                data: cardStatement,
+            }, {
+                filename: accountUploadFilename,
+                data: accountStatement,
+            }],
         });
-
-        await importTemplateTests.run();
 
         // Convert transactions with invalid main account
         setBlock('Upload CSV with invalid account', 2);
+        await ImportTests.uploadFile({
+            filename: cardUploadFilename,
+            data: cardStatement,
+        });
         await ImportTests.submitUploaded({
-            data: csvStatement,
+            data: cardStatement,
             account: App.scenario.ACC_USD,
         });
 
@@ -168,11 +208,11 @@ export const importTests = {
 
         // Convert transactions
         await ImportTests.uploadFile({
-            filename: uploadFilename,
-            data: csvStatement,
+            filename: cardUploadFilename,
+            data: cardStatement,
         });
         await ImportTests.submitUploaded({
-            data: csvStatement,
+            data: cardStatement,
         });
         // Delete all
         setBlock('Delete all items', 2);
@@ -182,11 +222,11 @@ export const importTests = {
         setBlock('Enable/disable rules', 2);
         // Upload again
         await ImportTests.uploadFile({
-            filename: uploadFilename,
-            data: csvStatement,
+            filename: cardUploadFilename,
+            data: cardStatement,
         });
         await ImportTests.submitUploaded({
-            data: csvStatement,
+            data: cardStatement,
             account: App.scenario.ACC_RUB,
         });
 

@@ -11,7 +11,7 @@
 .filters-heading__icon {
   height: 24px;
   width: 24px;
-  margin: 0 9px 0 0;
+  margin: 0 12px 0 8px;
 
   .filter-icon {
     height: 24px;
@@ -50,6 +50,10 @@
   .toggle-btn,
   .toggle-btn:active,
   .toggle-btn:visited {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
     background: none;
     cursor: pointer;
   }
@@ -84,33 +88,23 @@
 }
 
 /* Paginator */
+.paginator {
+  gap: 2px;
+}
+
 .paginator-item {
   padding: 0.25rem 0.5rem;
   margin: 0;
   text-decoration: none;
-  border: 1px solid #ffffff00;
+  border: 0 none;
   border-radius: 3px;
   color: #447fd6;
-  z-index: 1;
 }
 
 .paginator-item__active {
   font-weight: normal;
-  background-color: #557dff;
+  background-color: #006cbd;
   color: #ffffff;
-}
-
-.paginator-arrow {
-  fill: #93beff;
-  z-index: 1;
-}
-
-.paginator-arrow[disabled] {
-  fill: #dbdbdb;
-}
-
-.paginator-item + .paginator-item {
-  margin-left: 2px;
 }
 
 a.paginator-item:focus,
@@ -121,11 +115,6 @@ a.paginator-arrow:focus {
 
 @media (hover: hover) {
   a.paginator-item:hover {
-    border-color: #93beff;
-  }
-
-  a.paginator-arrow:hover {
-    fill: #447fd6;
-    border-color: #ffffff;
+    background-color: #51b4ff59;
   }
 }

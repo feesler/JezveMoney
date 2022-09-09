@@ -62,6 +62,7 @@ import {
     calculateExchange,
     reducer,
     typeChange,
+    dateChange,
 } from './reducer.js';
 
 const PAGE_TITLE_UPDATE = 'Jezve Money | Edit transaction';
@@ -115,6 +116,7 @@ class TransactionView extends View {
                 fDestResult: null,
                 exchange: 1,
                 fExchange: 1,
+                date: formatDate(new Date()),
             },
             validation: {
                 sourceAmount: true,
@@ -133,6 +135,7 @@ class TransactionView extends View {
         if (transaction.id) {
             initialState.form.sourceAmount = transaction.src_amount;
             initialState.form.destAmount = transaction.dest_amount;
+            initialState.form.date = formatDate(new Date(transaction.date * 1000));
         }
 
         if (transaction.type === EXPENSE || transaction.type === INCOME) {
@@ -345,6 +348,7 @@ class TransactionView extends View {
             this.dateInputBtn.addEventListener('click', () => this.showCalendar());
         }
         this.dateInput = ge('date');
+        this.dateInput?.addEventListener('input', (e) => this.onDateInput(e));
 
         this.commentRow = ge('comment_row');
         this.commentBtn = IconLink.fromElement({
@@ -543,11 +547,7 @@ class TransactionView extends View {
      * @param {Date} date - selected date object
      */
     onSelectDate(date) {
-        if (!this.dateInput) {
-            return;
-        }
-
-        this.dateInput.value = formatDate(date);
+        this.store.dispatch(dateChange(formatDate(date)));
 
         this.datePicker.hide();
     }
@@ -753,6 +753,32 @@ class TransactionView extends View {
         }
     }
 
+    validateSourceAmount(state) {
+        const valid = (
+            state.transaction.src_amount
+            && isNum(fixFloat(state.form.sourceAmount))
+        );
+
+        if (!valid) {
+            this.store.dispatch(invalidateSourceAmount());
+        }
+
+        return valid;
+    }
+
+    validateDestAmount(state) {
+        const valid = (
+            state.transaction.dest_amount
+            && isNum(fixFloat(state.form.destAmount))
+        );
+
+        if (!valid) {
+            this.store.dispatch(invalidateDestAmount());
+        }
+
+        return valid;
+    }
+
     /**
      * Common transaction 'submit' event handler
      */
@@ -763,29 +789,20 @@ class TransactionView extends View {
         }
 
         const state = this.store.getState();
-        const { sourceAmount, destAmount } = state.form;
+        const { sourceAmount, destAmount, date } = state.form;
         let valid = true;
 
-        if (
-            state.transaction.src_amount <= 0
-            || !isNum(fixFloat(sourceAmount))
-        ) {
-            this.store.dispatch(invalidateSourceAmount());
-            valid = false;
+        if (state.transaction.type === EXPENSE) {
+            const destValid = this.validateDestAmount(state);
+            const sourceValid = (state.isDiff) ? this.validateSourceAmount(state) : true;
+            valid = destValid && sourceValid;
+        } else {
+            const sourceValid = this.validateSourceAmount(state);
+            const destValid = (state.isDiff) ? this.validateDestAmount(state) : true;
+            valid = destValid && sourceValid;
         }
 
-        if (
-            state.isDiff
-            && (
-                state.transaction.dest_amount <= 0
-                || !isNum(fixFloat(destAmount))
-            )
-        ) {
-            this.store.dispatch(invalidateDestAmount());
-            valid = false;
-        }
-
-        if (!checkDate(this.dateInput.value)) {
+        if (!checkDate(date)) {
             this.store.dispatch(invalidateDate());
             valid = false;
         }
@@ -818,6 +835,10 @@ class TransactionView extends View {
 
     onDestResultInput(e) {
         this.store.dispatch(destResultChange(e.target.value));
+    }
+
+    onDateInput(e) {
+        this.store.dispatch(dateChange(e.target.value));
     }
 
     /**
@@ -1209,121 +1230,124 @@ class TransactionView extends View {
 
         show(this.dateRow, state.isAvailable);
         show(this.commentRow, state.isAvailable);
+        show(this.submitControls, state.isAvailable);
 
-        if (state.isAvailable) {
-            if (transaction.type === EXPENSE || transaction.type === TRANSFER) {
-                if (this.srcTile && state.srcAccount) {
-                    this.srcTile.render(state.srcAccount);
-                }
+        if (!state.isAvailable) {
+            return;
+        }
 
-                this.initSrcAccList();
-                if (this.srcDDList && transaction.src_id) {
-                    this.srcDDList.selectItem(transaction.src_id);
-                }
+        if (transaction.type === EXPENSE || transaction.type === TRANSFER) {
+            if (this.srcTile && state.srcAccount) {
+                this.srcTile.render(state.srcAccount);
             }
 
-            if (transaction.type === INCOME || transaction.type === TRANSFER) {
-                if (this.destTile && state.destAccount) {
-                    this.destTile.render(state.destAccount);
-                }
-
-                this.initDestAccList();
-                if (this.destDDList && transaction.dest_id) {
-                    this.destDDList.selectItem(transaction.dest_id);
-                }
-            }
-
-            this.typeInp.value = transaction.type;
-
-            enable(this.srcIdInp, transaction.type !== DEBT);
-            enable(this.destIdInp, transaction.type !== DEBT);
-            enable(this.personIdInp, transaction.type === DEBT);
-            enable(this.debtAccountInp, transaction.type === DEBT);
-
-            this.srcIdInp.value = transaction.src_id;
-            this.destIdInp.value = transaction.dest_id;
-            this.srcCurrInp.value = transaction.src_curr;
-            this.destCurrInp.value = transaction.dest_curr;
-            if (transaction.type === INCOME) {
-                this.initSrcCurrList();
-            }
-            if (transaction.type === EXPENSE) {
-                this.initDestCurrList();
-            }
-
-            const sourceAmountLbl = (state.isDiff) ? 'Source amount' : 'Amount';
-            const destAmountLbl = (state.isDiff) ? 'Destination amount' : 'Amount';
-            if (this.srcAmountRowLabel) {
-                this.srcAmountRowLabel.textContent = sourceAmountLbl;
-            }
-            if (this.destAmountRowLabel) {
-                this.destAmountRowLabel.textContent = destAmountLbl;
-            }
-
-            this.setSign(this.destAmountSign, this.destCurrDDList, transaction.dest_curr);
-            this.setSign(this.srcAmountSign, this.srcCurrDDList, transaction.src_curr);
-            this.setSign(this.srcResBalanceSign, null, transaction.src_curr);
-            this.setSign(this.destResBalanceSign, null, transaction.dest_curr);
-            this.renderExchangeRate(state);
-
-            this.srcAmountInput.value = state.form.sourceAmount;
-            this.destAmountInput.value = state.form.destAmount;
-            if (this.exchangeInput) {
-                this.exchangeInput.value = state.form.exchange;
-            }
-            if (this.srcResBalanceInput) {
-                this.srcResBalanceInput.value = state.form.sourceResult;
-            }
-            if (this.destResBalanceInput) {
-                this.destResBalanceInput.value = state.form.destResult;
-            }
-
-            const currencyModel = window.app.model.currency;
-            const srcCurrency = currencyModel.getItem(transaction.src_curr);
-            const destCurrency = currencyModel.getItem(transaction.dest_curr);
-
-            if (this.srcAmountInfo) {
-                const title = srcCurrency.formatValue(transaction.src_amount);
-                this.srcAmountInfo.setTitle(title);
-                this.srcAmountInfo.setLabel(sourceAmountLbl);
-            }
-
-            if (this.destAmountInfo) {
-                const title = destCurrency.formatValue(transaction.dest_amount);
-                this.destAmountInfo.setTitle(title);
-                this.destAmountInfo.setLabel(destAmountLbl);
-            }
-
-            if (this.srcResBalanceInfo) {
-                const title = srcCurrency.formatValue(state.form.fSourceResult);
-                this.srcResBalanceInfo.setTitle(title);
-            }
-
-            if (this.destResBalanceInfo) {
-                const title = destCurrency.formatValue(state.form.fDestResult);
-                this.destResBalanceInfo.setTitle(title);
-            }
-
-            if (state.validation.sourceAmount) {
-                window.app.clearBlockValidation(this.srcAmountRow);
-            } else {
-                window.app.invalidateBlock(this.srcAmountRow);
-            }
-
-            if (state.validation.destAmount) {
-                window.app.clearBlockValidation(this.destAmountRow);
-            } else {
-                window.app.invalidateBlock(this.destAmountRow);
-            }
-
-            if (state.validation.date) {
-                window.app.clearBlockValidation(this.dateBlock);
-            } else {
-                window.app.invalidateBlock(this.dateBlock);
+            this.initSrcAccList();
+            if (this.srcDDList && transaction.src_id) {
+                this.srcDDList.selectItem(transaction.src_id);
             }
         }
 
-        show(this.submitControls, state.isAvailable);
+        if (transaction.type === INCOME || transaction.type === TRANSFER) {
+            if (this.destTile && state.destAccount) {
+                this.destTile.render(state.destAccount);
+            }
+
+            this.initDestAccList();
+            if (this.destDDList && transaction.dest_id) {
+                this.destDDList.selectItem(transaction.dest_id);
+            }
+        }
+
+        this.typeInp.value = transaction.type;
+
+        enable(this.srcIdInp, transaction.type !== DEBT);
+        enable(this.destIdInp, transaction.type !== DEBT);
+        enable(this.personIdInp, transaction.type === DEBT);
+        enable(this.debtAccountInp, transaction.type === DEBT);
+
+        this.srcIdInp.value = transaction.src_id;
+        this.destIdInp.value = transaction.dest_id;
+        this.srcCurrInp.value = transaction.src_curr;
+        this.destCurrInp.value = transaction.dest_curr;
+        if (transaction.type === INCOME) {
+            this.initSrcCurrList();
+        }
+        if (transaction.type === EXPENSE) {
+            this.initDestCurrList();
+        }
+
+        const sourceAmountLbl = (state.isDiff) ? 'Source amount' : 'Amount';
+        const destAmountLbl = (state.isDiff) ? 'Destination amount' : 'Amount';
+        if (this.srcAmountRowLabel) {
+            this.srcAmountRowLabel.textContent = sourceAmountLbl;
+        }
+        if (this.destAmountRowLabel) {
+            this.destAmountRowLabel.textContent = destAmountLbl;
+        }
+
+        this.setSign(this.destAmountSign, this.destCurrDDList, transaction.dest_curr);
+        this.setSign(this.srcAmountSign, this.srcCurrDDList, transaction.src_curr);
+        this.setSign(this.srcResBalanceSign, null, transaction.src_curr);
+        this.setSign(this.destResBalanceSign, null, transaction.dest_curr);
+        this.renderExchangeRate(state);
+
+        this.srcAmountInput.value = state.form.sourceAmount;
+        this.destAmountInput.value = state.form.destAmount;
+        if (this.exchangeInput) {
+            this.exchangeInput.value = state.form.exchange;
+        }
+        if (this.srcResBalanceInput) {
+            this.srcResBalanceInput.value = state.form.sourceResult;
+        }
+        if (this.destResBalanceInput) {
+            this.destResBalanceInput.value = state.form.destResult;
+        }
+
+        const currencyModel = window.app.model.currency;
+        const srcCurrency = currencyModel.getItem(transaction.src_curr);
+        const destCurrency = currencyModel.getItem(transaction.dest_curr);
+
+        if (this.srcAmountInfo) {
+            const title = srcCurrency.formatValue(transaction.src_amount);
+            this.srcAmountInfo.setTitle(title);
+            this.srcAmountInfo.setLabel(sourceAmountLbl);
+        }
+
+        if (this.destAmountInfo) {
+            const title = destCurrency.formatValue(transaction.dest_amount);
+            this.destAmountInfo.setTitle(title);
+            this.destAmountInfo.setLabel(destAmountLbl);
+        }
+
+        if (this.srcResBalanceInfo) {
+            const title = srcCurrency.formatValue(state.form.fSourceResult);
+            this.srcResBalanceInfo.setTitle(title);
+        }
+
+        if (this.destResBalanceInfo) {
+            const title = destCurrency.formatValue(state.form.fDestResult);
+            this.destResBalanceInfo.setTitle(title);
+        }
+
+        if (state.validation.sourceAmount) {
+            window.app.clearBlockValidation(this.srcAmountRow);
+        } else {
+            window.app.invalidateBlock(this.srcAmountRow);
+        }
+
+        if (state.validation.destAmount) {
+            window.app.clearBlockValidation(this.destAmountRow);
+        } else {
+            window.app.invalidateBlock(this.destAmountRow);
+        }
+
+        if (state.validation.date) {
+            window.app.clearBlockValidation(this.dateBlock);
+        } else {
+            window.app.invalidateBlock(this.dateBlock);
+        }
+
+        this.dateInput.value = state.form.date;
     }
 }
 

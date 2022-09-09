@@ -1,35 +1,36 @@
 .login-layer {
+  --login-logo-size: 54px;
+  --login-logo-font-size: 26px;
+
   justify-content: flex-start;
 }
 
 .logo-container {
-  width: 100%;
-  background-color: #20a0ff;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  background-color: #006cbd;
 }
 
 .login-logo {
-  max-width: 300px;
-  padding: 12px;
-  height: 62px;
   display: flex;
   flex-flow: row nowrap;
+  padding: 24px 0;
 
   .logo {
-    width: 62px;
+    width: var(--login-logo-size);
   }
 
   .logo-icon {
-    width: 62px;
-    height: 62px;
+    width: var(--login-logo-size);
+    height: var(--login-logo-size);
   }
 
   .title {
-    height: 62px;
-    line-height: 62px;
-    font-size: 32px;
+    height: var(--login-logo-size);
+    line-height: var(--login-logo-size);
+    font-size: var(--login-logo-font-size);
     font-weight: normal;
     color: #ffffff;
     white-space: nowrap;
@@ -44,7 +45,14 @@
   padding: 0 12px;
 }
 
-@media all and (min-width: 700px) {
+@media screen and (min-width: 576px) {
+  .login-layer {
+    --login-logo-size: 62px;
+    --login-logo-font-size: 32px;
+  }
+}
+
+@media screen and (min-width: 768px) {
   .login-layer {
     display: flex;
     flex-flow: column nowrap;
@@ -58,9 +66,25 @@
     flex-basis: auto;
     justify-content: center;
     width: 100%;
-    max-width: 700px;
-    height: 300px;
-    margin: 0 auto;
-    padding: 0 12px;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .logo-container {
+    justify-content: flex-end;
+  }
+
+  .login-logo {
+    padding: 24px 48px;
+  }
+
+  .form-container {
+    align-items: flex-start;
+  }
+
+  .login-form {
+    max-width: 380px;
+    padding: 0 48px;
   }
 }

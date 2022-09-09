@@ -482,8 +482,8 @@ export class TransactionView extends AppView {
             };
 
             if (this.model.isAvailable) {
-                res.source.tile.name = (this.model.srcAccount) ? this.model.srcAccount.name : '';
-                res.source.tile.balance = (this.model.srcAccount)
+                res.source.tile.title = (this.model.srcAccount) ? this.model.srcAccount.name : '';
+                res.source.tile.subtitle = (this.model.srcAccount)
                     ? this.model.srcCurr.format(this.model.srcAccount.balance)
                     : '';
             }
@@ -495,8 +495,8 @@ export class TransactionView extends AppView {
             };
 
             if (this.model.isAvailable) {
-                res.destination.tile.name = (this.model.destAccount) ? this.model.destAccount.name : '';
-                res.destination.tile.balance = (this.model.destAccount)
+                res.destination.tile.title = (this.model.destAccount) ? this.model.destAccount.name : '';
+                res.destination.tile.subtitle = (this.model.destAccount)
                     ? this.model.destCurr.format(this.model.destAccount.balance)
                     : '';
             }
@@ -820,32 +820,32 @@ export class TransactionView extends AppView {
 
             if (this.model.debtType) {
                 if (this.model.isAvailable) {
-                    res.person.tile.name = (this.model.person) ? this.model.person.name : '';
-                    res.person.tile.balance = (this.model.srcAccount)
+                    res.person.tile.title = (this.model.person) ? this.model.person.name : '';
+                    res.person.tile.subtitle = (this.model.srcAccount)
                         ? this.model.srcCurr.format(this.model.srcAccount.balance)
                         : '';
                 }
 
                 if (!this.model.noAccount) {
                     if (this.model.isAvailable) {
-                        res.account.tile.name = (this.model.destAccount) ? this.model.destAccount.name : '';
-                        res.account.tile.balance = (this.model.destAccount)
+                        res.account.tile.title = (this.model.destAccount) ? this.model.destAccount.name : '';
+                        res.account.tile.subtitle = (this.model.destAccount)
                             ? this.model.destCurr.format(this.model.destAccount.balance)
                             : '';
                     }
                 }
             } else {
                 if (this.model.isAvailable) {
-                    res.person.tile.name = (this.model.person) ? this.model.person.name : '';
-                    res.person.tile.balance = (this.model.destAccount)
+                    res.person.tile.title = (this.model.person) ? this.model.person.name : '';
+                    res.person.tile.subtitle = (this.model.destAccount)
                         ? this.model.destCurr.format(this.model.destAccount.balance)
                         : '';
                 }
 
                 if (!this.model.noAccount) {
                     if (this.model.isAvailable) {
-                        res.account.tile.name = (this.model.srcAccount) ? this.model.srcAccount.name : '';
-                        res.account.tile.balance = (this.model.srcAccount)
+                        res.account.tile.title = (this.model.srcAccount) ? this.model.srcAccount.name : '';
+                        res.account.tile.subtitle = (this.model.srcAccount)
                             ? this.model.srcCurr.format(this.model.srcAccount.balance)
                             : '';
                     }

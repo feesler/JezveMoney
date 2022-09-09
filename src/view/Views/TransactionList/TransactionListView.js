@@ -431,6 +431,7 @@ class TransactionListView extends View {
         if (!('stdate' in this.state.filter) && !('enddate' in this.state.filter)) {
             return;
         }
+        this.datePicker?.hide();
 
         delete this.state.filter.stdate;
         delete this.state.filter.enddate;
@@ -572,10 +573,21 @@ class TransactionListView extends View {
         }
 
         // Render date
-        const dateSubtitle = (state.filter.stdate && state.filter.enddate)
+        const isDateFilter = !!(state.filter.stdate && state.filter.enddate);
+        const dateRangeFmt = (isDateFilter)
             ? `${state.filter.stdate} - ${state.filter.enddate}`
-            : null;
+            : '';
+        this.dateInput.value = dateRangeFmt;
+        const dateSubtitle = (isDateFilter) ? dateRangeFmt : null;
         this.datePickerBtn.setSubtitle(dateSubtitle);
+        show(this.noDateBtn, isDateFilter);
+
+        // Search form
+        const isSearchFilter = !!state.filter.search;
+        if (!state.typingSearch) {
+            this.searchInp.value = (isSearchFilter) ? state.filter.search : '';
+        }
+        show(this.noSearchBtn, isSearchFilter);
 
         // Render list
         this.list.setMode(state.mode);
@@ -597,21 +609,6 @@ class TransactionListView extends View {
         this.modeSelector.setMode(state.mode);
         filterUrl.searchParams.set('page', state.pagination.page);
         this.modeSelector.setURL(filterUrl);
-
-        // Date range
-        if (this.state.filter.stdate && this.state.filter.enddate) {
-            const start = this.state.filter.stdate;
-            const end = this.state.filter.enddate;
-
-            this.dateInput.value = `${start} - ${end}`;
-        } else {
-            this.dateInput.value = '';
-        }
-
-        // Search form
-        if (!this.state.typingSearch) {
-            this.searchInp.value = (this.state.filter.search) ? this.state.filter.search : '';
-        }
 
         // toolbar
         this.toolbar.updateBtn.show(this.list.selectedItems.count() === 1);

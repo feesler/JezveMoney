@@ -3,7 +3,7 @@ import { createCSV } from '../common.js';
 import { App } from '../Application.js';
 
 /** Convert data array to import statement row */
-function createDummyTransaction(data) {
+function createCardTransaction(data) {
     const [
         date,
         comment,
@@ -35,7 +35,7 @@ function createDummyTransaction(data) {
 }
 
 /** Convert transactions data array to CSV */
-export function generateCSV(data) {
+export function generateCardCSV(data) {
     const header = [
         'Transaction date',
         'Posting date',
@@ -52,7 +52,48 @@ export function generateCSV(data) {
 
     assert.isArray(data, 'Invalid data');
 
-    const rows = data.map((item) => createDummyTransaction(item));
+    const rows = data.map((item) => createCardTransaction(item));
+
+    return createCSV({ header, data: rows });
+}
+
+/** Convert data array to import statement row */
+function createAccountTransaction(data) {
+    const [
+        date,
+        comment,
+        trCurr,
+        trAmount,
+        accCurr = trCurr,
+        accAmount = trAmount,
+    ] = data;
+
+    assert.isDate(date, 'Invalid date object');
+
+    return [
+        `${formatDate(date)} 00:00`,
+        comment,
+        trCurr,
+        trAmount,
+        accCurr,
+        accAmount,
+    ];
+}
+
+/** Convert transactions data array to CSV */
+export function generateAccountCSV(data) {
+    const header = [
+        'Transaction date',
+        'Description',
+        'Transaction currency',
+        'Amount in transaction currency',
+        'Account currency',
+        'Amount in account currency',
+    ];
+
+    assert.isArray(data, 'Invalid data');
+
+    const rows = data.map((item) => createAccountTransaction(item));
 
     return createCSV({ header, data: rows });
 }

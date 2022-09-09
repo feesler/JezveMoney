@@ -136,6 +136,7 @@ export class ImportUploadDialog extends TestComponent {
         res.uploadFilename = (res.useServerAddress) ? res.serverAddress : res.fileName;
 
         res.tplNameInp.value = await prop(res.tplNameInp.elem, 'value');
+        res.tplFeedback.title = await prop(res.tplFeedback.elem, 'textContent');
 
         res.tplVisible = await isVisible(res.templateBlock.elem, true);
         if (res.isLoading) {
@@ -318,7 +319,7 @@ export class ImportUploadDialog extends TestComponent {
         }
 
         if ([CREATE_TPL_STATE, UPDATE_TPL_STATE, RAW_DATA_STATE].includes(model.state)) {
-            const rawDataHeader = this.parent.fileData.slice(0, 1)[0];
+            const [rawDataHeader] = this.parent.fileData.slice(0, 1);
             res.columns = rawDataHeader.map(
                 (item, ind) => this.getColumn(this.parent.fileData, ind),
             );
@@ -398,6 +399,11 @@ export class ImportUploadDialog extends TestComponent {
         const tplVisible = await isVisible(this.content.templateBlock.elem, true);
         if (App.state.templates.length > 0) {
             this.model.state = RAW_DATA_STATE;
+
+            const template = this.findValidTemplate(this.parent.fileData);
+            if (template) {
+                this.model.template = template;
+            }
         } else {
             this.model.state = CREATE_TPL_STATE;
         }
@@ -491,7 +497,7 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async inputTemplateName(val) {
-        assert(TPL_FORM_STATES.includes(this.model.state), 'Invalid state');
+        assert(TPL_FORM_STATES.includes(this.model.state), `Invalid state: ${this.model.state}`);
 
         this.model.template.name = val;
         this.expectedState = this.getExpectedState(this.model);
@@ -503,7 +509,7 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async selectTemplateColumn(name, index) {
-        assert(TPL_FORM_STATES.includes(this.model.state), 'Invalid state');
+        assert(TPL_FORM_STATES.includes(this.model.state), `Invalid state: ${this.model.state}`);
 
         this.model.template.columns[name] = index;
         this.expectedState = this.getExpectedState(this.model);
@@ -584,6 +590,14 @@ export class ImportUploadDialog extends TestComponent {
 
         await this.content.isEncodeCheck.toggle();
         await this.parse();
+    }
+
+    /** Find valid template for data */
+    findValidTemplate(data) {
+        return App.state.templates.find((template) => {
+            const tpl = new ImportTemplate(template);
+            return tpl.isValid(data);
+        });
     }
 
     getExpectedUploadResult(importData) {
