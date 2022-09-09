@@ -8,8 +8,6 @@ import {
 } from 'jezve-test';
 import { asyncMap } from '../../common.js';
 
-const DEFAULT_USER_MENU_ITEMS = 2;
-
 export class Header extends TestComponent {
     async parseContent() {
         // no header is ok for login view
@@ -23,29 +21,33 @@ export class Header extends TestComponent {
 
         assert(res.logo.elem, 'Logo element not found');
 
-        res.user = { elem: await query(this.elem, '.user-block') };
-        if (res.user.elem) {
-            res.user.menuBtn = await query(this.elem, 'button.user-menu-btn');
-            assert(res.user.menuBtn, 'User button not found');
-            const el = await query(res.user.menuBtn, '.user__title');
-            assert(el, 'User title element not found');
-            res.user.name = await prop(el, 'textContent');
+        res.userBtn = { elem: await query(this.elem, '.header .user-btn') };
+        assert(res.userBtn.elem, 'User button not found');
 
-            res.user.menuEl = await query(this.elem, '.user-menu');
-            assert(res.user.menuEl, 'Menu element not found');
+        res.userBtn.titleElem = await query(res.userBtn.elem, '.user-btn__title');
+        if (res.userBtn.titleElem) {
+            res.userBtn.title = await prop(res.userBtn.titleElem, 'textContent');
+        }
 
-            const menuLinks = await queryAll(res.user.menuEl, 'ul > li > a');
-            res.user.menuItems = await asyncMap(menuLinks, async (elem) => ({
+        res.userNav = { elem: await query('.user-navigation') };
+        assert(res.userNav.elem, 'User navigation not found');
+
+        res.userNav.menuEl = await query(res.userNav.elem, '.nav-list');
+        if (res.userNav.menuEl) {
+            const menuLinks = await queryAll(res.userNav.menuEl, 'a.nav-link');
+            res.userNav.menuItems = await asyncMap(menuLinks, async (elem) => ({
                 elem,
-                link: await prop(elem, 'href'),
-                text: await prop(elem, 'textContent'),
+                title: await prop(elem, 'textContent'),
             }));
-            assert(res.user.menuItems.length >= DEFAULT_USER_MENU_ITEMS, 'Invalid user menu');
 
-            const itemShift = (res.user.menuItems.length > DEFAULT_USER_MENU_ITEMS) ? 1 : 0;
-
-            res.user.profileBtn = res.user.menuItems[itemShift].elem;
-            res.user.logoutBtn = res.user.menuItems[itemShift + 1].elem;
+            for (const item of res.userNav.menuItems) {
+                if (item.title.toLowerCase() === 'profile') {
+                    res.userNav.profileBtn = item;
+                }
+                if (item.title.toLowerCase() === 'logout') {
+                    res.userNav.logoutBtn = item;
+                }
+            }
         }
 
         return res;
@@ -55,17 +57,17 @@ export class Header extends TestComponent {
         await click(this.content.logo.elem);
     }
 
-    async clickMenuButton() {
-        await click(this.content.user.menuBtn);
+    async clickUserButton() {
+        await click(this.content.userBtn.elem);
     }
 
     async clickProfileMenuItem() {
-        await this.clickMenuButton();
-        await click(this.content.user.profileBtn);
+        await this.clickUserButton();
+        await click(this.content.userNav.profileBtn.elem);
     }
 
     async clickLogoutMenuItem() {
-        await this.clickMenuButton();
-        await click(this.content.user.logoutBtn);
+        await this.clickUserButton();
+        await click(this.content.userNav.logoutBtn.elem);
     }
 }

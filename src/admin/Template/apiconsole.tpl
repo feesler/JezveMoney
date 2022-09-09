@@ -7,11 +7,11 @@
 <div class="navigation navigation_closed">
     <nav class="navigation-content">
         <div class="navigation-controls">
-            <button class="navigation__close-btn"><?=svgIcon("back")?></button>
+            <button class="navigation__close-btn"><?=svgIcon("back", "navigation__close-btn-icon")?></button>
             <div class="navigation-logo">
-                <a class="logo__link" href="<?=BASEURL?>">
-                    <span class="logo__icon"><?=svgIcon("header_logo")?></span>
-                    <span class="logo__title">Jezve Money</span>
+                <a class="header-logo" href="<?=BASEURL?>admin/">
+                    <span class="header-logo__icon"><?=svgIcon("header_logo", "logo-icon")?></span>
+                    <span class="header-logo__title">Admin</span>
                 </a>
             </div>
         </div>

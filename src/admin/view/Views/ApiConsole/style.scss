@@ -40,8 +40,12 @@ h3 {
 /* Left menus */
 
 /* Menu lists */
+.menu-list {
+  padding: 24px;
+}
+
 .menu-list > li {
-  padding: 5px;
+  padding: 5px 0;
   list-style-type: none;
 }
 
