@@ -65,7 +65,7 @@ export class StatisticsView extends AppView {
             return res;
         }
 
-        const bars = await queryAll(res.chart.elem, 'svg > rect.histogram__bar');
+        const bars = await queryAll(res.chart.elem, '.histogram__bar');
         for (const bar of bars) {
             res.chart.bars.push({
                 elem: bar,
