@@ -3,8 +3,6 @@ import {
     ge,
     show,
     isDate,
-    urlJoin,
-    isEmpty,
     setEvents,
     formatDate,
     throttle,
@@ -221,49 +219,31 @@ class TransactionListView extends View {
         window.app.createMessage(MSG_SET_POS_FAIL, 'msg_error');
     }
 
-    /**
-     * Build new location address from current filterObj
-     */
-    buildAddress() {
+    /** Returns URL for filter of specified state */
+    getFilterURL(state = this.state, keepPage = true) {
         const { baseURL } = window.app;
-        let newLocation = `${baseURL}transactions/`;
-        const locFilter = { ...this.state.filter };
+        const { filter } = state;
+        const res = new URL(`${baseURL}transactions/`);
 
-        if ('type' in locFilter) {
-            if (!Array.isArray(locFilter.type)) {
-                locFilter.type = [locFilter.type];
+        Object.keys(filter).forEach((prop) => {
+            const value = filter[prop];
+            if (Array.isArray(value)) {
+                const arrProp = `${prop}[]`;
+                value.forEach((item) => res.searchParams.append(arrProp, item));
+            } else {
+                res.searchParams.set(prop, value);
             }
+        });
 
-            if (!locFilter.type.length) {
-                delete locFilter.type;
-            }
+        if (keepPage) {
+            res.searchParams.set('page', state.pagination.page);
         }
 
-        if ('acc_id' in locFilter) {
-            if (!Array.isArray(locFilter.acc_id)) {
-                locFilter.acc_id = [locFilter.acc_id];
-            }
-
-            if (!locFilter.acc_id.length) {
-                delete locFilter.acc_id;
-            }
+        if (state.mode === 'details') {
+            res.searchParams.set('mode', 'details');
         }
 
-        if ('person_id' in locFilter) {
-            if (!Array.isArray(locFilter.person_id)) {
-                locFilter.person_id = [locFilter.person_id];
-            }
-
-            if (!locFilter.person_id.length) {
-                delete locFilter.person_id;
-            }
-        }
-
-        if (!isEmpty(locFilter)) {
-            newLocation += `?${urlJoin(locFilter)}`;
-        }
-
-        return newLocation;
+        return res;
     }
 
     /**
@@ -481,13 +461,7 @@ class TransactionListView extends View {
     }
 
     replaceHistory() {
-        const url = new URL(this.buildAddress());
-        url.searchParams.set('page', this.state.pagination.page);
-        if (this.state.mode === 'details') {
-            url.searchParams.set('mode', 'details');
-        } else {
-            url.searchParams.delete('mode');
-        }
+        const url = this.getFilterURL();
         window.history.replaceState({}, PAGE_TITLE, url);
     }
 
@@ -554,13 +528,7 @@ class TransactionListView extends View {
             this.loadingIndicator.show();
         }
 
-        const filterUrl = new URL(this.buildAddress());
-        filterUrl.searchParams.delete('page');
-        if (state.mode === 'details') {
-            filterUrl.searchParams.set('mode', 'details');
-        } else {
-            filterUrl.searchParams.delete('mode');
-        }
+        const filterUrl = this.getFilterURL(state, false);
 
         this.typeMenu.setURL(filterUrl);
         this.typeMenu.setSelection(state.filter.type);
