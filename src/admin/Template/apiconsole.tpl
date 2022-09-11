@@ -624,11 +624,11 @@
                 </select>
                 <div class="std_margin">
                     <label for="statistics_curr">Currency</label>
-                    <input id="statistics_curr" class="stretch-input" name="curr_id" type="text">
+                    <input id="statistics_curr" class="stretch-input" name="curr_id" type="text" disabled>
                 </div>
                 <div class="std_margin">
                     <label for="statistics_acc">Account</label>
-                    <input id="statistics_acc" class="stretch-input" name="acc_id" type="text" disabled>
+                    <input id="statistics_acc" class="stretch-input" name="acc_id" type="text">
                 </div>
                 <div class="std_margin">
                     <label for="statistics_group">Group by</label>
