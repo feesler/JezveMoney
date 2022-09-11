@@ -18,7 +18,7 @@ const BTN_CREATE_CONDITION = 'Create';
 const TITLE_CONDITIONS = 'Conditions';
 const BTN_CREATE_ACTION = 'Create';
 const TITLE_ACTIONS = 'Actions';
-const BTN_SAVE = 'Ok';
+const BTN_SAVE = 'Submit';
 const BTN_CANCEL = 'Cancel';
 const MSG_NO_DATA = 'No data';
 const MSG_NO_ACTIONS = 'No actions';
@@ -130,7 +130,7 @@ export class ImportRuleForm extends Component {
             this.validFeedback,
         );
 
-        this.controls = window.app.createContainer('rule-form__controls', [
+        this.controls = window.app.createContainer('form-controls', [
             this.saveBtn,
             this.cancelBtn,
         ]);

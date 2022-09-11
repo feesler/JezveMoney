@@ -138,13 +138,6 @@
   line-height: var(--rdc-cell-height);
 }
 
-/* Create/update template controls: Save, cancel buttons */
-.import-tpl-controls {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: baseline;
-}
-
 @media (hover: hover) {
   .raw-data-column:hover {
     background-color: #7b7b7b;

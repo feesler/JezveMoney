@@ -26,7 +26,7 @@
                         </tbody>
                     </table>
 
-                    <div class="acc_controls">
+                    <div class="form-controls">
                         <input id="createbtn" class="adm_act_btn" type="button" value="create">
                         <input id="updbtn" class="adm_act_btn" type="button" value="update" hidden>
                         <input id="del_btn" class="adm_act_btn" type="button" value="delete" hidden>

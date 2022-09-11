@@ -16,8 +16,8 @@ export class LoginView extends AppView {
         const res = {
             loginInp: await InputRow.create(this, await query('#login-inp-block')),
             passwordInp: await InputRow.create(this, await query('#pwd-inp-block')),
-            submitBtn: await query('.form-controls .btn.submit-btn'),
-            registerLink: await query('.form-controls .alter_link > a'),
+            submitBtn: await query('.form-controls .submit-btn'),
+            registerLink: await query('.form-controls .alter-link'),
         };
 
         assert(

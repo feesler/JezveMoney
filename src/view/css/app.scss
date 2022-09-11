@@ -43,10 +43,13 @@
   src: local("Segoe UI Bold Italic");
 }
 
+:root {
+  --action-btn-border-radius: 5px;
+  --focus-shadow: #0d6efd40;
+}
+
 html,
 body {
-  --focus-shadow: #0d6efd40;
-
   width: 100%;
   height: 100%;
 }
@@ -170,21 +173,6 @@ label {
   }
 }
 
-/* Validation */
-.validation-block .invalid-feedback {
-  color: #ff0000;
-  display: none;
-  font-size: 14px;
-}
-
-.validation-block.invalid-block .invalid-feedback {
-  display: block;
-}
-
-.validation-block.invalid-block .stretch-input {
-  border-color: #ff0000;
-}
-
 /* Centered block */
 .centered {
   margin: 0 auto;
@@ -234,33 +222,6 @@ label {
   padding: 50px 12px;
 }
 
-/* Aligned to right element */
-.right-align {
-  margin-left: auto;
-}
-
-/* Classes used both by Login and Registration views */
-.form-container {
-  display: flex;
-  flex-basis: 100%;
-  flex-flow: column nowrap;
-  align-items: center;
-  justify-content: center;
-}
-
-.form-controls {
-  padding: 5px 0;
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-}
-
-/* alternative link */
-.alter_link {
-  margin: 0 20px;
-}
-
-/* accounts page */
 .heading {
   display: flex;
   flex-flow: row wrap;
@@ -283,17 +244,34 @@ label {
   }
 }
 
+/* Aligned to right element */
+.right-align {
+  margin-left: auto;
+}
+
+/* Classes used both by Login and Registration views */
+.form-container {
+  display: flex;
+  flex-basis: 100%;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-controls {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  gap: 30px;
+  padding: 24px 0 12px 0;
+}
+
 .amount-input {
   text-align: right;
 }
 
 .std_margin {
   margin: 9px 0;
-}
-
-.acc_controls {
-  padding: 5px 0;
-  clear: both;
 }
 
 /* buttons */
@@ -313,6 +291,7 @@ label {
 
 .submit-btn,
 .submit-btn:visited {
+  border-radius: var(--action-btn-border-radius);
   background-color: #0072c6;
 }
 
@@ -321,13 +300,13 @@ label {
   opacity: 0.3;
 }
 
-* + .cancel-btn {
-  margin-left: 30px;
-}
-
 .cancel-btn,
 .cancel-btn:visited {
-  background-color: #b0b0b0;
+  vertical-align: baseline;
+  text-decoration: underline;
+  background: none;
+  color: #0072c6;
+  cursor: pointer;
 }
 
 .warning-btn {
@@ -365,6 +344,21 @@ label {
     border-left: 0 none;
     border-bottom: 1px dashed #0072c6;
   }
+}
+
+/* Validation */
+.validation-block .invalid-feedback {
+  color: #ff0000;
+  display: none;
+  font-size: 14px;
+}
+
+.validation-block.invalid-block .invalid-feedback {
+  display: block;
+}
+
+.validation-block.invalid-block .stretch-input {
+  border-color: #ff0000;
 }
 
 /* No data message for lists & etc. */
@@ -468,6 +462,14 @@ label {
 .popup .close-btn,
 .popup__content-box.dragging .close-btn {
   display: block;
+}
+
+.popup__controls {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: baseline;
+  gap: 30px;
+  padding: 24px 0 12px 0;
 }
 
 /* Messages */
@@ -601,10 +603,6 @@ label {
 
   .submit-btn:hover {
     background-color: #1e82cc;
-  }
-
-  .acc_controls .cancel-btn:hover {
-    background-color: #c0c0c0;
   }
 
   .link-btn:hover {

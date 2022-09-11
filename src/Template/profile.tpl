@@ -50,7 +50,7 @@
 
 <div id="changename" class="profile-form-container" hidden>
 <form method="post" action="<?=BASEURL?>profile/changename/">
-    <div id="name-inp-block" class="validation-block view-row">
+    <div id="name-inp-block" class="validation-block view-row std_margin">
         <label for="newname">New name</label>
         <input id="newname" class="stretch-input" name="name" type="text" autocomplete="off" value="<?=e($profileInfo["name"])?>">
         <div class="invalid-feedback">Please input correct name.<br>New name must be different from the old.</div>
@@ -60,13 +60,13 @@
 
 <div id="changepass" class="profile-form-container" hidden>
 <form method="post" action="<?=BASEURL?>profile/changepass/">
-    <div id="old-pwd-inp-block" class="validation-block view-row">
+    <div id="old-pwd-inp-block" class="validation-block view-row std_margin">
         <label for="oldpwd">Current password</label>
         <input id="oldpwd" class="stretch-input" name="current" type="password" autocomplete="off">
         <div class="invalid-feedback">Please input current password.</div>
     </div>
 
-    <div id="new-pwd-inp-block" class="validation-block view-row">
+    <div id="new-pwd-inp-block" class="validation-block view-row std_margin">
         <label for="newpwd">New password</label>
         <input id="newpwd" class="stretch-input" name="new" type="password" autocomplete="off">
         <div class="invalid-feedback">Please input correct new password.<br>New password must be different from the old.</div>

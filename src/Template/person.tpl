@@ -31,9 +31,9 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             <div id="namefeedback" class="invalid-feedback"></div>
                         </div>
 
-                        <div class="acc_controls">
-                            <input class="btn submit-btn" type="submit" value="ok">
-                            <a class="btn cancel-btn" href="<?=BASEURL?>persons/">cancel</a>
+                        <div class="form-controls">
+                            <input class="btn submit-btn" type="submit" value="Submit">
+                            <a class="btn cancel-btn" href="<?=BASEURL?>persons/">Cancel</a>
                         </div>
                         <input id="flags" name="flags" type="hidden" value="<?=e($pInfo->flags)?>">
                         </form>

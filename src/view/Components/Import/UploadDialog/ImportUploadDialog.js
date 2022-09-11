@@ -67,7 +67,7 @@ export class ImportUploadDialog extends Component {
         });
 
         this.initialAccField = ge('initialAccField');
-        this.controlsBlock = this.elem.querySelector('.upload-dialog-controls');
+        this.controlsBlock = this.elem.querySelector('.upload-dialog > .form-controls');
         this.submitUploadedBtn = ge('submitUploadedBtn');
         if (!this.initialAccField
             || !this.accountDropDown

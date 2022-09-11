@@ -29,7 +29,7 @@
                         </tbody>
                     </table>
 
-                    <div class="acc_controls">
+                    <div class="form-controls">
                         <input id="createbtn" class="adm_act_btn" type="button" value="create">
                         <input id="updbtn" class="adm_act_btn" type="button" value="update" hidden>
                         <input id="passbtn" class="adm_act_btn" type="button" value="set password" hidden>

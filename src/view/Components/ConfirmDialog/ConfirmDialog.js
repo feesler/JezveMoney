@@ -24,8 +24,8 @@ export class ConfirmDialog extends Component {
             title: this.props.title,
             content: this.props.content,
             btn: {
-                okBtn: { onclick: () => this.onResult(true) },
-                cancelBtn: { onclick: () => this.onResult(false) },
+                okBtn: { value: 'Ok', onclick: () => this.onResult(true) },
+                cancelBtn: { value: 'Cancel', onclick: () => this.onResult(false) },
             },
         };
         if ('id' in this.props) {
