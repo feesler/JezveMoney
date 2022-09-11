@@ -33,6 +33,14 @@ class TransactionModel extends CachedTable
     private static $destAvailTypes = [INCOME, TRANSFER, DEBT];
     private static $destMandatoryTypes = [INCOME, TRANSFER];
 
+    private static $histogramGroupNames = [
+        NO_GROUP => "None",
+        GROUP_BY_DAY => "Day",
+        GROUP_BY_WEEK => "Week",
+        GROUP_BY_MONTH => "Month",
+        GROUP_BY_YEAR => "Year"
+    ];
+
     protected $tbl_name = "transactions";
     protected $accModel = null;
     protected $currMod = null;
@@ -1486,6 +1494,82 @@ class TransactionModel extends CachedTable
     }
 
 
+    // Convert request object to histogram request parameters
+    public function getHistogramFilters($request)
+    {
+        $currModel = CurrencyModel::getInstance();
+        $accModel = AccountModel::getInstance();
+
+        $res = new \stdClass();
+
+        // Filter type
+        $byCurrency = (isset($request["filter"]) && $request["filter"] == "currency");
+        $res->filter = $byCurrency ? "currency" : "account";
+
+        // Transaction type
+        $trans_type = (isset($request["type"])) ? $request["type"] : EXPENSE;
+        if (!is_array($trans_type)) {
+            $trans_type = [$trans_type];
+        }
+
+        $transTypes = [];
+        foreach ($trans_type as $type) {
+            $intType = intval($type);
+            if (!$intType) {
+                throw new \Error("Invalid transaction type");
+            }
+            $transTypes[] = $intType;
+        }
+        $res->type = $transTypes;
+
+        // Currency or account
+        if ($byCurrency) {
+            if (isset($request["curr_id"]) && is_numeric($request["curr_id"])) {
+                $curr_id = intval($request["curr_id"]);
+                if (!$currModel->isExist($curr_id)) {
+                    throw new \Error("Currency not found");
+                }
+            } else { // try to get first currency
+                $curr_id = $currModel->getIdByPos(0);
+                if (!$curr_id) {
+                    throw new \Error("No currencies available");
+                }
+            }
+            $res->curr_id = $curr_id;
+        } else {
+            if (isset($request["acc_id"]) && is_numeric($request["acc_id"])) {
+                $acc_id = intval($request["acc_id"]);
+                if (!$accModel->isExist($acc_id)) {
+                    throw new \Error("Account not found");
+                }
+            } else { // try to get first account of user
+                $acc_id = $accModel->getIdByPos(0);
+                if (!$acc_id) {
+                    throw new \Error("No accounts available");
+                }
+            }
+            $res->acc_id = $acc_id;
+        }
+
+        // Group type
+        if (isset($request["group"])) {
+            $groupType = self::getHistogramGroupTypeByName($request["group"]);
+            if ($groupType != 0) {
+                $res->group = strtolower($request["group"]);
+            }
+        }
+
+        $stDate = isset($request["stdate"]) ? $request["stdate"] : null;
+        $endDate = isset($request["enddate"]) ? $request["enddate"] : null;
+        if (!is_null($stDate) && !is_null($endDate)) {
+            $res->stdate = $stDate;
+            $res->enddate = $endDate;
+        }
+
+        return $res;
+    }
+
+
     // Return series array of amounts and date of transactions for statistics histogram
     public function getHistogramSeries($params = null)
     {
@@ -1723,5 +1807,24 @@ class TransactionModel extends CachedTable
     public static function getTypeNames()
     {
         return self::$typeNames;
+    }
+
+
+    public static function getHistogramGroupTypeByName($name)
+    {
+        $lname = strtolower($name);
+        foreach (self::$histogramGroupNames as $index => $groupName) {
+            if ($lname == strtolower($groupName)) {
+                return $index;
+            }
+        }
+
+        return NO_GROUP;
+    }
+
+    // Return array of histogram group names
+    public static function getHistogramGroupNames()
+    {
+        return self::$histogramGroupNames;
     }
 }

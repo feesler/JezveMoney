@@ -4,11 +4,12 @@ import {
     queryAll,
     prop,
     parentNode,
-    navigation,
     isVisible,
+    waitForFunction,
 } from 'jezve-test';
 import { DropDown } from 'jezvejs/tests';
 import { AppView } from './AppView.js';
+import { availTransTypes } from '../model/Transaction.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
 import { TransactionTypeMenu } from './component/TransactionTypeMenu.js';
 import { App } from '../Application.js';
@@ -60,10 +61,11 @@ export class StatisticsView extends AppView {
         };
         assert(res.chart, 'Invalid statistics view structure');
 
-        const chartChild = await query(res.chart.elem, '.nodata-message');
-        if (chartChild) {
-            return res;
-        }
+        res.chart.renderTime = await prop(res.chart.elem, 'dataset.time');
+        res.chartContainer = { elem: await query(res.chart.elem, '.charts') };
+
+        res.loadingIndicator = { elem: await query('.loading-indicator') };
+        res.noDataMessage = { elem: await query(res.chart.elem, '.nodata-message') };
 
         const bars = await queryAll(res.chart.elem, '.histogram__bar');
         for (const bar of bars) {
@@ -79,10 +81,9 @@ export class StatisticsView extends AppView {
     async buildModel(cont) {
         const res = {};
 
-        const [selectedType] = cont.typeMenu.getSelectedTypes();
         const selectedFilter = cont.filterByDropDown.content.textValue;
         res.filter = {
-            type: selectedType,
+            type: cont.typeMenu.getSelectedTypes(),
             byCurrency: selectedFilter === 'Currencies',
         };
         const dateRange = cont.dateFilter.getSelectedRange();
@@ -114,6 +115,9 @@ export class StatisticsView extends AppView {
             bars: cont.chart.bars.map(({ height }) => ({ height })),
         };
 
+        res.renderTime = cont.chart.renderTime;
+        res.loading = cont.loadingIndicator.visible;
+
         return res;
     }
 
@@ -135,12 +139,14 @@ export class StatisticsView extends AppView {
         const { byCurrency } = this.model.filter;
 
         const res = {
-            typeMenu: { selectedTypes: [this.model.filter.type] },
+            typeMenu: { selectedTypes: this.model.filter.type },
             filterByDropDown: {
                 visible: true,
                 textValue: (byCurrency) ? 'Currencies' : 'Accounts',
             },
             dateFilter: {},
+            noDataMessage: {},
+            chartContainer: {},
         };
 
         if (byCurrency) {
@@ -182,19 +188,56 @@ export class StatisticsView extends AppView {
         res.chart = {
             bars: { length: histogram.values.length },
         };
+        res.noDataMessage.visible = histogram.values.length === 0;
+        res.chartContainer.visible = histogram.values.length > 0;
 
         return res;
     }
 
+    async waitForData(action) {
+        await this.parse();
+
+        const prevTime = this.model.renderTime;
+
+        await action();
+
+        await waitForFunction(async () => {
+            await this.parse();
+            return (
+                !this.model.loading
+                && prevTime !== this.model.renderTime
+            );
+        });
+    }
+
     async filterByType(type) {
-        if (this.content.typeMenu.isSingleSelected(type)) {
+        const newTypeSel = Array.isArray(type) ? type : [type];
+        newTypeSel.sort();
+
+        if (this.content.typeMenu.isSameSelected(newTypeSel)) {
             return true;
         }
 
-        this.model.filter.type = type;
+        const typesBefore = this.model.filter.type;
+        this.model.filter.type = newTypeSel;
         const expected = this.getExpectedState();
 
-        await navigation(() => this.content.typeMenu.select(type));
+        if (newTypeSel.length === 1) {
+            await this.waitForData(() => App.view.content.typeMenu.select(newTypeSel[0]));
+        } else {
+            // Select new types
+            for (const transType of availTransTypes) {
+                if (!typesBefore.includes(transType) && newTypeSel.includes(transType)) {
+                    await this.waitForData(() => App.view.content.typeMenu.toggle(transType));
+                }
+            }
+            // Deselect previous types
+            for (const transType of availTransTypes) {
+                if (typesBefore.includes(transType) && !newTypeSel.includes(transType)) {
+                    await this.waitForData(() => App.view.content.typeMenu.toggle(transType));
+                }
+            }
+        }
 
         return App.view.checkState(expected);
     }
@@ -207,7 +250,7 @@ export class StatisticsView extends AppView {
         this.model.filter.acc_id = account.id;
         const expected = this.getExpectedState();
 
-        await navigation(() => this.content.filterByDropDown.setSelection(0));
+        await this.waitForData(() => this.content.filterByDropDown.setSelection(0));
 
         return App.view.checkState(expected);
     }
@@ -220,7 +263,7 @@ export class StatisticsView extends AppView {
         this.model.filter.curr_id = currency.id;
         const expected = this.getExpectedState();
 
-        await navigation(() => this.content.filterByDropDown.setSelection(1));
+        await this.waitForData(() => this.content.filterByDropDown.setSelection(1));
 
         return App.view.checkState(expected);
     }
@@ -231,7 +274,7 @@ export class StatisticsView extends AppView {
         this.model.filter.acc_id = parseInt(accountId, 10);
         const expected = this.getExpectedState();
 
-        await navigation(() => this.content.accountsDropDown.setSelection(accountId));
+        await this.waitForData(() => this.content.accountsDropDown.setSelection(accountId));
 
         return App.view.checkState(expected);
     }
@@ -248,7 +291,7 @@ export class StatisticsView extends AppView {
         this.model.filter.curr_id = parseInt(currencyId, 10);
         const expected = this.getExpectedState();
 
-        await navigation(() => this.content.currencyDropDown.setSelection(currencyId));
+        await this.waitForData(() => this.content.currencyDropDown.setSelection(currencyId));
 
         return App.view.checkState(expected);
     }
@@ -263,7 +306,7 @@ export class StatisticsView extends AppView {
         this.model.filter.group = group;
         const expected = this.getExpectedState();
 
-        await navigation(() => this.content.groupDropDown.setSelection(group));
+        await this.waitForData(() => this.content.groupDropDown.setSelection(group));
 
         return App.view.checkState(expected);
     }
@@ -295,7 +338,7 @@ export class StatisticsView extends AppView {
 
         const startDate = new Date(fixDate(start));
         const endDate = new Date(fixDate(end));
-        await navigation(() => this.content.dateFilter.selectRange(startDate, endDate));
+        await this.waitForData(() => this.content.dateFilter.selectRange(startDate, endDate));
 
         return App.view.checkState(expected);
     }
@@ -305,7 +348,7 @@ export class StatisticsView extends AppView {
         this.model.filter.endDate = null;
         const expected = this.getExpectedState();
 
-        await navigation(() => this.content.dateFilter.clear());
+        await this.waitForData(() => this.content.dateFilter.clear());
 
         return App.view.checkState(expected);
     }

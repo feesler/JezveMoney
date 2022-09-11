@@ -519,7 +519,7 @@ export class TransactionsList extends List {
         let sumDate = null;
         let curDate = null;
         let prevDate = null;
-        let curSum = 0;
+        const curSum = [];
         let itemsInGroup = 0;
         let transDate = null;
         let currId = params.curr_id;
@@ -544,16 +544,22 @@ export class TransactionsList extends List {
             }
         }
 
-        const transType = params.type ?? EXPENSE;
+        const transType = params.type ?? [EXPENSE];
         if (!transType) {
             return null;
         }
+        const transTypes = Array.isArray(transType) ? transType : [transType];
+        for (const type of transTypes) {
+            amountArr[type] = [];
+            curSum[type] = 0;
+        }
+
         const groupType = params.group ?? 'none';
         const limit = params.limit ?? 0;
 
         const itemsFilter = {
             order: 'asc',
-            type: transType,
+            type: transTypes,
         };
         if (accId) {
             itemsFilter.accounts = accId;
@@ -565,17 +571,17 @@ export class TransactionsList extends List {
 
         const list = this.applyFilter(itemsFilter);
         list.forEach((item) => {
-            if (item.type !== transType) {
+            if (!transTypes.includes(item.type)) {
                 return;
             }
 
             if (byCurrency) {
-                const transCurr = (transType === EXPENSE) ? item.src_curr : item.dest_curr;
+                const transCurr = (item.type === EXPENSE) ? item.src_curr : item.dest_curr;
                 if (transCurr !== currId) {
                     return;
                 }
             } else {
-                const transAcc = (transType === EXPENSE) ? item.src_id : item.dest_id;
+                const transAcc = (item.type === EXPENSE) ? item.src_id : item.dest_id;
                 if (transAcc !== accId) {
                     return;
                 }
@@ -586,10 +592,10 @@ export class TransactionsList extends List {
             itemsInGroup += 1;
 
             if (groupType === 'none') {
-                if (transType === EXPENSE) {
-                    amountArr.push(item.src_amount);
+                if (item.type === EXPENSE) {
+                    amountArr[item.type].push(item.src_amount);
                 } else {
-                    amountArr.push(item.dest_amount);
+                    amountArr[item.type].push(item.dest_amount);
                 }
 
                 if (prevDate == null || prevDate !== transDate.getDate()) {
@@ -611,30 +617,40 @@ export class TransactionsList extends List {
                 sumDate = curDate;
             } else if (sumDate != null && sumDate !== curDate) {
                 sumDate = curDate;
-                amountArr.push(curSum);
-                curSum = 0;
+                for (const type of transTypes) {
+                    amountArr[type].push(curSum[type]);
+                    curSum[type] = 0;
+                }
+
                 const label = this.getStatisticsLabel(transDate, groupType);
                 groupArr.push([label, 1]);
             }
 
-            if (transType === EXPENSE) {
-                curSum += item.src_amount;
+            if (item.type === EXPENSE) {
+                curSum[item.type] += item.src_amount;
             } else {
-                curSum += item.dest_amount;
+                curSum[item.type] += item.dest_amount;
             }
         });
 
         // save remain value
         if (groupType !== 'none' && list.length > 0) {
             if (sumDate != null && sumDate !== curDate) {
-                amountArr.push(curSum);
+                for (const type of transTypes) {
+                    amountArr[type].push(curSum[type]);
+                    curSum[type] = 0;
+                }
+
                 const label = this.getStatisticsLabel(transDate, groupType);
                 groupArr.push([label, 1]);
             } else {
-                if (amountArr.length === 0) {
-                    amountArr.push(curSum);
-                } else {
-                    amountArr[amountArr.length - 1] += curSum;
+                for (const type of transTypes) {
+                    const { length } = amountArr[type];
+                    if (length === 0) {
+                        amountArr[type].push(curSum[type]);
+                    } else {
+                        amountArr[type][length - 1] += curSum[type];
+                    }
                 }
 
                 if (groupArr.length === 0) {
@@ -645,8 +661,18 @@ export class TransactionsList extends List {
         }
 
         if (limit > 0) {
-            const limitCount = Math.min(amountArr.length, limit);
-            amountArr = amountArr.slice(-limitCount);
+            let amountCount = 0;
+            for (const type of transTypes) {
+                amountCount = Math.max(amountCount, amountArr[type].length);
+            }
+
+            const limitCount = Math.min(amountCount, limit);
+
+            const trimAmounts = [];
+            for (const type of transTypes) {
+                trimAmounts[type] = amountArr[type].slice(-limitCount);
+            }
+            amountArr = trimAmounts;
 
             let newGroupsCount = 0;
             let groupLimit = 0;
@@ -660,8 +686,16 @@ export class TransactionsList extends List {
             groupArr = groupArr.slice(-newGroupsCount);
         }
 
+        let resultValues = [];
+        for (const type of transTypes) {
+            resultValues.push({ data: amountArr[type] });
+        }
+        if (transTypes.length === 1) {
+            resultValues = resultValues[0].data;
+        }
+
         return {
-            values: amountArr,
+            values: resultValues,
             series: groupArr,
         };
     }

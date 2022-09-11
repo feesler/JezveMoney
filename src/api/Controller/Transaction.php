@@ -156,82 +156,29 @@ class Transaction extends ApiListController
 
     public function statistics()
     {
-        $currModel = CurrencyModel::getInstance();
-        $accModel = AccountModel::getInstance();
         $res = new \stdClass();
         $filterObj = new \stdClass();
 
-        // Filter type
-        $byCurrency = (isset($_GET["filter"]) && $_GET["filter"] == "currency");
-        $params["filter"] = $byCurrency ? "currency" : "account";
-        $filterObj->filter = $params["filter"];
+        $request = $this->getRequestData();
+        $filterObj = $this->model->getHistogramFilters($request);
 
-        // Transaction type
-        $trans_type = EXPENSE;
-        if (isset($_GET["type"])) {
-            $trans_type = TransactionModel::stringToType($_GET["type"]);
-            if (!$trans_type) {
-                throw new \Error("Invalid transaction type");
-            }
-        }
-        $filterObj->type = TransactionModel::typeToString($trans_type);
-        $params["type"] = $trans_type;
+        $byCurrency = $filterObj->filter == "currency";
+        $params["filter"] = $filterObj->filter;
+        $params["type"] = $filterObj->type;
 
-        // Currency or account
         if ($byCurrency) {
-            if (isset($_GET["curr_id"]) && is_numeric($_GET["curr_id"])) {
-                $curr_id = intval($_GET["curr_id"]);
-                if (!$currModel->isExist($curr_id)) {
-                    throw new \Error("Currency not found");
-                }
-            } else { // try to get first currency
-                $curr_id = $currModel->getIdByPos(0);
-                if (!$curr_id) {
-                    throw new \Error("No currencies available");
-                }
-            }
-            $params["curr_id"] = $curr_id;
-            $filterObj->curr_id = $curr_id;
+            $params["curr_id"] = $filterObj->curr_id;
         } else {
-            if (isset($_GET["acc_id"]) && is_numeric($_GET["acc_id"])) {
-                $acc_id = intval($_GET["acc_id"]);
-                if (!$accModel->isExist($acc_id)) {
-                    throw new \Error("Account not found");
-                }
-            } else { // try to get first account of user
-                $acc_id = $accModel->getIdByPos(0);
-                if (!$acc_id) {
-                    throw new \Error("No accounts available");
-                }
-            }
-            $params["acc_id"] = $acc_id;
-            $filterObj->acc_id = $acc_id;
+            $params["acc_id"] = $filterObj->acc_id;
         }
 
-        // Group type
-        $groupTypes = ["None", "Day", "Week", "Month", "Year"];
-        $groupType_id = 0;
-        if (isset($_GET["group"])) {
-            $requestedGroup = strtolower($_GET["group"]);
-            foreach ($groupTypes as $index => $grtype) {
-                if ($requestedGroup == strtolower($grtype)) {
-                    $groupType_id = $index;
-                    break;
-                }
-            }
-            if ($index != 0) {
-                $params["group"] = $groupType_id;
-                $filterObj->group = $requestedGroup;
-            }
+        if (isset($filterObj->group)) {
+            $params["group"] = TransactionModel::getHistogramGroupTypeByName($filterObj->group);
         }
 
-        $stDate = (isset($_GET["stdate"]) ? $_GET["stdate"] : null);
-        $endDate = (isset($_GET["enddate"]) ? $_GET["enddate"] : null);
-        if (!is_null($stDate) && !is_null($endDate)) {
-            $params["startDate"] = $stDate;
-            $params["endDate"] = $endDate;
-            $filterObj->stdate = $stDate;
-            $filterObj->enddate = $endDate;
+        if (isset($filterObj->stdate) && isset($filterObj->enddate)) {
+            $params["startDate"] = $filterObj->stdate;
+            $params["endDate"] = $filterObj->enddate;
         }
 
         $res->histogram = $this->model->getHistogramSeries($params);

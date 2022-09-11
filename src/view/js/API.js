@@ -72,6 +72,10 @@ export const API = {
         async setPos(id, pos) {
             return apiPost('transaction/setpos', { id, pos });
         },
+
+        async statistics(options = {}) {
+            return apiGet('transaction/statistics', options);
+        },
     },
 
     import: {

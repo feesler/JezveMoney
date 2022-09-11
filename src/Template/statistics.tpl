@@ -65,7 +65,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
 
                             <div class="filter-item std_margin">
-                                <h3 class="filter-item__title">Type</h3>
+                                <h3 class="filter-item__title">Group by</h3>
                                 <select id="groupsel">
 <?php	foreach($groupTypes as $val => $grtype) {	?>
 <?php		if ($val == $groupType_id) {		?>
@@ -99,9 +99,7 @@ include(TPL_PATH."commonhdr.tpl");	?>
                         </div>
 
                         <div id="chart" class="stat-histogram">
-<?php	if (!$statArr || !is_array($statArr->values) || !count($statArr->values)) {	?>
-                            <span class="nodata-message">No results found.</span>
-<?php	}		?>
+                            <span class="nodata-message" hidden>No results found.</span>
                         </div>
                     </div>
                 </div>
