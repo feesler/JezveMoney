@@ -55,11 +55,11 @@
   }
 
   .iconlink .iconlink__icon {
-    border-color: #dddddd;
+    border-color: var(--main-text-color);
   }
 
   .iconlink .iconlink__icon-content {
-    fill: #dddddd;
+    fill: var(--main-text-color);
   }
 
   .iconlink .iconlink__content {
@@ -132,7 +132,7 @@
 
     /* Clear and toggle buttons */
     --dd-btn-fill: #888888;
-    --dd-btn-hover-fill: #dddddd;
+    --dd-btn-hover-fill: var(--main-text-color);
 
     /* Disabled component */
     --dd-disabled-bg: var(--input-disabled-bg-color);
@@ -187,7 +187,7 @@
   }
 
   .filter-icon {
-    fill: #dddddd;
+    fill: var(--main-text-color);
   }
 
   /* Transaction list item */
@@ -207,7 +207,7 @@
 
   /* Bar chart */
   .charts svg text tspan {
-    fill: #dddddd;
+    fill: var(--main-text-color);
   }
 
   /* Profile view */
@@ -448,7 +448,7 @@
     }
 
     .iconlink:hover .iconlink__icon {
-      background-color: #dddddd;
+      background-color: var(--main-text-color);
     }
 
     .iconlink > *:hover .iconlink__icon,
@@ -461,7 +461,7 @@
     }
 
     .swap-btn:hover .swap-icon {
-      fill: #dddddd;
+      fill: var(--main-text-color);
     }
 
     .import-form .btn:hover,
