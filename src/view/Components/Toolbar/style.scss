@@ -66,7 +66,7 @@
     min-height: 0;
     height: auto;
     width: 100%;
-    left: 0;
+    left: 200px;
     right: 0;
     top: auto;
     bottom: 0;
@@ -79,9 +79,6 @@
       color: #ffffff;
       background-color: #44aaff;
       position: static;
-      margin: 0 auto;
-      max-width: 824px;
-      min-width: 200px;
     }
 
     .sidebar__controls,
