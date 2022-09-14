@@ -37,23 +37,23 @@ export class TransactionListItem extends Component {
     }
 
     initClassic() {
-        this.titleElem = ce('div', { className: 'trans-list__item-title' });
-        this.amountElem = ce('div', { className: 'trans-list__item-content' });
-        this.dateCommentElem = ce('div', { className: 'trans-list__item-details' });
-        this.contentElem = ce('div', { className: 'trans-list__item' }, [
+        this.titleElem = ce('div', { className: 'trans-item__title' });
+        this.amountElem = ce('div', { className: 'trans-item__content' });
+        this.dateCommentElem = ce('div', { className: 'trans-item__details' });
+        this.contentElem = ce('div', { className: 'trans-item' }, [
             this.titleElem,
             this.amountElem,
             this.dateCommentElem,
         ]);
 
-        this.elem = ce('div', { className: 'trans-list__item-wrapper' }, this.contentElem);
+        this.elem = ce('div', { className: 'trans-item__wrapper' }, this.contentElem);
     }
 
     initDetails() {
-        this.titleElem = ce('div', { className: 'trans-list__item-title' });
-        this.amountElem = ce('div', { className: 'trans-list__item-content' });
-        this.balanceElem = ce('div', { className: 'tritem_balance' });
-        this.dateElem = ce('div', { className: 'trans-list__item-details' });
+        this.titleElem = ce('div', { className: 'trans-item__title' });
+        this.amountElem = ce('div', { className: 'trans-item__content' });
+        this.balanceElem = ce('div', { className: 'trans-item__balance' });
+        this.dateElem = ce('div', { className: 'trans-item__details' });
         this.commentElem = ce('div');
 
         this.contentElem = ce('tr', {}, [
@@ -64,7 +64,7 @@ export class TransactionListItem extends Component {
             ce('td', {}, ce('div', { className: 'ellipsis-cell' }, this.commentElem)),
         ]);
 
-        this.elem = ce('tbody', { className: 'trans-list__item-wrapper' }, this.contentElem);
+        this.elem = ce('tbody', { className: 'trans-item__wrapper' }, this.contentElem);
     }
 
     formatAccounts(item) {
@@ -203,16 +203,16 @@ export class TransactionListItem extends Component {
             this.dateCommentElem.appendChild(ce('span', { textContent: item.date }));
             if (item.comment !== '') {
                 this.dateCommentElem.appendChild(ce('span', {
-                    className: 'trans-list__item-comment',
+                    className: 'trans-item__comment',
                     textContent: item.comment,
                 }));
             }
         }
 
         if (state.selected) {
-            this.contentElem.classList.add('trans-list__item_selected');
+            this.contentElem.classList.add('trans-item_selected');
         } else {
-            this.contentElem.classList.remove('trans-list__item_selected');
+            this.contentElem.classList.remove('trans-item_selected');
         }
     }
 }

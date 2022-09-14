@@ -8,7 +8,7 @@ import './style.scss';
 
 /** CSS classes */
 const TILE_CLASS = 'tile';
-const WIDE_CLASS = 'tile--wide';
+const WIDE_CLASS = 'tile_wide';
 const TITLE_CLASS = 'tile__title';
 const SUBTITLE_CLASS = 'tile__subtitle';
 const ICON_CLASS = 'tile__icon';

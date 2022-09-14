@@ -192,31 +192,31 @@
   /* Transaction list item */
   .trans-list_details td > div,
   table.trans-list-items td > div,
-  .trans-list_details tr.trans-list__item_selected > td > div {
+  .trans-list_details tr.trans-item_selected > td > div {
     background-color: var(--alt-bg-color);
   }
 
-  .trans-list__item-comment {
+  .trans-item__comment {
     border-left-color: #808080;
   }
 
-  .trans-list_details .trans-list__item-comment,
-  table.trans-list-items .trans-list__item-comment {
+  .trans-list_details .trans-item__comment,
+  table.trans-list-items .trans-item__comment {
     color: #808080;
   }
 
-  .trans-list__item,
-  div.trans-list__item_selected {
+  .trans-item,
+  div.trans-item_selected {
     background-color: var(--alt-bg-color);
   }
 
-  .tritem_balance,
-  .trans-list__item-title,
-  .trans-list__item-content {
+  .trans-item__balance,
+  .trans-item__title,
+  .trans-item__content {
     color: var(--main-text-color);
   }
 
-  .trans-list__item-details {
+  .trans-item__details {
     color: #808080;
   }
 

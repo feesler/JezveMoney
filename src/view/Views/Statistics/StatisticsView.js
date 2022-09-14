@@ -84,7 +84,7 @@ class StatisticsView extends View {
         this.filterTypeDropDown = DropDown.create({
             elem: 'filter_type',
             onitemselect: (obj) => this.onFilterSel(obj),
-            className: 'dd__fullwidth',
+            className: 'dd_fullwidth',
         });
 
         this.accountField = ge('acc_block');
@@ -93,7 +93,7 @@ class StatisticsView extends View {
         this.currencyDropDown = DropDown.create({
             elem: 'curr_id',
             onitemselect: (obj) => this.onCurrencySel(obj),
-            className: 'dd__fullwidth',
+            className: 'dd_fullwidth',
         });
 
         window.app.initCurrencyList(this.currencyDropDown);
@@ -105,7 +105,7 @@ class StatisticsView extends View {
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
             onitemselect: (obj) => this.onAccountSel(obj),
-            className: 'dd__fullwidth',
+            className: 'dd_fullwidth',
         });
 
         window.app.initAccountsList(this.accountDropDown);
@@ -117,7 +117,7 @@ class StatisticsView extends View {
         this.groupDropDown = DropDown.create({
             elem: 'groupsel',
             onitemselect: (obj) => this.onGroupSel(obj),
-            className: 'dd__fullwidth',
+            className: 'dd_fullwidth',
         });
 
         this.datePickerBtn = IconLink.fromElement({

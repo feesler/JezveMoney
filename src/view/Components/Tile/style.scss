@@ -21,11 +21,11 @@
   cursor: pointer;
 }
 
-.tile--wide {
+.tile_wide {
   width: calc(var(--tile-size) * 2 + var(--tile-gap));
 }
 
-.tile--selected::after {
+.tile_selected::after {
   content: "";
   display: block;
   position: absolute;

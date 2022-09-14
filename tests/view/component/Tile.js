@@ -26,7 +26,7 @@ export class Tile extends TestComponent {
 
         res.title = await prop(res.titleElem, 'textContent');
 
-        res.isActive = await hasClass(this.elem, 'tile--selected');
+        res.isActive = await hasClass(this.elem, 'tile_selected');
 
         res.iconElem = await query(this.elem, '.tile__icon > svg');
         if (res.iconElem) {

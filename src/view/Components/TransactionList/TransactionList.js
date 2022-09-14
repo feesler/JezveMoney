@@ -66,8 +66,8 @@ export class TransactionList extends Component {
                 oninsertat: (elem, ref) => this.onSort(elem, ref),
                 elem: this.elem,
                 group: 'transactions',
-                selector: '.trans-list__item-wrapper',
-                placeholderClass: 'trans-list__item-placeholder',
+                selector: '.trans-item__wrapper',
+                placeholderClass: 'trans-item_placeholder',
                 copyWidth: true,
                 table: (this.state.mode === 'details'),
             });
@@ -89,7 +89,7 @@ export class TransactionList extends Component {
      * @param {Element} elem - element to start looking from
      */
     findListItemElement(elem) {
-        const selector = (this.state.mode === 'details') ? 'tr' : '.trans-list__item';
+        const selector = (this.state.mode === 'details') ? 'tr' : '.trans-item';
 
         if (!elem) {
             return null;

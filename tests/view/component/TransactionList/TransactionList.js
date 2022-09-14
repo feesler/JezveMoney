@@ -16,7 +16,7 @@ export class TransactionList extends TestComponent {
 
         res.items = [];
         res.details = await hasClass(this.elem, 'trans-list_details');
-        const itemSelector = (res.details) ? 'tr' : '.trans-list__item-wrapper > div';
+        const itemSelector = (res.details) ? 'tr' : '.trans-item__wrapper > div';
         const listItems = await queryAll(this.elem, itemSelector);
         if (
             !listItems

@@ -39,7 +39,7 @@ class Tile extends TemplateComponent
             $data["subtitle"] = implode("<br>", $escapedLines);
 
             if ($subtitleLength > SUBTITLE_LIMIT) {
-                $classNames[] = "tile--wide";
+                $classNames[] = "tile_wide";
             }
         }
 
