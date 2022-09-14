@@ -14,7 +14,7 @@ const SUBTITLE_CLASS = 'tile__subtitle';
 const ICON_CLASS = 'tile__icon';
 const ICON_CONTENT_CLASS = 'tile__icon-content';
 
-const SUBTITLE_LIMIT = 13;
+const SUBTITLE_LIMIT = 11;
 
 /**
  * Tile component
