@@ -191,33 +191,17 @@
   }
 
   /* Transaction list item */
-  .trans-list_details td > div,
-  table.trans-list-items td > div,
-  .trans-list_details tr.trans-item_selected > td > div {
-    background-color: #505050;
-  }
-
-  .trans-item__comment {
-    border-left-color: #b0b0b0;
-  }
-
-  .trans-list_details .trans-item__comment,
-  table.trans-list-items .trans-item__comment {
-    color: var(--main-text-color);
-  }
-
-  .trans-item,
-  div.trans-item_selected {
+  .trans-item {
     background-color: #505050;
   }
 
   .trans-item__balance,
-  .trans-item__title,
-  .trans-item__content {
+  .trans-item__title {
     color: var(--main-text-color);
   }
 
-  .trans-item__details {
+  .trans-item__date,
+  .trans-item__comment {
     color: #b0b0b0;
   }
 

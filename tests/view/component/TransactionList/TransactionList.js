@@ -1,5 +1,6 @@
 import {
     TestComponent,
+    query,
     queryAll,
     prop,
     hasClass,
@@ -11,18 +12,14 @@ import { asyncMap } from '../../../common.js';
 export class TransactionList extends TestComponent {
     async parseContent() {
         const res = {
+            items: [],
             renderTime: await prop(this.elem, 'dataset.time'),
+            details: await hasClass(this.elem, 'trans-list_details'),
+            noDataMessage: await query(this.elem, '.nodata-message'),
         };
 
-        res.items = [];
-        res.details = await hasClass(this.elem, 'trans-list_details');
-        const itemSelector = (res.details) ? 'tr' : '.trans-item__wrapper > div';
-        const listItems = await queryAll(this.elem, itemSelector);
-        if (
-            !listItems
-            || !listItems.length
-            || (listItems.length === 1 && await hasClass(listItems[0], 'nodata-message'))
-        ) {
+        const listItems = await queryAll(this.elem, '.trans-item');
+        if (listItems.length === 0) {
             return res;
         }
 

@@ -1,6 +1,5 @@
 import {
     ce,
-    addChilds,
     removeChilds,
     Component,
 } from 'jezvejs';
@@ -10,6 +9,20 @@ import {
     TRANSFER,
     DEBT,
 } from '../../js/model/Transaction.js';
+import './style.scss';
+
+/** CSS classes */
+export const TRANS_ITEM_CLASS = 'trans-item';
+const TITLE_CLASS = 'trans-item__title';
+const AMOUNT_CLASS = 'trans-item__amount';
+const DATE_CLASS = 'trans-item__date';
+const BALANCE_CLASS = 'trans-item__balance';
+const BALANCE_VALUE_CLASS = 'trans-item__balance-value';
+const COMMENT_CLASS = 'trans-item__comment';
+const AMOUNT_RESULT_CLASS = 'trans-item__amount-result';
+const DATE_COMMENT_CLASS = 'trans-item__date-comment';
+const DETAILS_CLASS = 'trans-item_details';
+const SELECTED_CLASS = 'trans-item_selected';
 
 /**
  * Transaction list item component
@@ -37,34 +50,47 @@ export class TransactionListItem extends Component {
     }
 
     initClassic() {
-        this.titleElem = ce('div', { className: 'trans-item__title' });
-        this.amountElem = ce('div', { className: 'trans-item__content' });
-        this.dateCommentElem = ce('div', { className: 'trans-item__details' });
-        this.contentElem = ce('div', { className: 'trans-item' }, [
+        this.titleElem = ce('div', { className: TITLE_CLASS });
+        this.amountElem = ce('div', { className: AMOUNT_CLASS });
+        this.dateElem = ce('div', { className: DATE_CLASS });
+        this.commentElem = ce('div', { className: COMMENT_CLASS });
+        this.dateCommentElem = ce(
+            'div',
+            { className: DATE_COMMENT_CLASS },
+            [this.dateElem, this.commentElem],
+        );
+
+        this.elem = ce('div', { className: TRANS_ITEM_CLASS }, [
             this.titleElem,
             this.amountElem,
             this.dateCommentElem,
         ]);
-
-        this.elem = ce('div', { className: 'trans-item__wrapper' }, this.contentElem);
     }
 
     initDetails() {
-        this.titleElem = ce('div', { className: 'trans-item__title' });
-        this.amountElem = ce('div', { className: 'trans-item__content' });
-        this.balanceElem = ce('div', { className: 'trans-item__balance' });
-        this.dateElem = ce('div', { className: 'trans-item__details' });
-        this.commentElem = ce('div');
+        this.titleElem = ce('div', { className: TITLE_CLASS });
 
-        this.contentElem = ce('tr', {}, [
-            ce('td', {}, ce('div', { className: 'ellipsis-cell' }, this.titleElem)),
-            ce('td', {}, this.amountElem),
-            ce('td', {}, this.balanceElem),
-            ce('td', {}, this.dateElem),
-            ce('td', {}, ce('div', { className: 'ellipsis-cell' }, this.commentElem)),
+        this.amountElem = ce('div', { className: AMOUNT_CLASS });
+        this.balanceElem = ce('div', { className: BALANCE_CLASS });
+        this.amountResultElem = ce(
+            'div',
+            { className: AMOUNT_RESULT_CLASS },
+            [this.amountElem, this.balanceElem],
+        );
+
+        this.dateElem = ce('div', { className: DATE_CLASS });
+        this.commentElem = ce('div', { className: COMMENT_CLASS });
+        this.dateCommentElem = ce(
+            'div',
+            { className: DATE_COMMENT_CLASS },
+            [this.dateElem, this.commentElem],
+        );
+
+        this.elem = ce('div', { className: `${TRANS_ITEM_CLASS} ${DETAILS_CLASS}` }, [
+            this.titleElem,
+            this.amountResultElem,
+            this.dateCommentElem,
         ]);
-
-        this.elem = ce('tbody', { className: 'trans-item__wrapper' }, this.contentElem);
     }
 
     formatAccounts(item) {
@@ -175,44 +201,32 @@ export class TransactionListItem extends Component {
             throw new Error('Invalid transaction object');
         }
 
-        this.contentElem.setAttribute('data-id', item.id);
+        this.elem.setAttribute('data-id', item.id);
 
         const accountTitle = this.formatAccounts(item);
-        removeChilds(this.titleElem);
-        this.titleElem.appendChild(ce('span', { textContent: accountTitle }));
+        this.titleElem.textContent = accountTitle;
         this.titleElem.setAttribute('title', accountTitle);
 
-        const amountText = this.formatAmount(item);
-        removeChilds(this.amountElem);
-        this.amountElem.appendChild(ce('span', { textContent: amountText }));
+        this.amountElem.textContent = this.formatAmount(item);
 
         if (state.mode === 'details') {
             const results = this.formatResults(item);
-            const elems = results.map((res) => ce('span', { textContent: res }));
+            const elems = results.map((res) => (
+                ce('span', { className: BALANCE_VALUE_CLASS, textContent: res })
+            ));
             removeChilds(this.balanceElem);
-            addChilds(this.balanceElem, elems);
-
-            removeChilds(this.dateElem);
-            this.dateElem.appendChild(ce('span', { textContent: item.date }));
-
-            removeChilds(this.commentElem);
-            this.commentElem.appendChild(ce('span', { textContent: item.comment }));
-            this.commentElem.setAttribute('title', item.comment);
-        } else {
-            removeChilds(this.dateCommentElem);
-            this.dateCommentElem.appendChild(ce('span', { textContent: item.date }));
-            if (item.comment !== '') {
-                this.dateCommentElem.appendChild(ce('span', {
-                    className: 'trans-item__comment',
-                    textContent: item.comment,
-                }));
-            }
+            this.balanceElem.append(...elems);
         }
 
+        this.dateElem.textContent = item.date;
+
+        this.commentElem.textContent = item.comment;
+        this.commentElem.setAttribute('title', item.comment);
+
         if (state.selected) {
-            this.contentElem.classList.add('trans-item_selected');
+            this.elem.classList.add(SELECTED_CLASS);
         } else {
-            this.contentElem.classList.remove('trans-item_selected');
+            this.elem.classList.remove(SELECTED_CLASS);
         }
     }
 }

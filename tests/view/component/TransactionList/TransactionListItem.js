@@ -21,19 +21,15 @@ export class TransactionListItem extends TestComponent {
         res.id = parseInt(await prop(this.elem, 'dataset.id'), 10);
         res.selected = await hasClass(this.elem, 'trans-item_selected');
 
-        const titleElem = await query(this.elem, '.trans-item__title > span');
+        const titleElem = await query(this.elem, '.trans-item__title');
         assert(titleElem, 'Account title not found');
         res.accountTitle = await prop(titleElem, 'textContent');
 
-        const amountElem = await query(this.elem, '.trans-item__content > span');
+        const amountElem = await query(this.elem, '.trans-item__amount');
         assert(amountElem, 'Amount text not found');
         res.amountText = await prop(amountElem, 'textContent');
 
-        const dateElem = await query(this.elem, '.trans-item__details > *');
-
-        const tagName = await prop(dateElem, 'tagName');
-        assert(dateElem && tagName === 'SPAN', 'Date element not found');
-
+        const dateElem = await query(this.elem, '.trans-item__date');
         res.dateFmt = await prop(dateElem, 'textContent');
 
         const commentElem = await query(this.elem, '.trans-item__comment');

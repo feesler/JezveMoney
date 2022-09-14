@@ -200,12 +200,16 @@ class TransactionListView extends View {
      * @param {number} newPos  - new position of transaction
      */
     async sendChangePosRequest(transactionId, newPos) {
+        this.startLoading();
+
         try {
             await API.transaction.setPos(transactionId, newPos);
             this.list.setPosition(transactionId, newPos);
         } catch (e) {
             this.cancelPosChange(transactionId);
         }
+
+        this.stopLoading();
     }
 
     /**
