@@ -1,8 +1,4 @@
-import {
-    ce,
-    formatDate,
-    Component,
-} from 'jezvejs';
+import { ce, Component } from 'jezvejs';
 import './style.scss';
 
 /** CSS classes */
@@ -61,7 +57,7 @@ export class OriginalImportData extends Component {
     render() {
         const dataTable = [
             [COL_MAIN, this.props.mainAccount.name],
-            [COL_DATE, formatDate(new Date(this.props.date))],
+            [COL_DATE, window.app.formatDate(new Date(this.props.date))],
             [COL_TR_AMOUNT, this.props.transactionAmount],
             [COL_TR_CURRENCY, this.props.transactionCurrency],
             [COL_ACC_AMOUNT, this.props.accountAmount],

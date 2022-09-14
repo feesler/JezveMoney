@@ -6,7 +6,6 @@ import {
     insertAfter,
     isDate,
     show,
-    formatDate,
     Histogram,
     DatePicker,
     DropDown,
@@ -198,8 +197,8 @@ class StatisticsView extends View {
 
         this.selDateRange = range;
         this.datePicker.hide();
-        const start = formatDate(range.start);
-        const end = formatDate(range.end);
+        const start = window.app.formatDate(range.start);
+        const end = window.app.formatDate(range.end);
 
         this.dateInput.value = `${start} - ${end}`;
     }
@@ -212,8 +211,8 @@ class StatisticsView extends View {
             return;
         }
 
-        this.state.filter.stdate = formatDate(this.selDateRange.start);
-        this.state.filter.enddate = formatDate(this.selDateRange.end);
+        this.state.filter.stdate = window.app.formatDate(this.selDateRange.start);
+        this.state.filter.enddate = window.app.formatDate(this.selDateRange.end);
 
         this.requestData(this.state.filter);
     }
@@ -225,7 +224,7 @@ class StatisticsView extends View {
         if (!this.datePicker) {
             this.datePicker = DatePicker.create({
                 relparent: this.datePickerWrapper.parentNode,
-                locales: 'en',
+                locales: window.app.datePickerLocale,
                 range: true,
                 onrangeselect: (range) => this.onRangeSelect(range),
                 onhide: () => this.onDatePickerHide(),

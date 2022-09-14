@@ -4,7 +4,6 @@ import {
     show,
     isDate,
     setEvents,
-    formatDate,
     throttle,
     Collapsible,
     DropDown,
@@ -376,8 +375,8 @@ class TransactionListView extends View {
 
         this.state.selDateRange = range;
         this.datePicker.hide();
-        const start = formatDate(range.start);
-        const end = formatDate(range.end);
+        const start = window.app.formatDate(range.start);
+        const end = window.app.formatDate(range.end);
 
         this.dateInput.value = `${start} - ${end}`;
     }
@@ -390,8 +389,8 @@ class TransactionListView extends View {
             return;
         }
 
-        const newStartDate = formatDate(this.state.selDateRange.start);
-        const newEndDate = formatDate(this.state.selDateRange.end);
+        const newStartDate = window.app.formatDate(this.state.selDateRange.start);
+        const newEndDate = window.app.formatDate(this.state.selDateRange.end);
 
         if (this.state.filter.stdate === newStartDate
             && this.state.filter.enddate === newEndDate) {
@@ -425,7 +424,7 @@ class TransactionListView extends View {
         if (!this.datePicker) {
             this.datePicker = DatePicker.create({
                 relparent: this.datePickerWrapper.parentNode,
-                locales: 'en',
+                locales: window.app.datePickerLocale,
                 range: true,
                 onrangeselect: (range) => this.onRangeSelect(range),
                 onhide: () => this.onDatePickerHide(),

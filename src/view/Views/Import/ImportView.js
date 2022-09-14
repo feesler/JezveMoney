@@ -9,7 +9,6 @@ import {
     enable,
     setEmptyClick,
     removeEmptyClick,
-    formatDate,
     Sortable,
     DropDown,
     Checkbox,
@@ -273,8 +272,8 @@ class ImportView extends View {
         // Prepare request data
         const reqParams = {
             count: 0,
-            stdate: formatDate(new Date(importedDateRange.start)),
-            enddate: formatDate(new Date(importedDateRange.end)),
+            stdate: window.app.formatDate(new Date(importedDateRange.start)),
+            enddate: window.app.formatDate(new Date(importedDateRange.end)),
             acc_id: this.state.mainAccount.id,
         };
 

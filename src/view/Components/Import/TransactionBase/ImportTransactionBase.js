@@ -3,7 +3,6 @@ import {
     re,
     copyObject,
     isFunction,
-    formatDate,
     Component,
     Collapsible,
 } from 'jezvejs';
@@ -110,7 +109,7 @@ export class ImportTransactionBase extends Component {
             this.setDestAmount(Math.abs(accAmount));
         }
 
-        this.setDate(formatDate(new Date(data.date)));
+        this.setDate(window.app.formatDate(new Date(data.date)));
         this.setComment(data.comment);
     }
 

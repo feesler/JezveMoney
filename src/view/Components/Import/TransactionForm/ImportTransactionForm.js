@@ -4,7 +4,6 @@ import {
     enable,
     insertAfter,
     checkDate,
-    formatDate,
     Checkbox,
     DatePicker,
     DropDown,
@@ -67,7 +66,7 @@ const defaultProps = {
     sourceAmount: '',
     destAmount: '',
     personId: 0,
-    date: formatDate(new Date()),
+    date: null,
     comment: '',
     onEnable: null,
     onRemove: null,
@@ -92,9 +91,11 @@ export class ImportTransactionForm extends ImportTransactionBase {
             ...defaultProps,
             ...this.props,
         };
+        if (this.props.date == null) {
+            this.props.date = window.app.formatDate(new Date());
+        }
 
         const { mainAccount } = this.props;
-
         const state = {
             mainAccount,
             ...this.props,
@@ -459,7 +460,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
 
     /** DatePicker select event handler */
     onDateSelect(date) {
-        const dateFmt = formatDate(date);
+        const dateFmt = window.app.formatDate(date);
         this.setDate(dateFmt);
         this.datePicker.hide();
         this.clearInvalid();
@@ -572,7 +573,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         if (!this.datePicker) {
             this.datePicker = DatePicker.create({
                 relparent: this.dateGroup.elem,
-                locales: 'en',
+                locales: window.app.datePickerLocale,
                 ondateselect: (date) => this.onDateSelect(date),
             });
             insertAfter(this.datePicker.elem, this.dateGroup.elem);
