@@ -48,6 +48,7 @@ class ImportView extends View {
         this.state = {
             transactionRows: [],
             activeItemIndex: -1,
+            originalItemData: null,
             mainAccount: null,
             transCache: null,
             rulesEnabled: true,
@@ -368,6 +369,7 @@ class ImportView extends View {
         this.state.transactionRows.forEach((item) => re(item.elem));
         this.state.transactionRows = [];
         this.state.activeItemIndex = -1;
+        this.state.originalItemData = null;
         this.render(this.state);
     }
 
@@ -383,7 +385,7 @@ class ImportView extends View {
     /**
      * Transaction item remove event handler
      * Return boolean result confirming remove action
-     * @param {ImportTransactionForm} item - item to remove
+     * @param {ImportTransactionBase} item - item to remove
      */
     onRemoveItem(item) {
         const index = this.getItemIndex(item);
@@ -394,9 +396,11 @@ class ImportView extends View {
         this.state.transactionRows.splice(index, 1);
         if (this.state.activeItemIndex === index) {
             this.state.activeItemIndex = -1;
+            this.state.originalItemData = null;
         } else if (index < this.state.activeItemIndex) {
             this.state.activeItemIndex -= 1;
         }
+        re(item.elem);
 
         this.render(this.state);
     }
@@ -465,8 +469,39 @@ class ImportView extends View {
         re(form.elem);
         this.state.transactionRows.splice(activeItemIndex, 1, item);
         this.state.activeItemIndex = -1;
+        this.state.originalItemData = null;
 
         return true;
+    }
+
+    cancelItemEdit() {
+        const { mainAccount, activeItemIndex, originalItemData } = this.state;
+        if (activeItemIndex === -1) {
+            return;
+        }
+
+        const form = this.state.transactionRows[activeItemIndex];
+        if (!originalItemData) {
+            this.onRemoveItem(form);
+            return;
+        }
+
+        const itemProps = this.convertItemDataToProps(originalItemData);
+
+        const item = ImportTransactionItem.create({
+            mainAccount,
+            ...itemProps,
+            originalData: form.getOriginal(),
+            onEnable: (i) => this.onEnableItem(i),
+            onUpdate: (i) => this.onUpdateItem(i),
+            onRemove: (i) => this.onRemoveItem(i),
+        });
+
+        insertAfter(item.elem, form.elem);
+        re(form.elem);
+        this.state.transactionRows.splice(activeItemIndex, 1, item);
+        this.state.activeItemIndex = -1;
+        this.state.originalItemData = null;
     }
 
     /** Add new transaction row and insert it into list */
@@ -484,11 +519,14 @@ class ImportView extends View {
             mainAccount: this.state.mainAccount,
             onEnable: (i) => this.onEnableItem(i),
             onRemove: (i) => this.onRemoveItem(i),
+            onSave: () => this.saveItem(),
+            onCancel: () => this.cancelItemEdit(),
         });
         this.rowsContainer.append(form.elem);
         form.elem.scrollIntoView();
 
         this.state.activeItemIndex = this.state.transactionRows.length;
+        this.state.originalItemData = null;
         this.state.transactionRows.push(form);
 
         this.render(this.state);
@@ -516,12 +554,15 @@ class ImportView extends View {
             originalData: item.getOriginal(),
             onEnable: (i) => this.onEnableItem(i),
             onRemove: (i) => this.onRemoveItem(i),
+            onSave: () => this.saveItem(),
+            onCancel: () => this.cancelItemEdit(),
         });
 
         insertAfter(form.elem, item.elem);
         re(item.elem);
         this.state.transactionRows.splice(index, 1, form);
         this.state.activeItemIndex = index;
+        this.state.originalItemData = { ...data };
     }
 
     /**

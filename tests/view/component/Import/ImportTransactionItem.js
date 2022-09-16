@@ -104,7 +104,7 @@ export class ImportTransactionItem extends TestComponent {
     async updateModel() {
         await super.updateModel();
 
-        this.data = this.getExpectedTransaction(this.model);
+        this.data = this.getExpectedTransaction();
         if (this.data) {
             this.data.enabled = this.model.enabled;
             this.data.mainAccount = this.model.mainAccount;
@@ -239,11 +239,11 @@ export class ImportTransactionItem extends TestComponent {
         return res;
     }
 
-    getExpectedState(model) {
+    getExpectedState(model = this.model) {
         return ImportTransactionItem.getExpectedState(model);
     }
 
-    getExpectedTransaction(model) {
+    getExpectedTransaction(model = this.model) {
         const res = {
             type: ImportTransaction.typeFromString(model.type),
         };
@@ -459,6 +459,7 @@ export class ImportTransactionItem extends TestComponent {
         const destCurrency = App.currency.getItem(item.dest_curr);
 
         const res = {
+            isForm: false,
             enabled: item.enabled,
             typeField: {
                 visible: true,

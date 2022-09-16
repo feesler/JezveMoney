@@ -2,6 +2,7 @@ import {
     ce,
     show,
     enable,
+    isFunction,
     insertAfter,
     checkDate,
     Checkbox,
@@ -41,8 +42,13 @@ const DEL_BUTTON_CLASS = 'delete-btn';
 const DEFAULT_ICON_CLASS = 'icon';
 const DEL_ICON_CLASS = 'delete-icon';
 const CALENDAR_ICON_CLASS = 'calendar-icon';
+/* Form controls */
+const FORM_CONTROLS_CLASS = 'form-controls';
+const SUBMIT_BUTTON_CLASS = 'submit-btn';
+const CANCEL_BUTTON_CLASS = 'cancel-btn';
 
-/** Fields */
+/** Strings */
+/* Fields */
 const TITLE_FIELD_AMOUNT = 'Amount';
 const TITLE_FIELD_SRC_AMOUNT = 'Source amount';
 const TITLE_FIELD_DEST_AMOUNT = 'Destination amount';
@@ -51,9 +57,12 @@ const TITLE_FIELD_COMMENT = 'Comment';
 const TITLE_FIELD_SRC_ACCOUNT = 'Source account';
 const TITLE_FIELD_DEST_ACCOUNT = 'Destination account';
 const TITLE_FIELD_PERSON = 'Person';
-/** Validation messages */
+/* Validation messages */
 const MSG_INCORRECT_AMOUNT = 'Please input correct amount';
 const MSG_INVALID_DATE = 'Please input correct date';
+/* Controls */
+const SAVE_BTN_TITLE = 'Save';
+const CANCEL_BTN_TITLE = 'Cancel';
 
 const defaultProps = {
     enabled: true,
@@ -70,6 +79,8 @@ const defaultProps = {
     comment: '',
     onEnable: null,
     onRemove: null,
+    onSave: null,
+    onCancel: null,
 };
 
 /**
@@ -218,9 +229,38 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.feedbackElem = ce('div', { className: INV_FEEDBACK_CLASS });
         show(this.feedbackElem, false);
 
+        // Save button
+        this.saveBtn = ce(
+            'button',
+            {
+                className: `${DEFAULT_BUTTON_CLASS} ${SUBMIT_BUTTON_CLASS}`,
+                type: 'button',
+                textContent: SAVE_BTN_TITLE,
+            },
+            null,
+            { click: () => this.save() },
+        );
+        // Cancel button
+        this.cancelBtn = ce(
+            'button',
+            {
+                className: `${DEFAULT_BUTTON_CLASS} ${CANCEL_BUTTON_CLASS}`,
+                type: 'button',
+                textContent: CANCEL_BTN_TITLE,
+            },
+            null,
+            { click: () => this.cancel() },
+        );
+
+        this.formControls = window.app.createContainer(FORM_CONTROLS_CLASS, [
+            this.saveBtn,
+            this.cancelBtn,
+        ]);
+
         this.initContainer(CONTAINER_CLASS, [
             this.mainContainer,
             this.feedbackElem,
+            this.formControls,
         ]);
 
         this.render();
@@ -551,6 +591,18 @@ export class ImportTransactionForm extends ImportTransactionBase {
         }
 
         return true;
+    }
+
+    save() {
+        if (isFunction(this.props.onSave)) {
+            this.props.onSave();
+        }
+    }
+
+    cancel() {
+        if (isFunction(this.props.onCancel)) {
+            this.props.onCancel();
+        }
     }
 
     renderCurrency(elem, ddown, currencyId) {

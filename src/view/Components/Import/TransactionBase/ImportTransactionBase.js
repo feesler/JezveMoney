@@ -1,6 +1,5 @@
 import {
     ce,
-    re,
     copyObject,
     isFunction,
     Component,
@@ -133,8 +132,6 @@ export class ImportTransactionBase extends Component {
         if (isFunction(this.props.onRemove)) {
             this.props.onRemove(this);
         }
-
-        re(this.elem);
     }
 
     /** Enable checkbox 'change' event handler */

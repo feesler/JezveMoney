@@ -129,6 +129,8 @@ export class ImportTransactionForm extends TestComponent {
         res.invFeedback = { elem: await query(this.elem, '.invalid-feedback') };
         res.deleteBtn = await query(this.elem, '.delete-btn');
         res.toggleBtn = await query(this.elem, '.toggle-btn');
+        res.saveBtn = await query(this.elem, '.submit-btn');
+        res.cancelBtn = await query(this.elem, '.cancel-btn');
         res.origDataTable = await query(this.elem, '.orig-data-table');
 
         assert(
@@ -140,7 +142,9 @@ export class ImportTransactionForm extends TestComponent {
             && res.dateField
             && res.commentField
             && res.invFeedback.elem
-            && res.deleteBtn,
+            && res.deleteBtn
+            && res.saveBtn
+            && res.cancelBtn,
             'Invalid structure of import item',
         );
 
@@ -768,6 +772,14 @@ export class ImportTransactionForm extends TestComponent {
         return click(this.content.deleteBtn);
     }
 
+    async clickSave() {
+        return click(this.content.saveBtn);
+    }
+
+    async clickCancel() {
+        return click(this.content.cancelBtn);
+    }
+
     /**
      * Convert transaction object to expected state of component
      * Transaction object: { mainAccount, enabled, ...fields of transaction }
@@ -790,6 +802,7 @@ export class ImportTransactionForm extends TestComponent {
         const showDestAmount = isExpense || (!isExpense && isDiff);
 
         const res = {
+            isForm: true,
             enabled: item.enabled,
             typeField: { disabled: !item.enabled },
             srcAmountField: {

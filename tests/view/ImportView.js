@@ -14,9 +14,9 @@ import { IconLink } from './component/IconLink.js';
 import { ImportList } from './component/Import/ImportList.js';
 import { ImportUploadDialog } from './component/Import/ImportUploadDialog.js';
 import { ImportRulesDialog } from './component/Import/ImportRulesDialog.js';
-import { ImportViewSubmitError } from '../error/ImportViewSubmitError.js';
 import { findSimilarTransaction } from '../model/import.js';
 import { App } from '../Application.js';
+import { ImportTransactionItem } from './component/Import/ImportTransactionItem.js';
 
 /** Import view class */
 export class ImportView extends AppView {
@@ -25,6 +25,7 @@ export class ImportView extends AppView {
 
         this.uploadPopupId = '#fileupload_popup';
         this.rulesPopupId = '#rules_popup';
+        this.originalItemData = null;
     }
 
     async parseContent() {
@@ -125,7 +126,7 @@ export class ImportView extends AppView {
         return res;
     }
 
-    getExpectedState(model) {
+    getExpectedState(model = this.model) {
         const showMenuItems = model.enabled && model.menuOpen;
         const res = {
             notAvailMsg: { visible: !model.enabled },
@@ -179,7 +180,7 @@ export class ImportView extends AppView {
         }
 
         this.model.menuOpen = true;
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
         await this.performAction(() => click(this.content.actionsMenuBtn.elem));
 
         return this.checkState();
@@ -198,7 +199,7 @@ export class ImportView extends AppView {
     async launchUploadDialog() {
         this.checkMainState();
 
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
         this.expectedState.uploadDialog = {
             visible: true,
             initialAccount: { value: this.model.mainAccount.toString() },
@@ -244,7 +245,7 @@ export class ImportView extends AppView {
         this.checkUploadState();
 
         this.model.mainAccount = parseInt(val, 10);
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         this.expectedState.itemsList = {};
         this.expectedState.itemsList.items = this.content.itemsList.content.items.map(
@@ -372,7 +373,7 @@ export class ImportView extends AppView {
         const enabledItems = expectedList.items.filter((item) => item.enabled);
         this.model.enabledCount = enabledItems.length;
 
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         this.expectedState.itemsList = expectedList;
         this.expectedState.uploadDialog = { visible: !isValid };
@@ -461,7 +462,7 @@ export class ImportView extends AppView {
     async deleteRule(index) {
         this.checkRulesListState();
 
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.rulesDialog.deleteRule(index));
 
@@ -545,7 +546,7 @@ export class ImportView extends AppView {
     async submitRule() {
         this.checkRulesFormState();
 
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.rulesDialog.submitRule());
 
@@ -555,7 +556,7 @@ export class ImportView extends AppView {
     async cancelRule() {
         this.checkRulesFormState();
 
-        this.expectedState = this.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.rulesDialog.cancelRule());
 
@@ -575,12 +576,64 @@ export class ImportView extends AppView {
         return this.content.rulesDialog.getExpectedRule();
     }
 
+    /**
+     * Validate current form if active
+     * If invalid form expected, then run action and check expected state
+     * @param {Function} action
+     * @returns form validation result
+     */
+    async validateSaveForm(action) {
+        const { formIndex } = this.content.itemsList.model;
+        if (formIndex === -1) {
+            return true;
+        }
+
+        const form = this.content.itemsList.getItem(formIndex);
+        const expectedTransaction = form.getExpectedTransaction(form.model);
+        const isValid = App.state.checkTransactionCorrectness(expectedTransaction);
+        if (isValid) {
+            return true;
+        }
+
+        form.model.invalidated = true;
+        this.model.menuOpen = false;
+        const expected = this.getExpectedState();
+        const itemsExpected = this.content.itemsList.getExpectedState();
+
+        this.expectedState = {
+            ...expected,
+            itemsList: {
+                ...expected.itemsList,
+                ...itemsExpected,
+            },
+        };
+
+        await action();
+
+        this.checkState();
+
+        return false;
+    }
+
     async addItem() {
         this.checkMainState();
         await this.openActionsMenu();
 
-        const expectedList = this.content.itemsList.getExpectedState();
+        const addAction = () => this.performAction(() => this.content.addBtn.click());
+        const isValid = await this.validateSaveForm(addAction);
+        if (!isValid) {
+            return true;
+        }
+
+        const { formIndex } = this.content.itemsList.model;
         const mainAccount = App.state.accounts.getItem(this.model.mainAccount);
+
+        if (formIndex !== -1) {
+            const currentForm = this.content.itemsList.getItem(formIndex);
+            currentForm.model.isForm = false;
+        }
+
+        const expectedList = this.content.itemsList.getExpectedState();
         const expectedItem = {
             isForm: true,
             enabled: true,
@@ -605,11 +658,111 @@ export class ImportView extends AppView {
         this.model.enabledCount += 1;
         this.model.menuOpen = false;
 
-        this.expectedState = this.getExpectedState(this.model);
-        this.expectedState.itemsList = expectedList;
+        this.expectedState = this.getExpectedState();
+        this.expectedState.itemsList.items = expectedList.items;
         this.expectedState.submitBtn.disabled = false;
+        this.originalItemData = null;
 
-        await this.performAction(() => this.content.addBtn.click());
+        await addAction();
+
+        return this.checkState();
+    }
+
+    async updateItemByPos(pos) {
+        this.checkMainState();
+
+        const item = this.content.itemsList.getItem(pos);
+        if (item.content.isForm) {
+            return true;
+        }
+        // Get current form
+        const { formIndex } = this.content.itemsList.model;
+        const updateAction = () => this.runItemAction(pos, { action: 'clickUpdate' });
+
+        const isValid = await this.validateSaveForm(updateAction);
+        if (!isValid) {
+            return true;
+        }
+
+        if (formIndex !== -1) {
+            const currentForm = this.content.itemsList.getItem(formIndex);
+            currentForm.model.isForm = false;
+        }
+
+        const newForm = this.content.itemsList.getItem(pos);
+
+        this.originalItemData = newForm.getExpectedTransaction();
+        this.originalItemData.type = newForm.model.type;
+        this.originalItemData.enabled = newForm.model.enabled;
+        const mainAccount = App.state.accounts.getItem(this.model.mainAccount);
+        this.originalItemData.mainAccount = mainAccount;
+
+        newForm.model.isForm = true;
+        this.expectedState = {
+            itemsList: this.content.itemsList.getExpectedState(),
+        };
+
+        await updateAction();
+
+        return this.checkState();
+    }
+
+    async saveItem() {
+        this.checkMainState();
+
+        const { formIndex } = this.content.itemsList.model;
+        assert(formIndex !== -1, 'Invalid state: import transaction form not available');
+
+        const saveAction = () => this.runItemAction(formIndex, { action: 'clickSave' });
+
+        const isValid = await this.validateSaveForm(saveAction);
+        if (!isValid) {
+            return true;
+        }
+
+        const currentForm = this.content.itemsList.getItem(formIndex);
+        currentForm.model.isForm = false;
+
+        this.expectedState = {
+            itemsList: this.content.itemsList.getExpectedState(),
+        };
+
+        await saveAction();
+
+        return this.checkState();
+    }
+
+    async cancelItem() {
+        this.checkMainState();
+
+        const { formIndex } = this.content.itemsList.model;
+        assert(formIndex !== -1, 'Invalid state: import transaction form not available');
+
+        const cancelAction = () => this.runItemAction(formIndex, { action: 'clickCancel' });
+
+        const isValid = await this.validateSaveForm(cancelAction);
+        if (!isValid) {
+            return true;
+        }
+
+        const expectedList = this.content.itemsList.getExpectedState();
+        if (this.originalItemData) {
+            const expectedItem = ImportTransactionItem.render(this.originalItemData, App.state);
+            expectedList.items[formIndex] = expectedItem;
+        } else {
+            this.model.totalCount -= 1;
+
+            const currentForm = this.content.itemsList.getItem(formIndex);
+            if (currentForm.model.enabled) {
+                this.model.enabledCount += 1;
+            }
+        }
+
+        this.expectedState = this.getExpectedState();
+        this.expectedState.itemsList.items = expectedList.items;
+        this.originalItemData = null;
+
+        await cancelAction();
 
         return this.checkState();
     }
@@ -617,6 +770,8 @@ export class ImportView extends AppView {
     async deleteAllItems() {
         this.checkMainState();
         await this.openActionsMenu();
+
+        this.originalItemData = null;
 
         await this.performAction(() => this.content.clearBtn.click());
     }
@@ -656,8 +811,14 @@ export class ImportView extends AppView {
 
         assert(typeof index !== 'undefined', 'No items specified');
 
+        const { formIndex } = this.content.itemsList.model;
+
         const items = Array.isArray(index) ? index : [index];
         items.sort();
+        if (items.includes(formIndex)) {
+            this.originalItemData = null;
+        }
+
         let removed = 0;
         for (const ind of items) {
             await this.runItemAction(ind - removed, { action: 'clickDelete' });
@@ -668,12 +829,27 @@ export class ImportView extends AppView {
     async submit() {
         this.checkMainState();
 
+        const enabledItems = this.content.itemsList.getEnabledItems();
         const disabled = await prop(this.content.submitBtn.elem, 'disabled');
+        assert(disabled === (enabledItems.length === 0), 'Submit is not available');
         if (disabled) {
-            throw new ImportViewSubmitError('Submit is not available');
+            return true;
         }
 
-        await this.performAction(() => click(this.content.submitBtn.elem));
+        const submitAction = () => this.performAction(() => click(this.content.submitBtn.elem));
+        const isValid = await this.validateSaveForm(submitAction);
+        if (!isValid) {
+            return true;
+        }
+
+        for (const item of enabledItems) {
+            const expectedTransaction = item.getExpectedTransaction(item.model);
+            const createRes = App.state.createTransaction(expectedTransaction);
+            assert(createRes, 'Failed to create transaction');
+        }
+
+        await submitAction();
+
         await waitForFunction(async () => {
             await this.parse();
 
@@ -688,5 +864,17 @@ export class ImportView extends AppView {
 
             return false;
         });
+
+        this.expectedState = {
+            msgPopup: {
+                success: true,
+                message: 'All transactions have been successfully imported',
+            },
+            itemsList: { items: [] },
+        };
+
+        await this.checkState();
+        await this.closeNotification();
+        return true;
     }
 }
