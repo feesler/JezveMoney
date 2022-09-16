@@ -266,7 +266,7 @@
 
   /* Import form */
   .import-form {
-    background-color: #505050;
+    background-color: var(--alt-bg-color);
 
     &.import-form__placeholder {
       border-color: #888888;
@@ -286,10 +286,6 @@
     input[type="text"]:focus {
       border-color: #d0d0d0;
       background-color: #202020;
-    }
-
-    .btn {
-      color: var(--main-text-color);
     }
 
     .icon {
@@ -323,7 +319,7 @@
 
   /* Import item */
   .import-item {
-    background-color: #505050;
+    background-color: var(--alt-bg-color);
 
     &[disabled] {
       background-color: #292929;
@@ -412,7 +408,7 @@
     .collapsible-content {
       color: #bbbbbb;
       border-color: #3c3c3c;
-      background-color: #444444;
+      background-color: #252525;
     }
 
     &[disabled] .collapsible-content {
