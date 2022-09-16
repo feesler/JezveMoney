@@ -11,7 +11,7 @@ import {
     IMPORT_ACTION_SET_ACCOUNT,
     IMPORT_ACTION_SET_PERSON,
 } from '../../../js/model/ImportAction.js';
-import { Field } from '../Field/Field.js';
+import { Field } from '../../Field/Field.js';
 import './style.scss';
 
 /** Strings */

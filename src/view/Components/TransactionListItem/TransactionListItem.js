@@ -9,10 +9,18 @@ import {
     TRANSFER,
     DEBT,
 } from '../../js/model/Transaction.js';
+import { Field } from '../Field/Field.js';
 import './style.scss';
 
 /** CSS classes */
 export const TRANS_ITEM_CLASS = 'trans-item';
+/* Fields */
+const TITLE_FIELD_CLASS = 'trans-item__title-field';
+const AMOUNT_FIELD_CLASS = 'trans-item__amount-field';
+const BALANCE_FIELD_CLASS = 'trans-item__balance-field';
+const DATE_FIELD_CLASS = 'trans-item__date-field';
+const COMMENT_FIELD_CLASS = 'trans-item__comment-field';
+
 const TITLE_CLASS = 'trans-item__title';
 const AMOUNT_CLASS = 'trans-item__amount';
 const DATE_CLASS = 'trans-item__date';
@@ -23,6 +31,16 @@ const AMOUNT_RESULT_CLASS = 'trans-item__amount-result';
 const DATE_COMMENT_CLASS = 'trans-item__date-comment';
 const DETAILS_CLASS = 'trans-item_details';
 const SELECTED_CLASS = 'trans-item_selected';
+
+/** Strings */
+const LABEL_SRC_ACCOUNT = 'Source account';
+const LABEL_DEST_ACCOUNT = 'Destination account';
+const LABEL_SRC_PERSON = 'Source person';
+const LABEL_DEST_PERSON = 'Destination person';
+const LABEL_AMOUNT = 'Amount';
+const LABEL_BALANCE = 'Result balance';
+const LABEL_DATE = 'Date';
+const LABEL_COMMENT = 'Comment';
 
 /**
  * Transaction list item component
@@ -69,28 +87,91 @@ export class TransactionListItem extends Component {
 
     initDetails() {
         this.titleElem = ce('div', { className: TITLE_CLASS });
+        this.srcDestField = Field.create({
+            content: this.titleElem,
+            className: TITLE_FIELD_CLASS,
+        });
 
         this.amountElem = ce('div', { className: AMOUNT_CLASS });
+        this.amountField = Field.create({
+            title: LABEL_AMOUNT,
+            content: this.amountElem,
+            className: AMOUNT_FIELD_CLASS,
+        });
+
         this.balanceElem = ce('div', { className: BALANCE_CLASS });
+        this.balanceField = Field.create({
+            title: LABEL_BALANCE,
+            content: this.balanceElem,
+            className: BALANCE_FIELD_CLASS,
+        });
+
         this.amountResultElem = ce(
             'div',
             { className: AMOUNT_RESULT_CLASS },
-            [this.amountElem, this.balanceElem],
+            [this.amountField.elem, this.balanceField.elem],
         );
 
         this.dateElem = ce('div', { className: DATE_CLASS });
+        this.dateField = Field.create({
+            title: LABEL_DATE,
+            content: this.dateElem,
+            className: DATE_FIELD_CLASS,
+        });
+
         this.commentElem = ce('div', { className: COMMENT_CLASS });
+        this.commentField = Field.create({
+            content: this.commentElem,
+            className: COMMENT_FIELD_CLASS,
+        });
+
         this.dateCommentElem = ce(
             'div',
             { className: DATE_COMMENT_CLASS },
-            [this.dateElem, this.commentElem],
+            [this.dateField.elem, this.commentField.elem],
         );
 
         this.elem = ce('div', { className: `${TRANS_ITEM_CLASS} ${DETAILS_CLASS}` }, [
-            this.titleElem,
+            this.srcDestField.elem,
             this.amountResultElem,
             this.dateCommentElem,
         ]);
+    }
+
+    getDebtType(item) {
+        if (item.type !== DEBT) {
+            throw new Error('Invalid item type');
+        }
+
+        const { profile, accounts } = window.app.model;
+        const srcAcc = accounts.getItem(item.src_id);
+        return (!!srcAcc && srcAcc.owner_id !== profile.owner_id);
+    }
+
+    getTitle(item) {
+        if (item.type === EXPENSE) {
+            return LABEL_SRC_ACCOUNT;
+        }
+        if (item.type === INCOME) {
+            return LABEL_DEST_ACCOUNT;
+        }
+        if (item.type === TRANSFER) {
+            return `${LABEL_SRC_ACCOUNT} → ${LABEL_DEST_ACCOUNT}`;
+        }
+        if (item.type !== DEBT) {
+            throw new Error('Invalid transaction type');
+        }
+
+        const debtType = this.getDebtType(item);
+        const noAccount = ((debtType) ? item.dest_id : item.src_id) === 0;
+        if (noAccount) {
+            return (debtType) ? LABEL_SRC_PERSON : LABEL_DEST_PERSON;
+        }
+
+        return ((debtType)
+            ? `${LABEL_SRC_PERSON} → ${LABEL_DEST_ACCOUNT}`
+            : `${LABEL_SRC_ACCOUNT} → ${LABEL_DEST_PERSON}`
+        );
     }
 
     formatAccounts(item) {
@@ -118,9 +199,8 @@ export class TransactionListItem extends Component {
             throw new Error('Invalid type of transaction');
         }
 
-        const { profile } = window.app.model;
         const personModel = window.app.model.persons;
-        const debtType = (srcAcc && srcAcc.owner_id !== profile.owner_id);
+        const debtType = this.getDebtType(item);
         const personAcc = (debtType) ? srcAcc : destAcc;
         const person = personModel.getItem(personAcc.owner_id);
         if (!person) {
@@ -159,10 +239,7 @@ export class TransactionListItem extends Component {
         }
 
         if (item.type === DEBT) {
-            const { profile } = window.app.model;
-            const accountModel = window.app.model.accounts;
-            const srcAcc = accountModel.getItem(item.src_id);
-            const debtType = (!!srcAcc && srcAcc.owner_id !== profile.owner_id);
+            const debtType = this.getDebtType(item);
             const acc = (debtType) ? item.dest_id : item.src_id;
 
             sign = (!!acc === debtType) ? '+ ' : '- ';
@@ -203,6 +280,11 @@ export class TransactionListItem extends Component {
 
         this.elem.setAttribute('data-id', item.id);
 
+        if (state.mode === 'details') {
+            const scrDestTitle = this.getTitle(item);
+            this.srcDestField.setTitle(scrDestTitle);
+        }
+
         const accountTitle = this.formatAccounts(item);
         this.titleElem.textContent = accountTitle;
         this.titleElem.setAttribute('title', accountTitle);
@@ -220,6 +302,10 @@ export class TransactionListItem extends Component {
 
         this.dateElem.textContent = item.date;
 
+        if (state.mode === 'details') {
+            const commentLabel = (item.comment.length > 0) ? LABEL_COMMENT : null;
+            this.commentField.setTitle(commentLabel);
+        }
         this.commentElem.textContent = item.comment;
         this.commentElem.setAttribute('title', item.comment);
 

@@ -74,6 +74,15 @@
   align-items: baseline;
   row-gap: 2px;
 
+  .field__title {
+    --field-title-font-size: 12px;
+
+    margin-bottom: 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .trans-item__amount-result {
     display: flex;
     flex-flow: column nowrap;
@@ -83,8 +92,9 @@
     overflow: hidden;
   }
 
-  .trans-item__amount,
-  .trans-item__balance {
+  .trans-item__title-field,
+  .trans-item__amount-field,
+  .trans-item__balance-field {
     width: 100%;
   }
 
@@ -104,6 +114,10 @@
   .trans-item__balance-value {
     flex: 1 1 100%;
   }
+
+  .trans-item__comment-field {
+    overflow: hidden;
+  }
 }
 
 @media (min-width: 576px) {
@@ -113,8 +127,8 @@
       column-gap: 10px;
     }
 
-    .trans-item__amount,
-    .trans-item__balance {
+    .trans-item__amount-field,
+    .trans-item__balance-field {
       width: calc((100% - 10px) / 2);
     }
   }
@@ -133,14 +147,14 @@
       font-size: 14px;
     }
 
-    .trans-item__title,
-    .trans-item__amount,
-    .trans-item__balance,
-    .trans-item__date {
+    .trans-item__title-field,
+    .trans-item__amount-field,
+    .trans-item__balance-field,
+    .trans-item__date-field {
       flex: 0 0 auto;
     }
 
-    .trans-item__title {
+    .trans-item__title-field {
       width: 30%;
     }
 
@@ -156,7 +170,7 @@
       justify-content: flex-end;
     }
 
-    .trans-item__comment {
+    .trans-item__comment-field {
       flex: 1 1 auto;
     }
   }

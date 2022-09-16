@@ -12,7 +12,7 @@ import {
 } from 'jezvejs';
 import { fixFloat } from '../../../js/utils.js';
 import { ImportTransactionBase, sourceTypes } from '../TransactionBase/ImportTransactionBase.js';
-import { Field } from '../Field/Field.js';
+import { Field } from '../../Field/Field.js';
 import './style.scss';
 
 /** CSS classes */
