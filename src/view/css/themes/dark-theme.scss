@@ -201,7 +201,9 @@
   }
 
   .trans-item__date,
-  .trans-item__comment {
+  .trans-item__comment,
+  .trans-item__date-field .field__content,
+  .trans-item__comment-field .field__content {
     color: #b0b0b0;
   }
 
