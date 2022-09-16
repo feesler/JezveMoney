@@ -38,10 +38,10 @@ export class PersonView extends AppView {
         res.flagsInp = await query('#flags');
         res.flags = parseInt(await prop(res.flagsInp, 'value'), 10);
 
-        res.submitBtn = await query('.acc_controls .submit-btn');
+        res.submitBtn = await query('.form-controls .submit-btn');
         assert(res.submitBtn, 'Submit button not found');
 
-        res.cancelBtn = await query('.acc_controls .cancel-btn');
+        res.cancelBtn = await query('.form-controls .cancel-btn');
         assert(res.cancelBtn, 'Cancel button not found');
 
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));

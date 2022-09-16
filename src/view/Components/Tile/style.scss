@@ -21,11 +21,11 @@
   cursor: pointer;
 }
 
-.tile--wide {
+.tile_wide {
   width: calc(var(--tile-size) * 2 + var(--tile-gap));
 }
 
-.tile--selected::after {
+.tile_selected::after {
   content: "";
   display: block;
   position: absolute;
@@ -70,12 +70,12 @@
   left: 0;
   right: 0;
   top: 23px;
-  fill: var(--tile-content-color);
 }
 
 .tile__icon-content {
   width: 60px;
   height: 54px;
+  fill: var(--tile-content-color);
 }
 
 @media (hover: hover) {

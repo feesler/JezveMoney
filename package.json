@@ -1,6 +1,6 @@
 {
   "name": "jezve-money",
-  "version": "1.25.0",
+  "version": "1.26.0",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -16,14 +16,11 @@
     "debug": "node --inspect-brk ./tests/index.js",
     "build": "npx webpack --config ./webpack.prod.js",
     "build-dev": "npx webpack --config ./webpack.dev.js",
-    "copy-server": "powershell -c \"cp ./src/Controller,./src/Model,./src/Template,./src/system,./src/api,./src/.htaccess,./src/index.php,./src/favicon.ico,./src/manifest.webmanifest -Destination ./dist -Force -Recurse",
     "copy-admin": "powershell -c \"cp ./src/admin/Controller,./src/admin/Template,./src/admin/.htaccess,./src/admin/index.php -Destination ./dist/admin/ -Force -Recurse\"",
-    "build-admin-themes": "sass src/admin/view/css/themes:dist/admin/view/css/themes",
+    "copy-server": "powershell -c \"cp ./src/Controller,./src/Model,./src/Template,./src/system,./src/api,./src/.htaccess,./src/index.php,./src/favicon.ico,./src/manifest.webmanifest -Destination ./dist -Force -Recurse",
     "copy-client": "powershell -c \"cp ./src/view/img -Destination ./dist/view -Force -Recurse\"",
-    "build-themes": "sass src/view/css/themes:dist/view/css/themes",
-    "copy-admin-all": "npm-run-all copy-admin build-admin-themes",
-    "copy-client-all": "npm-run-all copy-server copy-client build-themes",
-    "copy-dist": "npm-run-all copy-admin-all copy-client-all",
+    "build-themes": "sass src/view/css/themes:dist/view/css/themes src/admin/view/css/themes:dist/admin/view/css/themes",
+    "copy-dist": "npm-run-all copy-admin copy-server copy-client build-themes",
     "update-composer": "powershell -c \"cp ./composer.json -Destination ./dist/; cd ./dist; composer update --no-dev; composer dump-autoload -a --no-dev; rm composer.lock,composer.json\"",
     "postbuild": "npm run copy-dist",
     "postbuild-dev": "npm run copy-dist",
@@ -55,7 +52,7 @@
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-import-resolver-webpack": "^0.13.0",
     "eslint-plugin-import": "^2.22.1",
-    "jezve-test": "^0.20.5",
+    "jezve-test": "^0.20.6",
     "mini-css-extract-plugin": "^2.1.0",
     "npm-run-all": "^4.1.5",
     "postcss-cli": "^8.3.1",
@@ -73,7 +70,7 @@
   "dependencies": {
     "@babel/runtime": "^7.13.9",
     "core-js": "^3.9.1",
-    "jezvejs": "^1.30.1",
+    "jezvejs": "^1.31.3",
     "whatwg-fetch": "^3.6.2"
   }
 }

@@ -132,9 +132,9 @@ class PersonListView extends View {
             const accountId = parseInt(tile.dataset.id, 10);
 
             if (state.selected.visible.isSelected(accountId)) {
-                tile.classList.add('tile--selected');
+                tile.classList.add('tile_selected');
             } else {
-                tile.classList.remove('tile--selected');
+                tile.classList.remove('tile_selected');
             }
         });
 
@@ -143,9 +143,9 @@ class PersonListView extends View {
             const accountId = parseInt(tile.dataset.id, 10);
 
             if (state.selected.hidden.isSelected(accountId)) {
-                tile.classList.add('tile--selected');
+                tile.classList.add('tile_selected');
             } else {
-                tile.classList.remove('tile--selected');
+                tile.classList.remove('tile_selected');
             }
         });
 

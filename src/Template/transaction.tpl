@@ -254,9 +254,9 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
                         </div>
 
-                        <div id="submit_controls" class="acc_controls"<?=hidden(!$trAvailable)?>>
-                            <input id="submitbtn" class="btn submit-btn" type="submit" value="ok">
-                            <a class="btn cancel-btn" href="<?=BASEURL?>">cancel</a>
+                        <div id="submit_controls" class="form-controls"<?=hidden(!$trAvailable)?>>
+                            <input id="submitbtn" class="btn submit-btn" type="submit" value="Submit">
+                            <a class="btn cancel-btn" href="<?=BASEURL?>">Cancel</a>
                         </div>
                         </form>
                     </div>

@@ -1,6 +1,6 @@
 <svg version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 <g>
-<g transform="translate(.5 -1.1004)" stroke-dasharray="186.048, 186.048" stroke-linecap="round" stroke-linejoin="round" stroke-width="23.256">
+<g transform="translate(.5 -1.1004)">
 <path d="m18.775 16.974-4.8438 4.8438-1.4141-1.4141 2.4277-2.4287h-8.7191v-2h8.7206l-2.4292-2.4287 1.4141-1.4141z"/>
 <path d="m4.2254 9.2244 4.8438 4.8438 1.4141-1.4141-2.4277-2.4287h8.7191v-2h-8.7206l2.4292-2.4287-1.4141-1.4141z"/>
 </g>

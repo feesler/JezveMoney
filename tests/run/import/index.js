@@ -12,7 +12,6 @@ import { ImportTransaction } from '../../model/ImportTransaction.js';
 import { ImportList } from '../../view/component/Import/ImportList.js';
 import { ImportTransactionForm } from '../../view/component/Import/ImportTransactionForm.js';
 import { ImportView } from '../../view/ImportView.js';
-import { ImportViewSubmitError } from '../../error/ImportViewSubmitError.js';
 import { ImportTransactionItem } from '../../view/component/Import/ImportTransactionItem.js';
 
 /** Reexport import templates and import rules runners */
@@ -369,35 +368,7 @@ export const updateItem = async (params) => {
         inputComment: 'Input comment',
     };
 
-    const item = App.view.content.itemsList.getItem(params.pos);
-    if (!item.content.isForm) {
-        // Get current form
-        const { formIndex } = App.view.content.itemsList.model;
-        let isValid = true;
-        if (formIndex !== -1) {
-            const form = App.view.content.itemsList.getItem(formIndex);
-            const expectedTransaction = form.getExpectedTransaction(form.model);
-            isValid = App.state.checkTransactionCorrectness(expectedTransaction);
-
-            if (isValid) {
-                const currentForm = App.view.content.itemsList.getItem(formIndex);
-                currentForm.model.isForm = false;
-            }
-        }
-
-        if (isValid) {
-            const newForm = App.view.content.itemsList.getItem(params.pos);
-            newForm.model.isForm = true;
-        }
-
-        App.view.expectedState = {
-            itemsList: App.view.content.itemsList.getExpectedState(),
-        };
-
-        await App.view.runItemAction(params.pos, { action: 'clickUpdate' });
-
-        App.view.checkState();
-    }
+    await App.view.updateItemByPos(params.pos);
 
     const actions = Array.isArray(params.action) ? params.action : [params.action];
     for (const action of actions) {
@@ -435,6 +406,26 @@ export const updateItem = async (params) => {
         itemsList: App.view.content.itemsList.getExpectedState(),
     };
     await test('View state', () => App.view.checkState());
+};
+
+/** Save current import transaction form */
+export const saveItem = async () => {
+    await test('Save import form', async () => {
+        await checkNavigation();
+        await checkViewState('main');
+
+        return App.view.saveItem();
+    });
+};
+
+/** Cancel edit current import transaction form */
+export const cancelItem = async () => {
+    await test('Cancel import form', async () => {
+        await checkNavigation();
+        await checkViewState('main');
+
+        return App.view.cancelItem();
+    });
 };
 
 /**
@@ -496,38 +487,7 @@ export const submit = async () => {
 
         await App.state.fetch();
 
-        const enabledItems = App.view.content.itemsList.getEnabledItems();
-        let isValid = (enabledItems.length > 0);
-        for (const item of enabledItems) {
-            const expectedTransaction = item.getExpectedTransaction(item.model);
-            const createRes = App.state.createTransaction(expectedTransaction);
-            if (!createRes) {
-                isValid = false;
-            }
-        }
-
-        const okNotification = { success: true, message: 'All transactions have been successfully imported' };
-
-        try {
-            await App.view.submit();
-
-            if (isValid) {
-                App.view.expectedState = {
-                    msgPopup: okNotification,
-                    itemsList: { items: [] },
-                };
-            } else {
-                App.view.expectedState = {
-                    itemsList: App.view.content.itemsList.getExpectedState(),
-                };
-            }
-            await App.view.checkState();
-            await App.view.closeNotification();
-        } catch (e) {
-            if (!(e instanceof ImportViewSubmitError) || isValid) {
-                throw e;
-            }
-        }
+        await App.view.submit();
 
         return App.state.fetchAndTest();
     });

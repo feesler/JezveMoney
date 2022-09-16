@@ -21,7 +21,7 @@
                     </div>
 
                     <form method="POST" action="<?=BASEURL."admin/dbinstall/update"?>">
-                    <div class="acc_controls">
+                    <div class="form-controls">
 <?php	if ($currentDBVersion == $latestDBVersion) {		?>
                         <input id="updbtn" class="adm_act_btn" type="submit" value="update" disabled>
 <?php	} else {		?>

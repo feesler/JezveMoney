@@ -6,13 +6,24 @@ const runCreateTests = async () => {
     setBlock('Add item', 2);
 
     await ImportTests.addItem();
+
+    setBlock('Verify new item not created while invalid form is active', 2);
+    await ImportTests.addItem();
+
     await ImportTests.updateItem({
         pos: 0,
-        action: [
-            { action: 'inputDestAmount', data: '1' },
-            { action: 'inputDate', data: App.dates.now },
-        ],
+        action: { action: 'inputDestAmount', data: '1' },
     });
+
+    setBlock('Save item', 2);
+    await ImportTests.saveItem();
+
+    setBlock('Cancel item edit', 2);
+    await ImportTests.updateItem({
+        pos: 0,
+        action: { action: 'inputDestAmount', data: '2' },
+    });
+    await ImportTests.cancelItem();
 };
 
 const runDeleteTests = async () => {

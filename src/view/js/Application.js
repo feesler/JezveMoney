@@ -2,6 +2,8 @@ import {
     ge,
     ce,
     svg,
+    isDate,
+    formatDate,
     Popup,
 } from 'jezvejs';
 import { parseCookies, setCookie } from './utils.js';
@@ -29,6 +31,11 @@ export class Application {
         if (!this.props.view) {
             this.props.view = {};
         }
+
+        this.config = {
+            datePickerLocale: 'en',
+            dateFormatLocale: 'ru',
+        };
 
         // Setup models
         this.model = {};
@@ -78,6 +85,18 @@ export class Application {
 
     get message() {
         return this.props.message;
+    }
+
+    get datePickerLocale() {
+        return this.config.datePickerLocale;
+    }
+
+    formatDate(date) {
+        if (!isDate(date)) {
+            throw new Error('Invalid date object');
+        }
+
+        return formatDate(date, this.config.dateFormatLocale);
     }
 
     getThemeCookie() {

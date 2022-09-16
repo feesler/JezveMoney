@@ -6,7 +6,10 @@ import {
     Selection,
     Sortable,
 } from 'jezvejs';
-import { TransactionListItem } from '../TransactionListItem/TransactionListItem.js';
+import {
+    TRANS_ITEM_CLASS,
+    TransactionListItem,
+} from '../TransactionListItem/TransactionListItem.js';
 import './style.scss';
 
 /** Strings */
@@ -16,6 +19,8 @@ const MSG_NO_TRANSACTIONS = 'No transactions found.';
 const LIST_ITEMS_CLASS = 'trans-list-items';
 const DETAILS_CLASS = 'trans-list_details';
 const NO_DATA_CLASS = 'nodata-message';
+/** Strings */
+const ITEM_SELECTOR = `.${TRANS_ITEM_CLASS}`;
 
 const defaultProps = {
     items: [],
@@ -66,10 +71,9 @@ export class TransactionList extends Component {
                 oninsertat: (elem, ref) => this.onSort(elem, ref),
                 elem: this.elem,
                 group: 'transactions',
-                selector: '.trans-list__item-wrapper',
-                placeholderClass: 'trans-list__item-placeholder',
+                selector: ITEM_SELECTOR,
+                placeholderClass: 'trans-item_placeholder',
                 copyWidth: true,
-                table: (this.state.mode === 'details'),
             });
         }
 
@@ -89,15 +93,13 @@ export class TransactionList extends Component {
      * @param {Element} elem - element to start looking from
      */
     findListItemElement(elem) {
-        const selector = (this.state.mode === 'details') ? 'tr' : '.trans-list__item';
-
         if (!elem) {
             return null;
         }
 
-        const res = elem.querySelector(selector);
+        const res = elem.querySelector(ITEM_SELECTOR);
         if (!res) {
-            return elem.closest(selector);
+            return elem.closest(ITEM_SELECTOR);
         }
 
         return res;
@@ -336,18 +338,14 @@ export class TransactionList extends Component {
 
         removeChilds(this.elem);
         if (elems.length) {
-            const itemsContainer = (state.mode === 'details')
-                ? ce('table', { className: LIST_ITEMS_CLASS }, elems)
-                : ce('div', { className: LIST_ITEMS_CLASS }, elems);
-
-            this.elem.appendChild(itemsContainer);
+            this.elem.append(ce('div', { className: LIST_ITEMS_CLASS }, elems));
             if (state.mode === 'details') {
                 this.elem.classList.add(DETAILS_CLASS);
             } else {
                 this.elem.classList.remove(DETAILS_CLASS);
             }
         } else {
-            this.elem.appendChild(ce('span', {
+            this.elem.append(ce('span', {
                 className: NO_DATA_CLASS,
                 textContent: MSG_NO_TRANSACTIONS,
             }));

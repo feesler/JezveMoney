@@ -162,7 +162,7 @@
         <div id="readStateForm" class="request-data-form">
         <h3>Read state</h3>
         <form action="<?=BASEURL?>api/state" method="list">
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input id="readstatebtn" class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -190,7 +190,7 @@
                     <option value="hidden">Hidden</option>
                 </select>
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -202,7 +202,7 @@
                 <label for="readaccid">Id</label>
                 <input id="readaccid" class="stretch-input" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input id="readaccbtn" class="adm_act_btn" type="button" value="submit">
             </div>
         </div>
@@ -230,7 +230,7 @@
                 <label for="create_account_flags">Flags (0 - account is visible; 1 - hidden)</label>
                 <input id="create_account_flags" class="stretch-input" name="flags" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -263,7 +263,7 @@
                 <label for="update_account_flags">Flags (0 - account is visible; 1 - hidden)</label>
                 <input id="update_account_flags" class="stretch-input" name="flags" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -275,7 +275,7 @@
             <label for="delaccounts">Accounts (comma separated ids)</label>
             <input id="delaccounts" class="stretch-input" type="text">
         </div>
-        <div class="acc_controls">
+        <div class="form-controls">
             <input id="delaccbtn" class="adm_act_btn" type="button" value="submit">
         </div>
         </div>
@@ -352,7 +352,7 @@
                 </label>
                 <input id="list_trans_search" class="stretch-input" name="search" type="text" value="" disabled>
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -364,7 +364,7 @@
             <label for="read_trans_id">Id</label>
             <input id="read_trans_id" class="stretch-input" type="text">
         </div>
-        <div class="acc_controls">
+        <div class="form-controls">
             <input id="readtransbtn" class="adm_act_btn" type="button" value="submit">
         </div>
         </div>
@@ -412,7 +412,7 @@
                 <input id="create_trans_comment" class="stretch-input" name="comment" type="text">
             </div>
 
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -463,7 +463,7 @@
                 <input id="create_debt_comment" class="stretch-input" name="comment" type="text">
             </div>
 
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -518,7 +518,7 @@
                 <input id="update_trans_comment" class="stretch-input" name="comment" type="text">
             </div>
 
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -575,7 +575,7 @@
                 <input id="update_debt_comment" class="stretch-input" name="comment" type="text">
             </div>
 
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -588,7 +588,7 @@
             <input id="deltransactions" class="stretch-input" type="text">
         </div>
 
-        <div class="acc_controls">
+        <div class="form-controls">
             <input id="deltransbtn" class="adm_act_btn" type="button" value="submit">
         </div>
         </div>
@@ -604,7 +604,7 @@
                 <label for="trans_pos_pos">Position</label>
                 <input id="trans_pos_pos" class="stretch-input" name="pos" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -624,11 +624,11 @@
                 </select>
                 <div class="std_margin">
                     <label for="statistics_curr">Currency</label>
-                    <input id="statistics_curr" class="stretch-input" name="curr_id" type="text">
+                    <input id="statistics_curr" class="stretch-input" name="curr_id" type="text" disabled>
                 </div>
                 <div class="std_margin">
                     <label for="statistics_acc">Account</label>
-                    <input id="statistics_acc" class="stretch-input" name="acc_id" type="text" disabled>
+                    <input id="statistics_acc" class="stretch-input" name="acc_id" type="text">
                 </div>
                 <div class="std_margin">
                     <label for="statistics_group">Group by</label>
@@ -659,7 +659,7 @@
                 </div>
             </div>
 
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -668,7 +668,7 @@
         <div id="listTplForm" class="request-data-form">
         <h3>List import templates</h3>
         <form action="<?=BASEURL?>api/importtpl/list" method="list">
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -680,7 +680,7 @@
                 <label for="readtplid">Id</label>
                 <input id="readtplid" class="stretch-input" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input id="readtplbtn" class="adm_act_btn" type="button" value="submit">
             </div>
         </div>
@@ -703,7 +703,7 @@
                 <input id="create_tpl_<?=e($column["name"])?>" class="stretch-input" name="<?=e($column["name"])?>" type="text">
             </div>
 <?php   }   ?>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -730,7 +730,7 @@
                 <input id="update_tpl_<?=e($column["name"])?>" class="stretch-input" name="<?=e($column["name"])?>" type="text">
             </div>
 <?php   }   ?>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -742,7 +742,7 @@
             <label for="deltemplates">Templates (comma separated ids)</label>
             <input id="deltemplates" class="stretch-input" type="text">
         </div>
-        <div class="acc_controls">
+        <div class="form-controls">
             <input id="deltplbtn" class="adm_act_btn" type="button" value="submit">
         </div>
         </div>
@@ -764,7 +764,7 @@
                     <span class="checkbox__label">Extended</span>
                 </label>
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -776,7 +776,7 @@
                 <label for="readruleid">Id</label>
                 <input id="readruleid" class="stretch-input" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input id="readrulebtn" class="adm_act_btn" type="button" value="submit">
             </div>
         </div>
@@ -788,7 +788,7 @@
                 <label for="create_rule_flags">Flags</label>
                 <input id="create_rule_flags" class="stretch-input" name="flags" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -805,7 +805,7 @@
                 <label for="update_rule_flags">Flags</label>
                 <input id="update_rule_flags" class="stretch-input" name="flags" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -817,7 +817,7 @@
             <label for="delrules">Rules (comma separated ids)</label>
             <input id="delrules" class="stretch-input" type="text">
         </div>
-        <div class="acc_controls">
+        <div class="form-controls">
             <input id="delrulebtn" class="adm_act_btn" type="button" value="submit">
         </div>
         </div>
@@ -840,7 +840,7 @@
                 </label>
                 <input id="list_cond_rule" class="stretch-input" name="rule" type="text" value="0" disabled>
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -852,7 +852,7 @@
                 <label for="readcondid">Id</label>
                 <input id="readcondid" class="stretch-input" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input id="readcondbtn" class="adm_act_btn" type="button" value="submit">
             </div>
         </div>
@@ -880,7 +880,7 @@
                 <label for="create_cond_flags">Flags</label>
                 <input id="create_cond_flags" class="stretch-input" name="flags" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -913,7 +913,7 @@
                 <label for="update_cond_flags">Flags</label>
                 <input id="update_cond_flags" class="stretch-input" name="flags" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -925,7 +925,7 @@
             <label for="delconds">Conditions (comma separated ids)</label>
             <input id="delconds" class="stretch-input" type="text">
         </div>
-        <div class="acc_controls">
+        <div class="form-controls">
             <input id="delcondbtn" class="adm_act_btn" type="button" value="submit">
         </div>
         </div>
@@ -948,7 +948,7 @@
                 </label>
                 <input id="list_act_rule" class="stretch-input" name="rule" type="text" value="0" disabled>
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -960,7 +960,7 @@
                 <label for="readactid">Id</label>
                 <input id="readactid" class="stretch-input" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input id="readactbtn" class="adm_act_btn" type="button" value="submit">
             </div>
         </div>
@@ -980,7 +980,7 @@
                 <label for="create_act_value">Value</label>
                 <input id="create_act_value" class="stretch-input" name="value" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -1005,7 +1005,7 @@
                 <label for="update_act_value">Value</label>
                 <input id="update_act_value" class="stretch-input" name="value" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -1017,7 +1017,7 @@
             <label for="delactions">Rules (comma separated ids)</label>
             <input id="delactions" class="stretch-input" type="text">
         </div>
-        <div class="acc_controls">
+        <div class="form-controls">
             <input id="delactbtn" class="adm_act_btn" type="button" value="submit">
         </div>
         </div>
@@ -1037,7 +1037,7 @@
                     <option value="hidden">Hidden</option>
                 </select>
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -1049,7 +1049,7 @@
                 <label for="read_person_id">Id</label>
                 <input id="read_person_id" class="stretch-input" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input id="readpersonbtn" class="adm_act_btn" type="button" value="submit">
             </div>
         </div>
@@ -1065,7 +1065,7 @@
                 <label for="create_person_flags">Flags (0 - person is visible; 1 - hidden)</label>
                 <input id="create_person_flags" class="stretch-input" name="flags" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -1086,7 +1086,7 @@
                 <label for="update_person_flags">Flags (0 - person is visible; 1 - hidden)</label>
                 <input id="update_person_flags" class="stretch-input" name="flags" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -1098,7 +1098,7 @@
             <label for="delpersons">Persons (comma separated ids)</label>
             <input id="delpersons" class="stretch-input" type="text">
         </div>
-        <div class="acc_controls">
+        <div class="form-controls">
             <input id="delpersonbtn" class="adm_act_btn" type="submit" value="submit">
         </div>
         </div>
@@ -1106,7 +1106,7 @@
         <div id="listCurrForm" class="request-data-form">
         <h3>Get currencies</h3>
         <form action="<?=BASEURL?>api/currency/list" method="list">
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -1118,7 +1118,7 @@
             <label for="read_curr_id">Id</label>
             <input id="read_curr_id" class="stretch-input" type="text">
         </div>
-        <div class="acc_controls">
+        <div class="form-controls">
             <input id="readcurrbtn" class="adm_act_btn" type="button" value="submit">
         </div>
         </div>
@@ -1138,7 +1138,7 @@
                 <label for="create_currency_flags">Flags (0 - sign on right, 1 - sign on left)</label>
                 <input id="create_currency_flags" class="stretch-input" name="flags" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -1163,7 +1163,7 @@
                 <label for="update_currency_flags">Flags (0 - sign on right, 1 - sign on left)</label>
                 <input id="update_currency_flags" class="stretch-input" name="flags" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -1175,7 +1175,7 @@
             <label for="delcurrencies">Currencies (comma separated ids)</label>
             <input id="delcurrencies" class="stretch-input" type="text">
         </div>
-        <div class="acc_controls">
+        <div class="form-controls">
             <input id="delcurrbtn" class="adm_act_btn" type="button" value="submit">
         </div>
         </div>
@@ -1183,7 +1183,7 @@
         <div id="listIconForm" class="request-data-form">
         <h3>Get icons</h3>
         <form action="<?=BASEURL?>api/icon/list" method="list">
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -1195,7 +1195,7 @@
             <label for="read_icon_id">Id</label>
             <input id="read_icon_id" class="stretch-input" type="text">
         </div>
-        <div class="acc_controls">
+        <div class="form-controls">
             <input id="read_icon_btn" class="adm_act_btn" type="button" value="submit">
         </div>
         </div>
@@ -1215,7 +1215,7 @@
                 <label for="create_icon_type">Type (0 - No type, 1 - Tile icon)</label>
                 <input id="create_icon_type" class="stretch-input" name="type" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -1240,7 +1240,7 @@
                 <label for="update_icon_type">Type (0 - No type, 1 - Tile icon)</label>
                 <input id="update_icon_type" class="stretch-input" name="type" type="text">
             </div>
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -1252,7 +1252,7 @@
             <label for="del_icons">Icons (comma separated ids)</label>
             <input id="del_icons" class="stretch-input" type="text">
         </div>
-        <div class="acc_controls">
+        <div class="form-controls">
             <input id="deliconbtn" class="adm_act_btn" type="button" value="submit">
         </div>
         </div>
@@ -1269,7 +1269,7 @@
                 <input id="login_password" class="stretch-input" name="password" type="text"><br>
             </div>
 
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -1278,7 +1278,7 @@
         <div id="logoutForm" class="request-data-form">
             <h3>Login</h3>
             <form action="<?=BASEURL?>api/logout/" method="post">
-                <div class="acc_controls">
+                <div class="form-controls">
                     <input class="adm_act_btn" type="submit" value="submit">
                 </div>
             </form>
@@ -1300,7 +1300,7 @@
                 <input id="reg_name" class="stretch-input" name="name" type="text">
             </div>
 
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -1309,7 +1309,7 @@
         <div id="readProfileForm" class="request-data-form">
         <h3>Read profile</h3>
         <form action="<?=BASEURL?>api/profile/read" method="list">
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -1323,7 +1323,7 @@
                 <input id="change_name" class="stretch-input" name="name" type="text"><br>
             </div>
 
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -1341,7 +1341,7 @@
                 <input id="change_pass_new" class="stretch-input" name="new" type="text"><br>
             </div>
 
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>
@@ -1386,7 +1386,7 @@
                 <span class="checkbox__label">Import rules</span>
             </label>
 
-            <div class="acc_controls">
+            <div class="form-controls">
                 <input class="adm_act_btn" type="submit" value="submit">
             </div>
         </form>

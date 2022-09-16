@@ -1,4 +1,4 @@
-<div id="uploadDialog" hidden>
+<div id="uploadDialog" class="upload-dialog" hidden>
     <div id="fileBlock" class="upload-form__browser">
         <div class="upload-form__inner">
             <form id="fileimportfrm" class="upload-form" method="post" enctype="multipart/form-data" action="<?=BASEURL?>api/import/upload">
@@ -72,16 +72,16 @@
         <div id="tableDescr" class="tpl-form__title">Column map</div>
         <div id="rawDataTable" class="tpl-form__block"></div>
         <div id="tplFeedback" class="invalid-feedback" hidden></div>
-        <div id="tplControls" class="import-tpl-controls std_margin" hidden>
+        <div id="tplControls" class="form-controls" hidden>
             <input id="submitTplBtn" class="btn submit-btn" type="button" value="Save">
             <input id="cancelTplBtn" class="btn link-btn cancel-btn" type="button" value="Cancel">
         </div>
     </div>
-    <div id="initialAccField" class="upload-dialog-account tpl-form-field" hidden>
+    <div id="initialAccField" class="tpl-form-field" hidden>
         <label>Main account</label>
         <select id="initialAccount"></select>
     </div>
-    <div class="upload-dialog-controls" hidden>
-        <input id="submitUploadedBtn" class="btn submit-btn" type="button" value="Ok">
+    <div class="form-controls" hidden>
+        <input id="submitUploadedBtn" class="btn submit-btn" type="button" value="Submit">
     </div>
 </div>

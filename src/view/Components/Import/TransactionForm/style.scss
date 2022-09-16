@@ -122,9 +122,8 @@
   }
 
   /* Common buttons style */
-  .btn,
-  .btn:visited,
-  .btn:active {
+  .delete-btn,
+  .toggle-btn {
     pointer-events: all;
     background: none;
     padding: 4px;
@@ -132,9 +131,7 @@
   }
 
   /* Toggle expand/collapse button */
-  .toggle-btn,
-  .toggle-btn:visited,
-  .toggle-btn:active {
+  .toggle-btn {
     padding: 7px;
   }
 
@@ -176,6 +173,10 @@
   .field.invalid-block input,
   .field.invalid-block .dd__combo {
     --input-border-color: #ff0000;
+  }
+
+  .form-controls {
+    padding: 12px 32px;
   }
 }
 

@@ -45,7 +45,7 @@
                             <label>Query</label><br>
                             <textarea id="query" name="query" rows="5" cols="80"><?=e($query)?></textarea><br>
 
-                            <div class="acc_controls">
+                            <div class="form-controls">
                                 <input class="adm_act_btn" type="submit" value="Query">
                             </div>
                             </form>

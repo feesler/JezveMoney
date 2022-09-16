@@ -7,7 +7,6 @@ import {
     enable,
     checkDate,
     addChilds,
-    formatDate,
     DropDown,
     DatePicker,
     DecimalInput,
@@ -116,7 +115,7 @@ class TransactionView extends View {
                 fDestResult: null,
                 exchange: 1,
                 fExchange: 1,
-                date: formatDate(new Date()),
+                date: window.app.formatDate(new Date()),
             },
             validation: {
                 sourceAmount: true,
@@ -135,7 +134,7 @@ class TransactionView extends View {
         if (transaction.id) {
             initialState.form.sourceAmount = transaction.src_amount;
             initialState.form.destAmount = transaction.dest_amount;
-            initialState.form.date = formatDate(new Date(transaction.date * 1000));
+            initialState.form.date = window.app.formatDate(new Date(transaction.date * 1000));
         }
 
         if (transaction.type === EXPENSE || transaction.type === INCOME) {
@@ -547,7 +546,7 @@ class TransactionView extends View {
      * @param {Date} date - selected date object
      */
     onSelectDate(date) {
-        this.store.dispatch(dateChange(formatDate(date)));
+        this.store.dispatch(dateChange(window.app.formatDate(date)));
 
         this.datePicker.hide();
     }
@@ -559,7 +558,7 @@ class TransactionView extends View {
         if (!this.datePicker) {
             this.datePicker = DatePicker.create({
                 relparent: this.datePickerWrapper.parentNode,
-                locales: 'en',
+                locales: window.app.datePickerLocale,
                 ondateselect: (d) => this.onSelectDate(d),
             });
             this.datePickerWrapper.append(this.datePicker.elem);

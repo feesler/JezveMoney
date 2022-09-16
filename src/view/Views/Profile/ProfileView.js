@@ -142,7 +142,7 @@ class ProfileView extends View {
             show(this.changeNameContent, true);
 
             this.changeNamePopup.setControls({
-                okBtn: { onclick: (ev) => this.onChangeNameSubmit(ev) },
+                okBtn: { value: 'Submit', onclick: (ev) => this.onChangeNameSubmit(ev) },
                 closeBtn: true,
             });
 
@@ -233,7 +233,7 @@ class ProfileView extends View {
             show(this.changePassContent, true);
 
             this.changePassPopup.setControls({
-                okBtn: { onclick: (ev) => this.onChangePassSubmit(ev) },
+                okBtn: { value: 'Submit', onclick: (ev) => this.onChangePassSubmit(ev) },
                 closeBtn: true,
             });
 
@@ -321,7 +321,7 @@ class ProfileView extends View {
             show(this.resetContent, true);
 
             this.resetPopup.setControls({
-                okBtn: { onclick: (ev) => this.onResetSubmit(ev) },
+                okBtn: { value: 'Submit', onclick: (ev) => this.onResetSubmit(ev) },
                 closeBtn: true,
             });
 

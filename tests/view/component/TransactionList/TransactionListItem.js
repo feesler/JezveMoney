@@ -1,8 +1,10 @@
 import {
     TestComponent,
     query,
+    queryAll,
     prop,
     hasClass,
+    isVisible,
     click,
     assert,
 } from 'jezve-test';
@@ -18,25 +20,84 @@ export class TransactionListItem extends TestComponent {
     async parseContent() {
         const res = {};
 
-        res.id = parseInt(await prop(this.elem, 'dataset.id'), 10);
-        res.selected = await hasClass(this.elem, 'trans-list__item_selected');
+        const id = await prop(this.elem, 'dataset.id');
+        res.id = parseInt(id, 10);
+        const type = await prop(this.elem, 'dataset.type');
+        res.type = parseInt(type, 10);
+        res.selected = await hasClass(this.elem, 'trans-item_selected');
+        res.detailsMode = await hasClass(this.elem, 'trans-item_details');
 
-        const titleElem = await query(this.elem, '.trans-list__item-title > span');
-        assert(titleElem, 'Account title not found');
-        res.accountTitle = await prop(titleElem, 'textContent');
+        if (res.detailsMode) {
+            const [
+                srcAccountElem,
+                destAccountElem,
+            ] = await queryAll(this.elem, '.trans-item__account-field .field__content');
 
-        const amountElem = await query(this.elem, '.trans-list__item-content > span');
-        assert(amountElem, 'Amount text not found');
-        res.amountText = await prop(amountElem, 'textContent');
+            const sourceVisible = await isVisible(srcAccountElem, false);
+            const destVisible = await isVisible(srcAccountElem, false);
+            const sourceContent = await prop(srcAccountElem, 'textContent');
+            const destContent = await prop(destAccountElem, 'textContent');
 
-        const dateElem = await query(this.elem, '.trans-list__item-details > *');
+            if (sourceVisible && destVisible) {
+                res.accountTitle = (sourceVisible) ? sourceContent : destContent;
+            } else {
+                res.accountTitle = `${sourceContent} → ${destContent}`;
+            }
 
-        const tagName = await prop(dateElem, 'tagName');
-        assert(dateElem && tagName === 'SPAN', 'Date element not found');
+            const [
+                srcAmountElem,
+                destAmountElem,
+            ] = await queryAll(this.elem, '.trans-item__amount-field .field__content');
 
-        res.dateFmt = await prop(dateElem, 'textContent');
+            const destAmountVisible = await isVisible(destAmountElem, false);
+            const srcAmount = await prop(srcAmountElem, 'textContent');
+            const destAmount = await prop(destAmountElem, 'textContent');
 
-        const commentElem = await query(this.elem, '.trans-list__item-comment');
+            let sign;
+            if (res.type === EXPENSE) {
+                sign = '- ';
+            }
+            if (res.type === INCOME) {
+                sign = '+ ';
+            }
+            if (res.type === TRANSFER) {
+                sign = '';
+            }
+            if (res.type === DEBT) {
+                let debtType;
+                if (sourceVisible) {
+                    const srcAcc = App.state.accounts.findByName(sourceContent);
+                    debtType = srcAcc?.owner_id !== App.state.profile.owner_id;
+                } else {
+                    debtType = false;
+                }
+                const acc = (debtType) ? destVisible : sourceVisible;
+
+                sign = (acc === debtType) ? '+ ' : '- ';
+            }
+
+            if (destAmountVisible) {
+                res.amountText = `${sign}${srcAmount} (${sign}${destAmount})`;
+            } else {
+                res.amountText = `${sign}${srcAmount}`;
+            }
+
+            const dateElem = await query(this.elem, '.trans-item__date-field .field__content');
+            res.dateFmt = await prop(dateElem, 'textContent');
+        } else {
+            const titleElem = await query(this.elem, '.trans-item__title');
+            assert(titleElem, 'Account title not found');
+            res.accountTitle = await prop(titleElem, 'textContent');
+
+            const amountElem = await query(this.elem, '.trans-item__amount');
+            assert(amountElem, 'Amount text not found');
+            res.amountText = await prop(amountElem, 'textContent');
+
+            const dateElem = await query(this.elem, '.trans-item__date');
+            res.dateFmt = await prop(dateElem, 'textContent');
+        }
+
+        const commentElem = await query(this.elem, '.trans-item__comment');
         res.comment = (commentElem) ? await prop(commentElem, 'textContent') : '';
 
         return res;

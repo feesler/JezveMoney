@@ -3,19 +3,19 @@ import {
     ge,
     ce,
     setEvents,
+    insertAfter,
     isDate,
     show,
-    urlJoin,
-    isEmpty,
-    formatDate,
     Histogram,
     DatePicker,
     DropDown,
 } from 'jezvejs';
 import { Application } from '../../js/Application.js';
+import { API } from '../../js/API.js';
 import { View } from '../../js/View.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
+import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import '../../css/app.scss';
 import '../../Components/TransactionTypeMenu/style.scss';
 import './style.scss';
@@ -25,6 +25,9 @@ const POPUP_LIST_CLASS = 'chart-popup-list';
 const POPUP_LIST_ITEM_CLASS = 'chart-popup-list__item';
 const POPUP_LIST_VALUE_CLASS = 'chart-popup-list__value';
 
+/** Strings */
+const PAGE_TITLE = 'Jezve Money | Statistics';
+
 /**
  * Statistics view
  */
@@ -32,10 +35,7 @@ class StatisticsView extends View {
     constructor(...args) {
         super(...args);
 
-        if (
-            !('accountCurrency' in this.props)
-            || !('chartData' in this.props)
-        ) {
+        if (!('accountCurrency' in this.props)) {
             throw new Error('Invalid Statistics view properties');
         }
 
@@ -44,7 +44,10 @@ class StatisticsView extends View {
         this.state = {
             selDateRange: null,
             accountCurrency: this.props.accountCurrency,
-            chartData: this.props.chartData,
+            chartData: null,
+            filter: this.props.filter,
+            loading: false,
+            renderTime: Date.now(),
         };
 
         this.state.filter = ('filter' in this.props) ? this.props.filter : {};
@@ -54,9 +57,10 @@ class StatisticsView extends View {
      * View initialization
      */
     onStart() {
+        const chartElem = ge('chart');
+        this.noDataMessage = chartElem.querySelector('.nodata-message');
         this.histogram = Histogram.create({
-            elem: 'chart',
-            data: this.state.chartData,
+            elem: chartElem,
             height: 320,
             marginTop: 35,
             scrollToEnd: true,
@@ -67,6 +71,11 @@ class StatisticsView extends View {
             renderPopup: (target) => this.renderPopupContent(target),
         });
 
+        this.histogram.elem.dataset.time = this.state.renderTime;
+
+        this.loadingIndicator = LoadingIndicator.create();
+        insertAfter(this.loadingIndicator.elem, chartElem);
+
         this.typeMenu = TransactionTypeMenu.fromElement(document.querySelector('.trtype-menu'), {
             allowActiveLink: true,
             onChange: (sel) => this.onChangeTypeFilter(sel),
@@ -75,39 +84,40 @@ class StatisticsView extends View {
         this.filterTypeDropDown = DropDown.create({
             elem: 'filter_type',
             onitemselect: (obj) => this.onFilterSel(obj),
-            className: 'dd__fullwidth',
+            className: 'dd_fullwidth',
         });
 
-        if (this.state.filter.filter === 'currency') {
-            this.currencyDropDown = DropDown.create({
-                elem: 'curr_id',
-                onitemselect: (obj) => this.onCurrencySel(obj),
-                className: 'dd__fullwidth',
-            });
+        this.accountField = ge('acc_block');
+        this.currencyField = ge('curr_block');
 
-            window.app.initCurrencyList(this.currencyDropDown);
+        this.currencyDropDown = DropDown.create({
+            elem: 'curr_id',
+            onitemselect: (obj) => this.onCurrencySel(obj),
+            className: 'dd_fullwidth',
+        });
 
-            if (this.state.filter.curr_id) {
-                this.currencyDropDown.selectItem(this.state.filter.curr_id);
-            }
-        } else {
-            this.accountDropDown = DropDown.create({
-                elem: 'acc_id',
-                onitemselect: (obj) => this.onAccountSel(obj),
-                className: 'dd__fullwidth',
-            });
+        window.app.initCurrencyList(this.currencyDropDown);
 
-            window.app.initAccountsList(this.accountDropDown);
+        if (this.state.filter.curr_id) {
+            this.currencyDropDown.selectItem(this.state.filter.curr_id);
+        }
 
-            if (this.state.filter.acc_id) {
-                this.accountDropDown.selectItem(this.state.filter.acc_id);
-            }
+        this.accountDropDown = DropDown.create({
+            elem: 'acc_id',
+            onitemselect: (obj) => this.onAccountSel(obj),
+            className: 'dd_fullwidth',
+        });
+
+        window.app.initAccountsList(this.accountDropDown);
+
+        if (this.state.filter.acc_id) {
+            this.accountDropDown.selectItem(this.state.filter.acc_id);
         }
 
         this.groupDropDown = DropDown.create({
             elem: 'groupsel',
             onitemselect: (obj) => this.onGroupSel(obj),
-            className: 'dd__fullwidth',
+            className: 'dd_fullwidth',
         });
 
         this.datePickerBtn = IconLink.fromElement({
@@ -128,21 +138,44 @@ class StatisticsView extends View {
             throw new Error('Failed to initialize Transaction List view');
         }
         setEvents(this.noDateBtn, { click: () => this.onDateClear() });
+
+        this.requestData(this.state.filter);
     }
 
-    /**
-     * Build new location address from current filter object
-     */
-    buildAddress() {
+    /** Set loading state and render view */
+    startLoading() {
+        this.state.loading = true;
+        this.render(this.state);
+    }
+
+    /** Remove loading state and render view */
+    stopLoading() {
+        this.state.loading = false;
+        this.render(this.state);
+    }
+
+    /** Returns URL for filter of specified state */
+    getFilterURL(state = this.state) {
         const { baseURL } = window.app;
-        let newLocation = `${baseURL}statistics/`;
-        const locFilter = { ...this.state.filter };
+        const { filter } = state;
+        const res = new URL(`${baseURL}statistics/`);
 
-        if (!isEmpty(locFilter)) {
-            newLocation += `?${urlJoin(locFilter)}`;
-        }
+        Object.keys(filter).forEach((prop) => {
+            const value = filter[prop];
+            if (Array.isArray(value)) {
+                const arrProp = `${prop}[]`;
+                value.forEach((item) => res.searchParams.append(arrProp, item));
+            } else {
+                res.searchParams.set(prop, value);
+            }
+        });
 
-        return newLocation;
+        return res;
+    }
+
+    getGroupTypeByName(name) {
+        const groupName = (name) ? name.toLowerCase() : null;
+        return this.groupTypes.indexOf(groupName);
     }
 
     /**
@@ -150,7 +183,7 @@ class StatisticsView extends View {
      */
     onChangeTypeFilter(selected) {
         this.state.filter.type = selected;
-        window.location = this.buildAddress();
+        this.requestData(this.state.filter);
     }
 
     /**
@@ -164,8 +197,8 @@ class StatisticsView extends View {
 
         this.selDateRange = range;
         this.datePicker.hide();
-        const start = formatDate(range.start);
-        const end = formatDate(range.end);
+        const start = window.app.formatDate(range.start);
+        const end = window.app.formatDate(range.end);
 
         this.dateInput.value = `${start} - ${end}`;
     }
@@ -178,10 +211,10 @@ class StatisticsView extends View {
             return;
         }
 
-        this.state.filter.stdate = formatDate(this.selDateRange.start);
-        this.state.filter.enddate = formatDate(this.selDateRange.end);
+        this.state.filter.stdate = window.app.formatDate(this.selDateRange.start);
+        this.state.filter.enddate = window.app.formatDate(this.selDateRange.end);
 
-        window.location = this.buildAddress();
+        this.requestData(this.state.filter);
     }
 
     /**
@@ -191,7 +224,7 @@ class StatisticsView extends View {
         if (!this.datePicker) {
             this.datePicker = DatePicker.create({
                 relparent: this.datePickerWrapper.parentNode,
-                locales: 'en',
+                locales: window.app.datePickerLocale,
                 range: true,
                 onrangeselect: (range) => this.onRangeSelect(range),
                 onhide: () => this.onDatePickerHide(),
@@ -219,7 +252,7 @@ class StatisticsView extends View {
 
         delete this.state.filter.stdate;
         delete this.state.filter.enddate;
-        window.location = this.buildAddress();
+        this.requestData(this.state.filter);
     }
 
     /**
@@ -238,7 +271,7 @@ class StatisticsView extends View {
             delete this.state.filter.filter;
         }
 
-        window.location = this.buildAddress();
+        this.requestData(this.state.filter);
     }
 
     /**
@@ -251,7 +284,7 @@ class StatisticsView extends View {
         }
 
         this.state.filter.acc_id = obj.id;
-        window.location = this.buildAddress();
+        this.requestData(this.state.filter);
     }
 
     /**
@@ -264,7 +297,7 @@ class StatisticsView extends View {
         }
 
         this.state.filter.curr_id = obj.id;
-        window.location = this.buildAddress();
+        this.requestData(this.state.filter);
     }
 
     /**
@@ -284,7 +317,29 @@ class StatisticsView extends View {
             delete this.state.filter.group;
         }
 
-        window.location = this.buildAddress();
+        this.requestData(this.state.filter);
+    }
+
+    replaceHistory() {
+        const url = this.getFilterURL();
+        window.history.replaceState({}, PAGE_TITLE, url);
+    }
+
+    async requestData(options) {
+        this.startLoading();
+
+        try {
+            const result = await API.transaction.statistics(options);
+
+            this.state.chartData = { ...result.data.histogram };
+            this.state.filter = { ...result.data.filter };
+        } catch (e) {
+            return;
+        }
+
+        this.replaceHistory();
+        this.state.renderTime = Date.now();
+        this.stopLoading();
     }
 
     formatItemValue(item) {
@@ -311,6 +366,61 @@ class StatisticsView extends View {
         ));
 
         return ce('ul', { className: POPUP_LIST_CLASS }, elems);
+    }
+
+    render(state) {
+        if (!state) {
+            throw new Error('Invalid state');
+        }
+
+        if (state.loading) {
+            this.loadingIndicator.show();
+        }
+
+        const filterUrl = this.getFilterURL(state);
+
+        this.typeMenu.setURL(filterUrl);
+        this.typeMenu.setSelection(state.filter.type);
+
+        const isByCurrency = (state.filter.filter === 'currency');
+        this.filterTypeDropDown.selectItem((isByCurrency) ? 1 : 0);
+
+        show(this.accountField, !isByCurrency);
+        show(this.currencyField, isByCurrency);
+
+        if (state.filter.acc_id) {
+            this.accountDropDown.selectItem(state.filter.acc_id);
+        }
+        if (state.filter.curr_id) {
+            this.currencyDropDown.selectItem(state.filter.curr_id);
+        }
+
+        const groupType = this.getGroupTypeByName(state.filter.group);
+        this.groupDropDown.selectItem(groupType);
+
+        // Render date
+        const isDateFilter = !!(state.filter.stdate && state.filter.enddate);
+        const dateRangeFmt = (isDateFilter)
+            ? `${state.filter.stdate} - ${state.filter.enddate}`
+            : '';
+        this.dateInput.value = dateRangeFmt;
+        const dateSubtitle = (isDateFilter) ? dateRangeFmt : null;
+        this.datePickerBtn.setSubtitle(dateSubtitle);
+        show(this.noDateBtn, isDateFilter);
+
+        // Render histogram
+        const noData = !state.chartData?.values?.length && !state.chartData?.series?.length;
+        show(this.noDataMessage, noData);
+        show(this.histogram.chartContainer, !noData);
+
+        if (state.chartData) {
+            this.histogram.setData(state.chartData);
+        }
+        this.histogram.elem.dataset.time = state.renderTime;
+
+        if (!state.loading) {
+            this.loadingIndicator.hide();
+        }
     }
 }
 

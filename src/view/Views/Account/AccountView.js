@@ -56,7 +56,7 @@ class AccountView extends View {
         this.iconSelect = DropDown.create({
             elem: 'icon',
             onitemselect: (o) => this.onIconSelect(o),
-            className: 'dd__fullwidth',
+            className: 'dd_fullwidth',
         });
         if (!this.iconSelect) {
             throw new Error('Failed to initialize Account view');
@@ -65,7 +65,7 @@ class AccountView extends View {
         this.currencySelect = DropDown.create({
             elem: 'currency',
             onitemselect: (o) => this.onCurrencySelect(o),
-            className: 'dd__fullwidth',
+            className: 'dd_fullwidth',
         });
         if (!this.currencySelect) {
             throw new Error('Failed to initialize Account view');

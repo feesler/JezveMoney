@@ -893,7 +893,7 @@ const apiStatistics = async () => {
     const data = [
         {},
         { filter: 'account', acc_id: App.scenario.ACC_RUB },
-        { filter: 'account', acc_id: App.scenario.ACC_RUB, type: 'income' },
+        { filter: 'account', acc_id: App.scenario.ACC_RUB, type: INCOME },
         { filter: 'currency', curr_id: RUB },
         { filter: 'currency', curr_id: RUB, group: 'day' },
         { filter: 'currency', curr_id: RUB, group: 'week' },

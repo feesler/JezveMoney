@@ -44,8 +44,8 @@ export class ImportRuleForm extends TestComponent {
         });
 
         res.idInput = { elem: await query(this.elem, 'input[type=hidden]') };
-        res.submitBtn = { elem: await query(this.elem, '.rule-form__controls .submit-btn') };
-        res.cancelBtn = { elem: await query(this.elem, '.rule-form__controls .cancel-btn') };
+        res.submitBtn = { elem: await query(this.elem, '.form-controls .submit-btn') };
+        res.cancelBtn = { elem: await query(this.elem, '.form-controls .cancel-btn') };
         res.feedbackElem = { elem: await query(this.elem, '.rule-form__feedback .invalid-feedback') };
         assert(
             res.idInput.elem

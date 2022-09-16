@@ -27,8 +27,8 @@
                                     <div class="invalid-feedback">Please input correct password.</div>
                                 </div>
                                 <div class="form-controls std_margin">
-                                    <input class="btn submit-btn" type="submit" value="ok">
-                                    <span class="alter_link"><a href="<?=BASEURL?>login/">Log in</a></span>
+                                    <input class="btn submit-btn" type="submit" value="Submit">
+                                    <a class="alter-link" href="<?=BASEURL?>login/">Log in</a>
                                 </div>
                             </form>
                         </div>

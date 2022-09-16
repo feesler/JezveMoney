@@ -25,7 +25,7 @@
                 </div>
                 <div class="form-controls std_margin">
                     <input class="btn submit-btn" type="submit" value="Log in">
-                    <span class="alter_link"><a href="<?=BASEURL?>register/">Register</a></span>
+                    <a class="alter-link" href="<?=BASEURL?>register/">Register</a>
                 </div>
             </div>
         </div>

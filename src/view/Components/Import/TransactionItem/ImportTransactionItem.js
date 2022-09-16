@@ -2,11 +2,10 @@ import {
     ce,
     enable,
     isFunction,
-    formatDate,
     Checkbox,
 } from 'jezvejs';
 import { ImportTransactionBase, sourceTypes } from '../TransactionBase/ImportTransactionBase.js';
-import { Field } from '../Field/Field.js';
+import { Field } from '../../Field/Field.js';
 import './style.scss';
 
 /** CSS classes */
@@ -67,7 +66,7 @@ const defaultProps = {
     sourceAmount: 0,
     destAmount: 0,
     personId: 0,
-    date: formatDate(new Date()),
+    date: null,
     comment: '',
     onUpdate: null,
     onEnable: null,
@@ -93,9 +92,11 @@ export class ImportTransactionItem extends ImportTransactionBase {
             ...defaultProps,
             ...this.props,
         };
+        if (this.props.date == null) {
+            this.props.date = window.app.formatDate(new Date());
+        }
 
         const { mainAccount } = this.props;
-
         const state = {
             mainAccount,
             ...this.props,

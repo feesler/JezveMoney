@@ -70,9 +70,9 @@ include(TPL_PATH."commonhdr.tpl");	?>
                             </div>
                             <div class="invalid-feedback">Please input correct initial balance.</div>
                         </div>
-                        <div class="acc_controls">
-                            <input class="btn submit-btn" type="submit" value="ok">
-                            <a class="btn cancel-btn" href="<?=BASEURL?>accounts/">cancel</a>
+                        <div class="form-controls">
+                            <input class="btn submit-btn" type="submit" value="Submit">
+                            <a class="btn cancel-btn" href="<?=BASEURL?>accounts/">Cancel</a>
                         </div>
                         <input id="flags" name="flags" type="hidden" value="<?=e($accInfo->flags)?>">
                         </form>

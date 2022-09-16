@@ -3,10 +3,7 @@ import {
     ge,
     show,
     isDate,
-    urlJoin,
-    isEmpty,
     setEvents,
-    formatDate,
     throttle,
     Collapsible,
     DropDown,
@@ -80,7 +77,7 @@ class TransactionListView extends View {
                 placeholder: 'Select account',
                 onitemselect: (obj) => this.onAccountChange(obj),
                 onchange: (obj) => this.onAccountChange(obj),
-                className: 'dd__fullwidth',
+                className: 'dd_fullwidth',
             });
             if (!this.accountDropDown) {
                 throw new Error('Failed to initialize Transaction List view');
@@ -97,7 +94,7 @@ class TransactionListView extends View {
                 placeholder: 'Select person',
                 onitemselect: (obj) => this.onPersonChange(obj),
                 onchange: (obj) => this.onPersonChange(obj),
-                className: 'dd__fullwidth',
+                className: 'dd_fullwidth',
             });
             if (!this.personDropDown) {
                 throw new Error('Failed to initialize Transaction List view');
@@ -203,12 +200,16 @@ class TransactionListView extends View {
      * @param {number} newPos  - new position of transaction
      */
     async sendChangePosRequest(transactionId, newPos) {
+        this.startLoading();
+
         try {
             await API.transaction.setPos(transactionId, newPos);
             this.list.setPosition(transactionId, newPos);
         } catch (e) {
             this.cancelPosChange(transactionId);
         }
+
+        this.stopLoading();
     }
 
     /**
@@ -221,49 +222,31 @@ class TransactionListView extends View {
         window.app.createMessage(MSG_SET_POS_FAIL, 'msg_error');
     }
 
-    /**
-     * Build new location address from current filterObj
-     */
-    buildAddress() {
+    /** Returns URL for filter of specified state */
+    getFilterURL(state = this.state, keepPage = true) {
         const { baseURL } = window.app;
-        let newLocation = `${baseURL}transactions/`;
-        const locFilter = { ...this.state.filter };
+        const { filter } = state;
+        const res = new URL(`${baseURL}transactions/`);
 
-        if ('type' in locFilter) {
-            if (!Array.isArray(locFilter.type)) {
-                locFilter.type = [locFilter.type];
+        Object.keys(filter).forEach((prop) => {
+            const value = filter[prop];
+            if (Array.isArray(value)) {
+                const arrProp = `${prop}[]`;
+                value.forEach((item) => res.searchParams.append(arrProp, item));
+            } else {
+                res.searchParams.set(prop, value);
             }
+        });
 
-            if (!locFilter.type.length) {
-                delete locFilter.type;
-            }
+        if (keepPage) {
+            res.searchParams.set('page', state.pagination.page);
         }
 
-        if ('acc_id' in locFilter) {
-            if (!Array.isArray(locFilter.acc_id)) {
-                locFilter.acc_id = [locFilter.acc_id];
-            }
-
-            if (!locFilter.acc_id.length) {
-                delete locFilter.acc_id;
-            }
+        if (state.mode === 'details') {
+            res.searchParams.set('mode', 'details');
         }
 
-        if ('person_id' in locFilter) {
-            if (!Array.isArray(locFilter.person_id)) {
-                locFilter.person_id = [locFilter.person_id];
-            }
-
-            if (!locFilter.person_id.length) {
-                delete locFilter.person_id;
-            }
-        }
-
-        if (!isEmpty(locFilter)) {
-            newLocation += `?${urlJoin(locFilter)}`;
-        }
-
-        return newLocation;
+        return res;
     }
 
     /**
@@ -396,8 +379,8 @@ class TransactionListView extends View {
 
         this.state.selDateRange = range;
         this.datePicker.hide();
-        const start = formatDate(range.start);
-        const end = formatDate(range.end);
+        const start = window.app.formatDate(range.start);
+        const end = window.app.formatDate(range.end);
 
         this.dateInput.value = `${start} - ${end}`;
     }
@@ -410,8 +393,8 @@ class TransactionListView extends View {
             return;
         }
 
-        const newStartDate = formatDate(this.state.selDateRange.start);
-        const newEndDate = formatDate(this.state.selDateRange.end);
+        const newStartDate = window.app.formatDate(this.state.selDateRange.start);
+        const newEndDate = window.app.formatDate(this.state.selDateRange.end);
 
         if (this.state.filter.stdate === newStartDate
             && this.state.filter.enddate === newEndDate) {
@@ -445,7 +428,7 @@ class TransactionListView extends View {
         if (!this.datePicker) {
             this.datePicker = DatePicker.create({
                 relparent: this.datePickerWrapper.parentNode,
-                locales: 'en',
+                locales: window.app.datePickerLocale,
                 range: true,
                 onrangeselect: (range) => this.onRangeSelect(range),
                 onhide: () => this.onDatePickerHide(),
@@ -481,13 +464,7 @@ class TransactionListView extends View {
     }
 
     replaceHistory() {
-        const url = new URL(this.buildAddress());
-        url.searchParams.set('page', this.state.pagination.page);
-        if (this.state.mode === 'details') {
-            url.searchParams.set('mode', 'details');
-        } else {
-            url.searchParams.delete('mode');
-        }
+        const url = this.getFilterURL();
         window.history.replaceState({}, PAGE_TITLE, url);
     }
 
@@ -554,13 +531,7 @@ class TransactionListView extends View {
             this.loadingIndicator.show();
         }
 
-        const filterUrl = new URL(this.buildAddress());
-        filterUrl.searchParams.delete('page');
-        if (state.mode === 'details') {
-            filterUrl.searchParams.set('mode', 'details');
-        } else {
-            filterUrl.searchParams.delete('mode');
-        }
+        const filterUrl = this.getFilterURL(state, false);
 
         this.typeMenu.setURL(filterUrl);
         this.typeMenu.setSelection(state.filter.type);

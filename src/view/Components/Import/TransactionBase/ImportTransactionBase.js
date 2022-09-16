@@ -1,9 +1,7 @@
 import {
     ce,
-    re,
     copyObject,
     isFunction,
-    formatDate,
     Component,
     Collapsible,
 } from 'jezvejs';
@@ -110,7 +108,7 @@ export class ImportTransactionBase extends Component {
             this.setDestAmount(Math.abs(accAmount));
         }
 
-        this.setDate(formatDate(new Date(data.date)));
+        this.setDate(window.app.formatDate(new Date(data.date)));
         this.setComment(data.comment);
     }
 
@@ -134,8 +132,6 @@ export class ImportTransactionBase extends Component {
         if (isFunction(this.props.onRemove)) {
             this.props.onRemove(this);
         }
-
-        re(this.elem);
     }
 
     /** Enable checkbox 'change' event handler */

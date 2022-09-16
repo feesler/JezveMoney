@@ -54,11 +54,11 @@
   }
 
   .iconlink .iconlink__icon {
-    border-color: #000000;
+    border-color: var(--main-text-color);
   }
 
   .iconlink .iconlink__icon-content {
-    fill: #000000;
+    fill: var(--main-text-color);
   }
 
   .iconlink .iconlink__content {
@@ -131,7 +131,7 @@
 
     /* Clear and toggle buttons */
     --dd-btn-fill: #888888;
-    --dd-btn-hover-fill: #000000;
+    --dd-btn-hover-fill: var(--main-text-color);
 
     /* Disabled component */
     --dd-disabled-bg: var(--input-disabled-bg-color);
@@ -186,43 +186,33 @@
   }
 
   .filter-icon {
-    fill: #000000;
+    fill: var(--main-text-color);
   }
 
   /* Transaction list item */
-  .trans-list_details td > div,
-  table.trans-list-items td > div,
-  .trans-list_details tr.trans-list__item_selected > td > div {
+  .trans-item {
     background-color: var(--alt-bg-color);
   }
 
-  .trans-list__item-comment {
-    border-left-color: #808080;
-  }
-
-  .trans-list_details .trans-list__item-comment,
-  table.trans-list-items .trans-list__item-comment {
-    color: #808080;
-  }
-
-  .trans-list__item,
-  div.trans-list__item_selected {
-    background-color: var(--alt-bg-color);
-  }
-
-  .tritem_balance,
-  .trans-list__item-title,
-  .trans-list__item-content {
+  .trans-item__balance,
+  .trans-item__title {
     color: var(--main-text-color);
   }
 
-  .trans-list__item-details {
+  .trans-item__date,
+  .trans-item__comment,
+  .trans-item__date-field .field__content,
+  .trans-item__comment-field .field__content {
     color: #808080;
+  }
+
+  .trans-item_details .field__title {
+    color: #a7a7a7;
   }
 
   /* Bar chart */
   .charts svg text tspan {
-    fill: #000000;
+    fill: var(--main-text-color);
   }
 
   /* Profile view */
@@ -295,10 +285,6 @@
     input[type="text"]:focus {
       border-color: #888888;
       background-color: #f2f2f2;
-    }
-
-    .btn {
-      color: #202020;
     }
 
     .icon {
@@ -421,7 +407,7 @@
     .collapsible-content {
       color: #202020;
       border-color: #b0b0b0;
-      background-color: #cccccc;
+      background-color: #e8e8e8;
     }
 
     &[disabled] .collapsible-content {
@@ -463,7 +449,7 @@
     }
 
     .iconlink:hover .iconlink__icon {
-      background-color: #000000;
+      background-color: var(--main-text-color);
     }
 
     .iconlink > *:hover .iconlink__icon,
@@ -476,12 +462,16 @@
     }
 
     .swap-btn:hover .swap-icon {
-      fill: #000000;
+      fill: var(--main-text-color);
     }
 
-    .import-form .btn:hover,
-    .import-item .btn:hover {
-      background-color: #808080;
+    .import-form,
+    .import-item {
+      .update-btn:hover,
+      .delete-btn:hover,
+      .toggle-btn:hover {
+        background-color: #808080;
+      }
     }
 
     .rule-item .collapsible-header:hover,

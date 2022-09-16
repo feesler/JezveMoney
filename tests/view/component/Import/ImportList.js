@@ -21,7 +21,6 @@ export class ImportList extends TestComponent {
     async parseContent() {
         const res = {
             items: [],
-            invalidated: false,
         };
 
         const listItems = await queryAll(this.elem, '.import-form,.import-item');
