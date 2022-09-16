@@ -1,3 +1,4 @@
+import webpack from 'webpack';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
@@ -6,7 +7,7 @@ const __dirname = dirname(__filename);
 export default {
     mode: 'production',
     target: 'browserslist',
-    entry: './tests/index.browser.js',
+    entry: './tests/index.js',
     output: {
         filename: 'index.js',
         path: resolve(__dirname, 'dist/admin/view/js/tests'),
@@ -38,4 +39,10 @@ export default {
     optimization: {
         minimize: false,
     },
+    plugins: [
+        new webpack.NormalModuleReplacementPlugin(
+            /jezve-test\/NodeEnvironment/,
+            'jezve-test\/BrowserEnvironment'
+        ),
+    ],
 };
