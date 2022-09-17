@@ -34,9 +34,10 @@
 
   input[type="text"] {
     display: flex;
-    border: 1px solid;
     padding: 5px;
     height: 32px;
+    border-width: 1px;
+    border-style: solid;
   }
 }
 
