@@ -30,11 +30,11 @@ const TITLE_FIELD_ACC_CURRENCY = 'Account currency';
 const TITLE_FIELD_DATE = 'Date';
 const TITLE_FIELD_COMMENT = 'Comment';
 /** Operator names */
-const TITLE_OP_INCLUDES = 'Includes';
-const TITLE_OP_EQUAL = 'Equal to';
-const TITLE_OP_NOT_EQUAL = 'Not equal to';
-const TITLE_OP_LESS = 'Less than';
-const TITLE_OP_GREATER = 'Greater than';
+const TITLE_OP_INCLUDES = 'contains';
+const TITLE_OP_EQUAL = 'is';
+const TITLE_OP_NOT_EQUAL = 'is not';
+const TITLE_OP_LESS = 'less than';
+const TITLE_OP_GREATER = 'greater than';
 
 /**
  * Import condition class
