@@ -2,16 +2,13 @@ import {
     TestComponent,
     assert,
     query,
-    queryAll,
+    hasClass,
     prop,
     click,
     input,
 } from 'jezve-test';
 import { DropDown } from 'jezvejs/tests';
-import {
-    asyncMap,
-    trimToDigitsLimit,
-} from '../../../common.js';
+import { trimToDigitsLimit } from '../../../common.js';
 import {
     IMPORT_ACTION_SET_TR_TYPE,
     IMPORT_ACTION_SET_ACCOUNT,
@@ -47,9 +44,12 @@ export class ImportActionForm extends TestComponent {
             deleteBtn: { elem: await query(this.elem, '.delete-btn') },
         };
 
-        const fieldElems = await queryAll(this.elem, '.field');
-        const fields = await asyncMap(fieldElems, (field) => this.parseField(field));
-        fields.forEach((field) => { res[field.name] = field.component; });
+        res.actionField = await this.parseField(await query(this.elem, '.action-type-field'));
+        res.transTypeField = await this.parseField(await query(this.elem, '.trans-type-field'));
+        res.accountField = await this.parseField(await query(this.elem, '.account-field'));
+        res.personField = await this.parseField(await query(this.elem, '.person-field'));
+        res.amountField = await this.parseField(await query(this.elem, '.amount-field'));
+        res.textField = await this.parseField(await query(this.elem, '.action-value-field'));
 
         assert(
             res.actionField
@@ -65,53 +65,24 @@ export class ImportActionForm extends TestComponent {
         return res;
     }
 
-    mapField(field) {
-        const fieldsMap = {
-            actionField: 'Action',
-            transTypeField: 'Transaction type',
-            accountField: 'Account',
-            personField: 'Person',
-            amountField: 'Amount',
-            textField: 'Value',
-        };
-
-        assert(field?.title, 'Invalid field');
-
-        let res = null;
-        for (const fieldName in fieldsMap) {
-            if (fieldsMap[fieldName] === field.title) {
-                res = { name: fieldName, component: field };
-                break;
-            }
-        }
-
-        assert(res, `Unknown field '${field.title}'`);
-        return res;
-    }
-
     async parseField(elem) {
         const res = { elem };
 
         assert(res.elem, 'Invalid field element');
 
-        res.labelElem = await query(elem, ':scope > label');
-        assert(res.labelElem, 'Invalid structure of field element');
-        res.title = await prop(res.labelElem, 'textContent');
-
-        const dropDownElem = await query(elem, '.dd__container');
-        if (dropDownElem) {
-            res.dropDown = await DropDown.create(this, dropDownElem);
+        const isDropDown = await hasClass(elem, 'dd__container');
+        if (isDropDown) {
+            res.dropDown = await DropDown.create(this, elem);
             assert(res.dropDown, 'Invalid structure of field element');
             res.disabled = res.dropDown.content.disabled;
             res.value = res.dropDown.content.value;
         } else {
-            res.inputElem = await query(elem, ':scope > div > *');
-            assert(res.inputElem, 'Invalid structure of field element');
+            res.inputElem = elem;
             res.disabled = await prop(res.inputElem, 'disabled');
             res.value = await prop(res.inputElem, 'value');
         }
 
-        return this.mapField(res);
+        return res;
     }
 
     static getStateName(model) {

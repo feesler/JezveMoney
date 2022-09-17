@@ -1,5 +1,6 @@
 import {
     ce,
+    show,
     isFunction,
     Component,
     Checkbox,
@@ -10,30 +11,26 @@ import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,
 } from '../../../js/model/ImportCondition.js';
-import { Field } from '../../Field/Field.js';
 import './style.scss';
 
 /** CSS classes */
 const FORM_CLASS = 'cond-form';
 const CONTAINER_CLASS = 'cond-form__container';
-const PROP_FILED_CLASS = 'property-field';
+const PROP_FIELD_CLASS = 'property-field';
 const OPERATOR_FILED_CLASS = 'operator-field';
 const VALUE_FIELD_CLASS = 'value-field';
+const TEXT_FIELD_CLASS = 'text-field';
+const AMOUNT_FIELD_CLASS = 'amount-field';
+const ACCOUNT_FIELD_CLASS = 'account-field';
+const TEMPLATE_FIELD_CLASS = 'tpl-field';
+const CURRENCY_FIELD_CLASS = 'currency-field';
+const VALUE_PROP_FIELD_CLASS = 'value-prop-field';
 const COND_FIELDS_CLASS = 'cond-form__fields';
 const CONTROLS_CLASS = 'cond-form__controls';
 const VALIDATION_CLASS = 'validation-block';
 const INV_FEEDBACK_CLASS = 'invalid-feedback';
-
 /** Strings */
-const TITLE_FIELD_AMOUNT = 'Amount';
-const TITLE_FIELD_VALUE = 'Value';
 const LABEL_PROPERTY_CMP = 'Compare with another property';
-const TITLE_FIELD_PROPERTY = 'Property';
-const TITLE_FIELD_OPERATOR = 'Operator';
-const TITLE_FIELD_ACCOUNT = 'Account';
-const TITLE_FIELD_TEMPLATE = 'Template';
-const TITLE_FIELD_CURRENCY = 'Currency';
-const TITLE_FIELD_VALUE_PROPERTY = 'Value property';
 
 /**
  * ImportConditionForm component constructor
@@ -77,27 +74,19 @@ export class ImportConditionForm extends Component {
         this.createValuePropField();
 
         // Create amount input element
-        this.amountInput = ce('input', { className: 'stretch-input', type: 'text' });
+        this.amountInput = ce('input', { className: `stretch-input ${AMOUNT_FIELD_CLASS}`, type: 'text' });
         this.decAmountInput = DecimalInput.create({
             elem: this.amountInput,
             digits: 2,
             oninput: () => this.onValueChange(),
         });
-        this.amountField = Field.create({
-            title: TITLE_FIELD_AMOUNT,
-            content: this.amountInput,
-        });
         // Create text value input element
         this.valueInput = ce(
             'input',
-            { className: 'stretch-input', type: 'text' },
+            { className: `stretch-input ${TEXT_FIELD_CLASS}`, type: 'text' },
             null,
             { input: () => this.onValueChange() },
         );
-        this.valueField = Field.create({
-            title: TITLE_FIELD_VALUE,
-            content: this.valueInput,
-        });
 
         // Field value checkbox
         this.fieldValueCheck = Checkbox.create({
@@ -106,17 +95,17 @@ export class ImportConditionForm extends Component {
         });
 
         this.valueFieldBlock = window.app.createContainer(VALUE_FIELD_CLASS, [
-            this.accountField.elem,
-            this.templateField.elem,
-            this.currencyField.elem,
-            this.amountField.elem,
-            this.valueField.elem,
-            this.valuePropField.elem,
+            this.accountDropDown.elem,
+            this.templateDropDown.elem,
+            this.currencyDropDown.elem,
+            this.amountInput,
+            this.valueInput,
+            this.valuePropDropDown.elem,
         ]);
 
         this.fields = window.app.createContainer(COND_FIELDS_CLASS, [
-            this.propertyField.elem,
-            this.operatorField.elem,
+            this.propertyDropDown.elem,
+            this.operatorDropDown.elem,
             this.valueFieldBlock,
         ]);
 
@@ -149,15 +138,8 @@ export class ImportConditionForm extends Component {
             .filter((fieldType) => !ImportCondition.isTemplateField(fieldType.id))
             .map((fieldType) => ({ id: fieldType.id, title: fieldType.title }));
 
-        const selectElem = ce('select');
-        this.propertyField = Field.create({
-            title: TITLE_FIELD_PROPERTY,
-            content: selectElem,
-            className: PROP_FILED_CLASS,
-        });
-
         this.propertyDropDown = DropDown.create({
-            elem: selectElem,
+            className: PROP_FIELD_CLASS,
             onchange: (property) => this.onPropertyChange(property),
         });
 
@@ -170,15 +152,8 @@ export class ImportConditionForm extends Component {
         const operatorItems = this.operatorTypes
             .map((operatorType) => ({ id: operatorType.id, title: operatorType.title }));
 
-        const selectElem = ce('select');
-        this.operatorField = Field.create({
-            title: TITLE_FIELD_OPERATOR,
-            content: selectElem,
-            className: OPERATOR_FILED_CLASS,
-        });
-
         this.operatorDropDown = DropDown.create({
-            elem: selectElem,
+            className: OPERATOR_FILED_CLASS,
             onchange: (operator) => this.onOperatorChange(operator),
         });
         this.operatorDropDown.append(operatorItems);
@@ -187,14 +162,8 @@ export class ImportConditionForm extends Component {
 
     /** Create account field */
     createAccountField() {
-        const selectElem = ce('select');
-        this.accountField = Field.create({
-            title: TITLE_FIELD_ACCOUNT,
-            content: selectElem,
-        });
-
         this.accountDropDown = DropDown.create({
-            elem: selectElem,
+            className: ACCOUNT_FIELD_CLASS,
             onchange: () => this.onValueChange(),
         });
         window.app.initAccountsList(this.accountDropDown);
@@ -206,14 +175,8 @@ export class ImportConditionForm extends Component {
             (template) => ({ id: template.id, title: template.name }),
         );
 
-        const selectElem = ce('select');
-        this.templateField = Field.create({
-            title: TITLE_FIELD_TEMPLATE,
-            content: selectElem,
-        });
-
         this.templateDropDown = DropDown.create({
-            elem: selectElem,
+            className: TEMPLATE_FIELD_CLASS,
             onchange: () => this.onValueChange(),
         });
         this.templateDropDown.append(templateItems);
@@ -224,14 +187,8 @@ export class ImportConditionForm extends Component {
 
     /** Create currency field */
     createCurrencyField() {
-        const selectElem = ce('select');
-        this.currencyField = Field.create({
-            title: TITLE_FIELD_CURRENCY,
-            content: selectElem,
-        });
-
         this.currencyDropDown = DropDown.create({
-            elem: selectElem,
+            className: CURRENCY_FIELD_CLASS,
             onchange: () => this.onValueChange(),
         });
         window.app.initCurrencyList(this.currencyDropDown);
@@ -243,14 +200,8 @@ export class ImportConditionForm extends Component {
             .filter((fieldType) => !ImportCondition.isTemplateField(fieldType.id))
             .map((fieldType) => ({ id: fieldType.id, title: fieldType.title }));
 
-        const selectElem = ce('select');
-        this.valuePropField = Field.create({
-            title: TITLE_FIELD_VALUE_PROPERTY,
-            content: selectElem,
-        });
-
         this.valuePropDropDown = DropDown.create({
-            elem: selectElem,
+            className: VALUE_PROP_FIELD_CLASS,
             onchange: () => this.onValueChange(),
         });
         this.valuePropDropDown.append(items);
@@ -515,12 +466,12 @@ export class ImportConditionForm extends Component {
             )
         );
 
-        this.accountField.show(isAccountValue);
-        this.templateField.show(isTplValue);
-        this.currencyField.show(isCurrencyValue);
-        this.amountField.show(isAmountValue);
-        this.valuePropField.show(state.isFieldValue);
-        this.valueField.show(isTextValue);
+        this.accountDropDown.show(isAccountValue);
+        this.templateDropDown.show(isTplValue);
+        this.currencyDropDown.show(isCurrencyValue);
+        show(this.amountInput, isAmountValue);
+        this.valuePropDropDown.show(state.isFieldValue);
+        show(this.valueInput, isTextValue);
 
         this.setConditionValue(state);
     }
