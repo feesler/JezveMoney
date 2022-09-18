@@ -36,6 +36,10 @@ const LABEL_PROPERTY_CMP = 'Compare with another property';
  * ImportConditionForm component constructor
  */
 export class ImportConditionForm extends Component {
+    static create(props) {
+        return new ImportConditionForm(props);
+    }
+
     constructor(...args) {
         super(...args);
 
@@ -57,11 +61,6 @@ export class ImportConditionForm extends Component {
 
         this.init();
         this.setData(this.props.data);
-    }
-
-    /** Shortcut for ImportConditionForm constructor */
-    static create(props) {
-        return new ImportConditionForm(props);
     }
 
     /** Form controls initialization */

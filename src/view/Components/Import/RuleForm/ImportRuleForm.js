@@ -28,6 +28,10 @@ const MSG_NO_CONDITIONS = 'No conditions';
  * ImportRuleForm component constructor
  */
 export class ImportRuleForm extends Component {
+    static create(props) {
+        return new ImportRuleForm(props);
+    }
+
     constructor(...args) {
         super(...args);
 
@@ -50,11 +54,6 @@ export class ImportRuleForm extends Component {
 
         this.init();
         this.setData(this.props.data);
-    }
-
-    /** Shortcut for ImportRuleForm constructor */
-    static create(props) {
-        return new ImportRuleForm(props);
     }
 
     /** Form controls initialization */

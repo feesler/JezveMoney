@@ -14,9 +14,13 @@ const FORM_COLLAPSED_CLASS = 'upload-form__collapsed';
 const MSG_UPLOAD_FAIL = 'Fail to process file';
 
 /**
- * ImportFileUploader component constructor
+ * ImportFileUploader component
  */
 export class ImportFileUploader extends Component {
+    static create(props) {
+        return new ImportFileUploader(props);
+    }
+
     constructor(...args) {
         super(...args);
 

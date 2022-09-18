@@ -12,10 +12,20 @@ import { ImportTemplateManager } from '../TemplateManager/ImportTemplateManager.
 import { LoadingIndicator } from '../../LoadingIndicator/LoadingIndicator.js';
 import './style.scss';
 
+/** CSS classes */
+const UPLOAD_POPUP_CLASS = 'upload-popup';
+const DRAG_OVER_CLASS = 'drag-over';
+/** Strings */
+const TITLE_UPLOAD = 'Upload';
+
 /**
  * ImportUploadDialog component
  */
 export class ImportUploadDialog extends Component {
+    static create(props) {
+        return new ImportUploadDialog(props);
+    }
+
     constructor(...args) {
         super(...args);
 
@@ -31,13 +41,13 @@ export class ImportUploadDialog extends Component {
             importedItems: null,
         };
 
-        this.uploader = new ImportFileUploader({
+        this.uploader = ImportFileUploader.create({
             elem: 'fileBlock',
             onUploadStart: () => this.onUploadStart(),
             onUploadError: (message) => this.onUploadError(message),
             onUploaded: (data) => this.onUploaded(data),
         });
-        this.tplManager = new ImportTemplateManager({
+        this.tplManager = ImportTemplateManager.create({
             elem: 'templateBlock',
             mainAccount: this.state.mainAccount,
             onStatus: (status) => this.onTemplateStatus(status),
@@ -46,13 +56,13 @@ export class ImportUploadDialog extends Component {
 
         this.popup = Popup.create({
             id: 'fileupload_popup',
-            title: 'Upload',
+            title: TITLE_UPLOAD,
             content: this.elem,
             onclose: () => this.onClose(),
             btn: {
                 closeBtn: true,
             },
-            className: 'upload-popup',
+            className: UPLOAD_POPUP_CLASS,
         });
         show(this.elem, true);
 
@@ -69,10 +79,12 @@ export class ImportUploadDialog extends Component {
         this.initialAccField = ge('initialAccField');
         this.controlsBlock = this.elem.querySelector('.upload-dialog > .form-controls');
         this.submitUploadedBtn = ge('submitUploadedBtn');
-        if (!this.initialAccField
+        if (
+            !this.initialAccField
             || !this.accountDropDown
             || !this.controlsBlock
-            || !this.submitUploadedBtn) {
+            || !this.submitUploadedBtn
+        ) {
             throw new Error('Failed to initialize upload file dialog');
         }
 
@@ -116,14 +128,14 @@ export class ImportUploadDialog extends Component {
         e.preventDefault();
 
         if (e.target === this.uploader.elem) {
-            this.uploader.elem.classList.add('drag-over');
+            this.uploader.elem.classList.add(DRAG_OVER_CLASS);
         }
     }
 
     /** File 'dragenter' event handler */
     onDragLeave(e) {
         if (e.target === this.uploader.elem) {
-            this.uploader.elem.classList.remove('drag-over');
+            this.uploader.elem.classList.remove(DRAG_OVER_CLASS);
         }
     }
 
@@ -138,7 +150,7 @@ export class ImportUploadDialog extends Component {
         e.stopPropagation();
         e.preventDefault();
 
-        this.uploader.elem.classList.remove('drag-over');
+        this.uploader.elem.classList.remove(DRAG_OVER_CLASS);
 
         const { files } = e.dataTransfer;
         if (!files.length) {

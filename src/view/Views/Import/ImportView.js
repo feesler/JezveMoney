@@ -173,7 +173,7 @@ class ImportView extends View {
     /** Show upload file dialog popup */
     showUploadDialog() {
         if (!this.uploadDialog) {
-            this.uploadDialog = new ImportUploadDialog({
+            this.uploadDialog = ImportUploadDialog.create({
                 mainAccount: this.state.mainAccount,
                 elem: 'uploadDialog',
                 onAccountChange: (accountId) => this.onUploadAccChange(accountId),

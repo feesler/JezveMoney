@@ -35,6 +35,10 @@ const CONTROLS_CLASS = 'action-form__controls';
  * ImportActionForm component
  */
 export class ImportActionForm extends Component {
+    static create(props) {
+        return new ImportActionForm(props);
+    }
+
     constructor(...args) {
         super(...args);
 
@@ -56,11 +60,6 @@ export class ImportActionForm extends Component {
 
         this.init();
         this.setData(this.props.data);
-    }
-
-    /** Shortcut for ImportActionForm constructor */
-    static create(props) {
-        return new ImportActionForm(props);
     }
 
     /** Form controls initialization */
