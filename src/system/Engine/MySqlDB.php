@@ -324,7 +324,8 @@ class MySqlDB
     // Insert query
     public function insertQ($table, $data)
     {
-        if (!is_array($data) || !count($data)) {
+        $table = $this->escape($table);
+        if (!$table || $table == "" || !is_array($data) || !count($data)) {
             return false;
         }
 
@@ -383,7 +384,8 @@ class MySqlDB
     // Next other rows is compared match
     public function insertMultipleQ($table, $data, $isUpdate = false)
     {
-        if (empty($table) || !is_array($data) || !count($data)) {
+        $table = $this->escape($table);
+        if (!$table || $table == "" || !is_array($data) || !count($data)) {
             return false;
         }
 
@@ -443,7 +445,8 @@ class MySqlDB
     // Update query
     public function updateQ($table, $data, $condition = null)
     {
-        if (empty($table) || empty($data)) {
+        $table = $this->escape($table);
+        if (!$table || $table == "" || empty($data)) {
             return false;
         }
 
@@ -470,6 +473,7 @@ class MySqlDB
     // Truncate table query
     public function truncateQ($table)
     {
+        $table = $this->escape($table);
         if (!$table || $table == "") {
             return false;
         }
@@ -486,6 +490,7 @@ class MySqlDB
     // Delete query
     public function deleteQ($table, $condition = null)
     {
+        $table = $this->escape($table);
         if (!$table || $table == "") {
             return false;
         }
@@ -506,8 +511,12 @@ class MySqlDB
     // Return count of rows
     public function countQ($table, $condition = null)
     {
-        $res = 0;
+        $table = $this->escape($table);
+        if (!$table || $table == "") {
+            return false;
+        }
 
+        $res = 0;
         $query = "SELECT COUNT(*) AS cnt FROM " . $table;
         if (!is_null($condition)) {
             $query .= " WHERE " . andJoin($condition);
@@ -552,6 +561,7 @@ class MySqlDB
     // Create table if not exist query
     public function createTableQ($table, $defs, $options)
     {
+        $table = $this->escape($table);
         if (!$table || $table == "" || !$defs || $defs == "") {
             return false;
         }
@@ -570,6 +580,7 @@ class MySqlDB
     // Drop table if exist query
     public function dropTableQ($table)
     {
+        $table = $this->escape($table);
         if (!$table || $table == "") {
             return false;
         }
@@ -586,16 +597,12 @@ class MySqlDB
 
     public function getColumns($table)
     {
+        $table = $this->escape($table);
         if (!$table || $table == "") {
             return false;
         }
 
-        $tblName = $this->escape($table);
-        if (!$tblName) {
-            return false;
-        }
-
-        $query = "SHOW COLUMNS FROM `" . $tblName . "`;";
+        $query = "SHOW COLUMNS FROM `" . $table . "`;";
         $result = $this->rawQ($query);
         $rows = mysqli_num_rows($result);
 
@@ -622,6 +629,7 @@ class MySqlDB
     //  ["column_1" => "INT NOT NULL", "column_2" => "VARCHAR(255) NULL"]
     public function addColumns($table, $columns)
     {
+        $table = $this->escape($table);
         if (!$table || $table == "") {
             return false;
         }
@@ -648,11 +656,12 @@ class MySqlDB
     // Rename column in specified table
     public function changeColumn($table, $oldName, $newName, $dataType)
     {
+        $table = $this->escape($table);
         if (
-            !$table || $table == "" ||
-            !$oldName || $oldName == "" ||
-            !$newName || $newName == "" ||
-            !$dataType || $dataType == ""
+            !$table || $table == ""
+            || !$oldName || $oldName == ""
+            || !$newName || $newName == ""
+            || !$dataType || $dataType == ""
         ) {
             return false;
         }
@@ -667,6 +676,7 @@ class MySqlDB
     // Remove specified columns from table
     public function dropColumns($table, $columns)
     {
+        $table = $this->escape($table);
         if (!$table || $table == "") {
             return false;
         }
@@ -699,6 +709,7 @@ class MySqlDB
     //  ["key_name_1" => "field_name", "key_name_2" => ["field_1", "field_2"]]
     public function addKeys($table, $keys)
     {
+        $table = $this->escape($table);
         if (!$table || $table == "") {
             return false;
         }
