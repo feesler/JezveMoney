@@ -1349,7 +1349,7 @@
 
         <div id="resetForm" class="request-data-form">
         <h3>Reset data</h3>
-        <form action="<?=BASEURL?>api/profile/reset" method="post">
+        <form class="column-container" action="<?=BASEURL?>api/profile/reset" method="post">
             <label class="checkbox std_margin">
                 <input type="checkbox" name="accounts">
                 <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
@@ -1363,13 +1363,13 @@
             </label>
 
             <label class="checkbox std_margin">
-                <input type="checkbox" name="transactions">
+                <input type="checkbox" name="transactions" data-target="keepbalance">
                 <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                 <span class="checkbox__label">Transactions</span>
             </label>
 
-            <label class="checkbox std_margin" disabled>
-                <input type="checkbox" name="keepbalance">
+            <label class="checkbox std_margin suboption">
+                <input type="checkbox" name="keepbalance" disabled>
                 <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                 <span class="checkbox__label">Keep current balance of accounts</span>
             </label>
