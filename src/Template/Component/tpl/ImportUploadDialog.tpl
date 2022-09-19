@@ -37,10 +37,9 @@
     <div id="templateBlock" class="tpl-form" hidden>
         <div id="tplHeading" hidden>
             <div class="tpl-form-header">
-                <label>Convert</label>
+                <label id="tplStateLbl">Template</label>
                 <input id="createTplBtn" class="btn link-btn" type="button" value="Create template">
             </div>
-            <label id="tplStateLbl" hidden>Create template</label>
             <div class="tpl-form-fields">
                 <div class="tpl-form__select-group">
                     <div id="tplField" class="tpl-form-field">
@@ -81,7 +80,7 @@
         <label>Main account</label>
         <select id="initialAccount"></select>
     </div>
-    <div class="form-controls" hidden>
+    <div id="uploadControls" class="form-controls" hidden>
         <input id="submitUploadedBtn" class="btn submit-btn" type="button" value="Submit">
     </div>
 </div>

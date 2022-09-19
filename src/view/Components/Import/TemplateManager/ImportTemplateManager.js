@@ -18,6 +18,7 @@ import { LoadingIndicator } from '../../LoadingIndicator/LoadingIndicator.js';
 import './style.scss';
 
 /** Strings */
+const TITLE_TEMPLATE = 'Template';
 const TITLE_CREATE_TEMPLATE = 'Create template';
 const TITLE_UPDATE_TEMPLATE = 'Update template';
 const TITLE_TEMPLATE_DELETE = 'Delete import template';
@@ -450,7 +451,7 @@ export class ImportTemplateManager extends Component {
     }
 
     /** Validate current template on raw data */
-    setTemplateFeedback(message) {
+    setTemplateFeedback(message = null) {
         if (typeof message === 'string' && message.length) {
             this.tplFeedback.textContent = message;
             show(this.tplFeedback, true);
@@ -545,7 +546,8 @@ export class ImportTemplateManager extends Component {
             show(this.tplField, templateAvail);
             show(this.noTplLabel, !templateAvail);
             show(this.tplHeading, true);
-            show(this.tplStateLbl, false);
+            this.tplStateLbl.textContent = TITLE_TEMPLATE;
+
             this.loadingIndicator.hide();
             show(this.tableDescr, false);
             show(this.rawDataTable, false);
@@ -562,7 +564,6 @@ export class ImportTemplateManager extends Component {
                 : TITLE_CREATE_TEMPLATE;
 
             show(this.noTplLabel, false);
-            show(this.tplStateLbl, true);
             show(this.tplHeading, true);
             this.loadingIndicator.hide();
             show(this.tableDescr, true);

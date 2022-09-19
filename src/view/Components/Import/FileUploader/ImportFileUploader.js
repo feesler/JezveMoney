@@ -8,8 +8,7 @@ import {
 import { API } from '../../../js/API.js';
 
 /** CSS classes */
-const FORM_COLLAPSED_CLASS = 'upload-form__collapsed';
-
+const FILE_NAME_CLASS = 'upload-form__filename';
 /** Strings */
 const MSG_UPLOAD_FAIL = 'Fail to process file';
 
@@ -24,18 +23,14 @@ export class ImportFileUploader extends Component {
     constructor(...args) {
         super(...args);
 
-        this.uploadStartHandler = this.props.onUploadStart;
-        this.uploadErrorHandler = this.props.onUploadError;
-        this.uploadedHandler = this.props.onUploaded;
         this.state = {
             filename: null,
-            collapsed: false,
             isEncoded: true,
         };
 
         this.formElem = ge('fileimportfrm');
         this.inputElem = ge('fileInp');
-        this.filenameElem = this.elem.querySelector('.upload-form__filename');
+        this.filenameElem = this.elem.querySelector(`.${FILE_NAME_CLASS}`);
         this.isEncodeCheck = Checkbox.fromElement(
             ge('isEncodeCheck'),
             { onChange: (checked) => this.onCheckEncode(checked) },
@@ -84,7 +79,6 @@ export class ImportFileUploader extends Component {
         this.state = {
             ...this.state,
             filename: null,
-            collapsed: false,
         };
         this.render(this.state);
     }
@@ -99,11 +93,8 @@ export class ImportFileUploader extends Component {
                 throw new Error(MSG_UPLOAD_FAIL);
             }
 
-            this.state.collapsed = true;
-            this.render(this.state);
-
-            if (isFunction(this.uploadedHandler)) {
-                this.uploadedHandler(data);
+            if (isFunction(this.props.onUploaded)) {
+                this.props.onUploaded(data);
             }
         } catch (e) {
             this.onImportError(e.message);
@@ -114,8 +105,8 @@ export class ImportFileUploader extends Component {
     onImportError(message) {
         this.reset();
 
-        if (isFunction(this.uploadErrorHandler)) {
-            this.uploadErrorHandler(message);
+        if (isFunction(this.props.onUploadError)) {
+            this.props.onUploadError(message);
         }
     }
 
@@ -190,7 +181,7 @@ export class ImportFileUploader extends Component {
         }
 
         const { filename } = this.state;
-        if (!filename.length) {
+        if (!filename?.length) {
             return;
         }
 
@@ -204,8 +195,8 @@ export class ImportFileUploader extends Component {
     }
 
     async sendUploadRequest(data, headers = {}) {
-        if (isFunction(this.uploadStartHandler)) {
-            this.uploadStartHandler();
+        if (isFunction(this.props.onUploadStart)) {
+            this.props.onUploadStart();
         }
 
         try {
@@ -218,13 +209,7 @@ export class ImportFileUploader extends Component {
 
     /** Render component */
     render(state) {
-        if (state.collapsed) {
-            this.elem.classList.add(FORM_COLLAPSED_CLASS);
-        } else {
-            this.elem.classList.remove(FORM_COLLAPSED_CLASS);
-        }
-
-        this.filenameElem.textContent = state.filename ? state.filename : '';
+        this.filenameElem.textContent = state.filename ?? '';
 
         if (this.useServerCheck) {
             this.useServerCheck.check(state.useServer);

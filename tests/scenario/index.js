@@ -62,15 +62,11 @@ export class Scenario {
 
         await App.state.fetch();
 
-        const ruleIds = App.state.rules.getIds();
-        if (ruleIds.length) {
-            await api.importrule.del(ruleIds);
-        }
-
-        const templateIds = App.state.templates.getIds();
-        if (templateIds.length) {
-            await api.importtemplate.del(templateIds);
-        }
+        await api.profile.resetData({
+            transactions: true,
+            importtpl: true,
+            importrules: true,
+        });
 
         await transactionTests.prepare();
 

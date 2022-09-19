@@ -83,34 +83,29 @@
   margin: 9px 0;
 }
 
-/* Collapsed state of import file uploader */
-.upload-form__collapsed {
-  align-items: normal;
+/* Extended popup title for Convert state */
+.upload-popup__convert-title {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  column-gap: 12px;
+}
 
-  .upload-form {
-    flex-flow: row nowrap;
-    overflow: hidden;
-    align-items: center;
-    margin-bottom: 8px;
-  }
+/* Back buton  */
+.back-btn {
+  display: block;
+  width: 32px;
+  height: 32px;
+  padding: 4px;
+  cursor: pointer;
+  background: none;
+  border: 0 none;
+  border-radius: 100vh;
 
-  .upload-form__inner {
-    flex-flow: row wrap;
-  }
-
-  .upload-form__descr {
-    display: none;
-  }
-
-  .upload-form__filename {
-    margin-left: 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .upload-form__options {
-    margin: 0;
+  .back-icon {
+    width: 24px;
+    height: 24px;
+    fill: var(--main-text-color);
   }
 }
 
