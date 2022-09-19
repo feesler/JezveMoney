@@ -1,7 +1,5 @@
-<?php	include(TPL_PATH."commonhdr.tpl");	?>
-</head>
-<body class="<?=($this->themeClass)?>">
-<form id="loginfrm" action="<?=BASEURL?>login/" method="post">
+<?php	include(TPL_PATH . "Header.tpl");	?>
+
 <div class="layer login-layer">
     <div class="layer-box">
         <div class="logo-container">
@@ -11,7 +9,7 @@
             </div>
         </div>
         <div class="form-container">
-            <div class="login-form">
+            <form id="loginfrm" class="login-form" action="<?=BASEURL?>login/" method="post">
                 <h1>Log in</h1>
                 <div id="login-inp-block" class="validation-block std_margin">
                     <label for="login">Username</label>
@@ -27,12 +25,9 @@
                     <input class="btn submit-btn" type="submit" value="Log in">
                     <a class="alter-link" href="<?=BASEURL?>register/">Register</a>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 </div>
-</form>
 
-<?php	include(TPL_PATH."footer.tpl");	?>
-</body>
-</html>
+<?php	include(TPL_PATH . "Footer.tpl");	?>

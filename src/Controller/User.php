@@ -33,7 +33,7 @@ class User extends TemplateController
             $this->loginUser();
         }
 
-        $this->template = new Template(TPL_PATH . "login.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "Login.tpl");
         $data = [
             "titleString" => "Jezve Money | Log in"
         ];
@@ -78,7 +78,7 @@ class User extends TemplateController
             $this->registerUser();
         }
 
-        $this->template = new Template(TPL_PATH . "register.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "Register.tpl");
         $data = [
             "titleString" => "Jezve Money | Registration"
         ];

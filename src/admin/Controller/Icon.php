@@ -19,7 +19,7 @@ class Icon extends AdminController
 
     public function index()
     {
-        $this->template = new Template(ADMIN_TPL_PATH . "icon.tpl");
+        $this->template = new Template(ADMIN_VIEW_TPL_PATH . "Icon.tpl");
         $data = [
             "titleString" => "Admin panel | Icons",
             "itemsData" => $this->model->getData(),

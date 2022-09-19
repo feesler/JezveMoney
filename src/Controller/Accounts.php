@@ -28,7 +28,7 @@ class Accounts extends TemplateController
 
     public function index()
     {
-        $this->template = new Template(TPL_PATH . "accounts.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "AccountList.tpl");
         $data = [
             "titleString" => "Jezve Money | Accounts",
             "tilesArr" => [],
@@ -68,7 +68,7 @@ class Accounts extends TemplateController
             return;
         }
 
-        $this->template = new Template(TPL_PATH . "account.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "Account.tpl");
         $data = [
             "headString" => "Create account",
             "titleString" => "Jezve Money | Create account"
@@ -137,7 +137,7 @@ class Accounts extends TemplateController
             return;
         }
 
-        $this->template = new Template(TPL_PATH . "account.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "Account.tpl");
         $data = [
             "headString" => "Edit account",
             "titleString" => "Jezve Money | Edit account"

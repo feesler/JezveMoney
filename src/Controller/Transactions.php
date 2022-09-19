@@ -55,7 +55,7 @@ class Transactions extends TemplateController
 
     public function index()
     {
-        $this->template = new Template(TPL_PATH . "transactions.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "TransactionList.tpl");
         $baseUrl = BASEURL . "transactions/";
         $data = [
             "titleString" => "Jezve Money | Transactions",
@@ -248,7 +248,7 @@ class Transactions extends TemplateController
             $this->createTransaction();
         }
 
-        $this->template = new Template(TPL_PATH . "transaction.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "Transaction.tpl");
         $data = [
             "action" => "create",
         ];
@@ -588,7 +588,7 @@ class Transactions extends TemplateController
             $this->updateTransaction();
         }
 
-        $this->template = new Template(TPL_PATH . "transaction.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "Transaction.tpl");
         $data = [
             "action" => "update",
         ];

@@ -10,7 +10,7 @@ class ApiConsole extends AdminController
 {
     public function index()
     {
-        $this->template = new Template(ADMIN_TPL_PATH . "apiconsole.tpl");
+        $this->template = new Template(ADMIN_VIEW_TPL_PATH . "ApiConsole.tpl");
         $data = [
             "titleString" => "Admin panel | API console",
         ];

@@ -13,7 +13,7 @@ class Main extends TemplateController
 {
     public function index()
     {
-        $this->template = new Template(TPL_PATH . "main.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "Main.tpl");
         $data = [
             "titleString" => "Jezve Money"
         ];
@@ -112,7 +112,7 @@ class Main extends TemplateController
 
     public function about()
     {
-        $this->template = new Template(TPL_PATH . "about.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "About.tpl");
         $data = [
             "titleString" => "Jezve Money"
         ];

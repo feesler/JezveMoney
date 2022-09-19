@@ -27,7 +27,7 @@ class Import extends TemplateController
         $accMod = AccountModel::getInstance();
         $currMod = CurrencyModel::getInstance();
 
-        $this->template = new Template(TPL_PATH . "import.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "Import.tpl");
         $this->template->testerUser =  $this->uMod->isTester($this->user_id);
 
         $accounts = $accMod->getData(["type" => "all"]);

@@ -13,7 +13,7 @@ class Persons extends TemplateController
 
     public function index()
     {
-        $this->template = new Template(TPL_PATH . "persons.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "PersonList.tpl");
         $data = [
             "titleString" => "Jezve Money | Persons",
             "persArr" => [],
@@ -59,7 +59,7 @@ class Persons extends TemplateController
             return;
         }
 
-        $this->template = new Template(TPL_PATH . "person.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "Person.tpl");
         $data = [
             "headString" => "New person",
             "titleString" => "Jezve Money | New person"
@@ -93,7 +93,7 @@ class Persons extends TemplateController
             $this->updatePerson();
         }
 
-        $this->template = new Template(TPL_PATH . "person.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "Person.tpl");
         $data = [
             "headString" => "Edit person",
             "titleString" => "Jezve Money | Edit person"

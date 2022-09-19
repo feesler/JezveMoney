@@ -11,7 +11,7 @@ class Balance extends AdminController
 {
     public function index()
     {
-        $this->template = new Template(ADMIN_TPL_PATH . "balance.tpl");
+        $this->template = new Template(ADMIN_VIEW_TPL_PATH . "Balance.tpl");
         $data = [
             "titleString" => "Admin panel | Balance",
         ];

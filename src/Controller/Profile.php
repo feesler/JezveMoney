@@ -14,7 +14,7 @@ class Profile extends TemplateController
 {
     public function index()
     {
-        $this->template = new Template(TPL_PATH . "profile.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "Profile.tpl");
         $data = [];
 
         $uObj = $this->uMod->getItem($this->user_id);

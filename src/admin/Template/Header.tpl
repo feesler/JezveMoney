@@ -21,3 +21,5 @@
 <?php	foreach($this->jsAdmin as $jsFile) {	?>
 <script defer="defer" type="text/javascript" src="<?=e(BASEURL.auto_version("admin/view/js/".$jsFile))?>"></script>
 <?php	}	?>
+</head>
+<body class="<?=($this->themeClass)?>">

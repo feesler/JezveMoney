@@ -10,7 +10,7 @@ class Logs extends AdminController
 {
     public function index()
     {
-        $this->template = new Template(ADMIN_TPL_PATH . "log.tpl");
+        $this->template = new Template(ADMIN_VIEW_TPL_PATH . "Log.tpl");
         $data = [
             "titleString" => "Admin panel | Log",
             "contents" => Logger::read(),

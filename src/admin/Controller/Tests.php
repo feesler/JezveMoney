@@ -10,7 +10,7 @@ class Tests extends AdminController
 {
     public function index()
     {
-        $this->template = new Template(ADMIN_TPL_PATH . "tests.tpl");
+        $this->template = new Template(ADMIN_VIEW_TPL_PATH . "Tests.tpl");
         $data = [
             "titleString" => "Admin panel | Tests",
         ];

@@ -19,7 +19,7 @@ class Currency extends AdminController
 
     public function index()
     {
-        $this->template = new Template(ADMIN_TPL_PATH . "currency.tpl");
+        $this->template = new Template(ADMIN_VIEW_TPL_PATH . "Currency.tpl");
         $data = [
             "titleString" => "Admin panel | Currency",
         ];

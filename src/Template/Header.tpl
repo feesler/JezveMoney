@@ -27,3 +27,5 @@
 <?php	foreach($this->jsArr as $jsFile) {	?>
 <script defer="defer" type="text/javascript" src="<?=e(BASEURL.auto_version("view/js/".$jsFile))?>"></script>
 <?php	}	?>
+</head>
+<body class="<?=($this->themeClass)?>">

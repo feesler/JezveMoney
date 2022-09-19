@@ -13,7 +13,7 @@ class Statistics extends TemplateController
 {
     public function index()
     {
-        $this->template = new Template(TPL_PATH . "statistics.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "Statistics.tpl");
         $data = [];
 
         $transMod = TransactionModel::getInstance();

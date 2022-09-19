@@ -9,7 +9,7 @@ class Main extends AdminController
 {
     public function index()
     {
-        $this->template = new Template(ADMIN_TPL_PATH . "index.tpl");
+        $this->template = new Template(ADMIN_VIEW_TPL_PATH . "Main.tpl");
         $data = [
             "titleString" => "Admin panel",
         ];
