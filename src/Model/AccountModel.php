@@ -126,6 +126,23 @@ class AccountModel extends CachedTable
     }
 
 
+    // Check same item already exist
+    protected function isSameItemExist($params, $updateId = 0)
+    {
+        if (!is_array($params) || !isset($params["name"])) {
+            return false;
+        }
+
+        $foundItem = $this->findByName($params["name"]);
+        if ($foundItem && $foundItem->id != $updateId) {
+            wlog("Such item already exist");
+            return true;
+        }
+
+        return false;
+    }
+
+
     // Preparations for item create
     protected function preCreate($params, $isMultiple = false)
     {
@@ -134,9 +151,7 @@ class AccountModel extends CachedTable
             return null;
         }
 
-        $foundItem = $this->findByName($res["name"]);
-        if ($foundItem) {
-            wlog("Such item already exist");
+        if ($this->isSameItemExist($res)) {
             return null;
         }
 
@@ -164,15 +179,11 @@ class AccountModel extends CachedTable
 
         $res = $this->validateParams($params, true);
         if (is_null($res)) {
-            return null;
+            return false;
         }
 
-        if (isset($res["name"])) {
-            $foundItem = $this->findByName($res["name"]);
-            if ($foundItem && $foundItem->id != $item_id) {
-                wlog("Such item already exist");
-                return null;
-            }
+        if ($this->isSameItemExist($res, $item_id)) {
+            return false;
         }
 
         $this->currencyUpdated = (isset($res["curr_id"]) && $res["curr_id"] != $accObj->curr_id);

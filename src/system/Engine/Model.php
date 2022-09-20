@@ -140,7 +140,7 @@ abstract class Model
         }
 
         $prepareRes = $this->preUpdate($item_id, $params);
-        if (is_null($prepareRes)) {
+        if (!is_array($prepareRes)) {
             throw new \Error("preUpdate failed");
         }
 

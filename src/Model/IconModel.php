@@ -85,6 +85,27 @@ class IconModel extends CachedTable
     }
 
 
+    // Check same item already exist
+    protected function isSameItemExist($params, $updateId = 0)
+    {
+        if (!is_array($params)) {
+            return false;
+        }
+
+        $items = $this->getData(["type" => $params["type"], "file" => $params["file"]]);
+        if (!count($items)) {
+            return false;
+        }
+        $foundItem = $items[0];
+        if ($foundItem->id != $updateId) {
+            wlog("Such item already exist");
+            return true;
+        }
+
+        return false;
+    }
+
+
     // Preparations for item create
     protected function preCreate($params, $isMultiple = false)
     {
@@ -93,16 +114,7 @@ class IconModel extends CachedTable
             return null;
         }
 
-        $qResult = $this->dbObj->selectQ(
-            "*",
-            $this->tbl_name,
-            [
-                "type=" . qnull($res["type"]),
-                "file=" . qnull($res["file"])
-            ]
-        );
-        if ($this->dbObj->rowsCount($qResult) > 0) {
-            wlog("Such item already exist");
+        if ($this->isSameItemExist($res)) {
             return null;
         }
 
@@ -126,21 +138,8 @@ class IconModel extends CachedTable
             return null;
         }
 
-        $qResult = $this->dbObj->selectQ(
-            "*",
-            $this->tbl_name,
-            [
-                "type=" . qnull($res["type"]),
-                "file=" . qnull($res["file"])
-            ]
-        );
-        $row = $this->dbObj->fetchRow($qResult);
-        if ($row) {
-            $found_id = intval($row["id"]);
-            if ($found_id != $item_id) {
-                wlog("Such item already exist");
-                return null;
-            }
+        if ($this->isSameItemExist($res, $item_id)) {
+            return null;
         }
 
         $res["updatedate"] = date("Y-m-d H:i:s");
@@ -187,8 +186,15 @@ class IconModel extends CachedTable
 
 
     // Return array of items
-    public function getData()
+    public function getData($params = null)
     {
+        if (is_null($params)) {
+            $params = [];
+        }
+
+        $typeFilter = isset($params["type"]) ? intval($params["type"]) : null;
+        $fileFilter = isset($params["file"]) ? $params["file"] : null;
+
         $res = [];
 
         if (!$this->checkCache()) {
@@ -196,6 +202,13 @@ class IconModel extends CachedTable
         }
 
         foreach ($this->cache as $item) {
+            if (!is_null($typeFilter) && $item->type != $typeFilter) {
+                continue;
+            }
+            if (!is_null($fileFilter) && $item->file != $fileFilter) {
+                continue;
+            }
+
             $itemObj = new IconItem($item);
 
             $res[] = $itemObj;

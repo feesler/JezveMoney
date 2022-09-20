@@ -120,6 +120,30 @@ class ImportTemplateModel extends CachedTable
     }
 
 
+    // Check same item already exist
+    protected function isSameItemExist($params, $updateId = 0)
+    {
+        if (!is_array($params)) {
+            return false;
+        }
+
+        $items = $this->getData([
+            "type" => $params["type_id"],
+            "name" => $params["name"]
+        ]);
+        if (!count($items)) {
+            return false;
+        }
+        $foundItem = $items[0];
+        if ($foundItem->id != $updateId) {
+            wlog("Such item already exist");
+            return true;
+        }
+
+        return false;
+    }
+
+
     // Preparations for item create
     protected function preCreate($params, $isMultiple = false)
     {
@@ -128,17 +152,7 @@ class ImportTemplateModel extends CachedTable
             return null;
         }
 
-        $qResult = $this->dbObj->selectQ(
-            "*",
-            $this->tbl_name,
-            [
-                "name=" . qnull($res["name"]),
-                "type_id=" . qnull($res["type_id"]),
-                "user_id=" . qnull(self::$user_id)
-            ]
-        );
-        if ($this->dbObj->rowsCount($qResult) > 0) {
-            wlog("Such item already exist");
+        if ($this->isSameItemExist($res)) {
             return null;
         }
 
@@ -169,22 +183,8 @@ class ImportTemplateModel extends CachedTable
             return null;
         }
 
-        $qResult = $this->dbObj->selectQ(
-            "*",
-            $this->tbl_name,
-            [
-                "name=" . qnull($res["name"]),
-                "type_id=" . qnull($res["type_id"]),
-                "user_id=" . qnull(self::$user_id)
-            ]
-        );
-        $row = $this->dbObj->fetchRow($qResult);
-        if ($row) {
-            $found_id = intval($row["id"]);
-            if ($found_id != $item_id) {
-                wlog("Such item already exist");
-                return null;
-            }
+        if ($this->isSameItemExist($res, $item_id)) {
+            return null;
         }
 
         $res["updatedate"] = date("Y-m-d H:i:s");
@@ -210,15 +210,28 @@ class ImportTemplateModel extends CachedTable
 
 
     // Return array of items
-    public function getData()
+    public function getData($params = [])
     {
-        $res = [];
+        if (!is_array($params)) {
+            $params = [];
+        }
 
+        $res = [];
         if (!$this->checkCache()) {
             return $res;
         }
 
+        $typeFilter = isset($params["type"]) ? intval($params["type"]) : 0;
+        $nameFilter = isset($params["name"]) ? $params["name"] : null;
+
         foreach ($this->cache as $item) {
+            if ($typeFilter && $item->type_id != $typeFilter) {
+                continue;
+            }
+            if (!is_null($nameFilter) && $item->name != $nameFilter) {
+                continue;
+            }
+
             $itemObj = new ImportTemplateItem($item);
             $res[] = $itemObj;
         }

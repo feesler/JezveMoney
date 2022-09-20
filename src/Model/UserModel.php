@@ -380,6 +380,22 @@ class UserModel extends CachedTable
     }
 
 
+    // Check same item already exist
+    protected function isSameItemExist($params, $updateId = 0)
+    {
+        if (!is_array($params) || !isset($params["login"])) {
+            return false;
+        }
+
+        $userId = $this->getIdByLogin($params["login"]);
+        if ($userId != 0 && $userId != $updateId) {
+            return true;
+        }
+
+        return false;
+    }
+
+
     protected function preCreate($params, $isMultiple = false)
     {
         $res = $this->validateParams($params);
@@ -387,9 +403,8 @@ class UserModel extends CachedTable
             return null;
         }
 
-        // check user exist
-        if ($this->getIdByLogin($res["login"]) != 0) {
-            return false;
+        if ($this->isSameItemExist($res)) {
+            return null;
         }
 
         $res["owner_id"] = 0;
@@ -426,12 +441,8 @@ class UserModel extends CachedTable
             return null;
         }
 
-        if (isset($res["login"]) && isset($res["passhash"])) {
-            // check no user exist with the same login
-            $luser_id = $this->getIdByLogin($res["login"]);
-            if ($luser_id != 0 && $luser_id != $item_id) {
-                return null;
-            }
+        if ($this->isSameItemExist($res, $item_id)) {
+            return null;
         }
 
         $this->personName = $res["name"];
