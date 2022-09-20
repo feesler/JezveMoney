@@ -19,7 +19,7 @@ class DBInstall extends AdminController
 
     public function index()
     {
-        $this->template = new Template(ADMIN_TPL_PATH . "dbinstall.tpl");
+        $this->template = new Template(ADMIN_VIEW_TPL_PATH . "DBInstall.tpl");
         $data = [
             "titleString" => "Admin panel | DB update",
             "currentDBVersion" => $this->dbVer->getCurrentVersion(),

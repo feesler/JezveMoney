@@ -18,6 +18,7 @@ import { LoadingIndicator } from '../../LoadingIndicator/LoadingIndicator.js';
 import './style.scss';
 
 /** Strings */
+const TITLE_TEMPLATE = 'Template';
 const TITLE_CREATE_TEMPLATE = 'Create template';
 const TITLE_UPDATE_TEMPLATE = 'Update template';
 const TITLE_TEMPLATE_DELETE = 'Delete import template';
@@ -32,11 +33,19 @@ const MSG_TPL_LIST_REQUEST_FAIL = 'Fail to read list of import templates';
 const MSG_RULES_LIST_REQUEST_FAIL = 'Fail to read list of import rules';
 const MSG_VALID_TEMPLATE = 'Valid template';
 const MSG_NOT_MATCHED_TEMPLATE = 'Template does not match data';
+/** States */
+const LOADING_STATE = 1;
+const RAW_DATA_STATE = 2;
+const TPL_UPDATE_STATE = 3;
 
 /**
  * ImportTemplateManager component constructor
  */
 export class ImportTemplateManager extends Component {
+    static create(props) {
+        return new ImportTemplateManager(props);
+    }
+
     constructor(...args) {
         super(...args);
 
@@ -56,10 +65,6 @@ export class ImportTemplateManager extends Component {
             date: { msg: MSG_SEL_DATE },
             comment: { msg: MSG_SEL_COMMENT },
         };
-
-        this.LOADING_STATE = 1;
-        this.RAW_DATA_STATE = 2;
-        this.TPL_UPDATE_STATE = 3;
 
         this.templateDropDown = DropDown.create({
             elem: 'templateSel',
@@ -85,7 +90,8 @@ export class ImportTemplateManager extends Component {
         this.tableDescr = ge('tableDescr');
         this.rawDataTable = ge('rawDataTable');
         this.tplFeedback = ge('tplFeedback');
-        if (!this.tplHeading
+        if (
+            !this.tplHeading
             || !this.tplStateLbl
             || !this.templateDropDown
             || !this.tplField
@@ -101,7 +107,8 @@ export class ImportTemplateManager extends Component {
             || !this.cancelTplBtn
             || !this.tableDescr
             || !this.rawDataTable
-            || !this.tplFeedback) {
+            || !this.tplFeedback
+        ) {
             throw new Error('Failed to initialize upload file dialog');
         }
 
@@ -170,7 +177,7 @@ export class ImportTemplateManager extends Component {
     /** Reset component state */
     reset() {
         const newState = {
-            id: this.LOADING_STATE,
+            id: LOADING_STATE,
             rawData: null,
             startFromRow: 2,
             rowsToShow: 3,
@@ -185,7 +192,7 @@ export class ImportTemplateManager extends Component {
 
     /** Show/hide loading indication */
     setLoading() {
-        this.state.id = this.LOADING_STATE;
+        this.state.id = LOADING_STATE;
         this.render(this.state);
     }
 
@@ -194,7 +201,7 @@ export class ImportTemplateManager extends Component {
         this.state.rawData = copyObject(data);
 
         if (window.app.model.templates.length > 0) {
-            this.state.id = this.RAW_DATA_STATE;
+            this.state.id = RAW_DATA_STATE;
 
             let template = this.findValidTemplate(this.state.rawData);
             if (!template) {
@@ -221,7 +228,7 @@ export class ImportTemplateManager extends Component {
 
     /** Import template select 'change' event handler */
     onTemplateChange(selectedTemplate) {
-        if (this.state.id !== this.RAW_DATA_STATE) {
+        if (this.state.id !== RAW_DATA_STATE) {
             return;
         }
 
@@ -261,7 +268,7 @@ export class ImportTemplateManager extends Component {
 
     /** Set create template state */
     setCreateTemplateState() {
-        this.state.id = this.TPL_UPDATE_STATE;
+        this.state.id = TPL_UPDATE_STATE;
         this.state.template = new ImportTemplate({
             name: '',
             type_id: 0,
@@ -273,7 +280,7 @@ export class ImportTemplateManager extends Component {
 
     /** Update template button 'click' event handler */
     onUpdateTemplateClick() {
-        this.state.id = this.TPL_UPDATE_STATE;
+        this.state.id = TPL_UPDATE_STATE;
 
         this.render(this.state);
     }
@@ -358,7 +365,7 @@ export class ImportTemplateManager extends Component {
             this.state.listLoading = false;
             window.app.model.templates.setData(result.data);
             if (window.app.model.templates.length > 0) {
-                this.state.id = this.RAW_DATA_STATE;
+                this.state.id = RAW_DATA_STATE;
                 this.renderTemplateSelect();
             } else {
                 this.setCreateTemplateState();
@@ -418,11 +425,11 @@ export class ImportTemplateManager extends Component {
 
     /** Cancel template button 'click' event handler */
     onCancelTemplateClick() {
-        if (this.state.id !== this.TPL_UPDATE_STATE) {
+        if (this.state.id !== TPL_UPDATE_STATE) {
             return;
         }
 
-        this.state.id = this.RAW_DATA_STATE;
+        this.state.id = RAW_DATA_STATE;
         // Restore previously selected template
         const selectedTemplate = this.templateDropDown.getSelectionData();
         this.setTemplate(selectedTemplate.id);
@@ -430,7 +437,7 @@ export class ImportTemplateManager extends Component {
 
     /** Raw data table column 'click' event handler */
     onDataColumnClick(index) {
-        if (this.state.id !== this.TPL_UPDATE_STATE) {
+        if (this.state.id !== TPL_UPDATE_STATE) {
             return;
         }
 
@@ -444,7 +451,7 @@ export class ImportTemplateManager extends Component {
     }
 
     /** Validate current template on raw data */
-    setTemplateFeedback(message) {
+    setTemplateFeedback(message = null) {
         if (typeof message === 'string' && message.length) {
             this.tplFeedback.textContent = message;
             show(this.tplFeedback, true);
@@ -465,7 +472,7 @@ export class ImportTemplateManager extends Component {
             throw new Error('Invalid property');
         }
 
-        if (state.id === this.TPL_UPDATE_STATE) {
+        if (state.id === TPL_UPDATE_STATE) {
             this.setTemplateFeedback(this.columnFeedback[propName].msg);
             this.columnDropDown.selectItem(propName);
         }
@@ -530,16 +537,17 @@ export class ImportTemplateManager extends Component {
     /** Render component */
     render(state) {
         const templateAvail = (window.app.model.templates.length > 0);
-        if (state.id === this.LOADING_STATE) {
+        if (state.id === LOADING_STATE) {
             this.loadingIndicator.show();
             show(this.tableDescr, false);
             show(this.rawDataTable, false);
             show(this.tplControls, false);
-        } else if (state.id === this.RAW_DATA_STATE) {
+        } else if (state.id === RAW_DATA_STATE) {
             show(this.tplField, templateAvail);
             show(this.noTplLabel, !templateAvail);
             show(this.tplHeading, true);
-            show(this.tplStateLbl, false);
+            this.tplStateLbl.textContent = TITLE_TEMPLATE;
+
             this.loadingIndicator.hide();
             show(this.tableDescr, false);
             show(this.rawDataTable, false);
@@ -550,13 +558,12 @@ export class ImportTemplateManager extends Component {
             show(this.updateTplBtn, !!state.template);
             show(this.deleteTplBtn, !!state.template);
             show(this.tplControls, false);
-        } else if (state.id === this.TPL_UPDATE_STATE) {
+        } else if (state.id === TPL_UPDATE_STATE) {
             this.tplStateLbl.textContent = (state.template && state.template.id)
                 ? TITLE_UPDATE_TEMPLATE
                 : TITLE_CREATE_TEMPLATE;
 
             show(this.noTplLabel, false);
-            show(this.tplStateLbl, true);
             show(this.tplHeading, true);
             this.loadingIndicator.hide();
             show(this.tableDescr, true);
@@ -633,7 +640,7 @@ export class ImportTemplateManager extends Component {
         this.rawDataTable.appendChild(tableElem);
 
         let isValid = false;
-        if (state.id === this.LOADING_STATE) {
+        if (state.id === LOADING_STATE) {
             this.setTemplateFeedback();
         } else {
             if (state.template.id) {
@@ -648,14 +655,14 @@ export class ImportTemplateManager extends Component {
             } else {
                 this.onInvalidPropertyValue(state, validateResult.column);
                 enable(this.submitTplBtn, false);
-                if (state.id === this.RAW_DATA_STATE) {
+                if (state.id === RAW_DATA_STATE) {
                     this.setTemplateFeedback(MSG_NOT_MATCHED_TEMPLATE);
                 }
             }
         }
 
         if (isFunction(this.props.onStatus)) {
-            this.props.onStatus(state.id === this.RAW_DATA_STATE && isValid);
+            this.props.onStatus(state.id === RAW_DATA_STATE && isValid);
         }
     }
 }

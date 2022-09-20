@@ -24,9 +24,7 @@ const MSG_PROFILE_DELETE = 'Are you sure to completely delete your profile?<br>T
  * User profile view
  */
 class ProfileView extends View {
-    /**
-     * View initialization
-     */
+    /** View initialization */
     onStart() {
         this.changeNamePopup = null;
         this.changePassPopup = null;
@@ -105,55 +103,54 @@ class ProfileView extends View {
         }
     }
 
-    /**
-     * Old password input at change password form event handler
-     */
+    /** Old password input at change password form event handler */
     onOldPasswordInput() {
         window.app.clearBlockValidation('old-pwd-inp-block');
     }
 
-    /**
-     * New password input at change password form event handler
-     */
+    /** New password input at change password form event handler */
     onNewPasswordInput() {
         window.app.clearBlockValidation('new-pwd-inp-block');
     }
 
-    /**
-     * New name input at change name form event handler
-     */
+    /** New name input at change name form event handler */
     onNewNameInput() {
         window.app.clearBlockValidation('name-inp-block');
     }
 
-    /** Create and show change name popup */
+    /** Creates change name popup */
+    createChangeNamePopup() {
+        this.changeNamePopup = Popup.create({
+            id: 'chname_popup',
+            title: 'Change name',
+            content: this.changeNameContent,
+            className: 'chname_popup',
+        });
+        show(this.changeNameContent, true);
+
+        this.changeNamePopup.setControls({
+            okBtn: { value: 'Submit', onclick: (ev) => this.onChangeNameSubmit(ev) },
+            closeBtn: true,
+        });
+
+        this.newNameInp = ge('newname');
+        if (!this.newNameInp) {
+            throw new Error('Failed to initialize change name dialog');
+        }
+        this.newNameInp.addEventListener('input', () => this.onNewNameInput());
+
+        this.changeNameLoading = LoadingIndicator.create({ fixed: false });
+        this.changeNameContent.append(this.changeNameLoading.elem);
+    }
+
+    /** Show change name popup */
     showChangeNamePopup(e) {
         if (e) {
             e.preventDefault();
         }
 
         if (!this.changeNamePopup) {
-            this.changeNamePopup = Popup.create({
-                id: 'chname_popup',
-                title: 'Change name',
-                content: this.changeNameContent,
-                className: 'chname_popup',
-            });
-            show(this.changeNameContent, true);
-
-            this.changeNamePopup.setControls({
-                okBtn: { value: 'Submit', onclick: (ev) => this.onChangeNameSubmit(ev) },
-                closeBtn: true,
-            });
-
-            this.newNameInp = ge('newname');
-            if (!this.newNameInp) {
-                throw new Error('Failed to initialize change name dialog');
-            }
-            this.newNameInp.addEventListener('input', () => this.onNewNameInput());
-
-            this.changeNameLoading = LoadingIndicator.create({ fixed: false });
-            this.changeNameContent.append(this.changeNameLoading.elem);
+            this.createChangeNamePopup();
         }
 
         this.newNameInp.value = window.app.model.profile.name;
@@ -161,9 +158,7 @@ class ProfileView extends View {
         this.changeNamePopup.show();
     }
 
-    /**
-     * Change password form submit event handler
-     */
+    /** Change password form submit event handler */
     onChangePassSubmit(e) {
         let valid = true;
 
@@ -215,47 +210,48 @@ class ProfileView extends View {
         this.changePassForm.reset();
     }
 
-    /**
-     * Show change password popup
-     */
+    /** Creates change password popup */
+    createChangePasswordPopup() {
+        this.changePassPopup = Popup.create({
+            id: 'chpass_popup',
+            title: 'Change password',
+            content: this.changePassContent,
+            className: 'chpass_popup',
+        });
+        show(this.changePassContent, true);
+
+        this.changePassPopup.setControls({
+            okBtn: { value: 'Submit', onclick: (e) => this.onChangePassSubmit(e) },
+            closeBtn: true,
+        });
+
+        this.oldPassInp = ge('oldpwd');
+        this.newPassInp = ge('newpwd');
+        if (!this.oldPassInp || !this.newPassInp) {
+            throw new Error('Failed to initialize change password dialog');
+        }
+
+        this.oldPassInp.addEventListener('input', () => this.onOldPasswordInput());
+        this.newPassInp.addEventListener('input', () => this.onNewPasswordInput());
+
+        this.changePassLoading = LoadingIndicator.create({ fixed: false });
+        this.changePassContent.append(this.changePassLoading.elem);
+    }
+
+    /** Show change password popup */
     showChangePasswordPopup(e) {
         if (e) {
             e.preventDefault();
         }
 
         if (!this.changePassPopup) {
-            this.changePassPopup = Popup.create({
-                id: 'chpass_popup',
-                title: 'Change password',
-                content: this.changePassContent,
-                className: 'chpass_popup',
-            });
-            show(this.changePassContent, true);
-
-            this.changePassPopup.setControls({
-                okBtn: { value: 'Submit', onclick: (ev) => this.onChangePassSubmit(ev) },
-                closeBtn: true,
-            });
-
-            this.oldPassInp = ge('oldpwd');
-            this.newPassInp = ge('newpwd');
-            if (!this.oldPassInp || !this.newPassInp) {
-                throw new Error('Failed to initialize change password dialog');
-            }
-
-            this.oldPassInp.addEventListener('input', () => this.onOldPasswordInput());
-            this.newPassInp.addEventListener('input', () => this.onNewPasswordInput());
-
-            this.changePassLoading = LoadingIndicator.create({ fixed: false });
-            this.changePassContent.append(this.changePassLoading.elem);
+            this.createChangePasswordPopup();
         }
 
         this.changePassPopup.show();
     }
 
-    /**
-     * Change name form submit event handler
-     */
+    /** Change name form submit event handler */
     onChangeNameSubmit(e) {
         let valid = true;
 
@@ -305,68 +301,74 @@ class ProfileView extends View {
         this.changeNameForm.reset();
     }
 
-    /** Create and show reset popup */
+    /** Creates reset popup */
+    createResetPopup() {
+        this.resetPopup = Popup.create({
+            id: 'reset_popup',
+            title: 'Reset data',
+            content: this.resetContent,
+            className: 'reset-dialog',
+        });
+        show(this.resetContent, true);
+
+        this.resetPopup.setControls({
+            okBtn: { value: 'Submit', onclick: (e) => this.onResetSubmit(e) },
+            closeBtn: true,
+        });
+
+        this.resetAllCheck = Checkbox.fromElement(
+            ge('resetAllCheck'),
+            { onChange: () => this.onToggleResetAll() },
+        );
+
+        this.accountsCheck = Checkbox.fromElement(
+            ge('accountsCheck'),
+            { onChange: () => this.onResetFormChange() },
+        );
+
+        this.personsCheck = Checkbox.fromElement(
+            ge('personsCheck'),
+            { onChange: () => this.onResetFormChange() },
+        );
+
+        this.transactionsCheck = Checkbox.fromElement(
+            ge('transactionsCheck'),
+            { onChange: () => this.onResetFormChange() },
+        );
+
+        this.keepAccountsBalanceCheck = Checkbox.fromElement(
+            ge('keepAccountsBalanceCheck'),
+            { onChange: () => this.onResetFormChange() },
+        );
+
+        this.importTemplatesCheck = Checkbox.fromElement(
+            ge('importTemplatesCheck'),
+            { onChange: () => this.onResetFormChange() },
+        );
+
+        this.importRulesCheck = Checkbox.fromElement(
+            ge('importRulesCheck'),
+            { onChange: () => this.onResetFormChange() },
+        );
+
+        this.resetLoading = LoadingIndicator.create({ fixed: false });
+        this.resetContent.append(this.resetLoading.elem);
+    }
+
+    /** Show reset popup */
     showResetPopup(e) {
         if (e) {
             e.preventDefault();
         }
 
         if (!this.resetPopup) {
-            this.resetPopup = Popup.create({
-                id: 'reset_popup',
-                title: 'Reset data',
-                content: this.resetContent,
-                className: 'reset-dialog',
-            });
-            show(this.resetContent, true);
-
-            this.resetPopup.setControls({
-                okBtn: { value: 'Submit', onclick: (ev) => this.onResetSubmit(ev) },
-                closeBtn: true,
-            });
-
-            this.resetAllCheck = Checkbox.fromElement(
-                ge('resetAllCheck'),
-                { onChange: () => this.onToggleResetAll() },
-            );
-
-            this.accountsCheck = Checkbox.fromElement(
-                ge('accountsCheck'),
-                { onChange: () => this.onResetFormChange() },
-            );
-
-            this.personsCheck = Checkbox.fromElement(
-                ge('personsCheck'),
-                { onChange: () => this.onResetFormChange() },
-            );
-
-            this.transactionsCheck = Checkbox.fromElement(
-                ge('transactionsCheck'),
-                { onChange: () => this.onResetFormChange() },
-            );
-
-            this.keepAccountsBalanceCheck = Checkbox.fromElement(
-                ge('keepAccountsBalanceCheck'),
-                { onChange: () => this.onResetFormChange() },
-            );
-
-            this.importTemplatesCheck = Checkbox.fromElement(
-                ge('importTemplatesCheck'),
-                { onChange: () => this.onResetFormChange() },
-            );
-
-            this.importRulesCheck = Checkbox.fromElement(
-                ge('importRulesCheck'),
-                { onChange: () => this.onResetFormChange() },
-            );
-
-            this.resetLoading = LoadingIndicator.create({ fixed: false });
-            this.resetContent.append(this.resetLoading.elem);
+            this.createResetPopup();
         }
 
         this.resetPopup.show();
     }
 
+    /** 'Reset all' checkbox change event handler */
     onToggleResetAll() {
         const resetAll = this.resetAllCheck.checked;
 
@@ -381,6 +383,7 @@ class ProfileView extends View {
         this.importRulesCheck.check(resetAll);
     }
 
+    /** Reset data form change handler */
     onResetFormChange() {
         const resetAll = (
             this.accountsCheck.checked
@@ -399,13 +402,12 @@ class ProfileView extends View {
         this.keepAccountsBalanceCheck.enable(enableKeepBalance);
     }
 
+    /** Reset data dialog submit event handler */
     onResetSubmit() {
         this.resetForm.submit();
     }
 
-    /**
-     * Show reset accounts confirmation popup
-     */
+    /** Show reset accounts confirmation popup */
     confirmResetAccounts() {
         ConfirmDialog.create({
             id: 'reset_warning',
@@ -415,9 +417,7 @@ class ProfileView extends View {
         });
     }
 
-    /**
-     * Show reset all data confirmation popup
-     */
+    /** Show reset all data confirmation popup */
     confirmResetAll() {
         ConfirmDialog.create({
             id: 'reset_all_warning',
@@ -427,9 +427,7 @@ class ProfileView extends View {
         });
     }
 
-    /**
-     * Show delete profile confirmation popup
-     */
+    /** Show delete profile confirmation popup */
     confirmDelete() {
         ConfirmDialog.create({
             id: 'delete_warning',

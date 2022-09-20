@@ -5,29 +5,11 @@
   max-height: 100%;
   flex: 1 1 auto;
   min-height: 0;
-  padding: 4px;
+  padding: 12px 8px;
+  column-gap: 8px;
 
   + .cond-form {
     margin-top: 3px;
-  }
-
-  /* Input field and label group */
-  .field {
-    --field-title-font-size: 14px;
-
-    flex-flow: row nowrap;
-    align-items: center;
-    margin: 0 0 4px 0;
-  }
-
-  .field__title {
-    width: 20%;
-    min-width: 70px;
-    margin: 0;
-    text-align: center;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
   }
 
   .dd__combo {
@@ -42,17 +24,22 @@
 
   input[type="text"] {
     display: flex;
-    border: 1px solid;
     padding: 5px;
     height: 32px;
+    border-width: 1px;
+    border-style: solid;
   }
 
   /* Update and delete buttons */
-  .icon-btn,
-  .icon-btn:visited,
-  .icon-btn:active {
+  .icon-btn {
     background: none;
     cursor: pointer;
+  }
+
+  .checkbox {
+    --checkbox-label-size: 14px;
+
+    width: fit-content;
   }
 }
 
@@ -64,6 +51,7 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
+  row-gap: 8px;
 
   .checkbox__label {
     overflow: hidden;
@@ -74,16 +62,17 @@
 /* Fields container */
 .cond-form__fields {
   display: flex;
-  flex-flow: column nowrap;
+  flex-flow: row wrap;
   max-height: 100%;
   flex: 1 1 auto;
   min-height: 0;
-  margin-bottom: 8px;
+  column-gap: 8px;
+  row-gap: 8px;
 }
 
 .property-field,
 .operator-field {
-  flex-grow: 1;
+  flex-grow: 0;
   flex-shrink: 0;
 }
 
@@ -91,11 +80,7 @@
   display: flex;
   flex-flow: column nowrap;
   overflow: hidden;
-  flex-basis: 100%;
-}
-
-.value-field .checkbox {
-  margin-left: 20%;
+  flex: 1 1 auto;
 }
 
 /* Controls container */
@@ -109,26 +94,6 @@
 @media (min-width: 768px) {
   .cond-form__fields {
     flex-flow: row nowrap;
-  }
-
-  .cond-form {
-    .field {
-      --field-title-font-size: 12px;
-
-      flex-direction: column;
-      align-items: normal;
-      margin: 0 8px 0 0;
-    }
-
-    .field__title {
-      width: auto;
-      min-width: auto;
-      margin: 0 0 4px 1px;
-      text-align: left;
-    }
-  }
-
-  .value-field .checkbox {
-    margin-left: 0;
+    column-gap: 8px;
   }
 }

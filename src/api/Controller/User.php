@@ -67,9 +67,13 @@ class User extends ApiListController
             throw new \Error("Invalid request data");
         }
 
+        $this->begin();
+
         if (!$this->uMod->create($reqData)) {
             throw new \Error(Message::get(ERR_REGISTER_FAIL));
         }
+
+        $this->commit();
 
         $this->ok();
     }
@@ -119,6 +123,8 @@ class User extends ApiListController
             throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
         }
 
+        $this->begin();
+
         $uObj = $this->uMod->getItem($reqData["id"]);
         if (!$uObj) {
             throw new \Error($defMsg);
@@ -127,6 +133,8 @@ class User extends ApiListController
         if (!$this->uMod->setPassword($uObj->login, $reqData["password"])) {
             throw new \Error($defMsg);
         }
+
+        $this->commit();
 
         $this->setMessage(Message::get(MSG_PROFILE_PASSWORD));
         $this->ok();

@@ -55,7 +55,7 @@ class Transactions extends TemplateController
 
     public function index()
     {
-        $this->template = new Template(TPL_PATH . "transactions.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "TransactionList.tpl");
         $baseUrl = BASEURL . "transactions/";
         $data = [
             "titleString" => "Jezve Money | Transactions",
@@ -172,7 +172,7 @@ class Transactions extends TemplateController
     }
 
 
-    private function fail($msg = null)
+    protected function fail($msg = null)
     {
         if (!is_null($msg)) {
             Message::set($msg);
@@ -248,7 +248,7 @@ class Transactions extends TemplateController
             $this->createTransaction();
         }
 
-        $this->template = new Template(TPL_PATH . "transaction.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "Transaction.tpl");
         $data = [
             "action" => "create",
         ];
@@ -588,7 +588,7 @@ class Transactions extends TemplateController
             $this->updateTransaction();
         }
 
-        $this->template = new Template(TPL_PATH . "transaction.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "Transaction.tpl");
         $data = [
             "action" => "update",
         ];
@@ -873,25 +873,28 @@ class Transactions extends TemplateController
         }
 
         if (!isset($_POST["type"])) {
-            $this->fail();
+            throw new \Error();
         }
 
         $trans_type = intval($_POST["type"]);
         $reqData = checkFields($_POST, ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields);
         if ($reqData === false) {
-            $this->fail();
+            throw new \Error();
         }
+
+        $this->begin();
 
         $itemData = ($trans_type == DEBT)
             ? $this->model->prepareDebt($reqData)
             : $reqData;
 
         if (!$this->model->create($itemData)) {
-            $this->fail(ERR_TRANS_CREATE);
+            throw new \Error(ERR_TRANS_CREATE);
         }
 
-        Message::set(MSG_TRANS_CREATE);
+        $this->commit();
 
+        Message::set(MSG_TRANS_CREATE);
         setLocation(BASEURL);
     }
 
@@ -903,24 +906,28 @@ class Transactions extends TemplateController
         }
 
         if (!isset($_POST["id"]) || !isset($_POST["type"])) {
-            $this->fail();
+            throw new \Error();
         }
 
         $trans_type = intval($_POST["type"]);
         $reqData = checkFields($_POST, ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields);
         if ($reqData === false) {
-            $this->fail();
+            throw new \Error();
         }
+
+        $this->begin();
 
         $itemData = ($trans_type == DEBT)
             ? $this->model->prepareDebt($reqData)
             : $reqData;
 
         if (!$this->model->update($_POST["id"], $itemData)) {
-            $this->fail(ERR_TRANS_UPDATE);
+            throw new \Error(ERR_TRANS_UPDATE);
         }
-        Message::set(MSG_TRANS_UPDATE);
 
+        $this->commit();
+
+        Message::set(MSG_TRANS_UPDATE);
         setLocation(BASEURL . "transactions/");
     }
 
@@ -934,13 +941,17 @@ class Transactions extends TemplateController
         $defMsg = ERR_TRANS_DELETE;
 
         if (!isset($_POST["transactions"])) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
+
+        $this->begin();
 
         $ids = explode(",", rawurldecode($_POST["transactions"]));
         if (!$this->model->del($ids)) {
-            $this->fail();
+            throw new \Error();
         }
+
+        $this->commit();
 
         Message::set(MSG_TRANS_DELETE);
         setLocation(BASEURL . "transactions/");

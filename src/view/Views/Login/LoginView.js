@@ -1,5 +1,5 @@
 import 'jezvejs/style';
-import { ge } from 'jezvejs';
+import { ge, Checkbox } from 'jezvejs';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import '../../css/app.scss';
@@ -30,13 +30,20 @@ class LoginView extends View {
     onStart() {
         this.loginInp = ge('login');
         this.passwordInp = ge('password');
+        const checkElem = ge('rememberCheck');
         this.form = ge('loginfrm');
-        if (!this.loginInp || !this.passwordInp || !this.form) {
+        if (
+            !this.loginInp
+            || !this.passwordInp
+            || !checkElem
+            || !this.form
+        ) {
             throw new Error('Failed to initialize Login view');
         }
 
         this.loginInp.addEventListener('input', () => this.onLoginInput());
         this.passwordInp.addEventListener('input', () => this.onPasswordInput());
+        this.rememberCheck = Checkbox.fromElement(checkElem);
         this.form.addEventListener('submit', (e) => this.onSubmit(e));
     }
 

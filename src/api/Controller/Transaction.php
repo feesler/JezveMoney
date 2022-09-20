@@ -146,9 +146,13 @@ class Transaction extends ApiListController
             throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
         }
 
+        $this->begin();
+
         if (!$this->model->updatePosition($reqData["id"], $reqData["pos"])) {
             throw new \Error(Message::get(ERR_TRANS_CHANGE_POS));
         }
+
+        $this->commit();
 
         $this->ok();
     }

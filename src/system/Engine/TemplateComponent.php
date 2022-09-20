@@ -6,6 +6,7 @@ use JezveMoney\Core\Template;
 
 abstract class TemplateComponent
 {
+    protected static $template = null;
     protected static $filename = null;
 
     public static function render($data)

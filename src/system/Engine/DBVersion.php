@@ -4,14 +4,29 @@ namespace JezveMoney\Core;
 
 use JezveMoney\App\Model\IconModel;
 
+const TABLE_OPTIONS = "ENGINE=InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci";
+
 class DBVersion
 {
     use Singleton;
 
     protected $tbl_name = "dbver";
-    protected $latestVersion = 8;
+    protected $latestVersion = 9;
     protected $dbClient = null;
-
+    protected $tables = [
+        "accounts",
+        "admin_query",
+        "currency",
+        "dbver",
+        "icon",
+        "import_act",
+        "import_cond",
+        "import_rule",
+        "import_tpl",
+        "persons",
+        "transactions",
+        "users"
+    ];
 
     protected function onStart()
     {
@@ -55,7 +70,7 @@ class DBVersion
             "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
                 "`version` INT(11) NOT NULL DEFAULT '0', " .
                 "PRIMARY KEY (`id`)",
-            "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
+            TABLE_OPTIONS
         );
 
         return $res;
@@ -136,6 +151,9 @@ class DBVersion
         }
         if ($current < 8) {
             $current = $this->version8();
+        }
+        if ($current < 9) {
+            $current = $this->version9();
         }
 
         $this->setVersion($current);
@@ -292,6 +310,20 @@ class DBVersion
     }
 
 
+    private function version9()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        foreach ($this->tables as $table) {
+            $this->dbClient->setTableEngine($table, "InnoDB");
+        }
+
+        return 9;
+    }
+
+
     private function createCurrencyTable()
     {
         if (!$this->dbClient) {
@@ -312,7 +344,7 @@ class DBVersion
                 "`createdate` DATETIME NOT NULL, " .
                 "`updatedate` DATETIME NOT NULL, " .
                 "PRIMARY KEY (`id`)",
-            "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
+            TABLE_OPTIONS
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -346,7 +378,7 @@ class DBVersion
                 "`updatedate` DATETIME NOT NULL, " .
                 "PRIMARY KEY (`id`), " .
                 "KEY `user_id` (`user_id`)",
-            "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
+            TABLE_OPTIONS
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -374,7 +406,7 @@ class DBVersion
                 "`createdate` DATETIME NOT NULL, " .
                 "`updatedate` DATETIME NOT NULL, " .
                 "PRIMARY KEY (`id`)",
-            "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
+            TABLE_OPTIONS
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -412,7 +444,7 @@ class DBVersion
                 "`src_result` DECIMAL(15,2) NOT NULL, " .
                 "`dest_result` DECIMAL(15,2) NOT NULL, " .
                 "PRIMARY KEY (`id`)",
-            "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
+            TABLE_OPTIONS
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -441,7 +473,7 @@ class DBVersion
                 "`createdate` DATETIME NOT NULL, " .
                 "`updatedate` DATETIME NOT NULL, " .
                 "PRIMARY KEY (`id`)",
-            "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
+            TABLE_OPTIONS
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -469,7 +501,7 @@ class DBVersion
                 "`createdate` DATETIME NOT NULL, " .
                 "`updatedate` DATETIME NOT NULL, " .
                 "PRIMARY KEY (`id`)",
-            "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
+            TABLE_OPTIONS
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -517,7 +549,7 @@ class DBVersion
                 "`updatedate` DATETIME NOT NULL, " .
                 "PRIMARY KEY (`id`), " .
                 "KEY `user_id` (`user_id`)",
-            "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
+            TABLE_OPTIONS
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -543,7 +575,7 @@ class DBVersion
                 "`createdate` DATETIME NOT NULL, " .
                 "`updatedate` DATETIME NOT NULL, " .
                 "PRIMARY KEY (`id`)",
-            "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
+            TABLE_OPTIONS
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -573,7 +605,7 @@ class DBVersion
                 "`createdate` DATETIME NOT NULL, " .
                 "`updatedate` DATETIME NOT NULL, " .
                 "PRIMARY KEY (`id`)",
-            "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
+            TABLE_OPTIONS
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");
@@ -601,7 +633,7 @@ class DBVersion
                 "`createdate` DATETIME NOT NULL, " .
                 "`updatedate` DATETIME NOT NULL, " .
                 "PRIMARY KEY (`id`)",
-            "DEFAULT CHARACTER SET = utf8mb4 COLLATE utf8mb4_general_ci"
+            TABLE_OPTIONS
         );
         if (!$res) {
             throw new \Error("Fail to create table '$tableName'");

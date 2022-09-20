@@ -171,6 +171,30 @@ class ImportActionModel extends CachedTable
     }
 
 
+    // Check same item already exist
+    protected function isSameItemExist($params, $updateId = 0)
+    {
+        if (!is_array($params)) {
+            return false;
+        }
+
+        $items = $this->getData([
+            "rule" => $params["rule_id"],
+            "action" => $params["action_id"]
+        ]);
+        if (!count($items)) {
+            return false;
+        }
+        $foundItem = $items[0];
+        if ($foundItem->id != $updateId) {
+            wlog("Such item already exist");
+            return true;
+        }
+
+        return false;
+    }
+
+
     // Preparations for item create
     protected function preCreate($params, $isMultiple = false)
     {
@@ -179,17 +203,7 @@ class ImportActionModel extends CachedTable
             return null;
         }
 
-        $qResult = $this->dbObj->selectQ(
-            "*",
-            $this->tbl_name,
-            [
-                "user_id=" . qnull(self::$user_id),
-                "rule_id=" . qnull($res["rule_id"]),
-                "action_id=" . qnull($res["action_id"]),
-            ]
-        );
-        if ($this->dbObj->rowsCount($qResult) > 0) {
-            wlog("Such item already exist");
+        if ($this->isSameItemExist($res)) {
             return null;
         }
 
@@ -224,22 +238,8 @@ class ImportActionModel extends CachedTable
             return null;
         }
 
-        $qResult = $this->dbObj->selectQ(
-            "*",
-            $this->tbl_name,
-            [
-                "user_id=" . qnull(self::$user_id),
-                "rule_id=" . qnull($res["rule_id"]),
-                "action_id=" . qnull($res["action_id"]),
-            ]
-        );
-        $row = $this->dbObj->fetchRow($qResult);
-        if ($row) {
-            $found_id = intval($row["id"]);
-            if ($found_id != $item_id) {
-                wlog("Such item already exist");
-                return null;
-            }
+        if ($this->isSameItemExist($res, $item_id)) {
+            return null;
         }
 
         $targetAction = isset($res["action_id"]) ? $res["action_id"] : $actionObj->action;
@@ -279,15 +279,8 @@ class ImportActionModel extends CachedTable
         }
 
         $requestAll = (isset($params["full"]) && $params["full"] == true && UserModel::isAdminUser());
-        $filterByRule = isset($params["rule"]);
-        $rule_id = 0;
-        if ($filterByRule) {
-            $rule_id = intval($params["rule"]);
-            if (!$rule_id) {
-                wlog("Invalid rule id: " . $params["rule"]);
-                return null;
-            }
-        }
+        $ruleFilter = isset($params["rule"]) ? intval($params["rule"]) : 0;
+        $actionFilter = isset($params["action"]) ? intval($params["action"]) : 0;
 
         $itemsData = [];
         if ($requestAll) {
@@ -308,7 +301,10 @@ class ImportActionModel extends CachedTable
 
         $res = [];
         foreach ($itemsData as $item) {
-            if ($filterByRule && $item->rule_id != $rule_id) {
+            if ($ruleFilter && $item->rule_id != $ruleFilter) {
+                continue;
+            }
+            if ($actionFilter && $item->action_id != $actionFilter) {
                 continue;
             }
 

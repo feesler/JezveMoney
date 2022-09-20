@@ -2,12 +2,11 @@
 use JezveMoney\App\Template\Component\Tile;
 use JezveMoney\App\Template\Component\IconLink;
 
-include(TPL_PATH."commonhdr.tpl");	?>
-</head>
-<body class="<?=($this->themeClass)?>">
+include(TPL_PATH . "Header.tpl");	?>
+
 <div class="page">
     <div class="page_wrapper">
-<?php	require_once(TPL_PATH."header.tpl");		?>
+<?php	require_once(TPL_PATH . "Component/tpl/Header.tpl");		?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
@@ -88,7 +87,5 @@ include(TPL_PATH."commonhdr.tpl");	?>
 </form>
 <?php	}	?>
 
-<?php	include(TPL_PATH."icons.tpl");	?>
-<?php	include(TPL_PATH."footer.tpl");	?>
-</body>
-</html>
+<?php	include(TPL_PATH . "Icons.tpl");	?>
+<?php	include(TPL_PATH . "Footer.tpl");	?>

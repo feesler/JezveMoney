@@ -3,7 +3,6 @@ import {
     assert,
     query,
     queryAll,
-    hasClass,
     prop,
     click,
     input,
@@ -35,6 +34,8 @@ export class ImportUploadDialog extends TestComponent {
         const res = {};
 
         res.closeBtn = await query(this.elem, '.close-btn');
+
+        res.fileBlock = { elem: await query('#fileBlock') };
 
         res.uploadFormBrowser = { elem: await query(this.elem, '.upload-form__browser') };
         res.fileNameElem = { elem: await query(this.elem, '.upload-form__filename') };
@@ -68,6 +69,7 @@ export class ImportUploadDialog extends TestComponent {
 
         assert(
             res.closeBtn
+            && res.fileBlock.elem
             && res.uploadFormBrowser.elem
             && res.fileNameElem.elem
             && res.templateSel
@@ -95,12 +97,17 @@ export class ImportUploadDialog extends TestComponent {
             'Failed to initialize extras of file upload dialog',
         );
 
-        res.isTplLoading = res.templateSel.content.disabled;
+        res.isTplLoading = res.templateSel.disabled;
 
-        res.loadingIndicator.visible = await isVisible(res.loadingIndicator.elem, true);
-        res.isLoading = res.loadingIndicator.visible;
+        res.templateBlock.visible = await isVisible(res.templateBlock.elem);
+        res.uploadProgress.visible = await isVisible(res.uploadProgress.elem);
+        res.loadingIndicator.visible = await isVisible(res.loadingIndicator.elem);
+        res.isLoading = (
+            res.uploadProgress.visible
+            || (res.templateBlock.visible && res.loadingIndicator.visible)
+        );
         res.columns = null;
-        if (!res.isLoading) {
+        if (res.templateBlock.visible && !res.isLoading) {
             res.columns = await asyncMap(
                 await queryAll(res.rawDataTable.elem, '.raw-data-column'),
                 async (elem) => {
@@ -128,7 +135,6 @@ export class ImportUploadDialog extends TestComponent {
             }
         }
 
-        res.uploadCollapsed = await hasClass(res.uploadFormBrowser.elem, 'upload-form__collapsed');
         res.fileName = await prop(res.fileNameElem.elem, 'value');
         res.useServerAddress = res.useServerCheck.checked;
         res.serverAddress = await prop(res.serverAddressInput.elem, 'value');
@@ -138,14 +144,14 @@ export class ImportUploadDialog extends TestComponent {
         res.tplNameInp.value = await prop(res.tplNameInp.elem, 'value');
         res.tplFeedback.title = await prop(res.tplFeedback.elem, 'textContent');
 
-        res.tplVisible = await isVisible(res.templateBlock.elem, true);
         if (res.isLoading) {
             res.state = LOADING_STATE;
-        } else if (res.tplVisible) {
-            const lblVisible = await isVisible(res.tplStateLbl.elem, true);
-            if (lblVisible) {
-                const stateLabel = await prop(res.tplStateLbl.elem, 'textContent');
-                res.state = (stateLabel === 'Create template') ? CREATE_TPL_STATE : UPDATE_TPL_STATE;
+        } else if (res.templateBlock.visible) {
+            const stateLabel = await prop(res.tplStateLbl.elem, 'textContent');
+            if (stateLabel === 'Create template') {
+                res.state = CREATE_TPL_STATE;
+            } else if (stateLabel === 'Update template') {
+                res.state = UPDATE_TPL_STATE;
             } else {
                 res.state = RAW_DATA_STATE;
             }
@@ -165,7 +171,6 @@ export class ImportUploadDialog extends TestComponent {
         res.uploadInProgress = cont.uploadProgress.visible;
         res.isTplLoading = cont.isTplLoading;
 
-        res.uploadCollapsed = cont.uploadCollapsed;
         res.useServerAddress = cont.useServerAddress;
         res.filename = cont.uploadFilename;
         res.fileData = cont.fileData;
@@ -225,6 +230,22 @@ export class ImportUploadDialog extends TestComponent {
         return res;
     }
 
+    assertStateId(state) {
+        assert(this.model.state === state, `Invalid state of upload dialog: ${this.model.state}. ${state} is expected`);
+    }
+
+    checkBrowseFileState() {
+        this.assertStateId(BROWSE_FILE_STATE);
+    }
+
+    checkRawDataState() {
+        this.assertStateId(RAW_DATA_STATE);
+    }
+
+    checkTplFormState() {
+        assert(TPL_FORM_STATES.includes(this.model.state), `Invalid state: ${this.model.state}`);
+    }
+
     getColumn(data, index) {
         const rowsToShow = 2;
         const headerRow = data.slice(0, 1)[0];
@@ -249,15 +270,14 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     getExpectedState(model) {
+        const isBrowseState = model.state === BROWSE_FILE_STATE;
         const res = {
-            uploadFormBrowser: { visible: true },
-            isEncodeCheck: { visible: true },
-            serverAddressBlock: { visible: model.useServerAddress },
+            uploadFormBrowser: { visible: isBrowseState },
+            isEncodeCheck: { visible: isBrowseState },
+            serverAddressBlock: { visible: isBrowseState && model.useServerAddress },
             columns: null,
             initialAccount: { value: model.initialAccount.id.toString() },
         };
-
-        res.uploadFilename = model.filename;
 
         if (model.state === CREATE_TPL_STATE
             || model.state === UPDATE_TPL_STATE) {
@@ -265,6 +285,7 @@ export class ImportUploadDialog extends TestComponent {
                 assert(model.template, 'Invalid model: expected template');
             }
 
+            res.fileBlock = { visible: false };
             res.templateBlock = { visible: true };
             res.loadingIndicator = { visible: false };
             res.tplField = { visible: false };
@@ -283,6 +304,7 @@ export class ImportUploadDialog extends TestComponent {
             const tplName = (model.template) ? model.template.name : '';
             res.tplNameInp = { value: tplName };
         } else if (model.state === RAW_DATA_STATE) {
+            res.fileBlock = { visible: false };
             res.templateBlock = { visible: true };
             res.loadingIndicator = { visible: false };
             res.tplField = { visible: true };
@@ -304,8 +326,10 @@ export class ImportUploadDialog extends TestComponent {
             res.deleteTplBtn = { visible: true };
             res.submitTplBtn = { visible: false };
             res.cancelTplBtn = { visible: false };
-            res.tplFeedback = { visible: false };
         } else if (model.state === BROWSE_FILE_STATE) {
+            res.uploadFilename = model.filename;
+
+            res.fileBlock = { visible: true };
             res.templateBlock = { visible: false };
             res.loadingIndicator = { visible: false };
             res.nameField = { visible: false };
@@ -373,11 +397,14 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async toggleServerAddress() {
+        this.checkBrowseFileState();
+
         await this.content.useServerCheck.toggle();
         await this.parse();
     }
 
     async setFile(filename) {
+        this.checkBrowseFileState();
         assert.isString(filename, 'Invalid parameter');
 
         if (!this.content.useServerAddress) {
@@ -394,9 +421,9 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async upload() {
-        await this.parse();
+        this.checkBrowseFileState();
+        assert(this.model.filename?.length, 'File name not set');
 
-        const tplVisible = await isVisible(this.content.templateBlock.elem, true);
         if (App.state.templates.length > 0) {
             this.model.state = RAW_DATA_STATE;
 
@@ -410,10 +437,8 @@ export class ImportUploadDialog extends TestComponent {
         this.expectedState = this.getExpectedState(this.model);
 
         await click(this.content.serverUploadBtn.elem);
-        // Template block is visible if file was already uploaded
-        if (!tplVisible) {
-            await wait('#templateBlock', { visible: true });
-        }
+
+        await wait('#templateBlock', { visible: true });
         await wait('.tpl-form > .loading-indicator', { hidden: true });
         await this.parse();
 
@@ -421,7 +446,7 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async selectTemplateById(val) {
-        assert(this.model.state === RAW_DATA_STATE, 'Invalid state');
+        this.checkRawDataState();
 
         this.model.template = App.state.templates.getItem(val);
         this.expectedState = this.getExpectedState(this.model);
@@ -438,7 +463,7 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async createTemplate() {
-        assert(this.model.state === RAW_DATA_STATE, 'Invalid state');
+        this.checkRawDataState();
 
         this.model.state = CREATE_TPL_STATE;
         this.model.template = null;
@@ -451,7 +476,7 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async updateTemplate() {
-        assert(this.model.state === RAW_DATA_STATE, 'Invalid state');
+        this.checkRawDataState();
 
         this.model.state = UPDATE_TPL_STATE;
         this.model.template = App.state.templates.getItem(this.content.templateSel.content.value);
@@ -464,7 +489,7 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async deleteTemplate() {
-        assert(this.model.state === RAW_DATA_STATE, 'Invalid state');
+        this.checkRawDataState();
 
         if (this.content.templateSel.content.items.length === 1) {
             this.model.state = CREATE_TPL_STATE;
@@ -497,7 +522,7 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async inputTemplateName(val) {
-        assert(TPL_FORM_STATES.includes(this.model.state), `Invalid state: ${this.model.state}`);
+        this.checkTplFormState();
 
         this.model.template.name = val;
         this.expectedState = this.getExpectedState(this.model);
@@ -509,7 +534,7 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async selectTemplateColumn(name, index) {
-        assert(TPL_FORM_STATES.includes(this.model.state), `Invalid state: ${this.model.state}`);
+        this.checkTplFormState();
 
         this.model.template.columns[name] = index;
         this.expectedState = this.getExpectedState(this.model);

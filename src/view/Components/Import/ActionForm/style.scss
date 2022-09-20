@@ -1,25 +1,13 @@
 .action-form {
   display: flex;
   flex-flow: row nowrap;
-  align-items: normal;
+  align-items: center;
   flex-grow: 1;
-  padding: 2px 8px 4px 8px;
+  padding: 12px 8px;
+  column-gap: 8px;
 
   + .action-form {
     margin-top: 3px;
-  }
-
-  /* Input field and label group */
-  .field {
-    --field-title-font-size: 12px;
-
-    margin: 0 0 4px 0;
-  }
-
-  .field__title {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
   }
 
   .dd__combo {
@@ -34,9 +22,11 @@
 
   input[type="text"] {
     display: flex;
-    border: 1px solid;
     padding: 5px;
     height: 32px;
+    border-width: 1px;
+    border-style: solid;
+    flex: 1 1 150px;
   }
 }
 
@@ -53,15 +43,12 @@
   flex-flow: row wrap;
   flex: 1 1 auto;
   column-gap: 8px;
+  row-gap: 8px;
 }
 
 .action-type-field {
   flex-grow: 0;
   flex-shrink: 1;
-}
-
-.action-value-field {
-  flex-grow: 1;
 }
 
 .action-form__controls {

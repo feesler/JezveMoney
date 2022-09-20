@@ -20,7 +20,7 @@ class Query extends AdminController
 
     public function index()
     {
-        $this->template = new Template(ADMIN_TPL_PATH . "query.tpl");
+        $this->template = new Template(ADMIN_VIEW_TPL_PATH . "Query.tpl");
         $data = [
             "titleString" => "Admin panel | DB queries",
             "rows" => 0,

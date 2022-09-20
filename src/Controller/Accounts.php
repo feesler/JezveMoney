@@ -28,7 +28,7 @@ class Accounts extends TemplateController
 
     public function index()
     {
-        $this->template = new Template(TPL_PATH . "accounts.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "AccountList.tpl");
         $data = [
             "titleString" => "Jezve Money | Accounts",
             "tilesArr" => [],
@@ -68,7 +68,7 @@ class Accounts extends TemplateController
             return;
         }
 
-        $this->template = new Template(TPL_PATH . "account.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "Account.tpl");
         $data = [
             "headString" => "Create account",
             "titleString" => "Jezve Money | Create account"
@@ -120,7 +120,7 @@ class Accounts extends TemplateController
     }
 
 
-    private function fail($msg = null)
+    protected function fail($msg = null)
     {
         if (!is_null($msg)) {
             Message::set($msg);
@@ -137,7 +137,7 @@ class Accounts extends TemplateController
             return;
         }
 
-        $this->template = new Template(TPL_PATH . "account.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "Account.tpl");
         $data = [
             "headString" => "Edit account",
             "titleString" => "Jezve Money | Edit account"
@@ -198,22 +198,25 @@ class Accounts extends TemplateController
 
         $reqData = checkFields($_POST, $this->requiredFields);
         if ($reqData === false) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
+
+        $this->begin();
 
         $uObj = $this->uMod->getItem($this->user_id);
         if (!$uObj) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
         $reqData["owner_id"] = $uObj->owner_id;
 
         if (!$this->model->create($reqData)) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
-        Message::set(MSG_ACCOUNT_CREATE);
+        $this->commit();
 
+        Message::set(MSG_ACCOUNT_CREATE);
         setLocation(BASEURL . "accounts/");
     }
 
@@ -227,16 +230,19 @@ class Accounts extends TemplateController
         $defMsg = ERR_ACCOUNT_UPDATE;
 
         if (!isset($_POST["id"])) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
+
+        $this->begin();
 
         $reqData = checkFields($_POST, $this->requiredFields);
         if (!$this->model->update($_POST["id"], $reqData)) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
-        Message::set(MSG_ACCOUNT_UPDATE);
+        $this->commit();
 
+        Message::set(MSG_ACCOUNT_UPDATE);
         setLocation(BASEURL . "accounts/");
     }
 
@@ -250,13 +256,17 @@ class Accounts extends TemplateController
         $defMsg = ERR_ACCOUNT_SHOW;
 
         if (!isset($_POST["accounts"])) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
+
+        $this->begin();
 
         $ids = explode(",", rawurldecode($_POST["accounts"]));
         if (!$this->model->show($ids)) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
+
+        $this->commit();
 
         setLocation(BASEURL . "accounts/");
     }
@@ -271,13 +281,17 @@ class Accounts extends TemplateController
         $defMsg = ERR_ACCOUNT_HIDE;
 
         if (!isset($_POST["accounts"])) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
+
+        $this->begin();
 
         $ids = explode(",", rawurldecode($_POST["accounts"]));
         if (!$this->model->hide($ids)) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
+
+        $this->commit();
 
         setLocation(BASEURL . "accounts/");
     }
@@ -292,16 +306,19 @@ class Accounts extends TemplateController
         $defMsg = ERR_ACCOUNT_DELETE;
 
         if (!isset($_POST["accounts"])) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
+
+        $this->begin();
 
         $ids = explode(",", rawurldecode($_POST["accounts"]));
         if (!$this->model->del($ids)) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
-        Message::set(MSG_ACCOUNT_DELETE);
+        $this->commit();
 
+        Message::set(MSG_ACCOUNT_DELETE);
         setLocation(BASEURL . "accounts/");
     }
 

@@ -816,6 +816,7 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Fail to init view');
         }
         resetForm.addEventListener('submit', (e) => this.onFormSubmit(e));
+        this.initCheckboxed(resetForm);
     }
 
     /**

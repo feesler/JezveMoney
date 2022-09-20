@@ -85,6 +85,23 @@ class CurrencyModel extends CachedTable
     }
 
 
+    // Check same item already exist
+    protected function isSameItemExist($params, $updateId = 0)
+    {
+        if (!is_array($params) || !isset($params["name"])) {
+            return false;
+        }
+
+        $foundItem = $this->findByName($params["name"]);
+        if ($foundItem && $foundItem->id != $updateId) {
+            wlog("Such item already exist");
+            return true;
+        }
+
+        return false;
+    }
+
+
     // Preparations for item create
     protected function preCreate($params, $isMultiple = false)
     {
@@ -93,9 +110,7 @@ class CurrencyModel extends CachedTable
             return null;
         }
 
-        $qResult = $this->dbObj->selectQ("*", $this->tbl_name, "name=" . qnull($res["name"]));
-        if ($this->dbObj->rowsCount($qResult) > 0) {
-            wlog("Such item already exist");
+        if ($this->isSameItemExist($res)) {
             return null;
         }
 
@@ -119,14 +134,8 @@ class CurrencyModel extends CachedTable
             return null;
         }
 
-        $qResult = $this->dbObj->selectQ("*", $this->tbl_name, "name=" . qnull($res["name"]));
-        $row = $this->dbObj->fetchRow($qResult);
-        if ($row) {
-            $found_id = intval($row["id"]);
-            if ($found_id != $item_id) {
-                wlog("Such item already exist");
-                return null;
-            }
+        if ($this->isSameItemExist($res, $item_id)) {
+            return null;
         }
 
         $res["updatedate"] = date("Y-m-d H:i:s");
@@ -209,5 +218,31 @@ class CurrencyModel extends CachedTable
         }
 
         return $res;
+    }
+
+
+    public function findByName($name, $caseSens = false)
+    {
+        if (is_empty($name)) {
+            return null;
+        }
+
+        if (!$this->checkCache()) {
+            return null;
+        }
+
+        if (!$caseSens) {
+            $name = strtolower($name);
+        }
+        foreach ($this->cache as $item) {
+            if (
+                ($caseSens && $item->name == $name) ||
+                (!$caseSens && strtolower($item->name) == $name)
+            ) {
+                return $item;
+            }
+        }
+
+        return null;
     }
 }

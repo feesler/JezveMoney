@@ -9,7 +9,7 @@ class User extends AdminController
 {
     public function index()
     {
-        $this->template = new Template(ADMIN_TPL_PATH . "user.tpl");
+        $this->template = new Template(ADMIN_VIEW_TPL_PATH . "User.tpl");
         $data = [
             "titleString" => "Admin panel | Users",
         ];

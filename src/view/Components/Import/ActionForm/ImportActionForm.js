@@ -1,5 +1,6 @@
 import {
     ce,
+    show,
     isFunction,
     Component,
     DropDown,
@@ -11,21 +12,33 @@ import {
     IMPORT_ACTION_SET_ACCOUNT,
     IMPORT_ACTION_SET_PERSON,
 } from '../../../js/model/ImportAction.js';
-import { Field } from '../../Field/Field.js';
 import './style.scss';
 
-/** Strings */
-const TITLE_FIELD_AMOUNT = 'Amount';
-const TITLE_FIELD_VALUE = 'Value';
-const TITLE_FIELD_ACTION = 'Action';
-const TITLE_FIELD_TR_TYPE = 'Transaction type';
-const TITLE_FIELD_ACCOUNT = 'Account';
-const TITLE_FIELD_PERSON = 'Person';
+/** CSS classes */
+const FORM_CLASS = 'action-form';
+const CONTAINER_CLASS = 'action-form__container';
+/* Fields */
+const FIELDS_CLASS = 'action-form__fields';
+const ACTION_FIELD_CLASS = 'action-type-field';
+const AMOUNT_FIELD_CLASS = 'amount-field';
+const TRANS_TYPE_FIELD_CLASS = 'trans-type-field';
+const ACCOUNT_FIELD_CLASS = 'account-field';
+const PERSON_FIELD_CLASS = 'person-field';
+const VALUE_FIELD_CLASS = 'action-value-field';
+/* Validation */
+const VALIDATION_BLOCK_CLASS = 'validation-block';
+const INV_FEEDBACK_CLASS = 'invalid-feedback';
+/* Controls */
+const CONTROLS_CLASS = 'action-form__controls';
 
 /**
  * ImportActionForm component
  */
 export class ImportActionForm extends Component {
+    static create(props) {
+        return new ImportActionForm(props);
+    }
+
     constructor(...args) {
         super(...args);
 
@@ -49,11 +62,6 @@ export class ImportActionForm extends Component {
         this.setData(this.props.data);
     }
 
-    /** Shortcut for ImportActionForm constructor */
-    static create(props) {
-        return new ImportActionForm(props);
-    }
-
     /** Form controls initialization */
     init() {
         this.createActionTypeField();
@@ -62,40 +70,32 @@ export class ImportActionForm extends Component {
         this.createPersonField();
 
         // Create amount input element
-        this.amountInput = ce('input', { className: 'stretch-input', type: 'text' });
+        this.amountInput = ce('input', { className: `stretch-input ${AMOUNT_FIELD_CLASS}`, type: 'text' });
         this.decAmountInput = DecimalInput.create({
             elem: this.amountInput,
             digits: 2,
             oninput: () => this.onValueChange(),
         });
-        this.amountField = Field.create({
-            title: TITLE_FIELD_AMOUNT,
-            content: this.amountInput,
-        });
         // Create value input element
         this.valueInput = ce(
             'input',
-            { className: 'stretch-input', type: 'text' },
+            { className: `stretch-input ${VALUE_FIELD_CLASS}`, type: 'text' },
             null,
             { input: () => this.onValueChange() },
         );
-        this.valueField = Field.create({
-            title: TITLE_FIELD_VALUE,
-            content: this.valueInput,
-            className: 'action-value-field',
-        });
         // Form fields container
-        this.fieldsContainer = window.app.createContainer('action-form__fields', [
-            this.actionTypeField.elem,
-            this.transTypeField.elem,
-            this.accountField.elem,
-            this.personField.elem,
-            this.amountField.elem,
-            this.valueField.elem,
+        this.fieldsContainer = window.app.createContainer(FIELDS_CLASS, [
+            this.actionDropDown.elem,
+            this.trTypeDropDown.elem,
+            this.accountDropDown.elem,
+            this.personDropDown.elem,
+            this.amountInput,
+            this.valueInput,
         ]);
+
         // Invalid feedback message
-        this.validFeedback = ce('div', { className: 'invalid-feedback' });
-        this.container = window.app.createContainer('action-form__container validation-block', [
+        this.validFeedback = ce('div', { className: INV_FEEDBACK_CLASS });
+        this.container = window.app.createContainer(`${CONTAINER_CLASS} ${VALIDATION_BLOCK_CLASS}`, [
             this.fieldsContainer,
             this.validFeedback,
         ]);
@@ -108,11 +108,11 @@ export class ImportActionForm extends Component {
             { click: () => this.onDelete() },
         );
 
-        this.controls = window.app.createContainer('action-form__controls', [
+        this.controls = window.app.createContainer(CONTROLS_CLASS, [
             this.delBtn,
         ]);
 
-        this.elem = window.app.createContainer('action-form', [
+        this.elem = window.app.createContainer(FORM_CLASS, [
             this.container,
             this.controls,
         ]);
@@ -134,15 +134,8 @@ export class ImportActionForm extends Component {
             })
             .map((type) => ({ id: type.id, title: type.title }));
 
-        const selectElem = ce('select');
-        this.actionTypeField = Field.create({
-            title: TITLE_FIELD_ACTION,
-            content: selectElem,
-            className: 'action-type-field',
-        });
-
         this.actionDropDown = DropDown.create({
-            elem: selectElem,
+            className: ACTION_FIELD_CLASS,
             onchange: (action) => this.onActionTypeChange(action),
         });
         this.actionDropDown.append(items);
@@ -152,14 +145,8 @@ export class ImportActionForm extends Component {
     createTransTypeField() {
         const items = this.transactionTypes.map((type) => ({ id: type.id, title: type.title }));
 
-        const selectElem = ce('select');
-        this.transTypeField = Field.create({
-            title: TITLE_FIELD_TR_TYPE,
-            content: selectElem,
-        });
-
         this.trTypeDropDown = DropDown.create({
-            elem: selectElem,
+            className: TRANS_TYPE_FIELD_CLASS,
             onchange: () => this.onValueChange(),
         });
         this.trTypeDropDown.append(items);
@@ -168,14 +155,8 @@ export class ImportActionForm extends Component {
 
     /** Create account field */
     createAccountField() {
-        const selectElem = ce('select');
-        this.accountField = Field.create({
-            title: TITLE_FIELD_ACCOUNT,
-            content: selectElem,
-        });
-
         this.accountDropDown = DropDown.create({
-            elem: selectElem,
+            className: ACCOUNT_FIELD_CLASS,
             onchange: () => this.onValueChange(),
         });
         window.app.initAccountsList(this.accountDropDown);
@@ -183,14 +164,8 @@ export class ImportActionForm extends Component {
 
     /** Create person field */
     createPersonField() {
-        const selectElem = ce('select');
-        this.personField = Field.create({
-            title: TITLE_FIELD_PERSON,
-            content: selectElem,
-        });
-
         this.personDropDown = DropDown.create({
-            elem: selectElem,
+            className: PERSON_FIELD_CLASS,
             onchange: () => this.onValueChange(),
         });
         window.app.initPersonsList(this.personDropDown);
@@ -341,11 +316,11 @@ export class ImportActionForm extends Component {
         const isAmountTarget = ImportAction.isAmountValue(state.actionType);
         this.actionDropDown.selectItem(state.actionType);
 
-        this.transTypeField.show(state.actionType === IMPORT_ACTION_SET_TR_TYPE);
-        this.accountField.show(state.actionType === IMPORT_ACTION_SET_ACCOUNT);
-        this.personField.show(state.actionType === IMPORT_ACTION_SET_PERSON);
-        this.amountField.show(isAmountTarget);
-        this.valueField.show(!isSelectTarget && !isAmountTarget);
+        this.trTypeDropDown.show(state.actionType === IMPORT_ACTION_SET_TR_TYPE);
+        this.accountDropDown.show(state.actionType === IMPORT_ACTION_SET_ACCOUNT);
+        this.personDropDown.show(state.actionType === IMPORT_ACTION_SET_PERSON);
+        show(this.amountInput, isAmountTarget);
+        show(this.valueInput, !isSelectTarget && !isAmountTarget);
 
         this.setActionValue(state);
     }

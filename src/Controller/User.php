@@ -33,7 +33,7 @@ class User extends TemplateController
             $this->loginUser();
         }
 
-        $this->template = new Template(TPL_PATH . "login.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "Login.tpl");
         $data = [
             "titleString" => "Jezve Money | Log in"
         ];
@@ -54,6 +54,9 @@ class User extends TemplateController
         }
 
         $reqData = checkFields($_POST, $loginFields);
+        if (isset($_POST["remember"])) {
+            $reqData["remember"] = true;
+        }
         if (!$this->uMod->login($reqData)) {
             $this->fail(ERR_LOGIN_FAIL);
         }
@@ -78,7 +81,7 @@ class User extends TemplateController
             $this->registerUser();
         }
 
-        $this->template = new Template(TPL_PATH . "register.tpl");
+        $this->template = new Template(VIEW_TPL_PATH . "Register.tpl");
         $data = [
             "titleString" => "Jezve Money | Registration"
         ];
@@ -98,13 +101,16 @@ class User extends TemplateController
             setLocation(BASEURL);
         }
 
+        $this->begin();
+
         $reqData = checkFields($_POST, $registerFields);
         if (!$this->uMod->create($reqData)) {
-            $this->fail(ERR_REGISTER_FAIL);
+            throw new \Error(ERR_REGISTER_FAIL);
         }
 
-        Message::set(MSG_REGISTER);
+        $this->commit();
 
+        Message::set(MSG_REGISTER);
         setLocation(BASEURL);
     }
 }

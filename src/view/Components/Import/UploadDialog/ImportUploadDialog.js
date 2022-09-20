@@ -1,5 +1,6 @@
 import {
     ge,
+    createElement,
     isFunction,
     show,
     enable,
@@ -12,10 +13,27 @@ import { ImportTemplateManager } from '../TemplateManager/ImportTemplateManager.
 import { LoadingIndicator } from '../../LoadingIndicator/LoadingIndicator.js';
 import './style.scss';
 
+/** CSS classes */
+const UPLOAD_POPUP_CLASS = 'upload-popup';
+const DRAG_OVER_CLASS = 'drag-over';
+const CONVERT_TITLE_CLASS = 'upload-popup__convert-title';
+const BACK_BTN_CLASS = 'back-btn';
+const BACK_ICON_CLASS = 'icon back-icon';
+/** Strings */
+const TITLE_UPLOAD = 'Upload';
+const TITLE_CONVERT = 'Convert';
+/** States */
+const UPLOAD_STATE = 1;
+const CONVERT_STATE = 2;
+
 /**
  * ImportUploadDialog component
  */
 export class ImportUploadDialog extends Component {
+    static create(props) {
+        return new ImportUploadDialog(props);
+    }
+
     constructor(...args) {
         super(...args);
 
@@ -29,15 +47,26 @@ export class ImportUploadDialog extends Component {
         this.state = {
             mainAccount: this.props.mainAccount,
             importedItems: null,
+            uploadEnabled: false,
+            loading: false,
         };
 
-        this.uploader = new ImportFileUploader({
+        this.dragEnterHandler = (e) => this.onDragEnter(e);
+        this.dragLeaveHandler = (e) => this.onDragLeave(e);
+        this.dragOverHandler = (e) => this.onDragOver(e);
+        this.dropHandler = (e) => this.onDrop(e);
+
+        this.init();
+    }
+
+    init() {
+        this.uploader = ImportFileUploader.create({
             elem: 'fileBlock',
             onUploadStart: () => this.onUploadStart(),
             onUploadError: (message) => this.onUploadError(message),
             onUploaded: (data) => this.onUploaded(data),
         });
-        this.tplManager = new ImportTemplateManager({
+        this.tplManager = ImportTemplateManager.create({
             elem: 'templateBlock',
             mainAccount: this.state.mainAccount,
             onStatus: (status) => this.onTemplateStatus(status),
@@ -46,20 +75,15 @@ export class ImportUploadDialog extends Component {
 
         this.popup = Popup.create({
             id: 'fileupload_popup',
-            title: 'Upload',
+            title: TITLE_UPLOAD,
             content: this.elem,
             onclose: () => this.onClose(),
             btn: {
                 closeBtn: true,
             },
-            className: 'upload-popup',
+            className: UPLOAD_POPUP_CLASS,
         });
         show(this.elem, true);
-
-        this.elem.addEventListener('dragenter', (e) => this.onDragEnter(e), false);
-        this.elem.addEventListener('dragleave', (e) => this.onDragLeave(e), false);
-        this.elem.addEventListener('dragover', (e) => this.onDragOver(e), false);
-        this.elem.addEventListener('drop', (e) => this.onDrop(e), false);
 
         this.accountDropDown = DropDown.create({
             elem: 'initialAccount',
@@ -67,12 +91,14 @@ export class ImportUploadDialog extends Component {
         });
 
         this.initialAccField = ge('initialAccField');
-        this.controlsBlock = this.elem.querySelector('.upload-dialog > .form-controls');
+        this.controlsBlock = ge('uploadControls');
         this.submitUploadedBtn = ge('submitUploadedBtn');
-        if (!this.initialAccField
+        if (
+            !this.initialAccField
             || !this.accountDropDown
             || !this.controlsBlock
-            || !this.submitUploadedBtn) {
+            || !this.submitUploadedBtn
+        ) {
             throw new Error('Failed to initialize upload file dialog');
         }
 
@@ -83,6 +109,22 @@ export class ImportUploadDialog extends Component {
 
         this.uploadProgress = LoadingIndicator.create({ fixed: false });
         this.elem.append(this.uploadProgress.elem);
+
+        this.setUploadState();
+    }
+
+    setDragHandlers() {
+        this.elem.addEventListener('dragenter', this.dragEnterHandler, false);
+        this.elem.addEventListener('dragleave', this.dragLeaveHandler, false);
+        this.elem.addEventListener('dragover', this.dragOverHandler, false);
+        this.elem.addEventListener('drop', this.dropHandler, false);
+    }
+
+    removeDragHandlers() {
+        this.elem.removeEventListener('dragenter', this.dragEnterHandler, false);
+        this.elem.removeEventListener('dragleave', this.dragLeaveHandler, false);
+        this.elem.removeEventListener('dragover', this.dragOverHandler, false);
+        this.elem.removeEventListener('drop', this.dropHandler, false);
     }
 
     /** Show/hide dialog */
@@ -98,11 +140,25 @@ export class ImportUploadDialog extends Component {
 
     /** Reset dialog */
     reset() {
-        this.uploader.reset();
-        this.tplManager.reset();
-        this.enableUpload(false);
+        this.setState({
+            ...this.state,
+            id: UPLOAD_STATE,
+            importedItems: null,
+            uploadEnabled: false,
+            loading: false,
+        });
+    }
 
-        this.state.importedItems = null;
+    setLoading(value) {
+        this.setState({ ...this.state, loading: !!value });
+    }
+
+    setUploadState() {
+        this.setState({ ...this.state, id: UPLOAD_STATE });
+    }
+
+    setConvertState() {
+        this.setState({ ...this.state, id: CONVERT_STATE });
     }
 
     /** Hide dialog */
@@ -116,14 +172,14 @@ export class ImportUploadDialog extends Component {
         e.preventDefault();
 
         if (e.target === this.uploader.elem) {
-            this.uploader.elem.classList.add('drag-over');
+            this.uploader.elem.classList.add(DRAG_OVER_CLASS);
         }
     }
 
     /** File 'dragenter' event handler */
     onDragLeave(e) {
         if (e.target === this.uploader.elem) {
-            this.uploader.elem.classList.remove('drag-over');
+            this.uploader.elem.classList.remove(DRAG_OVER_CLASS);
         }
     }
 
@@ -138,7 +194,7 @@ export class ImportUploadDialog extends Component {
         e.stopPropagation();
         e.preventDefault();
 
-        this.uploader.elem.classList.remove('drag-over');
+        this.uploader.elem.classList.remove(DRAG_OVER_CLASS);
 
         const { files } = e.dataTransfer;
         if (!files.length) {
@@ -150,11 +206,11 @@ export class ImportUploadDialog extends Component {
 
     /** Enable/disable upload button */
     enableUpload(val) {
-        enable(this.initialAccountSel, !!val);
-        show(this.initialAccField, !!val);
-
-        enable(this.submitUploadedBtn, !!val);
-        show(this.controlsBlock, !!val);
+        this.setState({
+            ...this.state,
+            loading: false,
+            uploadEnabled: !!val,
+        });
     }
 
     /** Main account update handler */
@@ -193,7 +249,7 @@ export class ImportUploadDialog extends Component {
 
     /** Submit event handler */
     onSubmit() {
-        this.uploadProgress.show();
+        this.setLoading(true);
 
         setTimeout(() => this.processItems(), 100);
     }
@@ -208,7 +264,7 @@ export class ImportUploadDialog extends Component {
         }
 
         if (!this.state.importedItems) {
-            this.uploadProgress.hide();
+            this.setLoading(false);
             return;
         }
 
@@ -217,13 +273,12 @@ export class ImportUploadDialog extends Component {
 
     /** Upload started handler */
     onUploadStart() {
-        this.tplManager.setLoading();
-        this.tplManager.show();
+        this.setLoading(true);
     }
 
     /** Upload error handler */
     onUploadError(message) {
-        this.tplManager.reset();
+        this.setLoading(false);
         window.app.createMessage(message, 'msg_error');
     }
 
@@ -237,6 +292,7 @@ export class ImportUploadDialog extends Component {
                 throw new Error('Invalid import data');
             }
 
+            this.setConvertState();
             this.tplManager.setRawData(data);
         } catch (e) {
             this.onUploadError(e.message);
@@ -264,5 +320,72 @@ export class ImportUploadDialog extends Component {
     importDone() {
         this.props.onUploadDone(this.state.importedItems);
         this.reset();
+    }
+
+    setState(state) {
+        if (this.state === state) {
+            return;
+        }
+
+        this.render(state, this.state);
+        this.state = state;
+    }
+
+    renderDialogTitle(state, prevState) {
+        if (state.id === prevState.id) {
+            return;
+        }
+
+        if (state.id === UPLOAD_STATE) {
+            this.popup.setTitle(TITLE_UPLOAD);
+        } else if (state.id === CONVERT_STATE) {
+            const icon = window.app.createIcon('back', BACK_ICON_CLASS);
+            const backButton = createElement('button', {
+                props: { className: BACK_BTN_CLASS },
+                children: icon,
+                events: { click: () => this.setUploadState() },
+            });
+
+            const titleElem = createElement('div', { props: { textContent: TITLE_CONVERT } });
+            const convertTitle = createElement('div', {
+                props: { className: CONVERT_TITLE_CLASS },
+                children: [backButton, titleElem],
+            });
+
+            this.popup.setTitle(convertTitle);
+        }
+    }
+
+    render(state, prevState) {
+        if (state.loading) {
+            this.uploadProgress.show();
+        }
+
+        this.renderDialogTitle(state, prevState);
+
+        if (state.id === UPLOAD_STATE) {
+            this.setDragHandlers();
+
+            this.uploader.reset();
+            this.tplManager.reset();
+
+            this.uploader.show();
+            this.tplManager.hide();
+        } else if (state.id === CONVERT_STATE) {
+            this.removeDragHandlers();
+
+            this.uploader.hide();
+            this.tplManager.show();
+        }
+
+        const uploadEnabled = state.id === CONVERT_STATE && state.uploadEnabled;
+        this.accountDropDown.enable(uploadEnabled);
+        show(this.initialAccField, uploadEnabled);
+        enable(this.submitUploadedBtn, uploadEnabled);
+        show(this.controlsBlock, uploadEnabled);
+
+        if (!state.loading) {
+            this.uploadProgress.hide();
+        }
     }
 }

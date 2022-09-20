@@ -163,6 +163,32 @@ class ImportConditionModel extends CachedTable
     }
 
 
+    // Check same item already exist
+    protected function isSameItemExist($params, $updateId = 0)
+    {
+        if (!is_array($params)) {
+            return false;
+        }
+
+        $items = $this->getData([
+            "rule" => $params["rule_id"],
+            "field" => $params["field_id"],
+            "operator" => $params["operator"],
+            "value" => $params["value"]
+        ]);
+        if (!count($items)) {
+            return false;
+        }
+        $foundItem = $items[0];
+        if ($foundItem->id != $updateId) {
+            wlog("Such item already exist");
+            return true;
+        }
+
+        return false;
+    }
+
+
     // Preparations for item create
     protected function preCreate($params, $isMultiple = false)
     {
@@ -171,18 +197,7 @@ class ImportConditionModel extends CachedTable
             return null;
         }
 
-        $qResult = $this->dbObj->selectQ(
-            "*",
-            $this->tbl_name,
-            [
-                "rule_id=" . qnull($res["rule_id"]),
-                "field_id=" . qnull($res["field_id"]),
-                "operator=" . qnull($res["operator"]),
-                "value=" . qnull($res["value"])
-            ]
-        );
-        if ($this->dbObj->rowsCount($qResult) > 0) {
-            wlog("Such item already exist");
+        if ($this->isSameItemExist($res)) {
             return null;
         }
 
@@ -207,23 +222,8 @@ class ImportConditionModel extends CachedTable
             return null;
         }
 
-        $qResult = $this->dbObj->selectQ(
-            "*",
-            $this->tbl_name,
-            [
-                "rule_id=" . qnull($res["rule_id"]),
-                "field_id=" . qnull($res["field_id"]),
-                "operator=" . qnull($res["operator"]),
-                "value=" . qnull($res["value"])
-            ]
-        );
-        $row = $this->dbObj->fetchRow($qResult);
-        if ($row) {
-            $found_id = intval($row["id"]);
-            if ($found_id != $item_id) {
-                wlog("Such item already exist");
-                return null;
-            }
+        if ($this->isSameItemExist($res, $item_id)) {
+            return null;
         }
 
         $res["updatedate"] = date("Y-m-d H:i:s");
@@ -255,11 +255,10 @@ class ImportConditionModel extends CachedTable
         }
 
         $requestAll = (isset($params["full"]) && $params["full"] == true && UserModel::isAdminUser());
-        $filterByRule = isset($params["rule"]);
-        $rule_id = 0;
-        if ($filterByRule) {
-            $rule_id = intval($params["rule"]);
-        }
+        $ruleFilter = isset($params["rule"]) ? intval($params["rule"]) : 0;
+        $fieldFilter = isset($params["field"]) ? intval($params["field"]) : 0;
+        $operatorFilter = isset($params["operator"]) ? intval($params["operator"]) : 0;
+        $valueFilter = isset($params["value"]) ? $params["value"] : null;
 
         $itemsData = [];
         if ($requestAll) {
@@ -280,7 +279,16 @@ class ImportConditionModel extends CachedTable
 
         $res = [];
         foreach ($itemsData as $item) {
-            if ($filterByRule && $item->rule_id != $rule_id) {
+            if ($ruleFilter && $item->rule_id != $ruleFilter) {
+                continue;
+            }
+            if ($fieldFilter && $item->field_id != $fieldFilter) {
+                continue;
+            }
+            if ($operatorFilter && $item->operator != $operatorFilter) {
+                continue;
+            }
+            if (!is_null($valueFilter) && $item->value != $valueFilter) {
                 continue;
             }
 

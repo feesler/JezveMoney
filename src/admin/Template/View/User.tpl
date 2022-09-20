@@ -1,9 +1,8 @@
-<?php	include(ADMIN_TPL_PATH."commonhdr.tpl");	?>
-</head>
-<body class="<?=($this->themeClass)?>">
+<?php	include(ADMIN_TPL_PATH . "Header.tpl");	?>
+
 <div class="page">
     <div class="page_wrapper">
-<?php	include(ADMIN_TPL_PATH."header.tpl");	?>
+<?php	include(ADMIN_TPL_PATH . "Component/tpl/Header.tpl");	?>
 
         <div class="container">
             <div class="content">
@@ -71,6 +70,4 @@
     </div>
 </form>
 
-<?php	include(ADMIN_TPL_PATH."footer.tpl");	?>
-</body>
-</html>
+<?php	include(ADMIN_TPL_PATH . "Footer.tpl");	?>

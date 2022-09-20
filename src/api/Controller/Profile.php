@@ -59,9 +59,13 @@ class Profile extends ApiController
             throw new \Error($defMsg);
         }
 
+        $this->begin();
+
         if (!$this->personMod->update($this->owner_id, $reqData)) {
             throw new \Error($defMsg);
         }
+
+        $this->commit();
 
         $this->setMessage(Message::get(MSG_PROFILE_NAME));
         $this->ok($reqData);
@@ -83,6 +87,8 @@ class Profile extends ApiController
             throw new \Error($defMsg);
         }
 
+        $this->begin();
+
         $uObj = $this->uMod->getItem($this->user_id);
         if (!$uObj) {
             throw new \Error($defMsg);
@@ -91,6 +97,8 @@ class Profile extends ApiController
         if (!$this->uMod->changePassword($uObj->login, $reqData["current"], $reqData["new"])) {
             throw new \Error($defMsg);
         }
+
+        $this->commit();
 
         $this->setMessage(Message::get(MSG_PROFILE_PASSWORD));
         $this->ok();
@@ -111,41 +119,43 @@ class Profile extends ApiController
             $request[$opt] = isset($request[$opt]);
         }
 
+        $this->begin();
+
         if ($request["accounts"]) {
             $accMod = AccountModel::getInstance();
             if (!$accMod->reset(["deletePersons" => $request["persons"]])) {
-                $this->fail($defMsg);
+                throw new \Error($defMsg);
             }
         }
 
         if ($request["persons"]) {
             if (!$this->personMod->reset()) {
-                $this->fail($defMsg);
+                throw new \Error($defMsg);
             }
         }
 
         if ($request["transactions"]) {
             $transMod = TransactionModel::getInstance();
             if (!$transMod->reset($request["keepbalance"])) {
-                $this->fail($defMsg);
+                throw new \Error($defMsg);
             }
         }
 
         if ($request["importtpl"]) {
             $tplModel = ImportTemplateModel::getInstance();
             if (!$tplModel->reset()) {
-                $this->fail($defMsg);
+                throw new \Error($defMsg);
             }
         }
 
         if ($request["importrules"]) {
             $ruleMod = ImportRuleModel::getInstance();
             if (!$ruleMod->reset()) {
-                $this->fail($defMsg);
+                throw new \Error($defMsg);
             }
         }
 
-
+        $this->commit();
 
         $this->setMessage(Message::get(MSG_PROFILE_RESET));
         $this->ok();
@@ -158,9 +168,13 @@ class Profile extends ApiController
             throw new \Error("Invalid type of request");
         }
 
+        $this->begin();
+
         if (!$this->uMod->del($this->user_id)) {
             throw new \Error(Message::get(ERR_PROFILE_DELETE));
         }
+
+        $this->commit();
 
         $this->ok();
     }

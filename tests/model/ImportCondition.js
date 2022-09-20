@@ -116,11 +116,11 @@ export class ImportCondition {
 
     /** List of available condition operator types */
     static operatorTypes = [
-        { id: IMPORT_COND_OP_STRING_INCLUDES, title: 'Includes' },
-        { id: IMPORT_COND_OP_EQUAL, title: 'Equal to' },
-        { id: IMPORT_COND_OP_NOT_EQUAL, title: 'Not equal to' },
-        { id: IMPORT_COND_OP_LESS, title: 'Less than' },
-        { id: IMPORT_COND_OP_GREATER, title: 'Greater than' },
+        { id: IMPORT_COND_OP_STRING_INCLUDES, title: 'contains' },
+        { id: IMPORT_COND_OP_EQUAL, title: 'is' },
+        { id: IMPORT_COND_OP_NOT_EQUAL, title: 'is not' },
+        { id: IMPORT_COND_OP_LESS, title: 'less than' },
+        { id: IMPORT_COND_OP_GREATER, title: 'greater than' },
     ];
 
     /**
