@@ -54,6 +54,9 @@ class User extends TemplateController
         }
 
         $reqData = checkFields($_POST, $loginFields);
+        if (isset($_POST["remember"])) {
+            $reqData["remember"] = true;
+        }
         if (!$this->uMod->login($reqData)) {
             $this->fail(ERR_LOGIN_FAIL);
         }

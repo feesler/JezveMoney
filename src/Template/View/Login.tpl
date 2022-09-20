@@ -21,6 +21,13 @@
                     <input id="password" class="stretch-input" name="password" type="password" autocomplete="off">
                     <div class="invalid-feedback">Please input correct password.</div>
                 </div>
+                <div class="std_margin">
+                    <label id="rememberCheck" class="checkbox">
+                        <input type="checkbox" name="remember" checked>
+                        <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
+                        <span class="checkbox__label">Remember me</span>
+                    </label>
+                </div>
                 <div class="form-controls std_margin">
                     <input class="btn submit-btn" type="submit" value="Log in">
                     <a class="alter-link" href="<?=BASEURL?>register/">Register</a>
