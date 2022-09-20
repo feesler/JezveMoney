@@ -70,6 +70,24 @@ function parseCSV(data) {
     return res;
 }
 
+/** Open import upload dialog */
+export const openUploadDialog = async () => {
+    await test('Open upload dialog', async () => {
+        await checkNavigation();
+
+        return App.view.launchUploadDialog();
+    });
+};
+
+/** Close import upload dialog */
+export const closeUploadDialog = async () => {
+    await test('Close upload dialog', async () => {
+        await checkNavigation();
+
+        return App.view.closeUploadDialog();
+    });
+};
+
 /** Admin access required */
 export const putFile = async (data) => {
     const baseURL = baseUrl();

@@ -192,6 +192,11 @@ export const importTests = {
             }],
         });
 
+        // Obtain card template
+        const template = App.state.templates.getItemByIndex(0);
+        assert(template?.id, 'Template not found');
+        await importRuleTests.createTemplateRule(template.id);
+
         // Convert transactions with invalid main account
         setBlock('Upload CSV with invalid account', 2);
         await ImportTests.uploadFile({
@@ -204,6 +209,7 @@ export const importTests = {
         });
 
         // Change account to check it updated even after close upload dialog
+        setBlock('Check main account is updated after select it at upload dialog', 2);
         await ImportTests.changeMainAccount(App.scenario.ACC_RUB);
 
         // Convert transactions

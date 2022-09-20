@@ -70,7 +70,7 @@ export class ImportConditionItem extends TestComponent {
 
                 res.value = account.id;
             } else if (ImportCondition.isTemplateField(field.id)) {
-                const template = App.state.templates.findByName(value);
+                const template = App.state.templates.find((item) => item.name === value);
                 assert(template, `Template not found: '${value}'`);
 
                 res.value = template.id;

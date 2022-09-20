@@ -18,6 +18,7 @@ export class ImportTemplate {
     constructor(data) {
         assert(data, 'Invalid data');
 
+        this.id = data.id;
         this.name = data.name;
         this.type_id = data.type_id;
         this.columns = copyObject(data.columns);
@@ -120,7 +121,11 @@ export class ImportTemplate {
                 }
 
                 const rowData = this.getRowData(row);
-                const original = { mainAccount, ...rowData };
+                const original = {
+                    ...rowData,
+                    mainAccount,
+                    template: this.id,
+                };
 
                 const accCurrency = App.currency.findByName(original.accountCurrency);
                 original.accountCurrencyId = accCurrency ? accCurrency.id : null;

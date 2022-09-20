@@ -1,6 +1,7 @@
 import { setBlock } from 'jezve-test';
 import {
     IMPORT_COND_FIELD_MAIN_ACCOUNT,
+    IMPORT_COND_FIELD_TPL,
     IMPORT_COND_FIELD_ACC_AMOUNT,
     IMPORT_COND_FIELD_TR_AMOUNT,
     IMPORT_COND_FIELD_DATE,
@@ -416,6 +417,27 @@ const runDeleteImportRuleTests = async () => {
     await ImportTests.deleteRule(2);
 };
 
+// Create import rule with template condition
+const runCreateTemplateRule = async (templateId) => {
+    setBlock('Create import rule with template condition', 2);
+    await ImportTests.createRule();
+    await ImportTests.createRuleCondition([
+        { action: 'changeFieldType', data: IMPORT_COND_FIELD_TPL },
+        { action: 'changeOperator', data: IMPORT_COND_OP_EQUAL },
+        { action: 'changeTemplate', data: templateId },
+    ]);
+    await ImportTests.createRuleCondition([
+        { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
+        { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
+        { action: 'inputValue', data: 'SALARY' },
+    ]);
+    await ImportTests.createRuleAction([
+        { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
+        { action: 'inputValue', data: 'Salary+Template' },
+    ]);
+    await ImportTests.submitRule();
+};
+
 export const importRuleTests = {
     /** Run import rules tests */
     async run() {
@@ -426,6 +448,14 @@ export const importRuleTests = {
         await runCreateTests();
         await runUpdateImportRuleTests();
         await runDeleteImportRuleTests();
+
+        await ImportTests.closeRulesDialog();
+    },
+
+    async createTemplateRule(templateId) {
+        await ImportTests.openRulesDialog();
+
+        await runCreateTemplateRule(templateId);
 
         await ImportTests.closeRulesDialog();
     },

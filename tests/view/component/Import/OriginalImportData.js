@@ -6,10 +6,12 @@ import {
     assert,
     formatDate,
 } from 'jezve-test';
+import { App } from '../../../Application.js';
 import { ImportTemplate } from '../../../model/ImportTemplate.js';
 
 const labelsMap = {
     mainAccount: 'Main account',
+    template: 'Template',
     transactionAmount: 'Tr. amount',
     transactionCurrency: 'Tr. currency',
     accountAmount: 'Acc. amount',
@@ -52,6 +54,10 @@ export class OriginalImportData extends TestComponent {
                 ImportTemplate.dateFromString(cont.date),
             ),
         };
+
+        const template = App.state.templates.find((item) => item.name === cont.template);
+        assert(template, `Template '${cont.template}' not found`);
+        res.template = template.id;
 
         return res;
     }

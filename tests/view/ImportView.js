@@ -214,10 +214,13 @@ export class ImportView extends AppView {
     async closeUploadDialog() {
         this.checkUploadState();
 
+        this.expectedState = this.getExpectedState();
+        this.expectedState.uploadDialog = { visible: false };
+
         await this.performAction(() => this.content.uploadDialog.close());
         await this.performAction(() => wait(this.uploadPopupId, { hidden: true }));
 
-        assert(!this.content.uploadDialog?.content?.visible, 'File upload dialog not closed');
+        return this.checkState();
     }
 
     async setUploadFile(name, data) {

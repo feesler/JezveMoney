@@ -134,7 +134,11 @@ export class ImportConditionForm extends Component {
     /** Create property field */
     createPropertyField() {
         const filedTypeItems = this.fieldTypes
-            .filter((fieldType) => !ImportCondition.isTemplateField(fieldType.id))
+            .filter((fieldType) => !(
+                // Remove `Template` property if no templates available yet
+                ImportCondition.isTemplateField(fieldType.id)
+                && window.app.model.templates.length === 0
+            ))
             .map((fieldType) => ({ id: fieldType.id, title: fieldType.title }));
 
         this.propertyDropDown = DropDown.create({

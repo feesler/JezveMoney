@@ -80,7 +80,8 @@ const runAutoSelectTests = async (files) => {
     await ImportTests.uploadFile(cardFile);
     // Upload accounts again and check 2nd template is selected
     await ImportTests.uploadFile(accountFile);
-    await ImportTests.deleteTemplate();
+
+    await ImportTests.closeUploadDialog();
 };
 
 export const importTemplateTests = {

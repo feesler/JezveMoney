@@ -12,6 +12,7 @@ const COMMENT_COLUMN_CLASS = 'comment-column';
 /** Strings */
 const TITLE_ORIGINAL_DATA = 'Original imported data';
 const COL_MAIN = 'Main account';
+const COL_TEMPLATE = 'Template';
 const COL_DATE = 'Date';
 const COL_COMMENT = 'Comment';
 const COL_TR_AMOUNT = 'Tr. amount';
@@ -38,6 +39,13 @@ export class OriginalImportData extends Component {
     constructor(...args) {
         super(...args);
 
+        if (!this.props.mainAccount) {
+            throw new Error('mainAccount expected');
+        }
+        if (!this.props.template) {
+            throw new Error('template expected');
+        }
+
         this.render();
     }
 
@@ -55,8 +63,12 @@ export class OriginalImportData extends Component {
     }
 
     render() {
+        const template = window.app.model.templates.getItem(this.props.template);
+        const templateName = (template) ? template.name : '';
+
         const dataTable = [
             [COL_MAIN, this.props.mainAccount.name],
+            [COL_TEMPLATE, templateName],
             [COL_DATE, window.app.formatDate(new Date(this.props.date))],
             [COL_TR_AMOUNT, this.props.transactionAmount],
             [COL_TR_CURRENCY, this.props.transactionCurrency],
