@@ -11,9 +11,22 @@ class DBVersion
     use Singleton;
 
     protected $tbl_name = "dbver";
-    protected $latestVersion = 8;
+    protected $latestVersion = 9;
     protected $dbClient = null;
-
+    protected $tables = [
+        "accounts",
+        "admin_query",
+        "currency",
+        "dbver",
+        "icon",
+        "import_act",
+        "import_cond",
+        "import_rule",
+        "import_tpl",
+        "persons",
+        "transactions",
+        "users"
+    ];
 
     protected function onStart()
     {
@@ -138,6 +151,9 @@ class DBVersion
         }
         if ($current < 8) {
             $current = $this->version8();
+        }
+        if ($current < 9) {
+            $current = $this->version9();
         }
 
         $this->setVersion($current);
@@ -291,6 +307,20 @@ class DBVersion
         $this->createImportConditionTable();
 
         return 8;
+    }
+
+
+    private function version9()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        foreach ($this->tables as $table) {
+            $this->dbClient->setTableEngine($table, "InnoDB");
+        }
+
+        return 9;
     }
 
 

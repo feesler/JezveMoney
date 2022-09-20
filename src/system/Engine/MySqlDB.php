@@ -657,6 +657,9 @@ class MySqlDB
     public function changeColumn($table, $oldName, $newName, $dataType)
     {
         $table = $this->escape($table);
+        $oldName = $this->escape($oldName);
+        $newName = $this->escape($newName);
+        $dataType = $this->escape($dataType);
         if (
             !$table || $table == ""
             || !$oldName || $oldName == ""
@@ -761,5 +764,20 @@ class MySqlDB
         }
 
         return intval($row["AUTO_INCREMENT"]);
+    }
+
+    // Change table engine
+    public function setTableEngine($table, $engine)
+    {
+        $table = $this->escape($table);
+        $engine = $this->escape($engine);
+        if (!$table || $table == "" || !$engine || $engine == "") {
+            return false;
+        }
+
+        $query = "ALTER TABLE `" . $table . "` ENGINE = " . qnull($engine) . ";";
+        $this->rawQ($query);
+
+        return ($this->errno == 0);
     }
 }
