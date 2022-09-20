@@ -98,13 +98,16 @@ class User extends TemplateController
             setLocation(BASEURL);
         }
 
+        $this->begin();
+
         $reqData = checkFields($_POST, $registerFields);
         if (!$this->uMod->create($reqData)) {
-            $this->fail(ERR_REGISTER_FAIL);
+            throw new \Error(ERR_REGISTER_FAIL);
         }
 
-        Message::set(MSG_REGISTER);
+        $this->commit();
 
+        Message::set(MSG_REGISTER);
         setLocation(BASEURL);
     }
 }

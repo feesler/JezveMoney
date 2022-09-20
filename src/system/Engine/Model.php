@@ -6,6 +6,28 @@ abstract class Model
 {
     protected $dbObj = null;
     protected $tbl_name = null;
+    protected $useTransactions = true;
+
+    // Starts transaction
+    public static function begin()
+    {
+        $dbInstance = MySqlDB::getInstance();
+        return $dbInstance->startTransaction();
+    }
+
+    // Commits current transaction
+    public static function commit()
+    {
+        $dbInstance = MySqlDB::getInstance();
+        return $dbInstance->commitTransaction();
+    }
+
+    // Rolls back current transaction
+    public static function rollback()
+    {
+        $dbInstance = MySqlDB::getInstance();
+        return $dbInstance->rollbackTransaction();
+    }
 
 
     abstract protected function rowToObj($row);
@@ -21,7 +43,7 @@ abstract class Model
     private function prepareRow($params, $isMultiple = false)
     {
         if (!is_array($params)) {
-            return 0;
+            return null;
         }
 
         $res = $this->preCreate($params, $isMultiple);
@@ -40,10 +62,10 @@ abstract class Model
     {
         $prepared = $this->prepareRow($params, false);
         if (!is_array($prepared)) {
-            return 0;
+            throw new \Error("prepareRow failed");
         }
         if (!$this->dbObj->insertQ($this->tbl_name, $prepared)) {
-            return 0;
+            throw new \Error("insertQ failed");
         }
 
         $item_id = $this->dbObj->insertId();
@@ -60,14 +82,14 @@ abstract class Model
     public function createMultiple($params)
     {
         if (!is_array($params)) {
-            return null;
+            throw new \Error("Invalid params");
         }
 
         $prepared = [];
         foreach ($params as $item) {
             $row = $this->prepareRow($item, true);
             if (!is_array($row)) {
-                return null;
+                throw new \Error("prepareRow failed");
             }
 
             $prepared[] = $row;
@@ -76,13 +98,12 @@ abstract class Model
         $rowsPrepared = count($prepared);
 
         if (!$this->dbObj->insertMultipleQ($this->tbl_name, $prepared)) {
-            return null;
+            throw new \Error("insertMultipleQ failed");
         }
         unset($prepared);
 
         if ($rowsPrepared != $this->dbObj->affectedRows()) {
-            wlog("Unexpected count of affected rows");
-            return null;
+            throw new \Error("Unexpected count of affected rows");
         }
 
         $res = [];
@@ -110,7 +131,7 @@ abstract class Model
     {
         $item_id = intval($item_id);
         if (!$item_id || !is_array($params)) {
-            return false;
+            throw new \Error("Invalid params");
         }
 
         // unset id if set
@@ -120,12 +141,12 @@ abstract class Model
 
         $prepareRes = $this->preUpdate($item_id, $params);
         if (is_null($prepareRes)) {
-            return false;
+            throw new \Error("preUpdate failed");
         }
 
         $updRes = $this->dbObj->updateQ($this->tbl_name, $prepareRes, "id=" . $item_id);
         if (!$updRes) {
-            return false;
+            throw new \Error("updateQ failed");
         }
 
         $this->postUpdate($item_id);
@@ -152,17 +173,17 @@ abstract class Model
 
         $setCond = inSetCondition($items);
         if (is_null($setCond)) {
-            return false;
+            throw new \Error("Invalid parameters");
         }
 
         $prepareRes = $this->preDelete($items);
         if (!$prepareRes) {
-            return false;
+            throw new \Error("preDelete failed");
         }
 
         $qRes = $this->dbObj->deleteQ($this->tbl_name, "id" . $setCond);
         if (!$qRes) {
-            return false;
+            throw new \Error("deleteQ failed");
         }
 
         $this->postDelete($items);

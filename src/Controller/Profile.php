@@ -79,17 +79,19 @@ class Profile extends TemplateController
 
         $reqData = checkFields($_POST, $requiredFields);
         if ($reqData === false) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
+
+        $this->begin();
 
         $owner_id = $this->uMod->getOwner($this->user_id);
-
         if (!$this->personMod->update($owner_id, $reqData)) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
-        Message::set(MSG_PROFILE_NAME);
+        $this->commit();
 
+        Message::set(MSG_PROFILE_NAME);
         setLocation(BASEURL . "profile/");
     }
 
@@ -106,20 +108,23 @@ class Profile extends TemplateController
 
         $reqData = checkFields($_POST, $requiredFields);
         if ($reqData === false) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
+
+        $this->begin();
 
         $uObj = $this->uMod->getItem($this->user_id);
         if (!$uObj) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
         if (!$this->uMod->changePassword($uObj->login, $reqData["current"], $reqData["new"])) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
-        Message::set(MSG_PROFILE_PASSWORD);
+        $this->commit();
 
+        Message::set(MSG_PROFILE_PASSWORD);
         setLocation(BASEURL . "profile/");
     }
 
@@ -138,42 +143,45 @@ class Profile extends TemplateController
             $request[$opt] = isset($_POST[$opt]);
         }
 
+        $this->begin();
+
         if ($request["accounts"]) {
             $accMod = AccountModel::getInstance();
             if (!$accMod->reset(["deletePersons" => $request["persons"]])) {
-                $this->fail($defMsg);
+                throw new \Error($defMsg);
             }
         }
 
         if ($request["persons"]) {
             if (!$this->personMod->reset()) {
-                $this->fail($defMsg);
+                throw new \Error($defMsg);
             }
         }
 
         if ($request["transactions"]) {
             $transMod = TransactionModel::getInstance();
             if (!$transMod->reset($request["keepbalance"])) {
-                $this->fail($defMsg);
+                throw new \Error($defMsg);
             }
         }
 
         if ($request["importtpl"]) {
             $tplModel = ImportTemplateModel::getInstance();
             if (!$tplModel->reset()) {
-                $this->fail($defMsg);
+                throw new \Error($defMsg);
             }
         }
 
         if ($request["importrules"]) {
             $ruleMod = ImportRuleModel::getInstance();
             if (!$ruleMod->reset()) {
-                $this->fail($defMsg);
+                throw new \Error($defMsg);
             }
         }
 
-        Message::set(MSG_PROFILE_RESET);
+        $this->commit();
 
+        Message::set(MSG_PROFILE_RESET);
         setLocation(BASEURL . "profile/");
     }
 
@@ -186,12 +194,15 @@ class Profile extends TemplateController
 
         $defMsg = ERR_PROFILE_DELETE;
 
+        $this->begin();
+
         if (!$this->uMod->del($this->user_id)) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
-        Message::set(MSG_PROFILE_DELETE);
+        $this->commit();
 
+        Message::set(MSG_PROFILE_DELETE);
         setLocation(BASEURL . "login/");
     }
 }

@@ -99,6 +99,8 @@ class ApiListController extends ApiController
             throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
         }
 
+        $this->begin();
+
         $itemData = $this->preCreate($request);
 
         $item_id = $this->model->create($itemData);
@@ -107,6 +109,8 @@ class ApiListController extends ApiController
         }
 
         $this->postCreate($item_id, $request);
+
+        $this->commit();
 
         $this->ok(["id" => $item_id]);
     }
@@ -122,6 +126,8 @@ class ApiListController extends ApiController
         if (!is_array($request)) {
             throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
         }
+
+        $this->begin();
 
         $items = [];
         foreach ($request as $item) {
@@ -145,6 +151,8 @@ class ApiListController extends ApiController
         }
 
         $this->postCreate($ids, $request);
+
+        $this->commit();
 
         $this->ok(["ids" => $ids]);
     }
@@ -178,6 +186,8 @@ class ApiListController extends ApiController
             throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
         }
 
+        $this->begin();
+
         $itemData = $this->preUpdate($request);
 
         if (!$this->model->update($request["id"], $itemData)) {
@@ -185,6 +195,8 @@ class ApiListController extends ApiController
         }
 
         $this->postUpdate($request);
+
+        $this->commit();
 
         $this->ok();
     }
@@ -201,9 +213,13 @@ class ApiListController extends ApiController
             throw new \Error(MSG_NO_IDS);
         }
 
+        $this->begin();
+
         if (!$this->model->del($ids)) {
             throw new \Error($this->deleteErrorMsg);
         }
+
+        $this->commit();
 
         $this->ok();
     }

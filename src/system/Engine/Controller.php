@@ -7,6 +7,7 @@ abstract class Controller
     public $action = null;
     public $actionParam = null;
     protected $headers = null;
+    public $transactionRunning = false;
 
 
     abstract public function index();
@@ -16,10 +17,24 @@ abstract class Controller
     }
 
 
+    protected function fail($msg = null)
+    {
+    }
+
+
     public function runAction($action)
     {
-        if (method_exists($this, $action)) {
+        if (!method_exists($this, $action)) {
+            return;
+        }
+
+        try {
             $this->$action();
+        } catch (\Error $e) {
+            $message = $e->getMessage();
+            wlog($message);
+            $this->rollback();
+            $this->fail($message);
         }
     }
 
@@ -112,5 +127,42 @@ abstract class Controller
         }
 
         return $res;
+    }
+
+
+    // Requests Model to start database transaction
+    protected function begin()
+    {
+        if (!Model::begin()) {
+            throw new \Error("Failed to start SQL transaction");
+        }
+
+        $this->transactionRunning = true;
+    }
+
+
+    // Requests Model to commit current database transaction
+    protected function commit()
+    {
+        if (!$this->transactionRunning) {
+            return;
+        }
+
+        if (!Model::commit()) {
+            throw new \Error("Failed to commit SQL transaction");
+        }
+    }
+
+
+    // Requests Model to rollback current database transaction
+    protected function rollback()
+    {
+        if (!$this->transactionRunning) {
+            return;
+        }
+
+        if (!Model::rollback()) {
+            throw new \Error("Failed to rollback SQL transaction");
+        }
     }
 }

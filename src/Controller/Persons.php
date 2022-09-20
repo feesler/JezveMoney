@@ -42,7 +42,7 @@ class Persons extends TemplateController
     }
 
 
-    private function fail($msg = null)
+    protected function fail($msg = null)
     {
         if (!is_null($msg)) {
             Message::set($msg);
@@ -136,15 +136,18 @@ class Persons extends TemplateController
 
         $reqData = checkFields($_POST, $this->requiredFields);
         if ($reqData === false) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
+
+        $this->begin();
 
         if (!$this->personMod->create($reqData)) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
-        Message::set(MSG_PERSON_CREATE);
+        $this->commit();
 
+        Message::set(MSG_PERSON_CREATE);
         setLocation(BASEURL . "persons/");
     }
 
@@ -158,20 +161,23 @@ class Persons extends TemplateController
         $defMsg = ERR_PERSON_UPDATE;
 
         if (!isset($_POST["id"])) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
         $reqData = checkFields($_POST, $this->requiredFields);
         if ($reqData === false) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
+
+        $this->begin();
 
         if (!$this->personMod->update($_POST["id"], $reqData)) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
-        Message::set(MSG_PERSON_UPDATE);
+        $this->commit();
 
+        Message::set(MSG_PERSON_UPDATE);
         setLocation(BASEURL . "persons/");
     }
 
@@ -185,13 +191,17 @@ class Persons extends TemplateController
         $defMsg = ERR_PERSON_SHOW;
 
         if (!isset($_POST["persons"])) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
+
+        $this->begin();
 
         $ids = explode(",", rawurldecode($_POST["persons"]));
         if (!$this->personMod->show($ids)) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
+
+        $this->commit();
 
         setLocation(BASEURL . "persons/");
     }
@@ -206,13 +216,17 @@ class Persons extends TemplateController
         $defMsg = ERR_PERSON_HIDE;
 
         if (!isset($_POST["persons"])) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
+
+        $this->begin();
 
         $ids = explode(",", rawurldecode($_POST["persons"]));
         if (!$this->personMod->hide($ids)) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
+
+        $this->commit();
 
         setLocation(BASEURL . "persons/");
     }
@@ -227,16 +241,19 @@ class Persons extends TemplateController
         $defMsg = ERR_PERSON_DELETE;
 
         if (!isset($_POST["persons"])) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
+
+        $this->begin();
 
         $ids = explode(",", rawurldecode($_POST["persons"]));
         if (!$this->personMod->del($ids)) {
-            $this->fail($defMsg);
+            throw new \Error($defMsg);
         }
 
-        Message::set(MSG_PERSON_DELETE);
+        $this->commit();
 
+        Message::set(MSG_PERSON_DELETE);
         setLocation(BASEURL . "persons/");
     }
 }

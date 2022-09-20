@@ -233,6 +233,7 @@ class MySqlDB
             return false;
         }
         $this->rawQ("SET NAMES 'utf8';");
+        $this->rawQ("SET autocommit=0;");
 
         return true;
     }
@@ -268,6 +269,30 @@ class MySqlDB
         wlog("Result: " . ($this->errno ? ($this->errno . " - " . $this->errorMessage) : "ok"));
 
         return ($res !== false) ? $res : null;
+    }
+
+
+    // Starts transaction
+    public function startTransaction()
+    {
+        $this->rawQ("START TRANSACTION;");
+        return ($this->errno == 0);
+    }
+
+
+    // Commits transaction
+    public function commitTransaction()
+    {
+        $this->rawQ("COMMIT;");
+        return ($this->errno == 0);
+    }
+
+
+    // Rolls back transaction
+    public function rollbackTransaction()
+    {
+        $this->rawQ("ROLLBACK;");
+        return ($this->errno == 0);
     }
 
 
