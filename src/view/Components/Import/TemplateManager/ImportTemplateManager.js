@@ -39,7 +39,7 @@ const RAW_DATA_STATE = 2;
 const TPL_UPDATE_STATE = 3;
 
 /**
- * ImportTemplateManager component constructor
+ * ImportTemplateManager component
  */
 export class ImportTemplateManager extends Component {
     static create(props) {

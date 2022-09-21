@@ -33,7 +33,7 @@ const INV_FEEDBACK_CLASS = 'invalid-feedback';
 const LABEL_PROPERTY_CMP = 'Compare with another property';
 
 /**
- * ImportConditionForm component constructor
+ * ImportConditionForm component
  */
 export class ImportConditionForm extends Component {
     static create(props) {

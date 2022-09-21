@@ -22,7 +22,7 @@ const TITLE_NO_ACTIONS = 'No actions.';
 const TITLE_NO_CONDITIONS = 'No conditions';
 
 /**
- * ImportRuleItem component constructor
+ * ImportRuleItem component
  * @param {Object} props
  */
 export class ImportRuleItem extends Component {
@@ -36,11 +36,6 @@ export class ImportRuleItem extends Component {
         if (!this.props?.data) {
             throw new Error('Invalid props');
         }
-
-        this.submitHandler = this.props.submit;
-        this.cancelHandler = this.props.cancel;
-        this.updateHandler = this.props.update;
-        this.deleteHandler = this.props.remove;
 
         if (!(this.props.data instanceof ImportRule)) {
             throw new Error('Invalid rule item');
@@ -152,24 +147,22 @@ export class ImportRuleItem extends Component {
     onUpdate(e) {
         e.stopPropagation();
 
-        if (!this.state.ruleId
-            || !isFunction(this.updateHandler)) {
+        if (!this.state.ruleId || !isFunction(this.props.onUpdate)) {
             return;
         }
 
-        this.updateHandler(this.state.ruleId);
+        this.props.onUpdate(this.state.ruleId);
     }
 
     /** Delete button 'click' event handler */
     onDelete(e) {
         e.stopPropagation();
 
-        if (!this.state.ruleId
-            || !isFunction(this.deleteHandler)) {
+        if (!this.state.ruleId || !isFunction(this.props.onRemove)) {
             return;
         }
 
-        this.deleteHandler(this.state.ruleId);
+        this.props.onRemove(this.state.ruleId);
     }
 
     /** Set data for list container */

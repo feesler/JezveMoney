@@ -25,7 +25,7 @@ const MSG_NO_ACTIONS = 'No actions';
 const MSG_NO_CONDITIONS = 'No conditions';
 
 /**
- * ImportRuleForm component constructor
+ * ImportRuleForm component
  */
 export class ImportRuleForm extends Component {
     static create(props) {

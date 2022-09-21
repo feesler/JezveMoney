@@ -30,7 +30,7 @@ const TITLE_CREATE_RULE = 'Create import rule';
 const TITLE_UPDATE_RULE = 'Update import rule';
 
 /**
- * ImportRulesDialog component constructor
+ * ImportRulesDialog component
  */
 export class ImportRulesDialog extends Component {
     static create(props) {
@@ -245,8 +245,8 @@ export class ImportRulesDialog extends Component {
     renderList(state) {
         const ruleItems = window.app.model.rules.map((rule) => ImportRuleItem.create({
             data: rule,
-            update: (ruleId) => this.onUpdateItem(ruleId),
-            remove: (ruleId) => this.onDeleteItem(ruleId),
+            onUpdate: (ruleId) => this.onUpdateItem(ruleId),
+            onRemove: (ruleId) => this.onDeleteItem(ruleId),
         }));
 
         this.listContainer.dataset.time = state.renderTime;
