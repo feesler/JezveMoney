@@ -181,13 +181,16 @@ export class ImportUploadDialog extends TestComponent {
             res.template = {};
             res.template.name = cont.tplNameInp.value;
         } else if (cont.state === UPDATE_TPL_STATE) {
-            res.template = App.state.templates.getItem(cont.templateSel.content.value);
+            res.template = App.state.templates.getItem(cont.templateSel.value);
             res.template.name = cont.tplNameInp.value;
         } else {
-            res.template = App.state.templates.getItem(cont.templateSel.content.value);
+            res.template = App.state.templates.getItem(cont.templateSel.value);
         }
 
-        if (res.template) {
+        if (
+            (cont.state === CREATE_TPL_STATE || cont.state === UPDATE_TPL_STATE)
+            && res.template
+        ) {
             res.template.columns = {};
             if (Array.isArray(cont.columns)) {
                 cont.columns.forEach((column, ind) => {
@@ -224,7 +227,7 @@ export class ImportUploadDialog extends TestComponent {
             }));
         }
 
-        res.initialAccount = App.state.accounts.getItem(cont.initialAccount.content.value);
+        res.initialAccount = App.state.accounts.getItem(cont.initialAccount.value);
         assert(res.initialAccount, 'Initial account not found');
 
         return res;
@@ -342,10 +345,10 @@ export class ImportUploadDialog extends TestComponent {
             res.tplFeedback = { visible: false };
         }
 
-        if ([CREATE_TPL_STATE, UPDATE_TPL_STATE, RAW_DATA_STATE].includes(model.state)) {
+        if ([CREATE_TPL_STATE, UPDATE_TPL_STATE].includes(model.state)) {
             const [rawDataHeader] = this.parent.fileData.slice(0, 1);
             res.columns = rawDataHeader.map(
-                (item, ind) => this.getColumn(this.parent.fileData, ind),
+                (_, ind) => this.getColumn(this.parent.fileData, ind),
             );
         }
 

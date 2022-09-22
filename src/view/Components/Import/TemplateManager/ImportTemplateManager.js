@@ -1,8 +1,6 @@
 import {
     ge,
-    ce,
     isFunction,
-    addChilds,
     removeChilds,
     copyObject,
     show,
@@ -15,6 +13,7 @@ import { ImportTemplateError } from '../../../js/error/ImportTemplateError.js';
 import { ImportTemplate } from '../../../js/model/ImportTemplate.js';
 import { ConfirmDialog } from '../../ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../LoadingIndicator/LoadingIndicator.js';
+import { RawDataTable } from '../RawDataTable/RawDataTable.js';
 import './style.scss';
 
 /** Strings */
@@ -589,55 +588,23 @@ export class ImportTemplateManager extends Component {
 
         this.tplNameInp.value = (state.template) ? state.template.name : '';
 
-        // Check there is data to render
+        // Raw data table
         if (!Array.isArray(state.rawData) || !state.rawData.length) {
-            removeChilds(this.rawDataTable);
             return;
-        }
-        // Render data table
-        let propertiesPerColumn = 0;
-        const headerRow = state.rawData.slice(0, 1)[0];
-        const dataRows = this.getDataRows(state, true);
-        const colElems = headerRow.map((title, columnInd) => {
-            const tplElem = ce('div', { className: 'raw-data-column__tpl' });
-            if (state.template) {
-                const columnsInfo = state.template.getColumnsByIndex(columnInd + 1);
-                if (Array.isArray(columnsInfo)) {
-                    const columnElems = columnsInfo.map(
-                        (column) => ce('div', {
-                            className: 'raw-data-column__tpl-prop',
-                            textContent: column.title,
-                        }),
-                    );
-                    addChilds(tplElem, columnElems);
-
-                    propertiesPerColumn = Math.max(propertiesPerColumn, columnElems.length);
-                }
-            }
-
-            const headElem = ce('div', { className: 'raw-data-column__header', textContent: title });
-            const columnData = dataRows.map(
-                (row) => ce('div', {
-                    className: 'raw-data-column__cell',
-                    textContent: row[columnInd],
-                }),
-            );
-
-            return ce(
-                'div',
-                { className: 'raw-data-column' },
-                [tplElem, headElem].concat(columnData),
-                { click: () => this.onDataColumnClick(columnInd) },
-            );
-        }, this);
-
-        const tableElem = ce('div', { className: 'raw-data-table' }, colElems);
-        if (propertiesPerColumn > 1) {
-            tableElem.classList.add(`raw-data-table__tpl-${propertiesPerColumn}`);
         }
 
         removeChilds(this.rawDataTable);
-        this.rawDataTable.appendChild(tableElem);
+        if (state.id === TPL_UPDATE_STATE) {
+            const dataTable = RawDataTable.create({
+                data: state.rawData,
+                rowsToShow: state.rowsToShow,
+                startFromRow: state.startFromRow,
+                template: state.template,
+                onSelectColumn: (index) => this.onDataColumnClick(index),
+            });
+
+            this.rawDataTable.append(dataTable.elem);
+        }
 
         let isValid = false;
         if (state.id === LOADING_STATE) {
