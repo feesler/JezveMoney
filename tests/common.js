@@ -254,6 +254,9 @@ export const generateId = () => Math.round(Math.random() * 10000);
 
 /** Returns copy of specified object with properties existing in expected object */
 export function getExpectedValues(control, expected) {
+    assert(control, 'Invalid control');
+    assert(expected, 'Invalid expected value');
+
     const res = {};
 
     const expectedKeys = Object.getOwnPropertyNames(expected);
