@@ -57,7 +57,7 @@ export const stateLoop = async () => {
     await App.state.fetch();
 
     const [ACC_3, ACC_RUB, ACC_USD, ACC_EUR, CARD_RUB] = App.state.getAccountIndexesByNames([
-        'acc_3', 'acc RUB', 'acc USD', 'acc EUR', 'card RUB',
+        'ACC_3', 'ACC_RUB', 'ACC_USD', 'ACC_EUR', 'CARD_RUB',
     ]);
 
     const [MARIA, IVAN] = App.state.getPersonIndexesByNames([

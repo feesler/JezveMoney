@@ -11,8 +11,6 @@ import * as ExpenseTransactionTests from '../run/transaction/expense.js';
 import * as IncomeTransactionTests from '../run/transaction/income.js';
 import * as TransferTransactionTests from '../run/transaction/transfer.js';
 import * as DebtTransactionTests from '../run/transaction/debt.js';
-import { transactionsListTests } from './transactionList.js';
-import { importTests } from './import/index.js';
 import { App } from '../Application.js';
 import { ACCOUNT_HIDDEN } from '../model/AccountsList.js';
 import { PERSON_HIDDEN } from '../model/PersonsList.js';
@@ -355,7 +353,7 @@ const deleteExpenseTests = async () => {
 
     const data = [
         [0],
-        [0, 1, 11, 13],
+        [0, 1],
     ];
 
     await App.scenario.runner.runGroup((items) => TransactionTests.del(EXPENSE, items), data);
@@ -366,7 +364,7 @@ const deleteIncomeTests = async () => {
 
     const data = [
         [0],
-        [0, 1, 2, 15],
+        [0, 1],
     ];
 
     await App.scenario.runner.runGroup((items) => TransactionTests.del(INCOME, items), data);
@@ -606,36 +604,36 @@ const availabilityTests = async (directNavigate) => {
 export const transactionTests = {
     /** Create accounts and persons required for transaction view tests */
     async prepare() {
-        const HIDDEN_ACCOUNT_NAME = 'Hidden acc';
+        const HIDDEN_ACCOUNT_NAME = 'HIDDEN_ACC';
         const HIDDEN_PERSON_NAME = 'Hidden person';
         const { RUB, USD, EUR } = App.scenario;
 
         const accList = [{
-            name: 'acc_3',
+            name: 'ACC_3',
             curr_id: RUB,
             initbalance: '500.99',
             icon_id: 2,
             flags: 0,
         }, {
-            name: 'acc RUB',
+            name: 'ACC_RUB',
             curr_id: RUB,
             initbalance: '500.99',
             icon_id: 5,
             flags: 0,
         }, {
-            name: 'acc USD',
+            name: 'ACC_USD',
             curr_id: USD,
             initbalance: '500.99',
             icon_id: 4,
             flags: 0,
         }, {
-            name: 'acc EUR',
+            name: 'ACC_EUR',
             curr_id: EUR,
             initbalance: '10000.99',
             icon_id: 3,
             flags: 0,
         }, {
-            name: 'card RUB',
+            name: 'CARD_RUB',
             curr_id: RUB,
             initbalance: '35000.40',
             icon_id: 3,
@@ -695,10 +693,6 @@ export const transactionTests = {
         await stateLoopTests();
         await createTests();
         await updateTests();
-
-        await transactionsListTests.run();
-        await importTests.run();
-
         await deleteTests();
         await deleteFromUpdateTests();
     },

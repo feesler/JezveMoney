@@ -55,7 +55,7 @@ export const stateLoop = async () => {
 
     const [RUB, USD, EUR] = App.currency.getItemsByNames(['RUB', 'USD', 'EUR']);
     const [ACC_3, ACC_RUB, ACC_USD, ACC_EUR] = App.state.getAccountIndexesByNames([
-        'acc_3', 'acc RUB', 'acc USD', 'acc EUR',
+        'ACC_3', 'ACC_RUB', 'ACC_USD', 'ACC_EUR',
     ]);
 
     // Navigate to create expense view

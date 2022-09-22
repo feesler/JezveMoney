@@ -131,28 +131,98 @@ const putAccountCSV = async () => {
     assert(accountUploadFilename, 'Fail to put file');
 };
 
+/** Login as admin and upload CSV files  */
+const prepareFiles = async () => {
+    await ApiTests.loginTest(App.config.testAdminUser);
+
+    await putCardCSV();
+    await putAccountCSV();
+
+    await ApiTests.loginTest(App.config.testUser);
+};
+
+const prepareAccounts = async () => {
+    const { RUB, USD, EUR } = App.scenario;
+
+    const accList = [{
+        name: 'ACC_3',
+        curr_id: RUB,
+        initbalance: '500.99',
+        icon_id: 2,
+        flags: 0,
+    }, {
+        name: 'ACC_RUB',
+        curr_id: RUB,
+        initbalance: '500.99',
+        icon_id: 5,
+        flags: 0,
+    }, {
+        name: 'ACC_USD',
+        curr_id: USD,
+        initbalance: '500.99',
+        icon_id: 4,
+        flags: 0,
+    }, {
+        name: 'ACC_EUR',
+        curr_id: EUR,
+        initbalance: '10000.99',
+        icon_id: 3,
+        flags: 0,
+    }];
+
+    for (const data of accList) {
+        let account = App.state.accounts.findByName(data.name);
+        if (!account) {
+            account = await api.account.create(data);
+        }
+        App.scenario[data.name] = account.id;
+    }
+};
+
+const preparePersons = async () => {
+    const personsList = [
+        { name: 'MARIA', flags: 0 },
+        { name: 'ALEX', flags: 0 },
+    ];
+
+    for (const data of personsList) {
+        let person = App.state.persons.findByName(data.name);
+        if (!person) {
+            person = await api.person.create(data);
+        }
+        App.scenario[data.name] = person.id;
+    }
+};
+
+/** Login as admin and remove previously uploaded files */
+const removeFiles = async () => {
+    await ApiTests.loginTest(App.config.testAdminUser);
+
+    await ImportTests.removeFile(cardUploadFilename);
+    cardUploadFilename = null;
+    await ImportTests.removeFile(accountUploadFilename);
+    accountUploadFilename = null;
+
+    await ApiTests.loginTest(App.config.testUser);
+};
+
 export const importTests = {
-    /** Upload CSV file for import tests */
     async prepare() {
-        // Login as admin to upload CSV file
-        await ApiTests.loginTest(App.config.testAdminUser);
+        await api.profile.resetData({
+            transactions: true,
+            importtpl: true,
+            importrules: true,
+        });
+        await App.state.fetch();
 
-        await putCardCSV();
-        await putAccountCSV();
-
-        await ApiTests.loginTest(App.config.testUser);
+        await prepareFiles();
+        await prepareAccounts();
+        await preparePersons();
+        await App.state.fetch();
     },
 
-    /** Remove previously uploaded file */
     async clean() {
-        await ApiTests.loginTest(App.config.testAdminUser);
-
-        await ImportTests.removeFile(cardUploadFilename);
-        cardUploadFilename = null;
-        await ImportTests.removeFile(accountUploadFilename);
-        accountUploadFilename = null;
-
-        await ApiTests.loginTest(App.config.testUser);
+        await removeFiles();
     },
 
     /** Run import view tests */
@@ -160,23 +230,6 @@ export const importTests = {
         setBlock('Import', 1);
 
         await this.prepare();
-
-        const accIndexes = App.state.getAccountIndexesByNames([
-            'acc_3', 'acc RUB', 'acc USD', 'acc EUR',
-        ]);
-        [
-            App.scenario.ACC_3,
-            App.scenario.ACC_RUB,
-            App.scenario.ACC_USD,
-            App.scenario.ACC_EUR,
-        ] = App.state.getAccountsByIndexes(accIndexes, true);
-        const personIndexes = App.state.getPersonIndexesByNames([
-            'Maria', 'Alex',
-        ]);
-        [
-            App.scenario.MARIA,
-            App.scenario.ALEX,
-        ] = App.state.getPersonsByIndexes(personIndexes, true);
 
         await ImportTests.checkInitialState();
         await importRuleTests.run();
@@ -197,7 +250,6 @@ export const importTests = {
         assert(template?.id, 'Template not found');
         await importRuleTests.createTemplateRule(template.id);
 
-        // Convert transactions with invalid main account
         setBlock('Upload CSV with invalid account', 2);
         await ImportTests.uploadFile({
             filename: cardUploadFilename,
@@ -208,11 +260,10 @@ export const importTests = {
             account: App.scenario.ACC_USD,
         });
 
-        // Change account to check it updated even after close upload dialog
         setBlock('Check main account is updated after select it at upload dialog', 2);
         await ImportTests.changeMainAccount(App.scenario.ACC_RUB);
 
-        // Convert transactions
+        setBlock('Convert transactions', 2);
         await ImportTests.uploadFile({
             filename: cardUploadFilename,
             data: cardStatement,
