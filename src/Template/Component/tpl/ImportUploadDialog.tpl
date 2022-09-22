@@ -70,17 +70,18 @@
         </div>
         <div id="tableDescr" class="tpl-form__title">Column map</div>
         <div id="rawDataTable" class="tpl-form__block"></div>
-        <div id="tplFeedback" class="invalid-feedback" hidden></div>
+        <div id="tplFeedback" class="feedback" hidden></div>
         <div id="tplControls" class="form-controls" hidden>
             <input id="submitTplBtn" class="btn submit-btn" type="button" value="Save">
             <input id="cancelTplBtn" class="btn link-btn cancel-btn" type="button" value="Cancel">
         </div>
-    </div>
-    <div id="initialAccField" class="tpl-form-field" hidden>
-        <label>Main account</label>
-        <select id="initialAccount"></select>
-    </div>
-    <div id="uploadControls" class="form-controls" hidden>
-        <input id="submitUploadedBtn" class="btn submit-btn" type="button" value="Submit">
+        <div id="initialAccField" class="tpl-form-field" hidden>
+            <label>Main account</label>
+            <select id="initialAccount"></select>
+        </div>
+        <div id="convertFeedback" class="feedback" hidden></div>
+        <div id="uploadControls" class="form-controls" hidden>
+            <input id="submitUploadedBtn" class="btn submit-btn" type="button" value="Submit">
+        </div>
     </div>
 </div>

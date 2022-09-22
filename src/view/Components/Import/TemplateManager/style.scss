@@ -18,7 +18,6 @@
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
-  margin-bottom: 12px;
 }
 
 /* Raw data table title */
@@ -69,4 +68,16 @@
 
 .validation-block.invalid-block .tpl-name-inp {
   border-color: #ff0000;
+}
+
+.feedback {
+  margin-bottom: 8px;
+}
+
+.feedback.valid-feedback {
+  color: #76ff6d;
+}
+
+.feedback.invalid-feedback {
+  color: #ff6565;
 }

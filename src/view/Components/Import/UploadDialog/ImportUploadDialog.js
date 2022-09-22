@@ -1,11 +1,8 @@
 import {
-    ge,
     createElement,
     isFunction,
     show,
-    enable,
     Component,
-    DropDown,
     Popup,
 } from 'jezvejs';
 import { ImportFileUploader } from '../FileUploader/ImportFileUploader.js';
@@ -47,7 +44,6 @@ export class ImportUploadDialog extends Component {
         this.state = {
             mainAccount: this.props.mainAccount,
             importedItems: null,
-            uploadEnabled: false,
             loading: false,
         };
 
@@ -69,8 +65,9 @@ export class ImportUploadDialog extends Component {
         this.tplManager = ImportTemplateManager.create({
             elem: 'templateBlock',
             mainAccount: this.state.mainAccount,
-            onStatus: (status) => this.onTemplateStatus(status),
             onUpdate: () => this.onTemplateUpdate(),
+            onAccountChange: (account) => this.onAccountChange(account),
+            onSubmit: () => this.onSubmit(),
         });
 
         this.popup = Popup.create({
@@ -84,28 +81,6 @@ export class ImportUploadDialog extends Component {
             className: UPLOAD_POPUP_CLASS,
         });
         show(this.elem, true);
-
-        this.accountDropDown = DropDown.create({
-            elem: 'initialAccount',
-            onchange: (account) => this.onAccountChange(account),
-        });
-
-        this.initialAccField = ge('initialAccField');
-        this.controlsBlock = ge('uploadControls');
-        this.submitUploadedBtn = ge('submitUploadedBtn');
-        if (
-            !this.initialAccField
-            || !this.accountDropDown
-            || !this.controlsBlock
-            || !this.submitUploadedBtn
-        ) {
-            throw new Error('Failed to initialize upload file dialog');
-        }
-
-        window.app.initAccountsList(this.accountDropDown);
-        this.accountDropDown.selectItem(this.state.mainAccount.id.toString());
-
-        this.submitUploadedBtn.addEventListener('click', () => this.onSubmit());
 
         this.uploadProgress = LoadingIndicator.create({ fixed: false });
         this.elem.append(this.uploadProgress.elem);
@@ -144,7 +119,6 @@ export class ImportUploadDialog extends Component {
             ...this.state,
             id: UPLOAD_STATE,
             importedItems: null,
-            uploadEnabled: false,
             loading: false,
         });
     }
@@ -204,15 +178,6 @@ export class ImportUploadDialog extends Component {
         this.uploader.setFile(files[0]);
     }
 
-    /** Enable/disable upload button */
-    enableUpload(val) {
-        this.setState({
-            ...this.state,
-            loading: false,
-            uploadEnabled: !!val,
-        });
-    }
-
     /** Main account update handler */
     setMainAccount(account) {
         if (!account) {
@@ -223,24 +188,18 @@ export class ImportUploadDialog extends Component {
             return;
         }
 
-        this.accountDropDown.selectItem(account.id.toString());
-        this.onAccountChange(account);
+        this.state.mainAccount = account;
+        this.tplManager.setMainAccount(account);
     }
 
     /** Initial account select 'change' event handler */
     onAccountChange(selectedAccount) {
-        let account = null;
-
-        if (selectedAccount) {
-            account = window.app.model.accounts.getItem(selectedAccount.id);
-        }
+        const account = window.app.model.accounts.getItem(selectedAccount);
         if (!account) {
             throw new Error('Account not found');
         }
 
         this.state.mainAccount = account;
-
-        this.tplManager.setMainAccount(account);
 
         if (isFunction(this.props.onAccountChange)) {
             this.props.onAccountChange(account.id);
@@ -294,19 +253,12 @@ export class ImportUploadDialog extends Component {
 
             this.setConvertState();
             this.tplManager.setRawData(data);
+            this.setLoading(false);
         } catch (e) {
             this.onUploadError(e.message);
             this.state.importedItems = null;
             this.importDone();
         }
-    }
-
-    /**
-     * Template status handler
-     * @param {boolean} status - is valid template flag
-     */
-    onTemplateStatus(status) {
-        this.enableUpload(status);
     }
 
     /** Template update handler */
@@ -377,12 +329,6 @@ export class ImportUploadDialog extends Component {
             this.uploader.hide();
             this.tplManager.show();
         }
-
-        const uploadEnabled = state.id === CONVERT_STATE && state.uploadEnabled;
-        this.accountDropDown.enable(uploadEnabled);
-        show(this.initialAccField, uploadEnabled);
-        enable(this.submitUploadedBtn, uploadEnabled);
-        show(this.controlsBlock, uploadEnabled);
 
         if (!state.loading) {
             this.uploadProgress.hide();

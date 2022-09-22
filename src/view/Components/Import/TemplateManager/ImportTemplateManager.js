@@ -16,6 +16,10 @@ import { LoadingIndicator } from '../../LoadingIndicator/LoadingIndicator.js';
 import { RawDataTable } from '../RawDataTable/RawDataTable.js';
 import './style.scss';
 
+/** CSS classes */
+const VALID_FEEDBACK_CLASS = 'valid-feedback';
+const INVALID_FEEDBACK_CLASS = 'invalid-feedback';
+
 /** Strings */
 const TITLE_TEMPLATE = 'Template';
 const TITLE_CREATE_TEMPLATE = 'Create template';
@@ -89,6 +93,10 @@ export class ImportTemplateManager extends Component {
         this.tableDescr = ge('tableDescr');
         this.rawDataTable = ge('rawDataTable');
         this.tplFeedback = ge('tplFeedback');
+        this.initialAccField = ge('initialAccField');
+        this.controlsBlock = ge('uploadControls');
+        this.submitUploadedBtn = ge('submitUploadedBtn');
+        this.convertFeedback = ge('convertFeedback');
         if (
             !this.tplHeading
             || !this.tplStateLbl
@@ -107,9 +115,23 @@ export class ImportTemplateManager extends Component {
             || !this.tableDescr
             || !this.rawDataTable
             || !this.tplFeedback
+            || !this.initialAccField
+            || !this.controlsBlock
+            || !this.submitUploadedBtn
+            || !this.convertFeedback
         ) {
             throw new Error('Failed to initialize upload file dialog');
         }
+
+        this.accountDropDown = DropDown.create({
+            elem: 'initialAccount',
+            onchange: (account) => this.onAccountChange(account),
+        });
+
+        window.app.initAccountsList(this.accountDropDown);
+        this.accountDropDown.selectItem(this.state.mainAccount.id.toString());
+
+        this.submitUploadedBtn.addEventListener('click', () => this.onSubmit());
 
         this.tplNameInp.addEventListener('input', () => this.onTemplateNameInput());
         this.createTplBtn.addEventListener('click', () => this.onCreateTemplateClick());
@@ -122,6 +144,12 @@ export class ImportTemplateManager extends Component {
         this.elem.append(this.loadingIndicator.elem);
 
         this.reset();
+    }
+
+    onSubmit() {
+        if (isFunction(this.props.onSubmit)) {
+            this.props.onSubmit();
+        }
     }
 
     /**
@@ -167,7 +195,7 @@ export class ImportTemplateManager extends Component {
                 throw e;
             }
 
-            this.setTemplateFeedback(e.message);
+            this.setConvertFeedback(e.message, false);
 
             return null;
         }
@@ -223,6 +251,21 @@ export class ImportTemplateManager extends Component {
         }
 
         this.state.mainAccount = account;
+        this.accountDropDown.selectItem(account.id.toString());
+    }
+
+    /** Initial account select 'change' event handler */
+    onAccountChange(selectedAccount) {
+        const account = window.app.model.accounts.getItem(selectedAccount?.id);
+        if (!account) {
+            throw new Error('Account not found');
+        }
+
+        this.state.mainAccount = account;
+
+        if (isFunction(this.props.onAccountChange)) {
+            this.props.onAccountChange(account.id);
+        }
     }
 
     /** Import template select 'change' event handler */
@@ -449,15 +492,41 @@ export class ImportTemplateManager extends Component {
         this.render(this.state);
     }
 
-    /** Validate current template on raw data */
-    setTemplateFeedback(message = null) {
-        if (typeof message === 'string' && message.length) {
-            this.tplFeedback.textContent = message;
-            show(this.tplFeedback, true);
-        } else {
-            this.tplFeedback.textContent = '';
-            show(this.tplFeedback, false);
+    /** Set feedback for specified element */
+    setFeedback(feedbackElem, message = null, isValid = false) {
+        const elem = feedbackElem;
+        if (!elem) {
+            throw new Error('Invalid element');
         }
+
+        if (typeof message === 'string' && message.length) {
+            elem.textContent = message;
+
+            if (isValid) {
+                elem.classList.add(VALID_FEEDBACK_CLASS);
+                elem.classList.remove(INVALID_FEEDBACK_CLASS);
+            } else {
+                elem.classList.add(INVALID_FEEDBACK_CLASS);
+                elem.classList.remove(VALID_FEEDBACK_CLASS);
+            }
+
+            show(elem, true);
+        } else {
+            elem.textContent = '';
+            show(elem, false);
+        }
+    }
+
+    /** Validate current template on raw data */
+    setTemplateFeedback(message = null, isValid = false) {
+        this.setFeedback(this.tplFeedback, message, isValid);
+        this.setFeedback(this.convertFeedback);
+    }
+
+    /** Validate current template on raw data */
+    setConvertFeedback(message = null, isValid = false) {
+        this.setFeedback(this.tplFeedback);
+        this.setFeedback(this.convertFeedback, message, isValid);
     }
 
     /** Validate current template on raw data */
@@ -472,7 +541,7 @@ export class ImportTemplateManager extends Component {
         }
 
         if (state.id === TPL_UPDATE_STATE) {
-            this.setTemplateFeedback(this.columnFeedback[propName].msg);
+            this.setTemplateFeedback(this.columnFeedback[propName].msg, false);
             this.columnDropDown.selectItem(propName);
         }
 
@@ -540,6 +609,7 @@ export class ImportTemplateManager extends Component {
             this.loadingIndicator.show();
             show(this.tableDescr, false);
             show(this.rawDataTable, false);
+            show(this.convertFeedback, false);
             show(this.tplControls, false);
         } else if (state.id === RAW_DATA_STATE) {
             show(this.tplField, templateAvail);
@@ -618,18 +688,20 @@ export class ImportTemplateManager extends Component {
             isValid = validateResult.valid;
             if (isValid) {
                 enable(this.submitTplBtn, true);
-                this.setTemplateFeedback(MSG_VALID_TEMPLATE);
+                this.setTemplateFeedback(MSG_VALID_TEMPLATE, true);
             } else {
                 this.onInvalidPropertyValue(state, validateResult.column);
                 enable(this.submitTplBtn, false);
                 if (state.id === RAW_DATA_STATE) {
-                    this.setTemplateFeedback(MSG_NOT_MATCHED_TEMPLATE);
+                    this.setTemplateFeedback(MSG_NOT_MATCHED_TEMPLATE, false);
                 }
             }
         }
 
-        if (isFunction(this.props.onStatus)) {
-            this.props.onStatus(state.id === RAW_DATA_STATE && isValid);
-        }
+        const uploadEnabled = state.id === RAW_DATA_STATE && isValid;
+        this.accountDropDown.enable(uploadEnabled);
+        show(this.initialAccField, uploadEnabled);
+        enable(this.submitUploadedBtn, uploadEnabled);
+        show(this.controlsBlock, uploadEnabled);
     }
 }
