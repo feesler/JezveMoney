@@ -221,6 +221,7 @@ class ImportTemplateModel extends CachedTable
             return $res;
         }
 
+        $returnIds = isset($params["returnIds"]) ? $params["returnIds"] : false;
         $typeFilter = isset($params["type"]) ? intval($params["type"]) : 0;
         $nameFilter = isset($params["name"]) ? $params["name"] : null;
 
@@ -232,8 +233,7 @@ class ImportTemplateModel extends CachedTable
                 continue;
             }
 
-            $itemObj = new ImportTemplateItem($item);
-            $res[] = $itemObj;
+            $res[] = ($returnIds) ? $item->id : (new ImportTemplateItem($item));
         }
 
         return $res;
@@ -249,6 +249,12 @@ class ImportTemplateModel extends CachedTable
     public function reset()
     {
         if (!self::$user_id) {
+            return false;
+        }
+
+        $items = $this->getData(["returnIds" => true]);
+        $ruleModel = ImportRuleModel::getInstance();
+        if (!$ruleModel->onTemplateDelete($items)) {
             return false;
         }
 
