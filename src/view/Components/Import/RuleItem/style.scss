@@ -1,11 +1,5 @@
 /* Import rule item */
 .rule-item {
-  margin-right: 3px;
-
-  + .rule-item {
-    margin-top: 4px;
-  }
-
   /* Main static view */
   .collapsible-header {
     flex-flow: row nowrap;

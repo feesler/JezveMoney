@@ -137,4 +137,17 @@ export class ImportConditionItem extends TestComponent {
 
         return res;
     }
+
+    static render(item) {
+        assert.instanceOf(item, ImportCondition, 'Invalid item');
+
+        const model = {
+            isFieldValue: item.isPropertyValue(),
+            fieldType: item.field_id,
+            operator: item.operator,
+            value: item.value,
+        };
+
+        return this.getExpectedState(model);
+    }
 }

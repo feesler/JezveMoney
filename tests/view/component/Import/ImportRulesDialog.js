@@ -7,6 +7,7 @@ import {
     queryAll,
     prop,
     click,
+    input,
     isVisible,
     wait,
     waitForFunction,
@@ -30,6 +31,9 @@ export class ImportRulesDialog extends TestComponent {
                 createBtn: await query(this.elem, '.create-btn'),
             },
             loadingIndicator: { elem: await query(this.elem, '.loading-indicator') },
+            searchField: { elem: await query(this.elem, '.search-field') },
+            searchInp: { elem: await query(this.elem, '#searchInp') },
+            clearSearchBtn: { elem: await query(this.elem, '#clearSearchBtn') },
             rulesList: { elem: await query(this.elem, '.rules-list') },
         };
 
@@ -39,12 +43,17 @@ export class ImportRulesDialog extends TestComponent {
             && res.header.labelElem
             && res.header.createBtn
             && res.loadingIndicator.elem
+            && res.searchField.elem
+            && res.searchInp.elem
+            && res.clearSearchBtn.elem
             && res.rulesList.elem,
             'Failed to initialize import rules dialog',
         );
 
         res.rulesList.renderTime = await prop(res.rulesList.elem, 'dataset.time');
         res.header.title = await prop(res.header.labelElem, 'textContent');
+
+        res.searchInp.value = await prop(res.searchInp.elem, 'value');
 
         const listItems = await queryAll(res.rulesList.elem, '.rule-item');
         res.items = await asyncMap(
@@ -72,6 +81,7 @@ export class ImportRulesDialog extends TestComponent {
 
         res.loading = cont.loadingIndicator.visible;
         res.renderTime = cont.rulesList.renderTime;
+        res.filter = cont.searchInp.value;
         res.rules = cont.items.map((item) => copyObject(item.model));
 
         const isListState = cont.rulesList.visible && cont.header.title === 'Import rules';
@@ -82,6 +92,7 @@ export class ImportRulesDialog extends TestComponent {
             res.state = (isUpdate) ? 'update' : 'create';
             if (cont.ruleForm) {
                 res.rule = copyObject(cont.ruleForm.model);
+                res.ruleItem = cont.ruleForm.getExpectedRule();
             }
         }
 
@@ -90,16 +101,21 @@ export class ImportRulesDialog extends TestComponent {
 
     getExpectedState(model) {
         const isForm = this.isFormState(model);
+        const isList = this.isListState(model);
         const res = {
             header: {},
-            rulesList: { visible: model.state === 'list' },
+            searchField: { visible: isList },
+            rulesList: { visible: isList },
         };
 
-        if (model.state === 'list') {
+        if (isList) {
             res.header.title = 'Import rules';
-            res.items = model.rules.map(
-                (rule) => ImportRuleItem.getExpectedState(rule),
-            );
+
+            const filteredRules = (model.filter !== '')
+                ? App.state.rules.filter((rule) => rule.isMatchFilter(model.filter))
+                : App.state.rules.data;
+
+            res.items = filteredRules.map((rule) => ImportRuleItem.render(rule));
         } else if (isForm) {
             res.header.title = (model.state === 'create')
                 ? 'Create import rule'
@@ -139,6 +155,28 @@ export class ImportRulesDialog extends TestComponent {
 
     async close() {
         await click(this.content.closeBtn);
+    }
+
+    async inputSearch(value) {
+        assert(this.isListState(), 'Invalid state');
+
+        this.model.filter = value.toString();
+        this.expectedState = this.getExpectedState(this.model);
+
+        await this.performAction(() => input(this.content.searchInp.elem, value));
+
+        return this.checkState();
+    }
+
+    async clearSearch() {
+        assert(this.isListState(), 'Invalid state');
+
+        this.model.filter = '';
+        this.expectedState = this.getExpectedState(this.model);
+
+        await this.performAction(() => click(this.content.clearSearchBtn.elem));
+
+        return this.checkState();
     }
 
     async createRule() {
@@ -200,7 +238,9 @@ export class ImportRulesDialog extends TestComponent {
         const ind = parseInt(index, 10);
         assert.arrayIndex(this.content.items, ind);
 
-        this.model.rules.splice(ind, 1);
+        const id = App.state.rules.indexToId(ind);
+        App.state.deleteRules(id);
+
         this.expectedState = this.getExpectedState(this.model);
 
         await this.content.items[ind].clickDelete();
@@ -223,6 +263,7 @@ export class ImportRulesDialog extends TestComponent {
             );
         });
 
+        await App.state.fetchAndTest();
         return this.checkState();
     }
 
@@ -232,11 +273,11 @@ export class ImportRulesDialog extends TestComponent {
         const valid = this.content.ruleForm.isValid();
         if (valid) {
             if (this.model.state === 'create') {
-                this.model.rules.push(this.model.rule);
+                const createResult = App.state.createRule(this.model.ruleItem);
+                assert(createResult, 'Failed to update import rule');
             } else {
-                const index = this.model.rules.findIndex((rule) => rule.id === this.model.rule.id);
-                assert(index !== -1, 'Invalid state');
-                this.model.rules[index] = this.model.rule;
+                const updateResult = App.state.updateRule(this.model.ruleItem);
+                assert(updateResult, 'Failed to update import rule');
             }
             this.model.state = 'list';
         }
@@ -254,6 +295,7 @@ export class ImportRulesDialog extends TestComponent {
             );
         });
 
+        await App.state.fetchAndTest();
         return this.checkState();
     }
 

@@ -4,6 +4,7 @@ import {
     hasFlag,
     assert,
 } from 'jezve-test';
+import { App } from '../Application.js';
 import { convDate, fixFloat } from '../common.js';
 
 /** Condition field types */
@@ -386,5 +387,28 @@ export class ImportCondition {
         const conditionValue = this.getConditionValue(data);
 
         return this.applyOperator(fieldValue, conditionValue);
+    }
+
+    /** Check condition match search filter */
+    isMatchFilter(value) {
+        if (this.isTemplateField()) {
+            const template = App.state.templates.getItem(this.value);
+            if (!template) {
+                return false;
+            }
+
+            return template.name.includes(value);
+        }
+
+        if (this.isAccountField()) {
+            const account = App.state.accounts.getItem(this.value);
+            if (!account) {
+                return false;
+            }
+
+            return account.name.includes(value);
+        }
+
+        return this.value.includes(value);
     }
 }

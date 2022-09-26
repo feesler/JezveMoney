@@ -165,4 +165,27 @@ export class ImportAction {
 
         context[actionName](this.value);
     }
+
+    /** Check action match search filter */
+    isMatchFilter(value) {
+        if (this.isAccountValue()) {
+            const account = App.state.accounts.getItem(this.value);
+            if (!account) {
+                return false;
+            }
+
+            return account.name.includes(value);
+        }
+
+        if (this.isPersonValue()) {
+            const person = App.state.persons.getItem(this.value);
+            if (!person) {
+                return false;
+            }
+
+            return person.name.includes(value);
+        }
+
+        return this.value.includes(value);
+    }
 }

@@ -180,4 +180,27 @@ export class ImportAction extends ListItem {
             throw new Error('Invalid action');
         }
     }
+
+    /** Check action match search filter */
+    isMatchFilter(value) {
+        if (this.isAccountValue()) {
+            const account = window.app.model.accounts.getItem(this.value);
+            if (!account) {
+                return false;
+            }
+
+            return account.name.includes(value);
+        }
+
+        if (this.isPersonValue()) {
+            const person = window.app.model.persons.getItem(this.value);
+            if (!person) {
+                return false;
+            }
+
+            return person.name.includes(value);
+        }
+
+        return this.value.includes(value);
+    }
 }

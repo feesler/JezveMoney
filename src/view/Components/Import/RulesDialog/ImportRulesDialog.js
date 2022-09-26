@@ -1,4 +1,5 @@
 import {
+    ge,
     ce,
     re,
     removeChilds,
@@ -7,6 +8,7 @@ import {
     isFunction,
     Component,
     Popup,
+    InputGroup,
 } from 'jezvejs';
 import { API } from '../../../js/API.js';
 import { ImportRule } from '../../../js/model/ImportRule.js';
@@ -47,14 +49,25 @@ export class ImportRulesDialog extends Component {
         this.headerElem = this.elem.querySelector('.rules-header');
         this.titleElem = this.headerElem?.querySelector('label');
         this.createRuleBtn = this.headerElem?.querySelector('.create-btn');
+        this.searchField = ge('searchField');
+        this.searchInp = ge('searchInp');
+        this.clearSearchBtn = ge('clearSearchBtn');
         this.listContainer = this.elem.querySelector('.rules-list');
         if (
             !this.createRuleBtn
             || !this.titleElem
+            || !this.searchField
+            || !this.searchInp
+            || !this.clearSearchBtn
             || !this.listContainer
         ) {
             throw new Error('Failed to initialize import rules dialog');
         }
+
+        InputGroup.fromElement(this.searchField);
+
+        this.searchInp.addEventListener('input', () => this.onSearchInput());
+        this.clearSearchBtn.addEventListener('click', () => this.onClearSearch());
 
         this.popup = Popup.create({
             id: 'rules_popup',
@@ -94,6 +107,7 @@ export class ImportRulesDialog extends Component {
         this.state = {
             id: this.LIST_STATE,
             listLoading: false,
+            filter: '',
             renderTime: Date.now(),
         };
     }
@@ -114,6 +128,18 @@ export class ImportRulesDialog extends Component {
     /** Hide dialog */
     onClose() {
         this.reset();
+    }
+
+    /** Search input */
+    onSearchInput() {
+        this.state.filter = this.searchInp.value;
+        this.render(this.state);
+    }
+
+    /** Clear search */
+    onClearSearch() {
+        this.state.filter = '';
+        this.render(this.state);
     }
 
     /** Create rule button 'click' event handler */
@@ -243,7 +269,14 @@ export class ImportRulesDialog extends Component {
 
     /** Render list state of component */
     renderList(state) {
-        const ruleItems = window.app.model.rules.map((rule) => ImportRuleItem.create({
+        const { rules } = window.app.model;
+        const isFiltered = (state.filter !== '');
+
+        const filteredRules = (isFiltered)
+            ? rules.filter((rule) => rule.isMatchFilter(state.filter))
+            : rules.data;
+
+        const ruleItems = filteredRules.map((rule) => ImportRuleItem.create({
             data: rule,
             onUpdate: (ruleId) => this.onUpdateItem(ruleId),
             onRemove: (ruleId) => this.onDeleteItem(ruleId),
@@ -257,6 +290,10 @@ export class ImportRulesDialog extends Component {
         } else {
             ruleItems.forEach((item) => this.listContainer.appendChild(item.elem));
         }
+
+        show(this.searchField, true);
+        this.searchInp.value = state.filter;
+        show(this.clearSearchBtn, isFiltered);
 
         show(this.listContainer, true);
         show(this.createRuleBtn, true);
@@ -280,6 +317,7 @@ export class ImportRulesDialog extends Component {
 
         insertAfter(this.formContainer.elem, this.listContainer);
 
+        show(this.searchField, false);
         show(this.listContainer, false);
         show(this.createRuleBtn, false);
         show(this.formContainer.elem, true);

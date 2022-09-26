@@ -371,7 +371,7 @@ const runCreateTests = async () => {
 };
 
 // Update import rule tests
-const runUpdateImportRuleTests = async () => {
+const runUpdateTests = async () => {
     setBlock('Update import rules', 1);
 
     setBlock('Update import rule #1', 2);
@@ -411,10 +411,19 @@ const runUpdateImportRuleTests = async () => {
 };
 
 // Delete import rule tests
-const runDeleteImportRuleTests = async () => {
+const runDeleteTests = async () => {
     setBlock('Delete import rules', 1);
     // Delete rule #3
     await ImportTests.deleteRule(2);
+};
+
+// Search import rule tests
+const runSearchTests = async () => {
+    setBlock('Search import rules', 1);
+
+    await ImportTests.inputRulesSearch('MOBILE');
+    await ImportTests.inputRulesSearch('Taxi');
+    await ImportTests.clearRulesSearch();
 };
 
 // Create import rule with template condition
@@ -446,8 +455,9 @@ export const importRuleTests = {
 
         await runValidationTests();
         await runCreateTests();
-        await runUpdateImportRuleTests();
-        await runDeleteImportRuleTests();
+        await runUpdateTests();
+        await runDeleteTests();
+        await runSearchTests();
 
         await ImportTests.closeRulesDialog();
     },

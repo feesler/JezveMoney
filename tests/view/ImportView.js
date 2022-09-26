@@ -466,6 +466,20 @@ export class ImportView extends AppView {
         return true;
     }
 
+    async inputRulesSearch(value) {
+        this.checkRulesListState();
+
+        await this.performAction(() => this.content.rulesDialog.inputSearch(value));
+        return true;
+    }
+
+    async clearRulesSearch() {
+        this.checkRulesListState();
+
+        await this.performAction(() => this.content.rulesDialog.clearSearch());
+        return true;
+    }
+
     async createRule() {
         this.checkRulesListState();
 

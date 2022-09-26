@@ -10,6 +10,8 @@ import { ImportRuleItemConditions } from './ImportRuleItemConditions.js';
 import { ImportConditionItem } from './ImportConditionItem.js';
 import { ImportRuleItemActions } from './ImportRuleItemActions.js';
 import { ImportActionItem } from './ImportActionItem.js';
+import { ImportCondition } from '../../../model/ImportCondition.js';
+import { ImportAction } from '../../../model/ImportAction.js';
 
 export class ImportRuleItem extends TestComponent {
     constructor(parent, elem, mainAccount) {
@@ -116,9 +118,32 @@ export class ImportRuleItem extends TestComponent {
     /**
      * Convert import rule object to expected state of component
      * @param {Object} item - import rule object
-     * @param {AppState} state - application state
      */
-    static render(item, state) {
-        assert(item && state, 'Invalid parameters');
+    static render(item) {
+        assert(item, 'Invalid parameters');
+
+        const res = {
+            ruleId: item.id.toString(),
+            propertyElem: { visible: true },
+            operatorElem: { visible: true },
+            valueElem: { visible: true },
+            infoElem: { visible: true },
+            updateBtn: { visible: true },
+            deleteBtn: { visible: true },
+            conditions: {},
+            actions: {},
+        };
+
+        res.conditions.items = item.conditions.data.map((condData) => {
+            const condition = new ImportCondition(condData);
+            return ImportConditionItem.render(condition);
+        });
+
+        res.actions.items = item.actions.data.map((actData) => {
+            const action = new ImportAction(actData);
+            return ImportActionItem.render(action);
+        });
+
+        return res;
     }
 }

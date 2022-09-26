@@ -36,6 +36,11 @@ export class ImportConditionList extends List {
         return this.filter((item) => item.rule_id === id);
     }
 
+    /** Check list of conditions match search query */
+    isMatchFilter(value) {
+        return this.some((condition) => condition.isMatchFilter(value));
+    }
+
     /**
      * Check list of conditions has condition with same properties
      * @param {ImportCondition} condition
