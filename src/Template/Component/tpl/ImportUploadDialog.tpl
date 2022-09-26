@@ -78,7 +78,7 @@
             </div>
         </div>
         <div id="tableDescr" class="tpl-form__title">Column map</div>
-        <div id="rawDataTable" class="tpl-form__block"></div>
+        <div id="rawDataTable"></div>
         <div id="tplFeedback" class="feedback" hidden></div>
         <div id="tplControls" class="form-controls" hidden>
             <input id="submitTplBtn" class="btn submit-btn" type="button" value="Save">

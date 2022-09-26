@@ -147,7 +147,7 @@ export class ImportUploadDialog extends TestComponent {
         res.columns = null;
         if (res.templateBlock.visible && !res.isLoading) {
             res.columns = await asyncMap(
-                await queryAll(res.rawDataTable.elem, '.raw-data-column'),
+                await queryAll(res.rawDataTable.elem, '.raw-data-table__data .raw-data-column'),
                 async (elem) => {
                     const item = {
                         elem,
