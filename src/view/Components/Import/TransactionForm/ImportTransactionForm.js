@@ -30,7 +30,7 @@ const IG_INPUT_CLASS = 'input-group__input';
 const IG_BUTTON_CLASS = 'input-group__btn';
 const IG_BUTTON_TITLE_CLASS = 'input-group__btn-title';
 const DEFAULT_INPUT_CLASS = 'stretch-input';
-const AMOUNT_INPUT_CLASS = 'amount-input';
+const AMOUNT_INPUT_CLASS = 'right-align-text';
 /* Fields */
 const AMOUNT_FIELD_CLASS = 'amount-field';
 const DATE_FIELD_CLASS = 'date-field';

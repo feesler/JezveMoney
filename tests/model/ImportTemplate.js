@@ -21,6 +21,7 @@ export class ImportTemplate {
         this.id = data.id;
         this.name = data.name;
         this.type_id = data.type_id;
+        this.first_row = data.first_row;
         this.columns = copyObject(data.columns);
     }
 
@@ -74,7 +75,8 @@ export class ImportTemplate {
         assert.isArray(data, 'Invalid data');
 
         try {
-            const [row] = data.slice(1, 2);
+            const start = this.first_row - 1;
+            const [row] = data.slice(start, start + 1);
             const rowData = this.getRowData(row);
 
             const accCurrency = App.currency.findByName(rowData.accountCurrency);
@@ -108,18 +110,12 @@ export class ImportTemplate {
     * @param {Account} mainAccount - main account object
     */
     applyTo(data, mainAccount) {
-        const skipRows = 1;
-
         assert.isArray(data, 'Invalid parameters');
         assert(mainAccount, 'Invalid parameters');
 
-        const res = [];
         try {
-            data.forEach((row, ind) => {
-                if (ind < skipRows) {
-                    return;
-                }
-
+            const rows = data.slice(this.first_row - 1);
+            const res = rows.map((row) => {
                 const rowData = this.getRowData(row);
                 const original = {
                     ...rowData,
@@ -144,9 +140,10 @@ export class ImportTemplate {
                 }
 
                 const item = ImportTransaction.fromImportData(original, mainAccount);
-
-                res.push(item);
+                return item;
             });
+
+            return res;
         } catch (e) {
             if (!(e instanceof ImportTemplateError)) {
                 throw e;
@@ -154,7 +151,5 @@ export class ImportTemplate {
 
             return null;
         }
-
-        return res;
     }
 }

@@ -34,30 +34,83 @@ export class ImportUploadDialog extends TestComponent {
         const res = {};
 
         res.closeBtn = await query(this.elem, '.close-btn');
+        assert(res.closeBtn, 'Invalid popup: cllose button not found');
 
+        // Upload form
         res.fileBlock = { elem: await query('#fileBlock') };
-
         res.uploadFormBrowser = { elem: await query(this.elem, '.upload-form__browser') };
         res.fileNameElem = { elem: await query(this.elem, '.upload-form__filename') };
-        res.templateSel = await DropDown.createFromChild(this, await query(this.elem, '#templateSel'));
         res.isEncodeCheck = await Checkbox.create(this, await query(this.elem, '#isEncodeCheck'));
-        res.submitBtn = { elem: await query(this.elem, '#submitUploadedBtn') };
         res.uploadProgress = { elem: await query(this.elem, ':scope > .loading-indicator') };
-
+        // Server address input
         res.useServerCheck = await Checkbox.create(this, await query('#useServerCheck'));
         res.serverAddressBlock = { elem: await query('#serverAddressBlock') };
         res.serverAddressInput = { elem: await query('#serverAddress') };
         res.serverUploadBtn = { elem: await query('#serverUploadBtn') };
+        assert(
+            res.fileBlock.elem
+            && res.uploadFormBrowser.elem
+            && res.fileNameElem.elem
+            && res.isEncodeCheck.elem
+            && res.useServerCheck.elem
+            && res.serverAddressBlock.elem
+            && res.serverAddressInput.elem
+            && res.serverUploadBtn.elem,
+            'Invalid file upload form',
+        );
 
+        res.fileName = await prop(res.fileNameElem.elem, 'value');
+        res.useServerAddress = res.useServerCheck.checked;
+        res.serverAddress = await prop(res.serverAddressInput.elem, 'value');
+        res.encode = res.isEncodeCheck.checked;
+        res.uploadFilename = (res.useServerAddress) ? res.serverAddress : res.fileName;
+
+        // Convert block
         res.templateBlock = { elem: await query('#templateBlock') };
         res.tplHeading = { elem: await query('#tplHeading') };
         res.tplStateLbl = { elem: await query('#tplStateLbl') };
+        assert(
+            res.templateBlock.elem
+            && res.tplHeading.elem
+            && res.tplStateLbl.elem,
+            'Invalid convert block',
+        );
+
+        // Template select field
         res.tplField = { elem: await query('#tplField') };
+        res.templateSel = await DropDown.createFromChild(this, await query(this.elem, '#templateSel'));
+        assert(res.tplField.elem && res.templateSel, 'Invalid template select field');
+
+        // Template name field
         res.nameField = { elem: await query('#nameField') };
         res.tplNameInp = { elem: await query('#tplNameInp') };
+        assert(res.nameField.elem && res.tplNameInp.elem, 'Invalid template name field');
+
+        res.tplNameInp.value = await prop(res.tplNameInp.elem, 'value');
+
+        // First row field
+        res.firstRowField = { elem: await query('#firstRowField') };
+        res.firstRowInp = { elem: await query('#firstRowInp') };
+        res.decFirstRowBtn = { elem: await query('#decFirstRowBtn') };
+        res.incFirstRowBtn = { elem: await query('#incFirstRowBtn') };
+        assert(
+            res.firstRowField.elem
+            && res.firstRowInp.elem
+            && res.decFirstRowBtn.elem
+            && res.incFirstRowBtn.elem,
+            'Invalid first row field',
+        );
+
+        res.firstRowInp.value = await prop(res.firstRowInp.elem, 'value');
+        res.decFirstRowBtn.disabled = await prop(res.decFirstRowBtn.elem, 'disabled');
+        res.incFirstRowBtn.disabled = await prop(res.incFirstRowBtn.elem, 'disabled');
+
+        // Template column field
         res.columnField = { elem: await query('#columnField') };
         res.columnSel = { elem: await query('#columnSel') };
-        res.loadingIndicator = { elem: await query(this.elem, '.tpl-form > .loading-indicator') };
+        assert(res.columnField.elem && res.columnSel.elem, 'Invalid template column field');
+
+        // Template form
         res.rawDataTable = { elem: await query('#rawDataTable') };
         res.createTplBtn = { elem: await query('#createTplBtn') };
         res.updateTplBtn = { elem: await query('#updateTplBtn') };
@@ -66,35 +119,20 @@ export class ImportUploadDialog extends TestComponent {
         res.cancelTplBtn = { elem: await query('#cancelTplBtn') };
         res.tplFeedback = { elem: await query('#tplFeedback') };
         res.initialAccount = await DropDown.createFromChild(this, await query('#initialAccount'));
+        res.submitBtn = { elem: await query(this.elem, '#submitUploadedBtn') };
+        res.loadingIndicator = { elem: await query(this.elem, '.tpl-form > .loading-indicator') };
 
         assert(
-            res.closeBtn
-            && res.fileBlock.elem
-            && res.uploadFormBrowser.elem
-            && res.fileNameElem.elem
-            && res.templateSel
-            && res.isEncodeCheck.elem
-            && res.useServerCheck.elem
-            && res.serverAddressBlock.elem
-            && res.serverAddressInput.elem
-            && res.serverUploadBtn.elem
-            && res.templateBlock.elem
-            && res.tplHeading.elem
-            && res.tplStateLbl.elem
-            && res.tplField.elem
-            && res.nameField.elem
-            && res.tplNameInp.elem
-            && res.columnField.elem
-            && res.columnSel.elem
-            && res.rawDataTable.elem
+            res.rawDataTable.elem
             && res.createTplBtn.elem
             && res.updateTplBtn.elem
             && res.deleteTplBtn.elem
             && res.submitTplBtn.elem
             && res.cancelTplBtn.elem
             && res.tplFeedback.elem
-            && res.initialAccount,
-            'Failed to initialize extras of file upload dialog',
+            && res.initialAccount
+            && res.submitBtn.elem,
+            'Invalid template form',
         );
 
         res.isTplLoading = res.templateSel.disabled;
@@ -135,13 +173,6 @@ export class ImportUploadDialog extends TestComponent {
             }
         }
 
-        res.fileName = await prop(res.fileNameElem.elem, 'value');
-        res.useServerAddress = res.useServerCheck.checked;
-        res.serverAddress = await prop(res.serverAddressInput.elem, 'value');
-        res.encode = res.isEncodeCheck.checked;
-        res.uploadFilename = (res.useServerAddress) ? res.serverAddress : res.fileName;
-
-        res.tplNameInp.value = await prop(res.tplNameInp.elem, 'value');
         res.tplFeedback.title = await prop(res.tplFeedback.elem, 'textContent');
 
         if (res.isLoading) {
@@ -175,14 +206,8 @@ export class ImportUploadDialog extends TestComponent {
         res.filename = cont.uploadFilename;
         res.fileData = cont.fileData;
 
-        res.template = null;
-
         if (cont.state === CREATE_TPL_STATE) {
             res.template = {};
-            res.template.name = cont.tplNameInp.value;
-        } else if (cont.state === UPDATE_TPL_STATE) {
-            res.template = App.state.templates.getItem(cont.templateSel.value);
-            res.template.name = cont.tplNameInp.value;
         } else {
             res.template = App.state.templates.getItem(cont.templateSel.value);
         }
@@ -191,6 +216,9 @@ export class ImportUploadDialog extends TestComponent {
             (cont.state === CREATE_TPL_STATE || cont.state === UPDATE_TPL_STATE)
             && res.template
         ) {
+            res.template.name = cont.tplNameInp.value;
+            res.template.first_row = parseInt(cont.firstRowInp.value, 10);
+
             res.template.columns = {};
             if (Array.isArray(cont.columns)) {
                 cont.columns.forEach((column, ind) => {
@@ -282,17 +310,15 @@ export class ImportUploadDialog extends TestComponent {
             initialAccount: { value: model.initialAccount.id.toString() },
         };
 
-        if (model.state === CREATE_TPL_STATE
-            || model.state === UPDATE_TPL_STATE) {
-            if (model.state === UPDATE_TPL_STATE) {
-                assert(model.template, 'Invalid model: expected template');
-            }
+        if (model.state === CREATE_TPL_STATE || model.state === UPDATE_TPL_STATE) {
+            assert(model.template, 'Invalid model: expected template');
 
             res.fileBlock = { visible: false };
             res.templateBlock = { visible: true };
             res.loadingIndicator = { visible: false };
             res.tplField = { visible: false };
             res.nameField = { visible: true };
+            res.firstRowField = { visible: true };
             res.columnField = { visible: true };
             res.rawDataTable = { visible: true };
             res.updateTplBtn = { visible: false };
@@ -304,14 +330,28 @@ export class ImportUploadDialog extends TestComponent {
                 ? (App.state.templates.length > 0)
                 : true;
             res.cancelTplBtn = { visible: showCancelBtn };
-            const tplName = (model.template) ? model.template.name : '';
-            res.tplNameInp = { value: tplName };
+            res.tplNameInp = { value: model.template.name };
+
+            const firstRow = (!Number.isNaN(model.template.first_row))
+                ? model.template.first_row
+                : '';
+            res.firstRowInp = { value: firstRow.toString() };
+
+            res.decFirstRowBtn = {
+                visible: true,
+                disabled: (firstRow <= 1),
+            };
+            res.incFirstRowBtn = {
+                visible: true,
+                disabled: false,
+            };
         } else if (model.state === RAW_DATA_STATE) {
             res.fileBlock = { visible: false };
             res.templateBlock = { visible: true };
             res.loadingIndicator = { visible: false };
             res.tplField = { visible: true };
             res.nameField = { visible: false };
+            res.firstRowField = { visible: false };
             res.columnField = { visible: false };
             res.rawDataTable = { visible: false };
             res.updateTplBtn = { visible: true };
@@ -323,6 +363,7 @@ export class ImportUploadDialog extends TestComponent {
             res.templateBlock = { visible: true };
             res.loadingIndicator = { visible: true };
             res.nameField = { visible: false };
+            res.firstRowField = { visible: false };
             res.columnField = { visible: false };
             res.rawDataTable = { visible: false };
             res.updateTplBtn = { visible: true };
@@ -336,6 +377,7 @@ export class ImportUploadDialog extends TestComponent {
             res.templateBlock = { visible: false };
             res.loadingIndicator = { visible: false };
             res.nameField = { visible: false };
+            res.firstRowField = { visible: false };
             res.columnField = { visible: false };
             res.rawDataTable = { visible: false };
             res.updateTplBtn = { visible: false };
@@ -360,6 +402,13 @@ export class ImportUploadDialog extends TestComponent {
             return false;
         }
 
+        if (template.name.length === 0) {
+            return false;
+        }
+        if (Number.isNaN(template.first_row) || template.first_row < 1) {
+            return false;
+        }
+
         const tplProp = [
             'accountAmount',
             'transactionAmount',
@@ -369,7 +418,7 @@ export class ImportUploadDialog extends TestComponent {
             'comment',
         ];
 
-        const res = tplProp.every((property) => {
+        return tplProp.every((property) => {
             if (!(property in template.columns)) {
                 return false;
             }
@@ -388,11 +437,6 @@ export class ImportUploadDialog extends TestComponent {
 
             return true;
         });
-        if (!res) {
-            return false;
-        }
-
-        return true;
     }
 
     async close() {
@@ -436,6 +480,11 @@ export class ImportUploadDialog extends TestComponent {
             }
         } else {
             this.model.state = CREATE_TPL_STATE;
+            this.model.template = {
+                name: '',
+                first_row: 2,
+                columns: {},
+            };
         }
         this.expectedState = this.getExpectedState(this.model);
 
@@ -469,7 +518,11 @@ export class ImportUploadDialog extends TestComponent {
         this.checkRawDataState();
 
         this.model.state = CREATE_TPL_STATE;
-        this.model.template = null;
+        this.model.template = {
+            name: '',
+            first_row: 2,
+            columns: {},
+        };
         this.expectedState = this.getExpectedState(this.model);
 
         await click(this.content.createTplBtn.elem);
@@ -482,7 +535,7 @@ export class ImportUploadDialog extends TestComponent {
         this.checkRawDataState();
 
         this.model.state = UPDATE_TPL_STATE;
-        this.model.template = App.state.templates.getItem(this.content.templateSel.content.value);
+        this.model.template = App.state.templates.getItem(this.content.templateSel.value);
         this.expectedState = this.getExpectedState(this.model);
 
         await click(this.content.updateTplBtn.elem);
@@ -494,16 +547,20 @@ export class ImportUploadDialog extends TestComponent {
     async deleteTemplate() {
         this.checkRawDataState();
 
-        if (this.content.templateSel.content.items.length === 1) {
+        if (this.content.templateSel.items.length === 1) {
             this.model.state = CREATE_TPL_STATE;
-            this.model.template = null;
+            this.model.template = {
+                name: '',
+                first_row: 2,
+                columns: {},
+            };
         } else {
             this.model.state = RAW_DATA_STATE;
-            const currentInd = this.content.templateSel.content.items.findIndex(
-                (item) => item.id === this.content.templateSel.content.value,
+            const currentInd = this.content.templateSel.items.findIndex(
+                (item) => item.id === this.content.templateSel.value,
             );
             const newInd = (currentInd > 0) ? 0 : 1;
-            const newTplId = this.content.templateSel.content.items[newInd].id;
+            const newTplId = this.content.templateSel.items[newInd].id;
             this.model.template = App.state.templates.getItem(newTplId);
         }
 
@@ -549,6 +606,50 @@ export class ImportUploadDialog extends TestComponent {
         assert.arrayIndex(this.content.columns, ind - 1);
 
         await click(this.content.columns[ind - 1].elem);
+        await this.parse();
+
+        return this.checkState();
+    }
+
+    async inputTemplateFirstRow(val) {
+        this.checkTplFormState();
+
+        this.model.template.first_row = parseInt(val, 10);
+        this.expectedState = this.getExpectedState(this.model);
+
+        await input(this.content.firstRowInp.elem, val);
+        await this.parse();
+
+        return this.checkState();
+    }
+
+    async decreaseTemplateFirstRow() {
+        this.checkTplFormState();
+
+        assert(!this.content.decFirstRowBtn.disabled, 'Decrease first row button is disabled');
+
+        this.model.template.first_row -= 1;
+        this.expectedState = this.getExpectedState(this.model);
+
+        await click(this.content.decFirstRowBtn.elem);
+        await this.parse();
+
+        return this.checkState();
+    }
+
+    async increaseTemplateFirstRow() {
+        this.checkTplFormState();
+
+        assert(!this.content.incFirstRowBtn.disabled, 'Increase first row button is disabled');
+
+        if (Number.isNaN(this.model.template.first_row)) {
+            this.model.template.first_row = 1;
+        } else {
+            this.model.template.first_row += 1;
+        }
+        this.expectedState = this.getExpectedState(this.model);
+
+        await click(this.content.incFirstRowBtn.elem);
         await this.parse();
 
         return this.checkState();

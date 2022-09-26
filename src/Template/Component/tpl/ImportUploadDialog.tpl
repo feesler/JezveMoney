@@ -42,7 +42,7 @@
             </div>
             <div class="tpl-form-fields">
                 <div class="tpl-form__select-group">
-                    <div id="tplField" class="tpl-form-field">
+                    <div id="tplField" class="tpl-form-field template-field">
                         <select id="templateSel">
 <?php   foreach($importTemplates as $template) {     ?>
                             <option value="<?=e($template->id)?>"><?=e($template->name)?></option>
@@ -65,6 +65,15 @@
 <?php   }   ?>
                     </select>
                     <div id="columnFeedback" class="invalid-feedback"></div>
+                </div>
+                <div id="firstRowField" class="tpl-form-field first-row-field validation-block" hidden>
+                    <label for="firstRowInp">First row</label>
+                    <div class="input-group">
+                        <button id="decFirstRowBtn" class="input-group__btn" type="button">-</button>
+                        <input id="firstRowInp" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off">
+                        <button id="incFirstRowBtn" class="input-group__btn" type="button">+</button>
+                    </div>
+                    <div class="invalid-feedback">Please input correct value</div>
                 </div>
             </div>
         </div>

@@ -17,7 +17,6 @@ const COLUMN_TPL_PROP_CLASS = 'raw-data-column__tpl-prop';
 
 /** Default properties */
 const defaultProps = {
-    startFromRow: 2, // first data row, 1-based
     rowsToShow: 3,
 };
 
@@ -72,8 +71,13 @@ export class RawDataTable extends Component {
         // Render data table
         let propertiesPerColumn = 0;
         const headerRow = state.data.slice(0, 1)[0];
-        const startRow = state.startFromRow - 1;
-        const endRow = Math.min(state.data.length, state.rowsToShow);
+
+        const safeFirstRow = Number.isNaN(state.template.first_row)
+            ? 1
+            : state.template.first_row;
+
+        const startRow = Math.max(safeFirstRow - 1, 1);
+        const endRow = Math.min(state.data.length, startRow + state.rowsToShow);
         const dataRows = state.data.slice(startRow, endRow);
 
         const colElems = headerRow.map((title, columnInd) => {

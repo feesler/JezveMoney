@@ -192,6 +192,7 @@ const isTemplate = (obj) => verifyObject(obj, {
     id: isInt,
     name: isString,
     type_id: isInt,
+    first_row: isInt,
     columns: isTemplateColumns,
 }, {
     user_id: isInt,

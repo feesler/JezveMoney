@@ -8,7 +8,6 @@ export const selectTemplateById = async (value) => {
     await test(`Select upload template [${value}]`, async () => {
         assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
-        await App.state.fetch();
         await App.view.selectUploadTemplateById(value);
         return App.view.checkState();
     });
@@ -19,7 +18,6 @@ export const selectTemplateByIndex = async (value) => {
     await test(`Select upload template by index [${value}]`, async () => {
         assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
-        await App.state.fetch();
         await App.view.selectUploadTemplateByIndex(value);
         return App.view.checkState();
     });
@@ -30,7 +28,6 @@ export const inputTemplateName = async (value) => {
     await test(`Input template name (${value})`, async () => {
         assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
-        await App.state.fetch();
         await App.view.inputTemplateName(value);
         return App.view.checkState();
     });
@@ -41,8 +38,37 @@ export const selectTemplateColumn = async ({ column, index }) => {
     await test(`Select template column [${column} => ${index}]`, async () => {
         assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
-        await App.state.fetch();
         await App.view.selectTemplateColumn(column, index);
+        return App.view.checkState();
+    });
+};
+
+/** Input import template first row */
+export const inputTemplateFirstRow = async (value) => {
+    await test(`Input template first row (${value})`, async () => {
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
+
+        await App.view.inputTemplateFirstRow(value);
+        return App.view.checkState();
+    });
+};
+
+/** Click by decrease template first row button */
+export const decreaseTemplateFirstRow = async () => {
+    await test('Decrease template first row', async () => {
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
+
+        await App.view.decreaseTemplateFirstRow();
+        return App.view.checkState();
+    });
+};
+
+/** Click by increase template first row button */
+export const increaseTemplateFirstRow = async (value) => {
+    await test('Increase template first row', async () => {
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
+
+        await App.view.increaseTemplateFirstRow(value);
         return App.view.checkState();
     });
 };

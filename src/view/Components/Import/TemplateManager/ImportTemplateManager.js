@@ -7,6 +7,7 @@ import {
     enable,
     Component,
     DropDown,
+    DecimalInput,
 } from 'jezvejs';
 import { API } from '../../../js/API.js';
 import { ImportTemplateError } from '../../../js/error/ImportTemplateError.js';
@@ -83,6 +84,10 @@ export class ImportTemplateManager extends Component {
         this.tplField = ge('tplField');
         this.nameField = ge('nameField');
         this.tplNameInp = ge('tplNameInp');
+        this.firstRowField = ge('firstRowField');
+        this.firstRowInp = ge('firstRowInp');
+        this.decFirstRowBtn = ge('decFirstRowBtn');
+        this.incFirstRowBtn = ge('incFirstRowBtn');
         this.createTplBtn = ge('createTplBtn');
         this.updateTplBtn = ge('updateTplBtn');
         this.deleteTplBtn = ge('deleteTplBtn');
@@ -104,6 +109,10 @@ export class ImportTemplateManager extends Component {
             || !this.tplField
             || !this.nameField
             || !this.tplNameInp
+            || !this.firstRowField
+            || !this.firstRowInp
+            || !this.decFirstRowBtn
+            || !this.incFirstRowBtn
             || !this.createTplBtn
             || !this.updateTplBtn
             || !this.deleteTplBtn
@@ -134,6 +143,15 @@ export class ImportTemplateManager extends Component {
         this.submitUploadedBtn.addEventListener('click', () => this.onSubmit());
 
         this.tplNameInp.addEventListener('input', () => this.onTemplateNameInput());
+        this.firstRowInp.addEventListener('input', () => this.onFirstRowInput());
+        DecimalInput.create({
+            elem: this.firstRowInp,
+            digits: 0,
+            allowNegative: false,
+        });
+        this.decFirstRowBtn.addEventListener('click', () => this.onFirstRowDecrease());
+        this.incFirstRowBtn.addEventListener('click', () => this.onFirstRowIncrease());
+
         this.createTplBtn.addEventListener('click', () => this.onCreateTemplateClick());
         this.updateTplBtn.addEventListener('click', () => this.onUpdateTemplateClick());
         this.deleteTplBtn.addEventListener('click', () => this.onDeleteTemplateClick());
@@ -152,25 +170,6 @@ export class ImportTemplateManager extends Component {
         }
     }
 
-    /**
-     * Return data rows from raw data
-     * @param {Object} state - component state object
-     * @param {boolean} limit - if true then maximum count of rows returned is state.rowsToShow
-     */
-    getDataRows(state, limit) {
-        if (!state || !Array.isArray(state.rawData)) {
-            throw new Error('Invalid state');
-        }
-
-        const start = state.startFromRow - 1;
-        let end;
-        if (limit) {
-            end = Math.min(state.rawData.length, state.rowsToShow);
-        }
-
-        return state.rawData.slice(start, end);
-    }
-
     /** Apply currently selected template to raw data and return array of import data items */
     applyTemplate() {
         if (
@@ -181,14 +180,8 @@ export class ImportTemplateManager extends Component {
             throw new Error('Invalid state');
         }
 
-        const data = this.getDataRows(this.state, false);
-
         try {
-            const res = data.map(
-                (item) => (
-                    this.state.template.applyTo(item, this.state.mainAccount)
-                ),
-            );
+            const res = this.state.template.applyTo(this.state.rawData, this.state.mainAccount);
             return res;
         } catch (e) {
             if (!(e instanceof ImportTemplateError)) {
@@ -206,7 +199,6 @@ export class ImportTemplateManager extends Component {
         const newState = {
             id: LOADING_STATE,
             rawData: null,
-            startFromRow: 2,
             rowsToShow: 3,
             listLoading: false,
             mainAccount: this.state.mainAccount,
@@ -303,6 +295,43 @@ export class ImportTemplateManager extends Component {
         window.app.clearBlockValidation(this.nameField);
     }
 
+    /** Template first row 'input' event handler */
+    onFirstRowInput() {
+        this.state.template.first_row = parseInt(this.firstRowInp.value, 10);
+
+        window.app.clearBlockValidation(this.firstRowField);
+        this.render(this.state);
+    }
+
+    /** Template first row decrease button 'click' event handler */
+    onFirstRowDecrease() {
+        const { template } = this.state;
+        if (Number.isNaN(template.first_row) || template.first_row === 1) {
+            return;
+        }
+
+        this.state.template.first_row -= 1;
+
+        window.app.clearBlockValidation(this.firstRowField);
+
+        this.render(this.state);
+    }
+
+    /** Template first row increase button 'click' event handler */
+    onFirstRowIncrease() {
+        const { template } = this.state;
+
+        if (Number.isNaN(template.first_row)) {
+            this.state.template.first_row = 1;
+        } else {
+            this.state.template.first_row += 1;
+        }
+
+        window.app.clearBlockValidation(this.firstRowField);
+
+        this.render(this.state);
+    }
+
     /** Create template button 'click' event handler */
     onCreateTemplateClick() {
         this.setCreateTemplateState();
@@ -314,6 +343,7 @@ export class ImportTemplateManager extends Component {
         this.state.template = new ImportTemplate({
             name: '',
             type_id: 0,
+            first_row: 2,
             columns: {},
         });
 
@@ -339,24 +369,33 @@ export class ImportTemplateManager extends Component {
 
     /** Save template button 'click' event handler */
     onSubmitTemplateClick() {
+        const { template } = this.state;
+
         const requestObj = {
-            name: this.state.template.name,
-            type_id: this.state.template.type_id,
-            date_col: this.state.template.columns.date,
-            comment_col: this.state.template.columns.comment,
-            trans_curr_col: this.state.template.columns.transactionCurrency,
-            trans_amount_col: this.state.template.columns.transactionAmount,
-            account_curr_col: this.state.template.columns.accountCurrency,
-            account_amount_col: this.state.template.columns.accountAmount,
+            name: template.name,
+            type_id: template.type_id,
+            first_row: template.first_row,
+            date_col: template.columns.date,
+            comment_col: template.columns.comment,
+            trans_curr_col: template.columns.transactionCurrency,
+            trans_amount_col: template.columns.transactionAmount,
+            account_curr_col: template.columns.accountCurrency,
+            account_amount_col: template.columns.accountAmount,
         };
 
-        if (!this.state.template.name.length) {
+        if (!template.name.length) {
             window.app.invalidateBlock(this.nameField);
             return;
         }
 
-        if (this.state.template.id) {
-            requestObj.id = this.state.template.id;
+        const firstRow = parseInt(template.first_row, 10);
+        if (Number.isNaN(firstRow) || firstRow < 1) {
+            window.app.invalidateBlock(this.firstRowField);
+            return;
+        }
+
+        if (template.id) {
+            requestObj.id = template.id;
         }
 
         this.requestSubmitTemplate(requestObj);
@@ -623,6 +662,7 @@ export class ImportTemplateManager extends Component {
             show(this.nameField, false);
             window.app.clearBlockValidation(this.nameField);
             show(this.columnField, false);
+            show(this.firstRowField, false);
             show(this.createTplBtn, templateAvail);
             show(this.updateTplBtn, !!state.template);
             show(this.deleteTplBtn, !!state.template);
@@ -640,6 +680,7 @@ export class ImportTemplateManager extends Component {
             show(this.tplField, false);
             show(this.nameField, true);
             show(this.columnField, true);
+            show(this.firstRowField, true);
             show(this.createTplBtn, false);
             show(this.updateTplBtn, false);
             show(this.deleteTplBtn, false);
@@ -668,12 +709,14 @@ export class ImportTemplateManager extends Component {
             const dataTable = RawDataTable.create({
                 data: state.rawData,
                 rowsToShow: state.rowsToShow,
-                startFromRow: state.startFromRow,
                 template: state.template,
                 onSelectColumn: (index) => this.onDataColumnClick(index),
             });
 
             this.rawDataTable.append(dataTable.elem);
+
+            this.firstRowInp.value = state.template.first_row;
+            enable(this.decFirstRowBtn, state.template.first_row > 1);
         }
 
         let isValid = false;

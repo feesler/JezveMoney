@@ -288,6 +288,24 @@ export class ImportView extends AppView {
         await this.performAction(() => this.content.uploadDialog.selectTemplateColumn(name, index));
     }
 
+    async inputTemplateFirstRow(val) {
+        this.checkUploadState();
+
+        await this.performAction(() => this.content.uploadDialog.inputTemplateFirstRow(val));
+    }
+
+    async decreaseTemplateFirstRow(val) {
+        this.checkUploadState();
+
+        await this.performAction(() => this.content.uploadDialog.decreaseTemplateFirstRow(val));
+    }
+
+    async increaseTemplateFirstRow(val) {
+        this.checkUploadState();
+
+        await this.performAction(() => this.content.uploadDialog.increaseTemplateFirstRow(val));
+    }
+
     /** Create new import template */
     async createTemplate() {
         this.checkUploadState();

@@ -12,6 +12,7 @@ class ImportTemplate extends ApiListController
     protected $requiredFields = [
         "name",
         "type_id",
+        "first_row",
         "date_col",
         "comment_col",
         "trans_curr_col",
