@@ -391,13 +391,15 @@ export class ImportCondition {
 
     /** Check condition match search filter */
     isMatchFilter(value) {
+        const lower = value.toLowerCase();
+
         if (this.isTemplateField()) {
             const template = App.state.templates.getItem(this.value);
             if (!template) {
                 return false;
             }
 
-            return template.name.includes(value);
+            return template.name.toLowerCase().includes(lower);
         }
 
         if (this.isAccountField()) {
@@ -406,9 +408,9 @@ export class ImportCondition {
                 return false;
             }
 
-            return account.name.includes(value);
+            return account.name.toLowerCase().includes(lower);
         }
 
-        return this.value.includes(value);
+        return this.value.toLowerCase().includes(lower);
     }
 }

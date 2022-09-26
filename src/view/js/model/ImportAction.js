@@ -183,13 +183,15 @@ export class ImportAction extends ListItem {
 
     /** Check action match search filter */
     isMatchFilter(value) {
+        const lower = value.toLowerCase();
+
         if (this.isAccountValue()) {
             const account = window.app.model.accounts.getItem(this.value);
             if (!account) {
                 return false;
             }
 
-            return account.name.includes(value);
+            return account.name.toLowerCase().includes(lower);
         }
 
         if (this.isPersonValue()) {
@@ -198,9 +200,9 @@ export class ImportAction extends ListItem {
                 return false;
             }
 
-            return person.name.includes(value);
+            return person.name.toLowerCase().includes(lower);
         }
 
-        return this.value.includes(value);
+        return this.value.toLowerCase().includes(lower);
     }
 }
