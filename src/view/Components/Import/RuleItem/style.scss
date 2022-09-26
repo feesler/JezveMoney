@@ -1,5 +1,7 @@
 /* Import rule item */
 .rule-item {
+  flex: 0 0 auto;
+
   /* Main static view */
   .collapsible-header {
     flex-flow: row nowrap;

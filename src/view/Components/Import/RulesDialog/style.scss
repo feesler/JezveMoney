@@ -8,6 +8,12 @@
     max-width: 600px;
     width: 100%;
   }
+
+  &.popup_scroll-message .popup__message {
+    overflow-y: hidden;
+    display: flex;
+    flex-flow: row nowrap;
+  }
 }
 
 .rules-dialog {
