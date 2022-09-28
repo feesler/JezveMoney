@@ -7,7 +7,7 @@ import {
 } from 'jezvejs';
 import { ImportFileUploader } from '../FileUploader/ImportFileUploader.js';
 import { ImportTemplateManager } from '../TemplateManager/ImportTemplateManager.js';
-import { LoadingIndicator } from '../../LoadingIndicator/LoadingIndicator.js';
+import { LoadingIndicator } from '../../../LoadingIndicator/LoadingIndicator.js';
 import './style.scss';
 
 /** CSS classes */

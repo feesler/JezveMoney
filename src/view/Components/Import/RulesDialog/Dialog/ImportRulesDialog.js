@@ -10,13 +10,13 @@ import {
     Popup,
     InputGroup,
 } from 'jezvejs';
-import { API } from '../../../js/API.js';
-import { ImportRule } from '../../../js/model/ImportRule.js';
+import { API } from '../../../../js/API.js';
+import { ImportRule } from '../../../../js/model/ImportRule.js';
 import { ImportRuleForm } from '../RuleForm/ImportRuleForm.js';
 import { ImportRuleItem } from '../RuleItem/ImportRuleItem.js';
-import { ConfirmDialog } from '../../ConfirmDialog/ConfirmDialog.js';
+import { ConfirmDialog } from '../../../ConfirmDialog/ConfirmDialog.js';
 import './style.scss';
-import { LoadingIndicator } from '../../LoadingIndicator/LoadingIndicator.js';
+import { LoadingIndicator } from '../../../LoadingIndicator/LoadingIndicator.js';
 
 /** CSS classes */
 export const IMPORT_RULES_DIALOG_CLASS = 'rules-dialog';

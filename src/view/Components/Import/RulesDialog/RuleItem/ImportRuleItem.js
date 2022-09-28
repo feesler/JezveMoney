@@ -8,9 +8,9 @@ import {
     Component,
     Collapsible,
 } from 'jezvejs';
-import { ImportRule } from '../../../js/model/ImportRule.js';
-import { ImportConditionList } from '../../../js/model/ImportConditionList.js';
-import { ImportActionList } from '../../../js/model/ImportActionList.js';
+import { ImportRule } from '../../../../js/model/ImportRule.js';
+import { ImportConditionList } from '../../../../js/model/ImportConditionList.js';
+import { ImportActionList } from '../../../../js/model/ImportActionList.js';
 import { ImportConditionItem } from '../ConditionItem/ImportConditionItem.js';
 import { ImportActionItem } from '../ActionItem/ImportActionItem.js';
 import './style.scss';

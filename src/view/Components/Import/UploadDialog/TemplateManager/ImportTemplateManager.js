@@ -9,11 +9,11 @@ import {
     DropDown,
     DecimalInput,
 } from 'jezvejs';
-import { API } from '../../../js/API.js';
-import { ImportTemplateError } from '../../../js/error/ImportTemplateError.js';
-import { ImportTemplate } from '../../../js/model/ImportTemplate.js';
-import { ConfirmDialog } from '../../ConfirmDialog/ConfirmDialog.js';
-import { LoadingIndicator } from '../../LoadingIndicator/LoadingIndicator.js';
+import { API } from '../../../../js/API.js';
+import { ImportTemplateError } from '../../../../js/error/ImportTemplateError.js';
+import { ImportTemplate } from '../../../../js/model/ImportTemplate.js';
+import { ConfirmDialog } from '../../../ConfirmDialog/ConfirmDialog.js';
+import { LoadingIndicator } from '../../../LoadingIndicator/LoadingIndicator.js';
 import { RawDataTable } from '../RawDataTable/RawDataTable.js';
 import './style.scss';
 

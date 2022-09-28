@@ -6,9 +6,9 @@ import {
     Component,
     Collapsible,
 } from 'jezvejs';
-import { ImportRule } from '../../../js/model/ImportRule.js';
-import { ImportAction } from '../../../js/model/ImportAction.js';
-import { ImportCondition } from '../../../js/model/ImportCondition.js';
+import { ImportRule } from '../../../../js/model/ImportRule.js';
+import { ImportAction } from '../../../../js/model/ImportAction.js';
+import { ImportCondition } from '../../../../js/model/ImportCondition.js';
 import { ImportConditionForm } from '../ConditionForm/ImportConditionForm.js';
 import { ImportActionForm } from '../ActionForm/ImportActionForm.js';
 import './style.scss';

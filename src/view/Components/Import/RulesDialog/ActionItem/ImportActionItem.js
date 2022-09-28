@@ -4,7 +4,7 @@ import {
     IMPORT_ACTION_SET_TR_TYPE,
     IMPORT_ACTION_SET_ACCOUNT,
     IMPORT_ACTION_SET_PERSON,
-} from '../../../js/model/ImportAction.js';
+} from '../../../../js/model/ImportAction.js';
 import './style.scss';
 
 /**

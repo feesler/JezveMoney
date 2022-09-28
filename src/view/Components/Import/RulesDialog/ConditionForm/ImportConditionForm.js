@@ -10,7 +10,7 @@ import {
 import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,
-} from '../../../js/model/ImportCondition.js';
+} from '../../../../js/model/ImportCondition.js';
 import './style.scss';
 
 /** CSS classes */
