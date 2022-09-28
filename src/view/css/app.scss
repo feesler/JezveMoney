@@ -444,7 +444,7 @@ label {
 
 /* Checkboxes list sub-option */
 .suboption {
-    margin-left: 29px;
+  margin-left: 29px;
 }
 
 /* Popup */
@@ -524,6 +524,41 @@ label {
     border-color: #f02020;
     background-color: #f02020;
   }
+}
+
+/* Paginator */
+.paginator {
+  gap: 2px;
+}
+
+.paginator-item {
+  padding: 0.25rem 0.5rem;
+  margin: 0;
+  text-decoration: none;
+  border: 0 none;
+  border-radius: 3px;
+  color: #447fd6;
+}
+
+.paginator-arrow {
+  width: fit-content;
+  fill: #447fd6;
+}
+
+.paginator-arrow[disabled] {
+  fill: #5e5e5e;
+}
+
+.paginator-item__active {
+  font-weight: normal;
+  background-color: #006cbd;
+  color: #ffffff;
+}
+
+a.paginator-item:focus,
+a.paginator-arrow:focus {
+  z-index: 2;
+  box-shadow: 0 0 0 0.25rem var(--focus-shadow);
 }
 
 /* Filters */
@@ -622,5 +657,9 @@ label {
 
   .msg .close-btn:hover .close-btn__icon {
     fill: #ffffff;
+  }
+
+  a.paginator-item:hover {
+    background-color: #51b4ff59;
   }
 }

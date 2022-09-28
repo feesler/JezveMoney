@@ -22,6 +22,7 @@ import {
 } from '../../model/ImportAction.js';
 import * as ImportTests from '../../run/import/index.js';
 import { api } from '../../model/api.js';
+import * as ImportRuleApiTests from '../../run/api/importrule.js';
 import { App } from '../../Application.js';
 
 // Import rule action form test for no persons
@@ -426,6 +427,49 @@ const runSearchTests = async () => {
     await ImportTests.clearRulesSearch();
 };
 
+// Import rules paginator tests
+const runPaginatorTests = async () => {
+    setBlock('Import rules pagination', 1);
+
+    const data = [];
+    const RULES_TO_CREATE = 25;
+    const ruleBase = {
+        flags: 0,
+        conditions: [{
+            field_id: IMPORT_COND_FIELD_COMMENT,
+            operator: IMPORT_COND_OP_EQUAL,
+            value: '',
+            flags: 0,
+        }],
+        actions: [{
+            action_id: IMPORT_ACTION_SET_COMMENT,
+            value: '',
+        }],
+    };
+
+    for (let i = 1; i <= RULES_TO_CREATE; i += 1) {
+        const rule = {
+            ...ruleBase,
+            conditions: [...ruleBase.conditions],
+            actions: [...ruleBase.actions],
+        };
+        rule.conditions[0].value = `Cond ${i}`;
+        rule.actions[0].value = `Act ${i}`;
+        data.push(rule);
+    }
+
+    // Create rules via API
+    const ruleIds = await App.scenario.runner.runGroup(ImportRuleApiTests.create, data);
+    // Refresh page
+    await App.view.navigateToImport();
+    // Iterate rules list pages
+    await ImportTests.iterateRulesList();
+    // Remove previously created rules via API
+    await ImportRuleApiTests.del(ruleIds);
+    // Refresh page
+    await App.view.navigateToImport();
+};
+
 // Create import rule with template condition
 const runCreateTemplateRule = async (templateId) => {
     setBlock('Create import rule with template condition', 2);
@@ -458,8 +502,7 @@ export const importRuleTests = {
         await runUpdateTests();
         await runDeleteTests();
         await runSearchTests();
-
-        await ImportTests.closeRulesDialog();
+        await runPaginatorTests();
     },
 
     async createTemplateRule(templateId) {

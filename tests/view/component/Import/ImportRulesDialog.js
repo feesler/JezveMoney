@@ -12,12 +12,15 @@ import {
     wait,
     waitForFunction,
 } from 'jezve-test';
+import { Paginator } from 'jezvejs/tests';
 import { IMPORT_COND_OP_FIELD_FLAG } from '../../../model/ImportCondition.js';
 import { ImportRuleForm } from './ImportRuleForm.js';
 import { ImportRuleItem } from './ImportRuleItem.js';
 import { asyncMap } from '../../../common.js';
 import { WarningPopup } from '../WarningPopup.js';
 import { App } from '../../../Application.js';
+
+const ITEMS_ON_PAGE = 20;
 
 export class ImportRulesDialog extends TestComponent {
     async parseContent() {
@@ -61,6 +64,8 @@ export class ImportRulesDialog extends TestComponent {
             (item) => ImportRuleItem.create(this.parent, item),
         );
 
+        res.paginator = await Paginator.create(res.rulesList.elem, await query('.paginator'));
+
         res.loadingIndicator.visible = await isVisible(res.loadingIndicator.elem, true);
         res.rulesList.visible = await isVisible(res.rulesList.elem, true);
 
@@ -83,6 +88,11 @@ export class ImportRulesDialog extends TestComponent {
         res.renderTime = cont.rulesList.renderTime;
         res.filter = cont.searchInp.value;
         res.rules = cont.items.map((item) => copyObject(item.model));
+
+        res.pagination = {
+            page: (cont.paginator) ? cont.paginator.active : 1,
+            pages: (cont.paginator) ? cont.paginator.pages : 1,
+        };
 
         const isListState = cont.rulesList.visible && cont.header.title === 'Import rules';
         if (isListState) {
@@ -115,7 +125,20 @@ export class ImportRulesDialog extends TestComponent {
                 ? App.state.rules.filter((rule) => rule.isMatchFilter(model.filter))
                 : App.state.rules.data;
 
-            res.items = filteredRules.map((rule) => ImportRuleItem.render(rule));
+            const pagesCount = Math.ceil(filteredRules.length / ITEMS_ON_PAGE);
+            const firstItem = ITEMS_ON_PAGE * (model.pagination.page - 1);
+            const lastItem = firstItem + ITEMS_ON_PAGE;
+            const pageItems = filteredRules.slice(firstItem, lastItem);
+
+            res.items = pageItems.map((rule) => ImportRuleItem.render(rule));
+
+            if (pagesCount > 1) {
+                res.paginator = {
+                    visible: true,
+                    active: model.pagination.page,
+                    pages: pagesCount,
+                };
+            }
         } else if (isForm) {
             res.header.title = (model.state === 'create')
                 ? 'Create import rule'
@@ -153,8 +176,44 @@ export class ImportRulesDialog extends TestComponent {
         return this.content.ruleForm.isValid();
     }
 
+    isFirstPage() {
+        assert(this.isListState(), 'Invalid state');
+
+        return !this.content.paginator || this.content.paginator.isFirstPage();
+    }
+
+    isLastPage() {
+        assert(this.isListState(), 'Invalid state');
+
+        return !this.content.paginator || this.content.paginator.isLastPage();
+    }
+
     async close() {
         await click(this.content.closeBtn);
+    }
+
+    async goToNextPage() {
+        assert(this.isListState(), 'Invalid state');
+        assert(!this.isLastPage(), 'Can\'t go to next page');
+
+        this.model.pagination.page += 1;
+        this.expectedState = this.getExpectedState(this.model);
+
+        await this.performAction(() => this.content.paginator.goToNextPage());
+
+        return this.checkState();
+    }
+
+    async iteratePages() {
+        assert(this.isListState(), 'Invalid state');
+
+        if (!this.isFirstPage()) {
+            await this.goToFirstPage();
+        }
+
+        while (!this.isLastPage()) {
+            await this.goToNextPage();
+        }
     }
 
     async inputSearch(value) {

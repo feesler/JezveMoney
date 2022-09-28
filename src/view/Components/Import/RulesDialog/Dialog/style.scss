@@ -71,6 +71,10 @@
   flex-flow: column nowrap;
   overflow-y: auto;
   row-gap: 4px;
+
+  .paginator {
+    margin-right: auto;
+  }
 }
 
 /* Desktop */
@@ -78,6 +82,7 @@
   .rules-popup {
     .popup__wrapper {
       padding-top: 60px;
+      padding-bottom: 20px;
     }
   }
 }

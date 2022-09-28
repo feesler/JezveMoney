@@ -480,6 +480,13 @@ export class ImportView extends AppView {
         return true;
     }
 
+    async iterateRulesList() {
+        this.checkRulesListState();
+
+        await this.performAction(() => this.content.rulesDialog.iteratePages());
+        return true;
+    }
+
     async createRule() {
         this.checkRulesListState();
 

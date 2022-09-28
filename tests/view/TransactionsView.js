@@ -117,8 +117,8 @@ export class TransactionsView extends AppView {
 
         if (cont.paginator && cont.transList) {
             res.list = {
-                page: cont.paginator.content.active,
-                pages: cont.paginator.getPages(),
+                page: cont.paginator.active,
+                pages: cont.paginator.pages,
                 items: cont.transList.getItems(),
             };
             res.renderTime = cont.transList.content.renderTime;
@@ -564,18 +564,11 @@ export class TransactionsView extends AppView {
     }
 
     currentPage() {
-        return (this.content.paginator) ? this.content.paginator.content.active : 1;
+        return (this.content.paginator) ? this.content.paginator.active : 1;
     }
 
     pagesCount() {
-        if (
-            this.content.paginator
-            && this.content.paginator.content.items
-            && this.content.paginator.content.items.length
-        ) {
-            return this.content.paginator.content.items.length;
-        }
-        return 1;
+        return (this.content.paginator) ? this.content.paginator.pages : 1;
     }
 
     isFirstPage() {

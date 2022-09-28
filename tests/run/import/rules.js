@@ -48,6 +48,15 @@ export const closeRulesDialog = async () => {
 };
 
 /** Click by create import rule button */
+export const iterateRulesList = async () => {
+    await test('Iterate rules list', async () => {
+        await checkRulesDialog();
+
+        return App.view.iterateRulesList();
+    });
+};
+
+/** Click by create import rule button */
 export const createRule = async () => {
     await test('Create rule', async () => {
         await checkRulesDialog();
