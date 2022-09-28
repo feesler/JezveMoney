@@ -37,7 +37,6 @@ export class ImportTransactionBase extends Component {
         if (originalData) {
             const origDataContainer = OriginalImportData.create({
                 ...originalData,
-                mainAccount: this.state.mainAccount,
             });
 
             this.toggleExtBtn = this.createToggleButton();

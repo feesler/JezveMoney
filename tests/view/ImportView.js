@@ -828,14 +828,37 @@ export class ImportView extends AppView {
 
         assert(this.content.itemsList, 'No items available');
 
-        await this.performAction(async () => {
-            for (const ind of items) {
-                const item = this.content.itemsList.getItem(ind);
-                assert(item.model.enabled !== enable, `Item ${ind} already ${enable ? 'enabled' : 'disabled'}`);
+        const expectedList = this.content.itemsList.getExpectedState();
 
-                await item.toggleEnable();
+        for (const ind of items) {
+            const item = this.content.itemsList.getItem(ind);
+            assert(item.model.enabled !== enable, `Item ${ind} already ${enable ? 'enabled' : 'disabled'}`);
+            item.model = item.onToggleEnable();
+            item.data = item.getExpectedTransaction();
+            if (item.data) {
+                item.data.enabled = item.model.enabled;
+                item.data.mainAccount = item.model.mainAccount;
             }
-        });
+
+            const itemExpected = item.getExpectedState();
+            expectedList.items[ind] = itemExpected;
+        }
+
+        const enabledItems = expectedList.items.filter((item) => item.enabled);
+        this.model.enabledCount = enabledItems.length;
+        this.model.items = this.content.itemsList.getItems();
+
+        this.expectedState = this.getExpectedState();
+        this.expectedState.itemsList = expectedList;
+
+        for (const ind of items) {
+            await this.performAction(async () => {
+                const item = this.content.itemsList.getItem(ind);
+                await item.toggleEnable();
+            });
+        }
+
+        return this.checkState();
     }
 
     async runItemAction(index, { action, data }) {

@@ -23,7 +23,7 @@ const COL_ACC_CURRENCY = 'Acc. currency';
 /**
  * Original import transaction data
  * @param {Object} props
- * @param {Object} props.mainAccount
+ * @param {Object} props.origAccount
  * @param {Number} props.transactionAmount
  * @param {Number} props.transactionCurrency
  * @param {Number} props.accountAmount
@@ -39,8 +39,8 @@ export class OriginalImportData extends Component {
     constructor(...args) {
         super(...args);
 
-        if (!this.props.mainAccount) {
-            throw new Error('mainAccount expected');
+        if (!this.props.origAccount) {
+            throw new Error('origAccount expected');
         }
         if (!this.props.template) {
             throw new Error('template expected');
@@ -67,7 +67,7 @@ export class OriginalImportData extends Component {
         const templateName = (template) ? template.name : '';
 
         const dataTable = [
-            [COL_MAIN, this.props.mainAccount.name],
+            [COL_MAIN, this.props.origAccount.name],
             [COL_TEMPLATE, templateName],
             [COL_DATE, window.app.formatDate(new Date(this.props.date))],
             [COL_TR_AMOUNT, this.props.transactionAmount],

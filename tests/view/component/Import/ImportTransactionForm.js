@@ -441,14 +441,18 @@ export class ImportTransactionForm extends TestComponent {
         return res;
     }
 
+    onToggleEnable(model = this.model) {
+        const res = copyObject(model);
+
+        res.enabled = !res.enabled;
+        res.srcCurrency = App.currency.getItem(res.srcCurrId);
+        res.destCurrency = App.currency.getItem(res.destCurrId);
+
+        return res;
+    }
+
     async toggleEnable() {
-        this.model.enabled = !this.model.enabled;
-        this.expectedState = this.getExpectedState(this.model);
-
         await this.content.enableCheck.toggle();
-        await this.parse();
-
-        return this.checkState();
     }
 
     checkEnabled(field) {

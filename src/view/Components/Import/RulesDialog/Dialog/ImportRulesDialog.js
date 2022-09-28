@@ -97,11 +97,11 @@ export class ImportRulesDialog extends Component {
         this.elem.append(this.loadingIndicator.elem);
 
         this.reset();
-        this.render(this.state);
     }
 
     /** Show/hide dialog */
     show(val) {
+        this.updateList();
         this.render(this.state);
         this.popup.show(val);
     }
@@ -126,8 +126,6 @@ export class ImportRulesDialog extends Component {
             },
             renderTime: Date.now(),
         };
-
-        this.updateList();
     }
 
     /** Updates rules list state */
@@ -242,6 +240,7 @@ export class ImportRulesDialog extends Component {
     /** Rule create/update 'cancel' event handler */
     onCancelItem() {
         this.reset();
+        this.updateList();
         this.render(this.state);
     }
 
