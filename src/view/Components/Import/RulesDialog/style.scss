@@ -23,19 +23,18 @@
   align-items: stretch;
   flex: 1 1 auto;
   min-height: 100px;
+  overflow: hidden;
 
   /* Create button */
-  .link-btn,
-  .link-btn:visited,
-  .link-btn:active {
+  .link-btn {
     pointer-events: all;
     padding: 0;
     cursor: pointer;
   }
-}
 
-.rules-dialog .loading-indicator {
-  border-radius: 10px;
+  .loading-indicator {
+    border-radius: 10px;
+  }
 }
 
 /* Import rules dialog heading */
