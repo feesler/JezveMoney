@@ -29,6 +29,10 @@
 
 /* Actions menu */
 .actions-menu {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
   position: relative;
   margin-left: 18px;
 }
