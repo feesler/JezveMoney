@@ -271,6 +271,14 @@ export const importTests = {
         await ImportTests.submitUploaded({
             data: cardStatement,
         });
+        setBlock('Check pagination', 2);
+        await ImportTests.uploadFile({
+            filename: cardUploadFilename,
+            data: cardStatement,
+        });
+        await ImportTests.submitUploaded({
+            data: cardStatement,
+        });
         // Delete all
         setBlock('Delete all items', 2);
         await ImportTests.deleteAllItems();

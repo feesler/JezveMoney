@@ -4,9 +4,10 @@ import {
     isFunction,
     Checkbox,
 } from 'jezvejs';
-import { ImportTransactionBase, sourceTypes } from '../TransactionBase/ImportTransactionBase.js';
+import { ImportTransactionBase } from '../TransactionBase/ImportTransactionBase.js';
 import { Field } from '../../Field/Field.js';
 import './style.scss';
+import { ImportTransaction } from '../../../js/model/ImportTransaction.js';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'import-item';
@@ -56,18 +57,6 @@ const typeStrings = {
 };
 
 const defaultProps = {
-    enabled: true,
-    type: 'expense',
-    sourceAccountId: 0,
-    destAccountId: 0,
-    srcCurrId: 0,
-    destCurrId: 0,
-    isDiff: false,
-    sourceAmount: 0,
-    destAmount: 0,
-    personId: 0,
-    date: null,
-    comment: '',
     onUpdate: null,
     onEnable: null,
     onRemove: null,
@@ -84,7 +73,7 @@ export class ImportTransactionItem extends ImportTransactionBase {
     constructor(...args) {
         super(...args);
 
-        if (!this.props?.mainAccount) {
+        if (!this.props?.data?.mainAccount) {
             throw new Error('Invalid props');
         }
 
@@ -92,36 +81,12 @@ export class ImportTransactionItem extends ImportTransactionBase {
             ...defaultProps,
             ...this.props,
         };
-        if (this.props.date == null) {
-            this.props.date = window.app.formatDate(new Date());
-        }
 
-        const { mainAccount } = this.props;
-        const state = {
-            mainAccount,
-            ...this.props,
+        this.state = {
+            transaction: new ImportTransaction(this.props.data),
         };
 
-        if (sourceTypes.includes(state.type)) {
-            state.sourceAccountId = mainAccount.id;
-            state.srcCurrId = mainAccount.curr_id;
-        } else {
-            state.destAccountId = mainAccount.id;
-            state.destCurrId = mainAccount.curr_id;
-        }
-
-        this.state = this.checkStateCurrencies(state);
-
-        this.data = null;
-        if (this.props.originalData) {
-            this.saveOriginal(this.props.originalData);
-        }
-
         this.init();
-    }
-
-    get enabled() {
-        return this.state.enabled;
     }
 
     init() {
@@ -243,26 +208,29 @@ export class ImportTransactionItem extends ImportTransactionBase {
         if (!state) {
             throw new Error('Invalid state');
         }
+        const transaction = state.transaction.state;
 
         const { userAccounts, persons, currency } = window.app.model;
-        const isTransfer = ['transferfrom', 'transferto'].includes(state.type);
-        const isDebt = ['debtfrom', 'debtto'].includes(state.type);
+        const isTransfer = ['transferfrom', 'transferto'].includes(transaction.type);
+        const isDebt = ['debtfrom', 'debtto'].includes(transaction.type);
 
-        enable(this.elem, state.enabled);
+        enable(this.elem, transaction.enabled);
 
-        this.enableCheck.check(state.enabled);
+        this.enableCheck.check(transaction.enabled);
 
         // Types field
-        if (!(state.type in typeStrings)) {
+        if (!(transaction.type in typeStrings)) {
             throw new Error('Invalid transaction type');
         }
-        this.trTypeTitle.textContent = typeStrings[state.type];
+        this.trTypeTitle.textContent = typeStrings[transaction.type];
 
         // Account field
         this.accountField.show(isTransfer);
         if (isTransfer) {
-            const isTransferFrom = state.type === 'transferfrom';
-            const accountId = (isTransferFrom) ? state.destAccountId : state.sourceAccountId;
+            const isTransferFrom = transaction.type === 'transferfrom';
+            const accountId = (isTransferFrom)
+                ? transaction.destAccountId
+                : transaction.sourceAccountId;
             const account = userAccounts.getItem(accountId);
             this.accountTitle.textContent = account.name;
 
@@ -274,32 +242,32 @@ export class ImportTransactionItem extends ImportTransactionBase {
         // Person field
         this.personField.show(isDebt);
         if (isDebt) {
-            const person = persons.getItem(state.personId);
+            const person = persons.getItem(transaction.personId);
             this.personTitle.textContent = person.name;
         }
 
         // Amount fields
-        const srcAmountLabel = (state.isDiff) ? TITLE_FIELD_SRC_AMOUNT : TITLE_FIELD_AMOUNT;
+        const srcAmountLabel = (transaction.isDiff) ? TITLE_FIELD_SRC_AMOUNT : TITLE_FIELD_AMOUNT;
         this.srcAmountField.setTitle(srcAmountLabel);
-        const srcAmount = currency.formatCurrency(state.sourceAmount, state.srcCurrId);
+        const srcAmount = currency.formatCurrency(transaction.sourceAmount, transaction.srcCurrId);
         this.srcAmountTitle.textContent = srcAmount;
 
-        this.srcAmountField.elem.dataset.amount = state.sourceAmount;
-        this.srcAmountField.elem.dataset.curr = state.srcCurrId;
+        this.srcAmountField.elem.dataset.amount = transaction.sourceAmount;
+        this.srcAmountField.elem.dataset.curr = transaction.srcCurrId;
 
-        this.destAmountField.show(state.isDiff);
-        const destAmount = (state.isDiff)
-            ? currency.formatCurrency(state.destAmount, state.destCurrId)
+        this.destAmountField.show(transaction.isDiff);
+        const destAmount = (transaction.isDiff)
+            ? currency.formatCurrency(transaction.destAmount, transaction.destCurrId)
             : '';
         this.destAmountTitle.textContent = destAmount;
 
-        this.destAmountField.elem.dataset.amount = state.destAmount;
-        this.destAmountField.elem.dataset.curr = state.destCurrId;
+        this.destAmountField.elem.dataset.amount = transaction.destAmount;
+        this.destAmountField.elem.dataset.curr = transaction.destCurrId;
 
         // Date field
-        this.dateTitle.textContent = state.date;
+        this.dateTitle.textContent = transaction.date;
 
         // Comment field
-        this.commentTitle.textContent = state.comment;
+        this.commentTitle.textContent = transaction.comment;
     }
 }

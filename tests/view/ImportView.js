@@ -17,6 +17,13 @@ import { ImportRulesDialog } from './component/Import/ImportRulesDialog.js';
 import { findSimilarTransaction } from '../model/import.js';
 import { App } from '../Application.js';
 import { ImportTransactionItem } from './component/Import/ImportTransactionItem.js';
+import { ImportTransaction } from '../model/ImportTransaction.js';
+
+const ITEMS_ON_PAGE = 20;
+const defaultPagination = {
+    page: 1,
+    pages: 1,
+};
 
 /** Import view class */
 export class ImportView extends AppView {
@@ -26,6 +33,7 @@ export class ImportView extends AppView {
         this.uploadPopupId = '#fileupload_popup';
         this.rulesPopupId = '#rules_popup';
         this.originalItemData = null;
+        this.items = [];
     }
 
     async parseContent() {
@@ -120,6 +128,10 @@ export class ImportView extends AppView {
         res.rulesEnabled = cont.rulesCheck.checked;
         res.renderTime = cont.renderTime;
         res.items = (cont.itemsList) ? cont.itemsList.getItems() : [];
+        res.pagination = (cont.itemsList)
+            ? cont.itemsList.getPagination()
+            : { ...defaultPagination };
+
         res.invalidated = (cont.itemsList) ? cont.itemsList.model.invalidated : false;
         res.submitInProgress = cont.submitProgress.visible;
 
@@ -144,10 +156,17 @@ export class ImportView extends AppView {
         if (model.enabled) {
             res.mainAccountSelect = { value: model.mainAccount.toString(), visible: true };
             res.itemsList = { visible: true };
-            res.submitBtn.disabled = !model.items.some((item) => item.enabled);
+            res.submitBtn.disabled = !this.items.some((item) => item.enabled);
         }
 
         return res;
+    }
+
+    getExpectedList(model = this.model) {
+        const firstItem = ITEMS_ON_PAGE * (model.pagination.page - 1);
+        const lastItem = firstItem + ITEMS_ON_PAGE;
+        const pageItems = this.items.slice(firstItem, lastItem);
+        return ImportList.render(pageItems, App.state);
     }
 
     isRulesEnabled() {
@@ -250,13 +269,10 @@ export class ImportView extends AppView {
         this.model.mainAccount = parseInt(val, 10);
         this.expectedState = this.getExpectedState();
 
-        this.expectedState.itemsList = {};
-        this.expectedState.itemsList.items = this.content.itemsList.content.items.map(
-            (item) => {
-                const model = item.onChangeMainAccount(item.model, val);
-                return copyObject(item.getExpectedState(model));
-            },
-        );
+        this.items.forEach((item) => item.setMainAccount(val));
+
+        const expectedList = this.getExpectedList();
+        this.expectedState.itemsList = expectedList;
 
         await this.performAction(() => this.content.uploadDialog.selectAccount(val));
 
@@ -381,21 +397,20 @@ export class ImportView extends AppView {
             }
         }
 
-        // Prepare expected state of previously created import items
-        const expectedList = this.content.itemsList.getExpectedState();
         // Append uploaded items if valid
         if (isValid) {
-            const uploadedItems = ImportList.render(expectedUpload, App.state);
-            expectedList.items = expectedList.items.concat(uploadedItems.items);
-            this.model.items = this.model.items.concat(expectedUpload);
+            this.items = this.items.concat(expectedUpload);
         }
 
-        this.model.totalCount = expectedList.items.length;
-        const enabledItems = expectedList.items.filter((item) => item.enabled);
+        const expectedList = this.getExpectedList();
+        const pagesCount = Math.ceil(this.items.length / ITEMS_ON_PAGE);
+        this.model.pagination.pages = pagesCount;
+
+        this.model.totalCount = this.items.length;
+        const enabledItems = this.items.filter((item) => item.enabled);
         this.model.enabledCount = enabledItems.length;
 
         this.expectedState = this.getExpectedState();
-
         this.expectedState.itemsList = expectedList;
         this.expectedState.uploadDialog = { visible: !isValid };
 
@@ -427,6 +442,8 @@ export class ImportView extends AppView {
 
     async selectMainAccount(val) {
         this.checkMainState();
+
+        this.items.forEach((item) => item.setMainAccount(val));
 
         await this.waitForList(
             () => this.content.mainAccountSelect.selectItem(val),
@@ -675,33 +692,39 @@ export class ImportView extends AppView {
             currentForm.model.isForm = false;
         }
 
-        const expectedList = this.content.itemsList.getExpectedState();
-        const expectedItem = {
-            isForm: true,
-            enabled: true,
-            typeField: { value: 'expense', disabled: false },
-            srcAmountField: { value: '', disabled: true },
-            destAmountField: {
-                value: '',
-                disabled: false,
-                dropDown: {
-                    value: mainAccount.curr_id.toString(),
-                    disabled: false,
-                },
-            },
-            transferAccountField: { disabled: true },
-            dateField: { value: App.dates.now, disabled: false },
-            commentField: { value: '', disabled: false },
-            personField: { disabled: true },
-        };
-        expectedList.items.push(expectedItem);
-
         this.model.totalCount += 1;
         this.model.enabledCount += 1;
         this.model.menuOpen = false;
 
+        const newItem = new ImportTransaction({
+            enabled: true,
+            mainAccount,
+            type: 'expense',
+            src_id: mainAccount.id,
+            dest_id: 0,
+            src_curr: mainAccount.curr_id,
+            dest_curr: mainAccount.curr_id,
+            src_amount: '',
+            dest_amount: '',
+            date: App.dates.now,
+            comment: '',
+        });
+        const index = this.items.length;
+        this.items.push(newItem);
+
+        const pagesCount = Math.ceil(this.items.length / ITEMS_ON_PAGE);
+        const firstItem = ITEMS_ON_PAGE * (this.model.pagination.page - 1);
+        const lastItem = firstItem + ITEMS_ON_PAGE;
+        const pageItems = this.items.slice(firstItem, lastItem);
+
+        this.model.pagination.pages = pagesCount;
+        this.model.pagination.page = pagesCount;
+
+        const relIndex = index - firstItem;
+        const expectedItems = ImportList.render(pageItems, App.state, relIndex);
+
         this.expectedState = this.getExpectedState();
-        this.expectedState.itemsList.items = expectedList.items;
+        this.expectedState.itemsList.items = expectedItems.items;
         this.expectedState.submitBtn.disabled = false;
         this.originalItemData = null;
 
@@ -814,6 +837,7 @@ export class ImportView extends AppView {
         await this.openActionsMenu();
 
         this.originalItemData = null;
+        this.items = [];
 
         await this.performAction(() => this.content.clearBtn.click());
     }
@@ -823,35 +847,25 @@ export class ImportView extends AppView {
 
         assert(typeof index !== 'undefined', 'No items specified');
 
-        const items = Array.isArray(index) ? index : [index];
+        const indexes = Array.isArray(index) ? index : [index];
         const enable = !!value;
 
         assert(this.content.itemsList, 'No items available');
 
-        const expectedList = this.content.itemsList.getExpectedState();
+        indexes.forEach((ind) => {
+            const item = this.items[ind];
+            assert(item.enabled !== enable, `Item ${ind} already ${enable ? 'enabled' : 'disabled'}`);
+            item.enabled = enable;
+        });
 
-        for (const ind of items) {
-            const item = this.content.itemsList.getItem(ind);
-            assert(item.model.enabled !== enable, `Item ${ind} already ${enable ? 'enabled' : 'disabled'}`);
-            item.model = item.onToggleEnable();
-            item.data = item.getExpectedTransaction();
-            if (item.data) {
-                item.data.enabled = item.model.enabled;
-                item.data.mainAccount = item.model.mainAccount;
-            }
-
-            const itemExpected = item.getExpectedState();
-            expectedList.items[ind] = itemExpected;
-        }
-
-        const enabledItems = expectedList.items.filter((item) => item.enabled);
+        const enabledItems = this.items.filter((item) => item.enabled);
         this.model.enabledCount = enabledItems.length;
-        this.model.items = this.content.itemsList.getItems();
 
         this.expectedState = this.getExpectedState();
+        const expectedList = this.getExpectedList();
         this.expectedState.itemsList = expectedList;
 
-        for (const ind of items) {
+        for (const ind of indexes) {
             await this.performAction(async () => {
                 const item = this.content.itemsList.getItem(ind);
                 await item.toggleEnable();
@@ -867,6 +881,14 @@ export class ImportView extends AppView {
         const item = this.content.itemsList.getItem(index);
 
         await this.performAction(() => item.runAction(action, data));
+
+        const updatedItem = this.content.itemsList.getItem(index);
+        const itemData = this.content.itemsList.getItemData(updatedItem);
+        itemData.type = itemData.importType;
+        delete itemData.importType;
+
+        const transaction = new ImportTransaction(itemData);
+        this.items[index] = transaction;
 
         return true;
     }
@@ -887,6 +909,8 @@ export class ImportView extends AppView {
         let removed = 0;
         for (const ind of items) {
             await this.runItemAction(ind - removed, { action: 'clickDelete' });
+            this.items.splice(ind - removed, 1);
+
             removed += 1;
         }
     }
@@ -937,6 +961,8 @@ export class ImportView extends AppView {
             },
             itemsList: { items: [] },
         };
+
+        this.items = [];
 
         await this.checkState();
         await this.closeNotification();

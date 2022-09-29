@@ -163,6 +163,7 @@ export class ImportTransactionForm extends TestComponent {
         if (this.data) {
             this.data.enabled = this.model.enabled;
             this.data.mainAccount = this.model.mainAccount;
+            this.data.importType = this.model.type;
         }
     }
 

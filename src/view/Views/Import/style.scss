@@ -195,4 +195,8 @@
   flex-flow: column nowrap;
   align-items: stretch;
   position: relative;
+
+  .paginator {
+    margin-right: auto;
+  }
 }
