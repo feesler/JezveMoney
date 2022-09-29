@@ -59,8 +59,8 @@ const TITLE_FIELD_SRC_ACCOUNT = 'Source account';
 const TITLE_FIELD_DEST_ACCOUNT = 'Destination account';
 const TITLE_FIELD_PERSON = 'Person';
 /* Validation messages */
-const MSG_INCORRECT_AMOUNT = 'Please input correct amount';
-const MSG_INVALID_DATE = 'Please input correct date';
+const MSG_INCORRECT_AMOUNT = 'Input correct amount';
+const MSG_INVALID_DATE = 'Input correct date';
 /* Controls */
 const SAVE_BTN_TITLE = 'Save';
 const CANCEL_BTN_TITLE = 'Cancel';

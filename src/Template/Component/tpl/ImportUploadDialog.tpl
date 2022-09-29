@@ -55,7 +55,7 @@
                 <div id="nameField" class="tpl-form-field validation-block" hidden>
                     <label for="tplNameInp">Name</label>
                     <input id="tplNameInp" class="stretch-input tpl-name-inp" type="text" autocomplete="off">
-                    <div class="invalid-feedback">Please input template name</div>
+                    <div class="invalid-feedback">Input template name</div>
                 </div>
                 <div id="columnField" class="tpl-form-field validation-block" hidden>
                     <label for="columnSel">Column</label>
@@ -73,7 +73,7 @@
                         <input id="firstRowInp" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off">
                         <button id="incFirstRowBtn" class="input-group__btn" type="button">+</button>
                     </div>
-                    <div class="invalid-feedback">Please input correct value</div>
+                    <div class="invalid-feedback">Input row number</div>
                 </div>
             </div>
         </div>

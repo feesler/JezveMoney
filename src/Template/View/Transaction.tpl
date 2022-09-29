@@ -172,7 +172,7 @@ include(TPL_PATH . "Header.tpl");	?>
                                     <div id="srcamountsign" class="input-group__btn-title"><?=e($form["srcCurrSign"])?></div>
                                 </button>
                             </div>
-                            <div class="invalid-feedback">Please input correct amount.</div>
+                            <div class="invalid-feedback">Input correct amount.</div>
                             <input id="src_curr" name="src_curr" type="hidden" value="<?=e($tr["src_curr"])?>">
                         </div>
 
@@ -184,7 +184,7 @@ include(TPL_PATH . "Header.tpl");	?>
                                     <div id="destamountsign" class="input-group__btn-title"><?=e($form["destCurrSign"])?></div>
                                 </button>
                             </div>
-                            <div class="invalid-feedback">Please input correct amount.</div>
+                            <div class="invalid-feedback">Input correct amount.</div>
                             <input id="dest_curr" name="dest_curr" type="hidden" value="<?=e($tr["dest_curr"])?>">
                         </div>
 
@@ -236,7 +236,7 @@ include(TPL_PATH . "Header.tpl");	?>
                                     </div>
                                     <div id="calendar" class="calendar"></div>
                                 </div>
-                                <div class="invalid-feedback">Please input correct date.</div>
+                                <div class="invalid-feedback">Input correct date.</div>
                             </div>
                         </div>
 

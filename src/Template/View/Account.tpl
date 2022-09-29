@@ -67,7 +67,7 @@ include(TPL_PATH . "Header.tpl");	?>
                                     <div id="currsign"><?=e($accInfo->sign)?></div>
                                 </div>
                             </div>
-                            <div class="invalid-feedback">Please input correct initial balance.</div>
+                            <div class="invalid-feedback">Input correct initial balance.</div>
                         </div>
                         <div class="form-controls">
                             <input class="btn submit-btn" type="submit" value="Submit">

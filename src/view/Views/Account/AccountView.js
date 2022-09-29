@@ -16,7 +16,7 @@ import '../../css/app.scss';
 const TITLE_ACCOUNT_DELETE = 'Delete account';
 const MSG_ACCOUNT_DELETE = 'Are you sure want to delete selected account?<br>All income and expense transactions history will be lost. Transfer to this account will be changed to expense. Transfer from this account will be changed to income.';
 const TITLE_NEW_ACCOUNT = 'New account';
-const MSG_EMPTY_NAME = 'Please input name of account.';
+const MSG_EMPTY_NAME = 'Input name.';
 const MSG_EXISTING_NAME = 'Account with this name already exist.';
 
 /**

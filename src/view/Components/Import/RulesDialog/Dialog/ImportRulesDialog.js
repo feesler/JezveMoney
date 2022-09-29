@@ -28,6 +28,7 @@ const TITLE_RULE_DELETE = 'Delete import rule';
 const MSG_RULE_DELETE = 'Are you sure to delete this import rule?';
 const MSG_RULE_LIST_REQUEST_FAIL = 'Fail to read list of import rules';
 const MSG_NO_RULES = 'No rules';
+const MSG_NOT_FOUND = 'Not found';
 const TITLE_RULES_LIST = 'Import rules';
 const TITLE_CREATE_RULE = 'Create import rule';
 const TITLE_UPDATE_RULE = 'Update import rule';
@@ -343,7 +344,8 @@ export class ImportRulesDialog extends Component {
         this.listContainer.dataset.time = state.renderTime;
         removeChilds(this.listContainer);
         if (!ruleItems.length) {
-            this.noDataMsg = ce('span', { className: 'nodata-message', textContent: MSG_NO_RULES });
+            const message = (state.filter !== '') ? MSG_NOT_FOUND : MSG_NO_RULES;
+            this.noDataMsg = ce('span', { className: 'nodata-message', textContent: message });
             this.listContainer.append(this.noDataMsg);
         } else {
             ruleItems.forEach((item) => this.listContainer.append(item.elem));
