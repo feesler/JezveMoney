@@ -87,5 +87,6 @@ include(TPL_PATH . "Header.tpl");	?>
 </form>
 <?php	}	?>
 
-<?php	include(TPL_PATH . "Icons.tpl");	?>
+<?php	include(ICONS_PATH . "TileIcons.tpl");	?>
+<?php	include(ICONS_PATH . "Common.tpl");	?>
 <?php	include(TPL_PATH . "Footer.tpl");	?>
