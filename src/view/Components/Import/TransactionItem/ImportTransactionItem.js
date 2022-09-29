@@ -8,6 +8,7 @@ import { ImportTransactionBase } from '../TransactionBase/ImportTransactionBase.
 import { Field } from '../../Field/Field.js';
 import './style.scss';
 import { ImportTransaction } from '../../../js/model/ImportTransaction.js';
+import { IconLink } from '../../IconLink/IconLink.js';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'import-item';
@@ -34,12 +35,9 @@ const COMMENT_CLASS = 'import-item__comment';
 /* Controls */
 const ENABLE_CHECK_CLASS = 'enable-check';
 const CONTROLS_CLASS = 'controls';
-const DEFAULT_BUTTON_CLASS = 'btn';
 const UPDATE_BUTTON_CLASS = 'update-btn';
 const DEL_BUTTON_CLASS = 'delete-btn';
-const DEFAULT_ICON_CLASS = 'icon';
-const UPDATE_ICON_CLASS = 'update-icon';
-const DEL_ICON_CLASS = 'delete-icon';
+const MENU_ICONLINK_CLASS = 'action-iconlink';
 
 /** Strings */
 const TITLE_FIELD_SRC_ACCOUNT = 'Source account';
@@ -86,10 +84,14 @@ export class ImportTransactionItem extends ImportTransactionBase {
             transaction: new ImportTransaction(this.props.data),
         };
 
+        this.menuEmptyClickHandler = () => this.hideMenu();
+
         this.init();
     }
 
     init() {
+        const { createContainer } = window.app;
+
         // Row enable checkbox
         this.enableCheck = Checkbox.create({
             className: ENABLE_CHECK_CLASS,
@@ -145,47 +147,32 @@ export class ImportTransactionItem extends ImportTransactionBase {
             className: COMMENT_FIELD_CLASS,
         });
 
-        // Update button
-        this.updateBtn = ce(
-            'button',
-            { className: `${DEFAULT_BUTTON_CLASS} ${UPDATE_BUTTON_CLASS}`, type: 'button' },
-            window.app.createIcon('update', `${DEFAULT_ICON_CLASS} ${UPDATE_ICON_CLASS}`),
-            { click: () => this.onUpdate() },
-        );
-        // Delete button
-        this.delBtn = ce(
-            'button',
-            { className: `${DEFAULT_BUTTON_CLASS} ${DEL_BUTTON_CLASS}`, type: 'button' },
-            window.app.createIcon('del', `${DEFAULT_ICON_CLASS} ${DEL_ICON_CLASS}`),
-            { click: () => this.remove() },
-        );
-
-        this.topRow = window.app.createContainer(ROW_CLASS, [
+        this.topRow = createContainer(ROW_CLASS, [
             this.dateField.elem,
             this.commentField.elem,
         ]);
 
-        this.itemContainer = window.app.createContainer(ITEM_CONTAINER_CLASS, [
-            window.app.createContainer(`${COLUMN_CLASS} ${TYPE_COLUMN_CLASS}`, [
+        this.itemContainer = createContainer(ITEM_CONTAINER_CLASS, [
+            createContainer(`${COLUMN_CLASS} ${TYPE_COLUMN_CLASS}`, [
                 this.trTypeField.elem,
                 this.accountField.elem,
                 this.personField.elem,
             ]),
-            window.app.createContainer(`${COLUMN_CLASS} ${AMOUNT_COLUMN_CLASS}`, [
+            createContainer(`${COLUMN_CLASS} ${AMOUNT_COLUMN_CLASS}`, [
                 this.srcAmountField.elem,
                 this.destAmountField.elem,
             ]),
-            window.app.createContainer(COLUMN_CLASS, [
+            createContainer(COLUMN_CLASS, [
                 this.topRow,
             ]),
         ]);
 
-        this.controls = window.app.createContainer(CONTROLS_CLASS, [
-            this.updateBtn,
-            this.delBtn,
+        this.initMenu();
+        this.controls = createContainer(CONTROLS_CLASS, [
+            this.menu,
         ]);
 
-        this.mainContainer = window.app.createContainer(MAIN_CONTENT_CLASS, [
+        this.mainContainer = createContainer(MAIN_CONTENT_CLASS, [
             this.enableCheck.elem,
             this.itemContainer,
             this.controls,
@@ -194,6 +181,26 @@ export class ImportTransactionItem extends ImportTransactionBase {
         this.initContainer(CONTAINER_CLASS, [this.mainContainer]);
 
         this.render();
+    }
+
+    initMenu() {
+        this.updateBtn = IconLink.create({
+            icon: 'update',
+            title: 'Edit',
+            className: [MENU_ICONLINK_CLASS, UPDATE_BUTTON_CLASS],
+            onClick: () => this.onUpdate(),
+        });
+        this.deleteBtn = IconLink.create({
+            icon: 'del',
+            title: 'Delete',
+            className: [MENU_ICONLINK_CLASS, DEL_BUTTON_CLASS],
+            onClick: () => this.remove(),
+        });
+
+        this.createMenu([
+            this.updateBtn.elem,
+            this.deleteBtn.elem,
+        ]);
     }
 
     /** Update button 'click' event handler */

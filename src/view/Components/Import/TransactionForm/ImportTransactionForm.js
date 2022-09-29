@@ -16,6 +16,7 @@ import { ImportTransactionBase } from '../TransactionBase/ImportTransactionBase.
 import { Field } from '../../Field/Field.js';
 import './style.scss';
 import { ImportTransaction } from '../../../js/model/ImportTransaction.js';
+import { IconLink } from '../../IconLink/IconLink.js';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'import-form';
@@ -41,8 +42,8 @@ const CONTROLS_CLASS = 'controls';
 const DEFAULT_BUTTON_CLASS = 'btn';
 const DEL_BUTTON_CLASS = 'delete-btn';
 const DEFAULT_ICON_CLASS = 'icon';
-const DEL_ICON_CLASS = 'delete-icon';
 const CALENDAR_ICON_CLASS = 'calendar-icon';
+const MENU_ICONLINK_CLASS = 'action-iconlink';
 /* Form controls */
 const FORM_CONTROLS_CLASS = 'form-controls';
 const SUBMIT_BUTTON_CLASS = 'submit-btn';
@@ -96,10 +97,14 @@ export class ImportTransactionForm extends ImportTransactionBase {
             transaction: new ImportTransaction(this.props.data),
         };
 
+        this.menuEmptyClickHandler = () => this.hideMenu();
+
         this.init();
     }
 
     init() {
+        const { createContainer } = window.app;
+
         // Row enable checkbox
         this.enableCheck = Checkbox.create({
             className: ENABLE_CHECK_CLASS,
@@ -112,53 +117,34 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.createSourceAmountField();
         this.createDestAmountField();
         this.createDateField();
+        this.createCommentField();
 
-        // Comment field
-        this.commInp = ce('input', {
-            className: DEFAULT_INPUT_CLASS,
-            type: 'text',
-            name: 'comment[]',
-            placeholder: TITLE_FIELD_COMMENT,
-            autocomplete: 'off',
-        }, null, { input: () => this.onCommentInput() });
-        this.commentField = Field.create({
-            title: TITLE_FIELD_COMMENT,
-            content: this.commInp,
-            className: COMMENT_FIELD_CLASS,
-        });
-        // Delete button
-        this.delBtn = ce(
-            'button',
-            { className: `${DEFAULT_BUTTON_CLASS} ${DEL_BUTTON_CLASS}`, type: 'button' },
-            window.app.createIcon('del', `${DEFAULT_ICON_CLASS} ${DEL_ICON_CLASS}`),
-            { click: () => this.remove() },
-        );
-
-        this.topRow = window.app.createContainer(FORM_ROW_CLASS, [
+        this.topRow = createContainer(FORM_ROW_CLASS, [
             this.dateField.elem,
             this.commentField.elem,
         ]);
 
-        this.formContainer = window.app.createContainer(FORM_CONTAINER_CLASS, [
-            window.app.createContainer(`${FORM_COLUMN_CLASS} ${TYPE_COLUMN_CLASS}`, [
+        this.formContainer = createContainer(FORM_CONTAINER_CLASS, [
+            createContainer(`${FORM_COLUMN_CLASS} ${TYPE_COLUMN_CLASS}`, [
                 this.trTypeField.elem,
                 this.transferAccountField.elem,
                 this.personField.elem,
             ]),
-            window.app.createContainer(`${FORM_COLUMN_CLASS} ${AMOUNT_COLUMN_CLASS}`, [
+            createContainer(`${FORM_COLUMN_CLASS} ${AMOUNT_COLUMN_CLASS}`, [
                 this.srcAmountField.elem,
                 this.destAmountField.elem,
             ]),
-            window.app.createContainer(FORM_COLUMN_CLASS, [
+            createContainer(FORM_COLUMN_CLASS, [
                 this.topRow,
             ]),
         ]);
 
-        this.controls = window.app.createContainer(CONTROLS_CLASS, [
-            this.delBtn,
+        this.initMenu();
+        this.controls = createContainer(CONTROLS_CLASS, [
+            this.menu,
         ]);
 
-        this.mainContainer = window.app.createContainer(MAIN_CONTENT_CLASS, [
+        this.mainContainer = createContainer(MAIN_CONTENT_CLASS, [
             this.enableCheck.elem,
             this.formContainer,
             this.controls,
@@ -189,7 +175,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
             { click: () => this.cancel() },
         );
 
-        this.formControls = window.app.createContainer(FORM_CONTROLS_CLASS, [
+        this.formControls = createContainer(FORM_CONTROLS_CLASS, [
             this.saveBtn,
             this.cancelBtn,
         ]);
@@ -374,6 +360,34 @@ export class ImportTransactionForm extends ImportTransactionBase {
             content: this.dateGroup.elem,
             className: DATE_FIELD_CLASS,
         });
+    }
+
+    createCommentField() {
+        this.commInp = ce('input', {
+            className: DEFAULT_INPUT_CLASS,
+            type: 'text',
+            name: 'comment[]',
+            placeholder: TITLE_FIELD_COMMENT,
+            autocomplete: 'off',
+        }, null, { input: () => this.onCommentInput() });
+        this.commentField = Field.create({
+            title: TITLE_FIELD_COMMENT,
+            content: this.commInp,
+            className: COMMENT_FIELD_CLASS,
+        });
+    }
+
+    initMenu() {
+        this.deleteBtn = IconLink.create({
+            icon: 'del',
+            title: 'Delete',
+            className: [MENU_ICONLINK_CLASS, DEL_BUTTON_CLASS],
+            onClick: () => this.remove(),
+        });
+
+        this.createMenu([
+            this.deleteBtn.elem,
+        ]);
     }
 
     /** Transaction type select 'change' event handler */

@@ -1,4 +1,4 @@
-import { isFunction, Component } from 'jezvejs';
+import { ge, isFunction, Component } from 'jezvejs';
 import { IconLink } from '../IconLink/IconLink.js';
 import './style.scss';
 
@@ -42,20 +42,39 @@ export class Toolbar extends Component {
 
         this.elem.addEventListener('click', () => this.onClick());
 
-        this.updateBtn = IconLink.fromElement({ elem: 'edit_btn' });
-        this.exportBtn = IconLink.fromElement({ elem: 'export_btn' });
-        this.showBtn = IconLink.fromElement({
-            elem: 'show_btn',
-            onclick: () => this.onShowClick(),
-        });
-        this.hideBtn = IconLink.fromElement({
-            elem: 'hide_btn',
-            onclick: () => this.onHideClick(),
-        });
-        this.deleteBtn = IconLink.fromElement({
-            elem: 'del_btn',
-            onclick: () => this.onDeleteClick(),
-        });
+        const editBtn = ge('edit_btn');
+        if (editBtn) {
+            this.updateBtn = IconLink.fromElement({ elem: editBtn });
+        }
+
+        const exportBtn = ge('export_btn');
+        if (exportBtn) {
+            this.exportBtn = IconLink.fromElement({ elem: exportBtn });
+        }
+
+        const showBtn = ge('show_btn');
+        if (showBtn) {
+            this.showBtn = IconLink.fromElement({
+                elem: showBtn,
+                onclick: () => this.onShowClick(),
+            });
+        }
+
+        const hideBtn = ge('hide_btn');
+        if (hideBtn) {
+            this.hideBtn = IconLink.fromElement({
+                elem: hideBtn,
+                onclick: () => this.onHideClick(),
+            });
+        }
+
+        const deleteBtn = ge('del_btn');
+        if (deleteBtn) {
+            this.deleteBtn = IconLink.fromElement({
+                elem: 'del_btn',
+                onclick: () => this.onDeleteClick(),
+            });
+        }
     }
 
     show(value = true) {

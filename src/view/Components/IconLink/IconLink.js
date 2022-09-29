@@ -1,38 +1,95 @@
 import {
     isFunction,
-    ce,
+    createElement,
     addChilds,
     removeChilds,
     Component,
 } from 'jezvejs';
 import './style.scss';
 
+/* CSS classes */
+const CONTAINER_CLASS = 'iconlink';
+const ICON_CONTAINER_CLASS = 'iconlink__icon';
+const ICON_CLASS = 'iconlink__icon-content';
+const CONTENT_CLASS = 'iconlink__content';
 const TITLE_CLASS = 'iconlink__title';
 const SUBTITLE_CLASS = 'iconlink__subtitle';
+
+const defaultProps = {
+    type: 'button', // button or link
+    enabled: true,
+    url: null,
+    title: null,
+    subtitle: null,
+    icon: null,
+    onClick: null,
+};
 
 /**
  * IconLink component
  */
 export class IconLink extends Component {
-    /**
-     * Create new IconLink from specified element
-     */
-    static fromElement(props) {
-        let res;
+    static create(props) {
+        const instance = new IconLink(props);
+        instance.init();
 
-        try {
-            res = new IconLink(props);
-            res.parse();
-        } catch (e) {
-            res = null;
-        }
-
-        return res;
+        return instance;
     }
 
-    /**
-     * Parse DOM to obtain child elements and build state of component
-     */
+    static fromElement(props) {
+        const instance = new IconLink(props);
+        instance.parse();
+
+        return instance;
+    }
+
+    constructor(props) {
+        super(props);
+
+        this.props = {
+            ...defaultProps,
+            ...this.props,
+        };
+
+        this.state = {
+            ...this.props,
+        };
+    }
+
+    init() {
+        this.iconElem = createElement('span', {
+            props: { className: ICON_CONTAINER_CLASS },
+        });
+
+        if (this.props.icon) {
+            this.icon = window.app.createIcon(this.props.icon, ICON_CLASS);
+            this.iconElem.append(this.icon);
+        }
+
+        this.contentElem = createElement('div', {
+            props: { className: CONTENT_CLASS },
+        });
+
+        const isLink = (this.props.type === 'link');
+        if (isLink) {
+            this.buttonElem = createElement('a');
+        } else {
+            this.buttonElem = createElement('button', {
+                props: { type: 'button' },
+            });
+        }
+        this.buttonElem.append(this.iconElem, this.contentElem);
+
+        this.elem = createElement('div', {
+            props: { className: CONTAINER_CLASS },
+            children: this.buttonElem,
+        });
+
+        this.setClassNames();
+        this.setHandlers();
+        this.render(this.state);
+    }
+
     parse() {
         if (!(this.elem instanceof Element)) {
             throw new Error('Invalid element specified');
@@ -48,8 +105,8 @@ export class IconLink extends Component {
             this.state.url = this.buttonElem.href;
         }
 
-        this.iconElem = this.buttonElem.querySelector('.iconlink__icon');
-        this.contentElem = this.buttonElem.querySelector('.iconlink__content');
+        this.iconElem = this.buttonElem.querySelector(`.${ICON_CONTAINER_CLASS}`);
+        this.contentElem = this.buttonElem.querySelector(`.${CONTENT_CLASS}`);
         if (!this.contentElem) {
             throw new Error('Invalid structure of iconlink element');
         }
@@ -70,6 +127,17 @@ export class IconLink extends Component {
 
         const disabledAttr = this.elem.getAttribute('disabled');
         this.state.enabled = disabledAttr == null;
+
+        this.setClassNames();
+        this.setHandlers();
+    }
+
+    setHandlers() {
+        if (!isFunction(this.props.onClick)) {
+            return;
+        }
+
+        this.buttonElem.addEventListener('click', (e) => this.props.onClick(e));
     }
 
     /** Set title text */
@@ -142,13 +210,14 @@ export class IconLink extends Component {
         }
 
         if (state.subtitle) {
-            this.titleElem = ce('span', { className: SUBTITLE_CLASS, textContent: state.title });
-            this.subtitleElem = ce('span', {
-                className: SUBTITLE_CLASS,
-                textContent: state.subtitle,
+            this.titleElem = createElement('span', {
+                props: { className: SUBTITLE_CLASS, textContent: state.title },
+            });
+            this.subtitleElem = createElement('span', {
+                props: { className: SUBTITLE_CLASS, textContent: state.subtitle },
             });
         } else {
-            this.titleElem = ce('span', { textContent: state.title });
+            this.titleElem = createElement('span', { props: { textContent: state.title } });
             this.subtitleElem = null;
         }
         addChilds(this.contentElem, [this.titleElem, this.subtitleElem]);

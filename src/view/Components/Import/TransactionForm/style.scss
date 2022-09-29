@@ -121,18 +121,12 @@
     }
   }
 
-  /* Common buttons style */
-  .delete-btn,
+  /* Toggle expand/collapse button */
   .toggle-btn {
     pointer-events: all;
     background: none;
-    padding: 4px;
-    cursor: pointer;
-  }
-
-  /* Toggle expand/collapse button */
-  .toggle-btn {
     padding: 7px;
+    cursor: pointer;
   }
 
   .toggle-icon {
@@ -145,6 +139,23 @@
   .delete-icon {
     width: 24px;
     height: 24px;
+  }
+
+  /* Menu */
+  .menu-btn {
+    pointer-events: all;
+    background: none;
+    padding: 4px;
+    cursor: pointer;
+  }
+
+  .menu-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .actions-menu {
+    margin: 0 4px;
   }
 
   /* Container for transaction form */

@@ -52,8 +52,9 @@ export class ImportTransactionItem extends TestComponent {
         res.dateField = await this.parseField(await query(this.elem, '.date-field'));
         res.commentField = await this.parseField(await query(this.elem, '.comment-field'));
 
-        res.updateBtn = await query(this.elem, '.update-btn');
-        res.deleteBtn = await query(this.elem, '.delete-btn');
+        res.menuBtn = await query(this.elem, '.menu-btn');
+        res.updateBtn = await query(this.elem, '.update-btn button');
+        res.deleteBtn = await query(this.elem, '.delete-btn button');
         res.toggleBtn = await query(this.elem, '.toggle-btn');
         res.origDataTable = await query(this.elem, '.orig-data-table');
 
@@ -65,6 +66,7 @@ export class ImportTransactionItem extends TestComponent {
             && res.personField
             && res.dateField
             && res.commentField
+            && res.menuBtn
             && res.updateBtn
             && res.deleteBtn,
             'Invalid structure of import item',
@@ -434,12 +436,18 @@ export class ImportTransactionItem extends TestComponent {
         return res;
     }
 
+    async openMenu() {
+        await this.performAction(() => click(this.content.menuBtn));
+    }
+
     async clickUpdate() {
-        return click(this.content.updateBtn);
+        await this.openMenu();
+        await click(this.content.updateBtn);
     }
 
     async clickDelete() {
-        return click(this.content.deleteBtn);
+        await this.openMenu();
+        await click(this.content.deleteBtn);
     }
 
     /**
