@@ -53,6 +53,16 @@ export class RawDataTable extends Component {
         this.render(this.state);
     }
 
+    get scrollLeft() {
+        return (this.columnContainer) ? this.columnContainer.scrollLeft : 0;
+    }
+
+    set scrollLeft(value) {
+        if (this.columnContainer) {
+            this.columnContainer.scrollLeft = value;
+        }
+    }
+
     getSafeFirstRow(state) {
         if (Number.isNaN(state.template.first_row)) {
             return 1;
@@ -154,16 +164,20 @@ export class RawDataTable extends Component {
             });
         });
 
-        const columnContainer = createElement('div', {
+        this.columnContainer = createElement('div', {
             props: { className: DATA_CLASS },
             children: colElems,
         });
 
         removeChilds(this.elem);
-        this.elem.append(rowNumbersColumn, columnContainer);
+        this.elem.append(rowNumbersColumn, this.columnContainer);
 
         if (propertiesPerColumn > 1) {
             this.elem.classList.add(`${TABLE_TPL_CLASS}${propertiesPerColumn}`);
+        }
+
+        if (state.scrollLeft) {
+            this.columnContainer.scrollLeft = state.scrollLeft;
         }
     }
 }

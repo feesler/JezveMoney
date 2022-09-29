@@ -704,16 +704,22 @@ export class ImportTemplateManager extends Component {
             return;
         }
 
+        const scrollLeft = (state.id === TPL_UPDATE_STATE && this.dataTable)
+            ? this.dataTable.scrollLeft
+            : 0;
+
         removeChilds(this.rawDataTable);
         if (state.id === TPL_UPDATE_STATE) {
-            const dataTable = RawDataTable.create({
+            this.dataTable = RawDataTable.create({
                 data: state.rawData,
                 rowsToShow: state.rowsToShow,
                 template: state.template,
+                scrollLeft,
                 onSelectColumn: (index) => this.onDataColumnClick(index),
             });
 
-            this.rawDataTable.append(dataTable.elem);
+            this.rawDataTable.append(this.dataTable.elem);
+            this.dataTable.scrollLeft = scrollLeft;
 
             this.firstRowInp.value = state.template.first_row;
             enable(this.decFirstRowBtn, state.template.first_row > 1);
