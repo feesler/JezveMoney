@@ -1,6 +1,6 @@
 {
   "name": "jezve-money",
-  "version": "1.27.0",
+  "version": "1.28.0",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -70,7 +70,7 @@
   "dependencies": {
     "@babel/runtime": "^7.13.9",
     "core-js": "^3.9.1",
-    "jezvejs": "^1.36.1",
+    "jezvejs": "^1.36.2",
     "whatwg-fetch": "^3.6.2"
   }
 }
