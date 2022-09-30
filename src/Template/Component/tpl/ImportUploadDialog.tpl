@@ -42,7 +42,7 @@
             </div>
             <div class="tpl-form-fields">
                 <div class="tpl-form__select-group">
-                    <div id="tplField" class="tpl-form-field">
+                    <div id="tplField" class="tpl-form-field template-field">
                         <select id="templateSel">
 <?php   foreach($importTemplates as $template) {     ?>
                             <option value="<?=e($template->id)?>"><?=e($template->name)?></option>
@@ -55,7 +55,7 @@
                 <div id="nameField" class="tpl-form-field validation-block" hidden>
                     <label for="tplNameInp">Name</label>
                     <input id="tplNameInp" class="stretch-input tpl-name-inp" type="text" autocomplete="off">
-                    <div class="invalid-feedback">Please input template name</div>
+                    <div class="invalid-feedback">Input template name</div>
                 </div>
                 <div id="columnField" class="tpl-form-field validation-block" hidden>
                     <label for="columnSel">Column</label>
@@ -66,21 +66,31 @@
                     </select>
                     <div id="columnFeedback" class="invalid-feedback"></div>
                 </div>
+                <div id="firstRowField" class="tpl-form-field first-row-field validation-block" hidden>
+                    <label for="firstRowInp">First row</label>
+                    <div class="input-group">
+                        <button id="decFirstRowBtn" class="input-group__btn" type="button">-</button>
+                        <input id="firstRowInp" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off">
+                        <button id="incFirstRowBtn" class="input-group__btn" type="button">+</button>
+                    </div>
+                    <div class="invalid-feedback">Input row number</div>
+                </div>
             </div>
         </div>
         <div id="tableDescr" class="tpl-form__title">Column map</div>
-        <div id="rawDataTable" class="tpl-form__block"></div>
-        <div id="tplFeedback" class="invalid-feedback" hidden></div>
+        <div id="rawDataTable"></div>
+        <div id="tplFeedback" class="feedback" hidden></div>
         <div id="tplControls" class="form-controls" hidden>
             <input id="submitTplBtn" class="btn submit-btn" type="button" value="Save">
             <input id="cancelTplBtn" class="btn link-btn cancel-btn" type="button" value="Cancel">
         </div>
-    </div>
-    <div id="initialAccField" class="tpl-form-field" hidden>
-        <label>Main account</label>
-        <select id="initialAccount"></select>
-    </div>
-    <div id="uploadControls" class="form-controls" hidden>
-        <input id="submitUploadedBtn" class="btn submit-btn" type="button" value="Submit">
+        <div id="initialAccField" class="tpl-form-field" hidden>
+            <label>Main account</label>
+            <select id="initialAccount"></select>
+        </div>
+        <div id="convertFeedback" class="feedback" hidden></div>
+        <div id="uploadControls" class="form-controls" hidden>
+            <input id="submitUploadedBtn" class="btn submit-btn" type="button" value="Submit">
+        </div>
     </div>
 </div>

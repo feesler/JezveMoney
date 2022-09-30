@@ -7,6 +7,7 @@ import {
     isVisible,
     copyObject,
 } from 'jezve-test';
+import { Paginator } from 'jezvejs/tests';
 import { ImportTransactionForm } from './ImportTransactionForm.js';
 import { ImportTransactionItem } from './ImportTransactionItem.js';
 import { asyncMap } from '../../../common.js';
@@ -33,6 +34,8 @@ export class ImportList extends TestComponent {
                     return ListItemClass.create(this.parent, item, this.mainAccount);
                 },
             );
+
+            res.paginator = await Paginator.create(this, await query(this.elem, '.paginator'));
         } else {
             const noDataMsg = await query(this.elem, '.nodata-message');
             const visible = await isVisible(noDataMsg);
@@ -51,6 +54,10 @@ export class ImportList extends TestComponent {
     async buildModel(cont) {
         const res = {
             items: [],
+            pagination: {
+                page: (cont.paginator) ? cont.paginator.active : 1,
+                pages: (cont.paginator) ? cont.paginator.pages : 1,
+            },
             invalidated: false,
             formIndex: -1,
             isLoading: cont.loadingIndicator.visible,
@@ -68,6 +75,12 @@ export class ImportList extends TestComponent {
         });
 
         return res;
+    }
+
+    getPagination() {
+        return {
+            ...this.model.pagination,
+        };
     }
 
     getItem(index) {
@@ -94,14 +107,16 @@ export class ImportList extends TestComponent {
     }
 
     getExpectedState() {
-        return {
+        const res = {
             items: this.content.items.map((item) => {
-                const res = (item.model.isForm)
+                const listItem = (item.model.isForm)
                     ? ImportTransactionForm.getExpectedState(item.model)
                     : ImportTransactionItem.getExpectedState(item.model);
-                return copyObject(res);
+                return copyObject(listItem);
             }),
         };
+
+        return res;
     }
 
     static render(transactions, state, formIndex = -1) {

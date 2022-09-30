@@ -2,11 +2,18 @@
 .rules-popup {
   .popup__wrapper {
     position: relative;
+    align-items: flex-start;
   }
 
   .popup__content-box {
     max-width: 600px;
     width: 100%;
+  }
+
+  &.popup_scroll-message .popup__message {
+    overflow-y: hidden;
+    display: flex;
+    flex-flow: row nowrap;
   }
 }
 
@@ -16,19 +23,18 @@
   align-items: stretch;
   flex: 1 1 auto;
   min-height: 100px;
+  overflow: hidden;
 
   /* Create button */
-  .link-btn,
-  .link-btn:visited,
-  .link-btn:active {
+  .link-btn {
     pointer-events: all;
     padding: 0;
     cursor: pointer;
   }
-}
 
-.rules-dialog .loading-indicator {
-  border-radius: 10px;
+  .loading-indicator {
+    border-radius: 10px;
+  }
 }
 
 /* Import rules dialog heading */
@@ -45,8 +51,38 @@
   }
 }
 
+.search-field {
+  margin-bottom: 1rem;
+
+  .search-btn {
+    pointer-events: none;
+  }
+
+  .search-icon {
+    height: 24px;
+    fill: #888888;
+    border-left: 1px solid #464646;
+    padding-left: 4px;
+  }
+}
+
 .rules-list {
   display: flex;
   flex-flow: column nowrap;
   overflow-y: auto;
+  row-gap: 4px;
+
+  .paginator {
+    margin-right: auto;
+  }
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .rules-popup {
+    .popup__wrapper {
+      padding-top: 60px;
+      padding-bottom: 20px;
+    }
+  }
 }

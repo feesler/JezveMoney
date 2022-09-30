@@ -12,6 +12,7 @@ const COMMENT_COLUMN_CLASS = 'comment-column';
 /** Strings */
 const TITLE_ORIGINAL_DATA = 'Original imported data';
 const COL_MAIN = 'Main account';
+const COL_TEMPLATE = 'Template';
 const COL_DATE = 'Date';
 const COL_COMMENT = 'Comment';
 const COL_TR_AMOUNT = 'Tr. amount';
@@ -22,7 +23,7 @@ const COL_ACC_CURRENCY = 'Acc. currency';
 /**
  * Original import transaction data
  * @param {Object} props
- * @param {Object} props.mainAccount
+ * @param {Object} props.origAccount
  * @param {Number} props.transactionAmount
  * @param {Number} props.transactionCurrency
  * @param {Number} props.accountAmount
@@ -37,6 +38,13 @@ export class OriginalImportData extends Component {
 
     constructor(...args) {
         super(...args);
+
+        if (!this.props.origAccount) {
+            throw new Error('origAccount expected');
+        }
+        if (!this.props.template) {
+            throw new Error('template expected');
+        }
 
         this.render();
     }
@@ -55,8 +63,12 @@ export class OriginalImportData extends Component {
     }
 
     render() {
+        const template = window.app.model.templates.getItem(this.props.template);
+        const templateName = (template) ? template.name : '';
+
         const dataTable = [
-            [COL_MAIN, this.props.mainAccount.name],
+            [COL_MAIN, this.props.origAccount.name],
+            [COL_TEMPLATE, templateName],
             [COL_DATE, window.app.formatDate(new Date(this.props.date))],
             [COL_TR_AMOUNT, this.props.transactionAmount],
             [COL_TR_CURRENCY, this.props.transactionCurrency],

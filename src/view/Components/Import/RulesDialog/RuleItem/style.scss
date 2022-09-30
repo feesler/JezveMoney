@@ -1,10 +1,6 @@
 /* Import rule item */
 .rule-item {
-  margin-right: 3px;
-
-  + .rule-item {
-    margin-top: 4px;
-  }
+  flex: 0 0 auto;
 
   /* Main static view */
   .collapsible-header {
@@ -17,10 +13,30 @@
     cursor: pointer;
   }
 
+  /* Menu */
+  .menu-btn {
+    pointer-events: all;
+    background: none;
+    padding: 4px;
+    cursor: pointer;
+  }
+
+  .menu-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .actions-menu {
+    position: static;
+    margin: 0 4px;
+  }
+
+  .actions-menu-list {
+    right: auto;
+  }
+
   /* Delete and toggle expand/collapse button */
-  .icon-btn,
-  .icon-btn:visited,
-  .icon-btn:active {
+  .icon-btn {
     display: flex;
     align-items: center;
     padding: 0;

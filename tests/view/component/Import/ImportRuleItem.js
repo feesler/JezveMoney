@@ -10,6 +10,8 @@ import { ImportRuleItemConditions } from './ImportRuleItemConditions.js';
 import { ImportConditionItem } from './ImportConditionItem.js';
 import { ImportRuleItemActions } from './ImportRuleItemActions.js';
 import { ImportActionItem } from './ImportActionItem.js';
+import { ImportCondition } from '../../../model/ImportCondition.js';
+import { ImportAction } from '../../../model/ImportAction.js';
 
 export class ImportRuleItem extends TestComponent {
     constructor(parent, elem, mainAccount) {
@@ -29,8 +31,9 @@ export class ImportRuleItem extends TestComponent {
             operatorElem: { elem: await query(this.elem, '.rule-item__operator') },
             valueElem: { elem: await query(this.elem, '.rule-item__value') },
             infoElem: { elem: await query(this.elem, '.rule-item__info') },
-            updateBtn: { elem: await query(this.elem, '.update-btn') },
-            deleteBtn: { elem: await query(this.elem, '.delete-btn') },
+            menuBtn: { elem: await query(this.elem, '.menu-btn') },
+            updateBtn: { elem: await query(this.elem, '.update-btn button') },
+            deleteBtn: { elem: await query(this.elem, '.delete-btn button') },
             toggleBtn: { elem: await query(this.elem, '.toggle-btn') },
         };
 
@@ -49,6 +52,7 @@ export class ImportRuleItem extends TestComponent {
             && res.operatorElem.elem
             && res.valueElem.elem
             && res.infoElem.elem
+            && res.menuBtn.elem
             && res.updateBtn.elem
             && res.deleteBtn.elem
             && res.toggleBtn.elem
@@ -80,8 +84,7 @@ export class ImportRuleItem extends TestComponent {
             operatorElem: { visible: true },
             valueElem: { visible: true },
             infoElem: { visible: true },
-            updateBtn: { visible: true },
-            deleteBtn: { visible: true },
+            menuBtn: { visible: true },
             conditions: {},
             actions: {},
         };
@@ -105,20 +108,48 @@ export class ImportRuleItem extends TestComponent {
         return click(this.content.toggleBtn.elem);
     }
 
+    async openMenu() {
+        await this.performAction(() => click(this.content.menuBtn.elem));
+    }
+
     async clickUpdate() {
-        return click(this.content.updateBtn.elem);
+        await this.openMenu();
+        await click(this.content.updateBtn.elem);
     }
 
     async clickDelete() {
-        return click(this.content.deleteBtn.elem);
+        await this.openMenu();
+        await click(this.content.deleteBtn.elem);
     }
 
     /**
      * Convert import rule object to expected state of component
      * @param {Object} item - import rule object
-     * @param {AppState} state - application state
      */
-    static render(item, state) {
-        assert(item && state, 'Invalid parameters');
+    static render(item) {
+        assert(item, 'Invalid parameters');
+
+        const res = {
+            ruleId: item.id.toString(),
+            propertyElem: { visible: true },
+            operatorElem: { visible: true },
+            valueElem: { visible: true },
+            infoElem: { visible: true },
+            menuBtn: { visible: true },
+            conditions: {},
+            actions: {},
+        };
+
+        res.conditions.items = item.conditions.data.map((condData) => {
+            const condition = new ImportCondition(condData);
+            return ImportConditionItem.render(condition);
+        });
+
+        res.actions.items = item.actions.data.map((actData) => {
+            const action = new ImportAction(actData);
+            return ImportActionItem.render(action);
+        });
+
+        return res;
     }
 }

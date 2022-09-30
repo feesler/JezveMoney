@@ -42,6 +42,11 @@ export class ImportRule {
         this.actions.forEach((item) => item.execute(context));
     }
 
+    /** Check import rule is match search filter */
+    isMatchFilter(value) {
+        return (this.conditions.isMatchFilter(value) || this.actions.isMatchFilter(value));
+    }
+
     /** Validate import rule */
     validate() {
         // Check conditions

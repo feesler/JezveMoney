@@ -8,7 +8,7 @@ import '../../css/app.scss';
 
 const TITLE_PERSON_DELETE = 'Delete person';
 const MSG_PERSON_DELETE = 'Are you sure want to delete selected person?<br>Debt operations will be converted into expense or income.';
-const MSG_EMPTY_NAME = 'Please input name of person.';
+const MSG_EMPTY_NAME = 'Input name.';
 const MSG_EXISTING_NAME = 'Person with this name already exist.';
 
 /**

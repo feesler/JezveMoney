@@ -6,9 +6,9 @@ import {
     Component,
     Collapsible,
 } from 'jezvejs';
-import { ImportRule } from '../../../js/model/ImportRule.js';
-import { ImportAction } from '../../../js/model/ImportAction.js';
-import { ImportCondition } from '../../../js/model/ImportCondition.js';
+import { ImportRule } from '../../../../js/model/ImportRule.js';
+import { ImportAction } from '../../../../js/model/ImportAction.js';
+import { ImportCondition } from '../../../../js/model/ImportCondition.js';
 import { ImportConditionForm } from '../ConditionForm/ImportConditionForm.js';
 import { ImportActionForm } from '../ActionForm/ImportActionForm.js';
 import './style.scss';
@@ -25,7 +25,7 @@ const MSG_NO_ACTIONS = 'No actions';
 const MSG_NO_CONDITIONS = 'No conditions';
 
 /**
- * ImportRuleForm component constructor
+ * ImportRuleForm component
  */
 export class ImportRuleForm extends Component {
     static create(props) {

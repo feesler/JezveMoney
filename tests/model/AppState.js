@@ -42,7 +42,7 @@ const trReqFields = ['type', 'src_id', 'dest_id', 'src_amount', 'dest_amount', '
 /**
  * Import templates
  */
-const tplReqFields = ['name', 'type_id', 'columns'];
+const tplReqFields = ['name', 'type_id', 'first_row', 'columns'];
 const tplReqColumns = ['accountAmount', 'transactionAmount', 'accountCurrency', 'transactionCurrency', 'date', 'comment'];
 
 /**
@@ -919,6 +919,14 @@ export class AppState {
         }
 
         if (typeof params.name !== 'string' || params.name === '') {
+            return false;
+        }
+
+        if (
+            typeof params.first_row !== 'number'
+            || Number.isNaN(params.first_row)
+            || params.first_row < 1
+        ) {
             return false;
         }
 

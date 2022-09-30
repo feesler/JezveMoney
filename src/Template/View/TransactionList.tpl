@@ -149,5 +149,6 @@ include(TPL_PATH . "Header.tpl"); ?>
 <input id="deltrans" name="transactions" type="hidden" value="">
 </form>
 
-<?php	include(TPL_PATH . "Icons.tpl");	?>
+<?php	include(ICONS_PATH . "Common.tpl");	?>
+<?php	include(ICONS_PATH . "ModeSelector.tpl");	?>
 <?php	include(TPL_PATH . "Footer.tpl");	?>

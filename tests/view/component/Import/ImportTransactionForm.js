@@ -127,7 +127,8 @@ export class ImportTransactionForm extends TestComponent {
         fields.forEach((field) => { res[field.name] = field.component; });
 
         res.invFeedback = { elem: await query(this.elem, '.invalid-feedback') };
-        res.deleteBtn = await query(this.elem, '.delete-btn');
+        res.menuBtn = await query(this.elem, '.menu-btn');
+        res.deleteBtn = await query(this.elem, '.delete-btn button');
         res.toggleBtn = await query(this.elem, '.toggle-btn');
         res.saveBtn = await query(this.elem, '.submit-btn');
         res.cancelBtn = await query(this.elem, '.cancel-btn');
@@ -142,6 +143,7 @@ export class ImportTransactionForm extends TestComponent {
             && res.dateField
             && res.commentField
             && res.invFeedback.elem
+            && res.menuBtn
             && res.deleteBtn
             && res.saveBtn
             && res.cancelBtn,
@@ -163,6 +165,7 @@ export class ImportTransactionForm extends TestComponent {
         if (this.data) {
             this.data.enabled = this.model.enabled;
             this.data.mainAccount = this.model.mainAccount;
+            this.data.importType = this.model.type;
         }
     }
 
@@ -441,14 +444,18 @@ export class ImportTransactionForm extends TestComponent {
         return res;
     }
 
+    onToggleEnable(model = this.model) {
+        const res = copyObject(model);
+
+        res.enabled = !res.enabled;
+        res.srcCurrency = App.currency.getItem(res.srcCurrId);
+        res.destCurrency = App.currency.getItem(res.destCurrId);
+
+        return res;
+    }
+
     async toggleEnable() {
-        this.model.enabled = !this.model.enabled;
-        this.expectedState = this.getExpectedState(this.model);
-
         await this.content.enableCheck.toggle();
-        await this.parse();
-
-        return this.checkState();
     }
 
     checkEnabled(field) {
@@ -768,8 +775,13 @@ export class ImportTransactionForm extends TestComponent {
         return this.checkState();
     }
 
+    async openMenu() {
+        await this.performAction(() => click(this.content.menuBtn));
+    }
+
     async clickDelete() {
-        return click(this.content.deleteBtn);
+        await this.openMenu();
+        await click(this.content.deleteBtn);
     }
 
     async clickSave() {

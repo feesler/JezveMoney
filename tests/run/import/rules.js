@@ -48,6 +48,15 @@ export const closeRulesDialog = async () => {
 };
 
 /** Click by create import rule button */
+export const iterateRulesList = async () => {
+    await test('Iterate rules list', async () => {
+        await checkRulesDialog();
+
+        return App.view.iterateRulesList();
+    });
+};
+
+/** Click by create import rule button */
 export const createRule = async () => {
     await test('Create rule', async () => {
         await checkRulesDialog();
@@ -320,27 +329,7 @@ export const submitRule = async () => {
     await test('Submit import rule', async () => {
         assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
-        // Prepare expected content
-        const validInput = App.view.isValidRule();
-        if (validInput) {
-            const expectedRule = App.view.getExpectedRule();
-            const dialogState = App.view.getRulesState();
-            assert(
-                ['create', 'update'].includes(dialogState),
-                'Invalid state of rules dialog',
-            );
-
-            if (dialogState === 'create') {
-                App.state.createRule(expectedRule);
-            } else if (dialogState === 'update') {
-                App.state.updateRule(expectedRule);
-            }
-        }
-
-        await App.view.submitRule();
-
-        // Check app state
-        return App.state.fetchAndTest();
+        return App.view.submitRule();
     });
 };
 
@@ -353,5 +342,23 @@ export const cancelRule = async () => {
 
         // Check app state
         return App.state.fetchAndTest();
+    });
+};
+
+/** Input import rule search filter */
+export const inputRulesSearch = async (value) => {
+    await test('Search rules', async () => {
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
+
+        return App.view.inputRulesSearch(value);
+    });
+};
+
+/** Clear import rules search filter */
+export const clearRulesSearch = async () => {
+    await test('Clear rules filter', async () => {
+        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
+
+        return App.view.clearRulesSearch();
     });
 };

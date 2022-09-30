@@ -14,8 +14,16 @@ const runCreateTests = async () => {
         { column: 'date', index: 1 },
         { column: 'comment', index: 2 },
     ]);
-    // Input template name and save
+
+    setBlock('Verify template with empty name not submitted', 2);
+    await ImportTests.submitTemplate();
     await ImportTests.inputTemplateName('Template_1');
+
+    setBlock('Verify template with empty first row not submitted', 2);
+    await ImportTests.inputTemplateFirstRow('');
+    await ImportTests.submitTemplate();
+
+    await ImportTests.inputTemplateFirstRow(2);
     await ImportTests.submitTemplate();
 
     // Create another template
@@ -80,7 +88,28 @@ const runAutoSelectTests = async (files) => {
     await ImportTests.uploadFile(cardFile);
     // Upload accounts again and check 2nd template is selected
     await ImportTests.uploadFile(accountFile);
-    await ImportTests.deleteTemplate();
+
+    await ImportTests.closeUploadDialog();
+};
+
+// Template first row option test
+const runFirstRowTests = async (files) => {
+    setBlock('Template first row option', 2);
+
+    const [, accountFile] = files;
+
+    await ImportTests.uploadFile(accountFile);
+
+    await ImportTests.selectTemplateByIndex(1);
+    await ImportTests.updateTemplate();
+    await ImportTests.inputTemplateFirstRow('');
+    await ImportTests.increaseTemplateFirstRow();
+    await ImportTests.inputTemplateFirstRow(4);
+    await ImportTests.decreaseTemplateFirstRow();
+    await ImportTests.submitTemplate();
+
+    await ImportTests.submitUploaded(accountFile);
+    await ImportTests.deleteAllItems();
 };
 
 export const importTemplateTests = {
@@ -98,5 +127,6 @@ export const importTemplateTests = {
         await runDeleteTests();
 
         await runAutoSelectTests(files);
+        await runFirstRowTests(files);
     },
 };

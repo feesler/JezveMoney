@@ -8,12 +8,17 @@ import {
     Component,
     Collapsible,
 } from 'jezvejs';
-import { ImportRule } from '../../../js/model/ImportRule.js';
-import { ImportConditionList } from '../../../js/model/ImportConditionList.js';
-import { ImportActionList } from '../../../js/model/ImportActionList.js';
+import { ImportRule } from '../../../../js/model/ImportRule.js';
+import { ImportConditionList } from '../../../../js/model/ImportConditionList.js';
+import { ImportActionList } from '../../../../js/model/ImportActionList.js';
 import { ImportConditionItem } from '../ConditionItem/ImportConditionItem.js';
 import { ImportActionItem } from '../ActionItem/ImportActionItem.js';
 import './style.scss';
+import { PopupMenu } from '../../../PopupMenu/PopupMenu.js';
+
+/** CSS classes */
+const UPDATE_BUTTON_CLASS = 'update-btn';
+const DEL_BUTTON_CLASS = 'delete-btn';
 
 /** Strings */
 const TITLE_CONDITIONS = 'Conditions';
@@ -22,7 +27,7 @@ const TITLE_NO_ACTIONS = 'No actions.';
 const TITLE_NO_CONDITIONS = 'No conditions';
 
 /**
- * ImportRuleItem component constructor
+ * ImportRuleItem component
  * @param {Object} props
  */
 export class ImportRuleItem extends Component {
@@ -36,11 +41,6 @@ export class ImportRuleItem extends Component {
         if (!this.props?.data) {
             throw new Error('Invalid props');
         }
-
-        this.submitHandler = this.props.submit;
-        this.cancelHandler = this.props.cancel;
-        this.updateHandler = this.props.update;
-        this.deleteHandler = this.props.remove;
 
         if (!(this.props.data instanceof ImportRule)) {
             throw new Error('Invalid rule item');
@@ -57,20 +57,6 @@ export class ImportRuleItem extends Component {
         this.valueLabel = ce('span', { className: 'rule-item__value' });
         this.infoLabel = ce('span', { className: 'rule-item__info' });
 
-        // Delete button
-        this.updateBtn = ce(
-            'button',
-            { className: 'btn icon-btn update-btn', type: 'button' },
-            window.app.createIcon('update', 'icon update-icon'),
-            { click: (e) => this.onUpdate(e) },
-        );
-        // Delete button
-        this.delBtn = ce(
-            'button',
-            { className: 'btn icon-btn delete-btn', type: 'button' },
-            window.app.createIcon('del', 'icon delete-icon'),
-            { click: (e) => this.onDelete(e) },
-        );
         // Toggle expand/collapse
         this.toggleExtBtn = ce(
             'button',
@@ -92,9 +78,9 @@ export class ImportRuleItem extends Component {
             this.bottomRow,
         ]);
 
+        this.createMenu();
         this.controls = window.app.createContainer('rule-item__main-controls', [
-            this.updateBtn,
-            this.delBtn,
+            this.menu.elem,
             this.toggleExtBtn,
         ]);
 
@@ -115,6 +101,22 @@ export class ImportRuleItem extends Component {
             ],
         });
         this.elem = this.collapse.elem;
+    }
+
+    createMenu() {
+        this.menu = PopupMenu.create({
+            items: [{
+                icon: 'update',
+                title: 'Edit',
+                className: UPDATE_BUTTON_CLASS,
+                onClick: (e) => this.onUpdate(e),
+            }, {
+                icon: 'del',
+                title: 'Delete',
+                className: DEL_BUTTON_CLASS,
+                onClick: (e) => this.onDelete(e),
+            }],
+        });
     }
 
     /** Set main state of component */
@@ -152,24 +154,22 @@ export class ImportRuleItem extends Component {
     onUpdate(e) {
         e.stopPropagation();
 
-        if (!this.state.ruleId
-            || !isFunction(this.updateHandler)) {
+        if (!this.state.ruleId || !isFunction(this.props.onUpdate)) {
             return;
         }
 
-        this.updateHandler(this.state.ruleId);
+        this.props.onUpdate(this.state.ruleId);
     }
 
     /** Delete button 'click' event handler */
     onDelete(e) {
         e.stopPropagation();
 
-        if (!this.state.ruleId
-            || !isFunction(this.deleteHandler)) {
+        if (!this.state.ruleId || !isFunction(this.props.onRemove)) {
             return;
         }
 
-        this.deleteHandler(this.state.ruleId);
+        this.props.onRemove(this.state.ruleId);
     }
 
     /** Set data for list container */

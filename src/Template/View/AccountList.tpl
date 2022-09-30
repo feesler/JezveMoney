@@ -95,5 +95,6 @@ include(TPL_PATH . "Header.tpl");	?>
 <input id="delaccounts" name="accounts" type="hidden" value="">
 </form>
 
-<?php	include(TPL_PATH . "Icons.tpl");	?>
+<?php	include(ICONS_PATH . "TileIcons.tpl");	?>
+<?php	include(ICONS_PATH . "Common.tpl");	?>
 <?php	include(TPL_PATH . "Footer.tpl");	?>

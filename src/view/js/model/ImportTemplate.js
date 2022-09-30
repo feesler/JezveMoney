@@ -23,7 +23,7 @@ export class ImportTemplate extends ListItem {
      * @param {string} field - field name to check
      */
     isAvailField(field) {
-        const availFields = ['id', 'name', 'type_id', 'columns'];
+        const availFields = ['id', 'name', 'type_id', 'first_row', 'columns'];
 
         return typeof field === 'string' && availFields.includes(field);
     }
@@ -151,7 +151,7 @@ export class ImportTemplate extends ListItem {
     }
 
     /** Apply import template to specified data row */
-    applyTo(data, mainAccount) {
+    convertRow(data, mainAccount) {
         const currencyModel = window.app.model.currency;
         const res = {
             accountAmount: this.getAccountAmount(data),
@@ -184,6 +184,13 @@ export class ImportTemplate extends ListItem {
             throw new ImportTemplateError(MSG_INVALID_TRANSACTION_AMOUNT, 'accountAmount');
         }
 
+        return res;
+    }
+
+    /** Apply import template to specified data */
+    applyTo(data, mainAccount) {
+        const rows = data.slice(this.first_row - 1);
+        const res = rows.map((item) => this.convertRow(item, mainAccount));
         return res;
     }
 }

@@ -15,7 +15,7 @@ UPLOAD_PATH - path to the uploads directory
 LOGS_PATH - path to the logs directory
 */
 
-define("APP_VERSION", "1.27.0");
+define("APP_VERSION", "1.28.0");
 define("APP_PROTOCOL", "https://");
 
 define("PROD_HOST", "jezvemoney.ru");
@@ -106,6 +106,7 @@ function defineHostConstants()
 
     define("TPL_PATH", pathJoin(APP_ROOT, "Template"));
     define("VIEW_TPL_PATH", pathJoin(APP_ROOT, "Template", "View"));
+    define("ICONS_PATH", pathJoin(APP_ROOT, "Template", "Icons"));
     define("ADMIN_TPL_PATH", pathJoin(APP_ROOT, "admin", "Template"));
     define("ADMIN_VIEW_TPL_PATH", pathJoin(APP_ROOT, "admin", "Template", "View"));
     define("UPLOAD_PATH", pathJoin(APP_ROOT, "system", "uploads"));

@@ -8,8 +8,7 @@ import { DARK_THEME } from '../../js/Application.js';
 import './style.scss';
 
 /**
- * Header component constructor
- * @param {Object} props
+ * Header component
  */
 export class Header extends Component {
     /**

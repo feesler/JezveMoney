@@ -1,7 +1,6 @@
 import { copyObject } from 'jezvejs';
 import { ListItem } from './ListItem.js';
-import { ImportTransactionForm } from '../../Components/Import/TransactionForm/ImportTransactionForm.js';
-import { ImportTransactionItem } from '../../Components/Import/TransactionItem/ImportTransactionItem.js';
+import { ImportTransaction } from './ImportTransaction.js';
 
 /** Action types */
 export const IMPORT_ACTION_SET_TR_TYPE = 1;
@@ -156,11 +155,10 @@ export class ImportAction extends ListItem {
 
     /**
      * Execute import action
-     * @param {ImportTransactionForm} context - import item component
+     * @param {ImportTransaction} context - import item component
      */
     execute(context) {
-        if (!(context instanceof ImportTransactionForm)
-            && !(context instanceof ImportTransactionItem)) {
+        if (!(context instanceof ImportTransaction)) {
             throw new Error('Invalid import item');
         }
 
@@ -179,5 +177,30 @@ export class ImportAction extends ListItem {
         } else {
             throw new Error('Invalid action');
         }
+    }
+
+    /** Check action match search filter */
+    isMatchFilter(value) {
+        const lower = value.toLowerCase();
+
+        if (this.isAccountValue()) {
+            const account = window.app.model.accounts.getItem(this.value);
+            if (!account) {
+                return false;
+            }
+
+            return account.name.toLowerCase().includes(lower);
+        }
+
+        if (this.isPersonValue()) {
+            const person = window.app.model.persons.getItem(this.value);
+            if (!person) {
+                return false;
+            }
+
+            return person.name.toLowerCase().includes(lower);
+        }
+
+        return this.value.toLowerCase().includes(lower);
     }
 }

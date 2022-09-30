@@ -165,4 +165,29 @@ export class ImportAction {
 
         context[actionName](this.value);
     }
+
+    /** Check action match search filter */
+    isMatchFilter(value) {
+        const lower = value.toLowerCase();
+
+        if (this.isAccountValue()) {
+            const account = App.state.accounts.getItem(this.value);
+            if (!account) {
+                return false;
+            }
+
+            return account.name.toLowerCase().includes(lower);
+        }
+
+        if (this.isPersonValue()) {
+            const person = App.state.persons.getItem(this.value);
+            if (!person) {
+                return false;
+            }
+
+            return person.name.toLowerCase().includes(lower);
+        }
+
+        return this.value.toLowerCase().includes(lower);
+    }
 }

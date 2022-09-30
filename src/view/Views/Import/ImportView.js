@@ -4,23 +4,25 @@ import {
     re,
     ce,
     show,
-    insertAfter,
+    removeChilds,
     setEvents,
     enable,
     setEmptyClick,
     removeEmptyClick,
+    deepMeet,
     Sortable,
     DropDown,
     Checkbox,
+    Paginator,
 } from 'jezvejs';
-import { timestampFromString } from '../../js/utils.js';
+import { fixFloat, timestampFromString } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import '../../css/app.scss';
 import './style.scss';
-import { ImportUploadDialog } from '../../Components/Import/UploadDialog/ImportUploadDialog.js';
-import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from '../../Components/Import/RulesDialog/ImportRulesDialog.js';
+import { ImportUploadDialog } from '../../Components/Import/UploadDialog/Dialog/ImportUploadDialog.js';
+import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from '../../Components/Import/RulesDialog/Dialog/ImportRulesDialog.js';
 import { ImportTransactionForm } from '../../Components/Import/TransactionForm/ImportTransactionForm.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { API } from '../../js/API.js';
@@ -31,12 +33,15 @@ import {
     TRANSFER,
     DEBT,
 } from '../../js/model/Transaction.js';
+import { ImportTransaction } from '../../js/model/ImportTransaction.js';
 
-const SUBMIT_LIMIT = 100;
 /** Messages */
 const MSG_IMPORT_SUCCESS = 'All transactions have been successfully imported';
 const MSG_IMPORT_FAIL = 'Fail to import transactions';
 const MSG_NO_TRANSACTIONS = 'No transactions to import';
+/** Other */
+const SUBMIT_LIMIT = 100;
+const SHOW_ON_PAGE = 20;
 
 /**
  * Import view constructor
@@ -45,8 +50,16 @@ class ImportView extends View {
     constructor(...args) {
         super(...args);
 
+        this.transactionRows = [];
+
         this.state = {
-            transactionRows: [],
+            items: [],
+            pagination: {
+                onPage: SHOW_ON_PAGE,
+                page: 1,
+                pagesCount: 0,
+                total: 0,
+            },
             activeItemIndex: -1,
             originalItemData: null,
             mainAccount: null,
@@ -128,6 +141,12 @@ class ImportView extends View {
         contentWrapper.append(this.submitProgress.elem);
 
         this.noDataMsg = this.rowsContainer.querySelector('.nodata-message');
+
+        this.paginator = Paginator.create({
+            arrows: true,
+            onChange: (page) => this.onChangePage(page),
+        });
+
         // Data loading indicator
         this.loadingInd = LoadingIndicator.create({ fixed: false });
         this.rowsContainer.append(this.loadingInd.elem);
@@ -144,6 +163,17 @@ class ImportView extends View {
 
         this.updMainAccObj();
         this.setRenderTime();
+    }
+
+    /** Updates list state */
+    updateList() {
+        const { items, pagination } = this.state;
+
+        pagination.pagesCount = Math.ceil(items.length / pagination.onPage);
+        pagination.page = (pagination.pagesCount > 0)
+            ? Math.min(pagination.pagesCount, pagination.page)
+            : 1;
+        pagination.total = items.length;
     }
 
     hideActionsMenu() {
@@ -167,7 +197,7 @@ class ImportView extends View {
 
     /** Import rules 'update' event handler */
     onUpdateRules() {
-        this.reApplyRules();
+        this.applyRules();
     }
 
     /** Show upload file dialog popup */
@@ -190,25 +220,28 @@ class ImportView extends View {
         this.uploadDialog.hide();
 
         this.mapImportedItems(items);
-
-        this.render(this.state);
     }
 
     /** Map data after template applied and request API for transactions in same date range */
-    mapImportedItems(data) {
-        if (!Array.isArray(data)) {
+    mapImportedItems(itemsData) {
+        if (!Array.isArray(itemsData)) {
             throw new Error('Invalid data');
         }
 
-        data.forEach((row) => {
-            const item = this.mapImportItem(row);
-            if (!item) {
+        itemsData.forEach((row) => {
+            const data = this.mapImportItem(row);
+            if (!data) {
                 throw new Error('Failed to map data row');
             }
 
-            this.state.transactionRows.push(item);
-            this.rowsContainer.appendChild(item.elem);
+            const props = this.convertItemDataToProps(data, this.state);
+            const item = new ImportTransaction(props.data);
+            this.state.items.push(item);
         });
+        this.updateList();
+        this.render(this.state);
+
+        this.applyRules(false);
 
         this.requestSimilar();
     }
@@ -218,26 +251,51 @@ class ImportView extends View {
      * @param {Object} data - import data
      */
     mapImportItem(data) {
+        const { mainAccount } = this.state;
+
         if (!data) {
             throw new Error('Invalid data');
         }
 
-        const item = ImportTransactionItem.create({
-            mainAccount: this.state.mainAccount,
+        if (data.accountCurrencyId !== mainAccount.curr_id) {
+            throw new Error('Currency must be the same as main account');
+        }
+        const accAmount = parseFloat(fixFloat(data.accountAmount));
+        if (Number.isNaN(accAmount) || accAmount === 0) {
+            throw new Error('Invalid account amount value');
+        }
+        const trAmount = parseFloat(fixFloat(data.transactionAmount));
+        if (Number.isNaN(trAmount) || trAmount === 0) {
+            throw new Error('Invalid transaction amount value');
+        }
+
+        const item = {
+            enabled: true,
+            type: (accAmount > 0) ? INCOME : EXPENSE,
             originalData: {
                 ...data,
-                origAccount: { ...this.state.mainAccount },
+                origAccount: { ...mainAccount },
             },
-            onEnable: (i) => this.onEnableItem(i),
-            onUpdate: (i) => this.onUpdateItem(i),
-            onRemove: (i) => this.onRemoveItem(i),
-        });
-        item.setOriginal(item.data);
+        };
 
-        if (this.state.rulesEnabled) {
-            window.app.model.rules.applyTo(item);
+        if (item.type === EXPENSE) {
+            item.src_id = mainAccount.id;
+            item.dest_id = 0;
+            item.dest_amount = Math.abs(trAmount);
+            item.dest_curr = data.transactionCurrencyId;
+            item.src_amount = Math.abs(accAmount);
+            item.src_curr = data.accountCurrencyId;
+        } else if (item.type === INCOME) {
+            item.src_id = 0;
+            item.dest_id = mainAccount.id;
+            item.src_amount = Math.abs(trAmount);
+            item.src_curr = data.transactionCurrencyId;
+            item.dest_amount = Math.abs(accAmount);
+            item.dest_curr = data.accountCurrencyId;
         }
-        item.render();
+
+        item.date = window.app.formatDate(new Date(data.date));
+        item.comment = data.comment;
 
         return item;
     }
@@ -288,14 +346,13 @@ class ImportView extends View {
         }
 
         importedItems.forEach((item) => {
-            item.enable(true);
             const data = item.getData();
             const transaction = this.findSameTransaction(data);
             if (transaction) {
                 transaction.picked = true;
-                item.enable(false);
             }
-            item.render();
+
+            item.enable(!transaction);
         });
 
         this.render(this.state);
@@ -366,18 +423,22 @@ class ImportView extends View {
 
     /** Remove all transaction rows */
     removeAllItems() {
-        this.state.transactionRows.forEach((item) => re(item.elem));
-        this.state.transactionRows = [];
+        this.state.items = [];
         this.state.activeItemIndex = -1;
         this.state.originalItemData = null;
+        this.updateList();
         this.render(this.state);
     }
 
     /** Transaction item enable/disable event handler */
     onEnableItem(item) {
-        if (!item) {
+        const index = this.getItemIndex(item);
+        if (index === -1) {
             return;
         }
+
+        const data = this.getItemData(item);
+        this.state.items[index] = data;
 
         this.render(this.state);
     }
@@ -393,21 +454,45 @@ class ImportView extends View {
             return;
         }
 
-        this.state.transactionRows.splice(index, 1);
+        this.state.items.splice(index, 1);
         if (this.state.activeItemIndex === index) {
             this.state.activeItemIndex = -1;
             this.state.originalItemData = null;
         } else if (index < this.state.activeItemIndex) {
             this.state.activeItemIndex -= 1;
         }
-        re(item.elem);
 
+        this.updateList();
         this.render(this.state);
     }
 
-    convertItemDataToProps(data) {
-        const { mainAccount } = this.state;
+    /** Change page event handler */
+    onChangePage(page) {
+        const { activeItemIndex } = this.state;
+
+        if (this.state.pagination.page === page) {
+            return;
+        }
+
+        // Save form data before to change page
+        if (activeItemIndex !== -1) {
+            const pageIndex = this.getPageIndex(activeItemIndex);
+            if (pageIndex.page === this.state.pagination.page) {
+                const form = this.transactionRows[pageIndex.index];
+                const data = new ImportTransaction(form.state.transaction);
+                this.state.items[activeItemIndex] = data;
+            }
+        }
+
+        this.state.pagination.page = page;
+        this.render(this.state);
+    }
+
+    convertItemDataToProps(data, state) {
+        const { mainAccount } = state;
         const res = {
+            mainAccount,
+            enabled: data.enabled,
             sourceAmount: data.src_amount,
             destAmount: data.dest_amount,
             srcCurrId: data.src_curr,
@@ -435,79 +520,95 @@ class ImportView extends View {
             res.personId = data.person_id;
         }
 
-        return res;
+        if (data.originalData) {
+            res.originalData = { ...data.originalData };
+        }
+
+        return { data: res };
+    }
+
+    /** Returns data from transaction component */
+    getItemData(item) {
+        const data = item.getData();
+        data.enabled = item.enabled;
+
+        const original = item.getOriginal();
+        if (original) {
+            data.originalData = { ...original };
+        }
+
+        const itemProps = this.convertItemDataToProps(data, this.state);
+        return new ImportTransaction(itemProps.data);
     }
 
     /** Save form data and replace it by item component */
     saveItem() {
-        const { mainAccount, activeItemIndex } = this.state;
-
+        const { activeItemIndex } = this.state;
         if (activeItemIndex === -1) {
             return true;
         }
 
-        const form = this.state.transactionRows[activeItemIndex];
-        const valid = form.validate();
-        if (!valid) {
-            form.elem.scrollIntoView();
-            return false;
+        const pageIndex = this.getPageIndex(activeItemIndex);
+        if (pageIndex.page === this.state.pagination.page) {
+            const form = this.transactionRows[pageIndex.index];
+            const valid = form.validate();
+            if (!valid) {
+                form.elem.scrollIntoView();
+                return false;
+            }
+
+            const data = this.getItemData(form);
+            this.state.items[activeItemIndex] = data;
+        } else {
+            const formItem = this.state.items[activeItemIndex];
+            const valid = formItem.validate();
+            if (!valid) {
+                this.state.pagination.page = pageIndex.page;
+                this.render(this.state);
+
+                const form = this.transactionRows[pageIndex.index];
+                form.validate();
+                form.elem.scrollIntoView();
+                return false;
+            }
         }
 
-        const data = form.getData();
-        const itemProps = this.convertItemDataToProps(data);
-
-        const item = ImportTransactionItem.create({
-            mainAccount,
-            ...itemProps,
-            originalData: form.getOriginal(),
-            onEnable: (i) => this.onEnableItem(i),
-            onUpdate: (i) => this.onUpdateItem(i),
-            onRemove: (i) => this.onRemoveItem(i),
-        });
-
-        insertAfter(item.elem, form.elem);
-        re(form.elem);
-        this.state.transactionRows.splice(activeItemIndex, 1, item);
         this.state.activeItemIndex = -1;
         this.state.originalItemData = null;
+        this.render(this.state);
 
         return true;
     }
 
     cancelItemEdit() {
-        const { mainAccount, activeItemIndex, originalItemData } = this.state;
+        const { activeItemIndex, originalItemData } = this.state;
         if (activeItemIndex === -1) {
             return;
         }
 
-        const form = this.state.transactionRows[activeItemIndex];
+        const pageIndex = this.getPageIndex(activeItemIndex);
+        if (pageIndex.page !== this.state.pagination.page) {
+            throw new Error('Invalid page');
+        }
+
+        const form = this.transactionRows[pageIndex.index];
         if (!originalItemData) {
             this.onRemoveItem(form);
             return;
         }
 
-        const itemProps = this.convertItemDataToProps(originalItemData);
-
-        const item = ImportTransactionItem.create({
-            mainAccount,
-            ...itemProps,
-            originalData: form.getOriginal(),
-            onEnable: (i) => this.onEnableItem(i),
-            onUpdate: (i) => this.onUpdateItem(i),
-            onRemove: (i) => this.onRemoveItem(i),
-        });
-
-        insertAfter(item.elem, form.elem);
-        re(form.elem);
-        this.state.transactionRows.splice(activeItemIndex, 1, item);
+        this.state.items[activeItemIndex] = originalItemData;
         this.state.activeItemIndex = -1;
         this.state.originalItemData = null;
+        this.render(this.state);
     }
 
     /** Add new transaction row and insert it into list */
     createItem() {
         this.updMainAccObj();
-        if (!this.state.mainAccount) {
+
+        const { mainAccount } = this.state;
+        if (!mainAccount) {
             return;
         }
 
@@ -515,26 +616,38 @@ class ImportView extends View {
             return;
         }
 
-        const form = ImportTransactionForm.create({
-            mainAccount: this.state.mainAccount,
-            onEnable: (i) => this.onEnableItem(i),
-            onRemove: (i) => this.onRemoveItem(i),
-            onSave: () => this.saveItem(),
-            onCancel: () => this.cancelItemEdit(),
-        });
-        this.rowsContainer.append(form.elem);
-        form.elem.scrollIntoView();
-
-        this.state.activeItemIndex = this.state.transactionRows.length;
+        const itemData = {
+            enabled: true,
+            type: EXPENSE,
+            src_amount: '',
+            dest_amount: '',
+            src_curr: mainAccount.curr_id,
+            dest_curr: mainAccount.curr_id,
+            date: window.app.formatDate(new Date()),
+            comment: '',
+        };
+        const itemProps = this.convertItemDataToProps(itemData, this.state);
+        const newItem = new ImportTransaction(itemProps.data);
+        this.state.activeItemIndex = this.state.items.length;
+        this.state.items.push(newItem);
         this.state.originalItemData = null;
-        this.state.transactionRows.push(form);
 
+        this.updateList();
+        this.state.pagination.page = this.state.pagination.pagesCount;
         this.render(this.state);
+
+        const pageIndex = this.getPageIndex(this.state.activeItemIndex);
+        if (pageIndex.page !== this.state.pagination.page) {
+            throw new Error('Invalid page');
+        }
+
+        const form = this.transactionRows[pageIndex.index];
+        form.elem.scrollIntoView();
     }
 
-    onUpdateItem(item) {
-        const { mainAccount, activeItemIndex } = this.state;
-        const index = this.getItemIndex(item);
+    onUpdateItem(transactionItem) {
+        const { activeItemIndex } = this.state;
+        const index = this.getItemIndex(transactionItem);
         if (index === -1 || index === activeItemIndex) {
             return;
         }
@@ -546,23 +659,12 @@ class ImportView extends View {
             }
         }
 
-        const data = item.getData();
-        const formProps = this.convertItemDataToProps(data);
-        const form = ImportTransactionForm.create({
-            mainAccount,
-            ...formProps,
-            originalData: item.getOriginal(),
-            onEnable: (i) => this.onEnableItem(i),
-            onRemove: (i) => this.onRemoveItem(i),
-            onSave: () => this.saveItem(),
-            onCancel: () => this.cancelItemEdit(),
-        });
-
-        insertAfter(form.elem, item.elem);
-        re(item.elem);
-        this.state.transactionRows.splice(index, 1, form);
         this.state.activeItemIndex = index;
-        this.state.originalItemData = { ...data };
+        const item = this.state.items[index];
+        const data = this.getItemData(item);
+
+        this.state.originalItemData = data;
+        this.render(this.state);
     }
 
     /**
@@ -574,11 +676,11 @@ class ImportView extends View {
             return;
         }
 
-        this.state.transactionRows.forEach(
-            (item) => item.onMainAccountChanged(this.state.mainAccount.id),
-        );
-
-        this.reApplyRules();
+        this.state.items.forEach((item) => (
+            item.setMainAccount(this.state.mainAccount.id)
+        ));
+        this.render(this.state);
+        this.applyRules();
 
         if (this.uploadDialog) {
             this.uploadDialog.setMainAccount(this.state.mainAccount);
@@ -593,20 +695,20 @@ class ImportView extends View {
 
     /** Filter imported transaction items */
     getImportedItems() {
-        if (!this.state || !Array.isArray(this.state.transactionRows)) {
+        if (!Array.isArray(this.state?.items)) {
             throw new Error('Invalid state');
         }
 
-        return this.state.transactionRows.filter((item) => item.getOriginal() !== null);
+        return this.state.items.filter((item) => !!item.state.originalData);
     }
 
     /** Filter enabled transaction items */
     getEnabledItems() {
-        if (!this.state || !Array.isArray(this.state.transactionRows)) {
+        if (!Array.isArray(this.state?.items)) {
             throw new Error('Invalid state');
         }
 
-        return this.state.transactionRows.filter((item) => item.enabled);
+        return this.state.items.filter((item) => item.enabled);
     }
 
     /** Submit buttom 'click' event handler */
@@ -690,35 +792,52 @@ class ImportView extends View {
     }
 
     /** Apply rules to imported items */
-    reApplyRules() {
+    applyRules(restore = true) {
         if (!this.state.rulesEnabled) {
             return;
         }
 
         const importedItems = this.getImportedItems();
         importedItems.forEach((item) => {
-            item.restoreOriginal();
-            const applied = window.app.model.rules.applyTo(item);
-            if (applied) {
-                item.render();
+            const index = this.state.items.indexOf(item);
+            if (index === -1) {
+                throw new Error('Invalid item');
             }
+
+            if (restore) {
+                item.restoreOriginal();
+            }
+            window.app.model.rules.applyTo(item);
+
+            const data = this.getItemData(item);
+            this.state.items[index] = data;
         });
+
+        this.render(this.state);
     }
 
     /** Rules checkbox 'change' event handler */
     onToggleEnableRules() {
         this.state.rulesEnabled = !!this.rulesCheck.checked;
-        enable(this.rulesBtn, this.state.rulesEnabled);
 
         const importedItems = this.getImportedItems();
         importedItems.forEach((item) => {
+            const index = this.state.items.indexOf(item);
+            if (index === -1) {
+                throw new Error('Invalid item');
+            }
+
             if (this.state.rulesEnabled) {
                 window.app.model.rules.applyTo(item);
             } else {
                 item.restoreOriginal();
             }
-            item.render();
+
+            const data = this.getItemData(item);
+            this.state.items[index] = data;
         });
+
+        this.render(this.state);
     }
 
     /** Rules button 'click' event handler */
@@ -742,9 +861,35 @@ class ImportView extends View {
         this.rulesDialog.show();
     }
 
+    /** Returns absolute index for relative index on current page */
+    getAbsoluteIndex(index, state = this.state) {
+        if (index === -1) {
+            return index;
+        }
+
+        const { pagination } = state;
+        const firstItemIndex = (pagination.page - 1) * pagination.onPage;
+        return firstItemIndex + index;
+    }
+
+    /** Returns page number and relative index of specified absolute index */
+    getPageIndex(index, state = this.state) {
+        if (index === -1) {
+            return { page: 0, index: -1 };
+        }
+
+        const { pagination } = state;
+
+        return {
+            page: Math.max(1, Math.ceil(index / pagination.onPage)),
+            index: index % pagination.onPage,
+        };
+    }
+
     /** Returns item index in the list */
     getItemIndex(item) {
-        return this.state.transactionRows.indexOf(item);
+        const index = this.transactionRows.indexOf(item);
+        return this.getAbsoluteIndex(index);
     }
 
     /**
@@ -752,7 +897,8 @@ class ImportView extends View {
      * @param {Element} elem - item root element
      */
     getItemIndexByElem(elem) {
-        return this.state.transactionRows.findIndex((item) => (elem === item.elem));
+        const index = this.transactionRows.findIndex((item) => (elem === item.elem));
+        return this.getAbsoluteIndex(index);
     }
 
     /**
@@ -761,7 +907,7 @@ class ImportView extends View {
      * @param {Object} replaced - new item object
      */
     onTransPosChanged(original, replaced) {
-        if (this.state.transactionRows.length < 2) {
+        if (this.state.items.length < 2) {
             return;
         }
 
@@ -771,23 +917,68 @@ class ImportView extends View {
             return;
         }
 
-        const [cutItem] = this.state.transactionRows.splice(origIndex, 1);
-        this.state.transactionRows.splice(replacedIndex, 0, cutItem);
-    }
+        const { activeItemIndex } = this.state;
 
-    render(state) {
-        if (!state) {
-            throw new Error('Invalid state');
+        const [cutItem] = this.state.items.splice(origIndex, 1);
+        this.state.items.splice(replacedIndex, 0, cutItem);
+
+        if (activeItemIndex !== -1) {
+            if (activeItemIndex === origIndex) {
+                this.state.activeItemIndex = replacedIndex;
+            } else if (activeItemIndex > origIndex && activeItemIndex < replacedIndex) {
+                this.state.activeItemIndex -= 1;
+            } else if (activeItemIndex < origIndex && activeItemIndex > replacedIndex) {
+                this.state.activeItemIndex += 1;
+            }
         }
 
-        const hasItems = (state.transactionRows.length > 0);
-        const enabledList = this.getEnabledItems();
+        this.render(this.state);
+    }
 
-        enable(this.submitBtn, (enabledList.length > 0));
-        this.enabledTransCountElem.textContent = enabledList.length;
-        this.transCountElem.textContent = state.transactionRows.length;
+    renderList(state, prevState) {
+        const changed = !deepMeet(prevState.items, state.items);
+        if (!changed) {
+            return;
+        }
 
-        this.clearFormBtn.enable(hasItems);
+        const { activeItemIndex } = state;
+        const hasItems = (state.items.length > 0);
+
+        const firstItem = this.getAbsoluteIndex(0);
+        const lastItem = firstItem + state.pagination.onPage;
+        const items = state.items.slice(firstItem, lastItem);
+
+        this.transactionRows = items.map((item, index) => {
+            const itemProps = {
+                data: item,
+                onEnable: (i) => this.onEnableItem(i),
+                onRemove: (i) => this.onRemoveItem(i),
+            };
+
+            const absIndex = firstItem + index;
+            if (activeItemIndex === absIndex) {
+                return ImportTransactionForm.create({
+                    ...itemProps,
+                    onSave: () => this.saveItem(),
+                    onCancel: () => this.cancelItemEdit(),
+                });
+            }
+
+            return ImportTransactionItem.create({
+                ...itemProps,
+                onUpdate: (i) => this.onUpdateItem(i),
+            });
+        });
+
+        removeChilds(this.rowsContainer);
+        this.transactionRows.forEach((item) => this.rowsContainer.append(item.elem));
+
+        if (state.pagination.pagesCount > 1) {
+            this.rowsContainer.append(this.paginator.elem);
+            this.paginator.setPagesCount(state.pagination.pagesCount);
+            this.paginator.setPage(state.pagination.page);
+        }
+
         if (hasItems) {
             re(this.noDataMsg);
             this.noDataMsg = null;
@@ -795,8 +986,26 @@ class ImportView extends View {
             if (!this.noDataMsg) {
                 this.noDataMsg = ce('span', { className: 'nodata-message', textContent: MSG_NO_TRANSACTIONS });
             }
-            this.rowsContainer.appendChild(this.noDataMsg);
+            this.rowsContainer.append(this.noDataMsg);
         }
+    }
+
+    render(state, prevState = {}) {
+        if (!state) {
+            throw new Error('Invalid state');
+        }
+
+        this.renderList(state, prevState);
+
+        const hasItems = (state.items.length > 0);
+        const enabledList = this.getEnabledItems();
+
+        enable(this.submitBtn, (enabledList.length > 0));
+        this.enabledTransCountElem.textContent = enabledList.length;
+        this.transCountElem.textContent = state.items.length;
+
+        this.clearFormBtn.enable(hasItems);
+        enable(this.rulesBtn, this.state.rulesEnabled);
     }
 }
 

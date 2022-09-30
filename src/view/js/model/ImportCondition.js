@@ -420,4 +420,29 @@ export class ImportCondition extends ListItem {
 
         return this.applyOperator(fieldValue, conditionValue);
     }
+
+    /** Check condition match search filter */
+    isMatchFilter(value) {
+        const lower = value.toLowerCase();
+
+        if (this.isTemplateField()) {
+            const template = window.app.model.templates.getItem(this.value);
+            if (!template) {
+                return false;
+            }
+
+            return template.name.toLowerCase().includes(lower);
+        }
+
+        if (this.isAccountField()) {
+            const account = window.app.model.accounts.getItem(this.value);
+            if (!account) {
+                return false;
+            }
+
+            return account.name.toLowerCase().includes(lower);
+        }
+
+        return this.value.toLowerCase().includes(lower);
+    }
 }

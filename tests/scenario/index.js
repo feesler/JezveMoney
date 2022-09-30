@@ -12,8 +12,8 @@ import * as ApiTests from '../run/api/index.js';
 import * as ProfileTests from '../run/profile.js';
 import * as StatisticsTests from '../run/statistics.js';
 
-import { api } from '../model/api.js';
 import { App } from '../Application.js';
+import { transactionsListTests } from './transactionList.js';
 
 export class Scenario {
     constructor(environment) {
@@ -62,14 +62,6 @@ export class Scenario {
 
         await App.state.fetch();
 
-        await api.profile.resetData({
-            transactions: true,
-            importtpl: true,
-            importrules: true,
-        });
-
-        await transactionTests.prepare();
-
         await importTests.run();
     }
 
@@ -85,6 +77,8 @@ export class Scenario {
         await accountTests.run();
         await personTests.run();
         await transactionTests.run();
+        await transactionsListTests.run();
+        await importTests.run();
 
         await accountTests.runPostTransaction();
         await personTests.runPostTransaction();

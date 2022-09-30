@@ -1,0 +1,89 @@
+/* Import template section */
+
+/* Header */
+.tpl-form-header {
+  display: flex;
+  flex-flow: row;
+  align-items: baseline;
+  margin: 6px 0;
+
+  label {
+    font-size: 24px;
+    font-weight: 100;
+    margin-right: 18px;
+  }
+}
+
+.tpl-form {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+}
+
+/* Raw data table title */
+.tpl-form__title {
+  font-size: 14px;
+}
+
+/* Template form fields: name, column type & etc. */
+.tpl-form-fields {
+  display: flex;
+  flex-flow: row wrap;
+  margin: 4px 0;
+}
+
+.tpl-form-field {
+  display: flex;
+  flex-flow: column nowrap;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  margin-right: 18px;
+  align-items: baseline;
+
+  label {
+    font-size: 14px;
+  }
+
+  input,
+  select {
+    height: 34px;
+    font-size: 14px;
+    padding: 2px 5px;
+    flex: 0 0 auto;
+  }
+
+  .input-group {
+    --ig-height: 34px;
+  }
+}
+
+.template-field {
+  overflow: hidden;
+}
+
+.first-row-field {
+  max-width: 150px;
+}
+
+.tpl-form__select-group {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: baseline;
+  overflow: hidden;
+}
+
+.validation-block.invalid-block .tpl-name-inp {
+  border-color: #ff0000;
+}
+
+.feedback {
+  margin-bottom: 8px;
+}
+
+.feedback.valid-feedback {
+  color: #76ff6d;
+}
+
+.feedback.invalid-feedback {
+  color: #ff6565;
+}

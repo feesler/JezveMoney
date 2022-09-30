@@ -1,6 +1,7 @@
 import { setBlock } from 'jezve-test';
 import {
     IMPORT_COND_FIELD_MAIN_ACCOUNT,
+    IMPORT_COND_FIELD_TPL,
     IMPORT_COND_FIELD_ACC_AMOUNT,
     IMPORT_COND_FIELD_TR_AMOUNT,
     IMPORT_COND_FIELD_DATE,
@@ -21,6 +22,7 @@ import {
 } from '../../model/ImportAction.js';
 import * as ImportTests from '../../run/import/index.js';
 import { api } from '../../model/api.js';
+import * as ImportRuleApiTests from '../../run/api/importrule.js';
 import { App } from '../../Application.js';
 
 // Import rule action form test for no persons
@@ -370,7 +372,7 @@ const runCreateTests = async () => {
 };
 
 // Update import rule tests
-const runUpdateImportRuleTests = async () => {
+const runUpdateTests = async () => {
     setBlock('Update import rules', 1);
 
     setBlock('Update import rule #1', 2);
@@ -410,10 +412,83 @@ const runUpdateImportRuleTests = async () => {
 };
 
 // Delete import rule tests
-const runDeleteImportRuleTests = async () => {
+const runDeleteTests = async () => {
     setBlock('Delete import rules', 1);
     // Delete rule #3
     await ImportTests.deleteRule(2);
+};
+
+// Search import rule tests
+const runSearchTests = async () => {
+    setBlock('Search import rules', 1);
+
+    await ImportTests.inputRulesSearch('MOBILE');
+    await ImportTests.inputRulesSearch('Taxi');
+    await ImportTests.clearRulesSearch();
+};
+
+// Import rules paginator tests
+const runPaginatorTests = async () => {
+    setBlock('Import rules pagination', 1);
+
+    const data = [];
+    const RULES_TO_CREATE = 25;
+    const ruleBase = {
+        flags: 0,
+        conditions: [{
+            field_id: IMPORT_COND_FIELD_COMMENT,
+            operator: IMPORT_COND_OP_EQUAL,
+            value: '',
+            flags: 0,
+        }],
+        actions: [{
+            action_id: IMPORT_ACTION_SET_COMMENT,
+            value: '',
+        }],
+    };
+
+    for (let i = 1; i <= RULES_TO_CREATE; i += 1) {
+        const rule = {
+            ...ruleBase,
+            conditions: [...ruleBase.conditions],
+            actions: [...ruleBase.actions],
+        };
+        rule.conditions[0].value = `Cond ${i}`;
+        rule.actions[0].value = `Act ${i}`;
+        data.push(rule);
+    }
+
+    // Create rules via API
+    const ruleIds = await App.scenario.runner.runGroup(ImportRuleApiTests.create, data);
+    // Refresh page
+    await App.view.navigateToImport();
+    // Iterate rules list pages
+    await ImportTests.iterateRulesList();
+    // Remove previously created rules via API
+    await ImportRuleApiTests.del(ruleIds);
+    // Refresh page
+    await App.view.navigateToImport();
+};
+
+// Create import rule with template condition
+const runCreateTemplateRule = async (templateId) => {
+    setBlock('Create import rule with template condition', 2);
+    await ImportTests.createRule();
+    await ImportTests.createRuleCondition([
+        { action: 'changeFieldType', data: IMPORT_COND_FIELD_TPL },
+        { action: 'changeOperator', data: IMPORT_COND_OP_EQUAL },
+        { action: 'changeTemplate', data: templateId },
+    ]);
+    await ImportTests.createRuleCondition([
+        { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
+        { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
+        { action: 'inputValue', data: 'SALARY' },
+    ]);
+    await ImportTests.createRuleAction([
+        { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
+        { action: 'inputValue', data: 'Salary+Template' },
+    ]);
+    await ImportTests.submitRule();
 };
 
 export const importRuleTests = {
@@ -424,8 +499,16 @@ export const importRuleTests = {
 
         await runValidationTests();
         await runCreateTests();
-        await runUpdateImportRuleTests();
-        await runDeleteImportRuleTests();
+        await runUpdateTests();
+        await runDeleteTests();
+        await runSearchTests();
+        await runPaginatorTests();
+    },
+
+    async createTemplateRule(templateId) {
+        await ImportTests.openRulesDialog();
+
+        await runCreateTemplateRule(templateId);
 
         await ImportTests.closeRulesDialog();
     },

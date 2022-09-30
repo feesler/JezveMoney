@@ -80,6 +80,11 @@ export class ImportRule extends ListItem {
         return (!Number.isNaN(amount) && amount > 0);
     }
 
+    /** Check import rule is match search filter */
+    isMatchFilter(value) {
+        return (this.conditions.isMatchFilter(value) || this.actions.isMatchFilter(value));
+    }
+
     /** Validate import rule */
     validate() {
         const result = { valid: false };

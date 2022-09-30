@@ -14,12 +14,12 @@
                 <div id="login-inp-block" class="validation-block std_margin">
                     <label for="login">Username</label>
                     <input id="login" class="stretch-input" name="login" type="text" autocomplete="off">
-                    <div class="invalid-feedback">Please input you login.</div>
+                    <div class="invalid-feedback">Input your login.</div>
                 </div>
                 <div id="pwd-inp-block" class="validation-block std_margin">
                     <label for="password">Password</label>
                     <input id="password" class="stretch-input" name="password" type="password" autocomplete="off">
-                    <div class="invalid-feedback">Please input correct password.</div>
+                    <div class="invalid-feedback">Input correct password.</div>
                 </div>
                 <div class="std_margin">
                     <label id="rememberCheck" class="checkbox">

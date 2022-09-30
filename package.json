@@ -1,6 +1,6 @@
 {
   "name": "jezve-money",
-  "version": "1.27.0",
+  "version": "1.28.0",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -9,10 +9,10 @@
     "all": "npm-run-all lint build test",
     "test": "node ./tests/index.js",
     "test-partial": "node ./tests/index.js -p",
-    "lint": "npm-run-all lint-src lint-css lint-php lint-tests",
+    "lint": "npm-run-all lint-src lint-style lint-php lint-tests",
     "lint-src": "eslint --quiet ./src/admin/view/ ./src/view/",
     "lint-tests": "eslint -c ./tests.eslintrc.json --quiet ./tests/",
-    "lint-css": "npx stylelint src/view/**/*.scss src/admin/view/**/*.scss",
+    "lint-style": "npx stylelint src/view/**/*.scss src/admin/view/**/*.scss --cache --cache-location .cache/.stylelintcache --rd",
     "debug": "node --inspect-brk ./tests/index.js",
     "build": "npx webpack --config ./webpack.prod.js",
     "build-dev": "npx webpack --config ./webpack.dev.js",
@@ -70,7 +70,7 @@
   "dependencies": {
     "@babel/runtime": "^7.13.9",
     "core-js": "^3.9.1",
-    "jezvejs": "^1.34.0",
+    "jezvejs": "^1.36.2",
     "whatwg-fetch": "^3.6.2"
   }
 }

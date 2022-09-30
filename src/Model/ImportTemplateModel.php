@@ -47,6 +47,7 @@ class ImportTemplateModel extends CachedTable
         $res->name = $row["name"];
         $res->user_id = intval($row["user_id"]);
         $res->type_id = intval($row["type_id"]);
+        $res->first_row = intval($row["first_row"]);
         $res->columns = [
             "date" => intval($row["date_col"]),
             "comment" => intval($row["comment_col"]),
@@ -102,6 +103,14 @@ class ImportTemplateModel extends CachedTable
             $res["type_id"] = intval($params["type_id"]);
         } else {
             $res["type_id"] = 0;
+        }
+
+        if (isset($params["first_row"])) {
+            $res["first_row"] = intval($params["first_row"]);
+            if ($res["first_row"] < 1) {
+                wlog("Invalid first_row specified: " . $params["first_row"]);
+                return null;
+            }
         }
 
         // Check column indexes data
@@ -221,6 +230,7 @@ class ImportTemplateModel extends CachedTable
             return $res;
         }
 
+        $returnIds = isset($params["returnIds"]) ? $params["returnIds"] : false;
         $typeFilter = isset($params["type"]) ? intval($params["type"]) : 0;
         $nameFilter = isset($params["name"]) ? $params["name"] : null;
 
@@ -232,8 +242,7 @@ class ImportTemplateModel extends CachedTable
                 continue;
             }
 
-            $itemObj = new ImportTemplateItem($item);
-            $res[] = $itemObj;
+            $res[] = ($returnIds) ? $item->id : (new ImportTemplateItem($item));
         }
 
         return $res;
@@ -249,6 +258,12 @@ class ImportTemplateModel extends CachedTable
     public function reset()
     {
         if (!self::$user_id) {
+            return false;
+        }
+
+        $items = $this->getData(["returnIds" => true]);
+        $ruleModel = ImportRuleModel::getInstance();
+        if (!$ruleModel->onTemplateDelete($items)) {
             return false;
         }
 

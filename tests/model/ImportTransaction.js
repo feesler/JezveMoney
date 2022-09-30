@@ -10,6 +10,8 @@ import {
     DEBT,
 } from './Transaction.js';
 
+export const sourceTypes = ['expense', 'transferfrom', 'debtfrom'];
+
 export class ImportTransaction {
     /** List of available transaction types */
     static availTypes = [
@@ -100,6 +102,74 @@ export class ImportTransaction {
 
     isDiff() {
         return (this.src_curr !== this.dest_curr);
+    }
+
+    /** Set main account */
+    setMainAccount(value) {
+        const account = App.state.accounts.getItem(value);
+        if (!account) {
+            throw new Error('Account not found');
+        }
+
+        if (this.mainAccount.id === account.id) {
+            return;
+        }
+        this.mainAccount = account;
+
+        const before = {
+            isDiff: this.isDiff(),
+        };
+
+        if (sourceTypes.includes(this.type)) {
+            this.src_id = account.id;
+            this.src_curr = account.curr_id;
+        } else {
+            this.dest_id = account.id;
+            this.dest_curr = account.curr_id;
+        }
+
+        if (this.data) {
+            this.data.mainAccount = account.id;
+        }
+
+        if (this.type === 'expense' || this.type === 'income') {
+            if (!before.isDiff) {
+                // If currencies was the same before, then set source and destination currencies
+                // to as the currency of main account
+                if (this.type === 'expense') {
+                    this.dest_curr = this.src_curr;
+                } else {
+                    this.src_curr = this.dest_curr;
+                }
+            } else if (this.dest_curr === this.src_curr) {
+                // If currencies was different before, but now became same, then
+                // make source and destination amounts same value
+                if (this.type === 'expense') {
+                    this.src_amount = this.dest_amount;
+                } else {
+                    this.dest_amount = this.src_amount;
+                }
+            }
+        } else if (this.type === 'transferfrom' || this.type === 'transferto') {
+            if (this.src_id === this.dest_id) {
+                const accId = App.state.accounts.getNext(this.mainAccount.id);
+                const transferAccount = App.state.accounts.getItem(accId);
+
+                if (this.type === 'transferfrom') {
+                    this.dest_id = transferAccount.id;
+                    this.dest_curr = transferAccount.curr_id;
+                } else {
+                    this.src_id = transferAccount.id;
+                    this.src_curr = transferAccount.curr_id;
+                }
+            }
+        } else if (this.type === 'debtfrom' || this.type === 'debtto') {
+            if (this.type === 'debtfrom') {
+                this.dest_curr = this.src_curr;
+            } else {
+                this.src_curr = this.dest_curr;
+            }
+        }
     }
 
     setTransactionType(value) {

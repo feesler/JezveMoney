@@ -70,7 +70,7 @@ export class ImportConditionItem extends TestComponent {
 
                 res.value = account.id;
             } else if (ImportCondition.isTemplateField(field.id)) {
-                const template = App.state.templates.findByName(value);
+                const template = App.state.templates.find((item) => item.name === value);
                 assert(template, `Template not found: '${value}'`);
 
                 res.value = template.id;
@@ -136,5 +136,18 @@ export class ImportConditionItem extends TestComponent {
         }
 
         return res;
+    }
+
+    static render(item) {
+        assert.instanceOf(item, ImportCondition, 'Invalid item');
+
+        const model = {
+            isFieldValue: item.isPropertyValue(),
+            fieldType: item.field_id,
+            operator: item.operator,
+            value: item.value,
+        };
+
+        return this.getExpectedState(model);
     }
 }

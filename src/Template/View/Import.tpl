@@ -84,5 +84,5 @@ include(TPL_PATH . "Header.tpl");	?>
 <?php	include(TPL_PATH . "Component/tpl/ImportUploadDialog.tpl");	?>
 <?php	include(TPL_PATH . "Component/tpl/ImportRulesDialog.tpl");	?>
 
-<?php	include(TPL_PATH . "Icons.tpl");	?>
+<?php	include(ICONS_PATH . "Common.tpl");	?>
 <?php	include(TPL_PATH . "Footer.tpl");	?>

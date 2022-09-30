@@ -97,10 +97,14 @@
     gap: 16px;
   }
 
-  .update-icon,
-  .delete-icon {
-    width: 24px;
-    height: 24px;
+  /* Menu */
+  .menu-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .actions-menu {
+    margin: 0 4px;
   }
 
   .account-field,

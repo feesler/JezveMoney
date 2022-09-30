@@ -62,12 +62,12 @@ include(TPL_PATH . "Header.tpl");	?>
                         <div id="initbal-inp-block" class="validation-block view-row std_margin">
                             <label for="balance">Initial balance</label>
                             <div class="input-group">
-                                <input id="balance" class="input-group__input stretch-input amount-input" name="initbalance" type="text" autocomplete="off" value="<?=e($accInfo->initbalance)?>">
+                                <input id="balance" class="input-group__input stretch-input right-align-text" name="initbalance" type="text" autocomplete="off" value="<?=e($accInfo->initbalance)?>">
                                 <div class="input-group__btn" disabled>
                                     <div id="currsign"><?=e($accInfo->sign)?></div>
                                 </div>
                             </div>
-                            <div class="invalid-feedback">Please input correct initial balance.</div>
+                            <div class="invalid-feedback">Input correct initial balance.</div>
                         </div>
                         <div class="form-controls">
                             <input class="btn submit-btn" type="submit" value="Submit">
@@ -87,5 +87,6 @@ include(TPL_PATH . "Header.tpl");	?>
 </form>
 <?php	}	?>
 
-<?php	include(TPL_PATH . "Icons.tpl");	?>
+<?php	include(ICONS_PATH . "TileIcons.tpl");	?>
+<?php	include(ICONS_PATH . "Common.tpl");	?>
 <?php	include(TPL_PATH . "Footer.tpl");	?>

@@ -695,6 +695,10 @@
                 <label for="create_tpl_type">Type</label>
                 <input id="create_tpl_type" class="stretch-input" name="type_id" type="text">
             </div>
+            <div class="std_margin">
+                <label for="create_first_row">First row (1-based)</label>
+                <input id="create_first_row" class="stretch-input" name="first_row" type="text">
+            </div>
             <label>Columns (1-based)</label>
 <?php   foreach($tplColumns as $column) { ?>
             <div class="std_margin">
@@ -722,6 +726,10 @@
             <div class="std_margin">
                 <label for="update_tpl_type">Type</label>
                 <input id="update_tpl_type" class="stretch-input" name="type_id" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="update_first_row">First row (1-based)</label>
+                <input id="update_first_row" class="stretch-input" name="first_row" type="text">
             </div>
 <?php   foreach($tplColumns as $column) { ?>
             <div class="std_margin">

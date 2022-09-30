@@ -12,9 +12,11 @@ import {
     InputGroup,
 } from 'jezvejs';
 import { fixFloat } from '../../../js/utils.js';
-import { ImportTransactionBase, sourceTypes } from '../TransactionBase/ImportTransactionBase.js';
+import { ImportTransactionBase } from '../TransactionBase/ImportTransactionBase.js';
 import { Field } from '../../Field/Field.js';
 import './style.scss';
+import { ImportTransaction } from '../../../js/model/ImportTransaction.js';
+import { PopupMenu } from '../../PopupMenu/PopupMenu.js';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'import-form';
@@ -30,7 +32,7 @@ const IG_INPUT_CLASS = 'input-group__input';
 const IG_BUTTON_CLASS = 'input-group__btn';
 const IG_BUTTON_TITLE_CLASS = 'input-group__btn-title';
 const DEFAULT_INPUT_CLASS = 'stretch-input';
-const AMOUNT_INPUT_CLASS = 'amount-input';
+const AMOUNT_INPUT_CLASS = 'right-align-text';
 /* Fields */
 const AMOUNT_FIELD_CLASS = 'amount-field';
 const DATE_FIELD_CLASS = 'date-field';
@@ -40,7 +42,6 @@ const CONTROLS_CLASS = 'controls';
 const DEFAULT_BUTTON_CLASS = 'btn';
 const DEL_BUTTON_CLASS = 'delete-btn';
 const DEFAULT_ICON_CLASS = 'icon';
-const DEL_ICON_CLASS = 'delete-icon';
 const CALENDAR_ICON_CLASS = 'calendar-icon';
 /* Form controls */
 const FORM_CONTROLS_CLASS = 'form-controls';
@@ -58,25 +59,13 @@ const TITLE_FIELD_SRC_ACCOUNT = 'Source account';
 const TITLE_FIELD_DEST_ACCOUNT = 'Destination account';
 const TITLE_FIELD_PERSON = 'Person';
 /* Validation messages */
-const MSG_INCORRECT_AMOUNT = 'Please input correct amount';
-const MSG_INVALID_DATE = 'Please input correct date';
+const MSG_INCORRECT_AMOUNT = 'Input correct amount';
+const MSG_INVALID_DATE = 'Input correct date';
 /* Controls */
 const SAVE_BTN_TITLE = 'Save';
 const CANCEL_BTN_TITLE = 'Cancel';
 
 const defaultProps = {
-    enabled: true,
-    type: 'expense',
-    sourceAccountId: 0,
-    destAccountId: 0,
-    srcCurrId: 0,
-    destCurrId: 0,
-    isDiff: false,
-    sourceAmount: '',
-    destAmount: '',
-    personId: 0,
-    date: null,
-    comment: '',
     onEnable: null,
     onRemove: null,
     onSave: null,
@@ -94,7 +83,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
     constructor(...args) {
         super(...args);
 
-        if (!this.props?.mainAccount) {
+        if (!this.props?.data?.mainAccount) {
             throw new Error('Invalid props');
         }
 
@@ -102,67 +91,19 @@ export class ImportTransactionForm extends ImportTransactionBase {
             ...defaultProps,
             ...this.props,
         };
-        if (this.props.date == null) {
-            this.props.date = window.app.formatDate(new Date());
-        }
 
-        const { mainAccount } = this.props;
-        const state = {
-            mainAccount,
-            ...this.props,
+        this.state = {
+            transaction: new ImportTransaction(this.props.data),
         };
 
-        if (sourceTypes.includes(state.type)) {
-            state.sourceAccountId = mainAccount.id;
-            state.srcCurrId = mainAccount.curr_id;
-            if (!state.destCurrId) {
-                state.destCurrId = mainAccount.curr_id;
-            }
-
-            if (state.type === 'transferfrom') {
-                const account = this.getTransferAccount(state, state.destAccountId);
-                state.destAccountId = account.id;
-                state.destCurrId = account.curr_id;
-            }
-        } else {
-            state.destAccountId = mainAccount.id;
-            state.destCurrId = mainAccount.curr_id;
-            if (!state.srcCurrId) {
-                state.srcCurrId = mainAccount.curr_id;
-            }
-
-            if (state.type === 'transferto') {
-                const account = this.getTransferAccount(state, state.sourceAccountId);
-                state.sourceAccountId = account.id;
-                state.srcCurrId = account.curr_id;
-            }
-        }
-
-        if (state.type === 'debtfrom' || state.type === 'debtto') {
-            if (!state.personId) {
-                const person = window.app.model.persons.getItemByIndex(0);
-                if (!person) {
-                    throw new Error('Person not found');
-                }
-                state.personId = person.id;
-            }
-        }
-
-        this.state = this.checkStateCurrencies(state);
-
-        this.data = null;
-        if (this.props.originalData) {
-            this.saveOriginal(this.props.originalData);
-        }
+        this.menuEmptyClickHandler = () => this.hideMenu();
 
         this.init();
     }
 
-    get enabled() {
-        return this.state.enabled;
-    }
-
     init() {
+        const { createContainer } = window.app;
+
         // Row enable checkbox
         this.enableCheck = Checkbox.create({
             className: ENABLE_CHECK_CLASS,
@@ -175,53 +116,34 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.createSourceAmountField();
         this.createDestAmountField();
         this.createDateField();
+        this.createCommentField();
 
-        // Comment field
-        this.commInp = ce('input', {
-            className: DEFAULT_INPUT_CLASS,
-            type: 'text',
-            name: 'comment[]',
-            placeholder: TITLE_FIELD_COMMENT,
-            autocomplete: 'off',
-        }, null, { input: () => this.onCommentInput() });
-        this.commentField = Field.create({
-            title: TITLE_FIELD_COMMENT,
-            content: this.commInp,
-            className: COMMENT_FIELD_CLASS,
-        });
-        // Delete button
-        this.delBtn = ce(
-            'button',
-            { className: `${DEFAULT_BUTTON_CLASS} ${DEL_BUTTON_CLASS}`, type: 'button' },
-            window.app.createIcon('del', `${DEFAULT_ICON_CLASS} ${DEL_ICON_CLASS}`),
-            { click: () => this.remove() },
-        );
-
-        this.topRow = window.app.createContainer(FORM_ROW_CLASS, [
+        this.topRow = createContainer(FORM_ROW_CLASS, [
             this.dateField.elem,
             this.commentField.elem,
         ]);
 
-        this.formContainer = window.app.createContainer(FORM_CONTAINER_CLASS, [
-            window.app.createContainer(`${FORM_COLUMN_CLASS} ${TYPE_COLUMN_CLASS}`, [
+        this.formContainer = createContainer(FORM_CONTAINER_CLASS, [
+            createContainer(`${FORM_COLUMN_CLASS} ${TYPE_COLUMN_CLASS}`, [
                 this.trTypeField.elem,
                 this.transferAccountField.elem,
                 this.personField.elem,
             ]),
-            window.app.createContainer(`${FORM_COLUMN_CLASS} ${AMOUNT_COLUMN_CLASS}`, [
+            createContainer(`${FORM_COLUMN_CLASS} ${AMOUNT_COLUMN_CLASS}`, [
                 this.srcAmountField.elem,
                 this.destAmountField.elem,
             ]),
-            window.app.createContainer(FORM_COLUMN_CLASS, [
+            createContainer(FORM_COLUMN_CLASS, [
                 this.topRow,
             ]),
         ]);
 
-        this.controls = window.app.createContainer(CONTROLS_CLASS, [
-            this.delBtn,
+        this.createMenu();
+        this.controls = createContainer(CONTROLS_CLASS, [
+            this.menu.elem,
         ]);
 
-        this.mainContainer = window.app.createContainer(MAIN_CONTENT_CLASS, [
+        this.mainContainer = createContainer(MAIN_CONTENT_CLASS, [
             this.enableCheck.elem,
             this.formContainer,
             this.controls,
@@ -252,7 +174,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
             { click: () => this.cancel() },
         );
 
-        this.formControls = window.app.createContainer(FORM_CONTROLS_CLASS, [
+        this.formControls = createContainer(FORM_CONTROLS_CLASS, [
             this.saveBtn,
             this.cancelBtn,
         ]);
@@ -439,6 +361,32 @@ export class ImportTransactionForm extends ImportTransactionBase {
         });
     }
 
+    createCommentField() {
+        this.commInp = ce('input', {
+            className: DEFAULT_INPUT_CLASS,
+            type: 'text',
+            name: 'comment[]',
+            placeholder: TITLE_FIELD_COMMENT,
+            autocomplete: 'off',
+        }, null, { input: () => this.onCommentInput() });
+        this.commentField = Field.create({
+            title: TITLE_FIELD_COMMENT,
+            content: this.commInp,
+            className: COMMENT_FIELD_CLASS,
+        });
+    }
+
+    createMenu() {
+        this.menu = PopupMenu.create({
+            items: [{
+                icon: 'del',
+                title: 'Delete',
+                className: DEL_BUTTON_CLASS,
+                onClick: () => this.remove(),
+            }],
+        });
+    }
+
     /** Transaction type select 'change' event handler */
     onTrTypeChanged(type) {
         this.setTransactionType(type.id);
@@ -559,32 +507,33 @@ export class ImportTransactionForm extends ImportTransactionBase {
     /** Validate transaction object */
     validate() {
         const { state } = this;
+        const transaction = state.transaction.state;
 
-        if (state.type === 'expense') {
-            const destAmountValid = this.validateDestAmount(state);
+        if (transaction.type === 'expense') {
+            const destAmountValid = this.validateDestAmount(transaction);
             if (!destAmountValid) {
                 return false;
             }
-            if (state.isDiff) {
-                const srcAmountValid = this.validateSourceAmount(state);
+            if (transaction.isDiff) {
+                const srcAmountValid = this.validateSourceAmount(transaction);
                 if (!srcAmountValid) {
                     return false;
                 }
             }
         } else {
-            const srcAmountValid = this.validateSourceAmount(state);
+            const srcAmountValid = this.validateSourceAmount(transaction);
             if (!srcAmountValid) {
                 return false;
             }
-            if (state.isDiff) {
-                const destAmountValid = this.validateDestAmount(state);
+            if (transaction.isDiff) {
+                const destAmountValid = this.validateDestAmount(transaction);
                 if (!destAmountValid) {
                     return false;
                 }
             }
         }
 
-        if (!checkDate(state.date)) {
+        if (!checkDate(transaction.date)) {
             window.app.invalidateBlock(this.dateField.elem);
             this.setFeedback(MSG_INVALID_DATE);
             return false;
@@ -641,86 +590,107 @@ export class ImportTransactionForm extends ImportTransactionBase {
         if (!state) {
             throw new Error('Invalid state');
         }
+        const transaction = state.transaction.state;
 
-        const isIncome = state.type === 'income';
-        const isTransfer = ['transferfrom', 'transferto'].includes(state.type);
-        const isDebt = ['debtfrom', 'debtto'].includes(state.type);
+        const isIncome = transaction.type === 'income';
+        const isTransfer = ['transferfrom', 'transferto'].includes(transaction.type);
+        const isDebt = ['debtfrom', 'debtto'].includes(transaction.type);
 
-        enable(this.elem, state.enabled);
+        enable(this.elem, transaction.enabled);
 
-        this.enableCheck.check(state.enabled);
+        this.enableCheck.check(transaction.enabled);
 
         // Type field
-        this.typeDropDown.enable(state.enabled);
-        this.typeDropDown.selectItem(state.type);
+        this.typeDropDown.enable(transaction.enabled);
+        this.typeDropDown.selectItem(transaction.type);
 
         // Amount field
-        if (state.type === 'expense') {
+        if (transaction.type === 'expense') {
             // Destination amount field
-            this.destAmountInp.value = state.destAmount;
-            enable(this.destAmountInp, state.enabled);
-            this.destCurrencyDropDown.enable(state.enabled);
-            enable(this.destCurrencyBtn, state.enabled);
-            this.renderCurrency(this.destCurrencySign, this.destCurrencyDropDown, state.destCurrId);
+            this.destAmountInp.value = transaction.destAmount;
+            enable(this.destAmountInp, transaction.enabled);
+            this.destCurrencyDropDown.enable(transaction.enabled);
+            enable(this.destCurrencyBtn, transaction.enabled);
+            this.renderCurrency(
+                this.destCurrencySign,
+                this.destCurrencyDropDown,
+                transaction.destCurrId,
+            );
             this.destAmountField.show();
 
-            const destAmountLabel = (state.isDiff) ? TITLE_FIELD_DEST_AMOUNT : TITLE_FIELD_AMOUNT;
+            const destAmountLabel = (transaction.isDiff)
+                ? TITLE_FIELD_DEST_AMOUNT
+                : TITLE_FIELD_AMOUNT;
             this.destAmountInp.placeholder = destAmountLabel;
             this.destAmountField.setTitle(destAmountLabel);
 
             // Source amount field
-            this.srcAmountInp.value = state.sourceAmount;
-            enable(this.srcAmountInp, state.enabled && state.isDiff);
+            this.srcAmountInp.value = transaction.sourceAmount;
+            enable(this.srcAmountInp, transaction.enabled && transaction.isDiff);
             this.srcCurrencyDropDown.enable(false);
             enable(this.srcCurrencyBtn, false);
-            this.renderCurrency(this.srcCurrencySign, this.srcCurrencyDropDown, state.srcCurrId);
-            this.srcAmountField.show(state.isDiff);
+            this.renderCurrency(
+                this.srcCurrencySign,
+                this.srcCurrencyDropDown,
+                transaction.srcCurrId,
+            );
+            this.srcAmountField.show(transaction.isDiff);
 
             this.srcAmountInp.placeholder = TITLE_FIELD_SRC_AMOUNT;
             this.srcAmountField.setTitle(TITLE_FIELD_SRC_AMOUNT);
         } else {
             // Source amount field
-            this.srcAmountInp.value = state.sourceAmount;
-            enable(this.srcAmountInp, state.enabled);
-            this.srcCurrencyDropDown.enable(state.enabled && isIncome);
-            enable(this.srcCurrencyBtn, state.enabled && isIncome);
-            this.renderCurrency(this.srcCurrencySign, this.srcCurrencyDropDown, state.srcCurrId);
+            this.srcAmountInp.value = transaction.sourceAmount;
+            enable(this.srcAmountInp, transaction.enabled);
+            this.srcCurrencyDropDown.enable(transaction.enabled && isIncome);
+            enable(this.srcCurrencyBtn, transaction.enabled && isIncome);
+            this.renderCurrency(
+                this.srcCurrencySign,
+                this.srcCurrencyDropDown,
+                transaction.srcCurrId,
+            );
             this.srcAmountField.show();
 
-            const srcAmountLabel = (state.isDiff) ? TITLE_FIELD_SRC_AMOUNT : TITLE_FIELD_AMOUNT;
+            const srcAmountLabel = (transaction.isDiff)
+                ? TITLE_FIELD_SRC_AMOUNT
+                : TITLE_FIELD_AMOUNT;
             this.srcAmountInp.placeholder = srcAmountLabel;
             this.srcAmountField.setTitle(srcAmountLabel);
 
             // Destination amount field
-            this.destAmountInp.value = state.destAmount;
-            enable(this.destAmountInp, state.enabled && state.isDiff);
+            this.destAmountInp.value = transaction.destAmount;
+            enable(this.destAmountInp, transaction.enabled && transaction.isDiff);
             this.destCurrencyDropDown.enable(false);
             enable(this.destCurrencyBtn, false);
-            this.renderCurrency(this.destCurrencySign, this.destCurrencyDropDown, state.destCurrId);
-            this.destAmountField.show(state.isDiff);
+            this.renderCurrency(
+                this.destCurrencySign,
+                this.destCurrencyDropDown,
+                transaction.destCurrId,
+            );
+            this.destAmountField.show(transaction.isDiff);
 
             this.destAmountInp.placeholder = TITLE_FIELD_DEST_AMOUNT;
             this.destAmountField.setTitle(TITLE_FIELD_DEST_AMOUNT);
         }
 
         // Second account field
-        this.transferAccDropDown.enable(state.enabled && isTransfer);
+        this.transferAccDropDown.enable(transaction.enabled && isTransfer);
         if (isTransfer) {
-            const strMainAccountId = state.mainAccount.id.toString();
+            const strMainAccountId = transaction.mainAccount.id.toString();
             const accountItems = this.transferAccDropDown.getVisibleItems();
             accountItems.forEach((accountItem) => this.transferAccDropDown.enableItem(
                 accountItem.id,
                 accountItem.id !== strMainAccountId,
             ));
 
-            const transferAccountId = (state.type === 'transferto')
-                ? state.sourceAccountId
-                : state.destAccountId;
+            const transferAccountId = (transaction.type === 'transferto')
+                ? transaction.sourceAccountId
+                : transaction.destAccountId;
             if (transferAccountId) {
                 this.transferAccDropDown.selectItem(transferAccountId);
             }
 
-            const accountLabel = (state.type === 'transferto')
+            const accountLabel = (transaction.type === 'transferto')
                 ? TITLE_FIELD_SRC_ACCOUNT
                 : TITLE_FIELD_DEST_ACCOUNT;
             this.transferAccountField.setTitle(accountLabel);
@@ -728,19 +698,19 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.transferAccountField.show(isTransfer);
 
         // Person field
-        this.personDropDown.enable(state.enabled && isDebt);
-        if (state.personId) {
-            this.personDropDown.selectItem(state.personId);
+        this.personDropDown.enable(transaction.enabled && isDebt);
+        if (transaction.personId) {
+            this.personDropDown.selectItem(transaction.personId);
         }
         this.personField.show(isDebt);
 
         // Date field
-        enable(this.dateBtn, state.enabled);
-        enable(this.dateInp, state.enabled);
-        this.dateInp.value = state.date;
+        enable(this.dateBtn, transaction.enabled);
+        enable(this.dateInp, transaction.enabled);
+        this.dateInp.value = transaction.date;
 
         // Commend field
-        enable(this.commInp, state.enabled);
-        this.commInp.value = state.comment;
+        enable(this.commInp, transaction.enabled);
+        this.commInp.value = transaction.comment;
     }
 }

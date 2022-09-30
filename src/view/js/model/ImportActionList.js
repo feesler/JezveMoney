@@ -35,6 +35,11 @@ export class ImportActionList extends List {
         return this.filter((item) => item.rule_id === id);
     }
 
+    /** Check list of actions match search query */
+    isMatchFilter(value) {
+        return this.some((action) => action.isMatchFilter(value));
+    }
+
     /** Check list has `Set transaction type` action with 'transferfrom' or 'transferto' value */
     hasSetTransfer() {
         return !!this.find((item) => (
