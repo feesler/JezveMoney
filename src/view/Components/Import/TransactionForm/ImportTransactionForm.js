@@ -16,7 +16,7 @@ import { ImportTransactionBase } from '../TransactionBase/ImportTransactionBase.
 import { Field } from '../../Field/Field.js';
 import './style.scss';
 import { ImportTransaction } from '../../../js/model/ImportTransaction.js';
-import { IconLink } from '../../IconLink/IconLink.js';
+import { PopupMenu } from '../../PopupMenu/PopupMenu.js';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'import-form';
@@ -43,7 +43,6 @@ const DEFAULT_BUTTON_CLASS = 'btn';
 const DEL_BUTTON_CLASS = 'delete-btn';
 const DEFAULT_ICON_CLASS = 'icon';
 const CALENDAR_ICON_CLASS = 'calendar-icon';
-const MENU_ICONLINK_CLASS = 'action-iconlink';
 /* Form controls */
 const FORM_CONTROLS_CLASS = 'form-controls';
 const SUBMIT_BUTTON_CLASS = 'submit-btn';
@@ -139,9 +138,9 @@ export class ImportTransactionForm extends ImportTransactionBase {
             ]),
         ]);
 
-        this.initMenu();
+        this.createMenu();
         this.controls = createContainer(CONTROLS_CLASS, [
-            this.menu,
+            this.menu.elem,
         ]);
 
         this.mainContainer = createContainer(MAIN_CONTENT_CLASS, [
@@ -377,17 +376,15 @@ export class ImportTransactionForm extends ImportTransactionBase {
         });
     }
 
-    initMenu() {
-        this.deleteBtn = IconLink.create({
-            icon: 'del',
-            title: 'Delete',
-            className: [MENU_ICONLINK_CLASS, DEL_BUTTON_CLASS],
-            onClick: () => this.remove(),
+    createMenu() {
+        this.menu = PopupMenu.create({
+            items: [{
+                icon: 'del',
+                title: 'Delete',
+                className: DEL_BUTTON_CLASS,
+                onClick: () => this.remove(),
+            }],
         });
-
-        this.createMenu([
-            this.deleteBtn.elem,
-        ]);
     }
 
     /** Transaction type select 'change' event handler */

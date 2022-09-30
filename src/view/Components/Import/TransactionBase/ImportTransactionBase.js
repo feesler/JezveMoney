@@ -1,9 +1,6 @@
 import {
     ce,
     isFunction,
-    show,
-    setEmptyClick,
-    removeEmptyClick,
     Component,
     Collapsible,
 } from 'jezvejs';
@@ -14,11 +11,6 @@ const DEFAULT_BUTTON_CLASS = 'btn';
 const TOGGLE_BUTTON_CLASS = 'toggle-btn';
 const DEFAULT_ICON_CLASS = 'icon';
 const TOGGLE_ICON_CLASS = 'toggle-icon';
-/* Menu */
-const MENU_CLASS = 'actions-menu';
-const MENU_LIST_CLASS = 'actions-menu-list';
-const MENU_BUTTON_CLASS = 'menu-btn';
-const MENU_ICON_CLASS = 'menu-icon';
 
 /** Base import transaction class */
 export class ImportTransactionBase extends Component {
@@ -56,38 +48,6 @@ export class ImportTransactionBase extends Component {
             window.app.createIcon('toggle-ext', `${DEFAULT_ICON_CLASS} ${TOGGLE_ICON_CLASS}`),
             { click: () => this.toggleCollapse() },
         );
-    }
-
-    createMenu(content) {
-        const { createContainer, createIcon } = window.app;
-
-        this.menuBtn = ce(
-            'button',
-            { className: `${DEFAULT_BUTTON_CLASS} ${MENU_BUTTON_CLASS}`, type: 'button' },
-            createIcon('ellipsis', `${DEFAULT_ICON_CLASS} ${MENU_ICON_CLASS}`),
-            { click: () => this.toggleMenu() },
-        );
-
-        this.menuList = createContainer(MENU_LIST_CLASS, content);
-        show(this.menuList, false);
-        this.menu = createContainer(MENU_CLASS, [
-            this.menuBtn,
-            this.menuList,
-        ]);
-    }
-
-    hideMenu() {
-        show(this.menuList, false);
-        removeEmptyClick(this.menuEmptyClickHandler);
-    }
-
-    toggleMenu() {
-        if (this.menuList.hasAttribute('hidden')) {
-            show(this.menuList, true);
-            setEmptyClick(this.menuEmptyClickHandler);
-        } else {
-            this.hideMenu();
-        }
     }
 
     /** Remove item */
