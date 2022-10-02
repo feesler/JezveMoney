@@ -11,7 +11,7 @@ import {
     InputGroup,
     Paginator,
 } from 'jezvejs';
-import { API } from '../../../../js/API.js';
+import { API } from '../../../../js/api/index.js';
 import { ImportRule } from '../../../../js/model/ImportRule.js';
 import { ImportRuleForm } from '../RuleForm/ImportRuleForm.js';
 import { ImportRuleItem } from '../RuleItem/ImportRuleItem.js';

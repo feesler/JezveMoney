@@ -9,7 +9,7 @@ import {
     DropDown,
     DecimalInput,
 } from 'jezvejs';
-import { API } from '../../../../js/API.js';
+import { API } from '../../../../js/api/index.js';
 import { ImportTemplateError } from '../../../../js/error/ImportTemplateError.js';
 import { ImportTemplate } from '../../../../js/model/ImportTemplate.js';
 import { ConfirmDialog } from '../../../ConfirmDialog/ConfirmDialog.js';

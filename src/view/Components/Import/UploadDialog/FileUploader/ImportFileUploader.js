@@ -5,7 +5,7 @@ import {
     Component,
     Checkbox,
 } from 'jezvejs';
-import { API } from '../../../../js/API.js';
+import { API } from '../../../../js/api/index.js';
 
 /** CSS classes */
 const FILE_NAME_CLASS = 'upload-form__filename';

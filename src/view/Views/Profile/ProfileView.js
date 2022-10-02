@@ -11,7 +11,7 @@ import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import '../../css/app.scss';
 import './style.scss';
-import { API } from '../../js/API.js';
+import { API } from '../../js/api/index.js';
 
 const TITLE_RESET_ACC = 'Reset accounts';
 const MSG_RESET_ACC = 'Are you sure want to reset all your accounts?<br>All accounts and transactions will be lost.';

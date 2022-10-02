@@ -11,7 +11,7 @@ import {
     DropDown,
 } from 'jezvejs';
 import { Application } from '../../js/Application.js';
-import { API } from '../../js/API.js';
+import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';

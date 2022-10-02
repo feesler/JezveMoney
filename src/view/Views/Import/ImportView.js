@@ -25,7 +25,7 @@ import { ImportUploadDialog } from '../../Components/Import/UploadDialog/Dialog/
 import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from '../../Components/Import/RulesDialog/Dialog/ImportRulesDialog.js';
 import { ImportTransactionForm } from '../../Components/Import/TransactionForm/ImportTransactionForm.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { API } from '../../js/API.js';
+import { API } from '../../js/api/index.js';
 import { ImportTransactionItem } from '../../Components/Import/TransactionItem/ImportTransactionItem.js';
 import {
     EXPENSE,
