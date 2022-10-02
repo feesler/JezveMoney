@@ -279,6 +279,10 @@ export const importTests = {
         await ImportTests.submitUploaded({
             data: cardStatement,
         });
+        await ImportTests.addItem();
+        await ImportTests.goToPrevPage();
+        await ImportTests.submit();
+
         // Delete all
         setBlock('Delete all items', 2);
         await ImportTests.deleteAllItems();

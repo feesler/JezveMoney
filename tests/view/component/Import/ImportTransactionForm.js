@@ -166,6 +166,9 @@ export class ImportTransactionForm extends TestComponent {
             this.data.enabled = this.model.enabled;
             this.data.mainAccount = this.model.mainAccount;
             this.data.importType = this.model.type;
+            if (this.model.original) {
+                this.data.original = { ...this.model.original };
+            }
         }
     }
 
@@ -326,6 +329,10 @@ export class ImportTransactionForm extends TestComponent {
         return ImportTransactionForm.getExpectedState(model);
     }
 
+    getAmountValue(value) {
+        return (value === '') ? value : normalize(value);
+    }
+
     getExpectedTransaction(model) {
         const res = {
             type: ImportTransaction.typeFromString(model.type),
@@ -336,9 +343,9 @@ export class ImportTransactionForm extends TestComponent {
             res.dest_id = 0;
             res.src_curr = model.mainAccount.curr_id;
             res.dest_curr = model.destCurrency.id;
-            res.dest_amount = normalize(model.destAmount);
+            res.dest_amount = this.getAmountValue(model.destAmount);
             if (model.isDifferent) {
-                res.src_amount = normalize(model.srcAmount);
+                res.src_amount = this.getAmountValue(model.srcAmount);
             } else {
                 res.src_amount = res.dest_amount;
             }
@@ -347,9 +354,9 @@ export class ImportTransactionForm extends TestComponent {
             res.dest_id = model.mainAccount.id;
             res.src_curr = model.srcCurrency.id;
             res.dest_curr = model.mainAccount.curr_id;
-            res.src_amount = normalize(model.srcAmount);
+            res.src_amount = this.getAmountValue(model.srcAmount);
             if (model.isDifferent) {
-                res.dest_amount = normalize(model.destAmount);
+                res.dest_amount = this.getAmountValue(model.destAmount);
             } else {
                 res.dest_amount = res.src_amount;
             }
@@ -364,9 +371,9 @@ export class ImportTransactionForm extends TestComponent {
             res.dest_id = destAccount.id;
             res.src_curr = srcAccount.curr_id;
             res.dest_curr = destAccount.curr_id;
-            res.src_amount = normalize(model.srcAmount);
+            res.src_amount = this.getAmountValue(model.srcAmount);
             res.dest_amount = (model.isDifferent)
-                ? normalize(model.destAmount)
+                ? this.getAmountValue(model.destAmount)
                 : res.src_amount;
         } else if (res.type === DEBT) {
             assert(model.person, 'Person not found');
@@ -376,7 +383,7 @@ export class ImportTransactionForm extends TestComponent {
             res.op = (model.type === 'debtto') ? 1 : 2;
             res.src_curr = model.mainAccount.curr_id;
             res.dest_curr = model.mainAccount.curr_id;
-            res.src_amount = normalize(model.srcAmount);
+            res.src_amount = this.getAmountValue(model.srcAmount);
             res.dest_amount = res.src_amount;
         }
 

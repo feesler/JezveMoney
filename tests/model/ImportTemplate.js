@@ -120,6 +120,7 @@ export class ImportTemplate {
                 const original = {
                     ...rowData,
                     mainAccount,
+                    origAccount: { ...mainAccount },
                     template: this.id,
                 };
 

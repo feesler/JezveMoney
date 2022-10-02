@@ -617,7 +617,7 @@ export class ImportUploadDialog extends TestComponent {
         this.model.template.first_row = parseInt(val, 10);
         this.expectedState = this.getExpectedState(this.model);
 
-        await input(this.content.firstRowInp.elem, val);
+        await input(this.content.firstRowInp.elem, val.toString());
         await this.parse();
 
         return this.checkState();

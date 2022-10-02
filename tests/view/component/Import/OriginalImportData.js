@@ -59,6 +59,9 @@ export class OriginalImportData extends TestComponent {
         assert(template, `Template '${cont.template}' not found`);
         res.template = template.id;
 
+        res.origAccount = App.state.accounts.findByName(res.mainAccount);
+        assert(res.origAccount, `Account ${res.mainAccount} not found`);
+
         return res;
     }
 }

@@ -16,7 +16,6 @@ import { ImportUploadDialog } from './component/Import/ImportUploadDialog.js';
 import { ImportRulesDialog } from './component/Import/ImportRulesDialog.js';
 import { findSimilarTransaction } from '../model/import.js';
 import { App } from '../Application.js';
-import { ImportTransactionItem } from './component/Import/ImportTransactionItem.js';
 import { ImportTransaction } from '../model/ImportTransaction.js';
 
 const ITEMS_ON_PAGE = 20;
@@ -34,6 +33,7 @@ export class ImportView extends AppView {
         this.rulesPopupId = '#rules_popup';
         this.originalItemData = null;
         this.items = [];
+        this.formIndex = -1;
     }
 
     async parseContent() {
@@ -166,7 +166,23 @@ export class ImportView extends AppView {
         const firstItem = ITEMS_ON_PAGE * (model.pagination.page - 1);
         const lastItem = firstItem + ITEMS_ON_PAGE;
         const pageItems = this.items.slice(firstItem, lastItem);
-        return ImportList.render(pageItems, App.state);
+
+        let relFormIndex = -1;
+        if (this.formIndex !== -1) {
+            const pos = this.getPositionByIndex(this.formIndex);
+            if (pos.page === model.pagination.page) {
+                relFormIndex = pos.index;
+            }
+        }
+
+        return ImportList.render(pageItems, App.state, relFormIndex);
+    }
+
+    getPositionByIndex(index) {
+        return {
+            page: Math.max(1, Math.ceil(index / ITEMS_ON_PAGE)),
+            index: index % ITEMS_ON_PAGE,
+        };
     }
 
     isRulesEnabled() {
@@ -191,6 +207,14 @@ export class ImportView extends AppView {
 
     checkRulesState() {
         this.assertStateId('rules');
+    }
+
+    checkValidIndex(index) {
+        const pos = this.getPositionByIndex(index);
+        assert(
+            pos.page === this.model.pagination.page,
+            `Invalid page ${this.model.pagination.page}, expected: ${pos.page}`,
+        );
     }
 
     async openActionsMenu() {
@@ -272,7 +296,7 @@ export class ImportView extends AppView {
         this.items.forEach((item) => item.setMainAccount(val));
 
         const expectedList = this.getExpectedList();
-        this.expectedState.itemsList = expectedList;
+        this.expectedState.itemsList.items = expectedList.items;
 
         await this.performAction(() => this.content.uploadDialog.selectAccount(val));
 
@@ -411,7 +435,7 @@ export class ImportView extends AppView {
         this.model.enabledCount = enabledItems.length;
 
         this.expectedState = this.getExpectedState();
-        this.expectedState.itemsList = expectedList;
+        this.expectedState.itemsList.items = expectedList.items;
         this.expectedState.uploadDialog = { visible: !isValid };
 
         if (isValid) {
@@ -442,8 +466,6 @@ export class ImportView extends AppView {
 
     async selectMainAccount(val) {
         this.checkMainState();
-
-        this.items.forEach((item) => item.setMainAccount(val));
 
         await this.waitForList(
             () => this.content.mainAccountSelect.selectItem(val),
@@ -642,30 +664,26 @@ export class ImportView extends AppView {
      * @returns form validation result
      */
     async validateSaveForm(action) {
-        const { formIndex } = this.content.itemsList.model;
-        if (formIndex === -1) {
+        if (this.formIndex === -1) {
             return true;
         }
 
-        const form = this.content.itemsList.getItem(formIndex);
-        const expectedTransaction = form.getExpectedTransaction(form.model);
+        const formItem = this.items[this.formIndex];
+        const expectedTransaction = formItem.getExpectedTransaction();
         const isValid = App.state.checkTransactionCorrectness(expectedTransaction);
         if (isValid) {
             return true;
         }
 
-        form.model.invalidated = true;
+        this.model.invalidated = true;
         this.model.menuOpen = false;
-        const expected = this.getExpectedState();
-        const itemsExpected = this.content.itemsList.getExpectedState();
 
-        this.expectedState = {
-            ...expected,
-            itemsList: {
-                ...expected.itemsList,
-                ...itemsExpected,
-            },
-        };
+        const formPos = this.getPositionByIndex(this.formIndex);
+        this.model.pagination.page = formPos.page;
+
+        this.expectedState = this.getExpectedState();
+        const expectedList = this.getExpectedList();
+        this.expectedState.itemsList.items = expectedList.items;
 
         await action();
 
@@ -684,12 +702,11 @@ export class ImportView extends AppView {
             return true;
         }
 
-        const { formIndex } = this.content.itemsList.model;
         const mainAccount = App.state.accounts.getItem(this.model.mainAccount);
 
-        if (formIndex !== -1) {
-            const currentForm = this.content.itemsList.getItem(formIndex);
-            currentForm.model.isForm = false;
+        if (this.formIndex !== -1) {
+            const currentForm = this.items[this.formIndex];
+            currentForm.isForm = false;
         }
 
         this.model.totalCount += 1;
@@ -698,6 +715,7 @@ export class ImportView extends AppView {
 
         const newItem = new ImportTransaction({
             enabled: true,
+            isForm: true,
             mainAccount,
             type: 'expense',
             src_id: mainAccount.id,
@@ -709,18 +727,18 @@ export class ImportView extends AppView {
             date: App.dates.now,
             comment: '',
         });
-        const index = this.items.length;
+        this.formIndex = this.items.length;
         this.items.push(newItem);
 
         const pagesCount = Math.ceil(this.items.length / ITEMS_ON_PAGE);
+        this.model.pagination.pages = pagesCount;
+        this.model.pagination.page = pagesCount;
+
         const firstItem = ITEMS_ON_PAGE * (this.model.pagination.page - 1);
         const lastItem = firstItem + ITEMS_ON_PAGE;
         const pageItems = this.items.slice(firstItem, lastItem);
 
-        this.model.pagination.pages = pagesCount;
-        this.model.pagination.page = pagesCount;
-
-        const relIndex = index - firstItem;
+        const relIndex = this.formIndex - firstItem;
         const expectedItems = ImportList.render(pageItems, App.state, relIndex);
 
         this.expectedState = this.getExpectedState();
@@ -735,13 +753,13 @@ export class ImportView extends AppView {
 
     async updateItemByPos(pos) {
         this.checkMainState();
+        this.checkValidIndex(pos);
 
-        const item = this.content.itemsList.getItem(pos);
-        if (item.content.isForm) {
+        const item = this.items[pos];
+        if (item.isForm) {
             return true;
         }
-        // Get current form
-        const { formIndex } = this.content.itemsList.model;
+
         const updateAction = () => this.runItemAction(pos, { action: 'clickUpdate' });
 
         const isValid = await this.validateSaveForm(updateAction);
@@ -749,23 +767,19 @@ export class ImportView extends AppView {
             return true;
         }
 
-        if (formIndex !== -1) {
-            const currentForm = this.content.itemsList.getItem(formIndex);
-            currentForm.model.isForm = false;
+        if (this.formIndex !== -1) {
+            const currentForm = this.items[this.formIndex];
+            currentForm.isForm = false;
         }
 
-        const newForm = this.content.itemsList.getItem(pos);
+        const newForm = this.items[pos];
+        this.originalItemData = new ImportTransaction(newForm);
 
-        this.originalItemData = newForm.getExpectedTransaction();
-        this.originalItemData.type = newForm.model.type;
-        this.originalItemData.enabled = newForm.model.enabled;
-        const mainAccount = App.state.accounts.getItem(this.model.mainAccount);
-        this.originalItemData.mainAccount = mainAccount;
-
-        newForm.model.isForm = true;
-        this.expectedState = {
-            itemsList: this.content.itemsList.getExpectedState(),
-        };
+        newForm.isForm = true;
+        this.formIndex = pos;
+        this.expectedState = this.getExpectedState();
+        const expectedList = this.getExpectedList();
+        this.expectedState.itemsList.items = expectedList.items;
 
         await updateAction();
 
@@ -775,8 +789,9 @@ export class ImportView extends AppView {
     async saveItem() {
         this.checkMainState();
 
-        const { formIndex } = this.content.itemsList.model;
+        const { formIndex } = this;
         assert(formIndex !== -1, 'Invalid state: import transaction form not available');
+        this.checkValidIndex(formIndex);
 
         const saveAction = () => this.runItemAction(formIndex, { action: 'clickSave' });
 
@@ -785,12 +800,13 @@ export class ImportView extends AppView {
             return true;
         }
 
-        const currentForm = this.content.itemsList.getItem(formIndex);
-        currentForm.model.isForm = false;
+        const currentForm = this.items[this.formIndex];
+        currentForm.isForm = false;
+        this.formIndex = -1;
 
-        this.expectedState = {
-            itemsList: this.content.itemsList.getExpectedState(),
-        };
+        this.expectedState = this.getExpectedState();
+        const expectedList = this.getExpectedList();
+        this.expectedState.itemsList.items = expectedList.items;
 
         await saveAction();
 
@@ -800,8 +816,9 @@ export class ImportView extends AppView {
     async cancelItem() {
         this.checkMainState();
 
-        const { formIndex } = this.content.itemsList.model;
+        const { formIndex } = this;
         assert(formIndex !== -1, 'Invalid state: import transaction form not available');
+        this.checkValidIndex(formIndex);
 
         const cancelAction = () => this.runItemAction(formIndex, { action: 'clickCancel' });
 
@@ -810,20 +827,20 @@ export class ImportView extends AppView {
             return true;
         }
 
-        const expectedList = this.content.itemsList.getExpectedState();
         if (this.originalItemData) {
-            const expectedItem = ImportTransactionItem.render(this.originalItemData, App.state);
-            expectedList.items[formIndex] = expectedItem;
+            const transaction = new ImportTransaction(this.originalItemData);
+            this.items[this.formIndex] = transaction;
         } else {
-            this.model.totalCount -= 1;
-
-            const currentForm = this.content.itemsList.getItem(formIndex);
-            if (currentForm.model.enabled) {
-                this.model.enabledCount += 1;
-            }
+            this.items.splice(this.formIndex, 1);
         }
+        this.formIndex = -1;
+
+        this.model.totalCount = this.items.length;
+        const enabledItems = this.items.filter((item) => item.enabled);
+        this.model.enabledCount = enabledItems.length;
 
         this.expectedState = this.getExpectedState();
+        const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
         this.originalItemData = null;
 
@@ -836,8 +853,9 @@ export class ImportView extends AppView {
         this.checkMainState();
         await this.openActionsMenu();
 
-        this.originalItemData = null;
         this.items = [];
+        this.formIndex = -1;
+        this.originalItemData = null;
 
         await this.performAction(() => this.content.clearBtn.click());
     }
@@ -863,7 +881,7 @@ export class ImportView extends AppView {
 
         this.expectedState = this.getExpectedState();
         const expectedList = this.getExpectedList();
-        this.expectedState.itemsList = expectedList;
+        this.expectedState.itemsList.items = expectedList.items;
 
         for (const ind of indexes) {
             await this.performAction(async () => {
@@ -878,14 +896,25 @@ export class ImportView extends AppView {
     async runItemAction(index, { action, data }) {
         this.checkMainState();
 
-        const item = this.content.itemsList.getItem(index);
+        this.checkValidIndex(index);
+        const position = this.getPositionByIndex(index);
+
+        const item = this.content.itemsList.getItem(position.index);
 
         await this.performAction(() => item.runAction(action, data));
 
-        const updatedItem = this.content.itemsList.getItem(index);
+        const updatedItem = this.content.itemsList.getItem(position.index);
         const itemData = this.content.itemsList.getItemData(updatedItem);
         itemData.type = itemData.importType;
         delete itemData.importType;
+        itemData.isForm = updatedItem.model.isForm;
+
+        if (itemData.original) {
+            const origMainAccount = App.state.accounts.findByName(
+                updatedItem.model.original.mainAccount,
+            );
+            itemData.original.mainAccount = origMainAccount;
+        }
 
         const transaction = new ImportTransaction(itemData);
         this.items[index] = transaction;
@@ -898,11 +927,9 @@ export class ImportView extends AppView {
 
         assert(typeof index !== 'undefined', 'No items specified');
 
-        const { formIndex } = this.content.itemsList.model;
-
         const items = Array.isArray(index) ? index : [index];
         items.sort();
-        if (items.includes(formIndex)) {
+        if (items.includes(this.formIndex)) {
             this.originalItemData = null;
         }
 
@@ -918,7 +945,7 @@ export class ImportView extends AppView {
     async submit() {
         this.checkMainState();
 
-        const enabledItems = this.content.itemsList.getEnabledItems();
+        const enabledItems = this.items.filter((item) => item.enabled);
         const disabled = await prop(this.content.submitBtn.elem, 'disabled');
         assert(disabled === (enabledItems.length === 0), 'Submit is not available');
         if (disabled) {
@@ -932,7 +959,7 @@ export class ImportView extends AppView {
         }
 
         for (const item of enabledItems) {
-            const expectedTransaction = item.getExpectedTransaction(item.model);
+            const expectedTransaction = item.getExpectedTransaction();
             const createRes = App.state.createTransaction(expectedTransaction);
             assert(createRes, 'Failed to create transaction');
         }
@@ -963,9 +990,68 @@ export class ImportView extends AppView {
         };
 
         this.items = [];
+        this.formIndex = -1;
+        this.originalItemData = null;
 
         await this.checkState();
         await this.closeNotification();
         return true;
+    }
+
+    isFirstPage() {
+        this.checkMainState();
+
+        return !this.content.itemsList.paginator || this.content.itemsList.paginator.isFirstPage();
+    }
+
+    isLastPage() {
+        this.checkMainState();
+
+        return !this.content.itemsList.paginator || this.content.itemsList.paginator.isLastPage();
+    }
+
+    async goToFirstPage() {
+        this.checkMainState();
+
+        if (this.isFirstPage()) {
+            return true;
+        }
+
+        this.model.pagination.page = 1;
+        this.expectedState = this.getExpectedState(this.model);
+        const expectedList = this.getExpectedList();
+        this.expectedState.itemsList.items = expectedList.items;
+
+        await this.performAction(() => this.content.itemsList.paginator.goToNextPage());
+
+        return this.checkState();
+    }
+
+    async goToNextPage() {
+        this.checkMainState();
+        assert(!this.isLastPage(), 'Can\'t go to next page');
+
+        this.model.pagination.page += 1;
+        this.expectedState = this.getExpectedState(this.model);
+        const expectedList = this.getExpectedList();
+        this.expectedState.itemsList.items = expectedList.items;
+
+        await this.performAction(() => this.content.itemsList.paginator.goToNextPage());
+
+        return this.checkState();
+    }
+
+    async goToPrevPage() {
+        this.checkMainState();
+        assert(!this.isFirstPage(), 'Can\'t go to previous page');
+
+        this.model.pagination.page -= 1;
+        this.expectedState = this.getExpectedState(this.model);
+        const expectedList = this.getExpectedList();
+        this.expectedState.itemsList.items = expectedList.items;
+
+        await this.performAction(() => this.content.itemsList.paginator.goToPrevPage());
+
+        return this.checkState();
     }
 }

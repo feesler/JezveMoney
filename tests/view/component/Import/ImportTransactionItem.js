@@ -111,6 +111,9 @@ export class ImportTransactionItem extends TestComponent {
             this.data.enabled = this.model.enabled;
             this.data.mainAccount = this.model.mainAccount;
             this.data.importType = this.model.type;
+            if (this.model.original) {
+                this.data.original = { ...this.model.original };
+            }
         }
     }
 

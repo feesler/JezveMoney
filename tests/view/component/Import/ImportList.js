@@ -51,6 +51,10 @@ export class ImportList extends TestComponent {
         return this.content.items;
     }
 
+    get paginator() {
+        return this.content.paginator;
+    }
+
     async buildModel(cont) {
         const res = {
             items: [],

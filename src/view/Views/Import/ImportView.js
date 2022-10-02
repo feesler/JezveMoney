@@ -439,6 +439,8 @@ class ImportView extends View {
 
     /** Remove all transaction rows */
     removeAllItems() {
+        this.hideActionsMenu();
+
         const state = {
             ...this.state,
             items: [],
@@ -663,6 +665,8 @@ class ImportView extends View {
 
     /** Add new transaction row and insert it into list */
     createItem() {
+        this.hideActionsMenu();
+
         const { mainAccount } = this.state;
         if (!mainAccount) {
             return;
@@ -788,12 +792,23 @@ class ImportView extends View {
             throw new Error(`Account ${accountId} not found`);
         }
 
+        const { activeItemIndex } = this.state;
         const state = {
             ...this.state,
             mainAccount,
             items: this.state.items.map((item) => this.setItemMainAccount(item, mainAccount.id)),
             originalItemData: this.setItemMainAccount(this.state.originalItemData, mainAccount.id),
         };
+
+        if (activeItemIndex !== -1) {
+            const pageIndex = this.getPageIndex(activeItemIndex);
+            if (pageIndex.page === state.pagination.page) {
+                const form = this.transactionRows[pageIndex.index];
+                const formData = new ImportTransaction(form.state.transaction);
+                formData.setMainAccount(mainAccount.id);
+                state.items[activeItemIndex] = formData;
+            }
+        }
 
         this.setState(state);
     }
@@ -917,6 +932,8 @@ class ImportView extends View {
 
     /** Rules checkbox 'change' event handler */
     onToggleEnableRules() {
+        this.hideActionsMenu();
+
         const state = {
             ...this.state,
             rulesEnabled: !!this.rulesCheck.checked,
@@ -942,6 +959,8 @@ class ImportView extends View {
 
     /** Rules button 'click' event handler */
     onRulesClick() {
+        this.hideActionsMenu();
+
         if (!this.state.rulesEnabled) {
             return;
         }

@@ -192,6 +192,21 @@ export class ImportRulesDialog extends TestComponent {
         await click(this.content.closeBtn);
     }
 
+    async goToFirstPage() {
+        assert(this.isListState(), 'Invalid state');
+
+        if (this.isFirstPage()) {
+            return true;
+        }
+
+        this.model.pagination.page = 1;
+        this.expectedState = this.getExpectedState(this.model);
+
+        await this.performAction(() => this.content.paginator.goToFirstPage());
+
+        return this.checkState();
+    }
+
     async goToNextPage() {
         assert(this.isListState(), 'Invalid state');
         assert(!this.isLastPage(), 'Can\'t go to next page');
