@@ -232,7 +232,7 @@ class MySqlDB
         if (!$this->selectDB(self::$config["name"])) {
             return false;
         }
-        $this->rawQ("SET NAMES 'utf8';");
+        $this->rawQ("SET NAMES 'utf8mb4';");
         $this->rawQ("SET autocommit=0;");
 
         return true;
@@ -791,6 +791,7 @@ class MySqlDB
         return intval($row["AUTO_INCREMENT"]);
     }
 
+
     // Change table engine
     public function setTableEngine($table, $engine)
     {
@@ -801,6 +802,22 @@ class MySqlDB
         }
 
         $query = "ALTER TABLE `" . $table . "` ENGINE = " . qnull($engine) . ";";
+        $this->rawQ($query);
+
+        return ($this->errno == 0);
+    }
+
+
+    // Change table engine
+    public function convertTableCharset($table, $charset)
+    {
+        $table = $this->escape($table);
+        $charset = $this->escape($charset);
+        if (!$table || $table == "" || !$charset || $charset == "") {
+            return false;
+        }
+
+        $query = "ALTER TABLE `" . $table . "` CONVERT TO CHARACTER SET " . qnull($charset) . ";";
         $this->rawQ($query);
 
         return ($this->errno == 0);

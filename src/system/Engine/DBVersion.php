@@ -11,7 +11,7 @@ class DBVersion
     use Singleton;
 
     protected $tbl_name = "dbver";
-    protected $latestVersion = 10;
+    protected $latestVersion = 11;
     protected $dbClient = null;
     protected $tables = [
         "accounts",
@@ -169,6 +169,9 @@ class DBVersion
             }
             if ($current < 10) {
                 $current = $this->version10();
+            }
+            if ($current < 11) {
+                $current = $this->version11();
             }
 
             $this->setVersion($current);
@@ -367,6 +370,20 @@ class DBVersion
         $this->dbClient->updateQ($tableName, ["first_row" => 2]);
 
         return 10;
+    }
+
+
+    private function version11()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        foreach ($this->tables as $table) {
+            $this->dbClient->convertTableCharset($table, "utf8mb4");
+        }
+
+        return 11;
     }
 
 
