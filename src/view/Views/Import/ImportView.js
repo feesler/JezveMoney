@@ -9,7 +9,6 @@ import {
     enable,
     setEmptyClick,
     removeEmptyClick,
-    deepMeet,
     Sortable,
     DropDown,
     Checkbox,
@@ -43,6 +42,13 @@ const MSG_NO_TRANSACTIONS = 'No transactions to import';
 const SUBMIT_LIMIT = 100;
 const SHOW_ON_PAGE = 20;
 
+const defaultPagination = {
+    onPage: SHOW_ON_PAGE,
+    page: 1,
+    pagesCount: 0,
+    total: 0,
+};
+
 /**
  * Import view constructor
  */
@@ -55,15 +61,11 @@ class ImportView extends View {
         this.state = {
             items: [],
             pagination: {
-                onPage: SHOW_ON_PAGE,
-                page: 1,
-                pagesCount: 0,
-                total: 0,
+                ...defaultPagination,
             },
             activeItemIndex: -1,
             originalItemData: null,
             mainAccount: null,
-            transCache: null,
             rulesEnabled: true,
         };
 
@@ -161,19 +163,29 @@ class ImportView extends View {
             handles: [{ query: 'div' }, { query: 'label' }],
         });
 
-        this.updMainAccObj();
+        const selectedAccount = this.accountDropDown.getSelectionData();
+        if (!selectedAccount) {
+            throw new Error('Invalid selection data');
+        }
+
+        this.setMainAccount(selectedAccount.id);
         this.setRenderTime();
     }
 
     /** Updates list state */
-    updateList() {
-        const { items, pagination } = this.state;
+    updateList(state) {
+        const { items, pagination } = state;
 
-        pagination.pagesCount = Math.ceil(items.length / pagination.onPage);
-        pagination.page = (pagination.pagesCount > 0)
-            ? Math.min(pagination.pagesCount, pagination.page)
-            : 1;
-        pagination.total = items.length;
+        const pagesCount = Math.ceil(items.length / pagination.onPage);
+        const res = {
+            ...pagination,
+            total: items.length,
+            pagesCount,
+        };
+
+        res.page = (pagesCount > 0) ? Math.min(pagesCount, res.page) : 1;
+
+        return res;
     }
 
     hideActionsMenu() {
@@ -228,18 +240,23 @@ class ImportView extends View {
             throw new Error('Invalid data');
         }
 
+        const state = {
+            ...this.state,
+            items: [...this.state.items],
+        };
+
         itemsData.forEach((row) => {
             const data = this.mapImportItem(row);
             if (!data) {
                 throw new Error('Failed to map data row');
             }
 
-            const props = this.convertItemDataToProps(data, this.state);
+            const props = this.convertItemDataToProps(data, state);
             const item = new ImportTransaction(props.data);
-            this.state.items.push(item);
+            state.items.push(item);
         });
-        this.updateList();
-        this.render(this.state);
+        state.pagination = this.updateList(state);
+        this.setState(state);
 
         this.applyRules(false);
 
@@ -310,16 +327,13 @@ class ImportView extends View {
 
         // Obtain date region of imported transactions
         const importedDateRange = { start: 0, end: 0 };
-        const importedItems = this.getImportedItems();
-        importedItems.forEach((item) => {
-            let timestamp;
-
-            try {
-                const date = item.getDate();
-                timestamp = timestampFromString(date);
-            } catch (e) {
+        this.state.items.forEach((item) => {
+            if (!this.isImportedItem(item)) {
                 return;
             }
+
+            const date = item.getDate();
+            const timestamp = timestampFromString(date);
 
             if (importedDateRange.start === 0 || importedDateRange.start > timestamp) {
                 importedDateRange.start = timestamp;
@@ -337,25 +351,41 @@ class ImportView extends View {
         };
 
         // Send request
+        let transCache = null;
         try {
             const result = await API.transaction.list(reqParams);
-            this.state.transCache = result.data.items;
+            transCache = result.data.items;
         } catch (e) {
             this.loadingInd.hide();
             return;
         }
 
-        importedItems.forEach((item) => {
-            const data = item.getData();
-            const transaction = this.findSameTransaction(data);
-            if (transaction) {
-                transaction.picked = true;
-            }
+        const state = {
+            ...this.state,
+            items: this.state.items.map((item) => {
+                if (!this.isImportedItem(item)) {
+                    return item;
+                }
 
-            item.enable(!transaction);
-        });
+                const data = item.getData();
+                const transaction = this.findSameTransaction(transCache, data);
+                if (transaction) {
+                    transaction.picked = true;
+                }
 
-        this.render(this.state);
+                const enableItem = !transaction;
+                if (item.enabled === enableItem) {
+                    return item;
+                }
+
+                const newItem = new ImportTransaction(item);
+                newItem.enable(enableItem);
+                return newItem;
+            }),
+        };
+
+        this.setState(state);
+
         this.loadingInd.hide();
         this.setRenderTime();
     }
@@ -371,9 +401,11 @@ class ImportView extends View {
         }
 
         // Check date, source and destination accounts
-        if (item.src_id !== reference.src_id
+        if (
+            item.src_id !== reference.src_id
             || item.dest_id !== reference.dest_id
-            || item.date !== reference.date) {
+            || item.date !== reference.date
+        ) {
             return false;
         }
 
@@ -381,8 +413,10 @@ class ImportView extends View {
         // Source and destination amount can be swapped
         const refSrcAmount = Math.abs(reference.src_amount);
         const refDestAmount = Math.abs(reference.dest_amount);
-        if ((item.src_amount !== refSrcAmount && item.src_amount !== refDestAmount)
-            || (item.dest_amount !== refDestAmount && item.dest_amount !== refSrcAmount)) {
+        if (
+            (item.src_amount !== refSrcAmount && item.src_amount !== refDestAmount)
+            || (item.dest_amount !== refDestAmount && item.dest_amount !== refSrcAmount)
+        ) {
             return false;
         }
 
@@ -390,57 +424,55 @@ class ImportView extends View {
     }
 
     /** Return first found transaction with same date and amount as reference */
-    findSameTransaction(reference) {
-        return this.state.transCache.find(
-            (item) => (item && !item.picked && this.isSameTransaction(item, reference)),
-        );
+    findSameTransaction(transactions, reference) {
+        return transactions.find((item) => (
+            item
+            && !item.picked
+            && this.isSameTransaction(item, reference)
+        ));
     }
 
     /** Initial account of upload change callback */
     onUploadAccChange(accountId) {
-        if (this.state.mainAccount.id === accountId) {
-            return;
-        }
-
-        this.accountDropDown.selectItem(accountId.toString());
-        this.onMainAccChange();
-    }
-
-    /** Refresh main account at model according to current selection */
-    updMainAccObj() {
-        let account = null;
-
-        const selectedAccount = this.accountDropDown.getSelectionData();
-        if (selectedAccount) {
-            account = window.app.model.accounts.getItem(selectedAccount.id);
-        }
-        if (!account) {
-            throw new Error('Account not found');
-        }
-
-        this.state.mainAccount = account;
+        this.setMainAccount(accountId);
     }
 
     /** Remove all transaction rows */
     removeAllItems() {
-        this.state.items = [];
-        this.state.activeItemIndex = -1;
-        this.state.originalItemData = null;
-        this.updateList();
-        this.render(this.state);
+        const state = {
+            ...this.state,
+            items: [],
+            activeItemIndex: -1,
+            originalItemData: null,
+        };
+        state.pagination = this.updateList(state);
+
+        this.setState(state);
     }
 
     /** Transaction item enable/disable event handler */
-    onEnableItem(item) {
-        const index = this.getItemIndex(item);
+    onEnableItem(i, value) {
+        const index = this.getItemIndex(i);
         if (index === -1) {
             return;
         }
 
-        const data = this.getItemData(item);
-        this.state.items[index] = data;
+        const state = {
+            ...this.state,
+            items: this.state.items.map((item, ind) => {
+                if (ind !== index) {
+                    return item;
+                }
+                if (item.enabled === value) {
+                    return item;
+                }
 
-        this.render(this.state);
+                const newItem = new ImportTransaction(item);
+                newItem.enable(value);
+                return newItem;
+            }),
+        };
+        this.setState(state);
     }
 
     /**
@@ -454,16 +486,20 @@ class ImportView extends View {
             return;
         }
 
-        this.state.items.splice(index, 1);
-        if (this.state.activeItemIndex === index) {
-            this.state.activeItemIndex = -1;
-            this.state.originalItemData = null;
-        } else if (index < this.state.activeItemIndex) {
-            this.state.activeItemIndex -= 1;
+        const state = {
+            ...this.state,
+            items: this.state.items.filter((_, ind) => (ind !== index)),
+        };
+
+        if (state.activeItemIndex === index) {
+            state.activeItemIndex = -1;
+            state.originalItemData = null;
+        } else if (index < state.activeItemIndex) {
+            state.activeItemIndex -= 1;
         }
 
-        this.updateList();
-        this.render(this.state);
+        state.pagination = this.updateList(state);
+        this.setState(state);
     }
 
     /** Change page event handler */
@@ -474,18 +510,25 @@ class ImportView extends View {
             return;
         }
 
+        const state = {
+            ...this.state,
+        };
+
         // Save form data before to change page
         if (activeItemIndex !== -1) {
             const pageIndex = this.getPageIndex(activeItemIndex);
             if (pageIndex.page === this.state.pagination.page) {
                 const form = this.transactionRows[pageIndex.index];
                 const data = new ImportTransaction(form.state.transaction);
-                this.state.items[activeItemIndex] = data;
+
+                state.items = this.state.items.map((item, ind) => (
+                    (ind === activeItemIndex) ? data : item
+                ));
             }
         }
 
-        this.state.pagination.page = page;
-        this.render(this.state);
+        state.pagination.page = page;
+        this.setState(state);
     }
 
     convertItemDataToProps(data, state) {
@@ -527,6 +570,11 @@ class ImportView extends View {
         return { data: res };
     }
 
+    /** Returns true if specified item was imported */
+    isImportedItem(item) {
+        return !!item?.state?.originalData;
+    }
+
     /** Returns data from transaction component */
     getItemData(item) {
         const data = item.getData();
@@ -558,24 +606,39 @@ class ImportView extends View {
             }
 
             const data = this.getItemData(form);
-            this.state.items[activeItemIndex] = data;
+
+            this.setState({
+                ...this.state,
+                items: this.state.items.map((item, ind) => (
+                    (ind === activeItemIndex) ? data : item
+                )),
+                activeItemIndex: -1,
+                originalItemData: null,
+            });
         } else {
             const formItem = this.state.items[activeItemIndex];
             const valid = formItem.validate();
             if (!valid) {
-                this.state.pagination.page = pageIndex.page;
-                this.render(this.state);
+                this.setState({
+                    ...this.state,
+                    pagination: {
+                        ...this.state.pagination,
+                        page: pageIndex.page,
+                    },
+                });
 
                 const form = this.transactionRows[pageIndex.index];
                 form.validate();
                 form.elem.scrollIntoView();
                 return false;
             }
-        }
 
-        this.state.activeItemIndex = -1;
-        this.state.originalItemData = null;
-        this.render(this.state);
+            this.setState({
+                ...this.state,
+                activeItemIndex: -1,
+                originalItemData: null,
+            });
+        }
 
         return true;
     }
@@ -597,16 +660,19 @@ class ImportView extends View {
             return;
         }
 
-        this.state.items[activeItemIndex] = originalItemData;
-        this.state.activeItemIndex = -1;
-        this.state.originalItemData = null;
-        this.render(this.state);
+        const state = {
+            ...this.state,
+            items: this.state.items.map((item, ind) => (
+                (ind === activeItemIndex) ? originalItemData : item
+            )),
+            activeItemIndex: -1,
+            originalItemData: null,
+        };
+        this.setState(state);
     }
 
     /** Add new transaction row and insert it into list */
     createItem() {
-        this.updMainAccObj();
-
         const { mainAccount } = this.state;
         if (!mainAccount) {
             return;
@@ -628,13 +694,16 @@ class ImportView extends View {
         };
         const itemProps = this.convertItemDataToProps(itemData, this.state);
         const newItem = new ImportTransaction(itemProps.data);
-        this.state.activeItemIndex = this.state.items.length;
-        this.state.items.push(newItem);
-        this.state.originalItemData = null;
 
-        this.updateList();
-        this.state.pagination.page = this.state.pagination.pagesCount;
-        this.render(this.state);
+        const state = {
+            ...this.state,
+            items: [...this.state.items, newItem],
+            activeItemIndex: this.state.items.length,
+            originalItemData: null,
+        };
+        state.pagination = this.updateList(state);
+        state.pagination.page = state.pagination.pagesCount;
+        this.setState(state);
 
         const pageIndex = this.getPageIndex(this.state.activeItemIndex);
         if (pageIndex.page !== this.state.pagination.page) {
@@ -659,27 +728,28 @@ class ImportView extends View {
             }
         }
 
-        this.state.activeItemIndex = index;
         const item = this.state.items[index];
         const data = this.getItemData(item);
+        const state = {
+            ...this.state,
+            items: [...this.state.items],
+            activeItemIndex: index,
+            originalItemData: data,
+        };
 
-        this.state.originalItemData = data;
-        this.render(this.state);
+        this.setState(state);
     }
 
     /**
      * Main account select event handler
      */
     onMainAccChange() {
-        this.updMainAccObj();
-        if (!this.state.mainAccount) {
-            return;
+        const selected = this.accountDropDown.getSelectionData();
+        if (!selected) {
+            throw new Error('Invalid selection data');
         }
 
-        this.state.items.forEach((item) => (
-            item.setMainAccount(this.state.mainAccount.id)
-        ));
-        this.render(this.state);
+        this.setMainAccount(selected.id);
         this.applyRules();
 
         if (this.uploadDialog) {
@@ -693,22 +763,37 @@ class ImportView extends View {
         }
     }
 
-    /** Filter imported transaction items */
-    getImportedItems() {
-        if (!Array.isArray(this.state?.items)) {
-            throw new Error('Invalid state');
+    /** Set main account */
+    setMainAccount(accountId) {
+        if (this.state.mainAccount?.id === accountId) {
+            return;
         }
 
-        return this.state.items.filter((item) => !!item.state.originalData);
+        const mainAccount = window.app.model.accounts.getItem(accountId);
+        if (!mainAccount) {
+            throw new Error(`Account ${accountId} not found`);
+        }
+
+        const state = {
+            ...this.state,
+            mainAccount,
+            items: this.state.items.map((item) => {
+                const newItem = new ImportTransaction(item);
+                newItem.setMainAccount(mainAccount.id);
+                return newItem;
+            }),
+        };
+
+        this.setState(state);
     }
 
     /** Filter enabled transaction items */
-    getEnabledItems() {
-        if (!Array.isArray(this.state?.items)) {
+    getEnabledItems(state = this.state) {
+        if (!Array.isArray(state?.items)) {
             throw new Error('Invalid state');
         }
 
-        return this.state.items.filter((item) => item.enabled);
+        return state.items.filter((item) => item.enabled);
     }
 
     /** Submit buttom 'click' event handler */
@@ -797,47 +882,51 @@ class ImportView extends View {
             return;
         }
 
-        const importedItems = this.getImportedItems();
-        importedItems.forEach((item) => {
-            const index = this.state.items.indexOf(item);
-            if (index === -1) {
-                throw new Error('Invalid item');
+        const state = {
+            ...this.state,
+            rulesEnabled: !!this.rulesCheck.checked,
+        };
+
+        state.items = this.state.items.map((item) => {
+            if (!this.isImportedItem(item)) {
+                return item;
             }
 
+            const newItem = new ImportTransaction(item);
             if (restore) {
-                item.restoreOriginal();
+                newItem.restoreOriginal();
             }
-            window.app.model.rules.applyTo(item);
+            window.app.model.rules.applyTo(newItem);
 
-            const data = this.getItemData(item);
-            this.state.items[index] = data;
+            return this.getItemData(newItem);
         });
 
-        this.render(this.state);
+        this.setState(state);
     }
 
     /** Rules checkbox 'change' event handler */
     onToggleEnableRules() {
-        this.state.rulesEnabled = !!this.rulesCheck.checked;
+        const state = {
+            ...this.state,
+            rulesEnabled: !!this.rulesCheck.checked,
+        };
 
-        const importedItems = this.getImportedItems();
-        importedItems.forEach((item) => {
-            const index = this.state.items.indexOf(item);
-            if (index === -1) {
-                throw new Error('Invalid item');
+        state.items = this.state.items.map((item) => {
+            if (!this.isImportedItem(item)) {
+                return item;
             }
 
-            if (this.state.rulesEnabled) {
-                window.app.model.rules.applyTo(item);
+            const newItem = new ImportTransaction(item);
+            if (state.rulesEnabled) {
+                window.app.model.rules.applyTo(newItem);
             } else {
-                item.restoreOriginal();
+                newItem.restoreOriginal();
             }
 
-            const data = this.getItemData(item);
-            this.state.items[index] = data;
+            return this.getItemData(newItem);
         });
 
-        this.render(this.state);
+        this.setState(state);
     }
 
     /** Rules button 'click' event handler */
@@ -868,6 +957,10 @@ class ImportView extends View {
         }
 
         const { pagination } = state;
+        if (!pagination) {
+            return index;
+        }
+
         const firstItemIndex = (pagination.page - 1) * pagination.onPage;
         return firstItemIndex + index;
     }
@@ -919,43 +1012,76 @@ class ImportView extends View {
 
         const { activeItemIndex } = this.state;
 
-        const [cutItem] = this.state.items.splice(origIndex, 1);
-        this.state.items.splice(replacedIndex, 0, cutItem);
+        const state = {
+            ...this.state,
+            items: [...this.state.items],
+        };
+
+        const [cutItem] = state.items.splice(origIndex, 1);
+        state.items.splice(replacedIndex, 0, cutItem);
 
         if (activeItemIndex !== -1) {
             if (activeItemIndex === origIndex) {
-                this.state.activeItemIndex = replacedIndex;
+                state.activeItemIndex = replacedIndex;
             } else if (activeItemIndex > origIndex && activeItemIndex < replacedIndex) {
-                this.state.activeItemIndex -= 1;
+                state.activeItemIndex -= 1;
             } else if (activeItemIndex < origIndex && activeItemIndex > replacedIndex) {
-                this.state.activeItemIndex += 1;
+                state.activeItemIndex += 1;
             }
         }
 
-        this.render(this.state);
+        this.setState(state);
+    }
+
+    setState(state) {
+        if (this.state === state) {
+            return;
+        }
+
+        this.render(state, this.state);
+        this.state = state;
     }
 
     renderList(state, prevState) {
-        const changed = !deepMeet(prevState.items, state.items);
-        if (!changed) {
+        if (state.items === prevState.items) {
             return;
         }
 
         const { activeItemIndex } = state;
         const hasItems = (state.items.length > 0);
 
-        const firstItem = this.getAbsoluteIndex(0);
+        const firstItem = this.getAbsoluteIndex(0, state);
         const lastItem = firstItem + state.pagination.onPage;
         const items = state.items.slice(firstItem, lastItem);
 
-        this.transactionRows = items.map((item, index) => {
+        let prevItems = null;
+        let prevFirstItem = 0;
+        let prevActiveItemIndex = -1;
+        if (prevState.items) {
+            prevActiveItemIndex = prevState.activeItemIndex;
+            prevFirstItem = this.getAbsoluteIndex(0, prevState);
+            const prevLastItem = prevFirstItem + prevState.pagination.onPage;
+            prevItems = prevState.items.slice(prevFirstItem, prevLastItem);
+        }
+
+        const rows = items.map((item, index) => {
+            const absIndex = firstItem + index;
+
+            const isSameItem = !!(prevItems && prevItems[index] && prevItems[index] === item);
+            const isFormItem = activeItemIndex === absIndex;
+            const isPrevFormItem = prevActiveItemIndex === absIndex;
+
+            // Check item not changed
+            if (isSameItem && isFormItem === isPrevFormItem) {
+                return this.transactionRows[index];
+            }
+
             const itemProps = {
                 data: item,
-                onEnable: (i) => this.onEnableItem(i),
+                onEnable: (i, val) => this.onEnableItem(i, val),
                 onRemove: (i) => this.onRemoveItem(i),
             };
 
-            const absIndex = firstItem + index;
             if (activeItemIndex === absIndex) {
                 return ImportTransactionForm.create({
                     ...itemProps,
@@ -969,6 +1095,8 @@ class ImportView extends View {
                 onUpdate: (i) => this.onUpdateItem(i),
             });
         });
+
+        this.transactionRows = rows;
 
         removeChilds(this.rowsContainer);
         this.transactionRows.forEach((item) => this.rowsContainer.append(item.elem));
@@ -997,8 +1125,11 @@ class ImportView extends View {
 
         this.renderList(state, prevState);
 
+        const accountId = state.mainAccount.id;
+        this.accountDropDown.selectItem(accountId.toString());
+
         const hasItems = (state.items.length > 0);
-        const enabledList = this.getEnabledItems();
+        const enabledList = this.getEnabledItems(state);
 
         enable(this.submitBtn, (enabledList.length > 0));
         this.enabledTransCountElem.textContent = enabledList.length;
