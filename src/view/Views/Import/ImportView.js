@@ -512,6 +512,10 @@ class ImportView extends View {
 
         const state = {
             ...this.state,
+            pagination: {
+                ...this.state.pagination,
+                page,
+            },
         };
 
         // Save form data before to change page
@@ -520,6 +524,7 @@ class ImportView extends View {
             if (pageIndex.page === this.state.pagination.page) {
                 const form = this.transactionRows[pageIndex.index];
                 const data = new ImportTransaction(form.state.transaction);
+                data.isForm = true;
 
                 state.items = this.state.items.map((item, ind) => (
                     (ind === activeItemIndex) ? data : item
@@ -527,7 +532,6 @@ class ImportView extends View {
             }
         }
 
-        state.pagination.page = page;
         this.setState(state);
     }
 
@@ -535,6 +539,7 @@ class ImportView extends View {
         const { mainAccount } = state;
         const res = {
             mainAccount,
+            isForm: data.isForm,
             enabled: data.enabled,
             sourceAmount: data.src_amount,
             destAmount: data.dest_amount,
@@ -575,20 +580,6 @@ class ImportView extends View {
         return !!item?.state?.originalData;
     }
 
-    /** Returns data from transaction component */
-    getItemData(item) {
-        const data = item.getData();
-        data.enabled = item.enabled;
-
-        const original = item.getOriginal();
-        if (original) {
-            data.originalData = { ...original };
-        }
-
-        const itemProps = this.convertItemDataToProps(data, this.state);
-        return new ImportTransaction(itemProps.data);
-    }
-
     /** Save form data and replace it by item component */
     saveItem() {
         const { activeItemIndex } = this.state;
@@ -596,6 +587,7 @@ class ImportView extends View {
             return true;
         }
 
+        let savedItem = null;
         const pageIndex = this.getPageIndex(activeItemIndex);
         if (pageIndex.page === this.state.pagination.page) {
             const form = this.transactionRows[pageIndex.index];
@@ -605,16 +597,8 @@ class ImportView extends View {
                 return false;
             }
 
-            const data = this.getItemData(form);
-
-            this.setState({
-                ...this.state,
-                items: this.state.items.map((item, ind) => (
-                    (ind === activeItemIndex) ? data : item
-                )),
-                activeItemIndex: -1,
-                originalItemData: null,
-            });
+            savedItem = new ImportTransaction(form.state.transaction);
+            savedItem.isForm = false;
         } else {
             const formItem = this.state.items[activeItemIndex];
             const valid = formItem.validate();
@@ -633,12 +617,18 @@ class ImportView extends View {
                 return false;
             }
 
-            this.setState({
-                ...this.state,
-                activeItemIndex: -1,
-                originalItemData: null,
-            });
+            savedItem = new ImportTransaction(formItem);
+            savedItem.isForm = false;
         }
+
+        this.setState({
+            ...this.state,
+            items: this.state.items.map((item, ind) => (
+                (ind === activeItemIndex) ? savedItem : item
+            )),
+            activeItemIndex: -1,
+            originalItemData: null,
+        });
 
         return true;
     }
@@ -683,6 +673,7 @@ class ImportView extends View {
         }
 
         const itemData = {
+            isForm: true,
             enabled: true,
             type: EXPENSE,
             src_amount: '',
@@ -728,13 +719,22 @@ class ImportView extends View {
             }
         }
 
-        const item = this.state.items[index];
-        const data = this.getItemData(item);
+        const itemToUpdate = this.state.items[index];
+        const originalItemData = new ImportTransaction(itemToUpdate);
         const state = {
             ...this.state,
-            items: [...this.state.items],
+            items: this.state.items.map((item, ind) => {
+                const isForm = (ind === index);
+                if (item.isForm === isForm) {
+                    return item;
+                }
+
+                const newItem = new ImportTransaction(item);
+                newItem.isForm = isForm;
+                return newItem;
+            }),
             activeItemIndex: index,
-            originalItemData: data,
+            originalItemData,
         };
 
         this.setState(state);
@@ -763,6 +763,20 @@ class ImportView extends View {
         }
     }
 
+    setItemMainAccount(item, accountId) {
+        if (!item) {
+            return null;
+        }
+
+        if (item?.mainAccount?.id === accountId) {
+            return item;
+        }
+
+        const newItem = new ImportTransaction(item);
+        newItem.setMainAccount(accountId);
+        return newItem;
+    }
+
     /** Set main account */
     setMainAccount(accountId) {
         if (this.state.mainAccount?.id === accountId) {
@@ -777,11 +791,8 @@ class ImportView extends View {
         const state = {
             ...this.state,
             mainAccount,
-            items: this.state.items.map((item) => {
-                const newItem = new ImportTransaction(item);
-                newItem.setMainAccount(mainAccount.id);
-                return newItem;
-            }),
+            items: this.state.items.map((item) => this.setItemMainAccount(item, mainAccount.id)),
+            originalItemData: this.setItemMainAccount(this.state.originalItemData, mainAccount.id),
         };
 
         this.setState(state);
@@ -898,7 +909,7 @@ class ImportView extends View {
             }
             window.app.model.rules.applyTo(newItem);
 
-            return this.getItemData(newItem);
+            return newItem;
         });
 
         this.setState(state);
@@ -923,7 +934,7 @@ class ImportView extends View {
                 newItem.restoreOriginal();
             }
 
-            return this.getItemData(newItem);
+            return newItem;
         });
 
         this.setState(state);
@@ -1043,11 +1054,13 @@ class ImportView extends View {
     }
 
     renderList(state, prevState) {
-        if (state.items === prevState.items) {
+        if (
+            state.items === prevState.items
+            && state.pagination === prevState.pagination
+        ) {
             return;
         }
 
-        const { activeItemIndex } = state;
         const hasItems = (state.items.length > 0);
 
         const firstItem = this.getAbsoluteIndex(0, state);
@@ -1055,24 +1068,16 @@ class ImportView extends View {
         const items = state.items.slice(firstItem, lastItem);
 
         let prevItems = null;
-        let prevFirstItem = 0;
-        let prevActiveItemIndex = -1;
         if (prevState.items) {
-            prevActiveItemIndex = prevState.activeItemIndex;
-            prevFirstItem = this.getAbsoluteIndex(0, prevState);
+            const prevFirstItem = this.getAbsoluteIndex(0, prevState);
             const prevLastItem = prevFirstItem + prevState.pagination.onPage;
             prevItems = prevState.items.slice(prevFirstItem, prevLastItem);
         }
 
         const rows = items.map((item, index) => {
-            const absIndex = firstItem + index;
-
-            const isSameItem = !!(prevItems && prevItems[index] && prevItems[index] === item);
-            const isFormItem = activeItemIndex === absIndex;
-            const isPrevFormItem = prevActiveItemIndex === absIndex;
-
             // Check item not changed
-            if (isSameItem && isFormItem === isPrevFormItem) {
+            const isSameItem = !!(prevItems && prevItems[index] && prevItems[index] === item);
+            if (isSameItem) {
                 return this.transactionRows[index];
             }
 
@@ -1082,7 +1087,7 @@ class ImportView extends View {
                 onRemove: (i) => this.onRemoveItem(i),
             };
 
-            if (activeItemIndex === absIndex) {
+            if (item.isForm) {
                 return ImportTransactionForm.create({
                     ...itemProps,
                     onSave: () => this.saveItem(),

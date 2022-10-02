@@ -507,6 +507,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
     /** Validate transaction object */
     validate() {
         const { state } = this;
+        const isDiff = state.transaction.isDiff();
         const transaction = state.transaction.state;
 
         if (transaction.type === 'expense') {
@@ -514,7 +515,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
             if (!destAmountValid) {
                 return false;
             }
-            if (transaction.isDiff) {
+            if (isDiff) {
                 const srcAmountValid = this.validateSourceAmount(transaction);
                 if (!srcAmountValid) {
                     return false;
@@ -525,7 +526,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
             if (!srcAmountValid) {
                 return false;
             }
-            if (transaction.isDiff) {
+            if (isDiff) {
                 const destAmountValid = this.validateDestAmount(transaction);
                 if (!destAmountValid) {
                     return false;
@@ -590,6 +591,8 @@ export class ImportTransactionForm extends ImportTransactionBase {
         if (!state) {
             throw new Error('Invalid state');
         }
+
+        const isDiff = state.transaction.isDiff();
         const transaction = state.transaction.state;
 
         const isIncome = transaction.type === 'income';
@@ -618,7 +621,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
             );
             this.destAmountField.show();
 
-            const destAmountLabel = (transaction.isDiff)
+            const destAmountLabel = (isDiff)
                 ? TITLE_FIELD_DEST_AMOUNT
                 : TITLE_FIELD_AMOUNT;
             this.destAmountInp.placeholder = destAmountLabel;
@@ -626,7 +629,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
 
             // Source amount field
             this.srcAmountInp.value = transaction.sourceAmount;
-            enable(this.srcAmountInp, transaction.enabled && transaction.isDiff);
+            enable(this.srcAmountInp, transaction.enabled && isDiff);
             this.srcCurrencyDropDown.enable(false);
             enable(this.srcCurrencyBtn, false);
             this.renderCurrency(
@@ -634,7 +637,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
                 this.srcCurrencyDropDown,
                 transaction.srcCurrId,
             );
-            this.srcAmountField.show(transaction.isDiff);
+            this.srcAmountField.show(isDiff);
 
             this.srcAmountInp.placeholder = TITLE_FIELD_SRC_AMOUNT;
             this.srcAmountField.setTitle(TITLE_FIELD_SRC_AMOUNT);
@@ -651,7 +654,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
             );
             this.srcAmountField.show();
 
-            const srcAmountLabel = (transaction.isDiff)
+            const srcAmountLabel = (isDiff)
                 ? TITLE_FIELD_SRC_AMOUNT
                 : TITLE_FIELD_AMOUNT;
             this.srcAmountInp.placeholder = srcAmountLabel;
@@ -659,7 +662,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
 
             // Destination amount field
             this.destAmountInp.value = transaction.destAmount;
-            enable(this.destAmountInp, transaction.enabled && transaction.isDiff);
+            enable(this.destAmountInp, transaction.enabled && isDiff);
             this.destCurrencyDropDown.enable(false);
             enable(this.destCurrencyBtn, false);
             this.renderCurrency(
@@ -667,7 +670,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
                 this.destCurrencyDropDown,
                 transaction.destCurrId,
             );
-            this.destAmountField.show(transaction.isDiff);
+            this.destAmountField.show(isDiff);
 
             this.destAmountInp.placeholder = TITLE_FIELD_DEST_AMOUNT;
             this.destAmountField.setTitle(TITLE_FIELD_DEST_AMOUNT);
