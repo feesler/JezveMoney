@@ -1,5 +1,5 @@
 import {
-    ce,
+    createElement,
     enable,
     isFunction,
     copyObject,
@@ -24,6 +24,11 @@ const MSG_NO_DATA = 'No data';
 const MSG_NO_ACTIONS = 'No actions';
 const MSG_NO_CONDITIONS = 'No conditions';
 
+const defaultProps = {
+    onSubmit: null,
+    onCancel: null,
+};
+
 /**
  * ImportRuleForm component
  */
@@ -38,15 +43,14 @@ export class ImportRuleForm extends Component {
         if (!this.props || !this.props.data) {
             throw new Error('Invalid props');
         }
-
-        this.submitHandler = this.props.submit;
-        this.cancelHandler = this.props.cancel;
-        this.updateHandler = this.props.update;
-        this.deleteHandler = this.props.remove;
-
         if (!(this.props.data instanceof ImportRule)) {
             throw new Error('Invalid rule item');
         }
+
+        this.props = {
+            ...defaultProps,
+            ...this.props,
+        };
 
         this.fieldTypes = ImportCondition.getFieldTypes();
         this.actionTypes = ImportAction.getTypes();
@@ -59,24 +63,25 @@ export class ImportRuleForm extends Component {
     /** Form controls initialization */
     init() {
         // Hidden id input
-        this.idInput = ce('input', { type: 'hidden' });
+        this.idInput = createElement('input', { props: { type: 'hidden' } });
         // Conditions
-        this.createCondBtn = ce(
-            'button',
-            { className: 'btn link-btn create-btn', type: 'button', textContent: BTN_CREATE_CONDITION },
-            null,
-            { click: (e) => this.onCreateConditionClick(e) },
-        );
-        this.toggleCondBtn = ce(
-            'button',
-            { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
-            window.app.createIcon('toggle-ext', 'icon toggle-icon'),
-        );
+        this.createCondBtn = createElement('button', {
+            props: {
+                className: 'btn link-btn create-btn',
+                type: 'button',
+                textContent: BTN_CREATE_CONDITION,
+            },
+            events: { click: (e) => this.onCreateConditionClick(e) },
+        });
+        this.toggleCondBtn = createElement('button', {
+            props: { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
+            children: window.app.createIcon('toggle-ext', 'icon toggle-icon'),
+        });
 
-        this.conditionsCollapse = new Collapsible({
+        this.conditionsCollapse = Collapsible.create({
             className: 'rule-form-collapse',
             header: [
-                ce('label', { textContent: TITLE_CONDITIONS }),
+                createElement('label', { props: { textContent: TITLE_CONDITIONS } }),
                 this.createCondBtn,
                 this.toggleCondBtn,
             ],
@@ -85,22 +90,19 @@ export class ImportRuleForm extends Component {
         });
 
         // Actions
-        this.createActionBtn = ce(
-            'button',
-            { className: 'btn link-btn create-btn', type: 'button', textContent: BTN_CREATE_ACTION },
-            null,
-            { click: (e) => this.onCreateActionClick(e) },
-        );
-        this.toggleActionsBtn = ce(
-            'button',
-            { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
-            window.app.createIcon('toggle-ext', 'icon toggle-icon'),
-        );
+        this.createActionBtn = createElement('button', {
+            props: { className: 'btn link-btn create-btn', type: 'button', textContent: BTN_CREATE_ACTION },
+            events: { click: (e) => this.onCreateActionClick(e) },
+        });
+        this.toggleActionsBtn = createElement('button', {
+            props: { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
+            children: window.app.createIcon('toggle-ext', 'icon toggle-icon'),
+        });
 
         this.actionsCollapse = new Collapsible({
             className: 'rule-form-collapse',
             header: [
-                ce('label', { textContent: TITLE_ACTIONS }),
+                createElement('label', { props: { textContent: TITLE_ACTIONS } }),
                 this.createActionBtn,
                 this.toggleActionsBtn,
             ],
@@ -109,21 +111,17 @@ export class ImportRuleForm extends Component {
         });
 
         // Controls
-        this.saveBtn = ce(
-            'button',
-            { className: 'btn submit-btn', type: 'button', textContent: BTN_SAVE },
-            null,
-            { click: () => this.onSubmit() },
-        );
-        this.cancelBtn = ce(
-            'button',
-            { className: 'btn link-btn cancel-btn', type: 'button', textContent: BTN_CANCEL },
-            null,
-            { click: () => this.onCancel() },
-        );
+        this.saveBtn = createElement('button', {
+            props: { className: 'btn submit-btn', type: 'button', textContent: BTN_SAVE },
+            events: { click: () => this.onSubmit() },
+        });
+        this.cancelBtn = createElement('button', {
+            props: { className: 'btn link-btn cancel-btn', type: 'button', textContent: BTN_CANCEL },
+            events: { click: () => this.onCancel() },
+        });
 
         // Invalid feedback message
-        this.validFeedback = ce('div', { className: 'invalid-feedback' });
+        this.validFeedback = createElement('div', { props: { className: 'invalid-feedback' } });
         this.feedbackContainer = window.app.createContainer(
             'rule-form__feedback validation-block',
             this.validFeedback,
@@ -364,15 +362,15 @@ export class ImportRuleForm extends Component {
             return;
         }
 
-        if (isFunction(this.submitHandler)) {
-            this.submitHandler(this.getData(this.state));
+        if (isFunction(this.props.onSubmit)) {
+            this.props.onSubmit(this.getData(this.state));
         }
     }
 
     /** Cancel button 'click' event handler */
     onCancel() {
-        if (isFunction(this.cancelHandler)) {
-            this.cancelHandler();
+        if (isFunction(this.props.onCancel)) {
+            this.props.onCancel();
         }
     }
 
@@ -414,7 +412,9 @@ export class ImportRuleForm extends Component {
             const dataItems = data.map((item) => item.elem);
             container.setContent(dataItems);
         } else {
-            const noDataMsgElem = ce('span', { className: 'nodata-message', textContent: message });
+            const noDataMsgElem = createElement('span', {
+                props: { className: 'nodata-message', textContent: message },
+            });
             container.setContent(noDataMsgElem);
         }
     }
@@ -436,10 +436,12 @@ export class ImportRuleForm extends Component {
 
         this.validateActionsAvail(state);
 
-        if (state.validation
+        if (
+            state.validation
             && !state.validation.valid
             && !('conditionIndex' in state.validation)
-            && !('actionIndex' in state.validation)) {
+            && !('actionIndex' in state.validation)
+        ) {
             this.validFeedback.textContent = state.validation.message;
             window.app.invalidateBlock(this.feedbackContainer);
         } else {
@@ -452,8 +454,8 @@ export class ImportRuleForm extends Component {
             const props = {
                 data: action,
                 isValid: true,
-                update: (data) => this.onActionUpdate(index, data),
-                remove: () => this.onActionDelete(index),
+                onUpdate: (data) => this.onActionUpdate(index, data),
+                onRemove: () => this.onActionDelete(index),
             };
 
             if (
@@ -465,7 +467,7 @@ export class ImportRuleForm extends Component {
                 props.message = state.validation.message;
             }
 
-            return new ImportActionForm(props);
+            return ImportActionForm.create(props);
         });
         this.setListContainerData(this.actionsCollapse, actionItems, MSG_NO_ACTIONS);
 
@@ -474,18 +476,20 @@ export class ImportRuleForm extends Component {
             const props = {
                 data: condition,
                 isValid: true,
-                update: (data) => this.onConditionUpdate(index, data),
-                remove: () => this.onConditionDelete(index),
+                onUpdate: (data) => this.onConditionUpdate(index, data),
+                onRemove: () => this.onConditionDelete(index),
             };
 
-            if (state.validation
+            if (
+                state.validation
                 && !state.validation.valid
-                && state.validation.conditionIndex === index) {
+                && state.validation.conditionIndex === index
+            ) {
                 props.isValid = false;
                 props.message = state.validation.message;
             }
 
-            return new ImportConditionForm(props);
+            return ImportConditionForm.create(props);
         });
         this.setListContainerData(this.conditionsCollapse, conditionItems, MSG_NO_CONDITIONS);
     }

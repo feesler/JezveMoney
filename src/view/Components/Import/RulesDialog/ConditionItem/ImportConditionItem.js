@@ -1,4 +1,4 @@
-import { ce, Component } from 'jezvejs';
+import { createElement, Component } from 'jezvejs';
 import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,
@@ -24,11 +24,6 @@ export class ImportConditionItem extends Component {
             throw new Error('Invalid props');
         }
 
-        this.submitHandler = this.props.submit;
-        this.cancelHandler = this.props.cancel;
-        this.updateHandler = this.props.update;
-        this.deleteHandler = this.props.remove;
-
         if (!(this.props.data instanceof ImportCondition)) {
             throw new Error('Invalid rule item');
         }
@@ -39,9 +34,9 @@ export class ImportConditionItem extends Component {
 
     /** Main structure initialization */
     init() {
-        this.propertyLabel = ce('span', { className: 'cond-item__property' });
-        this.operatorLabel = ce('span', { className: 'cond-item__operator' });
-        this.valueLabel = ce('span', { className: 'cond-item__value' });
+        this.propertyLabel = createElement('span', { props: { className: 'cond-item__property' } });
+        this.operatorLabel = createElement('span', { props: { className: 'cond-item__operator' } });
+        this.valueLabel = createElement('span', { props: { className: 'cond-item__value' } });
 
         this.elem = window.app.createContainer('cond-item', [
             this.propertyLabel,

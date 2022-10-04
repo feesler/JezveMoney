@@ -1,5 +1,5 @@
 import {
-    ce,
+    createElement,
     show,
     isFunction,
     Component,
@@ -32,6 +32,11 @@ const INV_FEEDBACK_CLASS = 'invalid-feedback';
 /** Strings */
 const LABEL_PROPERTY_CMP = 'Compare with another property';
 
+const defaultProps = {
+    onUpdate: null,
+    onRemove: null,
+};
+
 /**
  * ImportConditionForm component
  */
@@ -46,13 +51,15 @@ export class ImportConditionForm extends Component {
         if (!this.props || !this.props.data) {
             throw new Error('Invalid props');
         }
-
-        this.updateHandler = this.props.update;
-        this.deleteHandler = this.props.remove;
-
         if (!(this.props.data instanceof ImportCondition)) {
             throw new Error('Invalid condition item');
         }
+
+        this.props = {
+            ...defaultProps,
+            ...this.props,
+        };
+
         this.props.data.isValid = this.props.isValid;
         this.props.data.message = this.props.message;
 
@@ -73,19 +80,19 @@ export class ImportConditionForm extends Component {
         this.createValuePropField();
 
         // Create amount input element
-        this.amountInput = ce('input', { className: `stretch-input ${AMOUNT_FIELD_CLASS}`, type: 'text' });
+        this.amountInput = createElement('input', {
+            props: { className: `stretch-input ${AMOUNT_FIELD_CLASS}`, type: 'text' },
+        });
         this.decAmountInput = DecimalInput.create({
             elem: this.amountInput,
             digits: 2,
             oninput: () => this.onValueChange(),
         });
         // Create text value input element
-        this.valueInput = ce(
-            'input',
-            { className: `stretch-input ${TEXT_FIELD_CLASS}`, type: 'text' },
-            null,
-            { input: () => this.onValueChange() },
-        );
+        this.valueInput = createElement('input', {
+            props: { className: `stretch-input ${TEXT_FIELD_CLASS}`, type: 'text' },
+            events: { input: () => this.onValueChange() },
+        });
 
         // Field value checkbox
         this.fieldValueCheck = Checkbox.create({
@@ -109,7 +116,7 @@ export class ImportConditionForm extends Component {
         ]);
 
         // Invalid feedback message
-        this.validFeedback = ce('div', { className: INV_FEEDBACK_CLASS });
+        this.validFeedback = createElement('div', { props: { className: INV_FEEDBACK_CLASS } });
         this.container = window.app.createContainer(`${CONTAINER_CLASS} ${VALIDATION_CLASS}`, [
             this.fields,
             this.fieldValueCheck.elem,
@@ -117,12 +124,11 @@ export class ImportConditionForm extends Component {
         ]);
 
         // Delete button
-        this.delBtn = ce(
-            'button',
-            { className: 'btn icon-btn delete-btn', type: 'button' },
-            window.app.createIcon('del', 'icon delete-icon'),
-            { click: () => this.onDelete() },
-        );
+        this.delBtn = createElement('button', {
+            props: { className: 'btn icon-btn delete-btn', type: 'button' },
+            children: window.app.createIcon('del', 'icon delete-icon'),
+            events: { click: () => this.onDelete() },
+        });
         this.controls = window.app.createContainer(CONTROLS_CLASS, this.delBtn);
 
         this.elem = window.app.createContainer(FORM_CLASS, [
@@ -397,15 +403,15 @@ export class ImportConditionForm extends Component {
 
     /** Send component 'update' event */
     sendUpdate() {
-        if (isFunction(this.updateHandler)) {
-            this.updateHandler(this.getData(this.state));
+        if (isFunction(this.props.onUpdate)) {
+            this.props.onUpdate(this.getData(this.state));
         }
     }
 
     /** Delete button 'click' event handler */
     onDelete() {
-        if (isFunction(this.deleteHandler)) {
-            this.deleteHandler();
+        if (isFunction(this.props.onRemove)) {
+            this.props.onRemove();
         }
     }
 

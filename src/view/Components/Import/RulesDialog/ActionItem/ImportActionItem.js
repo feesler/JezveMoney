@@ -1,4 +1,4 @@
-import { ce, Component } from 'jezvejs';
+import { createElement, Component } from 'jezvejs';
 import {
     ImportAction,
     IMPORT_ACTION_SET_TR_TYPE,
@@ -32,8 +32,8 @@ export class ImportActionItem extends Component {
 
     /** Component initialization */
     init() {
-        this.actionTypeLabel = ce('span', { className: 'action-item__type' });
-        this.valueLabel = ce('span', { className: 'action-item__value' });
+        this.actionTypeLabel = createElement('span', { props: { className: 'action-item__type' } });
+        this.valueLabel = createElement('span', { props: { className: 'action-item__value' } });
 
         this.elem = window.app.createContainer('action-item', [
             this.actionTypeLabel,

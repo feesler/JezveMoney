@@ -1,6 +1,6 @@
 import {
     ge,
-    ce,
+    createElement,
     re,
     removeChilds,
     show,
@@ -345,7 +345,9 @@ export class ImportRulesDialog extends Component {
         removeChilds(this.listContainer);
         if (!ruleItems.length) {
             const message = (state.filter !== '') ? MSG_NOT_FOUND : MSG_NO_RULES;
-            this.noDataMsg = ce('span', { className: 'nodata-message', textContent: message });
+            this.noDataMsg = createElement('span', {
+                props: { className: 'nodata-message', textContent: message },
+            });
             this.listContainer.append(this.noDataMsg);
         } else {
             ruleItems.forEach((item) => this.listContainer.append(item.elem));
@@ -377,8 +379,8 @@ export class ImportRulesDialog extends Component {
 
         this.formContainer = ImportRuleForm.create({
             data: state.rule,
-            submit: (data) => this.onSubmitItem(data),
-            cancel: () => this.onCancelItem(),
+            onSubmit: (data) => this.onSubmitItem(data),
+            onCancel: () => this.onCancelItem(),
         });
 
         insertAfter(this.formContainer.elem, this.listContainer);
