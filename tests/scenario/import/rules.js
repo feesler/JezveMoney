@@ -120,13 +120,84 @@ const runValidationTests = async () => {
     ]);
     await ImportTests.submitRule();
     await ImportTests.deleteRuleCondition(3);
+    await ImportTests.deleteRuleAction(0);
 
-    setBlock('Submit duplicate actions', 2);
+    setBlock('Check available actions', 2);
+    // Check available actions if type of `Set transaction type` action is
+    // 'transferfrom' or 'transferto'
+    await ImportTests.createRuleAction([
+        { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
+        { action: 'changeTransactionType', data: 'transferfrom' },
+    ]);
+    await ImportTests.createRuleAction([
+        { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
+    ]);
+
+    // Check available actions if type of `Set transaction type` action is
+    // 'debtfrom' or 'debtto'
+    await ImportTests.updateRuleAction({
+        pos: 0,
+        action: { action: 'changeTransactionType', data: 'debtfrom' },
+    });
+    await ImportTests.createRuleAction([
+        { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
+    ]);
+
+    // Check `Set person` action is removed if change type of `Set transaction type` action
+    // to 'expense'
+    await ImportTests.updateRuleAction({
+        pos: 0,
+        action: { action: 'changeTransactionType', data: 'expense' },
+    });
+
+    // Check `Set account` action is removed if remove `Set transaction type` action
+    await ImportTests.updateRuleAction({
+        pos: 0,
+        action: { action: 'changeTransactionType', data: 'transferfrom' },
+    });
+    await ImportTests.createRuleAction([
+        { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
+    ]);
+    await ImportTests.deleteRuleAction(0);
+
+    // Check `Set person` action is removed if remove `Set transaction type` action
+    await ImportTests.createRuleAction([
+        { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
+        { action: 'changeTransactionType', data: 'debtfrom' },
+    ]);
+    await ImportTests.createRuleAction([
+        { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
+    ]);
+    await ImportTests.deleteRuleAction(0);
+
+    // Check `Set account` action is removed if change type of `Set transaction type` action to
+    // any value except 'transferfrom' and 'transferto'
+    await ImportTests.createRuleAction([
+        { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
+        { action: 'changeTransactionType', data: 'transferfrom' },
+    ]);
+    await ImportTests.createRuleAction([
+        { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
+    ]);
+    await ImportTests.updateRuleAction({
+        pos: 0,
+        action: { action: 'changeAction', data: IMPORT_ACTION_SET_SRC_AMOUNT },
+    });
+
+    // Check available actions after remove `Set transaction type` action
+    await ImportTests.updateRuleAction({
+        pos: 0,
+        action: { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
+    });
     await ImportTests.createRuleAction([
         { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
-        { action: 'inputValue', data: 'New comment' },
     ]);
-    await ImportTests.submitRule();
+    await ImportTests.deleteRuleAction(0);
+
+    // Check available actions are correctly set even if changed order
+    await ImportTests.createRuleAction([
+        { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
+    ]);
 
     setBlock('Submit empty amount action', 2);
     await ImportTests.updateRuleAction({
@@ -194,30 +265,15 @@ const runValidationTests = async () => {
     });
     await ImportTests.submitRule();
 
-    setBlock('Submit `Set person` action without set transaction type to debt', 2);
-    await ImportTests.updateRuleAction({
-        pos: 0,
-        action: [
-            { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
-            { action: 'changePerson', data: App.scenario.MARIA },
-        ],
-    });
-    await ImportTests.submitRule();
-
-    setBlock('Submit `Set account` action without set transaction type to transfer', 2);
-    await ImportTests.updateRuleAction({
-        pos: 0,
-        action: [
-            { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
-            { action: 'changeAccount', data: App.scenario.ACC_3 },
-        ],
-    });
-    await ImportTests.submitRule();
-
     setBlock('Submit rule without guard condition for `Set account` action', 2);
+    await ImportTests.deleteRuleAction(0);
     await ImportTests.createRuleAction([
         { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
         { action: 'changeTransactionType', data: 'transferfrom' },
+    ]);
+    await ImportTests.createRuleAction([
+        { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
+        { action: 'changeAccount', data: App.scenario.ACC_3 },
     ]);
     await ImportTests.submitRule();
 

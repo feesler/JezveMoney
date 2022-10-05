@@ -198,6 +198,10 @@ export class List {
         return res;
     }
 
+    indexOf(...args) {
+        return this.data.indexOf(...args);
+    }
+
     forEach(...args) {
         this.data.forEach(...args);
     }

@@ -2,6 +2,7 @@ import {
     createElement,
     show,
     isFunction,
+    asArray,
     Component,
     DropDown,
     DecimalInput,
@@ -32,6 +33,7 @@ const INV_FEEDBACK_CLASS = 'invalid-feedback';
 const CONTROLS_CLASS = 'action-form__controls';
 
 const defaultProps = {
+    actions: null,
     onUpdate: null,
     onRemove: null,
 };
@@ -61,9 +63,6 @@ export class ImportActionForm extends Component {
 
         this.props.data.isValid = this.props.isValid;
         this.props.data.message = this.props.message;
-
-        this.actionTypes = ImportAction.getTypes();
-        this.transactionTypes = ImportAction.getTransactionTypes();
 
         this.init();
         this.setData(this.props.data);
@@ -124,21 +123,25 @@ export class ImportActionForm extends Component {
         ]);
     }
 
+    getActionTypes() {
+        const actionTypes = ImportAction.getTypes();
+        if (!this.props.actions) {
+            return actionTypes;
+        }
+
+        const typesFilter = asArray(this.props.actions);
+        if (!typesFilter.length) {
+            return actionTypes;
+        }
+
+        return actionTypes.filter((type) => typesFilter.includes(type.id));
+    }
+
     /** Create action type field */
     createActionTypeField() {
-        const items = this.actionTypes
-            .filter((type) => {
-                // Remove `Set person` action if no persons available
-                if (
-                    type.id === IMPORT_ACTION_SET_PERSON
-                    && window.app.model.persons.length === 0
-                ) {
-                    return false;
-                }
-
-                return true;
-            })
-            .map((type) => ({ id: type.id, title: type.title }));
+        const actionTypes = this.getActionTypes();
+        // const items = actionTypes.map((type) => ({ id: type.id, title: type.title }));
+        const items = actionTypes.map(({ id, title }) => ({ id, title }));
 
         this.actionDropDown = DropDown.create({
             className: ACTION_FIELD_CLASS,
@@ -149,7 +152,9 @@ export class ImportActionForm extends Component {
 
     /** Create transaction type field */
     createTransTypeField() {
-        const items = this.transactionTypes.map((type) => ({ id: type.id, title: type.title }));
+        const transactionTypes = ImportAction.getTransactionTypes();
+        // const items = transactionTypes.map((type) => ({ id: type.id, title: type.title }));
+        const items = transactionTypes.map(({ id, title }) => ({ id, title }));
 
         this.trTypeDropDown = DropDown.create({
             className: TRANS_TYPE_FIELD_CLASS,
