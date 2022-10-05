@@ -185,6 +185,18 @@ export class ImportView extends AppView {
         };
     }
 
+    get rulesDialog() {
+        return this.content.rulesDialog;
+    }
+
+    get uploadDialog() {
+        return this.content.uploadDialog;
+    }
+
+    get itemsList() {
+        return this.content.itemsList;
+    }
+
     isRulesEnabled() {
         return this.model.rulesEnabled;
     }
@@ -260,7 +272,7 @@ export class ImportView extends AppView {
         this.expectedState = this.getExpectedState();
         this.expectedState.uploadDialog = { visible: false };
 
-        await this.performAction(() => this.content.uploadDialog.close());
+        await this.performAction(() => this.uploadDialog.close());
         await this.performAction(() => wait(this.uploadPopupId, { hidden: true }));
 
         return this.checkState();
@@ -272,19 +284,19 @@ export class ImportView extends AppView {
         this.uploadFilename = name;
         this.fileData = data;
 
-        await this.performAction(() => this.content.uploadDialog.setFile(name));
+        await this.performAction(() => this.uploadDialog.setFile(name));
     }
 
     async selectUploadTemplateById(val) {
         this.checkUploadState();
 
-        await this.performAction(() => this.content.uploadDialog.selectTemplateById(val));
+        await this.performAction(() => this.uploadDialog.selectTemplateById(val));
     }
 
     async selectUploadTemplateByIndex(val) {
         this.checkUploadState();
 
-        await this.performAction(() => this.content.uploadDialog.selectTemplateByIndex(val));
+        await this.performAction(() => this.uploadDialog.selectTemplateByIndex(val));
     }
 
     async selectUploadAccount(val) {
@@ -298,7 +310,7 @@ export class ImportView extends AppView {
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
 
-        await this.performAction(() => this.content.uploadDialog.selectAccount(val));
+        await this.performAction(() => this.uploadDialog.selectAccount(val));
 
         return this.checkState();
     }
@@ -306,79 +318,79 @@ export class ImportView extends AppView {
     async selectUploadEncoding(val) {
         this.checkUploadState();
 
-        await this.performAction(() => this.content.uploadDialog.selectEncoding(val));
+        await this.performAction(() => this.uploadDialog.selectEncoding(val));
     }
 
     /** Select file to upload */
     async upload() {
         this.checkUploadState();
 
-        await this.performAction(() => this.content.uploadDialog.upload());
+        await this.performAction(() => this.uploadDialog.upload());
     }
 
     async inputTemplateName(val) {
         this.checkUploadState();
 
-        await this.performAction(() => this.content.uploadDialog.inputTemplateName(val));
+        await this.performAction(() => this.uploadDialog.inputTemplateName(val));
     }
 
     async selectTemplateColumn(name, index) {
         this.checkUploadState();
 
-        await this.performAction(() => this.content.uploadDialog.selectTemplateColumn(name, index));
+        await this.performAction(() => this.uploadDialog.selectTemplateColumn(name, index));
     }
 
     async inputTemplateFirstRow(val) {
         this.checkUploadState();
 
-        await this.performAction(() => this.content.uploadDialog.inputTemplateFirstRow(val));
+        await this.performAction(() => this.uploadDialog.inputTemplateFirstRow(val));
     }
 
     async decreaseTemplateFirstRow(val) {
         this.checkUploadState();
 
-        await this.performAction(() => this.content.uploadDialog.decreaseTemplateFirstRow(val));
+        await this.performAction(() => this.uploadDialog.decreaseTemplateFirstRow(val));
     }
 
     async increaseTemplateFirstRow(val) {
         this.checkUploadState();
 
-        await this.performAction(() => this.content.uploadDialog.increaseTemplateFirstRow(val));
+        await this.performAction(() => this.uploadDialog.increaseTemplateFirstRow(val));
     }
 
     /** Create new import template */
     async createTemplate() {
         this.checkUploadState();
 
-        await this.performAction(() => this.content.uploadDialog.createTemplate());
+        await this.performAction(() => this.uploadDialog.createTemplate());
     }
 
     /** Update currently selected template */
     async updateTemplate() {
         this.checkUploadState();
 
-        await this.performAction(() => this.content.uploadDialog.updateTemplate());
+        await this.performAction(() => this.uploadDialog.updateTemplate());
     }
 
     /** Delete currently selected template */
     async deleteTemplate() {
         this.checkUploadState();
 
-        await this.performAction(() => this.content.uploadDialog.deleteTemplate());
+        await this.performAction(() => this.uploadDialog.deleteTemplate());
     }
 
     /** Submit template */
     async submitTemplate() {
         this.checkUploadState();
 
-        await this.performAction(() => this.content.uploadDialog.submitTemplate());
+        await this.performAction(() => this.uploadDialog.submitTemplate());
     }
 
     /** Cancel create/update template */
     async cancelTemplate() {
         this.checkUploadState();
 
-        await this.performAction(() => this.content.uploadDialog.cancelTemplate());
+        await this.performAction(() => this.uploadDialog.cancelTemplate());
     }
 
     /** Run action and wait until list finish to load */
@@ -390,7 +402,7 @@ export class ImportView extends AppView {
         await waitForFunction(async () => {
             await this.parse();
             return (
-                !this.content.itemsList.model.isLoading
+                !this.itemsList.model.isLoading
                 && prevTime !== this.content.renderTime
             );
         });
@@ -400,7 +412,7 @@ export class ImportView extends AppView {
     async submitUploaded(importData) {
         this.checkUploadState();
 
-        const expectedUpload = this.content.uploadDialog.getExpectedUploadResult(importData);
+        const expectedUpload = this.uploadDialog.getExpectedUploadResult(importData);
         const isValid = expectedUpload != null;
         if (isValid) {
             // Apply rules if enabled
@@ -440,11 +452,11 @@ export class ImportView extends AppView {
 
         if (isValid) {
             await this.waitForList(async () => {
-                await this.content.uploadDialog.submit();
+                await this.uploadDialog.submit();
                 await wait(this.uploadPopupId, { hidden: true });
             });
         } else {
-            await this.performAction(() => this.content.uploadDialog.submit());
+            await this.performAction(() => this.uploadDialog.submit());
         }
 
         return this.checkState();
@@ -454,14 +466,14 @@ export class ImportView extends AppView {
     getUploadState() {
         this.checkUploadState();
 
-        return this.content.uploadDialog.getCurrentState();
+        return this.uploadDialog.getCurrentState();
     }
 
     /** Return expected template object */
     getExpectedTemplate() {
         this.checkUploadState();
 
-        return this.content.uploadDialog.getExpectedTemplate();
+        return this.uploadDialog.getExpectedTemplate();
     }
 
     async selectMainAccount(val) {
@@ -474,12 +486,12 @@ export class ImportView extends AppView {
 
     checkRulesFormState() {
         this.checkRulesState();
-        assert(this.content.rulesDialog.isFormState(), 'Invalid state');
+        assert(this.rulesDialog.isFormState(), 'Invalid state');
     }
 
     checkRulesListState() {
         this.checkRulesState();
-        assert(this.content.rulesDialog.isListState(), 'Invalid state');
+        assert(this.rulesDialog.isListState(), 'Invalid state');
     }
 
     async launchRulesDialog() {
@@ -497,7 +509,7 @@ export class ImportView extends AppView {
     async closeRulesDialog() {
         this.checkRulesState();
 
-        await this.performAction(() => this.content.rulesDialog.close());
+        await this.performAction(() => this.rulesDialog.close());
         await this.performAction(() => wait(this.rulesPopupId, { hidden: true }));
 
         this.checkMainState();
@@ -508,35 +520,35 @@ export class ImportView extends AppView {
     async inputRulesSearch(value) {
         this.checkRulesListState();
 
-        await this.performAction(() => this.content.rulesDialog.inputSearch(value));
+        await this.performAction(() => this.rulesDialog.inputSearch(value));
         return true;
     }
 
     async clearRulesSearch() {
         this.checkRulesListState();
 
-        await this.performAction(() => this.content.rulesDialog.clearSearch());
+        await this.performAction(() => this.rulesDialog.clearSearch());
         return true;
     }
 
     async iterateRulesList() {
         this.checkRulesListState();
 
-        await this.performAction(() => this.content.rulesDialog.iteratePages());
+        await this.performAction(() => this.rulesDialog.iteratePages());
         return true;
     }
 
     async createRule() {
         this.checkRulesListState();
 
-        await this.performAction(() => this.content.rulesDialog.createRule());
+        await this.performAction(() => this.rulesDialog.createRule());
         return true;
     }
 
     async updateRule(index) {
         this.checkRulesListState();
 
-        await this.performAction(() => this.content.rulesDialog.updateRule(index));
+        await this.performAction(() => this.rulesDialog.updateRule(index));
         return true;
     }
 
@@ -545,7 +557,7 @@ export class ImportView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.rulesDialog.deleteRule(index));
+        await this.performAction(() => this.rulesDialog.deleteRule(index));
 
         return this.checkState();
     }
@@ -553,7 +565,7 @@ export class ImportView extends AppView {
     async addRuleCondition() {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog.content;
+        const { ruleForm } = this.rulesDialog.content;
         await this.performAction(() => ruleForm.addCondition());
 
         return true;
@@ -562,7 +574,7 @@ export class ImportView extends AppView {
     async deleteRuleCondition(index) {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog.content;
+        const { ruleForm } = this.rulesDialog.content;
         await this.performAction(() => ruleForm.deleteCondition(index));
 
         return true;
@@ -571,7 +583,7 @@ export class ImportView extends AppView {
     async runOnRuleCondition(index, action) {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog.content;
+        const { ruleForm } = this.rulesDialog.content;
         await this.performAction(() => ruleForm.runOnCondition(index, action));
 
         return true;
@@ -580,21 +592,21 @@ export class ImportView extends AppView {
     getRuleConditions() {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog.content;
+        const { ruleForm } = this.rulesDialog.content;
         return copyObject(ruleForm.model.conditions);
     }
 
     getRuleActions() {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog.content;
+        const { ruleForm } = this.rulesDialog.content;
         return copyObject(ruleForm.model.actions);
     }
 
     async addRuleAction() {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog.content;
+        const { ruleForm } = this.rulesDialog.content;
         await this.performAction(() => ruleForm.addAction());
 
         return true;
@@ -603,7 +615,7 @@ export class ImportView extends AppView {
     async deleteRuleAction(index) {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog.content;
+        const { ruleForm } = this.rulesDialog.content;
         await this.performAction(() => ruleForm.deleteAction(index));
 
         return true;
@@ -612,7 +624,7 @@ export class ImportView extends AppView {
     async runOnRuleAction(index, action) {
         this.checkRulesFormState();
 
-        const { ruleForm } = this.content.rulesDialog.content;
+        const { ruleForm } = this.rulesDialog.content;
         await this.performAction(() => ruleForm.runOnAction(index, action));
 
         return true;
@@ -621,7 +633,7 @@ export class ImportView extends AppView {
     isValidRule() {
         this.checkRulesFormState();
 
-        return this.content.rulesDialog.isValidRule();
+        return this.rulesDialog.isValidRule();
     }
 
     async submitRule() {
@@ -629,7 +641,7 @@ export class ImportView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.rulesDialog.submitRule());
+        await this.performAction(() => this.rulesDialog.submitRule());
 
         return this.checkState();
     }
@@ -639,7 +651,7 @@ export class ImportView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.rulesDialog.cancelRule());
+        await this.performAction(() => this.rulesDialog.cancelRule());
 
         return this.checkState();
     }
@@ -647,14 +659,14 @@ export class ImportView extends AppView {
     getRulesState() {
         this.checkRulesState();
 
-        return this.content.rulesDialog.getState();
+        return this.rulesDialog.getState();
     }
 
     /** Return expected import rule object */
     getExpectedRule() {
         this.checkRulesState();
 
-        return this.content.rulesDialog.getExpectedRule();
+        return this.rulesDialog.getExpectedRule();
     }
 
     /**
@@ -868,7 +880,7 @@ export class ImportView extends AppView {
         const indexes = Array.isArray(index) ? index : [index];
         const enable = !!value;
 
-        assert(this.content.itemsList, 'No items available');
+        assert(this.itemsList, 'No items available');
 
         indexes.forEach((ind) => {
             const item = this.items[ind];
@@ -885,7 +897,7 @@ export class ImportView extends AppView {
 
         for (const ind of indexes) {
             await this.performAction(async () => {
-                const item = this.content.itemsList.getItem(ind);
+                const item = this.itemsList.getItem(ind);
                 await item.toggleEnable();
             });
         }
@@ -899,12 +911,12 @@ export class ImportView extends AppView {
         this.checkValidIndex(index);
         const position = this.getPositionByIndex(index);
 
-        const item = this.content.itemsList.getItem(position.index);
+        const item = this.itemsList.getItem(position.index);
 
         await this.performAction(() => item.runAction(action, data));
 
-        const updatedItem = this.content.itemsList.getItem(position.index);
-        const itemData = this.content.itemsList.getItemData(updatedItem);
+        const updatedItem = this.itemsList.getItem(position.index);
+        const itemData = this.itemsList.getItemData(updatedItem);
         itemData.type = itemData.importType;
         delete itemData.importType;
         itemData.isForm = updatedItem.model.isForm;
@@ -1001,13 +1013,13 @@ export class ImportView extends AppView {
     isFirstPage() {
         this.checkMainState();
 
-        return !this.content.itemsList.paginator || this.content.itemsList.paginator.isFirstPage();
+        return !this.itemsList.paginator || this.itemsList.paginator.isFirstPage();
     }
 
     isLastPage() {
         this.checkMainState();
 
-        return !this.content.itemsList.paginator || this.content.itemsList.paginator.isLastPage();
+        return !this.itemsList.paginator || this.itemsList.paginator.isLastPage();
     }
 
     async goToFirstPage() {
@@ -1022,7 +1034,7 @@ export class ImportView extends AppView {
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
 
-        await this.performAction(() => this.content.itemsList.paginator.goToNextPage());
+        await this.performAction(() => this.itemsList.paginator.goToNextPage());
 
         return this.checkState();
     }
@@ -1036,7 +1048,7 @@ export class ImportView extends AppView {
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
 
-        await this.performAction(() => this.content.itemsList.paginator.goToNextPage());
+        await this.performAction(() => this.itemsList.paginator.goToNextPage());
 
         return this.checkState();
     }
@@ -1050,7 +1062,7 @@ export class ImportView extends AppView {
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
 
-        await this.performAction(() => this.content.itemsList.paginator.goToPrevPage());
+        await this.performAction(() => this.itemsList.paginator.goToPrevPage());
 
         return this.checkState();
     }
