@@ -70,6 +70,7 @@ export class ImportRuleForm extends TestComponent {
         };
 
         this.setExpectedRule(localModel);
+        this.setAvailableConditions(localModel);
         this.setAvailableActions(localModel);
 
         res.conditionsList.items = localModel.conditions.map(
@@ -88,6 +89,26 @@ export class ImportRuleForm extends TestComponent {
         const ruleData = this.getExpectedRule(model);
         const rule = new ImportRule(ruleData);
         res.rule = rule;
+    }
+
+    static setAvailableConditions(model) {
+        const res = model;
+        const { rule } = model;
+
+        res.conditions = model.conditions.map((condition, ind) => {
+            let propFilter = ImportCondition.fieldTypes.map(({ id }) => id);
+            // Remove properties which already have `is` operator
+            propFilter = propFilter.filter((property) => {
+                const found = rule.conditions.findIsCondition(property);
+                const foundInd = rule.conditions.indexOf(found);
+                return (!found || foundInd === ind);
+            });
+
+            return {
+                ...condition,
+                fieldsAvailable: propFilter.map((type) => type.toString()),
+            };
+        });
     }
 
     static setAvailableActions(model) {
@@ -332,10 +353,21 @@ export class ImportRuleForm extends TestComponent {
     }
 
     async addCondition() {
+        const { conditions } = this.model.rule;
+
         const fieldType = this.getNextAvailProperty(this.model);
+        const hasNotIsCond = conditions.hasNotIsCondition(fieldType.id);
+        if (hasNotIsCond && fieldType.operators.length < 2) {
+            return;
+        }
+
+        const operator = (hasNotIsCond)
+            ? fieldType.operators[0]
+            : fieldType.operators[1];
+
         const condition = {
             fieldType: fieldType.id,
-            operator: fieldType.operators[0],
+            operator,
             value: this.getDefaultValue(fieldType.id),
             isFieldValue: false,
         };
@@ -375,11 +407,144 @@ export class ImportRuleForm extends TestComponent {
         const ind = parseInt(index, 10);
         assert.arrayIndex(this.content.conditionsList.content.items, ind);
 
+        if (action === 'changeFieldType') {
+            return this.changeConditionFieldType(index, data);
+        }
+        if (action === 'changeOperator') {
+            return this.changeConditionOperator(index, data);
+        }
+        if (action === 'changeTemplate') {
+            return this.changeConditionTemplate(index, data);
+        }
+        if (action === 'changeAccount') {
+            return this.changeConditionAccount(index, data);
+        }
+        if (action === 'changeCurrency') {
+            return this.changeConditionCurrency(index, data);
+        }
+        if (action === 'changeProperty') {
+            return this.changeConditionProperty(index, data);
+        }
+        if (action === 'inputAmount') {
+            return this.inputConditionAmount(index, data);
+        }
+        if (action === 'inputValue') {
+            return this.inputConditionValue(index, data);
+        }
+        if (action === 'togglePropValue') {
+            return this.toggleConditionPropValue(index);
+        }
+        if (action === 'clickDelete') {
+            return this.deleteCondition(index);
+        }
+
+        throw new Error(`Invalid action for Import condition: ${action}`);
+    }
+
+    async changeConditionFieldType(index, value) {
+        const ind = parseInt(index, 10);
+        assert.arrayIndex(this.content.conditionsList.content.items, ind);
+
+        const conditionModel = this.model.conditions[ind];
+
+        const fieldId = parseInt(value, 10);
+        conditionModel.fieldType = fieldId;
+        const field = ImportCondition.getFieldTypeById(fieldId);
+        if (!field.operators.includes(conditionModel.operator)) {
+            [conditionModel.operator] = field.operators;
+        }
+        conditionModel.state = ImportConditionForm.getStateName(conditionModel);
+        conditionModel.value = ImportConditionForm.getStateValue(conditionModel);
+        this.expectedState = this.getExpectedState();
+
         await this.openConditions();
 
-        const item = this.content.conditionsList.content.items[index];
-        await item.runAction(action, data);
-        await this.parse();
+        const item = this.content.conditionsList.content.items[ind];
+        await this.performAction(() => item.changeFieldType(value));
+
+        return this.checkState();
+    }
+
+    async changeConditionValue(index, name, value) {
+        const ind = parseInt(index, 10);
+        assert.arrayIndex(this.content.conditionsList.content.items, ind);
+
+        const conditionModel = this.model.conditions[ind];
+        assert(conditionModel.state === name, `Invalid state ${conditionModel.state} expected ${name}`);
+
+        if (name === 'amount') {
+            conditionModel[name] = trimToDigitsLimit(value, 2);
+        } else {
+            conditionModel[name] = value;
+        }
+        conditionModel.value = ImportConditionForm.getStateValue(conditionModel);
+        this.expectedState = this.getExpectedState();
+
+        await this.openConditions();
+
+        const item = this.content.conditionsList.content.items[ind];
+        await this.performAction(() => item.changeValue(name, value));
+
+        return this.checkState();
+    }
+
+    async changeConditionOperator(index, value) {
+        const ind = parseInt(index, 10);
+        assert.arrayIndex(this.content.conditionsList.content.items, ind);
+
+        const conditionModel = this.model.conditions[ind];
+        conditionModel.operator = value;
+        conditionModel.value = ImportConditionForm.getStateValue(conditionModel);
+        this.expectedState = this.getExpectedState();
+
+        await this.openConditions();
+
+        const item = this.content.conditionsList.content.items[ind];
+        await this.performAction(() => item.changeOperator(value));
+
+        return this.checkState();
+    }
+
+    async changeConditionTemplate(index, value) {
+        return this.changeConditionValue(index, 'template', value);
+    }
+
+    async changeConditionAccount(index, value) {
+        return this.changeConditionValue(index, 'account', value);
+    }
+
+    async changeConditionCurrency(index, value) {
+        return this.changeConditionValue(index, 'currency', value);
+    }
+
+    async changeConditionProperty(index, value) {
+        return this.changeConditionValue(index, 'property', value);
+    }
+
+    async inputConditionAmount(index, value) {
+        return this.changeConditionValue(index, 'amount', value);
+    }
+
+    async inputConditionValue(index, value) {
+        return this.changeConditionValue(index, 'text', value);
+    }
+
+    async toggleConditionPropValue(index, value) {
+        const ind = parseInt(index, 10);
+        assert.arrayIndex(this.content.conditionsList.content.items, ind);
+
+        const conditionModel = this.model.conditions[ind];
+        conditionModel.isFieldValue = !conditionModel.isFieldValue;
+        conditionModel.state = ImportConditionForm.getStateName(conditionModel);
+        conditionModel.value = ImportConditionForm.getStateValue(conditionModel);
+        this.expectedState = this.getExpectedState();
+
+        await this.openConditions();
+
+        const item = this.content.conditionsList.content.items[ind];
+        await this.performAction(() => item.togglePropValue(value));
+
+        return this.checkState();
     }
 
     async openActions() {

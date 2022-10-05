@@ -2,6 +2,7 @@ import {
     createElement,
     show,
     isFunction,
+    asArray,
     Component,
     Checkbox,
     DropDown,
@@ -33,6 +34,7 @@ const INV_FEEDBACK_CLASS = 'invalid-feedback';
 const LABEL_PROPERTY_CMP = 'Compare with another property';
 
 const defaultProps = {
+    properties: null,
     onUpdate: null,
     onRemove: null,
 };
@@ -137,23 +139,31 @@ export class ImportConditionForm extends Component {
         ]);
     }
 
+    getPropertyTypes() {
+        if (!this.props.properties) {
+            return this.fieldTypes;
+        }
+
+        const propFilter = asArray(this.props.properties);
+        if (!propFilter.length) {
+            return this.fieldTypes;
+        }
+
+        return this.fieldTypes.filter((type) => propFilter.includes(type.id));
+    }
+
     /** Create property field */
     createPropertyField() {
-        const filedTypeItems = this.fieldTypes
-            .filter((fieldType) => !(
-                // Remove `Template` property if no templates available yet
-                ImportCondition.isTemplateField(fieldType.id)
-                && window.app.model.templates.length === 0
-            ))
-            .map((fieldType) => ({ id: fieldType.id, title: fieldType.title }));
+        const propTypes = this.getPropertyTypes();
+        const items = propTypes.map(({ id, title }) => ({ id, title }));
 
         this.propertyDropDown = DropDown.create({
             className: PROP_FIELD_CLASS,
             onchange: (property) => this.onPropertyChange(property),
         });
 
-        this.propertyDropDown.append(filedTypeItems);
-        this.propertyDropDown.selectItem(filedTypeItems[0].id);
+        this.propertyDropDown.append(items);
+        this.propertyDropDown.selectItem(items[0].id);
     }
 
     /** Create operator field */

@@ -13,7 +13,7 @@ import {
     IMPORT_ACTION_SET_TR_TYPE,
     ImportAction,
 } from '../../../../js/model/ImportAction.js';
-import { ImportCondition } from '../../../../js/model/ImportCondition.js';
+import { ImportCondition, IMPORT_COND_OP_EQUAL } from '../../../../js/model/ImportCondition.js';
 import { ImportConditionForm } from '../ConditionForm/ImportConditionForm.js';
 import { ImportActionForm } from '../ActionForm/ImportActionForm.js';
 import './style.scss';
@@ -252,9 +252,13 @@ export class ImportRuleForm extends Component {
         // Obtain condition field types currently used by rule
         const ruleFieldTypes = state.rule.conditions.map((condition) => condition.field_id);
         // Filter available field types
-        const availFields = this.fieldTypes.filter(
-            (fieldType) => !ImportCondition.isTemplateField(fieldType.id),
-        );
+        const availFields = this.fieldTypes.filter((fieldType) => {
+            if (ImportCondition.isTemplateField(fieldType.id)) {
+                return window.app.model.templates.length > 0;
+            }
+
+            return true;
+        });
 
         // Search for first field type not in list
         return availFields.find((fieldType) => !ruleFieldTypes.includes(fieldType.id));
@@ -301,19 +305,30 @@ export class ImportRuleForm extends Component {
     onCreateConditionClick(e) {
         e.stopPropagation();
 
+        const { conditions } = this.state.rule;
+
         const fieldType = this.getNextAvailProperty(this.state);
         if (!fieldType) {
             return;
         }
 
+        const hasNotIsCond = conditions.hasNotIsCondition(fieldType.id);
+        if (hasNotIsCond && fieldType.operators.length < 2) {
+            return;
+        }
+
+        const operator = (hasNotIsCond)
+            ? fieldType.operators[0]
+            : fieldType.operators[1];
+
         const conditionData = {
             field_id: fieldType.id,
-            operator: fieldType.operators[0],
+            operator,
             value: this.getConditionDefaultValue(fieldType.id),
             flags: 0,
         };
 
-        this.state.rule.conditions.addItem(conditionData);
+        conditions.addItem(conditionData);
 
         this.conditionsCollapse.expand();
         this.actionsCollapse.collapse();
@@ -395,7 +410,21 @@ export class ImportRuleForm extends Component {
 
     /** Condition 'update' event handler */
     onConditionUpdate(index, data) {
-        this.state.rule.conditions.updateItemByIndex(index, data);
+        const { conditions } = this.state.rule;
+
+        const conditionToUpdate = copyObject(conditions.getItemByIndex(index));
+        conditions.updateItemByIndex(index, data);
+
+        // If condition operator not changed and current operator is not `is`
+        // then skip conditions list update
+        if (
+            conditionToUpdate.operator === data.operator
+            && data.operator !== IMPORT_COND_OP_EQUAL
+        ) {
+            return;
+        }
+
+        this.render(this.state);
     }
 
     /** Condition 'delete' event handler */
@@ -421,7 +450,7 @@ export class ImportRuleForm extends Component {
         const actionToUpdate = copyObject(actions.getItemByIndex(index));
         actions.updateItemByIndex(index, data);
 
-        // If action type not changed and both old and new type is not `Set transaction type`
+        // If action type not changed and current type is not `Set transaction type`
         // then skip action list update
         if (
             actionToUpdate.action_id === data.action_id
@@ -485,7 +514,12 @@ export class ImportRuleForm extends Component {
         }
     }
 
-    /** Validate rule data and enable/disable submit button */
+    validateConditionsAvail(state) {
+        const isAvail = this.getNextAvailProperty(state);
+
+        enable(this.createCondBtn, !!isAvail);
+    }
+
     validateActionsAvail(state) {
         const isAvail = this.getNextAvailAction(state);
 
@@ -494,7 +528,9 @@ export class ImportRuleForm extends Component {
 
     /** Renders conditions list */
     renderConditionsList(state) {
-        const conditionItems = state.rule.conditions.map((condition, index) => {
+        const { conditions } = state.rule;
+
+        const conditionItems = conditions.map((condition, index) => {
             const props = {
                 data: condition,
                 isValid: true,
@@ -510,6 +546,16 @@ export class ImportRuleForm extends Component {
                 props.isValid = false;
                 props.message = state.validation.message;
             }
+
+            let propFilter = this.fieldTypes.map(({ id }) => id);
+            // Remove properties which already have `is` operator
+            propFilter = propFilter.filter((property) => {
+                const found = conditions.findIsCondition(property);
+                const foundInd = conditions.indexOf(found);
+                return (!found || foundInd === index);
+            });
+
+            props.properties = propFilter;
 
             return ImportConditionForm.create(props);
         });
@@ -582,6 +628,7 @@ export class ImportRuleForm extends Component {
 
         this.idInput.value = (state.rule.id) ? state.rule.id : '';
 
+        this.validateConditionsAvail(state);
         this.validateActionsAvail(state);
 
         if (

@@ -60,6 +60,11 @@ export class List {
         return this.data.sort(...args);
     }
 
+    /** Wrap method for array indexOf() method */
+    indexOf(...args) {
+        return this.data.indexOf(...args);
+    }
+
     /**
      * Assign new data to the list
      * @param {Array} data - array of list items

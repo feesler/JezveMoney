@@ -140,7 +140,6 @@ export class ImportActionForm extends Component {
     /** Create action type field */
     createActionTypeField() {
         const actionTypes = this.getActionTypes();
-        // const items = actionTypes.map((type) => ({ id: type.id, title: type.title }));
         const items = actionTypes.map(({ id, title }) => ({ id, title }));
 
         this.actionDropDown = DropDown.create({
@@ -153,7 +152,6 @@ export class ImportActionForm extends Component {
     /** Create transaction type field */
     createTransTypeField() {
         const transactionTypes = ImportAction.getTransactionTypes();
-        // const items = transactionTypes.map((type) => ({ id: type.id, title: type.title }));
         const items = transactionTypes.map(({ id, title }) => ({ id, title }));
 
         this.trTypeDropDown = DropDown.create({
