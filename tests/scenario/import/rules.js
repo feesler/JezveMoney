@@ -336,14 +336,21 @@ const runCreateTests = async () => {
         { action: 'changeOperator', data: IMPORT_COND_OP_LESS },
         { action: 'inputAmount', data: '0' },
     ]);
+    // Create `Set account` action before `Set transaction type` to check actions sort
+    await ImportTests.createRuleAction([
+        { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
+    ]);
     await ImportTests.createRuleAction([
         { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
         { action: 'changeTransactionType', data: 'transferto' },
     ]);
-    await ImportTests.createRuleAction([
-        { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
-        { action: 'changeAccount', data: App.scenario.ACC_USD },
-    ]);
+    await ImportTests.updateRuleAction({
+        pos: 0,
+        action: [
+            { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
+            { action: 'changeAccount', data: App.scenario.ACC_USD },
+        ],
+    });
     await ImportTests.createRuleAction([
         { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
         { action: 'inputValue', data: 'Local shop' },

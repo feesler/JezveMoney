@@ -63,7 +63,9 @@ export class ImportRule extends ListItem {
 
     /** Run actions assigned to rule */
     runActions(context) {
-        this.actions.forEach((item) => {
+        const sortedActions = this.actions.sort();
+
+        sortedActions.forEach((item) => {
             item.execute(context);
         });
     }

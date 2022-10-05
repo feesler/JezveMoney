@@ -1,3 +1,4 @@
+import { copyObject } from 'jezvejs';
 import { List } from './List.js';
 import {
     ImportAction,
@@ -9,7 +10,6 @@ import {
  * @param {object[]} props - array of import action
  */
 export class ImportActionList extends List {
-    /** Static alias for ImportActionList constructor */
     static create(props) {
         return new ImportActionList(props);
     }
@@ -75,5 +75,11 @@ export class ImportActionList extends List {
                 || item.value === 'debtto'
             )
         ));
+    }
+
+    sort() {
+        const data = copyObject(this.data);
+        data.sort((a, b) => a.action_id - b.action_id);
+        return ImportActionList.create(data);
     }
 }
