@@ -72,6 +72,7 @@ const CANCEL_BTN_TITLE = 'Cancel';
 
 const defaultProps = {
     onEnable: null,
+    onUpdate: null,
     onRemove: null,
     onSave: null,
     onCancel: null,
@@ -400,6 +401,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setTransactionType(type.id);
         this.clearInvalid();
         this.render();
+        this.sendUpdate();
     }
 
     /** Destination account select 'change' event handler */
@@ -407,6 +409,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setTransferAccount(account.id);
         this.clearInvalid();
         this.render();
+        this.sendUpdate();
     }
 
     /** Person select 'change' event handler */
@@ -414,6 +417,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setPerson(person.id);
         this.clearInvalid();
         this.render();
+        this.sendUpdate();
     }
 
     /** Source amount field 'input' event handler */
@@ -422,6 +426,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setSourceAmount(value);
         this.clearInvalid();
         this.render();
+        this.sendUpdate();
     }
 
     /** Destination amount field 'input' event handler */
@@ -430,6 +435,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setDestAmount(value);
         this.clearInvalid();
         this.render();
+        this.sendUpdate();
     }
 
     /** Currency select 'change' event handler */
@@ -437,6 +443,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setSourceCurrency(currency.id);
         this.clearInvalid();
         this.render();
+        this.sendUpdate();
     }
 
     /** Currency select 'change' event handler */
@@ -444,6 +451,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setDestCurrency(currency.id);
         this.clearInvalid();
         this.render();
+        this.sendUpdate();
     }
 
     /** Date field 'input' event handler */
@@ -452,6 +460,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setDate(value);
         this.clearInvalid();
         this.render();
+        this.sendUpdate();
     }
 
     /** DatePicker select event handler */
@@ -461,6 +470,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.datePicker.hide();
         this.clearInvalid();
         this.render();
+        this.sendUpdate();
     }
 
     /** Comment field 'input' event handler */
@@ -469,6 +479,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setComment(value);
         this.clearInvalid();
         this.render();
+        this.sendUpdate();
     }
 
     /** Validate transaction object */
@@ -488,6 +499,13 @@ export class ImportTransactionForm extends ImportTransactionBase {
         window.app.clearBlockValidation(this.destAmountField.elem);
         window.app.clearBlockValidation(this.dateField.elem);
         this.setFeedback();
+    }
+
+    /** Send component 'update' event */
+    sendUpdate() {
+        if (isFunction(this.props.onUpdate)) {
+            this.props.onUpdate(this.state.transaction);
+        }
     }
 
     validateSourceAmount(state) {

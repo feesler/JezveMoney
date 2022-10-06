@@ -663,41 +663,21 @@ export class ImportTransaction {
         return state.srcCurrId !== state.destCurrId;
     }
 
-    validateSourceAmount(state) {
-        const amountValue = parseFloat(fixFloat(state.sourceAmount));
+    validateAmount(value) {
+        const amountValue = parseFloat(fixFloat(value));
         return (!Number.isNaN(amountValue) && amountValue > 0);
     }
 
-    validateDestAmount(state) {
-        const amountValue = parseFloat(fixFloat(state.destAmount));
-        return (!Number.isNaN(amountValue) && amountValue > 0);
-    }
+    validate(state = this.state) {
+        const isDiff = this.isDiff(state);
+        const isExpense = (state.type === 'expense');
 
-    validate() {
-        const { state } = this;
-
-        if (state.type === 'expense') {
-            const destAmountValid = this.validateDestAmount(state);
-            if (!destAmountValid) {
-                return false;
-            }
-            if (state.isDiff) {
-                const srcAmountValid = this.validateSourceAmount(state);
-                if (!srcAmountValid) {
-                    return false;
-                }
-            }
-        } else {
-            const srcAmountValid = this.validateSourceAmount(state);
-            if (!srcAmountValid) {
-                return false;
-            }
-            if (state.isDiff) {
-                const destAmountValid = this.validateDestAmount(state);
-                if (!destAmountValid) {
-                    return false;
-                }
-            }
+        let valid = this.validateAmount(isExpense ? state.destAmount : state.sourceAmount);
+        if (valid && isDiff) {
+            valid = this.validateAmount(isExpense ? state.sourceAmount : state.destAmount);
+        }
+        if (!valid) {
+            return false;
         }
 
         if (!checkDate(state.date)) {

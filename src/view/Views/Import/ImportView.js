@@ -146,7 +146,7 @@ class ImportView extends View {
 
         this.paginator = Paginator.create({
             arrows: true,
-            onChange: (page) => this.onChangePage(page),
+            onChange: (page) => this.setPage(page),
         });
 
         // Data loading indicator
@@ -504,37 +504,19 @@ class ImportView extends View {
         this.setState(state);
     }
 
-    /** Change page event handler */
-    onChangePage(page) {
-        const { activeItemIndex } = this.state;
-
+    /** Change page of transactions list */
+    setPage(page) {
         if (this.state.pagination.page === page) {
             return;
         }
 
-        const state = {
+        this.setState({
             ...this.state,
             pagination: {
                 ...this.state.pagination,
                 page,
             },
-        };
-
-        // Save form data before to change page
-        if (activeItemIndex !== -1) {
-            const pageIndex = this.getPageIndex(activeItemIndex);
-            if (pageIndex.page === this.state.pagination.page) {
-                const form = this.transactionRows[pageIndex.index];
-                const data = new ImportTransaction(form.state.transaction);
-                data.isForm = true;
-
-                state.items = this.state.items.map((item, ind) => (
-                    (ind === activeItemIndex) ? data : item
-                ));
-            }
-        }
-
-        this.setState(state);
+        });
     }
 
     convertItemDataToProps(data, state) {
@@ -589,39 +571,22 @@ class ImportView extends View {
             return true;
         }
 
-        let savedItem = null;
-        const pageIndex = this.getPageIndex(activeItemIndex);
-        if (pageIndex.page === this.state.pagination.page) {
+        const formItem = this.state.items[activeItemIndex];
+        const valid = formItem.validate();
+        if (!valid) {
+            // Navigate to the page with transaction form if needed
+            const pageIndex = this.getPageIndex(activeItemIndex);
+            this.setPage(pageIndex.page);
+            // Render form validation
             const form = this.transactionRows[pageIndex.index];
-            const valid = form.validate();
-            if (!valid) {
-                form.elem.scrollIntoView();
-                return false;
-            }
+            form.validate();
+            form.elem.scrollIntoView();
 
-            savedItem = new ImportTransaction(form.state.transaction);
-            savedItem.isForm = false;
-        } else {
-            const formItem = this.state.items[activeItemIndex];
-            const valid = formItem.validate();
-            if (!valid) {
-                this.setState({
-                    ...this.state,
-                    pagination: {
-                        ...this.state.pagination,
-                        page: pageIndex.page,
-                    },
-                });
-
-                const form = this.transactionRows[pageIndex.index];
-                form.validate();
-                form.elem.scrollIntoView();
-                return false;
-            }
-
-            savedItem = new ImportTransaction(formItem);
-            savedItem.isForm = false;
+            return false;
         }
+
+        const savedItem = new ImportTransaction(formItem);
+        savedItem.isForm = false;
 
         this.setState({
             ...this.state,
@@ -744,6 +709,17 @@ class ImportView extends View {
         this.setState(state);
     }
 
+    /** ImportTransaction 'update' event handler */
+    onFormUpdate(data) {
+        const { activeItemIndex } = this.state;
+        if (activeItemIndex === -1) {
+            return;
+        }
+
+        const formData = new ImportTransaction(data);
+        this.state.items[activeItemIndex] = formData;
+    }
+
     /**
      * Main account select event handler
      */
@@ -792,23 +768,12 @@ class ImportView extends View {
             throw new Error(`Account ${accountId} not found`);
         }
 
-        const { activeItemIndex } = this.state;
         const state = {
             ...this.state,
             mainAccount,
             items: this.state.items.map((item) => this.setItemMainAccount(item, mainAccount.id)),
             originalItemData: this.setItemMainAccount(this.state.originalItemData, mainAccount.id),
         };
-
-        if (activeItemIndex !== -1) {
-            const pageIndex = this.getPageIndex(activeItemIndex);
-            if (pageIndex.page === state.pagination.page) {
-                const form = this.transactionRows[pageIndex.index];
-                const formData = new ImportTransaction(form.state.transaction);
-                formData.setMainAccount(mainAccount.id);
-                state.items[activeItemIndex] = formData;
-            }
-        }
 
         this.setState(state);
     }
@@ -1111,6 +1076,7 @@ class ImportView extends View {
                     ...itemProps,
                     onSave: () => this.saveItem(),
                     onCancel: () => this.cancelItemEdit(),
+                    onUpdate: (data) => this.onFormUpdate(data),
                 });
             }
 
