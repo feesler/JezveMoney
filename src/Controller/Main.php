@@ -76,14 +76,36 @@ class Main extends TemplateController
             ];
         }
 
-        $curr_acc_id = $currMod->getIdByPos(0);
-        if (!$curr_acc_id) {
+        // Find most frequent currency of laters transactions
+        $currencies = [];
+        foreach ($transactions as $item) {
+            if (!isset($currencies[$item->src_curr])) {
+                $currencies[$item->src_curr] = 0;
+            }
+            $currencies[$item->src_curr]++;
+
+            if (!isset($currencies[$item->dest_curr])) {
+                $currencies[$item->dest_curr] = 0;
+            }
+            $currencies[$item->dest_curr]++;
+        }
+        $currencyId = 0;
+        foreach ($currencies as $curr_id => $value) {
+            if (!$currencyId || $value > $currencies[$currencyId]) {
+                $currencyId = $curr_id;
+            }
+        }
+
+        if (!$currencyId) {
+            $currencyId = $currMod->getIdByPos(0);
+        }
+        if (!$currencyId) {
             throw new \Error("No currencies found");
         }
 
         $data["statArr"] = $transMod->getHistogramSeries([
             "filter" => "currency",
-            "curr_id" => $curr_acc_id,
+            "curr_id" => $currencyId,
             "type" => EXPENSE,
             "group" => 2, // group by week
             "limit" => 5
