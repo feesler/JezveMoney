@@ -3,8 +3,8 @@ import {
     isFunction,
     show,
     Component,
-    Popup,
 } from 'jezvejs';
+import { Popup } from 'jezvejs/Popup';
 import { ImportFileUploader } from '../FileUploader/ImportFileUploader.js';
 import { ImportTemplateManager } from '../TemplateManager/ImportTemplateManager.js';
 import { LoadingIndicator } from '../../../LoadingIndicator/LoadingIndicator.js';

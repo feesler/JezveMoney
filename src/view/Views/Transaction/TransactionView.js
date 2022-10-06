@@ -7,10 +7,10 @@ import {
     enable,
     checkDate,
     addChilds,
-    DropDown,
-    DatePicker,
-    DecimalInput,
 } from 'jezvejs';
+import { DropDown } from 'jezvejs/DropDown';
+import { DatePicker } from 'jezvejs/DatePicker';
+import { DecimalInput } from 'jezvejs/DecimalInput';
 import {
     fixFloat,
     isValidValue,

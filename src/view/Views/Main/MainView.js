@@ -1,5 +1,5 @@
 import 'jezvejs/style';
-import { Histogram } from 'jezvejs';
+import { Histogram } from 'jezvejs/Histogram';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';

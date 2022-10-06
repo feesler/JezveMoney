@@ -2,8 +2,8 @@ import {
     ce,
     enable,
     isFunction,
-    Checkbox,
 } from 'jezvejs';
+import { Checkbox } from 'jezvejs/Checkbox';
 import { ImportTransactionBase } from '../TransactionBase/ImportTransactionBase.js';
 import { Field } from '../../Field/Field.js';
 import './style.scss';

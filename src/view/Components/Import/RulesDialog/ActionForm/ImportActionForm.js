@@ -4,9 +4,9 @@ import {
     isFunction,
     asArray,
     Component,
-    DropDown,
-    DecimalInput,
 } from 'jezvejs';
+import { DropDown } from 'jezvejs/DropDown';
+import { DecimalInput } from 'jezvejs/DecimalInput';
 import {
     ImportAction,
     IMPORT_ACTION_SET_TR_TYPE,

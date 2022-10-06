@@ -1,9 +1,6 @@
-import {
-    ge,
-    Component,
-    Switch,
-    Offcanvas,
-} from 'jezvejs';
+import { ge, Component } from 'jezvejs';
+import { Switch } from 'jezvejs/Switch';
+import { Offcanvas } from 'jezvejs/Offcanvas';
 import { DARK_THEME } from '../../js/Application.js';
 import './style.scss';
 

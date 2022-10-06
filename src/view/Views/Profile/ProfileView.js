@@ -2,9 +2,9 @@ import 'jezvejs/style';
 import {
     ge,
     show,
-    Popup,
-    Checkbox,
 } from 'jezvejs';
+import { Checkbox } from 'jezvejs/Checkbox';
+import { Popup } from 'jezvejs/Popup';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';

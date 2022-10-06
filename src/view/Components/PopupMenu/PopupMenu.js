@@ -8,8 +8,8 @@ import {
     setEmptyClick,
     removeEmptyClick,
     Component,
-    Checkbox,
 } from 'jezvejs';
+import { Checkbox } from 'jezvejs/Checkbox';
 import { IconLink } from '../IconLink/IconLink.js';
 import './style.scss';
 

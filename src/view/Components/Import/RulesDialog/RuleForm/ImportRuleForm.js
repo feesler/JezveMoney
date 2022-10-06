@@ -4,8 +4,8 @@ import {
     isFunction,
     copyObject,
     Component,
-    Collapsible,
 } from 'jezvejs';
+import { Collapsible } from 'jezvejs/Collapsible';
 import { ImportRule } from '../../../../js/model/ImportRule.js';
 import {
     IMPORT_ACTION_SET_ACCOUNT,

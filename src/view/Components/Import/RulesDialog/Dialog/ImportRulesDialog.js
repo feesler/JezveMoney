@@ -7,10 +7,10 @@ import {
     insertAfter,
     isFunction,
     Component,
-    Popup,
-    InputGroup,
-    Paginator,
 } from 'jezvejs';
+import { Popup } from 'jezvejs/Popup';
+import { InputGroup } from 'jezvejs/InputGroup';
+import { Paginator } from 'jezvejs/Paginator';
 import { API } from '../../../../js/api/index.js';
 import { ImportRule } from '../../../../js/model/ImportRule.js';
 import { ImportRuleForm } from '../RuleForm/ImportRuleForm.js';

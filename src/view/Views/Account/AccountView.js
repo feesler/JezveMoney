@@ -1,10 +1,7 @@
 import 'jezvejs/style';
-import {
-    ge,
-    isNum,
-    DropDown,
-    DecimalInput,
-} from 'jezvejs';
+import { ge, isNum } from 'jezvejs';
+import { DropDown } from 'jezvejs/DropDown';
+import { DecimalInput } from 'jezvejs/DecimalInput';
 import { normalize } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';

@@ -1,5 +1,6 @@
 import 'jezvejs/style';
-import { ge, Checkbox } from 'jezvejs';
+import { ge } from 'jezvejs';
+import { Checkbox } from 'jezvejs/Checkbox';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
 import '../../css/app.scss';

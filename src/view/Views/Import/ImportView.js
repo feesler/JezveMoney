@@ -9,11 +9,11 @@ import {
     enable,
     setEmptyClick,
     removeEmptyClick,
-    Sortable,
-    DropDown,
-    Checkbox,
-    Paginator,
 } from 'jezvejs';
+import { Checkbox } from 'jezvejs/Checkbox';
+import { DropDown } from 'jezvejs/DropDown';
+import { Paginator } from 'jezvejs/Paginator';
+import { Sortable } from 'jezvejs/Sortable';
 import { fixFloat, timestampFromString } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';

@@ -3,8 +3,8 @@ import {
     show,
     isFunction,
     Component,
-    Checkbox,
 } from 'jezvejs';
+import { Checkbox } from 'jezvejs/Checkbox';
 import { API } from '../../../../js/api/index.js';
 
 /** CSS classes */

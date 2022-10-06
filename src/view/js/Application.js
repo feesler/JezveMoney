@@ -4,8 +4,8 @@ import {
     svg,
     isDate,
     formatDate,
-    Popup,
 } from 'jezvejs';
+import { Popup } from 'jezvejs/Popup';
 import { parseCookies, setCookie } from './utils.js';
 import { AccountList } from './model/AccountList.js';
 import { CurrencyList } from './model/CurrencyList.js';

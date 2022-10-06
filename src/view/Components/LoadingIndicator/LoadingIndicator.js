@@ -2,8 +2,8 @@ import {
     ce,
     show,
     Component,
-    Spinner,
 } from 'jezvejs';
+import { Spinner } from 'jezvejs/Spinner';
 import './style.scss';
 
 const defaultProps = {

@@ -4,8 +4,8 @@ import {
     removeChilds,
     Component,
     Selection,
-    Sortable,
 } from 'jezvejs';
+import { Sortable } from 'jezvejs/Sortable';
 import {
     TRANS_ITEM_CLASS,
     TransactionListItem,

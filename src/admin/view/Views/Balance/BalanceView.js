@@ -1,9 +1,6 @@
 import 'jezvejs/style';
-import {
-    urlJoin,
-    isEmpty,
-    DropDown,
-} from 'jezvejs';
+import { urlJoin, isEmpty } from 'jezvejs';
+import { DropDown } from 'jezvejs/DropDown';
 import { Application } from '../../../../view/js/Application.js';
 import { View } from '../../../../view/js/View.js';
 import '../../../../view/css/app.scss';

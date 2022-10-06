@@ -5,8 +5,8 @@ import {
     addChilds,
     removeChilds,
     show,
-    Popup,
 } from 'jezvejs';
+import { Popup } from 'jezvejs/Popup';
 import { ConfirmDialog } from '../../../view/Components/ConfirmDialog/ConfirmDialog.js';
 import { AdminView } from './AdminView.js';
 

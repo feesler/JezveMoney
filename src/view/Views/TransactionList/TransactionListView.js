@@ -5,11 +5,11 @@ import {
     isDate,
     setEvents,
     throttle,
-    Collapsible,
-    DropDown,
-    DatePicker,
-    Paginator,
 } from 'jezvejs';
+import { Collapsible } from 'jezvejs/Collapsible';
+import { DropDown } from 'jezvejs/DropDown';
+import { DatePicker } from 'jezvejs/DatePicker';
+import { Paginator } from 'jezvejs/Paginator';
 import { Application } from '../../js/Application.js';
 import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';

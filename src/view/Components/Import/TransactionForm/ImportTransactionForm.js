@@ -5,12 +5,12 @@ import {
     isFunction,
     insertAfter,
     checkDate,
-    Checkbox,
-    DatePicker,
-    DropDown,
-    DecimalInput,
-    InputGroup,
 } from 'jezvejs';
+import { Checkbox } from 'jezvejs/Checkbox';
+import { DatePicker } from 'jezvejs/DatePicker';
+import { DropDown } from 'jezvejs/DropDown';
+import { DecimalInput } from 'jezvejs/DecimalInput';
+import { InputGroup } from 'jezvejs/InputGroup';
 import { fixFloat } from '../../../js/utils.js';
 import { ImportTransactionBase } from '../TransactionBase/ImportTransactionBase.js';
 import { Field } from '../../Field/Field.js';

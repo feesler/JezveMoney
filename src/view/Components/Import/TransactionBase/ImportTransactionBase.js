@@ -2,8 +2,8 @@ import {
     ce,
     isFunction,
     Component,
-    Collapsible,
 } from 'jezvejs';
+import { Collapsible } from 'jezvejs/Collapsible';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 
 /** CSS classes */

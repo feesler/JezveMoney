@@ -6,10 +6,10 @@ import {
     insertAfter,
     isDate,
     show,
-    Histogram,
-    DatePicker,
-    DropDown,
 } from 'jezvejs';
+import { Histogram } from 'jezvejs/Histogram';
+import { DatePicker } from 'jezvejs/DatePicker';
+import { DropDown } from 'jezvejs/DropDown';
 import { Application } from '../../js/Application.js';
 import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';
