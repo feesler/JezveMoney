@@ -57,6 +57,12 @@ include(TPL_PATH . "Header.tpl");	?>
                                             "title" => "Edit rules",
                                             "icon" => "edit"
                                         ])?>
+                                        <div class="actions-menu-list__separator"></div>
+                                        <label id="similarCheck" class="checkbox action-checkbox">
+                                            <input type="checkbox" checked>
+                                            <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
+                                            <span class="checkbox__label">Check similar transactions</span>
+                                        </label>
                                     </div>
                                 </div>
                             </div>

@@ -67,6 +67,7 @@ class ImportView extends View {
             originalItemData: null,
             mainAccount: null,
             rulesEnabled: true,
+            checkSimilarEnabled: true,
         };
 
         this.menuEmptyClickHandler = () => this.hideActionsMenu();
@@ -92,21 +93,22 @@ class ImportView extends View {
             elem: 'clearFormBtn',
             onclick: () => this.removeAllItems(),
         });
-
         this.uploadBtn = IconLink.fromElement({
             elem: 'uploadBtn',
             onclick: () => this.showUploadDialog(),
         });
-
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
             onchange: () => this.onMainAccChange(),
             className: 'dd__main-account',
         });
-
         this.rulesCheck = Checkbox.fromElement(
             ge('rulesCheck'),
             { onChange: () => this.onToggleEnableRules() },
+        );
+        this.similarCheck = Checkbox.fromElement(
+            ge('similarCheck'),
+            { onChange: () => this.onToggleCheckSimilar() },
         );
 
         this.submitBtn = ge('submitbtn');
@@ -260,7 +262,11 @@ class ImportView extends View {
 
         this.applyRules(false);
 
-        this.requestSimilar();
+        if (this.state.checkSimilarEnabled) {
+            this.requestSimilar();
+        } else {
+            this.setRenderTime();
+        }
     }
 
     /**
@@ -317,45 +323,58 @@ class ImportView extends View {
         return item;
     }
 
+    /** Returns date range for current imported transactions */
+    getImportedItemsDateRange(state = this.state) {
+        const res = { start: 0, end: 0 };
+        state.items.forEach((item) => {
+            if (!this.isImportedItem(item)) {
+                return;
+            }
+
+            const date = item.getDate();
+            const time = timestampFromString(date);
+            if (res.start === 0) {
+                res.start = time;
+                res.end = time;
+            } else {
+                res.start = Math.min(time, res.start);
+                res.end = Math.max(time, res.end);
+            }
+        });
+
+        return res;
+    }
+
+    /** Request API for list of transactions similar to imported */
+    async fetchSimilarTransactions() {
+        try {
+            const range = this.getImportedItemsDateRange();
+            const result = await API.transaction.list({
+                count: 0,
+                stdate: window.app.formatDate(new Date(range.start)),
+                enddate: window.app.formatDate(new Date(range.end)),
+                acc_id: this.state.mainAccount.id,
+            });
+            return result.data.items;
+        } catch (e) {
+            return null;
+        }
+    }
+
     /**
      * Send API request to obtain transactions similar to imported.
      * Compare list of import items with transactions already in DB
      *  and disable import item if same(similar) transaction found
      */
     async requestSimilar() {
+        if (!this.state.checkSimilarEnabled) {
+            return;
+        }
+
         this.loadingInd.show();
 
-        // Obtain date region of imported transactions
-        const importedDateRange = { start: 0, end: 0 };
-        this.state.items.forEach((item) => {
-            if (!this.isImportedItem(item)) {
-                return;
-            }
-
-            const date = item.getDate();
-            const timestamp = timestampFromString(date);
-
-            if (importedDateRange.start === 0 || importedDateRange.start > timestamp) {
-                importedDateRange.start = timestamp;
-            }
-            if (importedDateRange.end === 0 || importedDateRange.end < timestamp) {
-                importedDateRange.end = timestamp;
-            }
-        });
-        // Prepare request data
-        const reqParams = {
-            count: 0,
-            stdate: window.app.formatDate(new Date(importedDateRange.start)),
-            enddate: window.app.formatDate(new Date(importedDateRange.end)),
-            acc_id: this.state.mainAccount.id,
-        };
-
-        // Send request
-        let transCache = null;
-        try {
-            const result = await API.transaction.list(reqParams);
-            transCache = result.data.items;
-        } catch (e) {
+        const transCache = await this.fetchSimilarTransactions();
+        if (!transCache) {
             this.loadingInd.hide();
             return;
         }
@@ -502,6 +521,26 @@ class ImportView extends View {
 
         state.pagination = this.updateList(state);
         this.setState(state);
+    }
+
+    /** Enables or disables all items of transaction list */
+    enableAll(value = true) {
+        const state = {
+            ...this.state,
+            items: this.state.items.map((item) => {
+                if (item.enabled === value) {
+                    return item;
+                }
+
+                const newItem = new ImportTransaction(item);
+                newItem.enable(value);
+
+                return newItem;
+            }),
+        };
+
+        this.setState(state);
+        this.setRenderTime();
     }
 
     /** Change page of transactions list */
@@ -920,6 +959,23 @@ class ImportView extends View {
         });
 
         this.setState(state);
+    }
+
+    /** Check similar transactions checkbox 'change' event handler */
+    onToggleCheckSimilar() {
+        this.hideActionsMenu();
+
+        const checkSimilarEnabled = !!this.similarCheck.checked;
+        this.setState({
+            ...this.state,
+            checkSimilarEnabled,
+        });
+
+        if (checkSimilarEnabled) {
+            this.requestSimilar();
+        } else {
+            this.enableAll();
+        }
     }
 
     /** Rules button 'click' event handler */

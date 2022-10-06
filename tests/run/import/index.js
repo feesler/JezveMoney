@@ -223,7 +223,7 @@ export const changeMainAccount = async (accountId) => {
         App.view.items.forEach((_, ind) => {
             const item = App.view.items[ind];
 
-            if (!item.original || !App.view.isRulesEnabled()) {
+            if (!item.original || !App.view.rulesEnabled) {
                 item.setMainAccount(accountId);
                 return;
             }
@@ -260,12 +260,12 @@ export const enableRules = async (value = true) => {
     const enable = !!value;
     const descr = enable ? 'Enable rules' : 'Disable rules';
 
-    await test(`${descr}`, async () => {
+    await test(descr, async () => {
         await checkNavigation();
         await checkViewState('main');
 
         assert(
-            enable !== App.view.isRulesEnabled(),
+            enable !== App.view.rulesEnabled,
             `Import rules already ${enable ? 'enabled' : 'disabled'}`,
         );
 
@@ -322,6 +322,19 @@ export const enableRules = async (value = true) => {
         };
 
         return App.view.checkState();
+    });
+};
+
+/** Enable/disable check similar transactions option */
+export const enableCheckSimilar = async (value = true) => {
+    const enable = !!value;
+    const act = enable ? 'Enable' : 'Disable';
+
+    await test(`${act} check similar transactions`, async () => {
+        await checkNavigation();
+        await checkViewState('main');
+
+        return App.view.enableCheckSimilar(enable);
     });
 };
 
