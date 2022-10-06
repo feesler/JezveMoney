@@ -1,5 +1,10 @@
-import { copyObject, isObject, hasFlag } from 'jezvejs';
-import { timestampFromString } from '../utils.js';
+import {
+    copyObject,
+    isObject,
+    hasFlag,
+    checkDate,
+} from 'jezvejs';
+import { timestampFromString, fixFloat } from '../utils.js';
 import { ListItem } from './ListItem.js';
 
 /** Condition field types */
@@ -286,6 +291,17 @@ export class ImportCondition extends ListItem {
         return hasFlag(res, IMPORT_COND_OP_FIELD_FLAG);
     }
 
+    /** Returns true if possible to compare specified field type with another field */
+    static isPropertyValueAvailable(value) {
+        return (this.isCurrencyField(value) || this.isAmountField(value));
+    }
+
+    /** Validate condition amount value */
+    static isValidAmount(value) {
+        const amount = parseFloat(fixFloat(value));
+        return !Number.isNaN(amount);
+    }
+
     /**
      * Check specified field name is available
      * @param {string} field - field name to check
@@ -361,6 +377,52 @@ export class ImportCondition extends ListItem {
     /** Return array of operators available for current type of field */
     getAvailOperators() {
         return ImportCondition.getAvailOperators(this.field_id);
+    }
+
+    /** Returns true if possible to compare current field type with another field */
+    isPropertyValueAvailable() {
+        return ImportCondition.isPropertyValueAvailable(this.field_id);
+    }
+
+    /** Validate condition amount value */
+    isValidAmount() {
+        return ImportCondition.isValidAmount(this.value);
+    }
+
+    /** Check correctness of condition */
+    validate() {
+        const res = {
+            amount: true,
+            date: true,
+            emptyValue: true,
+            propValue: true,
+            sameProperty: true,
+        };
+
+        // Check amount value
+        if (this.isAmountField()) {
+            res.amount = this.isValidAmount();
+        }
+
+        // Check date condition
+        if (this.isDateField()) {
+            res.date = checkDate(this.value);
+        }
+
+        // Check empty condition value is used only for string field
+        // with 'equal' and 'not equal' operators
+        if (this.value === '') {
+            res.emptyValue = this.isStringField() && this.isItemOperator();
+        }
+
+        if (this.isPropertyValue()) {
+            // Check property value is available
+            res.propValue = this.isPropertyValueAvailable();
+            // Check property is not compared with itself as property value
+            res.sameProperty = this.field_id !== parseInt(this.value, 10);
+        }
+
+        return res;
     }
 
     /**

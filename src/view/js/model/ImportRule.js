@@ -1,4 +1,3 @@
-import { checkDate } from 'jezvejs';
 import { fixFloat } from '../utils.js';
 import { ListItem } from './ListItem.js';
 import {
@@ -18,6 +17,7 @@ const MSG_DUP_CONDITION = 'Duplicate condition';
 const MSG_INCORRECT_AMOUNT = 'Input correct amount';
 const MSG_INVALID_DATE = 'Input correct date in DD.MM.YYYY format';
 const MSG_NO_EMPTY_VALUE = 'Input value';
+const MSG_PROPERTY_COMPARE_UNAVAIL = 'Compare with another property not available';
 const MSG_SAME_PROPERTY_COMPARE = 'Can not compare property with itself';
 const MSG_EQUAL_CONDITION = '\'Equal\' condition can not be combined with other conditions for same property';
 const MSG_DUP_LESS = 'Duplicate \'less\' condition';
@@ -70,12 +70,6 @@ export class ImportRule extends ListItem {
         });
     }
 
-    /** Validate condition amount value */
-    isValidConditionAmount(value) {
-        const amount = parseFloat(fixFloat(value));
-        return !Number.isNaN(amount);
-    }
-
     /** Validate action amount value */
     isValidActionAmount(value) {
         const amount = parseFloat(fixFloat(value));
@@ -103,35 +97,26 @@ export class ImportRule extends ListItem {
 
         try {
             this.conditions.forEach((condition, ind) => {
+                const validation = condition.validate();
+                if (!validation.amount) {
+                    throw new ImportConditionValidationError(MSG_INCORRECT_AMOUNT, ind);
+                }
+                if (!validation.date) {
+                    throw new ImportConditionValidationError(MSG_INVALID_DATE, ind);
+                }
+                if (!validation.emptyValue) {
+                    throw new ImportConditionValidationError(MSG_NO_EMPTY_VALUE, ind);
+                }
+                if (!validation.propValue) {
+                    throw new ImportConditionValidationError(MSG_PROPERTY_COMPARE_UNAVAIL, ind);
+                }
+                if (!validation.sameProperty) {
+                    throw new ImportConditionValidationError(MSG_SAME_PROPERTY_COMPARE, ind);
+                }
+
                 // Check full duplicates of condition
                 if (this.conditions.hasSameCondition(condition)) {
                     throw new ImportConditionValidationError(MSG_DUP_CONDITION, ind);
-                }
-
-                // Check amount value
-                if (condition.isAmountField()
-                    && !this.isValidConditionAmount(condition.value)) {
-                    throw new ImportConditionValidationError(MSG_INCORRECT_AMOUNT, ind);
-                }
-
-                // Check date condition
-                if (condition.isDateField()
-                    && !checkDate(condition.value)) {
-                    throw new ImportConditionValidationError(MSG_INVALID_DATE, ind);
-                }
-
-                // Check empty condition value is used only for string field
-                // with 'equal' and 'not equal' operators
-                if (condition.value === ''
-                    && !(condition.isStringField()
-                        && condition.isItemOperator())) {
-                    throw new ImportConditionValidationError(MSG_NO_EMPTY_VALUE, ind);
-                }
-
-                // Check property is not compared with itself as property value
-                if (condition.isPropertyValue()
-                    && condition.field_id === parseInt(condition.value, 10)) {
-                    throw new ImportConditionValidationError(MSG_SAME_PROPERTY_COMPARE, ind);
                 }
 
                 // Check 'equal' conditions for each field type present only once

@@ -18,6 +18,7 @@ import {
     IMPORT_COND_FIELD_ACC_CURRENCY,
     IMPORT_COND_FIELD_DATE,
     IMPORT_COND_FIELD_COMMENT,
+    ImportCondition,
 } from '../../../model/ImportCondition.js';
 
 const fieldValueTypes = [
@@ -144,7 +145,10 @@ export class ImportConditionForm extends TestComponent {
                 },
             },
             operatorField: { value: model.operator.toString(), visible: true },
-            fieldValueCheck: { checked: model.isFieldValue, visible: true },
+            fieldValueCheck: {
+                checked: model.isFieldValue,
+                visible: ImportCondition.isPropertyValueAvailable(model.fieldType),
+            },
             deleteBtn: { visible: true },
         };
 

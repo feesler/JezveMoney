@@ -231,6 +231,11 @@ export class ImportCondition {
         return hasFlag(flags, IMPORT_COND_OP_FIELD_FLAG);
     }
 
+    /** Returns true if possible to compare specified field type with another field */
+    static isPropertyValueAvailable(value) {
+        return (this.isCurrencyField(value) || this.isAmountField(value));
+    }
+
     /** Check field type of condition is account */
     isItemField() {
         return ImportCondition.isItemField(this.field_id);
@@ -297,33 +302,39 @@ export class ImportCondition {
         return !Number.isNaN(amount);
     }
 
+    /** Returns true if possible to compare current field type with another field */
+    isPropertyValueAvailable() {
+        return ImportCondition.isPropertyValueAvailable(this.field_id);
+    }
+
     /** Check correctness of condition */
     validate() {
         // Check amount value
-        if (this.isAmountField()
-            && !this.isValidAmount(this.value)) {
+        if (this.isAmountField() && !this.isValidAmount(this.value)) {
             return false;
         }
 
         // Check date condition
-        if (this.isDateField()
-            && !convDate(this.value)) {
+        if (this.isDateField() && !convDate(this.value)) {
             return false;
         }
 
         // Check empty condition value is used only for string field
         // with 'equal' and 'not equal' operators
-        if (this.value === ''
-            && !(this.isStringField()
-                && this.isItemOperator())
-        ) {
+        if (this.value === '' && !(this.isStringField() && this.isItemOperator())) {
             return false;
         }
 
-        // Check property is not compared with itself as property value
-        if (this.isPropertyValue()
-            && this.field_id === parseInt(this.value, 10)) {
-            return false;
+        if (this.isPropertyValue()) {
+            // Check property value is available
+            if (!this.isPropertyValueAvailable()) {
+                return false;
+            }
+
+            // Check property is not compared with itself as property value
+            if (this.field_id === parseInt(this.value, 10)) {
+                return false;
+            }
         }
 
         return true;

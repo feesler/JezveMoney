@@ -152,6 +152,11 @@ export class ImportConditionForm extends Component {
         return this.fieldTypes.filter((type) => propFilter.includes(type.id));
     }
 
+    /** Returns true if possible to compare current field type with another field */
+    isFieldValueAvailable(state = this.state) {
+        return ImportCondition.isPropertyValueAvailable(state.fieldType);
+    }
+
     /** Create property field */
     createPropertyField() {
         const propTypes = this.getPropertyTypes();
@@ -215,16 +220,10 @@ export class ImportConditionForm extends Component {
 
     /** Create value property field */
     createValuePropField() {
-        const items = this.fieldTypes
-            .filter((fieldType) => !ImportCondition.isTemplateField(fieldType.id))
-            .map((fieldType) => ({ id: fieldType.id, title: fieldType.title }));
-
         this.valuePropDropDown = DropDown.create({
             className: VALUE_PROP_FIELD_CLASS,
             onchange: () => this.onValueChange(),
         });
-        this.valuePropDropDown.append(items);
-        this.valuePropDropDown.selectItem(items[0].id);
     }
 
     /** Verify correctness of operator */
@@ -287,7 +286,17 @@ export class ImportConditionForm extends Component {
             [this.state.operator] = this.state.availOperators;
         }
 
-        this.state.value = this.getConditionValue(this.state);
+        if (!this.isFieldValueAvailable()) {
+            this.state.isFieldValue = false;
+        }
+
+        if (this.state.isFieldValue) {
+            const [item] = this.getValuePropertyItems(this.state);
+            this.state.value = item.id;
+        } else {
+            this.state.value = this.getConditionValue(this.state);
+        }
+
         this.state.isValid = true;
 
         this.verifyOperator(this.state);
@@ -383,8 +392,18 @@ export class ImportConditionForm extends Component {
 
     /** Field value checkbox 'change' event handler */
     onFieldValueChecked() {
+        if (!this.isFieldValueAvailable()) {
+            return;
+        }
+
         this.state.isFieldValue = this.fieldValueCheck.checked;
-        this.state.value = this.getConditionValue(this.state);
+        if (this.state.isFieldValue) {
+            const [item] = this.getValuePropertyItems(this.state);
+            this.state.value = item.id;
+        } else {
+            this.state.value = this.getConditionValue(this.state);
+        }
+
         this.state.isValid = true;
         this.render(this.state);
         this.sendUpdate();
@@ -427,10 +446,6 @@ export class ImportConditionForm extends Component {
 
     /** Render operator select */
     renderOperator(state) {
-        if (!state) {
-            throw new Error('Invalid state');
-        }
-
         const items = this.operatorTypes
             .filter((operatorType) => state.availOperators.includes(operatorType.id))
             .map((operatorType) => ({
@@ -441,6 +456,42 @@ export class ImportConditionForm extends Component {
         this.operatorDropDown.removeAll();
         this.operatorDropDown.append(items);
         this.operatorDropDown.selectItem(state.operator);
+    }
+
+    getValuePropertyItems(state) {
+        const isCurrencyField = ImportCondition.isCurrencyField(state.fieldType);
+        const isAmountField = ImportCondition.isAmountField(state.fieldType);
+        if (!isCurrencyField && !isAmountField) {
+            throw new Error('Invalid state');
+        }
+
+        const items = this.fieldTypes
+            .filter((fieldType) => {
+                if (fieldType.id === state.fieldType) {
+                    return false;
+                }
+
+                if (isCurrencyField) {
+                    return ImportCondition.isCurrencyField(fieldType.id);
+                }
+
+                return ImportCondition.isAmountField(fieldType.id);
+            })
+            .map(({ id, title }) => ({ id, title }));
+
+        return items;
+    }
+
+    renderValueProperty(state) {
+        if (!this.isFieldValueAvailable(state)) {
+            return;
+        }
+
+        const items = this.getValuePropertyItems(state);
+
+        this.valuePropDropDown.removeAll();
+        this.valuePropDropDown.append(items);
+        this.valuePropDropDown.selectItem(items[0].id);
     }
 
     /** Render component state */
@@ -459,7 +510,6 @@ export class ImportConditionForm extends Component {
 
         this.propertyDropDown.selectItem(state.fieldType);
         this.renderOperator(state);
-        this.fieldValueCheck.check(state.isFieldValue);
 
         const isAccountValue = (
             !state.isFieldValue
@@ -469,14 +519,10 @@ export class ImportConditionForm extends Component {
             !state.isFieldValue
             && ImportCondition.isTemplateField(state.fieldType)
         );
-        const isCurrencyValue = (
-            !state.isFieldValue
-            && ImportCondition.isCurrencyField(state.fieldType)
-        );
-        const isAmountValue = (
-            !state.isFieldValue
-            && ImportCondition.isAmountField(state.fieldType)
-        );
+        const isCurrencyField = ImportCondition.isCurrencyField(state.fieldType);
+        const isCurrencyValue = (!state.isFieldValue && isCurrencyField);
+        const isAmountField = ImportCondition.isAmountField(state.fieldType);
+        const isAmountValue = (!state.isFieldValue && isAmountField);
         const isTextValue = (
             !state.isFieldValue
             && (
@@ -489,9 +535,16 @@ export class ImportConditionForm extends Component {
         this.templateDropDown.show(isTplValue);
         this.currencyDropDown.show(isCurrencyValue);
         show(this.amountInput, isAmountValue);
+        if (state.isFieldValue) {
+            this.renderValueProperty(state);
+        }
         this.valuePropDropDown.show(state.isFieldValue);
         show(this.valueInput, isTextValue);
 
         this.setConditionValue(state);
+
+        const showFieldValueCheck = this.isFieldValueAvailable(state);
+        this.fieldValueCheck.show(showFieldValueCheck);
+        this.fieldValueCheck.check(state.isFieldValue);
     }
 }
