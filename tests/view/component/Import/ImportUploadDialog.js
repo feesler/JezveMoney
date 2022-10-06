@@ -729,6 +729,7 @@ export class ImportUploadDialog extends TestComponent {
         });
     }
 
+    /** Returns array of ImportTransaction */
     getExpectedUploadResult(importData) {
         const tpl = new ImportTemplate(this.model.template);
 

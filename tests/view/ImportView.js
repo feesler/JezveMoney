@@ -415,22 +415,20 @@ export class ImportView extends AppView {
         const expectedUpload = this.uploadDialog.getExpectedUploadResult(importData);
         const isValid = expectedUpload != null;
         if (isValid) {
-            // Apply rules if enabled
-            if (this.isRulesEnabled()) {
-                for (const item of expectedUpload) {
+            const skipList = [];
+            expectedUpload.forEach((item) => {
+                // Apply rules if enabled
+                if (this.isRulesEnabled()) {
                     App.state.rules.applyTo(item);
                 }
-            }
 
-            // Disable transactions similar to already existing
-            const skipList = [];
-            for (const item of expectedUpload) {
+                // Disable transactions similar to already existing
                 const tr = findSimilarTransaction(item, skipList);
                 if (tr) {
                     skipList.push(tr.id);
-                    item.enabled = false;
+                    item.enable(false);
                 }
-            }
+            });
         }
 
         // Append uploaded items if valid
@@ -970,11 +968,11 @@ export class ImportView extends AppView {
             return true;
         }
 
-        for (const item of enabledItems) {
+        enabledItems.forEach((item) => {
             const expectedTransaction = item.getExpectedTransaction();
             const createRes = App.state.createTransaction(expectedTransaction);
             assert(createRes, 'Failed to create transaction');
-        }
+        });
 
         await submitAction();
 

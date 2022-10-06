@@ -1,13 +1,11 @@
 import {
     TestComponent,
     query,
-    queryAll,
     prop,
     click,
     input,
     isVisible,
     assert,
-    isFunction,
     copyObject,
 } from 'jezve-test';
 import { Checkbox, DropDown } from 'jezvejs/tests';
@@ -35,39 +33,6 @@ export class ImportTransactionForm extends TestComponent {
         this.mainAccount = mainAccount;
 
         this.model = {};
-    }
-
-    mapField(field) {
-        const fieldsMap = {
-            typeField: 'Type',
-            srcAmountField: (f) => f.name === 'src_amount[]',
-            destAmountField: (f) => f.name === 'dest_amount[]',
-            transferAccountField: [
-                'Source account',
-                'Destination account',
-            ],
-            personField: 'Person',
-            dateField: 'Date',
-            commentField: 'Comment',
-        };
-
-        assert(field?.title, 'Invalid field');
-
-        let res = null;
-        for (const fieldName of Object.keys(fieldsMap)) {
-            const fieldLabel = fieldsMap[fieldName];
-            if (
-                (typeof fieldLabel === 'string' && fieldLabel === field.title)
-                || (Array.isArray(fieldLabel) && fieldLabel.includes(field.title))
-                || (isFunction(fieldLabel) && fieldLabel(field))
-            ) {
-                res = { name: fieldName, component: field };
-                break;
-            }
-        }
-
-        assert(res, `Unknown field '${field.title}'`);
-        return res;
     }
 
     async parseField(elem) {
@@ -110,7 +75,7 @@ export class ImportTransactionForm extends TestComponent {
             res.value = await prop(res.inputElem, 'value');
         }
 
-        return this.mapField(res);
+        return res;
     }
 
     async parseContent() {
@@ -122,9 +87,27 @@ export class ImportTransactionForm extends TestComponent {
         assert(res.enableCheck, 'Invalid structure of import item');
         res.enabled = res.enableCheck.checked;
 
-        const fieldElems = await queryAll(this.elem, '.field');
-        const fields = await asyncMap(fieldElems, (field) => this.parseField(field));
-        fields.forEach((field) => { res[field.name] = field.component; });
+        const fieldSelectors = [
+            '.type-field',
+            '.account-field',
+            '.person-field',
+            '.src-amount-field',
+            '.dest-amount-field',
+            '.date-field',
+            '.comment-field',
+        ];
+
+        [
+            res.typeField,
+            res.transferAccountField,
+            res.personField,
+            res.srcAmountField,
+            res.destAmountField,
+            res.dateField,
+            res.commentField,
+        ] = await asyncMap(fieldSelectors, async (selector) => (
+            this.parseField(await query(this.elem, selector))
+        ));
 
         res.invFeedback = { elem: await query(this.elem, '.invalid-feedback') };
         res.menuBtn = await query(this.elem, '.menu-btn');

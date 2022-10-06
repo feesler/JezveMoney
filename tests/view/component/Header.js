@@ -40,14 +40,14 @@ export class Header extends TestComponent {
                 title: await prop(elem, 'textContent'),
             }));
 
-            for (const item of res.userNav.menuItems) {
+            res.userNav.menuItems.forEach((item) => {
                 if (item.title.toLowerCase() === 'profile') {
                     res.userNav.profileBtn = item;
                 }
                 if (item.title.toLowerCase() === 'logout') {
                     res.userNav.logoutBtn = item;
                 }
-            }
+            });
         }
 
         return res;

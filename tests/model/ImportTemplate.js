@@ -140,8 +140,7 @@ export class ImportTemplate {
                     throw new ImportTemplateError();
                 }
 
-                const item = ImportTransaction.fromImportData(original, mainAccount);
-                return item;
+                return ImportTransaction.fromImportData(original, mainAccount);
             });
 
             return res;

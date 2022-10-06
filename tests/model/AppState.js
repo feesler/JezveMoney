@@ -60,13 +60,7 @@ function checkFields(fields, expFields) {
         return false;
     }
 
-    for (const f of expFields) {
-        if (!(f in fields)) {
-            return false;
-        }
-    }
-
-    return true;
+    return expFields.every((f) => (f in fields));
 }
 
 /**
@@ -78,11 +72,11 @@ function copyFields(fields, expFields) {
     assert(fields && expFields, 'Invalid parameters');
 
     const res = {};
-    for (const f of expFields) {
+    expFields.forEach((f) => {
         if (f in fields) {
             res[f] = copyObject(fields[f]);
         }
-    }
+    });
 
     return res;
 }

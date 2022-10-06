@@ -16,39 +16,41 @@ export class ModeSelector extends TestComponent {
         const validClass = await hasClass(this.elem, 'mode-selector');
         assert(validClass, 'Unexpected stucture of mode selector control');
 
+        const [listModeElem, detailsModeElem] = await queryAll(this.elem, '.mode-selector__item');
+
         const res = {
-            listMode: {},
-            detailsMode: {},
+            listMode: await this.parseModeItem(listModeElem),
+            detailsMode: await this.parseModeItem(detailsModeElem),
         };
-
-        const modeElements = await queryAll(this.elem, '.mode-selector__item');
-        for (const elem of modeElements) {
-            const tagName = await prop(elem, 'tagName');
-            let text = await prop(elem, 'textContent');
-            text = text.trim().toLowerCase();
-
-            assert(availModes.includes(text), `Unknown mode ${text}`);
-
-            const modeItem = {
-                elem,
-                isActive: (tagName === 'B'),
-            };
-
-            if (text === 'classic') {
-                res.listMode = modeItem;
-            } else if (text === 'details') {
-                res.detailsMode = modeItem;
-            }
-        }
 
         assert(
             res.listMode.elem
-            && res.detailsMode.elem,
+            && res.listMode.title === 'Classic'
+            && res.detailsMode.elem
+            && res.detailsMode.title === 'Details',
             'Unexpected stucture of mode selector control',
         );
         assert(res.listMode.isActive !== res.detailsMode.isActive, 'Invalid state of mode selector');
 
         res.details = res.detailsMode.isActive;
+
+        return res;
+    }
+
+    async parseModeItem(elem) {
+        assert(elem, 'Invalid element');
+
+        const tagName = await prop(elem, 'tagName');
+        let title = await prop(elem, 'textContent');
+        title = title.trim();
+
+        assert(availModes.includes(title.toLowerCase()), `Unknown mode ${title}`);
+
+        const res = {
+            elem,
+            title,
+            isActive: (tagName === 'B'),
+        };
 
         return res;
     }

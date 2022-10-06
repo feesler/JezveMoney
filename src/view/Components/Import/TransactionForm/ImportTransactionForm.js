@@ -34,7 +34,12 @@ const IG_BUTTON_TITLE_CLASS = 'input-group__btn-title';
 const DEFAULT_INPUT_CLASS = 'stretch-input';
 const AMOUNT_INPUT_CLASS = 'right-align-text';
 /* Fields */
+const TYPE_FIELD_CLASS = 'type-field';
+const ACCOUNT_FIELD_CLASS = 'account-field';
 const AMOUNT_FIELD_CLASS = 'amount-field';
+const SRC_AMOUNT_FIELD_CLASS = 'src-amount-field';
+const DEST_AMOUNT_FIELD_CLASS = 'dest-amount-field';
+const PERSON_FIELD_CLASS = 'person-field';
 const DATE_FIELD_CLASS = 'date-field';
 const COMMENT_FIELD_CLASS = 'comment-field';
 /* Controls */
@@ -205,6 +210,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.trTypeField = Field.create({
             title: 'Type',
             content: selectElem,
+            className: TYPE_FIELD_CLASS,
         });
 
         this.typeDropDown = DropDown.create({
@@ -225,6 +231,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.transferAccountField = Field.create({
             title: TITLE_FIELD_DEST_ACCOUNT,
             content: selectElem,
+            className: ACCOUNT_FIELD_CLASS,
         });
 
         this.transferAccDropDown = DropDown.create({
@@ -241,6 +248,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.personField = Field.create({
             title: TITLE_FIELD_PERSON,
             content: selectElem,
+            className: PERSON_FIELD_CLASS,
         });
 
         this.personDropDown = DropDown.create({
@@ -287,7 +295,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.srcAmountField = Field.create({
             title: TITLE_FIELD_AMOUNT,
             content: this.srcAmountGroup.elem,
-            className: AMOUNT_FIELD_CLASS,
+            className: [AMOUNT_FIELD_CLASS, SRC_AMOUNT_FIELD_CLASS],
         });
     }
 
@@ -327,7 +335,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.destAmountField = Field.create({
             title: TITLE_FIELD_DEST_AMOUNT,
             content: this.destAmountGroup.elem,
-            className: AMOUNT_FIELD_CLASS,
+            className: [AMOUNT_FIELD_CLASS, DEST_AMOUNT_FIELD_CLASS],
         });
         this.destAmountField.hide();
     }

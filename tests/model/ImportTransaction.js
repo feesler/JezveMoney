@@ -33,10 +33,6 @@ export class ImportTransaction {
         debtto: DEBT,
     };
 
-    constructor(props) {
-        Object.assign(this, props);
-    }
-
     /** Convert import data to transaction object */
     static fromImportData(data, mainAccount) {
         assert(data && mainAccount, 'Invalid data');
@@ -101,8 +97,17 @@ export class ImportTransaction {
         return this.typesMap[lstr];
     }
 
+    constructor(props) {
+        Object.assign(this, props);
+    }
+
     isDiff() {
         return (this.src_curr !== this.dest_curr);
+    }
+
+    /** Enable/disable transaction */
+    enable(value = true) {
+        this.enabled = !!value;
     }
 
     /** Set main account */

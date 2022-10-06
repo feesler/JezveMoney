@@ -4,6 +4,7 @@ import {
     queryAll,
     hasClass,
 } from 'jezve-test';
+import { asyncMap } from '../../common.js';
 import { MenuItem } from './MenuItem.js';
 
 export class TransactionTypeMenu extends TestComponent {
@@ -14,15 +15,17 @@ export class TransactionTypeMenu extends TestComponent {
             multi: await hasClass(this.elem, 'trtype-menu-multi'),
         };
 
-        const menuItems = await queryAll(this.elem, '.trtype-menu__item');
-        for (const item of menuItems) {
-            const menuItemObj = await MenuItem.create(this.parent, item);
-            if (menuItemObj.isActive) {
-                res.selectedTypes.push(menuItemObj.type);
+        const menuItemElems = await queryAll(this.elem, '.trtype-menu__item');
+        const menuItems = await asyncMap(menuItemElems, (elem) => (
+            MenuItem.create(this.parent, elem)
+        ));
+        menuItems.forEach((item) => {
+            if (item.isActive) {
+                res.selectedTypes.push(item.type);
             }
 
-            res.items[menuItemObj.type] = menuItemObj;
-        }
+            res.items[item.type] = item;
+        });
 
         return res;
     }
