@@ -1,4 +1,5 @@
 import 'jezvejs/style';
+import 'jezvejs/style/Checkbox';
 import {
     ge,
     ce,
