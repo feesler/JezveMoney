@@ -17,6 +17,18 @@ import { Sortable } from 'jezvejs/Sortable';
 import { fixFloat, timestampFromString } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
+import {
+    EXPENSE,
+    INCOME,
+    TRANSFER,
+    DEBT,
+} from '../../js/model/Transaction.js';
+import { ImportTransaction } from '../../js/model/ImportTransaction.js';
+import { CurrencyList } from '../../js/model/CurrencyList.js';
+import { AccountList } from '../../js/model/AccountList.js';
+import { PersonList } from '../../js/model/PersonList.js';
+import { ImportRuleList } from '../../js/model/ImportRuleList.js';
+import { ImportTemplateList } from '../../js/model/ImportTemplateList.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import '../../css/app.scss';
 import './style.scss';
@@ -26,13 +38,6 @@ import { ImportTransactionForm } from '../../Components/Import/TransactionForm/I
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { API } from '../../js/api/index.js';
 import { ImportTransactionItem } from '../../Components/Import/TransactionItem/ImportTransactionItem.js';
-import {
-    EXPENSE,
-    INCOME,
-    TRANSFER,
-    DEBT,
-} from '../../js/model/Transaction.js';
-import { ImportTransaction } from '../../js/model/ImportTransaction.js';
 
 /** Messages */
 const MSG_IMPORT_SUCCESS = 'All transactions have been successfully imported';
@@ -71,6 +76,12 @@ class ImportView extends View {
         };
 
         this.menuEmptyClickHandler = () => this.hideActionsMenu();
+
+        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
+        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
+        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
+        window.app.loadModel(ImportRuleList, 'rules', window.app.props.rules);
+        window.app.loadModel(ImportTemplateList, 'templates', window.app.props.templates);
     }
 
     /**

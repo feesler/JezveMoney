@@ -13,6 +13,9 @@ import { Paginator } from 'jezvejs/Paginator';
 import { Application } from '../../js/Application.js';
 import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';
+import { CurrencyList } from '../../js/model/CurrencyList.js';
+import { AccountList } from '../../js/model/AccountList.js';
+import { PersonList } from '../../js/model/PersonList.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
@@ -47,6 +50,10 @@ class TransactionListView extends View {
             typingSearch: false,
             selDateRange: null,
         };
+
+        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
+        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
+        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
     }
 
     /**

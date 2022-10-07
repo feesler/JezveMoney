@@ -2,6 +2,7 @@ import 'jezvejs/style';
 import { ge, urlJoin, Selection } from 'jezvejs';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
+import { AccountList } from '../../js/model/AccountList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import '../../css/app.scss';
@@ -26,6 +27,8 @@ class AccountListView extends View {
                 hidden: new Selection(),
             },
         };
+
+        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
     }
 
     /**

@@ -25,6 +25,10 @@ import {
 } from '../../js/model/Transaction.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
+import { CurrencyList } from '../../js/model/CurrencyList.js';
+import { AccountList } from '../../js/model/AccountList.js';
+import { IconList } from '../../js/model/IconList.js';
+import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Tile } from '../../Components/Tile/Tile.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
@@ -86,6 +90,11 @@ class TransactionView extends View {
         if (!('transaction' in this.props)) {
             throw new Error('Invalid Transaction view properties');
         }
+
+        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
+        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
+        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
+        window.app.loadModel(IconList, 'icons', window.app.props.icons);
 
         const currencyModel = window.app.model.currency;
         const accountModel = window.app.model.accounts;

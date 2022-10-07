@@ -7,22 +7,16 @@ import {
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
 import { parseCookies, setCookie } from './utils.js';
-import { AccountList } from './model/AccountList.js';
-import { CurrencyList } from './model/CurrencyList.js';
-import { IconList } from './model/IconList.js';
-import { ImportRuleList } from './model/ImportRuleList.js';
-import { ImportTemplateList } from './model/ImportTemplateList.js';
-import { PersonList } from './model/PersonList.js';
 
 /** CSS classes */
 const INVALID_BLOCK_CLASS = 'invalid-block';
-
+/** Strings */
+const HIDDEN_GROUP_TITLE = 'Hidden';
 /** Theme constants */
 export const WHITE_THEME = 0;
 export const DARK_THEME = 1;
 
-const HIDDEN_GROUP_TITLE = 'Hidden';
-
+/** Application class */
 export class Application {
     constructor(props = {}) {
         this.props = { ...props };
@@ -39,33 +33,10 @@ export class Application {
 
         // Setup models
         this.model = {};
+        this.modelClass = {};
 
         if (this.props.profile) {
             this.model.profile = { ...this.props.profile };
-        }
-
-        if (this.props.currency) {
-            this.model.currency = CurrencyList.create(this.props.currency);
-        }
-
-        if (this.props.icons) {
-            this.model.icons = IconList.create(this.props.icons);
-        }
-
-        if (this.props.accounts) {
-            this.model.accounts = AccountList.create(this.props.accounts);
-        }
-
-        if (this.props.persons) {
-            this.model.persons = PersonList.create(this.props.persons);
-        }
-
-        if (this.props.rules) {
-            this.model.rules = ImportRuleList.create(this.props.rules);
-        }
-
-        if (this.props.templates) {
-            this.model.templates = ImportTemplateList.create(this.props.templates);
         }
 
         this.messageBox = null;
@@ -73,6 +44,20 @@ export class Application {
 
     createView(ViewClass) {
         this.view = new ViewClass(this.props.view);
+    }
+
+    loadModel(ModelClass, name, data) {
+        if (!ModelClass) {
+            throw new Error('Invalid model class');
+        }
+        if (typeof name !== 'string' || name.length === 0) {
+            throw new Error('Invalid model name');
+        }
+
+        this.modelClass[name] = ModelClass;
+        this.model[name] = ModelClass.create(data);
+
+        return this.model[name];
     }
 
     get baseURL() {
@@ -215,14 +200,19 @@ export class Application {
             return;
         }
 
-        const userAccounts = AccountList.create(
+        const ModelClass = this.modelClass.accounts;
+        if (!ModelClass) {
+            throw new Error('Accounts model not initialized');
+        }
+
+        const userAccounts = ModelClass.create(
             this.model.accounts.getUserAccounts(this.model.profile.owner_id),
         );
         // Sort user accounts by visibility: [...visible, ...hidden]
         userAccounts.sort((a, b) => a.flags - b.flags);
         this.model.userAccounts = userAccounts;
-        this.model.visibleUserAccounts = AccountList.create(userAccounts.getVisible());
-        this.model.hiddenUserAccounts = AccountList.create(userAccounts.getHidden());
+        this.model.visibleUserAccounts = ModelClass.create(userAccounts.getVisible());
+        this.model.hiddenUserAccounts = ModelClass.create(userAccounts.getHidden());
     }
 
     checkPersonModels() {
@@ -230,11 +220,16 @@ export class Application {
             return;
         }
 
+        const ModelClass = this.modelClass.persons;
+        if (!ModelClass) {
+            throw new Error('Persons model not initialized');
+        }
+
         const { persons } = this.model;
         // Sort persons by visibility: [...visible, ...hidden]
         persons.sort((a, b) => a.flags - b.flags);
-        this.model.visiblePersons = PersonList.create(persons.getVisible());
-        this.model.hiddenPersons = PersonList.create(persons.getHidden());
+        this.model.visiblePersons = ModelClass.create(persons.getVisible());
+        this.model.hiddenPersons = ModelClass.create(persons.getHidden());
     }
 
     /** Initialize currency DropDown */

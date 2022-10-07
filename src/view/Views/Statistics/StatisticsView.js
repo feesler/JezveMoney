@@ -13,6 +13,8 @@ import { DropDown } from 'jezvejs/DropDown';
 import { Application } from '../../js/Application.js';
 import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';
+import { CurrencyList } from '../../js/model/CurrencyList.js';
+import { AccountList } from '../../js/model/AccountList.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
@@ -51,6 +53,9 @@ class StatisticsView extends View {
         };
 
         this.state.filter = ('filter' in this.props) ? this.props.filter : {};
+
+        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
+        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
     }
 
     /**

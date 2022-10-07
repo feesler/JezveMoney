@@ -2,6 +2,7 @@ import 'jezvejs/style';
 import { ge, Selection } from 'jezvejs';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
+import { PersonList } from '../../js/model/PersonList.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import '../../css/app.scss';
@@ -26,6 +27,8 @@ class PersonListView extends View {
                 hidden: new Selection(),
             },
         };
+
+        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
     }
 
     /**

@@ -5,10 +5,13 @@ import { DecimalInput } from 'jezvejs/DecimalInput';
 import { normalize } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
+import { IconList } from '../../js/model/IconList.js';
+import { AccountList } from '../../js/model/AccountList.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import '../../css/app.scss';
+import { CurrencyList } from '../../js/model/CurrencyList.js';
 
 const TITLE_ACCOUNT_DELETE = 'Delete account';
 const MSG_ACCOUNT_DELETE = 'Are you sure want to delete selected account?<br>All income and expense transactions history will be lost. Transfer to this account will be changed to expense. Transfer from this account will be changed to income.';
@@ -36,6 +39,10 @@ class AccountView extends View {
             this.state.data = { ...this.state.original };
             this.state.data.fInitBalance = normalize(this.state.data.initbalance);
         }
+
+        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
+        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
+        window.app.loadModel(IconList, 'icons', window.app.props.icons);
     }
 
     /**

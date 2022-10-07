@@ -2,6 +2,7 @@ import 'jezvejs/style';
 import { ge } from 'jezvejs';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
+import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import '../../css/app.scss';
@@ -28,6 +29,8 @@ class PersonView extends View {
             this.state.original = this.props.person;
             this.state.data = { ...this.state.original };
         }
+
+        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
     }
 
     /**
