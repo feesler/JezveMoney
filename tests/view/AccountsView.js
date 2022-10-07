@@ -8,7 +8,6 @@ import {
 } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { TilesList } from './component/TilesList.js';
-import { Tile } from './component/Tile.js';
 import { IconLink } from './component/IconLink.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { Toolbar } from './component/Toolbar.js';
@@ -33,8 +32,8 @@ export class AccountsView extends AppView {
         );
 
         res.title = await prop(res.titleEl, 'textContent');
-        res.tiles = await TilesList.create(this, await query('#tilesContainer'), Tile);
-        res.hiddenTiles = await TilesList.create(this, await query('#hiddenTilesContainer'), Tile);
+        res.tiles = await TilesList.create(this, await query('#tilesContainer'));
+        res.hiddenTiles = await TilesList.create(this, await query('#hiddenTilesContainer'));
 
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 

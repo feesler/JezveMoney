@@ -9,14 +9,6 @@ import { PersonsList } from '../../model/PersonsList.js';
 import { asyncMap } from '../../common.js';
 
 export class TilesList extends TestComponent {
-    constructor(parent, elem, tileClass) {
-        super(parent, elem);
-
-        assert(tileClass, 'Invalid tile constructor specified');
-
-        this.tileClass = tileClass;
-    }
-
     get items() {
         return this.content.items;
     }
@@ -25,7 +17,7 @@ export class TilesList extends TestComponent {
         const res = {};
 
         const listItems = await queryAll(this.elem, '.tile');
-        res.items = await asyncMap(listItems, (item) => this.tileClass.create(this.parent, item));
+        res.items = await asyncMap(listItems, (item) => Tile.create(this.parent, item));
         res.items.sort((a, b) => a.id - b.id);
 
         return res;

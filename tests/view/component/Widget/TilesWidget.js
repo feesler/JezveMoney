@@ -1,13 +1,12 @@
 import { assert, query, navigation } from 'jezve-test';
 import { Widget } from './Widget.js';
 import { TilesList } from '../TilesList.js';
-import { Tile } from '../Tile.js';
 
 export class TilesWidget extends Widget {
     async parseContent() {
         const res = await super.parseContent();
 
-        const tiles = await TilesList.create(this, await query(this.elem, '.tiles'), Tile);
+        const tiles = await TilesList.create(this, await query(this.elem, '.tiles'));
         assert(tiles, 'Invalid tiles widget');
 
         res.tiles = tiles;
