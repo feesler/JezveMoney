@@ -1,7 +1,6 @@
 import {
     TestComponent,
     queryAll,
-    hasClass,
     assert,
 } from 'jezve-test';
 import { Tile } from './Tile.js';
@@ -23,18 +22,9 @@ export class TilesList extends TestComponent {
     }
 
     async parseContent() {
-        const res = {
-            items: [],
-        };
-        const listItems = await queryAll(this.elem, ':scope > *');
-        if (
-            !listItems
-            || !listItems.length
-            || (listItems.length === 1 && await hasClass(listItems[0], 'nodata-message'))
-        ) {
-            return res;
-        }
+        const res = {};
 
+        const listItems = await queryAll(this.elem, '.tile');
         res.items = await asyncMap(listItems, (item) => this.tileClass.create(this.parent, item));
         res.items.sort((a, b) => a.id - b.id);
 
@@ -58,7 +48,7 @@ export class TilesList extends TestComponent {
     }
 
     getItems() {
-        return this.content.items.map(this.getItemData);
+        return this.content.items.map((item) => this.getItemData(item));
     }
 
     /**

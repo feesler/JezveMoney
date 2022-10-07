@@ -4,6 +4,7 @@ namespace JezveMoney\Core;
 
 Message::add(ERR_INVALID_REQUEST, MSG_TYPE_ERROR, "Invalid type of request");
 Message::add(ERR_INVALID_REQUEST_DATA, MSG_TYPE_ERROR, "Invalid request data");
+Message::add(ERR_NO_IDS, MSG_TYPE_ERROR, "No ids specified");
 
 Message::add(MSG_REGISTER, MSG_TYPE_SUCCESS, "You successfully registered.");
 Message::add(ERR_REGISTER_FAIL, MSG_TYPE_ERROR, "Fail to register.");

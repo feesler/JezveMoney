@@ -26,7 +26,7 @@ export class AccountTile extends Tile {
      * Render specified account
      * @param {object} account - account object
      */
-    render(account) {
+    setAccount(account) {
         if (!isObject(account)) {
             throw new Error('Invalid account specified');
         }
@@ -37,8 +37,11 @@ export class AccountTile extends Tile {
         );
         const icon = window.app.model.icons.getItem(account.icon_id);
 
-        this.setTitle(account.name);
-        this.setSubTitle(fmtBalance);
-        this.setIcon((icon) ? icon.file : null);
+        this.setState({
+            ...this.state,
+            title: account.name,
+            subtitle: fmtBalance,
+            icon: (icon) ? icon.file : null,
+        });
     }
 }

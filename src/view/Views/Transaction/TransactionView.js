@@ -1157,7 +1157,7 @@ class TransactionView extends View {
         const currencyModel = window.app.model.currency;
         const srcCurrency = currencyModel.getItem(state.transaction.src_curr);
         const personBalance = srcCurrency.formatValue(state.personAccount.balance);
-        this.personTile.render({
+        this.personTile.setState({
             title: state.person.name,
             subtitle: personBalance,
         });
@@ -1171,7 +1171,7 @@ class TransactionView extends View {
         }
 
         if (!noAccount) {
-            this.debtAccountTile.render(state.account);
+            this.debtAccountTile.setAccount(state.account);
             if (!this.accDDList) {
                 this.initAccList();
             }
@@ -1247,7 +1247,7 @@ class TransactionView extends View {
 
         if (transaction.type === EXPENSE || transaction.type === TRANSFER) {
             if (this.srcTile && state.srcAccount) {
-                this.srcTile.render(state.srcAccount);
+                this.srcTile.setAccount(state.srcAccount);
             }
 
             this.initSrcAccList();
@@ -1258,7 +1258,7 @@ class TransactionView extends View {
 
         if (transaction.type === INCOME || transaction.type === TRANSFER) {
             if (this.destTile && state.destAccount) {
-                this.destTile.render(state.destAccount);
+                this.destTile.setAccount(state.destAccount);
             }
 
             this.initDestAccList();

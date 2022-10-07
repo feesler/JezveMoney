@@ -262,8 +262,13 @@ label {
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  gap: 30px;
+  gap: 16px;
   padding: 24px 0 12px 0;
+}
+
+.form-controls .spinner {
+  --spinner-size: 20px;
+  --spinner-color: #dddddd;
 }
 
 .right-align-text {

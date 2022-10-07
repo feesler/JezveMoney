@@ -55,6 +55,32 @@ export const API = {
         },
     },
 
+    person: {
+        async list(options = {}) {
+            return apiGet('person/list', options);
+        },
+
+        async create(data) {
+            return apiPost('person/create', data);
+        },
+
+        async update(data) {
+            return apiPost('person/update', data);
+        },
+
+        async del(ids) {
+            return apiPost('person/delete', ids);
+        },
+
+        async show(ids) {
+            return apiPost('person/show', ids);
+        },
+
+        async hide(ids) {
+            return apiPost('person/hide', ids);
+        },
+    },
+
     transaction: {
         async createMultiple(data) {
             return apiPost('transaction/createMultiple', data);

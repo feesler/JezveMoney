@@ -235,7 +235,7 @@ class AccountView extends View {
             tileTitle = TITLE_NEW_ACCOUNT;
         }
 
-        this.tile.render({
+        this.tile.setAccount({
             name: tileTitle,
             balance: bal,
             curr_id: state.data.curr_id,

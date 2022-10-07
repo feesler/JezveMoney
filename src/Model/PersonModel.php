@@ -127,7 +127,7 @@ class PersonModel extends CachedTable
         }
 
         if ($this->isSameItemExist($res)) {
-            return null;
+            throw new \Error("Same person already exist");
         }
 
         $res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
@@ -170,7 +170,7 @@ class PersonModel extends CachedTable
         }
 
         if ($this->isSameItemExist($res, $item_id)) {
-            return null;
+            throw new \Error("Same person already exist");
         }
 
         $res["updatedate"] = date("Y-m-d H:i:s");

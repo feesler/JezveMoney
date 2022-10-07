@@ -31,8 +31,8 @@ include(TPL_PATH . "Header.tpl");	?>
                         </div>
 
                         <div class="form-controls">
-                            <input class="btn submit-btn" type="submit" value="Submit">
-                            <a class="btn cancel-btn" href="<?=BASEURL?>persons/">Cancel</a>
+                            <input id="submitBtn" class="btn submit-btn" type="submit" value="Submit">
+                            <a id="cancelBtn" class="btn cancel-btn" href="<?=BASEURL?>persons/">Cancel</a>
                         </div>
                         <input id="flags" name="flags" type="hidden" value="<?=e($pInfo->flags)?>">
                         </form>
@@ -42,10 +42,5 @@ include(TPL_PATH . "Header.tpl");	?>
         </div>
     </div>
 </div>
-<?php	if ($this->action == "update") {		?>
-<form id="delform" method="post" action="<?=BASEURL?>persons/del/">
-<input name="persons" type="hidden" value="<?=e($pInfo->id)?>">
-</form>
-<?php	}	?>
 
 <?php	include(TPL_PATH . "Footer.tpl");	?>

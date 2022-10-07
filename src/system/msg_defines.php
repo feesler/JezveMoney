@@ -4,6 +4,7 @@ namespace JezveMoney\Core;
 
 define("ERR_INVALID_REQUEST", 1);
 define("ERR_INVALID_REQUEST_DATA", 2);
+define("ERR_NO_IDS", 3);
 
 define("MSG_REGISTER", 100);
 define("ERR_REGISTER_FAIL", 101);

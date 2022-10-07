@@ -1,46 +1,30 @@
 <?php
-use JezveMoney\App\Template\Component\Tile;
+
 use JezveMoney\App\Template\Component\IconLink;
 
-include(TPL_PATH . "Header.tpl");	?>
+include(TPL_PATH . "Header.tpl");    ?>
 
 <div class="page">
     <div class="page_wrapper">
-<?php	require_once(TPL_PATH . "Component/tpl/Header.tpl");	?>
+        <?php require_once(TPL_PATH . "Component/tpl/Header.tpl");    ?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
                     <div class="heading">
                         <h1>Persons</h1>
-                        <?=IconLink::render([
+                        <?= IconLink::render([
                             "id" => "add_btn",
                             "type" => "link",
                             "link" => BASEURL . "persons/create/",
                             "title" => "Create",
                             "icon" => "plus"
-                        ])?>
+                        ]) ?>
                     </div>
-                    <div id="tilesContainer" class="tiles">
-<?php   if (count($persArr)) {
-               foreach($persArr as $tile) {       ?>
-<?=Tile::render($tile)?>
-<?php       }
-        } else {	?>
-                        <span class="nodata-message">You have no one person. Please create one.</span>
-<?php	}	?>
-                    </div>
-<?php	if (count($hiddenPersArr)) {	?>
-                    <div class="heading">
+                    <div id="tilesContainer" class="tiles"></div>
+                    <div id="hiddenTilesHeading" class="heading" hidden>
                         <h1>Hidden</h1>
                     </div>
-                    <div id="hiddenTilesContainer" class="tiles">
-<?php		foreach($hiddenPersArr as $tile) {     ?>
-<?=Tile::render($tile)?>
-<?php		}   ?>
-                    </div>
-<?php	} else {	?>
-                    <div id="hiddenTilesContainer" class="tiles" hidden></div>
-<?php	}	?>
+                    <div id="hiddenTilesContainer" class="tiles"></div>
                 </div>
             </div>
         </div>
@@ -48,45 +32,36 @@ include(TPL_PATH . "Header.tpl");	?>
 
     <div id="toolbar" class="sidebar" hidden>
         <div class="siderbar__content">
-            <div id="sbEllipsis" class="sidebar__ellipsis"><?=svgIcon("sbellipsis", "icon")?></div>
+            <div id="sbEllipsis" class="sidebar__ellipsis"><?= svgIcon("sbellipsis", "icon") ?></div>
             <div id="sbButtons" class="sidebar__controls">
-                <?=IconLink::render([
+                <?= IconLink::render([
                     "id" => "edit_btn",
                     "type" => "link",
                     "title" => "Edit",
                     "icon" => "edit",
                     "hidden" => true
-                ])?>
-                <?=IconLink::render([
+                ]) ?>
+                <?= IconLink::render([
                     "id" => "show_btn",
                     "title" => "Restore",
                     "icon" => "show",
                     "hidden" => true
-                ])?>
-                <?=IconLink::render([
+                ]) ?>
+                <?= IconLink::render([
                     "id" => "hide_btn",
                     "title" => "Hide",
                     "icon" => "hide",
                     "hidden" => true
-                ])?>
-                <?=IconLink::render([
+                ]) ?>
+                <?= IconLink::render([
                     "id" => "del_btn",
                     "title" => "Delete",
                     "icon" => "del",
                     "hidden" => true
-                ])?>
+                ]) ?>
             </div>
         </div>
     </div>
 </div>
-<form id="showform" method="post" action="<?=BASEURL?>persons/show/">
-<input id="showpersons" name="persons" type="hidden" value="">
-</form>
-<form id="hideform" method="post" action="<?=BASEURL?>persons/hide/">
-<input id="hidepersons" name="persons" type="hidden" value="">
-</form>
-<form id="delform" method="post" action="<?=BASEURL?>persons/del/">
-<input id="delpersons" name="persons" type="hidden" value="">
-</form>
 
-<?php	include(TPL_PATH . "Footer.tpl");	?>
+<?php include(TPL_PATH . "Footer.tpl");    ?>

@@ -1,7 +1,15 @@
 import 'jezvejs/style';
-import { ge } from 'jezvejs';
+import {
+    ge,
+    show,
+    enable,
+    insertAfter,
+    setEvents,
+} from 'jezvejs';
+import { Spinner } from 'jezvejs/Spinner';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
+import { API } from '../../js/api/index.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
@@ -23,6 +31,7 @@ class PersonView extends View {
             validation: {
                 name: true,
             },
+            submitStarted: false,
         };
 
         if (this.props.person) {
@@ -38,22 +47,26 @@ class PersonView extends View {
      */
     onStart() {
         this.form = ge('personForm');
-        if (!this.form) {
-            throw new Error('Failed to initialize Person view');
-        }
-        this.form.addEventListener('submit', (e) => this.onSubmit(e));
-
         this.nameInp = ge('pname');
-        if (!this.nameInp) {
+        this.nameFeedback = ge('namefeedback');
+        this.submitBtn = ge('submitBtn');
+        this.cancelBtn = ge('cancelBtn');
+        if (
+            !this.form
+            || !this.nameInp
+            || !this.nameFeedback
+            || !this.submitBtn
+            || !this.cancelBtn
+        ) {
             throw new Error('Failed to initialize Person view');
         }
 
-        this.nameInp.addEventListener('input', () => this.onNameInput());
+        setEvents(this.form, { submit: (e) => this.onSubmit(e) });
+        setEvents(this.nameInp, { input: (e) => this.onNameInput(e) });
 
-        this.nameFeedback = ge('namefeedback');
-        if (!this.nameFeedback) {
-            throw new Error('Invalid Person view');
-        }
+        this.spinner = Spinner.create();
+        this.spinner.hide();
+        insertAfter(this.spinner.elem, this.cancelBtn);
 
         // Update mode
         if (this.state.original.id) {
@@ -61,51 +74,118 @@ class PersonView extends View {
                 elem: 'del_btn',
                 onclick: () => this.confirmDelete(),
             });
-            this.delForm = ge('delform');
-            if (!this.delForm) {
-                throw new Error('Failed to initialize Person view');
-            }
         }
     }
 
-    /**
-     * Person name input event handler
-     */
+    /** Name input event handler */
     onNameInput() {
-        this.state.validation.name = true;
-        this.state.data.name = this.nameInp.value;
-        this.render(this.state);
+        this.setState({
+            ...this.state,
+            validation: {
+                ...this.state.validation,
+                name: true,
+            },
+            data: {
+                ...this.state.data,
+                name: this.nameInp.value,
+            },
+        });
     }
 
-    /**
-     * Form submit event handler
-     */
+    /** Form submit event handler */
     onSubmit(e) {
+        e.preventDefault();
+
+        if (this.state.submitStarted) {
+            return;
+        }
+
         const { name } = this.state.data;
-        let valid = true;
+        const validation = {
+            valid: true,
+            name: true,
+        };
 
         if (name.length === 0) {
-            this.state.validation.name = MSG_EMPTY_NAME;
+            validation.name = MSG_EMPTY_NAME;
+            validation.valid = false;
             this.nameInp.focus();
-            valid = false;
         } else {
             const person = window.app.model.persons.findByName(name);
             if (person && this.state.original.id !== person.id) {
-                this.state.validation.name = MSG_EXISTING_NAME;
+                validation.name = MSG_EXISTING_NAME;
+                validation.valid = false;
                 this.nameInp.focus();
-                valid = false;
             }
         }
 
-        if (!valid) {
-            e.preventDefault();
-            this.render(this.state);
+        if (validation.valid) {
+            this.submitPerson();
+        } else {
+            this.setState({ ...this.state, validation });
         }
     }
 
-    /**
-     * Show person delete confirmation popup
-     */
+    startSubmit() {
+        this.setState({ ...this.state, submitStarted: true });
+    }
+
+    cancelSubmit() {
+        this.setState({ ...this.state, submitStarted: false });
+    }
+
+    async submitPerson() {
+        if (this.state.submitStarted) {
+            return;
+        }
+
+        this.startSubmit();
+
+        const isUpdate = this.state.original.id;
+        const data = {
+            name: this.state.data.name,
+            flags: this.state.original.flags,
+        };
+
+        if (isUpdate) {
+            data.id = this.state.original.id;
+        }
+
+        try {
+            if (isUpdate) {
+                await API.person.update(data);
+            } else {
+                await API.person.create(data);
+            }
+
+            const { baseURL } = window.app;
+            window.location = `${baseURL}persons/`;
+        } catch (e) {
+            this.cancelSubmit();
+            window.app.createMessage(e.message, 'msg_error');
+        }
+    }
+
+    async deletePerson() {
+        const { original } = this.state;
+        if (this.state.submitStarted || !original.id) {
+            return;
+        }
+
+        this.startSubmit();
+
+        try {
+            await API.person.del({ id: original.id });
+
+            const { baseURL } = window.app;
+            window.location = `${baseURL}persons/`;
+        } catch (e) {
+            this.cancelSubmit();
+            window.app.createMessage(e.message, 'msg_error');
+        }
+    }
+
+    /** Show person delete confirmation popup */
     confirmDelete() {
         if (!this.state.data.id) {
             return;
@@ -115,13 +195,17 @@ class PersonView extends View {
             id: 'delete_warning',
             title: TITLE_PERSON_DELETE,
             content: MSG_PERSON_DELETE,
-            onconfirm: () => this.delForm.submit(),
+            onconfirm: () => this.deletePerson(),
         });
     }
 
     render(state) {
         if (!state) {
             throw new Error('Invalid state');
+        }
+
+        if (this.deleteBtn) {
+            this.deleteBtn.enable(!state.submitStarted);
         }
 
         // Name input
@@ -131,6 +215,11 @@ class PersonView extends View {
             this.nameFeedback.textContent = state.validation.name;
             window.app.invalidateBlock('name-inp-block');
         }
+        enable(this.nameInp, !state.submitStarted);
+        enable(this.submitBtn, !state.submitStarted);
+        show(this.cancelBtn, !state.submitStarted);
+
+        this.spinner.show(state.submitStarted);
     }
 }
 
