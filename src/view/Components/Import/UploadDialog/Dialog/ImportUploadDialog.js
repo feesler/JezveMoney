@@ -274,15 +274,6 @@ export class ImportUploadDialog extends Component {
         this.reset();
     }
 
-    setState(state) {
-        if (this.state === state) {
-            return;
-        }
-
-        this.render(state, this.state);
-        this.state = state;
-    }
-
     renderDialogTitle(state, prevState) {
         if (state.id === prevState.id) {
             return;

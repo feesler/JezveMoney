@@ -69,15 +69,6 @@ export class LoadingIndicator extends Component {
         this.setState({ ...this.state, title });
     }
 
-    setState(state) {
-        if (this.state === state) {
-            return;
-        }
-
-        this.render(state, this.state);
-        this.state = state;
-    }
-
     render(state) {
         this.titleElem.textContent = state.title;
         show(this.elem, state.visible);
