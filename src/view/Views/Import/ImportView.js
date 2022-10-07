@@ -1095,15 +1095,6 @@ class ImportView extends View {
         this.setState(state);
     }
 
-    setState(state) {
-        if (this.state === state) {
-            return;
-        }
-
-        this.render(state, this.state);
-        this.state = state;
-    }
-
     renderList(state, prevState) {
         if (
             state.items === prevState.items
