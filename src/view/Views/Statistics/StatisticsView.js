@@ -10,6 +10,7 @@ import {
 import { Histogram } from 'jezvejs/Histogram';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { DropDown } from 'jezvejs/DropDown';
+import 'jezvejs/style/InputGroup';
 import { Application } from '../../js/Application.js';
 import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';

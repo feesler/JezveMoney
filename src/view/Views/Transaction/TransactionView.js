@@ -11,6 +11,7 @@ import {
 import { DropDown } from 'jezvejs/DropDown';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { DecimalInput } from 'jezvejs/DecimalInput';
+import 'jezvejs/style/InputGroup';
 import {
     fixFloat,
     isValidValue,

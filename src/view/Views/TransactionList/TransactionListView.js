@@ -10,6 +10,7 @@ import { Collapsible } from 'jezvejs/Collapsible';
 import { DropDown } from 'jezvejs/DropDown';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { Paginator } from 'jezvejs/Paginator';
+import 'jezvejs/style/InputGroup';
 import { Application } from '../../js/Application.js';
 import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';

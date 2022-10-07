@@ -1,4 +1,5 @@
 import 'jezvejs/style';
+import 'jezvejs/style/InputGroup';
 import { ge, isNum } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
