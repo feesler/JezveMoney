@@ -89,16 +89,15 @@ export const fixFloat = (str) => {
     if (typeof str === 'number') {
         return str;
     }
-
-    if (typeof str === 'string') {
-        let res = str.replace(/,/g, '.');
-        if (res.indexOf('.') === 0 || !res.length) {
-            res = `0${res}`;
-        }
-        return res;
+    if (typeof str !== 'string') {
+        return null;
     }
 
-    return null;
+    let res = str.replace(/,/g, '.');
+    if (res.indexOf('.') === 0 || !res.length) {
+        res = `0${res}`;
+    }
+    return res;
 };
 
 /** Convert string to amount value */
@@ -110,7 +109,7 @@ export const amountFix = (value) => {
         return null;
     }
 
-    const res = value.replace(/ /, '');
+    const res = value.trim();
     return parseFloat(fixFloat(res));
 };
 
@@ -134,9 +133,7 @@ export const correctExch = (val) => correct(val, 5);
  * @param {string|Number} val - value to normalize
  * @param {Number} prec - precision of result decimal
  */
-export const normalize = (val, prec = 2) => (
-    parseFloat(parseFloat(fixFloat(val)).toFixed(prec))
-);
+export const normalize = (val, prec = 2) => correct(fixFloat(val), prec);
 
 /**
  * Normalize exchange rate value from string
