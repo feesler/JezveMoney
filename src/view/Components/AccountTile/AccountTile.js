@@ -1,20 +1,18 @@
-import { isObject } from 'jezvejs';
-import { Tile } from '../Tile/Tile.js';
+import { createElement } from 'jezvejs';
+import { Tile, TILE_CLASS } from '../Tile/Tile.js';
 
 /**
  * Account Tile component
  * @param {object} props
  */
 export class AccountTile extends Tile {
-    constructor(...args) {
-        super(...args);
+    static create(props) {
+        const res = new AccountTile(props);
+        res.init();
 
-        this.parent = this.props.parent;
+        return res;
     }
 
-    /**
-     * Create new Account Tile from specified element
-     */
     static fromElement(props) {
         const res = new AccountTile(props);
         res.parse();
@@ -22,12 +20,22 @@ export class AccountTile extends Tile {
         return res;
     }
 
+    init() {
+        this.elem = createElement('div', { props: { className: TILE_CLASS } });
+
+        this.setClassNames();
+        this.render(this.state);
+        if (this.props.account) {
+            this.setAccount(this.props.account);
+        }
+    }
+
     /**
      * Render specified account
      * @param {object} account - account object
      */
     setAccount(account) {
-        if (!isObject(account)) {
+        if (!account) {
             throw new Error('Invalid account specified');
         }
 

@@ -1,18 +1,27 @@
 import 'jezvejs/style';
 import 'jezvejs/style/InputGroup';
-import { ge, isNum } from 'jezvejs';
+import {
+    ge,
+    isNum,
+    setEvents,
+    insertAfter,
+    enable,
+    show,
+} from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
+import { Spinner } from 'jezvejs/Spinner';
 import { normalize } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
+import { API } from '../../js/api/index.js';
 import { IconList } from '../../js/model/IconList.js';
 import { AccountList } from '../../js/model/AccountList.js';
+import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { IconLink } from '../../Components/IconLink/IconLink.js';
 import '../../css/app.scss';
-import { CurrencyList } from '../../js/model/CurrencyList.js';
 
 const TITLE_ACCOUNT_DELETE = 'Delete account';
 const MSG_ACCOUNT_DELETE = 'Are you sure want to delete selected account?<br>All income and expense transactions history will be lost. Transfer to this account will be changed to expense. Transfer from this account will be changed to income.';
@@ -33,6 +42,7 @@ class AccountView extends View {
                 initbalance: true,
                 name: true,
             },
+            submitStarted: false,
         };
 
         if (this.props.account) {
@@ -50,42 +60,44 @@ class AccountView extends View {
      * View initialization
      */
     onStart() {
+        this.form = ge('accForm');
+        this.currencySign = ge('currsign');
+        this.balanceInp = ge('balance');
+        this.nameInp = ge('accname');
+        this.nameFeedback = ge('namefeedback');
+        this.submitBtn = ge('submitBtn');
+        this.cancelBtn = ge('cancelBtn');
+        if (
+            !this.form
+            || !this.currencySign
+            || !this.balanceInp
+            || !this.nameInp
+            || !this.nameFeedback
+            || !this.submitBtn
+            || !this.cancelBtn
+        ) {
+            throw new Error('Failed to initialize Account view');
+        }
+
         this.tile = AccountTile.fromElement({
             elem: 'acc_tile',
             parent: this,
         });
-        if (!this.tile) {
-            throw new Error('Failed to initialize Account view');
-        }
-
         this.iconSelect = DropDown.create({
             elem: 'icon',
             onitemselect: (o) => this.onIconSelect(o),
             className: 'dd_fullwidth',
         });
-        if (!this.iconSelect) {
-            throw new Error('Failed to initialize Account view');
-        }
-
         this.currencySelect = DropDown.create({
             elem: 'currency',
             onitemselect: (o) => this.onCurrencySelect(o),
             className: 'dd_fullwidth',
         });
-        if (!this.currencySelect) {
-            throw new Error('Failed to initialize Account view');
-        }
         window.app.initCurrencyList(this.currencySelect);
         if (this.state.original.curr_id) {
             this.currencySelect.selectItem(this.state.original.curr_id);
         }
 
-        this.currencySign = ge('currsign');
-        if (!this.currencySign) {
-            throw new Error('Failed to initialize Account view');
-        }
-
-        this.balanceInp = ge('balance');
         this.initBalanceDecimalInput = DecimalInput.create({
             elem: this.balanceInp,
             digits: 2,
@@ -95,119 +107,190 @@ class AccountView extends View {
             throw new Error('Failed to initialize Account view');
         }
 
+        setEvents(this.form, { submit: (e) => this.onSubmit(e) });
+        setEvents(this.nameInp, { input: (e) => this.onNameInput(e) });
+
+        this.spinner = Spinner.create();
+        this.spinner.hide();
+        insertAfter(this.spinner.elem, this.cancelBtn);
+
         // Update mode
         if (this.state.original.id) {
             this.deleteBtn = IconLink.fromElement({
                 elem: 'del_btn',
                 onclick: () => this.confirmDelete(),
             });
-            this.delForm = ge('delform');
-            if (!this.delForm) {
-                throw new Error('Failed to initialize Account view');
-            }
-        }
-
-        this.form = ge('accForm');
-        if (!this.form) {
-            throw new Error('Invalid Account view');
-        }
-        this.form.addEventListener('submit', (e) => this.onSubmit(e));
-
-        this.nameInp = ge('accname');
-        if (!this.nameInp) {
-            throw new Error('Invalid Account view');
-        }
-        this.nameInp.addEventListener('input', () => this.onNameInput());
-
-        this.nameFeedback = ge('namefeedback');
-        if (!this.nameFeedback) {
-            throw new Error('Invalid Account view');
         }
     }
 
-    /**
-     * Icon select event handler
-     */
+    /** Icon select event handler */
     onIconSelect(obj) {
         if (!obj) {
             return;
         }
 
-        this.state.data.icon_id = obj.id;
-        this.render(this.state);
+        this.setState({
+            ...this.state,
+            data: {
+                ...this.state.data,
+                icon_id: obj.id,
+            },
+        });
     }
 
-    /**
-     * Currency select event handler
-     */
+    /** Currency select event handler */
     onCurrencySelect(obj) {
         if (!obj) {
             return;
         }
 
-        this.state.data.curr_id = obj.id;
-        this.render(this.state);
+        this.setState({
+            ...this.state,
+            data: {
+                ...this.state.data,
+                curr_id: obj.id,
+            },
+        });
     }
 
-    /**
-     * Initial balance input event handler
-     */
+    /** Initial balance input event handler */
     onInitBalanceInput(e) {
-        if (!e || !e.target) {
+        const { value } = e.target;
+
+        this.setState({
+            ...this.state,
+            validation: {
+                ...this.state.validation,
+                initbalance: true,
+            },
+            data: {
+                ...this.state.data,
+                initbalance: value,
+                fInitBalance: normalize(value),
+            },
+        });
+    }
+
+    /** Account name input event handler */
+    onNameInput() {
+        this.setState({
+            ...this.state,
+            nameChanged: true,
+            validation: {
+                ...this.state.validation,
+                name: true,
+            },
+            data: {
+                ...this.state.data,
+                name: this.nameInp.value,
+            },
+        });
+    }
+
+    /** Form submit event handler */
+    onSubmit(e) {
+        e.preventDefault();
+
+        if (this.state.submitStarted) {
             return;
         }
 
-        this.state.validation.initbalance = true;
-        this.state.data.initbalance = e.target.value;
-        this.state.data.fInitBalance = normalize(e.target.value);
-        this.render(this.state);
-    }
-
-    /**
-     * Account name input event handler
-     */
-    onNameInput() {
-        this.state.nameChanged = true;
-        this.state.validation.name = true;
-        this.state.data.name = this.nameInp.value;
-        this.render(this.state);
-    }
-
-    /**
-     * Form submit event handler
-     */
-    onSubmit(e) {
         const { name, initbalance } = this.state.data;
-        let valid = true;
+        const validation = {
+            valid: true,
+            initbalance: true,
+            name: true,
+        };
 
         if (name.length === 0) {
-            this.state.validation.name = MSG_EMPTY_NAME;
+            validation.name = MSG_EMPTY_NAME;
+            validation.valid = false;
             this.nameInp.focus();
-            valid = false;
         } else {
             const account = window.app.model.accounts.findByName(name);
             if (account && this.state.original.id !== account.id) {
-                this.state.validation.name = MSG_EXISTING_NAME;
+                validation.name = MSG_EXISTING_NAME;
+                validation.valid = false;
                 this.nameInp.focus();
-                valid = false;
             }
         }
 
         if (initbalance.length === 0 || !isNum(initbalance)) {
-            this.state.validation.initbalance = false;
+            validation.initbalance = false;
+            validation.valid = false;
             this.balanceInp.focus();
-            valid = false;
         }
 
-        if (!valid) {
-            e.preventDefault();
-            this.render(this.state);
+        if (validation.valid) {
+            this.submitAccount();
+        } else {
+            this.setState({ ...this.state, validation });
         }
     }
 
-    /**
-     * Show account delete confirmation popup
-     */
+    async submitAccount() {
+        if (this.state.submitStarted) {
+            return;
+        }
+
+        this.startSubmit();
+
+        const { data, original } = this.state;
+        const account = {
+            name: data.name,
+            initbalance: data.initbalance,
+            curr_id: data.curr_id,
+            icon_id: data.icon_id,
+            flags: original.flags,
+        };
+        const isUpdate = original.id;
+        if (isUpdate) {
+            account.id = original.id;
+        }
+
+        try {
+            if (isUpdate) {
+                await API.account.update(data);
+            } else {
+                await API.account.create(data);
+            }
+
+            const { baseURL } = window.app;
+            window.location = `${baseURL}accounts/`;
+        } catch (e) {
+            this.cancelSubmit();
+            window.app.createMessage(e.message, 'msg_error');
+        }
+    }
+
+    startSubmit() {
+        this.setState({ ...this.state, submitStarted: true });
+    }
+
+    cancelSubmit() {
+        this.setState({ ...this.state, submitStarted: false });
+    }
+
+    async deleteAccount() {
+        const { original } = this.state;
+        if (this.state.submitStarted || !original.id) {
+            return;
+        }
+
+        this.startSubmit();
+
+        try {
+            await API.account.del({ id: original.id });
+
+            const { baseURL } = window.app;
+            window.location = `${baseURL}accounts/`;
+        } catch (e) {
+            this.cancelSubmit();
+            window.app.createMessage(e.message, 'msg_error');
+        }
+    }
+
+    /** Show account delete confirmation popup */
     confirmDelete() {
         if (!this.state.data.id) {
             return;
@@ -217,7 +300,7 @@ class AccountView extends View {
             id: 'delete_warning',
             title: TITLE_ACCOUNT_DELETE,
             content: MSG_ACCOUNT_DELETE,
-            onconfirm: () => this.delForm.submit(),
+            onconfirm: () => this.deleteAccount(),
         });
     }
 
@@ -264,6 +347,19 @@ class AccountView extends View {
         } else {
             window.app.invalidateBlock('initbal-inp-block');
         }
+
+        this.iconSelect.enable(!state.submitStarted);
+        this.currencySelect.enable(!state.submitStarted);
+        enable(this.balanceInp, !state.submitStarted);
+        enable(this.nameInp, !state.submitStarted);
+        enable(this.submitBtn, !state.submitStarted);
+        show(this.cancelBtn, !state.submitStarted);
+
+        if (this.deleteBtn) {
+            this.deleteBtn.enable(!state.submitStarted);
+        }
+
+        this.spinner.show(state.submitStarted);
     }
 }
 

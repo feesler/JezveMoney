@@ -102,8 +102,6 @@ class Transactions extends TemplateController
         $transCount = $this->model->getTransCount($trParams);
         $pagination["total"] = $transCount;
 
-        $currArr = $this->currModel->getData();
-
         // Prepare transaction types menu
         $trTypes = [0 => "Show all"];
         $availTypes = TransactionModel::getTypeNames();
@@ -156,7 +154,7 @@ class Transactions extends TemplateController
             "profile" => $this->getProfileData(),
             "accounts" => $this->accModel->getData(["full" => true, "type" => "all"]),
             "persons" => $this->personMod->getData(["type" => "all"]),
-            "currency" => $currArr,
+            "currency" => $this->currModel->getData(),
             "view" => [
                 "transArr" => $trItems,
                 "filterObj" => (object)$filterObj,

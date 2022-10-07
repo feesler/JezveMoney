@@ -112,11 +112,7 @@ class Main extends TemplateController
         ]);
 
         $data["appProps"] = [
-            "profile" => [
-                "user_id" => $this->user_id,
-                "owner_id" => $this->owner_id,
-                "name" => $this->user_name,
-            ],
+            "profile" => $this->getProfileData(),
             "accounts" => $accMod->getData(["full" => true, "type" => "all"]),
             "persons" => $this->personMod->getData(["type" => "all"]),
             "currency" => $currMod->getData(),

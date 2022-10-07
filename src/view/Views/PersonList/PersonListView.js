@@ -72,8 +72,8 @@ class PersonListView extends View {
 
         this.toolbar = Toolbar.create({
             elem: 'toolbar',
-            onshow: () => this.showPersons(),
-            onhide: () => this.showPersons(false),
+            onshow: () => this.showSelected(),
+            onhide: () => this.showSelected(false),
             ondelete: () => this.confirmDelete(),
         });
 
@@ -125,17 +125,11 @@ class PersonListView extends View {
             return;
         }
 
-        this.setState({
-            ...this.state,
-            loading: false,
-        });
+        this.setState({ ...this.state, loading: false });
     }
 
     setRenderTime() {
-        this.setState({
-            ...this.state,
-            renderTime: Date.now(),
-        });
+        this.setState({ ...this.state, renderTime: Date.now() });
     }
 
     getSelectedIds(state = this.state) {
@@ -144,7 +138,7 @@ class PersonListView extends View {
         return selArr.concat(hiddenSelArr);
     }
 
-    async showPersons(value = true) {
+    async showSelected(value = true) {
         if (this.state.loading) {
             return;
         }
@@ -161,14 +155,14 @@ class PersonListView extends View {
             } else {
                 await API.person.hide({ id: selectedIds });
             }
-            this.requestPersons();
+            this.requestList();
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
             this.stopLoading();
         }
     }
 
-    async deletePersons() {
+    async deleteSelected() {
         if (this.state.loading) {
             return;
         }
@@ -181,14 +175,14 @@ class PersonListView extends View {
 
         try {
             await API.person.del({ id: selectedIds });
-            this.requestPersons();
+            this.requestList();
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
             this.stopLoading();
         }
     }
 
-    async requestPersons() {
+    async requestList() {
         try {
             const { data } = await API.person.list({ type: 'all' });
             window.app.model.persons.setData(data);
@@ -222,7 +216,7 @@ class PersonListView extends View {
             id: 'delete_warning',
             title: (multiple) ? TITLE_MULTI_PERSON_DELETE : TITLE_SINGLE_PERSON_DELETE,
             content: (multiple) ? MSG_MULTI_PERSON_DELETE : MSG_SINGLE_PERSON_DELETE,
-            onconfirm: () => this.deletePersons(),
+            onconfirm: () => this.deleteSelected(),
         });
     }
 
@@ -278,13 +272,10 @@ class PersonListView extends View {
         this.toolbar.hideBtn.show(selCount > 0);
         this.toolbar.deleteBtn.show(totalSelCount > 0);
 
-        const selArr = state.selected.visible.getIdArray();
-        const hiddenSelArr = state.selected.hidden.getIdArray();
-        const totalSelArr = selArr.concat(hiddenSelArr);
-
-        if (totalSelCount === 1) {
+        const selectedIds = this.getSelectedIds();
+        if (selectedIds.length === 1) {
             const { baseURL } = window.app;
-            this.toolbar.updateBtn.setURL(`${baseURL}persons/update/${totalSelArr[0]}`);
+            this.toolbar.updateBtn.setURL(`${baseURL}persons/update/${selectedIds[0]}`);
         }
 
         this.toolbar.show(totalSelCount > 0);

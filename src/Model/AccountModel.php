@@ -152,7 +152,7 @@ class AccountModel extends CachedTable
         }
 
         if ($this->isSameItemExist($res)) {
-            return null;
+            throw new \Error("Same account already exist");
         }
 
         $res["balance"] = $res["initbalance"];
@@ -183,7 +183,7 @@ class AccountModel extends CachedTable
         }
 
         if ($this->isSameItemExist($res, $item_id)) {
-            return false;
+            throw new \Error("Same account already exist");
         }
 
         $this->currencyUpdated = (isset($res["curr_id"]) && $res["curr_id"] != $accObj->curr_id);

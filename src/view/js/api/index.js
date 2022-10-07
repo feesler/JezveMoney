@@ -55,6 +55,32 @@ export const API = {
         },
     },
 
+    account: {
+        async list(options = {}) {
+            return apiGet('account/list', options);
+        },
+
+        async create(data) {
+            return apiPost('account/create', data);
+        },
+
+        async update(data) {
+            return apiPost('account/update', data);
+        },
+
+        async del(ids) {
+            return apiPost('account/delete', ids);
+        },
+
+        async show(ids) {
+            return apiPost('account/show', ids);
+        },
+
+        async hide(ids) {
+            return apiPost('account/hide', ids);
+        },
+    },
+
     person: {
         async list(options = {}) {
             return apiGet('person/list', options);

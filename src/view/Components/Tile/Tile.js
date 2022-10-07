@@ -7,7 +7,7 @@ import {
 import './style.scss';
 
 /** CSS classes */
-const TILE_CLASS = 'tile';
+export const TILE_CLASS = 'tile';
 const WIDE_CLASS = 'tile_wide';
 const SELECTED_CLASS = 'tile_selected';
 const TITLE_CLASS = 'tile__title';
