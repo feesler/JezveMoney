@@ -2,6 +2,7 @@ import 'jezvejs/style';
 import {
     ge,
     show,
+    setEvents,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { Popup } from 'jezvejs/Popup';
@@ -13,10 +14,7 @@ import '../../css/app.scss';
 import './style.scss';
 import { API } from '../../js/api/index.js';
 
-const TITLE_RESET_ACC = 'Reset accounts';
-const MSG_RESET_ACC = 'Are you sure want to reset all your accounts?<br>All accounts and transactions will be lost.';
-const TITLE_RESET_ALL = 'Reset all data';
-const MSG_RESET_ALL = 'Are you sure to reset all your data?<br>Everything will be lost.';
+/** Strings */
 const TITLE_PROFILE_DELETE = 'Delete profile';
 const MSG_PROFILE_DELETE = 'Are you sure to completely delete your profile?<br>This operation can not be undone.';
 
@@ -31,68 +29,48 @@ class ProfileView extends View {
         this.resetPopup = null;
 
         this.nameElem = ge('namestatic');
-        if (!this.nameElem) {
-            throw new Error('Failed to initialize Profile view');
-        }
-
         this.changeNameBtn = ge('changeNameBtn');
-        if (!this.changeNameBtn) {
-            throw new Error('Failed to initialize Profile view');
-        }
-        this.changeNameBtn.addEventListener('click', (e) => this.showChangeNamePopup(e));
-
         this.changePassBtn = ge('changePassBtn');
-        if (!this.changePassBtn) {
-            throw new Error('Failed to initialize Profile view');
-        }
-        this.changePassBtn.addEventListener('click', (e) => this.showChangePasswordPopup(e));
-
         this.resetBtn = ge('resetBtn');
-        if (!this.resetBtn) {
-            throw new Error('Failed to initialize Profile view');
-        }
-        this.resetBtn.addEventListener('click', () => this.showResetPopup());
-
         this.delProfileBtn = ge('delProfileBtn');
-        if (!this.delProfileBtn) {
+        if (
+            !this.nameElem
+            || !this.changeNameBtn
+            || !this.changePassBtn
+            || !this.resetBtn
+            || !this.delProfileBtn
+        ) {
             throw new Error('Failed to initialize Profile view');
         }
-        this.delProfileBtn.addEventListener('click', () => this.confirmDelete());
 
-        this.deleteForm = ge('delete_form');
-        if (!this.deleteForm) {
-            throw new Error('Failed to initialize Profile view');
-        }
+        setEvents(this.changeNameBtn, { click: (e) => this.showChangeNamePopup(e) });
+        setEvents(this.changePassBtn, { click: (e) => this.showChangePasswordPopup(e) });
+        setEvents(this.resetBtn, { click: () => this.showResetPopup() });
+        setEvents(this.delProfileBtn, { click: () => this.confirmDelete() });
 
+        // Change name dialog
         this.changeNameContent = ge('changename');
-        if (!this.changeNameContent) {
-            throw new Error('Failed to initialize Profile view');
+        this.changeNameForm = this.changeNameContent?.querySelector('form');
+        if (!this.changeNameContent || !this.changeNameForm) {
+            throw new Error('Failed to initialize Change name form');
         }
-        this.changeNameForm = this.changeNameContent.querySelector('form');
-        if (!this.changeNameForm) {
-            throw new Error('Failed to initialize Profile view');
-        }
-        this.changeNameForm.addEventListener('submit', (e) => this.onChangeNameSubmit(e));
+        setEvents(this.changeNameForm, { submit: (e) => this.onChangeNameSubmit(e) });
 
+        // Change password dialog
         this.changePassContent = ge('changepass');
-        if (!this.changePassContent) {
-            throw new Error('Failed to initialize Profile view');
+        this.changePassForm = this.changePassContent?.querySelector('form');
+        if (!this.changePassContent || !this.changePassForm) {
+            throw new Error('Failed to initialize Change password form');
         }
-        this.changePassForm = this.changePassContent.querySelector('form');
-        if (!this.changePassForm) {
-            throw new Error('Failed to initialize Profile view');
-        }
-        this.changePassForm.addEventListener('submit', (e) => this.onChangePassSubmit(e));
+        setEvents(this.changePassForm, { submit: (e) => this.onChangePassSubmit(e) });
 
+        // Reset data dialog
         this.resetContent = ge('reset');
-        if (!this.resetContent) {
-            throw new Error('Failed to initialize Profile view');
+        this.resetForm = this.resetContent?.querySelector('form');
+        if (!this.resetContent || !this.resetForm) {
+            throw new Error('Failed to initialize Reset data form');
         }
-        this.resetForm = this.resetContent.querySelector('form');
-        if (!this.resetForm) {
-            throw new Error('Failed to initialize Profile view');
-        }
-        this.resetForm.addEventListener('submit', (e) => this.onResetSubmit(e));
+        setEvents(this.resetForm, { submit: (e) => this.onResetSubmit(e) });
 
         if (this.props.action) {
             if (this.props.action === 'changePass') {
@@ -137,7 +115,7 @@ class ProfileView extends View {
         if (!this.newNameInp) {
             throw new Error('Failed to initialize change name dialog');
         }
-        this.newNameInp.addEventListener('input', () => this.onNewNameInput());
+        setEvents(this.newNameInp, { input: () => this.onNewNameInput() });
 
         this.changeNameLoading = LoadingIndicator.create({ fixed: false });
         this.changeNameContent.append(this.changeNameLoading.elem);
@@ -230,9 +208,8 @@ class ProfileView extends View {
         if (!this.oldPassInp || !this.newPassInp) {
             throw new Error('Failed to initialize change password dialog');
         }
-
-        this.oldPassInp.addEventListener('input', () => this.onOldPasswordInput());
-        this.newPassInp.addEventListener('input', () => this.onNewPasswordInput());
+        setEvents(this.oldPassInp, { input: () => this.onOldPasswordInput() });
+        setEvents(this.newPassInp, { input: () => this.onNewPasswordInput() });
 
         this.changePassLoading = LoadingIndicator.create({ fixed: false });
         this.changePassContent.append(this.changePassLoading.elem);
@@ -403,37 +380,77 @@ class ProfileView extends View {
     }
 
     /** Reset data dialog submit event handler */
-    onResetSubmit() {
-        this.resetForm.submit();
+    onResetSubmit(e) {
+        e.preventDefault();
+
+        this.requestResetData();
     }
 
-    /** Show reset accounts confirmation popup */
-    confirmResetAccounts() {
-        ConfirmDialog.create({
-            id: 'reset_warning',
-            title: TITLE_RESET_ACC,
-            content: MSG_RESET_ACC,
-            onconfirm: () => this.resetAccForm.submit(),
-        });
+    /** Send reset data API request */
+    async requestResetData() {
+        this.resetLoading.show();
+
+        const request = {};
+        if (this.accountsCheck.checked) {
+            request.accounts = true;
+        }
+        if (this.personsCheck.checked) {
+            request.persons = true;
+        }
+        if (this.transactionsCheck.checked) {
+            request.transactions = true;
+        }
+        if (!this.keepAccountsBalanceCheck.disabled && this.keepAccountsBalanceCheck.checked) {
+            request.keepbalance = true;
+        }
+        if (this.importTemplatesCheck.checked) {
+            request.importtpl = true;
+        }
+        if (this.importRulesCheck.checked) {
+            request.importrules = true;
+        }
+
+        try {
+            const result = await API.profile.reset(request);
+
+            this.resetPopup.close();
+            this.resetForm.reset();
+
+            if (result.msg) {
+                window.app.createMessage(result.msg, 'msg_success');
+            }
+        } catch (e) {
+            window.app.createMessage(e.message, 'msg_error');
+        }
+
+        this.resetLoading.hide();
     }
 
-    /** Show reset all data confirmation popup */
-    confirmResetAll() {
-        ConfirmDialog.create({
-            id: 'reset_all_warning',
-            title: TITLE_RESET_ALL,
-            content: MSG_RESET_ALL,
-            onconfirm: () => this.resetAllForm.submit(),
-        });
+    /** Send delete profile API request */
+    async requestDeleteProfile() {
+        this.deleteLoading.show();
+
+        try {
+            await API.profile.del();
+            window.location = `${window.app.baseURL}login/`;
+        } catch (e) {
+            window.app.createMessage(e.message, 'msg_error');
+            this.deleteLoading.hide();
+        }
     }
 
     /** Show delete profile confirmation popup */
     confirmDelete() {
+        if (!this.deleteLoading) {
+            this.deleteLoading = LoadingIndicator.create({ fixed: false });
+            document.documentElement.append(this.deleteLoading.elem);
+        }
+
         ConfirmDialog.create({
             id: 'delete_warning',
             title: TITLE_PROFILE_DELETE,
             content: MSG_PROFILE_DELETE,
-            onconfirm: () => this.deleteForm.submit(),
+            onconfirm: () => this.requestDeleteProfile(),
         });
     }
 }

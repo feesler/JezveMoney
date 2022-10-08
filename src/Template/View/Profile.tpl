@@ -35,8 +35,6 @@
                             <input id="resetBtn" class="btn submit-btn" type="button" value="Reset data"></span>
                         </div>
                         <div class="std_margin">
-                            <form id="delete_form" method="post" action="<?=BASEURL?>profile/del/">
-                            </form>
                             <span>Completely delete profile and all related data.<br>
                             <input id="delProfileBtn" class="btn submit-btn warning-btn" type="button" value="Delete profile"></span>
                         </div>

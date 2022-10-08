@@ -53,6 +53,14 @@ export const API = {
         async changeName(name) {
             return apiPost('profile/changename', { name });
         },
+
+        async reset(options) {
+            return apiPost('profile/reset', options);
+        },
+
+        async del() {
+            return apiPost('profile/del');
+        },
     },
 
     account: {

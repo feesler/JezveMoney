@@ -182,7 +182,10 @@ export class ProfileView extends AppView {
             await this.performAction(() => importRulesCheck.toggle());
         }
 
-        await navigation(() => click(this.content.resetDataPopup.okBtn));
+        await this.performAction(async () => {
+            await click(this.content.resetDataPopup.okBtn);
+            await wait('.popup.msg', { visible: true });
+        });
     }
 
     async deleteProfile() {
