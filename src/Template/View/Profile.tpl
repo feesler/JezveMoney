@@ -98,13 +98,13 @@
             <span class="checkbox__label">Transactions</span>
         </label>
 
-        <label id="keepAccountsBalanceCheck" class="checkbox std_margin suboption" disabled>
+        <label id="keepBalanceCheck" class="checkbox std_margin suboption" disabled>
             <input type="checkbox" name="keepbalance">
             <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
             <span class="checkbox__label">Keep current balance of accounts</span>
         </label>
 
-        <label id="importTemplatesCheck" class="checkbox std_margin">
+        <label id="importTplCheck" class="checkbox std_margin">
             <input type="checkbox" name="importtpl">
             <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
             <span class="checkbox__label">Import templates</span>

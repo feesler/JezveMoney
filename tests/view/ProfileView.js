@@ -76,8 +76,8 @@ export class ProfileView extends AppView {
             accountsCheck: await Checkbox.create(this, await query('#accountsCheck')),
             personsCheck: await Checkbox.create(this, await query('#personsCheck')),
             transactionsCheck: await Checkbox.create(this, await query('#transactionsCheck')),
-            keepAccountsBalanceCheck: await Checkbox.create(this, await query('#keepAccountsBalanceCheck')),
-            importTemplatesCheck: await Checkbox.create(this, await query('#importTemplatesCheck')),
+            keepBalanceCheck: await Checkbox.create(this, await query('#keepBalanceCheck')),
+            importTplCheck: await Checkbox.create(this, await query('#importTplCheck')),
             importRulesCheck: await Checkbox.create(this, await query('#importRulesCheck')),
         };
 
@@ -97,7 +97,7 @@ export class ProfileView extends AppView {
 
     async changeName(newName) {
         await this.performAction(() => click(this.content.nameLinkElem));
-        await this.performAction(() => wait('.popup.chname_popup', { visible: true }));
+        await this.performAction(() => wait('.popup.name-dialog', { visible: true }));
 
         assert(this.content.changeNamePopup?.visible, 'Change name popup not appear');
 
@@ -115,7 +115,7 @@ export class ProfileView extends AppView {
 
     async changePassword(oldPass, newPass) {
         await this.performAction(() => click(this.content.changePassLinkElem));
-        await this.performAction(() => wait('.popup.chpass_popup', { visible: true }));
+        await this.performAction(() => wait('.popup.password-dialog', { visible: true }));
 
         assert(this.content.changePassPopup?.visible, 'Change password popup not appear');
 
@@ -166,15 +166,15 @@ export class ProfileView extends AppView {
             await this.performAction(() => transactionsCheck.toggle());
         }
 
-        const { keepAccountsBalanceCheck } = this.content.resetDataPopup;
-        if (('keepbalance' in options) && !keepAccountsBalanceCheck.checked) {
-            assert(!keepAccountsBalanceCheck.disabled, 'Keep accounts balance checkbox is disabled');
-            await this.performAction(() => keepAccountsBalanceCheck.toggle());
+        const { keepBalanceCheck } = this.content.resetDataPopup;
+        if (('keepbalance' in options) && !keepBalanceCheck.checked) {
+            assert(!keepBalanceCheck.disabled, 'Keep accounts balance checkbox is disabled');
+            await this.performAction(() => keepBalanceCheck.toggle());
         }
 
-        const { importTemplatesCheck } = this.content.resetDataPopup;
-        if (('importtpl' in options) && !importTemplatesCheck.checked) {
-            await this.performAction(() => importTemplatesCheck.toggle());
+        const { importTplCheck } = this.content.resetDataPopup;
+        if (('importtpl' in options) && !importTplCheck.checked) {
+            await this.performAction(() => importTplCheck.toggle());
         }
 
         const { importRulesCheck } = this.content.resetDataPopup;
