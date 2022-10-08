@@ -81,6 +81,16 @@ export const dateStringToTime = (value) => {
     return (res) ? (res / 1000) : null;
 };
 
+/** Convert Unix timestamp in seconds to date string */
+export const timeToDate = (value) => {
+    const time = parseInt(value, 10);
+    if (Number.isNaN(time) || time === 0) {
+        throw new Error('Invalid time value');
+    }
+
+    return new Date(time * 1000);
+};
+
 /**
  * Fix string to correct float number format
  * @param {string} str - decimal value string

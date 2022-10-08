@@ -30,11 +30,14 @@ const SOURCE_RESULT_CHANGE = 'sourceResultChange';
 const DEST_RESULT_CHANGE = 'destResultChange';
 const EXCHANGE_CHANGE = 'exchangeChange';
 const DATE_CHANGE = 'dateChange';
+const COMMENT_CHANGE = 'commentChange';
 const INVALIDATE_SOURCE_AMOUNT = 'invalidateSourceAmount';
 const INVALIDATE_DEST_AMOUNT = 'invalidateDestAmount';
 const INVALIDATE_DATE = 'invalidateDate';
 const TYPE_CHANGE = 'typeChange';
 const SWAP_SOURCE_AND_DEST = 'swapSourceAndDest';
+const START_SUBMIT = 'startSubmit';
+const CANCEL_SUBMIT = 'cancelSubmit';
 
 // Action creators
 export const sourceAmountClick = () => ({ type: SOURCE_AMOUNT_CLICK });
@@ -70,11 +73,14 @@ export const sourceResultChange = (value) => ({ type: SOURCE_RESULT_CHANGE, payl
 export const destResultChange = (value) => ({ type: DEST_RESULT_CHANGE, payload: value });
 export const exchangeChange = (value) => ({ type: EXCHANGE_CHANGE, payload: value });
 export const dateChange = (value) => ({ type: DATE_CHANGE, payload: value });
+export const commentChange = (value) => ({ type: COMMENT_CHANGE, payload: value });
 export const invalidateSourceAmount = () => ({ type: INVALIDATE_SOURCE_AMOUNT });
 export const invalidateDestAmount = () => ({ type: INVALIDATE_DEST_AMOUNT });
 export const invalidateDate = () => ({ type: INVALIDATE_DATE });
 export const typeChange = (type) => ({ type: TYPE_CHANGE, payload: type });
 export const swapSourceAndDest = () => ({ type: SWAP_SOURCE_AND_DEST });
+export const startSubmit = () => ({ type: START_SUBMIT });
+export const cancelSubmit = () => ({ type: CANCEL_SUBMIT });
 
 // Tools
 
@@ -1026,6 +1032,18 @@ const reduceDateChange = (state, value) => ({
     },
 });
 
+const reduceCommentChange = (state, value) => ({
+    ...state,
+    transaction: {
+        ...state.transaction,
+        comment: value,
+    },
+    form: {
+        ...state.form,
+        comment: value,
+    },
+});
+
 const reduceInvalidateSourceAmount = (state) => ({
     ...state,
     validation: {
@@ -1402,6 +1420,9 @@ const reduceSwap = (state) => {
     return newState;
 };
 
+const reduceStartSubmit = (state) => ({ ...state, submitStarted: true });
+const reduceCancelSubmit = (state) => ({ ...state, submitStarted: false });
+
 const reducerMap = {
     [SOURCE_AMOUNT_CLICK]: reduceSourceAmountClick,
     [DEST_AMOUNT_CLICK]: reduceDestAmountClick,
@@ -1421,11 +1442,14 @@ const reducerMap = {
     [DEST_RESULT_CHANGE]: reduceDestResultChange,
     [EXCHANGE_CHANGE]: reduceExchangeChange,
     [DATE_CHANGE]: reduceDateChange,
+    [COMMENT_CHANGE]: reduceCommentChange,
     [INVALIDATE_SOURCE_AMOUNT]: reduceInvalidateSourceAmount,
     [INVALIDATE_DEST_AMOUNT]: reduceInvalidateDestAmount,
     [INVALIDATE_DATE]: reduceInvalidateDate,
     [TYPE_CHANGE]: reduceTypeChange,
     [SWAP_SOURCE_AND_DEST]: reduceSwap,
+    [START_SUBMIT]: reduceStartSubmit,
+    [CANCEL_SUBMIT]: reduceCancelSubmit,
 };
 
 export const reducer = (state, action) => {

@@ -771,6 +771,6 @@ export class TransactionsView extends AppView {
         assert(this.content.delete_warning?.content?.visible, 'Delete transaction warning popup not appear');
         assert(this.content.delete_warning.content.okBtn, 'OK button not found');
 
-        await navigation(() => click(this.content.delete_warning.content.okBtn));
+        await this.waitForList(() => click(this.content.delete_warning.content.okBtn));
     }
 }

@@ -254,8 +254,8 @@ include(TPL_PATH . "Header.tpl");	?>
                         </div>
 
                         <div id="submit_controls" class="form-controls"<?=hidden(!$trAvailable)?>>
-                            <input id="submitbtn" class="btn submit-btn" type="submit" value="Submit">
-                            <a class="btn cancel-btn" href="<?=BASEURL?>">Cancel</a>
+                            <input id="submitBtn" class="btn submit-btn" type="submit" value="Submit">
+                            <a id="cancelBtn" class="btn cancel-btn" href="<?=BASEURL?>">Cancel</a>
                         </div>
                         </form>
                     </div>
@@ -264,11 +264,6 @@ include(TPL_PATH . "Header.tpl");	?>
         </div>
     </div>
 </div>
-<?php	if ($action == "update") {	?>
-<form id="delform" method="post" action="<?=BASEURL?>transactions/del/">
-<input name="transactions" type="hidden" value="<?=e($tr["id"])?>">
-</form>
-<?php	}	?>
 
 <?php	include(ICONS_PATH . "TileIcons.tpl");	?>
 <?php	include(ICONS_PATH . "Common.tpl");	?>

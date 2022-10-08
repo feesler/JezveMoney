@@ -145,9 +145,6 @@ include(TPL_PATH . "Header.tpl"); ?>
         </div>
     </div>
 </div>
-<form id="delform" method="post" action="<?=BASEURL?>transactions/del/">
-<input id="deltrans" name="transactions" type="hidden" value="">
-</form>
 
 <?php	include(ICONS_PATH . "Common.tpl");	?>
 <?php	include(ICONS_PATH . "ModeSelector.tpl");	?>

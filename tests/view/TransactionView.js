@@ -119,8 +119,10 @@ export class TransactionView extends AppView {
         res.datePicker = await DatePickerRow.create(this, await query('#date_row'));
         res.comment_row = await CommentRow.create(this, await query('#comment_row'));
 
-        res.submitBtn = await query('#submitbtn');
-        res.cancelBtn = await query('#submitbtn + *');
+        res.submitBtn = await query('#submitBtn');
+        assert(res.submitBtn, 'Submit button not found');
+        res.cancelBtn = await query('#cancelBtn');
+        assert(res.cancelBtn, 'Cancel button not found');
 
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 

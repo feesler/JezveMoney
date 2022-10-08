@@ -121,6 +121,18 @@ export const API = {
             return apiGet('transaction/list', requestOptions);
         },
 
+        async create(data) {
+            return apiPost('transaction/create', data);
+        },
+
+        async update(data) {
+            return apiPost('transaction/update', data);
+        },
+
+        async del(ids) {
+            return apiPost('transaction/delete', ids);
+        },
+
         async setPos(id, pos) {
             return apiPost('transaction/setpos', { id, pos });
         },

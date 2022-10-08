@@ -149,12 +149,6 @@ class TransactionListView extends View {
         }
         setEvents(this.noDateBtn, { click: () => this.onDateClear() });
 
-        this.delForm = ge('delform');
-        this.delTransInp = ge('deltrans');
-        if (!this.delForm || !this.delTransInp) {
-            throw new Error('Failed to initialize Transaction List view');
-        }
-
         const listContainer = document.querySelector('.list-container');
         this.loadingIndicator = LoadingIndicator.create();
         listContainer.append(this.loadingIndicator.elem);
@@ -359,6 +353,26 @@ class TransactionListView extends View {
         this.requestTransactions(this.state.filter);
     }
 
+    async deleteSelected() {
+        if (this.state.loading) {
+            return;
+        }
+        const selectedIds = this.list.selectedItems.getIdArray();
+        if (selectedIds.length === 0) {
+            return;
+        }
+
+        this.startLoading();
+
+        try {
+            await API.transaction.del({ id: selectedIds });
+            this.requestTransactions(this.state.filter);
+        } catch (e) {
+            window.app.createMessage(e.message, 'msg_error');
+            this.stopLoading();
+        }
+    }
+
     /**
      * Create and show transaction delete warning popup
      */
@@ -372,7 +386,7 @@ class TransactionListView extends View {
             id: 'delete_warning',
             title: (multi) ? TITLE_MULTI_TRANS_DELETE : TITLE_SINGLE_TRANS_DELETE,
             content: (multi) ? MSG_MULTI_TRANS_DELETE : MSG_SINGLE_TRANS_DELETE,
-            onconfirm: () => this.delForm.submit(),
+            onconfirm: () => this.deleteSelected(),
         });
     }
 
@@ -589,19 +603,18 @@ class TransactionListView extends View {
         filterUrl.searchParams.set('page', state.pagination.page);
         this.modeSelector.setURL(filterUrl);
 
+        const selectedIds = this.list.selectedItems.getIdArray();
+
         // toolbar
-        this.toolbar.updateBtn.show(this.list.selectedItems.count() === 1);
-        this.toolbar.deleteBtn.show(this.list.selectedItems.count() > 0);
+        this.toolbar.updateBtn.show(selectedIds.length === 1);
+        this.toolbar.deleteBtn.show(selectedIds.length > 0);
 
-        const selArr = this.list.selectedItems.getIdArray();
-        this.delTransInp.value = selArr.join();
-
-        if (this.list.selectedItems.count() === 1) {
+        if (selectedIds.length === 1) {
             const { baseURL } = window.app;
-            this.toolbar.updateBtn.setURL(`${baseURL}transactions/update/${selArr[0]}`);
+            this.toolbar.updateBtn.setURL(`${baseURL}transactions/update/${selectedIds[0]}`);
         }
 
-        this.toolbar.show(this.list.selectedItems.count() > 0);
+        this.toolbar.show(selectedIds.length > 0);
 
         if (!state.loading) {
             this.loadingIndicator.hide();
