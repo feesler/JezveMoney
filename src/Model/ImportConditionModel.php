@@ -111,7 +111,7 @@ class ImportConditionModel extends CachedTable
     }
 
 
-    protected function validateParams($params, $isUpdate = false)
+    protected function validateParams($params, $item_id = 0)
     {
         $avFields = [
             "rule_id",
@@ -123,31 +123,28 @@ class ImportConditionModel extends CachedTable
         $res = [];
 
         // In CREATE mode all fields is required
-        if (!$isUpdate && !checkFields($params, $avFields)) {
-            return null;
+        if (!$item_id) {
+            checkFields($params, $avFields, true);
         }
 
         if (isset($params["rule_id"])) {
             $res["rule_id"] = intval($params["rule_id"]);
             if (!$this->ruleModel->isExist($res["rule_id"])) {
-                wlog("Parent rule not found: " . $res["rule_id"]);
-                return null;
+                throw new \Error("Parent rule not found: " . $res["rule_id"]);
             }
         }
 
         if (isset($params["field_id"])) {
             $res["field_id"] = intval($params["field_id"]);
             if (!in_array($res["field_id"], self::$availCondFields)) {
-                wlog("Invalid field_id: " . $res["field_id"]);
-                return null;
+                throw new \Error("Invalid field_id: " . $res["field_id"]);
             }
         }
 
         if (isset($params["operator"])) {
             $res["operator"] = intval($params["operator"]);
             if (!in_array($res["operator"], self::$availCondOperators)) {
-                wlog("Invalid operator: " . $res["operator"]);
-                return null;
+                throw new \Error("Invalid operator: " . $res["operator"]);
             }
         }
 
@@ -159,12 +156,16 @@ class ImportConditionModel extends CachedTable
             $res["value"] = $this->dbObj->escape($params["value"]);
         }
 
+        if ($this->isSameItemExist($res, $item_id)) {
+            throw new \Error("Same import condition already exist");
+        }
+
         return $res;
     }
 
 
     // Check same item already exist
-    protected function isSameItemExist($params, $updateId = 0)
+    protected function isSameItemExist($params, $item_id = 0)
     {
         if (!is_array($params)) {
             return false;
@@ -176,16 +177,8 @@ class ImportConditionModel extends CachedTable
             "operator" => $params["operator"],
             "value" => $params["value"]
         ]);
-        if (!count($items)) {
-            return false;
-        }
-        $foundItem = $items[0];
-        if ($foundItem->id != $updateId) {
-            wlog("Such item already exist");
-            return true;
-        }
-
-        return false;
+        $foundItem = (count($items) > 0) ? $items[0] : null;
+        return ($foundItem && $foundItem->id != $item_id);
     }
 
 
@@ -193,13 +186,6 @@ class ImportConditionModel extends CachedTable
     protected function preCreate($params, $isMultiple = false)
     {
         $res = $this->validateParams($params);
-        if (is_null($res)) {
-            return null;
-        }
-
-        if ($this->isSameItemExist($res)) {
-            return null;
-        }
 
         $res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
         $res["user_id"] = self::$user_id;
@@ -211,21 +197,15 @@ class ImportConditionModel extends CachedTable
     // Preparations for item update
     protected function preUpdate($item_id, $params)
     {
-        // check item is exist
-        $ruleObj = $this->getItem($item_id);
-        if (!$ruleObj) {
-            return false;
+        $item = $this->getItem($item_id);
+        if (!$item) {
+            throw new \Error("Item not found");
+        }
+        if ($item->user_id != self::$user_id) {
+            throw new \Error("Invalid user");
         }
 
-        $res = $this->validateParams($params, true);
-        if (is_null($res)) {
-            return null;
-        }
-
-        if ($this->isSameItemExist($res, $item_id)) {
-            return null;
-        }
-
+        $res = $this->validateParams($params, $item_id);
         $res["updatedate"] = date("Y-m-d H:i:s");
 
         return $res;

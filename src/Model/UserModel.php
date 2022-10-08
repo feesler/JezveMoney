@@ -344,37 +344,34 @@ class UserModel extends CachedTable
     }
 
 
-    protected function validateParams($params, $isUpdate = false)
+    protected function validateParams($params, $item_id = 0)
     {
         $avFields = ["login", "password", "name"];
         $res = [];
 
         // In CREATE mode all fields is required
-        if (!$isUpdate && !checkFields($params, $avFields)) {
-            return null;
+        if (!$item_id) {
+            checkFields($params, $avFields, true);
         }
 
         if (isset($params["login"])) {
             $res["login"] = $this->dbObj->escape($params["login"]);
             if (is_empty($res["login"])) {
-                wlog("Invalid login specified");
-                return null;
+                throw new \Error("Invalid login specified");
             }
         }
 
         if (isset($params["password"]) && isset($res["login"])) {
             $res["passhash"] = $this->createHash($res["login"], $params["password"]);
             if (is_empty($res["passhash"])) {
-                wlog("Invalid password specified");
-                return null;
+                throw new \Error("Invalid password specified");
             }
         }
 
         if (isset($params["name"])) {
             $res["name"] = $this->dbObj->escape($params["name"]);
             if (is_empty($res["name"])) {
-                wlog("Invalid name specified");
-                return null;
+                throw new \Error("Invalid name specified");
             }
         }
 
@@ -384,36 +381,29 @@ class UserModel extends CachedTable
             $res["access"] = 0;
         }
 
+        if ($this->isSameItemExist($res, $item_id)) {
+            throw new \Error("User with same login already exist");
+        }
+
         return $res;
     }
 
 
     // Check same item already exist
-    protected function isSameItemExist($params, $updateId = 0)
+    protected function isSameItemExist($params, $item_id = 0)
     {
         if (!is_array($params) || !isset($params["login"])) {
             return false;
         }
 
         $userId = $this->getIdByLogin($params["login"]);
-        if ($userId != 0 && $userId != $updateId) {
-            return true;
-        }
-
-        return false;
+        return ($userId != 0 && $userId != $item_id);
     }
 
 
     protected function preCreate($params, $isMultiple = false)
     {
         $res = $this->validateParams($params);
-        if (is_null($res)) {
-            return null;
-        }
-
-        if ($this->isSameItemExist($res)) {
-            return null;
-        }
 
         $res["owner_id"] = 0;
         $res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
@@ -439,19 +429,12 @@ class UserModel extends CachedTable
 
     protected function preUpdate($item_id, $params)
     {
-        $userObj = $this->getItem($item_id);
-        if (!$userObj) {
-            return null;
+        $item = $this->getItem($item_id);
+        if (!$item) {
+            throw new \Error("Item not found");
         }
 
-        $res = $this->validateParams($params, true);
-        if (is_null($res)) {
-            return null;
-        }
-
-        if ($this->isSameItemExist($res, $item_id)) {
-            return null;
-        }
+        $res = $this->validateParams($params, $item_id);
 
         $this->personName = $res["name"];
         unset($res["name"]);

@@ -51,29 +51,27 @@ class IconModel extends CachedTable
     }
 
 
-    protected function validateParams($params, $isUpdate = false)
+    protected function validateParams($params, $item_id = 0)
     {
         $avFields = ["name", "file", "type"];
         $res = [];
 
         // In CREATE mode all fields is required
-        if (!$isUpdate && !checkFields($params, $avFields)) {
-            return null;
+        if (!$item_id) {
+            checkFields($params, $avFields, true);
         }
 
         if (isset($params["name"])) {
             $res["name"] = $this->dbObj->escape($params["name"]);
             if (is_empty($res["name"])) {
-                wlog("Invalid name specified");
-                return null;
+                throw new \Error("Invalid name specified");
             }
         }
 
         if (isset($params["file"])) {
             $res["file"] = $this->dbObj->escape($params["file"]);
             if (is_empty($res["file"])) {
-                wlog("Invalid file specified");
-                return null;
+                throw new \Error("Invalid file specified");
             }
         }
 
@@ -81,28 +79,24 @@ class IconModel extends CachedTable
             $res["type"] = intval($params["type"]);
         }
 
+        if ($this->isSameItemExist($res, $item_id)) {
+            throw new \Error("Same currency already exist");
+        }
+
         return $res;
     }
 
 
     // Check same item already exist
-    protected function isSameItemExist($params, $updateId = 0)
+    protected function isSameItemExist($params, $item_id = 0)
     {
-        if (!is_array($params)) {
+        if (!is_array($params) || !isset($params["type"]) || !isset($params["file"])) {
             return false;
         }
 
         $items = $this->getData(["type" => $params["type"], "file" => $params["file"]]);
-        if (!count($items)) {
-            return false;
-        }
-        $foundItem = $items[0];
-        if ($foundItem->id != $updateId) {
-            wlog("Such item already exist");
-            return true;
-        }
-
-        return false;
+        $foundItem = (count($items) > 0) ? $items[0] : null;
+        return ($foundItem && $foundItem->id != $item_id);
     }
 
 
@@ -110,14 +104,6 @@ class IconModel extends CachedTable
     protected function preCreate($params, $isMultiple = false)
     {
         $res = $this->validateParams($params);
-        if (is_null($res)) {
-            return null;
-        }
-
-        if ($this->isSameItemExist($res)) {
-            return null;
-        }
-
         $res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
 
         return $res;
@@ -127,21 +113,12 @@ class IconModel extends CachedTable
     // Preparations for item update
     protected function preUpdate($item_id, $params)
     {
-        // check currency is exist
-        $currObj = $this->getItem($item_id);
-        if (!$currObj) {
-            return false;
+        $item = $this->getItem($item_id);
+        if (!$item) {
+            throw new \Error("Item not found");
         }
 
-        $res = $this->validateParams($params, true);
-        if (is_null($res)) {
-            return null;
-        }
-
-        if ($this->isSameItemExist($res, $item_id)) {
-            return null;
-        }
-
+        $res = $this->validateParams($params, $item_id);
         $res["updatedate"] = date("Y-m-d H:i:s");
 
         return $res;
