@@ -14,7 +14,7 @@ import * as StatisticsTests from '../run/statistics.js';
 
 import { App } from '../Application.js';
 import { transactionsListTests } from './transactionList.js';
-import { commonTests } from './common.js';
+import { unitTests } from './unit.js';
 
 export class Scenario {
     constructor(environment) {
@@ -69,7 +69,7 @@ export class Scenario {
     async runFullScenario() {
         setBlock('Running full test scenario', 1);
 
-        await commonTests.run();
+        await unitTests.run();
 
         await securityTests.run();
         await this.prepareTests();
