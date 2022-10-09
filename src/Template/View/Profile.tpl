@@ -52,6 +52,10 @@
         <input id="newname" class="stretch-input" name="name" type="text" autocomplete="off" value="<?=e($profileInfo["name"])?>">
         <div class="invalid-feedback">Input name.<br>New name must be different from the old.</div>
     </div>
+
+    <div class="popup__controls">
+        <input class="btn submit-btn" type="submit" value="Submit">
+    </div>
 </form>
 </div>
 
@@ -67,6 +71,10 @@
         <label for="newpwd">New password</label>
         <input id="newpwd" class="stretch-input" name="new" type="password" autocomplete="off">
         <div class="invalid-feedback">Input new password.<br>New password must be different from the old.</div>
+    </div>
+
+    <div class="popup__controls">
+        <input class="btn submit-btn" type="submit" value="Submit">
     </div>
 </form>
 </div>
@@ -115,6 +123,10 @@
             <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
             <span class="checkbox__label">Import rules</span>
         </label>
+    </div>
+
+    <div class="popup__controls">
+        <input class="btn submit-btn" type="submit" value="Submit">
     </div>
 </form>
 </div>

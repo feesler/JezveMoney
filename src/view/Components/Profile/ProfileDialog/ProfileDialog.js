@@ -28,10 +28,7 @@ export class ProfileDialog extends Component {
             title,
             className: [DIALOG_CLASS, className],
             content: this.elem,
-            btn: {
-                okBtn: { value: 'Submit', onclick: (e) => this.onSubmit(e) },
-                closeBtn: true,
-            },
+            btn: { closeBtn: true },
             onclose: () => this.onClose(),
         });
         show(this.elem, true);
