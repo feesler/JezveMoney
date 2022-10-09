@@ -1,26 +1,14 @@
-import {
-    ge,
-    show,
-    setEvents,
-    isFunction,
-    Component,
-} from 'jezvejs';
+import { ge } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
-import { Popup } from 'jezvejs/Popup';
 import { API } from '../../../js/api/index.js';
-import { LoadingIndicator } from '../../LoadingIndicator/LoadingIndicator.js';
-import './style.scss';
+import { ProfileDialog } from '../ProfileDialog/ProfileDialog.js';
 
 /* CSS classes */
 const DIALOG_CLASS = 'reset-dialog';
 /* Strings */
 const DIALOG_TITLE = 'Reset data';
 
-export class ResetDataDialog extends Component {
-    static create(props) {
-        return new ResetDataDialog(props);
-    }
-
+export class ResetDataDialog extends ProfileDialog {
     constructor(...args) {
         super(...args);
 
@@ -29,32 +17,15 @@ export class ResetDataDialog extends Component {
 
     init() {
         this.elem = ge('reset');
-        this.form = this.elem?.querySelector('form');
-        if (!this.elem || !this.form) {
+        if (!this.elem) {
             throw new Error('Failed to initialize Reset data form');
         }
-
-        setEvents(this.form, { submit: (e) => this.onSubmit(e) });
-
-        this.popup = Popup.create({
-            id: 'reset_popup',
-            title: DIALOG_TITLE,
-            content: this.elem,
-            className: DIALOG_CLASS,
-            btn: {
-                okBtn: { value: 'Submit', onclick: (e) => this.onSubmit(e) },
-                closeBtn: true,
-            },
-            onclose: () => this.onClose(),
-        });
-        show(this.elem, true);
 
         this.resetAllCheck = Checkbox.fromElement(ge('resetAllCheck'), {
             onChange: () => this.onToggleAll(),
         });
 
         const checkboxProps = { onChange: () => this.onChange() };
-
         this.accountsCheck = Checkbox.fromElement(ge('accountsCheck'), checkboxProps);
         this.personsCheck = Checkbox.fromElement(ge('personsCheck'), checkboxProps);
         this.transactionsCheck = Checkbox.fromElement(ge('transactionsCheck'), checkboxProps);
@@ -62,34 +33,17 @@ export class ResetDataDialog extends Component {
         this.importTplCheck = Checkbox.fromElement(ge('importTplCheck'), checkboxProps);
         this.importRulesCheck = Checkbox.fromElement(ge('importRulesCheck'), checkboxProps);
 
-        this.loadingIndicator = LoadingIndicator.create({ fixed: false });
-        this.elem.append(this.loadingIndicator.elem);
-
-        this.reset();
-    }
-
-    onClose() {
-        this.reset();
-
-        if (isFunction(this.props.onClose)) {
-            this.props.onClose();
-        }
-    }
-
-    /** Show/hide dialog */
-    show(val) {
-        this.render(this.state);
-        this.popup.show(val);
-    }
-
-    /** Hide dialog */
-    hide() {
-        this.popup.hide();
+        this.initDialog({
+            id: 'reset_popup',
+            title: DIALOG_TITLE,
+            className: DIALOG_CLASS,
+        });
     }
 
     /** Reset dialog state */
     reset() {
-        this.form.reset();
+        super.reset();
+
         this.setState({
             resetAll: false,
             accounts: false,
@@ -101,14 +55,6 @@ export class ResetDataDialog extends Component {
             importRules: false,
             loading: false,
         });
-    }
-
-    startLoading() {
-        this.setState({ ...this.state, loading: true });
-    }
-
-    stopLoading() {
-        this.setState({ ...this.state, loading: false });
     }
 
     /** 'Reset all' checkbox 'change' event handler */
@@ -158,17 +104,7 @@ export class ResetDataDialog extends Component {
         this.setState(state);
     }
 
-    /** Form 'submit' event handler */
-    onSubmit(e) {
-        e.preventDefault();
-
-        this.requestResetData();
-    }
-
-    /** Send reset data API request */
-    async requestResetData() {
-        this.startLoading();
-
+    async sendFormRequest() {
         const { state } = this;
         const request = {};
 
@@ -191,27 +127,11 @@ export class ResetDataDialog extends Component {
             request.importrules = true;
         }
 
-        try {
-            const result = await API.profile.reset(request);
-
-            this.popup.close();
-
-            if (result.msg) {
-                window.app.createMessage(result.msg, 'msg_success');
-            }
-        } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
-        }
-
-        this.stopLoading();
+        return API.profile.reset(request);
     }
 
     /** Render component state */
-    render(state) {
-        if (state.loading) {
-            this.loadingIndicator.show();
-        }
-
+    renderDialog(state) {
         this.accountsCheck.check(state.accounts);
         this.personsCheck.check(state.persons);
         this.transactionsCheck.check(state.transactions);
@@ -221,9 +141,5 @@ export class ResetDataDialog extends Component {
 
         this.importTplCheck.check(state.importTpl);
         this.importRulesCheck.check(state.importRules);
-
-        if (!state.loading) {
-            this.loadingIndicator.hide();
-        }
     }
 }

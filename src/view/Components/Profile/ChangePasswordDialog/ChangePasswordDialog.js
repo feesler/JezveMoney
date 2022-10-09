@@ -1,25 +1,15 @@
-import {
-    ge,
-    show,
-    setEvents,
-    isFunction,
-    Component,
-} from 'jezvejs';
-import { Popup } from 'jezvejs/Popup';
+import { ge, setEvents } from 'jezvejs';
 import { API } from '../../../js/api/index.js';
-import { LoadingIndicator } from '../../LoadingIndicator/LoadingIndicator.js';
-import './style.scss';
+import { ProfileDialog } from '../ProfileDialog/ProfileDialog.js';
 
 /** CSS classes */
 const DIALOG_CLASS = 'password-dialog';
+const OLD_PASS_BLOCK = 'old-pwd-inp-block';
+const NEW_PASS_BLOCK = 'new-pwd-inp-block';
 /** Strings */
 const DIALOG_TITLE = 'Change password';
 
-export class ChangePasswordDialog extends Component {
-    static create(props) {
-        return new ChangePasswordDialog(props);
-    }
-
+export class ChangePasswordDialog extends ProfileDialog {
     constructor(...args) {
         super(...args);
 
@@ -28,63 +18,32 @@ export class ChangePasswordDialog extends Component {
 
     init() {
         this.elem = ge('changepass');
-        this.form = this.elem?.querySelector('form');
         this.oldPassInp = ge('oldpwd');
         this.newPassInp = ge('newpwd');
         if (
             !this.elem
-            || !this.form
             || !this.oldPassInp
             || !this.newPassInp
         ) {
             throw new Error('Failed to initialize Change password form');
         }
 
-        setEvents(this.form, { submit: (e) => this.onSubmit(e) });
         setEvents(this.oldPassInp, { input: (e) => this.onOldPasswordInput(e) });
         setEvents(this.newPassInp, { input: (e) => this.onNewPasswordInput(e) });
 
-        this.popup = Popup.create({
+        this.initDialog({
             id: 'chpass_popup',
             title: DIALOG_TITLE,
-            content: this.elem,
             className: DIALOG_CLASS,
-            btn: {
-                okBtn: { value: 'Submit', onclick: (e) => this.onSubmit(e) },
-                closeBtn: true,
-            },
-            onclose: () => this.onClose(),
         });
-        show(this.elem, true);
-
-        this.loadingIndicator = LoadingIndicator.create({ fixed: false });
-        this.elem.append(this.loadingIndicator.elem);
 
         this.reset();
-    }
-
-    onClose() {
-        this.reset();
-
-        if (isFunction(this.props.onClose)) {
-            this.props.onClose();
-        }
-    }
-
-    /** Show/hide dialog */
-    show(val) {
-        this.render(this.state);
-        this.popup.show(val);
-    }
-
-    /** Hide dialog */
-    hide() {
-        this.popup.hide();
     }
 
     /** Reset dialog state */
     reset() {
-        this.form.reset();
+        super.reset();
+
         this.setState({
             oldPassword: '',
             newPassword: '',
@@ -94,14 +53,6 @@ export class ChangePasswordDialog extends Component {
             },
             loading: false,
         });
-    }
-
-    startLoading() {
-        this.setState({ ...this.state, loading: true });
-    }
-
-    stopLoading() {
-        this.setState({ ...this.state, loading: false });
     }
 
     /** Old password 'input' event handler */
@@ -128,79 +79,50 @@ export class ChangePasswordDialog extends Component {
         });
     }
 
-    /** Change name form submit event handler */
-    onSubmit(e) {
-        e.preventDefault();
-
-        const validation = {
+    validateForm(state) {
+        const res = {
             valid: true,
             oldPassword: true,
             newPassword: true,
         };
 
-        if (!this.state.oldPassword || this.state.oldPassword.length === 0) {
-            validation.oldPassword = false;
-            validation.valid = false;
+        if (!state.oldPassword || state.oldPassword.length === 0) {
+            res.oldPassword = false;
+            res.valid = false;
         }
 
         if (
-            !this.state.newPassword
-            || this.state.newPassword.length === 0
-            || this.state.newPassword === this.state.oldPassword
+            !state.newPassword
+            || state.newPassword.length === 0
+            || state.newPassword === state.oldPassword
         ) {
-            validation.newPassword = false;
-            validation.valid = false;
+            res.newPassword = false;
+            res.valid = false;
         }
 
-        if (validation.valid) {
-            this.requestPasswordChange();
-        } else {
-            this.setState({ ...this.state, validation });
-        }
+        return res;
     }
 
     /** Send request to API to change user password */
-    async requestPasswordChange() {
-        this.startLoading();
-
-        try {
-            const { oldPassword, newPassword } = this.state;
-            const result = await API.profile.changePassword(oldPassword, newPassword);
-
-            this.popup.close();
-
-            if (result.msg) {
-                window.app.createMessage(result.msg, 'msg_success');
-            }
-        } catch (e) {
-            window.app.createMessage(e.message, 'msg_error');
-        }
-
-        this.stopLoading();
+    async sendFormRequest() {
+        const { oldPassword, newPassword } = this.state;
+        return API.profile.changePassword(oldPassword, newPassword);
     }
 
     /** Render component state */
-    render(state) {
-        if (state.loading) {
-            this.loadingIndicator.show();
-        }
-
+    renderDialog(state) {
         this.oldPassInp.value = state.oldPassword;
         if (state.validation.oldPassword) {
-            window.app.clearBlockValidation('old-pwd-inp-block');
+            window.app.clearBlockValidation(OLD_PASS_BLOCK);
         } else {
-            window.app.invalidateBlock('old-pwd-inp-block');
+            window.app.invalidateBlock(OLD_PASS_BLOCK);
         }
 
         this.newPassInp.value = state.newPassword;
         if (state.validation.newPassword) {
-            window.app.clearBlockValidation('new-pwd-inp-block');
+            window.app.clearBlockValidation(NEW_PASS_BLOCK);
         } else {
-            window.app.invalidateBlock('new-pwd-inp-block');
-        }
-
-        if (!state.loading) {
-            this.loadingIndicator.hide();
+            window.app.invalidateBlock(NEW_PASS_BLOCK);
         }
     }
 }
