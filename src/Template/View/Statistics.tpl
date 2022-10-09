@@ -90,7 +90,7 @@ include(TPL_PATH . "Header.tpl");	?>
                                         <button id="nodatebtn" class="input-group__inner-btn" type="button"<?=hidden(is_empty($dateFmt))?>>
                                             <?=svgIcon("close", "input-group__inner-btn__icon")?>
                                         </button>
-                                        <button id="cal_rbtn" class="icon-btn input-group__btn" type="button"><?=svgIcon("cal", "icon calendar-icon")?></button>
+                                        <button id="cal_rbtn" class="btn icon-btn input-group__btn" type="button"><?=svgIcon("cal", "icon calendar-icon")?></button>
                                     </div>
                                     <div id="calendar" class="calendar"></div>
                                 </div>

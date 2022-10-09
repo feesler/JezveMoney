@@ -102,6 +102,11 @@
     border-color: var(--active-input-border-color);
   }
 
+  .stretch-input[disabled] {
+    color: var(--input-disabled-text-color);
+    background-color: var(--input-disabled-bg-color);
+  }
+
   /* Input group */
   .input-group {
     --ig-border-color: var(--input-border-color);
@@ -110,7 +115,8 @@
     --ig-input-active-border: var(--active-input-border-color);
     --ig-input-disabled-color: var(--input-disabled-text-color);
     --ig-input-disabled-bg: var(--input-disabled-bg-color);
-    --ig-button-disabled-color: var(--main-text-color);
+    --ig-input-disabled-border: var(--input-border-color);
+    --ig-button-disabled-color: var(--input-disabled-text-color);
     --ig-button-disabled-border: var(--input-border-color);
     --ig-button-disabled-bg: #e7e7e7;
     --ig-inner-button-color: #888888;
@@ -222,7 +228,7 @@
   }
 
   /* Profile view */
-  .profile_block {
+  .profile-block {
     color: var(--main-text-color);
   }
 
@@ -246,8 +252,8 @@
   }
 
   /* Swap button */
-  .swap-btn {
-    border-color: #b0b0b0;
+  .swap-btn:active {
+    background-color: #b0b0b0;
   }
 
   .swap-icon {
@@ -291,10 +297,6 @@
     input[type="text"]:focus {
       border-color: #888888;
       background-color: #f2f2f2;
-    }
-
-    .icon {
-      fill: #a7a7a7;
     }
   }
 
@@ -343,10 +345,6 @@
 
     .btn {
       color: #202020;
-    }
-
-    .icon {
-      fill: #a7a7a7;
     }
   }
 
@@ -438,13 +436,18 @@
   }
 
   /* Tile info block */
-  .tile-info-block > div > span {
+  .tile-info-item {
     color: var(--main-text-color);
   }
 
   /* Transaction list mode selector */
   .mode-selector > b > span {
     color: var(--main-text-color);
+  }
+
+  /* Input group disabled button with icon */
+  .input-group .icon-btn[disabled] .icon {
+    fill: var(--input-disabled-text-color);
   }
 }
 
@@ -484,11 +487,13 @@
       border-color: #808080;
     }
 
+    .rule-item .menu-btn:hover,
     .rule-item .icon-btn:hover,
     .rule-form .icon-btn:hover {
       background-color: #cccccc;
     }
 
+    .rule-item .menu-btn:hover .icon,
     .rule-item .icon-btn:hover .icon,
     .rule-form .icon-btn:hover .icon {
       fill: #ffffff;

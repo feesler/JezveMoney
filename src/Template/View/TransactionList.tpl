@@ -85,7 +85,7 @@ include(TPL_PATH . "Header.tpl"); ?>
                                     <button id="nodatebtn" class="input-group__inner-btn" type="button"<?=hidden(is_empty($dateFmt))?>>
                                         <?=svgIcon("close", "input-group__inner-btn__icon")?>
                                     </button>
-                                    <button id="cal_rbtn" class="icon-btn input-group__btn" type="button">
+                                    <button id="cal_rbtn" class="btn icon-btn input-group__btn" type="button">
                                         <svg class="icon calendar-icon"><use href="#calendar-icon"></use></svg>
                                     </button>
                                 </div>
@@ -101,7 +101,7 @@ include(TPL_PATH . "Header.tpl"); ?>
                                 <button id="nosearchbtn" class="input-group__inner-btn" type="button"<?=hidden(is_empty($searchReq))?>>
                                     <?=svgIcon("close", "input-group__inner-btn__icon")?>
                                 </button>
-                                <button class="icon-btn search_btn input-group__btn" type="submit"><?=svgIcon("search", "icon search-icon")?></button>
+                                <button class="btn icon-btn search_btn input-group__btn" type="submit"><?=svgIcon("search", "icon search-icon")?></button>
                             </div>
                             </form>
                         </div>

@@ -99,7 +99,7 @@ include(TPL_PATH . "Header.tpl");	?>
                                     </div>
                                 </div>
                                 <div id="selaccount" class="account-toggler"<?=hidden(!$noAccount)?>>
-                                    <button class="dashed-btn" type="button"><span>Select account</span></button>
+                                    <button class="btn dashed-btn" type="button">Select account</button>
                                 </div>
                             </div>
 
@@ -230,7 +230,7 @@ include(TPL_PATH . "Header.tpl");	?>
                                 <div class="column-container">
                                     <div class="input-group">
                                         <input id="date" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?=e($dateFmt)?>">
-                                        <button id="cal_rbtn" class="icon-btn input-group__btn" type="button">
+                                        <button id="cal_rbtn" class="btn icon-btn input-group__btn" type="button">
                                             <svg class="icon calendar-icon"><use href="#calendar-icon"></use></svg>
                                         </button>
                                     </div>

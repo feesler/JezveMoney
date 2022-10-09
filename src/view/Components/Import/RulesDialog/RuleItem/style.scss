@@ -132,6 +132,7 @@
 .rule-item__actions {
   display: flex;
   flex-flow: column nowrap;
+  gap: 1px;
 }
 
 .rule-item__conditions {

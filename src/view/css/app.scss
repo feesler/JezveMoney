@@ -135,7 +135,6 @@ label {
   padding: 5px;
   color: #ffffff;
   background-color: #0072c6;
-  cursor: pointer;
 }
 
 .icon-btn .icon {
@@ -292,6 +291,7 @@ label {
   vertical-align: middle;
   overflow: visible;
   border-radius: 0;
+  cursor: pointer;
 }
 
 .submit-btn,
@@ -311,7 +311,6 @@ label {
   text-decoration: underline;
   background: none;
   color: #0072c6;
-  cursor: pointer;
 }
 
 .warning-btn {
@@ -334,20 +333,26 @@ label {
 
 /* dashed underline button */
 .dashed-btn {
+  position: relative;
+  padding: 0;
   border: 0 none;
-  clear: both;
-  cursor: pointer;
-  background: none;
   font-size: 16px;
+  background: none;
+  color: #0072c6;
 
-  > span {
-    color: #0072c6;
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
     padding: 0;
-    margin-top: -10px;
     border-top: 0 none;
     border-right: 0 none;
     border-left: 0 none;
-    border-bottom: 1px dashed #0072c6;
+    border-bottom-style: dashed;
+    border-bottom-width: 1px;
+    border-bottom-color: #0072c6;
   }
 }
 
@@ -529,6 +534,11 @@ label {
     border-color: #f02020;
     background-color: #f02020;
   }
+
+  .close-btn__icon {
+    fill: #ffffff;
+    opacity: 0.5;
+  }
 }
 
 /* Paginator */
@@ -656,16 +666,16 @@ a.paginator-arrow:focus {
 
   .link-btn:hover {
     text-decoration: underline;
-    cursor: pointer;
     color: #1e82cc;
   }
 
-  .dashed-btn:hover > span {
-    border-bottom: 1px solid #0072c6;
+  .dashed-btn:hover::after {
+    border-bottom-style: solid;
   }
 
   .msg .close-btn:hover .close-btn__icon {
     fill: #ffffff;
+    opacity: 1;
   }
 
   a.paginator-item:hover {
