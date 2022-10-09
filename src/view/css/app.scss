@@ -294,6 +294,13 @@ label {
   cursor: pointer;
 }
 
+.btn[disabled],
+.close-btn[disabled] {
+  cursor: default;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
 .submit-btn,
 .submit-btn:visited {
   border-radius: var(--action-btn-border-radius);

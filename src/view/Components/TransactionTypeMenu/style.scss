@@ -12,6 +12,16 @@
   cursor: pointer;
 }
 
+.trtype-menu[disabled],
+.trtype-menu__item[disabled] {
+  cursor: default;
+  pointer-events: none;
+
+  .trtype-menu_item_title {
+    color: #7e7e7e;
+  }
+}
+
 .trtype-menu__item_selected {
   font-weight: 500;
 }

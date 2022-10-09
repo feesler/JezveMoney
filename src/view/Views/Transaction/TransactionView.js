@@ -247,10 +247,7 @@ class TransactionView extends View {
             throw new Error('Failed to initialize view');
         }
 
-        this.swapBtn.addEventListener(
-            'click',
-            () => this.store.dispatch(swapSourceAndDest()),
-        );
+        setEvents(this.swapBtn, { click: () => this.store.dispatch(swapSourceAndDest()) });
 
         this.srcTileBase = this.srcContainer.querySelector('.tile-base');
         this.srcTileContainer = this.srcContainer.querySelector('.tile_container');
@@ -358,9 +355,8 @@ class TransactionView extends View {
         this.datePickerWrapper = ge('calendar');
 
         this.dateInputBtn = ge('cal_rbtn');
-        if (this.dateInputBtn) {
-            this.dateInputBtn.addEventListener('click', () => this.showCalendar());
-        }
+        setEvents(this.dateInputBtn, { click: () => this.showCalendar() });
+
         this.dateInput = ge('date');
         setEvents(this.dateInput, { input: (e) => this.onDateInput(e) });
 
@@ -387,16 +383,11 @@ class TransactionView extends View {
         this.debtAccountTile = AccountTile.fromElement({ elem: 'acc_tile', parent: this });
 
         this.noAccountBtn = ge('noacc_btn');
-        if (this.noAccountBtn) {
-            this.noAccountBtn.addEventListener('click', () => this.toggleEnableAccount());
-        }
+        setEvents(this.noAccountBtn, { click: () => this.toggleEnableAccount() });
+
         this.selectAccountBtn = ge('selaccount');
-        if (this.selectAccountBtn) {
-            const accountToggleBtn = this.selectAccountBtn.querySelector('button');
-            if (accountToggleBtn) {
-                accountToggleBtn.addEventListener('click', () => this.toggleEnableAccount());
-            }
-        }
+        this.accountToggleBtn = this.selectAccountBtn?.querySelector('button');
+        setEvents(this.accountToggleBtn, { click: () => this.toggleEnableAccount() });
 
         this.debtAccountLabel = ge('acclbl');
 
@@ -522,6 +513,22 @@ class TransactionView extends View {
         }
     }
 
+    /** Initialize DropDown for currency */
+    createCurrencyList({ elem, onitemselect, currId }) {
+        const res = DropDown.create({
+            elem,
+            onitemselect,
+            listAttach: true,
+        });
+
+        window.app.initCurrencyList(res);
+        if (currId) {
+            res.selectItem(currId);
+        }
+
+        return res;
+    }
+
     /** Initialize DropDown for source currency */
     initSrcCurrList() {
         if (this.srcCurrDDList) {
@@ -529,17 +536,11 @@ class TransactionView extends View {
         }
 
         const state = this.store.getState();
-        this.srcCurrDDList = DropDown.create({
+        this.srcCurrDDList = this.createCurrencyList({
             elem: 'srcamountsign',
-            listAttach: true,
+            currId: state.transaction.src_curr,
             onitemselect: (item) => this.onSrcCurrencySel(item),
         });
-
-        window.app.initCurrencyList(this.srcCurrDDList);
-
-        if (state.transaction.src_curr) {
-            this.srcCurrDDList.selectItem(state.transaction.src_curr);
-        }
     }
 
     /** Initialize DropDown for destination currency */
@@ -549,17 +550,11 @@ class TransactionView extends View {
         }
 
         const state = this.store.getState();
-        this.destCurrDDList = DropDown.create({
+        this.destCurrDDList = this.createCurrencyList({
             elem: 'destamountsign',
-            listAttach: true,
+            currId: state.transaction.dest_curr,
             onitemselect: (item) => this.onDestCurrencySel(item),
         });
-
-        window.app.initCurrencyList(this.destCurrDDList);
-
-        if (state.transaction.dest_curr) {
-            this.destCurrDDList.selectItem(state.transaction.dest_curr);
-        }
     }
 
     /**
@@ -979,6 +974,7 @@ class TransactionView extends View {
 
         if (this.exchangeInfo) {
             this.exchangeInfo.setTitle(`${normExch} ${exchText}`);
+            this.exchangeInfo.enable(!state.submitStarted);
         }
     }
 
@@ -1022,7 +1018,7 @@ class TransactionView extends View {
         this.destResBalanceRowLabel.textContent = 'Result balance';
 
         enable(this.srcCurrBtn, false);
-        enable(this.destCurrBtn, true);
+        enable(this.destCurrBtn, !state.submitStarted);
     }
 
     renderIncome(state) {
@@ -1067,7 +1063,7 @@ class TransactionView extends View {
         this.srcResBalanceRowLabel.textContent = 'Result balance';
         this.destResBalanceRowLabel.textContent = 'Result balance';
 
-        enable(this.srcCurrBtn, true);
+        enable(this.srcCurrBtn, !state.submitStarted);
         enable(this.destCurrBtn, false);
     }
 
@@ -1210,8 +1206,12 @@ class TransactionView extends View {
         }
 
         show(this.noAccountBtn, !noAccount);
+        enable(this.noAccountBtn, !state.submitStarted);
+
         show(this.debtAccountTileBase, !noAccount);
+
         show(this.selectAccountBtn, noAccount);
+        enable(this.accountToggleBtn, !state.submitStarted);
 
         this.srcResBalanceRowLabel.textContent = (debtType) ? 'Result balance (Person)' : 'Result balance (Account)';
         this.destResBalanceRowLabel.textContent = (debtType) ? 'Result balance (Account)' : 'Result balance (Person)';
@@ -1235,6 +1235,7 @@ class TransactionView extends View {
         const personId = state.transaction.person_id;
         if (personId) {
             this.persDDList.selectItem(personId);
+            this.persDDList.enable(!state.submitStarted);
         }
 
         if (!noAccount) {
@@ -1242,6 +1243,7 @@ class TransactionView extends View {
             if (!this.accDDList) {
                 this.initAccList();
             }
+            this.accDDList.enable(!state.submitStarted);
         }
     }
 
@@ -1283,8 +1285,10 @@ class TransactionView extends View {
             this.swapBtn,
             state.isAvailable && (transaction.type === TRANSFER || transaction.type === DEBT),
         );
+        enable(this.swapBtn, !state.submitStarted);
 
         this.typeMenu.setSelection(transaction.type);
+        this.typeMenu.enable(!state.submitStarted);
 
         if (state.isAvailable) {
             if (transaction.type === EXPENSE) {
@@ -1321,6 +1325,7 @@ class TransactionView extends View {
             if (this.srcDDList && transaction.src_id) {
                 this.srcDDList.selectItem(transaction.src_id);
             }
+            this.srcDDList?.enable(!state.submitStarted);
         }
 
         if (transaction.type === INCOME || transaction.type === TRANSFER) {
@@ -1332,15 +1337,10 @@ class TransactionView extends View {
             if (this.destDDList && transaction.dest_id) {
                 this.destDDList.selectItem(transaction.dest_id);
             }
+            this.destDDList?.enable(!state.submitStarted);
         }
 
         this.typeInp.value = transaction.type;
-
-        enable(this.srcIdInp, transaction.type !== DEBT);
-        enable(this.destIdInp, transaction.type !== DEBT);
-        enable(this.personIdInp, transaction.type === DEBT);
-        enable(this.debtAccountInp, transaction.type === DEBT);
-
         this.srcIdInp.value = transaction.src_id;
         this.destIdInp.value = transaction.dest_id;
         this.srcCurrInp.value = transaction.src_curr;
@@ -1368,16 +1368,25 @@ class TransactionView extends View {
         this.renderExchangeRate(state);
 
         this.srcAmountInput.value = state.form.sourceAmount;
+        enable(this.srcAmountInput.elem, !state.submitStarted);
+
         this.destAmountInput.value = state.form.destAmount;
+        enable(this.destAmountInput.elem, !state.submitStarted);
+
         if (this.exchangeInput) {
             this.exchangeInput.value = state.form.exchange;
         }
+        enable(this.exchangeInput.elem, !state.submitStarted);
+
         if (this.srcResBalanceInput) {
             this.srcResBalanceInput.value = state.form.sourceResult;
         }
+        enable(this.srcResBalanceInput.elem, !state.submitStarted);
+
         if (this.destResBalanceInput) {
             this.destResBalanceInput.value = state.form.destResult;
         }
+        enable(this.destResBalanceInput.elem, !state.submitStarted);
 
         const currencyModel = window.app.model.currency;
         const srcCurrency = currencyModel.getItem(transaction.src_curr);
@@ -1387,22 +1396,26 @@ class TransactionView extends View {
             const title = srcCurrency.formatValue(transaction.src_amount);
             this.srcAmountInfo.setTitle(title);
             this.srcAmountInfo.setLabel(sourceAmountLbl);
+            this.srcAmountInfo.enable(!state.submitStarted);
         }
 
         if (this.destAmountInfo) {
             const title = destCurrency.formatValue(transaction.dest_amount);
             this.destAmountInfo.setTitle(title);
             this.destAmountInfo.setLabel(destAmountLbl);
+            this.destAmountInfo.enable(!state.submitStarted);
         }
 
         if (this.srcResBalanceInfo) {
             const title = srcCurrency.formatValue(state.form.fSourceResult);
             this.srcResBalanceInfo.setTitle(title);
+            this.srcResBalanceInfo.enable(!state.submitStarted);
         }
 
         if (this.destResBalanceInfo) {
             const title = destCurrency.formatValue(state.form.fDestResult);
             this.destResBalanceInfo.setTitle(title);
+            this.destResBalanceInfo.enable(!state.submitStarted);
         }
 
         if (state.validation.sourceAmount) {
@@ -1422,8 +1435,12 @@ class TransactionView extends View {
         } else {
             window.app.invalidateBlock(this.dateBlock);
         }
-
+        this.datePickerBtn.enable(!state.submitStarted);
+        enable(this.dateInput, !state.submitStarted);
         this.dateInput.value = state.form.date;
+
+        this.commentBtn.enable(!state.submitStarted);
+        enable(this.commentInput, !state.submitStarted);
         this.commentInput.value = state.form.comment;
 
         enable(this.submitBtn, !state.submitStarted);
