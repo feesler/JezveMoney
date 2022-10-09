@@ -2,6 +2,7 @@ import {
     ge,
     show,
     setEvents,
+    isFunction,
     Component,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
@@ -44,7 +45,7 @@ export class ResetDataDialog extends Component {
                 okBtn: { value: 'Submit', onclick: (e) => this.onSubmit(e) },
                 closeBtn: true,
             },
-            onclose: () => this.reset(),
+            onclose: () => this.onClose(),
         });
         show(this.elem, true);
 
@@ -65,6 +66,14 @@ export class ResetDataDialog extends Component {
         this.elem.append(this.loadingIndicator.elem);
 
         this.reset();
+    }
+
+    onClose() {
+        this.reset();
+
+        if (isFunction(this.props.onClose)) {
+            this.props.onClose();
+        }
     }
 
     /** Show/hide dialog */

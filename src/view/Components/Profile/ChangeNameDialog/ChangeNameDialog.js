@@ -1,8 +1,8 @@
 import {
     ge,
     show,
-    isFunction,
     setEvents,
+    isFunction,
     Component,
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
@@ -55,7 +55,7 @@ export class ChangeNameDialog extends Component {
                 okBtn: { value: 'Submit', onclick: (e) => this.onSubmit(e) },
                 closeBtn: true,
             },
-            onclose: () => this.reset(),
+            onclose: () => this.onClose(),
         });
         show(this.elem, true);
 
@@ -63,6 +63,14 @@ export class ChangeNameDialog extends Component {
         this.elem.append(this.loadingIndicator.elem);
 
         this.reset();
+    }
+
+    onClose() {
+        this.reset();
+
+        if (isFunction(this.props.onClose)) {
+            this.props.onClose();
+        }
     }
 
     /** Show/hide dialog */

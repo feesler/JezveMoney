@@ -12,13 +12,27 @@ import '../../css/app.scss';
 import './style.scss';
 
 /** Strings */
+const VIEW_TITLE = 'Jezve Money | Profile';
 const TITLE_PROFILE_DELETE = 'Delete profile';
 const MSG_PROFILE_DELETE = 'Are you sure to completely delete your profile?<br>This operation can not be undone.';
+const titleMap = {
+    name: 'Change name',
+    password: 'Change password',
+    reset: 'Reset data',
+};
 
 /**
  * User profile view
  */
 class ProfileView extends View {
+    constructor(...args) {
+        super(...args);
+
+        this.state = {
+            ...this.props,
+        };
+    }
+
     /** View initialization */
     onStart() {
         this.changeNamePopup = null;
@@ -40,65 +54,35 @@ class ProfileView extends View {
             throw new Error('Failed to initialize Profile view');
         }
 
-        setEvents(this.changeNameBtn, { click: (e) => this.showChangeNamePopup(e) });
-        setEvents(this.changePassBtn, { click: (e) => this.showChangePasswordPopup(e) });
-        setEvents(this.resetBtn, { click: () => this.showResetPopup() });
+        setEvents(this.changeNameBtn, { click: (e) => this.onActionClick(e) });
+        setEvents(this.changePassBtn, { click: (e) => this.onActionClick(e) });
+        setEvents(this.resetBtn, { click: (e) => this.onActionClick(e) });
         setEvents(this.delProfileBtn, { click: () => this.confirmDelete() });
 
-        if (this.props.action) {
-            if (this.props.action === 'changePass') {
-                this.showChangePasswordPopup();
-            } else if (this.props.action === 'changeName') {
-                this.showChangeNamePopup();
-            }
-        }
+        this.render(this.state);
     }
 
-    /** Show change name popup */
-    showChangeNamePopup(e) {
-        if (e) {
-            e.preventDefault();
+    onActionClick(e) {
+        e.preventDefault();
+        this.setAction(e.target.dataset.action);
+    }
+
+    onCloseDialog() {
+        this.setAction(null);
+    }
+
+    setAction(action) {
+        if (this.state.action === action) {
+            return;
         }
 
-        if (!this.changeNamePopup) {
-            this.changeNamePopup = ChangeNameDialog.create({
-                onNameChanged: (value) => this.onNameChanged(value),
-            });
-        }
-
-        this.changeNamePopup.show();
+        this.setState({ ...this.state, action });
     }
 
     onNameChanged(value) {
         window.app.model.profile.name = value;
         this.nameElem.textContent = value;
         this.header.setUserName(value);
-    }
-
-    /** Show change password popup */
-    showChangePasswordPopup(e) {
-        if (e) {
-            e.preventDefault();
-        }
-
-        if (!this.changePassPopup) {
-            this.changePassPopup = ChangePasswordDialog.create();
-        }
-
-        this.changePassPopup.show();
-    }
-
-    /** Show reset popup */
-    showResetPopup(e) {
-        if (e) {
-            e.preventDefault();
-        }
-
-        if (!this.resetPopup) {
-            this.resetPopup = ResetDataDialog.create();
-        }
-
-        this.resetPopup.show();
     }
 
     /** Send delete profile API request */
@@ -127,6 +111,67 @@ class ProfileView extends View {
             content: MSG_PROFILE_DELETE,
             onconfirm: () => this.requestDeleteProfile(),
         });
+    }
+
+    getViewTitle(state) {
+        const { action } = state;
+        if (!action || !titleMap[action]) {
+            return VIEW_TITLE;
+        }
+
+        return `${VIEW_TITLE} | ${titleMap[action]}`;
+    }
+
+    replaceHistory(state) {
+        const { baseURL } = window.app;
+        const action = (state.action) ? `${state.action}/` : '';
+        const url = `${baseURL}profile/${action}`;
+
+        const title = this.getViewTitle(state);
+        window.history.replaceState({}, title, url);
+    }
+
+    renderChangeNameDialog() {
+        if (!this.changeNamePopup) {
+            this.changeNamePopup = ChangeNameDialog.create({
+                onNameChanged: (value) => this.onNameChanged(value),
+                onClose: () => this.onCloseDialog(),
+            });
+        }
+
+        this.changeNamePopup.show();
+    }
+
+    renderChangePasswordDialog() {
+        if (!this.changePassPopup) {
+            this.changePassPopup = ChangePasswordDialog.create({
+                onClose: () => this.onCloseDialog(),
+            });
+        }
+
+        this.changePassPopup.show();
+    }
+
+    renderResetDialog() {
+        if (!this.resetPopup) {
+            this.resetPopup = ResetDataDialog.create({
+                onClose: () => this.onCloseDialog(),
+            });
+        }
+
+        this.resetPopup.show();
+    }
+
+    render(state) {
+        this.replaceHistory(state);
+
+        if (state.action === 'password') {
+            this.renderChangePasswordDialog();
+        } else if (state.action === 'name') {
+            this.renderChangeNameDialog();
+        } else if (state.action === 'reset') {
+            this.renderResetDialog();
+        }
     }
 }
 

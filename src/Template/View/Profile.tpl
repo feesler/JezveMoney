@@ -19,20 +19,20 @@
                         <h2>Name</h2>
                         <div class="name-container">
                             <span id="namestatic"><?=e($profileInfo["name"])?></span>
-                            <a id="changeNameBtn" class="change-name-link" href="<?=BASEURL?>profile/changeName/">Change</a>
+                            <a id="changeNameBtn" class="change-name-link" href="<?=BASEURL?>profile/name/" data-action="name">Change</a>
                         </div>
                     </div>
 
                     <div class="profile-block">
                         <h2>Security</h2>
-                        <div><a id="changePassBtn" href="<?=BASEURL?>profile/changePass/">Change password</a></div>
+                        <div><a id="changePassBtn" href="<?=BASEURL?>profile/password/" data-action="password">Change password</a></div>
                     </div>
 
                     <div class="profile-block">
                         <h2>User data</h2>
                         <div class="profile-block__section">
                             <span>You also may reset your data.</span>
-                            <input id="resetBtn" class="btn submit-btn" type="button" value="Reset data">
+                            <a id="resetBtn" href="<?=BASEURL?>profile/reset/" data-action="reset">Reset data</a>
                         </div>
                         <div class="profile-block__section">
                             <span>Completely delete profile and all related data.</span>

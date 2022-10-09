@@ -25,23 +25,21 @@ export class ProfileView extends AppView {
 
         res.loginElem = await query(blocks[0], 'span');
         res.nameElem = await query('#namestatic');
-        res.nameLinkElem = await query(blocks[1], 'div > a');
-        res.changePassLinkElem = await query(blocks[2], 'div > a');
+        res.nameLinkElem = await query('#changeNameBtn');
+        res.changePassLinkElem = await query('#changePassBtn');
+        res.resetLinkElem = await query('#resetBtn');
+        res.deleteProfileBtn = await query('#delProfileBtn');
         assert(
             res.loginElem
             && res.nameElem
             && res.nameLinkElem
-            && res.changePassLinkElem,
+            && res.changePassLinkElem
+            && res.resetLinkElem,
             'Invalid profile view structure',
         );
 
         res.login = await prop(res.loginElem, 'textContent');
         res.name = await prop(res.nameElem, 'textContent');
-
-        const buttons = await queryAll(blocks[3], 'input[type="button"]');
-        assert(buttons?.length === 2, 'Invalid profile view structure');
-
-        [res.resetBtn, res.deleteProfileBtn] = buttons;
 
         res.changeNamePopup = {
             elem: await query('#chname_popup'),
@@ -139,9 +137,9 @@ export class ProfileView extends AppView {
     }
 
     async resetData(options = {}) {
-        assert(this.content.resetBtn, 'Reset button not found');
+        assert(this.content.resetLinkElem, 'Reset button not found');
 
-        await this.performAction(() => click(this.content.resetBtn));
+        await this.performAction(() => click(this.content.resetLinkElem));
 
         assert(this.content.resetDataPopup?.visible, 'Change password popup not appear');
 

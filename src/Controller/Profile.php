@@ -10,6 +10,8 @@ class Profile extends TemplateController
 {
     public function index()
     {
+        $availActions = ["name", "password", "reset"];
+
         $this->template = new Template(VIEW_TPL_PATH . "Profile.tpl");
         $data = [];
 
@@ -29,15 +31,17 @@ class Profile extends TemplateController
         $data["profileInfo"] = $profileInfo;
 
         $titleString = "Jezve Money | Profile";
-        if ($this->action == "changeName") {
+        if ($this->action == "name") {
             $titleString .= " | Change name";
         } elseif ($this->action == "changePass") {
             $titleString .= " | Change password";
+        } elseif ($this->action == "reset") {
+            $titleString .= " | Reset data";
         }
         $data["titleString"] = $titleString;
 
         $viewProps = [];
-        if ($this->action == "changePass" || $this->action == "changeName") {
+        if (in_array($this->action, $availActions)) {
             $viewProps["action"] = $this->action;
         }
 
@@ -50,6 +54,24 @@ class Profile extends TemplateController
         $this->jsArr[] = "ProfileView.js";
 
         $this->render($data);
+    }
+
+
+    public function name()
+    {
+        $this->index();
+    }
+
+
+    public function password()
+    {
+        $this->index();
+    }
+
+
+    public function reset()
+    {
+        $this->index();
     }
 
 
