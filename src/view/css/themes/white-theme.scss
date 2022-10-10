@@ -17,6 +17,10 @@
   --input-disabled-border-color: #eeeeee;
   --input-disabled-text-color: #a0a0a0;
 
+  /* List item icons */
+  --list-item-icon-fill: #a7a7a7;
+  --list-item-hover-icon-fill: #ffffff;
+
   color: var(--main-text-color);
   background-color: var(--main-bg-color);
 
@@ -298,6 +302,10 @@
       border-color: #888888;
       background-color: #f2f2f2;
     }
+
+    .icon {
+      fill: var(--list-item-icon-fill);
+    }
   }
 
   /* Disabled Import form */
@@ -346,6 +354,10 @@
     .btn {
       color: #202020;
     }
+
+    .icon {
+      fill: var(--list-item-icon-fill);
+    }
   }
 
   .import-controls {
@@ -374,7 +386,7 @@
 
   .rule-item .icon,
   .rule-form .icon {
-    fill: #b0b0b0;
+    fill: var(--list-item-icon-fill);
   }
 
   .rule-item__info {
@@ -487,22 +499,20 @@
       border-color: #808080;
     }
 
-    .rule-item .menu-btn:hover,
     .rule-item .icon-btn:hover,
     .rule-form .icon-btn:hover {
       background-color: #cccccc;
     }
 
-    .rule-item .menu-btn:hover .icon,
     .rule-item .icon-btn:hover .icon,
     .rule-form .icon-btn:hover .icon {
-      fill: #ffffff;
+      fill: var(--list-item-hover-icon-fill);
     }
 
     /* Import item */
-    .import-form .btn:hover .icon,
-    .import-item .btn:hover .icon {
-      fill: #ffffff;
+    .import-form .icon-btn:hover .icon,
+    .import-item .icon-btn:hover .icon {
+      fill: var(--list-item-hover-icon-fill);
     }
 
     .iconlink:hover .iconlink__icon-content {

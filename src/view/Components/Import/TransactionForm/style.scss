@@ -123,9 +123,11 @@
 
   /* Toggle expand/collapse button */
   .toggle-btn {
-    pointer-events: all;
-    background: none;
+    width: 32px;
+    height: 32px;
     padding: 7px;
+    background: none;
+    pointer-events: all;
     cursor: pointer;
   }
 
@@ -141,14 +143,16 @@
   }
 
   /* Menu */
-  .menu-btn {
-    pointer-events: all;
-    background: none;
+  .actions-menu-btn {
+    width: 26px;
+    height: 26px;
     padding: 4px;
+    background: none;
+    pointer-events: all;
     cursor: pointer;
   }
 
-  .menu-icon {
+  .actions-menu-btn__icon {
     width: 18px;
     height: 18px;
   }

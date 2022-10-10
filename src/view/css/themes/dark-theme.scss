@@ -18,6 +18,10 @@
   --input-disabled-border-color: #202020;
   --input-disabled-text-color: #707070;
 
+  /* List item icons */
+  --list-item-icon-fill: #888888;
+  --list-item-hover-icon-fill: #dddddd;
+
   color: var(--main-text-color);
   background-color: var(--main-bg-color);
 
@@ -299,6 +303,10 @@
       border-color: #d0d0d0;
       background-color: #202020;
     }
+
+    .icon {
+      fill: var(--list-item-icon-fill);
+    }
   }
 
   /* Disabled Import form */
@@ -347,6 +355,10 @@
     .btn {
       color: var(--main-text-color);
     }
+
+    .icon {
+      fill: var(--list-item-icon-fill);
+    }
   }
 
   .import-controls {
@@ -375,7 +387,7 @@
 
   .rule-item .icon,
   .rule-form .icon {
-    fill: #888888;
+    fill: var(--list-item-icon-fill);
   }
 
   .rule-item__info {
@@ -475,35 +487,26 @@
       fill: var(--main-text-color);
     }
 
-    .import-form,
-    .import-item {
-      .toggle-btn:hover {
-        background-color: #303030;
-      }
-    }
-
     .rule-item .collapsible-header:hover,
     .rule-form-collapse .collapsible-header:hover {
       background-color: #2e2e2e;
       border-color: #505050;
     }
 
-    .rule-item .menu-btn:hover,
     .rule-item .icon-btn:hover,
     .rule-form .icon-btn:hover {
       background-color: #2e2e2e;
     }
 
-    .rule-item .menu-btn:hover .icon,
     .rule-item .icon-btn:hover .icon,
     .rule-form .icon-btn:hover .icon {
-      fill: #dddddd;
+      fill: var(--list-item-hover-icon-fill);
     }
 
     /* Import form */
-    .import-form .btn:hover .icon,
-    .import-item .btn:hover .icon {
-      fill: #dddddd;
+    .import-form .icon-btn:hover .icon,
+    .import-item .icon-btn:hover .icon {
+      fill: var(--list-item-hover-icon-fill);
     }
 
     .iconlink:hover .iconlink__icon-content {

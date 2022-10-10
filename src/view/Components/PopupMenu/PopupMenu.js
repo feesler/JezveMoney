@@ -16,8 +16,8 @@ import './style.scss';
 /* CSS classes */
 const MENU_CLASS = 'actions-menu';
 const LIST_CLASS = 'actions-menu-list';
-const BUTTON_CLASS = 'btn menu-btn';
-const ICON_CLASS = 'icon menu-icon';
+const BUTTON_CLASS = 'btn icon-btn actions-menu-btn';
+const ICON_CLASS = 'icon actions-menu-btn__icon';
 const SEPARATOR_CLASS = 'actions-menu-list__separator';
 const ICONLINK_CLASS = 'action-iconlink';
 const CHECKBOX_CLASS = 'action-checkbox';
