@@ -111,7 +111,7 @@ export const fixFloat = (str) => {
 };
 
 /** Convert string to amount value */
-export const amountFix = (value) => {
+export const amountFix = (value, thSep = ' ') => {
     if (typeof value === 'number') {
         return value;
     }
@@ -119,7 +119,14 @@ export const amountFix = (value) => {
         return null;
     }
 
-    const res = value.trim();
+    // Trim leading and trailing spaces
+    let res = value.trim();
+    // Cut thousands separator
+    if (thSep.length > 0) {
+        const search = new RegExp(`(\\d)${thSep}(\\d)`, 'g');
+        res = res.replaceAll(search, '$1$2');
+    }
+
     return parseFloat(fixFloat(res));
 };
 

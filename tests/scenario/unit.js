@@ -38,7 +38,7 @@ const amountFixTests = async () => {
     await amountFixTest('Float number string starts with point', '.56', 0.56);
     await amountFixTest('Float number string starts with comma', ',56', 0.56);
     await amountFixTest('Spaces around', ' 123.56 ', 123.56);
-    await amountFixTest('Spaces in between', ' 1 234.56 ', 1);
+    await amountFixTest('Spaces in between', ' 1 234.56 ', 1234.56);
 };
 
 const correctTests = async () => {

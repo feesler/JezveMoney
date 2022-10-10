@@ -121,11 +121,11 @@ const putCardCSV = async () => {
         [now, 'BAR', 'SANKT-PETERBU', 'RU', 'RUB', '-443.00'],
         [now, 'DOSTAVKA', 'SANKT-PETERBU', 'RU', 'RUB', '-688.00'],
         [now, 'PRODUCTY', 'SANKT-PETERBU', 'RU', 'RUB', '-550.5'],
-        [now, 'BOOKING', 'AMSTERDAM', 'NL', 'EUR', '-500.00', 'RUB', '-50750.35'],
-        [now, 'SALARY', 'MOSKVA', 'RU', 'RUB', '100000.00'],
+        [now, 'BOOKING', 'AMSTERDAM', 'NL', 'EUR', '-500.00', 'RUB', '-50 750.35'],
+        [now, 'SALARY', 'MOSKVA', 'RU', 'RUB', '100 000.00'],
         [now, 'INTEREST', 'SANKT-PETERBU', 'RU', 'RUB', '23.16'],
-        [now, 'RBA R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-5000.00'],
-        [now, 'C2C R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-10000.00'],
+        [now, 'RBA R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-5 000.00'],
+        [now, 'C2C R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-10 000.00'],
     ]);
 
     return putFile(data);
@@ -143,12 +143,12 @@ const putAccountCSV = async () => {
         [now, 'BAR', 'RUB', '-443.00'],
         [now, 'DOSTAVKA', 'RUB', '-688.00'],
         [now, 'PRODUCTY', 'RUB', '-550.5'],
-        [now, 'BOOKING', 'EUR', '-500.00', 'RUB', '-50750.35'],
-        [now, 'SALARY', 'RUB', '100000.00'],
-        [now, 'CASHBACK', 'PLN', '136.50', 'RUB', '4257.11'],
+        [now, 'BOOKING', 'EUR', '-500.00', 'RUB', '-50 750.35'],
+        [now, 'SALARY', 'RUB', '100 000.00'],
+        [now, 'CASHBACK', 'PLN', '136.50', 'RUB', '4 257.11'],
         [now, 'INTEREST', 'RUB', '23.16'],
-        [now, 'RBA R-BANK', 'RUB', '-5000.00'],
-        [now, 'C2C R-BANK', 'RUB', '-10000.00'],
+        [now, 'RBA R-BANK', 'RUB', '-5 000.00'],
+        [now, 'C2C R-BANK', 'RUB', '-10 000.00'],
     ]);
 
     return putFile(data);
