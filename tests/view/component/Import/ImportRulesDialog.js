@@ -12,7 +12,7 @@ import {
     wait,
     waitForFunction,
 } from 'jezve-test';
-import { Paginator } from 'jezvejs/tests';
+import { Paginator } from 'jezvejs-test';
 import { IMPORT_COND_OP_FIELD_FLAG } from '../../../model/ImportCondition.js';
 import { ImportRuleForm } from './ImportRuleForm.js';
 import { ImportRuleItem } from './ImportRuleItem.js';

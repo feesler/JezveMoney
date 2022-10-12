@@ -6,7 +6,7 @@ import {
     click,
     copyObject,
 } from 'jezve-test';
-import { DropDown } from 'jezvejs/tests';
+import { DropDown } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { Icon } from '../model/Icon.js';
 import { isValidValue, normalize, trimToDigitsLimit } from '../common.js';

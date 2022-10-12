@@ -8,7 +8,7 @@ import {
     input,
     isVisible,
 } from 'jezve-test';
-import { Checkbox, DropDown } from 'jezvejs/tests';
+import { Checkbox, DropDown } from 'jezvejs-test';
 import {
     IMPORT_COND_FIELD_MAIN_ACCOUNT,
     IMPORT_COND_FIELD_TPL,

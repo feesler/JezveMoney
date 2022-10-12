@@ -7,7 +7,7 @@ import {
     isVisible,
     waitForFunction,
 } from 'jezve-test';
-import { DropDown } from 'jezvejs/tests';
+import { DropDown } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { availTransTypes } from '../model/Transaction.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';

@@ -4,7 +4,7 @@ import {
     query,
     prop,
 } from 'jezve-test';
-import { DropDown } from 'jezvejs/tests';
+import { DropDown } from 'jezvejs-test';
 import { Tile } from './Tile.js';
 
 export class TileBlock extends TestComponent {

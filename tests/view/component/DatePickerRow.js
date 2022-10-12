@@ -5,7 +5,7 @@ import {
     isVisible,
     click,
 } from 'jezve-test';
-import { DatePicker } from 'jezvejs/tests';
+import { DatePicker } from 'jezvejs-test';
 import { IconLink } from './IconLink.js';
 import { InputRow } from './InputRow.js';
 

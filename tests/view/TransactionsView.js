@@ -11,7 +11,7 @@ import {
     copyObject,
     isVisible,
 } from 'jezve-test';
-import { DropDown, Paginator } from 'jezvejs/tests';
+import { DropDown, Paginator } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
 import { IconLink } from './component/IconLink.js';

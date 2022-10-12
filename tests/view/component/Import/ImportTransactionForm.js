@@ -8,7 +8,7 @@ import {
     assert,
     copyObject,
 } from 'jezve-test';
-import { Checkbox, DropDown } from 'jezvejs/tests';
+import { Checkbox, DropDown } from 'jezvejs-test';
 import {
     EXPENSE,
     INCOME,

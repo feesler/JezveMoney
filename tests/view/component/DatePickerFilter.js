@@ -8,7 +8,7 @@ import {
     input,
     copyObject,
 } from 'jezve-test';
-import { DatePicker } from 'jezvejs/tests';
+import { DatePicker } from 'jezvejs-test';
 import { IconLink } from './IconLink.js';
 
 export class DatePickerFilter extends TestComponent {

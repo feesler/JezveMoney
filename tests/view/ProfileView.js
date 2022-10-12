@@ -8,7 +8,7 @@ import {
     click,
     wait,
 } from 'jezve-test';
-import { Checkbox } from 'jezvejs/tests';
+import { Checkbox } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { LoginView } from './LoginView.js';
 import { App } from '../Application.js';

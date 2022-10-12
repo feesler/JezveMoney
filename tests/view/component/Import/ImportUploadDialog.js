@@ -13,7 +13,7 @@ import {
     isNum,
     copyObject,
 } from 'jezve-test';
-import { Checkbox, DropDown } from 'jezvejs/tests';
+import { Checkbox, DropDown } from 'jezvejs-test';
 import { App } from '../../../Application.js';
 import { asyncMap, fixFloat } from '../../../common.js';
 import { WarningPopup } from '../WarningPopup.js';

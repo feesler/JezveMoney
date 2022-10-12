@@ -7,7 +7,7 @@ import {
     isVisible,
     copyObject,
 } from 'jezve-test';
-import { Paginator } from 'jezvejs/tests';
+import { Paginator } from 'jezvejs-test';
 import { ImportTransactionForm } from './ImportTransactionForm.js';
 import { ImportTransactionItem } from './ImportTransactionItem.js';
 import { asyncMap } from '../../../common.js';
