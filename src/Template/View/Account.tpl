@@ -29,7 +29,7 @@ include(TPL_PATH . "Header.tpl");	?>
                         <div class="view-row std_margin">
                             <?=Tile::render($tile)?>
                         </div>
-                        <div class="view-row std_margin">
+                        <div id="icon-block" class="view-row std_margin">
                             <label for="icon">Icon</label>
                             <div>
                                 <select id="icon" name="icon_id">
@@ -53,7 +53,7 @@ include(TPL_PATH . "Header.tpl");	?>
                             <input id="accname" class="stretch-input" name="name" type="text" autocomplete="off" value="<?=e($accInfo->name)?>">
                             <div id="namefeedback" class="invalid-feedback"></div>
                         </div>
-                        <div class="view-row std_margin">
+                        <div id="currency-block" class="view-row std_margin">
                             <label for="currency">Currency</label>
                             <div>
                                 <select id="currency" name="curr_id"></select>

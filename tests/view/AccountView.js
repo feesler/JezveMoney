@@ -43,22 +43,15 @@ export class AccountView extends AppView {
             assert(res.id, 'Wrong account id');
         }
 
-        let curChildren = (res.isUpdate) ? 3 : 2;
-
         res.iconDropDown = await DropDown.createFromChild(this, await query('#icon'));
 
-        curChildren += 1;
-        let elem = await query(`form > *:nth-child(${curChildren})`);
-        res.name = await InputRow.create(this, elem);
+        res.name = await InputRow.create(this, await query('#name-inp-block'));
         assert(res.name, 'Account name input not found');
 
-        curChildren += 1;
         res.currDropDown = await DropDown.createFromChild(this, await query('#currency'));
 
-        curChildren += 1;
-        elem = await query(`form > *:nth-child(${curChildren})`);
-
-        res.balance = await InputRow.create(this, elem);
+        res.balance = await InputRow.create(this, await query('#initbal-inp-block'));
+        assert(res.name, 'Account balance input not found');
 
         res.flagsInp = await query('#flags');
         res.flags = parseInt(await prop(res.flagsInp, 'value'), 10);
