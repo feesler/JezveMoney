@@ -189,9 +189,7 @@ export class PopupMenu extends Component {
         removeEmptyClick(this.emptyClickHandler);
     }
 
-    toggleMenu(e) {
-        e.stopPropagation();
-
+    toggleMenu() {
         if (this.menuList.hasAttribute('hidden')) {
             show(this.menuList, true);
             this.calculatePosition();

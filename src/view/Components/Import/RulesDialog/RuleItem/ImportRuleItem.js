@@ -70,6 +70,7 @@ export class ImportRuleItem extends Component {
         this.toggleExtBtn = createElement('button', {
             props: { className: 'btn icon-btn toggle-btn', type: 'button' },
             children: window.app.createIcon('toggle-ext', 'icon toggle-icon'),
+            events: { click: (e) => this.onToggle(e) },
         });
 
         this.topRow = window.app.createContainer('rule-item__main-top', [
@@ -102,7 +103,8 @@ export class ImportRuleItem extends Component {
         });
         this.actionsContainer = window.app.createContainer('rule-item__actions', []);
 
-        this.collapse = new Collapsible({
+        this.collapse = Collapsible.create({
+            toggleOnClick: false,
             className: 'rule-item',
             header: [this.infoContainer, this.controls],
             content: [
@@ -160,6 +162,11 @@ export class ImportRuleItem extends Component {
         res.conditions = copyObject(this.state.conditions);
 
         return res;
+    }
+
+    /** Toggle expand/collapse button 'click' event handler */
+    onToggle() {
+        this.collapse.toggle();
     }
 
     /** Update button 'click' event handler */
