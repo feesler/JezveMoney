@@ -10,7 +10,7 @@ import {
     Component,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
-import { IconLink } from '../IconLink/IconLink.js';
+import { IconButton } from '../IconButton/IconButton.js';
 import './style.scss';
 
 /* CSS classes */
@@ -19,7 +19,7 @@ const LIST_CLASS = 'actions-menu-list';
 const BUTTON_CLASS = 'btn icon-btn actions-menu-btn';
 const ICON_CLASS = 'icon actions-menu-btn__icon';
 const SEPARATOR_CLASS = 'actions-menu-list__separator';
-const ICONLINK_CLASS = 'action-iconlink';
+const ICONBTN_CLASS = 'action-iconbutton';
 const CHECKBOX_CLASS = 'action-checkbox';
 
 const defaultProps = {
@@ -113,8 +113,8 @@ export class PopupMenu extends Component {
         }
 
         const { className = [], ...rest } = item;
-        const button = IconLink.create({
-            className: [ICONLINK_CLASS, ...asArray(className)],
+        const button = IconButton.create({
+            className: [ICONBTN_CLASS, ...asArray(className)],
             ...rest,
         });
         this.menuList.append(button.elem);

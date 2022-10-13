@@ -9,14 +9,14 @@ import {
     copyObject,
 } from 'jezve-test';
 import { DatePicker } from 'jezvejs-test';
-import { IconLink } from './IconLink.js';
+import { IconButton } from './IconButton.js';
 
 export class DatePickerFilter extends TestComponent {
     async parseContent() {
         const res = {
-            iconLink: await IconLink.create(this.parent, await query(this.elem, '.iconlink')),
+            iconBtn: await IconButton.create(this.parent, await query(this.elem, '.iconbutton')),
         };
-        assert(res.iconLink, 'Iconlink of date picker not found');
+        assert(res.iconBtn, 'Icon button of date picker not found');
 
         res.inputElem = await query(this.elem, '.stretch-input');
         assert(res.inputElem, 'Input element not found');
@@ -47,8 +47,8 @@ export class DatePickerFilter extends TestComponent {
     async selectDate(date) {
         assert.isDate(date, 'Invalid parameter');
 
-        if (await isVisible(this.content.iconLink.elem)) {
-            await this.content.iconLink.click();
+        if (await isVisible(this.content.iconBtn.elem)) {
+            await this.content.iconBtn.click();
             await this.parse();
         }
 
@@ -61,8 +61,8 @@ export class DatePickerFilter extends TestComponent {
         assert.isDate(date1, 'Invalid parameters');
         assert.isDate(date2, 'Invalid parameters');
 
-        if (await isVisible(this.content.iconLink.elem)) {
-            await this.content.iconLink.click();
+        if (await isVisible(this.content.iconBtn.elem)) {
+            await this.content.iconBtn.click();
         } else {
             await click(this.content.datePickerBtn);
         }
@@ -73,8 +73,8 @@ export class DatePickerFilter extends TestComponent {
     }
 
     async clear() {
-        if (await isVisible(this.content.iconLink.elem)) {
-            await this.content.iconLink.click();
+        if (await isVisible(this.content.iconBtn.elem)) {
+            await this.content.iconBtn.click();
             await this.parse();
         }
 
@@ -86,8 +86,8 @@ export class DatePickerFilter extends TestComponent {
     }
 
     async input(val) {
-        if (await isVisible(this.content.iconLink.elem)) {
-            await this.content.iconLink.click();
+        if (await isVisible(this.content.iconBtn.elem)) {
+            await this.content.iconBtn.click();
             await this.parent.performAction(() => click(this.content.datePickerBtn));
         }
 

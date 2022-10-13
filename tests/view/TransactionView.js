@@ -18,7 +18,7 @@ import {
 } from '../common.js';
 import { TransactionTypeMenu } from './component/TransactionTypeMenu.js';
 import { InputRow } from './component/InputRow.js';
-import { IconLink } from './component/IconLink.js';
+import { IconButton } from './component/IconButton.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { DatePickerRow } from './component/DatePickerRow.js';
 import { CommentRow } from './component/CommentRow.js';
@@ -60,7 +60,7 @@ export class TransactionView extends AppView {
             res.heading.title = await prop(res.heading.elem, 'textContent');
         }
 
-        res.delBtn = await IconLink.create(this, await query('#del_btn'));
+        res.delBtn = await IconButton.create(this, await query('#del_btn'));
 
         res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
         assert(!res.typeMenu.multi, 'Invalid transaction type menu');

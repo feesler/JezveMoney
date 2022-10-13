@@ -3,11 +3,11 @@
 <?php   } else { ?>
 <button <?=$attributes?>>
 <?php   } ?>
-    <span class="iconlink__icon"><?=svgIcon($icon, "iconlink__icon-content")?></span>
-    <span class="iconlink__content">
+    <span class="iconbutton__icon"><?=svgIcon($icon, "iconbutton__icon-content")?></span>
+    <span class="iconbutton__content">
 <?php   if (isset($subtitle) && !is_empty($subtitle)) { ?>
-        <span class="iconlink__title"><?=e($title)?></span>
-        <span class="iconlink__subtitle"><?=e($subtitle)?></span>
+        <span class="iconbutton__title"><?=e($title)?></span>
+        <span class="iconbutton__subtitle"><?=e($subtitle)?></span>
 <?php   } else { ?>
         <span><?=e($title)?></span>
 <?php   } ?>

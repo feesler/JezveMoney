@@ -16,7 +16,7 @@ import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import '../../css/app.scss';
 import '../../Components/Tile/style.scss';
-import '../../Components/IconLink/style.scss';
+import '../../Components/IconButton/style.scss';
 import { Tile } from '../../Components/Tile/Tile.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 

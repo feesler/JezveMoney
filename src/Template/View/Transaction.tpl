@@ -1,7 +1,7 @@
 <?php
 use JezveMoney\App\Template\Component\Tile;
 use JezveMoney\App\Template\Component\TileInfoItem;
-use JezveMoney\App\Template\Component\IconLink;
+use JezveMoney\App\Template\Component\IconButton;
 
 include(TPL_PATH . "Header.tpl");	?>
 
@@ -14,7 +14,7 @@ include(TPL_PATH . "Header.tpl");	?>
                     <div class="heading">
                         <h1><?=e($headString)?></h1>
 <?php	if ($action == "update") {	?>
-                        <?=IconLink::render([
+                        <?=IconButton::render([
                             "id" => "del_btn",
                             "icon" => "del",
                             "title" => "Delete"
@@ -219,7 +219,7 @@ include(TPL_PATH . "Header.tpl");	?>
                         </div>
 
                         <div id="date_row" class="view-row std_margin"<?=hidden(!$trAvailable)?>>
-                            <?=IconLink::render([
+                            <?=IconButton::render([
                                 "id" => "calendar_btn",
                                 "icon" => "cal",
                                 "title" => "Change date",
@@ -241,7 +241,7 @@ include(TPL_PATH . "Header.tpl");	?>
                         </div>
 
                         <div id="comment_row" class="view-row std_margin"<?=hidden(!$trAvailable)?>>
-                            <?=IconLink::render([
+                            <?=IconButton::render([
                                 "id" => "comm_btn",
                                 "icon" => "plus",
                                 "title" => "Add comment",

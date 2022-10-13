@@ -17,7 +17,7 @@ import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { PersonList } from '../../js/model/PersonList.js';
-import { IconLink } from '../../Components/IconLink/IconLink.js';
+import { IconButton } from '../../Components/IconButton/IconButton.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
@@ -130,7 +130,7 @@ class TransactionListView extends View {
         }
         setEvents(this.noSearchBtn, { click: () => this.onSearchClear() });
 
-        this.datePickerBtn = IconLink.fromElement({
+        this.datePickerBtn = IconButton.fromElement({
             elem: 'calendar_btn',
             onClick: () => this.showCalendar(),
         });

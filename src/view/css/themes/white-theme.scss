@@ -61,16 +61,18 @@
     color: var(--main-text-color);
   }
 
-  .iconlink .iconlink__icon {
-    border-color: var(--main-text-color);
-  }
+  .iconbutton {
+    .iconbutton__icon {
+      border-color: var(--main-text-color);
+    }
 
-  .iconlink .iconlink__icon-content {
-    fill: var(--main-text-color);
-  }
+    .iconbutton__icon-content {
+      fill: var(--main-text-color);
+    }
 
-  .iconlink .iconlink__content {
-    color: var(--main-text-color);
+    .iconbutton__content {
+      color: var(--main-text-color);
+    }
   }
 
   /* No data message for lists & etc. */
@@ -469,17 +471,19 @@
       color: var(--main-text-color);
     }
 
-    .iconlink:hover .iconlink__icon,
-    .iconlink:hover .iconlink__content {
-      color: var(--main-text-color);
-    }
+    .iconbutton:hover {
+      .iconbutton__icon,
+      .iconbutton__content {
+        color: var(--main-text-color);
+      }
 
-    .iconlink:hover .iconlink__icon {
-      background-color: var(--main-text-color);
-    }
+      .iconbutton__icon {
+        background-color: var(--main-text-color);
+      }
 
-    .iconlink:hover .iconlink__icon-content {
-      fill: #ffffff;
+      .iconbutton__icon-content {
+        fill: #ffffff;
+      }
     }
 
     .filters-collapsible .collapsible-header:hover {

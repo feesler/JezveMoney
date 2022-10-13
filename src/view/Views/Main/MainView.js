@@ -6,7 +6,7 @@ import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
-import '../../Components/IconLink/style.scss';
+import '../../Components/IconButton/style.scss';
 import '../../css/app.scss';
 import '../../Components/Tile/style.scss';
 import './style.scss';

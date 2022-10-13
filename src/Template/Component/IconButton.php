@@ -4,10 +4,10 @@ namespace JezveMoney\App\Template\Component;
 
 use JezveMoney\Core\TemplateComponent;
 
-class IconLink extends TemplateComponent
+class IconButton extends TemplateComponent
 {
     protected static $template = null;
-    protected static $filename = "IconLink.tpl";
+    protected static $filename = "IconButton.tpl";
 
     public static function render($data)
     {
@@ -24,7 +24,7 @@ class IconLink extends TemplateComponent
             $attrs[] = "hidden";
         }
 
-        $classNames = ["iconlink"];
+        $classNames = ["iconbutton"];
         if (isset($data["classNames"])) {
             array_push($classNames, ...asArray($data["classNames"]));
         }

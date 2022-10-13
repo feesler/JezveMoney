@@ -39,7 +39,7 @@ import { Tile } from '../../Components/Tile/Tile.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TileInfoItem } from '../../Components/TileInfoItem/TileInfoItem.js';
-import { IconLink } from '../../Components/IconLink/IconLink.js';
+import { IconButton } from '../../Components/IconButton/IconButton.js';
 import '../../css/app.scss';
 import './style.scss';
 import { createStore } from '../../js/store.js';
@@ -220,7 +220,7 @@ class TransactionView extends View {
         setEvents(this.form, { submit: (e) => this.onSubmit(e) });
 
         if (state.isUpdate) {
-            this.deleteBtn = IconLink.fromElement({
+            this.deleteBtn = IconButton.fromElement({
                 elem: 'del_btn',
                 onClick: () => this.confirmDelete(),
             });
@@ -347,7 +347,7 @@ class TransactionView extends View {
         this.exchangeSign = ge('exchcomm');
 
         this.dateRow = ge('date_row');
-        this.datePickerBtn = IconLink.fromElement({
+        this.datePickerBtn = IconButton.fromElement({
             elem: 'calendar_btn',
             onClick: () => this.showCalendar(),
         });
@@ -361,7 +361,7 @@ class TransactionView extends View {
         setEvents(this.dateInput, { input: (e) => this.onDateInput(e) });
 
         this.commentRow = ge('comment_row');
-        this.commentBtn = IconLink.fromElement({
+        this.commentBtn = IconButton.fromElement({
             elem: 'comm_btn',
             onClick: () => this.showComment(),
         });

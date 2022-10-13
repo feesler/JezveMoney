@@ -1,5 +1,5 @@
 <?php
-use JezveMoney\App\Template\Component\IconLink;
+use JezveMoney\App\Template\Component\IconButton;
 
 include(TPL_PATH . "Header.tpl"); ?>
 
@@ -11,7 +11,7 @@ include(TPL_PATH . "Header.tpl"); ?>
                 <div class="content_wrap">
                     <div class="heading">
                         <h1>Transactions</h1>
-                        <?=IconLink::render([
+                        <?=IconButton::render([
                             "id" => "add_btn",
                             "type" => "link",
                             "link" => BASEURL . "transactions/create/",
@@ -73,7 +73,7 @@ include(TPL_PATH . "Header.tpl"); ?>
 
                         <div class="filter-item">
                             <h3 class="filter-item__title">Date range</h3>
-                            <?=IconLink::render([
+                            <?=IconButton::render([
                                 "id" => "calendar_btn",
                                 "icon" => "cal",
                                 "title" => "Select range",
@@ -128,14 +128,14 @@ include(TPL_PATH . "Header.tpl"); ?>
         <div class="siderbar__content">
             <div id="sbEllipsis" class="sidebar__ellipsis"><?=svgIcon("sbellipsis", "icon")?></div>
             <div id="sbButtons" class="sidebar__controls">
-                <?=IconLink::render([
+                <?=IconButton::render([
                     "id" => "edit_btn",
                     "type" => "link",
                     "title" => "Edit",
                     "icon" => "edit",
                     "hidden" => true
                 ])?>
-                <?=IconLink::render([
+                <?=IconButton::render([
                     "id" => "del_btn",
                     "title" => "Delete",
                     "icon" => "del",

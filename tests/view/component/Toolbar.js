@@ -1,5 +1,5 @@
 import { TestComponent, query, assert } from 'jezve-test';
-import { IconLink } from './IconLink.js';
+import { IconButton } from './IconButton.js';
 
 export class Toolbar extends TestComponent {
     async parseContent() {
@@ -11,27 +11,27 @@ export class Toolbar extends TestComponent {
             buttons: {},
         };
 
-        res.editBtn = await IconLink.create(this, await query('#edit_btn'));
+        res.editBtn = await IconButton.create(this, await query('#edit_btn'));
         if (res.editBtn) {
             res.buttons.update = res.editBtn;
         }
 
-        res.exportBtn = await IconLink.create(this, await query('#export_btn'));
+        res.exportBtn = await IconButton.create(this, await query('#export_btn'));
         if (res.exportBtn) {
             res.buttons.export = res.exportBtn;
         }
 
-        res.delBtn = await IconLink.create(this, await query('#del_btn'));
+        res.delBtn = await IconButton.create(this, await query('#del_btn'));
         if (res.delBtn) {
             res.buttons.del = res.delBtn;
         }
 
-        res.showBtn = await IconLink.create(this, await query('#show_btn'));
+        res.showBtn = await IconButton.create(this, await query('#show_btn'));
         if (res.showBtn) {
             res.buttons.show = res.showBtn;
         }
 
-        res.hideBtn = await IconLink.create(this, await query('#hide_btn'));
+        res.hideBtn = await IconButton.create(this, await query('#hide_btn'));
         if (res.hideBtn) {
             res.buttons.hide = res.hideBtn;
         }

@@ -29,7 +29,7 @@ import { AccountList } from '../../js/model/AccountList.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { ImportRuleList } from '../../js/model/ImportRuleList.js';
 import { ImportTemplateList } from '../../js/model/ImportTemplateList.js';
-import { IconLink } from '../../Components/IconLink/IconLink.js';
+import { IconButton } from '../../Components/IconButton/IconButton.js';
 import '../../css/app.scss';
 import './style.scss';
 import { ImportUploadDialog } from '../../Components/Import/UploadDialog/Dialog/ImportUploadDialog.js';
@@ -96,15 +96,15 @@ class ImportView extends View {
         setEvents(this.actionsMenuBtn, { click: () => this.toggleActionsMenu() });
         this.actionsList = ge('actionsList');
 
-        this.newItemBtn = IconLink.fromElement({
+        this.newItemBtn = IconButton.fromElement({
             elem: 'newItemBtn',
             onClick: () => this.createItem(),
         });
-        this.clearFormBtn = IconLink.fromElement({
+        this.clearFormBtn = IconButton.fromElement({
             elem: 'clearFormBtn',
             onClick: () => this.removeAllItems(),
         });
-        this.uploadBtn = IconLink.fromElement({
+        this.uploadBtn = IconButton.fromElement({
             elem: 'uploadBtn',
             onClick: () => this.showUploadDialog(),
         });

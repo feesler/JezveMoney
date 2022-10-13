@@ -10,7 +10,7 @@ import {
 } from 'jezve-test';
 import { DropDown, Checkbox } from 'jezvejs-test';
 import { AppView } from './AppView.js';
-import { IconLink } from './component/IconLink.js';
+import { IconButton } from './component/IconButton.js';
 import { ImportList } from './component/Import/ImportList.js';
 import { ImportUploadDialog } from './component/Import/ImportUploadDialog.js';
 import { ImportRulesDialog } from './component/Import/ImportRulesDialog.js';
@@ -39,12 +39,12 @@ export class ImportView extends AppView {
     async parseContent() {
         const res = {
             title: { elem: await query('.content_wrap > .heading > h1') },
-            uploadBtn: await IconLink.create(this, await query('#uploadBtn')),
+            uploadBtn: await IconButton.create(this, await query('#uploadBtn')),
             actionsMenuBtn: { elem: await query('#toggleActionsMenuBtn') },
             actionsList: { elem: await query('#actionsList') },
             notAvailMsg: { elem: await query('#notavailmsg') },
-            addBtn: await IconLink.create(this, await query('#newItemBtn')),
-            clearBtn: await IconLink.create(this, await query('#clearFormBtn')),
+            addBtn: await IconButton.create(this, await query('#newItemBtn')),
+            clearBtn: await IconButton.create(this, await query('#clearFormBtn')),
             totalCount: { elem: await query('#trcount') },
             enabledCount: { elem: await query('#entrcount') },
             rulesCheck: await Checkbox.create(this, await query('#rulesCheck')),

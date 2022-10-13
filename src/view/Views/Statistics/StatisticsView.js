@@ -16,7 +16,7 @@ import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
-import { IconLink } from '../../Components/IconLink/IconLink.js';
+import { IconButton } from '../../Components/IconButton/IconButton.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import '../../css/app.scss';
@@ -126,7 +126,7 @@ class StatisticsView extends View {
             className: 'dd_fullwidth',
         });
 
-        this.datePickerBtn = IconLink.fromElement({
+        this.datePickerBtn = IconButton.fromElement({
             elem: 'calendar_btn',
             onClick: () => this.showCalendar(),
         });

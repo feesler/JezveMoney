@@ -1,5 +1,5 @@
 <?php
-use JezveMoney\App\Template\Component\IconLink;
+use JezveMoney\App\Template\Component\IconButton;
 
 include(TPL_PATH . "Header.tpl");	?>
 
@@ -78,7 +78,7 @@ include(TPL_PATH . "Header.tpl");	?>
 
                             <div class="filter-item std_margin">
                                 <h3 class="filter-item__title">Date range</h3>
-                                <?=IconLink::render([
+                                <?=IconButton::render([
                                     "id" => "calendar_btn",
                                     "icon" => "cal",
                                     "title" => "Select range",

@@ -9,7 +9,7 @@ import {
 } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { TilesList } from './component/TilesList.js';
-import { IconLink } from './component/IconLink.js';
+import { IconButton } from './component/IconButton.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { Toolbar } from './component/Toolbar.js';
 
@@ -18,7 +18,7 @@ export class AccountsView extends AppView {
     async parseContent() {
         const res = {
             titleEl: await query('.content_wrap > .heading > h1'),
-            addBtn: await IconLink.create(this, await query('#add_btn')),
+            addBtn: await IconButton.create(this, await query('#add_btn')),
             toolbar: await Toolbar.create(this, await query('#toolbar')),
         };
 

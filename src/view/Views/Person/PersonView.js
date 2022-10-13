@@ -12,7 +12,7 @@ import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { IconLink } from '../../Components/IconLink/IconLink.js';
+import { IconButton } from '../../Components/IconButton/IconButton.js';
 import '../../css/app.scss';
 
 const TITLE_PERSON_DELETE = 'Delete person';
@@ -70,7 +70,7 @@ class PersonView extends View {
 
         // Update mode
         if (this.state.original.id) {
-            this.deleteBtn = IconLink.fromElement({
+            this.deleteBtn = IconButton.fromElement({
                 elem: 'del_btn',
                 onClick: () => this.confirmDelete(),
             });

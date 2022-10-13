@@ -12,7 +12,7 @@ import { Icon } from '../model/Icon.js';
 import { isValidValue, normalize, trimToDigitsLimit } from '../common.js';
 import { Tile } from './component/Tile.js';
 import { InputRow } from './component/InputRow.js';
-import { IconLink } from './component/IconLink.js';
+import { IconButton } from './component/IconButton.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 
@@ -30,7 +30,7 @@ export class AccountView extends AppView {
         res.heading = { elem: await query('.heading > h1') };
         assert(res.heading.elem, 'Heading element not found');
         res.heading.text = await prop(res.heading.elem, 'textContent');
-        res.delBtn = await IconLink.create(this, await query('#del_btn'));
+        res.delBtn = await IconButton.create(this, await query('#del_btn'));
         res.tile = await Tile.create(this, await query('#acc_tile'));
 
         res.formElem = await query('form');

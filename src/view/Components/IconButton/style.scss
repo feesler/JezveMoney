@@ -1,5 +1,5 @@
 /* icon link */
-.iconlink {
+.iconbutton {
   display: inline-flex;
   flex-flow: row nowrap;
   height: 32px;
@@ -12,7 +12,7 @@
   cursor: pointer;
 }
 
-.iconlink__icon {
+.iconbutton__icon {
   width: 32px;
   height: 32px;
   border: 2px solid #000000;
@@ -21,7 +21,7 @@
   overflow: hidden;
 }
 
-.iconlink__content {
+.iconbutton__content {
   height: 32px;
   color: #000000;
   display: inline-flex;
@@ -37,7 +37,7 @@
   text-transform: none;
 }
 
-.iconlink__title {
+.iconbutton__title {
   height: 20px;
   line-height: 20px;
   white-space: nowrap;
@@ -47,7 +47,7 @@
   text-transform: none;
 }
 
-.iconlink__subtitle {
+.iconbutton__subtitle {
   height: 12px;
   line-height: 12px;
   clear: both;
@@ -57,22 +57,22 @@
   white-space: nowrap;
 }
 
-.iconlink[disabled] {
+.iconbutton[disabled] {
   pointer-events: none;
   opacity: 0.3;
 }
 
 @media (hover: hover) {
-  .iconlink:hover .iconlink__icon {
+  .iconbutton:hover .iconbutton__icon {
     background-color: #000000;
   }
 
-  .iconlink:hover .iconlink__icon-content {
+  .iconbutton:hover .iconbutton__icon-content {
     fill: #ffffff;
   }
 
-  .iconlink:hover .iconlink__icon,
-  .iconlink:hover .iconlink__content {
+  .iconbutton:hover .iconbutton__icon,
+  .iconbutton:hover .iconbutton__content {
     color: #000000;
   }
 }

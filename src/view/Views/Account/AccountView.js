@@ -20,7 +20,7 @@ import { AccountList } from '../../js/model/AccountList.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { IconLink } from '../../Components/IconLink/IconLink.js';
+import { IconButton } from '../../Components/IconButton/IconButton.js';
 import '../../css/app.scss';
 
 const TITLE_ACCOUNT_DELETE = 'Delete account';
@@ -116,7 +116,7 @@ class AccountView extends View {
 
         // Update mode
         if (this.state.original.id) {
-            this.deleteBtn = IconLink.fromElement({
+            this.deleteBtn = IconButton.fromElement({
                 elem: 'del_btn',
                 onClick: () => this.confirmDelete(),
             });

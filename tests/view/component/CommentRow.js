@@ -4,17 +4,17 @@ import {
     query,
     isVisible,
 } from 'jezve-test';
-import { IconLink } from './IconLink.js';
+import { IconButton } from './IconButton.js';
 import { InputRow } from './InputRow.js';
 
 export class CommentRow extends TestComponent {
     async parseContent() {
         const res = {};
 
-        const iconLinkElem = await query(this.elem, '.iconlink');
+        const iconBtnElem = await query(this.elem, '.iconbutton');
 
-        res.iconLink = await IconLink.create(this.parent, iconLinkElem);
-        assert(res.iconLink, 'Iconlink of comment not found');
+        res.iconBtn = await IconButton.create(this.parent, iconBtnElem);
+        assert(res.iconBtn, 'Icon button of comment not found');
 
         res.inputRow = await InputRow.create(
             this.parent,
@@ -28,8 +28,8 @@ export class CommentRow extends TestComponent {
     }
 
     async input(val) {
-        if (await isVisible(this.content.iconLink.elem)) {
-            await this.content.iconLink.click();
+        if (await isVisible(this.content.iconBtn.elem)) {
+            await this.content.iconBtn.click();
         }
 
         return this.content.inputRow.input(val);

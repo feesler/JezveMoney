@@ -43,22 +43,22 @@
 }
 
 /* Menu item with icon */
-.action-iconlink {
+.action-iconbutton {
   height: auto;
   padding: 4px 14px 4px 4px;
   width: 100%;
 
-  .iconlink__icon {
+  .iconbutton__icon {
     border: 0;
     padding: 4px;
   }
 
-  .iconlink__icon-content {
+  .iconbutton__icon-content {
     width: 24px;
     height: 24px;
   }
 
-  .iconlink__content {
+  .iconbutton__content {
     padding-left: 10px;
   }
 }
@@ -82,18 +82,18 @@
 @media (hover: hover) {
   .white-theme,
   .dark-theme {
-    .iconlink.action-iconlink:hover {
+    .iconbutton.action-iconbutton:hover {
       background-color: #3078e2;
 
-      .iconlink__icon {
+      .iconbutton__icon {
         background: none;
       }
 
-      .iconlink__icon-content {
+      .iconbutton__icon-content {
         fill: #ffffff;
       }
 
-      .iconlink__content {
+      .iconbutton__content {
         color: #ffffff;
       }
     }

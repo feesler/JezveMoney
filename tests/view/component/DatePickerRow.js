@@ -6,19 +6,19 @@ import {
     click,
 } from 'jezve-test';
 import { DatePicker } from 'jezvejs-test';
-import { IconLink } from './IconLink.js';
+import { IconButton } from './IconButton.js';
 import { InputRow } from './InputRow.js';
 
 export class DatePickerRow extends TestComponent {
     async parseContent() {
         const res = {};
 
-        res.iconLink = await IconLink.create(this.parent, await query(this.elem, '.iconlink'));
-        assert(res.iconLink, 'Iconlink of date picker not found');
+        res.iconBtn = await IconButton.create(this.parent, await query(this.elem, '.iconbutton'));
+        assert(res.iconBtn, 'Icon button of date picker not found');
 
         res.inputRow = await InputRow.create(
             this.parent,
-            await query(this.elem, '.iconlink + *'),
+            await query(this.elem, '.iconbutton + *'),
         );
         assert(
             res.inputRow
@@ -38,8 +38,8 @@ export class DatePickerRow extends TestComponent {
     async selectDate(date) {
         assert.isDate(date, 'Invalid parameter');
 
-        if (await isVisible(this.content.iconLink.elem)) {
-            await this.content.iconLink.click();
+        if (await isVisible(this.content.iconBtn.elem)) {
+            await this.content.iconBtn.click();
             await this.parse();
         }
 
@@ -49,8 +49,8 @@ export class DatePickerRow extends TestComponent {
     }
 
     async input(val) {
-        if (await isVisible(this.content.iconLink.elem)) {
-            await this.content.iconLink.click();
+        if (await isVisible(this.content.iconBtn.elem)) {
+            await this.content.iconBtn.click();
             await click(this.content.inputRow.content.datePickerBtn);
         }
 

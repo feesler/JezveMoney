@@ -1,5 +1,5 @@
 <?php
-use JezveMoney\App\Template\Component\IconLink;
+use JezveMoney\App\Template\Component\IconButton;
 
 include(TPL_PATH . "Header.tpl");	?>
 
@@ -12,7 +12,7 @@ include(TPL_PATH . "Header.tpl");	?>
                     <div class="heading">
                         <h1><?=e($headString)?></h1>
 <?php	if ($this->action == "update") {		?>
-                        <?=IconLink::render([
+                        <?=IconButton::render([
                             "id" => "del_btn",
                             "title" => "Delete",
                             "icon" => "del"

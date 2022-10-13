@@ -9,12 +9,12 @@ import {
 import './style.scss';
 
 /* CSS classes */
-const CONTAINER_CLASS = 'iconlink';
-const ICON_CONTAINER_CLASS = 'iconlink__icon';
-const ICON_CLASS = 'iconlink__icon-content';
-const CONTENT_CLASS = 'iconlink__content';
-const TITLE_CLASS = 'iconlink__title';
-const SUBTITLE_CLASS = 'iconlink__subtitle';
+const CONTAINER_CLASS = 'iconbutton';
+const ICON_CONTAINER_CLASS = 'iconbutton__icon';
+const ICON_CLASS = 'iconbutton__icon-content';
+const CONTENT_CLASS = 'iconbutton__content';
+const TITLE_CLASS = 'iconbutton__title';
+const SUBTITLE_CLASS = 'iconbutton__subtitle';
 
 const defaultProps = {
     type: 'button', // button or link
@@ -27,18 +27,18 @@ const defaultProps = {
 };
 
 /**
- * IconLink component
+ * IconButton component
  */
-export class IconLink extends Component {
+export class IconButton extends Component {
     static create(props) {
-        const instance = new IconLink(props);
+        const instance = new IconButton(props);
         instance.init();
 
         return instance;
     }
 
     static fromElement(props) {
-        const instance = new IconLink(props);
+        const instance = new IconButton(props);
         instance.parse();
 
         return instance;
@@ -103,7 +103,7 @@ export class IconLink extends Component {
         this.iconElem = this.elem.querySelector(`.${ICON_CONTAINER_CLASS}`);
         this.contentElem = this.elem.querySelector(`.${CONTENT_CLASS}`);
         if (!this.contentElem) {
-            throw new Error('Invalid structure of iconlink element');
+            throw new Error('Invalid structure of iconbutton element');
         }
 
         this.titleElem = this.contentElem.querySelector(`.${TITLE_CLASS}`);

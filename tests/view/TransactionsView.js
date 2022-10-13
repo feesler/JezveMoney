@@ -14,7 +14,7 @@ import {
 import { DropDown, Paginator } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
-import { IconLink } from './component/IconLink.js';
+import { IconButton } from './component/IconButton.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { TransactionTypeMenu } from './component/TransactionTypeMenu.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
@@ -30,7 +30,7 @@ export class TransactionsView extends AppView {
     async parseContent() {
         const res = {
             titleEl: await query('.content_wrap > .heading > h1'),
-            addBtn: await IconLink.create(this, await query('#add_btn')),
+            addBtn: await IconButton.create(this, await query('#add_btn')),
             toolbar: await Toolbar.create(this, await query('#toolbar')),
         };
 

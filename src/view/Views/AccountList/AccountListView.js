@@ -21,7 +21,7 @@ import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import '../../css/app.scss';
 import '../../Components/Tile/style.scss';
-import '../../Components/IconLink/style.scss';
+import '../../Components/IconButton/style.scss';
 
 /** CSS classes */
 const NO_DATA_CLASS = 'nodata-message';

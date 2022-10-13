@@ -7,14 +7,14 @@ import {
     click,
 } from 'jezve-test';
 
-export class IconLink extends TestComponent {
+export class IconButton extends TestComponent {
     async parseContent() {
         if (!this.elem) {
             return {};
         }
 
-        const validClass = await hasClass(this.elem, 'iconlink');
-        assert(validClass, 'Wrong icon link');
+        const validClass = await hasClass(this.elem, 'iconbutton');
+        assert(validClass, 'Invalid icon button element');
 
         const res = {};
 
@@ -23,13 +23,13 @@ export class IconLink extends TestComponent {
             res.link = await prop(this.elem, 'href');
         }
 
-        res.titleElem = await query(this.elem, '.iconlink__content');
+        res.titleElem = await query(this.elem, '.iconbutton__content');
         const titleInner = await query(res.titleElem, ':scope > *');
         assert(titleInner, 'Title element not found');
         res.title = await prop(titleInner, 'textContent');
 
         // Subtitle is optional
-        res.subTitleElem = await query(res.titleElem, '.iconlink__subtitle');
+        res.subTitleElem = await query(res.titleElem, '.iconbutton__subtitle');
         if (res.subTitleElem) {
             res.subtitle = await prop(res.subTitleElem, 'textContent');
         }
