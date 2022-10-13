@@ -10,7 +10,7 @@ class Logger
     // Write string to log file
     public static function write($str)
     {
-        if (!is_writable(self::$filename)) {
+        if (file_exists(self::$filename) && !is_writable(self::$filename)) {
             return;
         }
 
