@@ -415,12 +415,8 @@ export class ImportRuleForm extends Component {
         const conditionToUpdate = copyObject(conditions.getItemByIndex(index));
         conditions.updateItemByIndex(index, data);
 
-        // If condition operator not changed and current operator is not `is`
-        // then skip conditions list update
-        if (
-            conditionToUpdate.operator === data.operator
-            && data.operator !== IMPORT_COND_OP_EQUAL
-        ) {
+        // If condition operator not changed then skip conditions list update
+        if (conditionToUpdate.operator === data.operator) {
             return;
         }
 
