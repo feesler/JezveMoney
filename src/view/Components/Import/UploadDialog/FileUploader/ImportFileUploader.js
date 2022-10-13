@@ -94,7 +94,7 @@ export class ImportFileUploader extends Component {
             }
 
             if (isFunction(this.props.onUploaded)) {
-                this.props.onUploaded(data);
+                this.props.onUploaded(data, this.state.filename);
             }
         } catch (e) {
             this.onImportError(e.message);
