@@ -1,7 +1,7 @@
 import { Runner, setBlock, isFullScenario } from 'jezve-test';
 
 import { securityTests } from './security.js';
-import { apiTests } from './api.js';
+import { apiTests } from './api/index.js';
 import { profileTests } from './profile.js';
 import { accountTests } from './account.js';
 import { personTests } from './person.js';
