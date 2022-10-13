@@ -218,39 +218,23 @@ include(TPL_PATH . "Header.tpl");	?>
                             </div>
                         </div>
 
-                        <div id="date_row" class="view-row std_margin"<?=hidden(!$trAvailable)?>>
-                            <?=IconButton::render([
-                                "id" => "calendar_btn",
-                                "icon" => "cal",
-                                "title" => "Change date",
-                                "subtitle" => $dateFmt
-                            ])?>
-                            <div id="date_block" class="validation-block" hidden>
-                                <label for="date">Date</label>
-                                <div class="column-container">
-                                    <div class="input-group">
-                                        <input id="date" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?=e($dateFmt)?>">
-                                        <button id="cal_rbtn" class="btn icon-btn input-group__btn" type="button">
-                                            <svg class="icon calendar-icon"><use href="#calendar-icon"></use></svg>
-                                        </button>
-                                    </div>
-                                    <div id="calendar" class="calendar"></div>
+                        <div id="date_row" class="validation-block view-row std_margin"<?=hidden(!$trAvailable)?>>
+                            <label for="date">Date</label>
+                            <div class="column-container">
+                                <div class="input-group">
+                                    <input id="date" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?=e($dateFmt)?>">
+                                    <button id="cal_rbtn" class="btn icon-btn input-group__btn" type="button">
+                                        <?=useIcon("calendar-icon", "icon calendar-icon")?>
+                                    </button>
                                 </div>
-                                <div class="invalid-feedback">Input correct date.</div>
+                                <div id="calendar" class="calendar"></div>
                             </div>
+                            <div class="invalid-feedback">Input correct date.</div>
                         </div>
 
                         <div id="comment_row" class="view-row std_margin"<?=hidden(!$trAvailable)?>>
-                            <?=IconButton::render([
-                                "id" => "comm_btn",
-                                "icon" => "plus",
-                                "title" => "Add comment",
-                                "hidden" => !is_empty($tr["comment"])
-                            ])?>
-                            <div id="comment_block"<?=hidden(is_empty($tr["comment"]))?>>
-                                <label for="comm">Comment</label>
-                                <input id="comm" class="stretch-input" name="comment" type="text" value="<?=e($tr["comment"])?>">
-                            </div>
+                            <label for="comm">Comment</label>
+                            <input id="comm" class="stretch-input" name="comment" type="text" value="<?=e($tr["comment"])?>">
                         </div>
 
                         <div id="submit_controls" class="form-controls"<?=hidden(!$trAvailable)?>>

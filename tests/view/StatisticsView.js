@@ -3,7 +3,6 @@ import {
     query,
     queryAll,
     prop,
-    parentNode,
     isVisible,
     waitForFunction,
 } from 'jezve-test';
@@ -51,8 +50,7 @@ export class StatisticsView extends AppView {
 
         res.groupDropDown = await DropDown.createFromChild(this, await query('#groupsel'));
 
-        const calendarBtn = await query('#calendar_btn');
-        res.dateFilter = await DatePickerFilter.create(this, await parentNode(calendarBtn));
+        res.dateFilter = await DatePickerFilter.create(this, await query('#dateFilter'));
         assert(res.dateFilter, 'Date filter not found');
 
         res.chart = {

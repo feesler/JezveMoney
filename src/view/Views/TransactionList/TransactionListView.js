@@ -17,7 +17,6 @@ import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { PersonList } from '../../js/model/PersonList.js';
-import { IconButton } from '../../Components/IconButton/IconButton.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
@@ -130,17 +129,9 @@ class TransactionListView extends View {
         }
         setEvents(this.noSearchBtn, { click: () => this.onSearchClear() });
 
-        this.datePickerBtn = IconButton.fromElement({
-            elem: 'calendar_btn',
-            onClick: () => this.showCalendar(),
-        });
-        this.dateBlock = ge('date_block');
         this.datePickerWrapper = ge('calendar');
-
         this.dateInputBtn = ge('cal_rbtn');
-        if (this.dateInputBtn) {
-            this.dateInputBtn.addEventListener('click', () => this.showCalendar());
-        }
+        setEvents(this.dateInputBtn, { click: () => this.showCalendar() });
         this.dateInput = ge('date');
 
         this.noDateBtn = ge('nodatebtn');
@@ -469,9 +460,6 @@ class TransactionListView extends View {
         }
 
         this.datePicker.show(!isVisible);
-
-        this.datePickerBtn.hide();
-        show(this.dateBlock, true);
     }
 
     onChangePage(page) {
@@ -578,8 +566,6 @@ class TransactionListView extends View {
             ? `${state.filter.stdate} - ${state.filter.enddate}`
             : '';
         this.dateInput.value = dateRangeFmt;
-        const dateSubtitle = (isDateFilter) ? dateRangeFmt : null;
-        this.datePickerBtn.setSubtitle(dateSubtitle);
         show(this.noDateBtn, isDateFilter);
 
         // Search form

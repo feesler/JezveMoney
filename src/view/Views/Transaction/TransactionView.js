@@ -347,11 +347,6 @@ class TransactionView extends View {
         this.exchangeSign = ge('exchcomm');
 
         this.dateRow = ge('date_row');
-        this.datePickerBtn = IconButton.fromElement({
-            elem: 'calendar_btn',
-            onClick: () => this.showCalendar(),
-        });
-        this.dateBlock = ge('date_block');
         this.datePickerWrapper = ge('calendar');
 
         this.dateInputBtn = ge('cal_rbtn');
@@ -361,11 +356,6 @@ class TransactionView extends View {
         setEvents(this.dateInput, { input: (e) => this.onDateInput(e) });
 
         this.commentRow = ge('comment_row');
-        this.commentBtn = IconButton.fromElement({
-            elem: 'comm_btn',
-            onClick: () => this.showComment(),
-        });
-        this.commentBlock = ge('comment_block');
         this.commentInput = ge('comm');
         setEvents(this.commentInput, { input: (e) => this.onCommentInput(e) });
 
@@ -584,18 +574,6 @@ class TransactionView extends View {
         }
 
         this.datePicker.show(!this.datePicker.visible());
-
-        this.datePickerBtn.hide();
-        show(this.dateBlock, true);
-    }
-
-    /**
-     * Show comment field
-     */
-    showComment() {
-        this.commentBtn.hide();
-        show(this.commentBlock, true);
-        this.commentInput.focus();
     }
 
     /**
@@ -1431,15 +1409,13 @@ class TransactionView extends View {
         }
 
         if (state.validation.date) {
-            window.app.clearBlockValidation(this.dateBlock);
+            window.app.clearBlockValidation(this.dateRow);
         } else {
-            window.app.invalidateBlock(this.dateBlock);
+            window.app.invalidateBlock(this.dateRow);
         }
-        this.datePickerBtn.enable(!state.submitStarted);
         enable(this.dateInput, !state.submitStarted);
         this.dateInput.value = state.form.date;
 
-        this.commentBtn.enable(!state.submitStarted);
         enable(this.commentInput, !state.submitStarted);
         this.commentInput.value = state.form.comment;
 

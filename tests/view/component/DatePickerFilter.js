@@ -3,20 +3,15 @@ import {
     assert,
     query,
     prop,
-    isVisible,
     click,
     input,
     copyObject,
 } from 'jezve-test';
 import { DatePicker } from 'jezvejs-test';
-import { IconButton } from './IconButton.js';
 
 export class DatePickerFilter extends TestComponent {
     async parseContent() {
-        const res = {
-            iconBtn: await IconButton.create(this.parent, await query(this.elem, '.iconbutton')),
-        };
-        assert(res.iconBtn, 'Icon button of date picker not found');
+        const res = {};
 
         res.inputElem = await query(this.elem, '.stretch-input');
         assert(res.inputElem, 'Input element not found');
@@ -46,12 +41,6 @@ export class DatePickerFilter extends TestComponent {
 
     async selectDate(date) {
         assert.isDate(date, 'Invalid parameter');
-
-        if (await isVisible(this.content.iconBtn.elem)) {
-            await this.content.iconBtn.click();
-            await this.parse();
-        }
-
         assert(this.content.datePicker, 'Date picker component not found');
 
         await this.content.datePicker.selectDate(date);
@@ -61,11 +50,7 @@ export class DatePickerFilter extends TestComponent {
         assert.isDate(date1, 'Invalid parameters');
         assert.isDate(date2, 'Invalid parameters');
 
-        if (await isVisible(this.content.iconBtn.elem)) {
-            await this.content.iconBtn.click();
-        } else {
-            await click(this.content.datePickerBtn);
-        }
+        await click(this.content.datePickerBtn);
         await this.parse();
 
         assert(this.content.datePicker, 'Date picker component not found');
@@ -73,11 +58,6 @@ export class DatePickerFilter extends TestComponent {
     }
 
     async clear() {
-        if (await isVisible(this.content.iconBtn.elem)) {
-            await this.content.iconBtn.click();
-            await this.parse();
-        }
-
         await click(this.content.clearBtn);
     }
 
@@ -86,11 +66,6 @@ export class DatePickerFilter extends TestComponent {
     }
 
     async input(val) {
-        if (await isVisible(this.content.iconBtn.elem)) {
-            await this.content.iconBtn.click();
-            await this.parent.performAction(() => click(this.content.datePickerBtn));
-        }
-
         return input(this.content.inputElem, val);
     }
 }

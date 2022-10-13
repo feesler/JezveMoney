@@ -71,26 +71,18 @@ include(TPL_PATH . "Header.tpl"); ?>
                             <select id="person_id" name="person_id" multiple></select>
                         </div>
 
-                        <div class="filter-item">
+                        <div id="dateFilter" class="filter-item">
                             <h3 class="filter-item__title">Date range</h3>
-                            <?=IconButton::render([
-                                "id" => "calendar_btn",
-                                "icon" => "cal",
-                                "title" => "Select range",
-                                "subtitle" => $dateFmt
-                            ])?>
-                            <div id="date_block" class="column-container" hidden>
-                                <div class="input-group">
-                                    <input id="date" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?=e($dateFmt)?>">
-                                    <button id="nodatebtn" class="input-group__inner-btn" type="button"<?=hidden(is_empty($dateFmt))?>>
-                                        <?=svgIcon("close", "input-group__inner-btn__icon")?>
-                                    </button>
-                                    <button id="cal_rbtn" class="btn icon-btn input-group__btn" type="button">
-                                        <svg class="icon calendar-icon"><use href="#calendar-icon"></use></svg>
-                                    </button>
-                                </div>
-                                <div id="calendar" class="calendar"></div>
+                            <div class="input-group">
+                                <input id="date" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?=e($dateFmt)?>">
+                                <button id="nodatebtn" class="input-group__inner-btn" type="button"<?=hidden(is_empty($dateFmt))?>>
+                                    <?=svgIcon("close", "input-group__inner-btn__icon")?>
+                                </button>
+                                <button id="cal_rbtn" class="btn icon-btn input-group__btn" type="button">
+                                    <?=useIcon("calendar-icon", "icon calendar-icon")?>
+                                </button>
                             </div>
+                            <div id="calendar" class="calendar"></div>
                         </div>
 
                         <div class="filter-item">

@@ -2,7 +2,6 @@ import {
     assert,
     query,
     prop,
-    parentNode,
     navigation,
     click,
     waitForFunction,
@@ -61,8 +60,7 @@ export class TransactionsView extends AppView {
             res.personDropDown = await DropDown.createFromChild(this, await query('#person_id'));
         }
 
-        const calendarBtn = await query('#calendar_btn');
-        res.dateFilter = await DatePickerFilter.create(this, await parentNode(calendarBtn));
+        res.dateFilter = await DatePickerFilter.create(this, await query('#dateFilter'));
         assert(res.dateFilter, 'Date filter not found');
 
         res.searchForm = await SearchForm.create(this, await query('#searchFrm'));
