@@ -6,7 +6,6 @@ import {
     removeChilds,
     insertAfter,
     show,
-    Selection,
 } from 'jezvejs';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
@@ -40,9 +39,9 @@ class PersonListView extends View {
         window.app.checkPersonModels();
 
         this.state = {
-            selected: {
-                visible: new Selection(),
-                hidden: new Selection(),
+            items: {
+                visible: PersonList.create(window.app.model.visiblePersons),
+                hidden: PersonList.create(window.app.model.hiddenPersons),
             },
             loading: false,
             renderTime: Date.now(),
@@ -99,13 +98,16 @@ class PersonListView extends View {
             return;
         }
 
-        const currentSelection = person.isVisible()
-            ? this.state.selected.visible
-            : this.state.selected.hidden;
-        if (currentSelection.isSelected(personId)) {
-            currentSelection.deselect(personId);
+        const toggleItem = (item) => (
+            (item.id === personId)
+                ? { ...item, selected: !item.selected }
+                : item
+        );
+
+        if (person.isVisible()) {
+            this.state.items.visible = this.state.items.visible.map(toggleItem);
         } else {
-            currentSelection.select(personId);
+            this.state.items.hidden = this.state.items.hidden.map(toggleItem);
         }
 
         this.render(this.state);
@@ -132,10 +134,18 @@ class PersonListView extends View {
         this.setState({ ...this.state, renderTime: Date.now() });
     }
 
+    getVisibleSelectedItems(state = this.state) {
+        return state.items.visible.filter((item) => item.selected);
+    }
+
+    getHiddenSelectedItems(state = this.state) {
+        return state.items.hidden.filter((item) => item.selected);
+    }
+
     getSelectedIds(state = this.state) {
-        const selArr = state.selected.visible.getIdArray();
-        const hiddenSelArr = state.selected.hidden.getIdArray();
-        return selArr.concat(hiddenSelArr);
+        const selArr = this.getVisibleSelectedItems(state);
+        const hiddenSelArr = this.getHiddenSelectedItems(state);
+        return selArr.concat(hiddenSelArr).map((item) => item.id);
     }
 
     async showSelected(value = true) {
@@ -191,9 +201,9 @@ class PersonListView extends View {
 
             this.setState({
                 ...this.state,
-                selected: {
-                    visible: new Selection(),
-                    hidden: new Selection(),
+                items: {
+                    visible: PersonList.create(window.app.model.visiblePersons),
+                    hidden: PersonList.create(window.app.model.hiddenPersons),
                 },
             });
         } catch (e) {
@@ -220,11 +230,11 @@ class PersonListView extends View {
         });
     }
 
-    renderTilesList(persons, selection) {
+    renderTilesList(persons) {
         return persons.map((person) => Tile.create({
             attrs: { 'data-id': person.id },
             title: person.name,
-            selected: selection.isSelected(person.id),
+            selected: person.selected,
         }));
     }
 
@@ -238,10 +248,7 @@ class PersonListView extends View {
         }
 
         // Render visible persons
-        const visibleTiles = this.renderTilesList(
-            window.app.model.visiblePersons,
-            state.selected.visible,
-        );
+        const visibleTiles = this.renderTilesList(state.items.visible);
         removeChilds(this.tilesContainer);
         if (visibleTiles.length > 0) {
             visibleTiles.forEach((item) => this.tilesContainer.appendChild(item.elem));
@@ -253,10 +260,7 @@ class PersonListView extends View {
         }
 
         // Render hidden persons
-        const hiddenTiles = this.renderTilesList(
-            window.app.model.hiddenPersons,
-            state.selected.hidden,
-        );
+        const hiddenTiles = this.renderTilesList(state.items.hidden);
         removeChilds(this.hiddenTilesContainer);
         const hiddenItemsAvailable = (hiddenTiles.length > 0);
         if (hiddenItemsAvailable) {
@@ -264,8 +268,10 @@ class PersonListView extends View {
         }
         show(this.hiddenTilesHeading, hiddenItemsAvailable);
 
-        const selCount = state.selected.visible.count();
-        const hiddenSelCount = state.selected.hidden.count();
+        const selArr = this.getVisibleSelectedItems(state);
+        const hiddenSelArr = this.getHiddenSelectedItems(state);
+        const selCount = selArr.length;
+        const hiddenSelCount = hiddenSelArr.length;
         const totalSelCount = selCount + hiddenSelCount;
         this.toolbar.updateBtn.show(totalSelCount === 1);
         this.toolbar.showBtn.show(hiddenSelCount > 0);

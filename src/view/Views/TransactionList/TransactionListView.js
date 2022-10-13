@@ -160,7 +160,7 @@ class TransactionListView extends View {
         this.list = TransactionList.create({
             elem: document.querySelector('.trans-list'),
             selectable: true,
-            onSelect: () => this.render(this.state),
+            onSelect: () => this.onItemSelect(),
             sortable: true,
             onSort: (id, pos) => this.sendChangePosRequest(id, pos),
         });
@@ -357,10 +357,11 @@ class TransactionListView extends View {
         if (this.state.loading) {
             return;
         }
-        const selectedIds = this.list.selectedItems.getIdArray();
-        if (selectedIds.length === 0) {
+        const selectedItems = this.list.getSelectedItems();
+        if (selectedItems.length === 0) {
             return;
         }
+        const selectedIds = selectedItems.map((item) => item.id);
 
         this.startLoading();
 
@@ -377,11 +378,12 @@ class TransactionListView extends View {
      * Create and show transaction delete warning popup
      */
     confirmDelete() {
-        if (this.list.selectedItems.count() === 0) {
+        const selectedItems = this.list.getSelectedItems();
+        if (selectedItems.length === 0) {
             return;
         }
 
-        const multi = (this.list.selectedItems.count() > 1);
+        const multi = (selectedItems.length > 1);
         ConfirmDialog.create({
             id: 'delete_warning',
             title: (multi) ? TITLE_MULTI_TRANS_DELETE : TITLE_SINGLE_TRANS_DELETE,
@@ -482,6 +484,11 @@ class TransactionListView extends View {
     onModeChanged(mode) {
         this.state.mode = mode;
         this.replaceHistory();
+        this.render(this.state);
+    }
+
+    onItemSelect() {
+        this.state.items = this.list.getItems();
         this.render(this.state);
     }
 
@@ -603,18 +610,19 @@ class TransactionListView extends View {
         filterUrl.searchParams.set('page', state.pagination.page);
         this.modeSelector.setURL(filterUrl);
 
-        const selectedIds = this.list.selectedItems.getIdArray();
+        const selectedItems = this.list.getSelectedItems();
 
         // toolbar
-        this.toolbar.updateBtn.show(selectedIds.length === 1);
-        this.toolbar.deleteBtn.show(selectedIds.length > 0);
+        this.toolbar.updateBtn.show(selectedItems.length === 1);
+        this.toolbar.deleteBtn.show(selectedItems.length > 0);
 
-        if (selectedIds.length === 1) {
+        if (selectedItems.length === 1) {
             const { baseURL } = window.app;
-            this.toolbar.updateBtn.setURL(`${baseURL}transactions/update/${selectedIds[0]}`);
+            const [item] = selectedItems;
+            this.toolbar.updateBtn.setURL(`${baseURL}transactions/update/${item.id}`);
         }
 
-        this.toolbar.show(selectedIds.length > 0);
+        this.toolbar.show(selectedItems.length > 0);
 
         if (!state.loading) {
             this.loadingIndicator.hide();

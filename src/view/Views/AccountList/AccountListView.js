@@ -7,7 +7,6 @@ import {
     insertAfter,
     show,
     urlJoin,
-    Selection,
 } from 'jezvejs';
 import { Application } from '../../js/Application.js';
 import { View } from '../../js/View.js';
@@ -45,9 +44,9 @@ class AccountListView extends View {
         window.app.loadModel(IconList, 'icons', window.app.props.icons);
 
         this.state = {
-            selected: {
-                visible: new Selection(),
-                hidden: new Selection(),
+            items: {
+                visible: AccountList.create(window.app.model.visibleUserAccounts),
+                hidden: AccountList.create(window.app.model.hiddenUserAccounts),
             },
             loading: false,
             renderTime: Date.now(),
@@ -104,13 +103,16 @@ class AccountListView extends View {
             return;
         }
 
-        const currentSelection = account.isVisible()
-            ? this.state.selected.visible
-            : this.state.selected.hidden;
-        if (currentSelection.isSelected(accountId)) {
-            currentSelection.deselect(accountId);
+        const toggleItem = (item) => (
+            (item.id === accountId)
+                ? { ...item, selected: !item.selected }
+                : item
+        );
+
+        if (account.isVisible()) {
+            this.state.items.visible = this.state.items.visible.map(toggleItem);
         } else {
-            currentSelection.select(accountId);
+            this.state.items.hidden = this.state.items.hidden.map(toggleItem);
         }
 
         this.render(this.state);
@@ -137,10 +139,18 @@ class AccountListView extends View {
         this.setState({ ...this.state, renderTime: Date.now() });
     }
 
+    getVisibleSelectedItems(state = this.state) {
+        return state.items.visible.filter((item) => item.selected);
+    }
+
+    getHiddenSelectedItems(state = this.state) {
+        return state.items.hidden.filter((item) => item.selected);
+    }
+
     getSelectedIds(state = this.state) {
-        const selArr = state.selected.visible.getIdArray();
-        const hiddenSelArr = state.selected.hidden.getIdArray();
-        return selArr.concat(hiddenSelArr);
+        const selArr = this.getVisibleSelectedItems(state);
+        const hiddenSelArr = this.getHiddenSelectedItems(state);
+        return selArr.concat(hiddenSelArr).map((item) => item.id);
     }
 
     async showSelected(value = true) {
@@ -196,9 +206,9 @@ class AccountListView extends View {
 
             this.setState({
                 ...this.state,
-                selected: {
-                    visible: new Selection(),
-                    hidden: new Selection(),
+                items: {
+                    visible: AccountList.create(window.app.model.visibleUserAccounts),
+                    hidden: AccountList.create(window.app.model.hiddenUserAccounts),
                 },
             });
         } catch (e) {
@@ -227,11 +237,11 @@ class AccountListView extends View {
         });
     }
 
-    renderTilesList(accounts, selection) {
+    renderTilesList(accounts) {
         return accounts.map((account) => AccountTile.create({
             account,
             attrs: { 'data-id': account.id },
-            selected: selection.isSelected(account.id),
+            selected: account.selected,
         }));
     }
 
@@ -245,10 +255,7 @@ class AccountListView extends View {
         }
 
         // Render visible accounts
-        const visibleTiles = this.renderTilesList(
-            window.app.model.visibleUserAccounts,
-            state.selected.visible,
-        );
+        const visibleTiles = this.renderTilesList(state.items.visible);
         removeChilds(this.tilesContainer);
         if (visibleTiles.length > 0) {
             visibleTiles.forEach((item) => this.tilesContainer.appendChild(item.elem));
@@ -260,10 +267,7 @@ class AccountListView extends View {
         }
 
         // Render hidden accounts
-        const hiddenTiles = this.renderTilesList(
-            window.app.model.hiddenUserAccounts,
-            state.selected.hidden,
-        );
+        const hiddenTiles = this.renderTilesList(state.items.hidden);
         removeChilds(this.hiddenTilesContainer);
         const hiddenItemsAvailable = (hiddenTiles.length > 0);
         if (hiddenItemsAvailable) {
@@ -271,8 +275,10 @@ class AccountListView extends View {
         }
         show(this.hiddenTilesHeading, hiddenItemsAvailable);
 
-        const selCount = state.selected.visible.count();
-        const hiddenSelCount = state.selected.hidden.count();
+        const selArr = this.getVisibleSelectedItems(state);
+        const hiddenSelArr = this.getHiddenSelectedItems(state);
+        const selCount = selArr.length;
+        const hiddenSelCount = hiddenSelArr.length;
         const totalSelCount = selCount + hiddenSelCount;
         this.toolbar.updateBtn.show(totalSelCount === 1);
         this.toolbar.exportBtn.show(totalSelCount > 0);
