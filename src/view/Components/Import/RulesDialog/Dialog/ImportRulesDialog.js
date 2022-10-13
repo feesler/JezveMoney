@@ -18,6 +18,7 @@ import { ImportRuleItem } from '../RuleItem/ImportRuleItem.js';
 import { ConfirmDialog } from '../../../ConfirmDialog/ConfirmDialog.js';
 import './style.scss';
 import { LoadingIndicator } from '../../../LoadingIndicator/LoadingIndicator.js';
+import { PopupMenu } from '../../../PopupMenu/PopupMenu.js';
 
 /** CSS classes */
 export const IMPORT_RULES_DIALOG_CLASS = 'rules-dialog';
@@ -68,6 +69,8 @@ export class ImportRulesDialog extends Component {
         ) {
             throw new Error('Failed to initialize import rules dialog');
         }
+
+        this.listContainer.addEventListener('scroll', () => this.onListScroll());
 
         InputGroup.fromElement(this.searchField);
 
@@ -227,6 +230,11 @@ export class ImportRulesDialog extends Component {
         this.state.rule = new ImportRule(item);
 
         this.render(this.state);
+    }
+
+    /** Rules list 'scroll' event handler */
+    onListScroll() {
+        PopupMenu.hideActive();
     }
 
     /** Rule 'submit' event handler */

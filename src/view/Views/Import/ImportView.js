@@ -38,6 +38,7 @@ import { ImportTransactionForm } from '../../Components/Import/TransactionForm/I
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { API } from '../../js/api/index.js';
 import { ImportTransactionItem } from '../../Components/Import/TransactionItem/ImportTransactionItem.js';
+import { PopupMenu } from '../../Components/PopupMenu/PopupMenu.js';
 
 /** Messages */
 const MSG_IMPORT_SUCCESS = 'All transactions have been successfully imported';
@@ -142,6 +143,8 @@ class ImportView extends View {
         }
 
         window.app.initAccountsList(this.accountDropDown);
+
+        window.addEventListener('scroll', () => this.onScroll(), { passive: true });
 
         this.submitBtn.addEventListener('click', () => this.onSubmitClick());
         this.rulesBtn.addEventListener('click', () => this.onRulesClick());
@@ -480,6 +483,11 @@ class ImportView extends View {
         state.pagination = this.updateList(state);
 
         this.setState(state);
+    }
+
+    /** Window 'scroll' event handler */
+    onScroll() {
+        PopupMenu.hideActive();
     }
 
     /** Transaction item enable/disable event handler */

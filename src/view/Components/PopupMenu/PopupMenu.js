@@ -33,6 +33,14 @@ export class PopupMenu extends Component {
         return new PopupMenu(props);
     }
 
+    static activeInstance = null;
+
+    static hideActive() {
+        if (this.activeInstance) {
+            this.activeInstance.hideMenu();
+        }
+    }
+
     constructor(props) {
         super(props);
 
@@ -186,6 +194,8 @@ export class PopupMenu extends Component {
         this.menuList.style.left = '';
         this.menuList.style.width = '';
 
+        PopupMenu.activeInstance = null;
+
         removeEmptyClick(this.emptyClickHandler);
     }
 
@@ -193,6 +203,8 @@ export class PopupMenu extends Component {
         if (this.menuList.hasAttribute('hidden')) {
             show(this.menuList, true);
             this.calculatePosition();
+
+            PopupMenu.activeInstance = this;
 
             setEmptyClick(this.emptyClickHandler);
         } else {
