@@ -13,17 +13,149 @@ import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,
 } from '../../../model/ImportCondition.js';
-import { ImportAction } from '../../../model/ImportAction.js';
+import {
+    ImportAction,
+    IMPORT_ACTION_SET_TR_TYPE,
+    IMPORT_ACTION_SET_ACCOUNT,
+    IMPORT_ACTION_SET_PERSON,
+} from '../../../model/ImportAction.js';
 import { ImportConditionForm } from './ImportConditionForm.js';
 import { ImportRuleAccordion } from './ImportRuleAccordion.js';
 import { ImportActionForm } from './ImportActionForm.js';
-import { asyncMap } from '../../../common.js';
+import { asyncMap, trimToDigitsLimit } from '../../../common.js';
 import { App } from '../../../Application.js';
 
 const availAccordionTitles = ['Conditions', 'Actions'];
 const isAvailableTitle = (title) => availAccordionTitles.includes(title);
 
 export class ImportRuleForm extends TestComponent {
+    static getExpectedCondition(model) {
+        return {
+            field_id: parseInt(model.fieldType, 10),
+            operator: parseInt(model.operator, 10),
+            value: model.value.toString(),
+            flags: (model.isFieldValue) ? IMPORT_COND_OP_FIELD_FLAG : 0,
+        };
+    }
+
+    static getExpectedAction(model) {
+        return {
+            action_id: parseInt(model.actionType, 10),
+            value: model.value.toString(),
+        };
+    }
+
+    /** Return expected import rule object */
+    static getExpectedRule(model = this.model) {
+        const res = {
+            flags: 0,
+        };
+
+        res.conditions = model.conditions.map((item) => this.getExpectedCondition(item));
+        res.actions = model.actions.map((item) => this.getExpectedAction(item));
+
+        if (model.id) {
+            res.id = model.id;
+        }
+
+        return res;
+    }
+
+    static getExpectedState(model) {
+        const localModel = copyObject(model);
+
+        const res = {
+            conditionsList: { visible: true },
+            actionsList: { visible: true },
+        };
+
+        this.setExpectedRule(localModel);
+        this.setAvailableConditions(localModel);
+        this.setAvailableActions(localModel);
+
+        res.conditionsList.items = localModel.conditions.map(
+            (item) => ImportConditionForm.getExpectedState(item),
+        );
+
+        res.actionsList.items = localModel.actions.map(
+            (item) => ImportActionForm.getExpectedState(item),
+        );
+
+        return res;
+    }
+
+    static setExpectedRule(model) {
+        const res = model;
+        const ruleData = this.getExpectedRule(model);
+        const rule = new ImportRule(ruleData);
+        res.rule = rule;
+    }
+
+    static setAvailableConditions(model) {
+        const res = model;
+        const { rule } = model;
+
+        res.conditions = model.conditions.map((condition, ind) => {
+            let propFilter = ImportCondition.fieldTypes.map(({ id }) => id);
+            // Remove properties which already have `is` operator
+            propFilter = propFilter.filter((property) => {
+                const found = rule.conditions.findIsCondition(property);
+                const foundInd = rule.conditions.indexOf(found);
+                return (!found || foundInd === ind);
+            });
+
+            return {
+                ...condition,
+                fieldsAvailable: propFilter.map((type) => type.toString()),
+            };
+        });
+    }
+
+    static setAvailableActions(model) {
+        const res = model;
+        const { rule } = model;
+
+        res.actions = model.actions.map((action, ind) => {
+            let actionsFilter = ImportAction.actionTypes.map(({ id }) => id);
+            // Remove already added actions
+            actionsFilter = actionsFilter.filter((type) => {
+                const found = rule.actions.findAction(type);
+                const foundInd = rule.actions.indexOf(found);
+                return (!found || foundInd === ind);
+            });
+
+            // Show `Set account` action if has `Set transaction type` action with
+            // transfer type selected
+            const setAccountAction = rule.actions.findAction(IMPORT_ACTION_SET_ACCOUNT);
+            const setAccountInd = rule.actions.indexOf(setAccountAction);
+            const showSetAccount = (
+                rule.actions.hasSetTransfer()
+                && (!setAccountAction || setAccountInd === ind)
+            );
+            if (!showSetAccount) {
+                actionsFilter = actionsFilter.filter((type) => type !== IMPORT_ACTION_SET_ACCOUNT);
+            }
+
+            // Show `Set person` action if person available and has `Set transaction type` action
+            // with debt type selected
+            const setPersonAction = rule.actions.findAction(IMPORT_ACTION_SET_PERSON);
+            const setPersonInd = rule.actions.indexOf(setPersonAction);
+            const showSetPerson = (
+                App.state.persons.length > 0
+                && rule.actions.hasSetDebt()
+                && (!setPersonAction || setPersonInd === ind)
+            );
+            if (!showSetPerson) {
+                actionsFilter = actionsFilter.filter((type) => type !== IMPORT_ACTION_SET_PERSON);
+            }
+
+            return {
+                ...action,
+                actionsAvailable: actionsFilter.map((type) => type.toString()),
+            };
+        });
+    }
+
     async parseContent() {
         const res = {};
 
@@ -86,72 +218,26 @@ export class ImportRuleForm extends TestComponent {
             ),
         };
 
-        const ruleData = {};
         const ruleId = parseInt(cont.idInput.value, 10);
         if (ruleId) {
             res.id = ruleId;
-            ruleData.id = ruleId;
         }
 
-        ruleData.conditions = res.conditions.map(
-            (item) => this.getExpectedCondition(item),
-        );
-        ruleData.actions = res.actions.map(
-            (item) => this.getExpectedAction(item),
-        );
-
-        res.rule = new ImportRule(ruleData);
+        this.setExpectedRule(res);
 
         return res;
     }
 
-    static getExpectedState(model) {
-        const res = {
-            conditionsList: { visible: true },
-            actionsList: { visible: true },
-        };
-
-        res.conditionsList.items = model.conditions.map(
-            (item) => ImportConditionForm.getExpectedState(item),
-        );
-
-        res.actionsList.items = model.actions.map(
-            (item) => ImportActionForm.getExpectedState(item),
-        );
-
-        return res;
+    getExpectedState(model = this.model) {
+        return ImportRuleForm.getExpectedState(model);
     }
 
-    getExpectedCondition(model) {
-        return {
-            field_id: parseInt(model.fieldType, 10),
-            operator: parseInt(model.operator, 10),
-            value: model.value.toString(),
-            flags: (model.isFieldValue) ? IMPORT_COND_OP_FIELD_FLAG : 0,
-        };
+    getExpectedRule(model = this.model) {
+        return ImportRuleForm.getExpectedRule(model);
     }
 
-    getExpectedAction(model) {
-        return {
-            action_id: parseInt(model.actionType, 10),
-            value: model.value.toString(),
-        };
-    }
-
-    /** Return expected import rule object */
-    getExpectedRule() {
-        const res = {
-            flags: 0,
-        };
-
-        res.conditions = this.model.conditions.map((item) => this.getExpectedCondition(item));
-        res.actions = this.model.actions.map((item) => this.getExpectedAction(item));
-
-        if (this.model.id) {
-            res.id = this.model.id;
-        }
-
-        return res;
+    setExpectedRule(model = this.model) {
+        return ImportRuleForm.setExpectedRule(model);
     }
 
     /** Return validation result for expected import rule */
@@ -192,9 +278,24 @@ export class ImportRuleForm extends TestComponent {
         // Obtain action types currently used by rule
         const ruleActionTypes = model.actions.map((action) => action.actionType);
         // Search for first action type not in list
-        return ImportAction.actionTypes.find(
-            (actionType) => !ruleActionTypes.includes(actionType.id),
-        );
+        return ImportAction.actionTypes.find((actionType) => {
+            if (ruleActionTypes.includes(actionType.id)) {
+                return false;
+            }
+
+            if (actionType.id === IMPORT_ACTION_SET_ACCOUNT) {
+                return model.rule.actions.hasSetTransfer();
+            }
+
+            if (actionType.id === IMPORT_ACTION_SET_PERSON) {
+                return (
+                    App.state.persons.length > 0
+                    && model.rule.actions.hasSetDebt()
+                );
+            }
+
+            return true;
+        });
     }
 
     getDefaultValue(fieldId) {
@@ -252,10 +353,21 @@ export class ImportRuleForm extends TestComponent {
     }
 
     async addCondition() {
+        const { conditions } = this.model.rule;
+
         const fieldType = this.getNextAvailProperty(this.model);
+        const hasNotIsCond = conditions.hasNotIsCondition(fieldType.id);
+        if (hasNotIsCond && fieldType.operators.length < 2) {
+            return;
+        }
+
+        const operator = (hasNotIsCond)
+            ? fieldType.operators[0]
+            : fieldType.operators[1];
+
         const condition = {
             fieldType: fieldType.id,
-            operator: fieldType.operators[0],
+            operator,
             value: this.getDefaultValue(fieldType.id),
             isFieldValue: false,
         };
@@ -264,7 +376,7 @@ export class ImportRuleForm extends TestComponent {
         condition[condition.state] = condition.value;
 
         this.model.conditions.push(condition);
-        this.expectedState = ImportRuleForm.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.openConditions();
 
@@ -279,7 +391,7 @@ export class ImportRuleForm extends TestComponent {
         assert.arrayIndex(this.content.conditionsList.content.items, ind);
 
         this.model.conditions.splice(ind, 1);
-        this.expectedState = ImportRuleForm.getExpectedState(this.model);
+        this.expectedState = this.getExpectedState();
 
         await this.openConditions();
 
@@ -295,11 +407,144 @@ export class ImportRuleForm extends TestComponent {
         const ind = parseInt(index, 10);
         assert.arrayIndex(this.content.conditionsList.content.items, ind);
 
+        if (action === 'changeFieldType') {
+            return this.changeConditionFieldType(index, data);
+        }
+        if (action === 'changeOperator') {
+            return this.changeConditionOperator(index, data);
+        }
+        if (action === 'changeTemplate') {
+            return this.changeConditionTemplate(index, data);
+        }
+        if (action === 'changeAccount') {
+            return this.changeConditionAccount(index, data);
+        }
+        if (action === 'changeCurrency') {
+            return this.changeConditionCurrency(index, data);
+        }
+        if (action === 'changeProperty') {
+            return this.changeConditionProperty(index, data);
+        }
+        if (action === 'inputAmount') {
+            return this.inputConditionAmount(index, data);
+        }
+        if (action === 'inputValue') {
+            return this.inputConditionValue(index, data);
+        }
+        if (action === 'togglePropValue') {
+            return this.toggleConditionPropValue(index);
+        }
+        if (action === 'clickDelete') {
+            return this.deleteCondition(index);
+        }
+
+        throw new Error(`Invalid action for Import condition: ${action}`);
+    }
+
+    async changeConditionFieldType(index, value) {
+        const ind = parseInt(index, 10);
+        assert.arrayIndex(this.content.conditionsList.content.items, ind);
+
+        const conditionModel = this.model.conditions[ind];
+
+        const fieldId = parseInt(value, 10);
+        conditionModel.fieldType = fieldId;
+        const field = ImportCondition.getFieldTypeById(fieldId);
+        if (!field.operators.includes(conditionModel.operator)) {
+            [conditionModel.operator] = field.operators;
+        }
+        conditionModel.state = ImportConditionForm.getStateName(conditionModel);
+        conditionModel.value = ImportConditionForm.getStateValue(conditionModel);
+        this.expectedState = this.getExpectedState();
+
         await this.openConditions();
 
-        const item = this.content.conditionsList.content.items[index];
-        await item.runAction(action, data);
-        await this.parse();
+        const item = this.content.conditionsList.content.items[ind];
+        await this.performAction(() => item.changeFieldType(value));
+
+        return this.checkState();
+    }
+
+    async changeConditionValue(index, name, value) {
+        const ind = parseInt(index, 10);
+        assert.arrayIndex(this.content.conditionsList.content.items, ind);
+
+        const conditionModel = this.model.conditions[ind];
+        assert(conditionModel.state === name, `Invalid state ${conditionModel.state} expected ${name}`);
+
+        if (name === 'amount') {
+            conditionModel[name] = trimToDigitsLimit(value, 2);
+        } else {
+            conditionModel[name] = value;
+        }
+        conditionModel.value = ImportConditionForm.getStateValue(conditionModel);
+        this.expectedState = this.getExpectedState();
+
+        await this.openConditions();
+
+        const item = this.content.conditionsList.content.items[ind];
+        await this.performAction(() => item.changeValue(name, value));
+
+        return this.checkState();
+    }
+
+    async changeConditionOperator(index, value) {
+        const ind = parseInt(index, 10);
+        assert.arrayIndex(this.content.conditionsList.content.items, ind);
+
+        const conditionModel = this.model.conditions[ind];
+        conditionModel.operator = value;
+        conditionModel.value = ImportConditionForm.getStateValue(conditionModel);
+        this.expectedState = this.getExpectedState();
+
+        await this.openConditions();
+
+        const item = this.content.conditionsList.content.items[ind];
+        await this.performAction(() => item.changeOperator(value));
+
+        return this.checkState();
+    }
+
+    async changeConditionTemplate(index, value) {
+        return this.changeConditionValue(index, 'template', value);
+    }
+
+    async changeConditionAccount(index, value) {
+        return this.changeConditionValue(index, 'account', value);
+    }
+
+    async changeConditionCurrency(index, value) {
+        return this.changeConditionValue(index, 'currency', value);
+    }
+
+    async changeConditionProperty(index, value) {
+        return this.changeConditionValue(index, 'property', value);
+    }
+
+    async inputConditionAmount(index, value) {
+        return this.changeConditionValue(index, 'amount', value);
+    }
+
+    async inputConditionValue(index, value) {
+        return this.changeConditionValue(index, 'text', value);
+    }
+
+    async toggleConditionPropValue(index, value) {
+        const ind = parseInt(index, 10);
+        assert.arrayIndex(this.content.conditionsList.content.items, ind);
+
+        const conditionModel = this.model.conditions[ind];
+        conditionModel.isFieldValue = !conditionModel.isFieldValue;
+        conditionModel.state = ImportConditionForm.getStateName(conditionModel);
+        conditionModel.value = ImportConditionForm.getStateValue(conditionModel);
+        this.expectedState = this.getExpectedState();
+
+        await this.openConditions();
+
+        const item = this.content.conditionsList.content.items[ind];
+        await this.performAction(() => item.togglePropValue(value));
+
+        return this.checkState();
     }
 
     async openActions() {
@@ -316,7 +561,8 @@ export class ImportRuleForm extends TestComponent {
             value: this.getActionDefaultValue(actionType.id),
         };
         this.model.actions.push(action);
-        this.expectedState = ImportRuleForm.getExpectedState(this.model);
+
+        this.expectedState = this.getExpectedState();
 
         await this.openActions();
 
@@ -330,8 +576,18 @@ export class ImportRuleForm extends TestComponent {
         const ind = parseInt(index, 10);
         assert.arrayIndex(this.content.actionsList.content.items, ind);
 
+        const removedAction = this.model.actions[ind];
         this.model.actions.splice(ind, 1);
-        this.expectedState = ImportRuleForm.getExpectedState(this.model);
+
+        // Remove `Set account` and `Set person` actions if `Set transaction type` was removed
+        if (removedAction.actionType === IMPORT_ACTION_SET_TR_TYPE) {
+            const actionsToRemove = [IMPORT_ACTION_SET_ACCOUNT, IMPORT_ACTION_SET_PERSON];
+            this.model.actions = this.model.actions.filter((action) => (
+                !actionsToRemove.includes(action.actionType)
+            ));
+        }
+
+        this.expectedState = this.getExpectedState();
 
         await this.openActions();
 
@@ -344,14 +600,114 @@ export class ImportRuleForm extends TestComponent {
     }
 
     async runOnAction(index, { action, data }) {
+        if (action === 'changeAction') {
+            return this.changeActionType(index, data);
+        }
+        if (action === 'changeTransactionType') {
+            return this.changeActionTransactionType(index, data);
+        }
+        if (action === 'changeAccount') {
+            return this.changeActionAccount(index, data);
+        }
+        if (action === 'changePerson') {
+            return this.changeActionPerson(index, data);
+        }
+        if (action === 'inputAmount') {
+            return this.inputActionAmount(index, data);
+        }
+        if (action === 'inputValue') {
+            return this.inputActionValue(index, data);
+        }
+        if (action === 'clickDelete') {
+            return this.deleteAction(index);
+        }
+
+        throw new Error(`Invalid action for Import action: ${action}`);
+    }
+
+    onActionUpdate() {
+        this.setExpectedRule();
+
+        // Check `Set transaction type` action was changed and remove not available
+        // `Set account` or `Set person` action
+        const hasTransfer = this.model.rule.actions.hasSetTransfer();
+        const hasDebt = this.model.rule.actions.hasSetDebt();
+
+        this.model.actions = this.model.actions.filter((action) => {
+            if (action.actionType === IMPORT_ACTION_SET_ACCOUNT) {
+                return hasTransfer;
+            }
+
+            if (action.actionType === IMPORT_ACTION_SET_PERSON) {
+                return hasDebt;
+            }
+
+            return true;
+        });
+    }
+
+    async changeActionType(index, value) {
         const ind = parseInt(index, 10);
         assert.arrayIndex(this.content.actionsList.content.items, ind);
 
+        const actionModel = this.model.actions[ind];
+        const actionId = parseInt(value, 10);
+        actionModel.actionType = actionId;
+        actionModel.state = ImportActionForm.getStateName(actionModel);
+        actionModel.value = ImportActionForm.getStateValue(actionModel);
+
+        this.onActionUpdate();
+        this.expectedState = this.getExpectedState();
+
         await this.openActions();
 
-        const item = this.content.actionsList.content.items[index];
-        await item.runAction(action, data);
-        await this.parse();
+        const item = this.content.actionsList.content.items[ind];
+        await this.performAction(() => item.changeAction(value));
+
+        await this.checkState();
+    }
+
+    async changeActionValue(index, name, value) {
+        const ind = parseInt(index, 10);
+        assert.arrayIndex(this.content.actionsList.content.items, ind);
+
+        const actionModel = this.model.actions[ind];
+        if (name === 'amount') {
+            actionModel[name] = trimToDigitsLimit(value, 2);
+        } else {
+            actionModel[name] = value;
+        }
+        actionModel.value = ImportActionForm.getStateValue(actionModel);
+
+        this.onActionUpdate();
+        this.expectedState = this.getExpectedState();
+
+        await this.openActions();
+
+        const item = this.content.actionsList.content.items[ind];
+        await this.performAction(() => item.changeValue(name, value));
+
+        await this.checkState();
+    }
+
+    async changeActionTransactionType(index, value) {
+        return this.changeActionValue(index, 'transType', value);
+    }
+
+    async changeActionAccount(index, value) {
+        return this.changeActionValue(index, 'account', value);
+    }
+
+    async changeActionPerson(index, value) {
+        return this.changeActionValue(index, 'person', value);
+    }
+
+    async inputActionAmount(index, value) {
+        return this.changeActionValue(index, 'amount', value);
+    }
+
+    async inputActionValue(index, value) {
+        return this.changeActionValue(index, 'text', value);
     }
 
     async submit() {
@@ -360,14 +716,5 @@ export class ImportRuleForm extends TestComponent {
 
     async cancel() {
         await click(this.content.cancelBtn.elem);
-    }
-
-    /**
-     * Convert import rule object to expected state of component
-     * @param {Object} item - import rule object
-     * @param {AppState} state - application state
-     */
-    static render(item, state) {
-        assert(item && state, 'Invalid parameters');
     }
 }

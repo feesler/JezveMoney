@@ -1,10 +1,4 @@
-<?php   if (isset($hidden) && $hidden) {  ?>
-<div id="<?=e($id)?>" hidden>
-<?php   } else {    ?>
-<div id="<?=e($id)?>">
-<?php   }   ?>
-    <span><?=e($title)?></span>
-    <div>
-        <button class="dashed-btn" type="button"><span><?=e($value)?></span></button>
-    </div>
+<div id="<?= e($id) ?>" class="tile-info-item" <?= hidden(isset($hidden) && $hidden) ?>>
+    <span><?= e($title) ?></span>
+    <button class="btn dashed-btn" type="button"><?= e($value) ?></button>
 </div>

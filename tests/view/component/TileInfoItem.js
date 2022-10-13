@@ -10,15 +10,13 @@ export class TileInfoItem extends TestComponent {
     async parseContent() {
         const res = {};
 
-        res.titleElem = await query(this.elem, ':scope > *');
+        res.titleElem = await query(this.elem, 'span');
         assert(res.titleElem, 'Title element not found');
         res.title = await prop(res.titleElem, 'textContent');
 
         res.buttonElem = await query(this.elem, 'button');
         assert(res.buttonElem, 'Button element not found');
-        const buttonInner = await query(res.buttonElem, 'span');
-        assert(buttonInner, 'Wrong structure of tile info block');
-        res.value = await prop(buttonInner, 'textContent');
+        res.value = await prop(res.buttonElem, 'textContent');
 
         return res;
     }

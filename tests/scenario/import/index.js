@@ -8,10 +8,9 @@ import { importItemsTests } from './items.js';
 import { importRuleTests } from './rules.js';
 import { importTemplateTests } from './templates.js';
 
-let cardStatement = null;
-let cardUploadFilename = null;
-let accountStatement = null;
-let accountUploadFilename = null;
+let cardFile = null;
+let accountFile = null;
+const files = [];
 
 const runSubmitImportTests = async () => {
     setBlock('Submit import transactions', 1);
@@ -69,12 +68,9 @@ const runSubmitImportTests = async () => {
 
     // Verify submit is disabled for list with no enabled items
     setBlock('Verify submit is disabled for list with no enabled items', 2);
-    await ImportTests.uploadFile({
-        filename: cardUploadFilename,
-        data: cardStatement,
-    });
+    await ImportTests.uploadFile(cardFile);
     await ImportTests.submitUploaded({
-        data: cardStatement,
+        ...cardFile,
         template: 0,
     });
     await ImportTests.enableItems({
@@ -84,9 +80,38 @@ const runSubmitImportTests = async () => {
     await ImportTests.submit();
 };
 
+const runCheckSimilarTests = async () => {
+    setBlock('Enable/disable check similar transactions', 1);
+    // Check option change is correctly update already uploaded transactions
+    await ImportTests.uploadFile(cardFile);
+    await ImportTests.submitUploaded({
+        ...cardFile,
+        account: App.scenario.ACC_RUB,
+    });
+    await ImportTests.enableCheckSimilar(false);
+    await ImportTests.enableCheckSimilar(true);
+    await ImportTests.enableCheckSimilar(false);
+    // Check option change is correctly affect on new uploaded transactions
+    await ImportTests.deleteAllItems();
+    await ImportTests.uploadFile(cardFile);
+    await ImportTests.submitUploaded({
+        ...cardFile,
+        account: App.scenario.ACC_RUB,
+    });
+    await ImportTests.enableCheckSimilar(true);
+    await ImportTests.deleteAllItems();
+};
+
+const putFile = async (data) => {
+    const filename = await ImportTests.putFile(data);
+    assert(filename, 'Fail to put file');
+
+    return { data, filename };
+};
+
 const putCardCSV = async () => {
     const now = new Date();
-    cardStatement = generateCardCSV([
+    const data = generateCardCSV([
         [now, 'MOBILE', 'MOSKVA', 'RU', 'RUB', '-500.00'],
         [now, 'SALON', 'SANKT-PETERBU', 'RU', 'RUB', '-80.00'],
         [now, 'OOO SIGMA', 'MOSKVA', 'RU', 'RUB', '-128.00'],
@@ -96,20 +121,19 @@ const putCardCSV = async () => {
         [now, 'BAR', 'SANKT-PETERBU', 'RU', 'RUB', '-443.00'],
         [now, 'DOSTAVKA', 'SANKT-PETERBU', 'RU', 'RUB', '-688.00'],
         [now, 'PRODUCTY', 'SANKT-PETERBU', 'RU', 'RUB', '-550.5'],
-        [now, 'BOOKING', 'AMSTERDAM', 'NL', 'EUR', '-500.00', 'RUB', '-50750.35'],
-        [now, 'SALARY', 'MOSKVA', 'RU', 'RUB', '100000.00'],
+        [now, 'BOOKING', 'AMSTERDAM', 'NL', 'EUR', '-500.00', 'RUB', '-50 750.35'],
+        [now, 'SALARY', 'MOSKVA', 'RU', 'RUB', '100 000.00'],
         [now, 'INTEREST', 'SANKT-PETERBU', 'RU', 'RUB', '23.16'],
-        [now, 'RBA R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-5000.00'],
-        [now, 'C2C R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-10000.00'],
+        [now, 'RBA R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-5 000.00'],
+        [now, 'C2C R-BANK', 'SANKT-PETERBU', 'RU', 'RUB', '-10 000.00'],
     ]);
 
-    cardUploadFilename = await ImportTests.putFile(cardStatement);
-    assert(cardUploadFilename, 'Fail to put file');
+    return putFile(data);
 };
 
 const putAccountCSV = async () => {
     const now = new Date();
-    accountStatement = generateAccountCSV([
+    const data = generateAccountCSV([
         [now, 'MOBILE', 'RUB', '-500.00'],
         [now, 'SALON', 'RUB', '-80.00'],
         [now, 'OOO SIGMA', 'RUB', '-128.00'],
@@ -119,24 +143,24 @@ const putAccountCSV = async () => {
         [now, 'BAR', 'RUB', '-443.00'],
         [now, 'DOSTAVKA', 'RUB', '-688.00'],
         [now, 'PRODUCTY', 'RUB', '-550.5'],
-        [now, 'BOOKING', 'EUR', '-500.00', 'RUB', '-50750.35'],
-        [now, 'SALARY', 'RUB', '100000.00'],
-        [now, 'CASHBACK', 'PLN', '136.50', 'RUB', '4257.11'],
+        [now, 'BOOKING', 'EUR', '-500.00', 'RUB', '-50 750.35'],
+        [now, 'SALARY', 'RUB', '100 000.00'],
+        [now, 'CASHBACK', 'PLN', '136.50', 'RUB', '4 257.11'],
         [now, 'INTEREST', 'RUB', '23.16'],
-        [now, 'RBA R-BANK', 'RUB', '-5000.00'],
-        [now, 'C2C R-BANK', 'RUB', '-10000.00'],
+        [now, 'RBA R-BANK', 'RUB', '-5 000.00'],
+        [now, 'C2C R-BANK', 'RUB', '-10 000.00'],
     ]);
 
-    accountUploadFilename = await ImportTests.putFile(accountStatement);
-    assert(accountUploadFilename, 'Fail to put file');
+    return putFile(data);
 };
 
 /** Login as admin and upload CSV files  */
 const prepareFiles = async () => {
     await ApiTests.loginTest(App.config.testAdminUser);
 
-    await putCardCSV();
-    await putAccountCSV();
+    cardFile = await putCardCSV();
+    accountFile = await putAccountCSV();
+    files.push(cardFile, accountFile);
 
     await ApiTests.loginTest(App.config.testUser);
 };
@@ -198,10 +222,11 @@ const preparePersons = async () => {
 const removeFiles = async () => {
     await ApiTests.loginTest(App.config.testAdminUser);
 
-    await ImportTests.removeFile(cardUploadFilename);
-    cardUploadFilename = null;
-    await ImportTests.removeFile(accountUploadFilename);
-    accountUploadFilename = null;
+    await ImportTests.removeFile(cardFile.filename);
+    cardFile = null;
+    await ImportTests.removeFile(accountFile.filename);
+    accountFile = null;
+    files.length = 0;
 
     await ApiTests.loginTest(App.config.testUser);
 };
@@ -235,15 +260,7 @@ export const importTests = {
         await importRuleTests.run();
         await importItemsTests.createTests();
 
-        await importTemplateTests.run({
-            files: [{
-                filename: cardUploadFilename,
-                data: cardStatement,
-            }, {
-                filename: accountUploadFilename,
-                data: accountStatement,
-            }],
-        });
+        await importTemplateTests.run({ files });
 
         // Obtain card template
         const template = App.state.templates.getItemByIndex(0);
@@ -251,12 +268,9 @@ export const importTests = {
         await importRuleTests.createTemplateRule(template.id);
 
         setBlock('Upload CSV with invalid account', 2);
-        await ImportTests.uploadFile({
-            filename: cardUploadFilename,
-            data: cardStatement,
-        });
+        await ImportTests.uploadFile(cardFile);
         await ImportTests.submitUploaded({
-            data: cardStatement,
+            ...cardFile,
             account: App.scenario.ACC_USD,
         });
 
@@ -264,34 +278,27 @@ export const importTests = {
         await ImportTests.changeMainAccount(App.scenario.ACC_RUB);
 
         setBlock('Convert transactions', 2);
-        await ImportTests.uploadFile({
-            filename: cardUploadFilename,
-            data: cardStatement,
-        });
-        await ImportTests.submitUploaded({
-            data: cardStatement,
-        });
+        await ImportTests.uploadFile(cardFile);
+        await ImportTests.submitUploaded(cardFile);
         setBlock('Check pagination', 2);
-        await ImportTests.uploadFile({
-            filename: cardUploadFilename,
-            data: cardStatement,
-        });
-        await ImportTests.submitUploaded({
-            data: cardStatement,
-        });
+        await ImportTests.uploadFile(cardFile);
+        await ImportTests.submitUploaded(cardFile);
+        await ImportTests.addItem();
+        await ImportTests.goToPrevPage();
+        await ImportTests.submit();
+
         // Delete all
         setBlock('Delete all items', 2);
         await ImportTests.deleteAllItems();
 
+        await runCheckSimilarTests();
+
         // Enable/disable rules
-        setBlock('Enable/disable rules', 2);
+        setBlock('Enable/disable rules', 1);
         // Upload again
-        await ImportTests.uploadFile({
-            filename: cardUploadFilename,
-            data: cardStatement,
-        });
+        await ImportTests.uploadFile(cardFile);
         await ImportTests.submitUploaded({
-            data: cardStatement,
+            ...cardFile,
             account: App.scenario.ACC_RUB,
         });
 

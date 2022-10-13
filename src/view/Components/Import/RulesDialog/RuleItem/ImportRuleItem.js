@@ -1,13 +1,13 @@
 import {
-    ce,
+    createElement,
     isFunction,
     show,
     copyObject,
     addChilds,
     removeChilds,
     Component,
-    Collapsible,
 } from 'jezvejs';
+import { Collapsible } from 'jezvejs/Collapsible';
 import { ImportRule } from '../../../../js/model/ImportRule.js';
 import { ImportConditionList } from '../../../../js/model/ImportConditionList.js';
 import { ImportActionList } from '../../../../js/model/ImportActionList.js';
@@ -26,6 +26,11 @@ const TITLE_ACTIONS = 'Actions';
 const TITLE_NO_ACTIONS = 'No actions.';
 const TITLE_NO_CONDITIONS = 'No conditions';
 
+const defaultProps = {
+    onUpdate: null,
+    onRemove: null,
+};
+
 /**
  * ImportRuleItem component
  * @param {Object} props
@@ -41,10 +46,14 @@ export class ImportRuleItem extends Component {
         if (!this.props?.data) {
             throw new Error('Invalid props');
         }
-
         if (!(this.props.data instanceof ImportRule)) {
             throw new Error('Invalid rule item');
         }
+
+        this.props = {
+            ...defaultProps,
+            ...this.props,
+        };
 
         this.init();
         this.setData(this.props.data);
@@ -52,17 +61,17 @@ export class ImportRuleItem extends Component {
 
     /** Main structure initialization */
     init() {
-        this.propertyLabel = ce('span', { className: 'rule-item__property' });
-        this.operatorLabel = ce('span', { className: 'rule-item__operator' });
-        this.valueLabel = ce('span', { className: 'rule-item__value' });
-        this.infoLabel = ce('span', { className: 'rule-item__info' });
+        this.propertyLabel = createElement('span', { props: { className: 'rule-item__property' } });
+        this.operatorLabel = createElement('span', { props: { className: 'rule-item__operator' } });
+        this.valueLabel = createElement('span', { props: { className: 'rule-item__value' } });
+        this.infoLabel = createElement('span', { props: { className: 'rule-item__info' } });
 
         // Toggle expand/collapse
-        this.toggleExtBtn = ce(
-            'button',
-            { className: 'btn icon-btn toggle-btn', type: 'button' },
-            window.app.createIcon('toggle-ext', 'icon toggle-icon'),
-        );
+        this.toggleExtBtn = createElement('button', {
+            props: { className: 'btn icon-btn toggle-btn', type: 'button' },
+            children: window.app.createIcon('toggle-ext', 'icon toggle-icon'),
+            events: { click: (e) => this.onToggle(e) },
+        });
 
         this.topRow = window.app.createContainer('rule-item__main-top', [
             this.propertyLabel,
@@ -84,13 +93,18 @@ export class ImportRuleItem extends Component {
             this.toggleExtBtn,
         ]);
 
-        this.conditionsHeader = ce('label', { className: 'rule-item__header', textContent: TITLE_CONDITIONS });
+        this.conditionsHeader = createElement('label', {
+            props: { className: 'rule-item__header', textContent: TITLE_CONDITIONS },
+        });
         this.conditionsContainer = window.app.createContainer('rule-item__conditions', []);
 
-        this.actionsHeader = ce('label', { className: 'rule-item__header', textContent: TITLE_ACTIONS });
+        this.actionsHeader = createElement('label', {
+            props: { className: 'rule-item__header', textContent: TITLE_ACTIONS },
+        });
         this.actionsContainer = window.app.createContainer('rule-item__actions', []);
 
-        this.collapse = new Collapsible({
+        this.collapse = Collapsible.create({
+            toggleOnClick: false,
             className: 'rule-item',
             header: [this.infoContainer, this.controls],
             content: [
@@ -148,6 +162,11 @@ export class ImportRuleItem extends Component {
         res.conditions = copyObject(this.state.conditions);
 
         return res;
+    }
+
+    /** Toggle expand/collapse button 'click' event handler */
+    onToggle() {
+        this.collapse.toggle();
     }
 
     /** Update button 'click' event handler */

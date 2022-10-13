@@ -318,13 +318,18 @@ function svgIcon($name, $className = null)
 
 // Return SVG use content for specified icon
 // Related SVG symbols should be available on target page
-function useIcon($name)
+function useIcon($name, $className = null)
 {
     if (is_empty($name)) {
         return "";
     }
 
-    return "<svg class=\"tile__icon-content\"><use xlink:href=\"#$name\"></use></svg>";
+    $attrs = "";
+    if (!is_null($className)) {
+        $attrs = " class=\"" . e($className) . "\"";
+    }
+
+    return "<svg$attrs><use xlink:href=\"#$name\"></use></svg>";
 }
 
 // Returns 'hidden' string if condition is true

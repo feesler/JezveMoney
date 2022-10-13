@@ -3,17 +3,18 @@ import {
     createElement,
     addChilds,
     removeChilds,
+    enable,
     Component,
 } from 'jezvejs';
 import './style.scss';
 
 /* CSS classes */
-const CONTAINER_CLASS = 'iconlink';
-const ICON_CONTAINER_CLASS = 'iconlink__icon';
-const ICON_CLASS = 'iconlink__icon-content';
-const CONTENT_CLASS = 'iconlink__content';
-const TITLE_CLASS = 'iconlink__title';
-const SUBTITLE_CLASS = 'iconlink__subtitle';
+const CONTAINER_CLASS = 'iconbutton';
+const ICON_CONTAINER_CLASS = 'iconbutton__icon';
+const ICON_CLASS = 'iconbutton__icon-content';
+const CONTENT_CLASS = 'iconbutton__content';
+const TITLE_CLASS = 'iconbutton__title';
+const SUBTITLE_CLASS = 'iconbutton__subtitle';
 
 const defaultProps = {
     type: 'button', // button or link
@@ -26,18 +27,18 @@ const defaultProps = {
 };
 
 /**
- * IconLink component
+ * IconButton component
  */
-export class IconLink extends Component {
+export class IconButton extends Component {
     static create(props) {
-        const instance = new IconLink(props);
+        const instance = new IconButton(props);
         instance.init();
 
         return instance;
     }
 
     static fromElement(props) {
-        const instance = new IconLink(props);
+        const instance = new IconButton(props);
         instance.parse();
 
         return instance;
@@ -72,18 +73,16 @@ export class IconLink extends Component {
 
         const isLink = (this.props.type === 'link');
         if (isLink) {
-            this.buttonElem = createElement('a');
+            this.elem = createElement('a', {
+                props: { className: CONTAINER_CLASS },
+                children: [this.iconElem, this.contentElem],
+            });
         } else {
-            this.buttonElem = createElement('button', {
-                props: { type: 'button' },
+            this.elem = createElement('button', {
+                props: { className: CONTAINER_CLASS, type: 'button' },
+                children: [this.iconElem, this.contentElem],
             });
         }
-        this.buttonElem.append(this.iconElem, this.contentElem);
-
-        this.elem = createElement('div', {
-            props: { className: CONTAINER_CLASS },
-            children: this.buttonElem,
-        });
 
         this.setClassNames();
         this.setHandlers();
@@ -91,24 +90,20 @@ export class IconLink extends Component {
     }
 
     parse() {
-        if (!(this.elem instanceof Element)) {
+        if (!this.elem) {
             throw new Error('Invalid element specified');
         }
 
         this.state = {};
 
-        this.buttonElem = this.elem.querySelector('button,a');
-        if (this.buttonElem && isFunction(this.props.onclick)) {
-            this.buttonElem.addEventListener('click', this.props.onclick);
-        }
-        if (this.buttonElem.tagName === 'A') {
-            this.state.url = this.buttonElem.href;
+        if (this.elem.tagName === 'A') {
+            this.state.url = this.elem.href;
         }
 
-        this.iconElem = this.buttonElem.querySelector(`.${ICON_CONTAINER_CLASS}`);
-        this.contentElem = this.buttonElem.querySelector(`.${CONTENT_CLASS}`);
+        this.iconElem = this.elem.querySelector(`.${ICON_CONTAINER_CLASS}`);
+        this.contentElem = this.elem.querySelector(`.${CONTENT_CLASS}`);
         if (!this.contentElem) {
-            throw new Error('Invalid structure of iconlink element');
+            throw new Error('Invalid structure of iconbutton element');
         }
 
         this.titleElem = this.contentElem.querySelector(`.${TITLE_CLASS}`);
@@ -137,17 +132,16 @@ export class IconLink extends Component {
             return;
         }
 
-        this.buttonElem.addEventListener('click', (e) => this.props.onClick(e));
+        this.elem.addEventListener('click', (e) => this.props.onClick(e));
     }
 
     /** Set title text */
     enable(value) {
-        const enable = !!value;
-        if (this.state.enabled === enable) {
+        if (this.state.enabled === !!value) {
             return;
         }
 
-        this.state.enabled = enable;
+        this.state.enabled = !!value;
         this.render(this.state);
     }
 
@@ -197,16 +191,10 @@ export class IconLink extends Component {
     render(state) {
         removeChilds(this.contentElem);
 
-        if (state.enabled) {
-            this.elem.removeAttribute('disabled');
-            this.buttonElem.removeAttribute('disabled');
-        } else {
-            this.elem.setAttribute('disabled', '');
-            this.buttonElem.setAttribute('disabled', '');
-        }
+        enable(this.elem, state.enabled);
 
-        if (this.buttonElem.tagName === 'A') {
-            this.buttonElem.href = state.url;
+        if (this.elem.tagName === 'A') {
+            this.elem.href = state.url;
         }
 
         if (state.subtitle) {

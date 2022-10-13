@@ -19,22 +19,22 @@
     min-width: 15px;
     height: 100%;
 
-    .iconlink {
+    .iconbutton {
       display: flex;
       margin: 9px 12px;
     }
 
-    .iconlink span {
+    .iconbutton span {
       color: #ffffff;
     }
   }
 
-  .sidebar__controls .iconlink {
-    .iconlink__icon {
+  .sidebar__controls .iconbutton {
+    .iconbutton__icon {
       border-color: #ffffff;
     }
 
-    .iconlink__icon-content {
+    .iconbutton__icon-content {
       fill: #ffffff;
     }
   }
@@ -88,12 +88,12 @@
       padding: 0;
     }
 
-    .sidebar__controls .iconlink:hover .iconlink__icon-content {
+    .sidebar__controls .iconbutton:hover .iconbutton__icon-content {
       fill: #44aaff;
     }
   }
 
-  .siderbar__content .iconlink {
+  .siderbar__content .iconbutton {
     margin: 9px 0 9px 12px;
   }
 
@@ -103,12 +103,12 @@
 }
 
 @media (hover: hover) {
-  .sidebar .sidebar__controls .iconlink {
-    &:hover .iconlink__icon {
+  .sidebar .sidebar__controls .iconbutton:hover {
+    .iconbutton__icon {
       background-color: #ffffff;
     }
 
-    &:hover .iconlink__icon-content {
+    .iconbutton__icon-content {
       fill: #404040;
     }
   }

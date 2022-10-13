@@ -3,9 +3,8 @@ import {
     isFunction,
     removeChilds,
     Component,
-    Selection,
-    Sortable,
 } from 'jezvejs';
+import { Sortable } from 'jezvejs/Sortable';
 import {
     TRANS_ITEM_CLASS,
     TransactionListItem,
@@ -52,13 +51,8 @@ export class TransactionList extends Component {
 
         this.state = {
             ...this.props,
-            selectedItems: new Selection(),
             renderTime: Date.now(),
         };
-    }
-
-    get selectedItems() {
-        return this.state.selectedItems;
     }
 
     init() {
@@ -78,6 +72,16 @@ export class TransactionList extends Component {
         }
 
         this.render(this.state);
+    }
+
+    /** Returns array of list items */
+    getItems() {
+        return this.state.items;
+    }
+
+    /** Returns array of selected items */
+    getSelectedItems() {
+        return this.state.items.filter((item) => item.selected);
     }
 
     /**
@@ -261,11 +265,11 @@ export class TransactionList extends Component {
             return;
         }
 
-        if (this.state.selectedItems.isSelected(transactionId)) {
-            this.state.selectedItems.deselect(transactionId);
-        } else {
-            this.state.selectedItems.select(transactionId);
-        }
+        this.state.items = this.state.items.map((item) => (
+            (item.id === transactionId)
+                ? { ...item, selected: !item.selected }
+                : item
+        ));
 
         if (isFunction(this.props.onSelect)) {
             this.props.onSelect();
@@ -314,7 +318,6 @@ export class TransactionList extends Component {
             return;
         }
 
-        this.state.selectedItems.clear();
         this.state.items = items;
         this.state.renderTime = Date.now();
 
@@ -329,7 +332,7 @@ export class TransactionList extends Component {
         const elems = state.items.map((item) => {
             const tritem = TransactionListItem.create({
                 mode: state.mode,
-                selected: state.selectedItems.isSelected(item.id),
+                selected: item.selected,
                 item,
             });
             tritem.render(tritem.state);

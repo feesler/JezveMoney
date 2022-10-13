@@ -8,7 +8,7 @@ import {
     assert,
     copyObject,
 } from 'jezve-test';
-import { Checkbox } from 'jezvejs/tests';
+import { Checkbox } from 'jezvejs-test';
 import {
     EXPENSE,
     INCOME,
@@ -52,9 +52,9 @@ export class ImportTransactionItem extends TestComponent {
         res.dateField = await this.parseField(await query(this.elem, '.date-field'));
         res.commentField = await this.parseField(await query(this.elem, '.comment-field'));
 
-        res.menuBtn = await query(this.elem, '.menu-btn');
-        res.updateBtn = await query(this.elem, '.update-btn button');
-        res.deleteBtn = await query(this.elem, '.delete-btn button');
+        res.menuBtn = await query(this.elem, '.actions-menu-btn');
+        res.updateBtn = await query(this.elem, '.update-btn');
+        res.deleteBtn = await query(this.elem, '.delete-btn');
         res.toggleBtn = await query(this.elem, '.toggle-btn');
         res.origDataTable = await query(this.elem, '.orig-data-table');
 
@@ -111,6 +111,9 @@ export class ImportTransactionItem extends TestComponent {
             this.data.enabled = this.model.enabled;
             this.data.mainAccount = this.model.mainAccount;
             this.data.importType = this.model.type;
+            if (this.model.original) {
+                this.data.original = { ...this.model.original };
+            }
         }
     }
 

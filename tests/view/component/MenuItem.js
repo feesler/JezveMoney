@@ -6,7 +6,7 @@ import {
     hasClass,
     click,
 } from 'jezve-test';
-import { Checkbox } from 'jezvejs/tests';
+import { Checkbox } from 'jezvejs-test';
 
 export class MenuItem extends TestComponent {
     async parseContent() {

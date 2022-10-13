@@ -5,20 +5,23 @@ import {
     isDate,
     setEvents,
     throttle,
-    Collapsible,
-    DropDown,
-    DatePicker,
-    Paginator,
 } from 'jezvejs';
+import { Collapsible } from 'jezvejs/Collapsible';
+import { DropDown } from 'jezvejs/DropDown';
+import { DatePicker } from 'jezvejs/DatePicker';
+import { Paginator } from 'jezvejs/Paginator';
+import 'jezvejs/style/InputGroup';
 import { Application } from '../../js/Application.js';
-import { API } from '../../js/API.js';
+import '../../css/app.scss';
+import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';
-import { IconLink } from '../../Components/IconLink/IconLink.js';
+import { CurrencyList } from '../../js/model/CurrencyList.js';
+import { AccountList } from '../../js/model/AccountList.js';
+import { PersonList } from '../../js/model/PersonList.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
-import '../../css/app.scss';
 import './style.scss';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { ModeSelector } from '../../Components/ModeSelector/ModeSelector.js';
@@ -47,6 +50,10 @@ class TransactionListView extends View {
             typingSearch: false,
             selDateRange: null,
         };
+
+        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
+        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
+        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
     }
 
     /**
@@ -122,17 +129,9 @@ class TransactionListView extends View {
         }
         setEvents(this.noSearchBtn, { click: () => this.onSearchClear() });
 
-        this.datePickerBtn = IconLink.fromElement({
-            elem: 'calendar_btn',
-            onclick: () => this.showCalendar(),
-        });
-        this.dateBlock = ge('date_block');
         this.datePickerWrapper = ge('calendar');
-
         this.dateInputBtn = ge('cal_rbtn');
-        if (this.dateInputBtn) {
-            this.dateInputBtn.addEventListener('click', () => this.showCalendar());
-        }
+        setEvents(this.dateInputBtn, { click: () => this.showCalendar() });
         this.dateInput = ge('date');
 
         this.noDateBtn = ge('nodatebtn');
@@ -140,12 +139,6 @@ class TransactionListView extends View {
             throw new Error('Failed to initialize Transaction List view');
         }
         setEvents(this.noDateBtn, { click: () => this.onDateClear() });
-
-        this.delForm = ge('delform');
-        this.delTransInp = ge('deltrans');
-        if (!this.delForm || !this.delTransInp) {
-            throw new Error('Failed to initialize Transaction List view');
-        }
 
         const listContainer = document.querySelector('.list-container');
         this.loadingIndicator = LoadingIndicator.create();
@@ -158,7 +151,7 @@ class TransactionListView extends View {
         this.list = TransactionList.create({
             elem: document.querySelector('.trans-list'),
             selectable: true,
-            onSelect: () => this.render(this.state),
+            onSelect: () => this.onItemSelect(),
             sortable: true,
             onSort: (id, pos) => this.sendChangePosRequest(id, pos),
         });
@@ -351,20 +344,42 @@ class TransactionListView extends View {
         this.requestTransactions(this.state.filter);
     }
 
+    async deleteSelected() {
+        if (this.state.loading) {
+            return;
+        }
+        const selectedItems = this.list.getSelectedItems();
+        if (selectedItems.length === 0) {
+            return;
+        }
+        const selectedIds = selectedItems.map((item) => item.id);
+
+        this.startLoading();
+
+        try {
+            await API.transaction.del({ id: selectedIds });
+            this.requestTransactions(this.state.filter);
+        } catch (e) {
+            window.app.createMessage(e.message, 'msg_error');
+            this.stopLoading();
+        }
+    }
+
     /**
      * Create and show transaction delete warning popup
      */
     confirmDelete() {
-        if (this.list.selectedItems.count() === 0) {
+        const selectedItems = this.list.getSelectedItems();
+        if (selectedItems.length === 0) {
             return;
         }
 
-        const multi = (this.list.selectedItems.count() > 1);
+        const multi = (selectedItems.length > 1);
         ConfirmDialog.create({
             id: 'delete_warning',
             title: (multi) ? TITLE_MULTI_TRANS_DELETE : TITLE_SINGLE_TRANS_DELETE,
             content: (multi) ? MSG_MULTI_TRANS_DELETE : MSG_SINGLE_TRANS_DELETE,
-            onconfirm: () => this.delForm.submit(),
+            onconfirm: () => this.deleteSelected(),
         });
     }
 
@@ -445,9 +460,6 @@ class TransactionListView extends View {
         }
 
         this.datePicker.show(!isVisible);
-
-        this.datePickerBtn.hide();
-        show(this.dateBlock, true);
     }
 
     onChangePage(page) {
@@ -460,6 +472,11 @@ class TransactionListView extends View {
     onModeChanged(mode) {
         this.state.mode = mode;
         this.replaceHistory();
+        this.render(this.state);
+    }
+
+    onItemSelect() {
+        this.state.items = this.list.getItems();
         this.render(this.state);
     }
 
@@ -549,8 +566,6 @@ class TransactionListView extends View {
             ? `${state.filter.stdate} - ${state.filter.enddate}`
             : '';
         this.dateInput.value = dateRangeFmt;
-        const dateSubtitle = (isDateFilter) ? dateRangeFmt : null;
-        this.datePickerBtn.setSubtitle(dateSubtitle);
         show(this.noDateBtn, isDateFilter);
 
         // Search form
@@ -581,19 +596,19 @@ class TransactionListView extends View {
         filterUrl.searchParams.set('page', state.pagination.page);
         this.modeSelector.setURL(filterUrl);
 
+        const selectedItems = this.list.getSelectedItems();
+
         // toolbar
-        this.toolbar.updateBtn.show(this.list.selectedItems.count() === 1);
-        this.toolbar.deleteBtn.show(this.list.selectedItems.count() > 0);
+        this.toolbar.updateBtn.show(selectedItems.length === 1);
+        this.toolbar.deleteBtn.show(selectedItems.length > 0);
 
-        const selArr = this.list.selectedItems.getIdArray();
-        this.delTransInp.value = selArr.join();
-
-        if (this.list.selectedItems.count() === 1) {
+        if (selectedItems.length === 1) {
             const { baseURL } = window.app;
-            this.toolbar.updateBtn.setURL(`${baseURL}transactions/update/${selArr[0]}`);
+            const [item] = selectedItems;
+            this.toolbar.updateBtn.setURL(`${baseURL}transactions/update/${item.id}`);
         }
 
-        this.toolbar.show(this.list.selectedItems.count() > 0);
+        this.toolbar.show(selectedItems.length > 0);
 
         if (!state.loading) {
             this.loadingIndicator.hide();

@@ -1,5 +1,5 @@
 import { ge, isFunction, Component } from 'jezvejs';
-import { IconLink } from '../IconLink/IconLink.js';
+import { IconButton } from '../IconButton/IconButton.js';
 import './style.scss';
 
 const TOOLBAR_ACTIVE_CLASS = 'sidebar_active';
@@ -44,35 +44,35 @@ export class Toolbar extends Component {
 
         const editBtn = ge('edit_btn');
         if (editBtn) {
-            this.updateBtn = IconLink.fromElement({ elem: editBtn });
+            this.updateBtn = IconButton.fromElement({ elem: editBtn });
         }
 
         const exportBtn = ge('export_btn');
         if (exportBtn) {
-            this.exportBtn = IconLink.fromElement({ elem: exportBtn });
+            this.exportBtn = IconButton.fromElement({ elem: exportBtn });
         }
 
         const showBtn = ge('show_btn');
         if (showBtn) {
-            this.showBtn = IconLink.fromElement({
+            this.showBtn = IconButton.fromElement({
                 elem: showBtn,
-                onclick: () => this.onShowClick(),
+                onClick: () => this.onShowClick(),
             });
         }
 
         const hideBtn = ge('hide_btn');
         if (hideBtn) {
-            this.hideBtn = IconLink.fromElement({
+            this.hideBtn = IconButton.fromElement({
                 elem: hideBtn,
-                onclick: () => this.onHideClick(),
+                onClick: () => this.onHideClick(),
             });
         }
 
         const deleteBtn = ge('del_btn');
         if (deleteBtn) {
-            this.deleteBtn = IconLink.fromElement({
+            this.deleteBtn = IconButton.fromElement({
                 elem: 'del_btn',
-                onclick: () => this.onDeleteClick(),
+                onClick: () => this.onDeleteClick(),
             });
         }
     }

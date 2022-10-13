@@ -8,7 +8,7 @@ import {
     click,
     wait,
 } from 'jezve-test';
-import { Checkbox } from 'jezvejs/tests';
+import { Checkbox } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { LoginView } from './LoginView.js';
 import { App } from '../Application.js';
@@ -20,28 +20,26 @@ export class ProfileView extends AppView {
     async parseContent() {
         const res = {};
 
-        const blocks = await queryAll('.content_wrap > .profile_block');
+        const blocks = await queryAll('.content_wrap > .profile-block');
         assert(blocks.length === 4, 'Invalid profile view structure');
 
         res.loginElem = await query(blocks[0], 'span');
         res.nameElem = await query('#namestatic');
-        res.nameLinkElem = await query(blocks[1], 'div > a');
-        res.changePassLinkElem = await query(blocks[2], 'div > a');
+        res.nameLinkElem = await query('#changeNameBtn');
+        res.changePassLinkElem = await query('#changePassBtn');
+        res.resetLinkElem = await query('#resetBtn');
+        res.deleteProfileBtn = await query('#delProfileBtn');
         assert(
             res.loginElem
             && res.nameElem
             && res.nameLinkElem
-            && res.changePassLinkElem,
+            && res.changePassLinkElem
+            && res.resetLinkElem,
             'Invalid profile view structure',
         );
 
         res.login = await prop(res.loginElem, 'textContent');
         res.name = await prop(res.nameElem, 'textContent');
-
-        const buttons = await queryAll(blocks[3], 'input[type="button"]');
-        assert(buttons?.length === 2, 'Invalid profile view structure');
-
-        [res.resetBtn, res.deleteProfileBtn] = buttons;
 
         res.changeNamePopup = {
             elem: await query('#chname_popup'),
@@ -76,8 +74,8 @@ export class ProfileView extends AppView {
             accountsCheck: await Checkbox.create(this, await query('#accountsCheck')),
             personsCheck: await Checkbox.create(this, await query('#personsCheck')),
             transactionsCheck: await Checkbox.create(this, await query('#transactionsCheck')),
-            keepAccountsBalanceCheck: await Checkbox.create(this, await query('#keepAccountsBalanceCheck')),
-            importTemplatesCheck: await Checkbox.create(this, await query('#importTemplatesCheck')),
+            keepBalanceCheck: await Checkbox.create(this, await query('#keepBalanceCheck')),
+            importTplCheck: await Checkbox.create(this, await query('#importTplCheck')),
             importRulesCheck: await Checkbox.create(this, await query('#importRulesCheck')),
         };
 
@@ -97,7 +95,7 @@ export class ProfileView extends AppView {
 
     async changeName(newName) {
         await this.performAction(() => click(this.content.nameLinkElem));
-        await this.performAction(() => wait('.popup.chname_popup', { visible: true }));
+        await this.performAction(() => wait('.popup.name-dialog', { visible: true }));
 
         assert(this.content.changeNamePopup?.visible, 'Change name popup not appear');
 
@@ -115,7 +113,7 @@ export class ProfileView extends AppView {
 
     async changePassword(oldPass, newPass) {
         await this.performAction(() => click(this.content.changePassLinkElem));
-        await this.performAction(() => wait('.popup.chpass_popup', { visible: true }));
+        await this.performAction(() => wait('.popup.password-dialog', { visible: true }));
 
         assert(this.content.changePassPopup?.visible, 'Change password popup not appear');
 
@@ -139,9 +137,9 @@ export class ProfileView extends AppView {
     }
 
     async resetData(options = {}) {
-        assert(this.content.resetBtn, 'Reset button not found');
+        assert(this.content.resetLinkElem, 'Reset button not found');
 
-        await this.performAction(() => click(this.content.resetBtn));
+        await this.performAction(() => click(this.content.resetLinkElem));
 
         assert(this.content.resetDataPopup?.visible, 'Change password popup not appear');
 
@@ -166,15 +164,15 @@ export class ProfileView extends AppView {
             await this.performAction(() => transactionsCheck.toggle());
         }
 
-        const { keepAccountsBalanceCheck } = this.content.resetDataPopup;
-        if (('keepbalance' in options) && !keepAccountsBalanceCheck.checked) {
-            assert(!keepAccountsBalanceCheck.disabled, 'Keep accounts balance checkbox is disabled');
-            await this.performAction(() => keepAccountsBalanceCheck.toggle());
+        const { keepBalanceCheck } = this.content.resetDataPopup;
+        if (('keepbalance' in options) && !keepBalanceCheck.checked) {
+            assert(!keepBalanceCheck.disabled, 'Keep accounts balance checkbox is disabled');
+            await this.performAction(() => keepBalanceCheck.toggle());
         }
 
-        const { importTemplatesCheck } = this.content.resetDataPopup;
-        if (('importtpl' in options) && !importTemplatesCheck.checked) {
-            await this.performAction(() => importTemplatesCheck.toggle());
+        const { importTplCheck } = this.content.resetDataPopup;
+        if (('importtpl' in options) && !importTplCheck.checked) {
+            await this.performAction(() => importTplCheck.toggle());
         }
 
         const { importRulesCheck } = this.content.resetDataPopup;
@@ -182,7 +180,10 @@ export class ProfileView extends AppView {
             await this.performAction(() => importRulesCheck.toggle());
         }
 
-        await navigation(() => click(this.content.resetDataPopup.okBtn));
+        await this.performAction(async () => {
+            await click(this.content.resetDataPopup.okBtn);
+            await wait('.popup.msg', { visible: true });
+        });
     }
 
     async deleteProfile() {

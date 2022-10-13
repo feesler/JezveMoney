@@ -1,16 +1,14 @@
 import {
     TestComponent,
     query,
-    queryAll,
     prop,
     click,
     input,
     isVisible,
     assert,
-    isFunction,
     copyObject,
 } from 'jezve-test';
-import { Checkbox, DropDown } from 'jezvejs/tests';
+import { Checkbox, DropDown } from 'jezvejs-test';
 import {
     EXPENSE,
     INCOME,
@@ -35,39 +33,6 @@ export class ImportTransactionForm extends TestComponent {
         this.mainAccount = mainAccount;
 
         this.model = {};
-    }
-
-    mapField(field) {
-        const fieldsMap = {
-            typeField: 'Type',
-            srcAmountField: (f) => f.name === 'src_amount[]',
-            destAmountField: (f) => f.name === 'dest_amount[]',
-            transferAccountField: [
-                'Source account',
-                'Destination account',
-            ],
-            personField: 'Person',
-            dateField: 'Date',
-            commentField: 'Comment',
-        };
-
-        assert(field?.title, 'Invalid field');
-
-        let res = null;
-        for (const fieldName of Object.keys(fieldsMap)) {
-            const fieldLabel = fieldsMap[fieldName];
-            if (
-                (typeof fieldLabel === 'string' && fieldLabel === field.title)
-                || (Array.isArray(fieldLabel) && fieldLabel.includes(field.title))
-                || (isFunction(fieldLabel) && fieldLabel(field))
-            ) {
-                res = { name: fieldName, component: field };
-                break;
-            }
-        }
-
-        assert(res, `Unknown field '${field.title}'`);
-        return res;
     }
 
     async parseField(elem) {
@@ -110,7 +75,7 @@ export class ImportTransactionForm extends TestComponent {
             res.value = await prop(res.inputElem, 'value');
         }
 
-        return this.mapField(res);
+        return res;
     }
 
     async parseContent() {
@@ -122,13 +87,31 @@ export class ImportTransactionForm extends TestComponent {
         assert(res.enableCheck, 'Invalid structure of import item');
         res.enabled = res.enableCheck.checked;
 
-        const fieldElems = await queryAll(this.elem, '.field');
-        const fields = await asyncMap(fieldElems, (field) => this.parseField(field));
-        fields.forEach((field) => { res[field.name] = field.component; });
+        const fieldSelectors = [
+            '.type-field',
+            '.account-field',
+            '.person-field',
+            '.src-amount-field',
+            '.dest-amount-field',
+            '.date-field',
+            '.comment-field',
+        ];
+
+        [
+            res.typeField,
+            res.transferAccountField,
+            res.personField,
+            res.srcAmountField,
+            res.destAmountField,
+            res.dateField,
+            res.commentField,
+        ] = await asyncMap(fieldSelectors, async (selector) => (
+            this.parseField(await query(this.elem, selector))
+        ));
 
         res.invFeedback = { elem: await query(this.elem, '.invalid-feedback') };
-        res.menuBtn = await query(this.elem, '.menu-btn');
-        res.deleteBtn = await query(this.elem, '.delete-btn button');
+        res.menuBtn = await query(this.elem, '.actions-menu-btn');
+        res.deleteBtn = await query(this.elem, '.delete-btn');
         res.toggleBtn = await query(this.elem, '.toggle-btn');
         res.saveBtn = await query(this.elem, '.submit-btn');
         res.cancelBtn = await query(this.elem, '.cancel-btn');
@@ -166,6 +149,9 @@ export class ImportTransactionForm extends TestComponent {
             this.data.enabled = this.model.enabled;
             this.data.mainAccount = this.model.mainAccount;
             this.data.importType = this.model.type;
+            if (this.model.original) {
+                this.data.original = { ...this.model.original };
+            }
         }
     }
 
@@ -326,6 +312,10 @@ export class ImportTransactionForm extends TestComponent {
         return ImportTransactionForm.getExpectedState(model);
     }
 
+    getAmountValue(value) {
+        return (value === '') ? value : normalize(value);
+    }
+
     getExpectedTransaction(model) {
         const res = {
             type: ImportTransaction.typeFromString(model.type),
@@ -336,9 +326,9 @@ export class ImportTransactionForm extends TestComponent {
             res.dest_id = 0;
             res.src_curr = model.mainAccount.curr_id;
             res.dest_curr = model.destCurrency.id;
-            res.dest_amount = normalize(model.destAmount);
+            res.dest_amount = this.getAmountValue(model.destAmount);
             if (model.isDifferent) {
-                res.src_amount = normalize(model.srcAmount);
+                res.src_amount = this.getAmountValue(model.srcAmount);
             } else {
                 res.src_amount = res.dest_amount;
             }
@@ -347,9 +337,9 @@ export class ImportTransactionForm extends TestComponent {
             res.dest_id = model.mainAccount.id;
             res.src_curr = model.srcCurrency.id;
             res.dest_curr = model.mainAccount.curr_id;
-            res.src_amount = normalize(model.srcAmount);
+            res.src_amount = this.getAmountValue(model.srcAmount);
             if (model.isDifferent) {
-                res.dest_amount = normalize(model.destAmount);
+                res.dest_amount = this.getAmountValue(model.destAmount);
             } else {
                 res.dest_amount = res.src_amount;
             }
@@ -364,9 +354,9 @@ export class ImportTransactionForm extends TestComponent {
             res.dest_id = destAccount.id;
             res.src_curr = srcAccount.curr_id;
             res.dest_curr = destAccount.curr_id;
-            res.src_amount = normalize(model.srcAmount);
+            res.src_amount = this.getAmountValue(model.srcAmount);
             res.dest_amount = (model.isDifferent)
-                ? normalize(model.destAmount)
+                ? this.getAmountValue(model.destAmount)
                 : res.src_amount;
         } else if (res.type === DEBT) {
             assert(model.person, 'Person not found');
@@ -376,7 +366,7 @@ export class ImportTransactionForm extends TestComponent {
             res.op = (model.type === 'debtto') ? 1 : 2;
             res.src_curr = model.mainAccount.curr_id;
             res.dest_curr = model.mainAccount.curr_id;
-            res.src_amount = normalize(model.srcAmount);
+            res.src_amount = this.getAmountValue(model.srcAmount);
             res.dest_amount = res.src_amount;
         }
 

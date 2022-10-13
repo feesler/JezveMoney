@@ -6,13 +6,13 @@ import {
     click,
     copyObject,
 } from 'jezve-test';
-import { DropDown } from 'jezvejs/tests';
+import { DropDown } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { Icon } from '../model/Icon.js';
 import { isValidValue, normalize, trimToDigitsLimit } from '../common.js';
 import { Tile } from './component/Tile.js';
 import { InputRow } from './component/InputRow.js';
-import { IconLink } from './component/IconLink.js';
+import { IconButton } from './component/IconButton.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 
@@ -30,7 +30,7 @@ export class AccountView extends AppView {
         res.heading = { elem: await query('.heading > h1') };
         assert(res.heading.elem, 'Heading element not found');
         res.heading.text = await prop(res.heading.elem, 'textContent');
-        res.delBtn = await IconLink.create(this, await query('#del_btn'));
+        res.delBtn = await IconButton.create(this, await query('#del_btn'));
         res.tile = await Tile.create(this, await query('#acc_tile'));
 
         res.formElem = await query('form');
@@ -43,22 +43,15 @@ export class AccountView extends AppView {
             assert(res.id, 'Wrong account id');
         }
 
-        let curChildren = (res.isUpdate) ? 3 : 2;
-
         res.iconDropDown = await DropDown.createFromChild(this, await query('#icon'));
 
-        curChildren += 1;
-        let elem = await query(`form > *:nth-child(${curChildren})`);
-        res.name = await InputRow.create(this, elem);
+        res.name = await InputRow.create(this, await query('#name-inp-block'));
         assert(res.name, 'Account name input not found');
 
-        curChildren += 1;
         res.currDropDown = await DropDown.createFromChild(this, await query('#currency'));
 
-        curChildren += 1;
-        elem = await query(`form > *:nth-child(${curChildren})`);
-
-        res.balance = await InputRow.create(this, elem);
+        res.balance = await InputRow.create(this, await query('#initbal-inp-block'));
+        assert(res.name, 'Account balance input not found');
 
         res.flagsInp = await query('#flags');
         res.flags = parseInt(await prop(res.flagsInp, 'value'), 10);

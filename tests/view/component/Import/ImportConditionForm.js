@@ -8,8 +8,7 @@ import {
     input,
     isVisible,
 } from 'jezve-test';
-import { Checkbox, DropDown } from 'jezvejs/tests';
-import { trimToDigitsLimit } from '../../../common.js';
+import { Checkbox, DropDown } from 'jezvejs-test';
 import {
     IMPORT_COND_FIELD_MAIN_ACCOUNT,
     IMPORT_COND_FIELD_TPL,
@@ -119,6 +118,7 @@ export class ImportConditionForm extends TestComponent {
     buildModel(cont) {
         const res = {
             fieldType: parseInt(cont.fieldTypeField.value, 10),
+            fieldsAvailable: cont.fieldTypeField.dropDown.items.map(({ id }) => id),
             operator: parseInt(cont.operatorField.value, 10),
             isFieldValue: cont.fieldValueCheck.checked,
             property: cont.propertyField.value,
@@ -137,9 +137,18 @@ export class ImportConditionForm extends TestComponent {
 
     static getExpectedState(model) {
         const res = {
-            fieldTypeField: { value: model.fieldType.toString(), visible: true },
+            fieldTypeField: {
+                value: model.fieldType.toString(),
+                visible: true,
+                dropDown: {
+                    items: model.fieldsAvailable.map((id) => ({ id })),
+                },
+            },
             operatorField: { value: model.operator.toString(), visible: true },
-            fieldValueCheck: { checked: model.isFieldValue, visible: true },
+            fieldValueCheck: {
+                checked: model.isFieldValue,
+                visible: ImportCondition.isPropertyValueAvailable(model.fieldType),
+            },
             deleteBtn: { visible: true },
         };
 
@@ -163,31 +172,12 @@ export class ImportConditionForm extends TestComponent {
 
     async changeFieldType(value) {
         const fieldId = parseInt(value, 10);
-        this.model.fieldType = fieldId;
-        const field = ImportCondition.getFieldTypeById(fieldId);
-        if (!field.operators.includes(this.model.operator)) {
-            [this.model.operator] = field.operators;
-        }
-        this.model.state = ImportConditionForm.getStateName(this.model);
-        this.model.value = ImportConditionForm.getStateValue(this.model);
-        this.expectedState = ImportConditionForm.getExpectedState(this.model);
 
         await this.content.fieldTypeField.dropDown.selectItem(fieldId);
-        await this.parse();
-
-        return this.checkState();
     }
 
     async changeValue(name, value) {
         assert(this.model.state === name, `Invalid state ${this.model.state} expected ${name}`);
-
-        if (name === 'amount') {
-            this.model[name] = trimToDigitsLimit(value, 2);
-        } else {
-            this.model[name] = value;
-        }
-        this.model.value = ImportConditionForm.getStateValue(this.model);
-        this.expectedState = ImportConditionForm.getExpectedState(this.model);
 
         const control = this.content[`${name}Field`];
         if (control.dropDown) {
@@ -195,20 +185,10 @@ export class ImportConditionForm extends TestComponent {
         } else {
             await input(control.inputElem, value.toString());
         }
-        await this.parse();
-
-        return this.checkState();
     }
 
     async changeOperator(value) {
-        this.model.operator = value;
-        this.model.value = ImportConditionForm.getStateValue(this.model);
-        this.expectedState = ImportConditionForm.getExpectedState(this.model);
-
         await this.content.operatorField.dropDown.selectItem(value);
-        await this.parse();
-
-        return this.checkState();
     }
 
     async changeTemplate(value) {
@@ -228,15 +208,7 @@ export class ImportConditionForm extends TestComponent {
     }
 
     async togglePropValue() {
-        this.model.isFieldValue = !this.model.isFieldValue;
-        this.model.state = ImportConditionForm.getStateName(this.model);
-        this.model.value = ImportConditionForm.getStateValue(this.model);
-        this.expectedState = ImportConditionForm.getExpectedState(this.model);
-
         await this.content.fieldValueCheck.toggle();
-        await this.parse();
-
-        return this.checkState();
     }
 
     async inputAmount(value) {

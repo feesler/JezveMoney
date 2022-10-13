@@ -1,12 +1,13 @@
 import {
-    ce,
+    createElement,
     show,
     isFunction,
+    asArray,
     Component,
-    Checkbox,
-    DropDown,
-    DecimalInput,
 } from 'jezvejs';
+import { Checkbox } from 'jezvejs/Checkbox';
+import { DropDown } from 'jezvejs/DropDown';
+import { DecimalInput } from 'jezvejs/DecimalInput';
 import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,
@@ -32,6 +33,12 @@ const INV_FEEDBACK_CLASS = 'invalid-feedback';
 /** Strings */
 const LABEL_PROPERTY_CMP = 'Compare with another property';
 
+const defaultProps = {
+    properties: null,
+    onUpdate: null,
+    onRemove: null,
+};
+
 /**
  * ImportConditionForm component
  */
@@ -46,13 +53,15 @@ export class ImportConditionForm extends Component {
         if (!this.props || !this.props.data) {
             throw new Error('Invalid props');
         }
-
-        this.updateHandler = this.props.update;
-        this.deleteHandler = this.props.remove;
-
         if (!(this.props.data instanceof ImportCondition)) {
             throw new Error('Invalid condition item');
         }
+
+        this.props = {
+            ...defaultProps,
+            ...this.props,
+        };
+
         this.props.data.isValid = this.props.isValid;
         this.props.data.message = this.props.message;
 
@@ -73,19 +82,19 @@ export class ImportConditionForm extends Component {
         this.createValuePropField();
 
         // Create amount input element
-        this.amountInput = ce('input', { className: `stretch-input ${AMOUNT_FIELD_CLASS}`, type: 'text' });
+        this.amountInput = createElement('input', {
+            props: { className: `stretch-input ${AMOUNT_FIELD_CLASS}`, type: 'text' },
+        });
         this.decAmountInput = DecimalInput.create({
             elem: this.amountInput,
             digits: 2,
             oninput: () => this.onValueChange(),
         });
         // Create text value input element
-        this.valueInput = ce(
-            'input',
-            { className: `stretch-input ${TEXT_FIELD_CLASS}`, type: 'text' },
-            null,
-            { input: () => this.onValueChange() },
-        );
+        this.valueInput = createElement('input', {
+            props: { className: `stretch-input ${TEXT_FIELD_CLASS}`, type: 'text' },
+            events: { input: () => this.onValueChange() },
+        });
 
         // Field value checkbox
         this.fieldValueCheck = Checkbox.create({
@@ -109,7 +118,7 @@ export class ImportConditionForm extends Component {
         ]);
 
         // Invalid feedback message
-        this.validFeedback = ce('div', { className: INV_FEEDBACK_CLASS });
+        this.validFeedback = createElement('div', { props: { className: INV_FEEDBACK_CLASS } });
         this.container = window.app.createContainer(`${CONTAINER_CLASS} ${VALIDATION_CLASS}`, [
             this.fields,
             this.fieldValueCheck.elem,
@@ -117,12 +126,11 @@ export class ImportConditionForm extends Component {
         ]);
 
         // Delete button
-        this.delBtn = ce(
-            'button',
-            { className: 'btn icon-btn delete-btn', type: 'button' },
-            window.app.createIcon('del', 'icon delete-icon'),
-            { click: () => this.onDelete() },
-        );
+        this.delBtn = createElement('button', {
+            props: { className: 'btn icon-btn delete-btn', type: 'button' },
+            children: window.app.createIcon('del', 'icon delete-icon'),
+            events: { click: () => this.onDelete() },
+        });
         this.controls = window.app.createContainer(CONTROLS_CLASS, this.delBtn);
 
         this.elem = window.app.createContainer(FORM_CLASS, [
@@ -131,23 +139,36 @@ export class ImportConditionForm extends Component {
         ]);
     }
 
+    getPropertyTypes() {
+        if (!this.props.properties) {
+            return this.fieldTypes;
+        }
+
+        const propFilter = asArray(this.props.properties);
+        if (!propFilter.length) {
+            return this.fieldTypes;
+        }
+
+        return this.fieldTypes.filter((type) => propFilter.includes(type.id));
+    }
+
+    /** Returns true if possible to compare current field type with another field */
+    isFieldValueAvailable(state = this.state) {
+        return ImportCondition.isPropertyValueAvailable(state.fieldType);
+    }
+
     /** Create property field */
     createPropertyField() {
-        const filedTypeItems = this.fieldTypes
-            .filter((fieldType) => !(
-                // Remove `Template` property if no templates available yet
-                ImportCondition.isTemplateField(fieldType.id)
-                && window.app.model.templates.length === 0
-            ))
-            .map((fieldType) => ({ id: fieldType.id, title: fieldType.title }));
+        const propTypes = this.getPropertyTypes();
+        const items = propTypes.map(({ id, title }) => ({ id, title }));
 
         this.propertyDropDown = DropDown.create({
             className: PROP_FIELD_CLASS,
             onchange: (property) => this.onPropertyChange(property),
         });
 
-        this.propertyDropDown.append(filedTypeItems);
-        this.propertyDropDown.selectItem(filedTypeItems[0].id);
+        this.propertyDropDown.append(items);
+        this.propertyDropDown.selectItem(items[0].id);
     }
 
     /** Create operator field */
@@ -199,16 +220,10 @@ export class ImportConditionForm extends Component {
 
     /** Create value property field */
     createValuePropField() {
-        const items = this.fieldTypes
-            .filter((fieldType) => !ImportCondition.isTemplateField(fieldType.id))
-            .map((fieldType) => ({ id: fieldType.id, title: fieldType.title }));
-
         this.valuePropDropDown = DropDown.create({
             className: VALUE_PROP_FIELD_CLASS,
             onchange: () => this.onValueChange(),
         });
-        this.valuePropDropDown.append(items);
-        this.valuePropDropDown.selectItem(items[0].id);
     }
 
     /** Verify correctness of operator */
@@ -271,7 +286,17 @@ export class ImportConditionForm extends Component {
             [this.state.operator] = this.state.availOperators;
         }
 
-        this.state.value = this.getConditionValue(this.state);
+        if (!this.isFieldValueAvailable()) {
+            this.state.isFieldValue = false;
+        }
+
+        if (this.state.isFieldValue) {
+            const [item] = this.getValuePropertyItems(this.state);
+            this.state.value = item.id;
+        } else {
+            this.state.value = this.getConditionValue(this.state);
+        }
+
         this.state.isValid = true;
 
         this.verifyOperator(this.state);
@@ -367,8 +392,18 @@ export class ImportConditionForm extends Component {
 
     /** Field value checkbox 'change' event handler */
     onFieldValueChecked() {
+        if (!this.isFieldValueAvailable()) {
+            return;
+        }
+
         this.state.isFieldValue = this.fieldValueCheck.checked;
-        this.state.value = this.getConditionValue(this.state);
+        if (this.state.isFieldValue) {
+            const [item] = this.getValuePropertyItems(this.state);
+            this.state.value = item.id;
+        } else {
+            this.state.value = this.getConditionValue(this.state);
+        }
+
         this.state.isValid = true;
         this.render(this.state);
         this.sendUpdate();
@@ -397,24 +432,20 @@ export class ImportConditionForm extends Component {
 
     /** Send component 'update' event */
     sendUpdate() {
-        if (isFunction(this.updateHandler)) {
-            this.updateHandler(this.getData(this.state));
+        if (isFunction(this.props.onUpdate)) {
+            this.props.onUpdate(this.getData(this.state));
         }
     }
 
     /** Delete button 'click' event handler */
     onDelete() {
-        if (isFunction(this.deleteHandler)) {
-            this.deleteHandler();
+        if (isFunction(this.props.onRemove)) {
+            this.props.onRemove();
         }
     }
 
     /** Render operator select */
     renderOperator(state) {
-        if (!state) {
-            throw new Error('Invalid state');
-        }
-
         const items = this.operatorTypes
             .filter((operatorType) => state.availOperators.includes(operatorType.id))
             .map((operatorType) => ({
@@ -425,6 +456,42 @@ export class ImportConditionForm extends Component {
         this.operatorDropDown.removeAll();
         this.operatorDropDown.append(items);
         this.operatorDropDown.selectItem(state.operator);
+    }
+
+    getValuePropertyItems(state) {
+        const isCurrencyField = ImportCondition.isCurrencyField(state.fieldType);
+        const isAmountField = ImportCondition.isAmountField(state.fieldType);
+        if (!isCurrencyField && !isAmountField) {
+            throw new Error('Invalid state');
+        }
+
+        const items = this.fieldTypes
+            .filter((fieldType) => {
+                if (fieldType.id === state.fieldType) {
+                    return false;
+                }
+
+                if (isCurrencyField) {
+                    return ImportCondition.isCurrencyField(fieldType.id);
+                }
+
+                return ImportCondition.isAmountField(fieldType.id);
+            })
+            .map(({ id, title }) => ({ id, title }));
+
+        return items;
+    }
+
+    renderValueProperty(state) {
+        if (!this.isFieldValueAvailable(state)) {
+            return;
+        }
+
+        const items = this.getValuePropertyItems(state);
+
+        this.valuePropDropDown.removeAll();
+        this.valuePropDropDown.append(items);
+        this.valuePropDropDown.selectItem(items[0].id);
     }
 
     /** Render component state */
@@ -443,7 +510,6 @@ export class ImportConditionForm extends Component {
 
         this.propertyDropDown.selectItem(state.fieldType);
         this.renderOperator(state);
-        this.fieldValueCheck.check(state.isFieldValue);
 
         const isAccountValue = (
             !state.isFieldValue
@@ -453,14 +519,10 @@ export class ImportConditionForm extends Component {
             !state.isFieldValue
             && ImportCondition.isTemplateField(state.fieldType)
         );
-        const isCurrencyValue = (
-            !state.isFieldValue
-            && ImportCondition.isCurrencyField(state.fieldType)
-        );
-        const isAmountValue = (
-            !state.isFieldValue
-            && ImportCondition.isAmountField(state.fieldType)
-        );
+        const isCurrencyField = ImportCondition.isCurrencyField(state.fieldType);
+        const isCurrencyValue = (!state.isFieldValue && isCurrencyField);
+        const isAmountField = ImportCondition.isAmountField(state.fieldType);
+        const isAmountValue = (!state.isFieldValue && isAmountField);
         const isTextValue = (
             !state.isFieldValue
             && (
@@ -473,9 +535,16 @@ export class ImportConditionForm extends Component {
         this.templateDropDown.show(isTplValue);
         this.currencyDropDown.show(isCurrencyValue);
         show(this.amountInput, isAmountValue);
+        if (state.isFieldValue) {
+            this.renderValueProperty(state);
+        }
         this.valuePropDropDown.show(state.isFieldValue);
         show(this.valueInput, isTextValue);
 
         this.setConditionValue(state);
+
+        const showFieldValueCheck = this.isFieldValueAvailable(state);
+        this.fieldValueCheck.show(showFieldValueCheck);
+        this.fieldValueCheck.check(state.isFieldValue);
     }
 }

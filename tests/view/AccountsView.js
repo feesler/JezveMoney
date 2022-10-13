@@ -3,13 +3,13 @@ import {
     query,
     prop,
     navigation,
+    waitForFunction,
     click,
     httpReq,
 } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { TilesList } from './component/TilesList.js';
-import { Tile } from './component/Tile.js';
-import { IconLink } from './component/IconLink.js';
+import { IconButton } from './component/IconButton.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { Toolbar } from './component/Toolbar.js';
 
@@ -18,7 +18,7 @@ export class AccountsView extends AppView {
     async parseContent() {
         const res = {
             titleEl: await query('.content_wrap > .heading > h1'),
-            addBtn: await IconLink.create(this, await query('#add_btn')),
+            addBtn: await IconButton.create(this, await query('#add_btn')),
             toolbar: await Toolbar.create(this, await query('#toolbar')),
         };
 
@@ -27,25 +27,31 @@ export class AccountsView extends AppView {
             && res.addBtn
             && res.toolbar
             && res.toolbar.content.editBtn
+            && res.toolbar.content.showBtn
+            && res.toolbar.content.hideBtn
             && res.toolbar.content.exportBtn
             && res.toolbar.content.delBtn,
             'Invalid structure of accounts view',
         );
 
         res.title = await prop(res.titleEl, 'textContent');
-        res.tiles = await TilesList.create(this, await query('#tilesContainer'), Tile);
-        res.hiddenTiles = await TilesList.create(this, await query('#hiddenTilesContainer'), Tile);
-
+        res.tiles = await TilesList.create(this, await query('#tilesContainer'));
+        res.hiddenTiles = await TilesList.create(this, await query('#hiddenTilesContainer'));
+        res.loadingIndicator = { elem: await query('.loading-indicator') };
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
+
+        res.renderTime = await prop(res.tiles.elem, 'dataset.time');
 
         return res;
     }
 
     async buildModel(cont) {
-        const res = {};
-
-        res.tiles = cont.tiles.getItems();
-        res.hiddenTiles = cont.hiddenTiles.getItems();
+        const res = {
+            tiles: cont.tiles.getItems(),
+            hiddenTiles: cont.hiddenTiles.getItems(),
+            loading: cont.loadingIndicator.visible,
+            renderTime: cont.renderTime,
+        };
 
         return res;
     }
@@ -56,6 +62,7 @@ export class AccountsView extends AppView {
         const totalSelected = visibleSelected.length + hiddenSelected.length;
 
         const res = {
+            loadingIndicator: { visible: model.loading },
             toolbar: {
                 editBtn: { visible: (totalSelected === 1) },
                 delBtn: { visible: (totalSelected > 0) },
@@ -96,6 +103,23 @@ export class AccountsView extends AppView {
         await navigation(() => this.content.toolbar.clickButton('update'));
     }
 
+    async waitForList(action) {
+        await this.parse();
+
+        const prevTime = this.model.renderTime;
+        await action();
+
+        await waitForFunction(async () => {
+            await this.parse();
+            return (
+                !this.model.loading
+                && prevTime !== this.model.renderTime
+            );
+        });
+
+        await this.parse();
+    }
+
     async selectAccounts(data) {
         assert.isDefined(data, 'No accounts specified');
 
@@ -119,7 +143,7 @@ export class AccountsView extends AppView {
                 ? this.content.tiles.content.items[num]
                 : this.content.hiddenTiles.content.items[num - visibleTiles];
 
-            await this.performAction(() => tile.click());
+            await this.waitForList(() => tile.click());
 
             this.checkState(expected);
         }
@@ -132,7 +156,7 @@ export class AccountsView extends AppView {
 
         const selected = visibleActive.concat(hiddenActive);
         if (selected.length > 0) {
-            await this.performAction(() => this.selectAccounts(selected));
+            await this.selectAccounts(selected);
         }
     }
 
@@ -145,14 +169,14 @@ export class AccountsView extends AppView {
 
         assert(this.content.delete_warning.content.okBtn, 'OK button not found');
 
-        await navigation(() => click(this.content.delete_warning.content.okBtn));
+        await this.waitForList(() => click(this.content.delete_warning.content.okBtn));
     }
 
     /** Show secified accounts */
     async showAccounts(acc, val = true) {
         await this.selectAccounts(acc);
 
-        await navigation(() => this.content.toolbar.clickButton(val ? 'show' : 'hide'));
+        await this.waitForList(() => this.content.toolbar.clickButton(val ? 'show' : 'hide'));
     }
 
     /** Hide secified accounts and return navigation promise */

@@ -1,17 +1,23 @@
 import {
-    ce,
+    createElement,
     enable,
     isFunction,
     copyObject,
     Component,
-    Collapsible,
 } from 'jezvejs';
+import { Collapsible } from 'jezvejs/Collapsible';
 import { ImportRule } from '../../../../js/model/ImportRule.js';
-import { ImportAction } from '../../../../js/model/ImportAction.js';
-import { ImportCondition } from '../../../../js/model/ImportCondition.js';
+import {
+    IMPORT_ACTION_SET_ACCOUNT,
+    IMPORT_ACTION_SET_PERSON,
+    IMPORT_ACTION_SET_TR_TYPE,
+    ImportAction,
+} from '../../../../js/model/ImportAction.js';
+import { ImportCondition, IMPORT_COND_OP_EQUAL } from '../../../../js/model/ImportCondition.js';
 import { ImportConditionForm } from '../ConditionForm/ImportConditionForm.js';
 import { ImportActionForm } from '../ActionForm/ImportActionForm.js';
 import './style.scss';
+import { ImportActionList } from '../../../../js/model/ImportActionList.js';
 
 /** Strings */
 const BTN_CREATE_CONDITION = 'Create';
@@ -23,6 +29,11 @@ const BTN_CANCEL = 'Cancel';
 const MSG_NO_DATA = 'No data';
 const MSG_NO_ACTIONS = 'No actions';
 const MSG_NO_CONDITIONS = 'No conditions';
+
+const defaultProps = {
+    onSubmit: null,
+    onCancel: null,
+};
 
 /**
  * ImportRuleForm component
@@ -38,15 +49,14 @@ export class ImportRuleForm extends Component {
         if (!this.props || !this.props.data) {
             throw new Error('Invalid props');
         }
-
-        this.submitHandler = this.props.submit;
-        this.cancelHandler = this.props.cancel;
-        this.updateHandler = this.props.update;
-        this.deleteHandler = this.props.remove;
-
         if (!(this.props.data instanceof ImportRule)) {
             throw new Error('Invalid rule item');
         }
+
+        this.props = {
+            ...defaultProps,
+            ...this.props,
+        };
 
         this.fieldTypes = ImportCondition.getFieldTypes();
         this.actionTypes = ImportAction.getTypes();
@@ -59,24 +69,25 @@ export class ImportRuleForm extends Component {
     /** Form controls initialization */
     init() {
         // Hidden id input
-        this.idInput = ce('input', { type: 'hidden' });
+        this.idInput = createElement('input', { props: { type: 'hidden' } });
         // Conditions
-        this.createCondBtn = ce(
-            'button',
-            { className: 'btn link-btn create-btn', type: 'button', textContent: BTN_CREATE_CONDITION },
-            null,
-            { click: (e) => this.onCreateConditionClick(e) },
-        );
-        this.toggleCondBtn = ce(
-            'button',
-            { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
-            window.app.createIcon('toggle-ext', 'icon toggle-icon'),
-        );
+        this.createCondBtn = createElement('button', {
+            props: {
+                className: 'btn link-btn create-btn',
+                type: 'button',
+                textContent: BTN_CREATE_CONDITION,
+            },
+            events: { click: (e) => this.onCreateConditionClick(e) },
+        });
+        this.toggleCondBtn = createElement('button', {
+            props: { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
+            children: window.app.createIcon('toggle-ext', 'icon toggle-icon'),
+        });
 
-        this.conditionsCollapse = new Collapsible({
+        this.conditionsCollapse = Collapsible.create({
             className: 'rule-form-collapse',
             header: [
-                ce('label', { textContent: TITLE_CONDITIONS }),
+                createElement('label', { props: { textContent: TITLE_CONDITIONS } }),
                 this.createCondBtn,
                 this.toggleCondBtn,
             ],
@@ -85,22 +96,19 @@ export class ImportRuleForm extends Component {
         });
 
         // Actions
-        this.createActionBtn = ce(
-            'button',
-            { className: 'btn link-btn create-btn', type: 'button', textContent: BTN_CREATE_ACTION },
-            null,
-            { click: (e) => this.onCreateActionClick(e) },
-        );
-        this.toggleActionsBtn = ce(
-            'button',
-            { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
-            window.app.createIcon('toggle-ext', 'icon toggle-icon'),
-        );
+        this.createActionBtn = createElement('button', {
+            props: { className: 'btn link-btn create-btn', type: 'button', textContent: BTN_CREATE_ACTION },
+            events: { click: (e) => this.onCreateActionClick(e) },
+        });
+        this.toggleActionsBtn = createElement('button', {
+            props: { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
+            children: window.app.createIcon('toggle-ext', 'icon toggle-icon'),
+        });
 
         this.actionsCollapse = new Collapsible({
             className: 'rule-form-collapse',
             header: [
-                ce('label', { textContent: TITLE_ACTIONS }),
+                createElement('label', { props: { textContent: TITLE_ACTIONS } }),
                 this.createActionBtn,
                 this.toggleActionsBtn,
             ],
@@ -109,21 +117,17 @@ export class ImportRuleForm extends Component {
         });
 
         // Controls
-        this.saveBtn = ce(
-            'button',
-            { className: 'btn submit-btn', type: 'button', textContent: BTN_SAVE },
-            null,
-            { click: () => this.onSubmit() },
-        );
-        this.cancelBtn = ce(
-            'button',
-            { className: 'btn link-btn cancel-btn', type: 'button', textContent: BTN_CANCEL },
-            null,
-            { click: () => this.onCancel() },
-        );
+        this.saveBtn = createElement('button', {
+            props: { className: 'btn submit-btn', type: 'button', textContent: BTN_SAVE },
+            events: { click: () => this.onSubmit() },
+        });
+        this.cancelBtn = createElement('button', {
+            props: { className: 'btn link-btn cancel-btn', type: 'button', textContent: BTN_CANCEL },
+            events: { click: () => this.onCancel() },
+        });
 
         // Invalid feedback message
-        this.validFeedback = ce('div', { className: 'invalid-feedback' });
+        this.validFeedback = createElement('div', { props: { className: 'invalid-feedback' } });
         this.feedbackContainer = window.app.createContainer(
             'rule-form__feedback validation-block',
             this.validFeedback,
@@ -162,12 +166,25 @@ export class ImportRuleForm extends Component {
             throw new Error('Invalid state');
         }
 
-        // Obtain action types currently used by rule
-        const ruleActionTypes = state.rule.actions.map((action) => action.action_id);
         // Search for first action type not in list
-        return this.actionTypes.find(
-            (actionType) => !ruleActionTypes.includes(actionType.id),
-        );
+        return this.actionTypes.find((actionType) => {
+            if (state.rule.actions.hasAction(actionType.id)) {
+                return false;
+            }
+
+            if (actionType.id === IMPORT_ACTION_SET_ACCOUNT) {
+                return state.rule.actions.hasSetTransfer();
+            }
+
+            if (actionType.id === IMPORT_ACTION_SET_PERSON) {
+                return (
+                    window.app.model.persons.length > 0
+                    && state.rule.actions.hasSetDebt()
+                );
+            }
+
+            return true;
+        });
     }
 
     /** Return default value for specified action type */
@@ -235,9 +252,13 @@ export class ImportRuleForm extends Component {
         // Obtain condition field types currently used by rule
         const ruleFieldTypes = state.rule.conditions.map((condition) => condition.field_id);
         // Filter available field types
-        const availFields = this.fieldTypes.filter(
-            (fieldType) => !ImportCondition.isTemplateField(fieldType.id),
-        );
+        const availFields = this.fieldTypes.filter((fieldType) => {
+            if (ImportCondition.isTemplateField(fieldType.id)) {
+                return window.app.model.templates.length > 0;
+            }
+
+            return true;
+        });
 
         // Search for first field type not in list
         return availFields.find((fieldType) => !ruleFieldTypes.includes(fieldType.id));
@@ -284,19 +305,30 @@ export class ImportRuleForm extends Component {
     onCreateConditionClick(e) {
         e.stopPropagation();
 
+        const { conditions } = this.state.rule;
+
         const fieldType = this.getNextAvailProperty(this.state);
         if (!fieldType) {
             return;
         }
 
+        const hasNotIsCond = conditions.hasNotIsCondition(fieldType.id);
+        if (hasNotIsCond && fieldType.operators.length < 2) {
+            return;
+        }
+
+        const operator = (hasNotIsCond)
+            ? fieldType.operators[0]
+            : fieldType.operators[1];
+
         const conditionData = {
             field_id: fieldType.id,
-            operator: fieldType.operators[0],
+            operator,
             value: this.getConditionDefaultValue(fieldType.id),
             flags: 0,
         };
 
-        this.state.rule.conditions.addItem(conditionData);
+        conditions.addItem(conditionData);
 
         this.conditionsCollapse.expand();
         this.actionsCollapse.collapse();
@@ -364,21 +396,31 @@ export class ImportRuleForm extends Component {
             return;
         }
 
-        if (isFunction(this.submitHandler)) {
-            this.submitHandler(this.getData(this.state));
+        if (isFunction(this.props.onSubmit)) {
+            this.props.onSubmit(this.getData(this.state));
         }
     }
 
     /** Cancel button 'click' event handler */
     onCancel() {
-        if (isFunction(this.cancelHandler)) {
-            this.cancelHandler();
+        if (isFunction(this.props.onCancel)) {
+            this.props.onCancel();
         }
     }
 
     /** Condition 'update' event handler */
     onConditionUpdate(index, data) {
-        this.state.rule.conditions.updateItemByIndex(index, data);
+        const { conditions } = this.state.rule;
+
+        const conditionToUpdate = copyObject(conditions.getItemByIndex(index));
+        conditions.updateItemByIndex(index, data);
+
+        // If condition operator not changed then skip conditions list update
+        if (conditionToUpdate.operator === data.operator) {
+            return;
+        }
+
+        this.render(this.state);
     }
 
     /** Condition 'delete' event handler */
@@ -388,14 +430,61 @@ export class ImportRuleForm extends Component {
         this.render(this.state);
     }
 
+    /** Remove `Set account` and `Set person` actions */
+    removeTransactionDependActions() {
+        const actionsToRemove = [IMPORT_ACTION_SET_ACCOUNT, IMPORT_ACTION_SET_PERSON];
+        const newActions = this.state.rule.actions.filter((action) => (
+            !actionsToRemove.includes(action.action_id)
+        ));
+        this.state.rule.actions = ImportActionList.create(newActions);
+    }
+
     /** Action 'update' event handler */
     onActionUpdate(index, data) {
-        this.state.rule.actions.updateItemByIndex(index, data);
+        const { actions } = this.state.rule;
+
+        const actionToUpdate = copyObject(actions.getItemByIndex(index));
+        actions.updateItemByIndex(index, data);
+
+        // If action type not changed and current type is not `Set transaction type`
+        // then skip action list update
+        if (
+            actionToUpdate.action_id === data.action_id
+            && data.action_id !== IMPORT_ACTION_SET_TR_TYPE
+        ) {
+            return;
+        }
+
+        // Check `Set transaction type` action was changed and remove not available
+        // `Set account` or `Set person` action
+        const hasTransfer = actions.hasSetTransfer();
+        const hasDebt = actions.hasSetDebt();
+
+        const newActions = actions.filter((action) => {
+            if (action.action_id === IMPORT_ACTION_SET_ACCOUNT) {
+                return hasTransfer;
+            }
+
+            if (action.action_id === IMPORT_ACTION_SET_PERSON) {
+                return hasDebt;
+            }
+
+            return true;
+        });
+        this.state.rule.actions = ImportActionList.create(newActions);
+
+        this.render(this.state);
     }
 
     /** Action 'delete' event handler */
     onActionDelete(index) {
+        const removedAction = this.state.rule.actions.getItemByIndex(index);
         this.state.rule.actions.deleteItemByIndex(index);
+
+        if (removedAction.action_id === IMPORT_ACTION_SET_TR_TYPE) {
+            this.removeTransactionDependActions();
+        }
+
         this.state.validation = null;
         this.render(this.state);
     }
@@ -414,46 +503,71 @@ export class ImportRuleForm extends Component {
             const dataItems = data.map((item) => item.elem);
             container.setContent(dataItems);
         } else {
-            const noDataMsgElem = ce('span', { className: 'nodata-message', textContent: message });
+            const noDataMsgElem = createElement('span', {
+                props: { className: 'nodata-message', textContent: message },
+            });
             container.setContent(noDataMsgElem);
         }
     }
 
-    /** Validate rule data and enable/disable submit button */
+    validateConditionsAvail(state) {
+        const isAvail = this.getNextAvailProperty(state);
+
+        enable(this.createCondBtn, !!isAvail);
+    }
+
     validateActionsAvail(state) {
         const isAvail = this.getNextAvailAction(state);
 
         enable(this.createActionBtn, !!isAvail);
     }
 
-    /** Render component state */
-    render(state) {
-        if (!state) {
-            throw new Error('Invalid state');
-        }
+    /** Renders conditions list */
+    renderConditionsList(state) {
+        const { conditions } = state.rule;
 
-        this.idInput.value = (state.rule.id) ? state.rule.id : '';
+        const conditionItems = conditions.map((condition, index) => {
+            const props = {
+                data: condition,
+                isValid: true,
+                onUpdate: (data) => this.onConditionUpdate(index, data),
+                onRemove: () => this.onConditionDelete(index),
+            };
 
-        this.validateActionsAvail(state);
+            if (
+                state.validation
+                && !state.validation.valid
+                && state.validation.conditionIndex === index
+            ) {
+                props.isValid = false;
+                props.message = state.validation.message;
+            }
 
-        if (state.validation
-            && !state.validation.valid
-            && !('conditionIndex' in state.validation)
-            && !('actionIndex' in state.validation)) {
-            this.validFeedback.textContent = state.validation.message;
-            window.app.invalidateBlock(this.feedbackContainer);
-        } else {
-            this.validFeedback.textContent = '';
-            window.app.clearBlockValidation(this.feedbackContainer);
-        }
+            let propFilter = this.fieldTypes.map(({ id }) => id);
+            // Remove properties which already have `is` operator
+            propFilter = propFilter.filter((property) => {
+                const found = conditions.findIsCondition(property);
+                const foundInd = conditions.indexOf(found);
+                return (!found || foundInd === index);
+            });
 
-        // Actions
-        const actionItems = state.rule.actions.map((action, index) => {
+            props.properties = propFilter;
+
+            return ImportConditionForm.create(props);
+        });
+        this.setListContainerData(this.conditionsCollapse, conditionItems, MSG_NO_CONDITIONS);
+    }
+
+    /** Render actions list */
+    renderActionsList(state) {
+        const { actions } = state.rule;
+
+        const actionItems = actions.map((action, index) => {
             const props = {
                 data: action,
                 isValid: true,
-                update: (data) => this.onActionUpdate(index, data),
-                remove: () => this.onActionDelete(index),
+                onUpdate: (data) => this.onActionUpdate(index, data),
+                onRemove: () => this.onActionDelete(index),
             };
 
             if (
@@ -465,28 +579,68 @@ export class ImportRuleForm extends Component {
                 props.message = state.validation.message;
             }
 
-            return new ImportActionForm(props);
-        });
-        this.setListContainerData(this.actionsCollapse, actionItems, MSG_NO_ACTIONS);
+            let actionsFilter = this.actionTypes.map(({ id }) => id);
+            // Remove already added actions
+            actionsFilter = actionsFilter.filter((type) => {
+                const found = actions.findAction(type);
+                return (!found || found === action);
+            });
 
-        // Conditions
-        const conditionItems = state.rule.conditions.map((condition, index) => {
-            const props = {
-                data: condition,
-                isValid: true,
-                update: (data) => this.onConditionUpdate(index, data),
-                remove: () => this.onConditionDelete(index),
-            };
-
-            if (state.validation
-                && !state.validation.valid
-                && state.validation.conditionIndex === index) {
-                props.isValid = false;
-                props.message = state.validation.message;
+            // Show `Set account` action if has `Set transaction type` action with
+            // transfer type selected
+            const setAccountAction = actions.findAction(IMPORT_ACTION_SET_ACCOUNT);
+            const showSetAccount = (
+                actions.hasSetTransfer()
+                && (!setAccountAction || setAccountAction === action)
+            );
+            if (!showSetAccount) {
+                actionsFilter = actionsFilter.filter((type) => type !== IMPORT_ACTION_SET_ACCOUNT);
             }
 
-            return new ImportConditionForm(props);
+            // Show `Set person` action if person available and has `Set transaction type` action
+            // with debt type selected
+            const setPersonAction = actions.findAction(IMPORT_ACTION_SET_PERSON);
+            const showSetPerson = (
+                window.app.model.persons.length > 0
+                && actions.hasSetDebt()
+                && (!setPersonAction || setPersonAction === action)
+            );
+            if (!showSetPerson) {
+                actionsFilter = actionsFilter.filter((type) => type !== IMPORT_ACTION_SET_PERSON);
+            }
+
+            props.actions = actionsFilter;
+
+            return ImportActionForm.create(props);
         });
-        this.setListContainerData(this.conditionsCollapse, conditionItems, MSG_NO_CONDITIONS);
+        this.setListContainerData(this.actionsCollapse, actionItems, MSG_NO_ACTIONS);
+    }
+
+    /** Render component state */
+    render(state) {
+        if (!state) {
+            throw new Error('Invalid state');
+        }
+
+        this.idInput.value = (state.rule.id) ? state.rule.id : '';
+
+        this.validateConditionsAvail(state);
+        this.validateActionsAvail(state);
+
+        if (
+            state.validation
+            && !state.validation.valid
+            && !('conditionIndex' in state.validation)
+            && !('actionIndex' in state.validation)
+        ) {
+            this.validFeedback.textContent = state.validation.message;
+            window.app.invalidateBlock(this.feedbackContainer);
+        } else {
+            this.validFeedback.textContent = '';
+            window.app.clearBlockValidation(this.feedbackContainer);
+        }
+
+        this.renderActionsList(state);
+        this.renderConditionsList(state);
     }
 }

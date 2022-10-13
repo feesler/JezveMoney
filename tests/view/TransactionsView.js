@@ -2,7 +2,6 @@ import {
     assert,
     query,
     prop,
-    parentNode,
     navigation,
     click,
     waitForFunction,
@@ -11,10 +10,10 @@ import {
     copyObject,
     isVisible,
 } from 'jezve-test';
-import { DropDown, Paginator } from 'jezvejs/tests';
+import { DropDown, Paginator } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
-import { IconLink } from './component/IconLink.js';
+import { IconButton } from './component/IconButton.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { TransactionTypeMenu } from './component/TransactionTypeMenu.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
@@ -30,7 +29,7 @@ export class TransactionsView extends AppView {
     async parseContent() {
         const res = {
             titleEl: await query('.content_wrap > .heading > h1'),
-            addBtn: await IconLink.create(this, await query('#add_btn')),
+            addBtn: await IconButton.create(this, await query('#add_btn')),
             toolbar: await Toolbar.create(this, await query('#toolbar')),
         };
 
@@ -61,8 +60,7 @@ export class TransactionsView extends AppView {
             res.personDropDown = await DropDown.createFromChild(this, await query('#person_id'));
         }
 
-        const calendarBtn = await query('#calendar_btn');
-        res.dateFilter = await DatePickerFilter.create(this, await parentNode(calendarBtn));
+        res.dateFilter = await DatePickerFilter.create(this, await query('#dateFilter'));
         assert(res.dateFilter, 'Date filter not found');
 
         res.searchForm = await SearchForm.create(this, await query('#searchFrm'));
@@ -771,6 +769,6 @@ export class TransactionsView extends AppView {
         assert(this.content.delete_warning?.content?.visible, 'Delete transaction warning popup not appear');
         assert(this.content.delete_warning.content.okBtn, 'OK button not found');
 
-        await navigation(() => click(this.content.delete_warning.content.okBtn));
+        await this.waitForList(() => click(this.content.delete_warning.content.okBtn));
     }
 }

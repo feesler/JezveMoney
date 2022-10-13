@@ -100,7 +100,7 @@ class TransactionModel extends CachedTable
     }
 
 
-    protected function validateParams($params, $isUpdate = false)
+    protected function validateParams($params, $item_id = false)
     {
         $avFields = [
             "type",
@@ -116,15 +116,14 @@ class TransactionModel extends CachedTable
         $res = [];
 
         // In CREATE mode all fields is required
-        if (!$isUpdate && !checkFields($params, $avFields)) {
-            return null;
+        if (!$item_id) {
+            checkFields($params, $avFields, true);
         }
 
         if (isset($params["type"])) {
             $res["type"] = intval($params["type"]);
             if (!in_array($res["type"], self::$availTypes)) {
-                wlog("Invalid type specified");
-                return null;
+                throw new \Error("Invalid type specified");
             }
         }
 
@@ -136,8 +135,7 @@ class TransactionModel extends CachedTable
                 ($res["src_id"] && !in_array($res["type"], self::$srcAvailTypes)) ||
                 (!$res["src_id"] && in_array($res["type"], self::$srcMandatoryTypes))
             ) {
-                wlog("Invalid src_id specified");
-                return null;
+                throw new \Error("Invalid src_id specified");
             }
 
             // Check user and owner of account
@@ -148,8 +146,7 @@ class TransactionModel extends CachedTable
                     || $srcAcc->user_id != self::$user_id
                     || ($res["type"] != DEBT && $srcAcc->owner_id != self::$owner_id)
                 ) {
-                    wlog("Invalid src_id specified");
-                    return null;
+                    throw new \Error("Invalid src_id specified");
                 }
             }
         }
@@ -162,8 +159,7 @@ class TransactionModel extends CachedTable
                 ($res["dest_id"] && !in_array($res["type"], self::$destAvailTypes)) ||
                 (!$res["dest_id"] && in_array($res["type"], self::$destMandatoryTypes))
             ) {
-                wlog("Invalid dest_id specified");
-                return null;
+                throw new \Error("Invalid dest_id specified");
             }
 
             // Check user and owner of account
@@ -174,31 +170,27 @@ class TransactionModel extends CachedTable
                     || $destAcc->user_id != self::$user_id
                     || ($res["type"] != DEBT && $destAcc->owner_id != self::$owner_id)
                 ) {
-                    wlog("Invalid dest_id specified");
-                    return null;
+                    throw new \Error("Invalid dest_id specified");
                 }
             }
         }
 
         // Check source and destination are not the same
         if ($res["src_id"] && $res["dest_id"] && $res["src_id"] == $res["dest_id"]) {
-            wlog("Source and destination are the same.");
-            return null;
+            throw new \Error("Source and destination are the same.");
         }
 
         if (isset($params["src_amount"])) {
             $res["src_amount"] = floatval($params["src_amount"]);
             if ($res["src_amount"] == 0.0) {
-                wlog("Invalid src_amount specified");
-                return null;
+                throw new \Error("Invalid src_amount specified");
             }
         }
 
         if (isset($params["dest_amount"])) {
             $res["dest_amount"] = floatval($params["dest_amount"]);
             if ($res["dest_amount"] == 0.0) {
-                wlog("Invalid dest_amount specified");
-                return null;
+                throw new \Error("Invalid dest_amount specified");
             }
         }
 
@@ -208,8 +200,7 @@ class TransactionModel extends CachedTable
                 !$this->currMod->isExist($res["src_curr"]) ||
                 ($srcAcc && $srcAcc->curr_id != $res["src_curr"])
             ) {
-                wlog("Invalid src_curr specified");
-                return null;
+                throw new \Error("Invalid src_curr specified");
             }
         }
 
@@ -219,16 +210,14 @@ class TransactionModel extends CachedTable
                 !$this->currMod->isExist($res["dest_curr"]) ||
                 ($destAcc && $destAcc->curr_id != $res["dest_curr"])
             ) {
-                wlog("Invalid dest_curr specified");
-                return null;
+                throw new \Error("Invalid dest_curr specified");
             }
         }
 
         if (isset($params["date"])) {
             $res["date"] = is_string($params["date"]) ? strtotime($params["date"]) : intval($params["date"]);
             if (!$res["date"]) {
-                wlog("Invalid date specified");
-                return null;
+                throw new \Error("Invalid date specified");
             }
         }
 
@@ -327,9 +316,6 @@ class TransactionModel extends CachedTable
             $item = (array)$item;
 
             $res = $this->validateParams($item);
-            if (is_null($res)) {
-                return false;
-            }
 
             $res["date"] = date("Y-m-d H:i:s", $item["date"]);
 
@@ -413,9 +399,6 @@ class TransactionModel extends CachedTable
     protected function preCreate($params, $isMultiple = false)
     {
         $res = $this->validateParams($params);
-        if (is_null($res)) {
-            return null;
-        }
 
         if (is_null($this->balanceChanges)) {
             $this->balanceChanges = [];
@@ -548,29 +531,23 @@ class TransactionModel extends CachedTable
     // Preparations for item update
     protected function preUpdate($item_id, $params)
     {
-        // check transaction is exist
-        $trObj = $this->getItem($item_id);
-        if (!$trObj) {
-            return false;
+        $item = $this->getItem($item_id);
+        if (!$item) {
+            throw new \Error("Item not found");
+        }
+        if ($item->user_id != self::$user_id) {
+            throw new \Error("Invalid user");
         }
 
-        // check user of transaction
-        if ($trObj->user_id != self::$user_id) {
-            return false;
-        }
+        $res = $this->validateParams($params, $item_id);
 
-        $res = $this->validateParams($params, true);
-        if (is_null($res)) {
-            return null;
-        }
+        $this->originalTrans = $item;
 
-        $this->originalTrans = $trObj;
-
-        $canceled = $this->cancelTransaction($trObj);
+        $canceled = $this->cancelTransaction($item);
         $this->balanceChanges = $this->applyTransaction($res, $canceled);
 
         // check date is changed
-        $orig_date = getdate($trObj->date);
+        $orig_date = getdate($item->date);
         $target_date = getdate($res["date"]);
 
         $orig_time = mktime(0, 0, 0, $orig_date["mon"], $orig_date["mday"], $orig_date["year"]);
@@ -579,7 +556,7 @@ class TransactionModel extends CachedTable
         if ($orig_time != $target_time) {
             $res["pos"] = 0;
         } else {
-            $res["pos"] = $trObj->pos;
+            $res["pos"] = $item->pos;
         }
 
         if (isset($res["date"])) {

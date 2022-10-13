@@ -4,9 +4,10 @@ import {
     addChilds,
     removeChilds,
     setEvents,
+    enable,
     Component,
-    Checkbox,
 } from 'jezvejs';
+import { Checkbox } from 'jezvejs/Checkbox';
 import {
     EXPENSE,
     INCOME,
@@ -30,6 +31,7 @@ const TITLE_TRANSFER = 'Transfer';
 const TITLE_DEBT = 'Debt';
 
 const defaultProps = {
+    disabled: false,
     typeParam: 'type',
     url: window.location,
     multiple: false,
@@ -144,6 +146,11 @@ export class TransactionTypeMenu extends Component {
         this.render(this.state);
     }
 
+    enable(value = true) {
+        this.state.disabled = !value;
+        this.render(this.state);
+    }
+
     setSelection(selectedItems) {
         const showAll = (
             !Array.isArray(selectedItems)
@@ -241,11 +248,13 @@ export class TransactionTypeMenu extends Component {
         return res;
     }
 
-    renderCheckboxItem(item, state) {
-        const isLink = (!item.selected || state.allowActiveLink);
+    isLinkItem(item, state) {
+        return !state.disabled && (!item.selected || state.allowActiveLink);
+    }
 
+    renderCheckboxItem(item, state) {
         let label = item.title;
-        if (isLink) {
+        if (this.isLinkItem(item, state)) {
             const linkElem = this.renderLinkElement(item, state);
             setEvents(linkElem, { click: (e) => this.onSelectItem(e) });
             label = linkElem;
@@ -255,6 +264,7 @@ export class TransactionTypeMenu extends Component {
             className: ITEM_CLASS,
             checked: item.selected,
             label,
+            disabled: state.disabled,
             onChange: () => this.onToggleItem(item.type),
         });
 
@@ -275,7 +285,7 @@ export class TransactionTypeMenu extends Component {
         elem.setAttribute('data-type', item.type);
 
         const titleElem = ce('span', { className: ITEM_TITLE_CLASS });
-        if (!item.selected || state.allowActiveLink) {
+        if (this.isLinkItem(item, state)) {
             const linkElem = this.renderLinkElement(item, state);
             setEvents(linkElem, { click: (e) => this.onSelectItem(e) });
             titleElem.appendChild(linkElem);
@@ -292,6 +302,8 @@ export class TransactionTypeMenu extends Component {
         const elems = state.items.map((item) => this.renderItem(item, state));
         removeChilds(this.elem);
         addChilds(this.elem, elems);
+
+        enable(this.elem, !state.disabled);
 
         if (state.multiple) {
             this.elem.classList.add(MULTI_CLASS);

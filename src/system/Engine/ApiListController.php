@@ -2,8 +2,6 @@
 
 namespace JezveMoney\Core;
 
-const MSG_NO_IDS = "No ids specified";
-
 class ApiListController extends ApiController
 {
     protected $requiredFields = [];
@@ -21,7 +19,7 @@ class ApiListController extends ApiController
     {
         $ids = $this->getRequestedIds();
         if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            throw new \Error(MSG_NO_IDS);
+            throw new \Error(Message::get(ERR_NO_IDS));
         }
 
         $res = [];
@@ -210,7 +208,7 @@ class ApiListController extends ApiController
 
         $ids = $this->getRequestedIds(true, $this->isJsonContent());
         if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            throw new \Error(MSG_NO_IDS);
+            throw new \Error(Message::get(ERR_NO_IDS));
         }
 
         $this->begin();

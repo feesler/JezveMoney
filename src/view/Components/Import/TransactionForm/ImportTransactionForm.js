@@ -5,12 +5,12 @@ import {
     isFunction,
     insertAfter,
     checkDate,
-    Checkbox,
-    DatePicker,
-    DropDown,
-    DecimalInput,
-    InputGroup,
 } from 'jezvejs';
+import { Checkbox } from 'jezvejs/Checkbox';
+import { DatePicker } from 'jezvejs/DatePicker';
+import { DropDown } from 'jezvejs/DropDown';
+import { DecimalInput } from 'jezvejs/DecimalInput';
+import { InputGroup } from 'jezvejs/InputGroup';
 import { fixFloat } from '../../../js/utils.js';
 import { ImportTransactionBase } from '../TransactionBase/ImportTransactionBase.js';
 import { Field } from '../../Field/Field.js';
@@ -34,7 +34,12 @@ const IG_BUTTON_TITLE_CLASS = 'input-group__btn-title';
 const DEFAULT_INPUT_CLASS = 'stretch-input';
 const AMOUNT_INPUT_CLASS = 'right-align-text';
 /* Fields */
+const TYPE_FIELD_CLASS = 'type-field';
+const ACCOUNT_FIELD_CLASS = 'account-field';
 const AMOUNT_FIELD_CLASS = 'amount-field';
+const SRC_AMOUNT_FIELD_CLASS = 'src-amount-field';
+const DEST_AMOUNT_FIELD_CLASS = 'dest-amount-field';
+const PERSON_FIELD_CLASS = 'person-field';
 const DATE_FIELD_CLASS = 'date-field';
 const COMMENT_FIELD_CLASS = 'comment-field';
 /* Controls */
@@ -67,6 +72,7 @@ const CANCEL_BTN_TITLE = 'Cancel';
 
 const defaultProps = {
     onEnable: null,
+    onUpdate: null,
     onRemove: null,
     onSave: null,
     onCancel: null,
@@ -205,6 +211,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.trTypeField = Field.create({
             title: 'Type',
             content: selectElem,
+            className: TYPE_FIELD_CLASS,
         });
 
         this.typeDropDown = DropDown.create({
@@ -225,6 +232,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.transferAccountField = Field.create({
             title: TITLE_FIELD_DEST_ACCOUNT,
             content: selectElem,
+            className: ACCOUNT_FIELD_CLASS,
         });
 
         this.transferAccDropDown = DropDown.create({
@@ -241,6 +249,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.personField = Field.create({
             title: TITLE_FIELD_PERSON,
             content: selectElem,
+            className: PERSON_FIELD_CLASS,
         });
 
         this.personDropDown = DropDown.create({
@@ -287,7 +296,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.srcAmountField = Field.create({
             title: TITLE_FIELD_AMOUNT,
             content: this.srcAmountGroup.elem,
-            className: AMOUNT_FIELD_CLASS,
+            className: [AMOUNT_FIELD_CLASS, SRC_AMOUNT_FIELD_CLASS],
         });
     }
 
@@ -327,7 +336,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.destAmountField = Field.create({
             title: TITLE_FIELD_DEST_AMOUNT,
             content: this.destAmountGroup.elem,
-            className: AMOUNT_FIELD_CLASS,
+            className: [AMOUNT_FIELD_CLASS, DEST_AMOUNT_FIELD_CLASS],
         });
         this.destAmountField.hide();
     }
@@ -392,6 +401,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setTransactionType(type.id);
         this.clearInvalid();
         this.render();
+        this.sendUpdate();
     }
 
     /** Destination account select 'change' event handler */
@@ -399,6 +409,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setTransferAccount(account.id);
         this.clearInvalid();
         this.render();
+        this.sendUpdate();
     }
 
     /** Person select 'change' event handler */
@@ -406,6 +417,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setPerson(person.id);
         this.clearInvalid();
         this.render();
+        this.sendUpdate();
     }
 
     /** Source amount field 'input' event handler */
@@ -414,6 +426,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setSourceAmount(value);
         this.clearInvalid();
         this.render();
+        this.sendUpdate();
     }
 
     /** Destination amount field 'input' event handler */
@@ -422,6 +435,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setDestAmount(value);
         this.clearInvalid();
         this.render();
+        this.sendUpdate();
     }
 
     /** Currency select 'change' event handler */
@@ -429,6 +443,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setSourceCurrency(currency.id);
         this.clearInvalid();
         this.render();
+        this.sendUpdate();
     }
 
     /** Currency select 'change' event handler */
@@ -436,6 +451,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setDestCurrency(currency.id);
         this.clearInvalid();
         this.render();
+        this.sendUpdate();
     }
 
     /** Date field 'input' event handler */
@@ -444,6 +460,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setDate(value);
         this.clearInvalid();
         this.render();
+        this.sendUpdate();
     }
 
     /** DatePicker select event handler */
@@ -453,6 +470,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.datePicker.hide();
         this.clearInvalid();
         this.render();
+        this.sendUpdate();
     }
 
     /** Comment field 'input' event handler */
@@ -461,6 +479,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setComment(value);
         this.clearInvalid();
         this.render();
+        this.sendUpdate();
     }
 
     /** Validate transaction object */
@@ -480,6 +499,13 @@ export class ImportTransactionForm extends ImportTransactionBase {
         window.app.clearBlockValidation(this.destAmountField.elem);
         window.app.clearBlockValidation(this.dateField.elem);
         this.setFeedback();
+    }
+
+    /** Send component 'update' event */
+    sendUpdate() {
+        if (isFunction(this.props.onUpdate)) {
+            this.props.onUpdate(this.state.transaction);
+        }
     }
 
     validateSourceAmount(state) {
@@ -507,6 +533,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
     /** Validate transaction object */
     validate() {
         const { state } = this;
+        const isDiff = state.transaction.isDiff();
         const transaction = state.transaction.state;
 
         if (transaction.type === 'expense') {
@@ -514,7 +541,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
             if (!destAmountValid) {
                 return false;
             }
-            if (transaction.isDiff) {
+            if (isDiff) {
                 const srcAmountValid = this.validateSourceAmount(transaction);
                 if (!srcAmountValid) {
                     return false;
@@ -525,7 +552,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
             if (!srcAmountValid) {
                 return false;
             }
-            if (transaction.isDiff) {
+            if (isDiff) {
                 const destAmountValid = this.validateDestAmount(transaction);
                 if (!destAmountValid) {
                     return false;
@@ -590,6 +617,8 @@ export class ImportTransactionForm extends ImportTransactionBase {
         if (!state) {
             throw new Error('Invalid state');
         }
+
+        const isDiff = state.transaction.isDiff();
         const transaction = state.transaction.state;
 
         const isIncome = transaction.type === 'income';
@@ -618,7 +647,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
             );
             this.destAmountField.show();
 
-            const destAmountLabel = (transaction.isDiff)
+            const destAmountLabel = (isDiff)
                 ? TITLE_FIELD_DEST_AMOUNT
                 : TITLE_FIELD_AMOUNT;
             this.destAmountInp.placeholder = destAmountLabel;
@@ -626,7 +655,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
 
             // Source amount field
             this.srcAmountInp.value = transaction.sourceAmount;
-            enable(this.srcAmountInp, transaction.enabled && transaction.isDiff);
+            enable(this.srcAmountInp, transaction.enabled && isDiff);
             this.srcCurrencyDropDown.enable(false);
             enable(this.srcCurrencyBtn, false);
             this.renderCurrency(
@@ -634,7 +663,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
                 this.srcCurrencyDropDown,
                 transaction.srcCurrId,
             );
-            this.srcAmountField.show(transaction.isDiff);
+            this.srcAmountField.show(isDiff);
 
             this.srcAmountInp.placeholder = TITLE_FIELD_SRC_AMOUNT;
             this.srcAmountField.setTitle(TITLE_FIELD_SRC_AMOUNT);
@@ -651,7 +680,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
             );
             this.srcAmountField.show();
 
-            const srcAmountLabel = (transaction.isDiff)
+            const srcAmountLabel = (isDiff)
                 ? TITLE_FIELD_SRC_AMOUNT
                 : TITLE_FIELD_AMOUNT;
             this.srcAmountInp.placeholder = srcAmountLabel;
@@ -659,7 +688,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
 
             // Destination amount field
             this.destAmountInp.value = transaction.destAmount;
-            enable(this.destAmountInp, transaction.enabled && transaction.isDiff);
+            enable(this.destAmountInp, transaction.enabled && isDiff);
             this.destCurrencyDropDown.enable(false);
             enable(this.destCurrencyBtn, false);
             this.renderCurrency(
@@ -667,7 +696,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
                 this.destCurrencyDropDown,
                 transaction.destCurrId,
             );
-            this.destAmountField.show(transaction.isDiff);
+            this.destAmountField.show(isDiff);
 
             this.destAmountInp.placeholder = TITLE_FIELD_DEST_AMOUNT;
             this.destAmountField.setTitle(TITLE_FIELD_DEST_AMOUNT);

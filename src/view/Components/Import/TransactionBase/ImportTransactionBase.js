@@ -2,15 +2,13 @@ import {
     ce,
     isFunction,
     Component,
-    Collapsible,
 } from 'jezvejs';
+import { Collapsible } from 'jezvejs/Collapsible';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 
 /** CSS classes */
-const DEFAULT_BUTTON_CLASS = 'btn';
-const TOGGLE_BUTTON_CLASS = 'toggle-btn';
-const DEFAULT_ICON_CLASS = 'icon';
-const TOGGLE_ICON_CLASS = 'toggle-icon';
+const TOGGLE_BUTTON_CLASS = 'btn icon-btn toggle-btn';
+const TOGGLE_ICON_CLASS = 'icon toggle-icon';
 
 /** Base import transaction class */
 export class ImportTransactionBase extends Component {
@@ -44,8 +42,8 @@ export class ImportTransactionBase extends Component {
     createToggleButton() {
         return ce(
             'button',
-            { className: `${DEFAULT_BUTTON_CLASS} ${TOGGLE_BUTTON_CLASS}`, type: 'button' },
-            window.app.createIcon('toggle-ext', `${DEFAULT_ICON_CLASS} ${TOGGLE_ICON_CLASS}`),
+            { className: TOGGLE_BUTTON_CLASS, type: 'button' },
+            window.app.createIcon('toggle-ext', TOGGLE_ICON_CLASS),
             { click: () => this.toggleCollapse() },
         );
     }

@@ -8,18 +8,18 @@ import {
     setEmptyClick,
     removeEmptyClick,
     Component,
-    Checkbox,
 } from 'jezvejs';
-import { IconLink } from '../IconLink/IconLink.js';
+import { Checkbox } from 'jezvejs/Checkbox';
+import { IconButton } from '../IconButton/IconButton.js';
 import './style.scss';
 
 /* CSS classes */
 const MENU_CLASS = 'actions-menu';
 const LIST_CLASS = 'actions-menu-list';
-const BUTTON_CLASS = 'btn menu-btn';
-const ICON_CLASS = 'icon menu-icon';
+const BUTTON_CLASS = 'btn icon-btn actions-menu-btn';
+const ICON_CLASS = 'icon actions-menu-btn__icon';
 const SEPARATOR_CLASS = 'actions-menu-list__separator';
-const ICONLINK_CLASS = 'action-iconlink';
+const ICONBTN_CLASS = 'action-iconbutton';
 const CHECKBOX_CLASS = 'action-checkbox';
 
 const defaultProps = {
@@ -31,6 +31,14 @@ const defaultProps = {
 export class PopupMenu extends Component {
     static create(props) {
         return new PopupMenu(props);
+    }
+
+    static activeInstance = null;
+
+    static hideActive() {
+        if (this.activeInstance) {
+            this.activeInstance.hideMenu();
+        }
     }
 
     constructor(props) {
@@ -113,8 +121,8 @@ export class PopupMenu extends Component {
         }
 
         const { className = [], ...rest } = item;
-        const button = IconLink.create({
-            className: [ICONLINK_CLASS, ...asArray(className)],
+        const button = IconButton.create({
+            className: [ICONBTN_CLASS, ...asArray(className)],
             ...rest,
         });
         this.menuList.append(button.elem);
@@ -186,15 +194,17 @@ export class PopupMenu extends Component {
         this.menuList.style.left = '';
         this.menuList.style.width = '';
 
+        PopupMenu.activeInstance = null;
+
         removeEmptyClick(this.emptyClickHandler);
     }
 
-    toggleMenu(e) {
-        e.stopPropagation();
-
+    toggleMenu() {
         if (this.menuList.hasAttribute('hidden')) {
             show(this.menuList, true);
             this.calculatePosition();
+
+            PopupMenu.activeInstance = this;
 
             setEmptyClick(this.emptyClickHandler);
         } else {

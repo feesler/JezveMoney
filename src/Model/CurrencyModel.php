@@ -51,29 +51,27 @@ class CurrencyModel extends CachedTable
     }
 
 
-    protected function validateParams($params, $isUpdate = false)
+    protected function validateParams($params, $item_id = 0)
     {
         $avFields = ["name", "sign", "flags"];
         $res = [];
 
         // In CREATE mode all fields is required
-        if (!$isUpdate && !checkFields($params, $avFields)) {
-            return null;
+        if (!$item_id) {
+            checkFields($params, $avFields, true);
         }
 
         if (isset($params["name"])) {
             $res["name"] = $this->dbObj->escape($params["name"]);
             if (is_empty($res["name"])) {
-                wlog("Invalid name specified");
-                return null;
+                throw new \Error("Invalid name specified");
             }
         }
 
         if (isset($params["sign"])) {
             $res["sign"] = $this->dbObj->escape($params["sign"]);
             if (is_empty($res["sign"])) {
-                wlog("Invalid sign specified");
-                return null;
+                throw new \Error("Invalid sign specified");
             }
         }
 
@@ -81,24 +79,23 @@ class CurrencyModel extends CachedTable
             $res["flags"] = intval($params["flags"]);
         }
 
+        if ($this->isSameItemExist($res, $item_id)) {
+            throw new \Error("Same currency already exist");
+        }
+
         return $res;
     }
 
 
     // Check same item already exist
-    protected function isSameItemExist($params, $updateId = 0)
+    protected function isSameItemExist($params, $item_id = 0)
     {
         if (!is_array($params) || !isset($params["name"])) {
             return false;
         }
 
         $foundItem = $this->findByName($params["name"]);
-        if ($foundItem && $foundItem->id != $updateId) {
-            wlog("Such item already exist");
-            return true;
-        }
-
-        return false;
+        return ($foundItem && $foundItem->id != $item_id);
     }
 
 
@@ -106,14 +103,6 @@ class CurrencyModel extends CachedTable
     protected function preCreate($params, $isMultiple = false)
     {
         $res = $this->validateParams($params);
-        if (is_null($res)) {
-            return null;
-        }
-
-        if ($this->isSameItemExist($res)) {
-            return null;
-        }
-
         $res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
 
         return $res;
@@ -123,21 +112,12 @@ class CurrencyModel extends CachedTable
     // Preparations for item update
     protected function preUpdate($item_id, $params)
     {
-        // check currency is exist
-        $currObj = $this->getItem($item_id);
-        if (!$currObj) {
-            return false;
+        $item = $this->getItem($item_id);
+        if (!$item) {
+            throw new \Error("Item not found");
         }
 
-        $res = $this->validateParams($params, true);
-        if (is_null($res)) {
-            return null;
-        }
-
-        if ($this->isSameItemExist($res, $item_id)) {
-            return null;
-        }
-
+        $res = $this->validateParams($params, $item_id);
         $res["updatedate"] = date("Y-m-d H:i:s");
 
         return $res;

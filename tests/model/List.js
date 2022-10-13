@@ -79,12 +79,7 @@ export class List {
     }
 
     getLatestId() {
-        let res = 0;
-        for (const item of this.data) {
-            res = Math.max(item.id, res);
-        }
-
-        return res;
+        return this.data.reduce((res, item) => Math.max(item.id, res), 0);
     }
 
     /** Return id of item with specified index(absolute position) in list */
@@ -196,6 +191,10 @@ export class List {
             .filter((item) => !itemIds.includes(item.id));
 
         return res;
+    }
+
+    indexOf(...args) {
+        return this.data.indexOf(...args);
     }
 
     forEach(...args) {

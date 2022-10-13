@@ -81,6 +81,16 @@ export const dateStringToTime = (value) => {
     return (res) ? (res / 1000) : null;
 };
 
+/** Convert Unix timestamp in seconds to date string */
+export const timeToDate = (value) => {
+    const time = parseInt(value, 10);
+    if (Number.isNaN(time) || time === 0) {
+        throw new Error('Invalid time value');
+    }
+
+    return new Date(time * 1000);
+};
+
 /**
  * Fix string to correct float number format
  * @param {string} str - decimal value string
@@ -89,20 +99,19 @@ export const fixFloat = (str) => {
     if (typeof str === 'number') {
         return str;
     }
-
-    if (typeof str === 'string') {
-        let res = str.replace(/,/g, '.');
-        if (res.indexOf('.') === 0 || !res.length) {
-            res = `0${res}`;
-        }
-        return res;
+    if (typeof str !== 'string') {
+        return null;
     }
 
-    return null;
+    let res = str.replace(/,/g, '.');
+    if (res.indexOf('.') === 0 || !res.length) {
+        res = `0${res}`;
+    }
+    return res;
 };
 
 /** Convert string to amount value */
-export const amountFix = (value) => {
+export const amountFix = (value, thSep = ' ') => {
     if (typeof value === 'number') {
         return value;
     }
@@ -110,7 +119,14 @@ export const amountFix = (value) => {
         return null;
     }
 
-    const res = value.replace(/ /, '');
+    // Trim leading and trailing spaces
+    let res = value.trim();
+    // Cut thousands separator
+    if (thSep.length > 0) {
+        const search = new RegExp(`(\\d)${thSep}(\\d)`, 'g');
+        res = res.replaceAll(search, '$1$2');
+    }
+
     return parseFloat(fixFloat(res));
 };
 
@@ -134,9 +150,7 @@ export const correctExch = (val) => correct(val, 5);
  * @param {string|Number} val - value to normalize
  * @param {Number} prec - precision of result decimal
  */
-export const normalize = (val, prec = 2) => (
-    parseFloat(parseFloat(fixFloat(val)).toFixed(prec))
-);
+export const normalize = (val, prec = 2) => correct(fixFloat(val), prec);
 
 /**
  * Normalize exchange rate value from string

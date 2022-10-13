@@ -1,5 +1,5 @@
 <?php
-use JezveMoney\App\Template\Component\IconLink;
+use JezveMoney\App\Template\Component\IconButton;
 
 include(TPL_PATH . "Header.tpl");	?>
 
@@ -26,22 +26,22 @@ include(TPL_PATH . "Header.tpl");	?>
                                 </div>
                             </div>
                             <div class="header-actions">
-                                <?=IconLink::render($uploadBtn)?>
+                                <?=IconButton::render($uploadBtn)?>
 
                                 <div class="actions-menu">
-                                    <button id="toggleActionsMenuBtn" class="actions-menu-btn" type="button">
+                                    <button id="toggleActionsMenuBtn" class="btn icon-btn actions-menu-btn" type="button">
                                         <?=svgIcon("ellipsis", "actions-menu-btn__icon")?>
                                     </button>
                                     <div id="actionsList" class="actions-menu-list" hidden>
-                                        <?=IconLink::render([
+                                        <?=IconButton::render([
                                             "id" => "newItemBtn",
-                                            "classNames" => "action-iconlink",
+                                            "classNames" => "action-iconbutton",
                                             "title" => "Add item",
                                             "icon" => "plus"
                                         ])?>
-                                        <?=IconLink::render([
+                                        <?=IconButton::render([
                                             "attributes" => ["id" => "clearFormBtn", "disabled" => true],
-                                            "classNames" => "action-iconlink",
+                                            "classNames" => "action-iconbutton",
                                             "title" => "Delete all",
                                             "icon" => "del"
                                         ])?>
@@ -51,12 +51,18 @@ include(TPL_PATH . "Header.tpl");	?>
                                             <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                                             <span class="checkbox__label">Enable rules</span>
                                         </label>
-                                        <?=IconLink::render([
+                                        <?=IconButton::render([
                                             "id" => "rulesBtn",
-                                            "classNames" => "action-iconlink",
+                                            "classNames" => "action-iconbutton",
                                             "title" => "Edit rules",
                                             "icon" => "edit"
                                         ])?>
+                                        <div class="actions-menu-list__separator"></div>
+                                        <label id="similarCheck" class="checkbox action-checkbox">
+                                            <input type="checkbox" checked>
+                                            <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
+                                            <span class="checkbox__label">Check similar transactions</span>
+                                        </label>
                                     </div>
                                 </div>
                             </div>

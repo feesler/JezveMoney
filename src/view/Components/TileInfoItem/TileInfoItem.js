@@ -1,47 +1,31 @@
-import { isFunction, Component } from 'jezvejs';
+import { isFunction, enable, Component } from 'jezvejs';
 
 /**
  * TileInfoItem component
  */
 export class TileInfoItem extends Component {
-    /**
-     * Create new TileInfoItem from specified element
-     */
     static fromElement(props) {
-        let res;
-
-        try {
-            res = new TileInfoItem(props);
-            res.parse();
-        } catch {
-            return null;
-        }
-
+        const res = new TileInfoItem(props);
+        res.parse();
         return res;
     }
 
-    /**
-     * Parse DOM to obtain child elements and build state of component
-     */
+    /** Parse DOM to obtain child elements and build state of component */
     parse() {
-        if (!(this.elem instanceof Element)) {
+        if (!(this.elem)) {
             throw new Error('Invalid element specified');
         }
 
         this.labelElem = this.elem.firstElementChild;
-        if (this.labelElem) {
-            this.label = this.labelElem.textContent;
-        }
 
         this.buttonElem = this.elem.querySelector('button');
         if (this.buttonElem && isFunction(this.props.onclick)) {
             this.buttonElem.addEventListener('click', this.props.onclick);
         }
+    }
 
-        this.titleElem = this.buttonElem.querySelector('span');
-        if (this.titleElem) {
-            this.title = this.titleElem.textContent;
-        }
+    enable(value = true) {
+        enable(this.buttonElem, !!value);
     }
 
     /**
@@ -75,6 +59,6 @@ export class TileInfoItem extends Component {
         }
 
         this.title = title;
-        this.titleElem.textContent = this.title;
+        this.buttonElem.textContent = this.title;
     }
 }

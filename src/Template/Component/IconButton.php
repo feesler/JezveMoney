@@ -4,10 +4,10 @@ namespace JezveMoney\App\Template\Component;
 
 use JezveMoney\Core\TemplateComponent;
 
-class IconLink extends TemplateComponent
+class IconButton extends TemplateComponent
 {
     protected static $template = null;
-    protected static $filename = "IconLink.tpl";
+    protected static $filename = "IconButton.tpl";
 
     public static function render($data)
     {
@@ -23,23 +23,26 @@ class IconLink extends TemplateComponent
         if (isset($data["hidden"]) && $data["hidden"] == true) {
             $attrs[] = "hidden";
         }
-        $data["attributes"] = implode(" ", $attrs);
 
-        $classNames = ["iconlink"];
+        $classNames = ["iconbutton"];
         if (isset($data["classNames"])) {
             array_push($classNames, ...asArray($data["classNames"]));
         }
-        $data["classNames"] = implode(" ", $classNames);
+        $attrs[] = "class=\"" . implode(" ", $classNames) . "\"";
 
         if (!isset($data["type"])) {
             $data["type"] = "button";
         }
 
-        if ($data["type"] == "link") {
-            $data["linkAttributes"] = isset($data["link"])
-                ? "href=\"" . e($data["link"]) . "\""
-                : "";
+        if ($data["type"] == "button") {
+            $attrs[] = "type=\"button\"";
         }
+
+        if ($data["type"] == "link" && isset($data["link"])) {
+            $attrs[] = "href=\"" . e($data["link"]) . "\"";
+        }
+
+        $data["attributes"] = implode(" ", $attrs);
 
         return self::renderTemplate($data);
     }

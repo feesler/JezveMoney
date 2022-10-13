@@ -18,6 +18,10 @@
   --input-disabled-border-color: #202020;
   --input-disabled-text-color: #707070;
 
+  /* List item icons */
+  --list-item-icon-fill: #888888;
+  --list-item-hover-icon-fill: #dddddd;
+
   color: var(--main-text-color);
   background-color: var(--main-bg-color);
 
@@ -58,16 +62,18 @@
     color: var(--main-text-color);
   }
 
-  .iconlink .iconlink__icon {
-    border-color: var(--main-text-color);
-  }
+  .iconbutton {
+    .iconbutton__icon {
+      border-color: var(--main-text-color);
+    }
 
-  .iconlink .iconlink__icon-content {
-    fill: var(--main-text-color);
-  }
+    .iconbutton__icon-content {
+      fill: var(--main-text-color);
+    }
 
-  .iconlink .iconlink__content {
-    color: var(--main-text-color);
+    .iconbutton__content {
+      color: var(--main-text-color);
+    }
   }
 
   /* No data message for lists & etc. */
@@ -103,13 +109,21 @@
     border-color: var(--active-input-border-color);
   }
 
+  .stretch-input[disabled] {
+    color: var(--input-disabled-text-color);
+    background-color: var(--input-disabled-bg-color);
+  }
+
   /* Input group */
   .input-group {
     --ig-border-color: var(--input-border-color);
     --ig-input-color: var(--main-text-color);
     --ig-input-bg: var(--input-bg-color);
     --ig-input-active-border: var(--active-input-border-color);
-    --ig-button-disabled-color: var(--main-text-color);
+    --ig-input-disabled-color: var(--input-disabled-text-color);
+    --ig-input-disabled-bg: var(--input-disabled-bg-color);
+    --ig-input-disabled-border: var(--input-border-color);
+    --ig-button-disabled-color: var(--input-disabled-text-color);
     --ig-button-disabled-border: var(--input-border-color);
     --ig-button-disabled-bg: #202020;
     --ig-inner-button-color: #888888;
@@ -221,7 +235,7 @@
   }
 
   /* Profile view */
-  .profile_block {
+  .profile-block {
     color: var(--main-text-color);
   }
 
@@ -245,8 +259,8 @@
   }
 
   /* Swap button */
-  .swap-btn {
-    border-color: #2e2e2e;
+  .swap-btn:active {
+    background-color: #2e2e2e;
   }
 
   .swap-icon {
@@ -293,7 +307,7 @@
     }
 
     .icon {
-      fill: #888888;
+      fill: var(--list-item-icon-fill);
     }
   }
 
@@ -345,7 +359,7 @@
     }
 
     .icon {
-      fill: #888888;
+      fill: var(--list-item-icon-fill);
     }
   }
 
@@ -375,7 +389,7 @@
 
   .rule-item .icon,
   .rule-form .icon {
-    fill: #888888;
+    fill: var(--list-item-icon-fill);
   }
 
   .rule-item__info {
@@ -437,13 +451,18 @@
   }
 
   /* Tile info block */
-  .tile-info-block > div > span {
+  .tile-info-item {
     color: var(--main-text-color);
   }
 
   /* Transaction list mode selector */
   .mode-selector > b > span {
     color: var(--main-text-color);
+  }
+
+  /* Input group disabled button with icon */
+  .input-group .icon-btn[disabled] .icon {
+    fill: var(--input-disabled-text-color);
   }
 }
 
@@ -453,13 +472,19 @@
       color: var(--hl-text-color);
     }
 
-    .iconlink:hover .iconlink__icon {
-      background-color: var(--main-text-color);
-    }
+    .iconbutton:hover {
+      .iconbutton__icon,
+      .iconbutton__content {
+        color: var(--main-text-color);
+      }
 
-    .iconlink > *:hover .iconlink__icon,
-    .iconlink > *:hover .iconlink__content {
-      color: var(--main-text-color);
+      .iconbutton__icon {
+        background-color: var(--main-text-color);
+      }
+
+      .iconbutton__icon-content {
+        fill: #202020;
+      }
     }
 
     .filters-collapsible .collapsible-header:hover {
@@ -468,13 +493,6 @@
 
     .swap-btn:hover .swap-icon {
       fill: var(--main-text-color);
-    }
-
-    .import-form,
-    .import-item {
-      .toggle-btn:hover {
-        background-color: #303030;
-      }
     }
 
     .rule-item .collapsible-header:hover,
@@ -490,17 +508,13 @@
 
     .rule-item .icon-btn:hover .icon,
     .rule-form .icon-btn:hover .icon {
-      fill: #dddddd;
+      fill: var(--list-item-hover-icon-fill);
     }
 
     /* Import form */
-    .import-form .btn:hover .icon,
-    .import-item .btn:hover .icon {
-      fill: #dddddd;
-    }
-
-    .iconlink:hover .iconlink__icon-content {
-      fill: #202020;
+    .import-form .icon-btn:hover .icon,
+    .import-item .icon-btn:hover .icon {
+      fill: var(--list-item-hover-icon-fill);
     }
 
     .tile_header .close-btn:hover .close-icon {

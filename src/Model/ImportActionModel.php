@@ -84,7 +84,7 @@ class ImportActionModel extends CachedTable
     }
 
 
-    protected function validateParams($params, $isUpdate = false)
+    protected function validateParams($params, $item_id = 0)
     {
         $avFields = [
             "rule_id",
@@ -94,28 +94,30 @@ class ImportActionModel extends CachedTable
         $res = [];
 
         // In CREATE mode all fields is required
-        if (!$isUpdate && !checkFields($params, $avFields)) {
-            return null;
+        if (!$item_id) {
+            checkFields($params, $avFields, true);
         }
 
         if (isset($params["rule_id"])) {
             $res["rule_id"] = intval($params["rule_id"]);
             if (!$this->ruleModel->isExist($res["rule_id"])) {
-                wlog("Invalid rule_id: " . $params["rule_id"]);
-                return null;
+                throw new \Error("Invalid rule_id: " . $params["rule_id"]);
             }
         }
 
         if (isset($params["action_id"])) {
             $res["action_id"] = intval($params["action_id"]);
             if (!in_array($res["action_id"], self::$availActions)) {
-                wlog("Invalid action: " . $res["action_id"]);
-                return null;
+                throw new \Error("Invalid action: " . $res["action_id"]);
             }
         }
 
         if (isset($params["value"])) {
             $res["value"] = $this->dbObj->escape($params["value"]);
+        }
+
+        if ($this->isSameItemExist($res, $item_id)) {
+            throw new \Error("Same import action already exist");
         }
 
         return $res;
@@ -135,26 +137,22 @@ class ImportActionModel extends CachedTable
 
         $action = intval($actionId);
         if (!in_array($action, self::$availActions)) {
-            wlog("Invalid action: " . $actionId);
-            return false;
+            throw new \Error("Invalid action: " . $actionId);
         }
 
         if ($action == IMPORT_ACTION_SET_TR_TYPE) {
             if (!in_array(strtolower($value), $importTransactionTypes)) {
-                wlog("Invalid transaction type: " . $value);
-                return false;
+                throw new \Error("Invalid transaction type: " . $value);
             }
         } elseif ($action == IMPORT_ACTION_SET_ACCOUNT) {
             $accountId = intval($value);
             if (!$this->accModel->isExist($accountId)) {
-                wlog("Invalid account id: " . $value);
-                return false;
+                throw new \Error("Invalid account id: " . $value);
             }
         } elseif ($action == IMPORT_ACTION_SET_PERSON) {
             $personId = intval($value);
             if (!$this->personModel->isExist($personId)) {
-                wlog("Invalid person id: " . $value);
-                return false;
+                throw new \Error("Invalid person id: " . $value);
             }
         } elseif (
             $action == IMPORT_ACTION_SET_SRC_AMOUNT
@@ -162,19 +160,16 @@ class ImportActionModel extends CachedTable
         ) {
             $amount = floatval($value);
             if ($amount == 0.0) {
-                wlog("Invalid amount: " . $value);
-                return false;
+                throw new \Error("Invalid amount: " . $value);
             }
         }
-
-        return true;
     }
 
 
     // Check same item already exist
-    protected function isSameItemExist($params, $updateId = 0)
+    protected function isSameItemExist($params, $item_id = 0)
     {
-        if (!is_array($params)) {
+        if (!is_array($params) || !isset($params["rule_id"]) || !isset($params["action_id"])) {
             return false;
         }
 
@@ -182,16 +177,8 @@ class ImportActionModel extends CachedTable
             "rule" => $params["rule_id"],
             "action" => $params["action_id"]
         ]);
-        if (!count($items)) {
-            return false;
-        }
-        $foundItem = $items[0];
-        if ($foundItem->id != $updateId) {
-            wlog("Such item already exist");
-            return true;
-        }
-
-        return false;
+        $foundItem = (count($items) > 0) ? $items[0] : null;
+        return ($foundItem && $foundItem->id != $item_id);
     }
 
 
@@ -199,18 +186,8 @@ class ImportActionModel extends CachedTable
     protected function preCreate($params, $isMultiple = false)
     {
         $res = $this->validateParams($params);
-        if (is_null($res)) {
-            return null;
-        }
 
-        if ($this->isSameItemExist($res)) {
-            return null;
-        }
-
-        if (!$this->validateAction($res["action_id"], $res["value"])) {
-            wlog("Invalid import action");
-            return null;
-        }
+        $this->validateAction($res["action_id"], $res["value"]);
 
         $res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
         $res["user_id"] = self::$user_id;
@@ -222,33 +199,20 @@ class ImportActionModel extends CachedTable
     // Preparations for item update
     protected function preUpdate($item_id, $params)
     {
-        // check currency is exist
-        $actionObj = $this->getItem($item_id);
-        if (!$actionObj) {
-            return false;
+        $item = $this->getItem($item_id);
+        if (!$item) {
+            throw new \Error("Item not found");
+        }
+        if ($item->user_id != self::$user_id) {
+            throw new \Error("Invalid user");
         }
 
-        // check user of account
-        if ($actionObj->user_id != self::$user_id) {
-            return false;
-        }
+        $res = $this->validateParams($params, $item_id);
 
-        $res = $this->validateParams($params, true);
-        if (is_null($res)) {
-            return null;
-        }
+        $targetAction = isset($res["action_id"]) ? $res["action_id"] : $item->action;
+        $targetValue = isset($res["value"]) ? $res["value"] : $item->value;
 
-        if ($this->isSameItemExist($res, $item_id)) {
-            return null;
-        }
-
-        $targetAction = isset($res["action_id"]) ? $res["action_id"] : $actionObj->action;
-        $targetValue = isset($res["value"]) ? $res["value"] : $actionObj->value;
-
-        if (!$this->validateAction($targetAction, $targetValue)) {
-            wlog("Invalid import action");
-            return null;
-        }
+        $this->validateAction($targetAction, $targetValue);
 
         $res["updatedate"] = date("Y-m-d H:i:s");
 

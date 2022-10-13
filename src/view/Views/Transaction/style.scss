@@ -7,9 +7,8 @@
   background: none;
   padding: 5px;
   align-self: flex-end;
-  border-width: 1px;
-  border-style: solid;
-  border-radius: 3px;
+  border: 0 none;
+  border-radius: 50%;
   cursor: pointer;
 }
 
@@ -64,14 +63,18 @@
 }
 
 .tile-info-block {
+  display: flex;
+  flex-flow: column nowrap;
+  row-gap: 10px;
   height: 100px;
   min-width: 100px;
   margin: 8px 20px 10px 0;
-  overflow: hidden;
 }
 
-.tile-info-block > div {
-  margin: 0 0 10px 0;
+.tile-info-item {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: flex-start;
 }
 
 .account-toggler {

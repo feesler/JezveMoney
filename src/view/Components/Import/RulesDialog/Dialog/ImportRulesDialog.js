@@ -1,23 +1,24 @@
 import {
     ge,
-    ce,
+    createElement,
     re,
     removeChilds,
     show,
     insertAfter,
     isFunction,
     Component,
-    Popup,
-    InputGroup,
-    Paginator,
 } from 'jezvejs';
-import { API } from '../../../../js/API.js';
+import { Popup } from 'jezvejs/Popup';
+import { InputGroup } from 'jezvejs/InputGroup';
+import { Paginator } from 'jezvejs/Paginator';
+import { API } from '../../../../js/api/index.js';
 import { ImportRule } from '../../../../js/model/ImportRule.js';
 import { ImportRuleForm } from '../RuleForm/ImportRuleForm.js';
 import { ImportRuleItem } from '../RuleItem/ImportRuleItem.js';
 import { ConfirmDialog } from '../../../ConfirmDialog/ConfirmDialog.js';
 import './style.scss';
 import { LoadingIndicator } from '../../../LoadingIndicator/LoadingIndicator.js';
+import { PopupMenu } from '../../../PopupMenu/PopupMenu.js';
 
 /** CSS classes */
 export const IMPORT_RULES_DIALOG_CLASS = 'rules-dialog';
@@ -68,6 +69,8 @@ export class ImportRulesDialog extends Component {
         ) {
             throw new Error('Failed to initialize import rules dialog');
         }
+
+        this.listContainer.addEventListener('scroll', () => this.onListScroll());
 
         InputGroup.fromElement(this.searchField);
 
@@ -229,6 +232,11 @@ export class ImportRulesDialog extends Component {
         this.render(this.state);
     }
 
+    /** Rules list 'scroll' event handler */
+    onListScroll() {
+        PopupMenu.hideActive();
+    }
+
     /** Rule 'submit' event handler */
     onSubmitItem(data) {
         if (!data) {
@@ -345,7 +353,9 @@ export class ImportRulesDialog extends Component {
         removeChilds(this.listContainer);
         if (!ruleItems.length) {
             const message = (state.filter !== '') ? MSG_NOT_FOUND : MSG_NO_RULES;
-            this.noDataMsg = ce('span', { className: 'nodata-message', textContent: message });
+            this.noDataMsg = createElement('span', {
+                props: { className: 'nodata-message', textContent: message },
+            });
             this.listContainer.append(this.noDataMsg);
         } else {
             ruleItems.forEach((item) => this.listContainer.append(item.elem));
@@ -377,8 +387,8 @@ export class ImportRulesDialog extends Component {
 
         this.formContainer = ImportRuleForm.create({
             data: state.rule,
-            submit: (data) => this.onSubmitItem(data),
-            cancel: () => this.onCancelItem(),
+            onSubmit: (data) => this.onSubmitItem(data),
+            onCancel: () => this.onCancelItem(),
         });
 
         insertAfter(this.formContainer.elem, this.listContainer);

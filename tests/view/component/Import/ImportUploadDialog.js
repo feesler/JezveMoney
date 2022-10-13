@@ -13,7 +13,7 @@ import {
     isNum,
     copyObject,
 } from 'jezve-test';
-import { Checkbox, DropDown } from 'jezvejs/tests';
+import { Checkbox, DropDown } from 'jezvejs-test';
 import { App } from '../../../Application.js';
 import { asyncMap, fixFloat } from '../../../common.js';
 import { WarningPopup } from '../WarningPopup.js';
@@ -617,7 +617,7 @@ export class ImportUploadDialog extends TestComponent {
         this.model.template.first_row = parseInt(val, 10);
         this.expectedState = this.getExpectedState(this.model);
 
-        await input(this.content.firstRowInp.elem, val);
+        await input(this.content.firstRowInp.elem, val.toString());
         await this.parse();
 
         return this.checkState();
@@ -729,6 +729,7 @@ export class ImportUploadDialog extends TestComponent {
         });
     }
 
+    /** Returns array of ImportTransaction */
     getExpectedUploadResult(importData) {
         const tpl = new ImportTemplate(this.model.template);
 

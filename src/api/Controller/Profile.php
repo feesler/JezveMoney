@@ -176,6 +176,8 @@ class Profile extends ApiController
 
         $this->commit();
 
+        Message::set(MSG_PROFILE_DELETE);
+        $this->setMessage(Message::get(MSG_PROFILE_DELETE));
         $this->ok();
     }
 }

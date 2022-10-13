@@ -14,14 +14,16 @@
   }
 
   /* Menu */
-  .menu-btn {
-    pointer-events: all;
-    background: none;
+  .actions-menu-btn {
+    width: 26px;
+    height: 26px;
     padding: 4px;
+    background: none;
+    pointer-events: all;
     cursor: pointer;
   }
 
-  .menu-icon {
+  .actions-menu-btn__icon {
     width: 18px;
     height: 18px;
   }
@@ -132,6 +134,7 @@
 .rule-item__actions {
   display: flex;
   flex-flow: column nowrap;
+  gap: 1px;
 }
 
 .rule-item__conditions {

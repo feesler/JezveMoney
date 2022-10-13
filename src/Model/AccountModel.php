@@ -72,29 +72,27 @@ class AccountModel extends CachedTable
     }
 
 
-    protected function validateParams($params, $isUpdate = false)
+    protected function validateParams($params, $item_id = 0)
     {
         $avFields = ["owner_id", "name", "initbalance", "curr_id", "icon_id", "flags"];
         $res = [];
 
         // In CREATE mode all fields is required
-        if (!$isUpdate && !checkFields($params, $avFields)) {
-            return null;
+        if (!$item_id) {
+            checkFields($params, $avFields, true);
         }
 
         if (isset($params["owner_id"])) {
             $res["owner_id"] = intval($params["owner_id"]);
             if (!$res["owner_id"]) {
-                wlog("Invalid owner_id specified");
-                return null;
+                throw new \Error("Invalid owner_id specified");
             }
         }
 
         if (isset($params["name"])) {
             $res["name"] = $this->dbObj->escape($params["name"]);
             if (is_empty($res["name"])) {
-                wlog("Invalid name specified");
-                return null;
+                throw new \Error("Invalid name specified");
             }
         }
 
@@ -105,16 +103,14 @@ class AccountModel extends CachedTable
         if (isset($params["curr_id"])) {
             $res["curr_id"] = intval($params["curr_id"]);
             if (!$this->currMod->isExist($res["curr_id"])) {
-                wlog("Invalid curr_id specified");
-                return null;
+                throw new \Error("Invalid curr_id specified");
             }
         }
 
         if (isset($params["icon_id"])) {
             $res["icon_id"] = intval($params["icon_id"]);
             if ($res["icon_id"] != 0 && !$this->iconModel->isExist($res["icon_id"])) {
-                wlog("Invalid icon_id specified");
-                return null;
+                throw new \Error("Invalid icon_id specified");
             }
         }
 
@@ -122,24 +118,23 @@ class AccountModel extends CachedTable
             $res["flags"] = intval($params["flags"]);
         }
 
+        if ($this->isSameItemExist($res, $item_id)) {
+            throw new \Error("Same account already exist");
+        }
+
         return $res;
     }
 
 
     // Check same item already exist
-    protected function isSameItemExist($params, $updateId = 0)
+    protected function isSameItemExist($params, $item_id = 0)
     {
         if (!is_array($params) || !isset($params["name"])) {
             return false;
         }
 
         $foundItem = $this->findByName($params["name"]);
-        if ($foundItem && $foundItem->id != $updateId) {
-            wlog("Such item already exist");
-            return true;
-        }
-
-        return false;
+        return ($foundItem && $foundItem->id != $item_id);
     }
 
 
@@ -147,13 +142,6 @@ class AccountModel extends CachedTable
     protected function preCreate($params, $isMultiple = false)
     {
         $res = $this->validateParams($params);
-        if (is_null($res)) {
-            return null;
-        }
-
-        if ($this->isSameItemExist($res)) {
-            return null;
-        }
 
         $res["balance"] = $res["initbalance"];
         $res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
@@ -166,33 +154,23 @@ class AccountModel extends CachedTable
     // Preparations for item update
     protected function preUpdate($item_id, $params)
     {
-        // check account is exist
-        $accObj = $this->getItem($item_id);
-        if (!$accObj) {
-            return false;
+        $item = $this->getItem($item_id);
+        if (!$item) {
+            throw new \Error("Item not found");
+        }
+        if ($item->user_id != self::$user_id) {
+            throw new \Error("Invalid user");
         }
 
-        // check user of account
-        if ($accObj->user_id != self::$user_id) {
-            return false;
-        }
+        $res = $this->validateParams($params, $item_id);
 
-        $res = $this->validateParams($params, true);
-        if (is_null($res)) {
-            return false;
-        }
-
-        if ($this->isSameItemExist($res, $item_id)) {
-            return false;
-        }
-
-        $this->currencyUpdated = (isset($res["curr_id"]) && $res["curr_id"] != $accObj->curr_id);
+        $this->currencyUpdated = (isset($res["curr_id"]) && $res["curr_id"] != $item->curr_id);
 
         // get initial balance to calc difference
-        $diff = round($res["initbalance"] - $accObj->initbalance, 2);
+        $diff = round($res["initbalance"] - $item->initbalance, 2);
         if (abs($diff) >= 0.01) {
             $this->balanceUpdated = true;
-            $res["balance"] = $accObj->balance + $diff;
+            $res["balance"] = $item->balance + $diff;
         } else {
             $this->balanceUpdated = false;
             unset($res["balance"]);

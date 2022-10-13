@@ -7,33 +7,29 @@ import {
     click,
 } from 'jezve-test';
 
-export class IconLink extends TestComponent {
+export class IconButton extends TestComponent {
     async parseContent() {
         if (!this.elem) {
             return {};
         }
 
-        const validClass = await hasClass(this.elem, 'iconlink');
-        assert(validClass, 'Wrong icon link');
+        const validClass = await hasClass(this.elem, 'iconbutton');
+        assert(validClass, 'Invalid icon button element');
 
-        const res = {
-            linkElem: await query(this.elem, ':scope > *'),
-        };
+        const res = {};
 
-        assert(res.linkElem, 'Link element not found');
-
-        const tagName = await prop(res.linkElem, 'tagName');
+        const tagName = await prop(this.elem, 'tagName');
         if (tagName === 'A') {
-            res.link = await prop(res.linkElem, 'href');
+            res.link = await prop(this.elem, 'href');
         }
 
-        res.titleElem = await query(res.linkElem, '.iconlink__content');
+        res.titleElem = await query(this.elem, '.iconbutton__content');
         const titleInner = await query(res.titleElem, ':scope > *');
         assert(titleInner, 'Title element not found');
         res.title = await prop(titleInner, 'textContent');
 
         // Subtitle is optional
-        res.subTitleElem = await query(res.titleElem, '.iconlink__subtitle');
+        res.subTitleElem = await query(res.titleElem, '.iconbutton__subtitle');
         if (res.subTitleElem) {
             res.subtitle = await prop(res.subTitleElem, 'textContent');
         }
@@ -42,6 +38,6 @@ export class IconLink extends TestComponent {
     }
 
     async click() {
-        return click(this.content.linkElem);
+        return click(this.elem);
     }
 }

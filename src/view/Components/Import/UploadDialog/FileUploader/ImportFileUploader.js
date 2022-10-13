@@ -3,9 +3,9 @@ import {
     show,
     isFunction,
     Component,
-    Checkbox,
 } from 'jezvejs';
-import { API } from '../../../../js/API.js';
+import { Checkbox } from 'jezvejs/Checkbox';
+import { API } from '../../../../js/api/index.js';
 
 /** CSS classes */
 const FILE_NAME_CLASS = 'upload-form__filename';
@@ -94,7 +94,7 @@ export class ImportFileUploader extends Component {
             }
 
             if (isFunction(this.props.onUploaded)) {
-                this.props.onUploaded(data);
+                this.props.onUploaded(data, this.state.filename);
             }
         } catch (e) {
             this.onImportError(e.message);

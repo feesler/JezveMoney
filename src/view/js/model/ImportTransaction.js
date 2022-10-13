@@ -18,13 +18,13 @@ const transTypeMap = {
 };
 
 const defaultProps = {
+    isForm: false,
     enabled: true,
     type: 'expense',
     sourceAccountId: 0,
     destAccountId: 0,
     srcCurrId: 0,
     destCurrId: 0,
-    isDiff: false,
     sourceAmount: 0,
     destAmount: 0,
     personId: 0,
@@ -47,6 +47,14 @@ export class ImportTransaction {
         }
 
         this.setData(this.props);
+    }
+
+    get isForm() {
+        return this.state.isForm;
+    }
+
+    set isForm(value) {
+        this.state.isForm = !!value;
     }
 
     get enabled() {
@@ -103,7 +111,7 @@ export class ImportTransaction {
             }
         }
 
-        this.state = this.checkStateCurrencies(state);
+        this.state = state;
 
         this.data = null;
         if (data.originalData) {
@@ -190,16 +198,6 @@ export class ImportTransaction {
         this.setMainAccount(currentMainAccount);
     }
 
-    /** Check currencies is different and return new state */
-    checkStateCurrencies(state) {
-        const res = {
-            ...state,
-            isDiff: state.srcCurrId !== state.destCurrId,
-        };
-
-        return res;
-    }
-
     getTransferAccount(state, initialId) {
         const { userAccounts } = window.app.model;
 
@@ -225,6 +223,7 @@ export class ImportTransaction {
         }
 
         const state = copyObject(this.state);
+        const isDiffBefore = this.isDiff(state);
         if (sourceTypes.includes(value)) {
             state.sourceAccountId = state.mainAccount.id;
             state.srcCurrId = state.mainAccount.curr_id;
@@ -238,7 +237,7 @@ export class ImportTransaction {
             state.destAccountId = 0;
             // Copy source amount to destination amount if previous type was
             // not income with different currencies
-            if (!(state.type === 'income' && state.isDiff)) {
+            if (!(state.type === 'income' && isDiffBefore)) {
                 state.destAmount = this.state.sourceAmount;
                 state.destCurrId = state.mainAccount.curr_id;
             }
@@ -251,7 +250,7 @@ export class ImportTransaction {
             state.sourceAccountId = 0;
             // Copy destination amount to source amount
             // if previous type was expense with same currencies
-            if (state.type === 'expense' && !state.isDiff) {
+            if (state.type === 'expense' && !isDiffBefore) {
                 state.sourceAmount = this.state.destAmount;
             }
             // Keep currencies from expense
@@ -260,7 +259,7 @@ export class ImportTransaction {
             }
             // Set source currency same as main account if currencies was the same or
             // previous type was not expense
-            if (state.type !== 'expense' || !state.isDiff) {
+            if (state.type !== 'expense' || !isDiffBefore) {
                 state.srcCurrId = state.mainAccount.curr_id;
             }
         } else if (value === 'transferfrom') {
@@ -310,9 +309,8 @@ export class ImportTransaction {
         }
         state.type = value;
 
-        const res = this.checkStateCurrencies(state);
-        this.state = res;
-        return res;
+        this.state = state;
+        return state;
     }
 
     /** Invert type of transaction */
@@ -354,9 +352,8 @@ export class ImportTransaction {
         const state = copyObject(this.state);
         state.srcCurrId = selectedCurr;
 
-        const res = this.checkStateCurrencies(state);
-        this.state = res;
-        return res;
+        this.state = state;
+        return state;
     }
 
     /** Set destination currency */
@@ -376,9 +373,8 @@ export class ImportTransaction {
         const state = copyObject(this.state);
 
         state.destCurrId = selectedCurr;
-        const res = this.checkStateCurrencies(state);
-        this.state = res;
-        return res;
+        this.state = state;
+        return state;
     }
 
     /** Set main account */
@@ -395,6 +391,7 @@ export class ImportTransaction {
             ...this.state,
             mainAccount: account,
         };
+        const isDiffBefore = this.isDiff(state);
 
         if (sourceTypes.includes(state.type)) {
             state.sourceAccountId = account.id;
@@ -409,7 +406,7 @@ export class ImportTransaction {
         }
 
         if (state.type === 'expense' || state.type === 'income') {
-            if (!state.isDiff) {
+            if (!isDiffBefore) {
                 // If currencies was the same before, then set source and destination currencies
                 // to as the currency of main account
                 if (state.type === 'expense') {
@@ -446,9 +443,8 @@ export class ImportTransaction {
             }
         }
 
-        const res = this.checkStateCurrencies(state);
-        this.state = res;
-        return res;
+        this.state = state;
+        return state;
     }
 
     /** Set transfer account */
@@ -480,9 +476,8 @@ export class ImportTransaction {
             state.srcCurrId = account.curr_id;
         }
 
-        const res = this.checkStateCurrencies(state);
-        this.state = res;
-        return res;
+        this.state = state;
+        return state;
     }
 
     /** Set person */
@@ -597,6 +592,7 @@ export class ImportTransaction {
 
         const srcAmountVal = parseFloat(fixFloat(state.sourceAmount));
         const destAmountVal = parseFloat(fixFloat(state.destAmount));
+        const isDiff = this.isDiff(state);
         const res = {};
 
         if (state.type === 'expense') {
@@ -605,7 +601,7 @@ export class ImportTransaction {
             res.dest_id = 0;
             res.src_curr = state.srcCurrId;
             res.dest_curr = state.destCurrId;
-            res.src_amount = (state.isDiff) ? srcAmountVal : destAmountVal;
+            res.src_amount = (isDiff) ? srcAmountVal : destAmountVal;
             res.dest_amount = destAmountVal;
         } else if (state.type === 'income') {
             res.type = INCOME;
@@ -614,7 +610,7 @@ export class ImportTransaction {
             res.src_curr = state.srcCurrId;
             res.dest_curr = state.destCurrId;
             res.src_amount = srcAmountVal;
-            res.dest_amount = (state.isDiff) ? destAmountVal : srcAmountVal;
+            res.dest_amount = (isDiff) ? destAmountVal : srcAmountVal;
         } else if (state.type === 'transferfrom') {
             const transferAcc = accounts.getItem(state.destAccountId);
             if (!transferAcc) {
@@ -627,7 +623,7 @@ export class ImportTransaction {
             res.src_curr = state.srcCurrId;
             res.dest_curr = state.destCurrId;
             res.src_amount = srcAmountVal;
-            res.dest_amount = (state.isDiff) ? destAmountVal : srcAmountVal;
+            res.dest_amount = (isDiff) ? destAmountVal : srcAmountVal;
         } else if (state.type === 'transferto') {
             const transferAcc = accounts.getItem(state.sourceAccountId);
             if (!transferAcc) {
@@ -640,7 +636,7 @@ export class ImportTransaction {
             res.src_curr = state.srcCurrId;
             res.dest_curr = state.destCurrId;
             res.src_amount = srcAmountVal;
-            res.dest_amount = (state.isDiff) ? destAmountVal : srcAmountVal;
+            res.dest_amount = (isDiff) ? destAmountVal : srcAmountVal;
         } else if (state.type === 'debtfrom' || state.type === 'debtto') {
             const person = persons.getItem(state.personId);
             if (!person) {
@@ -663,41 +659,25 @@ export class ImportTransaction {
         return res;
     }
 
-    validateSourceAmount(state) {
-        const amountValue = parseFloat(fixFloat(state.sourceAmount));
+    isDiff(state = this.state) {
+        return state.srcCurrId !== state.destCurrId;
+    }
+
+    validateAmount(value) {
+        const amountValue = parseFloat(fixFloat(value));
         return (!Number.isNaN(amountValue) && amountValue > 0);
     }
 
-    validateDestAmount(state) {
-        const amountValue = parseFloat(fixFloat(state.destAmount));
-        return (!Number.isNaN(amountValue) && amountValue > 0);
-    }
+    validate(state = this.state) {
+        const isDiff = this.isDiff(state);
+        const isExpense = (state.type === 'expense');
 
-    validate() {
-        const { state } = this;
-
-        if (state.type === 'expense') {
-            const destAmountValid = this.validateDestAmount(state);
-            if (!destAmountValid) {
-                return false;
-            }
-            if (state.isDiff) {
-                const srcAmountValid = this.validateSourceAmount(state);
-                if (!srcAmountValid) {
-                    return false;
-                }
-            }
-        } else {
-            const srcAmountValid = this.validateSourceAmount(state);
-            if (!srcAmountValid) {
-                return false;
-            }
-            if (state.isDiff) {
-                const destAmountValid = this.validateDestAmount(state);
-                if (!destAmountValid) {
-                    return false;
-                }
-            }
+        let valid = this.validateAmount(isExpense ? state.destAmount : state.sourceAmount);
+        if (valid && isDiff) {
+            valid = this.validateAmount(isExpense ? state.sourceAmount : state.destAmount);
+        }
+        if (!valid) {
+            return false;
         }
 
         if (!checkDate(state.date)) {

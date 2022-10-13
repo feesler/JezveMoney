@@ -1,4 +1,16 @@
 /* Import template section */
+.tpl-form {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+}
+
+/* Uploaded file name */
+.tpl-form__file {
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #7b7b7b;
+}
 
 /* Header */
 .tpl-form-header {
@@ -12,12 +24,6 @@
     font-weight: 100;
     margin-right: 18px;
   }
-}
-
-.tpl-form {
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: stretch;
 }
 
 /* Raw data table title */

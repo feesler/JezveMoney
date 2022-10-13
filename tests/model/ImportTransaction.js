@@ -1,7 +1,7 @@
 import { assert } from 'jezve-test';
 import { App } from '../Application.js';
 import {
-    fixFloat,
+    fixFloat, normalize,
 } from '../common.js';
 import {
     EXPENSE,
@@ -33,10 +33,6 @@ export class ImportTransaction {
         debtto: DEBT,
     };
 
-    constructor(props) {
-        Object.assign(this, props);
-    }
-
     /** Convert import data to transaction object */
     static fromImportData(data, mainAccount) {
         assert(data && mainAccount, 'Invalid data');
@@ -48,6 +44,7 @@ export class ImportTransaction {
 
         const res = new ImportTransaction({
             enabled: true,
+            isForm: false,
             mainAccount,
             type: (data.accountAmount < 0) ? 'expense' : 'income',
             date: data.date,
@@ -100,8 +97,17 @@ export class ImportTransaction {
         return this.typesMap[lstr];
     }
 
+    constructor(props) {
+        Object.assign(this, props);
+    }
+
     isDiff() {
         return (this.src_curr !== this.dest_curr);
+    }
+
+    /** Enable/disable transaction */
+    enable(value = true) {
+        this.enabled = !!value;
     }
 
     /** Set main account */
@@ -115,6 +121,9 @@ export class ImportTransaction {
             return;
         }
         this.mainAccount = account;
+        if (this.original) {
+            this.original.mainAccount = account;
+        }
 
         const before = {
             isDiff: this.isDiff(),
@@ -126,10 +135,6 @@ export class ImportTransaction {
         } else {
             this.dest_id = account.id;
             this.dest_curr = account.curr_id;
-        }
-
-        if (this.data) {
-            this.data.mainAccount = account.id;
         }
 
         if (this.type === 'expense' || this.type === 'income') {
@@ -331,5 +336,96 @@ export class ImportTransaction {
 
     setComment(value) {
         this.comment = value;
+    }
+
+    restoreOriginal() {
+        assert(this.original, 'Original data not found');
+
+        this.mainAccount = App.state.accounts.getItem(this.original.origAccount.id);
+        assert(this.mainAccount, `Account ${this.original.origAccount.id} not found`);
+        const mainAccountCurrency = App.currency.getItem(this.mainAccount.curr_id);
+        assert(mainAccountCurrency, `Currency ${this.mainAccount.curr_id} not found`);
+
+        const accAmount = parseFloat(fixFloat(this.original.accountAmount));
+        const trAmount = parseFloat(fixFloat(this.original.transactionAmount));
+        this.type = (accAmount > 0) ? 'income' : 'expense';
+        if (this.type === 'expense') {
+            this.src_id = this.mainAccount.id;
+            this.dest_id = 0;
+            this.dest_amount = Math.abs(trAmount);
+            this.src_amount = Math.abs(accAmount);
+            this.src_curr = mainAccountCurrency.id;
+        } else if (this.type === 'income') {
+            this.src_id = 0;
+            this.dest_id = this.mainAccount.id;
+            this.src_amount = Math.abs(trAmount);
+            this.dest_amount = Math.abs(accAmount);
+            this.dest_curr = mainAccountCurrency.id;
+        }
+
+        if (this.original.accountCurrency === this.original.transactionCurrency) {
+            if (this.type === 'expense') {
+                this.dest_curr = mainAccountCurrency.id;
+            } else if (this.type === 'income') {
+                this.src_curr = mainAccountCurrency.id;
+            }
+        } else {
+            const currency = App.currency.findByName(this.original.transactionCurrency);
+            assert(currency, `Currency ${this.original.transactionCurrency} not found`);
+            if (this.type === 'expense') {
+                this.dest_curr = currency.id;
+            } else if (this.type === 'income') {
+                this.src_curr = currency.id;
+            }
+        }
+
+        this.date = this.original.date;
+        this.comment = this.original.comment;
+    }
+
+    getExpectedTransaction() {
+        const res = {
+            type: ImportTransaction.typeFromString(this.type),
+            src_curr: this.src_curr,
+            dest_curr: this.dest_curr,
+            date: this.date,
+            comment: this.comment,
+        };
+
+        if (res.type !== DEBT) {
+            res.src_id = this.src_id;
+            res.dest_id = this.dest_id;
+        }
+
+        if (res.type === EXPENSE) {
+            res.dest_amount = normalize(this.dest_amount);
+            if (this.isDiff()) {
+                res.src_amount = normalize(this.src_amount);
+            } else {
+                res.src_amount = res.dest_amount;
+            }
+        } else if (res.type === INCOME) {
+            res.src_amount = normalize(this.src_amount);
+            if (this.isDiff()) {
+                res.dest_amount = normalize(this.dest_amount);
+            } else {
+                res.dest_amount = res.src_amount;
+            }
+        } else if (res.type === TRANSFER) {
+            res.src_amount = normalize(this.src_amount);
+            res.dest_amount = (this.isDiff())
+                ? normalize(this.dest_amount)
+                : res.src_amount;
+        } else if (res.type === DEBT) {
+            assert(this.person_id, 'Invalid person id');
+
+            res.acc_id = this.acc_id;
+            res.person_id = this.person_id;
+            res.op = this.op;
+            res.src_amount = normalize(this.src_amount);
+            res.dest_amount = res.src_amount;
+        }
+
+        return res;
     }
 }

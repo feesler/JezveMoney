@@ -10,9 +10,7 @@ import { App } from '../../Application.js';
 import { findSimilarTransaction } from '../../model/import.js';
 import { ImportTransaction } from '../../model/ImportTransaction.js';
 import { ImportList } from '../../view/component/Import/ImportList.js';
-import { ImportTransactionForm } from '../../view/component/Import/ImportTransactionForm.js';
 import { ImportView } from '../../view/ImportView.js';
-import { ImportTransactionItem } from '../../view/component/Import/ImportTransactionItem.js';
 
 /** Reexport import templates and import rules runners */
 export * from './templates.js';
@@ -219,58 +217,41 @@ export const changeMainAccount = async (accountId) => {
 
     await test(`Change main account to '${account.name}'`, async () => {
         await checkNavigation();
+        await checkViewState('main');
 
         const skipList = [];
-        const itemsData = App.view.content.itemsList.content.items.map((item) => {
-            // Reapply rules
-            if (item.model.original && App.view.isRulesEnabled()) {
-                /* eslint-disable-next-line no-param-reassign */
-                item.model = item.restoreOriginal();
-                /* eslint-disable-next-line no-param-reassign */
-                item.model = item.onChangeMainAccount(item.model, accountId);
+        App.view.items.forEach((_, ind) => {
+            const item = App.view.items[ind];
 
-                const expectedTransaction = item.getExpectedTransaction(item.model);
-
-                const importTrans = new ImportTransaction({
-                    ...expectedTransaction,
-                    enabled: item.model.enabled,
-                    mainAccount: account,
-                    type: item.model.type,
-                    original: {
-                        ...item.model.original,
-                        mainAccount: account,
-                    },
-                });
-
-                App.state.rules.applyTo(importTrans);
-
-                importTrans.enabled = true;
-                const tr = findSimilarTransaction(importTrans, skipList);
-                if (tr) {
-                    skipList.push(tr.id);
-                    importTrans.enabled = false;
-                }
-
-                const imported = (item.model.isForm)
-                    ? ImportTransactionForm.render(importTrans, App.state)
-                    : ImportTransactionItem.render(importTrans, App.state);
-                return copyObject(imported);
+            if (!item.original || !App.view.rulesEnabled) {
+                item.setMainAccount(accountId);
+                return;
             }
 
-            /* eslint-disable-next-line no-param-reassign */
-            item.model = item.onChangeMainAccount(item.model, accountId);
+            // Reapply rules
+            item.restoreOriginal();
+            item.setMainAccount(accountId);
+            App.state.rules.applyTo(item);
 
-            return copyObject(item.getExpectedState(item.model));
+            item.enabled = true;
+            const tr = findSimilarTransaction(item, skipList);
+            if (tr) {
+                skipList.push(tr.id);
+                item.enabled = false;
+            }
         });
 
-        await checkViewState('main');
+        App.view.model.mainAccount = account.id;
+        App.view.model.totalCount = App.view.items.length;
+        const enabledItems = App.view.items.filter((item) => item.enabled);
+        App.view.model.enabledCount = enabledItems.length;
+
+        App.view.expectedState = App.view.getExpectedState();
+        const expectedList = App.view.getExpectedList();
+        App.view.expectedState.itemsList.items = expectedList.items;
+
         await App.view.selectMainAccount(accountId);
 
-        App.view.expectedState = {
-            itemsList: {
-                items: itemsData,
-            },
-        };
         return App.view.checkState();
     });
 };
@@ -279,12 +260,12 @@ export const enableRules = async (value = true) => {
     const enable = !!value;
     const descr = enable ? 'Enable rules' : 'Disable rules';
 
-    await test(`${descr}`, async () => {
+    await test(descr, async () => {
         await checkNavigation();
         await checkViewState('main');
 
         assert(
-            enable !== App.view.isRulesEnabled(),
+            enable !== App.view.rulesEnabled,
             `Import rules already ${enable ? 'enabled' : 'disabled'}`,
         );
 
@@ -341,6 +322,19 @@ export const enableRules = async (value = true) => {
         };
 
         return App.view.checkState();
+    });
+};
+
+/** Enable/disable check similar transactions option */
+export const enableCheckSimilar = async (value = true) => {
+    const enable = !!value;
+    const act = enable ? 'Enable' : 'Disable';
+
+    await test(`${act} check similar transactions`, async () => {
+        await checkNavigation();
+        await checkViewState('main');
+
+        return App.view.enableCheckSimilar(enable);
     });
 };
 
@@ -508,5 +502,35 @@ export const submit = async () => {
         await App.view.submit();
 
         return App.state.fetchAndTest();
+    });
+};
+
+/** Navigate to first page */
+export const goToFirstPage = async () => {
+    await test('Navigate to first page', async () => {
+        await checkNavigation();
+        await checkViewState('main');
+
+        return App.view.goToFirstPage();
+    });
+};
+
+/** Navigate to next page */
+export const goToNextPage = async () => {
+    await test('Navigate to next page', async () => {
+        await checkNavigation();
+        await checkViewState('main');
+
+        return App.view.goToNextPage();
+    });
+};
+
+/** Navigate to previous page */
+export const goToPrevPage = async () => {
+    await test('Navigate to previous page', async () => {
+        await checkNavigation();
+        await checkViewState('main');
+
+        return App.view.goToPrevPage();
     });
 };

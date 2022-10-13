@@ -2,8 +2,8 @@ import {
     ce,
     show,
     Component,
-    Spinner,
 } from 'jezvejs';
+import { Spinner } from 'jezvejs/Spinner';
 import './style.scss';
 
 const defaultProps = {
@@ -67,15 +67,6 @@ export class LoadingIndicator extends Component {
 
     setTitle(title) {
         this.setState({ ...this.state, title });
-    }
-
-    setState(state) {
-        if (this.state === state) {
-            return;
-        }
-
-        this.render(state, this.state);
-        this.state = state;
     }
 
     render(state) {

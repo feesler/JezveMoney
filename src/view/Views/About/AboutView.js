@@ -1,7 +1,7 @@
 import 'jezvejs/style';
 import { Application } from '../../js/Application.js';
-import { View } from '../../js/View.js';
 import '../../css/app.scss';
+import { View } from '../../js/View.js';
 
 /**
  * About view

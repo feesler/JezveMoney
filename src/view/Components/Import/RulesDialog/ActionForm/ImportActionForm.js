@@ -1,11 +1,12 @@
 import {
-    ce,
+    createElement,
     show,
     isFunction,
+    asArray,
     Component,
-    DropDown,
-    DecimalInput,
 } from 'jezvejs';
+import { DropDown } from 'jezvejs/DropDown';
+import { DecimalInput } from 'jezvejs/DecimalInput';
 import {
     ImportAction,
     IMPORT_ACTION_SET_TR_TYPE,
@@ -31,6 +32,12 @@ const INV_FEEDBACK_CLASS = 'invalid-feedback';
 /* Controls */
 const CONTROLS_CLASS = 'action-form__controls';
 
+const defaultProps = {
+    actions: null,
+    onUpdate: null,
+    onRemove: null,
+};
+
 /**
  * ImportActionForm component
  */
@@ -45,18 +52,17 @@ export class ImportActionForm extends Component {
         if (!this.props || !this.props.data) {
             throw new Error('Invalid props');
         }
-
-        this.updateHandler = this.props.update;
-        this.deleteHandler = this.props.remove;
-
         if (!(this.props.data instanceof ImportAction)) {
             throw new Error('Invalid action item');
         }
+
+        this.props = {
+            ...defaultProps,
+            ...this.props,
+        };
+
         this.props.data.isValid = this.props.isValid;
         this.props.data.message = this.props.message;
-
-        this.actionTypes = ImportAction.getTypes();
-        this.transactionTypes = ImportAction.getTransactionTypes();
 
         this.init();
         this.setData(this.props.data);
@@ -70,19 +76,19 @@ export class ImportActionForm extends Component {
         this.createPersonField();
 
         // Create amount input element
-        this.amountInput = ce('input', { className: `stretch-input ${AMOUNT_FIELD_CLASS}`, type: 'text' });
+        this.amountInput = createElement('input', {
+            props: { className: `stretch-input ${AMOUNT_FIELD_CLASS}`, type: 'text' },
+        });
         this.decAmountInput = DecimalInput.create({
             elem: this.amountInput,
             digits: 2,
             oninput: () => this.onValueChange(),
         });
         // Create value input element
-        this.valueInput = ce(
-            'input',
-            { className: `stretch-input ${VALUE_FIELD_CLASS}`, type: 'text' },
-            null,
-            { input: () => this.onValueChange() },
-        );
+        this.valueInput = createElement('input', {
+            props: { className: `stretch-input ${VALUE_FIELD_CLASS}`, type: 'text' },
+            events: { input: () => this.onValueChange() },
+        });
         // Form fields container
         this.fieldsContainer = window.app.createContainer(FIELDS_CLASS, [
             this.actionDropDown.elem,
@@ -94,19 +100,18 @@ export class ImportActionForm extends Component {
         ]);
 
         // Invalid feedback message
-        this.validFeedback = ce('div', { className: INV_FEEDBACK_CLASS });
+        this.validFeedback = createElement('div', { props: { className: INV_FEEDBACK_CLASS } });
         this.container = window.app.createContainer(`${CONTAINER_CLASS} ${VALIDATION_BLOCK_CLASS}`, [
             this.fieldsContainer,
             this.validFeedback,
         ]);
 
         // Delete button
-        this.delBtn = ce(
-            'button',
-            { className: 'btn icon-btn delete-btn right-align', type: 'button' },
-            window.app.createIcon('del', 'icon delete-icon'),
-            { click: () => this.onDelete() },
-        );
+        this.delBtn = createElement('button', {
+            props: { className: 'btn icon-btn delete-btn right-align', type: 'button' },
+            children: window.app.createIcon('del', 'icon delete-icon'),
+            events: { click: () => this.onDelete() },
+        });
 
         this.controls = window.app.createContainer(CONTROLS_CLASS, [
             this.delBtn,
@@ -118,21 +123,24 @@ export class ImportActionForm extends Component {
         ]);
     }
 
+    getActionTypes() {
+        const actionTypes = ImportAction.getTypes();
+        if (!this.props.actions) {
+            return actionTypes;
+        }
+
+        const typesFilter = asArray(this.props.actions);
+        if (!typesFilter.length) {
+            return actionTypes;
+        }
+
+        return actionTypes.filter((type) => typesFilter.includes(type.id));
+    }
+
     /** Create action type field */
     createActionTypeField() {
-        const items = this.actionTypes
-            .filter((type) => {
-                // Remove `Set person` action if no persons available
-                if (
-                    type.id === IMPORT_ACTION_SET_PERSON
-                    && window.app.model.persons.length === 0
-                ) {
-                    return false;
-                }
-
-                return true;
-            })
-            .map((type) => ({ id: type.id, title: type.title }));
+        const actionTypes = this.getActionTypes();
+        const items = actionTypes.map(({ id, title }) => ({ id, title }));
 
         this.actionDropDown = DropDown.create({
             className: ACTION_FIELD_CLASS,
@@ -143,7 +151,8 @@ export class ImportActionForm extends Component {
 
     /** Create transaction type field */
     createTransTypeField() {
-        const items = this.transactionTypes.map((type) => ({ id: type.id, title: type.title }));
+        const transactionTypes = ImportAction.getTransactionTypes();
+        const items = transactionTypes.map(({ id, title }) => ({ id, title }));
 
         this.trTypeDropDown = DropDown.create({
             className: TRANS_TYPE_FIELD_CLASS,
@@ -268,15 +277,15 @@ export class ImportActionForm extends Component {
 
     /** Send component 'update' event */
     sendUpdate() {
-        if (isFunction(this.updateHandler)) {
-            this.updateHandler(this.getData(this.state));
+        if (isFunction(this.props.onUpdate)) {
+            this.props.onUpdate(this.getData(this.state));
         }
     }
 
     /** Delete button 'click' event handler */
     onDelete() {
-        if (isFunction(this.deleteHandler)) {
-            this.deleteHandler();
+        if (isFunction(this.props.onRemove)) {
+            this.props.onRemove();
         }
     }
 

@@ -52,14 +52,14 @@ class ImportRuleModel extends CachedTable
     }
 
 
-    protected function validateParams($params, $isUpdate = false)
+    protected function validateParams($params, $item_id = 0)
     {
         $avFields = ["flags"];
         $res = [];
 
         // In CREATE mode all fields is required
-        if (!$isUpdate && !checkFields($params, $avFields)) {
-            return null;
+        if (!$item_id) {
+            checkFields($params, $avFields, true);
         }
 
         if (isset($params["flags"])) {
@@ -74,9 +74,6 @@ class ImportRuleModel extends CachedTable
     protected function preCreate($params, $isMultiple = false)
     {
         $res = $this->validateParams($params);
-        if (is_null($res)) {
-            return null;
-        }
 
         $res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
         $res["user_id"] = self::$user_id;
@@ -88,17 +85,15 @@ class ImportRuleModel extends CachedTable
     // Preparations for item update
     protected function preUpdate($item_id, $params)
     {
-        // check item is exist
-        $ruleObj = $this->getItem($item_id);
-        if (!$ruleObj) {
-            return false;
+        $item = $this->getItem($item_id);
+        if (!$item) {
+            throw new \Error("Item not found");
+        }
+        if ($item->user_id != self::$user_id) {
+            throw new \Error("Invalid user");
         }
 
-        $res = $this->validateParams($params, true);
-        if (is_null($res)) {
-            return null;
-        }
-
+        $res = $this->validateParams($params, $item_id);
         $res["updatedate"] = date("Y-m-d H:i:s");
 
         return $res;

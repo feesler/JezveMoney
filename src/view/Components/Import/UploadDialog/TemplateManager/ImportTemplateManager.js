@@ -6,10 +6,10 @@ import {
     show,
     enable,
     Component,
-    DropDown,
-    DecimalInput,
 } from 'jezvejs';
-import { API } from '../../../../js/API.js';
+import { DropDown } from 'jezvejs/DropDown';
+import { DecimalInput } from 'jezvejs/DecimalInput';
+import { API } from '../../../../js/api/index.js';
 import { ImportTemplateError } from '../../../../js/error/ImportTemplateError.js';
 import { ImportTemplate } from '../../../../js/model/ImportTemplate.js';
 import { ConfirmDialog } from '../../../ConfirmDialog/ConfirmDialog.js';
@@ -80,6 +80,7 @@ export class ImportTemplateManager extends Component {
         });
 
         this.tplHeading = ge('tplHeading');
+        this.tplFilename = ge('tplFilename');
         this.tplStateLbl = ge('tplStateLbl');
         this.tplField = ge('tplField');
         this.nameField = ge('nameField');
@@ -104,6 +105,7 @@ export class ImportTemplateManager extends Component {
         this.convertFeedback = ge('convertFeedback');
         if (
             !this.tplHeading
+            || !this.tplFilename
             || !this.tplStateLbl
             || !this.templateDropDown
             || !this.tplField
@@ -199,6 +201,7 @@ export class ImportTemplateManager extends Component {
         const newState = {
             id: LOADING_STATE,
             rawData: null,
+            filename: null,
             rowsToShow: 3,
             listLoading: false,
             mainAccount: this.state.mainAccount,
@@ -216,8 +219,9 @@ export class ImportTemplateManager extends Component {
     }
 
     /** Copy specified data to component */
-    setRawData(data) {
+    setRawData(data, filename) {
         this.state.rawData = copyObject(data);
+        this.state.filename = filename;
 
         if (window.app.model.templates.length > 0) {
             this.state.id = RAW_DATA_STATE;
@@ -696,6 +700,8 @@ export class ImportTemplateManager extends Component {
         enable(this.deleteTplBtn, !state.listLoading);
         enable(this.submitTplBtn, !state.listLoading);
         enable(this.cancelTplBtn, !state.listLoading);
+
+        this.tplFilename.textContent = state.filename ?? '';
 
         this.tplNameInp.value = (state.template) ? state.template.name : '';
 

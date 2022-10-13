@@ -3,8 +3,8 @@ import {
     isFunction,
     show,
     Component,
-    Popup,
 } from 'jezvejs';
+import { Popup } from 'jezvejs/Popup';
 import { ImportFileUploader } from '../FileUploader/ImportFileUploader.js';
 import { ImportTemplateManager } from '../TemplateManager/ImportTemplateManager.js';
 import { LoadingIndicator } from '../../../LoadingIndicator/LoadingIndicator.js';
@@ -14,7 +14,7 @@ import './style.scss';
 const UPLOAD_POPUP_CLASS = 'upload-popup';
 const DRAG_OVER_CLASS = 'drag-over';
 const CONVERT_TITLE_CLASS = 'upload-popup__convert-title';
-const BACK_BTN_CLASS = 'back-btn';
+const BACK_BTN_CLASS = 'btn icon-btn back-btn';
 const BACK_ICON_CLASS = 'icon back-icon';
 /** Strings */
 const TITLE_UPLOAD = 'Upload';
@@ -60,7 +60,7 @@ export class ImportUploadDialog extends Component {
             elem: 'fileBlock',
             onUploadStart: () => this.onUploadStart(),
             onUploadError: (message) => this.onUploadError(message),
-            onUploaded: (data) => this.onUploaded(data),
+            onUploaded: (data, filename) => this.onUploaded(data, filename),
         });
         this.tplManager = ImportTemplateManager.create({
             elem: 'templateBlock',
@@ -245,14 +245,14 @@ export class ImportUploadDialog extends Component {
      * Import data request callback
      * @param {Array} data - data from uploader file
      */
-    onUploaded(data) {
+    onUploaded(data, filename) {
         try {
             if (!data) {
                 throw new Error('Invalid import data');
             }
 
             this.setConvertState();
-            this.tplManager.setRawData(data);
+            this.tplManager.setRawData(data, filename);
             this.setLoading(false);
         } catch (e) {
             this.onUploadError(e.message);
@@ -272,15 +272,6 @@ export class ImportUploadDialog extends Component {
     importDone() {
         this.props.onUploadDone(this.state.importedItems);
         this.reset();
-    }
-
-    setState(state) {
-        if (this.state === state) {
-            return;
-        }
-
-        this.render(state, this.state);
-        this.state = state;
     }
 
     renderDialogTitle(state, prevState) {
@@ -315,19 +306,21 @@ export class ImportUploadDialog extends Component {
 
         this.renderDialogTitle(state, prevState);
 
-        if (state.id === UPLOAD_STATE) {
-            this.setDragHandlers();
+        if (state.id !== prevState.id) {
+            if (state.id === UPLOAD_STATE) {
+                this.setDragHandlers();
 
-            this.uploader.reset();
-            this.tplManager.reset();
+                this.uploader.reset();
+                this.tplManager.reset();
 
-            this.uploader.show();
-            this.tplManager.hide();
-        } else if (state.id === CONVERT_STATE) {
-            this.removeDragHandlers();
+                this.uploader.show();
+                this.tplManager.hide();
+            } else if (state.id === CONVERT_STATE) {
+                this.removeDragHandlers();
 
-            this.uploader.hide();
-            this.tplManager.show();
+                this.uploader.hide();
+                this.tplManager.show();
+            }
         }
 
         if (!state.loading) {

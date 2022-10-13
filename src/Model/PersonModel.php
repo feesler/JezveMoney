@@ -58,21 +58,20 @@ class PersonModel extends CachedTable
     }
 
 
-    protected function validateParams($params, $isUpdate = false)
+    protected function validateParams($params, $item_id = 0)
     {
         $avFields = ["name", "flags"];
         $res = [];
 
         // In CREATE mode all fields is required
-        if (!$isUpdate && !checkFields($params, $avFields)) {
-            return null;
+        if (!$item_id) {
+            checkFields($params, $avFields, true);
         }
 
         if (isset($params["name"])) {
             $res["name"] = $this->dbObj->escape($params["name"]);
             if (is_empty($res["name"])) {
-                wlog("Invalid name specified");
-                return null;
+                throw new \Error("Invalid name specified");
             }
         }
 
@@ -83,18 +82,20 @@ class PersonModel extends CachedTable
                 !$res["user_id"] ||
                 (self::$user_id && $res["user_id"] != self::$user_id && !UserModel::isAdminUser())
             ) {
-                wlog("Invalid user_id");
-                return null;
+                throw new \Error("Invalid user_id");
             }
         } elseif (self::$user_id) {
             $res["user_id"] = self::$user_id;
         } else {
-            wlog("Can't obtain user_id");
-            return null;
+            throw new \Error("Can't obtain user_id");
         }
 
         if (isset($params["flags"])) {
             $res["flags"] = intval($params["flags"]);
+        }
+
+        if ($this->isSameItemExist($res, $item_id)) {
+            throw new \Error("Same person already exist");
         }
 
         return $res;
@@ -102,19 +103,14 @@ class PersonModel extends CachedTable
 
 
     // Check same item already exist
-    protected function isSameItemExist($params, $updateId = 0)
+    protected function isSameItemExist($params, $item_id = 0)
     {
         if (!is_array($params) || !isset($params["name"])) {
             return false;
         }
 
         $foundItem = $this->findByName($params["name"]);
-        if ($foundItem && $foundItem->id != $updateId) {
-            wlog("Such item already exist");
-            return true;
-        }
-
-        return false;
+        return ($foundItem && $foundItem->id != $item_id);
     }
 
 
@@ -122,14 +118,6 @@ class PersonModel extends CachedTable
     protected function preCreate($params, $isMultiple = false)
     {
         $res = $this->validateParams($params);
-        if (is_null($res)) {
-            return null;
-        }
-
-        if ($this->isSameItemExist($res)) {
-            return null;
-        }
-
         $res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
 
         return $res;
@@ -153,26 +141,15 @@ class PersonModel extends CachedTable
     // Preparations for item update
     protected function preUpdate($item_id, $params)
     {
-        // check person is exist
-        $personObj = $this->getItem($item_id);
-        if (!$personObj) {
-            return false;
+        $item = $this->getItem($item_id);
+        if (!$item) {
+            throw new \Error("Item not found");
+        }
+        if (!$this->adminForce && $item->user_id != self::$user_id) {
+            throw new \Error("Invalid user");
         }
 
-        // check user of person
-        if (!$this->adminForce && $personObj->user_id != self::$user_id) {
-            return false;
-        }
-
-        $res = $this->validateParams($params, true);
-        if (is_null($res)) {
-            return null;
-        }
-
-        if ($this->isSameItemExist($res, $item_id)) {
-            return null;
-        }
-
+        $res = $this->validateParams($params, $item_id);
         $res["updatedate"] = date("Y-m-d H:i:s");
 
         return $res;

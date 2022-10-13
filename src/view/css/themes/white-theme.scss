@@ -17,6 +17,10 @@
   --input-disabled-border-color: #eeeeee;
   --input-disabled-text-color: #a0a0a0;
 
+  /* List item icons */
+  --list-item-icon-fill: #a7a7a7;
+  --list-item-hover-icon-fill: #ffffff;
+
   color: var(--main-text-color);
   background-color: var(--main-bg-color);
 
@@ -57,16 +61,18 @@
     color: var(--main-text-color);
   }
 
-  .iconlink .iconlink__icon {
-    border-color: var(--main-text-color);
-  }
+  .iconbutton {
+    .iconbutton__icon {
+      border-color: var(--main-text-color);
+    }
 
-  .iconlink .iconlink__icon-content {
-    fill: var(--main-text-color);
-  }
+    .iconbutton__icon-content {
+      fill: var(--main-text-color);
+    }
 
-  .iconlink .iconlink__content {
-    color: var(--main-text-color);
+    .iconbutton__content {
+      color: var(--main-text-color);
+    }
   }
 
   /* No data message for lists & etc. */
@@ -102,13 +108,21 @@
     border-color: var(--active-input-border-color);
   }
 
+  .stretch-input[disabled] {
+    color: var(--input-disabled-text-color);
+    background-color: var(--input-disabled-bg-color);
+  }
+
   /* Input group */
   .input-group {
     --ig-border-color: var(--input-border-color);
     --ig-input-color: var(--main-text-color);
     --ig-input-bg: var(--input-bg-color);
     --ig-input-active-border: var(--active-input-border-color);
-    --ig-button-disabled-color: var(--main-text-color);
+    --ig-input-disabled-color: var(--input-disabled-text-color);
+    --ig-input-disabled-bg: var(--input-disabled-bg-color);
+    --ig-input-disabled-border: var(--input-border-color);
+    --ig-button-disabled-color: var(--input-disabled-text-color);
     --ig-button-disabled-border: var(--input-border-color);
     --ig-button-disabled-bg: #e7e7e7;
     --ig-inner-button-color: #888888;
@@ -220,7 +234,7 @@
   }
 
   /* Profile view */
-  .profile_block {
+  .profile-block {
     color: var(--main-text-color);
   }
 
@@ -244,8 +258,8 @@
   }
 
   /* Swap button */
-  .swap-btn {
-    border-color: #b0b0b0;
+  .swap-btn:active {
+    background-color: #b0b0b0;
   }
 
   .swap-icon {
@@ -292,7 +306,7 @@
     }
 
     .icon {
-      fill: #a7a7a7;
+      fill: var(--list-item-icon-fill);
     }
   }
 
@@ -344,7 +358,7 @@
     }
 
     .icon {
-      fill: #a7a7a7;
+      fill: var(--list-item-icon-fill);
     }
   }
 
@@ -374,7 +388,7 @@
 
   .rule-item .icon,
   .rule-form .icon {
-    fill: #b0b0b0;
+    fill: var(--list-item-icon-fill);
   }
 
   .rule-item__info {
@@ -436,13 +450,18 @@
   }
 
   /* Tile info block */
-  .tile-info-block > div > span {
+  .tile-info-item {
     color: var(--main-text-color);
   }
 
   /* Transaction list mode selector */
   .mode-selector > b > span {
     color: var(--main-text-color);
+  }
+
+  /* Input group disabled button with icon */
+  .input-group .icon-btn[disabled] .icon {
+    fill: var(--input-disabled-text-color);
   }
 }
 
@@ -452,13 +471,19 @@
       color: var(--main-text-color);
     }
 
-    .iconlink:hover .iconlink__icon {
-      background-color: var(--main-text-color);
-    }
+    .iconbutton:hover {
+      .iconbutton__icon,
+      .iconbutton__content {
+        color: var(--main-text-color);
+      }
 
-    .iconlink > *:hover .iconlink__icon,
-    .iconlink > *:hover .iconlink__content {
-      color: var(--main-text-color);
+      .iconbutton__icon {
+        background-color: var(--main-text-color);
+      }
+
+      .iconbutton__icon-content {
+        fill: #ffffff;
+      }
     }
 
     .filters-collapsible .collapsible-header:hover {
@@ -489,17 +514,13 @@
 
     .rule-item .icon-btn:hover .icon,
     .rule-form .icon-btn:hover .icon {
-      fill: #ffffff;
+      fill: var(--list-item-hover-icon-fill);
     }
 
     /* Import item */
-    .import-form .btn:hover .icon,
-    .import-item .btn:hover .icon {
-      fill: #ffffff;
-    }
-
-    .iconlink:hover .iconlink__icon-content {
-      fill: #ffffff;
+    .import-form .icon-btn:hover .icon,
+    .import-item .icon-btn:hover .icon {
+      fill: var(--list-item-hover-icon-fill);
     }
 
     .tile_header .close-btn:hover .close-icon {

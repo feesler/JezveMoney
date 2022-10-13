@@ -7,8 +7,7 @@ import {
     click,
     input,
 } from 'jezve-test';
-import { DropDown } from 'jezvejs/tests';
-import { trimToDigitsLimit } from '../../../common.js';
+import { DropDown } from 'jezvejs-test';
 import {
     IMPORT_ACTION_SET_TR_TYPE,
     IMPORT_ACTION_SET_ACCOUNT,
@@ -101,6 +100,7 @@ export class ImportActionForm extends TestComponent {
     async buildModel(cont) {
         const res = {
             actionType: parseInt(cont.actionField.value, 10),
+            actionsAvailable: cont.actionField.dropDown.items.map(({ id }) => id),
             transType: cont.transTypeField.value,
             account: parseInt(cont.accountField.value, 10),
             person: parseInt(cont.personField.value, 10),
@@ -116,7 +116,13 @@ export class ImportActionForm extends TestComponent {
 
     static getExpectedState(model) {
         const res = {
-            actionField: { value: model.actionType.toString(), visible: true },
+            actionField: {
+                visible: true,
+                value: model.actionType.toString(),
+                dropDown: {
+                    items: model.actionsAvailable.map((id) => ({ id })),
+                },
+            },
             deleteBtn: { visible: true },
         };
 
@@ -140,27 +146,11 @@ export class ImportActionForm extends TestComponent {
 
     async changeAction(value) {
         const actionId = parseInt(value, 10);
-        this.model.actionType = actionId;
-        this.model.state = ImportActionForm.getStateName(this.model);
-        this.model.value = ImportActionForm.getStateValue(this.model);
-        this.expectedState = ImportActionForm.getExpectedState(this.model);
-
         await this.content.actionField.dropDown.selectItem(actionId);
-        await this.parse();
-
-        return this.checkState();
     }
 
     async changeValue(name, value) {
         assert(this.model.state === name, 'Invalid state');
-
-        if (name === 'amount') {
-            this.model[name] = trimToDigitsLimit(value, 2);
-        } else {
-            this.model[name] = value;
-        }
-        this.model.value = ImportActionForm.getStateValue(this.model);
-        this.expectedState = ImportActionForm.getExpectedState(this.model);
 
         const control = this.content[`${name}Field`];
         if (control.dropDown) {
@@ -168,9 +158,6 @@ export class ImportActionForm extends TestComponent {
         } else {
             await input(control.inputElem, value.toString());
         }
-        await this.parse();
-
-        return this.checkState();
     }
 
     async changeTransactionType(value) {

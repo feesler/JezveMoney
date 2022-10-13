@@ -89,11 +89,10 @@ export class AccountsList extends List {
 
     deleteTransactions(transactions, returnRaw = false) {
         const transList = Array.isArray(transactions) ? transactions : [transactions];
-        let res = copyObject(this.data);
 
-        for (const transaction of transList) {
-            res = AccountsList.cancelTransaction(res, transaction);
-        }
+        const res = transList.reduce((data, transaction) => (
+            AccountsList.cancelTransaction(data, transaction)
+        ), copyObject(this.data));
 
         if (returnRaw) {
             return res;
@@ -104,10 +103,10 @@ export class AccountsList extends List {
 
     /** Reset initial balances of all accounts to current values */
     toCurrent(returnRaw = false) {
-        const res = copyObject(this.data);
-        for (const acc of res) {
-            acc.initbalance = acc.balance;
-        }
+        const res = this.data.map((account) => ({
+            ...account,
+            initbalance: account.balance,
+        }));
 
         if (returnRaw) {
             return res;
@@ -118,10 +117,10 @@ export class AccountsList extends List {
 
     /** Reset balance of all accounts to initial values */
     toInitial(returnRaw = false) {
-        const res = copyObject(this.data);
-        for (const acc of res) {
-            acc.balance = acc.initbalance;
-        }
+        const res = this.data.map((account) => ({
+            ...account,
+            balance: account.initbalance,
+        }));
 
         if (returnRaw) {
             return res;

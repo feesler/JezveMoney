@@ -6,8 +6,8 @@ import {
     enable,
 } from 'jezvejs';
 import { Application } from '../../../../view/js/Application.js';
-import { AdminListView } from '../../js/AdminListView.js';
 import '../../../../view/css/app.scss';
+import { AdminListView } from '../../js/AdminListView.js';
 import '../../css/admin.scss';
 
 /**

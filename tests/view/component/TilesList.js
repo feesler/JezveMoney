@@ -1,7 +1,6 @@
 import {
     TestComponent,
     queryAll,
-    hasClass,
     assert,
 } from 'jezve-test';
 import { Tile } from './Tile.js';
@@ -10,32 +9,15 @@ import { PersonsList } from '../../model/PersonsList.js';
 import { asyncMap } from '../../common.js';
 
 export class TilesList extends TestComponent {
-    constructor(parent, elem, tileClass) {
-        super(parent, elem);
-
-        assert(tileClass, 'Invalid tile constructor specified');
-
-        this.tileClass = tileClass;
-    }
-
     get items() {
         return this.content.items;
     }
 
     async parseContent() {
-        const res = {
-            items: [],
-        };
-        const listItems = await queryAll(this.elem, ':scope > *');
-        if (
-            !listItems
-            || !listItems.length
-            || (listItems.length === 1 && await hasClass(listItems[0], 'nodata-message'))
-        ) {
-            return res;
-        }
+        const res = {};
 
-        res.items = await asyncMap(listItems, (item) => this.tileClass.create(this.parent, item));
+        const listItems = await queryAll(this.elem, '.tile');
+        res.items = await asyncMap(listItems, (item) => Tile.create(this.parent, item));
         res.items.sort((a, b) => a.id - b.id);
 
         return res;
@@ -58,7 +40,7 @@ export class TilesList extends TestComponent {
     }
 
     getItems() {
-        return this.content.items.map(this.getItemData);
+        return this.content.items.map((item) => this.getItemData(item));
     }
 
     /**

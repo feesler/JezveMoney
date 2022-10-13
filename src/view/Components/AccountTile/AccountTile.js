@@ -1,4 +1,3 @@
-import { isObject } from 'jezvejs';
 import { Tile } from '../Tile/Tile.js';
 
 /**
@@ -6,15 +5,13 @@ import { Tile } from '../Tile/Tile.js';
  * @param {object} props
  */
 export class AccountTile extends Tile {
-    constructor(...args) {
-        super(...args);
+    static create(props) {
+        const res = new AccountTile(props);
+        res.init();
 
-        this.parent = this.props.parent;
+        return res;
     }
 
-    /**
-     * Create new Account Tile from specified element
-     */
     static fromElement(props) {
         const res = new AccountTile(props);
         res.parse();
@@ -22,12 +19,20 @@ export class AccountTile extends Tile {
         return res;
     }
 
+    init() {
+        super.init();
+
+        if (this.props.account) {
+            this.setAccount(this.props.account);
+        }
+    }
+
     /**
      * Render specified account
      * @param {object} account - account object
      */
-    render(account) {
-        if (!isObject(account)) {
+    setAccount(account) {
+        if (!account) {
             throw new Error('Invalid account specified');
         }
 
@@ -37,8 +42,11 @@ export class AccountTile extends Tile {
         );
         const icon = window.app.model.icons.getItem(account.icon_id);
 
-        this.setTitle(account.name);
-        this.setSubTitle(fmtBalance);
-        this.setIcon((icon) ? icon.file : null);
+        this.setState({
+            ...this.state,
+            title: account.name,
+            subtitle: fmtBalance,
+            icon: (icon) ? icon.file : null,
+        });
     }
 }

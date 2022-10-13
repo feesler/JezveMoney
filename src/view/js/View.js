@@ -57,4 +57,17 @@ export class View {
 
         return res;
     }
+
+    /** Update state of view and render changes */
+    setState(state) {
+        if (this.state === state) {
+            return;
+        }
+
+        this.render(state, this.state);
+        this.state = state;
+    }
+
+    /** Renders view state to the DOM */
+    render() { }
 }

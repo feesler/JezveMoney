@@ -6,15 +6,19 @@ import {
     show,
     enable,
     checkDate,
+    setEvents,
     addChilds,
-    DropDown,
-    DatePicker,
-    DecimalInput,
 } from 'jezvejs';
+import { DropDown } from 'jezvejs/DropDown';
+import { DatePicker } from 'jezvejs/DatePicker';
+import { DecimalInput } from 'jezvejs/DecimalInput';
+import { Spinner } from 'jezvejs/Spinner';
+import 'jezvejs/style/InputGroup';
 import {
     fixFloat,
     isValidValue,
     normalizeExch,
+    timeToDate,
 } from '../../js/utils.js';
 import {
     EXPENSE,
@@ -24,14 +28,19 @@ import {
     Transaction,
 } from '../../js/model/Transaction.js';
 import { Application } from '../../js/Application.js';
+import '../../css/app.scss';
 import { View } from '../../js/View.js';
+import { API } from '../../js/api/index.js';
+import { CurrencyList } from '../../js/model/CurrencyList.js';
+import { AccountList } from '../../js/model/AccountList.js';
+import { IconList } from '../../js/model/IconList.js';
+import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Tile } from '../../Components/Tile/Tile.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TileInfoItem } from '../../Components/TileInfoItem/TileInfoItem.js';
-import { IconLink } from '../../Components/IconLink/IconLink.js';
-import '../../css/app.scss';
+import { IconButton } from '../../Components/IconButton/IconButton.js';
 import './style.scss';
 import { createStore } from '../../js/store.js';
 import {
@@ -62,6 +71,9 @@ import {
     reducer,
     typeChange,
     dateChange,
+    startSubmit,
+    commentChange,
+    cancelSubmit,
 } from './reducer.js';
 
 const PAGE_TITLE_UPDATE = 'Jezve Money | Edit transaction';
@@ -86,6 +98,11 @@ class TransactionView extends View {
         if (!('transaction' in this.props)) {
             throw new Error('Invalid Transaction view properties');
         }
+
+        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
+        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
+        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
+        window.app.loadModel(IconList, 'icons', window.app.props.icons);
 
         const currencyModel = window.app.model.currency;
         const accountModel = window.app.model.accounts;
@@ -115,7 +132,8 @@ class TransactionView extends View {
                 fDestResult: null,
                 exchange: 1,
                 fExchange: 1,
-                date: window.app.formatDate(new Date()),
+                date: window.app.formatDate(timeToDate(transaction.date)),
+                comment: transaction.comment,
             },
             validation: {
                 sourceAmount: true,
@@ -129,12 +147,12 @@ class TransactionView extends View {
             isDiff: transaction.src_curr !== transaction.dest_curr,
             isUpdate: this.props.mode === 'update',
             isAvailable: this.props.trAvailable,
+            submitStarted: false,
         };
 
         if (transaction.id) {
             initialState.form.sourceAmount = transaction.src_amount;
             initialState.form.destAmount = transaction.dest_amount;
-            initialState.form.date = window.app.formatDate(new Date(transaction.date * 1000));
         }
 
         if (transaction.type === EXPENSE || transaction.type === INCOME) {
@@ -194,21 +212,18 @@ class TransactionView extends View {
         const state = this.store.getState();
         const { transaction } = state;
 
-        this.submitStarted = false;
-
         // Init form submit event handler
         this.form = ge('mainfrm');
         if (!this.form) {
             throw new Error('Failed to initialize Transaction view');
         }
-        this.form.addEventListener('submit', (e) => this.onFormSubmit(e));
+        setEvents(this.form, { submit: (e) => this.onSubmit(e) });
 
         if (state.isUpdate) {
-            this.deleteBtn = IconLink.fromElement({
+            this.deleteBtn = IconButton.fromElement({
                 elem: 'del_btn',
-                onclick: () => this.confirmDelete(),
+                onClick: () => this.confirmDelete(),
             });
-            this.deleteForm = ge('delform');
         }
 
         this.typeMenu = TransactionTypeMenu.fromElement(document.querySelector('.trtype-menu'), {
@@ -232,10 +247,7 @@ class TransactionView extends View {
             throw new Error('Failed to initialize view');
         }
 
-        this.swapBtn.addEventListener(
-            'click',
-            () => this.store.dispatch(swapSourceAndDest()),
-        );
+        setEvents(this.swapBtn, { click: () => this.store.dispatch(swapSourceAndDest()) });
 
         this.srcTileBase = this.srcContainer.querySelector('.tile-base');
         this.srcTileContainer = this.srcContainer.querySelector('.tile_container');
@@ -335,27 +347,17 @@ class TransactionView extends View {
         this.exchangeSign = ge('exchcomm');
 
         this.dateRow = ge('date_row');
-        this.datePickerBtn = IconLink.fromElement({
-            elem: 'calendar_btn',
-            onclick: () => this.showCalendar(),
-        });
-        this.dateBlock = ge('date_block');
         this.datePickerWrapper = ge('calendar');
 
         this.dateInputBtn = ge('cal_rbtn');
-        if (this.dateInputBtn) {
-            this.dateInputBtn.addEventListener('click', () => this.showCalendar());
-        }
+        setEvents(this.dateInputBtn, { click: () => this.showCalendar() });
+
         this.dateInput = ge('date');
-        this.dateInput?.addEventListener('input', (e) => this.onDateInput(e));
+        setEvents(this.dateInput, { input: (e) => this.onDateInput(e) });
 
         this.commentRow = ge('comment_row');
-        this.commentBtn = IconLink.fromElement({
-            elem: 'comm_btn',
-            onclick: () => this.showComment(),
-        });
-        this.commentBlock = ge('comment_block');
         this.commentInput = ge('comm');
+        setEvents(this.commentInput, { input: (e) => this.onCommentInput(e) });
 
         this.typeInp = ge('typeInp');
         this.srcIdInp = ge('src_id');
@@ -371,16 +373,11 @@ class TransactionView extends View {
         this.debtAccountTile = AccountTile.fromElement({ elem: 'acc_tile', parent: this });
 
         this.noAccountBtn = ge('noacc_btn');
-        if (this.noAccountBtn) {
-            this.noAccountBtn.addEventListener('click', () => this.toggleEnableAccount());
-        }
+        setEvents(this.noAccountBtn, { click: () => this.toggleEnableAccount() });
+
         this.selectAccountBtn = ge('selaccount');
-        if (this.selectAccountBtn) {
-            const accountToggleBtn = this.selectAccountBtn.querySelector('button');
-            if (accountToggleBtn) {
-                accountToggleBtn.addEventListener('click', () => this.toggleEnableAccount());
-            }
-        }
+        this.accountToggleBtn = this.selectAccountBtn?.querySelector('button');
+        setEvents(this.accountToggleBtn, { click: () => this.toggleEnableAccount() });
 
         this.debtAccountLabel = ge('acclbl');
 
@@ -415,7 +412,12 @@ class TransactionView extends View {
         }
 
         this.submitControls = ge('submit_controls');
-        this.submitBtn = ge('submitbtn');
+        this.submitBtn = ge('submitBtn');
+        this.cancelBtn = ge('cancelBtn');
+
+        this.spinner = Spinner.create();
+        this.spinner.hide();
+        insertAfter(this.spinner.elem, this.cancelBtn);
 
         // Check type change request
         if (state.isUpdate && transaction.type !== this.props.requestedType) {
@@ -501,6 +503,22 @@ class TransactionView extends View {
         }
     }
 
+    /** Initialize DropDown for currency */
+    createCurrencyList({ elem, onitemselect, currId }) {
+        const res = DropDown.create({
+            elem,
+            onitemselect,
+            listAttach: true,
+        });
+
+        window.app.initCurrencyList(res);
+        if (currId) {
+            res.selectItem(currId);
+        }
+
+        return res;
+    }
+
     /** Initialize DropDown for source currency */
     initSrcCurrList() {
         if (this.srcCurrDDList) {
@@ -508,17 +526,11 @@ class TransactionView extends View {
         }
 
         const state = this.store.getState();
-        this.srcCurrDDList = DropDown.create({
+        this.srcCurrDDList = this.createCurrencyList({
             elem: 'srcamountsign',
-            listAttach: true,
+            currId: state.transaction.src_curr,
             onitemselect: (item) => this.onSrcCurrencySel(item),
         });
-
-        window.app.initCurrencyList(this.srcCurrDDList);
-
-        if (state.transaction.src_curr) {
-            this.srcCurrDDList.selectItem(state.transaction.src_curr);
-        }
     }
 
     /** Initialize DropDown for destination currency */
@@ -528,17 +540,11 @@ class TransactionView extends View {
         }
 
         const state = this.store.getState();
-        this.destCurrDDList = DropDown.create({
+        this.destCurrDDList = this.createCurrencyList({
             elem: 'destamountsign',
-            listAttach: true,
+            currId: state.transaction.dest_curr,
             onitemselect: (item) => this.onDestCurrencySel(item),
         });
-
-        window.app.initCurrencyList(this.destCurrDDList);
-
-        if (state.transaction.dest_curr) {
-            this.destCurrDDList.selectItem(state.transaction.dest_curr);
-        }
     }
 
     /**
@@ -568,18 +574,6 @@ class TransactionView extends View {
         }
 
         this.datePicker.show(!this.datePicker.visible());
-
-        this.datePickerBtn.hide();
-        show(this.dateBlock, true);
-    }
-
-    /**
-     * Show comment field
-     */
-    showComment() {
-        this.commentBtn.hide();
-        show(this.commentBlock, true);
-        this.commentInput.focus();
     }
 
     /**
@@ -715,20 +709,6 @@ class TransactionView extends View {
     }
 
     /**
-     * Set currency button active/inactive
-     * @param {boolean} src - if set to true use source amount currency button, else destination
-     * @param {boolean} act - if set to true activate currency, else inactivate
-     */
-    setCurrActive(src, act) {
-        const currBtn = (src) ? this.srcCurrBtn : this.destCurrBtn;
-        if (act) {
-            currBtn.removeAttribute('disabled');
-        } else {
-            currBtn.setAttribute('disabled', true);
-        }
-    }
-
-    /**
      * Set currency sign for specified field
      * @param {string} obj - currency sign element id
      * @param {DropDown} ddown - DropDown object
@@ -761,8 +741,6 @@ class TransactionView extends View {
         if (!valid) {
             this.store.dispatch(invalidateSourceAmount());
         }
-
-        return valid;
     }
 
     validateDestAmount(state) {
@@ -773,46 +751,6 @@ class TransactionView extends View {
 
         if (!valid) {
             this.store.dispatch(invalidateDestAmount());
-        }
-
-        return valid;
-    }
-
-    /**
-     * Common transaction 'submit' event handler
-     */
-    onFormSubmit(e) {
-        if (this.submitStarted) {
-            e.preventDefault();
-            return;
-        }
-
-        const state = this.store.getState();
-        const { sourceAmount, destAmount, date } = state.form;
-        let valid = true;
-
-        if (state.transaction.type === EXPENSE) {
-            const destValid = this.validateDestAmount(state);
-            const sourceValid = (state.isDiff) ? this.validateSourceAmount(state) : true;
-            valid = destValid && sourceValid;
-        } else {
-            const sourceValid = this.validateSourceAmount(state);
-            const destValid = (state.isDiff) ? this.validateDestAmount(state) : true;
-            valid = destValid && sourceValid;
-        }
-
-        if (!checkDate(date)) {
-            this.store.dispatch(invalidateDate());
-            valid = false;
-        }
-
-        if (valid) {
-            this.srcAmountInput.value = fixFloat(sourceAmount);
-            this.destAmountInput.value = fixFloat(destAmount);
-            this.submitStarted = true;
-            enable(this.submitBtn, false);
-        } else {
-            e.preventDefault();
         }
     }
 
@@ -840,6 +778,118 @@ class TransactionView extends View {
         this.store.dispatch(dateChange(e.target.value));
     }
 
+    onCommentInput(e) {
+        this.store.dispatch(commentChange(e.target.value));
+    }
+
+    startSubmit() {
+        this.store.dispatch(startSubmit());
+    }
+
+    cancelSubmit() {
+        this.store.dispatch(cancelSubmit());
+    }
+
+    /** Form 'submit' event handler */
+    onSubmit(e) {
+        e.preventDefault();
+
+        const state = this.store.getState();
+        if (state.submitStarted) {
+            return;
+        }
+
+        if (state.transaction.type === EXPENSE) {
+            this.validateDestAmount(state);
+            if (state.isDiff) {
+                this.validateSourceAmount(state);
+            }
+        } else {
+            this.validateSourceAmount(state);
+            if (state.isDiff) {
+                this.validateDestAmount(state);
+            }
+        }
+
+        if (!checkDate(state.form.date)) {
+            this.store.dispatch(invalidateDate());
+        }
+
+        const { validation } = this.store.getState();
+        const valid = validation.destAmount && validation.sourceAmount && validation.date;
+        if (valid) {
+            this.submitTransaction();
+        }
+    }
+
+    async submitTransaction() {
+        const state = this.store.getState();
+        if (state.submitStarted) {
+            return;
+        }
+
+        this.startSubmit();
+
+        const { transaction } = state;
+        const request = {
+            type: transaction.type,
+            src_amount: transaction.src_amount,
+            dest_amount: transaction.dest_amount,
+            src_curr: transaction.src_curr,
+            dest_curr: transaction.dest_curr,
+            date: window.app.formatDate(timeToDate(state.transaction.date)),
+            comment: transaction.comment,
+        };
+
+        if (state.isUpdate) {
+            request.id = transaction.id;
+        }
+
+        if (request.type === DEBT) {
+            request.person_id = transaction.person_id;
+            request.op = transaction.debtType ? 1 : 2;
+            request.acc_id = transaction.noAccount ? 0 : state.account.id;
+        } else {
+            request.src_id = transaction.src_id;
+            request.dest_id = transaction.dest_id;
+        }
+
+        try {
+            if (state.isUpdate) {
+                await API.transaction.update(request);
+            } else {
+                await API.transaction.create(request);
+            }
+
+            const { baseURL } = window.app;
+            window.location = (state.isUpdate)
+                ? `${baseURL}transactions/`
+                : baseURL;
+        } catch (e) {
+            this.cancelSubmit();
+            window.app.createMessage(e.message, 'msg_error');
+        }
+    }
+
+    async deleteTransaction() {
+        const state = this.store.getState();
+        if (state.submitStarted || !state.isUpdate) {
+            return;
+        }
+
+        this.startSubmit();
+
+        try {
+            await API.transaction.del({ id: state.transaction.id });
+
+            const { baseURL } = window.app;
+            window.location = `${baseURL}transactions/`;
+        } catch (e) {
+            this.cancelSubmit();
+            window.app.createMessage(e.message, 'msg_error');
+        }
+    }
+
     /**
      * Create and show transaction delete warning popup
      */
@@ -848,7 +898,7 @@ class TransactionView extends View {
             id: 'delete_warning',
             title: TITLE_TRANS_DELETE,
             content: MSG_TRANS_DELETE,
-            onconfirm: () => this.deleteForm.submit(),
+            onconfirm: () => this.deleteTransaction(),
         });
     }
 
@@ -902,6 +952,7 @@ class TransactionView extends View {
 
         if (this.exchangeInfo) {
             this.exchangeInfo.setTitle(`${normExch} ${exchText}`);
+            this.exchangeInfo.enable(!state.submitStarted);
         }
     }
 
@@ -944,8 +995,8 @@ class TransactionView extends View {
         this.srcResBalanceRowLabel.textContent = 'Result balance';
         this.destResBalanceRowLabel.textContent = 'Result balance';
 
-        this.setCurrActive(true, false); // set source currency inactive
-        this.setCurrActive(false, true); // set destination currency active
+        enable(this.srcCurrBtn, false);
+        enable(this.destCurrBtn, !state.submitStarted);
     }
 
     renderIncome(state) {
@@ -990,8 +1041,8 @@ class TransactionView extends View {
         this.srcResBalanceRowLabel.textContent = 'Result balance';
         this.destResBalanceRowLabel.textContent = 'Result balance';
 
-        this.setCurrActive(true, true); // set source currency active
-        this.setCurrActive(false, false); // set destination currency inactive
+        enable(this.srcCurrBtn, !state.submitStarted);
+        enable(this.destCurrBtn, false);
     }
 
     renderTransfer(state) {
@@ -1066,8 +1117,8 @@ class TransactionView extends View {
         this.srcResBalanceRowLabel.textContent = 'Result balance (Source)';
         this.destResBalanceRowLabel.textContent = 'Result balance (Destination)';
 
-        this.setCurrActive(true, false); // set source currency inactive
-        this.setCurrActive(false, false); // set destination currency inactive
+        enable(this.srcCurrBtn, false);
+        enable(this.destCurrBtn, false);
     }
 
     renderDebt(state) {
@@ -1133,21 +1184,25 @@ class TransactionView extends View {
         }
 
         show(this.noAccountBtn, !noAccount);
+        enable(this.noAccountBtn, !state.submitStarted);
+
         show(this.debtAccountTileBase, !noAccount);
+
         show(this.selectAccountBtn, noAccount);
+        enable(this.accountToggleBtn, !state.submitStarted);
 
         this.srcResBalanceRowLabel.textContent = (debtType) ? 'Result balance (Person)' : 'Result balance (Account)';
         this.destResBalanceRowLabel.textContent = (debtType) ? 'Result balance (Account)' : 'Result balance (Person)';
 
-        this.setCurrActive(true, false); // set source currency inactive
-        this.setCurrActive(false, false); // set destination currency inactive
+        enable(this.srcCurrBtn, false);
+        enable(this.destCurrBtn, false);
 
         this.personIdInp.value = state.person.id;
 
         const currencyModel = window.app.model.currency;
         const srcCurrency = currencyModel.getItem(state.transaction.src_curr);
         const personBalance = srcCurrency.formatValue(state.personAccount.balance);
-        this.personTile.render({
+        this.personTile.setState({
             title: state.person.name,
             subtitle: personBalance,
         });
@@ -1158,13 +1213,15 @@ class TransactionView extends View {
         const personId = state.transaction.person_id;
         if (personId) {
             this.persDDList.selectItem(personId);
+            this.persDDList.enable(!state.submitStarted);
         }
 
         if (!noAccount) {
-            this.debtAccountTile.render(state.account);
+            this.debtAccountTile.setAccount(state.account);
             if (!this.accDDList) {
                 this.initAccList();
             }
+            this.accDDList.enable(!state.submitStarted);
         }
     }
 
@@ -1206,8 +1263,10 @@ class TransactionView extends View {
             this.swapBtn,
             state.isAvailable && (transaction.type === TRANSFER || transaction.type === DEBT),
         );
+        enable(this.swapBtn, !state.submitStarted);
 
         this.typeMenu.setSelection(transaction.type);
+        this.typeMenu.enable(!state.submitStarted);
 
         if (state.isAvailable) {
             if (transaction.type === EXPENSE) {
@@ -1237,33 +1296,29 @@ class TransactionView extends View {
 
         if (transaction.type === EXPENSE || transaction.type === TRANSFER) {
             if (this.srcTile && state.srcAccount) {
-                this.srcTile.render(state.srcAccount);
+                this.srcTile.setAccount(state.srcAccount);
             }
 
             this.initSrcAccList();
             if (this.srcDDList && transaction.src_id) {
                 this.srcDDList.selectItem(transaction.src_id);
             }
+            this.srcDDList?.enable(!state.submitStarted);
         }
 
         if (transaction.type === INCOME || transaction.type === TRANSFER) {
             if (this.destTile && state.destAccount) {
-                this.destTile.render(state.destAccount);
+                this.destTile.setAccount(state.destAccount);
             }
 
             this.initDestAccList();
             if (this.destDDList && transaction.dest_id) {
                 this.destDDList.selectItem(transaction.dest_id);
             }
+            this.destDDList?.enable(!state.submitStarted);
         }
 
         this.typeInp.value = transaction.type;
-
-        enable(this.srcIdInp, transaction.type !== DEBT);
-        enable(this.destIdInp, transaction.type !== DEBT);
-        enable(this.personIdInp, transaction.type === DEBT);
-        enable(this.debtAccountInp, transaction.type === DEBT);
-
         this.srcIdInp.value = transaction.src_id;
         this.destIdInp.value = transaction.dest_id;
         this.srcCurrInp.value = transaction.src_curr;
@@ -1291,16 +1346,25 @@ class TransactionView extends View {
         this.renderExchangeRate(state);
 
         this.srcAmountInput.value = state.form.sourceAmount;
+        enable(this.srcAmountInput.elem, !state.submitStarted);
+
         this.destAmountInput.value = state.form.destAmount;
+        enable(this.destAmountInput.elem, !state.submitStarted);
+
         if (this.exchangeInput) {
             this.exchangeInput.value = state.form.exchange;
         }
+        enable(this.exchangeInput.elem, !state.submitStarted);
+
         if (this.srcResBalanceInput) {
             this.srcResBalanceInput.value = state.form.sourceResult;
         }
+        enable(this.srcResBalanceInput.elem, !state.submitStarted);
+
         if (this.destResBalanceInput) {
             this.destResBalanceInput.value = state.form.destResult;
         }
+        enable(this.destResBalanceInput.elem, !state.submitStarted);
 
         const currencyModel = window.app.model.currency;
         const srcCurrency = currencyModel.getItem(transaction.src_curr);
@@ -1310,22 +1374,26 @@ class TransactionView extends View {
             const title = srcCurrency.formatValue(transaction.src_amount);
             this.srcAmountInfo.setTitle(title);
             this.srcAmountInfo.setLabel(sourceAmountLbl);
+            this.srcAmountInfo.enable(!state.submitStarted);
         }
 
         if (this.destAmountInfo) {
             const title = destCurrency.formatValue(transaction.dest_amount);
             this.destAmountInfo.setTitle(title);
             this.destAmountInfo.setLabel(destAmountLbl);
+            this.destAmountInfo.enable(!state.submitStarted);
         }
 
         if (this.srcResBalanceInfo) {
             const title = srcCurrency.formatValue(state.form.fSourceResult);
             this.srcResBalanceInfo.setTitle(title);
+            this.srcResBalanceInfo.enable(!state.submitStarted);
         }
 
         if (this.destResBalanceInfo) {
             const title = destCurrency.formatValue(state.form.fDestResult);
             this.destResBalanceInfo.setTitle(title);
+            this.destResBalanceInfo.enable(!state.submitStarted);
         }
 
         if (state.validation.sourceAmount) {
@@ -1341,12 +1409,23 @@ class TransactionView extends View {
         }
 
         if (state.validation.date) {
-            window.app.clearBlockValidation(this.dateBlock);
+            window.app.clearBlockValidation(this.dateRow);
         } else {
-            window.app.invalidateBlock(this.dateBlock);
+            window.app.invalidateBlock(this.dateRow);
+        }
+        enable(this.dateInput, !state.submitStarted);
+        this.dateInput.value = state.form.date;
+
+        enable(this.commentInput, !state.submitStarted);
+        this.commentInput.value = state.form.comment;
+
+        enable(this.submitBtn, !state.submitStarted);
+        show(this.cancelBtn, !state.submitStarted);
+        if (this.deleteBtn) {
+            this.deleteBtn.enable(!state.submitStarted);
         }
 
-        this.dateInput.value = state.form.date;
+        this.spinner.show(state.submitStarted);
     }
 }
 

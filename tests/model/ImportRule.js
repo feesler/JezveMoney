@@ -39,7 +39,9 @@ export class ImportRule {
 
     /** Run actions assigned to rule */
     runActions(context) {
-        this.actions.forEach((item) => item.execute(context));
+        const sortedActions = this.actions.sort();
+
+        sortedActions.forEach((item) => item.execute(context));
     }
 
     /** Check import rule is match search filter */

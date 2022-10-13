@@ -1,5 +1,5 @@
 <?php
-use JezveMoney\App\Template\Component\IconLink;
+use JezveMoney\App\Template\Component\IconButton;
 
 include(TPL_PATH . "Header.tpl"); ?>
 
@@ -11,7 +11,7 @@ include(TPL_PATH . "Header.tpl"); ?>
                 <div class="content_wrap">
                     <div class="heading">
                         <h1>Transactions</h1>
-                        <?=IconLink::render([
+                        <?=IconButton::render([
                             "id" => "add_btn",
                             "type" => "link",
                             "link" => BASEURL . "transactions/create/",
@@ -71,26 +71,18 @@ include(TPL_PATH . "Header.tpl"); ?>
                             <select id="person_id" name="person_id" multiple></select>
                         </div>
 
-                        <div class="filter-item">
+                        <div id="dateFilter" class="filter-item">
                             <h3 class="filter-item__title">Date range</h3>
-                            <?=IconLink::render([
-                                "id" => "calendar_btn",
-                                "icon" => "cal",
-                                "title" => "Select range",
-                                "subtitle" => $dateFmt
-                            ])?>
-                            <div id="date_block" class="column-container" hidden>
-                                <div class="input-group">
-                                    <input id="date" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?=e($dateFmt)?>">
-                                    <button id="nodatebtn" class="input-group__inner-btn" type="button"<?=hidden(is_empty($dateFmt))?>>
-                                        <?=svgIcon("close", "input-group__inner-btn__icon")?>
-                                    </button>
-                                    <button id="cal_rbtn" class="icon-btn input-group__btn" type="button">
-                                        <svg class="icon calendar-icon"><use href="#calendar-icon"></use></svg>
-                                    </button>
-                                </div>
-                                <div id="calendar" class="calendar"></div>
+                            <div class="input-group">
+                                <input id="date" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?=e($dateFmt)?>">
+                                <button id="nodatebtn" class="input-group__inner-btn" type="button"<?=hidden(is_empty($dateFmt))?>>
+                                    <?=svgIcon("close", "input-group__inner-btn__icon")?>
+                                </button>
+                                <button id="cal_rbtn" class="btn icon-btn input-group__btn" type="button">
+                                    <?=useIcon("calendar-icon", "icon calendar-icon")?>
+                                </button>
                             </div>
+                            <div id="calendar" class="calendar"></div>
                         </div>
 
                         <div class="filter-item">
@@ -101,7 +93,7 @@ include(TPL_PATH . "Header.tpl"); ?>
                                 <button id="nosearchbtn" class="input-group__inner-btn" type="button"<?=hidden(is_empty($searchReq))?>>
                                     <?=svgIcon("close", "input-group__inner-btn__icon")?>
                                 </button>
-                                <button class="icon-btn search_btn input-group__btn" type="submit"><?=svgIcon("search", "icon search-icon")?></button>
+                                <button class="btn icon-btn search_btn input-group__btn" type="submit"><?=svgIcon("search", "icon search-icon")?></button>
                             </div>
                             </form>
                         </div>
@@ -128,14 +120,14 @@ include(TPL_PATH . "Header.tpl"); ?>
         <div class="siderbar__content">
             <div id="sbEllipsis" class="sidebar__ellipsis"><?=svgIcon("sbellipsis", "icon")?></div>
             <div id="sbButtons" class="sidebar__controls">
-                <?=IconLink::render([
+                <?=IconButton::render([
                     "id" => "edit_btn",
                     "type" => "link",
                     "title" => "Edit",
                     "icon" => "edit",
                     "hidden" => true
                 ])?>
-                <?=IconLink::render([
+                <?=IconButton::render([
                     "id" => "del_btn",
                     "title" => "Delete",
                     "icon" => "del",
@@ -145,9 +137,6 @@ include(TPL_PATH . "Header.tpl"); ?>
         </div>
     </div>
 </div>
-<form id="delform" method="post" action="<?=BASEURL?>transactions/del/">
-<input id="deltrans" name="transactions" type="hidden" value="">
-</form>
 
 <?php	include(ICONS_PATH . "Common.tpl");	?>
 <?php	include(ICONS_PATH . "ModeSelector.tpl");	?>

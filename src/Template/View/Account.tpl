@@ -1,6 +1,6 @@
 <?php
 use JezveMoney\App\Template\Component\Tile;
-use JezveMoney\App\Template\Component\IconLink;
+use JezveMoney\App\Template\Component\IconButton;
 
 include(TPL_PATH . "Header.tpl");	?>
 
@@ -13,7 +13,7 @@ include(TPL_PATH . "Header.tpl");	?>
                     <div class="heading">
                         <h1><?=e($headString)?></h1>
 <?php	if ($this->action == "update") {	?>
-                        <?=IconLink::render([
+                        <?=IconButton::render([
                             "id" => "del_btn",
                             "title" => "Delete",
                             "icon" => "del"
@@ -29,7 +29,7 @@ include(TPL_PATH . "Header.tpl");	?>
                         <div class="view-row std_margin">
                             <?=Tile::render($tile)?>
                         </div>
-                        <div class="view-row std_margin">
+                        <div id="icon-block" class="view-row std_margin">
                             <label for="icon">Icon</label>
                             <div>
                                 <select id="icon" name="icon_id">
@@ -53,7 +53,7 @@ include(TPL_PATH . "Header.tpl");	?>
                             <input id="accname" class="stretch-input" name="name" type="text" autocomplete="off" value="<?=e($accInfo->name)?>">
                             <div id="namefeedback" class="invalid-feedback"></div>
                         </div>
-                        <div class="view-row std_margin">
+                        <div id="currency-block" class="view-row std_margin">
                             <label for="currency">Currency</label>
                             <div>
                                 <select id="currency" name="curr_id"></select>
@@ -70,8 +70,8 @@ include(TPL_PATH . "Header.tpl");	?>
                             <div class="invalid-feedback">Input correct initial balance.</div>
                         </div>
                         <div class="form-controls">
-                            <input class="btn submit-btn" type="submit" value="Submit">
-                            <a class="btn cancel-btn" href="<?=BASEURL?>accounts/">Cancel</a>
+                            <input id="submitBtn" class="btn submit-btn" type="submit" value="Submit">
+                            <a id="cancelBtn" class="btn cancel-btn" href="<?=BASEURL?>accounts/">Cancel</a>
                         </div>
                         <input id="flags" name="flags" type="hidden" value="<?=e($accInfo->flags)?>">
                         </form>
@@ -81,11 +81,6 @@ include(TPL_PATH . "Header.tpl");	?>
         </div>
     </div>
 </div>
-<?php	if ($this->action == "update") {	?>
-<form id="delform" method="post" action="<?=BASEURL?>accounts/del">
-<input name="accounts" type="hidden" value="<?=e($accInfo->id)?>">
-</form>
-<?php	}	?>
 
 <?php	include(ICONS_PATH . "TileIcons.tpl");	?>
 <?php	include(ICONS_PATH . "Common.tpl");	?>

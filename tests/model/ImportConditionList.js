@@ -28,6 +28,55 @@ export class ImportConditionList extends List {
     }
 
     /**
+     * Search for condition for specified property with `is` (equal) operator
+     * @param {Number} field
+     */
+    findIsCondition(fieldId) {
+        const field = parseInt(fieldId, 10);
+        if (!field) {
+            throw new Error('Invalid field id');
+        }
+
+        return this.find((item) => (
+            item.field_id === field
+            && item.operator === IMPORT_COND_OP_EQUAL
+        ));
+    }
+
+    /**
+     * Check list of conditions has condition for specified property with `is` (equal) operator
+     * @param {Number} field
+     */
+    hasIsCondition(fieldId) {
+        return !!this.findIsCondition(fieldId);
+    }
+
+    /**
+     * Search for condition for specified property with any operator except `is` (equal)
+     * @param {Number} field
+     */
+    findNotIsCondition(fieldId) {
+        const field = parseInt(fieldId, 10);
+        if (!field) {
+            throw new Error('Invalid field id');
+        }
+
+        return this.find((item) => (
+            item.field_id === field
+            && item.operator !== IMPORT_COND_OP_EQUAL
+        ));
+    }
+
+    /**
+     * Check list of conditions has condition for specified property with
+     * any operator except `is` (equal)
+     * @param {Number} field
+     */
+    hasNotIsCondition(fieldId) {
+        return !!this.findNotIsCondition(fieldId);
+    }
+
+    /**
      * Check list of conditions has condition with same properties
      * @param {ImportCondition} condition
      */

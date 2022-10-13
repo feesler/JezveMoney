@@ -36,22 +36,13 @@ class Accounts extends TemplateController
         ];
 
         $currMod = CurrencyModel::getInstance();
-
-        $accountsData = $this->model->getData(["type" => "all"]);
-        foreach ($accountsData as $account) {
-            $hidden = $this->model->isHidden($account);
-            $var = $hidden ? "hiddenTilesArr" : "tilesArr";
-            $data[$var][] = [
-                "type" => "button",
-                "attributes" => ["data-id" => $account->id],
-                "title" => $account->name,
-                "subtitle" => $currMod->format($account->balance, $account->curr_id),
-                "icon" => $this->model->getIconFile($account->id)
-            ];
-        }
+        $iconModel = IconModel::getInstance();
 
         $data["appProps"] = [
-            "accounts" => $accountsData
+            "profile" => $this->getProfileData(),
+            "accounts" => $this->model->getData(["type" => "all"]),
+            "currency" => $currMod->getData(),
+            "icons" => $iconModel->getData(),
         ];
 
         $this->cssArr[] = "AccountListView.css";
@@ -64,8 +55,7 @@ class Accounts extends TemplateController
     public function create()
     {
         if ($this->isPOST()) {
-            $this->createAccount();
-            return;
+            $this->fail(ERR_INVALID_REQUEST);
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Account.tpl");
@@ -94,7 +84,6 @@ class Accounts extends TemplateController
         $accInfo->sign = $currObj->sign;
         $data["accInfo"] = $accInfo;
         $data["tile"] = [
-            "type" => "button",
             "id" => "acc_tile",
             "title" => "New account",
             "subtitle" => $currMod->format($accInfo->balance, $accInfo->curr_id),
@@ -133,8 +122,7 @@ class Accounts extends TemplateController
     public function update()
     {
         if ($this->isPOST()) {
-            $this->updateAccount();
-            return;
+            $this->fail(ERR_INVALID_REQUEST);
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Account.tpl");
@@ -162,7 +150,6 @@ class Accounts extends TemplateController
         $data["accInfo"] = $accInfo;
 
         $data["tile"] = [
-            "type" => "button",
             "id" => "acc_tile",
             "title" => $accInfo->name,
             "subtitle" => $currMod->format($accInfo->balance, $accInfo->curr_id),
@@ -185,141 +172,6 @@ class Accounts extends TemplateController
         $this->jsArr[] = "AccountView.js";
 
         $this->render($data);
-    }
-
-
-    protected function createAccount()
-    {
-        if (!$this->isPOST()) {
-            setLocation(BASEURL . "accounts/");
-        }
-
-        $defMsg = ERR_ACCOUNT_CREATE;
-
-        $reqData = checkFields($_POST, $this->requiredFields);
-        if ($reqData === false) {
-            throw new \Error($defMsg);
-        }
-
-        $this->begin();
-
-        $uObj = $this->uMod->getItem($this->user_id);
-        if (!$uObj) {
-            throw new \Error($defMsg);
-        }
-
-        $reqData["owner_id"] = $uObj->owner_id;
-
-        if (!$this->model->create($reqData)) {
-            throw new \Error($defMsg);
-        }
-
-        $this->commit();
-
-        Message::set(MSG_ACCOUNT_CREATE);
-        setLocation(BASEURL . "accounts/");
-    }
-
-
-    protected function updateAccount()
-    {
-        if (!$this->isPOST()) {
-            setLocation(BASEURL . "accounts/");
-        }
-
-        $defMsg = ERR_ACCOUNT_UPDATE;
-
-        if (!isset($_POST["id"])) {
-            throw new \Error($defMsg);
-        }
-
-        $this->begin();
-
-        $reqData = checkFields($_POST, $this->requiredFields);
-        if (!$this->model->update($_POST["id"], $reqData)) {
-            throw new \Error($defMsg);
-        }
-
-        $this->commit();
-
-        Message::set(MSG_ACCOUNT_UPDATE);
-        setLocation(BASEURL . "accounts/");
-    }
-
-
-    public function show()
-    {
-        if (!$this->isPOST()) {
-            setLocation(BASEURL . "accounts/");
-        }
-
-        $defMsg = ERR_ACCOUNT_SHOW;
-
-        if (!isset($_POST["accounts"])) {
-            throw new \Error($defMsg);
-        }
-
-        $this->begin();
-
-        $ids = explode(",", rawurldecode($_POST["accounts"]));
-        if (!$this->model->show($ids)) {
-            throw new \Error($defMsg);
-        }
-
-        $this->commit();
-
-        setLocation(BASEURL . "accounts/");
-    }
-
-
-    public function hide()
-    {
-        if (!$this->isPOST()) {
-            setLocation(BASEURL . "accounts/");
-        }
-
-        $defMsg = ERR_ACCOUNT_HIDE;
-
-        if (!isset($_POST["accounts"])) {
-            throw new \Error($defMsg);
-        }
-
-        $this->begin();
-
-        $ids = explode(",", rawurldecode($_POST["accounts"]));
-        if (!$this->model->hide($ids)) {
-            throw new \Error($defMsg);
-        }
-
-        $this->commit();
-
-        setLocation(BASEURL . "accounts/");
-    }
-
-
-    public function del()
-    {
-        if (!$this->isPOST()) {
-            setLocation(BASEURL . "accounts/");
-        }
-
-        $defMsg = ERR_ACCOUNT_DELETE;
-
-        if (!isset($_POST["accounts"])) {
-            throw new \Error($defMsg);
-        }
-
-        $this->begin();
-
-        $ids = explode(",", rawurldecode($_POST["accounts"]));
-        if (!$this->model->del($ids)) {
-            throw new \Error($defMsg);
-        }
-
-        $this->commit();
-
-        Message::set(MSG_ACCOUNT_DELETE);
-        setLocation(BASEURL . "accounts/");
     }
 
 

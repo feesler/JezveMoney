@@ -1,7 +1,7 @@
 <?php
 use JezveMoney\App\Template\Component\Tile;
 use JezveMoney\App\Template\Component\TileInfoItem;
-use JezveMoney\App\Template\Component\IconLink;
+use JezveMoney\App\Template\Component\IconButton;
 
 include(TPL_PATH . "Header.tpl");	?>
 
@@ -14,7 +14,7 @@ include(TPL_PATH . "Header.tpl");	?>
                     <div class="heading">
                         <h1><?=e($headString)?></h1>
 <?php	if ($action == "update") {	?>
-                        <?=IconLink::render([
+                        <?=IconButton::render([
                             "id" => "del_btn",
                             "icon" => "del",
                             "title" => "Delete"
@@ -99,7 +99,7 @@ include(TPL_PATH . "Header.tpl");	?>
                                     </div>
                                 </div>
                                 <div id="selaccount" class="account-toggler"<?=hidden(!$noAccount)?>>
-                                    <button class="dashed-btn" type="button"><span>Select account</span></button>
+                                    <button class="btn dashed-btn" type="button">Select account</button>
                                 </div>
                             </div>
 
@@ -218,44 +218,28 @@ include(TPL_PATH . "Header.tpl");	?>
                             </div>
                         </div>
 
-                        <div id="date_row" class="view-row std_margin"<?=hidden(!$trAvailable)?>>
-                            <?=IconLink::render([
-                                "id" => "calendar_btn",
-                                "icon" => "cal",
-                                "title" => "Change date",
-                                "subtitle" => $dateFmt
-                            ])?>
-                            <div id="date_block" class="validation-block" hidden>
-                                <label for="date">Date</label>
-                                <div class="column-container">
-                                    <div class="input-group">
-                                        <input id="date" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?=e($dateFmt)?>">
-                                        <button id="cal_rbtn" class="icon-btn input-group__btn" type="button">
-                                            <svg class="icon calendar-icon"><use href="#calendar-icon"></use></svg>
-                                        </button>
-                                    </div>
-                                    <div id="calendar" class="calendar"></div>
+                        <div id="date_row" class="validation-block view-row std_margin"<?=hidden(!$trAvailable)?>>
+                            <label for="date">Date</label>
+                            <div class="column-container">
+                                <div class="input-group">
+                                    <input id="date" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?=e($dateFmt)?>">
+                                    <button id="cal_rbtn" class="btn icon-btn input-group__btn" type="button">
+                                        <?=useIcon("calendar-icon", "icon calendar-icon")?>
+                                    </button>
                                 </div>
-                                <div class="invalid-feedback">Input correct date.</div>
+                                <div id="calendar" class="calendar"></div>
                             </div>
+                            <div class="invalid-feedback">Input correct date.</div>
                         </div>
 
                         <div id="comment_row" class="view-row std_margin"<?=hidden(!$trAvailable)?>>
-                            <?=IconLink::render([
-                                "id" => "comm_btn",
-                                "icon" => "plus",
-                                "title" => "Add comment",
-                                "hidden" => !is_empty($tr["comment"])
-                            ])?>
-                            <div id="comment_block"<?=hidden(is_empty($tr["comment"]))?>>
-                                <label for="comm">Comment</label>
-                                <input id="comm" class="stretch-input" name="comment" type="text" value="<?=e($tr["comment"])?>">
-                            </div>
+                            <label for="comm">Comment</label>
+                            <input id="comm" class="stretch-input" name="comment" type="text" value="<?=e($tr["comment"])?>">
                         </div>
 
                         <div id="submit_controls" class="form-controls"<?=hidden(!$trAvailable)?>>
-                            <input id="submitbtn" class="btn submit-btn" type="submit" value="Submit">
-                            <a class="btn cancel-btn" href="<?=BASEURL?>">Cancel</a>
+                            <input id="submitBtn" class="btn submit-btn" type="submit" value="Submit">
+                            <a id="cancelBtn" class="btn cancel-btn" href="<?=BASEURL?>">Cancel</a>
                         </div>
                         </form>
                     </div>
@@ -264,11 +248,6 @@ include(TPL_PATH . "Header.tpl");	?>
         </div>
     </div>
 </div>
-<?php	if ($action == "update") {	?>
-<form id="delform" method="post" action="<?=BASEURL?>transactions/del/">
-<input name="transactions" type="hidden" value="<?=e($tr["id"])?>">
-</form>
-<?php	}	?>
 
 <?php	include(ICONS_PATH . "TileIcons.tpl");	?>
 <?php	include(ICONS_PATH . "Common.tpl");	?>

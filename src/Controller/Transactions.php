@@ -17,29 +17,6 @@ const MSG_DEBT_NOT_AVAILABLE = "You have no one active person. Please create one
 
 class Transactions extends TemplateController
 {
-    protected $requiredFields = [
-        "type",
-        "src_id",
-        "dest_id",
-        "src_amount",
-        "dest_amount",
-        "src_curr",
-        "dest_curr",
-        "date",
-        "comment"
-    ];
-    protected $debtRequiredFields = [
-        "type",
-        "person_id",
-        "acc_id",
-        "op",
-        "src_amount",
-        "dest_amount",
-        "src_curr",
-        "dest_curr",
-        "date",
-        "comment"
-    ];
     protected $model = null;
     protected $accModel = null;
     protected $currModel = null;
@@ -102,8 +79,6 @@ class Transactions extends TemplateController
         $transCount = $this->model->getTransCount($trParams);
         $pagination["total"] = $transCount;
 
-        $currArr = $this->currModel->getData();
-
         // Prepare transaction types menu
         $trTypes = [0 => "Show all"];
         $availTypes = TransactionModel::getTypeNames();
@@ -156,7 +131,7 @@ class Transactions extends TemplateController
             "profile" => $this->getProfileData(),
             "accounts" => $this->accModel->getData(["full" => true, "type" => "all"]),
             "persons" => $this->personMod->getData(["type" => "all"]),
-            "currency" => $currArr,
+            "currency" => $this->currModel->getData(),
             "view" => [
                 "transArr" => $trItems,
                 "filterObj" => (object)$filterObj,
@@ -245,7 +220,7 @@ class Transactions extends TemplateController
     public function create()
     {
         if ($this->isPOST()) {
-            $this->createTransaction();
+            $this->fail(ERR_INVALID_REQUEST);
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Transaction.tpl");
@@ -266,7 +241,8 @@ class Transactions extends TemplateController
             "type" => $this->getRequestedType($_GET, EXPENSE),
             "src_amount" => 0,
             "dest_amount" => 0,
-            "comment" => ""
+            "comment" => "",
+            "date" => strtotime(date("d.m.Y"))
         ];
 
         // Check availability of selected type of transaction
@@ -585,7 +561,7 @@ class Transactions extends TemplateController
     public function update()
     {
         if ($this->isPOST()) {
-            $this->updateTransaction();
+            $this->fail(ERR_INVALID_REQUEST);
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Transaction.tpl");
@@ -863,97 +839,5 @@ class Transactions extends TemplateController
         $this->jsArr[] = "TransactionView.js";
 
         $this->render($data);
-    }
-
-
-    protected function createTransaction()
-    {
-        if (!$this->isPOST()) {
-            setLocation(BASEURL);
-        }
-
-        if (!isset($_POST["type"])) {
-            throw new \Error();
-        }
-
-        $trans_type = intval($_POST["type"]);
-        $reqData = checkFields($_POST, ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields);
-        if ($reqData === false) {
-            throw new \Error();
-        }
-
-        $this->begin();
-
-        $itemData = ($trans_type == DEBT)
-            ? $this->model->prepareDebt($reqData)
-            : $reqData;
-
-        if (!$this->model->create($itemData)) {
-            throw new \Error(ERR_TRANS_CREATE);
-        }
-
-        $this->commit();
-
-        Message::set(MSG_TRANS_CREATE);
-        setLocation(BASEURL);
-    }
-
-
-    protected function updateTransaction()
-    {
-        if (!$this->isPOST()) {
-            setLocation(BASEURL);
-        }
-
-        if (!isset($_POST["id"]) || !isset($_POST["type"])) {
-            throw new \Error();
-        }
-
-        $trans_type = intval($_POST["type"]);
-        $reqData = checkFields($_POST, ($trans_type == DEBT) ? $this->debtRequiredFields : $this->requiredFields);
-        if ($reqData === false) {
-            throw new \Error();
-        }
-
-        $this->begin();
-
-        $itemData = ($trans_type == DEBT)
-            ? $this->model->prepareDebt($reqData)
-            : $reqData;
-
-        if (!$this->model->update($_POST["id"], $itemData)) {
-            throw new \Error(ERR_TRANS_UPDATE);
-        }
-
-        $this->commit();
-
-        Message::set(MSG_TRANS_UPDATE);
-        setLocation(BASEURL . "transactions/");
-    }
-
-
-    public function del()
-    {
-        if (!$this->isPOST()) {
-            setLocation(BASEURL . "transactions/");
-        }
-
-        $defMsg = ERR_TRANS_DELETE;
-
-        if (!isset($_POST["transactions"])) {
-            throw new \Error($defMsg);
-        }
-
-        $this->begin();
-
-        $ids = explode(",", rawurldecode($_POST["transactions"]));
-        if (!$this->model->del($ids)) {
-            throw new \Error();
-        }
-
-        $this->commit();
-
-        Message::set(MSG_TRANS_DELETE);
-        setLocation(BASEURL . "transactions/");
     }
 }

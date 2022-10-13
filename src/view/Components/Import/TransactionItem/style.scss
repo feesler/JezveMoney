@@ -73,17 +73,14 @@
     }
   }
 
-  /* Common buttons style */
-  .btn {
-    pointer-events: all;
-    background: none;
-    padding: 4px;
-    cursor: pointer;
-  }
-
   /* Toggle expand/collapse button */
   .toggle-btn {
+    width: 32px;
+    height: 32px;
     padding: 7px;
+    background: none;
+    pointer-events: all;
+    cursor: pointer;
   }
 
   .toggle-icon {
@@ -98,7 +95,16 @@
   }
 
   /* Menu */
-  .menu-icon {
+  .actions-menu-btn {
+    width: 26px;
+    height: 26px;
+    padding: 4px;
+    background: none;
+    pointer-events: all;
+    cursor: pointer;
+  }
+
+  .actions-menu-btn__icon {
     width: 18px;
     height: 18px;
   }

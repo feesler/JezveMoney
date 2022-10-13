@@ -70,7 +70,7 @@ class ImportTemplateModel extends CachedTable
     }
 
 
-    protected function validateParams($params, $isUpdate = false)
+    protected function validateParams($params, $item_id = 0)
     {
         $columnFields = [
             "date_col",
@@ -87,15 +87,14 @@ class ImportTemplateModel extends CachedTable
         $res = [];
 
         // In CREATE mode all fields is required
-        if (!$isUpdate && !checkFields($params, $avFields)) {
-            return null;
+        if (!$item_id) {
+            checkFields($params, $avFields, true);
         }
 
         if (isset($params["name"])) {
             $res["name"] = $this->dbObj->escape($params["name"]);
             if (is_empty($res["name"])) {
-                wlog("Invalid name specified");
-                return null;
+                throw new \Error("Invalid name specified");
             }
         }
 
@@ -108,8 +107,7 @@ class ImportTemplateModel extends CachedTable
         if (isset($params["first_row"])) {
             $res["first_row"] = intval($params["first_row"]);
             if ($res["first_row"] < 1) {
-                wlog("Invalid first_row specified: " . $params["first_row"]);
-                return null;
+                throw new \Error("Invalid first_row specified: " . $params["first_row"]);
             }
         }
 
@@ -119,10 +117,13 @@ class ImportTemplateModel extends CachedTable
             if (isset($params[$fieldName])) {
                 $res[$fieldName] = intval($params[$fieldName]);
                 if ($res[$fieldName] < 1) {
-                    wlog("Invalid value for '$fieldName' specified: " . $params[$fieldName]);
-                    return null;
+                    throw new \Error("Invalid value for '$fieldName' specified: " . $params[$fieldName]);
                 }
             }
+        }
+
+        if ($this->isSameItemExist($res, $item_id)) {
+            throw new \Error("Same import template already exist");
         }
 
         return $res;
@@ -130,7 +131,7 @@ class ImportTemplateModel extends CachedTable
 
 
     // Check same item already exist
-    protected function isSameItemExist($params, $updateId = 0)
+    protected function isSameItemExist($params, $item_id = 0)
     {
         if (!is_array($params)) {
             return false;
@@ -140,16 +141,8 @@ class ImportTemplateModel extends CachedTable
             "type" => $params["type_id"],
             "name" => $params["name"]
         ]);
-        if (!count($items)) {
-            return false;
-        }
-        $foundItem = $items[0];
-        if ($foundItem->id != $updateId) {
-            wlog("Such item already exist");
-            return true;
-        }
-
-        return false;
+        $foundItem = (count($items) > 0) ? $items[0] : null;
+        return ($foundItem && $foundItem->id != $item_id);
     }
 
 
@@ -157,13 +150,6 @@ class ImportTemplateModel extends CachedTable
     protected function preCreate($params, $isMultiple = false)
     {
         $res = $this->validateParams($params);
-        if (is_null($res)) {
-            return null;
-        }
-
-        if ($this->isSameItemExist($res)) {
-            return null;
-        }
 
         $res["user_id"] = self::$user_id;
         $res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
@@ -175,27 +161,15 @@ class ImportTemplateModel extends CachedTable
     // Preparations for item update
     protected function preUpdate($item_id, $params)
     {
-        // check currency is exist
         $item = $this->getItem($item_id);
         if (!$item) {
-            return false;
+            throw new \Error("Item not found");
         }
-
-        // check user of template
         if ($item->user_id != self::$user_id) {
-            wlog("Invalid user of item");
-            return false;
+            throw new \Error("Invalid user");
         }
 
-        $res = $this->validateParams($params, true);
-        if (is_null($res)) {
-            return null;
-        }
-
-        if ($this->isSameItemExist($res, $item_id)) {
-            return null;
-        }
-
+        $res = $this->validateParams($params, $item_id);
         $res["updatedate"] = date("Y-m-d H:i:s");
 
         return $res;

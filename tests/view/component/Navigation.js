@@ -4,6 +4,7 @@ import {
     prop,
     click,
 } from 'jezve-test';
+import { asyncMap } from '../../common.js';
 
 const navLinksMap = {
     accountsLink: 'Accounts',
@@ -22,21 +23,19 @@ export class Navigation extends TestComponent {
 
         const res = {};
 
-        const navLinks = await queryAll(this.elem, '.nav-link');
-        for (const linkElem of navLinks) {
-            const title = await prop(linkElem, 'textContent');
-            const link = {
-                elem: linkElem,
-                title,
-            };
-
+        const navElems = await queryAll(this.elem, '.nav-link');
+        const navLinks = await asyncMap(navElems, async (elem) => ({
+            elem,
+            title: await prop(elem, 'textContent'),
+        }));
+        navLinks.forEach((link) => {
             for (const name in navLinksMap) {
                 if (navLinksMap[name] === link.title) {
                     res[name] = link;
                     break;
                 }
             }
-        }
+        });
 
         return res;
     }

@@ -2,8 +2,8 @@ import {
     ce,
     enable,
     isFunction,
-    Checkbox,
 } from 'jezvejs';
+import { Checkbox } from 'jezvejs/Checkbox';
 import { ImportTransactionBase } from '../TransactionBase/ImportTransactionBase.js';
 import { Field } from '../../Field/Field.js';
 import './style.scss';
@@ -208,6 +208,8 @@ export class ImportTransactionItem extends ImportTransactionBase {
         if (!state) {
             throw new Error('Invalid state');
         }
+
+        const isDiff = state.transaction.isDiff();
         const transaction = state.transaction.state;
 
         const { userAccounts, persons, currency } = window.app.model;
@@ -247,7 +249,7 @@ export class ImportTransactionItem extends ImportTransactionBase {
         }
 
         // Amount fields
-        const srcAmountLabel = (transaction.isDiff) ? TITLE_FIELD_SRC_AMOUNT : TITLE_FIELD_AMOUNT;
+        const srcAmountLabel = (isDiff) ? TITLE_FIELD_SRC_AMOUNT : TITLE_FIELD_AMOUNT;
         this.srcAmountField.setTitle(srcAmountLabel);
         const srcAmount = currency.formatCurrency(transaction.sourceAmount, transaction.srcCurrId);
         this.srcAmountTitle.textContent = srcAmount;
@@ -255,8 +257,8 @@ export class ImportTransactionItem extends ImportTransactionBase {
         this.srcAmountField.elem.dataset.amount = transaction.sourceAmount;
         this.srcAmountField.elem.dataset.curr = transaction.srcCurrId;
 
-        this.destAmountField.show(transaction.isDiff);
-        const destAmount = (transaction.isDiff)
+        this.destAmountField.show(isDiff);
+        const destAmount = (isDiff)
             ? currency.formatCurrency(transaction.destAmount, transaction.destCurrId)
             : '';
         this.destAmountTitle.textContent = destAmount;

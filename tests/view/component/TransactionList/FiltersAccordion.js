@@ -3,7 +3,7 @@ import {
     click,
     assert,
 } from 'jezve-test';
-import { Collapsible } from 'jezvejs/tests';
+import { Collapsible } from 'jezvejs-test';
 
 export class FiltersAccordion extends Collapsible {
     async parseContent() {

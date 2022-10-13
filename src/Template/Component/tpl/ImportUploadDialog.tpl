@@ -36,6 +36,7 @@
 
     <div id="templateBlock" class="tpl-form" hidden>
         <div id="tplHeading" hidden>
+            <div id="tplFilename" class="tpl-form__file"></div>
             <div class="tpl-form-header">
                 <label id="tplStateLbl">Template</label>
                 <input id="createTplBtn" class="btn link-btn" type="button" value="Create template">

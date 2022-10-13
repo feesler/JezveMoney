@@ -6,17 +6,19 @@ import {
     insertAfter,
     isDate,
     show,
-    Histogram,
-    DatePicker,
-    DropDown,
 } from 'jezvejs';
+import { Histogram } from 'jezvejs/Histogram';
+import { DatePicker } from 'jezvejs/DatePicker';
+import { DropDown } from 'jezvejs/DropDown';
+import 'jezvejs/style/InputGroup';
 import { Application } from '../../js/Application.js';
-import { API } from '../../js/API.js';
+import '../../css/app.scss';
+import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';
-import { IconLink } from '../../Components/IconLink/IconLink.js';
+import { CurrencyList } from '../../js/model/CurrencyList.js';
+import { AccountList } from '../../js/model/AccountList.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import '../../css/app.scss';
 import '../../Components/TransactionTypeMenu/style.scss';
 import './style.scss';
 
@@ -51,6 +53,9 @@ class StatisticsView extends View {
         };
 
         this.state.filter = ('filter' in this.props) ? this.props.filter : {};
+
+        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
+        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
     }
 
     /**
@@ -120,13 +125,7 @@ class StatisticsView extends View {
             className: 'dd_fullwidth',
         });
 
-        this.datePickerBtn = IconLink.fromElement({
-            elem: 'calendar_btn',
-            onclick: () => this.showCalendar(),
-        });
-        this.dateBlock = ge('date_block');
         this.datePickerWrapper = ge('calendar');
-
         this.dateInputBtn = ge('cal_rbtn');
         if (this.dateInputBtn) {
             this.dateInputBtn.addEventListener('click', () => this.showCalendar());
@@ -236,9 +235,6 @@ class StatisticsView extends View {
         }
 
         this.datePicker.show(!this.datePicker.visible());
-
-        this.datePickerBtn.hide();
-        show(this.dateBlock, true);
     }
 
     /**
@@ -404,8 +400,6 @@ class StatisticsView extends View {
             ? `${state.filter.stdate} - ${state.filter.enddate}`
             : '';
         this.dateInput.value = dateRangeFmt;
-        const dateSubtitle = (isDateFilter) ? dateRangeFmt : null;
-        this.datePickerBtn.setSubtitle(dateSubtitle);
         show(this.noDateBtn, isDateFilter);
 
         // Render histogram

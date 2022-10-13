@@ -10,35 +10,33 @@
                         <h1>Profile</h1>
                     </div>
 
-                    <div class="profile_block">
+                    <div class="profile-block">
                         <h2>Login</h2>
                         <span><?=e($user_login)?></span>
                     </div>
 
-                    <div class="profile_block">
+                    <div class="profile-block">
                         <h2>Name</h2>
                         <div class="name-container">
                             <span id="namestatic"><?=e($profileInfo["name"])?></span>
-                            <a id="changeNameBtn" class="change-name-link" href="<?=BASEURL?>profile/changeName/">Change</a>
+                            <a id="changeNameBtn" class="change-name-link" href="<?=BASEURL?>profile/name/" data-action="name">Change</a>
                         </div>
                     </div>
 
-                    <div class="profile_block">
+                    <div class="profile-block">
                         <h2>Security</h2>
-                        <div><a id="changePassBtn" href="<?=BASEURL?>profile/changePass/">Change password</a></div>
+                        <div><a id="changePassBtn" href="<?=BASEURL?>profile/password/" data-action="password">Change password</a></div>
                     </div>
 
-                    <div class="profile_block">
+                    <div class="profile-block">
                         <h2>User data</h2>
-                        <div class="std_margin">
-                            <span>You also may reset your data.<br>
-                            <input id="resetBtn" class="btn submit-btn" type="button" value="Reset data"></span>
+                        <div class="profile-block__section">
+                            <span>You also may reset your data.</span>
+                            <a id="resetBtn" href="<?=BASEURL?>profile/reset/" data-action="reset">Reset data</a>
                         </div>
-                        <div class="std_margin">
-                            <form id="delete_form" method="post" action="<?=BASEURL?>profile/del/">
-                            </form>
-                            <span>Completely delete profile and all related data.<br>
-                            <input id="delProfileBtn" class="btn submit-btn warning-btn" type="button" value="Delete profile"></span>
+                        <div class="profile-block__section">
+                            <span>Completely delete profile and all related data.</span>
+                            <input id="delProfileBtn" class="btn submit-btn warning-btn" type="button" value="Delete profile">
                         </div>
                     </div>
                 </div>
@@ -53,6 +51,10 @@
         <label for="newname">New name</label>
         <input id="newname" class="stretch-input" name="name" type="text" autocomplete="off" value="<?=e($profileInfo["name"])?>">
         <div class="invalid-feedback">Input name.<br>New name must be different from the old.</div>
+    </div>
+
+    <div class="popup__controls">
+        <input class="btn submit-btn" type="submit" value="Submit">
     </div>
 </form>
 </div>
@@ -69,6 +71,10 @@
         <label for="newpwd">New password</label>
         <input id="newpwd" class="stretch-input" name="new" type="password" autocomplete="off">
         <div class="invalid-feedback">Input new password.<br>New password must be different from the old.</div>
+    </div>
+
+    <div class="popup__controls">
+        <input class="btn submit-btn" type="submit" value="Submit">
     </div>
 </form>
 </div>
@@ -100,13 +106,13 @@
             <span class="checkbox__label">Transactions</span>
         </label>
 
-        <label id="keepAccountsBalanceCheck" class="checkbox std_margin suboption" disabled>
+        <label id="keepBalanceCheck" class="checkbox std_margin suboption" disabled>
             <input type="checkbox" name="keepbalance">
             <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
             <span class="checkbox__label">Keep current balance of accounts</span>
         </label>
 
-        <label id="importTemplatesCheck" class="checkbox std_margin">
+        <label id="importTplCheck" class="checkbox std_margin">
             <input type="checkbox" name="importtpl">
             <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
             <span class="checkbox__label">Import templates</span>
@@ -117,6 +123,10 @@
             <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
             <span class="checkbox__label">Import rules</span>
         </label>
+    </div>
+
+    <div class="popup__controls">
+        <input class="btn submit-btn" type="submit" value="Submit">
     </div>
 </form>
 </div>

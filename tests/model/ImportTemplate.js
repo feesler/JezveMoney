@@ -120,6 +120,7 @@ export class ImportTemplate {
                 const original = {
                     ...rowData,
                     mainAccount,
+                    origAccount: { ...mainAccount },
                     template: this.id,
                 };
 
@@ -139,8 +140,7 @@ export class ImportTemplate {
                     throw new ImportTemplateError();
                 }
 
-                const item = ImportTransaction.fromImportData(original, mainAccount);
-                return item;
+                return ImportTransaction.fromImportData(original, mainAccount);
             });
 
             return res;
