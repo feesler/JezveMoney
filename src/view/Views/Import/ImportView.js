@@ -98,15 +98,15 @@ class ImportView extends View {
 
         this.newItemBtn = IconLink.fromElement({
             elem: 'newItemBtn',
-            onclick: () => this.createItem(),
+            onClick: () => this.createItem(),
         });
         this.clearFormBtn = IconLink.fromElement({
             elem: 'clearFormBtn',
-            onclick: () => this.removeAllItems(),
+            onClick: () => this.removeAllItems(),
         });
         this.uploadBtn = IconLink.fromElement({
             elem: 'uploadBtn',
-            onclick: () => this.showUploadDialog(),
+            onClick: () => this.showUploadDialog(),
         });
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',

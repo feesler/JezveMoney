@@ -118,7 +118,7 @@ class AccountView extends View {
         if (this.state.original.id) {
             this.deleteBtn = IconLink.fromElement({
                 elem: 'del_btn',
-                onclick: () => this.confirmDelete(),
+                onClick: () => this.confirmDelete(),
             });
         }
     }

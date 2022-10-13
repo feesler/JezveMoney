@@ -103,12 +103,12 @@
 }
 
 @media (hover: hover) {
-  .sidebar .sidebar__controls .iconlink {
-    &:hover .iconlink__icon {
+  .sidebar .sidebar__controls .iconlink:hover {
+    .iconlink__icon {
       background-color: #ffffff;
     }
 
-    &:hover .iconlink__icon-content {
+    .iconlink__icon-content {
       fill: #404040;
     }
   }

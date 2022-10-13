@@ -2,8 +2,14 @@
 .iconlink {
   display: inline-flex;
   flex-flow: row nowrap;
-  overflow: hidden;
   height: 32px;
+  border: 0 none;
+  padding: 0;
+  overflow: hidden;
+  vertical-align: middle;
+  text-decoration: none;
+  background: none;
+  cursor: pointer;
 }
 
 .iconlink__icon {
@@ -49,24 +55,6 @@
   font-size: 10px;
   font-weight: bold;
   white-space: nowrap;
-}
-
-.iconlink > a {
-  height: 32px;
-  display: inline-flex;
-  flex-flow: row nowrap;
-  vertical-align: middle;
-  text-decoration: none;
-}
-
-.iconlink > button {
-  display: inline-flex;
-  flex-flow: row nowrap;
-  height: 32px;
-  border: 0 none;
-  cursor: pointer;
-  padding: 0;
-  background: none;
 }
 
 .iconlink[disabled] {

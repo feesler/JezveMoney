@@ -45,13 +45,8 @@
 /* Menu item with icon */
 .action-iconlink {
   height: auto;
-  padding: 0;
-
-  button {
-    width: 100%;
-    height: auto;
-    padding: 4px 14px 4px 4px;
-  }
+  padding: 4px 14px 4px 4px;
+  width: 100%;
 
   .iconlink__icon {
     border: 0;

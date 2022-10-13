@@ -3,6 +3,7 @@ import {
     createElement,
     addChilds,
     removeChilds,
+    enable,
     Component,
 } from 'jezvejs';
 import './style.scss';
@@ -72,18 +73,16 @@ export class IconLink extends Component {
 
         const isLink = (this.props.type === 'link');
         if (isLink) {
-            this.buttonElem = createElement('a');
+            this.elem = createElement('a', {
+                props: { className: CONTAINER_CLASS },
+                children: [this.iconElem, this.contentElem],
+            });
         } else {
-            this.buttonElem = createElement('button', {
-                props: { type: 'button' },
+            this.elem = createElement('button', {
+                props: { className: CONTAINER_CLASS, type: 'button' },
+                children: [this.iconElem, this.contentElem],
             });
         }
-        this.buttonElem.append(this.iconElem, this.contentElem);
-
-        this.elem = createElement('div', {
-            props: { className: CONTAINER_CLASS },
-            children: this.buttonElem,
-        });
 
         this.setClassNames();
         this.setHandlers();
@@ -91,22 +90,18 @@ export class IconLink extends Component {
     }
 
     parse() {
-        if (!(this.elem instanceof Element)) {
+        if (!this.elem) {
             throw new Error('Invalid element specified');
         }
 
         this.state = {};
 
-        this.buttonElem = this.elem.querySelector('button,a');
-        if (this.buttonElem && isFunction(this.props.onclick)) {
-            this.buttonElem.addEventListener('click', this.props.onclick);
-        }
-        if (this.buttonElem.tagName === 'A') {
-            this.state.url = this.buttonElem.href;
+        if (this.elem.tagName === 'A') {
+            this.state.url = this.elem.href;
         }
 
-        this.iconElem = this.buttonElem.querySelector(`.${ICON_CONTAINER_CLASS}`);
-        this.contentElem = this.buttonElem.querySelector(`.${CONTENT_CLASS}`);
+        this.iconElem = this.elem.querySelector(`.${ICON_CONTAINER_CLASS}`);
+        this.contentElem = this.elem.querySelector(`.${CONTENT_CLASS}`);
         if (!this.contentElem) {
             throw new Error('Invalid structure of iconlink element');
         }
@@ -137,17 +132,16 @@ export class IconLink extends Component {
             return;
         }
 
-        this.buttonElem.addEventListener('click', (e) => this.props.onClick(e));
+        this.elem.addEventListener('click', (e) => this.props.onClick(e));
     }
 
     /** Set title text */
     enable(value) {
-        const enable = !!value;
-        if (this.state.enabled === enable) {
+        if (this.state.enabled === !!value) {
             return;
         }
 
-        this.state.enabled = enable;
+        this.state.enabled = !!value;
         this.render(this.state);
     }
 
@@ -197,16 +191,10 @@ export class IconLink extends Component {
     render(state) {
         removeChilds(this.contentElem);
 
-        if (state.enabled) {
-            this.elem.removeAttribute('disabled');
-            this.buttonElem.removeAttribute('disabled');
-        } else {
-            this.elem.setAttribute('disabled', '');
-            this.buttonElem.setAttribute('disabled', '');
-        }
+        enable(this.elem, state.enabled);
 
-        if (this.buttonElem.tagName === 'A') {
-            this.buttonElem.href = state.url;
+        if (this.elem.tagName === 'A') {
+            this.elem.href = state.url;
         }
 
         if (state.subtitle) {

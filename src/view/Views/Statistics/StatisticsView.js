@@ -128,7 +128,7 @@ class StatisticsView extends View {
 
         this.datePickerBtn = IconLink.fromElement({
             elem: 'calendar_btn',
-            onclick: () => this.showCalendar(),
+            onClick: () => this.showCalendar(),
         });
         this.dateBlock = ge('date_block');
         this.datePickerWrapper = ge('calendar');

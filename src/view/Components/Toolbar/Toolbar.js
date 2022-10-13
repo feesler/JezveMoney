@@ -56,7 +56,7 @@ export class Toolbar extends Component {
         if (showBtn) {
             this.showBtn = IconLink.fromElement({
                 elem: showBtn,
-                onclick: () => this.onShowClick(),
+                onClick: () => this.onShowClick(),
             });
         }
 
@@ -64,7 +64,7 @@ export class Toolbar extends Component {
         if (hideBtn) {
             this.hideBtn = IconLink.fromElement({
                 elem: hideBtn,
-                onclick: () => this.onHideClick(),
+                onClick: () => this.onHideClick(),
             });
         }
 
@@ -72,7 +72,7 @@ export class Toolbar extends Component {
         if (deleteBtn) {
             this.deleteBtn = IconLink.fromElement({
                 elem: 'del_btn',
-                onclick: () => this.onDeleteClick(),
+                onClick: () => this.onDeleteClick(),
             });
         }
     }

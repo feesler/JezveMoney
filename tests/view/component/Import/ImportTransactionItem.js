@@ -53,8 +53,8 @@ export class ImportTransactionItem extends TestComponent {
         res.commentField = await this.parseField(await query(this.elem, '.comment-field'));
 
         res.menuBtn = await query(this.elem, '.actions-menu-btn');
-        res.updateBtn = await query(this.elem, '.update-btn button');
-        res.deleteBtn = await query(this.elem, '.delete-btn button');
+        res.updateBtn = await query(this.elem, '.update-btn');
+        res.deleteBtn = await query(this.elem, '.delete-btn');
         res.toggleBtn = await query(this.elem, '.toggle-btn');
         res.origDataTable = await query(this.elem, '.orig-data-table');
 

@@ -470,13 +470,17 @@
       color: var(--hl-text-color);
     }
 
+    .iconlink:hover .iconlink__icon,
+    .iconlink:hover .iconlink__content {
+      color: var(--main-text-color);
+    }
+
     .iconlink:hover .iconlink__icon {
       background-color: var(--main-text-color);
     }
 
-    .iconlink > *:hover .iconlink__icon,
-    .iconlink > *:hover .iconlink__content {
-      color: var(--main-text-color);
+    .iconlink:hover .iconlink__icon-content {
+      fill: #202020;
     }
 
     .filters-collapsible .collapsible-header:hover {
@@ -507,10 +511,6 @@
     .import-form .icon-btn:hover .icon,
     .import-item .icon-btn:hover .icon {
       fill: var(--list-item-hover-icon-fill);
-    }
-
-    .iconlink:hover .iconlink__icon-content {
-      fill: #202020;
     }
 
     .tile_header .close-btn:hover .close-icon {

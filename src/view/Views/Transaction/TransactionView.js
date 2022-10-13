@@ -222,7 +222,7 @@ class TransactionView extends View {
         if (state.isUpdate) {
             this.deleteBtn = IconLink.fromElement({
                 elem: 'del_btn',
-                onclick: () => this.confirmDelete(),
+                onClick: () => this.confirmDelete(),
             });
         }
 
@@ -349,7 +349,7 @@ class TransactionView extends View {
         this.dateRow = ge('date_row');
         this.datePickerBtn = IconLink.fromElement({
             elem: 'calendar_btn',
-            onclick: () => this.showCalendar(),
+            onClick: () => this.showCalendar(),
         });
         this.dateBlock = ge('date_block');
         this.datePickerWrapper = ge('calendar');
@@ -363,7 +363,7 @@ class TransactionView extends View {
         this.commentRow = ge('comment_row');
         this.commentBtn = IconLink.fromElement({
             elem: 'comm_btn',
-            onclick: () => this.showComment(),
+            onClick: () => this.showComment(),
         });
         this.commentBlock = ge('comment_block');
         this.commentInput = ge('comm');

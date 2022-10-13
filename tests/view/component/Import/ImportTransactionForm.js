@@ -111,7 +111,7 @@ export class ImportTransactionForm extends TestComponent {
 
         res.invFeedback = { elem: await query(this.elem, '.invalid-feedback') };
         res.menuBtn = await query(this.elem, '.actions-menu-btn');
-        res.deleteBtn = await query(this.elem, '.delete-btn button');
+        res.deleteBtn = await query(this.elem, '.delete-btn');
         res.toggleBtn = await query(this.elem, '.toggle-btn');
         res.saveBtn = await query(this.elem, '.submit-btn');
         res.cancelBtn = await query(this.elem, '.cancel-btn');
