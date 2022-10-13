@@ -14,11 +14,14 @@
   margin: 0;
   display: inline-flex;
   position: relative;
-  overflow: hidden;
   text-transform: none;
   font-weight: normal;
   text-decoration: none;
   cursor: pointer;
+
+  &:focus-visible {
+    box-shadow: var(--focus-shadow);
+  }
 }
 
 .tile_wide {
@@ -47,18 +50,22 @@
 .tile__subtitle {
   color: var(--tile-content-color);
   white-space: nowrap;
+  overflow: hidden;
+  width: 100%;
 }
 
 .tile__title {
-  left: 5px;
+  left: 0;
   bottom: 2px;
+  padding-left: 5px;
   font-size: 18px;
   text-align: left;
 }
 
 .tile__subtitle {
   top: 2px;
-  right: 5px;
+  right: 0;
+  padding-right: 5px;
   font-size: 14px;
   text-align: right;
 }

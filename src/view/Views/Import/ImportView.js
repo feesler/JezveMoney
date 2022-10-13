@@ -16,6 +16,7 @@ import { Paginator } from 'jezvejs/Paginator';
 import { Sortable } from 'jezvejs/Sortable';
 import { fixFloat, timestampFromString } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
+import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import {
     EXPENSE,
@@ -30,7 +31,6 @@ import { PersonList } from '../../js/model/PersonList.js';
 import { ImportRuleList } from '../../js/model/ImportRuleList.js';
 import { ImportTemplateList } from '../../js/model/ImportTemplateList.js';
 import { IconButton } from '../../Components/IconButton/IconButton.js';
-import '../../css/app.scss';
 import './style.scss';
 import { ImportUploadDialog } from '../../Components/Import/UploadDialog/Dialog/ImportUploadDialog.js';
 import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from '../../Components/Import/RulesDialog/Dialog/ImportRulesDialog.js';

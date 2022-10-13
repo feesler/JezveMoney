@@ -10,8 +10,8 @@ import {
     removeChilds,
 } from 'jezvejs';
 import { Application } from '../../../../view/js/Application.js';
-import { AdminView } from '../../js/AdminView.js';
 import '../../../../view/css/app.scss';
+import { AdminView } from '../../js/AdminView.js';
 import '../../css/admin.scss';
 import './style.scss';
 import * as apiTypes from '../../../../view/js/api/types.js';

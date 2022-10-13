@@ -84,7 +84,6 @@ class Accounts extends TemplateController
         $accInfo->sign = $currObj->sign;
         $data["accInfo"] = $accInfo;
         $data["tile"] = [
-            "type" => "button",
             "id" => "acc_tile",
             "title" => "New account",
             "subtitle" => $currMod->format($accInfo->balance, $accInfo->curr_id),
@@ -151,7 +150,6 @@ class Accounts extends TemplateController
         $data["accInfo"] = $accInfo;
 
         $data["tile"] = [
-            "type" => "button",
             "id" => "acc_tile",
             "title" => $accInfo->name,
             "subtitle" => $currMod->format($accInfo->balance, $accInfo->curr_id),

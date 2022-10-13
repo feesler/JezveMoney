@@ -19,6 +19,8 @@ const SUBTITLE_LIMIT = 11;
 
 const defaultProps = {
     attrs: {},
+    type: 'static', // 'static', 'button' or 'link'
+    link: null,
     title: '',
     subtitle: null,
     icon: null,
@@ -57,7 +59,20 @@ export class Tile extends Component {
     }
 
     init() {
-        this.elem = createElement('div', { props: { className: TILE_CLASS } });
+        if (this.props.type === 'static') {
+            this.elem = createElement('div', { props: { className: TILE_CLASS } });
+        }
+        if (this.props.type === 'link') {
+            this.elem = createElement('a', { props: { className: TILE_CLASS } });
+            if (this.props.link) {
+                this.elem.href = this.props.link;
+            }
+        }
+        if (this.props.type === 'button') {
+            this.elem = createElement('button', {
+                props: { className: TILE_CLASS, type: 'button' },
+            });
+        }
 
         this.setClassNames();
         this.render(this.state);

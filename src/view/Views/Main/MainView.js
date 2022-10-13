@@ -1,13 +1,13 @@
 import 'jezvejs/style';
 import { Histogram } from 'jezvejs/Histogram';
 import { Application } from '../../js/Application.js';
+import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
 import '../../Components/IconButton/style.scss';
-import '../../css/app.scss';
 import '../../Components/Tile/style.scss';
 import './style.scss';
 

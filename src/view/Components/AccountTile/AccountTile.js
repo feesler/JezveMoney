@@ -1,5 +1,4 @@
-import { createElement } from 'jezvejs';
-import { Tile, TILE_CLASS } from '../Tile/Tile.js';
+import { Tile } from '../Tile/Tile.js';
 
 /**
  * Account Tile component
@@ -21,10 +20,8 @@ export class AccountTile extends Tile {
     }
 
     init() {
-        this.elem = createElement('div', { props: { className: TILE_CLASS } });
+        super.init();
 
-        this.setClassNames();
-        this.render(this.state);
         if (this.props.account) {
             this.setAccount(this.props.account);
         }

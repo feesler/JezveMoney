@@ -2,8 +2,8 @@ import 'jezvejs/style';
 import { ge } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { Application } from '../../js/Application.js';
-import { View } from '../../js/View.js';
 import '../../css/app.scss';
+import { View } from '../../js/View.js';
 import './style.scss';
 
 /**

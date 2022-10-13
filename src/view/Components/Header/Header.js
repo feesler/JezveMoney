@@ -1,4 +1,4 @@
-import { ge, Component } from 'jezvejs';
+import { ge, show, Component } from 'jezvejs';
 import { Switch } from 'jezvejs/Switch';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 import { DARK_THEME } from '../../js/Application.js';
@@ -45,6 +45,7 @@ export class Header extends Component {
             placement: 'right',
             className: 'user-navigation',
         });
+        show(this.userNavContent, false);
 
         this.navUserNameElem = this.userNavContent.querySelector('.user-btn__title');
         this.closeUserNavBtn = this.userNavContent.querySelector('.user-navigation__close-btn');
@@ -71,12 +72,14 @@ export class Header extends Component {
     /** Show user navigation */
     showUserNavigation() {
         this.hideNavigation();
+        show(this.userNavContent, true);
         this.userNavigation.open();
     }
 
     /** Hide user navigation */
     hideUserNavigation() {
         this.userNavigation.close();
+        show(this.userNavContent, false);
     }
 
     /**

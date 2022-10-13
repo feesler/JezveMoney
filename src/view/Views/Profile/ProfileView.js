@@ -1,14 +1,14 @@
 import 'jezvejs/style';
 import { ge, setEvents } from 'jezvejs';
 import { Application } from '../../js/Application.js';
+import { ResetDataDialog } from '../../Components/Profile/ResetDataDialog/ResetDataDialog.js';
+import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { ChangeNameDialog } from '../../Components/Profile/ChangeNameDialog/ChangeNameDialog.js';
 import { ChangePasswordDialog } from '../../Components/Profile/ChangePasswordDialog/ChangePasswordDialog.js';
-import { ResetDataDialog } from '../../Components/Profile/ResetDataDialog/ResetDataDialog.js';
-import '../../css/app.scss';
 import './style.scss';
 
 /** Strings */

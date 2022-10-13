@@ -12,13 +12,13 @@ import { DatePicker } from 'jezvejs/DatePicker';
 import { DropDown } from 'jezvejs/DropDown';
 import 'jezvejs/style/InputGroup';
 import { Application } from '../../js/Application.js';
+import '../../css/app.scss';
 import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import '../../css/app.scss';
 import '../../Components/TransactionTypeMenu/style.scss';
 import './style.scss';
 

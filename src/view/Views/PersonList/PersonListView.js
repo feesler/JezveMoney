@@ -8,12 +8,12 @@ import {
     show,
 } from 'jezvejs';
 import { Application } from '../../js/Application.js';
+import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import '../../css/app.scss';
 import '../../Components/Tile/style.scss';
 import '../../Components/IconButton/style.scss';
 import { Tile } from '../../Components/Tile/Tile.js';
@@ -232,6 +232,7 @@ class PersonListView extends View {
 
     renderTilesList(persons) {
         return persons.map((person) => Tile.create({
+            type: 'button',
             attrs: { 'data-id': person.id },
             title: person.name,
             selected: person.selected,

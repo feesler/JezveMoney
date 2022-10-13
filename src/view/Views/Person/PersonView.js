@@ -8,12 +8,12 @@ import {
 } from 'jezvejs';
 import { Spinner } from 'jezvejs/Spinner';
 import { Application } from '../../js/Application.js';
+import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { IconButton } from '../../Components/IconButton/IconButton.js';
-import '../../css/app.scss';
 
 const TITLE_PERSON_DELETE = 'Delete person';
 const MSG_PERSON_DELETE = 'Are you sure want to delete selected person?<br>Debt operations will be converted into expense or income.';

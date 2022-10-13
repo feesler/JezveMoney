@@ -9,6 +9,7 @@ import {
     urlJoin,
 } from 'jezvejs';
 import { Application } from '../../js/Application.js';
+import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
@@ -18,7 +19,6 @@ import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import '../../css/app.scss';
 import '../../Components/Tile/style.scss';
 import '../../Components/IconButton/style.scss';
 
@@ -239,6 +239,7 @@ class AccountListView extends View {
 
     renderTilesList(accounts) {
         return accounts.map((account) => AccountTile.create({
+            type: 'button',
             account,
             attrs: { 'data-id': account.id },
             selected: account.selected,

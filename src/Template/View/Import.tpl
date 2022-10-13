@@ -29,7 +29,7 @@ include(TPL_PATH . "Header.tpl");	?>
                                 <?=IconButton::render($uploadBtn)?>
 
                                 <div class="actions-menu">
-                                    <button id="toggleActionsMenuBtn" class="actions-menu-btn" type="button">
+                                    <button id="toggleActionsMenuBtn" class="btn icon-btn actions-menu-btn" type="button">
                                         <?=svgIcon("ellipsis", "actions-menu-btn__icon")?>
                                     </button>
                                     <div id="actionsList" class="actions-menu-list" hidden>

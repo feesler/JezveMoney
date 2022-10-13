@@ -28,6 +28,7 @@ import {
     Transaction,
 } from '../../js/model/Transaction.js';
 import { Application } from '../../js/Application.js';
+import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
@@ -40,7 +41,6 @@ import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/Transa
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TileInfoItem } from '../../Components/TileInfoItem/TileInfoItem.js';
 import { IconButton } from '../../Components/IconButton/IconButton.js';
-import '../../css/app.scss';
 import './style.scss';
 import { createStore } from '../../js/store.js';
 import {
