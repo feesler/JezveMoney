@@ -19,7 +19,6 @@ import {
 import { AccountsList } from '../../model/AccountsList.js';
 import { App } from '../../Application.js';
 import { formatProps, generateId } from '../../common.js';
-import * as AccountTests from '../account.js';
 
 export const runAction = async ({ action, data }) => {
     let testDescr = null;
@@ -330,42 +329,6 @@ export const delFromUpdate = async (type, pos) => {
         App.view.checkState();
         return App.state.fetchAndTest();
     });
-};
-
-export const typeChangeLoop = async () => {
-    setBlock('Change transaction type tests', 2);
-
-    // Hide first account
-    let userVisibleAccounts = App.state.accounts.getUserVisible();
-    const account = userVisibleAccounts.getItemByIndex(0);
-    await AccountTests.hide(0);
-
-    await App.goToMainView();
-    await App.view.goToNewTransactionByAccount(0);
-
-    // Start from Expense type
-    await runActions([
-        { action: 'changeTransactionType', data: INCOME },
-        { action: 'changeTransactionType', data: EXPENSE },
-        { action: 'changeTransactionType', data: TRANSFER },
-        { action: 'changeTransactionType', data: EXPENSE },
-        { action: 'changeTransactionType', data: DEBT },
-        { action: 'changeTransactionType', data: INCOME },
-        { action: 'changeTransactionType', data: TRANSFER },
-        { action: 'changeTransactionType', data: INCOME },
-        { action: 'changeTransactionType', data: DEBT },
-        { action: 'changeTransactionType', data: TRANSFER },
-        { action: 'changeTransactionType', data: DEBT },
-        // Disable account to check obtaining first visible account on switch to expense
-        { action: 'toggleAccount' },
-        { action: 'changeTransactionType', data: EXPENSE },
-    ]);
-
-    // Show previously hidden account
-    userVisibleAccounts = App.state.accounts.getUserVisible();
-    const userHiddenAccounts = App.state.accounts.getUserHidden();
-    const index = userHiddenAccounts.getIndexById(account.id);
-    await AccountTests.show(userVisibleAccounts.length + index);
 };
 
 /** Check navigation to update not existing transaction */

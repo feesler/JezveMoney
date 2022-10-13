@@ -5,7 +5,7 @@ import { apiTests } from './api/index.js';
 import { profileTests } from './profile.js';
 import { accountTests } from './account.js';
 import { personTests } from './person.js';
-import { transactionTests } from './transaction.js';
+import { transactionTests } from './transaction/index.js';
 import { importTests } from './import/index.js';
 
 import * as ApiTests from '../run/api/index.js';

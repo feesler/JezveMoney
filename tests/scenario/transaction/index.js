@@ -4,16 +4,22 @@ import {
     INCOME,
     TRANSFER,
     DEBT,
-} from '../model/Transaction.js';
-import { api } from '../model/api.js';
-import * as TransactionTests from '../run/transaction/index.js';
-import * as ExpenseTransactionTests from '../run/transaction/expense.js';
-import * as IncomeTransactionTests from '../run/transaction/income.js';
-import * as TransferTransactionTests from '../run/transaction/transfer.js';
-import * as DebtTransactionTests from '../run/transaction/debt.js';
-import { App } from '../Application.js';
-import { ACCOUNT_HIDDEN } from '../model/AccountsList.js';
-import { PERSON_HIDDEN } from '../model/PersonsList.js';
+} from '../../model/Transaction.js';
+import { api } from '../../model/api.js';
+import * as TransactionTests from '../../run/transaction/index.js';
+import * as ExpenseTransactionTests from '../../run/transaction/expense.js';
+import * as IncomeTransactionTests from '../../run/transaction/income.js';
+import * as TransferTransactionTests from '../../run/transaction/transfer.js';
+import * as DebtTransactionTests from '../../run/transaction/debt.js';
+import * as AccountTests from '../../run/account.js';
+import { App } from '../../Application.js';
+import { ACCOUNT_HIDDEN } from '../../model/AccountsList.js';
+import { PERSON_HIDDEN } from '../../model/PersonsList.js';
+
+import * as expenseTests from './expense.js';
+import * as incomeTests from './income.js';
+import * as transferTests from './transfer.js';
+import * as debtTests from './debt.js';
 
 const createExpenseTests = async () => {
     setBlock('Create expense transactions', 1);
@@ -392,15 +398,51 @@ const deleteDebtTests = async () => {
     await App.scenario.runner.runGroup((items) => TransactionTests.del(DEBT, items), data);
 };
 
+const typeChangeLoop = async () => {
+    setBlock('Change transaction type tests', 2);
+
+    // Hide first account
+    let userVisibleAccounts = App.state.accounts.getUserVisible();
+    const account = userVisibleAccounts.getItemByIndex(0);
+    await AccountTests.hide(0);
+
+    await App.goToMainView();
+    await App.view.goToNewTransactionByAccount(0);
+
+    // Start from Expense type
+    await TransactionTests.runActions([
+        { action: 'changeTransactionType', data: INCOME },
+        { action: 'changeTransactionType', data: EXPENSE },
+        { action: 'changeTransactionType', data: TRANSFER },
+        { action: 'changeTransactionType', data: EXPENSE },
+        { action: 'changeTransactionType', data: DEBT },
+        { action: 'changeTransactionType', data: INCOME },
+        { action: 'changeTransactionType', data: TRANSFER },
+        { action: 'changeTransactionType', data: INCOME },
+        { action: 'changeTransactionType', data: DEBT },
+        { action: 'changeTransactionType', data: TRANSFER },
+        { action: 'changeTransactionType', data: DEBT },
+        // Disable account to check obtaining first visible account on switch to expense
+        { action: 'toggleAccount' },
+        { action: 'changeTransactionType', data: EXPENSE },
+    ]);
+
+    // Show previously hidden account
+    userVisibleAccounts = App.state.accounts.getUserVisible();
+    const userHiddenAccounts = App.state.accounts.getUserHidden();
+    const index = userHiddenAccounts.getIndexById(account.id);
+    await AccountTests.show(userVisibleAccounts.length + index);
+};
+
 const stateLoopTests = async () => {
     setBlock('Transaction view state loops', 1);
 
-    await ExpenseTransactionTests.stateLoop();
-    await IncomeTransactionTests.stateLoop();
-    await TransferTransactionTests.stateLoop();
-    await DebtTransactionTests.stateLoop();
+    await expenseTests.stateLoop();
+    await incomeTests.stateLoop();
+    await transferTests.stateLoop();
+    await debtTests.stateLoop();
 
-    await TransactionTests.typeChangeLoop();
+    await typeChangeLoop();
 };
 
 const createTests = async () => {
