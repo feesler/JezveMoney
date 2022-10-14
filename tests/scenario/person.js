@@ -1,6 +1,7 @@
 import { setBlock } from 'jezve-test';
 import * as PersonTests from '../run/person.js';
 import { App } from '../Application.js';
+import { api } from '../model/api.js';
 
 const createTests = async () => {
     setBlock('Create persons', 2);
@@ -97,10 +98,33 @@ const toggleTests = async () => {
     await App.scenario.runner.runGroup(PersonTests.toggleSelect, data);
 };
 
+const prepare = async () => {
+    await App.scenario.prepareTestUser();
+
+    await api.profile.resetData({
+        accounts: true,
+        persons: true,
+    });
+    await App.state.fetch();
+};
+
+const prepareTransactions = async () => {
+    await api.profile.resetData({
+        accounts: true,
+        persons: true,
+    });
+    await App.state.fetch();
+    await App.scenario.createTestData();
+
+    await App.goToMainView();
+};
+
 export const personTests = {
     /** Run person view tests */
     async run() {
         setBlock('Persons', 1);
+
+        await prepare();
 
         await PersonTests.securityTests();
 
@@ -110,10 +134,9 @@ export const personTests = {
         await showTests();
         await updateTests();
         await deleteTests();
-    },
 
-    /** Run person view tests with transactions */
-    async runPostTransaction() {
+        await prepareTransactions();
+
         await deleteFromUpdateTests();
     },
 };

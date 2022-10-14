@@ -13,15 +13,13 @@ import * as TransferTransactionTests from '../../run/transaction/transfer.js';
 import * as DebtTransactionTests from '../../run/transaction/debt.js';
 import * as AccountTests from '../../run/account.js';
 import { App } from '../../Application.js';
-import { ACCOUNT_HIDDEN } from '../../model/AccountsList.js';
-import { PERSON_HIDDEN } from '../../model/PersonsList.js';
 
 import * as expenseTests from './expense.js';
 import * as incomeTests from './income.js';
 import * as transferTests from './transfer.js';
 import * as debtTests from './debt.js';
 
-const createExpenseTests = async () => {
+const createExpense = async () => {
     setBlock('Create expense transactions', 1);
     const { RUB, KRW } = App.scenario;
 
@@ -67,7 +65,7 @@ const createExpenseTests = async () => {
     await App.scenario.runner.runGroup(ExpenseTransactionTests.create, data);
 };
 
-const createIncomeTests = async () => {
+const createIncome = async () => {
     setBlock('Create income transactions', 1);
 
     const { USD, KRW } = App.scenario;
@@ -115,7 +113,7 @@ const createIncomeTests = async () => {
     await App.scenario.runner.runGroup(IncomeTransactionTests.create, data);
 };
 
-const createTransferTests = async () => {
+const createTransfer = async () => {
     setBlock('Create transfer transactions', 1);
 
     const data = [{
@@ -161,7 +159,7 @@ const createTransferTests = async () => {
     await App.scenario.runner.runGroup(TransferTransactionTests.create, data);
 };
 
-const createDebtTests = async () => {
+const createDebt = async () => {
     setBlock('Create debt transactions', 1);
 
     const data = [{
@@ -214,7 +212,7 @@ const createDebtTests = async () => {
     await App.scenario.runner.runGroup(DebtTransactionTests.create, data);
 };
 
-const updateExpenseTests = async () => {
+const updateExpense = async () => {
     setBlock('Update expense transactions', 2);
 
     const { USD } = App.scenario;
@@ -245,7 +243,7 @@ const updateExpenseTests = async () => {
     await App.scenario.runner.runGroup(ExpenseTransactionTests.update, data);
 };
 
-const updateIncomeTests = async () => {
+const updateIncome = async () => {
     setBlock('Update income transactions', 2);
 
     const { USD } = App.scenario;
@@ -275,7 +273,7 @@ const updateIncomeTests = async () => {
     await App.scenario.runner.runGroup(IncomeTransactionTests.update, data);
 };
 
-const updateTransferTests = async () => {
+const updateTransfer = async () => {
     setBlock('Update transfer transactions', 2);
 
     const data = [{
@@ -309,7 +307,7 @@ const updateTransferTests = async () => {
     await App.scenario.runner.runGroup(TransferTransactionTests.update, data);
 };
 
-const updateDebtTests = async () => {
+const updateDebt = async () => {
     setBlock('Update debt transactions', 2);
 
     const data = [{
@@ -354,7 +352,7 @@ const updateDebtTests = async () => {
     await App.scenario.runner.runGroup(DebtTransactionTests.update, data);
 };
 
-const deleteExpenseTests = async () => {
+const deleteExpense = async () => {
     setBlock('Delete expense transactions', 2);
 
     const data = [
@@ -365,7 +363,7 @@ const deleteExpenseTests = async () => {
     await App.scenario.runner.runGroup((items) => TransactionTests.del(EXPENSE, items), data);
 };
 
-const deleteIncomeTests = async () => {
+const deleteIncome = async () => {
     setBlock('Delete income transactions', 2);
 
     const data = [
@@ -376,7 +374,7 @@ const deleteIncomeTests = async () => {
     await App.scenario.runner.runGroup((items) => TransactionTests.del(INCOME, items), data);
 };
 
-const deleteTransferTests = async () => {
+const deleteTransfer = async () => {
     setBlock('Delete transfer transactions', 2);
 
     const data = [
@@ -387,7 +385,7 @@ const deleteTransferTests = async () => {
     await App.scenario.runner.runGroup((items) => TransactionTests.del(TRANSFER, items), data);
 };
 
-const deleteDebtTests = async () => {
+const deleteDebt = async () => {
     setBlock('Delete debt transactions', 2);
 
     const data = [
@@ -434,7 +432,7 @@ const typeChangeLoop = async () => {
     await AccountTests.show(userVisibleAccounts.length + index);
 };
 
-const stateLoopTests = async () => {
+const stateLoops = async () => {
     setBlock('Transaction view state loops', 1);
 
     await expenseTests.stateLoop();
@@ -445,34 +443,34 @@ const stateLoopTests = async () => {
     await typeChangeLoop();
 };
 
-const createTests = async () => {
+const create = async () => {
     setBlock('Create transaction', 1);
 
-    await createExpenseTests();
-    await createIncomeTests();
-    await createTransferTests();
-    await createDebtTests();
+    await createExpense();
+    await createIncome();
+    await createTransfer();
+    await createDebt();
 };
 
-const updateTests = async () => {
+const update = async () => {
     setBlock('Update transaction', 1);
 
-    await updateExpenseTests();
-    await updateIncomeTests();
-    await updateTransferTests();
-    await updateDebtTests();
+    await updateExpense();
+    await updateIncome();
+    await updateTransfer();
+    await updateDebt();
 };
 
-const deleteTests = async () => {
+const del = async () => {
     setBlock('Delete transaction', 1);
 
-    await deleteExpenseTests();
-    await deleteIncomeTests();
-    await deleteTransferTests();
-    await deleteDebtTests();
+    await deleteExpense();
+    await deleteIncome();
+    await deleteTransfer();
+    await deleteDebt();
 };
 
-const deleteFromUpdateTests = async () => {
+const deleteFromUpdate = async () => {
     setBlock('Delete transaction from update view', 2);
 
     const data = [
@@ -648,74 +646,16 @@ export const transactionTests = {
     async prepare() {
         const HIDDEN_ACCOUNT_NAME = 'HIDDEN_ACC';
         const HIDDEN_PERSON_NAME = 'Hidden person';
-        const { RUB, USD, EUR } = App.scenario;
 
-        const accList = [{
-            name: 'ACC_3',
-            curr_id: RUB,
-            initbalance: '500.99',
-            icon_id: 2,
-            flags: 0,
-        }, {
-            name: 'ACC_RUB',
-            curr_id: RUB,
-            initbalance: '500.99',
-            icon_id: 5,
-            flags: 0,
-        }, {
-            name: 'ACC_USD',
-            curr_id: USD,
-            initbalance: '500.99',
-            icon_id: 4,
-            flags: 0,
-        }, {
-            name: 'ACC_EUR',
-            curr_id: EUR,
-            initbalance: '10000.99',
-            icon_id: 3,
-            flags: 0,
-        }, {
-            name: 'CARD_RUB',
-            curr_id: RUB,
-            initbalance: '35000.40',
-            icon_id: 3,
-            flags: 0,
-        }, {
-            name: HIDDEN_ACCOUNT_NAME,
-            curr_id: RUB,
-            initbalance: '100',
-            icon_id: 0,
-            flags: ACCOUNT_HIDDEN,
-        }];
-
-        for (const account of accList) {
-            if (App.state.accounts.findByName(account.name)) {
-                continue;
-            }
-
-            await api.account.create(account);
-        }
-
-        const personsList = [{
-            name: 'Maria',
-            flags: 0,
-        }, {
-            name: 'Ivan<',
-            flags: 0,
-        }, {
-            name: HIDDEN_PERSON_NAME,
-            flags: PERSON_HIDDEN,
-        }];
-
-        for (const person of personsList) {
-            if (App.state.persons.findByName(person.name)) {
-                continue;
-            }
-
-            await api.person.create(person);
-        }
-
+        await App.scenario.prepareTestUser();
+        await api.profile.resetData({
+            accounts: true,
+            persons: true,
+        });
         await App.state.fetch();
+
+        await App.scenario.createAccounts();
+        await App.scenario.createPersons();
 
         const [hiddenAccountInd] = App.state.getAccountIndexesByNames(HIDDEN_ACCOUNT_NAME);
         assert(hiddenAccountInd !== -1, `Account '${HIDDEN_ACCOUNT_NAME}' not found`);
@@ -732,11 +672,11 @@ export const transactionTests = {
         await this.prepare();
 
         await TransactionTests.securityTests();
-        await stateLoopTests();
-        await createTests();
-        await updateTests();
-        await deleteTests();
-        await deleteFromUpdateTests();
+        await stateLoops();
+        await create();
+        await update();
+        await del();
+        await deleteFromUpdate();
     },
 
     async runAvailabilityTests() {

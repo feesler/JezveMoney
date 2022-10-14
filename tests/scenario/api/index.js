@@ -1,4 +1,4 @@
-import { copyObject, setBlock } from 'jezve-test';
+import { setBlock } from 'jezve-test';
 import { api } from '../../model/api.js';
 import * as ApiTests from '../../run/api/index.js';
 import { App } from '../../Application.js';
@@ -10,18 +10,8 @@ import { apiImportRulesTests } from './rules.js';
 import { apiSecurityTests } from './security.js';
 import { apiProfileTests } from './profile.js';
 
-// Register and login main test user
-const createTestUser = async () => {
-    await ApiTests.registerAndLogin(App.config.testUser);
-    // Set 'Tester' access level for test user
-    const testUserId = App.state.profile.user_id;
-    await ApiTests.loginTest(App.config.testAdminUser);
-    const testUserData = copyObject(App.config.testUser);
-    testUserData.id = testUserId;
-    testUserData.access = 2;
-    await api.user.update(testUserData);
-    await ApiTests.loginTest(App.config.testUser);
-    await App.setupUser();
+const prepare = async () => {
+    await App.scenario.removeUsers();
 };
 
 export const apiTests = {
@@ -29,6 +19,8 @@ export const apiTests = {
     async run() {
         setBlock('API tests', 1);
         setBlock('User', 2);
+
+        await prepare();
 
         // Register API test user and prepare data for security tests
         await ApiTests.registerAndLogin(App.config.apiTestUser);
@@ -40,7 +32,8 @@ export const apiTests = {
         await ApiTests.loginTest({ login: '', password: App.config.testUser.password });
         await ApiTests.loginTest({ login: App.config.testUser.login, password: '' });
 
-        await createTestUser();
+        await App.scenario.createTestUser();
+        await App.scenario.loginTestUser();
 
         await ApiTests.resetData({});
 

@@ -401,7 +401,7 @@ const runCreateTests = async () => {
     ]);
     await ImportTests.createRuleAction([
         { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
-        { action: 'changePerson', data: App.scenario.ALEX },
+        { action: 'changePerson', data: App.scenario.IVAN },
     ]);
     await ImportTests.submitRule();
 

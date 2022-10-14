@@ -1,6 +1,7 @@
 import { test, setBlock, formatDate } from 'jezve-test';
 import { App } from '../Application.js';
 import { fixDate } from '../common.js';
+import { api } from '../model/api.js';
 import {
     EXPENSE,
     INCOME,
@@ -18,8 +19,22 @@ const selectDateRange = async ({ start, end }) => {
     );
 };
 
+const prepare = async () => {
+    await App.scenario.prepareTestUser();
+    await api.profile.resetData({
+        accounts: true,
+        persons: true,
+    });
+    await App.state.fetch();
+    await App.scenario.createTestData();
+
+    await App.goToMainView();
+};
+
 export const run = async () => {
     setBlock('Statistics', 1);
+
+    await prepare();
 
     await App.view.navigateToStatistics();
 

@@ -2,7 +2,7 @@ import { setBlock } from 'jezve-test';
 import { App } from '../../Application.js';
 import * as AccountApiTests from '../../run/api/account.js';
 
-const createAccounts = async () => {
+const create = async () => {
     const { RUB, USD } = App.scenario;
 
     const data = [{
@@ -76,7 +76,7 @@ const createAccounts = async () => {
     ] = await App.scenario.runner.runGroup(AccountApiTests.create, data);
 };
 
-const createMultipleAccounts = async () => {
+const createMultiple = async () => {
     setBlock('Create multiple', 3);
 
     const { RUB, USD } = App.scenario;
@@ -159,8 +159,8 @@ const del = async () => {
 
 export const apiAccountsTests = {
     async createTests() {
-        await createAccounts();
-        await createMultipleAccounts();
+        await create();
+        await createMultiple();
     },
 
     async updateAndDeleteTests() {

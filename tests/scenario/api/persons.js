@@ -2,7 +2,7 @@ import { setBlock } from 'jezve-test';
 import { App } from '../../Application.js';
 import * as PersonApiTests from '../../run/api/person.js';
 
-const createPersons = async () => {
+const create = async () => {
     const data = [{
         name: 'Person X',
         flags: 0,
@@ -33,7 +33,7 @@ const createPersons = async () => {
     ] = await App.scenario.runner.runGroup(PersonApiTests.create, data);
 };
 
-const createMultiplePersons = async () => {
+const createMultiple = async () => {
     setBlock('Create multiple', 3);
 
     const data = [{
@@ -90,8 +90,8 @@ const del = async () => {
 
 export const apiPersonsTests = {
     async createTests() {
-        await createPersons();
-        await createMultiplePersons();
+        await create();
+        await createMultiple();
     },
 
     async updateAndDeleteTests() {

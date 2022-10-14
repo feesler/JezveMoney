@@ -10,7 +10,7 @@ export const stateLoop = async () => {
     ]);
 
     const [MARIA, IVAN] = App.state.getPersonIndexesByNames([
-        'Maria', 'Johnny',
+        'Maria', 'Ivan<',
     ]);
 
     // Navigate to create debt view

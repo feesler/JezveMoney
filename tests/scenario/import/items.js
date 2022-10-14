@@ -151,7 +151,7 @@ const runStateLoopTests = async () => {
         pos: 7,
         action: [
             { action: 'changeType', data: 'debtfrom' }, // 1-9
-            { action: 'changePerson', data: App.scenario.ALEX },
+            { action: 'changePerson', data: App.scenario.IVAN },
         ],
     });
     await ImportTests.updateItem({

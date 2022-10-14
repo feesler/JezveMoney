@@ -494,6 +494,10 @@ export class TransactionsList extends List {
     }
 
     getStatisticsLabel(date, groupType) {
+        if (!date) {
+            return null;
+        }
+
         if (groupType === 'none' || groupType === 'day' || groupType === 'week') {
             return formatDate(date);
         }

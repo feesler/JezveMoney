@@ -165,59 +165,6 @@ const prepareFiles = async () => {
     await ApiTests.loginTest(App.config.testUser);
 };
 
-const prepareAccounts = async () => {
-    const { RUB, USD, EUR } = App.scenario;
-
-    const accList = [{
-        name: 'ACC_3',
-        curr_id: RUB,
-        initbalance: '500.99',
-        icon_id: 2,
-        flags: 0,
-    }, {
-        name: 'ACC_RUB',
-        curr_id: RUB,
-        initbalance: '500.99',
-        icon_id: 5,
-        flags: 0,
-    }, {
-        name: 'ACC_USD',
-        curr_id: USD,
-        initbalance: '500.99',
-        icon_id: 4,
-        flags: 0,
-    }, {
-        name: 'ACC_EUR',
-        curr_id: EUR,
-        initbalance: '10000.99',
-        icon_id: 3,
-        flags: 0,
-    }];
-
-    for (const data of accList) {
-        let account = App.state.accounts.findByName(data.name);
-        if (!account) {
-            account = await api.account.create(data);
-        }
-        App.scenario[data.name] = account.id;
-    }
-};
-
-const preparePersons = async () => {
-    const personsList = [
-        { name: 'MARIA', flags: 0 },
-        { name: 'ALEX', flags: 0 },
-    ];
-
-    for (const data of personsList) {
-        let person = App.state.persons.findByName(data.name);
-        if (!person) {
-            person = await api.person.create(data);
-        }
-        App.scenario[data.name] = person.id;
-    }
-};
-
 /** Login as admin and remove previously uploaded files */
 const removeFiles = async () => {
     await ApiTests.loginTest(App.config.testAdminUser);
@@ -234,6 +181,8 @@ const removeFiles = async () => {
 export const importTests = {
     async prepare() {
         await api.profile.resetData({
+            accounts: true,
+            persons: true,
             transactions: true,
             importtpl: true,
             importrules: true,
@@ -241,9 +190,8 @@ export const importTests = {
         await App.state.fetch();
 
         await prepareFiles();
-        await prepareAccounts();
-        await preparePersons();
-        await App.state.fetch();
+        await App.scenario.createAccounts();
+        await App.scenario.createPersons();
     },
 
     async clean() {
