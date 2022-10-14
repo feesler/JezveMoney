@@ -7,7 +7,6 @@ import { api } from '../model/api.js';
 import { App } from '../Application.js';
 import * as ApiTests from '../run/api/index.js';
 import * as ProfileTests from '../run/profile.js';
-import * as StatisticsTests from '../run/statistics.js';
 import { securityTests } from './security.js';
 import { apiTests } from './api/index.js';
 import { profileTests } from './profile.js';
@@ -20,6 +19,7 @@ import { unitTests } from './unit.js';
 import { createAccounts } from './data/accounts.js';
 import { createPersons } from './data/persons.js';
 import { createTransactions } from './data/transactions.js';
+import { statisticsTests } from './statistics.js';
 
 export class Scenario {
     constructor(environment) {
@@ -60,7 +60,7 @@ export class Scenario {
     async runTestScenario() {
         setBlock('Running partial test scenario', 1);
 
-        await StatisticsTests.run();
+        await statisticsTests.run();
     }
 
     async runFullScenario() {
@@ -79,7 +79,7 @@ export class Scenario {
         await transactionTests.run();
         await transactionsListTests.run();
         await importTests.run();
-        await StatisticsTests.run();
+        await statisticsTests.run();
 
         await transactionTests.runAvailabilityTests();
         await importTests.runNoPersonsTest();
