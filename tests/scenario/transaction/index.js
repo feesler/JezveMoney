@@ -530,7 +530,7 @@ const createFromPersonAccount = async () => {
     await App.scenario.runner.runGroup(TransactionTests.createFromPersonAccount, data);
 };
 
-const availabilityTests = async (directNavigate) => {
+const availability = async (directNavigate) => {
     const { RUB } = App.scenario;
 
     if (directNavigate) {
@@ -677,11 +677,8 @@ export const transactionTests = {
         await update();
         await del();
         await deleteFromUpdate();
-    },
-
-    async runAvailabilityTests() {
         await createFromPersonAccount();
-        await availabilityTests(false);
-        await availabilityTests(true);
+        await availability(false);
+        await availability(true);
     },
 };

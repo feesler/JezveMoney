@@ -19,6 +19,8 @@ import { unitTests } from './unit.js';
 import { createAccounts } from './data/accounts.js';
 import { createPersons } from './data/persons.js';
 import { createTransactions } from './data/transactions.js';
+import { getAccountCSV, getCardCSV } from './data/importfiles.js';
+import { putFile, removeFile } from '../run/import/index.js';
 import { statisticsTests } from './statistics.js';
 
 export class Scenario {
@@ -67,12 +69,8 @@ export class Scenario {
         setBlock('Running full test scenario', 1);
 
         await unitTests.run();
-
         await securityTests.run();
-
         await apiTests.run();
-        await App.goToMainView();
-
         await profileTests.run();
         await accountTests.run();
         await personTests.run();
@@ -80,10 +78,6 @@ export class Scenario {
         await transactionsListTests.run();
         await importTests.run();
         await statisticsTests.run();
-
-        await transactionTests.runAvailabilityTests();
-        await importTests.runNoPersonsTest();
-        await importTests.runNoAccountsTest();
 
         await this.finishTests();
     }
@@ -154,6 +148,28 @@ export class Scenario {
         await createAccounts();
         await createPersons();
         await createTransactions();
+    }
+
+    /** Upload CSV files to server */
+    async createCsvFiles() {
+        await ApiTests.loginTest(App.config.testAdminUser);
+
+        this.cardFile = await putFile(getCardCSV());
+        this.accountFile = await putFile(getAccountCSV());
+
+        await ApiTests.loginTest(App.config.testUser);
+    }
+
+    /** Remove previously uploaded CSV files */
+    async removeCsvFiles() {
+        await ApiTests.loginTest(App.config.testAdminUser);
+
+        await removeFile(this.cardFile?.filename);
+        this.cardFile = null;
+        await removeFile(this.accountFile?.filename);
+        this.accountFile = null;
+
+        await ApiTests.loginTest(App.config.testUser);
     }
 
     async finishTests() {

@@ -3,7 +3,7 @@ import * as ImportTests from '../../run/import/index.js';
 import { App } from '../../Application.js';
 
 // Create import template tests
-const runCreateTests = async () => {
+const create = async () => {
     setBlock('Create import template', 2);
     // Select columns for template
     await App.scenario.runner.runGroup(ImportTests.selectTemplateColumn, [
@@ -41,7 +41,7 @@ const runCreateTests = async () => {
 };
 
 // Update import template tests
-const runUpdateTests = async () => {
+const update = async () => {
     setBlock('Update import template', 2);
 
     await ImportTests.selectTemplateByIndex(0);
@@ -55,7 +55,7 @@ const runUpdateTests = async () => {
 };
 
 // Delete import template tests
-const runDeleteTests = async () => {
+const del = async () => {
     setBlock('Delete import template', 2);
 
     await ImportTests.selectTemplateByIndex(0);
@@ -63,10 +63,10 @@ const runDeleteTests = async () => {
 };
 
 // Automatic select valid template
-const runAutoSelectTests = async (files) => {
+const autoSelect = async () => {
     setBlock('Automatically select valid template on upload', 2);
 
-    const [cardFile, accountFile] = files;
+    const { cardFile, accountFile } = App.scenario;
 
     await ImportTests.uploadFile(accountFile);
 
@@ -93,10 +93,10 @@ const runAutoSelectTests = async (files) => {
 };
 
 // Template first row option test
-const runFirstRowTests = async (files) => {
+const firstRow = async () => {
     setBlock('Template first row option', 2);
 
-    const [, accountFile] = files;
+    const { accountFile } = App.scenario;
 
     await ImportTests.uploadFile(accountFile);
 
@@ -114,19 +114,17 @@ const runFirstRowTests = async (files) => {
 
 export const importTemplateTests = {
     /** Run import template tests */
-    async run({ files }) {
+    async run() {
         setBlock('Import templates', 1);
 
-        const [cardFile] = files;
-
         setBlock('Upload card CSV', 2);
-        await ImportTests.uploadFile(cardFile);
+        await ImportTests.uploadFile(App.scenario.cardFile);
 
-        await runCreateTests();
-        await runUpdateTests();
-        await runDeleteTests();
+        await create();
+        await update();
+        await del();
 
-        await runAutoSelectTests(files);
-        await runFirstRowTests(files);
+        await autoSelect();
+        await firstRow();
     },
 };

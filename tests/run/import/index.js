@@ -110,7 +110,7 @@ export const putFile = async (data) => {
             (res.msg) ? res.msg : defErrorMessage,
         );
 
-        return res.data.filename;
+        return { filename: res.data.filename, data };
     } catch (e) {
         console.log(e.message);
         return null;
@@ -122,6 +122,10 @@ export const removeFile = async (filename) => {
     const baseURL = baseUrl();
     const removeURL = `${baseURL}admin/tests/remove`;
     const defErrorMessage = 'Request failed';
+
+    if (!filename) {
+        return true;
+    }
 
     try {
         const data = { filename };
