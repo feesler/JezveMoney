@@ -1,14 +1,14 @@
 import { setBlock } from 'jezve-test';
-import { App } from '../../Application.js';
+import { App } from '../../../Application.js';
 import {
     EXPENSE,
     INCOME,
     TRANSFER,
     DEBT,
-} from '../../model/Transaction.js';
-import * as AccountApiTests from '../../run/api/account.js';
-import * as PersonApiTests from '../../run/api/person.js';
-import * as TransactionApiTests from '../../run/api/transaction.js';
+} from '../../../model/Transaction.js';
+import * as AccountApiTests from '../../../run/api/account.js';
+import * as PersonApiTests from '../../../run/api/person.js';
+import * as TransactionApiTests from '../../../run/api/transaction.js';
 
 const prepareTests = async () => {
     setBlock('Prepare data for security tests', 2);

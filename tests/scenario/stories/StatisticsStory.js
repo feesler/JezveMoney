@@ -1,31 +1,30 @@
 import { setBlock } from 'jezve-test';
-import { App } from '../Application.js';
-import { api } from '../model/api.js';
+import { App } from '../../Application.js';
+import { api } from '../../model/api.js';
 import {
     EXPENSE,
     INCOME,
     TRANSFER,
     DEBT,
-} from '../model/Transaction.js';
-import * as StatisticsTests from '../run/statistics.js';
+} from '../../model/Transaction.js';
+import * as StatisticsTests from '../../run/statistics.js';
+import { TestStory } from '../TestStory.js';
 
-const prepare = async () => {
-    await App.scenario.prepareTestUser();
-    await api.profile.resetData({
-        accounts: true,
-        persons: true,
-    });
-    await App.state.fetch();
-    await App.scenario.createTestData();
+export class StatisticsStory extends TestStory {
+    async beforeRun() {
+        await App.scenario.prepareTestUser();
+        await api.profile.resetData({
+            accounts: true,
+            persons: true,
+        });
+        await App.state.fetch();
+        await App.scenario.createTestData();
 
-    await App.goToMainView();
-};
+        await App.goToMainView();
+    }
 
-export const statisticsTests = {
     async run() {
         setBlock('Statistics', 1);
-
-        await prepare();
 
         await App.view.navigateToStatistics();
 
@@ -57,5 +56,5 @@ export const statisticsTests = {
             end: App.dates.now,
         });
         await StatisticsTests.clearDateRange();
-    },
-};
+    }
+}

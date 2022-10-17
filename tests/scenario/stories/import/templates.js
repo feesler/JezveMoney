@@ -1,6 +1,6 @@
 import { setBlock } from 'jezve-test';
-import * as ImportTests from '../../run/import/index.js';
-import { App } from '../../Application.js';
+import * as ImportTests from '../../../run/import/index.js';
+import { App } from '../../../Application.js';
 
 // Create import template tests
 const create = async () => {

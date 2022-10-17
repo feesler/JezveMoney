@@ -8,13 +8,13 @@ import {
     IMPORT_COND_OP_NOT_EQUAL,
     IMPORT_COND_OP_STRING_INCLUDES,
     IMPORT_COND_OP_FIELD_FLAG,
-} from '../../model/ImportCondition.js';
+} from '../../../model/ImportCondition.js';
 import {
     IMPORT_ACTION_SET_TR_TYPE,
     IMPORT_ACTION_SET_COMMENT,
-} from '../../model/ImportAction.js';
-import { App } from '../../Application.js';
-import * as ImportRuleApiTests from '../../run/api/importrule.js';
+} from '../../../model/ImportAction.js';
+import { App } from '../../../Application.js';
+import * as ImportRuleApiTests from '../../../run/api/importrule.js';
 
 const create = async () => {
     setBlock('Create import rule', 2);

@@ -7,21 +7,21 @@ import { api } from '../model/api.js';
 import { App } from '../Application.js';
 import * as ApiTests from '../run/api/index.js';
 import * as ProfileTests from '../run/profile.js';
-import { securityTests } from './security.js';
-import { apiTests } from './api/index.js';
-import { profileTests } from './profile.js';
-import { accountTests } from './account.js';
-import { personTests } from './person.js';
-import { transactionTests } from './transaction/index.js';
-import { importTests } from './import/index.js';
-import { transactionsListTests } from './transactionList.js';
-import { unitTests } from './unit.js';
+import { UnitTestsStory } from './stories/UnitTestsStory.js';
+import { SecurityStory } from './stories/SecurityStory.js';
+import { ApiStory } from './stories/api/ApiStory.js';
+import { ProfileStory } from './stories/ProfileStory.js';
+import { AccountsStory } from './stories/AccountsStory.js';
+import { PersonsStory } from './stories/PersonsStory.js';
+import { TransactionsStory } from './stories/transaction/TransactionsStory.js';
+import { ImportStory } from './stories/import/ImportStory.js';
+import { TransactionListStory } from './stories/TransactionListStory.js';
+import { StatisticsStory } from './stories/StatisticsStory.js';
 import { createAccounts } from './data/accounts.js';
 import { createPersons } from './data/persons.js';
 import { createTransactions } from './data/transactions.js';
 import { getAccountCSV, getCardCSV } from './data/importfiles.js';
 import { putFile, removeFile } from '../run/import/index.js';
-import { statisticsTests } from './statistics.js';
 
 export class Scenario {
     constructor(environment) {
@@ -62,22 +62,22 @@ export class Scenario {
     async runTestScenario() {
         setBlock('Running partial test scenario', 1);
 
-        await statisticsTests.run();
+        await StatisticsStory.run();
     }
 
     async runFullScenario() {
         setBlock('Running full test scenario', 1);
 
-        await unitTests.run();
-        await securityTests.run();
-        await apiTests.run();
-        await profileTests.run();
-        await accountTests.run();
-        await personTests.run();
-        await transactionTests.run();
-        await transactionsListTests.run();
-        await importTests.run();
-        await statisticsTests.run();
+        await UnitTestsStory.run();
+        await SecurityStory.run();
+        await ApiStory.run();
+        await ProfileStory.run();
+        await AccountsStory.run();
+        await PersonsStory.run();
+        await TransactionsStory.run();
+        await TransactionListStory.run();
+        await ImportStory.run();
+        await StatisticsStory.run();
 
         await this.finishTests();
     }

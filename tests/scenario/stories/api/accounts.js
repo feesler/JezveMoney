@@ -1,6 +1,6 @@
 import { setBlock } from 'jezve-test';
-import { App } from '../../Application.js';
-import * as AccountApiTests from '../../run/api/account.js';
+import { App } from '../../../Application.js';
+import * as AccountApiTests from '../../../run/api/account.js';
 
 const create = async () => {
     const { RUB, USD } = App.scenario;

@@ -11,7 +11,7 @@ import {
     IMPORT_COND_OP_STRING_INCLUDES,
     IMPORT_COND_OP_LESS,
     IMPORT_COND_OP_GREATER,
-} from '../../model/ImportCondition.js';
+} from '../../../model/ImportCondition.js';
 import {
     IMPORT_ACTION_SET_TR_TYPE,
     IMPORT_ACTION_SET_ACCOUNT,
@@ -19,11 +19,11 @@ import {
     IMPORT_ACTION_SET_SRC_AMOUNT,
     IMPORT_ACTION_SET_DEST_AMOUNT,
     IMPORT_ACTION_SET_COMMENT,
-} from '../../model/ImportAction.js';
-import * as ImportTests from '../../run/import/index.js';
-import { api } from '../../model/api.js';
-import * as ImportRuleApiTests from '../../run/api/importrule.js';
-import { App } from '../../Application.js';
+} from '../../../model/ImportAction.js';
+import { api } from '../../../model/api.js';
+import * as ImportTests from '../../../run/import/index.js';
+import * as ImportRuleApiTests from '../../../run/api/importrule.js';
+import { App } from '../../../Application.js';
 
 // Import rule action form test for no persons
 const noPersonTests = async () => {

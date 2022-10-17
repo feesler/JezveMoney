@@ -4,9 +4,9 @@ import {
     INCOME,
     TRANSFER,
     DEBT,
-} from '../../model/Transaction.js';
-import { App } from '../../Application.js';
-import * as TransactionApiTests from '../../run/api/transaction.js';
+} from '../../../model/Transaction.js';
+import { App } from '../../../Application.js';
+import * as TransactionApiTests from '../../../run/api/transaction.js';
 
 const create = async () => {
     setBlock('Create', 3);
