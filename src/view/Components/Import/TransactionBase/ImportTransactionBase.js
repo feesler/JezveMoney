@@ -16,6 +16,10 @@ export class ImportTransactionBase extends Component {
         return this.state.transaction.enabled;
     }
 
+    get collapsed() {
+        return this.state.collapsed;
+    }
+
     initContainer(className, children) {
         const { originalData } = this.props.data.props;
         if (originalData) {
@@ -68,7 +72,13 @@ export class ImportTransactionBase extends Component {
 
     /** Toggle collapse/expand button 'click' event handler */
     toggleCollapse() {
-        this.collapse?.toggle();
+        const value = !this.state.transaction.collapsed;
+        this.state.transaction.collapse(value);
+        this.render();
+
+        if (isFunction(this.props.onCollapse)) {
+            this.props.onCollapse(this, value);
+        }
     }
 
     /** Main account of transaction select 'change' event handler */

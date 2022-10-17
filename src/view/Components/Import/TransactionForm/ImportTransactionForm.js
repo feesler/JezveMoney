@@ -71,6 +71,7 @@ const SAVE_BTN_TITLE = 'Save';
 const CANCEL_BTN_TITLE = 'Cancel';
 
 const defaultProps = {
+    onCollapse: null,
     onEnable: null,
     onUpdate: null,
     onRemove: null,
@@ -741,5 +742,13 @@ export class ImportTransactionForm extends ImportTransactionBase {
         // Commend field
         enable(this.commInp, transaction.enabled);
         this.commInp.value = transaction.comment;
+
+        if (this.collapse) {
+            if (transaction.collapsed) {
+                this.collapse.collapse();
+            } else {
+                this.collapse.expand();
+            }
+        }
     }
 }

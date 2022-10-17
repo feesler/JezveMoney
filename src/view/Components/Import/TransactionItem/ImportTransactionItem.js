@@ -54,6 +54,7 @@ const typeStrings = {
 };
 
 const defaultProps = {
+    onCollapse: null,
     onUpdate: null,
     onEnable: null,
     onRemove: null,
@@ -81,6 +82,7 @@ export class ImportTransactionItem extends ImportTransactionBase {
 
         this.state = {
             transaction: new ImportTransaction(this.props.data),
+            collapsed: this.props.collapsed,
         };
 
         this.init();
@@ -271,5 +273,13 @@ export class ImportTransactionItem extends ImportTransactionBase {
 
         // Comment field
         this.commentTitle.textContent = transaction.comment;
+
+        if (this.collapse) {
+            if (transaction.collapsed) {
+                this.collapse.collapse();
+            } else {
+                this.collapse.expand();
+            }
+        }
     }
 }

@@ -490,6 +490,31 @@ class ImportView extends View {
         PopupMenu.hideActive();
     }
 
+    /** Transaction item collapse/expand event handler */
+    onCollapseItem(i, value) {
+        const index = this.getItemIndex(i);
+        if (index === -1) {
+            return;
+        }
+
+        const state = {
+            ...this.state,
+            items: this.state.items.map((item, ind) => {
+                if (ind !== index) {
+                    return item;
+                }
+                if (item.collapsed === value) {
+                    return item;
+                }
+
+                const newItem = new ImportTransaction(item);
+                newItem.collapse(value);
+                return newItem;
+            }),
+        };
+        this.setState(state);
+    }
+
     /** Transaction item enable/disable event handler */
     onEnableItem(i, value) {
         const index = this.getItemIndex(i);
@@ -1133,6 +1158,7 @@ class ImportView extends View {
 
             const itemProps = {
                 data: item,
+                onCollapse: (i, val) => this.onCollapseItem(i, val),
                 onEnable: (i, val) => this.onEnableItem(i, val),
                 onRemove: (i) => this.onRemoveItem(i),
             };
