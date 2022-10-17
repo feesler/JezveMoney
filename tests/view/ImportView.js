@@ -288,10 +288,11 @@ export class ImportView extends AppView {
                 const tr = findSimilarTransaction(item, skipList);
                 if (tr) {
                     skipList.push(tr.id);
-                    item.enable(false);
                 }
+
+                item.setSimilarTransaction(tr);
             } else {
-                item.enable(true);
+                item.setSimilarTransaction(null);
             }
         });
 
@@ -480,8 +481,8 @@ export class ImportView extends AppView {
                     const tr = findSimilarTransaction(item, skipList);
                     if (tr) {
                         skipList.push(tr.id);
-                        item.enable(false);
                     }
+                    item.setSimilarTransaction(tr);
                 }
             });
 

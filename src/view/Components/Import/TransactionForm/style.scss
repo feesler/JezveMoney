@@ -169,6 +169,8 @@
   }
 
   .collapsible-content {
+    flex-flow: column nowrap;
+    row-gap: 1rem;
     border-top: 1px solid;
     padding: 8px;
     overflow: hidden;
@@ -176,6 +178,14 @@
 
   &.collapsible__expanded .toggle-icon {
     transform: rotate(180deg);
+  }
+
+  /* Found similar transaction info */
+  .similar {
+    display: flex;
+    flex-flow: row nowrap;
+    column-gap: 1rem;
+    font-size: 14px;
   }
 
   /* Validation */

@@ -21,6 +21,7 @@ const defaultProps = {
     isForm: false,
     enabled: true,
     collapsed: true,
+    similarTransaction: null,
     type: 'expense',
     sourceAccountId: 0,
     destAccountId: 0,
@@ -153,6 +154,34 @@ export class ImportTransaction {
         }
         const state = copyObject(this.state);
         state.collapsed = res;
+
+        this.state = state;
+        return state;
+    }
+
+    isSameSimilarTransaction(transaction) {
+        return (
+            (!this.state.similarTransaction && !transaction)
+            || (
+                this.state.similarTransaction
+                && transaction
+                && this.state.similarTransaction.id === transaction.id
+            )
+        );
+    }
+
+    /**
+     * Set similar transaction value
+     * @param {Object} transaction
+     */
+    setSimilarTransaction(transaction) {
+        if (this.isSameSimilarTransaction(transaction)) {
+            return this.state;
+        }
+
+        const state = copyObject(this.state);
+        state.similarTransaction = copyObject(transaction);
+        state.enabled = !transaction;
 
         this.state = state;
         return state;

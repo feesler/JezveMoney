@@ -117,10 +117,13 @@ const stateLoop = async () => {
             { action: 'inputSourceAmount', data: '100' },
         ],
     });
+
+    await ImportTests.enableItems({ index: 2, value: true });
     await ImportTests.updateItem({
         pos: 2,
         action: { action: 'changeType', data: 'income' }, // 1-3
     });
+    await ImportTests.enableItems({ index: 3, value: true });
     await ImportTests.updateItem({
         pos: 3,
         action: [
@@ -130,10 +133,12 @@ const stateLoop = async () => {
             { action: 'inputSourceAmount', data: '9' },
         ],
     });
+    await ImportTests.enableItems({ index: 4, value: true });
     await ImportTests.updateItem({
         pos: 4,
         action: { action: 'changeType', data: 'transferfrom' }, // 1-5
     });
+    await ImportTests.enableItems({ index: 5, value: true });
     await ImportTests.updateItem({
         pos: 5,
         action: [
@@ -143,10 +148,12 @@ const stateLoop = async () => {
             { action: 'inputSourceAmount', data: '50.03' },
         ],
     });
+    await ImportTests.enableItems({ index: 6, value: true });
     await ImportTests.updateItem({
         pos: 6,
         action: { action: 'changeType', data: 'transferto' }, // 1-7
     });
+    await ImportTests.enableItems({ index: 7, value: true });
     await ImportTests.updateItem({
         pos: 7,
         action: [
@@ -154,6 +161,7 @@ const stateLoop = async () => {
             { action: 'changePerson', data: App.scenario.IVAN },
         ],
     });
+    await ImportTests.enableItems({ index: 8, value: true });
     await ImportTests.updateItem({
         pos: 8,
         action: { action: 'changeType', data: 'debtto' }, // 1-10

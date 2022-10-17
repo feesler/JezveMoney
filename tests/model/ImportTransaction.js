@@ -44,6 +44,7 @@ export class ImportTransaction {
 
         const res = new ImportTransaction({
             enabled: true,
+            similarTransaction: null,
             isForm: false,
             mainAccount,
             type: (data.accountAmount < 0) ? 'expense' : 'income',
@@ -108,6 +109,30 @@ export class ImportTransaction {
     /** Enable/disable transaction */
     enable(value = true) {
         this.enabled = !!value;
+    }
+
+    isSameSimilarTransaction(transaction) {
+        return (
+            (!this.similarTransaction && !transaction)
+            || (
+                this.similarTransaction
+                && transaction
+                && this.similarTransaction.id === transaction.id
+            )
+        );
+    }
+
+    /**
+     * Set similar transaction value
+     * @param {Object} transaction
+     */
+    setSimilarTransaction(transaction) {
+        if (this.isSameSimilarTransaction(transaction)) {
+            return;
+        }
+
+        this.similarTransaction = (transaction) ? { ...transaction } : null;
+        this.enabled = !transaction;
     }
 
     /** Set main account */

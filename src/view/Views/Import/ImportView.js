@@ -406,13 +406,12 @@ class ImportView extends View {
                     transaction.picked = true;
                 }
 
-                const enableItem = !transaction;
-                if (item.enabled === enableItem) {
+                if (item.isSameSimilarTransaction(transaction)) {
                     return item;
                 }
 
                 const newItem = new ImportTransaction(item);
-                newItem.enable(enableItem);
+                newItem.setSimilarTransaction(transaction);
                 return newItem;
             }),
         };
@@ -420,6 +419,27 @@ class ImportView extends View {
         this.setState(state);
 
         this.loadingInd.hide();
+        this.setRenderTime();
+    }
+
+    disableCheckSimilar() {
+        const state = {
+            ...this.state,
+            items: this.state.items.map((item) => {
+                if (!this.isImportedItem(item)) {
+                    return item;
+                }
+                if (item.isSameSimilarTransaction(null)) {
+                    return item;
+                }
+
+                const newItem = new ImportTransaction(item);
+                newItem.setSimilarTransaction(null);
+                return newItem;
+            }),
+        };
+
+        this.setState(state);
         this.setRenderTime();
     }
 
@@ -458,11 +478,12 @@ class ImportView extends View {
 
     /** Return first found transaction with same date and amount as reference */
     findSameTransaction(transactions, reference) {
-        return transactions.find((item) => (
+        const res = transactions.find((item) => (
             item
             && !item.picked
             && this.isSameTransaction(item, reference)
         ));
+        return res ?? null;
     }
 
     /** Initial account of upload change callback */
@@ -1018,7 +1039,7 @@ class ImportView extends View {
         if (checkSimilarEnabled) {
             this.requestSimilar();
         } else {
-            this.enableAll();
+            this.disableCheckSimilar();
         }
     }
 
