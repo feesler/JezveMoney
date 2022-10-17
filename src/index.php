@@ -38,4 +38,8 @@ $router->onBeforeAction(function ($controller, $contrStr, $action) {
     $controller->initDefResources();
 });
 
+$router->onAfterAction(function () {
+    responseLog();
+});
+
 $router->route();

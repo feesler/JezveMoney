@@ -45,6 +45,15 @@ function bootLog()
 }
 
 
+function responseLog()
+{
+    wlog("=== Response headers =============================");
+    foreach (headers_list() as $value) {
+        wlog($value);
+    }
+}
+
+
 function setLogs($enable)
 {
     global $noLogs;
@@ -77,6 +86,7 @@ function setupLogs()
 function setLocation($loc)
 {
     header("Location: " . $loc);
+    responseLog();
     exit();
 }
 
