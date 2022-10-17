@@ -1,4 +1,4 @@
-import { setBlock } from 'jezve-test';
+import { setBlock, TestStory } from 'jezve-test';
 import { App } from '../../Application.js';
 import { api } from '../../model/api.js';
 import {
@@ -8,7 +8,6 @@ import {
     DEBT,
 } from '../../model/Transaction.js';
 import * as StatisticsTests from '../../run/statistics.js';
-import { TestStory } from '../TestStory.js';
 
 export class StatisticsStory extends TestStory {
     async beforeRun() {

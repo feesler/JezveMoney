@@ -1,7 +1,8 @@
 import {
     Runner,
+    assert,
     setBlock,
-    isFullScenario,
+    getSelectedStory,
 } from 'jezve-test';
 import { api } from '../model/api.js';
 import { App } from '../Application.js';
@@ -22,6 +23,19 @@ import { createPersons } from './data/persons.js';
 import { createTransactions } from './data/transactions.js';
 import { getAccountCSV, getCardCSV } from './data/importfiles.js';
 import { putFile, removeFile } from '../run/import/index.js';
+
+const storiesMap = {
+    unitTests: UnitTestsStory,
+    security: SecurityStory,
+    api: ApiStory,
+    profile: ProfileStory,
+    accounts: AccountsStory,
+    persons: PersonsStory,
+    transactions: TransactionsStory,
+    transactionList: TransactionListStory,
+    import: ImportStory,
+    statistics: StatisticsStory,
+};
 
 export class Scenario {
     constructor(environment) {
@@ -51,35 +65,39 @@ export class Scenario {
     }
 
     async run() {
-        const fullTest = isFullScenario();
-        if (fullTest) {
-            await this.runFullScenario();
+        const story = getSelectedStory();
+        if (story) {
+            setBlock(`Running '${story}' test story`, 1);
+            await this.runStory(story);
         } else {
-            await this.runTestScenario();
+            await this.runFullScenario();
         }
+
+        await this.finishTests();
     }
 
-    async runTestScenario() {
-        setBlock('Running partial test scenario', 1);
+    getStory(name) {
+        assert(name in storiesMap, `Invalid story name: ${name}`);
 
-        await StatisticsStory.run();
+        return storiesMap[name];
+    }
+
+    getStorieNames() {
+        return Object.keys(storiesMap);
+    }
+
+    async runStory(name) {
+        const story = this.getStory(name);
+        await story.run();
     }
 
     async runFullScenario() {
         setBlock('Running full test scenario', 1);
 
-        await UnitTestsStory.run();
-        await SecurityStory.run();
-        await ApiStory.run();
-        await ProfileStory.run();
-        await AccountsStory.run();
-        await PersonsStory.run();
-        await TransactionsStory.run();
-        await TransactionListStory.run();
-        await ImportStory.run();
-        await StatisticsStory.run();
-
-        await this.finishTests();
+        const stories = this.getStorieNames();
+        for (const story of stories) {
+            await this.runStory(story);
+        }
     }
 
     /** Register test user and set 'Tester' access */

@@ -14,7 +14,9 @@ input[type="submit"] {
 
 /* Button */
 .test-btn {
-  padding: 3px 10px;
+  padding: 4px 12px;
+  border-radius: 5px;
+  font-size: 1rem;
   background-color: #44aaff;
   color: #ffffff;
 }
@@ -23,32 +25,14 @@ input[type="submit"] {
   background-color: #708290;
 }
 
-/* Checkbox wrapper */
-.checkbox-wrap {
-  height: 20px;
-  padding: 5px 0;
+/* Story select field */
+.story-field {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
 
-  & > input[type="checkbox"] {
-    display: inline;
-    height: 20px;
-    line-height: 20px;
-  }
-
-  & > label {
-    display: inline;
-    padding: 0 5px;
-    font-size: 16px;
-    height: 20px;
-    line-height: 20px;
-  }
-
-  & label > input {
-    margin-right: 8px;
-  }
-
-  &.checkbox-wrap_inline {
-    display: inline-block;
-    margin-right: 10px;
+  select {
+    height: 2rem;
   }
 }
 
@@ -61,6 +45,11 @@ input[type="submit"] {
 }
 
 .controls {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  column-gap: 1rem;
+  row-gap: 8px;
   padding: 0 0 10px 0;
 }
 

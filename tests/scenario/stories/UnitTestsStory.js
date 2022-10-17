@@ -1,5 +1,4 @@
-import { setBlock } from 'jezve-test';
-import { TestStory } from '../TestStory.js';
+import { setBlock, TestStory } from 'jezve-test';
 import {
     fixFloatTest,
     amountFixTest,

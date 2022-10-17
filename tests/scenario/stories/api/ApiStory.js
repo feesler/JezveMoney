@@ -1,5 +1,4 @@
-import { setBlock } from 'jezve-test';
-import { TestStory } from '../../TestStory.js';
+import { setBlock, TestStory } from 'jezve-test';
 import { api } from '../../../model/api.js';
 import * as ApiTests from '../../../run/api/index.js';
 import { App } from '../../../Application.js';
