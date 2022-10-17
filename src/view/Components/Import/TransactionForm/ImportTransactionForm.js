@@ -6,7 +6,6 @@ import {
     insertAfter,
     checkDate,
 } from 'jezvejs';
-import { Checkbox } from 'jezvejs/Checkbox';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
@@ -20,7 +19,6 @@ import { PopupMenu } from '../../PopupMenu/PopupMenu.js';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'import-form';
-const ENABLE_CHECK_CLASS = 'enable-check';
 const MAIN_CONTENT_CLASS = 'main-content';
 const INV_FEEDBACK_CLASS = 'invalid-feedback';
 const FORM_CONTAINER_CLASS = 'form-container';
@@ -45,6 +43,7 @@ const COMMENT_FIELD_CLASS = 'comment-field';
 /* Controls */
 const CONTROLS_CLASS = 'controls';
 const DEFAULT_BUTTON_CLASS = 'btn';
+const ENABLE_BUTTON_CLASS = 'enable-btn';
 const DEL_BUTTON_CLASS = 'delete-btn';
 const DEFAULT_ICON_CLASS = 'icon';
 const CALENDAR_ICON_CLASS = 'calendar-icon';
@@ -111,12 +110,6 @@ export class ImportTransactionForm extends ImportTransactionBase {
     init() {
         const { createContainer } = window.app;
 
-        // Row enable checkbox
-        this.enableCheck = Checkbox.create({
-            className: ENABLE_CHECK_CLASS,
-            onChange: () => this.onRowChecked(),
-        });
-
         this.createTypeField();
         this.createAccountField();
         this.createPersonField();
@@ -151,7 +144,6 @@ export class ImportTransactionForm extends ImportTransactionBase {
         ]);
 
         this.mainContainer = createContainer(MAIN_CONTENT_CLASS, [
-            this.enableCheck.elem,
             this.formContainer,
             this.controls,
         ]);
@@ -387,14 +379,19 @@ export class ImportTransactionForm extends ImportTransactionBase {
     }
 
     createMenu() {
-        this.menu = PopupMenu.create({
-            items: [{
-                icon: 'del',
-                title: 'Delete',
-                className: DEL_BUTTON_CLASS,
-                onClick: () => this.remove(),
-            }],
+        this.menu = PopupMenu.create({});
+        this.enableMenuItem = this.menu.addIconItem({
+            title: this.getEnableMenuItemTitle(),
+            className: ENABLE_BUTTON_CLASS,
+            onClick: () => this.onToggleEnable(),
         });
+
+        this.menu.append([{
+            icon: 'del',
+            title: 'Delete',
+            className: DEL_BUTTON_CLASS,
+            onClick: () => this.remove(),
+        }]);
     }
 
     /** Transaction type select 'change' event handler */
@@ -628,8 +625,6 @@ export class ImportTransactionForm extends ImportTransactionBase {
 
         enable(this.elem, transaction.enabled);
 
-        this.enableCheck.check(transaction.enabled);
-
         // Type field
         this.typeDropDown.enable(transaction.enabled);
         this.typeDropDown.selectItem(transaction.type);
@@ -742,6 +737,9 @@ export class ImportTransactionForm extends ImportTransactionBase {
         // Commend field
         enable(this.commInp, transaction.enabled);
         this.commInp.value = transaction.comment;
+
+        // Enable/disable menu item
+        this.enableMenuItem.setTitle(this.getEnableMenuItemTitle(state));
 
         if (this.collapse) {
             if (transaction.collapsed) {

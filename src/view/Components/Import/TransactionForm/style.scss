@@ -105,22 +105,6 @@
     --ig-height: 34px;
   }
 
-  /* Enable/disable item checkbox container */
-  .enable-check {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 6px;
-
-    .checkbox__check {
-      margin: 0;
-    }
-
-    input[type="checkbox"] {
-      pointer-events: all;
-    }
-  }
-
   /* Toggle expand/collapse button */
   .toggle-btn {
     width: 32px;
@@ -163,7 +147,7 @@
 
   /* Container for transaction form */
   .main-content {
-    padding: 4px 0;
+    padding: 4px 0 4px 8px;
     display: flex;
     flex-flow: row nowrap;
   }
@@ -243,7 +227,7 @@
     }
 
     .main-content {
-      padding: 4px 0 6px 0;
+      padding: 4px 0 6px 8px;
     }
 
     .controls {

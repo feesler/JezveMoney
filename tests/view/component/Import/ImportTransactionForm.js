@@ -1,6 +1,7 @@
 import {
     TestComponent,
     query,
+    attr,
     prop,
     click,
     input,
@@ -8,7 +9,7 @@ import {
     assert,
     copyObject,
 } from 'jezve-test';
-import { Checkbox, DropDown } from 'jezvejs-test';
+import { DropDown } from 'jezvejs-test';
 import {
     EXPENSE,
     INCOME,
@@ -81,11 +82,13 @@ export class ImportTransactionForm extends TestComponent {
     async parseContent() {
         const res = {
             isForm: true,
-            enableCheck: await Checkbox.create(this, await query(this.elem, '.checkbox.enable-check')),
         };
 
-        assert(res.enableCheck, 'Invalid structure of import item');
-        res.enabled = res.enableCheck.checked;
+        const disabledAttr = await attr(this.elem, 'disabled');
+        res.enabled = !disabledAttr;
+
+        const disabled = await prop(this.elem, 'disabled');
+        res.enabled = !disabled;
 
         const fieldSelectors = [
             '.type-field',
@@ -111,6 +114,7 @@ export class ImportTransactionForm extends TestComponent {
 
         res.invFeedback = { elem: await query(this.elem, '.invalid-feedback') };
         res.menuBtn = await query(this.elem, '.actions-menu-btn');
+        res.toggleEnableBtn = await query(this.elem, '.enable-btn');
         res.deleteBtn = await query(this.elem, '.delete-btn');
         res.toggleBtn = await query(this.elem, '.toggle-btn');
         res.saveBtn = await query(this.elem, '.submit-btn');
@@ -127,6 +131,7 @@ export class ImportTransactionForm extends TestComponent {
             && res.commentField
             && res.invFeedback.elem
             && res.menuBtn
+            && res.toggleEnableBtn
             && res.deleteBtn
             && res.saveBtn
             && res.cancelBtn,
@@ -442,10 +447,6 @@ export class ImportTransactionForm extends TestComponent {
         res.destCurrency = App.currency.getItem(res.destCurrId);
 
         return res;
-    }
-
-    async toggleEnable() {
-        await this.content.enableCheck.toggle();
     }
 
     checkEnabled(field) {
@@ -767,6 +768,11 @@ export class ImportTransactionForm extends TestComponent {
 
     async openMenu() {
         await this.performAction(() => click(this.content.menuBtn));
+    }
+
+    async toggleEnable() {
+        await this.openMenu();
+        await click(this.content.toggleEnableBtn);
     }
 
     async clickDelete() {

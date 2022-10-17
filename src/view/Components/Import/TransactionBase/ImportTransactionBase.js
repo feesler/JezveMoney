@@ -18,6 +18,8 @@ const SIMILAR_LINK_CLASS = 'similar__link';
 /** Strings */
 const STR_SIMILAR_FOUND = 'Similar transaction found: ';
 const STR_SIMILAR_LINK = 'Edit';
+const STR_ENABLE_ITEM = 'Enable';
+const STR_DISABLE_ITEM = 'Disable';
 
 /** Base import transaction class */
 export class ImportTransactionBase extends Component {
@@ -104,15 +106,25 @@ export class ImportTransactionBase extends Component {
         }
     }
 
-    /** Enable checkbox 'change' event handler */
-    onRowChecked() {
-        const value = this.enableCheck.checked;
+    getEnableMenuItemTitle(state = this.state) {
+        const { enabled } = state.transaction;
+        return (enabled) ? STR_DISABLE_ITEM : STR_ENABLE_ITEM;
+    }
+
+    /** Enable/disable component */
+    enable(value = true) {
         this.state.transaction.enable(value);
         this.render();
 
         if (isFunction(this.props.onEnable)) {
             this.props.onEnable(this, value);
         }
+    }
+
+    /** Enable/disable menu item 'click' event handler */
+    onToggleEnable() {
+        const value = !this.enabled;
+        this.enable(value);
     }
 
     /** Toggle collapse/expand button 'click' event handler */

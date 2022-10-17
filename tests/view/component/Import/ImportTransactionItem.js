@@ -2,13 +2,13 @@ import {
     TestComponent,
     query,
     queryAll,
+    attr,
     prop,
     click,
     isVisible,
     assert,
     copyObject,
 } from 'jezve-test';
-import { Checkbox } from 'jezvejs-test';
 import {
     EXPENSE,
     INCOME,
@@ -34,11 +34,10 @@ export class ImportTransactionItem extends TestComponent {
     async parseContent() {
         const res = {
             isForm: false,
-            enableCheck: await Checkbox.create(this, await query(this.elem, '.checkbox.enable-check')),
         };
 
-        assert(res.enableCheck, 'Invalid structure of import item');
-        res.enabled = res.enableCheck.checked;
+        const disabledAttr = await attr(this.elem, 'disabled');
+        res.enabled = !disabledAttr;
 
         res.typeField = await this.parseField(await query(this.elem, '.type-field'));
 
@@ -53,6 +52,7 @@ export class ImportTransactionItem extends TestComponent {
         res.commentField = await this.parseField(await query(this.elem, '.comment-field'));
 
         res.menuBtn = await query(this.elem, '.actions-menu-btn');
+        res.toggleEnableBtn = await query(this.elem, '.enable-btn');
         res.updateBtn = await query(this.elem, '.update-btn');
         res.deleteBtn = await query(this.elem, '.delete-btn');
         res.toggleBtn = await query(this.elem, '.toggle-btn');
@@ -67,6 +67,7 @@ export class ImportTransactionItem extends TestComponent {
             && res.dateField
             && res.commentField
             && res.menuBtn
+            && res.toggleEnableBtn
             && res.updateBtn
             && res.deleteBtn,
             'Invalid structure of import item',
@@ -375,10 +376,6 @@ export class ImportTransactionItem extends TestComponent {
         return res;
     }
 
-    async toggleEnable() {
-        await this.content.enableCheck.toggle();
-    }
-
     onChangeMainAccount(model, value) {
         assert(model, 'Invalid model specified');
 
@@ -441,6 +438,11 @@ export class ImportTransactionItem extends TestComponent {
 
     async openMenu() {
         await this.performAction(() => click(this.content.menuBtn));
+    }
+
+    async toggleEnable() {
+        await this.openMenu();
+        await click(this.content.toggleEnableBtn);
     }
 
     async clickUpdate() {
