@@ -1,25 +1,21 @@
 import { setBlock, TestStory } from 'jezve-test';
 import * as PersonTests from '../../run/person.js';
 import { App } from '../../Application.js';
-import { api } from '../../model/api.js';
 
 export class PersonsStory extends TestStory {
     async beforeRun() {
         await App.scenario.prepareTestUser();
-
-        await api.profile.resetData({
+        await App.scenario.resetData({
             accounts: true,
             persons: true,
         });
-        await App.state.fetch();
     }
 
     async prepareTransactions() {
-        await api.profile.resetData({
+        await App.scenario.resetData({
             accounts: true,
             persons: true,
         });
-        await App.state.fetch();
         await App.scenario.createTestData();
 
         await App.goToMainView();

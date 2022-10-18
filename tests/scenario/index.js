@@ -146,6 +146,12 @@ export class Scenario {
         await ApiTests.deleteUserIfExist(App.config.newUser);
     }
 
+    /** Reset specified data of user */
+    async resetData(options) {
+        await api.profile.resetData(options);
+        await App.state.fetch();
+    }
+
     /** Creates common test accounts */
     async createAccounts() {
         await createAccounts();

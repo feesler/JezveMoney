@@ -25,11 +25,10 @@ export class TransactionsStory extends TestStory {
         const HIDDEN_PERSON_NAME = 'Hidden person';
 
         await App.scenario.prepareTestUser();
-        await api.profile.resetData({
+        await App.scenario.resetData({
             accounts: true,
             persons: true,
         });
-        await App.state.fetch();
 
         await App.scenario.createAccounts();
         await App.scenario.createPersons();

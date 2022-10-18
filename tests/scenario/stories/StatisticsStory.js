@@ -13,11 +13,10 @@ import * as StatisticsTests from '../../run/statistics.js';
 export class StatisticsStory extends TestStory {
     async beforeRun() {
         await App.scenario.prepareTestUser();
-        await api.profile.resetData({
+        await App.scenario.resetData({
             accounts: true,
             persons: true,
         });
-        await App.state.fetch();
         await App.scenario.createTestData();
 
         await App.goToMainView();

@@ -1,5 +1,4 @@
 import { setBlock, TestStory } from 'jezve-test';
-import { api } from '../../../model/api.js';
 import * as ImportTests from '../../../run/import/index.js';
 import { App } from '../../../Application.js';
 import { importItemsTests } from './items.js';
@@ -9,15 +8,13 @@ import { importTemplateTests } from './templates.js';
 export class ImportStory extends TestStory {
     async beforeRun() {
         await App.scenario.prepareTestUser();
-
-        await api.profile.resetData({
+        await App.scenario.resetData({
             accounts: true,
             persons: true,
             transactions: true,
             importtpl: true,
             importrules: true,
         });
-        await App.state.fetch();
 
         await App.scenario.createCsvFiles();
         await App.scenario.createAccounts();
@@ -43,11 +40,11 @@ export class ImportStory extends TestStory {
     async noAccounts() {
         setBlock('Import view with no accounts', 2);
 
-        const accountIds = App.state.accounts.getIds();
-        if (accountIds.length) {
-            await api.account.del(accountIds);
-        }
+        await App.scenario.resetData({
+            accounts: true,
+        });
 
+        await App.goToMainView();
         await ImportTests.checkInitialState();
     }
 }

@@ -14,8 +14,6 @@ export class ProfileStory extends TestStory {
     async beforeRun() {
         await App.scenario.removeUsers();
         await App.scenario.prepareTestUser();
-
-        await App.state.fetch();
     }
 
     async run() {
