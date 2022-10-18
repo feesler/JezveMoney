@@ -43,7 +43,7 @@ include(TPL_PATH . "Header.tpl");	?>
         }	?>
                         </div>
 
-                        <span id="notavailmsg" class="nodata-message"<?=hidden($trAvailable)?>><?=e($noDataMessage)?></span>
+                        <span id="notavailmsg" class="nodata-message"<?=hidden($trAvailable)?>><?=e($notAvailMessage)?></span>
 
                         <div class="accounts-section">
                             <div id="person" class="account-container"<?=hidden(!$trAvailable || $tr["type"] != DEBT)?>>
@@ -98,9 +98,10 @@ include(TPL_PATH . "Header.tpl");	?>
 <?php	}		?>
                                     </div>
                                 </div>
-                                <div id="selaccount" class="account-toggler"<?=hidden(!$noAccount)?>>
+                                <div id="selaccount" class="account-toggler"<?=hidden(!$noAccount || !$acc_count)?>>
                                     <button class="btn dashed-btn" type="button">Select account</button>
                                 </div>
+                                <span id="noaccountsmsg" class="nodata-message"<?=hidden($acc_count > 0)?>><?=e($noAccountsMessage)?></span>
                             </div>
 
                             <div id="source" class="account-container"<?=hidden(!$trAvailable || $tr["type"] == INCOME || $tr["type"] == DEBT)?>>

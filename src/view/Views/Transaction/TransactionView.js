@@ -366,8 +366,6 @@ class TransactionView extends View {
         this.destCurrInp = ge('dest_curr');
         this.debtOperationInp = ge('debtOperation');
 
-        this.debtOpControls = ge('operation');
-
         this.personIdInp = ge('person_id');
         this.debtAccountInp = ge('acc_id');
         this.debtAccountTile = AccountTile.fromElement({ elem: 'acc_tile', parent: this });
@@ -1188,7 +1186,8 @@ class TransactionView extends View {
 
         show(this.debtAccountTileBase, !noAccount);
 
-        show(this.selectAccountBtn, noAccount);
+        const { userAccounts } = window.app.model;
+        show(this.selectAccountBtn, noAccount && userAccounts.length > 0);
         enable(this.accountToggleBtn, !state.submitStarted);
 
         this.srcResBalanceRowLabel.textContent = (debtType) ? 'Result balance (Person)' : 'Result balance (Account)';
@@ -1258,7 +1257,6 @@ class TransactionView extends View {
         );
         show(this.personContainer, state.isAvailable && transaction.type === DEBT);
         show(this.debtAccountContainer, state.isAvailable && transaction.type === DEBT);
-        show(this.debtOpControls, state.isAvailable && transaction.type === DEBT);
         show(
             this.swapBtn,
             state.isAvailable && (transaction.type === TRANSFER || transaction.type === DEBT),

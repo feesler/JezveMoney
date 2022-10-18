@@ -11,9 +11,10 @@ use JezveMoney\App\Model\IconModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Item\TransactionItem;
 
-const MSG_ACCOUNT_NOT_AVAILABLE = "You have no one active account. Please create one.";
-const MSG_TRANSFER_NOT_AVAILABLE = "You need at least two active accounts for transfer.";
-const MSG_DEBT_NOT_AVAILABLE = "You have no one active person. Please create one for debts.";
+const MSG_ACCOUNT_NOT_AVAILABLE = "You have no accounts. Please create one.";
+const MSG_DEBT_ACCOUNT_NOT_AVAILABLE = "No accounts available";
+const MSG_TRANSFER_NOT_AVAILABLE = "You need at least two accounts for transfer.";
+const MSG_DEBT_NOT_AVAILABLE = "You have no persons. Please create one for debts.";
 
 class Transactions extends TemplateController
 {
@@ -246,19 +247,20 @@ class Transactions extends TemplateController
         ];
 
         // Check availability of selected type of transaction
-        $noDataMessage = null;
+        $notAvailMessage = null;
         if ($tr["type"] == EXPENSE || $tr["type"] == INCOME) {
             $trAvailable = $acc_count > 0;
-            $noDataMessage = MSG_ACCOUNT_NOT_AVAILABLE;
+            $notAvailMessage = MSG_ACCOUNT_NOT_AVAILABLE;
         } elseif ($tr["type"] == TRANSFER) {
             $trAvailable = $acc_count > 1;
-            $noDataMessage = MSG_TRANSFER_NOT_AVAILABLE;
+            $notAvailMessage = MSG_TRANSFER_NOT_AVAILABLE;
         } elseif ($tr["type"] == DEBT) {
             $trAvailable = is_array($persons) && count($persons) > 0;
-            $noDataMessage = MSG_DEBT_NOT_AVAILABLE;
+            $notAvailMessage = MSG_DEBT_NOT_AVAILABLE;
         }
         $data["trAvailable"] = $trAvailable;
-        $data["noDataMessage"] = $noDataMessage;
+        $data["notAvailMessage"] = $notAvailMessage;
+        $data["noAccountsMessage"] = MSG_DEBT_ACCOUNT_NOT_AVAILABLE;
 
         // Check specified account
         $acc_id = 0;
@@ -273,7 +275,7 @@ class Transactions extends TemplateController
             }
         }
         // Use first account if nothing is specified
-        if (!$acc_id && count($userAccounts) > 0) {
+        if (!$acc_id && $acc_count > 0) {
             $acc_id = $userAccounts[0]->id;
         }
         $data["acc_id"] = $acc_id;
@@ -567,7 +569,7 @@ class Transactions extends TemplateController
         ];
         $form = [];
 
-        $visiblePersons = $this->personMod->getData();
+        $persons = $this->personMod->getData(["type" => "all", "sort" => "visibility"]);
         $iconModel = IconModel::getInstance();
         $defMsg = ERR_TRANS_UPDATE;
 
@@ -589,10 +591,11 @@ class Transactions extends TemplateController
         // check type change request
         $requestedType = $this->getRequestedType($_GET, $tr["type"]);
 
-        $data["acc_count"] = $this->accModel->getCount(["full" => ($tr["type"] == DEBT)]);
+        $data["acc_count"] = $this->accModel->getCount(["type" => "all"]);
 
-        $noDataMessage = null;
-        $data["noDataMessage"] = $noDataMessage;
+        $notAvailMessage = null;
+        $data["notAvailMessage"] = $notAvailMessage;
+        $data["noAccountsMessage"] = MSG_DEBT_ACCOUNT_NOT_AVAILABLE;
         $trAvailable = true;
         $data["trAvailable"] = $trAvailable;
 
@@ -658,9 +661,6 @@ class Transactions extends TemplateController
             if ($noAccount) {
                 $acc_id = $this->accModel->getAnother();
                 $debtAcc = $this->accModel->getItem($acc_id);
-                if (!$debtAcc) {
-                    throw new \Error("Account " . $acc_id . " not found");
-                }
             } else {
                 $acc_id = $debtAcc->id;
             }
@@ -676,8 +676,8 @@ class Transactions extends TemplateController
             $acc_id = $this->accModel->getAnother();
             $debtAcc = $this->accModel->getItem($acc_id);
 
-            $person_id = (is_array($visiblePersons) && count($visiblePersons) > 0)
-                ? $visiblePersons[0]->id
+            $person_id = (is_array($persons) && count($persons) > 0)
+                ? $persons[0]->id
                 : 0;
             $pObj = $this->personMod->getItem($person_id);
 

@@ -91,6 +91,8 @@ export class TransactionView extends AppView {
 
         res.noacc_btn = { elem: await query('#noacc_btn') };
         assert(res.noacc_btn.elem, 'Disable account button not found');
+        res.noAccountsMsg = { elem: await query('#noaccountsmsg') };
+        assert(res.noAccountsMsg.elem, 'No accounts message element not found');
 
         res.source = await TileBlock.create(this, await query('#source'));
         if (res.source) {
@@ -281,7 +283,7 @@ export class TransactionView extends AppView {
             res.personAccount = this.getPersonAccount(res.person?.id, personAccountCurr);
 
             const isSelectAccountVisible = cont.selaccount?.content?.visible;
-            res.noAccount = isSelectAccountVisible;
+            res.noAccount = isSelectAccountVisible || cont.noAccountsMsg.visible;
 
             res.account = App.state.accounts.getItem(cont.account.content.id);
             if (res.isAvailable && !res.noAccount) {
@@ -802,25 +804,30 @@ export class TransactionView extends AppView {
         if (this.model.type === DEBT) {
             assert(newState >= -1 && newState <= 9, 'Invalid state specified');
 
-            res.selaccount = { visible: this.model.isAvailable && this.model.noAccount };
-            res.noacc_btn = { visible: this.model.isAvailable && !this.model.noAccount };
+            const { isAvailable, debtType, noAccount } = this.model;
+            const userAccounts = App.state.getUserAccounts();
+            const accountsAvailable = userAccounts.length > 0;
+
+            res.selaccount = { visible: isAvailable && noAccount && accountsAvailable };
+            res.noacc_btn = { visible: isAvailable && !noAccount };
+            res.noAccountsMsg = { visible: isAvailable && !accountsAvailable };
             res.dest_amount_row.visible = false;
             res.dest_amount_left.visible = false;
             res.exchange_row.visible = false;
             res.exch_left.visible = false;
 
-            if (this.model.isAvailable) {
+            if (isAvailable) {
                 res.src_amount_row.label = 'Amount';
-                res.result_balance_row.label = (this.model.debtType)
+                res.result_balance_row.label = (debtType)
                     ? 'Result balance (Person)'
                     : 'Result balance (Account)';
-                res.result_balance_dest_row.label = (this.model.debtType)
+                res.result_balance_dest_row.label = (debtType)
                     ? 'Result balance (Account)'
                     : 'Result balance (Person)';
             }
 
-            if (this.model.debtType) {
-                if (this.model.isAvailable) {
+            if (debtType) {
+                if (isAvailable) {
                     res.person.tile.title = (this.model.person) ? this.model.person.name : '';
                     res.person.tile.subtitle = (this.model.srcAccount)
                         ? this.model.srcCurr.format(this.model.srcAccount.balance)
@@ -828,7 +835,7 @@ export class TransactionView extends AppView {
                 }
 
                 if (!this.model.noAccount) {
-                    if (this.model.isAvailable) {
+                    if (isAvailable) {
                         res.account.tile.title = (this.model.destAccount) ? this.model.destAccount.name : '';
                         res.account.tile.subtitle = (this.model.destAccount)
                             ? this.model.destCurr.format(this.model.destAccount.balance)
@@ -836,7 +843,7 @@ export class TransactionView extends AppView {
                     }
                 }
             } else {
-                if (this.model.isAvailable) {
+                if (isAvailable) {
                     res.person.tile.title = (this.model.person) ? this.model.person.name : '';
                     res.person.tile.subtitle = (this.model.destAccount)
                         ? this.model.destCurr.format(this.model.destAccount.balance)
@@ -844,7 +851,7 @@ export class TransactionView extends AppView {
                 }
 
                 if (!this.model.noAccount) {
-                    if (this.model.isAvailable) {
+                    if (isAvailable) {
                         res.account.tile.title = (this.model.srcAccount) ? this.model.srcAccount.name : '';
                         res.account.tile.subtitle = (this.model.srcAccount)
                             ? this.model.srcCurr.format(this.model.srcAccount.balance)

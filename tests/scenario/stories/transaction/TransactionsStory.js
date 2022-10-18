@@ -672,6 +672,8 @@ export class TransactionsStory extends TestStory {
         setBlock('No accounts and 1 hidden person', 2);
         // Only Debt must be available
         await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
+        // Check state of Debt transaction after swap source and destination
+        await TransactionTests.runAction({ action: 'swapSourceAndDest' });
 
         // Remove person
         await api.person.del(person1);
