@@ -42,7 +42,6 @@ export class ImportView extends AppView {
             uploadBtn: await IconButton.create(this, await query('#uploadBtn')),
             actionsMenuBtn: { elem: await query('#toggleActionsMenuBtn') },
             actionsList: { elem: await query('#actionsList') },
-            notAvailMsg: { elem: await query('#notavailmsg') },
             addBtn: await IconButton.create(this, await query('#newItemBtn')),
             clearBtn: await IconButton.create(this, await query('#clearFormBtn')),
             totalCount: { elem: await query('#trcount') },
@@ -51,26 +50,14 @@ export class ImportView extends AppView {
             rulesBtn: { elem: await query('#rulesBtn') },
             similarCheck: await Checkbox.create(this, await query('#similarCheck')),
             submitBtn: { elem: await query('#submitbtn') },
-            submitProgress: { elem: await query('.content_wrap > .loading-indicator') },
         };
 
-        assert(
-            res.title.elem
-            && res.uploadBtn.elem
-            && res.actionsMenuBtn.elem
-            && res.actionsList.elem
-            && res.addBtn
-            && res.clearBtn
-            && res.totalCount.elem
-            && res.enabledCount.elem
-            && res.rulesCheck
-            && res.rulesBtn.elem
-            && res.similarCheck
-            && res.submitBtn.elem
-            && res.submitProgress.elem,
-            'Invalid structure of import view',
-        );
+        Object.keys(res).forEach((child) => (
+            assert(res[child]?.elem, `Invalid structure of import view: ${child} component not found`)
+        ));
 
+        res.submitProgress = { elem: await query('.content_wrap > .loading-indicator') };
+        res.notAvailMsg = { elem: await query('#notavailmsg') };
         const importEnabled = !res.notAvailMsg.elem;
 
         res.title.value = await prop(res.title.elem, 'textContent');
@@ -148,7 +135,7 @@ export class ImportView extends AppView {
             notAvailMsg: { visible: !model.enabled },
             addBtn: { visible: showMenuItems },
             clearBtn: { visible: showMenuItems },
-            uploadBtn: { visible: true, disabled: !model.enabled },
+            uploadBtn: { visible: model.enabled, disabled: !model.enabled },
             title: { value: model.title.toString(), visible: true },
             totalCount: { value: model.totalCount.toString(), visible: model.enabled },
             enabledCount: { value: model.enabledCount.toString(), visible: model.enabled },
