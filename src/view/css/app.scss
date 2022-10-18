@@ -625,16 +625,6 @@ a.paginator-arrow:focus-visible {
   margin-left: 1px;
 }
 
-.filter-item .trtype-menu {
-  flex-flow: column nowrap;
-  align-items: baseline;
-  padding: 0;
-}
-
-.filter-item .trtype-menu__item {
-  margin-bottom: 6px;
-}
-
 /* Histogram bar item */
 .charts {
   --charts-color-1: #20a0ff;
@@ -673,11 +663,6 @@ a.paginator-arrow:focus-visible {
 @media (min-width: 768px) {
   .content_wrap {
     padding: 50px 12px 50px 212px;
-  }
-
-  .filter-item .trtype-menu {
-    flex-flow: row nowrap;
-    align-items: center;
   }
 }
 
