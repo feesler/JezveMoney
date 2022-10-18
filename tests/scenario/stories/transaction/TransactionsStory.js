@@ -4,6 +4,7 @@ import {
     INCOME,
     TRANSFER,
     DEBT,
+    availTransTypes,
 } from '../../../model/Transaction.js';
 import { api } from '../../../model/api.js';
 import * as TransactionTests from '../../../run/transaction/index.js';
@@ -569,17 +570,18 @@ export class TransactionsStory extends TestStory {
     async availability(directNavigate) {
         const { RUB } = App.scenario;
 
-        if (directNavigate) {
-            setBlock('Transaction availability: direct navigation', 1);
-        } else {
-            setBlock('Transaction availability: manual navigation', 1);
-        }
+        const checkAvailable = (type) => (
+            TransactionTests.checkTransactionAvailable(type, directNavigate)
+        );
+
+        const navType = (directNavigate) ? 'direct' : 'manual';
+        setBlock(`Transaction availability: ${navType} navigation`, 1);
 
         // Remove all accounts and persons
         await api.profile.resetData({ accounts: true, persons: true });
 
         // Create first account
-        await api.account.create({
+        const { id: account1 } = await api.account.create({
             name: 'Account 1',
             curr_id: RUB,
             initbalance: '1',
@@ -587,25 +589,21 @@ export class TransactionsStory extends TestStory {
             flags: 0,
         });
         await App.state.fetch();
-        const [account1] = App.state.accounts.getIds();
 
         setBlock('1 account and no person', 2);
         // Only Expense and Income must be available
-        await TransactionTests.checkTransactionAvailable(EXPENSE, directNavigate);
-        await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
-        await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
-        await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
+        await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
 
         if (!directNavigate) {
             // Navigate from not available Debt to available Expense
-            await TransactionTests.checkTransactionAvailable(EXPENSE, directNavigate);
-            await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
+            await checkAvailable(EXPENSE);
+            await checkAvailable(DEBT);
             // Navigate from not available Debt to available Income
-            await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
+            await checkAvailable(INCOME);
         }
 
         // Create second account
-        await api.account.create({
+        const { id: account2 } = await api.account.create({
             name: 'Account 2',
             curr_id: RUB,
             initbalance: '2',
@@ -613,14 +611,10 @@ export class TransactionsStory extends TestStory {
             flags: 0,
         });
         await App.state.fetch();
-        const [, account2] = App.state.accounts.getIds();
 
         setBlock('2 accounts and no person', 2);
         // Expense, Income and Transfer must be available
-        await TransactionTests.checkTransactionAvailable(EXPENSE, directNavigate);
-        await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
-        await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
-        await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
+        await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
 
         if (!directNavigate) {
             // Navigate from not available Debt to available Transfer
@@ -628,30 +622,40 @@ export class TransactionsStory extends TestStory {
         }
 
         // Create person
-        await api.person.create({
+        const { id: person1 } = await api.person.create({
             name: 'Person 1',
             flags: 0,
         });
         await App.state.fetch();
-        const [person1] = App.state.persons.getIds();
 
         setBlock('2 accounts and 1 person', 2);
         // All transaction types must be available
-        await TransactionTests.checkTransactionAvailable(EXPENSE, directNavigate);
-        await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
-        await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
-        await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
+        await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
+
+        // Hide first account
+        await api.account.hide(account1);
+        await App.state.fetch();
+
+        setBlock('1 visible, 1 hidden account and 1 person', 2);
+        // All transaction types must be available
+        await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
+
+        // Hide second account
+        await api.account.hide(account2);
+        await App.state.fetch();
+
+        setBlock('2 hidden accounts and 1 person', 2);
+        // All transaction types must be available
+        await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
 
         // Remove account
+        await api.account.show(account1);
         await api.account.del(account2);
         await App.state.fetch();
 
         setBlock('1 account and 1 person', 2);
         // Expense, Income and Debt must be available
-        await TransactionTests.checkTransactionAvailable(EXPENSE, directNavigate);
-        await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
-        await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
-        await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
+        await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
 
         // Remove account
         await api.account.del(account1);
@@ -659,11 +663,15 @@ export class TransactionsStory extends TestStory {
 
         setBlock('No accounts and 1 person', 2);
         // Only Debt must be available
-        await TransactionTests.checkTransactionAvailable(EXPENSE, directNavigate);
-        await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
-        await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
-        // Navigate from not available Transfer to available Debt
-        await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
+        await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
+
+        // Hide person
+        await api.person.hide(person1);
+        await App.state.fetch();
+
+        setBlock('No accounts and 1 hidden person', 2);
+        // Only Debt must be available
+        await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
 
         // Remove person
         await api.person.del(person1);
@@ -671,9 +679,6 @@ export class TransactionsStory extends TestStory {
 
         setBlock('No accounts and no persons', 2);
         // Expected no transaction available
-        await TransactionTests.checkTransactionAvailable(EXPENSE, directNavigate);
-        await TransactionTests.checkTransactionAvailable(INCOME, directNavigate);
-        await TransactionTests.checkTransactionAvailable(TRANSFER, directNavigate);
-        await TransactionTests.checkTransactionAvailable(DEBT, directNavigate);
+        await App.scenario.runner.runGroup(checkAvailable, availTransTypes);
     }
 }

@@ -377,6 +377,11 @@ export class AppState {
         this.userAccountsCache.sortByVisibility();
     }
 
+    getUserAccounts() {
+        this.cacheUserAccounts();
+        return this.userAccountsCache;
+    }
+
     getAccountsByIndexes(accounts, returnIds = false) {
         const itemIndexes = Array.isArray(accounts) ? accounts : [accounts];
         this.cacheUserAccounts();
@@ -886,18 +891,17 @@ export class AppState {
     isAvailableTransactionType(type) {
         assert(availTransTypes.includes(type), 'Invalid transaction type');
 
-        const userVisibleAccounts = this.accounts.getUserVisible();
+        this.cacheUserAccounts();
 
         if (type === EXPENSE || type === INCOME) {
-            return (userVisibleAccounts.length > 0);
+            return (this.userAccountsCache.length > 0);
         }
         if (type === TRANSFER) {
-            return (userVisibleAccounts.length > 1);
+            return (this.userAccountsCache.length > 1);
         }
 
         // DEBT
-        const visiblePersons = this.persons.getVisible();
-        return (visiblePersons.length > 0);
+        return (this.persons.length > 0);
     }
 
     /**

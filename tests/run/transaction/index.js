@@ -398,24 +398,23 @@ export const checkTransactionAvailable = async (type, directNavigate = false) =>
         }
 
         let stateId = -1;
-        const userVisibleAccounts = App.state.accounts.getUserVisible();
-        const visiblePersons = App.state.persons.getVisible();
+        const userAccounts = App.state.getUserAccounts();
 
         if (type === EXPENSE || type === INCOME) {
-            if (userVisibleAccounts.length > 0) {
+            if (userAccounts.length > 0) {
                 stateId = 0;
             }
         } else if (type === TRANSFER) {
-            if (userVisibleAccounts.length > 1) {
-                const srcAccount = userVisibleAccounts.getItemByIndex(0);
-                const destAccount = userVisibleAccounts.getItemByIndex(1);
+            if (userAccounts.length > 1) {
+                const srcAccount = userAccounts.getItemByIndex(0);
+                const destAccount = userAccounts.getItemByIndex(1);
                 const isDiff = srcAccount.curr_id !== destAccount.curr_id;
 
                 stateId = (isDiff) ? 3 : 0;
             }
         } else if (type === DEBT) {
-            if (visiblePersons.length > 0) {
-                stateId = (userVisibleAccounts.length > 0) ? 0 : 6;
+            if (App.state.persons.length > 0) {
+                stateId = (userAccounts.length > 0) ? 0 : 6;
             }
         }
 

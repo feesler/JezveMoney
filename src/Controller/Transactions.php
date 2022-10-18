@@ -229,11 +229,11 @@ class Transactions extends TemplateController
         ];
         $form = [];
 
-        $visibleAccounts = $this->accModel->getData();
-        $acc_count = count($visibleAccounts);
+        $userAccounts = $this->accModel->getUserAccounts();
+        $acc_count = count($userAccounts);
         $data["acc_count"] = $acc_count;
 
-        $visiblePersons = $this->personMod->getData();
+        $persons = $this->personMod->getData(["type" => "all", "sort" => "visibility"]);
         $iconModel = IconModel::getInstance();
         $defMsg = ERR_TRANS_CREATE;
 
@@ -254,7 +254,7 @@ class Transactions extends TemplateController
             $trAvailable = $acc_count > 1;
             $noDataMessage = MSG_TRANSFER_NOT_AVAILABLE;
         } elseif ($tr["type"] == DEBT) {
-            $trAvailable = is_array($visiblePersons) && count($visiblePersons) > 0;
+            $trAvailable = is_array($persons) && count($persons) > 0;
             $noDataMessage = MSG_DEBT_NOT_AVAILABLE;
         }
         $data["trAvailable"] = $trAvailable;
@@ -265,7 +265,7 @@ class Transactions extends TemplateController
         if (isset($_GET["acc_id"])) {
             $acc_id = intval($_GET["acc_id"]);
         }
-        // Redirect if invalid or hidden account is specified
+        // Redirect if invalid account is specified
         if ($acc_id) {
             $account = $this->accModel->getItem($acc_id);
             if (!$account || $account->owner_id != $this->owner_id) {
@@ -273,10 +273,8 @@ class Transactions extends TemplateController
             }
         }
         // Use first account if nothing is specified
-        if (!$acc_id) {
-            $acc_id = (is_array($visibleAccounts) && count($visibleAccounts) > 0)
-                ? $visibleAccounts[0]->id
-                : 0;
+        if (!$acc_id && count($userAccounts) > 0) {
+            $acc_id = $userAccounts[0]->id;
         }
         $data["acc_id"] = $acc_id;
 
@@ -291,10 +289,9 @@ class Transactions extends TemplateController
             if (!$pObj) {
                 $this->fail($defMsg);
             }
-        } else {
-            $person_id = (is_array($visiblePersons) && count($visiblePersons) > 0)
-                ? $visiblePersons[0]->id
-                : 0;
+        }
+        if (!$person_id && count($persons) > 0) {
+            $person_id = $persons[0]->id;
             $pObj = $this->personMod->getItem($person_id);
         }
 
@@ -341,9 +338,9 @@ class Transactions extends TemplateController
             $src_id = 0;
             $dest_id = 0;
             if ($tr["type"] == EXPENSE || $tr["type"] == TRANSFER) {
-                $src_id = ($acc_id ? $acc_id : $this->accModel->getIdByPos(0));
+                $src_id = ($acc_id ? $acc_id : $this->accModel->getAnother());
             } elseif ($tr["type"] == INCOME) {       // income
-                $dest_id = ($acc_id ? $acc_id : $this->accModel->getIdByPos(0));
+                $dest_id = ($acc_id ? $acc_id : $this->accModel->getAnother());
             }
 
             if ($tr["type"] == TRANSFER) {
@@ -659,7 +656,7 @@ class Transactions extends TemplateController
             $noAccount = is_null($debtAcc);
 
             if ($noAccount) {
-                $acc_id = $this->accModel->getIdByPos(0);
+                $acc_id = $this->accModel->getAnother();
                 $debtAcc = $this->accModel->getItem($acc_id);
                 if (!$debtAcc) {
                     throw new \Error("Account " . $acc_id . " not found");
@@ -676,7 +673,7 @@ class Transactions extends TemplateController
             $debtType = true;
             $noAccount = false;
 
-            $acc_id = $this->accModel->getIdByPos(0);
+            $acc_id = $this->accModel->getAnother();
             $debtAcc = $this->accModel->getItem($acc_id);
 
             $person_id = (is_array($visiblePersons) && count($visiblePersons) > 0)

@@ -547,10 +547,8 @@ class AccountModel extends CachedTable
     //   person - return accounts of specified person
     public function getData($params = null)
     {
-        $resArr = [];
-
         if (!$this->checkCache()) {
-            return $resArr;
+            return [];
         }
 
         if (!is_array($params)) {
@@ -561,6 +559,7 @@ class AccountModel extends CachedTable
         $requestedType = isset($params["type"]) ? $params["type"] : "visible";
         $includeVisible = in_array($requestedType, ["all", "visible"]);
         $includeHidden = in_array($requestedType, ["all", "hidden"]);
+        $sortByVisibility = (isset($params["sort"]) && $params["sort"] == "visibility");
         $person_id = (isset($params["person"])) ? intval($params["person"]) : 0;
         if ($person_id) {
             $includePersons = true;
@@ -579,6 +578,7 @@ class AccountModel extends CachedTable
             $itemsData = $this->cache;
         }
 
+        $res = [];
         foreach ($itemsData as $item) {
             if ($person_id && $item->owner_id != $person_id) {
                 continue;
@@ -593,10 +593,16 @@ class AccountModel extends CachedTable
 
             $accObj = new AccountItem($item);
 
-            $resArr[] = $accObj;
+            $res[] = $accObj;
         }
 
-        return $resArr;
+        if ($sortByVisibility) {
+            usort($res, function ($a, $b) {
+                return $a->flags - $b->flags;
+            });
+        }
+
+        return $res;
     }
 
 
@@ -695,11 +701,18 @@ class AccountModel extends CachedTable
     }
 
 
+    // Returns array of user accounts sorted by visibility
+    public function getUserAccounts()
+    {
+        return $this->getData(["type" => "all", "sort" => "visibility"]);
+    }
+
+
     // Try to find account of user different from specified
-    public function getAnother($acc_id = 0, $type = "all")
+    public function getAnother($acc_id = 0)
     {
         $acc_id = intval($acc_id);
-        $items = $this->getData(["type" => $type]);
+        $items = $this->getUserAccounts();
         foreach ($items as $item) {
             if ($item->id != $acc_id) {
                 return $item->id;
