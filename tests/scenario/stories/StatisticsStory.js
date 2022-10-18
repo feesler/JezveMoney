@@ -6,6 +6,7 @@ import {
     INCOME,
     TRANSFER,
     DEBT,
+    Transaction,
 } from '../../model/Transaction.js';
 import * as StatisticsTests from '../../run/statistics.js';
 
@@ -55,5 +56,36 @@ export class StatisticsStory extends TestStory {
             end: App.dates.now,
         });
         await StatisticsTests.clearDateRange();
+
+        await this.availability();
+    }
+
+    async availability() {
+        setBlock('Check initialization in case owner of first account is person', 2);
+
+        await App.scenario.resetData({
+            accounts: true,
+            persons: true,
+        });
+        await App.scenario.createPersons();
+
+        const { RUB, MARIA } = App.scenario;
+        const transaction = {
+            type: DEBT,
+            op: 1,
+            person_id: MARIA,
+            src_amount: '1050',
+            src_curr: RUB,
+        };
+        const extracted = Transaction.extract(transaction, App.state);
+        await api.transaction.create(extracted);
+        await App.state.fetch();
+
+        await App.scenario.createAccounts();
+
+        await App.goToMainView();
+        await App.view.navigateToStatistics();
+
+        await StatisticsTests.checkInitialState();
     }
 }

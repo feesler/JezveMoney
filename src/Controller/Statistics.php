@@ -19,13 +19,8 @@ class Statistics extends TemplateController
         $transMod = TransactionModel::getInstance();
         $accMod = AccountModel::getInstance();
         $currMod = CurrencyModel::getInstance();
-        $filterObj = null;
 
-        try {
-            $filterObj = $transMod->getHistogramFilters($_GET);
-        } catch (\Error $e) {
-            $this->fail($e->getMessage());
-        }
+        $filterObj = $transMod->getHistogramFilters($_GET);
 
         $byCurrency = ($filterObj->filter == "currency");
         $data["byCurrency"] = $byCurrency;

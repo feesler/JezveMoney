@@ -632,7 +632,7 @@ class AccountModel extends CachedTable
         $includeVisible = in_array($requestedType, ["all", "visible"]);
         $includeHidden = in_array($requestedType, ["all", "hidden"]);
 
-        foreach ($this->cache as $acc_id => $item) {
+        foreach ($this->cache as $item) {
             if (!$includePersons && $item->owner_id != self::$owner_id) {
                 continue;
             }
@@ -695,20 +695,13 @@ class AccountModel extends CachedTable
     }
 
 
-    // Try to find visible account different from specified
-    public function getAnother($acc_id)
+    // Try to find account of user different from specified
+    public function getAnother($acc_id = 0, $type = "all")
     {
         $acc_id = intval($acc_id);
-        if ($acc_id != 0 && $this->getCount(["type" => "visible"]) < 2) {
-            return 0;
-        }
-
-        foreach ($this->cache as $item) {
-            if (
-                $item->id != $acc_id &&
-                $item->owner_id == self::$owner_id &&
-                !$this->isHidden($item)
-            ) {
+        $items = $this->getData(["type" => $type]);
+        foreach ($items as $item) {
+            if ($item->id != $acc_id) {
                 return $item->id;
             }
         }

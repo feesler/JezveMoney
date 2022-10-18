@@ -1527,7 +1527,7 @@ class TransactionModel extends CachedTable
                     throw new \Error("Account not found");
                 }
             } else { // try to get first account of user
-                $acc_id = $accModel->getIdByPos(0);
+                $acc_id = $accModel->getAnother();
                 if (!$acc_id) {
                     throw new \Error("No accounts available");
                 }
