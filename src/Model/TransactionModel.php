@@ -11,11 +11,18 @@ use function JezveMoney\Core\inSetCondition;
 use function JezveMoney\Core\orJoin;
 use function JezveMoney\Core\qnull;
 
-const NO_GROUP = 0;
-const GROUP_BY_DAY = 1;
-const GROUP_BY_WEEK = 2;
-const GROUP_BY_MONTH = 3;
-const GROUP_BY_YEAR = 4;
+// Transaction types
+define("EXPENSE", 1);
+define("INCOME", 2);
+define("TRANSFER", 3);
+define("DEBT", 4);
+
+// Statistics group types
+define("NO_GROUP", 0);
+define("GROUP_BY_DAY", 1);
+define("GROUP_BY_WEEK", 2);
+define("GROUP_BY_MONTH", 3);
+define("GROUP_BY_YEAR", 4);
 
 
 class TransactionModel extends CachedTable

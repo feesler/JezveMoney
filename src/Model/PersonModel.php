@@ -10,6 +10,8 @@ use JezveMoney\App\Item\PersonItem;
 
 use function JezveMoney\Core\inSetCondition;
 
+define("PERSON_HIDDEN", 1);
+
 class PersonModel extends CachedTable
 {
     use Singleton;

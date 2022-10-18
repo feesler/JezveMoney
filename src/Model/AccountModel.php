@@ -10,6 +10,8 @@ use JezveMoney\App\Item\AccountItem;
 
 use function JezveMoney\Core\inSetCondition;
 
+define("ACCOUNT_HIDDEN", 1);
+
 class AccountModel extends CachedTable
 {
     use Singleton;

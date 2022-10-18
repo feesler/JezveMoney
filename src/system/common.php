@@ -1,14 +1,5 @@
 <?php
 
-define("EXPENSE", 1);
-define("INCOME", 2);
-define("TRANSFER", 3);
-define("DEBT", 4);
-
-define("ACCOUNT_HIDDEN", 1);
-
-define("PERSON_HIDDEN", 1);
-
 define("WHITE_THEME", 0);
 define("DARK_THEME", 1);
 
