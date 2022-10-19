@@ -236,6 +236,15 @@ export class TransactionTypeMenu extends Component {
             url.searchParams.delete(paramName);
         }
 
+        if (item.type !== DEBT && !state.multiple) {
+            const accountId = url.searchParams.get('acc_id');
+            if (accountId === '0') {
+                url.searchParams.delete('acc_id');
+            }
+
+            url.searchParams.delete('person_id');
+        }
+
         return url;
     }
 

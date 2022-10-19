@@ -200,10 +200,15 @@ class Transactions extends TemplateController
     protected function getTypeMenu($baseUrl, $selectedType, $params = [])
     {
         $trTypes = TransactionModel::getTypeNames();
+        $acc_id = (is_array($params) && isset($params["acc_id"])) ? intval($params["acc_id"]) : 0;
+
         $res = [];
         foreach ($trTypes as $type_id => $trTypeName) {
             $urlParams = $params;
             $urlParams["type"] = strtolower($trTypeName);
+            if ($type_id != DEBT && $acc_id == 0) {
+                unset($urlParams["acc_id"]);
+            }
 
             $menuItem = new \stdClass();
             $menuItem->type = $type_id;
@@ -263,10 +268,8 @@ class Transactions extends TemplateController
         $data["noAccountsMessage"] = MSG_DEBT_ACCOUNT_NOT_AVAILABLE;
 
         // Check specified account
-        $acc_id = 0;
-        if (isset($_GET["acc_id"])) {
-            $acc_id = intval($_GET["acc_id"]);
-        }
+        $accountRequested = isset($_GET["acc_id"]);
+        $acc_id = ($accountRequested) ? intval($_GET["acc_id"]) : 0;
         // Redirect if invalid account is specified
         if ($acc_id) {
             $account = $this->accModel->getItem($acc_id);
@@ -275,10 +278,9 @@ class Transactions extends TemplateController
             }
         }
         // Use first account if nothing is specified
-        if (!$acc_id && $acc_count > 0) {
+        if (!$acc_id && $acc_count > 0 && !$accountRequested) {
             $acc_id = $userAccounts[0]->id;
         }
-        $data["acc_id"] = $acc_id;
 
         // Check person parameter
         $person_id = 0;
@@ -298,7 +300,7 @@ class Transactions extends TemplateController
         }
 
         $debtType = true;
-        $noAccount = $acc_id == 0;
+        $noAccount = ($acc_id == 0);
         $debtAcc = $this->accModel->getItem($acc_id);
 
         // Prepare person account
@@ -400,10 +402,7 @@ class Transactions extends TemplateController
         $data["dest"] = $dest;
 
         // Prepare transaction types menu
-        $menuParams = [];
-        if ($acc_id != 0) {
-            $menuParams["acc_id"] = $acc_id;
-        }
+        $menuParams = ["acc_id" => $acc_id];
         $baseUrl = BASEURL . "transactions/create/";
         $data["transMenu"] = $this->getTypeMenu($baseUrl, $tr["type"], $menuParams);
 

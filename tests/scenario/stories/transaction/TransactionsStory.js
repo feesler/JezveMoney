@@ -52,6 +52,7 @@ export class TransactionsStory extends TestStory {
         await this.del();
         await this.deleteFromUpdate();
         await this.createFromPersonAccount();
+        await this.noAccountURL();
         await this.availability(false);
         await this.availability(true);
     }
@@ -565,6 +566,12 @@ export class TransactionsStory extends TestStory {
             { type: DEBT, accountId: personAccount.id },
         ];
         await App.scenario.runner.runGroup(TransactionTests.createFromPersonAccount, data);
+    }
+
+    async noAccountURL() {
+        setBlock('Handling URL parameters', 1);
+
+        await TransactionTests.checkDebtNoAccountURL();
     }
 
     async availability(directNavigate) {

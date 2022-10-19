@@ -918,11 +918,8 @@ class TransactionView extends View {
                 url.searchParams.set('acc_id', transaction.dest_id);
             } else if (transaction.type === DEBT) {
                 url.searchParams.set('person_id', state.person.id);
-                if (transaction.noAccount) {
-                    url.searchParams.delete('acc_id');
-                } else {
-                    url.searchParams.set('acc_id', state.account.id);
-                }
+                const accountId = (transaction.noAccount) ? 0 : state.account.id;
+                url.searchParams.set('acc_id', accountId);
             }
         }
 
