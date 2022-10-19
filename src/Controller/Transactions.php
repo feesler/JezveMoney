@@ -135,7 +135,7 @@ class Transactions extends TemplateController
             "currency" => $this->currModel->getData(),
             "view" => [
                 "transArr" => $trItems,
-                "filterObj" => (object)$filterObj,
+                "filter" => (object)$filterObj,
                 "pagination" => $pagination,
                 "mode" => $showDetails ? "details" : "classic",
             ],

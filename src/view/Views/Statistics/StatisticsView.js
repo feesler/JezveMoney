@@ -253,7 +253,7 @@ class StatisticsView extends View {
             });
             this.datePickerWrapper.append(this.datePicker.elem);
 
-            this.datePicker.setSelection(this.state.form.stdate, this.state.form.enddate);
+            this.setDatePickerSelection();
         }
 
         this.datePicker.show(!this.datePicker.visible());
@@ -430,6 +430,20 @@ class StatisticsView extends View {
         return ce('ul', { className: POPUP_LIST_CLASS }, elems);
     }
 
+    setDatePickerSelection(state = this.state) {
+        if (!this.datePicker) {
+            return;
+        }
+
+        const { stdate, enddate } = state.form;
+        const isDateFilter = !!(stdate && enddate);
+        if (isDateFilter) {
+            this.datePicker.setSelection(stdate, enddate);
+        } else {
+            this.datePicker.clearSelection();
+        }
+    }
+
     renderFilters(state, prevState = {}) {
         if (state.form === prevState.form) {
             return;
@@ -468,7 +482,7 @@ class StatisticsView extends View {
         this.dateInput.value = dateRangeFmt;
         show(this.noDateBtn, isDateFilter);
 
-        this.datePicker?.setSelection(state.form.stdate, state.form.enddate);
+        this.setDatePickerSelection(state);
     }
 
     renderHistogram(state, prevState = {}) {
