@@ -21,6 +21,7 @@ import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/Transa
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import '../../Components/TransactionTypeMenu/style.scss';
 import './style.scss';
+import { LinkMenu } from '../../Components/LinkMenu/LinkMenu.js';
 
 /** CSS classes */
 const POPUP_LIST_CLASS = 'chart-popup-list';
@@ -93,10 +94,9 @@ class StatisticsView extends View {
             onChange: (sel) => this.onChangeTypeFilter(sel),
         });
 
-        this.filterTypeDropDown = DropDown.create({
-            elem: 'filter_type',
-            onitemselect: (obj) => this.onFilterSel(obj),
-            className: 'dd_fullwidth',
+        this.reportMenu = LinkMenu.fromElement(ge('report_menu'), {
+            itemParam: 'report',
+            onChange: (value) => this.onSelectReportType(value),
         });
 
         this.accountField = ge('acc_block');
@@ -192,12 +192,12 @@ class StatisticsView extends View {
 
         this.setState({
             ...this.state,
-            filter: {
-                ...this.state.filter,
+            form: {
+                ...this.state.form,
                 type: selected,
             },
         });
-        this.requestData(this.state.filter);
+        this.requestData(this.state.form);
     }
 
     /**
@@ -280,22 +280,21 @@ class StatisticsView extends View {
     }
 
     /**
-     * Filter type select callback
-     * @param {object} obj - selected filter type item
+     * Report type select callback
+     * @param {string} value - selected report type
      */
-    onFilterSel(obj) {
-        if (!obj) {
+    onSelectReportType(value) {
+        if (!value) {
             return;
         }
 
         const form = { ...this.state.form };
-        const filterType = (parseInt(obj.id, 10) === 1) ? 'currency' : null;
-        if (filterType) {
-            form.filter = filterType;
-        } else if ('filter' in form) {
-            delete form.filter;
+        if (value) {
+            form.report = value;
+        } else if ('report' in form) {
+            delete form.report;
         }
-        if (form.filter === this.state.form.filter) {
+        if (form.report === this.state.form.report) {
             return;
         }
 
@@ -372,7 +371,7 @@ class StatisticsView extends View {
 
         this.setState({ ...this.state, form });
 
-        this.requestData(this.state.filter);
+        this.requestData(this.state.form);
     }
 
     replaceHistory(state = this.state) {
@@ -445,8 +444,8 @@ class StatisticsView extends View {
         this.typeMenu.setURL(filterUrl);
         this.typeMenu.setSelection(state.form.type);
 
-        const isByCurrency = (state.form.filter === 'currency');
-        this.filterTypeDropDown.selectItem((isByCurrency) ? 1 : 0);
+        const isByCurrency = (state.form.report === 'currency');
+        this.reportMenu.setActive(state.form.report);
 
         show(this.accountField, !isByCurrency);
         show(this.currencyField, isByCurrency);

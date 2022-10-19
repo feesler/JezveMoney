@@ -41,16 +41,20 @@ include(TPL_PATH . "Header.tpl");	?>
                             </div>
 
                             <div class="filter-item std_margin">
-                                <h3 class="filter-item__title">Filter by</h3>
-                                <select id="filter_type">
-<?php	foreach($byCurrArr as $ind => $byCurrItem) {	?>
-<?php		if ($byCurrItem["selected"]) {		?>
-                                    <option value="<?=e($ind)?>" selected><?=e($byCurrItem["title"])?></option>
+                                <h3 class="filter-item__title">Report type</h3>
+                                <div id="report_menu" class="link-menu">
+<?php	foreach($reportMenu as $item) {	    ?>
+<?php		if ($item["selected"]) {		?>
+                                    <b class="link-menu-item link-menu-item_active" data-value="<?=e($item["value"])?>">
+                                        <span class="link-menu-item__title"><?=e($item["title"])?></span>
+                                    </b>
 <?php		} else {	?>
-                                    <option value="<?=e($ind)?>"><?=e($byCurrItem["title"])?></option>
+                                    <a class="link-menu-item" href="<?=e($item["url"])?>" data-value="<?=e($item["value"])?>">
+                                        <span class="link-menu-item__title"><?=e($item["title"])?></span>
+                                    </a>
 <?php		}	?>
 <?php	}	?>
-                                </select>
+                                </div>
                             </div>
 
                             <div id="acc_block" class="filter-item std_margin"<?=hidden($byCurrency)?>>

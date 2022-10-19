@@ -16,11 +16,11 @@ export const filterByType = async (type) => {
 };
 
 export const byAccounts = async () => {
-    await test('Filter by accounts', () => App.view.byAccounts());
+    await test('Show report by accounts', () => App.view.byAccounts());
 };
 
 export const byCurrencies = async () => {
-    await test('Filter by currencies', () => App.view.byCurrencies());
+    await test('Show report by currencies', () => App.view.byCurrencies());
 };
 
 export const selectAccountByPos = async (pos) => {

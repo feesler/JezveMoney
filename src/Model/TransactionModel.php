@@ -1495,9 +1495,9 @@ class TransactionModel extends CachedTable
 
         $res = new \stdClass();
 
-        // Filter type
-        $byCurrency = (isset($request["filter"]) && $request["filter"] == "currency");
-        $res->filter = $byCurrency ? "currency" : "account";
+        // Report type
+        $byCurrency = (isset($request["report"]) && $request["report"] == "currency");
+        $res->report = $byCurrency ? "currency" : "account";
 
         // Transaction type
         $trans_type = (isset($request["type"])) ? $request["type"] : EXPENSE;
@@ -1570,7 +1570,7 @@ class TransactionModel extends CachedTable
             $params = [];
         }
 
-        $byCurrency = (isset($params["filter"]) && $params["filter"] == "currency");
+        $byCurrency = (isset($params["report"]) && $params["report"] == "currency");
         if ($byCurrency) {
             if (!isset($params["curr_id"])) {
                 return null;

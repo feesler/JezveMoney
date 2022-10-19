@@ -493,13 +493,13 @@ const statistics = async () => {
 
     const data = [
         {},
-        { filter: 'account', acc_id: App.scenario.ACC_RUB },
-        { filter: 'account', acc_id: App.scenario.ACC_RUB, type: INCOME },
-        { filter: 'currency', curr_id: RUB },
-        { filter: 'currency', curr_id: RUB, group: 'day' },
-        { filter: 'currency', curr_id: RUB, group: 'week' },
+        { report: 'account', acc_id: App.scenario.ACC_RUB },
+        { report: 'account', acc_id: App.scenario.ACC_RUB, type: INCOME },
+        { report: 'currency', curr_id: RUB },
+        { report: 'currency', curr_id: RUB, group: 'day' },
+        { report: 'currency', curr_id: RUB, group: 'week' },
         {
-            filter: 'currency',
+            report: 'currency',
             curr_id: RUB,
             group: 'week',
             stdate: App.dates.monthAgo,

@@ -13,6 +13,7 @@ import { DatePickerFilter } from './component/DatePickerFilter.js';
 import { TransactionTypeMenu } from './component/TransactionTypeMenu.js';
 import { App } from '../Application.js';
 import { fixDate } from '../common.js';
+import { LinkMenu } from './component/LinkMenu.js';
 
 const NO_GROUP = 0;
 const GROUP_BY_DAY = 1;
@@ -34,7 +35,7 @@ export class StatisticsView extends AppView {
         res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
         res.title = await prop(res.titleEl, 'textContent');
 
-        res.filterByDropDown = await DropDown.createFromChild(this, await query('#filter_type'));
+        res.reportMenu = await LinkMenu.create(this, await query('#report_menu'));
 
         res.accountsDropDown = null;
         const accountsFilter = await query('#acc_block');
@@ -79,10 +80,10 @@ export class StatisticsView extends AppView {
     async buildModel(cont) {
         const res = {};
 
-        const selectedFilter = cont.filterByDropDown.content.textValue;
+        const selectedReport = cont.reportMenu.value;
         res.filter = {
             type: cont.typeMenu.getSelectedTypes(),
-            byCurrency: selectedFilter === 'Currencies',
+            byCurrency: selectedReport === 'currency',
         };
         const dateRange = cont.dateFilter.getSelectedRange();
         if (dateRange && dateRange.startDate && dateRange.endDate) {
@@ -138,9 +139,9 @@ export class StatisticsView extends AppView {
 
         const res = {
             typeMenu: { selectedTypes: this.model.filter.type },
-            filterByDropDown: {
+            reportMenu: {
                 visible: true,
-                textValue: (byCurrency) ? 'Currencies' : 'Accounts',
+                value: (byCurrency) ? 'currency' : 'account',
             },
             dateFilter: {},
             noDataMessage: {},
@@ -164,7 +165,7 @@ export class StatisticsView extends AppView {
         // Prepare expected histogram data
         const params = {
             type: this.model.filter.type,
-            filter: (byCurrency) ? 'currency' : 'account',
+            report: (byCurrency) ? 'currency' : 'account',
             group: this.getGroupTypeString(this.model.filter.group),
         };
         if (byCurrency) {
@@ -248,7 +249,7 @@ export class StatisticsView extends AppView {
         this.model.filter.acc_id = account.id;
         const expected = this.getExpectedState();
 
-        await this.waitForData(() => this.content.filterByDropDown.setSelection(0));
+        await this.waitForData(() => this.content.reportMenu.selectItemByValue('account'));
 
         return App.view.checkState(expected);
     }
@@ -261,7 +262,7 @@ export class StatisticsView extends AppView {
         this.model.filter.curr_id = currency.id;
         const expected = this.getExpectedState();
 
-        await this.waitForData(() => this.content.filterByDropDown.setSelection(1));
+        await this.waitForData(() => this.content.reportMenu.selectItemByValue('currency'));
 
         return App.view.checkState(expected);
     }

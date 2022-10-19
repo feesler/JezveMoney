@@ -104,7 +104,7 @@ class Main extends TemplateController
         }
 
         $data["statArr"] = $transMod->getHistogramSeries([
-            "filter" => "currency",
+            "report" => "currency",
             "curr_id" => $currencyId,
             "type" => EXPENSE,
             "group" => GROUP_BY_WEEK,

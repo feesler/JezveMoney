@@ -22,12 +22,12 @@ class Statistics extends TemplateController
 
         $filterObj = $transMod->getHistogramFilters($_GET);
 
-        $byCurrency = ($filterObj->filter == "currency");
+        $byCurrency = ($filterObj->report == "currency");
         $data["byCurrency"] = $byCurrency;
 
-        $data["byCurrArr"] = [
-            ["title" => "Accounts", "selected" => ($byCurrency == false)],
-            ["title" => "Currencies", "selected" => ($byCurrency == true)]
+        $reportTypes = [
+            ["title" => "Accounts", "value" => "account"],
+            ["title" => "Currencies", "value" => "currency"]
         ];
 
         $dateFmt = "";
@@ -54,7 +54,7 @@ class Statistics extends TemplateController
 
         $urlParams = [];
         if ($byCurrency) {
-            $urlParams["filter"] = "currency";
+            $urlParams["report"] = "currency";
             if (isset($filterObj->curr_id)) {
                 $urlParams["curr_id"] = $filterObj->curr_id;
             }
@@ -71,8 +71,26 @@ class Statistics extends TemplateController
             $urlParams["enddate"] = $filterObj->enddate;
         }
 
-        $transMenu = [];
         $baseUrl = BASEURL . "statistics/";
+
+        $reportMenu = [];
+        $selectedReport = ($byCurrency) ? "currency" : "account";
+        foreach ($reportTypes as $type) {
+            $searchParams = $urlParams;
+            $searchParams["report"] = $type["value"];
+
+            $item = [
+                "title" => $type["title"],
+                "value" => $type["value"],
+                "selected" => ($type["value"] == $selectedReport),
+                "url" => urlJoin($baseUrl, $searchParams)
+            ];
+
+            $reportMenu[] = $item;
+        }
+        $data["reportMenu"] = $reportMenu;
+
+        $transMenu = [];
         foreach ($trTypes as $type_id => $trTypeName) {
             $searchParams = $urlParams;
             if ($type_id) {

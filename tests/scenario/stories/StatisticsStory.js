@@ -41,7 +41,7 @@ export class StatisticsStory extends TestStory {
         await StatisticsTests.groupByWeek();
         await StatisticsTests.groupByMonth();
         await StatisticsTests.groupByYear();
-        // Filter by currencies
+        // Show report by currencies
         await StatisticsTests.byCurrencies();
         // Change transaction type when currencies filter is selected
         await StatisticsTests.filterByType(EXPENSE);
