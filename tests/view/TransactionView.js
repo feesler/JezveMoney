@@ -77,21 +77,20 @@ export class TransactionView extends AppView {
         const debtOperationInp = await query('#debtOperation');
         res.debtOperation = parseInt(await prop(debtOperationInp, 'value'), 10);
 
-        res.account = await TileBlock.create(this, await query('#debtaccount'));
-        if (res.account) {
-            const accountIdInp = await query('#acc_id');
-            res.account.content.id = parseInt(await prop(accountIdInp, 'value'), 10);
-        }
+        const accountBlock = await query('#debtaccount');
+        res.account = await TileBlock.create(this, accountBlock);
+        const accountIdInp = await query('#acc_id');
+        res.account.content.id = parseInt(await prop(accountIdInp, 'value'), 10);
 
-        res.selaccount = await Button.create(this, await query('#selaccount'));
+        res.selaccount = await Button.create(this, await query(accountBlock, '.account-toggler'));
         assert(res.selaccount, 'Select account button not found');
 
         res.swapBtn = { elem: await query('#swapBtn') };
         assert(res.swapBtn.elem, 'Swap button not found');
 
-        res.noacc_btn = { elem: await query('#noacc_btn') };
+        res.noacc_btn = { elem: await query(accountBlock, '.close-btn') };
         assert(res.noacc_btn.elem, 'Disable account button not found');
-        res.noAccountsMsg = { elem: await query('#noaccountsmsg') };
+        res.noAccountsMsg = { elem: await query(accountBlock, '.nodata-message') };
         assert(res.noAccountsMsg.elem, 'No accounts message element not found');
 
         res.source = await TileBlock.create(this, await query('#source'));

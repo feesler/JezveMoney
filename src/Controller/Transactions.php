@@ -223,6 +223,109 @@ class Transactions extends TemplateController
     }
 
 
+    protected function getContainersData($data)
+    {
+        $trAvailable = $data["trAvailable"];
+        $tr = $data["tr"];
+        $debtType = $data["debtType"];
+        $noAccount = $data["noAccount"];
+        $acc_count = $data["acc_count"];
+
+        $personContainer = [
+            "id" => "person",
+            "hidden" => (!$trAvailable || $tr["type"] != DEBT),
+            "inputId" => "person_id",
+            "inputValue" => $data["person_id"],
+            "title" => "Person",
+            "tile" => $data["personTile"],
+            "infoItems" => [],
+        ];
+
+        if ($noAccount) {
+            $debtAccountLabel = "No account";
+        } else {
+            $debtAccountLabel = ($debtType) ? "Destination account" : "Source account";
+        }
+        $debtAccountContainer = [
+            "id" => "debtaccount",
+            "hidden" => (!$trAvailable || $tr["type"] != DEBT),
+            "inputId" => "acc_id",
+            "inputValue" => $data["acc_id"],
+            "title" => $debtAccountLabel,
+            "baseHidden" => $noAccount,
+            "closeButton" => $noAccount,
+            "accountToggler" => (!$noAccount || !$acc_count),
+            "noAccountsMsg" => MSG_DEBT_ACCOUNT_NOT_AVAILABLE,
+            "noAccountsMsgHidden" => ($acc_count > 0),
+            "tile" => $data["debtAccountTile"],
+            "infoItems" => [],
+        ];
+
+        $debtSrcContainer = ($debtType) ? $personContainer : $debtAccountContainer;
+        $debtDestContainer = ($debtType) ? $debtAccountContainer : $personContainer;
+
+        if ($tr["type"] == DEBT) {
+            $debtSrcContainer["infoItems"][] = $data["srcAmountInfo"];
+            $debtSrcContainer["infoItems"][] = $data["exchangeInfo"];
+            $debtSrcContainer["infoItems"][] = $data["srcResultInfo"];
+
+            $debtDestContainer["infoItems"][] = $data["destAmountInfo"];
+            $debtDestContainer["infoItems"][] = $data["destResultInfo"];
+        }
+
+        $data["debtSrcContainer"] = $debtSrcContainer;
+        $data["debtDestContainer"] = $debtDestContainer;
+
+        $sourceContainer = [
+            "id" => "source",
+            "hidden" => (!$trAvailable || $tr["type"] == INCOME || $tr["type"] == DEBT),
+            "inputId" => "src_id",
+            "inputValue" => $tr["src_id"],
+            "title" => "Source account",
+            "tile" => $data["srcAccountTile"],
+            "infoItems" => [],
+        ];
+        if ($tr["type"] == TRANSFER) {
+            $sourceContainer["infoItems"][] = $data["srcAmountInfo"];
+        }
+        if ($tr["type"] == EXPENSE) {
+            $sourceContainer["infoItems"][] = $data["destAmountInfo"];
+        }
+        if ($tr["type"] != DEBT) {
+            $sourceContainer["infoItems"][] = $data["srcResultInfo"];
+        }
+        if ($tr["type"] == EXPENSE || $tr["type"] == TRANSFER) {
+            $sourceContainer["infoItems"][] = $data["exchangeInfo"];
+        }
+        $data["sourceContainer"] = $sourceContainer;
+
+        $destContainer = [
+            "id" => "destination",
+            "hidden" => (!$trAvailable || $tr["type"] == EXPENSE || $tr["type"] == DEBT),
+            "inputId" => "dest_id",
+            "inputValue" => $tr["dest_id"],
+            "title" => "Destination account",
+            "tile" => $data["destAccountTile"],
+            "infoItems" => [],
+        ];
+        if ($tr["type"] == EXPENSE || $tr["type"] == INCOME) {
+            $destContainer["infoItems"][] = $data["srcAmountInfo"];
+        }
+        if ($tr["type"] == INCOME || $tr["type"] == TRANSFER) {
+            $destContainer["infoItems"][] = $data["destAmountInfo"];
+        }
+        if ($tr["type"] != DEBT) {
+            $destContainer["infoItems"][] = $data["destResultInfo"];
+        }
+        if ($tr["type"] == INCOME) {
+            $destContainer["infoItems"][] = $data["exchangeInfo"];
+        }
+        $data["destContainer"] = $destContainer;
+
+        return $data;
+    }
+
+
     public function create()
     {
         if ($this->isPOST()) {
@@ -265,7 +368,6 @@ class Transactions extends TemplateController
         }
         $data["trAvailable"] = $trAvailable;
         $data["notAvailMessage"] = $notAvailMessage;
-        $data["noAccountsMessage"] = MSG_DEBT_ACCOUNT_NOT_AVAILABLE;
 
         // Check specified account
         $accountRequested = isset($_GET["acc_id"]);
@@ -463,12 +565,6 @@ class Transactions extends TemplateController
         $data["srcAmountLbl"] = ($showBothAmounts) ? "Source amount" : "Amount";
         $data["destAmountLbl"] = ($showBothAmounts) ? "Destination amount" : "Amount";
 
-        if ($noAccount) {
-            $data["accLbl"] = "No account";
-        } else {
-            $data["accLbl"] = ($debtType) ? "Destination account" : "Source account";
-        }
-
         $currObj = $this->currModel->getItem($tr["src_curr"]);
         $srcAmountSign = $currObj ? $currObj->sign : null;
         $form["srcCurrSign"] = $srcAmountSign;
@@ -479,6 +575,7 @@ class Transactions extends TemplateController
 
         $form["exchSign"] = $destAmountSign . "/" . $srcAmountSign;
         $form["exchange"] = 1;
+        $rtExchange = $form["exchange"] . " " . $form["exchSign"];
 
         if ($tr["type"] != DEBT) {
             $srcResBalance = ($src) ? $src->balance : 0;
@@ -527,9 +624,11 @@ class Transactions extends TemplateController
         $data["exchangeInfo"] = [
             "id" => "exch_left",
             "title" => "Exchange rate",
-            "value" => $form["exchange"] . " " . $form["exchSign"],
-            "hidden" => ($tr["src_curr"] == $tr["dest_curr"])
+            "value" => $rtExchange,
+            "hidden" => !$isDiffCurr
         ];
+
+        $data = $this->getContainersData($data);
 
         $data["dateFmt"] = date("d.m.Y");
 
@@ -590,11 +689,11 @@ class Transactions extends TemplateController
         // check type change request
         $requestedType = $this->getRequestedType($_GET, $tr["type"]);
 
-        $data["acc_count"] = $this->accModel->getCount(["type" => "all"]);
+        $userAccounts = $this->accModel->getUserAccounts();
+        $data["acc_count"] = count($userAccounts);
 
         $notAvailMessage = null;
         $data["notAvailMessage"] = $notAvailMessage;
-        $data["noAccountsMessage"] = MSG_DEBT_ACCOUNT_NOT_AVAILABLE;
         $trAvailable = true;
         $data["trAvailable"] = $trAvailable;
 
@@ -725,12 +824,6 @@ class Transactions extends TemplateController
         $data["srcAmountLbl"] = ($showBothAmounts) ? "Source amount" : "Amount";
         $data["destAmountLbl"] = ($showBothAmounts) ? "Destination amount" : "Amount";
 
-        if ($noAccount) {
-            $data["accLbl"] = "No account";
-        } else {
-            $data["accLbl"] = ($debtType) ? "Destination account" : "Source account";
-        }
-
         if ($tr["type"] == DEBT && $debtAcc) {
             $balanceDiff = 0;
             if (!$noAccount) {
@@ -811,6 +904,8 @@ class Transactions extends TemplateController
             "value" => $rtExchange,
             "hidden" => !$isDiffCurr
         ];
+
+        $data = $this->getContainersData($data);
 
         $data["dateFmt"] = date("d.m.Y", $tr["date"]);
 

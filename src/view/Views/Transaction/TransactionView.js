@@ -368,14 +368,14 @@ class TransactionView extends View {
         this.debtAccountInp = ge('acc_id');
         this.debtAccountTile = AccountTile.fromElement({ elem: 'acc_tile', parent: this });
 
-        this.noAccountBtn = ge('noacc_btn');
+        this.noAccountBtn = this.debtAccountContainer.querySelector('.tile_header .close-btn');
         setEvents(this.noAccountBtn, { click: () => this.toggleEnableAccount() });
 
-        this.selectAccountBtn = ge('selaccount');
+        this.selectAccountBtn = this.debtAccountContainer.querySelector('.account-toggler');
         this.accountToggleBtn = this.selectAccountBtn?.querySelector('button');
         setEvents(this.accountToggleBtn, { click: () => this.toggleEnableAccount() });
 
-        this.debtAccountLabel = ge('acclbl');
+        this.debtAccountLabel = this.debtAccountContainer.querySelector('.tile_header label');
 
         this.personTile = Tile.fromElement({ elem: 'person_tile', parent: this });
 
