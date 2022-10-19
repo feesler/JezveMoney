@@ -13,7 +13,7 @@ import {
     IMPORT_ACTION_SET_TR_TYPE,
     ImportAction,
 } from '../../../../js/model/ImportAction.js';
-import { ImportCondition, IMPORT_COND_OP_EQUAL } from '../../../../js/model/ImportCondition.js';
+import { ImportCondition } from '../../../../js/model/ImportCondition.js';
 import { ImportConditionForm } from '../ConditionForm/ImportConditionForm.js';
 import { ImportActionForm } from '../ActionForm/ImportActionForm.js';
 import './style.scss';

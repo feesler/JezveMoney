@@ -1,4 +1,4 @@
-import { copyObject, assert } from 'jezve-test';
+import { assert } from 'jezve-test';
 import { App } from '../Application.js';
 
 /** Types of transactions */
@@ -67,22 +67,24 @@ export class Transaction {
     }
 
     static expense(params, state) {
-        assert(params.src_id, 'Source account not specified');
+        const res = {
+            ...params,
+            type: EXPENSE,
+        };
 
-        const res = copyObject(params);
-
-        res.type = EXPENSE;
-        res.dest_id = 0;
-
-        if (!res.dest_amount) {
+        if (!('dest_id' in res)) {
+            res.dest_id = 0;
+        }
+        if (!('dest_amount' in res)) {
             res.dest_amount = res.src_amount;
         }
 
         const acc = state.accounts.getItem(res.src_id);
-        assert(acc, 'Account not found');
-        res.src_curr = acc.curr_id;
+        if (acc) {
+            res.src_curr = acc.curr_id;
+        }
 
-        if (!res.dest_curr) {
+        if (!('dest_curr' in res)) {
             res.dest_curr = res.src_curr;
         }
 
@@ -90,22 +92,24 @@ export class Transaction {
     }
 
     static income(params, state) {
-        assert(params.dest_id, 'Destination account not specified');
+        const res = {
+            ...params,
+            type: INCOME,
+        };
 
-        const res = copyObject(params);
-
-        res.type = INCOME;
-        res.src_id = 0;
-
-        if (!res.src_amount) {
+        if (!('src_id' in res)) {
+            res.src_id = 0;
+        }
+        if (!('src_amount' in res)) {
             res.src_amount = res.dest_amount;
         }
 
         const acc = state.accounts.getItem(res.dest_id);
-        assert(acc, 'Account not found');
-        res.dest_curr = acc.curr_id;
+        if (acc) {
+            res.dest_curr = acc.curr_id;
+        }
 
-        if (!res.src_curr) {
+        if (!('src_curr' in res)) {
             res.src_curr = res.dest_curr;
         }
 
@@ -113,26 +117,26 @@ export class Transaction {
     }
 
     static transfer(params, state) {
-        assert(params.src_id, 'Source account not specified');
-        assert(params.dest_id, 'Destination account not specified');
+        const res = {
+            ...params,
+            type: TRANSFER,
+        };
 
-        const res = copyObject(params);
-
-        res.type = TRANSFER;
-
-        if (!res.dest_amount) {
+        if (!('dest_amount' in res)) {
             res.dest_amount = res.src_amount;
         }
 
         const srcAcc = state.accounts.getItem(res.src_id);
-        assert(srcAcc, 'Account not found');
-        res.src_curr = srcAcc.curr_id;
+        if (srcAcc) {
+            res.src_curr = srcAcc.curr_id;
+        }
 
         const destAcc = state.accounts.getItem(res.dest_id);
-        assert(destAcc, 'Account not found');
-        res.dest_curr = destAcc.curr_id;
+        if (destAcc) {
+            res.dest_curr = destAcc.curr_id;
+        }
 
-        if (!res.src_curr) {
+        if (!('src_curr' in res)) {
             res.src_curr = res.dest_curr;
         }
 
@@ -140,13 +144,12 @@ export class Transaction {
     }
 
     static debt(params, state) {
-        assert(params.person_id, 'Person not specified');
+        const res = {
+            ...params,
+            type: DEBT,
+        };
 
-        const res = copyObject(params);
-
-        res.type = DEBT;
-
-        if (!res.dest_amount) {
+        if (!('dest_amount' in res)) {
             res.dest_amount = res.src_amount;
         }
 

@@ -77,20 +77,21 @@ export class TransactionView extends AppView {
         const debtOperationInp = await query('#debtOperation');
         res.debtOperation = parseInt(await prop(debtOperationInp, 'value'), 10);
 
-        res.account = await TileBlock.create(this, await query('#debtaccount'));
-        if (res.account) {
-            const accountIdInp = await query('#acc_id');
-            res.account.content.id = parseInt(await prop(accountIdInp, 'value'), 10);
-        }
+        const accountBlock = await query('#debtaccount');
+        res.account = await TileBlock.create(this, accountBlock);
+        const accountIdInp = await query('#acc_id');
+        res.account.content.id = parseInt(await prop(accountIdInp, 'value'), 10);
 
-        res.selaccount = await Button.create(this, await query('#selaccount'));
+        res.selaccount = await Button.create(this, await query(accountBlock, '.account-toggler'));
         assert(res.selaccount, 'Select account button not found');
 
         res.swapBtn = { elem: await query('#swapBtn') };
         assert(res.swapBtn.elem, 'Swap button not found');
 
-        res.noacc_btn = { elem: await query('#noacc_btn') };
+        res.noacc_btn = { elem: await query(accountBlock, '.close-btn') };
         assert(res.noacc_btn.elem, 'Disable account button not found');
+        res.noAccountsMsg = { elem: await query(accountBlock, '.nodata-message') };
+        assert(res.noAccountsMsg.elem, 'No accounts message element not found');
 
         res.source = await TileBlock.create(this, await query('#source'));
         if (res.source) {
@@ -281,7 +282,7 @@ export class TransactionView extends AppView {
             res.personAccount = this.getPersonAccount(res.person?.id, personAccountCurr);
 
             const isSelectAccountVisible = cont.selaccount?.content?.visible;
-            res.noAccount = isSelectAccountVisible;
+            res.noAccount = isSelectAccountVisible || cont.noAccountsMsg.visible;
 
             res.account = App.state.accounts.getItem(cont.account.content.id);
             if (res.isAvailable && !res.noAccount) {
@@ -360,13 +361,13 @@ export class TransactionView extends AppView {
 
     isValid() {
         if (this.content.src_amount_row?.content?.visible) {
-            if (!this.model.srcAmount.length || !isValidValue(this.model.srcAmount)) {
+            if (this.model.fSrcAmount <= 0) {
                 return false;
             }
         }
 
         if (this.content.dest_amount_row?.content?.visible) {
-            if (!this.model.destAmount.length || !isValidValue(this.model.destAmount)) {
+            if (this.model.fDestAmount <= 0) {
                 return false;
             }
         }
@@ -802,25 +803,30 @@ export class TransactionView extends AppView {
         if (this.model.type === DEBT) {
             assert(newState >= -1 && newState <= 9, 'Invalid state specified');
 
-            res.selaccount = { visible: this.model.isAvailable && this.model.noAccount };
-            res.noacc_btn = { visible: this.model.isAvailable && !this.model.noAccount };
+            const { isAvailable, debtType, noAccount } = this.model;
+            const userAccounts = App.state.getUserAccounts();
+            const accountsAvailable = userAccounts.length > 0;
+
+            res.selaccount = { visible: isAvailable && noAccount && accountsAvailable };
+            res.noacc_btn = { visible: isAvailable && !noAccount };
+            res.noAccountsMsg = { visible: isAvailable && !accountsAvailable };
             res.dest_amount_row.visible = false;
             res.dest_amount_left.visible = false;
             res.exchange_row.visible = false;
             res.exch_left.visible = false;
 
-            if (this.model.isAvailable) {
+            if (isAvailable) {
                 res.src_amount_row.label = 'Amount';
-                res.result_balance_row.label = (this.model.debtType)
+                res.result_balance_row.label = (debtType)
                     ? 'Result balance (Person)'
                     : 'Result balance (Account)';
-                res.result_balance_dest_row.label = (this.model.debtType)
+                res.result_balance_dest_row.label = (debtType)
                     ? 'Result balance (Account)'
                     : 'Result balance (Person)';
             }
 
-            if (this.model.debtType) {
-                if (this.model.isAvailable) {
+            if (debtType) {
+                if (isAvailable) {
                     res.person.tile.title = (this.model.person) ? this.model.person.name : '';
                     res.person.tile.subtitle = (this.model.srcAccount)
                         ? this.model.srcCurr.format(this.model.srcAccount.balance)
@@ -828,7 +834,7 @@ export class TransactionView extends AppView {
                 }
 
                 if (!this.model.noAccount) {
-                    if (this.model.isAvailable) {
+                    if (isAvailable) {
                         res.account.tile.title = (this.model.destAccount) ? this.model.destAccount.name : '';
                         res.account.tile.subtitle = (this.model.destAccount)
                             ? this.model.destCurr.format(this.model.destAccount.balance)
@@ -836,7 +842,7 @@ export class TransactionView extends AppView {
                     }
                 }
             } else {
-                if (this.model.isAvailable) {
+                if (isAvailable) {
                     res.person.tile.title = (this.model.person) ? this.model.person.name : '';
                     res.person.tile.subtitle = (this.model.destAccount)
                         ? this.model.destCurr.format(this.model.destAccount.balance)
@@ -844,7 +850,7 @@ export class TransactionView extends AppView {
                 }
 
                 if (!this.model.noAccount) {
-                    if (this.model.isAvailable) {
+                    if (isAvailable) {
                         res.account.tile.title = (this.model.srcAccount) ? this.model.srcAccount.name : '';
                         res.account.tile.subtitle = (this.model.srcAccount)
                             ? this.model.srcCurr.format(this.model.srcAccount.balance)

@@ -364,6 +364,26 @@ export const api = {
             return true;
         },
 
+        async show(ids) {
+            const itemIds = Array.isArray(ids) ? ids : [ids];
+            const apiRes = await apiPost('account/show', { id: itemIds });
+            if (!apiRes || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to show account');
+            }
+
+            return true;
+        },
+
+        async hide(ids) {
+            const itemIds = Array.isArray(ids) ? ids : [ids];
+            const apiRes = await apiPost('account/hide', { id: itemIds });
+            if (!apiRes || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to hide account');
+            }
+
+            return true;
+        },
+
         async list(full) {
             let reqUrl = 'account/list';
             if (full) {
@@ -422,6 +442,26 @@ export const api = {
             const apiRes = await apiPost('person/delete', { id: itemIds });
             if (!apiRes || apiRes.result !== 'ok') {
                 throw new ApiRequestError('Fail to delete person');
+            }
+
+            return true;
+        },
+
+        async show(ids) {
+            const itemIds = Array.isArray(ids) ? ids : [ids];
+            const apiRes = await apiPost('person/show', { id: itemIds });
+            if (!apiRes || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to show person');
+            }
+
+            return true;
+        },
+
+        async hide(ids) {
+            const itemIds = Array.isArray(ids) ? ids : [ids];
+            const apiRes = await apiPost('person/hide', { id: itemIds });
+            if (!apiRes || apiRes.result !== 'ok') {
+                throw new ApiRequestError('Fail to hide person');
             }
 
             return true;

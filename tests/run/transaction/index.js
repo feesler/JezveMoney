@@ -19,7 +19,6 @@ import {
 import { AccountsList } from '../../model/AccountsList.js';
 import { App } from '../../Application.js';
 import { formatProps, generateId } from '../../common.js';
-import * as AccountTests from '../account.js';
 
 export const runAction = async ({ action, data }) => {
     let testDescr = null;
@@ -332,42 +331,6 @@ export const delFromUpdate = async (type, pos) => {
     });
 };
 
-export const typeChangeLoop = async () => {
-    setBlock('Change transaction type tests', 2);
-
-    // Hide first account
-    let userVisibleAccounts = App.state.accounts.getUserVisible();
-    const account = userVisibleAccounts.getItemByIndex(0);
-    await AccountTests.hide(0);
-
-    await App.goToMainView();
-    await App.view.goToNewTransactionByAccount(0);
-
-    // Start from Expense type
-    await runActions([
-        { action: 'changeTransactionType', data: INCOME },
-        { action: 'changeTransactionType', data: EXPENSE },
-        { action: 'changeTransactionType', data: TRANSFER },
-        { action: 'changeTransactionType', data: EXPENSE },
-        { action: 'changeTransactionType', data: DEBT },
-        { action: 'changeTransactionType', data: INCOME },
-        { action: 'changeTransactionType', data: TRANSFER },
-        { action: 'changeTransactionType', data: INCOME },
-        { action: 'changeTransactionType', data: DEBT },
-        { action: 'changeTransactionType', data: TRANSFER },
-        { action: 'changeTransactionType', data: DEBT },
-        // Disable account to check obtaining first visible account on switch to expense
-        { action: 'toggleAccount' },
-        { action: 'changeTransactionType', data: EXPENSE },
-    ]);
-
-    // Show previously hidden account
-    userVisibleAccounts = App.state.accounts.getUserVisible();
-    const userHiddenAccounts = App.state.accounts.getUserHidden();
-    const index = userHiddenAccounts.getIndexById(account.id);
-    await AccountTests.show(userVisibleAccounts.length + index);
-};
-
 /** Check navigation to update not existing transaction */
 export const securityTests = async () => {
     setBlock('Transaction security', 2);
@@ -435,25 +398,41 @@ export const checkTransactionAvailable = async (type, directNavigate = false) =>
         }
 
         let stateId = -1;
-        const userVisibleAccounts = App.state.accounts.getUserVisible();
-        const visiblePersons = App.state.persons.getVisible();
+        const userAccounts = App.state.getUserAccounts();
 
         if (type === EXPENSE || type === INCOME) {
-            if (userVisibleAccounts.length > 0) {
+            if (userAccounts.length > 0) {
                 stateId = 0;
             }
         } else if (type === TRANSFER) {
-            if (userVisibleAccounts.length > 1) {
-                const srcAccount = userVisibleAccounts.getItemByIndex(0);
-                const destAccount = userVisibleAccounts.getItemByIndex(1);
+            if (userAccounts.length > 1) {
+                const srcAccount = userAccounts.getItemByIndex(0);
+                const destAccount = userAccounts.getItemByIndex(1);
                 const isDiff = srcAccount.curr_id !== destAccount.curr_id;
 
                 stateId = (isDiff) ? 3 : 0;
             }
         } else if (type === DEBT) {
-            if (visiblePersons.length > 0) {
-                stateId = (userVisibleAccounts.length > 0) ? 0 : 6;
+            if (App.state.persons.length > 0) {
+                stateId = (userAccounts.length > 0) ? 0 : 6;
             }
+        }
+
+        App.view.setExpectedState(stateId);
+        await App.view.checkState();
+
+        return true;
+    });
+};
+
+export const checkDebtNoAccountURL = async () => {
+    await test('Debt no account URL', async () => {
+        const requestURL = `${baseUrl()}transactions/create/?type=debt&acc_id=0`;
+        await goTo(requestURL);
+
+        let stateId = -1;
+        if (App.state.persons.length > 0) {
+            stateId = 6;
         }
 
         App.view.setExpectedState(stateId);

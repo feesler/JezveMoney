@@ -230,4 +230,5 @@ export class AccountsList extends List {
 
         return userAccounts.indexToId(ind);
     }
+    // TODO: move to AppState and use with this.cacheUserAccounts();
 }

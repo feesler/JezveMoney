@@ -3,7 +3,6 @@ import {
     enable,
     isFunction,
 } from 'jezvejs';
-import { Checkbox } from 'jezvejs/Checkbox';
 import { ImportTransactionBase } from '../TransactionBase/ImportTransactionBase.js';
 import { Field } from '../../Field/Field.js';
 import './style.scss';
@@ -33,8 +32,8 @@ const AMOUNT_CLASS = 'import-item__amount';
 const DATE_CLASS = 'import-item__date';
 const COMMENT_CLASS = 'import-item__comment';
 /* Controls */
-const ENABLE_CHECK_CLASS = 'enable-check';
 const CONTROLS_CLASS = 'controls';
+const ENABLE_BUTTON_CLASS = 'enable-btn';
 const UPDATE_BUTTON_CLASS = 'update-btn';
 const DEL_BUTTON_CLASS = 'delete-btn';
 
@@ -54,6 +53,7 @@ const typeStrings = {
 };
 
 const defaultProps = {
+    onCollapse: null,
     onUpdate: null,
     onEnable: null,
     onRemove: null,
@@ -81,6 +81,7 @@ export class ImportTransactionItem extends ImportTransactionBase {
 
         this.state = {
             transaction: new ImportTransaction(this.props.data),
+            collapsed: this.props.collapsed,
         };
 
         this.init();
@@ -88,12 +89,6 @@ export class ImportTransactionItem extends ImportTransactionBase {
 
     init() {
         const { createContainer } = window.app;
-
-        // Row enable checkbox
-        this.enableCheck = Checkbox.create({
-            className: ENABLE_CHECK_CLASS,
-            onChange: () => this.onRowChecked(),
-        });
 
         this.trTypeTitle = ce('span', { className: TYPE_CLASS });
         this.trTypeField = Field.create({
@@ -170,7 +165,6 @@ export class ImportTransactionItem extends ImportTransactionBase {
         ]);
 
         this.mainContainer = createContainer(MAIN_CONTENT_CLASS, [
-            this.enableCheck.elem,
             this.itemContainer,
             this.controls,
         ]);
@@ -181,19 +175,24 @@ export class ImportTransactionItem extends ImportTransactionBase {
     }
 
     createMenu() {
-        this.menu = PopupMenu.create({
-            items: [{
-                icon: 'update',
-                title: 'Edit',
-                className: UPDATE_BUTTON_CLASS,
-                onClick: () => this.onUpdate(),
-            }, {
-                icon: 'del',
-                title: 'Delete',
-                className: DEL_BUTTON_CLASS,
-                onClick: () => this.remove(),
-            }],
+        this.menu = PopupMenu.create({});
+        this.enableMenuItem = this.menu.addIconItem({
+            title: this.getEnableMenuItemTitle(),
+            className: ENABLE_BUTTON_CLASS,
+            onClick: () => this.onToggleEnable(),
         });
+
+        this.menu.append([{
+            icon: 'update',
+            title: 'Edit',
+            className: UPDATE_BUTTON_CLASS,
+            onClick: () => this.onUpdate(),
+        }, {
+            icon: 'del',
+            title: 'Delete',
+            className: DEL_BUTTON_CLASS,
+            onClick: () => this.remove(),
+        }]);
     }
 
     /** Update button 'click' event handler */
@@ -217,8 +216,6 @@ export class ImportTransactionItem extends ImportTransactionBase {
         const isDebt = ['debtfrom', 'debtto'].includes(transaction.type);
 
         enable(this.elem, transaction.enabled);
-
-        this.enableCheck.check(transaction.enabled);
 
         // Types field
         if (!(transaction.type in typeStrings)) {
@@ -271,5 +268,16 @@ export class ImportTransactionItem extends ImportTransactionBase {
 
         // Comment field
         this.commentTitle.textContent = transaction.comment;
+
+        // Enable/disable menu item
+        this.enableMenuItem.setTitle(this.getEnableMenuItemTitle(state));
+
+        if (this.collapse) {
+            if (transaction.collapsed) {
+                this.collapse.collapse();
+            } else {
+                this.collapse.expand();
+            }
+        }
     }
 }

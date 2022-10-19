@@ -1,4 +1,4 @@
-import { setBlock } from 'jezve-test';
+import { setBlock, assert } from 'jezve-test';
 import {
     IMPORT_COND_FIELD_MAIN_ACCOUNT,
     IMPORT_COND_FIELD_TPL,
@@ -11,7 +11,7 @@ import {
     IMPORT_COND_OP_STRING_INCLUDES,
     IMPORT_COND_OP_LESS,
     IMPORT_COND_OP_GREATER,
-} from '../../model/ImportCondition.js';
+} from '../../../model/ImportCondition.js';
 import {
     IMPORT_ACTION_SET_TR_TYPE,
     IMPORT_ACTION_SET_ACCOUNT,
@@ -19,11 +19,11 @@ import {
     IMPORT_ACTION_SET_SRC_AMOUNT,
     IMPORT_ACTION_SET_DEST_AMOUNT,
     IMPORT_ACTION_SET_COMMENT,
-} from '../../model/ImportAction.js';
-import * as ImportTests from '../../run/import/index.js';
-import { api } from '../../model/api.js';
-import * as ImportRuleApiTests from '../../run/api/importrule.js';
-import { App } from '../../Application.js';
+} from '../../../model/ImportAction.js';
+import { api } from '../../../model/api.js';
+import * as ImportTests from '../../../run/import/index.js';
+import * as ImportRuleApiTests from '../../../run/api/importrule.js';
+import { App } from '../../../Application.js';
 
 // Import rule action form test for no persons
 const noPersonTests = async () => {
@@ -57,7 +57,7 @@ const noPersonTests = async () => {
 };
 
 // Import rule validation tests
-const runValidationTests = async () => {
+const validation = async () => {
     setBlock('Import rule validation', 1);
 
     setBlock('Submit empty rule', 2);
@@ -281,7 +281,7 @@ const runValidationTests = async () => {
 };
 
 // Create import rule tests
-const runCreateTests = async () => {
+const create = async () => {
     setBlock('Create import rules', 1);
 
     setBlock('Create import rule #1', 2);
@@ -401,7 +401,7 @@ const runCreateTests = async () => {
     ]);
     await ImportTests.createRuleAction([
         { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
-        { action: 'changePerson', data: App.scenario.ALEX },
+        { action: 'changePerson', data: App.scenario.IVAN },
     ]);
     await ImportTests.submitRule();
 
@@ -435,7 +435,7 @@ const runCreateTests = async () => {
 };
 
 // Update import rule tests
-const runUpdateTests = async () => {
+const update = async () => {
     setBlock('Update import rules', 1);
 
     setBlock('Update import rule #1', 2);
@@ -475,14 +475,14 @@ const runUpdateTests = async () => {
 };
 
 // Delete import rule tests
-const runDeleteTests = async () => {
+const del = async () => {
     setBlock('Delete import rules', 1);
     // Delete rule #3
     await ImportTests.deleteRule(2);
 };
 
 // Search import rule tests
-const runSearchTests = async () => {
+const search = async () => {
     setBlock('Search import rules', 1);
 
     await ImportTests.inputRulesSearch('MOBILE');
@@ -491,7 +491,7 @@ const runSearchTests = async () => {
 };
 
 // Import rules paginator tests
-const runPaginatorTests = async () => {
+const pagination = async () => {
     setBlock('Import rules pagination', 1);
 
     const data = [];
@@ -534,13 +534,19 @@ const runPaginatorTests = async () => {
 };
 
 // Create import rule with template condition
-const runCreateTemplateRule = async (templateId) => {
+const createTemplateRule = async (templateIndex) => {
+    const template = App.state.templates.getItemByIndex(templateIndex);
+    assert(template?.id, `Template index ${templateIndex} not found`);
+
     setBlock('Create import rule with template condition', 2);
+
+    await ImportTests.openRulesDialog();
+
     await ImportTests.createRule();
     await ImportTests.createRuleCondition([
         { action: 'changeFieldType', data: IMPORT_COND_FIELD_TPL },
         { action: 'changeOperator', data: IMPORT_COND_OP_EQUAL },
-        { action: 'changeTemplate', data: templateId },
+        { action: 'changeTemplate', data: template.id },
     ]);
     await ImportTests.createRuleCondition([
         { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
@@ -552,28 +558,22 @@ const runCreateTemplateRule = async (templateId) => {
         { action: 'inputValue', data: 'Salary+Template' },
     ]);
     await ImportTests.submitRule();
+
+    await ImportTests.closeRulesDialog();
 };
 
 export const importRuleTests = {
-    /** Run import rules tests */
     async run() {
         setBlock('Import rules', 1);
         await ImportTests.openRulesDialog();
 
-        await runValidationTests();
-        await runCreateTests();
-        await runUpdateTests();
-        await runDeleteTests();
-        await runSearchTests();
-        await runPaginatorTests();
-    },
-
-    async createTemplateRule(templateId) {
-        await ImportTests.openRulesDialog();
-
-        await runCreateTemplateRule(templateId);
-
-        await ImportTests.closeRulesDialog();
+        await validation();
+        await create();
+        await update();
+        await del();
+        await search();
+        await pagination();
+        await createTemplateRule(0);
     },
 
     async runNoPersonsTest() {

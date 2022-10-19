@@ -494,6 +494,10 @@ export class TransactionsList extends List {
     }
 
     getStatisticsLabel(date, groupType) {
+        if (!date) {
+            return null;
+        }
+
         if (groupType === 'none' || groupType === 'day' || groupType === 'week') {
             return formatDate(date);
         }
@@ -525,7 +529,7 @@ export class TransactionsList extends List {
         let currId = params.curr_id;
         let accId = params.acc_id;
 
-        const byCurrency = params.filter === 'currency';
+        const byCurrency = params.report === 'currency';
         if (byCurrency) {
             if (!currId) {
                 const curr = App.currency.getItemByIndex(0);

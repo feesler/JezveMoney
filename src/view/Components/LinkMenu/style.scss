@@ -1,0 +1,27 @@
+.link-menu {
+  display: flex;
+  flex-flow: row wrap;
+  column-gap: 12px;
+  row-gap: 6px;
+  font-size: 16px;
+}
+
+.link-menu-item {
+  display: inline-flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+
+  &:focus-visible {
+    box-shadow: var(--focus-shadow);
+  }
+}
+
+.link-menu-item_active {
+  font-weight: 600;
+}
+
+.link-menu-item__title {
+  font-size: 16px;
+}

@@ -10,6 +10,8 @@ use JezveMoney\App\Item\AccountItem;
 
 use function JezveMoney\Core\inSetCondition;
 
+define("ACCOUNT_HIDDEN", 1);
+
 class AccountModel extends CachedTable
 {
     use Singleton;
@@ -545,10 +547,8 @@ class AccountModel extends CachedTable
     //   person - return accounts of specified person
     public function getData($params = null)
     {
-        $resArr = [];
-
         if (!$this->checkCache()) {
-            return $resArr;
+            return [];
         }
 
         if (!is_array($params)) {
@@ -559,6 +559,7 @@ class AccountModel extends CachedTable
         $requestedType = isset($params["type"]) ? $params["type"] : "visible";
         $includeVisible = in_array($requestedType, ["all", "visible"]);
         $includeHidden = in_array($requestedType, ["all", "hidden"]);
+        $sortByVisibility = (isset($params["sort"]) && $params["sort"] == "visibility");
         $person_id = (isset($params["person"])) ? intval($params["person"]) : 0;
         if ($person_id) {
             $includePersons = true;
@@ -577,6 +578,7 @@ class AccountModel extends CachedTable
             $itemsData = $this->cache;
         }
 
+        $res = [];
         foreach ($itemsData as $item) {
             if ($person_id && $item->owner_id != $person_id) {
                 continue;
@@ -591,10 +593,16 @@ class AccountModel extends CachedTable
 
             $accObj = new AccountItem($item);
 
-            $resArr[] = $accObj;
+            $res[] = $accObj;
         }
 
-        return $resArr;
+        if ($sortByVisibility) {
+            usort($res, function ($a, $b) {
+                return $a->flags - $b->flags;
+            });
+        }
+
+        return $res;
     }
 
 
@@ -630,7 +638,7 @@ class AccountModel extends CachedTable
         $includeVisible = in_array($requestedType, ["all", "visible"]);
         $includeHidden = in_array($requestedType, ["all", "hidden"]);
 
-        foreach ($this->cache as $acc_id => $item) {
+        foreach ($this->cache as $item) {
             if (!$includePersons && $item->owner_id != self::$owner_id) {
                 continue;
             }
@@ -693,20 +701,20 @@ class AccountModel extends CachedTable
     }
 
 
-    // Try to find visible account different from specified
-    public function getAnother($acc_id)
+    // Returns array of user accounts sorted by visibility
+    public function getUserAccounts()
+    {
+        return $this->getData(["type" => "all", "sort" => "visibility"]);
+    }
+
+
+    // Try to find account of user different from specified
+    public function getAnother($acc_id = 0)
     {
         $acc_id = intval($acc_id);
-        if ($acc_id != 0 && $this->getCount(["type" => "visible"]) < 2) {
-            return 0;
-        }
-
-        foreach ($this->cache as $item) {
-            if (
-                $item->id != $acc_id &&
-                $item->owner_id == self::$owner_id &&
-                !$this->isHidden($item)
-            ) {
+        $items = $this->getUserAccounts();
+        foreach ($items as $item) {
+            if ($item->id != $acc_id) {
                 return $item->id;
             }
         }

@@ -5,6 +5,7 @@ import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import './style.scss';
+import { parseCookies, setCookie } from '../../js/utils.js';
 
 /**
  * User log in view
@@ -17,6 +18,7 @@ class LoginView extends View {
             form: {
                 login: '',
                 password: '',
+                remember: true,
             },
             validation: {
                 login: true,
@@ -44,8 +46,32 @@ class LoginView extends View {
 
         this.loginInp.addEventListener('input', () => this.onLoginInput());
         this.passwordInp.addEventListener('input', () => this.onPasswordInput());
-        this.rememberCheck = Checkbox.fromElement(checkElem);
+        this.rememberCheck = Checkbox.fromElement(checkElem, {
+            onChange: () => this.onToggleRememberCheck(),
+        });
         this.form.addEventListener('submit', (e) => this.onSubmit(e));
+
+        this.setupCookies();
+    }
+
+    getRememberCookie() {
+        const cookies = parseCookies();
+        return cookies.find((item) => item.name === 'remember');
+    }
+
+    setupCookies() {
+        const cookie = this.getRememberCookie();
+        const remember = (cookie)
+            ? (parseInt(cookie.value, 10) === 1)
+            : true;
+        this.setRememberUser(remember);
+    }
+
+    setRememberUser(value) {
+        setCookie('remember', (value) ? 1 : 0);
+
+        this.state.form.remember = !!value;
+        this.render(this.state);
     }
 
     /**
@@ -64,6 +90,14 @@ class LoginView extends View {
         this.state.form.password = this.passwordInp.value;
         this.state.validation.password = true;
         this.render(this.state);
+    }
+
+    /**
+     * 'Remember me' checkbox 'change' event handler
+     */
+    onToggleRememberCheck() {
+        const remember = this.rememberCheck.checked;
+        this.setRememberUser(remember);
     }
 
     /**
@@ -107,6 +141,9 @@ class LoginView extends View {
         } else {
             window.app.invalidateBlock('pwd-inp-block');
         }
+
+        // 'Remember me' checkbox
+        this.rememberCheck.check(state.form.remember);
     }
 }
 

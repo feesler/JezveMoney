@@ -6,6 +6,7 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 
 export default {
     target: 'browserslist',
+    context: resolve(__dirname, '..'),
     entry: {
         polyfills: {
             import: './src/view/js/polyfill/index.js',
@@ -108,7 +109,7 @@ export default {
     },
     output: {
         filename: '[name].js',
-        path: resolve(__dirname, './dist'),
+        path: resolve(__dirname, '../dist'),
         clean: {
             keep: 'vendor',
         },
@@ -125,8 +126,8 @@ export default {
             {
                 test: /\.m?js$/,
                 include: [
-                    resolve(__dirname, 'src'),
-                    resolve('node_modules/jezvejs'),
+                    resolve(__dirname, '../src'),
+                    resolve(__dirname, '../node_modules/jezvejs'),
                 ],
                 exclude: /node_modules\/(?!(jezvejs)\/).*/,
                 use: [

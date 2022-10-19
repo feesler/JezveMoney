@@ -133,8 +133,7 @@ class UserModel extends CachedTable
     // Setup cookies
     private function setupCookies($login, $passhash)
     {
-        $rememberUser = isset($_SESSION["remember"]);
-        if ($rememberUser) {
+        if ($this->rememberUser()) {
             $expTime = time() + SECONDS_IN_YEAR;
         } else {
             $expTime = 0;
@@ -195,6 +194,16 @@ class UserModel extends CachedTable
         $this->currentUser = $this->getItem($user_id);
 
         return $user_id;
+    }
+
+
+    public function rememberUser()
+    {
+        if (!isset($_COOKIE["remember"])) {
+            return false;
+        }
+
+        return intval($_COOKIE["remember"]) != 0;
     }
 
 
@@ -499,11 +508,6 @@ class UserModel extends CachedTable
 
         sessionStart();
         $_SESSION["userid"] = $this->getIdByLogin($login);
-        if (isset($params["remember"])) {
-            $_SESSION["remember"] = true;
-        } else {
-            unset($_SESSION["remember"]);
-        }
 
         $preHash = $this->createPreHash($login, $password);
 

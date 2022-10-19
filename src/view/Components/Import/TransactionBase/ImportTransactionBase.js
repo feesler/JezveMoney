@@ -1,5 +1,6 @@
 import {
     ce,
+    createElement,
     isFunction,
     Component,
 } from 'jezvejs';
@@ -9,11 +10,25 @@ import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 /** CSS classes */
 const TOGGLE_BUTTON_CLASS = 'btn icon-btn toggle-btn';
 const TOGGLE_ICON_CLASS = 'icon toggle-icon';
+/* Similar transaction */
+const SIMILAR_CLASS = 'similar';
+const SIMILAR_TITLE_CLASS = 'similar__title';
+const SIMILAR_LINK_CLASS = 'similar__link';
+
+/** Strings */
+const STR_SIMILAR_FOUND = 'Similar transaction found: ';
+const STR_SIMILAR_LINK = 'Edit';
+const STR_ENABLE_ITEM = 'Enable';
+const STR_DISABLE_ITEM = 'Disable';
 
 /** Base import transaction class */
 export class ImportTransactionBase extends Component {
     get enabled() {
         return this.state.transaction.enabled;
+    }
+
+    get collapsed() {
+        return this.state.collapsed;
     }
 
     initContainer(className, children) {
@@ -23,6 +38,14 @@ export class ImportTransactionBase extends Component {
                 ...originalData,
             });
 
+            const content = [origDataContainer.elem];
+
+            const { similarTransaction } = this.props.data.state;
+            if (similarTransaction) {
+                const infoElem = this.createSimilarTransactionInfo(similarTransaction);
+                content.push(infoElem);
+            }
+
             this.toggleExtBtn = this.createToggleButton();
             this.controls.append(this.toggleExtBtn);
 
@@ -30,7 +53,7 @@ export class ImportTransactionBase extends Component {
                 toggleOnClick: false,
                 className,
                 header: children,
-                content: origDataContainer.elem,
+                content,
             });
             this.elem = this.collapse.elem;
         } else {
@@ -48,6 +71,34 @@ export class ImportTransactionBase extends Component {
         );
     }
 
+    createSimilarTransactionInfo(transaction) {
+        if (!transaction) {
+            return null;
+        }
+
+        const { baseURL } = window.app;
+        const url = `${baseURL}transactions/update/${transaction.id}`;
+
+        return createElement('div', {
+            props: { className: SIMILAR_CLASS },
+            children: [
+                createElement('div', {
+                    props: {
+                        className: SIMILAR_TITLE_CLASS,
+                        textContent: STR_SIMILAR_FOUND,
+                    },
+                }),
+                createElement('a', {
+                    props: {
+                        className: SIMILAR_LINK_CLASS,
+                        href: url,
+                        textContent: STR_SIMILAR_LINK,
+                    },
+                }),
+            ],
+        });
+    }
+
     /** Remove item */
     remove() {
         if (isFunction(this.props.onRemove)) {
@@ -55,9 +106,13 @@ export class ImportTransactionBase extends Component {
         }
     }
 
-    /** Enable checkbox 'change' event handler */
-    onRowChecked() {
-        const value = this.enableCheck.checked;
+    getEnableMenuItemTitle(state = this.state) {
+        const { enabled } = state.transaction;
+        return (enabled) ? STR_DISABLE_ITEM : STR_ENABLE_ITEM;
+    }
+
+    /** Enable/disable component */
+    enable(value = true) {
         this.state.transaction.enable(value);
         this.render();
 
@@ -66,9 +121,21 @@ export class ImportTransactionBase extends Component {
         }
     }
 
+    /** Enable/disable menu item 'click' event handler */
+    onToggleEnable() {
+        const value = !this.enabled;
+        this.enable(value);
+    }
+
     /** Toggle collapse/expand button 'click' event handler */
     toggleCollapse() {
-        this.collapse?.toggle();
+        const value = !this.state.transaction.collapsed;
+        this.state.transaction.collapse(value);
+        this.render();
+
+        if (isFunction(this.props.onCollapse)) {
+            this.props.onCollapse(this, value);
+        }
     }
 
     /** Main account of transaction select 'change' event handler */

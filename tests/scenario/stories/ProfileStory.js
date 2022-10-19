@@ -1,18 +1,36 @@
-import { setBlock } from 'jezve-test';
-import * as ProfileTests from '../run/profile.js';
-import { App } from '../Application.js';
+import { setBlock, TestStory } from 'jezve-test';
+import * as ProfileTests from '../../run/profile.js';
+import { App } from '../../Application.js';
 
-export const profileTests = {
-    /** Run account view tests */
+const resetAllOptions = {
+    accounts: true,
+    persons: true,
+    transactions: true,
+    importtpl: true,
+    importrules: true,
+};
+
+export class ProfileStory extends TestStory {
+    async beforeRun() {
+        await App.scenario.removeUsers();
+        await App.scenario.prepareTestUser();
+    }
+
     async run() {
         setBlock('Profile tests', 1);
 
-        await App.state.fetch();
+        await this.registration();
+        await this.login();
+        await this.reset();
+        await this.about();
+        await this.changeName();
+        await this.changePassword();
+        await this.resetWithData();
+    }
 
-        const origUserName = App.state.profile.name;
-        const tmpPassword = 'test123';
+    async registration() {
+        setBlock('User registration', 2);
 
-        // Registration tests
         await ProfileTests.register(App.config.newUser);
         await ProfileTests.deleteProfile();
 
@@ -33,8 +51,11 @@ export const profileTests = {
             name: App.config.newUser.name,
             password: '',
         }]);
+    }
 
-        // Login tests
+    async login() {
+        setBlock('User login', 2);
+
         await App.scenario.runner.runGroup(ProfileTests.relogin, [{
             login: App.config.testUser.login,
             password: '',
@@ -47,26 +68,26 @@ export const profileTests = {
         }, {
             ...App.config.testUser,
         }]);
+    }
 
-        await ProfileTests.resetData({
-            accounts: true,
-            persons: true,
-            transactions: true,
-            importtpl: true,
-            importrules: true,
-        });
+    async changeName() {
+        setBlock('Change name', 2);
 
-        await ProfileTests.openAbout();
+        const origUserName = App.state.profile.name;
 
-        // Change name tests
         await App.scenario.runner.runGroup(ProfileTests.changeName, [
             '',
             origUserName,
             '^^&&>>',
             origUserName,
         ]);
+    }
 
-        // Change password tests
+    async changePassword() {
+        setBlock('Change password', 2);
+
+        const tmpPassword = 'test123';
+
         await App.scenario.runner.runGroup(ProfileTests.changePass, [{
             oldPassword: '',
             newPassword: '',
@@ -83,23 +104,27 @@ export const profileTests = {
             oldPassword: tmpPassword,
             newPassword: App.config.testUser.password,
         }]);
-    },
+    }
 
-    /** Run profile tests with transactions */
-    async runPostTransaction() {
-        setBlock('Profile with transactions tests', 1);
+    async reset() {
+        setBlock('Reset data', 2);
 
-        const resetAllOptions = {
-            accounts: true,
-            persons: true,
-            transactions: true,
-            importtpl: true,
-            importrules: true,
-        };
+        await ProfileTests.resetData(resetAllOptions);
+    }
 
+    async resetWithData() {
+        setBlock('Reset precreated data', 2);
+
+        await App.scenario.createTestData();
         await App.scenario.runner.runGroup(ProfileTests.resetData, [
             { accounts: true },
             resetAllOptions,
         ]);
-    },
-};
+    }
+
+    async about() {
+        setBlock('About view', 2);
+
+        await ProfileTests.openAbout();
+    }
+}

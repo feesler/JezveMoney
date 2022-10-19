@@ -2,7 +2,6 @@ import 'jezvejs/style';
 import {
     ge,
     insertAfter,
-    isNum,
     show,
     enable,
     checkDate,
@@ -15,7 +14,6 @@ import { DecimalInput } from 'jezvejs/DecimalInput';
 import { Spinner } from 'jezvejs/Spinner';
 import 'jezvejs/style/InputGroup';
 import {
-    fixFloat,
     isValidValue,
     normalizeExch,
     timeToDate,
@@ -366,20 +364,18 @@ class TransactionView extends View {
         this.destCurrInp = ge('dest_curr');
         this.debtOperationInp = ge('debtOperation');
 
-        this.debtOpControls = ge('operation');
-
         this.personIdInp = ge('person_id');
         this.debtAccountInp = ge('acc_id');
         this.debtAccountTile = AccountTile.fromElement({ elem: 'acc_tile', parent: this });
 
-        this.noAccountBtn = ge('noacc_btn');
+        this.noAccountBtn = this.debtAccountContainer.querySelector('.tile_header .close-btn');
         setEvents(this.noAccountBtn, { click: () => this.toggleEnableAccount() });
 
-        this.selectAccountBtn = ge('selaccount');
+        this.selectAccountBtn = this.debtAccountContainer.querySelector('.account-toggler');
         this.accountToggleBtn = this.selectAccountBtn?.querySelector('button');
         setEvents(this.accountToggleBtn, { click: () => this.toggleEnableAccount() });
 
-        this.debtAccountLabel = ge('acclbl');
+        this.debtAccountLabel = this.debtAccountContainer.querySelector('.tile_header label');
 
         this.personTile = Tile.fromElement({ elem: 'person_tile', parent: this });
 
@@ -733,22 +729,14 @@ class TransactionView extends View {
     }
 
     validateSourceAmount(state) {
-        const valid = (
-            state.transaction.src_amount
-            && isNum(fixFloat(state.form.sourceAmount))
-        );
-
+        const valid = (state.transaction.src_amount > 0);
         if (!valid) {
             this.store.dispatch(invalidateSourceAmount());
         }
     }
 
     validateDestAmount(state) {
-        const valid = (
-            state.transaction.dest_amount
-            && isNum(fixFloat(state.form.destAmount))
-        );
-
+        const valid = (state.transaction.dest_amount > 0);
         if (!valid) {
             this.store.dispatch(invalidateDestAmount());
         }
@@ -920,11 +908,8 @@ class TransactionView extends View {
                 url.searchParams.set('acc_id', transaction.dest_id);
             } else if (transaction.type === DEBT) {
                 url.searchParams.set('person_id', state.person.id);
-                if (transaction.noAccount) {
-                    url.searchParams.delete('acc_id');
-                } else {
-                    url.searchParams.set('acc_id', state.account.id);
-                }
+                const accountId = (transaction.noAccount) ? 0 : state.account.id;
+                url.searchParams.set('acc_id', accountId);
             }
         }
 
@@ -1188,7 +1173,8 @@ class TransactionView extends View {
 
         show(this.debtAccountTileBase, !noAccount);
 
-        show(this.selectAccountBtn, noAccount);
+        const { userAccounts } = window.app.model;
+        show(this.selectAccountBtn, noAccount && userAccounts.length > 0);
         enable(this.accountToggleBtn, !state.submitStarted);
 
         this.srcResBalanceRowLabel.textContent = (debtType) ? 'Result balance (Person)' : 'Result balance (Account)';
@@ -1258,7 +1244,6 @@ class TransactionView extends View {
         );
         show(this.personContainer, state.isAvailable && transaction.type === DEBT);
         show(this.debtAccountContainer, state.isAvailable && transaction.type === DEBT);
-        show(this.debtOpControls, state.isAvailable && transaction.type === DEBT);
         show(
             this.swapBtn,
             state.isAvailable && (transaction.type === TRANSFER || transaction.type === DEBT),

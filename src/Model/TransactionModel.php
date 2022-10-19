@@ -11,11 +11,18 @@ use function JezveMoney\Core\inSetCondition;
 use function JezveMoney\Core\orJoin;
 use function JezveMoney\Core\qnull;
 
-const NO_GROUP = 0;
-const GROUP_BY_DAY = 1;
-const GROUP_BY_WEEK = 2;
-const GROUP_BY_MONTH = 3;
-const GROUP_BY_YEAR = 4;
+// Transaction types
+define("EXPENSE", 1);
+define("INCOME", 2);
+define("TRANSFER", 3);
+define("DEBT", 4);
+
+// Statistics group types
+define("NO_GROUP", 0);
+define("GROUP_BY_DAY", 1);
+define("GROUP_BY_WEEK", 2);
+define("GROUP_BY_MONTH", 3);
+define("GROUP_BY_YEAR", 4);
 
 
 class TransactionModel extends CachedTable
@@ -119,6 +126,7 @@ class TransactionModel extends CachedTable
         if (!$item_id) {
             checkFields($params, $avFields, true);
         }
+        $item = ($item_id) ? $this->getItem($item_id) : null;
 
         if (isset($params["type"])) {
             $res["type"] = intval($params["type"]);
@@ -182,17 +190,19 @@ class TransactionModel extends CachedTable
 
         if (isset($params["src_amount"])) {
             $res["src_amount"] = floatval($params["src_amount"]);
-            if ($res["src_amount"] == 0.0) {
+            if ($res["src_amount"] <= 0.0) {
                 throw new \Error("Invalid src_amount specified");
             }
         }
+        $srcAmount = (isset($res["src_amount"])) ? $res["src_amount"] : $item->src_amount;
 
         if (isset($params["dest_amount"])) {
             $res["dest_amount"] = floatval($params["dest_amount"]);
-            if ($res["dest_amount"] == 0.0) {
+            if ($res["dest_amount"] <= 0.0) {
                 throw new \Error("Invalid dest_amount specified");
             }
         }
+        $destAmount = (isset($res["dest_amount"])) ? $res["dest_amount"] : $item->dest_amount;
 
         if (isset($params["src_curr"])) {
             $res["src_curr"] = intval($params["src_curr"]);
@@ -203,6 +213,7 @@ class TransactionModel extends CachedTable
                 throw new \Error("Invalid src_curr specified");
             }
         }
+        $srcCurrId = (isset($res["src_curr"])) ? $res["src_curr"] : $item->src_curr;
 
         if (isset($params["dest_curr"])) {
             $res["dest_curr"] = intval($params["dest_curr"]);
@@ -212,6 +223,11 @@ class TransactionModel extends CachedTable
             ) {
                 throw new \Error("Invalid dest_curr specified");
             }
+        }
+        $destCurrId = (isset($res["dest_curr"])) ? $res["dest_curr"] : $item->dest_curr;
+
+        if ($srcCurrId === $destCurrId && $srcAmount != $destAmount) {
+            throw new \Error("src_amount and dest_amount must be equal when src_curr and dest_curr are same");
         }
 
         if (isset($params["date"])) {
@@ -1479,9 +1495,9 @@ class TransactionModel extends CachedTable
 
         $res = new \stdClass();
 
-        // Filter type
-        $byCurrency = (isset($request["filter"]) && $request["filter"] == "currency");
-        $res->filter = $byCurrency ? "currency" : "account";
+        // Report type
+        $byCurrency = (isset($request["report"]) && $request["report"] == "currency");
+        $res->report = $byCurrency ? "currency" : "account";
 
         // Transaction type
         $trans_type = (isset($request["type"])) ? $request["type"] : EXPENSE;
@@ -1520,7 +1536,7 @@ class TransactionModel extends CachedTable
                     throw new \Error("Account not found");
                 }
             } else { // try to get first account of user
-                $acc_id = $accModel->getIdByPos(0);
+                $acc_id = $accModel->getAnother();
                 if (!$acc_id) {
                     throw new \Error("No accounts available");
                 }
@@ -1554,7 +1570,7 @@ class TransactionModel extends CachedTable
             $params = [];
         }
 
-        $byCurrency = (isset($params["filter"]) && $params["filter"] == "currency");
+        $byCurrency = (isset($params["report"]) && $params["report"] == "currency");
         if ($byCurrency) {
             if (!isset($params["curr_id"])) {
                 return null;

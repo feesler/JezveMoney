@@ -21,6 +21,7 @@ import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/Transa
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import '../../Components/TransactionTypeMenu/style.scss';
 import './style.scss';
+import { LinkMenu } from '../../Components/LinkMenu/LinkMenu.js';
 
 /** CSS classes */
 const POPUP_LIST_CLASS = 'chart-popup-list';
@@ -29,6 +30,10 @@ const POPUP_LIST_VALUE_CLASS = 'chart-popup-list__value';
 
 /** Strings */
 const PAGE_TITLE = 'Jezve Money | Statistics';
+
+const defaultProps = {
+    filter: {},
+};
 
 /**
  * Statistics view
@@ -43,16 +48,19 @@ class StatisticsView extends View {
 
         this.groupTypes = [null, 'day', 'week', 'month', 'year'];
 
+        this.props = {
+            ...defaultProps,
+            ...this.props,
+        };
+
         this.state = {
-            selDateRange: null,
             accountCurrency: this.props.accountCurrency,
             chartData: null,
             filter: this.props.filter,
+            form: { ...this.props.filter },
             loading: false,
             renderTime: Date.now(),
         };
-
-        this.state.filter = ('filter' in this.props) ? this.props.filter : {};
 
         window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
@@ -86,10 +94,9 @@ class StatisticsView extends View {
             onChange: (sel) => this.onChangeTypeFilter(sel),
         });
 
-        this.filterTypeDropDown = DropDown.create({
-            elem: 'filter_type',
-            onitemselect: (obj) => this.onFilterSel(obj),
-            className: 'dd_fullwidth',
+        this.reportMenu = LinkMenu.fromElement(ge('report_menu'), {
+            itemParam: 'report',
+            onChange: (value) => this.onSelectReportType(value),
         });
 
         this.accountField = ge('acc_block');
@@ -143,14 +150,12 @@ class StatisticsView extends View {
 
     /** Set loading state and render view */
     startLoading() {
-        this.state.loading = true;
-        this.render(this.state);
+        this.setState({ ...this.state, loading: true });
     }
 
     /** Remove loading state and render view */
     stopLoading() {
-        this.state.loading = false;
-        this.render(this.state);
+        this.setState({ ...this.state, loading: false });
     }
 
     /** Returns URL for filter of specified state */
@@ -181,8 +186,18 @@ class StatisticsView extends View {
      * Transaction type menu change event handler
      */
     onChangeTypeFilter(selected) {
-        this.state.filter.type = selected;
-        this.requestData(this.state.filter);
+        if (this.state.filter.type === selected) {
+            return;
+        }
+
+        this.setState({
+            ...this.state,
+            form: {
+                ...this.state.form,
+                type: selected,
+            },
+        });
+        this.requestData(this.state.form);
     }
 
     /**
@@ -194,26 +209,34 @@ class StatisticsView extends View {
             return;
         }
 
-        this.selDateRange = range;
-        this.datePicker.hide();
-        const start = window.app.formatDate(range.start);
-        const end = window.app.formatDate(range.end);
+        const stdate = window.app.formatDate(range.start);
+        const enddate = window.app.formatDate(range.end);
+        if (stdate === this.state.form.stdate && enddate === this.state.form.enddate) {
+            return;
+        }
 
-        this.dateInput.value = `${start} - ${end}`;
+        this.setState({
+            ...this.state,
+            form: {
+                ...this.state.form,
+                stdate: window.app.formatDate(range.start),
+                enddate: window.app.formatDate(range.end),
+            },
+        });
+
+        this.datePicker.hide();
     }
 
     /**
      * Date picker hide callback
      */
     onDatePickerHide() {
-        if (!this.selDateRange) {
+        const { filter, form } = this.state;
+        if (filter.stdate === form.stdate && filter.enddate === form.enddate) {
             return;
         }
 
-        this.state.filter.stdate = window.app.formatDate(this.selDateRange.start);
-        this.state.filter.enddate = window.app.formatDate(this.selDateRange.end);
-
-        this.requestData(this.state.filter);
+        this.requestData(form);
     }
 
     /**
@@ -229,9 +252,8 @@ class StatisticsView extends View {
                 onhide: () => this.onDatePickerHide(),
             });
             this.datePickerWrapper.append(this.datePicker.elem);
-        }
-        if (!this.datePicker) {
-            return;
+
+            this.setDatePickerSelection();
         }
 
         this.datePicker.show(!this.datePicker.visible());
@@ -241,33 +263,44 @@ class StatisticsView extends View {
      * Clear date range query
      */
     onDateClear() {
-        if (!('stdate' in this.state.filter) && !('enddate' in this.state.filter)) {
+        if (!('stdate' in this.state.form) && !('enddate' in this.state.form)) {
             return;
         }
-        this.datePicker?.hide();
 
-        delete this.state.filter.stdate;
-        delete this.state.filter.enddate;
-        this.requestData(this.state.filter);
+        const form = { ...this.state.form };
+        delete form.stdate;
+        delete form.enddate;
+        this.setState({ ...this.state, form });
+
+        if (this.datePicker) {
+            this.datePicker.hide();
+        } else {
+            this.requestData(this.state.form);
+        }
     }
 
     /**
-     * Filter type select callback
-     * @param {object} obj - selected filter type item
+     * Report type select callback
+     * @param {string} value - selected report type
      */
-    onFilterSel(obj) {
-        if (!obj) {
+    onSelectReportType(value) {
+        if (!value) {
             return;
         }
 
-        const filterType = (parseInt(obj.id, 10) === 1) ? 'currency' : null;
-        if (filterType) {
-            this.state.filter.filter = filterType;
-        } else if ('filter' in this.state.filter) {
-            delete this.state.filter.filter;
+        const form = { ...this.state.form };
+        if (value) {
+            form.report = value;
+        } else if ('report' in form) {
+            delete form.report;
+        }
+        if (form.report === this.state.form.report) {
+            return;
         }
 
-        this.requestData(this.state.filter);
+        this.setState({ ...this.state, form });
+
+        this.requestData(this.state.form);
     }
 
     /**
@@ -278,9 +311,19 @@ class StatisticsView extends View {
         if (!obj) {
             return;
         }
+        if (this.state.form.acc_id === obj.id) {
+            return;
+        }
 
-        this.state.filter.acc_id = obj.id;
-        this.requestData(this.state.filter);
+        this.setState({
+            ...this.state,
+            form: {
+                ...this.state.form,
+                acc_id: obj.id,
+            },
+        });
+
+        this.requestData(this.state.form);
     }
 
     /**
@@ -291,9 +334,18 @@ class StatisticsView extends View {
         if (!obj) {
             return;
         }
+        if (this.state.form.curr_id === obj.id) {
+            return;
+        }
+        this.setState({
+            ...this.state,
+            form: {
+                ...this.state.form,
+                curr_id: obj.id,
+            },
+        });
 
-        this.state.filter.curr_id = obj.id;
-        this.requestData(this.state.filter);
+        this.requestData(this.state.form);
     }
 
     /**
@@ -305,19 +357,25 @@ class StatisticsView extends View {
             return;
         }
 
+        const form = { ...this.state.form };
         const groupId = parseInt(obj.id, 10);
         const group = (groupId < this.groupTypes.length) ? this.groupTypes[groupId] : null;
         if (group) {
-            this.state.filter.group = group;
-        } else if ('group' in this.state.filter) {
-            delete this.state.filter.group;
+            form.group = group;
+        } else if ('group' in form) {
+            delete form.group;
+        }
+        if (form.group === this.state.form.group) {
+            return;
         }
 
-        this.requestData(this.state.filter);
+        this.setState({ ...this.state, form });
+
+        this.requestData(this.state.form);
     }
 
-    replaceHistory() {
-        const url = this.getFilterURL();
+    replaceHistory(state = this.state) {
+        const url = this.getFilterURL(state);
         window.history.replaceState({}, PAGE_TITLE, url);
     }
 
@@ -327,14 +385,22 @@ class StatisticsView extends View {
         try {
             const result = await API.transaction.statistics(options);
 
-            this.state.chartData = { ...result.data.histogram };
-            this.state.filter = { ...result.data.filter };
+            this.setState({
+                ...this.state,
+                chartData: { ...result.data.histogram },
+                filter: { ...result.data.filter },
+                form: { ...result.data.filter },
+                renderTime: Date.now(),
+            });
         } catch (e) {
-            return;
+            window.app.createMessage(e.message, 'msg_error');
+
+            this.setState({
+                ...this.state,
+                form: { ...this.state.filter },
+            });
         }
 
-        this.replaceHistory();
-        this.state.renderTime = Date.now();
         this.stopLoading();
     }
 
@@ -364,45 +430,66 @@ class StatisticsView extends View {
         return ce('ul', { className: POPUP_LIST_CLASS }, elems);
     }
 
-    render(state) {
-        if (!state) {
-            throw new Error('Invalid state');
+    setDatePickerSelection(state = this.state) {
+        if (!this.datePicker) {
+            return;
         }
 
-        if (state.loading) {
-            this.loadingIndicator.show();
+        const { stdate, enddate } = state.form;
+        const isDateFilter = !!(stdate && enddate);
+        if (isDateFilter) {
+            this.datePicker.setSelection(stdate, enddate);
+        } else {
+            this.datePicker.clearSelection();
+        }
+    }
+
+    renderFilters(state, prevState = {}) {
+        if (state.form === prevState.form) {
+            return;
+        }
+
+        if (state.filter !== prevState.filter) {
+            this.replaceHistory(state);
         }
 
         const filterUrl = this.getFilterURL(state);
 
         this.typeMenu.setURL(filterUrl);
-        this.typeMenu.setSelection(state.filter.type);
+        this.typeMenu.setSelection(state.form.type);
 
-        const isByCurrency = (state.filter.filter === 'currency');
-        this.filterTypeDropDown.selectItem((isByCurrency) ? 1 : 0);
+        const isByCurrency = (state.form.report === 'currency');
+        this.reportMenu.setActive(state.form.report);
 
         show(this.accountField, !isByCurrency);
         show(this.currencyField, isByCurrency);
 
-        if (state.filter.acc_id) {
-            this.accountDropDown.selectItem(state.filter.acc_id);
+        if (state.form.acc_id) {
+            this.accountDropDown.selectItem(state.form.acc_id);
         }
-        if (state.filter.curr_id) {
-            this.currencyDropDown.selectItem(state.filter.curr_id);
+        if (state.form.curr_id) {
+            this.currencyDropDown.selectItem(state.form.curr_id);
         }
 
-        const groupType = this.getGroupTypeByName(state.filter.group);
+        const groupType = this.getGroupTypeByName(state.form.group);
         this.groupDropDown.selectItem(groupType);
 
         // Render date
-        const isDateFilter = !!(state.filter.stdate && state.filter.enddate);
+        const isDateFilter = !!(state.form.stdate && state.form.enddate);
         const dateRangeFmt = (isDateFilter)
-            ? `${state.filter.stdate} - ${state.filter.enddate}`
+            ? `${state.form.stdate} - ${state.form.enddate}`
             : '';
         this.dateInput.value = dateRangeFmt;
         show(this.noDateBtn, isDateFilter);
 
-        // Render histogram
+        this.setDatePickerSelection(state);
+    }
+
+    renderHistogram(state, prevState = {}) {
+        if (state.chartData === prevState.chartData) {
+            return;
+        }
+
         const noData = !state.chartData?.values?.length && !state.chartData?.series?.length;
         show(this.noDataMessage, noData);
         show(this.histogram.chartContainer, !noData);
@@ -411,6 +498,19 @@ class StatisticsView extends View {
             this.histogram.setData(state.chartData);
         }
         this.histogram.elem.dataset.time = state.renderTime;
+    }
+
+    render(state, prevState = {}) {
+        if (!state) {
+            throw new Error('Invalid state');
+        }
+
+        if (state.loading) {
+            this.loadingIndicator.show();
+        }
+
+        this.renderFilters(state, prevState);
+        this.renderHistogram(state, prevState);
 
         if (!state.loading) {
             this.loadingIndicator.hide();

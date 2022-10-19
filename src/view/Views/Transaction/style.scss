@@ -1,4 +1,9 @@
-/* Swapn button */
+/* Type menu */
+.trtype-menu {
+  margin-bottom: 12px;
+}
+
+/* Swap button */
 .swap-btn {
   display: inline-flex;
   position: absolute;
@@ -66,7 +71,6 @@
   display: flex;
   flex-flow: column nowrap;
   row-gap: 10px;
-  height: 100px;
   min-width: 100px;
   margin: 8px 20px 10px 0;
 }

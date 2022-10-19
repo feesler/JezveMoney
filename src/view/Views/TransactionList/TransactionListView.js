@@ -5,6 +5,7 @@ import {
     isDate,
     setEvents,
     throttle,
+    asArray,
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { DropDown } from 'jezvejs/DropDown';
@@ -43,7 +44,8 @@ class TransactionListView extends View {
 
         this.state = {
             items: [...this.props.transArr],
-            filter: { ...this.props.filterObj },
+            filter: { ...this.props.filter },
+            form: { ...this.props.filter },
             pagination: { ...this.props.pagination },
             mode: this.props.mode,
             loading: false,
@@ -250,18 +252,18 @@ class TransactionListView extends View {
         e.stopPropagation();
         e.preventDefault();
 
-        this.state.filter = {};
+        this.state.form = {};
         this.state.pagination.page = 1;
 
-        this.requestTransactions(this.state.filter);
+        this.requestTransactions(this.state.form);
     }
 
     /**
      * Transaction type menu change event handler
      */
     onChangeTypeFilter(selected) {
-        this.state.filter.type = selected;
-        this.requestTransactions(this.state.filter);
+        this.state.form.type = selected;
+        this.requestTransactions(this.state.form);
     }
 
     isSameSelection(a, b) {
@@ -275,15 +277,15 @@ class TransactionListView extends View {
     onAccountChange(obj) {
         const data = Array.isArray(obj) ? obj : [obj];
         const ids = data.map((item) => parseInt(item.id, 10));
-        const filterIds = this.state.filter.acc_id ?? [];
+        const filterIds = this.state.form.acc_id ?? [];
 
         if (this.isSameSelection(ids, filterIds)) {
             return;
         }
 
         // Prepare parameters
-        this.state.filter.acc_id = ids;
-        this.requestTransactions(this.state.filter);
+        this.state.form.acc_id = ids;
+        this.requestTransactions(this.state.form);
     }
 
     /**
@@ -293,15 +295,15 @@ class TransactionListView extends View {
     onPersonChange(obj) {
         const data = Array.isArray(obj) ? obj : [obj];
         const ids = data.map((item) => parseInt(item.id, 10));
-        const filterIds = this.state.filter.person_id ?? [];
+        const filterIds = this.state.form.person_id ?? [];
 
         if (this.isSameSelection(ids, filterIds)) {
             return;
         }
 
         // Prepare parameters
-        this.state.filter.person_id = ids;
-        this.requestTransactions(this.state.filter);
+        this.state.form.person_id = ids;
+        this.requestTransactions(this.state.form);
     }
 
     /**
@@ -317,31 +319,31 @@ class TransactionListView extends View {
     /** Search field input event handler */
     onSearchInput() {
         const searchQuery = this.searchInp.value;
-        if (this.state.filter.search === searchQuery) {
+        if (this.state.form.search === searchQuery) {
             return;
         }
 
         if (searchQuery.length > 0) {
-            this.state.filter.search = searchQuery;
-        } else if ('search' in this.state.filter) {
-            delete this.state.filter.search;
+            this.state.form.search = searchQuery;
+        } else if ('search' in this.state.form) {
+            delete this.state.form.search;
         }
 
         this.state.typingSearch = true;
 
-        this.requestTransactions(this.state.filter);
+        this.requestTransactions(this.state.form);
     }
 
     /**
      * Clear search query
      */
     onSearchClear() {
-        if (!('search' in this.state.filter)) {
+        if (!('search' in this.state.form)) {
             return;
         }
 
-        delete this.state.filter.search;
-        this.requestTransactions(this.state.filter);
+        delete this.state.form.search;
+        this.requestTransactions(this.state.form);
     }
 
     async deleteSelected() {
@@ -358,7 +360,7 @@ class TransactionListView extends View {
 
         try {
             await API.transaction.del({ id: selectedIds });
-            this.requestTransactions(this.state.filter);
+            this.requestTransactions(this.state.form);
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
             this.stopLoading();
@@ -392,48 +394,47 @@ class TransactionListView extends View {
             return;
         }
 
-        this.state.selDateRange = range;
-        this.datePicker.hide();
-        const start = window.app.formatDate(range.start);
-        const end = window.app.formatDate(range.end);
+        const stdate = window.app.formatDate(range.start);
+        const enddate = window.app.formatDate(range.end);
+        if (stdate === this.state.form.stdate && enddate === this.state.form.enddate) {
+            return;
+        }
 
-        this.dateInput.value = `${start} - ${end}`;
+        this.state.form.stdate = window.app.formatDate(range.start);
+        this.state.form.enddate = window.app.formatDate(range.end);
+        this.render(this.state);
+
+        this.datePicker.hide();
     }
 
     /**
      * Date picker hide callback
      */
     onDatePickerHide() {
-        if (!this.state.selDateRange) {
+        const { filter, form } = this.state;
+        if (filter.stdate === form.stdate && filter.enddate === form.enddate) {
             return;
         }
 
-        const newStartDate = window.app.formatDate(this.state.selDateRange.start);
-        const newEndDate = window.app.formatDate(this.state.selDateRange.end);
-
-        if (this.state.filter.stdate === newStartDate
-            && this.state.filter.enddate === newEndDate) {
-            return;
-        }
-
-        this.state.filter.stdate = newStartDate;
-        this.state.filter.enddate = newEndDate;
-
-        this.requestTransactions(this.state.filter);
+        this.requestTransactions(form);
     }
 
     /**
      * Clear date range query
      */
     onDateClear() {
-        if (!('stdate' in this.state.filter) && !('enddate' in this.state.filter)) {
+        if (!('stdate' in this.state.form) && !('enddate' in this.state.form)) {
             return;
         }
-        this.datePicker?.hide();
 
-        delete this.state.filter.stdate;
-        delete this.state.filter.enddate;
-        this.requestTransactions(this.state.filter);
+        delete this.state.form.stdate;
+        delete this.state.form.enddate;
+
+        if (this.datePicker) {
+            this.datePicker.hide();
+        } else {
+            this.requestTransactions(this.state.form);
+        }
     }
 
     /**
@@ -449,22 +450,17 @@ class TransactionListView extends View {
                 onhide: () => this.onDatePickerHide(),
             });
             this.datePickerWrapper.append(this.datePicker.elem);
-        }
-        if (!this.datePicker) {
-            return;
+
+            this.setDatePickerSelection();
         }
 
         const isVisible = this.datePicker.visible();
-        if (!isVisible) {
-            this.datePicker.setSelection(this.state.filter.stdate, this.state.filter.enddate);
-        }
-
         this.datePicker.show(!isVisible);
     }
 
     onChangePage(page) {
         this.requestTransactions({
-            ...this.state.filter,
+            ...this.state.form,
             page,
         });
     }
@@ -494,8 +490,11 @@ class TransactionListView extends View {
             this.state.items = [...result.data.items];
             this.state.pagination = { ...result.data.pagination };
             this.state.filter = { ...result.data.filter };
+            this.state.form = { ...result.data.filter };
         } catch (e) {
-            return;
+            window.app.createMessage(e.message, 'msg_error');
+
+            this.state.form = { ...this.state.filter };
         }
 
         this.replaceHistory();
@@ -507,7 +506,7 @@ class TransactionListView extends View {
     renderAccountsFilter(state) {
         const selectedAccounts = this.accountDropDown.getSelectedItems();
         const selectedIds = [];
-        const idsToSelect = Array.isArray(state.filter.acc_id) ? state.filter.acc_id : [];
+        const idsToSelect = asArray(state.form.acc_id);
         selectedAccounts.forEach((accountItem) => {
             const itemId = parseInt(accountItem.id, 10);
             selectedIds.push(itemId);
@@ -527,7 +526,7 @@ class TransactionListView extends View {
     renderPersonsFilter(state) {
         const selectedPersons = this.personDropDown.getSelectedItems();
         const selectedIds = [];
-        const idsToSelect = Array.isArray(state.filter.person_id) ? state.filter.person_id : [];
+        const idsToSelect = asArray(state.form.person_id);
         selectedPersons.forEach((personItem) => {
             const itemId = parseInt(personItem.id, 10);
             selectedIds.push(itemId);
@@ -543,6 +542,20 @@ class TransactionListView extends View {
         });
     }
 
+    setDatePickerSelection(state = this.state) {
+        if (!this.datePicker) {
+            return;
+        }
+
+        const { stdate, enddate } = state.form;
+        const isDateFilter = !!(stdate && enddate);
+        if (isDateFilter) {
+            this.datePicker.setSelection(stdate, enddate);
+        } else {
+            this.datePicker.clearSelection();
+        }
+    }
+
     render(state) {
         if (state.loading) {
             this.loadingIndicator.show();
@@ -551,7 +564,7 @@ class TransactionListView extends View {
         const filterUrl = this.getFilterURL(state, false);
 
         this.typeMenu.setURL(filterUrl);
-        this.typeMenu.setSelection(state.filter.type);
+        this.typeMenu.setSelection(state.form.type);
 
         if (window.app.model.accounts.length > 0) {
             this.renderAccountsFilter(state);
@@ -561,17 +574,19 @@ class TransactionListView extends View {
         }
 
         // Render date
-        const isDateFilter = !!(state.filter.stdate && state.filter.enddate);
+        const isDateFilter = !!(state.form.stdate && state.form.enddate);
         const dateRangeFmt = (isDateFilter)
-            ? `${state.filter.stdate} - ${state.filter.enddate}`
+            ? `${state.form.stdate} - ${state.form.enddate}`
             : '';
         this.dateInput.value = dateRangeFmt;
         show(this.noDateBtn, isDateFilter);
 
+        this.setDatePickerSelection(state);
+
         // Search form
-        const isSearchFilter = !!state.filter.search;
+        const isSearchFilter = !!state.form.search;
         if (!state.typingSearch) {
-            this.searchInp.value = (isSearchFilter) ? state.filter.search : '';
+            this.searchInp.value = (isSearchFilter) ? state.form.search : '';
         }
         show(this.noSearchBtn, isSearchFilter);
 

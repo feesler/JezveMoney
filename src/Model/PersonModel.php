@@ -10,6 +10,8 @@ use JezveMoney\App\Item\PersonItem;
 
 use function JezveMoney\Core\inSetCondition;
 
+define("PERSON_HIDDEN", 1);
+
 class PersonModel extends CachedTable
 {
     use Singleton;
@@ -391,6 +393,7 @@ class PersonModel extends CachedTable
         $requestedType = isset($params["type"]) ? $params["type"] : "visible";
         $includeVisible = in_array($requestedType, ["all", "visible"]);
         $includeHidden = in_array($requestedType, ["all", "hidden"]);
+        $sortByVisibility = (isset($params["sort"]) && $params["sort"] == "visibility");
 
         $itemsData = [];
         if ($requestAll) {
@@ -403,7 +406,7 @@ class PersonModel extends CachedTable
             }
         } else {
             if (!$this->checkCache()) {
-                return null;
+                return [];
             }
 
             $itemsData = $this->cache;
@@ -423,6 +426,12 @@ class PersonModel extends CachedTable
             $itemObj->accounts = $accMod->getData(["person" => $item->id]);
 
             $res[] = $itemObj;
+        }
+
+        if ($sortByVisibility) {
+            usort($res, function ($a, $b) {
+                return $a->flags - $b->flags;
+            });
         }
 
         return $res;

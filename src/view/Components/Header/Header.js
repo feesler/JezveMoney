@@ -1,4 +1,10 @@
-import { ge, show, Component } from 'jezvejs';
+import {
+    ge,
+    show,
+    Component,
+    setEmptyClick,
+    removeEmptyClick,
+} from 'jezvejs';
 import { Switch } from 'jezvejs/Switch';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 import { DARK_THEME } from '../../js/Application.js';
@@ -8,6 +14,12 @@ import './style.scss';
  * Header component
  */
 export class Header extends Component {
+    constructor(props) {
+        super(props);
+
+        this.userNavEmptyClick = () => this.hideUserNavigation();
+    }
+
     /**
      * Parse DOM to obtain child elements and build state of component
      */
@@ -33,7 +45,7 @@ export class Header extends Component {
         }
 
         this.userBtn = ge('userbtn');
-        this.userBtn.addEventListener('click', () => this.showUserNavigation());
+        this.userBtn.addEventListener('click', (e) => this.showUserNavigation(e));
         this.userNameElem = this.userBtn.querySelector('.user-btn__title');
         if (this.userNameElem) {
             this.userName = this.userNameElem.textContent;
@@ -70,16 +82,22 @@ export class Header extends Component {
     }
 
     /** Show user navigation */
-    showUserNavigation() {
+    showUserNavigation(e) {
+        e.stopPropagation();
+
         this.hideNavigation();
         show(this.userNavContent, true);
         this.userNavigation.open();
+
+        setEmptyClick(this.userNavEmptyClick, [this.userNavContent]);
     }
 
     /** Hide user navigation */
     hideUserNavigation() {
         this.userNavigation.close();
         show(this.userNavContent, false);
+
+        removeEmptyClick(this.userNavEmptyClick);
     }
 
     /**

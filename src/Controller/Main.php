@@ -76,7 +76,7 @@ class Main extends TemplateController
             ];
         }
 
-        // Find most frequent currency of laters transactions
+        // Find most frequent currency of latest transactions
         $currencies = [];
         foreach ($transactions as $item) {
             if (!isset($currencies[$item->src_curr])) {
@@ -104,10 +104,10 @@ class Main extends TemplateController
         }
 
         $data["statArr"] = $transMod->getHistogramSeries([
-            "filter" => "currency",
+            "report" => "currency",
             "curr_id" => $currencyId,
             "type" => EXPENSE,
-            "group" => 2, // group by week
+            "group" => GROUP_BY_WEEK,
             "limit" => 5
         ]);
 

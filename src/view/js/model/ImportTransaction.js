@@ -20,6 +20,8 @@ const transTypeMap = {
 const defaultProps = {
     isForm: false,
     enabled: true,
+    collapsed: true,
+    similarTransaction: null,
     type: 'expense',
     sourceAccountId: 0,
     destAccountId: 0,
@@ -59,6 +61,10 @@ export class ImportTransaction {
 
     get enabled() {
         return this.state.enabled;
+    }
+
+    get collapsed() {
+        return this.state.collapsed;
     }
 
     get mainAccount() {
@@ -131,6 +137,51 @@ export class ImportTransaction {
         }
         const state = copyObject(this.state);
         state.enabled = res;
+
+        this.state = state;
+        return state;
+    }
+
+    /**
+     * Collapse/expand component
+     * @param {boolean} val - if true then collapse component, else expand
+     */
+    collapse(value) {
+        const res = !!value;
+
+        if (this.state.collapsed === res) {
+            return this.state;
+        }
+        const state = copyObject(this.state);
+        state.collapsed = res;
+
+        this.state = state;
+        return state;
+    }
+
+    isSameSimilarTransaction(transaction) {
+        return (
+            (!this.state.similarTransaction && !transaction)
+            || (
+                this.state.similarTransaction
+                && transaction
+                && this.state.similarTransaction.id === transaction.id
+            )
+        );
+    }
+
+    /**
+     * Set similar transaction value
+     * @param {Object} transaction
+     */
+    setSimilarTransaction(transaction) {
+        if (this.isSameSimilarTransaction(transaction)) {
+            return this.state;
+        }
+
+        const state = copyObject(this.state);
+        state.similarTransaction = copyObject(transaction);
+        state.enabled = !transaction;
 
         this.state = state;
         return state;

@@ -20,6 +20,8 @@ class Application extends TestApplication {
     }
 
     async init() {
+        setupTest(this.environment);
+
         this.state = new AppState();
 
         this.scenario = await Scenario.create(this.environment);
@@ -46,8 +48,6 @@ class Application extends TestApplication {
         );
 
         this.dateList.push(...Object.values(this.dates));
-
-        setupTest(this.environment);
     }
 
     async setupUser() {

@@ -110,7 +110,7 @@ export const putFile = async (data) => {
             (res.msg) ? res.msg : defErrorMessage,
         );
 
-        return res.data.filename;
+        return { filename: res.data.filename, data };
     } catch (e) {
         console.log(e.message);
         return null;
@@ -122,6 +122,10 @@ export const removeFile = async (filename) => {
     const baseURL = baseUrl();
     const removeURL = `${baseURL}admin/tests/remove`;
     const defErrorMessage = 'Request failed';
+
+    if (!filename) {
+        return true;
+    }
 
     try {
         const data = { filename };
@@ -233,12 +237,11 @@ export const changeMainAccount = async (accountId) => {
             item.setMainAccount(accountId);
             App.state.rules.applyTo(item);
 
-            item.enabled = true;
             const tr = findSimilarTransaction(item, skipList);
             if (tr) {
                 skipList.push(tr.id);
-                item.enabled = false;
             }
+            item.setSimilarTransaction(tr);
         });
 
         App.view.model.mainAccount = account.id;
@@ -344,8 +347,6 @@ export const enableItems = async ({ index, value = true }) => {
     const descr = enable ? 'Enable items' : 'Disable items';
 
     await test(`${descr} [${index}]`, async () => {
-        assert.isArray(index, 'Invalid parameters');
-
         await checkNavigation();
         await checkViewState('main');
 

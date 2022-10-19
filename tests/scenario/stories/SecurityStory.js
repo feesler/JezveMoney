@@ -1,9 +1,8 @@
-import { setBlock } from 'jezve-test';
-import * as SecurityTests from '../run/security.js';
-import { App } from '../Application.js';
+import { setBlock, TestStory } from 'jezve-test';
+import * as SecurityTests from '../../run/security.js';
+import { App } from '../../Application.js';
 
-export const securityTests = {
-    /** Run security tests */
+export class SecurityStory extends TestStory {
     async run() {
         setBlock('Security tests', 1);
 
@@ -20,5 +19,5 @@ export const securityTests = {
             'api/',
             'admin/',
         ]);
-    },
-};
+    }
+}

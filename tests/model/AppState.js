@@ -377,6 +377,11 @@ export class AppState {
         this.userAccountsCache.sortByVisibility();
     }
 
+    getUserAccounts() {
+        this.cacheUserAccounts();
+        return this.userAccountsCache;
+    }
+
     getAccountsByIndexes(accounts, returnIds = false) {
         const itemIndexes = Array.isArray(accounts) ? accounts : [accounts];
         this.cacheUserAccounts();
@@ -619,8 +624,12 @@ export class AppState {
         if (!availTransTypes.includes(params.type)) {
             return false;
         }
-
+        // Amount must be greather than zero
         if (params.src_amount <= 0 || params.dest_amount <= 0) {
+            return false;
+        }
+        // Source and destination amounts must be equal if currencies are same
+        if (params.src_curr === params.dest_curr && params.src_amount !== params.dest_amount) {
             return false;
         }
 
@@ -635,6 +644,9 @@ export class AppState {
 
         if (params.type === DEBT) {
             if (!params.person_id) {
+                return false;
+            }
+            if ('op' in params && params.op !== 1 && params.op !== 2) {
                 return false;
             }
 
@@ -886,18 +898,17 @@ export class AppState {
     isAvailableTransactionType(type) {
         assert(availTransTypes.includes(type), 'Invalid transaction type');
 
-        const userVisibleAccounts = this.accounts.getUserVisible();
+        this.cacheUserAccounts();
 
         if (type === EXPENSE || type === INCOME) {
-            return (userVisibleAccounts.length > 0);
+            return (this.userAccountsCache.length > 0);
         }
         if (type === TRANSFER) {
-            return (userVisibleAccounts.length > 1);
+            return (this.userAccountsCache.length > 1);
         }
 
         // DEBT
-        const visiblePersons = this.persons.getVisible();
-        return (visiblePersons.length > 0);
+        return (this.persons.length > 0);
     }
 
     /**

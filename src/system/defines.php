@@ -15,12 +15,15 @@ UPLOAD_PATH - path to the uploads directory
 LOGS_PATH - path to the logs directory
 */
 
-define("APP_VERSION", "1.28.0");
+define("APP_VERSION", "1.30.0");
 define("APP_PROTOCOL", "https://");
 
 define("PROD_HOST", "jezvemoney.ru");
 define("DEV_HOST", "jezve.net");
 define("LOCAL_DEV_HOST", "testsrv");
+
+define("MAX_LOG_SIZE", 1024 * 1024);
+define("MAX_LOG_FILES", 10);
 
 
 function domainFromHost($host)

@@ -7,10 +7,11 @@ const __dirname = dirname(__filename);
 export default {
     mode: 'production',
     target: 'browserslist',
+    context: resolve(__dirname, '..'),
     entry: './tests/index.js',
     output: {
         filename: 'index.js',
-        path: resolve(__dirname, 'dist/admin/view/js/tests'),
+        path: resolve(__dirname, '../dist/admin/view/js/tests'),
         clean: true
     },
     module: {
@@ -18,9 +19,9 @@ export default {
             {
                 test: /\.m?js$/,
                 include: [
-                    resolve(__dirname, 'tests'),
-                    resolve('node_modules/jezvejs'),
-                    resolve('node_modules/jezve-test'),
+                    resolve(__dirname, '../tests'),
+                    resolve(__dirname, '../node_modules/jezvejs'),
+                    resolve(__dirname, '../node_modules/jezve-test'),
                 ],
                 exclude: /node_modules\/(?!(jezve-test|jezvejs)\/).*/,
                 use: [
