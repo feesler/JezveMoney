@@ -362,13 +362,13 @@ export class TransactionView extends AppView {
 
     isValid() {
         if (this.content.src_amount_row?.content?.visible) {
-            if (!this.model.srcAmount.length || !isValidValue(this.model.srcAmount)) {
+            if (this.model.fSrcAmount <= 0) {
                 return false;
             }
         }
 
         if (this.content.dest_amount_row?.content?.visible) {
-            if (!this.model.destAmount.length || !isValidValue(this.model.destAmount)) {
+            if (this.model.fDestAmount <= 0) {
                 return false;
             }
         }

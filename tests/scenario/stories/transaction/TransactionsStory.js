@@ -127,10 +127,18 @@ export class TransactionsStory extends TestStory {
             fromAccount: 0,
             destAmount: '',
         }, {
+            fromAccount: 0,
+            destAmount: '-100',
+        }, {
             fromAccount: 1,
             destAmount: '1',
             destCurr: KRW,
             srcAmount: '',
+        }, {
+            fromAccount: 1,
+            destAmount: '1',
+            destCurr: KRW,
+            srcAmount: '-100',
         }, {
             // Try to submit expense with invalid date
             fromAccount: 0,
@@ -174,10 +182,18 @@ export class TransactionsStory extends TestStory {
             fromAccount: 0,
             srcAmount: '',
         }, {
+            fromAccount: 0,
+            srcAmount: '-100',
+        }, {
             fromAccount: 1,
             srcAmount: '1',
             srcCurr: KRW,
             destAmount: '',
+        }, {
+            fromAccount: 1,
+            srcAmount: '1',
+            srcCurr: KRW,
+            destAmount: '-100',
         },
         // Try to submit income with invalid date
         {
@@ -223,9 +239,15 @@ export class TransactionsStory extends TestStory {
             // Try to submit transfer with invalid amount
             srcAmount: '',
         }, {
+            srcAmount: '-100',
+        }, {
             destAcc: 2,
             srcAmount: '11.4',
             destAmount: '',
+        }, {
+            destAcc: 2,
+            srcAmount: '11.4',
+            destAmount: '-100',
         }, {
             // Try to submit transfer with invalid date
             srcAmount: '100',
@@ -279,6 +301,8 @@ export class TransactionsStory extends TestStory {
         }, {
             // Try to submit debt with invalid amount
             srcAmount: '',
+        }, {
+            srcAmount: '-100',
         }, {
             // Try to submit debt with invalid date
             srcAmount: '100',

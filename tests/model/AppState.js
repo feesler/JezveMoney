@@ -624,8 +624,12 @@ export class AppState {
         if (!availTransTypes.includes(params.type)) {
             return false;
         }
-
+        // Amount must be greather than zero
         if (params.src_amount <= 0 || params.dest_amount <= 0) {
+            return false;
+        }
+        // Source and destination amounts must be equal if currencies are same
+        if (params.src_curr === params.dest_curr && params.src_amount !== params.dest_amount) {
             return false;
         }
 
@@ -640,6 +644,9 @@ export class AppState {
 
         if (params.type === DEBT) {
             if (!params.person_id) {
+                return false;
+            }
+            if ('op' in params && params.op !== 1 && params.op !== 2) {
                 return false;
             }
 

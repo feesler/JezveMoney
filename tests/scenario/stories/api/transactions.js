@@ -121,6 +121,15 @@ const create = async () => {
         src_amount: 0,
     }, {
         type: EXPENSE,
+        src_id: App.scenario.ACC_RUB,
+        src_amount: -100,
+    }, {
+        type: EXPENSE,
+        src_id: App.scenario.ACC_RUB,
+        src_amount: 100,
+        dest_amount: 1000,
+    }, {
+        type: EXPENSE,
         src_id: 0,
         dest_id: App.scenario.ACC_RUB,
         src_amount: 100,
@@ -141,6 +150,10 @@ const create = async () => {
         type: INCOME,
         dest_id: App.scenario.ACC_RUB,
         dest_amount: '',
+    }, {
+        type: INCOME,
+        dest_id: App.scenario.ACC_RUB,
+        dest_amount: -100,
     }, {
         type: INCOME,
         dest_id: personAccount.id,
@@ -173,6 +186,22 @@ const create = async () => {
         dest_amount: 100,
     }, {
         type: TRANSFER,
+        src_id: App.scenario.ACC_RUB,
+        dest_id: App.scenario.CASH_RUB,
+        src_amount: 0,
+    }, {
+        type: TRANSFER,
+        src_id: App.scenario.ACC_RUB,
+        dest_id: App.scenario.CASH_RUB,
+        src_amount: -100,
+    }, {
+        type: TRANSFER,
+        src_id: App.scenario.ACC_RUB,
+        dest_id: App.scenario.CASH_RUB,
+        src_amount: 100,
+        dest_amount: 100,
+    }, {
+        type: TRANSFER,
         src_id: App.scenario.ACC_USD,
         dest_id: personAccount.id,
         src_amount: 100,
@@ -202,10 +231,17 @@ const create = async () => {
         op: 1,
         person_id: App.scenario.PERSON_X,
         acc_id: 0,
+        src_amount: -100,
+        src_curr: RUB,
+    }, {
+        type: DEBT,
+        op: 1,
+        person_id: App.scenario.PERSON_X,
+        acc_id: 0,
         src_amount: 10,
         src_curr: 9999,
     }];
-    await App.scenario.runner.runGroup(TransactionApiTests.create, invData);
+    await App.scenario.runner.runGroup(TransactionApiTests.extractAndCreate, invData);
 };
 
 const createMultiple = async () => {

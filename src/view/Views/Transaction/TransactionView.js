@@ -2,7 +2,6 @@ import 'jezvejs/style';
 import {
     ge,
     insertAfter,
-    isNum,
     show,
     enable,
     checkDate,
@@ -15,7 +14,6 @@ import { DecimalInput } from 'jezvejs/DecimalInput';
 import { Spinner } from 'jezvejs/Spinner';
 import 'jezvejs/style/InputGroup';
 import {
-    fixFloat,
     isValidValue,
     normalizeExch,
     timeToDate,
@@ -731,22 +729,14 @@ class TransactionView extends View {
     }
 
     validateSourceAmount(state) {
-        const valid = (
-            state.transaction.src_amount
-            && isNum(fixFloat(state.form.sourceAmount))
-        );
-
+        const valid = (state.transaction.src_amount > 0);
         if (!valid) {
             this.store.dispatch(invalidateSourceAmount());
         }
     }
 
     validateDestAmount(state) {
-        const valid = (
-            state.transaction.dest_amount
-            && isNum(fixFloat(state.form.destAmount))
-        );
-
+        const valid = (state.transaction.dest_amount > 0);
         if (!valid) {
             this.store.dispatch(invalidateDestAmount());
         }

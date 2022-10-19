@@ -75,6 +75,7 @@ export const createTransactions = async () => {
         dest_id: ACC_RUB,
         src_amount: '7013.21',
         dest_amount: '5000',
+        src_curr: USD,
         comment: '33333',
     }, {
         type: INCOME,
