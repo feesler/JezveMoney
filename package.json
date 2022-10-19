@@ -13,8 +13,8 @@
     "lint-tests": "eslint -c ./tests.eslintrc.json --quiet ./tests/",
     "lint-style": "npx stylelint src/view/**/*.scss src/admin/view/**/*.scss --cache --cache-location .cache/.stylelintcache --rd",
     "debug": "node --inspect-brk ./tests/index.js",
-    "build": "npx webpack --progress -c ./webpack.prod.js",
-    "build-dev": "npx webpack --progress -c ./webpack.dev.js",
+    "build": "npx webpack --progress -c ./config/webpack.config.js -c ./config/webpack.prod.js -m",
+    "build-dev": "npx webpack --progress -c ./config/webpack.config.js -c ./config/webpack.dev.js -m",
     "copy-admin": "powershell -c \"cp ./src/admin/Controller,./src/admin/Template,./src/admin/.htaccess,./src/admin/index.php -Destination ./dist/admin/ -Force -Recurse\"",
     "copy-server": "powershell -c \"cp ./src/Controller,./src/Model,./src/Template,./src/system,./src/api,./src/.htaccess,./src/index.php,./src/favicon.ico,./src/manifest.webmanifest -Destination ./dist -Force -Recurse",
     "copy-client": "powershell -c \"cp ./src/view/img -Destination ./dist/view -Force -Recurse\"",
@@ -23,7 +23,7 @@
     "update-composer": "powershell -c \"cp ./composer.json -Destination ./dist/; cd ./dist; composer update --no-dev; composer dump-autoload -a --no-dev; rm composer.lock,composer.json\"",
     "postbuild": "npm run copy-dist",
     "postbuild-dev": "npm run copy-dist",
-    "build-tests": "npx webpack --progress -c ./webpack.tests.js",
+    "build-tests": "npx webpack --progress -c ./config/webpack.tests.js",
     "build-all": "npm-run-all build build-tests copy-dist"
   },
   "keywords": [
