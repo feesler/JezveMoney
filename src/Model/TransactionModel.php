@@ -927,7 +927,7 @@ class TransactionModel extends CachedTable
         }
 
         // Prepare balance updates for accounts
-        $userAccounts = $this->accModel->getData(["full" => true, "type" => "all"]);
+        $userAccounts = $this->accModel->getData(["owner" => "all", "visibility" => "all"]);
         $balanceChanges = [];
         foreach ($userAccounts as $account) {
             if ($keepAccountBalance) {
@@ -1141,7 +1141,7 @@ class TransactionModel extends CachedTable
         }
         $res = [];
         foreach ($persons as $personId) {
-            $accounts = $this->accModel->getData(["person" => $personId]);
+            $accounts = $this->accModel->getData(["owner" => $personId]);
             if (count($accounts) > 0) {
                 foreach ($accounts as $account) {
                     $res[] = $account->id;

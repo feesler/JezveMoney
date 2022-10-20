@@ -40,7 +40,7 @@ class Accounts extends TemplateController
 
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
-            "accounts" => $this->model->getData(["type" => "all"]),
+            "accounts" => $this->model->getData(["visibility" => "all"]),
             "currency" => $currMod->getData(),
             "icons" => $iconModel->getData(),
         ];
@@ -94,7 +94,7 @@ class Accounts extends TemplateController
         $data["icons"] = $iconModel->getData();
 
         $data["appProps"] = [
-            "accounts" => $this->model->getData(["type" => "all"]),
+            "accounts" => $this->model->getData(["visibility" => "all"]),
             "currency" => $currMod->getData(),
             "icons" => $data["icons"],
             "view" => [
@@ -160,7 +160,7 @@ class Accounts extends TemplateController
         $data["icons"] = $iconModel->getData();
 
         $data["appProps"] = [
-            "accounts" => $this->model->getData(["type" => "all"]),
+            "accounts" => $this->model->getData(["visibility" => "all"]),
             "currency" => $currMod->getData(),
             "icons" => $data["icons"],
             "view" => [

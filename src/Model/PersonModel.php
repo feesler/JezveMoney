@@ -309,7 +309,7 @@ class PersonModel extends CachedTable
         }
 
         // delete import rules
-        $userPersons = $this->getData(["full" => true, "type" => "all"]);
+        $userPersons = $this->getData(["full" => true, "visibility" => "all"]);
         $personsToDelete = [];
         foreach ($userPersons as $person) {
             $personsToDelete[] = $person->id;
@@ -378,11 +378,12 @@ class PersonModel extends CachedTable
      *      Query parameters
      *      - full (boolean): if set to true and current user have admin rights method
      *                        will return persons of all users ;
-     *      - type (string): visibility filter. Possible values: "all", "visible", "hidden" ;
+     *      - visibility (string): visibility filter. Possible values: "all", "visible", "hidden" ;
+     *      - sort (string): sort result array. Possible value: "visibility" ;
      *
      * @return array of person objects
      */
-    public function getData($params = null)
+    public function getData($params = [])
     {
         if (!is_array($params)) {
             $params = [];
@@ -390,9 +391,9 @@ class PersonModel extends CachedTable
 
         $accMod = AccountModel::getInstance();
         $requestAll = (isset($params["full"]) && $params["full"] == true && UserModel::isAdminUser());
-        $requestedType = isset($params["type"]) ? $params["type"] : "visible";
-        $includeVisible = in_array($requestedType, ["all", "visible"]);
-        $includeHidden = in_array($requestedType, ["all", "hidden"]);
+        $requestedVisibility = isset($params["visibility"]) ? $params["visibility"] : "visible";
+        $includeVisible = in_array($requestedVisibility, ["all", "visible"]);
+        $includeHidden = in_array($requestedVisibility, ["all", "hidden"]);
         $sortByVisibility = (isset($params["sort"]) && $params["sort"] == "visibility");
 
         $itemsData = [];
@@ -423,7 +424,7 @@ class PersonModel extends CachedTable
             }
 
             $itemObj = new PersonItem($item);
-            $itemObj->accounts = $accMod->getData(["person" => $item->id]);
+            $itemObj->accounts = $accMod->getData(["owner" => $item->id]);
 
             $res[] = $itemObj;
         }

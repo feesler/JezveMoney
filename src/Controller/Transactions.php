@@ -130,8 +130,8 @@ class Transactions extends TemplateController
 
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
-            "accounts" => $this->accModel->getData(["full" => true, "type" => "all"]),
-            "persons" => $this->personMod->getData(["type" => "all"]),
+            "accounts" => $this->accModel->getData(["owner" => "all", "visibility" => "all"]),
+            "persons" => $this->personMod->getData(["visibility" => "all"]),
             "currency" => $this->currModel->getData(),
             "view" => [
                 "transArr" => $trItems,
@@ -342,7 +342,7 @@ class Transactions extends TemplateController
         $acc_count = count($userAccounts);
         $data["acc_count"] = $acc_count;
 
-        $persons = $this->personMod->getData(["type" => "all", "sort" => "visibility"]);
+        $persons = $this->personMod->getData(["visibility" => "all", "sort" => "visibility"]);
         $iconModel = IconModel::getInstance();
         $defMsg = ERR_TRANS_CREATE;
 
@@ -637,10 +637,10 @@ class Transactions extends TemplateController
 
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
-            "accounts" => $this->accModel->getData(["type" => "all", "full" => true]),
+            "accounts" => $this->accModel->getData(["owner" => "all", "visibility" => "all"]),
             "currency" => $this->currModel->getData(),
             "icons" => $iconModel->getData(),
-            "persons" => $this->personMod->getData(["type" => "all"]),
+            "persons" => $this->personMod->getData(["visibility" => "all"]),
             "view" => [
                 "mode" => $this->action,
                 "transaction" => $tr,
@@ -667,7 +667,7 @@ class Transactions extends TemplateController
         ];
         $form = [];
 
-        $persons = $this->personMod->getData(["type" => "all", "sort" => "visibility"]);
+        $persons = $this->personMod->getData(["visibility" => "all", "sort" => "visibility"]);
         $iconModel = IconModel::getInstance();
         $defMsg = ERR_TRANS_UPDATE;
 
@@ -914,10 +914,10 @@ class Transactions extends TemplateController
 
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
-            "accounts" => $this->accModel->getData(["type" => "all", "full" => true]),
+            "accounts" => $this->accModel->getData(["owner" => "all", "visibility" => "all"]),
             "currency" => $this->currModel->getData(),
             "icons" => $iconModel->getData(),
-            "persons" => $this->personMod->getData(["type" => "all"]),
+            "persons" => $this->personMod->getData(["visibility" => "all"]),
             "view" => [
                 "mode" => $this->action,
                 "transaction" => $tr,

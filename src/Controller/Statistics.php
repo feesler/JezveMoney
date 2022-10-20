@@ -119,7 +119,7 @@ class Statistics extends TemplateController
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
             "currency" => $currMod->getData(),
-            "accounts" => $accMod->getData(["type" => "all"]),
+            "accounts" => $accMod->getData(["visibility" => "all"]),
             "view" => [
                 "accountCurrency" => $accCurr,
                 "filter" => $filterObj,

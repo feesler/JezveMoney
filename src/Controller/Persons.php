@@ -18,7 +18,7 @@ class Persons extends TemplateController
             "titleString" => "Jezve Money | Persons",
         ];
         $data["appProps"] = [
-            "persons" => $this->personMod->getData(["type" => "all"])
+            "persons" => $this->personMod->getData(["visibility" => "all"])
         ];
 
         $this->cssArr[] = "PersonListView.css";
@@ -50,7 +50,7 @@ class Persons extends TemplateController
             "titleString" => "Jezve Money | New person"
         ];
 
-        $personsData = $this->personMod->getData(["type" => "all"]);
+        $personsData = $this->personMod->getData(["visibility" => "all"]);
 
         $pInfo = new \stdClass();
         $pInfo->id = 0;
@@ -95,7 +95,7 @@ class Persons extends TemplateController
         }
         $data["pInfo"] = $pInfo;
 
-        $personsData = $this->personMod->getData(["type" => "all"]);
+        $personsData = $this->personMod->getData(["visibility" => "all"]);
 
         $data["appProps"] = [
             "persons" => $personsData,
