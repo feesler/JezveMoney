@@ -2,7 +2,7 @@ import 'jezvejs/style';
 import {
     ge,
     re,
-    ce,
+    createElement,
     show,
     removeChilds,
     setEvents,
@@ -150,7 +150,7 @@ class ImportView extends View {
         this.rulesBtn.addEventListener('click', () => this.onRulesClick());
         // Submit progress indicator
         this.submitProgress = LoadingIndicator.create({ title: 'Saving items...' });
-        this.submitProgressIndicator = ce('div');
+        this.submitProgressIndicator = createElement('div');
         this.submitProgress.elem.append(this.submitProgressIndicator);
         const contentWrapper = document.querySelector('.content_wrap');
         if (!contentWrapper) {
@@ -1215,7 +1215,12 @@ class ImportView extends View {
             this.noDataMsg = null;
         } else {
             if (!this.noDataMsg) {
-                this.noDataMsg = ce('span', { className: 'nodata-message', textContent: MSG_NO_TRANSACTIONS });
+                this.noDataMsg = createElement('span', {
+                    props: {
+                        className: 'nodata-message',
+                        textContent: MSG_NO_TRANSACTIONS,
+                    },
+                });
             }
             this.rowsContainer.append(this.noDataMsg);
         }

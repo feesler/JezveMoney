@@ -1,7 +1,7 @@
 import 'jezvejs/style';
 import {
     ge,
-    ce,
+    createElement,
     show,
     enable,
 } from 'jezvejs';
@@ -160,15 +160,17 @@ class AdminUserListView extends AdminListView {
             accessTitle = `Unknown access level: ${item.access}`;
         }
 
-        return ce('tr', {}, [
-            ce('td', { textContent: item.id }),
-            ce('td', { textContent: item.login }),
-            ce('td', { textContent: item.name }),
-            ce('td', { textContent: accessTitle }),
-            ce('td', { textContent: item.accCount }),
-            ce('td', { textContent: item.trCount }),
-            ce('td', { textContent: item.pCount }),
-        ]);
+        return createElement('tr', {
+            children: [
+                createElement('td', { props: { textContent: item.id } }),
+                createElement('td', { props: { textContent: item.login } }),
+                createElement('td', { props: { textContent: item.name } }),
+                createElement('td', { props: { textContent: accessTitle } }),
+                createElement('td', { props: { textContent: item.accCount } }),
+                createElement('td', { props: { textContent: item.trCount } }),
+                createElement('td', { props: { textContent: item.pCount } }),
+            ],
+        });
     }
 }
 

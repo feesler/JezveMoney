@@ -1,5 +1,5 @@
 import {
-    ce,
+    createElement,
     isFunction,
     removeChilds,
     Component,
@@ -341,17 +341,26 @@ export class TransactionList extends Component {
 
         removeChilds(this.elem);
         if (elems.length) {
-            this.elem.append(ce('div', { className: LIST_ITEMS_CLASS }, elems));
+            const listItems = createElement('div', {
+                props: { className: LIST_ITEMS_CLASS },
+                children: elems,
+            });
+            this.elem.append(listItems);
+
             if (state.mode === 'details') {
                 this.elem.classList.add(DETAILS_CLASS);
             } else {
                 this.elem.classList.remove(DETAILS_CLASS);
             }
         } else {
-            this.elem.append(ce('span', {
-                className: NO_DATA_CLASS,
-                textContent: MSG_NO_TRANSACTIONS,
-            }));
+            const noDataMsg = createElement('span', {
+                props: {
+                    className: NO_DATA_CLASS,
+                    textContent: MSG_NO_TRANSACTIONS,
+                },
+            });
+
+            this.elem.append(noDataMsg);
         }
         this.elem.dataset.time = state.renderTime;
     }

@@ -1,6 +1,6 @@
 import {
     isFunction,
-    ce,
+    createElement,
     addChilds,
     removeChilds,
     setEvents,
@@ -51,7 +51,7 @@ export class ModeSelector extends Component {
     }
 
     init() {
-        this.elem = ce('div', { className: CONTAINER_CLASS });
+        this.elem = createElement('div', { props: { className: CONTAINER_CLASS } });
         this.setHandlers();
         this.setClassNames();
 
@@ -125,10 +125,16 @@ export class ModeSelector extends Component {
     renderItem(item) {
         const tagName = item.active ? 'b' : 'a';
 
-        const elem = ce(tagName, { className: ITEM_CLASS }, [
-            ce('span', { className: 'icon' }, window.app.createIcon(item.icon, 'icon-content')),
-            ce('span', { textContent: item.title }),
-        ]);
+        const elem = createElement(tagName, {
+            props: { className: ITEM_CLASS },
+            children: [
+                createElement('span', {
+                    props: { className: 'icon' },
+                    children: window.app.createIcon(item.icon, 'icon-content'),
+                }),
+                createElement('span', { props: { textContent: item.title } }),
+            ],
+        });
         elem.setAttribute('data-mode', item.mode);
         if (item.active) {
             elem.classList.add(ACTIVE_ITEM_CLASS);

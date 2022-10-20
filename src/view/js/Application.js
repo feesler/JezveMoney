@@ -1,6 +1,6 @@
 import {
     ge,
-    ce,
+    createElement,
     svg,
     isDate,
     formatDate,
@@ -179,7 +179,7 @@ export class Application {
 
     /** Create simple container element */
     createContainer(elemClass, children, events) {
-        return ce('div', { className: elemClass }, children, events);
+        return createElement('div', { props: { className: elemClass }, children, events });
     }
 
     /** Create SVG icon element */

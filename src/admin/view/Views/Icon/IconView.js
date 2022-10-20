@@ -1,5 +1,5 @@
 import 'jezvejs/style';
-import { ge, ce, selectByValue } from 'jezvejs';
+import { ge, createElement, selectByValue } from 'jezvejs';
 import { Application } from '../../../../view/js/Application.js';
 import '../../../../view/css/app.scss';
 import { AdminListView } from '../../js/AdminListView.js';
@@ -55,12 +55,14 @@ class AdminIconListView extends AdminListView {
             return null;
         }
 
-        return ce('tr', {}, [
-            ce('td', { textContent: item.id }),
-            ce('td', { textContent: item.name }),
-            ce('td', { textContent: item.file }),
-            ce('td', { textContent: item.type }),
-        ]);
+        return createElement('tr', {
+            children: [
+                createElement('td', { props: { textContent: item.id } }),
+                createElement('td', { props: { textContent: item.name } }),
+                createElement('td', { props: { textContent: item.file } }),
+                createElement('td', { props: { textContent: item.type } }),
+            ],
+        });
     }
 }
 

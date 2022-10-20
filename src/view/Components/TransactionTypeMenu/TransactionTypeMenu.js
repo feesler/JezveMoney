@@ -1,6 +1,6 @@
 import {
     isFunction,
-    ce,
+    createElement,
     addChilds,
     removeChilds,
     setEvents,
@@ -66,7 +66,7 @@ export class TransactionTypeMenu extends Component {
     }
 
     init() {
-        this.elem = ce('div', { className: CONTAINER_CLASS });
+        this.elem = createElement('div', { props: { className: CONTAINER_CLASS } });
         if (this.props.multiple) {
             this.elem.classList.add(MULTI_CLASS);
         }
@@ -249,7 +249,7 @@ export class TransactionTypeMenu extends Component {
     }
 
     renderLinkElement(item, state) {
-        const res = ce('a', { textContent: item.title });
+        const res = createElement('a', { props: { textContent: item.title } });
         const url = this.getItemURL(item, state);
         if (url) {
             res.href = url.toString();
@@ -287,13 +287,13 @@ export class TransactionTypeMenu extends Component {
             return this.renderCheckboxItem(item, state);
         }
 
-        const elem = ce('span', { className: ITEM_CLASS });
+        const elem = createElement('span', { props: { className: ITEM_CLASS } });
         if (item.selected) {
             elem.classList.add(ITEM_SELECTED_CLASS);
         }
         elem.setAttribute('data-type', item.type);
 
-        const titleElem = ce('span', { className: ITEM_TITLE_CLASS });
+        const titleElem = createElement('span', { props: { className: ITEM_TITLE_CLASS } });
         if (this.isLinkItem(item, state)) {
             const linkElem = this.renderLinkElement(item, state);
             setEvents(linkElem, { click: (e) => this.onSelectItem(e) });

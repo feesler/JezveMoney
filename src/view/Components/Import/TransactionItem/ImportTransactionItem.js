@@ -1,5 +1,5 @@
 import {
-    ce,
+    createElement,
     enable,
     isFunction,
 } from 'jezvejs';
@@ -90,49 +90,49 @@ export class ImportTransactionItem extends ImportTransactionBase {
     init() {
         const { createContainer } = window.app;
 
-        this.trTypeTitle = ce('span', { className: TYPE_CLASS });
+        this.trTypeTitle = createElement('span', { props: { className: TYPE_CLASS } });
         this.trTypeField = Field.create({
             title: 'Type',
             content: this.trTypeTitle,
             className: TYPE_FIELD_CLASS,
         });
 
-        this.accountTitle = ce('span', { className: ACCOUNT_CLASS });
+        this.accountTitle = createElement('span', { props: { className: ACCOUNT_CLASS } });
         this.accountField = Field.create({
             title: 'Account',
             content: this.accountTitle,
             className: ACCOUNT_FIELD_CLASS,
         });
 
-        this.personTitle = ce('span', { className: PERSON_CLASS });
+        this.personTitle = createElement('span', { props: { className: PERSON_CLASS } });
         this.personField = Field.create({
             title: 'Person',
             content: this.personTitle,
             className: PERSON_FIELD_CLASS,
         });
 
-        this.srcAmountTitle = ce('span', { className: AMOUNT_CLASS });
+        this.srcAmountTitle = createElement('span', { props: { className: AMOUNT_CLASS } });
         this.srcAmountField = Field.create({
             title: 'Amount',
             content: this.srcAmountTitle,
             className: AMOUNT_FIELD_CLASS,
         });
 
-        this.destAmountTitle = ce('span', { className: AMOUNT_CLASS });
+        this.destAmountTitle = createElement('span', { props: { className: AMOUNT_CLASS } });
         this.destAmountField = Field.create({
             title: 'Destination amount',
             content: this.destAmountTitle,
             className: AMOUNT_FIELD_CLASS,
         });
 
-        this.dateTitle = ce('span', { className: DATE_CLASS });
+        this.dateTitle = createElement('span', { props: { className: DATE_CLASS } });
         this.dateField = Field.create({
             title: 'Date',
             content: this.dateTitle,
             className: DATE_FIELD_CLASS,
         });
 
-        this.commentTitle = ce('span', { className: COMMENT_CLASS });
+        this.commentTitle = createElement('span', { props: { className: COMMENT_CLASS } });
         this.commentField = Field.create({
             title: 'Comment',
             content: this.commentTitle,

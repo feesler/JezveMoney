@@ -1,7 +1,7 @@
 import 'jezvejs/style';
 import {
     ge,
-    ce,
+    createElement,
     setEvents,
     insertAfter,
     isDate,
@@ -418,16 +418,20 @@ class StatisticsView extends View {
         }
 
         const items = target.group ?? [target.item];
-        const elems = items.map((item) => ce(
-            'li',
-            { className: POPUP_LIST_ITEM_CLASS },
-            ce('span', {
-                className: POPUP_LIST_VALUE_CLASS,
-                textContent: this.formatItemValue(item),
+        const elems = items.map((item) => createElement('li', {
+            props: { className: POPUP_LIST_ITEM_CLASS },
+            children: createElement('span', {
+                props: {
+                    className: POPUP_LIST_VALUE_CLASS,
+                    textContent: this.formatItemValue(item),
+                },
             }),
-        ));
+        }));
 
-        return ce('ul', { className: POPUP_LIST_CLASS }, elems);
+        return createElement('ul', {
+            props: { className: POPUP_LIST_CLASS },
+            children: elems,
+        });
     }
 
     setDatePickerSelection(state = this.state) {

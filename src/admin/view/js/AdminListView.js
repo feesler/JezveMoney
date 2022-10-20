@@ -1,6 +1,6 @@
 import {
     ge,
-    setParam,
+    setProps,
     isObject,
     addChilds,
     removeChilds,
@@ -32,7 +32,7 @@ export class AdminListView extends AdminView {
         };
 
         if (isObject(this.props.elements)) {
-            setParam(this.elements, this.props.elements);
+            setProps(this.elements, this.props.elements);
         }
     }
 

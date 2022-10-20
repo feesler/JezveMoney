@@ -2,7 +2,7 @@ import 'jezvejs/style';
 import 'jezvejs/style/Checkbox';
 import {
     ge,
-    ce,
+    createElement,
     enable,
     setEvents,
     isObject,
@@ -674,12 +674,14 @@ class AdminApiConsoleView extends AdminView {
             view: this,
         };
 
-        reqItem.itemContainer = ce('div', { className: 'request-item' });
+        reqItem.itemContainer = createElement('div', { props: { className: 'request-item' } });
 
-        reqItem.requestContainer = ce('div', { className: 'request-container collapsed' });
-        reqItem.requestContainer.addEventListener('click', function () {
-            this.requestContainer.classList.toggle('collapsed');
-        }.bind(reqItem));
+        reqItem.requestContainer = createElement('div', {
+            props: { className: 'request-container collapsed' },
+        });
+        setEvents(reqItem.requestContainer, {
+            click: () => reqItem.requestContainer.classList.toggle('collapsed'),
+        });
 
         let reqText = reqData.url.toString();
         if (reqText.startsWith(baseURL)) {
@@ -687,12 +689,24 @@ class AdminApiConsoleView extends AdminView {
         }
 
         const method = (reqData.options?.method) ? reqData.options.method : 'GET';
-        reqItem.requestContainer.append(ce('div', { className: 'title', textContent: `${method} ${reqText}` }));
+        const titleElem = createElement('div', {
+            props: { className: 'title', textContent: `${method} ${reqText}` },
+        });
+
+        reqItem.requestContainer.append(titleElem);
         if (reqData.options?.body) {
-            reqItem.requestContainer.append(ce('div', { className: 'request-details', textContent: reqData.options?.body }));
+            const bodyElem = createElement('div', {
+                props: { className: 'request-details', textContent: reqData.options?.body },
+            });
+            reqItem.requestContainer.append(bodyElem);
         }
 
-        reqItem.resultContainer = ce('div', { className: 'response-container response-container_pending', textContent: 'Pending...' });
+        reqItem.resultContainer = createElement('div', {
+            props: {
+                className: 'response-container response-container_pending',
+                textContent: 'Pending...',
+            },
+        });
 
         reqItem.itemContainer.append(reqItem.requestContainer, reqItem.resultContainer);
 
@@ -701,15 +715,20 @@ class AdminApiConsoleView extends AdminView {
             this.resultContainer.classList.add('response-container', 'collapsed', (res ? 'ok-result' : 'fail-result'));
             removeChilds(this.resultContainer);
 
-            const titleEl = ce('div', { className: 'title', textContent: title });
-            titleEl.addEventListener('click', function () {
-                this.resultContainer.classList.toggle('collapsed');
-            }.bind(reqItem));
+            const titleEl = createElement('div', {
+                props: { className: 'title', textContent: title },
+            });
+            setEvents(titleEl, {
+                click: () => reqItem.resultContainer.classList.toggle('collapsed'),
+            });
 
             this.resultContainer.append(titleEl);
 
             if (rawResult) {
-                this.resultContainer.append(ce('div', { className: 'response-details', textContent: rawResult }));
+                const responseElem = createElement('div', {
+                    props: { className: 'response-details', textContent: rawResult },
+                });
+                this.resultContainer.append(responseElem);
             }
 
             this.view.clearResultsBtn.disabled = false;

@@ -1,5 +1,5 @@
 import {
-    ce,
+    createElement,
     show,
     Component,
 } from 'jezvejs';
@@ -43,11 +43,14 @@ export class LoadingIndicator extends Component {
 
     init() {
         this.spinner = Spinner.create({ className: SPINNER_CLASS });
-        this.titleElem = ce('div', { className: TITLE_CLASS });
-        this.elem = ce('div', { className: CONTAINER_CLASS }, [
-            this.spinner.elem,
-            this.titleElem,
-        ]);
+        this.titleElem = createElement('div', { props: { className: TITLE_CLASS } });
+        this.elem = createElement('div', {
+            props: { className: CONTAINER_CLASS },
+            children: [
+                this.spinner.elem,
+                this.titleElem,
+            ],
+        });
         if (this.props.fixed) {
             this.elem.classList.add(FIXED_CONTAINER_CLASS);
         }
