@@ -1,5 +1,5 @@
 <?php
-use JezveMoney\App\Template\Component\IconButton;
+use JezveMoney\App\Template\Component\DateRangeInput;
 
 include(TPL_PATH . "Header.tpl");	?>
 
@@ -80,24 +80,9 @@ include(TPL_PATH . "Header.tpl");	?>
                                 </select>
                             </div>
 
-                            <div id="dateFilter" class="filter-item validation-block">
+                            <div id="dateFilter" class="filter-item">
                                 <h3 class="filter-item__title">Date range</h3>
-                                <form id="dateFrm" method="get" action="<?=BASEURL?>statistics/">
-                                <div class="input-group">
-                                    <input id="startDateInp" class="input-group__input stretch-input" name="stdate" type="text" autocomplete="off" value="<?=e($startDateFmt)?>">
-                                    <div class="input-group__text">-</div>
-                                    <input id="endDateInp" class="input-group__input stretch-input" name="enddate" type="text" autocomplete="off" value="<?=e($endDateFmt)?>">
-                                    <button id="nodatebtn" class="input-group__inner-btn" type="button"<?=hidden($dateFilter)?>>
-                                        <?=svgIcon("close", "input-group__inner-btn__icon")?>
-                                    </button>
-                                    <button id="cal_rbtn" class="btn icon-btn input-group__btn" type="button">
-                                        <?=useIcon("calendar-icon", "icon calendar-icon")?>
-                                    </button>
-                                </div>
-                                <input type="submit" hidden>
-                                <div id="calendar" class="calendar"></div>
-                                </form>
-                                <div class="invalid-feedback">Input correct date range.</div>
+                                <?= DateRangeInput::render($dateRange) ?>
                             </div>
                         </div>
 

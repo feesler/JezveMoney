@@ -57,22 +57,11 @@ class Transactions extends TemplateController
         $data["accFilter"] = isset($trParams["accounts"]) ? $trParams["accounts"] : [];
         $data["personFilter"] = isset($trParams["persons"]) ? $trParams["persons"] : [];
         $data["searchReq"] = isset($trParams["search"]) ? $trParams["search"] : null;
-
-        $startDateFmt = "";
-        $endDateFmt = "";
-        $dateFilter = false;
-        if (isset($trParams["startDate"]) && $trParams["endDate"]) {
-            $sdate = strtotime($trParams["startDate"]);
-            $edate = strtotime($trParams["endDate"]);
-            if ($sdate != -1 && $edate != -1) {
-                $dateFilter = true;
-                $startDateFmt = date("d.m.Y", $sdate);
-                $endDateFmt = date("d.m.Y", $edate);
-            }
-        }
-        $data["startDateFmt"] = $startDateFmt;
-        $data["endDateFmt"] = $endDateFmt;
-        $data["dateFilter"] = $dateFilter;
+        $data["dateRange"] = [
+            "id" => "dateFrm",
+            "start" => ($filterObj["stdate"] ?? null),
+            "end" => ($filterObj["enddate"] ?? null)
+        ];
 
         // Obtain requested view mode
         $showDetails = false;

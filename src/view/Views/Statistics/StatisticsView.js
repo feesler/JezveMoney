@@ -2,18 +2,13 @@ import 'jezvejs/style';
 import {
     ge,
     createElement,
-    setEvents,
     insertAfter,
-    isDate,
     show,
 } from 'jezvejs';
 import { Histogram } from 'jezvejs/Histogram';
-import { DateInput } from 'jezvejs/DateInput';
-import { DatePicker } from 'jezvejs/DatePicker';
 import { DropDown } from 'jezvejs/DropDown';
 import 'jezvejs/style/InputGroup';
 import { Application } from '../../js/Application.js';
-import { fixDate } from '../../js/utils.js';
 import '../../css/app.scss';
 import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';
@@ -21,6 +16,7 @@ import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { LinkMenu } from '../../Components/LinkMenu/LinkMenu.js';
+import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import '../../Components/TransactionTypeMenu/style.scss';
 import './style.scss';
@@ -32,13 +28,6 @@ const POPUP_LIST_VALUE_CLASS = 'chart-popup-list__value';
 
 /** Strings */
 const PAGE_TITLE = 'Jezve Money | Statistics';
-
-const defaultDateRangeValidation = {
-    stdate: true,
-    enddate: true,
-    order: true,
-    valid: true,
-};
 
 const defaultProps = {
     filter: {},
@@ -67,7 +56,6 @@ class StatisticsView extends View {
             chartData: null,
             filter: { ...this.props.filter },
             form: { ...this.props.filter },
-            validation: { ...defaultDateRangeValidation },
             loading: false,
             renderTime: Date.now(),
         };
@@ -143,24 +131,9 @@ class StatisticsView extends View {
         });
 
         // Date range filter
-        this.dateFilter = ge('dateFilter');
-        this.dateFrm = ge('dateFrm');
-        setEvents(this.dateFrm, { submit: (e) => this.onDateSubmit(e) });
-
-        this.startDateInput = DateInput.create({
-            elem: ge('startDateInp'),
-            oninput: (e) => this.onStartDateInput(e),
+        this.dateRangeFilter = DateRangeInput.fromElement(ge('dateFrm'), {
+            onChange: (data) => this.onChangeDateFilter(data),
         });
-        this.endDateInput = DateInput.create({
-            elem: ge('endDateInp'),
-            oninput: (e) => this.onEndDateInput(e),
-        });
-        this.noDateBtn = ge('nodatebtn');
-        setEvents(this.noDateBtn, { click: () => this.onDateClear() });
-
-        this.dateInputBtn = ge('cal_rbtn');
-        setEvents(this.dateInputBtn, { click: () => this.showCalendar() });
-        this.datePickerWrapper = ge('calendar');
 
         this.requestData(this.state.filter);
     }
@@ -217,144 +190,17 @@ class StatisticsView extends View {
         this.requestData(this.state.form);
     }
 
-    /**
-     * Date range select calback
-     * @param {Range} range - object with 'start' and 'end' date properties
-     */
-    onRangeSelect(range) {
-        if (!range || !isDate(range.start) || !isDate(range.end)) {
-            return;
-        }
-
-        const stdate = window.app.formatDate(range.start);
-        const enddate = window.app.formatDate(range.end);
-        if (stdate === this.state.form.stdate && enddate === this.state.form.enddate) {
-            return;
-        }
-
+    /** Date range filter change handler */
+    onChangeDateFilter(data) {
         this.setState({
             ...this.state,
             form: {
                 ...this.state.form,
-                stdate: window.app.formatDate(range.start),
-                enddate: window.app.formatDate(range.end),
+                ...data,
             },
         });
 
-        this.datePicker.hide();
-    }
-
-    /**
-     * Date picker hide callback
-     */
-    onDatePickerHide() {
-        const { filter, form } = this.state;
-        if (filter.stdate === form.stdate && filter.enddate === form.enddate) {
-            return;
-        }
-
-        this.requestData(form);
-    }
-
-    /** Date range form 'submit' event handler */
-    onDateSubmit(e) {
-        e.preventDefault();
-
-        const validation = this.validateDateRange();
-        this.state.validation = validation;
-        if (validation.valid) {
-            this.requestData(this.state.form);
-        } else {
-            this.render(this.state);
-        }
-    }
-
-    onStartDateInput(e) {
-        this.setState({
-            ...this.state,
-            form: {
-                ...this.state.form,
-                stdate: e.target.value,
-            },
-            validation: { ...defaultDateRangeValidation },
-        });
-    }
-
-    onEndDateInput(e) {
-        this.setState({
-            ...this.state,
-            form: {
-                ...this.state.form,
-                enddate: e.target.value,
-            },
-            validation: { ...defaultDateRangeValidation },
-        });
-    }
-
-    validateDateRange(state = this.state) {
-        const validation = { ...defaultDateRangeValidation };
-        const startDate = fixDate(state.form.stdate);
-        const endDate = fixDate(state.form.enddate);
-        if (!startDate) {
-            validation.stdate = false;
-        }
-        if (!endDate) {
-            validation.enddate = false;
-        }
-        if (startDate > endDate) {
-            validation.order = false;
-        }
-        validation.valid = (
-            validation.stdate
-            && validation.enddate
-            && validation.order
-        );
-
-        return validation;
-    }
-
-    /**
-     * Show calendar block
-     */
-    showCalendar() {
-        if (!this.datePicker) {
-            this.datePicker = DatePicker.create({
-                relparent: this.datePickerWrapper.parentNode,
-                locales: window.app.datePickerLocale,
-                range: true,
-                onrangeselect: (range) => this.onRangeSelect(range),
-                onhide: () => this.onDatePickerHide(),
-            });
-            this.datePickerWrapper.append(this.datePicker.elem);
-
-            this.setDatePickerSelection();
-        }
-
-        this.datePicker.show(!this.datePicker.visible());
-    }
-
-    /**
-     * Clear date range query
-     */
-    onDateClear() {
-        if (!('stdate' in this.state.form) && !('enddate' in this.state.form)) {
-            return;
-        }
-
-        const form = { ...this.state.form };
-        delete form.stdate;
-        delete form.enddate;
-        this.setState({
-            ...this.state,
-            form,
-            validation: { ...defaultDateRangeValidation },
-        });
-
-        if (this.datePicker) {
-            this.datePicker.hide();
-        } else {
-            this.requestData(this.state.form);
-        }
+        this.requestData(this.state.form);
     }
 
     /**
@@ -512,20 +358,6 @@ class StatisticsView extends View {
         });
     }
 
-    setDatePickerSelection(state = this.state) {
-        if (!this.datePicker) {
-            return;
-        }
-
-        const { stdate, enddate } = state.filter;
-        const isDateFilter = !!(stdate && enddate);
-        if (isDateFilter) {
-            this.datePicker.setSelection(stdate, enddate);
-        } else {
-            this.datePicker.clearSelection();
-        }
-    }
-
     renderFilters(state, prevState = {}) {
         if (state.form === prevState.form) {
             return;
@@ -557,18 +389,11 @@ class StatisticsView extends View {
         this.groupDropDown.selectItem(groupType);
 
         // Render date
-        this.startDateInput.value = state.form.stdate ?? '';
-        this.endDateInput.value = state.form.enddate ?? '';
-        const isDateFilter = !!(state.filter.stdate && state.filter.enddate);
-        show(this.noDateBtn, isDateFilter);
-
-        if (state.validation.valid) {
-            window.app.clearBlockValidation(this.dateFilter);
-        } else {
-            window.app.invalidateBlock(this.dateFilter);
-        }
-
-        this.setDatePickerSelection(state);
+        const dateFilter = {
+            stdate: (state.filter.stdate ?? null),
+            enddate: (state.filter.enddate ?? null),
+        };
+        this.dateRangeFilter.setData(dateFilter);
     }
 
     renderHistogram(state, prevState = {}) {

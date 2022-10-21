@@ -20,7 +20,7 @@ const apiRequest = async (method, path, data = null, headers = {}) => {
             if (Array.isArray(value)) {
                 const arrayName = `${name}[]`;
                 value.forEach((item) => url.searchParams.append(arrayName, item));
-            } else {
+            } else if (typeof value !== 'undefined' && value !== null) {
                 url.searchParams.set(name, value.toString());
             }
         });

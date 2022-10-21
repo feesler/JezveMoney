@@ -2,19 +2,15 @@ import 'jezvejs/style';
 import {
     ge,
     show,
-    isDate,
     setEvents,
     throttle,
     asArray,
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { DropDown } from 'jezvejs/DropDown';
-import { DateInput } from 'jezvejs/DateInput';
-import { DatePicker } from 'jezvejs/DatePicker';
 import { Paginator } from 'jezvejs/Paginator';
 import 'jezvejs/style/InputGroup';
 import { Application } from '../../js/Application.js';
-import { fixDate } from '../../js/utils.js';
 import '../../css/app.scss';
 import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';
@@ -26,6 +22,7 @@ import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/Transa
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { ModeSelector } from '../../Components/ModeSelector/ModeSelector.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
+import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
 import './style.scss';
 
@@ -36,13 +33,6 @@ const TITLE_MULTI_TRANS_DELETE = 'Delete transactions';
 const MSG_MULTI_TRANS_DELETE = 'Are you sure want to delete selected transactions?<br>Changes in the balance of affected accounts will be canceled.';
 const MSG_SINGLE_TRANS_DELETE = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
 const SEARCH_THROTTLE = 300;
-
-const defaultDateRangeValidation = {
-    stdate: true,
-    enddate: true,
-    order: true,
-    valid: true,
-};
 
 /**
  * List of transactions view
@@ -55,7 +45,6 @@ class TransactionListView extends View {
             items: [...this.props.transArr],
             filter: { ...this.props.filter },
             form: { ...this.props.filter },
-            validation: { ...defaultDateRangeValidation },
             pagination: { ...this.props.pagination },
             mode: this.props.mode,
             loading: false,
@@ -142,24 +131,9 @@ class TransactionListView extends View {
         setEvents(this.noSearchBtn, { click: () => this.onSearchClear() });
 
         // Date range filter
-        this.dateFilter = ge('dateFilter');
-        this.dateFrm = ge('dateFrm');
-        setEvents(this.dateFrm, { submit: (e) => this.onDateSubmit(e) });
-
-        this.startDateInput = DateInput.create({
-            elem: ge('startDateInp'),
-            oninput: (e) => this.onStartDateInput(e),
+        this.dateRangeFilter = DateRangeInput.fromElement(ge('dateFrm'), {
+            onChange: (data) => this.onChangeDateFilter(data),
         });
-        this.endDateInput = DateInput.create({
-            elem: ge('endDateInp'),
-            oninput: (e) => this.onEndDateInput(e),
-        });
-        this.noDateBtn = ge('nodatebtn');
-        setEvents(this.noDateBtn, { click: () => this.onDateClear() });
-
-        this.dateInputBtn = ge('cal_rbtn');
-        setEvents(this.dateInputBtn, { click: () => this.showCalendar() });
-        this.datePickerWrapper = ge('calendar');
 
         const listContainer = document.querySelector('.list-container');
         this.loadingIndicator = LoadingIndicator.create();
@@ -404,126 +378,14 @@ class TransactionListView extends View {
         });
     }
 
-    /**
-     * Date range select calback
-     * @param {object} range - selected range object
-     */
-    onRangeSelect(range) {
-        if (!range || !isDate(range.start) || !isDate(range.end)) {
-            return;
-        }
+    /** Date range filter change handler */
+    onChangeDateFilter(data) {
+        this.state.form = {
+            ...this.state.form,
+            ...data,
+        };
 
-        const stdate = window.app.formatDate(range.start);
-        const enddate = window.app.formatDate(range.end);
-        if (stdate === this.state.form.stdate && enddate === this.state.form.enddate) {
-            return;
-        }
-
-        this.state.form.stdate = window.app.formatDate(range.start);
-        this.state.form.enddate = window.app.formatDate(range.end);
-        this.render(this.state);
-
-        this.datePicker.hide();
-    }
-
-    /**
-     * Date picker hide callback
-     */
-    onDatePickerHide() {
-        const { filter, form } = this.state;
-        if (filter.stdate === form.stdate && filter.enddate === form.enddate) {
-            return;
-        }
-
-        this.requestTransactions(form);
-    }
-
-    /** Date range form 'submit' event handler */
-    onDateSubmit(e) {
-        e.preventDefault();
-
-        const validation = this.validateDateRange();
-        this.state.validation = validation;
-
-        if (validation.valid) {
-            this.requestTransactions(this.state.form);
-        } else {
-            this.render(this.state);
-        }
-    }
-
-    onStartDateInput(e) {
-        this.state.form.stdate = e.target.value;
-        this.state.validation = { ...defaultDateRangeValidation };
-        this.render(this.state);
-    }
-
-    onEndDateInput(e) {
-        this.state.form.enddate = e.target.value;
-        this.state.validation = { ...defaultDateRangeValidation };
-        this.render(this.state);
-    }
-
-    validateDateRange(state = this.state) {
-        const validation = { ...defaultDateRangeValidation };
-        const startDate = fixDate(state.form.stdate);
-        const endDate = fixDate(state.form.enddate);
-        if (!startDate) {
-            validation.stdate = false;
-        }
-        if (!endDate) {
-            validation.enddate = false;
-        }
-        if (startDate > endDate) {
-            validation.order = false;
-        }
-        validation.valid = (
-            validation.stdate
-            && validation.enddate
-            && validation.order
-        );
-
-        return validation;
-    }
-
-    /**
-     * Clear date range query
-     */
-    onDateClear() {
-        if (!('stdate' in this.state.form) && !('enddate' in this.state.form)) {
-            return;
-        }
-
-        delete this.state.form.stdate;
-        delete this.state.form.enddate;
-        this.state.validation = { ...defaultDateRangeValidation };
-
-        if (this.datePicker) {
-            this.datePicker.hide();
-        } else {
-            this.requestTransactions(this.state.form);
-        }
-    }
-
-    /**
-     * Show calendar block
-     */
-    showCalendar() {
-        if (!this.datePicker) {
-            this.datePicker = DatePicker.create({
-                relparent: this.datePickerWrapper.parentNode,
-                locales: window.app.datePickerLocale,
-                range: true,
-                onrangeselect: (range) => this.onRangeSelect(range),
-                onhide: () => this.onDatePickerHide(),
-            });
-            this.datePickerWrapper.append(this.datePicker.elem);
-
-            this.setDatePickerSelection();
-        }
-
-        const isVisible = this.datePicker.visible();
-        this.datePicker.show(!isVisible);
+        this.requestTransactions(this.state.form);
     }
 
     onChangePage(page) {
@@ -610,20 +472,6 @@ class TransactionListView extends View {
         });
     }
 
-    setDatePickerSelection(state = this.state) {
-        if (!this.datePicker) {
-            return;
-        }
-
-        const { stdate, enddate } = state.filter;
-        const isDateFilter = !!(stdate && enddate);
-        if (isDateFilter) {
-            this.datePicker.setSelection(stdate, enddate);
-        } else {
-            this.datePicker.clearSelection();
-        }
-    }
-
     render(state) {
         if (state.loading) {
             this.loadingIndicator.show();
@@ -642,18 +490,11 @@ class TransactionListView extends View {
         }
 
         // Render date
-        this.startDateInput.value = state.form.stdate ?? '';
-        this.endDateInput.value = state.form.enddate ?? '';
-        const isDateFilter = !!(state.filter.stdate && state.filter.enddate);
-        show(this.noDateBtn, isDateFilter);
-
-        if (state.validation.valid) {
-            window.app.clearBlockValidation(this.dateFilter);
-        } else {
-            window.app.invalidateBlock(this.dateFilter);
-        }
-
-        this.setDatePickerSelection(state);
+        const dateFilter = {
+            stdate: (state.filter.stdate ?? null),
+            enddate: (state.filter.enddate ?? null),
+        };
+        this.dateRangeFilter.setData(dateFilter);
 
         // Search form
         const isSearchFilter = !!state.form.search;

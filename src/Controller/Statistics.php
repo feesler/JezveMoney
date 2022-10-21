@@ -30,21 +30,11 @@ class Statistics extends TemplateController
             ["title" => "Currencies", "value" => "currency"]
         ];
 
-        $startDateFmt = "";
-        $endDateFmt = "";
-        $dateFilter = false;
-        if (isset($filterObj->stdate) && isset($filterObj->enddate)) {
-            $sdate = strtotime($filterObj->stdate);
-            $edate = strtotime($filterObj->enddate);
-            if ($sdate != -1 && $edate != -1) {
-                $dateFilter = true;
-                $startDateFmt = date("d.m.Y", $sdate);
-                $endDateFmt = date("d.m.Y", $edate);
-            }
-        }
-        $data["startDateFmt"] = $startDateFmt;
-        $data["endDateFmt"] = $endDateFmt;
-        $data["dateFilter"] = $dateFilter;
+        $data["dateRange"] = [
+            "id" => "dateFrm",
+            "start" => ($filterObj->stdate ?? null),
+            "end" => ($filterObj->enddate ?? null)
+        ];
 
         $groupTypes = TransactionModel::getHistogramGroupNames();
         $data["groupTypes"] = $groupTypes;
