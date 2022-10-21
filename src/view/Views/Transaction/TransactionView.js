@@ -8,6 +8,7 @@ import {
     setEvents,
     addChilds,
 } from 'jezvejs';
+import { DateInput } from 'jezvejs/DateInput';
 import { DropDown } from 'jezvejs/DropDown';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { DecimalInput } from 'jezvejs/DecimalInput';
@@ -350,8 +351,10 @@ class TransactionView extends View {
         this.dateInputBtn = ge('cal_rbtn');
         setEvents(this.dateInputBtn, { click: () => this.showCalendar() });
 
-        this.dateInput = ge('date');
-        setEvents(this.dateInput, { input: (e) => this.onDateInput(e) });
+        this.dateInput = DateInput.create({
+            elem: ge('date'),
+            oninput: (e) => this.onDateInput(e),
+        });
 
         this.commentRow = ge('comment_row');
         this.commentInput = ge('comm');
@@ -1398,7 +1401,7 @@ class TransactionView extends View {
         } else {
             window.app.invalidateBlock(this.dateRow);
         }
-        enable(this.dateInput, !state.submitStarted);
+        this.dateInput.enable(!state.submitStarted);
         this.dateInput.value = state.form.date;
 
         enable(this.commentInput, !state.submitStarted);

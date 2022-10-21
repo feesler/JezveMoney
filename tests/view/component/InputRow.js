@@ -57,6 +57,10 @@ export class InputRow extends TestComponent {
         return res;
     }
 
+    get value() {
+        return this.content.value;
+    }
+
     async input(val) {
         return input(this.content.valueInput, val.toString());
     }

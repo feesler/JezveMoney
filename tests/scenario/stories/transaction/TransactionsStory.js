@@ -199,7 +199,7 @@ export class TransactionsStory extends TestStory {
         {
             fromAccount: 0,
             srcAmount: '100',
-            date: '0921-dd.0',
+            date: '',
         }];
 
         await App.scenario.runner.runGroup(IncomeTransactionTests.create, data);
@@ -306,7 +306,7 @@ export class TransactionsStory extends TestStory {
         }, {
             // Try to submit debt with invalid date
             srcAmount: '100',
-            date: '0921-dd.0',
+            date: '',
         }];
 
         await App.scenario.runner.runGroup(DebtTransactionTests.create, data);

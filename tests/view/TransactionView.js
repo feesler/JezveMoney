@@ -168,19 +168,19 @@ export class TransactionView extends AppView {
         }
         res.isDiffCurr = (res.src_curr_id !== res.dest_curr_id);
 
-        res.srcAmount = cont.src_amount_row.content.value;
+        res.srcAmount = cont.src_amount_row.value;
         res.fSrcAmount = isValidValue(res.srcAmount) ? normalize(res.srcAmount) : res.srcAmount;
 
-        res.destAmount = cont.dest_amount_row.content.value;
+        res.destAmount = cont.dest_amount_row.value;
         res.fDestAmount = isValidValue(res.destAmount) ? normalize(res.destAmount) : res.destAmount;
 
-        res.srcResBal = cont.result_balance_row.content.value;
+        res.srcResBal = cont.result_balance_row.value;
         res.fSrcResBal = isValidValue(res.srcResBal) ? normalize(res.srcResBal) : res.srcResBal;
 
-        res.destResBal = cont.result_balance_dest_row.content.value;
+        res.destResBal = cont.result_balance_dest_row.value;
         res.fDestResBal = isValidValue(res.destResBal) ? normalize(res.destResBal) : res.destResBal;
 
-        res.exchRate = cont.exchange_row.content.value;
+        res.exchRate = cont.exchange_row.value;
         this.updateExch();
 
         if (res.type === EXPENSE) {
@@ -353,8 +353,8 @@ export class TransactionView extends AppView {
             );
         }
 
-        res.date = cont.datePicker.content.date;
-        res.comment = cont.comment_row.content.value;
+        res.date = cont.datePicker.value;
+        res.comment = cont.comment_row.value;
 
         return res;
     }

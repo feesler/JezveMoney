@@ -6,6 +6,7 @@ import {
     insertAfter,
     checkDate,
 } from 'jezvejs';
+import { DateInput } from 'jezvejs/DateInput';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
@@ -335,15 +336,13 @@ export class ImportTransactionForm extends ImportTransactionBase {
 
     /** Create date field */
     createDateField() {
-        this.dateInp = createElement('input', {
-            props: {
-                className: `${DEFAULT_INPUT_CLASS} ${IG_INPUT_CLASS}`,
-                type: 'text',
-                name: 'date[]',
-                placeholder: TITLE_FIELD_DATE,
-                autocomplete: 'off',
-            },
-            events: { input: () => this.onDateInput() },
+        const elem = createElement('input', { props: { type: 'text', autocomplete: 'off' } });
+        this.dateInp = DateInput.create({
+            elem,
+            className: `${DEFAULT_INPUT_CLASS} ${IG_INPUT_CLASS}`,
+            name: 'date[]',
+            placeholder: TITLE_FIELD_DATE,
+            oninput: () => this.onDateInput(),
         });
 
         const dateIcon = window.app.createIcon(
@@ -360,7 +359,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         });
 
         this.dateGroup = InputGroup.create({
-            children: [this.dateInp, this.dateBtn],
+            children: [this.dateInp.elem, this.dateBtn],
         });
         this.dateField = Field.create({
             title: TITLE_FIELD_DATE,
@@ -740,7 +739,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
 
         // Date field
         enable(this.dateBtn, transaction.enabled);
-        enable(this.dateInp, transaction.enabled);
+        this.dateInp.enable(transaction.enabled);
         this.dateInp.value = transaction.date;
 
         // Commend field
