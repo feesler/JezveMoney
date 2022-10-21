@@ -15,7 +15,7 @@ include(TPL_PATH . "Header.tpl");	?>
 
                     <div>
                         <div class="filters-container">
-                            <div class="filter-item std_margin">
+                            <div class="filter-item">
                                 <h3 class="filter-item__title">Type</h3>
                                 <div class="trtype-menu trtype-menu-multi">
 <?php	foreach($transMenu as $menuItem) {  ?>
@@ -40,7 +40,7 @@ include(TPL_PATH . "Header.tpl");	?>
                                 </div>
                             </div>
 
-                            <div class="filter-item std_margin">
+                            <div class="filter-item">
                                 <h3 class="filter-item__title">Report type</h3>
                                 <div id="report_menu" class="link-menu">
 <?php	foreach($reportMenu as $item) {	    ?>
@@ -57,17 +57,17 @@ include(TPL_PATH . "Header.tpl");	?>
                                 </div>
                             </div>
 
-                            <div id="acc_block" class="filter-item std_margin"<?=hidden($byCurrency)?>>
+                            <div id="acc_block" class="filter-item"<?=hidden($byCurrency)?>>
                                 <h3 class="filter-item__title">Account</h3>
                                 <select id="acc_id"></select>
                             </div>
 
-                            <div id="curr_block" class="filter-item std_margin"<?=hidden(!$byCurrency)?>>
+                            <div id="curr_block" class="filter-item"<?=hidden(!$byCurrency)?>>
                                 <h3 class="filter-item__title">Currency</h3>
                                 <select id="curr_id"></select>
                             </div>
 
-                            <div class="filter-item std_margin">
+                            <div class="filter-item">
                                 <h3 class="filter-item__title">Group by</h3>
                                 <select id="groupsel">
 <?php	foreach($groupTypes as $val => $grtype) {	?>
@@ -80,18 +80,24 @@ include(TPL_PATH . "Header.tpl");	?>
                                 </select>
                             </div>
 
-                            <div id="dateFilter" class="filter-item std_margin">
+                            <div id="dateFilter" class="filter-item validation-block">
                                 <h3 class="filter-item__title">Date range</h3>
+                                <form id="dateFrm" method="get" action="<?=BASEURL?>statistics/">
                                 <div class="input-group">
-                                    <input id="date" class="input-group__input stretch-input" name="date" type="text" autocomplete="off" value="<?=e($dateFmt)?>">
-                                    <button id="nodatebtn" class="input-group__inner-btn" type="button"<?=hidden(is_empty($dateFmt))?>>
+                                    <input id="startDateInp" class="input-group__input stretch-input" name="stdate" type="text" autocomplete="off" value="<?=e($startDateFmt)?>">
+                                    <div class="input-group__text">-</div>
+                                    <input id="endDateInp" class="input-group__input stretch-input" name="enddate" type="text" autocomplete="off" value="<?=e($endDateFmt)?>">
+                                    <button id="nodatebtn" class="input-group__inner-btn" type="button"<?=hidden($dateFilter)?>>
                                         <?=svgIcon("close", "input-group__inner-btn__icon")?>
                                     </button>
                                     <button id="cal_rbtn" class="btn icon-btn input-group__btn" type="button">
                                         <?=useIcon("calendar-icon", "icon calendar-icon")?>
                                     </button>
                                 </div>
+                                <input type="submit" hidden>
                                 <div id="calendar" class="calendar"></div>
+                                </form>
+                                <div class="invalid-feedback">Input correct date range.</div>
                             </div>
                         </div>
 

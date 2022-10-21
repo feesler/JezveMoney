@@ -9,10 +9,12 @@ import {
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { DropDown } from 'jezvejs/DropDown';
+import { DateInput } from 'jezvejs/DateInput';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { Paginator } from 'jezvejs/Paginator';
 import 'jezvejs/style/InputGroup';
 import { Application } from '../../js/Application.js';
+import { fixDate } from '../../js/utils.js';
 import '../../css/app.scss';
 import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';
@@ -21,11 +23,11 @@ import { AccountList } from '../../js/model/AccountList.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
+import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
+import { ModeSelector } from '../../Components/ModeSelector/ModeSelector.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
 import './style.scss';
-import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { ModeSelector } from '../../Components/ModeSelector/ModeSelector.js';
 
 const PAGE_TITLE = 'Jezve Money | Transactions';
 const MSG_SET_POS_FAIL = 'Fail to change position of transaction.';
@@ -34,6 +36,13 @@ const TITLE_MULTI_TRANS_DELETE = 'Delete transactions';
 const MSG_MULTI_TRANS_DELETE = 'Are you sure want to delete selected transactions?<br>Changes in the balance of affected accounts will be canceled.';
 const MSG_SINGLE_TRANS_DELETE = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
 const SEARCH_THROTTLE = 300;
+
+const defaultDateRangeValidation = {
+    stdate: true,
+    enddate: true,
+    order: true,
+    valid: true,
+};
 
 /**
  * List of transactions view
@@ -46,6 +55,7 @@ class TransactionListView extends View {
             items: [...this.props.transArr],
             filter: { ...this.props.filter },
             form: { ...this.props.filter },
+            validation: { ...defaultDateRangeValidation },
             pagination: { ...this.props.pagination },
             mode: this.props.mode,
             loading: false,
@@ -131,16 +141,25 @@ class TransactionListView extends View {
         }
         setEvents(this.noSearchBtn, { click: () => this.onSearchClear() });
 
-        this.datePickerWrapper = ge('calendar');
+        // Date range filter
+        this.dateFilter = ge('dateFilter');
+        this.dateFrm = ge('dateFrm');
+        setEvents(this.dateFrm, { submit: (e) => this.onDateSubmit(e) });
+
+        this.startDateInput = DateInput.create({
+            elem: ge('startDateInp'),
+            oninput: (e) => this.onStartDateInput(e),
+        });
+        this.endDateInput = DateInput.create({
+            elem: ge('endDateInp'),
+            oninput: (e) => this.onEndDateInput(e),
+        });
+        this.noDateBtn = ge('nodatebtn');
+        setEvents(this.noDateBtn, { click: () => this.onDateClear() });
+
         this.dateInputBtn = ge('cal_rbtn');
         setEvents(this.dateInputBtn, { click: () => this.showCalendar() });
-        this.dateInput = ge('date');
-
-        this.noDateBtn = ge('nodatebtn');
-        if (!this.noDateBtn) {
-            throw new Error('Failed to initialize Transaction List view');
-        }
-        setEvents(this.noDateBtn, { click: () => this.onDateClear() });
+        this.datePickerWrapper = ge('calendar');
 
         const listContainer = document.querySelector('.list-container');
         this.loadingIndicator = LoadingIndicator.create();
@@ -419,6 +438,54 @@ class TransactionListView extends View {
         this.requestTransactions(form);
     }
 
+    /** Date range form 'submit' event handler */
+    onDateSubmit(e) {
+        e.preventDefault();
+
+        const validation = this.validateDateRange();
+        this.state.validation = validation;
+
+        if (validation.valid) {
+            this.requestTransactions(this.state.form);
+        } else {
+            this.render(this.state);
+        }
+    }
+
+    onStartDateInput(e) {
+        this.state.form.stdate = e.target.value;
+        this.state.validation = { ...defaultDateRangeValidation };
+        this.render(this.state);
+    }
+
+    onEndDateInput(e) {
+        this.state.form.enddate = e.target.value;
+        this.state.validation = { ...defaultDateRangeValidation };
+        this.render(this.state);
+    }
+
+    validateDateRange(state = this.state) {
+        const validation = { ...defaultDateRangeValidation };
+        const startDate = fixDate(state.form.stdate);
+        const endDate = fixDate(state.form.enddate);
+        if (!startDate) {
+            validation.stdate = false;
+        }
+        if (!endDate) {
+            validation.enddate = false;
+        }
+        if (startDate > endDate) {
+            validation.order = false;
+        }
+        validation.valid = (
+            validation.stdate
+            && validation.enddate
+            && validation.order
+        );
+
+        return validation;
+    }
+
     /**
      * Clear date range query
      */
@@ -429,6 +496,7 @@ class TransactionListView extends View {
 
         delete this.state.form.stdate;
         delete this.state.form.enddate;
+        this.state.validation = { ...defaultDateRangeValidation };
 
         if (this.datePicker) {
             this.datePicker.hide();
@@ -547,7 +615,7 @@ class TransactionListView extends View {
             return;
         }
 
-        const { stdate, enddate } = state.form;
+        const { stdate, enddate } = state.filter;
         const isDateFilter = !!(stdate && enddate);
         if (isDateFilter) {
             this.datePicker.setSelection(stdate, enddate);
@@ -574,12 +642,16 @@ class TransactionListView extends View {
         }
 
         // Render date
-        const isDateFilter = !!(state.form.stdate && state.form.enddate);
-        const dateRangeFmt = (isDateFilter)
-            ? `${state.form.stdate} - ${state.form.enddate}`
-            : '';
-        this.dateInput.value = dateRangeFmt;
+        this.startDateInput.value = state.form.stdate ?? '';
+        this.endDateInput.value = state.form.enddate ?? '';
+        const isDateFilter = !!(state.filter.stdate && state.filter.enddate);
         show(this.noDateBtn, isDateFilter);
+
+        if (state.validation.valid) {
+            window.app.clearBlockValidation(this.dateFilter);
+        } else {
+            window.app.invalidateBlock(this.dateFilter);
+        }
 
         this.setDatePickerSelection(state);
 

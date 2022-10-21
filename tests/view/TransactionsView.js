@@ -104,6 +104,8 @@ export class TransactionsView extends AppView {
             accounts: this.getDropDownFilter(cont.accDropDown),
             persons: this.getDropDownFilter(cont.personDropDown),
             search: cont.searchForm.content.value,
+            startDate: null,
+            endDate: null,
         };
         const dateRange = cont.dateFilter.getSelectedRange();
         if (dateRange && dateRange.startDate && dateRange.endDate) {
@@ -261,6 +263,13 @@ export class TransactionsView extends AppView {
             },
             personDropDown: {
                 visible: isFiltersVisible && isPersonsAvailable,
+            },
+            dateFilter: {
+                visible: isFiltersVisible,
+                value: {
+                    startDate: model.filter.startDate,
+                    endDate: model.filter.endDate,
+                },
             },
             searchForm: {
                 value: model.filter.search,

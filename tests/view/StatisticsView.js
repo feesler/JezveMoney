@@ -84,6 +84,8 @@ export class StatisticsView extends AppView {
         res.filter = {
             type: cont.typeMenu.getSelectedTypes(),
             byCurrency: selectedReport === 'currency',
+            startDate: null,
+            endDate: null,
         };
         const dateRange = cont.dateFilter.getSelectedRange();
         if (dateRange && dateRange.startDate && dateRange.endDate) {
@@ -143,7 +145,13 @@ export class StatisticsView extends AppView {
                 visible: true,
                 value: (byCurrency) ? 'currency' : 'account',
             },
-            dateFilter: {},
+            dateFilter: {
+                visible: true,
+                value: {
+                    startDate: this.model.filter.startDate,
+                    endDate: this.model.filter.endDate,
+                },
+            },
             noDataMessage: {},
             chartContainer: {},
         };
@@ -177,10 +185,6 @@ export class StatisticsView extends AppView {
         if (this.model.filter.startDate && this.model.filter.endDate) {
             params.startDate = this.model.filter.startDate;
             params.endDate = this.model.filter.endDate;
-
-            res.dateFilter.value = { startDate: params.startDate, endDate: params.endDate };
-        } else {
-            res.dateFilter.value = { startDate: null, endDate: null };
         }
 
         const histogram = App.state.transactions.getStatistics(params);

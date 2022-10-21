@@ -8,20 +8,22 @@ import {
     show,
 } from 'jezvejs';
 import { Histogram } from 'jezvejs/Histogram';
+import { DateInput } from 'jezvejs/DateInput';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { DropDown } from 'jezvejs/DropDown';
 import 'jezvejs/style/InputGroup';
 import { Application } from '../../js/Application.js';
+import { fixDate } from '../../js/utils.js';
 import '../../css/app.scss';
 import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
+import { LinkMenu } from '../../Components/LinkMenu/LinkMenu.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import '../../Components/TransactionTypeMenu/style.scss';
 import './style.scss';
-import { LinkMenu } from '../../Components/LinkMenu/LinkMenu.js';
 
 /** CSS classes */
 const POPUP_LIST_CLASS = 'chart-popup-list';
@@ -30,6 +32,13 @@ const POPUP_LIST_VALUE_CLASS = 'chart-popup-list__value';
 
 /** Strings */
 const PAGE_TITLE = 'Jezve Money | Statistics';
+
+const defaultDateRangeValidation = {
+    stdate: true,
+    enddate: true,
+    order: true,
+    valid: true,
+};
 
 const defaultProps = {
     filter: {},
@@ -56,8 +65,9 @@ class StatisticsView extends View {
         this.state = {
             accountCurrency: this.props.accountCurrency,
             chartData: null,
-            filter: this.props.filter,
+            filter: { ...this.props.filter },
             form: { ...this.props.filter },
+            validation: { ...defaultDateRangeValidation },
             loading: false,
             renderTime: Date.now(),
         };
@@ -132,18 +142,25 @@ class StatisticsView extends View {
             className: 'dd_fullwidth',
         });
 
-        this.datePickerWrapper = ge('calendar');
-        this.dateInputBtn = ge('cal_rbtn');
-        if (this.dateInputBtn) {
-            this.dateInputBtn.addEventListener('click', () => this.showCalendar());
-        }
-        this.dateInput = ge('date');
+        // Date range filter
+        this.dateFilter = ge('dateFilter');
+        this.dateFrm = ge('dateFrm');
+        setEvents(this.dateFrm, { submit: (e) => this.onDateSubmit(e) });
 
+        this.startDateInput = DateInput.create({
+            elem: ge('startDateInp'),
+            oninput: (e) => this.onStartDateInput(e),
+        });
+        this.endDateInput = DateInput.create({
+            elem: ge('endDateInp'),
+            oninput: (e) => this.onEndDateInput(e),
+        });
         this.noDateBtn = ge('nodatebtn');
-        if (!this.noDateBtn) {
-            throw new Error('Failed to initialize Transaction List view');
-        }
         setEvents(this.noDateBtn, { click: () => this.onDateClear() });
+
+        this.dateInputBtn = ge('cal_rbtn');
+        setEvents(this.dateInputBtn, { click: () => this.showCalendar() });
+        this.datePickerWrapper = ge('calendar');
 
         this.requestData(this.state.filter);
     }
@@ -239,6 +256,63 @@ class StatisticsView extends View {
         this.requestData(form);
     }
 
+    /** Date range form 'submit' event handler */
+    onDateSubmit(e) {
+        e.preventDefault();
+
+        const validation = this.validateDateRange();
+        this.state.validation = validation;
+        if (validation.valid) {
+            this.requestData(this.state.form);
+        } else {
+            this.render(this.state);
+        }
+    }
+
+    onStartDateInput(e) {
+        this.setState({
+            ...this.state,
+            form: {
+                ...this.state.form,
+                stdate: e.target.value,
+            },
+            validation: { ...defaultDateRangeValidation },
+        });
+    }
+
+    onEndDateInput(e) {
+        this.setState({
+            ...this.state,
+            form: {
+                ...this.state.form,
+                enddate: e.target.value,
+            },
+            validation: { ...defaultDateRangeValidation },
+        });
+    }
+
+    validateDateRange(state = this.state) {
+        const validation = { ...defaultDateRangeValidation };
+        const startDate = fixDate(state.form.stdate);
+        const endDate = fixDate(state.form.enddate);
+        if (!startDate) {
+            validation.stdate = false;
+        }
+        if (!endDate) {
+            validation.enddate = false;
+        }
+        if (startDate > endDate) {
+            validation.order = false;
+        }
+        validation.valid = (
+            validation.stdate
+            && validation.enddate
+            && validation.order
+        );
+
+        return validation;
+    }
+
     /**
      * Show calendar block
      */
@@ -270,7 +344,11 @@ class StatisticsView extends View {
         const form = { ...this.state.form };
         delete form.stdate;
         delete form.enddate;
-        this.setState({ ...this.state, form });
+        this.setState({
+            ...this.state,
+            form,
+            validation: { ...defaultDateRangeValidation },
+        });
 
         if (this.datePicker) {
             this.datePicker.hide();
@@ -439,7 +517,7 @@ class StatisticsView extends View {
             return;
         }
 
-        const { stdate, enddate } = state.form;
+        const { stdate, enddate } = state.filter;
         const isDateFilter = !!(stdate && enddate);
         if (isDateFilter) {
             this.datePicker.setSelection(stdate, enddate);
@@ -479,12 +557,16 @@ class StatisticsView extends View {
         this.groupDropDown.selectItem(groupType);
 
         // Render date
-        const isDateFilter = !!(state.form.stdate && state.form.enddate);
-        const dateRangeFmt = (isDateFilter)
-            ? `${state.form.stdate} - ${state.form.enddate}`
-            : '';
-        this.dateInput.value = dateRangeFmt;
+        this.startDateInput.value = state.form.stdate ?? '';
+        this.endDateInput.value = state.form.enddate ?? '';
+        const isDateFilter = !!(state.filter.stdate && state.filter.enddate);
         show(this.noDateBtn, isDateFilter);
+
+        if (state.validation.valid) {
+            window.app.clearBlockValidation(this.dateFilter);
+        } else {
+            window.app.invalidateBlock(this.dateFilter);
+        }
 
         this.setDatePickerSelection(state);
     }
