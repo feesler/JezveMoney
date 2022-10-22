@@ -92,16 +92,9 @@ include(TPL_PATH . "Header.tpl"); ?>
                     </div>
 
                     <div class="list-container">
-                        <div class="paginator-row">
-                            <div class="mode-selector"></div>
-                            <div class="paginator"></div>
-                        </div>
-
+                        <div class="paginator-row list-header"></div>
                         <div class="trans-list"></div>
-
-                        <div class="paginator-row">
-                            <div class="paginator"></div>
-                        </div>
+                        <div class="paginator-row list-footer"></div>
                     </div>
                 </div>
             </div>

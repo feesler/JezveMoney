@@ -20,7 +20,7 @@ import { PersonList } from '../../js/model/PersonList.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { ModeSelector } from '../../Components/ModeSelector/ModeSelector.js';
+import { LinkMenu } from '../../Components/LinkMenu/LinkMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
@@ -32,6 +32,10 @@ const TITLE_SINGLE_TRANS_DELETE = 'Delete transaction';
 const TITLE_MULTI_TRANS_DELETE = 'Delete transactions';
 const MSG_MULTI_TRANS_DELETE = 'Are you sure want to delete selected transactions?<br>Changes in the balance of affected accounts will be canceled.';
 const MSG_SINGLE_TRANS_DELETE = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
+/* Mode selector items */
+const TITLE_CLASSIC = 'Classic';
+const TITLE_DETAILS = 'Details';
+
 const SEARCH_THROTTLE = 300;
 
 /**
@@ -139,9 +143,23 @@ class TransactionListView extends View {
         this.loadingIndicator = LoadingIndicator.create();
         listContainer.append(this.loadingIndicator.elem);
 
-        this.modeSelector = ModeSelector.fromElement(document.querySelector('.mode-selector'), {
+        const listHeader = document.querySelector('.list-header');
+        this.modeSelector = LinkMenu.create({
+            className: 'mode-selector',
+            itemParam: 'mode',
+            items: [
+                { icon: 'mode-list', title: TITLE_CLASSIC, value: 'classic' },
+                { icon: 'mode-details', title: TITLE_DETAILS, value: 'details' },
+            ],
             onChange: (mode) => this.onModeChanged(mode),
         });
+
+        const paginatorOptions = {
+            onChange: (page) => this.onChangePage(page),
+        };
+
+        this.topPaginator = Paginator.create(paginatorOptions);
+        listHeader.append(this.modeSelector.elem, this.topPaginator.elem);
 
         this.list = TransactionList.create({
             elem: document.querySelector('.trans-list'),
@@ -151,16 +169,9 @@ class TransactionListView extends View {
             onSort: (id, pos) => this.sendChangePosRequest(id, pos),
         });
 
-        const paginatorElems = document.querySelectorAll('.paginator');
-        if (paginatorElems.length !== 2) {
-            throw new Error('Failed to initialize Transaction List view');
-        }
-        const paginatorOptions = {
-            onChange: (page) => this.onChangePage(page),
-        };
-
-        this.topPaginator = Paginator.fromElement(paginatorElems[0], paginatorOptions);
-        this.bottomPaginator = Paginator.fromElement(paginatorElems[1], paginatorOptions);
+        const listFooter = document.querySelector('.list-footer');
+        this.bottomPaginator = Paginator.create(paginatorOptions);
+        listFooter.append(this.bottomPaginator.elem);
 
         this.toolbar = Toolbar.create({
             elem: 'toolbar',
@@ -520,7 +531,7 @@ class TransactionListView extends View {
         }
 
         this.modeSelector.show(state.items.length > 0);
-        this.modeSelector.setMode(state.mode);
+        this.modeSelector.setActive(state.mode);
         filterUrl.searchParams.set('page', state.pagination.page);
         this.modeSelector.setURL(filterUrl);
 

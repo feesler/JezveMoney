@@ -1,4 +1,7 @@
 .link-menu {
+  --link-menu-icon-size: 24px;
+  --link-menu-icon-color: #20a0ff;
+
   display: flex;
   flex-flow: row wrap;
   column-gap: 12px;
@@ -10,8 +13,9 @@
   display: inline-flex;
   flex-flow: row nowrap;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 2px;
+  column-gap: 5px;
 
   &:focus-visible {
     box-shadow: var(--focus-shadow);
@@ -24,4 +28,16 @@
 
 .link-menu-item__title {
   font-size: 16px;
+}
+
+.link-menu-item__icon {
+  width: var(--link-menu-icon-size);
+  height: var(--link-menu-icon-size);
+  padding: 0;
+
+  .icon {
+    width: var(--link-menu-icon-size);
+    height: var(--link-menu-icon-size);
+    fill: var(--link-menu-icon-color);
+  }
 }

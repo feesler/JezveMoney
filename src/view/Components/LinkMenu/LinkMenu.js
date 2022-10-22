@@ -13,15 +13,19 @@ const CONTAINER_CLASS = 'link-menu';
 const ITEM_CLASS = 'link-menu-item';
 const ACTIVE_ITEM_CLASS = 'link-menu-item_active';
 const ITEM_TITLE_CLASS = 'link-menu-item__title';
+const ITEM_ICON_CONTAINER_CLASS = 'link-menu-item__icon';
+const ITEM_ICON_CLASS = 'icon';
 
 const defaultProps = {
     disabled: false,
     itemParam: 'value',
     url: window.location,
+    items: [],
+    onChange: null,
 };
 
 /**
- * Mode selector component
+ * Link Menu component
  */
 export class LinkMenu extends Component {
     static create(props = {}) {
@@ -86,7 +90,17 @@ export class LinkMenu extends Component {
             title: titleElem.textContent.trim(),
             value: elem.dataset.value,
             active: elem.classList.contains(ACTIVE_ITEM_CLASS),
+            icon: null,
         };
+
+        const iconElem = elem.querySelector(`.${ITEM_ICON_CONTAINER_CLASS}`);
+        const iconUseElem = iconElem?.querySelector('use');
+        if (iconUseElem) {
+            res.icon = iconUseElem.href.baseVal;
+            if (res.icon.startsWith('#')) {
+                res.icon = res.substring(1);
+            }
+        }
 
         return res;
     }
@@ -96,10 +110,6 @@ export class LinkMenu extends Component {
     }
 
     onSelectItem(e) {
-        if (!isFunction(this.props.onChange)) {
-            return;
-        }
-
         e.preventDefault();
 
         const itemTarget = e.target.closest(`.${ITEM_CLASS}`);
@@ -110,7 +120,9 @@ export class LinkMenu extends Component {
         const { value } = itemTarget.dataset;
         this.setActive(value);
 
-        this.props.onChange(value);
+        if (isFunction(this.props.onChange)) {
+            this.props.onChange(value);
+        }
     }
 
     enable(value = true) {
@@ -159,14 +171,26 @@ export class LinkMenu extends Component {
     renderItem(item, state) {
         const tagName = (item.active) ? 'b' : 'a';
 
+        const children = [];
+
+        if (item.icon) {
+            const iconElem = createElement('span', {
+                props: { className: ITEM_ICON_CONTAINER_CLASS },
+                children: window.app.createIcon(item.icon, ITEM_ICON_CLASS),
+            });
+
+            children.push(iconElem);
+        }
+
         const titleElem = createElement('span', {
             props: { className: ITEM_TITLE_CLASS, textContent: item.title },
         });
+        children.push(titleElem);
 
         const elem = createElement(tagName, {
             props: { className: ITEM_CLASS },
             attrs: { 'data-value': item.value },
-            children: titleElem,
+            children,
         });
 
         if (item.active) {
