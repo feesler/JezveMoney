@@ -80,7 +80,7 @@ class Transactions extends TemplateController
         $availTypes = TransactionModel::getTypeNames();
         array_push($trTypes, ...$availTypes);
 
-        $transMenu = [];
+        $typeMenu = [];
         foreach ($trTypes as $type_id => $trTypeName) {
             $urlParams = $filterObj;
             $urlParams["mode"] = ($showDetails) ? "classic" : "details";
@@ -94,20 +94,24 @@ class Transactions extends TemplateController
             // Clear page number because list of transactions guaranteed to change on change type filter
             unset($urlParams["page"]);
 
-            $menuItem = new \stdClass();
-            $menuItem->type = $type_id;
-            $menuItem->title = $trTypeName;
-
             if ($type_id == 0) {
-                $menuItem->selected = !isset($filterObj["type"]) || !count($filterObj["type"]);
+                $selected = !isset($filterObj["type"]) || !count($filterObj["type"]);
             } else {
-                $menuItem->selected = isset($filterObj["type"]) && in_array($type_id, $filterObj["type"]);
+                $selected = isset($filterObj["type"]) && in_array($type_id, $filterObj["type"]);
             }
-            $menuItem->url = urlJoin($baseUrl, $urlParams);
 
-            $transMenu[] = $menuItem;
+            $item = [
+                "title" => $trTypeName,
+                "selected" => $selected,
+                "url" => urlJoin($baseUrl, $urlParams)
+            ];
+
+            if ($type_id != 0) {
+                $item["value"] = $type_id;
+            }
+            $typeMenu[] = $item;
         }
-        $data["transMenu"] = $transMenu;
+        $data["typeMenu"] = $typeMenu;
 
         // Build data for paginator
         if ($trParams["onPage"] > 0) {

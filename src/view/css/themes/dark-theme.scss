@@ -459,7 +459,7 @@
   }
 
   /* Link menu item */
-  .link-menu-item_active .link-menu-item__title {
+  b.link-menu-item_selected .link-menu-item__title {
     color: var(--main-text-color);
   }
 

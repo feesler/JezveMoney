@@ -18,7 +18,6 @@ import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
-import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { LinkMenu } from '../../Components/LinkMenu/LinkMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
@@ -75,8 +74,10 @@ class TransactionListView extends View {
         this.clearAllBtn = ge('clearall_btn');
         this.clearAllBtn.addEventListener('click', (e) => this.onClearAllFilters(e));
 
-        this.typeMenu = TransactionTypeMenu.fromElement(document.querySelector('.trtype-menu'), {
+        this.linkMenu = LinkMenu.fromElement(ge('type_menu'), {
+            multiple: true,
             allowActiveLink: true,
+            itemParam: 'type',
             onChange: (sel) => this.onChangeTypeFilter(sel),
         });
 
@@ -490,8 +491,9 @@ class TransactionListView extends View {
 
         const filterUrl = this.getFilterURL(state, false);
 
-        this.typeMenu.setURL(filterUrl);
-        this.typeMenu.setSelection(state.form.type);
+        this.linkMenu.setURL(filterUrl);
+        const types = asArray(state.form.type).map((type) => type.toString());
+        this.linkMenu.setSelection(types);
 
         if (window.app.model.accounts.length > 0) {
             this.renderAccountsFilter(state);

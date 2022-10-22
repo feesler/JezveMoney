@@ -15,14 +15,19 @@
   align-items: center;
   justify-content: flex-start;
   padding: 2px;
-  column-gap: 5px;
+  column-gap: 6px;
+  margin: 0;
 
   &:focus-visible {
     box-shadow: var(--focus-shadow);
   }
+
+  .checkbox__check {
+    margin: 0;
+  }
 }
 
-.link-menu-item_active {
+b.link-menu-item_selected {
   font-weight: 600;
 }
 

@@ -10,10 +10,9 @@ import { DropDown } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { availTransTypes } from '../model/Transaction.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
-import { TransactionTypeMenu } from './component/TransactionTypeMenu.js';
+import { LinkMenu } from './component/LinkMenu.js';
 import { App } from '../Application.js';
 import { fixDate } from '../common.js';
-import { LinkMenu } from './component/LinkMenu.js';
 
 const NO_GROUP = 0;
 const GROUP_BY_DAY = 1;
@@ -32,7 +31,7 @@ export class StatisticsView extends AppView {
 
         assert(res.titleEl, 'Wrong statistics view structure');
 
-        res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
+        res.typeMenu = await LinkMenu.create(this, await query('.trtype-menu'));
         res.title = await prop(res.titleEl, 'textContent');
 
         res.reportMenu = await LinkMenu.create(this, await query('#report_menu'));
@@ -82,7 +81,7 @@ export class StatisticsView extends AppView {
 
         const selectedReport = cont.reportMenu.value;
         res.filter = {
-            type: cont.typeMenu.getSelectedTypes(),
+            type: cont.typeMenu.value.map((item) => parseInt(item, 10)),
             byCurrency: selectedReport === 'currency',
             startDate: null,
             endDate: null,
@@ -140,7 +139,9 @@ export class StatisticsView extends AppView {
         const { byCurrency } = this.model.filter;
 
         const res = {
-            typeMenu: { selectedTypes: this.model.filter.type },
+            typeMenu: {
+                value: this.model.filter.type.map((type) => type.toString()),
+            },
             reportMenu: {
                 visible: true,
                 value: (byCurrency) ? 'currency' : 'account',

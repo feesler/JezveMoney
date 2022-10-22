@@ -86,22 +86,23 @@ class Statistics extends TemplateController
         }
         $data["reportMenu"] = $reportMenu;
 
-        $transMenu = [];
+        $typeMenu = [];
         foreach ($trTypes as $type_id => $trTypeName) {
             $searchParams = $urlParams;
             if ($type_id) {
                 $searchParams["type"] = strtolower($trTypeName);
             }
 
-            $menuItem = new \stdClass();
-            $menuItem->type = $type_id;
-            $menuItem->title = $trTypeName;
-            $menuItem->selected = in_array($menuItem->type, $filterObj->type);
-            $menuItem->url = urlJoin($baseUrl, $searchParams);
+            $item = [
+                "value" => $type_id,
+                "title" => $trTypeName,
+                "selected" => in_array($type_id, $filterObj->type),
+                "url" => urlJoin($baseUrl, $searchParams)
+            ];
 
-            $transMenu[] = $menuItem;
+            $typeMenu[] = $item;
         }
-        $data["transMenu"] = $transMenu;
+        $data["typeMenu"] = $typeMenu;
 
         if ($byCurrency) {
             $accCurr = $filterObj->curr_id;

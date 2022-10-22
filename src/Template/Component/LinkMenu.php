@@ -27,7 +27,27 @@ class LinkMenu extends TemplateComponent
         }
         $attrs[] = "class=\"" . implode(" ", $classNames) . "\"";
 
+        if (!isset($data["multiple"])) {
+            $data["multiple"] = false;
+        }
+
+        if ($data["multiple"]) {
+            $attrs[] = "multiple";
+        }
+
         $data["attributes"] = implode(" ", $attrs);
+
+        $items = [];
+        foreach ($data["items"] as $item) {
+            if (isset($item["value"])) {
+                $item["data-value"] = " data-value=\"" . e($item["value"]) . "\"";
+            } else {
+                $item["data-value"] = "";
+            }
+
+            $items[] = $item;
+        }
+        $data["items"] = $items;
 
         return self::renderTemplate($data);
     }
