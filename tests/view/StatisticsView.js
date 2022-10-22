@@ -212,6 +212,8 @@ export class StatisticsView extends AppView {
                 && prevTime !== this.model.renderTime
             );
         });
+
+        await this.parse();
     }
 
     async filterByType(type) {

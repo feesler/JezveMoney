@@ -36,7 +36,7 @@ import { IconList } from '../../js/model/IconList.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { Tile } from '../../Components/Tile/Tile.js';
-import { LinkMenu } from '../../Components/LinkMenu/LinkMenu.js';
+import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TileInfoItem } from '../../Components/TileInfoItem/TileInfoItem.js';
 import { IconButton } from '../../Components/IconButton/IconButton.js';
@@ -225,7 +225,7 @@ class TransactionView extends View {
             });
         }
 
-        this.typeMenu = LinkMenu.fromElement(ge('type_menu'), {
+        this.typeMenu = TransactionTypeMenu.fromElement(ge('type_menu'), {
             itemParam: 'type',
             onChange: (sel) => this.onChangeType(sel),
         });
@@ -1255,7 +1255,7 @@ class TransactionView extends View {
         );
         enable(this.swapBtn, !state.submitStarted);
 
-        this.typeMenu.setActive(transaction.type.toString());
+        this.typeMenu.setActive(transaction.type);
         this.typeMenu.enable(!state.submitStarted);
 
         if (state.isAvailable) {

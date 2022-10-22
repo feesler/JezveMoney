@@ -20,6 +20,7 @@ import { PersonList } from '../../js/model/PersonList.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { LinkMenu } from '../../Components/LinkMenu/LinkMenu.js';
+import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
@@ -74,7 +75,7 @@ class TransactionListView extends View {
         this.clearAllBtn = ge('clearall_btn');
         this.clearAllBtn.addEventListener('click', (e) => this.onClearAllFilters(e));
 
-        this.linkMenu = LinkMenu.fromElement(ge('type_menu'), {
+        this.typeMenu = TransactionTypeMenu.fromElement(ge('type_menu'), {
             multiple: true,
             allowActiveLink: true,
             itemParam: 'type',
@@ -491,9 +492,8 @@ class TransactionListView extends View {
 
         const filterUrl = this.getFilterURL(state, false);
 
-        this.linkMenu.setURL(filterUrl);
-        const types = asArray(state.form.type).map((type) => type.toString());
-        this.linkMenu.setSelection(types);
+        this.typeMenu.setURL(filterUrl);
+        this.typeMenu.setSelection(state.form.type);
 
         if (window.app.model.accounts.length > 0) {
             this.renderAccountsFilter(state);

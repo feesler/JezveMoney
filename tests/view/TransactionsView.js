@@ -625,6 +625,8 @@ export class TransactionsView extends AppView {
                 && prevTime !== this.model.renderTime
             );
         });
+
+        await this.parse();
     }
 
     async goToFirstPage(directNavigate = false) {

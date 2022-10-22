@@ -4,7 +4,6 @@ import {
     createElement,
     insertAfter,
     show,
-    asArray,
 } from 'jezvejs';
 import { Histogram } from 'jezvejs/Histogram';
 import { DropDown } from 'jezvejs/DropDown';
@@ -16,6 +15,7 @@ import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { LinkMenu } from '../../Components/LinkMenu/LinkMenu.js';
+import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import '../../Components/TransactionTypeMenu/style.scss';
@@ -87,7 +87,7 @@ class StatisticsView extends View {
         this.loadingIndicator = LoadingIndicator.create();
         insertAfter(this.loadingIndicator.elem, chartElem);
 
-        this.linkMenu = LinkMenu.fromElement(ge('type_menu'), {
+        this.typeMenu = TransactionTypeMenu.fromElement(ge('type_menu'), {
             multiple: true,
             allowActiveLink: true,
             itemParam: 'type',
@@ -371,9 +371,8 @@ class StatisticsView extends View {
 
         const filterUrl = this.getFilterURL(state);
 
-        this.linkMenu.setURL(filterUrl);
-        const types = asArray(state.form.type).map((type) => type.toString());
-        this.linkMenu.setSelection(types);
+        this.typeMenu.setURL(filterUrl);
+        this.typeMenu.setSelection(state.form.type);
 
         const isByCurrency = (state.form.report === 'currency');
         this.reportMenu.setActive(state.form.report);

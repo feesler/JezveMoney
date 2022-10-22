@@ -34,13 +34,13 @@ const defaultProps = {
  */
 export class LinkMenu extends Component {
     static create(props = {}) {
-        const instance = new LinkMenu(props);
+        const instance = new this(props);
         instance.init();
         return instance;
     }
 
     static fromElement(elem, props = {}) {
-        const instance = new LinkMenu(props);
+        const instance = new this(props);
         instance.parse(elem);
         return instance;
     }
@@ -95,12 +95,16 @@ export class LinkMenu extends Component {
 
         const res = {
             title: this.parseTitle(elem),
-            value: elem.dataset.value,
+            value: this.getItemValue(elem),
             selected: elem.classList.contains(SELECTED_ITEM_CLASS),
             icon: this.parseIcon(elem),
         };
 
         return res;
+    }
+
+    getItemValue(elem) {
+        return elem.dataset.value;
     }
 
     parseTitle(elem) {
@@ -128,7 +132,7 @@ export class LinkMenu extends Component {
             throw new Error('Invalid element');
         }
 
-        const { value } = elem.dataset;
+        const value = this.getItemValue(elem);
         const checkbox = Checkbox.fromElement(elem, {
             onChange: () => this.onToggleItem(value),
         });
