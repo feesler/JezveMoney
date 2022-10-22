@@ -1,5 +1,6 @@
 <?php
 use JezveMoney\App\Template\Component\DateRangeInput;
+use JezveMoney\App\Template\Component\LinkMenu;
 
 include(TPL_PATH . "Header.tpl");	?>
 
@@ -42,19 +43,7 @@ include(TPL_PATH . "Header.tpl");	?>
 
                             <div class="filter-item">
                                 <h3 class="filter-item__title">Report type</h3>
-                                <div id="report_menu" class="link-menu">
-<?php	foreach($reportMenu as $item) {	    ?>
-<?php		if ($item["selected"]) {		?>
-                                    <b class="link-menu-item link-menu-item_active" data-value="<?=e($item["value"])?>">
-                                        <span class="link-menu-item__title"><?=e($item["title"])?></span>
-                                    </b>
-<?php		} else {	?>
-                                    <a class="link-menu-item" href="<?=e($item["url"])?>" data-value="<?=e($item["value"])?>">
-                                        <span class="link-menu-item__title"><?=e($item["title"])?></span>
-                                    </a>
-<?php		}	?>
-<?php	}	?>
-                                </div>
+                                <?= LinkMenu::render([ "id" => "report_menu", "items" => $reportMenu]) ?>
                             </div>
 
                             <div id="acc_block" class="filter-item"<?=hidden($byCurrency)?>>
