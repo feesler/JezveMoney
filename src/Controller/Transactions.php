@@ -205,13 +205,14 @@ class Transactions extends TemplateController
                 unset($urlParams["acc_id"]);
             }
 
-            $menuItem = new \stdClass();
-            $menuItem->type = $type_id;
-            $menuItem->title = $trTypeName;
-            $menuItem->selected = ($type_id == $selectedType);
-            $menuItem->url = urlJoin($baseUrl, $urlParams);
+            $item = [
+                "value" => $type_id,
+                "title" => $trTypeName,
+                "selected" => ($type_id == $selectedType),
+                "url" => urlJoin($baseUrl, $urlParams)
+            ];
 
-            $res[] = $menuItem;
+            $res[] = $item;
         }
 
         return $res;
@@ -501,7 +502,7 @@ class Transactions extends TemplateController
         // Prepare transaction types menu
         $menuParams = ["acc_id" => $acc_id];
         $baseUrl = BASEURL . "transactions/create/";
-        $data["transMenu"] = $this->getTypeMenu($baseUrl, $tr["type"], $menuParams);
+        $data["typeMenu"] = $this->getTypeMenu($baseUrl, $tr["type"], $menuParams);
 
         $form["action"] = BASEURL . "transactions/" . $data["action"] . "/";
 
@@ -712,7 +713,7 @@ class Transactions extends TemplateController
 
         // Prepare transaction types menu
         $baseUrl = $baseUrl = BASEURL . "transactions/update/" . $trans_id;
-        $data["transMenu"] = $this->getTypeMenu($baseUrl, $tr["type"]);
+        $data["typeMenu"] = $this->getTypeMenu($baseUrl, $tr["type"]);
 
         $form["action"] = BASEURL . "transactions/" . $data["action"] . "/";
 

@@ -1,6 +1,7 @@
 <?php
 use JezveMoney\App\Template\Component\AccountContainer;
 use JezveMoney\App\Template\Component\IconButton;
+use JezveMoney\App\Template\Component\LinkMenu;
 
 include(TPL_PATH . "Header.tpl");	?>
 
@@ -26,21 +27,11 @@ include(TPL_PATH . "Header.tpl");	?>
                         <input name="id" type="hidden" value="<?=e($tr["id"])?>">
 <?php	}	?>
                         <input id="typeInp" name="type" type="hidden" value="<?=e($tr["type"])?>">
-                        <div class="trtype-menu">
-<?php	forEach($transMenu as $menuItem) {
-            if ($menuItem->selected) {		?>
-                            <span class="trtype-menu__item trtype-menu__item_selected" data-type="<?=e($menuItem->type)?>">
-                                <span class="trtype-menu_item_title"><?=e($menuItem->title)?></span>
-                            </span>
-<?php		} else {		?>
-                            <span class="trtype-menu__item" data-type="<?=e($menuItem->type)?>">
-                                <span class="trtype-menu_item_title">
-                                    <a href="<?=e($menuItem->url)?>"><?=e($menuItem->title)?></a>
-                                </span>
-                            </span>
-<?php		}
-        }	?>
-                        </div>
+                        <?= LinkMenu::render([
+                            "id" => "type_menu",
+                            "classNames" => "trtype-menu",
+                            "items" => $typeMenu,
+                        ]) ?>
 
                         <span id="notavailmsg" class="nodata-message"<?=hidden($trAvailable)?>><?=e($notAvailMessage)?></span>
 

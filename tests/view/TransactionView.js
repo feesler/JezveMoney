@@ -16,7 +16,7 @@ import {
     normalizeExch,
     trimToDigitsLimit,
 } from '../common.js';
-import { TransactionTypeMenu } from './component/TransactionTypeMenu.js';
+import { LinkMenu } from './component/LinkMenu.js';
 import { InputRow } from './component/InputRow.js';
 import { IconButton } from './component/IconButton.js';
 import { WarningPopup } from './component/WarningPopup.js';
@@ -61,7 +61,7 @@ export class TransactionView extends AppView {
 
         res.delBtn = await IconButton.create(this, await query('#del_btn'));
 
-        res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
+        res.typeMenu = await LinkMenu.create(this, await query('.trtype-menu'));
         assert(!res.typeMenu.multi, 'Invalid transaction type menu');
 
         res.notAvailMsg = { elem: await query('#notavailmsg') };
@@ -132,13 +132,9 @@ export class TransactionView extends AppView {
     async buildModel(cont) {
         const res = this.model;
 
-        const selectedTypes = cont.typeMenu.getSelectedTypes();
-        assert(
-            selectedTypes.length === 1 && availTransTypes.includes(selectedTypes[0]),
-            'Invalid type selected',
-        );
+        res.type = parseInt(cont.typeMenu.value, 10);
+        assert(availTransTypes.includes(res.type), 'Invalid type selected');
 
-        [res.type] = selectedTypes;
         res.isAvailable = !cont.notAvailMsg.visible;
 
         res.isUpdate = cont.isUpdate;
@@ -412,7 +408,7 @@ export class TransactionView extends AppView {
         assert(!Number.isNaN(newState), 'Invalid state specified');
 
         const res = {
-            typeMenu: { selectedTypes: [this.model.type] },
+            typeMenu: { value: this.model.type.toString() },
             person: {
                 tile: {},
                 visible: this.model.isAvailable && this.model.type === DEBT,
@@ -1348,7 +1344,7 @@ export class TransactionView extends AppView {
 
         this.setExpectedState(this.model.state);
 
-        await this.performAction(() => this.content.typeMenu.select(type));
+        await this.performAction(() => this.content.typeMenu.selectItemByValue(type));
 
         return this.checkState();
     }

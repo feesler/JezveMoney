@@ -54,7 +54,8 @@ export class LinkMenu extends TestComponent {
     }
 
     findItemByValue(value) {
-        return this.content.items.find((item) => item.value === value);
+        const str = value.toString();
+        return this.content.items.find((item) => item.value === str);
     }
 
     async selectItemByValue(value) {
