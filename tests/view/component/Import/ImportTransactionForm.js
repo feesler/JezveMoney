@@ -1,7 +1,7 @@
 import {
     TestComponent,
     query,
-    attr,
+    hasAttr,
     prop,
     click,
     input,
@@ -84,10 +84,7 @@ export class ImportTransactionForm extends TestComponent {
             isForm: true,
         };
 
-        const disabledAttr = await attr(this.elem, 'disabled');
-        res.enabled = !disabledAttr;
-
-        const disabled = await prop(this.elem, 'disabled');
+        const disabled = await hasAttr(this.elem, 'disabled');
         res.enabled = !disabled;
 
         const fieldSelectors = [

@@ -1,5 +1,6 @@
 import {
     assert,
+    asArray,
     query,
     prop,
     navigation,
@@ -16,7 +17,8 @@ import { App } from '../Application.js';
 import { IconButton } from './component/IconButton.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
-import { LinkMenu } from './component/LinkMenu.js';
+import { LinkMenu } from './component/LinkMenu/LinkMenu.js';
+import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { SearchForm } from './component/TransactionList/SearchForm.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
 import { fixDate, isEmpty, urlJoin } from '../common.js';
@@ -44,7 +46,7 @@ export class TransactionsView extends AppView {
         res.filtersAccordion = await FiltersAccordion.create(this, await query('.filters-collapsible'));
         assert(res.filtersAccordion, 'Filters not found');
 
-        res.typeMenu = await LinkMenu.create(this, await query('.trtype-menu'));
+        res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
         assert(res.typeMenu, 'Types menu not found');
 
         const accountsFilter = await query('#accountsFilter');
@@ -99,7 +101,7 @@ export class TransactionsView extends AppView {
 
         res.filterCollapsed = cont.filtersAccordion.isCollapsed();
         res.filter = {
-            type: cont.typeMenu.value.map((item) => parseInt(item, 10)),
+            type: cont.typeMenu.value,
             accounts: this.getDropDownFilter(cont.accDropDown),
             persons: this.getDropDownFilter(cont.personDropDown),
             search: cont.searchForm.content.value,
@@ -254,7 +256,7 @@ export class TransactionsView extends AppView {
 
         const res = {
             typeMenu: {
-                value: model.filter.type.map((type) => type.toString()),
+                value: model.filter.type,
                 visible: isFiltersVisible,
             },
             accDropDown: {
@@ -349,11 +351,12 @@ export class TransactionsView extends AppView {
         return App.view.checkState(expected);
     }
 
-    async filterByType(type, directNavigate = false) {
-        const newTypeSel = Array.isArray(type) ? type : [type];
-        newTypeSel.sort();
+    async filterByType(value, directNavigate = false) {
+        const newTypeSel = asArray(value);
+        const types = (newTypeSel.includes(0)) ? [] : newTypeSel;
+        types.sort();
 
-        if (this.content.typeMenu.isSameSelected(newTypeSel)) {
+        if (this.content.typeMenu.isSameSelected(types)) {
             return true;
         }
 
@@ -363,26 +366,20 @@ export class TransactionsView extends AppView {
             await this.openFilters();
         }
 
-        const types = (newTypeSel.length === 1 && newTypeSel[0] === 0)
-            ? []
-            : newTypeSel;
-
         this.model.filter.type = types;
         const expected = this.onFilterUpdate();
 
         if (directNavigate) {
             await goTo(this.getExpectedURL());
-        } else if (newTypeSel.length === 1) {
-            const [typeSel] = newTypeSel;
-            if (typeSel === 0) {
-                await this.waitForList(() => App.view.content.typeMenu.selectItemByIndex(0));
-            } else {
-                await this.waitForList(() => App.view.content.typeMenu.select(typeSel));
-            }
+        } else if (types.length === 0) {
+            await this.waitForList(() => App.view.content.typeMenu.selectItemByIndex(0));
+        } else if (types.length === 1) {
+            const [type] = types;
+            await this.waitForList(() => App.view.content.typeMenu.select(type));
         } else {
             await this.waitForList(() => App.view.content.typeMenu.selectItemByIndex(0));
-            for (const typeItem of newTypeSel) {
-                await this.waitForList(() => App.view.content.typeMenu.toggle(typeItem));
+            for (const type of newTypeSel) {
+                await this.waitForList(() => App.view.content.typeMenu.toggle(type));
             }
         }
 

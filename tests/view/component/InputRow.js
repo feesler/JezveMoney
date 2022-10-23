@@ -3,7 +3,7 @@ import {
     assert,
     query,
     prop,
-    attr,
+    hasAttr,
     hasClass,
     input,
 } from 'jezve-test';
@@ -25,8 +25,8 @@ export class InputRow extends TestComponent {
             res.currElem = await query(this.elem, '.input-group__btn');
             res.isCurrActive = false;
             if (res.currElem) {
-                const disabledAttr = await attr(res.currElem, 'disabled');
-                res.isCurrActive = disabledAttr == null;
+                const disabled = await hasAttr(res.currElem, 'disabled');
+                res.isCurrActive = !disabled;
                 if (res.isCurrActive) {
                     const ddElem = await query(res.currElem, ':scope > *');
                     res.currDropDown = await DropDown.create(this.parent, ddElem);

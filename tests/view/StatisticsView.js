@@ -1,5 +1,6 @@
 import {
     assert,
+    asArray,
     query,
     queryAll,
     prop,
@@ -10,7 +11,8 @@ import { DropDown } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { availTransTypes } from '../model/Transaction.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
-import { LinkMenu } from './component/LinkMenu.js';
+import { LinkMenu } from './component/LinkMenu/LinkMenu.js';
+import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { App } from '../Application.js';
 import { fixDate } from '../common.js';
 
@@ -31,7 +33,7 @@ export class StatisticsView extends AppView {
 
         assert(res.titleEl, 'Wrong statistics view structure');
 
-        res.typeMenu = await LinkMenu.create(this, await query('.trtype-menu'));
+        res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
         res.title = await prop(res.titleEl, 'textContent');
 
         res.reportMenu = await LinkMenu.create(this, await query('#report_menu'));
@@ -81,7 +83,7 @@ export class StatisticsView extends AppView {
 
         const selectedReport = cont.reportMenu.value;
         res.filter = {
-            type: cont.typeMenu.value.map((item) => parseInt(item, 10)),
+            type: cont.typeMenu.value,
             byCurrency: selectedReport === 'currency',
             startDate: null,
             endDate: null,
@@ -140,7 +142,7 @@ export class StatisticsView extends AppView {
 
         const res = {
             typeMenu: {
-                value: this.model.filter.type.map((type) => type.toString()),
+                value: this.model.filter.type,
             },
             reportMenu: {
                 visible: true,
@@ -216,31 +218,32 @@ export class StatisticsView extends AppView {
         await this.parse();
     }
 
-    async filterByType(type) {
-        const newTypeSel = Array.isArray(type) ? type : [type];
-        newTypeSel.sort();
+    async filterByType(value) {
+        const types = asArray(value);
+        types.sort();
 
-        if (this.content.typeMenu.isSameSelected(newTypeSel)) {
+        if (this.content.typeMenu.isSameSelected(types)) {
             return true;
         }
 
         const typesBefore = this.model.filter.type;
-        this.model.filter.type = newTypeSel;
+        this.model.filter.type = types;
         const expected = this.getExpectedState();
 
-        if (newTypeSel.length === 1) {
-            await this.waitForData(() => App.view.content.typeMenu.select(newTypeSel[0]));
+        if (types.length === 1) {
+            const [type] = types;
+            await this.waitForData(() => App.view.content.typeMenu.select(type));
         } else {
             // Select new types
-            for (const transType of availTransTypes) {
-                if (!typesBefore.includes(transType) && newTypeSel.includes(transType)) {
-                    await this.waitForData(() => App.view.content.typeMenu.toggle(transType));
+            for (const type of availTransTypes) {
+                if (!typesBefore.includes(type) && types.includes(type)) {
+                    await this.waitForData(() => App.view.content.typeMenu.toggle(type));
                 }
             }
             // Deselect previous types
-            for (const transType of availTransTypes) {
-                if (typesBefore.includes(transType) && !newTypeSel.includes(transType)) {
-                    await this.waitForData(() => App.view.content.typeMenu.toggle(transType));
+            for (const type of availTransTypes) {
+                if (typesBefore.includes(type) && !types.includes(type)) {
+                    await this.waitForData(() => App.view.content.typeMenu.toggle(type));
                 }
             }
         }

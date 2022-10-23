@@ -1,15 +1,13 @@
 import {
     TestComponent,
     assert,
-    query,
+    asArray,
     queryAll,
     hasClass,
-    attr,
-    prop,
-    click,
+    hasAttr,
 } from 'jezve-test';
-import { Checkbox } from 'jezvejs-test';
-import { asyncMap } from '../../common.js';
+import { asyncMap } from '../../../common.js';
+import { LinkMenuItem } from './LinkMenuItem.js';
 
 export class LinkMenu extends TestComponent {
     async parseContent() {
@@ -17,11 +15,9 @@ export class LinkMenu extends TestComponent {
         assert(validClass, 'Unexpected stucture of link menu');
 
         const itemElems = await queryAll(this.elem, '.link-menu-item');
-        const multipleAttr = await attr(this.elem, 'multiple');
-
         const res = {
-            multiple: (multipleAttr !== null),
-            items: await asyncMap(itemElems, (elem) => this.parseItem(elem)),
+            multiple: await hasAttr(this.elem, 'multiple'),
+            items: await asyncMap(itemElems, (elem) => LinkMenuItem.create(this, elem)),
         };
 
         const selected = this.getSelectedValues(res);
@@ -29,40 +25,6 @@ export class LinkMenu extends TestComponent {
             res.value = selected;
         } else {
             res.value = (selected.length > 0) ? selected[0] : null;
-        }
-
-        return res;
-    }
-
-    async parseItem(elem) {
-        assert(elem, 'Invalid element');
-
-        const res = {
-            elem,
-        };
-
-        const tagName = await prop(elem, 'tagName');
-        if (tagName === 'A') {
-            res.linkElem = elem;
-        } else {
-            res.linkElem = await query(elem, 'a');
-        }
-
-        let titleElem = await query(elem, '.link-menu-item__title');
-        if (!titleElem) {
-            titleElem = elem;
-        }
-        const title = await prop(titleElem, 'textContent');
-        res.title = title.trim();
-
-        res.value = await prop(elem, 'dataset.value');
-
-        res.isCheckbox = await hasClass(elem, 'checkbox');
-        if (res.isCheckbox) {
-            res.checkbox = await Checkbox.create(this, elem);
-            res.selected = res.checkbox.checked;
-        } else {
-            res.selected = await hasClass(elem, 'link-menu-item_selected');
         }
 
         return res;
@@ -76,22 +38,29 @@ export class LinkMenu extends TestComponent {
         return this.content.items;
     }
 
+    getItemValue(item) {
+        assert(item, 'Invalid item');
+
+        return item.value;
+    }
+
     getSelectedItems(cont = this.content) {
         return cont.items.filter((item) => item.selected);
     }
 
     getSelectedValues(cont = this.content) {
+        assert.isArray(cont.items);
+
         return cont.items.filter((item) => (
             typeof item.value !== 'undefined'
             && item.value !== null
             && item.selected
-        )).map((item) => item.value);
+        )).map((item) => this.getItemValue(item));
     }
 
     isSameSelected(value) {
-        const values = Array.isArray(value) ? value : [value];
-        const data = values.map((item) => item.toString());
-        const selected = Array.isArray(this.value) ? this.value : [this.value];
+        const data = asArray(value).map((item) => item.toString());
+        const selected = this.getSelectedValues();
 
         if (selected.length !== data.length) {
             return false;
@@ -116,14 +85,14 @@ export class LinkMenu extends TestComponent {
         assert.arrayIndex(this.items, index);
         const item = this.items[index];
 
-        await click(item.linkElem);
+        await item.click();
     }
 
     async selectItemByValue(value) {
         const item = this.findItemByValue(value);
         assert(item, `Item '${value}' not found`);
 
-        await click(item.linkElem);
+        await item.click();
     }
 
     async select(value) {
@@ -133,8 +102,7 @@ export class LinkMenu extends TestComponent {
     async toggle(value) {
         const item = this.findItemByValue(value);
         assert(item, `Item '${value}' not found`);
-        assert(item.checkbox, 'Check not available');
 
-        await item.checkbox.toggle();
+        await item.toggle();
     }
 }

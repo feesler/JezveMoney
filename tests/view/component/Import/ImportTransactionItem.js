@@ -2,7 +2,7 @@ import {
     TestComponent,
     query,
     queryAll,
-    attr,
+    hasAttr,
     prop,
     click,
     isVisible,
@@ -36,8 +36,8 @@ export class ImportTransactionItem extends TestComponent {
             isForm: false,
         };
 
-        const disabledAttr = await attr(this.elem, 'disabled');
-        res.enabled = !disabledAttr;
+        const disabled = await hasAttr(this.elem, 'disabled');
+        res.enabled = !disabled;
 
         res.typeField = await this.parseField(await query(this.elem, '.type-field'));
 
