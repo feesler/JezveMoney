@@ -109,76 +109,6 @@ h3 {
 }
 
 /* Requests log */
-
-/* Both request and response container */
-.request-item {
-  padding: 5px;
-  margin: 5px 0;
-  border: 1px solid;
-  border-radius: 2px;
-
-  .request-container,
-  .response-container {
-    margin: 5px 0;
-  }
-
-  /* Request */
-  .request-container .title,
-  .response-container .title {
-    font-size: 14px;
-    font-weight: bold;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    color: #ffffff;
-    background-color: #66a1f0;
-    cursor: pointer;
-    height: 25px;
-    line-height: 25px;
-  }
-
-  .request-container .title::before,
-  .response-container .title::before {
-    content: "-";
-    padding: 0 10px;
-    display: inline-block;
-    width: 0.5rem;
-    text-align: center;
-  }
-
-  .request-container.collapsed .title::before,
-  .response-container.collapsed .title::before {
-    content: "+";
-  }
-
-  .request-container .request-details,
-  .response-container .response-details {
-    word-break: break-all;
-    font-size: 14px;
-    padding: 0 5px;
-  }
-
-  .request-container.collapsed .request-details,
-  .response-container.collapsed .response-details {
-    display: none;
-  }
-
-  /* Result */
-  .response-container.response-container_pending {
-    background: none;
-    border: 1px dashed;
-  }
-
-  .response-container.ok-result .title {
-    background-color: #65d458;
-  }
-
-  .response-container.fail-result .title {
-    background-color: #ff6666;
-  }
-}
-
-/* Requests log */
 .request-log {
   display: flex;
   flex-flow: row nowrap;
@@ -204,19 +134,5 @@ h3 {
 @media (hover: hover) {
   .menu-list .sub-menu-list > li:hover {
     text-decoration: underline;
-  }
-
-  .request-item {
-    .request-container .title:hover::before {
-      background-color: #95c3ff;
-    }
-
-    .response-container.ok-result .title:hover::before {
-      background-color: #59b74e;
-    }
-
-    .response-container.fail-result .title:hover::before {
-      background-color: #ff8a8a;
-    }
   }
 }

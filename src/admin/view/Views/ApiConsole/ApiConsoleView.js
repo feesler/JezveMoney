@@ -2,7 +2,6 @@ import 'jezvejs/style';
 import 'jezvejs/style/Checkbox';
 import {
     ge,
-    createElement,
     enable,
     setEvents,
     isObject,
@@ -15,6 +14,7 @@ import { AdminView } from '../../js/AdminView.js';
 import '../../css/admin.scss';
 import './style.scss';
 import * as apiTypes from '../../../../view/js/api/types.js';
+import { ApiRequest } from '../../Components/ApiRequest/ApiRequest.js';
 
 /**
  * Admin currecny list view
@@ -597,7 +597,7 @@ class AdminApiConsoleView extends AdminView {
      */
     clearResults() {
         removeChilds(this.resultsContainer);
-        this.clearResultsBtn.disabled = true;
+        enable(this.clearResultsBtn, false);
     }
 
     /**
@@ -665,78 +665,6 @@ class AdminApiConsoleView extends AdminView {
         const ids = values.split(',');
 
         return { id: ids };
-    }
-
-    /** Create new request item object */
-    addRequestItem(reqData) {
-        const { baseURL } = window.app;
-        const reqItem = {
-            view: this,
-        };
-
-        reqItem.itemContainer = createElement('div', { props: { className: 'request-item' } });
-
-        reqItem.requestContainer = createElement('div', {
-            props: { className: 'request-container collapsed' },
-        });
-        setEvents(reqItem.requestContainer, {
-            click: () => reqItem.requestContainer.classList.toggle('collapsed'),
-        });
-
-        let reqText = reqData.url.toString();
-        if (reqText.startsWith(baseURL)) {
-            reqText = reqText.substr(baseURL.length);
-        }
-
-        const method = (reqData.options?.method) ? reqData.options.method : 'GET';
-        const titleElem = createElement('div', {
-            props: { className: 'title', textContent: `${method} ${reqText}` },
-        });
-
-        reqItem.requestContainer.append(titleElem);
-        if (reqData.options?.body) {
-            const bodyElem = createElement('div', {
-                props: { className: 'request-details', textContent: reqData.options?.body },
-            });
-            reqItem.requestContainer.append(bodyElem);
-        }
-
-        reqItem.resultContainer = createElement('div', {
-            props: {
-                className: 'response-container response-container_pending',
-                textContent: 'Pending...',
-            },
-        });
-
-        reqItem.itemContainer.append(reqItem.requestContainer, reqItem.resultContainer);
-
-        reqItem.addResult = function (res, title, rawResult) {
-            this.resultContainer.classList.remove('response-container_pending');
-            this.resultContainer.classList.add('response-container', 'collapsed', (res ? 'ok-result' : 'fail-result'));
-            removeChilds(this.resultContainer);
-
-            const titleEl = createElement('div', {
-                props: { className: 'title', textContent: title },
-            });
-            setEvents(titleEl, {
-                click: () => reqItem.resultContainer.classList.toggle('collapsed'),
-            });
-
-            this.resultContainer.append(titleEl);
-
-            if (rawResult) {
-                const responseElem = createElement('div', {
-                    props: { className: 'response-details', textContent: rawResult },
-                });
-                this.resultContainer.append(responseElem);
-            }
-
-            this.view.clearResultsBtn.disabled = false;
-        };
-
-        this.resultsContainer.append(reqItem.itemContainer);
-
-        return reqItem;
     }
 
     /**
@@ -818,34 +746,32 @@ class AdminApiConsoleView extends AdminView {
     async apiRequest(request) {
         const isPOST = request.httpMethod?.toLowerCase() === 'post';
         const requestItem = this.getRequestItem(request, isPOST);
-        const reqContainer = this.addRequestItem(requestItem);
+        const reqContainer = ApiRequest.create({ request: requestItem });
 
-        const response = await fetch(requestItem.url, requestItem.options);
-        const text = await response.text();
-
-        let apiResult;
-        let resText;
-        let res = true;
+        this.resultsContainer.append(reqContainer.elem);
+        enable(this.clearResultsBtn);
 
         try {
-            apiResult = JSON.parse(text);
+            const response = await fetch(requestItem.url, requestItem.options);
+            const text = await response.text();
+
+            const apiResult = JSON.parse(text);
+            let res = false;
+            let resText = 'Fail result';
+
+            if (apiResult?.result === 'ok') {
+                res = isFunction(request.verify)
+                    ? request.verify(apiResult.data)
+                    : true;
+
+                resText = (res) ? 'Valid response' : 'Invalid response format';
+            }
+
+            reqContainer.addResult(res, resText, text);
         } catch (e) {
             console.log(e.message);
             reqContainer.addResult(false, 'Fail to parse response from server', null);
-            return;
         }
-
-        if (apiResult?.result === 'ok') {
-            if (isFunction(request.verify)) {
-                res = request.verify(apiResult.data);
-            }
-            resText = res ? 'Valid response' : 'Invalid response format';
-        } else {
-            res = false;
-            resText = 'Fail result';
-        }
-
-        reqContainer.addResult(res, resText, text);
     }
 
     /** Send read items request */
