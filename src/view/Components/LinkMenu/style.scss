@@ -1,6 +1,7 @@
 .link-menu {
   --link-menu-icon-size: 24px;
   --link-menu-icon-color: #20a0ff;
+  --link-menu-disabled-color: #7e7e7e;
 
   display: flex;
   flex-flow: row wrap;
@@ -44,5 +45,20 @@ b.link-menu-item_selected {
     width: var(--link-menu-icon-size);
     height: var(--link-menu-icon-size);
     fill: var(--link-menu-icon-color);
+  }
+}
+
+/* Disabled state */
+.link-menu[disabled],
+.link-menu-item[disabled] {
+  cursor: default;
+  pointer-events: none;
+
+  .link-menu-item__title {
+    color: var(--link-menu-disabled-color);
+  }
+
+  .icon {
+    fill: var(--link-menu-disabled-color);
   }
 }

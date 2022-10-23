@@ -6,7 +6,6 @@ import {
     DEBT,
 } from '../../js/model/Transaction.js';
 import { LinkMenu } from '../LinkMenu/LinkMenu.js';
-import './style.scss';
 
 const CONTAINER_CLASS = 'link-menu trtype-menu';
 

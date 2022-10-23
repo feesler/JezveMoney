@@ -18,7 +18,6 @@ import { LinkMenu } from '../../Components/LinkMenu/LinkMenu.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import '../../Components/TransactionTypeMenu/style.scss';
 import './style.scss';
 
 /** CSS classes */
