@@ -1,6 +1,5 @@
 import {
     TestApplication,
-    setupTest,
     assert,
     formatDate,
 } from 'jezve-test';
@@ -20,8 +19,6 @@ class Application extends TestApplication {
     }
 
     async init() {
-        setupTest(this.environment);
-
         this.state = new AppState();
 
         this.scenario = await Scenario.create(this.environment);
