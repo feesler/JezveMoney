@@ -74,6 +74,7 @@ import {
     commentChange,
     cancelSubmit,
 } from './reducer.js';
+import * as STATE from './stateId.js';
 
 const PAGE_TITLE_UPDATE = 'Jezve Money | Edit transaction';
 const PAGE_TITLE_CREATE = 'Jezve Money | New transaction';
@@ -154,10 +155,12 @@ class TransactionView extends View {
             initialState.form.destAmount = transaction.dest_amount;
         }
 
-        if (transaction.type === EXPENSE || transaction.type === INCOME) {
-            initialState.id = (initialState.isDiff) ? 2 : 0;
+        if (transaction.type === EXPENSE) {
+            initialState.id = (initialState.isDiff) ? STATE.E_S_AMOUNT_D_AMOUNT : STATE.E_D_AMOUNT;
+        } else if (transaction.type === INCOME) {
+            initialState.id = (initialState.isDiff) ? STATE.I_S_AMOUNT_D_AMOUNT : STATE.I_S_AMOUNT;
         } else if (transaction.type === TRANSFER) {
-            initialState.id = (initialState.isDiff) ? 3 : 0;
+            initialState.id = (initialState.isDiff) ? STATE.T_S_AMOUNT_D_AMOUNT : STATE.T_S_AMOUNT;
         } else if (transaction.type === DEBT) {
             initialState.person = window.app.model.persons.getItem(transaction.person_id);
             const personAccountId = (transaction.debtType)
@@ -180,12 +183,16 @@ class TransactionView extends View {
                 initialState.srcAccount = initialState.personAccount;
                 initialState.account = initialState.destAccount;
 
-                initialState.id = (initialState.transaction.noAccount) ? 6 : 0;
+                initialState.id = (initialState.transaction.noAccount)
+                    ? STATE.DG_NOACC_S_AMOUNT
+                    : STATE.DG_S_AMOUNT;
             } else {
                 initialState.destAccount = initialState.personAccount;
                 initialState.account = initialState.srcAccount;
 
-                initialState.id = (transaction.noAccount) ? 7 : 3;
+                initialState.id = (transaction.noAccount)
+                    ? STATE.DT_NOACC_S_AMOUNT
+                    : STATE.DT_S_AMOUNT;
             }
         }
 
@@ -982,27 +989,27 @@ class TransactionView extends View {
     renderExpense(state) {
         this.resBalanceDestSwitch(HIDE_BOTH);
 
-        if (state.id === 0) {
+        if (state.id === STATE.E_D_AMOUNT) {
             this.srcAmountSwitch(HIDE_BOTH);
             this.destAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(SHOW_INFO);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === 1) {
+        } else if (state.id === STATE.E_S_RESULT) {
             this.srcAmountSwitch(HIDE_BOTH);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INPUT);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === 2) {
+        } else if (state.id === STATE.E_S_AMOUNT_D_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(SHOW_INFO);
             this.exchRateSwitch(SHOW_INFO);
-        } else if (state.id === 3) {
+        } else if (state.id === STATE.E_S_AMOUNT_EXCH) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INFO);
             this.exchRateSwitch(SHOW_INPUT);
-        } else if (state.id === 4) {
+        } else if (state.id === STATE.E_S_AMOUNT_S_RESULT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INPUT);
@@ -1023,31 +1030,31 @@ class TransactionView extends View {
     }
 
     renderIncome(state) {
-        if (state.id === 0) {
+        if (state.id === STATE.I_S_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === 1) {
+        } else if (state.id === STATE.I_D_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INPUT);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === 2) {
+        } else if (state.id === STATE.I_S_AMOUNT_D_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(SHOW_INFO);
-        } else if (state.id === 3) {
+        } else if (state.id === STATE.I_S_AMOUNT_EXCH) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(SHOW_INPUT);
-        } else if (state.id === 4) {
+        } else if (state.id === STATE.I_S_AMOUNT_D_RESULT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INFO);
@@ -1069,55 +1076,55 @@ class TransactionView extends View {
     }
 
     renderTransfer(state) {
-        if (state.id === 0) {
+        if (state.id === STATE.T_S_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === 1) {
+        } else if (state.id === STATE.T_S_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INPUT);
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === 2) {
+        } else if (state.id === STATE.T_D_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INPUT);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === 3) {
+        } else if (state.id === STATE.T_S_AMOUNT_D_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(SHOW_INFO);
-        } else if (state.id === 4) {
+        } else if (state.id === STATE.T_D_AMOUNT_S_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(SHOW_INPUT);
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(SHOW_INFO);
-        } else if (state.id === 5) {
+        } else if (state.id === STATE.T_S_AMOUNT_D_RESULT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INPUT);
             this.exchRateSwitch(SHOW_INFO);
-        } else if (state.id === 6) {
+        } else if (state.id === STATE.T_S_RESULT_D_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INPUT);
             this.resBalanceDestSwitch(SHOW_INPUT);
             this.exchRateSwitch(SHOW_INFO);
-        } else if (state.id === 7) {
+        } else if (state.id === STATE.T_S_AMOUNT_EXCH) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(SHOW_INPUT);
-        } else if (state.id === 8) {
+        } else if (state.id === STATE.T_EXCH_S_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INPUT);
@@ -1148,31 +1155,31 @@ class TransactionView extends View {
         this.destAmountSwitch(HIDE_BOTH);
         this.exchRateSwitch(HIDE_BOTH);
 
-        if (state.id === 0 || state.id === 3) {
+        if (state.id === STATE.DG_S_AMOUNT || state.id === STATE.DT_S_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INFO);
-        } else if (state.id === 1 || state.id === 5) {
+        } else if (state.id === STATE.DG_S_RESULT || state.id === STATE.DT_S_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INPUT);
             this.resBalanceDestSwitch(SHOW_INFO);
-        } else if (state.id === 2 || state.id === 4) {
+        } else if (state.id === STATE.DG_D_RESULT || state.id === STATE.DT_D_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INPUT);
-        } else if (state.id === 6) {
+        } else if (state.id === STATE.DG_NOACC_S_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(HIDE_BOTH);
-        } else if (state.id === 7) {
+        } else if (state.id === STATE.DT_NOACC_S_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(HIDE_BOTH);
             this.resBalanceDestSwitch(SHOW_INFO);
-        } else if (state.id === 8) {
+        } else if (state.id === STATE.DT_NOACC_D_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(HIDE_BOTH);
             this.resBalanceDestSwitch(SHOW_INPUT);
-        } else if (state.id === 9) {
+        } else if (state.id === STATE.DG_NOACC_S_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INPUT);
             this.resBalanceDestSwitch(HIDE_BOTH);

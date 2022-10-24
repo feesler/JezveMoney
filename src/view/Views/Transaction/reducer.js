@@ -10,6 +10,7 @@ import {
     DEBT,
     TRANSFER,
 } from '../../js/model/Transaction.js';
+import * as STATE from './stateId.js';
 
 // Action types
 const SOURCE_AMOUNT_CLICK = 'sourceAmountClick';
@@ -247,32 +248,32 @@ const getPersonAccount = (personId, currencyId) => {
 const reduceSourceAmountClick = (state) => {
     let newId = state.id;
     if (state.transaction.type === INCOME) {
-        if (state.id === 1) {
-            newId = 0;
+        if (state.id === STATE.I_D_RESULT) {
+            newId = STATE.I_S_AMOUNT;
         }
     }
 
     if (state.transaction.type === TRANSFER) {
-        if (state.id === 1 || state.id === 2) {
-            newId = 0;
-        } else if (state.id === 4) {
-            newId = 3;
-        } else if (state.id === 6) {
-            newId = 5;
-        } else if (state.id === 8) {
-            newId = 7;
+        if (state.id === STATE.T_S_RESULT || state.id === STATE.T_D_RESULT) {
+            newId = STATE.T_S_AMOUNT;
+        } else if (state.id === STATE.T_D_AMOUNT_S_RESULT) {
+            newId = STATE.T_S_AMOUNT_D_AMOUNT;
+        } else if (state.id === STATE.T_S_RESULT_D_RESULT) {
+            newId = STATE.T_S_AMOUNT_D_RESULT;
+        } else if (state.id === STATE.T_EXCH_S_RESULT) {
+            newId = STATE.T_S_AMOUNT_EXCH;
         }
     }
 
     if (state.transaction.type === DEBT) {
-        if (state.id === 1 || state.id === 2) {
-            newId = 0;
-        } else if (state.id === 4 || state.id === 5) {
-            newId = 3;
-        } else if (state.id === 8) {
-            newId = 7;
-        } else if (state.id === 9) {
-            newId = 6;
+        if (state.id === STATE.DG_S_RESULT || state.id === STATE.DG_D_RESULT) {
+            newId = STATE.DG_S_AMOUNT;
+        } else if (state.id === STATE.DT_D_RESULT || state.id === STATE.DT_S_RESULT) {
+            newId = STATE.DT_S_AMOUNT;
+        } else if (state.id === STATE.DT_NOACC_D_RESULT) {
+            newId = STATE.DT_NOACC_S_AMOUNT;
+        } else if (state.id === STATE.DG_NOACC_S_RESULT) {
+            newId = STATE.DG_NOACC_S_AMOUNT;
         }
     }
 
@@ -282,24 +283,24 @@ const reduceSourceAmountClick = (state) => {
 const reduceDestAmountClick = (state) => {
     let newId = state.id;
     if (state.transaction.type === EXPENSE) {
-        if (state.id === 1) {
-            newId = 0;
-        } else if (state.id === 3 || state.id === 4) {
-            newId = 2;
+        if (state.id === STATE.E_S_RESULT) {
+            newId = STATE.E_D_AMOUNT;
+        } else if (state.id === STATE.E_S_AMOUNT_EXCH || state.id === STATE.E_S_AMOUNT_S_RESULT) {
+            newId = STATE.E_S_AMOUNT_D_AMOUNT;
         }
     }
 
     if (state.transaction.type === INCOME) {
-        if (state.id === 3 || state.id === 4) {
-            newId = 2;
+        if (state.id === STATE.I_S_AMOUNT_EXCH || state.id === STATE.I_S_AMOUNT_D_RESULT) {
+            newId = STATE.I_S_AMOUNT_D_AMOUNT;
         }
     }
 
     if (state.transaction.type === TRANSFER) {
-        if (state.id === 5 || state.id === 7) {
-            newId = 3;
-        } else if (state.id === 6 || state.id === 8) {
-            newId = 4;
+        if (state.id === STATE.T_S_AMOUNT_D_RESULT || state.id === STATE.T_S_AMOUNT_EXCH) {
+            newId = STATE.T_S_AMOUNT_D_AMOUNT;
+        } else if (state.id === STATE.T_S_RESULT_D_RESULT || state.id === STATE.T_EXCH_S_RESULT) {
+            newId = STATE.T_D_AMOUNT_S_RESULT;
         }
     }
 
@@ -309,32 +310,32 @@ const reduceDestAmountClick = (state) => {
 const reduceSourceResultClick = (state) => {
     let newId = state.id;
     if (state.transaction.type === EXPENSE) {
-        if (state.id === 0) {
-            newId = 1;
-        } else if (state.id === 2 || state.id === 3) {
-            newId = 4;
+        if (state.id === STATE.E_D_AMOUNT) {
+            newId = STATE.E_S_RESULT;
+        } else if (state.id === STATE.E_S_AMOUNT_D_AMOUNT || state.id === STATE.E_S_AMOUNT_EXCH) {
+            newId = STATE.E_S_AMOUNT_S_RESULT;
         }
     }
 
     if (state.transaction.type === TRANSFER) {
-        if (state.id === 0 || state.id === 2) {
-            newId = 1;
-        } else if (state.id === 3) {
-            newId = 4;
-        } else if (state.id === 5) {
-            newId = 6;
-        } else if (state.id === 7) {
-            newId = 8;
+        if (state.id === STATE.T_S_AMOUNT || state.id === STATE.T_D_RESULT) {
+            newId = STATE.T_S_RESULT;
+        } else if (state.id === STATE.T_S_AMOUNT_D_AMOUNT) {
+            newId = STATE.T_D_AMOUNT_S_RESULT;
+        } else if (state.id === STATE.T_S_AMOUNT_D_RESULT) {
+            newId = STATE.T_S_RESULT_D_RESULT;
+        } else if (state.id === STATE.T_S_AMOUNT_EXCH) {
+            newId = STATE.T_EXCH_S_RESULT;
         }
     }
 
     if (state.transaction.type === DEBT) {
-        if (state.id === 0 || state.id === 2) {
-            newId = 1;
-        } else if (state.id === 3 || state.id === 4) {
-            newId = 5;
-        } else if (state.id === 6) {
-            newId = 9;
+        if (state.id === STATE.DG_S_AMOUNT || state.id === STATE.DG_D_RESULT) {
+            newId = STATE.DG_S_RESULT;
+        } else if (state.id === STATE.DT_S_AMOUNT || state.id === STATE.DT_D_RESULT) {
+            newId = STATE.DT_S_RESULT;
+        } else if (state.id === STATE.DG_NOACC_S_AMOUNT) {
+            newId = STATE.DG_NOACC_S_RESULT;
         }
     }
 
@@ -344,30 +345,30 @@ const reduceSourceResultClick = (state) => {
 const reduceDestResultClick = (state) => {
     let newId = state.id;
     if (state.transaction.type === INCOME) {
-        if (state.id === 0) {
-            newId = 1;
-        } else if (state.id === 2 || state.id === 3) {
-            newId = 4;
+        if (state.id === STATE.I_S_AMOUNT) {
+            newId = STATE.I_D_RESULT;
+        } else if (state.id === STATE.I_S_AMOUNT_D_AMOUNT || state.id === STATE.I_S_AMOUNT_EXCH) {
+            newId = STATE.I_S_AMOUNT_D_RESULT;
         }
     }
 
     if (state.transaction.type === TRANSFER) {
-        if (state.id === 0 || state.id === 1) {
-            newId = 2;
-        } else if (state.id === 3 || state.id === 7) {
-            newId = 5;
-        } else if (state.id === 4 || state.id === 8) {
-            newId = 6;
+        if (state.id === STATE.T_S_AMOUNT || state.id === STATE.T_S_RESULT) {
+            newId = STATE.T_D_RESULT;
+        } else if (state.id === STATE.T_S_AMOUNT_D_AMOUNT || state.id === STATE.T_S_AMOUNT_EXCH) {
+            newId = STATE.T_S_AMOUNT_D_RESULT;
+        } else if (state.id === STATE.T_D_AMOUNT_S_RESULT || state.id === STATE.T_EXCH_S_RESULT) {
+            newId = STATE.T_S_RESULT_D_RESULT;
         }
     }
 
     if (state.transaction.type === DEBT) {
-        if (state.id === 0 || state.id === 1) {
-            newId = 2;
-        } else if (state.id === 3 || state.id === 5) {
-            newId = 4;
-        } else if (state.id === 7) {
-            newId = 8;
+        if (state.id === STATE.DG_S_AMOUNT || state.id === STATE.DG_S_RESULT) {
+            newId = STATE.DG_D_RESULT;
+        } else if (state.id === STATE.DT_S_AMOUNT || state.id === STATE.DT_S_RESULT) {
+            newId = STATE.DT_D_RESULT;
+        } else if (state.id === STATE.DT_NOACC_S_AMOUNT) {
+            newId = STATE.DT_NOACC_D_RESULT;
         }
     }
 
@@ -376,15 +377,20 @@ const reduceDestResultClick = (state) => {
 
 const reduceExchangeClick = (state) => {
     let newId = state.id;
-    if (state.transaction.type === EXPENSE || state.transaction.type === INCOME) {
-        newId = 3;
+    if (state.transaction.type === EXPENSE) {
+        newId = STATE.E_S_AMOUNT_EXCH;
     }
-
+    if (state.transaction.type === INCOME) {
+        newId = STATE.I_S_AMOUNT_EXCH;
+    }
     if (state.transaction.type === TRANSFER) {
-        if (state.id === 3 || state.id === 5) {
-            newId = 7;
-        } else if (state.id === 4 || state.id === 6) {
-            newId = 8;
+        if (state.id === STATE.T_S_AMOUNT_D_AMOUNT || state.id === STATE.T_S_AMOUNT_D_RESULT) {
+            newId = STATE.T_S_AMOUNT_EXCH;
+        } else if (
+            state.id === STATE.T_D_AMOUNT_S_RESULT
+            || state.id === STATE.T_S_RESULT_D_RESULT
+        ) {
+            newId = STATE.T_EXCH_S_RESULT;
         }
     }
 
@@ -421,7 +427,7 @@ const reduceSourceAccountChange = (state, accountId) => {
     if (transaction.type === EXPENSE) {
         // If currencies are same before account was changed
         // then copy source currency to destination
-        if (state.id === 0 || state.id === 1) {
+        if (state.id === STATE.E_D_AMOUNT || state.id === STATE.E_S_RESULT) {
             transaction.dest_curr = srcAccount.curr_id;
             newState.destCurrency = srcCurrency;
         }
@@ -430,11 +436,18 @@ const reduceSourceAccountChange = (state, accountId) => {
 
         newState.isDiff = transaction.src_curr !== transaction.dest_curr;
         if (!newState.isDiff) {
-            if (newState.id === 2 || newState.id === 3 || newState.id === 4) {
+            const availStates = [
+                STATE.E_S_AMOUNT_D_AMOUNT,
+                STATE.E_S_AMOUNT_EXCH,
+                STATE.E_S_AMOUNT_S_RESULT,
+            ];
+            if (availStates.includes(newState.id)) {
                 const srcAmount = transaction.src_amount;
                 transaction.dest_amount = srcAmount;
                 newState.form.destAmount = srcAmount;
-                newState.id = (newState.id === 4) ? 1 : 0;
+                newState.id = (newState.id === STATE.E_S_AMOUNT_S_RESULT)
+                    ? STATE.E_S_RESULT
+                    : STATE.E_D_AMOUNT;
             }
         }
     }
@@ -458,24 +471,31 @@ const reduceSourceAccountChange = (state, accountId) => {
 
         newState.isDiff = transaction.src_curr !== transaction.dest_curr;
         if (newState.isDiff) {
-            if (newState.id === 0) {
-                newState.id = 3;
-            } else if (newState.id === 1) {
-                newState.id = 4;
-            } else if (newState.id === 2) {
-                newState.id = 5;
+            if (newState.id === STATE.T_S_AMOUNT) {
+                newState.id = STATE.T_S_AMOUNT_D_AMOUNT;
+            } else if (newState.id === STATE.T_S_RESULT) {
+                newState.id = STATE.T_D_AMOUNT_S_RESULT;
+            } else if (newState.id === STATE.T_D_RESULT) {
+                newState.id = STATE.T_S_AMOUNT_D_RESULT;
             }
         } else {
             if (transaction.dest_amount !== transaction.src_amount) {
                 setStateDestAmount(newState, transaction.src_amount);
             }
 
-            if (newState.id === 3 || newState.id === 7) {
-                newState.id = 0;
-            } else if (newState.id === 4 || newState.id === 6 || newState.id === 8) {
-                newState.id = 1;
-            } else if (newState.id === 5) {
-                newState.id = 2;
+            if (
+                newState.id === STATE.T_S_AMOUNT_D_AMOUNT
+                || newState.id === STATE.T_S_AMOUNT_EXCH
+            ) {
+                newState.id = STATE.T_S_AMOUNT;
+            } else if (
+                newState.id === STATE.T_D_AMOUNT_S_RESULT
+                || newState.id === STATE.T_S_RESULT_D_RESULT
+                || newState.id === STATE.T_EXCH_S_RESULT
+            ) {
+                newState.id = STATE.T_S_RESULT;
+            } else if (newState.id === STATE.T_S_AMOUNT_D_RESULT) {
+                newState.id = STATE.T_D_RESULT;
             }
         }
     }
@@ -522,9 +542,16 @@ const reduceDestAccountChange = (state, accountId) => {
 
         newState.isDiff = transaction.src_curr !== transaction.dest_curr;
         if (!newState.isDiff) {
-            if (newState.id === 2 || newState.id === 3 || newState.id === 4) {
+            const availStates = [
+                STATE.I_S_AMOUNT_D_AMOUNT,
+                STATE.I_S_AMOUNT_EXCH,
+                STATE.I_S_AMOUNT_D_RESULT,
+            ];
+            if (availStates.includes(newState.id)) {
                 setStateSourceAmount(newState, transaction.dest_amount);
-                newState.id = (newState.id === 4) ? 1 : 0;
+                newState.id = (newState.id === STATE.I_S_AMOUNT_D_RESULT)
+                    ? STATE.E_S_RESULT
+                    : STATE.E_D_AMOUNT;
             }
         }
     }
@@ -548,24 +575,33 @@ const reduceDestAccountChange = (state, accountId) => {
 
         newState.isDiff = transaction.src_curr !== transaction.dest_curr;
         if (newState.isDiff) {
-            if (newState.id === 0) {
-                newState.id = 3;
-            } else if (newState.id === 1) {
-                newState.id = 4;
-            } else if (newState.id === 2) {
-                newState.id = 5;
+            if (newState.id === STATE.T_S_AMOUNT) {
+                newState.id = STATE.T_S_AMOUNT_D_AMOUNT;
+            } else if (newState.id === STATE.T_S_RESULT) {
+                newState.id = STATE.T_D_AMOUNT_S_RESULT;
+            } else if (newState.id === STATE.T_D_RESULT) {
+                newState.id = STATE.T_S_AMOUNT_D_RESULT;
             }
         } else {
             if (transaction.dest_amount !== transaction.src_amount) {
                 setStateDestAmount(newState, transaction.src_amount);
             }
 
-            if (newState.id === 3 || newState.id === 7) {
-                newState.id = 0;
-            } else if (newState.id === 4 || newState.id === 8) {
-                newState.id = 1;
-            } else if (newState.id === 5 || newState.id === 6) {
-                newState.id = 2;
+            if (
+                newState.id === STATE.T_S_AMOUNT_D_AMOUNT
+                || newState.id === STATE.T_S_AMOUNT_EXCH
+            ) {
+                newState.id = STATE.T_S_AMOUNT;
+            } else if (
+                newState.id === STATE.T_D_AMOUNT_S_RESULT
+                || newState.id === STATE.T_EXCH_S_RESULT
+            ) {
+                newState.id = STATE.T_S_RESULT;
+            } else if (
+                newState.id === STATE.T_S_AMOUNT_D_RESULT
+                || newState.id === STATE.T_S_RESULT_D_RESULT
+            ) {
+                newState.id = STATE.T_D_RESULT;
             }
         }
     }
@@ -674,13 +710,19 @@ const reduceSourceCurrencyChange = (state, currencyId) => {
         isDiff: srcCurrency.id !== state.transaction.dest_curr,
     };
 
-    if (newState.isDiff && newState.id === 0) {
-        newState.id = 2;
-    } else if (newState.id === 2 || newState.id === 3 || newState.id === 4) {
+    if (newState.isDiff && newState.id === STATE.I_S_AMOUNT) {
+        newState.id = STATE.I_S_AMOUNT_D_AMOUNT;
+    } else if (
+        newState.id === STATE.I_S_AMOUNT_D_AMOUNT
+        || newState.id === STATE.I_S_AMOUNT_EXCH
+        || newState.id === STATE.I_S_AMOUNT_D_RESULT
+    ) {
         if (!newState.isDiff) {
             setStateDestAmount(newState, newState.transaction.src_amount);
             updateStateExchange(newState);
-            newState.id = (newState.id === 4) ? 1 : 0;
+            newState.id = (newState.id === STATE.I_S_AMOUNT_D_RESULT)
+                ? STATE.I_D_RESULT
+                : STATE.I_S_AMOUNT;
         }
     }
 
@@ -704,11 +746,11 @@ const reduceDestCurrencyChange = (state, currencyId) => {
         isDiff: destCurrency.id !== state.transaction.src_curr,
     };
 
-    if (newState.isDiff && newState.id === 0) {
-        newState.id = 2;
-    } else if (newState.id === 2) {
+    if (newState.isDiff && newState.id === STATE.E_D_AMOUNT) {
+        newState.id = STATE.E_S_AMOUNT_D_AMOUNT;
+    } else if (newState.id === STATE.E_S_AMOUNT_D_AMOUNT) {
         if (!newState.isDiff) {
-            newState.id = 0;
+            newState.id = STATE.E_D_AMOUNT;
             setStateSourceAmount(newState, newState.transaction.dest_amount);
             updateStateExchange(newState);
         }
@@ -732,14 +774,14 @@ const reduceToggleDebtAccount = (state) => {
     const { transaction } = newState;
 
     if (transaction.noAccount) {
-        if (newState.id === 0 || newState.id === 2) {
-            newState.id = 6;
-        } else if (newState.id === 1) {
-            newState.id = 9;
-        } else if (newState.id === 3 || newState.id === 5) {
-            newState.id = 7;
-        } else if (newState.id === 4) {
-            newState.id = 8;
+        if (newState.id === STATE.DG_S_AMOUNT || newState.id === STATE.DG_D_RESULT) {
+            newState.id = STATE.DG_NOACC_S_AMOUNT;
+        } else if (newState.id === STATE.DG_S_RESULT) {
+            newState.id = STATE.DG_NOACC_S_RESULT;
+        } else if (newState.id === STATE.DT_S_AMOUNT || newState.id === STATE.DT_S_RESULT) {
+            newState.id = STATE.DT_NOACC_S_AMOUNT;
+        } else if (newState.id === STATE.DT_D_RESULT) {
+            newState.id = STATE.DT_NOACC_D_RESULT;
         }
 
         transaction.lastAcc_id = newState.account.id;
@@ -756,14 +798,14 @@ const reduceToggleDebtAccount = (state) => {
             newState.srcAccount = newState.account;
         }
 
-        if (newState.id === 6) {
-            newState.id = 0;
-        } else if (newState.id === 7) {
-            newState.id = 3;
-        } else if (newState.id === 8) {
-            newState.id = 4;
-        } else if (newState.id === 9) {
-            newState.id = 1;
+        if (newState.id === STATE.DG_NOACC_S_AMOUNT) {
+            newState.id = STATE.DG_S_AMOUNT;
+        } else if (newState.id === STATE.DT_NOACC_S_AMOUNT) {
+            newState.id = STATE.DT_S_AMOUNT;
+        } else if (newState.id === STATE.DT_NOACC_D_RESULT) {
+            newState.id = STATE.DT_D_RESULT;
+        } else if (newState.id === STATE.DG_NOACC_S_RESULT) {
+            newState.id = STATE.DG_S_RESULT;
         }
     }
 
@@ -1109,7 +1151,7 @@ const reduceTypeChange = (state, type) => {
         newState.destAccount = null;
 
         if (!state.isAvailable) {
-            newState.id = 0;
+            newState.id = STATE.E_D_AMOUNT;
 
             const srcAccount = userAccounts.getItemByIndex(0);
             const srcCurrency = currencyModel.getItem(srcAccount.curr_id);
@@ -1142,7 +1184,7 @@ const reduceTypeChange = (state, type) => {
             setStateSourceAmount(newState, state.form.destAmount);
             setStateDestAmount(newState, state.form.sourceAmount);
         } else if (currentType === TRANSFER) {
-            newState.id = 0;
+            newState.id = STATE.E_D_AMOUNT;
             transaction.dest_curr = transaction.src_curr;
             newState.destCurrency = newState.srcCurrency;
 
@@ -1153,7 +1195,7 @@ const reduceTypeChange = (state, type) => {
                 ? state.account
                 : userAccounts.getItemByIndex(0);
 
-            newState.id = 0;
+            newState.id = STATE.E_D_AMOUNT;
             newState.srcAccount = fromAccount;
             transaction.src_id = fromAccount.id;
             transaction.src_curr = fromAccount.curr_id;
@@ -1176,7 +1218,7 @@ const reduceTypeChange = (state, type) => {
         newState.srcAccount = null;
 
         if (!state.isAvailable) {
-            newState.id = 0;
+            newState.id = STATE.I_S_AMOUNT;
 
             const destAccount = userAccounts.getItemByIndex(0);
             const srcCurrency = currencyModel.getItem(destAccount.curr_id);
@@ -1209,7 +1251,7 @@ const reduceTypeChange = (state, type) => {
             setStateSourceAmount(newState, state.form.sourceAmount);
             setStateDestAmount(newState, state.form.destAmount);
         } else if (currentType === TRANSFER) {
-            newState.id = 0;
+            newState.id = STATE.I_S_AMOUNT;
             transaction.src_curr = transaction.dest_curr;
             newState.srcCurrency = newState.destCurrency;
 
@@ -1220,7 +1262,7 @@ const reduceTypeChange = (state, type) => {
                 ? state.account
                 : userAccounts.getItemByIndex(0);
 
-            newState.id = 0;
+            newState.id = STATE.I_S_AMOUNT;
             newState.destAccount = fromAccount;
             transaction.dest_id = fromAccount.id;
             transaction.dest_curr = fromAccount.curr_id;
@@ -1277,7 +1319,7 @@ const reduceTypeChange = (state, type) => {
         }
 
         newState.isDiff = transaction.src_curr !== transaction.dest_curr;
-        newState.id = (newState.isDiff) ? 3 : 0;
+        newState.id = (newState.isDiff) ? STATE.T_S_AMOUNT_D_AMOUNT : STATE.T_S_AMOUNT;
 
         setStateSourceAmount(newState, state.form.sourceAmount);
         setStateDestAmount(newState, state.form.destAmount);
@@ -1332,9 +1374,13 @@ const reduceTypeChange = (state, type) => {
 
         newState.isDiff = transaction.src_curr !== transaction.dest_curr;
         if (transaction.noAccount) {
-            newState.id = (transaction.debtType) ? 6 : 7;
+            newState.id = (transaction.debtType)
+                ? STATE.DG_NOACC_S_AMOUNT
+                : STATE.DT_NOACC_S_AMOUNT;
         } else {
-            newState.id = (transaction.debtType) ? 0 : 3;
+            newState.id = (transaction.debtType)
+                ? STATE.DG_S_AMOUNT
+                : STATE.DT_S_AMOUNT;
         }
 
         setStateSourceAmount(newState, state.form.sourceAmount);
@@ -1389,27 +1435,27 @@ const reduceSwap = (state) => {
         newState.transaction.debtType = debtType;
 
         if (debtType) {
-            if (newState.id === 3) {
-                newState.id = 0;
-            } else if (newState.id === 4) {
-                newState.id = 1;
-            } else if (newState.id === 5) {
-                newState.id = 2;
-            } else if (newState.id === 7) {
-                newState.id = 6;
-            } else if (newState.id === 8) {
-                newState.id = 9;
+            if (newState.id === STATE.DT_S_AMOUNT) {
+                newState.id = STATE.DG_S_AMOUNT;
+            } else if (newState.id === STATE.DT_D_RESULT) {
+                newState.id = STATE.DG_S_RESULT;
+            } else if (newState.id === STATE.DT_S_RESULT) {
+                newState.id = STATE.DG_D_RESULT;
+            } else if (newState.id === STATE.DT_NOACC_S_AMOUNT) {
+                newState.id = STATE.DG_NOACC_S_AMOUNT;
+            } else if (newState.id === STATE.DT_NOACC_D_RESULT) {
+                newState.id = STATE.DG_NOACC_S_RESULT;
             }
-        } else if (newState.id === 0) {
-            newState.id = 3;
-        } else if (newState.id === 1) {
-            newState.id = 4;
-        } else if (newState.id === 2) {
-            newState.id = 5;
-        } else if (newState.id === 6) {
-            newState.id = 7;
-        } else if (newState.id === 9) {
-            newState.id = 8;
+        } else if (newState.id === STATE.DG_S_AMOUNT) {
+            newState.id = STATE.DT_S_AMOUNT;
+        } else if (newState.id === STATE.DG_S_RESULT) {
+            newState.id = STATE.DT_D_RESULT;
+        } else if (newState.id === STATE.DG_D_RESULT) {
+            newState.id = STATE.DT_S_RESULT;
+        } else if (newState.id === STATE.DG_NOACC_S_AMOUNT) {
+            newState.id = STATE.DT_NOACC_S_AMOUNT;
+        } else if (newState.id === STATE.DG_NOACC_S_RESULT) {
+            newState.id = STATE.DT_NOACC_D_RESULT;
         }
     }
 
