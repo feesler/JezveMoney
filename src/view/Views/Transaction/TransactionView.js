@@ -354,6 +354,7 @@ class TransactionView extends View {
 
         this.dateInput = DateInput.create({
             elem: ge('date'),
+            locales: window.app.dateFormatLocale,
             oninput: (e) => this.onDateInput(e),
         });
 

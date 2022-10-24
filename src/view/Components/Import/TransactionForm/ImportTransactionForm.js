@@ -342,6 +342,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
             className: `${DEFAULT_INPUT_CLASS} ${IG_INPUT_CLASS}`,
             name: 'date[]',
             placeholder: TITLE_FIELD_DATE,
+            locales: window.app.dateFormatLocale,
             oninput: () => this.onDateInput(),
         });
 

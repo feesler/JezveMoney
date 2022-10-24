@@ -62,11 +62,13 @@ export class DateRangeInput extends Component {
 
         this.startDateInput = DateInput.create({
             elem: elem.querySelector('input[name="stdate"]'),
+            locales: window.app.dateFormatLocale,
             oninput: (e) => this.onStartDateInput(e),
         });
 
         this.endDateInput = DateInput.create({
             elem: elem.querySelector('input[name="enddate"]'),
+            locales: window.app.dateFormatLocale,
             oninput: (e) => this.onEndDateInput(e),
         });
 
