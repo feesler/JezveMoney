@@ -76,6 +76,10 @@ export class Application {
         return this.config.datePickerLocale;
     }
 
+    get dateFormatLocale() {
+        return this.config.dateFormatLocale;
+    }
+
     formatDate(date) {
         if (!isDate(date)) {
             throw new Error('Invalid date object');

@@ -602,6 +602,21 @@ export class ImportTransactionForm extends ImportTransactionBase {
         ddown?.selectItem(currencyId);
     }
 
+    enableCurrency(currBtn, signElem, value) {
+        currBtn.classList.toggle('input-group__btn', value);
+        currBtn.classList.toggle('input-group__text', !value);
+        signElem.classList.toggle('input-group__btn-title', value);
+        signElem.classList.toggle('input-group__text-title', !value);
+    }
+
+    enableSourceCurrency(value) {
+        this.enableCurrency(this.srcCurrencyBtn, this.srcCurrencySign, value);
+    }
+
+    enableDestCurrency(value) {
+        this.enableCurrency(this.destCurrencyBtn, this.destCurrencySign, value);
+    }
+
     /** Show date pciker */
     showDatePicker() {
         if (!this.datePicker) {
@@ -642,8 +657,9 @@ export class ImportTransactionForm extends ImportTransactionBase {
             // Destination amount field
             this.destAmountInp.value = transaction.destAmount;
             enable(this.destAmountInp, transaction.enabled);
+
+            this.enableDestCurrency(true);
             this.destCurrencyDropDown.enable(transaction.enabled);
-            enable(this.destCurrencyBtn, transaction.enabled);
             this.renderCurrency(
                 this.destCurrencySign,
                 this.destCurrencyDropDown,
@@ -660,8 +676,9 @@ export class ImportTransactionForm extends ImportTransactionBase {
             // Source amount field
             this.srcAmountInp.value = transaction.sourceAmount;
             enable(this.srcAmountInp, transaction.enabled && isDiff);
+
+            this.enableSourceCurrency(false);
             this.srcCurrencyDropDown.enable(false);
-            enable(this.srcCurrencyBtn, false);
             this.renderCurrency(
                 this.srcCurrencySign,
                 this.srcCurrencyDropDown,
@@ -675,8 +692,9 @@ export class ImportTransactionForm extends ImportTransactionBase {
             // Source amount field
             this.srcAmountInp.value = transaction.sourceAmount;
             enable(this.srcAmountInp, transaction.enabled);
+
+            this.enableSourceCurrency(isIncome);
             this.srcCurrencyDropDown.enable(transaction.enabled && isIncome);
-            enable(this.srcCurrencyBtn, transaction.enabled && isIncome);
             this.renderCurrency(
                 this.srcCurrencySign,
                 this.srcCurrencyDropDown,
@@ -693,8 +711,9 @@ export class ImportTransactionForm extends ImportTransactionBase {
             // Destination amount field
             this.destAmountInp.value = transaction.destAmount;
             enable(this.destAmountInp, transaction.enabled && isDiff);
+
+            this.enableDestCurrency(false);
             this.destCurrencyDropDown.enable(false);
-            enable(this.destCurrencyBtn, false);
             this.renderCurrency(
                 this.destCurrencySign,
                 this.destCurrencyDropDown,
@@ -705,6 +724,9 @@ export class ImportTransactionForm extends ImportTransactionBase {
             this.destAmountInp.placeholder = TITLE_FIELD_DEST_AMOUNT;
             this.destAmountField.setTitle(TITLE_FIELD_DEST_AMOUNT);
         }
+
+        enable(this.srcCurrencyBtn, transaction.enabled);
+        enable(this.destCurrencyBtn, transaction.enabled);
 
         // Second account field
         this.transferAccDropDown.enable(transaction.enabled && isTransfer);

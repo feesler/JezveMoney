@@ -298,7 +298,7 @@ class TransactionView extends View {
             digits: 2,
             oninput: (e) => this.onSourceAmountInput(e),
         });
-        this.srcCurrBtn = this.srcAmountRow.querySelector('.input-group__btn');
+        this.srcCurrBtn = ge('srcCurrBtn');
         this.srcAmountSign = ge('srcamountsign');
 
         this.destAmountRow = ge('dest_amount_row');
@@ -310,7 +310,7 @@ class TransactionView extends View {
             digits: 2,
             oninput: (e) => this.onDestAmountInput(e),
         });
-        this.destCurrBtn = this.destAmountRow.querySelector('.input-group__btn');
+        this.destCurrBtn = ge('destCurrBtn');
         this.destAmountSign = ge('destamountsign');
 
         this.srcResBalanceRow = ge('result_balance');
@@ -733,6 +733,38 @@ class TransactionView extends View {
         }
     }
 
+    /** Enable/disable specified currency button */
+    enableCurrencySelect(currBtn, signElem, ddown, value) {
+        currBtn.classList.toggle('input-group__btn', value);
+        currBtn.classList.toggle('input-group__text', !value);
+        signElem.classList.toggle('input-group__btn-title', value);
+        signElem.classList.toggle('input-group__text-title', !value);
+
+        if (ddown) {
+            ddown.enable(value);
+        }
+    }
+
+    /** Enable/disable source currency button */
+    enableSourceCurrencySelect(value) {
+        this.enableCurrencySelect(
+            this.srcCurrBtn,
+            this.srcAmountSign,
+            this.srcCurrDDList,
+            value,
+        );
+    }
+
+    /** Enable/disable destination currency button */
+    enableDestCurrencySelect(value) {
+        this.enableCurrencySelect(
+            this.destCurrBtn,
+            this.destAmountSign,
+            this.destCurrDDList,
+            value,
+        );
+    }
+
     validateSourceAmount(state) {
         const valid = (state.transaction.src_amount > 0);
         if (!valid) {
@@ -985,8 +1017,8 @@ class TransactionView extends View {
         this.srcResBalanceRowLabel.textContent = 'Result balance';
         this.destResBalanceRowLabel.textContent = 'Result balance';
 
-        enable(this.srcCurrBtn, false);
-        enable(this.destCurrBtn, !state.submitStarted);
+        this.enableSourceCurrencySelect(false);
+        this.enableDestCurrencySelect(true);
     }
 
     renderIncome(state) {
@@ -1031,8 +1063,8 @@ class TransactionView extends View {
         this.srcResBalanceRowLabel.textContent = 'Result balance';
         this.destResBalanceRowLabel.textContent = 'Result balance';
 
-        enable(this.srcCurrBtn, !state.submitStarted);
-        enable(this.destCurrBtn, false);
+        this.enableSourceCurrencySelect(true);
+        this.enableDestCurrencySelect(false);
     }
 
     renderTransfer(state) {
@@ -1107,8 +1139,8 @@ class TransactionView extends View {
         this.srcResBalanceRowLabel.textContent = 'Result balance (Source)';
         this.destResBalanceRowLabel.textContent = 'Result balance (Destination)';
 
-        enable(this.srcCurrBtn, false);
-        enable(this.destCurrBtn, false);
+        this.enableSourceCurrencySelect(false);
+        this.enableDestCurrencySelect(false);
     }
 
     renderDebt(state) {
@@ -1185,8 +1217,8 @@ class TransactionView extends View {
         this.srcResBalanceRowLabel.textContent = (debtType) ? 'Result balance (Person)' : 'Result balance (Account)';
         this.destResBalanceRowLabel.textContent = (debtType) ? 'Result balance (Account)' : 'Result balance (Person)';
 
-        enable(this.srcCurrBtn, false);
-        enable(this.destCurrBtn, false);
+        this.enableSourceCurrencySelect(false);
+        this.enableDestCurrencySelect(false);
 
         this.personIdInp.value = state.person.id;
 
@@ -1329,6 +1361,8 @@ class TransactionView extends View {
             this.destAmountRowLabel.textContent = destAmountLbl;
         }
 
+        enable(this.srcCurrBtn, !state.submitStarted);
+        enable(this.destCurrBtn, !state.submitStarted);
         this.setSign(this.destAmountSign, this.destCurrDDList, transaction.dest_curr);
         this.setSign(this.srcAmountSign, this.srcCurrDDList, transaction.src_curr);
         this.setSign(this.srcResBalanceSign, null, transaction.src_curr);
@@ -1404,6 +1438,7 @@ class TransactionView extends View {
             window.app.invalidateBlock(this.dateRow);
         }
         this.dateInput.enable(!state.submitStarted);
+        enable(this.dateInputBtn, !state.submitStarted);
         this.dateInput.value = state.form.date;
 
         enable(this.commentInput, !state.submitStarted);

@@ -161,7 +161,12 @@ label {
 }
 
 /* Input group */
-.input-group {
+.input-group,
+.import-form .input-group {
+  .input-group__text {
+    font-size: 1rem;
+  }
+
   .input-group__btn-title {
     font-size: 1rem;
     min-width: var(--ig-height);
@@ -175,6 +180,12 @@ label {
 
   .input-group__btn[disabled]:last-child {
     border-right-width: var(--ig-border-width);
+  }
+
+  .input-group__text[disabled] {
+    color: var(--ig-button-disabled-color);
+    border-color: var(--ig-button-disabled-border);
+    background-color: var(--ig-button-disabled-bg);
   }
 }
 

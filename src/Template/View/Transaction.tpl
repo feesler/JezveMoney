@@ -59,9 +59,15 @@ include(TPL_PATH . "Header.tpl");	?>
                             <label for="src_amount"><?=e($srcAmountLbl)?></label>
                             <div class="input-group">
                                 <input id="src_amount" name="src_amount" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?=e($form["src_amount"])?>">
-                                <button class="input-group__btn" type="button"<?=disabled($tr["type"] != INCOME)?> tabindex="-1">
+<?php   if ($tr["type"] == INCOME) { ?>
+                                <button id="srcCurrBtn" class="input-group__btn" type="button" tabindex="-1">
                                     <div id="srcamountsign" class="input-group__btn-title"><?=e($form["srcCurrSign"])?></div>
                                 </button>
+<?php   } else { ?>
+                                <button id="srcCurrBtn" class="input-group__text" type="button" disabled tabindex="-1">
+                                    <div id="srcamountsign" class="input-group__text-title"><?=e($form["srcCurrSign"])?></div>
+                                </button>
+<?php   } ?>
                             </div>
                             <div class="invalid-feedback">Input correct amount.</div>
                             <input id="src_curr" name="src_curr" type="hidden" value="<?=e($tr["src_curr"])?>">
@@ -71,9 +77,15 @@ include(TPL_PATH . "Header.tpl");	?>
                             <label for="dest_amount"><?=e($destAmountLbl)?></label>
                             <div class="input-group">
                                 <input id="dest_amount" name="dest_amount" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?=e($form["dest_amount"])?>">
-                                <button class="input-group__btn" type="button"<?=disabled($tr["type"] != EXPENSE)?> tabindex="-1">
+<?php   if ($tr["type"] == EXPENSE) { ?>
+                                <button id="destCurrBtn" class="input-group__btn" type="button" tabindex="-1">
                                     <div id="destamountsign" class="input-group__btn-title"><?=e($form["destCurrSign"])?></div>
                                 </button>
+<?php   } else { ?>
+                                <button id="destCurrBtn" class="input-group__text" type="button" disabled tabindex="-1">
+                                    <div id="destamountsign" class="input-group__text-title"><?=e($form["destCurrSign"])?></div>
+                                </button>
+<?php   } ?>
                             </div>
                             <div class="invalid-feedback">Input correct amount.</div>
                             <input id="dest_curr" name="dest_curr" type="hidden" value="<?=e($tr["dest_curr"])?>">
@@ -83,9 +95,7 @@ include(TPL_PATH . "Header.tpl");	?>
                             <label for="exchrate">Exchange rate</label>
                             <div class="input-group">
                                 <input id="exchrate" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?=e($form["exchange"])?>">
-                                <div class="input-group__btn" disabled>
-                                    <div id="exchcomm" class="input-group__btn-title"><?=e($form["exchSign"])?></div>
-                                </div>
+                                <div id="exchcomm" class="input-group__text"><?=e($form["exchSign"])?></div>
                             </div>
                         </div>
 
@@ -93,9 +103,7 @@ include(TPL_PATH . "Header.tpl");	?>
                             <label for="resbal"><?=e($srcBalTitle)?></label>
                             <div class="input-group">
                                 <input id="resbal" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?=e($form["srcResult"])?>">
-                                <div class="input-group__btn" disabled>
-                                    <div id="res_currsign" class="input-group__btn-title"><?=e($form["srcCurrSign"])?></div>
-                                </div>
+                                <div id="res_currsign" class="input-group__text"><?=e($form["srcCurrSign"])?></div>
                             </div>
                         </div>
 
@@ -103,9 +111,7 @@ include(TPL_PATH . "Header.tpl");	?>
                             <label for="resbal_d"><?=e($destBalTitle)?></label>
                             <div class="input-group">
                                 <input id="resbal_d" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?=e($form["destResult"])?>">
-                                <div class="input-group__btn" disabled>
-                                    <div id="res_currsign_d" class="input-group__btn-title"><?=e($form["destCurrSign"])?></div>
-                                </div>
+                                <div id="res_currsign_d" class="input-group__text"><?=e($form["destCurrSign"])?></div>
                             </div>
                         </div>
 

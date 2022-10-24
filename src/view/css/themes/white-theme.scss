@@ -325,7 +325,8 @@
       color: #dddddd;
     }
 
-    .input-group__btn {
+    .input-group__btn,
+    .input-group__text {
       color: var(--input-disabled-text-color);
       border-color: var(--input-disabled-border-color);
       background-color: var(--input-disabled-bg-color);
