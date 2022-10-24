@@ -27,6 +27,9 @@ const POPUP_LIST_VALUE_CLASS = 'chart-popup-list__value';
 
 /** Strings */
 const PAGE_TITLE = 'Jezve Money | Statistics';
+/* Date range input */
+const START_DATE_PLACEHOLDER = 'From';
+const END_DATE_PLACEHOLDER = 'To';
 
 const defaultProps = {
     filter: {},
@@ -133,6 +136,8 @@ class StatisticsView extends View {
 
         // Date range filter
         this.dateRangeFilter = DateRangeInput.fromElement(ge('dateFrm'), {
+            startPlaceholder: START_DATE_PLACEHOLDER,
+            endPlaceholder: END_DATE_PLACEHOLDER,
             onChange: (data) => this.onChangeDateFilter(data),
         });
 

@@ -35,6 +35,9 @@ const MSG_SINGLE_TRANS_DELETE = 'Are you sure want to delete selected transactio
 /* Mode selector items */
 const TITLE_CLASSIC = 'Classic';
 const TITLE_DETAILS = 'Details';
+/* Date range input */
+const START_DATE_PLACEHOLDER = 'From';
+const END_DATE_PLACEHOLDER = 'To';
 
 const SEARCH_THROTTLE = 300;
 
@@ -138,6 +141,8 @@ class TransactionListView extends View {
 
         // Date range filter
         this.dateRangeFilter = DateRangeInput.fromElement(ge('dateFrm'), {
+            startPlaceholder: START_DATE_PLACEHOLDER,
+            endPlaceholder: END_DATE_PLACEHOLDER,
             onChange: (data) => this.onChangeDateFilter(data),
         });
 

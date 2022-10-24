@@ -19,6 +19,8 @@ const defaultValidation = {
 const defaultProps = {
     start: null,
     end: null,
+    startPlaceholder: null,
+    endPlaceholder: null,
     onChange: null,
 };
 
@@ -63,12 +65,14 @@ export class DateRangeInput extends Component {
         this.startDateInput = DateInput.create({
             elem: elem.querySelector('input[name="stdate"]'),
             locales: window.app.dateFormatLocale,
+            placeholder: this.props.startPlaceholder,
             oninput: (e) => this.onStartDateInput(e),
         });
 
         this.endDateInput = DateInput.create({
             elem: elem.querySelector('input[name="enddate"]'),
             locales: window.app.dateFormatLocale,
+            placeholder: this.props.endPlaceholder,
             oninput: (e) => this.onEndDateInput(e),
         });
 
