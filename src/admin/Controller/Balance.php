@@ -20,9 +20,7 @@ class Balance extends AdminController
         $destAvailTypes = [INCOME, TRANSFER, DEBT];
 
         $accModel = AccountModel::getInstance();
-        $visibleAccounts = $accModel->getData(["type" => "visible"]);
-        $hiddenAccounts = $accModel->getData(["type" => "hidden"]);
-        $accounts = [...$visibleAccounts, ...$hiddenAccounts];
+        $accounts = $accModel->getData(["visibility" => "all", "sort" => "visibility"]);
         $data["accounts"] = $accounts;
 
         $filter = new \stdClass();

@@ -57,16 +57,11 @@ class Transactions extends TemplateController
         $data["accFilter"] = isset($trParams["accounts"]) ? $trParams["accounts"] : [];
         $data["personFilter"] = isset($trParams["persons"]) ? $trParams["persons"] : [];
         $data["searchReq"] = isset($trParams["search"]) ? $trParams["search"] : null;
-
-        $dateFmt = "";
-        if (isset($trParams["startDate"]) && $trParams["endDate"]) {
-            $sdate = strtotime($trParams["startDate"]);
-            $edate = strtotime($trParams["endDate"]);
-            if ($sdate != -1 && $edate != -1) {
-                $dateFmt = date("d.m.Y", $sdate) . " - " . date("d.m.Y", $edate);
-            }
-        }
-        $data["dateFmt"] = $dateFmt;
+        $data["dateRange"] = [
+            "id" => "dateFrm",
+            "start" => ($filterObj["stdate"] ?? null),
+            "end" => ($filterObj["enddate"] ?? null)
+        ];
 
         // Obtain requested view mode
         $showDetails = false;
@@ -85,7 +80,7 @@ class Transactions extends TemplateController
         $availTypes = TransactionModel::getTypeNames();
         array_push($trTypes, ...$availTypes);
 
-        $transMenu = [];
+        $typeMenu = [];
         foreach ($trTypes as $type_id => $trTypeName) {
             $urlParams = $filterObj;
             $urlParams["mode"] = ($showDetails) ? "classic" : "details";
@@ -99,20 +94,24 @@ class Transactions extends TemplateController
             // Clear page number because list of transactions guaranteed to change on change type filter
             unset($urlParams["page"]);
 
-            $menuItem = new \stdClass();
-            $menuItem->type = $type_id;
-            $menuItem->title = $trTypeName;
-
             if ($type_id == 0) {
-                $menuItem->selected = !isset($filterObj["type"]) || !count($filterObj["type"]);
+                $selected = !isset($filterObj["type"]) || !count($filterObj["type"]);
             } else {
-                $menuItem->selected = isset($filterObj["type"]) && in_array($type_id, $filterObj["type"]);
+                $selected = isset($filterObj["type"]) && in_array($type_id, $filterObj["type"]);
             }
-            $menuItem->url = urlJoin($baseUrl, $urlParams);
 
-            $transMenu[] = $menuItem;
+            $item = [
+                "title" => $trTypeName,
+                "selected" => $selected,
+                "url" => urlJoin($baseUrl, $urlParams)
+            ];
+
+            if ($type_id != 0) {
+                $item["value"] = $type_id;
+            }
+            $typeMenu[] = $item;
         }
-        $data["transMenu"] = $transMenu;
+        $data["typeMenu"] = $typeMenu;
 
         // Build data for paginator
         if ($trParams["onPage"] > 0) {
@@ -130,8 +129,8 @@ class Transactions extends TemplateController
 
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
-            "accounts" => $this->accModel->getData(["full" => true, "type" => "all"]),
-            "persons" => $this->personMod->getData(["type" => "all"]),
+            "accounts" => $this->accModel->getData(["owner" => "all", "visibility" => "all"]),
+            "persons" => $this->personMod->getData(["visibility" => "all"]),
             "currency" => $this->currModel->getData(),
             "view" => [
                 "transArr" => $trItems,
@@ -210,13 +209,14 @@ class Transactions extends TemplateController
                 unset($urlParams["acc_id"]);
             }
 
-            $menuItem = new \stdClass();
-            $menuItem->type = $type_id;
-            $menuItem->title = $trTypeName;
-            $menuItem->selected = ($type_id == $selectedType);
-            $menuItem->url = urlJoin($baseUrl, $urlParams);
+            $item = [
+                "value" => $type_id,
+                "title" => $trTypeName,
+                "selected" => ($type_id == $selectedType),
+                "url" => urlJoin($baseUrl, $urlParams)
+            ];
 
-            $res[] = $menuItem;
+            $res[] = $item;
         }
 
         return $res;
@@ -342,7 +342,7 @@ class Transactions extends TemplateController
         $acc_count = count($userAccounts);
         $data["acc_count"] = $acc_count;
 
-        $persons = $this->personMod->getData(["type" => "all", "sort" => "visibility"]);
+        $persons = $this->personMod->getData(["visibility" => "all", "sort" => "visibility"]);
         $iconModel = IconModel::getInstance();
         $defMsg = ERR_TRANS_CREATE;
 
@@ -506,7 +506,7 @@ class Transactions extends TemplateController
         // Prepare transaction types menu
         $menuParams = ["acc_id" => $acc_id];
         $baseUrl = BASEURL . "transactions/create/";
-        $data["transMenu"] = $this->getTypeMenu($baseUrl, $tr["type"], $menuParams);
+        $data["typeMenu"] = $this->getTypeMenu($baseUrl, $tr["type"], $menuParams);
 
         $form["action"] = BASEURL . "transactions/" . $data["action"] . "/";
 
@@ -637,10 +637,10 @@ class Transactions extends TemplateController
 
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
-            "accounts" => $this->accModel->getData(["type" => "all", "full" => true]),
+            "accounts" => $this->accModel->getData(["owner" => "all", "visibility" => "all"]),
             "currency" => $this->currModel->getData(),
             "icons" => $iconModel->getData(),
-            "persons" => $this->personMod->getData(["type" => "all"]),
+            "persons" => $this->personMod->getData(["visibility" => "all"]),
             "view" => [
                 "mode" => $this->action,
                 "transaction" => $tr,
@@ -667,7 +667,7 @@ class Transactions extends TemplateController
         ];
         $form = [];
 
-        $persons = $this->personMod->getData(["type" => "all", "sort" => "visibility"]);
+        $persons = $this->personMod->getData(["visibility" => "all", "sort" => "visibility"]);
         $iconModel = IconModel::getInstance();
         $defMsg = ERR_TRANS_UPDATE;
 
@@ -717,7 +717,7 @@ class Transactions extends TemplateController
 
         // Prepare transaction types menu
         $baseUrl = $baseUrl = BASEURL . "transactions/update/" . $trans_id;
-        $data["transMenu"] = $this->getTypeMenu($baseUrl, $tr["type"]);
+        $data["typeMenu"] = $this->getTypeMenu($baseUrl, $tr["type"]);
 
         $form["action"] = BASEURL . "transactions/" . $data["action"] . "/";
 
@@ -914,10 +914,10 @@ class Transactions extends TemplateController
 
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
-            "accounts" => $this->accModel->getData(["type" => "all", "full" => true]),
+            "accounts" => $this->accModel->getData(["owner" => "all", "visibility" => "all"]),
             "currency" => $this->currModel->getData(),
             "icons" => $iconModel->getData(),
-            "persons" => $this->personMod->getData(["type" => "all"]),
+            "persons" => $this->personMod->getData(["visibility" => "all"]),
             "view" => [
                 "mode" => $this->action,
                 "transaction" => $tr,

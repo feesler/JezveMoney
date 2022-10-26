@@ -28,20 +28,6 @@ class Account extends ApiListController
     }
 
 
-    protected function prepareListRequest($request)
-    {
-        $res = [];
-        if (isset($request["full"]) && $request["full"] == 1) {
-            $res["full"] = true;
-        }
-        if (isset($request["type"])) {
-            $res["type"] = $request["type"];
-        }
-
-        return $res;
-    }
-
-
     protected function preCreate($item)
     {
         $res = $item;

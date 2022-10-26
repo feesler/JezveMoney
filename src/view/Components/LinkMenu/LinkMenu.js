@@ -1,5 +1,6 @@
 import {
     isFunction,
+    asArray,
     createElement,
     addChilds,
     removeChilds,
@@ -7,31 +8,39 @@ import {
     enable,
     Component,
 } from 'jezvejs';
+import { Checkbox } from 'jezvejs/Checkbox';
 import './style.scss';
 
 const CONTAINER_CLASS = 'link-menu';
 const ITEM_CLASS = 'link-menu-item';
-const ACTIVE_ITEM_CLASS = 'link-menu-item_active';
+const SELECTED_ITEM_CLASS = 'link-menu-item_selected';
 const ITEM_TITLE_CLASS = 'link-menu-item__title';
+const ITEM_ICON_CONTAINER_CLASS = 'link-menu-item__icon';
+const ITEM_ICON_CLASS = 'icon';
+const CHECKBOX_CLASS = 'checkbox';
 
 const defaultProps = {
     disabled: false,
+    multiple: false,
+    allowActiveLink: false,
     itemParam: 'value',
     url: window.location,
+    items: [],
+    onChange: null,
 };
 
 /**
- * Mode selector component
+ * Link Menu component
  */
 export class LinkMenu extends Component {
     static create(props = {}) {
-        const instance = new LinkMenu(props);
+        const instance = new this(props);
         instance.init();
         return instance;
     }
 
     static fromElement(elem, props = {}) {
-        const instance = new LinkMenu(props);
+        const instance = new this(props);
         instance.parse(elem);
         return instance;
     }
@@ -66,6 +75,8 @@ export class LinkMenu extends Component {
         this.setHandlers();
         this.setClassNames();
 
+        this.state.multiple = this.elem.hasAttribute('multiple');
+
         const itemElems = Array.from(elem.querySelectorAll(`.${ITEM_CLASS}`));
         this.state.items = itemElems.map((item) => this.parseItem(item));
 
@@ -77,18 +88,61 @@ export class LinkMenu extends Component {
             return null;
         }
 
+        const isCheckbox = elem.classList.contains(CHECKBOX_CLASS);
+        if (isCheckbox) {
+            return this.parseCheckbox(elem);
+        }
+
+        const res = {
+            title: this.parseTitle(elem),
+            value: this.getItemValue(elem),
+            selected: elem.classList.contains(SELECTED_ITEM_CLASS),
+            icon: this.parseIcon(elem),
+        };
+
+        return res;
+    }
+
+    getItemValue(elem) {
+        return elem.dataset.value;
+    }
+
+    parseTitle(elem) {
         let titleElem = elem.querySelector(`.${ITEM_TITLE_CLASS}`);
         if (!titleElem) {
             titleElem = elem;
         }
 
-        const res = {
-            title: titleElem.textContent.trim(),
-            value: elem.dataset.value,
-            active: elem.classList.contains(ACTIVE_ITEM_CLASS),
-        };
+        return titleElem.textContent.trim();
+    }
 
-        return res;
+    parseIcon(elem) {
+        const iconElem = elem.querySelector(`.${ITEM_ICON_CONTAINER_CLASS}`);
+        const iconUseElem = iconElem?.querySelector('use');
+        if (!iconUseElem) {
+            return null;
+        }
+
+        const icon = iconUseElem.href.baseVal;
+        return icon.startsWith('#') ? icon.substring(1) : icon;
+    }
+
+    parseCheckbox(elem) {
+        if (!this.state.multiple) {
+            throw new Error('Invalid element');
+        }
+
+        const value = this.getItemValue(elem);
+        const checkbox = Checkbox.fromElement(elem, {
+            onChange: () => this.onToggleItem(value),
+        });
+
+        return {
+            value,
+            selected: checkbox.checked,
+            title: this.parseTitle(elem),
+            icon: this.parseIcon(elem),
+        };
     }
 
     setHandlers() {
@@ -96,21 +150,62 @@ export class LinkMenu extends Component {
     }
 
     onSelectItem(e) {
-        if (!isFunction(this.props.onChange)) {
+        const link = e.target.closest('a');
+        if (!link) {
             return;
         }
 
         e.preventDefault();
+        e.stopPropagation();
 
         const itemTarget = e.target.closest(`.${ITEM_CLASS}`);
-        if (!itemTarget?.dataset?.value) {
+        if (!itemTarget) {
             return;
         }
 
         const { value } = itemTarget.dataset;
-        this.setActive(value);
+        if (value) {
+            this.setActive(value);
+        } else {
+            this.setSelection([]);
+        }
 
-        this.props.onChange(value);
+        if (isFunction(this.props.onChange)) {
+            this.props.onChange(value);
+        }
+    }
+
+    sendChangeEvent() {
+        if (!isFunction(this.props.onChange)) {
+            return;
+        }
+
+        const selectedItems = this.state.items
+            .filter((item) => item.value && item.selected)
+            .map((item) => item.value);
+
+        const data = (this.state.multiple) ? selectedItems : selectedItems[0];
+        this.props.onChange(data);
+    }
+
+    onToggleItem(value) {
+        this.setState({
+            ...this.state,
+            items: this.state.items.map((item) => {
+                let selected = false;
+                if (item.value) {
+                    selected = (item.value === value) ? !item.selected : item.selected;
+                }
+
+                if (item.selected === selected) {
+                    return item;
+                }
+
+                return { ...item, selected };
+            }),
+        });
+
+        this.sendChangeEvent();
     }
 
     enable(value = true) {
@@ -126,7 +221,23 @@ export class LinkMenu extends Component {
             ...this.state,
             items: this.state.items.map((item) => ({
                 ...item,
-                active: item.value === value,
+                selected: item.value === value,
+            })),
+        });
+    }
+
+    setSelection(selectedItems) {
+        const items = asArray(selectedItems);
+        const showAll = (items.length === 0 || items.includes(0));
+
+        this.setState({
+            ...this.state,
+            items: this.state.items.map((item) => ({
+                ...item,
+                selected: (
+                    (showAll && !item.value)
+                    || items.includes(item.value)
+                ),
             })),
         });
     }
@@ -146,34 +257,79 @@ export class LinkMenu extends Component {
         }
 
         const { itemParam } = state;
+        const param = (state.multiple) ? `${itemParam}[]` : itemParam;
+
         const url = new URL(state.url);
         if (item.value) {
-            url.searchParams.set(itemParam, item.value);
+            url.searchParams.set(param, item.value);
         } else {
-            url.searchParams.delete(itemParam);
+            url.searchParams.delete(param);
         }
 
         return url;
     }
 
-    renderItem(item, state) {
-        const tagName = (item.active) ? 'b' : 'a';
+    isLinkItem(item, state) {
+        return (!item.disabled && !state.disabled && (!item.selected || state.allowActiveLink));
+    }
+
+    renderCheckboxItem(item, state) {
+        const content = this.renderItemContent(item, state);
+
+        const checkbox = Checkbox.create({
+            className: ITEM_CLASS,
+            checked: item.selected,
+            label: content,
+            disabled: (item.disabled || state.disabled),
+            onChange: () => this.onToggleItem(item.value),
+        });
+
+        checkbox.elem.setAttribute('data-value', item.value);
+
+        return checkbox.elem;
+    }
+
+    renderItemContent(item, state) {
+        const isLink = this.isLinkItem(item, state);
+        const tagName = (isLink) ? 'a' : 'b';
+
+        const children = [];
+
+        if (item.icon) {
+            const iconElem = createElement('span', {
+                props: { className: ITEM_ICON_CONTAINER_CLASS },
+                children: window.app.createIcon(item.icon, ITEM_ICON_CLASS),
+            });
+
+            children.push(iconElem);
+        }
 
         const titleElem = createElement('span', {
             props: { className: ITEM_TITLE_CLASS, textContent: item.title },
         });
+        children.push(titleElem);
 
-        const elem = createElement(tagName, {
-            props: { className: ITEM_CLASS },
-            attrs: { 'data-value': item.value },
-            children: titleElem,
-        });
-
-        if (item.active) {
-            elem.classList.add(ACTIVE_ITEM_CLASS);
-        } else {
+        const elem = createElement(tagName, { children });
+        if (item.selected) {
+            elem.classList.add(SELECTED_ITEM_CLASS);
+        }
+        if (isLink) {
             const url = this.getItemURL(item, state);
             elem.href = url.toString();
+        }
+
+        return elem;
+    }
+
+    renderItem(item, state) {
+        if (state.multiple && item.value) {
+            return this.renderCheckboxItem(item, state);
+        }
+
+        const elem = this.renderItemContent(item, state);
+        elem.classList.add(ITEM_CLASS);
+        if (item.value) {
+            elem.setAttribute('data-value', item.value);
         }
 
         return elem;
@@ -185,5 +341,11 @@ export class LinkMenu extends Component {
         addChilds(this.elem, elems);
 
         enable(this.elem, !state.disabled);
+
+        if (state.multiple) {
+            this.elem.setAttribute('multiple', '');
+        } else {
+            this.elem.removeAttribute('multiple');
+        }
     }
 }

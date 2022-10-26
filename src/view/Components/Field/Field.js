@@ -1,5 +1,5 @@
 import {
-    ce,
+    createElement,
     addChilds,
     removeChilds,
     Component,
@@ -26,13 +26,12 @@ export class Field extends Component {
     }
 
     init() {
-        this.titleElem = ce('label', { className: TITLE_CLASS });
-        this.contentContainer = ce('div', { className: CONTENT_CLASS });
-        this.elem = ce(
-            'div',
-            { className: CONTAINER_CLASS },
-            [this.titleElem, this.contentContainer],
-        );
+        this.titleElem = createElement('label', { props: { className: TITLE_CLASS } });
+        this.contentContainer = createElement('div', { props: { className: CONTENT_CLASS } });
+        this.elem = createElement('div', {
+            props: { className: CONTAINER_CLASS },
+            children: [this.titleElem, this.contentContainer],
+        });
 
         this.setClassNames();
         this.render();

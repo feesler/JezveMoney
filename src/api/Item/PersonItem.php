@@ -26,7 +26,7 @@ class PersonItem
             $accData = $obj->accounts;
         } else {
             $accModel = AccountModel::getInstance();
-            $accData = $accModel->getData([ "person" => $this->id ]);
+            $accData = $accModel->getData([ "owner" => $this->id ]);
         }
 
         $this->accounts = [];

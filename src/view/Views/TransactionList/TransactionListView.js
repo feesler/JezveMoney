@@ -2,14 +2,12 @@ import 'jezvejs/style';
 import {
     ge,
     show,
-    isDate,
     setEvents,
     throttle,
     asArray,
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { DropDown } from 'jezvejs/DropDown';
-import { DatePicker } from 'jezvejs/DatePicker';
 import { Paginator } from 'jezvejs/Paginator';
 import 'jezvejs/style/InputGroup';
 import { Application } from '../../js/Application.js';
@@ -20,12 +18,13 @@ import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
+import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
+import { LinkMenu } from '../../Components/LinkMenu/LinkMenu.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
+import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
 import './style.scss';
-import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { ModeSelector } from '../../Components/ModeSelector/ModeSelector.js';
 
 const PAGE_TITLE = 'Jezve Money | Transactions';
 const MSG_SET_POS_FAIL = 'Fail to change position of transaction.';
@@ -33,6 +32,13 @@ const TITLE_SINGLE_TRANS_DELETE = 'Delete transaction';
 const TITLE_MULTI_TRANS_DELETE = 'Delete transactions';
 const MSG_MULTI_TRANS_DELETE = 'Are you sure want to delete selected transactions?<br>Changes in the balance of affected accounts will be canceled.';
 const MSG_SINGLE_TRANS_DELETE = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
+/* Mode selector items */
+const TITLE_CLASSIC = 'Classic';
+const TITLE_DETAILS = 'Details';
+/* Date range input */
+const START_DATE_PLACEHOLDER = 'From';
+const END_DATE_PLACEHOLDER = 'To';
+
 const SEARCH_THROTTLE = 300;
 
 /**
@@ -72,8 +78,10 @@ class TransactionListView extends View {
         this.clearAllBtn = ge('clearall_btn');
         this.clearAllBtn.addEventListener('click', (e) => this.onClearAllFilters(e));
 
-        this.typeMenu = TransactionTypeMenu.fromElement(document.querySelector('.trtype-menu'), {
+        this.typeMenu = TransactionTypeMenu.fromElement(ge('type_menu'), {
+            multiple: true,
             allowActiveLink: true,
+            itemParam: 'type',
             onChange: (sel) => this.onChangeTypeFilter(sel),
         });
 
@@ -131,24 +139,34 @@ class TransactionListView extends View {
         }
         setEvents(this.noSearchBtn, { click: () => this.onSearchClear() });
 
-        this.datePickerWrapper = ge('calendar');
-        this.dateInputBtn = ge('cal_rbtn');
-        setEvents(this.dateInputBtn, { click: () => this.showCalendar() });
-        this.dateInput = ge('date');
-
-        this.noDateBtn = ge('nodatebtn');
-        if (!this.noDateBtn) {
-            throw new Error('Failed to initialize Transaction List view');
-        }
-        setEvents(this.noDateBtn, { click: () => this.onDateClear() });
+        // Date range filter
+        this.dateRangeFilter = DateRangeInput.fromElement(ge('dateFrm'), {
+            startPlaceholder: START_DATE_PLACEHOLDER,
+            endPlaceholder: END_DATE_PLACEHOLDER,
+            onChange: (data) => this.onChangeDateFilter(data),
+        });
 
         const listContainer = document.querySelector('.list-container');
         this.loadingIndicator = LoadingIndicator.create();
         listContainer.append(this.loadingIndicator.elem);
 
-        this.modeSelector = ModeSelector.fromElement(document.querySelector('.mode-selector'), {
+        const listHeader = document.querySelector('.list-header');
+        this.modeSelector = LinkMenu.create({
+            className: 'mode-selector',
+            itemParam: 'mode',
+            items: [
+                { icon: 'mode-list', title: TITLE_CLASSIC, value: 'classic' },
+                { icon: 'mode-details', title: TITLE_DETAILS, value: 'details' },
+            ],
             onChange: (mode) => this.onModeChanged(mode),
         });
+
+        const paginatorOptions = {
+            onChange: (page) => this.onChangePage(page),
+        };
+
+        this.topPaginator = Paginator.create(paginatorOptions);
+        listHeader.append(this.modeSelector.elem, this.topPaginator.elem);
 
         this.list = TransactionList.create({
             elem: document.querySelector('.trans-list'),
@@ -158,16 +176,9 @@ class TransactionListView extends View {
             onSort: (id, pos) => this.sendChangePosRequest(id, pos),
         });
 
-        const paginatorElems = document.querySelectorAll('.paginator');
-        if (paginatorElems.length !== 2) {
-            throw new Error('Failed to initialize Transaction List view');
-        }
-        const paginatorOptions = {
-            onChange: (page) => this.onChangePage(page),
-        };
-
-        this.topPaginator = Paginator.fromElement(paginatorElems[0], paginatorOptions);
-        this.bottomPaginator = Paginator.fromElement(paginatorElems[1], paginatorOptions);
+        const listFooter = document.querySelector('.list-footer');
+        this.bottomPaginator = Paginator.create(paginatorOptions);
+        listFooter.append(this.bottomPaginator.elem);
 
         this.toolbar = Toolbar.create({
             elem: 'toolbar',
@@ -385,77 +396,14 @@ class TransactionListView extends View {
         });
     }
 
-    /**
-     * Date range select calback
-     * @param {object} range - selected range object
-     */
-    onRangeSelect(range) {
-        if (!range || !isDate(range.start) || !isDate(range.end)) {
-            return;
-        }
+    /** Date range filter change handler */
+    onChangeDateFilter(data) {
+        this.state.form = {
+            ...this.state.form,
+            ...data,
+        };
 
-        const stdate = window.app.formatDate(range.start);
-        const enddate = window.app.formatDate(range.end);
-        if (stdate === this.state.form.stdate && enddate === this.state.form.enddate) {
-            return;
-        }
-
-        this.state.form.stdate = window.app.formatDate(range.start);
-        this.state.form.enddate = window.app.formatDate(range.end);
-        this.render(this.state);
-
-        this.datePicker.hide();
-    }
-
-    /**
-     * Date picker hide callback
-     */
-    onDatePickerHide() {
-        const { filter, form } = this.state;
-        if (filter.stdate === form.stdate && filter.enddate === form.enddate) {
-            return;
-        }
-
-        this.requestTransactions(form);
-    }
-
-    /**
-     * Clear date range query
-     */
-    onDateClear() {
-        if (!('stdate' in this.state.form) && !('enddate' in this.state.form)) {
-            return;
-        }
-
-        delete this.state.form.stdate;
-        delete this.state.form.enddate;
-
-        if (this.datePicker) {
-            this.datePicker.hide();
-        } else {
-            this.requestTransactions(this.state.form);
-        }
-    }
-
-    /**
-     * Show calendar block
-     */
-    showCalendar() {
-        if (!this.datePicker) {
-            this.datePicker = DatePicker.create({
-                relparent: this.datePickerWrapper.parentNode,
-                locales: window.app.datePickerLocale,
-                range: true,
-                onrangeselect: (range) => this.onRangeSelect(range),
-                onhide: () => this.onDatePickerHide(),
-            });
-            this.datePickerWrapper.append(this.datePicker.elem);
-
-            this.setDatePickerSelection();
-        }
-
-        const isVisible = this.datePicker.visible();
-        this.datePicker.show(!isVisible);
+        this.requestTransactions(this.state.form);
     }
 
     onChangePage(page) {
@@ -542,20 +490,6 @@ class TransactionListView extends View {
         });
     }
 
-    setDatePickerSelection(state = this.state) {
-        if (!this.datePicker) {
-            return;
-        }
-
-        const { stdate, enddate } = state.form;
-        const isDateFilter = !!(stdate && enddate);
-        if (isDateFilter) {
-            this.datePicker.setSelection(stdate, enddate);
-        } else {
-            this.datePicker.clearSelection();
-        }
-    }
-
     render(state) {
         if (state.loading) {
             this.loadingIndicator.show();
@@ -574,14 +508,11 @@ class TransactionListView extends View {
         }
 
         // Render date
-        const isDateFilter = !!(state.form.stdate && state.form.enddate);
-        const dateRangeFmt = (isDateFilter)
-            ? `${state.form.stdate} - ${state.form.enddate}`
-            : '';
-        this.dateInput.value = dateRangeFmt;
-        show(this.noDateBtn, isDateFilter);
-
-        this.setDatePickerSelection(state);
+        const dateFilter = {
+            stdate: (state.filter.stdate ?? null),
+            enddate: (state.filter.enddate ?? null),
+        };
+        this.dateRangeFilter.setData(dateFilter);
 
         // Search form
         const isSearchFilter = !!state.form.search;
@@ -607,7 +538,7 @@ class TransactionListView extends View {
         }
 
         this.modeSelector.show(state.items.length > 0);
-        this.modeSelector.setMode(state.mode);
+        this.modeSelector.setActive(state.mode);
         filterUrl.searchParams.set('page', state.pagination.page);
         this.modeSelector.setURL(filterUrl);
 

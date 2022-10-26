@@ -30,15 +30,11 @@ class Statistics extends TemplateController
             ["title" => "Currencies", "value" => "currency"]
         ];
 
-        $dateFmt = "";
-        if (isset($filterObj->stdate) && isset($filterObj->enddate)) {
-            $sdate = strtotime($filterObj->stdate);
-            $edate = strtotime($filterObj->enddate);
-            if ($sdate != -1 && $edate != -1) {
-                $dateFmt = date("d.m.Y", $sdate) . " - " . date("d.m.Y", $edate);
-            }
-        }
-        $data["dateFmt"] = $dateFmt;
+        $data["dateRange"] = [
+            "id" => "dateFrm",
+            "start" => ($filterObj->stdate ?? null),
+            "end" => ($filterObj->enddate ?? null)
+        ];
 
         $groupTypes = TransactionModel::getHistogramGroupNames();
         $data["groupTypes"] = $groupTypes;
@@ -90,22 +86,23 @@ class Statistics extends TemplateController
         }
         $data["reportMenu"] = $reportMenu;
 
-        $transMenu = [];
+        $typeMenu = [];
         foreach ($trTypes as $type_id => $trTypeName) {
             $searchParams = $urlParams;
             if ($type_id) {
                 $searchParams["type"] = strtolower($trTypeName);
             }
 
-            $menuItem = new \stdClass();
-            $menuItem->type = $type_id;
-            $menuItem->title = $trTypeName;
-            $menuItem->selected = in_array($menuItem->type, $filterObj->type);
-            $menuItem->url = urlJoin($baseUrl, $searchParams);
+            $item = [
+                "value" => $type_id,
+                "title" => $trTypeName,
+                "selected" => in_array($type_id, $filterObj->type),
+                "url" => urlJoin($baseUrl, $searchParams)
+            ];
 
-            $transMenu[] = $menuItem;
+            $typeMenu[] = $item;
         }
-        $data["transMenu"] = $transMenu;
+        $data["typeMenu"] = $typeMenu;
 
         if ($byCurrency) {
             $accCurr = $filterObj->curr_id;
@@ -119,7 +116,7 @@ class Statistics extends TemplateController
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
             "currency" => $currMod->getData(),
-            "accounts" => $accMod->getData(["type" => "all"]),
+            "accounts" => $accMod->getData(["visibility" => "all"]),
             "view" => [
                 "accountCurrency" => $accCurr,
                 "filter" => $filterObj,

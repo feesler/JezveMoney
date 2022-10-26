@@ -3,7 +3,7 @@ import {
     assert,
     query,
     prop,
-    attr,
+    hasAttr,
     hasClass,
     input,
 } from 'jezve-test';
@@ -23,10 +23,9 @@ export class InputRow extends TestComponent {
             res.datePickerBtn = await query(this.elem, '.icon-btn');
         } else {
             res.currElem = await query(this.elem, '.input-group__btn');
-            res.isCurrActive = false;
             if (res.currElem) {
-                const disabledAttr = await attr(res.currElem, 'disabled');
-                res.isCurrActive = disabledAttr == null;
+                const disabled = await hasAttr(res.currElem, 'disabled');
+                res.isCurrActive = !disabled;
                 if (res.isCurrActive) {
                     const ddElem = await query(res.currElem, ':scope > *');
                     res.currDropDown = await DropDown.create(this.parent, ddElem);
@@ -34,8 +33,13 @@ export class InputRow extends TestComponent {
                 }
 
                 res.currSignElem = await query(res.currElem, '.input-group__btn-title');
-                res.currSign = await prop(res.currSignElem, 'textContent');
+            } else {
+                res.isCurrActive = false;
+                res.currElem = await query(this.elem, '.input-group__text');
+                res.currSignElem = await query(this.elem, '.input-group__text-title');
+                res.currSignElem = res.currSignElem ?? res.currElem;
             }
+            res.currSign = await prop(res.currSignElem, 'textContent');
         }
 
         const hiddenInpElem = await query(this.elem, 'input[type="hidden"]');
@@ -55,6 +59,10 @@ export class InputRow extends TestComponent {
         }
 
         return res;
+    }
+
+    get value() {
+        return this.content.value;
     }
 
     async input(val) {

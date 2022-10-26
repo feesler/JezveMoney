@@ -1,11 +1,12 @@
 import {
-    ce,
+    createElement,
     show,
     enable,
     isFunction,
     insertAfter,
     checkDate,
 } from 'jezvejs';
+import { DateInput } from 'jezvejs/DateInput';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
@@ -147,31 +148,27 @@ export class ImportTransactionForm extends ImportTransactionBase {
             this.formContainer,
             this.controls,
         ]);
-        this.feedbackElem = ce('div', { className: INV_FEEDBACK_CLASS });
+        this.feedbackElem = createElement('div', { props: { className: INV_FEEDBACK_CLASS } });
         show(this.feedbackElem, false);
 
         // Save button
-        this.saveBtn = ce(
-            'button',
-            {
+        this.saveBtn = createElement('button', {
+            props: {
                 className: `${DEFAULT_BUTTON_CLASS} ${SUBMIT_BUTTON_CLASS}`,
                 type: 'button',
                 textContent: SAVE_BTN_TITLE,
             },
-            null,
-            { click: () => this.save() },
-        );
+            events: { click: () => this.save() },
+        });
         // Cancel button
-        this.cancelBtn = ce(
-            'button',
-            {
+        this.cancelBtn = createElement('button', {
+            props: {
                 className: `${DEFAULT_BUTTON_CLASS} ${CANCEL_BUTTON_CLASS}`,
                 type: 'button',
                 textContent: CANCEL_BTN_TITLE,
             },
-            null,
-            { click: () => this.cancel() },
-        );
+            events: { click: () => this.cancel() },
+        });
 
         this.formControls = createContainer(FORM_CONTROLS_CLASS, [
             this.saveBtn,
@@ -200,68 +197,59 @@ export class ImportTransactionForm extends ImportTransactionBase {
             { id: 'debtto', title: 'Debt to', disabled: debtDisabled },
         ];
 
-        const selectElem = ce('select');
-        this.trTypeField = Field.create({
-            title: 'Type',
-            content: selectElem,
-            className: TYPE_FIELD_CLASS,
-        });
-
         this.typeDropDown = DropDown.create({
-            elem: selectElem,
+            data: typeItems,
             onchange: (type) => this.onTrTypeChanged(type),
         });
-        typeItems.forEach((typeItem) => {
-            this.typeDropDown.addItem(typeItem);
-            if (typeItem.disabled) {
-                this.typeDropDown.enableItem(typeItem.id, false);
-            }
+
+        this.trTypeField = Field.create({
+            title: 'Type',
+            content: this.typeDropDown.elem,
+            className: TYPE_FIELD_CLASS,
         });
     }
 
     /** Create destination(second) account field */
     createAccountField() {
-        const selectElem = ce('select');
-        this.transferAccountField = Field.create({
-            title: TITLE_FIELD_DEST_ACCOUNT,
-            content: selectElem,
-            className: ACCOUNT_FIELD_CLASS,
-        });
-
         this.transferAccDropDown = DropDown.create({
-            elem: selectElem,
             disabled: true,
             onchange: (account) => this.onTransferAccountChanged(account),
         });
         window.app.initAccountsList(this.transferAccDropDown);
+
+        this.transferAccountField = Field.create({
+            title: TITLE_FIELD_DEST_ACCOUNT,
+            content: this.transferAccDropDown.elem,
+            className: ACCOUNT_FIELD_CLASS,
+        });
     }
 
     /** Create person field */
     createPersonField() {
-        const selectElem = ce('select');
-        this.personField = Field.create({
-            title: TITLE_FIELD_PERSON,
-            content: selectElem,
-            className: PERSON_FIELD_CLASS,
-        });
-
         this.personDropDown = DropDown.create({
-            elem: selectElem,
             disabled: true,
             onchange: (person) => this.onPersonChanged(person),
         });
         window.app.initPersonsList(this.personDropDown);
+
+        this.personField = Field.create({
+            title: TITLE_FIELD_PERSON,
+            content: this.personDropDown.elem,
+            className: PERSON_FIELD_CLASS,
+        });
     }
 
     /** Create source amount field */
     createSourceAmountField() {
-        this.srcAmountInp = ce('input', {
-            className: `${IG_INPUT_CLASS} ${DEFAULT_INPUT_CLASS} ${AMOUNT_INPUT_CLASS}`,
-            type: 'text',
-            name: 'src_amount[]',
-            disabled: true,
-            placeholder: TITLE_FIELD_AMOUNT,
-            autocomplete: 'off',
+        this.srcAmountInp = createElement('input', {
+            props: {
+                className: `${IG_INPUT_CLASS} ${DEFAULT_INPUT_CLASS} ${AMOUNT_INPUT_CLASS}`,
+                type: 'text',
+                name: 'src_amount[]',
+                disabled: true,
+                placeholder: TITLE_FIELD_AMOUNT,
+                autocomplete: 'off',
+            },
         });
         this.srcAmountDecimalInput = DecimalInput.create({
             elem: this.srcAmountInp,
@@ -269,12 +257,17 @@ export class ImportTransactionForm extends ImportTransactionBase {
             oninput: () => this.onSrcAmountInput(),
         });
 
-        this.srcCurrencySign = ce('div', { className: IG_BUTTON_TITLE_CLASS });
-        this.srcCurrencyBtn = ce('button', {
-            type: 'button',
-            className: IG_BUTTON_CLASS,
-            tabIndex: -1,
-        }, this.srcCurrencySign);
+        this.srcCurrencySign = createElement('div', {
+            props: { className: IG_BUTTON_TITLE_CLASS },
+        });
+        this.srcCurrencyBtn = createElement('button', {
+            props: {
+                type: 'button',
+                className: IG_BUTTON_CLASS,
+                tabIndex: -1,
+            },
+            children: this.srcCurrencySign,
+        });
 
         this.srcCurrencyDropDown = DropDown.create({
             elem: this.srcCurrencySign,
@@ -295,12 +288,14 @@ export class ImportTransactionForm extends ImportTransactionBase {
 
     /** Create destination amount field */
     createDestAmountField() {
-        this.destAmountInp = ce('input', {
-            className: `${IG_INPUT_CLASS} ${DEFAULT_INPUT_CLASS} ${AMOUNT_INPUT_CLASS}`,
-            type: 'text',
-            name: 'dest_amount[]',
-            placeholder: TITLE_FIELD_DEST_AMOUNT,
-            autocomplete: 'off',
+        this.destAmountInp = createElement('input', {
+            props: {
+                className: `${IG_INPUT_CLASS} ${DEFAULT_INPUT_CLASS} ${AMOUNT_INPUT_CLASS}`,
+                type: 'text',
+                name: 'dest_amount[]',
+                placeholder: TITLE_FIELD_DEST_AMOUNT,
+                autocomplete: 'off',
+            },
         });
         this.destAmountDecimalInput = DecimalInput.create({
             elem: this.destAmountInp,
@@ -308,12 +303,17 @@ export class ImportTransactionForm extends ImportTransactionBase {
             oninput: () => this.onDestAmountInput(),
         });
 
-        this.destCurrencySign = ce('div', { className: IG_BUTTON_TITLE_CLASS });
-        this.destCurrencyBtn = ce('button', {
-            type: 'button',
-            className: IG_BUTTON_CLASS,
-            tabIndex: -1,
-        }, this.destCurrencySign);
+        this.destCurrencySign = createElement('div', {
+            props: { className: IG_BUTTON_TITLE_CLASS },
+        });
+        this.destCurrencyBtn = createElement('button', {
+            props: {
+                type: 'button',
+                className: IG_BUTTON_CLASS,
+                tabIndex: -1,
+            },
+            children: this.destCurrencySign,
+        });
 
         this.destCurrencyDropDown = DropDown.create({
             elem: this.destCurrencySign,
@@ -336,25 +336,31 @@ export class ImportTransactionForm extends ImportTransactionBase {
 
     /** Create date field */
     createDateField() {
-        this.dateInp = ce('input', {
+        const elem = createElement('input', { props: { type: 'text', autocomplete: 'off' } });
+        this.dateInp = DateInput.create({
+            elem,
             className: `${DEFAULT_INPUT_CLASS} ${IG_INPUT_CLASS}`,
-            type: 'text',
             name: 'date[]',
             placeholder: TITLE_FIELD_DATE,
-            autocomplete: 'off',
-        }, null, { input: () => this.onDateInput() });
+            locales: window.app.dateFormatLocale,
+            oninput: () => this.onDateInput(),
+        });
 
         const dateIcon = window.app.createIcon(
             'calendar-icon',
             `${DEFAULT_ICON_CLASS} ${CALENDAR_ICON_CLASS}`,
         );
-        this.dateBtn = ce('button', {
-            type: 'button',
-            className: IG_BUTTON_CLASS,
-        }, dateIcon, { click: () => this.showDatePicker() });
+        this.dateBtn = createElement('button', {
+            props: {
+                type: 'button',
+                className: IG_BUTTON_CLASS,
+            },
+            children: dateIcon,
+            events: { click: () => this.showDatePicker() },
+        });
 
         this.dateGroup = InputGroup.create({
-            children: [this.dateInp, this.dateBtn],
+            children: [this.dateInp.elem, this.dateBtn],
         });
         this.dateField = Field.create({
             title: TITLE_FIELD_DATE,
@@ -364,13 +370,16 @@ export class ImportTransactionForm extends ImportTransactionBase {
     }
 
     createCommentField() {
-        this.commInp = ce('input', {
-            className: DEFAULT_INPUT_CLASS,
-            type: 'text',
-            name: 'comment[]',
-            placeholder: TITLE_FIELD_COMMENT,
-            autocomplete: 'off',
-        }, null, { input: () => this.onCommentInput() });
+        this.commInp = createElement('input', {
+            props: {
+                className: DEFAULT_INPUT_CLASS,
+                type: 'text',
+                name: 'comment[]',
+                placeholder: TITLE_FIELD_COMMENT,
+                autocomplete: 'off',
+            },
+            events: { input: () => this.onCommentInput() },
+        });
         this.commentField = Field.create({
             title: TITLE_FIELD_COMMENT,
             content: this.commInp,
@@ -594,6 +603,21 @@ export class ImportTransactionForm extends ImportTransactionBase {
         ddown?.selectItem(currencyId);
     }
 
+    enableCurrency(currBtn, signElem, value) {
+        currBtn.classList.toggle('input-group__btn', value);
+        currBtn.classList.toggle('input-group__text', !value);
+        signElem.classList.toggle('input-group__btn-title', value);
+        signElem.classList.toggle('input-group__text-title', !value);
+    }
+
+    enableSourceCurrency(value) {
+        this.enableCurrency(this.srcCurrencyBtn, this.srcCurrencySign, value);
+    }
+
+    enableDestCurrency(value) {
+        this.enableCurrency(this.destCurrencyBtn, this.destCurrencySign, value);
+    }
+
     /** Show date pciker */
     showDatePicker() {
         if (!this.datePicker) {
@@ -634,8 +658,9 @@ export class ImportTransactionForm extends ImportTransactionBase {
             // Destination amount field
             this.destAmountInp.value = transaction.destAmount;
             enable(this.destAmountInp, transaction.enabled);
+
+            this.enableDestCurrency(true);
             this.destCurrencyDropDown.enable(transaction.enabled);
-            enable(this.destCurrencyBtn, transaction.enabled);
             this.renderCurrency(
                 this.destCurrencySign,
                 this.destCurrencyDropDown,
@@ -652,8 +677,9 @@ export class ImportTransactionForm extends ImportTransactionBase {
             // Source amount field
             this.srcAmountInp.value = transaction.sourceAmount;
             enable(this.srcAmountInp, transaction.enabled && isDiff);
+
+            this.enableSourceCurrency(false);
             this.srcCurrencyDropDown.enable(false);
-            enable(this.srcCurrencyBtn, false);
             this.renderCurrency(
                 this.srcCurrencySign,
                 this.srcCurrencyDropDown,
@@ -667,8 +693,9 @@ export class ImportTransactionForm extends ImportTransactionBase {
             // Source amount field
             this.srcAmountInp.value = transaction.sourceAmount;
             enable(this.srcAmountInp, transaction.enabled);
+
+            this.enableSourceCurrency(isIncome);
             this.srcCurrencyDropDown.enable(transaction.enabled && isIncome);
-            enable(this.srcCurrencyBtn, transaction.enabled && isIncome);
             this.renderCurrency(
                 this.srcCurrencySign,
                 this.srcCurrencyDropDown,
@@ -685,8 +712,9 @@ export class ImportTransactionForm extends ImportTransactionBase {
             // Destination amount field
             this.destAmountInp.value = transaction.destAmount;
             enable(this.destAmountInp, transaction.enabled && isDiff);
+
+            this.enableDestCurrency(false);
             this.destCurrencyDropDown.enable(false);
-            enable(this.destCurrencyBtn, false);
             this.renderCurrency(
                 this.destCurrencySign,
                 this.destCurrencyDropDown,
@@ -697,6 +725,9 @@ export class ImportTransactionForm extends ImportTransactionBase {
             this.destAmountInp.placeholder = TITLE_FIELD_DEST_AMOUNT;
             this.destAmountField.setTitle(TITLE_FIELD_DEST_AMOUNT);
         }
+
+        enable(this.srcCurrencyBtn, transaction.enabled);
+        enable(this.destCurrencyBtn, transaction.enabled);
 
         // Second account field
         this.transferAccDropDown.enable(transaction.enabled && isTransfer);
@@ -731,7 +762,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
 
         // Date field
         enable(this.dateBtn, transaction.enabled);
-        enable(this.dateInp, transaction.enabled);
+        this.dateInp.enable(transaction.enabled);
         this.dateInp.value = transaction.date;
 
         // Commend field

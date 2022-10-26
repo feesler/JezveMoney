@@ -1,6 +1,10 @@
 /* Type menu */
 .trtype-menu {
   margin-bottom: 12px;
+
+  .link-menu-item_selected {
+    font-weight: 500;
+  }
 }
 
 /* Swap button */

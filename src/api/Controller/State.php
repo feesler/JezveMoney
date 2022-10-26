@@ -36,11 +36,8 @@ class State extends ApiController
         $res = new \stdClass();
         // Accounts
         $res->accounts = new \stdClass();
-        $res->accounts->data = [];
-        $items = $this->accModel->getData(["full" => true, "type" => "all"]);
-        foreach ($items as $item) {
-            $res->accounts->data[] = new AccountItem($item);
-        }
+        $items = $this->accModel->getData(["owner" => "all", "visibility" => "all"]);
+        $res->accounts->data = $items;
         $res->accounts->autoincrement = $this->accModel->autoIncrement();
         // Transactions
         $res->transactions = new \stdClass();
@@ -53,7 +50,7 @@ class State extends ApiController
         // Persons
         $res->persons = new \stdClass();
         $res->persons->data = [];
-        $items = $this->pModel->getData(["type" => "all"]);
+        $items = $this->pModel->getData(["visibility" => "all"]);
         foreach ($items as $item) {
             $res->persons->data[] = new PersonItem($item);
         }

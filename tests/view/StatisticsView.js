@@ -1,5 +1,6 @@
 import {
     assert,
+    asArray,
     query,
     queryAll,
     prop,
@@ -10,10 +11,10 @@ import { DropDown } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { availTransTypes } from '../model/Transaction.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
-import { TransactionTypeMenu } from './component/TransactionTypeMenu.js';
+import { LinkMenu } from './component/LinkMenu/LinkMenu.js';
+import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { App } from '../Application.js';
 import { fixDate } from '../common.js';
-import { LinkMenu } from './component/LinkMenu.js';
 
 const NO_GROUP = 0;
 const GROUP_BY_DAY = 1;
@@ -82,8 +83,10 @@ export class StatisticsView extends AppView {
 
         const selectedReport = cont.reportMenu.value;
         res.filter = {
-            type: cont.typeMenu.getSelectedTypes(),
+            type: cont.typeMenu.value,
             byCurrency: selectedReport === 'currency',
+            startDate: null,
+            endDate: null,
         };
         const dateRange = cont.dateFilter.getSelectedRange();
         if (dateRange && dateRange.startDate && dateRange.endDate) {
@@ -138,12 +141,20 @@ export class StatisticsView extends AppView {
         const { byCurrency } = this.model.filter;
 
         const res = {
-            typeMenu: { selectedTypes: this.model.filter.type },
+            typeMenu: {
+                value: this.model.filter.type,
+            },
             reportMenu: {
                 visible: true,
                 value: (byCurrency) ? 'currency' : 'account',
             },
-            dateFilter: {},
+            dateFilter: {
+                visible: true,
+                value: {
+                    startDate: this.model.filter.startDate,
+                    endDate: this.model.filter.endDate,
+                },
+            },
             noDataMessage: {},
             chartContainer: {},
         };
@@ -177,10 +188,6 @@ export class StatisticsView extends AppView {
         if (this.model.filter.startDate && this.model.filter.endDate) {
             params.startDate = this.model.filter.startDate;
             params.endDate = this.model.filter.endDate;
-
-            res.dateFilter.value = { startDate: params.startDate, endDate: params.endDate };
-        } else {
-            res.dateFilter.value = { startDate: null, endDate: null };
         }
 
         const histogram = App.state.transactions.getStatistics(params);
@@ -207,33 +214,36 @@ export class StatisticsView extends AppView {
                 && prevTime !== this.model.renderTime
             );
         });
+
+        await this.parse();
     }
 
-    async filterByType(type) {
-        const newTypeSel = Array.isArray(type) ? type : [type];
-        newTypeSel.sort();
+    async filterByType(value) {
+        const types = asArray(value);
+        types.sort();
 
-        if (this.content.typeMenu.isSameSelected(newTypeSel)) {
+        if (this.content.typeMenu.isSameSelected(types)) {
             return true;
         }
 
         const typesBefore = this.model.filter.type;
-        this.model.filter.type = newTypeSel;
+        this.model.filter.type = types;
         const expected = this.getExpectedState();
 
-        if (newTypeSel.length === 1) {
-            await this.waitForData(() => App.view.content.typeMenu.select(newTypeSel[0]));
+        if (types.length === 1) {
+            const [type] = types;
+            await this.waitForData(() => App.view.content.typeMenu.select(type));
         } else {
             // Select new types
-            for (const transType of availTransTypes) {
-                if (!typesBefore.includes(transType) && newTypeSel.includes(transType)) {
-                    await this.waitForData(() => App.view.content.typeMenu.toggle(transType));
+            for (const type of availTransTypes) {
+                if (!typesBefore.includes(type) && types.includes(type)) {
+                    await this.waitForData(() => App.view.content.typeMenu.toggle(type));
                 }
             }
             // Deselect previous types
-            for (const transType of availTransTypes) {
-                if (typesBefore.includes(transType) && !newTypeSel.includes(transType)) {
-                    await this.waitForData(() => App.view.content.typeMenu.toggle(transType));
+            for (const type of availTransTypes) {
+                if (typesBefore.includes(type) && !types.includes(type)) {
+                    await this.waitForData(() => App.view.content.typeMenu.toggle(type));
                 }
             }
         }

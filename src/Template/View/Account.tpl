@@ -63,9 +63,7 @@ include(TPL_PATH . "Header.tpl");	?>
                             <label for="balance">Initial balance</label>
                             <div class="input-group">
                                 <input id="balance" class="input-group__input stretch-input right-align-text" name="initbalance" type="text" autocomplete="off" value="<?=e($accInfo->initbalance)?>">
-                                <div class="input-group__btn" disabled>
-                                    <div id="currsign"><?=e($accInfo->sign)?></div>
-                                </div>
+                                <div id="currsign" class="input-group__text"><?=e($accInfo->sign)?></div>
                             </div>
                             <div class="invalid-feedback">Input correct initial balance.</div>
                         </div>

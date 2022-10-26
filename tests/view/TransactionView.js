@@ -16,7 +16,7 @@ import {
     normalizeExch,
     trimToDigitsLimit,
 } from '../common.js';
-import { TransactionTypeMenu } from './component/TransactionTypeMenu.js';
+import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { InputRow } from './component/InputRow.js';
 import { IconButton } from './component/IconButton.js';
 import { WarningPopup } from './component/WarningPopup.js';
@@ -132,13 +132,9 @@ export class TransactionView extends AppView {
     async buildModel(cont) {
         const res = this.model;
 
-        const selectedTypes = cont.typeMenu.getSelectedTypes();
-        assert(
-            selectedTypes.length === 1 && availTransTypes.includes(selectedTypes[0]),
-            'Invalid type selected',
-        );
+        res.type = cont.typeMenu.value;
+        assert(availTransTypes.includes(res.type), 'Invalid type selected');
 
-        [res.type] = selectedTypes;
         res.isAvailable = !cont.notAvailMsg.visible;
 
         res.isUpdate = cont.isUpdate;
@@ -168,19 +164,19 @@ export class TransactionView extends AppView {
         }
         res.isDiffCurr = (res.src_curr_id !== res.dest_curr_id);
 
-        res.srcAmount = cont.src_amount_row.content.value;
+        res.srcAmount = cont.src_amount_row.value;
         res.fSrcAmount = isValidValue(res.srcAmount) ? normalize(res.srcAmount) : res.srcAmount;
 
-        res.destAmount = cont.dest_amount_row.content.value;
+        res.destAmount = cont.dest_amount_row.value;
         res.fDestAmount = isValidValue(res.destAmount) ? normalize(res.destAmount) : res.destAmount;
 
-        res.srcResBal = cont.result_balance_row.content.value;
+        res.srcResBal = cont.result_balance_row.value;
         res.fSrcResBal = isValidValue(res.srcResBal) ? normalize(res.srcResBal) : res.srcResBal;
 
-        res.destResBal = cont.result_balance_dest_row.content.value;
+        res.destResBal = cont.result_balance_dest_row.value;
         res.fDestResBal = isValidValue(res.destResBal) ? normalize(res.destResBal) : res.destResBal;
 
-        res.exchRate = cont.exchange_row.content.value;
+        res.exchRate = cont.exchange_row.value;
         this.updateExch();
 
         if (res.type === EXPENSE) {
@@ -353,8 +349,8 @@ export class TransactionView extends AppView {
             );
         }
 
-        res.date = cont.datePicker.content.date;
-        res.comment = cont.comment_row.content.value;
+        res.date = cont.datePicker.value;
+        res.comment = cont.comment_row.value;
 
         return res;
     }
@@ -412,7 +408,7 @@ export class TransactionView extends AppView {
         assert(!Number.isNaN(newState), 'Invalid state specified');
 
         const res = {
-            typeMenu: { selectedTypes: [this.model.type] },
+            typeMenu: { value: this.model.type },
             person: {
                 tile: {},
                 visible: this.model.isAvailable && this.model.type === DEBT,

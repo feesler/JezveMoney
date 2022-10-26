@@ -194,7 +194,7 @@ class PersonListView extends View {
 
     async requestList() {
         try {
-            const { data } = await API.person.list({ type: 'all' });
+            const { data } = await API.person.list({ visibility: 'all' });
             window.app.model.persons.setData(data);
             window.app.model.visiblePersons = null;
             window.app.checkPersonModels();

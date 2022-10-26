@@ -1,27 +1,13 @@
-import {
-    isFunction,
-    ce,
-    addChilds,
-    removeChilds,
-    setEvents,
-    enable,
-    Component,
-} from 'jezvejs';
-import { Checkbox } from 'jezvejs/Checkbox';
+import { createElement } from 'jezvejs';
 import {
     EXPENSE,
     INCOME,
     TRANSFER,
     DEBT,
 } from '../../js/model/Transaction.js';
-import './style.scss';
+import { LinkMenu } from '../LinkMenu/LinkMenu.js';
 
-const CONTAINER_CLASS = 'trtype-menu';
-const MULTI_CLASS = 'trtype-menu-multi';
-const ITEM_CLASS = 'trtype-menu__item';
-const ITEM_SELECTED_CLASS = 'trtype-menu__item_selected';
-const ITEM_TITLE_CLASS = 'trtype-menu_item_title';
-const CHECKBOX_CLASS = 'checkbox';
+const CONTAINER_CLASS = 'link-menu trtype-menu';
 
 /** Strings */
 const TITLE_SHOW_ALL = 'Show all';
@@ -31,31 +17,15 @@ const TITLE_TRANSFER = 'Transfer';
 const TITLE_DEBT = 'Debt';
 
 const defaultProps = {
-    disabled: false,
-    typeParam: 'type',
-    url: window.location,
-    multiple: false,
-    allowActiveLink: false,
+    itemParam: 'type',
 };
 
 /**
- * Transaction list item component
+ * Transaction type menu component
  */
-export class TransactionTypeMenu extends Component {
-    static create(props) {
-        const instance = new TransactionTypeMenu(props);
-        instance.init();
-        return instance;
-    }
-
-    static fromElement(elem, props = {}) {
-        const instance = new TransactionTypeMenu(props);
-        instance.parse(elem);
-        return instance;
-    }
-
-    constructor(...args) {
-        super(...args);
+export class TransactionTypeMenu extends LinkMenu {
+    constructor(props) {
+        super(props);
 
         this.props = {
             ...defaultProps,
@@ -66,177 +36,41 @@ export class TransactionTypeMenu extends Component {
     }
 
     init() {
-        this.elem = ce('div', { className: CONTAINER_CLASS });
-        if (this.props.multiple) {
-            this.elem.classList.add(MULTI_CLASS);
-        }
+        this.elem = createElement('div', { props: { className: CONTAINER_CLASS } });
+        this.setHandlers();
+        this.setClassNames();
 
-        this.state.items = [
-            { type: 0, title: TITLE_SHOW_ALL },
-            { type: EXPENSE, title: TITLE_EXPENSE },
-            { type: INCOME, title: TITLE_INCOME },
-            { type: TRANSFER, title: TITLE_TRANSFER },
-            { type: DEBT, title: TITLE_DEBT },
-        ];
-
-        this.render(this.state);
-    }
-
-    getItemType(item) {
-        return parseInt(item.dataset.type, 10);
-    }
-
-    parseCheckbox(elem) {
-        const type = this.getItemType(elem);
-
-        const checkbox = Checkbox.fromElement(
-            elem,
-            { onChange: () => this.onToggleItem(type) },
-        );
-
-        return {
-            type,
-            selected: checkbox.checked,
-            title: checkbox.label?.textContent,
-        };
-    }
-
-    parseItem(elem) {
-        const linkElem = elem.querySelector(`.${ITEM_TITLE_CLASS} a`);
-        const titleElem = elem.querySelector(`.${ITEM_TITLE_CLASS}`);
-        if (!linkElem && !titleElem) {
-            throw new Error('Invalid element');
-        }
-
-        const title = (linkElem) ? linkElem.textContent : titleElem.textContent;
-
-        if (linkElem) {
-            setEvents(linkElem, { click: (e) => this.onSelectItem(e) });
-        }
-
-        return {
-            type: this.getItemType(elem),
-            selected: elem.classList.contains(ITEM_SELECTED_CLASS),
-            title,
-        };
-    }
-
-    parse(elem) {
-        if (!elem || !elem.classList || !elem.classList.contains(CONTAINER_CLASS)) {
-            throw new Error('Invalid element');
-        }
-
-        this.elem = elem;
-        this.state.multiple = this.elem.classList.contains(MULTI_CLASS);
-
-        const items = Array.from(elem.querySelectorAll(`.${ITEM_CLASS}`));
-        this.state.items = items.map((item) => {
-            const isCheckbox = item.classList.contains(CHECKBOX_CLASS);
-            if (isCheckbox && !this.state.multiple) {
-                throw new Error('Invalid element');
-            }
-
-            if (isCheckbox) {
-                return this.parseCheckbox(item);
-            }
-
-            return this.parseItem(item);
+        this.setState({
+            ...this.state,
+            items: [
+                { title: TITLE_SHOW_ALL },
+                { value: EXPENSE, title: TITLE_EXPENSE },
+                { value: INCOME, title: TITLE_INCOME },
+                { value: TRANSFER, title: TITLE_TRANSFER },
+                { value: DEBT, title: TITLE_DEBT },
+            ],
         });
-
-        this.render(this.state);
     }
 
-    enable(value = true) {
-        this.state.disabled = !value;
-        this.render(this.state);
-    }
-
-    setSelection(selectedItems) {
-        const showAll = (
-            !Array.isArray(selectedItems)
-            || selectedItems.length === 0
-            || selectedItems.includes(0)
-        );
-        const items = Array.isArray(selectedItems) ? selectedItems : [selectedItems];
-
-        this.state.items = this.state.items.map((item) => ({
-            ...item,
-            selected: (
-                (showAll && item.type === 0)
-                || items.includes(item.type)
-            ),
-        }));
-
-        this.render(this.state);
-    }
-
-    sendChangeEvent() {
-        if (!isFunction(this.props.onChange)) {
-            return;
-        }
-
-        const selectedItems = this.state.items
-            .filter((item) => item.type && item.selected)
-            .map((item) => item.type);
-
-        const data = (this.state.multiple) ? selectedItems : selectedItems[0];
-        this.props.onChange(data);
-    }
-
-    onToggleItem(type) {
-        this.state.items = this.state.items.map((item) => {
-            let selected = false;
-            if (item.type) {
-                selected = (item.type === type) ? !item.selected : item.selected;
-            }
-
-            return {
-                ...item,
-                selected,
-            };
-        });
-
-        this.sendChangeEvent();
-        this.render(this.state);
-    }
-
-    onSelectItem(e) {
-        const itemElem = e.target.closest(`.${ITEM_CLASS}`);
-        if (!itemElem || !itemElem.dataset) {
-            return;
-        }
-
-        e.preventDefault();
-
-        const selectedType = this.getItemType(itemElem);
-        this.state.items = this.state.items.map((item) => ({
-            ...item,
-            selected: (item.type === selectedType),
-        }));
-
-        this.sendChangeEvent();
-        this.render(this.state);
-    }
-
-    setURL(url) {
-        this.state.url = url.toString();
-        this.render(this.state);
+    getItemValue(elem) {
+        return parseInt(elem.dataset.value, 10);
     }
 
     getItemURL(item, state) {
         if (!state.url) {
             return null;
         }
-        const paramName = (state.multiple) ? `${state.typeParam}[]` : state.typeParam;
+        const { itemParam } = state;
+        const param = (state.multiple) ? `${itemParam}[]` : itemParam;
 
         const url = new URL(state.url);
-        if (item.type) {
-            url.searchParams.set(paramName, item.type);
+        if (item.value) {
+            url.searchParams.set(param, item.value);
         } else {
-            url.searchParams.delete(paramName);
+            url.searchParams.delete(param);
         }
 
-        if (item.type !== DEBT && !state.multiple) {
+        if (item.value !== DEBT && !state.multiple) {
             const accountId = url.searchParams.get('acc_id');
             if (accountId === '0') {
                 url.searchParams.delete('acc_id');
@@ -246,78 +80,5 @@ export class TransactionTypeMenu extends Component {
         }
 
         return url;
-    }
-
-    renderLinkElement(item, state) {
-        const res = ce('a', { textContent: item.title });
-        const url = this.getItemURL(item, state);
-        if (url) {
-            res.href = url.toString();
-        }
-        return res;
-    }
-
-    isLinkItem(item, state) {
-        return !state.disabled && (!item.selected || state.allowActiveLink);
-    }
-
-    renderCheckboxItem(item, state) {
-        let label = item.title;
-        if (this.isLinkItem(item, state)) {
-            const linkElem = this.renderLinkElement(item, state);
-            setEvents(linkElem, { click: (e) => this.onSelectItem(e) });
-            label = linkElem;
-        }
-
-        const checkbox = Checkbox.create({
-            className: ITEM_CLASS,
-            checked: item.selected,
-            label,
-            disabled: state.disabled,
-            onChange: () => this.onToggleItem(item.type),
-        });
-
-        checkbox.elem.setAttribute('data-type', item.type);
-
-        return checkbox.elem;
-    }
-
-    renderItem(item, state) {
-        if (state.multiple && item.type !== 0) {
-            return this.renderCheckboxItem(item, state);
-        }
-
-        const elem = ce('span', { className: ITEM_CLASS });
-        if (item.selected) {
-            elem.classList.add(ITEM_SELECTED_CLASS);
-        }
-        elem.setAttribute('data-type', item.type);
-
-        const titleElem = ce('span', { className: ITEM_TITLE_CLASS });
-        if (this.isLinkItem(item, state)) {
-            const linkElem = this.renderLinkElement(item, state);
-            setEvents(linkElem, { click: (e) => this.onSelectItem(e) });
-            titleElem.appendChild(linkElem);
-        } else {
-            titleElem.textContent = item.title;
-        }
-
-        elem.appendChild(titleElem);
-
-        return elem;
-    }
-
-    render(state) {
-        const elems = state.items.map((item) => this.renderItem(item, state));
-        removeChilds(this.elem);
-        addChilds(this.elem, elems);
-
-        enable(this.elem, !state.disabled);
-
-        if (state.multiple) {
-            this.elem.classList.add(MULTI_CLASS);
-        } else {
-            this.elem.classList.remove(MULTI_CLASS);
-        }
     }
 }

@@ -92,11 +92,6 @@
     fill: var(--main-text-color);
   }
 
-  /* Transaction type menu */
-  .trtype-menu__item_selected {
-    color: var(--main-text-color);
-  }
-
   /* Input control */
   .stretch-input {
     color: var(--main-text-color);
@@ -127,6 +122,9 @@
     --ig-button-disabled-bg: #e7e7e7;
     --ig-inner-button-color: #888888;
     --ig-inner-button-active-color: #000000;
+    --ig-text-bg: #e7e7e7;
+    --ig-text-border: var(--input-border-color);
+    --ig-text-color: var(--main-text-color);
   }
 
   /* Checkbox */
@@ -327,7 +325,8 @@
       color: #dddddd;
     }
 
-    .input-group__btn {
+    .input-group__btn,
+    .input-group__text {
       color: var(--input-disabled-text-color);
       border-color: var(--input-disabled-border-color);
       background-color: var(--input-disabled-bg-color);
@@ -454,8 +453,8 @@
     color: var(--main-text-color);
   }
 
-  /* Transaction list mode selector */
-  .mode-selector > b > span {
+  /* Link menu item */
+  b.link-menu-item_selected .link-menu-item__title {
     color: var(--main-text-color);
   }
 

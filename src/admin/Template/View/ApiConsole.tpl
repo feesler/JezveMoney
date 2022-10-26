@@ -172,21 +172,32 @@
         <form action="<?=BASEURL?>api/account/list" method="list">
             <div class="std_margin">
                 <label class="checkbox">
-                    <input name="full" type="checkbox" value="1">
+                    <input type="checkbox" data-target="owner">
                     <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
-                    <span class="checkbox__label">Include accounts of persons</span>
+                    <span class="checkbox__label">Owner</span>
                 </label>
+                <input class="stretch-input" name="owner" type="text" disabled>
             </div>
             <div class="std_margin">
                 <label class="checkbox">
-                    <input type="checkbox" data-target="type">
+                    <input type="checkbox" data-target="visibility">
                     <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
-                    <span class="checkbox__label">Type</span>
+                    <span class="checkbox__label">Visibility</span>
                 </label>
-                <select name="type" class="stretch-input" disabled>
+                <select name="visibility" class="stretch-input" disabled>
                     <option value="all">All</option>
                     <option value="visible" selected>Visible</option>
                     <option value="hidden">Hidden</option>
+                </select>
+            </div>
+            <div class="std_margin">
+                <label class="checkbox">
+                    <input type="checkbox" data-target="sort">
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
+                    <span class="checkbox__label">Sort by</span>
+                </label>
+                <select name="sort" class="stretch-input" disabled>
+                    <option value="visibility">Visibility</option>
                 </select>
             </div>
             <div class="form-controls">
@@ -1034,11 +1045,11 @@
         <form action="<?=BASEURL?>api/person/list" method="list">
             <div class="std_margin">
                 <label class="checkbox">
-                    <input type="checkbox" data-target="type">
+                    <input type="checkbox" data-target="visibility">
                     <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
-                    <span class="checkbox__label">Type</span>
+                    <span class="checkbox__label">Visibility</span>
                 </label>
-                <select class="stretch-input" name="type" disabled>
+                <select class="stretch-input" name="visibility" disabled>
                     <option value="all">All</option>
                     <option value="visible" selected>Visible</option>
                     <option value="hidden">Hidden</option>

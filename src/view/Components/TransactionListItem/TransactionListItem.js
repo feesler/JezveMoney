@@ -1,4 +1,4 @@
-import { ce, Component } from 'jezvejs';
+import { createElement, Component } from 'jezvejs';
 import {
     EXPENSE,
     INCOME,
@@ -69,21 +69,23 @@ export class TransactionListItem extends Component {
     }
 
     initClassic() {
-        this.titleElem = ce('div', { className: TITLE_CLASS });
-        this.amountElem = ce('div', { className: AMOUNT_CLASS });
-        this.dateElem = ce('div', { className: DATE_CLASS });
-        this.commentElem = ce('div', { className: COMMENT_CLASS });
-        this.dateCommentElem = ce(
-            'div',
-            { className: DATE_COMMENT_CLASS },
-            [this.dateElem, this.commentElem],
-        );
+        this.titleElem = createElement('div', { props: { className: TITLE_CLASS } });
+        this.amountElem = createElement('div', { props: { className: AMOUNT_CLASS } });
+        this.dateElem = createElement('div', { props: { className: DATE_CLASS } });
+        this.commentElem = createElement('div', { props: { className: COMMENT_CLASS } });
+        this.dateCommentElem = createElement('div', {
+            props: { className: DATE_COMMENT_CLASS },
+            children: [this.dateElem, this.commentElem],
+        });
 
-        this.elem = ce('div', { className: TRANS_ITEM_CLASS }, [
-            this.titleElem,
-            this.amountElem,
-            this.dateCommentElem,
-        ]);
+        this.elem = createElement('div', {
+            props: { className: TRANS_ITEM_CLASS },
+            children: [
+                this.titleElem,
+                this.amountElem,
+                this.dateCommentElem,
+            ],
+        });
     }
 
     initDetails() {
@@ -96,11 +98,10 @@ export class TransactionListItem extends Component {
             title: LABEL_DESTINATION,
             className: TITLE_FIELD_CLASS,
         });
-        this.sourceDestGroup = ce(
-            'div',
-            { className: ACCOUNTS_GROUP_CLASS },
-            [this.sourceField.elem, this.destField.elem],
-        );
+        this.sourceDestGroup = createElement('div', {
+            props: { className: ACCOUNTS_GROUP_CLASS },
+            children: [this.sourceField.elem, this.destField.elem],
+        });
         // Amount
         this.srcAmountField = Field.create({
             title: LABEL_SRC_AMOUNT,
@@ -110,11 +111,10 @@ export class TransactionListItem extends Component {
             title: LABEL_DEST_AMOUNT,
             className: AMOUNT_FIELD_CLASS,
         });
-        this.amountGroup = ce(
-            'div',
-            { className: AMOUNT_GROUP_CLASS },
-            [this.srcAmountField.elem, this.destAmountField.elem],
-        );
+        this.amountGroup = createElement('div', {
+            props: { className: AMOUNT_GROUP_CLASS },
+            children: [this.srcAmountField.elem, this.destAmountField.elem],
+        });
         // Result balance
         this.srcResultField = Field.create({
             title: LABEL_SRC_RESULT,
@@ -124,42 +124,42 @@ export class TransactionListItem extends Component {
             title: LABEL_DEST_RESULT,
             className: RESULT_FIELD_CLASS,
         });
-        this.resultsGroup = ce(
-            'div',
-            { className: RESULTS_GROUP_CLASS },
-            [this.srcResultField.elem, this.destResultField.elem],
-        );
+        this.resultsGroup = createElement('div', {
+            props: { className: RESULTS_GROUP_CLASS },
+            children: [this.srcResultField.elem, this.destResultField.elem],
+        });
 
-        this.amountResultGroup = ce(
-            'div',
-            { className: AMOUNT_RESULT_GROUP_CLASS },
-            [this.amountGroup, this.resultsGroup],
-        );
+        this.amountResultGroup = createElement('div', {
+            props: { className: AMOUNT_RESULT_GROUP_CLASS },
+            children: [this.amountGroup, this.resultsGroup],
+        });
         // Date
-        this.dateElem = ce('div', { className: DATE_CLASS });
+        this.dateElem = createElement('div', { props: { className: DATE_CLASS } });
         this.dateField = Field.create({
             title: LABEL_DATE,
             content: this.dateElem,
             className: DATE_FIELD_CLASS,
         });
         // Comment
-        this.commentElem = ce('div', { className: COMMENT_CLASS });
+        this.commentElem = createElement('div', { props: { className: COMMENT_CLASS } });
         this.commentField = Field.create({
             content: this.commentElem,
             className: COMMENT_FIELD_CLASS,
         });
 
-        this.dateCommentGroup = ce(
-            'div',
-            { className: DATE_COMMENT_CLASS },
-            [this.dateField.elem, this.commentField.elem],
-        );
+        this.dateCommentGroup = createElement('div', {
+            props: { className: DATE_COMMENT_CLASS },
+            children: [this.dateField.elem, this.commentField.elem],
+        });
 
-        this.elem = ce('div', { className: `${TRANS_ITEM_CLASS} ${DETAILS_CLASS}` }, [
-            this.sourceDestGroup,
-            this.amountResultGroup,
-            this.dateCommentGroup,
-        ]);
+        this.elem = createElement('div', {
+            props: { className: `${TRANS_ITEM_CLASS} ${DETAILS_CLASS}` },
+            children: [
+                this.sourceDestGroup,
+                this.amountResultGroup,
+                this.dateCommentGroup,
+            ],
+        });
     }
 
     getDebtType(item) {

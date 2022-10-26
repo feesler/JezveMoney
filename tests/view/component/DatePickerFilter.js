@@ -13,27 +13,25 @@ export class DatePickerFilter extends TestComponent {
     async parseContent() {
         const res = {};
 
-        res.inputElem = await query(this.elem, '.stretch-input');
-        assert(res.inputElem, 'Input element not found');
+        res.stInputElem = await query(this.elem, 'input[name="stdate"]');
+        assert(res.stInputElem, 'Start date input element not found');
+        res.endInputElem = await query(this.elem, 'input[name="enddate"]');
+        assert(res.endInputElem, 'End date input element not found');
 
-        let dateValue = await prop(res.inputElem, 'value');
-        if (!dateValue) {
-            dateValue = '';
-        }
-
-        if (dateValue === '') {
+        const startDate = await prop(res.stInputElem, 'value');
+        const endDate = await prop(res.endInputElem, 'value');
+        if (!startDate || startDate === '') {
             res.value = { startDate: null, endDate: null };
         } else {
-            const dates = dateValue.split(' - ');
-            res.value = { startDate: dates[0], endDate: dates[1] };
+            res.value = { startDate, endDate };
         }
 
-        res.datePickerBtn = await query(this.elem, '#cal_rbtn');
+        res.datePickerBtn = await query(this.elem, '.dp-btn');
         assert(res.datePickerBtn, 'Date picker button not found');
 
         res.datePicker = await DatePicker.create(this.parent, await query(this.elem, '.dp__container'));
 
-        res.clearBtn = await query(this.elem, '#nodatebtn');
+        res.clearBtn = await query(this.elem, '.clear-btn');
         assert(res.clearBtn, 'Clear button not found');
 
         return res;

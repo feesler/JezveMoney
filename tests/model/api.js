@@ -387,7 +387,7 @@ export const api = {
         async list(full) {
             let reqUrl = 'account/list';
             if (full) {
-                reqUrl += '?full=1';
+                reqUrl += '?owner=all';
             }
 
             const jsonRes = await apiGet(reqUrl);

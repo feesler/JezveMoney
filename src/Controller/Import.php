@@ -30,7 +30,7 @@ class Import extends TemplateController
         $this->template = new Template(VIEW_TPL_PATH . "Import.tpl");
         $this->template->testerUser =  $this->uMod->isTester($this->user_id);
 
-        $accounts = $accMod->getData(["type" => "all"]);
+        $accounts = $accMod->getData(["visibility" => "all"]);
         $importAvailable = count($accounts) > 0;
 
         $data = [
@@ -55,7 +55,7 @@ class Import extends TemplateController
             "profile" => $this->getProfileData(),
             "accounts" => $data["accounts"],
             "currency" => $currMod->getData(),
-            "persons" => $this->personMod->getData(["type" => "all"]),
+            "persons" => $this->personMod->getData(["visibility" => "all"]),
             "rules" => $data["importRules"],
             "templates" => $data["importTemplates"]
         ];

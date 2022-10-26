@@ -199,7 +199,7 @@ class AccountListView extends View {
 
     async requestList() {
         try {
-            const { data } = await API.account.list({ type: 'all' });
+            const { data } = await API.account.list({ visibility: 'all' });
             window.app.model.accounts.setData(data);
             window.app.model.userAccounts = null;
             window.app.checkUserAccountModels();

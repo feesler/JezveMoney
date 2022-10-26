@@ -1,0 +1,80 @@
+/* Both request and response container */
+.request-item {
+  display: flex;
+  flex-flow: column nowrap;
+  row-gap: 5px;
+  padding: 5px;
+  margin: 5px 0;
+  border: 1px solid;
+  border-radius: 2px;
+
+  .title {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: stretch;
+    height: 25px;
+    line-height: 25px;
+    padding-left: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #ffffff;
+    background-color: #66a1f0;
+  }
+
+  .collapsible .title {
+    cursor: pointer;
+  }
+
+  .collapsible .title::after {
+    content: "+";
+    display: inline-block;
+    padding: 0 10px;
+    width: 0.5rem;
+    text-align: center;
+  }
+
+  .collapsible__expanded .title::after {
+    content: "-";
+  }
+
+  .request-container .request-details,
+  .response-container .response-details {
+    word-break: break-all;
+    font-size: 14px;
+    padding: 0 5px;
+  }
+
+  /* Result */
+  .response-container.response-container_pending {
+    background: none;
+    border: 1px dashed;
+  }
+
+  .response-container.ok-result .title {
+    background-color: #65d458;
+  }
+
+  .response-container.fail-result .title {
+    background-color: #ff6666;
+  }
+}
+
+@media (hover: hover) {
+  .request-item {
+    .request-container .title:hover::after {
+      background-color: #95c3ff;
+    }
+
+    .response-container.ok-result .title:hover::after {
+      background-color: #59b74e;
+    }
+
+    .response-container.fail-result .title:hover::after {
+      background-color: #ff8a8a;
+    }
+  }
+}

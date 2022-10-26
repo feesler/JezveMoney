@@ -1,5 +1,6 @@
 import {
     assert,
+    asArray,
     query,
     prop,
     navigation,
@@ -15,9 +16,9 @@ import { AppView } from './AppView.js';
 import { App } from '../Application.js';
 import { IconButton } from './component/IconButton.js';
 import { WarningPopup } from './component/WarningPopup.js';
-import { TransactionTypeMenu } from './component/TransactionTypeMenu.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
-import { ModeSelector } from './component/TransactionList/ModeSelector.js';
+import { LinkMenu } from './component/LinkMenu/LinkMenu.js';
+import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { SearchForm } from './component/TransactionList/SearchForm.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
 import { fixDate, isEmpty, urlJoin } from '../common.js';
@@ -71,7 +72,7 @@ export class TransactionsView extends AppView {
 
         res.loadingIndicator = { elem: await query(transList, '.loading-indicator') };
 
-        res.modeSelector = await ModeSelector.create(this, await query('.mode-selector'));
+        res.modeSelector = await LinkMenu.create(this, await query('.mode-selector'));
         res.paginator = await Paginator.create(this, await query('.paginator'));
 
         res.title = await prop(res.titleEl, 'textContent');
@@ -100,10 +101,12 @@ export class TransactionsView extends AppView {
 
         res.filterCollapsed = cont.filtersAccordion.isCollapsed();
         res.filter = {
-            type: cont.typeMenu.getSelectedTypes(),
+            type: cont.typeMenu.value,
             accounts: this.getDropDownFilter(cont.accDropDown),
             persons: this.getDropDownFilter(cont.personDropDown),
             search: cont.searchForm.content.value,
+            startDate: null,
+            endDate: null,
         };
         const dateRange = cont.dateFilter.getSelectedRange();
         if (dateRange && dateRange.startDate && dateRange.endDate) {
@@ -130,7 +133,7 @@ export class TransactionsView extends AppView {
 
         const isModeSelectorVisible = cont.modeSelector?.content?.visible;
         if (isModeSelectorVisible) {
-            res.detailsMode = cont.modeSelector.content.details;
+            res.detailsMode = cont.modeSelector.value === 'details';
         } else {
             const locURL = new URL(this.location);
             res.detailsMode = locURL.searchParams.has('mode') && locURL.searchParams.get('mode') === 'details';
@@ -253,7 +256,7 @@ export class TransactionsView extends AppView {
 
         const res = {
             typeMenu: {
-                selectedTypes: model.filter.type,
+                value: model.filter.type,
                 visible: isFiltersVisible,
             },
             accDropDown: {
@@ -261,6 +264,13 @@ export class TransactionsView extends AppView {
             },
             personDropDown: {
                 visible: isFiltersVisible && isPersonsAvailable,
+            },
+            dateFilter: {
+                visible: isFiltersVisible,
+                value: {
+                    startDate: model.filter.startDate,
+                    endDate: model.filter.endDate,
+                },
             },
             searchForm: {
                 value: model.filter.search,
@@ -299,7 +309,7 @@ export class TransactionsView extends AppView {
 
             res.modeSelector = {
                 ...res.modeSelector,
-                details: model.detailsMode,
+                value: (model.detailsMode) ? 'details' : 'classic',
             };
         }
 
@@ -341,11 +351,12 @@ export class TransactionsView extends AppView {
         return App.view.checkState(expected);
     }
 
-    async filterByType(type, directNavigate = false) {
-        const newTypeSel = Array.isArray(type) ? type : [type];
-        newTypeSel.sort();
+    async filterByType(value, directNavigate = false) {
+        const newTypeSel = asArray(value);
+        const types = (newTypeSel.includes(0)) ? [] : newTypeSel;
+        types.sort();
 
-        if (this.content.typeMenu.isSameSelected(newTypeSel)) {
+        if (this.content.typeMenu.isSameSelected(types)) {
             return true;
         }
 
@@ -355,17 +366,20 @@ export class TransactionsView extends AppView {
             await this.openFilters();
         }
 
-        this.model.filter.type = newTypeSel;
+        this.model.filter.type = types;
         const expected = this.onFilterUpdate();
 
         if (directNavigate) {
             await goTo(this.getExpectedURL());
-        } else if (newTypeSel.length === 1) {
-            await this.waitForList(() => App.view.content.typeMenu.select(newTypeSel[0]));
+        } else if (types.length === 0) {
+            await this.waitForList(() => App.view.content.typeMenu.selectItemByIndex(0));
+        } else if (types.length === 1) {
+            const [type] = types;
+            await this.waitForList(() => App.view.content.typeMenu.select(type));
         } else {
-            await this.waitForList(() => App.view.content.typeMenu.select(0));
-            for (const typeItem of newTypeSel) {
-                await this.waitForList(() => App.view.content.typeMenu.toggle(typeItem));
+            await this.waitForList(() => App.view.content.typeMenu.selectItemByIndex(0));
+            for (const type of newTypeSel) {
+                await this.waitForList(() => App.view.content.typeMenu.toggle(type));
             }
         }
 
@@ -519,7 +533,7 @@ export class TransactionsView extends AppView {
         if (!this.content.modeSelector) {
             return false;
         }
-        if (this.content.modeSelector.content.listMode.isActive) {
+        if (this.content.modeSelector.value === 'classic') {
             return false;
         }
 
@@ -532,7 +546,7 @@ export class TransactionsView extends AppView {
         if (directNavigate) {
             await goTo(this.getExpectedURL());
         } else {
-            await this.waitForList(() => this.content.modeSelector.setClassicMode());
+            await this.waitForList(() => this.content.modeSelector.selectItemByValue('classic'));
         }
 
         return App.view.checkState(expected);
@@ -542,7 +556,7 @@ export class TransactionsView extends AppView {
         if (!this.content.modeSelector) {
             return false;
         }
-        if (this.content.modeSelector.content.detailsMode.isActive) {
+        if (this.content.modeSelector.value === 'details') {
             return false;
         }
 
@@ -555,7 +569,7 @@ export class TransactionsView extends AppView {
         if (directNavigate) {
             await goTo(this.getExpectedURL());
         } else {
-            await this.waitForList(() => this.content.modeSelector.setDetailsMode());
+            await this.waitForList(() => this.content.modeSelector.selectItemByValue('details'));
         }
 
         return App.view.checkState(expected);
@@ -608,6 +622,8 @@ export class TransactionsView extends AppView {
                 && prevTime !== this.model.renderTime
             );
         });
+
+        await this.parse();
     }
 
     async goToFirstPage(directNavigate = false) {

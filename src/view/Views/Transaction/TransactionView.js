@@ -8,6 +8,7 @@ import {
     setEvents,
     addChilds,
 } from 'jezvejs';
+import { DateInput } from 'jezvejs/DateInput';
 import { DropDown } from 'jezvejs/DropDown';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { DecimalInput } from 'jezvejs/DecimalInput';
@@ -73,6 +74,7 @@ import {
     commentChange,
     cancelSubmit,
 } from './reducer.js';
+import * as STATE from './stateId.js';
 
 const PAGE_TITLE_UPDATE = 'Jezve Money | Edit transaction';
 const PAGE_TITLE_CREATE = 'Jezve Money | New transaction';
@@ -153,10 +155,12 @@ class TransactionView extends View {
             initialState.form.destAmount = transaction.dest_amount;
         }
 
-        if (transaction.type === EXPENSE || transaction.type === INCOME) {
-            initialState.id = (initialState.isDiff) ? 2 : 0;
+        if (transaction.type === EXPENSE) {
+            initialState.id = (initialState.isDiff) ? STATE.E_S_AMOUNT_D_AMOUNT : STATE.E_D_AMOUNT;
+        } else if (transaction.type === INCOME) {
+            initialState.id = (initialState.isDiff) ? STATE.I_S_AMOUNT_D_AMOUNT : STATE.I_S_AMOUNT;
         } else if (transaction.type === TRANSFER) {
-            initialState.id = (initialState.isDiff) ? 3 : 0;
+            initialState.id = (initialState.isDiff) ? STATE.T_S_AMOUNT_D_AMOUNT : STATE.T_S_AMOUNT;
         } else if (transaction.type === DEBT) {
             initialState.person = window.app.model.persons.getItem(transaction.person_id);
             const personAccountId = (transaction.debtType)
@@ -179,12 +183,16 @@ class TransactionView extends View {
                 initialState.srcAccount = initialState.personAccount;
                 initialState.account = initialState.destAccount;
 
-                initialState.id = (initialState.transaction.noAccount) ? 6 : 0;
+                initialState.id = (initialState.transaction.noAccount)
+                    ? STATE.DG_NOACC_S_AMOUNT
+                    : STATE.DG_S_AMOUNT;
             } else {
                 initialState.destAccount = initialState.personAccount;
                 initialState.account = initialState.srcAccount;
 
-                initialState.id = (transaction.noAccount) ? 7 : 3;
+                initialState.id = (transaction.noAccount)
+                    ? STATE.DT_NOACC_S_AMOUNT
+                    : STATE.DT_S_AMOUNT;
             }
         }
 
@@ -224,7 +232,8 @@ class TransactionView extends View {
             });
         }
 
-        this.typeMenu = TransactionTypeMenu.fromElement(document.querySelector('.trtype-menu'), {
+        this.typeMenu = TransactionTypeMenu.fromElement(ge('type_menu'), {
+            itemParam: 'type',
             onChange: (sel) => this.onChangeType(sel),
         });
 
@@ -296,7 +305,7 @@ class TransactionView extends View {
             digits: 2,
             oninput: (e) => this.onSourceAmountInput(e),
         });
-        this.srcCurrBtn = this.srcAmountRow.querySelector('.input-group__btn');
+        this.srcCurrBtn = ge('srcCurrBtn');
         this.srcAmountSign = ge('srcamountsign');
 
         this.destAmountRow = ge('dest_amount_row');
@@ -308,7 +317,7 @@ class TransactionView extends View {
             digits: 2,
             oninput: (e) => this.onDestAmountInput(e),
         });
-        this.destCurrBtn = this.destAmountRow.querySelector('.input-group__btn');
+        this.destCurrBtn = ge('destCurrBtn');
         this.destAmountSign = ge('destamountsign');
 
         this.srcResBalanceRow = ge('result_balance');
@@ -350,8 +359,11 @@ class TransactionView extends View {
         this.dateInputBtn = ge('cal_rbtn');
         setEvents(this.dateInputBtn, { click: () => this.showCalendar() });
 
-        this.dateInput = ge('date');
-        setEvents(this.dateInput, { input: (e) => this.onDateInput(e) });
+        this.dateInput = DateInput.create({
+            elem: ge('date'),
+            locales: window.app.dateFormatLocale,
+            oninput: (e) => this.onDateInput(e),
+        });
 
         this.commentRow = ge('comment_row');
         this.commentInput = ge('comm');
@@ -639,7 +651,8 @@ class TransactionView extends View {
         this.commonSwitch(this.exchangeRow, this.exchangeInfo, this.exchangeInput, options);
     }
 
-    onChangeType(type) {
+    onChangeType(value) {
+        const type = parseInt(value, 10);
         this.store.dispatch(typeChange(type));
     }
 
@@ -726,6 +739,38 @@ class TransactionView extends View {
         if (ddown) {
             ddown.selectItem(currencyId);
         }
+    }
+
+    /** Enable/disable specified currency button */
+    enableCurrencySelect(currBtn, signElem, ddown, value) {
+        currBtn.classList.toggle('input-group__btn', value);
+        currBtn.classList.toggle('input-group__text', !value);
+        signElem.classList.toggle('input-group__btn-title', value);
+        signElem.classList.toggle('input-group__text-title', !value);
+
+        if (ddown) {
+            ddown.enable(value);
+        }
+    }
+
+    /** Enable/disable source currency button */
+    enableSourceCurrencySelect(value) {
+        this.enableCurrencySelect(
+            this.srcCurrBtn,
+            this.srcAmountSign,
+            this.srcCurrDDList,
+            value,
+        );
+    }
+
+    /** Enable/disable destination currency button */
+    enableDestCurrencySelect(value) {
+        this.enableCurrencySelect(
+            this.destCurrBtn,
+            this.destAmountSign,
+            this.destCurrDDList,
+            value,
+        );
     }
 
     validateSourceAmount(state) {
@@ -944,27 +989,27 @@ class TransactionView extends View {
     renderExpense(state) {
         this.resBalanceDestSwitch(HIDE_BOTH);
 
-        if (state.id === 0) {
+        if (state.id === STATE.E_D_AMOUNT) {
             this.srcAmountSwitch(HIDE_BOTH);
             this.destAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(SHOW_INFO);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === 1) {
+        } else if (state.id === STATE.E_S_RESULT) {
             this.srcAmountSwitch(HIDE_BOTH);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INPUT);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === 2) {
+        } else if (state.id === STATE.E_S_AMOUNT_D_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(SHOW_INFO);
             this.exchRateSwitch(SHOW_INFO);
-        } else if (state.id === 3) {
+        } else if (state.id === STATE.E_S_AMOUNT_EXCH) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INFO);
             this.exchRateSwitch(SHOW_INPUT);
-        } else if (state.id === 4) {
+        } else if (state.id === STATE.E_S_AMOUNT_S_RESULT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INPUT);
@@ -980,36 +1025,36 @@ class TransactionView extends View {
         this.srcResBalanceRowLabel.textContent = 'Result balance';
         this.destResBalanceRowLabel.textContent = 'Result balance';
 
-        enable(this.srcCurrBtn, false);
-        enable(this.destCurrBtn, !state.submitStarted);
+        this.enableSourceCurrencySelect(false);
+        this.enableDestCurrencySelect(true);
     }
 
     renderIncome(state) {
-        if (state.id === 0) {
+        if (state.id === STATE.I_S_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === 1) {
+        } else if (state.id === STATE.I_D_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INPUT);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === 2) {
+        } else if (state.id === STATE.I_S_AMOUNT_D_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(SHOW_INFO);
-        } else if (state.id === 3) {
+        } else if (state.id === STATE.I_S_AMOUNT_EXCH) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(SHOW_INPUT);
-        } else if (state.id === 4) {
+        } else if (state.id === STATE.I_S_AMOUNT_D_RESULT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INFO);
@@ -1026,60 +1071,60 @@ class TransactionView extends View {
         this.srcResBalanceRowLabel.textContent = 'Result balance';
         this.destResBalanceRowLabel.textContent = 'Result balance';
 
-        enable(this.srcCurrBtn, !state.submitStarted);
-        enable(this.destCurrBtn, false);
+        this.enableSourceCurrencySelect(true);
+        this.enableDestCurrencySelect(false);
     }
 
     renderTransfer(state) {
-        if (state.id === 0) {
+        if (state.id === STATE.T_S_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === 1) {
+        } else if (state.id === STATE.T_S_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INPUT);
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === 2) {
+        } else if (state.id === STATE.T_D_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INPUT);
             this.exchRateSwitch(HIDE_BOTH);
-        } else if (state.id === 3) {
+        } else if (state.id === STATE.T_S_AMOUNT_D_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(SHOW_INFO);
-        } else if (state.id === 4) {
+        } else if (state.id === STATE.T_D_AMOUNT_S_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(SHOW_INPUT);
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(SHOW_INFO);
-        } else if (state.id === 5) {
+        } else if (state.id === STATE.T_S_AMOUNT_D_RESULT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INPUT);
             this.exchRateSwitch(SHOW_INFO);
-        } else if (state.id === 6) {
+        } else if (state.id === STATE.T_S_RESULT_D_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INPUT);
             this.resBalanceDestSwitch(SHOW_INPUT);
             this.exchRateSwitch(SHOW_INFO);
-        } else if (state.id === 7) {
+        } else if (state.id === STATE.T_S_AMOUNT_EXCH) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INFO);
             this.exchRateSwitch(SHOW_INPUT);
-        } else if (state.id === 8) {
+        } else if (state.id === STATE.T_EXCH_S_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
             this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INPUT);
@@ -1102,39 +1147,39 @@ class TransactionView extends View {
         this.srcResBalanceRowLabel.textContent = 'Result balance (Source)';
         this.destResBalanceRowLabel.textContent = 'Result balance (Destination)';
 
-        enable(this.srcCurrBtn, false);
-        enable(this.destCurrBtn, false);
+        this.enableSourceCurrencySelect(false);
+        this.enableDestCurrencySelect(false);
     }
 
     renderDebt(state) {
         this.destAmountSwitch(HIDE_BOTH);
         this.exchRateSwitch(HIDE_BOTH);
 
-        if (state.id === 0 || state.id === 3) {
+        if (state.id === STATE.DG_S_AMOUNT || state.id === STATE.DT_S_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INFO);
-        } else if (state.id === 1 || state.id === 5) {
+        } else if (state.id === STATE.DG_S_RESULT || state.id === STATE.DT_S_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INPUT);
             this.resBalanceDestSwitch(SHOW_INFO);
-        } else if (state.id === 2 || state.id === 4) {
+        } else if (state.id === STATE.DG_D_RESULT || state.id === STATE.DT_D_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INPUT);
-        } else if (state.id === 6) {
+        } else if (state.id === STATE.DG_NOACC_S_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(HIDE_BOTH);
-        } else if (state.id === 7) {
+        } else if (state.id === STATE.DT_NOACC_S_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(HIDE_BOTH);
             this.resBalanceDestSwitch(SHOW_INFO);
-        } else if (state.id === 8) {
+        } else if (state.id === STATE.DT_NOACC_D_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(HIDE_BOTH);
             this.resBalanceDestSwitch(SHOW_INPUT);
-        } else if (state.id === 9) {
+        } else if (state.id === STATE.DG_NOACC_S_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(SHOW_INPUT);
             this.resBalanceDestSwitch(HIDE_BOTH);
@@ -1180,8 +1225,8 @@ class TransactionView extends View {
         this.srcResBalanceRowLabel.textContent = (debtType) ? 'Result balance (Person)' : 'Result balance (Account)';
         this.destResBalanceRowLabel.textContent = (debtType) ? 'Result balance (Account)' : 'Result balance (Person)';
 
-        enable(this.srcCurrBtn, false);
-        enable(this.destCurrBtn, false);
+        this.enableSourceCurrencySelect(false);
+        this.enableDestCurrencySelect(false);
 
         this.personIdInp.value = state.person.id;
 
@@ -1250,7 +1295,7 @@ class TransactionView extends View {
         );
         enable(this.swapBtn, !state.submitStarted);
 
-        this.typeMenu.setSelection(transaction.type);
+        this.typeMenu.setActive(transaction.type);
         this.typeMenu.enable(!state.submitStarted);
 
         if (state.isAvailable) {
@@ -1324,6 +1369,8 @@ class TransactionView extends View {
             this.destAmountRowLabel.textContent = destAmountLbl;
         }
 
+        enable(this.srcCurrBtn, !state.submitStarted);
+        enable(this.destCurrBtn, !state.submitStarted);
         this.setSign(this.destAmountSign, this.destCurrDDList, transaction.dest_curr);
         this.setSign(this.srcAmountSign, this.srcCurrDDList, transaction.src_curr);
         this.setSign(this.srcResBalanceSign, null, transaction.src_curr);
@@ -1398,7 +1445,8 @@ class TransactionView extends View {
         } else {
             window.app.invalidateBlock(this.dateRow);
         }
-        enable(this.dateInput, !state.submitStarted);
+        this.dateInput.enable(!state.submitStarted);
+        enable(this.dateInputBtn, !state.submitStarted);
         this.dateInput.value = state.form.date;
 
         enable(this.commentInput, !state.submitStarted);

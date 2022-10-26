@@ -80,9 +80,24 @@
   position: relative;
 }
 
-/* Mode selector and paginator row */
+/* Footer and header rows */
 .paginator-row {
   display: flex;
   flex-flow: row wrap;
   justify-content: space-between;
+}
+
+/* Mode selector */
+.mode-selector {
+  align-items: center;
+  padding: 5px 0;
+
+  .link-menu-item {
+    padding: 0;
+  }
+
+  .link-menu-item__title {
+    height: 24px;
+    line-height: 24px;
+  }
 }

@@ -1,4 +1,4 @@
-import { ce, Component } from 'jezvejs';
+import { createElement, Component } from 'jezvejs';
 import './style.scss';
 
 /** CSS classes */
@@ -56,10 +56,17 @@ export class OriginalImportData extends Component {
             elemClasses.push(className);
         }
 
-        return ce('div', { className: elemClasses.join(' ') }, [
-            ce('label', { className: COLUMN_HEADER_CLASS, textContent: title }),
-            ce('div', { className: COLUMN_DATA_CLASS, textContent: value }),
-        ]);
+        return createElement('div', {
+            props: { className: elemClasses.join(' ') },
+            children: [
+                createElement('label', {
+                    props: { className: COLUMN_HEADER_CLASS, textContent: title },
+                }),
+                createElement('div', {
+                    props: { className: COLUMN_DATA_CLASS, textContent: value },
+                }),
+            ],
+        });
     }
 
     render() {
@@ -78,7 +85,7 @@ export class OriginalImportData extends Component {
         ];
 
         this.elem = window.app.createContainer(CONTAINER_CLASS, [
-            ce('h3', { textContent: TITLE_ORIGINAL_DATA }),
+            createElement('h3', { props: { textContent: TITLE_ORIGINAL_DATA } }),
             window.app.createContainer(
                 TABLE_CLASS,
                 dataTable.map((col) => this.renderColumn(...col)),

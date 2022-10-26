@@ -2,7 +2,7 @@ import {
     assert,
     query,
     prop,
-    attr,
+    hasAttr,
     click,
     wait,
     waitForFunction,
@@ -62,8 +62,7 @@ export class ImportView extends AppView {
 
         res.title.value = await prop(res.title.elem, 'textContent');
 
-        const disabledAttr = await attr(res.uploadBtn.elem, 'disabled');
-        res.uploadBtn.content.disabled = disabledAttr != null;
+        res.uploadBtn.content.disabled = await hasAttr(res.uploadBtn.elem, 'disabled');
         res.totalCount.value = await prop(res.totalCount.elem, 'textContent');
         res.enabledCount.value = await prop(res.enabledCount.elem, 'textContent');
         res.submitBtn.disabled = await prop(res.submitBtn.elem, 'disabled');

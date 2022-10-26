@@ -176,9 +176,7 @@ export const create = async (type, params, submitHandler) => {
         await App.view.goToNewTransactionByAccount(accNum);
     }
 
-    if (!App.view.content.typeMenu.isSingleSelected(type)) {
-        await App.view.changeTransactionType(type);
-    }
+    await App.view.changeTransactionType(type);
 
     // Input data and submit
     const expectedTransaction = await submitHandler(params);
@@ -206,11 +204,7 @@ export const update = async (type, params, submitHandler) => {
     setBlock(`Update ${Transaction.typeToString(type)} [${pos}] (${formatProps(props)})`, 2);
 
     await App.view.navigateToTransactions();
-
-    if (!App.view.content.typeMenu.isSingleSelected(type)) {
-        await App.view.filterByType(type);
-    }
-
+    await App.view.filterByType(type);
     await App.view.goToUpdateTransaction(pos);
 
     // Step
@@ -314,12 +308,8 @@ export const delFromUpdate = async (type, pos) => {
         await App.view.navigateToTransactions();
     }
 
-    if (!App.view.content.typeMenu.isSingleSelected(type)) {
-        await App.view.filterByType(type);
-    }
-
+    await App.view.filterByType(type);
     await App.view.goToUpdateTransaction(ind);
-
     await App.view.deleteSelfItem();
 
     await test('Submit result', async () => {
@@ -392,9 +382,7 @@ export const checkTransactionAvailable = async (type, directNavigate = false) =>
             await App.view.goToCreateTransaction();
             assert.instanceOf(App.view, TransactionView, 'Invalid view');
 
-            if (!App.view.content.typeMenu.isSingleSelected(type)) {
-                await App.view.changeTransactionType(type);
-            }
+            await App.view.changeTransactionType(type);
         }
 
         let stateId = -1;

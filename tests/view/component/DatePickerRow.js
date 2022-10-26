@@ -9,8 +9,6 @@ export class DatePickerRow extends InputRow {
     async parseContent() {
         const res = await super.parseContent();
 
-        res.date = res.value;
-
         res.datePicker = await DatePicker.create(
             this.parent,
             await query(this.elem, '.dp__container'),

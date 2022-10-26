@@ -1,5 +1,4 @@
 import {
-    ce,
     createElement,
     isFunction,
     Component,
@@ -63,12 +62,11 @@ export class ImportTransactionBase extends Component {
 
     /** Returns toggle expand/collapse button */
     createToggleButton() {
-        return ce(
-            'button',
-            { className: TOGGLE_BUTTON_CLASS, type: 'button' },
-            window.app.createIcon('toggle-ext', TOGGLE_ICON_CLASS),
-            { click: () => this.toggleCollapse() },
-        );
+        return createElement('button', {
+            props: { className: TOGGLE_BUTTON_CLASS, type: 'button' },
+            children: window.app.createIcon('toggle-ext', TOGGLE_ICON_CLASS),
+            events: { click: () => this.toggleCollapse() },
+        });
     }
 
     createSimilarTransactionInfo(transaction) {

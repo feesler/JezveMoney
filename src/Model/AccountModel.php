@@ -423,7 +423,8 @@ class AccountModel extends CachedTable
         $condArr = ["user_id" . $setCond];
 
         // delete import rules
-        $userAccounts = $this->getData(["full" => $deletePersons, "type" => "all"]);
+        $reqOwner = ($deletePersons) ? "all" : "user";
+        $userAccounts = $this->getData(["owner" => $reqOwner, "visibility" => "all"]);
         $accountsToDelete = [];
         foreach ($userAccounts as $account) {
             $accountsToDelete[] = $account->id;
@@ -539,13 +540,19 @@ class AccountModel extends CachedTable
         }
     }
 
-
-    // Return array of accounts
-    // $params - array of parameters
-    //   full - if set to true include accounts of persons
-    //   type - select user accounts by visibility. Possible values: "all", "visible", "hidden"
-    //   person - return accounts of specified person
-    public function getData($params = null)
+    /**
+     * Returns array of accounts
+     *
+     * @param array $params - array of parameters
+     *    $params = [
+     *      visibility - select accounts by visibility. Possible values: "all", "visible", "hidden"
+     *      owner - select accounts by owner. Possible values: "all", "user" or (int) for id
+     *      sort - sort result array. Possible value: "visibility"
+     *    ]
+     *
+     * @return [AccountItem]
+     */
+    public function getData($params = [])
     {
         if (!$this->checkCache()) {
             return [];
@@ -555,12 +562,12 @@ class AccountModel extends CachedTable
             $params = [];
         }
 
-        $includePersons = (isset($params["full"]) && $params["full"] == true);
-        $requestedType = isset($params["type"]) ? $params["type"] : "visible";
-        $includeVisible = in_array($requestedType, ["all", "visible"]);
-        $includeHidden = in_array($requestedType, ["all", "hidden"]);
+        $includePersons = (isset($params["owner"]) && $params["owner"] == "all");
+        $requestedVisibility = isset($params["visibility"]) ? $params["visibility"] : "visible";
+        $includeVisible = in_array($requestedVisibility, ["all", "visible"]);
+        $includeHidden = in_array($requestedVisibility, ["all", "hidden"]);
         $sortByVisibility = (isset($params["sort"]) && $params["sort"] == "visibility");
-        $person_id = (isset($params["person"])) ? intval($params["person"]) : 0;
+        $person_id = (isset($params["owner"]) && is_numeric($params["owner"])) ? intval($params["owner"]) : 0;
         if ($person_id) {
             $includePersons = true;
         }
@@ -704,7 +711,7 @@ class AccountModel extends CachedTable
     // Returns array of user accounts sorted by visibility
     public function getUserAccounts()
     {
-        return $this->getData(["type" => "all", "sort" => "visibility"]);
+        return $this->getData(["visibility" => "all", "sort" => "visibility"]);
     }
 
 
