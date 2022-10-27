@@ -13,7 +13,7 @@ import { WarningPopup } from './component/WarningPopup.js';
 import { Toolbar } from './component/Toolbar.js';
 
 /** List of persons view class */
-export class PersonsView extends AppView {
+export class PersonListView extends AppView {
     async parseContent() {
         const res = {
             titleEl: await query('.content_wrap > .heading > h1'),

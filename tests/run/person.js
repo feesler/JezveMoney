@@ -7,14 +7,14 @@ import {
     goTo,
 } from 'jezve-test';
 import { formatProps, generateId } from '../common.js';
-import { PersonsView } from '../view/PersonsView.js';
+import { PersonListView } from '../view/PersonListView.js';
 import { PersonView } from '../view/PersonView.js';
 import { MainView } from '../view/MainView.js';
 import { App } from '../Application.js';
 
 /** Navigate to persons list page */
 const checkNavigation = async () => {
-    if (!(App.view instanceof PersonsView)) {
+    if (!(App.view instanceof PersonListView)) {
         await App.view.navigateToPersons();
     }
 };
@@ -33,7 +33,7 @@ const submitPerson = async (params) => {
     await App.view.submit();
 
     if (validInput) {
-        assert.instanceOf(App.view, PersonsView, 'Fail to submit person');
+        assert.instanceOf(App.view, PersonListView, 'Fail to submit person');
     }
 
     return res;
@@ -57,7 +57,7 @@ export const create = async (params) => {
             await App.view.cancel();
         }
 
-        App.view.expectedState = PersonsView.render(App.state);
+        App.view.expectedState = PersonListView.render(App.state);
         await App.view.checkState();
 
         return App.state.fetchAndTest();
@@ -103,7 +103,7 @@ export const update = async (params) => {
             await App.view.cancel();
         }
 
-        App.view.expectedState = PersonsView.render(App.state);
+        App.view.expectedState = PersonListView.render(App.state);
         await App.view.checkState();
 
         return App.state.fetchAndTest();
@@ -120,7 +120,7 @@ export const del = async (persons) => {
         // Perform actions on view
         await App.view.deletePersons(persons);
 
-        App.view.expectedState = PersonsView.render(App.state);
+        App.view.expectedState = PersonListView.render(App.state);
         await App.view.checkState();
 
         return App.state.fetchAndTest();
@@ -141,7 +141,7 @@ export const delFromUpdate = async (pos) => {
         await App.view.goToUpdatePerson(ind);
         await App.view.deleteSelfItem();
         // Check state of persons list view
-        App.view.expectedState = PersonsView.render(App.state);
+        App.view.expectedState = PersonListView.render(App.state);
         await App.view.checkState();
         // Check state of main view
         await App.goToMainView();
@@ -167,7 +167,7 @@ export const show = async (persons, val = true) => {
         // Perform actions on view
         await App.view.showPersons(itemIds, val);
         // Check state of persons list view
-        App.view.expectedState = PersonsView.render(App.state);
+        App.view.expectedState = PersonListView.render(App.state);
         await App.view.checkState();
         // Check app state
         return App.state.fetchAndTest();

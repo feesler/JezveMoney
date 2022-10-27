@@ -26,7 +26,7 @@ import { Toolbar } from './component/Toolbar.js';
 import { FiltersAccordion } from './component/TransactionList/FiltersAccordion.js';
 
 /** List of transactions view class */
-export class TransactionsView extends AppView {
+export class TransactionListView extends AppView {
     async parseContent() {
         const res = {
             titleEl: await query('.content_wrap > .heading > h1'),

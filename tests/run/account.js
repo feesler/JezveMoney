@@ -7,7 +7,7 @@ import {
     goTo,
 } from 'jezve-test';
 import { MainView } from '../view/MainView.js';
-import { AccountsView } from '../view/AccountsView.js';
+import { AccountListView } from '../view/AccountListView.js';
 import { Transaction } from '../model/Transaction.js';
 import { formatProps, createCSV, generateId } from '../common.js';
 import { App } from '../Application.js';
@@ -15,7 +15,7 @@ import { AccountView } from '../view/AccountView.js';
 
 /** Navigate to accounts list page */
 const checkNavigation = async () => {
-    if (!(App.view instanceof AccountsView)) {
+    if (!(App.view instanceof AccountListView)) {
         await App.view.navigateToAccounts();
     }
 };
@@ -97,7 +97,7 @@ export const submitAccount = async (params) => {
     await App.view.submit();
 
     if (validInput) {
-        assert.instanceOf(App.view, AccountsView, 'Fail to submit account');
+        assert.instanceOf(App.view, AccountListView, 'Fail to submit account');
     }
 
     return res;
@@ -131,7 +131,7 @@ export const create = async (params) => {
             await App.view.cancel();
         }
         // Check state of accounts list view
-        App.view.expectedState = AccountsView.render(App.state);
+        App.view.expectedState = AccountListView.render(App.state);
         await App.view.checkState();
         // Check app state
         return App.state.fetchAndTest();
@@ -171,7 +171,7 @@ export const update = async (params) => {
             await App.view.cancel();
         }
 
-        App.view.expectedState = AccountsView.render(App.state);
+        App.view.expectedState = AccountListView.render(App.state);
         await App.view.checkState();
         // Check app state
         return App.state.fetchAndTest();
@@ -191,7 +191,7 @@ export const del = async (accounts) => {
         // Perform actions on view
         await App.view.deleteAccounts(indexes);
         // Check state of view
-        App.view.expectedState = AccountsView.render(App.state);
+        App.view.expectedState = AccountListView.render(App.state);
         await App.view.checkState();
         // Check app state
         return App.state.fetchAndTest();
@@ -213,7 +213,7 @@ export const delFromUpdate = async (pos) => {
         // Perform actions on view
         await App.view.deleteSelfItem();
         // Check state of accounts list view
-        App.view.expectedState = AccountsView.render(App.state);
+        App.view.expectedState = AccountListView.render(App.state);
         await App.view.checkState();
         // Check state of main view
         await App.goToMainView();
@@ -242,7 +242,7 @@ export const show = async (accounts, val = true) => {
             await App.view.hideAccounts(itemIds);
         }
         // Check state of view
-        App.view.expectedState = AccountsView.render(App.state);
+        App.view.expectedState = AccountListView.render(App.state);
         await App.view.checkState();
         // Check app state
         return App.state.fetchAndTest();
@@ -346,7 +346,7 @@ export const securityTests = async () => {
 
     await test('Access to not existing account', async () => {
         await goTo(requestURL);
-        assert.instanceOf(App.view, AccountsView, 'Invalid view');
+        assert.instanceOf(App.view, AccountListView, 'Invalid view');
 
         App.view.expectedState = {
             msgPopup: { success: false, message: 'Fail to update account.' },

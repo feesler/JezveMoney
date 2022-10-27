@@ -14,7 +14,7 @@ import { WarningPopup } from './component/WarningPopup.js';
 import { Toolbar } from './component/Toolbar.js';
 
 /** List of accounts view class */
-export class AccountsView extends AppView {
+export class AccountListView extends AppView {
     async parseContent() {
         const res = {
             titleEl: await query('.content_wrap > .heading > h1'),
