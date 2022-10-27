@@ -102,6 +102,10 @@ export const runAction = async ({ action, data }) => {
         testDescr = `Input exchange rate (${data})`;
     }
 
+    if (action === 'toggleExchange') {
+        testDescr = 'Toggle exchange rate direction';
+    }
+
     if (action === 'clickSrcAmount') {
         testDescr = 'Click on source amount';
     }

@@ -30,6 +30,7 @@ const DEST_AMOUNT_CHANGE = 'destAmountChange';
 const SOURCE_RESULT_CHANGE = 'sourceResultChange';
 const DEST_RESULT_CHANGE = 'destResultChange';
 const EXCHANGE_CHANGE = 'exchangeChange';
+const TOGGLE_EXCHANGE = 'toggleExchange';
 const DATE_CHANGE = 'dateChange';
 const COMMENT_CHANGE = 'commentChange';
 const INVALIDATE_SOURCE_AMOUNT = 'invalidateSourceAmount';
@@ -73,6 +74,7 @@ export const destAmountChange = (value) => ({ type: DEST_AMOUNT_CHANGE, payload:
 export const sourceResultChange = (value) => ({ type: SOURCE_RESULT_CHANGE, payload: value });
 export const destResultChange = (value) => ({ type: DEST_RESULT_CHANGE, payload: value });
 export const exchangeChange = (value) => ({ type: EXCHANGE_CHANGE, payload: value });
+export const toggleExchange = () => ({ type: TOGGLE_EXCHANGE });
 export const dateChange = (value) => ({ type: DATE_CHANGE, payload: value });
 export const commentChange = (value) => ({ type: COMMENT_CHANGE, payload: value });
 export const invalidateSourceAmount = () => ({ type: INVALIDATE_SOURCE_AMOUNT });
@@ -205,6 +207,28 @@ const setStateNextDestAccount = (state, accountId) => {
     result.destCurrency = currencyModel.getItem(destAccount.curr_id);
 };
 
+const calculateSourceAmountByExchange = (state) => {
+    const { useBackExchange, fExchange, fBackExchange } = state.form;
+    const destination = state.transaction.dest_amount;
+
+    if (useBackExchange) {
+        return normalize(destination * fBackExchange);
+    }
+
+    return (fExchange === 0) ? 0 : normalize(destination / fExchange);
+};
+
+const calculateDestAmountByExchange = (state) => {
+    const { useBackExchange, fExchange, fBackExchange } = state.form;
+    const source = state.transaction.src_amount;
+
+    if (useBackExchange) {
+        return (fBackExchange === 0) ? 0 : normalize(source / fBackExchange);
+    }
+
+    return normalize(source * fExchange);
+};
+
 export const calculateExchange = (state) => {
     const source = state.transaction.src_amount;
     const destination = state.transaction.dest_amount;
@@ -213,15 +237,30 @@ export const calculateExchange = (state) => {
         return 1;
     }
 
-    return normalizeExch(destination / source);
+    return normalizeExch(Math.abs(destination / source));
 };
 
-const updateStateExchange = (state) => {
+export const calculateBackExchange = (state) => {
+    const source = state.transaction.src_amount;
+    const destination = state.transaction.dest_amount;
+
+    if (source === 0 || destination === 0) {
+        return 1;
+    }
+
+    return normalizeExch(Math.abs(source / destination));
+};
+
+export const updateStateExchange = (state) => {
     const result = state;
 
     const exchange = calculateExchange(state);
     result.form.fExchange = exchange;
     result.form.exchange = exchange;
+
+    const backExchange = calculateBackExchange(state);
+    result.form.fBackExchange = backExchange;
+    result.form.backExchange = backExchange;
 
     return result;
 };
@@ -1028,6 +1067,7 @@ const reduceDestResultChange = (state, value) => {
 
 const reduceExchangeChange = (state, value) => {
     const { transaction } = state;
+    const { useBackExchange } = state.form;
 
     if (transaction.type === DEBT) {
         return state;
@@ -1035,25 +1075,62 @@ const reduceExchangeChange = (state, value) => {
 
     const newState = {
         ...state,
-        form: {
-            ...state.form,
-            exchange: value,
-        },
+        form: { ...state.form },
     };
 
+    if (useBackExchange) {
+        newState.form.backExchange = value;
+    } else {
+        newState.form.exchange = value;
+    }
+
     const newValue = normalizeExch(value);
-    if (newState.form.fExchange === newValue) {
+    if (
+        (useBackExchange && newState.form.fBackExchange === newValue)
+        || (!useBackExchange && newState.form.fExchange === newValue)
+    ) {
         return newState;
     }
 
-    newState.form.fExchange = newValue;
+    if (useBackExchange) {
+        newState.form.fBackExchange = newValue;
+    } else {
+        newState.form.fExchange = newValue;
+    }
+
     if (isValidValue(newState.form.sourceAmount)) {
-        const destAmount = normalize(transaction.src_amount * newValue);
+        const destAmount = calculateDestAmountByExchange(newState);
         setStateDestAmount(newState, destAmount);
     } else if (isValidValue(newState.form.destAmount)) {
-        const srcAmount = normalize(transaction.dest_amount / newValue);
+        const srcAmount = calculateSourceAmountByExchange(newState);
         setStateSourceAmount(newState, srcAmount);
     }
+
+    if (useBackExchange) {
+        const exchange = calculateExchange(state);
+        newState.form.fExchange = exchange;
+        newState.form.exchange = exchange;
+    } else {
+        const backExchange = calculateBackExchange(state);
+        newState.form.fBackExchange = backExchange;
+        newState.form.backExchange = backExchange;
+    }
+
+    return newState;
+};
+
+const reduceToggleExchange = (state) => {
+    if (state.transaction.type === DEBT) {
+        return state;
+    }
+
+    const newState = {
+        ...state,
+        form: {
+            ...state.form,
+            useBackExchange: !state.form.useBackExchange,
+        },
+    };
 
     return newState;
 };
@@ -1487,6 +1564,7 @@ const reducerMap = {
     [SOURCE_RESULT_CHANGE]: reduceSourceResultChange,
     [DEST_RESULT_CHANGE]: reduceDestResultChange,
     [EXCHANGE_CHANGE]: reduceExchangeChange,
+    [TOGGLE_EXCHANGE]: reduceToggleExchange,
     [DATE_CHANGE]: reduceDateChange,
     [COMMENT_CHANGE]: reduceCommentChange,
     [INVALIDATE_SOURCE_AMOUNT]: reduceInvalidateSourceAmount,

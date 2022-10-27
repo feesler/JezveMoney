@@ -83,6 +83,17 @@ export const stateLoop = async () => {
     ];
     await TransactionTests.runGroup('inputExchRate', exInputData);
 
+    // Toggle direction of exchange rate and stay on State 3
+    await TransactionTests.runAction({ action: 'toggleExchange' });
+    // Input backexchange rate
+    const backExchInputData = [
+        '66.5',
+        '166.56',
+    ];
+    await TransactionTests.runGroup('inputExchRate', backExchInputData);
+    // Toggle direction of exchange rate and stay on State 3
+    await TransactionTests.runAction({ action: 'toggleExchange' });
+
     await TransactionTests.runActions([
         // Transition 16: click on destination amount block and move from State 3 to State 2
         { action: 'clickDestAmount' },
