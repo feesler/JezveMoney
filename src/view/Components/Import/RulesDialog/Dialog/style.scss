@@ -1,8 +1,11 @@
 /* Import rules dialog */
 .rules-popup {
+  background: none;
+
   .popup__wrapper {
     position: relative;
     align-items: flex-start;
+    background: var(--popup-dim-bg);
   }
 
   .popup__content-box {
