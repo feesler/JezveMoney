@@ -1,5 +1,7 @@
 import {
     createElement,
+    setEvents,
+    removeEvents,
     isFunction,
     removeChilds,
     Component,
@@ -16,6 +18,7 @@ const MSG_NO_TRANSACTIONS = 'No transactions found.';
 
 /** CSS classes */
 const LIST_ITEMS_CLASS = 'trans-list-items';
+const SELECT_MODE_CLASS = 'trans-list_select';
 const DETAILS_CLASS = 'trans-list_details';
 const NO_DATA_CLASS = 'nodata-message';
 /** Strings */
@@ -24,25 +27,20 @@ const ITEM_SELECTOR = `.${TRANS_ITEM_CLASS}`;
 const defaultProps = {
     items: [],
     mode: 'classic',
+    listMode: 'list',
     selectable: false,
     onSelect: null,
     sortable: false,
     onSort: null,
+    onContextMenu: null,
 };
 
 /**
  * Transaction list component
  */
 export class TransactionList extends Component {
-    static create(props) {
-        const instance = new TransactionList(props);
-        instance.init();
-
-        return instance;
-    }
-
-    constructor(...args) {
-        super(...args);
+    constructor(props) {
+        super(props);
 
         this.props = {
             ...defaultProps,
@@ -53,11 +51,15 @@ export class TransactionList extends Component {
             ...this.props,
             renderTime: Date.now(),
         };
+
+        this.selectEvents = { click: (e) => this.onItemClick(e) };
+
+        this.init();
     }
 
     init() {
-        if (this.props.selectable) {
-            this.elem.addEventListener('click', (e) => this.onItemClick(e));
+        if (this.state.selectable) {
+            this.setHandlers();
         }
 
         if (this.props.sortable) {
@@ -72,6 +74,14 @@ export class TransactionList extends Component {
         }
 
         this.render(this.state);
+    }
+
+    setHandlers() {
+        setEvents(this.elem, this.selectEvents);
+    }
+
+    removeHandlers() {
+        removeEvents(this.elem, this.selectEvents);
     }
 
     /** Returns array of list items */
@@ -90,6 +100,14 @@ export class TransactionList extends Component {
      */
     getTransaction(transactionId) {
         return this.state.items.find((item) => item && item.id === transactionId);
+    }
+
+    getListItemElementById(id) {
+        if (!this.getTransaction(id)) {
+            return null;
+        }
+
+        return this.elem.querySelector(`${ITEM_SELECTOR}[data-id="${id}"]`);
     }
 
     /**
@@ -254,28 +272,41 @@ export class TransactionList extends Component {
      * @param {Event} e - click event object
      */
     onItemClick(e) {
-        const listItemElem = this.findListItemElement(e.target);
-        if (!listItemElem || !listItemElem.dataset) {
-            return;
-        }
-
-        const transactionId = parseInt(listItemElem.dataset.id, 10);
-        const transaction = this.getTransaction(transactionId);
+        const listItemElem = this.findListItemElement(e?.target);
+        const itemId = parseInt(listItemElem?.dataset?.id, 10);
+        const transaction = this.getTransaction(itemId);
         if (!transaction) {
             return;
         }
 
-        this.state.items = this.state.items.map((item) => (
-            (item.id === transactionId)
-                ? { ...item, selected: !item.selected }
-                : item
-        ));
+        if (this.state.listMode === 'list') {
+            const menuBtn = e?.target?.closest('.actions-menu-btn');
+            if (menuBtn && isFunction(this.props.onContextMenu)) {
+                this.props.onContextMenu(itemId);
+            }
+        } else if (this.state.listMode === 'select') {
+            if (isFunction(this.props.onSelect)) {
+                this.props.onSelect(itemId);
+            }
+        }
+    }
 
-        if (isFunction(this.props.onSelect)) {
-            this.props.onSelect();
+    toggleSelectItem(itemId) {
+        const transaction = this.getTransaction(itemId);
+        if (!transaction) {
+            return;
         }
 
-        this.render(this.state);
+        const toggleItem = (item) => (
+            (item.id === itemId)
+                ? { ...item, selected: !item.selected }
+                : item
+        );
+
+        this.setState({
+            ...this.state,
+            items: this.state.items.map(toggleItem),
+        });
     }
 
     /**
@@ -302,15 +333,24 @@ export class TransactionList extends Component {
         }
     }
 
+    setListMode(listMode) {
+        if (this.state.listMode === listMode) {
+            return;
+        }
+
+        this.setState({ ...this.state, listMode });
+    }
+
     setMode(mode) {
         if (this.state.mode === mode) {
             return;
         }
 
-        this.state.mode = mode;
-        this.state.renderTime = Date.now();
-
-        this.render(this.state);
+        this.setState({
+            ...this.state,
+            mode,
+            renderTime: Date.now(),
+        });
     }
 
     setItems(items) {
@@ -318,10 +358,11 @@ export class TransactionList extends Component {
             return;
         }
 
-        this.state.items = items;
-        this.state.renderTime = Date.now();
-
-        this.render(this.state);
+        this.setState({
+            ...this.state,
+            items,
+            renderTime: Date.now(),
+        });
     }
 
     render(state) {
@@ -329,10 +370,13 @@ export class TransactionList extends Component {
             throw new Error('Invalid state object');
         }
 
+        this.elem.classList.toggle(SELECT_MODE_CLASS, state.listMode === 'select');
+
         const elems = state.items.map((item) => {
             const tritem = TransactionListItem.create({
                 mode: state.mode,
                 selected: item.selected,
+                showControls: state.listMode === 'list',
                 item,
             });
             tritem.render(tritem.state);

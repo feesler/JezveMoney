@@ -134,12 +134,12 @@ export const delFromUpdate = async (pos) => {
     await test(`Delete person from update view [${ind}]`, async () => {
         // Navigate to persons list view
         await checkNavigation();
-        // Prepare expected state
-        const ids = App.state.getPersonsByIndexes(ind, true);
-        App.state.deletePersons(ids);
         // Perform actions on view
         await App.view.goToUpdatePerson(ind);
         await App.view.deleteSelfItem();
+        // Prepare expected state
+        const ids = App.state.getPersonsByIndexes(ind, true);
+        App.state.deletePersons(ids);
         // Check state of persons list view
         App.view.expectedState = PersonListView.render(App.state);
         await App.view.checkState();

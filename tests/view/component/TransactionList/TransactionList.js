@@ -31,6 +31,10 @@ export class TransactionList extends TestComponent {
         return res;
     }
 
+    get items() {
+        return this.content.items;
+    }
+
     getItemData(item) {
         assert(item, 'Invalid item');
 

@@ -32,9 +32,23 @@ export class IconButton extends TestComponent {
         res.subTitleElem = await query(res.titleElem, '.iconbutton__subtitle');
         if (res.subTitleElem) {
             res.subtitle = await prop(res.subTitleElem, 'textContent');
+        } else {
+            res.subtitle = null;
         }
 
         return res;
+    }
+
+    get link() {
+        return this.content.link;
+    }
+
+    get title() {
+        return this.content.title;
+    }
+
+    get subtitle() {
+        return this.content.subtitle;
     }
 
     async click() {

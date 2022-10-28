@@ -100,11 +100,21 @@ export class TransactionListItem extends TestComponent {
         const commentElem = await query(this.elem, '.trans-item__comment');
         res.comment = (commentElem) ? await prop(commentElem, 'textContent') : '';
 
+        res.menuBtn = await query(this.elem, '.actions-menu-btn');
+
         return res;
+    }
+
+    get id() {
+        return this.content.id;
     }
 
     async click() {
         return click(this.elem);
+    }
+
+    async clickMenu() {
+        return click(this.content.menuBtn);
     }
 
     static render(transaction, state) {

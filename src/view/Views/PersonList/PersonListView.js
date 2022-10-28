@@ -1,5 +1,6 @@
 import 'jezvejs/style';
 import {
+    asArray,
     ge,
     createElement,
     setEvents,
@@ -12,12 +13,11 @@ import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 import { PersonList } from '../../js/model/PersonList.js';
-import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import '../../Components/Tile/style.scss';
-import '../../Components/IconButton/style.scss';
 import { Tile } from '../../Components/Tile/Tile.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
+import { PopupMenu } from '../../Components/PopupMenu/PopupMenu.js';
+import './style.scss';
 
 /** CSS classes */
 const NO_DATA_CLASS = 'nodata-message';
@@ -44,6 +44,8 @@ class PersonListView extends View {
                 hidden: PersonList.create(window.app.model.hiddenPersons),
             },
             loading: false,
+            mode: 'list',
+            contextItem: null,
             renderTime: Date.now(),
         };
     }
@@ -66,28 +68,86 @@ class PersonListView extends View {
         setEvents(this.tilesContainer, tileEvents);
         setEvents(this.hiddenTilesContainer, tileEvents);
 
+        this.createBtn = ge('add_btn');
+        this.createMenu();
+        insertAfter(this.menu.elem, this.createBtn);
+
+        this.createContextMenu();
+
         this.loadingIndicator = LoadingIndicator.create();
         insertAfter(this.loadingIndicator.elem, this.hiddenTilesContainer);
 
-        this.toolbar = Toolbar.create({
-            elem: 'toolbar',
-            onshow: () => this.showSelected(),
-            onhide: () => this.showSelected(false),
-            ondelete: () => this.confirmDelete(),
+        this.render(this.state);
+    }
+
+    createMenu() {
+        this.menu = PopupMenu.create({ id: 'listMenu' });
+
+        this.selectModeBtn = this.menu.addIconItem({
+            id: 'selectModeBtn',
+            icon: 'select',
+            title: 'Select',
+            onClick: () => this.toggleSelectMode(),
+        });
+        this.menu.addSeparator();
+
+        this.showBtn = this.menu.addIconItem({
+            id: 'showBtn',
+            icon: 'show',
+            title: 'Restore',
+            onClick: () => this.showItems(),
+        });
+        this.hideBtn = this.menu.addIconItem({
+            id: 'hideBtn',
+            icon: 'hide',
+            title: 'Hide',
+            onClick: () => this.showItems(false),
+        });
+        this.deleteBtn = this.menu.addIconItem({
+            id: 'deleteBtn',
+            icon: 'del',
+            title: 'Delete',
+            onClick: () => this.confirmDelete(),
+        });
+    }
+
+    createContextMenu() {
+        this.contextMenu = PopupMenu.create({
+            id: 'contextMenu',
+            attachTo: this.tilesContainer,
         });
 
-        this.render(this.state);
+        this.ctxUpdateBtn = this.contextMenu.addIconItem({
+            id: 'ctxUpdateBtn',
+            type: 'link',
+            icon: 'update',
+            title: 'Edit',
+        });
+        this.ctxShowBtn = this.contextMenu.addIconItem({
+            id: 'ctxShowBtn',
+            icon: 'show',
+            title: 'Restore',
+            onClick: () => this.showItems(),
+        });
+        this.ctxHideBtn = this.contextMenu.addIconItem({
+            id: 'ctxHideBtn',
+            icon: 'hide',
+            title: 'Hide',
+            onClick: () => this.showItems(false),
+        });
+        this.ctxDeleteBtn = this.contextMenu.addIconItem({
+            id: 'ctxDeleteBtn',
+            icon: 'del',
+            title: 'Delete',
+            onClick: () => this.confirmDelete(),
+        });
     }
 
     /**
      * Tile click event handler
      */
     onTileClick(e) {
-        if (!e || !e.target) {
-            return;
-        }
-
-        const tile = e.target.closest('.tile');
+        const tile = e?.target?.closest('.tile');
         if (!tile || !tile.dataset) {
             return;
         }
@@ -98,20 +158,75 @@ class PersonListView extends View {
             return;
         }
 
+        if (this.state.mode === 'list') {
+            this.showContextMenu(personId);
+        } else if (this.state.mode === 'select') {
+            this.toggleSelectItem(personId);
+            this.setRenderTime();
+        }
+    }
+
+    showContextMenu(itemId) {
+        if (this.state.contextItem === itemId) {
+            return;
+        }
+
+        this.setState({ ...this.state, contextItem: itemId });
+    }
+
+    toggleSelectItem(itemId) {
+        const person = window.app.model.persons.getItem(itemId);
+        if (!person) {
+            return;
+        }
+
         const toggleItem = (item) => (
-            (item.id === personId)
+            (item.id === itemId)
                 ? { ...item, selected: !item.selected }
                 : item
         );
 
-        if (person.isVisible()) {
-            this.state.items.visible = this.state.items.visible.map(toggleItem);
-        } else {
-            this.state.items.hidden = this.state.items.hidden.map(toggleItem);
+        const { visible, hidden } = this.state.items;
+        this.setState({
+            ...this.state,
+            items: {
+                visible: (person.isVisible()) ? visible.map(toggleItem) : visible,
+                hidden: (!person.isVisible()) ? hidden.map(toggleItem) : hidden,
+            },
+        });
+    }
+
+    reduceDeselectAll(state) {
+        const deselectItem = (item) => (
+            (item.selected)
+                ? { ...item, selected: false }
+                : item
+        );
+
+        return {
+            ...state,
+            items: {
+                visible: state.items.visible.map(deselectItem),
+                hidden: state.items.hidden.map(deselectItem),
+            },
+        };
+    }
+
+    deselectAll() {
+        this.setState(this.reduceDeselectAll());
+    }
+
+    toggleSelectMode() {
+        let newState = {
+            ...this.state,
+            mode: (this.state.mode === 'list') ? 'select' : 'list',
+            contextItem: null,
+        };
+        if (newState.mode === 'list') {
+            newState = this.reduceDeselectAll(newState);
         }
 
-        this.render(this.state);
-        this.setRenderTime();
+        this.setState(newState);
     }
 
     startLoading() {
@@ -148,12 +263,21 @@ class PersonListView extends View {
         return selArr.concat(hiddenSelArr).map((item) => item.id);
     }
 
-    async showSelected(value = true) {
+    getContextIds(state = this.state) {
+        if (state.mode === 'list') {
+            return asArray(state.contextItem);
+        }
+
+        return this.getSelectedIds(state);
+    }
+
+    async showItems(value = true) {
         if (this.state.loading) {
             return;
         }
-        const selectedIds = this.getSelectedIds();
-        if (selectedIds.length === 0) {
+
+        const ids = this.getContextIds();
+        if (ids.length === 0) {
             return;
         }
 
@@ -161,9 +285,9 @@ class PersonListView extends View {
 
         try {
             if (value) {
-                await API.person.show({ id: selectedIds });
+                await API.person.show({ id: ids });
             } else {
-                await API.person.hide({ id: selectedIds });
+                await API.person.hide({ id: ids });
             }
             this.requestList();
         } catch (e) {
@@ -172,19 +296,20 @@ class PersonListView extends View {
         }
     }
 
-    async deleteSelected() {
+    async deleteItems() {
         if (this.state.loading) {
             return;
         }
-        const selectedIds = this.getSelectedIds();
-        if (selectedIds.length === 0) {
+
+        const ids = this.getContextIds();
+        if (ids.length === 0) {
             return;
         }
 
         this.startLoading();
 
         try {
-            await API.person.del({ id: selectedIds });
+            await API.person.del({ id: ids });
             this.requestList();
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
@@ -205,6 +330,8 @@ class PersonListView extends View {
                     visible: PersonList.create(window.app.model.visiblePersons),
                     hidden: PersonList.create(window.app.model.hiddenPersons),
                 },
+                mode: 'list',
+                contextItem: null,
             });
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
@@ -216,17 +343,17 @@ class PersonListView extends View {
 
     /** Show person(s) delete confirmation popup */
     confirmDelete() {
-        const selectedIds = this.getSelectedIds();
-        if (selectedIds.length === 0) {
+        const ids = this.getContextIds();
+        if (ids.length === 0) {
             return;
         }
 
-        const multiple = (selectedIds.length > 1);
+        const multiple = (ids.length > 1);
         ConfirmDialog.create({
             id: 'delete_warning',
             title: (multiple) ? TITLE_MULTI_PERSON_DELETE : TITLE_SINGLE_PERSON_DELETE,
             content: (multiple) ? MSG_MULTI_PERSON_DELETE : MSG_SINGLE_PERSON_DELETE,
-            onconfirm: () => this.deleteSelected(),
+            onconfirm: () => this.deleteItems(),
         });
     }
 
@@ -237,6 +364,54 @@ class PersonListView extends View {
             title: person.name,
             selected: person.selected,
         }));
+    }
+
+    renderContextMenu(state) {
+        if (state.mode !== 'list') {
+            this.contextMenu.detach();
+            return;
+        }
+
+        const { contextItem } = state;
+        if (!contextItem) {
+            return;
+        }
+        const person = window.app.model.persons.getItem(contextItem);
+        if (!person) {
+            return;
+        }
+
+        const tile = document.querySelector(`.tile[data-id="${person.id}"]`);
+        if (!tile) {
+            return;
+        }
+
+        if (this.contextMenu.menuList.parentNode !== tile) {
+            PopupMenu.hideActive();
+            this.contextMenu.attachTo(tile);
+            this.contextMenu.toggleMenu();
+        }
+
+        const { baseURL } = window.app;
+        this.ctxUpdateBtn.setURL(`${baseURL}persons/update/${person.id}`);
+        this.ctxShowBtn.show(!person.isVisible());
+        this.ctxHideBtn.show(person.isVisible());
+    }
+
+    renderMenu(state) {
+        const selArr = this.getVisibleSelectedItems(state);
+        const hiddenSelArr = this.getHiddenSelectedItems(state);
+        const selCount = selArr.length;
+        const hiddenSelCount = hiddenSelArr.length;
+        const totalSelCount = selCount + hiddenSelCount;
+
+        const selectModeTitle = (state.mode === 'list') ? 'Select' : 'Cancel';
+        this.selectModeBtn.setIcon((state.mode === 'list') ? 'select' : null);
+        this.selectModeBtn.setTitle(selectModeTitle);
+
+        this.showBtn.show(hiddenSelCount > 0);
+        this.hideBtn.show(selCount > 0);
+        this.deleteBtn.show(totalSelCount > 0);
     }
 
     render(state) {
@@ -269,25 +444,11 @@ class PersonListView extends View {
         }
         show(this.hiddenTilesHeading, hiddenItemsAvailable);
 
-        const selArr = this.getVisibleSelectedItems(state);
-        const hiddenSelArr = this.getHiddenSelectedItems(state);
-        const selCount = selArr.length;
-        const hiddenSelCount = hiddenSelArr.length;
-        const totalSelCount = selCount + hiddenSelCount;
-        this.toolbar.updateBtn.show(totalSelCount === 1);
-        this.toolbar.showBtn.show(hiddenSelCount > 0);
-        this.toolbar.hideBtn.show(selCount > 0);
-        this.toolbar.deleteBtn.show(totalSelCount > 0);
-
-        const selectedIds = this.getSelectedIds();
-        if (selectedIds.length === 1) {
-            const { baseURL } = window.app;
-            this.toolbar.updateBtn.setURL(`${baseURL}persons/update/${selectedIds[0]}`);
-        }
-
-        this.toolbar.show(totalSelCount > 0);
+        this.renderContextMenu(state);
+        this.renderMenu(state);
 
         this.tilesContainer.dataset.time = state.renderTime;
+
         if (!state.loading) {
             this.loadingIndicator.hide();
         }

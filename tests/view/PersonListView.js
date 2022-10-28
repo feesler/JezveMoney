@@ -1,7 +1,10 @@
 import {
+    asArray,
     assert,
+    asyncMap,
     query,
     prop,
+    parentNode,
     navigation,
     waitForFunction,
     click,
@@ -10,7 +13,15 @@ import { AppView } from './AppView.js';
 import { TilesList } from './component/TilesList.js';
 import { IconButton } from './component/IconButton.js';
 import { WarningPopup } from './component/WarningPopup.js';
-import { Toolbar } from './component/Toolbar.js';
+import { App } from '../Application.js';
+
+const listMenuItems = [
+    'selectModeBtn', 'showBtn', 'hideBtn', 'deleteBtn',
+];
+
+const contextMenuItems = [
+    'ctxUpdateBtn', 'ctxShowBtn', 'ctxHideBtn', 'ctxDeleteBtn',
+];
 
 /** List of persons view class */
 export class PersonListView extends AppView {
@@ -18,19 +29,33 @@ export class PersonListView extends AppView {
         const res = {
             titleEl: await query('.content_wrap > .heading > h1'),
             addBtn: await IconButton.create(this, await query('#add_btn')),
-            toolbar: await Toolbar.create(this, await query('#toolbar')),
+            listMenuContainer: {
+                elem: await query('#listMenu'),
+                menuBtn: await query('#listMenu .actions-menu-btn'),
+            },
+            listMenu: { elem: await query('#listMenu .actions-menu-list') },
+            contextMenu: { elem: await query('#contextMenu') },
         };
+
+        await this.parseMenuItems(res, listMenuItems);
 
         assert(
             res.titleEl
             && res.addBtn
-            && res.toolbar
-            && res.toolbar.content.editBtn
-            && res.toolbar.content.showBtn
-            && res.toolbar.content.hideBtn
-            && res.toolbar.content.delBtn,
+            && res.listMenuContainer.elem
+            && res.listMenuContainer.menuBtn
+            && res.listMenu.elem,
             'Invalid structure of persons view',
         );
+
+        if (res.contextMenu.elem) {
+            const contextParent = await parentNode(res.contextMenu.elem);
+            const itemId = await prop(contextParent, 'dataset.id');
+            res.contextMenu.tileId = parseInt(itemId, 10);
+            assert(res.contextMenu.tileId, 'Invalid person');
+
+            await this.parseMenuItems(res, contextMenuItems);
+        }
 
         res.title = prop(res.titleEl, 'textContent');
         res.tiles = await TilesList.create(this, await query('#tilesContainer'));
@@ -43,12 +68,45 @@ export class PersonListView extends AppView {
         return res;
     }
 
+    async parseMenuItems(cont, ids) {
+        const itemIds = asArray(ids);
+        if (!itemIds.length) {
+            return cont;
+        }
+
+        const res = cont;
+        await asyncMap(itemIds, async (id) => {
+            res[id] = await IconButton.create(this, await query(`#${id}`));
+            assert(res[id], `Menu item '${id}' not found`);
+            return res[id];
+        });
+
+        return res;
+    }
+
+    getViewMode(cont) {
+        if (!cont.listMenuContainer.visible) {
+            return 'nodata';
+        }
+
+        if (cont.selectModeBtn.title === 'Cancel') {
+            return 'select';
+        }
+
+        return 'list';
+    }
+
     async buildModel(cont) {
+        const contextMenuVisible = cont.contextMenu.visible;
         const res = {
             tiles: cont.tiles.getItems(),
             hiddenTiles: cont.hiddenTiles.getItems(),
             loading: cont.loadingIndicator.visible,
             renderTime: cont.renderTime,
+            contextItem: cont.contextMenu.tileId,
+            mode: this.getViewMode(cont),
+            listMenuVisible: cont.listMenu.visible,
+            contextMenuVisible,
         };
 
         return res;
@@ -59,16 +117,32 @@ export class PersonListView extends AppView {
         const hiddenSelected = this.getHiddenSelectedItems(model);
         const totalSelected = visibleSelected.length + hiddenSelected.length;
 
+        const showSelectItems = model.listMenuVisible && model.mode === 'select';
+
         const res = {
             loadingIndicator: { visible: model.loading },
-            toolbar: {
-                editBtn: { visible: (totalSelected === 1) },
-                delBtn: { visible: (totalSelected > 0) },
-                showBtn: { visible: (hiddenSelected.length > 0) },
-                hideBtn: { visible: (visibleSelected.length > 0) },
-                visible: totalSelected > 0,
-            },
+            listMenu: { visible: model.listMenuVisible },
+            selectModeBtn: { visible: model.listMenuVisible },
+            showBtn: { visible: showSelectItems && (hiddenSelected.length > 0) },
+            hideBtn: { visible: showSelectItems && (visibleSelected.length > 0) },
+            deleteBtn: { visible: showSelectItems && (totalSelected > 0) },
         };
+
+        if (model.contextMenuVisible) {
+            const ctxPerson = App.state.persons.getItem(model.contextItem);
+            assert(ctxPerson, 'Invalid state');
+
+            const isHidden = App.state.persons.isHidden(ctxPerson);
+            res.contextMenu = {
+                visible: true,
+                tileId: model.contextItem,
+            };
+
+            res.ctxUpdateBtn = { visible: true };
+            res.ctxShowBtn = { visible: isHidden };
+            res.ctxHideBtn = { visible: !isHidden };
+            res.ctxDeleteBtn = { visible: true };
+        }
 
         return res;
     }
@@ -93,6 +167,13 @@ export class PersonListView extends AppView {
         await navigation(() => this.content.addBtn.click());
     }
 
+    /** Select specified person, click on edit button */
+    async goToUpdatePerson(num) {
+        await this.openContextMenu(num);
+
+        await navigation(() => this.content.ctxUpdateBtn.click());
+    }
+
     async waitForList(action) {
         await this.parse();
 
@@ -110,8 +191,75 @@ export class PersonListView extends AppView {
         await this.parse();
     }
 
+    async openContextMenu(num) {
+        await this.cancelSelectMode();
+
+        const visibleTiles = this.model.tiles.length;
+        const hiddenTiles = this.model.hiddenTiles.length;
+        const totalTiles = visibleTiles + hiddenTiles;
+
+        assert(num >= 0 && num < totalTiles, 'Invalid person number');
+
+        const item = (num < visibleTiles)
+            ? this.model.tiles[num]
+            : this.model.hiddenTiles[num - visibleTiles];
+
+        this.model.contextMenuVisible = true;
+        this.model.contextItem = item.id;
+        const expected = this.getExpectedState();
+
+        const tile = (num < visibleTiles)
+            ? this.content.tiles.content.items[num]
+            : this.content.hiddenTiles.content.items[num - visibleTiles];
+
+        await this.performAction(() => tile.click());
+
+        return this.checkState(expected);
+    }
+
+    async openListMenu() {
+        assert(!this.content.listMenu.visible, 'List menu already opened');
+
+        this.model.listMenuVisible = true;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => click(this.content.listMenuContainer.menuBtn));
+
+        return this.checkState(expected);
+    }
+
+    async toggleSelectMode() {
+        await this.openListMenu();
+
+        this.model.listMenuVisible = false;
+        this.model.mode = (this.model.mode === 'select') ? 'list' : 'select';
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.selectModeBtn.click());
+
+        return this.checkState(expected);
+    }
+
+    async setSelectMode() {
+        if (this.model.mode === 'select') {
+            return true;
+        }
+
+        return this.toggleSelectMode();
+    }
+
+    async cancelSelectMode() {
+        if (this.model.mode === 'list') {
+            return true;
+        }
+
+        return this.toggleSelectMode();
+    }
+
     async selectPersons(data) {
-        assert(typeof data !== 'undefined', 'No persons specified');
+        assert.isDefined(data, 'No persons specified');
+
+        await this.setSelectMode();
 
         const persons = Array.isArray(data) ? data : [data];
 
@@ -139,17 +287,16 @@ export class PersonListView extends AppView {
         }
     }
 
-    /** Select specified person, click on edit button */
-    async goToUpdatePerson(num) {
-        await this.selectPersons(num);
-
-        await navigation(() => this.content.toolbar.clickButton('update'));
-    }
-
     async deletePersons(persons) {
         await this.selectPersons(persons);
 
-        await this.performAction(() => this.content.toolbar.clickButton('del'));
+        await this.openListMenu();
+
+        this.model.listMenuVisible = false;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.deleteBtn.click());
+        this.checkState(expected);
 
         assert(this.content.delete_warning?.content?.visible, 'Delete person(s) warning popup not appear');
 
@@ -160,7 +307,13 @@ export class PersonListView extends AppView {
     async showPersons(persons, val = true) {
         await this.selectPersons(persons);
 
-        await this.waitForList(() => this.content.toolbar.clickButton(val ? 'show' : 'hide'));
+        await this.openListMenu();
+
+        if (val) {
+            await this.waitForList(() => this.content.showBtn.click());
+        } else {
+            await this.waitForList(() => this.content.hideBtn.click());
+        }
     }
 
     /** Hide secified accounts */

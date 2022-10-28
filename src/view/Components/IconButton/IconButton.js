@@ -24,6 +24,7 @@ const defaultProps = {
     subtitle: null,
     icon: null,
     onClick: null,
+    id: null,
 };
 
 /**
@@ -62,11 +63,6 @@ export class IconButton extends Component {
             props: { className: ICON_CONTAINER_CLASS },
         });
 
-        if (this.props.icon) {
-            this.icon = window.app.createIcon(this.props.icon, ICON_CLASS);
-            this.iconElem.append(this.icon);
-        }
-
         this.contentElem = createElement('div', {
             props: { className: CONTENT_CLASS },
         });
@@ -84,8 +80,7 @@ export class IconButton extends Component {
             });
         }
 
-        this.setClassNames();
-        this.setHandlers();
+        this.postInit();
         this.render(this.state);
     }
 
@@ -123,6 +118,14 @@ export class IconButton extends Component {
         const disabledAttr = this.elem.getAttribute('disabled');
         this.state.enabled = disabledAttr == null;
 
+        this.postInit();
+    }
+
+    postInit() {
+        if (this.props.id) {
+            this.elem.id = this.props.id;
+        }
+
         this.setClassNames();
         this.setHandlers();
     }
@@ -141,8 +144,20 @@ export class IconButton extends Component {
             return;
         }
 
-        this.state.enabled = !!value;
-        this.render(this.state);
+        this.setState({ ...this.state, enabled: !!value });
+    }
+
+    /** Set icon */
+    setIcon(icon) {
+        if (icon && typeof icon !== 'string') {
+            throw new Error('Invalid icon specified');
+        }
+
+        if (this.state.icon === icon) {
+            return;
+        }
+
+        this.setState({ ...this.state, icon });
     }
 
     /** Set title text */
@@ -155,8 +170,7 @@ export class IconButton extends Component {
             return;
         }
 
-        this.state.title = title;
-        this.render(this.state);
+        this.setState({ ...this.state, title });
     }
 
     /** Set subtitle text */
@@ -169,8 +183,7 @@ export class IconButton extends Component {
             return;
         }
 
-        this.state.subtitle = subtitle;
-        this.render(this.state);
+        this.setState({ ...this.state, subtitle });
     }
 
     /** Set URL for link element */
@@ -183,15 +196,28 @@ export class IconButton extends Component {
             return;
         }
 
-        this.state.url = url;
-        this.render(this.state);
+        this.setState({ ...this.state, url });
+    }
+
+    renderIcon(state) {
+        removeChilds(this.iconElem);
+        if (!state.icon) {
+            return;
+        }
+
+        this.icon = window.app.createIcon(state.icon, ICON_CLASS);
+        this.iconElem.append(this.icon);
     }
 
     /** Render component */
-    render(state) {
+    render(state, prevState = {}) {
         removeChilds(this.contentElem);
 
         enable(this.elem, state.enabled);
+
+        if (state.icon !== prevState.icon) {
+            this.renderIcon(state);
+        }
 
         if (this.elem.tagName === 'A') {
             this.elem.href = state.url;

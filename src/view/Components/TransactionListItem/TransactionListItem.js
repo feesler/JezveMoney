@@ -10,6 +10,7 @@ import './style.scss';
 
 /** CSS classes */
 export const TRANS_ITEM_CLASS = 'trans-item';
+const CONTENT_CLASS = 'trans-item__content';
 const TITLE_CLASS = 'trans-item__title';
 const AMOUNT_CLASS = 'trans-item__amount';
 const DATE_CLASS = 'trans-item__date';
@@ -28,6 +29,11 @@ const AMOUNT_FIELD_CLASS = 'trans-item__amount-field';
 const RESULT_FIELD_CLASS = 'trans-item__result-field';
 const DATE_FIELD_CLASS = 'trans-item__date-field';
 const COMMENT_FIELD_CLASS = 'trans-item__comment-field';
+/* Controls */
+const CONTROLS_CLASS = 'trans-item__controls';
+const MENU_CLASS = 'actions-menu';
+const MENU_BUTTON_CLASS = 'btn icon-btn actions-menu-btn';
+const MENU_ICON_CLASS = 'icon actions-menu-btn__icon';
 /* Other */
 const SELECTED_CLASS = 'trans-item_selected';
 
@@ -43,6 +49,11 @@ const LABEL_DEST_RESULT = 'Destination result';
 const LABEL_DATE = 'Date';
 const LABEL_COMMENT = 'Comment';
 
+const defaultProps = {
+    selected: false,
+    showControls: false,
+};
+
 /**
  * Transaction list item component
  */
@@ -54,8 +65,13 @@ export class TransactionListItem extends Component {
         return instance;
     }
 
-    constructor(...args) {
-        super(...args);
+    constructor(props) {
+        super(props);
+
+        this.props = {
+            ...defaultProps,
+            ...this.props,
+        };
 
         this.state = { ...this.props };
     }
@@ -78,13 +94,24 @@ export class TransactionListItem extends Component {
             children: [this.dateElem, this.commentElem],
         });
 
-        this.elem = createElement('div', {
-            props: { className: TRANS_ITEM_CLASS },
+        this.contentElem = createElement('div', {
+            props: { className: CONTENT_CLASS },
             children: [
                 this.titleElem,
                 this.amountElem,
                 this.dateCommentElem,
             ],
+        });
+
+        const children = [this.contentElem];
+        if (this.props.showControls) {
+            this.createControls();
+            children.push(this.controlsElem);
+        }
+
+        this.elem = createElement('div', {
+            props: { className: TRANS_ITEM_CLASS },
+            children,
         });
     }
 
@@ -152,13 +179,41 @@ export class TransactionListItem extends Component {
             children: [this.dateField.elem, this.commentField.elem],
         });
 
-        this.elem = createElement('div', {
-            props: { className: `${TRANS_ITEM_CLASS} ${DETAILS_CLASS}` },
+        this.contentElem = createElement('div', {
+            props: { className: CONTENT_CLASS },
             children: [
                 this.sourceDestGroup,
                 this.amountResultGroup,
                 this.dateCommentGroup,
             ],
+        });
+
+        const children = [this.contentElem];
+        if (this.props.showControls) {
+            this.createControls();
+            children.push(this.controlsElem);
+        }
+
+        this.elem = createElement('div', {
+            props: { className: [TRANS_ITEM_CLASS, DETAILS_CLASS].join(' ') },
+            children,
+        });
+    }
+
+    createControls() {
+        const { createContainer, createIcon } = window.app;
+
+        this.menuBtn = createElement('button', {
+            props: { className: MENU_BUTTON_CLASS, type: 'button' },
+            children: createIcon('ellipsis', MENU_ICON_CLASS),
+        });
+        this.menuContainer = createContainer(MENU_CLASS, [
+            this.menuBtn,
+        ]);
+
+        this.controlsElem = createElement('div', {
+            props: { className: CONTROLS_CLASS },
+            children: this.menuContainer,
         });
     }
 

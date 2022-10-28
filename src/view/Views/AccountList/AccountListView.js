@@ -1,5 +1,6 @@
 import 'jezvejs/style';
 import {
+    asArray,
     ge,
     createElement,
     setEvents,
@@ -16,11 +17,10 @@ import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { IconList } from '../../js/model/IconList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { Toolbar } from '../../Components/Toolbar/Toolbar.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import '../../Components/Tile/style.scss';
-import '../../Components/IconButton/style.scss';
+import { PopupMenu } from '../../Components/PopupMenu/PopupMenu.js';
+import './style.scss';
 
 /** CSS classes */
 const NO_DATA_CLASS = 'nodata-message';
@@ -49,6 +49,8 @@ class AccountListView extends View {
                 hidden: AccountList.create(window.app.model.hiddenUserAccounts),
             },
             loading: false,
+            mode: 'list',
+            contextItem: null,
             renderTime: Date.now(),
         };
     }
@@ -71,52 +73,173 @@ class AccountListView extends View {
         setEvents(this.tilesContainer, tileEvents);
         setEvents(this.hiddenTilesContainer, tileEvents);
 
+        this.createBtn = ge('add_btn');
+        this.createMenu();
+        insertAfter(this.menu.elem, this.createBtn);
+
+        this.createContextMenu();
+
         this.loadingIndicator = LoadingIndicator.create();
         insertAfter(this.loadingIndicator.elem, this.hiddenTilesContainer);
 
-        this.toolbar = Toolbar.create({
-            elem: 'toolbar',
-            onshow: () => this.showSelected(),
-            onhide: () => this.showSelected(false),
-            ondelete: () => this.confirmDelete(),
+        this.render(this.state);
+    }
+
+    createMenu() {
+        this.menu = PopupMenu.create({ id: 'listMenu' });
+
+        this.selectModeBtn = this.menu.addIconItem({
+            id: 'selectModeBtn',
+            icon: 'select',
+            title: 'Select',
+            onClick: () => this.toggleSelectMode(),
+        });
+        this.menu.addSeparator();
+
+        this.exportBtn = this.menu.addIconItem({
+            id: 'exportBtn',
+            type: 'link',
+            icon: 'export',
+            title: 'Export to CSV',
+        });
+        this.showBtn = this.menu.addIconItem({
+            id: 'showBtn',
+            icon: 'show',
+            title: 'Restore',
+            onClick: () => this.showItems(),
+        });
+        this.hideBtn = this.menu.addIconItem({
+            id: 'hideBtn',
+            icon: 'hide',
+            title: 'Hide',
+            onClick: () => this.showItems(false),
+        });
+        this.deleteBtn = this.menu.addIconItem({
+            id: 'deleteBtn',
+            icon: 'del',
+            title: 'Delete',
+            onClick: () => this.confirmDelete(),
+        });
+    }
+
+    createContextMenu() {
+        this.contextMenu = PopupMenu.create({
+            id: 'contextMenu',
+            attachTo: this.tilesContainer,
         });
 
-        this.render(this.state);
+        this.ctxUpdateBtn = this.contextMenu.addIconItem({
+            id: 'ctxUpdateBtn',
+            type: 'link',
+            icon: 'update',
+            title: 'Edit',
+        });
+        this.ctxExportBtn = this.contextMenu.addIconItem({
+            id: 'ctxExportBtn',
+            type: 'link',
+            icon: 'export',
+            title: 'Export to CSV',
+        });
+        this.ctxShowBtn = this.contextMenu.addIconItem({
+            id: 'ctxShowBtn',
+            icon: 'show',
+            title: 'Restore',
+            onClick: () => this.showItems(),
+        });
+        this.ctxHideBtn = this.contextMenu.addIconItem({
+            id: 'ctxHideBtn',
+            icon: 'hide',
+            title: 'Hide',
+            onClick: () => this.showItems(false),
+        });
+        this.ctxDeleteBtn = this.contextMenu.addIconItem({
+            id: 'ctxDeleteBtn',
+            icon: 'del',
+            title: 'Delete',
+            onClick: () => this.confirmDelete(),
+        });
     }
 
     /**
      * Tile click event handler
      */
     onTileClick(e) {
-        if (!e || !e.target) {
+        const tile = e?.target?.closest('.tile');
+        const itemId = parseInt(tile?.dataset?.id, 10);
+        const account = window.app.model.userAccounts.getItem(itemId);
+        if (!account) {
             return;
         }
 
-        const tile = e.target.closest('.tile');
-        if (!tile || !tile.dataset) {
+        if (this.state.mode === 'list') {
+            this.showContextMenu(itemId);
+        } else if (this.state.mode === 'select') {
+            this.toggleSelectItem(itemId);
+            this.setRenderTime();
+        }
+    }
+
+    showContextMenu(itemId) {
+        if (this.state.contextItem === itemId) {
             return;
         }
 
-        const accountId = parseInt(tile.dataset.id, 10);
-        const account = window.app.model.accounts.getItem(accountId);
+        this.setState({ ...this.state, contextItem: itemId });
+    }
+
+    toggleSelectItem(itemId) {
+        const account = window.app.model.userAccounts.getItem(itemId);
         if (!account) {
             return;
         }
 
         const toggleItem = (item) => (
-            (item.id === accountId)
+            (item.id === itemId)
                 ? { ...item, selected: !item.selected }
                 : item
         );
 
-        if (account.isVisible()) {
-            this.state.items.visible = this.state.items.visible.map(toggleItem);
-        } else {
-            this.state.items.hidden = this.state.items.hidden.map(toggleItem);
+        const { visible, hidden } = this.state.items;
+        this.setState({
+            ...this.state,
+            items: {
+                visible: (account.isVisible()) ? visible.map(toggleItem) : visible,
+                hidden: (!account.isVisible()) ? hidden.map(toggleItem) : hidden,
+            },
+        });
+    }
+
+    reduceDeselectAll(state) {
+        const deselectItem = (item) => (
+            (item.selected)
+                ? { ...item, selected: false }
+                : item
+        );
+
+        return {
+            ...state,
+            items: {
+                visible: state.items.visible.map(deselectItem),
+                hidden: state.items.hidden.map(deselectItem),
+            },
+        };
+    }
+
+    deselectAll() {
+        this.setState(this.reduceDeselectAll());
+    }
+
+    toggleSelectMode() {
+        let newState = {
+            ...this.state,
+            mode: (this.state.mode === 'list') ? 'select' : 'list',
+            contextItem: null,
+        };
+        if (newState.mode === 'list') {
+            newState = this.reduceDeselectAll(newState);
         }
 
-        this.render(this.state);
-        this.setRenderTime();
+        this.setState(newState);
     }
 
     startLoading() {
@@ -153,12 +276,21 @@ class AccountListView extends View {
         return selArr.concat(hiddenSelArr).map((item) => item.id);
     }
 
-    async showSelected(value = true) {
+    getContextIds(state = this.state) {
+        if (state.mode === 'list') {
+            return asArray(state.contextItem);
+        }
+
+        return this.getSelectedIds(state);
+    }
+
+    async showItems(value = true) {
         if (this.state.loading) {
             return;
         }
-        const selectedIds = this.getSelectedIds();
-        if (selectedIds.length === 0) {
+
+        const ids = this.getContextIds();
+        if (ids.length === 0) {
             return;
         }
 
@@ -166,9 +298,9 @@ class AccountListView extends View {
 
         try {
             if (value) {
-                await API.account.show({ id: selectedIds });
+                await API.account.show({ id: ids });
             } else {
-                await API.account.hide({ id: selectedIds });
+                await API.account.hide({ id: ids });
             }
             this.requestList();
         } catch (e) {
@@ -177,19 +309,20 @@ class AccountListView extends View {
         }
     }
 
-    async deleteSelected() {
+    async deleteItems() {
         if (this.state.loading) {
             return;
         }
-        const selectedIds = this.getSelectedIds();
-        if (selectedIds.length === 0) {
+
+        const ids = this.getContextIds();
+        if (ids.length === 0) {
             return;
         }
 
         this.startLoading();
 
         try {
-            await API.account.del({ id: selectedIds });
+            await API.account.del({ id: ids });
             this.requestList();
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
@@ -210,6 +343,8 @@ class AccountListView extends View {
                     visible: AccountList.create(window.app.model.visibleUserAccounts),
                     hidden: AccountList.create(window.app.model.hiddenUserAccounts),
                 },
+                mode: 'list',
+                contextItem: null,
             });
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
@@ -223,17 +358,17 @@ class AccountListView extends View {
      * Show account(s) delete confirmation popup
      */
     confirmDelete() {
-        const selectedIds = this.getSelectedIds();
-        if (selectedIds.length === 0) {
+        const ids = this.getContextIds();
+        if (ids.length === 0) {
             return;
         }
 
-        const multiple = (selectedIds.length > 1);
+        const multiple = (ids.length > 1);
         ConfirmDialog.create({
             id: 'delete_warning',
             title: (multiple) ? TITLE_MULTI_ACC_DELETE : TITLE_SINGLE_ACC_DELETE,
             content: (multiple) ? MSG_MULTI_ACC_DELETE : MSG_SINGLE_ACC_DELETE,
-            onconfirm: () => this.deleteSelected(),
+            onconfirm: () => this.deleteItems(),
         });
     }
 
@@ -244,6 +379,69 @@ class AccountListView extends View {
             attrs: { 'data-id': account.id },
             selected: account.selected,
         }));
+    }
+
+    renderContextMenu(state) {
+        if (state.mode !== 'list') {
+            this.contextMenu.detach();
+            return;
+        }
+
+        const { contextItem } = state;
+        if (!contextItem) {
+            return;
+        }
+        const account = window.app.model.userAccounts.getItem(contextItem);
+        if (!account) {
+            return;
+        }
+
+        const tile = document.querySelector(`.tile[data-id="${account.id}"]`);
+        if (!tile) {
+            return;
+        }
+
+        if (this.contextMenu.menuList.parentNode !== tile) {
+            PopupMenu.hideActive();
+            this.contextMenu.attachTo(tile);
+            this.contextMenu.toggleMenu();
+        }
+
+        const { baseURL } = window.app;
+        this.ctxUpdateBtn.setURL(`${baseURL}accounts/update/${account.id}`);
+        this.ctxExportBtn.setURL(`${baseURL}accounts/export/${account.id}`);
+        this.ctxShowBtn.show(!account.isVisible());
+        this.ctxHideBtn.show(account.isVisible());
+    }
+
+    renderMenu(state) {
+        const selArr = this.getVisibleSelectedItems(state);
+        const hiddenSelArr = this.getHiddenSelectedItems(state);
+        const selCount = selArr.length;
+        const hiddenSelCount = hiddenSelArr.length;
+        const totalSelCount = selCount + hiddenSelCount;
+
+        const selectModeTitle = (state.mode === 'list') ? 'Select' : 'Cancel';
+        this.selectModeBtn.setIcon((state.mode === 'list') ? 'select' : null);
+        this.selectModeBtn.setTitle(selectModeTitle);
+
+        this.exportBtn.show(totalSelCount > 0);
+        this.showBtn.show(hiddenSelCount > 0);
+        this.hideBtn.show(selCount > 0);
+        this.deleteBtn.show(totalSelCount > 0);
+
+        const { baseURL } = window.app;
+        const selectedIds = this.getSelectedIds(state);
+
+        if (totalSelCount > 0) {
+            let exportURL = `${baseURL}accounts/export/`;
+            if (totalSelCount === 1) {
+                exportURL += selectedIds[0];
+            } else {
+                exportURL += `?${urlJoin({ id: selectedIds })}`;
+            }
+            this.exportBtn.setURL(exportURL);
+        }
     }
 
     render(state) {
@@ -276,36 +474,11 @@ class AccountListView extends View {
         }
         show(this.hiddenTilesHeading, hiddenItemsAvailable);
 
-        const selArr = this.getVisibleSelectedItems(state);
-        const hiddenSelArr = this.getHiddenSelectedItems(state);
-        const selCount = selArr.length;
-        const hiddenSelCount = hiddenSelArr.length;
-        const totalSelCount = selCount + hiddenSelCount;
-        this.toolbar.updateBtn.show(totalSelCount === 1);
-        this.toolbar.exportBtn.show(totalSelCount > 0);
-        this.toolbar.showBtn.show(hiddenSelCount > 0);
-        this.toolbar.hideBtn.show(selCount > 0);
-        this.toolbar.deleteBtn.show(totalSelCount > 0);
-
-        const { baseURL } = window.app;
-        const selectedIds = this.getSelectedIds();
-        if (selectedIds.length === 1) {
-            this.toolbar.updateBtn.setURL(`${baseURL}accounts/update/${selectedIds[0]}`);
-        }
-
-        if (totalSelCount > 0) {
-            let exportURL = `${baseURL}accounts/export/`;
-            if (totalSelCount === 1) {
-                exportURL += selectedIds[0];
-            } else {
-                exportURL += `?${urlJoin({ id: selectedIds })}`;
-            }
-            this.toolbar.exportBtn.setURL(exportURL);
-        }
-
-        this.toolbar.show(totalSelCount > 0);
+        this.renderContextMenu(state);
+        this.renderMenu(state);
 
         this.tilesContainer.dataset.time = state.renderTime;
+
         if (!state.loading) {
             this.loadingIndicator.hide();
         }

@@ -206,12 +206,12 @@ export const delFromUpdate = async (pos) => {
         // Navigate to update account view
         await checkNavigation();
         await App.view.goToUpdateAccount(ind);
-        // Prepare expected state
         await App.state.fetch();
-        const ids = App.state.getAccountsByIndexes(ind, true);
-        App.state.deleteAccounts(ids);
         // Perform actions on view
         await App.view.deleteSelfItem();
+        // Prepare expected state
+        const ids = App.state.getAccountsByIndexes(ind, true);
+        App.state.deleteAccounts(ids);
         // Check state of accounts list view
         App.view.expectedState = AccountListView.render(App.state);
         await App.view.checkState();

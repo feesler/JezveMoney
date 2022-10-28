@@ -211,6 +211,14 @@ label {
     vertical-align: middle;
     white-space: nowrap;
   }
+
+  .heading-actions {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 1 1 auto;
+  }
 }
 
 /* Aligned to right element */
@@ -375,7 +383,7 @@ label {
   display: flex;
   flex-flow: row wrap;
   gap: var(--tile-gap);
-  max-width: calc((var(--tile-size) + var(--tile-gap)) * 4);
+  max-width: calc(var(--tile-size) * 4 + var(--tile-gap) * 3);
 }
 
 /* Total list */

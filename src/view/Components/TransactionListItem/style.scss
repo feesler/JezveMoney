@@ -6,10 +6,42 @@
 
   border: 0;
   display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  position: relative;
+  row-gap: 2px;
+}
+
+.trans-item__content {
+  display: flex;
   flex-flow: column wrap;
   padding: 8px;
   position: relative;
   row-gap: 2px;
+  flex: 1 1 auto;
+}
+
+.trans-item__controls {
+  display: flex;
+  flex-flow: row nowrap;
+
+  .actions-menu {
+    margin: 0 4px;
+    position: static;
+  }
+
+  .actions-menu-btn {
+    width: 26px;
+    height: 26px;
+    padding: 4px;
+    background: none;
+    cursor: pointer;
+  }
+
+  .actions-menu-btn__icon {
+    height: 18px;
+    width: 18px;
+  }
 }
 
 .trans-item_placeholder {
@@ -72,10 +104,12 @@
 }
 
 .trans-item_details {
-  align-items: baseline;
-  column-gap: var(--trans-item-column-gap);
-  flex-flow: column nowrap;
-  row-gap: var(--trans-item-row-gap);
+  .trans-item__content {
+    align-items: baseline;
+    column-gap: var(--trans-item-column-gap);
+    flex-flow: column nowrap;
+    row-gap: var(--trans-item-row-gap);
+  }
 
   .field {
     --field-title-font-size: 12px;
@@ -157,8 +191,10 @@
 
 @media (min-width: 1200px) {
   .trans-item_details {
-    align-items: center;
-    flex-flow: row nowrap;
+    .trans-item__content {
+      align-items: center;
+      flex-flow: row nowrap;
+    }
 
     .trans-item__accounts-group,
     .trans-item__amount-group {
