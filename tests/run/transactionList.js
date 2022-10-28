@@ -88,6 +88,20 @@ export const toggleSelect = async (transactions) => {
     });
 };
 
+export const selectAll = async () => {
+    await test('Select all transactions', async () => {
+        await checkNavigation();
+        return App.view.selectAll();
+    });
+};
+
+export const deselectAll = async () => {
+    await test('Deselect all transactions', async () => {
+        await checkNavigation();
+        return App.view.deselectAll();
+    });
+};
+
 export const clearAllFilters = async (directNavigate = false) => {
     if (!directNavigate) {
         await checkNavigation();

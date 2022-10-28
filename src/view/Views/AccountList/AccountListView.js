@@ -94,7 +94,19 @@ class AccountListView extends View {
             title: 'Select',
             onClick: () => this.toggleSelectMode(),
         });
-        this.menu.addSeparator();
+        this.separator1 = this.menu.addSeparator();
+
+        this.selectAllBtn = this.menu.addIconItem({
+            id: 'selectAllBtn',
+            title: 'Select all',
+            onClick: () => this.selectAll(),
+        });
+        this.deselectAllBtn = this.menu.addIconItem({
+            id: 'deselectAllBtn',
+            title: 'Clear selection',
+            onClick: () => this.deselectAll(),
+        });
+        this.separator2 = this.menu.addSeparator();
 
         this.exportBtn = this.menu.addIconItem({
             id: 'exportBtn',
@@ -209,7 +221,23 @@ class AccountListView extends View {
         });
     }
 
-    reduceDeselectAll(state) {
+    reduceSelectAll(state = this.state) {
+        const selectItem = (item) => (
+            (item.selected)
+                ? item
+                : { ...item, selected: true }
+        );
+
+        return {
+            ...state,
+            items: {
+                visible: state.items.visible.map(selectItem),
+                hidden: state.items.hidden.map(selectItem),
+            },
+        };
+    }
+
+    reduceDeselectAll(state = this.state) {
         const deselectItem = (item) => (
             (item.selected)
                 ? { ...item, selected: false }
@@ -225,8 +253,14 @@ class AccountListView extends View {
         };
     }
 
+    selectAll() {
+        this.setState(this.reduceSelectAll());
+        this.setRenderTime();
+    }
+
     deselectAll() {
         this.setState(this.reduceDeselectAll());
+        this.setRenderTime();
     }
 
     toggleSelectMode() {
@@ -415,20 +449,27 @@ class AccountListView extends View {
     }
 
     renderMenu(state) {
+        const itemsCount = state.items.visible.length + state.items.hidden.length;
         const selArr = this.getVisibleSelectedItems(state);
         const hiddenSelArr = this.getHiddenSelectedItems(state);
         const selCount = selArr.length;
         const hiddenSelCount = hiddenSelArr.length;
         const totalSelCount = selCount + hiddenSelCount;
+        const isSelectMode = (state.mode === 'select');
 
-        const selectModeTitle = (state.mode === 'list') ? 'Select' : 'Cancel';
-        this.selectModeBtn.setIcon((state.mode === 'list') ? 'select' : null);
+        const selectModeTitle = (isSelectMode) ? 'Cancel' : 'Select';
         this.selectModeBtn.setTitle(selectModeTitle);
+        this.selectModeBtn.setIcon((isSelectMode) ? null : 'select');
+        show(this.separator1, isSelectMode);
 
-        this.exportBtn.show(totalSelCount > 0);
-        this.showBtn.show(hiddenSelCount > 0);
-        this.hideBtn.show(selCount > 0);
-        this.deleteBtn.show(totalSelCount > 0);
+        this.selectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount);
+        this.deselectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount > 0);
+        show(this.separator2, isSelectMode);
+
+        this.exportBtn.show(isSelectMode && totalSelCount > 0);
+        this.showBtn.show(isSelectMode && hiddenSelCount > 0);
+        this.hideBtn.show(isSelectMode && selCount > 0);
+        this.deleteBtn.show(isSelectMode && totalSelCount > 0);
 
         const { baseURL } = window.app;
         const selectedIds = this.getSelectedIds(state);

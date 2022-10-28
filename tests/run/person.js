@@ -216,6 +216,20 @@ export const toggleSelect = async (persons) => {
     });
 };
 
+export const selectAll = async () => {
+    await test('Select all persons', async () => {
+        await checkNavigation();
+        return App.view.selectAll();
+    });
+};
+
+export const deselectAll = async () => {
+    await test('Deselect all persons', async () => {
+        await checkNavigation();
+        return App.view.deselectAll();
+    });
+};
+
 /** Check navigation to update not existing person */
 export const securityTests = async () => {
     setBlock('Person security', 2);

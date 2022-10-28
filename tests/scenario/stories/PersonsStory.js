@@ -28,7 +28,7 @@ export class PersonsStory extends TestStory {
 
         await this.create();
         await this.hide();
-        await this.toggleSelect();
+        await this.select();
         await this.show();
         await this.update();
         await this.del();
@@ -122,14 +122,19 @@ export class PersonsStory extends TestStory {
         await App.scenario.runner.runGroup(PersonTests.show, data);
     }
 
-    async toggleSelect() {
-        setBlock('Toggle select persons', 2);
+    async select() {
+        setBlock('Select persons', 1);
 
         const data = [
             [0],
             [1, 2],
         ];
 
+        setBlock('Toggle select persons', 2);
         await App.scenario.runner.runGroup(PersonTests.toggleSelect, data);
+
+        setBlock('Select/deselect all persons', 2);
+        await PersonTests.selectAll();
+        await PersonTests.deselectAll();
     }
 }

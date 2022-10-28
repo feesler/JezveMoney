@@ -332,6 +332,20 @@ export const toggleSelect = async (accounts) => {
     });
 };
 
+export const selectAll = async () => {
+    await test('Select all accounts', async () => {
+        await checkNavigation();
+        return App.view.selectAll();
+    });
+};
+
+export const deselectAll = async () => {
+    await test('Deselect all accounts', async () => {
+        await checkNavigation();
+        return App.view.deselectAll();
+    });
+};
+
 /** Check navigation to update not existing account */
 export const securityTests = async () => {
     setBlock('Account security', 2);

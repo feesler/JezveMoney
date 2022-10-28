@@ -204,6 +204,19 @@ class TransactionListView extends View {
             onClick: () => this.toggleSelectMode(),
         });
         this.menu.addSeparator();
+        this.separator1 = this.menu.addSeparator();
+
+        this.selectAllBtn = this.menu.addIconItem({
+            id: 'selectAllBtn',
+            title: 'Select all',
+            onClick: () => this.selectAll(),
+        });
+        this.deselectAllBtn = this.menu.addIconItem({
+            id: 'deselectAllBtn',
+            title: 'Clear selection',
+            onClick: () => this.deselectAll(),
+        });
+        this.separator2 = this.menu.addSeparator();
 
         this.deleteBtn = this.menu.addIconItem({
             id: 'deleteBtn',
@@ -249,7 +262,20 @@ class TransactionListView extends View {
         });
     }
 
-    reduceDeselectAll(state) {
+    reduceSelectAll(state = this.state) {
+        const selectItem = (item) => (
+            (item.selected)
+                ? item
+                : { ...item, selected: true }
+        );
+
+        return {
+            ...state,
+            items: state.items.map(selectItem),
+        };
+    }
+
+    reduceDeselectAll(state = this.state) {
         const deselectItem = (item) => (
             (item.selected)
                 ? { ...item, selected: false }
@@ -260,6 +286,10 @@ class TransactionListView extends View {
             ...state,
             items: state.items.map(deselectItem),
         };
+    }
+
+    selectAll() {
+        this.setState(this.reduceSelectAll());
     }
 
     deselectAll() {
@@ -602,12 +632,21 @@ class TransactionListView extends View {
     }
 
     renderMenu(state) {
-        const selectModeTitle = (state.listMode === 'list') ? 'Select' : 'Cancel';
-        this.selectModeBtn.setIcon((state.listMode === 'list') ? 'select' : null);
-        this.selectModeBtn.setTitle(selectModeTitle);
-
+        const itemsCount = state.items.length;
+        const isSelectMode = (state.listMode === 'select');
         const selectedItems = this.list.getSelectedItems();
-        this.deleteBtn.show(selectedItems.length > 0);
+        const totalSelCount = selectedItems.length;
+
+        const selectModeTitle = (isSelectMode) ? 'Cancel' : 'Select';
+        this.selectModeBtn.setTitle(selectModeTitle);
+        this.selectModeBtn.setIcon((isSelectMode) ? null : 'select');
+        show(this.separator1, isSelectMode);
+
+        this.selectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount);
+        this.deselectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount > 0);
+        show(this.separator2, isSelectMode);
+
+        this.deleteBtn.show(isSelectMode && totalSelCount > 0);
     }
 
     /** Render accounts selection */

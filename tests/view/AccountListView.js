@@ -17,7 +17,13 @@ import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 
 const listMenuItems = [
-    'selectModeBtn', 'exportBtn', 'showBtn', 'hideBtn', 'deleteBtn',
+    'selectModeBtn',
+    'selectAllBtn',
+    'deselectAllBtn',
+    'exportBtn',
+    'showBtn',
+    'hideBtn',
+    'deleteBtn',
 ];
 
 const contextMenuItems = [
@@ -113,6 +119,7 @@ export class AccountListView extends AppView {
     }
 
     getExpectedState(model = this.model) {
+        const itemsCount = model.tiles.length + model.hiddenTiles.length;
         const visibleSelected = this.getSelectedItems(model);
         const hiddenSelected = this.getHiddenSelectedItems(model);
         const totalSelected = visibleSelected.length + hiddenSelected.length;
@@ -123,6 +130,12 @@ export class AccountListView extends AppView {
             loadingIndicator: { visible: model.loading },
             listMenu: { visible: model.listMenuVisible },
             selectModeBtn: { visible: model.listMenuVisible },
+            selectAllBtn: {
+                visible: showSelectItems && itemsCount > 0 && totalSelected < itemsCount,
+            },
+            deselectAllBtn: {
+                visible: showSelectItems && itemsCount > 0 && totalSelected > 0,
+            },
             exportBtn: { visible: showSelectItems && (totalSelected > 0) },
             showBtn: { visible: showSelectItems && (hiddenSelected.length > 0) },
             hideBtn: { visible: showSelectItems && (visibleSelected.length > 0) },
@@ -289,17 +302,37 @@ export class AccountListView extends AppView {
         }
     }
 
-    async deselectAccounts() {
+    async selectAll() {
+        const selectItem = (item) => ({ ...item, isActive: true });
+
+        await this.setSelectMode();
+        await this.openListMenu();
+
+        this.model.listMenuVisible = false;
+        this.model.tiles = this.model.tiles.map(selectItem);
+        this.model.hiddenTiles = this.model.hiddenTiles.map(selectItem);
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.selectAllBtn.click());
+
+        return this.checkState(expected);
+    }
+
+    async deselectAll() {
         assert(this.model.mode === 'select', 'Invalid state');
 
-        const visibleActive = this.content.tiles.getSelectedIndexes();
-        const hiddenActive = this.content.hiddenTiles.getSelectedIndexes()
-            .map((ind) => ind + this.content.tiles.length);
+        const deselectItem = (item) => ({ ...item, isActive: false });
 
-        const selected = visibleActive.concat(hiddenActive);
-        if (selected.length > 0) {
-            await this.selectAccounts(selected);
-        }
+        await this.openListMenu();
+
+        this.model.listMenuVisible = false;
+        this.model.tiles = this.model.tiles.map(deselectItem);
+        this.model.hiddenTiles = this.model.hiddenTiles.map(deselectItem);
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.deselectAllBtn.click());
+
+        return this.checkState(expected);
     }
 
     /** Delete secified accounts and return navigation promise */

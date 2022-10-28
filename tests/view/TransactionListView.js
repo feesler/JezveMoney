@@ -28,7 +28,10 @@ import { fixDate, isEmpty, urlJoin } from '../common.js';
 import { FiltersAccordion } from './component/TransactionList/FiltersAccordion.js';
 
 const listMenuItems = [
-    'selectModeBtn', 'deleteBtn',
+    'selectModeBtn',
+    'selectAllBtn',
+    'deselectAllBtn',
+    'deleteBtn',
 ];
 
 const contextMenuItems = [
@@ -315,7 +318,11 @@ export class TransactionListView extends AppView {
         const isFiltersVisible = !model.filterCollapsed;
         const selected = this.getSelectedItems(model);
 
-        const showSelectItems = model.listMenuVisible && model.mode === 'select';
+        const showSelectItems = (
+            isItemsAvailable
+            && model.listMenuVisible
+            && model.mode === 'select'
+        );
 
         const res = {
             typeMenu: {
@@ -344,6 +351,12 @@ export class TransactionListView extends AppView {
             transList: { visible: true },
             listMenu: { visible: model.listMenuVisible },
             selectModeBtn: { visible: model.listMenuVisible },
+            selectAllBtn: {
+                visible: showSelectItems && selected.length < model.list.items.length,
+            },
+            deselectAllBtn: {
+                visible: showSelectItems && selected.length > 0,
+            },
             deleteBtn: { visible: showSelectItems && selected.length > 0 },
         };
 
@@ -890,6 +903,37 @@ export class TransactionListView extends AppView {
 
             this.checkState(expected);
         }
+    }
+
+    async selectAll() {
+        const selectItem = (item) => ({ ...item, selected: true });
+
+        await this.setSelectMode();
+        await this.openListMenu();
+
+        this.model.listMenuVisible = false;
+        this.model.list.items = this.model.list.items.map(selectItem);
+        const expected = this.setExpectedState();
+
+        await this.performAction(() => this.content.selectAllBtn.click());
+
+        return this.checkState(expected);
+    }
+
+    async deselectAll() {
+        assert(this.model.mode === 'select', 'Invalid state');
+
+        const deselectItem = (item) => ({ ...item, selected: false });
+
+        await this.openListMenu();
+
+        this.model.listMenuVisible = false;
+        this.model.list.items = this.model.list.items.map(deselectItem);
+        const expected = this.setExpectedState();
+
+        await this.performAction(() => this.content.deselectAllBtn.click());
+
+        return this.checkState(expected);
     }
 
     /** Select specified transaction, click on edit button */

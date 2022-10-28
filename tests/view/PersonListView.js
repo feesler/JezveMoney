@@ -16,7 +16,12 @@ import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 
 const listMenuItems = [
-    'selectModeBtn', 'showBtn', 'hideBtn', 'deleteBtn',
+    'selectModeBtn',
+    'selectAllBtn',
+    'deselectAllBtn',
+    'showBtn',
+    'hideBtn',
+    'deleteBtn',
 ];
 
 const contextMenuItems = [
@@ -113,19 +118,30 @@ export class PersonListView extends AppView {
     }
 
     getExpectedState(model = this.model) {
+        const itemsCount = model.tiles.length + model.hiddenTiles.length;
         const visibleSelected = this.getSelectedItems(model);
         const hiddenSelected = this.getHiddenSelectedItems(model);
         const totalSelected = visibleSelected.length + hiddenSelected.length;
 
-        const showSelectItems = model.listMenuVisible && model.mode === 'select';
+        const showSelectItems = (
+            itemsCount > 0
+            && model.listMenuVisible
+            && model.mode === 'select'
+        );
 
         const res = {
             loadingIndicator: { visible: model.loading },
             listMenu: { visible: model.listMenuVisible },
             selectModeBtn: { visible: model.listMenuVisible },
-            showBtn: { visible: showSelectItems && (hiddenSelected.length > 0) },
-            hideBtn: { visible: showSelectItems && (visibleSelected.length > 0) },
-            deleteBtn: { visible: showSelectItems && (totalSelected > 0) },
+            selectAllBtn: {
+                visible: showSelectItems && totalSelected < itemsCount,
+            },
+            deselectAllBtn: {
+                visible: showSelectItems && totalSelected > 0,
+            },
+            showBtn: { visible: showSelectItems && hiddenSelected.length > 0 },
+            hideBtn: { visible: showSelectItems && visibleSelected.length > 0 },
+            deleteBtn: { visible: showSelectItems && totalSelected > 0 },
         };
 
         if (model.contextMenuVisible) {
@@ -285,6 +301,39 @@ export class PersonListView extends AppView {
 
             this.checkState(expected);
         }
+    }
+
+    async selectAll() {
+        const selectItem = (item) => ({ ...item, isActive: true });
+
+        await this.setSelectMode();
+        await this.openListMenu();
+
+        this.model.listMenuVisible = false;
+        this.model.tiles = this.model.tiles.map(selectItem);
+        this.model.hiddenTiles = this.model.hiddenTiles.map(selectItem);
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.selectAllBtn.click());
+
+        return this.checkState(expected);
+    }
+
+    async deselectAll() {
+        assert(this.model.mode === 'select', 'Invalid state');
+
+        const deselectItem = (item) => ({ ...item, isActive: false });
+
+        await this.openListMenu();
+
+        this.model.listMenuVisible = false;
+        this.model.tiles = this.model.tiles.map(deselectItem);
+        this.model.hiddenTiles = this.model.hiddenTiles.map(deselectItem);
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.deselectAllBtn.click());
+
+        return this.checkState(expected);
     }
 
     async deletePersons(persons) {

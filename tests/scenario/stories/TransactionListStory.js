@@ -46,6 +46,9 @@ export class TransactionListStory extends TestStory {
             ];
 
             await App.scenario.runner.runGroup(TransactionListTests.toggleSelect, toggleSelectData);
+
+            await TransactionListTests.selectAll();
+            await TransactionListTests.deselectAll();
         }
 
         await App.scenario.runner.runGroup(
