@@ -207,7 +207,8 @@
   }
 
   /* Transaction list item */
-  .trans-item {
+  .trans-item__content,
+  .trans-item__controls {
     background-color: var(--alt-bg-color);
   }
 
@@ -325,7 +326,6 @@
     input::placeholder {
       color: #707070;
     }
-
 
     .input-group__btn,
     .input-group__text {

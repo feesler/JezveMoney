@@ -376,6 +376,7 @@ export class TransactionList extends Component {
             const tritem = TransactionListItem.create({
                 mode: state.mode,
                 selected: item.selected,
+                selectMode: state.listMode === 'select',
                 showControls: state.listMode === 'list',
                 item,
             });

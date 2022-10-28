@@ -1,4 +1,5 @@
 import { createElement, Component } from 'jezvejs';
+import { Checkbox } from 'jezvejs/Checkbox';
 import {
     EXPENSE,
     INCOME,
@@ -29,6 +30,8 @@ const AMOUNT_FIELD_CLASS = 'trans-item__amount-field';
 const RESULT_FIELD_CLASS = 'trans-item__result-field';
 const DATE_FIELD_CLASS = 'trans-item__date-field';
 const COMMENT_FIELD_CLASS = 'trans-item__comment-field';
+/* Select controls */
+const SELECT_CONTROLS_CLASS = 'trans-item__select';
 /* Controls */
 const CONTROLS_CLASS = 'trans-item__controls';
 const MENU_CLASS = 'actions-menu';
@@ -51,6 +54,7 @@ const LABEL_COMMENT = 'Comment';
 
 const defaultProps = {
     selected: false,
+    selectMode: false,
     showControls: false,
 };
 
@@ -103,7 +107,14 @@ export class TransactionListItem extends Component {
             ],
         });
 
-        const children = [this.contentElem];
+        const children = [];
+        if (this.props.selectMode) {
+            this.createSelectControls();
+            children.push(this.selectControls);
+        }
+
+        children.push(this.contentElem);
+
         if (this.props.showControls) {
             this.createControls();
             children.push(this.controlsElem);
@@ -188,7 +199,14 @@ export class TransactionListItem extends Component {
             ],
         });
 
-        const children = [this.contentElem];
+        const children = [];
+        if (this.props.selectMode) {
+            this.createSelectControls();
+            children.push(this.selectControls);
+        }
+
+        children.push(this.contentElem);
+
         if (this.props.showControls) {
             this.createControls();
             children.push(this.controlsElem);
@@ -198,6 +216,17 @@ export class TransactionListItem extends Component {
             props: { className: [TRANS_ITEM_CLASS, DETAILS_CLASS].join(' ') },
             children,
         });
+    }
+
+    createSelectControls() {
+        const { createContainer } = window.app;
+
+        this.checkbox = Checkbox.create({
+            onChange: () => this.onSelect(),
+        });
+        this.selectControls = createContainer(SELECT_CONTROLS_CLASS, [
+            this.checkbox.elem,
+        ]);
     }
 
     createControls() {
@@ -414,10 +443,10 @@ export class TransactionListItem extends Component {
             this.renderClassic(state);
         }
 
-        if (state.selected) {
-            this.elem.classList.add(SELECTED_CLASS);
-        } else {
-            this.elem.classList.remove(SELECTED_CLASS);
+        if (this.state.selectMode) {
+            const selected = state.selected ?? false;
+            this.elem.classList.toggle(SELECTED_CLASS, selected);
+            this.checkbox.check(selected);
         }
     }
 }
