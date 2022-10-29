@@ -725,6 +725,7 @@ class TransactionListView extends View {
         // Render list
         this.list.setMode(state.mode);
         this.list.setListMode(state.listMode);
+        this.list.setShowControls(state.listMode === 'list');
         this.list.setItems(state.items);
 
         if (this.topPaginator && this.bottomPaginator) {

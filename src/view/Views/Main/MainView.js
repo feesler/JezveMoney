@@ -30,6 +30,7 @@ class MainView extends View {
         TransactionList.create({
             elem: document.querySelector('.transactions-widget .trans-list'),
             items: this.props.transactions,
+            showControls: false,
         });
 
         Histogram.create({

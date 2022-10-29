@@ -29,6 +29,7 @@ const defaultProps = {
     mode: 'classic',
     listMode: 'list',
     selectable: false,
+    showControls: true,
     onSelect: null,
     sortable: false,
     onSort: null,
@@ -333,6 +334,14 @@ export class TransactionList extends Component {
         }
     }
 
+    setShowControls(showControls) {
+        if (this.state.showControls === showControls) {
+            return;
+        }
+
+        this.setState({ ...this.state, showControls });
+    }
+
     setListMode(listMode) {
         if (this.state.listMode === listMode) {
             return;
@@ -377,7 +386,7 @@ export class TransactionList extends Component {
                 mode: state.mode,
                 selected: item.selected,
                 selectMode: state.listMode === 'select',
-                showControls: state.listMode === 'list',
+                showControls: state.showControls,
                 item,
             });
             tritem.render(tritem.state);
@@ -392,11 +401,7 @@ export class TransactionList extends Component {
             });
             this.elem.append(listItems);
 
-            if (state.mode === 'details') {
-                this.elem.classList.add(DETAILS_CLASS);
-            } else {
-                this.elem.classList.remove(DETAILS_CLASS);
-            }
+            this.elem.classList.toggle(DETAILS_CLASS, (state.mode === 'details'));
         } else {
             const noDataMsg = createElement('span', {
                 props: {
