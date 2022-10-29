@@ -49,7 +49,7 @@ class AccountListView extends View {
                 hidden: AccountList.create(window.app.model.hiddenUserAccounts),
             },
             loading: false,
-            mode: 'list',
+            listMode: 'list',
             contextItem: null,
             renderTime: Date.now(),
         };
@@ -183,9 +183,9 @@ class AccountListView extends View {
             return;
         }
 
-        if (this.state.mode === 'list') {
+        if (this.state.listMode === 'list') {
             this.showContextMenu(itemId);
-        } else if (this.state.mode === 'select') {
+        } else if (this.state.listMode === 'select') {
             this.toggleSelectItem(itemId);
             this.setRenderTime();
         }
@@ -266,10 +266,10 @@ class AccountListView extends View {
     toggleSelectMode() {
         let newState = {
             ...this.state,
-            mode: (this.state.mode === 'list') ? 'select' : 'list',
+            listMode: (this.state.listMode === 'list') ? 'select' : 'list',
             contextItem: null,
         };
-        if (newState.mode === 'list') {
+        if (newState.listMode === 'list') {
             newState = this.reduceDeselectAll(newState);
         }
 
@@ -311,7 +311,7 @@ class AccountListView extends View {
     }
 
     getContextIds(state = this.state) {
-        if (state.mode === 'list') {
+        if (state.listMode === 'list') {
             return asArray(state.contextItem);
         }
 
@@ -377,7 +377,7 @@ class AccountListView extends View {
                     visible: AccountList.create(window.app.model.visibleUserAccounts),
                     hidden: AccountList.create(window.app.model.hiddenUserAccounts),
                 },
-                mode: 'list',
+                listMode: 'list',
                 contextItem: null,
             });
         } catch (e) {
@@ -406,17 +406,18 @@ class AccountListView extends View {
         });
     }
 
-    renderTilesList(accounts) {
+    renderTilesList(accounts, listMode) {
         return accounts.map((account) => AccountTile.create({
             type: 'button',
             account,
             attrs: { 'data-id': account.id },
             selected: account.selected,
+            selectMode: listMode === 'select',
         }));
     }
 
     renderContextMenu(state) {
-        if (state.mode !== 'list') {
+        if (state.listMode !== 'list') {
             this.contextMenu.detach();
             return;
         }
@@ -455,7 +456,7 @@ class AccountListView extends View {
         const selCount = selArr.length;
         const hiddenSelCount = hiddenSelArr.length;
         const totalSelCount = selCount + hiddenSelCount;
-        const isSelectMode = (state.mode === 'select');
+        const isSelectMode = (state.listMode === 'select');
 
         const selectModeTitle = (isSelectMode) ? 'Cancel' : 'Select';
         this.selectModeBtn.setTitle(selectModeTitle);
@@ -495,7 +496,7 @@ class AccountListView extends View {
         }
 
         // Render visible accounts
-        const visibleTiles = this.renderTilesList(state.items.visible);
+        const visibleTiles = this.renderTilesList(state.items.visible, state.listMode);
         removeChilds(this.tilesContainer);
         if (visibleTiles.length > 0) {
             visibleTiles.forEach((item) => this.tilesContainer.appendChild(item.elem));
@@ -507,7 +508,7 @@ class AccountListView extends View {
         }
 
         // Render hidden accounts
-        const hiddenTiles = this.renderTilesList(state.items.hidden);
+        const hiddenTiles = this.renderTilesList(state.items.hidden, state.listMode);
         removeChilds(this.hiddenTilesContainer);
         const hiddenItemsAvailable = (hiddenTiles.length > 0);
         if (hiddenItemsAvailable) {

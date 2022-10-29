@@ -4,6 +4,7 @@ import {
     setAttributes,
     Component,
 } from 'jezvejs';
+import { Checkbox } from 'jezvejs/Checkbox';
 import './style.scss';
 
 /** CSS classes */
@@ -14,6 +15,7 @@ const TITLE_CLASS = 'tile__title';
 const SUBTITLE_CLASS = 'tile__subtitle';
 const ICON_CLASS = 'tile__icon';
 const ICON_CONTENT_CLASS = 'tile__icon-content';
+const CHECKBOX_CLASS = 'tile__checkbox';
 
 const SUBTITLE_LIMIT = 11;
 
@@ -217,6 +219,27 @@ export class Tile extends Component {
         this.iconUseElem.href.baseVal = (state.icon) ? `#${state.icon}` : '';
     }
 
+    renderSelectControls(state, prevState) {
+        if (state.selectMode === prevState.selectMode) {
+            return;
+        }
+
+        if (state.selectMode && !this.checkbox) {
+            this.checkbox = Checkbox.create({
+                className: CHECKBOX_CLASS,
+            });
+            this.elem.append(this.checkbox.elem);
+        }
+
+        this.checkbox?.show(state.selectMode);
+
+        if (state.selectMode) {
+            const selected = state.selected ?? false;
+            this.elem.classList.toggle(SELECTED_CLASS, selected);
+            this.checkbox.check(selected);
+        }
+    }
+
     /**
      * Render specified state
      * @param {object} state - tile state object
@@ -230,11 +253,6 @@ export class Tile extends Component {
         this.renderTitle(state, prevState);
         this.renderSubTitle(state, prevState);
         this.renderIcon(state, prevState);
-
-        if (state.selected) {
-            this.elem.classList.add(SELECTED_CLASS);
-        } else {
-            this.elem.classList.remove(SELECTED_CLASS);
-        }
+        this.renderSelectControls(state, prevState);
     }
 }

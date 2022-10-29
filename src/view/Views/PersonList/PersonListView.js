@@ -44,7 +44,7 @@ class PersonListView extends View {
                 hidden: PersonList.create(window.app.model.hiddenPersons),
             },
             loading: false,
-            mode: 'list',
+            listMode: 'list',
             contextItem: null,
             renderTime: Date.now(),
         };
@@ -170,9 +170,9 @@ class PersonListView extends View {
             return;
         }
 
-        if (this.state.mode === 'list') {
+        if (this.state.listMode === 'list') {
             this.showContextMenu(personId);
-        } else if (this.state.mode === 'select') {
+        } else if (this.state.listMode === 'select') {
             this.toggleSelectItem(personId);
             this.setRenderTime();
         }
@@ -251,10 +251,10 @@ class PersonListView extends View {
     toggleSelectMode() {
         let newState = {
             ...this.state,
-            mode: (this.state.mode === 'list') ? 'select' : 'list',
+            listMode: (this.state.listMode === 'list') ? 'select' : 'list',
             contextItem: null,
         };
-        if (newState.mode === 'list') {
+        if (newState.listMode === 'list') {
             newState = this.reduceDeselectAll(newState);
         }
 
@@ -296,7 +296,7 @@ class PersonListView extends View {
     }
 
     getContextIds(state = this.state) {
-        if (state.mode === 'list') {
+        if (state.listMode === 'list') {
             return asArray(state.contextItem);
         }
 
@@ -362,7 +362,7 @@ class PersonListView extends View {
                     visible: PersonList.create(window.app.model.visiblePersons),
                     hidden: PersonList.create(window.app.model.hiddenPersons),
                 },
-                mode: 'list',
+                listMode: 'list',
                 contextItem: null,
             });
         } catch (e) {
@@ -389,17 +389,18 @@ class PersonListView extends View {
         });
     }
 
-    renderTilesList(persons) {
+    renderTilesList(persons, listMode) {
         return persons.map((person) => Tile.create({
             type: 'button',
             attrs: { 'data-id': person.id },
             title: person.name,
             selected: person.selected,
+            selectMode: listMode === 'select',
         }));
     }
 
     renderContextMenu(state) {
-        if (state.mode !== 'list') {
+        if (state.listMode !== 'list') {
             this.contextMenu.detach();
             return;
         }
@@ -437,7 +438,7 @@ class PersonListView extends View {
         const selCount = selArr.length;
         const hiddenSelCount = hiddenSelArr.length;
         const totalSelCount = selCount + hiddenSelCount;
-        const isSelectMode = (state.mode === 'select');
+        const isSelectMode = (state.listMode === 'select');
 
         const selectModeTitle = (isSelectMode) ? 'Cancel' : 'Select';
         this.selectModeBtn.setTitle(selectModeTitle);
@@ -463,7 +464,7 @@ class PersonListView extends View {
         }
 
         // Render visible persons
-        const visibleTiles = this.renderTilesList(state.items.visible);
+        const visibleTiles = this.renderTilesList(state.items.visible, state.listMode);
         removeChilds(this.tilesContainer);
         if (visibleTiles.length > 0) {
             visibleTiles.forEach((item) => this.tilesContainer.appendChild(item.elem));
@@ -475,7 +476,7 @@ class PersonListView extends View {
         }
 
         // Render hidden persons
-        const hiddenTiles = this.renderTilesList(state.items.hidden);
+        const hiddenTiles = this.renderTilesList(state.items.hidden, state.listMode);
         removeChilds(this.hiddenTilesContainer);
         const hiddenItemsAvailable = (hiddenTiles.length > 0);
         if (hiddenItemsAvailable) {

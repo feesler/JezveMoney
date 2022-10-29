@@ -216,9 +216,7 @@ export class TransactionListItem extends Component {
     createSelectControls() {
         const { createContainer } = window.app;
 
-        this.checkbox = Checkbox.create({
-            onChange: () => this.onSelect(),
-        });
+        this.checkbox = Checkbox.create();
         this.selectControls = createContainer(SELECT_CONTROLS_CLASS, [
             this.checkbox.elem,
         ]);
@@ -438,7 +436,7 @@ export class TransactionListItem extends Component {
             this.renderClassic(state);
         }
 
-        if (this.state.selectMode) {
+        if (state.selectMode) {
             const selected = state.selected ?? false;
             this.elem.classList.toggle(SELECTED_CLASS, selected);
             this.checkbox.check(selected);
