@@ -7,7 +7,6 @@ import {
     navigation,
     click,
     waitForFunction,
-    wait,
     goTo,
     baseUrl,
     copyObject,
@@ -415,7 +414,7 @@ export class TransactionListView extends AppView {
         const expected = this.setExpectedState();
 
         await this.performAction(() => item.clickMenu());
-        await this.performAction(() => wait(contextMenuId, { visible: true }));
+        assert(this.content.contextMenu.visible, 'Context menu not visible');
 
         return this.checkState(expected);
     }
