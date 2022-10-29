@@ -131,6 +131,7 @@ export class PersonListView extends AppView {
 
         const res = {
             loadingIndicator: { visible: model.loading },
+            listMenuContainer: { visible: itemsCount > 0 },
             listMenu: { visible: model.listMenuVisible },
             selectModeBtn: { visible: model.listMenuVisible },
             selectAllBtn: {

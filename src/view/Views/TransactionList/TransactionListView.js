@@ -637,6 +637,8 @@ class TransactionListView extends View {
         const selectedItems = this.list.getSelectedItems();
         const totalSelCount = selectedItems.length;
 
+        this.menu.show(itemsCount > 0);
+
         const selectModeTitle = (isSelectMode) ? 'Cancel' : 'Select';
         this.selectModeBtn.setTitle(selectModeTitle);
         this.selectModeBtn.setIcon((isSelectMode) ? null : 'select');

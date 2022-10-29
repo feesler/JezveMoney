@@ -440,6 +440,8 @@ class PersonListView extends View {
         const totalSelCount = selCount + hiddenSelCount;
         const isSelectMode = (state.listMode === 'select');
 
+        this.menu.show(itemsCount > 0);
+
         const selectModeTitle = (isSelectMode) ? 'Cancel' : 'Select';
         this.selectModeBtn.setTitle(selectModeTitle);
         this.selectModeBtn.setIcon((isSelectMode) ? null : 'select');

@@ -349,6 +349,7 @@ export class TransactionListView extends AppView {
             modeSelector: { visible: isItemsAvailable },
             paginator: { visible: isItemsAvailable },
             transList: { visible: true },
+            listMenuContainer: { visible: isItemsAvailable },
             listMenu: { visible: model.listMenuVisible },
             selectModeBtn: { visible: model.listMenuVisible },
             selectAllBtn: {
