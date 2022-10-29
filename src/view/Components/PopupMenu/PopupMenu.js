@@ -37,10 +37,6 @@ const defaultProps = {
 };
 
 export class PopupMenu extends Component {
-    static create(props) {
-        return new PopupMenu(props);
-    }
-
     static activeInstance = null;
 
     static hideActive() {

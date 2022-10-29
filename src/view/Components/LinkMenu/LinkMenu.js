@@ -33,18 +33,6 @@ const defaultProps = {
  * Link Menu component
  */
 export class LinkMenu extends Component {
-    static create(props = {}) {
-        const instance = new this(props);
-        instance.init();
-        return instance;
-    }
-
-    static fromElement(elem, props = {}) {
-        const instance = new this(props);
-        instance.parse(elem);
-        return instance;
-    }
-
     constructor(props) {
         super(props);
 
@@ -56,6 +44,12 @@ export class LinkMenu extends Component {
         this.state = {
             ...this.props,
         };
+
+        if (this.elem) {
+            this.parse();
+        } else {
+            this.init();
+        }
     }
 
     init() {
@@ -66,18 +60,17 @@ export class LinkMenu extends Component {
         this.render(this.state);
     }
 
-    parse(elem) {
-        if (!elem || !elem.classList || !elem.classList.contains(CONTAINER_CLASS)) {
+    parse() {
+        if (!this.elem?.classList?.contains(CONTAINER_CLASS)) {
             throw new Error('Invalid element');
         }
 
-        this.elem = elem;
         this.setHandlers();
         this.setClassNames();
 
         this.state.multiple = this.elem.hasAttribute('multiple');
 
-        const itemElems = Array.from(elem.querySelectorAll(`.${ITEM_CLASS}`));
+        const itemElems = Array.from(this.elem.querySelectorAll(`.${ITEM_CLASS}`));
         this.state.items = itemElems.map((item) => this.parseItem(item));
 
         this.render(this.state);

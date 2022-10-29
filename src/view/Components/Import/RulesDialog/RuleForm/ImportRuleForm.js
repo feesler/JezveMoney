@@ -39,10 +39,6 @@ const defaultProps = {
  * ImportRuleForm component
  */
 export class ImportRuleForm extends Component {
-    static create(props) {
-        return new ImportRuleForm(props);
-    }
-
     constructor(...args) {
         super(...args);
 

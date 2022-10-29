@@ -62,13 +62,6 @@ const defaultProps = {
  * Transaction list item component
  */
 export class TransactionListItem extends Component {
-    static create(props) {
-        const instance = new TransactionListItem(props);
-        instance.init();
-
-        return instance;
-    }
-
     constructor(props) {
         super(props);
 
@@ -78,6 +71,8 @@ export class TransactionListItem extends Component {
         };
 
         this.state = { ...this.props };
+
+        this.init();
     }
 
     init() {

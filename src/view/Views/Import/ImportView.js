@@ -97,16 +97,13 @@ class ImportView extends View {
         setEvents(this.actionsMenuBtn, { click: () => this.toggleActionsMenu() });
         this.actionsList = ge('actionsList');
 
-        this.newItemBtn = IconButton.fromElement({
-            elem: 'newItemBtn',
+        this.newItemBtn = IconButton.fromElement('newItemBtn', {
             onClick: () => this.createItem(),
         });
-        this.clearFormBtn = IconButton.fromElement({
-            elem: 'clearFormBtn',
+        this.clearFormBtn = IconButton.fromElement('clearFormBtn', {
             onClick: () => this.removeAllItems(),
         });
-        this.uploadBtn = IconButton.fromElement({
-            elem: 'uploadBtn',
+        this.uploadBtn = IconButton.fromElement('uploadBtn', {
             onClick: () => this.showUploadDialog(),
         });
         this.accountDropDown = DropDown.create({
@@ -114,14 +111,12 @@ class ImportView extends View {
             onchange: () => this.onMainAccChange(),
             className: 'dd__main-account',
         });
-        this.rulesCheck = Checkbox.fromElement(
-            ge('rulesCheck'),
-            { onChange: () => this.onToggleEnableRules() },
-        );
-        this.similarCheck = Checkbox.fromElement(
-            ge('similarCheck'),
-            { onChange: () => this.onToggleCheckSimilar() },
-        );
+        this.rulesCheck = Checkbox.fromElement(ge('rulesCheck'), {
+            onChange: () => this.onToggleEnableRules(),
+        });
+        this.similarCheck = Checkbox.fromElement(ge('similarCheck'), {
+            onChange: () => this.onToggleCheckSimilar(),
+        });
 
         this.submitBtn = ge('submitbtn');
         this.transCountElem = ge('trcount');

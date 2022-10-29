@@ -26,10 +26,6 @@ const defaultProps = {
  * RawDataTable component
  */
 export class RawDataTable extends Component {
-    static create(props) {
-        return new RawDataTable(props);
-    }
-
     constructor(...args) {
         super(...args);
 

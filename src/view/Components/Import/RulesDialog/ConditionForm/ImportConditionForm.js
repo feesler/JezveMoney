@@ -43,10 +43,6 @@ const defaultProps = {
  * ImportConditionForm component
  */
 export class ImportConditionForm extends Component {
-    static create(props) {
-        return new ImportConditionForm(props);
-    }
-
     constructor(...args) {
         super(...args);
 

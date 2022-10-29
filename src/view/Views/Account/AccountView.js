@@ -79,8 +79,7 @@ class AccountView extends View {
             throw new Error('Failed to initialize Account view');
         }
 
-        this.tile = AccountTile.fromElement({
-            elem: 'acc_tile',
+        this.tile = AccountTile.fromElement('acc_tile', {
             parent: this,
         });
         this.iconSelect = DropDown.create({
@@ -116,8 +115,7 @@ class AccountView extends View {
 
         // Update mode
         if (this.state.original.id) {
-            this.deleteBtn = IconButton.fromElement({
-                elem: 'del_btn',
+            this.deleteBtn = IconButton.fromElement('del_btn', {
                 onClick: () => this.confirmDelete(),
             });
         }

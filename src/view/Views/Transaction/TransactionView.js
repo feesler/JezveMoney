@@ -228,8 +228,7 @@ class TransactionView extends View {
         setEvents(this.form, { submit: (e) => this.onSubmit(e) });
 
         if (state.isUpdate) {
-            this.deleteBtn = IconButton.fromElement({
-                elem: 'del_btn',
+            this.deleteBtn = IconButton.fromElement('del_btn', {
                 onClick: () => this.confirmDelete(),
             });
         }
@@ -272,29 +271,24 @@ class TransactionView extends View {
         this.debtAccTileInfoBlock = this.debtAccountContainer.querySelector('.tile-info-block');
 
         const srcTileElem = ge('source_tile');
-        this.srcTile = (srcTileElem) ? AccountTile.fromElement({ elem: srcTileElem }) : null;
+        this.srcTile = (srcTileElem) ? AccountTile.fromElement(srcTileElem) : null;
 
         const destTileElem = ge('dest_tile');
-        this.destTile = (destTileElem) ? AccountTile.fromElement({ elem: destTileElem }) : null;
+        this.destTile = (destTileElem) ? AccountTile.fromElement(destTileElem) : null;
 
-        this.srcAmountInfo = TileInfoItem.fromElement({
-            elem: 'src_amount_left',
+        this.srcAmountInfo = TileInfoItem.fromElement('src_amount_left', {
             onclick: () => this.store.dispatch(sourceAmountClick()),
         });
-        this.destAmountInfo = TileInfoItem.fromElement({
-            elem: 'dest_amount_left',
+        this.destAmountInfo = TileInfoItem.fromElement('dest_amount_left', {
             onclick: () => this.store.dispatch(destAmountClick()),
         });
-        this.exchangeInfo = TileInfoItem.fromElement({
-            elem: 'exch_left',
+        this.exchangeInfo = TileInfoItem.fromElement('exch_left', {
             onclick: () => this.store.dispatch(exchangeClick()),
         });
-        this.srcResBalanceInfo = TileInfoItem.fromElement({
-            elem: 'src_res_balance_left',
+        this.srcResBalanceInfo = TileInfoItem.fromElement('src_res_balance_left', {
             onclick: () => this.store.dispatch(sourceResultClick()),
         });
-        this.destResBalanceInfo = TileInfoItem.fromElement({
-            elem: 'dest_res_balance_left',
+        this.destResBalanceInfo = TileInfoItem.fromElement('dest_res_balance_left', {
             onclick: () => this.store.dispatch(destResultClick()),
         });
 
@@ -382,7 +376,7 @@ class TransactionView extends View {
 
         this.personIdInp = ge('person_id');
         this.debtAccountInp = ge('acc_id');
-        this.debtAccountTile = AccountTile.fromElement({ elem: 'acc_tile', parent: this });
+        this.debtAccountTile = AccountTile.fromElement('acc_tile', { parent: this });
 
         this.noAccountBtn = this.debtAccountContainer.querySelector('.tile_header .close-btn');
         setEvents(this.noAccountBtn, { click: () => this.toggleEnableAccount() });
@@ -393,7 +387,7 @@ class TransactionView extends View {
 
         this.debtAccountLabel = this.debtAccountContainer.querySelector('.tile_header label');
 
-        this.personTile = Tile.fromElement({ elem: 'person_tile', parent: this });
+        this.personTile = Tile.fromElement('person_tile', { parent: this });
 
         if (transaction.type === DEBT) {
             this.initPersonsDropDown();

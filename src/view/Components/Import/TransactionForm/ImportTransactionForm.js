@@ -83,10 +83,6 @@ const defaultProps = {
  * ImportTransactionForm component
  */
 export class ImportTransactionForm extends ImportTransactionBase {
-    static create(props) {
-        return new ImportTransactionForm(props);
-    }
-
     constructor(...args) {
         super(...args);
 

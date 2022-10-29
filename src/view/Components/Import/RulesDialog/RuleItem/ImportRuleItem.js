@@ -36,10 +36,6 @@ const defaultProps = {
  * @param {Object} props
  */
 export class ImportRuleItem extends Component {
-    static create(props) {
-        return new ImportRuleItem(props);
-    }
-
     constructor(...args) {
         super(...args);
 

@@ -16,10 +16,6 @@ const MSG_UPLOAD_FAIL = 'Fail to process file';
  * ImportFileUploader component
  */
 export class ImportFileUploader extends Component {
-    static create(props) {
-        return new ImportFileUploader(props);
-    }
-
     constructor(...args) {
         super(...args);
 
@@ -31,10 +27,9 @@ export class ImportFileUploader extends Component {
         this.formElem = ge('fileimportfrm');
         this.inputElem = ge('fileInp');
         this.filenameElem = this.elem.querySelector(`.${FILE_NAME_CLASS}`);
-        this.isEncodeCheck = Checkbox.fromElement(
-            ge('isEncodeCheck'),
-            { onChange: (checked) => this.onCheckEncode(checked) },
-        );
+        this.isEncodeCheck = Checkbox.fromElement(ge('isEncodeCheck'), {
+            onChange: (checked) => this.onCheckEncode(checked),
+        });
         if (!this.formElem || !this.inputElem || !this.filenameElem || !this.isEncodeCheck) {
             throw new Error('Failed to initialize import file uploader');
         }
@@ -130,10 +125,9 @@ export class ImportFileUploader extends Component {
 
     /** Setup extra controls of file upload dialog */
     initUploadExtras() {
-        this.useServerCheck = Checkbox.fromElement(
-            ge('useServerCheck'),
-            { onChange: (checked) => this.onCheckServer(checked) },
-        );
+        this.useServerCheck = Checkbox.fromElement(ge('useServerCheck'), {
+            onChange: (checked) => this.onCheckServer(checked),
+        });
         this.serverAddressBlock = ge('serverAddressBlock');
         this.serverAddressInput = ge('serverAddress');
         this.uploadBtn = ge('serverUploadBtn');

@@ -25,26 +25,13 @@ const defaultProps = {
     subtitle: null,
     icon: null,
     selected: false,
+    selectMode: false,
 };
 
 /**
  * Tile component
  */
 export class Tile extends Component {
-    static create(props) {
-        const res = new Tile(props);
-        res.init();
-
-        return res;
-    }
-
-    static fromElement(props) {
-        const res = new Tile(props);
-        res.parse();
-
-        return res;
-    }
-
     constructor(...args) {
         super(...args);
 
@@ -56,6 +43,12 @@ export class Tile extends Component {
         this.state = {
             ...this.props,
         };
+
+        if (this.elem) {
+            this.parse();
+        } else {
+            this.init();
+        }
     }
 
     init() {

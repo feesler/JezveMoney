@@ -41,10 +41,6 @@ const SHOW_ON_PAGE = 20;
  * ImportRulesDialog component
  */
 export class ImportRulesDialog extends Component {
-    static create(props) {
-        return new ImportRulesDialog(props);
-    }
-
     constructor(...args) {
         super(...args);
 

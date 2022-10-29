@@ -5,20 +5,6 @@ import { Tile } from '../Tile/Tile.js';
  * @param {object} props
  */
 export class AccountTile extends Tile {
-    static create(props) {
-        const res = new AccountTile(props);
-        res.init();
-
-        return res;
-    }
-
-    static fromElement(props) {
-        const res = new AccountTile(props);
-        res.parse();
-
-        return res;
-    }
-
     init() {
         super.init();
 

@@ -22,12 +22,6 @@ const TITLE_CLASS = 'loading-indicator__title';
  * Loading indicator component
  */
 export class LoadingIndicator extends Component {
-    static create(props = {}) {
-        const instance = new LoadingIndicator(props);
-        instance.init();
-        return instance;
-    }
-
     constructor(props) {
         super(props);
 
@@ -39,6 +33,8 @@ export class LoadingIndicator extends Component {
         this.state = {
             ...this.props,
         };
+
+        this.init();
     }
 
     init() {

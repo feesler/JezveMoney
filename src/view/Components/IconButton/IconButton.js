@@ -31,20 +31,6 @@ const defaultProps = {
  * IconButton component
  */
 export class IconButton extends Component {
-    static create(props) {
-        const instance = new IconButton(props);
-        instance.init();
-
-        return instance;
-    }
-
-    static fromElement(props) {
-        const instance = new IconButton(props);
-        instance.parse();
-
-        return instance;
-    }
-
     constructor(props) {
         super(props);
 
@@ -56,6 +42,12 @@ export class IconButton extends Component {
         this.state = {
             ...this.props,
         };
+
+        if (this.elem) {
+            this.parse();
+        } else {
+            this.init();
+        }
     }
 
     init() {
