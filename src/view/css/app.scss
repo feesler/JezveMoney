@@ -1,4 +1,6 @@
 :root {
+  --accent-color: #0072c6;
+  --accent-color-alt: #20a0ff;
   --action-btn-border-radius: 5px;
   --focus-shadow: 0 0 0 0.25rem #0d6efd40;
 }
@@ -29,7 +31,7 @@ h2 {
 /* link style */
 a,
 a:visited {
-  color: #0072c6;
+  color: var(--accent-color);
 }
 
 a:focus-visible {
@@ -93,7 +95,7 @@ label {
   height: 34px;
   padding: 5px;
   color: #ffffff;
-  background-color: #0072c6;
+  background-color: var(--accent-color);
 }
 
 .icon-btn .icon {
@@ -287,7 +289,7 @@ label {
 .submit-btn,
 .submit-btn:visited {
   border-radius: var(--action-btn-border-radius);
-  background-color: #0072c6;
+  background-color: var(--accent-color);
 }
 
 .submit-btn:disabled {
@@ -300,7 +302,7 @@ label {
   vertical-align: baseline;
   text-decoration: underline;
   background: none;
-  color: #0072c6;
+  color: var(--accent-color);
 }
 
 .warning-btn {
@@ -317,7 +319,7 @@ label {
   padding: 4px;
   vertical-align: baseline;
   background: none;
-  color: #0072c6;
+  color: var(--accent-color);
 }
 
 .link-btn:disabled {
@@ -332,7 +334,7 @@ label {
   border: 0 none;
   font-size: 16px;
   background: none;
-  color: #0072c6;
+  color: var(--accent-color);
 
   &::after {
     content: "";
@@ -346,7 +348,7 @@ label {
     border-left: 0 none;
     border-bottom-style: dashed;
     border-bottom-width: 1px;
-    border-bottom-color: #0072c6;
+    border-bottom-color: var(--accent-color);
   }
 }
 

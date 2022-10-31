@@ -133,6 +133,7 @@
     --checkbox-text: var(--main-text-color);
     --checkbox-bg: var(--input-bg-color);
     --checkbox-border: var(--input-border-color);
+    --checkbox-checked-fill: var(--accent-color);
   }
 
   /* DropDown  */
@@ -165,7 +166,7 @@
     --dd-list-item-check: var(--main-text-color);
 
     /* List group */
-    --dd-list-group-text: #0072c6;
+    --dd-list-group-text: var(--accent-color);
     --dd-list-group-bg: #202020;
   }
 

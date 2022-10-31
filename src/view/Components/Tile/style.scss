@@ -2,7 +2,7 @@
   --tile-gap: 10px;
   --tile-size: 100px;
   --tile-content-color: #ffffff;
-  --tile-bg-color: #20a0ff;
+  --tile-bg-color: var(--accent-color-alt);
 }
 
 .tile {

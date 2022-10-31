@@ -1,6 +1,6 @@
 .trans-item {
-  --trans-item-amount-color: #20a0ff;
-  --trans-item-selected-color: #0072c6;
+  --trans-item-amount-color: var(--accent-color-alt);
+  --trans-item-selected-color: var(--accent-color);
   --trans-item-column-gap: 10px;
   --trans-item-row-gap: 2px;
 
