@@ -374,12 +374,15 @@ export class TransactionList extends Component {
         });
     }
 
-    render(state) {
-        if (!state) {
-            throw new Error('Invalid state object');
+    renderList(state, prevState) {
+        if (
+            state.items === prevState.items
+            && state.mode === prevState.mode
+            && state.listMode === prevState.listMode
+            && state.showControls === prevState.showControls
+        ) {
+            return;
         }
-
-        this.elem.classList.toggle(SELECT_MODE_CLASS, state.listMode === 'select');
 
         const elems = state.items.map((item) => {
             const tritem = TransactionListItem.create({
@@ -412,6 +415,16 @@ export class TransactionList extends Component {
 
             this.elem.append(noDataMsg);
         }
+    }
+
+    render(state, prevState = {}) {
+        if (!state) {
+            throw new Error('Invalid state object');
+        }
+
+        this.elem.classList.toggle(SELECT_MODE_CLASS, state.listMode === 'select');
+        this.renderList(state, prevState);
+
         this.elem.dataset.time = state.renderTime;
     }
 }

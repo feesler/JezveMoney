@@ -69,9 +69,9 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
-    "@babel/runtime": "^7.19.4",
+    "@babel/runtime": "^7.20.0",
     "core-js": "^3.26.0",
-    "jezvejs": "^1.45.0",
+    "jezvejs": "^1.46.0",
     "whatwg-fetch": "^3.6.2"
   }
 }

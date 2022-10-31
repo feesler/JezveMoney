@@ -723,26 +723,33 @@ class TransactionListView extends View {
         show(this.noSearchBtn, isSearchFilter);
 
         // Render list
-        this.list.setMode(state.mode);
-        this.list.setListMode(state.listMode);
-        this.list.setShowControls(state.listMode === 'list');
-        this.list.setItems(state.items);
+        this.list.setState((listState) => ({
+            ...listState,
+            mode: state.mode,
+            listMode: state.listMode,
+            showControls: (state.listMode === 'list'),
+            items: state.items,
+            renderTime: Date.now(),
+        }));
 
         if (this.topPaginator && this.bottomPaginator) {
+            const setPaginatorState = (paginatorState) => ({
+                ...paginatorState,
+                url: filterUrl,
+                pagesCount: state.pagination.pagesCount,
+                pageNum: state.pagination.page,
+            });
+
             this.topPaginator.show(state.items.length > 0);
-            this.topPaginator.setURL(filterUrl);
-            this.topPaginator.setPagesCount(state.pagination.pagesCount);
-            this.topPaginator.setPage(state.pagination.page);
+            this.topPaginator.setState(setPaginatorState);
 
             this.bottomPaginator.show(state.items.length > 0);
-            this.bottomPaginator.setURL(filterUrl);
-            this.bottomPaginator.setPagesCount(state.pagination.pagesCount);
-            this.bottomPaginator.setPage(state.pagination.page);
+            this.bottomPaginator.setState(setPaginatorState);
         }
 
+        filterUrl.searchParams.set('page', state.pagination.page);
         this.modeSelector.show(state.items.length > 0);
         this.modeSelector.setActive(state.mode);
-        filterUrl.searchParams.set('page', state.pagination.page);
         this.modeSelector.setURL(filterUrl);
 
         this.renderContextMenu(state);

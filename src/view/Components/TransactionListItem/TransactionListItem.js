@@ -437,7 +437,7 @@ export class TransactionListItem extends Component {
         }
 
         if (state.selectMode) {
-            const selected = state.selected ?? false;
+            const selected = !!state.selected;
             this.elem.classList.toggle(SELECTED_CLASS, selected);
             this.checkbox.check(selected);
         }

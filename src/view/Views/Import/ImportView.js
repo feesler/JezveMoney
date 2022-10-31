@@ -1201,8 +1201,11 @@ class ImportView extends View {
 
         if (state.pagination.pagesCount > 1) {
             this.rowsContainer.append(this.paginator.elem);
-            this.paginator.setPagesCount(state.pagination.pagesCount);
-            this.paginator.setPage(state.pagination.page);
+            this.paginator.setState((paginatorState) => ({
+                ...paginatorState,
+                pagesCount: state.pagination.pagesCount,
+                pageNum: state.pagination.page,
+            }));
         }
 
         if (hasItems) {
