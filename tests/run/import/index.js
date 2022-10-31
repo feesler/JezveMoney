@@ -86,6 +86,7 @@ export const closeUploadDialog = async () => {
     });
 };
 
+/* eslint-disable no-console */
 /** Admin access required */
 export const putFile = async (data) => {
     const baseURL = baseUrl();
@@ -150,6 +151,7 @@ export const removeFile = async (filename) => {
 
     return true;
 };
+/* eslint-enable no-console */
 
 /** Test manual add new import item */
 export const addItem = async () => {

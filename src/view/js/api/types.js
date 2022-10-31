@@ -6,6 +6,7 @@ import {
     checkDate,
 } from 'jezvejs';
 
+/* eslint-disable no-console */
 /**
  * Verify fields of specified object
  * @param {Object} obj - object to check
@@ -71,6 +72,7 @@ export const verifyObject = (obj, expected, optional) => {
 
     return res;
 };
+/* eslint-enable no-console */
 
 /** Verify object is create result */
 export const isCreateResult = (obj) => verifyObject(obj, { id: isInt });

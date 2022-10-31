@@ -80,6 +80,7 @@ export class Scenario {
         await this.finishTests();
     }
 
+    /* eslint-disable no-console */
     checkSelectedStory(story) {
         if (typeof story !== 'string') {
             return false;
@@ -95,6 +96,7 @@ export class Scenario {
 
         return false;
     }
+    /* eslint-enable no-console */
 
     getStory(name) {
         assert(name in storiesMap, `Invalid story name: ${name}`);
