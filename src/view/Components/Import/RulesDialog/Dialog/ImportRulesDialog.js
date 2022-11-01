@@ -1,9 +1,8 @@
 import {
     ge,
-    createElement,
     re,
-    removeChilds,
     show,
+    setEvents,
     insertAfter,
     isFunction,
     Component,
@@ -16,13 +15,16 @@ import { ImportRule } from '../../../../js/model/ImportRule.js';
 import { ImportRuleForm } from '../RuleForm/ImportRuleForm.js';
 import { ImportRuleItem } from '../RuleItem/ImportRuleItem.js';
 import { ConfirmDialog } from '../../../ConfirmDialog/ConfirmDialog.js';
-import './style.scss';
+import { ListContainer } from '../../../ListContainer/ListContainer.js';
 import { LoadingIndicator } from '../../../LoadingIndicator/LoadingIndicator.js';
 import { PopupMenu } from '../../../PopupMenu/PopupMenu.js';
+import './style.scss';
 
 /** CSS classes */
 export const IMPORT_RULES_DIALOG_CLASS = 'rules-dialog';
 const IMPORT_RULES_POPUP_CLASS = 'rules-popup';
+const UPDATE_BUTTON_CLASS = 'update-btn';
+const DEL_BUTTON_CLASS = 'delete-btn';
 
 /** Strings */
 const TITLE_RULE_DELETE = 'Delete import rule';
@@ -54,7 +56,7 @@ export class ImportRulesDialog extends Component {
         this.searchField = ge('searchField');
         this.searchInp = ge('searchInp');
         this.clearSearchBtn = ge('clearSearchBtn');
-        this.listContainer = this.elem.querySelector('.rules-list');
+        this.listContainer = this.elem.querySelector('.rules-list-container');
         if (
             !this.createRuleBtn
             || !this.titleElem
@@ -66,7 +68,20 @@ export class ImportRulesDialog extends Component {
             throw new Error('Failed to initialize import rules dialog');
         }
 
-        this.listContainer.addEventListener('scroll', () => this.onListScroll());
+        this.rulesList = ListContainer.create({
+            ItemComponent: ImportRuleItem,
+            className: 'rules-list',
+            itemSelector: '.rule-item',
+            getItemProps: (rule) => ({
+                data: rule,
+                ruleId: rule.id,
+                conditions: rule.conditions,
+                actions: rule.actions,
+            }),
+            onItemClick: (id, e) => this.onItemClick(id, e),
+        });
+        setEvents(this.rulesList.elem, { scroll: () => this.onListScroll() });
+        this.listContainer.append(this.rulesList.elem);
 
         InputGroup.fromElement(this.searchField);
 
@@ -77,6 +92,8 @@ export class ImportRulesDialog extends Component {
             arrows: true,
             onChange: (page) => this.onChangePage(page),
         });
+
+        this.listContainer.append(this.paginator.elem);
 
         this.popup = Popup.create({
             id: 'rules_popup',
@@ -93,10 +110,29 @@ export class ImportRulesDialog extends Component {
 
         this.createRuleBtn.addEventListener('click', () => this.onCreateRuleClick());
 
+        this.createContextMenu();
+
         this.loadingIndicator = LoadingIndicator.create({ fixed: false });
         this.elem.append(this.loadingIndicator.elem);
 
         this.reset();
+    }
+
+    createContextMenu() {
+        this.contextMenu = PopupMenu.create({
+            attached: true,
+            items: [{
+                icon: 'update',
+                title: 'Edit',
+                className: UPDATE_BUTTON_CLASS,
+                onClick: (e) => this.onUpdateItem(e),
+            }, {
+                icon: 'del',
+                title: 'Delete',
+                className: DEL_BUTTON_CLASS,
+                onClick: (e) => this.onDeleteItem(e),
+            }],
+        });
     }
 
     /** Show/hide dialog */
@@ -124,6 +160,7 @@ export class ImportRulesDialog extends Component {
                 pagesCount: 0,
                 total: 0,
             },
+            contextItem: null,
             renderTime: Date.now(),
         };
     }
@@ -147,15 +184,16 @@ export class ImportRulesDialog extends Component {
 
     /** Set loading state and render component */
     startLoading() {
-        this.state.listLoading = true;
-        this.render(this.state);
+        this.setState({ ...this.state, listLoading: true });
     }
 
     /** Remove loading state and render component */
     stopLoading() {
-        this.state.listLoading = false;
-        this.state.renderTime = Date.now();
-        this.render(this.state);
+        this.setState({
+            ...this.state,
+            listLoading: false,
+            renderTime: Date.now(),
+        });
     }
 
     /** Hide dialog */
@@ -228,6 +266,20 @@ export class ImportRulesDialog extends Component {
         this.render(this.state);
     }
 
+    onItemClick(itemId) {
+        if (this.state.id === this.LIST_STATE) {
+            this.showContextMenu(itemId);
+        }
+    }
+
+    showContextMenu(itemId) {
+        if (this.state.contextItem === itemId) {
+            return;
+        }
+
+        this.setState({ ...this.state, contextItem: itemId });
+    }
+
     /** Rules list 'scroll' event handler */
     onListScroll() {
         PopupMenu.hideActive();
@@ -250,12 +302,14 @@ export class ImportRulesDialog extends Component {
     }
 
     /** Rule 'update' event handler */
-    onUpdateItem(ruleId) {
+    onUpdateItem() {
+        const ruleId = this.state.contextItem;
         this.setUpdateRuleState(ruleId);
     }
 
     /** Rule 'delete' event handler */
-    onDeleteItem(ruleId) {
+    onDeleteItem() {
+        const ruleId = this.state.contextItem;
         ConfirmDialog.create({
             id: 'rule_delete_warning',
             title: TITLE_RULE_DELETE,
@@ -319,6 +373,7 @@ export class ImportRulesDialog extends Component {
 
             rules.setData(result.data);
             this.state.id = this.LIST_STATE;
+            this.state.contextItem = null;
             this.updateList();
 
             delete this.state.rule;
@@ -333,41 +388,56 @@ export class ImportRulesDialog extends Component {
         }
     }
 
+    renderContextMenu(state) {
+        if (state.id !== this.LIST_STATE) {
+            this.contextMenu.detach();
+            return;
+        }
+        const itemId = state.contextItem;
+        if (!itemId) {
+            return;
+        }
+        const listItem = this.rulesList.getListItemById(itemId);
+        const menuContainer = listItem?.elem?.querySelector('.actions-menu');
+        if (!menuContainer) {
+            return;
+        }
+
+        if (this.contextMenu.menuList.parentNode !== menuContainer) {
+            PopupMenu.hideActive();
+            this.contextMenu.attachTo(menuContainer);
+            this.contextMenu.toggleMenu();
+        }
+    }
+
     /** Render list state of component */
     renderList(state) {
         const firstItem = state.pagination.onPage * (state.pagination.page - 1);
         const lastItem = firstItem + state.pagination.onPage;
         const items = state.items.slice(firstItem, lastItem);
 
-        const ruleItems = items.map((rule) => ImportRuleItem.create({
-            data: rule,
-            onUpdate: (ruleId) => this.onUpdateItem(ruleId),
-            onRemove: (ruleId) => this.onDeleteItem(ruleId),
+        this.rulesList.setState((listState) => ({
+            ...listState,
+            items,
+            noItemsMessage: (state.filter !== '') ? MSG_NOT_FOUND : MSG_NO_RULES,
+            renderTime: state.renderTime,
         }));
-
-        this.listContainer.dataset.time = state.renderTime;
-        removeChilds(this.listContainer);
-        if (!ruleItems.length) {
-            const message = (state.filter !== '') ? MSG_NOT_FOUND : MSG_NO_RULES;
-            this.noDataMsg = createElement('span', {
-                props: { className: 'nodata-message', textContent: message },
-            });
-            this.listContainer.append(this.noDataMsg);
-        } else {
-            ruleItems.forEach((item) => this.listContainer.append(item.elem));
-        }
 
         show(this.searchField, true);
         this.searchInp.value = state.filter;
         show(this.clearSearchBtn, (state.filter !== ''));
 
-        if (state.pagination.pagesCount > 1) {
-            this.listContainer.append(this.paginator.elem);
-            this.paginator.setPagesCount(state.pagination.pagesCount);
-            this.paginator.setPage(state.pagination.page);
+        const showPaginator = state.pagination.pagesCount > 1;
+        this.paginator.show(showPaginator);
+        if (showPaginator) {
+            this.paginator.setState((paginatorState) => ({
+                ...paginatorState,
+                pagesCount: state.pagination.pagesCount,
+                pageNum: state.pagination.page,
+            }));
         }
 
-        show(this.listContainer, true);
+        this.rulesList.show(true);
         show(this.createRuleBtn, true);
         if (this.formContainer) {
             re(this.formContainer.elem);
@@ -387,10 +457,11 @@ export class ImportRulesDialog extends Component {
             onCancel: () => this.onCancelItem(),
         });
 
-        insertAfter(this.formContainer.elem, this.listContainer);
+        insertAfter(this.formContainer.elem, this.rulesList.elem);
 
         show(this.searchField, false);
-        show(this.listContainer, false);
+        this.rulesList.show(false);
+        this.paginator.show(false);
         show(this.createRuleBtn, false);
         show(this.formContainer.elem, true);
     }
@@ -412,6 +483,8 @@ export class ImportRulesDialog extends Component {
 
             this.renderForm(state);
         }
+
+        this.renderContextMenu(state);
 
         if (!state.listLoading) {
             this.loadingIndicator.hide();

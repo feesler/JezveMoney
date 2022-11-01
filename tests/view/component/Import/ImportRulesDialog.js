@@ -5,6 +5,7 @@ import {
     hasFlag,
     query,
     queryAll,
+    closest,
     prop,
     click,
     input,
@@ -18,6 +19,7 @@ import { ImportRuleForm } from './ImportRuleForm.js';
 import { ImportRuleItem } from './ImportRuleItem.js';
 import { asyncMap } from '../../../common.js';
 import { WarningPopup } from '../WarningPopup.js';
+import { IconButton } from '../IconButton.js';
 import { App } from '../../../Application.js';
 
 const ITEMS_ON_PAGE = 20;
@@ -38,6 +40,7 @@ export class ImportRulesDialog extends TestComponent {
             searchInp: { elem: await query(this.elem, '#searchInp') },
             clearSearchBtn: { elem: await query(this.elem, '#clearSearchBtn') },
             rulesList: { elem: await query(this.elem, '.rules-list') },
+            contextMenu: { elem: await query(this.elem, '.actions-menu-list') },
         };
 
         assert(
@@ -52,6 +55,18 @@ export class ImportRulesDialog extends TestComponent {
             && res.rulesList.elem,
             'Failed to initialize import rules dialog',
         );
+
+        const contextParent = await closest(res.contextMenu.elem, '.rule-item');
+        if (contextParent) {
+            const itemId = await prop(contextParent, 'dataset.id');
+            res.contextMenu.itemId = parseInt(itemId, 10);
+            assert(res.contextMenu.itemId, 'Invalid item');
+
+            const updateBtnElem = await query(res.contextMenu.elem, '.update-btn');
+            res.updateBtn = await IconButton.create(this, updateBtnElem);
+            const deleteBtnElem = await query(res.contextMenu.elem, '.delete-btn');
+            res.deleteBtn = await IconButton.create(this, deleteBtnElem);
+        }
 
         res.rulesList.renderTime = await prop(res.rulesList.elem, 'dataset.time');
         res.header.title = await prop(res.header.labelElem, 'textContent');
@@ -297,7 +312,8 @@ export class ImportRulesDialog extends TestComponent {
         };
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.content.items[ind].clickUpdate();
+        await this.performAction(() => this.content.items[ind].openMenu());
+        await this.content.updateBtn.click();
         await waitForFunction(async () => {
             await this.parse();
             return this.model.state === 'update';
@@ -317,7 +333,8 @@ export class ImportRulesDialog extends TestComponent {
 
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.content.items[ind].clickDelete();
+        await this.performAction(() => this.content.items[ind].openMenu());
+        await this.content.deleteBtn.click();
         await wait(this.content.ruleDeletePopupId, { visible: true });
         await this.parse();
 

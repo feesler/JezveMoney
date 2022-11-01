@@ -72,8 +72,14 @@
 .rules-list {
   display: flex;
   flex-flow: column nowrap;
-  overflow-y: auto;
   row-gap: 4px;
+}
+
+.rules-list-container {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  overflow-y: auto;
 
   .paginator {
     margin-right: auto;

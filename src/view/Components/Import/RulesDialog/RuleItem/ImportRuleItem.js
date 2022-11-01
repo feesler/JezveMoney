@@ -14,22 +14,17 @@ import { ImportActionList } from '../../../../js/model/ImportActionList.js';
 import { ImportConditionItem } from '../ConditionItem/ImportConditionItem.js';
 import { ImportActionItem } from '../ActionItem/ImportActionItem.js';
 import './style.scss';
-import { PopupMenu } from '../../../PopupMenu/PopupMenu.js';
 
 /** CSS classes */
-const UPDATE_BUTTON_CLASS = 'update-btn';
-const DEL_BUTTON_CLASS = 'delete-btn';
+const MENU_CLASS = 'actions-menu';
+const MENU_BUTTON_CLASS = 'btn icon-btn actions-menu-btn';
+const MENU_ICON_CLASS = 'icon actions-menu-btn__icon';
 
 /** Strings */
 const TITLE_CONDITIONS = 'Conditions';
 const TITLE_ACTIONS = 'Actions';
 const TITLE_NO_ACTIONS = 'No actions.';
 const TITLE_NO_CONDITIONS = 'No conditions';
-
-const defaultProps = {
-    onUpdate: null,
-    onRemove: null,
-};
 
 /**
  * ImportRuleItem component
@@ -46,13 +41,12 @@ export class ImportRuleItem extends Component {
             throw new Error('Invalid rule item');
         }
 
-        this.props = {
-            ...defaultProps,
-            ...this.props,
-        };
-
         this.init();
         this.setData(this.props.data);
+    }
+
+    get id() {
+        return this.state.ruleId;
     }
 
     /** Main structure initialization */
@@ -85,7 +79,7 @@ export class ImportRuleItem extends Component {
 
         this.createMenu();
         this.controls = window.app.createContainer('rule-item__main-controls', [
-            this.menu.elem,
+            this.menu,
             this.toggleExtBtn,
         ]);
 
@@ -114,19 +108,15 @@ export class ImportRuleItem extends Component {
     }
 
     createMenu() {
-        this.menu = PopupMenu.create({
-            items: [{
-                icon: 'update',
-                title: 'Edit',
-                className: UPDATE_BUTTON_CLASS,
-                onClick: (e) => this.onUpdate(e),
-            }, {
-                icon: 'del',
-                title: 'Delete',
-                className: DEL_BUTTON_CLASS,
-                onClick: (e) => this.onDelete(e),
-            }],
+        const { createContainer, createIcon } = window.app;
+
+        this.menuBtn = createElement('button', {
+            props: { className: MENU_BUTTON_CLASS, type: 'button' },
+            children: createIcon('ellipsis', MENU_ICON_CLASS),
         });
+        this.menu = createContainer(MENU_CLASS, [
+            this.menuBtn,
+        ]);
     }
 
     /** Set main state of component */
@@ -234,13 +224,9 @@ export class ImportRuleItem extends Component {
             this.propertyLabel.textContent = firstCondition.propertyLabel.textContent;
             this.operatorLabel.textContent = firstCondition.operatorLabel.textContent;
 
-            if (firstCondition.state.isFieldValue) {
-                this.valueLabel.classList.add('rule-item__value-property');
-                this.valueLabel.classList.remove('rule-item__value');
-            } else {
-                this.valueLabel.classList.remove('rule-item__value-property');
-                this.valueLabel.classList.add('rule-item__value');
-            }
+            const { isFieldValue } = firstCondition.state;
+            this.valueLabel.classList.toggle('rule-item__value-property', !!isFieldValue);
+            this.valueLabel.classList.toggle('rule-item__value', !isFieldValue);
 
             this.valueLabel.textContent = firstCondition.valueLabel.textContent;
         } else {

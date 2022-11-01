@@ -100,6 +100,7 @@ export class PopupMenu extends Component {
     detach() {
         if (this.hostElem) {
             removeEvents(this.hostElem, this.togglerEvents);
+            this.hostElem = null;
         } else {
             removeEvents(this.menuBtn, this.togglerEvents);
         }
