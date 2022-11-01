@@ -43,14 +43,11 @@ const defaultProps = {
  * ImportConditionForm component
  */
 export class ImportConditionForm extends Component {
-    constructor(...args) {
-        super(...args);
+    constructor(props) {
+        super(props);
 
-        if (!this.props || !this.props.data) {
+        if (!this.props?.data) {
             throw new Error('Invalid props');
-        }
-        if (!(this.props.data instanceof ImportCondition)) {
-            throw new Error('Invalid condition item');
         }
 
         this.props = {
@@ -58,14 +55,31 @@ export class ImportConditionForm extends Component {
             ...this.props,
         };
 
-        this.props.data.isValid = this.props.isValid;
-        this.props.data.message = this.props.message;
-
         this.fieldTypes = ImportCondition.getFieldTypes();
         this.operatorTypes = ImportCondition.getOperatorTypes();
 
         this.init();
-        this.setData(this.props.data);
+
+        this.state = {
+            conditionId: this.props.data.id,
+            parent: this.props.data.parent_id,
+            fieldType: this.props.data.field_id,
+            availOperators: this.props.data.getAvailOperators(),
+            operator: this.props.data.operator,
+            isFieldValue: this.props.data.isPropertyValue(),
+            value: this.props.data.value,
+            isValid: this.props.isValid,
+            message: this.props.message,
+        };
+
+        this.verifyOperator(this.state);
+        this.render(this.state);
+        // Check value changed
+        const value = this.getConditionValue(this.state);
+        if (this.props.data.value !== value) {
+            this.state.value = value;
+            this.sendUpdate();
+        }
     }
 
     /** Form controls initialization */
@@ -229,34 +243,6 @@ export class ImportConditionForm extends Component {
             || !state.availOperators.length
             || !state.availOperators.includes(state.operator)) {
             throw new Error('Invalid state');
-        }
-    }
-
-    /** Set main state of component */
-    setData(data) {
-        if (!data) {
-            throw new Error('Invalid data');
-        }
-
-        this.state = {
-            conditionId: data.id,
-            parent: data.parent_id,
-            fieldType: data.field_id,
-            availOperators: data.getAvailOperators(),
-            operator: data.operator,
-            isFieldValue: data.isPropertyValue(),
-            value: data.value,
-            isValid: data.isValid,
-            message: data.message,
-        };
-
-        this.verifyOperator(this.state);
-        this.render(this.state);
-        // Check value changed
-        const value = this.getConditionValue(this.state);
-        if (data.value !== value) {
-            this.state.value = value;
-            this.sendUpdate();
         }
     }
 

@@ -45,11 +45,8 @@ export class ImportActionForm extends Component {
     constructor(...args) {
         super(...args);
 
-        if (!this.props || !this.props.data) {
+        if (!this.props?.data) {
             throw new Error('Invalid props');
-        }
-        if (!(this.props.data instanceof ImportAction)) {
-            throw new Error('Invalid action item');
         }
 
         this.props = {
@@ -57,11 +54,22 @@ export class ImportActionForm extends Component {
             ...this.props,
         };
 
-        this.props.data.isValid = this.props.isValid;
-        this.props.data.message = this.props.message;
+        this.state = {
+            actionId: this.props.data.id,
+            actionType: this.props.data.action_id,
+            value: this.props.data.value,
+            isValid: this.props.isValid,
+            message: this.props.message,
+        };
 
         this.init();
-        this.setData(this.props.data);
+        this.render(this.state);
+        // Check value changed
+        const value = this.getActionValue(this.state);
+        if (this.props.data.value !== value) {
+            this.state.value = value;
+            this.sendUpdate();
+        }
     }
 
     /** Form controls initialization */
@@ -176,40 +184,20 @@ export class ImportActionForm extends Component {
         window.app.initPersonsList(this.personDropDown);
     }
 
-    /** Set data for component */
-    setData(data) {
-        if (!data) {
-            throw new Error('Invalid data');
-        }
-
-        this.state = {
-            actionId: data.id,
-            actionType: data.action_id,
-            value: data.value,
-            isValid: data.isValid,
-            message: data.message,
-        };
-
-        this.render(this.state);
-        // Check value changed
-        const value = this.getActionValue(this.state);
-        if (data.value !== value) {
-            this.state.value = value;
-            this.sendUpdate();
-        }
-    }
-
     /** Action type select 'change' event handler */
     onActionTypeChange(action) {
-        if (!action) {
+        const actionType = parseInt(action?.id, 10);
+        if (this.state.actionType === actionType) {
             return;
         }
 
-        const actionId = parseInt(action.id, 10);
-        this.state.actionType = actionId;
-        this.state.value = this.getActionValue(this.state);
-        this.state.isValid = true;
-        this.render(this.state);
+        this.setState({
+            ...this.state,
+            actionType,
+            value: this.getActionValue(this.state),
+            isValid: true,
+        });
+
         this.sendUpdate();
     }
 
@@ -260,14 +248,16 @@ export class ImportActionForm extends Component {
     /** Value select 'change' event handler */
     onValueChange() {
         const value = this.getActionValue(this.state);
-
         if (this.state.value === value) {
             return;
         }
 
-        this.state.value = value;
-        this.state.isValid = true;
-        this.render(this.state);
+        this.setState({
+            ...this.state,
+            value,
+            isValid: true,
+        });
+
         this.sendUpdate();
     }
 
