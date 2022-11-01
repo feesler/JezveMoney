@@ -64,8 +64,8 @@ export class TransactionListView extends AppView {
             'Invalid structure of transactions view',
         );
 
-        if (res.contextMenu.elem) {
-            const contextParent = await closest(res.contextMenu.elem, '.trans-item');
+        const contextParent = await closest(res.contextMenu.elem, '.trans-item');
+        if (contextParent) {
             const itemId = await prop(contextParent, 'dataset.id');
             res.contextMenu.itemId = parseInt(itemId, 10);
             assert(res.contextMenu.itemId, 'Invalid item');

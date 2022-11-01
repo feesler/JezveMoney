@@ -30,6 +30,7 @@ const LIST_MARGIN = 5;
 
 const defaultProps = {
     icon: 'ellipsis',
+    attached: false,
     attachTo: null,
     content: null,
     items: [],
@@ -71,9 +72,11 @@ export class PopupMenu extends Component {
             this.setContent(this.props.content);
         }
 
-        if (this.props.attachTo) {
+        if (this.props.attached) {
             this.elem = this.menuList;
-            this.attachTo(this.props.attachTo);
+            if (this.props.attachTo) {
+                this.attachTo(this.props.attachTo);
+            }
         } else {
             this.menuBtn = createElement('button', {
                 props: { className: BUTTON_CLASS, type: 'button' },

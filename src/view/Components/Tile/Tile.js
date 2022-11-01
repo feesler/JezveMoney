@@ -34,8 +34,8 @@ const defaultProps = {
  * Tile component
  */
 export class Tile extends Component {
-    constructor(...args) {
-        super(...args);
+    constructor(props) {
+        super(props);
 
         this.props = {
             ...defaultProps,
@@ -51,6 +51,13 @@ export class Tile extends Component {
         } else {
             this.init();
         }
+
+        this.setClassNames();
+        this.render(this.state);
+    }
+
+    get id() {
+        return this.state.id;
     }
 
     init() {
@@ -68,9 +75,6 @@ export class Tile extends Component {
                 props: { className: TILE_CLASS, type: 'button' },
             });
         }
-
-        this.setClassNames();
-        this.render(this.state);
     }
 
     /**
@@ -102,54 +106,6 @@ export class Tile extends Component {
                 this.state.icon = this.icon.substr(1);
             }
         }
-
-        this.setClassNames();
-        this.render(this.state);
-    }
-
-    /**
-     * Set title of tile
-     * @param {string|null} title - title to set, if null is set then title removed
-     */
-    setTitle(title) {
-        if (title !== null && typeof title !== 'string') {
-            throw new Error('Invalid title specified');
-        }
-        if (this.state.title === title) {
-            return;
-        }
-
-        this.setState({ ...this.state, title });
-    }
-
-    /**
-     * Set subtitle of tile
-     * @param {string|null} subtitle - subtitle to set, if null is set then subtitle removed
-     */
-    setSubTitle(subtitle) {
-        if (subtitle !== null && typeof subtitle !== 'string') {
-            throw new Error('Invalid subtitle specified');
-        }
-        if (this.state.subtitle === subtitle) {
-            return;
-        }
-
-        this.setState({ ...this.state, subtitle });
-    }
-
-    /**
-     * Set icon of tile
-     * @param {string|null} icon - icon to set, if null is set then icon removed
-     */
-    setIcon(icon) {
-        if (icon !== null && typeof icon !== 'string') {
-            throw new Error('Invalid icon specified');
-        }
-        if (this.state.icon === icon) {
-            return;
-        }
-
-        this.setState({ ...this.state, icon });
     }
 
     renderAttributes(state, prevState) {
@@ -220,7 +176,10 @@ export class Tile extends Component {
     }
 
     renderSelectControls(state, prevState) {
-        if (state.selectMode === prevState.selectMode) {
+        if (
+            state.selectMode === prevState.selectMode
+            && state.selected === prevState.selected
+        ) {
             return;
         }
 
@@ -234,9 +193,8 @@ export class Tile extends Component {
         this.checkbox?.show(state.selectMode);
 
         if (state.selectMode) {
-            const selected = state.selected ?? false;
-            this.elem.classList.toggle(SELECTED_CLASS, selected);
-            this.checkbox.check(selected);
+            this.elem.classList.toggle(SELECTED_CLASS, !!state.selected);
+            this.checkbox.check(!!state.selected);
         }
     }
 

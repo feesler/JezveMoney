@@ -80,7 +80,7 @@ class AccountView extends View {
         }
 
         this.tile = AccountTile.fromElement('acc_tile', {
-            parent: this,
+            account: this.state.data,
         });
         this.iconSelect = DropDown.create({
             elem: 'icon',
@@ -119,6 +119,8 @@ class AccountView extends View {
                 onClick: () => this.confirmDelete(),
             });
         }
+
+        this.render(this.state);
     }
 
     /** Icon select event handler */
@@ -308,20 +310,22 @@ class AccountView extends View {
         }
 
         // Render account tile
-        let tileTitle = state.data.name;
-        const bal = state.original.balance
+        const balance = state.original.balance
             + state.data.fInitBalance - state.original.initbalance;
 
-        if (!state.original.id && !state.nameChanged) {
-            tileTitle = TITLE_NEW_ACCOUNT;
-        }
+        const name = (!state.original.id && !state.nameChanged)
+            ? TITLE_NEW_ACCOUNT
+            : state.data.name;
 
-        this.tile.setAccount({
-            name: tileTitle,
-            balance: bal,
-            curr_id: state.data.curr_id,
-            icon_id: state.data.icon_id,
-        });
+        this.tile.setState((tileState) => ({
+            ...tileState,
+            account: {
+                name,
+                balance,
+                curr_id: state.data.curr_id,
+                icon_id: state.data.icon_id,
+            },
+        }));
 
         // Currency sign
         const currencyObj = window.app.model.currency.getItem(state.data.curr_id);

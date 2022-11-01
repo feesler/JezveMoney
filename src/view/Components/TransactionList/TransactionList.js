@@ -1,9 +1,10 @@
 import {
     createElement,
     setEvents,
-    removeEvents,
     isFunction,
+    re,
     removeChilds,
+    insertAfter,
     Component,
 } from 'jezvejs';
 import { Sortable } from 'jezvejs/Sortable';
@@ -53,15 +54,17 @@ export class TransactionList extends Component {
             renderTime: Date.now(),
         };
 
+        this.listItems = [];
+        this.list = null;
+        this.noDataMsg = null;
+
         this.selectEvents = { click: (e) => this.onItemClick(e) };
 
         this.init();
     }
 
     init() {
-        if (this.state.selectable) {
-            this.setHandlers();
-        }
+        this.setHandlers();
 
         if (this.props.sortable) {
             this.trListSortable = new Sortable({
@@ -79,10 +82,6 @@ export class TransactionList extends Component {
 
     setHandlers() {
         setEvents(this.elem, this.selectEvents);
-    }
-
-    removeHandlers() {
-        removeEvents(this.elem, this.selectEvents);
     }
 
     /** Returns array of list items */
@@ -112,29 +111,12 @@ export class TransactionList extends Component {
     }
 
     /**
-     * Find closest list item element to specified
-     * @param {Element} elem - element to start looking from
-     */
-    findListItemElement(elem) {
-        if (!elem) {
-            return null;
-        }
-
-        const res = elem.querySelector(ITEM_SELECTOR);
-        if (!res) {
-            return elem.closest(ITEM_SELECTOR);
-        }
-
-        return res;
-    }
-
-    /**
      * Return transaction id from transaction item element
      * @param {Element} elem - target list item element
      */
-    transIdFromElem(elem) {
-        const listItemElem = this.findListItemElement(elem);
-        if (!listItemElem || !listItemElem.dataset) {
+    itemIdFromElem(elem) {
+        const listItemElem = elem?.closest(ITEM_SELECTOR);
+        if (!listItemElem?.dataset) {
             return 0;
         }
 
@@ -273,10 +255,8 @@ export class TransactionList extends Component {
      * @param {Event} e - click event object
      */
     onItemClick(e) {
-        const listItemElem = this.findListItemElement(e?.target);
-        const itemId = parseInt(listItemElem?.dataset?.id, 10);
-        const transaction = this.getTransaction(itemId);
-        if (!transaction) {
+        const itemId = this.itemIdFromElem(e?.target);
+        if (!this.getTransaction(itemId)) {
             return;
         }
 
@@ -293,8 +273,7 @@ export class TransactionList extends Component {
     }
 
     toggleSelectItem(itemId) {
-        const transaction = this.getTransaction(itemId);
-        if (!transaction) {
+        if (!this.getTransaction(itemId)) {
             return;
         }
 
@@ -316,8 +295,8 @@ export class TransactionList extends Component {
      * @param {number} retrans_id - identifier of replaced transaction
      */
     onSort(elem, refElem) {
-        const transactionId = this.transIdFromElem(elem);
-        const refId = this.transIdFromElem(refElem);
+        const transactionId = this.itemIdFromElem(elem);
+        const refId = this.itemIdFromElem(refElem);
         if (!transactionId || !refId) {
             return;
         }
@@ -334,44 +313,22 @@ export class TransactionList extends Component {
         }
     }
 
-    setShowControls(showControls) {
-        if (this.state.showControls === showControls) {
+    renderNoDataMessage() {
+        if (this.noDataMsg) {
             return;
         }
 
-        this.setState({ ...this.state, showControls });
-    }
-
-    setListMode(listMode) {
-        if (this.state.listMode === listMode) {
-            return;
-        }
-
-        this.setState({ ...this.state, listMode });
-    }
-
-    setMode(mode) {
-        if (this.state.mode === mode) {
-            return;
-        }
-
-        this.setState({
-            ...this.state,
-            mode,
-            renderTime: Date.now(),
+        this.noDataMsg = createElement('span', {
+            props: {
+                className: NO_DATA_CLASS,
+                textContent: MSG_NO_TRANSACTIONS,
+            },
         });
+        this.elem.append(this.noDataMsg);
     }
 
-    setItems(items) {
-        if (this.state.items === items) {
-            return;
-        }
-
-        this.setState({
-            ...this.state,
-            items,
-            renderTime: Date.now(),
-        });
+    getListItemById(id) {
+        return this.listItems.find((item) => item.id === id);
     }
 
     renderList(state, prevState) {
@@ -384,37 +341,66 @@ export class TransactionList extends Component {
             return;
         }
 
-        const elems = state.items.map((item) => {
-            const tritem = TransactionListItem.create({
+        if (!state.items) {
+            throw new Error('Invalid state');
+        }
+
+        const emptyList = state.items.length === 0;
+        const emptyBefore = !prevState.items || prevState.items.length === 0;
+        if ((emptyList || emptyBefore) && emptyList !== emptyBefore) {
+            removeChilds(this.elem);
+            this.list = null;
+            this.listItems = [];
+            this.noDataMsg = null;
+        }
+
+        if (emptyList) {
+            this.renderNoDataMessage();
+            return;
+        }
+
+        if (!this.list) {
+            this.list = createElement('div', {
+                props: { className: LIST_ITEMS_CLASS },
+            });
+            this.elem.append(this.list);
+        }
+
+        const listItems = [];
+        let lastItem = null;
+        state.items.forEach((item) => {
+            const itemProps = {
                 mode: state.mode,
                 selected: item.selected,
                 selectMode: state.listMode === 'select',
                 showControls: state.showControls,
                 item,
-            });
-            tritem.render(tritem.state);
-            return tritem.elem;
+            };
+
+            let listItem = this.getListItemById(item.id);
+            if (listItem) {
+                listItem.setState(itemProps);
+            } else {
+                listItem = TransactionListItem.create(itemProps);
+                if (lastItem) {
+                    insertAfter(listItem.elem, lastItem.elem);
+                } else {
+                    this.list.prepend(listItem.elem);
+                }
+            }
+
+            lastItem = listItem;
+            listItems.push(listItem);
         });
 
-        removeChilds(this.elem);
-        if (elems.length) {
-            const listItems = createElement('div', {
-                props: { className: LIST_ITEMS_CLASS },
-                children: elems,
-            });
-            this.elem.append(listItems);
+        // Remove items not included in new state
+        this.listItems.forEach((item) => {
+            if (!listItems.includes(item)) {
+                re(item.elem);
+            }
+        });
 
-            this.elem.classList.toggle(DETAILS_CLASS, (state.mode === 'details'));
-        } else {
-            const noDataMsg = createElement('span', {
-                props: {
-                    className: NO_DATA_CLASS,
-                    textContent: MSG_NO_TRANSACTIONS,
-                },
-            });
-
-            this.elem.append(noDataMsg);
-        }
+        this.listItems = listItems;
     }
 
     render(state, prevState = {}) {
@@ -422,6 +408,7 @@ export class TransactionList extends Component {
             throw new Error('Invalid state object');
         }
 
+        this.elem.classList.toggle(DETAILS_CLASS, state.mode === 'details');
         this.elem.classList.toggle(SELECT_MODE_CLASS, state.listMode === 'select');
         this.renderList(state, prevState);
 

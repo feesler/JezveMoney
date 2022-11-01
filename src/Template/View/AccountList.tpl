@@ -10,7 +10,7 @@ include(TPL_PATH . "Header.tpl");    ?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
-                    <div class="heading">
+                    <div id="visibleTilesHeading" class="heading">
                         <h1>Accounts</h1>
                         <div class="heading-actions">
                             <?= IconButton::render([
@@ -22,11 +22,9 @@ include(TPL_PATH . "Header.tpl");    ?>
                             ]) ?>
                         </div>
                     </div>
-                    <div id="tilesContainer" class="tiles"></div>
                     <div id="hiddenTilesHeading" class="heading" hidden>
                         <h1>Hidden</h1>
                     </div>
-                    <div id="hiddenTilesContainer" class="tiles"></div>
                 </div>
             </div>
         </div>

@@ -2,9 +2,6 @@ import 'jezvejs/style';
 import {
     asArray,
     ge,
-    createElement,
-    setEvents,
-    removeChilds,
     insertAfter,
     show,
 } from 'jezvejs';
@@ -14,13 +11,11 @@ import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { Tile } from '../../Components/Tile/Tile.js';
+import { TilesList } from '../../Components/TilesList/TilesList.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { PopupMenu } from '../../Components/PopupMenu/PopupMenu.js';
 import './style.scss';
 
-/** CSS classes */
-const NO_DATA_CLASS = 'nodata-message';
 /** Strings */
 const TITLE_SINGLE_PERSON_DELETE = 'Delete person';
 const TITLE_MULTI_PERSON_DELETE = 'Delete persons';
@@ -54,19 +49,31 @@ class PersonListView extends View {
      * View initialization
      */
     onStart() {
-        this.tilesContainer = ge('tilesContainer');
+        const listProps = {
+            getItemProps: (person, state) => ({
+                type: 'button',
+                attrs: { 'data-id': person.id },
+                title: person.name,
+                selected: person.selected,
+                selectMode: state.listMode === 'select',
+            }),
+            listMode: this.state.listMode,
+            noItemsMessage: MSG_NO_PERSONS,
+            onSelect: (id) => this.onItemSelect(id),
+            onContextMenu: (id) => this.onContextMenu(id),
+        };
+
+        const visibleTilesHeading = ge('visibleTilesHeading');
         this.hiddenTilesHeading = ge('hiddenTilesHeading');
-        this.hiddenTilesContainer = ge('hiddenTilesContainer');
-        if (
-            !this.tilesContainer
-            || !this.hiddenTilesHeading
-            || !this.hiddenTilesContainer
-        ) {
-            throw new Error('Failed to initialize Person List view');
+        if (!visibleTilesHeading || !this.hiddenTilesHeading) {
+            throw new Error('Failed to initialize Account List view');
         }
-        const tileEvents = { click: (e) => this.onTileClick(e) };
-        setEvents(this.tilesContainer, tileEvents);
-        setEvents(this.hiddenTilesContainer, tileEvents);
+
+        this.visibleTiles = TilesList.create(listProps);
+        insertAfter(this.visibleTiles.elem, visibleTilesHeading);
+
+        this.hiddenTiles = TilesList.create(listProps);
+        insertAfter(this.hiddenTiles.elem, this.hiddenTilesHeading);
 
         this.createBtn = ge('add_btn');
         this.createMenu();
@@ -75,7 +82,7 @@ class PersonListView extends View {
         this.createContextMenu();
 
         this.loadingIndicator = LoadingIndicator.create();
-        insertAfter(this.loadingIndicator.elem, this.hiddenTilesContainer);
+        insertAfter(this.loadingIndicator.elem, this.hiddenTiles.elem);
 
         this.render(this.state);
     }
@@ -126,7 +133,7 @@ class PersonListView extends View {
     createContextMenu() {
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
-            attachTo: this.tilesContainer,
+            attached: true,
         });
 
         this.ctxUpdateBtn = this.contextMenu.addIconItem({
@@ -155,27 +162,20 @@ class PersonListView extends View {
         });
     }
 
-    /**
-     * Tile click event handler
-     */
-    onTileClick(e) {
-        const tile = e?.target?.closest('.tile');
-        if (!tile || !tile.dataset) {
+    onItemSelect(itemId) {
+        if (this.state.listMode !== 'select') {
             return;
         }
 
-        const personId = parseInt(tile.dataset.id, 10);
-        const person = window.app.model.persons.getItem(personId);
-        if (!person) {
+        this.toggleSelectItem(itemId);
+    }
+
+    onContextMenu(itemId) {
+        if (this.state.listMode !== 'list') {
             return;
         }
 
-        if (this.state.listMode === 'list') {
-            this.showContextMenu(personId);
-        } else if (this.state.listMode === 'select') {
-            this.toggleSelectItem(personId);
-            this.setRenderTime();
-        }
+        this.showContextMenu(itemId);
     }
 
     showContextMenu(itemId) {
@@ -186,8 +186,12 @@ class PersonListView extends View {
         this.setState({ ...this.state, contextItem: itemId });
     }
 
+    getPersonById(id) {
+        return window.app.model.persons.getItem(id);
+    }
+
     toggleSelectItem(itemId) {
-        const person = window.app.model.persons.getItem(itemId);
+        const person = this.getPersonById(itemId);
         if (!person) {
             return;
         }
@@ -275,10 +279,6 @@ class PersonListView extends View {
         }
 
         this.setState({ ...this.state, loading: false });
-    }
-
-    setRenderTime() {
-        this.setState({ ...this.state, renderTime: Date.now() });
     }
 
     getVisibleSelectedItems(state = this.state) {
@@ -370,7 +370,6 @@ class PersonListView extends View {
         }
 
         this.stopLoading();
-        this.setRenderTime();
     }
 
     /** Show person(s) delete confirmation popup */
@@ -389,46 +388,30 @@ class PersonListView extends View {
         });
     }
 
-    renderTilesList(persons, listMode) {
-        return persons.map((person) => Tile.create({
-            type: 'button',
-            attrs: { 'data-id': person.id },
-            title: person.name,
-            selected: person.selected,
-            selectMode: listMode === 'select',
-        }));
-    }
-
     renderContextMenu(state) {
         if (state.listMode !== 'list') {
             this.contextMenu.detach();
             return;
         }
-
-        const { contextItem } = state;
-        if (!contextItem) {
-            return;
-        }
-        const person = window.app.model.persons.getItem(contextItem);
+        const person = this.getPersonById(state.contextItem);
         if (!person) {
             return;
         }
-
         const tile = document.querySelector(`.tile[data-id="${person.id}"]`);
         if (!tile) {
             return;
-        }
-
-        if (this.contextMenu.menuList.parentNode !== tile) {
-            PopupMenu.hideActive();
-            this.contextMenu.attachTo(tile);
-            this.contextMenu.toggleMenu();
         }
 
         const { baseURL } = window.app;
         this.ctxUpdateBtn.setURL(`${baseURL}persons/update/${person.id}`);
         this.ctxShowBtn.show(!person.isVisible());
         this.ctxHideBtn.show(person.isVisible());
+
+        if (this.contextMenu.menuList.parentNode !== tile) {
+            PopupMenu.hideActive();
+            this.contextMenu.attachTo(tile);
+            this.contextMenu.toggleMenu();
+        }
     }
 
     renderMenu(state) {
@@ -466,30 +449,25 @@ class PersonListView extends View {
         }
 
         // Render visible persons
-        const visibleTiles = this.renderTilesList(state.items.visible, state.listMode);
-        removeChilds(this.tilesContainer);
-        if (visibleTiles.length > 0) {
-            visibleTiles.forEach((item) => this.tilesContainer.appendChild(item.elem));
-        } else {
-            const noDataMsg = createElement('span', {
-                props: { className: NO_DATA_CLASS, textContent: MSG_NO_PERSONS },
-            });
-            this.tilesContainer.append(noDataMsg);
-        }
-
+        this.visibleTiles.setState((visibleState) => ({
+            ...visibleState,
+            items: state.items.visible,
+            listMode: state.listMode,
+            renderTime: Date.now(),
+        }));
         // Render hidden persons
-        const hiddenTiles = this.renderTilesList(state.items.hidden, state.listMode);
-        removeChilds(this.hiddenTilesContainer);
-        const hiddenItemsAvailable = (hiddenTiles.length > 0);
-        if (hiddenItemsAvailable) {
-            hiddenTiles.forEach((item) => this.hiddenTilesContainer.appendChild(item.elem));
-        }
+        this.hiddenTiles.setState((hiddenState) => ({
+            ...hiddenState,
+            items: state.items.hidden,
+            listMode: state.listMode,
+        }));
+
+        const hiddenItemsAvailable = (state.items.hidden.length > 0);
+        this.hiddenTiles.show(hiddenItemsAvailable);
         show(this.hiddenTilesHeading, hiddenItemsAvailable);
 
         this.renderContextMenu(state);
         this.renderMenu(state);
-
-        this.tilesContainer.dataset.time = state.renderTime;
 
         if (!state.loading) {
             this.loadingIndicator.hide();

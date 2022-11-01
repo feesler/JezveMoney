@@ -271,10 +271,14 @@ class TransactionView extends View {
         this.debtAccTileInfoBlock = this.debtAccountContainer.querySelector('.tile-info-block');
 
         const srcTileElem = ge('source_tile');
-        this.srcTile = (srcTileElem) ? AccountTile.fromElement(srcTileElem) : null;
+        this.srcTile = (srcTileElem)
+            ? AccountTile.fromElement(srcTileElem, { account: state.srcAccount })
+            : null;
 
         const destTileElem = ge('dest_tile');
-        this.destTile = (destTileElem) ? AccountTile.fromElement(destTileElem) : null;
+        this.destTile = (destTileElem)
+            ? AccountTile.fromElement(destTileElem, { account: state.destAccount })
+            : null;
 
         this.srcAmountInfo = TileInfoItem.fromElement('src_amount_left', {
             onclick: () => this.store.dispatch(sourceAmountClick()),
@@ -376,7 +380,9 @@ class TransactionView extends View {
 
         this.personIdInp = ge('person_id');
         this.debtAccountInp = ge('acc_id');
-        this.debtAccountTile = AccountTile.fromElement('acc_tile', { parent: this });
+        this.debtAccountTile = AccountTile.fromElement('acc_tile', {
+            account: state.account,
+        });
 
         this.noAccountBtn = this.debtAccountContainer.querySelector('.tile_header .close-btn');
         setEvents(this.noAccountBtn, { click: () => this.toggleEnableAccount() });
@@ -1243,7 +1249,7 @@ class TransactionView extends View {
         }
 
         if (!noAccount) {
-            this.debtAccountTile.setAccount(state.account);
+            this.debtAccountTile.setState({ account: state.account });
             if (!this.accDDList) {
                 this.initAccList(state);
             }
@@ -1321,7 +1327,7 @@ class TransactionView extends View {
 
         if (transaction.type === EXPENSE || transaction.type === TRANSFER) {
             if (this.srcTile && state.srcAccount) {
-                this.srcTile.setAccount(state.srcAccount);
+                this.srcTile.setState({ account: state.srcAccount });
             }
 
             this.initSrcAccList(state);
@@ -1333,7 +1339,7 @@ class TransactionView extends View {
 
         if (transaction.type === INCOME || transaction.type === TRANSFER) {
             if (this.destTile && state.destAccount) {
-                this.destTile.setAccount(state.destAccount);
+                this.destTile.setState({ account: state.destAccount });
             }
 
             this.initDestAccList(state);

@@ -2,9 +2,6 @@ import 'jezvejs/style';
 import {
     asArray,
     ge,
-    createElement,
-    setEvents,
-    removeChilds,
     insertAfter,
     show,
     urlJoin,
@@ -18,12 +15,11 @@ import { AccountList } from '../../js/model/AccountList.js';
 import { IconList } from '../../js/model/IconList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
+import { TilesList } from '../../Components/TilesList/TilesList.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { PopupMenu } from '../../Components/PopupMenu/PopupMenu.js';
 import './style.scss';
 
-/** CSS classes */
-const NO_DATA_CLASS = 'nodata-message';
 /** Strings */
 const TITLE_SINGLE_ACC_DELETE = 'Delete account';
 const TITLE_MULTI_ACC_DELETE = 'Delete accounts';
@@ -59,19 +55,32 @@ class AccountListView extends View {
      * View initialization
      */
     onStart() {
-        this.tilesContainer = ge('tilesContainer');
+        const listProps = {
+            ItemComponent: AccountTile,
+            getItemProps: (account, state) => ({
+                type: 'button',
+                account,
+                attrs: { 'data-id': account.id },
+                selected: account.selected,
+                selectMode: state.listMode === 'select',
+            }),
+            listMode: this.state.listMode,
+            noItemsMessage: MSG_NO_ACCOUNTS,
+            onSelect: (id) => this.onItemSelect(id),
+            onContextMenu: (id) => this.onContextMenu(id),
+        };
+
+        const visibleTilesHeading = ge('visibleTilesHeading');
         this.hiddenTilesHeading = ge('hiddenTilesHeading');
-        this.hiddenTilesContainer = ge('hiddenTilesContainer');
-        if (
-            !this.tilesContainer
-            || !this.hiddenTilesHeading
-            || !this.hiddenTilesContainer
-        ) {
+        if (!visibleTilesHeading || !this.hiddenTilesHeading) {
             throw new Error('Failed to initialize Account List view');
         }
-        const tileEvents = { click: (e) => this.onTileClick(e) };
-        setEvents(this.tilesContainer, tileEvents);
-        setEvents(this.hiddenTilesContainer, tileEvents);
+
+        this.visibleTiles = TilesList.create(listProps);
+        insertAfter(this.visibleTiles.elem, visibleTilesHeading);
+
+        this.hiddenTiles = TilesList.create(listProps);
+        insertAfter(this.hiddenTiles.elem, this.hiddenTilesHeading);
 
         this.createBtn = ge('add_btn');
         this.createMenu();
@@ -80,7 +89,7 @@ class AccountListView extends View {
         this.createContextMenu();
 
         this.loadingIndicator = LoadingIndicator.create();
-        insertAfter(this.loadingIndicator.elem, this.hiddenTilesContainer);
+        insertAfter(this.loadingIndicator.elem, this.hiddenTiles.elem);
 
         this.render(this.state);
     }
@@ -137,7 +146,7 @@ class AccountListView extends View {
     createContextMenu() {
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
-            attachTo: this.tilesContainer,
+            attached: true,
         });
 
         this.ctxUpdateBtn = this.contextMenu.addIconItem({
@@ -172,23 +181,20 @@ class AccountListView extends View {
         });
     }
 
-    /**
-     * Tile click event handler
-     */
-    onTileClick(e) {
-        const tile = e?.target?.closest('.tile');
-        const itemId = parseInt(tile?.dataset?.id, 10);
-        const account = window.app.model.userAccounts.getItem(itemId);
-        if (!account) {
+    onItemSelect(itemId) {
+        if (this.state.listMode !== 'select') {
             return;
         }
 
-        if (this.state.listMode === 'list') {
-            this.showContextMenu(itemId);
-        } else if (this.state.listMode === 'select') {
-            this.toggleSelectItem(itemId);
-            this.setRenderTime();
+        this.toggleSelectItem(itemId);
+    }
+
+    onContextMenu(itemId) {
+        if (this.state.listMode !== 'list') {
+            return;
         }
+
+        this.showContextMenu(itemId);
     }
 
     showContextMenu(itemId) {
@@ -199,8 +205,12 @@ class AccountListView extends View {
         this.setState({ ...this.state, contextItem: itemId });
     }
 
+    getAccountById(id) {
+        return window.app.model.userAccounts.getItem(id);
+    }
+
     toggleSelectItem(itemId) {
-        const account = window.app.model.userAccounts.getItem(itemId);
+        const account = this.getAccountById(itemId);
         if (!account) {
             return;
         }
@@ -255,12 +265,10 @@ class AccountListView extends View {
 
     selectAll() {
         this.setState(this.reduceSelectAll());
-        this.setRenderTime();
     }
 
     deselectAll() {
         this.setState(this.reduceDeselectAll());
-        this.setRenderTime();
     }
 
     toggleSelectMode() {
@@ -290,10 +298,6 @@ class AccountListView extends View {
         }
 
         this.setState({ ...this.state, loading: false });
-    }
-
-    setRenderTime() {
-        this.setState({ ...this.state, renderTime: Date.now() });
     }
 
     getVisibleSelectedItems(state = this.state) {
@@ -385,7 +389,6 @@ class AccountListView extends View {
         }
 
         this.stopLoading();
-        this.setRenderTime();
     }
 
     /**
@@ -406,40 +409,18 @@ class AccountListView extends View {
         });
     }
 
-    renderTilesList(accounts, listMode) {
-        return accounts.map((account) => AccountTile.create({
-            type: 'button',
-            account,
-            attrs: { 'data-id': account.id },
-            selected: account.selected,
-            selectMode: listMode === 'select',
-        }));
-    }
-
     renderContextMenu(state) {
         if (state.listMode !== 'list') {
             this.contextMenu.detach();
             return;
         }
-
-        const { contextItem } = state;
-        if (!contextItem) {
-            return;
-        }
-        const account = window.app.model.userAccounts.getItem(contextItem);
+        const account = this.getAccountById(state.contextItem);
         if (!account) {
             return;
         }
-
         const tile = document.querySelector(`.tile[data-id="${account.id}"]`);
         if (!tile) {
             return;
-        }
-
-        if (this.contextMenu.menuList.parentNode !== tile) {
-            PopupMenu.hideActive();
-            this.contextMenu.attachTo(tile);
-            this.contextMenu.toggleMenu();
         }
 
         const { baseURL } = window.app;
@@ -447,6 +428,12 @@ class AccountListView extends View {
         this.ctxExportBtn.setURL(`${baseURL}accounts/export/${account.id}`);
         this.ctxShowBtn.show(!account.isVisible());
         this.ctxHideBtn.show(account.isVisible());
+
+        if (this.contextMenu.menuList.parentNode !== tile) {
+            PopupMenu.hideActive();
+            this.contextMenu.attachTo(tile);
+            this.contextMenu.toggleMenu();
+        }
     }
 
     renderMenu(state) {
@@ -498,30 +485,25 @@ class AccountListView extends View {
         }
 
         // Render visible accounts
-        const visibleTiles = this.renderTilesList(state.items.visible, state.listMode);
-        removeChilds(this.tilesContainer);
-        if (visibleTiles.length > 0) {
-            visibleTiles.forEach((item) => this.tilesContainer.appendChild(item.elem));
-        } else {
-            const noDataMsg = createElement('span', {
-                props: { className: NO_DATA_CLASS, textContent: MSG_NO_ACCOUNTS },
-            });
-            this.tilesContainer.append(noDataMsg);
-        }
-
+        this.visibleTiles.setState((visibleState) => ({
+            ...visibleState,
+            items: state.items.visible,
+            listMode: state.listMode,
+            renderTime: Date.now(),
+        }));
         // Render hidden accounts
-        const hiddenTiles = this.renderTilesList(state.items.hidden, state.listMode);
-        removeChilds(this.hiddenTilesContainer);
-        const hiddenItemsAvailable = (hiddenTiles.length > 0);
-        if (hiddenItemsAvailable) {
-            hiddenTiles.forEach((item) => this.hiddenTilesContainer.appendChild(item.elem));
-        }
+        this.hiddenTiles.setState((hiddenState) => ({
+            ...hiddenState,
+            items: state.items.hidden,
+            listMode: state.listMode,
+        }));
+
+        const hiddenItemsAvailable = (state.items.hidden.length > 0);
+        this.hiddenTiles.show(hiddenItemsAvailable);
         show(this.hiddenTilesHeading, hiddenItemsAvailable);
 
         this.renderContextMenu(state);
         this.renderMenu(state);
-
-        this.tilesContainer.dataset.time = state.renderTime;
 
         if (!state.loading) {
             this.loadingIndicator.hide();

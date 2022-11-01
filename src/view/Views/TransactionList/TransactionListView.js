@@ -229,7 +229,7 @@ class TransactionListView extends View {
     createContextMenu() {
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
-            attachTo: this.list.elem,
+            attached: true,
         });
 
         this.ctxUpdateBtn = this.contextMenu.addIconItem({
