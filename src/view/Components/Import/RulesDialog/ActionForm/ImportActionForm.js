@@ -42,34 +42,40 @@ const defaultProps = {
  * ImportActionForm component
  */
 export class ImportActionForm extends Component {
-    constructor(...args) {
-        super(...args);
-
-        if (!this.props?.data) {
-            throw new Error('Invalid props');
-        }
+    constructor(props) {
+        super(props);
 
         this.props = {
             ...defaultProps,
             ...this.props,
         };
 
+        if (!this.props?.data) {
+            throw new Error('Invalid props');
+        }
+
+        const { data } = this.props;
         this.state = {
-            actionId: this.props.data.id,
-            actionType: this.props.data.action_id,
-            value: this.props.data.value,
+            actionId: data.id,
+            actionType: data.action_id,
+            value: data.value,
             isValid: this.props.isValid,
             message: this.props.message,
+            actions: this.props.actions,
         };
 
         this.init();
         this.render(this.state);
         // Check value changed
         const value = this.getActionValue(this.state);
-        if (this.props.data.value !== value) {
+        if (data.value.toString() !== value.toString()) {
             this.state.value = value;
             this.sendUpdate();
         }
+    }
+
+    get id() {
+        return this.state.actionId;
     }
 
     /** Form controls initialization */
@@ -127,13 +133,13 @@ export class ImportActionForm extends Component {
         ]);
     }
 
-    getActionTypes() {
+    getActionTypes(state) {
         const actionTypes = ImportAction.getTypes();
-        if (!this.props.actions) {
+        if (!state.actions) {
             return actionTypes;
         }
 
-        const typesFilter = asArray(this.props.actions);
+        const typesFilter = asArray(state.actions);
         if (!typesFilter.length) {
             return actionTypes;
         }
@@ -143,13 +149,18 @@ export class ImportActionForm extends Component {
 
     /** Create action type field */
     createActionTypeField() {
-        const actionTypes = this.getActionTypes();
-        const items = actionTypes.map(({ id, title }) => ({ id, title }));
-
         this.actionDropDown = DropDown.create({
             className: ACTION_FIELD_CLASS,
             onchange: (action) => this.onActionTypeChange(action),
         });
+    }
+
+    /** Render action type field */
+    renderActionTypeField(state) {
+        const actionTypes = this.getActionTypes(state);
+        const items = actionTypes.map(({ id, title }) => ({ id, title }));
+
+        this.actionDropDown.removeAll();
         this.actionDropDown.append(items);
     }
 
@@ -213,11 +224,11 @@ export class ImportActionForm extends Component {
         }
         if (state.actionType === IMPORT_ACTION_SET_ACCOUNT) {
             const selection = this.accountDropDown.getSelectionData();
-            return selection.id;
+            return parseInt(selection.id, 10);
         }
         if (state.actionType === IMPORT_ACTION_SET_PERSON) {
             const selection = this.personDropDown.getSelectionData();
-            return selection.id;
+            return parseInt(selection.id, 10);
         }
         if (ImportAction.isAmountValue(state.actionType)) {
             return this.decAmountInput.value;
@@ -264,14 +275,14 @@ export class ImportActionForm extends Component {
     /** Send component 'update' event */
     sendUpdate() {
         if (isFunction(this.props.onUpdate)) {
-            this.props.onUpdate(this.getData(this.state));
+            this.props.onUpdate(this.id, this.getData(this.state));
         }
     }
 
     /** Delete button 'click' event handler */
     onDelete() {
         if (isFunction(this.props.onRemove)) {
-            this.props.onRemove();
+            this.props.onRemove(this.id);
         }
     }
 
@@ -309,6 +320,8 @@ export class ImportActionForm extends Component {
 
         const isSelectTarget = ImportAction.isSelectValue(state.actionType);
         const isAmountTarget = ImportAction.isAmountValue(state.actionType);
+
+        this.renderActionTypeField(state);
         this.actionDropDown.selectItem(state.actionType);
 
         this.trTypeDropDown.show(state.actionType === IMPORT_ACTION_SET_TR_TYPE);

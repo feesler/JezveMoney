@@ -15,6 +15,7 @@ const defaultProps = {
     ItemComponent: null,
     itemSelector: null, // mandatory item CSS selector
     getItemProps: null, // optional callback to map items to props
+    isListChanged: null, // optional callback to verify list content was changed
     items: [],
     noItemsMessage: 'No items',
     listMode: 'list',
@@ -155,6 +156,10 @@ export class ListContainer extends Component {
     }
 
     isChanged(state, prevState) {
+        if (isFunction(state.isListChanged)) {
+            return state.isListChanged(state, prevState);
+        }
+
         return (
             state.items !== prevState.items
             || state.listMode !== prevState.listMode
