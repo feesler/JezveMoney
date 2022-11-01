@@ -172,14 +172,13 @@ class TransactionListView extends View {
         listHeader.append(this.modeSelector.elem, this.topPaginator.elem);
 
         this.list = TransactionList.create({
-            elem: document.querySelector('.trans-list'),
             selectable: true,
             sortable: true,
             listMode: 'list',
-            onSelect: (id) => this.onItemSelect(id),
+            onItemClick: (id, e) => this.onItemClick(id, e),
             onSort: (id, pos) => this.sendChangePosRequest(id, pos),
-            onContextMenu: (id) => this.onContextMenu(id),
         });
+        insertAfter(this.list.elem, listHeader);
 
         const listFooter = document.querySelector('.list-footer');
         this.bottomPaginator = Paginator.create(paginatorOptions);
@@ -555,15 +554,18 @@ class TransactionListView extends View {
         this.render(this.state);
     }
 
-    onItemSelect(itemId) {
-        if (this.state.listMode === 'select') {
-            this.toggleSelectItem(itemId);
-        }
-    }
-
-    onContextMenu(itemId) {
+    onItemClick(itemId, e) {
         if (this.state.listMode === 'list') {
-            this.showContextMenu(itemId);
+            const menuBtn = e?.target?.closest('.actions-menu-btn');
+            if (menuBtn) {
+                this.showContextMenu(itemId);
+            }
+        } else if (this.state.listMode === 'select') {
+            if (e?.target?.closest('.checkbox')) {
+                e.preventDefault();
+            }
+
+            this.toggleSelectItem(itemId);
         }
     }
 
@@ -606,17 +608,12 @@ class TransactionListView extends View {
             this.contextMenu.detach();
             return;
         }
-
-        const { contextItem } = state;
-        if (!contextItem) {
+        const itemId = state.contextItem;
+        if (!itemId) {
             return;
         }
-        const listItem = this.list.getListItemElementById(contextItem);
-        if (!listItem) {
-            return;
-        }
-
-        const menuContainer = listItem.querySelector('.actions-menu');
+        const listItem = this.list.getListItemById(itemId);
+        const menuContainer = listItem?.elem?.querySelector('.actions-menu');
         if (!menuContainer) {
             return;
         }
@@ -628,7 +625,7 @@ class TransactionListView extends View {
         }
 
         const { baseURL } = window.app;
-        this.ctxUpdateBtn.setURL(`${baseURL}transactions/update/${contextItem}`);
+        this.ctxUpdateBtn.setURL(`${baseURL}transactions/update/${itemId}`);
     }
 
     renderMenu(state) {

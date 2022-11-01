@@ -42,14 +42,13 @@ include(TPL_PATH . "Header.tpl");	?>
                         </div>
                     </div>
 
-                    <div class="widget transactions-widget">
+                    <div id="transactionsWidget" class="widget transactions-widget">
                         <div class="widget_title">
                             <a class="widget_title-link" href="<?=BASEURL?>transactions/">
                                 <span>Transactions</span>
                                 <div class="glyph"><?=svgIcon("glyph", "glyph-icon")?></div>
                             </a>
                         </div>
-                        <div class="trans-list"></div>
                     </div>
 
                     <div class="widget">

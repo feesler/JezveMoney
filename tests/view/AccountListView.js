@@ -6,7 +6,7 @@ import {
     waitForFunction,
     click,
     httpReq,
-    parentNode,
+    closest,
     asArray,
     asyncMap,
 } from 'jezve-test';
@@ -55,8 +55,8 @@ export class AccountListView extends AppView {
             'Invalid structure of accounts view',
         );
 
-        if (res.contextMenu.elem) {
-            const contextParent = await parentNode(res.contextMenu.elem);
+        const contextParent = await closest(res.contextMenu.elem, '.tile');
+        if (contextParent) {
             const itemId = await prop(contextParent, 'dataset.id');
             res.contextMenu.tileId = parseInt(itemId, 10);
             assert(res.contextMenu.tileId, 'Invalid account');

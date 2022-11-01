@@ -37,8 +37,6 @@ const contextMenuItems = [
     'ctxUpdateBtn', 'ctxDeleteBtn',
 ];
 
-const contextMenuId = '#contextMenu';
-
 /** List of transactions view class */
 export class TransactionListView extends AppView {
     async parseContent() {
@@ -50,7 +48,7 @@ export class TransactionListView extends AppView {
                 menuBtn: await query('#listMenu .actions-menu-btn'),
             },
             listMenu: { elem: await query('#listMenu .actions-menu-list') },
-            contextMenu: { elem: await query(contextMenuId) },
+            contextMenu: { elem: await query('#contextMenu') },
         };
 
         await this.parseMenuItems(res, listMenuItems);

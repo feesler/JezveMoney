@@ -19,8 +19,7 @@ const defaultProps = {
     noItemsMessage: 'No items',
     listMode: 'list',
     selectable: false,
-    onSelect: null,
-    onContextMenu: null,
+    onItemClick: null,
 };
 
 /**
@@ -50,8 +49,6 @@ export class ListContainer extends Component {
         this.listItems = [];
         this.noDataMsg = null;
 
-        this.selectEvents = { click: (e) => this.onItemClick(e) };
-
         this.init();
     }
 
@@ -65,7 +62,9 @@ export class ListContainer extends Component {
     }
 
     setHandlers() {
-        setEvents(this.elem, this.selectEvents);
+        if (isFunction(this.props.onItemClick)) {
+            setEvents(this.elem, { click: (e) => this.onItemClick(e) });
+        }
     }
 
     /** Returns array of list items */
@@ -109,14 +108,8 @@ export class ListContainer extends Component {
             return;
         }
 
-        if (this.state.listMode === 'list') {
-            if (isFunction(this.props.onContextMenu)) {
-                this.props.onContextMenu(itemId);
-            }
-        } else if (this.state.listMode === 'select') {
-            if (isFunction(this.props.onSelect)) {
-                this.props.onSelect(itemId);
-            }
+        if (isFunction(this.props.onItemClick)) {
+            this.props.onItemClick(itemId, e);
         }
     }
 
@@ -161,11 +154,15 @@ export class ListContainer extends Component {
             : item;
     }
 
+    isChanged(state, prevState) {
+        return (
+            state.items !== prevState.items
+            || state.listMode !== prevState.listMode
+        );
+    }
+
     renderList(state, prevState) {
-        if (
-            state.items === prevState.items
-            && state.listMode === prevState.listMode
-        ) {
+        if (!this.isChanged(state, prevState)) {
             return;
         }
 
@@ -224,7 +221,6 @@ export class ListContainer extends Component {
         }
 
         this.renderList(state, prevState);
-
         this.elem.dataset.time = state.renderTime;
     }
 }

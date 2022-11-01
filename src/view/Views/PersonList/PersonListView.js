@@ -64,8 +64,7 @@ class PersonListView extends View {
             itemSelector: '.tile',
             listMode: this.state.listMode,
             noItemsMessage: MSG_NO_PERSONS,
-            onSelect: (id) => this.onItemSelect(id),
-            onContextMenu: (id) => this.onContextMenu(id),
+            onItemClick: (id, e) => this.onItemClick(id, e),
         };
 
         const visibleTilesHeading = ge('visibleTilesHeading');
@@ -167,20 +166,16 @@ class PersonListView extends View {
         });
     }
 
-    onItemSelect(itemId) {
-        if (this.state.listMode !== 'select') {
-            return;
+    onItemClick(itemId, e) {
+        if (this.state.listMode === 'list') {
+            this.showContextMenu(itemId);
+        } else if (this.state.listMode === 'select') {
+            if (e?.target?.closest('.checkbox')) {
+                e.preventDefault();
+            }
+
+            this.toggleSelectItem(itemId);
         }
-
-        this.toggleSelectItem(itemId);
-    }
-
-    onContextMenu(itemId) {
-        if (this.state.listMode !== 'list') {
-            return;
-        }
-
-        this.showContextMenu(itemId);
     }
 
     showContextMenu(itemId) {

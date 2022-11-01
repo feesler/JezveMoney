@@ -1,13 +1,6 @@
-import {
-    createElement,
-    setEvents,
-    isFunction,
-    re,
-    removeChilds,
-    insertAfter,
-    Component,
-} from 'jezvejs';
+import { isFunction } from 'jezvejs';
 import { Sortable } from 'jezvejs/Sortable';
+import { ListContainer } from '../ListContainer/ListContainer.js';
 import {
     TRANS_ITEM_CLASS,
     TransactionListItem,
@@ -18,107 +11,45 @@ import './style.scss';
 const MSG_NO_TRANSACTIONS = 'No transactions found.';
 
 /** CSS classes */
+const LIST_CLASS = 'trans-list';
 const SELECT_MODE_CLASS = 'trans-list_select';
 const DETAILS_CLASS = 'trans-list_details';
-const NO_DATA_CLASS = 'nodata-message';
-/** Strings */
-const ITEM_SELECTOR = `.${TRANS_ITEM_CLASS}`;
 
 const defaultProps = {
-    items: [],
+    ItemComponent: TransactionListItem,
+    itemSelector: `.${TRANS_ITEM_CLASS}`,
+    className: LIST_CLASS,
+    noItemsMessage: MSG_NO_TRANSACTIONS,
     mode: 'classic',
-    listMode: 'list',
-    selectable: false,
     showControls: true,
-    onSelect: null,
     sortable: false,
     onSort: null,
-    onContextMenu: null,
 };
 
 /**
  * Transaction list component
  */
-export class TransactionList extends Component {
+export class TransactionList extends ListContainer {
     constructor(props) {
-        super(props);
-
-        this.props = {
+        super({
             ...defaultProps,
-            ...this.props,
-        };
-
-        this.state = {
-            ...this.props,
-            renderTime: Date.now(),
-        };
-
-        this.listItems = [];
-        this.noDataMsg = null;
-
-        this.selectEvents = { click: (e) => this.onItemClick(e) };
-
-        this.init();
+            ...props,
+        });
     }
 
     init() {
-        this.setHandlers();
+        super.init();
 
         if (this.props.sortable) {
             this.trListSortable = new Sortable({
                 oninsertat: (elem, ref) => this.onSort(elem, ref),
                 elem: this.elem,
                 group: 'transactions',
-                selector: ITEM_SELECTOR,
+                selector: this.props.itemSelector,
                 placeholderClass: 'trans-item_placeholder',
                 copyWidth: true,
             });
         }
-
-        this.render(this.state);
-    }
-
-    setHandlers() {
-        setEvents(this.elem, this.selectEvents);
-    }
-
-    /** Returns array of list items */
-    getItems() {
-        return this.state.items;
-    }
-
-    /** Returns array of selected items */
-    getSelectedItems() {
-        return this.state.items.filter((item) => item.selected);
-    }
-
-    /**
-     * Search for transaction by specified id
-     * @param {number} transactionId - identifier of transaction
-     */
-    getTransaction(transactionId) {
-        return this.state.items.find((item) => item && item.id === transactionId);
-    }
-
-    getListItemElementById(id) {
-        if (!this.getTransaction(id)) {
-            return null;
-        }
-
-        return this.elem.querySelector(`${ITEM_SELECTOR}[data-id="${id}"]`);
-    }
-
-    /**
-     * Return transaction id from transaction item element
-     * @param {Element} elem - target list item element
-     */
-    itemIdFromElem(elem) {
-        const listItemElem = elem?.closest(ITEM_SELECTOR);
-        if (!listItemElem?.dataset) {
-            return 0;
-        }
-
-        return parseInt(listItemElem.dataset.id, 10);
     }
 
     /**
@@ -132,7 +63,7 @@ export class TransactionList extends Component {
         const initBalArr = [];
         const tBalanceArr = [];
 
-        const trInfo = this.getTransaction(transactionId);
+        const trInfo = this.getItemById(transactionId);
         if (!trInfo) {
             return false;
         }
@@ -249,45 +180,6 @@ export class TransactionList extends Component {
     }
 
     /**
-     * Transaction item click event handler
-     * @param {Event} e - click event object
-     */
-    onItemClick(e) {
-        const itemId = this.itemIdFromElem(e?.target);
-        if (!this.getTransaction(itemId)) {
-            return;
-        }
-
-        if (this.state.listMode === 'list') {
-            const menuBtn = e?.target?.closest('.actions-menu-btn');
-            if (menuBtn && isFunction(this.props.onContextMenu)) {
-                this.props.onContextMenu(itemId);
-            }
-        } else if (this.state.listMode === 'select') {
-            if (isFunction(this.props.onSelect)) {
-                this.props.onSelect(itemId);
-            }
-        }
-    }
-
-    toggleSelectItem(itemId) {
-        if (!this.getTransaction(itemId)) {
-            return;
-        }
-
-        const toggleItem = (item) => (
-            (item.id === itemId)
-                ? { ...item, selected: !item.selected }
-                : item
-        );
-
-        this.setState({
-            ...this.state,
-            items: this.state.items.map(toggleItem),
-        });
-    }
-
-    /**
      * Transaction item drop callback
      * @param {number} trans_id - identifier of moving transaction
      * @param {number} retrans_id - identifier of replaced transaction
@@ -299,7 +191,7 @@ export class TransactionList extends Component {
             return;
         }
 
-        const replacedItem = this.getTransaction(refId);
+        const replacedItem = this.getItemById(refId);
         if (!replacedItem) {
             return;
         }
@@ -311,97 +203,29 @@ export class TransactionList extends Component {
         }
     }
 
-    renderNoDataMessage() {
-        if (this.noDataMsg) {
-            return;
-        }
-
-        this.noDataMsg = createElement('span', {
-            props: {
-                className: NO_DATA_CLASS,
-                textContent: MSG_NO_TRANSACTIONS,
-            },
-        });
-        this.elem.append(this.noDataMsg);
+    getItemProps(item, state) {
+        return {
+            mode: state.mode,
+            selected: item.selected,
+            selectMode: state.listMode === 'select',
+            showControls: state.showControls,
+            item,
+        };
     }
 
-    getListItemById(id) {
-        return this.listItems.find((item) => item.id === id);
-    }
-
-    renderList(state, prevState) {
-        if (
-            state.items === prevState.items
-            && state.mode === prevState.mode
-            && state.listMode === prevState.listMode
-            && state.showControls === prevState.showControls
-        ) {
-            return;
-        }
-
-        if (!state.items) {
-            throw new Error('Invalid state');
-        }
-
-        const emptyList = state.items.length === 0;
-        const emptyBefore = !prevState.items || prevState.items.length === 0;
-        if ((emptyList || emptyBefore) && emptyList !== emptyBefore) {
-            removeChilds(this.elem);
-            this.listItems = [];
-            this.noDataMsg = null;
-        }
-
-        if (emptyList) {
-            this.renderNoDataMessage();
-            return;
-        }
-
-        const listItems = [];
-        let lastItem = null;
-        state.items.forEach((item) => {
-            const itemProps = {
-                mode: state.mode,
-                selected: item.selected,
-                selectMode: state.listMode === 'select',
-                showControls: state.showControls,
-                item,
-            };
-
-            let listItem = this.getListItemById(item.id);
-            if (listItem) {
-                listItem.setState(itemProps);
-            } else {
-                listItem = TransactionListItem.create(itemProps);
-                if (lastItem) {
-                    insertAfter(listItem.elem, lastItem.elem);
-                } else {
-                    this.elem.prepend(listItem.elem);
-                }
-            }
-
-            lastItem = listItem;
-            listItems.push(listItem);
-        });
-
-        // Remove items not included in new state
-        this.listItems.forEach((item) => {
-            if (!listItems.includes(item)) {
-                re(item.elem);
-            }
-        });
-
-        this.listItems = listItems;
+    isChanged(state, prevState) {
+        return (
+            state.items !== prevState.items
+            || state.mode !== prevState.mode
+            || state.listMode !== prevState.listMode
+            || state.showControls !== prevState.showControls
+        );
     }
 
     render(state, prevState = {}) {
-        if (!state) {
-            throw new Error('Invalid state object');
-        }
+        super.render(state, prevState);
 
         this.elem.classList.toggle(DETAILS_CLASS, state.mode === 'details');
         this.elem.classList.toggle(SELECT_MODE_CLASS, state.listMode === 'select');
-        this.renderList(state, prevState);
-
-        this.elem.dataset.time = state.renderTime;
     }
 }

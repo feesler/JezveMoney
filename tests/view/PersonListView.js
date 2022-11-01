@@ -4,7 +4,7 @@ import {
     asyncMap,
     query,
     prop,
-    parentNode,
+    closest,
     navigation,
     waitForFunction,
     click,
@@ -53,8 +53,8 @@ export class PersonListView extends AppView {
             'Invalid structure of persons view',
         );
 
-        if (res.contextMenu.elem) {
-            const contextParent = await parentNode(res.contextMenu.elem);
+        const contextParent = await closest(res.contextMenu.elem, '.tile');
+        if (contextParent) {
             const itemId = await prop(contextParent, 'dataset.id');
             res.contextMenu.tileId = parseInt(itemId, 10);
             assert(res.contextMenu.tileId, 'Invalid person');
