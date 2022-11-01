@@ -18,7 +18,6 @@ import './style.scss';
 const MSG_NO_TRANSACTIONS = 'No transactions found.';
 
 /** CSS classes */
-const LIST_ITEMS_CLASS = 'trans-list-items';
 const SELECT_MODE_CLASS = 'trans-list_select';
 const DETAILS_CLASS = 'trans-list_details';
 const NO_DATA_CLASS = 'nodata-message';
@@ -55,7 +54,6 @@ export class TransactionList extends Component {
         };
 
         this.listItems = [];
-        this.list = null;
         this.noDataMsg = null;
 
         this.selectEvents = { click: (e) => this.onItemClick(e) };
@@ -349,7 +347,6 @@ export class TransactionList extends Component {
         const emptyBefore = !prevState.items || prevState.items.length === 0;
         if ((emptyList || emptyBefore) && emptyList !== emptyBefore) {
             removeChilds(this.elem);
-            this.list = null;
             this.listItems = [];
             this.noDataMsg = null;
         }
@@ -357,13 +354,6 @@ export class TransactionList extends Component {
         if (emptyList) {
             this.renderNoDataMessage();
             return;
-        }
-
-        if (!this.list) {
-            this.list = createElement('div', {
-                props: { className: LIST_ITEMS_CLASS },
-            });
-            this.elem.append(this.list);
         }
 
         const listItems = [];
@@ -385,7 +375,7 @@ export class TransactionList extends Component {
                 if (lastItem) {
                     insertAfter(listItem.elem, lastItem.elem);
                 } else {
-                    this.list.prepend(listItem.elem);
+                    this.elem.prepend(listItem.elem);
                 }
             }
 
