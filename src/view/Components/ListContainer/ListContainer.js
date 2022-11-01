@@ -7,28 +7,26 @@ import {
     insertAfter,
     Component,
 } from 'jezvejs';
-import { Tile } from '../Tile/Tile.js';
 
 /** CSS classes */
-const CONTAINER_CLASS = 'tiles';
 const NO_DATA_CLASS = 'nodata-message';
-const ITEM_SELECTOR = '.tile';
 
 const defaultProps = {
+    ItemComponent: null,
+    itemSelector: null, // mandatory item CSS selector
+    getItemProps: null, // optional callback to map items to props
     items: [],
     noItemsMessage: 'No items',
     listMode: 'list',
     selectable: false,
     onSelect: null,
     onContextMenu: null,
-    ItemComponent: Tile,
-    getItemProps: null,
 };
 
 /**
- * Tiles list component
+ * List container component
  */
-export class TilesList extends Component {
+export class ListContainer extends Component {
     constructor(props) {
         super(props);
 
@@ -36,6 +34,13 @@ export class TilesList extends Component {
             ...defaultProps,
             ...this.props,
         };
+
+        if (!this.props.ItemComponent) {
+            throw new Error('Item component not specified');
+        }
+        if (!this.props.itemSelector) {
+            throw new Error('Item selector not specified');
+        }
 
         this.state = {
             ...this.props,
@@ -51,8 +56,9 @@ export class TilesList extends Component {
     }
 
     init() {
-        this.elem = createElement('div', { props: { className: CONTAINER_CLASS } });
+        this.elem = createElement('div');
 
+        this.setClassNames();
         this.setHandlers();
 
         this.render(this.state);
@@ -85,7 +91,7 @@ export class TilesList extends Component {
      * @param {Element} elem - target list item element
      */
     itemIdFromElem(elem) {
-        const listItemElem = elem?.closest(ITEM_SELECTOR);
+        const listItemElem = elem?.closest(this.props.itemSelector);
         if (!listItemElem?.dataset) {
             return 0;
         }

@@ -11,9 +11,10 @@ import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { TilesList } from '../../Components/TilesList/TilesList.js';
+import { ListContainer } from '../../Components/ListContainer/ListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { PopupMenu } from '../../Components/PopupMenu/PopupMenu.js';
+import { Tile } from '../../Components/Tile/Tile.js';
 import './style.scss';
 
 /** Strings */
@@ -50,13 +51,17 @@ class PersonListView extends View {
      */
     onStart() {
         const listProps = {
+            ItemComponent: Tile,
             getItemProps: (person, state) => ({
                 type: 'button',
                 attrs: { 'data-id': person.id },
+                className: 'tiles',
                 title: person.name,
                 selected: person.selected,
                 selectMode: state.listMode === 'select',
             }),
+            className: 'tiles',
+            itemSelector: '.tile',
             listMode: this.state.listMode,
             noItemsMessage: MSG_NO_PERSONS,
             onSelect: (id) => this.onItemSelect(id),
@@ -69,10 +74,10 @@ class PersonListView extends View {
             throw new Error('Failed to initialize Account List view');
         }
 
-        this.visibleTiles = TilesList.create(listProps);
+        this.visibleTiles = ListContainer.create(listProps);
         insertAfter(this.visibleTiles.elem, visibleTilesHeading);
 
-        this.hiddenTiles = TilesList.create(listProps);
+        this.hiddenTiles = ListContainer.create(listProps);
         insertAfter(this.hiddenTiles.elem, this.hiddenTilesHeading);
 
         this.createBtn = ge('add_btn');

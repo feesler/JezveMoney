@@ -15,7 +15,7 @@ import { AccountList } from '../../js/model/AccountList.js';
 import { IconList } from '../../js/model/IconList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
-import { TilesList } from '../../Components/TilesList/TilesList.js';
+import { ListContainer } from '../../Components/ListContainer/ListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { PopupMenu } from '../../Components/PopupMenu/PopupMenu.js';
 import './style.scss';
@@ -64,6 +64,8 @@ class AccountListView extends View {
                 selected: account.selected,
                 selectMode: state.listMode === 'select',
             }),
+            className: 'tiles',
+            itemSelector: '.tile',
             listMode: this.state.listMode,
             noItemsMessage: MSG_NO_ACCOUNTS,
             onSelect: (id) => this.onItemSelect(id),
@@ -76,10 +78,10 @@ class AccountListView extends View {
             throw new Error('Failed to initialize Account List view');
         }
 
-        this.visibleTiles = TilesList.create(listProps);
+        this.visibleTiles = ListContainer.create(listProps);
         insertAfter(this.visibleTiles.elem, visibleTilesHeading);
 
-        this.hiddenTiles = TilesList.create(listProps);
+        this.hiddenTiles = ListContainer.create(listProps);
         insertAfter(this.hiddenTiles.elem, this.hiddenTilesHeading);
 
         this.createBtn = ge('add_btn');
