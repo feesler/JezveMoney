@@ -38,7 +38,6 @@ import { ImportTransactionForm } from '../../Components/Import/TransactionForm/I
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { API } from '../../js/api/index.js';
 import { ImportTransactionItem } from '../../Components/Import/TransactionItem/ImportTransactionItem.js';
-import { PopupMenu } from '../../Components/PopupMenu/PopupMenu.js';
 
 /** CSS classes */
 const SELECT_MODE_CLASS = 'import-list_select';
@@ -167,7 +166,6 @@ class ImportView extends View {
         window.app.initAccountsList(this.accountDropDown);
 
         setEvents(this.rowsContainer, { click: (e) => this.onItemClick(e) });
-        window.addEventListener('scroll', () => this.onScroll(), { passive: true });
         setEvents(this.submitBtn, { click: () => this.onSubmitClick() });
         setEvents(this.rulesBtn, { click: () => this.onRulesClick() });
 
@@ -638,11 +636,6 @@ class ImportView extends View {
         state.pagination = this.updateList(state);
 
         this.setState(state);
-    }
-
-    /** Window 'scroll' event handler */
-    onScroll() {
-        PopupMenu.hideActive();
     }
 
     /** Transaction item collapse/expand event handler */

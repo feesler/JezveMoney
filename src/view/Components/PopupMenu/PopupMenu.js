@@ -32,6 +32,7 @@ const defaultProps = {
     icon: 'ellipsis',
     attached: false,
     attachTo: null,
+    hideOnScroll: true,
     content: null,
     items: [],
     id: null,
@@ -54,7 +55,10 @@ export class PopupMenu extends Component {
             ...this.props,
         };
 
+        this.ignoreScroll = false;
+
         this.emptyClickHandler = () => this.hideMenu();
+        this.scrollHandler = () => this.onScroll();
         this.togglerEvents = { click: (e) => this.toggleMenu(e) };
 
         this.init();
@@ -94,7 +98,25 @@ export class PopupMenu extends Component {
         if (this.props.id) {
             this.elem.id = this.props.id;
         }
+
         this.setClassNames();
+    }
+
+    setScrollEvents() {
+        window.addEventListener('scroll', this.scrollHandler, { passive: true });
+    }
+
+    removeScrollEvents() {
+        window.removeEventListener('scroll', this.scrollHandler, { passive: true });
+    }
+
+    onScroll() {
+        if (this.ignoreScroll) {
+            this.ignoreScroll = false;
+            return;
+        }
+
+        this.hideMenu();
     }
 
     detach() {
@@ -234,6 +256,26 @@ export class PopupMenu extends Component {
         }
     }
 
+    showMenu() {
+        show(this.menuList, true);
+        if (!this.menuList.offsetParent) {
+            show(this.menuList, false);
+            return;
+        }
+
+        this.ignoreScroll = true;
+        this.calculatePosition();
+
+        PopupMenu.hideActive();
+        PopupMenu.activeInstance = this;
+
+        setEmptyClick(this.emptyClickHandler);
+
+        if (this.props.hideOnScroll) {
+            this.setScrollEvents();
+        }
+    }
+
     hideMenu() {
         show(this.menuList, false);
         this.menuList.style.top = '';
@@ -243,21 +285,15 @@ export class PopupMenu extends Component {
         PopupMenu.activeInstance = null;
 
         removeEmptyClick(this.emptyClickHandler);
+
+        if (this.props.hideOnScroll) {
+            this.removeScrollEvents();
+        }
     }
 
     toggleMenu() {
         if (this.menuList.hasAttribute('hidden')) {
-            show(this.menuList, true);
-            if (!this.menuList.offsetParent) {
-                show(this.menuList, false);
-                return;
-            }
-
-            this.calculatePosition();
-
-            PopupMenu.activeInstance = this;
-
-            setEmptyClick(this.emptyClickHandler);
+            this.showMenu();
         } else {
             this.hideMenu();
         }
