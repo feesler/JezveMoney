@@ -1,9 +1,10 @@
 /* Transaction item */
 .import-form {
+  --import-form-popup-zindex: 500;
+
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
-  margin: 2px 0;
 
   .main-content {
     display: flex;
@@ -112,7 +113,13 @@
   }
 
   .dd__container {
+    --dd-list-z-index: var(--import-form-popup-zindex);
+
     display: flex;
+  }
+
+  .dp__wrapper {
+    z-index: var(--import-form-popup-zindex);
   }
 
   input[type="text"] {
