@@ -32,8 +32,6 @@ export class ImportRuleItem extends TestComponent {
             valueElem: { elem: await query(this.elem, '.rule-item__value') },
             infoElem: { elem: await query(this.elem, '.rule-item__info') },
             menuBtn: { elem: await query(this.elem, '.actions-menu-btn') },
-            updateBtn: { elem: await query(this.elem, '.update-btn') },
-            deleteBtn: { elem: await query(this.elem, '.delete-btn') },
             toggleBtn: { elem: await query(this.elem, '.toggle-btn') },
         };
 
@@ -53,8 +51,6 @@ export class ImportRuleItem extends TestComponent {
             && res.valueElem.elem
             && res.infoElem.elem
             && res.menuBtn.elem
-            && res.updateBtn.elem
-            && res.deleteBtn.elem
             && res.toggleBtn.elem
             && res.conditions.elem
             && res.actions.elem,
@@ -109,17 +105,7 @@ export class ImportRuleItem extends TestComponent {
     }
 
     async openMenu() {
-        await this.performAction(() => click(this.content.menuBtn.elem));
-    }
-
-    async clickUpdate() {
-        await this.openMenu();
-        await click(this.content.updateBtn.elem);
-    }
-
-    async clickDelete() {
-        await this.openMenu();
-        await click(this.content.deleteBtn.elem);
+        await click(this.content.menuBtn.elem);
     }
 
     /**

@@ -70,8 +70,7 @@ class PersonView extends View {
 
         // Update mode
         if (this.state.original.id) {
-            this.deleteBtn = IconButton.fromElement({
-                elem: 'del_btn',
+            this.deleteBtn = IconButton.fromElement('del_btn', {
                 onClick: () => this.confirmDelete(),
             });
         }

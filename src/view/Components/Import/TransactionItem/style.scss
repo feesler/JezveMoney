@@ -5,10 +5,8 @@
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
-  margin: 2px 0;
 
   .main-content {
-    padding: 4px 0 4px 8px;
     display: flex;
     flex-flow: row nowrap;
   }
@@ -19,6 +17,7 @@
     flex-grow: 1;
     align-items: normal;
     gap: 8px;
+    padding: 4px 0 4px 8px;
     overflow: hidden;
   }
 
@@ -48,6 +47,26 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+  }
+
+  /* Select controls */
+  .select-controls {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    width: 32px;
+
+    .checkbox {
+      --checkbox-size: 24px;
+
+      margin: 0;
+    }
+
+    .checkbox__check {
+      margin: 0;
+      border-radius: 50%;
+    }
   }
 
   /* Controls */
@@ -159,9 +178,6 @@
     .item-container {
       flex-flow: row nowrap;
       gap: 16px;
-    }
-
-    .main-content {
       padding: 4px 0 6px 8px;
     }
 

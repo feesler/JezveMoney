@@ -15,6 +15,8 @@ import {
     isValidValue,
     normalizeExch,
     trimToDigitsLimit,
+    EXCHANGE_DIGITS,
+    CENTS_DIGITS,
 } from '../common.js';
 import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { InputRow } from './component/InputRow.js';
@@ -176,8 +178,24 @@ export class TransactionView extends AppView {
         res.destResBal = cont.result_balance_dest_row.value;
         res.fDestResBal = isValidValue(res.destResBal) ? normalize(res.destResBal) : res.destResBal;
 
-        res.exchRate = cont.exchange_row.value;
-        this.updateExch();
+        if (res.isAvailable) {
+            res.exchSign = `${res.destCurr.sign}/${res.srcCurr.sign}`;
+            res.backExchSign = `${res.srcCurr.sign}/${res.destCurr.sign}`;
+
+            res.useBackExchange = (res.isDiffCurr)
+                ? (cont.exchange_row.currSign === res.backExchSign)
+                : false;
+
+            if (res.useBackExchange) {
+                res.backExchRate = cont.exchange_row.value;
+                res.exchRate = this.calcExchange(res);
+            } else {
+                res.exchRate = cont.exchange_row.value;
+                res.backExchRate = this.calcBackExchange(res);
+            }
+
+            this.updateExch();
+        }
 
         if (res.type === EXPENSE) {
             if (res.isAvailable) {
@@ -469,9 +487,18 @@ export class TransactionView extends AppView {
             res.dest_amount_row.currSign = (this.model.destCurr) ? this.model.destCurr.sign : '';
             res.dest_amount_row.isCurrActive = (this.model.type === EXPENSE);
 
-            res.exchange_row.value = this.model.exchRate.toString();
-            res.exchange_row.currSign = this.model.exchSign;
-            res.exch_left.value = this.model.fmtExch;
+            if (this.model.destCurr && this.model.srcCurr) {
+                const exchRateValue = (this.model.useBackExchange)
+                    ? this.model.backExchRate
+                    : this.model.exchRate;
+                const exchSign = (this.model.useBackExchange)
+                    ? this.model.backExchSign
+                    : this.model.exchSign;
+
+                res.exchange_row.value = exchRateValue.toString();
+                res.exchange_row.currSign = exchSign;
+                res.exch_left.value = this.model.fmtExch;
+            }
         }
 
         if (this.model.type === EXPENSE || this.model.type === TRANSFER) {
@@ -1022,12 +1049,25 @@ export class TransactionView extends AppView {
         }
     }
 
-    calcExchByAmounts() {
-        if (this.model.fSrcAmount === 0 || this.model.fDestAmount === 0) {
-            this.model.exchRate = 1;
-        } else {
-            this.model.exchRate = correctExch(this.model.fDestAmount / this.model.fSrcAmount);
+    calcExchange(model = this.model) {
+        if (model.fSrcAmount === 0 || model.fDestAmount === 0) {
+            return 1;
         }
+
+        return correctExch(Math.abs(this.model.fDestAmount / this.model.fSrcAmount));
+    }
+
+    calcBackExchange(model = this.model) {
+        if (model.fSrcAmount === 0 || model.fDestAmount === 0) {
+            return 1;
+        }
+
+        return correctExch(Math.abs(this.model.fSrcAmount / this.model.fDestAmount));
+    }
+
+    calcExchByAmounts() {
+        this.model.exchRate = this.calcExchange();
+        this.model.backExchRate = this.calcBackExchange();
     }
 
     updateExch() {
@@ -1038,27 +1078,18 @@ export class TransactionView extends AppView {
         this.model.fExchRate = isValidValue(this.model.exchRate)
             ? normalizeExch(this.model.exchRate)
             : this.model.exchRate;
+        this.model.fBackExchRate = isValidValue(this.model.backExchRate)
+            ? normalizeExch(this.model.backExchRate)
+            : this.model.backExchRate;
 
         this.model.exchSign = `${this.model.destCurr.sign}/${this.model.srcCurr.sign}`;
         this.model.backExchSign = `${this.model.srcCurr.sign}/${this.model.destCurr.sign}`;
 
-        let exchText = this.model.exchSign;
-        if (
-            isValidValue(this.model.exchRate)
-            && this.model.fExchRate !== 0
-            && this.model.fExchRate !== 1
-        ) {
-            let backExchRate = 1;
-            if (this.model.fSrcAmount !== 0 && this.model.fDestAmount !== 0) {
-                backExchRate = this.model.fSrcAmount / this.model.fDestAmount;
-            }
-
-            this.model.invExchRate = parseFloat(backExchRate.toFixed(5));
-
-            exchText += ` (${this.model.invExchRate} ${this.model.backExchSign})`;
+        if (this.model.useBackExchange) {
+            this.model.fmtExch = `${this.model.fBackExchRate} ${this.model.backExchSign}`;
+        } else {
+            this.model.fmtExch = `${this.model.fExchRate} ${this.model.exchSign}`;
         }
-
-        this.model.fmtExch = `${this.model.fExchRate} ${exchText}`;
     }
 
     setNextSourceAccount(accountId) {
@@ -1329,6 +1360,7 @@ export class TransactionView extends AppView {
             const { srcAmount, destAmount } = this.model;
             this.setSrcAmount(srcAmount);
             this.setDestAmount(destAmount);
+            this.calcExchByAmounts();
             this.updateExch();
         }
 
@@ -1580,7 +1612,7 @@ export class TransactionView extends AppView {
             );
         }
 
-        const cutVal = trimToDigitsLimit(val, 2);
+        const cutVal = trimToDigitsLimit(val, CENTS_DIGITS);
         this.model.srcAmount = cutVal;
         const fNewValue = isValidValue(cutVal) ? normalize(cutVal) : cutVal;
         if (this.model.fSrcAmount !== fNewValue) {
@@ -1650,7 +1682,7 @@ export class TransactionView extends AppView {
             );
         }
 
-        const cutVal = trimToDigitsLimit(val, 2);
+        const cutVal = trimToDigitsLimit(val, CENTS_DIGITS);
         const fNewValue = (isValidValue(cutVal)) ? normalize(cutVal) : cutVal;
         this.model.destAmount = cutVal;
         if (this.model.fDestAmount !== fNewValue) {
@@ -1792,7 +1824,7 @@ export class TransactionView extends AppView {
     async inputResBalance(val) {
         assert(this.model.type !== INCOME, 'Unexpected action: can\'t input source result balance');
 
-        const cutVal = trimToDigitsLimit(val, 2);
+        const cutVal = trimToDigitsLimit(val, CENTS_DIGITS);
         const fNewValue = isValidValue(cutVal) ? normalize(cutVal) : cutVal;
         this.model.srcResBal = cutVal;
         if (this.model.fSrcResBal !== fNewValue) {
@@ -1820,7 +1852,7 @@ export class TransactionView extends AppView {
     async inputDestResBalance(val) {
         assert(this.model.type !== EXPENSE, 'Unexpected action: can\'t input destination result balance');
 
-        const cutVal = trimToDigitsLimit(val, 2);
+        const cutVal = trimToDigitsLimit(val, CENTS_DIGITS);
         const fNewValue = isValidValue(cutVal) ? normalize(cutVal) : cutVal;
         this.model.destResBal = cutVal;
         const valueChanged = this.model.fDestResBal !== fNewValue;
@@ -1961,20 +1993,66 @@ export class TransactionView extends AppView {
         return this.checkState();
     }
 
-    async inputExchRate(val) {
-        assert(this.model.type !== DEBT, 'Unexpected action: can\'t input exchange rate');
-        assert(this.model.state === 3, `Unexpected state ${this.model.state} to input exchange rate`);
+    isExchangeInputVisible() {
+        return (
+            ((this.model.type === EXPENSE || this.model.type === INCOME) && this.model.state === 3)
+            || (this.model.type === TRANSFER && (this.model.state === 7 || this.model.state === 8))
+        );
+    }
 
-        const cutVal = trimToDigitsLimit(val, 5);
-        this.model.exchRate = cutVal;
+    async inputExchRate(val) {
+        const { useBackExchange } = this.model;
+
+        assert(this.isExchangeInputVisible(), `Unexpected state ${this.model.state} to input exchange rate`);
+
+        const cutVal = trimToDigitsLimit(val, EXCHANGE_DIGITS);
+        if (useBackExchange) {
+            this.model.backExchRate = cutVal;
+        } else {
+            this.model.exchRate = cutVal;
+        }
+
         const fNewValue = isValidValue(cutVal) ? normalizeExch(cutVal) : cutVal;
-        if (this.model.fExchRate !== fNewValue) {
+        const valueChanged = (
+            (useBackExchange && this.model.fBackExchRate !== fNewValue)
+            || (!useBackExchange && this.model.fExchRate !== fNewValue)
+        );
+
+        if (valueChanged) {
+            if (useBackExchange) {
+                this.model.fBackExchRate = fNewValue;
+            } else {
+                this.model.fExchRate = fNewValue;
+            }
+
             if (isValidValue(this.model.srcAmount)) {
-                const newDestAmount = correct(this.model.fSrcAmount * fNewValue);
+                let newDestAmount;
+                if (useBackExchange) {
+                    newDestAmount = (fNewValue === 0)
+                        ? 0
+                        : correct(this.model.fSrcAmount / fNewValue);
+                } else {
+                    newDestAmount = correct(this.model.fSrcAmount * fNewValue);
+                }
+
                 this.setDestAmount(newDestAmount);
             } else if (isValidValue(this.model.destAmount)) {
-                const newSrcAmount = correct(this.model.fDestAmount / fNewValue);
+                let newSrcAmount;
+                if (useBackExchange) {
+                    newSrcAmount = correct(this.model.fDestAmount * fNewValue);
+                } else {
+                    newSrcAmount = (fNewValue === 0)
+                        ? 0
+                        : correct(this.model.fDestAmount / fNewValue);
+                }
+
                 this.setSrcAmount(newSrcAmount);
+            }
+
+            if (useBackExchange) {
+                this.model.exchRate = this.calcExchange();
+            } else {
+                this.model.backExchRate = this.calcBackExchange();
             }
 
             this.updateExch();
@@ -1983,6 +2061,18 @@ export class TransactionView extends AppView {
         this.setExpectedState(this.model.state);
 
         await this.performAction(() => this.content.exchange_row.input(val));
+
+        return this.checkState();
+    }
+
+    async toggleExchange() {
+        assert(this.isExchangeInputVisible(), `Unexpected state ${this.model.state} to input exchange rate`);
+
+        this.model.useBackExchange = !this.model.useBackExchange;
+        this.updateExch();
+        this.setExpectedState(this.model.state);
+
+        await this.performAction(() => this.content.exchange_row.clickButton());
 
         return this.checkState();
     }

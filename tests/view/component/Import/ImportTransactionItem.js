@@ -2,6 +2,7 @@ import {
     TestComponent,
     query,
     queryAll,
+    hasClass,
     hasAttr,
     prop,
     click,
@@ -36,6 +37,10 @@ export class ImportTransactionItem extends TestComponent {
             isForm: false,
         };
 
+        const selectedControls = await query(this.elem, '.select-controls');
+        res.selectMode = await isVisible(selectedControls);
+        res.selected = await hasClass(this.elem, 'import-item_selected');
+
         const disabled = await hasAttr(this.elem, 'disabled');
         res.enabled = !disabled;
 
@@ -52,9 +57,7 @@ export class ImportTransactionItem extends TestComponent {
         res.commentField = await this.parseField(await query(this.elem, '.comment-field'));
 
         res.menuBtn = await query(this.elem, '.actions-menu-btn');
-        res.toggleEnableBtn = await query(this.elem, '.enable-btn');
-        res.updateBtn = await query(this.elem, '.update-btn');
-        res.deleteBtn = await query(this.elem, '.delete-btn');
+        res.contextMenuElem = await query(this.elem, '.actions-menu-list');
         res.toggleBtn = await query(this.elem, '.toggle-btn');
         res.origDataTable = await query(this.elem, '.orig-data-table');
 
@@ -66,10 +69,7 @@ export class ImportTransactionItem extends TestComponent {
             && res.personField
             && res.dateField
             && res.commentField
-            && res.menuBtn
-            && res.toggleEnableBtn
-            && res.updateBtn
-            && res.deleteBtn,
+            && res.menuBtn,
             'Invalid structure of import item',
         );
 
@@ -109,6 +109,8 @@ export class ImportTransactionItem extends TestComponent {
 
         this.data = this.getExpectedTransaction();
         if (this.data) {
+            this.data.selectMode = this.model.selectMode;
+            this.data.selected = this.model.selected;
             this.data.enabled = this.model.enabled;
             this.data.mainAccount = this.model.mainAccount;
             this.data.importType = this.model.type;
@@ -126,6 +128,9 @@ export class ImportTransactionItem extends TestComponent {
         res.mainAccount = App.state.accounts.getItem(this.mainAccount);
         assert(res.mainAccount, 'Main account not found');
 
+        res.isContextMenu = !!cont.contextMenuElem;
+        res.selectMode = cont.selectMode;
+        res.selected = cont.selected;
         res.enabled = cont.enabled;
 
         const transactionType = ImportTransaction.findTypeByName(cont.typeField.value);
@@ -199,6 +204,8 @@ export class ImportTransactionItem extends TestComponent {
 
         const res = {
             isForm: false,
+            selectMode: model.selectMode,
+            selected: model.selected,
             enabled: model.enabled,
             typeField: {
                 visible: true,
@@ -436,23 +443,13 @@ export class ImportTransactionItem extends TestComponent {
         return res;
     }
 
-    async openMenu() {
-        await this.performAction(() => click(this.content.menuBtn));
+    async clickMenu() {
+        return click(this.content.menuBtn);
     }
 
-    async toggleEnable() {
-        await this.openMenu();
-        await click(this.content.toggleEnableBtn);
-    }
-
-    async clickUpdate() {
-        await this.openMenu();
-        await click(this.content.updateBtn);
-    }
-
-    async clickDelete() {
-        await this.openMenu();
-        await click(this.content.deleteBtn);
+    async toggleSelect() {
+        assert(this.model.selectMode, 'Invalid state: item not in select mode');
+        await click(this.elem);
     }
 
     /**

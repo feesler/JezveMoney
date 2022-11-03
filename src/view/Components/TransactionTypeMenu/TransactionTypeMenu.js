@@ -27,12 +27,10 @@ export class TransactionTypeMenu extends LinkMenu {
     constructor(props) {
         super(props);
 
-        this.props = {
+        this.state = {
             ...defaultProps,
-            ...this.props,
+            ...this.state,
         };
-
-        this.state = { ...this.props };
     }
 
     init() {

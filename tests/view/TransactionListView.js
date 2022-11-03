@@ -1,6 +1,7 @@
 import {
     assert,
     asArray,
+    asyncMap,
     query,
     prop,
     navigation,
@@ -10,6 +11,7 @@ import {
     baseUrl,
     copyObject,
     isVisible,
+    closest,
 } from 'jezve-test';
 import { DropDown, Paginator } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -22,26 +24,52 @@ import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js
 import { SearchForm } from './component/TransactionList/SearchForm.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
 import { fixDate, isEmpty, urlJoin } from '../common.js';
-import { Toolbar } from './component/Toolbar.js';
 import { FiltersAccordion } from './component/TransactionList/FiltersAccordion.js';
 
+const listMenuItems = [
+    'selectModeBtn',
+    'selectAllBtn',
+    'deselectAllBtn',
+    'deleteBtn',
+];
+
+const contextMenuItems = [
+    'ctxUpdateBtn', 'ctxDeleteBtn',
+];
+
 /** List of transactions view class */
-export class TransactionsView extends AppView {
+export class TransactionListView extends AppView {
     async parseContent() {
         const res = {
             titleEl: await query('.content_wrap > .heading > h1'),
             addBtn: await IconButton.create(this, await query('#add_btn')),
-            toolbar: await Toolbar.create(this, await query('#toolbar')),
+            listMenuContainer: {
+                elem: await query('#listMenu'),
+                menuBtn: await query('#listMenu .actions-menu-btn'),
+            },
+            listMenu: { elem: await query('#listMenu .actions-menu-list') },
+            contextMenu: { elem: await query('#contextMenu') },
         };
+
+        await this.parseMenuItems(res, listMenuItems);
 
         assert(
             res.titleEl
             && res.addBtn
-            && res.toolbar
-            && res.toolbar.content.editBtn
-            && res.toolbar.content.delBtn,
+            && res.listMenuContainer.elem
+            && res.listMenuContainer.menuBtn
+            && res.listMenu.elem,
             'Invalid structure of transactions view',
         );
+
+        const contextParent = await closest(res.contextMenu.elem, '.trans-item');
+        if (contextParent) {
+            const itemId = await prop(contextParent, 'dataset.id');
+            res.contextMenu.itemId = parseInt(itemId, 10);
+            assert(res.contextMenu.itemId, 'Invalid item');
+
+            await this.parseMenuItems(res, contextMenuItems);
+        }
 
         res.filtersAccordion = await FiltersAccordion.create(this, await query('.filters-collapsible'));
         assert(res.filtersAccordion, 'Filters not found');
@@ -88,6 +116,34 @@ export class TransactionsView extends AppView {
         return res;
     }
 
+    async parseMenuItems(cont, ids) {
+        const itemIds = asArray(ids);
+        if (!itemIds.length) {
+            return cont;
+        }
+
+        const res = cont;
+        await asyncMap(itemIds, async (id) => {
+            res[id] = await IconButton.create(this, await query(`#${id}`));
+            assert(res[id], `Menu item '${id}' not found`);
+            return res[id];
+        });
+
+        return res;
+    }
+
+    getViewMode(cont) {
+        if (!cont.listMenuContainer.visible) {
+            return 'nodata';
+        }
+
+        if (cont.selectModeBtn.title === 'Done') {
+            return 'select';
+        }
+
+        return 'list';
+    }
+
     getDropDownFilter(dropDown) {
         return (dropDown)
             ? dropDown.getSelectedValues().map((item) => parseInt(item, 10))
@@ -95,7 +151,12 @@ export class TransactionsView extends AppView {
     }
 
     async buildModel(cont) {
-        const res = {};
+        const res = {
+            contextItem: cont.contextMenu.itemId,
+            mode: this.getViewMode(cont),
+            listMenuVisible: cont.listMenu.visible,
+            contextMenuVisible: cont.contextMenu.visible,
+        };
 
         res.data = App.state.transactions.clone();
 
@@ -254,6 +315,12 @@ export class TransactionsView extends AppView {
         const isFiltersVisible = !model.filterCollapsed;
         const selected = this.getSelectedItems(model);
 
+        const showSelectItems = (
+            isItemsAvailable
+            && model.listMenuVisible
+            && model.mode === 'select'
+        );
+
         const res = {
             typeMenu: {
                 value: model.filter.type,
@@ -279,12 +346,30 @@ export class TransactionsView extends AppView {
             modeSelector: { visible: isItemsAvailable },
             paginator: { visible: isItemsAvailable },
             transList: { visible: true },
-            toolbar: {
-                editBtn: { visible: (selected.length === 1) },
-                delBtn: { visible: (selected.length > 0) },
-                visible: selected.length > 0,
+            listMenuContainer: { visible: isItemsAvailable },
+            listMenu: { visible: model.listMenuVisible },
+            selectModeBtn: { visible: model.listMenuVisible },
+            selectAllBtn: {
+                visible: showSelectItems && selected.length < model.list.items.length,
             },
+            deselectAllBtn: {
+                visible: showSelectItems && selected.length > 0,
+            },
+            deleteBtn: { visible: showSelectItems && selected.length > 0 },
         };
+
+        if (model.contextMenuVisible) {
+            const ctxTransaction = model.filtered.getItem(model.contextItem);
+            assert(ctxTransaction, 'Invalid state');
+
+            res.contextMenu = {
+                visible: true,
+                itemId: model.contextItem,
+            };
+
+            res.ctxUpdateBtn = { visible: true };
+            res.ctxDeleteBtn = { visible: true };
+        }
 
         if (isAccountsAvailable) {
             res.accDropDown.isMulti = true;
@@ -314,6 +399,61 @@ export class TransactionsView extends AppView {
         }
 
         return res;
+    }
+
+    async openContextMenu(num) {
+        await this.cancelSelectMode();
+
+        assert.arrayIndex(this.model.list.items, num, 'Invalid transaction index');
+
+        const item = this.content.transList.items[num];
+        this.model.contextMenuVisible = true;
+        this.model.contextItem = item.id;
+        const expected = this.setExpectedState();
+
+        await this.performAction(() => item.clickMenu());
+        assert(this.content.contextMenu.visible, 'Context menu not visible');
+
+        return this.checkState(expected);
+    }
+
+    async openListMenu() {
+        assert(!this.content.listMenu.visible, 'List menu already opened');
+
+        this.model.listMenuVisible = true;
+        const expected = this.setExpectedState();
+
+        await this.performAction(() => click(this.content.listMenuContainer.menuBtn));
+
+        return this.checkState(expected);
+    }
+
+    async toggleSelectMode() {
+        await this.openListMenu();
+
+        this.model.listMenuVisible = false;
+        this.model.mode = (this.model.mode === 'select') ? 'list' : 'select';
+        const expected = this.setExpectedState();
+
+        await this.performAction(() => this.content.selectModeBtn.click());
+
+        return this.checkState(expected);
+    }
+
+    async setSelectMode() {
+        if (this.model.mode === 'select') {
+            return true;
+        }
+
+        return this.toggleSelectMode();
+    }
+
+    async cancelSelectMode() {
+        if (this.model.mode === 'list') {
+            return true;
+        }
+
+        return this.toggleSelectMode();
     }
 
     async openFilters() {
@@ -713,9 +853,9 @@ export class TransactionsView extends AppView {
         }
 
         let pos = this.pagesCount() * App.config.transactionsOnPage;
-        while (this.content.transList.content.items.length) {
+        while (this.content.transList.items.length) {
             const curPos = pos;
-            const pageItems = this.content.transList.content.items.map((item, ind) => ({
+            const pageItems = this.content.transList.items.map((item, ind) => ({
                 id: item.content.id,
                 accountTitle: item.content.accountTitle,
                 amountText: item.content.amountText,
@@ -744,33 +884,61 @@ export class TransactionsView extends AppView {
     }
 
     async selectTransactions(data) {
-        assert(typeof data !== 'undefined', 'No transactions specified');
-
-        const transactions = Array.isArray(data) ? data : [data];
-
+        assert.isDefined(data, 'No transactions specified');
         assert(this.content.transList, 'No transactions available to select');
 
+        await this.setSelectMode();
+
+        const transactions = asArray(data);
         for (const num of transactions) {
-            assert.arrayIndex(this.content.transList.content.items, num);
+            assert.arrayIndex(this.content.transList.items, num);
 
             const item = this.model.list.items[num];
             item.selected = !item.selected;
             const expected = this.setExpectedState();
 
-            await this.performAction(() => this.content.transList.content.items[num].click());
+            await this.performAction(() => this.content.transList.items[num].click());
 
             this.checkState(expected);
         }
     }
 
+    async selectAll() {
+        const selectItem = (item) => ({ ...item, selected: true });
+
+        await this.setSelectMode();
+        await this.openListMenu();
+
+        this.model.listMenuVisible = false;
+        this.model.list.items = this.model.list.items.map(selectItem);
+        const expected = this.setExpectedState();
+
+        await this.performAction(() => this.content.selectAllBtn.click());
+
+        return this.checkState(expected);
+    }
+
+    async deselectAll() {
+        assert(this.model.mode === 'select', 'Invalid state');
+
+        const deselectItem = (item) => ({ ...item, selected: false });
+
+        await this.openListMenu();
+
+        this.model.listMenuVisible = false;
+        this.model.list.items = this.model.list.items.map(deselectItem);
+        const expected = this.setExpectedState();
+
+        await this.performAction(() => this.content.deselectAllBtn.click());
+
+        return this.checkState(expected);
+    }
+
     /** Select specified transaction, click on edit button */
     async goToUpdateTransaction(num) {
-        const pos = parseInt(num, 10);
-        assert(!Number.isNaN(pos), 'Invalid position of transaction');
+        await this.openContextMenu(num);
 
-        await this.selectTransactions(pos);
-
-        return navigation(() => this.content.toolbar.clickButton('update'));
+        return navigation(() => this.content.ctxUpdateBtn.click());
     }
 
     /** Delete specified transactions */
@@ -780,7 +948,13 @@ export class TransactionsView extends AppView {
         const transactions = Array.isArray(data) ? data : [data];
         await this.selectTransactions(transactions);
 
-        await this.performAction(() => this.content.toolbar.clickButton('del'));
+        await this.openListMenu();
+
+        this.model.listMenuVisible = false;
+        const expected = this.setExpectedState();
+
+        await this.performAction(() => this.content.deleteBtn.click());
+        this.checkState(expected);
 
         assert(this.content.delete_warning?.content?.visible, 'Delete transaction warning popup not appear');
         assert(this.content.delete_warning.content.okBtn, 'OK button not found');

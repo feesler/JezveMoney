@@ -124,20 +124,27 @@ export const fixFloat = (str) => {
     return res;
 };
 
+export const CENTS_DIGITS = 2;
+export const EXCHANGE_DIGITS = 4;
+
 /** Correct calculated value */
-export const correct = (val, prec = 2) => parseFloat(parseFloat(val).toFixed(prec));
+export const correct = (val, prec = CENTS_DIGITS) => parseFloat(parseFloat(val).toFixed(prec));
 
 /** Correct calculated exchange rate value */
-export const correctExch = (val) => correct(val, 5);
+export const correctExch = (val) => correct(val, EXCHANGE_DIGITS);
 
 /** Normalize monetary value from string */
-export const normalize = (val, prec = 2) => parseFloat(parseFloat(fixFloat(val)).toFixed(prec));
+export const normalize = (val, prec = CENTS_DIGITS) => (
+    parseFloat(parseFloat(fixFloat(val)).toFixed(prec))
+);
 
 /** Normalize exchange rate value from string */
-export const normalizeExch = (val) => normalize(val, 5);
+export const normalizeExch = (val) => normalize(val, EXCHANGE_DIGITS);
 
 /** Check value is valid */
-export const isValidValue = (val) => (typeof val !== 'undefined' && val !== null && !Number.isNaN(parseFloat(fixFloat(val))));
+export const isValidValue = (val) => (
+    typeof val !== 'undefined' && val !== null && !Number.isNaN(parseFloat(fixFloat(val)))
+);
 
 /** Return number of digits after the decimal point */
 export const digitsAfterPoint = (val) => {

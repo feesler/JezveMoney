@@ -86,6 +86,7 @@ export const closeUploadDialog = async () => {
     });
 };
 
+/* eslint-disable no-console */
 /** Admin access required */
 export const putFile = async (data) => {
     const baseURL = baseUrl();
@@ -150,6 +151,7 @@ export const removeFile = async (filename) => {
 
     return true;
 };
+/* eslint-enable no-console */
 
 /** Test manual add new import item */
 export const addItem = async () => {
@@ -348,15 +350,67 @@ export const enableItems = async ({ index, value = true }) => {
 
     await test(`${descr} [${index}]`, async () => {
         await checkNavigation();
-        await checkViewState('main');
 
-        await App.view.enableItems(index, enable);
+        return App.view.enableItems(index, enable);
+    });
+};
 
-        App.view.expectedState = {
-            itemsList: App.view.content.itemsList.getExpectedState(),
-        };
+/** Done select mode */
+export const setSelectMode = async () => {
+    await test('Set select mode', async () => {
+        await checkNavigation();
+        return App.view.setSelectMode();
+    });
+};
 
-        return App.view.checkState();
+/** Done select mode */
+export const cancelSelectMode = async () => {
+    await test('Done select mode', async () => {
+        await checkNavigation();
+        return App.view.cancelSelectMode();
+    });
+};
+
+/** Toggle select items */
+export const toggleSelectItems = async (index) => {
+    await test(`Toggle select items [${index}]`, async () => {
+        await checkNavigation();
+        return App.view.toggleSelectItems(index);
+    });
+};
+
+/** Select all items */
+export const selectAllItems = async () => {
+    await test('Select all items', async () => {
+        await checkNavigation();
+        return App.view.selectAllItems();
+    });
+};
+
+/** Deselect all items */
+export const deselectAllItems = async () => {
+    await test('Deselect all items', async () => {
+        await checkNavigation();
+        return App.view.deselectAllItems();
+    });
+};
+
+/** Enable/disable selected items */
+export const enableSelectedItems = async (value) => {
+    const enable = !!value;
+    const descr = enable ? 'Enable selected items' : 'Disable selected items';
+
+    await test(descr, async () => {
+        await checkNavigation();
+        return App.view.enableSelectedItems(value);
+    });
+};
+
+/** Enable/disable selected items */
+export const deleteSelectedItems = async () => {
+    await test('Delete selected items', async () => {
+        await checkNavigation();
+        return App.view.deleteSelectedItems();
     });
 };
 

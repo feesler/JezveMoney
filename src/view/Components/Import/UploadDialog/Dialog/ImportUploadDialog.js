@@ -27,10 +27,6 @@ const CONVERT_STATE = 2;
  * ImportUploadDialog component
  */
 export class ImportUploadDialog extends Component {
-    static create(props) {
-        return new ImportUploadDialog(props);
-    }
-
     constructor(...args) {
         super(...args);
 

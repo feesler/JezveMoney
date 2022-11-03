@@ -46,10 +46,6 @@ const TPL_UPDATE_STATE = 3;
  * ImportTemplateManager component
  */
 export class ImportTemplateManager extends Component {
-    static create(props) {
-        return new ImportTemplateManager(props);
-    }
-
     constructor(...args) {
         super(...args);
 

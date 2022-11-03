@@ -95,7 +95,7 @@ include(TPL_PATH . "Header.tpl");	?>
                             <label for="exchrate">Exchange rate</label>
                             <div class="input-group">
                                 <input id="exchrate" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?=e($form["exchange"])?>">
-                                <div id="exchcomm" class="input-group__text"><?=e($form["exchSign"])?></div>
+                                <button id="exchcomm" class="input-group__btn" type="button"><?=e($form["exchSign"])?></button>
                             </div>
                         </div>
 

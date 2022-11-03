@@ -6,6 +6,7 @@ import {
     hasAttr,
     hasClass,
     input,
+    click,
 } from 'jezve-test';
 import { DropDown } from 'jezvejs-test';
 
@@ -27,9 +28,11 @@ export class InputRow extends TestComponent {
                 const disabled = await hasAttr(res.currElem, 'disabled');
                 res.isCurrActive = !disabled;
                 if (res.isCurrActive) {
-                    const ddElem = await query(res.currElem, ':scope > *');
+                    const ddElem = await query(res.currElem, '.dd__container_attached');
                     res.currDropDown = await DropDown.create(this.parent, ddElem);
-                    assert(res.currDropDown.content.isAttached, 'Currency drop down is not attached');
+                    if (res.currDropDown) {
+                        assert(res.currDropDown.content.isAttached, 'Currency drop down is not attached');
+                    }
                 }
 
                 res.currSignElem = await query(res.currElem, '.input-group__btn-title');
@@ -37,8 +40,8 @@ export class InputRow extends TestComponent {
                 res.isCurrActive = false;
                 res.currElem = await query(this.elem, '.input-group__text');
                 res.currSignElem = await query(this.elem, '.input-group__text-title');
-                res.currSignElem = res.currSignElem ?? res.currElem;
             }
+            res.currSignElem = res.currSignElem ?? res.currElem;
             res.currSign = await prop(res.currSignElem, 'textContent');
         }
 
@@ -65,6 +68,10 @@ export class InputRow extends TestComponent {
         return this.content.value;
     }
 
+    get currSign() {
+        return this.content.currSign;
+    }
+
     async input(val) {
         return input(this.content.valueInput, val.toString());
     }
@@ -75,5 +82,11 @@ export class InputRow extends TestComponent {
         if (this.content.isCurrActive && this.content.currDropDown) {
             await this.content.currDropDown.setSelection(currencyId);
         }
+    }
+
+    async clickButton() {
+        assert(this.content.isCurrActive, 'Input group button not active');
+
+        await click(this.content.currElem);
     }
 }

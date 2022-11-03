@@ -13,10 +13,6 @@ import './style.scss';
  * ImportConditionItem component
  */
 export class ImportConditionItem extends Component {
-    static create(props) {
-        return new ImportConditionItem(props);
-    }
-
     constructor(...args) {
         super(...args);
 

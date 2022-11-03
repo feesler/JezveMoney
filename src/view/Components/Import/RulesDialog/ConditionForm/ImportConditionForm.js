@@ -43,33 +43,49 @@ const defaultProps = {
  * ImportConditionForm component
  */
 export class ImportConditionForm extends Component {
-    static create(props) {
-        return new ImportConditionForm(props);
-    }
-
-    constructor(...args) {
-        super(...args);
-
-        if (!this.props || !this.props.data) {
-            throw new Error('Invalid props');
-        }
-        if (!(this.props.data instanceof ImportCondition)) {
-            throw new Error('Invalid condition item');
-        }
+    constructor(props) {
+        super(props);
 
         this.props = {
             ...defaultProps,
             ...this.props,
         };
 
-        this.props.data.isValid = this.props.isValid;
-        this.props.data.message = this.props.message;
+        if (!this.props?.data) {
+            throw new Error('Invalid props');
+        }
 
         this.fieldTypes = ImportCondition.getFieldTypes();
         this.operatorTypes = ImportCondition.getOperatorTypes();
 
+        const { data } = this.props;
+        this.state = {
+            conditionId: data.id,
+            parent: data.parent_id,
+            fieldType: data.field_id,
+            availOperators: data.getAvailOperators(),
+            operator: data.operator,
+            isFieldValue: data.isPropertyValue(),
+            value: data.value,
+            isValid: this.props.isValid,
+            message: this.props.message,
+            properties: this.props.properties,
+        };
+
+        this.verifyOperator(this.state);
+
         this.init();
-        this.setData(this.props.data);
+        this.render(this.state);
+        // Check value changed
+        const value = this.getConditionValue(this.state);
+        if (data.value.toString() !== value.toString()) {
+            this.state.value = value;
+            this.sendUpdate();
+        }
+    }
+
+    get id() {
+        return this.state.conditionId;
     }
 
     /** Form controls initialization */
@@ -140,11 +156,11 @@ export class ImportConditionForm extends Component {
     }
 
     getPropertyTypes() {
-        if (!this.props.properties) {
+        if (!this.state.properties) {
             return this.fieldTypes;
         }
 
-        const propFilter = asArray(this.props.properties);
+        const propFilter = asArray(this.state.properties);
         if (!propFilter.length) {
             return this.fieldTypes;
         }
@@ -228,39 +244,13 @@ export class ImportConditionForm extends Component {
 
     /** Verify correctness of operator */
     verifyOperator(state) {
-        if (!state
+        if (
+            !state
             || !Array.isArray(state.availOperators)
             || !state.availOperators.length
-            || !state.availOperators.includes(state.operator)) {
+            || !state.availOperators.includes(state.operator)
+        ) {
             throw new Error('Invalid state');
-        }
-    }
-
-    /** Set main state of component */
-    setData(data) {
-        if (!data) {
-            throw new Error('Invalid data');
-        }
-
-        this.state = {
-            conditionId: data.id,
-            parent: data.parent_id,
-            fieldType: data.field_id,
-            availOperators: data.getAvailOperators(),
-            operator: data.operator,
-            isFieldValue: data.isPropertyValue(),
-            value: data.value,
-            isValid: data.isValid,
-            message: data.message,
-        };
-
-        this.verifyOperator(this.state);
-        this.render(this.state);
-        // Check value changed
-        const value = this.getConditionValue(this.state);
-        if (data.value !== value) {
-            this.state.value = value;
-            this.sendUpdate();
         }
     }
 
@@ -279,28 +269,31 @@ export class ImportConditionForm extends Component {
             return;
         }
 
-        this.state.fieldType = fieldType.id;
-        this.state.availOperators = fieldType.operators;
+        const newState = {
+            ...this.state,
+            fieldType: fieldType.id,
+            availOperators: fieldType.operators,
+            isValid: true,
+        };
+
         // If not available operator is selected then select first available
-        if (!this.state.availOperators.includes(this.state.operator)) {
-            [this.state.operator] = this.state.availOperators;
+        if (!newState.availOperators.includes(newState.operator)) {
+            [newState.operator] = newState.availOperators;
         }
 
         if (!this.isFieldValueAvailable()) {
-            this.state.isFieldValue = false;
+            newState.isFieldValue = false;
         }
 
-        if (this.state.isFieldValue) {
-            const [item] = this.getValuePropertyItems(this.state);
-            this.state.value = item.id;
+        if (newState.isFieldValue) {
+            const [item] = this.getValuePropertyItems(newState);
+            newState.value = item.id;
         } else {
-            this.state.value = this.getConditionValue(this.state);
+            newState.value = this.getConditionValue(newState);
         }
 
-        this.state.isValid = true;
-
-        this.verifyOperator(this.state);
-        this.render(this.state);
+        this.verifyOperator(newState);
+        this.setState(newState);
         this.sendUpdate();
     }
 
@@ -315,9 +308,11 @@ export class ImportConditionForm extends Component {
             return;
         }
 
-        this.state.operator = operatorId;
-        this.state.isValid = true;
-        this.render(this.state);
+        this.setState({
+            ...this.state,
+            operator: operatorId,
+            isValid: true,
+        });
         this.sendUpdate();
     }
 
@@ -379,14 +374,15 @@ export class ImportConditionForm extends Component {
     /** Value property select 'change' event handler */
     onValueChange() {
         const value = this.getConditionValue(this.state);
-
         if (this.state.value === value) {
             return;
         }
 
-        this.state.value = value;
-        this.state.isValid = true;
-        this.render(this.state);
+        this.setState({
+            ...this.state,
+            value,
+            isValid: true,
+        });
         this.sendUpdate();
     }
 
@@ -396,16 +392,20 @@ export class ImportConditionForm extends Component {
             return;
         }
 
-        this.state.isFieldValue = this.fieldValueCheck.checked;
-        if (this.state.isFieldValue) {
-            const [item] = this.getValuePropertyItems(this.state);
-            this.state.value = item.id;
+        const newState = {
+            ...this.state,
+            isFieldValue: this.fieldValueCheck.checked,
+            isValid: true,
+        };
+
+        if (newState.isFieldValue) {
+            const [item] = this.getValuePropertyItems(newState);
+            newState.value = item.id;
         } else {
-            this.state.value = this.getConditionValue(this.state);
+            newState.value = this.getConditionValue(newState);
         }
 
-        this.state.isValid = true;
-        this.render(this.state);
+        this.setState(newState);
         this.sendUpdate();
     }
 
@@ -433,14 +433,14 @@ export class ImportConditionForm extends Component {
     /** Send component 'update' event */
     sendUpdate() {
         if (isFunction(this.props.onUpdate)) {
-            this.props.onUpdate(this.getData(this.state));
+            this.props.onUpdate(this.id, this.getData(this.state));
         }
     }
 
     /** Delete button 'click' event handler */
     onDelete() {
         if (isFunction(this.props.onRemove)) {
-            this.props.onRemove();
+            this.props.onRemove(this.id);
         }
     }
 

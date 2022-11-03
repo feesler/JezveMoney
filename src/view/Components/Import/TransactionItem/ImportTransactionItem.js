@@ -1,13 +1,12 @@
 import {
     createElement,
     enable,
-    isFunction,
+    show,
 } from 'jezvejs';
 import { ImportTransactionBase } from '../TransactionBase/ImportTransactionBase.js';
 import { Field } from '../../Field/Field.js';
 import './style.scss';
 import { ImportTransaction } from '../../../js/model/ImportTransaction.js';
-import { PopupMenu } from '../../PopupMenu/PopupMenu.js';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'import-item';
@@ -33,9 +32,6 @@ const DATE_CLASS = 'import-item__date';
 const COMMENT_CLASS = 'import-item__comment';
 /* Controls */
 const CONTROLS_CLASS = 'controls';
-const ENABLE_BUTTON_CLASS = 'enable-btn';
-const UPDATE_BUTTON_CLASS = 'update-btn';
-const DEL_BUTTON_CLASS = 'delete-btn';
 
 /** Strings */
 const TITLE_FIELD_SRC_ACCOUNT = 'Source account';
@@ -53,6 +49,7 @@ const typeStrings = {
 };
 
 const defaultProps = {
+    onSelect: null,
     onCollapse: null,
     onUpdate: null,
     onEnable: null,
@@ -63,10 +60,6 @@ const defaultProps = {
  * ImportTransactionForm component
  */
 export class ImportTransactionItem extends ImportTransactionBase {
-    static create(props) {
-        return new ImportTransactionItem(props);
-    }
-
     constructor(...args) {
         super(...args);
 
@@ -159,9 +152,9 @@ export class ImportTransactionItem extends ImportTransactionBase {
             ]),
         ]);
 
-        this.createMenu();
+        this.createMenuButton();
         this.controls = createContainer(CONTROLS_CLASS, [
-            this.menu.elem,
+            this.menuContainer,
         ]);
 
         this.mainContainer = createContainer(MAIN_CONTENT_CLASS, [
@@ -172,34 +165,6 @@ export class ImportTransactionItem extends ImportTransactionBase {
         this.initContainer(CONTAINER_CLASS, [this.mainContainer]);
 
         this.render();
-    }
-
-    createMenu() {
-        this.menu = PopupMenu.create({});
-        this.enableMenuItem = this.menu.addIconItem({
-            title: this.getEnableMenuItemTitle(),
-            className: ENABLE_BUTTON_CLASS,
-            onClick: () => this.onToggleEnable(),
-        });
-
-        this.menu.append([{
-            icon: 'update',
-            title: 'Edit',
-            className: UPDATE_BUTTON_CLASS,
-            onClick: () => this.onUpdate(),
-        }, {
-            icon: 'del',
-            title: 'Delete',
-            className: DEL_BUTTON_CLASS,
-            onClick: () => this.remove(),
-        }]);
-    }
-
-    /** Update button 'click' event handler */
-    onUpdate() {
-        if (isFunction(this.props.onUpdate)) {
-            this.props.onUpdate(this);
-        }
     }
 
     /** Render component */
@@ -216,6 +181,9 @@ export class ImportTransactionItem extends ImportTransactionBase {
         const isDebt = ['debtfrom', 'debtto'].includes(transaction.type);
 
         enable(this.elem, transaction.enabled);
+
+        // Select controls
+        this.renderSelectControls(state);
 
         // Types field
         if (!(transaction.type in typeStrings)) {
@@ -269,8 +237,7 @@ export class ImportTransactionItem extends ImportTransactionBase {
         // Comment field
         this.commentTitle.textContent = transaction.comment;
 
-        // Enable/disable menu item
-        this.enableMenuItem.setTitle(this.getEnableMenuItemTitle(state));
+        show(this.menuContainer, !transaction.selectMode);
 
         if (this.collapse) {
             if (transaction.collapsed) {

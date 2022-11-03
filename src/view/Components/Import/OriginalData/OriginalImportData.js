@@ -32,10 +32,6 @@ const COL_ACC_CURRENCY = 'Acc. currency';
  * @param {Number} props.comment
  */
 export class OriginalImportData extends Component {
-    static create(props) {
-        return new OriginalImportData(props);
-    }
-
     constructor(...args) {
         super(...args);
 

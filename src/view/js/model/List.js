@@ -40,6 +40,11 @@ export class List {
         return this.data.find(...args);
     }
 
+    /** Wrap method for array findIndex() method */
+    findIndex(...args) {
+        return this.data.findIndex(...args);
+    }
+
     /** Wrap method for array filter() method */
     filter(...args) {
         return this.data.filter(...args);

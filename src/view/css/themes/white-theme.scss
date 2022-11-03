@@ -24,12 +24,6 @@
   color: var(--main-text-color);
   background-color: var(--main-bg-color);
 
-  /* Page */
-  .page_wrapper {
-    color: var(--main-text-color);
-    background-color: var(--main-bg-color);
-  }
-
   /* Navigation */
   .navigation {
     background-color: var(--alt-bg-color);
@@ -39,11 +33,6 @@
   a.nav-link,
   a.nav-link:visited {
     color: #202020;
-  }
-
-  /* Main content */
-  .container {
-    background-color: var(--main-bg-color);
   }
 
   /* Login/Register view */
@@ -132,6 +121,7 @@
     --checkbox-text: var(--main-text-color);
     --checkbox-bg: var(--input-bg-color);
     --checkbox-border: var(--input-border-color);
+    --checkbox-checked-fill: var(--accent-color);
   }
 
   /* DropDown  */
@@ -164,7 +154,7 @@
     --dd-list-item-check: var(--main-text-color);
 
     /* List group */
-    --dd-list-group-text: #0072c6;
+    --dd-list-group-text: var(--accent-color);
     --dd-list-group-bg: #f2f2f2;
   }
 
@@ -206,7 +196,8 @@
   }
 
   /* Transaction list item */
-  .trans-item {
+  .trans-item__content,
+  .trans-item__controls {
     background-color: var(--alt-bg-color);
   }
 
@@ -281,7 +272,12 @@
 
   /* Import form */
   .import-form {
-    background-color: #dddddd;
+    .form-container,
+    .controls,
+    .invalid-feedback,
+    .form-controls {
+      background-color: #dddddd;
+    }
 
     &.import-form__placeholder {
       border-color: #888888;
@@ -310,10 +306,6 @@
 
   /* Disabled Import form */
   .import-form[disabled] {
-    background-color: #e8e8e8;
-    color: #808080;
-    border-color: #e8e8e8;
-
     input[type="text"],
     input[disabled] {
       color: var(--input-disabled-text-color);
@@ -335,12 +327,18 @@
 
   /* Import item */
   .import-item {
-    background-color: #dddddd;
+    .item-container,
+    .controls {
+      background-color: #dddddd;
+    }
 
     &[disabled] {
-      background-color: #e8e8e8;
-      color: #808080;
-      border-color: #e8e8e8;
+      .item-container,
+      .controls {
+        background-color: #e8e8e8;
+        color: #808080;
+        border-color: #e8e8e8;
+      }
     }
 
     &.import-item__placeholder {
@@ -359,6 +357,16 @@
     .icon {
       fill: var(--list-item-icon-fill);
     }
+  }
+
+  /* Disabled Import form */
+  .import-form[disabled] .form-container,
+  .import-form[disabled] .controls,
+  .import-form[disabled] .invalid-feedback,
+  .import-form[disabled] .form-controls {
+    background-color: #e8e8e8;
+    color: #808080;
+    border-color: #e8e8e8;
   }
 
   .import-controls {

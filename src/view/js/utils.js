@@ -130,12 +130,15 @@ export const amountFix = (value, thSep = ' ') => {
     return parseFloat(fixFloat(res));
 };
 
+export const CENTS_DIGITS = 2;
+export const EXCHANGE_DIGITS = 4;
+
 /**
  * Correct calculated value
  * @param {string|Number} val - value to correct
  * @param {Number} prec - precision
  */
-export const correct = (val, prec = 2) => (
+export const correct = (val, prec = CENTS_DIGITS) => (
     parseFloat(parseFloat(val).toFixed(prec))
 );
 
@@ -143,20 +146,20 @@ export const correct = (val, prec = 2) => (
  * Correct calculated exchange rate value
  * @param {string|Number} val - exchange rate value
  */
-export const correctExch = (val) => correct(val, 5);
+export const correctExch = (val) => correct(val, EXCHANGE_DIGITS);
 
 /**
  * Normalize monetary value from string
  * @param {string|Number} val - value to normalize
  * @param {Number} prec - precision of result decimal
  */
-export const normalize = (val, prec = 2) => correct(fixFloat(val), prec);
+export const normalize = (val, prec = CENTS_DIGITS) => correct(fixFloat(val), prec);
 
 /**
  * Normalize exchange rate value from string
  * @param {string|Number} val - exchange rate value
  */
-export const normalizeExch = (val) => normalize(val, 5);
+export const normalizeExch = (val) => normalize(val, EXCHANGE_DIGITS);
 
 /**
  * Check value is valid

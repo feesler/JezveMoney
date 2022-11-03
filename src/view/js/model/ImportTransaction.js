@@ -21,6 +21,8 @@ const defaultProps = {
     isForm: false,
     enabled: true,
     collapsed: true,
+    selected: false,
+    selectMode: false,
     similarTransaction: null,
     type: 'expense',
     sourceAccountId: 0,
@@ -61,6 +63,10 @@ export class ImportTransaction {
 
     get enabled() {
         return this.state.enabled;
+    }
+
+    get selected() {
+        return this.state.selected;
     }
 
     get collapsed() {
@@ -137,6 +143,41 @@ export class ImportTransaction {
         }
         const state = copyObject(this.state);
         state.enabled = res;
+
+        this.state = state;
+        return state;
+    }
+
+    /**
+     * Select/deselect component
+     * @param {boolean} val - if true then select component, else deselect
+     */
+    select(value) {
+        if (!this.state.selectMode) {
+            return this.state;
+        }
+
+        const res = !!value;
+        if (this.state.selected === res) {
+            return this.state;
+        }
+        const state = copyObject(this.state);
+        state.selected = res;
+
+        this.state = state;
+        return state;
+    }
+
+    /**
+     * Toggle select/deselect component
+     */
+    toggleSelect() {
+        if (!this.state.selectMode) {
+            return this.state;
+        }
+
+        const state = copyObject(this.state);
+        state.selected = !state.selected;
 
         this.state = state;
         return state;

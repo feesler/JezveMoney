@@ -4,10 +4,10 @@ import { RegisterView } from './view/RegisterView.js';
 import { ProfileView } from './view/ProfileView.js';
 import { AboutView } from './view/AboutView.js';
 import { AccountView } from './view/AccountView.js';
-import { AccountsView } from './view/AccountsView.js';
+import { AccountListView } from './view/AccountListView.js';
 import { PersonView } from './view/PersonView.js';
-import { PersonsView } from './view/PersonsView.js';
-import { TransactionsView } from './view/TransactionsView.js';
+import { PersonListView } from './view/PersonListView.js';
+import { TransactionListView } from './view/TransactionListView.js';
 import { TransactionView } from './view/TransactionView.js';
 import { ImportView } from './view/ImportView.js';
 import { StatisticsView } from './view/StatisticsView.js';
@@ -59,7 +59,7 @@ export async function route(env, url) {
     if (part === 'accounts') {
         const actPart = parts.shift();
         if (!actPart) {
-            return AccountsView;
+            return AccountListView;
         }
 
         if (actPart === 'create' || actPart === 'update') {
@@ -72,7 +72,7 @@ export async function route(env, url) {
     if (part === 'persons') {
         const actPart = parts.shift();
         if (!actPart) {
-            return PersonsView;
+            return PersonListView;
         }
 
         if (actPart === 'create' || actPart === 'update') {
@@ -85,7 +85,7 @@ export async function route(env, url) {
     if (part === 'transactions') {
         const actPart = parts.shift();
         if (!actPart) {
-            return TransactionsView;
+            return TransactionListView;
         }
 
         if (actPart === 'create' || actPart === 'update') {

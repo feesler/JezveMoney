@@ -16,7 +16,6 @@ import { ImportTransactionBase } from '../TransactionBase/ImportTransactionBase.
 import { Field } from '../../Field/Field.js';
 import './style.scss';
 import { ImportTransaction } from '../../../js/model/ImportTransaction.js';
-import { PopupMenu } from '../../PopupMenu/PopupMenu.js';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'import-form';
@@ -44,8 +43,6 @@ const COMMENT_FIELD_CLASS = 'comment-field';
 /* Controls */
 const CONTROLS_CLASS = 'controls';
 const DEFAULT_BUTTON_CLASS = 'btn';
-const ENABLE_BUTTON_CLASS = 'enable-btn';
-const DEL_BUTTON_CLASS = 'delete-btn';
 const DEFAULT_ICON_CLASS = 'icon';
 const CALENDAR_ICON_CLASS = 'calendar-icon';
 /* Form controls */
@@ -71,6 +68,7 @@ const SAVE_BTN_TITLE = 'Save';
 const CANCEL_BTN_TITLE = 'Cancel';
 
 const defaultProps = {
+    onSelect: null,
     onCollapse: null,
     onEnable: null,
     onUpdate: null,
@@ -83,10 +81,6 @@ const defaultProps = {
  * ImportTransactionForm component
  */
 export class ImportTransactionForm extends ImportTransactionBase {
-    static create(props) {
-        return new ImportTransactionForm(props);
-    }
-
     constructor(...args) {
         super(...args);
 
@@ -139,9 +133,9 @@ export class ImportTransactionForm extends ImportTransactionBase {
             ]),
         ]);
 
-        this.createMenu();
+        this.createMenuButton();
         this.controls = createContainer(CONTROLS_CLASS, [
-            this.menu.elem,
+            this.menuContainer,
         ]);
 
         this.mainContainer = createContainer(MAIN_CONTENT_CLASS, [
@@ -385,22 +379,6 @@ export class ImportTransactionForm extends ImportTransactionBase {
             content: this.commInp,
             className: COMMENT_FIELD_CLASS,
         });
-    }
-
-    createMenu() {
-        this.menu = PopupMenu.create({});
-        this.enableMenuItem = this.menu.addIconItem({
-            title: this.getEnableMenuItemTitle(),
-            className: ENABLE_BUTTON_CLASS,
-            onClick: () => this.onToggleEnable(),
-        });
-
-        this.menu.append([{
-            icon: 'del',
-            title: 'Delete',
-            className: DEL_BUTTON_CLASS,
-            onClick: () => this.remove(),
-        }]);
     }
 
     /** Transaction type select 'change' event handler */
@@ -649,6 +627,9 @@ export class ImportTransactionForm extends ImportTransactionBase {
 
         enable(this.elem, transaction.enabled);
 
+        // Select controls
+        this.renderSelectControls(state);
+
         // Type field
         this.typeDropDown.enable(transaction.enabled);
         this.typeDropDown.selectItem(transaction.type);
@@ -768,9 +749,6 @@ export class ImportTransactionForm extends ImportTransactionBase {
         // Commend field
         enable(this.commInp, transaction.enabled);
         this.commInp.value = transaction.comment;
-
-        // Enable/disable menu item
-        this.enableMenuItem.setTitle(this.getEnableMenuItemTitle(state));
 
         if (this.collapse) {
             if (transaction.collapsed) {

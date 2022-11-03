@@ -170,6 +170,31 @@ export const stateLoop = async () => {
         { action: 'clickSrcResultBalance' },
         // Transition 45: Click by exchange rate and move from State 6 to State 8
         { action: 'clickExchRate' },
+    ]);
+
+    // Input exchange rate
+    const exInputData = [
+        '1.09',
+        '3.09',
+        '.',
+        '.0',
+        '.09',
+        '.090101',
+    ];
+    await TransactionTests.runGroup('inputExchRate', exInputData);
+
+    // Toggle direction of exchange rate and stay on State 8
+    await TransactionTests.runAction({ action: 'toggleExchange' });
+    // Input backexchange rate
+    const backExchInputData = [
+        '66.5',
+        '166.56',
+    ];
+    await TransactionTests.runGroup('inputExchRate', backExchInputData);
+    // Toggle direction of exchange rate and stay on State 8
+    await TransactionTests.runAction({ action: 'toggleExchange' });
+
+    await TransactionTests.runActions([
         // Transition 51: Change source account to another one with different currency than
         //  destination (USD) and stay on State 6
         { action: 'changeSrcAccountByPos', data: ACC_USD },
@@ -199,7 +224,7 @@ export const stateLoop = async () => {
         { action: 'clickSrcAmount' }, // move from State 1 to State 0
         { action: 'clickDestResultBalance' }, // move from State 0 to State 2
         { action: 'changeDestAccountByPos', data: ACC_USD }, // move from State 2 to State 5
-        { action: 'clickExchRate' },
+        { action: 'clickExchRate' }, // move from State 5 to State 7
         // Transition 55: Click by destination amount and move from State 7 to State 3
         { action: 'clickDestAmount' },
         // Transition 25: Click by destination result balance and move from State 3 to State 5

@@ -7,7 +7,7 @@
 .content-header {
   position: sticky;
   top: 50px;
-  z-index: 10;
+  z-index: 1000;
   padding: 10px 0;
 }
 
@@ -91,8 +91,38 @@
   flex-flow: column nowrap;
   align-items: stretch;
   position: relative;
+  row-gap: 2px;
 
   .paginator {
     margin-right: auto;
   }
+}
+
+.import-list_select {
+  .import-item,
+  .import-form {
+    cursor: pointer;
+  }
+
+  .collapsible-content,
+  .invalid-feedback,
+  .form-controls {
+    margin-left: 32px;
+  }
+}
+
+.import-item_selected .main-content {
+  position: relative;
+}
+
+.import-item_selected .main-content::after {
+  border: 2px solid var(--accent-color);
+  bottom: 0;
+  content: "";
+  cursor: pointer;
+  display: block;
+  left: 32px;
+  position: absolute;
+  right: 0;
+  top: 0;
 }

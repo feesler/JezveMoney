@@ -1,7 +1,7 @@
 .dark-theme {
   --main-text-color: #dddddd;
   --hl-text-color: #ffffff;
-  --main-bg-color: #101010;
+  --main-bg-color: #202020;
   --alt-bg-color: #2a2a2a;
 
   /* Header */
@@ -25,12 +25,6 @@
   color: var(--main-text-color);
   background-color: var(--main-bg-color);
 
-  /* Page */
-  .page_wrapper {
-    color: var(--main-text-color);
-    background-color: var(--main-bg-color);
-  }
-
   /* Navigation */
   .navigation {
     background-color: var(--alt-bg-color);
@@ -40,11 +34,6 @@
   a.nav-link,
   a.nav-link:visited {
     color: var(--main-text-color);
-  }
-
-  /* Main content */
-  .container {
-    background-color: #202020;
   }
 
   /* Login/Register view */
@@ -133,6 +122,7 @@
     --checkbox-text: var(--main-text-color);
     --checkbox-bg: var(--input-bg-color);
     --checkbox-border: var(--input-border-color);
+    --checkbox-checked-fill: var(--accent-color);
   }
 
   /* DropDown  */
@@ -165,7 +155,7 @@
     --dd-list-item-check: var(--main-text-color);
 
     /* List group */
-    --dd-list-group-text: #0072c6;
+    --dd-list-group-text: var(--accent-color);
     --dd-list-group-bg: #202020;
   }
 
@@ -207,7 +197,8 @@
   }
 
   /* Transaction list item */
-  .trans-item {
+  .trans-item__content,
+  .trans-item__controls {
     background-color: var(--alt-bg-color);
   }
 
@@ -282,7 +273,12 @@
 
   /* Import form */
   .import-form {
-    background-color: var(--alt-bg-color);
+    .form-container,
+    .controls,
+    .invalid-feedback,
+    .form-controls {
+      background-color: var(--alt-bg-color);
+    }
 
     &.import-form__placeholder {
       border-color: #888888;
@@ -311,10 +307,6 @@
 
   /* Disabled Import form */
   .import-form[disabled] {
-    background-color: #292929;
-    color: #707070;
-    border-color: #707070;
-
     input[type="text"],
     input[disabled] {
       color: var(--input-disabled-text-color);
@@ -326,7 +318,6 @@
       color: #707070;
     }
 
-
     .input-group__btn,
     .input-group__text {
       color: var(--input-disabled-text-color);
@@ -337,12 +328,18 @@
 
   /* Import item */
   .import-item {
-    background-color: var(--alt-bg-color);
+    .item-container,
+    .controls {
+      background-color: var(--alt-bg-color);
+    }
 
     &[disabled] {
-      background-color: #292929;
-      color: #707070;
-      border-color: #707070;
+      .item-container,
+      .controls {
+        background-color: #292929;
+        color: #707070;
+        border-color: #707070;
+      }
     }
 
     &.import-item__placeholder {
@@ -361,6 +358,16 @@
     .icon {
       fill: var(--list-item-icon-fill);
     }
+  }
+
+  /* Disabled Import form */
+  .import-form[disabled] .form-container,
+  .import-form[disabled] .controls,
+  .import-form[disabled] .invalid-feedback,
+  .import-form[disabled] .form-controls {
+    background-color: #292929;
+    color: #707070;
+    border-color: #707070;
   }
 
   .import-controls {

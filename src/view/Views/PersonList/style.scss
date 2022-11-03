@@ -1,0 +1,7 @@
+.heading {
+  max-width: calc(var(--tile-size) * 4 + var(--tile-gap) * 3);
+}
+
+.actions-menu-list {
+  z-index: 2500;
+}

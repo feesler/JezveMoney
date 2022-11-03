@@ -1,14 +1,12 @@
 /* Transactions list component */
 .trans-list {
   display: flex;
-  flex-flow: column wrap;
-  align-items: stretch;
-}
-
-.trans-list-items {
-  display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
   width: 100%;
   gap: 4px;
+}
+
+.trans-list_select .trans-item {
+  cursor: pointer;
 }

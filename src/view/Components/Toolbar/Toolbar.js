@@ -44,34 +44,31 @@ export class Toolbar extends Component {
 
         const editBtn = ge('edit_btn');
         if (editBtn) {
-            this.updateBtn = IconButton.fromElement({ elem: editBtn });
+            this.updateBtn = IconButton.fromElement(editBtn);
         }
 
         const exportBtn = ge('export_btn');
         if (exportBtn) {
-            this.exportBtn = IconButton.fromElement({ elem: exportBtn });
+            this.exportBtn = IconButton.fromElement(exportBtn);
         }
 
         const showBtn = ge('show_btn');
         if (showBtn) {
-            this.showBtn = IconButton.fromElement({
-                elem: showBtn,
+            this.showBtn = IconButton.fromElement(showBtn, {
                 onClick: () => this.onShowClick(),
             });
         }
 
         const hideBtn = ge('hide_btn');
         if (hideBtn) {
-            this.hideBtn = IconButton.fromElement({
-                elem: hideBtn,
+            this.hideBtn = IconButton.fromElement(hideBtn, {
                 onClick: () => this.onHideClick(),
             });
         }
 
         const deleteBtn = ge('del_btn');
         if (deleteBtn) {
-            this.deleteBtn = IconButton.fromElement({
-                elem: 'del_btn',
+            this.deleteBtn = IconButton.fromElement('del_btn', {
                 onClick: () => this.onDeleteClick(),
             });
         }

@@ -1,4 +1,10 @@
-import { createElement, Component } from 'jezvejs';
+import {
+    createElement,
+    removeChilds,
+    show,
+    Component,
+} from 'jezvejs';
+import { Checkbox } from 'jezvejs/Checkbox';
 import {
     EXPENSE,
     INCOME,
@@ -10,6 +16,7 @@ import './style.scss';
 
 /** CSS classes */
 export const TRANS_ITEM_CLASS = 'trans-item';
+const CONTENT_CLASS = 'trans-item__content';
 const TITLE_CLASS = 'trans-item__title';
 const AMOUNT_CLASS = 'trans-item__amount';
 const DATE_CLASS = 'trans-item__date';
@@ -28,6 +35,13 @@ const AMOUNT_FIELD_CLASS = 'trans-item__amount-field';
 const RESULT_FIELD_CLASS = 'trans-item__result-field';
 const DATE_FIELD_CLASS = 'trans-item__date-field';
 const COMMENT_FIELD_CLASS = 'trans-item__comment-field';
+/* Select controls */
+const SELECT_CONTROLS_CLASS = 'trans-item__select';
+/* Controls */
+const CONTROLS_CLASS = 'trans-item__controls';
+const MENU_CLASS = 'actions-menu';
+const MENU_BUTTON_CLASS = 'btn icon-btn actions-menu-btn';
+const MENU_ICON_CLASS = 'icon actions-menu-btn__icon';
 /* Other */
 const SELECTED_CLASS = 'trans-item_selected';
 
@@ -43,29 +57,44 @@ const LABEL_DEST_RESULT = 'Destination result';
 const LABEL_DATE = 'Date';
 const LABEL_COMMENT = 'Comment';
 
+const defaultProps = {
+    selected: false,
+    selectMode: false,
+    showControls: false,
+};
+
 /**
  * Transaction list item component
  */
 export class TransactionListItem extends Component {
-    static create(props) {
-        const instance = new TransactionListItem(props);
-        instance.init();
+    constructor(props) {
+        super(props);
 
-        return instance;
-    }
-
-    constructor(...args) {
-        super(...args);
+        this.props = {
+            ...defaultProps,
+            ...this.props,
+        };
 
         this.state = { ...this.props };
+
+        this.selectControls = null;
+        this.controlsElem = null;
+
+        this.init();
+    }
+
+    get id() {
+        return this.state.item.id;
     }
 
     init() {
-        if (this.props.mode && this.props.mode === 'details') {
-            this.initDetails();
-        } else {
-            this.initClassic();
-        }
+        this.contentElem = createElement('div', { props: { className: CONTENT_CLASS } });
+        this.elem = createElement('div', {
+            props: { className: TRANS_ITEM_CLASS },
+            children: this.contentElem,
+        });
+
+        this.render(this.state);
     }
 
     initClassic() {
@@ -73,19 +102,12 @@ export class TransactionListItem extends Component {
         this.amountElem = createElement('div', { props: { className: AMOUNT_CLASS } });
         this.dateElem = createElement('div', { props: { className: DATE_CLASS } });
         this.commentElem = createElement('div', { props: { className: COMMENT_CLASS } });
-        this.dateCommentElem = createElement('div', {
+        const dateCommentElem = createElement('div', {
             props: { className: DATE_COMMENT_CLASS },
             children: [this.dateElem, this.commentElem],
         });
 
-        this.elem = createElement('div', {
-            props: { className: TRANS_ITEM_CLASS },
-            children: [
-                this.titleElem,
-                this.amountElem,
-                this.dateCommentElem,
-            ],
-        });
+        this.contentElem.append(this.titleElem, this.amountElem, dateCommentElem);
     }
 
     initDetails() {
@@ -98,7 +120,7 @@ export class TransactionListItem extends Component {
             title: LABEL_DESTINATION,
             className: TITLE_FIELD_CLASS,
         });
-        this.sourceDestGroup = createElement('div', {
+        const sourceDestGroup = createElement('div', {
             props: { className: ACCOUNTS_GROUP_CLASS },
             children: [this.sourceField.elem, this.destField.elem],
         });
@@ -111,7 +133,7 @@ export class TransactionListItem extends Component {
             title: LABEL_DEST_AMOUNT,
             className: AMOUNT_FIELD_CLASS,
         });
-        this.amountGroup = createElement('div', {
+        const amountGroup = createElement('div', {
             props: { className: AMOUNT_GROUP_CLASS },
             children: [this.srcAmountField.elem, this.destAmountField.elem],
         });
@@ -124,14 +146,14 @@ export class TransactionListItem extends Component {
             title: LABEL_DEST_RESULT,
             className: RESULT_FIELD_CLASS,
         });
-        this.resultsGroup = createElement('div', {
+        const resultsGroup = createElement('div', {
             props: { className: RESULTS_GROUP_CLASS },
             children: [this.srcResultField.elem, this.destResultField.elem],
         });
 
-        this.amountResultGroup = createElement('div', {
+        const amountResultGroup = createElement('div', {
             props: { className: AMOUNT_RESULT_GROUP_CLASS },
-            children: [this.amountGroup, this.resultsGroup],
+            children: [amountGroup, resultsGroup],
         });
         // Date
         this.dateElem = createElement('div', { props: { className: DATE_CLASS } });
@@ -147,19 +169,73 @@ export class TransactionListItem extends Component {
             className: COMMENT_FIELD_CLASS,
         });
 
-        this.dateCommentGroup = createElement('div', {
+        const dateCommentGroup = createElement('div', {
             props: { className: DATE_COMMENT_CLASS },
             children: [this.dateField.elem, this.commentField.elem],
         });
 
-        this.elem = createElement('div', {
-            props: { className: `${TRANS_ITEM_CLASS} ${DETAILS_CLASS}` },
-            children: [
-                this.sourceDestGroup,
-                this.amountResultGroup,
-                this.dateCommentGroup,
-            ],
+        this.contentElem.append(
+            sourceDestGroup,
+            amountResultGroup,
+            dateCommentGroup,
+        );
+    }
+
+    resetContent() {
+        removeChilds(this.contentElem);
+        // Classic mode elements
+        this.titleElem = null;
+        this.amountElem = null;
+        // Details mode elements
+        this.sourceField = null;
+        this.destField = null;
+        this.srcAmountField = null;
+        this.destAmountField = null;
+        this.srcResultField = null;
+        this.destResultField = null;
+        this.dateField = null;
+        this.commentField = null;
+        // Common
+        this.dateElem = null;
+        this.commentElem = null;
+    }
+
+    createSelectControls() {
+        const { createContainer } = window.app;
+
+        if (this.selectControls) {
+            return;
+        }
+
+        this.checkbox = Checkbox.create();
+        this.selectControls = createContainer(SELECT_CONTROLS_CLASS, [
+            this.checkbox.elem,
+        ]);
+
+        this.elem.prepend(this.selectControls);
+    }
+
+    createControls() {
+        const { createContainer, createIcon } = window.app;
+
+        if (this.controlsElem) {
+            return;
+        }
+
+        this.menuBtn = createElement('button', {
+            props: { className: MENU_BUTTON_CLASS, type: 'button' },
+            children: createIcon('ellipsis', MENU_ICON_CLASS),
         });
+        this.menuContainer = createContainer(MENU_CLASS, [
+            this.menuBtn,
+        ]);
+
+        this.controlsElem = createElement('div', {
+            props: { className: CONTROLS_CLASS },
+            children: this.menuContainer,
+        });
+
+        this.elem.append(this.controlsElem);
     }
 
     getDebtType(item) {
@@ -262,6 +338,30 @@ export class TransactionListItem extends Component {
             : `${sign}${srcAmountFmt}`;
     }
 
+    renderSelectControls(state, prevState) {
+        if (state.selectMode === prevState.selectMode) {
+            return;
+        }
+
+        if (state.selectMode) {
+            this.createSelectControls();
+        }
+
+        show(this.selectControls, state.selectMode);
+    }
+
+    renderControls(state, prevState) {
+        if (state.showControls === prevState.showControls) {
+            return;
+        }
+
+        if (state.showControls) {
+            this.createControls();
+        }
+
+        show(this.controlsElem, state.showControls);
+    }
+
     renderClassic(state) {
         const { item } = state;
 
@@ -340,7 +440,24 @@ export class TransactionListItem extends Component {
         this.commentElem.setAttribute('title', item.comment);
     }
 
-    render(state) {
+    renderContent(state, prevState) {
+        if (state.mode !== prevState.mode) {
+            this.resetContent();
+            if (state.mode === 'details') {
+                this.initDetails();
+            } else {
+                this.initClassic();
+            }
+        }
+
+        if (state.mode === 'details') {
+            this.renderDetails(state);
+        } else {
+            this.renderClassic(state);
+        }
+    }
+
+    render(state, prevState = {}) {
         if (!state) {
             throw new Error('Invalid state object');
         }
@@ -353,16 +470,17 @@ export class TransactionListItem extends Component {
         this.elem.setAttribute('data-id', item.id);
         this.elem.setAttribute('data-type', item.type);
 
-        if (state.mode === 'details') {
-            this.renderDetails(state);
-        } else {
-            this.renderClassic(state);
-        }
+        this.renderSelectControls(state, prevState);
+        this.renderControls(state, prevState);
 
-        if (state.selected) {
-            this.elem.classList.add(SELECTED_CLASS);
-        } else {
-            this.elem.classList.remove(SELECTED_CLASS);
+        this.elem.classList.toggle(DETAILS_CLASS, state.mode === 'details');
+
+        this.renderContent(state, prevState);
+
+        if (state.selectMode) {
+            const selected = !!state.selected;
+            this.elem.classList.toggle(SELECTED_CLASS, selected);
+            this.checkbox.check(selected);
         }
     }
 }

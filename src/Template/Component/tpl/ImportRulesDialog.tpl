@@ -10,5 +10,5 @@
         </button>
         <button class="input-group__inner-btn search-btn" type="button"><?= svgIcon("search", "icon search-icon") ?></button>
     </div>
-    <div class="rules-list"></div>
+    <div class="rules-list-container"></div>
 </div>

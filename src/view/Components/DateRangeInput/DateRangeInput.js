@@ -28,12 +28,6 @@ const defaultProps = {
  * Date range component
  */
 export class DateRangeInput extends Component {
-    static fromElement(elem, props) {
-        const instance = new DateRangeInput(props);
-        instance.parse(elem);
-        return instance;
-    }
-
     constructor(props) {
         super(props);
 
@@ -42,8 +36,9 @@ export class DateRangeInput extends Component {
             ...this.props,
         };
 
-        this.state = {
-        };
+        this.state = {};
+
+        this.parse();
     }
 
     setData(data) {
@@ -55,40 +50,39 @@ export class DateRangeInput extends Component {
         });
     }
 
-    parse(elem) {
-        this.elem = elem;
+    parse() {
         if (!this.elem) {
             throw new Error('Invalid element');
         }
         setEvents(this.elem, { submit: (e) => this.onSubmit(e) });
 
         this.startDateInput = DateInput.create({
-            elem: elem.querySelector('input[name="stdate"]'),
+            elem: this.elem.querySelector('input[name="stdate"]'),
             locales: window.app.dateFormatLocale,
             placeholder: this.props.startPlaceholder,
             oninput: (e) => this.onStartDateInput(e),
         });
 
         this.endDateInput = DateInput.create({
-            elem: elem.querySelector('input[name="enddate"]'),
+            elem: this.elem.querySelector('input[name="enddate"]'),
             locales: window.app.dateFormatLocale,
             placeholder: this.props.endPlaceholder,
             oninput: (e) => this.onEndDateInput(e),
         });
 
-        this.clearBtn = elem.querySelector('.clear-btn');
+        this.clearBtn = this.elem.querySelector('.clear-btn');
         if (!this.clearBtn) {
             throw new Error('Clear button not found');
         }
         setEvents(this.clearBtn, { click: () => this.onDateClear() });
 
-        this.dateInputBtn = elem.querySelector('.dp-btn');
+        this.dateInputBtn = this.elem.querySelector('.dp-btn');
         if (!this.dateInputBtn) {
             throw new Error('DatePicker button not found');
         }
         setEvents(this.dateInputBtn, { click: () => this.showCalendar() });
 
-        this.datePickerWrapper = elem.querySelector('.calendar');
+        this.datePickerWrapper = this.elem.querySelector('.calendar');
 
         this.setClassNames();
         this.setData(this.props);

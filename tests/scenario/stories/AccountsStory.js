@@ -33,7 +33,7 @@ export class AccountsStory extends TestStory {
         await this.prepareTransactions();
 
         await this.hide();
-        await this.toggle();
+        await this.select();
         await this.show();
         await this.exportCSV();
         await this.update();
@@ -152,14 +152,19 @@ export class AccountsStory extends TestStory {
         await App.scenario.runner.runGroup(AccountTests.exportTest, data);
     }
 
-    async toggle() {
-        setBlock('Toggle select accounts', 2);
+    async select() {
+        setBlock('Select accounts', 1);
 
         const data = [
             [0],
             [1, 2],
         ];
 
+        setBlock('Toggle select accounts', 2);
         await App.scenario.runner.runGroup(AccountTests.toggleSelect, data);
+
+        setBlock('Select/deselect all accounts', 2);
+        await AccountTests.selectAll();
+        await AccountTests.deselectAll();
     }
 }

@@ -1,24 +1,31 @@
 import {
     createElement,
     isFunction,
+    show,
     Component,
 } from 'jezvejs';
+import { Checkbox } from 'jezvejs/Checkbox';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 
 /** CSS classes */
 const TOGGLE_BUTTON_CLASS = 'btn icon-btn toggle-btn';
 const TOGGLE_ICON_CLASS = 'icon toggle-icon';
+/* Select controls */
+const SELECT_CONTROLS_CLASS = 'select-controls';
+const SELECTED_CLASS = 'import-item_selected';
 /* Similar transaction */
 const SIMILAR_CLASS = 'similar';
 const SIMILAR_TITLE_CLASS = 'similar__title';
 const SIMILAR_LINK_CLASS = 'similar__link';
+/* Menu */
+const MENU_CLASS = 'actions-menu';
+const MENU_BUTTON_CLASS = 'btn icon-btn actions-menu-btn';
+const MENU_ICON_CLASS = 'icon actions-menu-btn__icon';
 
 /** Strings */
 const STR_SIMILAR_FOUND = 'Similar transaction found: ';
 const STR_SIMILAR_LINK = 'Edit';
-const STR_ENABLE_ITEM = 'Enable';
-const STR_DISABLE_ITEM = 'Disable';
 
 /** Base import transaction class */
 export class ImportTransactionBase extends Component {
@@ -32,32 +39,45 @@ export class ImportTransactionBase extends Component {
 
     initContainer(className, children) {
         const { originalData } = this.props.data.props;
-        if (originalData) {
-            const origDataContainer = OriginalImportData.create({
-                ...originalData,
-            });
-
-            const content = [origDataContainer.elem];
-
-            const { similarTransaction } = this.props.data.state;
-            if (similarTransaction) {
-                const infoElem = this.createSimilarTransactionInfo(similarTransaction);
-                content.push(infoElem);
-            }
-
-            this.toggleExtBtn = this.createToggleButton();
-            this.controls.append(this.toggleExtBtn);
-
-            this.collapse = Collapsible.create({
-                toggleOnClick: false,
-                className,
-                header: children,
-                content,
-            });
-            this.elem = this.collapse.elem;
-        } else {
+        if (!originalData) {
             this.elem = window.app.createContainer(className, children);
+            return;
         }
+
+        const origDataContainer = OriginalImportData.create({
+            ...originalData,
+        });
+
+        const content = [origDataContainer.elem];
+
+        const { similarTransaction } = this.props.data.state;
+        if (similarTransaction) {
+            const infoElem = this.createSimilarTransactionInfo(similarTransaction);
+            content.push(infoElem);
+        }
+
+        this.toggleExtBtn = this.createToggleButton();
+        this.controls.append(this.toggleExtBtn);
+
+        this.collapse = Collapsible.create({
+            toggleOnClick: false,
+            className,
+            header: children,
+            content,
+        });
+        this.elem = this.collapse.elem;
+    }
+
+    createMenuButton() {
+        const { createContainer, createIcon } = window.app;
+
+        this.menuBtn = createElement('button', {
+            props: { className: MENU_BUTTON_CLASS, type: 'button' },
+            children: createIcon('ellipsis', MENU_ICON_CLASS),
+        });
+        this.menuContainer = createContainer(MENU_CLASS, [
+            this.menuBtn,
+        ]);
     }
 
     /** Returns toggle expand/collapse button */
@@ -97,32 +117,49 @@ export class ImportTransactionBase extends Component {
         });
     }
 
-    /** Remove item */
-    remove() {
-        if (isFunction(this.props.onRemove)) {
-            this.props.onRemove(this);
+    createSelectControls() {
+        const { createContainer } = window.app;
+
+        if (this.selectControls) {
+            return;
         }
+
+        this.checkbox = Checkbox.create();
+        this.selectControls = createContainer(SELECT_CONTROLS_CLASS, [
+            this.checkbox.elem,
+        ]);
+
+        this.mainContainer.prepend(this.selectControls);
     }
 
-    getEnableMenuItemTitle(state = this.state) {
-        const { enabled } = state.transaction;
-        return (enabled) ? STR_DISABLE_ITEM : STR_ENABLE_ITEM;
+    renderSelectControls(state, prevState = {}) {
+        if (state.transaction.state.selectMode === prevState?.transaction?.state?.selectMode) {
+            return;
+        }
+
+        const { selectMode, selected } = state.transaction.state;
+        if (selectMode) {
+            this.createSelectControls();
+        }
+
+        show(this.selectControls, selectMode);
+
+        if (selectMode) {
+            this.elem.classList.toggle(SELECTED_CLASS, !!selected);
+            this.checkbox.check(!!selected);
+        }
     }
 
     /** Enable/disable component */
     enable(value = true) {
         this.state.transaction.enable(value);
         this.render();
-
-        if (isFunction(this.props.onEnable)) {
-            this.props.onEnable(this, value);
-        }
     }
 
-    /** Enable/disable menu item 'click' event handler */
-    onToggleEnable() {
-        const value = !this.enabled;
-        this.enable(value);
+    /** Toggle select/deselect component */
+    toggleSelect() {
+        this.state.transaction.toggleSelect();
+        this.render();
     }
 
     /** Toggle collapse/expand button 'click' event handler */

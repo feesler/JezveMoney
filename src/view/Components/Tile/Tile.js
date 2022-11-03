@@ -4,6 +4,7 @@ import {
     setAttributes,
     Component,
 } from 'jezvejs';
+import { Checkbox } from 'jezvejs/Checkbox';
 import './style.scss';
 
 /** CSS classes */
@@ -14,6 +15,7 @@ const TITLE_CLASS = 'tile__title';
 const SUBTITLE_CLASS = 'tile__subtitle';
 const ICON_CLASS = 'tile__icon';
 const ICON_CONTENT_CLASS = 'tile__icon-content';
+const CHECKBOX_CLASS = 'tile__checkbox';
 
 const SUBTITLE_LIMIT = 11;
 
@@ -25,28 +27,15 @@ const defaultProps = {
     subtitle: null,
     icon: null,
     selected: false,
+    selectMode: false,
 };
 
 /**
  * Tile component
  */
 export class Tile extends Component {
-    static create(props) {
-        const res = new Tile(props);
-        res.init();
-
-        return res;
-    }
-
-    static fromElement(props) {
-        const res = new Tile(props);
-        res.parse();
-
-        return res;
-    }
-
-    constructor(...args) {
-        super(...args);
+    constructor(props) {
+        super(props);
 
         this.props = {
             ...defaultProps,
@@ -56,6 +45,19 @@ export class Tile extends Component {
         this.state = {
             ...this.props,
         };
+
+        if (this.elem) {
+            this.parse();
+        } else {
+            this.init();
+        }
+
+        this.setClassNames();
+        this.render(this.state);
+    }
+
+    get id() {
+        return this.state.id;
     }
 
     init() {
@@ -73,9 +75,6 @@ export class Tile extends Component {
                 props: { className: TILE_CLASS, type: 'button' },
             });
         }
-
-        this.setClassNames();
-        this.render(this.state);
     }
 
     /**
@@ -107,54 +106,6 @@ export class Tile extends Component {
                 this.state.icon = this.icon.substr(1);
             }
         }
-
-        this.setClassNames();
-        this.render(this.state);
-    }
-
-    /**
-     * Set title of tile
-     * @param {string|null} title - title to set, if null is set then title removed
-     */
-    setTitle(title) {
-        if (title !== null && typeof title !== 'string') {
-            throw new Error('Invalid title specified');
-        }
-        if (this.state.title === title) {
-            return;
-        }
-
-        this.setState({ ...this.state, title });
-    }
-
-    /**
-     * Set subtitle of tile
-     * @param {string|null} subtitle - subtitle to set, if null is set then subtitle removed
-     */
-    setSubTitle(subtitle) {
-        if (subtitle !== null && typeof subtitle !== 'string') {
-            throw new Error('Invalid subtitle specified');
-        }
-        if (this.state.subtitle === subtitle) {
-            return;
-        }
-
-        this.setState({ ...this.state, subtitle });
-    }
-
-    /**
-     * Set icon of tile
-     * @param {string|null} icon - icon to set, if null is set then icon removed
-     */
-    setIcon(icon) {
-        if (icon !== null && typeof icon !== 'string') {
-            throw new Error('Invalid icon specified');
-        }
-        if (this.state.icon === icon) {
-            return;
-        }
-
-        this.setState({ ...this.state, icon });
     }
 
     renderAttributes(state, prevState) {
@@ -224,6 +175,29 @@ export class Tile extends Component {
         this.iconUseElem.href.baseVal = (state.icon) ? `#${state.icon}` : '';
     }
 
+    renderSelectControls(state, prevState) {
+        if (
+            state.selectMode === prevState.selectMode
+            && state.selected === prevState.selected
+        ) {
+            return;
+        }
+
+        if (state.selectMode && !this.checkbox) {
+            this.checkbox = Checkbox.create({
+                className: CHECKBOX_CLASS,
+            });
+            this.elem.append(this.checkbox.elem);
+        }
+
+        this.checkbox?.show(state.selectMode);
+
+        if (state.selectMode) {
+            this.elem.classList.toggle(SELECTED_CLASS, !!state.selected);
+            this.checkbox.check(!!state.selected);
+        }
+    }
+
     /**
      * Render specified state
      * @param {object} state - tile state object
@@ -237,11 +211,6 @@ export class Tile extends Component {
         this.renderTitle(state, prevState);
         this.renderSubTitle(state, prevState);
         this.renderIcon(state, prevState);
-
-        if (state.selected) {
-            this.elem.classList.add(SELECTED_CLASS);
-        } else {
-            this.elem.classList.remove(SELECTED_CLASS);
-        }
+        this.renderSelectControls(state, prevState);
     }
 }

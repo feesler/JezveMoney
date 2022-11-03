@@ -1,8 +1,11 @@
 /* Import rules dialog */
 .rules-popup {
+  background: none;
+
   .popup__wrapper {
     position: relative;
     align-items: flex-start;
+    background: var(--popup-dim-bg);
   }
 
   .popup__content-box {
@@ -69,8 +72,14 @@
 .rules-list {
   display: flex;
   flex-flow: column nowrap;
-  overflow-y: auto;
   row-gap: 4px;
+}
+
+.rules-list-container {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  overflow-y: auto;
 
   .paginator {
     margin-right: auto;

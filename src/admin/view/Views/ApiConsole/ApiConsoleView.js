@@ -769,6 +769,7 @@ class AdminApiConsoleView extends AdminView {
 
             reqContainer.addResult(res, resText, text);
         } catch (e) {
+            /* eslint-disable-next-line no-console */
             console.log(e.message);
             reqContainer.addResult(false, 'Fail to parse response from server', null);
         }

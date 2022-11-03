@@ -8,12 +8,12 @@ import {
 } from 'jezve-test';
 import { App } from '../Application.js';
 import { fixDate } from '../common.js';
-import { TransactionsView } from '../view/TransactionsView.js';
+import { TransactionListView } from '../view/TransactionListView.js';
 import { availTransTypes, Transaction } from '../model/Transaction.js';
 
 /** Navigate to transactions list page */
 const checkNavigation = async () => {
-    if (App.view instanceof TransactionsView) {
+    if (App.view instanceof TransactionListView) {
         return;
     }
 
@@ -85,6 +85,20 @@ export const toggleSelect = async (transactions) => {
         assert.deepMeet(items, expectedItems);
 
         return true;
+    });
+};
+
+export const selectAll = async () => {
+    await test('Select all transactions', async () => {
+        await checkNavigation();
+        return App.view.selectAll();
+    });
+};
+
+export const deselectAll = async () => {
+    await test('Deselect all transactions', async () => {
+        await checkNavigation();
+        return App.view.deselectAll();
     });
 };
 

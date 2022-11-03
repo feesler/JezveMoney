@@ -12,10 +12,6 @@ import './style.scss';
 const DIALOG_CLASS = 'profile-dialog';
 
 export class ProfileDialog extends Component {
-    static create(props) {
-        return new this(props);
-    }
-
     initDialog({ id, title, className }) {
         this.form = this.elem?.querySelector('form');
         if (!this.elem || !this.form) {

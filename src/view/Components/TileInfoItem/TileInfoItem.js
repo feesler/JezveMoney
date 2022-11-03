@@ -4,10 +4,10 @@ import { isFunction, enable, Component } from 'jezvejs';
  * TileInfoItem component
  */
 export class TileInfoItem extends Component {
-    static fromElement(props) {
-        const res = new TileInfoItem(props);
-        res.parse();
-        return res;
+    constructor(props) {
+        super(props);
+
+        this.parse();
     }
 
     /** Parse DOM to obtain child elements and build state of component */

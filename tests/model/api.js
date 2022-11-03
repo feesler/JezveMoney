@@ -7,6 +7,7 @@ import {
 import { urlJoin } from '../common.js';
 import { ApiRequestError } from '../error/ApiRequestError.js';
 
+/* eslint-disable no-console */
 async function apiRequest(method, url, data = null) {
     const reqUrl = `${baseUrl()}api/${url}`;
     const response = await httpReq(method, reqUrl, data);
@@ -22,6 +23,7 @@ async function apiRequest(method, url, data = null) {
         throw e;
     }
 }
+/* eslint-enable no-console */
 
 async function apiGet(method) {
     assert(method, 'Method not specified');

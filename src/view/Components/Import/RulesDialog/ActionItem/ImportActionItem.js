@@ -12,10 +12,6 @@ import './style.scss';
  * @param {Object} props
  */
 export class ImportActionItem extends Component {
-    static create(props) {
-        return new ImportActionItem(props);
-    }
-
     constructor(...args) {
         super(...args);
 

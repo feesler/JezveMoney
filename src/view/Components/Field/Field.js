@@ -15,10 +15,6 @@ const CONTENT_CLASS = 'field__content';
  * Field component
  */
 export class Field extends Component {
-    static create(props) {
-        return new Field(props);
-    }
-
     constructor(...args) {
         super(...args);
 

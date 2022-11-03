@@ -6,7 +6,7 @@ import {
     goTo,
     copyObject,
 } from 'jezve-test';
-import { TransactionsView } from '../../view/TransactionsView.js';
+import { TransactionListView } from '../../view/TransactionListView.js';
 import { TransactionView } from '../../view/TransactionView.js';
 import { MainView } from '../../view/MainView.js';
 import {
@@ -100,6 +100,10 @@ export const runAction = async ({ action, data }) => {
 
     if (action === 'inputExchRate') {
         testDescr = `Input exchange rate (${data})`;
+    }
+
+    if (action === 'toggleExchange') {
+        testDescr = 'Toggle exchange rate direction';
     }
 
     if (action === 'clickSrcAmount') {
@@ -304,7 +308,7 @@ export const delFromUpdate = async (type, pos) => {
     const ids = expectedState.transactions.filterByType(type).indexesToIds(ind);
     expectedState.deleteTransactions(ids);
 
-    if (!(App.view instanceof TransactionsView)) {
+    if (!(App.view instanceof TransactionListView)) {
         await App.view.navigateToTransactions();
     }
 

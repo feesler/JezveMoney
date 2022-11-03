@@ -1,4 +1,5 @@
 import 'jezvejs/style';
+import { ge } from 'jezvejs';
 import { Histogram } from 'jezvejs/Histogram';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
@@ -27,10 +28,12 @@ class MainView extends View {
      * View initialization
      */
     onStart() {
-        TransactionList.create({
-            elem: document.querySelector('.transactions-widget .trans-list'),
+        const transactionsWidget = ge('transactionsWidget');
+        this.latestList = TransactionList.create({
             items: this.props.transactions,
+            showControls: false,
         });
+        transactionsWidget.append(this.latestList.elem);
 
         Histogram.create({
             elem: 'chart',
