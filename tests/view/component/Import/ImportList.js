@@ -69,12 +69,17 @@ export class ImportList extends TestComponent {
             },
             invalidated: false,
             formIndex: -1,
+            contextMenuIndex: -1,
             isLoading: cont.loadingIndicator.visible,
         };
 
         cont.items.forEach((item, index) => {
             res.items.push(this.getItemData(item));
             res.invalidated = res.invalidated || item.model.invalidated;
+            if (item.model.isContextMenu) {
+                assert(res.contextMenuIndex === -1, 'Invalid state: two or more context menus');
+                res.contextMenuIndex = index;
+            }
 
             if (item.content.isForm) {
                 assert(res.formIndex === -1, 'Invalid state: two or more Import transaction forms');

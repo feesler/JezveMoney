@@ -18,12 +18,14 @@ const SELECTED_CLASS = 'import-item_selected';
 const SIMILAR_CLASS = 'similar';
 const SIMILAR_TITLE_CLASS = 'similar__title';
 const SIMILAR_LINK_CLASS = 'similar__link';
+/* Menu */
+const MENU_CLASS = 'actions-menu';
+const MENU_BUTTON_CLASS = 'btn icon-btn actions-menu-btn';
+const MENU_ICON_CLASS = 'icon actions-menu-btn__icon';
 
 /** Strings */
 const STR_SIMILAR_FOUND = 'Similar transaction found: ';
 const STR_SIMILAR_LINK = 'Edit';
-const STR_ENABLE_ITEM = 'Enable';
-const STR_DISABLE_ITEM = 'Disable';
 
 /** Base import transaction class */
 export class ImportTransactionBase extends Component {
@@ -64,6 +66,18 @@ export class ImportTransactionBase extends Component {
             content,
         });
         this.elem = this.collapse.elem;
+    }
+
+    createMenuButton() {
+        const { createContainer, createIcon } = window.app;
+
+        this.menuBtn = createElement('button', {
+            props: { className: MENU_BUTTON_CLASS, type: 'button' },
+            children: createIcon('ellipsis', MENU_ICON_CLASS),
+        });
+        this.menuContainer = createContainer(MENU_CLASS, [
+            this.menuBtn,
+        ]);
     }
 
     /** Returns toggle expand/collapse button */
@@ -136,42 +150,16 @@ export class ImportTransactionBase extends Component {
         }
     }
 
-    /** Remove item */
-    remove() {
-        if (isFunction(this.props.onRemove)) {
-            this.props.onRemove(this);
-        }
-    }
-
-    getEnableMenuItemTitle(state = this.state) {
-        const { enabled } = state.transaction;
-        return (enabled) ? STR_DISABLE_ITEM : STR_ENABLE_ITEM;
-    }
-
     /** Enable/disable component */
     enable(value = true) {
         this.state.transaction.enable(value);
         this.render();
-
-        if (isFunction(this.props.onEnable)) {
-            this.props.onEnable(this, value);
-        }
     }
 
     /** Toggle select/deselect component */
     toggleSelect() {
         this.state.transaction.toggleSelect();
         this.render();
-
-        if (isFunction(this.props.onSelect)) {
-            this.props.onSelect(this, this.state.transaction.selected);
-        }
-    }
-
-    /** Enable/disable menu item 'click' event handler */
-    onToggleEnable() {
-        const value = !this.enabled;
-        this.enable(value);
     }
 
     /** Toggle collapse/expand button 'click' event handler */

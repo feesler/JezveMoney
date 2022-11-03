@@ -31,6 +31,7 @@ import { PersonList } from '../../js/model/PersonList.js';
 import { ImportRuleList } from '../../js/model/ImportRuleList.js';
 import { ImportTemplateList } from '../../js/model/ImportTemplateList.js';
 import { IconButton } from '../../Components/IconButton/IconButton.js';
+import { PopupMenu } from '../../Components/PopupMenu/PopupMenu.js';
 import './style.scss';
 import { ImportUploadDialog } from '../../Components/Import/UploadDialog/Dialog/ImportUploadDialog.js';
 import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from '../../Components/Import/RulesDialog/Dialog/ImportRulesDialog.js';
@@ -39,14 +40,16 @@ import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndic
 import { API } from '../../js/api/index.js';
 import { ImportTransactionItem } from '../../Components/Import/TransactionItem/ImportTransactionItem.js';
 
-/** CSS classes */
+/* CSS classes */
 const SELECT_MODE_CLASS = 'import-list_select';
 
-/** Messages */
+/* Strings */
+const STR_ENABLE_ITEM = 'Enable';
+const STR_DISABLE_ITEM = 'Disable';
 const MSG_IMPORT_SUCCESS = 'All transactions have been successfully imported';
 const MSG_IMPORT_FAIL = 'Fail to import transactions';
 const MSG_NO_TRANSACTIONS = 'No transactions to import';
-/** Other */
+/* Other */
 const SUBMIT_LIMIT = 100;
 const SHOW_ON_PAGE = 20;
 
@@ -76,6 +79,7 @@ class ImportView extends View {
             mainAccount: null,
             rulesEnabled: true,
             checkSimilarEnabled: true,
+            contextItemIndex: -1,
             listMode: 'list',
         };
 
@@ -205,8 +209,47 @@ class ImportView extends View {
             throw new Error('Invalid selection data');
         }
 
+        this.createContextMenu();
+
         this.setMainAccount(selectedAccount.id);
         this.setRenderTime();
+    }
+
+    createContextMenu() {
+        this.contextMenu = PopupMenu.create({
+            id: 'contextMenu',
+            attached: true,
+        });
+
+        this.ctxEnableBtn = this.contextMenu.addIconItem({
+            id: 'ctxEnableBtn',
+            title: STR_DISABLE_ITEM,
+            onClick: () => this.onToggleEnableItem(),
+        });
+        this.ctxUpdateBtn = this.contextMenu.addIconItem({
+            id: 'ctxUpdateBtn',
+            icon: 'update',
+            title: 'Edit',
+            onClick: () => this.onUpdateItem(),
+        });
+        this.ctxDeleteBtn = this.contextMenu.addIconItem({
+            id: 'ctxDeleteBtn',
+            icon: 'del',
+            title: 'Delete',
+            onClick: () => this.onRemoveItem(),
+        });
+    }
+
+    showContextMenu(itemIndex) {
+        if (this.state.contextItemIndex === itemIndex) {
+            return;
+        }
+
+        this.setState({ ...this.state, contextItemIndex: itemIndex });
+    }
+
+    hideContextMenu() {
+        this.showContextMenu(-1);
     }
 
     /** Updates list state */
@@ -594,6 +637,7 @@ class ImportView extends View {
         this.setState({
             ...this.state,
             listMode: (selectMode) ? 'list' : 'select',
+            contextItemIndex: -1,
             items: this.state.items.map((item) => {
                 const newItem = new ImportTransaction(item);
                 newItem.state.selectMode = !selectMode;
@@ -663,59 +707,62 @@ class ImportView extends View {
     }
 
     /** Transaction item enable/disable event handler */
-    onEnableItem(i, value) {
-        const index = this.getItemIndex(i);
+    onToggleEnableItem() {
+        const index = this.state.contextItemIndex;
         if (index === -1) {
+            this.hideContextMenu();
             return;
         }
 
         this.setState({
             ...this.state,
+            contextItemIndex: -1,
             items: this.state.items.map((item, ind) => {
                 if (ind !== index) {
                     return item;
                 }
-                if (item.enabled === value) {
-                    return item;
-                }
 
                 const newItem = new ImportTransaction(item);
-                newItem.enable(value);
+                newItem.enable(!item.enabled);
                 return newItem;
             }),
         });
     }
 
     onItemClick(e) {
-        if (this.state.listMode !== 'select') {
-            return;
-        }
-        if (e?.target?.closest('.checkbox')) {
-            e.preventDefault();
-        }
-
-        const elem = e?.target?.closest('.import-item,.import-form');
-        const index = this.getItemIndexByElem(elem);
+        const index = this.getItemIndexByElem(e.target);
         if (index === -1) {
             return;
         }
 
-        this.toggleSelectItem(index);
+        const { listMode } = this.state;
+        if (listMode === 'list') {
+            if (!e.target.closest('.actions-menu-btn')) {
+                return;
+            }
+            this.showContextMenu(index);
+        } else if (listMode === 'select') {
+            if (e.target.closest('.checkbox')) {
+                e.preventDefault();
+            }
+
+            this.toggleSelectItem(index);
+        }
     }
 
-    /**
-     * Transaction item remove event handler
-     * Return boolean result confirming remove action
-     * @param {ImportTransactionBase} item - item to remove
-     */
-    onRemoveItem(item) {
-        const index = this.getItemIndex(item);
+    /** Transaction item remove event handler */
+    onRemoveItem() {
+        this.removeItem(this.state.contextItemIndex);
+    }
+
+    removeItem(index) {
         if (index === -1) {
             return;
         }
 
         const state = {
             ...this.state,
+            contextItemIndex: -1,
             items: this.state.items.filter((_, ind) => (ind !== index)),
         };
 
@@ -858,9 +905,8 @@ class ImportView extends View {
             throw new Error('Invalid page');
         }
 
-        const form = this.transactionRows[pageIndex.index];
         if (!originalItemData) {
-            this.onRemoveItem(form);
+            this.removeItem(activeItemIndex);
             return;
         }
 
@@ -926,24 +972,23 @@ class ImportView extends View {
         form.elem.scrollIntoView();
     }
 
-    onUpdateItem(transactionItem) {
+    onUpdateItem() {
         const { activeItemIndex } = this.state;
-        const index = this.getItemIndex(transactionItem);
-        if (index === -1 || index === activeItemIndex) {
+        const index = this.state.contextItemIndex;
+        if (
+            index === -1
+            || index === activeItemIndex
+            || !this.saveItem()
+        ) {
+            this.hideContextMenu();
             return;
-        }
-
-        if (activeItemIndex !== -1) {
-            const saveResult = this.saveItem();
-            if (!saveResult) {
-                return;
-            }
         }
 
         const itemToUpdate = this.state.items[index];
         const originalItemData = new ImportTransaction(itemToUpdate);
         const state = {
             ...this.state,
+            contextItemIndex: -1,
             items: this.state.items.map((item, ind) => {
                 const isForm = (ind === index);
                 if (item.isForm === isForm) {
@@ -1259,7 +1304,12 @@ class ImportView extends View {
      * @param {Element} elem - item root element
      */
     getItemIndexByElem(elem) {
-        const index = this.transactionRows.findIndex((item) => (elem === item.elem));
+        const itemElem = elem?.closest('.import-item,.import-form');
+        if (!itemElem) {
+            return -1;
+        }
+
+        const index = this.transactionRows.findIndex((item) => (itemElem === item.elem));
         return this.getAbsoluteIndex(index);
     }
 
@@ -1300,6 +1350,40 @@ class ImportView extends View {
         }
 
         this.setState(state);
+    }
+
+    renderContextMenu(state) {
+        if (state.listMode !== 'list') {
+            this.contextMenu.detach();
+            return;
+        }
+        const index = state.contextItemIndex;
+        if (index === -1) {
+            return;
+        }
+
+        const pageIndex = this.getPageIndex(index, state);
+        if (state.pagination.page !== pageIndex.page) {
+            return;
+        }
+
+        const listItem = this.transactionRows[pageIndex.index];
+        const menuContainer = listItem?.elem?.querySelector('.actions-menu');
+        if (!menuContainer) {
+            return;
+        }
+
+        const item = state.items[index];
+        const title = (item.enabled) ? STR_DISABLE_ITEM : STR_ENABLE_ITEM;
+        this.ctxEnableBtn.setTitle(title);
+
+        this.ctxUpdateBtn.show(!item.isForm);
+
+        if (this.contextMenu.menuList.parentNode !== menuContainer) {
+            PopupMenu.hideActive();
+            this.contextMenu.attachTo(menuContainer);
+            this.contextMenu.toggleMenu();
+        }
     }
 
     renderMenu(state) {
@@ -1362,8 +1446,6 @@ class ImportView extends View {
             const itemProps = {
                 data: item,
                 onCollapse: (i, val) => this.onCollapseItem(i, val),
-                onEnable: (i, val) => this.onEnableItem(i, val),
-                onRemove: (i) => this.onRemoveItem(i),
             };
 
             if (item.isForm) {
@@ -1377,7 +1459,6 @@ class ImportView extends View {
 
             return ImportTransactionItem.create({
                 ...itemProps,
-                onUpdate: (i) => this.onUpdateItem(i),
             });
         });
 
@@ -1429,6 +1510,7 @@ class ImportView extends View {
         this.enabledTransCountElem.textContent = enabledList.length;
         this.transCountElem.textContent = state.items.length;
 
+        this.renderContextMenu(state);
         this.renderMenu(state);
     }
 }

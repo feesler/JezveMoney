@@ -1,6 +1,7 @@
 import {
     assert,
     query,
+    closest,
     prop,
     hasAttr,
     click,
@@ -8,6 +9,7 @@ import {
     waitForFunction,
     copyObject,
     asArray,
+    asyncMap,
 } from 'jezve-test';
 import { DropDown, Checkbox } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -24,6 +26,10 @@ const defaultPagination = {
     page: 1,
     pages: 1,
 };
+
+const contextMenuItems = [
+    'ctxEnableBtn', 'ctxUpdateBtn', 'ctxDeleteBtn',
+];
 
 /** Import view class */
 export class ImportView extends AppView {
@@ -59,6 +65,7 @@ export class ImportView extends AppView {
             rulesBtn: { elem: await query('#rulesBtn') },
             similarCheck: await Checkbox.create(this, await query('#similarCheck')),
             submitBtn: { elem: await query('#submitbtn') },
+
         };
 
         Object.keys(res).forEach((child) => (
@@ -91,6 +98,15 @@ export class ImportView extends AppView {
             assert(res.itemsList, 'Invalid structure of import view');
         }
 
+        res.contextMenu = { elem: await query('#contextMenu') };
+        const contextParent = await closest(res.contextMenu.elem, '.import-item,.import-form');
+        if (contextParent) {
+            res.contextMenu.itemIndex = res.itemsList.model.contextMenuIndex;
+            assert(res.contextMenu.itemIndex !== -1, 'Invalid context menu');
+
+            await this.parseMenuItems(res, contextMenuItems);
+        }
+
         const uploadDialogPopup = await query(this.uploadPopupId);
         res.uploadDialog = await ImportUploadDialog.create(this, uploadDialogPopup);
 
@@ -100,10 +116,28 @@ export class ImportView extends AppView {
         return res;
     }
 
+    async parseMenuItems(cont, ids) {
+        const itemIds = asArray(ids);
+        if (!itemIds.length) {
+            return cont;
+        }
+
+        const res = cont;
+        await asyncMap(itemIds, async (id) => {
+            res[id] = await IconButton.create(this, await query(`#${id}`));
+            assert(res[id], `Menu item '${id}' not found`);
+            return res[id];
+        });
+
+        return res;
+    }
+
     async buildModel(cont) {
         const res = {
             enabled: !cont.notAvailMsg.visible,
             menuOpen: cont.actionsList.visible,
+            contextItemIndex: cont.contextMenu.itemIndex,
+            contextMenuVisible: cont.contextMenu.visible,
         };
 
         const uploadVisible = !!cont.uploadDialog?.content?.visible;
@@ -180,6 +214,22 @@ export class ImportView extends AppView {
         res.mainAccountSelect = { value: model.mainAccount.toString(), visible: true };
         res.itemsList = { visible: true };
         res.submitBtn.disabled = !hasItems || !this.items.some((item) => item.enabled);
+
+        if (model.contextMenuVisible) {
+            const firstItem = ITEMS_ON_PAGE * (model.pagination.page - 1);
+            const absIndex = firstItem + model.contextItemIndex;
+            assert.arrayIndex(this.items, absIndex, 'Invalid state');
+
+            const item = this.items[absIndex];
+            res.contextMenu = {
+                visible: true,
+                itemIndex: model.contextItemIndex,
+            };
+
+            res.ctxEnableBtn = { visible: true };
+            res.ctxUpdateBtn = { visible: !item.isForm };
+            res.ctxDeleteBtn = { visible: true };
+        }
 
         return res;
     }
@@ -263,6 +313,22 @@ export class ImportView extends AppView {
             pos.page === this.model.pagination.page,
             `Invalid page ${this.model.pagination.page}, expected: ${pos.page}`,
         );
+    }
+
+    async openContextMenu(index) {
+        await this.cancelSelectMode();
+
+        const pos = this.getPositionByIndex(index);
+
+        this.model.contextMenuVisible = true;
+        this.model.contextItemIndex = pos.index;
+        const expected = this.getExpectedState();
+
+        const item = this.itemsList.getItem(pos.index);
+        await this.performAction(() => item.clickMenu());
+        assert(this.content.contextMenu.visible, 'Context menu not visible');
+
+        return this.checkState(expected);
     }
 
     async openActionsMenu() {
@@ -837,8 +903,9 @@ export class ImportView extends AppView {
             return true;
         }
 
-        const updateAction = () => this.runItemAction(pos, { action: 'clickUpdate' });
+        const updateAction = () => this.performAction(() => this.content.ctxUpdateBtn.click());
 
+        await this.openContextMenu(pos);
         const isValid = await this.validateSaveForm(updateAction);
         if (!isValid) {
             return true;
@@ -854,13 +921,14 @@ export class ImportView extends AppView {
 
         newForm.isForm = true;
         this.formIndex = pos;
-        this.expectedState = this.getExpectedState();
+        this.model.contextMenuVisible = false;
+        const expected = this.getExpectedState();
         const expectedList = this.getExpectedList();
-        this.expectedState.itemsList.items = expectedList.items;
+        expected.itemsList.items = expectedList.items;
 
         await updateAction();
 
-        return this.checkState();
+        return this.checkState(expected);
     }
 
     async saveItem() {
@@ -1064,18 +1132,16 @@ export class ImportView extends AppView {
         });
 
         this.updateItemsCount();
-        this.expectedState = this.getExpectedState();
+        const expected = this.getExpectedState();
         const expectedList = this.getExpectedList();
-        this.expectedState.itemsList.items = expectedList.items;
+        expected.itemsList.items = expectedList.items;
 
         for (const ind of indexes) {
-            await this.performAction(async () => {
-                const item = this.itemsList.getItem(ind);
-                await item.toggleEnable();
-            });
+            await this.openContextMenu(ind);
+            await this.performAction(() => this.content.ctxEnableBtn.click());
         }
 
-        return this.checkState();
+        return this.checkState(expected);
     }
 
     async runItemAction(index, { action, data }) {
@@ -1120,7 +1186,9 @@ export class ImportView extends AppView {
 
         let removed = 0;
         for (const ind of items) {
-            await this.runItemAction(ind - removed, { action: 'clickDelete' });
+            await this.openContextMenu(ind - removed);
+            await this.performAction(() => this.content.ctxDeleteBtn.click());
+
             this.items.splice(ind - removed, 1);
 
             removed += 1;
