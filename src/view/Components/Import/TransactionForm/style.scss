@@ -5,12 +5,18 @@
   align-items: stretch;
   margin: 2px 0;
 
+  .main-content {
+    display: flex;
+    flex-flow: row nowrap;
+  }
+
   .form-container {
     display: flex;
     flex-flow: column nowrap;
     flex-grow: 1;
     align-items: normal;
     gap: 8px;
+    padding: 4px 0 4px 8px;
   }
 
   .form-rows {
@@ -165,13 +171,6 @@
     margin: 0 4px;
   }
 
-  /* Container for transaction form */
-  .main-content {
-    padding: 4px 0 4px 8px;
-    display: flex;
-    flex-flow: row nowrap;
-  }
-
   .collapsible-content {
     flex-flow: column nowrap;
     row-gap: 1rem;
@@ -245,10 +244,6 @@
 
     .form-row {
       flex-flow: row nowrap;
-    }
-
-    .main-content {
-      padding: 0;
     }
 
     .controls {
