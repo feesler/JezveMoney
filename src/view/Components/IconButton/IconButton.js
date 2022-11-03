@@ -1,7 +1,6 @@
 import {
     isFunction,
     createElement,
-    addChilds,
     removeChilds,
     enable,
     Component,
@@ -215,17 +214,19 @@ export class IconButton extends Component {
             this.elem.href = state.url;
         }
 
+        this.titleElem = createElement('span', {
+            props: {
+                className: (state.subtitle) ? TITLE_CLASS : '',
+                textContent: state.title,
+            },
+        });
+        this.contentElem.append(this.titleElem);
+
         if (state.subtitle) {
-            this.titleElem = createElement('span', {
-                props: { className: SUBTITLE_CLASS, textContent: state.title },
-            });
             this.subtitleElem = createElement('span', {
                 props: { className: SUBTITLE_CLASS, textContent: state.subtitle },
             });
-        } else {
-            this.titleElem = createElement('span', { props: { textContent: state.title } });
-            this.subtitleElem = null;
+            this.contentElem.append(this.subtitleElem);
         }
-        addChilds(this.contentElem, [this.titleElem, this.subtitleElem]);
     }
 }
