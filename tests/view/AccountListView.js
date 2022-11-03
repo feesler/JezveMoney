@@ -96,7 +96,7 @@ export class AccountListView extends AppView {
             return 'nodata';
         }
 
-        if (cont.selectModeBtn.title === 'Cancel') {
+        if (cont.selectModeBtn.title === 'Done') {
             return 'select';
         }
 
@@ -123,7 +123,6 @@ export class AccountListView extends AppView {
         const visibleSelected = this.getSelectedItems(model);
         const hiddenSelected = this.getHiddenSelectedItems(model);
         const totalSelected = visibleSelected.length + hiddenSelected.length;
-
         const showSelectItems = model.listMenuVisible && model.mode === 'select';
 
         const res = {

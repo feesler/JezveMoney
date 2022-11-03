@@ -329,6 +329,24 @@ const pagination = async () => {
     await ImportTests.deleteAllItems();
 };
 
+const select = async () => {
+    setBlock('Select items', 2);
+
+    const { cardFile } = App.scenario;
+    await ImportTests.uploadFile(cardFile);
+    await ImportTests.submitUploaded(cardFile);
+    await ImportTests.toggleSelectItems([0, 1]);
+    await ImportTests.toggleSelectItems([0, 1]);
+    await ImportTests.selectAllItems();
+    await ImportTests.deselectAllItems();
+    await ImportTests.toggleSelectItems([0, 1, 2]);
+    await ImportTests.enableSelectedItems(false);
+    await ImportTests.enableSelectedItems(true);
+    await ImportTests.deleteSelectedItems();
+
+    await ImportTests.deleteAllItems();
+};
+
 const checkSimilar = async () => {
     setBlock('Enable/disable check similar transactions', 1);
 
@@ -375,6 +393,7 @@ export const importItemsTests = {
         await uploadAccount();
         await convert();
         await pagination();
+        await select();
         await checkSimilar();
         await enableDisableRules();
         await del();

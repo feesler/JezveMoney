@@ -2,6 +2,7 @@ import {
     TestComponent,
     query,
     queryAll,
+    hasClass,
     hasAttr,
     prop,
     click,
@@ -35,6 +36,10 @@ export class ImportTransactionItem extends TestComponent {
         const res = {
             isForm: false,
         };
+
+        const selectedControls = await query(this.elem, '.select-controls');
+        res.selectMode = await isVisible(selectedControls);
+        res.selected = await hasClass(this.elem, 'import-item_selected');
 
         const disabled = await hasAttr(this.elem, 'disabled');
         res.enabled = !disabled;
@@ -109,6 +114,8 @@ export class ImportTransactionItem extends TestComponent {
 
         this.data = this.getExpectedTransaction();
         if (this.data) {
+            this.data.selectMode = this.model.selectMode;
+            this.data.selected = this.model.selected;
             this.data.enabled = this.model.enabled;
             this.data.mainAccount = this.model.mainAccount;
             this.data.importType = this.model.type;
@@ -126,6 +133,8 @@ export class ImportTransactionItem extends TestComponent {
         res.mainAccount = App.state.accounts.getItem(this.mainAccount);
         assert(res.mainAccount, 'Main account not found');
 
+        res.selectMode = cont.selectMode;
+        res.selected = cont.selected;
         res.enabled = cont.enabled;
 
         const transactionType = ImportTransaction.findTypeByName(cont.typeField.value);
@@ -199,6 +208,8 @@ export class ImportTransactionItem extends TestComponent {
 
         const res = {
             isForm: false,
+            selectMode: model.selectMode,
+            selected: model.selected,
             enabled: model.enabled,
             typeField: {
                 visible: true,
@@ -453,6 +464,11 @@ export class ImportTransactionItem extends TestComponent {
     async clickDelete() {
         await this.openMenu();
         await click(this.content.deleteBtn);
+    }
+
+    async toggleSelect() {
+        assert(this.model.selectMode, 'Invalid state: item not in select mode');
+        await click(this.elem);
     }
 
     /**

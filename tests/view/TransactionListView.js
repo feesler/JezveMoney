@@ -137,7 +137,7 @@ export class TransactionListView extends AppView {
             return 'nodata';
         }
 
-        if (cont.selectModeBtn.title === 'Cancel') {
+        if (cont.selectModeBtn.title === 'Done') {
             return 'select';
         }
 

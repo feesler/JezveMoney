@@ -444,7 +444,7 @@ class AccountListView extends View {
 
         this.menu.show(itemsCount > 0);
 
-        const selectModeTitle = (isSelectMode) ? 'Cancel' : 'Select';
+        const selectModeTitle = (isSelectMode) ? 'Done' : 'Select';
         this.selectModeBtn.setTitle(selectModeTitle);
         this.selectModeBtn.setIcon((isSelectMode) ? null : 'select');
         show(this.separator1, isSelectMode);

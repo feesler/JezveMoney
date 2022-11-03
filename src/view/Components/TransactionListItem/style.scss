@@ -70,7 +70,7 @@
 }
 
 .trans-item_selected::after {
-  border: 3px solid var(--trans-item-selected-color);
+  border: 2px solid var(--trans-item-selected-color);
   bottom: 0;
   content: "";
   cursor: pointer;

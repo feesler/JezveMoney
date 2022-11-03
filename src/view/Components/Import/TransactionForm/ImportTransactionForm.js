@@ -71,6 +71,7 @@ const SAVE_BTN_TITLE = 'Save';
 const CANCEL_BTN_TITLE = 'Cancel';
 
 const defaultProps = {
+    onSelect: null,
     onCollapse: null,
     onEnable: null,
     onUpdate: null,
@@ -644,6 +645,9 @@ export class ImportTransactionForm extends ImportTransactionBase {
         const isDebt = ['debtfrom', 'debtto'].includes(transaction.type);
 
         enable(this.elem, transaction.enabled);
+
+        // Select controls
+        this.renderSelectControls(state);
 
         // Type field
         this.typeDropDown.enable(transaction.enabled);

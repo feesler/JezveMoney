@@ -284,7 +284,12 @@
 
   /* Import form */
   .import-form {
-    background-color: var(--alt-bg-color);
+    .form-container,
+    .controls,
+    .invalid-feedback,
+    .form-controls {
+      background-color: var(--alt-bg-color);
+    }
 
     &.import-form__placeholder {
       border-color: #888888;
@@ -313,10 +318,6 @@
 
   /* Disabled Import form */
   .import-form[disabled] {
-    background-color: #292929;
-    color: #707070;
-    border-color: #707070;
-
     input[type="text"],
     input[disabled] {
       color: var(--input-disabled-text-color);
@@ -338,12 +339,18 @@
 
   /* Import item */
   .import-item {
-    background-color: var(--alt-bg-color);
+    .item-container,
+    .controls {
+      background-color: var(--alt-bg-color);
+    }
 
     &[disabled] {
-      background-color: #292929;
-      color: #707070;
-      border-color: #707070;
+      .item-container,
+      .controls {
+        background-color: #292929;
+        color: #707070;
+        border-color: #707070;
+      }
     }
 
     &.import-item__placeholder {
@@ -362,6 +369,16 @@
     .icon {
       fill: var(--list-item-icon-fill);
     }
+  }
+
+  /* Disabled Import form */
+  .import-form[disabled] .form-container,
+  .import-form[disabled] .controls,
+  .import-form[disabled] .invalid-feedback,
+  .import-form[disabled] .form-controls {
+    background-color: #292929;
+    color: #707070;
+    border-color: #707070;
   }
 
   .import-controls {

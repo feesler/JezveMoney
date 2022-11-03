@@ -53,6 +53,7 @@ const typeStrings = {
 };
 
 const defaultProps = {
+    onSelect: null,
     onCollapse: null,
     onUpdate: null,
     onEnable: null,
@@ -213,6 +214,9 @@ export class ImportTransactionItem extends ImportTransactionBase {
 
         enable(this.elem, transaction.enabled);
 
+        // Select controls
+        this.renderSelectControls(state);
+
         // Types field
         if (!(transaction.type in typeStrings)) {
             throw new Error('Invalid transaction type');
@@ -264,6 +268,8 @@ export class ImportTransactionItem extends ImportTransactionBase {
 
         // Comment field
         this.commentTitle.textContent = transaction.comment;
+
+        this.menu.show(!transaction.selectMode);
 
         // Enable/disable menu item
         this.enableMenuItem.setTitle(this.getEnableMenuItemTitle(state));

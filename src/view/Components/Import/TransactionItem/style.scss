@@ -50,6 +50,26 @@
     overflow: hidden;
   }
 
+  /* Select controls */
+  .select-controls {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    width: 32px;
+
+    .checkbox {
+      --checkbox-size: 24px;
+
+      margin: 0;
+    }
+
+    .checkbox__check {
+      margin: 0;
+      border-radius: 50%;
+    }
+  }
+
   /* Controls */
   .controls {
     display: flex;
@@ -159,10 +179,11 @@
     .item-container {
       flex-flow: row nowrap;
       gap: 16px;
+      padding: 4px 0 6px 8px;
     }
 
     .main-content {
-      padding: 4px 0 6px 8px;
+      padding: 0;
     }
 
     .item-row {

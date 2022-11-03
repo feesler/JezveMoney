@@ -283,7 +283,12 @@
 
   /* Import form */
   .import-form {
-    background-color: #dddddd;
+    .form-container,
+    .controls,
+    .invalid-feedback,
+    .form-controls {
+      background-color: #dddddd;
+    }
 
     &.import-form__placeholder {
       border-color: #888888;
@@ -312,10 +317,6 @@
 
   /* Disabled Import form */
   .import-form[disabled] {
-    background-color: #e8e8e8;
-    color: #808080;
-    border-color: #e8e8e8;
-
     input[type="text"],
     input[disabled] {
       color: var(--input-disabled-text-color);
@@ -337,12 +338,18 @@
 
   /* Import item */
   .import-item {
-    background-color: #dddddd;
+    .item-container,
+    .controls {
+      background-color: #dddddd;
+    }
 
     &[disabled] {
-      background-color: #e8e8e8;
-      color: #808080;
-      border-color: #e8e8e8;
+      .item-container,
+      .controls {
+        background-color: #e8e8e8;
+        color: #808080;
+        border-color: #e8e8e8;
+      }
     }
 
     &.import-item__placeholder {
@@ -361,6 +368,16 @@
     .icon {
       fill: var(--list-item-icon-fill);
     }
+  }
+
+  /* Disabled Import form */
+  .import-form[disabled] .form-container,
+  .import-form[disabled] .controls,
+  .import-form[disabled] .invalid-feedback,
+  .import-form[disabled] .form-controls {
+    background-color: #e8e8e8;
+    color: #808080;
+    border-color: #e8e8e8;
   }
 
   .import-controls {

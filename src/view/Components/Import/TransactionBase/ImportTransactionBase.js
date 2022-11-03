@@ -1,14 +1,19 @@
 import {
     createElement,
     isFunction,
+    show,
     Component,
 } from 'jezvejs';
+import { Checkbox } from 'jezvejs/Checkbox';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 
 /** CSS classes */
 const TOGGLE_BUTTON_CLASS = 'btn icon-btn toggle-btn';
 const TOGGLE_ICON_CLASS = 'icon toggle-icon';
+/* Select controls */
+const SELECT_CONTROLS_CLASS = 'select-controls';
+const SELECTED_CLASS = 'import-item_selected';
 /* Similar transaction */
 const SIMILAR_CLASS = 'similar';
 const SIMILAR_TITLE_CLASS = 'similar__title';
@@ -32,32 +37,33 @@ export class ImportTransactionBase extends Component {
 
     initContainer(className, children) {
         const { originalData } = this.props.data.props;
-        if (originalData) {
-            const origDataContainer = OriginalImportData.create({
-                ...originalData,
-            });
-
-            const content = [origDataContainer.elem];
-
-            const { similarTransaction } = this.props.data.state;
-            if (similarTransaction) {
-                const infoElem = this.createSimilarTransactionInfo(similarTransaction);
-                content.push(infoElem);
-            }
-
-            this.toggleExtBtn = this.createToggleButton();
-            this.controls.append(this.toggleExtBtn);
-
-            this.collapse = Collapsible.create({
-                toggleOnClick: false,
-                className,
-                header: children,
-                content,
-            });
-            this.elem = this.collapse.elem;
-        } else {
+        if (!originalData) {
             this.elem = window.app.createContainer(className, children);
+            return;
         }
+
+        const origDataContainer = OriginalImportData.create({
+            ...originalData,
+        });
+
+        const content = [origDataContainer.elem];
+
+        const { similarTransaction } = this.props.data.state;
+        if (similarTransaction) {
+            const infoElem = this.createSimilarTransactionInfo(similarTransaction);
+            content.push(infoElem);
+        }
+
+        this.toggleExtBtn = this.createToggleButton();
+        this.controls.append(this.toggleExtBtn);
+
+        this.collapse = Collapsible.create({
+            toggleOnClick: false,
+            className,
+            header: children,
+            content,
+        });
+        this.elem = this.collapse.elem;
     }
 
     /** Returns toggle expand/collapse button */
@@ -97,6 +103,39 @@ export class ImportTransactionBase extends Component {
         });
     }
 
+    createSelectControls() {
+        const { createContainer } = window.app;
+
+        if (this.selectControls) {
+            return;
+        }
+
+        this.checkbox = Checkbox.create();
+        this.selectControls = createContainer(SELECT_CONTROLS_CLASS, [
+            this.checkbox.elem,
+        ]);
+
+        this.mainContainer.prepend(this.selectControls);
+    }
+
+    renderSelectControls(state, prevState = {}) {
+        if (state.transaction.state.selectMode === prevState?.transaction?.state?.selectMode) {
+            return;
+        }
+
+        const { selectMode, selected } = state.transaction.state;
+        if (selectMode) {
+            this.createSelectControls();
+        }
+
+        show(this.selectControls, selectMode);
+
+        if (selectMode) {
+            this.elem.classList.toggle(SELECTED_CLASS, !!selected);
+            this.checkbox.check(!!selected);
+        }
+    }
+
     /** Remove item */
     remove() {
         if (isFunction(this.props.onRemove)) {
@@ -116,6 +155,16 @@ export class ImportTransactionBase extends Component {
 
         if (isFunction(this.props.onEnable)) {
             this.props.onEnable(this, value);
+        }
+    }
+
+    /** Toggle select/deselect component */
+    toggleSelect() {
+        this.state.transaction.toggleSelect();
+        this.render();
+
+        if (isFunction(this.props.onSelect)) {
+            this.props.onSelect(this, this.state.transaction.selected);
         }
     }
 

@@ -21,6 +21,7 @@ export class ImportList extends TestComponent {
 
     async parseContent() {
         const res = {
+            selectMode: await hasClass(this.elem, 'import-list_select'),
             items: [],
         };
 
@@ -45,6 +46,10 @@ export class ImportList extends TestComponent {
         res.loadingIndicator = { elem: await query(this.elem, '.loading-indicator') };
 
         return res;
+    }
+
+    get selectMode() {
+        return this.content.selectMode;
     }
 
     get items() {
@@ -113,6 +118,7 @@ export class ImportList extends TestComponent {
     getExpectedState() {
         const res = {
             items: this.content.items.map((item) => {
+                // TODO : don't use copyObject
                 const listItem = (item.model.isForm)
                     ? ImportTransactionForm.getExpectedState(item.model)
                     : ImportTransactionItem.getExpectedState(item.model);
