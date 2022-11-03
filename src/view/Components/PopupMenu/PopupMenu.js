@@ -207,6 +207,9 @@ export class PopupMenu extends Component {
             className: [CHECKBOX_CLASS, ...asArray(className)],
             ...rest,
         });
+        if (item.id) {
+            button.elem.id = item.id;
+        }
         this.menuList.append(button.elem);
 
         return button;

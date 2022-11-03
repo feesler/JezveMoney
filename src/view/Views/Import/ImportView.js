@@ -7,10 +7,8 @@ import {
     removeChilds,
     setEvents,
     enable,
-    setEmptyClick,
-    removeEmptyClick,
+    insertAfter,
 } from 'jezvejs';
-import { Checkbox } from 'jezvejs/Checkbox';
 import { DropDown } from 'jezvejs/DropDown';
 import { Paginator } from 'jezvejs/Paginator';
 import { Sortable } from 'jezvejs/Sortable';
@@ -83,8 +81,6 @@ class ImportView extends View {
             listMode: 'list',
         };
 
-        this.menuEmptyClickHandler = () => this.hideActionsMenu();
-
         window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
         window.app.loadModel(PersonList, 'persons', window.app.props.persons);
@@ -100,78 +96,35 @@ class ImportView extends View {
             return;
         }
 
-        this.uploadBtn = IconButton.fromElement('uploadBtn', {
-            onClick: () => this.showUploadDialog(),
-        });
+        this.submitBtn = ge('submitbtn');
+        this.transCountElem = ge('trcount');
+        this.enabledTransCountElem = ge('entrcount');
+        this.rowsContainer = ge('rowsContainer');
+        if (
+            !this.submitBtn
+            || !this.transCountElem
+            || !this.enabledTransCountElem
+            || !this.rowsContainer
+        ) {
+            throw new Error('Failed to initialize Import view');
+        }
 
-        this.actionsMenuBtn = ge('toggleActionsMenuBtn');
-        setEvents(this.actionsMenuBtn, { click: () => this.toggleActionsMenu() });
-        this.actionsList = ge('actionsList');
-
-        this.newItemBtn = IconButton.fromElement('newItemBtn', {
-            onClick: () => this.createItem(),
-        });
-        this.deleteAllBtn = IconButton.fromElement('deleteAllBtn', {
-            onClick: () => this.removeAllItems(),
-        });
-        this.selectModeBtn = IconButton.fromElement('selectModeBtn', {
-            onClick: () => this.toggleSelectMode(),
-        });
-        this.separator2 = ge('separator2');
-
-        this.selectAllBtn = IconButton.fromElement('selectAllBtn', {
-            onClick: () => this.selectAll(),
-        });
-        this.deselectAllBtn = IconButton.fromElement('deselectAllBtn', {
-            onClick: () => this.deselectAll(),
-        });
-        this.disableSelectedBtn = IconButton.fromElement('disableSelectedBtn', {
-            onClick: () => this.enableSelected(false),
-        });
-        this.enableSelectedBtn = IconButton.fromElement('enableSelectedBtn', {
-            onClick: () => this.enableSelected(true),
-        });
-        this.deleteSelectedBtn = IconButton.fromElement('deleteSelectedBtn', {
-            onClick: () => this.deleteSelected(),
-        });
-        this.separator3 = ge('separator3');
+        setEvents(this.rowsContainer, { click: (e) => this.onItemClick(e) });
+        setEvents(this.submitBtn, { click: () => this.onSubmitClick() });
 
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
             onchange: () => this.onMainAccChange(),
             className: 'dd__main-account',
         });
-        this.rulesCheck = Checkbox.fromElement(ge('rulesCheck'), {
-            onChange: () => this.onToggleEnableRules(),
-        });
-        this.similarCheck = Checkbox.fromElement(ge('similarCheck'), {
-            onChange: () => this.onToggleCheckSimilar(),
-        });
-
-        this.submitBtn = ge('submitbtn');
-        this.transCountElem = ge('trcount');
-        this.enabledTransCountElem = ge('entrcount');
-        this.rulesBtn = ge('rulesBtn');
-        this.rowsContainer = ge('rowsContainer');
-        if (
-            !this.newItemBtn
-            || !this.uploadBtn
-            || !this.submitBtn
-            || !this.transCountElem
-            || !this.enabledTransCountElem
-            || !this.accountDropDown
-            || !this.rulesCheck
-            || !this.rulesBtn
-            || !this.rowsContainer
-        ) {
-            throw new Error('Failed to initialize Import view');
-        }
-
         window.app.initAccountsList(this.accountDropDown);
 
-        setEvents(this.rowsContainer, { click: (e) => this.onItemClick(e) });
-        setEvents(this.submitBtn, { click: () => this.onSubmitClick() });
-        setEvents(this.rulesBtn, { click: () => this.onRulesClick() });
+        this.uploadBtn = IconButton.fromElement('uploadBtn', {
+            onClick: () => this.showUploadDialog(),
+        });
+
+        this.createMenu();
+        insertAfter(this.menu.elem, this.uploadBtn.elem);
 
         // Submit progress indicator
         this.submitProgress = LoadingIndicator.create({ title: 'Saving items...' });
@@ -213,6 +166,78 @@ class ImportView extends View {
 
         this.setMainAccount(selectedAccount.id);
         this.setRenderTime();
+    }
+
+    createMenu() {
+        this.menu = PopupMenu.create({ id: 'listMenu' });
+
+        this.createItemBtn = this.menu.addIconItem({
+            id: 'createItemBtn',
+            icon: 'plus',
+            title: 'Add item',
+            onClick: () => this.createItem(),
+        });
+        this.menu.addSeparator();
+        this.selectModeBtn = this.menu.addIconItem({
+            id: 'selectModeBtn',
+            icon: 'select',
+            title: 'Select',
+            onClick: () => this.toggleSelectMode(),
+        });
+        this.separator2 = this.menu.addSeparator();
+
+        this.selectAllBtn = this.menu.addIconItem({
+            id: 'selectAllBtn',
+            title: 'Select all',
+            onClick: () => this.selectAll(),
+        });
+        this.deselectAllBtn = this.menu.addIconItem({
+            id: 'deselectAllBtn',
+            title: 'Clear selection',
+            onClick: () => this.deselectAll(),
+        });
+        this.enableSelectedBtn = this.menu.addIconItem({
+            id: 'enableSelectedBtn',
+            title: 'Enable selected',
+            onClick: () => this.enableSelected(true),
+        });
+        this.disableSelectedBtn = this.menu.addIconItem({
+            id: 'disableSelectedBtn',
+            title: 'Enable selected',
+            onClick: () => this.enableSelected(false),
+        });
+        this.deleteSelectedBtn = this.menu.addIconItem({
+            id: 'deleteSelectedBtn',
+            icon: 'del',
+            title: 'Delete selected',
+            onClick: () => this.deleteSelected(),
+        });
+        this.deleteAllBtn = this.menu.addIconItem({
+            id: 'deleteAllBtn',
+            icon: 'del',
+            title: 'Delete all',
+            onClick: () => this.removeAllItems(),
+        });
+        this.separator3 = this.menu.addSeparator();
+        this.rulesCheck = this.menu.addCheckboxItem({
+            id: 'rulesCheck',
+            label: 'Enable rules',
+            checked: true,
+            onChange: () => this.onToggleEnableRules(),
+        });
+        this.rulesBtn = this.menu.addIconItem({
+            id: 'rulesBtn',
+            icon: 'update',
+            title: 'Edit rules',
+            onClick: () => this.onRulesClick(),
+        });
+        this.menu.addSeparator();
+        this.similarCheck = this.menu.addCheckboxItem({
+            id: 'similarCheck',
+            label: 'Check similar transactions',
+            checked: true,
+            onChange: () => this.onToggleCheckSimilar(),
+        });
     }
 
     createContextMenu() {
@@ -266,20 +291,6 @@ class ImportView extends View {
         res.page = (pagesCount > 0) ? Math.min(pagesCount, res.page) : 1;
 
         return res;
-    }
-
-    hideActionsMenu() {
-        show(this.actionsList, false);
-        removeEmptyClick(this.menuEmptyClickHandler);
-    }
-
-    toggleActionsMenu() {
-        if (this.actionsList.hasAttribute('hidden')) {
-            show(this.actionsList, true);
-            setEmptyClick(this.menuEmptyClickHandler);
-        } else {
-            this.hideActionsMenu();
-        }
     }
 
     /** Update render time data attribute of list container */
@@ -580,17 +591,14 @@ class ImportView extends View {
     }
 
     selectAll() {
-        this.hideActionsMenu();
         this.setState(this.reduceSelectAll());
     }
 
     deselectAll() {
-        this.hideActionsMenu();
         this.setState(this.reduceDeselectAll());
     }
 
     enableSelected(value) {
-        this.hideActionsMenu();
         if (this.state.listMode !== 'select') {
             return;
         }
@@ -610,7 +618,6 @@ class ImportView extends View {
     }
 
     deleteSelected() {
-        this.hideActionsMenu();
         if (this.state.listMode !== 'select') {
             return;
         }
@@ -628,7 +635,6 @@ class ImportView extends View {
     }
 
     toggleSelectMode() {
-        this.hideActionsMenu();
         if (!this.saveItem()) {
             return;
         }
@@ -668,8 +674,6 @@ class ImportView extends View {
 
     /** Remove all transaction rows */
     removeAllItems() {
-        this.hideActionsMenu();
-
         const state = {
             ...this.state,
             items: [],
@@ -923,8 +927,6 @@ class ImportView extends View {
 
     /** Add new transaction row and insert it into list */
     createItem() {
-        this.hideActionsMenu();
-
         if (this.state.listMode !== 'list') {
             return;
         }
@@ -1199,8 +1201,6 @@ class ImportView extends View {
 
     /** Rules checkbox 'change' event handler */
     onToggleEnableRules() {
-        this.hideActionsMenu();
-
         const state = {
             ...this.state,
             rulesEnabled: !!this.rulesCheck.checked,
@@ -1226,8 +1226,6 @@ class ImportView extends View {
 
     /** Check similar transactions checkbox 'change' event handler */
     onToggleCheckSimilar() {
-        this.hideActionsMenu();
-
         const checkSimilarEnabled = !!this.similarCheck.checked;
         this.setState({
             ...this.state,
@@ -1243,8 +1241,6 @@ class ImportView extends View {
 
     /** Rules button 'click' event handler */
     onRulesClick() {
-        this.hideActionsMenu();
-
         if (!this.state.rulesEnabled) {
             return;
         }
@@ -1393,7 +1389,7 @@ class ImportView extends View {
         const hasEnabled = selectedItems.some((item) => item.enabled);
         const hasDisabled = selectedItems.some((item) => !item.enabled);
 
-        this.newItemBtn.show(!isSelectMode);
+        this.createItemBtn.show(!isSelectMode);
 
         const selectModeTitle = (isSelectMode) ? 'Done' : 'Select';
         this.selectModeBtn.show(hasItems);
@@ -1409,8 +1405,8 @@ class ImportView extends View {
         this.deleteAllBtn.enable(state.items.length > 0);
 
         this.rulesCheck.show(!isSelectMode);
-        show(this.rulesBtn, !isSelectMode);
-        enable(this.rulesBtn, state.rulesEnabled);
+        this.rulesBtn.show(!isSelectMode);
+        this.rulesBtn.enable(state.rulesEnabled);
         this.similarCheck.show(!isSelectMode);
     }
 
