@@ -24,12 +24,6 @@
   color: var(--main-text-color);
   background-color: var(--main-bg-color);
 
-  /* Page */
-  .page_wrapper {
-    color: var(--main-text-color);
-    background-color: var(--main-bg-color);
-  }
-
   /* Navigation */
   .navigation {
     background-color: var(--alt-bg-color);
@@ -39,11 +33,6 @@
   a.nav-link,
   a.nav-link:visited {
     color: #202020;
-  }
-
-  /* Main content */
-  .container {
-    background-color: var(--main-bg-color);
   }
 
   /* Login/Register view */
