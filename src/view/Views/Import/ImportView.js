@@ -331,7 +331,6 @@ class ImportView extends View {
             throw new Error('Invalid data');
         }
 
-        const selectMode = (this.state.listMode === 'select');
         const state = {
             ...this.state,
             items: [...this.state.items],
@@ -345,7 +344,7 @@ class ImportView extends View {
 
             const props = this.convertItemDataToProps(data, state);
             const item = new ImportTransaction(props.data);
-            item.state.selectMode = selectMode;
+            item.state.listMode = this.state.listMode;
             state.items.push(item);
         });
         state.pagination = this.updateList(state);
@@ -640,13 +639,14 @@ class ImportView extends View {
         }
 
         const selectMode = (this.state.listMode === 'select');
+        const listMode = (selectMode) ? 'list' : 'select';
         this.setState({
             ...this.state,
-            listMode: (selectMode) ? 'list' : 'select',
+            listMode,
             contextItemIndex: -1,
             items: this.state.items.map((item) => {
                 const newItem = new ImportTransaction(item);
-                newItem.state.selectMode = !selectMode;
+                newItem.state.listMode = listMode;
                 newItem.select(false);
                 return newItem;
             }),
@@ -953,7 +953,7 @@ class ImportView extends View {
         };
         const itemProps = this.convertItemDataToProps(itemData, this.state);
         const newItem = new ImportTransaction(itemProps.data);
-        newItem.state.selectMode = (this.state.listMode === 'select');
+        newItem.state.listMode = 'list';
 
         const state = {
             ...this.state,
@@ -1383,19 +1383,21 @@ class ImportView extends View {
     }
 
     renderMenu(state) {
+        const isListMode = state.listMode === 'list';
         const isSelectMode = state.listMode === 'select';
         const hasItems = state.items.length > 0;
         const selectedItems = this.getSelectedItems(state);
         const hasEnabled = selectedItems.some((item) => item.enabled);
         const hasDisabled = selectedItems.some((item) => !item.enabled);
 
-        this.createItemBtn.show(!isSelectMode);
+        this.createItemBtn.show(isListMode);
 
-        const selectModeTitle = (isSelectMode) ? 'Done' : 'Select';
+        const selectModeTitle = (isListMode) ? 'Select' : 'Done';
         this.selectModeBtn.show(hasItems);
         this.selectModeBtn.setTitle(selectModeTitle);
-        this.selectModeBtn.setIcon((isSelectMode) ? null : 'select');
+        this.selectModeBtn.setIcon((isListMode) ? 'select' : null);
         show(this.separator2, isSelectMode);
+        show(this.separator3, isSelectMode);
 
         this.selectAllBtn.show(isSelectMode && selectedItems.length < state.items.length);
         this.deselectAllBtn.show(isSelectMode && selectedItems.length > 0);
@@ -1404,10 +1406,10 @@ class ImportView extends View {
         this.deleteSelectedBtn.show(isSelectMode && selectedItems.length > 0);
         this.deleteAllBtn.enable(state.items.length > 0);
 
-        this.rulesCheck.show(!isSelectMode);
-        this.rulesBtn.show(!isSelectMode);
+        this.rulesCheck.show(isListMode);
+        this.rulesBtn.show(isListMode);
         this.rulesBtn.enable(state.rulesEnabled);
-        this.similarCheck.show(!isSelectMode);
+        this.similarCheck.show(isListMode);
     }
 
     renderList(state, prevState) {

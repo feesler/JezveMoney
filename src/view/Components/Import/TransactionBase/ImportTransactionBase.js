@@ -133,11 +133,12 @@ export class ImportTransactionBase extends Component {
     }
 
     renderSelectControls(state, prevState = {}) {
-        if (state.transaction.state.selectMode === prevState?.transaction?.state?.selectMode) {
+        if (state.transaction.state.listMode === prevState?.transaction?.state?.listMode) {
             return;
         }
 
-        const { selectMode, selected } = state.transaction.state;
+        const { listMode, selected } = state.transaction.state;
+        const selectMode = listMode === 'select';
         if (selectMode) {
             this.createSelectControls();
         }

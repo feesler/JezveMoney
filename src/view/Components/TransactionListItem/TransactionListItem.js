@@ -59,7 +59,7 @@ const LABEL_COMMENT = 'Comment';
 
 const defaultProps = {
     selected: false,
-    selectMode: false,
+    listMode: 'list',
     showControls: false,
 };
 
@@ -339,15 +339,16 @@ export class TransactionListItem extends Component {
     }
 
     renderSelectControls(state, prevState) {
-        if (state.selectMode === prevState.selectMode) {
+        if (state.listMode === prevState.listMode) {
             return;
         }
 
-        if (state.selectMode) {
+        const selectMode = state.listMode === 'select';
+        if (selectMode) {
             this.createSelectControls();
         }
 
-        show(this.selectControls, state.selectMode);
+        show(this.selectControls, selectMode);
     }
 
     renderControls(state, prevState) {
@@ -477,10 +478,8 @@ export class TransactionListItem extends Component {
 
         this.renderContent(state, prevState);
 
-        if (state.selectMode) {
-            const selected = !!state.selected;
-            this.elem.classList.toggle(SELECTED_CLASS, selected);
-            this.checkbox.check(selected);
-        }
+        const selected = state.listMode === 'select' && !!state.selected;
+        this.elem.classList.toggle(SELECTED_CLASS, selected);
+        this.checkbox?.check(selected);
     }
 }

@@ -207,7 +207,7 @@ export class TransactionList extends ListContainer {
         return {
             mode: state.mode,
             selected: item.selected,
-            selectMode: state.listMode === 'select',
+            listMode: state.listMode,
             showControls: state.showControls,
             item,
         };

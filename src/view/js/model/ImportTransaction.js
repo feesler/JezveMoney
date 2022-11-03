@@ -22,7 +22,7 @@ const defaultProps = {
     enabled: true,
     collapsed: true,
     selected: false,
-    selectMode: false,
+    listMode: 'list',
     similarTransaction: null,
     type: 'expense',
     sourceAccountId: 0,
@@ -153,7 +153,7 @@ export class ImportTransaction {
      * @param {boolean} val - if true then select component, else deselect
      */
     select(value) {
-        if (!this.state.selectMode) {
+        if (this.state.listMode !== 'select') {
             return this.state;
         }
 
@@ -172,7 +172,7 @@ export class ImportTransaction {
      * Toggle select/deselect component
      */
     toggleSelect() {
-        if (!this.state.selectMode) {
+        if (this.state.listMode !== 'select') {
             return this.state;
         }
 

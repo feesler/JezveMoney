@@ -237,7 +237,7 @@ export class ImportTransactionItem extends ImportTransactionBase {
         // Comment field
         this.commentTitle.textContent = transaction.comment;
 
-        show(this.menuContainer, !transaction.selectMode);
+        show(this.menuContainer, transaction.listMode === 'list');
 
         if (this.collapse) {
             if (transaction.collapsed) {
