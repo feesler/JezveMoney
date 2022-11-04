@@ -56,6 +56,7 @@
     align-items: center;
     justify-content: flex-start;
     width: 32px;
+    flex-shrink: 0;
 
     .checkbox {
       --checkbox-size: 24px;
