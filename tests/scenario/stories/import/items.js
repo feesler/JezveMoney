@@ -329,8 +329,8 @@ const pagination = async () => {
     await ImportTests.deleteAllItems();
 };
 
-const select = async () => {
-    setBlock('Select items', 2);
+const listModes = async () => {
+    setBlock('List modes', 2);
 
     const { cardFile } = App.scenario;
     await ImportTests.uploadFile(cardFile);
@@ -343,6 +343,9 @@ const select = async () => {
     await ImportTests.enableSelectedItems(false);
     await ImportTests.enableSelectedItems(true);
     await ImportTests.deleteSelectedItems();
+    await ImportTests.setListMode();
+    await ImportTests.setSortMode();
+    await ImportTests.setListMode();
 
     await ImportTests.deleteAllItems();
 };
@@ -393,7 +396,7 @@ export const importItemsTests = {
         await uploadAccount();
         await convert();
         await pagination();
-        await select();
+        await listModes();
         await checkSimilar();
         await enableDisableRules();
         await del();

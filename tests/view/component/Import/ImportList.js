@@ -21,9 +21,17 @@ export class ImportList extends TestComponent {
 
     async parseContent() {
         const res = {
-            selectMode: await hasClass(this.elem, 'import-list_select'),
             items: [],
         };
+        const isSelectMode = await hasClass(this.elem, 'import-list_select');
+        const isSortMode = await hasClass(this.elem, 'import-list_sort');
+        if (isSelectMode) {
+            res.listMode = 'select';
+        } else if (isSortMode) {
+            res.listMode = 'sort';
+        } else {
+            res.listMode = 'list';
+        }
 
         const listItems = await queryAll(this.elem, '.import-form,.import-item');
         if (listItems) {
@@ -48,8 +56,8 @@ export class ImportList extends TestComponent {
         return res;
     }
 
-    get selectMode() {
-        return this.content.selectMode;
+    get listMode() {
+        return this.content.listMode;
     }
 
     get items() {

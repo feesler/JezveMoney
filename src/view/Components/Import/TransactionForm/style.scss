@@ -190,6 +190,11 @@
     transform: rotate(180deg);
   }
 
+  /* Sort mode */
+  &.import-form_sort {
+    cursor: move;
+  }
+
   /* Found similar transaction info */
   .similar {
     display: flex;

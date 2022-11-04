@@ -27,9 +27,17 @@ const defaultPagination = {
     pages: 1,
 };
 
+const modeButtons = {
+    list: 'listModeBtn',
+    select: 'selectModeBtn',
+    sort: 'sortModeBtn',
+};
+
 const menuItems = [
     'createItemBtn',
+    'listModeBtn',
     'selectModeBtn',
+    'sortModeBtn',
     'selectAllBtn',
     'deselectAllBtn',
     'enableSelectedBtn',
@@ -171,7 +179,7 @@ export class ImportView extends AppView {
         res.rulesEnabled = (res.enabled) ? cont.rulesCheck.checked : false;
         res.checkSimilarEnabled = (res.enabled) ? cont.similarCheck.checked : false;
         res.renderTime = cont.renderTime;
-        res.selectMode = !!(cont.itemsList?.selectMode);
+        res.listMode = (cont.itemsList) ? cont.itemsList.listMode : 'list';
         res.items = (cont.itemsList) ? cont.itemsList.getItems() : [];
         res.pagination = (cont.itemsList)
             ? cont.itemsList.getPagination()
@@ -184,9 +192,11 @@ export class ImportView extends AppView {
     }
 
     getExpectedState(model = this.model) {
+        const listMode = model.listMode === 'list';
+        const selectMode = model.listMode === 'select';
         const showMenuItems = model.enabled && model.menuOpen;
-        const showListItems = showMenuItems && !model.selectMode;
-        const showSelectItems = showMenuItems && model.selectMode;
+        const showListItems = showMenuItems && listMode;
+        const showSelectItems = showMenuItems && selectMode;
         const hasItems = this.items.length > 0;
 
         const res = {
@@ -204,12 +214,15 @@ export class ImportView extends AppView {
             return res;
         }
 
-        const selectedItems = (model.selectMode) ? this.items.filter((item) => item.selected) : [];
-        const hasEnabled = selectedItems.some((item) => item.enabled);
-        const hasDisabled = selectedItems.some((item) => !item.enabled);
+        const selectedItems = (selectMode) ? this.items.filter((item) => item.selected) : [];
+        const hasEnabled = (selectMode) ? selectedItems.some((item) => item.enabled) : false;
+        const hasDisabled = (selectMode) ? selectedItems.some((item) => !item.enabled) : false;
 
         res.createItemBtn = { visible: showListItems };
-        res.selectModeBtn = { visible: showMenuItems && hasItems };
+        res.listModeBtn = { visible: showMenuItems && !listMode };
+        res.selectModeBtn = { visible: showListItems && hasItems };
+        res.sortModeBtn = { visible: showListItems && this.items.length > 1 };
+
         res.selectAllBtn = {
             visible: showSelectItems && selectedItems.length < this.items.length,
         };
@@ -218,6 +231,7 @@ export class ImportView extends AppView {
         res.disableSelectedBtn = { visible: showMenuItems && hasEnabled };
         res.deleteSelectedBtn = { visible: showMenuItems && selectedItems.length > 0 };
         res.deleteAllBtn = { visible: showMenuItems, disabled: !hasItems };
+
         res.rulesCheck = { checked: model.rulesEnabled, visible: showListItems };
         res.similarCheck = { checked: model.checkSimilarEnabled, visible: showListItems };
         res.rulesBtn = { visible: showListItems };
@@ -306,8 +320,24 @@ export class ImportView extends AppView {
         assert(this.model.state === state, `Invalid state of import view: ${this.model.state}. ${state} is expected`);
     }
 
+    assertListMode(listMode) {
+        assert(this.model.listMode === listMode, `Invalid list mode: ${this.model.listMode}. ${listMode} is expected`);
+    }
+
     checkMainState() {
         this.assertStateId('main');
+    }
+
+    checkListMode() {
+        this.assertListMode('list');
+    }
+
+    checkSelectMode() {
+        this.assertListMode('select');
+    }
+
+    checkSortMode() {
+        this.assertListMode('sort');
     }
 
     checkUploadState() {
@@ -327,7 +357,7 @@ export class ImportView extends AppView {
     }
 
     async openContextMenu(index) {
-        await this.cancelSelectMode();
+        await this.setListMode();
 
         const pos = this.getPositionByIndex(index);
 
@@ -1002,33 +1032,43 @@ export class ImportView extends AppView {
         return this.checkState();
     }
 
-    async toggleSelectMode() {
+    async changeListMode(listMode) {
         this.checkMainState();
+
+        if (this.model.listMode === listMode) {
+            return true;
+        }
+
+        assert(
+            this.model.listMode === 'list' || listMode === 'list',
+            `Can't change list mode from ${this.model.listMode} to ${listMode}.`,
+        );
+
         await this.openActionsMenu();
 
         this.model.menuOpen = false;
-        this.model.selectMode = !this.model.selectMode;
+        this.model.listMode = listMode;
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.selectModeBtn.click());
+        const buttonName = modeButtons[listMode];
+        const button = this.content[buttonName];
+        assert(button, `Button ${buttonName} not found`);
+
+        await this.performAction(() => button.click());
 
         return this.checkState();
     }
 
-    async setSelectMode() {
-        if (this.model.selectMode) {
-            return true;
-        }
-
-        return this.toggleSelectMode();
+    async setListMode() {
+        return this.changeListMode('list');
     }
 
-    async cancelSelectMode() {
-        if (!this.model.selectMode) {
-            return true;
-        }
+    async setSelectMode() {
+        return this.changeListMode('select');
+    }
 
-        return this.toggleSelectMode();
+    async setSortMode() {
+        return this.changeListMode('sort');
     }
 
     async toggleSelectItems(index) {
@@ -1102,7 +1142,7 @@ export class ImportView extends AppView {
 
     async enableSelectedItems(value) {
         assert(this.itemsList, 'No items available');
-        assert(this.model.selectMode, 'Invalid state: not in select mode');
+        this.checkSelectMode();
 
         await this.openActionsMenu();
         const enable = !!value;
@@ -1128,7 +1168,7 @@ export class ImportView extends AppView {
 
     async enableItems(index, value) {
         this.checkMainState();
-        assert(!this.model.selectMode, 'Invalid state: not in list mode');
+        this.checkListMode();
 
         const indexes = asArray(index);
         assert(indexes.length > 0, 'No items specified');
@@ -1186,7 +1226,7 @@ export class ImportView extends AppView {
 
     async deleteItem(index) {
         this.checkMainState();
-        assert(!this.model.selectMode, 'Invalid state: not in list mode');
+        this.checkListMode();
 
         const items = asArray(index);
         assert(items.length > 0, 'No items specified');
@@ -1207,8 +1247,8 @@ export class ImportView extends AppView {
     }
 
     async deleteSelectedItems() {
-        assert(this.model.selectMode, 'Invalid state: not in select mode');
         assert(this.itemsList, 'No items available');
+        this.checkSelectMode();
 
         await this.openActionsMenu();
 
@@ -1227,7 +1267,7 @@ export class ImportView extends AppView {
         });
 
         if (this.items.length === 0) {
-            this.model.selectMode = false;
+            this.model.listMode = 'list';
         }
         this.model.menuOpen = false;
         this.expectedState = this.getExpectedState();
@@ -1246,7 +1286,7 @@ export class ImportView extends AppView {
         this.items = [];
         this.formIndex = -1;
         this.originalItemData = null;
-        this.model.selectMode = false;
+        this.model.listMode = 'list';
         this.model.menuOpen = false;
         this.expectedState = this.getExpectedState();
 

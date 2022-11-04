@@ -19,7 +19,6 @@ const defaultProps = {
     items: [],
     noItemsMessage: 'No items',
     listMode: 'list',
-    selectable: false,
     onItemClick: null,
 };
 

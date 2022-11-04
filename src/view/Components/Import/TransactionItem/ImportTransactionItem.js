@@ -32,6 +32,8 @@ const DATE_CLASS = 'import-item__date';
 const COMMENT_CLASS = 'import-item__comment';
 /* Controls */
 const CONTROLS_CLASS = 'controls';
+/* Sort state */
+const SORT_CLASS = 'import-item_sort';
 
 /** Strings */
 const TITLE_FIELD_SRC_ACCOUNT = 'Source account';
@@ -181,6 +183,8 @@ export class ImportTransactionItem extends ImportTransactionBase {
         const isDebt = ['debtfrom', 'debtto'].includes(transaction.type);
 
         enable(this.elem, transaction.enabled);
+
+        this.elem.classList.toggle(SORT_CLASS, transaction.listMode === 'sort');
 
         // Select controls
         this.renderSelectControls(state);

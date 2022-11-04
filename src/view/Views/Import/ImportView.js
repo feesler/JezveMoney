@@ -40,6 +40,7 @@ import { ImportTransactionItem } from '../../Components/Import/TransactionItem/I
 
 /* CSS classes */
 const SELECT_MODE_CLASS = 'import-list_select';
+const SORT_MODE_CLASS = 'import-list_sort';
 
 /* Strings */
 const STR_ENABLE_ITEM = 'Enable';
@@ -147,16 +148,6 @@ class ImportView extends View {
         this.loadingInd = LoadingIndicator.create({ fixed: false });
         this.rowsContainer.append(this.loadingInd.elem);
 
-        this.trListSortable = new Sortable({
-            oninsertat: (orig, replaced) => this.onTransPosChanged(orig, replaced),
-            elem: 'rowsContainer',
-            group: 'transactions',
-            selector: '.import-item,.import-form',
-            placeholderClass: 'import-form__placeholder',
-            copyWidth: true,
-            handles: [{ query: 'div' }, { query: 'label' }],
-        });
-
         const selectedAccount = this.accountDropDown.getSelectionData();
         if (!selectedAccount) {
             throw new Error('Invalid selection data');
@@ -166,6 +157,22 @@ class ImportView extends View {
 
         this.setMainAccount(selectedAccount.id);
         this.setRenderTime();
+    }
+
+    createSortable(state = this.state) {
+        if (state.listMode !== 'sort' || this.listSortable) {
+            return;
+        }
+
+        this.listSortable = new Sortable({
+            oninsertat: (orig, replaced) => this.onTransPosChanged(orig, replaced),
+            elem: 'rowsContainer',
+            group: 'transactions',
+            selector: '.import-item.import-item_sort,.import-form.import-item_sort',
+            placeholderClass: 'import-form__placeholder',
+            copyWidth: true,
+            handles: [{ query: 'div' }, { query: 'label' }],
+        });
     }
 
     createMenu() {
@@ -178,11 +185,22 @@ class ImportView extends View {
             onClick: () => this.createItem(),
         });
         this.menu.addSeparator();
+        this.listModeBtn = this.menu.addIconItem({
+            id: 'listModeBtn',
+            title: 'Done',
+            onClick: () => this.setListMode('list'),
+        });
         this.selectModeBtn = this.menu.addIconItem({
             id: 'selectModeBtn',
             icon: 'select',
             title: 'Select',
-            onClick: () => this.toggleSelectMode(),
+            onClick: () => this.setListMode('select'),
+        });
+        this.sortModeBtn = this.menu.addIconItem({
+            id: 'sortModeBtn',
+            icon: 'sort',
+            title: 'Sort',
+            onClick: () => this.setListMode('sort'),
         });
         this.separator2 = this.menu.addSeparator();
 
@@ -633,13 +651,14 @@ class ImportView extends View {
         this.setState(state);
     }
 
-    toggleSelectMode() {
-        if (!this.saveItem()) {
+    setListMode(listMode) {
+        if (this.state.listMode === listMode) {
+            return;
+        }
+        if (this.state.listMode === 'list' && !this.saveItem()) {
             return;
         }
 
-        const selectMode = (this.state.listMode === 'select');
-        const listMode = (selectMode) ? 'list' : 'select';
         this.setState({
             ...this.state,
             listMode,
@@ -1203,6 +1222,7 @@ class ImportView extends View {
     onToggleEnableRules() {
         const state = {
             ...this.state,
+            contextItemIndex: -1,
             rulesEnabled: !!this.rulesCheck.checked,
         };
 
@@ -1229,6 +1249,7 @@ class ImportView extends View {
         const checkSimilarEnabled = !!this.similarCheck.checked;
         this.setState({
             ...this.state,
+            contextItemIndex: -1,
             checkSimilarEnabled,
         });
 
@@ -1392,10 +1413,9 @@ class ImportView extends View {
 
         this.createItemBtn.show(isListMode);
 
-        const selectModeTitle = (isListMode) ? 'Select' : 'Done';
-        this.selectModeBtn.show(hasItems);
-        this.selectModeBtn.setTitle(selectModeTitle);
-        this.selectModeBtn.setIcon((isListMode) ? 'select' : null);
+        this.listModeBtn.show(!isListMode);
+        this.selectModeBtn.show(isListMode && hasItems);
+        this.sortModeBtn.show(isListMode && state.items.length > 1);
         show(this.separator2, isSelectMode);
         show(this.separator3, isSelectMode);
 
@@ -1489,7 +1509,10 @@ class ImportView extends View {
             this.rowsContainer.append(this.noDataMsg);
         }
 
+        this.createSortable(state);
+
         this.rowsContainer.classList.toggle(SELECT_MODE_CLASS, state.listMode === 'select');
+        this.rowsContainer.classList.toggle(SORT_MODE_CLASS, state.listMode === 'sort');
     }
 
     render(state, prevState = {}) {

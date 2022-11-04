@@ -172,8 +172,6 @@ class TransactionListView extends View {
         listHeader.append(this.modeSelector.elem, this.topPaginator.elem);
 
         this.list = TransactionList.create({
-            selectable: true,
-            sortable: true,
             listMode: 'list',
             onItemClick: (id, e) => this.onItemClick(id, e),
             onSort: (id, pos) => this.sendChangePosRequest(id, pos),
@@ -196,11 +194,22 @@ class TransactionListView extends View {
     createMenu() {
         this.menu = PopupMenu.create({ id: 'listMenu' });
 
+        this.listModeBtn = this.menu.addIconItem({
+            id: 'listModeBtn',
+            title: 'Done',
+            onClick: () => this.setListMode('list'),
+        });
         this.selectModeBtn = this.menu.addIconItem({
             id: 'selectModeBtn',
             icon: 'select',
             title: 'Select',
-            onClick: () => this.toggleSelectMode(),
+            onClick: () => this.setListMode('select'),
+        });
+        this.sortModeBtn = this.menu.addIconItem({
+            id: 'sortModeBtn',
+            icon: 'sort',
+            title: 'Sort',
+            onClick: () => this.setListMode('sort'),
         });
         this.menu.addSeparator();
         this.separator1 = this.menu.addSeparator();
@@ -295,10 +304,14 @@ class TransactionListView extends View {
         this.setState(this.reduceDeselectAll());
     }
 
-    toggleSelectMode() {
+    setListMode(listMode) {
+        if (this.state.listMode === listMode) {
+            return;
+        }
+
         let newState = {
             ...this.state,
-            listMode: (this.state.listMode === 'list') ? 'select' : 'list',
+            listMode,
             contextItem: null,
         };
         if (newState.listMode === 'list') {
@@ -630,15 +643,17 @@ class TransactionListView extends View {
 
     renderMenu(state) {
         const itemsCount = state.items.length;
+        const isListMode = state.listMode === 'list';
         const isSelectMode = (state.listMode === 'select');
         const selectedItems = this.list.getSelectedItems();
         const totalSelCount = selectedItems.length;
 
         this.menu.show(itemsCount > 0);
 
-        const selectModeTitle = (isSelectMode) ? 'Done' : 'Select';
-        this.selectModeBtn.setTitle(selectModeTitle);
-        this.selectModeBtn.setIcon((isSelectMode) ? null : 'select');
+        this.listModeBtn.show(!isListMode);
+        this.selectModeBtn.show(isListMode && itemsCount > 0);
+        this.sortModeBtn.show(isListMode && itemsCount > 1);
+
         show(this.separator1, isSelectMode);
 
         this.selectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount);

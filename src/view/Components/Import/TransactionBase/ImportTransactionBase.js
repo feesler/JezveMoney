@@ -145,10 +145,9 @@ export class ImportTransactionBase extends Component {
 
         show(this.selectControls, selectMode);
 
-        if (selectMode) {
-            this.elem.classList.toggle(SELECTED_CLASS, !!selected);
-            this.checkbox.check(!!selected);
-        }
+        const isSelected = selectMode && !!selected;
+        this.elem.classList.toggle(SELECTED_CLASS, isSelected);
+        this.checkbox?.check(isSelected);
     }
 
     /** Enable/disable component */
