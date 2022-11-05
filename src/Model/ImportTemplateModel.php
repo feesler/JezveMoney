@@ -8,7 +8,7 @@ use JezveMoney\Core\Singleton;
 use JezveMoney\Core\CachedInstance;
 use JezveMoney\App\Item\ImportTemplateItem;
 
-use function JezveMoney\Core\qnull;
+use function JezveMoney\Core\inSetCondition;
 
 class ImportTemplateModel extends CachedTable
 {
@@ -16,6 +16,7 @@ class ImportTemplateModel extends CachedTable
     use CachedInstance;
 
     private static $user_id = 0;
+    private static $owner_id = 0;
 
     protected $tbl_name = "import_tpl";
     protected $columnTypes = [
@@ -32,6 +33,8 @@ class ImportTemplateModel extends CachedTable
         $this->dbObj = MySqlDB::getInstance();
         $uMod = UserModel::getInstance();
         self::$user_id = $uMod->getUser();
+        self::$owner_id = $uMod->getOwner();
+        $this->accModel = AccountModel::getInstance();
     }
 
 
@@ -47,6 +50,7 @@ class ImportTemplateModel extends CachedTable
         $res->name = $row["name"];
         $res->user_id = intval($row["user_id"]);
         $res->type_id = intval($row["type_id"]);
+        $res->account_id = intval($row["account_id"]);
         $res->first_row = intval($row["first_row"]);
         $res->columns = [
             "date" => intval($row["date_col"]),
@@ -83,6 +87,7 @@ class ImportTemplateModel extends CachedTable
         $avFields = array_merge($columnFields, [
             "name",
             "type_id",
+            "account_id",
         ]);
         $res = [];
 
@@ -98,10 +103,18 @@ class ImportTemplateModel extends CachedTable
             }
         }
 
-        if (isset($params["type_id"])) {
-            $res["type_id"] = intval($params["type_id"]);
-        } else {
-            $res["type_id"] = 0;
+        $res["type_id"] = (isset($params["type_id"])) ? intval($params["type_id"]) : 0;
+
+        $res["account_id"] = (isset($params["account_id"])) ? intval($params["account_id"]) : 0;
+        if ($res["account_id"] !== 0) {
+            $account = $this->accModel->getItem($res["account_id"]);
+            if (
+                !$account
+                || $account->user_id != self::$user_id
+                || $account->owner_id != self::$owner_id
+            ) {
+                throw new \Error("Invalid account_id specified");
+            }
         }
 
         if (isset($params["first_row"])) {
@@ -243,6 +256,27 @@ class ImportTemplateModel extends CachedTable
 
         $condArr = ["user_id=" . self::$user_id];
         if (!$this->dbObj->deleteQ($this->tbl_name, $condArr)) {
+            return false;
+        }
+
+        $this->cleanCache();
+
+        return true;
+    }
+
+    // Update templates with removed accounts
+    public function onAccountDelete($accounts)
+    {
+        if (is_null($accounts)) {
+            return false;
+        }
+
+        $updRes = $this->dbObj->updateQ(
+            $this->tbl_name,
+            ["account_id" => 0],
+            "account_id" . inSetCondition($accounts)
+        );
+        if (!$updRes) {
             return false;
         }
 

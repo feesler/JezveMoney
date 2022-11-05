@@ -23,10 +23,13 @@ const create = async () => {
     await ImportTests.inputTemplateFirstRow('');
     await ImportTests.submitTemplate();
 
+    setBlock('Submit valid template', 2);
     await ImportTests.inputTemplateFirstRow(2);
+    await ImportTests.toggleTemplateAccount();
+    await ImportTests.selectTemplateAccountByIndex(1);
     await ImportTests.submitTemplate();
 
-    // Create another template
+    setBlock('Create second template', 2);
     await ImportTests.createTemplate();
     await App.scenario.runner.runGroup(ImportTests.selectTemplateColumn, [
         { column: 'accountAmount', index: 11 },
@@ -51,6 +54,7 @@ const update = async () => {
         { column: 'transactionAmount', index: 11 },
         { column: 'transactionCurrency', index: 10 },
     ]);
+    await ImportTests.toggleTemplateAccount();
     await ImportTests.submitTemplate();
 };
 
@@ -80,8 +84,10 @@ const autoSelect = async () => {
         { column: 'date', index: 1 },
         { column: 'comment', index: 2 },
     ]);
-    // Input template name and save
+    // Input template name, select account and save
     await ImportTests.inputTemplateName('Template_Account');
+    await ImportTests.toggleTemplateAccount();
+    await ImportTests.selectTemplateAccountByIndex(1);
     await ImportTests.submitTemplate();
 
     // Upload card file and check 1st template is selected

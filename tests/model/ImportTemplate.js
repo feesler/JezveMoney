@@ -21,6 +21,7 @@ export class ImportTemplate {
         this.id = data.id;
         this.name = data.name;
         this.type_id = data.type_id;
+        this.account_id = data.account_id;
         this.first_row = data.first_row;
         this.columns = copyObject(data.columns);
     }

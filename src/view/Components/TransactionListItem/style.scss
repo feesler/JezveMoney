@@ -38,6 +38,7 @@
   position: relative;
   row-gap: 2px;
   flex: 1 1 auto;
+  overflow: hidden;
 }
 
 .trans-item__controls {
@@ -79,6 +80,11 @@
   position: absolute;
   right: 0;
   top: 0;
+}
+
+/* Sort mode */
+.trans-item_sort {
+  cursor: move;
 }
 
 .trans-item__amount,

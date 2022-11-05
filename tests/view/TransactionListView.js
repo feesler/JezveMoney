@@ -26,8 +26,16 @@ import { TransactionList } from './component/TransactionList/TransactionList.js'
 import { fixDate, isEmpty, urlJoin } from '../common.js';
 import { FiltersAccordion } from './component/TransactionList/FiltersAccordion.js';
 
+const modeButtons = {
+    list: 'listModeBtn',
+    select: 'selectModeBtn',
+    sort: 'sortModeBtn',
+};
+
 const listMenuItems = [
+    'listModeBtn',
     'selectModeBtn',
+    'sortModeBtn',
     'selectAllBtn',
     'deselectAllBtn',
     'deleteBtn',
@@ -132,18 +140,6 @@ export class TransactionListView extends AppView {
         return res;
     }
 
-    getViewMode(cont) {
-        if (!cont.listMenuContainer.visible) {
-            return 'nodata';
-        }
-
-        if (cont.selectModeBtn.title === 'Done') {
-            return 'select';
-        }
-
-        return 'list';
-    }
-
     getDropDownFilter(dropDown) {
         return (dropDown)
             ? dropDown.getSelectedValues().map((item) => parseInt(item, 10))
@@ -153,7 +149,7 @@ export class TransactionListView extends AppView {
     async buildModel(cont) {
         const res = {
             contextItem: cont.contextMenu.itemId,
-            mode: this.getViewMode(cont),
+            listMode: (cont.transList) ? cont.transList.listMode : 'list',
             listMenuVisible: cont.listMenu.visible,
             contextMenuVisible: cont.contextMenu.visible,
         };
@@ -309,6 +305,8 @@ export class TransactionListView extends AppView {
     }
 
     setExpectedState(model = this.model) {
+        const listMode = model.listMode === 'list';
+        const selectMode = model.listMode === 'select';
         const isItemsAvailable = (model.filtered.length > 0);
         const isAccountsAvailable = App.state.accounts.length > 0;
         const isPersonsAvailable = App.state.persons.length > 0;
@@ -318,7 +316,7 @@ export class TransactionListView extends AppView {
         const showSelectItems = (
             isItemsAvailable
             && model.listMenuVisible
-            && model.mode === 'select'
+            && selectMode
         );
 
         const res = {
@@ -348,7 +346,15 @@ export class TransactionListView extends AppView {
             transList: { visible: true },
             listMenuContainer: { visible: isItemsAvailable },
             listMenu: { visible: model.listMenuVisible },
-            selectModeBtn: { visible: model.listMenuVisible },
+            listModeBtn: {
+                visible: model.listMenuVisible && !listMode,
+            },
+            selectModeBtn: {
+                visible: model.listMenuVisible && listMode && isItemsAvailable,
+            },
+            sortModeBtn: {
+                visible: model.listMenuVisible && listMode && model.list.items.length > 1,
+            },
             selectAllBtn: {
                 visible: showSelectItems && selected.length < model.list.items.length,
             },
@@ -402,7 +408,7 @@ export class TransactionListView extends AppView {
     }
 
     async openContextMenu(num) {
-        await this.cancelSelectMode();
+        await this.setListMode();
 
         assert.arrayIndex(this.model.list.items, num, 'Invalid transaction index');
 
@@ -428,32 +434,41 @@ export class TransactionListView extends AppView {
         return this.checkState(expected);
     }
 
-    async toggleSelectMode() {
+    async changeListMode(listMode) {
+        if (this.model.listMode === listMode) {
+            return true;
+        }
+
+        assert(
+            this.model.listMode === 'list' || listMode === 'list',
+            `Can't change list mode from ${this.model.listMode} to ${listMode}.`,
+        );
+
         await this.openListMenu();
 
         this.model.listMenuVisible = false;
-        this.model.mode = (this.model.mode === 'select') ? 'list' : 'select';
+        this.model.listMode = listMode;
         const expected = this.setExpectedState();
 
-        await this.performAction(() => this.content.selectModeBtn.click());
+        const buttonName = modeButtons[listMode];
+        const button = this.content[buttonName];
+        assert(button, `Button ${buttonName} not found`);
+
+        await this.performAction(() => button.click());
 
         return this.checkState(expected);
     }
 
-    async setSelectMode() {
-        if (this.model.mode === 'select') {
-            return true;
-        }
-
-        return this.toggleSelectMode();
+    async setListMode() {
+        return this.changeListMode('list');
     }
 
-    async cancelSelectMode() {
-        if (this.model.mode === 'list') {
-            return true;
-        }
+    async setSelectMode() {
+        return this.changeListMode('select');
+    }
 
-        return this.toggleSelectMode();
+    async setSortMode() {
+        return this.changeListMode('sort');
     }
 
     async openFilters() {
@@ -919,7 +934,7 @@ export class TransactionListView extends AppView {
     }
 
     async deselectAll() {
-        assert(this.model.mode === 'select', 'Invalid state');
+        assert(this.model.listMode === 'select', 'Invalid state');
 
         const deselectItem = (item) => ({ ...item, selected: false });
 

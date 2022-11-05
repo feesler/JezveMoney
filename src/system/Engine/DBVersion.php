@@ -11,7 +11,7 @@ class DBVersion
     use Singleton;
 
     protected $tbl_name = "dbver";
-    protected $latestVersion = 11;
+    protected $latestVersion = 12;
     protected $dbClient = null;
     protected $tables = [
         "accounts",
@@ -172,6 +172,9 @@ class DBVersion
             }
             if ($current < 11) {
                 $current = $this->version11();
+            }
+            if ($current < 12) {
+                $current = $this->version12();
             }
 
             $this->setVersion($current);
@@ -384,6 +387,31 @@ class DBVersion
         }
 
         return 11;
+    }
+
+
+    private function version12()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "import_tpl";
+        $columns = $this->dbClient->getColumns($tableName);
+        if (!$columns) {
+            throw new \Error("Fail to obtian columns of '$tableName' table");
+        }
+
+        if (!isset($columns["account_id"])) {
+            $res = $this->dbClient->addColumns($tableName, [
+                "account_id" => "INT(11) NOT NULL DEFAULT '0'"
+            ]);
+            if (!$res) {
+                throw new \Error("Fail to update '$tableName' table");
+            }
+        }
+
+        return 12;
     }
 
 
@@ -602,6 +630,7 @@ class DBVersion
                 "`name` VARCHAR(128) NOT NULL, " .
                 "`type_id` INT(11) NOT NULL DEFAULT '0', " .
                 "`user_id` INT(11) NOT NULL DEFAULT '0', " .
+                "`account_id` INT(11) NOT NULL DEFAULT '0', " .
                 "`first_row` INT(11) NOT NULL DEFAULT '0', " .
                 "`date_col` INT(11) NOT NULL DEFAULT '0', " .
                 "`comment_col` INT(11) NOT NULL DEFAULT '0', " .

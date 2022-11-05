@@ -32,6 +32,8 @@ const DATE_CLASS = 'import-item__date';
 const COMMENT_CLASS = 'import-item__comment';
 /* Controls */
 const CONTROLS_CLASS = 'controls';
+/* Sort state */
+const SORT_CLASS = 'import-item_sort';
 
 /** Strings */
 const TITLE_FIELD_SRC_ACCOUNT = 'Source account';
@@ -182,6 +184,8 @@ export class ImportTransactionItem extends ImportTransactionBase {
 
         enable(this.elem, transaction.enabled);
 
+        this.elem.classList.toggle(SORT_CLASS, transaction.listMode === 'sort');
+
         // Select controls
         this.renderSelectControls(state);
 
@@ -237,7 +241,7 @@ export class ImportTransactionItem extends ImportTransactionBase {
         // Comment field
         this.commentTitle.textContent = transaction.comment;
 
-        show(this.menuContainer, !transaction.selectMode);
+        show(this.menuContainer, transaction.listMode === 'list');
 
         if (this.collapse) {
             if (transaction.collapsed) {

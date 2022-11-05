@@ -49,6 +49,8 @@ const CALENDAR_ICON_CLASS = 'calendar-icon';
 const FORM_CONTROLS_CLASS = 'form-controls';
 const SUBMIT_BUTTON_CLASS = 'submit-btn';
 const CANCEL_BUTTON_CLASS = 'cancel-btn';
+/* Sort state */
+const SORT_CLASS = 'import-form_sort';
 
 /** Strings */
 /* Fields */
@@ -626,6 +628,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         const isDebt = ['debtfrom', 'debtto'].includes(transaction.type);
 
         enable(this.elem, transaction.enabled);
+        this.elem.classList.toggle(SORT_CLASS, transaction.listMode === 'sort');
 
         // Select controls
         this.renderSelectControls(state);

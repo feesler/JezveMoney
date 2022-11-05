@@ -15,7 +15,7 @@ import { Field } from '../Field/Field.js';
 import './style.scss';
 
 /** CSS classes */
-export const TRANS_ITEM_CLASS = 'trans-item';
+const TRANS_ITEM_CLASS = 'trans-item';
 const CONTENT_CLASS = 'trans-item__content';
 const TITLE_CLASS = 'trans-item__title';
 const AMOUNT_CLASS = 'trans-item__amount';
@@ -44,6 +44,7 @@ const MENU_BUTTON_CLASS = 'btn icon-btn actions-menu-btn';
 const MENU_ICON_CLASS = 'icon actions-menu-btn__icon';
 /* Other */
 const SELECTED_CLASS = 'trans-item_selected';
+const SORT_CLASS = 'trans-item_sort';
 
 /** Strings */
 const LABEL_SOURCE = 'Source';
@@ -59,7 +60,7 @@ const LABEL_COMMENT = 'Comment';
 
 const defaultProps = {
     selected: false,
-    selectMode: false,
+    listMode: 'list',
     showControls: false,
 };
 
@@ -339,15 +340,16 @@ export class TransactionListItem extends Component {
     }
 
     renderSelectControls(state, prevState) {
-        if (state.selectMode === prevState.selectMode) {
+        if (state.listMode === prevState.listMode) {
             return;
         }
 
-        if (state.selectMode) {
+        const selectMode = state.listMode === 'select';
+        if (selectMode) {
             this.createSelectControls();
         }
 
-        show(this.selectControls, state.selectMode);
+        show(this.selectControls, selectMode);
     }
 
     renderControls(state, prevState) {
@@ -474,13 +476,12 @@ export class TransactionListItem extends Component {
         this.renderControls(state, prevState);
 
         this.elem.classList.toggle(DETAILS_CLASS, state.mode === 'details');
+        this.elem.classList.toggle(SORT_CLASS, state.listMode === 'sort');
 
         this.renderContent(state, prevState);
 
-        if (state.selectMode) {
-            const selected = !!state.selected;
-            this.elem.classList.toggle(SELECTED_CLASS, selected);
-            this.checkbox.check(selected);
-        }
+        const selected = state.listMode === 'select' && !!state.selected;
+        this.elem.classList.toggle(SELECTED_CLASS, selected);
+        this.checkbox?.check(selected);
     }
 }

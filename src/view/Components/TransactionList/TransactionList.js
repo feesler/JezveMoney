@@ -1,10 +1,7 @@
 import { isFunction } from 'jezvejs';
 import { Sortable } from 'jezvejs/Sortable';
 import { ListContainer } from '../ListContainer/ListContainer.js';
-import {
-    TRANS_ITEM_CLASS,
-    TransactionListItem,
-} from '../TransactionListItem/TransactionListItem.js';
+import { TransactionListItem } from '../TransactionListItem/TransactionListItem.js';
 import './style.scss';
 
 /** Strings */
@@ -13,16 +10,17 @@ const MSG_NO_TRANSACTIONS = 'No transactions found.';
 /** CSS classes */
 const LIST_CLASS = 'trans-list';
 const SELECT_MODE_CLASS = 'trans-list_select';
+const SORT_MODE_CLASS = 'trans-list_sort';
 const DETAILS_CLASS = 'trans-list_details';
 
 const defaultProps = {
     ItemComponent: TransactionListItem,
-    itemSelector: `.${TRANS_ITEM_CLASS}`,
+    itemSelector: '.trans-item',
+    itemSortSelector: '.trans-item.trans-item_sort',
     className: LIST_CLASS,
     noItemsMessage: MSG_NO_TRANSACTIONS,
     mode: 'classic',
     showControls: true,
-    sortable: false,
     onSort: null,
 };
 
@@ -37,19 +35,19 @@ export class TransactionList extends ListContainer {
         });
     }
 
-    init() {
-        super.init();
-
-        if (this.props.sortable) {
-            this.trListSortable = new Sortable({
-                oninsertat: (elem, ref) => this.onSort(elem, ref),
-                elem: this.elem,
-                group: 'transactions',
-                selector: this.props.itemSelector,
-                placeholderClass: 'trans-item_placeholder',
-                copyWidth: true,
-            });
+    createSortable(state = this.state) {
+        if (state.listMode !== 'sort' || this.listSortable) {
+            return;
         }
+
+        this.listSortable = new Sortable({
+            oninsertat: (elem, ref) => this.onSort(elem, ref),
+            elem: this.elem,
+            group: 'transactions',
+            selector: state.itemSortSelector,
+            placeholderClass: 'trans-item_placeholder',
+            copyWidth: true,
+        });
     }
 
     /**
@@ -207,7 +205,7 @@ export class TransactionList extends ListContainer {
         return {
             mode: state.mode,
             selected: item.selected,
-            selectMode: state.listMode === 'select',
+            listMode: state.listMode,
             showControls: state.showControls,
             item,
         };
@@ -225,7 +223,10 @@ export class TransactionList extends ListContainer {
     render(state, prevState = {}) {
         super.render(state, prevState);
 
+        this.createSortable(state);
+
         this.elem.classList.toggle(DETAILS_CLASS, state.mode === 'details');
         this.elem.classList.toggle(SELECT_MODE_CLASS, state.listMode === 'select');
+        this.elem.classList.toggle(SORT_MODE_CLASS, state.listMode === 'sort');
     }
 }

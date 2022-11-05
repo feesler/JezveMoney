@@ -230,9 +230,11 @@ class AccountModel extends CachedTable
 
         $transMod = TransactionModel::getInstance();
         $ruleModel = ImportRuleModel::getInstance();
+        $tplModel = ImportTemplateModel::getInstance();
 
         $res = $transMod->onAccountDelete($this->removedItems)
-            && $ruleModel->onAccountDelete($items);
+            && $ruleModel->onAccountDelete($items)
+            && $tplModel->onAccountDelete($items);
         $this->removedItems = null;
 
         return $res;

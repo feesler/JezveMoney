@@ -207,9 +207,6 @@ export const submitUploaded = async (params) => {
         if (params.account) {
             await App.view.selectUploadAccount(params.account);
         }
-        if (params.encode) {
-            await App.view.selectUploadEncoding(params.encode);
-        }
 
         return App.view.submitUploaded(importData);
     });
@@ -355,7 +352,15 @@ export const enableItems = async ({ index, value = true }) => {
     });
 };
 
-/** Done select mode */
+/** Set list mode */
+export const setListMode = async () => {
+    await test('Set list mode', async () => {
+        await checkNavigation();
+        return App.view.setListMode();
+    });
+};
+
+/** Set select mode */
 export const setSelectMode = async () => {
     await test('Set select mode', async () => {
         await checkNavigation();
@@ -363,11 +368,11 @@ export const setSelectMode = async () => {
     });
 };
 
-/** Done select mode */
-export const cancelSelectMode = async () => {
-    await test('Done select mode', async () => {
+/** Set sort mode */
+export const setSortMode = async () => {
+    await test('Set sort mode', async () => {
         await checkNavigation();
-        return App.view.cancelSelectMode();
+        return App.view.setSortMode();
     });
 };
 

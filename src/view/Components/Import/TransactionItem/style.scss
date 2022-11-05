@@ -56,6 +56,7 @@
     align-items: center;
     justify-content: flex-start;
     width: 32px;
+    flex-shrink: 0;
 
     .checkbox {
       --checkbox-size: 24px;
@@ -152,6 +153,11 @@
 
   &.collapsible__expanded .toggle-icon {
     transform: rotate(180deg);
+  }
+
+  /* Sort mode */
+  &.import-item_sort {
+    cursor: move;
   }
 
   /* Found similar transaction info */

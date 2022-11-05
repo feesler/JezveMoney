@@ -88,6 +88,30 @@ export const toggleSelect = async (transactions) => {
     });
 };
 
+/** Set list mode */
+export const setListMode = async () => {
+    await test('Set list mode', async () => {
+        await checkNavigation();
+        return App.view.setListMode();
+    });
+};
+
+/** Set select mode */
+export const setSelectMode = async () => {
+    await test('Set select mode', async () => {
+        await checkNavigation();
+        return App.view.setSelectMode();
+    });
+};
+
+/** Set sort mode */
+export const setSortMode = async () => {
+    await test('Set sort mode', async () => {
+        await checkNavigation();
+        return App.view.setSortMode();
+    });
+};
+
 export const selectAll = async () => {
     await test('Select all transactions', async () => {
         await checkNavigation();

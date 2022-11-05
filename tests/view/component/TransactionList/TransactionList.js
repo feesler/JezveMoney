@@ -18,6 +18,16 @@ export class TransactionList extends TestComponent {
             noDataMessage: await query(this.elem, '.nodata-message'),
         };
 
+        const isSelectMode = await hasClass(this.elem, 'trans-list_select');
+        const isSortMode = await hasClass(this.elem, 'trans-list_sort');
+        if (isSelectMode) {
+            res.listMode = 'select';
+        } else if (isSortMode) {
+            res.listMode = 'sort';
+        } else {
+            res.listMode = 'list';
+        }
+
         const listItems = await queryAll(this.elem, '.trans-item');
         if (listItems.length === 0) {
             return res;
@@ -33,6 +43,10 @@ export class TransactionList extends TestComponent {
 
     get items() {
         return this.content.items;
+    }
+
+    get listMode() {
+        return this.content.listMode;
     }
 
     getItemData(item) {

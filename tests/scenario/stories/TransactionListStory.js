@@ -49,6 +49,9 @@ export class TransactionListStory extends TestStory {
 
             await TransactionListTests.selectAll();
             await TransactionListTests.deselectAll();
+            await TransactionListTests.setListMode();
+            await TransactionListTests.setSortMode();
+            await TransactionListTests.setListMode();
         }
 
         await App.scenario.runner.runGroup(

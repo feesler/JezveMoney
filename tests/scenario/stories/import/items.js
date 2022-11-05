@@ -224,10 +224,9 @@ const submit = async () => {
 
     // Disable all items except 0 and 1 and submit
     // As result two first transactions will be found as similar
-    await ImportTests.enableItems({
-        index: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-        value: false,
-    });
+    await ImportTests.selectAllItems();
+    await ImportTests.toggleSelectItems([0, 1]);
+    await ImportTests.enableSelectedItems(false);
     await ImportTests.submit();
     // Verify submit is disabled for empty list
     setBlock('Verify submit is disabled for empty list', 2);
@@ -287,10 +286,8 @@ const submit = async () => {
         ...App.scenario.cardFile,
         template: 0,
     });
-    await ImportTests.enableItems({
-        index: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
-        value: false,
-    });
+    await ImportTests.selectAllItems();
+    await ImportTests.enableSelectedItems(false);
     await ImportTests.submit();
 };
 
@@ -329,8 +326,8 @@ const pagination = async () => {
     await ImportTests.deleteAllItems();
 };
 
-const select = async () => {
-    setBlock('Select items', 2);
+const listModes = async () => {
+    setBlock('List modes', 2);
 
     const { cardFile } = App.scenario;
     await ImportTests.uploadFile(cardFile);
@@ -343,6 +340,9 @@ const select = async () => {
     await ImportTests.enableSelectedItems(false);
     await ImportTests.enableSelectedItems(true);
     await ImportTests.deleteSelectedItems();
+    await ImportTests.setListMode();
+    await ImportTests.setSortMode();
+    await ImportTests.setListMode();
 
     await ImportTests.deleteAllItems();
 };
@@ -393,7 +393,7 @@ export const importItemsTests = {
         await uploadAccount();
         await convert();
         await pagination();
-        await select();
+        await listModes();
         await checkSimilar();
         await enableDisableRules();
         await del();
