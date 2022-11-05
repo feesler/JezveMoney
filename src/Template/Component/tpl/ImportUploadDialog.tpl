@@ -41,18 +41,20 @@
                 <label id="tplStateLbl">Template</label>
                 <input id="createTplBtn" class="btn link-btn" type="button" value="Create template">
             </div>
-            <div class="tpl-form-fields">
-                <div class="tpl-form__select-group">
-                    <div id="tplField" class="tpl-form-field template-field">
-                        <select id="templateSel">
-                            <?php foreach ($importTemplates as $template) {     ?>
-                                <option value="<?= e($template->id) ?>"><?= e($template->name) ?></option>
-                            <?php   }   ?>
-                        </select>
-                    </div>
+            <div class="tpl-form-fields tpl-form__select-group">
+                <div id="tplField" class="tpl-form-field template-field">
+                    <select id="templateSel">
+                        <?php foreach ($importTemplates as $template) {     ?>
+                            <option value="<?= e($template->id) ?>"><?= e($template->name) ?></option>
+                        <?php   }   ?>
+                    </select>
+                </div>
+                <div class="tpl-form__select-group-controls">
                     <input id="updateTplBtn" class="btn link-btn" type="button" value="Update" hidden>
                     <input id="deleteTplBtn" class="btn link-btn" type="button" value="Delete" hidden>
                 </div>
+            </div>
+            <div class="tpl-form-fields">
                 <div id="nameField" class="tpl-form-field validation-block" hidden>
                     <label for="tplNameInp">Name</label>
                     <input id="tplNameInp" class="stretch-input tpl-name-inp" type="text" autocomplete="off">

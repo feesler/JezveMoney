@@ -36,6 +36,7 @@
   display: flex;
   flex-flow: row wrap;
   margin: 4px 0;
+  column-gap: 18px;
 }
 
 .tpl-form-field {
@@ -43,11 +44,12 @@
   flex-flow: column nowrap;
   margin-top: 4px;
   margin-bottom: 4px;
-  margin-right: 18px;
   align-items: baseline;
+  row-gap: 5px;
 
   label {
     font-size: 14px;
+    margin-bottom: 0;
   }
 
   input,
@@ -76,6 +78,11 @@
   flex-flow: row nowrap;
   align-items: baseline;
   overflow: hidden;
+}
+
+.tpl-form__select-group-controls {
+  display: flex;
+  flex-flow: row nowrap;
 }
 
 .tpl-account-field {
