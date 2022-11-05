@@ -8,6 +8,7 @@ const create = async () => {
     const data = [{
         name: 'Template 1',
         type: 0,
+        account_id: App.scenario.CASH_RUB,
         account_amount_col: 1,
         account_curr_col: 2,
         trans_amount_col: 3,
@@ -17,6 +18,7 @@ const create = async () => {
     }, {
         name: 'Template 2',
         type: 1,
+        account_id: App.scenario.ACC_RUB,
         account_amount_col: 1,
         account_curr_col: 2,
         trans_amount_col: 1,
@@ -26,6 +28,7 @@ const create = async () => {
     }, {
         name: 'Template 3',
         type: 0,
+        account_id: 0,
         account_amount_col: 10,
         account_curr_col: 20,
         trans_amount_col: 30,
@@ -37,6 +40,12 @@ const create = async () => {
         name: 'Invalid template',
     }, {
         name: null,
+    }, {
+        name: 'Invalid template',
+        account_id: 'null',
+    }, {
+        name: 'Invalid template',
+        account_id: App.scenario.API_USER_ACC_RUB,
     }, {
         account_amount_col: 1,
         account_curr_col: 2,
@@ -67,6 +76,7 @@ const createMultiple = async () => {
     const data = [{
         name: 'Template 10',
         type: 0,
+        account_id: App.scenario.CASH_RUB,
         account_amount_col: 1,
         account_curr_col: 2,
         trans_amount_col: 3,
@@ -76,6 +86,7 @@ const createMultiple = async () => {
     }, {
         name: 'Template 11',
         type: 1,
+        account_id: 0,
         account_amount_col: 7,
         account_curr_col: 6,
         trans_amount_col: 5,
@@ -95,6 +106,12 @@ const createMultiple = async () => {
             name: 'Invalid template',
         }, {
             name: null,
+        }, {
+            name: 'Invalid template',
+            account_id: 'null',
+        }, {
+            name: 'Invalid template',
+            account_id: App.scenario.API_USER_ACC_RUB,
         }],
         [{
             name: 'Template 12',
@@ -117,6 +134,7 @@ const update = async () => {
         id: App.scenario.TEMPLATE_1,
         name: 'TPL',
         type: 1,
+        account_id: App.scenario.ACC_RUB,
         comment_col: 8,
     }, {
         id: App.scenario.TEMPLATE_2,
@@ -124,6 +142,13 @@ const update = async () => {
     }, {
         id: App.scenario.TEMPLATE_2,
         account_amount_col: 0,
+    }, {
+        // Invalid templates
+        id: App.scenario.TEMPLATE_2,
+        account_id: 'null',
+    }, {
+        name: 'Invalid template',
+        account_id: App.scenario.API_USER_ACC_RUB,
     }];
 
     await App.scenario.runner.runGroup(ImportTemplateApiTests.update, data);

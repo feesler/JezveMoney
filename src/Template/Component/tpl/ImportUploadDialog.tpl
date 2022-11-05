@@ -1,7 +1,7 @@
 <div id="uploadDialog" class="upload-dialog" hidden>
     <div id="fileBlock" class="upload-form__browser">
         <div class="upload-form__inner">
-            <form id="fileimportfrm" class="upload-form" method="post" enctype="multipart/form-data" action="<?=BASEURL?>api/import/upload">
+            <form id="fileimportfrm" class="upload-form" method="post" enctype="multipart/form-data" action="<?= BASEURL ?>api/import/upload">
                 <label id="fileBrowser" class="upload-form__file">
                     <input id="fileInp" type="file">
                     <div class="upload-form__overlap">
@@ -11,26 +11,26 @@
                 <div class="upload-form__descr">or simply drop it to this dialog</div>
                 <div class="upload-form__filename"></div>
             </form>
-<?php	if ($this->adminUser || $this->testerUser) { ?>
-            <div id="serverAddressBlock" class="row-container" hidden>
-                <input id="serverAddress" class="stretch-input" type="text">
-                <input id="serverUploadBtn" class="btn submit-btn" type="button" value="Upload">
-            </div>
-<?php   }   ?>
+            <?php if ($this->adminUser || $this->testerUser) { ?>
+                <div id="serverAddressBlock" class="row-container" hidden>
+                    <input id="serverAddress" class="stretch-input" type="text">
+                    <input id="serverUploadBtn" class="btn submit-btn" type="button" value="Upload">
+                </div>
+            <?php   }   ?>
         </div>
         <div class="upload-form__options">
             <label id="isEncodeCheck" class="checkbox">
                 <input name="encode" type="checkbox" checked>
-                <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
                 <span class="checkbox__label">CP-1251 encoding</span>
             </label>
-<?php	if ($this->adminUser || $this->testerUser) { ?>
-            <label id="useServerCheck" class="checkbox">
-                <input type="checkbox">
-                <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
-                <span class="checkbox__label">Use address on server</span>
-            </label>
-<?php   }   ?>
+            <?php if ($this->adminUser || $this->testerUser) { ?>
+                <label id="useServerCheck" class="checkbox">
+                    <input type="checkbox">
+                    <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                    <span class="checkbox__label">Use address on server</span>
+                </label>
+            <?php   }   ?>
         </div>
     </div>
 
@@ -45,9 +45,9 @@
                 <div class="tpl-form__select-group">
                     <div id="tplField" class="tpl-form-field template-field">
                         <select id="templateSel">
-<?php   foreach($importTemplates as $template) {     ?>
-                            <option value="<?=e($template->id)?>"><?=e($template->name)?></option>
-<?php   }   ?>
+                            <?php foreach ($importTemplates as $template) {     ?>
+                                <option value="<?= e($template->id) ?>"><?= e($template->name) ?></option>
+                            <?php   }   ?>
                         </select>
                     </div>
                     <input id="updateTplBtn" class="btn link-btn" type="button" value="Update" hidden>
@@ -61,9 +61,9 @@
                 <div id="columnField" class="tpl-form-field validation-block" hidden>
                     <label for="columnSel">Column</label>
                     <select id="columnSel">
-<?php   foreach($tplColumnTypes as $colType => $tplColumn) {     ?>
-                        <option value="<?=e($colType)?>"><?=e($tplColumn["title"])?></option>
-<?php   }   ?>
+                        <?php foreach ($tplColumnTypes as $colType => $tplColumn) {     ?>
+                            <option value="<?= e($colType) ?>"><?= e($tplColumn["title"]) ?></option>
+                        <?php   }   ?>
                     </select>
                     <div id="columnFeedback" class="invalid-feedback"></div>
                 </div>
@@ -75,6 +75,15 @@
                         <button id="incFirstRowBtn" class="input-group__btn" type="button">+</button>
                     </div>
                     <div class="invalid-feedback">Input row number</div>
+                </div>
+            </div>
+            <div class="tpl-form-fields">
+                <div id="tplAccountField" class="tpl-form-field tpl-account-field" hidden>
+                    <label id="tplAccountCheck" class="checkbox">
+                        <input type="checkbox">
+                        <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                        <span class="checkbox__label">Set default account</span>
+                    </label>
                 </div>
             </div>
         </div>

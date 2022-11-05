@@ -707,6 +707,10 @@
                 <input id="create_tpl_type" class="stretch-input" name="type_id" type="text">
             </div>
             <div class="std_margin">
+                <label for="create_tpl_account">Default account (0 for disabled)</label>
+                <input id="create_tpl_account" class="stretch-input" name="account_id" type="text">
+            </div>
+            <div class="std_margin">
                 <label for="create_first_row">First row (1-based)</label>
                 <input id="create_first_row" class="stretch-input" name="first_row" type="text">
             </div>
@@ -737,6 +741,10 @@
             <div class="std_margin">
                 <label for="update_tpl_type">Type</label>
                 <input id="update_tpl_type" class="stretch-input" name="type_id" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="update_tpl_account">Default account (0 for disabled)</label>
+                <input id="update_tpl_account" class="stretch-input" name="account_id" type="text">
             </div>
             <div class="std_margin">
                 <label for="update_first_row">First row (1-based)</label>

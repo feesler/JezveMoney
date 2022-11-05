@@ -207,9 +207,6 @@ export const submitUploaded = async (params) => {
         if (params.account) {
             await App.view.selectUploadAccount(params.account);
         }
-        if (params.encode) {
-            await App.view.selectUploadEncoding(params.encode);
-        }
 
         return App.view.submitUploaded(importData);
     });

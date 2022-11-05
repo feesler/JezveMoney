@@ -5,8 +5,10 @@ import {
     copyObject,
     show,
     enable,
+    insertAfter,
     Component,
 } from 'jezvejs';
+import { Checkbox } from 'jezvejs/Checkbox';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { API } from '../../../../js/api/index.js';
@@ -85,6 +87,7 @@ export class ImportTemplateManager extends Component {
         this.firstRowInp = ge('firstRowInp');
         this.decFirstRowBtn = ge('decFirstRowBtn');
         this.incFirstRowBtn = ge('incFirstRowBtn');
+        this.tplAccountField = ge('tplAccountField');
         this.createTplBtn = ge('createTplBtn');
         this.updateTplBtn = ge('updateTplBtn');
         this.deleteTplBtn = ge('deleteTplBtn');
@@ -111,6 +114,7 @@ export class ImportTemplateManager extends Component {
             || !this.firstRowInp
             || !this.decFirstRowBtn
             || !this.incFirstRowBtn
+            || !this.tplAccountField
             || !this.createTplBtn
             || !this.updateTplBtn
             || !this.deleteTplBtn
@@ -130,13 +134,24 @@ export class ImportTemplateManager extends Component {
             throw new Error('Failed to initialize upload file dialog');
         }
 
+        // Main account
         this.accountDropDown = DropDown.create({
             elem: 'initialAccount',
             onchange: (account) => this.onAccountChange(account),
         });
-
         window.app.initAccountsList(this.accountDropDown);
         this.accountDropDown.selectItem(this.state.mainAccount.id.toString());
+
+        // Template default account
+        this.tplAccountCheck = Checkbox.fromElement(ge('tplAccountCheck'), {
+            onChange: () => this.onTemplateAccountToggle(),
+        });
+
+        this.tplAccountDropDown = DropDown.create({
+            onchange: (account) => this.onTemplateAccountChange(account),
+        });
+        window.app.initAccountsList(this.tplAccountDropDown);
+        insertAfter(this.tplAccountDropDown.elem, this.tplAccountCheck.elem);
 
         this.submitUploadedBtn.addEventListener('click', () => this.onSubmit());
 
@@ -248,7 +263,11 @@ export class ImportTemplateManager extends Component {
 
     /** Initial account select 'change' event handler */
     onAccountChange(selectedAccount) {
-        const account = window.app.model.accounts.getItem(selectedAccount?.id);
+        return this.changeMainAccount(selectedAccount?.id);
+    }
+
+    changeMainAccount(id) {
+        const account = window.app.model.accounts.getItem(id);
         if (!account) {
             throw new Error('Account not found');
         }
@@ -258,6 +277,8 @@ export class ImportTemplateManager extends Component {
         if (isFunction(this.props.onAccountChange)) {
             this.props.onAccountChange(account.id);
         }
+
+        this.render(this.state);
     }
 
     /** Import template select 'change' event handler */
@@ -281,6 +302,10 @@ export class ImportTemplateManager extends Component {
         const template = window.app.model.templates.getItem(value);
         if (template) {
             this.state.template = new ImportTemplate(template);
+
+            if (template.account_id) {
+                this.changeMainAccount(template.account_id);
+            }
         } else {
             this.state.template = null;
         }
@@ -332,6 +357,25 @@ export class ImportTemplateManager extends Component {
         this.render(this.state);
     }
 
+    /** Template default account 'change' event handler */
+    onTemplateAccountToggle() {
+        if (this.state.template.account_id) {
+            this.state.template.account_id = 0;
+        } else {
+            const account = window.app.model.userAccounts.getItemByIndex(0);
+            this.state.template.account_id = account.id;
+        }
+
+        this.render(this.state);
+    }
+
+    /** Template default account 'change' event handler */
+    onTemplateAccountChange(account) {
+        this.state.template.account_id = account?.id;
+
+        this.render(this.state);
+    }
+
     /** Create template button 'click' event handler */
     onCreateTemplateClick() {
         this.setCreateTemplateState();
@@ -343,6 +387,7 @@ export class ImportTemplateManager extends Component {
         this.state.template = new ImportTemplate({
             name: '',
             type_id: 0,
+            account_id: 0,
             first_row: 2,
             columns: {},
         });
@@ -374,6 +419,7 @@ export class ImportTemplateManager extends Component {
         const requestObj = {
             name: template.name,
             type_id: template.type_id,
+            account_id: template.account_id,
             first_row: template.first_row,
             date_col: template.columns.date,
             comment_col: template.columns.comment,
@@ -663,6 +709,7 @@ export class ImportTemplateManager extends Component {
             window.app.clearBlockValidation(this.nameField);
             show(this.columnField, false);
             show(this.firstRowField, false);
+            show(this.tplAccountField, false);
             show(this.createTplBtn, templateAvail);
             show(this.updateTplBtn, !!state.template);
             show(this.deleteTplBtn, !!state.template);
@@ -681,6 +728,7 @@ export class ImportTemplateManager extends Component {
             show(this.nameField, true);
             show(this.columnField, true);
             show(this.firstRowField, true);
+            show(this.tplAccountField, true);
             show(this.createTplBtn, false);
             show(this.updateTplBtn, false);
             show(this.deleteTplBtn, false);
@@ -725,6 +773,13 @@ export class ImportTemplateManager extends Component {
 
             this.firstRowInp.value = state.template.first_row;
             enable(this.decFirstRowBtn, state.template.first_row > 1);
+
+            const useTplAccount = state.template.account_id !== 0;
+            this.tplAccountCheck.check(useTplAccount);
+            this.tplAccountDropDown.show(useTplAccount);
+            if (state.template.account_id !== 0) {
+                this.tplAccountDropDown.selectItem(state.template.account_id);
+            }
         }
 
         let isValid = false;
@@ -751,6 +806,7 @@ export class ImportTemplateManager extends Component {
 
         const uploadEnabled = state.id === RAW_DATA_STATE && isValid;
         this.accountDropDown.enable(uploadEnabled);
+        this.accountDropDown.selectItem(state.mainAccount.id);
         show(this.initialAccField, uploadEnabled);
         enable(this.submitUploadedBtn, uploadEnabled);
         show(this.controlsBlock, uploadEnabled);

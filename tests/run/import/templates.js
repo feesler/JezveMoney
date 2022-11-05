@@ -1,13 +1,10 @@
-import { test, assert } from 'jezve-test';
+import { test } from 'jezve-test';
 import { App } from '../../Application.js';
-import { ImportView } from '../../view/ImportView.js';
 import { CREATE_TPL_STATE } from '../../view/component/Import/ImportUploadDialog.js';
 
 /** Test selection of import template by id */
 export const selectTemplateById = async (value) => {
     await test(`Select upload template [${value}]`, async () => {
-        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
-
         await App.view.selectUploadTemplateById(value);
         return App.view.checkState();
     });
@@ -16,8 +13,6 @@ export const selectTemplateById = async (value) => {
 /** Test selection of import template by index */
 export const selectTemplateByIndex = async (value) => {
     await test(`Select upload template by index [${value}]`, async () => {
-        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
-
         await App.view.selectUploadTemplateByIndex(value);
         return App.view.checkState();
     });
@@ -26,8 +21,6 @@ export const selectTemplateByIndex = async (value) => {
 /** Test input import template name on create/update state */
 export const inputTemplateName = async (value) => {
     await test(`Input template name (${value})`, async () => {
-        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
-
         await App.view.inputTemplateName(value);
         return App.view.checkState();
     });
@@ -36,8 +29,6 @@ export const inputTemplateName = async (value) => {
 /** Select column of import template */
 export const selectTemplateColumn = async ({ column, index }) => {
     await test(`Select template column [${column} => ${index}]`, async () => {
-        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
-
         await App.view.selectTemplateColumn(column, index);
         return App.view.checkState();
     });
@@ -46,8 +37,6 @@ export const selectTemplateColumn = async ({ column, index }) => {
 /** Input import template first row */
 export const inputTemplateFirstRow = async (value) => {
     await test(`Input template first row (${value})`, async () => {
-        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
-
         await App.view.inputTemplateFirstRow(value);
         return App.view.checkState();
     });
@@ -56,8 +45,6 @@ export const inputTemplateFirstRow = async (value) => {
 /** Click by decrease template first row button */
 export const decreaseTemplateFirstRow = async () => {
     await test('Decrease template first row', async () => {
-        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
-
         await App.view.decreaseTemplateFirstRow();
         return App.view.checkState();
     });
@@ -66,9 +53,31 @@ export const decreaseTemplateFirstRow = async () => {
 /** Click by increase template first row button */
 export const increaseTemplateFirstRow = async (value) => {
     await test('Increase template first row', async () => {
-        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
-
         await App.view.increaseTemplateFirstRow(value);
+        return App.view.checkState();
+    });
+};
+
+/** Click by template account checkbox */
+export const toggleTemplateAccount = async () => {
+    await test('Toggle enable template account', async () => {
+        await App.view.toggleTemplateAccount();
+        return App.view.checkState();
+    });
+};
+
+/** Select template account */
+export const selectTemplateAccountById = async (value) => {
+    await test(`Select template account by id (${value})`, async () => {
+        await App.view.selectTemplateAccountById(value);
+        return App.view.checkState();
+    });
+};
+
+/** Select template account */
+export const selectTemplateAccountByIndex = async (index) => {
+    await test(`Select upload template by index [${index}]`, async () => {
+        await App.view.selectTemplateAccountByIndex(index);
         return App.view.checkState();
     });
 };
@@ -76,8 +85,6 @@ export const increaseTemplateFirstRow = async (value) => {
 /** Go to create import template state */
 export const createTemplate = async () => {
     await test('Create template', async () => {
-        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
-
         await App.state.fetch();
         await App.view.createTemplate();
         return App.view.checkState();
@@ -87,8 +94,6 @@ export const createTemplate = async () => {
 /** Update currently selected template */
 export const updateTemplate = async () => {
     await test('Update template', async () => {
-        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
-
         await App.state.fetch();
         await App.view.updateTemplate();
         return App.view.checkState();
@@ -98,7 +103,6 @@ export const updateTemplate = async () => {
 /** Delete currently selected template */
 export const deleteTemplate = async () => {
     await test('Delete template', async () => {
-        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
         // Prepare expected content
         await App.state.fetch();
         const expectedTpl = App.view.getExpectedTemplate();
@@ -115,8 +119,6 @@ export const deleteTemplate = async () => {
 /** Submit current template */
 export const submitTemplate = async () => {
     await test('Submit template', async () => {
-        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
-
         // Prepare expected content
         await App.state.fetch();
 
@@ -129,7 +131,6 @@ export const submitTemplate = async () => {
         }
 
         await App.view.submitTemplate();
-        await App.view.checkState();
         // Check app state
         return App.state.fetchAndTest();
     });
@@ -138,8 +139,6 @@ export const submitTemplate = async () => {
 /** Cancel create/update template */
 export const cancelTemplate = async () => {
     await test('Cancel template', async () => {
-        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
-
         await App.state.fetch();
         await App.view.cancelTemplate();
         return App.view.checkState();

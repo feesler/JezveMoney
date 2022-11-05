@@ -536,6 +536,24 @@ export class ImportView extends AppView {
         await this.performAction(() => this.uploadDialog.increaseTemplateFirstRow(val));
     }
 
+    async toggleTemplateAccount() {
+        this.checkUploadState();
+
+        await this.performAction(() => this.uploadDialog.toggleTemplateAccount());
+    }
+
+    async selectTemplateAccountById(val) {
+        this.checkUploadState();
+
+        await this.performAction(() => this.uploadDialog.selectTemplateAccountById(val));
+    }
+
+    async selectTemplateAccountByIndex(index) {
+        this.checkUploadState();
+
+        await this.performAction(() => this.uploadDialog.selectTemplateAccountByIndex(index));
+    }
+
     /** Create new import template */
     async createTemplate() {
         this.checkUploadState();
@@ -561,7 +579,26 @@ export class ImportView extends AppView {
     async submitTemplate() {
         this.checkUploadState();
 
+        const template = this.getExpectedTemplate();
+        const updateMainAccount = (
+            this.uploadDialog.isValidTemplate()
+            && template?.account_id
+            && this.model.mainAccount !== template.account_id
+        );
+
+        if (updateMainAccount) {
+            this.model.mainAccount = template.account_id;
+        }
+        this.expectedState = this.getExpectedState();
+        if (updateMainAccount) {
+            this.items.forEach((item) => item.setMainAccount(template.account_id));
+        }
+        const expectedList = this.getExpectedList();
+        this.expectedState.itemsList.items = expectedList.items;
+
         await this.performAction(() => this.uploadDialog.submitTemplate());
+
+        return this.checkState();
     }
 
     /** Cancel create/update template */

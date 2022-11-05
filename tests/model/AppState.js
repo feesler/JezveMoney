@@ -923,8 +923,15 @@ export class AppState {
             return false;
         }
 
-        if (typeof params.name !== 'string' || params.name === '') {
+        if (typeof params.name !== 'string' || params.name.length === 0) {
             return false;
+        }
+
+        if ('account_id' in params) {
+            const account = this.accounts.getItem(params.account_id);
+            if (!account || account.owner_id !== this.profile.owner_id) {
+                return false;
+            }
         }
 
         if (

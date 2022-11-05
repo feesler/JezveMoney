@@ -78,6 +78,10 @@
   overflow: hidden;
 }
 
+.tpl-account-field {
+  row-gap: 5px;
+}
+
 .validation-block.invalid-block .tpl-name-inp {
   border-color: #ff0000;
 }

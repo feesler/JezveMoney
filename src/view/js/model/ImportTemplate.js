@@ -23,7 +23,7 @@ export class ImportTemplate extends ListItem {
      * @param {string} field - field name to check
      */
     isAvailField(field) {
-        const availFields = ['id', 'name', 'type_id', 'first_row', 'columns'];
+        const availFields = ['id', 'name', 'account_id', 'type_id', 'first_row', 'columns'];
 
         return typeof field === 'string' && availFields.includes(field);
     }

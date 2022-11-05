@@ -105,6 +105,13 @@ export class ImportUploadDialog extends TestComponent {
         res.decFirstRowBtn.disabled = await prop(res.decFirstRowBtn.elem, 'disabled');
         res.incFirstRowBtn.disabled = await prop(res.incFirstRowBtn.elem, 'disabled');
 
+        // Template account field
+        res.tplAccountField = { elem: await query('#tplAccountField') };
+        res.tplAccountCheck = await Checkbox.create(this, await query(this.elem, '#tplAccountCheck'));
+        const tplAccountSelElem = await query(this.elem, '#tplAccountCheck + .dd__container');
+        res.tplAccountSel = await DropDown.create(this, tplAccountSelElem);
+        assert(res.tplAccountField.elem && res.tplAccountSel, 'Invalid template account field');
+
         // Template column field
         res.columnField = { elem: await query('#columnField') };
         res.columnSel = { elem: await query('#columnSel') };
@@ -218,6 +225,9 @@ export class ImportUploadDialog extends TestComponent {
         ) {
             res.template.name = cont.tplNameInp.value;
             res.template.first_row = parseInt(cont.firstRowInp.value, 10);
+            res.template.account_id = (cont.tplAccountCheck.checked)
+                ? parseInt(cont.tplAccountSel.value, 10)
+                : 0;
 
             res.template.columns = {};
             if (Array.isArray(cont.columns)) {
@@ -345,6 +355,18 @@ export class ImportUploadDialog extends TestComponent {
                 visible: true,
                 disabled: false,
             };
+
+            const useAccount = !!model.template.account_id;
+            res.tplAccountCheck = {
+                visible: true,
+                checked: useAccount,
+            };
+            res.tplAccountSel = {
+                visible: useAccount,
+            };
+            if (useAccount) {
+                res.tplAccountSel.value = model.template.account_id.toString();
+            }
         } else if (model.state === RAW_DATA_STATE) {
             res.fileBlock = { visible: false };
             res.templateBlock = { visible: true };
@@ -397,7 +419,7 @@ export class ImportUploadDialog extends TestComponent {
         return res;
     }
 
-    isValidTemplate(template) {
+    isValidTemplate(template = this.model.template) {
         if (!template || !template.columns) {
             return false;
         }
@@ -477,11 +499,15 @@ export class ImportUploadDialog extends TestComponent {
             const template = this.findValidTemplate(this.parent.fileData);
             if (template) {
                 this.model.template = template;
+                if (template.account_id) {
+                    this.model.initialAccount = App.state.accounts.getItem(template.account_id);
+                }
             }
         } else {
             this.model.state = CREATE_TPL_STATE;
             this.model.template = {
                 name: '',
+                account_id: 0,
                 first_row: 2,
                 columns: {},
             };
@@ -655,13 +681,53 @@ export class ImportUploadDialog extends TestComponent {
         return this.checkState();
     }
 
+    async toggleTemplateAccount() {
+        this.checkTplFormState();
+
+        if (this.model.template.account_id) {
+            this.model.template.account_id = 0;
+        } else {
+            const account = App.state.getFirstAccount();
+            this.model.template.account_id = account.id;
+        }
+        this.expectedState = this.getExpectedState(this.model);
+
+        await this.content.tplAccountCheck.toggle();
+        await this.parse();
+
+        return this.checkState();
+    }
+
+    async selectTemplateAccountById(val) {
+        this.checkTplFormState();
+
+        const account = App.state.accounts.getItem(val);
+        this.model.template.account_id = account.id;
+        this.expectedState = this.getExpectedState(this.model);
+
+        await this.content.tplAccountSel.selectItem(val);
+        await this.parse();
+
+        return this.checkState();
+    }
+
+    async selectTemplateAccountByIndex(index) {
+        const [itemId] = App.state.getAccountsByIndexes(index, true);
+        return this.selectTemplateAccountById(itemId);
+    }
+
     async submitTemplate() {
         const disabled = await prop(this.content.submitTplBtn.elem, 'disabled');
         assert(!disabled, 'Submit template button is disabled');
 
-        const isValid = this.isValidTemplate(this.model.template);
+        const { template } = this.model;
+        const isValid = this.isValidTemplate(template);
         if (isValid) {
             this.model.state = RAW_DATA_STATE;
+
+            if (template.account_id) {
+                this.model.initialAccount = App.state.accounts.getItem(template.account_id);
+            }
         }
         this.expectedState = this.getExpectedState(this.model);
 
