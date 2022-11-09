@@ -153,6 +153,7 @@ class TransactionListView extends View {
         this.loadingIndicator = LoadingIndicator.create();
         this.listContainer.append(this.loadingIndicator.elem);
 
+        // List mode selected
         const listHeader = document.querySelector('.list-header');
         this.modeSelector = LinkMenu.create({
             className: 'mode-selector',
@@ -163,14 +164,9 @@ class TransactionListView extends View {
             ],
             onChange: (mode) => this.onModeChanged(mode),
         });
+        listHeader.append(this.modeSelector.elem);
 
-        const paginatorOptions = {
-            onChange: (page) => this.onChangePage(page),
-        };
-
-        this.topPaginator = Paginator.create(paginatorOptions);
-        listHeader.append(this.modeSelector.elem, this.topPaginator.elem);
-
+        // Transactions list
         this.list = TransactionList.create({
             listMode: 'list',
             onItemClick: (id, e) => this.onItemClick(id, e),
@@ -178,9 +174,13 @@ class TransactionListView extends View {
         });
         insertAfter(this.list.elem, listHeader);
 
+        // Paginator
         const listFooter = document.querySelector('.list-footer');
-        this.bottomPaginator = Paginator.create(paginatorOptions);
-        listFooter.append(this.bottomPaginator.elem);
+        this.paginator = Paginator.create({
+            arrows: true,
+            onChange: (page) => this.onChangePage(page),
+        });
+        listFooter.append(this.paginator.elem);
 
         this.createBtn = ge('add_btn');
         this.createMenu();
@@ -744,19 +744,14 @@ class TransactionListView extends View {
             renderTime: Date.now(),
         }));
 
-        if (this.topPaginator && this.bottomPaginator) {
-            const setPaginatorState = (paginatorState) => ({
+        if (this.paginator) {
+            this.paginator.show(state.items.length > 0);
+            this.paginator.setState((paginatorState) => ({
                 ...paginatorState,
                 url: filterUrl,
                 pagesCount: state.pagination.pagesCount,
                 pageNum: state.pagination.page,
-            });
-
-            this.topPaginator.show(state.items.length > 0);
-            this.topPaginator.setState(setPaginatorState);
-
-            this.bottomPaginator.show(state.items.length > 0);
-            this.bottomPaginator.setState(setPaginatorState);
+            }));
         }
 
         filterUrl.searchParams.set('page', state.pagination.page);

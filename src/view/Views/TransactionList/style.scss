@@ -81,7 +81,8 @@
 }
 
 /* Footer and header rows */
-.paginator-row {
+.list-header,
+.list-footer {
   display: flex;
   flex-flow: row wrap;
   justify-content: space-between;
@@ -90,7 +91,7 @@
 /* Mode selector */
 .mode-selector {
   align-items: center;
-  padding: 5px 0;
+  padding: 8px 0;
 
   .link-menu-item {
     padding: 0;

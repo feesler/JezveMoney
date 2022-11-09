@@ -83,8 +83,8 @@ include(TPL_PATH . "Header.tpl"); ?>
                     </div>
 
                     <div class="list-container">
-                        <div class="paginator-row list-header"></div>
-                        <div class="paginator-row list-footer"></div>
+                        <div class="list-header"></div>
+                        <div class="list-footer"></div>
                     </div>
                 </div>
             </div>
