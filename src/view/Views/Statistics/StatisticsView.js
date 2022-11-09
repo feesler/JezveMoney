@@ -128,6 +128,7 @@ class StatisticsView extends View {
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
             multiple: true,
+            placeholder: 'Select account',
             onitemselect: (obj) => this.onAccountSel(obj),
             onchange: (obj) => this.onAccountSel(obj),
             className: 'dd_fullwidth',
