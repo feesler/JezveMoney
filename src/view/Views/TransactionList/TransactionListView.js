@@ -434,7 +434,7 @@ class TransactionListView extends View {
      * @param {object} obj - selection object
      */
     onAccountChange(obj) {
-        const data = Array.isArray(obj) ? obj : [obj];
+        const data = asArray(obj);
         const ids = data.map((item) => parseInt(item.id, 10));
         const filterIds = this.state.form.acc_id ?? [];
 

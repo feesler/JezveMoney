@@ -11,6 +11,13 @@ const availTransTypes = {
     [DEBT]: 'debt',
 };
 
+const transTitles = {
+    [EXPENSE]: 'Expense',
+    [INCOME]: 'Income',
+    [TRANSFER]: 'Transfer',
+    [DEBT]: 'Debt',
+};
+
 export class Transaction {
     /** Return string for specified transaction type */
     static getTypeString(value) {
@@ -20,5 +27,15 @@ export class Transaction {
         }
 
         return availTransTypes[type];
+    }
+
+    /** Return title string for specified transaction type */
+    static getTypeTitle(value) {
+        const type = parseInt(value, 10);
+        if (!transTitles[type]) {
+            return null;
+        }
+
+        return transTitles[type];
     }
 }

@@ -167,8 +167,10 @@ class Transaction extends ApiListController
         $filterObj = $this->model->getHistogramFilters($request);
 
         $byCurrency = $filterObj->report == "currency";
-        $params["report"] = $filterObj->report;
-        $params["type"] = $filterObj->type;
+        $params = [
+            "report" => $filterObj->report,
+            "type" => $filterObj->type,
+        ];
 
         if ($byCurrency) {
             $params["curr_id"] = $filterObj->curr_id;

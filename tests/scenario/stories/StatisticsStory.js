@@ -25,6 +25,8 @@ export class StatisticsStory extends TestStory {
     async run() {
         setBlock('Statistics', 1);
 
+        const { ACC_3, ACC_RUB, ACC_EUR } = App.scenario;
+
         await App.view.navigateToStatistics();
 
         await StatisticsTests.checkInitialState();
@@ -34,7 +36,9 @@ export class StatisticsStory extends TestStory {
         await StatisticsTests.filterByType(DEBT);
         // Filter by accounts
         await StatisticsTests.filterByType(EXPENSE);
-        await StatisticsTests.selectAccountByPos(2);
+        await StatisticsTests.filterByAccounts(ACC_EUR);
+        await StatisticsTests.filterByAccounts([ACC_3, ACC_RUB]);
+        await StatisticsTests.filterByAccounts(ACC_3);
         // Test grouping
         await StatisticsTests.filterByType(DEBT);
         await StatisticsTests.groupByDay();

@@ -541,12 +541,9 @@ export class TransactionListView extends AppView {
         return App.view.checkState(expected);
     }
 
-    async setFilterSelection(dropDown, ids) {
+    async setFilterSelection(dropDown, itemIds) {
+        const ids = asArray(itemIds);
         const selection = this.content[dropDown].getSelectedValues();
-        if (selection.length === 0 && ids.length === 0) {
-            return;
-        }
-
         if (selection.length > 0) {
             await this.waitForList(() => this.content[dropDown].clearSelection());
         }
@@ -561,7 +558,7 @@ export class TransactionListView extends AppView {
         await this.performAction(() => this.content[dropDown].showList(false));
     }
 
-    async filterByAccounts(accounts, directNavigate = false) {
+    async filterByAccounts(ids, directNavigate = false) {
         assert(App.state.accounts.length > 0, 'No accounts available');
 
         if (directNavigate) {
@@ -570,6 +567,7 @@ export class TransactionListView extends AppView {
             await this.openFilters();
         }
 
+        const accounts = asArray(ids);
         this.model.filter.accounts = accounts;
         const expected = this.onFilterUpdate();
 
@@ -582,7 +580,7 @@ export class TransactionListView extends AppView {
         return App.view.checkState(expected);
     }
 
-    async filterByPersons(persons, directNavigate = false) {
+    async filterByPersons(ids, directNavigate = false) {
         assert(App.state.persons.length > 0, 'No persons available');
 
         if (directNavigate) {
@@ -591,6 +589,7 @@ export class TransactionListView extends AppView {
             await this.openFilters();
         }
 
+        const persons = asArray(ids);
         this.model.filter.persons = persons;
         const expected = this.onFilterUpdate();
 

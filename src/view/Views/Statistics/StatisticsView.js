@@ -4,6 +4,7 @@ import {
     createElement,
     insertAfter,
     show,
+    asArray,
 } from 'jezvejs';
 import { Histogram } from 'jezvejs/Histogram';
 import { DropDown } from 'jezvejs/DropDown';
@@ -19,8 +20,11 @@ import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/Transa
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import './style.scss';
+import { Transaction } from '../../js/model/Transaction.js';
 
 /** CSS classes */
+const POPUP_CONTENT_CLASS = 'chart-popup__content';
+const POPUP_HEADER_CLASS = 'chart-popup__header';
 const POPUP_LIST_CLASS = 'chart-popup-list';
 const POPUP_LIST_ITEM_CLASS = 'chart-popup-list__item';
 const POPUP_LIST_VALUE_CLASS = 'chart-popup-list__value';
@@ -64,6 +68,13 @@ class StatisticsView extends View {
 
         window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
+        window.app.checkUserAccountModels();
+
+        const accounts = asArray(this.state.filter.acc_id);
+        if (this.state.filter.report === 'account' && accounts.length === 0) {
+            const account = window.app.model.userAccounts.getItemByIndex(0);
+            this.state.filter.acc_id = [account.id];
+        }
     }
 
     /**
@@ -79,6 +90,9 @@ class StatisticsView extends View {
             scrollToEnd: true,
             autoScale: true,
             scrollThrottle: 100,
+            barWidth: 45,
+            columnGap: 3,
+            stacked: true,
             showPopup: true,
             activateOnHover: true,
             renderPopup: (target) => this.renderPopupContent(target),
@@ -109,24 +123,16 @@ class StatisticsView extends View {
             onitemselect: (obj) => this.onCurrencySel(obj),
             className: 'dd_fullwidth',
         });
-
         window.app.initCurrencyList(this.currencyDropDown);
-
-        if (this.state.filter.curr_id) {
-            this.currencyDropDown.selectItem(this.state.filter.curr_id);
-        }
 
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
+            multiple: true,
             onitemselect: (obj) => this.onAccountSel(obj),
+            onchange: (obj) => this.onAccountSel(obj),
             className: 'dd_fullwidth',
         });
-
         window.app.initAccountsList(this.accountDropDown);
-
-        if (this.state.filter.acc_id) {
-            this.accountDropDown.selectItem(this.state.filter.acc_id);
-        }
 
         this.groupDropDown = DropDown.create({
             elem: 'groupsel',
@@ -141,6 +147,7 @@ class StatisticsView extends View {
             onChange: (data) => this.onChangeDateFilter(data),
         });
 
+        this.render(this.state);
         this.requestData(this.state.filter);
     }
 
@@ -233,24 +240,32 @@ class StatisticsView extends View {
         this.requestData(this.state.form);
     }
 
+    isSameSelection(a, b) {
+        return a.length === b.length && a.every((id) => b.includes(id));
+    }
+
     /**
      * Account select callback
      * @param {object} obj - selected account item
      */
     onAccountSel(obj) {
-        if (!obj) {
+        const data = asArray(obj);
+        const ids = data.map((item) => parseInt(item.id, 10));
+        const filterIds = this.state.form.acc_id ?? [];
+
+        if (this.isSameSelection(ids, filterIds)) {
             return;
         }
-        if (this.state.form.acc_id === obj.id) {
-            return;
-        }
+
+        const account = window.app.model.userAccounts.getItem(ids[0]);
 
         this.setState({
             ...this.state,
             form: {
                 ...this.state.form,
-                acc_id: obj.id,
+                acc_id: ids,
             },
+            accountCurrency: account?.curr_id ?? 0,
         });
 
         this.requestData(this.state.form);
@@ -341,14 +356,8 @@ class StatisticsView extends View {
         );
     }
 
-    /** Returns content of chart popup for specified target */
-    renderPopupContent(target) {
-        if (!target) {
-            return null;
-        }
-
-        const items = target.group ?? [target.item];
-        const elems = items.map((item) => createElement('li', {
+    renderPopupListItem(item) {
+        return createElement('li', {
             props: { className: POPUP_LIST_ITEM_CLASS },
             children: createElement('span', {
                 props: {
@@ -356,11 +365,59 @@ class StatisticsView extends View {
                     textContent: this.formatItemValue(item),
                 },
             }),
-        }));
+        });
+    }
 
-        return createElement('ul', {
+    /** Returns content of chart popup for specified target */
+    renderPopupContent(target) {
+        if (!target) {
+            return null;
+        }
+
+        const items = target.group ?? [target.item];
+        const listItems = [];
+        items.forEach((item) => {
+            if (item.columnIndex !== target.item.columnIndex) {
+                return;
+            }
+
+            listItems.push(this.renderPopupListItem(item));
+        });
+
+        const list = createElement('ul', {
             props: { className: POPUP_LIST_CLASS },
-            children: elems,
+            children: listItems,
+        });
+        const headerTitle = Transaction.getTypeTitle(target.item.groupName);
+        const header = createElement('ul', {
+            props: { className: POPUP_HEADER_CLASS, textContent: headerTitle },
+        });
+
+        return createElement('div', {
+            props: { className: POPUP_CONTENT_CLASS },
+            children: [header, list],
+        });
+    }
+
+    renderAccountsFilter(state, prevState = {}) {
+        const ids = state.form?.acc_id ?? [];
+        const filterIds = prevState?.form?.acc_id ?? [];
+        if (this.isSameSelection(ids, filterIds)) {
+            return;
+        }
+
+        window.app.model.userAccounts.forEach((account) => {
+            const enable = (
+                state.accountCurrency === 0
+                || account.curr_id === state.accountCurrency
+            );
+            this.accountDropDown.enableItem(account.id, enable);
+
+            if (enable && ids.includes(account.id)) {
+                this.accountDropDown.selectItem(account.id);
+            } else {
+                this.accountDropDown.deselectItem(account.id);
+            }
         });
     }
 
@@ -384,9 +441,8 @@ class StatisticsView extends View {
         show(this.accountField, !isByCurrency);
         show(this.currencyField, isByCurrency);
 
-        if (state.form.acc_id) {
-            this.accountDropDown.selectItem(state.form.acc_id);
-        }
+        this.renderAccountsFilter(state, prevState);
+
         if (state.form.curr_id) {
             this.currencyDropDown.selectItem(state.form.curr_id);
         }

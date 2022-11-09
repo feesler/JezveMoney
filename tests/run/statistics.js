@@ -23,8 +23,8 @@ export const byCurrencies = async () => {
     await test('Show report by currencies', () => App.view.byCurrencies());
 };
 
-export const selectAccountByPos = async (pos) => {
-    await test(`Select account [${pos}]`, () => App.view.selectAccountByPos(pos));
+export const filterByAccounts = async (accounts) => {
+    await test(`Filter by accounts [${accounts}]`, () => App.view.filterByAccounts(accounts));
 };
 
 export const groupByDay = async () => {
