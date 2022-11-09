@@ -1253,6 +1253,14 @@ class TransactionModel extends CachedTable
             }
         }
 
+        // Pages range
+        if (isset($request["range"])) {
+            $range = intval($request["range"]);
+            if ($range > 0) {
+                $res["range"] = $range;
+            }
+        }
+
         return $res;
     }
 
@@ -1385,6 +1393,7 @@ class TransactionModel extends CachedTable
     //   desc - sort result descending
     //   onPage - count of transactions per page.
     //   page - page to return. zero based
+    //   range - count of pages to return. Default is 1
     public function getData($params = null)
     {
         if (is_null($params)) {
@@ -1424,14 +1433,18 @@ class TransactionModel extends CachedTable
         $orderAndLimit = "pos " . (($isDesc == true) ? "DESC" : "ASC");
 
         // Pagination conditions
-        $tr_on_page = isset($params["onPage"]) ? intval($params["onPage"]) : 0;
-        if ($tr_on_page > 0) {
-            $page_num = isset($params["page"]) ? intval($params["page"]) : 0;
+        $onPage = isset($params["onPage"]) ? intval($params["onPage"]) : 0;
+        if ($onPage > 0) {
+            $pageNum = isset($params["page"]) ? intval($params["page"]) : 0;
+            $pagesRange = isset($params["range"]) ? intval($params["range"]) : 1;
+            if ($pagesRange < 1) {
+                $pagesRange = 1;
+            }
 
             $transCount = $this->dbObj->countQ($this->tbl_name, $condArr);
 
-            $limitOffset = ($tr_on_page * $page_num);
-            $limitRows = min($transCount - $limitOffset, $tr_on_page);
+            $limitOffset = ($onPage * $pageNum);
+            $limitRows = min($transCount - $limitOffset, $onPage * $pagesRange);
 
             $orderAndLimit .= " LIMIT " . $limitOffset . ", " . $limitRows;
         }

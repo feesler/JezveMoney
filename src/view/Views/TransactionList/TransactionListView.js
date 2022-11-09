@@ -1,6 +1,7 @@
 import 'jezvejs/style';
 import {
     ge,
+    createElement,
     show,
     insertAfter,
     throttle,
@@ -39,6 +40,8 @@ const TITLE_DETAILS = 'Details';
 /* Date range input */
 const START_DATE_PLACEHOLDER = 'From';
 const END_DATE_PLACEHOLDER = 'To';
+/* 'Show more' button */
+const TITLE_SHOW_MORE = 'Show more...';
 
 const SEARCH_THROTTLE = 300;
 
@@ -163,8 +166,19 @@ class TransactionListView extends View {
         });
         insertAfter(this.list.elem, listHeader);
 
-        // Paginator
         const listFooter = document.querySelector('.list-footer');
+        // 'Show more' button
+        this.showMoreBtn = createElement('button', {
+            props: {
+                className: 'btn show-more-btn',
+                type: 'button',
+                textContent: TITLE_SHOW_MORE,
+            },
+            events: { click: (e) => this.showMore(e) },
+        });
+        listFooter.append(this.showMoreBtn);
+
+        // Paginator
         this.paginator = Paginator.create({
             arrows: true,
             onChange: (page) => this.onChangePage(page),
@@ -520,6 +534,21 @@ class TransactionListView extends View {
         this.requestTransactions(this.state.form);
     }
 
+    showMore() {
+        const { page } = this.state.pagination;
+        let { range } = this.state.pagination;
+        if (!range) {
+            range = 1;
+        }
+        range += 1;
+
+        this.requestTransactions({
+            ...this.state.form,
+            range,
+            page,
+        });
+    }
+
     onChangePage(page) {
         this.requestTransactions({
             ...this.state.form,
@@ -711,13 +740,19 @@ class TransactionListView extends View {
 
         if (this.paginator) {
             this.paginator.show(state.items.length > 0);
+            const range = state.pagination.range ?? 1;
             this.paginator.setState((paginatorState) => ({
                 ...paginatorState,
                 url: filterUrl,
                 pagesCount: state.pagination.pagesCount,
-                pageNum: state.pagination.page,
+                pageNum: state.pagination.page + range - 1,
             }));
         }
+
+        show(
+            this.showMoreBtn,
+            state.items.length > 0 && state.pagination.page < state.pagination.pagesCount,
+        );
 
         filterUrl.searchParams.set('page', state.pagination.page);
         this.modeSelector.show(state.items.length > 0);

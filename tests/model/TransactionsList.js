@@ -272,23 +272,24 @@ export class TransactionsList extends List {
         return new TransactionsList(items);
     }
 
-    getItemsPage(list, num, limit) {
-        const pageLimit = (typeof limit !== 'undefined') ? limit : App.config.transactionsOnPage;
+    getItemsPage(list, num, limit, range) {
+        const onPage = (typeof limit !== 'undefined') ? limit : App.config.transactionsOnPage;
+        const pagesRange = (typeof range !== 'undefined') ? range : 1;
 
-        const totalPages = this.getExpectedPages(list, pageLimit);
+        const totalPages = this.getExpectedPages(list, onPage);
         assert(num >= 1 && num <= totalPages, `Invalid page number: ${num}`);
 
-        const offset = (num - 1) * pageLimit;
+        const offset = (num - 1) * onPage;
 
         const res = copyObject(list);
 
         res.sort((a, b) => a.pos - b.pos);
 
-        return res.slice(offset, Math.min(offset + pageLimit, res.length));
+        return res.slice(offset, Math.min(offset + onPage * pagesRange, res.length));
     }
 
-    getPage(num, limit) {
-        const items = this.getItemsPage(this.data, num, limit);
+    getPage(num, limit, range) {
+        const items = this.getItemsPage(this.data, num, limit, range);
         if (items === this.data) {
             return this;
         }
@@ -309,10 +310,7 @@ export class TransactionsList extends List {
         if ('accounts' in params || 'persons' in params) {
             const filterAccounts = [];
             if ('persons' in params) {
-                const personsFilter = Array.isArray(params.persons)
-                    ? params.persons
-                    : [params.persons];
-
+                const personsFilter = asArray(params.persons);
                 personsFilter.forEach((personId) => {
                     const personAccounts = App.state.getPersonAccounts(personId);
                     if (personAccounts.length > 0) {
@@ -324,10 +322,7 @@ export class TransactionsList extends List {
             }
 
             if ('accounts' in params) {
-                const accountsFilter = Array.isArray(params.accounts)
-                    ? params.accounts
-                    : [params.accounts];
-
+                const accountsFilter = asArray(params.accounts);
                 filterAccounts.push(...accountsFilter);
             }
 

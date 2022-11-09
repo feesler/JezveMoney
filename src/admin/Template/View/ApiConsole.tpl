@@ -332,11 +332,27 @@
             </div>
             <div class="std_margin">
                 <label class="checkbox">
+                    <input type="checkbox" data-target="range">
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
+                    <span class="checkbox__label">Pages range</span>
+                </label>
+                <input id="list_trans_range" class="stretch-input" name="range" type="text" value="1" disabled>
+            </div>
+            <div class="std_margin">
+                <label class="checkbox">
                     <input type="checkbox" data-target="acc_id">
                     <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Account ids</span>
                 </label>
                 <input id="list_trans_accounts" class="stretch-input" name="acc_id" type="text" value="0" disabled>
+            </div>
+            <div class="std_margin">
+                <label class="checkbox">
+                    <input type="checkbox" data-target="person_id">
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
+                    <span class="checkbox__label">Person ids</span>
+                </label>
+                <input id="list_trans_persons" class="stretch-input" name="person_id" type="text" value="0" disabled>
             </div>
             <div class="std_margin">
                 <label class="checkbox">

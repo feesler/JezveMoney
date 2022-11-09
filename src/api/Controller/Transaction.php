@@ -104,6 +104,9 @@ class Transaction extends ApiListController
             "pagesCount" => $pagesCount,
             "page" => $currentPage
         ];
+        if (isset($request["range"])) {
+            $res->pagination["range"] = intval($request["range"]);
+        }
 
         $this->ok($res);
     }

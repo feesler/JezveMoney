@@ -110,6 +110,7 @@ export class TransactionListView extends AppView {
 
         res.modeSelector = await LinkMenu.create(this, await query('.mode-selector'));
         res.paginator = await Paginator.create(this, await query('.paginator'));
+        res.showMoreBtn = { elem: await query('.show-more-btn') };
 
         res.title = await prop(res.titleEl, 'textContent');
         res.transList = await TransactionList.create(this, transList);
@@ -179,6 +180,13 @@ export class TransactionListView extends AppView {
                 pages: cont.paginator.pages,
                 items: cont.transList.getItems(),
             };
+
+            if (res.list.items.length > App.config.transactionsOnPage) {
+                const range = Math.ceil(res.list.items.length / App.config.transactionsOnPage);
+                res.list.range = range;
+                res.list.page -= range - 1;
+            }
+
             res.renderTime = cont.transList.content.renderTime;
         } else {
             res.list = {
@@ -293,6 +301,7 @@ export class TransactionListView extends AppView {
 
         res.filtered = res.data.applyFilter(res.filter);
         res.list.page = page;
+        delete res.list.range;
         const pageItems = res.filtered.getPage(page);
         res.list.items = TransactionList.render(pageItems.data, App.state);
 
@@ -301,6 +310,29 @@ export class TransactionListView extends AppView {
 
     onPageChanged(page) {
         this.model = this.setModelPage(this.model, page);
+        return this.setExpectedState();
+    }
+
+    setModelRange(model, range) {
+        assert(
+            range >= 1
+            && range <= model.list.pages - model.list.page,
+            `Invalid pages range ${range}`,
+        );
+
+        const res = this.cloneModel(model);
+        const onPage = App.config.transactionsOnPage;
+
+        res.filtered = res.data.applyFilter(res.filter);
+        res.list.range = range;
+        const pageItems = res.filtered.getPage(model.list.page, onPage, range);
+        res.list.items = TransactionList.render(pageItems.data, App.state);
+
+        return res;
+    }
+
+    onRangeChanged(range) {
+        this.model = this.setModelRange(this.model, range);
         return this.setExpectedState();
     }
 
@@ -342,6 +374,7 @@ export class TransactionListView extends AppView {
                 visible: isFiltersVisible,
             },
             modeSelector: { visible: isItemsAvailable },
+            showMoreBtn: { visible: isItemsAvailable && model.list.page < model.list.pages },
             paginator: { visible: isItemsAvailable },
             transList: { visible: true },
             listMenuContainer: { visible: isItemsAvailable },
@@ -395,7 +428,7 @@ export class TransactionListView extends AppView {
             res.paginator = {
                 ...res.paginator,
                 pages: model.list.pages,
-                active: model.list.page,
+                active: model.list.page + this.currentRange(model) - 1,
             };
 
             res.modeSelector = {
@@ -741,6 +774,10 @@ export class TransactionListView extends AppView {
         return (this.content.paginator) ? this.content.paginator.active : 1;
     }
 
+    currentRange(model = this.model) {
+        return model.list?.range ?? 1;
+    }
+
     pagesCount() {
         return (this.content.paginator) ? this.content.paginator.pages : 1;
     }
@@ -858,6 +895,16 @@ export class TransactionListView extends AppView {
         }
 
         return App.view.checkState(expected);
+    }
+
+    async showMore() {
+        assert(!this.isLastPage(), 'Can\'t show more items');
+
+        const expected = this.onRangeChanged(this.currentRange() + 1);
+
+        await this.waitForList(() => click(this.content.showMoreBtn.elem));
+
+        return this.checkState(expected);
     }
 
     async iteratePages() {
