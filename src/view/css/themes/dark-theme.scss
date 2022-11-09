@@ -192,7 +192,8 @@
     color: var(--main-text-color);
   }
 
-  .filter-icon {
+  .filter-icon,
+  .toggle-icon {
     fill: var(--main-text-color);
   }
 
@@ -216,6 +217,12 @@
 
   .trans-item_details .field__title {
     color: #858585;
+  }
+
+  /* 'Show more' button */
+  .show-more-btn {
+    color: var(--main-text-color);
+    background-color: #3c3c3c;
   }
 
   /* Bar chart */
@@ -492,6 +499,11 @@
       .iconbutton__icon-content {
         fill: #202020;
       }
+    }
+
+    /* 'Show more' button */
+    .show-more-btn:hover {
+      background-color: #4a4a4a;
     }
 
     .filters-collapsible .collapsible-header:hover {

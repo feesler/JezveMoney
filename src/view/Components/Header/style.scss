@@ -156,8 +156,8 @@
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  padding: 24px 24px 12px 24px;
   justify-content: space-between;
+  height: 40px;
 }
 
 .theme-switch__label {
@@ -245,11 +245,15 @@
   padding: 24px;
   height: 100%;
   list-style-type: none;
-  gap: 0.5rem;
 }
 
 a.nav-link,
 a.nav-link:visited {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  height: 40px;
   font-size: 1.15rem;
   font-weight: 300;
   text-decoration: none;

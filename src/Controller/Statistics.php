@@ -107,7 +107,9 @@ class Statistics extends TemplateController
         if ($byCurrency) {
             $accCurr = $filterObj->curr_id;
         } else {
-            $account = $accMod->getItem($filterObj->acc_id);
+            $account = (is_array($filterObj->acc_id) && count($filterObj->acc_id) > 0)
+                ? $accMod->getItem($filterObj->acc_id[0])
+                : null;
             $accCurr = ($account) ? $account->curr_id : 0;
         }
 

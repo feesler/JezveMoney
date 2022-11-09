@@ -78,6 +78,12 @@ export class StatisticsView extends AppView {
         return res;
     }
 
+    getDropDownFilter(dropDown) {
+        return (dropDown)
+            ? dropDown.getSelectedValues().map((item) => parseInt(item, 10))
+            : [];
+    }
+
     async buildModel(cont) {
         const res = {};
 
@@ -101,11 +107,7 @@ export class StatisticsView extends AppView {
 
             res.filter.curr_id = currency.id;
         } else {
-            const [selectedAccount] = cont.accountsDropDown.getSelectedValues();
-            const account = App.state.accounts.getItem(selectedAccount);
-            assert(account, 'Account not found');
-
-            res.filter.acc_id = account.id;
+            res.filter.accounts = this.getDropDownFilter(cont.accountsDropDown);
         }
 
         const [selectedGroup] = cont.groupDropDown.getSelectedValues();
@@ -166,10 +168,12 @@ export class StatisticsView extends AppView {
                 textValue: currency.name,
             };
         } else {
-            const account = App.state.accounts.getItem(this.model.filter.acc_id);
             res.accountsDropDown = {
                 visible: true,
-                textValue: account.name,
+                isMulti: true,
+                selectedItems: this.model.filter.accounts.map(
+                    (accountId) => ({ id: accountId.toString() }),
+                ),
             };
         }
 
@@ -182,7 +186,7 @@ export class StatisticsView extends AppView {
         if (byCurrency) {
             params.curr_id = this.model.filter.curr_id;
         } else {
-            params.acc_id = this.model.filter.acc_id;
+            params.acc_id = this.model.filter.accounts;
         }
 
         if (this.model.filter.startDate && this.model.filter.endDate) {
@@ -256,7 +260,7 @@ export class StatisticsView extends AppView {
         delete this.model.filter.curr_id;
 
         const account = App.state.getFirstAccount();
-        this.model.filter.acc_id = account.id;
+        this.model.filter.accounts = account.id;
         const expected = this.getExpectedState();
 
         await this.waitForData(() => this.content.reportMenu.selectItemByValue('account'));
@@ -266,7 +270,7 @@ export class StatisticsView extends AppView {
 
     async byCurrencies() {
         this.model.filter.byCurrency = true;
-        delete this.model.filter.acc_id;
+        delete this.model.filter.accounts;
 
         const currency = App.currency.getItemByIndex(0);
         this.model.filter.curr_id = currency.id;
@@ -277,21 +281,33 @@ export class StatisticsView extends AppView {
         return App.view.checkState(expected);
     }
 
-    async selectAccount(accountId) {
-        assert(this.content.accountsDropDown, 'Account drop down control not found');
+    async setFilterSelection(dropDown, itemIds) {
+        const ids = asArray(itemIds);
+        const selection = this.content[dropDown].getSelectedValues();
+        if (selection.length > 0) {
+            await this.waitForData(() => this.content[dropDown].clearSelection());
+        }
+        if (ids.length === 0) {
+            return;
+        }
 
-        this.model.filter.acc_id = parseInt(accountId, 10);
-        const expected = this.getExpectedState();
+        for (const id of ids) {
+            await this.waitForData(() => this.content[dropDown].selectItem(id));
+        }
 
-        await this.waitForData(() => this.content.accountsDropDown.setSelection(accountId));
-
-        return App.view.checkState(expected);
+        await this.performAction(() => this.content[dropDown].showList(false));
     }
 
-    selectAccountByPos(pos) {
-        assert(this.content.accountsDropDown, 'Account drop down control not found');
+    async filterByAccounts(ids) {
+        assert(App.state.accounts.length > 0, 'No accounts available');
 
-        return this.selectAccount(this.content.accountsDropDown.content.items[pos].id);
+        const accounts = asArray(ids);
+        this.model.filter.accounts = accounts;
+        const expected = this.getExpectedState();
+
+        await this.setFilterSelection('accountsDropDown', accounts);
+
+        return App.view.checkState(expected);
     }
 
     async selectCurrency(currencyId) {

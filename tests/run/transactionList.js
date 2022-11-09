@@ -33,12 +33,26 @@ export const checkInitialState = async (directNavigate = false) => {
     await test('Initial state of transaction list view', () => App.view.checkState());
 };
 
+export const goToFirstPage = async (directNavigate = false) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Navigate to first page', () => App.view.goToFirstPage(directNavigate));
+};
+
 export const goToNextPage = async (directNavigate = false) => {
     if (!directNavigate) {
         await checkNavigation();
     }
 
     await test('Navigate to next page', () => App.view.goToNextPage(directNavigate));
+};
+
+export const showMore = async () => {
+    await checkNavigation();
+
+    await test('Show more transactions', () => App.view.showMore());
 };
 
 export const setDetailsMode = async (directNavigate = false) => {

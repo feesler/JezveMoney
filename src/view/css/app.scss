@@ -550,21 +550,28 @@ label {
 
 /* Paginator */
 .paginator {
+  margin-left: auto;
+  margin-right: auto;
+  padding: 16px 0;
   gap: 2px;
 }
 
 .paginator-item {
-  padding: 0.25rem 0.5rem;
+  padding: 0.5rem 0.75rem;
   margin: 0;
   text-decoration: none;
   border: 0 none;
   border-radius: 3px;
-  color: #447fd6;
+}
+
+a.paginator-item,
+a.paginator-item:visited {
+  color: var(--accent-color);
 }
 
 .paginator-arrow {
   width: fit-content;
-  fill: #447fd6;
+  fill: var(--accent-color-alt);
 }
 
 .paginator-arrow[disabled] {
@@ -573,7 +580,7 @@ label {
 
 .paginator-item__active {
   font-weight: normal;
-  background-color: #006cbd;
+  background-color: var(--accent-color-alt);
   color: #ffffff;
 }
 
@@ -616,22 +623,22 @@ a.paginator-arrow:focus-visible {
   --charts-active-color-4: #fcf93d;
 }
 
-.histogram__bar {
+.histogram_category-1 {
   --historgam-bar-color: var(--charts-color-1);
   --historgam-active-bar-color: var(--charts-active-color-1);
 }
 
-.histogram_category-1 {
+.histogram_category-2 {
   --historgam-bar-color: var(--charts-color-2);
   --historgam-active-bar-color: var(--charts-active-color-2);
 }
 
-.histogram_category-2 {
+.histogram_category-3 {
   --historgam-bar-color: var(--charts-color-3);
   --historgam-active-bar-color: var(--charts-active-color-3);
 }
 
-.histogram_category-3 {
+.histogram_category-4 {
   --historgam-bar-color: var(--charts-color-4);
   --historgam-active-bar-color: var(--charts-active-color-4);
 }

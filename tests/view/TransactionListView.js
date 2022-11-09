@@ -21,7 +21,7 @@ import { WarningPopup } from './component/WarningPopup.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
 import { LinkMenu } from './component/LinkMenu/LinkMenu.js';
 import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
-import { SearchForm } from './component/TransactionList/SearchForm.js';
+import { SearchInput } from './component/SearchInput.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
 import { fixDate, isEmpty, urlJoin } from '../common.js';
 import { FiltersAccordion } from './component/TransactionList/FiltersAccordion.js';
@@ -100,7 +100,7 @@ export class TransactionListView extends AppView {
         res.dateFilter = await DatePickerFilter.create(this, await query('#dateFilter'));
         assert(res.dateFilter, 'Date filter not found');
 
-        res.searchForm = await SearchForm.create(this, await query('#searchFrm'));
+        res.searchForm = await SearchInput.create(this, await query('#searchFilter .search-field'));
         assert(res.searchForm, 'Search form not found');
 
         const transList = await query('.trans-list');
@@ -110,6 +110,7 @@ export class TransactionListView extends AppView {
 
         res.modeSelector = await LinkMenu.create(this, await query('.mode-selector'));
         res.paginator = await Paginator.create(this, await query('.paginator'));
+        res.showMoreBtn = { elem: await query('.show-more-btn') };
 
         res.title = await prop(res.titleEl, 'textContent');
         res.transList = await TransactionList.create(this, transList);
@@ -161,7 +162,7 @@ export class TransactionListView extends AppView {
             type: cont.typeMenu.value,
             accounts: this.getDropDownFilter(cont.accDropDown),
             persons: this.getDropDownFilter(cont.personDropDown),
-            search: cont.searchForm.content.value,
+            search: cont.searchForm.value,
             startDate: null,
             endDate: null,
         };
@@ -179,6 +180,13 @@ export class TransactionListView extends AppView {
                 pages: cont.paginator.pages,
                 items: cont.transList.getItems(),
             };
+
+            if (res.list.items.length > App.config.transactionsOnPage) {
+                const range = Math.ceil(res.list.items.length / App.config.transactionsOnPage);
+                res.list.range = range;
+                res.list.page -= range - 1;
+            }
+
             res.renderTime = cont.transList.content.renderTime;
         } else {
             res.list = {
@@ -293,6 +301,7 @@ export class TransactionListView extends AppView {
 
         res.filtered = res.data.applyFilter(res.filter);
         res.list.page = page;
+        delete res.list.range;
         const pageItems = res.filtered.getPage(page);
         res.list.items = TransactionList.render(pageItems.data, App.state);
 
@@ -301,6 +310,29 @@ export class TransactionListView extends AppView {
 
     onPageChanged(page) {
         this.model = this.setModelPage(this.model, page);
+        return this.setExpectedState();
+    }
+
+    setModelRange(model, range) {
+        assert(
+            range >= 1
+            && range <= model.list.pages - model.list.page,
+            `Invalid pages range ${range}`,
+        );
+
+        const res = this.cloneModel(model);
+        const onPage = App.config.transactionsOnPage;
+
+        res.filtered = res.data.applyFilter(res.filter);
+        res.list.range = range;
+        const pageItems = res.filtered.getPage(model.list.page, onPage, range);
+        res.list.items = TransactionList.render(pageItems.data, App.state);
+
+        return res;
+    }
+
+    onRangeChanged(range) {
+        this.model = this.setModelRange(this.model, range);
         return this.setExpectedState();
     }
 
@@ -342,6 +374,7 @@ export class TransactionListView extends AppView {
                 visible: isFiltersVisible,
             },
             modeSelector: { visible: isItemsAvailable },
+            showMoreBtn: { visible: isItemsAvailable && model.list.page < model.list.pages },
             paginator: { visible: isItemsAvailable },
             transList: { visible: true },
             listMenuContainer: { visible: isItemsAvailable },
@@ -395,7 +428,7 @@ export class TransactionListView extends AppView {
             res.paginator = {
                 ...res.paginator,
                 pages: model.list.pages,
-                active: model.list.page,
+                active: model.list.page + this.currentRange(model) - 1,
             };
 
             res.modeSelector = {
@@ -541,12 +574,9 @@ export class TransactionListView extends AppView {
         return App.view.checkState(expected);
     }
 
-    async setFilterSelection(dropDown, ids) {
+    async setFilterSelection(dropDown, itemIds) {
+        const ids = asArray(itemIds);
         const selection = this.content[dropDown].getSelectedValues();
-        if (selection.length === 0 && ids.length === 0) {
-            return;
-        }
-
         if (selection.length > 0) {
             await this.waitForList(() => this.content[dropDown].clearSelection());
         }
@@ -561,7 +591,7 @@ export class TransactionListView extends AppView {
         await this.performAction(() => this.content[dropDown].showList(false));
     }
 
-    async filterByAccounts(accounts, directNavigate = false) {
+    async filterByAccounts(ids, directNavigate = false) {
         assert(App.state.accounts.length > 0, 'No accounts available');
 
         if (directNavigate) {
@@ -570,6 +600,7 @@ export class TransactionListView extends AppView {
             await this.openFilters();
         }
 
+        const accounts = asArray(ids);
         this.model.filter.accounts = accounts;
         const expected = this.onFilterUpdate();
 
@@ -582,7 +613,7 @@ export class TransactionListView extends AppView {
         return App.view.checkState(expected);
     }
 
-    async filterByPersons(persons, directNavigate = false) {
+    async filterByPersons(ids, directNavigate = false) {
         assert(App.state.persons.length > 0, 'No persons available');
 
         if (directNavigate) {
@@ -591,6 +622,7 @@ export class TransactionListView extends AppView {
             await this.openFilters();
         }
 
+        const persons = asArray(ids);
         this.model.filter.persons = persons;
         const expected = this.onFilterUpdate();
 
@@ -647,6 +679,10 @@ export class TransactionListView extends AppView {
     }
 
     async search(text, directNavigate = false) {
+        if (this.model.filter.search === text) {
+            return true;
+        }
+
         if (directNavigate) {
             this.model.filterCollapsed = true;
         } else {
@@ -666,6 +702,10 @@ export class TransactionListView extends AppView {
     }
 
     async clearSearch(directNavigate = false) {
+        if (this.model.filter.search === '') {
+            return true;
+        }
+
         if (directNavigate) {
             this.model.filterCollapsed = true;
         } else {
@@ -732,6 +772,10 @@ export class TransactionListView extends AppView {
 
     currentPage() {
         return (this.content.paginator) ? this.content.paginator.active : 1;
+    }
+
+    currentRange(model = this.model) {
+        return model.list?.range ?? 1;
     }
 
     pagesCount() {
@@ -851,6 +895,16 @@ export class TransactionListView extends AppView {
         }
 
         return App.view.checkState(expected);
+    }
+
+    async showMore() {
+        assert(!this.isLastPage(), 'Can\'t show more items');
+
+        const expected = this.onRangeChanged(this.currentRange() + 1);
+
+        await this.waitForList(() => click(this.content.showMoreBtn.elem));
+
+        return this.checkState(expected);
     }
 
     async iteratePages() {

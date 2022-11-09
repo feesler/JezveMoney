@@ -8,7 +8,6 @@ import {
     closest,
     prop,
     click,
-    input,
     isVisible,
     wait,
     waitForFunction,
@@ -21,6 +20,7 @@ import { asyncMap } from '../../../common.js';
 import { WarningPopup } from '../WarningPopup.js';
 import { IconButton } from '../IconButton.js';
 import { App } from '../../../Application.js';
+import { SearchInput } from '../SearchInput.js';
 
 const ITEMS_ON_PAGE = 20;
 
@@ -36,9 +36,8 @@ export class ImportRulesDialog extends TestComponent {
                 createBtn: await query(this.elem, '.create-btn'),
             },
             loadingIndicator: { elem: await query(this.elem, '.loading-indicator') },
-            searchField: { elem: await query(this.elem, '.search-field') },
-            searchInp: { elem: await query(this.elem, '#searchInp') },
-            clearSearchBtn: { elem: await query(this.elem, '#clearSearchBtn') },
+            searchField: await SearchInput.create(this, await query(this.elem, '.search-field')),
+            clearSearchBtn: { elem: await query(this.elem, '.search-field .clear-btn') },
             rulesList: { elem: await query(this.elem, '.rules-list') },
             contextMenu: { elem: await query(this.elem, '.actions-menu-list') },
         };
@@ -50,8 +49,6 @@ export class ImportRulesDialog extends TestComponent {
             && res.header.createBtn
             && res.loadingIndicator.elem
             && res.searchField.elem
-            && res.searchInp.elem
-            && res.clearSearchBtn.elem
             && res.rulesList.elem,
             'Failed to initialize import rules dialog',
         );
@@ -70,8 +67,6 @@ export class ImportRulesDialog extends TestComponent {
 
         res.rulesList.renderTime = await prop(res.rulesList.elem, 'dataset.time');
         res.header.title = await prop(res.header.labelElem, 'textContent');
-
-        res.searchInp.value = await prop(res.searchInp.elem, 'value');
 
         const listItems = await queryAll(res.rulesList.elem, '.rule-item');
         res.items = await asyncMap(
@@ -101,7 +96,7 @@ export class ImportRulesDialog extends TestComponent {
 
         res.loading = cont.loadingIndicator.visible;
         res.renderTime = cont.rulesList.renderTime;
-        res.filter = cont.searchInp.value;
+        res.filter = cont.searchField.value;
         res.rules = cont.items.map((item) => copyObject(item.model));
 
         res.pagination = {
@@ -249,10 +244,15 @@ export class ImportRulesDialog extends TestComponent {
     async inputSearch(value) {
         assert(this.isListState(), 'Invalid state');
 
-        this.model.filter = value.toString();
+        const strValue = value.toString();
+        if (this.model.filter === strValue) {
+            return true;
+        }
+
+        this.model.filter = strValue;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.performAction(() => input(this.content.searchInp.elem, value));
+        await this.performAction(() => this.content.searchField.input(strValue));
 
         return this.checkState();
     }
@@ -260,10 +260,14 @@ export class ImportRulesDialog extends TestComponent {
     async clearSearch() {
         assert(this.isListState(), 'Invalid state');
 
+        if (this.model.filter === '') {
+            return true;
+        }
+
         this.model.filter = '';
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.performAction(() => click(this.content.clearSearchBtn.elem));
+        await this.performAction(() => this.content.searchField.clear());
 
         return this.checkState();
     }

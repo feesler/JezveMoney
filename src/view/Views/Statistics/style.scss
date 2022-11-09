@@ -13,6 +13,17 @@
   white-space: nowrap;
 }
 
+.chart-popup__content {
+  display: flex;
+  flex-flow: column nowrap;
+  row-gap: 4px;
+}
+
+.chart-popup__header {
+  text-transform: capitalize;
+  font-weight: 600;
+}
+
 .chart-popup-list {
   display: flex;
   flex-flow: column nowrap;

@@ -1,8 +1,8 @@
 import 'jezvejs/style';
 import {
     ge,
+    createElement,
     show,
-    setEvents,
     insertAfter,
     throttle,
     asArray,
@@ -26,6 +26,7 @@ import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
 import './style.scss';
+import { SearchInput } from '../../Components/SearchInput/SearchInput.js';
 
 const PAGE_TITLE = 'Jezve Money | Transactions';
 const MSG_SET_POS_FAIL = 'Fail to change position of transaction.';
@@ -39,6 +40,8 @@ const TITLE_DETAILS = 'Details';
 /* Date range input */
 const START_DATE_PLACEHOLDER = 'From';
 const END_DATE_PLACEHOLDER = 'To';
+/* 'Show more' button */
+const TITLE_SHOW_MORE = 'Show more...';
 
 const SEARCH_THROTTLE = 300;
 
@@ -122,26 +125,6 @@ class TransactionListView extends View {
             window.app.initPersonsList(this.personDropDown);
         }
 
-        this.searchFrm = ge('searchFrm');
-        if (!this.searchFrm) {
-            throw new Error('Failed to initialize Transaction List view');
-        }
-        this.searchFrm.addEventListener('submit', (e) => this.onSearchSubmit(e));
-
-        this.searchInp = ge('search');
-        if (!this.searchInp) {
-            throw new Error('Failed to initialize Transaction List view');
-        }
-        this.searchInp.inputMode = 'search';
-        this.searchHandler = throttle((e) => this.onSearchInput(e), SEARCH_THROTTLE);
-        this.searchInp.addEventListener('input', this.searchHandler);
-
-        this.noSearchBtn = ge('nosearchbtn');
-        if (!this.noSearchBtn) {
-            throw new Error('Failed to initialize Transaction List view');
-        }
-        setEvents(this.noSearchBtn, { click: () => this.onSearchClear() });
-
         // Date range filter
         this.dateRangeFilter = DateRangeInput.fromElement(ge('dateFrm'), {
             startPlaceholder: START_DATE_PLACEHOLDER,
@@ -149,10 +132,20 @@ class TransactionListView extends View {
             onChange: (data) => this.onChangeDateFilter(data),
         });
 
+        // Search input
+        this.searchFilter = ge('searchFilter');
+        this.searchHandler = throttle((val) => this.onSearchInputChange(val), SEARCH_THROTTLE);
+        this.searchInput = SearchInput.create({
+            placeholder: 'Type to filter',
+            onChange: this.searchHandler,
+        });
+        this.searchFilter.append(this.searchInput.elem);
+
         this.listContainer = document.querySelector('.list-container');
         this.loadingIndicator = LoadingIndicator.create();
         this.listContainer.append(this.loadingIndicator.elem);
 
+        // List mode selected
         const listHeader = document.querySelector('.list-header');
         this.modeSelector = LinkMenu.create({
             className: 'mode-selector',
@@ -163,14 +156,9 @@ class TransactionListView extends View {
             ],
             onChange: (mode) => this.onModeChanged(mode),
         });
+        listHeader.append(this.modeSelector.elem);
 
-        const paginatorOptions = {
-            onChange: (page) => this.onChangePage(page),
-        };
-
-        this.topPaginator = Paginator.create(paginatorOptions);
-        listHeader.append(this.modeSelector.elem, this.topPaginator.elem);
-
+        // Transactions list
         this.list = TransactionList.create({
             listMode: 'list',
             onItemClick: (id, e) => this.onItemClick(id, e),
@@ -179,8 +167,23 @@ class TransactionListView extends View {
         insertAfter(this.list.elem, listHeader);
 
         const listFooter = document.querySelector('.list-footer');
-        this.bottomPaginator = Paginator.create(paginatorOptions);
-        listFooter.append(this.bottomPaginator.elem);
+        // 'Show more' button
+        this.showMoreBtn = createElement('button', {
+            props: {
+                className: 'btn show-more-btn',
+                type: 'button',
+                textContent: TITLE_SHOW_MORE,
+            },
+            events: { click: (e) => this.showMore(e) },
+        });
+        listFooter.append(this.showMoreBtn);
+
+        // Paginator
+        this.paginator = Paginator.create({
+            arrows: true,
+            onChange: (page) => this.onChangePage(page),
+        });
+        listFooter.append(this.paginator.elem);
 
         this.createBtn = ge('add_btn');
         this.createMenu();
@@ -434,7 +437,7 @@ class TransactionListView extends View {
      * @param {object} obj - selection object
      */
     onAccountChange(obj) {
-        const data = Array.isArray(obj) ? obj : [obj];
+        const data = asArray(obj);
         const ids = data.map((item) => parseInt(item.id, 10));
         const filterIds = this.state.form.acc_id ?? [];
 
@@ -465,43 +468,20 @@ class TransactionListView extends View {
         this.requestTransactions(this.state.form);
     }
 
-    /**
-     * Transaction search form submit event handler
-     * @param {Event} e - submit event
-     */
-    onSearchSubmit(e) {
-        e.preventDefault();
-
-        this.onSearchInput();
-    }
-
     /** Search field input event handler */
-    onSearchInput() {
-        const searchQuery = this.searchInp.value;
-        if (this.state.form.search === searchQuery) {
+    onSearchInputChange(value) {
+        if (this.state.form.search === value) {
             return;
         }
 
-        if (searchQuery.length > 0) {
-            this.state.form.search = searchQuery;
+        if (value.length > 0) {
+            this.state.form.search = value;
         } else if ('search' in this.state.form) {
             delete this.state.form.search;
         }
 
         this.state.typingSearch = true;
 
-        this.requestTransactions(this.state.form);
-    }
-
-    /**
-     * Clear search query
-     */
-    onSearchClear() {
-        if (!('search' in this.state.form)) {
-            return;
-        }
-
-        delete this.state.form.search;
         this.requestTransactions(this.state.form);
     }
 
@@ -552,6 +532,21 @@ class TransactionListView extends View {
         };
 
         this.requestTransactions(this.state.form);
+    }
+
+    showMore() {
+        const { page } = this.state.pagination;
+        let { range } = this.state.pagination;
+        if (!range) {
+            range = 1;
+        }
+        range += 1;
+
+        this.requestTransactions({
+            ...this.state.form,
+            range,
+            page,
+        });
     }
 
     onChangePage(page) {
@@ -730,9 +725,8 @@ class TransactionListView extends View {
         // Search form
         const isSearchFilter = !!state.form.search;
         if (!state.typingSearch) {
-            this.searchInp.value = (isSearchFilter) ? state.form.search : '';
+            this.searchInput.value = (isSearchFilter) ? state.form.search : '';
         }
-        show(this.noSearchBtn, isSearchFilter);
 
         // Render list
         this.list.setState((listState) => ({
@@ -744,20 +738,21 @@ class TransactionListView extends View {
             renderTime: Date.now(),
         }));
 
-        if (this.topPaginator && this.bottomPaginator) {
-            const setPaginatorState = (paginatorState) => ({
+        if (this.paginator) {
+            this.paginator.show(state.items.length > 0);
+            const range = state.pagination.range ?? 1;
+            this.paginator.setState((paginatorState) => ({
                 ...paginatorState,
                 url: filterUrl,
                 pagesCount: state.pagination.pagesCount,
-                pageNum: state.pagination.page,
-            });
-
-            this.topPaginator.show(state.items.length > 0);
-            this.topPaginator.setState(setPaginatorState);
-
-            this.bottomPaginator.show(state.items.length > 0);
-            this.bottomPaginator.setState(setPaginatorState);
+                pageNum: state.pagination.page + range - 1,
+            }));
         }
+
+        show(
+            this.showMoreBtn,
+            state.items.length > 0 && state.pagination.page < state.pagination.pagesCount,
+        );
 
         filterUrl.searchParams.set('page', state.pagination.page);
         this.modeSelector.show(state.items.length > 0);

@@ -1,4 +1,9 @@
-import { copyObject, assert, formatDate } from 'jezve-test';
+import {
+    copyObject,
+    assert,
+    formatDate,
+    asArray,
+} from 'jezve-test';
 import { convDate, fixDate, getWeek } from '../common.js';
 import { App } from '../Application.js';
 import { api } from './api.js';
@@ -267,23 +272,24 @@ export class TransactionsList extends List {
         return new TransactionsList(items);
     }
 
-    getItemsPage(list, num, limit) {
-        const pageLimit = (typeof limit !== 'undefined') ? limit : App.config.transactionsOnPage;
+    getItemsPage(list, num, limit, range) {
+        const onPage = (typeof limit !== 'undefined') ? limit : App.config.transactionsOnPage;
+        const pagesRange = (typeof range !== 'undefined') ? range : 1;
 
-        const totalPages = this.getExpectedPages(list, pageLimit);
+        const totalPages = this.getExpectedPages(list, onPage);
         assert(num >= 1 && num <= totalPages, `Invalid page number: ${num}`);
 
-        const offset = (num - 1) * pageLimit;
+        const offset = (num - 1) * onPage;
 
         const res = copyObject(list);
 
         res.sort((a, b) => a.pos - b.pos);
 
-        return res.slice(offset, Math.min(offset + pageLimit, res.length));
+        return res.slice(offset, Math.min(offset + onPage * pagesRange, res.length));
     }
 
-    getPage(num, limit) {
-        const items = this.getItemsPage(this.data, num, limit);
+    getPage(num, limit, range) {
+        const items = this.getItemsPage(this.data, num, limit, range);
         if (items === this.data) {
             return this;
         }
@@ -304,10 +310,7 @@ export class TransactionsList extends List {
         if ('accounts' in params || 'persons' in params) {
             const filterAccounts = [];
             if ('persons' in params) {
-                const personsFilter = Array.isArray(params.persons)
-                    ? params.persons
-                    : [params.persons];
-
+                const personsFilter = asArray(params.persons);
                 personsFilter.forEach((personId) => {
                     const personAccounts = App.state.getPersonAccounts(personId);
                     if (personAccounts.length > 0) {
@@ -319,10 +322,7 @@ export class TransactionsList extends List {
             }
 
             if ('accounts' in params) {
-                const accountsFilter = Array.isArray(params.accounts)
-                    ? params.accounts
-                    : [params.accounts];
-
+                const accountsFilter = asArray(params.accounts);
                 filterAccounts.push(...accountsFilter);
             }
 
@@ -518,17 +518,22 @@ export class TransactionsList extends List {
     }
 
     getStatistics(params) {
-        let amountArr = [];
+        const amountArr = {};
         let groupArr = [];
         let sumDate = null;
         let curDate = null;
         let prevDate = null;
-        const curSum = [];
+        const curSum = {};
         let itemsInGroup = 0;
         let transDate = null;
         let currId = params.curr_id;
-        let accId = params.acc_id;
+        const accId = asArray(params.acc_id);
+        const res = {
+            values: [],
+            series: [],
+        };
 
+        const categories = [];
         const byCurrency = params.report === 'currency';
         if (byCurrency) {
             if (!currId) {
@@ -536,26 +541,26 @@ export class TransactionsList extends List {
                 currId = curr?.id;
             }
             if (!currId) {
-                return null;
+                return res;
             }
+            categories.push(currId);
         } else {
-            if (!accId) {
-                const [account] = App.state.getAccountsByIndexes(0);
-                accId = account.id;
+            if (accId.length === 0) {
+                return res;
             }
-            if (!accId) {
-                return null;
-            }
+
+            categories.push(...accId);
         }
 
         const transType = params.type ?? [EXPENSE];
-        if (!transType) {
-            return null;
-        }
-        const transTypes = Array.isArray(transType) ? transType : [transType];
+        const transTypes = asArray(transType);
         for (const type of transTypes) {
-            amountArr[type] = [];
-            curSum[type] = 0;
+            amountArr[type] = {};
+            curSum[type] = {};
+            for (const category of categories) {
+                amountArr[type][category] = [];
+                curSum[type][category] = 0;
+            }
         }
 
         const groupType = params.group ?? 'none';
@@ -565,7 +570,7 @@ export class TransactionsList extends List {
             order: 'asc',
             type: transTypes,
         };
-        if (accId) {
+        if (accId.length > 0) {
             itemsFilter.accounts = accId;
         }
         if (params.startDate && params.endDate) {
@@ -579,14 +584,21 @@ export class TransactionsList extends List {
                 return;
             }
 
+            let category = 0;
+            let isSource = true;
             if (byCurrency) {
-                const transCurr = (item.type === EXPENSE) ? item.src_curr : item.dest_curr;
-                if (transCurr !== currId) {
+                isSource = (item.type === EXPENSE);
+                category = (isSource) ? item.src_curr : item.dest_curr;
+                if (!categories.includes(category)) {
                     return;
                 }
-            } else {
-                const transAcc = (item.type === EXPENSE) ? item.src_id : item.dest_id;
-                if (transAcc !== accId) {
+            } else if (accId.length > 0) {
+                if (categories.includes(item.src_id)) {
+                    category = item.src_id;
+                } else if (categories.includes(item.dest_id)) {
+                    category = item.dest_id;
+                    isSource = false;
+                } else {
                     return;
                 }
             }
@@ -594,13 +606,10 @@ export class TransactionsList extends List {
             const time = convDate(item.date);
             transDate = new Date(time);
             itemsInGroup += 1;
+            const amount = (isSource) ? item.src_amount : item.dest_amount;
 
             if (groupType === 'none') {
-                if (item.type === EXPENSE) {
-                    amountArr[item.type].push(item.src_amount);
-                } else {
-                    amountArr[item.type].push(item.dest_amount);
-                }
+                amountArr[item.type][category].push(amount);
 
                 if (prevDate == null || prevDate !== transDate.getDate()) {
                     groupArr.push([formatDate(transDate), itemsInGroup]);
@@ -622,38 +631,40 @@ export class TransactionsList extends List {
             } else if (sumDate != null && sumDate !== curDate) {
                 sumDate = curDate;
                 for (const type of transTypes) {
-                    amountArr[type].push(curSum[type]);
-                    curSum[type] = 0;
+                    for (const cat of categories) {
+                        amountArr[type][cat].push(curSum[type][cat]);
+                        curSum[type][cat] = 0;
+                    }
                 }
 
                 const label = this.getStatisticsLabel(transDate, groupType);
                 groupArr.push([label, 1]);
             }
 
-            if (item.type === EXPENSE) {
-                curSum[item.type] += item.src_amount;
-            } else {
-                curSum[item.type] += item.dest_amount;
-            }
+            curSum[item.type][category] += amount;
         });
 
         // save remain value
         if (groupType !== 'none' && list.length > 0) {
             if (sumDate != null && sumDate !== curDate) {
                 for (const type of transTypes) {
-                    amountArr[type].push(curSum[type]);
-                    curSum[type] = 0;
+                    for (const cat of categories) {
+                        amountArr[type][cat].push(curSum[type][cat]);
+                    }
                 }
 
                 const label = this.getStatisticsLabel(transDate, groupType);
                 groupArr.push([label, 1]);
             } else {
                 for (const type of transTypes) {
-                    const { length } = amountArr[type];
-                    if (length === 0) {
-                        amountArr[type].push(curSum[type]);
-                    } else {
-                        amountArr[type][length - 1] += curSum[type];
+                    for (const cat of categories) {
+                        const { length } = amountArr[type][cat];
+                        const value = curSum[type][cat];
+                        if (length === 0) {
+                            amountArr[type][cat].push(value);
+                        } else {
+                            amountArr[type][cat][length - 1] += value;
+                        }
                     }
                 }
 
@@ -664,42 +675,46 @@ export class TransactionsList extends List {
             }
         }
 
+        const dataSets = [];
+        Object.keys(amountArr).forEach((type) => {
+            const typeCategories = amountArr[type];
+            Object.keys(typeCategories).forEach((cat) => {
+                dataSets.push({
+                    group: type,
+                    category: cat,
+                    data: typeCategories[cat],
+                });
+            });
+        });
+
         if (limit > 0) {
             let amountCount = 0;
-            for (const type of transTypes) {
-                amountCount = Math.max(amountCount, amountArr[type].length);
+            for (const dataSet of dataSets) {
+                amountCount = Math.max(amountCount, dataSet.data.length);
             }
-
             const limitCount = Math.min(amountCount, limit);
 
-            const trimAmounts = [];
-            for (const type of transTypes) {
-                trimAmounts[type] = amountArr[type].slice(-limitCount);
-            }
-            amountArr = trimAmounts;
+            dataSets.forEach((dataSet, index) => {
+                dataSets[index].data = dataSet.data.slice(-limitCount);
+            });
 
             let newGroupsCount = 0;
             let groupLimit = 0;
+            let firstSerieSize = 0;
             let i = groupArr.length - 1;
             while (i >= 0 && groupLimit < limitCount) {
+                firstSerieSize = limitCount - groupLimit;
                 groupLimit += groupArr[i][1];
                 newGroupsCount += 1;
                 i -= 1;
             }
 
             groupArr = groupArr.slice(-newGroupsCount);
-        }
-
-        let resultValues = [];
-        for (const type of transTypes) {
-            resultValues.push({ data: amountArr[type] });
-        }
-        if (transTypes.length === 1) {
-            resultValues = resultValues[0].data;
+            groupArr[0][1] = firstSerieSize;
         }
 
         return {
-            values: resultValues,
+            values: dataSets,
             series: groupArr,
         };
     }

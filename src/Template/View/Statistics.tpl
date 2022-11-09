@@ -33,7 +33,7 @@ include(TPL_PATH . "Header.tpl");	?>
 
                             <div id="acc_block" class="filter-item"<?=hidden($byCurrency)?>>
                                 <h3 class="filter-item__title">Account</h3>
-                                <select id="acc_id"></select>
+                                <select id="acc_id" multiple></select>
                             </div>
 
                             <div id="curr_block" class="filter-item"<?=hidden(!$byCurrency)?>>
