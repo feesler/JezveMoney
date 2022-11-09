@@ -68,17 +68,8 @@ include(TPL_PATH . "Header.tpl"); ?>
                             <?= DateRangeInput::render($dateRange) ?>
                         </div>
 
-                        <div class="filter-item">
+                        <div id="searchFilter" class="filter-item">
                             <h3 class="filter-item__title">Search</h3>
-                            <form id="searchFrm" method="get" action="<?= BASEURL ?>transactions/">
-                                <div class="input-group">
-                                    <input id="search" class="input-group__input stretch-input" name="search" type="text" autocomplete="off" value="<?= (is_null($searchReq) ? "" : e($searchReq)) ?>">
-                                    <button id="nosearchbtn" class="input-group__inner-btn" type="button" <?= hidden(is_empty($searchReq)) ?>>
-                                        <?= svgIcon("close", "input-group__inner-btn__icon") ?>
-                                    </button>
-                                    <button class="btn icon-btn search_btn input-group__btn" type="submit"><?= svgIcon("search", "icon search-icon") ?></button>
-                                </div>
-                            </form>
                         </div>
                     </div>
 

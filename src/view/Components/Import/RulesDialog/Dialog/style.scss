@@ -54,21 +54,6 @@
   }
 }
 
-.search-field {
-  margin-bottom: 1rem;
-
-  .search-btn {
-    pointer-events: none;
-  }
-
-  .search-icon {
-    height: 24px;
-    fill: #888888;
-    border-left: 1px solid #464646;
-    padding-left: 4px;
-  }
-}
-
 .rules-list {
   display: flex;
   flex-flow: column nowrap;

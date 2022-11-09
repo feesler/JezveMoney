@@ -1,0 +1,18 @@
+.search-field {
+  margin-bottom: 1rem;
+
+  .search-btn {
+    width: 37px;
+    pointer-events: none;
+  }
+
+  .search-icon {
+    height: 24px;
+    fill: #888888;
+    padding-left: 4px;
+  }
+
+  .clear-btn {
+    width: 37px;
+  }
+}

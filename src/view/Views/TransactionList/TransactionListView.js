@@ -2,7 +2,6 @@ import 'jezvejs/style';
 import {
     ge,
     show,
-    setEvents,
     insertAfter,
     throttle,
     asArray,
@@ -26,6 +25,7 @@ import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
 import './style.scss';
+import { SearchInput } from '../../Components/SearchInput/SearchInput.js';
 
 const PAGE_TITLE = 'Jezve Money | Transactions';
 const MSG_SET_POS_FAIL = 'Fail to change position of transaction.';
@@ -122,32 +122,21 @@ class TransactionListView extends View {
             window.app.initPersonsList(this.personDropDown);
         }
 
-        this.searchFrm = ge('searchFrm');
-        if (!this.searchFrm) {
-            throw new Error('Failed to initialize Transaction List view');
-        }
-        this.searchFrm.addEventListener('submit', (e) => this.onSearchSubmit(e));
-
-        this.searchInp = ge('search');
-        if (!this.searchInp) {
-            throw new Error('Failed to initialize Transaction List view');
-        }
-        this.searchInp.inputMode = 'search';
-        this.searchHandler = throttle((e) => this.onSearchInput(e), SEARCH_THROTTLE);
-        this.searchInp.addEventListener('input', this.searchHandler);
-
-        this.noSearchBtn = ge('nosearchbtn');
-        if (!this.noSearchBtn) {
-            throw new Error('Failed to initialize Transaction List view');
-        }
-        setEvents(this.noSearchBtn, { click: () => this.onSearchClear() });
-
         // Date range filter
         this.dateRangeFilter = DateRangeInput.fromElement(ge('dateFrm'), {
             startPlaceholder: START_DATE_PLACEHOLDER,
             endPlaceholder: END_DATE_PLACEHOLDER,
             onChange: (data) => this.onChangeDateFilter(data),
         });
+
+        // Search input
+        this.searchFilter = ge('searchFilter');
+        this.searchHandler = throttle((val) => this.onSearchInputChange(val), SEARCH_THROTTLE);
+        this.searchInput = SearchInput.create({
+            placeholder: 'Type to filter',
+            onChange: this.searchHandler,
+        });
+        this.searchFilter.append(this.searchInput.elem);
 
         this.listContainer = document.querySelector('.list-container');
         this.loadingIndicator = LoadingIndicator.create();
@@ -465,43 +454,20 @@ class TransactionListView extends View {
         this.requestTransactions(this.state.form);
     }
 
-    /**
-     * Transaction search form submit event handler
-     * @param {Event} e - submit event
-     */
-    onSearchSubmit(e) {
-        e.preventDefault();
-
-        this.onSearchInput();
-    }
-
     /** Search field input event handler */
-    onSearchInput() {
-        const searchQuery = this.searchInp.value;
-        if (this.state.form.search === searchQuery) {
+    onSearchInputChange(value) {
+        if (this.state.form.search === value) {
             return;
         }
 
-        if (searchQuery.length > 0) {
-            this.state.form.search = searchQuery;
+        if (value.length > 0) {
+            this.state.form.search = value;
         } else if ('search' in this.state.form) {
             delete this.state.form.search;
         }
 
         this.state.typingSearch = true;
 
-        this.requestTransactions(this.state.form);
-    }
-
-    /**
-     * Clear search query
-     */
-    onSearchClear() {
-        if (!('search' in this.state.form)) {
-            return;
-        }
-
-        delete this.state.form.search;
         this.requestTransactions(this.state.form);
     }
 
@@ -730,9 +696,8 @@ class TransactionListView extends View {
         // Search form
         const isSearchFilter = !!state.form.search;
         if (!state.typingSearch) {
-            this.searchInp.value = (isSearchFilter) ? state.form.search : '';
+            this.searchInput.value = (isSearchFilter) ? state.form.search : '';
         }
-        show(this.noSearchBtn, isSearchFilter);
 
         // Render list
         this.list.setState((listState) => ({

@@ -1,5 +1,4 @@
 import {
-    ge,
     re,
     show,
     setEvents,
@@ -8,7 +7,6 @@ import {
     Component,
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
-import { InputGroup } from 'jezvejs/InputGroup';
 import { Paginator } from 'jezvejs/Paginator';
 import { API } from '../../../../js/api/index.js';
 import { ImportRule } from '../../../../js/model/ImportRule.js';
@@ -19,6 +17,7 @@ import { ListContainer } from '../../../ListContainer/ListContainer.js';
 import { LoadingIndicator } from '../../../LoadingIndicator/LoadingIndicator.js';
 import { PopupMenu } from '../../../PopupMenu/PopupMenu.js';
 import './style.scss';
+import { SearchInput } from '../../../SearchInput/SearchInput.js';
 
 /** CSS classes */
 export const IMPORT_RULES_DIALOG_CLASS = 'rules-dialog';
@@ -53,16 +52,10 @@ export class ImportRulesDialog extends Component {
         this.headerElem = this.elem.querySelector('.rules-header');
         this.titleElem = this.headerElem?.querySelector('label');
         this.createRuleBtn = this.headerElem?.querySelector('.create-btn');
-        this.searchField = ge('searchField');
-        this.searchInp = ge('searchInp');
-        this.clearSearchBtn = ge('clearSearchBtn');
         this.listContainer = this.elem.querySelector('.rules-list-container');
         if (
             !this.createRuleBtn
             || !this.titleElem
-            || !this.searchField
-            || !this.searchInp
-            || !this.clearSearchBtn
             || !this.listContainer
         ) {
             throw new Error('Failed to initialize import rules dialog');
@@ -83,10 +76,11 @@ export class ImportRulesDialog extends Component {
         setEvents(this.rulesList.elem, { scroll: () => this.onListScroll() });
         this.listContainer.append(this.rulesList.elem);
 
-        InputGroup.fromElement(this.searchField);
-
-        this.searchInp.addEventListener('input', () => this.onSearchInput());
-        this.clearSearchBtn.addEventListener('click', () => this.onClearSearch());
+        this.searchInput = SearchInput.create({
+            placeholder: 'Type to filter',
+            onChange: (value) => this.onSearchInputChange(value),
+        });
+        insertAfter(this.searchInput.elem, this.headerElem);
 
         this.paginator = Paginator.create({
             arrows: true,
@@ -202,26 +196,15 @@ export class ImportRulesDialog extends Component {
     }
 
     /** Search input */
-    onSearchInput() {
-        const { value } = this.searchInp;
-
+    onSearchInputChange(value) {
         if (this.state.filter.toLowerCase() === value.toLowerCase()) {
             return;
         }
 
         this.state.filter = value;
-        this.updateList();
-        this.render(this.state);
-    }
-
-    /** Clear search */
-    onClearSearch() {
-        if (this.state.filter === '') {
-            return;
+        if (value.length === 0) {
+            this.state.pagination.page = 1;
         }
-
-        this.state.filter = '';
-        this.state.pagination.page = 1;
         this.updateList();
         this.render(this.state);
     }
@@ -423,9 +406,7 @@ export class ImportRulesDialog extends Component {
             renderTime: state.renderTime,
         }));
 
-        show(this.searchField, true);
-        this.searchInp.value = state.filter;
-        show(this.clearSearchBtn, (state.filter !== ''));
+        this.searchInput.value = state.filter;
 
         const showPaginator = state.pagination.pagesCount > 1;
         this.paginator.show(showPaginator);
@@ -437,6 +418,7 @@ export class ImportRulesDialog extends Component {
             }));
         }
 
+        this.searchInput.show(true);
         this.rulesList.show(true);
         show(this.createRuleBtn, true);
         if (this.formContainer) {
@@ -459,7 +441,7 @@ export class ImportRulesDialog extends Component {
 
         insertAfter(this.formContainer.elem, this.rulesList.elem);
 
-        show(this.searchField, false);
+        this.searchInput.show(false);
         this.rulesList.show(false);
         this.paginator.show(false);
         show(this.createRuleBtn, false);

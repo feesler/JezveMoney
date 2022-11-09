@@ -21,7 +21,7 @@ import { WarningPopup } from './component/WarningPopup.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
 import { LinkMenu } from './component/LinkMenu/LinkMenu.js';
 import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
-import { SearchForm } from './component/TransactionList/SearchForm.js';
+import { SearchInput } from './component/SearchInput.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
 import { fixDate, isEmpty, urlJoin } from '../common.js';
 import { FiltersAccordion } from './component/TransactionList/FiltersAccordion.js';
@@ -100,7 +100,7 @@ export class TransactionListView extends AppView {
         res.dateFilter = await DatePickerFilter.create(this, await query('#dateFilter'));
         assert(res.dateFilter, 'Date filter not found');
 
-        res.searchForm = await SearchForm.create(this, await query('#searchFrm'));
+        res.searchForm = await SearchInput.create(this, await query('#searchFilter .search-field'));
         assert(res.searchForm, 'Search form not found');
 
         const transList = await query('.trans-list');
@@ -161,7 +161,7 @@ export class TransactionListView extends AppView {
             type: cont.typeMenu.value,
             accounts: this.getDropDownFilter(cont.accDropDown),
             persons: this.getDropDownFilter(cont.personDropDown),
-            search: cont.searchForm.content.value,
+            search: cont.searchForm.value,
             startDate: null,
             endDate: null,
         };
@@ -646,6 +646,10 @@ export class TransactionListView extends AppView {
     }
 
     async search(text, directNavigate = false) {
+        if (this.model.filter.search === text) {
+            return true;
+        }
+
         if (directNavigate) {
             this.model.filterCollapsed = true;
         } else {
@@ -665,6 +669,10 @@ export class TransactionListView extends AppView {
     }
 
     async clearSearch(directNavigate = false) {
+        if (this.model.filter.search === '') {
+            return true;
+        }
+
         if (directNavigate) {
             this.model.filterCollapsed = true;
         } else {
