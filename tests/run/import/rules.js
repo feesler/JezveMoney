@@ -1,4 +1,9 @@
-import { test, setBlock, assert } from 'jezve-test';
+import {
+    test,
+    setBlock,
+    assert,
+    asArray,
+} from 'jezve-test';
 import { App } from '../../Application.js';
 import { ImportTransaction } from '../../model/ImportTransaction.js';
 import { ImportCondition } from '../../model/ImportCondition.js';
@@ -75,11 +80,7 @@ export const updateRule = async (index) => {
 
     await test(`Update rule [${ind}]`, async () => {
         await checkRulesDialog();
-
-        await App.view.updateRule(ind);
-
-        App.view.expectedState = App.view.getExpectedState(App.view.model);
-        return App.view.checkState();
+        return App.view.updateRule(ind);
     });
 };
 
@@ -90,11 +91,7 @@ export const deleteRule = async (index) => {
 
     await test(`Delete rule [${ind}]`, async () => {
         await checkRulesDialog();
-
-        await App.view.deleteRule(ind);
-
-        App.view.expectedState = App.view.getExpectedState(App.view.model);
-        return App.view.checkState();
+        return App.view.deleteRule(ind);
     });
 };
 
@@ -104,8 +101,6 @@ const runOnRuleCondition = async (params) => {
         params && ('pos' in params) && ('action' in params),
         'Invalid parameters',
     );
-
-    assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
     const actDescr = {
         changeFieldType: 'Change field type',
@@ -119,7 +114,7 @@ const runOnRuleCondition = async (params) => {
         inputValue: 'Input value',
     };
 
-    const actions = Array.isArray(params.action) ? params.action : [params.action];
+    const actions = asArray(params.action);
     for (const action of actions) {
         let descr;
 
@@ -164,14 +159,7 @@ const runOnRuleCondition = async (params) => {
 
 /** Click by create import condition button */
 export const addRuleCondition = async () => {
-    await test('Add rule condition', async () => {
-        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
-
-        await App.view.addRuleCondition();
-
-        App.view.expectedState = App.view.getExpectedState(App.view.model);
-        return App.view.checkState();
-    });
+    await test('Add rule condition', () => App.view.addRuleCondition());
 };
 
 /** Create new import rule condition */
@@ -206,14 +194,7 @@ export const deleteRuleCondition = async (index) => {
     const ind = parseInt(index, 10);
     assert(!Number.isNaN(ind), 'Invalid index');
 
-    await test(`Delete rule condition [${ind}]`, async () => {
-        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
-
-        await App.view.deleteRuleCondition(ind);
-
-        App.view.expectedState = App.view.getExpectedState(App.view.model);
-        return App.view.checkState();
-    });
+    await test(`Delete rule condition [${ind}]`, () => App.view.deleteRuleCondition(ind));
 };
 
 /** Run set of actions on specified rule action item */
@@ -222,8 +203,6 @@ const runOnRuleAction = async (params) => {
         params && ('pos' in params) && ('action' in params),
         'Invalid parameters',
     );
-
-    assert.instanceOf(App.view, ImportView, 'Invalid view instance');
 
     const actDescr = {
         changeAction: 'Change action',
@@ -234,7 +213,7 @@ const runOnRuleAction = async (params) => {
         inputValue: 'Input value',
     };
 
-    const actions = Array.isArray(params.action) ? params.action : [params.action];
+    const actions = asArray(params.action);
     for (const action of actions) {
         let descr;
 
@@ -271,15 +250,7 @@ const runOnRuleAction = async (params) => {
 
 /** Click by create import action button */
 export const addRuleAction = async () => {
-    await test('Add rule action', async () => {
-        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
-
-        await App.view.addRuleAction();
-
-        App.view.expectedState = App.view.getExpectedState(App.view.model);
-
-        return App.view.checkState();
-    });
+    await test('Add rule action', () => App.view.addRuleAction());
 };
 
 /** Create new import rule action */
@@ -313,52 +284,28 @@ export const deleteRuleAction = async (index) => {
     const ind = parseInt(index, 10);
     assert(!Number.isNaN(ind), 'Invalid index');
 
-    await test(`Delete rule action [${ind}]`, async () => {
-        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
-
-        await App.view.deleteRuleAction(ind);
-
-        App.view.expectedState = App.view.getExpectedState(App.view.model);
-
-        return App.view.checkState();
-    });
+    await test(`Delete rule action [${ind}]`, () => App.view.deleteRuleAction(ind));
 };
 
 /** Submit import rule */
 export const submitRule = async () => {
-    await test('Submit import rule', async () => {
-        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
-
-        return App.view.submitRule();
-    });
+    await test('Submit import rule', () => App.view.submitRule());
 };
 
 /** Cancel import rule form */
 export const cancelRule = async () => {
     await test('Cancel import rule', async () => {
-        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
-
         await App.view.cancelRule();
-
-        // Check app state
         return App.state.fetchAndTest();
     });
 };
 
 /** Input import rule search filter */
 export const inputRulesSearch = async (value) => {
-    await test('Search rules', async () => {
-        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
-
-        return App.view.inputRulesSearch(value);
-    });
+    await test('Search rules', () => App.view.inputRulesSearch(value));
 };
 
 /** Clear import rules search filter */
 export const clearRulesSearch = async () => {
-    await test('Clear rules filter', async () => {
-        assert.instanceOf(App.view, ImportView, 'Invalid view instance');
-
-        return App.view.clearRulesSearch();
-    });
+    await test('Clear rules filter', () => App.view.clearRulesSearch());
 };

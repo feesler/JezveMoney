@@ -20,6 +20,8 @@ import { ImportRulesDialog } from './component/Import/ImportRulesDialog.js';
 import { findSimilarTransaction } from '../model/import.js';
 import { App } from '../Application.js';
 import { ImportTransaction } from '../model/ImportTransaction.js';
+import { ImportTransactionForm } from './component/Import/ImportTransactionForm.js';
+import { ImportTransactionItem } from './component/Import/ImportTransactionItem.js';
 
 const ITEMS_ON_PAGE = 20;
 const defaultPagination = {
@@ -386,22 +388,74 @@ export class ImportView extends AppView {
 
     async enableRules(value) {
         this.checkMainState();
+
         const enable = !!value;
         assert(
             enable !== this.rulesEnabled,
             enable ? 'Already enabled' : 'Already disabled',
         );
+
+        // Apply rules or restore original import data according to enable flag
+        // and convert to expected state of ImportTransactionForm component
+        const itemsData = this.itemsList.items.map((item) => {
+            if (!item.model.original) {
+                return item.getExpectedState(item.model);
+            }
+
+            if (!enable) {
+                let model = item.restoreOriginal();
+                if (this.model.mainAccount !== model.mainAccount.id) {
+                    model = item.onChangeMainAccount(model, this.model.mainAccount);
+                }
+
+                return item.getExpectedState(model);
+            }
+
+            const expTrans = item.getExpectedTransaction(item.model);
+            const origMainAccount = App.state.accounts.findByName(
+                item.model.original.mainAccount,
+            );
+            const importTrans = new ImportTransaction({
+                ...expTrans,
+                enabled: item.model.enabled,
+                mainAccount: origMainAccount,
+                type: item.model.type,
+                original: {
+                    ...item.model.original,
+                    mainAccount: origMainAccount,
+                },
+            });
+
+            App.state.rules.applyTo(importTrans);
+
+            return (
+                (item.model.isForm)
+                    ? ImportTransactionForm.render(importTrans, App.state)
+                    : ImportTransactionItem.render(importTrans, App.state)
+            );
+        });
+
         await this.openActionsMenu();
+
+        this.model.rulesEnabled = !this.model.rulesEnabled;
+        this.model.menuOpen = false;
+        const expected = this.getExpectedState();
+        expected.itemsList.items = itemsData;
+
         await this.performAction(() => this.content.rulesCheck.toggle());
+
+        return this.checkState(expected);
     }
 
     async enableCheckSimilar(value) {
         this.checkMainState();
+
         const enable = !!value;
         assert(
             enable !== this.checkSimilarEnabled,
             enable ? 'Already enabled' : 'Already disabled',
         );
+
         await this.openActionsMenu();
 
         const skipList = [];
@@ -469,12 +523,16 @@ export class ImportView extends AppView {
         this.checkUploadState();
 
         await this.performAction(() => this.uploadDialog.selectTemplateById(val));
+
+        return this.checkState();
     }
 
     async selectUploadTemplateByIndex(val) {
         this.checkUploadState();
 
         await this.performAction(() => this.uploadDialog.selectTemplateByIndex(val));
+
+        return this.checkState();
     }
 
     async selectUploadAccount(val) {
@@ -510,48 +568,64 @@ export class ImportView extends AppView {
         this.checkUploadState();
 
         await this.performAction(() => this.uploadDialog.inputTemplateName(val));
+
+        return this.checkState();
     }
 
     async selectTemplateColumn(name, index) {
         this.checkUploadState();
 
         await this.performAction(() => this.uploadDialog.selectTemplateColumn(name, index));
+
+        return this.checkState();
     }
 
     async inputTemplateFirstRow(val) {
         this.checkUploadState();
 
         await this.performAction(() => this.uploadDialog.inputTemplateFirstRow(val));
+
+        return this.checkState();
     }
 
     async decreaseTemplateFirstRow(val) {
         this.checkUploadState();
 
         await this.performAction(() => this.uploadDialog.decreaseTemplateFirstRow(val));
+
+        return this.checkState();
     }
 
     async increaseTemplateFirstRow(val) {
         this.checkUploadState();
 
         await this.performAction(() => this.uploadDialog.increaseTemplateFirstRow(val));
+
+        return this.checkState();
     }
 
     async toggleTemplateAccount() {
         this.checkUploadState();
 
         await this.performAction(() => this.uploadDialog.toggleTemplateAccount());
+
+        return this.checkState();
     }
 
     async selectTemplateAccountById(val) {
         this.checkUploadState();
 
         await this.performAction(() => this.uploadDialog.selectTemplateAccountById(val));
+
+        return this.checkState();
     }
 
     async selectTemplateAccountByIndex(index) {
         this.checkUploadState();
 
         await this.performAction(() => this.uploadDialog.selectTemplateAccountByIndex(index));
+
+        return this.checkState();
     }
 
     /** Create new import template */
@@ -559,6 +633,8 @@ export class ImportView extends AppView {
         this.checkUploadState();
 
         await this.performAction(() => this.uploadDialog.createTemplate());
+
+        return this.checkState();
     }
 
     /** Update currently selected template */
@@ -566,6 +642,8 @@ export class ImportView extends AppView {
         this.checkUploadState();
 
         await this.performAction(() => this.uploadDialog.updateTemplate());
+
+        return this.checkState();
     }
 
     /** Delete currently selected template */
@@ -573,6 +651,8 @@ export class ImportView extends AppView {
         this.checkUploadState();
 
         await this.performAction(() => this.uploadDialog.deleteTemplate());
+
+        return this.checkState();
     }
 
     /** Submit template */
@@ -606,6 +686,8 @@ export class ImportView extends AppView {
         this.checkUploadState();
 
         await this.performAction(() => this.uploadDialog.cancelTemplate());
+
+        return this.checkState();
     }
 
     /** Run action and wait until list finish to load */
@@ -689,9 +771,42 @@ export class ImportView extends AppView {
     async selectMainAccount(val) {
         this.checkMainState();
 
+        const accountId = parseInt(val, 10);
+        const skipList = [];
+        this.items.forEach((_, ind) => {
+            const item = App.view.items[ind];
+
+            if (!item.original || !App.view.rulesEnabled) {
+                item.setMainAccount(accountId);
+                return;
+            }
+
+            // Reapply rules
+            item.restoreOriginal();
+            item.setMainAccount(accountId);
+            App.state.rules.applyTo(item);
+
+            const tr = findSimilarTransaction(item, skipList);
+            if (tr) {
+                skipList.push(tr.id);
+            }
+            item.setSimilarTransaction(tr);
+        });
+
+        this.model.mainAccount = accountId;
+        this.model.totalCount = this.items.length;
+        const enabledItems = this.items.filter((item) => item.enabled);
+        this.model.enabledCount = enabledItems.length;
+
+        this.expectedState = this.getExpectedState();
+        const expectedList = this.getExpectedList();
+        this.expectedState.itemsList.items = expectedList.items;
+
         await this.waitForList(
             () => this.content.mainAccountSelect.selectItem(val),
         );
+
+        return this.checkState();
     }
 
     checkRulesFormState() {
@@ -759,7 +874,9 @@ export class ImportView extends AppView {
         this.checkRulesListState();
 
         await this.performAction(() => this.rulesDialog.updateRule(index));
-        return true;
+
+        this.expectedState = this.getExpectedState();
+        return this.checkState();
     }
 
     async deleteRule(index) {
@@ -778,7 +895,8 @@ export class ImportView extends AppView {
         const { ruleForm } = this.rulesDialog.content;
         await this.performAction(() => ruleForm.addCondition());
 
-        return true;
+        this.expectedState = this.getExpectedState();
+        return this.checkState();
     }
 
     async deleteRuleCondition(index) {
@@ -787,7 +905,8 @@ export class ImportView extends AppView {
         const { ruleForm } = this.rulesDialog.content;
         await this.performAction(() => ruleForm.deleteCondition(index));
 
-        return true;
+        this.expectedState = this.getExpectedState();
+        return this.checkState();
     }
 
     async runOnRuleCondition(index, action) {
@@ -819,7 +938,8 @@ export class ImportView extends AppView {
         const { ruleForm } = this.rulesDialog.content;
         await this.performAction(() => ruleForm.addAction());
 
-        return true;
+        this.expectedState = this.getExpectedState();
+        return this.checkState();
     }
 
     async deleteRuleAction(index) {
@@ -828,7 +948,8 @@ export class ImportView extends AppView {
         const { ruleForm } = this.rulesDialog.content;
         await this.performAction(() => ruleForm.deleteAction(index));
 
-        return true;
+        this.expectedState = this.getExpectedState();
+        return this.checkState();
     }
 
     async runOnRuleAction(index, action) {
@@ -1234,10 +1355,9 @@ export class ImportView extends AppView {
 
     async runItemAction(index, { action, data }) {
         this.checkMainState();
-
         this.checkValidIndex(index);
-        const position = this.getPositionByIndex(index);
 
+        const position = this.getPositionByIndex(index);
         const item = this.itemsList.getItem(position.index);
 
         await this.performAction(() => item.runAction(action, data));
@@ -1255,8 +1375,7 @@ export class ImportView extends AppView {
             itemData.original.mainAccount = origMainAccount;
         }
 
-        const transaction = new ImportTransaction(itemData);
-        this.items[index] = transaction;
+        this.items[index] = new ImportTransaction(itemData);
 
         return true;
     }
@@ -1281,6 +1400,12 @@ export class ImportView extends AppView {
 
             removed += 1;
         }
+
+        this.expectedState = this.getExpectedState();
+        const expectedList = this.getExpectedList();
+        this.expectedState.itemsList.items = expectedList.items;
+
+        return this.checkState();
     }
 
     async deleteSelectedItems() {
