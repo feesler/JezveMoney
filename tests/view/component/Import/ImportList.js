@@ -130,13 +130,11 @@ export class ImportList extends TestComponent {
 
     getExpectedState() {
         const res = {
-            items: this.content.items.map((item) => {
-                // TODO : don't use copyObject
-                const listItem = (item.model.isForm)
+            items: this.content.items.map((item) => (
+                (item.model.isForm)
                     ? ImportTransactionForm.getExpectedState(item.model)
-                    : ImportTransactionItem.getExpectedState(item.model);
-                return copyObject(listItem);
-            }),
+                    : ImportTransactionItem.getExpectedState(item.model)
+            )),
         };
 
         return res;

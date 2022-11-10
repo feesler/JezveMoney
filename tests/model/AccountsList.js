@@ -200,35 +200,4 @@ export class AccountsList extends List {
     getUserHidden(returnRaw = false) {
         return this.getUserAccounts().getHidden(returnRaw);
     }
-
-    /**
-     * Return another user account id if possible
-     * Return first account if no id specified
-     * Return zero if no account found
-     * @param {number} accountId - identifier of account
-     */
-    getNext(accountId = 0) {
-        const userAccounts = this.getUserAccounts();
-        if (!userAccounts || !userAccounts.length) {
-            return 0;
-        }
-        userAccounts.sortByVisibility();
-
-        if (!accountId) {
-            return userAccounts.indexToId(0);
-        }
-
-        if (userAccounts.length < 2) {
-            return 0;
-        }
-        let ind = userAccounts.getIndexById(accountId);
-        if (ind === -1) {
-            return 0;
-        }
-
-        ind = (ind === userAccounts.length - 1) ? 0 : ind + 1;
-
-        return userAccounts.indexToId(ind);
-    }
-    // TODO: move to AppState and use with this.cacheUserAccounts();
 }

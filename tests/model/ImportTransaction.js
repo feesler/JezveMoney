@@ -182,7 +182,7 @@ export class ImportTransaction {
             }
         } else if (this.type === 'transferfrom' || this.type === 'transferto') {
             if (this.src_id === this.dest_id) {
-                const accId = App.state.accounts.getNext(this.mainAccount.id);
+                const accId = App.state.getNextAccount(this.mainAccount.id);
                 const transferAccount = App.state.accounts.getItem(accId);
 
                 if (this.type === 'transferfrom') {
@@ -258,7 +258,7 @@ export class ImportTransaction {
             }
         } else if (value === 'transferfrom' || value === 'transferto') {
             if (before.type !== 'debtfrom' && before.type !== 'debtto') {
-                const accountId = App.state.accounts.getNext(this.mainAccount.id);
+                const accountId = App.state.getNextAccount(this.mainAccount.id);
                 const nextAccount = App.state.accounts.getItem(accountId);
                 assert(nextAccount, 'Failed to find next account');
 

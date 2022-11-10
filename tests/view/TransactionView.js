@@ -1093,7 +1093,7 @@ export class TransactionView extends AppView {
     }
 
     setNextSourceAccount(accountId) {
-        const nextAccountId = App.state.accounts.getNext(accountId);
+        const nextAccountId = App.state.getNextAccount(accountId);
         const newSrcAcc = App.state.accounts.getItem(nextAccountId);
         assert(newSrcAcc, 'Next account not found');
         this.model.srcAccount = newSrcAcc;
@@ -1111,7 +1111,7 @@ export class TransactionView extends AppView {
     }
 
     setNextDestAccount(accountId) {
-        const nextAccountId = App.state.accounts.getNext(accountId);
+        const nextAccountId = App.state.getNextAccount(accountId);
         assert(nextAccountId, 'Next account not found');
 
         this.model.destAccount = App.state.accounts.getItem(nextAccountId);

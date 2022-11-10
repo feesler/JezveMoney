@@ -417,7 +417,7 @@ export class ImportTransactionItem extends TestComponent {
         }
         if (res.type === 'transferfrom' || res.type === 'transferto') {
             if (res.transferAccount && res.transferAccount.id === res.mainAccount.id) {
-                const accId = App.state.accounts.getNext(res.mainAccount.id);
+                const accId = App.state.getNextAccount(res.mainAccount.id);
                 res.transferAccount = App.state.accounts.getItem(accId);
 
                 if (res.type === 'transferfrom') {
