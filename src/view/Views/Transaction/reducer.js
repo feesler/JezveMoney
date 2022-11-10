@@ -494,19 +494,8 @@ const reduceSourceAccountChange = (state, accountId) => {
     if (transaction.type === TRANSFER) {
         if (accountId === transaction.dest_id) {
             setStateNextDestAccount(newState, accountId);
-
-            // TODO : investigate unconditional copying of amount for different currencies case
-            // Copy source amount to destination amount
-            if (transaction.dest_amount !== transaction.src_amount) {
-                newState.form.destAmount = newState.form.sourceAmount;
-            }
-            transaction.dest_amount = transaction.src_amount;
-
-            // Update result balance of destination
             calculateDestResult(newState);
         }
-
-        updateStateExchange(newState);
 
         newState.isDiff = transaction.src_curr !== transaction.dest_curr;
         if (newState.isDiff) {
@@ -537,6 +526,8 @@ const reduceSourceAccountChange = (state, accountId) => {
                 newState.id = STATE.T_D_RESULT;
             }
         }
+
+        updateStateExchange(newState);
     }
 
     return newState;
@@ -598,19 +589,8 @@ const reduceDestAccountChange = (state, accountId) => {
     if (transaction.type === TRANSFER) {
         if (accountId === newState.transaction.src_id) {
             setStateNextSourceAccount(newState, accountId);
-
-            // TODO : investigate unconditional copying of amount for different currencies case
-            // Copy source amount to destination amount
-            if (transaction.dest_amount !== transaction.src_amount) {
-                newState.form.sourceAmount = newState.form.destAmount;
-            }
-            transaction.src_amount = transaction.dest_amount;
-
-            // Update result balance of source
             calculateSourceResult(newState);
         }
-
-        updateStateExchange(newState);
 
         newState.isDiff = transaction.src_curr !== transaction.dest_curr;
         if (newState.isDiff) {
@@ -643,6 +623,8 @@ const reduceDestAccountChange = (state, accountId) => {
                 newState.id = STATE.T_D_RESULT;
             }
         }
+
+        updateStateExchange(newState);
     }
 
     return newState;

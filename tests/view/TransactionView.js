@@ -1096,17 +1096,11 @@ export class TransactionView extends AppView {
         const nextAccountId = App.state.getNextAccount(accountId);
         const newSrcAcc = App.state.accounts.getItem(nextAccountId);
         assert(newSrcAcc, 'Next account not found');
+
         this.model.srcAccount = newSrcAcc;
         this.model.src_curr_id = this.model.srcAccount.curr_id;
         this.model.srcCurr = App.currency.getItem(this.model.src_curr_id);
 
-        // Copy destination amount to source amount
-        if (this.model.fDestAmount !== this.model.fSrcAmount) {
-            this.model.srcAmount = this.model.destAmount;
-        }
-        this.model.fSrcAmount = this.model.fDestAmount;
-
-        // Update result balance of source
         this.calculateSourceResult();
     }
 
@@ -1118,13 +1112,6 @@ export class TransactionView extends AppView {
         this.model.dest_curr_id = this.model.destAccount.curr_id;
         this.model.destCurr = App.currency.getItem(this.model.dest_curr_id);
 
-        // Copy source amount to destination amount
-        if (this.model.fDestAmount !== this.model.fSrcAmount) {
-            this.model.destAmount = this.model.srcAmount;
-        }
-        this.model.fDestAmount = this.model.fSrcAmount;
-
-        // Update result balance of destination
         this.calculateDestResult();
     }
 
@@ -1440,10 +1427,6 @@ export class TransactionView extends AppView {
             this.setNextDestAccount(newAcc.id);
         }
 
-        // Update exchange rate
-        this.calcExchByAmounts();
-        this.updateExch();
-
         this.model.isDiffCurr = (this.model.src_curr_id !== this.model.dest_curr_id);
 
         if (this.model.type === EXPENSE) {
@@ -1496,6 +1479,10 @@ export class TransactionView extends AppView {
             }
         }
 
+        // Update exchange rate
+        this.calcExchByAmounts();
+        this.updateExch();
+
         this.setExpectedState(this.model.state);
 
         await this.performAction(() => this.content.source.selectAccount(val));
@@ -1534,9 +1521,6 @@ export class TransactionView extends AppView {
             this.setNextSourceAccount(newAcc.id);
         }
 
-        // Update exchange rate
-        this.calcExchByAmounts();
-        this.updateExch();
         this.model.isDiffCurr = (this.model.src_curr_id !== this.model.dest_curr_id);
 
         if (this.model.type === INCOME) {
@@ -1586,6 +1570,10 @@ export class TransactionView extends AppView {
                 }
             }
         }
+
+        // Update exchange rate
+        this.calcExchByAmounts();
+        this.updateExch();
 
         this.setExpectedState(this.model.state);
 
