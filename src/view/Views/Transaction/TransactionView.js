@@ -44,37 +44,11 @@ import { IconButton } from '../../Components/IconButton/IconButton.js';
 import './style.scss';
 import { createStore } from '../../js/store.js';
 import {
-    debtAccountChange,
-    destAccountChange,
-    destAmountChange,
-    destAmountClick,
-    destCurrencyChange,
-    destResultChange,
-    destResultClick,
-    exchangeChange,
-    exchangeClick,
-    invalidateSourceAmount,
-    invalidateDestAmount,
-    invalidateDate,
-    personChange,
-    sourceAccountChange,
-    sourceAmountChange,
-    sourceAmountClick,
-    sourceCurrencyChange,
-    sourceResultChange,
-    sourceResultClick,
-    toggleDebtAccount,
-    swapSourceAndDest,
+    actions,
+    reducer,
     calculateSourceResult,
     calculateDestResult,
     updateStateExchange,
-    reducer,
-    typeChange,
-    toggleExchange,
-    dateChange,
-    startSubmit,
-    commentChange,
-    cancelSubmit,
 } from './reducer.js';
 import * as STATE from './stateId.js';
 
@@ -255,7 +229,7 @@ class TransactionView extends View {
             throw new Error('Failed to initialize view');
         }
 
-        setEvents(this.swapBtn, { click: () => this.store.dispatch(swapSourceAndDest()) });
+        setEvents(this.swapBtn, { click: () => this.store.dispatch(actions.swapSourceAndDest()) });
 
         this.srcTileBase = this.srcContainer.querySelector('.tile-base');
         this.srcTileContainer = this.srcContainer.querySelector('.tile_container');
@@ -281,19 +255,19 @@ class TransactionView extends View {
             : null;
 
         this.srcAmountInfo = TileInfoItem.fromElement('src_amount_left', {
-            onclick: () => this.store.dispatch(sourceAmountClick()),
+            onclick: () => this.store.dispatch(actions.sourceAmountClick()),
         });
         this.destAmountInfo = TileInfoItem.fromElement('dest_amount_left', {
-            onclick: () => this.store.dispatch(destAmountClick()),
+            onclick: () => this.store.dispatch(actions.destAmountClick()),
         });
         this.exchangeInfo = TileInfoItem.fromElement('exch_left', {
-            onclick: () => this.store.dispatch(exchangeClick()),
+            onclick: () => this.store.dispatch(actions.exchangeClick()),
         });
         this.srcResBalanceInfo = TileInfoItem.fromElement('src_res_balance_left', {
-            onclick: () => this.store.dispatch(sourceResultClick()),
+            onclick: () => this.store.dispatch(actions.sourceResultClick()),
         });
         this.destResBalanceInfo = TileInfoItem.fromElement('dest_res_balance_left', {
-            onclick: () => this.store.dispatch(destResultClick()),
+            onclick: () => this.store.dispatch(actions.destResultClick()),
         });
 
         this.srcAmountRow = ge('src_amount_row');
@@ -559,7 +533,7 @@ class TransactionView extends View {
      * @param {Date} date - selected date object
      */
     onSelectDate(date) {
-        this.store.dispatch(dateChange(window.app.formatDate(date)));
+        this.store.dispatch(actions.dateChange(window.app.formatDate(date)));
 
         this.datePicker.hide();
     }
@@ -652,7 +626,7 @@ class TransactionView extends View {
 
     onChangeType(value) {
         const type = parseInt(value, 10);
-        this.store.dispatch(typeChange(type));
+        this.store.dispatch(actions.typeChange(type));
     }
 
     /**
@@ -661,7 +635,7 @@ class TransactionView extends View {
      */
     onSrcAccountSelect(obj) {
         const accountId = parseInt(obj.id, 10);
-        this.store.dispatch(sourceAccountChange(accountId));
+        this.store.dispatch(actions.sourceAccountChange(accountId));
     }
 
     /**
@@ -670,7 +644,7 @@ class TransactionView extends View {
      */
     onDestAccountSelect(obj) {
         const accountId = parseInt(obj.id, 10);
-        this.store.dispatch(destAccountChange(accountId));
+        this.store.dispatch(actions.destAccountChange(accountId));
     }
 
     /**
@@ -679,7 +653,7 @@ class TransactionView extends View {
      */
     onDebtAccountSelect(obj) {
         const accountId = parseInt(obj.id, 10);
-        this.store.dispatch(debtAccountChange(accountId));
+        this.store.dispatch(actions.debtAccountChange(accountId));
     }
 
     /**
@@ -688,7 +662,7 @@ class TransactionView extends View {
      */
     onPersonSelect(obj) {
         const personId = parseInt(obj.id, 10);
-        this.store.dispatch(personChange(personId));
+        this.store.dispatch(actions.personChange(personId));
     }
 
     /**
@@ -697,7 +671,7 @@ class TransactionView extends View {
      */
     onSrcCurrencySel(obj) {
         const currencyId = parseInt(obj.id, 10);
-        this.store.dispatch(sourceCurrencyChange(currencyId));
+        this.store.dispatch(actions.sourceCurrencyChange(currencyId));
     }
 
     /**
@@ -706,14 +680,14 @@ class TransactionView extends View {
      */
     onDestCurrencySel(obj) {
         const currencyId = parseInt(obj.id, 10);
-        this.store.dispatch(destCurrencyChange(currencyId));
+        this.store.dispatch(actions.destCurrencyChange(currencyId));
     }
 
     /**
      * Account disable button click event handler
      */
     toggleEnableAccount() {
-        this.store.dispatch(toggleDebtAccount());
+        this.store.dispatch(actions.toggleDebtAccount());
     }
 
     /**
@@ -775,55 +749,55 @@ class TransactionView extends View {
     validateSourceAmount(state) {
         const valid = (state.transaction.src_amount > 0);
         if (!valid) {
-            this.store.dispatch(invalidateSourceAmount());
+            this.store.dispatch(actions.invalidateSourceAmount());
         }
     }
 
     validateDestAmount(state) {
         const valid = (state.transaction.dest_amount > 0);
         if (!valid) {
-            this.store.dispatch(invalidateDestAmount());
+            this.store.dispatch(actions.invalidateDestAmount());
         }
     }
 
     onSourceAmountInput(e) {
-        this.store.dispatch(sourceAmountChange(e.target.value));
+        this.store.dispatch(actions.sourceAmountChange(e.target.value));
     }
 
     onDestAmountInput(e) {
-        this.store.dispatch(destAmountChange(e.target.value));
+        this.store.dispatch(actions.destAmountChange(e.target.value));
     }
 
     onExchangeInput(e) {
-        this.store.dispatch(exchangeChange(e.target.value));
+        this.store.dispatch(actions.exchangeChange(e.target.value));
     }
 
     onSourceResultInput(e) {
-        this.store.dispatch(sourceResultChange(e.target.value));
+        this.store.dispatch(actions.sourceResultChange(e.target.value));
     }
 
     onDestResultInput(e) {
-        this.store.dispatch(destResultChange(e.target.value));
+        this.store.dispatch(actions.destResultChange(e.target.value));
     }
 
     onToggleExchange() {
-        this.store.dispatch(toggleExchange());
+        this.store.dispatch(actions.toggleExchange());
     }
 
     onDateInput(e) {
-        this.store.dispatch(dateChange(e.target.value));
+        this.store.dispatch(actions.dateChange(e.target.value));
     }
 
     onCommentInput(e) {
-        this.store.dispatch(commentChange(e.target.value));
+        this.store.dispatch(actions.commentChange(e.target.value));
     }
 
     startSubmit() {
-        this.store.dispatch(startSubmit());
+        this.store.dispatch(actions.startSubmit());
     }
 
     cancelSubmit() {
-        this.store.dispatch(cancelSubmit());
+        this.store.dispatch(actions.cancelSubmit());
     }
 
     /** Form 'submit' event handler */
@@ -848,7 +822,7 @@ class TransactionView extends View {
         }
 
         if (!checkDate(state.form.date)) {
-            this.store.dispatch(invalidateDate());
+            this.store.dispatch(actions.invalidateDate());
         }
 
         const { validation } = this.store.getState();

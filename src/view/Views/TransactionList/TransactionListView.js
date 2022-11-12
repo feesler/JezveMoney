@@ -28,26 +28,7 @@ import { TransactionList } from '../../Components/TransactionList/TransactionLis
 import './style.scss';
 import { SearchInput } from '../../Components/SearchInput/SearchInput.js';
 import { createStore } from '../../js/store.js';
-import {
-    reducer,
-    changeAccountsFilter,
-    changeListMode,
-    changePersonsFilter,
-    changeTypeFilter,
-    clearAllFilters,
-    deselectAllItems,
-    isSameSelection,
-    selectAllItems,
-    showContextMenu,
-    startLoading,
-    stopLoading,
-    toggleSelectItem,
-    changeSearchQuery,
-    changeDateFilter,
-    changeMode,
-    listRequestLoaded,
-    listRequestError,
-} from './reducer.js';
+import { reducer, actions, isSameSelection } from './reducer.js';
 
 const PAGE_TITLE = 'Jezve Money | Transactions';
 const MSG_SET_POS_FAIL = 'Fail to change position of transaction.';
@@ -286,33 +267,33 @@ class TransactionListView extends View {
     }
 
     showContextMenu(itemId) {
-        this.store.dispatch(showContextMenu(itemId));
+        this.store.dispatch(actions.showContextMenu(itemId));
     }
 
     toggleSelectItem(itemId) {
-        this.store.dispatch(toggleSelectItem(itemId));
+        this.store.dispatch(actions.toggleSelectItem(itemId));
     }
 
     selectAll() {
-        this.store.dispatch(selectAllItems());
+        this.store.dispatch(actions.selectAllItems());
     }
 
     deselectAll() {
-        this.store.dispatch(deselectAllItems());
+        this.store.dispatch(actions.deselectAllItems());
     }
 
     setListMode(listMode) {
-        this.store.dispatch(changeListMode(listMode));
+        this.store.dispatch(actions.changeListMode(listMode));
     }
 
     /** Set loading state and render view */
     startLoading() {
-        this.store.dispatch(startLoading());
+        this.store.dispatch(actions.startLoading());
     }
 
     /** Remove loading state and render view */
     stopLoading() {
-        this.store.dispatch(stopLoading());
+        this.store.dispatch(actions.stopLoading());
     }
 
     getContextIds() {
@@ -388,7 +369,7 @@ class TransactionListView extends View {
         e.stopPropagation();
         e.preventDefault();
 
-        this.store.dispatch(clearAllFilters());
+        this.store.dispatch(actions.clearAllFilters());
         const state = this.store.getState();
         this.requestTransactions(state.form);
     }
@@ -397,7 +378,7 @@ class TransactionListView extends View {
      * Transaction type menu change event handler
      */
     onChangeTypeFilter(selected) {
-        this.store.dispatch(changeTypeFilter(selected));
+        this.store.dispatch(actions.changeTypeFilter(selected));
         const state = this.store.getState();
         this.requestTransactions(state.form);
     }
@@ -414,7 +395,7 @@ class TransactionListView extends View {
             return;
         }
 
-        this.store.dispatch(changeAccountsFilter(ids));
+        this.store.dispatch(actions.changeAccountsFilter(ids));
         state = this.store.getState();
         this.requestTransactions(state.form);
     }
@@ -431,14 +412,14 @@ class TransactionListView extends View {
             return;
         }
 
-        this.store.dispatch(changePersonsFilter(ids));
+        this.store.dispatch(actions.changePersonsFilter(ids));
         state = this.store.getState();
         this.requestTransactions(state.form);
     }
 
     /** Search field input event handler */
     onSearchInputChange(value) {
-        this.store.dispatch(changeSearchQuery(value));
+        this.store.dispatch(actions.changeSearchQuery(value));
         const state = this.store.getState();
         this.requestTransactions(state.form);
     }
@@ -485,7 +466,7 @@ class TransactionListView extends View {
 
     /** Date range filter change handler */
     onChangeDateFilter(data) {
-        this.store.dispatch(changeDateFilter(data));
+        this.store.dispatch(actions.changeDateFilter(data));
         const state = this.store.getState();
         this.requestTransactions(state.form);
     }
@@ -515,7 +496,7 @@ class TransactionListView extends View {
     }
 
     onModeChanged(mode) {
-        this.store.dispatch(changeMode(mode));
+        this.store.dispatch(actions.changeMode(mode));
         this.replaceHistory();
     }
 
@@ -546,10 +527,10 @@ class TransactionListView extends View {
         try {
             const result = await API.transaction.list(options);
 
-            this.store.dispatch(listRequestLoaded(result.data));
+            this.store.dispatch(actions.listRequestLoaded(result.data));
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
-            this.store.dispatch(listRequestError());
+            this.store.dispatch(actions.listRequestError());
         }
 
         this.replaceHistory();

@@ -1,4 +1,4 @@
-import { isFunction } from 'jezvejs';
+import { isFunction, isObject } from 'jezvejs';
 
 class Store {
     constructor(reducer, initialState = {}) {
@@ -37,3 +37,30 @@ class Store {
 }
 
 export const createStore = (...args) => (new Store(...args));
+
+export const createSlice = (reducers) => {
+    if (!isObject(reducers)) {
+        throw new Error('Invalid actions object');
+    }
+
+    const slice = {
+        actions: {},
+        reducers: {},
+    };
+
+    Object.keys(reducers).forEach((action) => {
+        slice.actions[action] = (payload) => ({ type: action, payload });
+        slice.reducers[action] = reducers[action];
+    });
+
+    slice.reducer = (state, action) => {
+        if (!(action.type in slice.reducers)) {
+            throw new Error('Invalid action type');
+        }
+
+        const reduceFunc = slice.reducers[action.type];
+        return reduceFunc(state, action.payload);
+    };
+
+    return slice;
+};
