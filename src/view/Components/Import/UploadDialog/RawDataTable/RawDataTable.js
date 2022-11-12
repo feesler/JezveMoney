@@ -89,7 +89,7 @@ export class RawDataTable extends Component {
             const cell = createElement('div', {
                 props: {
                     className: CELL_CLASS,
-                    textContent: startRow + ind + 1,
+                    textContent: ind + 1,
                 },
             });
             cells.push(cell);
