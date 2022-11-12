@@ -18,6 +18,8 @@ import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { ListContainer } from '../../Components/ListContainer/ListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { PopupMenu } from '../../Components/PopupMenu/PopupMenu.js';
+import { createStore } from '../../js/store.js';
+import { actions, reducer } from './reducer.js';
 import './style.scss';
 
 /** Strings */
@@ -39,7 +41,7 @@ class AccountListView extends View {
         window.app.checkUserAccountModels();
         window.app.loadModel(IconList, 'icons', window.app.props.icons);
 
-        this.state = {
+        const initialState = {
             items: {
                 visible: AccountList.create(window.app.model.visibleUserAccounts),
                 hidden: AccountList.create(window.app.model.hiddenUserAccounts),
@@ -49,24 +51,32 @@ class AccountListView extends View {
             contextItem: null,
             renderTime: Date.now(),
         };
+
+        this.store = createStore(reducer, initialState);
+        this.store.subscribe((state, prevState) => {
+            if (state !== prevState) {
+                this.render(state, prevState);
+            }
+        });
     }
 
     /**
      * View initialization
      */
     onStart() {
+        const state = this.store.getState();
         const listProps = {
             ItemComponent: AccountTile,
-            getItemProps: (account, state) => ({
+            getItemProps: (account, { listMode }) => ({
                 type: 'button',
                 account,
                 attrs: { 'data-id': account.id },
                 selected: account.selected,
-                selectMode: state.listMode === 'select',
+                selectMode: listMode === 'select',
             }),
             className: 'tiles',
             itemSelector: '.tile',
-            listMode: this.state.listMode,
+            listMode: state.listMode,
             noItemsMessage: MSG_NO_ACCOUNTS,
             onItemClick: (id, e) => this.onItemClick(id, e),
         };
@@ -92,7 +102,7 @@ class AccountListView extends View {
         this.loadingIndicator = LoadingIndicator.create();
         insertAfter(this.loadingIndicator.elem, this.hiddenTiles.elem);
 
-        this.render(this.state);
+        this.render(state);
     }
 
     createMenu() {
@@ -183,9 +193,10 @@ class AccountListView extends View {
     }
 
     onItemClick(itemId, e) {
-        if (this.state.listMode === 'list') {
+        const { listMode } = this.store.getState();
+        if (listMode === 'list') {
             this.showContextMenu(itemId);
-        } else if (this.state.listMode === 'select') {
+        } else if (listMode === 'select') {
             if (e?.target?.closest('.checkbox')) {
                 e.preventDefault();
             }
@@ -195,123 +206,48 @@ class AccountListView extends View {
     }
 
     showContextMenu(itemId) {
-        if (this.state.contextItem === itemId) {
-            return;
-        }
-
-        this.setState({ ...this.state, contextItem: itemId });
-    }
-
-    getAccountById(id) {
-        return window.app.model.userAccounts.getItem(id);
+        this.store.dispatch(actions.showContextMenu(itemId));
     }
 
     toggleSelectItem(itemId) {
-        const account = this.getAccountById(itemId);
-        if (!account) {
-            return;
-        }
-
-        const toggleItem = (item) => (
-            (item.id === itemId)
-                ? { ...item, selected: !item.selected }
-                : item
-        );
-
-        const { visible, hidden } = this.state.items;
-        this.setState({
-            ...this.state,
-            items: {
-                visible: (account.isVisible()) ? visible.map(toggleItem) : visible,
-                hidden: (!account.isVisible()) ? hidden.map(toggleItem) : hidden,
-            },
-        });
-    }
-
-    reduceSelectAll(state = this.state) {
-        const selectItem = (item) => (
-            (item.selected)
-                ? item
-                : { ...item, selected: true }
-        );
-
-        return {
-            ...state,
-            items: {
-                visible: state.items.visible.map(selectItem),
-                hidden: state.items.hidden.map(selectItem),
-            },
-        };
-    }
-
-    reduceDeselectAll(state = this.state) {
-        const deselectItem = (item) => (
-            (item.selected)
-                ? { ...item, selected: false }
-                : item
-        );
-
-        return {
-            ...state,
-            items: {
-                visible: state.items.visible.map(deselectItem),
-                hidden: state.items.hidden.map(deselectItem),
-            },
-        };
+        this.store.dispatch(actions.toggleSelectItem(itemId));
     }
 
     selectAll() {
-        this.setState(this.reduceSelectAll());
+        this.store.dispatch(actions.selectAllItems());
     }
 
     deselectAll() {
-        this.setState(this.reduceDeselectAll());
+        this.store.dispatch(actions.deselectAllItems());
     }
 
     toggleSelectMode() {
-        let newState = {
-            ...this.state,
-            listMode: (this.state.listMode === 'list') ? 'select' : 'list',
-            contextItem: null,
-        };
-        if (newState.listMode === 'list') {
-            newState = this.reduceDeselectAll(newState);
-        }
-
-        this.setState(newState);
+        this.store.dispatch(actions.toggleSelectMode());
     }
 
     startLoading() {
-        if (this.state.loading) {
-            return;
-        }
-
-        this.setState({ ...this.state, loading: true });
+        this.store.dispatch(actions.startLoading());
     }
 
     stopLoading() {
-        if (!this.state.loading) {
-            return;
-        }
-
-        this.setState({ ...this.state, loading: false });
+        this.store.dispatch(actions.stopLoading());
     }
 
-    getVisibleSelectedItems(state = this.state) {
+    getVisibleSelectedItems(state) {
         return state.items.visible.filter((item) => item.selected);
     }
 
-    getHiddenSelectedItems(state = this.state) {
+    getHiddenSelectedItems(state) {
         return state.items.hidden.filter((item) => item.selected);
     }
 
-    getSelectedIds(state = this.state) {
+    getSelectedIds(state) {
         const selArr = this.getVisibleSelectedItems(state);
         const hiddenSelArr = this.getHiddenSelectedItems(state);
         return selArr.concat(hiddenSelArr).map((item) => item.id);
     }
 
-    getContextIds(state = this.state) {
+    getContextIds(state) {
         if (state.listMode === 'list') {
             return asArray(state.contextItem);
         }
@@ -320,11 +256,12 @@ class AccountListView extends View {
     }
 
     async showItems(value = true) {
-        if (this.state.loading) {
+        const state = this.store.getState();
+        if (state.loading) {
             return;
         }
 
-        const ids = this.getContextIds();
+        const ids = this.getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -345,11 +282,12 @@ class AccountListView extends View {
     }
 
     async deleteItems() {
-        if (this.state.loading) {
+        const state = this.store.getState();
+        if (state.loading) {
             return;
         }
 
-        const ids = this.getContextIds();
+        const ids = this.getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -372,15 +310,7 @@ class AccountListView extends View {
             window.app.model.userAccounts = null;
             window.app.checkUserAccountModels();
 
-            this.setState({
-                ...this.state,
-                items: {
-                    visible: AccountList.create(window.app.model.visibleUserAccounts),
-                    hidden: AccountList.create(window.app.model.hiddenUserAccounts),
-                },
-                listMode: 'list',
-                contextItem: null,
-            });
+            this.store.dispatch(actions.listRequestLoaded());
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
         }
@@ -392,7 +322,8 @@ class AccountListView extends View {
      * Show account(s) delete confirmation popup
      */
     confirmDelete() {
-        const ids = this.getContextIds();
+        const state = this.store.getState();
+        const ids = this.getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -411,7 +342,7 @@ class AccountListView extends View {
             this.contextMenu.detach();
             return;
         }
-        const account = this.getAccountById(state.contextItem);
+        const account = window.app.model.userAccounts.getItem(state.contextItem);
         if (!account) {
             return;
         }

@@ -16,6 +16,8 @@ import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndic
 import { PopupMenu } from '../../Components/PopupMenu/PopupMenu.js';
 import { Tile } from '../../Components/Tile/Tile.js';
 import './style.scss';
+import { createStore } from '../../js/store.js';
+import { actions, reducer } from './reducer.js';
 
 /** Strings */
 const TITLE_SINGLE_PERSON_DELETE = 'Delete person';
@@ -34,7 +36,7 @@ class PersonListView extends View {
         window.app.loadModel(PersonList, 'persons', window.app.props.persons);
         window.app.checkPersonModels();
 
-        this.state = {
+        const initialState = {
             items: {
                 visible: PersonList.create(window.app.model.visiblePersons),
                 hidden: PersonList.create(window.app.model.hiddenPersons),
@@ -44,25 +46,33 @@ class PersonListView extends View {
             contextItem: null,
             renderTime: Date.now(),
         };
+
+        this.store = createStore(reducer, initialState);
+        this.store.subscribe((state, prevState) => {
+            if (state !== prevState) {
+                this.render(state, prevState);
+            }
+        });
     }
 
     /**
      * View initialization
      */
     onStart() {
+        const state = this.store.getState();
         const listProps = {
             ItemComponent: Tile,
-            getItemProps: (person, state) => ({
+            getItemProps: (person, { listMode }) => ({
                 type: 'button',
                 attrs: { 'data-id': person.id },
                 className: 'tiles',
                 title: person.name,
                 selected: person.selected,
-                selectMode: state.listMode === 'select',
+                selectMode: listMode === 'select',
             }),
             className: 'tiles',
             itemSelector: '.tile',
-            listMode: this.state.listMode,
+            listMode: state.listMode,
             noItemsMessage: MSG_NO_PERSONS,
             onItemClick: (id, e) => this.onItemClick(id, e),
         };
@@ -88,7 +98,7 @@ class PersonListView extends View {
         this.loadingIndicator = LoadingIndicator.create();
         insertAfter(this.loadingIndicator.elem, this.hiddenTiles.elem);
 
-        this.render(this.state);
+        this.render(state);
     }
 
     createMenu() {
@@ -167,9 +177,10 @@ class PersonListView extends View {
     }
 
     onItemClick(itemId, e) {
-        if (this.state.listMode === 'list') {
+        const { listMode } = this.store.getState();
+        if (listMode === 'list') {
             this.showContextMenu(itemId);
-        } else if (this.state.listMode === 'select') {
+        } else if (listMode === 'select') {
             if (e?.target?.closest('.checkbox')) {
                 e.preventDefault();
             }
@@ -179,123 +190,48 @@ class PersonListView extends View {
     }
 
     showContextMenu(itemId) {
-        if (this.state.contextItem === itemId) {
-            return;
-        }
-
-        this.setState({ ...this.state, contextItem: itemId });
-    }
-
-    getPersonById(id) {
-        return window.app.model.persons.getItem(id);
+        this.store.dispatch(actions.showContextMenu(itemId));
     }
 
     toggleSelectItem(itemId) {
-        const person = this.getPersonById(itemId);
-        if (!person) {
-            return;
-        }
-
-        const toggleItem = (item) => (
-            (item.id === itemId)
-                ? { ...item, selected: !item.selected }
-                : item
-        );
-
-        const { visible, hidden } = this.state.items;
-        this.setState({
-            ...this.state,
-            items: {
-                visible: (person.isVisible()) ? visible.map(toggleItem) : visible,
-                hidden: (!person.isVisible()) ? hidden.map(toggleItem) : hidden,
-            },
-        });
-    }
-
-    reduceSelectAll(state = this.state) {
-        const selectItem = (item) => (
-            (item.selected)
-                ? item
-                : { ...item, selected: true }
-        );
-
-        return {
-            ...state,
-            items: {
-                visible: state.items.visible.map(selectItem),
-                hidden: state.items.hidden.map(selectItem),
-            },
-        };
-    }
-
-    reduceDeselectAll(state = this.state) {
-        const deselectItem = (item) => (
-            (item.selected)
-                ? { ...item, selected: false }
-                : item
-        );
-
-        return {
-            ...state,
-            items: {
-                visible: state.items.visible.map(deselectItem),
-                hidden: state.items.hidden.map(deselectItem),
-            },
-        };
+        this.store.dispatch(actions.toggleSelectItem(itemId));
     }
 
     selectAll() {
-        this.setState(this.reduceSelectAll());
+        this.store.dispatch(actions.selectAllItems());
     }
 
     deselectAll() {
-        this.setState(this.reduceDeselectAll());
+        this.store.dispatch(actions.deselectAllItems());
     }
 
     toggleSelectMode() {
-        let newState = {
-            ...this.state,
-            listMode: (this.state.listMode === 'list') ? 'select' : 'list',
-            contextItem: null,
-        };
-        if (newState.listMode === 'list') {
-            newState = this.reduceDeselectAll(newState);
-        }
-
-        this.setState(newState);
+        this.store.dispatch(actions.toggleSelectMode());
     }
 
     startLoading() {
-        if (this.state.loading) {
-            return;
-        }
-
-        this.setState({ ...this.state, loading: true });
+        this.store.dispatch(actions.startLoading());
     }
 
     stopLoading() {
-        if (!this.state.loading) {
-            return;
-        }
-
-        this.setState({ ...this.state, loading: false });
+        this.store.dispatch(actions.stopLoading());
     }
 
-    getVisibleSelectedItems(state = this.state) {
+    getVisibleSelectedItems(state) {
         return state.items.visible.filter((item) => item.selected);
     }
 
-    getHiddenSelectedItems(state = this.state) {
+    getHiddenSelectedItems(state) {
         return state.items.hidden.filter((item) => item.selected);
     }
 
-    getSelectedIds(state = this.state) {
+    getSelectedIds(state) {
         const selArr = this.getVisibleSelectedItems(state);
         const hiddenSelArr = this.getHiddenSelectedItems(state);
         return selArr.concat(hiddenSelArr).map((item) => item.id);
     }
 
-    getContextIds(state = this.state) {
+    getContextIds(state) {
         if (state.listMode === 'list') {
             return asArray(state.contextItem);
         }
@@ -304,11 +240,12 @@ class PersonListView extends View {
     }
 
     async showItems(value = true) {
-        if (this.state.loading) {
+        const state = this.store.getState();
+        if (state.loading) {
             return;
         }
 
-        const ids = this.getContextIds();
+        const ids = this.getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -329,11 +266,12 @@ class PersonListView extends View {
     }
 
     async deleteItems() {
-        if (this.state.loading) {
+        const state = this.store.getState();
+        if (state.loading) {
             return;
         }
 
-        const ids = this.getContextIds();
+        const ids = this.getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -356,15 +294,7 @@ class PersonListView extends View {
             window.app.model.visiblePersons = null;
             window.app.checkPersonModels();
 
-            this.setState({
-                ...this.state,
-                items: {
-                    visible: PersonList.create(window.app.model.visiblePersons),
-                    hidden: PersonList.create(window.app.model.hiddenPersons),
-                },
-                listMode: 'list',
-                contextItem: null,
-            });
+            this.store.dispatch(actions.listRequestLoaded());
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
         }
@@ -374,7 +304,8 @@ class PersonListView extends View {
 
     /** Show person(s) delete confirmation popup */
     confirmDelete() {
-        const ids = this.getContextIds();
+        const state = this.store.getState();
+        const ids = this.getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -393,7 +324,7 @@ class PersonListView extends View {
             this.contextMenu.detach();
             return;
         }
-        const person = this.getPersonById(state.contextItem);
+        const person = window.app.model.persons.getItem(state.contextItem);
         if (!person) {
             return;
         }
