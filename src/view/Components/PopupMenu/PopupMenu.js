@@ -11,6 +11,7 @@ import {
     removeChilds,
     setEmptyClick,
     removeEmptyClick,
+    computedStyle,
     Component,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
@@ -27,6 +28,7 @@ const ICONBTN_CLASS = 'action-iconbutton';
 const CHECKBOX_CLASS = 'action-checkbox';
 
 /* List position constants */
+const SCREEN_PADDING = 5;
 const LIST_MARGIN = 5;
 
 const defaultProps = {
@@ -109,6 +111,9 @@ export class PopupMenu extends Component {
 
         if (this.props.hideOnScroll) {
             this.setScrollEvents();
+            setTimeout(() => {
+                this.ignoreScroll = false;
+            }, 200);
         }
     }
 
@@ -129,7 +134,6 @@ export class PopupMenu extends Component {
 
     onScroll() {
         if (this.ignoreScroll) {
-            this.ignoreScroll = false;
             return;
         }
 
@@ -249,9 +253,23 @@ export class PopupMenu extends Component {
         return separator;
     }
 
+    /** Find parent element of list without offsetParent and check it has position: fixed */
+    isInsideFixedContainer() {
+        let elem = this.menuList;
+        while (elem.offsetParent) {
+            elem = elem.offsetParent;
+        }
+
+        const style = computedStyle(elem);
+        return style.position === 'fixed';
+    }
+
     calculatePosition() {
         const html = document.documentElement;
-        const screenBottom = html.scrollTop + html.clientHeight;
+        const screenTop = html.scrollTop;
+        const screenBottom = screenTop + html.clientHeight;
+        const scrollAvailable = !this.isInsideFixedContainer();
+        const scrollHeight = (scrollAvailable) ? html.scrollHeight : screenBottom;
 
         const offset = getOffset(this.menuList.offsetParent);
         const container = getOffset(this.relElem);
@@ -259,20 +277,47 @@ export class PopupMenu extends Component {
         container.height = this.relElem.offsetHeight;
 
         const margins = LIST_MARGIN * 2;
+        const padding = SCREEN_PADDING * 2;
         const listWidth = this.menuList.offsetWidth;
-        const listHeight = this.menuList.offsetHeight;
+        let listHeight = this.menuList.offsetHeight;
         const totalListHeight = container.height + listHeight + margins;
         const listBottom = container.top + totalListHeight;
 
         // Check vertical offset of menu list
-        if (listBottom > html.scrollHeight) {
-            this.menuList.style.top = px(container.top - offset.top - listHeight - LIST_MARGIN);
+        const listTop = container.top - listHeight - padding;
+        const topSpace = container.top - screenTop;
+        const bottomSpace = screenBottom - container.top + container.height;
+
+        if (
+            listBottom > scrollHeight
+            && (
+                scrollAvailable
+                || (!scrollAvailable && topSpace > bottomSpace)
+            )
+        ) {
+            const listOverflow = screenTop - listTop;
+            if (listOverflow > 0) {
+                if (scrollAvailable) {
+                    html.scrollTop -= listOverflow;
+                } else {
+                    listHeight -= listOverflow;
+                    this.menuList.style.height = px(listHeight);
+                }
+            }
+
+            this.menuList.style.top = px(container.top - offset.top - listHeight - padding);
         } else {
-            if (listBottom > screenBottom) {
-                html.scrollTop += listBottom - screenBottom;
+            const listOverflow = listBottom + padding - screenBottom;
+            if (listOverflow > 0) {
+                if (scrollAvailable) {
+                    html.scrollTop += listOverflow;
+                } else {
+                    listHeight -= listOverflow;
+                    this.menuList.style.height = px(listHeight);
+                }
             }
             this.menuList.style.top = px(
-                container.top - offset.top + container.height + LIST_MARGIN,
+                container.top - offset.top + container.height,
             );
         }
 
@@ -310,6 +355,7 @@ export class PopupMenu extends Component {
         this.menuList.style.top = '';
         this.menuList.style.left = '';
         this.menuList.style.width = '';
+        this.menuList.style.height = '';
 
         PopupMenu.activeInstance = null;
         this.removeHandlers();
