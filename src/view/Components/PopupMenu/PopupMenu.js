@@ -21,6 +21,7 @@ import './style.scss';
 /* CSS classes */
 const MENU_CLASS = 'actions-menu';
 const LIST_CLASS = 'actions-menu-list';
+const FIXED_LIST_CLASS = 'actions-menu-list_fixed';
 const BUTTON_CLASS = 'btn icon-btn actions-menu-btn';
 const ICON_CLASS = 'icon actions-menu-btn__icon';
 const SEPARATOR_CLASS = 'actions-menu-list__separator';
@@ -36,6 +37,7 @@ const defaultProps = {
     attached: false,
     attachTo: null,
     hideOnScroll: true,
+    fixed: true,
     content: null,
     items: [],
     id: null,
@@ -73,6 +75,10 @@ export class PopupMenu extends Component {
 
         this.menuList = createContainer(LIST_CLASS);
         show(this.menuList, false);
+
+        if (this.props.fixed) {
+            this.menuList.classList.add(FIXED_LIST_CLASS);
+        }
 
         if (this.props.items) {
             this.append(this.props.items);
@@ -271,7 +277,9 @@ export class PopupMenu extends Component {
         const scrollAvailable = !this.isInsideFixedContainer();
         const scrollHeight = (scrollAvailable) ? html.scrollHeight : screenBottom;
 
-        const offset = getOffset(this.menuList.offsetParent);
+        const offset = (this.menuList.offsetParent)
+            ? getOffset(this.menuList.offsetParent)
+            : { top: screenTop, left: html.scrollLeft };
         const container = getOffset(this.relElem);
         container.width = this.relElem.offsetWidth;
         container.height = this.relElem.offsetHeight;
@@ -334,7 +342,7 @@ export class PopupMenu extends Component {
 
     showMenu() {
         show(this.menuList, true);
-        if (!this.menuList.offsetParent) {
+        if (!this.props.fixed && !this.menuList.offsetParent) {
             show(this.menuList, false);
             return;
         }

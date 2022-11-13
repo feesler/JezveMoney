@@ -35,6 +35,10 @@
   z-index: 2000;
 }
 
+.actions-menu-list_fixed {
+  position: fixed;
+}
+
 .actions-menu-list__separator {
   border: 0;
   border-bottom-width: 1px;
