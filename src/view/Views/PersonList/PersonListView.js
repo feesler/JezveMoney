@@ -102,45 +102,43 @@ class PersonListView extends View {
     }
 
     createMenu() {
-        this.menu = PopupMenu.create({ id: 'listMenu' });
-
-        this.selectModeBtn = this.menu.addIconItem({
-            id: 'selectModeBtn',
-            icon: 'select',
-            title: 'Select',
-            onClick: () => this.toggleSelectMode(),
-        });
-        this.separator1 = this.menu.addSeparator();
-
-        this.selectAllBtn = this.menu.addIconItem({
-            id: 'selectAllBtn',
-            title: 'Select all',
-            onClick: () => this.selectAll(),
-        });
-        this.deselectAllBtn = this.menu.addIconItem({
-            id: 'deselectAllBtn',
-            title: 'Clear selection',
-            onClick: () => this.deselectAll(),
-        });
-        this.separator2 = this.menu.addSeparator();
-
-        this.showBtn = this.menu.addIconItem({
-            id: 'showBtn',
-            icon: 'show',
-            title: 'Restore',
-            onClick: () => this.showItems(),
-        });
-        this.hideBtn = this.menu.addIconItem({
-            id: 'hideBtn',
-            icon: 'hide',
-            title: 'Hide',
-            onClick: () => this.showItems(false),
-        });
-        this.deleteBtn = this.menu.addIconItem({
-            id: 'deleteBtn',
-            icon: 'del',
-            title: 'Delete',
-            onClick: () => this.confirmDelete(),
+        this.menu = PopupMenu.create({
+            id: 'listMenu',
+            items: [{
+                id: 'selectModeBtn',
+                icon: 'select',
+                title: 'Select',
+                onClick: () => this.toggleSelectMode(),
+            }, {
+                id: 'separator1',
+                type: 'separator',
+            }, {
+                id: 'selectAllBtn',
+                title: 'Select all',
+                onClick: () => this.selectAll(),
+            }, {
+                id: 'deselectAllBtn',
+                title: 'Clear selection',
+                onClick: () => this.deselectAll(),
+            }, {
+                id: 'separator2',
+                type: 'separator',
+            }, {
+                id: 'showBtn',
+                icon: 'show',
+                title: 'Restore',
+                onClick: () => this.showItems(),
+            }, {
+                id: 'hideBtn',
+                icon: 'hide',
+                title: 'Hide',
+                onClick: () => this.showItems(false),
+            }, {
+                id: 'deleteBtn',
+                icon: 'del',
+                title: 'Delete',
+                onClick: () => this.confirmDelete(),
+            }],
         });
     }
 
@@ -148,31 +146,27 @@ class PersonListView extends View {
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
             attached: true,
-        });
-
-        this.ctxUpdateBtn = this.contextMenu.addIconItem({
-            id: 'ctxUpdateBtn',
-            type: 'link',
-            icon: 'update',
-            title: 'Edit',
-        });
-        this.ctxShowBtn = this.contextMenu.addIconItem({
-            id: 'ctxShowBtn',
-            icon: 'show',
-            title: 'Restore',
-            onClick: () => this.showItems(),
-        });
-        this.ctxHideBtn = this.contextMenu.addIconItem({
-            id: 'ctxHideBtn',
-            icon: 'hide',
-            title: 'Hide',
-            onClick: () => this.showItems(false),
-        });
-        this.ctxDeleteBtn = this.contextMenu.addIconItem({
-            id: 'ctxDeleteBtn',
-            icon: 'del',
-            title: 'Delete',
-            onClick: () => this.confirmDelete(),
+            items: [{
+                id: 'ctxUpdateBtn',
+                type: 'link',
+                icon: 'update',
+                title: 'Edit',
+            }, {
+                id: 'ctxShowBtn',
+                icon: 'show',
+                title: 'Restore',
+                onClick: () => this.showItems(),
+            }, {
+                id: 'ctxHideBtn',
+                icon: 'hide',
+                title: 'Hide',
+                onClick: () => this.showItems(false),
+            }, {
+                id: 'ctxDeleteBtn',
+                icon: 'del',
+                title: 'Delete',
+                onClick: () => this.confirmDelete(),
+            }],
         });
     }
 
@@ -336,9 +330,10 @@ class PersonListView extends View {
         }
 
         const { baseURL } = window.app;
-        this.ctxUpdateBtn.setURL(`${baseURL}persons/update/${person.id}`);
-        this.ctxShowBtn.show(!person.isVisible());
-        this.ctxHideBtn.show(person.isVisible());
+        const { items } = this.contextMenu;
+        items.ctxUpdateBtn.setURL(`${baseURL}persons/update/${person.id}`);
+        items.ctxShowBtn.show(!person.isVisible());
+        items.ctxHideBtn.show(person.isVisible());
 
         this.contextMenu.attachAndShow(tile);
     }
@@ -354,18 +349,19 @@ class PersonListView extends View {
 
         this.menu.show(itemsCount > 0);
 
+        const { items } = this.menu;
         const selectModeTitle = (isSelectMode) ? 'Done' : 'Select';
-        this.selectModeBtn.setTitle(selectModeTitle);
-        this.selectModeBtn.setIcon((isSelectMode) ? null : 'select');
-        show(this.separator1, isSelectMode);
+        items.selectModeBtn.setTitle(selectModeTitle);
+        items.selectModeBtn.setIcon((isSelectMode) ? null : 'select');
+        show(items.separator1, isSelectMode);
 
-        this.selectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount);
-        this.deselectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount > 0);
-        show(this.separator2, isSelectMode);
+        items.selectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount);
+        items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount > 0);
+        show(items.separator2, isSelectMode);
 
-        this.showBtn.show(hiddenSelCount > 0);
-        this.hideBtn.show(selCount > 0);
-        this.deleteBtn.show(totalSelCount > 0);
+        items.showBtn.show(hiddenSelCount > 0);
+        items.hideBtn.show(selCount > 0);
+        items.deleteBtn.show(totalSelCount > 0);
     }
 
     render(state) {

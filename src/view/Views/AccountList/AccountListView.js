@@ -106,51 +106,48 @@ class AccountListView extends View {
     }
 
     createMenu() {
-        this.menu = PopupMenu.create({ id: 'listMenu' });
-
-        this.selectModeBtn = this.menu.addIconItem({
-            id: 'selectModeBtn',
-            icon: 'select',
-            title: 'Select',
-            onClick: () => this.toggleSelectMode(),
-        });
-        this.separator1 = this.menu.addSeparator();
-
-        this.selectAllBtn = this.menu.addIconItem({
-            id: 'selectAllBtn',
-            title: 'Select all',
-            onClick: () => this.selectAll(),
-        });
-        this.deselectAllBtn = this.menu.addIconItem({
-            id: 'deselectAllBtn',
-            title: 'Clear selection',
-            onClick: () => this.deselectAll(),
-        });
-        this.separator2 = this.menu.addSeparator();
-
-        this.exportBtn = this.menu.addIconItem({
-            id: 'exportBtn',
-            type: 'link',
-            icon: 'export',
-            title: 'Export to CSV',
-        });
-        this.showBtn = this.menu.addIconItem({
-            id: 'showBtn',
-            icon: 'show',
-            title: 'Restore',
-            onClick: () => this.showItems(),
-        });
-        this.hideBtn = this.menu.addIconItem({
-            id: 'hideBtn',
-            icon: 'hide',
-            title: 'Hide',
-            onClick: () => this.showItems(false),
-        });
-        this.deleteBtn = this.menu.addIconItem({
-            id: 'deleteBtn',
-            icon: 'del',
-            title: 'Delete',
-            onClick: () => this.confirmDelete(),
+        this.menu = PopupMenu.create({
+            id: 'listMenu',
+            items: [{
+                id: 'selectModeBtn',
+                icon: 'select',
+                title: 'Select',
+                onClick: () => this.toggleSelectMode(),
+            }, {
+                id: 'separator1',
+                type: 'separator',
+            }, {
+                id: 'selectAllBtn',
+                title: 'Select all',
+                onClick: () => this.selectAll(),
+            }, {
+                id: 'deselectAllBtn',
+                title: 'Clear selection',
+                onClick: () => this.deselectAll(),
+            }, {
+                id: 'separator2',
+                type: 'separator',
+            }, {
+                id: 'exportBtn',
+                type: 'link',
+                icon: 'export',
+                title: 'Export to CSV',
+            }, {
+                id: 'showBtn',
+                icon: 'show',
+                title: 'Restore',
+                onClick: () => this.showItems(),
+            }, {
+                id: 'hideBtn',
+                icon: 'hide',
+                title: 'Hide',
+                onClick: () => this.showItems(false),
+            }, {
+                id: 'deleteBtn',
+                icon: 'del',
+                title: 'Delete',
+                onClick: () => this.confirmDelete(),
+            }],
         });
     }
 
@@ -158,37 +155,32 @@ class AccountListView extends View {
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
             attached: true,
-        });
-
-        this.ctxUpdateBtn = this.contextMenu.addIconItem({
-            id: 'ctxUpdateBtn',
-            type: 'link',
-            icon: 'update',
-            title: 'Edit',
-        });
-        this.ctxExportBtn = this.contextMenu.addIconItem({
-            id: 'ctxExportBtn',
-            type: 'link',
-            icon: 'export',
-            title: 'Export to CSV',
-        });
-        this.ctxShowBtn = this.contextMenu.addIconItem({
-            id: 'ctxShowBtn',
-            icon: 'show',
-            title: 'Restore',
-            onClick: () => this.showItems(),
-        });
-        this.ctxHideBtn = this.contextMenu.addIconItem({
-            id: 'ctxHideBtn',
-            icon: 'hide',
-            title: 'Hide',
-            onClick: () => this.showItems(false),
-        });
-        this.ctxDeleteBtn = this.contextMenu.addIconItem({
-            id: 'ctxDeleteBtn',
-            icon: 'del',
-            title: 'Delete',
-            onClick: () => this.confirmDelete(),
+            items: [{
+                id: 'ctxUpdateBtn',
+                type: 'link',
+                icon: 'update',
+                title: 'Edit',
+            }, {
+                id: 'ctxExportBtn',
+                type: 'link',
+                icon: 'export',
+                title: 'Export to CSV',
+            }, {
+                id: 'ctxShowBtn',
+                icon: 'show',
+                title: 'Restore',
+                onClick: () => this.showItems(),
+            }, {
+                id: 'ctxHideBtn',
+                icon: 'hide',
+                title: 'Hide',
+                onClick: () => this.showItems(false),
+            }, {
+                id: 'ctxDeleteBtn',
+                icon: 'del',
+                title: 'Delete',
+                onClick: () => this.confirmDelete(),
+            }],
         });
     }
 
@@ -354,10 +346,11 @@ class AccountListView extends View {
         }
 
         const { baseURL } = window.app;
-        this.ctxUpdateBtn.setURL(`${baseURL}accounts/update/${account.id}`);
-        this.ctxExportBtn.setURL(`${baseURL}accounts/export/${account.id}`);
-        this.ctxShowBtn.show(!account.isVisible());
-        this.ctxHideBtn.show(account.isVisible());
+        const { items } = this.contextMenu;
+        items.ctxUpdateBtn.setURL(`${baseURL}accounts/update/${account.id}`);
+        items.ctxExportBtn.setURL(`${baseURL}accounts/export/${account.id}`);
+        items.ctxShowBtn.show(!account.isVisible());
+        items.ctxHideBtn.show(account.isVisible());
 
         this.contextMenu.attachAndShow(tile);
     }
@@ -372,20 +365,21 @@ class AccountListView extends View {
         const isSelectMode = (state.listMode === 'select');
 
         this.menu.show(itemsCount > 0);
+        const { items } = this.menu;
 
         const selectModeTitle = (isSelectMode) ? 'Done' : 'Select';
-        this.selectModeBtn.setTitle(selectModeTitle);
-        this.selectModeBtn.setIcon((isSelectMode) ? null : 'select');
-        show(this.separator1, isSelectMode);
+        items.selectModeBtn.setTitle(selectModeTitle);
+        items.selectModeBtn.setIcon((isSelectMode) ? null : 'select');
+        show(items.separator1, isSelectMode);
 
-        this.selectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount);
-        this.deselectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount > 0);
-        show(this.separator2, isSelectMode);
+        items.selectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount);
+        items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount > 0);
+        show(items.separator2, isSelectMode);
 
-        this.exportBtn.show(isSelectMode && totalSelCount > 0);
-        this.showBtn.show(isSelectMode && hiddenSelCount > 0);
-        this.hideBtn.show(isSelectMode && selCount > 0);
-        this.deleteBtn.show(isSelectMode && totalSelCount > 0);
+        items.exportBtn.show(isSelectMode && totalSelCount > 0);
+        items.showBtn.show(isSelectMode && hiddenSelCount > 0);
+        items.hideBtn.show(isSelectMode && selCount > 0);
+        items.deleteBtn.show(isSelectMode && totalSelCount > 0);
 
         const { baseURL } = window.app;
         const selectedIds = this.getSelectedIds(state);
@@ -397,7 +391,7 @@ class AccountListView extends View {
             } else {
                 exportURL += `?${urlJoin({ id: selectedIds })}`;
             }
-            this.exportBtn.setURL(exportURL);
+            items.exportBtn.setURL(exportURL);
         }
     }
 

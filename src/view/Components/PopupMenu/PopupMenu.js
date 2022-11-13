@@ -62,6 +62,7 @@ export class PopupMenu extends Component {
         };
 
         this.ignoreScroll = false;
+        this.items = {};
 
         this.emptyClickHandler = () => this.hideMenu();
         this.scrollHandler = () => this.onScroll();
@@ -209,18 +210,23 @@ export class PopupMenu extends Component {
             return null;
         }
 
-        const { type = 'icon', ...props } = item;
-        if (type === 'icon') {
-            return this.addIconItem(props);
-        }
-        if (type === 'checkbox') {
-            return this.addCheckboxItem(props);
-        }
-        if (type === 'separator') {
-            return this.addSeparator();
+        const { type = 'button', ...rest } = item;
+        const props = item.props ?? rest;
+
+        let res = null;
+        if (type === 'button' || type === 'link') {
+            res = this.addIconItem({ type, ...props });
+        } else if (type === 'checkbox') {
+            res = this.addCheckboxItem(props);
+        } else if (type === 'separator') {
+            res = this.addSeparator();
         }
 
-        return null;
+        if (res && typeof props.id === 'string' && props.id.length > 0) {
+            this.items[props.id] = res;
+        }
+
+        return res;
     }
 
     addIconItem(item) {

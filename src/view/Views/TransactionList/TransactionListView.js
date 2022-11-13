@@ -204,45 +204,42 @@ class TransactionListView extends View {
     }
 
     createMenu() {
-        this.menu = PopupMenu.create({ id: 'listMenu' });
-
-        this.listModeBtn = this.menu.addIconItem({
-            id: 'listModeBtn',
-            title: 'Done',
-            onClick: () => this.setListMode('list'),
-        });
-        this.selectModeBtn = this.menu.addIconItem({
-            id: 'selectModeBtn',
-            icon: 'select',
-            title: 'Select',
-            onClick: () => this.setListMode('select'),
-        });
-        this.sortModeBtn = this.menu.addIconItem({
-            id: 'sortModeBtn',
-            icon: 'sort',
-            title: 'Sort',
-            onClick: () => this.setListMode('sort'),
-        });
-        this.menu.addSeparator();
-        this.separator1 = this.menu.addSeparator();
-
-        this.selectAllBtn = this.menu.addIconItem({
-            id: 'selectAllBtn',
-            title: 'Select all',
-            onClick: () => this.selectAll(),
-        });
-        this.deselectAllBtn = this.menu.addIconItem({
-            id: 'deselectAllBtn',
-            title: 'Clear selection',
-            onClick: () => this.deselectAll(),
-        });
-        this.separator2 = this.menu.addSeparator();
-
-        this.deleteBtn = this.menu.addIconItem({
-            id: 'deleteBtn',
-            icon: 'del',
-            title: 'Delete',
-            onClick: () => this.confirmDelete(),
+        this.menu = PopupMenu.create({
+            id: 'listMenu',
+            items: [{
+                id: 'listModeBtn',
+                title: 'Done',
+                onClick: () => this.setListMode('list'),
+            }, {
+                id: 'selectModeBtn',
+                icon: 'select',
+                title: 'Select',
+                onClick: () => this.setListMode('select'),
+            }, {
+                id: 'sortModeBtn',
+                icon: 'sort',
+                title: 'Sort',
+                onClick: () => this.setListMode('sort'),
+            }, {
+                id: 'separator1',
+                type: 'separator',
+            }, {
+                id: 'selectAllBtn',
+                title: 'Select all',
+                onClick: () => this.selectAll(),
+            }, {
+                id: 'deselectAllBtn',
+                title: 'Clear selection',
+                onClick: () => this.deselectAll(),
+            }, {
+                id: 'separator2',
+                type: 'separator',
+            }, {
+                id: 'deleteBtn',
+                icon: 'del',
+                title: 'Delete',
+                onClick: () => this.confirmDelete(),
+            }],
         });
     }
 
@@ -250,19 +247,17 @@ class TransactionListView extends View {
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
             attached: true,
-        });
-
-        this.ctxUpdateBtn = this.contextMenu.addIconItem({
-            id: 'ctxUpdateBtn',
-            type: 'link',
-            icon: 'update',
-            title: 'Edit',
-        });
-        this.ctxDeleteBtn = this.contextMenu.addIconItem({
-            id: 'ctxDeleteBtn',
-            icon: 'del',
-            title: 'Delete',
-            onClick: () => this.confirmDelete(),
+            items: [{
+                id: 'ctxUpdateBtn',
+                type: 'link',
+                icon: 'update',
+                title: 'Edit',
+            }, {
+                id: 'ctxDeleteBtn',
+                icon: 'del',
+                title: 'Delete',
+                onClick: () => this.confirmDelete(),
+            }],
         });
     }
 
@@ -555,7 +550,8 @@ class TransactionListView extends View {
         }
 
         const { baseURL } = window.app;
-        this.ctxUpdateBtn.setURL(`${baseURL}transactions/update/${itemId}`);
+        const { items } = this.contextMenu;
+        items.ctxUpdateBtn.setURL(`${baseURL}transactions/update/${itemId}`);
 
         this.contextMenu.attachAndShow(menuContainer);
     }
@@ -569,17 +565,18 @@ class TransactionListView extends View {
 
         this.menu.show(itemsCount > 0);
 
-        this.listModeBtn.show(!isListMode);
-        this.selectModeBtn.show(isListMode && itemsCount > 0);
-        this.sortModeBtn.show(isListMode && itemsCount > 1);
+        const { items } = this.menu;
+        items.listModeBtn.show(!isListMode);
+        items.selectModeBtn.show(isListMode && itemsCount > 0);
+        items.sortModeBtn.show(isListMode && itemsCount > 1);
 
-        show(this.separator1, isSelectMode);
+        show(items.separator1, isSelectMode);
 
-        this.selectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount);
-        this.deselectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount > 0);
-        show(this.separator2, isSelectMode);
+        items.selectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount);
+        items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount > 0);
+        show(items.separator2, isSelectMode);
 
-        this.deleteBtn.show(isSelectMode && totalSelCount > 0);
+        items.deleteBtn.show(isSelectMode && totalSelCount > 0);
     }
 
     /** Render accounts selection */

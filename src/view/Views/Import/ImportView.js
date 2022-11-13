@@ -178,85 +178,81 @@ class ImportView extends View {
     }
 
     createMenu() {
-        this.menu = PopupMenu.create({ id: 'listMenu' });
-
-        this.createItemBtn = this.menu.addIconItem({
-            id: 'createItemBtn',
-            icon: 'plus',
-            title: 'Add item',
-            onClick: () => this.createItem(),
-        });
-        this.menu.addSeparator();
-        this.listModeBtn = this.menu.addIconItem({
-            id: 'listModeBtn',
-            title: 'Done',
-            onClick: () => this.setListMode('list'),
-        });
-        this.selectModeBtn = this.menu.addIconItem({
-            id: 'selectModeBtn',
-            icon: 'select',
-            title: 'Select',
-            onClick: () => this.setListMode('select'),
-        });
-        this.sortModeBtn = this.menu.addIconItem({
-            id: 'sortModeBtn',
-            icon: 'sort',
-            title: 'Sort',
-            onClick: () => this.setListMode('sort'),
-        });
-        this.separator2 = this.menu.addSeparator();
-
-        this.selectAllBtn = this.menu.addIconItem({
-            id: 'selectAllBtn',
-            title: 'Select all',
-            onClick: () => this.selectAll(),
-        });
-        this.deselectAllBtn = this.menu.addIconItem({
-            id: 'deselectAllBtn',
-            title: 'Clear selection',
-            onClick: () => this.deselectAll(),
-        });
-        this.enableSelectedBtn = this.menu.addIconItem({
-            id: 'enableSelectedBtn',
-            title: 'Enable selected',
-            onClick: () => this.enableSelected(true),
-        });
-        this.disableSelectedBtn = this.menu.addIconItem({
-            id: 'disableSelectedBtn',
-            title: 'Disable selected',
-            onClick: () => this.enableSelected(false),
-        });
-        this.deleteSelectedBtn = this.menu.addIconItem({
-            id: 'deleteSelectedBtn',
-            icon: 'del',
-            title: 'Delete selected',
-            onClick: () => this.deleteSelected(),
-        });
-        this.deleteAllBtn = this.menu.addIconItem({
-            id: 'deleteAllBtn',
-            icon: 'del',
-            title: 'Delete all',
-            onClick: () => this.removeAllItems(),
-        });
-        this.separator3 = this.menu.addSeparator();
-        this.rulesCheck = this.menu.addCheckboxItem({
-            id: 'rulesCheck',
-            label: 'Enable rules',
-            checked: true,
-            onChange: () => this.onToggleEnableRules(),
-        });
-        this.rulesBtn = this.menu.addIconItem({
-            id: 'rulesBtn',
-            icon: 'update',
-            title: 'Edit rules',
-            onClick: () => this.onRulesClick(),
-        });
-        this.menu.addSeparator();
-        this.similarCheck = this.menu.addCheckboxItem({
-            id: 'similarCheck',
-            label: 'Check similar transactions',
-            checked: true,
-            onChange: () => this.onToggleCheckSimilar(),
+        this.menu = PopupMenu.create({
+            id: 'listMenu',
+            items: [{
+                id: 'createItemBtn',
+                icon: 'plus',
+                title: 'Add item',
+                onClick: () => this.createItem(),
+            }, {
+                type: 'separator',
+            }, {
+                id: 'listModeBtn',
+                title: 'Done',
+                onClick: () => this.setListMode('list'),
+            }, {
+                id: 'selectModeBtn',
+                icon: 'select',
+                title: 'Select',
+                onClick: () => this.setListMode('select'),
+            }, {
+                id: 'sortModeBtn',
+                icon: 'sort',
+                title: 'Sort',
+                onClick: () => this.setListMode('sort'),
+            }, {
+                id: 'separator2',
+                type: 'separator',
+            }, {
+                id: 'selectAllBtn',
+                title: 'Select all',
+                onClick: () => this.selectAll(),
+            }, {
+                id: 'deselectAllBtn',
+                title: 'Clear selection',
+                onClick: () => this.deselectAll(),
+            }, {
+                id: 'enableSelectedBtn',
+                title: 'Enable selected',
+                onClick: () => this.enableSelected(true),
+            }, {
+                id: 'disableSelectedBtn',
+                title: 'Disable selected',
+                onClick: () => this.enableSelected(false),
+            }, {
+                id: 'deleteSelectedBtn',
+                icon: 'del',
+                title: 'Delete selected',
+                onClick: () => this.deleteSelected(),
+            }, {
+                id: 'deleteAllBtn',
+                icon: 'del',
+                title: 'Delete all',
+                onClick: () => this.removeAllItems(),
+            }, {
+                id: 'separator3',
+                type: 'separator',
+            }, {
+                id: 'rulesCheck',
+                type: 'checkbox',
+                label: 'Enable rules',
+                checked: true,
+                onChange: () => this.onToggleEnableRules(),
+            }, {
+                id: 'rulesBtn',
+                icon: 'update',
+                title: 'Edit rules',
+                onClick: () => this.onRulesClick(),
+            }, {
+                type: 'separator',
+            }, {
+                id: 'similarCheck',
+                type: 'checkbox',
+                label: 'Check similar transactions',
+                checked: true,
+                onChange: () => this.onToggleCheckSimilar(),
+            }],
         });
     }
 
@@ -265,24 +261,21 @@ class ImportView extends View {
             id: 'contextMenu',
             attached: true,
             onClose: () => this.hideContextMenu(),
-        });
-
-        this.ctxEnableBtn = this.contextMenu.addIconItem({
-            id: 'ctxEnableBtn',
-            title: STR_DISABLE_ITEM,
-            onClick: () => this.onToggleEnableItem(),
-        });
-        this.ctxUpdateBtn = this.contextMenu.addIconItem({
-            id: 'ctxUpdateBtn',
-            icon: 'update',
-            title: 'Edit',
-            onClick: () => this.onUpdateItem(),
-        });
-        this.ctxDeleteBtn = this.contextMenu.addIconItem({
-            id: 'ctxDeleteBtn',
-            icon: 'del',
-            title: 'Delete',
-            onClick: () => this.onRemoveItem(),
+            items: [{
+                id: 'ctxEnableBtn',
+                title: STR_DISABLE_ITEM,
+                onClick: () => this.onToggleEnableItem(),
+            }, {
+                id: 'ctxUpdateBtn',
+                icon: 'update',
+                title: 'Edit',
+                onClick: () => this.onUpdateItem(),
+            }, {
+                id: 'ctxDeleteBtn',
+                icon: 'del',
+                title: 'Delete',
+                onClick: () => this.onRemoveItem(),
+            }],
         });
     }
 
@@ -837,9 +830,9 @@ class ImportView extends View {
 
         const item = state.items[index];
         const title = (item.enabled) ? STR_DISABLE_ITEM : STR_ENABLE_ITEM;
-        this.ctxEnableBtn.setTitle(title);
+        this.contextMenu.items.ctxEnableBtn.setTitle(title);
 
-        this.ctxUpdateBtn.show(!item.isForm);
+        this.contextMenu.items.ctxUpdateBtn.show(!item.isForm);
 
         this.contextMenu.attachAndShow(menuContainer);
     }
@@ -852,25 +845,27 @@ class ImportView extends View {
         const hasEnabled = selectedItems.some((item) => item.enabled);
         const hasDisabled = selectedItems.some((item) => !item.enabled);
 
-        this.createItemBtn.show(isListMode);
+        const { items } = this.menu;
 
-        this.listModeBtn.show(!isListMode);
-        this.selectModeBtn.show(isListMode && hasItems);
-        this.sortModeBtn.show(isListMode && state.items.length > 1);
-        show(this.separator2, isSelectMode);
-        show(this.separator3, isSelectMode);
+        items.createItemBtn.show(isListMode);
 
-        this.selectAllBtn.show(isSelectMode && selectedItems.length < state.items.length);
-        this.deselectAllBtn.show(isSelectMode && selectedItems.length > 0);
-        this.enableSelectedBtn.show(isSelectMode && hasDisabled);
-        this.disableSelectedBtn.show(isSelectMode && hasEnabled);
-        this.deleteSelectedBtn.show(isSelectMode && selectedItems.length > 0);
-        this.deleteAllBtn.enable(state.items.length > 0);
+        items.listModeBtn.show(!isListMode);
+        items.selectModeBtn.show(isListMode && hasItems);
+        items.sortModeBtn.show(isListMode && state.items.length > 1);
+        show(items.separator2, isSelectMode);
+        show(items.separator3, isSelectMode);
 
-        this.rulesCheck.show(isListMode);
-        this.rulesBtn.show(isListMode);
-        this.rulesBtn.enable(state.rulesEnabled);
-        this.similarCheck.show(isListMode);
+        items.selectAllBtn.show(isSelectMode && selectedItems.length < state.items.length);
+        items.deselectAllBtn.show(isSelectMode && selectedItems.length > 0);
+        items.enableSelectedBtn.show(isSelectMode && hasDisabled);
+        items.disableSelectedBtn.show(isSelectMode && hasEnabled);
+        items.deleteSelectedBtn.show(isSelectMode && selectedItems.length > 0);
+        items.deleteAllBtn.enable(state.items.length > 0);
+
+        items.rulesCheck.show(isListMode);
+        items.rulesBtn.show(isListMode);
+        items.rulesBtn.enable(state.rulesEnabled);
+        items.similarCheck.show(isListMode);
     }
 
     renderList(state, prevState) {
