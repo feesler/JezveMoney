@@ -1,4 +1,5 @@
 import {
+    isFunction,
     createElement,
     setEvents,
     re,
@@ -36,6 +37,7 @@ const defaultProps = {
     content: null,
     items: [],
     id: null,
+    onClose: null,
 };
 
 export class PopupMenu extends Component {
@@ -291,6 +293,9 @@ export class PopupMenu extends Component {
 
         if (this.props.hideOnScroll) {
             this.removeScrollEvents();
+        }
+        if (isFunction(this.props.onClose)) {
+            this.props.onClose();
         }
     }
 

@@ -382,6 +382,7 @@ const slice = createSlice({
             ? state
             : {
                 ...state,
+                contextItemIndex: -1,
                 pagination: {
                     ...state.pagination,
                     page,
