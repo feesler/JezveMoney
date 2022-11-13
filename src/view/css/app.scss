@@ -437,7 +437,7 @@ label {
     white-space: nowrap;
     display: inline-block;
     flex-shrink: 1;
-    line-height: 30px;
+    line-height: var(--dd-combo-content-height);
   }
 }
 
