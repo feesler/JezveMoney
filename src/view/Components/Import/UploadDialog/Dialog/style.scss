@@ -38,7 +38,7 @@
   margin: 0;
   text-align: center;
 
-  > input[type="file"] {
+  input[type="file"] {
     position: absolute;
     z-index: 22;
     width: 100%;
@@ -46,6 +46,11 @@
     left: 0;
     top: 0;
     opacity: 0;
+    cursor: pointer;
+  }
+
+  input[type="file"]::file-selector-button {
+    cursor: pointer;
   }
 
   > .upload-form__overlap {
