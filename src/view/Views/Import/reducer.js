@@ -16,7 +16,7 @@ export const getPageIndex = (index, state) => {
 
     const { onPage } = state.pagination;
     return {
-        page: Math.max(1, Math.ceil(index / onPage)),
+        page: Math.floor(index / onPage) + 1,
         index: index % onPage,
     };
 };

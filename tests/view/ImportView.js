@@ -289,7 +289,7 @@ export class ImportView extends AppView {
 
     getPositionByIndex(index) {
         return {
-            page: Math.max(1, Math.ceil(index / ITEMS_ON_PAGE)),
+            page: Math.floor(index / ITEMS_ON_PAGE) + 1,
             index: index % ITEMS_ON_PAGE,
         };
     }
