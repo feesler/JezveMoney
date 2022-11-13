@@ -1,7 +1,6 @@
 import {
     re,
     show,
-    setEvents,
     insertAfter,
     isFunction,
     Component,
@@ -73,7 +72,6 @@ export class ImportRulesDialog extends Component {
             }),
             onItemClick: (id, e) => this.onItemClick(id, e),
         });
-        setEvents(this.rulesList.elem, { scroll: () => this.onListScroll() });
         this.listContainer.append(this.rulesList.elem);
 
         this.searchInput = SearchInput.create({
@@ -249,8 +247,11 @@ export class ImportRulesDialog extends Component {
         this.render(this.state);
     }
 
-    onItemClick(itemId) {
+    onItemClick(itemId, e) {
         if (this.state.id === this.LIST_STATE) {
+            if (!e.target.closest('.actions-menu-btn')) {
+                return;
+            }
             this.showContextMenu(itemId);
         }
     }
@@ -261,11 +262,6 @@ export class ImportRulesDialog extends Component {
         }
 
         this.setState({ ...this.state, contextItem: itemId });
-    }
-
-    /** Rules list 'scroll' event handler */
-    onListScroll() {
-        PopupMenu.hideActive();
     }
 
     /** Rule 'submit' event handler */

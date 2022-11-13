@@ -120,11 +120,11 @@ export class PopupMenu extends Component {
     }
 
     setScrollEvents() {
-        window.addEventListener('scroll', this.scrollHandler, { passive: true });
+        window.addEventListener('scroll', this.scrollHandler, { passive: true, capture: true });
     }
 
     removeScrollEvents() {
-        window.removeEventListener('scroll', this.scrollHandler, { passive: true });
+        window.removeEventListener('scroll', this.scrollHandler, { passive: true, capture: true });
     }
 
     onScroll() {
