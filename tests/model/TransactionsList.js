@@ -398,27 +398,24 @@ export class TransactionsList extends List {
             return list;
         }
 
-        const res = [];
-        for (const trans of list) {
-            const convTrans = copyObject(trans);
+        return list.map((item) => {
+            const res = { ...item };
 
-            if (convTrans.src_id === account.id) {
-                convTrans.src_curr = account.curr_id;
-                if (convTrans.dest_curr === account.curr_id) {
-                    convTrans.src_amount = convTrans.dest_amount;
+            if (res.src_id === account.id) {
+                res.src_curr = account.curr_id;
+                if (res.dest_curr === account.curr_id) {
+                    res.src_amount = res.dest_amount;
                 }
             }
-            if (convTrans.dest_id === account.id) {
-                convTrans.dest_curr = account.curr_id;
-                if (convTrans.src_curr === account.curr_id) {
-                    convTrans.dest_amount = convTrans.src_amount;
+            if (res.dest_id === account.id) {
+                res.dest_curr = account.curr_id;
+                if (res.src_curr === account.curr_id) {
+                    res.dest_amount = res.src_amount;
                 }
             }
 
-            res.push(convTrans);
-        }
-
-        return res;
+            return res;
+        });
     }
 
     // Return expected list of transactions after update specified account
