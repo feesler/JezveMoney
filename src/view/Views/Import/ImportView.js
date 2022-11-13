@@ -264,7 +264,6 @@ class ImportView extends View {
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
             attached: true,
-            onClose: () => this.hideContextMenu(),
         });
 
         this.ctxEnableBtn = this.contextMenu.addIconItem({
