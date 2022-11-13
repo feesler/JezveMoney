@@ -378,6 +378,7 @@ export class ImportRulesDialog extends Component {
         }
         const itemId = state.contextItem;
         if (!itemId) {
+            this.contextMenu.detach();
             return;
         }
         const listItem = this.rulesList.getListItemById(itemId);
@@ -386,11 +387,7 @@ export class ImportRulesDialog extends Component {
             return;
         }
 
-        if (this.contextMenu.menuList.parentNode !== menuContainer) {
-            PopupMenu.hideActive();
-            this.contextMenu.attachTo(menuContainer);
-            this.contextMenu.toggleMenu();
-        }
+        this.contextMenu.attachAndShow(menuContainer);
     }
 
     /** Render list state of component */

@@ -344,10 +344,12 @@ class AccountListView extends View {
         }
         const account = window.app.model.userAccounts.getItem(state.contextItem);
         if (!account) {
+            this.contextMenu.detach();
             return;
         }
         const tile = document.querySelector(`.tile[data-id="${account.id}"]`);
         if (!tile) {
+            this.contextMenu.detach();
             return;
         }
 
@@ -357,11 +359,7 @@ class AccountListView extends View {
         this.ctxShowBtn.show(!account.isVisible());
         this.ctxHideBtn.show(account.isVisible());
 
-        if (this.contextMenu.menuList.parentNode !== tile) {
-            PopupMenu.hideActive();
-            this.contextMenu.attachTo(tile);
-            this.contextMenu.toggleMenu();
-        }
+        this.contextMenu.attachAndShow(tile);
     }
 
     renderMenu(state) {

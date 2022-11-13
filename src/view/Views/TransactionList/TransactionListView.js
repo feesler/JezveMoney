@@ -544,22 +544,20 @@ class TransactionListView extends View {
         }
         const itemId = state.contextItem;
         if (!itemId) {
+            this.contextMenu.detach();
             return;
         }
         const listItem = this.list.getListItemById(itemId);
         const menuContainer = listItem?.elem?.querySelector('.actions-menu');
         if (!menuContainer) {
+            this.contextMenu.detach();
             return;
-        }
-
-        if (this.contextMenu.menuList.parentNode !== menuContainer) {
-            PopupMenu.hideActive();
-            this.contextMenu.attachTo(menuContainer);
-            this.contextMenu.toggleMenu();
         }
 
         const { baseURL } = window.app;
         this.ctxUpdateBtn.setURL(`${baseURL}transactions/update/${itemId}`);
+
+        this.contextMenu.attachAndShow(menuContainer);
     }
 
     renderMenu(state) {

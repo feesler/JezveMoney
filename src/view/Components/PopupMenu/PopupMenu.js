@@ -104,6 +104,21 @@ export class PopupMenu extends Component {
         this.setClassNames();
     }
 
+    setHandlers() {
+        setEmptyClick(this.emptyClickHandler);
+
+        if (this.props.hideOnScroll) {
+            this.setScrollEvents();
+        }
+    }
+
+    removeHandlers() {
+        removeEmptyClick(this.emptyClickHandler);
+        if (this.props.hideOnScroll) {
+            this.removeScrollEvents();
+        }
+    }
+
     setScrollEvents() {
         window.addEventListener('scroll', this.scrollHandler, { passive: true });
     }
@@ -121,14 +136,21 @@ export class PopupMenu extends Component {
         this.hideMenu();
     }
 
+    isMenuVisible() {
+        return !this.menuList.hasAttribute('hidden');
+    }
+
     detach() {
+        this.removeHandlers();
         if (this.hostElem) {
             removeEvents(this.hostElem, this.togglerEvents);
             this.hostElem = null;
+            this.relElem = null;
         } else {
             removeEvents(this.menuBtn, this.togglerEvents);
         }
 
+        show(this.menuList, false);
         re(this.elem);
     }
 
@@ -147,6 +169,13 @@ export class PopupMenu extends Component {
         setEvents(this.hostElem, this.togglerEvents);
 
         this.hostElem.append(this.elem);
+    }
+
+    attachAndShow(elem) {
+        this.attachTo(elem);
+        if (!this.isMenuVisible()) {
+            this.showMenu();
+        }
     }
 
     setContent(content) {
@@ -209,9 +238,6 @@ export class PopupMenu extends Component {
             className: [CHECKBOX_CLASS, ...asArray(className)],
             ...rest,
         });
-        if (item.id) {
-            button.elem.id = item.id;
-        }
         this.menuList.append(button.elem);
 
         return button;
@@ -271,14 +297,12 @@ export class PopupMenu extends Component {
         this.ignoreScroll = true;
         this.calculatePosition();
 
-        PopupMenu.hideActive();
-        PopupMenu.activeInstance = this;
-
-        setEmptyClick(this.emptyClickHandler);
-
-        if (this.props.hideOnScroll) {
-            this.setScrollEvents();
+        if (PopupMenu.activeInstance !== this) {
+            PopupMenu.hideActive();
+            PopupMenu.activeInstance = this;
         }
+
+        this.setHandlers();
     }
 
     hideMenu() {
@@ -288,22 +312,20 @@ export class PopupMenu extends Component {
         this.menuList.style.width = '';
 
         PopupMenu.activeInstance = null;
+        this.removeHandlers();
 
-        removeEmptyClick(this.emptyClickHandler);
-
-        if (this.props.hideOnScroll) {
-            this.removeScrollEvents();
-        }
         if (isFunction(this.props.onClose)) {
             this.props.onClose();
         }
     }
 
-    toggleMenu() {
-        if (this.menuList.hasAttribute('hidden')) {
-            this.showMenu();
-        } else {
+    toggleMenu(e) {
+        e?.stopPropagation();
+
+        if (this.isMenuVisible()) {
             this.hideMenu();
+        } else {
+            this.showMenu();
         }
     }
 }

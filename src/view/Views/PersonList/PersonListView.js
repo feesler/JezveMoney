@@ -326,10 +326,12 @@ class PersonListView extends View {
         }
         const person = window.app.model.persons.getItem(state.contextItem);
         if (!person) {
+            this.contextMenu.detach();
             return;
         }
         const tile = document.querySelector(`.tile[data-id="${person.id}"]`);
         if (!tile) {
+            this.contextMenu.detach();
             return;
         }
 
@@ -338,11 +340,7 @@ class PersonListView extends View {
         this.ctxShowBtn.show(!person.isVisible());
         this.ctxHideBtn.show(person.isVisible());
 
-        if (this.contextMenu.menuList.parentNode !== tile) {
-            PopupMenu.hideActive();
-            this.contextMenu.attachTo(tile);
-            this.contextMenu.toggleMenu();
-        }
+        this.contextMenu.attachAndShow(tile);
     }
 
     renderMenu(state) {

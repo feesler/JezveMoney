@@ -806,13 +806,21 @@ class ImportView extends View {
         this.store.dispatch(actions.changeItemPosition({ fromIndex, toIndex }));
     }
 
-    renderContextMenu(state) {
+    renderContextMenu(state, prevState) {
+        if (state === prevState) {
+            return;
+        }
         if (state.listMode !== 'list') {
             this.contextMenu.detach();
             return;
         }
+        if (state.contextItemIndex === prevState.contextItemIndex) {
+            return;
+        }
+
         const index = state.contextItemIndex;
         if (index === -1) {
+            this.contextMenu.detach();
             return;
         }
 
@@ -833,11 +841,7 @@ class ImportView extends View {
 
         this.ctxUpdateBtn.show(!item.isForm);
 
-        if (this.contextMenu.menuList.parentNode !== menuContainer) {
-            PopupMenu.hideActive();
-            this.contextMenu.attachTo(menuContainer);
-            this.contextMenu.toggleMenu();
-        }
+        this.contextMenu.attachAndShow(menuContainer);
     }
 
     renderMenu(state) {
@@ -968,7 +972,7 @@ class ImportView extends View {
         this.enabledTransCountElem.textContent = enabledList.length;
         this.transCountElem.textContent = state.items.length;
 
-        this.renderContextMenu(state);
+        this.renderContextMenu(state, prevState);
         this.renderMenu(state);
     }
 }
