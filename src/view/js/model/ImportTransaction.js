@@ -77,6 +77,10 @@ export class ImportTransaction {
         return this.state.mainAccount;
     }
 
+    get isImported() {
+        return !!this.state.originalData;
+    }
+
     setData(data) {
         const { mainAccount } = data;
         const state = {

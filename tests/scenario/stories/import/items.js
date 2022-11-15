@@ -35,7 +35,7 @@ const del = async () => {
 const stateLoop = async () => {
     const { RUB, USD } = App.scenario;
 
-    setBlock('Import item state loop', 2);
+    setBlock('Import item state loop', 1);
 
     await ImportTests.changeMainAccount(App.scenario.ACC_3);
 
@@ -300,7 +300,7 @@ const uploadAccount = async () => {
     });
 
     setBlock('Check main account is updated after select it at upload dialog', 2);
-    await ImportTests.changeMainAccount(App.scenario.ACC_RUB);
+    await ImportTests.selectUploadAccount(App.scenario.ACC_RUB);
 };
 
 const convert = async () => {

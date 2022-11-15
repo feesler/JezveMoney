@@ -56,8 +56,8 @@ export class ImportTransactionItem extends TestComponent {
         res.dateField = await this.parseField(await query(this.elem, '.date-field'));
         res.commentField = await this.parseField(await query(this.elem, '.comment-field'));
 
-        res.menuBtn = await query(this.elem, '.actions-menu-btn');
-        res.contextMenuElem = await query(this.elem, '.actions-menu-list');
+        res.menuBtn = await query(this.elem, '.popup-menu-btn');
+        res.contextMenuElem = await query(this.elem, '.popup-menu-list');
         res.toggleBtn = await query(this.elem, '.toggle-btn');
         res.origDataTable = await query(this.elem, '.orig-data-table');
 
@@ -417,7 +417,7 @@ export class ImportTransactionItem extends TestComponent {
         }
         if (res.type === 'transferfrom' || res.type === 'transferto') {
             if (res.transferAccount && res.transferAccount.id === res.mainAccount.id) {
-                const accId = App.state.accounts.getNext(res.mainAccount.id);
+                const accId = App.state.getNextAccount(res.mainAccount.id);
                 res.transferAccount = App.state.accounts.getItem(accId);
 
                 if (res.type === 'transferfrom') {

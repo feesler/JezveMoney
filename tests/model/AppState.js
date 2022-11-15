@@ -411,6 +411,32 @@ export class AppState {
     }
 
     /**
+     * Returns another user account id if possible
+     * Returns first account if no id specified
+     * Returns zero if no account found
+     * @param {number} accountId - identifier of account
+     */
+    getNextAccount(accountId = 0) {
+        this.cacheUserAccounts();
+
+        if (!accountId) {
+            return this.userAccountsCache.indexToId(0);
+        }
+
+        if (this.userAccountsCache.length < 2) {
+            return 0;
+        }
+        let ind = this.userAccountsCache.getIndexById(accountId);
+        if (ind === -1) {
+            return 0;
+        }
+
+        ind = (ind === this.userAccountsCache.length - 1) ? 0 : ind + 1;
+
+        return this.userAccountsCache.indexToId(ind);
+    }
+
+    /**
      * Persons
      */
 

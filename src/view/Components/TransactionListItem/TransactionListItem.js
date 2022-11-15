@@ -39,9 +39,9 @@ const COMMENT_FIELD_CLASS = 'trans-item__comment-field';
 const SELECT_CONTROLS_CLASS = 'trans-item__select';
 /* Controls */
 const CONTROLS_CLASS = 'trans-item__controls';
-const MENU_CLASS = 'actions-menu';
-const MENU_BUTTON_CLASS = 'btn icon-btn actions-menu-btn';
-const MENU_ICON_CLASS = 'icon actions-menu-btn__icon';
+const MENU_CLASS = 'popup-menu';
+const MENU_BUTTON_CLASS = 'btn icon-btn popup-menu-btn';
+const MENU_ICON_CLASS = 'icon popup-menu-btn__icon';
 /* Other */
 const SELECTED_CLASS = 'trans-item_selected';
 const SORT_CLASS = 'trans-item_sort';

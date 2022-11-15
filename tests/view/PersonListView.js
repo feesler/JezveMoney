@@ -9,9 +9,9 @@ import {
     waitForFunction,
     click,
 } from 'jezve-test';
+import { IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { TilesList } from './component/TilesList.js';
-import { IconButton } from './component/IconButton.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 
@@ -36,9 +36,9 @@ export class PersonListView extends AppView {
             addBtn: await IconButton.create(this, await query('#add_btn')),
             listMenuContainer: {
                 elem: await query('#listMenu'),
-                menuBtn: await query('#listMenu .actions-menu-btn'),
+                menuBtn: await query('#listMenu .popup-menu-btn'),
             },
-            listMenu: { elem: await query('#listMenu .actions-menu-list') },
+            listMenu: { elem: await query('#listMenu .popup-menu-list') },
             contextMenu: { elem: await query('#contextMenu') },
         };
 

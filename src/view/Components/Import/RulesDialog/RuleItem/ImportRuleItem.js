@@ -16,9 +16,9 @@ import { ImportActionItem } from '../ActionItem/ImportActionItem.js';
 import './style.scss';
 
 /** CSS classes */
-const MENU_CLASS = 'actions-menu';
-const MENU_BUTTON_CLASS = 'btn icon-btn actions-menu-btn';
-const MENU_ICON_CLASS = 'icon actions-menu-btn__icon';
+const MENU_CLASS = 'popup-menu';
+const MENU_BUTTON_CLASS = 'btn icon-btn popup-menu-btn';
+const MENU_ICON_CLASS = 'icon popup-menu-btn__icon';
 
 /** Strings */
 const TITLE_CONDITIONS = 'Conditions';

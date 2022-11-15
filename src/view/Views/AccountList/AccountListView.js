@@ -6,6 +6,7 @@ import {
     show,
     urlJoin,
 } from 'jezvejs';
+import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
@@ -17,7 +18,8 @@ import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { ListContainer } from '../../Components/ListContainer/ListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { PopupMenu } from '../../Components/PopupMenu/PopupMenu.js';
+import { createStore } from '../../js/store.js';
+import { actions, reducer } from './reducer.js';
 import './style.scss';
 
 /** Strings */
@@ -39,7 +41,7 @@ class AccountListView extends View {
         window.app.checkUserAccountModels();
         window.app.loadModel(IconList, 'icons', window.app.props.icons);
 
-        this.state = {
+        const initialState = {
             items: {
                 visible: AccountList.create(window.app.model.visibleUserAccounts),
                 hidden: AccountList.create(window.app.model.hiddenUserAccounts),
@@ -49,24 +51,32 @@ class AccountListView extends View {
             contextItem: null,
             renderTime: Date.now(),
         };
+
+        this.store = createStore(reducer, initialState);
+        this.store.subscribe((state, prevState) => {
+            if (state !== prevState) {
+                this.render(state, prevState);
+            }
+        });
     }
 
     /**
      * View initialization
      */
     onStart() {
+        const state = this.store.getState();
         const listProps = {
             ItemComponent: AccountTile,
-            getItemProps: (account, state) => ({
+            getItemProps: (account, { listMode }) => ({
                 type: 'button',
                 account,
                 attrs: { 'data-id': account.id },
                 selected: account.selected,
-                selectMode: state.listMode === 'select',
+                selectMode: listMode === 'select',
             }),
             className: 'tiles',
             itemSelector: '.tile',
-            listMode: this.state.listMode,
+            listMode: state.listMode,
             noItemsMessage: MSG_NO_ACCOUNTS,
             onItemClick: (id, e) => this.onItemClick(id, e),
         };
@@ -92,55 +102,52 @@ class AccountListView extends View {
         this.loadingIndicator = LoadingIndicator.create();
         insertAfter(this.loadingIndicator.elem, this.hiddenTiles.elem);
 
-        this.render(this.state);
+        this.render(state);
     }
 
     createMenu() {
-        this.menu = PopupMenu.create({ id: 'listMenu' });
-
-        this.selectModeBtn = this.menu.addIconItem({
-            id: 'selectModeBtn',
-            icon: 'select',
-            title: 'Select',
-            onClick: () => this.toggleSelectMode(),
-        });
-        this.separator1 = this.menu.addSeparator();
-
-        this.selectAllBtn = this.menu.addIconItem({
-            id: 'selectAllBtn',
-            title: 'Select all',
-            onClick: () => this.selectAll(),
-        });
-        this.deselectAllBtn = this.menu.addIconItem({
-            id: 'deselectAllBtn',
-            title: 'Clear selection',
-            onClick: () => this.deselectAll(),
-        });
-        this.separator2 = this.menu.addSeparator();
-
-        this.exportBtn = this.menu.addIconItem({
-            id: 'exportBtn',
-            type: 'link',
-            icon: 'export',
-            title: 'Export to CSV',
-        });
-        this.showBtn = this.menu.addIconItem({
-            id: 'showBtn',
-            icon: 'show',
-            title: 'Restore',
-            onClick: () => this.showItems(),
-        });
-        this.hideBtn = this.menu.addIconItem({
-            id: 'hideBtn',
-            icon: 'hide',
-            title: 'Hide',
-            onClick: () => this.showItems(false),
-        });
-        this.deleteBtn = this.menu.addIconItem({
-            id: 'deleteBtn',
-            icon: 'del',
-            title: 'Delete',
-            onClick: () => this.confirmDelete(),
+        this.menu = PopupMenu.create({
+            id: 'listMenu',
+            items: [{
+                id: 'selectModeBtn',
+                icon: 'select',
+                title: 'Select',
+                onClick: () => this.toggleSelectMode(),
+            }, {
+                id: 'separator1',
+                type: 'separator',
+            }, {
+                id: 'selectAllBtn',
+                title: 'Select all',
+                onClick: () => this.selectAll(),
+            }, {
+                id: 'deselectAllBtn',
+                title: 'Clear selection',
+                onClick: () => this.deselectAll(),
+            }, {
+                id: 'separator2',
+                type: 'separator',
+            }, {
+                id: 'exportBtn',
+                type: 'link',
+                icon: 'export',
+                title: 'Export to CSV',
+            }, {
+                id: 'showBtn',
+                icon: 'show',
+                title: 'Restore',
+                onClick: () => this.showItems(),
+            }, {
+                id: 'hideBtn',
+                icon: 'hide',
+                title: 'Hide',
+                onClick: () => this.showItems(false),
+            }, {
+                id: 'deleteBtn',
+                icon: 'del',
+                title: 'Delete',
+                onClick: () => this.confirmDelete(),
+            }],
         });
     }
 
@@ -148,44 +155,40 @@ class AccountListView extends View {
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
             attached: true,
-        });
-
-        this.ctxUpdateBtn = this.contextMenu.addIconItem({
-            id: 'ctxUpdateBtn',
-            type: 'link',
-            icon: 'update',
-            title: 'Edit',
-        });
-        this.ctxExportBtn = this.contextMenu.addIconItem({
-            id: 'ctxExportBtn',
-            type: 'link',
-            icon: 'export',
-            title: 'Export to CSV',
-        });
-        this.ctxShowBtn = this.contextMenu.addIconItem({
-            id: 'ctxShowBtn',
-            icon: 'show',
-            title: 'Restore',
-            onClick: () => this.showItems(),
-        });
-        this.ctxHideBtn = this.contextMenu.addIconItem({
-            id: 'ctxHideBtn',
-            icon: 'hide',
-            title: 'Hide',
-            onClick: () => this.showItems(false),
-        });
-        this.ctxDeleteBtn = this.contextMenu.addIconItem({
-            id: 'ctxDeleteBtn',
-            icon: 'del',
-            title: 'Delete',
-            onClick: () => this.confirmDelete(),
+            items: [{
+                id: 'ctxUpdateBtn',
+                type: 'link',
+                icon: 'update',
+                title: 'Edit',
+            }, {
+                id: 'ctxExportBtn',
+                type: 'link',
+                icon: 'export',
+                title: 'Export to CSV',
+            }, {
+                id: 'ctxShowBtn',
+                icon: 'show',
+                title: 'Restore',
+                onClick: () => this.showItems(),
+            }, {
+                id: 'ctxHideBtn',
+                icon: 'hide',
+                title: 'Hide',
+                onClick: () => this.showItems(false),
+            }, {
+                id: 'ctxDeleteBtn',
+                icon: 'del',
+                title: 'Delete',
+                onClick: () => this.confirmDelete(),
+            }],
         });
     }
 
     onItemClick(itemId, e) {
-        if (this.state.listMode === 'list') {
+        const { listMode } = this.store.getState();
+        if (listMode === 'list') {
             this.showContextMenu(itemId);
-        } else if (this.state.listMode === 'select') {
+        } else if (listMode === 'select') {
             if (e?.target?.closest('.checkbox')) {
                 e.preventDefault();
             }
@@ -195,123 +198,48 @@ class AccountListView extends View {
     }
 
     showContextMenu(itemId) {
-        if (this.state.contextItem === itemId) {
-            return;
-        }
-
-        this.setState({ ...this.state, contextItem: itemId });
-    }
-
-    getAccountById(id) {
-        return window.app.model.userAccounts.getItem(id);
+        this.store.dispatch(actions.showContextMenu(itemId));
     }
 
     toggleSelectItem(itemId) {
-        const account = this.getAccountById(itemId);
-        if (!account) {
-            return;
-        }
-
-        const toggleItem = (item) => (
-            (item.id === itemId)
-                ? { ...item, selected: !item.selected }
-                : item
-        );
-
-        const { visible, hidden } = this.state.items;
-        this.setState({
-            ...this.state,
-            items: {
-                visible: (account.isVisible()) ? visible.map(toggleItem) : visible,
-                hidden: (!account.isVisible()) ? hidden.map(toggleItem) : hidden,
-            },
-        });
-    }
-
-    reduceSelectAll(state = this.state) {
-        const selectItem = (item) => (
-            (item.selected)
-                ? item
-                : { ...item, selected: true }
-        );
-
-        return {
-            ...state,
-            items: {
-                visible: state.items.visible.map(selectItem),
-                hidden: state.items.hidden.map(selectItem),
-            },
-        };
-    }
-
-    reduceDeselectAll(state = this.state) {
-        const deselectItem = (item) => (
-            (item.selected)
-                ? { ...item, selected: false }
-                : item
-        );
-
-        return {
-            ...state,
-            items: {
-                visible: state.items.visible.map(deselectItem),
-                hidden: state.items.hidden.map(deselectItem),
-            },
-        };
+        this.store.dispatch(actions.toggleSelectItem(itemId));
     }
 
     selectAll() {
-        this.setState(this.reduceSelectAll());
+        this.store.dispatch(actions.selectAllItems());
     }
 
     deselectAll() {
-        this.setState(this.reduceDeselectAll());
+        this.store.dispatch(actions.deselectAllItems());
     }
 
     toggleSelectMode() {
-        let newState = {
-            ...this.state,
-            listMode: (this.state.listMode === 'list') ? 'select' : 'list',
-            contextItem: null,
-        };
-        if (newState.listMode === 'list') {
-            newState = this.reduceDeselectAll(newState);
-        }
-
-        this.setState(newState);
+        this.store.dispatch(actions.toggleSelectMode());
     }
 
     startLoading() {
-        if (this.state.loading) {
-            return;
-        }
-
-        this.setState({ ...this.state, loading: true });
+        this.store.dispatch(actions.startLoading());
     }
 
     stopLoading() {
-        if (!this.state.loading) {
-            return;
-        }
-
-        this.setState({ ...this.state, loading: false });
+        this.store.dispatch(actions.stopLoading());
     }
 
-    getVisibleSelectedItems(state = this.state) {
+    getVisibleSelectedItems(state) {
         return state.items.visible.filter((item) => item.selected);
     }
 
-    getHiddenSelectedItems(state = this.state) {
+    getHiddenSelectedItems(state) {
         return state.items.hidden.filter((item) => item.selected);
     }
 
-    getSelectedIds(state = this.state) {
+    getSelectedIds(state) {
         const selArr = this.getVisibleSelectedItems(state);
         const hiddenSelArr = this.getHiddenSelectedItems(state);
         return selArr.concat(hiddenSelArr).map((item) => item.id);
     }
 
-    getContextIds(state = this.state) {
+    getContextIds(state) {
         if (state.listMode === 'list') {
             return asArray(state.contextItem);
         }
@@ -320,11 +248,12 @@ class AccountListView extends View {
     }
 
     async showItems(value = true) {
-        if (this.state.loading) {
+        const state = this.store.getState();
+        if (state.loading) {
             return;
         }
 
-        const ids = this.getContextIds();
+        const ids = this.getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -345,11 +274,12 @@ class AccountListView extends View {
     }
 
     async deleteItems() {
-        if (this.state.loading) {
+        const state = this.store.getState();
+        if (state.loading) {
             return;
         }
 
-        const ids = this.getContextIds();
+        const ids = this.getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -372,15 +302,7 @@ class AccountListView extends View {
             window.app.model.userAccounts = null;
             window.app.checkUserAccountModels();
 
-            this.setState({
-                ...this.state,
-                items: {
-                    visible: AccountList.create(window.app.model.visibleUserAccounts),
-                    hidden: AccountList.create(window.app.model.hiddenUserAccounts),
-                },
-                listMode: 'list',
-                contextItem: null,
-            });
+            this.store.dispatch(actions.listRequestLoaded());
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
         }
@@ -392,7 +314,8 @@ class AccountListView extends View {
      * Show account(s) delete confirmation popup
      */
     confirmDelete() {
-        const ids = this.getContextIds();
+        const state = this.store.getState();
+        const ids = this.getContextIds(state);
         if (ids.length === 0) {
             return;
         }
@@ -411,26 +334,25 @@ class AccountListView extends View {
             this.contextMenu.detach();
             return;
         }
-        const account = this.getAccountById(state.contextItem);
+        const account = window.app.model.userAccounts.getItem(state.contextItem);
         if (!account) {
+            this.contextMenu.detach();
             return;
         }
         const tile = document.querySelector(`.tile[data-id="${account.id}"]`);
         if (!tile) {
+            this.contextMenu.detach();
             return;
         }
 
         const { baseURL } = window.app;
-        this.ctxUpdateBtn.setURL(`${baseURL}accounts/update/${account.id}`);
-        this.ctxExportBtn.setURL(`${baseURL}accounts/export/${account.id}`);
-        this.ctxShowBtn.show(!account.isVisible());
-        this.ctxHideBtn.show(account.isVisible());
+        const { items } = this.contextMenu;
+        items.ctxUpdateBtn.setURL(`${baseURL}accounts/update/${account.id}`);
+        items.ctxExportBtn.setURL(`${baseURL}accounts/export/${account.id}`);
+        items.ctxShowBtn.show(!account.isVisible());
+        items.ctxHideBtn.show(account.isVisible());
 
-        if (this.contextMenu.menuList.parentNode !== tile) {
-            PopupMenu.hideActive();
-            this.contextMenu.attachTo(tile);
-            this.contextMenu.toggleMenu();
-        }
+        this.contextMenu.attachAndShow(tile);
     }
 
     renderMenu(state) {
@@ -443,20 +365,21 @@ class AccountListView extends View {
         const isSelectMode = (state.listMode === 'select');
 
         this.menu.show(itemsCount > 0);
+        const { items } = this.menu;
 
         const selectModeTitle = (isSelectMode) ? 'Done' : 'Select';
-        this.selectModeBtn.setTitle(selectModeTitle);
-        this.selectModeBtn.setIcon((isSelectMode) ? null : 'select');
-        show(this.separator1, isSelectMode);
+        items.selectModeBtn.setTitle(selectModeTitle);
+        items.selectModeBtn.setIcon((isSelectMode) ? null : 'select');
+        show(items.separator1, isSelectMode);
 
-        this.selectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount);
-        this.deselectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount > 0);
-        show(this.separator2, isSelectMode);
+        items.selectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount);
+        items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount > 0);
+        show(items.separator2, isSelectMode);
 
-        this.exportBtn.show(isSelectMode && totalSelCount > 0);
-        this.showBtn.show(isSelectMode && hiddenSelCount > 0);
-        this.hideBtn.show(isSelectMode && selCount > 0);
-        this.deleteBtn.show(isSelectMode && totalSelCount > 0);
+        items.exportBtn.show(isSelectMode && totalSelCount > 0);
+        items.showBtn.show(isSelectMode && hiddenSelCount > 0);
+        items.hideBtn.show(isSelectMode && selCount > 0);
+        items.deleteBtn.show(isSelectMode && totalSelCount > 0);
 
         const { baseURL } = window.app;
         const selectedIds = this.getSelectedIds(state);
@@ -468,7 +391,7 @@ class AccountListView extends View {
             } else {
                 exportURL += `?${urlJoin({ id: selectedIds })}`;
             }
-            this.exportBtn.setURL(exportURL);
+            items.exportBtn.setURL(exportURL);
         }
     }
 

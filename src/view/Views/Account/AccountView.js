@@ -10,6 +10,7 @@ import {
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
+import { IconButton } from 'jezvejs/IconButton';
 import { Spinner } from 'jezvejs/Spinner';
 import { normalize } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
@@ -21,7 +22,8 @@ import { AccountList } from '../../js/model/AccountList.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { IconButton } from '../../Components/IconButton/IconButton.js';
+import { createStore } from '../../js/store.js';
+import { actions, reducer } from './reducer.js';
 
 const TITLE_ACCOUNT_DELETE = 'Delete account';
 const MSG_ACCOUNT_DELETE = 'Are you sure want to delete selected account?<br>All income and expense transactions history will be lost. Transfer to this account will be changed to expense. Transfer from this account will be changed to income.';
@@ -36,30 +38,40 @@ class AccountView extends View {
     constructor(...args) {
         super(...args);
 
-        this.state = {
+        const initialState = {
             nameChanged: false,
             validation: {
                 initbalance: true,
                 name: true,
+                valid: true,
             },
             submitStarted: false,
         };
 
         if (this.props.account) {
-            this.state.original = this.props.account;
-            this.state.data = { ...this.state.original };
-            this.state.data.fInitBalance = normalize(this.state.data.initbalance);
+            initialState.original = this.props.account;
+            initialState.data = { ...initialState.original };
+            initialState.data.fInitBalance = normalize(initialState.data.initbalance);
         }
 
         window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
         window.app.loadModel(IconList, 'icons', window.app.props.icons);
+
+        this.store = createStore(reducer, initialState);
+        this.store.subscribe((state, prevState) => {
+            if (state !== prevState) {
+                this.render(state, prevState);
+            }
+        });
     }
 
     /**
      * View initialization
      */
     onStart() {
+        const state = this.store.getState();
+
         this.form = ge('accForm');
         this.currencySign = ge('currsign');
         this.balanceInp = ge('balance');
@@ -80,7 +92,7 @@ class AccountView extends View {
         }
 
         this.tile = AccountTile.fromElement('acc_tile', {
-            account: this.state.data,
+            account: state.data,
         });
         this.iconSelect = DropDown.create({
             elem: 'icon',
@@ -93,8 +105,8 @@ class AccountView extends View {
             className: 'dd_fullwidth',
         });
         window.app.initCurrencyList(this.currencySelect);
-        if (this.state.original.curr_id) {
-            this.currencySelect.selectItem(this.state.original.curr_id);
+        if (state.original.curr_id) {
+            this.currencySelect.selectItem(state.original.curr_id);
         }
 
         this.initBalanceDecimalInput = DecimalInput.create({
@@ -114,13 +126,13 @@ class AccountView extends View {
         insertAfter(this.spinner.elem, this.cancelBtn);
 
         // Update mode
-        if (this.state.original.id) {
+        if (state.original.id) {
             this.deleteBtn = IconButton.fromElement('del_btn', {
                 onClick: () => this.confirmDelete(),
             });
         }
 
-        this.render(this.state);
+        this.render(state);
     }
 
     /** Icon select event handler */
@@ -129,13 +141,7 @@ class AccountView extends View {
             return;
         }
 
-        this.setState({
-            ...this.state,
-            data: {
-                ...this.state.data,
-                icon_id: obj.id,
-            },
-        });
+        this.store.dispatch(actions.changeIcon(obj.id));
     }
 
     /** Currency select event handler */
@@ -144,98 +150,62 @@ class AccountView extends View {
             return;
         }
 
-        this.setState({
-            ...this.state,
-            data: {
-                ...this.state.data,
-                curr_id: obj.id,
-            },
-        });
+        this.store.dispatch(actions.changeCurrency(obj.id));
     }
 
     /** Initial balance input event handler */
     onInitBalanceInput(e) {
         const { value } = e.target;
-
-        this.setState({
-            ...this.state,
-            validation: {
-                ...this.state.validation,
-                initbalance: true,
-            },
-            data: {
-                ...this.state.data,
-                initbalance: value,
-                fInitBalance: normalize(value),
-            },
-        });
+        this.store.dispatch(actions.changeInitialBalance(value));
     }
 
     /** Account name input event handler */
     onNameInput() {
-        this.setState({
-            ...this.state,
-            nameChanged: true,
-            validation: {
-                ...this.state.validation,
-                name: true,
-            },
-            data: {
-                ...this.state.data,
-                name: this.nameInp.value,
-            },
-        });
+        const { value } = this.nameInp;
+        this.store.dispatch(actions.changeName(value));
     }
 
     /** Form submit event handler */
     onSubmit(e) {
         e.preventDefault();
 
-        if (this.state.submitStarted) {
+        const state = this.store.getState();
+        if (state.submitStarted) {
             return;
         }
 
-        const { name, initbalance } = this.state.data;
-        const validation = {
-            valid: true,
-            initbalance: true,
-            name: true,
-        };
-
+        const { name, initbalance } = state.data;
         if (name.length === 0) {
-            validation.name = MSG_EMPTY_NAME;
-            validation.valid = false;
+            this.store.dispatch(actions.invalidateNameField(MSG_EMPTY_NAME));
             this.nameInp.focus();
         } else {
             const account = window.app.model.accounts.findByName(name);
-            if (account && this.state.original.id !== account.id) {
-                validation.name = MSG_EXISTING_NAME;
-                validation.valid = false;
+            if (account && state.original.id !== account.id) {
+                this.store.dispatch(actions.invalidateNameField(MSG_EXISTING_NAME));
                 this.nameInp.focus();
             }
         }
 
         if (initbalance.length === 0 || !isNum(initbalance)) {
-            validation.initbalance = false;
-            validation.valid = false;
+            this.store.dispatch(actions.invalidateInitialBalanceField());
             this.balanceInp.focus();
         }
 
+        const { validation } = this.store.getState();
         if (validation.valid) {
             this.submitAccount();
-        } else {
-            this.setState({ ...this.state, validation });
         }
     }
 
     async submitAccount() {
-        if (this.state.submitStarted) {
+        const state = this.store.getState();
+        if (state.submitStarted) {
             return;
         }
 
         this.startSubmit();
 
-        const { data, original } = this.state;
+        const { data, original } = state;
         const account = {
             name: data.name,
             initbalance: data.initbalance,
@@ -264,16 +234,16 @@ class AccountView extends View {
     }
 
     startSubmit() {
-        this.setState({ ...this.state, submitStarted: true });
+        this.store.dispatch(actions.startSubmit());
     }
 
     cancelSubmit() {
-        this.setState({ ...this.state, submitStarted: false });
+        this.store.dispatch(actions.cancelSubmit());
     }
 
     async deleteAccount() {
-        const { original } = this.state;
-        if (this.state.submitStarted || !original.id) {
+        const { submitStarted, original } = this.store.getState();
+        if (submitStarted || !original.id) {
             return;
         }
 
@@ -292,7 +262,8 @@ class AccountView extends View {
 
     /** Show account delete confirmation popup */
     confirmDelete() {
-        if (!this.state.data.id) {
+        const { data } = this.store.getState();
+        if (!data.id) {
             return;
         }
 

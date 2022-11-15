@@ -1,12 +1,12 @@
 import {
     re,
     show,
-    setEvents,
     insertAfter,
     isFunction,
     Component,
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
+import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Paginator } from 'jezvejs/Paginator';
 import { API } from '../../../../js/api/index.js';
 import { ImportRule } from '../../../../js/model/ImportRule.js';
@@ -15,9 +15,8 @@ import { ImportRuleItem } from '../RuleItem/ImportRuleItem.js';
 import { ConfirmDialog } from '../../../ConfirmDialog/ConfirmDialog.js';
 import { ListContainer } from '../../../ListContainer/ListContainer.js';
 import { LoadingIndicator } from '../../../LoadingIndicator/LoadingIndicator.js';
-import { PopupMenu } from '../../../PopupMenu/PopupMenu.js';
-import './style.scss';
 import { SearchInput } from '../../../SearchInput/SearchInput.js';
+import './style.scss';
 
 /** CSS classes */
 export const IMPORT_RULES_DIALOG_CLASS = 'rules-dialog';
@@ -73,7 +72,6 @@ export class ImportRulesDialog extends Component {
             }),
             onItemClick: (id, e) => this.onItemClick(id, e),
         });
-        setEvents(this.rulesList.elem, { scroll: () => this.onListScroll() });
         this.listContainer.append(this.rulesList.elem);
 
         this.searchInput = SearchInput.create({
@@ -249,8 +247,11 @@ export class ImportRulesDialog extends Component {
         this.render(this.state);
     }
 
-    onItemClick(itemId) {
+    onItemClick(itemId, e) {
         if (this.state.id === this.LIST_STATE) {
+            if (!e.target.closest('.popup-menu-btn')) {
+                return;
+            }
             this.showContextMenu(itemId);
         }
     }
@@ -261,11 +262,6 @@ export class ImportRulesDialog extends Component {
         }
 
         this.setState({ ...this.state, contextItem: itemId });
-    }
-
-    /** Rules list 'scroll' event handler */
-    onListScroll() {
-        PopupMenu.hideActive();
     }
 
     /** Rule 'submit' event handler */
@@ -378,19 +374,16 @@ export class ImportRulesDialog extends Component {
         }
         const itemId = state.contextItem;
         if (!itemId) {
+            this.contextMenu.detach();
             return;
         }
         const listItem = this.rulesList.getListItemById(itemId);
-        const menuContainer = listItem?.elem?.querySelector('.actions-menu');
+        const menuContainer = listItem?.elem?.querySelector('.popup-menu');
         if (!menuContainer) {
             return;
         }
 
-        if (this.contextMenu.menuList.parentNode !== menuContainer) {
-            PopupMenu.hideActive();
-            this.contextMenu.attachTo(menuContainer);
-            this.contextMenu.toggleMenu();
-        }
+        this.contextMenu.attachAndShow(menuContainer);
     }
 
     /** Render list state of component */

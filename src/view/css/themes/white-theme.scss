@@ -51,7 +51,7 @@
   }
 
   .iconbutton {
-    .iconbutton__icon {
+    &.circle-icon .iconbutton__icon {
       border-color: var(--main-text-color);
     }
 
@@ -152,6 +152,7 @@
     --dd-list-item-text: var(--main-text-color);
     --dd-list-item-bg: #f2f2f2;
     --dd-list-item-check: var(--main-text-color);
+    --dd-disabled-list-item-text: var(--input-disabled-text-color);
 
     /* List group */
     --dd-list-group-text: var(--accent-color);
@@ -267,14 +268,12 @@
     background-color: var(--main-bg-color);
   }
 
-  .actions-menu-btn__icon {
-    fill: var(--main-text-color);
-  }
-
-  .actions-menu-list,
-  .actions-menu-list__separator {
-    background-color: #f2f2f2;
-    border-color: #b0b0b0;
+  .popup-menu,
+  .popup-menu-list {
+    --popupmenu-border-color: #b0b0b0;
+    --popupmenu-separator-color: #b0b0b0;
+    --popupmenu-background: #f2f2f2;
+    --popupmenu-icon-color: var(--main-text-color);
   }
 
   /* Import form */
@@ -491,12 +490,14 @@
         color: var(--main-text-color);
       }
 
-      .iconbutton__icon {
-        background-color: var(--main-text-color);
-      }
+      &.circle-icon {
+        .iconbutton__icon {
+          background-color: var(--main-text-color);
+        }
 
-      .iconbutton__icon-content {
-        fill: #ffffff;
+        .iconbutton__icon-content {
+          fill: #ffffff;
+        }
       }
     }
 

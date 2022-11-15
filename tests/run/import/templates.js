@@ -4,90 +4,79 @@ import { CREATE_TPL_STATE } from '../../view/component/Import/ImportUploadDialog
 
 /** Test selection of import template by id */
 export const selectTemplateById = async (value) => {
-    await test(`Select upload template [${value}]`, async () => {
-        await App.view.selectUploadTemplateById(value);
-        return App.view.checkState();
-    });
+    await test(`Select upload template [${value}]`, () => (
+        App.view.selectUploadTemplateById(value)
+    ));
 };
 
 /** Test selection of import template by index */
 export const selectTemplateByIndex = async (value) => {
-    await test(`Select upload template by index [${value}]`, async () => {
-        await App.view.selectUploadTemplateByIndex(value);
-        return App.view.checkState();
-    });
+    await test(`Select upload template by index [${value}]`, () => (
+        App.view.selectUploadTemplateByIndex(value)
+    ));
 };
 
 /** Test input import template name on create/update state */
 export const inputTemplateName = async (value) => {
-    await test(`Input template name (${value})`, async () => {
-        await App.view.inputTemplateName(value);
-        return App.view.checkState();
-    });
+    await test(`Input template name (${value})`, () => (
+        App.view.inputTemplateName(value)
+    ));
 };
 
 /** Select column of import template */
 export const selectTemplateColumn = async ({ column, index }) => {
-    await test(`Select template column [${column} => ${index}]`, async () => {
-        await App.view.selectTemplateColumn(column, index);
-        return App.view.checkState();
-    });
+    await test(`Select template column [${column} => ${index}]`, () => (
+        App.view.selectTemplateColumn(column, index)
+    ));
 };
 
 /** Input import template first row */
 export const inputTemplateFirstRow = async (value) => {
-    await test(`Input template first row (${value})`, async () => {
-        await App.view.inputTemplateFirstRow(value);
-        return App.view.checkState();
-    });
+    await test(`Input template first row (${value})`, () => (
+        App.view.inputTemplateFirstRow(value)
+    ));
 };
 
 /** Click by decrease template first row button */
 export const decreaseTemplateFirstRow = async () => {
-    await test('Decrease template first row', async () => {
-        await App.view.decreaseTemplateFirstRow();
-        return App.view.checkState();
-    });
+    await test('Decrease template first row', () => (
+        App.view.decreaseTemplateFirstRow()
+    ));
 };
 
 /** Click by increase template first row button */
 export const increaseTemplateFirstRow = async (value) => {
-    await test('Increase template first row', async () => {
-        await App.view.increaseTemplateFirstRow(value);
-        return App.view.checkState();
-    });
+    await test('Increase template first row', () => (
+        App.view.increaseTemplateFirstRow(value)
+    ));
 };
 
 /** Click by template account checkbox */
 export const toggleTemplateAccount = async () => {
-    await test('Toggle enable template account', async () => {
-        await App.view.toggleTemplateAccount();
-        return App.view.checkState();
-    });
+    await test('Toggle enable template account', () => (
+        App.view.toggleTemplateAccount()
+    ));
 };
 
 /** Select template account */
 export const selectTemplateAccountById = async (value) => {
-    await test(`Select template account by id (${value})`, async () => {
-        await App.view.selectTemplateAccountById(value);
-        return App.view.checkState();
-    });
+    await test(`Select template account by id (${value})`, () => (
+        App.view.selectTemplateAccountById(value)
+    ));
 };
 
 /** Select template account */
 export const selectTemplateAccountByIndex = async (index) => {
-    await test(`Select upload template by index [${index}]`, async () => {
-        await App.view.selectTemplateAccountByIndex(index);
-        return App.view.checkState();
-    });
+    await test(`Select upload template by index [${index}]`, () => (
+        App.view.selectTemplateAccountByIndex(index)
+    ));
 };
 
 /** Go to create import template state */
 export const createTemplate = async () => {
     await test('Create template', async () => {
         await App.state.fetch();
-        await App.view.createTemplate();
-        return App.view.checkState();
+        return App.view.createTemplate();
     });
 };
 
@@ -95,8 +84,7 @@ export const createTemplate = async () => {
 export const updateTemplate = async () => {
     await test('Update template', async () => {
         await App.state.fetch();
-        await App.view.updateTemplate();
-        return App.view.checkState();
+        return App.view.updateTemplate();
     });
 };
 
@@ -110,8 +98,6 @@ export const deleteTemplate = async () => {
 
         // Perform actions on view
         await App.view.deleteTemplate();
-        await App.view.checkState();
-
         return App.state.fetchAndTest();
     });
 };
@@ -140,7 +126,6 @@ export const submitTemplate = async () => {
 export const cancelTemplate = async () => {
     await test('Cancel template', async () => {
         await App.state.fetch();
-        await App.view.cancelTemplate();
-        return App.view.checkState();
+        return App.view.cancelTemplate();
     });
 };

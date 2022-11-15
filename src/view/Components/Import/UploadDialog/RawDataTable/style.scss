@@ -1,14 +1,16 @@
 /* Raw data table */
 .raw-data-table {
+  --rdc-cell-height: 2rem;
+  --rdc-tpl-prop-height: 1.75rem;
+  --rdt-border-width: 1px;
+
   display: flex;
   flex-flow: row nowrap;
-  column-gap: 2px;
 }
 
 .raw-data-table__data {
   display: flex;
   flex-flow: row nowrap;
-  column-gap: 2px;
   overflow-x: auto;
 }
 
@@ -17,8 +19,8 @@
   flex-flow: column nowrap;
   height: fit-content;
   margin-bottom: 2px;
-  border: 1px solid;
-  border-bottom: 0 none;
+  border-top: var(--rdt-border-width) solid;
+  border-right: var(--rdt-border-width) solid;
   border-color: #9b9b9b;
 }
 
@@ -38,44 +40,42 @@
 .raw-data-column__tpl,
 .raw-data-column__header,
 .raw-data-column__cell {
-  --rdc-cell-height: 1.75rem;
-
   white-space: nowrap;
-  padding: 0 4px;
+  padding: 0 8px;
   height: var(--rdc-cell-height);
   line-height: var(--rdc-cell-height);
-  border-bottom: 1px solid;
+  border-bottom: var(--rdt-border-width) solid;
   border-color: #9b9b9b;
 }
 
 .raw-data-table__tpl-2 .raw-data-column__tpl {
-  height: calc(var(--rdc-cell-height) * 2);
+  height: calc(var(--rdc-tpl-prop-height) * 2 + var(--rdt-border-width));
 }
 
 .raw-data-table__tpl-3 .raw-data-column__tpl {
-  height: calc(var(--rdc-cell-height) * 3);
+  height: calc(var(--rdc-tpl-prop-height) * 3 + var(--rdt-border-width));
 }
 
 .raw-data-table__tpl-4 .raw-data-column__tpl {
-  height: calc(var(--rdc-cell-height) * 4);
+  height: calc(var(--rdc-tpl-prop-height) * 4 + var(--rdt-border-width));
 }
 
 .raw-data-table__tpl-5 .raw-data-column__tpl {
-  height: calc(var(--rdc-cell-height) * 5);
+  height: calc(var(--rdc-tpl-prop-height) * 5 + var(--rdt-border-width));
 }
 
 .raw-data-table__tpl-6 .raw-data-column__tpl {
-  height: calc(var(--rdc-cell-height) * 6);
+  height: calc(var(--rdc-tpl-prop-height) * 6 + var(--rdt-border-width));
 }
 
 .raw-data-column__tpl-prop {
-  height: var(--rdc-cell-height);
-  line-height: var(--rdc-cell-height);
+  height: var(--rdc-tpl-prop-height);
+  line-height: var(--rdc-tpl-prop-height);
 }
 
 .raw-data-column_row-numbers {
   border-left: 0 none;
-  border-top: 1px solid #00000000;
+  border-top: var(--rdt-border-width) solid #00000000;
 
   .raw-data-column__tpl {
     background: none;

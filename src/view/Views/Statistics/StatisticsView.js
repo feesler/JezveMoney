@@ -8,6 +8,7 @@ import {
 } from 'jezvejs';
 import { Histogram } from 'jezvejs/Histogram';
 import { DropDown } from 'jezvejs/DropDown';
+import { LinkMenu } from 'jezvejs/LinkMenu';
 import 'jezvejs/style/InputGroup';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
@@ -15,12 +16,18 @@ import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
-import { LinkMenu } from '../../Components/LinkMenu/LinkMenu.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import './style.scss';
 import { Transaction } from '../../js/model/Transaction.js';
+import { createStore } from '../../js/store.js';
+import {
+    getGroupTypeByName,
+    isSameSelection,
+    actions,
+    reducer,
+} from './reducer.js';
+import './style.scss';
 
 /** CSS classes */
 const POPUP_CONTENT_CLASS = 'chart-popup__content';
@@ -50,14 +57,12 @@ class StatisticsView extends View {
             throw new Error('Invalid Statistics view properties');
         }
 
-        this.groupTypes = [null, 'day', 'week', 'month', 'year'];
-
         this.props = {
             ...defaultProps,
             ...this.props,
         };
 
-        this.state = {
+        const initialState = {
             accountCurrency: this.props.accountCurrency,
             chartData: null,
             filter: { ...this.props.filter },
@@ -70,17 +75,26 @@ class StatisticsView extends View {
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
         window.app.checkUserAccountModels();
 
-        const accounts = asArray(this.state.filter.acc_id);
-        if (this.state.filter.report === 'account' && accounts.length === 0) {
+        const accounts = asArray(initialState.filter.acc_id);
+        if (initialState.filter.report === 'account' && accounts.length === 0) {
             const account = window.app.model.userAccounts.getItemByIndex(0);
-            this.state.filter.acc_id = [account.id];
+            initialState.filter.acc_id = [account.id];
         }
+
+        this.store = createStore(reducer, initialState);
+        this.store.subscribe((state, prevState) => {
+            if (state !== prevState) {
+                this.render(state, prevState);
+            }
+        });
     }
 
     /**
      * View initialization
      */
     onStart() {
+        const state = this.store.getState();
+
         const chartElem = ge('chart');
         this.noDataMessage = chartElem.querySelector('.nodata-message');
         this.histogram = Histogram.create({
@@ -98,7 +112,7 @@ class StatisticsView extends View {
             renderPopup: (target) => this.renderPopupContent(target),
         });
 
-        this.histogram.elem.dataset.time = this.state.renderTime;
+        this.histogram.elem.dataset.time = state.renderTime;
 
         this.loadingIndicator = LoadingIndicator.create();
         insertAfter(this.loadingIndicator.elem, chartElem);
@@ -148,22 +162,21 @@ class StatisticsView extends View {
             onChange: (data) => this.onChangeDateFilter(data),
         });
 
-        this.render(this.state);
-        this.requestData(this.state.filter);
+        this.requestData(state.filter);
     }
 
     /** Set loading state and render view */
     startLoading() {
-        this.setState({ ...this.state, loading: true });
+        this.store.dispatch(actions.startLoading());
     }
 
     /** Remove loading state and render view */
     stopLoading() {
-        this.setState({ ...this.state, loading: false });
+        this.store.dispatch(actions.stopLoading());
     }
 
     /** Returns URL for filter of specified state */
-    getFilterURL(state = this.state) {
+    getFilterURL(state) {
         const { baseURL } = window.app;
         const { filter } = state;
         const res = new URL(`${baseURL}statistics/`);
@@ -181,40 +194,20 @@ class StatisticsView extends View {
         return res;
     }
 
-    getGroupTypeByName(name) {
-        const groupName = (name) ? name.toLowerCase() : null;
-        return this.groupTypes.indexOf(groupName);
-    }
-
     /**
      * Transaction type menu change event handler
      */
     onChangeTypeFilter(selected) {
-        if (this.state.filter.type === selected) {
-            return;
-        }
-
-        this.setState({
-            ...this.state,
-            form: {
-                ...this.state.form,
-                type: selected,
-            },
-        });
-        this.requestData(this.state.form);
+        this.store.dispatch(actions.changeTypeFilter(selected));
+        const state = this.store.getState();
+        this.requestData(state.form);
     }
 
     /** Date range filter change handler */
     onChangeDateFilter(data) {
-        this.setState({
-            ...this.state,
-            form: {
-                ...this.state.form,
-                ...data,
-            },
-        });
-
-        this.requestData(this.state.form);
+        this.store.dispatch(actions.changeDateFilter(data));
+        const state = this.store.getState();
+        this.requestData(state.form);
     }
 
     /**
@@ -222,27 +215,9 @@ class StatisticsView extends View {
      * @param {string} value - selected report type
      */
     onSelectReportType(value) {
-        if (!value) {
-            return;
-        }
-
-        const form = { ...this.state.form };
-        if (value) {
-            form.report = value;
-        } else if ('report' in form) {
-            delete form.report;
-        }
-        if (form.report === this.state.form.report) {
-            return;
-        }
-
-        this.setState({ ...this.state, form });
-
-        this.requestData(this.state.form);
-    }
-
-    isSameSelection(a, b) {
-        return a.length === b.length && a.every((id) => b.includes(id));
+        this.store.dispatch(actions.changeReportType(value));
+        const state = this.store.getState();
+        this.requestData(state.form);
     }
 
     /**
@@ -250,26 +225,16 @@ class StatisticsView extends View {
      * @param {object} obj - selected account item
      */
     onAccountSel(obj) {
-        const data = asArray(obj);
-        const ids = data.map((item) => parseInt(item.id, 10));
-        const filterIds = this.state.form.acc_id ?? [];
-
-        if (this.isSameSelection(ids, filterIds)) {
+        const ids = asArray(obj).map((item) => parseInt(item.id, 10));
+        const state = this.store.getState();
+        const filterIds = state.form.acc_id ?? [];
+        if (isSameSelection(ids, filterIds)) {
             return;
         }
 
-        const account = window.app.model.userAccounts.getItem(ids[0]);
-
-        this.setState({
-            ...this.state,
-            form: {
-                ...this.state.form,
-                acc_id: ids,
-            },
-            accountCurrency: account?.curr_id ?? 0,
-        });
-
-        this.requestData(this.state.form);
+        this.store.dispatch(actions.changeAccountsFilter(ids));
+        const { form } = this.store.getState();
+        this.requestData(form);
     }
 
     /**
@@ -280,18 +245,10 @@ class StatisticsView extends View {
         if (!obj) {
             return;
         }
-        if (this.state.form.curr_id === obj.id) {
-            return;
-        }
-        this.setState({
-            ...this.state,
-            form: {
-                ...this.state.form,
-                curr_id: obj.id,
-            },
-        });
 
-        this.requestData(this.state.form);
+        this.store.dispatch(actions.changeCurrencyFilter(obj.id));
+        const { form } = this.store.getState();
+        this.requestData(form);
     }
 
     /**
@@ -303,24 +260,12 @@ class StatisticsView extends View {
             return;
         }
 
-        const form = { ...this.state.form };
-        const groupId = parseInt(obj.id, 10);
-        const group = (groupId < this.groupTypes.length) ? this.groupTypes[groupId] : null;
-        if (group) {
-            form.group = group;
-        } else if ('group' in form) {
-            delete form.group;
-        }
-        if (form.group === this.state.form.group) {
-            return;
-        }
-
-        this.setState({ ...this.state, form });
-
-        this.requestData(this.state.form);
+        this.store.dispatch(actions.changeGroupType(obj.id));
+        const { form } = this.store.getState();
+        this.requestData(form);
     }
 
-    replaceHistory(state = this.state) {
+    replaceHistory(state) {
         const url = this.getFilterURL(state);
         window.history.replaceState({}, PAGE_TITLE, url);
     }
@@ -330,30 +275,20 @@ class StatisticsView extends View {
 
         try {
             const result = await API.transaction.statistics(options);
-
-            this.setState({
-                ...this.state,
-                chartData: { ...result.data.histogram },
-                filter: { ...result.data.filter },
-                form: { ...result.data.filter },
-                renderTime: Date.now(),
-            });
+            this.store.dispatch(actions.dataRequestLoaded(result.data));
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
-
-            this.setState({
-                ...this.state,
-                form: { ...this.state.filter },
-            });
+            this.store.dispatch(actions.dataRequestError());
         }
 
         this.stopLoading();
     }
 
     formatItemValue(item) {
+        const state = this.store.getState();
         return window.app.model.currency.formatCurrency(
             item.value,
-            this.state.accountCurrency,
+            state.accountCurrency,
         );
     }
 
@@ -403,7 +338,7 @@ class StatisticsView extends View {
     renderAccountsFilter(state, prevState = {}) {
         const ids = state.form?.acc_id ?? [];
         const filterIds = prevState?.form?.acc_id ?? [];
-        if (this.isSameSelection(ids, filterIds)) {
+        if (isSameSelection(ids, filterIds)) {
             return;
         }
 
@@ -448,7 +383,7 @@ class StatisticsView extends View {
             this.currencyDropDown.selectItem(state.form.curr_id);
         }
 
-        const groupType = this.getGroupTypeByName(state.form.group);
+        const groupType = getGroupTypeByName(state.form.group);
         this.groupDropDown.selectItem(groupType);
 
         // Render date

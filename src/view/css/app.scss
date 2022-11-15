@@ -147,6 +147,15 @@ label {
   }
 }
 
+.iconbutton.circle-icon {
+  --iconbtn-hover-icon-color: #ffffff;
+
+  .iconbutton__icon {
+    border: 2px solid #000000;
+    border-radius: 50%;
+  }
+}
+
 /* Centered block */
 .centered {
   margin: 0 auto;
@@ -221,6 +230,10 @@ label {
     justify-content: flex-end;
     flex: 1 1 auto;
   }
+}
+
+.heading-actions .popup-menu {
+  margin-left: 18px;
 }
 
 /* Aligned to right element */
@@ -413,6 +426,7 @@ label {
   --dd-border-radius: 5px;
   --dd-list-border-radius: 5px;
   --dd-selection-item-border-radius: 3px;
+  --dd-disabled-list-item-bg: none;
 }
 
 .dark-theme .dd__list-item.dd__list-item_active,
@@ -437,7 +451,6 @@ label {
     white-space: nowrap;
     display: inline-block;
     flex-shrink: 1;
-    line-height: 30px;
   }
 }
 
@@ -463,6 +476,8 @@ label {
 .suboption {
   margin-left: 29px;
 }
+
+/* PopupMenu */
 
 /* Popup */
 .popup__content {

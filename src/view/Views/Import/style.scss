@@ -26,9 +26,8 @@
   justify-content: flex-end;
   flex: 1 1 auto;
 
-  .actions-menu-list {
-    right: 0;
-    top: 38px;
+  .popup-menu {
+    margin-left: 18px;
   }
 }
 
@@ -63,7 +62,6 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     flex-shrink: 1;
-    padding: 6px 0 6px 5px;
   }
 }
 
@@ -92,10 +90,11 @@
   align-items: stretch;
   position: relative;
   row-gap: 2px;
+}
 
-  .paginator {
-    margin-right: auto;
-  }
+.data-form .paginator {
+  width: 100%;
+  justify-content: center;
 }
 
 .import-list_select {

@@ -110,8 +110,8 @@ export class ImportTransactionForm extends TestComponent {
         ));
 
         res.invFeedback = { elem: await query(this.elem, '.invalid-feedback') };
-        res.menuBtn = await query(this.elem, '.actions-menu-btn');
-        res.contextMenuElem = await query(this.elem, '.actions-menu-list');
+        res.menuBtn = await query(this.elem, '.popup-menu-btn');
+        res.contextMenuElem = await query(this.elem, '.popup-menu-list');
         res.toggleEnableBtn = await query(this.elem, '.enable-btn');
         res.deleteBtn = await query(this.elem, '.delete-btn');
         res.toggleBtn = await query(this.elem, '.toggle-btn');
@@ -477,7 +477,7 @@ export class ImportTransactionForm extends TestComponent {
         }
         if (res.type === 'transferfrom' || res.type === 'transferto') {
             if (res.transferAccount && res.transferAccount.id === res.mainAccount.id) {
-                const accId = App.state.accounts.getNext(res.mainAccount.id);
+                const accId = App.state.getNextAccount(res.mainAccount.id);
                 res.transferAccount = App.state.accounts.getItem(accId);
 
                 if (res.type === 'transferfrom') {
@@ -565,7 +565,7 @@ export class ImportTransactionForm extends TestComponent {
                 accId = account.id;
             }
             if (accId === this.model.mainAccount.id) {
-                accId = App.state.accounts.getNext(accId);
+                accId = App.state.getNextAccount(accId);
             }
             this.model.transferAccount = App.state.accounts.getItem(accId);
 
@@ -585,7 +585,7 @@ export class ImportTransactionForm extends TestComponent {
                 accId = account.id;
             }
             if (accId === this.model.mainAccount.id) {
-                accId = App.state.accounts.getNext(accId);
+                accId = App.state.getNextAccount(accId);
             }
             this.model.transferAccount = App.state.accounts.getItem(accId);
 

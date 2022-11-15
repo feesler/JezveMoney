@@ -9,7 +9,9 @@ import {
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { DropDown } from 'jezvejs/DropDown';
+import { LinkMenu } from 'jezvejs/LinkMenu';
 import { Paginator } from 'jezvejs/Paginator';
+import { PopupMenu } from 'jezvejs/PopupMenu';
 import 'jezvejs/style/InputGroup';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
@@ -19,14 +21,14 @@ import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { PopupMenu } from '../../Components/PopupMenu/PopupMenu.js';
-import { LinkMenu } from '../../Components/LinkMenu/LinkMenu.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
 import './style.scss';
 import { SearchInput } from '../../Components/SearchInput/SearchInput.js';
+import { createStore } from '../../js/store.js';
+import { reducer, actions, isSameSelection } from './reducer.js';
 
 const PAGE_TITLE = 'Jezve Money | Transactions';
 const MSG_SET_POS_FAIL = 'Fail to change position of transaction.';
@@ -52,7 +54,7 @@ class TransactionListView extends View {
     constructor(...args) {
         super(...args);
 
-        this.state = {
+        const initialState = {
             items: [...this.props.transArr],
             filter: { ...this.props.filter },
             form: { ...this.props.filter },
@@ -68,6 +70,13 @@ class TransactionListView extends View {
         window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
         window.app.loadModel(PersonList, 'persons', window.app.props.persons);
+
+        this.store = createStore(reducer, initialState);
+        this.store.subscribe((state, prevState) => {
+            if (state !== prevState) {
+                this.render(state, prevState);
+            }
+        });
     }
 
     /**
@@ -191,49 +200,46 @@ class TransactionListView extends View {
 
         this.createContextMenu();
 
-        this.render(this.state);
+        this.render(this.store.getState());
     }
 
     createMenu() {
-        this.menu = PopupMenu.create({ id: 'listMenu' });
-
-        this.listModeBtn = this.menu.addIconItem({
-            id: 'listModeBtn',
-            title: 'Done',
-            onClick: () => this.setListMode('list'),
-        });
-        this.selectModeBtn = this.menu.addIconItem({
-            id: 'selectModeBtn',
-            icon: 'select',
-            title: 'Select',
-            onClick: () => this.setListMode('select'),
-        });
-        this.sortModeBtn = this.menu.addIconItem({
-            id: 'sortModeBtn',
-            icon: 'sort',
-            title: 'Sort',
-            onClick: () => this.setListMode('sort'),
-        });
-        this.menu.addSeparator();
-        this.separator1 = this.menu.addSeparator();
-
-        this.selectAllBtn = this.menu.addIconItem({
-            id: 'selectAllBtn',
-            title: 'Select all',
-            onClick: () => this.selectAll(),
-        });
-        this.deselectAllBtn = this.menu.addIconItem({
-            id: 'deselectAllBtn',
-            title: 'Clear selection',
-            onClick: () => this.deselectAll(),
-        });
-        this.separator2 = this.menu.addSeparator();
-
-        this.deleteBtn = this.menu.addIconItem({
-            id: 'deleteBtn',
-            icon: 'del',
-            title: 'Delete',
-            onClick: () => this.confirmDelete(),
+        this.menu = PopupMenu.create({
+            id: 'listMenu',
+            items: [{
+                id: 'listModeBtn',
+                title: 'Done',
+                onClick: () => this.setListMode('list'),
+            }, {
+                id: 'selectModeBtn',
+                icon: 'select',
+                title: 'Select',
+                onClick: () => this.setListMode('select'),
+            }, {
+                id: 'sortModeBtn',
+                icon: 'sort',
+                title: 'Sort',
+                onClick: () => this.setListMode('sort'),
+            }, {
+                id: 'separator1',
+                type: 'separator',
+            }, {
+                id: 'selectAllBtn',
+                title: 'Select all',
+                onClick: () => this.selectAll(),
+            }, {
+                id: 'deselectAllBtn',
+                title: 'Clear selection',
+                onClick: () => this.deselectAll(),
+            }, {
+                id: 'separator2',
+                type: 'separator',
+            }, {
+                id: 'deleteBtn',
+                icon: 'del',
+                title: 'Delete',
+                onClick: () => this.confirmDelete(),
+            }],
         });
     }
 
@@ -241,108 +247,52 @@ class TransactionListView extends View {
         this.contextMenu = PopupMenu.create({
             id: 'contextMenu',
             attached: true,
-        });
-
-        this.ctxUpdateBtn = this.contextMenu.addIconItem({
-            id: 'ctxUpdateBtn',
-            type: 'link',
-            icon: 'update',
-            title: 'Edit',
-        });
-        this.ctxDeleteBtn = this.contextMenu.addIconItem({
-            id: 'ctxDeleteBtn',
-            icon: 'del',
-            title: 'Delete',
-            onClick: () => this.confirmDelete(),
+            items: [{
+                id: 'ctxUpdateBtn',
+                type: 'link',
+                icon: 'update',
+                title: 'Edit',
+            }, {
+                id: 'ctxDeleteBtn',
+                icon: 'del',
+                title: 'Delete',
+                onClick: () => this.confirmDelete(),
+            }],
         });
     }
 
     showContextMenu(itemId) {
-        if (this.state.contextItem === itemId) {
-            return;
-        }
-
-        this.setState({ ...this.state, contextItem: itemId });
+        this.store.dispatch(actions.showContextMenu(itemId));
     }
 
     toggleSelectItem(itemId) {
-        this.list.toggleSelectItem(itemId);
-        this.setState({
-            ...this.state,
-            items: this.list.getItems(),
-        });
-    }
-
-    reduceSelectAll(state = this.state) {
-        const selectItem = (item) => (
-            (item.selected)
-                ? item
-                : { ...item, selected: true }
-        );
-
-        return {
-            ...state,
-            items: state.items.map(selectItem),
-        };
-    }
-
-    reduceDeselectAll(state = this.state) {
-        const deselectItem = (item) => (
-            (item.selected)
-                ? { ...item, selected: false }
-                : item
-        );
-
-        return {
-            ...state,
-            items: state.items.map(deselectItem),
-        };
+        this.store.dispatch(actions.toggleSelectItem(itemId));
     }
 
     selectAll() {
-        this.setState(this.reduceSelectAll());
+        this.store.dispatch(actions.selectAllItems());
     }
 
     deselectAll() {
-        this.setState(this.reduceDeselectAll());
+        this.store.dispatch(actions.deselectAllItems());
     }
 
     setListMode(listMode) {
-        if (this.state.listMode === listMode) {
-            return;
-        }
-
-        let newState = {
-            ...this.state,
-            listMode,
-            contextItem: null,
-        };
-        if (newState.listMode === 'list') {
-            newState = this.reduceDeselectAll(newState);
-        }
-
-        this.setState(newState);
+        this.store.dispatch(actions.changeListMode(listMode));
     }
 
     /** Set loading state and render view */
     startLoading() {
-        if (this.state.loading) {
-            return;
-        }
-
-        this.setState({ ...this.state, loading: true });
+        this.store.dispatch(actions.startLoading());
     }
 
     /** Remove loading state and render view */
     stopLoading() {
-        if (!this.state.loading) {
-            return;
-        }
-
-        this.setState({ ...this.state, loading: false });
+        this.store.dispatch(actions.stopLoading());
     }
 
-    getContextIds(state = this.state) {
+    getContextIds() {
+        const state = this.store.getState();
         if (state.listMode === 'list') {
             return asArray(state.contextItem);
         }
@@ -374,13 +324,13 @@ class TransactionListView extends View {
      * @param {number} trans_id - identifier of transaction
      */
     cancelPosChange() {
-        this.render(this.state);
+        this.render(this.store.getState());
 
         window.app.createMessage(MSG_SET_POS_FAIL, 'msg_error');
     }
 
     /** Returns URL for filter of specified state */
-    getFilterURL(state = this.state, keepPage = true) {
+    getFilterURL(state, keepPage = true) {
         const { baseURL } = window.app;
         const { filter } = state;
         const res = new URL(`${baseURL}transactions/`);
@@ -414,22 +364,18 @@ class TransactionListView extends View {
         e.stopPropagation();
         e.preventDefault();
 
-        this.state.form = {};
-        this.state.pagination.page = 1;
-
-        this.requestTransactions(this.state.form);
+        this.store.dispatch(actions.clearAllFilters());
+        const state = this.store.getState();
+        this.requestTransactions(state.form);
     }
 
     /**
      * Transaction type menu change event handler
      */
     onChangeTypeFilter(selected) {
-        this.state.form.type = selected;
-        this.requestTransactions(this.state.form);
-    }
-
-    isSameSelection(a, b) {
-        return a.length === b.length && a.every((id) => b.includes(id));
+        this.store.dispatch(actions.changeTypeFilter(selected));
+        const state = this.store.getState();
+        this.requestTransactions(state.form);
     }
 
     /**
@@ -437,17 +383,16 @@ class TransactionListView extends View {
      * @param {object} obj - selection object
      */
     onAccountChange(obj) {
-        const data = asArray(obj);
-        const ids = data.map((item) => parseInt(item.id, 10));
-        const filterIds = this.state.form.acc_id ?? [];
-
-        if (this.isSameSelection(ids, filterIds)) {
+        const ids = asArray(obj).map((item) => parseInt(item.id, 10));
+        let state = this.store.getState();
+        const filterIds = state.form.acc_id ?? [];
+        if (isSameSelection(ids, filterIds)) {
             return;
         }
 
-        // Prepare parameters
-        this.state.form.acc_id = ids;
-        this.requestTransactions(this.state.form);
+        this.store.dispatch(actions.changeAccountsFilter(ids));
+        state = this.store.getState();
+        this.requestTransactions(state.form);
     }
 
     /**
@@ -455,38 +400,28 @@ class TransactionListView extends View {
      * @param {object} obj - selection object
      */
     onPersonChange(obj) {
-        const data = Array.isArray(obj) ? obj : [obj];
-        const ids = data.map((item) => parseInt(item.id, 10));
-        const filterIds = this.state.form.person_id ?? [];
-
-        if (this.isSameSelection(ids, filterIds)) {
+        const ids = asArray(obj).map((item) => parseInt(item.id, 10));
+        let state = this.store.getState();
+        const filterIds = state.form.person_id ?? [];
+        if (isSameSelection(ids, filterIds)) {
             return;
         }
 
-        // Prepare parameters
-        this.state.form.person_id = ids;
-        this.requestTransactions(this.state.form);
+        this.store.dispatch(actions.changePersonsFilter(ids));
+        state = this.store.getState();
+        this.requestTransactions(state.form);
     }
 
     /** Search field input event handler */
     onSearchInputChange(value) {
-        if (this.state.form.search === value) {
-            return;
-        }
-
-        if (value.length > 0) {
-            this.state.form.search = value;
-        } else if ('search' in this.state.form) {
-            delete this.state.form.search;
-        }
-
-        this.state.typingSearch = true;
-
-        this.requestTransactions(this.state.form);
+        this.store.dispatch(actions.changeSearchQuery(value));
+        const state = this.store.getState();
+        this.requestTransactions(state.form);
     }
 
     async deleteItems() {
-        if (this.state.loading) {
+        const state = this.store.getState();
+        if (state.loading) {
             return;
         }
 
@@ -499,7 +434,7 @@ class TransactionListView extends View {
 
         try {
             await API.transaction.del({ id: ids });
-            this.requestTransactions(this.state.form);
+            this.requestTransactions(state.form);
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
             this.stopLoading();
@@ -526,49 +461,48 @@ class TransactionListView extends View {
 
     /** Date range filter change handler */
     onChangeDateFilter(data) {
-        this.state.form = {
-            ...this.state.form,
-            ...data,
-        };
-
-        this.requestTransactions(this.state.form);
+        this.store.dispatch(actions.changeDateFilter(data));
+        const state = this.store.getState();
+        this.requestTransactions(state.form);
     }
 
     showMore() {
-        const { page } = this.state.pagination;
-        let { range } = this.state.pagination;
+        const state = this.store.getState();
+        const { page } = state.pagination;
+        let { range } = state.pagination;
         if (!range) {
             range = 1;
         }
         range += 1;
 
         this.requestTransactions({
-            ...this.state.form,
+            ...state.form,
             range,
             page,
         });
     }
 
     onChangePage(page) {
+        const state = this.store.getState();
         this.requestTransactions({
-            ...this.state.form,
+            ...state.form,
             page,
         });
     }
 
     onModeChanged(mode) {
-        this.state.mode = mode;
+        this.store.dispatch(actions.changeMode(mode));
         this.replaceHistory();
-        this.render(this.state);
     }
 
     onItemClick(itemId, e) {
-        if (this.state.listMode === 'list') {
-            const menuBtn = e?.target?.closest('.actions-menu-btn');
+        const state = this.store.getState();
+        if (state.listMode === 'list') {
+            const menuBtn = e?.target?.closest('.popup-menu-btn');
             if (menuBtn) {
                 this.showContextMenu(itemId);
             }
-        } else if (this.state.listMode === 'select') {
+        } else if (state.listMode === 'select') {
             if (e?.target?.closest('.checkbox')) {
                 e.preventDefault();
             }
@@ -578,7 +512,7 @@ class TransactionListView extends View {
     }
 
     replaceHistory() {
-        const url = this.getFilterURL();
+        const url = this.getFilterURL(this.store.getState());
         window.history.replaceState({}, PAGE_TITLE, url);
     }
 
@@ -588,27 +522,14 @@ class TransactionListView extends View {
         try {
             const result = await API.transaction.list(options);
 
-            this.setState({
-                ...this.state,
-                items: [...result.data.items],
-                pagination: { ...result.data.pagination },
-                filter: { ...result.data.filter },
-                form: { ...result.data.filter },
-                listMode: 'list',
-                contextItem: null,
-            });
+            this.store.dispatch(actions.listRequestLoaded(result.data));
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
-
-            this.setState({
-                ...this.state,
-                form: { ...this.state.filter },
-            });
+            this.store.dispatch(actions.listRequestError());
         }
 
         this.replaceHistory();
         this.stopLoading();
-        this.state.typingSearch = false;
     }
 
     renderContextMenu(state) {
@@ -618,22 +539,21 @@ class TransactionListView extends View {
         }
         const itemId = state.contextItem;
         if (!itemId) {
+            this.contextMenu.detach();
             return;
         }
         const listItem = this.list.getListItemById(itemId);
-        const menuContainer = listItem?.elem?.querySelector('.actions-menu');
+        const menuContainer = listItem?.elem?.querySelector('.popup-menu');
         if (!menuContainer) {
+            this.contextMenu.detach();
             return;
         }
 
-        if (this.contextMenu.menuList.parentNode !== menuContainer) {
-            PopupMenu.hideActive();
-            this.contextMenu.attachTo(menuContainer);
-            this.contextMenu.toggleMenu();
-        }
-
         const { baseURL } = window.app;
-        this.ctxUpdateBtn.setURL(`${baseURL}transactions/update/${itemId}`);
+        const { items } = this.contextMenu;
+        items.ctxUpdateBtn.setURL(`${baseURL}transactions/update/${itemId}`);
+
+        this.contextMenu.attachAndShow(menuContainer);
     }
 
     renderMenu(state) {
@@ -645,17 +565,18 @@ class TransactionListView extends View {
 
         this.menu.show(itemsCount > 0);
 
-        this.listModeBtn.show(!isListMode);
-        this.selectModeBtn.show(isListMode && itemsCount > 0);
-        this.sortModeBtn.show(isListMode && itemsCount > 1);
+        const { items } = this.menu;
+        items.listModeBtn.show(!isListMode);
+        items.selectModeBtn.show(isListMode && itemsCount > 0);
+        items.sortModeBtn.show(isListMode && itemsCount > 1);
 
-        show(this.separator1, isSelectMode);
+        show(items.separator1, isSelectMode);
 
-        this.selectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount);
-        this.deselectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount > 0);
-        show(this.separator2, isSelectMode);
+        items.selectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount);
+        items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount > 0);
+        show(items.separator2, isSelectMode);
 
-        this.deleteBtn.show(isSelectMode && totalSelCount > 0);
+        items.deleteBtn.show(isSelectMode && totalSelCount > 0);
     }
 
     /** Render accounts selection */

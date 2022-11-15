@@ -1,5 +1,5 @@
 import { TestComponent, query, assert } from 'jezve-test';
-import { IconButton } from './IconButton.js';
+import { IconButton } from 'jezvejs-test';
 
 export class Toolbar extends TestComponent {
     async parseContent() {

@@ -155,29 +155,15 @@ export class ImportUploadDialog extends TestComponent {
         if (res.templateBlock.visible && !res.isLoading) {
             res.columns = await asyncMap(
                 await queryAll(res.rawDataTable.elem, '.raw-data-table__data .raw-data-column'),
-                async (elem) => {
-                    const item = {
-                        elem,
-                        tplElem: await query(elem, '.raw-data-column__tpl'),
-                        headerElem: await query(elem, '.raw-data-column__header'),
-                        cellElems: await queryAll(elem, '.raw-data-column__cell'),
-                    };
-
-                    item.cells = await asyncMap(item.cellElems, (cellElem) => prop(cellElem, 'textContent'));
-
-                    item.tplProperties = await asyncMap(
-                        await queryAll(item.tplElem, '.raw-data-column__tpl-prop'),
-                        (propElem) => prop(propElem, 'textContent'),
-                    );
-                    item.title = await prop(item.headerElem, 'textContent');
-
-                    return item;
-                },
+                async (elem) => this.parseRawDataTableColumn(elem),
             );
 
             if (!res.columns.length) {
                 res.columns = null;
             }
+
+            const rowNumbersColumn = await query(res.rawDataTable.elem, '.raw-data-column_row-numbers');
+            res.rowNumbers = await this.parseRawDataTableColumn(rowNumbersColumn);
         }
 
         res.tplFeedback.title = await prop(res.tplFeedback.elem, 'textContent');
@@ -198,6 +184,31 @@ export class ImportUploadDialog extends TestComponent {
         }
 
         res.delete_warning = await WarningPopup.create(this, await query('#tpl_delete_warning'));
+
+        return res;
+    }
+
+    async parseRawDataTableColumn(elem) {
+        if (!elem) {
+            return null;
+        }
+
+        const res = {
+            elem,
+            tplElem: await query(elem, '.raw-data-column__tpl'),
+            headerElem: await query(elem, '.raw-data-column__header'),
+            cellElems: await queryAll(elem, '.raw-data-column__cell'),
+        };
+
+        res.cells = await asyncMap(res.cellElems, (cellElem) => prop(cellElem, 'textContent'));
+
+        res.tplProperties = await asyncMap(
+            await queryAll(res.tplElem, '.raw-data-column__tpl-prop'),
+            (propElem) => prop(propElem, 'textContent'),
+        );
+        if (res.headerElem) {
+            res.title = await prop(res.headerElem, 'textContent');
+        }
 
         return res;
     }
@@ -414,6 +425,15 @@ export class ImportUploadDialog extends TestComponent {
             res.columns = rawDataHeader.map(
                 (_, ind) => this.getColumn(this.parent.fileData, ind),
             );
+            res.rowNumbers = {
+                cells: ['1'],
+            };
+
+            const firstRowIndex = Math.max(model.template.first_row, 2);
+            for (let i = 0; i < 3; i += 1) {
+                const rowNumber = firstRowIndex + i;
+                res.rowNumbers.cells.push(rowNumber.toString());
+            }
         }
 
         return res;

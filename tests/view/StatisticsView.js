@@ -7,11 +7,10 @@ import {
     isVisible,
     waitForFunction,
 } from 'jezve-test';
-import { DropDown } from 'jezvejs-test';
+import { DropDown, LinkMenu } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { availTransTypes } from '../model/Transaction.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
-import { LinkMenu } from './component/LinkMenu/LinkMenu.js';
 import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { App } from '../Application.js';
 import { fixDate } from '../common.js';

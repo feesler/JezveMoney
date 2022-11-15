@@ -1,15 +1,12 @@
 import {
     test,
-    copyObject,
+    asArray,
     assert,
     baseUrl,
     httpReq,
     setBlock,
 } from 'jezve-test';
 import { App } from '../../Application.js';
-import { findSimilarTransaction } from '../../model/import.js';
-import { ImportTransaction } from '../../model/ImportTransaction.js';
-import { ImportList } from '../../view/component/Import/ImportList.js';
 import { ImportView } from '../../view/ImportView.js';
 
 /** Reexport import templates and import rules runners */
@@ -72,7 +69,6 @@ function parseCSV(data) {
 export const openUploadDialog = async () => {
     await test('Open upload dialog', async () => {
         await checkNavigation();
-
         return App.view.launchUploadDialog();
     });
 };
@@ -81,7 +77,6 @@ export const openUploadDialog = async () => {
 export const closeUploadDialog = async () => {
     await test('Close upload dialog', async () => {
         await checkNavigation();
-
         return App.view.closeUploadDialog();
     });
 };
@@ -157,8 +152,6 @@ export const removeFile = async (filename) => {
 export const addItem = async () => {
     await test('Add import item', async () => {
         await checkNavigation();
-        await checkViewState('main');
-
         return App.view.addItem();
     });
 };
@@ -212,6 +205,18 @@ export const submitUploaded = async (params) => {
     });
 };
 
+/** Change main account at upload dialog */
+export const selectUploadAccount = async (accountId) => {
+    const userAccounts = App.state.accounts.getUserVisible();
+    const account = userAccounts.getItem(accountId);
+    assert(account, `Invalid account id ${accountId}`);
+
+    await test(`Change main account at upload dialog to '${account.name}'`, async () => {
+        await checkNavigation();
+        return App.view.selectUploadAccount(accountId);
+    });
+};
+
 /** Change main account */
 export const changeMainAccount = async (accountId) => {
     const userAccounts = App.state.accounts.getUserVisible();
@@ -220,41 +225,7 @@ export const changeMainAccount = async (accountId) => {
 
     await test(`Change main account to '${account.name}'`, async () => {
         await checkNavigation();
-        await checkViewState('main');
-
-        const skipList = [];
-        App.view.items.forEach((_, ind) => {
-            const item = App.view.items[ind];
-
-            if (!item.original || !App.view.rulesEnabled) {
-                item.setMainAccount(accountId);
-                return;
-            }
-
-            // Reapply rules
-            item.restoreOriginal();
-            item.setMainAccount(accountId);
-            App.state.rules.applyTo(item);
-
-            const tr = findSimilarTransaction(item, skipList);
-            if (tr) {
-                skipList.push(tr.id);
-            }
-            item.setSimilarTransaction(tr);
-        });
-
-        App.view.model.mainAccount = account.id;
-        App.view.model.totalCount = App.view.items.length;
-        const enabledItems = App.view.items.filter((item) => item.enabled);
-        App.view.model.enabledCount = enabledItems.length;
-
-        App.view.expectedState = App.view.getExpectedState();
-        const expectedList = App.view.getExpectedList();
-        App.view.expectedState.itemsList.items = expectedList.items;
-
-        await App.view.selectMainAccount(accountId);
-
-        return App.view.checkState();
+        return App.view.selectMainAccount(accountId);
     });
 };
 
@@ -264,66 +235,7 @@ export const enableRules = async (value = true) => {
 
     await test(descr, async () => {
         await checkNavigation();
-        await checkViewState('main');
-
-        assert(
-            enable !== App.view.rulesEnabled,
-            `Import rules already ${enable ? 'enabled' : 'disabled'}`,
-        );
-
-        // Apply rules or restore original import data according to enable flag
-        // and convert to expected state of ImportTransactionForm component
-        const itemsData = App.view.content.itemsList.content.items.map((item) => {
-            let model;
-
-            if (item.model.original) {
-                if (enable) {
-                    const expTrans = item.getExpectedTransaction(item.model);
-                    const origMainAccount = App.state.accounts.findByName(
-                        item.model.original.mainAccount,
-                    );
-                    const importTrans = new ImportTransaction({
-                        ...expTrans,
-                        enabled: item.model.enabled,
-                        mainAccount: origMainAccount,
-                        type: item.model.type,
-                        original: {
-                            ...item.model.original,
-                            mainAccount: origMainAccount,
-                        },
-                    });
-
-                    App.state.rules.applyTo(importTrans);
-
-                    const imported = ImportList.render(
-                        [importTrans],
-                        App.state,
-                        (item.model.isForm) ? 0 : -1,
-                    );
-                    return copyObject(imported.items[0]);
-                }
-
-                model = item.restoreOriginal();
-                if (App.view.model.mainAccount !== model.mainAccount.id) {
-                    model = item.onChangeMainAccount(model, App.view.model.mainAccount);
-                }
-            } else {
-                model = item.model;
-            }
-
-            const result = item.getExpectedState(model);
-            return copyObject(result);
-        });
-
-        await App.view.enableRules(enable);
-
-        App.view.expectedState = {
-            itemsList: {
-                items: itemsData,
-            },
-        };
-
-        return App.view.checkState();
+        return App.view.enableRules(enable);
     });
 };
 
@@ -334,8 +246,6 @@ export const enableCheckSimilar = async (value = true) => {
 
     await test(`${act} check similar transactions`, async () => {
         await checkNavigation();
-        await checkViewState('main');
-
         return App.view.enableCheckSimilar(enable);
     });
 };
@@ -347,7 +257,6 @@ export const enableItems = async ({ index, value = true }) => {
 
     await test(`${descr} [${index}]`, async () => {
         await checkNavigation();
-
         return App.view.enableItems(index, enable);
     });
 };
@@ -426,7 +335,6 @@ export const updateItem = async (params) => {
     setBlock(`Update item [${params.pos}]`, 2);
 
     await checkNavigation();
-    await checkViewState('main');
 
     const actDescr = {
         changeType: 'Change transaction type',
@@ -442,7 +350,7 @@ export const updateItem = async (params) => {
 
     await App.view.updateItemByPos(params.pos);
 
-    const actions = Array.isArray(params.action) ? params.action : [params.action];
+    const actions = asArray(params.action);
     for (const action of actions) {
         let descr;
 
@@ -484,8 +392,6 @@ export const updateItem = async (params) => {
 export const saveItem = async () => {
     await test('Save import form', async () => {
         await checkNavigation();
-        await checkViewState('main');
-
         return App.view.saveItem();
     });
 };
@@ -494,8 +400,6 @@ export const saveItem = async () => {
 export const cancelItem = async () => {
     await test('Cancel import form', async () => {
         await checkNavigation();
-        await checkViewState('main');
-
         return App.view.cancelItem();
     });
 };
@@ -505,31 +409,11 @@ export const cancelItem = async () => {
  * @param {number|number[]} indexes - index or array of indexes of items to delete
  */
 export const deleteItems = async (indexes) => {
-    const itemInds = Array.isArray(indexes) ? indexes : [indexes];
+    const itemInds = asArray(indexes);
 
     await test(`Delete import item(s) [${itemInds.join()}]`, async () => {
         await checkNavigation();
-        await checkViewState('main');
-
-        const itemsList = App.view.content.itemsList.getExpectedState();
-        const expected = copyObject(itemsList.items);
-        let removed = 0;
-        itemInds.sort();
-        for (const ind of itemInds) {
-            const index = parseInt(ind, 10);
-            assert.arrayIndex(itemsList.items, index);
-
-            expected.splice(ind - removed, 1);
-            removed += 1;
-        }
-
-        await App.view.deleteItem(itemInds);
-
-        App.view.expectedState = {
-            itemsList: { items: expected },
-        };
-
-        return App.view.checkState();
+        return App.view.deleteItem(itemInds);
     });
 };
 
@@ -539,15 +423,7 @@ export const deleteItems = async (indexes) => {
 export const deleteAllItems = async () => {
     await test('Delete all import items', async () => {
         await checkNavigation();
-        await checkViewState('main');
-
-        await App.view.deleteAllItems();
-
-        App.view.expectedState = {
-            itemsList: { items: [] },
-        };
-
-        return App.view.checkState();
+        return App.view.deleteAllItems();
     });
 };
 
@@ -555,12 +431,8 @@ export const deleteAllItems = async () => {
 export const submit = async () => {
     await test('Submit items', async () => {
         await checkNavigation();
-        await checkViewState('main');
-
         await App.state.fetch();
-
         await App.view.submit();
-
         return App.state.fetchAndTest();
     });
 };
@@ -569,8 +441,6 @@ export const submit = async () => {
 export const goToFirstPage = async () => {
     await test('Navigate to first page', async () => {
         await checkNavigation();
-        await checkViewState('main');
-
         return App.view.goToFirstPage();
     });
 };
@@ -579,8 +449,6 @@ export const goToFirstPage = async () => {
 export const goToNextPage = async () => {
     await test('Navigate to next page', async () => {
         await checkNavigation();
-        await checkViewState('main');
-
         return App.view.goToNextPage();
     });
 };
@@ -589,8 +457,6 @@ export const goToNextPage = async () => {
 export const goToPrevPage = async () => {
     await test('Navigate to previous page', async () => {
         await checkNavigation();
-        await checkViewState('main');
-
         return App.view.goToPrevPage();
     });
 };

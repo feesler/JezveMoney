@@ -6,6 +6,7 @@ import {
     insertAfter,
     setEvents,
 } from 'jezvejs';
+import { IconButton } from 'jezvejs/IconButton';
 import { Spinner } from 'jezvejs/Spinner';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
@@ -13,7 +14,8 @@ import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { IconButton } from '../../Components/IconButton/IconButton.js';
+import { actions, reducer } from './reducer.js';
+import { createStore } from '../../js/store.js';
 
 const TITLE_PERSON_DELETE = 'Delete person';
 const MSG_PERSON_DELETE = 'Are you sure want to delete selected person?<br>Debt operations will be converted into expense or income.';
@@ -27,25 +29,35 @@ class PersonView extends View {
     constructor(...args) {
         super(...args);
 
-        this.state = {
+        const initialState = {
             validation: {
                 name: true,
+                valid: true,
             },
             submitStarted: false,
         };
 
         if (this.props.person) {
-            this.state.original = this.props.person;
-            this.state.data = { ...this.state.original };
+            initialState.original = this.props.person;
+            initialState.data = { ...initialState.original };
         }
 
         window.app.loadModel(PersonList, 'persons', window.app.props.persons);
+
+        this.store = createStore(reducer, initialState);
+        this.store.subscribe((state, prevState) => {
+            if (state !== prevState) {
+                this.render(state, prevState);
+            }
+        });
     }
 
     /**
      * View initialization
      */
     onStart() {
+        const state = this.store.getState();
+
         this.form = ge('personForm');
         this.nameInp = ge('pname');
         this.nameFeedback = ge('namefeedback');
@@ -69,7 +81,7 @@ class PersonView extends View {
         insertAfter(this.spinner.elem, this.cancelBtn);
 
         // Update mode
-        if (this.state.original.id) {
+        if (state.original.id) {
             this.deleteBtn = IconButton.fromElement('del_btn', {
                 onClick: () => this.confirmDelete(),
             });
@@ -78,76 +90,61 @@ class PersonView extends View {
 
     /** Name input event handler */
     onNameInput() {
-        this.setState({
-            ...this.state,
-            validation: {
-                ...this.state.validation,
-                name: true,
-            },
-            data: {
-                ...this.state.data,
-                name: this.nameInp.value,
-            },
-        });
+        const { value } = this.nameInp;
+        this.store.dispatch(actions.changeName(value));
     }
 
     /** Form submit event handler */
     onSubmit(e) {
         e.preventDefault();
 
-        if (this.state.submitStarted) {
+        const state = this.store.getState();
+        if (state.submitStarted) {
             return;
         }
 
-        const { name } = this.state.data;
-        const validation = {
-            valid: true,
-            name: true,
-        };
-
+        const { name } = state.data;
         if (name.length === 0) {
-            validation.name = MSG_EMPTY_NAME;
-            validation.valid = false;
+            this.store.dispatch(actions.invalidateNameField(MSG_EMPTY_NAME));
             this.nameInp.focus();
         } else {
             const person = window.app.model.persons.findByName(name);
-            if (person && this.state.original.id !== person.id) {
-                validation.name = MSG_EXISTING_NAME;
-                validation.valid = false;
+            if (person && state.original.id !== person.id) {
+                this.store.dispatch(actions.invalidateNameField(MSG_EXISTING_NAME));
                 this.nameInp.focus();
             }
         }
 
+        const { validation } = this.store.getState();
         if (validation.valid) {
             this.submitPerson();
-        } else {
-            this.setState({ ...this.state, validation });
         }
     }
 
     startSubmit() {
-        this.setState({ ...this.state, submitStarted: true });
+        this.store.dispatch(actions.startSubmit());
     }
 
     cancelSubmit() {
-        this.setState({ ...this.state, submitStarted: false });
+        this.store.dispatch(actions.cancelSubmit());
     }
 
     async submitPerson() {
-        if (this.state.submitStarted) {
+        const state = this.store.getState();
+        if (state.submitStarted) {
             return;
         }
 
         this.startSubmit();
 
-        const isUpdate = this.state.original.id;
+        const isUpdate = state.original.id;
         const data = {
-            name: this.state.data.name,
-            flags: this.state.original.flags,
+            name: state.data.name,
+            flags: state.original.flags,
         };
 
         if (isUpdate) {
-            data.id = this.state.original.id;
+            data.id = state.original.id;
         }
 
         try {
@@ -166,8 +163,8 @@ class PersonView extends View {
     }
 
     async deletePerson() {
-        const { original } = this.state;
-        if (this.state.submitStarted || !original.id) {
+        const { submitStarted, original } = this.store.getState();
+        if (submitStarted || !original.id) {
             return;
         }
 
@@ -186,7 +183,8 @@ class PersonView extends View {
 
     /** Show person delete confirmation popup */
     confirmDelete() {
-        if (!this.state.data.id) {
+        const { data } = this.store.getState();
+        if (!data.id) {
             return;
         }
 

@@ -16,6 +16,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                             <?= IconButton::render([
                                 "id" => "add_btn",
                                 "type" => "link",
+                                "classNames" => "circle-icon",
                                 "link" => BASEURL . "persons/create/",
                                 "title" => "Create",
                                 "icon" => "plus"

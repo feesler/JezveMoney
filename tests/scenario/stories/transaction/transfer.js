@@ -124,9 +124,12 @@ export const stateLoop = async () => {
         // Transition 6: Change source account to another one with different currency than
         //  destination (USD) and move from State 0 to State 3
         { action: 'changeSrcAccountByPos', data: ACC_USD },
+        // Input different source and destination amount
+        { action: 'inputSrcAmount', data: '111' },
+        { action: 'inputDestAmount', data: '222' },
         // Transition 43: Change source account to another one with different currency than
         //  destination (RUB) and stay on State 3
-        { action: 'changeSrcAccountByPos', data: ACC_RUB },
+        { action: 'changeSrcAccountByPos', data: ACC_EUR },
         // Transition 41: Change destination account to another one with same currency as source
         //  (EUR) and stay on State 3
         { action: 'changeDestAccountByPos', data: ACC_EUR },
@@ -152,7 +155,7 @@ export const stateLoop = async () => {
         { action: 'changeDestAccountByPos', data: ACC_EUR },
         // Transition 39: Change destination account to another one with same currency as source
         //  (RUB) and move from State 4 to State 1
-        { action: 'changeDestAccountByPos', data: ACC_EUR },
+        { action: 'changeDestAccountByPos', data: ACC_3 },
         // Transition 14: Change destination account to another one with different currency than
         //  source (USD) and move from State 1 to State 4
         { action: 'changeDestAccountByPos', data: ACC_USD },

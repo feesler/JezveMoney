@@ -23,8 +23,9 @@ export class ImportList extends TestComponent {
         const res = {
             items: [],
         };
-        const isSelectMode = await hasClass(this.elem, 'import-list_select');
-        const isSortMode = await hasClass(this.elem, 'import-list_sort');
+        const dataContainer = await query(this.elem, '.data-container');
+        const isSelectMode = await hasClass(dataContainer, 'import-list_select');
+        const isSortMode = await hasClass(dataContainer, 'import-list_sort');
         if (isSelectMode) {
             res.listMode = 'select';
         } else if (isSortMode) {
@@ -33,7 +34,7 @@ export class ImportList extends TestComponent {
             res.listMode = 'list';
         }
 
-        const listItems = await queryAll(this.elem, '.import-form,.import-item');
+        const listItems = await queryAll(dataContainer, '.import-form,.import-item');
         if (listItems) {
             res.items = await asyncMap(
                 listItems,
@@ -69,11 +70,12 @@ export class ImportList extends TestComponent {
     }
 
     async buildModel(cont) {
+        const paginatorVisible = cont.paginator?.content?.visible;
         const res = {
             items: [],
             pagination: {
-                page: (cont.paginator) ? cont.paginator.active : 1,
-                pages: (cont.paginator) ? cont.paginator.pages : 1,
+                page: (paginatorVisible) ? cont.paginator.active : 1,
+                pages: (paginatorVisible) ? cont.paginator.pages : 1,
             },
             invalidated: false,
             formIndex: -1,
@@ -130,13 +132,11 @@ export class ImportList extends TestComponent {
 
     getExpectedState() {
         const res = {
-            items: this.content.items.map((item) => {
-                // TODO : don't use copyObject
-                const listItem = (item.model.isForm)
+            items: this.content.items.map((item) => (
+                (item.model.isForm)
                     ? ImportTransactionForm.getExpectedState(item.model)
-                    : ImportTransactionItem.getExpectedState(item.model);
-                return copyObject(listItem);
-            }),
+                    : ImportTransactionItem.getExpectedState(item.model)
+            )),
         };
 
         return res;
