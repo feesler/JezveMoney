@@ -145,6 +145,8 @@ class ImportView extends View {
             arrows: true,
             onChange: (page) => this.setPage(page),
         });
+        const listContainer = document.querySelector('.data-form');
+        listContainer.append(this.paginator.elem);
 
         // Data loading indicator
         this.loadingInd = LoadingIndicator.create({ fixed: false });
@@ -921,8 +923,9 @@ class ImportView extends View {
         removeChilds(this.rowsContainer);
         this.transactionRows.forEach((item) => this.rowsContainer.append(item.elem));
 
-        if (state.pagination.pagesCount > 1) {
-            this.rowsContainer.append(this.paginator.elem);
+        const showPaginator = state.pagination.pagesCount > 1;
+        this.paginator.show(showPaginator);
+        if (showPaginator) {
             this.paginator.setState((paginatorState) => ({
                 ...paginatorState,
                 pagesCount: state.pagination.pagesCount,

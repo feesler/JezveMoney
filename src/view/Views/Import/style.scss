@@ -90,10 +90,11 @@
   align-items: stretch;
   position: relative;
   row-gap: 2px;
+}
 
-  .paginator {
-    margin-right: auto;
-  }
+.data-form .paginator {
+  width: 100%;
+  justify-content: center;
 }
 
 .import-list_select {

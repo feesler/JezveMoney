@@ -111,7 +111,8 @@ export class ImportView extends AppView {
         res.renderTime = await prop(rowsContainer, 'dataset.time');
         if (importEnabled) {
             const mainAccountId = res.mainAccountSelect.content.value;
-            res.itemsList = await ImportList.create(this, rowsContainer, mainAccountId);
+            const listContainer = await query('.data-form');
+            res.itemsList = await ImportList.create(this, listContainer, mainAccountId);
             assert(res.itemsList, 'Invalid structure of import view');
         }
         res.submitProgress = { elem: await query('.content_wrap > .loading-indicator') };
