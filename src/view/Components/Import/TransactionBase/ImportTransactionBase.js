@@ -19,9 +19,9 @@ const SIMILAR_CLASS = 'similar';
 const SIMILAR_TITLE_CLASS = 'similar__title';
 const SIMILAR_LINK_CLASS = 'similar__link';
 /* Menu */
-const MENU_CLASS = 'actions-menu';
-const MENU_BUTTON_CLASS = 'btn icon-btn actions-menu-btn';
-const MENU_ICON_CLASS = 'icon actions-menu-btn__icon';
+const MENU_CLASS = 'popup-menu';
+const MENU_BUTTON_CLASS = 'btn icon-btn popup-menu-btn';
+const MENU_ICON_CLASS = 'icon popup-menu-btn__icon';
 
 /** Strings */
 const STR_SIMILAR_FOUND = 'Similar transaction found: ';

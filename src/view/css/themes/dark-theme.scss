@@ -52,7 +52,7 @@
   }
 
   .iconbutton {
-    .iconbutton__icon {
+    &.circle-icon .iconbutton__icon {
       border-color: var(--main-text-color);
     }
 
@@ -268,14 +268,12 @@
     background-color: #202020;
   }
 
-  .actions-menu-btn__icon {
-    fill: var(--main-text-color);
-  }
-
-  .actions-menu-list,
-  .actions-menu-list__separator {
-    background-color: #222222;
-    border-color: #444444;
+  .popup-menu,
+  .popup-menu-list {
+    --popupmenu-border-color: #444444;
+    --popupmenu-separator-color: #444444;
+    --popupmenu-background: #222222;
+    --popupmenu-icon-color: var(--main-text-color);
   }
 
   /* Import form */
@@ -492,12 +490,14 @@
         color: var(--main-text-color);
       }
 
-      .iconbutton__icon {
-        background-color: var(--main-text-color);
-      }
+      &.circle-icon {
+        .iconbutton__icon {
+          background-color: var(--main-text-color);
+        }
 
-      .iconbutton__icon-content {
-        fill: #202020;
+        .iconbutton__icon-content {
+          fill: #202020;
+        }
       }
     }
 

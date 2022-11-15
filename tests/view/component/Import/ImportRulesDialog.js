@@ -12,13 +12,12 @@ import {
     wait,
     waitForFunction,
 } from 'jezve-test';
-import { Paginator } from 'jezvejs-test';
+import { IconButton, Paginator } from 'jezvejs-test';
 import { IMPORT_COND_OP_FIELD_FLAG } from '../../../model/ImportCondition.js';
 import { ImportRuleForm } from './ImportRuleForm.js';
 import { ImportRuleItem } from './ImportRuleItem.js';
 import { asyncMap } from '../../../common.js';
 import { WarningPopup } from '../WarningPopup.js';
-import { IconButton } from '../IconButton.js';
 import { App } from '../../../Application.js';
 import { SearchInput } from '../SearchInput.js';
 
@@ -39,7 +38,7 @@ export class ImportRulesDialog extends TestComponent {
             searchField: await SearchInput.create(this, await query(this.elem, '.search-field')),
             clearSearchBtn: { elem: await query(this.elem, '.search-field .clear-btn') },
             rulesList: { elem: await query(this.elem, '.rules-list') },
-            contextMenu: { elem: await query(this.elem, '.actions-menu-list') },
+            contextMenu: { elem: await query(this.elem, '.popup-menu-list') },
         };
 
         assert(

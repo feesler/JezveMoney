@@ -6,6 +6,7 @@ import {
     insertAfter,
     setEvents,
 } from 'jezvejs';
+import { IconButton } from 'jezvejs/IconButton';
 import { Spinner } from 'jezvejs/Spinner';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
@@ -13,7 +14,6 @@ import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { IconButton } from '../../Components/IconButton/IconButton.js';
 import { actions, reducer } from './reducer.js';
 import { createStore } from '../../js/store.js';
 

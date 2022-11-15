@@ -6,6 +6,7 @@ import {
     navigation,
     click,
 } from 'jezve-test';
+import { IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import {
     convDate,
@@ -20,7 +21,6 @@ import {
 } from '../common.js';
 import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { InputRow } from './component/InputRow.js';
-import { IconButton } from './component/IconButton.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { DatePickerRow } from './component/DatePickerRow.js';
 import { TileInfoItem } from './component/TileInfoItem.js';

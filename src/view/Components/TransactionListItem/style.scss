@@ -46,13 +46,13 @@
   flex-flow: row nowrap;
   align-items: center;
 
-  .actions-menu {
+  .popup-menu {
     position: static;
     height: 26px;
     margin: 0 4px;
   }
 
-  .actions-menu-btn {
+  .popup-menu-btn {
     width: 26px;
     height: 26px;
     padding: 4px;
@@ -60,7 +60,7 @@
     cursor: pointer;
   }
 
-  .actions-menu-btn__icon {
+  .popup-menu-btn__icon {
     height: 18px;
     width: 18px;
   }

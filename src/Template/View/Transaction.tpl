@@ -16,6 +16,7 @@ include(TPL_PATH . "Header.tpl");	?>
 <?php	if ($action == "update") {	?>
                         <?=IconButton::render([
                             "id" => "del_btn",
+                            "classNames" => "circle-icon",
                             "icon" => "del",
                             "title" => "Delete"
                         ])?>

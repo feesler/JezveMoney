@@ -5,6 +5,7 @@ import {
     insertAfter,
     show,
 } from 'jezvejs';
+import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
@@ -13,7 +14,6 @@ import { PersonList } from '../../js/model/PersonList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { ListContainer } from '../../Components/ListContainer/ListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { PopupMenu } from '../../Components/PopupMenu/PopupMenu.js';
 import { Tile } from '../../Components/Tile/Tile.js';
 import './style.scss';
 import { createStore } from '../../js/store.js';

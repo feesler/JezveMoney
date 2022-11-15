@@ -1,5 +1,5 @@
 import { assert } from 'jezve-test';
-import { LinkMenu } from './LinkMenu.js';
+import { LinkMenu } from 'jezvejs-test';
 
 export class TransactionTypeMenu extends LinkMenu {
     getItemValue(item) {

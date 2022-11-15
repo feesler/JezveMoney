@@ -9,7 +9,9 @@ import {
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { DropDown } from 'jezvejs/DropDown';
+import { LinkMenu } from 'jezvejs/LinkMenu';
 import { Paginator } from 'jezvejs/Paginator';
+import { PopupMenu } from 'jezvejs/PopupMenu';
 import 'jezvejs/style/InputGroup';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
@@ -19,8 +21,6 @@ import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { PopupMenu } from '../../Components/PopupMenu/PopupMenu.js';
-import { LinkMenu } from '../../Components/LinkMenu/LinkMenu.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
@@ -498,7 +498,7 @@ class TransactionListView extends View {
     onItemClick(itemId, e) {
         const state = this.store.getState();
         if (state.listMode === 'list') {
-            const menuBtn = e?.target?.closest('.actions-menu-btn');
+            const menuBtn = e?.target?.closest('.popup-menu-btn');
             if (menuBtn) {
                 this.showContextMenu(itemId);
             }
@@ -543,7 +543,7 @@ class TransactionListView extends View {
             return;
         }
         const listItem = this.list.getListItemById(itemId);
-        const menuContainer = listItem?.elem?.querySelector('.actions-menu');
+        const menuContainer = listItem?.elem?.querySelector('.popup-menu');
         if (!menuContainer) {
             this.contextMenu.detach();
             return;

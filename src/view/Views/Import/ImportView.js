@@ -10,7 +10,9 @@ import {
     insertAfter,
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
+import { IconButton } from 'jezvejs/IconButton';
 import { Paginator } from 'jezvejs/Paginator';
+import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Sortable } from 'jezvejs/Sortable';
 import { timestampFromString } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
@@ -21,8 +23,6 @@ import { AccountList } from '../../js/model/AccountList.js';
 import { PersonList } from '../../js/model/PersonList.js';
 import { ImportRuleList } from '../../js/model/ImportRuleList.js';
 import { ImportTemplateList } from '../../js/model/ImportTemplateList.js';
-import { IconButton } from '../../Components/IconButton/IconButton.js';
-import { PopupMenu } from '../../Components/PopupMenu/PopupMenu.js';
 import './style.scss';
 import { ImportUploadDialog } from '../../Components/Import/UploadDialog/Dialog/ImportUploadDialog.js';
 import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from '../../Components/Import/RulesDialog/Dialog/ImportRulesDialog.js';
@@ -484,7 +484,7 @@ class ImportView extends View {
 
         const { listMode } = this.store.getState();
         if (listMode === 'list') {
-            if (!e.target.closest('.actions-menu-btn')) {
+            if (!e.target.closest('.popup-menu-btn')) {
                 return;
             }
             this.showContextMenu(index);
@@ -823,7 +823,7 @@ class ImportView extends View {
         }
 
         const listItem = this.transactionRows[pageIndex.index];
-        const menuContainer = listItem?.elem?.querySelector('.actions-menu');
+        const menuContainer = listItem?.elem?.querySelector('.popup-menu');
         if (!menuContainer) {
             return;
         }

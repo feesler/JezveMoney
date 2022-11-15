@@ -11,9 +11,8 @@ import {
     asArray,
     asyncMap,
 } from 'jezve-test';
-import { DropDown, Checkbox } from 'jezvejs-test';
+import { DropDown, Checkbox, IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
-import { IconButton } from './component/IconButton.js';
 import { ImportList } from './component/Import/ImportList.js';
 import { ImportUploadDialog } from './component/Import/ImportUploadDialog.js';
 import { ImportRulesDialog } from './component/Import/ImportRulesDialog.js';
@@ -97,9 +96,9 @@ export class ImportView extends AppView {
         // List menu
         res.listMenuContainer = {
             elem: await query('#listMenu'),
-            menuBtn: await query('#listMenu .actions-menu-btn'),
+            menuBtn: await query('#listMenu .popup-menu-btn'),
         };
-        res.listMenu = { elem: await query('#listMenu .actions-menu-list') };
+        res.listMenu = { elem: await query('#listMenu .popup-menu-list') };
         if (res.listMenu.elem) {
             await this.parseMenuItems(res, menuItems);
             res.deleteAllBtn.content.disabled = await hasAttr(res.deleteAllBtn.elem, 'disabled');

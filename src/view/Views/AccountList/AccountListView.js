@@ -6,6 +6,7 @@ import {
     show,
     urlJoin,
 } from 'jezvejs';
+import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
@@ -17,7 +18,6 @@ import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { ListContainer } from '../../Components/ListContainer/ListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { PopupMenu } from '../../Components/PopupMenu/PopupMenu.js';
 import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
 import './style.scss';

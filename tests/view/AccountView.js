@@ -6,13 +6,12 @@ import {
     click,
     copyObject,
 } from 'jezve-test';
-import { DropDown } from 'jezvejs-test';
+import { DropDown, IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { Icon } from '../model/Icon.js';
 import { isValidValue, normalize, trimToDigitsLimit } from '../common.js';
 import { Tile } from './component/Tile.js';
 import { InputRow } from './component/InputRow.js';
-import { IconButton } from './component/IconButton.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 

@@ -147,6 +147,15 @@ label {
   }
 }
 
+.iconbutton.circle-icon {
+  --iconbtn-hover-icon-color: #ffffff;
+
+  .iconbutton__icon {
+    border: 2px solid #000000;
+    border-radius: 50%;
+  }
+}
+
 /* Centered block */
 .centered {
   margin: 0 auto;
@@ -221,6 +230,10 @@ label {
     justify-content: flex-end;
     flex: 1 1 auto;
   }
+}
+
+.heading-actions .popup-menu {
+  margin-left: 18px;
 }
 
 /* Aligned to right element */
@@ -437,7 +450,6 @@ label {
     white-space: nowrap;
     display: inline-block;
     flex-shrink: 1;
-    line-height: var(--dd-combo-content-height);
   }
 }
 
@@ -463,6 +475,8 @@ label {
 .suboption {
   margin-left: 29px;
 }
+
+/* PopupMenu */
 
 /* Popup */
 .popup__content {

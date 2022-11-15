@@ -110,8 +110,8 @@ export class ImportTransactionForm extends TestComponent {
         ));
 
         res.invFeedback = { elem: await query(this.elem, '.invalid-feedback') };
-        res.menuBtn = await query(this.elem, '.actions-menu-btn');
-        res.contextMenuElem = await query(this.elem, '.actions-menu-list');
+        res.menuBtn = await query(this.elem, '.popup-menu-btn');
+        res.contextMenuElem = await query(this.elem, '.popup-menu-list');
         res.toggleEnableBtn = await query(this.elem, '.enable-btn');
         res.deleteBtn = await query(this.elem, '.delete-btn');
         res.toggleBtn = await query(this.elem, '.toggle-btn');

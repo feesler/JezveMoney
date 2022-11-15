@@ -1,5 +1,5 @@
 import { ge, isFunction, Component } from 'jezvejs';
-import { IconButton } from '../IconButton/IconButton.js';
+import { IconButton } from 'jezvejs/IconButton';
 import './style.scss';
 
 const TOOLBAR_ACTIVE_CLASS = 'sidebar_active';

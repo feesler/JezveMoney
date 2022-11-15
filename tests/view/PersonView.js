@@ -5,9 +5,9 @@ import {
     navigation,
     click,
 } from 'jezve-test';
+import { IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { InputRow } from './component/InputRow.js';
-import { IconButton } from './component/IconButton.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 

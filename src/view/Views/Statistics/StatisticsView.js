@@ -8,6 +8,7 @@ import {
 } from 'jezvejs';
 import { Histogram } from 'jezvejs/Histogram';
 import { DropDown } from 'jezvejs/DropDown';
+import { LinkMenu } from 'jezvejs/LinkMenu';
 import 'jezvejs/style/InputGroup';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
@@ -15,7 +16,6 @@ import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
-import { LinkMenu } from '../../Components/LinkMenu/LinkMenu.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';

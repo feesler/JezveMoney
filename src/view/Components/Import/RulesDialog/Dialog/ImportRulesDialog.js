@@ -6,6 +6,7 @@ import {
     Component,
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
+import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Paginator } from 'jezvejs/Paginator';
 import { API } from '../../../../js/api/index.js';
 import { ImportRule } from '../../../../js/model/ImportRule.js';
@@ -14,9 +15,8 @@ import { ImportRuleItem } from '../RuleItem/ImportRuleItem.js';
 import { ConfirmDialog } from '../../../ConfirmDialog/ConfirmDialog.js';
 import { ListContainer } from '../../../ListContainer/ListContainer.js';
 import { LoadingIndicator } from '../../../LoadingIndicator/LoadingIndicator.js';
-import { PopupMenu } from '../../../PopupMenu/PopupMenu.js';
-import './style.scss';
 import { SearchInput } from '../../../SearchInput/SearchInput.js';
+import './style.scss';
 
 /** CSS classes */
 export const IMPORT_RULES_DIALOG_CLASS = 'rules-dialog';
@@ -249,7 +249,7 @@ export class ImportRulesDialog extends Component {
 
     onItemClick(itemId, e) {
         if (this.state.id === this.LIST_STATE) {
-            if (!e.target.closest('.actions-menu-btn')) {
+            if (!e.target.closest('.popup-menu-btn')) {
                 return;
             }
             this.showContextMenu(itemId);
@@ -378,7 +378,7 @@ export class ImportRulesDialog extends Component {
             return;
         }
         const listItem = this.rulesList.getListItemById(itemId);
-        const menuContainer = listItem?.elem?.querySelector('.actions-menu');
+        const menuContainer = listItem?.elem?.querySelector('.popup-menu');
         if (!menuContainer) {
             return;
         }

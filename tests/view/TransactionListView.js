@@ -13,13 +13,16 @@ import {
     isVisible,
     closest,
 } from 'jezve-test';
-import { DropDown, Paginator } from 'jezvejs-test';
+import {
+    DropDown,
+    Paginator,
+    LinkMenu,
+    IconButton,
+} from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
-import { IconButton } from './component/IconButton.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
-import { LinkMenu } from './component/LinkMenu/LinkMenu.js';
 import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js';
 import { SearchInput } from './component/SearchInput.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
@@ -53,9 +56,9 @@ export class TransactionListView extends AppView {
             addBtn: await IconButton.create(this, await query('#add_btn')),
             listMenuContainer: {
                 elem: await query('#listMenu'),
-                menuBtn: await query('#listMenu .actions-menu-btn'),
+                menuBtn: await query('#listMenu .popup-menu-btn'),
             },
-            listMenu: { elem: await query('#listMenu .actions-menu-list') },
+            listMenu: { elem: await query('#listMenu .popup-menu-list') },
             contextMenu: { elem: await query('#contextMenu') },
         };
 

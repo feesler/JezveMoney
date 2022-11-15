@@ -10,6 +10,7 @@ import {
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
+import { IconButton } from 'jezvejs/IconButton';
 import { Spinner } from 'jezvejs/Spinner';
 import { normalize } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
@@ -21,7 +22,6 @@ import { AccountList } from '../../js/model/AccountList.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { IconButton } from '../../Components/IconButton/IconButton.js';
 import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
 

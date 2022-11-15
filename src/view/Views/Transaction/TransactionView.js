@@ -12,6 +12,7 @@ import { DateInput } from 'jezvejs/DateInput';
 import { DropDown } from 'jezvejs/DropDown';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { DecimalInput } from 'jezvejs/DecimalInput';
+import { IconButton } from 'jezvejs/IconButton';
 import { Spinner } from 'jezvejs/Spinner';
 import 'jezvejs/style/InputGroup';
 import {
@@ -40,7 +41,6 @@ import { Tile } from '../../Components/Tile/Tile.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TileInfoItem } from '../../Components/TileInfoItem/TileInfoItem.js';
-import { IconButton } from '../../Components/IconButton/IconButton.js';
 import './style.scss';
 import { createStore } from '../../js/store.js';
 import {
