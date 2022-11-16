@@ -75,12 +75,6 @@ class StatisticsView extends View {
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
         window.app.checkUserAccountModels();
 
-        const accounts = asArray(initialState.filter.acc_id);
-        if (initialState.filter.report === 'account' && accounts.length === 0) {
-            const account = window.app.model.userAccounts.getItemByIndex(0);
-            initialState.filter.acc_id = [account.id];
-        }
-
         this.store = createStore(reducer, initialState);
         this.store.subscribe((state, prevState) => {
             if (state !== prevState) {
@@ -162,7 +156,15 @@ class StatisticsView extends View {
             onChange: (data) => this.onChangeDateFilter(data),
         });
 
-        this.requestData(state.filter);
+        // Select first account if nothing selected on account report type
+        const accounts = asArray(state.form.acc_id);
+        if (state.form.report === 'account' && accounts.length === 0) {
+            const account = window.app.model.userAccounts.getItemByIndex(0);
+            this.store.dispatch(actions.changeAccountsFilter([account.id]));
+        }
+
+        const { form } = this.store.getState();
+        this.requestData(form);
     }
 
     /** Set loading state and render view */
