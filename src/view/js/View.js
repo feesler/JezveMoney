@@ -17,7 +17,9 @@ export class View {
     onReady() {
         window.app.setupTheme();
 
-        this.header = Header.create();
+        const headerElem = document.querySelector('.header');
+        this.header = (headerElem) ? Header.fromElement(headerElem) : null;
+
         this.onStart();
 
         const { message } = window.app;

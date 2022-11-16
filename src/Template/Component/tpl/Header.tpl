@@ -5,6 +5,7 @@
             <span class="header-logo__title">Jezve Money</span>
         </a>
         <button class="nav-toggle-btn"><?= svgIcon("menu", "nav-toggle-icon") ?></button>
+        <div class="header-title"></div>
 
         <button id="userbtn" class="btn user-btn" type="button" tabindex="2">
             <?php if ($this->user_id != 0) {        ?>

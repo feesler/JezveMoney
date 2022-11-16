@@ -38,6 +38,7 @@ const SELECT_MODE_CLASS = 'import-list_select';
 const SORT_MODE_CLASS = 'import-list_sort';
 
 /* Strings */
+const STR_TITLE = 'Import';
 const STR_ENABLE_ITEM = 'Enable';
 const STR_DISABLE_ITEM = 'Disable';
 const MSG_IMPORT_SUCCESS = 'All transactions have been successfully imported';
@@ -99,12 +100,14 @@ class ImportView extends View {
             return;
         }
 
+        this.heading = document.querySelector('.heading');
         this.submitBtn = ge('submitbtn');
         this.transCountElem = ge('trcount');
         this.enabledTransCountElem = ge('entrcount');
         this.rowsContainer = ge('rowsContainer');
         if (
-            !this.submitBtn
+            !this.heading
+            || !this.submitBtn
             || !this.transCountElem
             || !this.enabledTransCountElem
             || !this.rowsContainer
@@ -157,10 +160,29 @@ class ImportView extends View {
             throw new Error('Invalid selection data');
         }
 
+        this.createHeadingObserver();
         this.createContextMenu();
 
         this.setMainAccount(selectedAccount.id);
         this.setRenderTime();
+    }
+
+    createHeadingObserver() {
+        const options = {
+            root: null,
+            rootMargin: '-50px',
+            threshold: 0,
+        };
+        const observer = new IntersectionObserver((entries) => {
+            const [entry] = entries;
+            if (entry.target !== this.heading) {
+                return;
+            }
+
+            this.header.setTitle(entry.isIntersecting ? null : STR_TITLE);
+        }, options);
+
+        observer.observe(this.heading);
     }
 
     createSortable(state) {

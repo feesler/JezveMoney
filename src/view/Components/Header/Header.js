@@ -18,13 +18,16 @@ export class Header extends Component {
         super(props);
 
         this.userNavEmptyClick = () => this.hideUserNavigation();
+
+        if (this.elem) {
+            this.parse();
+        }
     }
 
     /**
      * Parse DOM to obtain child elements and build state of component
      */
     parse() {
-        this.elem = document.querySelector('.header');
         if (!this.elem) {
             throw new Error('Invalid element specified');
         }
@@ -43,6 +46,8 @@ export class Header extends Component {
         if (this.closeNavBtn) {
             this.closeNavBtn.addEventListener('click', () => this.hideNavigation());
         }
+
+        this.titleElem = this.elem.querySelector('.header-title');
 
         this.userBtn = ge('userbtn');
         this.userBtn.addEventListener('click', (e) => this.showUserNavigation(e));
@@ -126,19 +131,14 @@ export class Header extends Component {
         this.navUserNameElem.textContent = this.userName;
     }
 
-    /**
-     * Create new Header from specified element
-     */
-    static create() {
-        let res;
-
-        try {
-            res = new Header();
-            res.parse();
-        } catch (e) {
-            res = null;
+    setTitle(title = null) {
+        if (!this.titleElem) {
+            return;
+        }
+        if (typeof title !== 'string' && title !== null) {
+            return;
         }
 
-        return res;
+        this.titleElem.textContent = title ?? '';
     }
 }
