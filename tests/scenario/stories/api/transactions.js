@@ -1,4 +1,4 @@
-import { setBlock } from 'jezve-test';
+import { setBlock, formatDate } from 'jezve-test';
 import {
     EXPENSE,
     INCOME,
@@ -281,6 +281,17 @@ const createMultiple = async () => {
         comment: 'multiple debt',
     }];
 
+    // Add transaction year after latest for statistics tests
+    const now = new Date();
+    const yearAfter = formatDate(
+        new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()),
+    );
+    const [expenseItem] = data;
+    data.push({
+        ...expenseItem,
+        date: yearAfter,
+    });
+
     await TransactionApiTests.extractAndCreateMultiple(data);
 
     const invData = [
@@ -504,6 +515,24 @@ const statistics = async () => {
             group: 'week',
             stdate: App.dates.monthAgo,
             enddate: App.dates.now,
+        },
+        {
+            report: 'account',
+            acc_id: App.scenario.ACC_RUB,
+            group: 'week',
+            type: EXPENSE,
+        },
+        {
+            report: 'account',
+            acc_id: App.scenario.ACC_RUB,
+            group: 'month',
+            type: EXPENSE,
+        },
+        {
+            report: 'account',
+            acc_id: App.scenario.ACC_RUB,
+            group: 'year',
+            type: EXPENSE,
         },
     ];
 

@@ -25,7 +25,12 @@ export class StatisticsStory extends TestStory {
     async run() {
         setBlock('Statistics', 1);
 
-        const { ACC_3, ACC_RUB, ACC_EUR } = App.scenario;
+        const {
+            ACC_3,
+            ACC_RUB,
+            ACC_EUR,
+            ACC_USD,
+        } = App.scenario;
 
         await App.view.navigateToStatistics();
 
@@ -41,6 +46,12 @@ export class StatisticsStory extends TestStory {
         await StatisticsTests.filterByAccounts(ACC_3);
         // Test grouping
         await StatisticsTests.filterByType(DEBT);
+        await StatisticsTests.groupByDay();
+        await StatisticsTests.groupByWeek();
+        await StatisticsTests.groupByMonth();
+        await StatisticsTests.groupByYear();
+        await StatisticsTests.filterByAccounts(ACC_USD);
+        await StatisticsTests.filterByType([EXPENSE, DEBT]);
         await StatisticsTests.groupByDay();
         await StatisticsTests.groupByWeek();
         await StatisticsTests.groupByMonth();

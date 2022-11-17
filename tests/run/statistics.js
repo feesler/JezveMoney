@@ -1,4 +1,9 @@
-import { test, formatDate } from 'jezve-test';
+import {
+    test,
+    formatDate,
+    asArray,
+    assert,
+} from 'jezve-test';
 import { App } from '../Application.js';
 import { fixDate } from '../common.js';
 import { Transaction } from '../model/Transaction.js';
@@ -11,8 +16,11 @@ export const checkInitialState = async () => {
 };
 
 export const filterByType = async (type) => {
-    const typeName = Transaction.typeToString(type);
-    await test(`${typeName} statistics view`, () => App.view.filterByType(type));
+    const types = asArray(type);
+    assert(types.length > 0, 'Invalid transaction type filter');
+    const typeNames = types.map((item) => Transaction.typeToString(item));
+
+    await test(`Filter by transaction types: [${typeNames}]`, () => App.view.filterByType(type));
 };
 
 export const byAccounts = async () => {

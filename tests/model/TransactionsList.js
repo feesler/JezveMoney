@@ -490,6 +490,27 @@ export class TransactionsList extends List {
         return new TransactionsList(res);
     }
 
+    getDateInfo(time, groupType) {
+        const date = new Date(time);
+        const res = { time, date };
+
+        if (groupType === 'none' || groupType === 'day') {
+            res.id = formatDate(date);
+        } else if (groupType === 'week') {
+            const week = getWeek(time);
+            const year = date.getFullYear();
+            res.id = `${week}.${year}`;
+        } else if (groupType === 'month') {
+            const month = date.getMonth();
+            const year = date.getFullYear();
+            res.id = `${month}.${year}`;
+        } else if (groupType === 'year') {
+            res.id = date.getFullYear().toString();
+        }
+
+        return res;
+    }
+
     getStatisticsLabel(date, groupType) {
         if (!date) {
             return null;
@@ -522,8 +543,6 @@ export class TransactionsList extends List {
         let prevDate = null;
         const curSum = {};
         let itemsInGroup = 0;
-        let transDate = null;
-        let sumTime = null;
         let currId = params.curr_id;
         const accId = asArray(params.acc_id);
         const res = {
@@ -602,33 +621,26 @@ export class TransactionsList extends List {
             }
 
             const time = convDate(item.date);
-            transDate = new Date(time);
+            const dateInfo = this.getDateInfo(time, groupType);
             itemsInGroup += 1;
             const amount = (isSource) ? item.src_amount : item.dest_amount;
 
             if (groupType === 'none') {
                 amountArr[item.type][category].push(amount);
 
-                if (prevDate == null || prevDate !== transDate.getDate()) {
-                    groupArr.push([formatDate(transDate), itemsInGroup]);
-                    itemsInGroup = 0;
+                if (prevDate && prevDate.id !== dateInfo.id) {
+                    const label = this.getStatisticsLabel(prevDate.date, groupType);
+                    groupArr.push([label, itemsInGroup - 1]);
+                    itemsInGroup = 1;
                 }
-                prevDate = transDate.getDate();
-            } else if (groupType === 'day') {
-                curDate = transDate.getDate();
-            } else if (groupType === 'week') {
-                curDate = getWeek(time);
-            } else if (groupType === 'month') {
-                curDate = transDate.getMonth();
-            } else if (groupType === 'year') {
-                curDate = transDate.getFullYear();
+                prevDate = dateInfo;
+            } else {
+                curDate = dateInfo;
             }
 
-            if (sumDate == null) {
+            if (!sumDate) {
                 sumDate = curDate;
-                sumTime = transDate;
-            } else if (sumDate != null && sumDate !== curDate) {
-                sumDate = curDate;
+            } else if (sumDate && sumDate.id !== curDate.id) {
                 for (const type of transTypes) {
                     for (const cat of categories) {
                         amountArr[type][cat].push(curSum[type][cat]);
@@ -636,9 +648,9 @@ export class TransactionsList extends List {
                     }
                 }
 
-                const label = this.getStatisticsLabel(sumTime, groupType);
+                const label = this.getStatisticsLabel(sumDate.date, groupType);
                 groupArr.push([label, 1]);
-                sumTime = transDate;
+                sumDate = curDate;
             }
 
             curSum[item.type][category] += amount;
@@ -656,8 +668,11 @@ export class TransactionsList extends List {
                 }
             }
 
-            const label = this.getStatisticsLabel(sumTime, groupType);
+            const label = this.getStatisticsLabel(sumDate.date, groupType);
             groupArr.push([label, 1]);
+        } else if (groupType === 'none' && prevDate) {
+            const label = this.getStatisticsLabel(prevDate.date, groupType);
+            groupArr.push([label, itemsInGroup]);
         }
 
         const dataSets = [];
