@@ -352,8 +352,6 @@ class TransactionModel extends CachedTable
         }
 
         $updResult = $this->dbObj->updateMultipleQ($this->tbl_name, $this->affectedTransactions);
-        wlog(" update result: " . $updResult);
-
         $this->affectedTransactions = null;
 
         $this->cleanCache();
@@ -1429,8 +1427,10 @@ class TransactionModel extends CachedTable
         $condArr = $this->getDBCondition($params);
 
         // Sort order condition
+        $orderByDate = (isset($params["orderByDate"]) && $params["orderByDate"] == true);
+        $orderAndLimit = ($orderByDate) ? "date " : "pos ";
         $isDesc = (isset($params["desc"]) && $params["desc"] == true);
-        $orderAndLimit = "pos " . (($isDesc == true) ? "DESC" : "ASC");
+        $orderAndLimit .= ($isDesc == true) ? "DESC" : "ASC";
 
         // Pagination conditions
         $onPage = isset($params["onPage"]) ? intval($params["onPage"]) : 0;
@@ -1615,6 +1615,7 @@ class TransactionModel extends CachedTable
         $curSum = [];
         $itemsInGroup = 0;
         $trans_time = 0;
+        $sumTime = 0;
 
         $typesReq = (isset($params["type"])) ? $params["type"] : EXPENSE;
         $typesReq = asArray($typesReq);
@@ -1643,6 +1644,7 @@ class TransactionModel extends CachedTable
 
         $dataParams = [
             "type" => $transTypes,
+            "orderByDate" => true,
         ];
         if (count($acc_id) > 0) {
             $dataParams["accounts"] = $acc_id;
@@ -1706,6 +1708,7 @@ class TransactionModel extends CachedTable
 
             if ($sumDate == null) {        // first iteration
                 $sumDate = $curDate;
+                $sumTime = $trans_time;
             } elseif ($sumDate != null && $sumDate != $curDate) {
                 $sumDate = $curDate;
                 foreach ($transTypes as $type) {
@@ -1715,43 +1718,29 @@ class TransactionModel extends CachedTable
                     }
                 }
 
-                $label = $this->getLabel($trans_time, $group_type);
+                $label = $this->getLabel($sumTime, $group_type);
                 $groupArr[] = [$label, 1];
+                $sumTime = $trans_time;
             }
 
             $curSum[$item->type][$category] += $amount;
         }
 
         // save remain value
-        if ($group_type != 0 && array_sum($curSum) != 0.0) {
-            if ($sumDate != null && $sumDate != $curDate) {
-                foreach ($transTypes as $type) {
-                    foreach ($categories as $cat) {
-                        $amountArr[$type][$cat][] = $curSum[$type][$cat];
-                    }
-                }
+        $remainSum = 0;
+        foreach ($transTypes as $type) {
+            $remainSum += array_sum($curSum[$type]);
+        }
 
-                $label = $this->getLabel($trans_time, $group_type);
-                $groupArr[] = [$label, 1];
-            } else {
-                foreach ($transTypes as $type) {
-                    foreach ($categories as $cat) {
-                        $length = count($amountArr[$type][$cat]);
-                        if (!$length) {
-                            $amountArr[$type][$cat][] = $curSum[$type][$cat];
-                        } else {
-                            $amountArr[$type][$cat][$length - 1] += $curSum[$type][$cat];
-                        }
-                    }
-                }
-
-                if (!count($groupArr)) {
-                    $label = $this->getLabel($trans_time, $group_type);
-                    $groupArr[] = [$label, 1];
-                } elseif ($group_type == 0) {
-                    $groupArr[count($groupArr) - 1][1]++;
+        if ($group_type != NO_GROUP && $remainSum != 0.0) {
+            foreach ($transTypes as $type) {
+                foreach ($categories as $cat) {
+                    $amountArr[$type][$cat][] = $curSum[$type][$cat];
                 }
             }
+
+            $label = $this->getLabel($sumTime, $group_type);
+            $groupArr[] = [$label, 1];
         }
 
         // Flatten arrays of values

@@ -6,6 +6,7 @@ import {
     prop,
     isVisible,
     waitForFunction,
+    isObject,
 } from 'jezve-test';
 import { DropDown, LinkMenu } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -194,8 +195,22 @@ export class StatisticsView extends AppView {
         }
 
         const histogram = App.state.transactions.getStatistics(params);
+        let barsCount = 0;
+        if (histogram.values.length > 0) {
+            const [firstValue] = histogram.values;
+            if (isObject(firstValue)) {
+                histogram.values.forEach((value) => {
+                    if (value?.data?.length) {
+                        barsCount += value.data.length;
+                    }
+                });
+            } else {
+                barsCount = histogram.values.length;
+            }
+        }
+
         res.chart = {
-            bars: { length: histogram.values.length },
+            bars: { length: barsCount },
         };
         res.noDataMessage.visible = histogram.values.length === 0;
         res.chartContainer.visible = histogram.values.length > 0;
