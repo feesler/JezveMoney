@@ -339,13 +339,8 @@ class StatisticsView extends View {
         });
     }
 
-    renderAccountsFilter(state, prevState = {}) {
+    renderAccountsFilter(state) {
         const ids = state.form?.acc_id ?? [];
-        const filterIds = prevState?.form?.acc_id ?? [];
-        if (isSameSelection(ids, filterIds)) {
-            return;
-        }
-
         window.app.model.userAccounts.forEach((account) => {
             const enable = (
                 state.accountCurrency === 0
@@ -381,7 +376,7 @@ class StatisticsView extends View {
         show(this.accountField, !isByCurrency);
         show(this.currencyField, isByCurrency);
 
-        this.renderAccountsFilter(state, prevState);
+        this.renderAccountsFilter(state);
 
         if (state.form.curr_id) {
             this.currencyDropDown.selectItem(state.form.curr_id);
