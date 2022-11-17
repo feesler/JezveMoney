@@ -34,6 +34,7 @@ const POPUP_CONTENT_CLASS = 'chart-popup__content';
 const POPUP_HEADER_CLASS = 'chart-popup__header';
 const POPUP_LIST_CLASS = 'chart-popup-list';
 const POPUP_LIST_ITEM_CLASS = 'chart-popup-list__item';
+const POPUP_LIST_ITEM_CATEGORY_CLASS = 'chart-popup-list__item-cat-';
 const POPUP_LIST_VALUE_CLASS = 'chart-popup-list__value';
 
 /** Strings */
@@ -295,8 +296,9 @@ class StatisticsView extends View {
     }
 
     renderPopupListItem(item) {
+        const categoryClass = `${POPUP_LIST_ITEM_CATEGORY_CLASS}${item.categoryIndex + 1}`;
         return createElement('li', {
-            props: { className: POPUP_LIST_ITEM_CLASS },
+            props: { className: [POPUP_LIST_ITEM_CLASS, categoryClass].join(' ') },
             children: createElement('span', {
                 props: {
                     className: POPUP_LIST_VALUE_CLASS,
@@ -405,9 +407,15 @@ class StatisticsView extends View {
         show(this.noDataMessage, noData);
         show(this.histogram.chartContainer, !noData);
 
-        if (state.chartData) {
-            this.histogram.setData(state.chartData);
-        }
+        const data = (noData)
+            ? { values: [], series: [] }
+            : state.chartData;
+        data.stacked = (
+            state.filter.report === 'account'
+            && state.filter.acc_id?.length > 1
+        );
+
+        this.histogram.setData(data);
         this.histogram.elem.dataset.time = state.renderTime;
     }
 

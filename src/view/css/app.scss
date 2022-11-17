@@ -1,3 +1,5 @@
+@use "sass:list";
+
 :root {
   --accent-color: #0072c6;
   --accent-color-alt: #20a0ff;
@@ -624,38 +626,29 @@ a.paginator-arrow:focus-visible {
   margin-left: 1px;
 }
 
-/* Histogram bar item */
+/* Histogram */
+$colors: #20a0ff, #ff0077, #00d647, #e2de00;
+$active-colors: #00bfff, #ff3392, #00ff55, #fcf93d;
+
 .charts {
-  --charts-color-1: #20a0ff;
-  --charts-color-2: #ff0077;
-  --charts-color-3: #00d647;
-  --charts-color-4: #e2de00;
-
-  /* Active chart item */
-  --charts-active-color-1: #00bfff;
-  --charts-active-color-2: #ff3392;
-  --charts-active-color-3: #00ff55;
-  --charts-active-color-4: #fcf93d;
+  @for $i from 1 through length($colors) {
+    --charts-color-#{$i}: #{list.nth($colors, $i)};
+    --charts-active-color-#{$i}: #{list.nth($active-colors, $i)};
+  }
 }
 
-.histogram_category-1 {
-  --historgam-bar-color: var(--charts-color-1);
-  --historgam-active-bar-color: var(--charts-active-color-1);
+@for $i from 1 through length($colors) {
+  .histogram_column-#{$i} {
+    --historgam-bar-color: var(--charts-color-#{$i});
+    --historgam-active-bar-color: var(--charts-active-color-#{$i});
+  }
 }
 
-.histogram_category-2 {
-  --historgam-bar-color: var(--charts-color-2);
-  --historgam-active-bar-color: var(--charts-active-color-2);
-}
-
-.histogram_category-3 {
-  --historgam-bar-color: var(--charts-color-3);
-  --historgam-active-bar-color: var(--charts-active-color-3);
-}
-
-.histogram_category-4 {
-  --historgam-bar-color: var(--charts-color-4);
-  --historgam-active-bar-color: var(--charts-active-color-4);
+@for $i from 1 through length($colors) {
+  .chart_stacked .histogram_category-#{$i} {
+    --historgam-bar-color: var(--charts-color-#{$i});
+    --historgam-active-bar-color: var(--charts-active-color-#{$i});
+  }
 }
 
 /* Desktop */

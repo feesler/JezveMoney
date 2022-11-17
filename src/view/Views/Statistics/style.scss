@@ -36,18 +36,8 @@
   left: -5px;
 }
 
-.chart-popup-list__item:nth-child(1) {
-  color: var(--charts-color-1);
-}
-
-.chart-popup-list__item:nth-child(2) {
-  color: var(--charts-color-2);
-}
-
-.chart-popup-list__item:nth-child(3) {
-  color: var(--charts-color-3);
-}
-
-.chart-popup-list__item:nth-child(4) {
-  color: var(--charts-color-4);
+@for $i from 1 through 4 {
+  .chart-popup-list__item-cat-#{$i} {
+    color: var(--charts-color-#{$i});
+  }
 }
