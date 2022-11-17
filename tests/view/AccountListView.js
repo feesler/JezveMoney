@@ -276,7 +276,7 @@ export class AccountListView extends AppView {
 
         await this.setSelectMode();
 
-        const accounts = Array.isArray(data) ? data : [data];
+        const accounts = asArray(data);
 
         const visibleTiles = this.model.tiles.length;
         const hiddenTiles = this.model.hiddenTiles.length;
@@ -296,7 +296,7 @@ export class AccountListView extends AppView {
                 ? this.content.tiles.content.items[num]
                 : this.content.hiddenTiles.content.items[num - visibleTiles];
 
-            await this.waitForList(() => tile.click());
+            await this.performAction(() => tile.click());
 
             this.checkState(expected);
         }

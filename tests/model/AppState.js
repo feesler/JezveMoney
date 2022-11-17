@@ -42,7 +42,7 @@ const trReqFields = ['type', 'src_id', 'dest_id', 'src_amount', 'dest_amount', '
 /**
  * Import templates
  */
-const tplReqFields = ['name', 'type_id', 'first_row', 'columns'];
+const tplReqFields = ['name', 'type_id', 'account_id', 'first_row', 'columns'];
 const tplReqColumns = ['accountAmount', 'transactionAmount', 'accountCurrency', 'transactionCurrency', 'date', 'comment'];
 
 /**
@@ -953,7 +953,7 @@ export class AppState {
             return false;
         }
 
-        if ('account_id' in params) {
+        if (params.account_id) {
             const account = this.accounts.getItem(params.account_id);
             if (!account || account.owner_id !== this.profile.owner_id) {
                 return false;

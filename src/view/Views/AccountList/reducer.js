@@ -82,7 +82,7 @@ const slice = createSlice({
 
     stopLoading: (state) => (
         (state.loading)
-            ? { ...state, loading: false }
+            ? { ...state, loading: false, renderTime: Date.now() }
             : state
     ),
 

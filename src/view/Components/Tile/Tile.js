@@ -192,10 +192,9 @@ export class Tile extends Component {
 
         this.checkbox?.show(state.selectMode);
 
-        if (state.selectMode) {
-            this.elem.classList.toggle(SELECTED_CLASS, !!state.selected);
-            this.checkbox.check(!!state.selected);
-        }
+        const selected = state.selectMode && !!state.selected;
+        this.elem.classList.toggle(SELECTED_CLASS, selected);
+        this.checkbox?.check(selected);
     }
 
     /**

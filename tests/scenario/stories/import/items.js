@@ -265,13 +265,6 @@ const submit = async () => {
     });
     await ImportTests.submit();
 
-    // Invalid date
-    await ImportTests.updateItem({
-        pos: 0,
-        action: { action: 'inputDate', data: '2.ssa' },
-    });
-    await ImportTests.submit();
-
     // Correct date
     await ImportTests.updateItem({
         pos: 0,

@@ -71,7 +71,7 @@ class AccountListView extends View {
                 type: 'button',
                 account,
                 attrs: { 'data-id': account.id },
-                selected: account.selected,
+                selected: account.selected ?? false,
                 selectMode: listMode === 'select',
             }),
             className: 'tiles',
@@ -409,7 +409,7 @@ class AccountListView extends View {
             ...visibleState,
             items: state.items.visible,
             listMode: state.listMode,
-            renderTime: Date.now(),
+            renderTime: state.renderTime,
         }));
         // Render hidden accounts
         this.hiddenTiles.setState((hiddenState) => ({
