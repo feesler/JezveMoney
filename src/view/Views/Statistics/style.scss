@@ -37,7 +37,8 @@
 }
 
 @for $i from 1 through 4 {
-  .chart-popup-list__item-cat-#{$i} {
+  .chart-popup-list__item-cat-#{$i},
+  .chart-legend__item-cat-#{$i} {
     color: var(--charts-color-#{$i});
   }
 }

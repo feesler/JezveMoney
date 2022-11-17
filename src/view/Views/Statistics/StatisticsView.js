@@ -105,6 +105,8 @@ class StatisticsView extends View {
             showPopup: true,
             activateOnHover: true,
             renderPopup: (target) => this.renderPopupContent(target),
+            showLegend: true,
+            renderLegend: (data) => this.renderLegendContent(data),
         });
 
         this.histogram.elem.dataset.time = state.renderTime;
@@ -336,6 +338,39 @@ class StatisticsView extends View {
         return createElement('div', {
             props: { className: POPUP_CONTENT_CLASS },
             children: [header, list],
+        });
+    }
+
+    getCategoryName(category) {
+        const state = this.store.getState();
+        const isStacked = (
+            state.filter.report === 'account'
+            && state.filter.acc_id?.length > 1
+        );
+        if (isStacked) {
+            const account = window.app.model.userAccounts.getItem(category);
+            return account.name;
+        }
+
+        const selectedTypes = asArray(state.form.type);
+        return Transaction.getTypeTitle(selectedTypes[category]);
+    }
+
+    renderLegendContent(categories) {
+        if (!Array.isArray(categories) || categories.length === 0) {
+            return null;
+        }
+
+        return createElement('ul', {
+            props: { className: 'chart__legend-list' },
+            children: categories.map((category, index) => createElement('li', {
+                props: {
+                    className: `chart-legend__item-cat-${index + 1}`,
+                },
+                children: createElement('span', {
+                    props: { textContent: this.getCategoryName(category) },
+                }),
+            })),
         });
     }
 
