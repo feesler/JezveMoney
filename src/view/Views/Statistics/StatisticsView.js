@@ -30,12 +30,17 @@ import {
 import './style.scss';
 
 /** CSS classes */
+/* Chart popup */
 const POPUP_CONTENT_CLASS = 'chart-popup__content';
 const POPUP_HEADER_CLASS = 'chart-popup__header';
 const POPUP_LIST_CLASS = 'chart-popup-list';
 const POPUP_LIST_ITEM_CLASS = 'chart-popup-list__item';
 const POPUP_LIST_ITEM_CATEGORY_CLASS = 'chart-popup-list__item-cat-';
 const POPUP_LIST_VALUE_CLASS = 'chart-popup-list__value';
+/* Chart legend */
+const LEGEND_LIST_CLASS = 'chart__legend-list';
+const LEGEND_ITEM_CAT_CLASS = 'chart-legend__item-cat-';
+const LEGEND_ITEM_TITLE_CLASS = 'chart-legend__item-title';
 
 /** Strings */
 const PAGE_TITLE = 'Jezve Money | Statistics';
@@ -362,13 +367,16 @@ class StatisticsView extends View {
         }
 
         return createElement('ul', {
-            props: { className: 'chart__legend-list' },
+            props: { className: LEGEND_LIST_CLASS },
             children: categories.map((category, index) => createElement('li', {
                 props: {
-                    className: `chart-legend__item-cat-${index + 1}`,
+                    className: `${LEGEND_ITEM_CAT_CLASS}${index + 1}`,
                 },
                 children: createElement('span', {
-                    props: { textContent: this.getCategoryName(category) },
+                    props: {
+                        className: LEGEND_ITEM_TITLE_CLASS,
+                        textContent: this.getCategoryName(category),
+                    },
                 }),
             })),
         });

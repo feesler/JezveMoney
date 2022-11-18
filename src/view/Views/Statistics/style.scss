@@ -31,7 +31,8 @@
   list-style-type: disc;
 }
 
-.chart-popup-list__value {
+.chart-popup-list__value,
+.chart-legend__item-title {
   position: relative;
   left: -5px;
 }
