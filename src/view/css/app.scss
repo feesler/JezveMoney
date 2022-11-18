@@ -608,15 +608,32 @@ a.paginator-arrow:focus-visible {
 }
 
 /* Filters */
+.filters-row {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: normal;
+  flex-grow: 1;
+  column-gap: 24px;
+  row-gap: 12px;
+}
+
+.filters-row_fixed {
+  display: flex;
+  flex-flow: row nowrap;
+  column-gap: 24px;
+  flex-grow: 1;
+  align-items: normal;
+}
+
 .filters-container {
   display: flex;
   flex-flow: column nowrap;
   width: 100%;
+  row-gap: 12px;
 }
 
 .filter-item {
   flex: 1 1 auto;
-  margin: 0 0 9px 0;
 }
 
 .filter-item__title {
@@ -624,6 +641,10 @@ a.paginator-arrow:focus-visible {
   font-weight: 400;
   margin-bottom: 5px;
   margin-left: 1px;
+}
+
+.filter-item .dd__container {
+  --dd-combo-height: 2.3rem;
 }
 
 /* Histogram */
@@ -648,6 +669,12 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d;
   .chart_stacked .histogram_category-#{$i} {
     --historgam-bar-color: var(--charts-color-#{$i});
     --historgam-active-bar-color: var(--charts-active-color-#{$i});
+  }
+}
+
+@media (min-width: 576px) {
+  .filters-row {
+    flex-flow: row nowrap;
   }
 }
 

@@ -198,6 +198,10 @@
     fill: var(--main-text-color);
   }
 
+  .filter-item__title {
+    color: #858585;
+  }
+
   /* Transaction list item */
   .trans-item__content,
   .trans-item__controls {

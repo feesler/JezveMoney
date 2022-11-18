@@ -1,3 +1,17 @@
+/* Filters */
+.trans-type-filter {
+  max-width: 450px;
+}
+
+.trans-type-filter .trtype-menu,
+.report-type-filter .link-menu {
+  min-height: 2.3rem;
+}
+
+.report-type-filter .link-menu {
+  flex-flow: row nowrap;
+}
+
 /* Statistics view histogram chart */
 .stat-histogram {
   width: 100%;
