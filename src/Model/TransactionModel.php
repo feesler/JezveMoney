@@ -510,12 +510,12 @@ class TransactionModel extends CachedTable
 
         if ($trans->src_id != 0) {
             $res = $this->pushBalance($trans->src_id, $res);
-            $res[$trans->src_id] = round($res[$trans->src_id] - $trans->src_amount, 2);
+            $res[$trans->src_id] = normalize($res[$trans->src_id] - $trans->src_amount);
         }
 
         if ($trans->dest_id != 0) {
             $res = $this->pushBalance($trans->dest_id, $res);
-            $res[$trans->dest_id] = round($res[$trans->dest_id] + $trans->dest_amount, 2);
+            $res[$trans->dest_id] = normalize($res[$trans->dest_id] + $trans->dest_amount);
         }
 
         return $res;
@@ -535,12 +535,12 @@ class TransactionModel extends CachedTable
 
         if ($trans->src_id != 0) {
             $res = $this->pushBalance($trans->src_id, $res);
-            $res[$trans->src_id] = round($res[$trans->src_id] + $trans->src_amount, 2);
+            $res[$trans->src_id] = normalize($res[$trans->src_id] + $trans->src_amount);
         }
 
         if ($trans->dest_id != 0) {
             $res = $this->pushBalance($trans->dest_id, $res);
-            $res[$trans->dest_id] = round($res[$trans->dest_id] - $trans->dest_amount, 2);
+            $res[$trans->dest_id] = normalize($res[$trans->dest_id] - $trans->dest_amount);
         }
 
         return $res;
@@ -1785,7 +1785,7 @@ class TransactionModel extends CachedTable
             $amount = ($isSource) ? $item->src_amount : $item->dest_amount;
 
             if ($group_type == NO_GROUP) {
-                $amountArr[$item->type][$category][] = $amount;
+                $amountArr[$item->type][$category][] = normalize($amount);
 
                 if (is_array($prevDate) && $prevDate["id"] != $dateInfo["id"]) {
                     $label = $this->getLabel($prevDate["time"], $group_type);
@@ -1826,7 +1826,7 @@ class TransactionModel extends CachedTable
                 $sumDate = $curDate;
             }
 
-            $curSum[$item->type][$category] += $amount;
+            $curSum[$item->type][$category] = normalize($curSum[$item->type][$category] + $amount);
         }
 
         // save remain value
