@@ -4,7 +4,12 @@ import {
     formatDate,
     asArray,
 } from 'jezve-test';
-import { convDate, fixDate, getWeek } from '../common.js';
+import {
+    convDate,
+    cutDate,
+    fixDate,
+    getWeek,
+} from '../common.js';
 import { App } from '../Application.js';
 import { api } from './api.js';
 import { List } from './List.js';
@@ -16,6 +21,13 @@ import {
     availTransTypes,
 } from './Transaction.js';
 import { AccountsList } from './AccountsList.js';
+
+const WEEKS_IN_YEAR = 52;
+const MONTHS_IN_YEAR = 12;
+const DAYS_IN_WEEK = 7;
+const MS_IN_DAY = 86400000;
+
+const availGroupTypes = ['none', 'day', 'week', 'month', 'year'];
 
 export class TransactionsList extends List {
     async fetch() {
@@ -511,6 +523,64 @@ export class TransactionsList extends List {
         return res;
     }
 
+    getDateDiff(itemA, itemB, groupType) {
+        const dateA = new Date(cutDate(itemA.date));
+        const dateB = new Date(cutDate(itemB.date));
+
+        if (groupType === 'none') {
+            if (itemA.id === itemB.id) {
+                return 0;
+            }
+
+            return (dateB > dateA) ? 1 : -1;
+        }
+
+        if (groupType === 'day') {
+            return (dateB - dateA) / MS_IN_DAY;
+        }
+
+        if (groupType === 'week') {
+            return (
+                (dateB.getFullYear() - dateA.getFullYear()) * WEEKS_IN_YEAR
+                + (getWeek(dateB) - getWeek(dateA))
+            );
+        }
+
+        if (groupType === 'month') {
+            return (
+                (dateB.getFullYear() - dateA.getFullYear()) * MONTHS_IN_YEAR
+                + (dateB.getMonth() - dateA.getMonth())
+            );
+        }
+
+        if (groupType === 'year') {
+            return dateB.getFullYear() - dateA.getFullYear();
+        }
+
+        throw new Error('Invalid group type');
+    }
+
+    getNextDate(date, groupType) {
+        if (!availGroupTypes.includes(groupType)) {
+            throw new Error('Invalid group type');
+        }
+
+        const res = new Date(cutDate(date));
+        if (groupType === 'none' || groupType === 'day') {
+            res.setDate(res.getDate() + 1);
+        }
+        if (groupType === 'week') {
+            res.setDate(res.getDate() + DAYS_IN_WEEK);
+        }
+        if (groupType === 'month') {
+            res.setMonth(res.getMonth() + 1);
+        }
+        if (groupType === 'year') {
+            res.setFullYear(res.getFullYear() + 1);
+        }
+        return res;
+    }
+
     getStatisticsLabel(date, groupType) {
         if (!date) {
             return null;
@@ -641,15 +711,28 @@ export class TransactionsList extends List {
             if (!sumDate) {
                 sumDate = curDate;
             } else if (sumDate && sumDate.id !== curDate.id) {
+                const dateDiff = this.getDateDiff(sumDate, curDate, groupType);
                 for (const type of transTypes) {
                     for (const cat of categories) {
                         amountArr[type][cat].push(curSum[type][cat]);
                         curSum[type][cat] = 0;
+                        // Append empty values after saved value
+                        for (let i = 1; i < dateDiff; i += 1) {
+                            amountArr[type][cat].push(0);
+                        }
                     }
                 }
 
-                const label = this.getStatisticsLabel(sumDate.date, groupType);
+                let label = this.getStatisticsLabel(sumDate.date, groupType);
                 groupArr.push([label, 1]);
+                // Append series for empty values
+                let groupDate = sumDate.date;
+                for (let i = 1; i < dateDiff; i += 1) {
+                    groupDate = this.getNextDate(groupDate, groupType);
+                    label = this.getStatisticsLabel(groupDate, groupType);
+                    groupArr.push([label, 1]);
+                }
+
                 sumDate = curDate;
             }
 

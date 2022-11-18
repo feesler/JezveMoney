@@ -2,6 +2,9 @@
 
 namespace JezveMoney\App\Model;
 
+use DateTime;
+use DateInterval;
+use DateTimeZone;
 use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
@@ -24,6 +27,8 @@ define("GROUP_BY_WEEK", 2);
 define("GROUP_BY_MONTH", 3);
 define("GROUP_BY_YEAR", 4);
 
+const MONTHS_IN_YEAR = 12;
+const WEEKS_IN_YEAR = 52;
 
 class TransactionModel extends CachedTable
 {
@@ -1503,14 +1508,16 @@ class TransactionModel extends CachedTable
     protected function getDateInfo($time, $groupType)
     {
         $info = getdate($time);
+        $info["week"] = intval(date("W", $time));
         $res = [
             "time" => $time,
+            "info" => $info,
         ];
 
         if ($groupType == NO_GROUP || $groupType == GROUP_BY_DAY) {
             $res["id"] = $info["mday"] . "." . $info["mon"] . "." . $info["year"];
         } elseif ($groupType == GROUP_BY_WEEK) {
-            $res["id"] = intval(date("W", $time)) . "." . $info["year"];
+            $res["id"] = $info["week"] . "." . $info["year"];
         } elseif ($groupType == GROUP_BY_MONTH) {
             $res["id"] = $info["mon"] . "." . $info["year"];
         } elseif ($groupType == GROUP_BY_YEAR) {
@@ -1518,6 +1525,74 @@ class TransactionModel extends CachedTable
         }
 
         return $res;
+    }
+
+
+    protected function getDateDiff($itemA, $itemB, $groupType)
+    {
+        if (!is_array($itemA) || !is_array($itemB)) {
+            throw new \Error("Invalid parameters");
+        }
+
+        // In 'no group' mode any item could be next to another
+        // So, return -1/1 if time is different and 0 otherwise
+        if ($groupType == NO_GROUP) {
+            if ($itemA["id"] == $itemB["id"]) {
+                return 0;
+            }
+
+            return ($itemB["time"] > $itemA["time"]) ? 1 : -1;
+        }
+
+        if ($groupType == GROUP_BY_DAY) {
+            $timeA = new DateTime("@" . $itemA["time"], new DateTimeZone('UTC'));
+            $timeB = new DateTime("@" . $itemB["time"], new DateTimeZone('UTC'));
+
+            $timeDiff = $timeA->diff($timeB, true);
+
+            return $timeDiff->days;
+        }
+
+        if ($groupType == GROUP_BY_WEEK) {
+            return (
+                ($itemB["info"]["year"] - $itemA["info"]["year"]) * WEEKS_IN_YEAR
+                + ($itemB["info"]["week"] - $itemA["info"]["week"])
+            );
+        }
+
+        if ($groupType == GROUP_BY_MONTH) {
+            return (
+                ($itemB["info"]["year"] - $itemA["info"]["year"]) * MONTHS_IN_YEAR
+                + ($itemB["info"]["mon"] - $itemA["info"]["mon"])
+            );
+        }
+
+        if ($groupType == GROUP_BY_YEAR) {
+            return $itemB["info"]["year"] - $itemA["info"]["year"];
+        }
+
+        throw new \Error("Invalid group type");
+    }
+
+
+    protected function getNextDate($time, $groupType)
+    {
+        $durationMap = [
+            NO_GROUP => "P1D",
+            GROUP_BY_DAY => "P1D",
+            GROUP_BY_WEEK => "P1W",
+            GROUP_BY_MONTH => "P1M",
+            GROUP_BY_YEAR => "P1Y",
+        ];
+
+        if (!isset($durationMap[$groupType])) {
+            throw new \Error("Invalid group type");
+        }
+
+        $date = new DateTime("@" . $time);
+        $duration = $durationMap[$groupType];
+
+        return $date->add(new DateInterval($duration))->getTimestamp();
     }
 
 
@@ -1725,15 +1800,29 @@ class TransactionModel extends CachedTable
             if (is_null($sumDate)) {        // first iteration
                 $sumDate = $curDate;
             } elseif (is_array($sumDate) && $sumDate["id"] != $curDate["id"]) {
+                $dateDiff = $this->getDateDiff($sumDate, $curDate, $group_type);
+
                 foreach ($transTypes as $type) {
                     foreach ($categories as $cat) {
                         $amountArr[$type][$cat][] = $curSum[$type][$cat];
                         $curSum[$type][$cat] = 0.0;
+                        // Append empty values after saved value
+                        for ($i = 1; $i < $dateDiff; $i++) {
+                            $amountArr[$type][$cat][] = 0;
+                        }
                     }
                 }
 
                 $label = $this->getLabel($sumDate["time"], $group_type);
                 $groupArr[] = [$label, 1];
+                // Append series for empty values
+                $groupTime = $sumDate["time"];
+                for ($i = 1; $i < $dateDiff; $i++) {
+                    $groupTime = $this->getNextDate($groupTime, $group_type);
+                    $label = $this->getLabel($groupTime, $group_type);
+                    $groupArr[] = [$label, 1];
+                }
+
                 $sumDate = $curDate;
             }
 
