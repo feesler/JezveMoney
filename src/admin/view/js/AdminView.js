@@ -9,7 +9,9 @@ export class AdminView extends View {
      * Document ready event handler
      */
     onReady() {
-        this.header = Header.create();
+        const headerElem = document.querySelector('.header');
+        this.header = (headerElem) ? Header.fromElement(headerElem) : null;
+
         this.onStart();
     }
 }
