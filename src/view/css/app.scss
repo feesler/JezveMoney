@@ -567,18 +567,20 @@ label {
 
 /* Paginator */
 .paginator {
-  margin-left: auto;
-  margin-right: auto;
+  align-items: center;
+  justify-content: center;
   padding: 16px 0;
+  margin-left: 0;
   gap: 2px;
 }
 
 .paginator-item {
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem;
   margin: 0;
   text-decoration: none;
   border: 0 none;
   border-radius: 3px;
+  font-size: 0.9rem;
 }
 
 a.paginator-item,
@@ -681,6 +683,11 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d;
 @media (min-width: 576px) {
   .filters-row {
     flex-flow: row nowrap;
+  }
+
+  .paginator-item {
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
   }
 }
 
