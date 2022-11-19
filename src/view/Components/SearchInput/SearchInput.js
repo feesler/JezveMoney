@@ -81,6 +81,7 @@ export class SearchInput extends Component {
             props: {
                 className: [INNER_BTN_CLASS, SEARCH_BTN_CLASS].join(' '),
                 type: 'button',
+                tabIndex: -1,
             },
             children: searchIcon,
         });
