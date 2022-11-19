@@ -1,15 +1,24 @@
 /* Filters */
+.filters-container {
+  flex-flow: row wrap;
+}
+
 .trans-type-filter {
   max-width: 450px;
 }
 
-.trans-type-filter .trtype-menu,
-.report-type-filter .link-menu {
-  min-height: 2.3rem;
-}
-
 .report-type-filter .link-menu {
   flex-flow: row nowrap;
+}
+
+.currency-filter,
+.group-type-filter {
+  width: 100px;
+  flex-grow: 0;
+}
+
+.date-range-filter {
+  max-width: 400px;
 }
 
 /* Statistics view histogram chart */

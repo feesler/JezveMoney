@@ -54,23 +54,27 @@ include(TPL_PATH . "Header.tpl"); ?>
                             ]) ?>
                         </div>
 
-                        <div id="accountsFilter" class="filter-item">
-                            <h3 class="filter-item__title">Accounts</h3>
-                            <select id="acc_id" name="acc_id" multiple></select>
+                        <div class="filters-row">
+                            <div id="accountsFilter" class="filter-item">
+                                <h3 class="filter-item__title">Accounts</h3>
+                                <select id="acc_id" name="acc_id" multiple></select>
+                            </div>
+
+                            <div id="personsFilter" class="filter-item">
+                                <h3 class="filter-item__title">Persons</h3>
+                                <select id="person_id" name="person_id" multiple></select>
+                            </div>
                         </div>
 
-                        <div id="personsFilter" class="filter-item">
-                            <h3 class="filter-item__title">Persons</h3>
-                            <select id="person_id" name="person_id" multiple></select>
-                        </div>
+                        <div class="filters-row">
+                            <div id="dateFilter" class="filter-item date-range-filter validation-block">
+                                <h3 class="filter-item__title">Date range</h3>
+                                <?= DateRangeInput::render($dateRange) ?>
+                            </div>
 
-                        <div id="dateFilter" class="filter-item validation-block">
-                            <h3 class="filter-item__title">Date range</h3>
-                            <?= DateRangeInput::render($dateRange) ?>
-                        </div>
-
-                        <div id="searchFilter" class="filter-item">
-                            <h3 class="filter-item__title">Search</h3>
+                            <div id="searchFilter" class="filter-item">
+                                <h3 class="filter-item__title">Search</h3>
+                            </div>
                         </div>
                     </div>
 

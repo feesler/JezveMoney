@@ -608,6 +608,8 @@ a.paginator-arrow:focus-visible {
 }
 
 /* Filters */
+
+/* Horizontal group of filters, on screen smaller 576px become vertical */
 .filters-row {
   display: flex;
   flex-flow: column nowrap;
@@ -617,11 +619,11 @@ a.paginator-arrow:focus-visible {
   row-gap: 12px;
 }
 
+/* Horizontal group of filters */
 .filters-row_fixed {
   display: flex;
   flex-flow: row nowrap;
   column-gap: 24px;
-  flex-grow: 1;
   align-items: normal;
 }
 
@@ -645,6 +647,10 @@ a.paginator-arrow:focus-visible {
 
 .filter-item .dd__container {
   --dd-combo-height: 2.3rem;
+}
+
+.filter-item .link-menu {
+  min-height: 2.3rem;
 }
 
 /* Histogram */
