@@ -169,7 +169,7 @@ class AccountModel extends CachedTable
         $this->currencyUpdated = (isset($res["curr_id"]) && $res["curr_id"] != $item->curr_id);
 
         // get initial balance to calc difference
-        $diff = round($res["initbalance"] - $item->initbalance, 2);
+        $diff = normalize($res["initbalance"] - $item->initbalance);
         if (abs($diff) >= 0.01) {
             $this->balanceUpdated = true;
             $res["balance"] = $item->balance + $diff;

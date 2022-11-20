@@ -66,7 +66,7 @@ class Balance extends AdminController
                     $results[$tr->src_id] = $accObj->initbalance;
                 }
 
-                $results[$tr->src_id] = round($results[$tr->src_id] - $tr->src_amount, 2);
+                $results[$tr->src_id] = normalize($results[$tr->src_id] - $tr->src_amount);
                 $tr->exp_src_result = $results[$tr->src_id];
             } else {
                 $tr->exp_src_result = 0;
@@ -81,7 +81,7 @@ class Balance extends AdminController
                     $results[$tr->dest_id] = $accObj->initbalance;
                 }
 
-                $results[$tr->dest_id] = round($results[$tr->dest_id] + $tr->dest_amount, 2);
+                $results[$tr->dest_id] = normalize($results[$tr->dest_id] + $tr->dest_amount);
                 $tr->exp_dest_result = $results[$tr->dest_id];
             } else {
                 $tr->exp_dest_result = 0;

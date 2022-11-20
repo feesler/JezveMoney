@@ -1,5 +1,6 @@
 import {
     test,
+    asArray,
     copyObject,
     assert,
     setBlock,
@@ -293,16 +294,16 @@ export const exportTest = async (accounts) => {
 };
 
 export const toggleSelect = async (accounts) => {
-    const itemIds = Array.isArray(accounts) ? accounts : [accounts];
+    const itemInds = asArray(accounts);
 
-    await test(`Toggle select items [${itemIds.join()}]`, async () => {
+    await test(`Toggle select items [${itemInds.join()}]`, async () => {
         // Navigate to accounts list view
         await checkNavigation();
 
         const origItems = App.view.getItems();
         // Check correctness of arguments
         const indexes = [];
-        for (const pos of itemIds) {
+        for (const pos of itemInds) {
             const ind = parseInt(pos, 10);
             assert.arrayIndex(origItems, ind);
 

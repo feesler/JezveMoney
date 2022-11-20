@@ -168,3 +168,6 @@ export const normalizeExch = (val) => normalize(val, EXCHANGE_DIGITS);
 export const isValidValue = (val) => (
     typeof val !== 'undefined' && val !== null && !Number.isNaN(parseFloat(fixFloat(val)))
 );
+
+/** Format decimal value */
+export const formatValue = (val) => val.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ');

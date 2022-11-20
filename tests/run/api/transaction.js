@@ -273,7 +273,12 @@ export const filter = async (params) => {
 // Request statistics data
 export const statistics = async (params) => {
     await test(`Statistics (${formatProps(params)})`, async () => {
-        const histogram = App.state.transactions.getStatistics(params);
+        const stateParams = { ...params };
+        if (params.stdate && params.enddate) {
+            stateParams.startDate = params.stdate;
+            stateParams.endDate = params.enddate;
+        }
+        const histogram = App.state.transactions.getStatistics(stateParams);
         const expected = { histogram };
 
         // Send API sequest to server

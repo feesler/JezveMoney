@@ -74,25 +74,18 @@ export const selectTemplateAccountByIndex = async (index) => {
 
 /** Go to create import template state */
 export const createTemplate = async () => {
-    await test('Create template', async () => {
-        await App.state.fetch();
-        return App.view.createTemplate();
-    });
+    await test('Create template', () => App.view.createTemplate());
 };
 
 /** Update currently selected template */
 export const updateTemplate = async () => {
-    await test('Update template', async () => {
-        await App.state.fetch();
-        return App.view.updateTemplate();
-    });
+    await test('Update template', () => App.view.updateTemplate());
 };
 
 /** Delete currently selected template */
 export const deleteTemplate = async () => {
     await test('Delete template', async () => {
         // Prepare expected content
-        await App.state.fetch();
         const expectedTpl = App.view.getExpectedTemplate();
         App.state.templates.deleteItems(expectedTpl.id);
 
@@ -106,8 +99,6 @@ export const deleteTemplate = async () => {
 export const submitTemplate = async () => {
     await test('Submit template', async () => {
         // Prepare expected content
-        await App.state.fetch();
-
         const expectedTpl = App.view.getExpectedTemplate();
         const uploadState = App.view.getUploadState();
         if (uploadState === CREATE_TPL_STATE) {

@@ -28,13 +28,20 @@ import {
     reducer,
 } from './reducer.js';
 import './style.scss';
+import { correct, formatValue } from '../../js/utils.js';
 
 /** CSS classes */
+/* Chart popup */
 const POPUP_CONTENT_CLASS = 'chart-popup__content';
 const POPUP_HEADER_CLASS = 'chart-popup__header';
 const POPUP_LIST_CLASS = 'chart-popup-list';
 const POPUP_LIST_ITEM_CLASS = 'chart-popup-list__item';
+const POPUP_LIST_ITEM_CATEGORY_CLASS = 'chart-popup-list__item-cat-';
 const POPUP_LIST_VALUE_CLASS = 'chart-popup-list__value';
+/* Chart legend */
+const LEGEND_LIST_CLASS = 'chart__legend-list';
+const LEGEND_ITEM_CAT_CLASS = 'chart-legend__item-cat-';
+const LEGEND_ITEM_TITLE_CLASS = 'chart-legend__item-title';
 
 /** Strings */
 const PAGE_TITLE = 'Jezve Money | Statistics';
@@ -75,12 +82,6 @@ class StatisticsView extends View {
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
         window.app.checkUserAccountModels();
 
-        const accounts = asArray(initialState.filter.acc_id);
-        if (initialState.filter.report === 'account' && accounts.length === 0) {
-            const account = window.app.model.userAccounts.getItemByIndex(0);
-            initialState.filter.acc_id = [account.id];
-        }
-
         this.store = createStore(reducer, initialState);
         this.store.subscribe((state, prevState) => {
             if (state !== prevState) {
@@ -103,13 +104,15 @@ class StatisticsView extends View {
             marginTop: 35,
             scrollToEnd: true,
             autoScale: true,
-            scrollThrottle: 100,
+            animate: true,
             barWidth: 45,
             columnGap: 3,
-            stacked: true,
             showPopup: true,
             activateOnHover: true,
             renderPopup: (target) => this.renderPopupContent(target),
+            showLegend: true,
+            renderLegend: (data) => this.renderLegendContent(data),
+            renderYAxisLabel: (value) => this.renderYLabel(value),
         });
 
         this.histogram.elem.dataset.time = state.renderTime;
@@ -162,7 +165,15 @@ class StatisticsView extends View {
             onChange: (data) => this.onChangeDateFilter(data),
         });
 
-        this.requestData(state.filter);
+        // Select first account if nothing selected on account report type
+        const accounts = asArray(state.form.acc_id);
+        if (state.form.report === 'account' && accounts.length === 0) {
+            const account = window.app.model.userAccounts.getItemByIndex(0);
+            this.store.dispatch(actions.changeAccountsFilter([account.id]));
+        }
+
+        const { form } = this.store.getState();
+        this.requestData(form);
     }
 
     /** Set loading state and render view */
@@ -293,8 +304,9 @@ class StatisticsView extends View {
     }
 
     renderPopupListItem(item) {
+        const categoryClass = `${POPUP_LIST_ITEM_CATEGORY_CLASS}${item.categoryIndex + 1}`;
         return createElement('li', {
-            props: { className: POPUP_LIST_ITEM_CLASS },
+            props: { className: [POPUP_LIST_ITEM_CLASS, categoryClass].join(' ') },
             children: createElement('span', {
                 props: {
                     className: POPUP_LIST_VALUE_CLASS,
@@ -335,13 +347,65 @@ class StatisticsView extends View {
         });
     }
 
-    renderAccountsFilter(state, prevState = {}) {
-        const ids = state.form?.acc_id ?? [];
-        const filterIds = prevState?.form?.acc_id ?? [];
-        if (isSameSelection(ids, filterIds)) {
-            return;
+    getCategoryName(category) {
+        const state = this.store.getState();
+        const isStacked = (
+            state.filter.report === 'account'
+            && state.filter.acc_id?.length > 1
+        );
+        if (isStacked) {
+            const account = window.app.model.userAccounts.getItem(category);
+            return account.name;
         }
 
+        const selectedTypes = asArray(state.form.type);
+        return Transaction.getTypeTitle(selectedTypes[category]);
+    }
+
+    renderYLabel(value) {
+        let val = value;
+        let size = '';
+        if (value >= 1e12) {
+            val = correct(value / 1e12, 2);
+            size = 'T';
+        } else if (value >= 1e9) {
+            val = correct(value / 1e9, 2);
+            size = 'B';
+        } else if (value >= 1e6) {
+            val = correct(value / 1e6, 2);
+            size = 'M';
+        } else if (value >= 1e3) {
+            val = correct(value / 1e3, 2);
+            size = 'k';
+        }
+
+        const fmtValue = formatValue(val);
+        return `${fmtValue}${size}`;
+    }
+
+    renderLegendContent(categories) {
+        if (!Array.isArray(categories) || categories.length === 0) {
+            return null;
+        }
+
+        return createElement('ul', {
+            props: { className: LEGEND_LIST_CLASS },
+            children: categories.map((category, index) => createElement('li', {
+                props: {
+                    className: `${LEGEND_ITEM_CAT_CLASS}${index + 1}`,
+                },
+                children: createElement('span', {
+                    props: {
+                        className: LEGEND_ITEM_TITLE_CLASS,
+                        textContent: this.getCategoryName(category),
+                    },
+                }),
+            })),
+        });
+    }
+
+    renderAccountsFilter(state) {
+        const ids = state.form?.acc_id ?? [];
         window.app.model.userAccounts.forEach((account) => {
             const enable = (
                 state.accountCurrency === 0
@@ -377,7 +441,7 @@ class StatisticsView extends View {
         show(this.accountField, !isByCurrency);
         show(this.currencyField, isByCurrency);
 
-        this.renderAccountsFilter(state, prevState);
+        this.renderAccountsFilter(state);
 
         if (state.form.curr_id) {
             this.currencyDropDown.selectItem(state.form.curr_id);
@@ -403,9 +467,15 @@ class StatisticsView extends View {
         show(this.noDataMessage, noData);
         show(this.histogram.chartContainer, !noData);
 
-        if (state.chartData) {
-            this.histogram.setData(state.chartData);
-        }
+        const data = (noData)
+            ? { values: [], series: [] }
+            : state.chartData;
+        data.stacked = (
+            state.filter.report === 'account'
+            && state.filter.acc_id?.length > 1
+        );
+
+        this.histogram.setData(data);
         this.histogram.elem.dataset.time = state.renderTime;
     }
 

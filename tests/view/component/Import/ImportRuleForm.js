@@ -529,12 +529,15 @@ export class ImportRuleForm extends TestComponent {
         return this.changeConditionValue(index, 'text', value);
     }
 
-    async toggleConditionPropValue(index, value) {
+    async toggleConditionPropValue(index) {
         const ind = parseInt(index, 10);
         assert.arrayIndex(this.content.conditionsList.content.items, ind);
 
         const conditionModel = this.model.conditions[ind];
         conditionModel.isFieldValue = !conditionModel.isFieldValue;
+        if (conditionModel.isFieldValue) {
+            conditionModel.property = ImportConditionForm.getExpectedPropertyValue(conditionModel);
+        }
         conditionModel.state = ImportConditionForm.getStateName(conditionModel);
         conditionModel.value = ImportConditionForm.getStateValue(conditionModel);
         this.expectedState = this.getExpectedState();
@@ -542,7 +545,7 @@ export class ImportRuleForm extends TestComponent {
         await this.openConditions();
 
         const item = this.content.conditionsList.content.items[ind];
-        await this.performAction(() => item.togglePropValue(value));
+        await this.performAction(() => item.togglePropValue());
 
         return this.checkState();
     }

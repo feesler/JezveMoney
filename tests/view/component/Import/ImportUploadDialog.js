@@ -429,7 +429,11 @@ export class ImportUploadDialog extends TestComponent {
                 cells: ['1'],
             };
 
-            const firstRowIndex = Math.max(model.template.first_row, 2);
+            const firstRowInd = (Number.isNaN(model.template.first_row))
+                ? 1
+                : model.template.first_row;
+
+            const firstRowIndex = Math.max(firstRowInd, 2);
             for (let i = 0; i < 3; i += 1) {
                 const rowNumber = firstRowIndex + i;
                 res.rowNumbers.cells.push(rowNumber.toString());

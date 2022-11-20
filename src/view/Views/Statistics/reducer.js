@@ -1,3 +1,4 @@
+import { asArray } from 'jezvejs';
 import { createSlice } from '../../js/store.js';
 
 const groupTypes = [null, 'day', 'week', 'month', 'year'];
@@ -50,7 +51,8 @@ const slice = createSlice({
             }
     ),
 
-    changeAccountsFilter: (state, accounts) => {
+    changeAccountsFilter: (state, ids) => {
+        const accounts = asArray(ids);
         const account = window.app.model.userAccounts.getItem(accounts[0]);
         return {
             ...state,

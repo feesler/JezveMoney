@@ -2,6 +2,9 @@
 
 namespace JezveMoney\App\Model;
 
+use DateTime;
+use DateInterval;
+use DateTimeZone;
 use JezveMoney\Core\MySqlDB;
 use JezveMoney\Core\CachedTable;
 use JezveMoney\Core\Singleton;
@@ -24,6 +27,8 @@ define("GROUP_BY_WEEK", 2);
 define("GROUP_BY_MONTH", 3);
 define("GROUP_BY_YEAR", 4);
 
+const MONTHS_IN_YEAR = 12;
+const WEEKS_IN_YEAR = 52;
 
 class TransactionModel extends CachedTable
 {
@@ -352,8 +357,6 @@ class TransactionModel extends CachedTable
         }
 
         $updResult = $this->dbObj->updateMultipleQ($this->tbl_name, $this->affectedTransactions);
-        wlog(" update result: " . $updResult);
-
         $this->affectedTransactions = null;
 
         $this->cleanCache();
@@ -507,12 +510,12 @@ class TransactionModel extends CachedTable
 
         if ($trans->src_id != 0) {
             $res = $this->pushBalance($trans->src_id, $res);
-            $res[$trans->src_id] = round($res[$trans->src_id] - $trans->src_amount, 2);
+            $res[$trans->src_id] = normalize($res[$trans->src_id] - $trans->src_amount);
         }
 
         if ($trans->dest_id != 0) {
             $res = $this->pushBalance($trans->dest_id, $res);
-            $res[$trans->dest_id] = round($res[$trans->dest_id] + $trans->dest_amount, 2);
+            $res[$trans->dest_id] = normalize($res[$trans->dest_id] + $trans->dest_amount);
         }
 
         return $res;
@@ -532,12 +535,12 @@ class TransactionModel extends CachedTable
 
         if ($trans->src_id != 0) {
             $res = $this->pushBalance($trans->src_id, $res);
-            $res[$trans->src_id] = round($res[$trans->src_id] + $trans->src_amount, 2);
+            $res[$trans->src_id] = normalize($res[$trans->src_id] + $trans->src_amount);
         }
 
         if ($trans->dest_id != 0) {
             $res = $this->pushBalance($trans->dest_id, $res);
-            $res[$trans->dest_id] = round($res[$trans->dest_id] - $trans->dest_amount, 2);
+            $res[$trans->dest_id] = normalize($res[$trans->dest_id] - $trans->dest_amount);
         }
 
         return $res;
@@ -1429,8 +1432,13 @@ class TransactionModel extends CachedTable
         $condArr = $this->getDBCondition($params);
 
         // Sort order condition
+        $orderByDate = (isset($params["orderByDate"]) && $params["orderByDate"] == true);
         $isDesc = (isset($params["desc"]) && $params["desc"] == true);
-        $orderAndLimit = "pos " . (($isDesc == true) ? "DESC" : "ASC");
+        $orderAndLimit = "";
+        if ($orderByDate) {
+            $orderAndLimit .= "date " . (($isDesc == true) ? "DESC" : "ASC") . ", ";
+        }
+        $orderAndLimit .= "pos " . (($isDesc == true) ? "DESC" : "ASC");
 
         // Pagination conditions
         $onPage = isset($params["onPage"]) ? intval($params["onPage"]) : 0;
@@ -1494,6 +1502,97 @@ class TransactionModel extends CachedTable
         }
 
         return null;
+    }
+
+
+    protected function getDateInfo($time, $groupType)
+    {
+        $info = getdate($time);
+        $info["week"] = intval(date("W", $time));
+        $res = [
+            "time" => $time,
+            "info" => $info,
+        ];
+
+        if ($groupType == NO_GROUP || $groupType == GROUP_BY_DAY) {
+            $res["id"] = $info["mday"] . "." . $info["mon"] . "." . $info["year"];
+        } elseif ($groupType == GROUP_BY_WEEK) {
+            $res["id"] = $info["week"] . "." . $info["year"];
+        } elseif ($groupType == GROUP_BY_MONTH) {
+            $res["id"] = $info["mon"] . "." . $info["year"];
+        } elseif ($groupType == GROUP_BY_YEAR) {
+            $res["id"] = $info["year"];
+        }
+
+        return $res;
+    }
+
+
+    protected function getDateDiff($itemA, $itemB, $groupType)
+    {
+        if (!is_array($itemA) || !is_array($itemB)) {
+            throw new \Error("Invalid parameters");
+        }
+
+        // In 'no group' mode any item could be next to another
+        // So, return -1/1 if time is different and 0 otherwise
+        if ($groupType == NO_GROUP) {
+            if ($itemA["id"] == $itemB["id"]) {
+                return 0;
+            }
+
+            return ($itemB["time"] > $itemA["time"]) ? 1 : -1;
+        }
+
+        if ($groupType == GROUP_BY_DAY) {
+            $timeA = new DateTime("@" . $itemA["time"], new DateTimeZone('UTC'));
+            $timeB = new DateTime("@" . $itemB["time"], new DateTimeZone('UTC'));
+
+            $timeDiff = $timeA->diff($timeB, true);
+
+            return $timeDiff->days;
+        }
+
+        if ($groupType == GROUP_BY_WEEK) {
+            return (
+                ($itemB["info"]["year"] - $itemA["info"]["year"]) * WEEKS_IN_YEAR
+                + ($itemB["info"]["week"] - $itemA["info"]["week"])
+            );
+        }
+
+        if ($groupType == GROUP_BY_MONTH) {
+            return (
+                ($itemB["info"]["year"] - $itemA["info"]["year"]) * MONTHS_IN_YEAR
+                + ($itemB["info"]["mon"] - $itemA["info"]["mon"])
+            );
+        }
+
+        if ($groupType == GROUP_BY_YEAR) {
+            return $itemB["info"]["year"] - $itemA["info"]["year"];
+        }
+
+        throw new \Error("Invalid group type");
+    }
+
+
+    protected function getNextDate($time, $groupType)
+    {
+        $durationMap = [
+            NO_GROUP => "P1D",
+            GROUP_BY_DAY => "P1D",
+            GROUP_BY_WEEK => "P1W",
+            GROUP_BY_MONTH => "P1M",
+            GROUP_BY_YEAR => "P1Y",
+        ];
+
+        if (!isset($durationMap[$groupType])) {
+            throw new \Error("Invalid group type");
+        }
+
+        $date = new DateTime("@" . $time);
+        $duration = $durationMap[$groupType];
+
+        return $date->add(new DateInterval($duration))->getTimestamp();
     }
 
 
@@ -1614,7 +1713,6 @@ class TransactionModel extends CachedTable
         $prevDate = null;
         $curSum = [];
         $itemsInGroup = 0;
-        $trans_time = 0;
 
         $typesReq = (isset($params["type"])) ? $params["type"] : EXPENSE;
         $typesReq = asArray($typesReq);
@@ -1643,6 +1741,7 @@ class TransactionModel extends CachedTable
 
         $dataParams = [
             "type" => $transTypes,
+            "orderByDate" => true,
         ];
         if (count($acc_id) > 0) {
             $dataParams["accounts"] = $acc_id;
@@ -1681,77 +1780,73 @@ class TransactionModel extends CachedTable
                 }
             }
 
-            $trans_time = $item->date;
-            $dateInfo = getdate($trans_time);
+            $dateInfo = $this->getDateInfo($item->date, $group_type);
             $itemsInGroup++;
             $amount = ($isSource) ? $item->src_amount : $item->dest_amount;
 
             if ($group_type == NO_GROUP) {
-                $amountArr[$item->type][$category][] = $amount;
+                $amountArr[$item->type][$category][] = normalize($amount);
 
-                if ($prevDate == null || $prevDate != $dateInfo["mday"]) {
-                    $groupArr[] = [date("d.m.Y", $trans_time), $itemsInGroup];
-                    $itemsInGroup = 0;
+                if (is_array($prevDate) && $prevDate["id"] != $dateInfo["id"]) {
+                    $label = $this->getLabel($prevDate["time"], $group_type);
+                    $groupArr[] = [$label, $itemsInGroup - 1];
+                    $itemsInGroup = 1;
                 }
-                $prevDate = $dateInfo["mday"];
-            } elseif ($group_type == GROUP_BY_DAY) {
-                $curDate = $dateInfo["mday"];
-            } elseif ($group_type == GROUP_BY_WEEK) {
-                $curDate = intval(date("W", $trans_time));
-            } elseif ($group_type == GROUP_BY_MONTH) {
-                $curDate = $dateInfo["mon"];
-            } elseif ($group_type == GROUP_BY_YEAR) {
-                $curDate = $dateInfo["year"];
+                $prevDate = $dateInfo;
+            } else {
+                $curDate = $dateInfo;
             }
 
-            if ($sumDate == null) {        // first iteration
+            if (is_null($sumDate)) {        // first iteration
                 $sumDate = $curDate;
-            } elseif ($sumDate != null && $sumDate != $curDate) {
-                $sumDate = $curDate;
+            } elseif (is_array($sumDate) && $sumDate["id"] != $curDate["id"]) {
+                $dateDiff = $this->getDateDiff($sumDate, $curDate, $group_type);
+
                 foreach ($transTypes as $type) {
                     foreach ($categories as $cat) {
                         $amountArr[$type][$cat][] = $curSum[$type][$cat];
                         $curSum[$type][$cat] = 0.0;
-                    }
-                }
-
-                $label = $this->getLabel($trans_time, $group_type);
-                $groupArr[] = [$label, 1];
-            }
-
-            $curSum[$item->type][$category] += $amount;
-        }
-
-        // save remain value
-        if ($group_type != 0 && array_sum($curSum) != 0.0) {
-            if ($sumDate != null && $sumDate != $curDate) {
-                foreach ($transTypes as $type) {
-                    foreach ($categories as $cat) {
-                        $amountArr[$type][$cat][] = $curSum[$type][$cat];
-                    }
-                }
-
-                $label = $this->getLabel($trans_time, $group_type);
-                $groupArr[] = [$label, 1];
-            } else {
-                foreach ($transTypes as $type) {
-                    foreach ($categories as $cat) {
-                        $length = count($amountArr[$type][$cat]);
-                        if (!$length) {
-                            $amountArr[$type][$cat][] = $curSum[$type][$cat];
-                        } else {
-                            $amountArr[$type][$cat][$length - 1] += $curSum[$type][$cat];
+                        // Append empty values after saved value
+                        for ($i = 1; $i < $dateDiff; $i++) {
+                            $amountArr[$type][$cat][] = 0;
                         }
                     }
                 }
 
-                if (!count($groupArr)) {
-                    $label = $this->getLabel($trans_time, $group_type);
+                $label = $this->getLabel($sumDate["time"], $group_type);
+                $groupArr[] = [$label, 1];
+                // Append series for empty values
+                $groupTime = $sumDate["time"];
+                for ($i = 1; $i < $dateDiff; $i++) {
+                    $groupTime = $this->getNextDate($groupTime, $group_type);
+                    $label = $this->getLabel($groupTime, $group_type);
                     $groupArr[] = [$label, 1];
-                } elseif ($group_type == 0) {
-                    $groupArr[count($groupArr) - 1][1]++;
+                }
+
+                $sumDate = $curDate;
+            }
+
+            $curSum[$item->type][$category] = normalize($curSum[$item->type][$category] + $amount);
+        }
+
+        // save remain value
+        $remainSum = 0;
+        foreach ($transTypes as $type) {
+            $remainSum += array_sum($curSum[$type]);
+        }
+
+        if ($group_type != NO_GROUP && $remainSum != 0.0) {
+            foreach ($transTypes as $type) {
+                foreach ($categories as $cat) {
+                    $amountArr[$type][$cat][] = $curSum[$type][$cat];
                 }
             }
+
+            $label = $this->getLabel($sumDate["time"], $group_type);
+            $groupArr[] = [$label, 1];
+        } elseif ($group_type == NO_GROUP && is_array($prevDate)) {
+            $label = $this->getLabel($prevDate["time"], $group_type);
+            $groupArr[] = [$label, $itemsInGroup];
         }
 
         // Flatten arrays of values

@@ -190,6 +190,7 @@ class TransactionListView extends View {
         // Paginator
         this.paginator = Paginator.create({
             arrows: true,
+            breakLimit: 3,
             onChange: (page) => this.onChangePage(page),
         });
         listFooter.append(this.paginator.elem);

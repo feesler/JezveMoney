@@ -155,12 +155,12 @@ export class ImportConditionForm extends Component {
         ]);
     }
 
-    getPropertyTypes() {
-        if (!this.state.properties) {
+    getPropertyTypes(state = this.state) {
+        if (!state.properties) {
             return this.fieldTypes;
         }
 
-        const propFilter = asArray(this.state.properties);
+        const propFilter = asArray(state.properties);
         if (!propFilter.length) {
             return this.fieldTypes;
         }
@@ -444,6 +444,16 @@ export class ImportConditionForm extends Component {
         }
     }
 
+    /** Render field type select */
+    renderProperty(state) {
+        const propTypes = this.getPropertyTypes(state);
+        const items = propTypes.map(({ id, title }) => ({ id, title }));
+
+        this.propertyDropDown.removeAll();
+        this.propertyDropDown.append(items);
+        this.propertyDropDown.selectItem(state.fieldType);
+    }
+
     /** Render operator select */
     renderOperator(state) {
         const items = this.operatorTypes
@@ -508,7 +518,7 @@ export class ImportConditionForm extends Component {
             window.app.invalidateBlock(this.container);
         }
 
-        this.propertyDropDown.selectItem(state.fieldType);
+        this.renderProperty(state);
         this.renderOperator(state);
 
         const isAccountValue = (

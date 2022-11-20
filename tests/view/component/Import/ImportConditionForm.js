@@ -170,6 +170,28 @@ export class ImportConditionForm extends TestComponent {
         return res;
     }
 
+    static getExpectedPropertyValue(model) {
+        assert(
+            model.isFieldValue && ImportCondition.isPropertyValueAvailable(model.fieldType),
+            'Preperty value not available',
+        );
+
+        if (model.fieldType === IMPORT_COND_FIELD_TR_AMOUNT) {
+            return IMPORT_COND_FIELD_ACC_AMOUNT;
+        }
+        if (model.fieldType === IMPORT_COND_FIELD_ACC_AMOUNT) {
+            return IMPORT_COND_FIELD_TR_AMOUNT;
+        }
+        if (model.fieldType === IMPORT_COND_FIELD_TR_CURRENCY) {
+            return IMPORT_COND_FIELD_ACC_CURRENCY;
+        }
+        if (model.fieldType === IMPORT_COND_FIELD_ACC_CURRENCY) {
+            return IMPORT_COND_FIELD_TR_CURRENCY;
+        }
+
+        throw new Error(`Invalid field type: ${model.fieldType}`);
+    }
+
     async changeFieldType(value) {
         const fieldId = parseInt(value, 10);
 

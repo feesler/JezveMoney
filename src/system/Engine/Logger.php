@@ -29,6 +29,9 @@ class Logger
     // Write string to log file
     protected static function checkSize()
     {
+        if (!file_exists(self::$filename)) {
+            return true;
+        }
         $fsize = filesize(self::$filename);
         if ($fsize < MAX_LOG_SIZE) {
             return true;

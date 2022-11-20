@@ -844,7 +844,7 @@ class Transactions extends TemplateController
         $form["destCurrSign"] = $currObj ? $currObj->sign : null;
 
         $form["exchSign"] = $form["destCurrSign"] . "/" . $form["srcCurrSign"];
-        $form["exchange"] = round($tr["dest_amount"] / $tr["src_amount"], 4);
+        $form["exchange"] = normalize($tr["dest_amount"] / $tr["src_amount"], 4);
         $rtExchange = $form["exchange"] . " " . $form["exchSign"];
 
         if ($tr["type"] != DEBT) {

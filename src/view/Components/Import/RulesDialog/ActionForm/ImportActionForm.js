@@ -202,13 +202,14 @@ export class ImportActionForm extends Component {
             return;
         }
 
-        this.setState({
+        const newState = {
             ...this.state,
             actionType,
-            value: this.getActionValue(this.state),
             isValid: true,
-        });
+        };
+        newState.value = this.getActionValue(newState);
 
+        this.setState(newState);
         this.sendUpdate();
     }
 

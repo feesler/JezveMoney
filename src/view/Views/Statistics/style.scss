@@ -1,3 +1,27 @@
+/* Filters */
+.filters-container {
+  flex-flow: row wrap;
+  column-gap: 24px;
+}
+
+.trans-type-filter {
+  max-width: 450px;
+}
+
+.report-type-filter .link-menu {
+  flex-flow: row nowrap;
+}
+
+.currency-filter,
+.group-type-filter {
+  width: 100px;
+  flex-grow: 0;
+}
+
+.date-range-filter {
+  max-width: 400px;
+}
+
 /* Statistics view histogram chart */
 .stat-histogram {
   width: 100%;
@@ -31,23 +55,15 @@
   list-style-type: disc;
 }
 
-.chart-popup-list__value {
+.chart-popup-list__value,
+.chart-legend__item-title {
   position: relative;
   left: -5px;
 }
 
-.chart-popup-list__item:nth-child(1) {
-  color: var(--charts-color-1);
-}
-
-.chart-popup-list__item:nth-child(2) {
-  color: var(--charts-color-2);
-}
-
-.chart-popup-list__item:nth-child(3) {
-  color: var(--charts-color-3);
-}
-
-.chart-popup-list__item:nth-child(4) {
-  color: var(--charts-color-4);
+@for $i from 1 through 4 {
+  .chart-popup-list__item-cat-#{$i},
+  .chart-legend__item-cat-#{$i} {
+    color: var(--charts-color-#{$i});
+  }
 }

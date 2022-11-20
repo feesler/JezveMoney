@@ -4,7 +4,12 @@ import {
     formatDate,
     asArray,
 } from 'jezve-test';
-import { convDate, fixDate, getWeek } from '../common.js';
+import {
+    convDate,
+    cutDate,
+    fixDate,
+    getWeek,
+} from '../common.js';
 import { App } from '../Application.js';
 import { api } from './api.js';
 import { List } from './List.js';
@@ -16,6 +21,13 @@ import {
     availTransTypes,
 } from './Transaction.js';
 import { AccountsList } from './AccountsList.js';
+
+const WEEKS_IN_YEAR = 52;
+const MONTHS_IN_YEAR = 12;
+const DAYS_IN_WEEK = 7;
+const MS_IN_DAY = 86400000;
+
+const availGroupTypes = ['none', 'day', 'week', 'month', 'year'];
 
 export class TransactionsList extends List {
     async fetch() {
@@ -490,6 +502,85 @@ export class TransactionsList extends List {
         return new TransactionsList(res);
     }
 
+    getDateInfo(time, groupType) {
+        const date = new Date(time);
+        const res = { time, date };
+
+        if (groupType === 'none' || groupType === 'day') {
+            res.id = formatDate(date);
+        } else if (groupType === 'week') {
+            const week = getWeek(time);
+            const year = date.getFullYear();
+            res.id = `${week}.${year}`;
+        } else if (groupType === 'month') {
+            const month = date.getMonth();
+            const year = date.getFullYear();
+            res.id = `${month}.${year}`;
+        } else if (groupType === 'year') {
+            res.id = date.getFullYear().toString();
+        }
+
+        return res;
+    }
+
+    getDateDiff(itemA, itemB, groupType) {
+        const dateA = new Date(cutDate(itemA.date));
+        const dateB = new Date(cutDate(itemB.date));
+
+        if (groupType === 'none') {
+            if (itemA.id === itemB.id) {
+                return 0;
+            }
+
+            return (dateB > dateA) ? 1 : -1;
+        }
+
+        if (groupType === 'day') {
+            return (dateB - dateA) / MS_IN_DAY;
+        }
+
+        if (groupType === 'week') {
+            return (
+                (dateB.getFullYear() - dateA.getFullYear()) * WEEKS_IN_YEAR
+                + (getWeek(dateB) - getWeek(dateA))
+            );
+        }
+
+        if (groupType === 'month') {
+            return (
+                (dateB.getFullYear() - dateA.getFullYear()) * MONTHS_IN_YEAR
+                + (dateB.getMonth() - dateA.getMonth())
+            );
+        }
+
+        if (groupType === 'year') {
+            return dateB.getFullYear() - dateA.getFullYear();
+        }
+
+        throw new Error('Invalid group type');
+    }
+
+    getNextDate(date, groupType) {
+        if (!availGroupTypes.includes(groupType)) {
+            throw new Error('Invalid group type');
+        }
+
+        const res = new Date(cutDate(date));
+        if (groupType === 'none' || groupType === 'day') {
+            res.setDate(res.getDate() + 1);
+        }
+        if (groupType === 'week') {
+            res.setDate(res.getDate() + DAYS_IN_WEEK);
+        }
+        if (groupType === 'month') {
+            res.setMonth(res.getMonth() + 1);
+        }
+        if (groupType === 'year') {
+            res.setFullYear(res.getFullYear() + 1);
+        }
+        return res;
+    }
+
     getStatisticsLabel(date, groupType) {
         if (!date) {
             return null;
@@ -522,7 +613,6 @@ export class TransactionsList extends List {
         let prevDate = null;
         const curSum = {};
         let itemsInGroup = 0;
-        let transDate = null;
         let currId = params.curr_id;
         const accId = asArray(params.acc_id);
         const res = {
@@ -601,75 +691,71 @@ export class TransactionsList extends List {
             }
 
             const time = convDate(item.date);
-            transDate = new Date(time);
+            const dateInfo = this.getDateInfo(time, groupType);
             itemsInGroup += 1;
             const amount = (isSource) ? item.src_amount : item.dest_amount;
 
             if (groupType === 'none') {
                 amountArr[item.type][category].push(amount);
 
-                if (prevDate == null || prevDate !== transDate.getDate()) {
-                    groupArr.push([formatDate(transDate), itemsInGroup]);
-                    itemsInGroup = 0;
+                if (prevDate && prevDate.id !== dateInfo.id) {
+                    const label = this.getStatisticsLabel(prevDate.date, groupType);
+                    groupArr.push([label, itemsInGroup - 1]);
+                    itemsInGroup = 1;
                 }
-                prevDate = transDate.getDate();
-            } else if (groupType === 'day') {
-                curDate = transDate.getDate();
-            } else if (groupType === 'week') {
-                curDate = getWeek(time);
-            } else if (groupType === 'month') {
-                curDate = transDate.getMonth();
-            } else if (groupType === 'year') {
-                curDate = transDate.getFullYear();
+                prevDate = dateInfo;
+            } else {
+                curDate = dateInfo;
             }
 
-            if (sumDate == null) {
+            if (!sumDate) {
                 sumDate = curDate;
-            } else if (sumDate != null && sumDate !== curDate) {
-                sumDate = curDate;
+            } else if (sumDate && sumDate.id !== curDate.id) {
+                const dateDiff = this.getDateDiff(sumDate, curDate, groupType);
                 for (const type of transTypes) {
                     for (const cat of categories) {
                         amountArr[type][cat].push(curSum[type][cat]);
                         curSum[type][cat] = 0;
+                        // Append empty values after saved value
+                        for (let i = 1; i < dateDiff; i += 1) {
+                            amountArr[type][cat].push(0);
+                        }
                     }
                 }
 
-                const label = this.getStatisticsLabel(transDate, groupType);
+                let label = this.getStatisticsLabel(sumDate.date, groupType);
                 groupArr.push([label, 1]);
+                // Append series for empty values
+                let groupDate = sumDate.date;
+                for (let i = 1; i < dateDiff; i += 1) {
+                    groupDate = this.getNextDate(groupDate, groupType);
+                    label = this.getStatisticsLabel(groupDate, groupType);
+                    groupArr.push([label, 1]);
+                }
+
+                sumDate = curDate;
             }
 
             curSum[item.type][category] += amount;
         });
 
         // save remain value
-        if (groupType !== 'none' && list.length > 0) {
-            if (sumDate != null && sumDate !== curDate) {
-                for (const type of transTypes) {
-                    for (const cat of categories) {
-                        amountArr[type][cat].push(curSum[type][cat]);
-                    }
-                }
+        const valuesRemain = transTypes.some((type) => (
+            categories.some((cat) => curSum[type][cat] > 0)
+        ));
 
-                const label = this.getStatisticsLabel(transDate, groupType);
-                groupArr.push([label, 1]);
-            } else {
-                for (const type of transTypes) {
-                    for (const cat of categories) {
-                        const { length } = amountArr[type][cat];
-                        const value = curSum[type][cat];
-                        if (length === 0) {
-                            amountArr[type][cat].push(value);
-                        } else {
-                            amountArr[type][cat][length - 1] += value;
-                        }
-                    }
-                }
-
-                if (groupArr.length === 0) {
-                    const label = this.getStatisticsLabel(transDate, groupType);
-                    groupArr.push([label, 1]);
+        if (groupType !== 'none' && valuesRemain) {
+            for (const type of transTypes) {
+                for (const cat of categories) {
+                    amountArr[type][cat].push(curSum[type][cat]);
                 }
             }
+
+            const label = this.getStatisticsLabel(sumDate.date, groupType);
+            groupArr.push([label, 1]);
+        } else if (groupType === 'none' && prevDate) {
+            const label = this.getStatisticsLabel(prevDate.date, groupType);
+            groupArr.push([label, itemsInGroup]);
         }
 
         const dataSets = [];
@@ -677,8 +763,8 @@ export class TransactionsList extends List {
             const typeCategories = amountArr[type];
             Object.keys(typeCategories).forEach((cat) => {
                 dataSets.push({
-                    group: type,
-                    category: cat,
+                    group: parseInt(type, 10),
+                    category: parseInt(cat, 10),
                     data: typeCategories[cat],
                 });
             });

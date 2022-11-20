@@ -203,7 +203,7 @@ export class ImportView extends AppView {
 
         const res = {
             notAvailMsg: { visible: !model.enabled },
-            listMenuContainer: { visible: model.enabled && hasItems },
+            listMenuContainer: { visible: model.enabled },
             listMenu: { visible: showMenuItems },
             uploadBtn: { visible: model.enabled, disabled: !model.enabled },
             title: { value: model.title.toString(), visible: true },
@@ -703,6 +703,7 @@ export class ImportView extends AppView {
                 && prevTime !== this.content.renderTime
             );
         });
+        await this.parse();
     }
 
     /** Submit converted file data */
@@ -782,6 +783,7 @@ export class ImportView extends AppView {
             }
 
             // Reapply rules
+            item.setMainAccount(accountId);
             item.restoreOriginal();
             item.setMainAccount(accountId);
             App.state.rules.applyTo(item);
@@ -794,9 +796,7 @@ export class ImportView extends AppView {
         });
 
         this.model.mainAccount = accountId;
-        this.model.totalCount = this.items.length;
-        const enabledItems = this.items.filter((item) => item.enabled);
-        this.model.enabledCount = enabledItems.length;
+        this.updateItemsCount();
 
         this.expectedState = this.getExpectedState();
         const expectedList = this.getExpectedList();
@@ -1334,21 +1334,24 @@ export class ImportView extends AppView {
 
         assert(this.itemsList, 'No items available');
 
+        const expectedItems = this.items.map((item) => new ImportTransaction(item));
         indexes.forEach((ind) => {
-            const item = this.items[ind];
+            assert.arrayIndex(expectedItems, ind);
+            const item = expectedItems[ind];
             assert(item.enabled !== enable, `Item ${ind} already ${enable ? 'enabled' : 'disabled'}`);
             item.enabled = enable;
         });
-
-        this.updateItemsCount();
-        const expected = this.getExpectedState();
-        const expectedList = this.getExpectedList();
-        expected.itemsList.items = expectedList.items;
 
         for (const ind of indexes) {
             await this.openContextMenu(ind);
             await this.performAction(() => this.content.ctxEnableBtn.click());
         }
+
+        this.items = expectedItems;
+        this.updateItemsCount();
+        const expected = this.getExpectedState();
+        const expectedList = this.getExpectedList();
+        expected.itemsList.items = expectedList.items;
 
         return this.checkState(expected);
     }
@@ -1401,6 +1404,7 @@ export class ImportView extends AppView {
             removed += 1;
         }
 
+        this.updateItemsCount();
         this.expectedState = this.getExpectedState();
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
@@ -1432,6 +1436,7 @@ export class ImportView extends AppView {
             this.model.listMode = 'list';
         }
         this.model.menuOpen = false;
+        this.updateItemsCount();
         this.expectedState = this.getExpectedState();
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
@@ -1450,7 +1455,10 @@ export class ImportView extends AppView {
         this.originalItemData = null;
         this.model.listMode = 'list';
         this.model.menuOpen = false;
+        this.updateItemsCount();
         this.expectedState = this.getExpectedState();
+        const expectedList = this.getExpectedList();
+        this.expectedState.itemsList.items = expectedList.items;
 
         await this.performAction(() => this.content.deleteAllBtn.click());
 
@@ -1496,19 +1504,20 @@ export class ImportView extends AppView {
             return false;
         });
 
-        this.expectedState = {
-            msgPopup: {
-                success: true,
-                message: 'All transactions have been successfully imported',
-            },
-            itemsList: { items: [] },
-        };
-
         this.items = [];
         this.formIndex = -1;
         this.originalItemData = null;
+        this.updateItemsCount();
+        const expected = this.getExpectedState();
+        const expectedList = this.getExpectedList();
+        expected.itemsList.items = expectedList.items;
 
-        await this.checkState();
+        expected.msgPopup = {
+            success: true,
+            message: 'All transactions have been successfully imported',
+        };
+
+        await this.checkState(expected);
         await this.closeNotification();
         return true;
     }

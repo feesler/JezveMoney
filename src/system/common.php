@@ -132,6 +132,13 @@ function valFormat($format, $val)
 }
 
 
+// Converts value to float and return rounded
+function normalize($value, $precision = 2)
+{
+    return round(floatval($value), $precision);
+}
+
+
 // Check session and start if it is not started yet
 function sessionStart()
 {
