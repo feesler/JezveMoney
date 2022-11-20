@@ -565,6 +565,11 @@ label {
   }
 }
 
+/* Link menu */
+.link-menu {
+  --link-menu-icon-color: var(--accent-color);
+}
+
 /* Paginator */
 .paginator {
   align-items: center;
