@@ -1,10 +1,5 @@
-import { normalize } from '../utils.js';
+import { formatValue, normalize } from '../utils.js';
 import { ListItem } from './ListItem.js';
-
-/** Format specified number value */
-function formatValue(val) {
-    return val.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ');
-}
 
 /**
  * Currency class
