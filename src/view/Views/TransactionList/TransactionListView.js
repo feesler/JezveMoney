@@ -44,6 +44,11 @@ const START_DATE_PLACEHOLDER = 'From';
 const END_DATE_PLACEHOLDER = 'To';
 /* 'Show more' button */
 const TITLE_SHOW_MORE = 'Show more...';
+/* Accounts and persons filter */
+const ACCOUNTS_GROUP_TITLE = 'Accounts';
+const PERSONS_GROUP_TITLE = 'Persons';
+const HIDDEN_ACCOUNTS_GROUP_TITLE = 'Hidden accounts';
+const HIDDEN_PERSONS_GROUP_TITLE = 'Hidden persons';
 
 const SEARCH_THROTTLE = 300;
 
@@ -101,37 +106,39 @@ class TransactionListView extends View {
         });
 
         const accountsFilter = ge('accountsFilter');
-        if (window.app.model.accounts.length === 0) {
+        if (!this.isAvailable()) {
             show(accountsFilter, false);
         } else {
             this.accountDropDown = DropDown.create({
                 elem: 'acc_id',
-                placeholder: 'Select account',
+                placeholder: 'Type to filter',
+                enableFilter: true,
+                noResultsMessage: 'Nothing found',
                 onitemselect: (obj) => this.onAccountChange(obj),
                 onchange: (obj) => this.onAccountChange(obj),
                 className: 'dd_fullwidth',
             });
-            if (!this.accountDropDown) {
-                throw new Error('Failed to initialize Transaction List view');
-            }
-            window.app.initAccountsList(this.accountDropDown);
-        }
 
-        const personsFilter = ge('personsFilter');
-        if (window.app.model.persons.length === 0) {
-            show(personsFilter, false);
-        } else {
-            this.personDropDown = DropDown.create({
-                elem: 'person_id',
-                placeholder: 'Select person',
-                onitemselect: (obj) => this.onPersonChange(obj),
-                onchange: (obj) => this.onPersonChange(obj),
-                className: 'dd_fullwidth',
+            window.app.appendAccounts(this.accountDropDown, {
+                visible: true,
+                idPrefix: 'a',
+                group: ACCOUNTS_GROUP_TITLE,
             });
-            if (!this.personDropDown) {
-                throw new Error('Failed to initialize Transaction List view');
-            }
-            window.app.initPersonsList(this.personDropDown);
+            window.app.appendAccounts(this.accountDropDown, {
+                visible: false,
+                idPrefix: 'a',
+                group: HIDDEN_ACCOUNTS_GROUP_TITLE,
+            });
+            window.app.appendPersons(this.accountDropDown, {
+                visible: true,
+                idPrefix: 'p',
+                group: PERSONS_GROUP_TITLE,
+            });
+            window.app.appendPersons(this.accountDropDown, {
+                visible: false,
+                idPrefix: 'p',
+                group: HIDDEN_PERSONS_GROUP_TITLE,
+            });
         }
 
         // Date range filter
@@ -262,6 +269,12 @@ class TransactionListView extends View {
         });
     }
 
+    /** Returns true if accounts or persons is available */
+    isAvailable() {
+        const { accounts, persons } = window.app.model;
+        return (accounts.length > 0 || persons.length > 0);
+    }
+
     showContextMenu(itemId) {
         this.store.dispatch(actions.showContextMenu(itemId));
     }
@@ -380,35 +393,34 @@ class TransactionListView extends View {
     }
 
     /**
-     * Account change event handler
+     * Account and person filter change event handler
      * @param {object} obj - selection object
      */
-    onAccountChange(obj) {
-        const ids = asArray(obj).map((item) => parseInt(item.id, 10));
+    onAccountChange(selected) {
+        const accountIds = [];
+        const personIds = [];
+        asArray(selected).forEach(({ id }) => {
+            const arr = (id.startsWith('a')) ? accountIds : personIds;
+            const itemId = parseInt(id.substring(1), 10);
+            arr.push(itemId);
+        });
+
         let state = this.store.getState();
-        const filterIds = state.form.acc_id ?? [];
-        if (isSameSelection(ids, filterIds)) {
+        const filterAccounts = asArray(state.form.acc_id);
+        const filterPersons = asArray(state.form.person_id);
+        const accountsChanged = !isSameSelection(accountIds, filterAccounts);
+        const personsChanged = !isSameSelection(personIds, filterPersons);
+        if (!accountsChanged && !personsChanged) {
             return;
         }
 
-        this.store.dispatch(actions.changeAccountsFilter(ids));
-        state = this.store.getState();
-        this.requestTransactions(state.form);
-    }
-
-    /**
-     * Persons filter change event handler
-     * @param {object} obj - selection object
-     */
-    onPersonChange(obj) {
-        const ids = asArray(obj).map((item) => parseInt(item.id, 10));
-        let state = this.store.getState();
-        const filterIds = state.form.person_id ?? [];
-        if (isSameSelection(ids, filterIds)) {
-            return;
+        if (accountsChanged) {
+            this.store.dispatch(actions.changeAccountsFilter(accountIds));
+        }
+        if (personsChanged) {
+            this.store.dispatch(actions.changePersonsFilter(personIds));
         }
 
-        this.store.dispatch(actions.changePersonsFilter(ids));
         state = this.store.getState();
         this.requestTransactions(state.form);
     }
@@ -580,42 +592,27 @@ class TransactionListView extends View {
         items.deleteBtn.show(isSelectMode && totalSelCount > 0);
     }
 
-    /** Render accounts selection */
+    /** Render accounts and persons selection */
     renderAccountsFilter(state) {
-        const selectedAccounts = this.accountDropDown.getSelectedItems();
+        if (!this.isAvailable()) {
+            return;
+        }
+
+        const selectedItems = this.accountDropDown.getSelectedItems();
         const selectedIds = [];
-        const idsToSelect = asArray(state.form.acc_id);
-        selectedAccounts.forEach((accountItem) => {
-            const itemId = parseInt(accountItem.id, 10);
-            selectedIds.push(itemId);
-
-            if (!idsToSelect.includes(itemId)) {
-                this.accountDropDown.deselectItem(accountItem.id);
+        const idsToSelect = [
+            ...asArray(state.form.acc_id).map((id) => `a${id}`),
+            ...asArray(state.form.person_id).map((id) => `p${id}`),
+        ];
+        selectedItems.forEach(({ id }) => {
+            selectedIds.push(id);
+            if (!idsToSelect.includes(id)) {
+                this.accountDropDown.deselectItem(id);
             }
         });
-        idsToSelect.forEach((accountId) => {
-            if (!selectedIds.includes(accountId)) {
-                this.accountDropDown.selectItem(accountId.toString());
-            }
-        });
-    }
-
-    /** Render persons selection */
-    renderPersonsFilter(state) {
-        const selectedPersons = this.personDropDown.getSelectedItems();
-        const selectedIds = [];
-        const idsToSelect = asArray(state.form.person_id);
-        selectedPersons.forEach((personItem) => {
-            const itemId = parseInt(personItem.id, 10);
-            selectedIds.push(itemId);
-
-            if (!idsToSelect.includes(itemId)) {
-                this.personDropDown.deselectItem(personItem.id);
-            }
-        });
-        idsToSelect.forEach((personId) => {
-            if (!selectedIds.includes(personId)) {
-                this.personDropDown.selectItem(personId.toString());
+        idsToSelect.forEach((id) => {
+            if (!selectedIds.includes(id)) {
+                this.accountDropDown.selectItem(id.toString());
             }
         });
     }
@@ -630,12 +627,7 @@ class TransactionListView extends View {
         this.typeMenu.setURL(filterUrl);
         this.typeMenu.setSelection(state.form.type);
 
-        if (window.app.model.accounts.length > 0) {
-            this.renderAccountsFilter(state);
-        }
-        if (window.app.model.persons.length > 0) {
-            this.renderPersonsFilter(state);
-        }
+        this.renderAccountsFilter(state);
 
         // Render date
         const dateFilter = {

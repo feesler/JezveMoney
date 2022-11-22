@@ -242,9 +242,57 @@ export class Application {
             return;
         }
 
-        window.app.model.currency.forEach(
+        this.model.currency.forEach(
             (curr) => ddlist.addItem({ id: curr.id, title: curr.name }),
         );
+    }
+
+    appendListItems(ddlist, items, options = {}) {
+        if (!ddlist || !items || items.length === 0) {
+            return;
+        }
+
+        const {
+            idPrefix = '',
+            group = null,
+        } = options;
+
+        const itemsGroup = (typeof group === 'string' && group.length > 0)
+            ? ddlist.addGroup(group)
+            : null;
+        items.forEach(
+            (item) => ddlist.addItem({
+                id: `${idPrefix}${item.id}`,
+                title: item.name,
+                group: itemsGroup,
+            }),
+        );
+    }
+
+    appendAccounts(ddlist, options = {}) {
+        if (!ddlist) {
+            return;
+        }
+
+        const { visible = true, ...rest } = options;
+
+        this.checkUserAccountModels();
+        const { visibleUserAccounts, hiddenUserAccounts } = this.model;
+        const items = (visible) ? visibleUserAccounts : hiddenUserAccounts;
+        this.appendListItems(ddlist, items, rest);
+    }
+
+    appendPersons(ddlist, options = {}) {
+        if (!ddlist) {
+            return;
+        }
+
+        const { visible = true, ...rest } = options;
+
+        this.checkPersonModels();
+        const { visiblePersons, hiddenPersons } = this.model;
+        const items = (visible) ? visiblePersons : hiddenPersons;
+        this.appendListItems(ddlist, items, rest);
     }
 
     /** Initialize acconts DropDown */
@@ -253,51 +301,13 @@ export class Application {
             return;
         }
 
-        window.app.checkUserAccountModels();
-
-        const { visibleUserAccounts, hiddenUserAccounts } = window.app.model;
-
-        visibleUserAccounts.forEach(
-            (item) => ddlist.addItem({ id: item.id, title: item.name }),
-        );
-        if (hiddenUserAccounts.length === 0) {
-            return;
-        }
-
-        const group = ddlist.addGroup(HIDDEN_GROUP_TITLE);
-        hiddenUserAccounts.forEach(
-            (item) => ddlist.addItem({
-                id: item.id,
-                title: item.name,
-                group,
-            }),
-        );
+        this.appendAccounts(ddlist, { visible: true });
+        this.appendAccounts(ddlist, { visible: false, group: HIDDEN_GROUP_TITLE });
     }
 
     /** Initialize DropDown for debt account tile */
     initPersonsList(ddlist) {
-        if (!ddlist) {
-            return;
-        }
-
-        window.app.checkPersonModels();
-
-        const { visiblePersons, hiddenPersons } = window.app.model;
-
-        visiblePersons.forEach(
-            (person) => ddlist.addItem({ id: person.id, title: person.name }),
-        );
-        if (hiddenPersons.length === 0) {
-            return;
-        }
-
-        const group = ddlist.addGroup(HIDDEN_GROUP_TITLE);
-        hiddenPersons.forEach(
-            (person) => ddlist.addItem({
-                id: person.id,
-                title: person.name,
-                group,
-            }),
-        );
+        this.appendPersons(ddlist, { visible: true });
+        this.appendPersons(ddlist, { visible: false, group: HIDDEN_GROUP_TITLE });
     }
 }

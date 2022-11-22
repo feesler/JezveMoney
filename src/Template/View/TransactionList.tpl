@@ -56,13 +56,8 @@ include(TPL_PATH . "Header.tpl"); ?>
 
                         <div class="filters-row">
                             <div id="accountsFilter" class="filter-item">
-                                <h3 class="filter-item__title">Accounts</h3>
+                                <h3 class="filter-item__title">Accounts and persons</h3>
                                 <select id="acc_id" name="acc_id" multiple></select>
-                            </div>
-
-                            <div id="personsFilter" class="filter-item">
-                                <h3 class="filter-item__title">Persons</h3>
-                                <select id="person_id" name="person_id" multiple></select>
                             </div>
                         </div>
 

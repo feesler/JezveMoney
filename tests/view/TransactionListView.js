@@ -94,12 +94,6 @@ export class TransactionListView extends AppView {
             res.accDropDown = await DropDown.createFromChild(this, await query('#acc_id'));
         }
 
-        const personsFilter = await query('#personsFilter');
-        const personsFilterVisible = await isVisible(personsFilter);
-        if (personsFilterVisible) {
-            res.personDropDown = await DropDown.createFromChild(this, await query('#person_id'));
-        }
-
         res.dateFilter = await DatePickerFilter.create(this, await query('#dateFilter'));
         assert(res.dateFilter, 'Date filter not found');
 
@@ -144,10 +138,18 @@ export class TransactionListView extends AppView {
         return res;
     }
 
-    getDropDownFilter(dropDown) {
-        return (dropDown)
-            ? dropDown.getSelectedValues().map((item) => parseInt(item, 10))
-            : [];
+    getDropDownFilter(dropDown, idPrefix) {
+        if (!dropDown) {
+            return [];
+        }
+
+        const res = [];
+        dropDown.getSelectedValues().forEach((id) => {
+            if (id.startsWith(idPrefix)) {
+                res.push(parseInt(id.substring(idPrefix.length), 10));
+            }
+        });
+        return res;
     }
 
     async buildModel(cont) {
@@ -163,8 +165,8 @@ export class TransactionListView extends AppView {
         res.filterCollapsed = cont.filtersAccordion.isCollapsed();
         res.filter = {
             type: cont.typeMenu.value,
-            accounts: this.getDropDownFilter(cont.accDropDown),
-            persons: this.getDropDownFilter(cont.personDropDown),
+            accounts: this.getDropDownFilter(cont.accDropDown, 'a'),
+            persons: this.getDropDownFilter(cont.accDropDown, 'p'),
             search: cont.searchForm.value,
             startDate: null,
             endDate: null,
@@ -339,12 +341,26 @@ export class TransactionListView extends AppView {
         return this.setExpectedState();
     }
 
+    getAccountPrefixedIds(model = this.model) {
+        return model.filter.accounts.map((id) => `a${id}`);
+    }
+
+    getPersonPrefixedIds(model = this.model) {
+        return model.filter.persons.map((id) => `p${id}`);
+    }
+
+    getPrefixedIds(model = this.model) {
+        return [
+            ...this.getAccountPrefixedIds(model),
+            ...this.getPersonPrefixedIds(model),
+        ];
+    }
+
     setExpectedState(model = this.model) {
         const listMode = model.listMode === 'list';
         const selectMode = model.listMode === 'select';
         const isItemsAvailable = (model.filtered.length > 0);
-        const isAccountsAvailable = App.state.accounts.length > 0;
-        const isPersonsAvailable = App.state.persons.length > 0;
+        const isAvailable = App.state.accounts.length > 0 || App.state.persons.length > 0;
         const isFiltersVisible = !model.filterCollapsed;
         const selected = this.getSelectedItems(model);
 
@@ -360,10 +376,7 @@ export class TransactionListView extends AppView {
                 visible: isFiltersVisible,
             },
             accDropDown: {
-                visible: isFiltersVisible && isAccountsAvailable,
-            },
-            personDropDown: {
-                visible: isFiltersVisible && isPersonsAvailable,
+                visible: isFiltersVisible && isAvailable,
             },
             dateFilter: {
                 visible: isFiltersVisible,
@@ -413,18 +426,10 @@ export class TransactionListView extends AppView {
             res.ctxDeleteBtn = { visible: true };
         }
 
-        if (isAccountsAvailable) {
+        if (isAvailable) {
             res.accDropDown.isMulti = true;
-            res.accDropDown.selectedItems = model.filter.accounts.map(
-                (accountId) => ({ id: accountId.toString() }),
-            );
-        }
-
-        if (isPersonsAvailable) {
-            res.personDropDown.isMulti = true;
-            res.personDropDown.selectedItems = model.filter.persons.map(
-                (personId) => ({ id: personId.toString() }),
-            );
+            const ids = this.getPrefixedIds(model);
+            res.accDropDown.selectedItems = ids.map((id) => ({ id }));
         }
 
         if (isItemsAvailable) {
@@ -577,21 +582,25 @@ export class TransactionListView extends AppView {
         return App.view.checkState(expected);
     }
 
-    async setFilterSelection(dropDown, itemIds) {
+    get accDropDown() {
+        return this.content.accDropDown;
+    }
+
+    async setFilterSelection(itemIds) {
         const ids = asArray(itemIds);
-        const selection = this.content[dropDown].getSelectedValues();
+        const selection = this.accDropDown.getSelectedValues();
         if (selection.length > 0) {
-            await this.waitForList(() => this.content[dropDown].clearSelection());
+            await this.waitForList(() => this.accDropDown.clearSelection());
         }
         if (ids.length === 0) {
             return;
         }
 
         for (const id of ids) {
-            await this.waitForList(() => this.content[dropDown].selectItem(id));
+            await this.waitForList(() => this.accDropDown.selectItem(id));
         }
 
-        await this.performAction(() => this.content[dropDown].showList(false));
+        await this.performAction(() => this.accDropDown.showList(false));
     }
 
     async filterByAccounts(ids, directNavigate = false) {
@@ -610,7 +619,8 @@ export class TransactionListView extends AppView {
         if (directNavigate) {
             await goTo(this.getExpectedURL());
         } else {
-            await this.setFilterSelection('accDropDown', accounts);
+            const selection = this.getPrefixedIds();
+            await this.setFilterSelection(selection);
         }
 
         return App.view.checkState(expected);
@@ -632,7 +642,8 @@ export class TransactionListView extends AppView {
         if (directNavigate) {
             await goTo(this.getExpectedURL());
         } else {
-            await this.setFilterSelection('personDropDown', persons);
+            const selection = this.getPrefixedIds();
+            await this.setFilterSelection(selection);
         }
 
         return App.view.checkState(expected);

@@ -5,6 +5,7 @@
   --accent-color-alt: #20a0ff;
   --action-btn-border-radius: 5px;
   --focus-shadow: 0 0 0 0.25rem #0d6efd40;
+  --input-height: 37px;
 }
 
 html,
@@ -111,7 +112,7 @@ label {
   display: flex;
   flex-basis: 100%;
   width: 100%;
-  height: 2.3rem;
+  height: var(--input-height);
   font-size: 0.9rem;
   border-width: 1px;
   border-style: solid;
@@ -122,6 +123,8 @@ label {
 /* Input group */
 .input-group,
 .import-form .input-group {
+  --ig-height: 37px;
+
   .input-group__btn,
   .input-group__text {
     font-size: 1rem;
@@ -431,6 +434,10 @@ label {
   --dd-disabled-list-item-bg: none;
 }
 
+.dd__input {
+  font-size: 0.9rem;
+}
+
 .dark-theme .dd__list-item.dd__list-item_active,
 .white-theme .dd__list-item.dd__list-item_active {
   color: #ffffff;
@@ -653,11 +660,11 @@ a.paginator-arrow:focus-visible {
 }
 
 .filter-item .dd__container {
-  --dd-combo-height: 2.3rem;
+  --dd-combo-height: var(--input-height);
 }
 
 .filter-item .link-menu {
-  min-height: 2.3rem;
+  min-height: var(--input-height);
 }
 
 /* Histogram */
