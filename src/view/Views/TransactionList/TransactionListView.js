@@ -6,6 +6,7 @@ import {
     insertAfter,
     throttle,
     asArray,
+    setEvents,
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { DropDown } from 'jezvejs/DropDown';
@@ -96,7 +97,7 @@ class TransactionListView extends View {
         ge('filterscollapse').appendChild(collapse.elem);
 
         this.clearAllBtn = ge('clearall_btn');
-        this.clearAllBtn.addEventListener('click', (e) => this.onClearAllFilters(e));
+        setEvents(this.clearAllBtn, { click: (e) => this.onClearAllFilters(e) });
 
         this.typeMenu = TransactionTypeMenu.fromElement(ge('type_menu'), {
             multiple: true,
@@ -160,6 +161,11 @@ class TransactionListView extends View {
         this.listContainer = document.querySelector('.list-container');
         this.loadingIndicator = LoadingIndicator.create();
         this.listContainer.append(this.loadingIndicator.elem);
+
+        // Counters
+        this.itemsCount = ge('itemsCount');
+        this.selectedCounter = ge('selectedCounter');
+        this.selItemsCount = ge('selItemsCount');
 
         // List mode selected
         const listHeader = document.querySelector('.list-header');
@@ -651,6 +657,13 @@ class TransactionListView extends View {
             items: state.items,
             renderTime: Date.now(),
         }));
+
+        // Counters
+        this.itemsCount.textContent = state.pagination.total;
+        const isSelectMode = (state.listMode === 'select');
+        show(this.selectedCounter, isSelectMode);
+        const selected = (isSelectMode) ? this.list.getSelectedItems() : [];
+        this.selItemsCount.textContent = selected.length;
 
         if (this.paginator) {
             this.paginator.show(state.items.length > 0);

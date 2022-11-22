@@ -68,8 +68,10 @@ export class ImportView extends AppView {
         const res = {
             title: { elem: await query('.content_wrap > .heading > h1') },
             uploadBtn: await IconButton.create(this, await query('#uploadBtn')),
-            totalCount: { elem: await query('#trcount') },
-            enabledCount: { elem: await query('#entrcount') },
+            totalCount: { elem: await query('#itemsCount') },
+            enabledCount: { elem: await query('#enabledCount') },
+            selectedCounter: { elem: await query('#selectedCounter') },
+            selectedCount: { elem: await query('#selectedCount') },
             submitBtn: { elem: await query('#submitbtn') },
         };
 
@@ -84,6 +86,7 @@ export class ImportView extends AppView {
         res.title.value = await prop(res.title.elem, 'textContent');
         res.totalCount.value = await prop(res.totalCount.elem, 'textContent');
         res.enabledCount.value = await prop(res.enabledCount.elem, 'textContent');
+        res.selectedCount.value = await prop(res.selectedCount.elem, 'textContent');
         res.submitBtn.disabled = await prop(res.submitBtn.elem, 'disabled');
         res.uploadBtn.content.disabled = await hasAttr(res.uploadBtn.elem, 'disabled');
 
@@ -177,6 +180,7 @@ export class ImportView extends AppView {
         res.title = cont.title.value;
         res.totalCount = (res.enabled) ? parseInt(cont.totalCount.value, 10) : 0;
         res.enabledCount = (res.enabled) ? parseInt(cont.enabledCount.value, 10) : 0;
+        res.selectedCount = (res.enabled) ? parseInt(cont.selectedCount.value, 10) : 0;
         res.mainAccount = (res.enabled) ? parseInt(cont.mainAccountSelect.content.value, 10) : 0;
         res.rulesEnabled = (res.enabled) ? cont.rulesCheck.checked : false;
         res.checkSimilarEnabled = (res.enabled) ? cont.similarCheck.checked : false;
@@ -209,6 +213,11 @@ export class ImportView extends AppView {
             title: { value: model.title.toString(), visible: true },
             totalCount: { value: model.totalCount.toString(), visible: model.enabled },
             enabledCount: { value: model.enabledCount.toString(), visible: model.enabled },
+            selectedCounter: { visible: model.enabled && selectMode },
+            selectedCount: {
+                value: model.selectedCount.toString(),
+                visible: model.enabled && selectMode,
+            },
             submitBtn: { visible: model.enabled },
         };
 
@@ -216,7 +225,7 @@ export class ImportView extends AppView {
             return res;
         }
 
-        const selectedItems = (selectMode) ? this.items.filter((item) => item.selected) : [];
+        const selectedItems = (selectMode) ? this.getSelectedItems() : [];
         const hasEnabled = (selectMode) ? selectedItems.some((item) => item.enabled) : false;
         const hasDisabled = (selectMode) ? selectedItems.some((item) => !item.enabled) : false;
 
@@ -277,12 +286,22 @@ export class ImportView extends AppView {
         return ImportList.render(pageItems, App.state, relFormIndex);
     }
 
+    getEnabledItems() {
+        return this.items.filter((item) => item.enabled);
+    }
+
+    getSelectedItems() {
+        return this.items.filter((item) => item.selected);
+    }
+
     updateItemsCount(model = this.model) {
         const res = model;
 
         res.totalCount = this.items.length;
-        const enabledItems = this.items.filter((item) => item.enabled);
+        const enabledItems = this.getEnabledItems();
         res.enabledCount = enabledItems.length;
+        const selectedItems = this.getSelectedItems();
+        res.selectedCount = selectedItems.length;
 
         return res;
     }
@@ -1204,8 +1223,14 @@ export class ImportView extends AppView {
 
         await this.openActionsMenu();
 
+        this.items.forEach((_, ind) => {
+            const item = this.items[ind];
+            item.selected = false;
+        });
+
         this.model.menuOpen = false;
         this.model.listMode = listMode;
+        this.updateItemsCount();
         this.expectedState = this.getExpectedState();
 
         const buttonName = modeButtons[listMode];
@@ -1242,6 +1267,7 @@ export class ImportView extends AppView {
         });
 
         this.model.menuOpen = false;
+        this.updateItemsCount();
         this.expectedState = this.getExpectedState();
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
@@ -1268,6 +1294,7 @@ export class ImportView extends AppView {
         });
 
         this.model.menuOpen = false;
+        this.updateItemsCount();
         this.expectedState = this.getExpectedState();
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
@@ -1289,6 +1316,7 @@ export class ImportView extends AppView {
         });
 
         this.model.menuOpen = false;
+        this.updateItemsCount();
         this.expectedState = this.getExpectedState();
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
@@ -1468,7 +1496,7 @@ export class ImportView extends AppView {
     async submit() {
         this.checkMainState();
 
-        const enabledItems = this.items.filter((item) => item.enabled);
+        const enabledItems = this.getEnabledItems();
         const disabled = await prop(this.content.submitBtn.elem, 'disabled');
         assert(disabled === (enabledItems.length === 0), 'Submit is not available');
         if (disabled) {

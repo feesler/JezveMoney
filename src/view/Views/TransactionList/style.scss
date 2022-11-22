@@ -88,8 +88,9 @@
 /* List header */
 .list-header {
   display: flex;
-  flex-flow: column nowrap;
-  align-items: flex-start;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: space-between;
 }
 
 /* List footer */

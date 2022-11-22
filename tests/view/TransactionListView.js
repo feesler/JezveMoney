@@ -60,6 +60,9 @@ export class TransactionListView extends AppView {
             },
             listMenu: { elem: await query('#listMenu .popup-menu-list') },
             contextMenu: { elem: await query('#contextMenu') },
+            itemsCount: { elem: await query('#itemsCount') },
+            selectedCounter: { elem: await query('#selectedCounter') },
+            selItemsCount: { elem: await query('#selItemsCount') },
         };
 
         await this.parseMenuItems(res, listMenuItems);
@@ -69,9 +72,15 @@ export class TransactionListView extends AppView {
             && res.addBtn
             && res.listMenuContainer.elem
             && res.listMenuContainer.menuBtn
-            && res.listMenu.elem,
+            && res.listMenu.elem
+            && res.itemsCount.elem
+            && res.selectedCounter.elem
+            && res.selItemsCount.elem,
             'Invalid structure of transactions view',
         );
+
+        res.itemsCount.value = await prop(res.itemsCount.elem, 'textContent');
+        res.selItemsCount.value = await prop(res.selItemsCount.elem, 'textContent');
 
         const contextParent = await closest(res.contextMenu.elem, '.trans-item');
         if (contextParent) {
@@ -111,11 +120,6 @@ export class TransactionListView extends AppView {
 
         res.title = await prop(res.titleEl, 'textContent');
         res.transList = await TransactionList.create(this, transList);
-
-        if (res.transList?.content?.items?.length > 0) {
-            assert(res.modeSelector, 'Mode selector not found');
-            assert(res.paginator, 'Paginator not found');
-        }
 
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
@@ -388,6 +392,12 @@ export class TransactionListView extends AppView {
             searchForm: {
                 value: model.filter.search,
                 visible: isFiltersVisible,
+            },
+            itemsCount: { visible: true, value: model.filtered.length.toString() },
+            selectedCounter: { visible: model.listMode === 'select' },
+            selItemsCount: {
+                visible: model.listMode === 'select',
+                value: selected.length.toString(),
             },
             modeSelector: { visible: isItemsAvailable },
             showMoreBtn: { visible: isItemsAvailable && model.list.page < model.list.pages },
@@ -819,6 +829,7 @@ export class TransactionListView extends AppView {
                 && searchQuery === this.model.filter.search
             );
         });
+        await this.parse();
     }
 
     async waitForList(action) {

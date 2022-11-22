@@ -77,14 +77,24 @@ class PersonListView extends View {
             onItemClick: (id, e) => this.onItemClick(id, e),
         };
 
-        const visibleTilesHeading = ge('visibleTilesHeading');
-        this.hiddenTilesHeading = ge('hiddenTilesHeading');
-        if (!visibleTilesHeading || !this.hiddenTilesHeading) {
-            throw new Error('Failed to initialize Account List view');
-        }
+        const elemIds = [
+            'counters',
+            'itemsCount',
+            'hiddenCount',
+            'selectedCounter',
+            'selItemsCount',
+            'visibleTilesHeading',
+            'hiddenTilesHeading',
+        ];
+        elemIds.forEach((id) => {
+            this[id] = ge(id);
+            if (!this[id]) {
+                throw new Error('Failed to initialize view');
+            }
+        });
 
         this.visibleTiles = ListContainer.create(listProps);
-        insertAfter(this.visibleTiles.elem, visibleTilesHeading);
+        insertAfter(this.visibleTiles.elem, this.counters);
 
         this.hiddenTiles = ListContainer.create(listProps);
         insertAfter(this.hiddenTiles.elem, this.hiddenTilesHeading);
@@ -373,14 +383,24 @@ class PersonListView extends View {
             this.loadingIndicator.show();
         }
 
-        // Render visible persons
+        // Counters
+        const itemsCount = state.items.visible.length + state.items.hidden.length;
+        this.itemsCount.textContent = itemsCount;
+        this.hiddenCount.textContent = state.items.hidden.length;
+        const isSelectMode = (state.listMode === 'select');
+        show(this.selectedCounter, isSelectMode);
+        const selected = (isSelectMode) ? this.getSelectedIds(state) : [];
+        this.selItemsCount.textContent = selected.length;
+
+        // Visible persons
         this.visibleTiles.setState((visibleState) => ({
             ...visibleState,
             items: state.items.visible,
             listMode: state.listMode,
             renderTime: Date.now(),
         }));
-        // Render hidden persons
+
+        // Hidden persons
         this.hiddenTiles.setState((hiddenState) => ({
             ...hiddenState,
             items: state.items.hidden,

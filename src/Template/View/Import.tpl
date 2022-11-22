@@ -32,8 +32,19 @@ include(TPL_PATH . "Header.tpl");    ?>
                         </div>
 
                         <div class="import-controls">
-                            <div class="items-counter">
-                                <span><span id="entrcount">0</span>&nbsp;/&nbsp;<span id="trcount">0</span> enabled</span>
+                            <div class="counters">
+                                <div class="counter">
+                                    <span class="counter__title">Items</span>
+                                    <span id="itemsCount" class="counter__value">0</span>
+                                </div>
+                                <div class="counter">
+                                    <span class="counter__title">Enabled</span>
+                                    <span id="enabledCount" class="counter__value">0</span>
+                                </div>
+                                <div id="selectedCounter" class="counter" hidden>
+                                    <span class="counter__title">Selected</span>
+                                    <span id="selectedCount" class="counter__value">0</span>
+                                </div>
                             </div>
                             <button id="submitbtn" class="btn submit-btn" type="button" disabled>Submit</button>
                         </div>

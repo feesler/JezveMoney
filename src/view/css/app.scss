@@ -123,7 +123,7 @@ label {
 /* Input group */
 .input-group,
 .import-form .input-group {
-  --ig-height: 37px;
+  --ig-height: var(--input-height);
 
   .input-group__btn,
   .input-group__text {
@@ -486,8 +486,6 @@ label {
   margin-left: 29px;
 }
 
-/* PopupMenu */
-
 /* Popup */
 .popup__content {
   background: none;
@@ -575,6 +573,33 @@ label {
 /* Link menu */
 .link-menu {
   --link-menu-icon-color: var(--accent-color);
+}
+
+/* Counters */
+.counters {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  column-gap: 24px;
+  height: var(--input-height);
+  line-height: var(--input-height);
+}
+
+.counter {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  column-gap: 12px;
+}
+
+.counter__title {
+  font-size: 0.8rem;
+  color: #858585;
+}
+
+.counter__value {
+  font-size: 0.9rem;
 }
 
 /* Paginator */

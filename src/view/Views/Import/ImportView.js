@@ -102,14 +102,18 @@ class ImportView extends View {
 
         this.heading = document.querySelector('.heading');
         this.submitBtn = ge('submitbtn');
-        this.transCountElem = ge('trcount');
-        this.enabledTransCountElem = ge('entrcount');
+        this.itemsCount = ge('itemsCount');
+        this.enabledCount = ge('enabledCount');
+        this.selectedCounter = ge('selectedCounter');
+        this.selectedCount = ge('selectedCount');
         this.rowsContainer = ge('rowsContainer');
         if (
             !this.heading
             || !this.submitBtn
-            || !this.transCountElem
-            || !this.enabledTransCountElem
+            || !this.itemsCount
+            || !this.enabledCount
+            || !this.selectedCounter
+            || !this.selectedCount
             || !this.rowsContainer
         ) {
             throw new Error('Failed to initialize Import view');
@@ -989,8 +993,13 @@ class ImportView extends View {
         const enabledList = this.getEnabledItems(state);
 
         enable(this.submitBtn, (enabledList.length > 0));
-        this.enabledTransCountElem.textContent = enabledList.length;
-        this.transCountElem.textContent = state.items.length;
+        this.enabledCount.textContent = enabledList.length;
+        this.itemsCount.textContent = state.items.length;
+
+        const isSelectMode = (state.listMode === 'select');
+        show(this.selectedCounter, isSelectMode);
+        const selectedItems = (isSelectMode) ? this.getSelectedItems(state) : [];
+        this.selectedCount.textContent = selectedItems.length;
 
         this.renderContextMenu(state, prevState);
         this.renderMenu(state);

@@ -74,7 +74,18 @@ include(TPL_PATH . "Header.tpl"); ?>
                     </div>
 
                     <div class="list-container">
-                        <div class="list-header"></div>
+                        <div class="list-header">
+                            <div id="counters" class="counters">
+                                <div class="counter">
+                                    <span class="counter__title">Items</span>
+                                    <span id="itemsCount" class="counter__value"></span>
+                                </div>
+                                <div id="selectedCounter" class="counter" hidden>
+                                    <span class="counter__title">Selected</span>
+                                    <span id="selItemsCount" class="counter__value"></span>
+                                </div>
+                            </div>
+                        </div>
                         <div class="list-footer"></div>
                     </div>
                 </div>

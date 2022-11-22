@@ -42,6 +42,10 @@ export class AccountListView extends AppView {
             },
             listMenu: { elem: await query('#listMenu .popup-menu-list') },
             contextMenu: { elem: await query('#contextMenu') },
+            itemsCount: { elem: await query('#itemsCount') },
+            hiddenCount: { elem: await query('#hiddenCount') },
+            selectedCounter: { elem: await query('#selectedCounter') },
+            selItemsCount: { elem: await query('#selItemsCount') },
         };
 
         await this.parseMenuItems(res, listMenuItems);
@@ -51,7 +55,11 @@ export class AccountListView extends AppView {
             && res.addBtn
             && res.listMenuContainer.elem
             && res.listMenuContainer.menuBtn
-            && res.listMenu.elem,
+            && res.listMenu.elem
+            && res.itemsCount.elem
+            && res.hiddenCount.elem
+            && res.selectedCounter.elem
+            && res.selItemsCount.elem,
             'Invalid structure of accounts view',
         );
 
@@ -65,7 +73,10 @@ export class AccountListView extends AppView {
         }
 
         res.title = await prop(res.titleEl, 'textContent');
-        res.tiles = await TilesList.create(this, await query('#visibleTilesHeading + .tiles'));
+        res.itemsCount.value = await prop(res.itemsCount.elem, 'textContent');
+        res.hiddenCount.value = await prop(res.hiddenCount.elem, 'textContent');
+        res.selItemsCount.value = await prop(res.selItemsCount.elem, 'textContent');
+        res.tiles = await TilesList.create(this, await query('#counters + .tiles'));
         res.hiddenTiles = await TilesList.create(this, await query('#hiddenTilesHeading + .tiles'));
         res.loadingIndicator = { elem: await query('.loading-indicator') };
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
@@ -127,6 +138,10 @@ export class AccountListView extends AppView {
 
         const res = {
             loadingIndicator: { visible: model.loading },
+            itemsCount: { visible: true, value: itemsCount.toString() },
+            hiddenCount: { visible: true, value: model.hiddenTiles.length.toString() },
+            selectedCounter: { visible: model.mode === 'select' },
+            selItemsCount: { visible: model.mode === 'select', value: totalSelected.toString() },
             listMenuContainer: { visible: itemsCount > 0 },
             listMenu: { visible: model.listMenuVisible },
             selectModeBtn: { visible: model.listMenuVisible },
@@ -168,6 +183,13 @@ export class AccountListView extends AppView {
 
     getHiddenSelectedItems(model = this.model) {
         return model.hiddenTiles.filter((item) => item.isActive);
+    }
+
+    onDeselectAll() {
+        const deselectItem = (item) => ({ ...item, isActive: false });
+
+        this.model.tiles = this.model.tiles.map(deselectItem);
+        this.model.hiddenTiles = this.model.hiddenTiles.map(deselectItem);
     }
 
     getItems() {
@@ -248,6 +270,7 @@ export class AccountListView extends AppView {
 
         this.model.listMenuVisible = false;
         this.model.mode = (this.model.mode === 'select') ? 'list' : 'select';
+        this.onDeselectAll();
         const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.selectModeBtn.click());
@@ -321,13 +344,10 @@ export class AccountListView extends AppView {
     async deselectAll() {
         assert(this.model.mode === 'select', 'Invalid state');
 
-        const deselectItem = (item) => ({ ...item, isActive: false });
-
         await this.openListMenu();
 
         this.model.listMenuVisible = false;
-        this.model.tiles = this.model.tiles.map(deselectItem);
-        this.model.hiddenTiles = this.model.hiddenTiles.map(deselectItem);
+        this.onDeselectAll();
         const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.deselectAllBtn.click());
