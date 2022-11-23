@@ -14,6 +14,7 @@ import { AppView } from './AppView.js';
 import { TilesList } from './component/TilesList.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
+import { Counter } from './component/Counter.js';
 
 const listMenuItems = [
     'selectModeBtn',
@@ -32,35 +33,26 @@ const contextMenuItems = [
 export class PersonListView extends AppView {
     async parseContent() {
         const res = {
-            titleEl: await query('.content_wrap > .heading > h1'),
+            title: { elem: await query('.content_wrap > .heading > h1') },
             addBtn: await IconButton.create(this, await query('#add_btn')),
             listMenuContainer: {
                 elem: await query('#listMenu'),
                 menuBtn: await query('#listMenu .popup-menu-btn'),
             },
             listMenu: { elem: await query('#listMenu .popup-menu-list') },
-            contextMenu: { elem: await query('#contextMenu') },
-            itemsCount: { elem: await query('#itemsCount') },
-            hiddenCount: { elem: await query('#hiddenCount') },
-            selectedCounter: { elem: await query('#selectedCounter') },
-            selItemsCount: { elem: await query('#selItemsCount') },
+            totalCounter: await Counter.create(this, await query('#itemsCounter')),
+            hiddenCounter: await Counter.create(this, await query('#hiddenCounter')),
+            selectedCounter: await Counter.create(this, await query('#selectedCounter')),
         };
+
+        Object.keys(res).forEach((child) => (
+            assert(res[child]?.elem, `Invalid structure of view: ${child} component not found`)
+        ));
 
         await this.parseMenuItems(res, listMenuItems);
 
-        assert(
-            res.titleEl
-            && res.addBtn
-            && res.listMenuContainer.elem
-            && res.listMenuContainer.menuBtn
-            && res.listMenu.elem
-            && res.itemsCount.elem
-            && res.hiddenCount.elem
-            && res.selectedCounter.elem
-            && res.selItemsCount.elem,
-            'Invalid structure of persons view',
-        );
-
+        // Context menu
+        res.contextMenu = { elem: await query('#contextMenu') };
         const contextParent = await closest(res.contextMenu.elem, '.tile');
         if (contextParent) {
             const itemId = await prop(contextParent, 'dataset.id');
@@ -70,10 +62,7 @@ export class PersonListView extends AppView {
             await this.parseMenuItems(res, contextMenuItems);
         }
 
-        res.title = prop(res.titleEl, 'textContent');
-        res.itemsCount.value = await prop(res.itemsCount.elem, 'textContent');
-        res.hiddenCount.value = await prop(res.hiddenCount.elem, 'textContent');
-        res.selItemsCount.value = await prop(res.selItemsCount.elem, 'textContent');
+        res.title.value = prop(res.title.elem, 'textContent');
         res.tiles = await TilesList.create(this, await query('#counters + .tiles'));
         res.hiddenTiles = await TilesList.create(this, await query('#hiddenTilesHeading + .tiles'));
         res.loadingIndicator = { elem: await query('.loading-indicator') };
@@ -142,10 +131,9 @@ export class PersonListView extends AppView {
 
         const res = {
             loadingIndicator: { visible: model.loading },
-            itemsCount: { visible: true, value: itemsCount.toString() },
-            hiddenCount: { visible: true, value: model.hiddenTiles.length.toString() },
-            selectedCounter: { visible: model.mode === 'select' },
-            selItemsCount: { visible: model.mode === 'select', value: totalSelected.toString() },
+            totalCounter: { visible: true, value: itemsCount },
+            hiddenCounter: { visible: true, value: model.hiddenTiles.length },
+            selectedCounter: { visible: model.mode === 'select', value: totalSelected },
             listMenuContainer: { visible: itemsCount > 0 },
             listMenu: { visible: model.listMenuVisible },
             selectModeBtn: { visible: model.listMenuVisible },

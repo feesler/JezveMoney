@@ -21,6 +21,7 @@ import { App } from '../Application.js';
 import { ImportTransaction } from '../model/ImportTransaction.js';
 import { ImportTransactionForm } from './component/Import/ImportTransactionForm.js';
 import { ImportTransactionItem } from './component/Import/ImportTransactionItem.js';
+import { Counter } from './component/Counter.js';
 
 const ITEMS_ON_PAGE = 20;
 const defaultPagination = {
@@ -68,15 +69,14 @@ export class ImportView extends AppView {
         const res = {
             title: { elem: await query('.content_wrap > .heading > h1') },
             uploadBtn: await IconButton.create(this, await query('#uploadBtn')),
-            totalCount: { elem: await query('#itemsCount') },
-            enabledCount: { elem: await query('#enabledCount') },
-            selectedCounter: { elem: await query('#selectedCounter') },
-            selectedCount: { elem: await query('#selectedCount') },
+            totalCounter: await Counter.create(this, await query('#itemsCounter')),
+            enabledCounter: await Counter.create(this, await query('#enabledCounter')),
+            selectedCounter: await Counter.create(this, await query('#selectedCounter')),
             submitBtn: { elem: await query('#submitbtn') },
         };
 
         Object.keys(res).forEach((child) => (
-            assert(res[child]?.elem, `Invalid structure of import view: ${child} component not found`)
+            assert(res[child]?.elem, `Invalid structure of view: ${child} component not found`)
         ));
 
         res.notAvailMsg = { elem: await query('#notavailmsg') };
@@ -84,9 +84,6 @@ export class ImportView extends AppView {
 
         // Heading
         res.title.value = await prop(res.title.elem, 'textContent');
-        res.totalCount.value = await prop(res.totalCount.elem, 'textContent');
-        res.enabledCount.value = await prop(res.enabledCount.elem, 'textContent');
-        res.selectedCount.value = await prop(res.selectedCount.elem, 'textContent');
         res.submitBtn.disabled = await prop(res.submitBtn.elem, 'disabled');
         res.uploadBtn.content.disabled = await hasAttr(res.uploadBtn.elem, 'disabled');
 
@@ -178,9 +175,6 @@ export class ImportView extends AppView {
         }
 
         res.title = cont.title.value;
-        res.totalCount = (res.enabled) ? parseInt(cont.totalCount.value, 10) : 0;
-        res.enabledCount = (res.enabled) ? parseInt(cont.enabledCount.value, 10) : 0;
-        res.selectedCount = (res.enabled) ? parseInt(cont.selectedCount.value, 10) : 0;
         res.mainAccount = (res.enabled) ? parseInt(cont.mainAccountSelect.content.value, 10) : 0;
         res.rulesEnabled = (res.enabled) ? cont.rulesCheck.checked : false;
         res.checkSimilarEnabled = (res.enabled) ? cont.similarCheck.checked : false;
@@ -211,13 +205,9 @@ export class ImportView extends AppView {
             listMenu: { visible: showMenuItems },
             uploadBtn: { visible: model.enabled, disabled: !model.enabled },
             title: { value: model.title.toString(), visible: true },
-            totalCount: { value: model.totalCount.toString(), visible: model.enabled },
-            enabledCount: { value: model.enabledCount.toString(), visible: model.enabled },
+            totalCounter: { visible: model.enabled },
+            enabledCounter: { visible: model.enabled },
             selectedCounter: { visible: model.enabled && selectMode },
-            selectedCount: {
-                value: model.selectedCount.toString(),
-                visible: model.enabled && selectMode,
-            },
             submitBtn: { visible: model.enabled },
         };
 
@@ -225,10 +215,17 @@ export class ImportView extends AppView {
             return res;
         }
 
+        const enabledItems = this.getEnabledItems();
         const selectedItems = (selectMode) ? this.getSelectedItems() : [];
         const hasEnabled = (selectMode) ? selectedItems.some((item) => item.enabled) : false;
         const hasDisabled = (selectMode) ? selectedItems.some((item) => !item.enabled) : false;
 
+        // Counters
+        res.totalCounter.value = this.items.length;
+        res.enabledCounter.value = enabledItems.length;
+        res.selectedCounter.value = selectedItems.length;
+
+        // Main menu
         res.createItemBtn = { visible: showListItems };
         res.listModeBtn = { visible: showMenuItems && !listMode };
         res.selectModeBtn = { visible: showListItems && hasItems };
@@ -292,18 +289,6 @@ export class ImportView extends AppView {
 
     getSelectedItems() {
         return this.items.filter((item) => item.selected);
-    }
-
-    updateItemsCount(model = this.model) {
-        const res = model;
-
-        res.totalCount = this.items.length;
-        const enabledItems = this.getEnabledItems();
-        res.enabledCount = enabledItems.length;
-        const selectedItems = this.getSelectedItems();
-        res.selectedCount = selectedItems.length;
-
-        return res;
     }
 
     getPositionByIndex(index) {
@@ -756,8 +741,6 @@ export class ImportView extends AppView {
         const expectedList = this.getExpectedList();
         const pagesCount = Math.ceil(this.items.length / ITEMS_ON_PAGE);
         this.model.pagination.pages = pagesCount;
-        this.updateItemsCount();
-
         this.expectedState = this.getExpectedState();
         this.expectedState.itemsList.items = expectedList.items;
         this.expectedState.uploadDialog = { visible: !isValid };
@@ -815,8 +798,6 @@ export class ImportView extends AppView {
         });
 
         this.model.mainAccount = accountId;
-        this.updateItemsCount();
-
         this.expectedState = this.getExpectedState();
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
@@ -1089,7 +1070,6 @@ export class ImportView extends AppView {
         });
         this.formIndex = this.items.length;
         this.items.push(newItem);
-        this.updateItemsCount();
 
         const pagesCount = Math.ceil(this.items.length / ITEMS_ON_PAGE);
         this.model.pagination.pages = pagesCount;
@@ -1197,7 +1177,6 @@ export class ImportView extends AppView {
             this.items.splice(this.formIndex, 1);
         }
         this.formIndex = -1;
-        this.updateItemsCount();
 
         this.expectedState = this.getExpectedState();
         const expectedList = this.getExpectedList();
@@ -1230,7 +1209,6 @@ export class ImportView extends AppView {
 
         this.model.menuOpen = false;
         this.model.listMode = listMode;
-        this.updateItemsCount();
         this.expectedState = this.getExpectedState();
 
         const buttonName = modeButtons[listMode];
@@ -1267,7 +1245,6 @@ export class ImportView extends AppView {
         });
 
         this.model.menuOpen = false;
-        this.updateItemsCount();
         this.expectedState = this.getExpectedState();
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
@@ -1294,7 +1271,6 @@ export class ImportView extends AppView {
         });
 
         this.model.menuOpen = false;
-        this.updateItemsCount();
         this.expectedState = this.getExpectedState();
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
@@ -1316,7 +1292,6 @@ export class ImportView extends AppView {
         });
 
         this.model.menuOpen = false;
-        this.updateItemsCount();
         this.expectedState = this.getExpectedState();
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
@@ -1341,7 +1316,6 @@ export class ImportView extends AppView {
             }
         });
 
-        this.updateItemsCount();
         this.model.menuOpen = false;
         this.expectedState = this.getExpectedState();
         const expectedList = this.getExpectedList();
@@ -1376,7 +1350,6 @@ export class ImportView extends AppView {
         }
 
         this.items = expectedItems;
-        this.updateItemsCount();
         const expected = this.getExpectedState();
         const expectedList = this.getExpectedList();
         expected.itemsList.items = expectedList.items;
@@ -1432,7 +1405,6 @@ export class ImportView extends AppView {
             removed += 1;
         }
 
-        this.updateItemsCount();
         this.expectedState = this.getExpectedState();
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
@@ -1464,7 +1436,6 @@ export class ImportView extends AppView {
             this.model.listMode = 'list';
         }
         this.model.menuOpen = false;
-        this.updateItemsCount();
         this.expectedState = this.getExpectedState();
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
@@ -1483,7 +1454,6 @@ export class ImportView extends AppView {
         this.originalItemData = null;
         this.model.listMode = 'list';
         this.model.menuOpen = false;
-        this.updateItemsCount();
         this.expectedState = this.getExpectedState();
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
@@ -1535,7 +1505,6 @@ export class ImportView extends AppView {
         this.items = [];
         this.formIndex = -1;
         this.originalItemData = null;
-        this.updateItemsCount();
         const expected = this.getExpectedState();
         const expectedList = this.getExpectedList();
         expected.itemsList.items = expectedList.items;

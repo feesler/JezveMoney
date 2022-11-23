@@ -28,6 +28,7 @@ import { SearchInput } from './component/SearchInput.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
 import { fixDate, isEmpty, urlJoin } from '../common.js';
 import { FiltersAccordion } from './component/TransactionList/FiltersAccordion.js';
+import { Counter } from './component/Counter.js';
 
 const modeButtons = {
     list: 'listModeBtn',
@@ -52,36 +53,25 @@ const contextMenuItems = [
 export class TransactionListView extends AppView {
     async parseContent() {
         const res = {
-            titleEl: await query('.content_wrap > .heading > h1'),
+            title: { elem: await query('.content_wrap > .heading > h1') },
             addBtn: await IconButton.create(this, await query('#add_btn')),
             listMenuContainer: {
                 elem: await query('#listMenu'),
                 menuBtn: await query('#listMenu .popup-menu-btn'),
             },
             listMenu: { elem: await query('#listMenu .popup-menu-list') },
-            contextMenu: { elem: await query('#contextMenu') },
-            itemsCount: { elem: await query('#itemsCount') },
-            selectedCounter: { elem: await query('#selectedCounter') },
-            selItemsCount: { elem: await query('#selItemsCount') },
+            totalCounter: await Counter.create(this, await query('#itemsCounter')),
+            selectedCounter: await Counter.create(this, await query('#selectedCounter')),
         };
+
+        Object.keys(res).forEach((child) => (
+            assert(res[child]?.elem, `Invalid structure of view: ${child} component not found`)
+        ));
 
         await this.parseMenuItems(res, listMenuItems);
 
-        assert(
-            res.titleEl
-            && res.addBtn
-            && res.listMenuContainer.elem
-            && res.listMenuContainer.menuBtn
-            && res.listMenu.elem
-            && res.itemsCount.elem
-            && res.selectedCounter.elem
-            && res.selItemsCount.elem,
-            'Invalid structure of transactions view',
-        );
-
-        res.itemsCount.value = await prop(res.itemsCount.elem, 'textContent');
-        res.selItemsCount.value = await prop(res.selItemsCount.elem, 'textContent');
-
+        // Context menu
+        res.contextMenu = { elem: await query('#contextMenu') };
         const contextParent = await closest(res.contextMenu.elem, '.trans-item');
         if (contextParent) {
             const itemId = await prop(contextParent, 'dataset.id');
@@ -118,7 +108,7 @@ export class TransactionListView extends AppView {
         res.paginator = await Paginator.create(this, await query('.paginator'));
         res.showMoreBtn = { elem: await query('.show-more-btn') };
 
-        res.title = await prop(res.titleEl, 'textContent');
+        res.title.value = await prop(res.title.elem, 'textContent');
         res.transList = await TransactionList.create(this, transList);
 
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
@@ -393,12 +383,8 @@ export class TransactionListView extends AppView {
                 value: model.filter.search,
                 visible: isFiltersVisible,
             },
-            itemsCount: { visible: true, value: model.filtered.length.toString() },
-            selectedCounter: { visible: model.listMode === 'select' },
-            selItemsCount: {
-                visible: model.listMode === 'select',
-                value: selected.length.toString(),
-            },
+            totalCounter: { visible: true, value: model.filtered.length },
+            selectedCounter: { visible: selectMode, value: selected.length },
             modeSelector: { visible: isItemsAvailable },
             showMoreBtn: { visible: isItemsAvailable && model.list.page < model.list.pages },
             paginator: { visible: isItemsAvailable },

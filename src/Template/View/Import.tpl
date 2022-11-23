@@ -33,11 +33,11 @@ include(TPL_PATH . "Header.tpl");    ?>
 
                         <div class="import-controls">
                             <div class="counters">
-                                <div class="counter">
+                                <div id="itemsCounter" class="counter">
                                     <span class="counter__title">Items</span>
                                     <span id="itemsCount" class="counter__value">0</span>
                                 </div>
-                                <div class="counter">
+                                <div id="enabledCounter" class="counter">
                                     <span class="counter__title">Enabled</span>
                                     <span id="enabledCount" class="counter__value">0</span>
                                 </div>
