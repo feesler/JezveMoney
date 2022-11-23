@@ -3,6 +3,7 @@
 :root {
   --accent-color: #0072c6;
   --accent-color-alt: #20a0ff;
+  --accent-hover-color: #1e82cc;
   --action-btn-border-radius: 5px;
   --focus-shadow: 0 0 0 0.25rem #0d6efd40;
   --input-height: 37px;
@@ -737,11 +738,11 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d;
 
 @media (hover: hover) {
   a:hover {
-    color: #1e82cc;
+    color: var(--accent-hover-color);
   }
 
   .submit-btn:hover {
-    background-color: #1e82cc;
+    background-color: var(--accent-hover-color);
   }
 
   .warning-btn:hover {
@@ -750,7 +751,7 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d;
 
   .link-btn:hover {
     text-decoration: underline;
-    color: #1e82cc;
+    color: var(--accent-hover-color);
   }
 
   .dashed-btn:hover::after {

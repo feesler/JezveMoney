@@ -127,9 +127,10 @@ const slice = createSlice({
         },
     }),
 
-    changeMode: (state, mode) => (
-        (state.mode === mode) ? state : { ...state, mode }
-    ),
+    toggleMode: (state) => ({
+        ...state,
+        mode: (state.mode === 'details') ? 'classic' : 'details',
+    }),
 
     listRequestLoaded: (state, data) => ({
         ...state,

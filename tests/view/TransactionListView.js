@@ -16,7 +16,6 @@ import {
 import {
     DropDown,
     Paginator,
-    LinkMenu,
     IconButton,
 } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -48,6 +47,9 @@ const listMenuItems = [
 const contextMenuItems = [
     'ctxUpdateBtn', 'ctxDeleteBtn',
 ];
+
+const TITLE_SHOW_MAIN = 'Show main';
+const TITLE_SHOW_DETAILS = 'Show details';
 
 /** List of transactions view class */
 export class TransactionListView extends AppView {
@@ -104,7 +106,7 @@ export class TransactionListView extends AppView {
 
         res.loadingIndicator = { elem: await query(transList, '.loading-indicator') };
 
-        res.modeSelector = await LinkMenu.create(this, await query('.mode-selector'));
+        res.modeSelector = await IconButton.create(this, await query('.mode-selector'));
         res.paginator = await Paginator.create(this, await query('.paginator'));
         res.showMoreBtn = { elem: await query('.show-more-btn') };
 
@@ -197,7 +199,7 @@ export class TransactionListView extends AppView {
 
         const isModeSelectorVisible = cont.modeSelector?.content?.visible;
         if (isModeSelectorVisible) {
-            res.detailsMode = cont.modeSelector.value === 'details';
+            res.detailsMode = cont.modeSelector.title === TITLE_SHOW_MAIN;
         } else {
             const locURL = new URL(this.location);
             res.detailsMode = locURL.searchParams.has('mode') && locURL.searchParams.get('mode') === 'details';
@@ -435,10 +437,7 @@ export class TransactionListView extends AppView {
                 active: model.list.page + this.currentRange(model) - 1,
             };
 
-            res.modeSelector = {
-                ...res.modeSelector,
-                value: (model.detailsMode) ? 'details' : 'classic',
-            };
+            res.modeSelector.title = (model.detailsMode) ? TITLE_SHOW_MAIN : TITLE_SHOW_DETAILS;
         }
 
         return res;
@@ -734,50 +733,38 @@ export class TransactionListView extends AppView {
         return App.view.checkState(expected);
     }
 
-    async setClassicMode(directNavigate = false) {
-        if (!this.content.modeSelector) {
-            return false;
-        }
-        if (this.content.modeSelector.value === 'classic') {
-            return false;
-        }
+    async toggleMode(directNavigate = false) {
+        assert(this.content.modeSelector, 'Mode toggler button not available');
 
         if (directNavigate) {
             this.model.filterCollapsed = true;
         }
-        this.model.detailsMode = false;
+        this.model.detailsMode = !this.model.detailsMode;
         const expected = this.setExpectedState();
 
         if (directNavigate) {
             await goTo(this.getExpectedURL());
         } else {
-            await this.waitForList(() => this.content.modeSelector.selectItemByValue('classic'));
+            await this.waitForList(() => this.content.modeSelector.click());
         }
 
         return App.view.checkState(expected);
     }
 
+    async setClassicMode(directNavigate = false) {
+        if (!this.model.detailsMode) {
+            return true;
+        }
+
+        return this.toggleMode(directNavigate);
+    }
+
     async setDetailsMode(directNavigate = false) {
-        if (!this.content.modeSelector) {
-            return false;
-        }
-        if (this.content.modeSelector.value === 'details') {
-            return false;
+        if (this.model.detailsMode) {
+            return true;
         }
 
-        if (directNavigate) {
-            this.model.filterCollapsed = true;
-        }
-        this.model.detailsMode = true;
-        const expected = this.setExpectedState();
-
-        if (directNavigate) {
-            await goTo(this.getExpectedURL());
-        } else {
-            await this.waitForList(() => this.content.modeSelector.selectItemByValue('details'));
-        }
-
-        return App.view.checkState(expected);
+        return this.toggleMode(directNavigate);
     }
 
     currentPage() {

@@ -10,7 +10,7 @@ import {
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { DropDown } from 'jezvejs/DropDown';
-import { LinkMenu } from 'jezvejs/LinkMenu';
+import { IconButton } from 'jezvejs/IconButton';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import 'jezvejs/style/InputGroup';
@@ -38,8 +38,8 @@ const TITLE_MULTI_TRANS_DELETE = 'Delete transactions';
 const MSG_MULTI_TRANS_DELETE = 'Are you sure want to delete selected transactions?<br>Changes in the balance of affected accounts will be canceled.';
 const MSG_SINGLE_TRANS_DELETE = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
 /* Mode selector items */
-const TITLE_CLASSIC = 'Classic';
-const TITLE_DETAILS = 'Details';
+const TITLE_SHOW_MAIN = 'Show main';
+const TITLE_SHOW_DETAILS = 'Show details';
 /* Date range input */
 const START_DATE_PLACEHOLDER = 'From';
 const END_DATE_PLACEHOLDER = 'To';
@@ -169,14 +169,10 @@ class TransactionListView extends View {
 
         // List mode selected
         const listHeader = document.querySelector('.list-header');
-        this.modeSelector = LinkMenu.create({
+        this.modeSelector = IconButton.create({
+            type: 'link',
             className: 'mode-selector',
-            itemParam: 'mode',
-            items: [
-                { icon: 'mode-list', title: TITLE_CLASSIC, value: 'classic' },
-                { icon: 'mode-details', title: TITLE_DETAILS, value: 'details' },
-            ],
-            onChange: (mode) => this.onModeChanged(mode),
+            onClick: (e) => this.onToggleMode(e),
         });
         listHeader.append(this.modeSelector.elem);
 
@@ -509,8 +505,10 @@ class TransactionListView extends View {
         });
     }
 
-    onModeChanged(mode) {
-        this.store.dispatch(actions.changeMode(mode));
+    onToggleMode(e) {
+        e.preventDefault();
+
+        this.store.dispatch(actions.toggleMode());
         this.replaceHistory();
     }
 
@@ -659,10 +657,10 @@ class TransactionListView extends View {
         }));
 
         // Counters
-        this.itemsCount.textContent = state.pagination.total;
         const isSelectMode = (state.listMode === 'select');
-        show(this.selectedCounter, isSelectMode);
         const selected = (isSelectMode) ? this.list.getSelectedItems() : [];
+        this.itemsCount.textContent = state.pagination.total;
+        show(this.selectedCounter, isSelectMode);
         this.selItemsCount.textContent = selected.length;
 
         if (this.paginator) {
@@ -681,10 +679,16 @@ class TransactionListView extends View {
             state.items.length > 0 && state.pagination.page < state.pagination.pagesCount,
         );
 
+        const isDetails = (state.mode === 'details');
+        filterUrl.searchParams.set('mode', (isDetails) ? 'classic' : 'details');
         filterUrl.searchParams.set('page', state.pagination.page);
         this.modeSelector.show(state.items.length > 0);
-        this.modeSelector.setActive(state.mode);
-        this.modeSelector.setURL(filterUrl);
+        this.modeSelector.setState((modeSelectorState) => ({
+            ...modeSelectorState,
+            icon: (isDetails) ? 'mode-list' : 'mode-details',
+            title: (isDetails) ? TITLE_SHOW_MAIN : TITLE_SHOW_DETAILS,
+            url: filterUrl.toString(),
+        }));
 
         this.renderContextMenu(state);
         this.renderMenu(state);
