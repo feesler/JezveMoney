@@ -12,10 +12,12 @@ import {
     waitForFunction,
     isNum,
     copyObject,
+    evaluate,
+    asyncMap,
 } from 'jezve-test';
 import { Checkbox, DropDown } from 'jezvejs-test';
 import { App } from '../../../Application.js';
-import { asyncMap, fixFloat } from '../../../common.js';
+import { fixFloat } from '../../../common.js';
 import { WarningPopup } from '../WarningPopup.js';
 import { ImportTemplate } from '../../../model/ImportTemplate.js';
 
@@ -59,11 +61,8 @@ export class ImportUploadDialog extends TestComponent {
             'Invalid file upload form',
         );
 
-        res.fileName = await prop(res.fileNameElem.elem, 'value');
         res.useServerAddress = res.useServerCheck.checked;
-        res.serverAddress = await prop(res.serverAddressInput.elem, 'value');
         res.encode = res.isEncodeCheck.checked;
-        res.uploadFilename = (res.useServerAddress) ? res.serverAddress : res.fileName;
 
         // Convert block
         res.templateBlock = { elem: await query('#templateBlock') };
@@ -86,8 +85,6 @@ export class ImportUploadDialog extends TestComponent {
         res.tplNameInp = { elem: await query('#tplNameInp') };
         assert(res.nameField.elem && res.tplNameInp.elem, 'Invalid template name field');
 
-        res.tplNameInp.value = await prop(res.tplNameInp.elem, 'value');
-
         // First row field
         res.firstRowField = { elem: await query('#firstRowField') };
         res.firstRowInp = { elem: await query('#firstRowInp') };
@@ -101,9 +98,30 @@ export class ImportUploadDialog extends TestComponent {
             'Invalid first row field',
         );
 
-        res.firstRowInp.value = await prop(res.firstRowInp.elem, 'value');
-        res.decFirstRowBtn.disabled = await prop(res.decFirstRowBtn.elem, 'disabled');
-        res.incFirstRowBtn.disabled = await prop(res.incFirstRowBtn.elem, 'disabled');
+        [
+            res.fileName,
+            res.serverAddress,
+            res.tplNameInp.value,
+            res.firstRowInp.value,
+            res.decFirstRowBtn.disabled,
+            res.incFirstRowBtn.disabled,
+        ] = await evaluate(
+            (fileNameEl, serverEl, tplNameEl, inputEl, decBtn, incBtn) => ([
+                fileNameEl.value,
+                serverEl.value,
+                tplNameEl.value,
+                inputEl.value,
+                decBtn.disabled,
+                incBtn.disabled,
+            ]),
+            res.fileNameElem.elem,
+            res.serverAddressInput.elem,
+            res.tplNameInp.elem,
+            res.firstRowInp.elem,
+            res.decFirstRowBtn.elem,
+            res.incFirstRowBtn.elem,
+        );
+        res.uploadFilename = (res.useServerAddress) ? res.serverAddress : res.fileName;
 
         // Template account field
         res.tplAccountField = { elem: await query('#tplAccountField') };

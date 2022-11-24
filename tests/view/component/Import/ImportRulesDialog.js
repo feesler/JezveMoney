@@ -11,12 +11,12 @@ import {
     isVisible,
     wait,
     waitForFunction,
+    asyncMap,
 } from 'jezve-test';
 import { IconButton, Paginator } from 'jezvejs-test';
 import { IMPORT_COND_OP_FIELD_FLAG } from '../../../model/ImportCondition.js';
 import { ImportRuleForm } from './ImportRuleForm.js';
 import { ImportRuleItem } from './ImportRuleItem.js';
-import { asyncMap } from '../../../common.js';
 import { WarningPopup } from '../WarningPopup.js';
 import { App } from '../../../Application.js';
 import { SearchInput } from '../SearchInput.js';

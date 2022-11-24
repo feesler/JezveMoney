@@ -2,8 +2,8 @@ import {
     TestComponent,
     assert,
     query,
-    prop,
     hasClass,
+    evaluate,
 } from 'jezve-test';
 
 export class Counter extends TestComponent {
@@ -17,9 +17,13 @@ export class Counter extends TestComponent {
         };
         assert(res.titleElem && res.valueElem, 'Invalid structure of counter');
 
-        res.title = await prop(res.titleElem, 'textContent');
-        res.value = await prop(res.valueElem, 'textContent');
-        res.value = parseInt(res.value, 10);
+        [
+            res.title,
+            res.value,
+        ] = await evaluate((titleEl, valueEl) => ([
+            titleEl.textContent,
+            parseInt(valueEl.textContent, 10),
+        ]), res.titleElem, res.valueElem);
 
         return res;
     }

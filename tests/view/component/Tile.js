@@ -5,6 +5,7 @@ import {
     prop,
     hasClass,
     click,
+    evaluate,
 } from 'jezve-test';
 import { App } from '../../Application.js';
 
@@ -13,20 +14,15 @@ export class Tile extends TestComponent {
         const validClass = await hasClass(this.elem, 'tile');
         assert(validClass, 'Invalid structure of tile');
 
-        const res = {
-            subtitleElem: await query(this.elem, '.tile__subtitle'),
-            titleElem: await query(this.elem, '.tile__title'),
-            id: parseInt(await prop(this.elem, 'dataset.id'), 10),
-        };
+        const subtitleElem = await query(this.elem, '.tile__subtitle');
+        const titleElem = await query(this.elem, '.tile__title');
 
-        const subtitleText = await prop(res.subtitleElem, 'innerText');
-        res.subtitle = (subtitleText)
-            ? subtitleText.split('\r\n').join('\n')
-            : null;
-
-        res.title = await prop(res.titleElem, 'textContent');
-
-        res.isActive = await hasClass(this.elem, 'tile_selected');
+        const res = await evaluate((elem, titleEl, subtitleEl) => ({
+            id: parseInt(elem.dataset.id, 10),
+            title: titleEl.textContent,
+            subtitle: (subtitleEl) ? subtitleEl.innerText.split('\r\n').join('\n') : '',
+            isActive: elem.classList.contains('tile_selected'),
+        }), this.elem, titleElem, subtitleElem);
 
         res.iconElem = await query(this.elem, '.tile__icon > svg');
         if (res.iconElem) {
@@ -34,7 +30,7 @@ export class Tile extends TestComponent {
 
             let iconHRef = await prop(svgUseElem, 'href.baseVal');
             if (typeof iconHRef === 'string' && iconHRef.startsWith('#')) {
-                iconHRef = iconHRef.substr(1);
+                iconHRef = iconHRef.substring(1);
             }
 
             const iconObj = App.icons.findByFile(iconHRef);
@@ -85,7 +81,7 @@ export class Tile extends TestComponent {
             const debtAccounts = Tile.filterPersonDebts(person.accounts);
             res.subtitle = (debtAccounts.length) ? debtAccounts.join('\n') : 'No debts';
         } else {
-            res.subtitle = null;
+            res.subtitle = '';
         }
 
         return res;

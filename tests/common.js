@@ -14,14 +14,6 @@ export const isEmpty = (obj) => {
     return true;
 };
 
-export const asyncMap = async (data, func) => {
-    assert.isArray(data, 'Invalid data type');
-    assert.isFunction(func, 'Invalid function type');
-
-    const tasks = data.map(func);
-    return Promise.all(tasks);
-};
-
 /** Convert date string from DD.MM.YYYY to timestamp */
 export const convDate = (dateStr) => {
     if (typeof dateStr !== 'string') {

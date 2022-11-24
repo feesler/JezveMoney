@@ -6,11 +6,11 @@ import {
     hasClass,
     isVisible,
     copyObject,
+    asyncMap,
 } from 'jezve-test';
 import { Paginator } from 'jezvejs-test';
 import { ImportTransactionForm } from './ImportTransactionForm.js';
 import { ImportTransactionItem } from './ImportTransactionItem.js';
-import { asyncMap } from '../../../common.js';
 
 export class ImportList extends TestComponent {
     constructor(parent, elem, mainAccount) {

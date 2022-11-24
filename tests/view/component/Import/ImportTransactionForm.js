@@ -8,6 +8,7 @@ import {
     isVisible,
     assert,
     copyObject,
+    asyncMap,
 } from 'jezve-test';
 import { DropDown } from 'jezvejs-test';
 import {
@@ -17,11 +18,7 @@ import {
     DEBT,
 } from '../../../model/Transaction.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
-import {
-    normalize,
-    asyncMap,
-    fixFloat,
-} from '../../../common.js';
+import { normalize, fixFloat } from '../../../common.js';
 import { App } from '../../../Application.js';
 import { OriginalImportData } from './OriginalImportData.js';
 

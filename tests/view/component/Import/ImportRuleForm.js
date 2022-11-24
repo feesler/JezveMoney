@@ -6,6 +6,7 @@ import {
     queryAll,
     prop,
     click,
+    asyncMap,
 } from 'jezve-test';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import { ImportRule } from '../../../model/ImportRule.js';
@@ -22,7 +23,7 @@ import {
 import { ImportConditionForm } from './ImportConditionForm.js';
 import { ImportRuleAccordion } from './ImportRuleAccordion.js';
 import { ImportActionForm } from './ImportActionForm.js';
-import { asyncMap, trimToDigitsLimit } from '../../../common.js';
+import { trimToDigitsLimit } from '../../../common.js';
 import { App } from '../../../Application.js';
 
 const availAccordionTitles = ['Conditions', 'Actions'];

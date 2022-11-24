@@ -1,8 +1,8 @@
 import {
     TestComponent,
     query,
-    prop,
     assert,
+    evaluate,
 } from 'jezve-test';
 import { ImportCondition } from '../../../model/ImportCondition.js';
 import { App } from '../../../Application.js';
@@ -25,14 +25,18 @@ export class ImportConditionItem extends TestComponent {
             'Invalid structure of condition item',
         );
 
-        res.propertyTitle.value = await prop(res.propertyTitle.elem, 'textContent');
-        res.operatorTitle.value = await prop(res.operatorTitle.elem, 'textContent');
-        if (res.valueTitle.elem) {
-            res.valueTitle.value = await prop(res.valueTitle.elem, 'textContent');
-        }
-        if (res.valuePropTitle.elem) {
-            res.valuePropTitle.value = await prop(res.valuePropTitle.elem, 'textContent');
-        }
+        [
+            res.propertyTitle.value,
+            res.operatorTitle.value,
+            res.valueTitle.value,
+            res.valuePropTitle.value,
+        ] = await evaluate(
+            (...elems) => elems.map((el) => el?.textContent),
+            res.propertyTitle.elem,
+            res.operatorTitle.elem,
+            res.valueTitle.elem,
+            res.valuePropTitle.elem,
+        );
 
         return res;
     }
