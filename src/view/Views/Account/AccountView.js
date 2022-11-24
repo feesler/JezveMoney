@@ -22,6 +22,8 @@ import { AccountList } from '../../js/model/AccountList.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
+import '../../Components/Heading/style.scss';
+import './style.scss';
 import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
 
