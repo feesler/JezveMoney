@@ -30,7 +30,10 @@ import './style.scss';
 import { SearchInput } from '../../Components/SearchInput/SearchInput.js';
 import { createStore } from '../../js/store.js';
 import { reducer, actions, isSameSelection } from './reducer.js';
+import { Heading } from '../../Components/Heading/Heading.js';
 
+/* Strings */
+const STR_TITLE = 'Transactions';
 const PAGE_TITLE = 'Jezve Money | Transactions';
 const MSG_SET_POS_FAIL = 'Fail to change position of transaction.';
 const TITLE_SINGLE_TRANS_DELETE = 'Delete transaction';
@@ -89,6 +92,10 @@ class TransactionListView extends View {
      * View initialization
      */
     onStart() {
+        this.heading = Heading.fromElement(ge('heading'), {
+            title: STR_TITLE,
+        });
+
         const collapse = new Collapsible({
             header: [ge('filtershdr')],
             content: ge('filters'),

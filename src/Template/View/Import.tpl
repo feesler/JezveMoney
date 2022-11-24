@@ -10,7 +10,7 @@ include(TPL_PATH . "Header.tpl");    ?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
-                    <div class="heading">
+                    <div id="heading" class="heading">
                         <h1>Import</h1>
                     </div>
 
@@ -46,7 +46,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                                     <span id="selectedCount" class="counter__value">0</span>
                                 </div>
                             </div>
-                            <button id="submitbtn" class="btn submit-btn" type="button" disabled>Submit</button>
+                            <button id="submitBtn" class="btn submit-btn" type="button" disabled>Submit</button>
                         </div>
                     </div>
 

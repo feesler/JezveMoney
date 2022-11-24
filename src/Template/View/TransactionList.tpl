@@ -12,7 +12,7 @@ include(TPL_PATH . "Header.tpl"); ?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
-                    <div class="heading">
+                    <div id="heading" class="heading">
                         <h1>Transactions</h1>
                         <div class="heading-actions">
                             <?= IconButton::render([

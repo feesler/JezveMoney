@@ -21,8 +21,10 @@ import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndic
 import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
 import './style.scss';
+import { Heading } from '../../Components/Heading/Heading.js';
 
 /** Strings */
+const STR_TITLE = 'Accounts';
 const TITLE_SINGLE_ACC_DELETE = 'Delete account';
 const TITLE_MULTI_ACC_DELETE = 'Delete accounts';
 const MSG_MULTI_ACC_DELETE = 'Are you sure want to delete selected accounts?<br>All income and expense transactions history will be lost. Transfer to this accounts will be changed to expense. Transfer from this accounts will be changed to income.';
@@ -87,7 +89,7 @@ class AccountListView extends View {
             'hiddenCount',
             'selectedCounter',
             'selItemsCount',
-            'visibleTilesHeading',
+            'heading',
             'hiddenTilesHeading',
         ];
         elemIds.forEach((id) => {
@@ -95,6 +97,10 @@ class AccountListView extends View {
             if (!this[id]) {
                 throw new Error('Failed to initialize view');
             }
+        });
+
+        this.heading = Heading.fromElement(this.heading, {
+            title: STR_TITLE,
         });
 
         this.visibleTiles = ListContainer.create(listProps);

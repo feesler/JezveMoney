@@ -11,7 +11,7 @@ include(TPL_PATH . "Header.tpl");    ?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
-                    <div class="heading">
+                    <div id="heading" class="heading">
                         <h1>Statistics</h1>
                     </div>
 

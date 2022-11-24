@@ -72,7 +72,7 @@ export class ImportView extends AppView {
             totalCounter: await Counter.create(this, await query('#itemsCounter')),
             enabledCounter: await Counter.create(this, await query('#enabledCounter')),
             selectedCounter: await Counter.create(this, await query('#selectedCounter')),
-            submitBtn: { elem: await query('#submitbtn') },
+            submitBtn: { elem: await query('#submitBtn') },
         };
 
         Object.keys(res).forEach((child) => (

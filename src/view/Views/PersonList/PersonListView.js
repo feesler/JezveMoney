@@ -18,8 +18,10 @@ import { Tile } from '../../Components/Tile/Tile.js';
 import './style.scss';
 import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
+import { Heading } from '../../Components/Heading/Heading.js';
 
 /** Strings */
+const STR_TITLE = 'Persons';
 const TITLE_SINGLE_PERSON_DELETE = 'Delete person';
 const TITLE_MULTI_PERSON_DELETE = 'Delete persons';
 const MSG_MULTI_PERSON_DELETE = 'Are you sure want to delete selected persons?<br>Debt operations will be converted into expense or income.';
@@ -83,7 +85,7 @@ class PersonListView extends View {
             'hiddenCount',
             'selectedCounter',
             'selItemsCount',
-            'visibleTilesHeading',
+            'heading',
             'hiddenTilesHeading',
         ];
         elemIds.forEach((id) => {
@@ -91,6 +93,10 @@ class PersonListView extends View {
             if (!this[id]) {
                 throw new Error('Failed to initialize view');
             }
+        });
+
+        this.heading = Heading.fromElement(this.heading, {
+            title: STR_TITLE,
         });
 
         this.visibleTiles = ListContainer.create(listProps);

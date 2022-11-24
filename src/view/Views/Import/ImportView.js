@@ -16,6 +16,7 @@ import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Sortable } from 'jezvejs/Sortable';
 import { timestampFromString } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
+import { API } from '../../js/api/index.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
@@ -28,8 +29,8 @@ import { ImportUploadDialog } from '../../Components/Import/UploadDialog/Dialog/
 import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from '../../Components/Import/RulesDialog/Dialog/ImportRulesDialog.js';
 import { ImportTransactionForm } from '../../Components/Import/TransactionForm/ImportTransactionForm.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { API } from '../../js/api/index.js';
 import { ImportTransactionItem } from '../../Components/Import/TransactionItem/ImportTransactionItem.js';
+import { Heading } from '../../Components/Heading/Heading.js';
 import { createStore } from '../../js/store.js';
 import { actions, reducer, getPageIndex } from './reducer.js';
 
@@ -100,24 +101,25 @@ class ImportView extends View {
             return;
         }
 
-        this.heading = document.querySelector('.heading');
-        this.submitBtn = ge('submitbtn');
-        this.itemsCount = ge('itemsCount');
-        this.enabledCount = ge('enabledCount');
-        this.selectedCounter = ge('selectedCounter');
-        this.selectedCount = ge('selectedCount');
-        this.rowsContainer = ge('rowsContainer');
-        if (
-            !this.heading
-            || !this.submitBtn
-            || !this.itemsCount
-            || !this.enabledCount
-            || !this.selectedCounter
-            || !this.selectedCount
-            || !this.rowsContainer
-        ) {
-            throw new Error('Failed to initialize Import view');
-        }
+        const elemIds = [
+            'heading',
+            'submitBtn',
+            'itemsCount',
+            'enabledCount',
+            'selectedCounter',
+            'selectedCount',
+            'rowsContainer',
+        ];
+        elemIds.forEach((id) => {
+            this[id] = ge(id);
+            if (!this[id]) {
+                throw new Error('Failed to initialize view');
+            }
+        });
+
+        this.heading = Heading.fromElement(this.heading, {
+            title: STR_TITLE,
+        });
 
         setEvents(this.rowsContainer, { click: (e) => this.onItemClick(e) });
         setEvents(this.submitBtn, { click: () => this.onSubmitClick() });
@@ -164,29 +166,10 @@ class ImportView extends View {
             throw new Error('Invalid selection data');
         }
 
-        this.createHeadingObserver();
         this.createContextMenu();
 
         this.setMainAccount(selectedAccount.id);
         this.setRenderTime();
-    }
-
-    createHeadingObserver() {
-        const options = {
-            root: null,
-            rootMargin: '-50px',
-            threshold: 0,
-        };
-        const observer = new IntersectionObserver((entries) => {
-            const [entry] = entries;
-            if (entry.target !== this.heading) {
-                return;
-            }
-
-            this.header.setTitle(entry.isIntersecting ? null : STR_TITLE);
-        }, options);
-
-        observer.observe(this.heading);
     }
 
     createSortable(state) {

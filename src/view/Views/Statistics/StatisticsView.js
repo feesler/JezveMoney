@@ -29,6 +29,7 @@ import {
 } from './reducer.js';
 import './style.scss';
 import { correct, formatValue } from '../../js/utils.js';
+import { Heading } from '../../Components/Heading/Heading.js';
 
 /** CSS classes */
 /* Chart popup */
@@ -44,6 +45,7 @@ const LEGEND_ITEM_CAT_CLASS = 'chart-legend__item-cat-';
 const LEGEND_ITEM_TITLE_CLASS = 'chart-legend__item-title';
 
 /** Strings */
+const STR_TITLE = 'Statistics';
 const PAGE_TITLE = 'Jezve Money | Statistics';
 /* Date range input */
 const START_DATE_PLACEHOLDER = 'From';
@@ -95,6 +97,10 @@ class StatisticsView extends View {
      */
     onStart() {
         const state = this.store.getState();
+
+        this.heading = Heading.fromElement(ge('heading'), {
+            title: STR_TITLE,
+        });
 
         const chartElem = ge('chart');
         this.noDataMessage = chartElem.querySelector('.nodata-message');
