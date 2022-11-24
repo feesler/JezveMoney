@@ -37,7 +37,6 @@ const modeButtons = {
 
 const menuItems = [
     'createItemBtn',
-    'listModeBtn',
     'selectModeBtn',
     'sortModeBtn',
     'selectAllBtn',
@@ -86,6 +85,7 @@ export class ImportView extends AppView {
         res.title.value = await prop(res.title.elem, 'textContent');
         res.submitBtn.disabled = await prop(res.submitBtn.elem, 'disabled');
         res.uploadBtn.content.disabled = await hasAttr(res.uploadBtn.elem, 'disabled');
+        res.listModeBtn = await IconButton.create(this, await query('#listModeBtn'));
 
         // Main account select
         if (importEnabled) {
@@ -203,12 +203,12 @@ export class ImportView extends AppView {
             notAvailMsg: { visible: !model.enabled },
             listMenuContainer: { visible: model.enabled },
             listMenu: { visible: showMenuItems },
-            uploadBtn: { visible: model.enabled, disabled: !model.enabled },
+            uploadBtn: { visible: model.enabled && listMode, disabled: !model.enabled },
             title: { value: model.title.toString(), visible: true },
             totalCounter: { visible: model.enabled },
             enabledCounter: { visible: model.enabled },
             selectedCounter: { visible: model.enabled && selectMode },
-            submitBtn: { visible: model.enabled },
+            submitBtn: { visible: model.enabled && listMode },
         };
 
         if (!model.enabled) {
@@ -220,6 +220,8 @@ export class ImportView extends AppView {
         const hasEnabled = (selectMode) ? selectedItems.some((item) => item.enabled) : false;
         const hasDisabled = (selectMode) ? selectedItems.some((item) => !item.enabled) : false;
 
+        res.listModeBtn = { visible: !listMode };
+
         // Counters
         res.totalCounter.value = this.items.length;
         res.enabledCounter.value = enabledItems.length;
@@ -227,7 +229,6 @@ export class ImportView extends AppView {
 
         // Main menu
         res.createItemBtn = { visible: showListItems };
-        res.listModeBtn = { visible: showMenuItems && !listMode };
         res.selectModeBtn = { visible: showListItems && hasItems };
         res.sortModeBtn = { visible: showListItems && this.items.length > 1 };
 
@@ -244,7 +245,7 @@ export class ImportView extends AppView {
         res.similarCheck = { checked: model.checkSimilarEnabled, visible: showListItems };
         res.rulesBtn = { visible: showListItems };
 
-        res.mainAccountSelect = { value: model.mainAccount.toString(), visible: true };
+        res.mainAccountSelect = { value: model.mainAccount.toString(), visible: listMode };
         res.itemsList = { visible: true };
         res.submitBtn.disabled = !hasItems || !this.items.some((item) => item.enabled);
 
@@ -378,7 +379,7 @@ export class ImportView extends AppView {
         return this.checkState(expected);
     }
 
-    async openActionsMenu() {
+    async openListMenu() {
         if (this.model.menuOpen) {
             return true;
         }
@@ -439,7 +440,7 @@ export class ImportView extends AppView {
             );
         });
 
-        await this.openActionsMenu();
+        await this.openListMenu();
 
         this.model.rulesEnabled = !this.model.rulesEnabled;
         this.model.menuOpen = false;
@@ -460,7 +461,7 @@ export class ImportView extends AppView {
             enable ? 'Already enabled' : 'Already disabled',
         );
 
-        await this.openActionsMenu();
+        await this.openListMenu();
 
         const skipList = [];
         this.model.checkSimilarEnabled = enable;
@@ -821,7 +822,7 @@ export class ImportView extends AppView {
 
     async launchRulesDialog() {
         this.checkMainState();
-        await this.openActionsMenu();
+        await this.openListMenu();
 
         await this.performAction(() => click(this.content.rulesBtn.elem));
         await this.performAction(() => wait(this.rulesPopupId, { visible: true }));
@@ -1037,7 +1038,7 @@ export class ImportView extends AppView {
 
     async addItem() {
         this.checkMainState();
-        await this.openActionsMenu();
+        await this.openListMenu();
 
         const addAction = () => this.performAction(() => this.content.createItemBtn.click());
         const isValid = await this.validateSaveForm(addAction);
@@ -1200,7 +1201,9 @@ export class ImportView extends AppView {
             `Can't change list mode from ${this.model.listMode} to ${listMode}.`,
         );
 
-        await this.openActionsMenu();
+        if (listMode === 'list') {
+            await this.openListMenu();
+        }
 
         this.items.forEach((_, ind) => {
             const item = this.items[ind];
@@ -1263,7 +1266,7 @@ export class ImportView extends AppView {
         assert(this.itemsList, 'No items available');
 
         await this.setSelectMode();
-        await this.openActionsMenu();
+        await this.openListMenu();
 
         this.items.forEach((_, ind) => {
             const item = this.items[ind];
@@ -1284,7 +1287,7 @@ export class ImportView extends AppView {
         assert(this.itemsList, 'No items available');
 
         await this.setSelectMode();
-        await this.openActionsMenu();
+        await this.openListMenu();
 
         this.items.forEach((_, ind) => {
             const item = this.items[ind];
@@ -1305,7 +1308,7 @@ export class ImportView extends AppView {
         assert(this.itemsList, 'No items available');
         this.checkSelectMode();
 
-        await this.openActionsMenu();
+        await this.openListMenu();
         const enable = !!value;
         const button = (enable) ? this.content.enableSelectedBtn : this.content.disableSelectedBtn;
 
@@ -1416,7 +1419,7 @@ export class ImportView extends AppView {
         assert(this.itemsList, 'No items available');
         this.checkSelectMode();
 
-        await this.openActionsMenu();
+        await this.openListMenu();
 
         const selectedIndexes = [];
         this.items.forEach((item, ind) => {
@@ -1447,7 +1450,7 @@ export class ImportView extends AppView {
 
     async deleteAllItems() {
         this.checkMainState();
-        await this.openActionsMenu();
+        await this.openListMenu();
 
         this.items = [];
         this.formIndex = -1;

@@ -159,6 +159,10 @@ label {
   }
 }
 
+.iconbutton.no-icon .iconbutton__icon {
+  display: none;
+}
+
 /* Centered block */
 .centered {
   margin: 0 auto;

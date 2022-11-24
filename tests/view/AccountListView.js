@@ -37,6 +37,7 @@ export class AccountListView extends AppView {
         const res = {
             title: { elem: await query('.content_wrap > .heading > h1') },
             addBtn: await IconButton.create(this, await query('#add_btn')),
+            listModeBtn: await IconButton.create(this, await query('#listModeBtn')),
             listMenuContainer: {
                 elem: await query('#listMenu'),
                 menuBtn: await query('#listMenu .popup-menu-btn'),
@@ -96,7 +97,7 @@ export class AccountListView extends AppView {
             return 'nodata';
         }
 
-        if (cont.selectModeBtn.title === 'Done') {
+        if (!cont.addBtn.content.visible) {
             return 'select';
         }
 
@@ -123,16 +124,19 @@ export class AccountListView extends AppView {
         const visibleSelected = this.getSelectedItems(model);
         const hiddenSelected = this.getHiddenSelectedItems(model);
         const totalSelected = visibleSelected.length + hiddenSelected.length;
+        const isListMode = model.mode === 'list';
         const showSelectItems = model.listMenuVisible && model.mode === 'select';
 
         const res = {
+            addBtn: { visible: isListMode },
+            listModeBtn: { visible: !isListMode },
             loadingIndicator: { visible: model.loading },
             totalCounter: { visible: true, value: itemsCount },
             hiddenCounter: { visible: true, value: model.hiddenTiles.length },
             selectedCounter: { visible: model.mode === 'select', value: totalSelected },
             listMenuContainer: { visible: itemsCount > 0 },
             listMenu: { visible: model.listMenuVisible },
-            selectModeBtn: { visible: model.listMenuVisible },
+            selectModeBtn: { visible: model.listMenuVisible && isListMode },
             selectAllBtn: {
                 visible: showSelectItems && itemsCount > 0 && totalSelected < itemsCount,
             },
@@ -254,14 +258,18 @@ export class AccountListView extends AppView {
     }
 
     async toggleSelectMode() {
-        await this.openListMenu();
+        const isListMode = (this.model.mode === 'list');
+        if (isListMode) {
+            await this.openListMenu();
+        }
 
         this.model.listMenuVisible = false;
-        this.model.mode = (this.model.mode === 'select') ? 'list' : 'select';
+        this.model.mode = (isListMode) ? 'select' : 'list';
         this.onDeselectAll();
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.selectModeBtn.click());
+        const buttonName = (isListMode) ? 'selectModeBtn' : 'listModeBtn';
+        await this.performAction(() => this.content[buttonName].click());
 
         return this.checkState(expected);
     }

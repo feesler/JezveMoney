@@ -103,6 +103,7 @@ class ImportView extends View {
 
         const elemIds = [
             'heading',
+            'dataHeaderControls',
             'submitBtn',
             'itemsCount',
             'enabledCount',
@@ -135,8 +136,16 @@ class ImportView extends View {
             onClick: () => this.showUploadDialog(),
         });
 
+        this.listModeBtn = IconButton.create({
+            id: 'listModeBtn',
+            className: 'no-icon',
+            title: 'Done',
+            onClick: () => this.setListMode('list'),
+        });
+        insertAfter(this.listModeBtn.elem, this.uploadBtn.elem);
+
         this.createMenu();
-        insertAfter(this.menu.elem, this.uploadBtn.elem);
+        insertAfter(this.menu.elem, this.listModeBtn.elem);
 
         // Submit progress indicator
         this.submitProgress = LoadingIndicator.create({ title: 'Saving items...' });
@@ -197,11 +206,8 @@ class ImportView extends View {
                 title: 'Add item',
                 onClick: () => this.createItem(),
             }, {
+                id: 'separator1',
                 type: 'separator',
-            }, {
-                id: 'listModeBtn',
-                title: 'Done',
-                onClick: () => this.setListMode('list'),
             }, {
                 id: 'selectModeBtn',
                 icon: 'select',
@@ -256,6 +262,7 @@ class ImportView extends View {
                 title: 'Edit rules',
                 onClick: () => this.onRulesClick(),
             }, {
+                id: 'separator4',
                 type: 'separator',
             }, {
                 id: 'similarCheck',
@@ -856,15 +863,20 @@ class ImportView extends View {
         const hasEnabled = selectedItems.some((item) => item.enabled);
         const hasDisabled = selectedItems.some((item) => !item.enabled);
 
+        this.uploadBtn.show(isListMode);
+        this.listModeBtn.show(!isListMode);
+        show(this.dataHeaderControls, isListMode);
+
         const { items } = this.menu;
 
         items.createItemBtn.show(isListMode);
+        show(items.separator1, isListMode);
 
-        items.listModeBtn.show(!isListMode);
         items.selectModeBtn.show(isListMode && hasItems);
         items.sortModeBtn.show(isListMode && state.items.length > 1);
-        show(items.separator2, isSelectMode);
-        show(items.separator3, isSelectMode);
+        show(items.separator2, isListMode);
+        show(items.separator3, isListMode);
+        show(items.separator4, isListMode);
 
         items.selectAllBtn.show(isSelectMode && selectedItems.length < state.items.length);
         items.deselectAllBtn.show(isSelectMode && selectedItems.length > 0);

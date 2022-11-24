@@ -6,6 +6,7 @@ import {
     show,
     urlJoin,
 } from 'jezvejs';
+import { IconButton } from 'jezvejs/IconButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
@@ -110,8 +111,17 @@ class AccountListView extends View {
         insertAfter(this.hiddenTiles.elem, this.hiddenTilesHeading);
 
         this.createBtn = ge('add_btn');
+
+        this.listModeBtn = IconButton.create({
+            id: 'listModeBtn',
+            className: 'no-icon',
+            title: 'Done',
+            onClick: () => this.toggleSelectMode(),
+        });
+        insertAfter(this.listModeBtn.elem, this.createBtn);
+
         this.createMenu();
-        insertAfter(this.menu.elem, this.createBtn);
+        insertAfter(this.menu.elem, this.listModeBtn.elem);
 
         this.createContextMenu();
 
@@ -129,9 +139,6 @@ class AccountListView extends View {
                 icon: 'select',
                 title: 'Select',
                 onClick: () => this.toggleSelectMode(),
-            }, {
-                id: 'separator1',
-                type: 'separator',
             }, {
                 id: 'selectAllBtn',
                 title: 'Select all',
@@ -380,13 +387,13 @@ class AccountListView extends View {
         const totalSelCount = selCount + hiddenSelCount;
         const isSelectMode = (state.listMode === 'select');
 
+        show(this.createBtn, !isSelectMode);
+        this.listModeBtn.show(isSelectMode);
+
         this.menu.show(itemsCount > 0);
         const { items } = this.menu;
 
-        const selectModeTitle = (isSelectMode) ? 'Done' : 'Select';
-        items.selectModeBtn.setTitle(selectModeTitle);
-        items.selectModeBtn.setIcon((isSelectMode) ? null : 'select');
-        show(items.separator1, isSelectMode);
+        items.selectModeBtn.show(!isSelectMode);
 
         items.selectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount);
         items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount > 0);

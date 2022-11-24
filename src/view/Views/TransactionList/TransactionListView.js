@@ -213,8 +213,17 @@ class TransactionListView extends View {
         listFooter.append(this.paginator.elem);
 
         this.createBtn = ge('add_btn');
+
+        this.listModeBtn = IconButton.create({
+            id: 'listModeBtn',
+            className: 'no-icon',
+            title: 'Done',
+            onClick: () => this.setListMode('list'),
+        });
+        insertAfter(this.listModeBtn.elem, this.createBtn);
+
         this.createMenu();
-        insertAfter(this.menu.elem, this.createBtn);
+        insertAfter(this.menu.elem, this.listModeBtn.elem);
 
         this.createContextMenu();
 
@@ -225,10 +234,6 @@ class TransactionListView extends View {
         this.menu = PopupMenu.create({
             id: 'listMenu',
             items: [{
-                id: 'listModeBtn',
-                title: 'Done',
-                onClick: () => this.setListMode('list'),
-            }, {
                 id: 'selectModeBtn',
                 icon: 'select',
                 title: 'Select',
@@ -588,10 +593,12 @@ class TransactionListView extends View {
         const selectedItems = this.list.getSelectedItems();
         const totalSelCount = selectedItems.length;
 
+        show(this.createBtn, isListMode);
+        this.listModeBtn.show(!isListMode);
+
         this.menu.show(itemsCount > 0);
 
         const { items } = this.menu;
-        items.listModeBtn.show(!isListMode);
         items.selectModeBtn.show(isListMode && itemsCount > 0);
         items.sortModeBtn.show(isListMode && itemsCount > 1);
 

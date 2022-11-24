@@ -22,7 +22,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                     <?php   }   ?>
 
                     <div class="content-header" <?= hidden(!$importAvailable) ?>>
-                        <div class="data-header">
+                        <div id="dataHeaderControls" class="data-header">
                             <div class="header-field account-field">
                                 <label>Main account</label>
                                 <div class="header-field__content">

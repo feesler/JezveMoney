@@ -36,7 +36,6 @@ const modeButtons = {
 };
 
 const listMenuItems = [
-    'listModeBtn',
     'selectModeBtn',
     'sortModeBtn',
     'selectAllBtn',
@@ -57,6 +56,7 @@ export class TransactionListView extends AppView {
         const res = {
             title: { elem: await query('.content_wrap > .heading > h1') },
             addBtn: await IconButton.create(this, await query('#add_btn')),
+            listModeBtn: await IconButton.create(this, await query('#listModeBtn')),
             listMenuContainer: {
                 elem: await query('#listMenu'),
                 menuBtn: await query('#listMenu .popup-menu-btn'),
@@ -391,11 +391,10 @@ export class TransactionListView extends AppView {
             showMoreBtn: { visible: isItemsAvailable && model.list.page < model.list.pages },
             paginator: { visible: isItemsAvailable },
             transList: { visible: true },
+            addBtn: { visible: listMode },
+            listModeBtn: { visible: !listMode },
             listMenuContainer: { visible: isItemsAvailable },
             listMenu: { visible: model.listMenuVisible },
-            listModeBtn: {
-                visible: model.listMenuVisible && !listMode,
-            },
             selectModeBtn: {
                 visible: model.listMenuVisible && listMode && isItemsAvailable,
             },
@@ -480,7 +479,9 @@ export class TransactionListView extends AppView {
             `Can't change list mode from ${this.model.listMode} to ${listMode}.`,
         );
 
-        await this.openListMenu();
+        if (listMode === 'list') {
+            await this.openListMenu();
+        }
 
         this.model.listMenuVisible = false;
         this.model.listMode = listMode;
