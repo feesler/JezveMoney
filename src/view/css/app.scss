@@ -4,7 +4,7 @@
   --accent-color: #0072c6;
   --accent-color-alt: #20a0ff;
   --accent-hover-color: #1e82cc;
-  --action-btn-border-radius: 5px;
+  --action-btn-border-radius: 6px;
   --focus-shadow: 0 0 0 0.25rem #0d6efd40;
   --input-height: 37px;
 }
@@ -263,7 +263,7 @@ label {
   color: #ffffff;
   text-decoration: none;
   border: 0 none;
-  padding: 4px 22px;
+  padding: 6px 24px;
   vertical-align: middle;
   overflow: visible;
   border-radius: 0;
@@ -400,6 +400,13 @@ label {
   white-space: nowrap;
   color: #000000;
   background-color: #d0d0d0;
+}
+
+/* Focused Checkbox, Radio, Switch */
+.checkbox input:focus-visible + .checkbox__check,
+.radio input:focus-visible + .radio__check {
+  outline-width: 0;
+  box-shadow: var(--focus-shadow);
 }
 
 /* DropDown */
