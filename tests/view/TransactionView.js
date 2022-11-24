@@ -5,6 +5,7 @@ import {
     prop,
     navigation,
     click,
+    asyncMap,
 } from 'jezve-test';
 import { IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -35,14 +36,24 @@ import {
 } from '../model/Transaction.js';
 import { App } from '../Application.js';
 
+const infoItemSelectors = [
+    '#src_amount_left',
+    '#dest_amount_left',
+    '#src_res_balance_left',
+    '#dest_res_balance_left',
+    '#exch_left',
+];
+const inputRowSelectors = [
+    '#src_amount_row',
+    '#dest_amount_row',
+    '#exchange',
+    '#result_balance',
+    '#result_balance_dest',
+    '#comment_row',
+];
+
 /** Create or update transaction view class */
 export class TransactionView extends AppView {
-    constructor(...args) {
-        super(...args);
-
-        this.expectedState = {};
-    }
-
     async parseContent() {
         const res = {};
 
@@ -106,20 +117,30 @@ export class TransactionView extends AppView {
             res.destination.content.id = parseInt(await prop(destIdInp, 'value'), 10);
         }
 
-        res.src_amount_left = await TileInfoItem.create(this, await query('#src_amount_left'));
-        res.dest_amount_left = await TileInfoItem.create(this, await query('#dest_amount_left'));
-        res.src_res_balance_left = await TileInfoItem.create(this, await query('#src_res_balance_left'));
-        res.dest_res_balance_left = await TileInfoItem.create(this, await query('#dest_res_balance_left'));
-        res.exch_left = await TileInfoItem.create(this, await query('#exch_left'));
+        [
+            res.src_amount_left,
+            res.dest_amount_left,
+            res.src_res_balance_left,
+            res.dest_res_balance_left,
+            res.exch_left,
+        ] = await asyncMap(
+            infoItemSelectors,
+            async (selector) => TileInfoItem.create(this, await query(selector)),
+        );
 
-        res.src_amount_row = await InputRow.create(this, await query('#src_amount_row'));
-        res.dest_amount_row = await InputRow.create(this, await query('#dest_amount_row'));
-        res.exchange_row = await InputRow.create(this, await query('#exchange'));
-        res.result_balance_row = await InputRow.create(this, await query('#result_balance'));
-        res.result_balance_dest_row = await InputRow.create(this, await query('#result_balance_dest'));
+        [
+            res.src_amount_row,
+            res.dest_amount_row,
+            res.exchange_row,
+            res.result_balance_row,
+            res.result_balance_dest_row,
+            res.comment_row,
+        ] = await asyncMap(
+            inputRowSelectors,
+            async (selector) => InputRow.create(this, await query(selector)),
+        );
 
         res.datePicker = await DatePickerRow.create(this, await query('#date_row'));
-        res.comment_row = await InputRow.create(this, await query('#comment_row'));
 
         res.submitBtn = await query('#submitBtn');
         assert(res.submitBtn, 'Submit button not found');
@@ -421,9 +442,9 @@ export class TransactionView extends AppView {
         return res;
     }
 
-    setExpectedState(stateId) {
-        const newState = parseInt(stateId, 10);
-        assert(!Number.isNaN(newState), 'Invalid state specified');
+    getExpectedState() {
+        const state = parseInt(this.model.state, 10);
+        assert(!Number.isNaN(state), 'Invalid state specified');
 
         const res = {
             typeMenu: { value: this.model.type },
@@ -550,10 +571,10 @@ export class TransactionView extends AppView {
         }
 
         if (this.model.type === EXPENSE) {
-            assert(newState >= -1 && newState <= 4, 'Invalid state specified');
+            assert(state >= -1 && state <= 4, 'Invalid state specified');
 
             if (this.model.isAvailable) {
-                if (newState === 0 || newState === 1) {
+                if (state === 0 || state === 1) {
                     res.src_amount_row.label = 'Amount';
                     res.dest_amount_row.label = 'Amount';
                 } else {
@@ -568,7 +589,7 @@ export class TransactionView extends AppView {
             res.dest_res_balance_left.visible = false;
             res.result_balance_dest_row.visible = false;
 
-            if (newState === -1) {
+            if (state === -1) {
                 res.dest_amount_left.visible = false;
                 res.src_res_balance_left.visible = false;
                 res.exch_left.visible = false;
@@ -576,7 +597,7 @@ export class TransactionView extends AppView {
                 res.dest_amount_row.visible = false;
                 res.exchange_row.visible = false;
                 res.result_balance_row.visible = false;
-            } else if (newState === 0) {
+            } else if (state === 0) {
                 res.dest_amount_left.visible = false;
                 res.src_res_balance_left.visible = true;
                 res.exch_left.visible = false;
@@ -584,7 +605,7 @@ export class TransactionView extends AppView {
                 res.dest_amount_row.visible = true;
                 res.exchange_row.visible = false;
                 res.result_balance_row.visible = false;
-            } else if (newState === 1) {
+            } else if (state === 1) {
                 res.dest_amount_left.visible = true;
                 res.src_res_balance_left.visible = false;
                 res.exch_left.visible = false;
@@ -592,7 +613,7 @@ export class TransactionView extends AppView {
                 res.dest_amount_row.visible = false;
                 res.exchange_row.visible = false;
                 res.result_balance_row.visible = true;
-            } else if (newState === 2) {
+            } else if (state === 2) {
                 res.dest_amount_left.visible = false;
                 res.src_res_balance_left.visible = true;
                 res.exch_left.visible = true;
@@ -600,7 +621,7 @@ export class TransactionView extends AppView {
                 res.dest_amount_row.visible = true;
                 res.exchange_row.visible = false;
                 res.result_balance_row.visible = false;
-            } else if (newState === 3) {
+            } else if (state === 3) {
                 res.dest_amount_left.visible = true;
                 res.src_res_balance_left.visible = true;
                 res.exch_left.visible = false;
@@ -608,7 +629,7 @@ export class TransactionView extends AppView {
                 res.dest_amount_row.visible = false;
                 res.exchange_row.visible = true;
                 res.result_balance_row.visible = false;
-            } else if (newState === 4) {
+            } else if (state === 4) {
                 res.dest_amount_left.visible = true;
                 res.src_res_balance_left.visible = false;
                 res.exch_left.visible = true;
@@ -620,12 +641,12 @@ export class TransactionView extends AppView {
         }
 
         if (this.model.type === INCOME) {
-            assert(newState >= -1 && newState <= 4, 'Invalid state specified');
+            assert(state >= -1 && state <= 4, 'Invalid state specified');
 
             if (this.model.isAvailable) {
                 res.result_balance_dest_row.label = 'Result balance';
 
-                if (newState === 0 || newState === 1) {
+                if (state === 0 || state === 1) {
                     res.src_amount_row.label = 'Amount';
                     res.dest_amount_row.label = 'Amount';
                 } else {
@@ -637,7 +658,7 @@ export class TransactionView extends AppView {
             res.dest_res_balance_left.visible = false;
             res.result_balance_dest_row.visible = false;
 
-            if (newState === -1) {
+            if (state === -1) {
                 res.src_amount_left.visible = false;
                 res.dest_amount_left.visible = false;
                 res.dest_res_balance_left.visible = false;
@@ -646,7 +667,7 @@ export class TransactionView extends AppView {
                 res.dest_amount_row.visible = false;
                 res.result_balance_dest_row.visible = false;
                 res.exchange_row.visible = false;
-            } else if (newState === 0) {
+            } else if (state === 0) {
                 res.src_amount_left.visible = false;
                 res.dest_amount_left.visible = false;
                 res.dest_res_balance_left.visible = true;
@@ -655,7 +676,7 @@ export class TransactionView extends AppView {
                 res.dest_amount_row.visible = false;
                 res.result_balance_dest_row.visible = false;
                 res.exchange_row.visible = false;
-            } else if (newState === 1) {
+            } else if (state === 1) {
                 res.src_amount_left.visible = true;
                 res.dest_amount_left.visible = false;
                 res.dest_res_balance_left.visible = false;
@@ -664,7 +685,7 @@ export class TransactionView extends AppView {
                 res.dest_amount_row.visible = false;
                 res.result_balance_dest_row.visible = true;
                 res.exchange_row.visible = false;
-            } else if (newState === 2) {
+            } else if (state === 2) {
                 res.src_amount_left.visible = false;
                 res.dest_amount_left.visible = false;
                 res.dest_res_balance_left.visible = true;
@@ -673,7 +694,7 @@ export class TransactionView extends AppView {
                 res.dest_amount_row.visible = true;
                 res.exchange_row.visible = false;
                 res.result_balance_dest_row.visible = false;
-            } else if (newState === 3) {
+            } else if (state === 3) {
                 res.src_amount_left.visible = false;
                 res.dest_amount_left.visible = true;
                 res.dest_res_balance_left.visible = true;
@@ -682,7 +703,7 @@ export class TransactionView extends AppView {
                 res.dest_amount_row.visible = false;
                 res.exchange_row.visible = true;
                 res.result_balance_dest_row.visible = false;
-            } else if (newState === 4) {
+            } else if (state === 4) {
                 res.src_amount_left.visible = false;
                 res.dest_amount_left.visible = true;
                 res.dest_res_balance_left.visible = false;
@@ -695,13 +716,13 @@ export class TransactionView extends AppView {
         }
 
         if (this.model.type === TRANSFER) {
-            assert(newState >= -1 && newState <= 8, 'Invalid state specified');
+            assert(state >= -1 && state <= 8, 'Invalid state specified');
 
             if (this.model.isAvailable) {
                 res.result_balance_row.label = 'Result balance (Source)';
                 res.result_balance_dest_row.label = 'Result balance (Destination)';
 
-                if (newState === 0 || newState === 1 || newState === 2) {
+                if (state === 0 || state === 1 || state === 2) {
                     res.src_amount_row.label = 'Amount';
                     res.dest_amount_row.label = 'Amount';
                 } else {
@@ -710,7 +731,7 @@ export class TransactionView extends AppView {
                 }
             }
 
-            if (newState === -1) {
+            if (state === -1) {
                 res.src_amount_left.visible = false;
                 res.dest_amount_left.visible = false;
                 res.src_res_balance_left.visible = false;
@@ -721,7 +742,7 @@ export class TransactionView extends AppView {
                 res.result_balance_row.visible = false;
                 res.result_balance_dest_row.visible = false;
                 res.exchange_row.visible = false;
-            } else if (newState === 0) {
+            } else if (state === 0) {
                 res.src_amount_left.visible = false;
                 res.dest_amount_left.visible = false;
                 res.src_res_balance_left.visible = true;
@@ -732,7 +753,7 @@ export class TransactionView extends AppView {
                 res.result_balance_row.visible = false;
                 res.result_balance_dest_row.visible = false;
                 res.exchange_row.visible = false;
-            } else if (newState === 1) {
+            } else if (state === 1) {
                 res.src_amount_left.visible = true;
                 res.dest_amount_left.visible = false;
                 res.src_res_balance_left.visible = false;
@@ -743,7 +764,7 @@ export class TransactionView extends AppView {
                 res.result_balance_row.visible = true;
                 res.result_balance_dest_row.visible = false;
                 res.exchange_row.visible = false;
-            } else if (newState === 2) {
+            } else if (state === 2) {
                 res.src_amount_left.visible = true;
                 res.dest_amount_left.visible = false;
                 res.src_res_balance_left.visible = true;
@@ -754,7 +775,7 @@ export class TransactionView extends AppView {
                 res.result_balance_row.visible = false;
                 res.result_balance_dest_row.visible = true;
                 res.exchange_row.visible = false;
-            } else if (newState === 3) {
+            } else if (state === 3) {
                 res.src_amount_left.visible = false;
                 res.dest_amount_left.visible = false;
                 res.src_res_balance_left.visible = true;
@@ -765,7 +786,7 @@ export class TransactionView extends AppView {
                 res.result_balance_row.visible = false;
                 res.result_balance_dest_row.visible = false;
                 res.exchange_row.visible = false;
-            } else if (newState === 4) {
+            } else if (state === 4) {
                 res.src_amount_left.visible = true;
                 res.dest_amount_left.visible = false;
                 res.src_res_balance_left.visible = false;
@@ -776,7 +797,7 @@ export class TransactionView extends AppView {
                 res.result_balance_row.visible = true;
                 res.result_balance_dest_row.visible = false;
                 res.exchange_row.visible = false;
-            } else if (newState === 5) {
+            } else if (state === 5) {
                 res.src_amount_left.visible = false;
                 res.dest_amount_left.visible = true;
                 res.src_res_balance_left.visible = true;
@@ -787,7 +808,7 @@ export class TransactionView extends AppView {
                 res.result_balance_row.visible = false;
                 res.result_balance_dest_row.visible = true;
                 res.exchange_row.visible = false;
-            } else if (newState === 6) {
+            } else if (state === 6) {
                 res.src_amount_left.visible = true;
                 res.dest_amount_left.visible = true;
                 res.src_res_balance_left.visible = false;
@@ -798,7 +819,7 @@ export class TransactionView extends AppView {
                 res.result_balance_row.visible = true;
                 res.result_balance_dest_row.visible = true;
                 res.exchange_row.visible = false;
-            } else if (newState === 7) {
+            } else if (state === 7) {
                 res.src_amount_left.visible = false;
                 res.dest_amount_left.visible = true;
                 res.src_res_balance_left.visible = true;
@@ -809,7 +830,7 @@ export class TransactionView extends AppView {
                 res.result_balance_row.visible = false;
                 res.result_balance_dest_row.visible = false;
                 res.exchange_row.visible = true;
-            } else if (newState === 8) {
+            } else if (state === 8) {
                 res.src_amount_left.visible = true;
                 res.dest_amount_left.visible = true;
                 res.src_res_balance_left.visible = false;
@@ -824,7 +845,7 @@ export class TransactionView extends AppView {
         }
 
         if (this.model.type === DEBT) {
-            assert(newState >= -1 && newState <= 9, 'Invalid state specified');
+            assert(state >= -1 && state <= 9, 'Invalid state specified');
 
             const { isAvailable, debtType, noAccount } = this.model;
             const userAccounts = App.state.getUserAccounts();
@@ -882,56 +903,56 @@ export class TransactionView extends AppView {
                 }
             }
 
-            if (newState === -1) {
+            if (state === -1) {
                 res.src_amount_row.visible = false;
                 res.src_amount_left.visible = false;
                 res.result_balance_row.visible = false;
                 res.src_res_balance_left.visible = false;
                 res.result_balance_dest_row.visible = false;
                 res.dest_res_balance_left.visible = false;
-            } else if (newState === 0 || newState === 3) {
+            } else if (state === 0 || state === 3) {
                 res.src_amount_row.visible = true;
                 res.src_amount_left.visible = false;
                 res.result_balance_row.visible = false;
                 res.src_res_balance_left.visible = true;
                 res.result_balance_dest_row.visible = false;
                 res.dest_res_balance_left.visible = true;
-            } else if (newState === 1 || newState === 5) {
+            } else if (state === 1 || state === 5) {
                 res.src_amount_row.visible = false;
                 res.src_amount_left.visible = true;
                 res.result_balance_row.visible = true;
                 res.src_res_balance_left.visible = false;
                 res.result_balance_dest_row.visible = false;
                 res.dest_res_balance_left.visible = true;
-            } else if (newState === 2 || newState === 4) {
+            } else if (state === 2 || state === 4) {
                 res.src_amount_row.visible = false;
                 res.src_amount_left.visible = true;
                 res.result_balance_row.visible = false;
                 res.src_res_balance_left.visible = true;
                 res.result_balance_dest_row.visible = true;
                 res.dest_res_balance_left.visible = false;
-            } else if (newState === 6) {
+            } else if (state === 6) {
                 res.src_amount_row.visible = true;
                 res.src_amount_left.visible = false;
                 res.result_balance_row.visible = false;
                 res.src_res_balance_left.visible = true;
                 res.result_balance_dest_row.visible = false;
                 res.dest_res_balance_left.visible = false;
-            } else if (newState === 7) {
+            } else if (state === 7) {
                 res.src_amount_row.visible = true;
                 res.src_amount_left.visible = false;
                 res.result_balance_row.visible = false;
                 res.src_res_balance_left.visible = false;
                 res.result_balance_dest_row.visible = false;
                 res.dest_res_balance_left.visible = true;
-            } else if (newState === 8) {
+            } else if (state === 8) {
                 res.src_amount_row.visible = false;
                 res.src_amount_left.visible = true;
                 res.result_balance_row.visible = false;
                 res.src_res_balance_left.visible = false;
                 res.result_balance_dest_row.visible = true;
                 res.dest_res_balance_left.visible = false;
-            } else if (newState === 9) {
+            } else if (state === 9) {
                 res.src_amount_row.visible = false;
                 res.src_amount_left.visible = true;
                 res.result_balance_row.visible = true;
@@ -940,8 +961,6 @@ export class TransactionView extends AppView {
                 res.dest_res_balance_left.visible = false;
             }
         }
-
-        this.expectedState = res;
 
         return res;
     }
@@ -1361,7 +1380,7 @@ export class TransactionView extends AppView {
             delete this.model.lastAcc_id;
         }
 
-        this.setExpectedState(this.model.state);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.typeMenu.select(type));
 
@@ -1483,7 +1502,7 @@ export class TransactionView extends AppView {
         this.calcExchByAmounts();
         this.updateExch();
 
-        this.setExpectedState(this.model.state);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.source.selectAccount(val));
 
@@ -1575,7 +1594,7 @@ export class TransactionView extends AppView {
         this.calcExchByAmounts();
         this.updateExch();
 
-        this.setExpectedState(this.model.state);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.destination.selectAccount(val));
 
@@ -1614,7 +1633,7 @@ export class TransactionView extends AppView {
             }
         }
 
-        this.setExpectedState(this.model.state);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.src_amount_row.input(val));
 
@@ -1626,34 +1645,36 @@ export class TransactionView extends AppView {
 
         if (this.model.type === INCOME) {
             assert(this.model.state === 1, `Unexpected state ${this.model.state} for clickSrcAmount action`);
-            this.setExpectedState(0); // Transition 4
+            this.model.state = 0; // Transition 4
         } else if (this.model.type === TRANSFER) {
             const availStates = [1, 2, 4, 6, 8];
             assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state} for clickSrcAmount action`);
 
             if (this.model.state === 1 || this.model.state === 2) {
-                this.setExpectedState(0); // Transition 2 or 4
+                this.model.state = 0; // Transition 2 or 4
             } else if (this.model.state === 4) {
-                this.setExpectedState(3); // Transition 30
+                this.model.state = 3; // Transition 30
             } else if (this.model.state === 6) {
-                this.setExpectedState(5); // Transition 20
+                this.model.state = 5; // Transition 20
             } else if (this.model.state === 8) {
-                this.setExpectedState(7); // Transition 23
+                this.model.state = 7; // Transition 23
             }
         } else if (this.model.type === DEBT) {
             const availStates = [1, 2, 4, 5, 8, 9];
             assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state} for clickSrcAmount action`);
 
             if (this.model.state === 1 || this.model.state === 2) {
-                this.setExpectedState(0); // Transition 2 or 4
+                this.model.state = 0; // Transition 2 or 4
             } else if (this.model.state === 4 || this.model.state === 5) {
-                this.setExpectedState(3); // Transition 30 or 12
+                this.model.state = 3; // Transition 30 or 12
             } else if (this.model.state === 8) {
-                this.setExpectedState(7); // Transition 31
+                this.model.state = 7; // Transition 31
             } else if (this.model.state === 9) {
-                this.setExpectedState(6); // Transition 35
+                this.model.state = 6; // Transition 35
             }
         }
+
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.src_amount_left.click());
 
@@ -1684,7 +1705,7 @@ export class TransactionView extends AppView {
             }
         }
 
-        this.setExpectedState(this.model.state);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.dest_amount_row.input(val));
 
@@ -1699,35 +1720,37 @@ export class TransactionView extends AppView {
             assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
 
             if (this.model.state === 0) {
-                this.setExpectedState(1);
+                this.model.state = 1;
             } else if (this.model.state === 2 || this.model.state === 3) {
-                this.setExpectedState(4);
+                this.model.state = 4;
             }
         } else if (this.model.type === TRANSFER) {
             const availStates = [0, 2, 3, 5, 7];
             assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
 
             if (this.model.state === 0 || this.model.state === 2) {
-                this.setExpectedState(1); // Transition 1 or 10
+                this.model.state = 1; // Transition 1 or 10
             } else if (this.model.state === 3) {
-                this.setExpectedState(4); // Transition 31
+                this.model.state = 4; // Transition 31
             } else if (this.model.state === 5) {
-                this.setExpectedState(6); // Transition 19
+                this.model.state = 6; // Transition 19
             } else if (this.model.state === 7) {
-                this.setExpectedState(8); // Transition 22
+                this.model.state = 8; // Transition 22
             }
         } else if (this.model.type === DEBT) {
             const availStates = [0, 2, 3, 4, 6];
             assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
 
             if (this.model.state === 0 || this.model.state === 2) {
-                this.setExpectedState(1); // Transition 1 or 4
+                this.model.state = 1; // Transition 1 or 4
             } else if (this.model.state === 3 || this.model.state === 4) {
-                this.setExpectedState(5); // Transition 13 or 11
+                this.model.state = 5; // Transition 13 or 11
             } else if (this.model.state === 6) {
-                this.setExpectedState(9); // Transition 36
+                this.model.state = 9; // Transition 36
             }
         }
+
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.src_res_balance_left.click());
 
@@ -1739,35 +1762,32 @@ export class TransactionView extends AppView {
 
         if (this.model.type === INCOME) {
             if (this.model.state === 0) {
-                // Transition 2
-                this.setExpectedState(1);
+                this.model.state = 1; // Transition 2
             } else if (this.model.state === 2 || this.model.state === 3) {
-                // Transition 7 or 14
-                this.setExpectedState(4);
+                this.model.state = 4; // Transition 7 or 14
             }
         } else if (this.model.type === TRANSFER) {
             if (this.model.state === 0 || this.model.state === 1) {
-                // Transition 3 or 9
-                this.setExpectedState(2);
+                this.model.state = 2; // Transition 3 or 9
             } else if (this.model.state === 3 || this.model.state === 7) {
-                // Transition 25 or 56
-                this.setExpectedState(5);
+                this.model.state = 5; // Transition 25 or 56
             } else if (this.model.state === 4 || this.model.state === 8) {
-                // Transition 32 or 46
-                this.setExpectedState(6);
+                this.model.state = 6; // Transition 32 or 46
             }
         } else if (this.model.type === DEBT) {
             const availStates = [0, 1, 3, 5, 7];
             assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
 
-            if (this.model.state === 0 || this.model.state === 1) { // Transition 3 or 5
-                this.setExpectedState(2);
-            } else if (this.model.state === 3 || this.model.state === 5) { // Transition 9
-                this.setExpectedState(4);
+            if (this.model.state === 0 || this.model.state === 1) {
+                this.model.state = 2; // Transition 3 or 5
+            } else if (this.model.state === 3 || this.model.state === 5) {
+                this.model.state = 4; // Transition 9
             } else if (this.model.state === 7) {
-                this.setExpectedState(8); // Transition 32 or 46
+                this.model.state = 8; // Transition 32 or 46
             }
         }
+
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.dest_res_balance_left.click());
 
@@ -1778,31 +1798,30 @@ export class TransactionView extends AppView {
         assert(this.model.type !== DEBT, 'Unexpected action: can\'t click by destination amount');
 
         if (this.model.type === EXPENSE) {
-            if (this.model.state === 1) { // Transition 3
-                this.setExpectedState(0);
-            } else if (this.model.state === 3 || this.model.state === 4) { // Transition 16 or 7
-                this.setExpectedState(2);
+            if (this.model.state === 1) {
+                this.model.state = 0; // Transition 3
+            } else if (this.model.state === 3 || this.model.state === 4) {
+                this.model.state = 2; // Transition 16 or 7
             }
         } else if (this.model.type === INCOME) {
-            // Transition 13 or 19
             assert(
                 this.model.state === 3 || this.model.state === 4,
                 `Unexpected state ${this.model.state} for clickDestAmount action`,
             );
 
-            this.setExpectedState(2);
+            this.model.state = 2; // Transition 13 or 19
         } else if (this.model.type === TRANSFER) {
             const availStates = [5, 7, 6, 8];
             assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state} for clickDestAmount action`);
 
             if (this.model.state === 5 || this.model.state === 7) {
-                // Transition 24 or 55
-                this.setExpectedState(3);
+                this.model.state = 3; // Transition 24 or 55
             } else if (this.model.state === 6 || this.model.state === 8) {
-                // Transition 33 or 35
-                this.setExpectedState(4);
+                this.model.state = 4; // Transition 33 or 35
             }
         }
+
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.dest_amount_left.click());
 
@@ -1830,7 +1849,7 @@ export class TransactionView extends AppView {
             }
         }
 
-        this.setExpectedState(this.model.state);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.result_balance_row.input(val));
 
@@ -1878,7 +1897,7 @@ export class TransactionView extends AppView {
             }
         }
 
-        this.setExpectedState(this.model.state);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.result_balance_dest_row.input(val));
 
@@ -1898,29 +1917,26 @@ export class TransactionView extends AppView {
         this.model.isDiffCurr = (this.model.src_curr_id !== this.model.dest_curr_id);
 
         if (this.model.isDiffCurr && this.model.state === 0) {
-            // Transition 3
             this.updateExch();
-            this.setExpectedState(2);
+            this.model.state = 2; // Transition 3
         } else if (this.model.state === 2 || this.model.state === 3 || this.model.state === 4) {
             if (this.model.isDiffCurr) {
-                // Transition 9, 21 or 15
-                this.updateExch();
-                this.setExpectedState(this.model.state);
+                this.updateExch(); // Transition 9, 21 or 15
             } else {
                 this.setDestAmount(this.model.srcAmount);
                 this.calcExchByAmounts();
                 this.updateExch();
                 if (this.model.state === 2 || this.model.state === 3) {
-                    // Transition 10 or 16
-                    this.setExpectedState(0);
+                    this.model.state = 0; // Transition 10 or 16
                 } else {
-                    // Transition 22
-                    this.setExpectedState(1);
+                    this.model.state = 1; // Transition 22
                 }
             }
         } else {
             throw new Error('Unexpected transition');
         }
+
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.src_amount_row.selectCurr(val));
 
@@ -1939,22 +1955,24 @@ export class TransactionView extends AppView {
 
         this.model.isDiffCurr = (this.model.src_curr_id !== this.model.dest_curr_id);
 
-        if (this.model.isDiffCurr && this.model.state === 0) { // Transition 4
+        if (this.model.isDiffCurr && this.model.state === 0) {
             this.updateExch();
-            this.setExpectedState(2);
+            this.model.state = 2; // Transition 4
         } else if (this.model.state === 2) {
-            if (this.model.isDiffCurr) { // Transition 13
+            if (this.model.isDiffCurr) {
                 this.updateExch();
-                this.setExpectedState(2);
-            } else { // Transition 9
+                this.model.state = 2; // Transition 13
+            } else {
                 this.setSrcAmount(this.model.fDestAmount);
                 this.calcExchByAmounts();
                 this.updateExch();
-                this.setExpectedState(0);
+                this.model.state = 0; // Transition 9
             }
         } else {
             throw new Error('Unexpected transition');
         }
+
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.dest_amount_row.selectCurr(val));
 
@@ -1965,16 +1983,16 @@ export class TransactionView extends AppView {
         assert(this.model.type !== DEBT, 'Unexpected action: can\'t click by exchange rate');
 
         if (this.model.type === EXPENSE || this.model.type === INCOME) {
-            this.setExpectedState(3);
+            this.model.state = 3;
         } else if (this.model.type === TRANSFER) {
             if (this.model.state === 3 || this.model.state === 5) {
-                // Transition 40 or 21
-                this.setExpectedState(7);
+                this.model.state = 7; // Transition 40 or 21
             } else if (this.model.state === 4 || this.model.state === 6) {
-                // Transition 34 or 45
-                this.setExpectedState(8);
+                this.model.state = 8; // Transition 34 or 45
             }
         }
+
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.exch_left.click());
 
@@ -2046,7 +2064,7 @@ export class TransactionView extends AppView {
             this.updateExch();
         }
 
-        this.setExpectedState(this.model.state);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.exchange_row.input(val));
 
@@ -2058,7 +2076,7 @@ export class TransactionView extends AppView {
 
         this.model.useBackExchange = !this.model.useBackExchange;
         this.updateExch();
-        this.setExpectedState(this.model.state);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.exchange_row.clickButton());
 
@@ -2096,7 +2114,7 @@ export class TransactionView extends AppView {
             this.calculateDestResult();
         }
 
-        this.setExpectedState(this.model.state);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.person.selectAccount(val));
 
@@ -2123,13 +2141,13 @@ export class TransactionView extends AppView {
             assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
 
             if (this.model.state === 0 || this.model.state === 2) {
-                this.setExpectedState(6); // Transition 25 or 41
+                this.model.state = 6; // Transition 25 or 41
             } else if (this.model.state === 1) {
-                this.setExpectedState(9); // Transition 38
+                this.model.state = 9; // Transition 38
             } else if (this.model.state === 3 || this.model.state === 5) {
-                this.setExpectedState(7); // Transition 40 or 50
+                this.model.state = 7; // Transition 40 or 50
             } else if (this.model.state === 4) {
-                this.setExpectedState(8); // Transition 39
+                this.model.state = 8; // Transition 39
             }
         } else {
             if (this.model.lastAccount_id) {
@@ -2149,15 +2167,17 @@ export class TransactionView extends AppView {
             assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
 
             if (this.model.state === 6) {
-                this.setExpectedState(0); // Transition 26
+                this.model.state = 0; // Transition 26
             } else if (this.model.state === 7) {
-                this.setExpectedState(3); // Transition 29
+                this.model.state = 3; // Transition 29
             } else if (this.model.state === 8) {
-                this.setExpectedState(4); // Transition 32
+                this.model.state = 4; // Transition 32
             } else if (this.model.state === 9) {
-                this.setExpectedState(1); // Transition 37
+                this.model.state = 1; // Transition 37
             }
         }
+
+        this.expectedState = this.getExpectedState();
 
         const action = (this.model.noAccount)
             ? () => click(this.content.noacc_btn.elem)
@@ -2201,7 +2221,7 @@ export class TransactionView extends AppView {
         this.calculateDestResult();
         this.updateExch();
 
-        this.setExpectedState(this.model.state);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.account.selectAccount(accountId));
 
@@ -2238,31 +2258,31 @@ export class TransactionView extends AppView {
                 const availStates = [3, 4, 5, 7, 8];
                 assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
 
-                if (this.model.state === 3) { // Transition 8
-                    this.model.state = 0;
-                } else if (this.model.state === 4) { // Transition 16
-                    this.model.state = 1;
-                } else if (this.model.state === 5) { // Transition 17
-                    this.model.state = 2;
-                } else if (this.model.state === 7) { // Transition 28
-                    this.model.state = 6;
-                } else if (this.model.state === 8) { // Transition 33
-                    this.model.state = 9;
+                if (this.model.state === 3) {
+                    this.model.state = 0; // Transition 8
+                } else if (this.model.state === 4) {
+                    this.model.state = 1; // Transition 16
+                } else if (this.model.state === 5) {
+                    this.model.state = 2; // Transition 17
+                } else if (this.model.state === 7) {
+                    this.model.state = 6; // Transition 28
+                } else if (this.model.state === 8) {
+                    this.model.state = 9; // Transition 33
                 }
             } else {
                 const availStates = [0, 1, 2, 6, 9];
                 assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
 
-                if (this.model.state === 0) { // Transition 7
-                    this.model.state = 3;
-                } else if (this.model.state === 1) { // Transition 16
-                    this.model.state = 4;
-                } else if (this.model.state === 2) { // Transition 18
-                    this.model.state = 5;
-                } else if (this.model.state === 6) { // Transition 27
-                    this.model.state = 7;
-                } else if (this.model.state === 9) { // Transition 34
-                    this.model.state = 8;
+                if (this.model.state === 0) {
+                    this.model.state = 3; // Transition 7
+                } else if (this.model.state === 1) {
+                    this.model.state = 4; // Transition 16
+                } else if (this.model.state === 2) {
+                    this.model.state = 5; // Transition 18
+                } else if (this.model.state === 6) {
+                    this.model.state = 7; // Transition 27
+                } else if (this.model.state === 9) {
+                    this.model.state = 8; // Transition 34
                 }
             }
         }
@@ -2271,7 +2291,7 @@ export class TransactionView extends AppView {
         this.calculateDestResult();
         this.updateExch();
 
-        this.setExpectedState(this.model.state);
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => click(this.content.swapBtn.elem));
 

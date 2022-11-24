@@ -52,18 +52,15 @@ export const checkInitialState = async () => {
     await test('Initial state of import view', () => App.view.checkState());
 };
 
-function parseCSV(data) {
+const parseCSV = (data) => {
     const content = data.toString().trim();
-
     const rows = content.split('\n');
-    const res = rows.map((row) => row.trim().split(';').map((val) => {
+    return rows.map((row) => row.trim().split(';').map((val) => {
         const start = val.startsWith('"') ? 1 : 0;
-        const length = val.length - start - (val.endsWith('"') ? 1 : 0);
-        return val.substr(start, length);
+        const length = val.length - (val.endsWith('"') ? 1 : 0);
+        return val.substring(start, length);
     }));
-
-    return res;
-}
+};
 
 /** Open import upload dialog */
 export const openUploadDialog = async () => {

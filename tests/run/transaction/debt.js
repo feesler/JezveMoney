@@ -37,16 +37,15 @@ export const create = async (params) => {
 
 export const update = async (params) => {
     await TransactionTests.update(DEBT, params, async (submitParams) => {
-        let expState;
-        if (App.view.model.noAccount) {
-            expState = (App.view.model.debtType) ? 6 : 7;
-        } else {
-            expState = (App.view.model.debtType) ? 0 : 3;
-        }
-
         await test('Initial state of update debt view', () => {
-            App.view.setExpectedState(expState);
-            return App.view.checkState();
+            if (App.view.model.noAccount) {
+                App.view.model.state = (App.view.model.debtType) ? 6 : 7;
+            } else {
+                App.view.model.state = (App.view.model.debtType) ? 0 : 3;
+            }
+
+            const expected = App.view.getExpectedState();
+            return App.view.checkState(expected);
         });
 
         return submit(submitParams);

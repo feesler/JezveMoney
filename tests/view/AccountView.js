@@ -129,8 +129,6 @@ export class AccountView extends AppView {
 
         this.model.curr_id = this.model.currObj.id;
         this.model.icon_id = account.icon_id;
-
-        this.setExpectedState();
     }
 
     getExpectedAccount() {
@@ -158,7 +156,7 @@ export class AccountView extends AppView {
         return res;
     }
 
-    setExpectedState() {
+    getExpectedState() {
         const account = this.getExpectedAccount();
         const accTile = Tile.renderAccount(account);
 
@@ -176,8 +174,6 @@ export class AccountView extends AppView {
             currDropDown: { textValue: this.model.currObj.name, visible: true },
             iconDropDown: { textValue: this.model.tileIcon.name, visible: true },
         };
-
-        this.expectedState = res;
 
         return res;
     }
@@ -222,7 +218,7 @@ export class AccountView extends AppView {
         }
 
         this.model.name = val;
-        this.setExpectedState();
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.name.input(val));
         return this.checkState();
@@ -233,7 +229,7 @@ export class AccountView extends AppView {
         const fNewValue = isValidValue(decimal) ? normalize(decimal) : decimal;
         this.model.initbalance = decimal;
         this.model.fInitBalance = fNewValue;
-        this.setExpectedState();
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.balance.input(val));
         return this.checkState();
@@ -245,7 +241,7 @@ export class AccountView extends AppView {
         assert(this.model.currObj, `Unexpected currency ${val}`);
 
         this.model.curr_id = this.model.currObj.id;
-        this.setExpectedState();
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.currDropDown.setSelection(val));
         return this.checkState();
@@ -263,7 +259,7 @@ export class AccountView extends AppView {
 
         this.model.icon_id = iconObj.id;
         this.model.tileIcon = iconObj;
-        this.setExpectedState();
+        this.expectedState = this.getExpectedState();
 
         await this.performAction(() => this.content.iconDropDown.setSelection(val));
         return this.checkState();

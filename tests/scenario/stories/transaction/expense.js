@@ -19,8 +19,9 @@ export const stateLoop = async () => {
     // State 0
     setBlock('Expense loop', 2);
     await test('Initial state of new expense view', () => {
-        App.view.setExpectedState(0);
-        return App.view.checkState();
+        App.view.model.state = 0;
+        const expected = App.view.getExpectedState();
+        return App.view.checkState(expected);
     });
 
     // Input destination amount

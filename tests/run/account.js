@@ -38,6 +38,7 @@ export const stateLoop = async () => {
         flags: 0,
     };
     App.view.setExpectedAccount(expAccount);
+    App.view.expectedState = App.view.getExpectedState();
     await test('Initial state of account view', () => App.view.checkState());
 
     // Check account name is 'New account' brefore input name
@@ -123,7 +124,8 @@ export const create = async (params) => {
             flags: 0,
         };
         App.view.setExpectedAccount(expAccount);
-        await App.view.checkState();
+        App.view.expectedState = App.view.getExpectedState();
+        App.view.checkState();
         // Perform actions on view
         expAccount = await submitAccount(params);
         if (expAccount) {
@@ -163,7 +165,8 @@ export const update = async (params) => {
         let [expAccount] = App.state.getAccountsByIndexes(pos);
         assert(expAccount, 'Can not find specified account');
         App.view.setExpectedAccount(expAccount);
-        await App.view.checkState();
+        App.view.expectedState = App.view.getExpectedState();
+        App.view.checkState();
 
         expAccount = await submitAccount(props);
         if (expAccount) {

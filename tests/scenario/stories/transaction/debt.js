@@ -18,10 +18,10 @@ export const stateLoop = async () => {
     await App.view.goToNewTransactionByPerson(0);
 
     setBlock('Debt loop', 2);
-    const initialState = (App.view.model.debtType) ? 0 : 3;
     await test('Initial state of new debt view', () => {
-        App.view.setExpectedState(initialState);
-        return App.view.checkState();
+        App.view.model.state = (App.view.model.debtType) ? 0 : 3;
+        const expected = App.view.getExpectedState();
+        return App.view.checkState(expected);
     });
 
     // Input source amount

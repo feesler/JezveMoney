@@ -17,8 +17,9 @@ export const stateLoop = async () => {
 
     setBlock('Transfer loop', 2);
     await test('Initial state of new transfer view', () => {
-        App.view.setExpectedState(0);
-        return App.view.checkState();
+        App.view.model.state = 0;
+        const expected = App.view.getExpectedState();
+        return App.view.checkState(expected);
     });
 
     // Input source amount

@@ -41,8 +41,9 @@ export const update = async (params) => {
         const isDiff = (origTransaction.src_curr !== origTransaction.dest_curr);
 
         await test('Initial state of update transfer view', () => {
-            App.view.setExpectedState(isDiff ? 3 : 0);
-            return App.view.checkState();
+            App.view.model.state = (isDiff) ? 3 : 0;
+            const expected = App.view.getExpectedState();
+            return App.view.checkState(expected);
         });
 
         return submit(submitParams);

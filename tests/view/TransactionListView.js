@@ -252,7 +252,7 @@ export class TransactionListView extends AppView {
 
     onFilterUpdate() {
         this.model = this.updateModelFilter(this.model);
-        return this.setExpectedState();
+        return this.getExpectedState();
     }
 
     getExpectedURL() {
@@ -311,7 +311,7 @@ export class TransactionListView extends AppView {
 
     onPageChanged(page) {
         this.model = this.setModelPage(this.model, page);
-        return this.setExpectedState();
+        return this.getExpectedState();
     }
 
     setModelRange(model, range) {
@@ -334,7 +334,7 @@ export class TransactionListView extends AppView {
 
     onRangeChanged(range) {
         this.model = this.setModelRange(this.model, range);
-        return this.setExpectedState();
+        return this.getExpectedState();
     }
 
     getAccountPrefixedIds(model = this.model) {
@@ -352,7 +352,7 @@ export class TransactionListView extends AppView {
         ];
     }
 
-    setExpectedState(model = this.model) {
+    getExpectedState(model = this.model) {
         const listMode = model.listMode === 'list';
         const selectMode = model.listMode === 'select';
         const isItemsAvailable = (model.filtered.length > 0);
@@ -451,7 +451,7 @@ export class TransactionListView extends AppView {
         const item = this.content.transList.items[num];
         this.model.contextMenuVisible = true;
         this.model.contextItem = item.id;
-        const expected = this.setExpectedState();
+        const expected = this.getExpectedState();
 
         await this.performAction(() => item.clickMenu());
         assert(this.content.contextMenu.visible, 'Context menu not visible');
@@ -463,7 +463,7 @@ export class TransactionListView extends AppView {
         assert(!this.content.listMenu.visible, 'List menu already opened');
 
         this.model.listMenuVisible = true;
-        const expected = this.setExpectedState();
+        const expected = this.getExpectedState();
 
         await this.performAction(() => click(this.content.listMenuContainer.menuBtn));
 
@@ -484,7 +484,7 @@ export class TransactionListView extends AppView {
 
         this.model.listMenuVisible = false;
         this.model.listMode = listMode;
-        const expected = this.setExpectedState();
+        const expected = this.getExpectedState();
 
         const buttonName = modeButtons[listMode];
         const button = this.content[buttonName];
@@ -513,7 +513,7 @@ export class TransactionListView extends AppView {
         }
 
         this.model.filterCollapsed = false;
-        const expected = this.setExpectedState();
+        const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.filtersAccordion.toggle());
 
@@ -740,7 +740,7 @@ export class TransactionListView extends AppView {
             this.model.filterCollapsed = true;
         }
         this.model.detailsMode = !this.model.detailsMode;
-        const expected = this.setExpectedState();
+        const expected = this.getExpectedState();
 
         if (directNavigate) {
             await goTo(this.getExpectedURL());
@@ -962,7 +962,7 @@ export class TransactionListView extends AppView {
 
             const item = this.model.list.items[num];
             item.selected = !item.selected;
-            const expected = this.setExpectedState();
+            const expected = this.getExpectedState();
 
             await this.performAction(() => this.content.transList.items[num].click());
 
@@ -978,7 +978,7 @@ export class TransactionListView extends AppView {
 
         this.model.listMenuVisible = false;
         this.model.list.items = this.model.list.items.map(selectItem);
-        const expected = this.setExpectedState();
+        const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.selectAllBtn.click());
 
@@ -994,7 +994,7 @@ export class TransactionListView extends AppView {
 
         this.model.listMenuVisible = false;
         this.model.list.items = this.model.list.items.map(deselectItem);
-        const expected = this.setExpectedState();
+        const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.deselectAllBtn.click());
 
@@ -1018,7 +1018,7 @@ export class TransactionListView extends AppView {
         await this.openListMenu();
 
         this.model.listMenuVisible = false;
-        const expected = this.setExpectedState();
+        const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.deleteBtn.click());
         this.checkState(expected);
