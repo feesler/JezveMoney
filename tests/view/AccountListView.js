@@ -65,7 +65,7 @@ export class AccountListView extends AppView {
         }
 
         res.title.value = await prop(res.title.elem, 'textContent');
-        res.tiles = await TilesList.create(this, await query('#counters + .tiles'));
+        res.tiles = await TilesList.create(this, await query('.content-header + .tiles'));
         res.hiddenTiles = await TilesList.create(this, await query('#hiddenTilesHeading + .tiles'));
         res.loadingIndicator = { elem: await query('.loading-indicator') };
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));

@@ -23,7 +23,6 @@ b {
 h1 {
   font-weight: 200;
   font-size: 32px;
-  margin: 0 0 10px 0;
 }
 
 h2 {
@@ -98,14 +97,12 @@ label {
   width: 34px;
   height: 34px;
   padding: 5px;
-  color: #ffffff;
   background-color: var(--accent-color);
 }
 
 .icon-btn .icon {
   width: 24px;
   height: 24px;
-  fill: #ffffff;
 }
 
 /* Input control fills all parent width */
@@ -209,6 +206,17 @@ label {
 
 .content_wrap {
   padding: 50px 12px;
+}
+
+/* Sticky header */
+.content-header {
+  display: flex;
+  flex-flow: column nowrap;
+  row-gap: 9px;
+  position: sticky;
+  top: 50px;
+  z-index: 1000;
+  padding: 10px 0;
 }
 
 /* Aligned to right element */
@@ -552,8 +560,6 @@ label {
   align-items: center;
   justify-content: flex-start;
   column-gap: 24px;
-  height: var(--input-height);
-  line-height: var(--input-height);
 }
 
 .counter {

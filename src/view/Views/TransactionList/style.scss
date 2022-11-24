@@ -1,10 +1,6 @@
 /* Filters collapsible */
-.filters-collapsible {
-  margin: 0 0 9px 0;
-
-  .collapsible-header {
-    cursor: pointer;
-  }
+.filters-collapsible .collapsible-header {
+  cursor: pointer;
 }
 
 /* Filters heading */
@@ -116,8 +112,6 @@
     --iconbtn-icon-color: var(--accent-color);
     --iconbtn-hover-icon-color: var(--accent-color);
     --iconbtn-hover-title-color: var(--accent-hover-color);
-
-    margin: 8px 0;
   }
 }
 

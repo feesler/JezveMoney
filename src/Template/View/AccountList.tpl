@@ -23,18 +23,20 @@ include(TPL_PATH . "Header.tpl");    ?>
                             ]) ?>
                         </div>
                     </div>
-                    <div id="counters" class="counters">
-                        <div id="itemsCounter" class="counter">
-                            <span class="counter__title">Items</span>
-                            <span id="itemsCount" class="counter__value"></span>
-                        </div>
-                        <div id="hiddenCounter" class="counter">
-                            <span class="counter__title">Hidden</span>
-                            <span id="hiddenCount" class="counter__value"></span>
-                        </div>
-                        <div id="selectedCounter" class="counter" hidden>
-                            <span class="counter__title">Selected</span>
-                            <span id="selItemsCount" class="counter__value"></span>
+                    <div id="contentHeader" class="content-header">
+                        <div class="counters">
+                            <div id="itemsCounter" class="counter">
+                                <span class="counter__title">Items</span>
+                                <span id="itemsCount" class="counter__value"></span>
+                            </div>
+                            <div id="hiddenCounter" class="counter">
+                                <span class="counter__title">Hidden</span>
+                                <span id="hiddenCount" class="counter__value"></span>
+                            </div>
+                            <div id="selectedCounter" class="counter" hidden>
+                                <span class="counter__title">Selected</span>
+                                <span id="selItemsCount" class="counter__value"></span>
+                            </div>
                         </div>
                     </div>
                     <div id="hiddenTilesHeading" class="heading" hidden>

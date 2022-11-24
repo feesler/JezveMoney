@@ -127,7 +127,7 @@ class ImportView extends View {
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
             onchange: () => this.onMainAccChange(),
-            className: 'dd__main-account',
+            className: 'dd__main-account dd_ellipsis',
         });
         window.app.initAccountsList(this.accountDropDown);
 

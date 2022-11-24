@@ -84,7 +84,7 @@ class AccountListView extends View {
         };
 
         const elemIds = [
-            'counters',
+            'contentHeader',
             'itemsCount',
             'hiddenCount',
             'selectedCounter',
@@ -104,7 +104,7 @@ class AccountListView extends View {
         });
 
         this.visibleTiles = ListContainer.create(listProps);
-        insertAfter(this.visibleTiles.elem, this.counters);
+        insertAfter(this.visibleTiles.elem, this.contentHeader);
 
         this.hiddenTiles = ListContainer.create(listProps);
         insertAfter(this.hiddenTiles.elem, this.hiddenTilesHeading);

@@ -26,6 +26,8 @@ export class Heading extends Component {
             throw new Error('Invalid element specified');
         }
 
+        this.actionsContainer = this.elem.querySelector('.heading-actions');
+
         this.postInit();
     }
 
@@ -47,6 +49,17 @@ export class Heading extends Component {
 
             const title = (entry.isIntersecting) ? null : this.state.title;
             window.app.view.header.setTitle(title);
+
+            if (!this.actionsContainer) {
+                return;
+            }
+
+            if (entry.isIntersecting) {
+                window.app.view.header.showUserMenu();
+                this.elem.append(this.actionsContainer);
+            } else {
+                window.app.view.header.showActions(this.actionsContainer);
+            }
         }, options);
 
         observer.observe(this.elem);

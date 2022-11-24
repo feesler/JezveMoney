@@ -96,7 +96,7 @@ class TransactionListView extends View {
             title: STR_TITLE,
         });
 
-        const collapse = new Collapsible({
+        const collapse = Collapsible.create({
             header: [ge('filtershdr')],
             content: ge('filters'),
             className: 'filters-collapsible',
@@ -184,12 +184,13 @@ class TransactionListView extends View {
         listHeader.append(this.modeSelector.elem);
 
         // Transactions list
+        const listContainer = document.querySelector('.list-container');
         this.list = TransactionList.create({
             listMode: 'list',
             onItemClick: (id, e) => this.onItemClick(id, e),
             onSort: (id, pos) => this.sendChangePosRequest(id, pos),
         });
-        insertAfter(this.list.elem, listHeader);
+        listContainer.append(this.list.elem);
 
         const listFooter = document.querySelector('.list-footer');
         // 'Show more' button

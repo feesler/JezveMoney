@@ -63,6 +63,10 @@
     }
   }
 
+  .icon-btn .icon {
+    fill: var(--main-text-color);
+  }
+
   /* No data message for lists & etc. */
   .nodata-message {
     color: #404040;
@@ -377,10 +381,6 @@
     background-color: #e8e8e8;
     color: #808080;
     border-color: #e8e8e8;
-  }
-
-  .import-controls {
-    color: var(--main-text-color);
   }
 
   /* Upload dialog */

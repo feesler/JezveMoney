@@ -4,6 +4,9 @@ import {
     Component,
     setEmptyClick,
     removeEmptyClick,
+    setEvents,
+    re,
+    insertAfter,
 } from 'jezvejs';
 import { Switch } from 'jezvejs/Switch';
 import { Offcanvas } from 'jezvejs/Offcanvas';
@@ -39,18 +42,17 @@ export class Header extends Component {
         });
 
         this.navToggleBtn = this.elem.querySelector('.nav-toggle-btn');
-        if (this.navToggleBtn) {
-            this.navToggleBtn.addEventListener('click', () => this.onToggleNav());
-        }
+        setEvents(this.navToggleBtn, { click: () => this.onToggleNav() });
         this.closeNavBtn = document.querySelector('.navigation__close-btn');
-        if (this.closeNavBtn) {
-            this.closeNavBtn.addEventListener('click', () => this.hideNavigation());
-        }
+        setEvents(this.closeNavBtn, { click: () => this.hideNavigation() });
 
         this.titleElem = this.elem.querySelector('.header-title');
 
         this.userBtn = ge('userbtn');
-        this.userBtn.addEventListener('click', (e) => this.showUserNavigation(e));
+        setEvents(this.userBtn, { click: (e) => this.showUserNavigation(e) });
+
+        this.actionsContainer = null;
+
         this.userNameElem = this.userBtn.querySelector('.user-btn__title');
         if (this.userNameElem) {
             this.userName = this.userNameElem.textContent;
@@ -66,13 +68,31 @@ export class Header extends Component {
 
         this.navUserNameElem = this.userNavContent.querySelector('.user-btn__title');
         this.closeUserNavBtn = this.userNavContent.querySelector('.user-navigation__close-btn');
-        this.closeUserNavBtn.addEventListener('click', () => this.hideUserNavigation());
+        setEvents(this.closeUserNavBtn, { click: () => this.hideUserNavigation() });
 
         this.themeSwitch = Switch.fromElement(ge('theme-check'), {
             onChange: (checked) => this.onToggleTheme(checked),
         });
         const currentTheme = window.app.getCurrentTheme();
         this.themeSwitch.check(currentTheme === DARK_THEME);
+    }
+
+    /** Shows user button and hides actions */
+    showUserMenu() {
+        re(this.actionsContainer);
+        this.actionsContainer = null;
+        show(this.userBtn, true);
+    }
+
+    /** Shows actions and hides user button */
+    showActions(actionsContainer) {
+        if (!actionsContainer) {
+            return;
+        }
+
+        this.actionsContainer = actionsContainer;
+        show(this.userBtn, false);
+        insertAfter(actionsContainer, this.userBtn);
     }
 
     /** Show navigation */
