@@ -103,7 +103,7 @@ export class Tile extends Component {
         if (this.iconUseElem) {
             this.icon = this.iconUseElem.href.baseVal;
             if (this.icon.startsWith('#')) {
-                this.state.icon = this.icon.substr(1);
+                this.state.icon = this.icon.substring(1);
             }
         }
     }

@@ -69,7 +69,7 @@ export const timestampFromString = (str) => {
     let tmpDate = str;
     const pos = str.indexOf(' ');
     if (pos !== -1) {
-        tmpDate = tmpDate.substr(0, pos);
+        tmpDate = tmpDate.substring(0, pos);
     }
 
     return fixDate(tmpDate);
