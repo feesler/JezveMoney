@@ -159,8 +159,14 @@ label {
   }
 }
 
-.iconbutton.no-icon .iconbutton__icon {
-  display: none;
+.iconbutton.no-icon {
+  .iconbutton__icon {
+    display: none;
+  }
+
+  .iconbutton__content {
+    padding: 0;
+  }
 }
 
 /* Centered block */
