@@ -101,16 +101,18 @@ export class TransactionListView extends AppView {
         res.searchForm = await SearchInput.create(this, await query('#searchFilter .search-field'));
         assert(res.searchForm, 'Search form not found');
 
-        const transList = await query('.trans-list');
-        assert(transList, 'List of transactions not found');
-
-        res.loadingIndicator = { elem: await query(transList, '.loading-indicator') };
+        const listContainer = await query('.list-container');
+        assert(listContainer, 'List container not found');
+        res.loadingIndicator = { elem: await query(listContainer, '.loading-indicator') };
 
         res.modeSelector = await IconButton.create(this, await query('.mode-selector'));
         res.paginator = await Paginator.create(this, await query('.paginator'));
         res.showMoreBtn = { elem: await query('.show-more-btn') };
 
         res.title.value = await prop(res.title.elem, 'textContent');
+
+        const transList = await query('.trans-list');
+        assert(transList, 'List of transactions not found');
         res.transList = await TransactionList.create(this, transList);
 
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));

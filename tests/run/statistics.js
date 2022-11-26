@@ -9,7 +9,8 @@ import { fixDate } from '../common.js';
 import { Transaction } from '../model/Transaction.js';
 
 export const checkInitialState = async () => {
-    await test('Initial state of transaction statistics view', () => {
+    await test('Initial state of transaction statistics view', async () => {
+        await App.view.waitForLoad();
         const expected = App.view.getExpectedState();
         return App.view.checkState(expected);
     });

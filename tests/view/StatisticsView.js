@@ -221,6 +221,15 @@ export class StatisticsView extends AppView {
         return res;
     }
 
+    async waitForLoad() {
+        await waitForFunction(async () => {
+            await this.parse();
+            return !this.model.loading;
+        });
+
+        await this.parse();
+    }
+
     async waitForData(action) {
         await this.parse();
 
