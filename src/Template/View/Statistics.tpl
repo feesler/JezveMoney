@@ -28,22 +28,10 @@ include(TPL_PATH . "Header.tpl");    ?>
                                     ]) ?>
                                 </div>
 
-                                <div class="filter-item report-type-filter">
-                                    <h3 class="filter-item__title">Report type</h3>
-                                    <?= LinkMenu::render(["id" => "report_menu", "items" => $reportMenu]) ?>
-                                </div>
-                            </div>
-
-                            <div id="acc_block" class="filter-item accounts-filter" <?= hidden($byCurrency) ?>>
-                                <h3 class="filter-item__title">Account</h3>
-                                <select id="acc_id" multiple></select>
-                            </div>
-
-                            <div class="filters-row">
                                 <div class="filters-row_fixed">
-                                    <div id="curr_block" class="filter-item currency-filter" <?= hidden(!$byCurrency) ?>>
-                                        <h3 class="filter-item__title">Currency</h3>
-                                        <select id="curr_id"></select>
+                                    <div class="filter-item report-type-filter">
+                                        <h3 class="filter-item__title">Report type</h3>
+                                        <?= LinkMenu::render(["id" => "report_menu", "items" => $reportMenu]) ?>
                                     </div>
 
                                     <div class="filter-item group-type-filter">
@@ -58,6 +46,18 @@ include(TPL_PATH . "Header.tpl");    ?>
                                             <?php    }    ?>
                                         </select>
                                     </div>
+                                </div>
+                            </div>
+
+                            <div class="filters-row">
+                                <div id="acc_block" class="filter-item accounts-filter" <?= hidden($byCurrency) ?>>
+                                    <h3 class="filter-item__title">Account</h3>
+                                    <select id="acc_id" multiple></select>
+                                </div>
+
+                                <div id="curr_block" class="filter-item currency-filter" <?= hidden(!$byCurrency) ?>>
+                                    <h3 class="filter-item__title">Currency</h3>
+                                    <select id="curr_id"></select>
                                 </div>
 
                                 <div id="dateFilter" class="filter-item date-range-filter">

@@ -564,6 +564,10 @@ label {
   --link-menu-icon-color: var(--accent-color);
 }
 
+.link-menu-item {
+  padding: 0;
+}
+
 /* Counters */
 .counters {
   display: flex;
