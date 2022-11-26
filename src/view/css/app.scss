@@ -148,6 +148,10 @@ label {
     border-color: var(--ig-button-disabled-border);
     background-color: var(--ig-button-disabled-bg);
   }
+
+  .input-group__btn .icon {
+    fill: var(--ig-button-color);
+  }
 }
 
 .iconbutton.circle-icon {
@@ -736,6 +740,7 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d;
     color: var(--accent-hover-color);
   }
 
+  .icon-btn:hover,
   .submit-btn:hover {
     background-color: var(--accent-hover-color);
   }

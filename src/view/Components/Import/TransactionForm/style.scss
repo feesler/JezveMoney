@@ -17,7 +17,7 @@
     flex-grow: 1;
     align-items: normal;
     gap: 8px;
-    padding: 4px 0 4px 8px;
+    padding: 4px 8px 4px 8px;
   }
 
   .form-rows {
@@ -70,10 +70,6 @@
 
   .date-field {
     min-width: 125px;
-
-    .icon.calendar-icon {
-      fill: var(--ig-button-color);
-    }
 
     .dp__container {
       width: 100%;

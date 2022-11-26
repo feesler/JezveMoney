@@ -59,14 +59,16 @@
     --iconbtn-hover-title-color: var(--main-text-color);
     --iconbtn-hover-icon-color: var(--main-text-color);
 
-    &.circle-icon .iconbutton__icon {
+    &.circle-icon {
       --iconbtn-hover-icon-color: #ffffff;
 
-      border-color: var(--main-text-color);
+      .iconbutton__icon {
+        border-color: var(--main-text-color);
+      }
     }
   }
 
-  .icon-btn .icon {
+  .icon {
     fill: var(--main-text-color);
   }
 
