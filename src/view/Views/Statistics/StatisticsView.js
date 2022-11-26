@@ -469,7 +469,9 @@ class StatisticsView extends View {
             return;
         }
 
-        const noData = !state.chartData?.values?.length && !state.chartData?.series?.length;
+        const [value] = state.chartData?.values ?? [];
+        const dataSet = value?.data ?? [];
+        const noData = !dataSet.length && !state.chartData?.series?.length;
         show(this.noDataMessage, noData);
         show(this.histogram.chartContainer, !noData);
 
