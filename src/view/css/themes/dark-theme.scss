@@ -18,6 +18,9 @@
   --input-disabled-border-color: #202020;
   --input-disabled-text-color: #707070;
 
+  /* List item */
+  --list-item-bg-color: var(--alt-bg-color);
+
   /* List item icons */
   --list-item-icon-fill: #888888;
   --list-item-hover-icon-fill: #dddddd;
@@ -184,8 +187,7 @@
   .rule-item .collapsible-header,
   .rule-form-collapse .collapsible-header {
     color: var(--main-text-color);
-    background-color: #202020;
-    border-color: #202020;
+    background-color: var(--list-item-bg-color);
   }
 
   /* Filters */
@@ -209,7 +211,7 @@
   /* Transaction list item */
   .trans-item__content,
   .trans-item__controls {
-    background-color: var(--alt-bg-color);
+    background-color: var(--list-item-bg-color);
   }
 
   .trans-item__balance,
@@ -416,15 +418,13 @@
   .rule-form-collapse .collapsible-content,
   .rule-item .collapsible-content {
     color: #bbbbbb;
-    border-color: #303030;
     background-color: #252525;
   }
 
   /* Condition item */
   .cond-item,
   .cond-form {
-    background-color: #353535;
-    border-color: #353535;
+    background-color: var(--list-item-bg-color);
   }
 
   .cond-item__operator {
@@ -434,7 +434,7 @@
   /* Action item */
   .action-item,
   .action-form {
-    background-color: #353535;
+    background-color: var(--list-item-bg-color);
   }
 
   /* Original import data container */

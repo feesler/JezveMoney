@@ -85,6 +85,7 @@ export class ImportRuleForm extends Component {
 
         this.conditionsList = ListContainer.create({
             ItemComponent: ImportConditionForm,
+            className: 'conditions-list',
             itemSelector: '.cond-form',
             noItemsMessage: MSG_NO_CONDITIONS,
             invalidItemIndex: -1,
@@ -118,6 +119,7 @@ export class ImportRuleForm extends Component {
 
         this.actionsList = ListContainer.create({
             ItemComponent: ImportActionForm,
+            className: 'actions-list',
             itemSelector: '.action-form',
             noItemsMessage: MSG_NO_ACTIONS,
             invalidItemIndex: -1,

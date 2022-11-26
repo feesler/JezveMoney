@@ -38,8 +38,7 @@
     align-items: center;
     flex: none;
     padding: 2px 8px 2px 8px;
-    border-width: 1px;
-    border-style: solid;
+    border: 0;
     cursor: pointer;
   }
 
@@ -61,6 +60,7 @@
     display: block;
     flex: 1 1 auto;
     height: 0;
+    max-height: 0;
     overflow-y: auto;
     padding: 0;
     border: 0 none;
@@ -71,6 +71,7 @@
   &.collapsible__expanded > .collapsible-content {
     height: auto;
     min-height: 48px;
+    max-height: none;
     padding: 6px;
     margin: 0 1px;
   }
@@ -82,6 +83,14 @@
   &.collapsible__expanded .link-btn {
     display: inline-block;
   }
+}
+
+.conditions-list,
+.actions-list {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  row-gap: 3px;
 }
 
 /* Validation feedback container */

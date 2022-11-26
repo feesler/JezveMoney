@@ -17,6 +17,9 @@
   --input-disabled-border-color: #eeeeee;
   --input-disabled-text-color: #a0a0a0;
 
+  /* List item */
+  --list-item-bg-color: var(--alt-bg-color);
+
   /* List item icons */
   --list-item-icon-fill: #a7a7a7;
   --list-item-hover-icon-fill: #ffffff;
@@ -183,8 +186,7 @@
   .rule-item .collapsible-header,
   .rule-form-collapse .collapsible-header {
     color: var(--main-text-color);
-    background-color: #dddddd;
-    border-color: #dddddd;
+    background-color: var(--list-item-bg-color);
   }
 
   /* Filters */
@@ -208,7 +210,7 @@
   /* Transaction list item */
   .trans-item__content,
   .trans-item__controls {
-    background-color: var(--alt-bg-color);
+    background-color: var(--list-item-bg-color);
   }
 
   .trans-item__balance,
@@ -416,14 +418,13 @@
   .rule-item .collapsible-content {
     color: #202020;
     border-color: #ffffff;
-    background-color: #e8e8e8;
+    background-color: #d0d0d0;
   }
 
   /* Condition item */
   .cond-item,
   .cond-form {
-    background-color: #cccccc;
-    border-color: #cccccc;
+    background-color: var(--list-item-bg-color);
   }
 
   .cond-item__operator {
@@ -433,7 +434,7 @@
   /* Action item */
   .action-item,
   .action-form {
-    background-color: #cccccc;
+    background-color: var(--list-item-bg-color);
   }
 
   /* Original import data container */
