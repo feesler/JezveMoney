@@ -449,6 +449,9 @@ const slice = createSlice({
 
             const newItem = new ImportTransaction(item);
             newItem.isForm = isForm;
+            if (isForm) {
+                newItem.enable(true);
+            }
             return newItem;
         }),
         activeItemIndex: index,

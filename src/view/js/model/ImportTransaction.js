@@ -226,7 +226,9 @@ export class ImportTransaction {
 
         const state = copyObject(this.state);
         state.similarTransaction = copyObject(transaction);
-        state.enabled = !transaction;
+        if (!state.isForm) {
+            state.enabled = !transaction;
+        }
 
         this.state = state;
         return state;

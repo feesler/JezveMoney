@@ -850,8 +850,6 @@ class ImportView extends View {
         const title = (item.enabled) ? STR_DISABLE_ITEM : STR_ENABLE_ITEM;
         this.contextMenu.items.ctxEnableBtn.setTitle(title);
 
-        this.contextMenu.items.ctxUpdateBtn.show(!item.isForm);
-
         this.contextMenu.attachAndShow(menuContainer);
     }
 

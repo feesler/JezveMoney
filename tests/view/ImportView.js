@@ -293,6 +293,8 @@ export class ImportView extends AppView {
     }
 
     getPositionByIndex(index) {
+        assert.arrayIndex(this.items, index, 'Invalid index');
+
         return {
             page: Math.floor(index / ITEMS_ON_PAGE) + 1,
             index: index % ITEMS_ON_PAGE,
@@ -364,9 +366,13 @@ export class ImportView extends AppView {
     }
 
     async openContextMenu(index) {
-        await this.setListMode();
-
         const pos = this.getPositionByIndex(index);
+        assert(
+            this.formIndex !== pos.index,
+            'Context menu not available for import transaction form',
+        );
+
+        await this.setListMode();
 
         this.model.contextMenuVisible = true;
         this.model.contextItemIndex = pos.index;
@@ -1119,6 +1125,7 @@ export class ImportView extends AppView {
         this.originalItemData = new ImportTransaction(newForm);
 
         newForm.isForm = true;
+        newForm.enabled = true;
         this.formIndex = pos;
         this.model.contextMenuVisible = false;
         const expected = this.getExpectedState();
@@ -1201,8 +1208,18 @@ export class ImportView extends AppView {
             `Can't change list mode from ${this.model.listMode} to ${listMode}.`,
         );
 
-        if (listMode === 'list') {
+        if (listMode !== 'list') {
             await this.openListMenu();
+        }
+
+        const buttonName = modeButtons[listMode];
+        const button = this.content[buttonName];
+        assert(button, `Button ${buttonName} not found`);
+        const menuAction = () => this.performAction(() => button.click());
+
+        const isValid = await this.validateSaveForm(menuAction);
+        if (!isValid) {
+            return true;
         }
 
         this.items.forEach((_, ind) => {
@@ -1214,11 +1231,7 @@ export class ImportView extends AppView {
         this.model.listMode = listMode;
         this.expectedState = this.getExpectedState();
 
-        const buttonName = modeButtons[listMode];
-        const button = this.content[buttonName];
-        assert(button, `Button ${buttonName} not found`);
-
-        await this.performAction(() => button.click());
+        await menuAction();
 
         return this.checkState();
     }
@@ -1468,6 +1481,7 @@ export class ImportView extends AppView {
 
     async submit() {
         this.checkMainState();
+        await this.setListMode();
 
         const enabledItems = this.getEnabledItems();
         const disabled = await prop(this.content.submitBtn.elem, 'disabled');

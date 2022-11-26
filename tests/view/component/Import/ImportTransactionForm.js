@@ -1,7 +1,6 @@
 import {
     TestComponent,
     query,
-    hasAttr,
     prop,
     click,
     input,
@@ -23,6 +22,16 @@ import { App } from '../../../Application.js';
 import { OriginalImportData } from './OriginalImportData.js';
 
 const sourceTransactionTypes = ['expense', 'transferfrom', 'debtfrom'];
+
+const fieldSelectors = [
+    '.type-field',
+    '.account-field',
+    '.person-field',
+    '.src-amount-field',
+    '.dest-amount-field',
+    '.date-field',
+    '.comment-field',
+];
 
 export class ImportTransactionForm extends TestComponent {
     constructor(parent, elem, mainAccount) {
@@ -79,20 +88,8 @@ export class ImportTransactionForm extends TestComponent {
     async parseContent() {
         const res = {
             isForm: true,
+            enabled: true,
         };
-
-        const disabled = await hasAttr(this.elem, 'disabled');
-        res.enabled = !disabled;
-
-        const fieldSelectors = [
-            '.type-field',
-            '.account-field',
-            '.person-field',
-            '.src-amount-field',
-            '.dest-amount-field',
-            '.date-field',
-            '.comment-field',
-        ];
 
         [
             res.typeField,
@@ -107,10 +104,6 @@ export class ImportTransactionForm extends TestComponent {
         ));
 
         res.invFeedback = { elem: await query(this.elem, '.invalid-feedback') };
-        res.menuBtn = await query(this.elem, '.popup-menu-btn');
-        res.contextMenuElem = await query(this.elem, '.popup-menu-list');
-        res.toggleEnableBtn = await query(this.elem, '.enable-btn');
-        res.deleteBtn = await query(this.elem, '.delete-btn');
         res.toggleBtn = await query(this.elem, '.toggle-btn');
         res.saveBtn = await query(this.elem, '.submit-btn');
         res.cancelBtn = await query(this.elem, '.cancel-btn');
@@ -125,7 +118,6 @@ export class ImportTransactionForm extends TestComponent {
             && res.dateField
             && res.commentField
             && res.invFeedback.elem
-            && res.menuBtn
             && res.saveBtn
             && res.cancelBtn,
             'Invalid structure of import item',
@@ -161,7 +153,6 @@ export class ImportTransactionForm extends TestComponent {
         res.mainAccount = App.state.accounts.getItem(this.mainAccount);
         assert(res.mainAccount, 'Main account not found');
 
-        res.isContextMenu = !!cont.contextMenuElem;
         res.enabled = cont.enabled;
         res.type = cont.typeField.value;
         res.srcAmount = cont.srcAmountField.value;
@@ -758,10 +749,6 @@ export class ImportTransactionForm extends TestComponent {
         await this.parse();
 
         return this.checkState();
-    }
-
-    async clickMenu() {
-        return click(this.content.menuBtn);
     }
 
     async clickSave() {

@@ -132,7 +132,9 @@ export class ImportTransaction {
         }
 
         this.similarTransaction = (transaction) ? { ...transaction } : null;
-        this.enabled = !transaction;
+        if (!this.isForm) {
+            this.enabled = !transaction;
+        }
     }
 
     /** Set main account */
