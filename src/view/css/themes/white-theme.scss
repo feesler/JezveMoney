@@ -14,8 +14,8 @@
 
   /* Disabled inputs */
   --input-disabled-bg-color: #eeeeee;
-  --input-disabled-border-color: #eeeeee;
-  --input-disabled-text-color: #a0a0a0;
+  --input-disabled-border-color: #dddddd;
+  --input-disabled-text-color: #b0b0b0;
 
   /* List item */
   --list-item-bg-color: var(--alt-bg-color);
@@ -102,6 +102,7 @@
 
   .stretch-input[disabled] {
     color: var(--input-disabled-text-color);
+    border-color: var(--input-disabled-border-color);
     background-color: var(--input-disabled-bg-color);
   }
 
@@ -290,6 +291,8 @@
 
   /* Import form */
   .import-form {
+    --input-disabled-border-color: #eeeeee;
+
     .form-container,
     .controls,
     .invalid-feedback,
