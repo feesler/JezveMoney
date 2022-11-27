@@ -543,7 +543,7 @@ class ImportView extends View {
             // Render form validation
             const form = this.transactionRows[pageIndex.index];
             form.validate();
-            form.elem.scrollIntoView();
+            form.elem.scrollIntoView({ block: 'center', inline: 'nearest' });
 
             return false;
         }
@@ -572,7 +572,7 @@ class ImportView extends View {
         }
 
         const form = this.transactionRows[pageIndex.index];
-        form.elem.scrollIntoView();
+        form.elem.scrollIntoView({ block: 'center', inline: 'nearest' });
     }
 
     onUpdateItem() {
