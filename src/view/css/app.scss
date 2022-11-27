@@ -431,6 +431,7 @@ label {
   --dd-list-border-radius: 5px;
   --dd-selection-item-border-radius: 3px;
   --dd-disabled-list-item-bg: none;
+  --dd-combo-height: var(--input-height);
 }
 
 .dd__input {
@@ -682,10 +683,6 @@ a.paginator-arrow:focus-visible {
   font-weight: 400;
   margin-bottom: 5px;
   margin-left: 1px;
-}
-
-.filter-item .dd__container {
-  --dd-combo-height: var(--input-height);
 }
 
 .filter-item .link-menu {
