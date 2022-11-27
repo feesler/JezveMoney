@@ -159,7 +159,9 @@ export class ImportTransactionItem extends ImportTransactionBase {
             this.menuContainer,
         ]);
 
+        this.createSelectControls();
         this.mainContainer = createContainer(MAIN_CONTENT_CLASS, [
+            this.selectControls,
             this.itemContainer,
             this.controls,
         ]);

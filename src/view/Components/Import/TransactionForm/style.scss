@@ -87,7 +87,9 @@
     flex-flow: row nowrap;
     align-items: center;
     justify-content: flex-start;
-    width: 32px;
+    width: 0;
+    overflow: hidden;
+    transition: width 0.2s ease;
 
     .checkbox {
       --checkbox-size: 24px;
@@ -213,6 +215,10 @@
   .form-controls {
     padding: 24px 8px 12px 8px;
   }
+}
+
+.import-list_select .select-controls {
+  width: 32px;
 }
 
 /* Disabled transaction row */

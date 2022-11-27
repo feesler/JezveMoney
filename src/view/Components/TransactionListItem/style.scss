@@ -17,7 +17,9 @@
   flex-flow: row nowrap;
   align-items: center;
   justify-content: flex-start;
-  width: 32px;
+  width: 0;
+  overflow: hidden;
+  transition: width 0.2s ease;
 
   .checkbox {
     --checkbox-size: 24px;
@@ -29,6 +31,10 @@
     margin: 0;
     border-radius: 50%;
   }
+}
+
+.trans-list_select .trans-item__select {
+  width: 32px;
 }
 
 .trans-item__content {

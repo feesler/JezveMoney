@@ -863,7 +863,6 @@ class ImportView extends View {
 
         this.uploadBtn.show(isListMode);
         this.listModeBtn.show(!isListMode);
-        show(this.dataHeaderControls, isListMode);
 
         const { items } = this.menu;
 
@@ -969,7 +968,11 @@ class ImportView extends View {
 
         this.createSortable(state);
 
-        this.rowsContainer.classList.toggle(SELECT_MODE_CLASS, state.listMode === 'select');
+        if (state.listMode === 'select' || prevState.listMode === 'select') {
+            setTimeout(() => {
+                this.rowsContainer.classList.toggle(SELECT_MODE_CLASS, state.listMode === 'select');
+            });
+        }
         this.rowsContainer.classList.toggle(SORT_MODE_CLASS, state.listMode === 'sort');
     }
 
@@ -980,18 +983,19 @@ class ImportView extends View {
 
         this.renderList(state, prevState);
 
-        const accountId = state.mainAccount.id;
-        this.accountDropDown.selectItem(accountId.toString());
-
+        const isSelectMode = (state.listMode === 'select');
+        const isListMode = (state.listMode === 'list');
         const enabledList = this.getEnabledItems(state);
+        const selectedItems = (isSelectMode) ? this.getSelectedItems(state) : [];
 
-        enable(this.submitBtn, (enabledList.length > 0));
+        this.accountDropDown.selectItem(state.mainAccount.id);
+        this.accountDropDown.enable(isListMode);
+
+        enable(this.submitBtn, (enabledList.length > 0 && isListMode));
         this.enabledCount.textContent = enabledList.length;
         this.itemsCount.textContent = state.items.length;
 
-        const isSelectMode = (state.listMode === 'select');
         show(this.selectedCounter, isSelectMode);
-        const selectedItems = (isSelectMode) ? this.getSelectedItems(state) : [];
         this.selectedCount.textContent = selectedItems.length;
 
         this.renderContextMenu(state, prevState);

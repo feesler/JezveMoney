@@ -48,6 +48,15 @@
   row-gap: 2px;
 }
 
+.data-container {
+  .collapsible-content,
+  .invalid-feedback,
+  .form-controls {
+    margin-left: 0;
+    transition: margin-left 0.2s ease;
+  }
+}
+
 .import-list_select {
   .import-item,
   .import-form {

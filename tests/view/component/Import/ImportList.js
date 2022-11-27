@@ -7,12 +7,33 @@ import {
     isVisible,
     copyObject,
     asyncMap,
+    evaluate,
 } from 'jezve-test';
 import { Paginator } from 'jezvejs-test';
 import { ImportTransactionForm } from './ImportTransactionForm.js';
 import { ImportTransactionItem } from './ImportTransactionItem.js';
 
 export class ImportList extends TestComponent {
+    static async getListMode(elem) {
+        if (!elem) {
+            return null;
+        }
+        const dataContainer = await query(elem, '.data-container');
+        if (!dataContainer) {
+            return null;
+        }
+
+        const { selectMode, sortMode } = await evaluate((el) => ({
+            selectMode: el.classList.contains('import-list_select'),
+            sortMode: el.classList.contains('import-list_sort'),
+        }), dataContainer);
+
+        if (selectMode) {
+            return 'select';
+        }
+        return (sortMode) ? 'sort' : 'list';
+    }
+
     constructor(parent, elem, mainAccount) {
         super(parent, elem);
 
@@ -21,20 +42,11 @@ export class ImportList extends TestComponent {
 
     async parseContent() {
         const res = {
+            listMode: await ImportList.getListMode(this.elem),
             items: [],
         };
-        const dataContainer = await query(this.elem, '.data-container');
-        const isSelectMode = await hasClass(dataContainer, 'import-list_select');
-        const isSortMode = await hasClass(dataContainer, 'import-list_sort');
-        if (isSelectMode) {
-            res.listMode = 'select';
-        } else if (isSortMode) {
-            res.listMode = 'sort';
-        } else {
-            res.listMode = 'list';
-        }
 
-        const listItems = await queryAll(dataContainer, '.import-form,.import-item');
+        const listItems = await queryAll(this.elem, '.import-form,.import-item');
         if (listItems) {
             res.items = await asyncMap(
                 listItems,

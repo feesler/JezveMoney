@@ -344,12 +344,7 @@ export class TransactionListItem extends Component {
             return;
         }
 
-        const selectMode = state.listMode === 'select';
-        if (selectMode) {
-            this.createSelectControls();
-        }
-
-        show(this.selectControls, selectMode);
+        this.createSelectControls();
     }
 
     renderControls(state, prevState) {

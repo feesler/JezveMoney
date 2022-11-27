@@ -10,6 +10,7 @@ import {
     copyObject,
     asArray,
     asyncMap,
+    evaluate,
 } from 'jezve-test';
 import { DropDown, Checkbox, IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -82,9 +83,16 @@ export class ImportView extends AppView {
         const importEnabled = !res.notAvailMsg.elem;
 
         // Heading
-        res.title.value = await prop(res.title.elem, 'textContent');
-        res.submitBtn.disabled = await prop(res.submitBtn.elem, 'disabled');
-        res.uploadBtn.content.disabled = await hasAttr(res.uploadBtn.elem, 'disabled');
+        [
+            res.title.value,
+            res.submitBtn.disabled,
+            res.uploadBtn.content.disabled,
+        ] = await evaluate((titleEl, submitBtn, uploadBtn) => ([
+            titleEl.textContent,
+            submitBtn.disabled,
+            uploadBtn.disabled,
+        ]), res.title.elem, res.submitBtn.elem, res.uploadBtn.elem);
+
         res.listModeBtn = await IconButton.create(this, await query('#listModeBtn'));
 
         // Main account select
@@ -203,12 +211,15 @@ export class ImportView extends AppView {
             notAvailMsg: { visible: !model.enabled },
             listMenuContainer: { visible: model.enabled },
             listMenu: { visible: showMenuItems },
-            uploadBtn: { visible: model.enabled && listMode, disabled: !model.enabled },
+            uploadBtn: {
+                visible: model.enabled && listMode,
+                disabled: !model.enabled,
+            },
             title: { value: model.title.toString(), visible: true },
             totalCounter: { visible: model.enabled },
             enabledCounter: { visible: model.enabled },
             selectedCounter: { visible: model.enabled && selectMode },
-            submitBtn: { visible: model.enabled && listMode },
+            submitBtn: { visible: model.enabled },
         };
 
         if (!model.enabled) {
@@ -245,9 +256,13 @@ export class ImportView extends AppView {
         res.similarCheck = { checked: model.checkSimilarEnabled, visible: showListItems };
         res.rulesBtn = { visible: showListItems };
 
-        res.mainAccountSelect = { value: model.mainAccount.toString(), visible: listMode };
+        res.mainAccountSelect = {
+            value: model.mainAccount.toString(),
+            visible: model.enabled,
+            disabled: !listMode,
+        };
         res.itemsList = { visible: true };
-        res.submitBtn.disabled = !hasItems || !this.items.some((item) => item.enabled);
+        res.submitBtn.disabled = !(listMode && hasItems && enabledItems.length > 0);
 
         if (model.contextMenuVisible) {
             const firstItem = ITEMS_ON_PAGE * (model.pagination.page - 1);
@@ -1091,7 +1106,6 @@ export class ImportView extends AppView {
 
         this.expectedState = this.getExpectedState();
         this.expectedState.itemsList.items = expectedItems.items;
-        this.expectedState.submitBtn.disabled = false;
         this.originalItemData = null;
 
         await addAction();
@@ -1215,7 +1229,13 @@ export class ImportView extends AppView {
         const buttonName = modeButtons[listMode];
         const button = this.content[buttonName];
         assert(button, `Button ${buttonName} not found`);
-        const menuAction = () => this.performAction(() => button.click());
+        const menuAction = () => this.performAction(async () => {
+            await button.click();
+            await wait(async () => {
+                const mode = await ImportList.getListMode(this.itemsList.elem);
+                return mode === listMode;
+            });
+        });
 
         const isValid = await this.validateSaveForm(menuAction);
         if (!isValid) {
@@ -1484,7 +1504,7 @@ export class ImportView extends AppView {
         await this.setListMode();
 
         const enabledItems = this.getEnabledItems();
-        const disabled = await prop(this.content.submitBtn.elem, 'disabled');
+        const { disabled } = this.content.submitBtn;
         assert(disabled === (enabledItems.length === 0), 'Submit is not available');
         if (disabled) {
             return true;

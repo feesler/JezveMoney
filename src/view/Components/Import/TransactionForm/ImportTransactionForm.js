@@ -137,7 +137,9 @@ export class ImportTransactionForm extends ImportTransactionBase {
 
         this.controls = createContainer(CONTROLS_CLASS);
 
+        this.createSelectControls();
         this.mainContainer = createContainer(MAIN_CONTENT_CLASS, [
+            this.selectControls,
             this.formContainer,
             this.controls,
         ]);
