@@ -147,7 +147,7 @@ export class ImportRuleForm extends Component {
             events: { click: () => this.onSubmit() },
         });
         this.cancelBtn = createElement('button', {
-            props: { className: 'btn link-btn cancel-btn', type: 'button', textContent: BTN_CANCEL },
+            props: { className: 'btn cancel-btn', type: 'button', textContent: BTN_CANCEL },
             events: { click: () => this.onCancel() },
         });
 
