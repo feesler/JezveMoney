@@ -6,6 +6,7 @@ import {
     show,
     urlJoin,
 } from 'jezvejs';
+import { IconButton } from 'jezvejs/IconButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
@@ -21,8 +22,10 @@ import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndic
 import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
 import './style.scss';
+import { Heading } from '../../Components/Heading/Heading.js';
 
 /** Strings */
+const STR_TITLE = 'Accounts';
 const TITLE_SINGLE_ACC_DELETE = 'Delete account';
 const TITLE_MULTI_ACC_DELETE = 'Delete accounts';
 const MSG_MULTI_ACC_DELETE = 'Are you sure want to delete selected accounts?<br>All income and expense transactions history will be lost. Transfer to this accounts will be changed to expense. Transfer from this accounts will be changed to income.';
@@ -81,21 +84,44 @@ class AccountListView extends View {
             onItemClick: (id, e) => this.onItemClick(id, e),
         };
 
-        const visibleTilesHeading = ge('visibleTilesHeading');
-        this.hiddenTilesHeading = ge('hiddenTilesHeading');
-        if (!visibleTilesHeading || !this.hiddenTilesHeading) {
-            throw new Error('Failed to initialize Account List view');
-        }
+        const elemIds = [
+            'contentHeader',
+            'itemsCount',
+            'hiddenCount',
+            'selectedCounter',
+            'selItemsCount',
+            'heading',
+            'hiddenTilesHeading',
+        ];
+        elemIds.forEach((id) => {
+            this[id] = ge(id);
+            if (!this[id]) {
+                throw new Error('Failed to initialize view');
+            }
+        });
+
+        this.heading = Heading.fromElement(this.heading, {
+            title: STR_TITLE,
+        });
 
         this.visibleTiles = ListContainer.create(listProps);
-        insertAfter(this.visibleTiles.elem, visibleTilesHeading);
+        insertAfter(this.visibleTiles.elem, this.contentHeader);
 
         this.hiddenTiles = ListContainer.create(listProps);
         insertAfter(this.hiddenTiles.elem, this.hiddenTilesHeading);
 
         this.createBtn = ge('add_btn');
+
+        this.listModeBtn = IconButton.create({
+            id: 'listModeBtn',
+            className: 'no-icon',
+            title: 'Done',
+            onClick: () => this.toggleSelectMode(),
+        });
+        insertAfter(this.listModeBtn.elem, this.createBtn);
+
         this.createMenu();
-        insertAfter(this.menu.elem, this.createBtn);
+        insertAfter(this.menu.elem, this.listModeBtn.elem);
 
         this.createContextMenu();
 
@@ -113,9 +139,6 @@ class AccountListView extends View {
                 icon: 'select',
                 title: 'Select',
                 onClick: () => this.toggleSelectMode(),
-            }, {
-                id: 'separator1',
-                type: 'separator',
             }, {
                 id: 'selectAllBtn',
                 title: 'Select all',
@@ -364,13 +387,13 @@ class AccountListView extends View {
         const totalSelCount = selCount + hiddenSelCount;
         const isSelectMode = (state.listMode === 'select');
 
+        show(this.createBtn, !isSelectMode);
+        this.listModeBtn.show(isSelectMode);
+
         this.menu.show(itemsCount > 0);
         const { items } = this.menu;
 
-        const selectModeTitle = (isSelectMode) ? 'Done' : 'Select';
-        items.selectModeBtn.setTitle(selectModeTitle);
-        items.selectModeBtn.setIcon((isSelectMode) ? null : 'select');
-        show(items.separator1, isSelectMode);
+        items.selectModeBtn.show(!isSelectMode);
 
         items.selectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount);
         items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount > 0);
@@ -404,14 +427,24 @@ class AccountListView extends View {
             this.loadingIndicator.show();
         }
 
-        // Render visible accounts
+        // Counters
+        const itemsCount = state.items.visible.length + state.items.hidden.length;
+        this.itemsCount.textContent = itemsCount;
+        this.hiddenCount.textContent = state.items.hidden.length;
+        const isSelectMode = (state.listMode === 'select');
+        show(this.selectedCounter, isSelectMode);
+        const selected = (isSelectMode) ? this.getSelectedIds(state) : [];
+        this.selItemsCount.textContent = selected.length;
+
+        // Visible accounts
         this.visibleTiles.setState((visibleState) => ({
             ...visibleState,
             items: state.items.visible,
             listMode: state.listMode,
             renderTime: state.renderTime,
         }));
-        // Render hidden accounts
+
+        // Hidden accounts
         this.hiddenTiles.setState((hiddenState) => ({
             ...hiddenState,
             items: state.items.hidden,

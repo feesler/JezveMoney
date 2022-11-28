@@ -54,6 +54,7 @@
   font-weight: 300;
   height: 50px;
   line-height: 50px;
+  color: var(--header-color);
 }
 
 /* User button */
@@ -179,6 +180,12 @@
   margin: 0;
 }
 
+/* Focused Switch */
+.theme-switch .switch input:focus-visible + .switch-slider {
+  outline-width: 0;
+  box-shadow: var(--focus-shadow);
+}
+
 /* Navigation toggle button */
 .nav-toggle-btn {
   display: block;
@@ -251,7 +258,7 @@
 .nav-list {
   display: flex;
   flex-flow: column nowrap;
-  padding: 24px;
+  padding: 4px 24px;
   height: 100%;
   list-style-type: none;
 }

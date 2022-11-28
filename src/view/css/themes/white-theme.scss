@@ -14,8 +14,11 @@
 
   /* Disabled inputs */
   --input-disabled-bg-color: #eeeeee;
-  --input-disabled-border-color: #eeeeee;
-  --input-disabled-text-color: #a0a0a0;
+  --input-disabled-border-color: #dddddd;
+  --input-disabled-text-color: #b0b0b0;
+
+  /* List item */
+  --list-item-bg-color: var(--alt-bg-color);
 
   /* List item icons */
   --list-item-icon-fill: #a7a7a7;
@@ -51,17 +54,22 @@
   }
 
   .iconbutton {
-    &.circle-icon .iconbutton__icon {
-      border-color: var(--main-text-color);
-    }
+    --iconbtn-title-color: var(--main-text-color);
+    --iconbtn-icon-color: var(--main-text-color);
+    --iconbtn-hover-title-color: var(--main-text-color);
+    --iconbtn-hover-icon-color: var(--main-text-color);
 
-    .iconbutton__icon-content {
-      fill: var(--main-text-color);
-    }
+    &.circle-icon {
+      --iconbtn-hover-icon-color: #ffffff;
 
-    .iconbutton__content {
-      color: var(--main-text-color);
+      .iconbutton__icon {
+        border-color: var(--main-text-color);
+      }
     }
+  }
+
+  .icon {
+    fill: var(--main-text-color);
   }
 
   /* No data message for lists & etc. */
@@ -94,6 +102,7 @@
 
   .stretch-input[disabled] {
     color: var(--input-disabled-text-color);
+    border-color: var(--input-disabled-border-color);
     background-color: var(--input-disabled-bg-color);
   }
 
@@ -130,6 +139,7 @@
     --dd-bg-color: var(--input-bg-color);
     --dd-selection-text: var(--main-text-color);
     --dd-border-color: var(--input-border-color);
+    --dd-input-text: var(--main-text-color);
 
     /* Active component */
     --dd-active-bg: #f2f2f2;
@@ -179,8 +189,7 @@
   .rule-item .collapsible-header,
   .rule-form-collapse .collapsible-header {
     color: var(--main-text-color);
-    background-color: #dddddd;
-    border-color: #dddddd;
+    background-color: var(--list-item-bg-color);
   }
 
   /* Filters */
@@ -204,7 +213,7 @@
   /* Transaction list item */
   .trans-item__content,
   .trans-item__controls {
-    background-color: var(--alt-bg-color);
+    background-color: var(--list-item-bg-color);
   }
 
   .trans-item__balance,
@@ -282,17 +291,7 @@
 
   /* Import form */
   .import-form {
-    .form-container,
-    .controls,
-    .invalid-feedback,
-    .form-controls {
-      background-color: #dddddd;
-    }
-
-    &.import-form__placeholder {
-      border-color: #888888;
-      background-color: var(--main-bg-color);
-    }
+    --input-disabled-border-color: #eeeeee;
 
     input[type="text"] {
       border-color: var(--input-border-color);
@@ -379,10 +378,6 @@
     border-color: #e8e8e8;
   }
 
-  .import-controls {
-    color: var(--main-text-color);
-  }
-
   /* Upload dialog */
   .upload-form__descr {
     color: #4e4e4e;
@@ -416,14 +411,13 @@
   .rule-item .collapsible-content {
     color: #202020;
     border-color: #ffffff;
-    background-color: #e8e8e8;
+    background-color: #d0d0d0;
   }
 
   /* Condition item */
   .cond-item,
   .cond-form {
-    background-color: #cccccc;
-    border-color: #cccccc;
+    background-color: var(--list-item-bg-color);
   }
 
   .cond-item__operator {
@@ -433,7 +427,7 @@
   /* Action item */
   .action-item,
   .action-form {
-    background-color: #cccccc;
+    background-color: var(--list-item-bg-color);
   }
 
   /* Original import data container */
@@ -490,18 +484,9 @@
     }
 
     .iconbutton:hover {
-      .iconbutton__icon,
-      .iconbutton__content {
-        color: var(--main-text-color);
-      }
-
       &.circle-icon {
         .iconbutton__icon {
           background-color: var(--main-text-color);
-        }
-
-        .iconbutton__icon-content {
-          fill: #ffffff;
         }
       }
     }

@@ -2,12 +2,12 @@ import {
     TestComponent,
     query,
     queryAll,
-    prop,
     assert,
     formatDate,
+    evaluate,
+    asyncMap,
 } from 'jezve-test';
 import { App } from '../../../Application.js';
-import { asyncMap } from '../../../common.js';
 import { ImportTemplate } from '../../../model/ImportTemplate.js';
 
 const labelsMap = {
@@ -44,13 +44,15 @@ export class OriginalImportData extends TestComponent {
         const valueElem = await query(elem, '.column__data');
         assert(labelElem && valueElem, 'Invalid structure of import item');
 
-        const label = await prop(labelElem, 'textContent');
-        const value = await prop(valueElem, 'textContent');
-        const property = Object.keys(labelsMap).find((key) => label === labelsMap[key]);
+        const res = await evaluate((labelEl, valueEl) => ({
+            label: labelEl.textContent,
+            value: valueEl.textContent,
+        }), labelElem, valueElem);
 
-        assert(property, `Invalid label: '${label}'`);
+        res.property = Object.keys(labelsMap).find((key) => res.label === labelsMap[key]);
+        assert(res.property, `Invalid label: '${res.label}'`);
 
-        return { value, property };
+        return res;
     }
 
     async buildModel(cont) {

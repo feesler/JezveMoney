@@ -8,8 +8,16 @@
   max-width: 450px;
 }
 
-.report-type-filter .link-menu {
-  flex-flow: row nowrap;
+.report-type-filter {
+  max-width: 200px;
+
+  .link-menu {
+    flex-flow: row nowrap;
+  }
+}
+
+.accounts-filter {
+  flex-shrink: 0;
 }
 
 .currency-filter,

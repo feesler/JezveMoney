@@ -3,9 +3,10 @@ import {
     assert,
     query,
     hasClass,
-    prop,
     click,
     input,
+    asyncMap,
+    evaluate,
 } from 'jezve-test';
 import { DropDown } from 'jezvejs-test';
 import {
@@ -34,6 +35,15 @@ const actionValueMap = {
     [IMPORT_ACTION_SET_COMMENT]: 'text',
 };
 
+const fieldSelectors = [
+    '.action-type-field',
+    '.trans-type-field',
+    '.account-field',
+    '.person-field',
+    '.amount-field',
+    '.action-value-field',
+];
+
 /** Import action form */
 export class ImportActionForm extends TestComponent {
     async parseContent() {
@@ -43,12 +53,17 @@ export class ImportActionForm extends TestComponent {
             deleteBtn: { elem: await query(this.elem, '.delete-btn') },
         };
 
-        res.actionField = await this.parseField(await query(this.elem, '.action-type-field'));
-        res.transTypeField = await this.parseField(await query(this.elem, '.trans-type-field'));
-        res.accountField = await this.parseField(await query(this.elem, '.account-field'));
-        res.personField = await this.parseField(await query(this.elem, '.person-field'));
-        res.amountField = await this.parseField(await query(this.elem, '.amount-field'));
-        res.textField = await this.parseField(await query(this.elem, '.action-value-field'));
+        [
+            res.actionField,
+            res.transTypeField,
+            res.accountField,
+            res.personField,
+            res.amountField,
+            res.textField,
+        ] = await asyncMap(
+            fieldSelectors,
+            (selector) => this.parseField(query(this.elem, selector)),
+        );
 
         assert(
             res.actionField
@@ -64,22 +79,31 @@ export class ImportActionForm extends TestComponent {
         return res;
     }
 
-    async parseField(elem) {
-        const res = { elem };
+    async parseField(el) {
+        const elem = await el;
+        assert(elem, 'Invalid field element');
 
-        assert(res.elem, 'Invalid field element');
+        let res;
 
         const isDropDown = await hasClass(elem, 'dd__container');
         if (isDropDown) {
-            res.dropDown = await DropDown.create(this, elem);
-            assert(res.dropDown, 'Invalid structure of field element');
-            res.disabled = res.dropDown.content.disabled;
-            res.value = res.dropDown.content.value;
+            const dropDown = await DropDown.create(this, elem);
+            assert(dropDown, 'Invalid structure of field element');
+
+            res = {
+                dropDown,
+                disabled: dropDown.disabled,
+                value: dropDown.value,
+            };
         } else {
+            res = await evaluate((inputEl) => ({
+                disabled: inputEl.disabled,
+                value: inputEl.value,
+            }), elem);
             res.inputElem = elem;
-            res.disabled = await prop(res.inputElem, 'disabled');
-            res.value = await prop(res.inputElem, 'value');
         }
+
+        res.elem = elem;
 
         return res;
     }

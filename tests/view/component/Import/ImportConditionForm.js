@@ -3,10 +3,10 @@ import {
     assert,
     query,
     hasClass,
-    prop,
     click,
     input,
-    isVisible,
+    evaluate,
+    asyncMap,
 } from 'jezve-test';
 import { Checkbox, DropDown } from 'jezvejs-test';
 import {
@@ -41,23 +41,38 @@ const fieldValueMap = {
     [IMPORT_COND_FIELD_DATE]: 'text',
 };
 
+const fieldSelectors = [
+    '.property-field',
+    '.operator-field',
+    '.amount-field',
+    '.account-field',
+    '.tpl-field',
+    '.currency-field',
+    '.value-prop-field',
+    '.text-field',
+];
+
 /** Import condition form */
 export class ImportConditionForm extends TestComponent {
     async parseContent() {
-        const res = {};
+        const res = {
+            fieldValueCheck: await Checkbox.create(this, await query(this.elem, '.cond-form__container .checkbox')),
+            deleteBtn: { elem: await query(this.elem, '.delete-btn') },
+        };
 
-        res.fieldTypeField = await this.parseField(await query(this.elem, '.property-field'));
-        res.operatorField = await this.parseField(await query(this.elem, '.operator-field'));
-        res.amountField = await this.parseField(await query(this.elem, '.amount-field'));
-        res.accountField = await this.parseField(await query(this.elem, '.account-field'));
-        res.templateField = await this.parseField(await query(this.elem, '.tpl-field'));
-        res.currencyField = await this.parseField(await query(this.elem, '.currency-field'));
-        res.propertyField = await this.parseField(await query(this.elem, '.value-prop-field'));
-        res.textField = await this.parseField(await query(this.elem, '.text-field'));
-
-        res.fieldValueCheck = await Checkbox.create(this, await query(this.elem, '.cond-form__container .checkbox'));
-
-        res.deleteBtn = { elem: await query(this.elem, '.delete-btn') };
+        [
+            res.fieldTypeField,
+            res.operatorField,
+            res.amountField,
+            res.accountField,
+            res.templateField,
+            res.currencyField,
+            res.propertyField,
+            res.textField,
+        ] = await asyncMap(
+            fieldSelectors,
+            (selector) => this.parseField(query(this.elem, selector)),
+        );
 
         assert(
             res.fieldTypeField
@@ -76,24 +91,31 @@ export class ImportConditionForm extends TestComponent {
         return res;
     }
 
-    async parseField(elem) {
-        const res = { elem };
+    async parseField(el) {
+        const elem = await el;
+        assert(elem, 'Invalid field element');
 
-        assert(res.elem, 'Invalid field element');
+        let res;
 
         const isDropDown = await hasClass(elem, 'dd__container');
         if (isDropDown) {
-            res.dropDown = await DropDown.create(this, elem);
-            assert(res.dropDown, 'Invalid structure of field element');
-            res.disabled = res.dropDown.content.disabled;
-            res.value = res.dropDown.content.value;
+            const dropDown = await DropDown.create(this, elem);
+            assert(dropDown, 'Invalid structure of field element');
+
+            res = {
+                dropDown,
+                disabled: dropDown.disabled,
+                value: dropDown.value,
+            };
         } else {
+            res = await evaluate((inputEl) => ({
+                disabled: inputEl.disabled,
+                value: inputEl.value,
+            }), elem);
             res.inputElem = elem;
-            res.disabled = await prop(res.inputElem, 'disabled');
-            res.value = await prop(res.inputElem, 'value');
         }
 
-        res.visible = await isVisible(elem);
+        res.elem = elem;
 
         return res;
     }

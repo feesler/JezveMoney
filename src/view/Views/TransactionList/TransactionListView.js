@@ -6,10 +6,11 @@ import {
     insertAfter,
     throttle,
     asArray,
+    setEvents,
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { DropDown } from 'jezvejs/DropDown';
-import { LinkMenu } from 'jezvejs/LinkMenu';
+import { IconButton } from 'jezvejs/IconButton';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import 'jezvejs/style/InputGroup';
@@ -29,7 +30,10 @@ import './style.scss';
 import { SearchInput } from '../../Components/SearchInput/SearchInput.js';
 import { createStore } from '../../js/store.js';
 import { reducer, actions, isSameSelection } from './reducer.js';
+import { Heading } from '../../Components/Heading/Heading.js';
 
+/* Strings */
+const STR_TITLE = 'Transactions';
 const PAGE_TITLE = 'Jezve Money | Transactions';
 const MSG_SET_POS_FAIL = 'Fail to change position of transaction.';
 const TITLE_SINGLE_TRANS_DELETE = 'Delete transaction';
@@ -37,13 +41,18 @@ const TITLE_MULTI_TRANS_DELETE = 'Delete transactions';
 const MSG_MULTI_TRANS_DELETE = 'Are you sure want to delete selected transactions?<br>Changes in the balance of affected accounts will be canceled.';
 const MSG_SINGLE_TRANS_DELETE = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
 /* Mode selector items */
-const TITLE_CLASSIC = 'Classic';
-const TITLE_DETAILS = 'Details';
+const TITLE_SHOW_MAIN = 'Show main';
+const TITLE_SHOW_DETAILS = 'Show details';
 /* Date range input */
 const START_DATE_PLACEHOLDER = 'From';
 const END_DATE_PLACEHOLDER = 'To';
 /* 'Show more' button */
 const TITLE_SHOW_MORE = 'Show more...';
+/* Accounts and persons filter */
+const ACCOUNTS_GROUP_TITLE = 'Accounts';
+const PERSONS_GROUP_TITLE = 'Persons';
+const HIDDEN_ACCOUNTS_GROUP_TITLE = 'Hidden accounts';
+const HIDDEN_PERSONS_GROUP_TITLE = 'Hidden persons';
 
 const SEARCH_THROTTLE = 300;
 
@@ -83,7 +92,11 @@ class TransactionListView extends View {
      * View initialization
      */
     onStart() {
-        const collapse = new Collapsible({
+        this.heading = Heading.fromElement(ge('heading'), {
+            title: STR_TITLE,
+        });
+
+        const collapse = Collapsible.create({
             header: [ge('filtershdr')],
             content: ge('filters'),
             className: 'filters-collapsible',
@@ -91,7 +104,7 @@ class TransactionListView extends View {
         ge('filterscollapse').appendChild(collapse.elem);
 
         this.clearAllBtn = ge('clearall_btn');
-        this.clearAllBtn.addEventListener('click', (e) => this.onClearAllFilters(e));
+        setEvents(this.clearAllBtn, { click: (e) => this.onClearAllFilters(e) });
 
         this.typeMenu = TransactionTypeMenu.fromElement(ge('type_menu'), {
             multiple: true,
@@ -101,37 +114,39 @@ class TransactionListView extends View {
         });
 
         const accountsFilter = ge('accountsFilter');
-        if (window.app.model.accounts.length === 0) {
+        if (!this.isAvailable()) {
             show(accountsFilter, false);
         } else {
             this.accountDropDown = DropDown.create({
                 elem: 'acc_id',
-                placeholder: 'Select account',
+                placeholder: 'Type to filter',
+                enableFilter: true,
+                noResultsMessage: 'Nothing found',
                 onitemselect: (obj) => this.onAccountChange(obj),
                 onchange: (obj) => this.onAccountChange(obj),
                 className: 'dd_fullwidth',
             });
-            if (!this.accountDropDown) {
-                throw new Error('Failed to initialize Transaction List view');
-            }
-            window.app.initAccountsList(this.accountDropDown);
-        }
 
-        const personsFilter = ge('personsFilter');
-        if (window.app.model.persons.length === 0) {
-            show(personsFilter, false);
-        } else {
-            this.personDropDown = DropDown.create({
-                elem: 'person_id',
-                placeholder: 'Select person',
-                onitemselect: (obj) => this.onPersonChange(obj),
-                onchange: (obj) => this.onPersonChange(obj),
-                className: 'dd_fullwidth',
+            window.app.appendAccounts(this.accountDropDown, {
+                visible: true,
+                idPrefix: 'a',
+                group: ACCOUNTS_GROUP_TITLE,
             });
-            if (!this.personDropDown) {
-                throw new Error('Failed to initialize Transaction List view');
-            }
-            window.app.initPersonsList(this.personDropDown);
+            window.app.appendAccounts(this.accountDropDown, {
+                visible: false,
+                idPrefix: 'a',
+                group: HIDDEN_ACCOUNTS_GROUP_TITLE,
+            });
+            window.app.appendPersons(this.accountDropDown, {
+                visible: true,
+                idPrefix: 'p',
+                group: PERSONS_GROUP_TITLE,
+            });
+            window.app.appendPersons(this.accountDropDown, {
+                visible: false,
+                idPrefix: 'p',
+                group: HIDDEN_PERSONS_GROUP_TITLE,
+            });
         }
 
         // Date range filter
@@ -154,26 +169,28 @@ class TransactionListView extends View {
         this.loadingIndicator = LoadingIndicator.create();
         this.listContainer.append(this.loadingIndicator.elem);
 
+        // Counters
+        this.itemsCount = ge('itemsCount');
+        this.selectedCounter = ge('selectedCounter');
+        this.selItemsCount = ge('selItemsCount');
+
         // List mode selected
         const listHeader = document.querySelector('.list-header');
-        this.modeSelector = LinkMenu.create({
+        this.modeSelector = IconButton.create({
+            type: 'link',
             className: 'mode-selector',
-            itemParam: 'mode',
-            items: [
-                { icon: 'mode-list', title: TITLE_CLASSIC, value: 'classic' },
-                { icon: 'mode-details', title: TITLE_DETAILS, value: 'details' },
-            ],
-            onChange: (mode) => this.onModeChanged(mode),
+            onClick: (e) => this.onToggleMode(e),
         });
         listHeader.append(this.modeSelector.elem);
 
         // Transactions list
+        const listContainer = document.querySelector('.list-container');
         this.list = TransactionList.create({
             listMode: 'list',
             onItemClick: (id, e) => this.onItemClick(id, e),
             onSort: (id, pos) => this.sendChangePosRequest(id, pos),
         });
-        insertAfter(this.list.elem, listHeader);
+        listContainer.append(this.list.elem);
 
         const listFooter = document.querySelector('.list-footer');
         // 'Show more' button
@@ -196,8 +213,17 @@ class TransactionListView extends View {
         listFooter.append(this.paginator.elem);
 
         this.createBtn = ge('add_btn');
+
+        this.listModeBtn = IconButton.create({
+            id: 'listModeBtn',
+            className: 'no-icon',
+            title: 'Done',
+            onClick: () => this.setListMode('list'),
+        });
+        insertAfter(this.listModeBtn.elem, this.createBtn);
+
         this.createMenu();
-        insertAfter(this.menu.elem, this.createBtn);
+        insertAfter(this.menu.elem, this.listModeBtn.elem);
 
         this.createContextMenu();
 
@@ -208,10 +234,6 @@ class TransactionListView extends View {
         this.menu = PopupMenu.create({
             id: 'listMenu',
             items: [{
-                id: 'listModeBtn',
-                title: 'Done',
-                onClick: () => this.setListMode('list'),
-            }, {
                 id: 'selectModeBtn',
                 icon: 'select',
                 title: 'Select',
@@ -260,6 +282,12 @@ class TransactionListView extends View {
                 onClick: () => this.confirmDelete(),
             }],
         });
+    }
+
+    /** Returns true if accounts or persons is available */
+    isAvailable() {
+        const { accounts, persons } = window.app.model;
+        return (accounts.length > 0 || persons.length > 0);
     }
 
     showContextMenu(itemId) {
@@ -380,35 +408,34 @@ class TransactionListView extends View {
     }
 
     /**
-     * Account change event handler
+     * Account and person filter change event handler
      * @param {object} obj - selection object
      */
-    onAccountChange(obj) {
-        const ids = asArray(obj).map((item) => parseInt(item.id, 10));
+    onAccountChange(selected) {
+        const accountIds = [];
+        const personIds = [];
+        asArray(selected).forEach(({ id }) => {
+            const arr = (id.startsWith('a')) ? accountIds : personIds;
+            const itemId = parseInt(id.substring(1), 10);
+            arr.push(itemId);
+        });
+
         let state = this.store.getState();
-        const filterIds = state.form.acc_id ?? [];
-        if (isSameSelection(ids, filterIds)) {
+        const filterAccounts = asArray(state.form.acc_id);
+        const filterPersons = asArray(state.form.person_id);
+        const accountsChanged = !isSameSelection(accountIds, filterAccounts);
+        const personsChanged = !isSameSelection(personIds, filterPersons);
+        if (!accountsChanged && !personsChanged) {
             return;
         }
 
-        this.store.dispatch(actions.changeAccountsFilter(ids));
-        state = this.store.getState();
-        this.requestTransactions(state.form);
-    }
-
-    /**
-     * Persons filter change event handler
-     * @param {object} obj - selection object
-     */
-    onPersonChange(obj) {
-        const ids = asArray(obj).map((item) => parseInt(item.id, 10));
-        let state = this.store.getState();
-        const filterIds = state.form.person_id ?? [];
-        if (isSameSelection(ids, filterIds)) {
-            return;
+        if (accountsChanged) {
+            this.store.dispatch(actions.changeAccountsFilter(accountIds));
+        }
+        if (personsChanged) {
+            this.store.dispatch(actions.changePersonsFilter(personIds));
         }
 
-        this.store.dispatch(actions.changePersonsFilter(ids));
         state = this.store.getState();
         this.requestTransactions(state.form);
     }
@@ -491,8 +518,10 @@ class TransactionListView extends View {
         });
     }
 
-    onModeChanged(mode) {
-        this.store.dispatch(actions.changeMode(mode));
+    onToggleMode(e) {
+        e.preventDefault();
+
+        this.store.dispatch(actions.toggleMode());
         this.replaceHistory();
     }
 
@@ -564,10 +593,12 @@ class TransactionListView extends View {
         const selectedItems = this.list.getSelectedItems();
         const totalSelCount = selectedItems.length;
 
+        show(this.createBtn, isListMode);
+        this.listModeBtn.show(!isListMode);
+
         this.menu.show(itemsCount > 0);
 
         const { items } = this.menu;
-        items.listModeBtn.show(!isListMode);
         items.selectModeBtn.show(isListMode && itemsCount > 0);
         items.sortModeBtn.show(isListMode && itemsCount > 1);
 
@@ -580,42 +611,27 @@ class TransactionListView extends View {
         items.deleteBtn.show(isSelectMode && totalSelCount > 0);
     }
 
-    /** Render accounts selection */
+    /** Render accounts and persons selection */
     renderAccountsFilter(state) {
-        const selectedAccounts = this.accountDropDown.getSelectedItems();
+        if (!this.isAvailable()) {
+            return;
+        }
+
+        const selectedItems = this.accountDropDown.getSelectedItems();
         const selectedIds = [];
-        const idsToSelect = asArray(state.form.acc_id);
-        selectedAccounts.forEach((accountItem) => {
-            const itemId = parseInt(accountItem.id, 10);
-            selectedIds.push(itemId);
-
-            if (!idsToSelect.includes(itemId)) {
-                this.accountDropDown.deselectItem(accountItem.id);
+        const idsToSelect = [
+            ...asArray(state.form.acc_id).map((id) => `a${id}`),
+            ...asArray(state.form.person_id).map((id) => `p${id}`),
+        ];
+        selectedItems.forEach(({ id }) => {
+            selectedIds.push(id);
+            if (!idsToSelect.includes(id)) {
+                this.accountDropDown.deselectItem(id);
             }
         });
-        idsToSelect.forEach((accountId) => {
-            if (!selectedIds.includes(accountId)) {
-                this.accountDropDown.selectItem(accountId.toString());
-            }
-        });
-    }
-
-    /** Render persons selection */
-    renderPersonsFilter(state) {
-        const selectedPersons = this.personDropDown.getSelectedItems();
-        const selectedIds = [];
-        const idsToSelect = asArray(state.form.person_id);
-        selectedPersons.forEach((personItem) => {
-            const itemId = parseInt(personItem.id, 10);
-            selectedIds.push(itemId);
-
-            if (!idsToSelect.includes(itemId)) {
-                this.personDropDown.deselectItem(personItem.id);
-            }
-        });
-        idsToSelect.forEach((personId) => {
-            if (!selectedIds.includes(personId)) {
-                this.personDropDown.selectItem(personId.toString());
+        idsToSelect.forEach((id) => {
+            if (!selectedIds.includes(id)) {
+                this.accountDropDown.selectItem(id.toString());
             }
         });
     }
@@ -630,12 +646,7 @@ class TransactionListView extends View {
         this.typeMenu.setURL(filterUrl);
         this.typeMenu.setSelection(state.form.type);
 
-        if (window.app.model.accounts.length > 0) {
-            this.renderAccountsFilter(state);
-        }
-        if (window.app.model.persons.length > 0) {
-            this.renderPersonsFilter(state);
-        }
+        this.renderAccountsFilter(state);
 
         // Render date
         const dateFilter = {
@@ -660,6 +671,13 @@ class TransactionListView extends View {
             renderTime: Date.now(),
         }));
 
+        // Counters
+        const isSelectMode = (state.listMode === 'select');
+        const selected = (isSelectMode) ? this.list.getSelectedItems() : [];
+        this.itemsCount.textContent = state.pagination.total;
+        show(this.selectedCounter, isSelectMode);
+        this.selItemsCount.textContent = selected.length;
+
         if (this.paginator) {
             this.paginator.show(state.items.length > 0);
             const range = state.pagination.range ?? 1;
@@ -676,10 +694,16 @@ class TransactionListView extends View {
             state.items.length > 0 && state.pagination.page < state.pagination.pagesCount,
         );
 
+        const isDetails = (state.mode === 'details');
+        filterUrl.searchParams.set('mode', (isDetails) ? 'classic' : 'details');
         filterUrl.searchParams.set('page', state.pagination.page);
         this.modeSelector.show(state.items.length > 0);
-        this.modeSelector.setActive(state.mode);
-        this.modeSelector.setURL(filterUrl);
+        this.modeSelector.setState((modeSelectorState) => ({
+            ...modeSelectorState,
+            icon: (isDetails) ? 'mode-list' : 'mode-details',
+            title: (isDetails) ? TITLE_SHOW_MAIN : TITLE_SHOW_DETAILS,
+            url: filterUrl.toString(),
+        }));
 
         this.renderContextMenu(state);
         this.renderMenu(state);

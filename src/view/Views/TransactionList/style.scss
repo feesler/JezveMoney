@@ -1,10 +1,6 @@
 /* Filters collapsible */
-.filters-collapsible {
-  margin: 0 0 9px 0;
-
-  .collapsible-header {
-    cursor: pointer;
-  }
+.filters-collapsible .collapsible-header {
+  cursor: pointer;
 }
 
 /* Filters heading */
@@ -88,8 +84,9 @@
 /* List header */
 .list-header {
   display: flex;
-  flex-flow: column nowrap;
-  align-items: flex-start;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: space-between;
 }
 
 /* List footer */
@@ -108,22 +105,24 @@
 }
 
 /* Mode selector */
-.mode-selector {
-  align-items: center;
-  padding: 8px 0;
-
-  .link-menu-item {
-    padding: 0;
-  }
-
-  .link-menu-item__title {
-    height: 24px;
-    line-height: 24px;
+.dark-theme,
+.white-theme {
+  .iconbutton.mode-selector {
+    --iconbtn-title-color: var(--accent-color);
+    --iconbtn-icon-color: var(--accent-color);
+    --iconbtn-hover-icon-color: var(--accent-color);
+    --iconbtn-hover-title-color: var(--accent-hover-color);
   }
 }
 
 @media (hover: hover) {
   .show-more-btn:hover {
     background-color: #4a4a4a;
+  }
+
+  .mode-selector:hover {
+    .iconbutton__content {
+      text-decoration: underline;
+    }
   }
 }

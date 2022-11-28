@@ -16,7 +16,6 @@ import {
 import {
     DropDown,
     Paginator,
-    LinkMenu,
     IconButton,
 } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -28,6 +27,7 @@ import { SearchInput } from './component/SearchInput.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
 import { fixDate, isEmpty, urlJoin } from '../common.js';
 import { FiltersAccordion } from './component/TransactionList/FiltersAccordion.js';
+import { Counter } from './component/Counter.js';
 
 const modeButtons = {
     list: 'listModeBtn',
@@ -36,7 +36,6 @@ const modeButtons = {
 };
 
 const listMenuItems = [
-    'listModeBtn',
     'selectModeBtn',
     'sortModeBtn',
     'selectAllBtn',
@@ -48,31 +47,33 @@ const contextMenuItems = [
     'ctxUpdateBtn', 'ctxDeleteBtn',
 ];
 
+const TITLE_SHOW_MAIN = 'Show main';
+const TITLE_SHOW_DETAILS = 'Show details';
+
 /** List of transactions view class */
 export class TransactionListView extends AppView {
     async parseContent() {
         const res = {
-            titleEl: await query('.content_wrap > .heading > h1'),
+            title: { elem: await query('.content_wrap > .heading > h1') },
             addBtn: await IconButton.create(this, await query('#add_btn')),
+            listModeBtn: await IconButton.create(this, await query('#listModeBtn')),
             listMenuContainer: {
                 elem: await query('#listMenu'),
                 menuBtn: await query('#listMenu .popup-menu-btn'),
             },
             listMenu: { elem: await query('#listMenu .popup-menu-list') },
-            contextMenu: { elem: await query('#contextMenu') },
+            totalCounter: await Counter.create(this, await query('#itemsCounter')),
+            selectedCounter: await Counter.create(this, await query('#selectedCounter')),
         };
+
+        Object.keys(res).forEach((child) => (
+            assert(res[child]?.elem, `Invalid structure of view: ${child} component not found`)
+        ));
 
         await this.parseMenuItems(res, listMenuItems);
 
-        assert(
-            res.titleEl
-            && res.addBtn
-            && res.listMenuContainer.elem
-            && res.listMenuContainer.menuBtn
-            && res.listMenu.elem,
-            'Invalid structure of transactions view',
-        );
-
+        // Context menu
+        res.contextMenu = { elem: await query('#contextMenu') };
         const contextParent = await closest(res.contextMenu.elem, '.trans-item');
         if (contextParent) {
             const itemId = await prop(contextParent, 'dataset.id');
@@ -94,34 +95,25 @@ export class TransactionListView extends AppView {
             res.accDropDown = await DropDown.createFromChild(this, await query('#acc_id'));
         }
 
-        const personsFilter = await query('#personsFilter');
-        const personsFilterVisible = await isVisible(personsFilter);
-        if (personsFilterVisible) {
-            res.personDropDown = await DropDown.createFromChild(this, await query('#person_id'));
-        }
-
         res.dateFilter = await DatePickerFilter.create(this, await query('#dateFilter'));
         assert(res.dateFilter, 'Date filter not found');
 
         res.searchForm = await SearchInput.create(this, await query('#searchFilter .search-field'));
         assert(res.searchForm, 'Search form not found');
 
-        const transList = await query('.trans-list');
-        assert(transList, 'List of transactions not found');
+        const listContainer = await query('.list-container');
+        assert(listContainer, 'List container not found');
+        res.loadingIndicator = { elem: await query(listContainer, '.loading-indicator') };
 
-        res.loadingIndicator = { elem: await query(transList, '.loading-indicator') };
-
-        res.modeSelector = await LinkMenu.create(this, await query('.mode-selector'));
+        res.modeSelector = await IconButton.create(this, await query('.mode-selector'));
         res.paginator = await Paginator.create(this, await query('.paginator'));
         res.showMoreBtn = { elem: await query('.show-more-btn') };
 
-        res.title = await prop(res.titleEl, 'textContent');
-        res.transList = await TransactionList.create(this, transList);
+        res.title.value = await prop(res.title.elem, 'textContent');
 
-        if (res.transList?.content?.items?.length > 0) {
-            assert(res.modeSelector, 'Mode selector not found');
-            assert(res.paginator, 'Paginator not found');
-        }
+        const transList = await query('.trans-list');
+        assert(transList, 'List of transactions not found');
+        res.transList = await TransactionList.create(this, transList);
 
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
@@ -144,10 +136,18 @@ export class TransactionListView extends AppView {
         return res;
     }
 
-    getDropDownFilter(dropDown) {
-        return (dropDown)
-            ? dropDown.getSelectedValues().map((item) => parseInt(item, 10))
-            : [];
+    getDropDownFilter(dropDown, idPrefix) {
+        if (!dropDown) {
+            return [];
+        }
+
+        const res = [];
+        dropDown.getSelectedValues().forEach((id) => {
+            if (id.startsWith(idPrefix)) {
+                res.push(parseInt(id.substring(idPrefix.length), 10));
+            }
+        });
+        return res;
     }
 
     async buildModel(cont) {
@@ -163,8 +163,8 @@ export class TransactionListView extends AppView {
         res.filterCollapsed = cont.filtersAccordion.isCollapsed();
         res.filter = {
             type: cont.typeMenu.value,
-            accounts: this.getDropDownFilter(cont.accDropDown),
-            persons: this.getDropDownFilter(cont.personDropDown),
+            accounts: this.getDropDownFilter(cont.accDropDown, 'a'),
+            persons: this.getDropDownFilter(cont.accDropDown, 'p'),
             search: cont.searchForm.value,
             startDate: null,
             endDate: null,
@@ -201,7 +201,7 @@ export class TransactionListView extends AppView {
 
         const isModeSelectorVisible = cont.modeSelector?.content?.visible;
         if (isModeSelectorVisible) {
-            res.detailsMode = cont.modeSelector.value === 'details';
+            res.detailsMode = cont.modeSelector.title === TITLE_SHOW_MAIN;
         } else {
             const locURL = new URL(this.location);
             res.detailsMode = locURL.searchParams.has('mode') && locURL.searchParams.get('mode') === 'details';
@@ -254,7 +254,7 @@ export class TransactionListView extends AppView {
 
     onFilterUpdate() {
         this.model = this.updateModelFilter(this.model);
-        return this.setExpectedState();
+        return this.getExpectedState();
     }
 
     getExpectedURL() {
@@ -313,7 +313,7 @@ export class TransactionListView extends AppView {
 
     onPageChanged(page) {
         this.model = this.setModelPage(this.model, page);
-        return this.setExpectedState();
+        return this.getExpectedState();
     }
 
     setModelRange(model, range) {
@@ -336,15 +336,29 @@ export class TransactionListView extends AppView {
 
     onRangeChanged(range) {
         this.model = this.setModelRange(this.model, range);
-        return this.setExpectedState();
+        return this.getExpectedState();
     }
 
-    setExpectedState(model = this.model) {
+    getAccountPrefixedIds(model = this.model) {
+        return model.filter.accounts.map((id) => `a${id}`);
+    }
+
+    getPersonPrefixedIds(model = this.model) {
+        return model.filter.persons.map((id) => `p${id}`);
+    }
+
+    getPrefixedIds(model = this.model) {
+        return [
+            ...this.getAccountPrefixedIds(model),
+            ...this.getPersonPrefixedIds(model),
+        ];
+    }
+
+    getExpectedState(model = this.model) {
         const listMode = model.listMode === 'list';
         const selectMode = model.listMode === 'select';
         const isItemsAvailable = (model.filtered.length > 0);
-        const isAccountsAvailable = App.state.accounts.length > 0;
-        const isPersonsAvailable = App.state.persons.length > 0;
+        const isAvailable = App.state.accounts.length > 0 || App.state.persons.length > 0;
         const isFiltersVisible = !model.filterCollapsed;
         const selected = this.getSelectedItems(model);
 
@@ -360,10 +374,7 @@ export class TransactionListView extends AppView {
                 visible: isFiltersVisible,
             },
             accDropDown: {
-                visible: isFiltersVisible && isAccountsAvailable,
-            },
-            personDropDown: {
-                visible: isFiltersVisible && isPersonsAvailable,
+                visible: isFiltersVisible && isAvailable,
             },
             dateFilter: {
                 visible: isFiltersVisible,
@@ -376,15 +387,16 @@ export class TransactionListView extends AppView {
                 value: model.filter.search,
                 visible: isFiltersVisible,
             },
+            totalCounter: { visible: true, value: model.filtered.length },
+            selectedCounter: { visible: selectMode, value: selected.length },
             modeSelector: { visible: isItemsAvailable },
             showMoreBtn: { visible: isItemsAvailable && model.list.page < model.list.pages },
             paginator: { visible: isItemsAvailable },
             transList: { visible: true },
+            addBtn: { visible: listMode },
+            listModeBtn: { visible: !listMode },
             listMenuContainer: { visible: isItemsAvailable },
             listMenu: { visible: model.listMenuVisible },
-            listModeBtn: {
-                visible: model.listMenuVisible && !listMode,
-            },
             selectModeBtn: {
                 visible: model.listMenuVisible && listMode && isItemsAvailable,
             },
@@ -413,18 +425,10 @@ export class TransactionListView extends AppView {
             res.ctxDeleteBtn = { visible: true };
         }
 
-        if (isAccountsAvailable) {
+        if (isAvailable) {
             res.accDropDown.isMulti = true;
-            res.accDropDown.selectedItems = model.filter.accounts.map(
-                (accountId) => ({ id: accountId.toString() }),
-            );
-        }
-
-        if (isPersonsAvailable) {
-            res.personDropDown.isMulti = true;
-            res.personDropDown.selectedItems = model.filter.persons.map(
-                (personId) => ({ id: personId.toString() }),
-            );
+            const ids = this.getPrefixedIds(model);
+            res.accDropDown.selectedItems = ids.map((id) => ({ id }));
         }
 
         if (isItemsAvailable) {
@@ -434,10 +438,7 @@ export class TransactionListView extends AppView {
                 active: model.list.page + this.currentRange(model) - 1,
             };
 
-            res.modeSelector = {
-                ...res.modeSelector,
-                value: (model.detailsMode) ? 'details' : 'classic',
-            };
+            res.modeSelector.title = (model.detailsMode) ? TITLE_SHOW_MAIN : TITLE_SHOW_DETAILS;
         }
 
         return res;
@@ -451,7 +452,7 @@ export class TransactionListView extends AppView {
         const item = this.content.transList.items[num];
         this.model.contextMenuVisible = true;
         this.model.contextItem = item.id;
-        const expected = this.setExpectedState();
+        const expected = this.getExpectedState();
 
         await this.performAction(() => item.clickMenu());
         assert(this.content.contextMenu.visible, 'Context menu not visible');
@@ -463,7 +464,7 @@ export class TransactionListView extends AppView {
         assert(!this.content.listMenu.visible, 'List menu already opened');
 
         this.model.listMenuVisible = true;
-        const expected = this.setExpectedState();
+        const expected = this.getExpectedState();
 
         await this.performAction(() => click(this.content.listMenuContainer.menuBtn));
 
@@ -480,11 +481,13 @@ export class TransactionListView extends AppView {
             `Can't change list mode from ${this.model.listMode} to ${listMode}.`,
         );
 
-        await this.openListMenu();
+        if (listMode === 'list') {
+            await this.openListMenu();
+        }
 
         this.model.listMenuVisible = false;
         this.model.listMode = listMode;
-        const expected = this.setExpectedState();
+        const expected = this.getExpectedState();
 
         const buttonName = modeButtons[listMode];
         const button = this.content[buttonName];
@@ -513,7 +516,7 @@ export class TransactionListView extends AppView {
         }
 
         this.model.filterCollapsed = false;
-        const expected = this.setExpectedState();
+        const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.filtersAccordion.toggle());
 
@@ -577,21 +580,25 @@ export class TransactionListView extends AppView {
         return App.view.checkState(expected);
     }
 
-    async setFilterSelection(dropDown, itemIds) {
+    get accDropDown() {
+        return this.content.accDropDown;
+    }
+
+    async setFilterSelection(itemIds) {
         const ids = asArray(itemIds);
-        const selection = this.content[dropDown].getSelectedValues();
+        const selection = this.accDropDown.getSelectedValues();
         if (selection.length > 0) {
-            await this.waitForList(() => this.content[dropDown].clearSelection());
+            await this.waitForList(() => this.accDropDown.clearSelection());
         }
         if (ids.length === 0) {
             return;
         }
 
         for (const id of ids) {
-            await this.waitForList(() => this.content[dropDown].selectItem(id));
+            await this.waitForList(() => this.accDropDown.selectItem(id));
         }
 
-        await this.performAction(() => this.content[dropDown].showList(false));
+        await this.performAction(() => this.accDropDown.showList(false));
     }
 
     async filterByAccounts(ids, directNavigate = false) {
@@ -610,7 +617,8 @@ export class TransactionListView extends AppView {
         if (directNavigate) {
             await goTo(this.getExpectedURL());
         } else {
-            await this.setFilterSelection('accDropDown', accounts);
+            const selection = this.getPrefixedIds();
+            await this.setFilterSelection(selection);
         }
 
         return App.view.checkState(expected);
@@ -632,7 +640,8 @@ export class TransactionListView extends AppView {
         if (directNavigate) {
             await goTo(this.getExpectedURL());
         } else {
-            await this.setFilterSelection('personDropDown', persons);
+            const selection = this.getPrefixedIds();
+            await this.setFilterSelection(selection);
         }
 
         return App.view.checkState(expected);
@@ -727,50 +736,38 @@ export class TransactionListView extends AppView {
         return App.view.checkState(expected);
     }
 
-    async setClassicMode(directNavigate = false) {
-        if (!this.content.modeSelector) {
-            return false;
-        }
-        if (this.content.modeSelector.value === 'classic') {
-            return false;
-        }
+    async toggleMode(directNavigate = false) {
+        assert(this.content.modeSelector, 'Mode toggler button not available');
 
         if (directNavigate) {
             this.model.filterCollapsed = true;
         }
-        this.model.detailsMode = false;
-        const expected = this.setExpectedState();
+        this.model.detailsMode = !this.model.detailsMode;
+        const expected = this.getExpectedState();
 
         if (directNavigate) {
             await goTo(this.getExpectedURL());
         } else {
-            await this.waitForList(() => this.content.modeSelector.selectItemByValue('classic'));
+            await this.waitForList(() => this.content.modeSelector.click());
         }
 
         return App.view.checkState(expected);
     }
 
+    async setClassicMode(directNavigate = false) {
+        if (!this.model.detailsMode) {
+            return true;
+        }
+
+        return this.toggleMode(directNavigate);
+    }
+
     async setDetailsMode(directNavigate = false) {
-        if (!this.content.modeSelector) {
-            return false;
-        }
-        if (this.content.modeSelector.value === 'details') {
-            return false;
+        if (this.model.detailsMode) {
+            return true;
         }
 
-        if (directNavigate) {
-            this.model.filterCollapsed = true;
-        }
-        this.model.detailsMode = true;
-        const expected = this.setExpectedState();
-
-        if (directNavigate) {
-            await goTo(this.getExpectedURL());
-        } else {
-            await this.waitForList(() => this.content.modeSelector.selectItemByValue('details'));
-        }
-
-        return App.view.checkState(expected);
+        return this.toggleMode(directNavigate);
     }
 
     currentPage() {
@@ -808,6 +805,7 @@ export class TransactionListView extends AppView {
                 && searchQuery === this.model.filter.search
             );
         });
+        await this.parse();
     }
 
     async waitForList(action) {
@@ -967,7 +965,7 @@ export class TransactionListView extends AppView {
 
             const item = this.model.list.items[num];
             item.selected = !item.selected;
-            const expected = this.setExpectedState();
+            const expected = this.getExpectedState();
 
             await this.performAction(() => this.content.transList.items[num].click());
 
@@ -983,7 +981,7 @@ export class TransactionListView extends AppView {
 
         this.model.listMenuVisible = false;
         this.model.list.items = this.model.list.items.map(selectItem);
-        const expected = this.setExpectedState();
+        const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.selectAllBtn.click());
 
@@ -999,7 +997,7 @@ export class TransactionListView extends AppView {
 
         this.model.listMenuVisible = false;
         this.model.list.items = this.model.list.items.map(deselectItem);
-        const expected = this.setExpectedState();
+        const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.deselectAllBtn.click());
 
@@ -1023,7 +1021,7 @@ export class TransactionListView extends AppView {
         await this.openListMenu();
 
         this.model.listMenuVisible = false;
-        const expected = this.setExpectedState();
+        const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.deleteBtn.click());
         this.checkState(expected);

@@ -12,6 +12,29 @@ import { TransactionView } from './view/TransactionView.js';
 import { ImportView } from './view/ImportView.js';
 import { StatisticsView } from './view/StatisticsView.js';
 
+const routeMap = {
+    index: MainView,
+    login: LoginView,
+    register: RegisterView,
+    profile: ProfileView,
+    about: AboutView,
+    import: ImportView,
+    statistics: StatisticsView,
+    accounts: {
+        list: AccountListView,
+        item: AccountView,
+    },
+    persons: {
+        list: PersonListView,
+        item: PersonView,
+    },
+    transactions: {
+        list: TransactionListView,
+        item: TransactionView,
+    },
+};
+const listViews = ['accounts', 'persons', 'transactions'];
+
 /** Process request url and return view class if match */
 export async function route(env, url) {
     if (typeof url !== 'string') {
@@ -19,7 +42,6 @@ export async function route(env, url) {
     }
 
     const testUrl = new URL(env.baseUrl());
-
     const reqUrl = new URL(url);
     if (reqUrl.host !== testUrl.host) {
         throw new Error(`Invalid URL specified: ${url}`);
@@ -28,7 +50,7 @@ export async function route(env, url) {
     // Remove leading directory if needed
     let reqPath = reqUrl.pathname;
     if (reqPath.startsWith(testUrl.pathname)) {
-        reqPath = reqPath.substr(testUrl.pathname.length);
+        reqPath = reqPath.substring(testUrl.pathname.length);
     }
 
     // cut leading and trailing slashes
@@ -37,71 +59,25 @@ export async function route(env, url) {
     const part = parts.shift();
 
     if (!part || !part.length) {
-        return MainView;
+        return routeMap.index;
     }
 
-    if (part === 'login') {
-        return LoginView;
+    const view = routeMap[part];
+    if (typeof view === 'undefined') {
+        throw new Error(`Unknown route: ${reqUrl.pathname}`);
     }
 
-    if (part === 'register') {
-        return RegisterView;
-    }
-
-    if (part === 'profile') {
-        return ProfileView;
-    }
-
-    if (part === 'about') {
-        return AboutView;
-    }
-
-    if (part === 'accounts') {
+    if (listViews.includes(part)) {
         const actPart = parts.shift();
         if (!actPart) {
-            return AccountListView;
+            return view.list;
         }
-
         if (actPart === 'create' || actPart === 'update') {
-            return AccountView;
+            return view.item;
         }
 
         throw new Error(`Unknown route: ${reqUrl.pathname}`);
     }
 
-    if (part === 'persons') {
-        const actPart = parts.shift();
-        if (!actPart) {
-            return PersonListView;
-        }
-
-        if (actPart === 'create' || actPart === 'update') {
-            return PersonView;
-        }
-
-        throw new Error(`Unknown route: ${reqUrl.pathname}`);
-    }
-
-    if (part === 'transactions') {
-        const actPart = parts.shift();
-        if (!actPart) {
-            return TransactionListView;
-        }
-
-        if (actPart === 'create' || actPart === 'update') {
-            return TransactionView;
-        }
-
-        throw new Error(`Unknown route: ${reqUrl.pathname}`);
-    }
-
-    if (part === 'import') {
-        return ImportView;
-    }
-
-    if (part === 'statistics') {
-        return StatisticsView;
-    }
-
-    throw new Error(`Unknown route: ${reqUrl.pathname}`);
+    return view;
 }

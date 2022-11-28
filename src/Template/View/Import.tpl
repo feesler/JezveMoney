@@ -10,8 +10,11 @@ include(TPL_PATH . "Header.tpl");    ?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
-                    <div class="heading">
+                    <div id="heading" class="heading">
                         <h1>Import</h1>
+                        <div class="heading-actions" <?= hidden(!$importAvailable) ?>>
+                            <?= IconButton::render($uploadBtn) ?>
+                        </div>
                     </div>
 
                     <?php if (!$importAvailable) { ?>
@@ -19,23 +22,29 @@ include(TPL_PATH . "Header.tpl");    ?>
                     <?php   }   ?>
 
                     <div class="content-header" <?= hidden(!$importAvailable) ?>>
-                        <div class="data-header">
+                        <div id="dataHeaderControls" class="data-header">
                             <div class="header-field account-field">
                                 <label>Main account</label>
                                 <div class="header-field__content">
                                     <select id="acc_id"></select>
                                 </div>
                             </div>
-                            <div class="header-actions">
-                                <?= IconButton::render($uploadBtn) ?>
-                            </div>
+                            <button id="submitBtn" class="btn submit-btn" type="button" disabled>Submit</button>
                         </div>
 
-                        <div class="import-controls">
-                            <div class="items-counter">
-                                <span><span id="entrcount">0</span>&nbsp;/&nbsp;<span id="trcount">0</span> enabled</span>
+                        <div class="counters">
+                            <div id="itemsCounter" class="counter">
+                                <span class="counter__title">Items</span>
+                                <span id="itemsCount" class="counter__value">0</span>
                             </div>
-                            <button id="submitbtn" class="btn submit-btn" type="button" disabled>Submit</button>
+                            <div id="enabledCounter" class="counter">
+                                <span class="counter__title">Enabled</span>
+                                <span id="enabledCount" class="counter__value">0</span>
+                            </div>
+                            <div id="selectedCounter" class="counter" hidden>
+                                <span class="counter__title">Selected</span>
+                                <span id="selectedCount" class="counter__value">0</span>
+                            </div>
                         </div>
                     </div>
 

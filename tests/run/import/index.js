@@ -52,18 +52,15 @@ export const checkInitialState = async () => {
     await test('Initial state of import view', () => App.view.checkState());
 };
 
-function parseCSV(data) {
+const parseCSV = (data) => {
     const content = data.toString().trim();
-
     const rows = content.split('\n');
-    const res = rows.map((row) => row.trim().split(';').map((val) => {
+    return rows.map((row) => row.trim().split(';').map((val) => {
         const start = val.startsWith('"') ? 1 : 0;
-        const length = val.length - start - (val.endsWith('"') ? 1 : 0);
-        return val.substr(start, length);
+        const length = val.length - (val.endsWith('"') ? 1 : 0);
+        return val.substring(start, length);
     }));
-
-    return res;
-}
+};
 
 /** Open import upload dialog */
 export const openUploadDialog = async () => {
@@ -147,14 +144,6 @@ export const removeFile = async (filename) => {
     return true;
 };
 /* eslint-enable no-console */
-
-/** Test manual add new import item */
-export const addItem = async () => {
-    await test('Add import item', async () => {
-        await checkNavigation();
-        return App.view.addItem();
-    });
-};
 
 /** Test file upload */
 export const uploadFile = async (params) => {
@@ -328,14 +317,7 @@ export const deleteSelectedItems = async () => {
     });
 };
 
-/** Update item */
-export const updateItem = async (params) => {
-    assert(params && ('pos' in params), 'Invalid parameters');
-
-    setBlock(`Update item [${params.pos}]`, 2);
-
-    await checkNavigation();
-
+export const runFormAction = async (action) => {
     const actDescr = {
         changeType: 'Change transaction type',
         changeTransferAccount: 'Change transfer account',
@@ -348,44 +330,58 @@ export const updateItem = async (params) => {
         inputComment: 'Input comment',
     };
 
-    await App.view.updateItemByPos(params.pos);
+    let descr;
+    if (action.action === 'changeSourceCurrency' || action.action === 'changeDestCurrency') {
+        const currency = App.currency.getItem(action.data);
+        assert(currency, `Currency (${action.data}) not found`);
 
-    const actions = asArray(params.action);
-    for (const action of actions) {
-        let descr;
+        descr = `${actDescr[action.action]} to '${currency.name}'`;
+    } else if (action.action === 'changeTransferAccount') {
+        const userAccounts = App.state.accounts.getUserVisible();
+        const account = userAccounts.getItem(action.data);
+        assert(account, `Account (${action.data}) not found`);
 
-        if (action.action === 'changeSourceCurrency' || action.action === 'changeDestCurrency') {
-            const currency = App.currency.getItem(action.data);
-            assert(currency, `Currency (${action.data}) not found`);
+        descr = `${actDescr[action.action]} to '${account.name}'`;
+    } else if (action.action === 'changePerson') {
+        const persons = App.state.persons.getVisible();
+        const person = persons.getItem(action.data);
+        assert(person, `Person (${action.data}) not found`);
 
-            descr = `${actDescr[action.action]} to '${currency.name}'`;
-        } else if (action.action === 'changeTransferAccount') {
-            const userAccounts = App.state.accounts.getUserVisible();
-            const account = userAccounts.getItem(action.data);
-            assert(account, `Account (${action.data}) not found`);
-
-            descr = `${actDescr[action.action]} to '${account.name}'`;
-        } else if (action.action === 'changePerson') {
-            const persons = App.state.persons.getVisible();
-            const person = persons.getItem(action.data);
-            assert(person, `Person (${action.data}) not found`);
-
-            descr = `${actDescr[action.action]} to '${person.name}'`;
-        } else {
-            descr = `${actDescr[action.action]} '${action.data}'`;
-        }
-
-        await test(descr, () => App.view.runItemAction(params.pos, action));
+        descr = `${actDescr[action.action]} to '${person.name}'`;
+    } else {
+        descr = `${actDescr[action.action]} '${action.data}'`;
     }
 
-    /**
-     * Set expected state here as array of expected states of items
-     * because ImportList.render() method use transaction data objects
-     */
-    App.view.expectedState = {
-        itemsList: App.view.content.itemsList.getExpectedState(),
-    };
-    await test('View state', () => App.view.checkState());
+    await test(descr, () => App.view.runFormAction(action));
+};
+
+export const runFormActions = async (actions) => {
+    for (const action of asArray(actions)) {
+        await runFormAction(action);
+    }
+};
+
+/** Test manual add new import item */
+export const addItem = async (actions) => {
+    await test('Add import item', async () => {
+        await checkNavigation();
+        return App.view.addItem();
+    });
+
+    await runFormActions(actions);
+};
+
+/** Update item */
+export const updateItem = async (params) => {
+    assert(params && ('pos' in params), 'Invalid parameters');
+
+    setBlock(`Update item [${params.pos}]`, 2);
+
+    await checkNavigation();
+
+    await App.view.updateItemByPos(params.pos);
+
+    await runFormActions(params.action);
 };
 
 /** Save current import transaction form */
@@ -402,6 +398,18 @@ export const cancelItem = async () => {
         await checkNavigation();
         return App.view.cancelItem();
     });
+};
+
+/** Create item and save */
+export const createItemAndSave = async (action) => {
+    await addItem(action);
+    await saveItem();
+};
+
+/** Update item and save */
+export const updateItemAndSave = async (params) => {
+    await updateItem(params);
+    await saveItem();
 };
 
 /**

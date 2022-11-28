@@ -2,11 +2,11 @@ import {
     TestComponent,
     queryAll,
     assert,
+    asyncMap,
 } from 'jezve-test';
 import { Tile } from './Tile.js';
 import { AccountsList } from '../../model/AccountsList.js';
 import { PersonsList } from '../../model/PersonsList.js';
-import { asyncMap } from '../../common.js';
 
 export class TilesList extends TestComponent {
     get items() {

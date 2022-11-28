@@ -1,18 +1,20 @@
-import { TestComponent, queryAll, assert } from 'jezve-test';
+import {
+    TestComponent,
+    queryAll,
+    assert,
+    asyncMap,
+} from 'jezve-test';
 import { ImportActionItem } from './ImportActionItem.js';
-import { asyncMap } from '../../../common.js';
 
 export class ImportRuleItemActions extends TestComponent {
     async parseContent() {
         assert(this.elem, 'Invalid import rule item');
 
-        const res = {
+        return {
             items: await asyncMap(
                 await queryAll(this.elem, '.action-item'),
-                async (elem) => ImportActionItem.create(this, elem),
+                (elem) => ImportActionItem.create(this, elem),
             ),
         };
-
-        return res;
     }
 }

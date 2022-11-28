@@ -2,13 +2,11 @@ import {
     TestComponent,
     query,
     queryAll,
-    hasClass,
-    hasAttr,
-    prop,
     click,
     isVisible,
     assert,
     copyObject,
+    evaluate,
 } from 'jezve-test';
 import {
     EXPENSE,
@@ -33,16 +31,13 @@ export class ImportTransactionItem extends TestComponent {
     }
 
     async parseContent() {
-        const res = {
-            isForm: false,
-        };
+        const res = await evaluate((elem) => ({
+            selected: elem.classList.contains('import-item_selected'),
+            enabled: !elem.hasAttribute('disabled'),
+        }), this.elem);
 
         const selectedControls = await query(this.elem, '.select-controls');
         res.selectMode = await isVisible(selectedControls);
-        res.selected = await hasClass(this.elem, 'import-item_selected');
-
-        const disabled = await hasAttr(this.elem, 'disabled');
-        res.enabled = !disabled;
 
         res.typeField = await this.parseField(await query(this.elem, '.type-field'));
 
@@ -82,25 +77,30 @@ export class ImportTransactionItem extends TestComponent {
     }
 
     async parseField(elem) {
-        const res = { elem };
+        assert(elem, 'Invalid field element');
 
-        assert(res.elem, 'Invalid field element');
+        const titleElem = await query(elem, '.field__title');
+        const contentElem = await query(elem, '.field__content');
+        assert(titleElem && contentElem, 'Invalid structure of field');
 
-        res.titleElem = await query(elem, '.field__title');
-        assert(res.titleElem, 'Invalid structure of field');
-        res.title = await prop(res.titleElem, 'textContent');
-
-        res.contentElem = await query(elem, '.field__content');
-        assert(res.contentElem, 'Invalid structure of field');
-        res.value = await prop(res.contentElem, 'textContent');
+        const res = await evaluate((titleEl, contEl) => ({
+            title: titleEl.textContent,
+            value: contEl.textContent,
+        }), titleElem, contentElem);
+        res.elem = elem;
 
         return res;
     }
 
     async parseAmountField(elem) {
         const res = await this.parseField(elem);
-        res.amount = await prop(elem, 'dataset.amount');
-        res.currencyId = await prop(elem, 'dataset.curr');
+
+        const props = await evaluate((el) => ({
+            amount: el.dataset.amount,
+            currencyId: el.dataset.curr,
+        }), elem);
+        Object.assign(res, props);
+
         return res;
     }
 
@@ -122,10 +122,8 @@ export class ImportTransactionItem extends TestComponent {
 
     async buildModel(cont) {
         const res = {
-            isForm: false,
+            mainAccount: App.state.accounts.getItem(this.mainAccount),
         };
-
-        res.mainAccount = App.state.accounts.getItem(this.mainAccount);
         assert(res.mainAccount, 'Main account not found');
 
         res.isContextMenu = !!cont.contextMenuElem;
@@ -203,7 +201,6 @@ export class ImportTransactionItem extends TestComponent {
         assert(transactionType, `Invalid transaction type: '${model.type}'`);
 
         const res = {
-            isForm: false,
             selectMode: model.selectMode,
             selected: model.selected,
             enabled: model.enabled,
@@ -474,7 +471,6 @@ export class ImportTransactionItem extends TestComponent {
         const destCurrency = App.currency.getItem(item.dest_curr);
 
         const res = {
-            isForm: false,
             enabled: item.enabled,
             typeField: {
                 visible: true,

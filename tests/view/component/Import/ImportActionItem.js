@@ -2,7 +2,7 @@ import {
     TestComponent,
     assert,
     query,
-    prop,
+    evaluate,
 } from 'jezve-test';
 import { ImportAction } from '../../../model/ImportAction.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
@@ -22,8 +22,14 @@ export class ImportActionItem extends TestComponent {
             'Invalid structure of action item',
         );
 
-        res.typeTitle.value = await prop(res.typeTitle.elem, 'textContent');
-        res.valueTitle.value = await prop(res.valueTitle.elem, 'textContent');
+        [
+            res.typeTitle.value,
+            res.valueTitle.value,
+        ] = await evaluate(
+            (...elems) => elems.map((el) => el?.textContent),
+            res.typeTitle.elem,
+            res.valueTitle.elem,
+        );
 
         return res;
     }

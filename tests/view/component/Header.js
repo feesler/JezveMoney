@@ -5,8 +5,8 @@ import {
     queryAll,
     prop,
     click,
+    asyncMap,
 } from 'jezve-test';
-import { asyncMap } from '../../common.js';
 
 export class Header extends TestComponent {
     async parseContent() {

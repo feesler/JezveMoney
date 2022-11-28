@@ -2,27 +2,31 @@ import {
     TestComponent,
     query,
     queryAll,
-    prop,
-    hasClass,
     assert,
+    evaluate,
+    asyncMap,
 } from 'jezve-test';
 import { TransactionListItem } from './TransactionListItem.js';
-import { asyncMap } from '../../../common.js';
 
 export class TransactionList extends TestComponent {
     async parseContent() {
         const res = {
             items: [],
-            renderTime: await prop(this.elem, 'dataset.time'),
-            details: await hasClass(this.elem, 'trans-list_details'),
             noDataMessage: await query(this.elem, '.nodata-message'),
         };
 
-        const isSelectMode = await hasClass(this.elem, 'trans-list_select');
-        const isSortMode = await hasClass(this.elem, 'trans-list_sort');
-        if (isSelectMode) {
+        const props = await evaluate((elem) => ({
+            renderTime: elem.dataset.time,
+            details: elem.classList.contains('trans-list_details'),
+            isSelectMode: elem.classList.contains('trans-list_select'),
+            isSortMode: elem.classList.contains('trans-list_sort'),
+        }), this.elem);
+        res.renderTime = props.renderTime;
+        res.details = props.details;
+
+        if (props.isSelectMode) {
             res.listMode = 'select';
-        } else if (isSortMode) {
+        } else if (props.isSortMode) {
             res.listMode = 'sort';
         } else {
             res.listMode = 'list';

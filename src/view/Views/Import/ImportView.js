@@ -16,6 +16,7 @@ import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Sortable } from 'jezvejs/Sortable';
 import { timestampFromString } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
+import { API } from '../../js/api/index.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
@@ -28,8 +29,8 @@ import { ImportUploadDialog } from '../../Components/Import/UploadDialog/Dialog/
 import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from '../../Components/Import/RulesDialog/Dialog/ImportRulesDialog.js';
 import { ImportTransactionForm } from '../../Components/Import/TransactionForm/ImportTransactionForm.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { API } from '../../js/api/index.js';
 import { ImportTransactionItem } from '../../Components/Import/TransactionItem/ImportTransactionItem.js';
+import { Heading } from '../../Components/Heading/Heading.js';
 import { createStore } from '../../js/store.js';
 import { actions, reducer, getPageIndex } from './reducer.js';
 
@@ -69,8 +70,8 @@ class ImportView extends View {
             pagination: {
                 ...defaultPagination,
             },
+            form: {},
             activeItemIndex: -1,
-            originalItemData: null,
             mainAccount: null,
             rulesEnabled: true,
             checkSimilarEnabled: true,
@@ -100,20 +101,26 @@ class ImportView extends View {
             return;
         }
 
-        this.heading = document.querySelector('.heading');
-        this.submitBtn = ge('submitbtn');
-        this.transCountElem = ge('trcount');
-        this.enabledTransCountElem = ge('entrcount');
-        this.rowsContainer = ge('rowsContainer');
-        if (
-            !this.heading
-            || !this.submitBtn
-            || !this.transCountElem
-            || !this.enabledTransCountElem
-            || !this.rowsContainer
-        ) {
-            throw new Error('Failed to initialize Import view');
-        }
+        const elemIds = [
+            'heading',
+            'dataHeaderControls',
+            'submitBtn',
+            'itemsCount',
+            'enabledCount',
+            'selectedCounter',
+            'selectedCount',
+            'rowsContainer',
+        ];
+        elemIds.forEach((id) => {
+            this[id] = ge(id);
+            if (!this[id]) {
+                throw new Error('Failed to initialize view');
+            }
+        });
+
+        this.heading = Heading.fromElement(this.heading, {
+            title: STR_TITLE,
+        });
 
         setEvents(this.rowsContainer, { click: (e) => this.onItemClick(e) });
         setEvents(this.submitBtn, { click: () => this.onSubmitClick() });
@@ -121,7 +128,7 @@ class ImportView extends View {
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
             onchange: () => this.onMainAccChange(),
-            className: 'dd__main-account',
+            className: 'dd__main-account dd_ellipsis',
         });
         window.app.initAccountsList(this.accountDropDown);
 
@@ -129,8 +136,16 @@ class ImportView extends View {
             onClick: () => this.showUploadDialog(),
         });
 
+        this.listModeBtn = IconButton.create({
+            id: 'listModeBtn',
+            className: 'no-icon',
+            title: 'Done',
+            onClick: () => this.setListMode('list'),
+        });
+        insertAfter(this.listModeBtn.elem, this.uploadBtn.elem);
+
         this.createMenu();
-        insertAfter(this.menu.elem, this.uploadBtn.elem);
+        insertAfter(this.menu.elem, this.listModeBtn.elem);
 
         // Submit progress indicator
         this.submitProgress = LoadingIndicator.create({ title: 'Saving items...' });
@@ -160,29 +175,10 @@ class ImportView extends View {
             throw new Error('Invalid selection data');
         }
 
-        this.createHeadingObserver();
         this.createContextMenu();
 
         this.setMainAccount(selectedAccount.id);
         this.setRenderTime();
-    }
-
-    createHeadingObserver() {
-        const options = {
-            root: null,
-            rootMargin: '-50px',
-            threshold: 0,
-        };
-        const observer = new IntersectionObserver((entries) => {
-            const [entry] = entries;
-            if (entry.target !== this.heading) {
-                return;
-            }
-
-            this.header.setTitle(entry.isIntersecting ? null : STR_TITLE);
-        }, options);
-
-        observer.observe(this.heading);
     }
 
     createSortable(state) {
@@ -210,11 +206,8 @@ class ImportView extends View {
                 title: 'Add item',
                 onClick: () => this.createItem(),
             }, {
+                id: 'separator1',
                 type: 'separator',
-            }, {
-                id: 'listModeBtn',
-                title: 'Done',
-                onClick: () => this.setListMode('list'),
             }, {
                 id: 'selectModeBtn',
                 icon: 'select',
@@ -269,6 +262,7 @@ class ImportView extends View {
                 title: 'Edit rules',
                 onClick: () => this.onRulesClick(),
             }, {
+                id: 'separator4',
                 type: 'separator',
             }, {
                 id: 'similarCheck',
@@ -356,7 +350,7 @@ class ImportView extends View {
     getImportedItemsDateRange(state) {
         const res = { start: 0, end: 0 };
         state.items.forEach((item) => {
-            if (!item.isImported) {
+            if (!item.originalData) {
                 return;
             }
 
@@ -454,10 +448,10 @@ class ImportView extends View {
 
     setListMode(listMode) {
         const state = this.store.getState();
-        if (state.listMode === listMode) {
-            return;
-        }
-        if (state.listMode === 'list' && !this.saveItem()) {
+        if (
+            state.listMode === listMode
+            || state.activeItemIndex !== -1
+        ) {
             return;
         }
 
@@ -533,66 +527,25 @@ class ImportView extends View {
     }
 
     /** Save form data and replace it by item component */
-    saveItem() {
-        const state = this.store.getState();
-        const { activeItemIndex } = state;
-        if (activeItemIndex === -1) {
-            return true;
+    onSaveItem(data) {
+        if (!data?.validate()) {
+            throw new Error('Invalid data');
         }
 
-        const formItem = state.items[activeItemIndex];
-        const valid = formItem.validate();
-        if (!valid) {
-            // Navigate to the page with transaction form if needed
-            const pageIndex = getPageIndex(activeItemIndex, state);
-            this.setPage(pageIndex.page);
-            // Render form validation
-            const form = this.transactionRows[pageIndex.index];
-            form.validate();
-            form.elem.scrollIntoView();
-
-            return false;
-        }
-
-        this.store.dispatch(actions.saveItem());
-
-        return true;
+        this.store.dispatch(actions.saveItem(data));
     }
 
-    cancelEditItem() {
+    onCancelEditItem() {
         this.store.dispatch(actions.cancelEditItem());
     }
 
     /** Add new transaction row and insert it into list */
     createItem() {
-        if (!this.saveItem()) {
-            return;
-        }
-
         this.store.dispatch(actions.createItem());
-
-        const state = this.store.getState();
-        const pageIndex = getPageIndex(state.activeItemIndex, state);
-        if (pageIndex.page !== state.pagination.page) {
-            throw new Error('Invalid page');
-        }
-
-        const form = this.transactionRows[pageIndex.index];
-        form.elem.scrollIntoView();
     }
 
     onUpdateItem() {
-        const { activeItemIndex, contextItemIndex } = this.store.getState();
-        if (
-            contextItemIndex === -1
-            || contextItemIndex === activeItemIndex
-            || !this.saveItem()
-        ) {
-            this.hideContextMenu();
-            return;
-        }
-
-        this.store.dispatch(actions.editItem(contextItemIndex));
+        this.store.dispatch(actions.editItem());
     }
 
     /** ImportTransaction 'update' event handler */
@@ -649,14 +602,13 @@ class ImportView extends View {
 
     /** Submit buttom 'click' event handler */
     onSubmitClick() {
-        this.submitProgress.show();
-
-        if (!this.saveItem()) {
-            this.submitProgress.hide();
+        const state = this.store.getState();
+        if (state.activeItemIndex !== -1) {
             return;
         }
 
-        const state = this.store.getState();
+        this.submitProgress.show();
+
         const enabledList = this.getEnabledItems(state);
         if (!Array.isArray(enabledList) || !enabledList.length) {
             throw new Error('Invalid list of items');
@@ -763,7 +715,7 @@ class ImportView extends View {
     /** Show rules dialog popup */
     showRulesDialog() {
         if (!this.rulesDialog) {
-            this.rulesDialog = new ImportRulesDialog({
+            this.rulesDialog = ImportRulesDialog.create({
                 elem: document.querySelector(`.${IMPORT_RULES_DIALOG_CLASS}`),
                 onUpdate: () => this.onUpdateRules(),
             });
@@ -823,6 +775,36 @@ class ImportView extends View {
         this.store.dispatch(actions.changeItemPosition({ fromIndex, toIndex }));
     }
 
+    /** Show transaction form dialog */
+    renderTransactionFormDialog(state) {
+        if (state.activeItemIndex === -1) {
+            this.transactionDialog?.hide();
+            return;
+        }
+
+        if (!state.form) {
+            throw new Error('Invalid state');
+        }
+
+        const isUpdate = (state.activeItemIndex < state.items.length);
+        if (!this.transactionDialog) {
+            this.transactionDialog = ImportTransactionForm.create({
+                transaction: state.form,
+                isUpdate,
+                onSave: (data) => this.onSaveItem(data),
+                onCancel: () => this.onCancelEditItem(),
+            });
+        } else {
+            this.transactionDialog.setState((formState) => ({
+                ...formState,
+                isUpdate,
+                transaction: state.form,
+            }));
+        }
+
+        this.transactionDialog.show();
+    }
+
     renderContextMenu(state, prevState) {
         if (state === prevState) {
             return;
@@ -856,8 +838,6 @@ class ImportView extends View {
         const title = (item.enabled) ? STR_DISABLE_ITEM : STR_ENABLE_ITEM;
         this.contextMenu.items.ctxEnableBtn.setTitle(title);
 
-        this.contextMenu.items.ctxUpdateBtn.show(!item.isForm);
-
         this.contextMenu.attachAndShow(menuContainer);
     }
 
@@ -869,15 +849,19 @@ class ImportView extends View {
         const hasEnabled = selectedItems.some((item) => item.enabled);
         const hasDisabled = selectedItems.some((item) => !item.enabled);
 
+        this.uploadBtn.show(isListMode);
+        this.listModeBtn.show(!isListMode);
+
         const { items } = this.menu;
 
         items.createItemBtn.show(isListMode);
+        show(items.separator1, isListMode);
 
-        items.listModeBtn.show(!isListMode);
         items.selectModeBtn.show(isListMode && hasItems);
         items.sortModeBtn.show(isListMode && state.items.length > 1);
-        show(items.separator2, isSelectMode);
-        show(items.separator3, isSelectMode);
+        show(items.separator2, isListMode);
+        show(items.separator3, isListMode);
+        show(items.separator4, isListMode);
 
         items.selectAllBtn.show(isSelectMode && selectedItems.length < state.items.length);
         items.deselectAllBtn.show(isSelectMode && selectedItems.length > 0);
@@ -921,22 +905,9 @@ class ImportView extends View {
                 return this.transactionRows[index];
             }
 
-            const itemProps = {
+            return ImportTransactionItem.create({
                 data: item,
                 onCollapse: (i, val) => this.onCollapseItem(i, val),
-            };
-
-            if (item.isForm) {
-                return ImportTransactionForm.create({
-                    ...itemProps,
-                    onSave: () => this.saveItem(),
-                    onCancel: () => this.cancelEditItem(),
-                    onUpdate: (data) => this.onFormUpdate(data),
-                });
-            }
-
-            return ImportTransactionItem.create({
-                ...itemProps,
             });
         });
 
@@ -972,7 +943,11 @@ class ImportView extends View {
 
         this.createSortable(state);
 
-        this.rowsContainer.classList.toggle(SELECT_MODE_CLASS, state.listMode === 'select');
+        if (state.listMode === 'select' || prevState.listMode === 'select') {
+            setTimeout(() => {
+                this.rowsContainer.classList.toggle(SELECT_MODE_CLASS, state.listMode === 'select');
+            });
+        }
         this.rowsContainer.classList.toggle(SORT_MODE_CLASS, state.listMode === 'sort');
     }
 
@@ -982,15 +957,22 @@ class ImportView extends View {
         }
 
         this.renderList(state, prevState);
+        this.renderTransactionFormDialog(state);
 
-        const accountId = state.mainAccount.id;
-        this.accountDropDown.selectItem(accountId.toString());
-
+        const isSelectMode = (state.listMode === 'select');
+        const isListMode = (state.listMode === 'list');
         const enabledList = this.getEnabledItems(state);
+        const selectedItems = (isSelectMode) ? this.getSelectedItems(state) : [];
 
-        enable(this.submitBtn, (enabledList.length > 0));
-        this.enabledTransCountElem.textContent = enabledList.length;
-        this.transCountElem.textContent = state.items.length;
+        this.accountDropDown.selectItem(state.mainAccount.id);
+        this.accountDropDown.enable(isListMode);
+
+        enable(this.submitBtn, (enabledList.length > 0 && isListMode));
+        this.enabledCount.textContent = enabledList.length;
+        this.itemsCount.textContent = state.items.length;
+
+        show(this.selectedCounter, isSelectMode);
+        this.selectedCount.textContent = selectedItems.length;
 
         this.renderContextMenu(state, prevState);
         this.renderMenu(state);

@@ -1,13 +1,13 @@
 import {
     TestComponent,
     query,
-    hasAttr,
     prop,
     click,
     input,
     isVisible,
     assert,
     copyObject,
+    asyncMap,
 } from 'jezve-test';
 import { DropDown } from 'jezvejs-test';
 import {
@@ -17,15 +17,21 @@ import {
     DEBT,
 } from '../../../model/Transaction.js';
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
-import {
-    normalize,
-    asyncMap,
-    fixFloat,
-} from '../../../common.js';
+import { normalize, fixFloat } from '../../../common.js';
 import { App } from '../../../Application.js';
 import { OriginalImportData } from './OriginalImportData.js';
 
 const sourceTransactionTypes = ['expense', 'transferfrom', 'debtfrom'];
+
+const fieldSelectors = [
+    '.type-field',
+    '.account-field',
+    '.person-field',
+    '.src-amount-field',
+    '.dest-amount-field',
+    '.date-field',
+    '.comment-field',
+];
 
 export class ImportTransactionForm extends TestComponent {
     constructor(parent, elem, mainAccount) {
@@ -80,22 +86,7 @@ export class ImportTransactionForm extends TestComponent {
     }
 
     async parseContent() {
-        const res = {
-            isForm: true,
-        };
-
-        const disabled = await hasAttr(this.elem, 'disabled');
-        res.enabled = !disabled;
-
-        const fieldSelectors = [
-            '.type-field',
-            '.account-field',
-            '.person-field',
-            '.src-amount-field',
-            '.dest-amount-field',
-            '.date-field',
-            '.comment-field',
-        ];
+        const res = {};
 
         [
             res.typeField,
@@ -110,10 +101,6 @@ export class ImportTransactionForm extends TestComponent {
         ));
 
         res.invFeedback = { elem: await query(this.elem, '.invalid-feedback') };
-        res.menuBtn = await query(this.elem, '.popup-menu-btn');
-        res.contextMenuElem = await query(this.elem, '.popup-menu-list');
-        res.toggleEnableBtn = await query(this.elem, '.enable-btn');
-        res.deleteBtn = await query(this.elem, '.delete-btn');
         res.toggleBtn = await query(this.elem, '.toggle-btn');
         res.saveBtn = await query(this.elem, '.submit-btn');
         res.cancelBtn = await query(this.elem, '.cancel-btn');
@@ -128,7 +115,6 @@ export class ImportTransactionForm extends TestComponent {
             && res.dateField
             && res.commentField
             && res.invFeedback.elem
-            && res.menuBtn
             && res.saveBtn
             && res.cancelBtn,
             'Invalid structure of import item',
@@ -145,9 +131,9 @@ export class ImportTransactionForm extends TestComponent {
     async updateModel() {
         await super.updateModel();
 
-        this.data = this.getExpectedTransaction(this.model);
+        this.data = this.getExpectedTransaction();
         if (this.data) {
-            this.data.enabled = this.model.enabled;
+            this.data.enabled = true;
             this.data.mainAccount = this.model.mainAccount;
             this.data.importType = this.model.type;
             if (this.model.original) {
@@ -158,14 +144,11 @@ export class ImportTransactionForm extends TestComponent {
 
     async buildModel(cont) {
         const res = {
-            isForm: true,
+            mainAccount: App.state.accounts.getItem(this.mainAccount),
         };
 
-        res.mainAccount = App.state.accounts.getItem(this.mainAccount);
         assert(res.mainAccount, 'Main account not found');
 
-        res.isContextMenu = !!cont.contextMenuElem;
-        res.enabled = cont.enabled;
         res.type = cont.typeField.value;
         res.srcAmount = cont.srcAmountField.value;
         res.destAmount = cont.destAmountField.value;
@@ -235,46 +218,44 @@ export class ImportTransactionForm extends TestComponent {
         const showDestAmount = isExpense || (!isExpense && model.isDifferent);
 
         const res = {
-            isForm: true,
-            enabled: model.enabled,
             typeField: {
-                disabled: !model.enabled,
+                disabled: false,
                 visible: true,
             },
             srcAmountField: {
-                disabled: !(model.enabled && showSrcAmount),
+                disabled: !showSrcAmount,
                 visible: showSrcAmount,
                 dropDown: {
-                    disabled: !(model.enabled && isIncome),
+                    disabled: !isIncome,
                 },
             },
             destAmountField: {
-                disabled: !(model.enabled && showDestAmount),
+                disabled: !showDestAmount,
                 visible: showDestAmount,
                 dropDown: {
-                    disabled: !(model.enabled && isExpense),
+                    disabled: !isExpense,
                 },
             },
             transferAccountField: {
-                disabled: !(model.enabled && isTransfer),
+                disabled: !isTransfer,
                 visible: isTransfer,
             },
             personField: {
                 visible: isDebt,
-                disabled: !(model.enabled && isDebt),
+                disabled: !isDebt,
             },
             dateField: {
                 value: model.date.toString(),
-                disabled: !model.enabled,
+                disabled: false,
                 visible: true,
                 button: {
                     visible: true,
-                    disabled: !model.enabled,
+                    disabled: false,
                 },
             },
             commentField: {
                 value: model.comment.toString(),
-                disabled: !model.enabled,
+                disabled: false,
                 visible: true,
             },
             invFeedback: {
@@ -318,7 +299,7 @@ export class ImportTransactionForm extends TestComponent {
         return (value === '') ? value : normalize(value);
     }
 
-    getExpectedTransaction(model) {
+    getExpectedTransaction(model = this.model) {
         const res = {
             type: ImportTransaction.typeFromString(model.type),
         };
@@ -436,16 +417,6 @@ export class ImportTransactionForm extends TestComponent {
         return res;
     }
 
-    onToggleEnable(model = this.model) {
-        const res = copyObject(model);
-
-        res.enabled = !res.enabled;
-        res.srcCurrency = App.currency.getItem(res.srcCurrId);
-        res.destCurrency = App.currency.getItem(res.destCurrId);
-
-        return res;
-    }
-
     checkEnabled(field) {
         assert(field, 'Invalid field');
         assert(!field.disabled, `'${field.title}' field is disabled`);
@@ -504,6 +475,7 @@ export class ImportTransactionForm extends TestComponent {
     }
 
     async changeType(value) {
+        assert(this.model.type !== value, `Transaction type is already ${value}`);
         this.checkEnabled(this.content.typeField);
 
         const typeBefore = this.model.type;
@@ -763,10 +735,6 @@ export class ImportTransactionForm extends TestComponent {
         return this.checkState();
     }
 
-    async clickMenu() {
-        return click(this.content.menuBtn);
-    }
-
     async clickSave() {
         return click(this.content.saveBtn);
     }
@@ -777,7 +745,7 @@ export class ImportTransactionForm extends TestComponent {
 
     /**
      * Convert transaction object to expected state of component
-     * Transaction object: { mainAccount, enabled, ...fields of transaction }
+     * Transaction object: { mainAccount, ...fields of transaction }
      * @param {ImportTransaction} item - transaction item object
      * @param {AppState} state - application state
      */
@@ -797,38 +765,36 @@ export class ImportTransactionForm extends TestComponent {
         const showDestAmount = isExpense || (!isExpense && isDiff);
 
         const res = {
-            isForm: true,
-            enabled: item.enabled,
-            typeField: { disabled: !item.enabled },
+            typeField: { disabled: false },
             srcAmountField: {
-                disabled: !(item.enabled && showSrcAmount),
+                disabled: !showSrcAmount,
                 visible: showSrcAmount,
                 dropDown: {
-                    disabled: !(item.enabled && isIncome),
+                    disabled: !isIncome,
                 },
             },
             destAmountField: {
-                disabled: !(item.enabled && showDestAmount),
+                disabled: !showDestAmount,
                 visible: showDestAmount,
                 dropDown: {
-                    disabled: !(item.enabled && isExpense),
+                    disabled: !isExpense,
                 },
             },
             transferAccountField: {
-                disabled: !(item.enabled && isTransfer),
+                disabled: !isTransfer,
                 visible: isTransfer,
             },
             personField: {
                 visible: isDebt,
-                disabled: !(item.enabled && isDebt),
+                disabled: !isDebt,
             },
             dateField: {
                 value: item.date,
-                disabled: !item.enabled,
+                disabled: false,
             },
             commentField: {
                 value: item.comment,
-                disabled: !item.enabled,
+                disabled: false,
             },
         };
 

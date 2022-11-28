@@ -195,9 +195,12 @@ export class StatisticsView extends AppView {
         }
 
         const histogram = App.state.transactions.getStatistics(params);
+        const [firstValue] = histogram.values ?? [];
+        const dataSet = firstValue?.data ?? [];
+        const noData = !dataSet.length && !histogram.series?.length;
+
         let barsCount = 0;
-        if (histogram.values.length > 0) {
-            const [firstValue] = histogram.values;
+        if (!noData) {
             if (isObject(firstValue)) {
                 histogram.values.forEach((value) => {
                     if (value?.data?.length) {
@@ -212,10 +215,19 @@ export class StatisticsView extends AppView {
         res.chart = {
             bars: { length: barsCount },
         };
-        res.noDataMessage.visible = histogram.values.length === 0;
-        res.chartContainer.visible = histogram.values.length > 0;
+        res.noDataMessage.visible = noData;
+        res.chartContainer.visible = !noData;
 
         return res;
+    }
+
+    async waitForLoad() {
+        await waitForFunction(async () => {
+            await this.parse();
+            return !this.model.loading;
+        });
+
+        await this.parse();
     }
 
     async waitForData(action) {

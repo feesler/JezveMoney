@@ -112,7 +112,7 @@ export class ImportFileUploader extends Component {
         }
 
         const { isEncoded } = this.state;
-        const fileType = file.name.substr(file.name.lastIndexOf('.') + 1);
+        const fileType = file.name.substring(file.name.lastIndexOf('.') + 1);
         const data = new FormData();
         data.append('file', file);
 

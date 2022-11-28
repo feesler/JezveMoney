@@ -2,11 +2,10 @@ import {
     TestComponent,
     query,
     queryAll,
-    prop,
-    hasClass,
     isVisible,
     click,
     assert,
+    evaluate,
 } from 'jezve-test';
 import {
     EXPENSE,
@@ -18,40 +17,44 @@ import { App } from '../../../Application.js';
 
 export class TransactionListItem extends TestComponent {
     async parseContent() {
-        const res = {};
+        const commentElem = await query(this.elem, '.trans-item__comment');
 
-        const id = await prop(this.elem, 'dataset.id');
-        res.id = parseInt(id, 10);
-        const type = await prop(this.elem, 'dataset.type');
-        res.type = parseInt(type, 10);
-        res.selected = await hasClass(this.elem, 'trans-item_selected');
-        res.detailsMode = await hasClass(this.elem, 'trans-item_details');
+        const res = await evaluate((elem, commentEl) => ({
+            id: parseInt(elem.dataset.id, 10),
+            type: parseInt(elem.dataset.type, 10),
+            selected: elem.classList.contains('trans-item_selected'),
+            detailsMode: elem.classList.contains('trans-item_details'),
+            comment: (commentEl) ? commentEl.textContent : '',
+        }), this.elem, commentElem);
 
         if (res.detailsMode) {
             const [
                 srcAccountElem,
                 destAccountElem,
             ] = await queryAll(this.elem, '.trans-item__account-field .field__content');
-
-            const sourceVisible = await isVisible(srcAccountElem, false);
-            const destVisible = await isVisible(srcAccountElem, false);
-            const sourceContent = await prop(srcAccountElem, 'textContent');
-            const destContent = await prop(destAccountElem, 'textContent');
-
-            if (sourceVisible && destVisible) {
-                res.accountTitle = (sourceVisible) ? sourceContent : destContent;
-            } else {
-                res.accountTitle = `${sourceContent} → ${destContent}`;
-            }
-
             const [
                 srcAmountElem,
                 destAmountElem,
             ] = await queryAll(this.elem, '.trans-item__amount-field .field__content');
+            const dateElem = await query(this.elem, '.trans-item__date-field .field__content');
 
+            const sourceVisible = await isVisible(srcAccountElem, false);
+            const destVisible = await isVisible(srcAccountElem, false);
             const destAmountVisible = await isVisible(destAmountElem, false);
-            const srcAmount = await prop(srcAmountElem, 'textContent');
-            const destAmount = await prop(destAmountElem, 'textContent');
+
+            const props = await evaluate((sAccount, dAccount, sAmount, dAmount, dateEl) => ({
+                sourceContent: sAccount.textContent,
+                destContent: dAccount.textContent,
+                srcAmount: sAmount.textContent,
+                destAmount: dAmount.textContent,
+                dateFmt: dateEl.textContent,
+            }), srcAccountElem, destAccountElem, srcAmountElem, destAmountElem, dateElem);
+
+            if (sourceVisible && destVisible) {
+                res.accountTitle = (sourceVisible) ? props.sourceContent : props.destContent;
+            } else {
+                res.accountTitle = `${props.sourceContent} → ${props.destContent}`;
+            }
 
             let sign;
             if (res.type === EXPENSE) {
@@ -66,7 +69,7 @@ export class TransactionListItem extends TestComponent {
             if (res.type === DEBT) {
                 let debtType;
                 if (sourceVisible) {
-                    const srcAcc = App.state.accounts.findByName(sourceContent);
+                    const srcAcc = App.state.accounts.findByName(props.sourceContent);
                     debtType = srcAcc?.owner_id !== App.state.profile.owner_id;
                 } else {
                     debtType = false;
@@ -77,28 +80,24 @@ export class TransactionListItem extends TestComponent {
             }
 
             if (destAmountVisible) {
-                res.amountText = `${sign}${srcAmount} (${sign}${destAmount})`;
+                res.amountText = `${sign}${props.srcAmount} (${sign}${props.destAmount})`;
             } else {
-                res.amountText = `${sign}${srcAmount}`;
+                res.amountText = `${sign}${props.srcAmount}`;
             }
-
-            const dateElem = await query(this.elem, '.trans-item__date-field .field__content');
-            res.dateFmt = await prop(dateElem, 'textContent');
         } else {
             const titleElem = await query(this.elem, '.trans-item__title');
             assert(titleElem, 'Account title not found');
-            res.accountTitle = await prop(titleElem, 'textContent');
-
             const amountElem = await query(this.elem, '.trans-item__amount');
             assert(amountElem, 'Amount text not found');
-            res.amountText = await prop(amountElem, 'textContent');
-
             const dateElem = await query(this.elem, '.trans-item__date');
-            res.dateFmt = await prop(dateElem, 'textContent');
-        }
 
-        const commentElem = await query(this.elem, '.trans-item__comment');
-        res.comment = (commentElem) ? await prop(commentElem, 'textContent') : '';
+            const props = await evaluate((titleEl, amountEl, dateEl) => ({
+                accountTitle: titleEl.textContent,
+                amountText: amountEl.textContent,
+                dateFmt: dateEl.textContent,
+            }), titleElem, amountElem, dateElem);
+            Object.assign(res, props);
+        }
 
         res.menuBtn = await query(this.elem, '.popup-menu-btn');
 

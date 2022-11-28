@@ -1,7 +1,6 @@
 import {
     createElement,
     isFunction,
-    show,
     Component,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
@@ -128,8 +127,6 @@ export class ImportTransactionBase extends Component {
         this.selectControls = createContainer(SELECT_CONTROLS_CLASS, [
             this.checkbox.elem,
         ]);
-
-        this.mainContainer.prepend(this.selectControls);
     }
 
     renderSelectControls(state, prevState = {}) {
@@ -139,12 +136,6 @@ export class ImportTransactionBase extends Component {
 
         const { listMode, selected } = state.transaction.state;
         const selectMode = listMode === 'select';
-        if (selectMode) {
-            this.createSelectControls();
-        }
-
-        show(this.selectControls, selectMode);
-
         const isSelected = selectMode && !!selected;
         this.elem.classList.toggle(SELECTED_CLASS, isSelected);
         this.checkbox?.check(isSelected);

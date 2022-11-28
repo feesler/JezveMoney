@@ -3,8 +3,8 @@ import {
     queryAll,
     prop,
     click,
+    asyncMap,
 } from 'jezve-test';
-import { asyncMap } from '../../common.js';
 
 const navLinksMap = {
     accountsLink: 'Accounts',

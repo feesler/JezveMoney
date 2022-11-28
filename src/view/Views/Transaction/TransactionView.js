@@ -41,6 +41,7 @@ import { Tile } from '../../Components/Tile/Tile.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { TileInfoItem } from '../../Components/TileInfoItem/TileInfoItem.js';
+import '../../Components/Heading/style.scss';
 import './style.scss';
 import { createStore } from '../../js/store.js';
 import {

@@ -37,7 +37,7 @@ export class ImportTemplate {
         let tmpDate = str;
         const pos = str.indexOf(' ');
         if (pos !== -1) {
-            tmpDate = tmpDate.substr(0, pos);
+            tmpDate = tmpDate.substring(0, pos);
         }
 
         const timestamp = fixDate(tmpDate);

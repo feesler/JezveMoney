@@ -6,20 +6,6 @@
   padding: 12px 0 12px 8px;
   column-gap: 8px;
 
-  + .action-form {
-    margin-top: 3px;
-  }
-
-  .dd__combo {
-    min-height: auto;
-    padding-right: 30px;
-  }
-
-  .dd__combo,
-  .dd__list {
-    border-width: 1px;
-  }
-
   input[type="text"] {
     display: flex;
     padding: 5px;

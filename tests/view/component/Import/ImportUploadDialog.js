@@ -12,10 +12,12 @@ import {
     waitForFunction,
     isNum,
     copyObject,
+    evaluate,
+    asyncMap,
 } from 'jezve-test';
 import { Checkbox, DropDown } from 'jezvejs-test';
 import { App } from '../../../Application.js';
-import { asyncMap, fixFloat } from '../../../common.js';
+import { fixFloat } from '../../../common.js';
 import { WarningPopup } from '../WarningPopup.js';
 import { ImportTemplate } from '../../../model/ImportTemplate.js';
 
@@ -59,11 +61,8 @@ export class ImportUploadDialog extends TestComponent {
             'Invalid file upload form',
         );
 
-        res.fileName = await prop(res.fileNameElem.elem, 'value');
         res.useServerAddress = res.useServerCheck.checked;
-        res.serverAddress = await prop(res.serverAddressInput.elem, 'value');
         res.encode = res.isEncodeCheck.checked;
-        res.uploadFilename = (res.useServerAddress) ? res.serverAddress : res.fileName;
 
         // Convert block
         res.templateBlock = { elem: await query('#templateBlock') };
@@ -86,8 +85,6 @@ export class ImportUploadDialog extends TestComponent {
         res.tplNameInp = { elem: await query('#tplNameInp') };
         assert(res.nameField.elem && res.tplNameInp.elem, 'Invalid template name field');
 
-        res.tplNameInp.value = await prop(res.tplNameInp.elem, 'value');
-
         // First row field
         res.firstRowField = { elem: await query('#firstRowField') };
         res.firstRowInp = { elem: await query('#firstRowInp') };
@@ -101,9 +98,30 @@ export class ImportUploadDialog extends TestComponent {
             'Invalid first row field',
         );
 
-        res.firstRowInp.value = await prop(res.firstRowInp.elem, 'value');
-        res.decFirstRowBtn.disabled = await prop(res.decFirstRowBtn.elem, 'disabled');
-        res.incFirstRowBtn.disabled = await prop(res.incFirstRowBtn.elem, 'disabled');
+        [
+            res.fileName,
+            res.serverAddress,
+            res.tplNameInp.value,
+            res.firstRowInp.value,
+            res.decFirstRowBtn.disabled,
+            res.incFirstRowBtn.disabled,
+        ] = await evaluate(
+            (fileNameEl, serverEl, tplNameEl, inputEl, decBtn, incBtn) => ([
+                fileNameEl.value,
+                serverEl.value,
+                tplNameEl.value,
+                inputEl.value,
+                decBtn.disabled,
+                incBtn.disabled,
+            ]),
+            res.fileNameElem.elem,
+            res.serverAddressInput.elem,
+            res.tplNameInp.elem,
+            res.firstRowInp.elem,
+            res.decFirstRowBtn.elem,
+            res.incFirstRowBtn.elem,
+        );
+        res.uploadFilename = (res.useServerAddress) ? res.serverAddress : res.fileName;
 
         // Template account field
         res.tplAccountField = { elem: await query('#tplAccountField') };
@@ -492,8 +510,7 @@ export class ImportUploadDialog extends TestComponent {
     async toggleServerAddress() {
         this.checkBrowseFileState();
 
-        await this.content.useServerCheck.toggle();
-        await this.parse();
+        await this.performAction(() => this.content.useServerCheck.toggle());
     }
 
     async setFile(filename) {
@@ -507,8 +524,7 @@ export class ImportUploadDialog extends TestComponent {
         this.model.filename = filename;
         this.expectedState = this.getExpectedState(this.model);
 
-        await input(this.content.serverAddressInput.elem, filename);
-        await this.parse();
+        await this.performAction(() => input(this.content.serverAddressInput.elem, filename));
 
         return this.checkState();
     }
@@ -538,11 +554,12 @@ export class ImportUploadDialog extends TestComponent {
         }
         this.expectedState = this.getExpectedState(this.model);
 
-        await click(this.content.serverUploadBtn.elem);
+        await this.performAction(async () => {
+            await click(this.content.serverUploadBtn.elem);
 
-        await wait('#templateBlock', { visible: true });
-        await wait('.tpl-form > .loading-indicator', { hidden: true });
-        await this.parse();
+            await wait('#templateBlock', { visible: true });
+            await wait('.tpl-form > .loading-indicator', { hidden: true });
+        });
 
         return this.checkState();
     }
@@ -553,8 +570,7 @@ export class ImportUploadDialog extends TestComponent {
         this.model.template = App.state.templates.getItem(val);
         this.expectedState = this.getExpectedState(this.model);
 
-        this.content.templateSel.selectItem(val);
-        await this.parse();
+        await this.performAction(() => this.content.templateSel.selectItem(val));
 
         return this.checkState();
     }
@@ -575,8 +591,7 @@ export class ImportUploadDialog extends TestComponent {
         };
         this.expectedState = this.getExpectedState(this.model);
 
-        await click(this.content.createTplBtn.elem);
-        await this.parse();
+        await this.performAction(() => click(this.content.createTplBtn.elem));
 
         return this.checkState();
     }
@@ -588,8 +603,7 @@ export class ImportUploadDialog extends TestComponent {
         this.model.template = App.state.templates.getItem(this.content.templateSel.value);
         this.expectedState = this.getExpectedState(this.model);
 
-        await click(this.content.updateTplBtn.elem);
-        await this.parse();
+        await this.performAction(() => click(this.content.updateTplBtn.elem));
 
         return this.checkState();
     }
@@ -616,8 +630,7 @@ export class ImportUploadDialog extends TestComponent {
 
         this.expectedState = this.getExpectedState(this.model);
 
-        await click(this.content.deleteTplBtn.elem);
-        await this.parse();
+        await this.performAction(() => click(this.content.deleteTplBtn.elem));
 
         assert(this.content.delete_warning?.content?.visible, 'Delete template warning popup not appear');
         assert(this.content.delete_warning.content.okBtn, 'OK button not found');
@@ -637,8 +650,7 @@ export class ImportUploadDialog extends TestComponent {
         this.model.template.name = val;
         this.expectedState = this.getExpectedState(this.model);
 
-        await input(this.content.tplNameInp.elem, val);
-        await this.parse();
+        await this.performAction(() => input(this.content.tplNameInp.elem, val));
 
         return this.checkState();
     }
@@ -649,14 +661,12 @@ export class ImportUploadDialog extends TestComponent {
         this.model.template.columns[name] = index;
         this.expectedState = this.getExpectedState(this.model);
 
-        await select(this.content.columnSel.elem, name.toString());
-        await this.parse();
+        await this.performAction(() => select(this.content.columnSel.elem, name.toString()));
 
         const ind = parseInt(index, 10);
         assert.arrayIndex(this.content.columns, ind - 1);
 
-        await click(this.content.columns[ind - 1].elem);
-        await this.parse();
+        await this.performAction(() => click(this.content.columns[ind - 1].elem));
 
         return this.checkState();
     }
@@ -667,8 +677,7 @@ export class ImportUploadDialog extends TestComponent {
         this.model.template.first_row = parseInt(val, 10);
         this.expectedState = this.getExpectedState(this.model);
 
-        await input(this.content.firstRowInp.elem, val.toString());
-        await this.parse();
+        await this.performAction(() => input(this.content.firstRowInp.elem, val.toString()));
 
         return this.checkState();
     }
@@ -681,8 +690,7 @@ export class ImportUploadDialog extends TestComponent {
         this.model.template.first_row -= 1;
         this.expectedState = this.getExpectedState(this.model);
 
-        await click(this.content.decFirstRowBtn.elem);
-        await this.parse();
+        await this.performAction(() => click(this.content.decFirstRowBtn.elem));
 
         return this.checkState();
     }
@@ -699,8 +707,7 @@ export class ImportUploadDialog extends TestComponent {
         }
         this.expectedState = this.getExpectedState(this.model);
 
-        await click(this.content.incFirstRowBtn.elem);
-        await this.parse();
+        await this.performAction(() => click(this.content.incFirstRowBtn.elem));
 
         return this.checkState();
     }
@@ -716,8 +723,7 @@ export class ImportUploadDialog extends TestComponent {
         }
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.content.tplAccountCheck.toggle();
-        await this.parse();
+        await this.performAction(() => this.content.tplAccountCheck.toggle());
 
         return this.checkState();
     }
@@ -729,8 +735,7 @@ export class ImportUploadDialog extends TestComponent {
         this.model.template.account_id = account.id;
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.content.tplAccountSel.selectItem(val);
-        await this.parse();
+        await this.performAction(() => this.content.tplAccountSel.selectItem(val));
 
         return this.checkState();
     }
@@ -786,8 +791,7 @@ export class ImportUploadDialog extends TestComponent {
         this.model.state = RAW_DATA_STATE;
         this.expectedState = this.getExpectedState(this.model);
 
-        await click(this.content.cancelTplBtn.elem);
-        await this.parse();
+        await this.performAction(() => click(this.content.cancelTplBtn.elem));
 
         return this.checkState();
     }
@@ -796,8 +800,7 @@ export class ImportUploadDialog extends TestComponent {
         this.model.initialAccount = App.state.accounts.getItem(val);
         this.expectedState = this.getExpectedState(this.model);
 
-        await this.content.initialAccount.selectItem(val);
-        await this.parse();
+        await this.performAction(() => this.content.initialAccount.selectItem(val));
 
         return this.checkState();
     }
@@ -807,8 +810,7 @@ export class ImportUploadDialog extends TestComponent {
             return;
         }
 
-        await this.content.isEncodeCheck.toggle();
-        await this.parse();
+        await this.performAction(() => this.content.isEncodeCheck.toggle());
     }
 
     /** Find valid template for data */

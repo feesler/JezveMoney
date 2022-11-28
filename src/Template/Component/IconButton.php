@@ -14,7 +14,12 @@ class IconButton extends TemplateComponent
         $attrs = [];
         if (isset($data["attributes"])) {
             foreach ($data["attributes"] as $attribute => $value) {
-                $attrs[] = e($attribute) . "=\"" . e($value) . "\"";
+                $attr = e($attribute);
+                if (!is_empty($value)) {
+                    $attr .= "=\"" . e($value) . "\"";
+                }
+
+                $attrs[] = $attr;
             }
         }
         if (isset($data["id"])) {

@@ -410,10 +410,9 @@ export const checkTransactionAvailable = async (type, directNavigate = false) =>
             }
         }
 
-        App.view.setExpectedState(stateId);
-        await App.view.checkState();
-
-        return true;
+        App.view.model.state = stateId;
+        const expected = App.view.getExpectedState();
+        return App.view.checkState(expected);
     });
 };
 
@@ -422,14 +421,8 @@ export const checkDebtNoAccountURL = async () => {
         const requestURL = `${baseUrl()}transactions/create/?type=debt&acc_id=0`;
         await goTo(requestURL);
 
-        let stateId = -1;
-        if (App.state.persons.length > 0) {
-            stateId = 6;
-        }
-
-        App.view.setExpectedState(stateId);
-        await App.view.checkState();
-
-        return true;
+        App.view.model.state = (App.state.persons.length > 0) ? 6 : -1;
+        const expected = App.view.getExpectedState();
+        return App.view.checkState(expected);
     });
 };

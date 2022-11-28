@@ -49,7 +49,7 @@ class Import extends TemplateController
         ];
 
         if (!$importAvailable) {
-            $data["uploadBtn"]["attributes"] = ["disabled" => !$importAvailable];
+            $data["uploadBtn"]["attributes"] = ["disabled" => ""];
         }
 
         $data["appProps"] = [

@@ -3,16 +3,35 @@ import {
     assert,
     query,
     queryAll,
-    hasClass,
     isVisible,
     copyObject,
+    asyncMap,
+    evaluate,
 } from 'jezve-test';
 import { Paginator } from 'jezvejs-test';
-import { ImportTransactionForm } from './ImportTransactionForm.js';
 import { ImportTransactionItem } from './ImportTransactionItem.js';
-import { asyncMap } from '../../../common.js';
 
 export class ImportList extends TestComponent {
+    static async getListMode(elem) {
+        if (!elem) {
+            return null;
+        }
+        const dataContainer = await query(elem, '.data-container');
+        if (!dataContainer) {
+            return null;
+        }
+
+        const { selectMode, sortMode } = await evaluate((el) => ({
+            selectMode: el.classList.contains('import-list_select'),
+            sortMode: el.classList.contains('import-list_sort'),
+        }), dataContainer);
+
+        if (selectMode) {
+            return 'select';
+        }
+        return (sortMode) ? 'sort' : 'list';
+    }
+
     constructor(parent, elem, mainAccount) {
         super(parent, elem);
 
@@ -21,28 +40,15 @@ export class ImportList extends TestComponent {
 
     async parseContent() {
         const res = {
+            listMode: await ImportList.getListMode(this.elem),
             items: [],
         };
-        const dataContainer = await query(this.elem, '.data-container');
-        const isSelectMode = await hasClass(dataContainer, 'import-list_select');
-        const isSortMode = await hasClass(dataContainer, 'import-list_sort');
-        if (isSelectMode) {
-            res.listMode = 'select';
-        } else if (isSortMode) {
-            res.listMode = 'sort';
-        } else {
-            res.listMode = 'list';
-        }
 
-        const listItems = await queryAll(dataContainer, '.import-form,.import-item');
+        const listItems = await queryAll(this.elem, '.import-form,.import-item');
         if (listItems) {
             res.items = await asyncMap(
                 listItems,
-                async (item) => {
-                    const isForm = await hasClass(item, 'import-form');
-                    const ListItemClass = (isForm) ? ImportTransactionForm : ImportTransactionItem;
-                    return ListItemClass.create(this.parent, item, this.mainAccount);
-                },
+                (item) => ImportTransactionItem.create(this.parent, item, this.mainAccount),
             );
 
             res.paginator = await Paginator.create(this, await query(this.elem, '.paginator'));
@@ -85,16 +91,9 @@ export class ImportList extends TestComponent {
 
         cont.items.forEach((item, index) => {
             res.items.push(this.getItemData(item));
-            res.invalidated = res.invalidated || item.model.invalidated;
             if (item.model.isContextMenu) {
                 assert(res.contextMenuIndex === -1, 'Invalid state: two or more context menus');
                 res.contextMenuIndex = index;
-            }
-
-            if (item.content.isForm) {
-                assert(res.formIndex === -1, 'Invalid state: two or more Import transaction forms');
-
-                res.formIndex = index;
             }
         });
 
@@ -133,23 +132,19 @@ export class ImportList extends TestComponent {
     getExpectedState() {
         const res = {
             items: this.content.items.map((item) => (
-                (item.model.isForm)
-                    ? ImportTransactionForm.getExpectedState(item.model)
-                    : ImportTransactionItem.getExpectedState(item.model)
+                ImportTransactionItem.getExpectedState(item.model)
             )),
         };
 
         return res;
     }
 
-    static render(transactions, state, formIndex = -1) {
+    static render(transactions, state) {
         assert.isArray(transactions, 'Invalid data');
 
         return {
-            items: transactions.map((item, index) => (
-                (formIndex === index)
-                    ? ImportTransactionForm.render(item, state)
-                    : ImportTransactionItem.render(item, state)
+            items: transactions.map((item) => (
+                ImportTransactionItem.render(item, state)
             )),
         };
     }

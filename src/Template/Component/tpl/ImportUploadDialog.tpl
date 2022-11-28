@@ -4,17 +4,15 @@
             <form id="fileimportfrm" class="upload-form" method="post" enctype="multipart/form-data" action="<?= BASEURL ?>api/import/upload">
                 <label id="fileBrowser" class="upload-form__file">
                     <input id="fileInp" type="file">
-                    <div class="upload-form__overlap">
-                        <button class="btn browse-btn" type="button">Select file</button>
-                    </div>
+                    <button class="btn browse-btn" type="button">Select file</button>
                 </label>
                 <div class="upload-form__descr">or simply drop it to this dialog</div>
                 <div class="upload-form__filename"></div>
             </form>
             <?php if ($this->adminUser || $this->testerUser) { ?>
-                <div id="serverAddressBlock" class="row-container" hidden>
-                    <input id="serverAddress" class="stretch-input" type="text">
-                    <input id="serverUploadBtn" class="btn submit-btn" type="button" value="Upload">
+                <div id="serverAddressBlock" class="input-group" hidden>
+                    <input id="serverAddress" class="stretch-input input-group__input" type="text">
+                    <input id="serverUploadBtn" class="btn submit-btn input-group__btn" type="button" value="Upload">
                 </div>
             <?php   }   ?>
         </div>

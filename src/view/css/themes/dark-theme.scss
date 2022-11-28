@@ -15,8 +15,11 @@
 
   /* Disabled inputs */
   --input-disabled-bg-color: #202020;
-  --input-disabled-border-color: #202020;
-  --input-disabled-text-color: #707070;
+  --input-disabled-border-color: #2e2e2e;
+  --input-disabled-text-color: #505050;
+
+  /* List item */
+  --list-item-bg-color: var(--alt-bg-color);
 
   /* List item icons */
   --list-item-icon-fill: #888888;
@@ -52,17 +55,22 @@
   }
 
   .iconbutton {
-    &.circle-icon .iconbutton__icon {
-      border-color: var(--main-text-color);
-    }
+    --iconbtn-title-color: var(--main-text-color);
+    --iconbtn-icon-color: var(--main-text-color);
+    --iconbtn-hover-title-color: var(--main-text-color);
+    --iconbtn-hover-icon-color: var(--main-text-color);
 
-    .iconbutton__icon-content {
-      fill: var(--main-text-color);
-    }
+    &.circle-icon {
+      --iconbtn-hover-icon-color: #202020;
 
-    .iconbutton__content {
-      color: var(--main-text-color);
+      .iconbutton__icon {
+        border-color: var(--main-text-color);
+      }
     }
+  }
+
+  .icon {
+    fill: var(--main-text-color);
   }
 
   /* No data message for lists & etc. */
@@ -95,6 +103,7 @@
 
   .stretch-input[disabled] {
     color: var(--input-disabled-text-color);
+    border-color: var(--input-disabled-border-color);
     background-color: var(--input-disabled-bg-color);
   }
 
@@ -131,6 +140,7 @@
     --dd-bg-color: var(--input-bg-color);
     --dd-selection-text: var(--main-text-color);
     --dd-border-color: var(--input-border-color);
+    --dd-input-text: var(--main-text-color);
 
     /* Active component */
     --dd-active-bg: #202020;
@@ -180,8 +190,7 @@
   .rule-item .collapsible-header,
   .rule-form-collapse .collapsible-header {
     color: var(--main-text-color);
-    background-color: #202020;
-    border-color: #202020;
+    background-color: var(--list-item-bg-color);
   }
 
   /* Filters */
@@ -205,7 +214,7 @@
   /* Transaction list item */
   .trans-item__content,
   .trans-item__controls {
-    background-color: var(--alt-bg-color);
+    background-color: var(--list-item-bg-color);
   }
 
   .trans-item__balance,
@@ -243,7 +252,7 @@
   /* Popup */
   .popup__content .popup__content-box {
     color: var(--main-text-color);
-    background-color: #303030;
+    background-color: var(--main-bg-color);
   }
 
   .popup__title,
@@ -283,17 +292,7 @@
 
   /* Import form */
   .import-form {
-    .form-container,
-    .controls,
-    .invalid-feedback,
-    .form-controls {
-      background-color: var(--alt-bg-color);
-    }
-
-    &.import-form__placeholder {
-      border-color: #888888;
-      background-color: #202020;
-    }
+    --input-disabled-border-color: #202020;
 
     input[type="text"] {
       border-color: var(--input-border-color);
@@ -380,10 +379,6 @@
     border-color: #707070;
   }
 
-  .import-controls {
-    color: var(--main-text-color);
-  }
-
   /* Upload dialog */
   .upload-form__descr {
     color: #adadad;
@@ -416,15 +411,13 @@
   .rule-form-collapse .collapsible-content,
   .rule-item .collapsible-content {
     color: #bbbbbb;
-    border-color: #303030;
     background-color: #252525;
   }
 
   /* Condition item */
   .cond-item,
   .cond-form {
-    background-color: #353535;
-    border-color: #353535;
+    background-color: var(--list-item-bg-color);
   }
 
   .cond-item__operator {
@@ -434,7 +427,7 @@
   /* Action item */
   .action-item,
   .action-form {
-    background-color: #353535;
+    background-color: var(--list-item-bg-color);
   }
 
   /* Original import data container */
@@ -491,18 +484,9 @@
     }
 
     .iconbutton:hover {
-      .iconbutton__icon,
-      .iconbutton__content {
-        color: var(--main-text-color);
-      }
-
       &.circle-icon {
         .iconbutton__icon {
           background-color: var(--main-text-color);
-        }
-
-        .iconbutton__icon-content {
-          fill: #202020;
         }
       }
     }

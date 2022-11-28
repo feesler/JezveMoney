@@ -15,6 +15,7 @@ import { AppView } from './AppView.js';
 import { TilesList } from './component/TilesList.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
+import { Counter } from './component/Counter.js';
 
 const listMenuItems = [
     'selectModeBtn',
@@ -34,27 +35,27 @@ const contextMenuItems = [
 export class AccountListView extends AppView {
     async parseContent() {
         const res = {
-            titleEl: await query('.content_wrap > .heading > h1'),
+            title: { elem: await query('.content_wrap > .heading > h1') },
             addBtn: await IconButton.create(this, await query('#add_btn')),
+            listModeBtn: await IconButton.create(this, await query('#listModeBtn')),
             listMenuContainer: {
                 elem: await query('#listMenu'),
                 menuBtn: await query('#listMenu .popup-menu-btn'),
             },
             listMenu: { elem: await query('#listMenu .popup-menu-list') },
-            contextMenu: { elem: await query('#contextMenu') },
+            totalCounter: await Counter.create(this, await query('#itemsCounter')),
+            hiddenCounter: await Counter.create(this, await query('#hiddenCounter')),
+            selectedCounter: await Counter.create(this, await query('#selectedCounter')),
         };
+
+        Object.keys(res).forEach((child) => (
+            assert(res[child]?.elem, `Invalid structure of view: ${child} component not found`)
+        ));
 
         await this.parseMenuItems(res, listMenuItems);
 
-        assert(
-            res.titleEl
-            && res.addBtn
-            && res.listMenuContainer.elem
-            && res.listMenuContainer.menuBtn
-            && res.listMenu.elem,
-            'Invalid structure of accounts view',
-        );
-
+        // Context menu
+        res.contextMenu = { elem: await query('#contextMenu') };
         const contextParent = await closest(res.contextMenu.elem, '.tile');
         if (contextParent) {
             const itemId = await prop(contextParent, 'dataset.id');
@@ -64,8 +65,8 @@ export class AccountListView extends AppView {
             await this.parseMenuItems(res, contextMenuItems);
         }
 
-        res.title = await prop(res.titleEl, 'textContent');
-        res.tiles = await TilesList.create(this, await query('#visibleTilesHeading + .tiles'));
+        res.title.value = await prop(res.title.elem, 'textContent');
+        res.tiles = await TilesList.create(this, await query('.content-header + .tiles'));
         res.hiddenTiles = await TilesList.create(this, await query('#hiddenTilesHeading + .tiles'));
         res.loadingIndicator = { elem: await query('.loading-indicator') };
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
@@ -96,7 +97,7 @@ export class AccountListView extends AppView {
             return 'nodata';
         }
 
-        if (cont.selectModeBtn.title === 'Done') {
+        if (!cont.addBtn.content.visible) {
             return 'select';
         }
 
@@ -123,13 +124,19 @@ export class AccountListView extends AppView {
         const visibleSelected = this.getSelectedItems(model);
         const hiddenSelected = this.getHiddenSelectedItems(model);
         const totalSelected = visibleSelected.length + hiddenSelected.length;
+        const isListMode = model.mode === 'list';
         const showSelectItems = model.listMenuVisible && model.mode === 'select';
 
         const res = {
+            addBtn: { visible: isListMode },
+            listModeBtn: { visible: !isListMode },
             loadingIndicator: { visible: model.loading },
+            totalCounter: { visible: true, value: itemsCount },
+            hiddenCounter: { visible: true, value: model.hiddenTiles.length },
+            selectedCounter: { visible: model.mode === 'select', value: totalSelected },
             listMenuContainer: { visible: itemsCount > 0 },
             listMenu: { visible: model.listMenuVisible },
-            selectModeBtn: { visible: model.listMenuVisible },
+            selectModeBtn: { visible: model.listMenuVisible && isListMode },
             selectAllBtn: {
                 visible: showSelectItems && itemsCount > 0 && totalSelected < itemsCount,
             },
@@ -168,6 +175,13 @@ export class AccountListView extends AppView {
 
     getHiddenSelectedItems(model = this.model) {
         return model.hiddenTiles.filter((item) => item.isActive);
+    }
+
+    onDeselectAll() {
+        const deselectItem = (item) => ({ ...item, isActive: false });
+
+        this.model.tiles = this.model.tiles.map(deselectItem);
+        this.model.hiddenTiles = this.model.hiddenTiles.map(deselectItem);
     }
 
     getItems() {
@@ -244,13 +258,18 @@ export class AccountListView extends AppView {
     }
 
     async toggleSelectMode() {
-        await this.openListMenu();
+        const isListMode = (this.model.mode === 'list');
+        if (isListMode) {
+            await this.openListMenu();
+        }
 
         this.model.listMenuVisible = false;
-        this.model.mode = (this.model.mode === 'select') ? 'list' : 'select';
+        this.model.mode = (isListMode) ? 'select' : 'list';
+        this.onDeselectAll();
         const expected = this.getExpectedState();
 
-        await this.performAction(() => this.content.selectModeBtn.click());
+        const buttonName = (isListMode) ? 'selectModeBtn' : 'listModeBtn';
+        await this.performAction(() => this.content[buttonName].click());
 
         return this.checkState(expected);
     }
@@ -321,13 +340,10 @@ export class AccountListView extends AppView {
     async deselectAll() {
         assert(this.model.mode === 'select', 'Invalid state');
 
-        const deselectItem = (item) => ({ ...item, isActive: false });
-
         await this.openListMenu();
 
         this.model.listMenuVisible = false;
-        this.model.tiles = this.model.tiles.map(deselectItem);
-        this.model.hiddenTiles = this.model.hiddenTiles.map(deselectItem);
+        this.onDeselectAll();
         const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.deselectAllBtn.click());

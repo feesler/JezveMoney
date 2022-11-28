@@ -29,7 +29,7 @@ export const checkInitialState = async (directNavigate = false) => {
         await checkNavigation();
     }
 
-    App.view.expectedState = App.view.setExpectedState();
+    App.view.expectedState = App.view.getExpectedState();
     await test('Initial state of transaction list view', () => App.view.checkState());
 };
 

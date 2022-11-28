@@ -78,7 +78,6 @@ const convertItemDataToProps = (data, state) => {
     const { mainAccount } = state;
     const res = {
         mainAccount,
-        isForm: data.isForm,
         enabled: data.enabled,
         sourceAmount: data.src_amount,
         destAmount: data.dest_amount,
@@ -172,28 +171,6 @@ const getPagination = (state) => {
     return res;
 };
 
-const reduceDeleteItemByIndex = (state, index) => {
-    if (index === -1) {
-        return state;
-    }
-
-    const newState = {
-        ...state,
-        contextItemIndex: -1,
-        items: state.items.filter((_, ind) => (ind !== index)),
-    };
-
-    if (newState.activeItemIndex === index) {
-        newState.activeItemIndex = -1;
-        newState.originalItemData = null;
-    } else if (index < newState.activeItemIndex) {
-        newState.activeItemIndex -= 1;
-    }
-
-    newState.pagination = getPagination(newState);
-    return newState;
-};
-
 const slice = createSlice({
     showContextMenu: (state, itemIndex) => (
         (state.contextItemIndex === itemIndex)
@@ -227,7 +204,7 @@ const slice = createSlice({
     similarTransactionsLoaded: (state, transactions) => ({
         ...state,
         items: state.items.map((item) => {
-            if (!item.isImported) {
+            if (!item.originalData) {
                 return item;
             }
 
@@ -250,10 +227,7 @@ const slice = createSlice({
     disableFindSimilar: (state) => ({
         ...state,
         items: state.items.map((item) => {
-            if (!item.isImported) {
-                return item;
-            }
-            if (item.isSameSimilarTransaction(null)) {
+            if (!item.originalData || item.isSameSimilarTransaction(null)) {
                 return item;
             }
 
@@ -312,7 +286,6 @@ const slice = createSlice({
             ...state,
             items: [],
             activeItemIndex: -1,
-            originalItemData: null,
             listMode: 'list',
         };
         newState.pagination = getPagination(newState);
@@ -320,7 +293,19 @@ const slice = createSlice({
         return newState;
     },
 
-    deleteItemByIndex: (state, index) => reduceDeleteItemByIndex(state, index),
+    deleteItemByIndex: (state, index) => {
+        if (index === -1) {
+            return state;
+        }
+
+        const newState = {
+            ...state,
+            contextItemIndex: -1,
+            items: state.items.filter((_, ind) => (ind !== index)),
+        };
+        newState.pagination = getPagination(newState);
+        return newState;
+    },
 
     changeListMode: (state, listMode) => ({
         ...state,
@@ -391,13 +376,12 @@ const slice = createSlice({
     ),
 
     createItem: (state) => {
-        if (state.listMode !== 'list') {
+        if (state.listMode !== 'list' || state.activeItemIndex !== -1) {
             return state;
         }
 
         const currencyId = state.mainAccount.curr_id;
         const itemData = {
-            isForm: true,
             enabled: true,
             type: EXPENSE,
             src_amount: '',
@@ -408,89 +392,58 @@ const slice = createSlice({
             comment: '',
         };
         const itemProps = convertItemDataToProps(itemData, state);
-        const newItem = new ImportTransaction(itemProps.data);
-        newItem.state.listMode = 'list';
-
-        const newState = {
-            ...state,
-            items: [...state.items, newItem],
-            activeItemIndex: state.items.length,
-            originalItemData: null,
-        };
-        newState.pagination = getPagination(newState);
-        newState.pagination.page = newState.pagination.pagesCount;
-
-        return newState;
-    },
-
-    saveItem: (state) => ({
-        ...state,
-        items: state.items.map((item, ind) => {
-            if (ind !== state.activeItemIndex) {
-                return item;
-            }
-
-            const savedItem = new ImportTransaction(item);
-            savedItem.isForm = false;
-            return savedItem;
-        }),
-        activeItemIndex: -1,
-        originalItemData: null,
-    }),
-
-    editItem: (state, index) => ({
-        ...state,
-        contextItemIndex: -1,
-        items: state.items.map((item, ind) => {
-            const isForm = (ind === index);
-            if (item.isForm === isForm) {
-                return item;
-            }
-
-            const newItem = new ImportTransaction(item);
-            newItem.isForm = isForm;
-            return newItem;
-        }),
-        activeItemIndex: index,
-        originalItemData: new ImportTransaction(state.items[index]),
-    }),
-
-    formChanged: (state, data) => {
-        const { activeItemIndex } = state;
-        if (activeItemIndex === -1) {
-            return state;
-        }
-
-        const newState = state;
-        newState.items[activeItemIndex] = new ImportTransaction(data);
-
-        return newState;
-    },
-
-    cancelEditItem: (state) => {
-        const { activeItemIndex, originalItemData } = state;
-        if (activeItemIndex === -1) {
-            return state;
-        }
-
-        const pageIndex = getPageIndex(activeItemIndex, state);
-        if (pageIndex.page !== state.pagination.page) {
-            throw new Error('Invalid page');
-        }
-
-        if (!originalItemData) {
-            return reduceDeleteItemByIndex(state, activeItemIndex);
-        }
+        const form = new ImportTransaction(itemProps.data);
+        form.state.listMode = 'list';
 
         return {
             ...state,
-            items: state.items.map((item, ind) => (
-                (ind === activeItemIndex) ? originalItemData : item
-            )),
-            activeItemIndex: -1,
-            originalItemData: null,
+            form,
+            activeItemIndex: state.items.length,
         };
     },
+
+    saveItem: (state, data) => {
+        const newState = {
+            ...state,
+            items: (
+                (state.activeItemIndex === state.items.length)
+                    ? [...state.items, data]
+                    : state.items.map((item, ind) => (
+                        (ind === state.activeItemIndex) ? data : item
+                    ))
+            ),
+            form: null,
+            activeItemIndex: -1,
+        };
+
+        newState.pagination = getPagination(newState);
+        const pageIndex = getPageIndex(state.activeItemIndex, newState);
+        newState.pagination.page = pageIndex.page;
+
+        return newState;
+    },
+
+    editItem: (state, index) => {
+        const activeItemIndex = index ?? state.contextItemIndex;
+        if (activeItemIndex === -1 || activeItemIndex === state.activeItemIndex) {
+            return state;
+        }
+
+        const form = new ImportTransaction(state.items[activeItemIndex]);
+        form.enable(true);
+        return {
+            ...state,
+            contextItemIndex: -1,
+            activeItemIndex,
+            form,
+        };
+    },
+
+    cancelEditItem: (state) => ({
+        ...state,
+        activeItemIndex: -1,
+        form: null,
+    }),
 
     changeMainAccount: (state, accountId) => {
         if (state.mainAccount?.id === accountId) {
@@ -516,7 +469,6 @@ const slice = createSlice({
             ...state,
             mainAccount,
             items: state.items.map((item) => setItemMainAccount(item, mainAccount.id)),
-            originalItemData: setItemMainAccount(state.originalItemData, mainAccount.id),
         };
     },
 
@@ -525,7 +477,7 @@ const slice = createSlice({
             ? {
                 ...state,
                 items: state.items.map((item) => {
-                    if (!item.isImported) {
+                    if (!item.originalData) {
                         return item;
                     }
 
@@ -546,7 +498,7 @@ const slice = createSlice({
         contextItemIndex: -1,
         rulesEnabled: !state.rulesEnabled,
         items: state.items.map((item) => {
-            if (!item.isImported) {
+            if (!item.originalData) {
                 return item;
             }
 

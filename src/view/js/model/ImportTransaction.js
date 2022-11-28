@@ -18,7 +18,6 @@ const transTypeMap = {
 };
 
 const defaultProps = {
-    isForm: false,
     enabled: true,
     collapsed: true,
     selected: false,
@@ -53,14 +52,6 @@ export class ImportTransaction {
         this.setData(this.props);
     }
 
-    get isForm() {
-        return this.state.isForm;
-    }
-
-    set isForm(value) {
-        this.state.isForm = !!value;
-    }
-
     get enabled() {
         return this.state.enabled;
     }
@@ -77,8 +68,8 @@ export class ImportTransaction {
         return this.state.mainAccount;
     }
 
-    get isImported() {
-        return !!this.state.originalData;
+    get originalData() {
+        return this.state.originalData;
     }
 
     setData(data) {

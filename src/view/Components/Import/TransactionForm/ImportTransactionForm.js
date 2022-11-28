@@ -6,20 +6,23 @@ import {
     insertAfter,
     checkDate,
 } from 'jezvejs';
+import { Collapsible } from 'jezvejs/Collapsible';
 import { DateInput } from 'jezvejs/DateInput';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
 import { InputGroup } from 'jezvejs/InputGroup';
+import { Popup } from 'jezvejs/Popup';
 import { fixFloat } from '../../../js/utils.js';
 import { ImportTransactionBase } from '../TransactionBase/ImportTransactionBase.js';
 import { Field } from '../../Field/Field.js';
 import './style.scss';
 import { ImportTransaction } from '../../../js/model/ImportTransaction.js';
+import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 
 /** CSS classes */
+const POPUP_CLASS = 'import-form-popup';
 const CONTAINER_CLASS = 'import-form';
-const MAIN_CONTENT_CLASS = 'main-content';
 const INV_FEEDBACK_CLASS = 'invalid-feedback';
 const FORM_CONTAINER_CLASS = 'form-container';
 const FORM_COLUMN_CLASS = 'form-rows';
@@ -41,18 +44,17 @@ const PERSON_FIELD_CLASS = 'person-field';
 const DATE_FIELD_CLASS = 'date-field';
 const COMMENT_FIELD_CLASS = 'comment-field';
 /* Controls */
-const CONTROLS_CLASS = 'controls';
-const DEFAULT_BUTTON_CLASS = 'btn';
-const DEFAULT_ICON_CLASS = 'icon';
-const CALENDAR_ICON_CLASS = 'calendar-icon';
+const CALENDAR_ICON_CLASS = 'icon calendar-icon';
 /* Form controls */
 const FORM_CONTROLS_CLASS = 'form-controls';
-const SUBMIT_BUTTON_CLASS = 'submit-btn';
-const CANCEL_BUTTON_CLASS = 'cancel-btn';
+const SUBMIT_BUTTON_CLASS = 'btn submit-btn';
+const CANCEL_BUTTON_CLASS = 'btn cancel-btn';
 /* Sort state */
 const SORT_CLASS = 'import-form_sort';
 
 /** Strings */
+const CREATE_TITLE = 'Create transaction';
+const UPDATE_TITLE = 'Edit transaction';
 /* Fields */
 const TITLE_FIELD_AMOUNT = 'Amount';
 const TITLE_FIELD_SRC_AMOUNT = 'Source amount';
@@ -70,11 +72,8 @@ const SAVE_BTN_TITLE = 'Save';
 const CANCEL_BTN_TITLE = 'Cancel';
 
 const defaultProps = {
-    onSelect: null,
-    onCollapse: null,
-    onEnable: null,
-    onUpdate: null,
-    onRemove: null,
+    isUpdate: false,
+    collapsed: true,
     onSave: null,
     onCancel: null,
 };
@@ -83,20 +82,18 @@ const defaultProps = {
  * ImportTransactionForm component
  */
 export class ImportTransactionForm extends ImportTransactionBase {
-    constructor(...args) {
-        super(...args);
+    constructor(props = {}) {
+        super({
+            ...defaultProps,
+            ...props,
+        });
 
-        if (!this.props?.data?.mainAccount) {
+        if (!this.props?.transaction?.mainAccount) {
             throw new Error('Invalid props');
         }
 
-        this.props = {
-            ...defaultProps,
-            ...this.props,
-        };
-
         this.state = {
-            transaction: new ImportTransaction(this.props.data),
+            ...this.props,
         };
 
         this.menuEmptyClickHandler = () => this.hideMenu();
@@ -135,49 +132,53 @@ export class ImportTransactionForm extends ImportTransactionBase {
             ]),
         ]);
 
-        this.createMenuButton();
-        this.controls = createContainer(CONTROLS_CLASS, [
-            this.menuContainer,
-        ]);
-
-        this.mainContainer = createContainer(MAIN_CONTENT_CLASS, [
-            this.formContainer,
-            this.controls,
-        ]);
         this.feedbackElem = createElement('div', { props: { className: INV_FEEDBACK_CLASS } });
         show(this.feedbackElem, false);
 
         // Save button
         this.saveBtn = createElement('button', {
             props: {
-                className: `${DEFAULT_BUTTON_CLASS} ${SUBMIT_BUTTON_CLASS}`,
-                type: 'button',
+                className: SUBMIT_BUTTON_CLASS,
+                type: 'submit',
                 textContent: SAVE_BTN_TITLE,
             },
-            events: { click: () => this.save() },
         });
         // Cancel button
         this.cancelBtn = createElement('button', {
             props: {
-                className: `${DEFAULT_BUTTON_CLASS} ${CANCEL_BUTTON_CLASS}`,
+                className: CANCEL_BUTTON_CLASS,
                 type: 'button',
                 textContent: CANCEL_BTN_TITLE,
             },
             events: { click: () => this.cancel() },
         });
+        this.toggleExtBtn = this.createToggleButton();
 
         this.formControls = createContainer(FORM_CONTROLS_CLASS, [
             this.saveBtn,
             this.cancelBtn,
+            this.toggleExtBtn,
         ]);
 
         this.initContainer(CONTAINER_CLASS, [
-            this.mainContainer,
+            this.formContainer,
             this.feedbackElem,
             this.formControls,
         ]);
 
-        this.render();
+        this.popup = Popup.create({
+            id: 'transactionFormPopup',
+            content: this.elem,
+            title: 'Transaction',
+            scrollMessage: true,
+            onclose: () => this.cancel(),
+            btn: {
+                closeBtn: true,
+            },
+            className: POPUP_CLASS,
+        });
+
+        this.render(this.state);
     }
 
     /** Create transaction type field */
@@ -344,7 +345,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
 
         const dateIcon = window.app.createIcon(
             'calendar-icon',
-            `${DEFAULT_ICON_CLASS} ${CALENDAR_ICON_CLASS}`,
+            CALENDAR_ICON_CLASS,
         );
         this.dateBtn = createElement('button', {
             props: {
@@ -383,90 +384,151 @@ export class ImportTransactionForm extends ImportTransactionBase {
         });
     }
 
+    initContainer(className, children) {
+        this.elem = createElement('form', {
+            props: { className },
+            children,
+            events: { submit: (e) => this.onSubmit(e) },
+        });
+    }
+
+    reset() {
+        this.state.isUpdate = false;
+        this.state.collapsed = true;
+    }
+
+    /** Show/hide dialog */
+    show(val) {
+        this.popup.show(val);
+    }
+
+    /** Hide dialog */
+    hide() {
+        this.popup.hide();
+    }
+
+    /** Creates new transaction from state, run action on it and returns result */
+    runAction(type, payload, state = this.state) {
+        if (typeof type !== 'string' || !isFunction(state.transaction[type])) {
+            throw new Error('Invalid action type');
+        }
+
+        const transaction = new ImportTransaction(this.state.transaction);
+        transaction[type](payload);
+        return transaction;
+    }
+
+    /** Toggle collapse/expand button 'click' event handler */
+    toggleCollapse() {
+        this.setState({
+            ...this.state,
+            collapsed: !this.state.collapsed,
+        });
+    }
+
     /** Transaction type select 'change' event handler */
     onTrTypeChanged(type) {
-        this.setTransactionType(type.id);
+        this.setState({
+            ...this.state,
+            transaction: this.runAction('setTransactionType', type.id),
+        });
+
         this.clearInvalid();
-        this.render();
-        this.sendUpdate();
     }
 
     /** Destination account select 'change' event handler */
     onTransferAccountChanged(account) {
-        this.setTransferAccount(account.id);
+        this.setState({
+            ...this.state,
+            transaction: this.runAction('setTransferAccount', account.id),
+        });
+
         this.clearInvalid();
-        this.render();
-        this.sendUpdate();
     }
 
     /** Person select 'change' event handler */
     onPersonChanged(person) {
-        this.setPerson(person.id);
+        this.setState({
+            ...this.state,
+            transaction: this.runAction('setPerson', person.id),
+        });
+
         this.clearInvalid();
-        this.render();
-        this.sendUpdate();
     }
 
     /** Source amount field 'input' event handler */
     onSrcAmountInput() {
         const { value } = this.srcAmountInp;
-        this.setSourceAmount(value);
+        this.setState({
+            ...this.state,
+            transaction: this.runAction('setSourceAmount', value),
+        });
+
         this.clearInvalid();
-        this.render();
-        this.sendUpdate();
     }
 
     /** Destination amount field 'input' event handler */
     onDestAmountInput() {
         const { value } = this.destAmountInp;
-        this.setDestAmount(value);
+        this.setState({
+            ...this.state,
+            transaction: this.runAction('setDestAmount', value),
+        });
         this.clearInvalid();
-        this.render();
-        this.sendUpdate();
     }
 
     /** Currency select 'change' event handler */
     onSrcCurrChanged(currency) {
-        this.setSourceCurrency(currency.id);
+        this.setState({
+            ...this.state,
+            transaction: this.runAction('setSourceCurrency', currency.id),
+        });
+
         this.clearInvalid();
-        this.render();
-        this.sendUpdate();
     }
 
     /** Currency select 'change' event handler */
     onDestCurrChanged(currency) {
-        this.setDestCurrency(currency.id);
+        this.setState({
+            ...this.state,
+            transaction: this.runAction('setDestCurrency', currency.id),
+        });
+
         this.clearInvalid();
-        this.render();
-        this.sendUpdate();
     }
 
     /** Date field 'input' event handler */
     onDateInput() {
         const { value } = this.dateInp;
-        this.setDate(value);
+        this.setState({
+            ...this.state,
+            transaction: this.runAction('setDate', value),
+        });
+
         this.clearInvalid();
-        this.render();
-        this.sendUpdate();
     }
 
     /** DatePicker select event handler */
     onDateSelect(date) {
         const dateFmt = window.app.formatDate(date);
-        this.setDate(dateFmt);
+        this.setState({
+            ...this.state,
+            transaction: this.runAction('setDate', dateFmt),
+        });
+
         this.datePicker.hide();
         this.clearInvalid();
-        this.render();
-        this.sendUpdate();
     }
 
     /** Comment field 'input' event handler */
     onCommentInput() {
         const { value } = this.commInp;
-        this.setComment(value);
+        this.setState({
+            ...this.state,
+            transaction: this.runAction('setComment', value),
+        });
+
         this.clearInvalid();
-        this.render();
-        this.sendUpdate();
     }
 
     /** Validate transaction object */
@@ -486,13 +548,6 @@ export class ImportTransactionForm extends ImportTransactionBase {
         window.app.clearBlockValidation(this.destAmountField.elem);
         window.app.clearBlockValidation(this.dateField.elem);
         this.setFeedback();
-    }
-
-    /** Send component 'update' event */
-    sendUpdate() {
-        if (isFunction(this.props.onUpdate)) {
-            this.props.onUpdate(this.state.transaction);
-        }
     }
 
     validateSourceAmount(state) {
@@ -556,13 +611,21 @@ export class ImportTransactionForm extends ImportTransactionBase {
         return true;
     }
 
-    save() {
+    onSubmit(e) {
+        e?.preventDefault();
+
+        if (!this.validate()) {
+            return;
+        }
+
+        this.reset();
         if (isFunction(this.props.onSave)) {
-            this.props.onSave();
+            this.props.onSave(this.state.transaction);
         }
     }
 
     cancel() {
+        this.reset();
         if (isFunction(this.props.onCancel)) {
             this.props.onCancel();
         }
@@ -612,12 +675,44 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.datePicker.show(!this.datePicker.visible());
     }
 
-    /** Render component */
-    render() {
-        const { state } = this;
+    renderOriginalData(state, prevState) {
+        const { originalData } = state.transaction;
+        if (originalData === prevState?.transaction?.originalData) {
+            return;
+        }
 
-        if (!state) {
-            throw new Error('Invalid state');
+        if (!originalData) {
+            this.collapse?.hide();
+            return;
+        }
+
+        const container = OriginalImportData.create({
+            ...originalData,
+        });
+
+        const content = [container.elem];
+        const { similarTransaction } = state.transaction;
+        if (similarTransaction) {
+            const infoElem = this.createSimilarTransactionInfo(similarTransaction);
+            content.push(infoElem);
+        }
+
+        if (!this.collapse) {
+            this.collapse = Collapsible.create({
+                toggleOnClick: false,
+                className: CONTAINER_CLASS,
+                header: null,
+            });
+
+            this.elem.append(this.collapse.elem);
+        }
+
+        this.collapse.setContent(content);
+    }
+
+    renderForm(state, prevState) {
+        if (state.transaction === prevState?.transaction) {
+            return;
         }
 
         const isDiff = state.transaction.isDiff();
@@ -629,9 +724,6 @@ export class ImportTransactionForm extends ImportTransactionBase {
 
         enable(this.elem, transaction.enabled);
         this.elem.classList.toggle(SORT_CLASS, transaction.listMode === 'sort');
-
-        // Select controls
-        this.renderSelectControls(state);
 
         // Type field
         this.typeDropDown.enable(transaction.enabled);
@@ -752,13 +844,30 @@ export class ImportTransactionForm extends ImportTransactionBase {
         // Commend field
         enable(this.commInp, transaction.enabled);
         this.commInp.value = transaction.comment;
+    }
 
-        if (this.collapse) {
-            if (transaction.collapsed) {
-                this.collapse.collapse();
-            } else {
-                this.collapse.expand();
-            }
+    /** Render component */
+    render(state, prevState = {}) {
+        if (!state) {
+            throw new Error('Invalid state');
+        }
+
+        const title = (state.isUpdate) ? UPDATE_TITLE : CREATE_TITLE;
+        this.popup.setTitle(title);
+
+        this.renderForm(state, prevState);
+        this.renderOriginalData(state, prevState);
+
+        const { originalData } = state.transaction;
+        show(this.toggleExtBtn, !!originalData);
+        this.toggleExtBtn.classList.toggle('rotate', !state.collapsed);
+        if (!this.collapse) {
+            return;
+        }
+        if (state.collapsed) {
+            this.collapse.collapse();
+        } else {
+            this.collapse.expand();
         }
     }
 }

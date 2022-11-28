@@ -45,7 +45,6 @@ export class ImportTransaction {
         const res = new ImportTransaction({
             enabled: true,
             similarTransaction: null,
-            isForm: false,
             mainAccount,
             type: (data.accountAmount < 0) ? 'expense' : 'income',
             date: data.date,

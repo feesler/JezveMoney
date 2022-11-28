@@ -20,6 +20,7 @@
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
+  row-gap: 12px;
 }
 
 .upload-form__browser.drag-over {
@@ -30,42 +31,40 @@
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
+
+  .input-group__btn {
+    padding: 6px 12px;
+  }
 }
 
 .upload-form__file {
   position: relative;
-  height: 30px;
-  margin: 0;
   text-align: center;
+  margin: 0 0 6px 0;
 
   input[type="file"] {
     position: absolute;
-    z-index: 22;
+    z-index: 2;
     width: 100%;
-    height: 30px;
     left: 0;
     top: 0;
+    bottom: 0;
     opacity: 0;
     cursor: pointer;
   }
 
   input[type="file"]::file-selector-button {
+    height: 100%;
+    margin: 0;
     cursor: pointer;
-  }
-
-  > .upload-form__overlap {
-    z-index: 21;
   }
 }
 
 .browse-btn {
+  padding: 6px 24px;
   margin: 0;
   white-space: nowrap;
   border-radius: var(--action-btn-border-radius);
-}
-
-.browse-btn,
-.browse-btn:visited {
   background-color: var(--accent-color);
 }
 
@@ -85,7 +84,19 @@
 .upload-form__options {
   display: flex;
   flex-flow: column nowrap;
-  margin: 9px 0;
+  row-gap: 2px;
+
+  .checkbox {
+    height: 24px;
+  }
+}
+
+/* Server address input group */
+.upload-form__browser .input-group {
+  .submit-btn,
+  .submit-btn:focus {
+    padding: 6px 12px;
+  }
 }
 
 /* Extended popup title for Convert state */

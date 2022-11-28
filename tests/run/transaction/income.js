@@ -42,8 +42,9 @@ export const update = async (params) => {
         const isDiff = (origTransaction.src_curr !== origTransaction.dest_curr);
 
         await test('Initial state of update income view', () => {
-            App.view.setExpectedState(isDiff ? 2 : 0);
-            return App.view.checkState();
+            App.view.model.state = (isDiff) ? 2 : 0;
+            const expected = App.view.getExpectedState();
+            return App.view.checkState(expected);
         });
 
         return submit(submitParams);
