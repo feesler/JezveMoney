@@ -32,7 +32,6 @@ export class ImportTransactionItem extends TestComponent {
 
     async parseContent() {
         const res = await evaluate((elem) => ({
-            isForm: false,
             selected: elem.classList.contains('import-item_selected'),
             enabled: !elem.hasAttribute('disabled'),
         }), this.elem);
@@ -123,10 +122,8 @@ export class ImportTransactionItem extends TestComponent {
 
     async buildModel(cont) {
         const res = {
-            isForm: false,
+            mainAccount: App.state.accounts.getItem(this.mainAccount),
         };
-
-        res.mainAccount = App.state.accounts.getItem(this.mainAccount);
         assert(res.mainAccount, 'Main account not found');
 
         res.isContextMenu = !!cont.contextMenuElem;
@@ -204,7 +201,6 @@ export class ImportTransactionItem extends TestComponent {
         assert(transactionType, `Invalid transaction type: '${model.type}'`);
 
         const res = {
-            isForm: false,
             selectMode: model.selectMode,
             selected: model.selected,
             enabled: model.enabled,
@@ -475,7 +471,6 @@ export class ImportTransactionItem extends TestComponent {
         const destCurrency = App.currency.getItem(item.dest_curr);
 
         const res = {
-            isForm: false,
             enabled: item.enabled,
             typeField: {
                 visible: true,

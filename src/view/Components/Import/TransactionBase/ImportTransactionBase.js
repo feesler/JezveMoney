@@ -143,10 +143,6 @@ export class ImportTransactionBase extends Component {
 
     /** Enable/disable component */
     enable(value = true) {
-        if (this.state.transaction.isForm) {
-            return;
-        }
-
         this.state.transaction.enable(value);
         this.render();
     }

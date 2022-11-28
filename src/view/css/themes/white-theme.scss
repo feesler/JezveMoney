@@ -293,18 +293,6 @@
   .import-form {
     --input-disabled-border-color: #eeeeee;
 
-    .form-container,
-    .controls,
-    .invalid-feedback,
-    .form-controls {
-      background-color: #dddddd;
-    }
-
-    &.import-form__placeholder {
-      border-color: #888888;
-      background-color: var(--main-bg-color);
-    }
-
     input[type="text"] {
       border-color: var(--input-border-color);
     }

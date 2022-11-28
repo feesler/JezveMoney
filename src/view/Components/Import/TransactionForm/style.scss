@@ -1,15 +1,15 @@
-/* Transaction item */
-.import-form {
+.import-form-popup .popup__content-box {
   --import-form-popup-zindex: 500;
 
+  max-width: 600px;
+  width: 100%;
+}
+
+/* Transaction item */
+.import-form {
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
-
-  .main-content {
-    display: flex;
-    flex-flow: row nowrap;
-  }
 
   .form-container {
     display: flex;
@@ -17,7 +17,6 @@
     flex-grow: 1;
     align-items: normal;
     gap: 8px;
-    padding: 4px 8px 4px 8px;
   }
 
   .form-rows {
@@ -103,13 +102,6 @@
     }
   }
 
-  /* Controls */
-  .controls {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: center;
-  }
-
   .dd__container {
     --dd-list-z-index: var(--import-form-popup-zindex);
 
@@ -123,7 +115,7 @@
   input[type="text"] {
     display: flex;
     padding: 5px;
-    height: 34px;
+    height: var(--input-height);
   }
 
   input[type="button"] {
@@ -133,7 +125,7 @@
   }
 
   .input-group {
-    --ig-height: 34px;
+    --ig-height: var(--input-height);
   }
 
   /* Toggle expand/collapse button */
@@ -144,11 +136,16 @@
     background: none;
     pointer-events: all;
     cursor: pointer;
+    margin-left: auto;
   }
 
   .toggle-icon {
     width: 18px;
     height: 18px;
+  }
+
+  .toggle-btn.rotate .toggle-icon {
+    transform: rotate(180deg);
   }
 
   /* Delete item button */
@@ -184,10 +181,6 @@
     overflow: hidden;
   }
 
-  &.collapsible__expanded .toggle-icon {
-    transform: rotate(180deg);
-  }
-
   /* Sort mode */
   &.import-form_sort {
     cursor: move;
@@ -210,10 +203,6 @@
   .field.invalid-block input,
   .field.invalid-block .dd__combo {
     --input-border-color: #ff0000;
-  }
-
-  .form-controls {
-    padding: 24px 8px 12px 8px;
   }
 }
 
@@ -246,23 +235,4 @@
 
 .field.invalid-block .field__title {
   color: #ff0000;
-}
-
-/* Desktop */
-@media (min-width: 768px) {
-  .import-form {
-    .form-container {
-      flex-flow: row nowrap;
-      padding: 4px 0 6px 8px;
-    }
-
-    .form-row {
-      flex-flow: row nowrap;
-    }
-
-    .controls {
-      align-items: start;
-      padding-top: 16px;
-    }
-  }
 }

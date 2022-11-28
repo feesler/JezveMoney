@@ -294,18 +294,6 @@
   .import-form {
     --input-disabled-border-color: #202020;
 
-    .form-container,
-    .controls,
-    .invalid-feedback,
-    .form-controls {
-      background-color: var(--alt-bg-color);
-    }
-
-    &.import-form__placeholder {
-      border-color: #888888;
-      background-color: #202020;
-    }
-
     input[type="text"] {
       border-color: var(--input-border-color);
     }

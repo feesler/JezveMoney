@@ -45,7 +45,6 @@ export class ImportTransaction {
         const res = new ImportTransaction({
             enabled: true,
             similarTransaction: null,
-            isForm: false,
             mainAccount,
             type: (data.accountAmount < 0) ? 'expense' : 'income',
             date: data.date,
@@ -132,9 +131,7 @@ export class ImportTransaction {
         }
 
         this.similarTransaction = (transaction) ? { ...transaction } : null;
-        if (!this.isForm) {
-            this.enabled = !transaction;
-        }
+        this.enabled = !transaction;
     }
 
     /** Set main account */

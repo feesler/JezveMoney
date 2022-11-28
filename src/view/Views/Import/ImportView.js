@@ -70,8 +70,8 @@ class ImportView extends View {
             pagination: {
                 ...defaultPagination,
             },
+            form: {},
             activeItemIndex: -1,
-            originalItemData: null,
             mainAccount: null,
             rulesEnabled: true,
             checkSimilarEnabled: true,
@@ -350,7 +350,7 @@ class ImportView extends View {
     getImportedItemsDateRange(state) {
         const res = { start: 0, end: 0 };
         state.items.forEach((item) => {
-            if (!item.isImported) {
+            if (!item.originalData) {
                 return;
             }
 
@@ -448,10 +448,10 @@ class ImportView extends View {
 
     setListMode(listMode) {
         const state = this.store.getState();
-        if (state.listMode === listMode) {
-            return;
-        }
-        if (state.listMode === 'list' && !this.saveItem()) {
+        if (
+            state.listMode === listMode
+            || state.activeItemIndex !== -1
+        ) {
             return;
         }
 
@@ -527,66 +527,25 @@ class ImportView extends View {
     }
 
     /** Save form data and replace it by item component */
-    saveItem() {
-        const state = this.store.getState();
-        const { activeItemIndex } = state;
-        if (activeItemIndex === -1) {
-            return true;
+    onSaveItem(data) {
+        if (!data?.validate()) {
+            throw new Error('Invalid data');
         }
 
-        const formItem = state.items[activeItemIndex];
-        const valid = formItem.validate();
-        if (!valid) {
-            // Navigate to the page with transaction form if needed
-            const pageIndex = getPageIndex(activeItemIndex, state);
-            this.setPage(pageIndex.page);
-            // Render form validation
-            const form = this.transactionRows[pageIndex.index];
-            form.validate();
-            form.elem.scrollIntoView({ block: 'center', inline: 'nearest' });
-
-            return false;
-        }
-
-        this.store.dispatch(actions.saveItem());
-
-        return true;
+        this.store.dispatch(actions.saveItem(data));
     }
 
-    cancelEditItem() {
+    onCancelEditItem() {
         this.store.dispatch(actions.cancelEditItem());
     }
 
     /** Add new transaction row and insert it into list */
     createItem() {
-        if (!this.saveItem()) {
-            return;
-        }
-
         this.store.dispatch(actions.createItem());
-
-        const state = this.store.getState();
-        const pageIndex = getPageIndex(state.activeItemIndex, state);
-        if (pageIndex.page !== state.pagination.page) {
-            throw new Error('Invalid page');
-        }
-
-        const form = this.transactionRows[pageIndex.index];
-        form.elem.scrollIntoView({ block: 'center', inline: 'nearest' });
     }
 
     onUpdateItem() {
-        const { activeItemIndex, contextItemIndex } = this.store.getState();
-        if (
-            contextItemIndex === -1
-            || contextItemIndex === activeItemIndex
-            || !this.saveItem()
-        ) {
-            this.hideContextMenu();
-            return;
-        }
-
-        this.store.dispatch(actions.editItem(contextItemIndex));
+        this.store.dispatch(actions.editItem());
     }
 
     /** ImportTransaction 'update' event handler */
@@ -643,14 +602,13 @@ class ImportView extends View {
 
     /** Submit buttom 'click' event handler */
     onSubmitClick() {
-        this.submitProgress.show();
-
-        if (!this.saveItem()) {
-            this.submitProgress.hide();
+        const state = this.store.getState();
+        if (state.activeItemIndex !== -1) {
             return;
         }
 
-        const state = this.store.getState();
+        this.submitProgress.show();
+
         const enabledList = this.getEnabledItems(state);
         if (!Array.isArray(enabledList) || !enabledList.length) {
             throw new Error('Invalid list of items');
@@ -757,7 +715,7 @@ class ImportView extends View {
     /** Show rules dialog popup */
     showRulesDialog() {
         if (!this.rulesDialog) {
-            this.rulesDialog = new ImportRulesDialog({
+            this.rulesDialog = ImportRulesDialog.create({
                 elem: document.querySelector(`.${IMPORT_RULES_DIALOG_CLASS}`),
                 onUpdate: () => this.onUpdateRules(),
             });
@@ -815,6 +773,36 @@ class ImportView extends View {
         const fromIndex = this.getItemIndexByElem(original);
         const toIndex = this.getItemIndexByElem(replaced);
         this.store.dispatch(actions.changeItemPosition({ fromIndex, toIndex }));
+    }
+
+    /** Show transaction form dialog */
+    renderTransactionFormDialog(state) {
+        if (state.activeItemIndex === -1) {
+            this.transactionDialog?.hide();
+            return;
+        }
+
+        if (!state.form) {
+            throw new Error('Invalid state');
+        }
+
+        const isUpdate = (state.activeItemIndex < state.items.length);
+        if (!this.transactionDialog) {
+            this.transactionDialog = ImportTransactionForm.create({
+                transaction: state.form,
+                isUpdate,
+                onSave: (data) => this.onSaveItem(data),
+                onCancel: () => this.onCancelEditItem(),
+            });
+        } else {
+            this.transactionDialog.setState((formState) => ({
+                ...formState,
+                isUpdate,
+                transaction: state.form,
+            }));
+        }
+
+        this.transactionDialog.show();
     }
 
     renderContextMenu(state, prevState) {
@@ -917,22 +905,9 @@ class ImportView extends View {
                 return this.transactionRows[index];
             }
 
-            const itemProps = {
+            return ImportTransactionItem.create({
                 data: item,
                 onCollapse: (i, val) => this.onCollapseItem(i, val),
-            };
-
-            if (item.isForm) {
-                return ImportTransactionForm.create({
-                    ...itemProps,
-                    onSave: () => this.saveItem(),
-                    onCancel: () => this.cancelEditItem(),
-                    onUpdate: (data) => this.onFormUpdate(data),
-                });
-            }
-
-            return ImportTransactionItem.create({
-                ...itemProps,
             });
         });
 
@@ -982,6 +957,7 @@ class ImportView extends View {
         }
 
         this.renderList(state, prevState);
+        this.renderTransactionFormDialog(state);
 
         const isSelectMode = (state.listMode === 'select');
         const isListMode = (state.listMode === 'list');

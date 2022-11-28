@@ -3,14 +3,12 @@ import {
     assert,
     query,
     queryAll,
-    hasClass,
     isVisible,
     copyObject,
     asyncMap,
     evaluate,
 } from 'jezve-test';
 import { Paginator } from 'jezvejs-test';
-import { ImportTransactionForm } from './ImportTransactionForm.js';
 import { ImportTransactionItem } from './ImportTransactionItem.js';
 
 export class ImportList extends TestComponent {
@@ -50,11 +48,7 @@ export class ImportList extends TestComponent {
         if (listItems) {
             res.items = await asyncMap(
                 listItems,
-                async (item) => {
-                    const isForm = await hasClass(item, 'import-form');
-                    const ListItemClass = (isForm) ? ImportTransactionForm : ImportTransactionItem;
-                    return ListItemClass.create(this.parent, item, this.mainAccount);
-                },
+                (item) => ImportTransactionItem.create(this.parent, item, this.mainAccount),
             );
 
             res.paginator = await Paginator.create(this, await query(this.elem, '.paginator'));
@@ -97,16 +91,9 @@ export class ImportList extends TestComponent {
 
         cont.items.forEach((item, index) => {
             res.items.push(this.getItemData(item));
-            res.invalidated = res.invalidated || item.model.invalidated;
             if (item.model.isContextMenu) {
                 assert(res.contextMenuIndex === -1, 'Invalid state: two or more context menus');
                 res.contextMenuIndex = index;
-            }
-
-            if (item.content.isForm) {
-                assert(res.formIndex === -1, 'Invalid state: two or more Import transaction forms');
-
-                res.formIndex = index;
             }
         });
 
@@ -145,23 +132,19 @@ export class ImportList extends TestComponent {
     getExpectedState() {
         const res = {
             items: this.content.items.map((item) => (
-                (item.model.isForm)
-                    ? ImportTransactionForm.getExpectedState(item.model)
-                    : ImportTransactionItem.getExpectedState(item.model)
+                ImportTransactionItem.getExpectedState(item.model)
             )),
         };
 
         return res;
     }
 
-    static render(transactions, state, formIndex = -1) {
+    static render(transactions, state) {
         assert.isArray(transactions, 'Invalid data');
 
         return {
-            items: transactions.map((item, index) => (
-                (formIndex === index)
-                    ? ImportTransactionForm.render(item, state)
-                    : ImportTransactionItem.render(item, state)
+            items: transactions.map((item) => (
+                ImportTransactionItem.render(item, state)
             )),
         };
     }

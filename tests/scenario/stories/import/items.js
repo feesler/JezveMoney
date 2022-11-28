@@ -5,15 +5,9 @@ import { App } from '../../../Application.js';
 const create = async () => {
     setBlock('Add item', 2);
 
-    await ImportTests.addItem();
-
-    setBlock('Verify new item not created while invalid form is active', 2);
-    await ImportTests.addItem();
-
-    await ImportTests.updateItem({
-        pos: 0,
-        action: { action: 'inputDestAmount', data: '1' },
-    });
+    await ImportTests.addItem(
+        { action: 'inputDestAmount', data: '1' },
+    );
 
     setBlock('Save item', 2);
     await ImportTests.saveItem();
@@ -39,7 +33,7 @@ const stateLoop = async () => {
 
     await ImportTests.changeMainAccount(App.scenario.ACC_3);
 
-    await ImportTests.updateItem({
+    await ImportTests.updateItemAndSave({
         pos: 0,
         action: [
             { action: 'changeType', data: 'expense' }, // 3-1
@@ -109,7 +103,7 @@ const stateLoop = async () => {
     });
 
     /** Prepare items of all states */
-    await ImportTests.updateItem({
+    await ImportTests.updateItemAndSave({
         pos: 1,
         action: [
             { action: 'changeDestCurrency', data: USD }, // 1-2
@@ -118,13 +112,12 @@ const stateLoop = async () => {
         ],
     });
 
-    await ImportTests.enableItems({ index: 2, value: true });
-    await ImportTests.updateItem({
+    await ImportTests.updateItemAndSave({
         pos: 2,
         action: { action: 'changeType', data: 'income' }, // 1-3
     });
-    await ImportTests.enableItems({ index: 3, value: true });
-    await ImportTests.updateItem({
+
+    await ImportTests.updateItemAndSave({
         pos: 3,
         action: [
             { action: 'changeDestCurrency', data: USD }, // 1-2
@@ -133,13 +126,13 @@ const stateLoop = async () => {
             { action: 'inputSourceAmount', data: '9' },
         ],
     });
-    await ImportTests.enableItems({ index: 4, value: true });
-    await ImportTests.updateItem({
+
+    await ImportTests.updateItemAndSave({
         pos: 4,
         action: { action: 'changeType', data: 'transferfrom' }, // 1-5
     });
-    await ImportTests.enableItems({ index: 5, value: true });
-    await ImportTests.updateItem({
+
+    await ImportTests.updateItemAndSave({
         pos: 5,
         action: [
             { action: 'changeType', data: 'transferfrom' }, // 1-5
@@ -148,34 +141,38 @@ const stateLoop = async () => {
             { action: 'inputSourceAmount', data: '50.03' },
         ],
     });
-    await ImportTests.enableItems({ index: 6, value: true });
-    await ImportTests.updateItem({
+
+    await ImportTests.updateItemAndSave({
         pos: 6,
         action: { action: 'changeType', data: 'transferto' }, // 1-7
     });
-    await ImportTests.enableItems({ index: 7, value: true });
-    await ImportTests.updateItem({
+
+    await ImportTests.updateItemAndSave({
         pos: 7,
         action: [
             { action: 'changeType', data: 'debtfrom' }, // 1-9
             { action: 'changePerson', data: App.scenario.IVAN },
         ],
     });
-    await ImportTests.enableItems({ index: 8, value: true });
-    await ImportTests.updateItem({
+
+    await ImportTests.updateItemAndSave({
         pos: 8,
         action: { action: 'changeType', data: 'debtto' }, // 1-10
     });
+
     await ImportTests.changeMainAccount(App.scenario.ACC_EUR);
-    await ImportTests.updateItem({
+
+    await ImportTests.updateItemAndSave({
         pos: 0,
         action: [
             { action: 'changeType', data: 'transferto' },
             { action: 'changeTransferAccount', data: App.scenario.ACC_3 }, // 8-8
         ],
     });
+
     await ImportTests.changeMainAccount(App.scenario.ACC_3); // for item 0: 8-1
-    await ImportTests.updateItem({
+
+    await ImportTests.updateItemAndSave({
         pos: 0,
         action: [
             { action: 'changeType', data: 'transferto' }, // 1-6
@@ -208,7 +205,7 @@ const stateLoop = async () => {
         ],
     });
 
-    await ImportTests.updateItem({
+    await ImportTests.updateItemAndSave({
         pos: 7,
         action: [
             { action: 'changeType', data: 'debtto' },
@@ -234,42 +231,34 @@ const submit = async () => {
 
     setBlock('Verify invalid items are not submitted', 2);
     // Empty amount
-    await ImportTests.addItem();
-    await ImportTests.submit();
+    await ImportTests.createItemAndSave();
 
     // Zero amount
-    await ImportTests.updateItem({
-        pos: 0,
-        action: { action: 'inputDestAmount', data: '0' },
-    });
-    await ImportTests.submit();
+    await ImportTests.runFormActions(
+        { action: 'inputDestAmount', data: '0' },
+    );
+    await ImportTests.saveItem();
 
     // Valid amount, different currencies and empty source amount
-    await ImportTests.updateItem({
-        pos: 0,
-        action: [
-            { action: 'inputDestAmount', data: '1' },
-            { action: 'changeDestCurrency', data: App.scenario.USD },
-            { action: 'inputSourceAmount', data: '' },
-        ],
-    });
-    await ImportTests.submit();
+    await ImportTests.runFormActions([
+        { action: 'inputDestAmount', data: '1' },
+        { action: 'changeDestCurrency', data: App.scenario.USD },
+        { action: 'inputSourceAmount', data: '' },
+    ]);
+    await ImportTests.saveItem();
 
     // Empty date
-    await ImportTests.updateItem({
-        pos: 0,
-        action: [
-            { action: 'inputSourceAmount', data: '2' },
-            { action: 'inputDate', data: '' },
-        ],
-    });
-    await ImportTests.submit();
+    await ImportTests.runFormActions([
+        { action: 'inputSourceAmount', data: '2' },
+        { action: 'inputDate', data: '' },
+    ]);
+    await ImportTests.saveItem();
 
     // Correct date
-    await ImportTests.updateItem({
-        pos: 0,
-        action: { action: 'inputDate', data: App.dates.now },
-    });
+    await ImportTests.runFormActions(
+        { action: 'inputDate', data: App.dates.now },
+    );
+    await ImportTests.saveItem();
     await ImportTests.submit();
 
     // Verify submit is disabled for list with no enabled items
@@ -313,9 +302,10 @@ const pagination = async () => {
     await ImportTests.submitUploaded(cardFile);
     await ImportTests.uploadFile(cardFile);
     await ImportTests.submitUploaded(cardFile);
-    await ImportTests.addItem();
+    await ImportTests.createItemAndSave(
+        { action: 'inputDestAmount', data: '1' },
+    );
     await ImportTests.goToPrevPage();
-    await ImportTests.submit();
     await ImportTests.deleteAllItems();
 };
 
