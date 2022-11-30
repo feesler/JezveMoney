@@ -121,7 +121,7 @@ export class ImportView extends AppView {
         const mainAccountId = res.mainAccountSelect.value;
 
         // Import list
-        const rowsContainer = await query('#rowsContainer');
+        const rowsContainer = await query('.data-container');
         res.renderTime = await prop(rowsContainer, 'dataset.time');
 
         const listContainer = await query('.data-form');
@@ -131,7 +131,7 @@ export class ImportView extends AppView {
 
         // Context menu
         res.contextMenu = { elem: await query('#contextMenu') };
-        const contextParent = await closest(res.contextMenu.elem, '.import-item,.import-form');
+        const contextParent = await closest(res.contextMenu.elem, '.import-item');
         if (contextParent) {
             res.contextMenu.itemIndex = res.itemsList.model.contextMenuIndex;
             assert(res.contextMenu.itemIndex !== -1, 'Invalid context menu');

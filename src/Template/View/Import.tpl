@@ -49,9 +49,6 @@ include(TPL_PATH . "Header.tpl");    ?>
                     </div>
 
                     <div class="data-form" <?= hidden(!$importAvailable) ?>>
-                        <div id="rowsContainer" class="data-container">
-                            <span class="nodata-message">No transactions to import</span>
-                        </div>
                     </div>
                 </div>
             </div>

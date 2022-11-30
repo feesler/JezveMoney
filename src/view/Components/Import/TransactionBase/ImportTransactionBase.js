@@ -3,17 +3,11 @@ import {
     isFunction,
     Component,
 } from 'jezvejs';
-import { Checkbox } from 'jezvejs/Checkbox';
-import { Collapsible } from 'jezvejs/Collapsible';
 import { Icon } from 'jezvejs/Icon';
-import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 
 /** CSS classes */
 const TOGGLE_BUTTON_CLASS = 'btn icon-btn toggle-btn';
 const TOGGLE_ICON_CLASS = 'icon toggle-icon';
-/* Select controls */
-const SELECT_CONTROLS_CLASS = 'select-controls';
-const SELECTED_CLASS = 'import-item_selected';
 /* Similar transaction */
 const SIMILAR_CLASS = 'similar';
 const SIMILAR_TITLE_CLASS = 'similar__title';
@@ -37,37 +31,6 @@ export class ImportTransactionBase extends Component {
         return this.state.collapsed;
     }
 
-    initContainer(className, children) {
-        const { originalData } = this.props.data.props;
-        if (!originalData) {
-            this.elem = window.app.createContainer(className, children);
-            return;
-        }
-
-        const origDataContainer = OriginalImportData.create({
-            ...originalData,
-        });
-
-        const content = [origDataContainer.elem];
-
-        const { similarTransaction } = this.props.data.state;
-        if (similarTransaction) {
-            const infoElem = this.createSimilarTransactionInfo(similarTransaction);
-            content.push(infoElem);
-        }
-
-        this.toggleExtBtn = this.createToggleButton();
-        this.controls.append(this.toggleExtBtn);
-
-        this.collapse = Collapsible.create({
-            toggleOnClick: false,
-            className,
-            header: children,
-            content,
-        });
-        this.elem = this.collapse.elem;
-    }
-
     createMenuButton() {
         const { createContainer } = window.app;
 
@@ -86,7 +49,7 @@ export class ImportTransactionBase extends Component {
     }
 
     /** Returns toggle expand/collapse button */
-    createToggleButton() {
+    createToggleButton(events = null) {
         const icon = Icon.create({
             icon: 'toggle-ext',
             className: TOGGLE_ICON_CLASS,
@@ -95,7 +58,7 @@ export class ImportTransactionBase extends Component {
         return createElement('button', {
             props: { className: TOGGLE_BUTTON_CLASS, type: 'button' },
             children: icon.elem,
-            events: { click: () => this.toggleCollapse() },
+            events,
         });
     }
 
@@ -125,31 +88,6 @@ export class ImportTransactionBase extends Component {
                 }),
             ],
         });
-    }
-
-    createSelectControls() {
-        const { createContainer } = window.app;
-
-        if (this.selectControls) {
-            return;
-        }
-
-        this.checkbox = Checkbox.create();
-        this.selectControls = createContainer(SELECT_CONTROLS_CLASS, [
-            this.checkbox.elem,
-        ]);
-    }
-
-    renderSelectControls(state, prevState = {}) {
-        if (state.transaction.state.listMode === prevState?.transaction?.state?.listMode) {
-            return;
-        }
-
-        const { listMode, selected } = state.transaction.state;
-        const selectMode = listMode === 'select';
-        const isSelected = selectMode && !!selected;
-        this.elem.classList.toggle(SELECTED_CLASS, isSelected);
-        this.checkbox?.check(isSelected);
     }
 
     /** Enable/disable component */

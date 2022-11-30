@@ -86,6 +86,14 @@ export class ListContainer extends Component {
     }
 
     /**
+     * Returns index of item with specified id
+     * @param {number} id - identifier of item
+     */
+    getItemIndexById(id) {
+        return this.state.items.findIndex((item) => item && item.id === id);
+    }
+
+    /**
      * Return item id from specified item element
      * @param {Element} elem - target list item element
      */

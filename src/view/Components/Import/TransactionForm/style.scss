@@ -80,28 +80,6 @@
     flex-grow: 1;
   }
 
-  /* Select controls */
-  .select-controls {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: center;
-    justify-content: flex-start;
-    width: 0;
-    overflow: hidden;
-    transition: width 0.2s ease;
-
-    .checkbox {
-      --checkbox-size: 24px;
-
-      margin: 0;
-    }
-
-    .checkbox__check {
-      margin: 0;
-      border-radius: 50%;
-    }
-  }
-
   .dd__container {
     --dd-list-z-index: var(--import-form-popup-zindex);
 
@@ -154,36 +132,12 @@
     height: 24px;
   }
 
-  /* Menu */
-  .popup-menu-btn {
-    width: 26px;
-    height: 26px;
-    padding: 4px;
-    background: none;
-    pointer-events: all;
-    cursor: pointer;
-  }
-
-  .popup-menu-btn__icon {
-    width: 18px;
-    height: 18px;
-  }
-
-  .popup-menu {
-    margin: 0 4px;
-  }
-
   .collapsible-content {
     flex-flow: column nowrap;
     row-gap: 1rem;
     border-top: 1px solid;
     padding: 8px;
     overflow: hidden;
-  }
-
-  /* Sort mode */
-  &.import-form_sort {
-    cursor: move;
   }
 
   /* Found similar transaction info */
@@ -203,33 +157,6 @@
   .field.invalid-block input,
   .field.invalid-block .dd__combo {
     --input-border-color: #ff0000;
-  }
-}
-
-.import-list_select .select-controls {
-  width: 32px;
-}
-
-/* Disabled transaction row */
-.import-form[disabled] {
-  .dd__container,
-  input[type="text"],
-  .input-group__btn,
-  input[disabled] {
-    pointer-events: none;
-  }
-
-  .date-field .icon.calendar-icon {
-    fill: var(--input-disabled-text-color);
-  }
-}
-
-/* Placeholder */
-.import-form__placeholder {
-  border: 1px dashed;
-
-  * {
-    opacity: 0;
   }
 }
 

@@ -314,27 +314,6 @@
     }
   }
 
-  /* Disabled Import form */
-  .import-form[disabled] {
-    input[type="text"],
-    input[disabled] {
-      color: var(--input-disabled-text-color);
-      border-color: var(--input-disabled-border-color);
-      background-color: var(--input-disabled-bg-color);
-    }
-
-    input::placeholder {
-      color: #707070;
-    }
-
-    .input-group__btn,
-    .input-group__text {
-      color: var(--input-disabled-text-color);
-      border-color: var(--input-disabled-border-color);
-      background-color: var(--input-disabled-bg-color);
-    }
-  }
-
   /* Import item */
   .import-item {
     .item-container,
@@ -367,16 +346,6 @@
     .icon {
       fill: var(--list-item-icon-fill);
     }
-  }
-
-  /* Disabled Import form */
-  .import-form[disabled] .form-container,
-  .import-form[disabled] .controls,
-  .import-form[disabled] .invalid-feedback,
-  .import-form[disabled] .form-controls {
-    background-color: #292929;
-    color: #707070;
-    border-color: #707070;
   }
 
   /* Upload dialog */
@@ -438,12 +407,12 @@
       border-color: #3c3c3c;
       background-color: #252525;
     }
+  }
 
-    &[disabled] .collapsible-content {
-      color: #707070;
-      border-color: #333333;
-      background-color: #232323;
-    }
+  .import-item[disabled] .collapsible-content {
+    color: #707070;
+    border-color: #333333;
+    background-color: #232323;
   }
 
   /* Statistics view */

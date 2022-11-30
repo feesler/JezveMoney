@@ -56,14 +56,11 @@
 }
 
 .import-list_select {
-  .import-item,
-  .import-form {
+  .import-item {
     cursor: pointer;
   }
 
-  .collapsible-content,
-  .invalid-feedback,
-  .form-controls {
+  .collapsible-content {
     margin-left: 32px;
   }
 }

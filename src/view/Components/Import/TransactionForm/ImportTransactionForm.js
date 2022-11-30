@@ -153,7 +153,9 @@ export class ImportTransactionForm extends ImportTransactionBase {
             },
             events: { click: () => this.cancel() },
         });
-        this.toggleExtBtn = this.createToggleButton();
+        this.toggleExtBtn = this.createToggleButton({
+            click: () => this.toggleCollapse(),
+        });
 
         this.formControls = createContainer(FORM_CONTROLS_CLASS, [
             this.saveBtn,

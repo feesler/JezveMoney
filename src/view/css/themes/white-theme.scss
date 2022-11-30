@@ -313,27 +313,6 @@
     }
   }
 
-  /* Disabled Import form */
-  .import-form[disabled] {
-    input[type="text"],
-    input[disabled] {
-      color: var(--input-disabled-text-color);
-      border-color: var(--input-disabled-border-color);
-      background-color: var(--input-disabled-bg-color);
-    }
-
-    input::placeholder {
-      color: #dddddd;
-    }
-
-    .input-group__btn,
-    .input-group__text {
-      color: var(--input-disabled-text-color);
-      border-color: var(--input-disabled-border-color);
-      background-color: var(--input-disabled-bg-color);
-    }
-  }
-
   /* Import item */
   .import-item {
     .item-container,
@@ -366,16 +345,6 @@
     .icon {
       fill: var(--list-item-icon-fill);
     }
-  }
-
-  /* Disabled Import form */
-  .import-form[disabled] .form-container,
-  .import-form[disabled] .controls,
-  .import-form[disabled] .invalid-feedback,
-  .import-form[disabled] .form-controls {
-    background-color: #e8e8e8;
-    color: #808080;
-    border-color: #e8e8e8;
   }
 
   /* Upload dialog */
@@ -438,12 +407,12 @@
       border-color: #b0b0b0;
       background-color: #e8e8e8;
     }
+  }
 
-    &[disabled] .collapsible-content {
-      color: #a0a0a0;
-      border-color: #d0d0d0;
-      background-color: #e0e0e0;
-    }
+  .import-item[disabled] .collapsible-content {
+    color: #a0a0a0;
+    border-color: #d0d0d0;
+    background-color: #e0e0e0;
   }
 
   /* Statistics view */

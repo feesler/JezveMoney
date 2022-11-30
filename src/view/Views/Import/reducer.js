@@ -187,14 +187,17 @@ const slice = createSlice({
             ...state,
             items: [
                 ...state.items,
-                ...data.map((item) => {
+                ...data.map((item, index) => {
                     const transaction = mapImportItem(item, state);
                     const props = convertItemDataToProps(transaction, state);
+                    props.data.id = state.lastId + index + 1;
+
                     const newItem = new ImportTransaction(props.data);
                     newItem.state.listMode = state.listMode;
                     return newItem;
                 }),
             ],
+            lastId: state.lastId + data.length,
         };
 
         newState.pagination = getPagination(newState);
@@ -332,18 +335,15 @@ const slice = createSlice({
         }),
     }),
 
-    collapseItem: (state, { index, collapsed }) => ({
+    toggleCollapseItem: (state, index) => ({
         ...state,
         items: state.items.map((item, ind) => {
             if (ind !== index) {
                 return item;
             }
-            if (item.collapsed === collapsed) {
-                return item;
-            }
 
             const newItem = new ImportTransaction(item);
-            newItem.collapse(collapsed);
+            newItem.collapse(!newItem.collapsed);
             return newItem;
         }),
     }),
@@ -403,15 +403,22 @@ const slice = createSlice({
     },
 
     saveItem: (state, data) => {
+        const isAppend = (state.activeItemIndex === state.items.length);
+        const savedItem = data;
+        if (isAppend) {
+            savedItem.props.id = state.lastId + 1;
+            savedItem.state.id = savedItem.props.id;
+        }
         const newState = {
             ...state,
             items: (
-                (state.activeItemIndex === state.items.length)
-                    ? [...state.items, data]
+                (isAppend)
+                    ? [...state.items, savedItem]
                     : state.items.map((item, ind) => (
-                        (ind === state.activeItemIndex) ? data : item
+                        (ind === state.activeItemIndex) ? savedItem : item
                     ))
             ),
+            lastId: (isAppend) ? (state.lastId + 1) : state.lastId,
             form: null,
             activeItemIndex: -1,
         };

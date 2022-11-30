@@ -44,7 +44,7 @@ export class ImportList extends TestComponent {
             items: [],
         };
 
-        const listItems = await queryAll(this.elem, '.import-form,.import-item');
+        const listItems = await queryAll(this.elem, '.import-item');
         if (listItems) {
             res.items = await asyncMap(
                 listItems,

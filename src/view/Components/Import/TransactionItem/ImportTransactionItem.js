@@ -3,7 +3,10 @@ import {
     enable,
     show,
 } from 'jezvejs';
+import { Checkbox } from 'jezvejs/Checkbox';
+import { Collapsible } from 'jezvejs/Collapsible';
 import { ImportTransactionBase } from '../TransactionBase/ImportTransactionBase.js';
+import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { Field } from '../../Field/Field.js';
 import './style.scss';
 import { ImportTransaction } from '../../../js/model/ImportTransaction.js';
@@ -32,6 +35,9 @@ const DATE_CLASS = 'import-item__date';
 const COMMENT_CLASS = 'import-item__comment';
 /* Controls */
 const CONTROLS_CLASS = 'controls';
+/* Select controls */
+const SELECT_CONTROLS_CLASS = 'select-controls';
+const SELECTED_CLASS = 'import-item_selected';
 /* Sort state */
 const SORT_CLASS = 'import-item_sort';
 
@@ -51,35 +57,32 @@ const typeStrings = {
 };
 
 const defaultProps = {
-    onSelect: null,
-    onCollapse: null,
-    onUpdate: null,
-    onEnable: null,
-    onRemove: null,
 };
 
 /**
  * ImportTransactionForm component
  */
 export class ImportTransactionItem extends ImportTransactionBase {
-    constructor(...args) {
-        super(...args);
+    constructor(props = {}) {
+        super({
+            ...defaultProps,
+            ...props,
+        });
 
-        if (!this.props?.data?.mainAccount) {
+        if (!this.props?.transaction?.mainAccount) {
             throw new Error('Invalid props');
         }
 
-        this.props = {
-            ...defaultProps,
-            ...this.props,
-        };
-
         this.state = {
-            transaction: new ImportTransaction(this.props.data),
-            collapsed: this.props.collapsed,
+            ...this.props,
+            transaction: new ImportTransaction(this.props.transaction),
         };
 
         this.init();
+    }
+
+    get id() {
+        return this.state.transaction.id;
     }
 
     init() {
@@ -155,8 +158,10 @@ export class ImportTransactionItem extends ImportTransactionBase {
         ]);
 
         this.createMenuButton();
+        this.toggleExtBtn = this.createToggleButton();
         this.controls = createContainer(CONTROLS_CLASS, [
             this.menuContainer,
+            this.toggleExtBtn,
         ]);
 
         this.createSelectControls();
@@ -166,20 +171,85 @@ export class ImportTransactionItem extends ImportTransactionBase {
             this.controls,
         ]);
 
-        this.initContainer(CONTAINER_CLASS, [this.mainContainer]);
+        this.collapse = Collapsible.create({
+            toggleOnClick: false,
+            className: CONTAINER_CLASS,
+            header: this.mainContainer,
+        });
+        this.elem = this.collapse.elem;
 
-        this.render();
+        this.render(this.state);
+    }
+
+    createSelectControls() {
+        const { createContainer } = window.app;
+
+        if (this.selectControls) {
+            return;
+        }
+
+        this.checkbox = Checkbox.create();
+        this.selectControls = createContainer(SELECT_CONTROLS_CLASS, [
+            this.checkbox.elem,
+        ]);
+    }
+
+    renderSelectControls(state, prevState = {}) {
+        const transaction = state.transaction.state;
+        const prevTransaction = prevState?.transaction?.state;
+        const { listMode, selected } = transaction;
+        if (
+            listMode === prevTransaction?.listMode
+            && selected === prevTransaction?.selected
+        ) {
+            return;
+        }
+
+        const selectMode = listMode === 'select';
+        const isSelected = selectMode && !!selected;
+        this.elem.classList.toggle(SELECTED_CLASS, isSelected);
+        this.checkbox?.check(isSelected);
+    }
+
+    renderContainer(state, prevState) {
+        const originalData = state.transaction.props.originalData ?? null;
+        const prevOriginalData = prevState?.transaction?.props?.originalData;
+        if (originalData === prevOriginalData) {
+            return;
+        }
+
+        show(this.toggleExtBtn, !!originalData);
+        if (!originalData) {
+            this.collapse.setContent(null);
+            return;
+        }
+
+        const origDataContainer = OriginalImportData.create({
+            ...originalData,
+        });
+
+        const content = [origDataContainer.elem];
+
+        const { similarTransaction } = state.transaction.state;
+        if (similarTransaction) {
+            const infoElem = this.createSimilarTransactionInfo(similarTransaction);
+            content.push(infoElem);
+        }
+
+        this.collapse.setContent(content);
     }
 
     /** Render component */
-    render(state = this.state) {
+    render(state, prevState = {}) {
         if (!state) {
             throw new Error('Invalid state');
         }
 
+        this.renderContainer(state, prevState);
+        this.elem.setAttribute('data-id', state.transaction.id);
+
         const isDiff = state.transaction.isDiff();
         const transaction = state.transaction.state;
-
         const { userAccounts, persons, currency } = window.app.model;
         const isTransfer = ['transferfrom', 'transferto'].includes(transaction.type);
         const isDebt = ['debtfrom', 'debtto'].includes(transaction.type);
@@ -189,7 +259,7 @@ export class ImportTransactionItem extends ImportTransactionBase {
         this.elem.classList.toggle(SORT_CLASS, transaction.listMode === 'sort');
 
         // Select controls
-        this.renderSelectControls(state);
+        this.renderSelectControls(state, prevState);
 
         // Types field
         if (!(transaction.type in typeStrings)) {

@@ -18,6 +18,7 @@ const transTypeMap = {
 };
 
 const defaultProps = {
+    id: undefined,
     enabled: true,
     collapsed: true,
     selected: false,
@@ -50,6 +51,10 @@ export class ImportTransaction {
         }
 
         this.setData(this.props);
+    }
+
+    get id() {
+        return this.props.id;
     }
 
     get enabled() {
