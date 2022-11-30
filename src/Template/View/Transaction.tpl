@@ -68,7 +68,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                                             <div id="srcamountsign" class="input-group__btn-title"><?= e($form["srcCurrSign"]) ?></div>
                                         </button>
                                     <?php   } else { ?>
-                                        <button id="srcCurrBtn" class="input-group__text" type="button" disabled tabindex="-1">
+                                        <button id="srcCurrBtn" class="input-group__text" type="button" tabindex="-1">
                                             <div id="srcamountsign" class="input-group__text-title"><?= e($form["srcCurrSign"]) ?></div>
                                         </button>
                                     <?php   } ?>
@@ -86,7 +86,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                                             <div id="destamountsign" class="input-group__btn-title"><?= e($form["destCurrSign"]) ?></div>
                                         </button>
                                     <?php   } else { ?>
-                                        <button id="destCurrBtn" class="input-group__text" type="button" disabled tabindex="-1">
+                                        <button id="destCurrBtn" class="input-group__text" type="button" tabindex="-1">
                                             <div id="destamountsign" class="input-group__text-title"><?= e($form["destCurrSign"]) ?></div>
                                         </button>
                                     <?php   } ?>
