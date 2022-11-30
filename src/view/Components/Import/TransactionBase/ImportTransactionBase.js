@@ -5,6 +5,7 @@ import {
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { Collapsible } from 'jezvejs/Collapsible';
+import { Icon } from 'jezvejs/Icon';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 
 /** CSS classes */
@@ -68,11 +69,16 @@ export class ImportTransactionBase extends Component {
     }
 
     createMenuButton() {
-        const { createContainer, createIcon } = window.app;
+        const { createContainer } = window.app;
+
+        const icon = Icon.create({
+            icon: 'ellipsis',
+            className: MENU_ICON_CLASS,
+        });
 
         this.menuBtn = createElement('button', {
             props: { className: MENU_BUTTON_CLASS, type: 'button' },
-            children: createIcon('ellipsis', MENU_ICON_CLASS),
+            children: icon.elem,
         });
         this.menuContainer = createContainer(MENU_CLASS, [
             this.menuBtn,
@@ -81,9 +87,14 @@ export class ImportTransactionBase extends Component {
 
     /** Returns toggle expand/collapse button */
     createToggleButton() {
+        const icon = Icon.create({
+            icon: 'toggle-ext',
+            className: TOGGLE_ICON_CLASS,
+        });
+
         return createElement('button', {
             props: { className: TOGGLE_BUTTON_CLASS, type: 'button' },
-            children: window.app.createIcon('toggle-ext', TOGGLE_ICON_CLASS),
+            children: icon.elem,
             events: { click: () => this.toggleCollapse() },
         });
     }

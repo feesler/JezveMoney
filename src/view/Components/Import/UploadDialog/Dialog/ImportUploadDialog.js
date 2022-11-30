@@ -4,6 +4,7 @@ import {
     show,
     Component,
 } from 'jezvejs';
+import { Icon } from 'jezvejs/Icon';
 import { Popup } from 'jezvejs/Popup';
 import { ImportFileUploader } from '../FileUploader/ImportFileUploader.js';
 import { ImportTemplateManager } from '../TemplateManager/ImportTemplateManager.js';
@@ -278,10 +279,13 @@ export class ImportUploadDialog extends Component {
         if (state.id === UPLOAD_STATE) {
             this.popup.setTitle(TITLE_UPLOAD);
         } else if (state.id === CONVERT_STATE) {
-            const icon = window.app.createIcon('back', BACK_ICON_CLASS);
+            const icon = Icon.create({
+                icon: 'back',
+                className: BACK_ICON_CLASS,
+            });
             const backButton = createElement('button', {
                 props: { className: BACK_BTN_CLASS },
-                children: icon,
+                children: icon.elem,
                 events: { click: () => this.setUploadState() },
             });
 

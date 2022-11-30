@@ -11,6 +11,7 @@ import { DateInput } from 'jezvejs/DateInput';
 import { DatePicker } from 'jezvejs/DatePicker';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
+import { Icon } from 'jezvejs/Icon';
 import { InputGroup } from 'jezvejs/InputGroup';
 import { Popup } from 'jezvejs/Popup';
 import { fixFloat } from '../../../js/utils.js';
@@ -343,16 +344,16 @@ export class ImportTransactionForm extends ImportTransactionBase {
             oninput: () => this.onDateInput(),
         });
 
-        const dateIcon = window.app.createIcon(
-            'calendar-icon',
-            CALENDAR_ICON_CLASS,
-        );
+        const dateIcon = Icon.create({
+            icon: 'calendar-icon',
+            className: CALENDAR_ICON_CLASS,
+        });
         this.dateBtn = createElement('button', {
             props: {
                 type: 'button',
                 className: IG_BUTTON_CLASS,
             },
-            children: dateIcon,
+            children: dateIcon.elem,
             events: { click: () => this.showDatePicker() },
         });
 

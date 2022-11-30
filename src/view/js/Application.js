@@ -1,7 +1,6 @@
 import {
     ge,
     createElement,
-    svg,
     isDate,
     formatDate,
 } from 'jezvejs';
@@ -184,19 +183,6 @@ export class Application {
     /** Create simple container element */
     createContainer(elemClass, children, events) {
         return createElement('div', { props: { className: elemClass }, children, events });
-    }
-
-    /** Create SVG icon element */
-    createIcon(icon, className = null) {
-        const useElem = svg('use');
-        const res = svg('svg', {}, useElem);
-        if (className) {
-            res.setAttribute('class', className);
-        }
-
-        useElem.href.baseVal = (icon) ? `#${icon}` : '';
-
-        return res;
     }
 
     checkUserAccountModels() {

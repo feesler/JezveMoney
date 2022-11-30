@@ -8,6 +8,7 @@ import {
 import { Checkbox } from 'jezvejs/Checkbox';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
+import { Icon } from 'jezvejs/Icon';
 import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,
@@ -142,9 +143,13 @@ export class ImportConditionForm extends Component {
         ]);
 
         // Delete button
+        const delIcon = Icon.create({
+            icon: 'del',
+            className: 'icon delete-icon',
+        });
         this.delBtn = createElement('button', {
             props: { className: 'btn icon-btn delete-btn', type: 'button' },
-            children: window.app.createIcon('del', 'icon delete-icon'),
+            children: delIcon.elem,
             events: { click: () => this.onDelete() },
         });
         this.controls = window.app.createContainer(CONTROLS_CLASS, this.delBtn);

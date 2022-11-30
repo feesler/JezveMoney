@@ -8,6 +8,7 @@ import {
     Component,
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
+import { Icon } from 'jezvejs/Icon';
 import { ImportRule } from '../../../../js/model/ImportRule.js';
 import { ImportConditionList } from '../../../../js/model/ImportConditionList.js';
 import { ImportActionList } from '../../../../js/model/ImportActionList.js';
@@ -57,9 +58,13 @@ export class ImportRuleItem extends Component {
         this.infoLabel = createElement('span', { props: { className: 'rule-item__info' } });
 
         // Toggle expand/collapse
+        const toggleIcon = Icon.create({
+            icon: 'toggle-ext',
+            className: 'icon toggle-icon',
+        });
         this.toggleExtBtn = createElement('button', {
             props: { className: 'btn icon-btn toggle-btn', type: 'button' },
-            children: window.app.createIcon('toggle-ext', 'icon toggle-icon'),
+            children: toggleIcon.elem,
             events: { click: (e) => this.onToggle(e) },
         });
 
@@ -108,11 +113,16 @@ export class ImportRuleItem extends Component {
     }
 
     createMenu() {
-        const { createContainer, createIcon } = window.app;
+        const { createContainer } = window.app;
+
+        const icon = Icon.create({
+            icon: 'ellipsis',
+            className: MENU_ICON_CLASS,
+        });
 
         this.menuBtn = createElement('button', {
             props: { className: MENU_BUTTON_CLASS, type: 'button' },
-            children: createIcon('ellipsis', MENU_ICON_CLASS),
+            children: icon.elem,
         });
         this.menu = createContainer(MENU_CLASS, [
             this.menuBtn,
