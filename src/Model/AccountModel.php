@@ -435,6 +435,9 @@ class AccountModel extends CachedTable
         $ruleModel = ImportRuleModel::getInstance();
         $ruleModel->onAccountDelete($accountsToDelete);
 
+        $tplModel = ImportTemplateModel::getInstance();
+        $tplModel->onAccountDelete($accountsToDelete);
+
         // if delete person accounts, then delete all transactions
         if ($deletePersons) {
             if (!$this->dbObj->deleteQ("transactions", $condArr)) {

@@ -482,18 +482,21 @@ export class ImportUploadDialog extends TestComponent {
             'comment',
         ];
 
+        const [dataRow] = this.parent.fileData.slice(template.first_row, template.first_row + 1);
+        const fileColumns = dataRow?.length ?? 0;
+
         return tplProp.every((property) => {
             if (!(property in template.columns)) {
                 return false;
             }
 
             const propValue = template.columns[property];
-            if (propValue < 1 || propValue > this.content.columns.length) {
+            if (propValue < 1 || propValue > fileColumns) {
                 return false;
             }
 
             if (property === 'accountAmount' || property === 'transactionAmount') {
-                const val = this.content.columns[propValue - 1].cells[0];
+                const val = dataRow[propValue - 1];
                 if (!parseFloat(fixFloat(val))) {
                     return false;
                 }
@@ -567,7 +570,11 @@ export class ImportUploadDialog extends TestComponent {
     async selectTemplateById(val) {
         this.checkRawDataState();
 
-        this.model.template = App.state.templates.getItem(val);
+        const template = App.state.templates.getItem(val);
+        this.model.template = template;
+        if (template?.account_id) {
+            this.model.initialAccount = App.state.accounts.getItem(template.account_id);
+        }
         this.expectedState = this.getExpectedState(this.model);
 
         await this.performAction(() => this.content.templateSel.selectItem(val));
@@ -625,7 +632,11 @@ export class ImportUploadDialog extends TestComponent {
             );
             const newInd = (currentInd > 0) ? 0 : 1;
             const newTplId = this.content.templateSel.items[newInd].id;
-            this.model.template = App.state.templates.getItem(newTplId);
+            const template = App.state.templates.getItem(newTplId);
+            this.model.template = template;
+            if (template?.account_id) {
+                this.model.initialAccount = App.state.accounts.getItem(template.account_id);
+            }
         }
 
         this.expectedState = this.getExpectedState(this.model);

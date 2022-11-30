@@ -3,6 +3,7 @@ import {
     isInt,
     copyObject,
     assert,
+    asArray,
 } from 'jezve-test';
 import {
     checkDate,
@@ -42,8 +43,20 @@ const trReqFields = ['type', 'src_id', 'dest_id', 'src_amount', 'dest_amount', '
 /**
  * Import templates
  */
-const tplReqFields = ['name', 'type_id', 'account_id', 'first_row', 'columns'];
-const tplReqColumns = ['accountAmount', 'transactionAmount', 'accountCurrency', 'transactionCurrency', 'date', 'comment'];
+const tplReqFields = [
+    'name',
+    'type_id',
+    'account_id',
+    'first_row',
+];
+const tplReqColumns = {
+    account_amount_col: 'accountAmount',
+    account_curr_col: 'accountCurrency',
+    trans_amount_col: 'transactionAmount',
+    trans_curr_col: 'transactionCurrency',
+    date_col: 'date',
+    comment_col: 'comment',
+};
 
 /**
  * Import rules
@@ -160,11 +173,26 @@ export class AppState {
     }
 
     meetExpectation(expected) {
+        assert(this.accounts.length === expected.accounts.length);
         assert.deepMeet(this.accounts.data, expected.accounts.data);
+
+        assert(this.transactions.length === expected.transactions.length);
         assert.deepMeet(this.transactions.data, expected.transactions.data);
+
+        assert(this.persons.length === expected.persons.length);
         assert.deepMeet(this.persons.data, expected.persons.data);
+
+        assert(this.templates.length === expected.templates.length);
         assert.deepMeet(this.templates.data, expected.templates.data);
-        assert.deepMeet(this.rules.data, expected.rules.data);
+
+        assert(this.rules.length === expected.rules.length);
+        this.rules.forEach((rule, index) => {
+            const expectedRule = expected.rules.data[index];
+            assert(rule.conditions.data.length === expectedRule.conditions.data.length);
+            assert(rule.actions.data.length === expectedRule.actions.data.length);
+            assert.deepMeet(rule, expectedRule);
+        });
+
         assert.deepMeet(this.profile, expected.profile);
 
         return true;
@@ -321,7 +349,7 @@ export class AppState {
     }
 
     deleteAccounts(ids) {
-        let itemIds = Array.isArray(ids) ? ids : [ids];
+        let itemIds = asArray(ids);
         if (!itemIds.length) {
             return false;
         }
@@ -334,6 +362,12 @@ export class AppState {
         }
 
         this.rules.deleteAccounts(itemIds);
+        this.templates.data = this.templates.map((item) => (
+            (itemIds.includes(item.account_id))
+                ? { ...item, account_id: 0 }
+                : item
+        ));
+
         this.transactions = this.transactions.deleteAccounts(this.accounts.data, itemIds);
 
         // Prepare expected updates of accounts list
@@ -497,7 +531,7 @@ export class AppState {
     }
 
     deletePersons(ids) {
-        const itemIds = Array.isArray(ids) ? ids : [ids];
+        const itemIds = asArray(ids);
         if (!itemIds.length) {
             return false;
         }
@@ -972,11 +1006,31 @@ export class AppState {
             return false;
         }
         // Check every column value is present and have correct value
-        return tplReqColumns.every((columnName) => (
+        return Object.values(tplReqColumns).every((columnName) => (
             (columnName in params.columns)
             && isInt(params.columns[columnName])
             && params.columns[columnName] > 0
         ));
+    }
+
+    templateFromRequest(request) {
+        if (!request) {
+            return request;
+        }
+
+        const origItem = this.templates.getItem(request.id) ?? { columns: {} };
+        const res = copyObject(origItem);
+        const data = copyFields(request, tplReqFields);
+        Object.assign(res, data);
+
+        Object.keys(tplReqColumns).forEach((columnName) => {
+            const targetProp = tplReqColumns[columnName];
+            if (request[columnName]) {
+                res.columns[targetProp] = request[columnName];
+            }
+        });
+
+        return res;
     }
 
     createTemplate(params) {
@@ -986,11 +1040,38 @@ export class AppState {
         }
 
         const data = copyFields(params, tplReqFields);
+        data.columns = {};
+        Object.values(tplReqColumns).forEach((columnName) => {
+            data.columns[columnName] = params.columns[columnName];
+        });
 
         const ind = this.templates.create(data);
         const item = this.templates.getItemByIndex(ind);
 
         return item.id;
+    }
+
+    getUpdateTemplateRequest(params) {
+        const origItem = this.templates.getItem(params.id) ?? { columns: {} };
+
+        const expTemplate = copyObject(origItem);
+        const data = copyFields(params, tplReqFields);
+        Object.assign(expTemplate, data);
+
+        const res = copyObject(expTemplate);
+        delete res.columns;
+
+        Object.keys(tplReqColumns).forEach((columnName) => {
+            const targetProp = tplReqColumns[columnName];
+
+            if (params[columnName]) {
+                expTemplate.columns[targetProp] = params[columnName];
+            }
+
+            res[columnName] = expTemplate.columns[targetProp];
+        });
+
+        return res;
     }
 
     updateTemplate(params) {
@@ -1002,6 +1083,15 @@ export class AppState {
         const expTemplate = copyObject(origItem);
         const data = copyFields(params, tplReqFields);
         Object.assign(expTemplate, data);
+
+        if (params.columns) {
+            Object.keys(tplReqColumns).forEach((columnName) => {
+                const targetProp = tplReqColumns[columnName];
+                if (params.columns && params.columns[targetProp]) {
+                    expTemplate.columns[targetProp] = params.columns[targetProp];
+                }
+            });
+        }
 
         const resExpected = this.checkTemplateCorrectness(expTemplate);
         if (!resExpected) {
@@ -1025,7 +1115,7 @@ export class AppState {
             }
         }
 
-        this.rulesDeleteTemplate(ids);
+        this.rules.deleteTemplate(ids);
         this.templates.deleteItems(ids);
 
         return true;

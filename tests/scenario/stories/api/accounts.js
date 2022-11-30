@@ -101,7 +101,11 @@ const createMultiple = async () => {
         flags: 0,
     }];
 
-    await AccountApiTests.createMultiple(data);
+    [
+        App.scenario.ACCOUNT_1,
+        App.scenario.ACCOUNT_2,
+        App.scenario.ACCOUNT_3,
+    ] = await AccountApiTests.createMultiple(data);
 
     const invData = [
         null,

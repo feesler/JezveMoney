@@ -7,7 +7,8 @@ const create = async () => {
 
     const data = [{
         name: 'Template 1',
-        type: 0,
+        type_id: 0,
+        first_row: 2,
         account_id: App.scenario.CASH_RUB,
         account_amount_col: 1,
         account_curr_col: 2,
@@ -17,7 +18,8 @@ const create = async () => {
         comment_col: 6,
     }, {
         name: 'Template 2',
-        type: 1,
+        type_id: 1,
+        first_row: 2,
         account_id: App.scenario.ACC_RUB,
         account_amount_col: 1,
         account_curr_col: 2,
@@ -27,7 +29,8 @@ const create = async () => {
         comment_col: 5,
     }, {
         name: 'Template 3',
-        type: 0,
+        type_id: 0,
+        first_row: 3,
         account_id: 0,
         account_amount_col: 10,
         account_curr_col: 20,
@@ -75,7 +78,8 @@ const createMultiple = async () => {
 
     const data = [{
         name: 'Template 10',
-        type: 0,
+        type_id: 0,
+        first_row: 2,
         account_id: App.scenario.CASH_RUB,
         account_amount_col: 1,
         account_curr_col: 2,
@@ -85,7 +89,8 @@ const createMultiple = async () => {
         comment_col: 6,
     }, {
         name: 'Template 11',
-        type: 1,
+        type_id: 1,
+        first_row: 2,
         account_id: 0,
         account_amount_col: 7,
         account_curr_col: 6,
@@ -93,6 +98,17 @@ const createMultiple = async () => {
         trans_curr_col: 4,
         date_col: 3,
         comment_col: 2,
+    }, {
+        name: 'Template 12',
+        type_id: 1,
+        first_row: 2,
+        account_id: App.scenario.ACCOUNT_1,
+        account_amount_col: 1,
+        account_curr_col: 2,
+        trans_amount_col: 1,
+        trans_curr_col: 2,
+        date_col: 5,
+        comment_col: 6,
     }];
 
     await ImportTemplateApiTests.createMultiple(data);
@@ -115,7 +131,7 @@ const createMultiple = async () => {
         }],
         [{
             name: 'Template 12',
-            type: 1,
+            type_id: 1,
             account_amount_col: 7,
             account_curr_col: 6,
             trans_amount_col: 5,
@@ -133,17 +149,17 @@ const update = async () => {
     const data = [{
         id: App.scenario.TEMPLATE_1,
         name: 'TPL',
-        type: 1,
+        type_id: 1,
         account_id: App.scenario.ACC_RUB,
         comment_col: 8,
     }, {
+        // Invalid templates
         id: App.scenario.TEMPLATE_2,
         name: null,
     }, {
         id: App.scenario.TEMPLATE_2,
         account_amount_col: 0,
     }, {
-        // Invalid templates
         id: App.scenario.TEMPLATE_2,
         account_id: 'null',
     }, {

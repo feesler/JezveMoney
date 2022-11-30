@@ -556,6 +556,8 @@ export class ImportView extends AppView {
 
         await this.performAction(() => this.uploadDialog.selectTemplateById(val));
 
+        this.getStateOnTemplateSelected();
+
         return this.checkState();
     }
 
@@ -563,6 +565,8 @@ export class ImportView extends AppView {
         this.checkUploadState();
 
         await this.performAction(() => this.uploadDialog.selectTemplateByIndex(val));
+
+        this.getStateOnTemplateSelected();
 
         return this.checkState();
     }
@@ -678,19 +682,7 @@ export class ImportView extends AppView {
         return this.checkState();
     }
 
-    /** Delete currently selected template */
-    async deleteTemplate() {
-        this.checkUploadState();
-
-        await this.performAction(() => this.uploadDialog.deleteTemplate());
-
-        return this.checkState();
-    }
-
-    /** Submit template */
-    async submitTemplate() {
-        this.checkUploadState();
-
+    getStateOnTemplateSelected() {
         const template = this.getExpectedTemplate();
         const updateMainAccount = (
             this.uploadDialog.isValidTemplate()
@@ -707,6 +699,24 @@ export class ImportView extends AppView {
         }
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
+    }
+
+    /** Delete currently selected template */
+    async deleteTemplate() {
+        this.checkUploadState();
+
+        await this.performAction(() => this.uploadDialog.deleteTemplate());
+
+        this.getStateOnTemplateSelected();
+
+        return this.checkState();
+    }
+
+    /** Submit template */
+    async submitTemplate() {
+        this.checkUploadState();
+
+        this.getStateOnTemplateSelected();
 
         await this.performAction(() => this.uploadDialog.submitTemplate());
 

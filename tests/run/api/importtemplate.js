@@ -20,7 +20,8 @@ export const create = async (params) => {
     let result = 0;
 
     await test(`Create import template (${formatProps(params)})`, async () => {
-        const resExpected = App.state.createTemplate(params);
+        const expTemplate = App.state.templateFromRequest(params);
+        const resExpected = App.state.createTemplate(expTemplate);
 
         let createRes;
         try {
@@ -53,7 +54,8 @@ export const createMultiple = async (params) => {
         if (Array.isArray(params)) {
             expectedResult = [];
             for (const item of params) {
-                const resExpected = App.state.createTemplate(item);
+                const expTemplate = App.state.templateFromRequest(item);
+                const resExpected = App.state.createTemplate(expTemplate);
                 if (!resExpected) {
                     App.state.deleteTemplates(expectedResult);
                     expectedResult = false;
@@ -102,17 +104,9 @@ export const update = async (params) => {
     const props = copyObject(params);
 
     await test(`Update import template (${formatProps(props)})`, async () => {
-        const resExpected = App.state.updateTemplate(props);
-        let updParams = {};
-
-        const item = App.state.templates.getItem(props.id);
-        if (item) {
-            updParams = copyObject(item);
-        }
-
-        if (!resExpected) {
-            Object.assign(updParams, props);
-        }
+        const expTemplate = App.state.templateFromRequest(props);
+        const resExpected = App.state.updateTemplate(expTemplate);
+        const updParams = App.state.getUpdateTemplateRequest(props);
 
         // Send API sequest to server
         try {

@@ -96,7 +96,7 @@ class ImportTemplateModel extends CachedTable
             checkFields($params, $avFields, true);
         }
 
-        if (isset($params["name"])) {
+        if (isset($params["name"]) || is_null($params["name"])) {
             $res["name"] = $this->dbObj->escape($params["name"]);
             if (is_empty($res["name"])) {
                 throw new \Error("Invalid name specified");
@@ -105,7 +105,14 @@ class ImportTemplateModel extends CachedTable
 
         $res["type_id"] = (isset($params["type_id"])) ? intval($params["type_id"]) : 0;
 
-        $res["account_id"] = (isset($params["account_id"])) ? intval($params["account_id"]) : 0;
+        if (isset($params["account_id"])) {
+            if (!is_numeric($params["account_id"])) {
+                throw new \Error("Invalid account_id specified");
+            }
+            $res["account_id"] = intval($params["account_id"]);
+        } else {
+            $res["account_id"] = 0;
+        }
         if ($res["account_id"] !== 0) {
             $account = $this->accModel->getItem($res["account_id"]);
             if (
@@ -146,7 +153,7 @@ class ImportTemplateModel extends CachedTable
     // Check same item already exist
     protected function isSameItemExist($params, $item_id = 0)
     {
-        if (!is_array($params)) {
+        if (!is_array($params) || !isset($params["name"]) || !isset($params["type_id"])) {
             return false;
         }
 

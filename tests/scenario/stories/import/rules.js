@@ -40,11 +40,9 @@ const noPersonTests = async () => {
         flags: 0,
     });
     // Remove all persons
-    const personIds = App.state.persons.getIds();
-    if (personIds.length > 0) {
-        await api.person.del(personIds);
-    }
-    await App.state.fetch();
+    await App.scenario.resetData({
+        persons: true,
+    });
 
     await App.view.navigateToImport();
 

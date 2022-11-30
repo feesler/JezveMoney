@@ -1,5 +1,6 @@
 import { setBlock } from 'jezve-test';
 import * as ImportTests from '../../../run/import/index.js';
+import { api } from '../../../model/api.js';
 import { App } from '../../../Application.js';
 
 // Create import template tests
@@ -118,6 +119,93 @@ const firstRow = async () => {
     await ImportTests.deleteAllItems();
 };
 
+// Template first row option test
+const resetAccounts = async () => {
+    setBlock('Check templates after delete and reset accounts', 2);
+
+    const { RUB, cardFile } = App.scenario;
+
+    const { id: account1 } = await api.account.create({
+        name: 'Tpl Test Account 1',
+        curr_id: RUB,
+        initbalance: '1',
+        icon_id: 1,
+        flags: 0,
+    });
+    const { id: account2 } = await api.account.create({
+        name: 'Tpl Test Account 2',
+        curr_id: RUB,
+        initbalance: '1',
+        icon_id: 1,
+        flags: 0,
+    });
+    // Remove all templates
+    await App.scenario.resetData({
+        importtpl: true,
+    });
+
+    await App.view.navigateToImport();
+    await ImportTests.uploadFile(cardFile);
+
+    // Create template with first account
+    await App.scenario.runner.runGroup(ImportTests.selectTemplateColumn, [
+        { column: 'accountAmount', index: 11 },
+        { column: 'transactionAmount', index: 9 },
+        { column: 'accountCurrency', index: 10 },
+        { column: 'transactionCurrency', index: 8 },
+        { column: 'date', index: 1 },
+        { column: 'comment', index: 4 },
+    ]);
+    await ImportTests.inputTemplateName('Template_Acc_1');
+    await ImportTests.toggleTemplateAccount();
+    await ImportTests.selectTemplateAccountById(account1);
+    await ImportTests.submitTemplate();
+
+    // Create template with second account
+    await ImportTests.createTemplate();
+    await App.scenario.runner.runGroup(ImportTests.selectTemplateColumn, [
+        { column: 'accountAmount', index: 11 },
+        { column: 'transactionAmount', index: 9 },
+        { column: 'accountCurrency', index: 10 },
+        { column: 'transactionCurrency', index: 8 },
+        { column: 'date', index: 1 },
+        { column: 'comment', index: 4 },
+    ]);
+    await ImportTests.inputTemplateName('Template_Acc_2');
+    await ImportTests.toggleTemplateAccount();
+    await ImportTests.selectTemplateAccountById(account2);
+    await ImportTests.submitTemplate();
+
+    // Check account changed on change template
+    await ImportTests.selectTemplateByIndex(0);
+    await ImportTests.selectTemplateByIndex(1);
+
+    // Remove first account
+    await api.account.del(account1);
+    await App.state.fetch();
+    // Reload page
+    await App.view.navigateToImport();
+    await ImportTests.uploadFile(cardFile);
+    await ImportTests.deleteTemplate();
+
+    // Reset accounts
+    await App.scenario.resetData({
+        accounts: true,
+    });
+    // Create account to load import view
+    await api.account.create({
+        name: 'Tpl Test Account 3',
+        curr_id: RUB,
+        initbalance: '1',
+        icon_id: 1,
+        flags: 0,
+    });
+    // Reload page
+    await App.view.navigateToImport();
+    await ImportTests.uploadFile(cardFile);
+    await ImportTests.deleteTemplate();
+};
+
 export const importTemplateTests = {
     /** Run import template tests */
     async run() {
@@ -132,5 +220,9 @@ export const importTemplateTests = {
 
         await autoSelect();
         await firstRow();
+    },
+
+    async runResetAccountsTest() {
+        await resetAccounts();
     },
 };
