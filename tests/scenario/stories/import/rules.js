@@ -289,79 +289,6 @@ const create = async () => {
         { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
         { action: 'inputValue', data: 'MOBILE' },
     ]);
-    await ImportTests.createRuleAction([
-        { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
-        { action: 'changeTransactionType', data: 'income' },
-    ]);
-    await ImportTests.submitRule();
-
-    setBlock('Create import rule #2', 2);
-    await ImportTests.createRule();
-    await ImportTests.createRuleCondition([
-        { action: 'changeFieldType', data: IMPORT_COND_FIELD_MAIN_ACCOUNT },
-        { action: 'changeOperator', data: IMPORT_COND_OP_NOT_EQUAL },
-        { action: 'changeAccount', data: App.scenario.ACC_EUR },
-    ]);
-    await ImportTests.createRuleCondition([
-        { action: 'changeFieldType', data: IMPORT_COND_FIELD_TR_AMOUNT },
-        { action: 'changeOperator', data: IMPORT_COND_OP_EQUAL },
-        { action: 'inputAmount', data: '80' },
-    ]);
-    await ImportTests.createRuleAction([
-        { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
-        { action: 'changeTransactionType', data: 'transferfrom' },
-    ]);
-    await ImportTests.createRuleAction([
-        { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
-        { action: 'changeAccount', data: App.scenario.ACC_EUR },
-    ]);
-    await ImportTests.submitRule();
-
-    setBlock('Create import rule #3', 2);
-    await ImportTests.createRule();
-    await ImportTests.createRuleCondition([
-        { action: 'changeFieldType', data: IMPORT_COND_FIELD_MAIN_ACCOUNT },
-        { action: 'changeOperator', data: IMPORT_COND_OP_NOT_EQUAL },
-        { action: 'changeAccount', data: App.scenario.ACC_USD },
-    ]);
-    await ImportTests.createRuleCondition([
-        { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
-        { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
-        { action: 'inputValue', data: 'SIGMA' },
-    ]);
-    await ImportTests.createRuleCondition([
-        { action: 'changeFieldType', data: IMPORT_COND_FIELD_TR_AMOUNT },
-        { action: 'changeOperator', data: IMPORT_COND_OP_LESS },
-        { action: 'inputAmount', data: '0' },
-    ]);
-    // Create `Set account` action before `Set transaction type` to check actions sort
-    await ImportTests.createRuleAction([
-        { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
-    ]);
-    await ImportTests.createRuleAction([
-        { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
-        { action: 'changeTransactionType', data: 'transferto' },
-    ]);
-    await ImportTests.updateRuleAction({
-        pos: 0,
-        action: [
-            { action: 'changeAction', data: IMPORT_ACTION_SET_ACCOUNT },
-            { action: 'changeAccount', data: App.scenario.ACC_USD },
-        ],
-    });
-    await ImportTests.createRuleAction([
-        { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },
-        { action: 'inputValue', data: 'Local shop' },
-    ]);
-    await ImportTests.submitRule();
-
-    setBlock('Create import rule #4', 2);
-    await ImportTests.createRule();
-    await ImportTests.createRuleCondition([
-        { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
-        { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
-        { action: 'inputValue', data: 'TAXI' },
-    ]);
     await ImportTests.createRuleCondition([
         { action: 'changeFieldType', data: IMPORT_COND_FIELD_ACC_AMOUNT },
         { action: 'changeOperator', data: IMPORT_COND_OP_GREATER },
@@ -371,6 +298,20 @@ const create = async () => {
         { action: 'changeFieldType', data: IMPORT_COND_FIELD_ACC_AMOUNT },
         { action: 'changeOperator', data: IMPORT_COND_OP_LESS },
         { action: 'inputAmount', data: '500' },
+    ]);
+    await ImportTests.createRuleAction([
+        { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
+        { action: 'changeTransactionType', data: 'income' },
+    ]);
+
+    await ImportTests.submitRule();
+
+    setBlock('Create import rule #2', 2);
+    await ImportTests.createRule();
+    await ImportTests.createRuleCondition([
+        { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
+        { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
+        { action: 'inputValue', data: 'TAXI' },
     ]);
     await ImportTests.createRuleAction([
         { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
@@ -386,24 +327,7 @@ const create = async () => {
     ]);
     await ImportTests.submitRule();
 
-    setBlock('Create import rule #5', 2);
-    await ImportTests.createRule();
-    await ImportTests.createRuleCondition([
-        { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
-        { action: 'changeOperator', data: IMPORT_COND_OP_STRING_INCLUDES },
-        { action: 'inputValue', data: 'MAGAZIN' },
-    ]);
-    await ImportTests.createRuleAction([
-        { action: 'changeAction', data: IMPORT_ACTION_SET_TR_TYPE },
-        { action: 'changeTransactionType', data: 'debtto' },
-    ]);
-    await ImportTests.createRuleAction([
-        { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
-        { action: 'changePerson', data: App.scenario.IVAN },
-    ]);
-    await ImportTests.submitRule();
-
-    setBlock('Create import rule #6', 2);
+    setBlock('Create import rule #3', 2);
     await ImportTests.createRule();
     await ImportTests.createRuleCondition([
         { action: 'changeFieldType', data: IMPORT_COND_FIELD_COMMENT },
@@ -436,7 +360,7 @@ const create = async () => {
 const update = async () => {
     setBlock('Update import rules', 1);
 
-    setBlock('Update import rule #1', 2);
+    setBlock('Add conditions and actions', 2);
     await ImportTests.updateRule(0);
     await ImportTests.createRuleCondition([
         { action: 'changeFieldType', data: IMPORT_COND_FIELD_MAIN_ACCOUNT },
@@ -449,8 +373,8 @@ const update = async () => {
     ]);
     await ImportTests.submitRule();
 
-    setBlock('Update import rule #4', 2);
-    await ImportTests.updateRule(3);
+    setBlock('Update conditions and actions', 2);
+    await ImportTests.updateRule(0);
     await ImportTests.updateRuleCondition({
         pos: 1,
         action: { action: 'changeFieldType', data: IMPORT_COND_FIELD_TR_AMOUNT },
@@ -459,14 +383,10 @@ const update = async () => {
         pos: 2,
         action: { action: 'changeFieldType', data: IMPORT_COND_FIELD_TR_AMOUNT },
     });
-    await ImportTests.updateRuleAction({
-        pos: 2,
-        action: { action: 'inputValue', data: 'Taxi for Maria' },
-    });
     await ImportTests.submitRule();
 
-    setBlock('Update import rule #6', 2);
-    await ImportTests.updateRule(5);
+    setBlock('Delete conditions and actions', 2);
+    await ImportTests.updateRule(2);
     await ImportTests.deleteRuleCondition(0);
     await ImportTests.deleteRuleAction(0);
     await ImportTests.submitRule();

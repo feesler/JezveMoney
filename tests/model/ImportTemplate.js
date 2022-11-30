@@ -4,7 +4,7 @@ import { ImportTransaction } from './ImportTransaction.js';
 import { ImportTemplateError } from '../error/ImportTemplateError.js';
 import { App } from '../Application.js';
 
-const tplColumns = [
+export const tplColumns = [
     'accountAmount',
     'accountCurrency',
     'transactionAmount',

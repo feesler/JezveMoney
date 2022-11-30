@@ -371,7 +371,18 @@ const enableDisableRules = async () => {
 };
 
 export const importItemsTests = {
+    async beforeRun() {
+        await App.scenario.resetData({
+            importrules: true,
+        });
+        await App.scenario.createImportRules();
+
+        await App.view.navigateToImport();
+    },
+
     async run() {
+        await this.beforeRun();
+
         await create();
         await uploadAccount();
         await convert();

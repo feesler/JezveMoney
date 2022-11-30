@@ -31,17 +31,32 @@ const create = async () => {
     await ImportTests.submitTemplate();
 
     setBlock('Create second template', 2);
-    await ImportTests.createTemplate();
-    await App.scenario.runner.runGroup(ImportTests.selectTemplateColumn, [
-        { column: 'accountAmount', index: 11 },
-        { column: 'transactionAmount', index: 9 },
-        { column: 'accountCurrency', index: 10 },
-        { column: 'transactionCurrency', index: 8 },
-        { column: 'date', index: 1 },
-        { column: 'comment', index: 4 },
-    ]);
-    await ImportTests.inputTemplateName('Template_dup');
-    await ImportTests.submitTemplate();
+    await ImportTests.addTemplate({
+        name: 'Template_dup',
+        accountAmount: 11,
+        transactionAmount: 9,
+        accountCurrency: 10,
+        transactionCurrency: 8,
+        date: 1,
+        comment: 4,
+    });
+
+    setBlock('Create third template', 2);
+    await ImportTests.addTemplate({
+        name: 'Template_1_2',
+        accountAmount: 11,
+        transactionAmount: 9,
+        accountCurrency: 10,
+        transactionCurrency: 8,
+        date: 1,
+        comment: 4,
+        account_id: App.scenario.CARD_RUB,
+    });
+
+    setBlock('Check main account changed on change template', 2);
+    await ImportTests.selectTemplateByIndex(0);
+    await ImportTests.selectTemplateByIndex(1);
+    await ImportTests.selectTemplateByIndex(2);
 };
 
 // Update import template tests
@@ -65,6 +80,8 @@ const del = async () => {
 
     await ImportTests.selectTemplateByIndex(0);
     await ImportTests.deleteTemplate();
+    await ImportTests.selectTemplateByIndex(1);
+    await ImportTests.deleteTemplate();
 };
 
 // Automatic select valid template
@@ -73,27 +90,25 @@ const autoSelect = async () => {
 
     const { cardFile, accountFile } = App.scenario;
 
-    await ImportTests.uploadFile(accountFile);
+    await api.importtemplate.create({
+        name: 'Template_Account',
+        type_id: 0,
+        first_row: 2,
+        account_id: App.scenario.ACC_RUB,
+        account_amount_col: 6,
+        account_curr_col: 5,
+        trans_amount_col: 4,
+        trans_curr_col: 3,
+        date_col: 1,
+        comment_col: 2,
+    });
+    await App.state.fetch();
 
-    await ImportTests.createTemplate();
-    // Select columns for template
-    await App.scenario.runner.runGroup(ImportTests.selectTemplateColumn, [
-        { column: 'accountAmount', index: 6 },
-        { column: 'transactionAmount', index: 4 },
-        { column: 'accountCurrency', index: 5 },
-        { column: 'transactionCurrency', index: 3 },
-        { column: 'date', index: 1 },
-        { column: 'comment', index: 2 },
-    ]);
-    // Input template name, select account and save
-    await ImportTests.inputTemplateName('Template_Account');
-    await ImportTests.toggleTemplateAccount();
-    await ImportTests.selectTemplateAccountByIndex(1);
-    await ImportTests.submitTemplate();
+    await App.view.navigateToImport();
 
     // Upload card file and check 1st template is selected
     await ImportTests.uploadFile(cardFile);
-    // Upload accounts again and check 2nd template is selected
+    // Upload accounts file and check 2nd template is selected
     await ImportTests.uploadFile(accountFile);
 
     await ImportTests.closeUploadDialog();
@@ -144,42 +159,32 @@ const resetAccounts = async () => {
         importtpl: true,
     });
 
-    await App.view.navigateToImport();
-    await ImportTests.uploadFile(cardFile);
-
     // Create template with first account
-    await App.scenario.runner.runGroup(ImportTests.selectTemplateColumn, [
-        { column: 'accountAmount', index: 11 },
-        { column: 'transactionAmount', index: 9 },
-        { column: 'accountCurrency', index: 10 },
-        { column: 'transactionCurrency', index: 8 },
-        { column: 'date', index: 1 },
-        { column: 'comment', index: 4 },
-    ]);
-    await ImportTests.inputTemplateName('Template_Acc_1');
-    await ImportTests.toggleTemplateAccount();
-    await ImportTests.selectTemplateAccountById(account1);
-    await ImportTests.submitTemplate();
-
+    await api.importtemplate.create({
+        name: 'Template_Acc_1',
+        type_id: 0,
+        first_row: 2,
+        account_id: account1,
+        account_amount_col: 11,
+        account_curr_col: 10,
+        trans_amount_col: 9,
+        trans_curr_col: 8,
+        date_col: 1,
+        comment_col: 4,
+    });
     // Create template with second account
-    await ImportTests.createTemplate();
-    await App.scenario.runner.runGroup(ImportTests.selectTemplateColumn, [
-        { column: 'accountAmount', index: 11 },
-        { column: 'transactionAmount', index: 9 },
-        { column: 'accountCurrency', index: 10 },
-        { column: 'transactionCurrency', index: 8 },
-        { column: 'date', index: 1 },
-        { column: 'comment', index: 4 },
-    ]);
-    await ImportTests.inputTemplateName('Template_Acc_2');
-    await ImportTests.toggleTemplateAccount();
-    await ImportTests.selectTemplateAccountById(account2);
-    await ImportTests.submitTemplate();
-
-    // Check account changed on change template
-    await ImportTests.selectTemplateByIndex(0);
-    await ImportTests.selectTemplateByIndex(1);
-
+    await api.importtemplate.create({
+        name: 'Template_Acc_2',
+        type_id: 0,
+        first_row: 2,
+        account_id: account2,
+        account_amount_col: 11,
+        account_curr_col: 10,
+        trans_amount_col: 9,
+        trans_curr_col: 8,
+        date_col: 1,
+        comment_col: 4,
+    });
     // Remove first account
     await api.account.del(account1);
     await App.state.fetch();

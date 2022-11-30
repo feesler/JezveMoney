@@ -1,5 +1,6 @@
-import { test } from 'jezve-test';
+import { assert, test } from 'jezve-test';
 import { App } from '../../Application.js';
+import { tplColumns } from '../../model/ImportTemplate.js';
 import { CREATE_TPL_STATE } from '../../view/component/Import/ImportUploadDialog.js';
 
 /** Test selection of import template by id */
@@ -119,4 +120,38 @@ export const cancelTemplate = async () => {
         await App.state.fetch();
         return App.view.cancelTemplate();
     });
+};
+
+/** Creates template from specified props and submit */
+export const addTemplate = async (props) => {
+    assert.isObject(props);
+    tplColumns.forEach((column) => {
+        assert(column in props, `Column '${column}' not found`);
+    });
+    assert(typeof props.name === 'string' && props.name.length > 0, 'Invalid name');
+
+    await createTemplate();
+    await App.scenario.runner.runGroup(selectTemplateColumn, [
+        { column: 'accountAmount', index: props.accountAmount },
+        { column: 'transactionAmount', index: props.transactionAmount },
+        { column: 'accountCurrency', index: props.accountCurrency },
+        { column: 'transactionCurrency', index: props.transactionCurrency },
+        { column: 'date', index: props.date },
+        { column: 'comment', index: props.comment },
+    ]);
+    await inputTemplateName(props.name);
+
+    if (props.first_row) {
+        assert.isInt(props.first_row, 'Invalid first row');
+        assert(props.first_row > 0, 'Invalid first row');
+
+        await inputTemplateFirstRow(2);
+    }
+
+    if (props.account_id) {
+        await toggleTemplateAccount();
+        await selectTemplateAccountById(props.account_id);
+    }
+
+    await submitTemplate();
 };
