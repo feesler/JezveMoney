@@ -561,24 +561,28 @@ export class TransactionsList extends List {
     }
 
     getNextDate(date, groupType) {
-        if (!availGroupTypes.includes(groupType)) {
-            throw new Error('Invalid group type');
-        }
+        assert.isDate(date);
+        assert(availGroupTypes.includes(groupType), 'Invalid group type');
 
-        const res = new Date(cutDate(date));
+        let timestamp = 0;
         if (groupType === 'none' || groupType === 'day') {
-            res.setDate(res.getDate() + 1);
+            timestamp = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate() + 1);
         }
         if (groupType === 'week') {
-            res.setDate(res.getDate() + DAYS_IN_WEEK);
+            timestamp = Date.UTC(
+                date.getFullYear(),
+                date.getMonth(),
+                date.getDate() + DAYS_IN_WEEK,
+            );
         }
         if (groupType === 'month') {
-            res.setMonth(res.getMonth() + 1);
+            timestamp = Date.UTC(date.getFullYear(), date.getMonth() + 1, 1);
         }
         if (groupType === 'year') {
-            res.setFullYear(res.getFullYear() + 1);
+            timestamp = Date.UTC(date.getFullYear() + 1, 0, 1);
         }
-        return res;
+
+        return new Date(timestamp);
     }
 
     getStatisticsLabel(date, groupType) {
