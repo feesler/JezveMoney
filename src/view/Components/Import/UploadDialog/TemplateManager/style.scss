@@ -26,6 +26,12 @@
   }
 }
 
+/* Heading controls */
+.tpl-form__heading {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
 /* Raw data table title */
 .tpl-form__title {
   font-size: 14px;
@@ -52,11 +58,7 @@
     margin-bottom: 0;
   }
 
-  input,
-  select {
-    height: 34px;
-    font-size: 14px;
-    padding: 2px 5px;
+  input {
     flex: 0 0 auto;
   }
 
@@ -89,6 +91,7 @@
   row-gap: 5px;
 }
 
+/* Validation feedback */
 .validation-block.invalid-block .tpl-name-inp {
   border-color: #ff0000;
 }
@@ -98,9 +101,9 @@
 }
 
 .feedback.valid-feedback {
-  color: #76ff6d;
+  color: #00b500;
 }
 
 .feedback.invalid-feedback {
-  color: #ff6565;
+  color: #ff3131;
 }

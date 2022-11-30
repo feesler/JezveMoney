@@ -33,13 +33,13 @@
     </div>
 
     <div id="templateBlock" class="tpl-form" hidden>
-        <div id="tplHeading" hidden>
+        <div id="tplHeading" class="tpl-form__heading" hidden>
             <div id="tplFilename" class="tpl-form__file"></div>
             <div class="tpl-form-header">
                 <label id="tplStateLbl">Template</label>
                 <input id="createTplBtn" class="btn link-btn" type="button" value="Create template">
             </div>
-            <div class="tpl-form-fields tpl-form__select-group">
+            <div id="tplSelectGroup" class="tpl-form-fields tpl-form__select-group">
                 <div id="tplField" class="tpl-form-field template-field">
                     <select id="templateSel">
                         <?php foreach ($importTemplates as $template) {     ?>
@@ -52,7 +52,7 @@
                     <input id="deleteTplBtn" class="btn link-btn" type="button" value="Delete" hidden>
                 </div>
             </div>
-            <div class="tpl-form-fields">
+            <div id="tplFormTop" class="tpl-form-fields">
                 <div id="nameField" class="tpl-form-field validation-block" hidden>
                     <label for="tplNameInp">Name</label>
                     <input id="tplNameInp" class="stretch-input tpl-name-inp" type="text" autocomplete="off">
@@ -77,7 +77,7 @@
                     <div class="invalid-feedback">Input row number</div>
                 </div>
             </div>
-            <div class="tpl-form-fields">
+            <div id="tplFormBottom" class="tpl-form-fields">
                 <div id="tplAccountField" class="tpl-form-field tpl-account-field" hidden>
                     <label id="tplAccountCheck" class="checkbox">
                         <input type="checkbox">
@@ -92,7 +92,7 @@
         <div id="tplFeedback" class="feedback" hidden></div>
         <div id="tplControls" class="form-controls" hidden>
             <input id="submitTplBtn" class="btn submit-btn" type="button" value="Save">
-            <input id="cancelTplBtn" class="btn link-btn cancel-btn" type="button" value="Cancel">
+            <input id="cancelTplBtn" class="btn cancel-btn" type="button" value="Cancel">
         </div>
         <div id="initialAccField" class="tpl-form-field" hidden>
             <label>Main account</label>
