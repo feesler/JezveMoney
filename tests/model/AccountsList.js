@@ -7,17 +7,6 @@ import { App } from '../Application.js';
 export const ACCOUNT_HIDDEN = 1;
 
 export class AccountsList extends List {
-    async fetch() {
-        return api.account.list(true);
-    }
-
-    clone() {
-        const res = new AccountsList(this.data);
-        res.autoincrement = this.autoincrement;
-
-        return res;
-    }
-
     /** Apply transaction to accounts */
     static applyTransaction(accounts, transaction) {
         assert.isArray(accounts, 'Invalid accounts list specified');
@@ -66,6 +55,10 @@ export class AccountsList extends List {
         return res;
     }
 
+    async fetch() {
+        return api.account.list(true);
+    }
+
     createTransaction(transaction, returnRaw = false) {
         const res = AccountsList.applyTransaction(this.data, transaction);
 
@@ -73,7 +66,7 @@ export class AccountsList extends List {
             return res;
         }
 
-        return new AccountsList(res);
+        return AccountsList.create(res);
     }
 
     updateTransaction(origTransaction, newTransaction, returnRaw = false) {
@@ -84,7 +77,7 @@ export class AccountsList extends List {
             return res;
         }
 
-        return new AccountsList(res);
+        return AccountsList.create(res);
     }
 
     deleteTransactions(transactions, returnRaw = false) {
@@ -98,7 +91,7 @@ export class AccountsList extends List {
             return res;
         }
 
-        return new AccountsList(res);
+        return AccountsList.create(res);
     }
 
     /** Reset initial balances of all accounts to current values */
@@ -112,7 +105,7 @@ export class AccountsList extends List {
             return res;
         }
 
-        return new AccountsList(res);
+        return AccountsList.create(res);
     }
 
     /** Reset balance of all accounts to initial values */
@@ -126,7 +119,7 @@ export class AccountsList extends List {
             return res;
         }
 
-        return new AccountsList(res);
+        return AccountsList.create(res);
     }
 
     findByName(name, caseSens = false) {
@@ -152,7 +145,7 @@ export class AccountsList extends List {
             return copyObject(res);
         }
 
-        return new AccountsList(res);
+        return AccountsList.create(res);
     }
 
     getPersonsAccounts(returnRaw = false) {
@@ -162,7 +155,7 @@ export class AccountsList extends List {
             return copyObject(res);
         }
 
-        return new AccountsList(res);
+        return AccountsList.create(res);
     }
 
     isHidden(account) {
@@ -178,7 +171,7 @@ export class AccountsList extends List {
             return copyObject(res);
         }
 
-        return new AccountsList(res);
+        return AccountsList.create(res);
     }
 
     getHidden(returnRaw = false) {
@@ -188,7 +181,7 @@ export class AccountsList extends List {
             return copyObject(res);
         }
 
-        return new AccountsList(res);
+        return AccountsList.create(res);
     }
 
     /** Return visible user accounts */

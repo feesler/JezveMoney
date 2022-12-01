@@ -9,13 +9,6 @@ export class PersonsList extends List {
         return api.person.list();
     }
 
-    clone() {
-        const res = new PersonsList(this.data);
-        res.autoincrement = this.autoincrement;
-
-        return res;
-    }
-
     findByName(name, caseSens = false) {
         let res;
 
@@ -42,7 +35,7 @@ export class PersonsList extends List {
             return copyObject(res);
         }
 
-        return new PersonsList(res);
+        return PersonsList.create(res);
     }
 
     getHidden(returnRaw = false) {
@@ -52,7 +45,7 @@ export class PersonsList extends List {
             return copyObject(res);
         }
 
-        return new PersonsList(res);
+        return PersonsList.create(res);
     }
 
     sortByVisibility() {

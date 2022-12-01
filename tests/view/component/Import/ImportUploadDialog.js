@@ -539,7 +539,7 @@ export class ImportUploadDialog extends TestComponent {
         if (App.state.templates.length > 0) {
             this.model.state = RAW_DATA_STATE;
 
-            const template = this.findValidTemplate(this.parent.fileData);
+            const template = App.state.templates.findValidTemplate(this.parent.fileData);
             if (template) {
                 this.model.template = template;
                 if (template.account_id) {
@@ -822,14 +822,6 @@ export class ImportUploadDialog extends TestComponent {
         }
 
         await this.performAction(() => this.content.isEncodeCheck.toggle());
-    }
-
-    /** Find valid template for data */
-    findValidTemplate(data) {
-        return App.state.templates.find((template) => {
-            const tpl = new ImportTemplate(template);
-            return tpl.isValid(data);
-        });
     }
 
     /** Returns array of ImportTransaction */

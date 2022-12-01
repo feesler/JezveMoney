@@ -1,67 +1,35 @@
 import { setBlock } from 'jezve-test';
 import {
-    IMPORT_COND_FIELD_MAIN_ACCOUNT,
-    IMPORT_COND_FIELD_ACC_AMOUNT,
-    IMPORT_COND_FIELD_TR_AMOUNT,
-    IMPORT_COND_FIELD_COMMENT,
-    IMPORT_COND_OP_EQUAL,
-    IMPORT_COND_OP_NOT_EQUAL,
-    IMPORT_COND_OP_STRING_INCLUDES,
-    IMPORT_COND_OP_FIELD_FLAG,
+    ConditionFields,
+    ConditionOperators,
+    conditions,
 } from '../../../model/ImportCondition.js';
-import {
-    IMPORT_ACTION_SET_TR_TYPE,
-    IMPORT_ACTION_SET_COMMENT,
-} from '../../../model/ImportAction.js';
+import { actions, ImportActionTypes } from '../../../model/ImportAction.js';
 import { App } from '../../../Application.js';
 import * as ImportRuleApiTests from '../../../run/api/importrule.js';
 
 const create = async () => {
     setBlock('Create import rule', 2);
 
-    const taxiCondition = {
-        field_id: IMPORT_COND_FIELD_COMMENT,
-        operator: IMPORT_COND_OP_STRING_INCLUDES,
-        value: 'BANK MESSAGE',
-        flags: 0,
-    };
-    const taxiAction = {
-        action_id: IMPORT_ACTION_SET_COMMENT,
-        value: 'Rule',
-    };
+    const taxiCondition = conditions.comment.includes.value('BANK MESSAGE');
+    const taxiAction = actions.setComment('Rule');
 
     const data = [{
         flags: 0,
-        conditions: [{
-            field_id: IMPORT_COND_FIELD_MAIN_ACCOUNT,
-            operator: IMPORT_COND_OP_NOT_EQUAL,
-            value: App.scenario.CASH_RUB,
-            flags: 0,
-        }],
-        actions: [{
-            action_id: IMPORT_ACTION_SET_COMMENT,
-            value: 'Rule',
-        }],
+        conditions: [
+            conditions.mainAccount.isNot.value(App.scenario.CASH_RUB),
+        ],
+        actions: [taxiAction],
     }, {
         flags: 0,
-        conditions: [{
-            field_id: IMPORT_COND_FIELD_TR_AMOUNT,
-            operator: IMPORT_COND_OP_NOT_EQUAL,
-            value: IMPORT_COND_FIELD_ACC_AMOUNT,
-            flags: IMPORT_COND_OP_FIELD_FLAG,
-        }, {
-            field_id: IMPORT_COND_FIELD_COMMENT,
-            operator: IMPORT_COND_OP_STRING_INCLUDES,
-            value: 'BANK MESSAGE',
-            flags: 0,
-        }],
-        actions: [{
-            action_id: IMPORT_ACTION_SET_TR_TYPE,
-            value: 'transferfrom',
-        }, {
-            action_id: IMPORT_ACTION_SET_COMMENT,
-            value: 'Bank',
-        }],
+        conditions: [
+            conditions.transactionAmount.isNot.prop(ConditionFields.accountAmount),
+            conditions.comment.includes.value('BANK MESSAGE'),
+        ],
+        actions: [
+            actions.setTransactionType('transferfrom'),
+            actions.setComment('Bank'),
+        ],
     }, {
         flags: 0,
         conditions: [taxiCondition],
@@ -93,17 +61,17 @@ const create = async () => {
         actions: [null],
     }, {
         flags: 0,
-        conditions: [{
+        conditions: [{ // Invalid field type
             field_id: 100,
-            operator: IMPORT_COND_OP_STRING_INCLUDES,
+            operator: ConditionOperators.includes,
             value: 'TEST',
             flags: 0,
         }],
         actions: [null],
     }, {
         flags: 0,
-        conditions: [{
-            field_id: IMPORT_COND_FIELD_COMMENT,
+        conditions: [{ // Invalid operator
+            field_id: ConditionFields.comment,
             operator: 100,
             value: 'TEST',
             flags: 0,
@@ -111,91 +79,82 @@ const create = async () => {
         actions: [null],
     }, {
         flags: 0,
-        conditions: [{
-            field_id: IMPORT_COND_FIELD_COMMENT,
-            operator: IMPORT_COND_OP_STRING_INCLUDES,
+        conditions: [{ // Invalid value for 'includes' operator
+            field_id: ConditionFields.comment,
+            operator: ConditionOperators.includes,
             value: null,
             flags: 0,
         }],
         actions: [null],
     }, {
         flags: 0,
-        conditions: [{
-            operator: IMPORT_COND_OP_STRING_INCLUDES,
+        conditions: [{ // No field_id
+            operator: ConditionOperators.includes,
             value: 'TEST',
             flags: 0,
         }],
         actions: [null],
     }, {
         flags: 0,
-        conditions: [{
-            field_id: IMPORT_COND_FIELD_COMMENT,
+        conditions: [{ // No operator
+            field_id: ConditionFields.comment,
             value: 'TEST',
             flags: 0,
         }],
         actions: [null],
     }, {
         flags: 0,
-        conditions: [{
-            field_id: IMPORT_COND_FIELD_COMMENT,
-            operator: IMPORT_COND_OP_STRING_INCLUDES,
+        conditions: [{ // No value
+            field_id: ConditionFields.comment,
+            operator: ConditionOperators.includes,
             flags: 0,
         }],
         actions: [null],
     }, {
         flags: 0,
-        conditions: [{
-            field_id: IMPORT_COND_FIELD_COMMENT,
-            operator: IMPORT_COND_OP_STRING_INCLUDES,
+        conditions: [{ // No flags
+            field_id: ConditionFields.comment,
+            operator: ConditionOperators.includes,
             value: 'TEST',
         }],
         actions: [null],
     }, {
         flags: 0,
-        conditions: [{
-            field_id: IMPORT_COND_FIELD_COMMENT,
-            operator: IMPORT_COND_OP_STRING_INCLUDES,
-            value: 'TEST',
-            flags: 0,
-        }],
+        conditions: [
+            conditions.comment.includes.value('TEST'),
+        ],
         actions: [{
-            action_id: IMPORT_ACTION_SET_COMMENT,
+            // Action without value
+            action_id: ImportActionTypes.setComment,
         }],
     }, {
         flags: 0,
-        conditions: [{
-            field_id: IMPORT_COND_FIELD_COMMENT,
-            operator: IMPORT_COND_OP_STRING_INCLUDES,
-            value: 'TEST',
-            flags: 0,
-        }],
+        conditions: [
+            conditions.comment.includes.value('TEST'),
+        ],
         actions: [{
+            // Action without action_id
             value: 'Rule',
         }],
     }, {
         flags: 0,
-        conditions: [{
-            field_id: IMPORT_COND_FIELD_COMMENT,
-            operator: IMPORT_COND_OP_STRING_INCLUDES,
-            value: 'TEST',
-            flags: 0,
-        }],
+        conditions: [
+            conditions.comment.includes.value('TEST'),
+        ],
         actions: [{
+            // Action with invalid action_id
             action_id: 100,
             value: 'Rule',
         }],
     }, {
         flags: 0,
-        conditions: [{
-            field_id: IMPORT_COND_FIELD_COMMENT,
-            operator: IMPORT_COND_OP_STRING_INCLUDES,
-            value: 'TEST',
-            flags: 0,
-        }],
-        actions: [{
-            action_id: IMPORT_ACTION_SET_TR_TYPE,
-            value: 100,
-        }],
+        conditions: [
+            conditions.comment.includes.value('TEST'),
+        ],
+        actions: [
+            // Action with invalid value
+            actions.setTransactionType(100),
+        ],
     }];
 
     [
@@ -208,57 +167,48 @@ const create = async () => {
 const update = async () => {
     setBlock('Update import rule', 2);
 
-    const diffAmountCondition = {
-        field_id: IMPORT_COND_FIELD_TR_AMOUNT,
-        operator: IMPORT_COND_OP_NOT_EQUAL,
-        value: IMPORT_COND_FIELD_ACC_AMOUNT,
-        flags: IMPORT_COND_OP_FIELD_FLAG,
-    };
-    const debtAction = {
-        action_id: IMPORT_ACTION_SET_TR_TYPE,
-        value: 'debtto',
-    };
+    const isDiffAmount = conditions.transactionAmount.isNot.prop(ConditionFields.accountAmount);
+    const setDebtTo = actions.setTransactionType('debtto');
 
     const data = [{
         id: App.scenario.RULE_1,
         conditions: [{
-            field_id: IMPORT_COND_FIELD_MAIN_ACCOUNT,
-            operator: IMPORT_COND_OP_EQUAL,
+            field_id: ConditionFields.mainAccount,
+            operator: ConditionOperators.is,
             value: App.scenario.CASH_RUB,
             flags: 0,
         }, {
-            field_id: IMPORT_COND_FIELD_COMMENT,
-            operator: IMPORT_COND_OP_STRING_INCLUDES,
+            field_id: ConditionFields.comment,
+            operator: ConditionOperators.includes,
             value: 'MARKET',
             flags: 0,
         }],
-        actions: [{
-            action_id: IMPORT_ACTION_SET_TR_TYPE,
-            value: 'transferto',
-        }],
+        actions: [
+            actions.setTransactionType('transferto'),
+        ],
     }, {
         id: App.scenario.RULE_2,
         conditions: null,
-        actions: [debtAction],
+        actions: [setDebtTo],
     }, {
         id: App.scenario.RULE_2,
         conditions: [],
-        actions: [debtAction],
+        actions: [setDebtTo],
     }, {
         id: App.scenario.RULE_2,
         conditions: [null],
-        actions: [debtAction],
+        actions: [setDebtTo],
     }, {
         id: App.scenario.RULE_2,
-        conditions: [diffAmountCondition],
+        conditions: [isDiffAmount],
         actions: null,
     }, {
         id: App.scenario.RULE_2,
-        conditions: [diffAmountCondition],
+        conditions: [isDiffAmount],
         actions: [],
     }, {
         id: App.scenario.RULE_2,
-        conditions: [diffAmountCondition],
+        conditions: [isDiffAmount],
         actions: [null],
     }];
 
@@ -278,7 +228,7 @@ const del = async () => {
 
 export const apiImportRulesTests = {
     async run() {
-        setBlock('Import rule', 2);
+        setBlock('Import rule', 1);
 
         await create();
         await update();

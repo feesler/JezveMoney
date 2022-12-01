@@ -1,3 +1,4 @@
+import { asArray } from 'jezve-test';
 import { List } from './List.js';
 import { ImportRule } from './ImportRule.js';
 
@@ -6,20 +7,14 @@ export class ImportRuleList extends List {
         return new ImportRule(obj);
     }
 
-    clone() {
-        const res = new ImportRuleList(this.data);
-        res.autoincrement = this.autoincrement;
-
-        return res;
-    }
-
     deleteEmptyRules() {
         this.data = this.filter(
             (rule) => (rule.conditions.length > 0 && rule.actions.length > 0),
         );
     }
 
-    deleteAccounts(...ids) {
+    deleteAccounts(accountIds) {
+        const ids = asArray(accountIds);
         if (!ids.length) {
             return;
         }

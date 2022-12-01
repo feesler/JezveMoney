@@ -1,7 +1,6 @@
 import { test, copyObject } from 'jezve-test';
 import { api } from '../../model/api.js';
 import { ApiRequestError } from '../../error/ApiRequestError.js';
-import { formatProps } from '../../common.js';
 import { App } from '../../Application.js';
 
 /**
@@ -19,7 +18,7 @@ import { App } from '../../Application.js';
 export const create = async (params) => {
     let result = 0;
 
-    await test(`Create import template (${formatProps(params)})`, async () => {
+    await test('Create import template', async () => {
         const expTemplate = App.state.templateFromRequest(params);
         const resExpected = App.state.createTemplate(expTemplate);
 
@@ -103,7 +102,7 @@ export const update = async (params) => {
     let result = false;
     const props = copyObject(params);
 
-    await test(`Update import template (${formatProps(props)})`, async () => {
+    await test('Update import template', async () => {
         const expTemplate = App.state.templateFromRequest(props);
         const resExpected = App.state.updateTemplate(expTemplate);
         const updParams = App.state.getUpdateTemplateRequest(props);

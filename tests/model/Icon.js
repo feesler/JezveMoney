@@ -1,11 +1,5 @@
 /** Icon class */
 export class Icon {
-    constructor(props) {
-        Object.keys(props).forEach((key) => {
-            this[key] = props[key];
-        });
-    }
-
     static noIcon() {
         return {
             id: 0,
@@ -13,5 +7,11 @@ export class Icon {
             file: null,
             type: null,
         };
+    }
+
+    constructor(props) {
+        Object.keys(props).forEach((key) => {
+            this[key] = props[key];
+        });
     }
 }

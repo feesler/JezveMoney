@@ -25,115 +25,193 @@ export const IMPORT_COND_OP_GREATER = 5;
 /** Condition flags */
 export const IMPORT_COND_OP_FIELD_FLAG = 0x01;
 
+export const ConditionFields = {
+    mainAccount: IMPORT_COND_FIELD_MAIN_ACCOUNT,
+    template: IMPORT_COND_FIELD_TPL,
+    transactionAmount: IMPORT_COND_FIELD_TR_AMOUNT,
+    transactionCurrency: IMPORT_COND_FIELD_TR_CURRENCY,
+    accountAmount: IMPORT_COND_FIELD_ACC_AMOUNT,
+    accountCurrency: IMPORT_COND_FIELD_ACC_CURRENCY,
+    comment: IMPORT_COND_FIELD_COMMENT,
+    date: IMPORT_COND_FIELD_DATE,
+};
+
+export const ConditionOperators = {
+    includes: IMPORT_COND_OP_STRING_INCLUDES,
+    is: IMPORT_COND_OP_EQUAL,
+    isNot: IMPORT_COND_OP_NOT_EQUAL,
+    less: IMPORT_COND_OP_LESS,
+    greater: IMPORT_COND_OP_GREATER,
+};
+
+/** Item field types */
+const itemFields = [
+    ConditionFields.mainAccount,
+    ConditionFields.template,
+    ConditionFields.transactionCurrency,
+    ConditionFields.accountCurrency,
+];
+
+/** Amount field types */
+const amountFields = [
+    ConditionFields.transactionAmount,
+    ConditionFields.accountAmount,
+];
+
+/** Currency field types */
+const currencyFields = [
+    ConditionFields.transactionCurrency,
+    ConditionFields.accountCurrency,
+];
+
+const propConditionAvailFields = [
+    ...amountFields,
+    ...currencyFields,
+];
+
+/** Item(account, template, currency) operators */
+const itemOperators = [
+    ConditionOperators.is,
+    ConditionOperators.isNot,
+];
+
+/** Numeric(amount and date) operators */
+const numOperators = [
+    ConditionOperators.is,
+    ConditionOperators.isNot,
+    ConditionOperators.less,
+    ConditionOperators.greater,
+];
+
+/** String operators */
+const stringOperators = [
+    ConditionOperators.includes,
+    ConditionOperators.is,
+    ConditionOperators.isNot,
+    ConditionOperators.less,
+    ConditionOperators.greater,
+];
+
+/** List of available field types */
+const fieldTypes = [
+    { id: ConditionFields.mainAccount, title: 'Main account', operators: itemOperators },
+    { id: ConditionFields.template, title: 'Template', operators: itemOperators },
+    { id: ConditionFields.transactionAmount, title: 'Transaction amount', operators: numOperators },
+    { id: ConditionFields.transactionCurrency, title: 'Transaction currency', operators: itemOperators },
+    { id: ConditionFields.accountAmount, title: 'Account amount', operators: numOperators },
+    { id: ConditionFields.accountCurrency, title: 'Account currency', operators: itemOperators },
+    { id: ConditionFields.comment, title: 'Comment', operators: stringOperators },
+    { id: ConditionFields.date, title: 'Date', operators: numOperators },
+];
+
+/** Field type to name map */
+const fieldNames = {
+    [ConditionFields.mainAccount]: 'mainAccount',
+    [ConditionFields.template]: 'template',
+    [ConditionFields.transactionAmount]: 'transactionAmount',
+    [ConditionFields.transactionCurrency]: 'transactionCurrency',
+    [ConditionFields.accountAmount]: 'accountAmount',
+    [ConditionFields.accountCurrency]: 'accountCurrency',
+    [ConditionFields.comment]: 'comment',
+    [ConditionFields.date]: 'date',
+};
+
+/** Field type to data property name map */
+const fieldsMap = {
+    ...fieldNames,
+    [ConditionFields.mainAccount]: (data) => data.mainAccount.id,
+};
+
+/** Operator functions map */
+const operatorsMap = {
+    [ConditionOperators.includes]: (left, right) => left.includes(right),
+    [ConditionOperators.is]: (left, right) => left === right,
+    [ConditionOperators.isNot]: (left, right) => left !== right,
+    [ConditionOperators.less]: (left, right) => left < right,
+    [ConditionOperators.greater]: (left, right) => left > right,
+};
+
+/** Operator type to name map */
+const operatorNames = {
+    [ConditionOperators.includes]: 'includes',
+    [ConditionOperators.is]: 'is',
+    [ConditionOperators.isNot]: 'isNot',
+    [ConditionOperators.less]: 'less',
+    [ConditionOperators.greater]: 'greater',
+};
+
+/** List of available condition operator types */
+const operatorTypes = [
+    { id: ConditionOperators.includes, title: 'contains' },
+    { id: ConditionOperators.is, title: 'is' },
+    { id: ConditionOperators.isNot, title: 'is not' },
+    { id: ConditionOperators.less, title: 'less than' },
+    { id: ConditionOperators.greater, title: 'greater than' },
+];
+
+/** Search condition field type by id */
+const getFieldTypeById = (value) => {
+    const id = parseInt(value, 10);
+    assert(id, 'Invalid parameter');
+
+    return fieldTypes.find((item) => item.id === id);
+};
+
+/** Returns import condition to compare field with value */
+const valueCondition = (id, operator, value) => ({
+    field_id: id,
+    operator,
+    value,
+    flags: 0,
+});
+
+/** Returns import condition to compare field with another field */
+const propCondition = (id, operator, value) => ({
+    field_id: id,
+    operator,
+    value,
+    flags: IMPORT_COND_OP_FIELD_FLAG,
+});
+
+const createFieldOperators = ({ id, operators }) => {
+    const res = {};
+    operators.forEach((operator) => {
+        const name = operatorNames[operator];
+        if (!res[name]) {
+            res[name] = {};
+        }
+
+        res[name].value = (value) => valueCondition(id, operator, value);
+        if (propConditionAvailFields.includes(id)) {
+            res[name].prop = (value) => propCondition(id, operator, value);
+        }
+    });
+    return res;
+};
+
+const createConditions = () => {
+    const res = {};
+    fieldTypes.forEach((fieldType) => {
+        const name = fieldNames[fieldType.id];
+        res[name] = createFieldOperators(fieldType);
+    });
+    return res;
+};
+
+export const conditions = createConditions();
+
 /** Import condition model */
 export class ImportCondition {
-    constructor(data) {
-        const requiredProps = ['field_id', 'operator', 'value', 'flags'];
-
-        assert(data, 'Invalid data');
-
-        requiredProps.forEach((propName) => {
-            assert(propName in data, `Property '${propName}' not found.`);
-
-            this[propName] = data[propName];
-        });
-    }
-
-    /** Item field types */
-    static itemFields = [
-        IMPORT_COND_FIELD_MAIN_ACCOUNT,
-        IMPORT_COND_FIELD_TPL,
-        IMPORT_COND_FIELD_TR_CURRENCY,
-        IMPORT_COND_FIELD_ACC_CURRENCY,
-    ];
-
-    /** Amount field types */
-    static amountFields = [
-        IMPORT_COND_FIELD_TR_AMOUNT,
-        IMPORT_COND_FIELD_ACC_AMOUNT,
-    ];
-
-    /** Currency field types */
-    static currencyFields = [
-        IMPORT_COND_FIELD_TR_CURRENCY,
-        IMPORT_COND_FIELD_ACC_CURRENCY,
-    ];
-
-    /** Item(account, template, currency) operators */
-    static itemOperators = [
-        IMPORT_COND_OP_EQUAL,
-        IMPORT_COND_OP_NOT_EQUAL,
-    ];
-
-    /** Numeric(amount and date) operators */
-    static numOperators = [
-        IMPORT_COND_OP_EQUAL,
-        IMPORT_COND_OP_NOT_EQUAL,
-        IMPORT_COND_OP_LESS,
-        IMPORT_COND_OP_GREATER,
-    ];
-
-    /** String operators */
-    static stringOperators = [
-        IMPORT_COND_OP_STRING_INCLUDES,
-        IMPORT_COND_OP_EQUAL,
-        IMPORT_COND_OP_NOT_EQUAL,
-        IMPORT_COND_OP_LESS,
-        IMPORT_COND_OP_GREATER,
-    ];
-
-    /** List of available field types */
-    static fieldTypes = [
-        { id: IMPORT_COND_FIELD_MAIN_ACCOUNT, title: 'Main account', operators: ImportCondition.itemOperators },
-        { id: IMPORT_COND_FIELD_TPL, title: 'Template', operators: ImportCondition.itemOperators },
-        { id: IMPORT_COND_FIELD_TR_AMOUNT, title: 'Transaction amount', operators: ImportCondition.numOperators },
-        { id: IMPORT_COND_FIELD_TR_CURRENCY, title: 'Transaction currency', operators: ImportCondition.itemOperators },
-        { id: IMPORT_COND_FIELD_ACC_AMOUNT, title: 'Account amount', operators: ImportCondition.numOperators },
-        { id: IMPORT_COND_FIELD_ACC_CURRENCY, title: 'Account currency', operators: ImportCondition.itemOperators },
-        { id: IMPORT_COND_FIELD_DATE, title: 'Date', operators: ImportCondition.numOperators },
-        { id: IMPORT_COND_FIELD_COMMENT, title: 'Comment', operators: ImportCondition.stringOperators },
-    ];
-
-    /** Field type to data property name map */
-    static fieldsMap = {
-        [IMPORT_COND_FIELD_MAIN_ACCOUNT]: (data) => data.mainAccount.id,
-        [IMPORT_COND_FIELD_TPL]: 'template',
-        [IMPORT_COND_FIELD_TR_AMOUNT]: 'transactionAmount',
-        [IMPORT_COND_FIELD_TR_CURRENCY]: 'transactionCurrency',
-        [IMPORT_COND_FIELD_ACC_AMOUNT]: 'accountAmount',
-        [IMPORT_COND_FIELD_ACC_CURRENCY]: 'accountCurrency',
-        [IMPORT_COND_FIELD_DATE]: 'date',
-        [IMPORT_COND_FIELD_COMMENT]: 'comment',
-    };
-
-    /** Operator functions map */
-    static operatorsMap = {
-        [IMPORT_COND_OP_STRING_INCLUDES]: (left, right) => left.includes(right),
-        [IMPORT_COND_OP_EQUAL]: (left, right) => left === right,
-        [IMPORT_COND_OP_NOT_EQUAL]: (left, right) => left !== right,
-        [IMPORT_COND_OP_LESS]: (left, right) => left < right,
-        [IMPORT_COND_OP_GREATER]: (left, right) => left > right,
-    };
-
-    /** List of available condition operator types */
-    static operatorTypes = [
-        { id: IMPORT_COND_OP_STRING_INCLUDES, title: 'contains' },
-        { id: IMPORT_COND_OP_EQUAL, title: 'is' },
-        { id: IMPORT_COND_OP_NOT_EQUAL, title: 'is not' },
-        { id: IMPORT_COND_OP_LESS, title: 'less than' },
-        { id: IMPORT_COND_OP_GREATER, title: 'greater than' },
-    ];
-
     /**
     * Return data value for specified field type
     * @param {string} field - field name to check
     */
     static getFieldValue(fieldId, data) {
         const field = parseInt(fieldId, 10);
-        assert(field && (field in this.fieldsMap), `Invalid field id: ${fieldId}`);
+        assert(field && (field in fieldsMap), `Invalid field id: ${fieldId}`);
         assert.isObject(data, 'Invalid transaction data');
 
-        const mapper = this.fieldsMap[field];
+        const mapper = fieldsMap[field];
         if (isFunction(mapper)) {
             return mapper(data);
         }
@@ -143,45 +221,42 @@ export class ImportCondition {
 
     /** Check value for specified field type is account */
     static isItemField(value) {
-        return this.itemFields.includes(parseInt(value, 10));
+        return itemFields.includes(parseInt(value, 10));
     }
 
     /** Check value for specified field type is account */
     static isAccountField(value) {
-        return parseInt(value, 10) === IMPORT_COND_FIELD_MAIN_ACCOUNT;
+        return parseInt(value, 10) === ConditionFields.mainAccount;
     }
 
     /** Check value for specified field type is template */
     static isTemplateField(value) {
-        return parseInt(value, 10) === IMPORT_COND_FIELD_TPL;
+        return parseInt(value, 10) === ConditionFields.template;
     }
 
     /** Check value for specified field type is currency */
     static isCurrencyField(value) {
-        return this.currencyFields.includes(parseInt(value, 10));
+        return currencyFields.includes(parseInt(value, 10));
     }
 
     /** Check value for specified field type is amount */
     static isAmountField(value) {
-        return this.amountFields.includes(parseInt(value, 10));
+        return amountFields.includes(parseInt(value, 10));
     }
 
     /** Check value for specified field type is date */
     static isDateField(value) {
-        return parseInt(value, 10) === IMPORT_COND_FIELD_DATE;
+        return parseInt(value, 10) === ConditionFields.date;
     }
 
     /** Check value for specified field type is string */
     static isStringField(value) {
-        return parseInt(value, 10) === IMPORT_COND_FIELD_COMMENT;
+        return parseInt(value, 10) === ConditionFields.comment;
     }
 
     /** Search condition field type by id */
     static getFieldTypeById(value) {
-        const id = parseInt(value, 10);
-        assert(id, 'Invalid parameter');
-
-        return this.fieldTypes.find((item) => item.id === id);
+        return getFieldTypeById(value);
     }
 
     /** Search condition field type by name (case insensitive) */
@@ -189,7 +264,7 @@ export class ImportCondition {
         assert.isString(name, 'Invalid parameter');
 
         const lcName = name.toLowerCase();
-        return this.fieldTypes.find((item) => item.title.toLowerCase() === lcName);
+        return fieldTypes.find((item) => item.title.toLowerCase() === lcName);
     }
 
     /** Search condition operator by id */
@@ -197,7 +272,7 @@ export class ImportCondition {
         const id = parseInt(value, 10);
         assert(id, 'Invalid parameter');
 
-        return this.operatorTypes.find((item) => item.id === id);
+        return operatorTypes.find((item) => item.id === id);
     }
 
     /** Search condition operator by name (case insensitive) */
@@ -205,22 +280,22 @@ export class ImportCondition {
         assert.isString(name, 'Invalid parameter');
 
         const lcName = name.toLowerCase();
-        return this.operatorTypes.find((item) => item.title.toLowerCase() === lcName);
+        return operatorTypes.find((item) => item.title.toLowerCase() === lcName);
     }
 
     /** Check specified value is item operator(equal or not equal) */
     static isItemOperator(value) {
-        return this.itemOperators.includes(parseInt(value, 10));
+        return itemOperators.includes(parseInt(value, 10));
     }
 
     /** Check specified value is numeric operator */
     static isNumOperator(value) {
-        return this.numOperators.includes(parseInt(value, 10));
+        return numOperators.includes(parseInt(value, 10));
     }
 
     /** Check specified value is string operator */
     static isStringOperator(value) {
-        return this.stringOperators.includes(parseInt(value, 10));
+        return stringOperators.includes(parseInt(value, 10));
     }
 
     /** Check field value flag */
@@ -233,7 +308,19 @@ export class ImportCondition {
 
     /** Returns true if possible to compare specified field type with another field */
     static isPropertyValueAvailable(value) {
-        return (this.isCurrencyField(value) || this.isAmountField(value));
+        return propConditionAvailFields.includes(parseInt(value, 10));
+    }
+
+    constructor(data) {
+        const requiredProps = ['field_id', 'operator', 'value', 'flags'];
+
+        assert(data, 'Invalid data');
+
+        requiredProps.forEach((propName) => {
+            assert(propName in data, `Property '${propName}' not found.`);
+
+            this[propName] = data[propName];
+        });
     }
 
     /** Check field type of condition is account */
@@ -351,9 +438,9 @@ export class ImportCondition {
         const left = leftVal;
         const right = (typeof left === 'string') ? rightVal.toString() : rightVal;
 
-        assert((this.operator in ImportCondition.operatorsMap), `Unknown operator '${this.operator}'`);
+        assert((this.operator in operatorsMap), `Unknown operator '${this.operator}'`);
 
-        const operatorFunction = ImportCondition.operatorsMap[this.operator];
+        const operatorFunction = operatorsMap[this.operator];
         return operatorFunction(left, right);
     }
 

@@ -6,8 +6,9 @@ import {
 } from './ImportAction.js';
 
 export class ImportActionList extends List {
-    setData(data) {
-        this.data = data.map((item) => new ImportAction(item));
+    /** Convert object to ImportAction */
+    createItem(obj) {
+        return new ImportAction(obj);
     }
 
     /** Check list of actions match search query */
@@ -55,6 +56,6 @@ export class ImportActionList extends List {
     sort() {
         const data = copyObject(this.data);
         data.sort((a, b) => a.action_id - b.action_id);
-        return new ImportActionList(data);
+        return ImportActionList.create(data);
     }
 }

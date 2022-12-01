@@ -7,8 +7,9 @@ import {
 } from './ImportCondition.js';
 
 export class ImportConditionList extends List {
-    setData(data) {
-        this.data = data.map((item) => new ImportCondition(item));
+    /** Convert object to ImportCondition */
+    createItem(obj) {
+        return new ImportCondition(obj);
     }
 
     /**

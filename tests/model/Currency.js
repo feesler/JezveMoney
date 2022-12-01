@@ -4,7 +4,7 @@ import { normalize, formatValue } from '../common.js';
 /** Currency object */
 export class Currency {
     constructor(props) {
-        assert(props, 'Invalid currency props');
+        assert.isObject(props, 'Invalid currency props');
 
         Object.keys(props).forEach((key) => {
             this[key] = props[key];

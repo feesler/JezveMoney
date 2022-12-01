@@ -38,7 +38,19 @@ const create = async () => {
         trans_curr_col: 40,
         date_col: 50,
         comment_col: 60,
-    }, {
+    }];
+
+    [
+        App.scenario.TEMPLATE_1,
+        App.scenario.TEMPLATE_2,
+        App.scenario.TEMPLATE_3,
+    ] = await App.scenario.runner.runGroup(ImportTemplateApiTests.create, data);
+};
+
+const createInvalid = async () => {
+    setBlock('Create import template with invalid data', 2);
+
+    const invData = [{
         // Invalid templates
         name: 'Invalid template',
     }, {
@@ -66,15 +78,11 @@ const create = async () => {
         comment_col: 6,
     }];
 
-    [
-        App.scenario.TEMPLATE_1,
-        App.scenario.TEMPLATE_2,
-        App.scenario.TEMPLATE_3,
-    ] = await App.scenario.runner.runGroup(ImportTemplateApiTests.create, data);
+    await App.scenario.runner.runGroup(ImportTemplateApiTests.create, invData);
 };
 
 const createMultiple = async () => {
-    setBlock('Create multiple', 3);
+    setBlock('Create multiple import templates', 2);
 
     const data = [{
         name: 'Template 10',
@@ -112,6 +120,10 @@ const createMultiple = async () => {
     }];
 
     await ImportTemplateApiTests.createMultiple(data);
+};
+
+const createMultipleInvalid = async () => {
+    setBlock('Create multiple import templates with invalid data', 2);
 
     const invData = [
         null,
@@ -152,7 +164,15 @@ const update = async () => {
         type_id: 1,
         account_id: App.scenario.ACC_RUB,
         comment_col: 8,
-    }, {
+    }];
+
+    await App.scenario.runner.runGroup(ImportTemplateApiTests.update, data);
+};
+
+const updateInvalid = async () => {
+    setBlock('Update import template with invalid data', 2);
+
+    const data = [{
         // Invalid templates
         id: App.scenario.TEMPLATE_2,
         name: null,
@@ -183,11 +203,14 @@ const del = async () => {
 
 export const apiImportTemplateTests = {
     async run() {
-        setBlock('Import template', 2);
+        setBlock('Import template', 1);
 
         await create();
+        await createInvalid();
         await createMultiple();
+        await createMultipleInvalid();
         await update();
+        await updateInvalid();
         await del();
     },
 };

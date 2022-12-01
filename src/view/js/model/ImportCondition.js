@@ -32,8 +32,8 @@ const TITLE_FIELD_TRANS_AMOUNT = 'Transaction amount';
 const TITLE_FIELD_TRANS_CURRENCY = 'Transaction currency';
 const TITLE_FIELD_ACC_AMOUNT = 'Account amount';
 const TITLE_FIELD_ACC_CURRENCY = 'Account currency';
-const TITLE_FIELD_DATE = 'Date';
 const TITLE_FIELD_COMMENT = 'Comment';
+const TITLE_FIELD_DATE = 'Date';
 /** Operator names */
 const TITLE_OP_INCLUDES = 'contains';
 const TITLE_OP_EQUAL = 'is';
@@ -122,14 +122,14 @@ export class ImportCondition extends ListItem {
             operators: ImportCondition.itemOperators,
         },
         {
-            id: IMPORT_COND_FIELD_DATE,
-            title: TITLE_FIELD_DATE,
-            operators: ImportCondition.numOperators,
-        },
-        {
             id: IMPORT_COND_FIELD_COMMENT,
             title: TITLE_FIELD_COMMENT,
             operators: ImportCondition.stringOperators,
+        },
+        {
+            id: IMPORT_COND_FIELD_DATE,
+            title: TITLE_FIELD_DATE,
+            operators: ImportCondition.numOperators,
         },
     ];
 
@@ -150,8 +150,8 @@ export class ImportCondition extends ListItem {
         [IMPORT_COND_FIELD_TR_CURRENCY]: 'transactionCurrencyId',
         [IMPORT_COND_FIELD_ACC_AMOUNT]: 'accountAmount',
         [IMPORT_COND_FIELD_ACC_CURRENCY]: 'accountCurrencyId',
-        [IMPORT_COND_FIELD_DATE]: 'date',
         [IMPORT_COND_FIELD_COMMENT]: 'comment',
+        [IMPORT_COND_FIELD_DATE]: 'date',
     };
 
     /** Operator functions map */

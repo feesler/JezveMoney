@@ -11,6 +11,24 @@ export const IMPORT_ACTION_SET_SRC_AMOUNT = 4;
 export const IMPORT_ACTION_SET_DEST_AMOUNT = 5;
 export const IMPORT_ACTION_SET_COMMENT = 6;
 
+export const ImportActionTypes = {
+    setTransactionType: IMPORT_ACTION_SET_TR_TYPE,
+    setAccount: IMPORT_ACTION_SET_ACCOUNT,
+    setPerson: IMPORT_ACTION_SET_PERSON,
+    setSourceAmount: IMPORT_ACTION_SET_SRC_AMOUNT,
+    setDestAmount: IMPORT_ACTION_SET_DEST_AMOUNT,
+    setComment: IMPORT_ACTION_SET_COMMENT,
+};
+
+export const actions = {
+    setTransactionType: (value) => ({ action_id: ImportActionTypes.setTransactionType, value }),
+    setAccount: (value) => ({ action_id: ImportActionTypes.setAccount, value }),
+    setPerson: (value) => ({ action_id: ImportActionTypes.setPerson, value }),
+    setSourceAmount: (value) => ({ action_id: ImportActionTypes.setSourceAmount, value }),
+    setDestAmount: (value) => ({ action_id: ImportActionTypes.setDestAmount, value }),
+    setComment: (value) => ({ action_id: ImportActionTypes.setComment, value }),
+};
+
 /** Import action model */
 export class ImportAction {
     constructor(data) {

@@ -17,12 +17,12 @@ import {
     TRANSFER,
 } from './Transaction.js';
 import { App } from '../Application.js';
-import { List } from './List.js';
 import { ImportRule } from './ImportRule.js';
 import { ACCOUNT_HIDDEN, AccountsList } from './AccountsList.js';
 import { PERSON_HIDDEN, PersonsList } from './PersonsList.js';
 import { TransactionsList } from './TransactionsList.js';
 import { ImportRuleList } from './ImportRuleList.js';
+import { ImportTemplateList } from './ImportTemplateList.js';
 import { api } from './api.js';
 
 /**
@@ -113,33 +113,33 @@ export class AppState {
 
     setState(state) {
         if (!this.accounts) {
-            this.accounts = new AccountsList();
+            this.accounts = AccountsList.create();
         }
         this.accounts.setData(state.accounts.data);
         this.accounts.autoincrement = state.accounts.autoincrement;
         this.userAccountsCache = null;
 
         if (!this.persons) {
-            this.persons = new PersonsList();
+            this.persons = PersonsList.create();
         }
         this.persons.setData(state.persons.data);
         this.persons.autoincrement = state.persons.autoincrement;
         this.personsCache = null;
 
         if (!this.transactions) {
-            this.transactions = new TransactionsList();
+            this.transactions = TransactionsList.create();
         }
         this.transactions.setData(state.transactions.data);
         this.transactions.autoincrement = state.transactions.autoincrement;
 
         if (!this.templates) {
-            this.templates = new List();
+            this.templates = ImportTemplateList.create();
         }
         this.templates.setData(state.templates.data);
         this.templates.autoincrement = state.templates.autoincrement;
 
         if (!this.rules) {
-            this.rules = new ImportRuleList();
+            this.rules = ImportRuleList.create();
         }
         this.rules.setData(state.rules.data);
         this.rules.autoincrement = state.rules.autoincrement;
@@ -348,27 +348,18 @@ export class AppState {
         return true;
     }
 
-    deleteAccounts(ids) {
-        let itemIds = asArray(ids);
-        if (!itemIds.length) {
+    deleteAccounts(accountIds) {
+        const ids = asArray(accountIds).map((id) => parseInt(id, 10));
+        if (!ids.length) {
+            return false;
+        }
+        if (!ids.every((id) => this.accounts.getItem(id))) {
             return false;
         }
 
-        itemIds = itemIds.map((id) => parseInt(id, 10));
-        for (const accountId of itemIds) {
-            if (!this.accounts.getItem(accountId)) {
-                return false;
-            }
-        }
-
-        this.rules.deleteAccounts(itemIds);
-        this.templates.data = this.templates.map((item) => (
-            (itemIds.includes(item.account_id))
-                ? { ...item, account_id: 0 }
-                : item
-        ));
-
-        this.transactions = this.transactions.deleteAccounts(this.accounts.data, itemIds);
+        this.rules.deleteAccounts(ids);
+        this.templates.deleteAccounts(ids);
+        this.transactions = this.transactions.deleteAccounts(this.accounts.data, ids);
 
         // Prepare expected updates of accounts list
         this.accounts.deleteItems(ids);
@@ -381,7 +372,7 @@ export class AppState {
 
     /* eslint-disable no-bitwise */
     showAccounts(ids, show = true) {
-        const itemIds = Array.isArray(ids) ? ids : [ids];
+        const itemIds = asArray(ids);
 
         for (const accountId of itemIds) {
             const account = this.accounts.getItem(accountId);
@@ -416,22 +407,20 @@ export class AppState {
         return this.userAccountsCache;
     }
 
-    getAccountsByIndexes(accounts, returnIds = false) {
-        const itemIndexes = Array.isArray(accounts) ? accounts : [accounts];
+    getAccountsByIndexes(indexes, returnIds = false) {
         this.cacheUserAccounts();
 
-        return itemIndexes.map((ind) => {
+        return asArray(indexes).map((ind) => {
             const item = this.userAccountsCache.getItemByIndex(ind);
             assert(item, `Invalid account index ${ind}`);
             return (returnIds) ? item.id : item;
         });
     }
 
-    getAccountIndexesByNames(accounts) {
-        const accNames = Array.isArray(accounts) ? accounts : [accounts];
+    getAccountIndexesByNames(names) {
         this.cacheUserAccounts();
 
-        return accNames.map((name) => {
+        return asArray(names).map((name) => {
             const acc = this.userAccountsCache.findByName(name);
             assert(acc, `Account '${name}' not found`);
 
@@ -530,23 +519,17 @@ export class AppState {
         return true;
     }
 
-    deletePersons(ids) {
-        const itemIds = asArray(ids);
-        if (!itemIds.length) {
+    deletePersons(personIds) {
+        const ids = asArray(personIds);
+        if (!ids.length) {
             return false;
         }
 
-        const accountsToDelete = [];
-        for (const personId of itemIds) {
-            const person = this.persons.getItem(personId);
-            if (!person) {
-                return false;
-            }
-
-            if (Array.isArray(person.accounts)) {
-                accountsToDelete.push(...person.accounts.map((item) => item.id));
-            }
+        if (!ids.every((id) => this.persons.getItem(id))) {
+            return false;
         }
+
+        const accountsToDelete = ids.flatMap((id) => this.getPersonAccounts(id));
 
         this.rules.deletePersons(ids);
         this.persons.deleteItems(ids);
@@ -561,7 +544,7 @@ export class AppState {
 
     /* eslint-disable no-bitwise */
     showPersons(ids, show = true) {
-        const itemIds = Array.isArray(ids) ? ids : [ids];
+        const itemIds = asArray(ids);
         for (const personId of itemIds) {
             const person = this.persons.getItem(personId);
             if (!person) {
@@ -583,7 +566,7 @@ export class AppState {
 
     getPersonAccounts(personId) {
         const person = this.persons.getItem(personId);
-        if (person && Array.isArray(person.accounts)) {
+        if (Array.isArray(person?.accounts)) {
             return person.accounts.map((item) => item.id);
         }
 
@@ -644,22 +627,20 @@ export class AppState {
         this.personsCache.sortByVisibility();
     }
 
-    getPersonsByIndexes(persons, returnIds = false) {
-        const itemIndexes = Array.isArray(persons) ? persons : [persons];
+    getPersonsByIndexes(indexes, returnIds = false) {
         this.cachePersons();
 
-        return itemIndexes.map((ind) => {
+        return asArray(indexes).map((ind) => {
             const item = this.personsCache.getItemByIndex(ind);
             assert(item, `Invalid person index ${ind}`);
             return (returnIds) ? item.id : item;
         });
     }
 
-    getPersonIndexesByNames(persons) {
-        const names = Array.isArray(persons) ? persons : [persons];
+    getPersonIndexesByNames(names) {
         this.cachePersons();
 
-        return names.map((name) => {
+        return asArray(names).map((name) => {
             const person = this.personsCache.findByName(name);
             assert(person, `Person '${name}' not found`);
 
@@ -916,25 +897,20 @@ export class AppState {
         return true;
     }
 
-    deleteTransactions(ids) {
-        const itemIds = Array.isArray(ids) ? ids : [ids];
-        if (!itemIds.length) {
+    deleteTransactions(transactionIds) {
+        const ids = asArray(transactionIds);
+        if (!ids.length) {
             return false;
         }
 
-        const itemsToDelete = [];
-        for (const transactionId of ids) {
-            const item = this.transactions.getItem(transactionId);
-            if (!item) {
-                return false;
-            }
-
-            itemsToDelete.push(item);
+        const itemsToDelete = ids.map((id) => this.transactions.getItem(id));
+        if (!itemsToDelete.every((item) => !!item)) {
+            return false;
         }
 
         // Prepare expected updates of transactions list
         this.accounts = this.accounts.deleteTransactions(itemsToDelete);
-        this.transactions.deleteItems(itemIds);
+        this.transactions.deleteItems(ids);
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
 
@@ -1103,16 +1079,13 @@ export class AppState {
         return true;
     }
 
-    deleteTemplates(ids) {
-        const itemIds = Array.isArray(ids) ? ids : [ids];
-        if (!itemIds.length) {
+    deleteTemplates(templateIds) {
+        const ids = asArray(templateIds);
+        if (!ids.length) {
             return false;
         }
-
-        for (const itemId of itemIds) {
-            if (!this.templates.getItem(itemId)) {
-                return false;
-            }
+        if (!ids.every((id) => this.templates.getItem(id))) {
+            return false;
         }
 
         this.rules.deleteTemplate(ids);
@@ -1142,7 +1115,7 @@ export class AppState {
 
         return conditions.map((condition) => ({
             ...condition,
-            value: ('value' in condition) ? condition.value.toString() : undefined,
+            value: condition.value?.toString(),
         }));
     }
 
@@ -1151,7 +1124,7 @@ export class AppState {
 
         return actions.map((action) => ({
             ...action,
-            value: ('value' in action) ? action.value.toString() : undefined,
+            value: action.value?.toString(),
         }));
     }
 
@@ -1194,16 +1167,13 @@ export class AppState {
         return true;
     }
 
-    deleteRules(ids) {
-        const itemIds = Array.isArray(ids) ? ids : [ids];
-        if (!itemIds.length) {
+    deleteRules(ruleIds) {
+        const ids = asArray(ruleIds);
+        if (!ids.length) {
             return false;
         }
-
-        for (const itemId of itemIds) {
-            if (!this.rules.getItem(itemId)) {
-                return false;
-            }
+        if (!ids.every((id) => this.rules.getItem(id))) {
+            return false;
         }
 
         this.rules.deleteItems(ids);
