@@ -148,18 +148,8 @@
     font-size: 14px;
   }
 
-  /* Validation */
-  .invalid-feedback {
-    padding: 4px 8px;
-    color: #ff0000;
-  }
-
   .field.invalid-block input,
   .field.invalid-block .dd__combo {
     --input-border-color: #ff0000;
   }
-}
-
-.field.invalid-block .field__title {
-  color: #ff0000;
 }

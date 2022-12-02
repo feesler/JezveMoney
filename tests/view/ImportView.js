@@ -23,6 +23,7 @@ import { ImportTransaction } from '../model/ImportTransaction.js';
 import { ImportTransactionForm } from './component/Import/ImportTransactionForm.js';
 import { ImportTransactionItem } from './component/Import/ImportTransactionItem.js';
 import { Counter } from './component/Counter.js';
+import { checkDate, fixFloat } from '../common.js';
 
 const ITEMS_ON_PAGE = 20;
 const defaultPagination = {
@@ -1038,6 +1039,12 @@ export class ImportView extends AppView {
         return this.rulesDialog.getExpectedRule();
     }
 
+    /** Validate amount value */
+    isValidAmount(value) {
+        const amount = parseFloat(fixFloat(value));
+        return (!Number.isNaN(amount) && amount > 0);
+    }
+
     /**
      * Validate current form if active
      * If invalid form expected, then run action and check expected state
@@ -1060,6 +1067,23 @@ export class ImportView extends AppView {
         this.expectedState.itemsList.items = expectedList.items;
 
         const formModel = this.transactionForm.model;
+        const isExpense = (formModel.type === 'expense');
+        const isDiff = formModel.isDifferent;
+
+        const srcAmount = (!isExpense || isDiff)
+            ? this.isValidAmount(formModel.srcAmount)
+            : true;
+        const destAmount = (isExpense || isDiff)
+            ? this.isValidAmount(formModel.destAmount)
+            : true;
+        const date = checkDate(formModel.date);
+        assert(srcAmount || destAmount || date, 'Invalid state');
+
+        formModel.validation = {
+            srcAmount,
+            destAmount,
+            date,
+        };
         formModel.invalidated = true;
         this.expectedState.transactionForm = ImportTransactionForm.getExpectedState(formModel);
 

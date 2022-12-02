@@ -180,6 +180,12 @@ export class Application {
         blockElem?.classList?.add(INVALID_BLOCK_CLASS);
     }
 
+    /** Set validation state for element */
+    setValidation(elem, valid) {
+        const el = (typeof elem === 'string') ? ge(elem) : elem;
+        el?.classList?.toggle(INVALID_BLOCK_CLASS, !valid);
+    }
+
     /** Create simple container element */
     createContainer(elemClass, children, events) {
         return createElement('div', { props: { className: elemClass }, children, events });

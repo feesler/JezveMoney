@@ -24,6 +24,7 @@ import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 /** CSS classes */
 const POPUP_CLASS = 'import-form-popup';
 const CONTAINER_CLASS = 'import-form';
+const VALIDATION_CLASS = 'validation-block';
 const INV_FEEDBACK_CLASS = 'invalid-feedback';
 const FORM_CONTAINER_CLASS = 'form-container';
 const FORM_COLUMN_CLASS = 'form-rows';
@@ -38,9 +39,8 @@ const AMOUNT_INPUT_CLASS = 'right-align-text';
 /* Fields */
 const TYPE_FIELD_CLASS = 'type-field';
 const ACCOUNT_FIELD_CLASS = 'account-field';
-const AMOUNT_FIELD_CLASS = 'amount-field';
-const SRC_AMOUNT_FIELD_CLASS = 'src-amount-field';
-const DEST_AMOUNT_FIELD_CLASS = 'dest-amount-field';
+const SRC_AMOUNT_FIELD_CLASS = 'amount-field src-amount-field';
+const DEST_AMOUNT_FIELD_CLASS = 'amount-field dest-amount-field';
 const PERSON_FIELD_CLASS = 'person-field';
 const DATE_FIELD_CLASS = 'date-field';
 const COMMENT_FIELD_CLASS = 'comment-field';
@@ -79,6 +79,13 @@ const defaultProps = {
     onCancel: null,
 };
 
+const defaultValidation = {
+    valid: true,
+    sourceAmount: true,
+    destAmount: true,
+    date: true,
+};
+
 /**
  * ImportTransactionForm component
  */
@@ -95,6 +102,9 @@ export class ImportTransactionForm extends ImportTransactionBase {
 
         this.state = {
             ...this.props,
+            validation: {
+                ...defaultValidation,
+            },
         };
 
         this.menuEmptyClickHandler = () => this.hideMenu();
@@ -133,9 +143,6 @@ export class ImportTransactionForm extends ImportTransactionBase {
             ]),
         ]);
 
-        this.feedbackElem = createElement('div', { props: { className: INV_FEEDBACK_CLASS } });
-        show(this.feedbackElem, false);
-
         // Save button
         this.saveBtn = createElement('button', {
             props: {
@@ -165,7 +172,6 @@ export class ImportTransactionForm extends ImportTransactionBase {
 
         this.initContainer(CONTAINER_CLASS, [
             this.formContainer,
-            this.feedbackElem,
             this.formControls,
         ]);
 
@@ -239,6 +245,16 @@ export class ImportTransactionForm extends ImportTransactionBase {
         });
     }
 
+    /** Returns invalid feedback element with specified message */
+    createInvalidFeedback(message) {
+        return createElement('div', {
+            props: {
+                className: INV_FEEDBACK_CLASS,
+                textContent: message,
+            },
+        });
+    }
+
     /** Create source amount field */
     createSourceAmountField() {
         this.srcAmountInp = createElement('input', {
@@ -279,10 +295,12 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.srcAmountGroup = InputGroup.create({
             children: [this.srcAmountInp, this.srcCurrencyBtn],
         });
+        const invalidFeedback = this.createInvalidFeedback(MSG_INCORRECT_AMOUNT);
+
         this.srcAmountField = Field.create({
             title: TITLE_FIELD_AMOUNT,
-            content: this.srcAmountGroup.elem,
-            className: [AMOUNT_FIELD_CLASS, SRC_AMOUNT_FIELD_CLASS],
+            content: [this.srcAmountGroup.elem, invalidFeedback],
+            className: [SRC_AMOUNT_FIELD_CLASS, VALIDATION_CLASS],
         });
     }
 
@@ -325,11 +343,12 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.destAmountGroup = InputGroup.create({
             children: [this.destAmountInp, this.destCurrencyBtn],
         });
+        const invalidFeedback = this.createInvalidFeedback(MSG_INCORRECT_AMOUNT);
 
         this.destAmountField = Field.create({
             title: TITLE_FIELD_DEST_AMOUNT,
-            content: this.destAmountGroup.elem,
-            className: [AMOUNT_FIELD_CLASS, DEST_AMOUNT_FIELD_CLASS],
+            content: [this.destAmountGroup.elem, invalidFeedback],
+            className: [DEST_AMOUNT_FIELD_CLASS, VALIDATION_CLASS],
         });
         this.destAmountField.hide();
     }
@@ -362,10 +381,12 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.dateGroup = InputGroup.create({
             children: [this.dateInp.elem, this.dateBtn],
         });
+        const invalidFeedback = this.createInvalidFeedback(MSG_INVALID_DATE);
+
         this.dateField = Field.create({
             title: TITLE_FIELD_DATE,
-            content: this.dateGroup.elem,
-            className: DATE_FIELD_CLASS,
+            content: [this.dateGroup.elem, invalidFeedback],
+            className: [DATE_FIELD_CLASS, VALIDATION_CLASS],
         });
     }
 
@@ -434,9 +455,8 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setState({
             ...this.state,
             transaction: this.runAction('setTransactionType', type.id),
+            validation: defaultValidation,
         });
-
-        this.clearInvalid();
     }
 
     /** Destination account select 'change' event handler */
@@ -444,9 +464,8 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setState({
             ...this.state,
             transaction: this.runAction('setTransferAccount', account.id),
+            validation: defaultValidation,
         });
-
-        this.clearInvalid();
     }
 
     /** Person select 'change' event handler */
@@ -454,9 +473,8 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setState({
             ...this.state,
             transaction: this.runAction('setPerson', person.id),
+            validation: defaultValidation,
         });
-
-        this.clearInvalid();
     }
 
     /** Source amount field 'input' event handler */
@@ -465,9 +483,8 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setState({
             ...this.state,
             transaction: this.runAction('setSourceAmount', value),
+            validation: defaultValidation,
         });
-
-        this.clearInvalid();
     }
 
     /** Destination amount field 'input' event handler */
@@ -476,8 +493,8 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setState({
             ...this.state,
             transaction: this.runAction('setDestAmount', value),
+            validation: defaultValidation,
         });
-        this.clearInvalid();
     }
 
     /** Currency select 'change' event handler */
@@ -485,9 +502,8 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setState({
             ...this.state,
             transaction: this.runAction('setSourceCurrency', currency.id),
+            validation: defaultValidation,
         });
-
-        this.clearInvalid();
     }
 
     /** Currency select 'change' event handler */
@@ -495,9 +511,8 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setState({
             ...this.state,
             transaction: this.runAction('setDestCurrency', currency.id),
+            validation: defaultValidation,
         });
-
-        this.clearInvalid();
     }
 
     /** Date field 'input' event handler */
@@ -506,9 +521,8 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setState({
             ...this.state,
             transaction: this.runAction('setDate', value),
+            validation: defaultValidation,
         });
-
-        this.clearInvalid();
     }
 
     /** DatePicker select event handler */
@@ -517,10 +531,10 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setState({
             ...this.state,
             transaction: this.runAction('setDate', dateFmt),
+            validation: defaultValidation,
         });
 
         this.datePicker.hide();
-        this.clearInvalid();
     }
 
     /** Comment field 'input' event handler */
@@ -529,50 +543,13 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.setState({
             ...this.state,
             transaction: this.runAction('setComment', value),
+            validation: defaultValidation,
         });
-
-        this.clearInvalid();
     }
 
-    /** Validate transaction object */
-    setFeedback(value) {
-        if (typeof value === 'string' && value.length > 0) {
-            this.feedbackElem.textContent = value;
-            show(this.feedbackElem, true);
-        } else {
-            this.feedbackElem.textContent = '';
-            show(this.feedbackElem, false);
-        }
-    }
-
-    /** Remove all invalidated marks */
-    clearInvalid() {
-        window.app.clearBlockValidation(this.srcAmountField.elem);
-        window.app.clearBlockValidation(this.destAmountField.elem);
-        window.app.clearBlockValidation(this.dateField.elem);
-        this.setFeedback();
-    }
-
-    validateSourceAmount(state) {
-        const amountValue = parseFloat(fixFloat(state.sourceAmount));
-        if (Number.isNaN(amountValue) || amountValue <= 0) {
-            window.app.invalidateBlock(this.srcAmountField.elem);
-            this.setFeedback(MSG_INCORRECT_AMOUNT);
-            return false;
-        }
-
-        return true;
-    }
-
-    validateDestAmount(state) {
-        const amountValue = parseFloat(fixFloat(state.destAmount));
-        if (Number.isNaN(amountValue) || amountValue <= 0) {
-            window.app.invalidateBlock(this.destAmountField.elem);
-            this.setFeedback(MSG_INCORRECT_AMOUNT);
-            return false;
-        }
-
-        return true;
+    validateAmount(value) {
+        const amount = parseFloat(fixFloat(value));
+        return (!Number.isNaN(amount) && amount > 0);
     }
 
     /** Validate transaction object */
@@ -580,38 +557,30 @@ export class ImportTransactionForm extends ImportTransactionBase {
         const { state } = this;
         const isDiff = state.transaction.isDiff();
         const transaction = state.transaction.state;
+        const isExpense = (transaction.type === 'expense');
 
-        if (transaction.type === 'expense') {
-            const destAmountValid = this.validateDestAmount(transaction);
-            if (!destAmountValid) {
-                return false;
-            }
-            if (isDiff) {
-                const srcAmountValid = this.validateSourceAmount(transaction);
-                if (!srcAmountValid) {
-                    return false;
-                }
-            }
-        } else {
-            const srcAmountValid = this.validateSourceAmount(transaction);
-            if (!srcAmountValid) {
-                return false;
-            }
-            if (isDiff) {
-                const destAmountValid = this.validateDestAmount(transaction);
-                if (!destAmountValid) {
-                    return false;
-                }
-            }
+        const sourceAmount = (!isExpense || isDiff)
+            ? this.validateAmount(transaction.sourceAmount)
+            : true;
+        const destAmount = (isExpense || isDiff)
+            ? this.validateAmount(transaction.destAmount)
+            : true;
+        const date = checkDate(transaction.date);
+        const valid = (sourceAmount && destAmount && date);
+
+        if (!valid) {
+            this.setState({
+                ...state,
+                validation: {
+                    sourceAmount,
+                    destAmount,
+                    date,
+                    valid,
+                },
+            });
         }
 
-        if (!checkDate(transaction.date)) {
-            window.app.invalidateBlock(this.dateField.elem);
-            this.setFeedback(MSG_INVALID_DATE);
-            return false;
-        }
-
-        return true;
+        return valid;
     }
 
     onSubmit(e) {
@@ -714,13 +683,17 @@ export class ImportTransactionForm extends ImportTransactionBase {
     }
 
     renderForm(state, prevState) {
-        if (state.transaction === prevState?.transaction) {
+        if (
+            state.transaction === prevState?.transaction
+            && state.validation === prevState?.validation
+        ) {
             return;
         }
 
         const isDiff = state.transaction.isDiff();
         const transaction = state.transaction.state;
 
+        const isExpense = transaction.type === 'expense';
         const isIncome = transaction.type === 'income';
         const isTransfer = ['transferfrom', 'transferto'].includes(transaction.type);
         const isDebt = ['debtfrom', 'debtto'].includes(transaction.type);
@@ -732,81 +705,51 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.typeDropDown.enable(transaction.enabled);
         this.typeDropDown.selectItem(transaction.type);
 
-        // Amount field
-        if (transaction.type === 'expense') {
-            // Destination amount field
-            this.destAmountInp.value = transaction.destAmount;
-            enable(this.destAmountInp, transaction.enabled);
+        // Source amount field
+        const showSrcAmount = (!isExpense || isDiff);
+        const srcAmountLabel = (!isExpense && !isDiff)
+            ? TITLE_FIELD_AMOUNT
+            : TITLE_FIELD_SRC_AMOUNT;
 
-            this.enableDestCurrency(true);
-            this.destCurrencyDropDown.enable(transaction.enabled);
-            this.renderCurrency(
-                this.destCurrencySign,
-                this.destCurrencyDropDown,
-                transaction.destCurrId,
-            );
-            this.destAmountField.show();
+        this.srcAmountField.show(showSrcAmount);
+        this.srcAmountField.setTitle(srcAmountLabel);
+        window.app.setValidation(this.srcAmountField.elem, state.validation.sourceAmount);
 
-            const destAmountLabel = (isDiff)
-                ? TITLE_FIELD_DEST_AMOUNT
-                : TITLE_FIELD_AMOUNT;
-            this.destAmountInp.placeholder = destAmountLabel;
-            this.destAmountField.setTitle(destAmountLabel);
+        enable(this.srcAmountInp, transaction.enabled && showSrcAmount);
+        this.srcAmountInp.value = transaction.sourceAmount;
+        this.srcAmountInp.placeholder = srcAmountLabel;
 
-            // Source amount field
-            this.srcAmountInp.value = transaction.sourceAmount;
-            enable(this.srcAmountInp, transaction.enabled && isDiff);
-
-            this.enableSourceCurrency(false);
-            this.srcCurrencyDropDown.enable(false);
-            this.renderCurrency(
-                this.srcCurrencySign,
-                this.srcCurrencyDropDown,
-                transaction.srcCurrId,
-            );
-            this.srcAmountField.show(isDiff);
-
-            this.srcAmountInp.placeholder = TITLE_FIELD_SRC_AMOUNT;
-            this.srcAmountField.setTitle(TITLE_FIELD_SRC_AMOUNT);
-        } else {
-            // Source amount field
-            this.srcAmountInp.value = transaction.sourceAmount;
-            enable(this.srcAmountInp, transaction.enabled);
-
-            this.enableSourceCurrency(isIncome);
-            this.srcCurrencyDropDown.enable(transaction.enabled && isIncome);
-            this.renderCurrency(
-                this.srcCurrencySign,
-                this.srcCurrencyDropDown,
-                transaction.srcCurrId,
-            );
-            this.srcAmountField.show();
-
-            const srcAmountLabel = (isDiff)
-                ? TITLE_FIELD_SRC_AMOUNT
-                : TITLE_FIELD_AMOUNT;
-            this.srcAmountInp.placeholder = srcAmountLabel;
-            this.srcAmountField.setTitle(srcAmountLabel);
-
-            // Destination amount field
-            this.destAmountInp.value = transaction.destAmount;
-            enable(this.destAmountInp, transaction.enabled && isDiff);
-
-            this.enableDestCurrency(false);
-            this.destCurrencyDropDown.enable(false);
-            this.renderCurrency(
-                this.destCurrencySign,
-                this.destCurrencyDropDown,
-                transaction.destCurrId,
-            );
-            this.destAmountField.show(isDiff);
-
-            this.destAmountInp.placeholder = TITLE_FIELD_DEST_AMOUNT;
-            this.destAmountField.setTitle(TITLE_FIELD_DEST_AMOUNT);
-        }
-
+        this.enableSourceCurrency(isIncome);
+        this.srcCurrencyDropDown.enable(transaction.enabled && isIncome);
         enable(this.srcCurrencyBtn, transaction.enabled);
+        this.renderCurrency(
+            this.srcCurrencySign,
+            this.srcCurrencyDropDown,
+            transaction.srcCurrId,
+        );
+
+        // Destination amount field
+        const showDestAmount = (isExpense || isDiff);
+        const destAmountLabel = (isExpense && !isDiff)
+            ? TITLE_FIELD_AMOUNT
+            : TITLE_FIELD_DEST_AMOUNT;
+
+        this.destAmountField.show(showDestAmount);
+        this.destAmountField.setTitle(destAmountLabel);
+        window.app.setValidation(this.destAmountField.elem, state.validation.destAmount);
+
+        enable(this.destAmountInp, transaction.enabled && showDestAmount);
+        this.destAmountInp.value = transaction.destAmount;
+        this.destAmountInp.placeholder = destAmountLabel;
+
+        this.enableDestCurrency(isExpense);
+        this.destCurrencyDropDown.enable(isExpense && transaction.enabled);
         enable(this.destCurrencyBtn, transaction.enabled);
+        this.renderCurrency(
+            this.destCurrencySign,
+            this.destCurrencyDropDown,
+            transaction.destCurrId,
+        );
 
         // Second account field
         this.transferAccDropDown.enable(transaction.enabled && isTransfer);
@@ -843,6 +786,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
         enable(this.dateBtn, transaction.enabled);
         this.dateInp.enable(transaction.enabled);
         this.dateInp.value = transaction.date;
+        window.app.setValidation(this.dateField.elem, state.validation.date);
 
         // Commend field
         enable(this.commInp, transaction.enabled);
