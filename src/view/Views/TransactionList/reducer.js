@@ -64,6 +64,11 @@ const slice = createSlice({
         (state.loading) ? { ...state, loading: false } : state
     ),
 
+    setRenderTime: (state) => ({
+        ...state,
+        renderTime: Date.now(),
+    }),
+
     clearAllFilters: (state) => ({
         ...state,
         form: {},
@@ -107,7 +112,6 @@ const slice = createSlice({
             form: {
                 ...state.form,
             },
-            typingSearch: true,
         };
 
         if (value.length > 0) {
@@ -140,13 +144,11 @@ const slice = createSlice({
         form: { ...data.filter },
         listMode: 'list',
         contextItem: null,
-        typingSearch: false,
     }),
 
     listRequestError: (state) => ({
         ...state,
         form: { ...state.filter },
-        typingSearch: false,
     }),
 });
 

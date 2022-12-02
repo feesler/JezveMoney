@@ -53,6 +53,10 @@ export class SearchInput extends Component {
     }
 
     set value(val) {
+        if (this.value === val) {
+            return;
+        }
+
         this.setState({ ...this.state, value: val });
     }
 
@@ -119,11 +123,9 @@ export class SearchInput extends Component {
     }
 
     sendChangeEvent() {
-        if (!isFunction(this.props.onChange)) {
-            return;
+        if (isFunction(this.props.onChange)) {
+            this.props.onChange(this.state.value);
         }
-
-        this.props.onChange(this.state.value);
     }
 
     render(state) {

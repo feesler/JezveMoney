@@ -4,9 +4,9 @@ import {
     createElement,
     show,
     insertAfter,
-    throttle,
     asArray,
     setEvents,
+    debounce,
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { DropDown } from 'jezvejs/DropDown';
@@ -54,7 +54,7 @@ const PERSONS_GROUP_TITLE = 'Persons';
 const HIDDEN_ACCOUNTS_GROUP_TITLE = 'Hidden accounts';
 const HIDDEN_PERSONS_GROUP_TITLE = 'Hidden persons';
 
-const SEARCH_THROTTLE = 300;
+const SEARCH_DELAY = 500;
 
 /**
  * List of transactions view
@@ -72,8 +72,8 @@ class TransactionListView extends View {
             loading: false,
             listMode: 'list',
             contextItem: null,
-            typingSearch: false,
             selDateRange: null,
+            renderTime: Date.now(),
         };
 
         window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
@@ -158,10 +158,9 @@ class TransactionListView extends View {
 
         // Search input
         this.searchFilter = ge('searchFilter');
-        this.searchHandler = throttle((val) => this.onSearchInputChange(val), SEARCH_THROTTLE);
         this.searchInput = SearchInput.create({
             placeholder: 'Type to filter',
-            onChange: this.searchHandler,
+            onChange: debounce((val) => this.onSearchInputChange(val), SEARCH_DELAY),
         });
         this.searchFilter.append(this.searchInput.elem);
 
@@ -308,6 +307,7 @@ class TransactionListView extends View {
 
     setListMode(listMode) {
         this.store.dispatch(actions.changeListMode(listMode));
+        this.setRenderTime();
     }
 
     /** Set loading state and render view */
@@ -318,6 +318,11 @@ class TransactionListView extends View {
     /** Remove loading state and render view */
     stopLoading() {
         this.store.dispatch(actions.stopLoading());
+    }
+
+    /** Update render time */
+    setRenderTime() {
+        this.store.dispatch(actions.setRenderTime());
     }
 
     getContextIds() {
@@ -346,6 +351,7 @@ class TransactionListView extends View {
         }
 
         this.stopLoading();
+        this.setRenderTime();
     }
 
     /**
@@ -466,6 +472,7 @@ class TransactionListView extends View {
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
             this.stopLoading();
+            this.setRenderTime();
         }
     }
 
@@ -523,6 +530,7 @@ class TransactionListView extends View {
 
         this.store.dispatch(actions.toggleMode());
         this.replaceHistory();
+        this.setRenderTime();
     }
 
     onItemClick(itemId, e) {
@@ -560,6 +568,7 @@ class TransactionListView extends View {
 
         this.replaceHistory();
         this.stopLoading();
+        this.setRenderTime();
     }
 
     renderContextMenu(state) {
@@ -656,10 +665,7 @@ class TransactionListView extends View {
         this.dateRangeFilter.setData(dateFilter);
 
         // Search form
-        const isSearchFilter = !!state.form.search;
-        if (!state.typingSearch) {
-            this.searchInput.value = (isSearchFilter) ? state.form.search : '';
-        }
+        this.searchInput.value = state.form.search ?? '';
 
         // Render list
         this.list.setState((listState) => ({
@@ -668,7 +674,7 @@ class TransactionListView extends View {
             listMode: state.listMode,
             showControls: (state.listMode === 'list'),
             items: state.items,
-            renderTime: Date.now(),
+            renderTime: state.renderTime,
         }));
 
         // Counters
