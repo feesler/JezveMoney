@@ -1,6 +1,12 @@
-.upload-popup .popup__content-box {
-  max-width: 600px;
-  width: 100%;
+.upload-popup {
+  .popup__content-box {
+    max-width: 600px;
+    width: 100%;
+  }
+
+  .popup__header {
+    margin-bottom: 0;
+  }
 }
 
 .upload-dialog {
@@ -21,6 +27,7 @@
   flex-flow: column nowrap;
   align-items: center;
   row-gap: 12px;
+  padding: 1rem 0;
 }
 
 .upload-form__browser.drag-over {

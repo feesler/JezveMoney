@@ -184,7 +184,13 @@ export class ImportUploadDialog extends TestComponent {
             res.rowNumbers = await this.parseRawDataTableColumn(rowNumbersColumn);
         }
 
-        res.tplFeedback.title = await prop(res.tplFeedback.elem, 'textContent');
+        [
+            res.tplFeedback.title,
+            res.tplFeedback.isValid,
+        ] = await evaluate((feedbackEl) => ([
+            feedbackEl.textContent,
+            feedbackEl.classList.contains('valid-feedback'),
+        ]), res.tplFeedback.elem);
 
         if (res.isLoading) {
             res.state = LOADING_STATE;
@@ -237,6 +243,7 @@ export class ImportUploadDialog extends TestComponent {
         res.state = cont.state;
         res.uploadInProgress = cont.uploadProgress.visible;
         res.isTplLoading = cont.isTplLoading;
+        res.isValid = cont.tplFeedback.isValid;
 
         res.useServerAddress = cont.useServerAddress;
         res.filename = cont.uploadFilename;
@@ -438,6 +445,8 @@ export class ImportUploadDialog extends TestComponent {
             res.tplFeedback = { visible: false };
         }
 
+        res.submitBtn = { visible: model.state === RAW_DATA_STATE && model.isValid };
+
         if ([CREATE_TPL_STATE, UPDATE_TPL_STATE].includes(model.state)) {
             const [rawDataHeader] = this.parent.fileData.slice(0, 1);
             res.columns = rawDataHeader.map(
@@ -546,6 +555,7 @@ export class ImportUploadDialog extends TestComponent {
                     this.model.initialAccount = App.state.accounts.getItem(template.account_id);
                 }
             }
+            this.model.isValid = !!template;
         } else {
             this.model.state = CREATE_TPL_STATE;
             this.model.template = {
@@ -575,6 +585,7 @@ export class ImportUploadDialog extends TestComponent {
         if (template?.account_id) {
             this.model.initialAccount = App.state.accounts.getItem(template.account_id);
         }
+        this.model.isValid = this.isValidTemplate();
         this.expectedState = this.getExpectedState(this.model);
 
         await this.performAction(() => this.content.templateSel.selectItem(val));
@@ -761,14 +772,15 @@ export class ImportUploadDialog extends TestComponent {
         assert(!disabled, 'Submit template button is disabled');
 
         const { template } = this.model;
-        const isValid = this.isValidTemplate(template);
-        if (isValid) {
+        this.model.isValid = this.isValidTemplate(template);
+        if (this.model.isValid) {
             this.model.state = RAW_DATA_STATE;
 
             if (template.account_id) {
                 this.model.initialAccount = App.state.accounts.getItem(template.account_id);
             }
         }
+
         this.expectedState = this.getExpectedState(this.model);
 
         await click(this.content.submitTplBtn.elem);
@@ -832,6 +844,8 @@ export class ImportUploadDialog extends TestComponent {
     }
 
     async submit() {
+        assert(this.content.submitBtn.visible, 'Submit button not visible');
+
         await click(this.content.submitBtn.elem);
         await waitForFunction(async () => {
             await this.parse();

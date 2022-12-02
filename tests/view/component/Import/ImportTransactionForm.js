@@ -211,15 +211,15 @@ export class ImportTransactionForm extends TestComponent {
 
         res.isDifferent = (res.srcCurrId !== res.destCurrId);
 
-        const srcAmount = cont.srcAmountField.invalidated;
-        const destAmount = cont.destAmountField.invalidated;
-        const date = cont.dateField.invalidated;
+        const srcAmount = !cont.srcAmountField.invalidated;
+        const destAmount = !cont.destAmountField.invalidated;
+        const date = !cont.dateField.invalidated;
         res.validation = {
             srcAmount,
             destAmount,
             date,
         };
-        res.invalidated = srcAmount || destAmount || date;
+        res.invalidated = !(srcAmount && destAmount && date);
 
         res.imported = await isVisible(cont.toggleBtn, true);
         if (cont.originalData) {
@@ -234,9 +234,9 @@ export class ImportTransactionForm extends TestComponent {
     cleanValidation(model = this.model) {
         const res = model;
         res.validation = {
-            srcAmount: false,
-            destAmount: false,
-            date: false,
+            srcAmount: true,
+            destAmount: true,
+            date: true,
         };
         res.invalidated = false;
         return res;
@@ -263,7 +263,7 @@ export class ImportTransactionForm extends TestComponent {
                     disabled: !isIncome,
                 },
                 invFeedback: {
-                    visible: showSrcAmount && model.validation.srcAmount,
+                    visible: showSrcAmount && !model.validation.srcAmount,
                 },
             },
             destAmountField: {
@@ -273,7 +273,7 @@ export class ImportTransactionForm extends TestComponent {
                     disabled: !isExpense,
                 },
                 invFeedback: {
-                    visible: showDestAmount && model.validation.destAmount,
+                    visible: showDestAmount && !model.validation.destAmount,
                 },
             },
             transferAccountField: {
@@ -293,7 +293,7 @@ export class ImportTransactionForm extends TestComponent {
                     disabled: false,
                 },
                 invFeedback: {
-                    visible: model.validation.date,
+                    visible: !model.validation.date,
                 },
             },
             commentField: {

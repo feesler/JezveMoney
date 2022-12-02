@@ -1077,13 +1077,14 @@ export class ImportView extends AppView {
             ? this.isValidAmount(formModel.destAmount)
             : true;
         const date = checkDate(formModel.date);
-        assert(srcAmount || destAmount || date, 'Invalid state');
+        assert(!(srcAmount && destAmount && date), 'Invalid state');
 
         formModel.validation = {
             srcAmount,
             destAmount,
             date,
         };
+
         formModel.invalidated = true;
         this.expectedState.transactionForm = ImportTransactionForm.getExpectedState(formModel);
 

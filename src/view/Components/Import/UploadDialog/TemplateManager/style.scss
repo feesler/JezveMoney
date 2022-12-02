@@ -3,11 +3,11 @@
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
+  row-gap: 9px;
 }
 
 /* Uploaded file name */
 .tpl-form__file {
-  margin-bottom: 12px;
   font-size: 14px;
   color: #7b7b7b;
 }
@@ -17,12 +17,14 @@
   display: flex;
   flex-flow: row;
   align-items: baseline;
-  margin: 6px 0;
+  padding: 10px 0;
 
   label {
     font-size: 24px;
     font-weight: 100;
     margin-right: 18px;
+    margin-bottom: 0;
+    margin-left: 0;
   }
 }
 
@@ -30,31 +32,29 @@
 .tpl-form__heading {
   display: flex;
   flex-flow: column nowrap;
+  row-gap: 9px;
 }
 
-/* Raw data table title */
-.tpl-form__title {
-  font-size: 14px;
+/* Raw data table field */
+.raw-data-field {
+  align-items: normal;
 }
 
 /* Template form fields: name, column type & etc. */
 .tpl-form-fields {
   display: flex;
   flex-flow: row wrap;
-  margin: 4px 0;
   column-gap: 18px;
+  row-gap: 9px;
 }
 
 .tpl-form-field {
   display: flex;
   flex-flow: column nowrap;
-  margin-top: 4px;
-  margin-bottom: 4px;
   align-items: baseline;
   row-gap: 5px;
 
   label {
-    font-size: 14px;
     margin-bottom: 0;
   }
 
@@ -63,7 +63,7 @@
   }
 
   .input-group {
-    --ig-height: 34px;
+    --ig-height: var(--input-height);
   }
 }
 
@@ -88,16 +88,13 @@
 }
 
 .tpl-account-field {
-  row-gap: 5px;
+  justify-content: center;
+  min-height: var(--input-height);
 }
 
 /* Validation feedback */
 .validation-block.invalid-block .tpl-name-inp {
   border-color: #ff0000;
-}
-
-.feedback {
-  margin-bottom: 8px;
 }
 
 .feedback.valid-feedback {

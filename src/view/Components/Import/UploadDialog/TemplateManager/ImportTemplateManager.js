@@ -1,12 +1,12 @@
 import {
     ge,
     isFunction,
-    removeChilds,
     copyObject,
     show,
     enable,
     insertAfter,
     Component,
+    re,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { DropDown } from 'jezvejs/DropDown';
@@ -80,7 +80,6 @@ export class ImportTemplateManager extends Component {
         const elemIds = [
             'tplSelectGroup',
             'tplFormTop',
-            'tplFormBottom',
             'tplHeading',
             'tplFilename',
             'tplStateLbl',
@@ -99,7 +98,6 @@ export class ImportTemplateManager extends Component {
             'tplControls',
             'submitTplBtn',
             'cancelTplBtn',
-            'tableDescr',
             'rawDataTable',
             'tplFeedback',
             'initialAccField',
@@ -703,9 +701,7 @@ export class ImportTemplateManager extends Component {
         const isForm = (state.id === TPL_UPDATE_STATE);
         show(this.tplSelectGroup, isRawData);
         show(this.rawDataTable, isForm);
-        show(this.tableDescr, isForm);
         show(this.tplFormTop, isForm);
-        show(this.tplFormBottom, isForm);
         show(this.nameField, isForm);
         show(this.tplAccountField, isForm);
         show(this.columnField, isForm);
@@ -734,7 +730,7 @@ export class ImportTemplateManager extends Component {
             ? this.dataTable.scrollLeft
             : 0;
 
-        removeChilds(this.rawDataTable);
+        re(this.dataTable?.elem);
         if (state.id === TPL_UPDATE_STATE) {
             this.dataTable = RawDataTable.create({
                 data: state.rawData,
@@ -785,6 +781,6 @@ export class ImportTemplateManager extends Component {
         this.accountDropDown.selectItem(state.mainAccount.id);
         show(this.initialAccField, uploadEnabled);
         enable(this.submitUploadedBtn, uploadEnabled);
-        show(this.controlsBlock, uploadEnabled);
+        show(this.uploadControls, uploadEnabled);
     }
 }
