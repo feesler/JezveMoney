@@ -704,20 +704,23 @@ class TransactionListView extends View {
         show(this.selectedCounter, isSelectMode);
         this.selItemsCount.textContent = selected.length;
 
+        // Paginator
+        const range = state.pagination.range ?? 1;
+        const pageNum = state.pagination.page + range - 1;
         if (this.paginator) {
             this.paginator.show(state.items.length > 0);
-            const range = state.pagination.range ?? 1;
             this.paginator.setState((paginatorState) => ({
                 ...paginatorState,
                 url: filterUrl,
                 pagesCount: state.pagination.pagesCount,
-                pageNum: state.pagination.page + range - 1,
+                pageNum,
             }));
         }
 
         show(
             this.showMoreBtn,
-            state.items.length > 0 && state.pagination.page < state.pagination.pagesCount,
+            state.items.length > 0
+            && pageNum < state.pagination.pagesCount,
         );
 
         const isDetails = (state.mode === 'details');

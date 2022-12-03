@@ -181,17 +181,14 @@ export class TransactionListView extends AppView {
         res.filtered = res.data.applyFilter(res.filter);
 
         if (cont.paginator && cont.transList) {
+            const items = cont.transList.getItems();
+            const range = Math.ceil(items.length / App.config.transactionsOnPage);
             res.list = {
-                page: cont.paginator.active,
+                page: cont.paginator.active - range + 1,
                 pages: cont.paginator.pages,
-                items: cont.transList.getItems(),
+                items,
+                range,
             };
-
-            if (res.list.items.length > App.config.transactionsOnPage) {
-                const range = Math.ceil(res.list.items.length / App.config.transactionsOnPage);
-                res.list.range = range;
-                res.list.page -= range - 1;
-            }
 
             res.renderTime = cont.transList.content.renderTime;
         } else {
@@ -199,6 +196,7 @@ export class TransactionListView extends AppView {
                 page: 0,
                 pages: 0,
                 items: [],
+                range: 1,
             };
         }
 
@@ -243,12 +241,14 @@ export class TransactionListView extends AppView {
                 page: 1,
                 pages: res.filtered.expectedPages(),
                 items: TransactionList.render(pageItems.data, App.state),
+                range: 1,
             };
         } else {
             res.list = {
                 page: 0,
                 pages: 0,
                 items: [],
+                range: 1,
             };
         }
 
@@ -307,7 +307,7 @@ export class TransactionListView extends AppView {
 
         res.filtered = res.data.applyFilter(res.filter);
         res.list.page = page;
-        delete res.list.range;
+        res.list.range = 1;
         const pageItems = res.filtered.getPage(page);
         res.list.items = TransactionList.render(pageItems.data, App.state);
 
@@ -322,7 +322,7 @@ export class TransactionListView extends AppView {
     setModelRange(model, range) {
         assert(
             range >= 1
-            && range <= model.list.pages - model.list.page,
+            && range <= model.list.pages - model.list.page + 1,
             `Invalid pages range ${range}`,
         );
 
@@ -364,12 +364,12 @@ export class TransactionListView extends AppView {
         const isAvailable = App.state.accounts.length > 0 || App.state.persons.length > 0;
         const { filtersVisible } = model;
         const selected = this.getSelectedItems(model);
-
         const showSelectItems = (
             isItemsAvailable
             && model.listMenuVisible
             && selectMode
         );
+        const pageNum = this.currentPage(model);
 
         const res = {
             typeMenu: {
@@ -393,7 +393,7 @@ export class TransactionListView extends AppView {
             totalCounter: { visible: true, value: model.filtered.length },
             selectedCounter: { visible: selectMode, value: selected.length },
             modeSelector: { visible: isItemsAvailable },
-            showMoreBtn: { visible: isItemsAvailable && model.list.page < model.list.pages },
+            showMoreBtn: { visible: isItemsAvailable && pageNum < model.list.pages },
             paginator: { visible: isItemsAvailable },
             transList: { visible: true },
             createBtn: { visible: listMode },
@@ -438,7 +438,7 @@ export class TransactionListView extends AppView {
             res.paginator = {
                 ...res.paginator,
                 pages: model.list.pages,
-                active: model.list.page + this.currentRange(model) - 1,
+                active: pageNum,
             };
 
             res.modeSelector.title = (model.detailsMode) ? TITLE_SHOW_MAIN : TITLE_SHOW_DETAILS;
@@ -791,16 +791,16 @@ export class TransactionListView extends AppView {
         return this.toggleMode(directNavigate);
     }
 
-    currentPage() {
-        return (this.content.paginator) ? this.content.paginator.active : 1;
+    currentPage(model = this.model) {
+        return model.list.page + model.list.range - 1;
     }
 
     currentRange(model = this.model) {
-        return model.list?.range ?? 1;
+        return model.list.range;
     }
 
-    pagesCount() {
-        return (this.content.paginator) ? this.content.paginator.pages : 1;
+    pagesCount(model = this.model) {
+        return model.list.pages;
     }
 
     isFirstPage() {

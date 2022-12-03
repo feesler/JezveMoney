@@ -41,6 +41,22 @@ export const goToFirstPage = async (directNavigate = false) => {
     await test('Navigate to first page', () => App.view.goToFirstPage(directNavigate));
 };
 
+export const goToLastPage = async (directNavigate = false) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Navigate to last page', () => App.view.goToLastPage(directNavigate));
+};
+
+export const goToPrevPage = async (directNavigate = false) => {
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    await test('Navigate to previous page', () => App.view.goToPrevPage(directNavigate));
+};
+
 export const goToNextPage = async (directNavigate = false) => {
     if (!directNavigate) {
         await checkNavigation();

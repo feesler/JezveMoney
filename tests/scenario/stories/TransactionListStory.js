@@ -57,6 +57,9 @@ export class TransactionListStory extends TestStory {
             await TransactionListTests.showMore();
             await TransactionListTests.showMore();
             await TransactionListTests.goToNextPage();
+            await TransactionListTests.goToLastPage();
+            await TransactionListTests.goToPrevPage();
+            await TransactionListTests.showMore();
         }
 
         await App.scenario.runner.runGroup(
