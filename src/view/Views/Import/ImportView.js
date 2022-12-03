@@ -825,7 +825,7 @@ class ImportView extends View {
 
         items.selectModeBtn.show(isListMode && hasItems);
         items.sortModeBtn.show(isListMode && state.items.length > 1);
-        show(items.separator2, isListMode);
+        show(items.separator2, isListMode && hasItems);
         show(items.separator3, isListMode);
         show(items.separator4, isListMode);
 
