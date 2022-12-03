@@ -90,12 +90,6 @@
     z-index: var(--import-form-popup-zindex);
   }
 
-  input[type="text"] {
-    display: flex;
-    padding: 5px;
-    height: var(--input-height);
-  }
-
   input[type="button"] {
     width: 30px;
     border: 0 none;

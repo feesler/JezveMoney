@@ -50,8 +50,6 @@ const CALENDAR_ICON_CLASS = 'icon calendar-icon';
 const FORM_CONTROLS_CLASS = 'form-controls';
 const SUBMIT_BUTTON_CLASS = 'btn submit-btn';
 const CANCEL_BUTTON_CLASS = 'btn cancel-btn';
-/* Sort state */
-const SORT_CLASS = 'import-form_sort';
 
 /** Strings */
 const CREATE_TITLE = 'Create transaction';
@@ -699,7 +697,6 @@ export class ImportTransactionForm extends ImportTransactionBase {
         const isDebt = ['debtfrom', 'debtto'].includes(transaction.type);
 
         enable(this.elem, transaction.enabled);
-        this.elem.classList.toggle(SORT_CLASS, transaction.listMode === 'sort');
 
         // Type field
         this.typeDropDown.enable(transaction.enabled);
