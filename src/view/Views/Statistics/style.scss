@@ -1,7 +1,6 @@
 /* Filters */
-.filters-container {
+.filters-list {
   flex-flow: row wrap;
-  column-gap: 24px;
 }
 
 .trans-type-filter {
@@ -28,6 +27,13 @@
 
 .date-range-filter {
   max-width: 400px;
+}
+
+/* Filters inside Collapsible container */
+.filters-collapsible {
+  .submit-btn {
+    display: none;
+  }
 }
 
 /* Statistics view histogram chart */

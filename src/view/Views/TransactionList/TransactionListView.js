@@ -8,7 +8,6 @@ import {
     setEvents,
     debounce,
 } from 'jezvejs';
-import { Collapsible } from 'jezvejs/Collapsible';
 import { DropDown } from 'jezvejs/DropDown';
 import { IconButton } from 'jezvejs/IconButton';
 import { Paginator } from 'jezvejs/Paginator';
@@ -26,11 +25,12 @@ import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/Transa
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
-import './style.scss';
 import { SearchInput } from '../../Components/SearchInput/SearchInput.js';
+import { Heading } from '../../Components/Heading/Heading.js';
+import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
 import { createStore } from '../../js/store.js';
 import { reducer, actions, isSameSelection } from './reducer.js';
-import { Heading } from '../../Components/Heading/Heading.js';
+import './style.scss';
 
 /* Strings */
 const STR_TITLE = 'Transactions';
@@ -92,30 +92,57 @@ class TransactionListView extends View {
      * View initialization
      */
     onStart() {
-        this.heading = Heading.fromElement(ge('heading'), {
+        const elemIds = [
+            'heading',
+            'createBtn',
+            // Filters
+            'filtersBtn',
+            'filtersContainer',
+            'applyFiltersBtn',
+            'clearFiltersBtn',
+            'typeMenu',
+            'accountsFilter',
+            'dateFrm',
+            'searchFilter',
+            // Counters
+            'itemsCount',
+            'selectedCounter',
+            'selItemsCount',
+        ];
+        elemIds.forEach((id) => {
+            this[id] = ge(id);
+            if (!this[id]) {
+                throw new Error('Failed to initialize view');
+            }
+        });
+
+        this.heading = Heading.fromElement(this.heading, {
             title: STR_TITLE,
         });
 
-        const collapse = Collapsible.create({
-            header: [ge('filtershdr')],
-            content: ge('filters'),
-            className: 'filters-collapsible',
+        // Filters
+        this.filtersBtn = IconButton.fromElement(this.filtersBtn, {
+            onClick: () => this.filters.toggle(),
         });
-        ge('filterscollapse').appendChild(collapse.elem);
+        this.filters = FiltersContainer.create({
+            content: this.filtersContainer,
+        });
+        insertAfter(this.filters.elem, this.filtersBtn.elem);
 
-        this.clearAllBtn = ge('clearall_btn');
-        setEvents(this.clearAllBtn, { click: (e) => this.onClearAllFilters(e) });
+        setEvents(this.applyFiltersBtn, { click: () => this.filters.close() });
+        setEvents(this.clearFiltersBtn, { click: (e) => this.onClearAllFilters(e) });
 
-        this.typeMenu = TransactionTypeMenu.fromElement(ge('type_menu'), {
+        // Transaction type filter
+        this.typeMenu = TransactionTypeMenu.fromElement(this.typeMenu, {
             multiple: true,
             allowActiveLink: true,
             itemParam: 'type',
             onChange: (sel) => this.onChangeTypeFilter(sel),
         });
 
-        const accountsFilter = ge('accountsFilter');
+        // Accounts and persons filter
         if (!this.isAvailable()) {
-            show(accountsFilter, false);
+            show(this.accountsFilter, false);
         } else {
             this.accountDropDown = DropDown.create({
                 elem: 'acc_id',
@@ -150,28 +177,23 @@ class TransactionListView extends View {
         }
 
         // Date range filter
-        this.dateRangeFilter = DateRangeInput.fromElement(ge('dateFrm'), {
+        this.dateRangeFilter = DateRangeInput.fromElement(this.dateFrm, {
             startPlaceholder: START_DATE_PLACEHOLDER,
             endPlaceholder: END_DATE_PLACEHOLDER,
             onChange: (data) => this.onChangeDateFilter(data),
         });
 
         // Search input
-        this.searchFilter = ge('searchFilter');
         this.searchInput = SearchInput.create({
             placeholder: 'Type to filter',
             onChange: debounce((val) => this.onSearchInputChange(val), SEARCH_DELAY),
         });
         this.searchFilter.append(this.searchInput.elem);
 
+        // Loading indicator
         this.listContainer = document.querySelector('.list-container');
         this.loadingIndicator = LoadingIndicator.create();
         this.listContainer.append(this.loadingIndicator.elem);
-
-        // Counters
-        this.itemsCount = ge('itemsCount');
-        this.selectedCounter = ge('selectedCounter');
-        this.selItemsCount = ge('selItemsCount');
 
         // List mode selected
         const listHeader = document.querySelector('.list-header');
@@ -211,8 +233,7 @@ class TransactionListView extends View {
         });
         listFooter.append(this.paginator.elem);
 
-        this.createBtn = ge('add_btn');
-
+        // 'Done' button
         this.listModeBtn = IconButton.create({
             id: 'listModeBtn',
             className: 'no-icon',
@@ -396,7 +417,6 @@ class TransactionListView extends View {
      * @param {Event} e - click event object
      */
     onClearAllFilters(e) {
-        e.stopPropagation();
         e.preventDefault();
 
         this.store.dispatch(actions.clearAllFilters());

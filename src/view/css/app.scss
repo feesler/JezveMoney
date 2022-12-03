@@ -164,10 +164,6 @@ label {
 }
 
 .iconbutton.no-icon {
-  .iconbutton__icon {
-    display: none;
-  }
-
   .iconbutton__content {
     padding: 0;
   }
@@ -647,44 +643,18 @@ a.paginator-arrow:focus-visible {
   box-shadow: var(--focus-shadow);
 }
 
+/* Show filters button */
+.iconbutton.filters-btn {
+  width: 150px;
+  justify-content: center;
+  border-radius: var(--action-btn-border-radius);
+
+  .iconbutton__content {
+    padding: 0 5px;
+  }
+}
+
 /* Filters */
-
-/* Horizontal group of filters, on screen smaller 576px become vertical */
-.filters-row {
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: normal;
-  flex-grow: 1;
-  column-gap: 24px;
-  row-gap: 12px;
-}
-
-/* Horizontal group of filters */
-.filters-row_fixed {
-  display: flex;
-  flex-flow: row nowrap;
-  column-gap: 24px;
-  align-items: normal;
-}
-
-.filters-container {
-  display: flex;
-  flex-flow: column nowrap;
-  width: 100%;
-  row-gap: 12px;
-}
-
-.filter-item {
-  flex: 1 1 auto;
-}
-
-.filter-item__title {
-  font-size: 0.8rem;
-  font-weight: 400;
-  margin-bottom: 5px;
-  margin-left: 1px;
-}
-
 .filter-item .link-menu {
   min-height: var(--input-height);
 }
@@ -715,10 +685,6 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d;
 }
 
 @media (min-width: 576px) {
-  .filters-row {
-    flex-flow: row nowrap;
-  }
-
   .paginator-item {
     padding: 0.5rem 0.75rem;
     font-size: 1rem;

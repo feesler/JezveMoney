@@ -4,11 +4,12 @@ import {
     query,
     queryAll,
     prop,
+    click,
     isVisible,
     waitForFunction,
     isObject,
 } from 'jezve-test';
-import { DropDown, LinkMenu } from 'jezvejs-test';
+import { DropDown, LinkMenu, IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import { availTransTypes } from '../model/Transaction.js';
 import { DatePickerFilter } from './component/DatePickerFilter.js';
@@ -29,23 +30,25 @@ export class StatisticsView extends AppView {
     async parseContent() {
         const res = {
             titleEl: await query('.content_wrap > .heading > h1'),
+            filtersBtn: await IconButton.create(this, await query('#filtersBtn')),
+            filtersContainer: { elem: await query('#filtersContainer') },
+            closeFiltersBtn: { elem: await query('#closeFiltersBtn') },
+            typeMenu: await TransactionTypeMenu.create(this, await query('.trtype-menu')),
+            reportMenu: await LinkMenu.create(this, await query('#reportMenu')),
         };
 
         assert(res.titleEl, 'Wrong statistics view structure');
 
-        res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
         res.title = await prop(res.titleEl, 'textContent');
 
-        res.reportMenu = await LinkMenu.create(this, await query('#report_menu'));
-
         res.accountsDropDown = null;
-        const accountsFilter = await query('#acc_block');
-        if (await isVisible(accountsFilter, true)) {
+        const accountsFilter = await query('#accountsFilter');
+        if (await isVisible(accountsFilter)) {
             res.accountsDropDown = await DropDown.createFromChild(this, await query('#acc_id'));
         }
 
         res.currencyDropDown = null;
-        const currencyFilter = await query('#curr_block');
+        const currencyFilter = await query('#currencyFilter');
         if (await isVisible(currencyFilter)) {
             res.currencyDropDown = await DropDown.createFromChild(this, await query('#curr_id'));
         }
@@ -84,8 +87,10 @@ export class StatisticsView extends AppView {
             : [];
     }
 
-    async buildModel(cont) {
-        const res = {};
+    buildModel(cont) {
+        const res = {
+            filtersVisible: cont.filtersContainer.visible,
+        };
 
         const selectedReport = cont.reportMenu.value;
         res.filter = {
@@ -139,22 +144,24 @@ export class StatisticsView extends AppView {
         return groupTypesMap[groupType];
     }
 
-    getExpectedState() {
-        const { byCurrency } = this.model.filter;
+    getExpectedState(model = this.model) {
+        const { filtersVisible } = model;
+        const { byCurrency } = model.filter;
 
         const res = {
             typeMenu: {
-                value: this.model.filter.type,
+                visible: filtersVisible,
+                value: model.filter.type,
             },
             reportMenu: {
-                visible: true,
+                visible: filtersVisible,
                 value: (byCurrency) ? 'currency' : 'account',
             },
             dateFilter: {
-                visible: true,
+                visible: filtersVisible,
                 value: {
-                    startDate: this.model.filter.startDate,
-                    endDate: this.model.filter.endDate,
+                    startDate: model.filter.startDate,
+                    endDate: model.filter.endDate,
                 },
             },
             noDataMessage: {},
@@ -162,16 +169,16 @@ export class StatisticsView extends AppView {
         };
 
         if (byCurrency) {
-            const currency = App.currency.getItem(this.model.filter.curr_id);
+            const currency = App.currency.getItem(model.filter.curr_id);
             res.currencyDropDown = {
-                visible: true,
+                visible: filtersVisible,
                 textValue: currency.name,
             };
         } else {
             res.accountsDropDown = {
-                visible: true,
+                visible: filtersVisible,
                 isMulti: true,
-                selectedItems: this.model.filter.accounts.map(
+                selectedItems: model.filter.accounts.map(
                     (accountId) => ({ id: accountId.toString() }),
                 ),
             };
@@ -179,19 +186,19 @@ export class StatisticsView extends AppView {
 
         // Prepare expected histogram data
         const params = {
-            type: this.model.filter.type,
+            type: model.filter.type,
             report: (byCurrency) ? 'currency' : 'account',
-            group: this.getGroupTypeString(this.model.filter.group),
+            group: this.getGroupTypeString(model.filter.group),
         };
         if (byCurrency) {
-            params.curr_id = this.model.filter.curr_id;
+            params.curr_id = model.filter.curr_id;
         } else {
-            params.acc_id = this.model.filter.accounts;
+            params.acc_id = model.filter.accounts;
         }
 
-        if (this.model.filter.startDate && this.model.filter.endDate) {
-            params.startDate = this.model.filter.startDate;
-            params.endDate = this.model.filter.endDate;
+        if (model.filter.startDate && model.filter.endDate) {
+            params.startDate = model.filter.startDate;
+            params.endDate = model.filter.endDate;
         }
 
         const histogram = App.state.transactions.getStatistics(params);
@@ -248,6 +255,37 @@ export class StatisticsView extends AppView {
         await this.parse();
     }
 
+    async openFilters() {
+        if (this.model.filtersVisible) {
+            return true;
+        }
+
+        this.model.filtersVisible = true;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.filtersBtn.click());
+
+        return this.checkState(expected);
+    }
+
+    async closeFilters() {
+        if (!this.model.filtersVisible) {
+            return true;
+        }
+
+        this.model.filtersVisible = false;
+        const expected = this.getExpectedState();
+
+        const { closeFiltersBtn } = this.content;
+        if (closeFiltersBtn.visible) {
+            await this.performAction(() => click(closeFiltersBtn.elem));
+        } else {
+            await this.performAction(() => this.content.filtersBtn.click());
+        }
+
+        return this.checkState(expected);
+    }
+
     async filterByType(value) {
         const types = asArray(value);
         types.sort();
@@ -255,6 +293,8 @@ export class StatisticsView extends AppView {
         if (this.content.typeMenu.isSameSelected(types)) {
             return true;
         }
+
+        await this.openFilters();
 
         const typesBefore = this.model.filter.type;
         this.model.filter.type = types;
@@ -282,6 +322,8 @@ export class StatisticsView extends AppView {
     }
 
     async byAccounts() {
+        await this.openFilters();
+
         this.model.filter.byCurrency = false;
         delete this.model.filter.curr_id;
 
@@ -295,6 +337,8 @@ export class StatisticsView extends AppView {
     }
 
     async byCurrencies() {
+        await this.openFilters();
+
         this.model.filter.byCurrency = true;
         delete this.model.filter.accounts;
 
@@ -327,6 +371,8 @@ export class StatisticsView extends AppView {
     async filterByAccounts(ids) {
         assert(App.state.accounts.length > 0, 'No accounts available');
 
+        await this.openFilters();
+
         const accounts = asArray(ids);
         this.model.filter.accounts = accounts;
         const expected = this.getExpectedState();
@@ -338,6 +384,8 @@ export class StatisticsView extends AppView {
 
     async selectCurrency(currencyId) {
         assert(this.content.currencyDropDown, 'Currency drop down control not found');
+
+        await this.openFilters();
 
         this.model.filter.curr_id = parseInt(currencyId, 10);
         const expected = this.getExpectedState();
@@ -354,6 +402,8 @@ export class StatisticsView extends AppView {
     }
 
     async groupBy(group) {
+        await this.openFilters();
+
         this.model.filter.group = group;
         const expected = this.getExpectedState();
 
@@ -383,6 +433,8 @@ export class StatisticsView extends AppView {
     }
 
     async selectDateRange(start, end) {
+        await this.openFilters();
+
         this.model.filter.startDate = start;
         this.model.filter.endDate = end;
         const expected = this.getExpectedState();
@@ -395,6 +447,8 @@ export class StatisticsView extends AppView {
     }
 
     async clearDateRange() {
+        await this.openFilters();
+
         this.model.filter.startDate = null;
         this.model.filter.endDate = null;
         const expected = this.getExpectedState();

@@ -32,7 +32,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                             <?php    }    ?>
                             <input id="typeInp" name="type" type="hidden" value="<?= e($tr["type"]) ?>">
                             <?= LinkMenu::render([
-                                "id" => "type_menu",
+                                "id" => "typeMenu",
                                 "classNames" => "trtype-menu",
                                 "items" => $typeMenu,
                             ]) ?>

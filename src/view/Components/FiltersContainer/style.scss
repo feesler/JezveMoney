@@ -1,0 +1,117 @@
+/* Filters container */
+.filters-container {
+  display: flex;
+  flex-flow: column nowrap;
+  width: 100%;
+  row-gap: 12px;
+  background-color: var(--main-bg-color);
+}
+
+/* Filters header */
+.filters-heading {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: baseline;
+  width: 100%;
+
+  .filters-heading__title {
+    margin: 0 30px 0 0;
+    font-size: 26px;
+    font-weight: 300;
+  }
+
+  /* Close button */
+  .close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    background: none;
+    cursor: pointer;
+  }
+
+  .close-icon {
+    height: 18px;
+  }
+}
+
+/* List of filter items */
+.filters-list {
+  display: flex;
+  flex-flow: column nowrap;
+  row-gap: 12px;
+  column-gap: 24px;
+}
+
+/* Filter item */
+.filter-item {
+  flex: 1 1 auto;
+}
+
+.filter-item__title {
+  font-size: 0.8rem;
+  font-weight: 400;
+  margin-bottom: 5px;
+  margin-left: 1px;
+}
+
+/* Horizontal group of filters, on screen smaller 576px become vertical */
+.filters-row {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: normal;
+  flex-grow: 1;
+  column-gap: 24px;
+  row-gap: 12px;
+}
+
+/* Horizontal group of filters */
+.filters-row_fixed {
+  display: flex;
+  flex-flow: row nowrap;
+  column-gap: 24px;
+  align-items: normal;
+}
+
+/* Filters controls */
+.filters-controls {
+  flex-flow: column nowrap;
+  align-items: stretch;
+}
+
+/* Filters inside Collapsible container */
+.filters-collapsible {
+  display: none;
+
+  .collapsible-header,
+  .filters-heading {
+    display: none;
+  }
+}
+
+/* Filters inside Offcanvas */
+.filters-offcanvas {
+  width: 100%;
+
+  .filters-container {
+    padding: 12px;
+  }
+}
+
+@media (min-width: 576px) {
+  .filters-row {
+    flex-flow: row nowrap;
+  }
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .filters-collapsible {
+    display: flex;
+  }
+
+  .filters-controls {
+    flex-flow: row nowrap;
+    align-items: center;
+  }
+}

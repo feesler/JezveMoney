@@ -208,7 +208,7 @@ class TransactionView extends View {
             });
         }
 
-        this.typeMenu = TransactionTypeMenu.fromElement(ge('type_menu'), {
+        this.typeMenu = TransactionTypeMenu.fromElement(ge('typeMenu'), {
             itemParam: 'type',
             onChange: (sel) => this.onChangeType(sel),
         });

@@ -2,11 +2,16 @@
   --main-text-color: #dddddd;
   --hl-text-color: #ffffff;
   --main-bg-color: #202020;
+  --semitrans-bg-color: #20202066;
   --alt-bg-color: #2a2a2a;
 
   /* Header */
   --header-bg-color: #181818;
   --header-hover-btn-bg-color: #303030;
+
+  /* Buttons */
+  --btn-bg: #3c3c3c;
+  --btn-hover-bg: #4a4a4a;
 
   /* Inputs */
   --input-bg-color: #181818;
@@ -194,8 +199,13 @@
   }
 
   /* Filters */
-  .filters-collapsible .collapsible-header {
-    background-color: #2e2e2e;
+  .filters-btn {
+    --iconbtn-background: var(--btn-bg);
+    --iconbtn-hover-background: var(--btn-hover-bg);
+  }
+
+  .filters-offcanvas {
+    --offcanvas-bg: var(--semitrans-bg-color);
   }
 
   .filters-heading label {
@@ -236,7 +246,7 @@
   /* 'Show more' button */
   .show-more-btn {
     color: var(--main-text-color);
-    background-color: #3c3c3c;
+    background-color: var(--btn-bg);
   }
 
   /* Bar chart */
@@ -462,11 +472,7 @@
 
     /* 'Show more' button */
     .show-more-btn:hover {
-      background-color: #4a4a4a;
-    }
-
-    .filters-collapsible .collapsible-header:hover {
-      background-color: #3a3a3a;
+      background-color: var(--btn-hover-bg);
     }
 
     .swap-btn:hover .swap-icon {

@@ -1,11 +1,16 @@
 .white-theme {
   --main-text-color: #000000;
   --main-bg-color: #ffffff;
+  --semitrans-bg-color: #ffffff66;
   --alt-bg-color: #f0f0f0;
 
   /* Header */
   --header-bg-color: #404040;
   --header-hover-btn-bg-color: #606060;
+
+  /* Buttons */
+  --btn-bg: #e8e8e8;
+  --btn-hover-bg: #c9c9c9;
 
   /* Inputs */
   --input-bg-color: #f2f2f2;
@@ -193,8 +198,13 @@
   }
 
   /* Filters */
-  .filters-collapsible .collapsible-header {
-    background-color: var(--alt-bg-color);
+  .filters-btn {
+    --iconbtn-background: var(--btn-bg);
+    --iconbtn-hover-background: var(--btn-hover-bg);
+  }
+
+  .filters-offcanvas {
+    --offcanvas-bg: var(--semitrans-bg-color);
   }
 
   .filters-heading label {
@@ -235,7 +245,7 @@
   /* 'Show more' button */
   .show-more-btn {
     color: var(--main-text-color);
-    background-color: #e8e8e8;
+    background-color: var(--btn-bg);
   }
 
   /* Bar chart */
@@ -463,10 +473,7 @@
     /* 'Show more' button */
     .show-more-btn:hover {
       background-color: #c9c9c9;
-    }
-
-    .filters-collapsible .collapsible-header:hover {
-      background-color: #e8e8e8;
+      background-color: var(--btn-hover-bg);
     }
 
     .swap-btn:hover .swap-icon {
