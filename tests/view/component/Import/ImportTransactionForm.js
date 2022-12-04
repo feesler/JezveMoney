@@ -571,15 +571,17 @@ export class ImportTransactionForm extends TestComponent {
                 this.model.srcAmount = this.model.destAmount;
             }
 
-            let accId = before.destId;
-            if (!accId) {
-                const account = App.state.getFirstAccount();
-                accId = account.id;
+            if (typeBefore !== 'transferto') {
+                let accId = before.destId;
+                if (!accId) {
+                    const account = App.state.getFirstAccount();
+                    accId = account.id;
+                }
+                if (accId === this.model.mainAccount.id) {
+                    accId = App.state.getNextAccount(accId);
+                }
+                this.model.transferAccount = App.state.accounts.getItem(accId);
             }
-            if (accId === this.model.mainAccount.id) {
-                accId = App.state.getNextAccount(accId);
-            }
-            this.model.transferAccount = App.state.accounts.getItem(accId);
 
             this.model.destId = this.model.transferAccount.id;
             this.model.destCurrId = this.model.transferAccount.curr_id;
@@ -591,15 +593,17 @@ export class ImportTransactionForm extends TestComponent {
                 this.model.srcAmount = this.model.destAmount;
             }
 
-            let accId = before.sourceId;
-            if (!accId) {
-                const account = App.state.getFirstAccount();
-                accId = account.id;
+            if (typeBefore !== 'transferfrom') {
+                let accId = before.sourceId;
+                if (!accId) {
+                    const account = App.state.getFirstAccount();
+                    accId = account.id;
+                }
+                if (accId === this.model.mainAccount.id) {
+                    accId = App.state.getNextAccount(accId);
+                }
+                this.model.transferAccount = App.state.accounts.getItem(accId);
             }
-            if (accId === this.model.mainAccount.id) {
-                accId = App.state.getNextAccount(accId);
-            }
-            this.model.transferAccount = App.state.accounts.getItem(accId);
 
             this.model.sourceId = this.model.transferAccount.id;
             this.model.srcCurrId = this.model.transferAccount.curr_id;
@@ -617,9 +621,11 @@ export class ImportTransactionForm extends TestComponent {
                 this.model.sourceId = 0;
             }
 
-            const person = App.state.getFirstPerson();
-            this.model.personId = person.id;
-            this.model.person = person;
+            if (typeBefore !== 'debtfrom' && typeBefore !== 'debtto') {
+                const person = App.state.getFirstPerson();
+                this.model.personId = person.id;
+                this.model.person = person;
+            }
             this.model.srcCurrId = this.model.mainAccount.curr_id;
             this.model.destCurrId = this.model.mainAccount.curr_id;
             this.model.transferAccount = null;

@@ -362,9 +362,14 @@ export class ImportTransaction {
                 state.sourceAmount = this.state.destAmount;
             }
 
-            const account = this.getTransferAccount(state, this.state.destAccountId);
-            state.destAccountId = account.id;
-            state.destCurrId = account.curr_id;
+            if (state.type === 'transferto') {
+                state.destAccountId = this.state.sourceAccountId;
+                state.destCurrId = this.state.srcCurrId;
+            } else {
+                const account = this.getTransferAccount(state, this.state.destAccountId);
+                state.destAccountId = account.id;
+                state.destCurrId = account.curr_id;
+            }
         } else if (value === 'transferto') {
             state.personId = 0;
             // Copy destination amount to source amount
@@ -373,9 +378,14 @@ export class ImportTransaction {
                 state.sourceAmount = this.state.destAmount;
             }
 
-            const account = this.getTransferAccount(state, this.state.sourceAccountId);
-            state.sourceAccountId = account.id;
-            state.srcCurrId = account.curr_id;
+            if (state.type === 'transferfrom') {
+                state.sourceAccountId = this.state.destAccountId;
+                state.srcCurrId = this.state.destCurrId;
+            } else {
+                const account = this.getTransferAccount(state, this.state.sourceAccountId);
+                state.sourceAccountId = account.id;
+                state.srcCurrId = account.curr_id;
+            }
         } else if (value === 'debtfrom' || value === 'debtto') {
             // Copy destination amount to source amount
             // if previous type was expense
