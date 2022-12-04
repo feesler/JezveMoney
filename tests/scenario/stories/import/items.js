@@ -165,17 +165,15 @@ const stateLoop = async () => {
     await ImportTests.updateItemAndSave({
         pos: 0,
         action: [
-            { action: 'changeType', data: 'transferto' },
             { action: 'changeTransferAccount', data: App.scenario.ACC_3 }, // 8-8
         ],
     });
 
-    await ImportTests.changeMainAccount(App.scenario.ACC_3); // for item 0: 8-1
+    await ImportTests.changeMainAccount(App.scenario.ACC_3); // for item 0: 8-8
 
     await ImportTests.updateItemAndSave({
         pos: 0,
         action: [
-            { action: 'changeType', data: 'transferto' }, // 1-6
             { action: 'changeTransferAccount', data: App.scenario.ACC_USD }, // 7-8
             { action: 'changeType', data: 'transferfrom' }, // 8-6
             { action: 'changeType', data: 'debtfrom' }, // 6-9

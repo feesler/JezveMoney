@@ -45,6 +45,8 @@ export class ImportTransaction {
         const res = new ImportTransaction({
             enabled: true,
             similarTransaction: null,
+            rulesApplied: false,
+            modifiedByUser: false,
             mainAccount,
             type: (data.accountAmount < 0) ? 'expense' : 'income',
             date: data.date,
@@ -108,6 +110,35 @@ export class ImportTransaction {
     /** Enable/disable transaction */
     enable(value = true) {
         this.enabled = !!value;
+    }
+
+    setRulesApplied(value) {
+        this.rulesApplied = !!value;
+    }
+
+    setModified(value = true) {
+        this.modifiedByUser = !!value;
+    }
+
+    isChanged(transaction) {
+        const props = [
+            'type',
+            'src_id',
+            'dest_id',
+            'src_curr',
+            'dest_curr',
+            'src_amount',
+            'dest_amount',
+            'person_id',
+            'date',
+            'comment',
+        ];
+
+        return (
+            (transaction)
+                ? props.some((prop) => this[prop] !== transaction[prop])
+                : true
+        );
     }
 
     isSameSimilarTransaction(transaction) {
@@ -419,6 +450,9 @@ export class ImportTransaction {
 
         this.date = this.original.date;
         this.comment = this.original.comment;
+
+        this.rulesApplied = false;
+        this.modifiedByUser = false;
     }
 
     getExpectedTransaction() {

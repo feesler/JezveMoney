@@ -107,9 +107,12 @@ export class ImportRuleList extends List {
 
     applyTo(transaction) {
         this.forEach((rule) => {
-            if (rule.meetConditions(transaction.original)) {
-                rule.runActions(transaction);
+            if (!rule.meetConditions(transaction.original)) {
+                return;
             }
+
+            transaction.setRulesApplied(true);
+            rule.runActions(transaction);
         });
     }
 }

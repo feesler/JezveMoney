@@ -110,7 +110,7 @@ const convertItemDataToProps = (data, state) => {
         res.originalData = { ...data.originalData };
     }
 
-    return { data: res };
+    return res;
 };
 
 /**
@@ -190,11 +190,9 @@ const slice = createSlice({
                 ...data.map((item, index) => {
                     const transaction = mapImportItem(item, state);
                     const props = convertItemDataToProps(transaction, state);
-                    props.data.id = state.lastId + index + 1;
+                    props.id = state.lastId + index + 1;
 
-                    const newItem = new ImportTransaction(props.data);
-                    newItem.state.listMode = state.listMode;
-                    return newItem;
+                    return new ImportTransaction(props);
                 }),
             ],
             lastId: state.lastId + data.length,
@@ -207,7 +205,7 @@ const slice = createSlice({
     similarTransactionsLoaded: (state, transactions) => ({
         ...state,
         items: state.items.map((item) => {
-            if (!item.originalData) {
+            if (!item.originalData || item.modifiedByUser) {
                 return item;
             }
 
@@ -230,7 +228,11 @@ const slice = createSlice({
     disableFindSimilar: (state) => ({
         ...state,
         items: state.items.map((item) => {
-            if (!item.originalData || item.isSameSimilarTransaction(null)) {
+            if (
+                !item.originalData
+                || item.modifiedByUser
+                || item.isSameSimilarTransaction(null)
+            ) {
                 return item;
             }
 
@@ -316,8 +318,7 @@ const slice = createSlice({
         contextItemIndex: -1,
         items: state.items.map((item) => {
             const newItem = new ImportTransaction(item);
-            newItem.state.listMode = listMode;
-            newItem.select(false);
+            newItem.setListMode(listMode);
             return newItem;
         }),
     }),
@@ -391,8 +392,8 @@ const slice = createSlice({
             date: window.app.formatDate(new Date()),
             comment: '',
         };
-        const itemProps = convertItemDataToProps(itemData, state);
-        const form = new ImportTransaction(itemProps.data);
+        const props = convertItemDataToProps(itemData, state);
+        const form = new ImportTransaction(props);
         form.state.listMode = 'list';
 
         return {
@@ -409,6 +410,10 @@ const slice = createSlice({
             savedItem.props.id = state.lastId + 1;
             savedItem.state.id = savedItem.props.id;
         }
+        if (isAppend || savedItem.isChanged(state.items[state.activeItemIndex])) {
+            savedItem.setModified(true);
+        }
+
         const newState = {
             ...state,
             items: (
@@ -479,20 +484,23 @@ const slice = createSlice({
         };
     },
 
-    applyRules: (state, restore) => (
+    applyRules: (state) => (
         (state.rulesEnabled)
             ? {
                 ...state,
                 items: state.items.map((item) => {
-                    if (!item.originalData) {
+                    if (!item.originalData || item.modifiedByUser) {
                         return item;
                     }
 
+                    const { rules } = window.app.model;
                     const newItem = new ImportTransaction(item);
-                    if (restore) {
+
+                    // Restore transaction for case some rules was removed
+                    if (newItem.rulesApplied) {
                         newItem.restoreOriginal();
                     }
-                    window.app.model.rules.applyTo(newItem);
+                    rules.applyTo(newItem);
 
                     return newItem;
                 }),
@@ -505,15 +513,19 @@ const slice = createSlice({
         contextItemIndex: -1,
         rulesEnabled: !state.rulesEnabled,
         items: state.items.map((item) => {
-            if (!item.originalData) {
+            if (!item.originalData || item.modifiedByUser) {
                 return item;
             }
 
+            const { rules } = window.app.model;
+            const enable = !state.rulesEnabled;
             const newItem = new ImportTransaction(item);
-            if (!state.rulesEnabled) {
-                window.app.model.rules.applyTo(newItem);
-            } else {
+
+            if (newItem.rulesApplied) {
                 newItem.restoreOriginal();
+            }
+            if (enable) {
+                rules.applyTo(newItem);
             }
 
             return newItem;

@@ -32,7 +32,11 @@ export class ImportRuleList extends List {
                 return;
             }
 
-            applied = true;
+            if (!applied) {
+                item.setRulesApplied(true);
+                applied = true;
+            }
+
             rule.runActions(item);
         });
 

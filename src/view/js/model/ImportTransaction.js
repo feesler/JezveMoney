@@ -24,6 +24,8 @@ const defaultProps = {
     selected: false,
     listMode: 'list',
     similarTransaction: null,
+    rulesApplied: false,
+    modifiedByUser: false,
     type: 'expense',
     sourceAccountId: 0,
     destAccountId: 0,
@@ -77,10 +79,17 @@ export class ImportTransaction {
         return this.state.originalData;
     }
 
+    get rulesApplied() {
+        return this.state.rulesApplied;
+    }
+
+    get modifiedByUser() {
+        return this.state.modifiedByUser;
+    }
+
     setData(data) {
         const { mainAccount } = data;
         const state = {
-            mainAccount,
             ...data,
         };
         if (state.date == null) {
@@ -184,6 +193,23 @@ export class ImportTransaction {
     }
 
     /**
+     * Changes list mode
+     * @param {string} listMode
+     */
+    setListMode(listMode) {
+        if (this.state.listMode === listMode) {
+            return this.state;
+        }
+
+        const state = copyObject(this.state);
+        state.listMode = listMode;
+        state.selected = false;
+
+        this.state = state;
+        return state;
+    }
+
+    /**
      * Collapse/expand component
      * @param {boolean} val - if true then collapse component, else expand
      */
@@ -198,6 +224,51 @@ export class ImportTransaction {
 
         this.state = state;
         return state;
+    }
+
+    setRulesApplied(value) {
+        const res = !!value;
+        if (this.state.rulesApplied === res) {
+            return this.state;
+        }
+        const state = copyObject(this.state);
+        state.rulesApplied = res;
+
+        this.state = state;
+        return state;
+    }
+
+    setModified(value = true) {
+        const res = !!value;
+        if (this.state.modifiedByUser === res) {
+            return this.state;
+        }
+        const state = copyObject(this.state);
+        state.modifiedByUser = res;
+
+        this.state = state;
+        return state;
+    }
+
+    isChanged(transaction) {
+        const props = [
+            'type',
+            'sourceAccountId',
+            'destAccountId',
+            'srcCurrId',
+            'destCurrId',
+            'sourceAmount',
+            'destAmount',
+            'personId',
+            'date',
+            'comment',
+        ];
+
+        return (
+            (transaction)
+                ? props.some((prop) => this.state[prop] !== transaction.state[prop])
+                : true
+        );
     }
 
     isSameSimilarTransaction(transaction) {
@@ -288,6 +359,8 @@ export class ImportTransaction {
         this.setOriginal(this.data);
 
         this.setMainAccount(currentMainAccount);
+
+        this.setRulesApplied(false);
     }
 
     getTransferAccount(state, initialId) {

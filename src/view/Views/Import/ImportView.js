@@ -317,7 +317,7 @@ class ImportView extends View {
         this.uploadDialog.hide();
 
         this.store.dispatch(actions.uploadFileDone(items));
-        this.applyRules(false);
+        this.applyRules();
 
         const state = this.store.getState();
         if (state.checkSimilarEnabled) {
@@ -550,12 +550,12 @@ class ImportView extends View {
         this.setMainAccount(selected.id);
         this.applyRules();
 
+        const state = this.store.getState();
         if (this.uploadDialog) {
-            const state = this.store.getState();
             this.uploadDialog.setMainAccount(state.mainAccount);
         }
 
-        if (!this.uploadDialog || !this.uploadDialog.isVisible()) {
+        if (state.checkSimilarEnabled && !this.uploadDialog?.isVisible()) {
             this.requestSimilar();
         } else {
             this.setRenderTime();
@@ -666,8 +666,8 @@ class ImportView extends View {
     }
 
     /** Apply rules to imported items */
-    applyRules(restore = true) {
-        this.store.dispatch(actions.applyRules(restore));
+    applyRules() {
+        this.store.dispatch(actions.applyRules());
     }
 
     /** Rules checkbox 'change' event handler */
