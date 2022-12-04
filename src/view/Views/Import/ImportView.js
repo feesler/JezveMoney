@@ -453,12 +453,7 @@ class ImportView extends View {
         this.store.dispatch(actions.deleteAllItems());
     }
 
-    toggleCollapseItem(relIndex) {
-        const index = this.getAbsoluteIndex(relIndex, this.store.getState());
-        if (index === -1) {
-            return;
-        }
-
+    toggleCollapseItem(index) {
         this.store.dispatch(actions.toggleCollapseItem(index));
     }
 
@@ -475,7 +470,9 @@ class ImportView extends View {
     }
 
     onItemClick(id, e) {
-        const index = this.list.getItemIndexById(id);
+        const state = this.store.getState();
+        const relIndex = this.list.getItemIndexById(id);
+        const index = this.getAbsoluteIndex(relIndex, state);
         if (index === -1) {
             return;
         }
@@ -485,7 +482,7 @@ class ImportView extends View {
             return;
         }
 
-        const { listMode } = this.store.getState();
+        const { listMode } = state;
         if (listMode === 'list') {
             if (!e.target.closest('.popup-menu-btn')) {
                 return;
