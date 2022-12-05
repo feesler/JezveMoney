@@ -303,7 +303,16 @@ const pagination = async () => {
     await ImportTests.createItemAndSave(
         { action: 'inputDestAmount', data: '1' },
     );
+    await ImportTests.updateItemAndSave({
+        pos: 21,
+        action: { action: 'inputDestAmount', data: '2' },
+    });
+
+    await ImportTests.toggleSelectItems([21, 22]);
     await ImportTests.goToPrevPage();
+    await ImportTests.toggleSelectItems([11, 12]);
+    await ImportTests.deleteSelectedItems();
+
     await ImportTests.deleteAllItems();
 };
 

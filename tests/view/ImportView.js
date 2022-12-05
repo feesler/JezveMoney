@@ -1239,13 +1239,15 @@ export class ImportView extends AppView {
     }
 
     async toggleSelectItems(index) {
-        await this.setSelectMode();
-
         const indexes = asArray(index);
         assert(indexes.length > 0, 'No items specified');
         assert(this.itemsList, 'No items available');
 
+        await this.setSelectMode();
+
         indexes.forEach((ind) => {
+            this.checkValidIndex(ind);
+
             const item = this.items[ind];
             item.selected = !item.selected;
         });
@@ -1257,7 +1259,8 @@ export class ImportView extends AppView {
 
         for (const ind of indexes) {
             await this.performAction(async () => {
-                const item = this.itemsList.getItem(ind);
+                const pos = this.getPositionByIndex(ind);
+                const item = this.itemsList.getItem(pos.index);
                 await item.toggleSelect();
             });
         }
