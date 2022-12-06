@@ -7,6 +7,9 @@
   --action-btn-border-radius: 6px;
   --focus-shadow: 0 0 0 0.25rem #0d6efd40;
   --input-height: 37px;
+
+  /* Popup menu, Chart popup & etc. */
+  --popup-menu-backdrop-filter: blur(2px);
 }
 
 html,
@@ -479,6 +482,15 @@ label {
 /* Checkboxes list sub-option */
 .suboption {
   margin-left: 29px;
+}
+
+/* Popup menu */
+.popup-menu-list {
+  --popupmenu-border-width: 0;
+  --popupmenu-border-radius: 5px;
+
+  box-shadow: var(--popup-menu-box-shadow);
+  backdrop-filter: var(--popup-menu-backdrop-filter);
 }
 
 /* Popup */

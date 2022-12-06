@@ -46,7 +46,8 @@
   position: absolute;
   border: 0 none;
   border-radius: 5px;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+  box-shadow: var(--popup-menu-box-shadow);
+  backdrop-filter: var(--popup-menu-backdrop-filter);
   padding: 8px;
   white-space: nowrap;
 }

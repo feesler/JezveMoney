@@ -30,6 +30,10 @@
   --list-item-icon-fill: #888888;
   --list-item-hover-icon-fill: #dddddd;
 
+  /* Popup menus */
+  --popup-menu-bg: #202020bb;
+  --popup-menu-box-shadow: 0 0 10px 0 #000000bb;
+
   color: var(--main-text-color);
   background-color: var(--main-bg-color);
 
@@ -295,8 +299,8 @@
   .popup-menu,
   .popup-menu-list {
     --popupmenu-border-color: #444444;
-    --popupmenu-separator-color: #444444;
-    --popupmenu-background: #222222;
+    --popupmenu-separator-color: #2a2a2a;
+    --popupmenu-background: var(--popup-menu-bg);
     --popupmenu-title-color: var(--main-text-color);
     --popupmenu-icon-color: var(--main-text-color);
     --popupmenu-hover-icon-color: #ffffff;
@@ -434,7 +438,7 @@
   }
 
   .chart__popup {
-    background-color: #202020e6;
+    background-color: var(--popup-menu-bg);
     color: var(--main-text-color);
   }
 

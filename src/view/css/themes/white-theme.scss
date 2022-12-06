@@ -29,6 +29,10 @@
   --list-item-icon-fill: #a7a7a7;
   --list-item-hover-icon-fill: #ffffff;
 
+  /* Popup menu */
+  --popup-menu-bg: #ffffffbb;
+  --popup-menu-box-shadow: 0 0 10px 0 #00000080;
+
   color: var(--main-text-color);
   background-color: var(--main-bg-color);
 
@@ -294,8 +298,8 @@
   .popup-menu,
   .popup-menu-list {
     --popupmenu-border-color: #b0b0b0;
-    --popupmenu-separator-color: #b0b0b0;
-    --popupmenu-background: #f2f2f2;
+    --popupmenu-separator-color: #ebebeb;
+    --popupmenu-background: var(--popup-menu-bg);
     --popupmenu-title-color: var(--main-text-color);
     --popupmenu-icon-color: var(--main-text-color);
     --popupmenu-hover-icon-color: #ffffff;
@@ -434,7 +438,7 @@
   }
 
   .chart__popup {
-    background-color: #ffffffe6;
+    background-color: var(--popup-menu-bg);
     color: var(--main-text-color);
   }
 
