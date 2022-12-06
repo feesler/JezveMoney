@@ -381,12 +381,20 @@ label {
   display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
   padding: 12px 0;
+  width: 100%;
 }
 
-.widget .nodata-message {
-  text-align: left;
+.nodata-group {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+
+  .nodata-message {
+    padding: 12px 0 0 0;
+  }
 }
 
 /* Tiles list */

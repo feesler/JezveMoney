@@ -274,14 +274,6 @@
     color: var(--main-text-color);
   }
 
-  /* Tiles list */
-  .tiles,
-  .total-list {
-    .nodata-message {
-      color: var(--main-text-color);
-    }
-  }
-
   /* Swap button */
   .swap-btn:active {
     background-color: #2e2e2e;
