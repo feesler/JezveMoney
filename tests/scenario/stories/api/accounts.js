@@ -3,6 +3,8 @@ import { App } from '../../../Application.js';
 import * as AccountApiTests from '../../../run/api/account.js';
 
 const create = async () => {
+    setBlock('Create accounts', 2);
+
     const { RUB, USD } = App.scenario;
 
     const data = [{
@@ -23,7 +25,21 @@ const create = async () => {
         initbalance: 10.5,
         icon_id: 5,
         flags: 0,
-    }, {
+    }];
+
+    [
+        App.scenario.ACC_RUB,
+        App.scenario.CASH_RUB,
+        App.scenario.ACC_USD,
+    ] = await App.scenario.runner.runGroup(AccountApiTests.create, data);
+};
+
+const createInvalid = async () => {
+    setBlock('Create accounts with invalid data', 2);
+
+    const { USD } = App.scenario;
+
+    const data = [{
         // Try to create account with existing name
         name: 'acc ru',
         curr_id: USD,
@@ -69,15 +85,11 @@ const create = async () => {
         flags: 0,
     }];
 
-    [
-        App.scenario.ACC_RUB,
-        App.scenario.CASH_RUB,
-        App.scenario.ACC_USD,
-    ] = await App.scenario.runner.runGroup(AccountApiTests.create, data);
+    await App.scenario.runner.runGroup(AccountApiTests.create, data);
 };
 
 const createMultiple = async () => {
-    setBlock('Create multiple', 3);
+    setBlock('Create multiple accounts', 2);
 
     const { RUB, USD } = App.scenario;
 
@@ -101,9 +113,19 @@ const createMultiple = async () => {
         flags: 0,
     }];
 
-    await AccountApiTests.createMultiple(data);
+    [
+        App.scenario.ACCOUNT_1,
+        App.scenario.ACCOUNT_2,
+        App.scenario.ACCOUNT_3,
+    ] = await AccountApiTests.createMultiple(data);
+};
 
-    const invData = [
+const createMultipleInvalid = async () => {
+    setBlock('Create multiple accounts with invalid data', 2);
+
+    const { RUB, USD } = App.scenario;
+
+    const data = [
         null,
         [null],
         [null, null],
@@ -128,10 +150,13 @@ const createMultiple = async () => {
             flags: 0,
         }, null],
     ];
-    await App.scenario.runner.runGroup(AccountApiTests.createMultiple, invData);
+
+    await App.scenario.runner.runGroup(AccountApiTests.createMultiple, data);
 };
 
 const update = async () => {
+    setBlock('Update accounts', 2);
+
     const { USD } = App.scenario;
 
     const data = [{
@@ -140,31 +165,57 @@ const update = async () => {
         curr_id: USD,
         initbalance: 101,
         icon_id: 2,
-    }, {
+    }];
+
+    await App.scenario.runner.runGroup(AccountApiTests.update, data);
+};
+
+const updateInvalid = async () => {
+    setBlock('Update accounts with invalid data', 2);
+
+    const data = [{
         // Try to update name of account to an existing one
         id: App.scenario.CASH_RUB,
         name: 'acc rub',
     }];
 
-    return App.scenario.runner.runGroup(AccountApiTests.update, data);
+    await App.scenario.runner.runGroup(AccountApiTests.update, data);
 };
 
 const del = async () => {
+    setBlock('Delete accounts', 2);
+
     const data = [
         [App.scenario.ACC_USD, App.scenario.CASH_RUB],
     ];
 
-    return App.scenario.runner.runGroup(AccountApiTests.del, data);
+    await App.scenario.runner.runGroup(AccountApiTests.del, data);
+};
+
+const delInvalid = async () => {
+    setBlock('Delete accounts with invalid data', 2);
+
+    const data = [
+        null,
+        [],
+        [null, null],
+    ];
+
+    await App.scenario.runner.runGroup(AccountApiTests.del, data);
 };
 
 export const apiAccountsTests = {
     async createTests() {
         await create();
+        await createInvalid();
         await createMultiple();
+        await createMultipleInvalid();
     },
 
     async updateAndDeleteTests() {
         await update();
+        await updateInvalid();
         await del();
+        await delInvalid();
     },
 };

@@ -18,8 +18,8 @@ export class ImportRule {
             this.id = data.id;
         }
 
-        this.conditions = new ImportConditionList(data.conditions);
-        this.actions = new ImportActionList(data.actions);
+        this.conditions = ImportConditionList.create(data.conditions);
+        this.actions = ImportActionList.create(data.actions);
     }
 
     /** Convert ImportRule instance to object */

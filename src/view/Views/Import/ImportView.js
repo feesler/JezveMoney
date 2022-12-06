@@ -1,10 +1,8 @@
 import 'jezvejs/style';
 import {
     ge,
-    re,
     createElement,
     show,
-    removeChilds,
     setEvents,
     enable,
     insertAfter,
@@ -13,10 +11,10 @@ import { DropDown } from 'jezvejs/DropDown';
 import { IconButton } from 'jezvejs/IconButton';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
-import { Sortable } from 'jezvejs/Sortable';
 import { timestampFromString } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { API } from '../../js/api/index.js';
+import { ImportTransactionForm } from '../../Components/Import/TransactionForm/ImportTransactionForm.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
@@ -27,16 +25,11 @@ import { ImportTemplateList } from '../../js/model/ImportTemplateList.js';
 import './style.scss';
 import { ImportUploadDialog } from '../../Components/Import/UploadDialog/Dialog/ImportUploadDialog.js';
 import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from '../../Components/Import/RulesDialog/Dialog/ImportRulesDialog.js';
-import { ImportTransactionForm } from '../../Components/Import/TransactionForm/ImportTransactionForm.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { ImportTransactionItem } from '../../Components/Import/TransactionItem/ImportTransactionItem.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { createStore } from '../../js/store.js';
 import { actions, reducer, getPageIndex } from './reducer.js';
-
-/* CSS classes */
-const SELECT_MODE_CLASS = 'import-list_select';
-const SORT_MODE_CLASS = 'import-list_sort';
+import { ImportTransactionList } from '../../Components/Import/List/ImportTransactionList.js';
 
 /* Strings */
 const STR_TITLE = 'Import';
@@ -44,7 +37,6 @@ const STR_ENABLE_ITEM = 'Enable';
 const STR_DISABLE_ITEM = 'Disable';
 const MSG_IMPORT_SUCCESS = 'All transactions have been successfully imported';
 const MSG_IMPORT_FAIL = 'Fail to import transactions';
-const MSG_NO_TRANSACTIONS = 'No transactions to import';
 /* Other */
 const SUBMIT_LIMIT = 100;
 const SHOW_ON_PAGE = 20;
@@ -63,14 +55,13 @@ class ImportView extends View {
     constructor(...args) {
         super(...args);
 
-        this.transactionRows = [];
-
         const initialState = {
             items: [],
             pagination: {
                 ...defaultPagination,
             },
             form: {},
+            lastId: 0,
             activeItemIndex: -1,
             mainAccount: null,
             rulesEnabled: true,
@@ -109,7 +100,6 @@ class ImportView extends View {
             'enabledCount',
             'selectedCounter',
             'selectedCount',
-            'rowsContainer',
         ];
         elemIds.forEach((id) => {
             this[id] = ge(id);
@@ -122,7 +112,6 @@ class ImportView extends View {
             title: STR_TITLE,
         });
 
-        setEvents(this.rowsContainer, { click: (e) => this.onItemClick(e) });
         setEvents(this.submitBtn, { click: () => this.onSubmitClick() });
 
         this.accountDropDown = DropDown.create({
@@ -147,6 +136,14 @@ class ImportView extends View {
         this.createMenu();
         insertAfter(this.menu.elem, this.listModeBtn.elem);
 
+        // List
+        this.list = ImportTransactionList.create({
+            onItemClick: (...args) => this.onItemClick(...args),
+            onSort: (...args) => this.onTransPosChanged(...args),
+        });
+        const listContainer = document.querySelector('.data-form');
+        listContainer.append(this.list.elem);
+
         // Submit progress indicator
         this.submitProgress = LoadingIndicator.create({ title: 'Saving items...' });
         this.submitProgressIndicator = createElement('div');
@@ -157,18 +154,15 @@ class ImportView extends View {
         }
         contentWrapper.append(this.submitProgress.elem);
 
-        this.noDataMsg = this.rowsContainer.querySelector('.nodata-message');
-
         this.paginator = Paginator.create({
             arrows: true,
             onChange: (page) => this.setPage(page),
         });
-        const listContainer = document.querySelector('.data-form');
         listContainer.append(this.paginator.elem);
 
         // Data loading indicator
         this.loadingInd = LoadingIndicator.create({ fixed: false });
-        this.rowsContainer.append(this.loadingInd.elem);
+        listContainer.append(this.loadingInd.elem);
 
         const selectedAccount = this.accountDropDown.getSelectionData();
         if (!selectedAccount) {
@@ -179,22 +173,6 @@ class ImportView extends View {
 
         this.setMainAccount(selectedAccount.id);
         this.setRenderTime();
-    }
-
-    createSortable(state) {
-        if (state.listMode !== 'sort' || this.listSortable) {
-            return;
-        }
-
-        this.listSortable = new Sortable({
-            oninsertat: (orig, replaced) => this.onTransPosChanged(orig, replaced),
-            elem: 'rowsContainer',
-            group: 'transactions',
-            selector: '.import-item.import-item_sort,.import-form.import-item_sort',
-            placeholderClass: 'import-form__placeholder',
-            copyWidth: true,
-            handles: [{ query: 'div' }, { query: 'label' }],
-        });
     }
 
     createMenu() {
@@ -307,7 +285,10 @@ class ImportView extends View {
 
     /** Update render time data attribute of list container */
     setRenderTime() {
-        this.rowsContainer.dataset.time = Date.now();
+        this.list.setState((listState) => ({
+            ...listState,
+            renderTime: Date.now(),
+        }));
     }
 
     /** Import rules 'update' event handler */
@@ -336,7 +317,7 @@ class ImportView extends View {
         this.uploadDialog.hide();
 
         this.store.dispatch(actions.uploadFileDone(items));
-        this.applyRules(false);
+        this.applyRules();
 
         const state = this.store.getState();
         if (state.checkSimilarEnabled) {
@@ -392,7 +373,10 @@ class ImportView extends View {
      */
     async requestSimilar() {
         const state = this.store.getState();
-        if (!state.checkSimilarEnabled) {
+        if (
+            !state.checkSimilarEnabled
+            || !state.items.some((item) => item.originalData)
+        ) {
             return;
         }
 
@@ -472,14 +456,8 @@ class ImportView extends View {
         this.store.dispatch(actions.deleteAllItems());
     }
 
-    /** Transaction item collapse/expand event handler */
-    onCollapseItem(i, value) {
-        const index = this.getItemIndex(i);
-        if (index === -1) {
-            return;
-        }
-
-        this.store.dispatch(actions.collapseItem({ index, collapsed: value }));
+    toggleCollapseItem(index) {
+        this.store.dispatch(actions.toggleCollapseItem(index));
     }
 
     /** Transaction item enable/disable event handler */
@@ -494,13 +472,20 @@ class ImportView extends View {
         this.store.dispatch(actions.toggleEnableItemByIndex(index));
     }
 
-    onItemClick(e) {
-        const index = this.getItemIndexByElem(e.target);
+    onItemClick(id, e) {
+        const state = this.store.getState();
+        const relIndex = this.list.getItemIndexById(id);
+        const index = this.getAbsoluteIndex(relIndex, state);
         if (index === -1) {
             return;
         }
 
-        const { listMode } = this.store.getState();
+        if (e.target.closest('.toggle-btn')) {
+            this.toggleCollapseItem(index);
+            return;
+        }
+
+        const { listMode } = state;
         if (listMode === 'list') {
             if (!e.target.closest('.popup-menu-btn')) {
                 return;
@@ -565,12 +550,12 @@ class ImportView extends View {
         this.setMainAccount(selected.id);
         this.applyRules();
 
+        const state = this.store.getState();
         if (this.uploadDialog) {
-            const state = this.store.getState();
             this.uploadDialog.setMainAccount(state.mainAccount);
         }
 
-        if (!this.uploadDialog || !this.uploadDialog.isVisible()) {
+        if (state.checkSimilarEnabled && !this.uploadDialog?.isVisible()) {
             this.requestSimilar();
         } else {
             this.setRenderTime();
@@ -681,8 +666,8 @@ class ImportView extends View {
     }
 
     /** Apply rules to imported items */
-    applyRules(restore = true) {
-        this.store.dispatch(actions.applyRules(restore));
+    applyRules() {
+        this.store.dispatch(actions.applyRules());
     }
 
     /** Rules checkbox 'change' event handler */
@@ -739,39 +724,19 @@ class ImportView extends View {
         return firstItemIndex + index;
     }
 
-    /** Returns item index in the list */
-    getItemIndex(item) {
-        const index = this.transactionRows.indexOf(item);
-        return this.getAbsoluteIndex(index, this.store.getState());
-    }
-
-    /**
-     * Search list item by specified element
-     * @param {Element} elem - item root element
-     */
-    getItemIndexByElem(elem) {
-        const itemElem = elem?.closest('.import-item,.import-form');
-        if (!itemElem) {
-            return -1;
-        }
-
-        const index = this.transactionRows.findIndex((item) => (itemElem === item.elem));
-        return this.getAbsoluteIndex(index, this.store.getState());
-    }
-
     /**
      * Transaction reorder handler
-     * @param {Object} original - original item object
-     * @param {Object} replaced - new item object
+     * @param {Object} from - original item index
+     * @param {Object} to - replaced item index
      */
-    onTransPosChanged(original, replaced) {
+    onTransPosChanged(from, to) {
         const state = this.store.getState();
         if (state.items.length < 2) {
             return;
         }
 
-        const fromIndex = this.getItemIndexByElem(original);
-        const toIndex = this.getItemIndexByElem(replaced);
+        const fromIndex = this.getAbsoluteIndex(from, state);
+        const toIndex = this.getAbsoluteIndex(to, state);
         this.store.dispatch(actions.changeItemPosition({ fromIndex, toIndex }));
     }
 
@@ -828,13 +793,14 @@ class ImportView extends View {
             return;
         }
 
-        const listItem = this.transactionRows[pageIndex.index];
+        const item = state.items[index];
+        const listItem = this.list.getListItemById(item.id);
         const menuContainer = listItem?.elem?.querySelector('.popup-menu');
         if (!menuContainer) {
+            this.contextMenu.detach();
             return;
         }
 
-        const item = state.items[index];
         const title = (item.enabled) ? STR_DISABLE_ITEM : STR_ENABLE_ITEM;
         this.contextMenu.items.ctxEnableBtn.setTitle(title);
 
@@ -859,7 +825,7 @@ class ImportView extends View {
 
         items.selectModeBtn.show(isListMode && hasItems);
         items.sortModeBtn.show(isListMode && state.items.length > 1);
-        show(items.separator2, isListMode);
+        show(items.separator2, isListMode && hasItems);
         show(items.separator3, isListMode);
         show(items.separator4, isListMode);
 
@@ -885,36 +851,16 @@ class ImportView extends View {
             return;
         }
 
-        const hasItems = (state.items.length > 0);
-
         const firstItem = this.getAbsoluteIndex(0, state);
         const lastItem = firstItem + state.pagination.onPage;
         const items = state.items.slice(firstItem, lastItem);
 
-        let prevItems = null;
-        if (prevState.items) {
-            const prevFirstItem = this.getAbsoluteIndex(0, prevState);
-            const prevLastItem = prevFirstItem + prevState.pagination.onPage;
-            prevItems = prevState.items.slice(prevFirstItem, prevLastItem);
-        }
-
-        const rows = items.map((item, index) => {
-            // Check item not changed
-            const isSameItem = !!(prevItems && prevItems[index] && prevItems[index] === item);
-            if (isSameItem) {
-                return this.transactionRows[index];
-            }
-
-            return ImportTransactionItem.create({
-                data: item,
-                onCollapse: (i, val) => this.onCollapseItem(i, val),
-            });
-        });
-
-        this.transactionRows = rows;
-
-        removeChilds(this.rowsContainer);
-        this.transactionRows.forEach((item) => this.rowsContainer.append(item.elem));
+        // Render list
+        this.list.setState((listState) => ({
+            ...listState,
+            listMode: state.listMode,
+            items,
+        }));
 
         const showPaginator = state.pagination.pagesCount > 1;
         this.paginator.show(showPaginator);
@@ -925,30 +871,6 @@ class ImportView extends View {
                 pageNum: state.pagination.page,
             }));
         }
-
-        if (hasItems) {
-            re(this.noDataMsg);
-            this.noDataMsg = null;
-        } else {
-            if (!this.noDataMsg) {
-                this.noDataMsg = createElement('span', {
-                    props: {
-                        className: 'nodata-message',
-                        textContent: MSG_NO_TRANSACTIONS,
-                    },
-                });
-            }
-            this.rowsContainer.append(this.noDataMsg);
-        }
-
-        this.createSortable(state);
-
-        if (state.listMode === 'select' || prevState.listMode === 'select') {
-            setTimeout(() => {
-                this.rowsContainer.classList.toggle(SELECT_MODE_CLASS, state.listMode === 'select');
-            });
-        }
-        this.rowsContainer.classList.toggle(SORT_MODE_CLASS, state.listMode === 'sort');
     }
 
     render(state, prevState = {}) {

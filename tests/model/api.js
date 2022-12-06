@@ -3,201 +3,127 @@ import {
     baseUrl,
     httpReq,
     assert,
+    asArray,
 } from 'jezve-test';
 import { urlJoin } from '../common.js';
 import { ApiRequestError } from '../error/ApiRequestError.js';
 
 /* eslint-disable no-console */
 async function apiRequest(method, url, data = null) {
+    assert(method, 'Method not specified');
+    assert(url, 'API method not specified');
+
     const reqUrl = `${baseUrl()}api/${url}`;
     const response = await httpReq(method, reqUrl, data);
     if (response.status !== 200) {
-        console.log(`Invalid status code: ${response.status}`);
-        return false;
+        throw new Error(`Invalid status code: ${response.status}`);
     }
 
-    try {
-        return JSON.parse(response.body);
-    } catch (e) {
-        console.log(response.body);
-        throw e;
+    const apiRes = JSON.parse(response.body);
+    if (apiRes?.result !== 'ok') {
+        const msg = apiRes?.msg ?? 'API request failed';
+        throw new ApiRequestError(msg);
     }
+
+    return apiRes;
 }
 /* eslint-enable no-console */
 
-async function apiGet(method) {
-    assert(method, 'Method not specified');
+const apiGet = (...args) => apiRequest('GET', ...args);
+const apiPost = (...args) => apiRequest('POST', ...args);
 
-    return apiRequest('GET', method);
-}
-
-async function apiPost(method, data = {}) {
-    assert(method, 'Method not specified');
-
-    return apiRequest('POST', method, data);
-}
-
-function idsRequest(base, val) {
+const idsRequest = (base, val) => {
     if (!base) {
         throw new ApiRequestError('Invalid request');
     }
 
-    const ids = Array.isArray(val) ? val : [val];
-    let res = base;
-    if (ids.length === 1) {
-        res += ids[0];
-    } else {
-        res += `?${urlJoin({ id: ids })}`;
-    }
-
-    return res;
-}
+    const ids = asArray(val);
+    return (ids.length === 1)
+        ? `${base}${ids[0]}`
+        : `${base}?${urlJoin({ id: ids })}`;
+};
 
 export const api = {
     currency: {
         async read(ids) {
             const apiReq = idsRequest('currency/', ids);
-            const jsonRes = await apiGet(apiReq);
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to read currency');
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet(apiReq);
+            return data;
         },
 
         async create(options) {
-            const apiRes = await apiPost('currency/create', options);
-            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to create currency');
-            }
-
-            return apiRes.data;
+            const { data } = await apiPost('currency/create', options);
+            return data;
         },
 
-        async createMultiple(data) {
-            const apiRes = await apiPost('currency/createMultiple', data);
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to create currencies');
-            }
-
-            return apiRes.data;
+        async createMultiple(options) {
+            const { data } = await apiPost('currency/createMultiple', options);
+            return data;
         },
 
         async update(options) {
-            const apiRes = await apiPost('currency/update', options);
-            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to update currency');
-            }
-
+            await apiPost('currency/update', options);
             return true;
         },
 
         async del(ids) {
-            const itemIds = Array.isArray(ids) ? ids : [ids];
-            const apiRes = await apiPost('currency/delete', { id: itemIds });
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to delete currency');
-            }
-
+            await apiPost('currency/delete', { id: asArray(ids) });
             return true;
         },
 
         async list() {
-            const reqUrl = 'currency/list';
-            const jsonRes = await apiGet(reqUrl);
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to obtain list of currencies');
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet('currency/list');
+            return data;
         },
     },
 
     icon: {
         async read(ids) {
             const apiReq = idsRequest('icon/', ids);
-            const jsonRes = await apiGet(apiReq);
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to read icons');
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet(apiReq);
+            return data;
         },
 
         async create(options) {
-            const apiRes = await apiPost('icon/create', options);
-            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to create icon');
-            }
-
-            return apiRes.data;
+            const { data } = await apiPost('icon/create', options);
+            return data;
         },
 
-        async createMultiple(data) {
-            const apiRes = await apiPost('icon/createMultiple', data);
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to create persons');
-            }
-
-            return apiRes.data;
+        async createMultiple(options) {
+            const { data } = await apiPost('icon/createMultiple', options);
+            return data;
         },
 
         async update(options) {
-            const apiRes = await apiPost('icon/update', options);
-            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to update icon');
-            }
-
+            await apiPost('icon/update', options);
             return true;
         },
 
         async del(ids) {
-            const itemIds = Array.isArray(ids) ? ids : [ids];
-            const apiRes = await apiPost('icon/delete', { id: itemIds });
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to delete icon');
-            }
-
+            await apiPost('icon/delete', { id: asArray(ids) });
             return true;
         },
 
         async list() {
-            const reqUrl = 'icon/list';
-            const jsonRes = await apiGet(reqUrl);
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to obtain list of icons');
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet('icon/list');
+            return data;
         },
     },
 
     user: {
         // Try to login user and return boolean result
         async login({ login, password }) {
-            const apiRes = await apiPost('login', { login, password });
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to login user');
-            }
-
+            await apiPost('login', { login, password });
             return true;
         },
 
         async logout() {
-            const apiRes = await apiPost('logout');
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to logout user');
-            }
-
+            await apiPost('logout');
             return true;
         },
 
         async register(options) {
-            const apiRes = await apiPost('register', options);
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to register user');
-            }
-
+            await apiPost('register', options);
             return true;
         },
 
@@ -206,53 +132,28 @@ export const api = {
          */
 
         async list() {
-            const reqUrl = 'user/list';
-            const jsonRes = await apiGet(reqUrl);
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                const msg = (jsonRes && jsonRes.msg)
-                    ? jsonRes.msg
-                    : 'Fail to obtain list of users';
-                throw new ApiRequestError(msg);
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet('user/list');
+            return data;
         },
 
         async create(options) {
-            const apiRes = await apiPost('user/create', options);
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to create user');
-            }
-
-            return apiRes.data;
+            const { data } = await apiPost('user/create', options);
+            return data;
         },
 
         async update(options) {
-            const apiRes = await apiPost('user/update', options);
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to update user');
-            }
-
+            await apiPost('user/update', options);
             return true;
         },
 
         async changePassword(id, password) {
-            const apiRes = await apiPost('user/changePassword', { id, password });
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to change password');
-            }
-
+            await apiPost('user/changePassword', { id, password });
             return true;
         },
 
         /** Delete user and all related data */
         async del(ids) {
-            const itemIds = Array.isArray(ids) ? ids : [ids];
-            const apiRes = await apiPost('user/delete', { id: itemIds });
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to delete user');
-            }
-
+            await apiPost('user/delete', { id: asArray(ids) });
             return true;
         },
     },
@@ -260,129 +161,74 @@ export const api = {
     profile: {
         /** Read profile data of current user */
         async read() {
-            const apiRes = await apiGet('profile/read');
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to read user profile data');
-            }
-
-            return apiRes.data;
+            const { data } = await apiGet('profile/read');
+            return data;
         },
 
         async changeName({ name }) {
-            const apiRes = await apiPost('profile/changename', { name });
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to change user name');
-            }
-
+            await apiPost('profile/changename', { name });
             return true;
         },
 
         async changePassword({ oldPassword, newPassword }) {
-            const apiRes = await apiPost('profile/changepass', { current: oldPassword, new: newPassword });
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to change password');
-            }
-
+            await apiPost('profile/changepass', { current: oldPassword, new: newPassword });
             return true;
         },
 
         /** Reset data of current user and return boolean result */
         async resetData(options) {
-            const apiRes = await apiPost('profile/reset', options);
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to reset user data');
-            }
-
+            await apiPost('profile/reset', options);
             return true;
         },
 
         /** Delete current user and all related data */
         async del() {
-            const apiRes = await apiPost('profile/delete');
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to delete user');
-            }
-
+            await apiPost('profile/delete');
             return true;
         },
     },
 
     state: {
         async read() {
-            const jsonRes = await apiGet('state');
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to read state');
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet('state');
+            return data;
         },
     },
 
     account: {
         async read(ids) {
             const apiReq = idsRequest('account/', ids);
-            const jsonRes = await apiGet(apiReq);
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to read account');
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet(apiReq);
+            return data;
         },
 
         async create(options) {
-            const apiRes = await apiPost('account/create', options);
-            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to create account');
-            }
-
-            return apiRes.data;
+            const { data } = await apiPost('account/create', options);
+            return data;
         },
 
-        async createMultiple(data) {
-            const apiRes = await apiPost('account/createMultiple', data);
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to create accounts');
-            }
-
-            return apiRes.data;
+        async createMultiple(options) {
+            const { data } = await apiPost('account/createMultiple', options);
+            return data;
         },
 
         async update(options) {
-            const apiRes = await apiPost('account/update', options);
-            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to update account');
-            }
-
+            await apiPost('account/update', options);
             return true;
         },
 
         async del(ids) {
-            const itemIds = Array.isArray(ids) ? ids : [ids];
-            const apiRes = await apiPost('account/delete', { id: itemIds });
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to delete account');
-            }
-
+            await apiPost('account/delete', { id: asArray(ids) });
             return true;
         },
 
         async show(ids) {
-            const itemIds = Array.isArray(ids) ? ids : [ids];
-            const apiRes = await apiPost('account/show', { id: itemIds });
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to show account');
-            }
-
+            await apiPost('account/show', { id: asArray(ids) });
             return true;
         },
 
         async hide(ids) {
-            const itemIds = Array.isArray(ids) ? ids : [ids];
-            const apiRes = await apiPost('account/hide', { id: itemIds });
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to hide account');
-            }
-
+            await apiPost('account/hide', { id: asArray(ids) });
             return true;
         },
 
@@ -392,138 +238,78 @@ export const api = {
                 reqUrl += '?owner=all';
             }
 
-            const jsonRes = await apiGet(reqUrl);
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to obtain list of accounts');
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet(reqUrl);
+            return data;
         },
     },
 
     person: {
         async read(ids) {
             const apiReq = idsRequest('person/', ids);
-            const jsonRes = await apiGet(apiReq);
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to read person');
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet(apiReq);
+            return data;
         },
 
         async create(options) {
-            const apiRes = await apiPost('person/create', options);
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to create person');
-            }
-
-            return apiRes.data;
+            const { data } = await apiPost('person/create', options);
+            return data;
         },
 
-        async createMultiple(data) {
-            const apiRes = await apiPost('person/createMultiple', data);
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to create persons');
-            }
-
-            return apiRes.data;
+        async createMultiple(options) {
+            const { data } = await apiPost('person/createMultiple', options);
+            return data;
         },
 
         async update(options) {
-            const apiRes = await apiPost('person/update', options);
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to update person');
-            }
-
+            await apiPost('person/update', options);
             return true;
         },
 
         async del(ids) {
-            const itemIds = Array.isArray(ids) ? ids : [ids];
-            const apiRes = await apiPost('person/delete', { id: itemIds });
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to delete person');
-            }
-
+            await apiPost('person/delete', { id: asArray(ids) });
             return true;
         },
 
         async show(ids) {
-            const itemIds = Array.isArray(ids) ? ids : [ids];
-            const apiRes = await apiPost('person/show', { id: itemIds });
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to show person');
-            }
-
+            await apiPost('person/show', { id: asArray(ids) });
             return true;
         },
 
         async hide(ids) {
-            const itemIds = Array.isArray(ids) ? ids : [ids];
-            const apiRes = await apiPost('person/hide', { id: itemIds });
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to hide person');
-            }
-
+            await apiPost('person/hide', { id: asArray(ids) });
             return true;
         },
 
         async list() {
-            const jsonRes = await apiGet('person/list');
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to obtain list of persons');
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet('person/list');
+            return data;
         },
     },
 
     transaction: {
         async read(ids) {
             const apiReq = idsRequest('transaction/', ids);
-            const jsonRes = await apiGet(apiReq);
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to read transaction');
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet(apiReq);
+            return data;
         },
 
         async create(options) {
-            const apiRes = await apiPost('transaction/create', options);
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to create transaction');
-            }
-
-            return apiRes.data;
+            const { data } = await apiPost('transaction/create', options);
+            return data;
         },
 
-        async createMultiple(data) {
-            const apiRes = await apiPost('transaction/createMultiple', data);
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to create transactions');
-            }
-
-            return apiRes.data;
+        async createMultiple(options) {
+            const { data } = await apiPost('transaction/createMultiple', options);
+            return data;
         },
 
         async update(options) {
-            const apiRes = await apiPost('transaction/update', options);
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to update transaction');
-            }
-
+            await apiPost('transaction/update', options);
             return true;
         },
 
         async del(ids) {
-            const itemIds = Array.isArray(ids) ? ids : [ids];
-            const apiRes = await apiPost('transaction/delete', { id: itemIds });
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to delete transaction');
-            }
-
+            await apiPost('transaction/delete', { id: asArray(ids) });
             return true;
         },
 
@@ -534,258 +320,150 @@ export const api = {
             }
 
             const apiReq = `transaction/list?${urlJoin(reqParams)}`;
-            const jsonRes = await apiGet(apiReq);
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to obtain list of transactions');
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet(apiReq);
+            return data;
         },
 
         async setPos(options) {
-            const apiRes = await apiPost('transaction/setpos', options);
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to delete transaction');
-            }
-
+            await apiPost('transaction/setpos', options);
             return true;
         },
 
         async statistics(options = {}) {
             const apiReq = `transaction/statistics?${urlJoin(options)}`;
-            const jsonRes = await apiGet(apiReq);
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to obtain statistics data');
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet(apiReq);
+            return data;
         },
     },
 
     importrule: {
         async read(ids) {
             const apiReq = idsRequest('importrule/', ids);
-            const jsonRes = await apiGet(apiReq);
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to read import rule');
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet(apiReq);
+            return data;
         },
 
         async create(options) {
-            const apiRes = await apiPost('importrule/create', options);
-            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to create import rule');
-            }
-
-            return apiRes.data;
+            const { data } = await apiPost('importrule/create', options);
+            return data;
         },
 
         async update(options) {
-            const apiRes = await apiPost('importrule/update', options);
-            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to update import rule');
-            }
-
+            await apiPost('importrule/update', options);
             return true;
         },
 
         async del(ids) {
-            const itemIds = Array.isArray(ids) ? ids : [ids];
-            const apiRes = await apiPost('importrule/delete', { id: itemIds });
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to delete import rule');
-            }
-
+            await apiPost('importrule/delete', { id: asArray(ids) });
             return true;
         },
 
         async list(params = {}) {
             const reqUrl = `importrule/list?${urlJoin(params)}`;
-            const jsonRes = await apiGet(reqUrl);
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to obtain list of import rules');
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet(reqUrl);
+            return data;
         },
     },
 
     importcondition: {
         async read(ids) {
             const apiReq = idsRequest('importcond/', ids);
-            const jsonRes = await apiGet(apiReq);
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to read import condition(s)');
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet(apiReq);
+            return data;
         },
 
         async create(options) {
-            const apiRes = await apiPost('importcond/create', options);
-            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to create import condition');
-            }
-
-            return apiRes.data;
+            const { data } = await apiPost('importcond/create', options);
+            return data;
         },
 
-        async createMultiple(data) {
-            const apiRes = await apiPost('importcond/createMultiple', data);
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to create import conditions');
-            }
-
-            return apiRes.data;
+        async createMultiple(options) {
+            const { data } = await apiPost('importcond/createMultiple', options);
+            return data;
         },
 
         async update(options) {
-            const apiRes = await apiPost('importcond/update', options);
-            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to update import condition');
-            }
-
+            await apiPost('importcond/update', options);
             return true;
         },
 
         async del(ids) {
-            const itemIds = Array.isArray(ids) ? ids : [ids];
-            const apiRes = await apiPost('importcond/delete', { id: itemIds });
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to delete import condition(s)');
-            }
-
+            await apiPost('importcond/delete', { id: asArray(ids) });
             return true;
         },
 
         async list() {
             const reqUrl = 'importrule/list';
-            const jsonRes = await apiGet(reqUrl);
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to obtain list of import conditions');
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet(reqUrl);
+            return data;
         },
     },
 
     importaction: {
         async read(ids) {
             const apiReq = idsRequest('importaction/', ids);
-            const jsonRes = await apiGet(apiReq);
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to read import action');
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet(apiReq);
+            return data;
         },
 
         async create(options) {
-            const apiRes = await apiPost('importaction/create', options);
-            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to create import action');
-            }
-
-            return apiRes.data;
+            const { data } = await apiPost('importaction/create', options);
+            return data;
         },
 
-        async createMultiple(data) {
-            const apiRes = await apiPost('importaction/createMultiple', data);
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to create import actions');
-            }
-
-            return apiRes.data;
+        async createMultiple(options) {
+            const { data } = await apiPost('importaction/createMultiple', options);
+            return data;
         },
 
         async update(options) {
-            const apiRes = await apiPost('importaction/update', options);
-            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to update import action');
-            }
-
+            await apiPost('importaction/update', options);
             return true;
         },
 
         async del(ids) {
-            const itemIds = Array.isArray(ids) ? ids : [ids];
-            const apiRes = await apiPost('importaction/delete', { id: itemIds });
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to delete import action');
-            }
-
+            await apiPost('importaction/delete', { id: asArray(ids) });
             return true;
         },
 
         async list() {
             const reqUrl = 'importaction/list';
-            const jsonRes = await apiGet(reqUrl);
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to obtain list of import actions');
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet(reqUrl);
+            return data;
         },
     },
 
     importtemplate: {
         async read(ids) {
             const apiReq = idsRequest('importtpl/', ids);
-            const jsonRes = await apiGet(apiReq);
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to read import template');
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet(apiReq);
+            return data;
         },
 
         async create(options) {
-            const apiRes = await apiPost('importtpl/create', options);
-            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to create import template');
-            }
-
-            return apiRes.data;
+            const { data } = await apiPost('importtpl/create', options);
+            return data;
         },
 
-        async createMultiple(data) {
-            const apiRes = await apiPost('importtpl/createMultiple', data);
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to create import templates');
-            }
-
-            return apiRes.data;
+        async createMultiple(options) {
+            const { data } = await apiPost('importtpl/createMultiple', options);
+            return data;
         },
 
         async update(options) {
-            const apiRes = await apiPost('importtpl/update', options);
-            if (!apiRes || !apiRes.result || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to update import template');
-            }
-
+            await apiPost('importtpl/update', options);
             return true;
         },
 
         async del(ids) {
-            const itemIds = Array.isArray(ids) ? ids : [ids];
-            const apiRes = await apiPost('importtpl/delete', { id: itemIds });
-            if (!apiRes || apiRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to delete import template');
-            }
-
+            await apiPost('importtpl/delete', { id: asArray(ids) });
             return true;
         },
 
         async list() {
             const reqUrl = 'importtpl/list';
-            const jsonRes = await apiGet(reqUrl);
-            if (!jsonRes || jsonRes.result !== 'ok') {
-                throw new ApiRequestError('Fail to obtain list of import templates');
-            }
-
-            return jsonRes.data;
+            const { data } = await apiGet(reqUrl);
+            return data;
         },
     },
 };

@@ -5,6 +5,7 @@ import {
     Component,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
+import { Icon } from 'jezvejs/Icon';
 import {
     EXPENSE,
     INCOME,
@@ -217,7 +218,7 @@ export class TransactionListItem extends Component {
     }
 
     createControls() {
-        const { createContainer, createIcon } = window.app;
+        const { createContainer } = window.app;
 
         if (this.controlsElem) {
             return;
@@ -225,7 +226,10 @@ export class TransactionListItem extends Component {
 
         this.menuBtn = createElement('button', {
             props: { className: MENU_BUTTON_CLASS, type: 'button' },
-            children: createIcon('ellipsis', MENU_ICON_CLASS),
+            children: Icon.create({
+                icon: 'ellipsis',
+                className: MENU_ICON_CLASS,
+            }).elem,
         });
         this.menuContainer = createContainer(MENU_CLASS, [
             this.menuBtn,

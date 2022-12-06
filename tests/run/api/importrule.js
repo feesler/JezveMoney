@@ -1,7 +1,6 @@
 import { test, copyObject } from 'jezve-test';
 import { api } from '../../model/api.js';
 import { ApiRequestError } from '../../error/ApiRequestError.js';
-import { formatProps } from '../../common.js';
 import { App } from '../../Application.js';
 
 /**
@@ -14,7 +13,7 @@ import { App } from '../../Application.js';
 export const create = async (params) => {
     let result = 0;
 
-    await test(`Create import rule (${formatProps(params)})`, async () => {
+    await test('Create import rule', async () => {
         const resExpected = App.state.createRule(params);
 
         let createRes;
@@ -45,7 +44,7 @@ export const update = async (params) => {
     let result = false;
     const props = copyObject(params);
 
-    await test(`Update import rule (${formatProps(props)})`, async () => {
+    await test('Update import rule', async () => {
         const resExpected = App.state.updateRule(props);
         let updParams = {};
 

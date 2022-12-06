@@ -1,12 +1,12 @@
 import {
     ge,
     isFunction,
-    removeChilds,
     copyObject,
     show,
     enable,
     insertAfter,
     Component,
+    re,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { DropDown } from 'jezvejs/DropDown';
@@ -77,62 +77,40 @@ export class ImportTemplateManager extends Component {
             elem: 'columnSel',
         });
 
-        this.tplHeading = ge('tplHeading');
-        this.tplFilename = ge('tplFilename');
-        this.tplStateLbl = ge('tplStateLbl');
-        this.tplField = ge('tplField');
-        this.nameField = ge('nameField');
-        this.tplNameInp = ge('tplNameInp');
-        this.firstRowField = ge('firstRowField');
-        this.firstRowInp = ge('firstRowInp');
-        this.decFirstRowBtn = ge('decFirstRowBtn');
-        this.incFirstRowBtn = ge('incFirstRowBtn');
-        this.tplAccountField = ge('tplAccountField');
-        this.createTplBtn = ge('createTplBtn');
-        this.updateTplBtn = ge('updateTplBtn');
-        this.deleteTplBtn = ge('deleteTplBtn');
-        this.columnField = ge('columnField');
-        this.tplControls = ge('tplControls');
-        this.submitTplBtn = ge('submitTplBtn');
-        this.cancelTplBtn = ge('cancelTplBtn');
-        this.tableDescr = ge('tableDescr');
-        this.rawDataTable = ge('rawDataTable');
-        this.tplFeedback = ge('tplFeedback');
-        this.initialAccField = ge('initialAccField');
-        this.controlsBlock = ge('uploadControls');
-        this.submitUploadedBtn = ge('submitUploadedBtn');
-        this.convertFeedback = ge('convertFeedback');
-        if (
-            !this.tplHeading
-            || !this.tplFilename
-            || !this.tplStateLbl
-            || !this.templateDropDown
-            || !this.tplField
-            || !this.nameField
-            || !this.tplNameInp
-            || !this.firstRowField
-            || !this.firstRowInp
-            || !this.decFirstRowBtn
-            || !this.incFirstRowBtn
-            || !this.tplAccountField
-            || !this.createTplBtn
-            || !this.updateTplBtn
-            || !this.deleteTplBtn
-            || !this.columnField
-            || !this.columnDropDown
-            || !this.tplControls
-            || !this.submitTplBtn
-            || !this.cancelTplBtn
-            || !this.tableDescr
-            || !this.rawDataTable
-            || !this.tplFeedback
-            || !this.initialAccField
-            || !this.controlsBlock
-            || !this.submitUploadedBtn
-            || !this.convertFeedback
-        ) {
-            throw new Error('Failed to initialize upload file dialog');
-        }
+        const elemIds = [
+            'tplSelectGroup',
+            'tplFormTop',
+            'tplHeading',
+            'tplFilename',
+            'tplStateLbl',
+            'tplField',
+            'nameField',
+            'tplNameInp',
+            'firstRowField',
+            'firstRowInp',
+            'decFirstRowBtn',
+            'incFirstRowBtn',
+            'tplAccountField',
+            'createTplBtn',
+            'updateTplBtn',
+            'deleteTplBtn',
+            'columnField',
+            'tplControls',
+            'submitTplBtn',
+            'cancelTplBtn',
+            'rawDataTable',
+            'tplFeedback',
+            'initialAccField',
+            'uploadControls',
+            'submitUploadedBtn',
+            'convertFeedback',
+        ];
+        elemIds.forEach((id) => {
+            this[id] = ge(id);
+            if (!this[id]) {
+                throw new Error('Failed to initialize upload file dialog');
+            }
+        });
 
         // Main account
         this.accountDropDown = DropDown.create({
@@ -692,10 +670,7 @@ export class ImportTemplateManager extends Component {
         const templateAvail = (window.app.model.templates.length > 0);
         if (state.id === LOADING_STATE) {
             this.loadingIndicator.show();
-            show(this.tableDescr, false);
-            show(this.rawDataTable, false);
             show(this.convertFeedback, false);
-            show(this.tplControls, false);
         } else if (state.id === RAW_DATA_STATE) {
             show(this.tplField, templateAvail);
             show(this.noTplLabel, !templateAvail);
@@ -703,17 +678,10 @@ export class ImportTemplateManager extends Component {
             this.tplStateLbl.textContent = TITLE_TEMPLATE;
 
             this.loadingIndicator.hide();
-            show(this.tableDescr, false);
-            show(this.rawDataTable, false);
-            show(this.nameField, false);
             window.app.clearBlockValidation(this.nameField);
-            show(this.columnField, false);
-            show(this.firstRowField, false);
-            show(this.tplAccountField, false);
             show(this.createTplBtn, templateAvail);
             show(this.updateTplBtn, !!state.template);
             show(this.deleteTplBtn, !!state.template);
-            show(this.tplControls, false);
         } else if (state.id === TPL_UPDATE_STATE) {
             this.tplStateLbl.textContent = (state.template && state.template.id)
                 ? TITLE_UPDATE_TEMPLATE
@@ -722,19 +690,23 @@ export class ImportTemplateManager extends Component {
             show(this.noTplLabel, false);
             show(this.tplHeading, true);
             this.loadingIndicator.hide();
-            show(this.tableDescr, true);
-            show(this.rawDataTable, true);
             show(this.tplField, false);
-            show(this.nameField, true);
-            show(this.columnField, true);
-            show(this.firstRowField, true);
-            show(this.tplAccountField, true);
             show(this.createTplBtn, false);
             show(this.updateTplBtn, false);
             show(this.deleteTplBtn, false);
-            show(this.tplControls, true);
             show(this.cancelTplBtn, templateAvail);
         }
+
+        const isRawData = (state.id === RAW_DATA_STATE);
+        const isForm = (state.id === TPL_UPDATE_STATE);
+        show(this.tplSelectGroup, isRawData);
+        show(this.rawDataTable, isForm);
+        show(this.tplFormTop, isForm);
+        show(this.nameField, isForm);
+        show(this.tplAccountField, isForm);
+        show(this.columnField, isForm);
+        show(this.firstRowField, isForm);
+        show(this.tplControls, isForm);
 
         this.templateDropDown.enable(!state.listLoading);
         this.columnDropDown.enable(!state.listLoading);
@@ -758,7 +730,7 @@ export class ImportTemplateManager extends Component {
             ? this.dataTable.scrollLeft
             : 0;
 
-        removeChilds(this.rawDataTable);
+        re(this.dataTable?.elem);
         if (state.id === TPL_UPDATE_STATE) {
             this.dataTable = RawDataTable.create({
                 data: state.rawData,
@@ -809,6 +781,6 @@ export class ImportTemplateManager extends Component {
         this.accountDropDown.selectItem(state.mainAccount.id);
         show(this.initialAccField, uploadEnabled);
         enable(this.submitUploadedBtn, uploadEnabled);
-        show(this.controlsBlock, uploadEnabled);
+        show(this.uploadControls, uploadEnabled);
     }
 }

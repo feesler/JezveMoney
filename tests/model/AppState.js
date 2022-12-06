@@ -3,6 +3,7 @@ import {
     isInt,
     copyObject,
     assert,
+    asArray,
 } from 'jezve-test';
 import {
     checkDate,
@@ -16,12 +17,12 @@ import {
     TRANSFER,
 } from './Transaction.js';
 import { App } from '../Application.js';
-import { List } from './List.js';
 import { ImportRule } from './ImportRule.js';
 import { ACCOUNT_HIDDEN, AccountsList } from './AccountsList.js';
 import { PERSON_HIDDEN, PersonsList } from './PersonsList.js';
 import { TransactionsList } from './TransactionsList.js';
 import { ImportRuleList } from './ImportRuleList.js';
+import { ImportTemplateList } from './ImportTemplateList.js';
 import { api } from './api.js';
 
 /**
@@ -42,8 +43,20 @@ const trReqFields = ['type', 'src_id', 'dest_id', 'src_amount', 'dest_amount', '
 /**
  * Import templates
  */
-const tplReqFields = ['name', 'type_id', 'account_id', 'first_row', 'columns'];
-const tplReqColumns = ['accountAmount', 'transactionAmount', 'accountCurrency', 'transactionCurrency', 'date', 'comment'];
+const tplReqFields = [
+    'name',
+    'type_id',
+    'account_id',
+    'first_row',
+];
+const tplReqColumns = {
+    account_amount_col: 'accountAmount',
+    account_curr_col: 'accountCurrency',
+    trans_amount_col: 'transactionAmount',
+    trans_curr_col: 'transactionCurrency',
+    date_col: 'date',
+    comment_col: 'comment',
+};
 
 /**
  * Import rules
@@ -100,33 +113,33 @@ export class AppState {
 
     setState(state) {
         if (!this.accounts) {
-            this.accounts = new AccountsList();
+            this.accounts = AccountsList.create();
         }
         this.accounts.setData(state.accounts.data);
         this.accounts.autoincrement = state.accounts.autoincrement;
         this.userAccountsCache = null;
 
         if (!this.persons) {
-            this.persons = new PersonsList();
+            this.persons = PersonsList.create();
         }
         this.persons.setData(state.persons.data);
         this.persons.autoincrement = state.persons.autoincrement;
         this.personsCache = null;
 
         if (!this.transactions) {
-            this.transactions = new TransactionsList();
+            this.transactions = TransactionsList.create();
         }
         this.transactions.setData(state.transactions.data);
         this.transactions.autoincrement = state.transactions.autoincrement;
 
         if (!this.templates) {
-            this.templates = new List();
+            this.templates = ImportTemplateList.create();
         }
         this.templates.setData(state.templates.data);
         this.templates.autoincrement = state.templates.autoincrement;
 
         if (!this.rules) {
-            this.rules = new ImportRuleList();
+            this.rules = ImportRuleList.create();
         }
         this.rules.setData(state.rules.data);
         this.rules.autoincrement = state.rules.autoincrement;
@@ -160,11 +173,26 @@ export class AppState {
     }
 
     meetExpectation(expected) {
+        assert(this.accounts.length === expected.accounts.length);
         assert.deepMeet(this.accounts.data, expected.accounts.data);
+
+        assert(this.transactions.length === expected.transactions.length);
         assert.deepMeet(this.transactions.data, expected.transactions.data);
+
+        assert(this.persons.length === expected.persons.length);
         assert.deepMeet(this.persons.data, expected.persons.data);
+
+        assert(this.templates.length === expected.templates.length);
         assert.deepMeet(this.templates.data, expected.templates.data);
-        assert.deepMeet(this.rules.data, expected.rules.data);
+
+        assert(this.rules.length === expected.rules.length);
+        this.rules.forEach((rule, index) => {
+            const expectedRule = expected.rules.data[index];
+            assert(rule.conditions.data.length === expectedRule.conditions.data.length);
+            assert(rule.actions.data.length === expectedRule.actions.data.length);
+            assert.deepMeet(rule, expectedRule);
+        });
+
         assert.deepMeet(this.profile, expected.profile);
 
         return true;
@@ -320,21 +348,18 @@ export class AppState {
         return true;
     }
 
-    deleteAccounts(ids) {
-        let itemIds = Array.isArray(ids) ? ids : [ids];
-        if (!itemIds.length) {
+    deleteAccounts(accountIds) {
+        const ids = asArray(accountIds).map((id) => parseInt(id, 10));
+        if (!ids.length) {
+            return false;
+        }
+        if (!ids.every((id) => this.accounts.getItem(id))) {
             return false;
         }
 
-        itemIds = itemIds.map((id) => parseInt(id, 10));
-        for (const accountId of itemIds) {
-            if (!this.accounts.getItem(accountId)) {
-                return false;
-            }
-        }
-
-        this.rules.deleteAccounts(itemIds);
-        this.transactions = this.transactions.deleteAccounts(this.accounts.data, itemIds);
+        this.rules.deleteAccounts(ids);
+        this.templates.deleteAccounts(ids);
+        this.transactions = this.transactions.deleteAccounts(this.accounts.data, ids);
 
         // Prepare expected updates of accounts list
         this.accounts.deleteItems(ids);
@@ -347,7 +372,7 @@ export class AppState {
 
     /* eslint-disable no-bitwise */
     showAccounts(ids, show = true) {
-        const itemIds = Array.isArray(ids) ? ids : [ids];
+        const itemIds = asArray(ids);
 
         for (const accountId of itemIds) {
             const account = this.accounts.getItem(accountId);
@@ -382,22 +407,20 @@ export class AppState {
         return this.userAccountsCache;
     }
 
-    getAccountsByIndexes(accounts, returnIds = false) {
-        const itemIndexes = Array.isArray(accounts) ? accounts : [accounts];
+    getAccountsByIndexes(indexes, returnIds = false) {
         this.cacheUserAccounts();
 
-        return itemIndexes.map((ind) => {
+        return asArray(indexes).map((ind) => {
             const item = this.userAccountsCache.getItemByIndex(ind);
             assert(item, `Invalid account index ${ind}`);
             return (returnIds) ? item.id : item;
         });
     }
 
-    getAccountIndexesByNames(accounts) {
-        const accNames = Array.isArray(accounts) ? accounts : [accounts];
+    getAccountIndexesByNames(names) {
         this.cacheUserAccounts();
 
-        return accNames.map((name) => {
+        return asArray(names).map((name) => {
             const acc = this.userAccountsCache.findByName(name);
             assert(acc, `Account '${name}' not found`);
 
@@ -496,23 +519,17 @@ export class AppState {
         return true;
     }
 
-    deletePersons(ids) {
-        const itemIds = Array.isArray(ids) ? ids : [ids];
-        if (!itemIds.length) {
+    deletePersons(personIds) {
+        const ids = asArray(personIds);
+        if (!ids.length) {
             return false;
         }
 
-        const accountsToDelete = [];
-        for (const personId of itemIds) {
-            const person = this.persons.getItem(personId);
-            if (!person) {
-                return false;
-            }
-
-            if (Array.isArray(person.accounts)) {
-                accountsToDelete.push(...person.accounts.map((item) => item.id));
-            }
+        if (!ids.every((id) => this.persons.getItem(id))) {
+            return false;
         }
+
+        const accountsToDelete = ids.flatMap((id) => this.getPersonAccounts(id));
 
         this.rules.deletePersons(ids);
         this.persons.deleteItems(ids);
@@ -527,7 +544,7 @@ export class AppState {
 
     /* eslint-disable no-bitwise */
     showPersons(ids, show = true) {
-        const itemIds = Array.isArray(ids) ? ids : [ids];
+        const itemIds = asArray(ids);
         for (const personId of itemIds) {
             const person = this.persons.getItem(personId);
             if (!person) {
@@ -549,7 +566,7 @@ export class AppState {
 
     getPersonAccounts(personId) {
         const person = this.persons.getItem(personId);
-        if (person && Array.isArray(person.accounts)) {
+        if (Array.isArray(person?.accounts)) {
             return person.accounts.map((item) => item.id);
         }
 
@@ -610,22 +627,20 @@ export class AppState {
         this.personsCache.sortByVisibility();
     }
 
-    getPersonsByIndexes(persons, returnIds = false) {
-        const itemIndexes = Array.isArray(persons) ? persons : [persons];
+    getPersonsByIndexes(indexes, returnIds = false) {
         this.cachePersons();
 
-        return itemIndexes.map((ind) => {
+        return asArray(indexes).map((ind) => {
             const item = this.personsCache.getItemByIndex(ind);
             assert(item, `Invalid person index ${ind}`);
             return (returnIds) ? item.id : item;
         });
     }
 
-    getPersonIndexesByNames(persons) {
-        const names = Array.isArray(persons) ? persons : [persons];
+    getPersonIndexesByNames(names) {
         this.cachePersons();
 
-        return names.map((name) => {
+        return asArray(names).map((name) => {
             const person = this.personsCache.findByName(name);
             assert(person, `Person '${name}' not found`);
 
@@ -882,25 +897,20 @@ export class AppState {
         return true;
     }
 
-    deleteTransactions(ids) {
-        const itemIds = Array.isArray(ids) ? ids : [ids];
-        if (!itemIds.length) {
+    deleteTransactions(transactionIds) {
+        const ids = asArray(transactionIds);
+        if (!ids.length) {
             return false;
         }
 
-        const itemsToDelete = [];
-        for (const transactionId of ids) {
-            const item = this.transactions.getItem(transactionId);
-            if (!item) {
-                return false;
-            }
-
-            itemsToDelete.push(item);
+        const itemsToDelete = ids.map((id) => this.transactions.getItem(id));
+        if (!itemsToDelete.every((item) => !!item)) {
+            return false;
         }
 
         // Prepare expected updates of transactions list
         this.accounts = this.accounts.deleteTransactions(itemsToDelete);
-        this.transactions.deleteItems(itemIds);
+        this.transactions.deleteItems(ids);
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
 
@@ -972,11 +982,31 @@ export class AppState {
             return false;
         }
         // Check every column value is present and have correct value
-        return tplReqColumns.every((columnName) => (
+        return Object.values(tplReqColumns).every((columnName) => (
             (columnName in params.columns)
             && isInt(params.columns[columnName])
             && params.columns[columnName] > 0
         ));
+    }
+
+    templateFromRequest(request) {
+        if (!request) {
+            return request;
+        }
+
+        const origItem = this.templates.getItem(request.id) ?? { columns: {} };
+        const res = copyObject(origItem);
+        const data = copyFields(request, tplReqFields);
+        Object.assign(res, data);
+
+        Object.keys(tplReqColumns).forEach((columnName) => {
+            const targetProp = tplReqColumns[columnName];
+            if (request[columnName]) {
+                res.columns[targetProp] = request[columnName];
+            }
+        });
+
+        return res;
     }
 
     createTemplate(params) {
@@ -986,11 +1016,38 @@ export class AppState {
         }
 
         const data = copyFields(params, tplReqFields);
+        data.columns = {};
+        Object.values(tplReqColumns).forEach((columnName) => {
+            data.columns[columnName] = params.columns[columnName];
+        });
 
         const ind = this.templates.create(data);
         const item = this.templates.getItemByIndex(ind);
 
         return item.id;
+    }
+
+    getUpdateTemplateRequest(params) {
+        const origItem = this.templates.getItem(params.id) ?? { columns: {} };
+
+        const expTemplate = copyObject(origItem);
+        const data = copyFields(params, tplReqFields);
+        Object.assign(expTemplate, data);
+
+        const res = copyObject(expTemplate);
+        delete res.columns;
+
+        Object.keys(tplReqColumns).forEach((columnName) => {
+            const targetProp = tplReqColumns[columnName];
+
+            if (params[columnName]) {
+                expTemplate.columns[targetProp] = params[columnName];
+            }
+
+            res[columnName] = expTemplate.columns[targetProp];
+        });
+
+        return res;
     }
 
     updateTemplate(params) {
@@ -1003,6 +1060,15 @@ export class AppState {
         const data = copyFields(params, tplReqFields);
         Object.assign(expTemplate, data);
 
+        if (params.columns) {
+            Object.keys(tplReqColumns).forEach((columnName) => {
+                const targetProp = tplReqColumns[columnName];
+                if (params.columns && params.columns[targetProp]) {
+                    expTemplate.columns[targetProp] = params.columns[targetProp];
+                }
+            });
+        }
+
         const resExpected = this.checkTemplateCorrectness(expTemplate);
         if (!resExpected) {
             return false;
@@ -1013,19 +1079,16 @@ export class AppState {
         return true;
     }
 
-    deleteTemplates(ids) {
-        const itemIds = Array.isArray(ids) ? ids : [ids];
-        if (!itemIds.length) {
+    deleteTemplates(templateIds) {
+        const ids = asArray(templateIds);
+        if (!ids.length) {
+            return false;
+        }
+        if (!ids.every((id) => this.templates.getItem(id))) {
             return false;
         }
 
-        for (const itemId of itemIds) {
-            if (!this.templates.getItem(itemId)) {
-                return false;
-            }
-        }
-
-        this.rulesDeleteTemplate(ids);
+        this.rules.deleteTemplate(ids);
         this.templates.deleteItems(ids);
 
         return true;
@@ -1052,7 +1115,7 @@ export class AppState {
 
         return conditions.map((condition) => ({
             ...condition,
-            value: ('value' in condition) ? condition.value.toString() : undefined,
+            value: condition.value?.toString(),
         }));
     }
 
@@ -1061,7 +1124,7 @@ export class AppState {
 
         return actions.map((action) => ({
             ...action,
-            value: ('value' in action) ? action.value.toString() : undefined,
+            value: action.value?.toString(),
         }));
     }
 
@@ -1104,16 +1167,13 @@ export class AppState {
         return true;
     }
 
-    deleteRules(ids) {
-        const itemIds = Array.isArray(ids) ? ids : [ids];
-        if (!itemIds.length) {
+    deleteRules(ruleIds) {
+        const ids = asArray(ruleIds);
+        if (!ids.length) {
             return false;
         }
-
-        for (const itemId of itemIds) {
-            if (!this.rules.getItem(itemId)) {
-                return false;
-            }
+        if (!ids.every((id) => this.rules.getItem(id))) {
+            return false;
         }
 
         this.rules.deleteItems(ids);

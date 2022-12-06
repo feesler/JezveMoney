@@ -69,37 +69,11 @@
 
   .date-field {
     min-width: 125px;
-
-    .dp__container {
-      width: 100%;
-    }
   }
 
   .form-row .comment-field,
   .form-row .comment-field div {
     flex-grow: 1;
-  }
-
-  /* Select controls */
-  .select-controls {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: center;
-    justify-content: flex-start;
-    width: 0;
-    overflow: hidden;
-    transition: width 0.2s ease;
-
-    .checkbox {
-      --checkbox-size: 24px;
-
-      margin: 0;
-    }
-
-    .checkbox__check {
-      margin: 0;
-      border-radius: 50%;
-    }
   }
 
   .dd__container {
@@ -110,12 +84,6 @@
 
   .dp__wrapper {
     z-index: var(--import-form-popup-zindex);
-  }
-
-  input[type="text"] {
-    display: flex;
-    padding: 5px;
-    height: var(--input-height);
   }
 
   input[type="button"] {
@@ -154,36 +122,12 @@
     height: 24px;
   }
 
-  /* Menu */
-  .popup-menu-btn {
-    width: 26px;
-    height: 26px;
-    padding: 4px;
-    background: none;
-    pointer-events: all;
-    cursor: pointer;
-  }
-
-  .popup-menu-btn__icon {
-    width: 18px;
-    height: 18px;
-  }
-
-  .popup-menu {
-    margin: 0 4px;
-  }
-
   .collapsible-content {
     flex-flow: column nowrap;
     row-gap: 1rem;
     border-top: 1px solid;
     padding: 8px;
     overflow: hidden;
-  }
-
-  /* Sort mode */
-  &.import-form_sort {
-    cursor: move;
   }
 
   /* Found similar transaction info */
@@ -194,45 +138,8 @@
     font-size: 14px;
   }
 
-  /* Validation */
-  .invalid-feedback {
-    padding: 4px 8px;
-    color: #ff0000;
-  }
-
   .field.invalid-block input,
   .field.invalid-block .dd__combo {
     --input-border-color: #ff0000;
   }
-}
-
-.import-list_select .select-controls {
-  width: 32px;
-}
-
-/* Disabled transaction row */
-.import-form[disabled] {
-  .dd__container,
-  input[type="text"],
-  .input-group__btn,
-  input[disabled] {
-    pointer-events: none;
-  }
-
-  .date-field .icon.calendar-icon {
-    fill: var(--input-disabled-text-color);
-  }
-}
-
-/* Placeholder */
-.import-form__placeholder {
-  border: 1px dashed;
-
-  * {
-    opacity: 0;
-  }
-}
-
-.field.invalid-block .field__title {
-  color: #ff0000;
 }

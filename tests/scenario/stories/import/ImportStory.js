@@ -34,6 +34,7 @@ export class ImportStory extends TestStory {
         await importItemsTests.run();
 
         await importRuleTests.runNoPersonsTest();
+        await importTemplateTests.runResetAccountsTest();
         await this.noAccounts();
     }
 

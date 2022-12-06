@@ -4,16 +4,15 @@ import {
     createElement,
     show,
     insertAfter,
-    throttle,
     asArray,
     setEvents,
+    debounce,
 } from 'jezvejs';
-import { Collapsible } from 'jezvejs/Collapsible';
 import { DropDown } from 'jezvejs/DropDown';
 import { IconButton } from 'jezvejs/IconButton';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
-import 'jezvejs/style/InputGroup';
+import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { API } from '../../js/api/index.js';
@@ -24,13 +23,13 @@ import { PersonList } from '../../js/model/PersonList.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
-import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
-import './style.scss';
 import { SearchInput } from '../../Components/SearchInput/SearchInput.js';
+import { Heading } from '../../Components/Heading/Heading.js';
+import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
 import { createStore } from '../../js/store.js';
 import { reducer, actions, isSameSelection } from './reducer.js';
-import { Heading } from '../../Components/Heading/Heading.js';
+import './style.scss';
 
 /* Strings */
 const STR_TITLE = 'Transactions';
@@ -54,7 +53,7 @@ const PERSONS_GROUP_TITLE = 'Persons';
 const HIDDEN_ACCOUNTS_GROUP_TITLE = 'Hidden accounts';
 const HIDDEN_PERSONS_GROUP_TITLE = 'Hidden persons';
 
-const SEARCH_THROTTLE = 300;
+const SEARCH_DELAY = 500;
 
 /**
  * List of transactions view
@@ -72,8 +71,8 @@ class TransactionListView extends View {
             loading: false,
             listMode: 'list',
             contextItem: null,
-            typingSearch: false,
             selDateRange: null,
+            renderTime: Date.now(),
         };
 
         window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
@@ -92,30 +91,57 @@ class TransactionListView extends View {
      * View initialization
      */
     onStart() {
-        this.heading = Heading.fromElement(ge('heading'), {
+        const elemIds = [
+            'heading',
+            'createBtn',
+            // Filters
+            'filtersBtn',
+            'filtersContainer',
+            'applyFiltersBtn',
+            'clearFiltersBtn',
+            'typeMenu',
+            'accountsFilter',
+            'dateFrm',
+            'searchFilter',
+            // Counters
+            'itemsCount',
+            'selectedCounter',
+            'selItemsCount',
+        ];
+        elemIds.forEach((id) => {
+            this[id] = ge(id);
+            if (!this[id]) {
+                throw new Error('Failed to initialize view');
+            }
+        });
+
+        this.heading = Heading.fromElement(this.heading, {
             title: STR_TITLE,
         });
 
-        const collapse = Collapsible.create({
-            header: [ge('filtershdr')],
-            content: ge('filters'),
-            className: 'filters-collapsible',
+        // Filters
+        this.filtersBtn = IconButton.fromElement(this.filtersBtn, {
+            onClick: () => this.filters.toggle(),
         });
-        ge('filterscollapse').appendChild(collapse.elem);
+        this.filters = FiltersContainer.create({
+            content: this.filtersContainer,
+        });
+        insertAfter(this.filters.elem, this.filtersBtn.elem);
 
-        this.clearAllBtn = ge('clearall_btn');
-        setEvents(this.clearAllBtn, { click: (e) => this.onClearAllFilters(e) });
+        setEvents(this.applyFiltersBtn, { click: () => this.filters.close() });
+        setEvents(this.clearFiltersBtn, { click: (e) => this.onClearAllFilters(e) });
 
-        this.typeMenu = TransactionTypeMenu.fromElement(ge('type_menu'), {
+        // Transaction type filter
+        this.typeMenu = TransactionTypeMenu.fromElement(this.typeMenu, {
             multiple: true,
             allowActiveLink: true,
             itemParam: 'type',
             onChange: (sel) => this.onChangeTypeFilter(sel),
         });
 
-        const accountsFilter = ge('accountsFilter');
+        // Accounts and persons filter
         if (!this.isAvailable()) {
-            show(accountsFilter, false);
+            show(this.accountsFilter, false);
         } else {
             this.accountDropDown = DropDown.create({
                 elem: 'acc_id',
@@ -150,29 +176,23 @@ class TransactionListView extends View {
         }
 
         // Date range filter
-        this.dateRangeFilter = DateRangeInput.fromElement(ge('dateFrm'), {
+        this.dateRangeFilter = DateRangeInput.fromElement(this.dateFrm, {
             startPlaceholder: START_DATE_PLACEHOLDER,
             endPlaceholder: END_DATE_PLACEHOLDER,
             onChange: (data) => this.onChangeDateFilter(data),
         });
 
         // Search input
-        this.searchFilter = ge('searchFilter');
-        this.searchHandler = throttle((val) => this.onSearchInputChange(val), SEARCH_THROTTLE);
         this.searchInput = SearchInput.create({
             placeholder: 'Type to filter',
-            onChange: this.searchHandler,
+            onChange: debounce((val) => this.onSearchInputChange(val), SEARCH_DELAY),
         });
         this.searchFilter.append(this.searchInput.elem);
 
+        // Loading indicator
         this.listContainer = document.querySelector('.list-container');
         this.loadingIndicator = LoadingIndicator.create();
         this.listContainer.append(this.loadingIndicator.elem);
-
-        // Counters
-        this.itemsCount = ge('itemsCount');
-        this.selectedCounter = ge('selectedCounter');
-        this.selItemsCount = ge('selItemsCount');
 
         // List mode selected
         const listHeader = document.querySelector('.list-header');
@@ -212,8 +232,7 @@ class TransactionListView extends View {
         });
         listFooter.append(this.paginator.elem);
 
-        this.createBtn = ge('add_btn');
-
+        // 'Done' button
         this.listModeBtn = IconButton.create({
             id: 'listModeBtn',
             className: 'no-icon',
@@ -308,6 +327,7 @@ class TransactionListView extends View {
 
     setListMode(listMode) {
         this.store.dispatch(actions.changeListMode(listMode));
+        this.setRenderTime();
     }
 
     /** Set loading state and render view */
@@ -318,6 +338,11 @@ class TransactionListView extends View {
     /** Remove loading state and render view */
     stopLoading() {
         this.store.dispatch(actions.stopLoading());
+    }
+
+    /** Update render time */
+    setRenderTime() {
+        this.store.dispatch(actions.setRenderTime());
     }
 
     getContextIds() {
@@ -346,6 +371,7 @@ class TransactionListView extends View {
         }
 
         this.stopLoading();
+        this.setRenderTime();
     }
 
     /**
@@ -390,7 +416,6 @@ class TransactionListView extends View {
      * @param {Event} e - click event object
      */
     onClearAllFilters(e) {
-        e.stopPropagation();
         e.preventDefault();
 
         this.store.dispatch(actions.clearAllFilters());
@@ -466,6 +491,7 @@ class TransactionListView extends View {
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
             this.stopLoading();
+            this.setRenderTime();
         }
     }
 
@@ -523,6 +549,7 @@ class TransactionListView extends View {
 
         this.store.dispatch(actions.toggleMode());
         this.replaceHistory();
+        this.setRenderTime();
     }
 
     onItemClick(itemId, e) {
@@ -560,6 +587,7 @@ class TransactionListView extends View {
 
         this.replaceHistory();
         this.stopLoading();
+        this.setRenderTime();
     }
 
     renderContextMenu(state) {
@@ -656,10 +684,7 @@ class TransactionListView extends View {
         this.dateRangeFilter.setData(dateFilter);
 
         // Search form
-        const isSearchFilter = !!state.form.search;
-        if (!state.typingSearch) {
-            this.searchInput.value = (isSearchFilter) ? state.form.search : '';
-        }
+        this.searchInput.value = state.form.search ?? '';
 
         // Render list
         this.list.setState((listState) => ({
@@ -668,7 +693,7 @@ class TransactionListView extends View {
             listMode: state.listMode,
             showControls: (state.listMode === 'list'),
             items: state.items,
-            renderTime: Date.now(),
+            renderTime: state.renderTime,
         }));
 
         // Counters
@@ -678,20 +703,23 @@ class TransactionListView extends View {
         show(this.selectedCounter, isSelectMode);
         this.selItemsCount.textContent = selected.length;
 
+        // Paginator
+        const range = state.pagination.range ?? 1;
+        const pageNum = state.pagination.page + range - 1;
         if (this.paginator) {
             this.paginator.show(state.items.length > 0);
-            const range = state.pagination.range ?? 1;
             this.paginator.setState((paginatorState) => ({
                 ...paginatorState,
                 url: filterUrl,
                 pagesCount: state.pagination.pagesCount,
-                pageNum: state.pagination.page + range - 1,
+                pageNum,
             }));
         }
 
         show(
             this.showMoreBtn,
-            state.items.length > 0 && state.pagination.page < state.pagination.pagesCount,
+            state.items.length > 0
+            && pageNum < state.pagination.pagesCount,
         );
 
         const isDetails = (state.mode === 'details');

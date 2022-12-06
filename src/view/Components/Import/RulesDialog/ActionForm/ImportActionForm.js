@@ -7,6 +7,7 @@ import {
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
+import { Icon } from 'jezvejs/Icon';
 import {
     ImportAction,
     IMPORT_ACTION_SET_TR_TYPE,
@@ -117,9 +118,13 @@ export class ImportActionForm extends Component {
         ]);
 
         // Delete button
+        const delIcon = Icon.create({
+            icon: 'del',
+            className: 'icon delete-icon',
+        });
         this.delBtn = createElement('button', {
             props: { className: 'btn icon-btn delete-btn right-align', type: 'button' },
-            children: window.app.createIcon('del', 'icon delete-icon'),
+            children: delIcon.elem,
             events: { click: () => this.onDelete() },
         });
 

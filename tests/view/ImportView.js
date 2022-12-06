@@ -21,8 +21,8 @@ import { findSimilarTransaction } from '../model/import.js';
 import { App } from '../Application.js';
 import { ImportTransaction } from '../model/ImportTransaction.js';
 import { ImportTransactionForm } from './component/Import/ImportTransactionForm.js';
-import { ImportTransactionItem } from './component/Import/ImportTransactionItem.js';
 import { Counter } from './component/Counter.js';
+import { checkDate, fixFloat } from '../common.js';
 
 const ITEMS_ON_PAGE = 20;
 const defaultPagination = {
@@ -121,7 +121,7 @@ export class ImportView extends AppView {
         const mainAccountId = res.mainAccountSelect.value;
 
         // Import list
-        const rowsContainer = await query('#rowsContainer');
+        const rowsContainer = await query('.data-container');
         res.renderTime = await prop(rowsContainer, 'dataset.time');
 
         const listContainer = await query('.data-form');
@@ -131,7 +131,7 @@ export class ImportView extends AppView {
 
         // Context menu
         res.contextMenu = { elem: await query('#contextMenu') };
-        const contextParent = await closest(res.contextMenu.elem, '.import-item,.import-form');
+        const contextParent = await closest(res.contextMenu.elem, '.import-item');
         if (contextParent) {
             res.contextMenu.itemIndex = res.itemsList.model.contextMenuIndex;
             assert(res.contextMenu.itemIndex !== -1, 'Invalid context menu');
@@ -431,48 +431,26 @@ export class ImportView extends AppView {
             enable ? 'Already enabled' : 'Already disabled',
         );
 
-        // Apply rules or restore original import data according to enable flag
-        // and convert to expected state of ImportTransaction
-        const itemsData = this.itemsList.items.map((item) => {
-            if (!item.model.original) {
-                return item.getExpectedState(item.model);
-            }
-
-            if (!enable) {
-                let model = item.restoreOriginal();
-                if (this.model.mainAccount !== model.mainAccount.id) {
-                    model = item.onChangeMainAccount(model, this.model.mainAccount);
-                }
-
-                return item.getExpectedState(model);
-            }
-
-            const expTrans = item.getExpectedTransaction(item.model);
-            const origMainAccount = App.state.accounts.findByName(
-                item.model.original.mainAccount,
-            );
-            const importTrans = new ImportTransaction({
-                ...expTrans,
-                enabled: item.model.enabled,
-                mainAccount: origMainAccount,
-                type: item.model.type,
-                original: {
-                    ...item.model.original,
-                    mainAccount: origMainAccount,
-                },
-            });
-
-            App.state.rules.applyTo(importTrans);
-
-            return ImportTransactionItem.render(importTrans, App.state);
-        });
-
         await this.openListMenu();
+
+        this.items.forEach((item) => {
+            if (!item.original || item.modifiedByUser) {
+                return;
+            }
+
+            if (item.rulesApplied) {
+                item.restoreOriginal();
+            }
+            if (enable) {
+                App.state.rules.applyTo(item);
+            }
+        });
 
         this.model.rulesEnabled = !this.model.rulesEnabled;
         this.model.menuOpen = false;
         const expected = this.getExpectedState();
-        expected.itemsList.items = itemsData;
+        const expectedList = this.getExpectedList();
+        expected.itemsList.items = expectedList.items;
 
         await this.performAction(() => this.content.rulesCheck.toggle());
 
@@ -556,6 +534,8 @@ export class ImportView extends AppView {
 
         await this.performAction(() => this.uploadDialog.selectTemplateById(val));
 
+        this.getStateOnTemplateSelected();
+
         return this.checkState();
     }
 
@@ -563,6 +543,8 @@ export class ImportView extends AppView {
         this.checkUploadState();
 
         await this.performAction(() => this.uploadDialog.selectTemplateByIndex(val));
+
+        this.getStateOnTemplateSelected();
 
         return this.checkState();
     }
@@ -678,19 +660,7 @@ export class ImportView extends AppView {
         return this.checkState();
     }
 
-    /** Delete currently selected template */
-    async deleteTemplate() {
-        this.checkUploadState();
-
-        await this.performAction(() => this.uploadDialog.deleteTemplate());
-
-        return this.checkState();
-    }
-
-    /** Submit template */
-    async submitTemplate() {
-        this.checkUploadState();
-
+    getStateOnTemplateSelected() {
         const template = this.getExpectedTemplate();
         const updateMainAccount = (
             this.uploadDialog.isValidTemplate()
@@ -707,6 +677,24 @@ export class ImportView extends AppView {
         }
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
+    }
+
+    /** Delete currently selected template */
+    async deleteTemplate() {
+        this.checkUploadState();
+
+        await this.performAction(() => this.uploadDialog.deleteTemplate());
+
+        this.getStateOnTemplateSelected();
+
+        return this.checkState();
+    }
+
+    /** Submit template */
+    async submitTemplate() {
+        this.checkUploadState();
+
+        this.getStateOnTemplateSelected();
 
         await this.performAction(() => this.uploadDialog.submitTemplate());
 
@@ -804,19 +792,21 @@ export class ImportView extends AppView {
 
         const accountId = parseInt(val, 10);
         const skipList = [];
-        this.items.forEach((_, ind) => {
-            const item = App.view.items[ind];
-
-            if (!item.original || !App.view.rulesEnabled) {
+        this.items.forEach((item) => {
+            if (!item.original || item.modifiedByUser || !this.rulesEnabled) {
                 item.setMainAccount(accountId);
                 return;
             }
 
-            // Reapply rules
-            item.setMainAccount(accountId);
-            item.restoreOriginal();
+            if (item.rulesApplied) {
+                item.restoreOriginal();
+            }
             item.setMainAccount(accountId);
             App.state.rules.applyTo(item);
+
+            if (!this.checkSimilarEnabled) {
+                return;
+            }
 
             const tr = findSimilarTransaction(item, skipList);
             if (tr) {
@@ -1028,6 +1018,12 @@ export class ImportView extends AppView {
         return this.rulesDialog.getExpectedRule();
     }
 
+    /** Validate amount value */
+    isValidAmount(value) {
+        const amount = parseFloat(fixFloat(value));
+        return (!Number.isNaN(amount) && amount > 0);
+    }
+
     /**
      * Validate current form if active
      * If invalid form expected, then run action and check expected state
@@ -1050,6 +1046,24 @@ export class ImportView extends AppView {
         this.expectedState.itemsList.items = expectedList.items;
 
         const formModel = this.transactionForm.model;
+        const isExpense = (formModel.type === 'expense');
+        const isDiff = formModel.isDifferent;
+
+        const srcAmount = (!isExpense || isDiff)
+            ? this.isValidAmount(formModel.srcAmount)
+            : true;
+        const destAmount = (isExpense || isDiff)
+            ? this.isValidAmount(formModel.destAmount)
+            : true;
+        const date = checkDate(formModel.date);
+        assert(!(srcAmount && destAmount && date), 'Invalid state');
+
+        formModel.validation = {
+            srcAmount,
+            destAmount,
+            date,
+        };
+
         formModel.invalidated = true;
         this.expectedState.transactionForm = ImportTransactionForm.getExpectedState(formModel);
 
@@ -1134,7 +1148,14 @@ export class ImportView extends AppView {
             itemData.original.mainAccount = origMainAccount;
         }
 
-        this.items[this.formIndex] = new ImportTransaction(itemData);
+        const origItem = this.items[this.formIndex];
+        const savedItem = new ImportTransaction(itemData);
+        const isAppend = (this.formIndex === this.items.length);
+        if (isAppend || savedItem.isChanged(origItem)) {
+            savedItem.setModified(true);
+        }
+
+        this.items[this.formIndex] = savedItem;
 
         const pagesCount = Math.ceil(this.items.length / ITEMS_ON_PAGE);
         this.model.pagination.pages = pagesCount;
@@ -1218,13 +1239,15 @@ export class ImportView extends AppView {
     }
 
     async toggleSelectItems(index) {
-        await this.setSelectMode();
-
         const indexes = asArray(index);
         assert(indexes.length > 0, 'No items specified');
         assert(this.itemsList, 'No items available');
 
+        await this.setSelectMode();
+
         indexes.forEach((ind) => {
+            this.checkValidIndex(ind);
+
             const item = this.items[ind];
             item.selected = !item.selected;
         });
@@ -1236,7 +1259,8 @@ export class ImportView extends AppView {
 
         for (const ind of indexes) {
             await this.performAction(async () => {
-                const item = this.itemsList.getItem(ind);
+                const pos = this.getPositionByIndex(ind);
+                const item = this.itemsList.getItem(pos.index);
                 await item.toggleSelect();
             });
         }

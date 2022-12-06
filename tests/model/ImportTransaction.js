@@ -45,6 +45,8 @@ export class ImportTransaction {
         const res = new ImportTransaction({
             enabled: true,
             similarTransaction: null,
+            rulesApplied: false,
+            modifiedByUser: false,
             mainAccount,
             type: (data.accountAmount < 0) ? 'expense' : 'income',
             date: data.date,
@@ -108,6 +110,35 @@ export class ImportTransaction {
     /** Enable/disable transaction */
     enable(value = true) {
         this.enabled = !!value;
+    }
+
+    setRulesApplied(value) {
+        this.rulesApplied = !!value;
+    }
+
+    setModified(value = true) {
+        this.modifiedByUser = !!value;
+    }
+
+    isChanged(transaction) {
+        const props = [
+            'type',
+            'src_id',
+            'dest_id',
+            'src_curr',
+            'dest_curr',
+            'src_amount',
+            'dest_amount',
+            'person_id',
+            'date',
+            'comment',
+        ];
+
+        return (
+            (transaction)
+                ? props.some((prop) => this[prop] !== transaction[prop])
+                : true
+        );
     }
 
     isSameSimilarTransaction(transaction) {
@@ -212,6 +243,8 @@ export class ImportTransaction {
         const before = {
             isDiff: this.isDiff(),
             type: this.type,
+            src_id: this.src_id,
+            dest_id: this.dest_id,
             src_amount: this.src_amount,
             dest_amount: this.dest_amount,
             src_curr: this.src_curr,
@@ -256,7 +289,19 @@ export class ImportTransaction {
                 this.src_curr = this.mainAccount.curr_id;
             }
         } else if (value === 'transferfrom' || value === 'transferto') {
-            if (before.type !== 'debtfrom' && before.type !== 'debtto') {
+            if (before.type === 'debtfrom' || before.type === 'debtto') {
+                return;
+            }
+
+            if (before.type === 'transferfrom' || before.type === 'transferto') {
+                if (value === 'transferfrom') {
+                    this.dest_id = before.src_id;
+                    this.dest_curr = before.src_curr;
+                } else {
+                    this.src_id = before.dest_id;
+                    this.src_curr = before.dest_curr;
+                }
+            } else {
                 const accountId = App.state.getNextAccount(this.mainAccount.id);
                 const nextAccount = App.state.accounts.getItem(accountId);
                 assert(nextAccount, 'Failed to find next account');
@@ -405,6 +450,9 @@ export class ImportTransaction {
 
         this.date = this.original.date;
         this.comment = this.original.comment;
+
+        this.rulesApplied = false;
+        this.modifiedByUser = false;
     }
 
     getExpectedTransaction() {

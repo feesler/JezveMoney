@@ -18,11 +18,14 @@ const transTypeMap = {
 };
 
 const defaultProps = {
+    id: undefined,
     enabled: true,
     collapsed: true,
     selected: false,
     listMode: 'list',
     similarTransaction: null,
+    rulesApplied: false,
+    modifiedByUser: false,
     type: 'expense',
     sourceAccountId: 0,
     destAccountId: 0,
@@ -52,6 +55,10 @@ export class ImportTransaction {
         this.setData(this.props);
     }
 
+    get id() {
+        return this.props.id;
+    }
+
     get enabled() {
         return this.state.enabled;
     }
@@ -72,10 +79,17 @@ export class ImportTransaction {
         return this.state.originalData;
     }
 
+    get rulesApplied() {
+        return this.state.rulesApplied;
+    }
+
+    get modifiedByUser() {
+        return this.state.modifiedByUser;
+    }
+
     setData(data) {
         const { mainAccount } = data;
         const state = {
-            mainAccount,
             ...data,
         };
         if (state.date == null) {
@@ -179,6 +193,23 @@ export class ImportTransaction {
     }
 
     /**
+     * Changes list mode
+     * @param {string} listMode
+     */
+    setListMode(listMode) {
+        if (this.state.listMode === listMode) {
+            return this.state;
+        }
+
+        const state = copyObject(this.state);
+        state.listMode = listMode;
+        state.selected = false;
+
+        this.state = state;
+        return state;
+    }
+
+    /**
      * Collapse/expand component
      * @param {boolean} val - if true then collapse component, else expand
      */
@@ -193,6 +224,51 @@ export class ImportTransaction {
 
         this.state = state;
         return state;
+    }
+
+    setRulesApplied(value) {
+        const res = !!value;
+        if (this.state.rulesApplied === res) {
+            return this.state;
+        }
+        const state = copyObject(this.state);
+        state.rulesApplied = res;
+
+        this.state = state;
+        return state;
+    }
+
+    setModified(value = true) {
+        const res = !!value;
+        if (this.state.modifiedByUser === res) {
+            return this.state;
+        }
+        const state = copyObject(this.state);
+        state.modifiedByUser = res;
+
+        this.state = state;
+        return state;
+    }
+
+    isChanged(transaction) {
+        const props = [
+            'type',
+            'sourceAccountId',
+            'destAccountId',
+            'srcCurrId',
+            'destCurrId',
+            'sourceAmount',
+            'destAmount',
+            'personId',
+            'date',
+            'comment',
+        ];
+
+        return (
+            (transaction)
+                ? props.some((prop) => this.state[prop] !== transaction.state[prop])
+                : true
+        );
     }
 
     isSameSimilarTransaction(transaction) {
@@ -283,6 +359,8 @@ export class ImportTransaction {
         this.setOriginal(this.data);
 
         this.setMainAccount(currentMainAccount);
+
+        this.setRulesApplied(false);
     }
 
     getTransferAccount(state, initialId) {
@@ -357,9 +435,14 @@ export class ImportTransaction {
                 state.sourceAmount = this.state.destAmount;
             }
 
-            const account = this.getTransferAccount(state, this.state.destAccountId);
-            state.destAccountId = account.id;
-            state.destCurrId = account.curr_id;
+            if (state.type === 'transferto') {
+                state.destAccountId = this.state.sourceAccountId;
+                state.destCurrId = this.state.srcCurrId;
+            } else {
+                const account = this.getTransferAccount(state, this.state.destAccountId);
+                state.destAccountId = account.id;
+                state.destCurrId = account.curr_id;
+            }
         } else if (value === 'transferto') {
             state.personId = 0;
             // Copy destination amount to source amount
@@ -368,9 +451,14 @@ export class ImportTransaction {
                 state.sourceAmount = this.state.destAmount;
             }
 
-            const account = this.getTransferAccount(state, this.state.sourceAccountId);
-            state.sourceAccountId = account.id;
-            state.srcCurrId = account.curr_id;
+            if (state.type === 'transferfrom') {
+                state.sourceAccountId = this.state.destAccountId;
+                state.srcCurrId = this.state.destCurrId;
+            } else {
+                const account = this.getTransferAccount(state, this.state.sourceAccountId);
+                state.sourceAccountId = account.id;
+                state.srcCurrId = account.curr_id;
+            }
         } else if (value === 'debtfrom' || value === 'debtto') {
             // Copy destination amount to source amount
             // if previous type was expense

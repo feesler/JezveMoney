@@ -40,13 +40,6 @@ export class TransactionsList extends List {
         this.sort();
     }
 
-    clone() {
-        const res = new TransactionsList(this.data);
-        res.autoincrement = this.autoincrement;
-
-        return res;
-    }
-
     getExpectedPos(params) {
         const pos = this.getLastestPos(params.date);
 
@@ -201,7 +194,7 @@ export class TransactionsList extends List {
             return this;
         }
 
-        return new TransactionsList(items);
+        return TransactionsList.create(items);
     }
 
     getItemsByAccounts(list, ids) {
@@ -223,7 +216,7 @@ export class TransactionsList extends List {
             return this;
         }
 
-        return new TransactionsList(items);
+        return TransactionsList.create(items);
     }
 
     getItemsByDate(list, start, end) {
@@ -262,7 +255,7 @@ export class TransactionsList extends List {
             return this;
         }
 
-        return new TransactionsList(items);
+        return TransactionsList.create(items);
     }
 
     getItemsByQuery(list, query) {
@@ -281,7 +274,7 @@ export class TransactionsList extends List {
             return this;
         }
 
-        return new TransactionsList(items);
+        return TransactionsList.create(items);
     }
 
     getItemsPage(list, num, limit, range) {
@@ -306,7 +299,7 @@ export class TransactionsList extends List {
             return this;
         }
 
-        return new TransactionsList(items);
+        return TransactionsList.create(items);
     }
 
     getItems(list, par) {
@@ -356,7 +349,7 @@ export class TransactionsList extends List {
             return this;
         }
 
-        const res = new TransactionsList(items);
+        const res = TransactionsList.create(items);
         // Sort again if asc order was requested
         // TODO: think how to avoid automatic sort at setData()
         const isDesc = params.order?.toLowerCase() === 'desc';
@@ -434,7 +427,7 @@ export class TransactionsList extends List {
     updateAccount(accList, account) {
         const res = this.onUpdateAccount(this.data, accList, account);
 
-        return new TransactionsList(res);
+        return TransactionsList.create(res);
     }
 
     /** Return expected list of transactions after delete specified accounts */
@@ -499,7 +492,7 @@ export class TransactionsList extends List {
     deleteAccounts(accList, ids) {
         const res = this.onDeleteAccounts(this.data, accList, ids);
 
-        return new TransactionsList(res);
+        return TransactionsList.create(res);
     }
 
     getDateInfo(time, groupType) {
@@ -561,24 +554,28 @@ export class TransactionsList extends List {
     }
 
     getNextDate(date, groupType) {
-        if (!availGroupTypes.includes(groupType)) {
-            throw new Error('Invalid group type');
-        }
+        assert.isDate(date);
+        assert(availGroupTypes.includes(groupType), 'Invalid group type');
 
-        const res = new Date(cutDate(date));
+        let timestamp = 0;
         if (groupType === 'none' || groupType === 'day') {
-            res.setDate(res.getDate() + 1);
+            timestamp = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate() + 1);
         }
         if (groupType === 'week') {
-            res.setDate(res.getDate() + DAYS_IN_WEEK);
+            timestamp = Date.UTC(
+                date.getFullYear(),
+                date.getMonth(),
+                date.getDate() + DAYS_IN_WEEK,
+            );
         }
         if (groupType === 'month') {
-            res.setMonth(res.getMonth() + 1);
+            timestamp = Date.UTC(date.getFullYear(), date.getMonth() + 1, 1);
         }
         if (groupType === 'year') {
-            res.setFullYear(res.getFullYear() + 1);
+            timestamp = Date.UTC(date.getFullYear() + 1, 0, 1);
         }
-        return res;
+
+        return new Date(timestamp);
     }
 
     getStatisticsLabel(date, groupType) {

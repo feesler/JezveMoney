@@ -53,6 +53,7 @@ class Main extends TemplateController
         foreach ($latestArr as $trans) {
             $transactions[] = new TransactionItem($trans);
         }
+        $data["transactions"] = $transactions;
 
         $persArr = $this->personMod->getData();
         $data["persons"] = [];

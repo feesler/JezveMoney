@@ -4,20 +4,13 @@ import { List } from './List.js';
 import { api } from './api.js';
 
 export class CurrencyList extends List {
-    async fetch() {
-        return api.currency.list();
-    }
-
     static async create() {
         const data = await api.currency.list();
         return new CurrencyList(data);
     }
 
-    clone() {
-        const res = new CurrencyList(this.data);
-        res.autoincrement = this.autoincrement;
-
-        return res;
+    async fetch() {
+        return api.currency.list();
     }
 
     createItem(obj) {

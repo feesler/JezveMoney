@@ -1589,8 +1589,14 @@ class TransactionModel extends CachedTable
             throw new \Error("Invalid group type");
         }
 
-        $date = new DateTime("@" . $time);
+        $date = new DateTime("@" . $time, new DateTimeZone('UTC'));
         $duration = $durationMap[$groupType];
+
+        if ($groupType === GROUP_BY_MONTH || $groupType === GROUP_BY_YEAR) {
+            $dateInfo = $this->getDateInfo($time, $groupType);
+            $month = ($groupType === GROUP_BY_YEAR) ? 1 : $dateInfo["info"]["mon"];
+            $date->setDate($dateInfo["info"]["year"], $month, 1);
+        }
 
         return $date->add(new DateInterval($duration))->getTimestamp();
     }

@@ -4,6 +4,7 @@ import {
     isFunction,
     Component,
 } from 'jezvejs';
+import { Icon } from 'jezvejs/Icon';
 import { InputGroup } from 'jezvejs/InputGroup';
 import './style.scss';
 
@@ -52,6 +53,10 @@ export class SearchInput extends Component {
     }
 
     set value(val) {
+        if (this.value === val) {
+            return;
+        }
+
         this.setState({ ...this.state, value: val });
     }
 
@@ -66,24 +71,30 @@ export class SearchInput extends Component {
             events: { input: (e) => this.onInput(e) },
         });
 
-        const clearIcon = window.app.createIcon('close', INNER_BTN_ICON_CLASS);
+        const clearIcon = Icon.create({
+            icon: 'close',
+            className: INNER_BTN_ICON_CLASS,
+        });
         this.clearBtn = createElement('button', {
             props: {
                 className: [INNER_BTN_CLASS, CLEAR_BTN_CLASS].join(' '),
                 type: 'button',
             },
-            children: clearIcon,
+            children: clearIcon.elem,
             events: { click: (e) => this.onClear(e) },
         });
 
-        const searchIcon = window.app.createIcon('search', SEARCH_ICON_CLASS);
+        const searchIcon = Icon.create({
+            icon: 'search',
+            className: SEARCH_ICON_CLASS,
+        });
         this.searchBtn = createElement('button', {
             props: {
                 className: [INNER_BTN_CLASS, SEARCH_BTN_CLASS].join(' '),
                 type: 'button',
                 tabIndex: -1,
             },
-            children: searchIcon,
+            children: searchIcon.elem,
         });
 
         this.inputGroup = InputGroup.create({
@@ -112,11 +123,9 @@ export class SearchInput extends Component {
     }
 
     sendChangeEvent() {
-        if (!isFunction(this.props.onChange)) {
-            return;
+        if (isFunction(this.props.onChange)) {
+            this.props.onChange(this.state.value);
         }
-
-        this.props.onChange(this.state.value);
     }
 
     render(state) {

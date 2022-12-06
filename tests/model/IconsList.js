@@ -3,20 +3,13 @@ import { List } from './List.js';
 import { api } from './api.js';
 
 export class IconsList extends List {
-    async fetch() {
-        return api.icon.list();
-    }
-
     static async create() {
         const data = await api.icon.list();
         return new IconsList(data);
     }
 
-    clone() {
-        const res = new IconsList(this.data);
-        res.autoincrement = this.autoincrement;
-
-        return res;
+    async fetch() {
+        return api.icon.list();
     }
 
     createItem(obj) {

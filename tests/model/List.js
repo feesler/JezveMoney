@@ -1,6 +1,24 @@
-import { copyObject, assert } from 'jezve-test';
+import { copyObject, assert, asArray } from 'jezve-test';
 
 export class List {
+    static create(props) {
+        return new this(props);
+    }
+
+    static deleteByIds(list, ids) {
+        assert.isArray(list, 'Invalid parameters');
+        assert(ids, 'Invalid parameters');
+
+        const itemIds = asArray(ids)
+            .map((id) => parseInt(id, 10))
+            .filter((id) => !!id);
+
+        const res = copyObject(list)
+            .filter((item) => !itemIds.includes(item.id));
+
+        return res;
+    }
+
     constructor(data = []) {
         if (data instanceof List) {
             this.setData(data.data);
@@ -11,15 +29,15 @@ export class List {
         }
     }
 
+    get length() {
+        return this.data.length;
+    }
+
     clone() {
-        const res = new List(this.data);
+        const res = new this.constructor(this.data);
         res.autoincrement = this.autoincrement;
 
         return res;
-    }
-
-    get length() {
-        return this.data.length;
     }
 
     setData(data) {
@@ -49,13 +67,12 @@ export class List {
             return null;
         }
         const res = this.data.find((item) => item.id === itemId);
-        return this.createItem(res);
+        return (res) ? this.createItem(res) : null;
     }
 
     getItems(ids) {
-        const itemIds = (Array.isArray(ids) ? ids : [ids])
-            .map((id) => parseInt(id, 10));
-        const res = this.data.filter((item) => itemIds.includes(item.id));
+        const itemIds = asArray(ids).map((id) => parseInt(id, 10));
+        const res = this.filter((item) => itemIds.includes(item.id));
         return res.map((item) => this.createItem(item));
     }
 
@@ -95,9 +112,7 @@ export class List {
     }
 
     indexesToIds(positions) {
-        const posList = Array.isArray(positions) ? positions : [positions];
-
-        return posList.map((pos) => this.indexToId(pos));
+        return asArray(positions).map((pos) => this.indexToId(pos));
     }
 
     // Return expected value of next id
@@ -176,21 +191,6 @@ export class List {
         this.data = res;
 
         return true;
-    }
-
-    static deleteByIds(list, ids) {
-        assert.isArray(list, 'Invalid parameters');
-        assert(ids, 'Invalid parameters');
-
-        let itemIds = Array.isArray(ids) ? ids : [ids];
-        itemIds = itemIds
-            .map((id) => parseInt(id, 10))
-            .filter((id) => !!id);
-
-        const res = copyObject(list)
-            .filter((item) => !itemIds.includes(item.id));
-
-        return res;
     }
 
     indexOf(...args) {

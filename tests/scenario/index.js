@@ -22,6 +22,7 @@ import { createAccounts } from './data/accounts.js';
 import { createPersons } from './data/persons.js';
 import { createTransactions } from './data/transactions.js';
 import { getAccountCSV, getCardCSV } from './data/importfiles.js';
+import { createImportRules } from './data/rules.js';
 import { putFile, removeFile } from '../run/import/index.js';
 
 const storiesMap = {
@@ -187,6 +188,11 @@ export class Scenario {
     /** Creates common test transactions */
     async createTransactions() {
         await createTransactions();
+    }
+
+    /** Creates import rules */
+    async createImportRules() {
+        await createImportRules();
     }
 
     /** Creates all common test data */

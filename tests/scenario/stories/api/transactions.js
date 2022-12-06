@@ -9,7 +9,7 @@ import { App } from '../../../Application.js';
 import * as TransactionApiTests from '../../../run/api/transaction.js';
 
 const create = async () => {
-    setBlock('Create', 3);
+    setBlock('Create transactions', 2);
 
     const { RUB, USD, EUR } = App.scenario;
 
@@ -106,12 +106,18 @@ const create = async () => {
         App.scenario.TR_DEBT_2,
         App.scenario.TR_DEBT_3,
     ] = await App.scenario.runner.runGroup(TransactionApiTests.extractAndCreate, data);
+};
+
+const createInvalid = async () => {
+    setBlock('Create transactions with invalid data', 2);
+
+    const { RUB, USD } = App.scenario;
 
     // Find person account for invalid transaction
     await App.state.fetch();
     const personAccount = App.state.getPersonAccount(App.scenario.PERSON_Y, USD);
 
-    const invData = [{
+    const data = [{
         type: EXPENSE,
         src_id: 0,
         src_amount: 100,
@@ -241,11 +247,12 @@ const create = async () => {
         src_amount: 10,
         src_curr: 9999,
     }];
-    await App.scenario.runner.runGroup(TransactionApiTests.extractAndCreate, invData);
+
+    await App.scenario.runner.runGroup(TransactionApiTests.extractAndCreate, data);
 };
 
 const createMultiple = async () => {
-    setBlock('Create multiple', 3);
+    setBlock('Create multiple transactions', 2);
 
     const { RUB, EUR } = App.scenario;
 
@@ -293,8 +300,12 @@ const createMultiple = async () => {
     });
 
     await TransactionApiTests.extractAndCreateMultiple(data);
+};
 
-    const invData = [
+const createMultipleInvalid = async () => {
+    setBlock('Create multiple transactions with invalid data', 2);
+
+    const data = [
         null,
         [null],
         [null, null],
@@ -313,18 +324,14 @@ const createMultiple = async () => {
             src_amount: 100,
         }, null],
     ];
-    await App.scenario.runner.runGroup(TransactionApiTests.extractAndCreateMultiple, invData);
+
+    await App.scenario.runner.runGroup(TransactionApiTests.extractAndCreateMultiple, data);
 };
 
 const update = async () => {
-    setBlock('Update', 3);
+    setBlock('Update transactions', 3);
 
-    const {
-        RUB,
-        USD,
-        EUR,
-        PLN,
-    } = App.scenario;
+    const { RUB, USD, EUR } = App.scenario;
 
     const data = [{
         id: App.scenario.TR_EXPENSE_1,
@@ -370,12 +377,23 @@ const update = async () => {
     }];
 
     await App.scenario.runner.runGroup(TransactionApiTests.update, data);
+};
+
+const updateInvalid = async () => {
+    setBlock('Update transactions with invalid data', 2);
+
+    const {
+        RUB,
+        USD,
+        EUR,
+        PLN,
+    } = App.scenario;
 
     // Find person account for invalid transaction
     await App.state.fetch();
     const personAccount = App.state.getPersonAccount(App.scenario.PERSON_Y, USD);
 
-    const invData = [{
+    const data = [{
         id: App.scenario.TR_EXPENSE_1,
         src_id: 0,
     }, {
@@ -435,23 +453,47 @@ const update = async () => {
     }, {
         id: App.scenario.TR_DEBT_3,
         op: 1,
-        acc_id: 9999,
+        acc_id: -1,
     }];
 
-    await App.scenario.runner.runGroup(TransactionApiTests.update, invData);
+    await App.scenario.runner.runGroup(TransactionApiTests.update, data);
 };
 
-const del = async () => App.scenario.runner.runGroup(TransactionApiTests.del, [
-    [App.scenario.TR_EXPENSE_2, App.scenario.TR_TRANSFER_1, App.scenario.TR_DEBT_3],
-    [],
-    [9999],
-]);
+const del = async () => {
+    setBlock('Delete transactions', 2);
 
-const setPos = async () => App.scenario.runner.runGroup(TransactionApiTests.setPos, [
-    { id: App.scenario.TR_EXPENSE_2, pos: 5 },
-    { id: App.scenario.TR_INCOME_2, pos: 10 },
-    { id: App.scenario.TR_TRANSFER_1, pos: 100 },
-]);
+    const data = [
+        [App.scenario.TR_EXPENSE_2],
+        [App.scenario.TR_TRANSFER_1, App.scenario.TR_DEBT_3],
+    ];
+
+    await App.scenario.runner.runGroup(TransactionApiTests.del, data);
+};
+
+const delInvalid = async () => {
+    setBlock('Delete transactions with invalid data', 2);
+
+    const data = [
+        null,
+        [null, null],
+        [],
+        [-1],
+    ];
+
+    await App.scenario.runner.runGroup(TransactionApiTests.del, data);
+};
+
+const setPos = async () => {
+    setBlock('Set position of transaction', 2);
+
+    const data = [
+        { id: App.scenario.TR_EXPENSE_2, pos: 5 },
+        { id: App.scenario.TR_INCOME_2, pos: 10 },
+        { id: App.scenario.TR_TRANSFER_1, pos: 100 },
+    ];
+
+    await App.scenario.runner.runGroup(TransactionApiTests.setPos, data);
+};
 
 const filter = async () => {
     setBlock('Filter transactions', 2);
@@ -498,7 +540,7 @@ const filter = async () => {
 };
 
 const statistics = async () => {
-    setBlock('Statistics', 2);
+    setBlock('Statistics', 1);
 
     const { RUB } = App.scenario;
 
@@ -542,11 +584,14 @@ const statistics = async () => {
 export const apiTransactionsTests = {
     async createTests() {
         await create();
+        await createInvalid();
         await createMultiple();
+        await createMultipleInvalid();
     },
 
     async updateTests() {
         await update();
+        await updateInvalid();
         await setPos();
     },
 
@@ -557,5 +602,6 @@ export const apiTransactionsTests = {
 
     async deleteTests() {
         await del();
+        await delInvalid();
     },
 };

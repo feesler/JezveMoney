@@ -16,7 +16,7 @@ include(TPL_PATH . "Header.tpl"); ?>
                         <h1>Transactions</h1>
                         <div class="heading-actions">
                             <?= IconButton::render([
-                                "id" => "add_btn",
+                                "id" => "createBtn",
                                 "type" => "link",
                                 "classNames" => "circle-icon",
                                 "link" => BASEURL . "transactions/create/",
@@ -27,50 +27,58 @@ include(TPL_PATH . "Header.tpl"); ?>
                     </div>
 
                     <div id="contentHeader" class="content-header">
-                        <div id="filterscollapse"></div>
-                        <div id="filtershdr" class="filters-heading">
-                            <div class="filters-heading__icon">
-                                <?= svgIcon("filter", "filter-icon") ?>
-                            </div>
-                            <label>Filters</label>
-                            <a id="clearall_btn" class="clear-all-btn" href="<?= e($clearAllURL) ?>">
-                                <?= svgIcon("close", "clear-all-icon") ?>
-                                <span>Clear all</span>
-                            </a>
-                            <button class="btn icon-btn toggle-btn right-align" type="button">
-                                <svg class="icon toggle-icon">
-                                    <use href="#toggle-ext"></use>
-                                </svg>
-                            </button>
-                        </div>
+                        <?= IconButton::render([
+                            "id" => "filtersBtn",
+                            "classNames" => "filters-btn",
+                            "icon" => "filter",
+                            "title" => "Filters"
+                        ]) ?>
 
-                        <div id="filters" class="filters-container">
-                            <div class="filter-item">
-                                <h3 class="filter-item__title">Type</h3>
-                                <?= LinkMenu::render([
-                                    "id" => "type_menu",
-                                    "classNames" => "trtype-menu",
-                                    "multiple" => true,
-                                    "items" => $typeMenu,
-                                ]) ?>
+                        <div id="filtersContainer" class="filters-container">
+                            <div class="filters-heading">
+                                <span class="filters-heading__title">Filters</span>
+                                <button id="closeFiltersBtn" class="btn icon-btn close-btn right-align" type="button">
+                                    <svg class="icon close-icon">
+                                        <use href="#close"></use>
+                                    </svg>
+                                </button>
                             </div>
 
-                            <div class="filters-row">
-                                <div id="accountsFilter" class="filter-item">
-                                    <h3 class="filter-item__title">Accounts and persons</h3>
-                                    <select id="acc_id" name="acc_id" multiple></select>
+                            <div class="filters-list">
+                                <div class="filters-row">
+                                    <div class="filter-item trans-type-filter">
+                                        <h3 class="filter-item__title">Type</h3>
+                                        <?= LinkMenu::render([
+                                            "id" => "typeMenu",
+                                            "classNames" => "trtype-menu",
+                                            "multiple" => true,
+                                            "items" => $typeMenu,
+                                        ]) ?>
+                                    </div>
+
+                                    <div id="accountsFilter" class="filter-item">
+                                        <h3 class="filter-item__title">Accounts and persons</h3>
+                                        <select id="acc_id" name="acc_id" multiple></select>
+                                    </div>
+                                </div>
+
+                                <div class="filters-row">
+                                    <div id="dateFilter" class="filter-item date-range-filter validation-block">
+                                        <h3 class="filter-item__title">Date range</h3>
+                                        <?= DateRangeInput::render($dateRange) ?>
+                                    </div>
+
+                                    <div id="searchFilter" class="filter-item">
+                                        <h3 class="filter-item__title">Search</h3>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="filters-row">
-                                <div id="dateFilter" class="filter-item date-range-filter validation-block">
-                                    <h3 class="filter-item__title">Date range</h3>
-                                    <?= DateRangeInput::render($dateRange) ?>
-                                </div>
-
-                                <div id="searchFilter" class="filter-item">
-                                    <h3 class="filter-item__title">Search</h3>
-                                </div>
+                            <div class="form-controls filters-controls">
+                                <button id="applyFiltersBtn" class="btn submit-btn" type="button">Apply</button>
+                                <a id="clearFiltersBtn" class="clear-all-btn" href="<?= e($clearAllURL) ?>">
+                                    <span>Clear all</span>
+                                </a>
                             </div>
                         </div>
 

@@ -6,6 +6,7 @@ import {
     Component,
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
+import { Icon } from 'jezvejs/Icon';
 import {
     IMPORT_ACTION_SET_ACCOUNT,
     IMPORT_ACTION_SET_PERSON,
@@ -78,9 +79,13 @@ export class ImportRuleForm extends Component {
             },
             events: { click: (e) => this.onCreateConditionClick(e) },
         });
+        const toggleCondIcon = Icon.create({
+            icon: 'toggle-ext',
+            className: 'icon toggle-icon',
+        });
         this.toggleCondBtn = createElement('button', {
             props: { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
-            children: window.app.createIcon('toggle-ext', 'icon toggle-icon'),
+            children: toggleCondIcon.elem,
         });
 
         this.conditionsList = ListContainer.create({
@@ -112,9 +117,13 @@ export class ImportRuleForm extends Component {
             props: { className: 'btn link-btn create-btn', type: 'button', textContent: BTN_CREATE_ACTION },
             events: { click: (e) => this.onCreateActionClick(e) },
         });
+        const toggleActIcon = Icon.create({
+            icon: 'toggle-ext',
+            className: 'icon toggle-icon',
+        });
         this.toggleActionsBtn = createElement('button', {
             props: { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
-            children: window.app.createIcon('toggle-ext', 'icon toggle-icon'),
+            children: toggleActIcon.elem,
         });
 
         this.actionsList = ListContainer.create({

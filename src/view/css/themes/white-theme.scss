@@ -1,11 +1,16 @@
 .white-theme {
   --main-text-color: #000000;
   --main-bg-color: #ffffff;
+  --semitrans-bg-color: #ffffff66;
   --alt-bg-color: #f0f0f0;
 
   /* Header */
   --header-bg-color: #404040;
   --header-hover-btn-bg-color: #606060;
+
+  /* Buttons */
+  --btn-bg: #e8e8e8;
+  --btn-hover-bg: #c9c9c9;
 
   /* Inputs */
   --input-bg-color: #f2f2f2;
@@ -24,6 +29,10 @@
   --list-item-icon-fill: #a7a7a7;
   --list-item-hover-icon-fill: #ffffff;
 
+  /* Popup menu */
+  --popup-menu-bg: #ffffffbb;
+  --popup-menu-box-shadow: 0 0 10px 0 #00000080;
+
   color: var(--main-text-color);
   background-color: var(--main-bg-color);
 
@@ -33,8 +42,8 @@
   }
 
   /* Navigation items */
-  a.nav-link,
-  a.nav-link:visited {
+  a.nav-item__link,
+  a.nav-item__link:visited {
     color: #202020;
   }
 
@@ -142,7 +151,7 @@
     --dd-input-text: var(--main-text-color);
 
     /* Active component */
-    --dd-active-bg: #f2f2f2;
+    --dd-active-bg: var(--input-bg-color);
     --dd-active-border: var(--active-input-border-color);
 
     /* Clear and toggle buttons */
@@ -193,8 +202,13 @@
   }
 
   /* Filters */
-  .filters-collapsible .collapsible-header {
-    background-color: var(--alt-bg-color);
+  .filters-btn {
+    --iconbtn-background: var(--btn-bg);
+    --iconbtn-hover-background: var(--btn-hover-bg);
+  }
+
+  .filters-offcanvas {
+    --offcanvas-bg: var(--semitrans-bg-color);
   }
 
   .filters-heading label {
@@ -235,7 +249,7 @@
   /* 'Show more' button */
   .show-more-btn {
     color: var(--main-text-color);
-    background-color: #e8e8e8;
+    background-color: var(--btn-bg);
   }
 
   /* Bar chart */
@@ -259,14 +273,6 @@
     color: var(--main-text-color);
   }
 
-  /* Tiles list */
-  .tiles,
-  .total-list {
-    .nodata-message {
-      color: var(--main-text-color);
-    }
-  }
-
   /* Swap button */
   .swap-btn:active {
     background-color: #b0b0b0;
@@ -284,9 +290,12 @@
   .popup-menu,
   .popup-menu-list {
     --popupmenu-border-color: #b0b0b0;
-    --popupmenu-separator-color: #b0b0b0;
-    --popupmenu-background: #f2f2f2;
+    --popupmenu-separator-color: #ebebeb;
+    --popupmenu-background: var(--popup-menu-bg);
+    --popupmenu-title-color: var(--main-text-color);
     --popupmenu-icon-color: var(--main-text-color);
+    --popupmenu-hover-icon-color: #ffffff;
+    --popupmenu-hover-title-color: #ffffff;
   }
 
   /* Import form */
@@ -310,27 +319,6 @@
 
     .icon {
       fill: var(--list-item-icon-fill);
-    }
-  }
-
-  /* Disabled Import form */
-  .import-form[disabled] {
-    input[type="text"],
-    input[disabled] {
-      color: var(--input-disabled-text-color);
-      border-color: var(--input-disabled-border-color);
-      background-color: var(--input-disabled-bg-color);
-    }
-
-    input::placeholder {
-      color: #dddddd;
-    }
-
-    .input-group__btn,
-    .input-group__text {
-      color: var(--input-disabled-text-color);
-      border-color: var(--input-disabled-border-color);
-      background-color: var(--input-disabled-bg-color);
     }
   }
 
@@ -366,16 +354,6 @@
     .icon {
       fill: var(--list-item-icon-fill);
     }
-  }
-
-  /* Disabled Import form */
-  .import-form[disabled] .form-container,
-  .import-form[disabled] .controls,
-  .import-form[disabled] .invalid-feedback,
-  .import-form[disabled] .form-controls {
-    background-color: #e8e8e8;
-    color: #808080;
-    border-color: #e8e8e8;
   }
 
   /* Upload dialog */
@@ -438,12 +416,12 @@
       border-color: #b0b0b0;
       background-color: #e8e8e8;
     }
+  }
 
-    &[disabled] .collapsible-content {
-      color: #a0a0a0;
-      border-color: #d0d0d0;
-      background-color: #e0e0e0;
-    }
+  .import-item[disabled] .collapsible-content {
+    color: #a0a0a0;
+    border-color: #d0d0d0;
+    background-color: #e0e0e0;
   }
 
   /* Statistics view */
@@ -452,7 +430,7 @@
   }
 
   .chart__popup {
-    background-color: #ffffffe6;
+    background-color: var(--popup-menu-bg);
     color: var(--main-text-color);
   }
 
@@ -479,8 +457,12 @@
 
 @media (hover: hover) {
   .white-theme {
-    a.nav-link:hover {
+    a.nav-item__link:hover {
       color: var(--main-text-color);
+    }
+
+    .nav-item__icon-btn:hover {
+      background: #dddddd;
     }
 
     .iconbutton:hover {
@@ -494,10 +476,7 @@
     /* 'Show more' button */
     .show-more-btn:hover {
       background-color: #c9c9c9;
-    }
-
-    .filters-collapsible .collapsible-header:hover {
-      background-color: #e8e8e8;
+      background-color: var(--btn-hover-bg);
     }
 
     .swap-btn:hover .swap-icon {

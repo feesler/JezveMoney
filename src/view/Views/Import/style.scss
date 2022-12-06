@@ -47,23 +47,18 @@
   position: relative;
   row-gap: 2px;
 
-  .collapsible-content,
-  .invalid-feedback,
-  .form-controls {
+  .collapsible-content {
     margin-left: 0;
     transition: margin-left 0.2s ease;
   }
 }
 
 .import-list_select {
-  .import-item,
-  .import-form {
+  .import-item {
     cursor: pointer;
   }
 
-  .collapsible-content,
-  .invalid-feedback,
-  .form-controls {
+  .collapsible-content {
     margin-left: 32px;
   }
 }

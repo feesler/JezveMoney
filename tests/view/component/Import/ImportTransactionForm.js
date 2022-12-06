@@ -8,6 +8,8 @@ import {
     assert,
     copyObject,
     asyncMap,
+    evaluate,
+    hasClass,
 } from 'jezve-test';
 import { DropDown } from 'jezvejs-test';
 import {
@@ -51,6 +53,13 @@ export class ImportTransactionForm extends TestComponent {
         assert(res.labelElem, 'Invalid structure of field');
         res.title = await prop(res.labelElem, 'textContent');
 
+        const isValidation = await hasClass(elem, 'validation-block');
+        if (isValidation) {
+            res.invFeedback = { elem: await query(elem, '.invalid-feedback') };
+            res.invFeedback.visible = await isVisible(res.invFeedback.elem);
+            res.invalidated = await hasClass(elem, 'invalid-block');
+        }
+
         const inputGroup = await query(elem, '.input-group');
         const dropDownSelector = (inputGroup) ? '.dd__container_attached' : '.dd__container';
         const dropDownElem = await query(elem, dropDownSelector);
@@ -77,9 +86,16 @@ export class ImportTransactionForm extends TestComponent {
         if (!dropDownElem || inputGroup) {
             res.inputElem = await query(elem, 'input[type=text]');
             assert(res.inputElem, 'Invalid structure of field');
-            res.name = await prop(res.inputElem, 'name');
-            res.disabled = await prop(res.inputElem, 'disabled');
-            res.value = await prop(res.inputElem, 'value');
+
+            [
+                res.name,
+                res.disabled,
+                res.value,
+            ] = await evaluate((inputEl) => ([
+                inputEl.name,
+                inputEl.disabled,
+                inputEl.value,
+            ]), res.inputElem);
         }
 
         return res;
@@ -100,7 +116,6 @@ export class ImportTransactionForm extends TestComponent {
             this.parseField(await query(this.elem, selector))
         ));
 
-        res.invFeedback = { elem: await query(this.elem, '.invalid-feedback') };
         res.toggleBtn = await query(this.elem, '.toggle-btn');
         res.saveBtn = await query(this.elem, '.submit-btn');
         res.cancelBtn = await query(this.elem, '.cancel-btn');
@@ -114,7 +129,6 @@ export class ImportTransactionForm extends TestComponent {
             && res.personField
             && res.dateField
             && res.commentField
-            && res.invFeedback.elem
             && res.saveBtn
             && res.cancelBtn,
             'Invalid structure of import item',
@@ -197,7 +211,16 @@ export class ImportTransactionForm extends TestComponent {
 
         res.isDifferent = (res.srcCurrId !== res.destCurrId);
 
-        res.invalidated = await isVisible(cont.invFeedback.elem, true);
+        const srcAmount = !cont.srcAmountField.invalidated;
+        const destAmount = !cont.destAmountField.invalidated;
+        const date = !cont.dateField.invalidated;
+        res.validation = {
+            srcAmount,
+            destAmount,
+            date,
+        };
+        res.invalidated = !(srcAmount && destAmount && date);
+
         res.imported = await isVisible(cont.toggleBtn, true);
         if (cont.originalData) {
             res.original = {
@@ -205,6 +228,17 @@ export class ImportTransactionForm extends TestComponent {
             };
         }
 
+        return res;
+    }
+
+    cleanValidation(model = this.model) {
+        const res = model;
+        res.validation = {
+            srcAmount: true,
+            destAmount: true,
+            date: true,
+        };
+        res.invalidated = false;
         return res;
     }
 
@@ -228,12 +262,18 @@ export class ImportTransactionForm extends TestComponent {
                 dropDown: {
                     disabled: !isIncome,
                 },
+                invFeedback: {
+                    visible: showSrcAmount && !model.validation.srcAmount,
+                },
             },
             destAmountField: {
                 disabled: !showDestAmount,
                 visible: showDestAmount,
                 dropDown: {
                     disabled: !isExpense,
+                },
+                invFeedback: {
+                    visible: showDestAmount && !model.validation.destAmount,
                 },
             },
             transferAccountField: {
@@ -252,14 +292,14 @@ export class ImportTransactionForm extends TestComponent {
                     visible: true,
                     disabled: false,
                 },
+                invFeedback: {
+                    visible: !model.validation.date,
+                },
             },
             commentField: {
                 value: model.comment.toString(),
                 disabled: false,
                 visible: true,
-            },
-            invFeedback: {
-                visible: model.invalidated ?? false,
             },
         };
 
@@ -412,7 +452,7 @@ export class ImportTransactionForm extends TestComponent {
         res.date = res.original.date;
         res.comment = res.original.comment;
         res.isDifferent = (res.srcCurrId !== res.destCurrId);
-        res.invalidated = false;
+        this.cleanValidation(res);
 
         return res;
     }
@@ -531,15 +571,17 @@ export class ImportTransactionForm extends TestComponent {
                 this.model.srcAmount = this.model.destAmount;
             }
 
-            let accId = before.destId;
-            if (!accId) {
-                const account = App.state.getFirstAccount();
-                accId = account.id;
+            if (typeBefore !== 'transferto') {
+                let accId = before.destId;
+                if (!accId) {
+                    const account = App.state.getFirstAccount();
+                    accId = account.id;
+                }
+                if (accId === this.model.mainAccount.id) {
+                    accId = App.state.getNextAccount(accId);
+                }
+                this.model.transferAccount = App.state.accounts.getItem(accId);
             }
-            if (accId === this.model.mainAccount.id) {
-                accId = App.state.getNextAccount(accId);
-            }
-            this.model.transferAccount = App.state.accounts.getItem(accId);
 
             this.model.destId = this.model.transferAccount.id;
             this.model.destCurrId = this.model.transferAccount.curr_id;
@@ -551,15 +593,17 @@ export class ImportTransactionForm extends TestComponent {
                 this.model.srcAmount = this.model.destAmount;
             }
 
-            let accId = before.sourceId;
-            if (!accId) {
-                const account = App.state.getFirstAccount();
-                accId = account.id;
+            if (typeBefore !== 'transferfrom') {
+                let accId = before.sourceId;
+                if (!accId) {
+                    const account = App.state.getFirstAccount();
+                    accId = account.id;
+                }
+                if (accId === this.model.mainAccount.id) {
+                    accId = App.state.getNextAccount(accId);
+                }
+                this.model.transferAccount = App.state.accounts.getItem(accId);
             }
-            if (accId === this.model.mainAccount.id) {
-                accId = App.state.getNextAccount(accId);
-            }
-            this.model.transferAccount = App.state.accounts.getItem(accId);
 
             this.model.sourceId = this.model.transferAccount.id;
             this.model.srcCurrId = this.model.transferAccount.curr_id;
@@ -577,9 +621,11 @@ export class ImportTransactionForm extends TestComponent {
                 this.model.sourceId = 0;
             }
 
-            const person = App.state.getFirstPerson();
-            this.model.personId = person.id;
-            this.model.person = person;
+            if (typeBefore !== 'debtfrom' && typeBefore !== 'debtto') {
+                const person = App.state.getFirstPerson();
+                this.model.personId = person.id;
+                this.model.person = person;
+            }
             this.model.srcCurrId = this.model.mainAccount.curr_id;
             this.model.destCurrId = this.model.mainAccount.curr_id;
             this.model.transferAccount = null;
@@ -587,7 +633,7 @@ export class ImportTransactionForm extends TestComponent {
         this.model.srcCurrency = App.currency.getItem(this.model.srcCurrId);
         this.model.destCurrency = App.currency.getItem(this.model.destCurrId);
         this.model.isDifferent = (this.model.srcCurrId !== this.model.destCurrId);
-        this.model.invalidated = false;
+        this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
         await this.content.typeField.dropDown.selectItem(value);
@@ -619,7 +665,7 @@ export class ImportTransactionForm extends TestComponent {
         this.model.srcCurrency = App.currency.getItem(this.model.srcCurrId);
         this.model.destCurrency = App.currency.getItem(this.model.destCurrId);
         this.model.isDifferent = (this.model.srcCurrId !== this.model.destCurrId);
-        this.model.invalidated = false;
+        this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
         await this.content.transferAccountField.dropDown.selectItem(value);
@@ -633,7 +679,7 @@ export class ImportTransactionForm extends TestComponent {
 
         this.model.personId = value;
         this.model.person = App.state.persons.getItem(value);
-        this.model.invalidated = false;
+        this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
         await this.content.personField.dropDown.selectItem(value);
@@ -649,7 +695,7 @@ export class ImportTransactionForm extends TestComponent {
         if (!this.model.isDifferent) {
             this.model.destAmount = value;
         }
-        this.model.invalidated = false;
+        this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
         await input(this.content.srcAmountField.inputElem, value);
@@ -665,7 +711,7 @@ export class ImportTransactionForm extends TestComponent {
         if (!this.model.isDifferent) {
             this.model.srcAmount = value;
         }
-        this.model.invalidated = false;
+        this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
         await input(this.content.destAmountField.inputElem, value);
@@ -683,7 +729,7 @@ export class ImportTransactionForm extends TestComponent {
         this.model.srcCurrId = parseInt(value, 10);
         this.model.srcCurrency = App.currency.getItem(value);
         this.model.isDifferent = (this.model.srcCurrId !== this.model.destCurrId);
-        this.model.invalidated = false;
+        this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
         await dropDown.selectItem(value);
@@ -701,7 +747,7 @@ export class ImportTransactionForm extends TestComponent {
         this.model.destCurrId = parseInt(value, 10);
         this.model.destCurrency = App.currency.getItem(value);
         this.model.isDifferent = (this.model.srcCurrId !== this.model.destCurrId);
-        this.model.invalidated = false;
+        this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
         await dropDown.selectItem(value);
@@ -714,7 +760,7 @@ export class ImportTransactionForm extends TestComponent {
         this.checkEnabled(this.content.dateField);
 
         this.model.date = value;
-        this.model.invalidated = false;
+        this.cleanValidation();
         this.expectedState = this.getExpectedState(this.model);
 
         await input(this.content.dateField.inputElem, value);

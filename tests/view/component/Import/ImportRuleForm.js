@@ -11,6 +11,7 @@ import {
 import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import { ImportRule } from '../../../model/ImportRule.js';
 import {
+    ConditionFields,
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,
 } from '../../../model/ImportCondition.js';
@@ -97,7 +98,7 @@ export class ImportRuleForm extends TestComponent {
         const { rule } = model;
 
         res.conditions = model.conditions.map((condition, ind) => {
-            let propFilter = ImportCondition.fieldTypes.map(({ id }) => id);
+            let propFilter = Object.values(ConditionFields);
             // Remove properties which already have `is` operator
             propFilter = propFilter.filter((property) => {
                 const found = rule.conditions.findIsCondition(property);
@@ -260,8 +261,8 @@ export class ImportRuleForm extends TestComponent {
         // Obtain condition field types currently used by rule
         const ruleFieldTypes = model.conditions.map((condition) => condition.fieldType);
         // Filter available field types
-        const availFields = ImportCondition.fieldTypes.filter((fieldType) => {
-            if (ImportCondition.isTemplateField(fieldType.id)) {
+        const availFields = Object.values(ConditionFields).filter((fieldType) => {
+            if (ImportCondition.isTemplateField(fieldType)) {
                 return App.state.templates.length > 0;
             }
 
@@ -269,7 +270,8 @@ export class ImportRuleForm extends TestComponent {
         });
 
         // Search for first field type not in list
-        return availFields.find((fieldType) => !ruleFieldTypes.includes(fieldType.id));
+        const resField = availFields.find((fieldType) => !ruleFieldTypes.includes(fieldType));
+        return (resField) ? ImportCondition.getFieldTypeById(resField) : null;
     }
 
     /** Search for first action type not used in rule */

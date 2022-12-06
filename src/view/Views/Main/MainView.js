@@ -12,6 +12,9 @@ import { TransactionList } from '../../Components/TransactionList/TransactionLis
 import '../../Components/Tile/style.scss';
 import './style.scss';
 
+/** Strings */
+const MSG_NO_TRANSACTIONS = 'No items';
+
 /**
  * Main view
  */
@@ -28,11 +31,17 @@ class MainView extends View {
      * View initialization
      */
     onStart() {
-        const transactionsWidget = ge('transactionsWidget');
+        const { accounts, persons } = window.app.model;
+        if (accounts.length === 0 && persons.length === 0) {
+            return;
+        }
+
         this.latestList = TransactionList.create({
             items: this.props.transactions,
             showControls: false,
+            noItemsMessage: MSG_NO_TRANSACTIONS,
         });
+        const transactionsWidget = ge('transactionsWidget');
         transactionsWidget.append(this.latestList.elem);
 
         Histogram.create({

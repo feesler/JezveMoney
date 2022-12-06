@@ -1,4 +1,4 @@
-import { assert, navigation, queryAll } from 'jezve-test';
+import { assert, navigation, query } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
@@ -10,37 +10,31 @@ import { TransactionsWidget } from './component/Widget/TransactionsWidget.js';
 /** Main view class */
 export class MainView extends AppView {
     async parseContent() {
-        const widgets = await queryAll('.widget');
-        assert(
-            widgets?.length === App.config.widgetsCount,
-            'Fail to parse main view widgets',
-        );
-
         const res = {};
 
         res.accountsWidget = await TilesWidget.create(
             this,
-            widgets[App.config.AccountsWidgetPos],
+            await query('.accounts-widget'),
         );
 
         res.totalsWidget = await Widget.create(
             this,
-            widgets[App.config.TotalsWidgetPos],
+            await query('.total-widget'),
         );
 
         res.transactionsWidget = await TransactionsWidget.create(
             this,
-            widgets[App.config.LatestWidgetPos],
+            await query('.transactions-widget'),
         );
 
         res.personsWidget = await TilesWidget.create(
             this,
-            widgets[App.config.PersonsWidgetPos],
+            await query('.persons-widget'),
         );
 
         res.statisticsWidget = await Widget.create(
             this,
-            widgets[App.config.StatisticsWidgetPos],
+            await query('.statistics-widget'),
         );
 
         return res;
@@ -85,19 +79,22 @@ export class MainView extends AppView {
     static render(state) {
         const res = {};
 
+        const userAccounts = state.accounts.getUserAccounts();
+
         // Accounts widget
         res.accountsWidget = {
             title: 'Accounts',
-            tiles: TilesList.renderAccounts(state.accounts.getUserAccounts()),
+            tiles: TilesList.renderAccounts(userAccounts),
         };
 
         // Transactions widget
-        const latestTransactionsList = state.transactions.slice(
-            0,
-            App.config.latestTransactions,
-        );
-        const transWidget = TransactionList.renderWidget(latestTransactionsList, state);
-        res.transactionsWidget = transWidget;
+        if (userAccounts.length > 0 || state.persons.length > 0) {
+            const latest = state.transactions.slice(
+                0,
+                App.config.latestTransactions,
+            );
+            res.transactionsWidget = TransactionList.renderWidget(latest, state);
+        }
 
         // Persons widget
         res.personsWidget = {

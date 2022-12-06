@@ -318,6 +318,9 @@ class PersonModel extends CachedTable
         $ruleModel = ImportRuleModel::getInstance();
         $ruleModel->onPersonDelete($personsToDelete);
 
+        $accMod = AccountModel::getInstance();
+        $accMod->onPersonDelete($personsToDelete);
+
         $condArr = ["user_id=" . self::$user_id, "id<>" . self::$owner_id];
         if (!$this->dbObj->deleteQ($this->tbl_name, $condArr)) {
             return false;

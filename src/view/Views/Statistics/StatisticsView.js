@@ -2,6 +2,7 @@ import 'jezvejs/style';
 import {
     ge,
     createElement,
+    setEvents,
     insertAfter,
     show,
     asArray,
@@ -9,17 +10,19 @@ import {
 import { Histogram } from 'jezvejs/Histogram';
 import { DropDown } from 'jezvejs/DropDown';
 import { LinkMenu } from 'jezvejs/LinkMenu';
-import 'jezvejs/style/InputGroup';
+import { IconButton } from 'jezvejs/IconButton';
+import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
-import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
-import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
-import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { Transaction } from '../../js/model/Transaction.js';
+import { Heading } from '../../Components/Heading/Heading.js';
+import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
+import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
+import { FiltersContainer } from '../../Components/FiltersContainer/FiltersContainer.js';
 import { createStore } from '../../js/store.js';
 import {
     getGroupTypeByName,
@@ -27,9 +30,8 @@ import {
     actions,
     reducer,
 } from './reducer.js';
-import './style.scss';
 import { correct, formatValue } from '../../js/utils.js';
-import { Heading } from '../../Components/Heading/Heading.js';
+import './style.scss';
 
 /** CSS classes */
 /* Chart popup */
@@ -98,14 +100,93 @@ class StatisticsView extends View {
     onStart() {
         const state = this.store.getState();
 
-        this.heading = Heading.fromElement(ge('heading'), {
+        const elemIds = [
+            'heading',
+            // Filters
+            'filtersBtn',
+            'filtersContainer',
+            'applyFiltersBtn',
+            'typeMenu',
+            'reportMenu',
+            'accountsFilter',
+            'currencyFilter',
+            'dateFrm',
+            // Chart
+            'chart',
+        ];
+        elemIds.forEach((id) => {
+            this[id] = ge(id);
+            if (!this[id]) {
+                throw new Error('Failed to initialize view');
+            }
+        });
+
+        this.heading = Heading.fromElement(this.heading, {
             title: STR_TITLE,
         });
 
-        const chartElem = ge('chart');
-        this.noDataMessage = chartElem.querySelector('.nodata-message');
+        // Filters
+        this.filtersBtn = IconButton.fromElement(this.filtersBtn, {
+            onClick: () => this.filters.toggle(),
+        });
+        this.filters = FiltersContainer.create({
+            content: this.filtersContainer,
+        });
+        insertAfter(this.filters.elem, this.filtersBtn.elem);
+
+        setEvents(this.applyFiltersBtn, { click: () => this.filters.close() });
+
+        // Transaction type filter
+        this.typeMenu = TransactionTypeMenu.fromElement(this.typeMenu, {
+            multiple: true,
+            allowActiveLink: true,
+            itemParam: 'type',
+            onChange: (sel) => this.onChangeTypeFilter(sel),
+        });
+
+        // Report type filter
+        this.reportMenu = LinkMenu.fromElement(this.reportMenu, {
+            itemParam: 'report',
+            onChange: (value) => this.onSelectReportType(value),
+        });
+
+        // Currency filter
+        this.currencyDropDown = DropDown.create({
+            elem: 'curr_id',
+            onitemselect: (obj) => this.onCurrencySel(obj),
+            className: 'dd_fullwidth',
+        });
+        window.app.initCurrencyList(this.currencyDropDown);
+
+        // Accounts filter
+        this.accountDropDown = DropDown.create({
+            elem: 'acc_id',
+            multiple: true,
+            placeholder: 'Select account',
+            onitemselect: (obj) => this.onAccountSel(obj),
+            onchange: (obj) => this.onAccountSel(obj),
+            className: 'dd_fullwidth',
+        });
+        window.app.initAccountsList(this.accountDropDown);
+
+        // 'Group by' filter
+        this.groupDropDown = DropDown.create({
+            elem: 'groupsel',
+            onitemselect: (obj) => this.onGroupSel(obj),
+            className: 'dd_fullwidth',
+        });
+
+        // Date range filter
+        this.dateRangeFilter = DateRangeInput.fromElement(this.dateFrm, {
+            startPlaceholder: START_DATE_PLACEHOLDER,
+            endPlaceholder: END_DATE_PLACEHOLDER,
+            onChange: (data) => this.onChangeDateFilter(data),
+        });
+
+        // Chart
+        this.noDataMessage = this.chart.querySelector('.nodata-message');
         this.histogram = Histogram.create({
-            elem: chartElem,
+            elem: this.chart,
             height: 320,
             marginTop: 35,
             scrollToEnd: true,
@@ -120,56 +201,11 @@ class StatisticsView extends View {
             renderLegend: (data) => this.renderLegendContent(data),
             renderYAxisLabel: (value) => this.renderYLabel(value),
         });
-
         this.histogram.elem.dataset.time = state.renderTime;
 
+        // Loading indicator
         this.loadingIndicator = LoadingIndicator.create();
-        insertAfter(this.loadingIndicator.elem, chartElem);
-
-        this.typeMenu = TransactionTypeMenu.fromElement(ge('type_menu'), {
-            multiple: true,
-            allowActiveLink: true,
-            itemParam: 'type',
-            onChange: (sel) => this.onChangeTypeFilter(sel),
-        });
-
-        this.reportMenu = LinkMenu.fromElement(ge('report_menu'), {
-            itemParam: 'report',
-            onChange: (value) => this.onSelectReportType(value),
-        });
-
-        this.accountField = ge('acc_block');
-        this.currencyField = ge('curr_block');
-
-        this.currencyDropDown = DropDown.create({
-            elem: 'curr_id',
-            onitemselect: (obj) => this.onCurrencySel(obj),
-            className: 'dd_fullwidth',
-        });
-        window.app.initCurrencyList(this.currencyDropDown);
-
-        this.accountDropDown = DropDown.create({
-            elem: 'acc_id',
-            multiple: true,
-            placeholder: 'Select account',
-            onitemselect: (obj) => this.onAccountSel(obj),
-            onchange: (obj) => this.onAccountSel(obj),
-            className: 'dd_fullwidth',
-        });
-        window.app.initAccountsList(this.accountDropDown);
-
-        this.groupDropDown = DropDown.create({
-            elem: 'groupsel',
-            onitemselect: (obj) => this.onGroupSel(obj),
-            className: 'dd_fullwidth',
-        });
-
-        // Date range filter
-        this.dateRangeFilter = DateRangeInput.fromElement(ge('dateFrm'), {
-            startPlaceholder: START_DATE_PLACEHOLDER,
-            endPlaceholder: END_DATE_PLACEHOLDER,
-            onChange: (data) => this.onChangeDateFilter(data),
-        });
+        insertAfter(this.loadingIndicator.elem, this.chart);
 
         // Select first account if nothing selected on account report type
         const accounts = asArray(state.form.acc_id);
@@ -444,8 +480,8 @@ class StatisticsView extends View {
         const isByCurrency = (state.form.report === 'currency');
         this.reportMenu.setActive(state.form.report);
 
-        show(this.accountField, !isByCurrency);
-        show(this.currencyField, isByCurrency);
+        show(this.accountsFilter, !isByCurrency);
+        show(this.currencyFilter, isByCurrency);
 
         this.renderAccountsFilter(state);
 

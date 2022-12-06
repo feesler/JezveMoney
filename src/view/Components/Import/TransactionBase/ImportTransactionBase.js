@@ -3,16 +3,11 @@ import {
     isFunction,
     Component,
 } from 'jezvejs';
-import { Checkbox } from 'jezvejs/Checkbox';
-import { Collapsible } from 'jezvejs/Collapsible';
-import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
+import { Icon } from 'jezvejs/Icon';
 
 /** CSS classes */
 const TOGGLE_BUTTON_CLASS = 'btn icon-btn toggle-btn';
 const TOGGLE_ICON_CLASS = 'icon toggle-icon';
-/* Select controls */
-const SELECT_CONTROLS_CLASS = 'select-controls';
-const SELECTED_CLASS = 'import-item_selected';
 /* Similar transaction */
 const SIMILAR_CLASS = 'similar';
 const SIMILAR_TITLE_CLASS = 'similar__title';
@@ -36,43 +31,17 @@ export class ImportTransactionBase extends Component {
         return this.state.collapsed;
     }
 
-    initContainer(className, children) {
-        const { originalData } = this.props.data.props;
-        if (!originalData) {
-            this.elem = window.app.createContainer(className, children);
-            return;
-        }
-
-        const origDataContainer = OriginalImportData.create({
-            ...originalData,
-        });
-
-        const content = [origDataContainer.elem];
-
-        const { similarTransaction } = this.props.data.state;
-        if (similarTransaction) {
-            const infoElem = this.createSimilarTransactionInfo(similarTransaction);
-            content.push(infoElem);
-        }
-
-        this.toggleExtBtn = this.createToggleButton();
-        this.controls.append(this.toggleExtBtn);
-
-        this.collapse = Collapsible.create({
-            toggleOnClick: false,
-            className,
-            header: children,
-            content,
-        });
-        this.elem = this.collapse.elem;
-    }
-
     createMenuButton() {
-        const { createContainer, createIcon } = window.app;
+        const { createContainer } = window.app;
+
+        const icon = Icon.create({
+            icon: 'ellipsis',
+            className: MENU_ICON_CLASS,
+        });
 
         this.menuBtn = createElement('button', {
             props: { className: MENU_BUTTON_CLASS, type: 'button' },
-            children: createIcon('ellipsis', MENU_ICON_CLASS),
+            children: icon.elem,
         });
         this.menuContainer = createContainer(MENU_CLASS, [
             this.menuBtn,
@@ -80,11 +49,16 @@ export class ImportTransactionBase extends Component {
     }
 
     /** Returns toggle expand/collapse button */
-    createToggleButton() {
+    createToggleButton(events = null) {
+        const icon = Icon.create({
+            icon: 'toggle-ext',
+            className: TOGGLE_ICON_CLASS,
+        });
+
         return createElement('button', {
             props: { className: TOGGLE_BUTTON_CLASS, type: 'button' },
-            children: window.app.createIcon('toggle-ext', TOGGLE_ICON_CLASS),
-            events: { click: () => this.toggleCollapse() },
+            children: icon.elem,
+            events,
         });
     }
 
@@ -114,31 +88,6 @@ export class ImportTransactionBase extends Component {
                 }),
             ],
         });
-    }
-
-    createSelectControls() {
-        const { createContainer } = window.app;
-
-        if (this.selectControls) {
-            return;
-        }
-
-        this.checkbox = Checkbox.create();
-        this.selectControls = createContainer(SELECT_CONTROLS_CLASS, [
-            this.checkbox.elem,
-        ]);
-    }
-
-    renderSelectControls(state, prevState = {}) {
-        if (state.transaction.state.listMode === prevState?.transaction?.state?.listMode) {
-            return;
-        }
-
-        const { listMode, selected } = state.transaction.state;
-        const selectMode = listMode === 'select';
-        const isSelected = selectMode && !!selected;
-        this.elem.classList.toggle(SELECTED_CLASS, isSelected);
-        this.checkbox?.check(isSelected);
     }
 
     /** Enable/disable component */

@@ -1,7 +1,6 @@
 import {
     ge,
     createElement,
-    svg,
     isDate,
     formatDate,
 } from 'jezvejs';
@@ -181,22 +180,15 @@ export class Application {
         blockElem?.classList?.add(INVALID_BLOCK_CLASS);
     }
 
+    /** Set validation state for element */
+    setValidation(elem, valid) {
+        const el = (typeof elem === 'string') ? ge(elem) : elem;
+        el?.classList?.toggle(INVALID_BLOCK_CLASS, !valid);
+    }
+
     /** Create simple container element */
     createContainer(elemClass, children, events) {
         return createElement('div', { props: { className: elemClass }, children, events });
-    }
-
-    /** Create SVG icon element */
-    createIcon(icon, className = null) {
-        const useElem = svg('use');
-        const res = svg('svg', {}, useElem);
-        if (className) {
-            res.setAttribute('class', className);
-        }
-
-        useElem.href.baseVal = (icon) ? `#${icon}` : '';
-
-        return res;
     }
 
     checkUserAccountModels() {
