@@ -373,7 +373,10 @@ class ImportView extends View {
      */
     async requestSimilar() {
         const state = this.store.getState();
-        if (!state.checkSimilarEnabled) {
+        if (
+            !state.checkSimilarEnabled
+            || !state.items.some((item) => item.originalData)
+        ) {
             return;
         }
 
