@@ -152,7 +152,7 @@
     --dd-input-text: var(--main-text-color);
 
     /* Active component */
-    --dd-active-bg: #202020;
+    --dd-active-bg: var(--input-bg-color);
     --dd-active-border: var(--active-input-border-color);
 
     /* Clear and toggle buttons */

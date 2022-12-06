@@ -151,7 +151,7 @@
     --dd-input-text: var(--main-text-color);
 
     /* Active component */
-    --dd-active-bg: #f2f2f2;
+    --dd-active-bg: var(--input-bg-color);
     --dd-active-border: var(--active-input-border-color);
 
     /* Clear and toggle buttons */
