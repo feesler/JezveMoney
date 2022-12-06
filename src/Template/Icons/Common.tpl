@@ -7,6 +7,10 @@
         <path d="m11 4v7h-7v2l7 1e-4v7h2v-7l7-1e-4v-2h-7v-7l-2-1e-5z" />
     </symbol>
 
+    <symbol id="plus-light" viewBox="0 0 13 13">
+        <path d="m6 1v5h-5v1l5 1e-4v5h1v-5l5-1e-4v-1h-5v-5l-1-1e-5z" />
+    </symbol>
+
     <symbol id="update" viewBox="0 0 24 24">
         <path d="m6.0243 14.357-1.8944 5.5228 5.5984-1.781z" />
         <path d="m7.1253 13.283 6.9499-7.0522 3.6506 3.6884-6.9388 7.0788z" />

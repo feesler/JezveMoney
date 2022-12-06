@@ -43,8 +43,8 @@
   }
 
   /* Navigation items */
-  a.nav-link,
-  a.nav-link:visited {
+  a.nav-item__link,
+  a.nav-item__link:visited {
     color: var(--main-text-color);
   }
 
@@ -465,8 +465,12 @@
 
 @media (hover: hover) {
   .dark-theme {
-    a.nav-link:hover {
+    a.nav-item__link:hover {
       color: var(--hl-text-color);
+    }
+
+    .nav-item__icon-btn:hover {
+      background: #323232;
     }
 
     .iconbutton:hover {

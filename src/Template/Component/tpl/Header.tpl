@@ -33,14 +33,29 @@
 
     <ul class="nav-list">
         <?php if ($this->user_id != 0) {        ?>
-            <li><a class="nav-link" href="<?= BASEURL ?>accounts/">Accounts</a></li>
-            <li><a class="nav-link" href="<?= BASEURL ?>persons/">Persons</a></li>
-            <li><a class="nav-link" href="<?= BASEURL ?>transactions/">Transactions</a></li>
-            <li><a class="nav-link" href="<?= BASEURL ?>statistics/">Statistics</a></li>
-            <li><a class="nav-link" href="<?= BASEURL ?>import/">Import</a></li>
+            <li class="nav-item">
+                <a class="nav-item__link" href="<?= BASEURL ?>accounts/">Accounts</a>
+                <a class="nav-item__icon-btn" href="<?= BASEURL ?>accounts/create/">
+                    <?= useIcon("plus-light", "nav-item__icon") ?>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-item__link" href="<?= BASEURL ?>persons/">Persons</a>
+                <a class="nav-item__icon-btn" href="<?= BASEURL ?>persons/create/">
+                    <?= useIcon("plus-light", "nav-item__icon") ?>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-item__link" href="<?= BASEURL ?>transactions/">Transactions</a>
+                <a class="nav-item__icon-btn" href="<?= BASEURL ?>transactions/create/">
+                    <?= useIcon("plus-light", "nav-item__icon") ?>
+                </a>
+            </li>
+            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>statistics/">Statistics</a></li>
+            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>import/">Import</a></li>
             <li class="nav-separator"></li>
         <?php    }        ?>
-        <li class="nav-bottom"><a class="nav-link" href="<?= BASEURL ?>about/">About</a></li>
+        <li class="nav-bottom"><a class="nav-item__link" href="<?= BASEURL ?>about/">About</a></li>
     </ul>
 </nav>
 
@@ -59,7 +74,7 @@
 
     <?php if ($this->user_id != 0) {        ?>
         <ul class="nav-list">
-            <li>
+            <li class="nav-item">
                 <div class="theme-switch">
                     <span class="theme-switch__label">Dark theme</span>
                     <label id="theme-check" class="switch">
@@ -69,11 +84,12 @@
                 </div>
             </li>
             <li class="nav-separator"></li>
-            <li><a class="nav-link" href="<?= BASEURL ?>profile/" tabindex="5">Profile</a></li>
-            <li><a class="nav-link" href="<?= BASEURL ?>logout/" tabindex="6">Logout</a></li>
+            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>profile/" tabindex="5">Profile</a></li>
+            <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>logout/" tabindex="6">Logout</a></li>
             <?php if ($this->adminUser) {        ?>
                 <li class="nav-separator"></li>
-                <li class="nav-bottom"><a class="nav-link" href="<?= BASEURL ?>admin/" tabindex="7">Admin panel</a></li>
+
+                <li class="nav-bottom"><a class="nav-item__link" href="<?= BASEURL ?>admin/" tabindex="7">Admin panel</a></li>
             <?php        }        ?>
         </ul>
     <?php    }        ?>

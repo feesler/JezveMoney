@@ -25,16 +25,16 @@
     </div>
 
     <ul class="nav-list">
-        <li><a class="nav-link" href="<?=BASEURL?>">Index</a></li>
+        <li><a class="nav-item__link" href="<?=BASEURL?>">Index</a></li>
         <li class="nav-separator"></li>
-        <li><a class="nav-link" href="<?=BASEURL?>admin/dbinstall/">DB update</a></li>
-        <li><a class="nav-link" href="<?=BASEURL?>admin/currency/">Currencies</a></li>
-        <li><a class="nav-link" href="<?=BASEURL?>admin/icon/">Icons</a></li>
-        <li><a class="nav-link" href="<?=BASEURL?>admin/query/">Queries</a></li>
-        <li><a class="nav-link" href="<?=BASEURL?>admin/log/">Logs</a></li>
-        <li><a class="nav-link" href="<?=BASEURL?>admin/balance/">Balance</a></li>
-        <li><a class="nav-link" href="<?=BASEURL?>admin/tests/">Tests</a></li>
-        <li><a class="nav-link" href="<?=BASEURL?>admin/apiconsole/">API console</a></li>
-        <li><a class="nav-link" href="<?=BASEURL?>admin/user/">Users</a></li>
+        <li><a class="nav-item__link" href="<?=BASEURL?>admin/dbinstall/">DB update</a></li>
+        <li><a class="nav-item__link" href="<?=BASEURL?>admin/currency/">Currencies</a></li>
+        <li><a class="nav-item__link" href="<?=BASEURL?>admin/icon/">Icons</a></li>
+        <li><a class="nav-item__link" href="<?=BASEURL?>admin/query/">Queries</a></li>
+        <li><a class="nav-item__link" href="<?=BASEURL?>admin/log/">Logs</a></li>
+        <li><a class="nav-item__link" href="<?=BASEURL?>admin/balance/">Balance</a></li>
+        <li><a class="nav-item__link" href="<?=BASEURL?>admin/tests/">Tests</a></li>
+        <li><a class="nav-item__link" href="<?=BASEURL?>admin/apiconsole/">API console</a></li>
+        <li><a class="nav-item__link" href="<?=BASEURL?>admin/user/">Users</a></li>
     </ul>
 </div>

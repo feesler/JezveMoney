@@ -23,7 +23,7 @@ export class Navigation extends TestComponent {
 
         const res = {};
 
-        const navElems = await queryAll(this.elem, '.nav-link');
+        const navElems = await queryAll(this.elem, '.nav-item__link');
         const navLinks = await asyncMap(navElems, async (elem) => ({
             elem,
             title: await prop(elem, 'textContent'),

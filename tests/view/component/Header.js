@@ -34,7 +34,7 @@ export class Header extends TestComponent {
 
         res.userNav.menuEl = await query(res.userNav.elem, '.nav-list');
         if (res.userNav.menuEl) {
-            const menuLinks = await queryAll(res.userNav.menuEl, 'a.nav-link');
+            const menuLinks = await queryAll(res.userNav.menuEl, 'a.nav-item__link');
             res.userNav.menuItems = await asyncMap(menuLinks, async (elem) => ({
                 elem,
                 title: await prop(elem, 'textContent'),

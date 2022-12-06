@@ -42,8 +42,8 @@
   }
 
   /* Navigation items */
-  a.nav-link,
-  a.nav-link:visited {
+  a.nav-item__link,
+  a.nav-item__link:visited {
     color: #202020;
   }
 
@@ -465,8 +465,12 @@
 
 @media (hover: hover) {
   .white-theme {
-    a.nav-link:hover {
+    a.nav-item__link:hover {
       color: var(--main-text-color);
+    }
+
+    .nav-item__icon-btn:hover {
+      background: #dddddd;
     }
 
     .iconbutton:hover {
