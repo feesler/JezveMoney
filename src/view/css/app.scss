@@ -472,6 +472,10 @@ label {
   border-radius: 5px;
 }
 
+.popup .dp__container {
+  position: static;
+}
+
 /* Checkboxes list sub-option */
 .suboption {
   margin-left: 29px;

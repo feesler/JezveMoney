@@ -297,7 +297,10 @@
     --popupmenu-border-color: #444444;
     --popupmenu-separator-color: #444444;
     --popupmenu-background: #222222;
+    --popupmenu-title-color: var(--main-text-color);
     --popupmenu-icon-color: var(--main-text-color);
+    --popupmenu-hover-icon-color: #ffffff;
+    --popupmenu-hover-title-color: #ffffff;
   }
 
   /* Import form */

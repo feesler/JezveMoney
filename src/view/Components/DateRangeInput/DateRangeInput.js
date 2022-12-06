@@ -7,6 +7,7 @@ import {
 } from 'jezvejs';
 import { DateInput } from 'jezvejs/DateInput';
 import { DatePicker } from 'jezvejs/DatePicker';
+import { InputGroup } from 'jezvejs/InputGroup';
 import { fixDate } from '../../js/utils.js';
 
 const defaultValidation = {
@@ -55,6 +56,8 @@ export class DateRangeInput extends Component {
             throw new Error('Invalid element');
         }
         setEvents(this.elem, { submit: (e) => this.onSubmit(e) });
+
+        this.inputGroup = InputGroup.fromElement(this.elem.querySelector('.input-group'));
 
         this.startDateInput = DateInput.create({
             elem: this.elem.querySelector('input[name="stdate"]'),
