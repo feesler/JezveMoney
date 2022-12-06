@@ -77,6 +77,8 @@
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
+    justify-content: flex-end;
+    width: 66px;
   }
 
   /* Toggle expand/collapse button */
