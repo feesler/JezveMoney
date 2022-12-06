@@ -423,21 +423,16 @@ label {
 .dd__container,
 .dd__container_attached {
   --dd-border-width: 1px;
-  --dd-border-radius: 5px;
   --dd-list-border-radius: 5px;
   --dd-selection-item-border-radius: 3px;
   --dd-disabled-list-item-bg: none;
+  --dd-combo-border-radius: 5px;
   --dd-combo-height: var(--input-height);
-}
-
-.dd__input {
-  font-size: 0.9rem;
-}
-
-.dark-theme .dd__list-item.dd__list-item_active,
-.white-theme .dd__list-item.dd__list-item_active {
-  color: #ffffff;
-  background-color: #3078e2;
+  --dd-active-list-item-text: #ffffff;
+  --dd-active-list-item-bg: #3078e2;
+  --dd-input-font-size: 0.9rem;
+  --dd-selection-font-size: 15px;
+  --dd-active-selection-bg: var(--dd-active-bg);
 }
 
 /* Stretching DropDown */
