@@ -350,6 +350,20 @@ const slice = createSlice({
         }),
     }),
 
+    restoreItemByIndex: (state, index) => ({
+        ...state,
+        contextItemIndex: -1,
+        items: state.items.map((item, ind) => {
+            if (ind !== index) {
+                return item;
+            }
+
+            const newItem = new ImportTransaction(item);
+            newItem.restoreOriginal();
+            return newItem;
+        }),
+    }),
+
     toggleEnableItemByIndex: (state, index) => ({
         ...state,
         contextItemIndex: -1,

@@ -33,6 +33,7 @@ import { ImportTransactionList } from '../../Components/Import/List/ImportTransa
 
 /* Strings */
 const STR_TITLE = 'Import';
+const STR_RESTORE_ITEM = 'Cancel changes';
 const STR_ENABLE_ITEM = 'Enable';
 const STR_DISABLE_ITEM = 'Disable';
 const MSG_IMPORT_SUCCESS = 'All transactions have been successfully imported';
@@ -273,6 +274,14 @@ class ImportView extends View {
             attached: true,
             onClose: () => this.hideContextMenu(),
             items: [{
+                id: 'ctxRestoreBtn',
+                title: STR_RESTORE_ITEM,
+                className: 'warning-item',
+                onClick: () => this.onRestoreItem(),
+            }, {
+                id: 'separator1',
+                type: 'separator',
+            }, {
                 id: 'ctxEnableBtn',
                 title: STR_DISABLE_ITEM,
                 onClick: () => this.onToggleEnableItem(),
@@ -473,6 +482,18 @@ class ImportView extends View {
 
     toggleCollapseItem(index) {
         this.store.dispatch(actions.toggleCollapseItem(index));
+    }
+
+    /** Restore original data of transaction item */
+    onRestoreItem() {
+        const state = this.store.getState();
+        const index = state.contextItemIndex;
+        if (index === -1) {
+            this.hideContextMenu();
+            return;
+        }
+
+        this.store.dispatch(actions.restoreItemByIndex(index));
     }
 
     /** Transaction item enable/disable event handler */
@@ -819,6 +840,12 @@ class ImportView extends View {
             this.contextMenu.detach();
             return;
         }
+
+        const itemRestoreAvail = (
+            !!item.originalData && (item.rulesApplied || item.modifiedByUser)
+        );
+        this.contextMenu.items.ctxRestoreBtn.show(itemRestoreAvail);
+        show(this.contextMenu.items.separator1, itemRestoreAvail);
 
         const title = (item.enabled) ? STR_DISABLE_ITEM : STR_ENABLE_ITEM;
         this.contextMenu.items.ctxEnableBtn.setTitle(title);

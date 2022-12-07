@@ -49,7 +49,7 @@ const menuItems = [
 ];
 
 const contextMenuItems = [
-    'ctxEnableBtn', 'ctxUpdateBtn', 'ctxDeleteBtn',
+    'ctxRestoreBtn', 'ctxEnableBtn', 'ctxUpdateBtn', 'ctxDeleteBtn',
 ];
 
 const transactionPopupId = '#transactionFormPopup';
@@ -289,10 +289,16 @@ export class ImportView extends AppView {
             const absIndex = firstItem + model.contextItemIndex;
             assert.arrayIndex(this.items, absIndex, 'Invalid state');
 
+            const item = this.items[absIndex];
+            const itemRestoreAvail = (
+                !!item.original && (item.rulesApplied || item.modifiedByUser)
+            );
+
             res.contextMenu = {
                 visible: true,
                 itemIndex: model.contextItemIndex,
             };
+            res.ctxRestoreBtn = { visible: itemRestoreAvail };
             res.ctxEnableBtn = { visible: true };
             res.ctxUpdateBtn = { visible: true };
             res.ctxDeleteBtn = { visible: true };
@@ -1347,6 +1353,37 @@ export class ImportView extends AppView {
         await this.performAction(() => button.click());
 
         return this.checkState();
+    }
+
+    async restoreItems(index) {
+        this.checkMainState();
+        this.checkListMode();
+
+        const indexes = asArray(index);
+        assert(indexes.length > 0, 'No items specified');
+        assert(this.itemsList, 'No items available');
+
+        const expectedItems = this.items.map((item) => new ImportTransaction(item));
+        indexes.forEach((ind) => {
+            assert.arrayIndex(expectedItems, ind);
+            const item = expectedItems[ind];
+            assert(item.original, 'Item not imported');
+            assert(item.rulesApplied || item.modifiedByUser, 'Item not modified');
+
+            item.restoreOriginal();
+        });
+
+        for (const ind of indexes) {
+            await this.openContextMenu(ind);
+            await this.performAction(() => this.content.ctxRestoreBtn.click());
+        }
+
+        this.items = expectedItems;
+        const expected = this.getExpectedState();
+        const expectedList = this.getExpectedList();
+        expected.itemsList.items = expectedList.items;
+
+        return this.checkState(expected);
     }
 
     async enableItems(index, value) {

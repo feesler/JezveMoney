@@ -82,6 +82,14 @@ export class ImportListStory extends TestStory {
         const { cardFile } = App.scenario;
         await ImportTests.uploadFile(cardFile);
         await ImportTests.submitUploaded(cardFile);
+
+        setBlock('Cancel changes', 2);
+        await ImportTests.updateItemAndSave({
+            pos: 8,
+            action: { action: 'inputDestAmount', data: '100' },
+        });
+        await ImportTests.restoreItems(8);
+
         await ImportTests.deleteAllItems();
     }
 

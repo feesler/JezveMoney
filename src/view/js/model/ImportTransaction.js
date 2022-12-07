@@ -361,6 +361,7 @@ export class ImportTransaction {
         this.setMainAccount(currentMainAccount);
 
         this.setRulesApplied(false);
+        this.setModified(false);
     }
 
     getTransferAccount(state, initialId) {
