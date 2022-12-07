@@ -117,3 +117,10 @@ textarea {
 .popup__content {
   background: none;
 }
+
+/* Desktop */
+@media (min-width: 768px) {
+  .admin_cont_wrap {
+    padding: 50px 12px 50px 212px;
+  }
+}

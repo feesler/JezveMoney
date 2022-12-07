@@ -3,7 +3,7 @@
 <div class="page">
     <div class="page_wrapper">
 <?php	include(ADMIN_TPL_PATH . "Component/tpl/Header.tpl");	?>
-<div class="navigation navigation_closed">
+<div id="apiMenu" class="navigation navigation_closed">
     <nav class="navigation-content">
         <div class="navigation-controls">
             <button class="navigation__close-btn"><?=svgIcon("back", "navigation__close-btn-icon")?></button>
@@ -155,6 +155,11 @@
                     <div class="heading">
                         <h1>API test</h1>
                     </div>
+
+<button id="showMethodsBtn" class="nav-toggle-btn methods-toggle-btn">
+    <?= svgIcon("menu", "nav-toggle-icon") ?>
+    <span>Show methods</span>
+</button>
 
 <div class="api-console">
     <div class="center-column">

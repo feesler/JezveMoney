@@ -8,6 +8,7 @@ import {
     isFunction,
     removeChilds,
 } from 'jezvejs';
+import { Offcanvas } from 'jezvejs/Offcanvas';
 import { Application } from '../../../../view/js/Application.js';
 import '../../../../view/css/app.scss';
 import { AdminView } from '../../js/AdminView.js';
@@ -33,6 +34,17 @@ class AdminApiConsoleView extends AdminView {
      */
     onStart(...args) {
         super.onStart(...args);
+
+        const apiMenuContainer = ge('apiMenu');
+        this.apiMenu = Offcanvas.create({
+            content: apiMenuContainer,
+            className: 'navigation methods-menu',
+        });
+
+        this.showMethodsBtn = ge('showMethodsBtn');
+        setEvents(this.showMethodsBtn, { click: () => this.showMethodsMenu() });
+        this.closeMethodsBtn = apiMenuContainer.querySelector('.navigation__close-btn');
+        setEvents(this.closeMethodsBtn, { click: () => this.hideMethodsMenu() });
 
         this.controllersList = ge('controllersList');
         if (!this.controllersList) {
@@ -579,6 +591,16 @@ class AdminApiConsoleView extends AdminView {
                 this.activeController = parentElem;
             }
         }
+    }
+
+    /** Show API methods menu */
+    showMethodsMenu() {
+        this.apiMenu.open();
+    }
+
+    /** Hides API methods menu */
+    hideMethodsMenu() {
+        this.apiMenu.close();
     }
 
     /**
