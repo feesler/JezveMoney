@@ -14,6 +14,7 @@ import { ImportConditionList } from '../../../../js/model/ImportConditionList.js
 import { ImportActionList } from '../../../../js/model/ImportActionList.js';
 import { ImportConditionItem } from '../ConditionItem/ImportConditionItem.js';
 import { ImportActionItem } from '../ActionItem/ImportActionItem.js';
+import { ToggleButton } from '../../../ToggleButton/ToggleButton.js';
 import './style.scss';
 
 /** CSS classes */
@@ -58,14 +59,8 @@ export class ImportRuleItem extends Component {
         this.infoLabel = createElement('span', { props: { className: 'rule-item__info' } });
 
         // Toggle expand/collapse
-        const toggleIcon = Icon.create({
-            icon: 'toggle-ext',
-            className: 'icon toggle-icon',
-        });
-        this.toggleExtBtn = createElement('button', {
-            props: { className: 'btn icon-btn toggle-btn', type: 'button' },
-            children: toggleIcon.elem,
-            events: { click: (e) => this.onToggle(e) },
+        this.toggleExtBtn = ToggleButton.create({
+            onClick: (e) => this.onToggle(e),
         });
 
         this.topRow = window.app.createContainer('rule-item__main-top', [
@@ -85,7 +80,7 @@ export class ImportRuleItem extends Component {
         this.createMenu();
         this.controls = window.app.createContainer('rule-item__main-controls', [
             this.menu,
-            this.toggleExtBtn,
+            this.toggleExtBtn.elem,
         ]);
 
         this.conditionsHeader = createElement('label', {

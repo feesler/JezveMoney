@@ -2,14 +2,17 @@ import {
     createElement,
     enable,
     show,
+    Component,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { Collapsible } from 'jezvejs/Collapsible';
-import { ImportTransactionBase } from '../TransactionBase/ImportTransactionBase.js';
+import { Icon } from 'jezvejs/Icon';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { Field } from '../../Field/Field.js';
 import './style.scss';
 import { ImportTransaction } from '../../../js/model/ImportTransaction.js';
+import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
+import { ToggleButton } from '../../ToggleButton/ToggleButton.js';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'import-item';
@@ -40,6 +43,10 @@ const SELECT_CONTROLS_CLASS = 'select-controls';
 const SELECTED_CLASS = 'import-item_selected';
 /* Sort state */
 const SORT_CLASS = 'import-item_sort';
+/* Menu */
+const MENU_CLASS = 'popup-menu';
+const MENU_BUTTON_CLASS = 'btn icon-btn popup-menu-btn';
+const MENU_ICON_CLASS = 'icon popup-menu-btn__icon';
 
 /** Strings */
 const TITLE_FIELD_SRC_ACCOUNT = 'Source account';
@@ -56,18 +63,12 @@ const typeStrings = {
     debtto: 'Debt to',
 };
 
-const defaultProps = {
-};
-
 /**
- * ImportTransactionForm component
+ * Import transaction form component
  */
-export class ImportTransactionItem extends ImportTransactionBase {
-    constructor(props = {}) {
-        super({
-            ...defaultProps,
-            ...props,
-        });
+export class ImportTransactionItem extends Component {
+    constructor(props) {
+        super(props);
 
         if (!this.props?.transaction?.mainAccount) {
             throw new Error('Invalid props');
@@ -158,10 +159,10 @@ export class ImportTransactionItem extends ImportTransactionBase {
         ]);
 
         this.createMenuButton();
-        this.toggleExtBtn = this.createToggleButton();
+        this.toggleExtBtn = ToggleButton.create();
         this.controls = createContainer(CONTROLS_CLASS, [
             this.menuContainer,
-            this.toggleExtBtn,
+            this.toggleExtBtn.elem,
         ]);
 
         this.createSelectControls();
@@ -179,6 +180,23 @@ export class ImportTransactionItem extends ImportTransactionBase {
         this.elem = this.collapse.elem;
 
         this.render(this.state);
+    }
+
+    createMenuButton() {
+        const { createContainer } = window.app;
+
+        const icon = Icon.create({
+            icon: 'ellipsis',
+            className: MENU_ICON_CLASS,
+        });
+
+        this.menuBtn = createElement('button', {
+            props: { className: MENU_BUTTON_CLASS, type: 'button' },
+            children: icon.elem,
+        });
+        this.menuContainer = createContainer(MENU_CLASS, [
+            this.menuBtn,
+        ]);
     }
 
     createSelectControls() {
@@ -218,7 +236,7 @@ export class ImportTransactionItem extends ImportTransactionBase {
             return;
         }
 
-        show(this.toggleExtBtn, !!originalData);
+        this.toggleExtBtn.show(!!originalData);
         if (!originalData) {
             this.collapse.setContent(null);
             return;
@@ -232,8 +250,8 @@ export class ImportTransactionItem extends ImportTransactionBase {
 
         const { similarTransaction } = state.transaction.state;
         if (similarTransaction) {
-            const infoElem = this.createSimilarTransactionInfo(similarTransaction);
-            content.push(infoElem);
+            const info = SimilarTransactionInfo.create(similarTransaction);
+            content.push(info.elem);
         }
 
         this.collapse.setContent(content);
