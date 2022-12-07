@@ -309,19 +309,13 @@ class AccountView extends View {
         this.currencySign.textContent = currencyObj.sign;
 
         // Name input
-        if (state.validation.name === true) {
-            window.app.clearBlockValidation('name-inp-block');
-        } else {
-            this.nameFeedback.textContent = state.validation.name;
-            window.app.invalidateBlock('name-inp-block');
-        }
+        window.app.setValidation('name-inp-block', (state.validation.name === true));
+        this.nameFeedback.textContent = (state.validation.name === true)
+            ? ''
+            : state.validation.name;
 
         // Initial balance input
-        if (state.validation.initbalance) {
-            window.app.clearBlockValidation('initbal-inp-block');
-        } else {
-            window.app.invalidateBlock('initbal-inp-block');
-        }
+        window.app.setValidation('initbal-inp-block', state.validation.initbalance);
 
         this.iconSelect.enable(!state.submitStarted);
         this.currencySelect.enable(!state.submitStarted);

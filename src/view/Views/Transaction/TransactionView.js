@@ -1406,23 +1406,10 @@ class TransactionView extends View {
             this.destResBalanceInfo.enable(!state.submitStarted);
         }
 
-        if (state.validation.sourceAmount) {
-            window.app.clearBlockValidation(this.srcAmountRow);
-        } else {
-            window.app.invalidateBlock(this.srcAmountRow);
-        }
+        window.app.setValidation(this.srcAmountRow, state.validation.sourceAmount);
+        window.app.setValidation(this.destAmountRow, state.validation.destAmount);
+        window.app.setValidation(this.dateRow, state.validation.date);
 
-        if (state.validation.destAmount) {
-            window.app.clearBlockValidation(this.destAmountRow);
-        } else {
-            window.app.invalidateBlock(this.destAmountRow);
-        }
-
-        if (state.validation.date) {
-            window.app.clearBlockValidation(this.dateRow);
-        } else {
-            window.app.invalidateBlock(this.dateRow);
-        }
         this.dateInput.enable(!state.submitStarted);
         enable(this.dateInputBtn, !state.submitStarted);
         this.dateInput.value = state.form.date;

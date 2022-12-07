@@ -112,17 +112,9 @@ export class ChangePasswordDialog extends ProfileDialog {
     /** Render component state */
     renderDialog(state) {
         this.oldPassInp.value = state.oldPassword;
-        if (state.validation.oldPassword) {
-            window.app.clearBlockValidation(OLD_PASS_BLOCK);
-        } else {
-            window.app.invalidateBlock(OLD_PASS_BLOCK);
-        }
+        window.app.setValidation(OLD_PASS_BLOCK, state.validation.oldPassword);
 
         this.newPassInp.value = state.newPassword;
-        if (state.validation.newPassword) {
-            window.app.clearBlockValidation(NEW_PASS_BLOCK);
-        } else {
-            window.app.invalidateBlock(NEW_PASS_BLOCK);
-        }
+        window.app.setValidation(NEW_PASS_BLOCK, state.validation.newPassword);
     }
 }

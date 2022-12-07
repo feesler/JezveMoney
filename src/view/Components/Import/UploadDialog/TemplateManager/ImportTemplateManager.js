@@ -294,15 +294,14 @@ export class ImportTemplateManager extends Component {
     /** Template name field 'input' event handler */
     onTemplateNameInput() {
         this.state.template.name = this.tplNameInp.value;
-
-        window.app.clearBlockValidation(this.nameField);
+        window.app.setValidation(this.nameField, true);
     }
 
     /** Template first row 'input' event handler */
     onFirstRowInput() {
         this.state.template.first_row = parseInt(this.firstRowInp.value, 10);
 
-        window.app.clearBlockValidation(this.firstRowField);
+        window.app.setValidation(this.firstRowField, true);
         this.render(this.state);
     }
 
@@ -315,8 +314,7 @@ export class ImportTemplateManager extends Component {
 
         this.state.template.first_row -= 1;
 
-        window.app.clearBlockValidation(this.firstRowField);
-
+        window.app.setValidation(this.firstRowField, true);
         this.render(this.state);
     }
 
@@ -330,8 +328,7 @@ export class ImportTemplateManager extends Component {
             this.state.template.first_row += 1;
         }
 
-        window.app.clearBlockValidation(this.firstRowField);
-
+        window.app.setValidation(this.firstRowField, true);
         this.render(this.state);
     }
 
@@ -408,13 +405,13 @@ export class ImportTemplateManager extends Component {
         };
 
         if (!template.name.length) {
-            window.app.invalidateBlock(this.nameField);
+            window.app.setValidation(this.nameField, false);
             return;
         }
 
         const firstRow = parseInt(template.first_row, 10);
         if (Number.isNaN(firstRow) || firstRow < 1) {
-            window.app.invalidateBlock(this.firstRowField);
+            window.app.setValidation(this.firstRowField, false);
             return;
         }
 
@@ -678,7 +675,7 @@ export class ImportTemplateManager extends Component {
             this.tplStateLbl.textContent = TITLE_TEMPLATE;
 
             this.loadingIndicator.hide();
-            window.app.clearBlockValidation(this.nameField);
+            window.app.setValidation(this.nameField, true);
             show(this.createTplBtn, templateAvail);
             show(this.updateTplBtn, !!state.template);
             show(this.deleteTplBtn, !!state.template);

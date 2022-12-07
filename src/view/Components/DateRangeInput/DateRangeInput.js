@@ -253,11 +253,7 @@ export class DateRangeInput extends Component {
         const isDateFilter = !!(state.filter.stdate && state.filter.enddate);
         show(this.clearBtn, isDateFilter);
 
-        if (state.validation.valid) {
-            window.app.clearBlockValidation(this.elem);
-        } else {
-            window.app.invalidateBlock(this.elem);
-        }
+        window.app.setValidation(this.elem, state.validation.valid);
 
         this.setDatePickerSelection(state);
     }

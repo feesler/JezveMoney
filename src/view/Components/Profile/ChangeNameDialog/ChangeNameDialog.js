@@ -101,10 +101,7 @@ export class ChangeNameDialog extends ProfileDialog {
     /** Render component state */
     renderDialog(state) {
         this.nameInp.value = state.name;
-        if (state.validation.name) {
-            window.app.clearBlockValidation('name-inp-block');
-        } else {
-            window.app.invalidateBlock('name-inp-block');
-        }
+
+        window.app.setValidation('name-inp-block', state.validation.name);
     }
 }

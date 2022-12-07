@@ -661,18 +661,15 @@ export class ImportRuleForm extends Component {
         this.validateConditionsAvail(state);
         this.validateActionsAvail(state);
 
-        if (
+        const isInvalid = (
             state.validation
             && !state.validation.valid
             && !('conditionIndex' in state.validation)
             && !('actionIndex' in state.validation)
-        ) {
-            this.validFeedback.textContent = state.validation.message;
-            window.app.invalidateBlock(this.feedbackContainer);
-        } else {
-            this.validFeedback.textContent = '';
-            window.app.clearBlockValidation(this.feedbackContainer);
-        }
+        );
+
+        window.app.setValidation(this.container, !isInvalid);
+        this.validFeedback.textContent = (isInvalid) ? state.validation.message : '';
 
         // Conditions list
         const isInvalidCondition = (

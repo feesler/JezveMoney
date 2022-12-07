@@ -129,18 +129,10 @@ class LoginView extends View {
         }
 
         // Login input
-        if (state.validation.login) {
-            window.app.clearBlockValidation('login-inp-block');
-        } else {
-            window.app.invalidateBlock('login-inp-block');
-        }
+        window.app.setValidation('login-inp-block', state.validation.login);
 
         // Password input
-        if (state.validation.password) {
-            window.app.clearBlockValidation('pwd-inp-block');
-        } else {
-            window.app.invalidateBlock('pwd-inp-block');
-        }
+        window.app.setValidation('pwd-inp-block', state.validation.password);
 
         // 'Remember me' checkbox
         this.rememberCheck.check(state.form.remember);

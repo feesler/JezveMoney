@@ -208,12 +208,11 @@ class PersonView extends View {
         }
 
         // Name input
-        if (state.validation.name === true) {
-            window.app.clearBlockValidation('name-inp-block');
-        } else {
-            this.nameFeedback.textContent = state.validation.name;
-            window.app.invalidateBlock('name-inp-block');
-        }
+        window.app.setValidation('name-inp-block', (state.validation.name === true));
+        this.nameFeedback.textContent = (state.validation.name === true)
+            ? ''
+            : state.validation.name;
+
         enable(this.nameInp, !state.submitStarted);
         enable(this.submitBtn, !state.submitStarted);
         show(this.cancelBtn, !state.submitStarted);
