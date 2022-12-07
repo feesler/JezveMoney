@@ -37,6 +37,8 @@ const STR_ENABLE_ITEM = 'Enable';
 const STR_DISABLE_ITEM = 'Disable';
 const MSG_IMPORT_SUCCESS = 'All transactions have been successfully imported';
 const MSG_IMPORT_FAIL = 'Fail to import transactions';
+/* 'Show more' button */
+const TITLE_SHOW_MORE = 'Show more...';
 /* Other */
 const SUBMIT_LIMIT = 100;
 const SHOW_ON_PAGE = 20;
@@ -46,6 +48,7 @@ const defaultPagination = {
     page: 1,
     pagesCount: 0,
     total: 0,
+    range: 1,
 };
 
 /**
@@ -142,7 +145,19 @@ class ImportView extends View {
             onSort: (...args) => this.onTransPosChanged(...args),
         });
         const listContainer = document.querySelector('.data-form');
-        listContainer.append(this.list.elem);
+        listContainer.prepend(this.list.elem);
+
+        const listFooter = document.querySelector('.list-footer');
+        // 'Show more' button
+        this.showMoreBtn = createElement('button', {
+            props: {
+                className: 'btn show-more-btn',
+                type: 'button',
+                textContent: TITLE_SHOW_MORE,
+            },
+            events: { click: (e) => this.showMore(e) },
+        });
+        listFooter.append(this.showMoreBtn);
 
         // Submit progress indicator
         this.submitProgress = LoadingIndicator.create({ title: 'Saving items...' });
@@ -158,7 +173,7 @@ class ImportView extends View {
             arrows: true,
             onChange: (page) => this.setPage(page),
         });
-        listContainer.append(this.paginator.elem);
+        listFooter.append(this.paginator.elem);
 
         // Data loading indicator
         this.loadingInd = LoadingIndicator.create({ fixed: false });
@@ -511,6 +526,10 @@ class ImportView extends View {
         this.store.dispatch(actions.changePage(page));
     }
 
+    showMore() {
+        this.store.dispatch(actions.showMore());
+    }
+
     /** Save form data and replace it by item component */
     onSaveItem(data) {
         if (!data?.validate()) {
@@ -852,7 +871,7 @@ class ImportView extends View {
         }
 
         const firstItem = this.getAbsoluteIndex(0, state);
-        const lastItem = firstItem + state.pagination.onPage;
+        const lastItem = firstItem + state.pagination.onPage * state.pagination.range;
         const items = state.items.slice(firstItem, lastItem);
 
         // Render list
@@ -862,15 +881,24 @@ class ImportView extends View {
             items,
         }));
 
+        const range = state.pagination.range ?? 1;
+        const pageNum = state.pagination.page + range - 1;
+
         const showPaginator = state.pagination.pagesCount > 1;
         this.paginator.show(showPaginator);
         if (showPaginator) {
             this.paginator.setState((paginatorState) => ({
                 ...paginatorState,
                 pagesCount: state.pagination.pagesCount,
-                pageNum: state.pagination.page,
+                pageNum,
             }));
         }
+
+        show(
+            this.showMoreBtn,
+            state.items.length > 0
+            && pageNum < state.pagination.pagesCount,
+        );
     }
 
     render(state, prevState = {}) {

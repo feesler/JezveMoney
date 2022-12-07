@@ -164,6 +164,7 @@ const getPagination = (state) => {
         ...pagination,
         total: items.length,
         pagesCount,
+        range: 1,
     };
 
     res.page = (pagesCount > 0) ? Math.min(pagesCount, res.page) : 1;
@@ -363,18 +364,24 @@ const slice = createSlice({
         }),
     }),
 
-    changePage: (state, page) => (
-        (state.pagination.page === page)
-            ? state
-            : {
-                ...state,
-                contextItemIndex: -1,
-                pagination: {
-                    ...state.pagination,
-                    page,
-                },
-            }
-    ),
+    changePage: (state, page) => ({
+        ...state,
+        contextItemIndex: -1,
+        pagination: {
+            ...state.pagination,
+            page,
+            range: 1,
+        },
+    }),
+
+    showMore: (state) => ({
+        ...state,
+        contextItemIndex: -1,
+        pagination: {
+            ...state.pagination,
+            range: state.pagination.range + 1,
+        },
+    }),
 
     createItem: (state) => {
         if (state.listMode !== 'list' || state.activeItemIndex !== -1) {

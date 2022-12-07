@@ -49,6 +49,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                     </div>
 
                     <div class="data-form" <?= hidden(!$importAvailable) ?>>
+                        <div class="list-footer"></div>
                     </div>
                 </div>
             </div>

@@ -468,3 +468,11 @@ export const goToPrevPage = async () => {
         return App.view.goToPrevPage();
     });
 };
+
+/** Show more items */
+export const showMore = async () => {
+    await test('Show more items', async () => {
+        await checkNavigation();
+        return App.view.showMore();
+    });
+};

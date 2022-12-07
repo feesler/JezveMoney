@@ -43,21 +43,6 @@
   justify-content: space-between;
 }
 
-/* List footer */
-.list-footer {
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: center;
-}
-
-.show-more-btn {
-  margin: 16px 0;
-  color: var(--main-text-color);
-  background-color: #3c3c3c;
-  border-color: #202020;
-  border-radius: var(--action-btn-border-radius);
-}
-
 /* Mode selector */
 .dark-theme,
 .white-theme {
@@ -72,10 +57,6 @@
 @media (hover: hover) {
   .clear-all-btn {
     text-decoration: underline;
-  }
-
-  .show-more-btn:hover {
-    background-color: #4a4a4a;
   }
 
   .mode-selector:hover {

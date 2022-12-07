@@ -93,16 +93,26 @@ export class ImportListStory extends TestStory {
         await ImportTests.submitUploaded(cardFile);
         await ImportTests.uploadFile(cardFile);
         await ImportTests.submitUploaded(cardFile);
+        await ImportTests.uploadFile(cardFile);
+        await ImportTests.submitUploaded(cardFile);
         await ImportTests.createItemAndSave(
             { action: 'inputDestAmount', data: '1' },
         );
+        await ImportTests.goToPrevPage(); // page 2
         await ImportTests.updateItemAndSave({
             pos: 21,
             action: { action: 'inputDestAmount', data: '2' },
         });
+        await ImportTests.showMore(); // pages 2-3
+        await ImportTests.goToPrevPage(); // page 2
+        await ImportTests.goToFirstPage(); // page 1
+        await ImportTests.showMore(); // pages 1-2
+        await ImportTests.showMore(); // pages 1-3
+        await ImportTests.goToFirstPage(); // page 1
+        await ImportTests.goToNextPage(); // page 2
 
         await ImportTests.toggleSelectItems([21, 22]);
-        await ImportTests.goToPrevPage();
+        await ImportTests.goToPrevPage(); // page 1
         await ImportTests.toggleSelectItems([11, 12]);
         await ImportTests.deleteSelectedItems();
 

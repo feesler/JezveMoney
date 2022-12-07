@@ -24,7 +24,6 @@ import { ImportTransactionForm } from './component/Import/ImportTransactionForm.
 import { Counter } from './component/Counter.js';
 import { checkDate, fixFloat } from '../common.js';
 
-const ITEMS_ON_PAGE = 20;
 const defaultPagination = {
     page: 1,
     pages: 1,
@@ -245,6 +244,8 @@ export class ImportView extends AppView {
         const hasEnabled = (selectMode) ? selectedItems.some((item) => item.enabled) : false;
         const hasDisabled = (selectMode) ? selectedItems.some((item) => !item.enabled) : false;
 
+        const pageNum = this.currentPage(model);
+
         res.listModeBtn = { visible: !listMode };
 
         // Counters
@@ -275,11 +276,16 @@ export class ImportView extends AppView {
             visible: model.enabled,
             disabled: !listMode,
         };
-        res.itemsList = { visible: true };
+        res.itemsList = {
+            visible: true,
+            showMoreBtn: { visible: hasItems && pageNum < model.pagination.pages },
+            paginator: { visible: hasItems && model.pagination.pages > 1 },
+        };
         res.submitBtn.disabled = !(listMode && hasItems && enabledItems.length > 0);
 
         if (model.contextMenuVisible) {
-            const firstItem = ITEMS_ON_PAGE * (model.pagination.page - 1);
+            const itemsOnPage = App.config.importTransactionsOnPage;
+            const firstItem = itemsOnPage * (model.pagination.page - 1);
             const absIndex = firstItem + model.contextItemIndex;
             assert.arrayIndex(this.items, absIndex, 'Invalid state');
 
@@ -296,11 +302,16 @@ export class ImportView extends AppView {
     }
 
     getExpectedList(model = this.model) {
-        const firstItem = ITEMS_ON_PAGE * (model.pagination.page - 1);
-        const lastItem = firstItem + ITEMS_ON_PAGE;
+        const itemsOnPage = App.config.importTransactionsOnPage;
+        const firstItem = itemsOnPage * (model.pagination.page - 1);
+        const lastItem = firstItem + itemsOnPage * model.pagination.range;
         const pageItems = this.items.slice(firstItem, lastItem);
 
         return ImportList.render(pageItems, App.state);
+    }
+
+    currentPage(model = this.model) {
+        return model.pagination.page + model.pagination.range - 1;
     }
 
     getEnabledItems() {
@@ -314,9 +325,10 @@ export class ImportView extends AppView {
     getPositionByIndex(index) {
         assert.arrayIndex(this.items, index, 'Invalid index');
 
+        const itemsOnPage = App.config.importTransactionsOnPage;
         return {
-            page: Math.floor(index / ITEMS_ON_PAGE) + 1,
-            index: index % ITEMS_ON_PAGE,
+            page: Math.floor(index / itemsOnPage) + 1,
+            index: index % itemsOnPage,
         };
     }
 
@@ -755,7 +767,8 @@ export class ImportView extends AppView {
         }
 
         const expectedList = this.getExpectedList();
-        const pagesCount = Math.ceil(this.items.length / ITEMS_ON_PAGE);
+        const itemsOnPage = App.config.importTransactionsOnPage;
+        const pagesCount = Math.ceil(this.items.length / itemsOnPage);
         this.model.pagination.pages = pagesCount;
         this.expectedState = this.getExpectedState();
         this.expectedState.itemsList.items = expectedList.items;
@@ -1157,7 +1170,8 @@ export class ImportView extends AppView {
 
         this.items[this.formIndex] = savedItem;
 
-        const pagesCount = Math.ceil(this.items.length / ITEMS_ON_PAGE);
+        const itemsOnPage = App.config.importTransactionsOnPage;
+        const pagesCount = Math.ceil(this.items.length / itemsOnPage);
         this.model.pagination.pages = pagesCount;
         const pos = this.getPositionByIndex(this.formIndex);
         this.model.pagination.page = pos.page;
@@ -1520,11 +1534,12 @@ export class ImportView extends AppView {
         }
 
         this.model.pagination.page = 1;
+        this.model.pagination.range = 1;
         this.expectedState = this.getExpectedState(this.model);
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
 
-        await this.performAction(() => this.itemsList.paginator.goToNextPage());
+        await this.performAction(() => this.itemsList.paginator.goToFirstPage());
 
         return this.checkState();
     }
@@ -1533,7 +1548,8 @@ export class ImportView extends AppView {
         this.checkMainState();
         assert(!this.isLastPage(), 'Can\'t go to next page');
 
-        this.model.pagination.page += 1;
+        this.model.pagination.page = this.currentPage() + 1;
+        this.model.pagination.range = 1;
         this.expectedState = this.getExpectedState(this.model);
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
@@ -1547,12 +1563,26 @@ export class ImportView extends AppView {
         this.checkMainState();
         assert(!this.isFirstPage(), 'Can\'t go to previous page');
 
-        this.model.pagination.page -= 1;
+        this.model.pagination.page = this.currentPage() - 1;
+        this.model.pagination.range = 1;
         this.expectedState = this.getExpectedState(this.model);
         const expectedList = this.getExpectedList();
         this.expectedState.itemsList.items = expectedList.items;
 
         await this.performAction(() => this.itemsList.paginator.goToPrevPage());
+
+        return this.checkState();
+    }
+
+    async showMore() {
+        assert(!this.isLastPage(), 'Can\'t show more items');
+
+        this.model.pagination.range += 1;
+        this.expectedState = this.getExpectedState(this.model);
+        const expectedList = this.getExpectedList();
+        this.expectedState.itemsList.items = expectedList.items;
+
+        await this.performAction(() => click(this.itemsList.showMoreBtn.elem));
 
         return this.checkState();
     }
