@@ -5,7 +5,7 @@ import {
     Component,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
-import { Icon } from 'jezvejs/Icon';
+import { PopupMenuButton } from 'jezvejs/PopupMenu';
 import {
     EXPENSE,
     INCOME,
@@ -40,9 +40,6 @@ const COMMENT_FIELD_CLASS = 'trans-item__comment-field';
 const SELECT_CONTROLS_CLASS = 'trans-item__select';
 /* Controls */
 const CONTROLS_CLASS = 'trans-item__controls';
-const MENU_CLASS = 'popup-menu';
-const MENU_BUTTON_CLASS = 'btn icon-btn popup-menu-btn';
-const MENU_ICON_CLASS = 'icon popup-menu-btn__icon';
 /* Other */
 const SELECTED_CLASS = 'trans-item_selected';
 const SORT_CLASS = 'trans-item_sort';
@@ -218,26 +215,14 @@ export class TransactionListItem extends Component {
     }
 
     createControls() {
-        const { createContainer } = window.app;
-
         if (this.controlsElem) {
             return;
         }
 
-        this.menuBtn = createElement('button', {
-            props: { className: MENU_BUTTON_CLASS, type: 'button' },
-            children: Icon.create({
-                icon: 'ellipsis',
-                className: MENU_ICON_CLASS,
-            }).elem,
-        });
-        this.menuContainer = createContainer(MENU_CLASS, [
-            this.menuBtn,
-        ]);
-
+        this.menuContainer = PopupMenuButton.create();
         this.controlsElem = createElement('div', {
             props: { className: CONTROLS_CLASS },
-            children: this.menuContainer,
+            children: this.menuContainer.elem,
         });
 
         this.elem.append(this.controlsElem);

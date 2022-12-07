@@ -8,7 +8,7 @@ import {
     Component,
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
-import { Icon } from 'jezvejs/Icon';
+import { PopupMenuButton } from 'jezvejs/PopupMenu';
 import { ImportRule } from '../../../../js/model/ImportRule.js';
 import { ImportConditionList } from '../../../../js/model/ImportConditionList.js';
 import { ImportActionList } from '../../../../js/model/ImportActionList.js';
@@ -16,11 +16,6 @@ import { ImportConditionItem } from '../ConditionItem/ImportConditionItem.js';
 import { ImportActionItem } from '../ActionItem/ImportActionItem.js';
 import { ToggleButton } from '../../../ToggleButton/ToggleButton.js';
 import './style.scss';
-
-/** CSS classes */
-const MENU_CLASS = 'popup-menu';
-const MENU_BUTTON_CLASS = 'btn icon-btn popup-menu-btn';
-const MENU_ICON_CLASS = 'icon popup-menu-btn__icon';
 
 /** Strings */
 const TITLE_CONDITIONS = 'Conditions';
@@ -77,9 +72,9 @@ export class ImportRuleItem extends Component {
             this.bottomRow,
         ]);
 
-        this.createMenu();
+        this.menuContainer = PopupMenuButton.create();
         this.controls = window.app.createContainer('rule-item__main-controls', [
-            this.menu,
+            this.menuContainer.elem,
             this.toggleExtBtn.elem,
         ]);
 
@@ -105,23 +100,6 @@ export class ImportRuleItem extends Component {
             ],
         });
         this.elem = this.collapse.elem;
-    }
-
-    createMenu() {
-        const { createContainer } = window.app;
-
-        const icon = Icon.create({
-            icon: 'ellipsis',
-            className: MENU_ICON_CLASS,
-        });
-
-        this.menuBtn = createElement('button', {
-            props: { className: MENU_BUTTON_CLASS, type: 'button' },
-            children: icon.elem,
-        });
-        this.menu = createContainer(MENU_CLASS, [
-            this.menuBtn,
-        ]);
     }
 
     /** Set main state of component */

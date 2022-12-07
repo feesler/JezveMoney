@@ -1,12 +1,11 @@
 import {
     createElement,
     enable,
-    show,
     Component,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { Collapsible } from 'jezvejs/Collapsible';
-import { Icon } from 'jezvejs/Icon';
+import { PopupMenuButton } from 'jezvejs/PopupMenu';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { Field } from '../../Field/Field.js';
 import './style.scss';
@@ -43,10 +42,6 @@ const SELECT_CONTROLS_CLASS = 'select-controls';
 const SELECTED_CLASS = 'import-item_selected';
 /* Sort state */
 const SORT_CLASS = 'import-item_sort';
-/* Menu */
-const MENU_CLASS = 'popup-menu';
-const MENU_BUTTON_CLASS = 'btn icon-btn popup-menu-btn';
-const MENU_ICON_CLASS = 'icon popup-menu-btn__icon';
 
 /** Strings */
 const TITLE_FIELD_SRC_ACCOUNT = 'Source account';
@@ -158,10 +153,10 @@ export class ImportTransactionItem extends Component {
             ]),
         ]);
 
-        this.createMenuButton();
+        this.menuContainer = PopupMenuButton.create();
         this.toggleExtBtn = ToggleButton.create();
         this.controls = createContainer(CONTROLS_CLASS, [
-            this.menuContainer,
+            this.menuContainer.elem,
             this.toggleExtBtn.elem,
         ]);
 
@@ -180,23 +175,6 @@ export class ImportTransactionItem extends Component {
         this.elem = this.collapse.elem;
 
         this.render(this.state);
-    }
-
-    createMenuButton() {
-        const { createContainer } = window.app;
-
-        const icon = Icon.create({
-            icon: 'ellipsis',
-            className: MENU_ICON_CLASS,
-        });
-
-        this.menuBtn = createElement('button', {
-            props: { className: MENU_BUTTON_CLASS, type: 'button' },
-            children: icon.elem,
-        });
-        this.menuContainer = createContainer(MENU_CLASS, [
-            this.menuBtn,
-        ]);
     }
 
     createSelectControls() {
@@ -331,7 +309,7 @@ export class ImportTransactionItem extends Component {
         // Comment field
         this.commentTitle.textContent = transaction.comment;
 
-        show(this.menuContainer, transaction.listMode === 'list');
+        this.menuContainer.show(transaction.listMode === 'list');
 
         if (this.collapse) {
             if (transaction.collapsed) {
