@@ -18,7 +18,7 @@
     </div>
 </div>
 
-<nav class="navigation-content">
+<nav class="main-navigation navigation-content">
     <div class="navigation-controls">
         <button class="navigation__close-btn">
             <?= svgIcon("back", "navigation__close-btn-icon") ?>

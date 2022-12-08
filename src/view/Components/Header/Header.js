@@ -35,7 +35,7 @@ export class Header extends Component {
             throw new Error('Invalid element specified');
         }
 
-        this.navigationContent = document.querySelector('.navigation-content');
+        this.navigationContent = document.querySelector('.main-navigation');
         this.navigation = Offcanvas.create({
             content: this.navigationContent,
             className: 'navigation',
@@ -43,7 +43,7 @@ export class Header extends Component {
 
         this.navToggleBtn = this.elem.querySelector('.nav-toggle-btn');
         setEvents(this.navToggleBtn, { click: () => this.onToggleNav() });
-        this.closeNavBtn = document.querySelector('.navigation__close-btn');
+        this.closeNavBtn = this.navigationContent.querySelector('.navigation__close-btn');
         setEvents(this.closeNavBtn, { click: () => this.hideNavigation() });
 
         this.titleElem = this.elem.querySelector('.header-title');
