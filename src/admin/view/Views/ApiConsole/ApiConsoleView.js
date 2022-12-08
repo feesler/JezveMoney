@@ -41,8 +41,8 @@ class AdminApiConsoleView extends AdminView {
             className: 'navigation methods-menu',
         });
 
-        this.showMethodsBtn = ge('showMethodsBtn');
-        setEvents(this.showMethodsBtn, { click: () => this.showMethodsMenu() });
+        this.toggleMethodsBtn = ge('toggleMethodsBtn');
+        setEvents(this.toggleMethodsBtn, { click: () => this.toggleMethodsMenu() });
         this.closeMethodsBtn = apiMenuContainer.querySelector('.navigation__close-btn');
         setEvents(this.closeMethodsBtn, { click: () => this.hideMethodsMenu() });
 
@@ -594,8 +594,8 @@ class AdminApiConsoleView extends AdminView {
     }
 
     /** Show API methods menu */
-    showMethodsMenu() {
-        this.apiMenu.open();
+    toggleMethodsMenu() {
+        this.apiMenu.toggle();
     }
 
     /** Hides API methods menu */

@@ -156,10 +156,7 @@
                         <h1>API test</h1>
                     </div>
 
-<button id="showMethodsBtn" class="nav-toggle-btn methods-toggle-btn">
-    <?= svgIcon("menu", "nav-toggle-icon") ?>
-    <span>Show methods</span>
-</button>
+<button id="toggleMethodsBtn" class="btn methods-toggle-btn">Methods</button>
 
 <div class="api-console">
     <div class="center-column">
