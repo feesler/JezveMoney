@@ -79,7 +79,7 @@ class AdminApiConsoleView extends AdminView {
     }
 
     /** Initialization of checkboxes of specified form */
-    initCheckboxed(form) {
+    initCheckboxes(form) {
         const checkboxes = Array.from(form.querySelectorAll('input[type="checkbox"]'));
         checkboxes.forEach((elem) => setEvents(elem, { change: (e) => this.onCheck(e) }));
     }
@@ -100,7 +100,7 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Fail to init view');
         }
         listAccForm.addEventListener('submit', this.getVerifyHandler(apiTypes.isAccountsArray));
-        this.initCheckboxed(listAccForm);
+        this.initCheckboxes(listAccForm);
 
         const readaccbtn = ge('readaccbtn');
         if (!readaccbtn) {
@@ -140,7 +140,7 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Fail to init view');
         }
         listPersonsForm.addEventListener('submit', this.getVerifyHandler(apiTypes.isPersonsArray));
-        this.initCheckboxed(listPersonsForm);
+        this.initCheckboxes(listPersonsForm);
 
         const readpersonbtn = ge('readpersonbtn');
         if (!readpersonbtn) {
@@ -180,7 +180,7 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Fail to init view');
         }
         listTrForm.addEventListener('submit', (e) => this.onListTransactionSubmit(e));
-        this.initCheckboxed(listTrForm);
+        this.initCheckboxes(listTrForm);
 
         const readtransbtn = ge('readtransbtn');
         if (!readtransbtn) {
@@ -235,6 +235,7 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Fail to init view');
         }
         statisticsForm.addEventListener('submit', (e) => this.onFormSubmit(e));
+        this.initCheckboxes(statisticsForm);
         const statisticsFilter = ge('statistics-filter');
         statisticsFilter.addEventListener('change', () => {
             const isByCurrency = statisticsFilter.value === 'currency';
@@ -328,7 +329,7 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Fail to init view');
         }
         listForm.addEventListener('submit', this.getVerifyHandler(apiTypes.isConditionsArray));
-        this.initCheckboxed(listForm);
+        this.initCheckboxes(listForm);
 
         const readBtn = ge('readcondbtn');
         if (!readBtn) {
@@ -368,7 +369,7 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Fail to init view');
         }
         listForm.addEventListener('submit', this.getVerifyHandler(apiTypes.isActionsArray));
-        this.initCheckboxed(listForm);
+        this.initCheckboxes(listForm);
 
         const readBtn = ge('readactbtn');
         if (!readBtn) {
@@ -525,7 +526,7 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Fail to init view');
         }
         resetForm.addEventListener('submit', (e) => this.onFormSubmit(e));
-        this.initCheckboxed(resetForm);
+        this.initCheckboxes(resetForm);
     }
 
     /**
