@@ -122,7 +122,7 @@ export class Application {
     }
 
     setTheme(dark) {
-        const { baseURL, themes } = this.props;
+        const { baseURL, themesPath, themes } = this.props;
         const themeId = (dark) ? DARK_THEME : WHITE_THEME;
         const theme = themes[themeId];
 
@@ -132,7 +132,7 @@ export class Application {
 
         const linkElem = ge('theme-style');
         if (linkElem) {
-            linkElem.href = `${baseURL}view/css/themes/${theme.file}`;
+            linkElem.href = `${baseURL}${themesPath}${theme.file}`;
         }
 
         document.body.className = theme.className;

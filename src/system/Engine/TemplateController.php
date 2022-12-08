@@ -67,6 +67,7 @@ abstract class TemplateController extends Controller
             $data["appProps"] = [];
         }
         $data["appProps"]["baseURL"] = BASEURL;
+        $data["appProps"]["themesPath"] = $this->themesPath;
         $data["appProps"]["themes"] = (object)$this->template->themes;
 
         // Check message
