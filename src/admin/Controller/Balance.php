@@ -16,6 +16,8 @@ class Balance extends AdminController
             "titleString" => "Admin panel | Balance",
         ];
 
+        $trModel = TransactionModel::getInstance();
+
         $srcAvailTypes = [EXPENSE, TRANSFER, DEBT];
         $destAvailTypes = [INCOME, TRANSFER, DEBT];
 
@@ -43,8 +45,6 @@ class Balance extends AdminController
         }
         $trParams["accounts"] = $filter->accounts = $accFilter;
         $data["accFilter"] = $accFilter;
-
-        $trModel = TransactionModel::getInstance();
 
         if (count($accFilter)) {
             $resArr = $trModel->getData($trParams);
