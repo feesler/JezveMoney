@@ -329,11 +329,12 @@ a.nav-item__link:visited {
   }
 
   .navigation {
+    width: 200px;
     z-index: 1000;
   }
 
   .navigation-content {
-    width: 200px;
+    width: 100%;
     margin: 50px 0 0 0;
   }
 
