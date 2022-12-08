@@ -5,6 +5,7 @@
             <span class="header-logo__title">Admin</span>
         </a>
         <button class="nav-toggle-btn"><?= svgIcon("menu", "nav-toggle-icon") ?></button>
+        <div class="header-title"></div>
 
         <button id="userbtn" class="user-btn" type="button">
             <span class="user-btn__icon"><?= svgIcon("user", "user-icon") ?></span>

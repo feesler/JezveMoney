@@ -42,14 +42,20 @@ h3 {
   flex-flow: row nowrap;
   align-items: center;
   column-gap: 8px;
+  margin-bottom: 12px;
   color: var(--main-text-color);
+  background-color: var(--btn-bg);
+  border-radius: var(--action-btn-border-radius);
+}
+
+/* API methods menu */
+.methods-menu {
+  border-left: 1px solid #80808030;
 }
 
 .methods-menu.offcanvas_closed {
   transform: translateX(-100%);
 }
-
-/* Left menus */
 
 /* Menu lists */
 .menu-list {
@@ -160,6 +166,10 @@ h3 {
 }
 
 @media (hover: hover) {
+  .methods-toggle-btn:hover {
+    background-color: var(--btn-hover-bg);
+  }
+
   .menu-list .sub-menu-list > li:hover {
     text-decoration: underline;
   }

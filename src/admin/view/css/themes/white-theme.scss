@@ -3,6 +3,14 @@
   --main-bg-color: #ffffff;
   --alt-bg-color: #f0f0f0;
 
+  /* Header */
+  --header-bg-color: #404040;
+  --header-hover-btn-bg-color: #606060;
+
+  /* Buttons */
+  --btn-bg: #e8e8e8;
+  --btn-hover-bg: #c9c9c9;
+
   /* Inputs */
   --input-bg-color: #f2f2f2;
   --input-border-color: #b0b0b0;
@@ -10,11 +18,6 @@
 
   color: var(--main-text-color);
   background-color: var(--main-bg-color);
-
-  /* Navigation */
-  .navigation-content {
-    background-color: #f0f0f0;
-  }
 
   /* Navigation items */
   a.nav-item__link,
