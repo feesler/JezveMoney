@@ -38,7 +38,7 @@ export class Header extends Component {
         this.navigationContent = document.querySelector('.main-navigation');
         this.navigation = Offcanvas.create({
             content: this.navigationContent,
-            className: 'navigation',
+            className: 'navigation main-navigation-offcanvas',
         });
 
         this.navToggleBtn = this.elem.querySelector('.nav-toggle-btn');

@@ -8,10 +8,9 @@
         <div class="navigation-controls">
             <button class="navigation__close-btn"><?=svgIcon("back", "navigation__close-btn-icon")?></button>
             <div class="navigation-logo">
-                <a class="header-logo" href="<?=BASEURL?>admin/">
-                    <span class="header-logo__icon"><?=svgIcon("header_logo", "logo-icon")?></span>
-                    <span class="header-logo__title">Admin</span>
-                </a>
+                <div class="header-logo">
+                    <span class="header-logo__title">API Methods</span>
+                </div>
             </div>
         </div>
 

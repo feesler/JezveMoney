@@ -50,11 +50,9 @@ h3 {
 
 /* API methods menu */
 .methods-menu {
-  border-left: 1px solid #80808030;
-}
-
-.methods-menu.offcanvas_closed {
-  transform: translateX(-100%);
+  .header-logo {
+    padding-left: 12px;
+  }
 }
 
 /* Menu lists */
@@ -144,20 +142,20 @@ h3 {
 
 /* Desktop */
 @media (min-width: 768px) {
+  .methods-menu {
+    z-index: 500;
+
+    .navigation-content {
+      margin-top: 100px;
+    }
+  }
+
   .api-console {
     flex-flow: row nowrap;
   }
-}
-
-/* Desktop */
-@media (min-width: 1200px) {
-  .methods-menu,
-  .methods-menu.offcanvas_closed {
-    transform: translateX(200px);
-  }
 
   .content_wrap {
-    padding: 50px 12px 50px 412px;
+    padding: 112px 12px 50px 212px;
   }
 
   .methods-toggle-btn {

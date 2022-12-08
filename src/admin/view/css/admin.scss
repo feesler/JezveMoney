@@ -120,7 +120,25 @@ textarea {
 
 /* Desktop */
 @media (min-width: 768px) {
+  .main-navigation-offcanvas {
+    --offcanvas-bg: var(--header-bg-color);
+
+    top: 50px;
+    bottom: auto;
+    left: 0;
+    right: 0;
+
+    .navigation-content {
+      width: 100%;
+      margin: 0;
+    }
+
+    .nav-list {
+      flex-flow: row nowrap;
+    }
+  }
+
   .admin_cont_wrap {
-    padding: 50px 12px 50px 212px;
+    padding: 100px 12px 50px 12px;
   }
 }
