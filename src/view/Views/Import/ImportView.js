@@ -33,10 +33,13 @@ import { ImportTransactionList } from '../../Components/Import/List/ImportTransa
 
 /* Strings */
 const STR_TITLE = 'Import';
+const STR_RESTORE_ITEM = 'Cancel changes';
 const STR_ENABLE_ITEM = 'Enable';
 const STR_DISABLE_ITEM = 'Disable';
 const MSG_IMPORT_SUCCESS = 'All transactions have been successfully imported';
 const MSG_IMPORT_FAIL = 'Fail to import transactions';
+/* 'Show more' button */
+const TITLE_SHOW_MORE = 'Show more...';
 /* Other */
 const SUBMIT_LIMIT = 100;
 const SHOW_ON_PAGE = 20;
@@ -46,6 +49,7 @@ const defaultPagination = {
     page: 1,
     pagesCount: 0,
     total: 0,
+    range: 1,
 };
 
 /**
@@ -142,7 +146,19 @@ class ImportView extends View {
             onSort: (...args) => this.onTransPosChanged(...args),
         });
         const listContainer = document.querySelector('.data-form');
-        listContainer.append(this.list.elem);
+        listContainer.prepend(this.list.elem);
+
+        const listFooter = document.querySelector('.list-footer');
+        // 'Show more' button
+        this.showMoreBtn = createElement('button', {
+            props: {
+                className: 'btn show-more-btn',
+                type: 'button',
+                textContent: TITLE_SHOW_MORE,
+            },
+            events: { click: (e) => this.showMore(e) },
+        });
+        listFooter.append(this.showMoreBtn);
 
         // Submit progress indicator
         this.submitProgress = LoadingIndicator.create({ title: 'Saving items...' });
@@ -158,7 +174,7 @@ class ImportView extends View {
             arrows: true,
             onChange: (page) => this.setPage(page),
         });
-        listContainer.append(this.paginator.elem);
+        listFooter.append(this.paginator.elem);
 
         // Data loading indicator
         this.loadingInd = LoadingIndicator.create({ fixed: false });
@@ -258,6 +274,14 @@ class ImportView extends View {
             attached: true,
             onClose: () => this.hideContextMenu(),
             items: [{
+                id: 'ctxRestoreBtn',
+                title: STR_RESTORE_ITEM,
+                className: 'warning-item',
+                onClick: () => this.onRestoreItem(),
+            }, {
+                id: 'separator1',
+                type: 'separator',
+            }, {
                 id: 'ctxEnableBtn',
                 title: STR_DISABLE_ITEM,
                 onClick: () => this.onToggleEnableItem(),
@@ -335,8 +359,7 @@ class ImportView extends View {
                 return;
             }
 
-            const date = item.getDate();
-            const time = timestampFromString(date);
+            const time = timestampFromString(item.date);
             if (res.start === 0) {
                 res.start = time;
                 res.end = time;
@@ -460,6 +483,18 @@ class ImportView extends View {
         this.store.dispatch(actions.toggleCollapseItem(index));
     }
 
+    /** Restore original data of transaction item */
+    onRestoreItem() {
+        const state = this.store.getState();
+        const index = state.contextItemIndex;
+        if (index === -1) {
+            this.hideContextMenu();
+            return;
+        }
+
+        this.store.dispatch(actions.restoreItemByIndex(index));
+    }
+
     /** Transaction item enable/disable event handler */
     onToggleEnableItem() {
         const state = this.store.getState();
@@ -509,6 +544,10 @@ class ImportView extends View {
     /** Change page of transactions list */
     setPage(page) {
         this.store.dispatch(actions.changePage(page));
+    }
+
+    showMore() {
+        this.store.dispatch(actions.showMore());
     }
 
     /** Save form data and replace it by item component */
@@ -801,6 +840,12 @@ class ImportView extends View {
             return;
         }
 
+        const itemRestoreAvail = (
+            !!item.originalData && (item.rulesApplied || item.modifiedByUser)
+        );
+        this.contextMenu.items.ctxRestoreBtn.show(itemRestoreAvail);
+        show(this.contextMenu.items.separator1, itemRestoreAvail);
+
         const title = (item.enabled) ? STR_DISABLE_ITEM : STR_ENABLE_ITEM;
         this.contextMenu.items.ctxEnableBtn.setTitle(title);
 
@@ -852,7 +897,7 @@ class ImportView extends View {
         }
 
         const firstItem = this.getAbsoluteIndex(0, state);
-        const lastItem = firstItem + state.pagination.onPage;
+        const lastItem = firstItem + state.pagination.onPage * state.pagination.range;
         const items = state.items.slice(firstItem, lastItem);
 
         // Render list
@@ -862,15 +907,24 @@ class ImportView extends View {
             items,
         }));
 
+        const range = state.pagination.range ?? 1;
+        const pageNum = state.pagination.page + range - 1;
+
         const showPaginator = state.pagination.pagesCount > 1;
         this.paginator.show(showPaginator);
         if (showPaginator) {
             this.paginator.setState((paginatorState) => ({
                 ...paginatorState,
                 pagesCount: state.pagination.pagesCount,
-                pageNum: state.pagination.page,
+                pageNum,
             }));
         }
+
+        show(
+            this.showMoreBtn,
+            state.items.length > 0
+            && pageNum < state.pagination.pagesCount,
+        );
     }
 
     render(state, prevState = {}) {

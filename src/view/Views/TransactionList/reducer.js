@@ -134,6 +134,7 @@ const slice = createSlice({
     toggleMode: (state) => ({
         ...state,
         mode: (state.mode === 'details') ? 'classic' : 'details',
+        contextItem: null,
     }),
 
     listRequestLoaded: (state, data) => ({

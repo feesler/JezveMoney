@@ -36,11 +36,6 @@
   color: var(--main-text-color);
   background-color: var(--main-bg-color);
 
-  /* Navigation */
-  .navigation {
-    background-color: var(--alt-bg-color);
-  }
-
   /* Navigation items */
   a.nav-item__link,
   a.nav-item__link:visited {
@@ -96,23 +91,6 @@
 
   .widget_title .glyph-icon {
     fill: var(--main-text-color);
-  }
-
-  /* Input control */
-  .stretch-input {
-    color: var(--main-text-color);
-    border-color: var(--input-border-color);
-    background-color: var(--input-bg-color);
-  }
-
-  .stretch-input:focus {
-    border-color: var(--active-input-border-color);
-  }
-
-  .stretch-input[disabled] {
-    color: var(--input-disabled-text-color);
-    border-color: var(--input-disabled-border-color);
-    background-color: var(--input-disabled-bg-color);
   }
 
   /* Input group */
@@ -475,7 +453,6 @@
 
     /* 'Show more' button */
     .show-more-btn:hover {
-      background-color: #c9c9c9;
       background-color: var(--btn-hover-bg);
     }
 

@@ -515,13 +515,8 @@ export class ImportConditionForm extends Component {
             throw new Error('Invalid state');
         }
 
-        if (state.isValid) {
-            this.validFeedback.textContent = '';
-            window.app.clearBlockValidation(this.container);
-        } else {
-            this.validFeedback.textContent = state.message;
-            window.app.invalidateBlock(this.container);
-        }
+        window.app.setValidation(this.container, state.isValid);
+        this.validFeedback.textContent = (state.isValid) ? '' : state.message;
 
         this.renderProperty(state);
         this.renderOperator(state);

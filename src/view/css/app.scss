@@ -4,6 +4,8 @@
   --accent-color: #0072c6;
   --accent-color-alt: #20a0ff;
   --accent-hover-color: #1e82cc;
+  --warning-color: #c60000;
+  --warning-color-alt: #e63030;
   --action-btn-border-radius: 6px;
   --focus-shadow: 0 0 0 0.25rem #0d6efd40;
   --input-height: 37px;
@@ -119,6 +121,19 @@ label {
   border-style: solid;
   padding: 0 0.5rem;
   border-radius: 5px;
+  color: var(--main-text-color);
+  border-color: var(--input-border-color);
+  background-color: var(--input-bg-color);
+}
+
+.stretch-input:focus {
+  border-color: var(--active-input-border-color);
+}
+
+.stretch-input[disabled] {
+  color: var(--input-disabled-text-color);
+  border-color: var(--input-disabled-border-color);
+  background-color: var(--input-disabled-bg-color);
 }
 
 /* Input group */
@@ -336,6 +351,11 @@ label {
   pointer-events: none;
 }
 
+/* Alternative button */
+.alter-link {
+  padding: 6px 24px;
+}
+
 /* dashed underline button */
 .dashed-btn {
   position: relative;
@@ -359,6 +379,20 @@ label {
     border-bottom-width: 1px;
     border-bottom-color: var(--accent-color);
   }
+}
+
+/* "Show more..." button */
+.show-more-btn {
+  margin: 16px 0;
+  color: var(--main-text-color);
+  border-radius: var(--action-btn-border-radius);
+}
+
+/* List footer */
+.list-footer {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
 }
 
 /* Validation */
@@ -421,6 +455,15 @@ label {
   white-space: nowrap;
   color: #000000;
   background-color: #d0d0d0;
+}
+
+/* Radio */
+.radio {
+  --radio-text: var(--main-text-color);
+  --radio-bg: var(--input-bg-color);
+  --radio-border: var(--input-border-color);
+  --radio-check-color: #5082aa;
+  --radio-checked-bg: var(--input-bg-color);
 }
 
 /* Focused Checkbox, Radio, Switch */
@@ -499,6 +542,12 @@ label {
 
   box-shadow: var(--popup-menu-box-shadow);
   backdrop-filter: var(--popup-menu-backdrop-filter);
+}
+
+.popup-menu-list .warning-item {
+  --popupmenu-title-color: var(--warning-color-alt);
+  --popupmenu-icon-color: var(--warning-color-alt);
+  --popupmenu-hover-background: var(--warning-color-alt);
 }
 
 /* Popup */
@@ -728,7 +777,7 @@ $active-colors: #00bfff, #ff3392, #00ff55, #fcf93d;
   }
 
   .warning-btn:hover {
-    background-color: #e63030;
+    background-color: var(--warning-color-alt);
   }
 
   .link-btn:hover {

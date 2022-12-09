@@ -1,4 +1,4 @@
-import { copyObject } from 'jezvejs';
+import { copyObject, isFunction } from 'jezvejs';
 import { ListItem } from './ListItem.js';
 import { ImportTransaction } from './ImportTransaction.js';
 
@@ -24,6 +24,16 @@ const TITLE_TRANS_TRANSFER_FROM = 'Transfer from';
 const TITLE_TRANS_TRANSFER_TO = 'Transfer to';
 const TITLE_TRANS_DEBT_FROM = 'Debt from';
 const TITLE_TRANS_DEBT_TO = 'Debt to';
+
+/* Action handlers map */
+const actionHandlers = {
+    [IMPORT_ACTION_SET_TR_TYPE]: (ctx, value) => ctx.setTransactionType(value),
+    [IMPORT_ACTION_SET_ACCOUNT]: (ctx, value) => ctx.setTransferAccount(value),
+    [IMPORT_ACTION_SET_PERSON]: (ctx, value) => ctx.setPerson(value),
+    [IMPORT_ACTION_SET_SRC_AMOUNT]: (ctx, value) => ctx.setSourceAmount(value),
+    [IMPORT_ACTION_SET_DEST_AMOUNT]: (ctx, value) => ctx.setDestAmount(value),
+    [IMPORT_ACTION_SET_COMMENT]: (ctx, value) => ctx.setComment(value),
+};
 
 /**
  * @constructor Import action class
@@ -162,21 +172,12 @@ export class ImportAction extends ListItem {
             throw new Error('Invalid import item');
         }
 
-        if (this.action_id === IMPORT_ACTION_SET_TR_TYPE) {
-            context.setTransactionType(this.value);
-        } else if (this.action_id === IMPORT_ACTION_SET_ACCOUNT) {
-            context.setTransferAccount(this.value);
-        } else if (this.action_id === IMPORT_ACTION_SET_PERSON) {
-            context.setPerson(this.value);
-        } else if (this.action_id === IMPORT_ACTION_SET_SRC_AMOUNT) {
-            context.setSourceAmount(this.value);
-        } else if (this.action_id === IMPORT_ACTION_SET_DEST_AMOUNT) {
-            context.setDestAmount(this.value);
-        } else if (this.action_id === IMPORT_ACTION_SET_COMMENT) {
-            context.setComment(this.value);
-        } else {
+        const handler = actionHandlers[this.action_id];
+        if (!isFunction(handler)) {
             throw new Error('Invalid action');
         }
+
+        return handler(context, this.value);
     }
 
     /** Check action match search filter */

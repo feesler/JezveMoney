@@ -3,18 +3,26 @@
   --main-bg-color: #ffffff;
   --alt-bg-color: #f0f0f0;
 
+  /* Header */
+  --header-bg-color: #404040;
+  --header-hover-btn-bg-color: #606060;
+
+  /* Buttons */
+  --btn-bg: #e8e8e8;
+  --btn-hover-bg: #c9c9c9;
+
   /* Inputs */
   --input-bg-color: #f2f2f2;
   --input-border-color: #b0b0b0;
   --active-input-border-color: #888888;
 
+  /* Disabled inputs */
+  --input-disabled-bg-color: #eeeeee;
+  --input-disabled-border-color: #dddddd;
+  --input-disabled-text-color: #b0b0b0;
+
   color: var(--main-text-color);
   background-color: var(--main-bg-color);
-
-  /* Navigation */
-  .navigation-content {
-    background-color: #f0f0f0;
-  }
 
   /* Navigation items */
   a.nav-item__link,
@@ -69,24 +77,6 @@
 
   .menu-list > li > button {
     color: #000000;
-  }
-
-  .request-data-form {
-    background-color: #f3f3f3;
-    border-color: #bbbbbb;
-  }
-
-  .request-data-form input[type="text"] {
-    color: #000000;
-    border-color: #000000;
-    background-color: #ffffff;
-  }
-
-  .request-data-form input[disabled],
-  .request-data-form select[disabled],
-  .request-data-form textarea[disabled] {
-    color: #888888;
-    border-color: #888888;
   }
 
   .request-item {

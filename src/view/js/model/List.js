@@ -35,6 +35,11 @@ export class List {
         return this.data.map(...args);
     }
 
+    /** Wrap method for array reduce() method */
+    reduce(...args) {
+        return this.data.reduce(...args);
+    }
+
     /** Wrap method for array find() method */
     find(...args) {
         return this.data.find(...args);

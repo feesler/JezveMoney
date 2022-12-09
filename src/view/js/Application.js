@@ -122,7 +122,7 @@ export class Application {
     }
 
     setTheme(dark) {
-        const { baseURL, themes } = this.props;
+        const { baseURL, themesPath, themes } = this.props;
         const themeId = (dark) ? DARK_THEME : WHITE_THEME;
         const theme = themes[themeId];
 
@@ -132,7 +132,7 @@ export class Application {
 
         const linkElem = ge('theme-style');
         if (linkElem) {
-            linkElem.href = `${baseURL}view/css/themes/${theme.file}`;
+            linkElem.href = `${baseURL}${themesPath}${theme.file}`;
         }
 
         document.body.className = theme.className;
@@ -160,24 +160,6 @@ export class Application {
         });
 
         this.messageBox.show();
-    }
-
-    /**
-     * Clear validation state of block
-     * @param {string|Element} block - block to clear validation state
-     */
-    clearBlockValidation(block) {
-        const blockElem = (typeof block === 'string') ? ge(block) : block;
-        blockElem?.classList?.remove(INVALID_BLOCK_CLASS);
-    }
-
-    /**
-     * Set invalid state for block
-     * @param {string|Element} block - block to invalidate
-     */
-    invalidateBlock(block) {
-        const blockElem = (typeof block === 'string') ? ge(block) : block;
-        blockElem?.classList?.add(INVALID_BLOCK_CLASS);
     }
 
     /** Set validation state for element */

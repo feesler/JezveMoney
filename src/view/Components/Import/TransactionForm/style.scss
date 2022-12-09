@@ -98,22 +98,7 @@
 
   /* Toggle expand/collapse button */
   .toggle-btn {
-    width: 32px;
-    height: 32px;
-    padding: 7px;
-    background: none;
-    pointer-events: all;
-    cursor: pointer;
     margin-left: auto;
-  }
-
-  .toggle-icon {
-    width: 18px;
-    height: 18px;
-  }
-
-  .toggle-btn.rotate .toggle-icon {
-    transform: rotate(180deg);
   }
 
   /* Delete item button */
@@ -128,14 +113,6 @@
     border-top: 1px solid;
     padding: 8px;
     overflow: hidden;
-  }
-
-  /* Found similar transaction info */
-  .similar {
-    display: flex;
-    flex-flow: row nowrap;
-    column-gap: 1rem;
-    font-size: 14px;
   }
 
   .field.invalid-block input,

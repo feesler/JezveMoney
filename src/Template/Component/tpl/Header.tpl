@@ -1,24 +1,29 @@
 <div class="header">
-    <div class="header__content">
-        <a class="header-logo" href="<?= BASEURL ?>" tabindex="1">
-            <span class="header-logo__icon"><?= svgIcon("header_logo", "logo-icon") ?></span>
-            <span class="header-logo__title">Jezve Money</span>
-        </a>
-        <button class="nav-toggle-btn"><?= svgIcon("menu", "nav-toggle-icon") ?></button>
-        <div class="header-title"></div>
+    <a class="header-logo" href="<?= BASEURL ?>" tabindex="1">
+        <span class="header-logo__icon"><?= svgIcon("header_logo", "logo-icon") ?></span>
+        <span class="header-logo__title">Jezve Money</span>
+    </a>
+    <button class="nav-toggle-btn"><?= svgIcon("menu", "nav-toggle-icon") ?></button>
 
-        <button id="userbtn" class="btn user-btn" type="button" tabindex="2">
-            <?php if ($this->user_id != 0) {        ?>
-                <span class="user-btn__icon"><?= svgIcon("user", "user-icon") ?></span>
-                <span class="user-btn__title"><?= e($this->user_name) ?></span>
-            <?php    } else {        ?>
-                <span class="user-btn__icon"><?= svgIcon("ellipsis", "user-icon") ?></span>
-            <?php    }        ?>
-        </button>
+    <div class="header__container">
+        <div class="header__content">
+            <button id="userbtn" class="btn user-btn right-align" type="button" tabindex="2">
+                <?php if ($this->user_id != 0) {        ?>
+                    <span class="user-btn__icon"><?= svgIcon("user", "user-icon") ?></span>
+                    <span class="user-btn__title"><?= e($this->user_name) ?></span>
+                <?php    } else {        ?>
+                    <span class="user-btn__icon"><?= svgIcon("ellipsis", "user-icon") ?></span>
+                <?php    }        ?>
+            </button>
+        </div>
+
+        <div class="header__content header-actions">
+            <div class="header-title"></div>
+        </div>
     </div>
 </div>
 
-<nav class="navigation-content">
+<nav class="main-navigation navigation-content">
     <div class="navigation-controls">
         <button class="navigation__close-btn">
             <?= svgIcon("back", "navigation__close-btn-icon") ?>

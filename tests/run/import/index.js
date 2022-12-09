@@ -412,6 +412,16 @@ export const updateItemAndSave = async (params) => {
     await saveItem();
 };
 
+/** Restore original data of imported transaction */
+export const restoreItems = async (indexes) => {
+    const itemInds = asArray(indexes);
+
+    await test(`Cancel changes of item(s) [${itemInds.join()}]`, async () => {
+        await checkNavigation();
+        return App.view.restoreItems(itemInds);
+    });
+};
+
 /**
  * Click by delete button of items specified by indexes
  * @param {number|number[]} indexes - index or array of indexes of items to delete
@@ -466,5 +476,13 @@ export const goToPrevPage = async () => {
     await test('Navigate to previous page', async () => {
         await checkNavigation();
         return App.view.goToPrevPage();
+    });
+};
+
+/** Show more items */
+export const showMore = async () => {
+    await test('Show more items', async () => {
+        await checkNavigation();
+        return App.view.showMore();
     });
 };

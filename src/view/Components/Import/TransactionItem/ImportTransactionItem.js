@@ -1,15 +1,17 @@
 import {
     createElement,
     enable,
-    show,
+    Component,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { Collapsible } from 'jezvejs/Collapsible';
-import { ImportTransactionBase } from '../TransactionBase/ImportTransactionBase.js';
+import { PopupMenuButton } from 'jezvejs/PopupMenu';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { Field } from '../../Field/Field.js';
 import './style.scss';
 import { ImportTransaction } from '../../../js/model/ImportTransaction.js';
+import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
+import { ToggleButton } from '../../ToggleButton/ToggleButton.js';
 
 /** CSS classes */
 const CONTAINER_CLASS = 'import-item';
@@ -56,18 +58,12 @@ const typeStrings = {
     debtto: 'Debt to',
 };
 
-const defaultProps = {
-};
-
 /**
- * ImportTransactionForm component
+ * Import transaction form component
  */
-export class ImportTransactionItem extends ImportTransactionBase {
-    constructor(props = {}) {
-        super({
-            ...defaultProps,
-            ...props,
-        });
+export class ImportTransactionItem extends Component {
+    constructor(props) {
+        super(props);
 
         if (!this.props?.transaction?.mainAccount) {
             throw new Error('Invalid props');
@@ -157,11 +153,11 @@ export class ImportTransactionItem extends ImportTransactionBase {
             ]),
         ]);
 
-        this.createMenuButton();
-        this.toggleExtBtn = this.createToggleButton();
+        this.menuContainer = PopupMenuButton.create();
+        this.toggleExtBtn = ToggleButton.create();
         this.controls = createContainer(CONTROLS_CLASS, [
-            this.menuContainer,
-            this.toggleExtBtn,
+            this.menuContainer.elem,
+            this.toggleExtBtn.elem,
         ]);
 
         this.createSelectControls();
@@ -195,8 +191,8 @@ export class ImportTransactionItem extends ImportTransactionBase {
     }
 
     renderSelectControls(state, prevState = {}) {
-        const transaction = state.transaction.state;
-        const prevTransaction = prevState?.transaction?.state;
+        const { transaction } = state;
+        const prevTransaction = prevState?.transaction;
         const { listMode, selected } = transaction;
         if (
             listMode === prevTransaction?.listMode
@@ -212,13 +208,13 @@ export class ImportTransactionItem extends ImportTransactionBase {
     }
 
     renderContainer(state, prevState) {
-        const originalData = state.transaction.props.originalData ?? null;
-        const prevOriginalData = prevState?.transaction?.props?.originalData;
+        const originalData = state.transaction.originalData ?? null;
+        const prevOriginalData = prevState?.transaction?.originalData;
         if (originalData === prevOriginalData) {
             return;
         }
 
-        show(this.toggleExtBtn, !!originalData);
+        this.toggleExtBtn.show(!!originalData);
         if (!originalData) {
             this.collapse.setContent(null);
             return;
@@ -230,10 +226,10 @@ export class ImportTransactionItem extends ImportTransactionBase {
 
         const content = [origDataContainer.elem];
 
-        const { similarTransaction } = state.transaction.state;
+        const { similarTransaction } = state.transaction;
         if (similarTransaction) {
-            const infoElem = this.createSimilarTransactionInfo(similarTransaction);
-            content.push(infoElem);
+            const info = SimilarTransactionInfo.create(similarTransaction);
+            content.push(info.elem);
         }
 
         this.collapse.setContent(content);
@@ -248,8 +244,8 @@ export class ImportTransactionItem extends ImportTransactionBase {
         this.renderContainer(state, prevState);
         this.elem.setAttribute('data-id', state.transaction.id);
 
-        const isDiff = state.transaction.isDiff();
-        const transaction = state.transaction.state;
+        const { transaction } = state;
+        const isDiff = transaction.isDiff();
         const { userAccounts, persons, currency } = window.app.model;
         const isTransfer = ['transferfrom', 'transferto'].includes(transaction.type);
         const isDebt = ['debtfrom', 'debtto'].includes(transaction.type);
@@ -313,7 +309,7 @@ export class ImportTransactionItem extends ImportTransactionBase {
         // Comment field
         this.commentTitle.textContent = transaction.comment;
 
-        show(this.menuContainer, transaction.listMode === 'list');
+        this.menuContainer.show(transaction.listMode === 'list');
 
         if (this.collapse) {
             if (transaction.collapsed) {

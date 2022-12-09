@@ -1,0 +1,25 @@
+/* Toggle expand/collapse button */
+.btn.toggle-btn {
+  width: 32px;
+  height: 32px;
+  padding: 7px;
+  background: none;
+  pointer-events: all;
+  cursor: pointer;
+  margin-left: auto;
+
+  .icon.toggle-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.toggle-btn.rotate .toggle-icon {
+  transform: rotate(180deg);
+}
+
+@media (hover: hover) {
+  .btn.toggle-btn:hover {
+    background: none;
+  }
+}

@@ -9,6 +9,7 @@ import {
     evaluate,
 } from 'jezve-test';
 import { Paginator } from 'jezvejs-test';
+import { App } from '../../../Application.js';
 import { ImportTransactionItem } from './ImportTransactionItem.js';
 
 export class ImportList extends TestComponent {
@@ -51,6 +52,7 @@ export class ImportList extends TestComponent {
                 (item) => ImportTransactionItem.create(this.parent, item, this.mainAccount),
             );
 
+            res.showMoreBtn = { elem: await query(this.elem, '.show-more-btn') };
             res.paginator = await Paginator.create(this, await query(this.elem, '.paginator'));
         } else {
             const noDataMsg = await query(this.elem, '.nodata-message');
@@ -71,18 +73,33 @@ export class ImportList extends TestComponent {
         return this.content.items;
     }
 
+    get showMoreBtn() {
+        return this.content.showMoreBtn;
+    }
+
     get paginator() {
         return this.content.paginator;
     }
 
     async buildModel(cont) {
         const paginatorVisible = cont.paginator?.content?.visible;
+
+        const itemsOnPage = App.config.importTransactionsOnPage;
+        const range = Math.ceil(cont.items.length / itemsOnPage);
+        const pagination = (paginatorVisible)
+            ? {
+                page: cont.paginator.active - range + 1,
+                pages: cont.paginator.pages,
+                range,
+            } : {
+                page: 1,
+                pages: 1,
+                range: 1,
+            };
+
         const res = {
             items: [],
-            pagination: {
-                page: (paginatorVisible) ? cont.paginator.active : 1,
-                pages: (paginatorVisible) ? cont.paginator.pages : 1,
-            },
+            pagination,
             invalidated: false,
             formIndex: -1,
             contextMenuIndex: -1,

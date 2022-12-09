@@ -1,10 +1,10 @@
 import {
     createElement,
-    show,
     enable,
     isFunction,
     insertAfter,
     checkDate,
+    Component,
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { DateInput } from 'jezvejs/DateInput';
@@ -15,11 +15,11 @@ import { Icon } from 'jezvejs/Icon';
 import { InputGroup } from 'jezvejs/InputGroup';
 import { Popup } from 'jezvejs/Popup';
 import { fixFloat } from '../../../js/utils.js';
-import { ImportTransactionBase } from '../TransactionBase/ImportTransactionBase.js';
 import { Field } from '../../Field/Field.js';
 import './style.scss';
-import { ImportTransaction } from '../../../js/model/ImportTransaction.js';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
+import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
+import { ToggleButton } from '../../ToggleButton/ToggleButton.js';
 
 /** CSS classes */
 const POPUP_CLASS = 'import-form-popup';
@@ -85,9 +85,9 @@ const defaultValidation = {
 };
 
 /**
- * ImportTransactionForm component
+ * Import transaction form component
  */
-export class ImportTransactionForm extends ImportTransactionBase {
+export class ImportTransactionForm extends Component {
     constructor(props = {}) {
         super({
             ...defaultProps,
@@ -158,14 +158,15 @@ export class ImportTransactionForm extends ImportTransactionBase {
             },
             events: { click: () => this.cancel() },
         });
-        this.toggleExtBtn = this.createToggleButton({
-            click: () => this.toggleCollapse(),
+
+        this.toggleExtBtn = ToggleButton.create({
+            onClick: () => this.toggleCollapse(),
         });
 
         this.formControls = createContainer(FORM_CONTROLS_CLASS, [
             this.saveBtn,
             this.cancelBtn,
-            this.toggleExtBtn,
+            this.toggleExtBtn.elem,
         ]);
 
         this.initContainer(CONTAINER_CLASS, [
@@ -435,9 +436,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
             throw new Error('Invalid action type');
         }
 
-        const transaction = new ImportTransaction(this.state.transaction);
-        transaction[type](payload);
-        return transaction;
+        return state.transaction[type](payload);
     }
 
     /** Toggle collapse/expand button 'click' event handler */
@@ -554,7 +553,7 @@ export class ImportTransactionForm extends ImportTransactionBase {
     validate() {
         const { state } = this;
         const isDiff = state.transaction.isDiff();
-        const transaction = state.transaction.state;
+        const { transaction } = state;
         const isExpense = (transaction.type === 'expense');
 
         const sourceAmount = (!isExpense || isDiff)
@@ -663,8 +662,8 @@ export class ImportTransactionForm extends ImportTransactionBase {
         const content = [container.elem];
         const { similarTransaction } = state.transaction;
         if (similarTransaction) {
-            const infoElem = this.createSimilarTransactionInfo(similarTransaction);
-            content.push(infoElem);
+            const info = SimilarTransactionInfo.create(similarTransaction);
+            content.push(info.elem);
         }
 
         if (!this.collapse) {
@@ -688,9 +687,8 @@ export class ImportTransactionForm extends ImportTransactionBase {
             return;
         }
 
-        const isDiff = state.transaction.isDiff();
-        const transaction = state.transaction.state;
-
+        const { transaction } = state;
+        const isDiff = transaction.isDiff();
         const isExpense = transaction.type === 'expense';
         const isIncome = transaction.type === 'income';
         const isTransfer = ['transferfrom', 'transferto'].includes(transaction.type);
@@ -803,8 +801,8 @@ export class ImportTransactionForm extends ImportTransactionBase {
         this.renderOriginalData(state, prevState);
 
         const { originalData } = state.transaction;
-        show(this.toggleExtBtn, !!originalData);
-        this.toggleExtBtn.classList.toggle('rotate', !state.collapsed);
+        this.toggleExtBtn.show(!!originalData);
+        this.toggleExtBtn.elem.classList.toggle('rotate', !state.collapsed);
         if (!this.collapse) {
             return;
         }

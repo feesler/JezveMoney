@@ -23,7 +23,11 @@ import { createPersons } from './data/persons.js';
 import { createTransactions } from './data/transactions.js';
 import { getAccountCSV, getCardCSV } from './data/importfiles.js';
 import { createImportRules } from './data/rules.js';
+import { createImportTemplates } from './data/templates.js';
 import { putFile, removeFile } from '../run/import/index.js';
+import { ImportListStory } from './stories/import/ImportListStory.js';
+import { ImportTemplateStory } from './stories/import/ImportTemplateStory.js';
+import { ImportRulesStory } from './stories/import/ImportRulesStory.js';
 
 const storiesMap = {
     unitTests: UnitTestsStory,
@@ -35,6 +39,9 @@ const storiesMap = {
     transactions: TransactionsStory,
     transactionList: TransactionListStory,
     import: ImportStory,
+    importTemplates: ImportTemplateStory,
+    importRules: ImportRulesStory,
+    importList: ImportListStory,
     statistics: StatisticsStory,
 };
 
@@ -119,6 +126,10 @@ export class Scenario {
 
         const stories = this.getStorieNames();
         for (const story of stories) {
+            if (story === 'import') {
+                continue;
+            }
+
             await this.runStory(story);
         }
     }
@@ -188,6 +199,11 @@ export class Scenario {
     /** Creates common test transactions */
     async createTransactions() {
         await createTransactions();
+    }
+
+    /** Creates import templates */
+    async createImportTemplates() {
+        await createImportTemplates();
     }
 
     /** Creates import rules */

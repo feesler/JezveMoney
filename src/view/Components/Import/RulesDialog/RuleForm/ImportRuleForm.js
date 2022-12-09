@@ -6,7 +6,6 @@ import {
     Component,
 } from 'jezvejs';
 import { Collapsible } from 'jezvejs/Collapsible';
-import { Icon } from 'jezvejs/Icon';
 import {
     IMPORT_ACTION_SET_ACCOUNT,
     IMPORT_ACTION_SET_PERSON,
@@ -20,6 +19,7 @@ import { ImportActionForm } from '../ActionForm/ImportActionForm.js';
 import { ListContainer } from '../../../ListContainer/ListContainer.js';
 import './style.scss';
 import { ImportRule } from '../../../../js/model/ImportRule.js';
+import { ToggleButton } from '../../../ToggleButton/ToggleButton.js';
 
 /** Strings */
 const BTN_CREATE_CONDITION = 'Create';
@@ -79,14 +79,8 @@ export class ImportRuleForm extends Component {
             },
             events: { click: (e) => this.onCreateConditionClick(e) },
         });
-        const toggleCondIcon = Icon.create({
-            icon: 'toggle-ext',
-            className: 'icon toggle-icon',
-        });
-        this.toggleCondBtn = createElement('button', {
-            props: { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
-            children: toggleCondIcon.elem,
-        });
+
+        this.toggleCondBtn = ToggleButton.create({ className: 'right-align' });
 
         this.conditionsList = ListContainer.create({
             ItemComponent: ImportConditionForm,
@@ -106,7 +100,7 @@ export class ImportRuleForm extends Component {
             header: [
                 createElement('label', { props: { textContent: TITLE_CONDITIONS } }),
                 this.createCondBtn,
-                this.toggleCondBtn,
+                this.toggleCondBtn.elem,
             ],
             content: this.conditionsList.elem,
             onStateChange: (expanded) => this.onToggleConditions(expanded),
@@ -117,14 +111,8 @@ export class ImportRuleForm extends Component {
             props: { className: 'btn link-btn create-btn', type: 'button', textContent: BTN_CREATE_ACTION },
             events: { click: (e) => this.onCreateActionClick(e) },
         });
-        const toggleActIcon = Icon.create({
-            icon: 'toggle-ext',
-            className: 'icon toggle-icon',
-        });
-        this.toggleActionsBtn = createElement('button', {
-            props: { className: 'btn icon-btn toggle-btn right-align', type: 'button' },
-            children: toggleActIcon.elem,
-        });
+
+        this.toggleActionsBtn = ToggleButton.create({ className: 'right-align' });
 
         this.actionsList = ListContainer.create({
             ItemComponent: ImportActionForm,
@@ -144,7 +132,7 @@ export class ImportRuleForm extends Component {
             header: [
                 createElement('label', { props: { textContent: TITLE_ACTIONS } }),
                 this.createActionBtn,
-                this.toggleActionsBtn,
+                this.toggleActionsBtn.elem,
             ],
             content: this.actionsList.elem,
             onStateChange: (expanded) => this.onToggleActions(expanded),
@@ -661,18 +649,15 @@ export class ImportRuleForm extends Component {
         this.validateConditionsAvail(state);
         this.validateActionsAvail(state);
 
-        if (
+        const isInvalid = (
             state.validation
             && !state.validation.valid
             && !('conditionIndex' in state.validation)
             && !('actionIndex' in state.validation)
-        ) {
-            this.validFeedback.textContent = state.validation.message;
-            window.app.invalidateBlock(this.feedbackContainer);
-        } else {
-            this.validFeedback.textContent = '';
-            window.app.clearBlockValidation(this.feedbackContainer);
-        }
+        );
+
+        window.app.setValidation(this.container, !isInvalid);
+        this.validFeedback.textContent = (isInvalid) ? state.validation.message : '';
 
         // Conditions list
         const isInvalidCondition = (

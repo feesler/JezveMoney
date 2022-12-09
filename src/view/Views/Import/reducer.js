@@ -1,11 +1,4 @@
 import { createSlice } from '../../js/store.js';
-import { fixFloat } from '../../js/utils.js';
-import {
-    EXPENSE,
-    INCOME,
-    TRANSFER,
-    DEBT,
-} from '../../js/model/Transaction.js';
 import { ImportTransaction } from '../../js/model/ImportTransaction.js';
 
 /** Returns page number and relative index of specified absolute index */
@@ -19,98 +12,6 @@ export const getPageIndex = (index, state) => {
         page: Math.floor(index / onPage) + 1,
         index: index % onPage,
     };
-};
-
-/**
- * Map import row to new transaction
- * @param {Object} data - import data
- */
-const mapImportItem = (data, state) => {
-    if (!data) {
-        throw new Error('Invalid data');
-    }
-
-    const { mainAccount } = state;
-    if (data.accountCurrencyId !== mainAccount.curr_id) {
-        throw new Error('Currency must be the same as main account');
-    }
-    const accAmount = parseFloat(fixFloat(data.accountAmount));
-    if (Number.isNaN(accAmount) || accAmount === 0) {
-        throw new Error('Invalid account amount value');
-    }
-    const trAmount = parseFloat(fixFloat(data.transactionAmount));
-    if (Number.isNaN(trAmount) || trAmount === 0) {
-        throw new Error('Invalid transaction amount value');
-    }
-
-    const item = {
-        enabled: true,
-        type: (accAmount > 0) ? INCOME : EXPENSE,
-        originalData: {
-            ...data,
-            origAccount: { ...mainAccount },
-        },
-    };
-
-    if (item.type === EXPENSE) {
-        item.src_id = mainAccount.id;
-        item.dest_id = 0;
-        item.dest_amount = Math.abs(trAmount);
-        item.dest_curr = data.transactionCurrencyId;
-        item.src_amount = Math.abs(accAmount);
-        item.src_curr = data.accountCurrencyId;
-    } else if (item.type === INCOME) {
-        item.src_id = 0;
-        item.dest_id = mainAccount.id;
-        item.src_amount = Math.abs(trAmount);
-        item.src_curr = data.transactionCurrencyId;
-        item.dest_amount = Math.abs(accAmount);
-        item.dest_curr = data.accountCurrencyId;
-    }
-
-    item.date = window.app.formatDate(new Date(data.date));
-    item.comment = data.comment;
-
-    return item;
-};
-
-const convertItemDataToProps = (data, state) => {
-    const { mainAccount } = state;
-    const res = {
-        mainAccount,
-        enabled: data.enabled,
-        sourceAmount: data.src_amount,
-        destAmount: data.dest_amount,
-        srcCurrId: data.src_curr,
-        destCurrId: data.dest_curr,
-        date: data.date,
-        comment: data.comment,
-    };
-
-    if (data.type === EXPENSE) {
-        res.type = 'expense';
-        res.sourceAccountId = data.src_id;
-    } else if (data.type === INCOME) {
-        res.type = 'income';
-        res.destAccountId = data.dest_id;
-    } else if (data.type === TRANSFER) {
-        const isTransferFrom = data.src_id === mainAccount.id;
-        res.type = (isTransferFrom) ? 'transferfrom' : 'transferto';
-        if (isTransferFrom) {
-            res.destAccountId = data.dest_id;
-        } else {
-            res.sourceAccountId = data.src_id;
-        }
-    } else if (data.type === DEBT) {
-        res.type = (data.op === 1) ? 'debtto' : 'debtfrom';
-        res.personId = data.person_id;
-    }
-
-    if (data.originalData) {
-        res.originalData = { ...data.originalData };
-    }
-
-    return res;
 };
 
 /**
@@ -164,6 +65,7 @@ const getPagination = (state) => {
         ...pagination,
         total: items.length,
         pagesCount,
+        range: 1,
     };
 
     res.page = (pagesCount > 0) ? Math.min(pagesCount, res.page) : 1;
@@ -187,13 +89,12 @@ const slice = createSlice({
             ...state,
             items: [
                 ...state.items,
-                ...data.map((item, index) => {
-                    const transaction = mapImportItem(item, state);
-                    const props = convertItemDataToProps(transaction, state);
-                    props.id = state.lastId + index + 1;
-
-                    return new ImportTransaction(props);
-                }),
+                ...data.map((item, index) => (
+                    ImportTransaction.fromImportData({
+                        ...item,
+                        id: state.lastId + index + 1,
+                    })
+                )),
             ],
             lastId: state.lastId + data.length,
         };
@@ -215,13 +116,7 @@ const slice = createSlice({
                 transaction.picked = true;
             }
 
-            if (item.isSameSimilarTransaction(transaction)) {
-                return item;
-            }
-
-            const newItem = new ImportTransaction(item);
-            newItem.setSimilarTransaction(transaction);
-            return newItem;
+            return item.setSimilarTransaction(transaction);
         }),
     }),
 
@@ -231,46 +126,29 @@ const slice = createSlice({
             if (
                 !item.originalData
                 || item.modifiedByUser
-                || item.isSameSimilarTransaction(null)
             ) {
                 return item;
             }
 
-            const newItem = new ImportTransaction(item);
-            newItem.setSimilarTransaction(null);
-            return newItem;
+            return item.setSimilarTransaction(null);
         }),
     }),
 
     selectAllItems: (state) => ({
         ...state,
-        items: state.items.map((item) => {
-            const newItem = new ImportTransaction(item);
-            newItem.select(true);
-            return newItem;
-        }),
+        items: state.items.map((item) => item.select(true)),
     }),
 
     deselectAllItems: (state) => ({
         ...state,
-        items: state.items.map((item) => {
-            const newItem = new ImportTransaction(item);
-            newItem.select(false);
-            return newItem;
-        }),
+        items: state.items.map((item) => item.select(false)),
     }),
 
     enableSelectedItems: (state, value) => ({
         ...state,
-        items: state.items.map((item) => {
-            if (!item.selected) {
-                return item;
-            }
-
-            const newItem = new ImportTransaction(item);
-            newItem.enable(!!value);
-            return newItem;
-        }),
+        items: state.items.map((item) => (
+            (item.selected) ? item.enable(!!value) : item
+        )),
     }),
 
     deleteSelectedItems: (state) => {
@@ -316,85 +194,68 @@ const slice = createSlice({
         ...state,
         listMode,
         contextItemIndex: -1,
-        items: state.items.map((item) => {
-            const newItem = new ImportTransaction(item);
-            newItem.setListMode(listMode);
-            return newItem;
-        }),
+        items: state.items.map((item) => item.setListMode(listMode)),
     }),
 
     toggleSelectItemByIndex: (state, index) => ({
         ...state,
-        items: state.items.map((item, ind) => {
-            if (index !== ind) {
-                return item;
-            }
-
-            const newItem = new ImportTransaction(item);
-            newItem.toggleSelect();
-            return newItem;
-        }),
+        items: state.items.map((item, ind) => (
+            (index === ind) ? item.toggleSelect() : item
+        )),
     }),
 
     toggleCollapseItem: (state, index) => ({
         ...state,
-        items: state.items.map((item, ind) => {
-            if (ind !== index) {
-                return item;
-            }
+        items: state.items.map((item, ind) => (
+            (index === ind) ? item.collapse(!item.collapsed) : item
+        )),
+    }),
 
-            const newItem = new ImportTransaction(item);
-            newItem.collapse(!newItem.collapsed);
-            return newItem;
-        }),
+    restoreItemByIndex: (state, index) => ({
+        ...state,
+        contextItemIndex: -1,
+        items: state.items.map((item, ind) => (
+            (index === ind) ? item.restoreOriginal() : item
+        )),
     }),
 
     toggleEnableItemByIndex: (state, index) => ({
         ...state,
         contextItemIndex: -1,
-        items: state.items.map((item, ind) => {
-            if (ind !== index) {
-                return item;
-            }
-
-            const newItem = new ImportTransaction(item);
-            newItem.enable(!item.enabled);
-            return newItem;
-        }),
+        items: state.items.map((item, ind) => (
+            (ind === index) ? item.enable(!item.enabled) : item
+        )),
     }),
 
-    changePage: (state, page) => (
-        (state.pagination.page === page)
-            ? state
-            : {
-                ...state,
-                contextItemIndex: -1,
-                pagination: {
-                    ...state.pagination,
-                    page,
-                },
-            }
-    ),
+    changePage: (state, page) => ({
+        ...state,
+        contextItemIndex: -1,
+        pagination: {
+            ...state.pagination,
+            page,
+            range: 1,
+        },
+    }),
+
+    showMore: (state) => ({
+        ...state,
+        contextItemIndex: -1,
+        pagination: {
+            ...state.pagination,
+            range: state.pagination.range + 1,
+        },
+    }),
 
     createItem: (state) => {
         if (state.listMode !== 'list' || state.activeItemIndex !== -1) {
             return state;
         }
 
-        const currencyId = state.mainAccount.curr_id;
-        const itemData = {
-            enabled: true,
-            type: EXPENSE,
-            src_amount: '',
-            dest_amount: '',
-            src_curr: currencyId,
-            dest_curr: currencyId,
-            date: window.app.formatDate(new Date()),
-            comment: '',
-        };
-        const props = convertItemDataToProps(itemData, state);
-        const form = new ImportTransaction(props);
-        form.state.listMode = 'list';
+        const form = new ImportTransaction({
+            mainAccount: state.mainAccount,
+            sourceAmount: '',
+            destAmount: '',
+        });
 
         return {
             ...state,
@@ -405,13 +266,13 @@ const slice = createSlice({
 
     saveItem: (state, data) => {
         const isAppend = (state.activeItemIndex === state.items.length);
-        const savedItem = data;
-        if (isAppend) {
-            savedItem.props.id = state.lastId + 1;
-            savedItem.state.id = savedItem.props.id;
-        }
+        let savedItem = new ImportTransaction({
+            ...data,
+            id: (isAppend) ? state.lastId + 1 : data.id,
+        });
+
         if (isAppend || savedItem.isChanged(state.items[state.activeItemIndex])) {
-            savedItem.setModified(true);
+            savedItem = savedItem.setModified(true);
         }
 
         const newState = {
@@ -441,13 +302,12 @@ const slice = createSlice({
             return state;
         }
 
-        const form = new ImportTransaction(state.items[activeItemIndex]);
-        form.enable(true);
+        const item = state.items[activeItemIndex];
         return {
             ...state,
             contextItemIndex: -1,
             activeItemIndex,
-            form,
+            form: item.enable(true),
         };
     },
 
@@ -467,20 +327,10 @@ const slice = createSlice({
             throw new Error(`Account ${accountId} not found`);
         }
 
-        const setItemMainAccount = (item, id) => {
-            if (!item || item?.mainAccount?.id === id) {
-                return item;
-            }
-
-            const newItem = new ImportTransaction(item);
-            newItem.setMainAccount(id);
-            return newItem;
-        };
-
         return {
             ...state,
             mainAccount,
-            items: state.items.map((item) => setItemMainAccount(item, mainAccount.id)),
+            items: state.items.map((item) => item.setMainAccount(mainAccount.id)),
         };
     },
 
@@ -494,15 +344,14 @@ const slice = createSlice({
                     }
 
                     const { rules } = window.app.model;
-                    const newItem = new ImportTransaction(item);
+                    let newItem = item;
 
                     // Restore transaction for case some rules was removed
                     if (newItem.rulesApplied) {
-                        newItem.restoreOriginal();
+                        newItem = newItem.restoreOriginal();
                     }
-                    rules.applyTo(newItem);
 
-                    return newItem;
+                    return rules.applyTo(newItem);
                 }),
             }
             : state
@@ -519,16 +368,12 @@ const slice = createSlice({
 
             const { rules } = window.app.model;
             const enable = !state.rulesEnabled;
-            const newItem = new ImportTransaction(item);
-
+            let newItem = item;
             if (newItem.rulesApplied) {
-                newItem.restoreOriginal();
-            }
-            if (enable) {
-                rules.applyTo(newItem);
+                newItem = newItem.restoreOriginal();
             }
 
-            return newItem;
+            return (enable) ? rules.applyTo(newItem) : newItem;
         }),
     }),
 

@@ -117,3 +117,39 @@ textarea {
 .popup__content {
   background: none;
 }
+
+/* Desktop */
+@media (min-width: 768px) {
+  .main-navigation-offcanvas {
+    --offcanvas-bg: var(--header-bg-color);
+
+    top: 50px;
+    bottom: auto;
+    left: 0;
+    right: 0;
+    width: 100%;
+
+    .navigation-content {
+      width: 100%;
+      margin: 0;
+    }
+
+    .nav-list {
+      flex-flow: row nowrap;
+    }
+  }
+
+  .white-theme,
+  .dark-theme {
+    .main-navigation-offcanvas {
+      a.nav-item__link,
+      a.nav-item__link:visited {
+        color: var(--header-color);
+      }
+    }
+  }
+
+  .admin_cont_wrap {
+    padding: 100px 12px 50px 12px;
+  }
+}

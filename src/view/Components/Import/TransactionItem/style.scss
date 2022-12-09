@@ -81,21 +81,6 @@
     width: 66px;
   }
 
-  /* Toggle expand/collapse button */
-  .toggle-btn {
-    width: 32px;
-    height: 32px;
-    padding: 7px;
-    background: none;
-    pointer-events: all;
-    cursor: pointer;
-  }
-
-  .toggle-icon {
-    width: 18px;
-    height: 18px;
-  }
-
   .type-col,
   .amount-col {
     flex-direction: row;
@@ -162,14 +147,6 @@
   /* Sort mode */
   &.import-item_sort {
     cursor: move;
-  }
-
-  /* Found similar transaction info */
-  .similar {
-    display: flex;
-    flex-flow: row nowrap;
-    column-gap: 1rem;
-    font-size: 14px;
   }
 }
 
