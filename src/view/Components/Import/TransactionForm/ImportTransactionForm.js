@@ -17,7 +17,6 @@ import { Popup } from 'jezvejs/Popup';
 import { fixFloat } from '../../../js/utils.js';
 import { Field } from '../../Field/Field.js';
 import './style.scss';
-import { ImportTransaction } from '../../../js/model/ImportTransaction.js';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
 import { ToggleButton } from '../../ToggleButton/ToggleButton.js';
@@ -437,9 +436,7 @@ export class ImportTransactionForm extends Component {
             throw new Error('Invalid action type');
         }
 
-        const transaction = new ImportTransaction(this.state.transaction);
-        transaction[type](payload);
-        return transaction;
+        return state.transaction[type](payload);
     }
 
     /** Toggle collapse/expand button 'click' event handler */
@@ -556,7 +553,7 @@ export class ImportTransactionForm extends Component {
     validate() {
         const { state } = this;
         const isDiff = state.transaction.isDiff();
-        const transaction = state.transaction.state;
+        const { transaction } = state;
         const isExpense = (transaction.type === 'expense');
 
         const sourceAmount = (!isExpense || isDiff)
@@ -690,9 +687,8 @@ export class ImportTransactionForm extends Component {
             return;
         }
 
-        const isDiff = state.transaction.isDiff();
-        const transaction = state.transaction.state;
-
+        const { transaction } = state;
+        const isDiff = transaction.isDiff();
         const isExpense = transaction.type === 'expense';
         const isIncome = transaction.type === 'income';
         const isTransfer = ['transferfrom', 'transferto'].includes(transaction.type);

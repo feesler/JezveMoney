@@ -359,8 +359,7 @@ class ImportView extends View {
                 return;
             }
 
-            const date = item.getDate();
-            const time = timestampFromString(date);
+            const time = timestampFromString(item.date);
             if (res.start === 0) {
                 res.start = time;
                 res.end = time;

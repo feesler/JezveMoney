@@ -25,7 +25,8 @@ export class ImportRuleList extends List {
      */
     applyTo(item) {
         let applied = false;
-        const data = item.getOriginal();
+        const data = item.originalData;
+        let res = item;
 
         this.forEach((rule) => {
             if (!rule.meetConditions(data)) {
@@ -33,13 +34,13 @@ export class ImportRuleList extends List {
             }
 
             if (!applied) {
-                item.setRulesApplied(true);
+                res = res.setRulesApplied(true);
                 applied = true;
             }
 
-            rule.runActions(item);
+            res = rule.runActions(res);
         });
 
-        return applied;
+        return res;
     }
 }

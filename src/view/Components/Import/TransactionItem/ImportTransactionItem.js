@@ -191,8 +191,8 @@ export class ImportTransactionItem extends Component {
     }
 
     renderSelectControls(state, prevState = {}) {
-        const transaction = state.transaction.state;
-        const prevTransaction = prevState?.transaction?.state;
+        const { transaction } = state;
+        const prevTransaction = prevState?.transaction;
         const { listMode, selected } = transaction;
         if (
             listMode === prevTransaction?.listMode
@@ -208,8 +208,8 @@ export class ImportTransactionItem extends Component {
     }
 
     renderContainer(state, prevState) {
-        const originalData = state.transaction.props.originalData ?? null;
-        const prevOriginalData = prevState?.transaction?.props?.originalData;
+        const originalData = state.transaction.originalData ?? null;
+        const prevOriginalData = prevState?.transaction?.originalData;
         if (originalData === prevOriginalData) {
             return;
         }
@@ -226,7 +226,7 @@ export class ImportTransactionItem extends Component {
 
         const content = [origDataContainer.elem];
 
-        const { similarTransaction } = state.transaction.state;
+        const { similarTransaction } = state.transaction;
         if (similarTransaction) {
             const info = SimilarTransactionInfo.create(similarTransaction);
             content.push(info.elem);
@@ -244,8 +244,8 @@ export class ImportTransactionItem extends Component {
         this.renderContainer(state, prevState);
         this.elem.setAttribute('data-id', state.transaction.id);
 
-        const isDiff = state.transaction.isDiff();
-        const transaction = state.transaction.state;
+        const { transaction } = state;
+        const isDiff = transaction.isDiff();
         const { userAccounts, persons, currency } = window.app.model;
         const isTransfer = ['transferfrom', 'transferto'].includes(transaction.type);
         const isDebt = ['debtfrom', 'debtto'].includes(transaction.type);
