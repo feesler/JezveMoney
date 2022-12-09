@@ -121,6 +121,19 @@ label {
   border-style: solid;
   padding: 0 0.5rem;
   border-radius: 5px;
+  color: var(--main-text-color);
+  border-color: var(--input-border-color);
+  background-color: var(--input-bg-color);
+}
+
+.stretch-input:focus {
+  border-color: var(--active-input-border-color);
+}
+
+.stretch-input[disabled] {
+  color: var(--input-disabled-text-color);
+  border-color: var(--input-disabled-border-color);
+  background-color: var(--input-disabled-bg-color);
 }
 
 /* Input group */
@@ -442,6 +455,15 @@ label {
   white-space: nowrap;
   color: #000000;
   background-color: #d0d0d0;
+}
+
+/* Radio */
+.radio {
+  --radio-text: var(--main-text-color);
+  --radio-bg: var(--input-bg-color);
+  --radio-border: var(--input-border-color);
+  --radio-check-color: #5082aa;
+  --radio-checked-bg: var(--input-bg-color);
 }
 
 /* Focused Checkbox, Radio, Switch */

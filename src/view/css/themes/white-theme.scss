@@ -93,23 +93,6 @@
     fill: var(--main-text-color);
   }
 
-  /* Input control */
-  .stretch-input {
-    color: var(--main-text-color);
-    border-color: var(--input-border-color);
-    background-color: var(--input-bg-color);
-  }
-
-  .stretch-input:focus {
-    border-color: var(--active-input-border-color);
-  }
-
-  .stretch-input[disabled] {
-    color: var(--input-disabled-text-color);
-    border-color: var(--input-disabled-border-color);
-    background-color: var(--input-disabled-bg-color);
-  }
-
   /* Input group */
   .input-group {
     --ig-border-color: var(--input-border-color);

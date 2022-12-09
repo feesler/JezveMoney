@@ -1,5 +1,6 @@
 import 'jezvejs/style';
 import 'jezvejs/style/Checkbox';
+import 'jezvejs/style/Radio';
 import {
     ge,
     enable,

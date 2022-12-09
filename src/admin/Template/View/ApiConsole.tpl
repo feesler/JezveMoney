@@ -163,7 +163,7 @@
         <h3>Read state</h3>
         <form action="<?=BASEURL?>api/state" method="list">
             <div class="form-controls">
-                <input id="readstatebtn" class="adm_act_btn" type="submit" value="submit">
+                <input id="readstatebtn" class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -202,7 +202,7 @@
                 </select>
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -214,7 +214,7 @@
                 <input id="readaccid" class="stretch-input" type="text">
             </div>
             <div class="form-controls">
-                <input id="readaccbtn" class="adm_act_btn" type="button" value="submit">
+                <input id="readaccbtn" class="btn submit-btn" type="button" value="Submit">
             </div>
         </div>
 
@@ -242,7 +242,7 @@
                 <input id="create_account_flags" class="stretch-input" name="flags" type="text">
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -275,7 +275,7 @@
                 <input id="update_account_flags" class="stretch-input" name="flags" type="text">
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -287,7 +287,7 @@
             <input id="delaccounts" class="stretch-input" type="text">
         </div>
         <div class="form-controls">
-            <input id="delaccbtn" class="adm_act_btn" type="button" value="submit">
+            <input id="delaccbtn" class="btn submit-btn" type="button" value="Submit">
         </div>
         </div>
 
@@ -300,12 +300,17 @@
                     <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Order</span>
                 </label>
-                <div id="admin_block" class="checkbox-wrap checkbox-wrap_inline">
-                    <label for="list_trans_isasc"><input id="list_trans_isasc" name="order" type="radio" value="asc" checked disabled>Ascending</label>
-                </div>
-                <div id="admin_block" class="checkbox-wrap checkbox-wrap_inline">
-                    <label for="list_trans_isdesc"><input id="list_trans_isdesc" name="order" type="radio" value="desc" disabled>Descending</label>
-                </div>
+
+                <label id="list_trans_isasc" class="radio">
+                    <input name="order" type="radio" value="asc" checked disabled>
+                    <span class="radio__check"></span>
+                    <span class="radio__label">Ascending</span>
+                </label>
+                <label id="list_trans_isdesc" class="radio">
+                    <input name="order" type="radio" value="desc" checked disabled>
+                    <span class="radio__check"></span>
+                    <span class="radio__label">Descending</span>
+                </label>
             </div>
             <div class="std_margin">
                 <label class="checkbox">
@@ -380,7 +385,7 @@
                 <input id="list_trans_search" class="stretch-input" name="search" type="text" value="" disabled>
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -392,7 +397,7 @@
             <input id="read_trans_id" class="stretch-input" type="text">
         </div>
         <div class="form-controls">
-            <input id="readtransbtn" class="adm_act_btn" type="button" value="submit">
+            <input id="readtransbtn" class="btn submit-btn" type="button" value="Submit">
         </div>
         </div>
 
@@ -440,7 +445,7 @@
             </div>
 
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -491,7 +496,7 @@
             </div>
 
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -546,7 +551,7 @@
             </div>
 
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -603,7 +608,7 @@
             </div>
 
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -616,7 +621,7 @@
         </div>
 
         <div class="form-controls">
-            <input id="deltransbtn" class="adm_act_btn" type="button" value="submit">
+            <input id="deltransbtn" class="btn submit-btn" type="button" value="Submit">
         </div>
         </div>
 
@@ -632,7 +637,7 @@
                 <input id="trans_pos_pos" class="stretch-input" name="pos" type="text">
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -687,7 +692,7 @@
             </div>
 
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -696,7 +701,7 @@
         <h3>List import templates</h3>
         <form action="<?=BASEURL?>api/importtpl/list" method="list">
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -708,7 +713,7 @@
                 <input id="readtplid" class="stretch-input" type="text">
             </div>
             <div class="form-controls">
-                <input id="readtplbtn" class="adm_act_btn" type="button" value="submit">
+                <input id="readtplbtn" class="btn submit-btn" type="button" value="Submit">
             </div>
         </div>
 
@@ -739,7 +744,7 @@
             </div>
 <?php   }   ?>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -774,7 +779,7 @@
             </div>
 <?php   }   ?>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -786,7 +791,7 @@
             <input id="deltemplates" class="stretch-input" type="text">
         </div>
         <div class="form-controls">
-            <input id="deltplbtn" class="adm_act_btn" type="button" value="submit">
+            <input id="deltplbtn" class="btn submit-btn" type="button" value="Submit">
         </div>
         </div>
 
@@ -808,7 +813,7 @@
                 </label>
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -820,7 +825,7 @@
                 <input id="readruleid" class="stretch-input" type="text">
             </div>
             <div class="form-controls">
-                <input id="readrulebtn" class="adm_act_btn" type="button" value="submit">
+                <input id="readrulebtn" class="btn submit-btn" type="button" value="Submit">
             </div>
         </div>
 
@@ -832,7 +837,7 @@
                 <input id="create_rule_flags" class="stretch-input" name="flags" type="text">
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -849,7 +854,7 @@
                 <input id="update_rule_flags" class="stretch-input" name="flags" type="text">
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -861,7 +866,7 @@
             <input id="delrules" class="stretch-input" type="text">
         </div>
         <div class="form-controls">
-            <input id="delrulebtn" class="adm_act_btn" type="button" value="submit">
+            <input id="delrulebtn" class="btn submit-btn" type="button" value="Submit">
         </div>
         </div>
 
@@ -884,7 +889,7 @@
                 <input id="list_cond_rule" class="stretch-input" name="rule" type="text" value="0" disabled>
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -896,7 +901,7 @@
                 <input id="readcondid" class="stretch-input" type="text">
             </div>
             <div class="form-controls">
-                <input id="readcondbtn" class="adm_act_btn" type="button" value="submit">
+                <input id="readcondbtn" class="btn submit-btn" type="button" value="Submit">
             </div>
         </div>
 
@@ -924,7 +929,7 @@
                 <input id="create_cond_flags" class="stretch-input" name="flags" type="text">
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -957,7 +962,7 @@
                 <input id="update_cond_flags" class="stretch-input" name="flags" type="text">
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -969,7 +974,7 @@
             <input id="delconds" class="stretch-input" type="text">
         </div>
         <div class="form-controls">
-            <input id="delcondbtn" class="adm_act_btn" type="button" value="submit">
+            <input id="delcondbtn" class="btn submit-btn" type="button" value="Submit">
         </div>
         </div>
 
@@ -992,7 +997,7 @@
                 <input id="list_act_rule" class="stretch-input" name="rule" type="text" value="0" disabled>
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -1004,7 +1009,7 @@
                 <input id="readactid" class="stretch-input" type="text">
             </div>
             <div class="form-controls">
-                <input id="readactbtn" class="adm_act_btn" type="button" value="submit">
+                <input id="readactbtn" class="btn submit-btn" type="button" value="Submit">
             </div>
         </div>
 
@@ -1024,7 +1029,7 @@
                 <input id="create_act_value" class="stretch-input" name="value" type="text">
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -1049,7 +1054,7 @@
                 <input id="update_act_value" class="stretch-input" name="value" type="text">
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -1061,7 +1066,7 @@
             <input id="delactions" class="stretch-input" type="text">
         </div>
         <div class="form-controls">
-            <input id="delactbtn" class="adm_act_btn" type="button" value="submit">
+            <input id="delactbtn" class="btn submit-btn" type="button" value="Submit">
         </div>
         </div>
 
@@ -1081,7 +1086,7 @@
                 </select>
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -1093,7 +1098,7 @@
                 <input id="read_person_id" class="stretch-input" type="text">
             </div>
             <div class="form-controls">
-                <input id="readpersonbtn" class="adm_act_btn" type="button" value="submit">
+                <input id="readpersonbtn" class="btn submit-btn" type="button" value="Submit">
             </div>
         </div>
 
@@ -1109,7 +1114,7 @@
                 <input id="create_person_flags" class="stretch-input" name="flags" type="text">
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -1130,7 +1135,7 @@
                 <input id="update_person_flags" class="stretch-input" name="flags" type="text">
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -1142,7 +1147,7 @@
             <input id="delpersons" class="stretch-input" type="text">
         </div>
         <div class="form-controls">
-            <input id="delpersonbtn" class="adm_act_btn" type="submit" value="submit">
+            <input id="delpersonbtn" class="btn submit-btn" type="submit" value="Submit">
         </div>
         </div>
 
@@ -1150,7 +1155,7 @@
         <h3>Get currencies</h3>
         <form action="<?=BASEURL?>api/currency/list" method="list">
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -1162,7 +1167,7 @@
             <input id="read_curr_id" class="stretch-input" type="text">
         </div>
         <div class="form-controls">
-            <input id="readcurrbtn" class="adm_act_btn" type="button" value="submit">
+            <input id="readcurrbtn" class="btn submit-btn" type="button" value="Submit">
         </div>
         </div>
 
@@ -1182,7 +1187,7 @@
                 <input id="create_currency_flags" class="stretch-input" name="flags" type="text">
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -1207,7 +1212,7 @@
                 <input id="update_currency_flags" class="stretch-input" name="flags" type="text">
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -1219,7 +1224,7 @@
             <input id="delcurrencies" class="stretch-input" type="text">
         </div>
         <div class="form-controls">
-            <input id="delcurrbtn" class="adm_act_btn" type="button" value="submit">
+            <input id="delcurrbtn" class="btn submit-btn" type="button" value="Submit">
         </div>
         </div>
 
@@ -1227,7 +1232,7 @@
         <h3>Get icons</h3>
         <form action="<?=BASEURL?>api/icon/list" method="list">
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -1239,7 +1244,7 @@
             <input id="read_icon_id" class="stretch-input" type="text">
         </div>
         <div class="form-controls">
-            <input id="read_icon_btn" class="adm_act_btn" type="button" value="submit">
+            <input id="read_icon_btn" class="btn submit-btn" type="button" value="Submit">
         </div>
         </div>
 
@@ -1259,7 +1264,7 @@
                 <input id="create_icon_type" class="stretch-input" name="type" type="text">
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -1284,7 +1289,7 @@
                 <input id="update_icon_type" class="stretch-input" name="type" type="text">
             </div>
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -1296,7 +1301,7 @@
             <input id="del_icons" class="stretch-input" type="text">
         </div>
         <div class="form-controls">
-            <input id="deliconbtn" class="adm_act_btn" type="button" value="submit">
+            <input id="deliconbtn" class="btn submit-btn" type="button" value="Submit">
         </div>
         </div>
 
@@ -1313,7 +1318,7 @@
             </div>
 
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -1322,7 +1327,7 @@
             <h3>Login</h3>
             <form action="<?=BASEURL?>api/logout/" method="post">
                 <div class="form-controls">
-                    <input class="adm_act_btn" type="submit" value="submit">
+                    <input class="btn submit-btn" type="submit" value="Submit">
                 </div>
             </form>
         </div>
@@ -1344,7 +1349,7 @@
             </div>
 
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -1353,7 +1358,7 @@
         <h3>Read profile</h3>
         <form action="<?=BASEURL?>api/profile/read" method="list">
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -1367,7 +1372,7 @@
             </div>
 
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -1385,7 +1390,7 @@
             </div>
 
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>
@@ -1430,7 +1435,7 @@
             </label>
 
             <div class="form-controls">
-                <input class="adm_act_btn" type="submit" value="submit">
+                <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
         </div>

@@ -16,6 +16,11 @@
   --input-border-color: #2e2e2e;
   --active-input-border-color: #d0d0d0;
 
+  /* Disabled inputs */
+  --input-disabled-bg-color: #202020;
+  --input-disabled-border-color: #2e2e2e;
+  --input-disabled-text-color: #505050;
+
   color: var(--main-text-color);
   background-color: var(--main-bg-color);
 
@@ -67,29 +72,11 @@
   /* API tests */
   .left-column,
   .right-column {
-    background-color: #202020;
+    background-color: #2a2a2a;
   }
 
   .menu-list > li > button {
     color: #dddddd;
-  }
-
-  .request-data-form {
-    background-color: #444444;
-    border-color: #202020;
-  }
-
-  .request-data-form input[type="text"] {
-    color: #dddddd;
-    border-color: #dddddd;
-    background-color: #101010;
-  }
-
-  .request-data-form input[disabled],
-  .request-data-form select[disabled],
-  .request-data-form textarea[disabled] {
-    color: #888888;
-    border-color: #888888;
   }
 
   .request-item {
