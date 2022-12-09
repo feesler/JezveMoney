@@ -39,6 +39,48 @@ const defaultProps = {
 };
 
 export class ImportTransaction {
+    static fromImportData(data) {
+        if (!data?.mainAccount) {
+            throw new Error('Invalid data');
+        }
+
+        const { mainAccount } = data;
+        if (data.accountCurrencyId !== mainAccount.curr_id) {
+            throw new Error('Currency must be the same as main account');
+        }
+        const accAmount = parseFloat(fixFloat(data.accountAmount));
+        if (Number.isNaN(accAmount) || accAmount === 0) {
+            throw new Error('Invalid account amount value');
+        }
+        const trAmount = parseFloat(fixFloat(data.transactionAmount));
+        if (Number.isNaN(trAmount) || trAmount === 0) {
+            throw new Error('Invalid transaction amount value');
+        }
+
+        const isExpense = (accAmount < 0);
+        const item = {
+            mainAccount,
+            id: data.id,
+            enabled: true,
+            type: (isExpense) ? 'expense' : 'income',
+            originalData: {
+                ...data,
+                origAccount: { ...mainAccount },
+            },
+
+            sourceAccountId: (isExpense) ? mainAccount.id : 0,
+            destAccountId: (isExpense) ? 0 : mainAccount.id,
+            sourceAmount: (isExpense) ? Math.abs(accAmount) : Math.abs(trAmount),
+            destAmount: (isExpense) ? Math.abs(trAmount) : Math.abs(accAmount),
+            srcCurrId: (isExpense) ? data.accountCurrencyId : data.transactionCurrencyId,
+            destCurrId: (isExpense) ? data.transactionCurrencyId : data.accountCurrencyId,
+            date: window.app.formatDate(new Date(data.date)),
+            comment: data.comment,
+        };
+
+        return new ImportTransaction(item);
+    }
+
     constructor(props) {
         if (props instanceof ImportTransaction) {
             const transaction = props;

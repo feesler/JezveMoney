@@ -154,6 +154,7 @@ export class ImportTemplate extends ListItem {
     convertRow(data, mainAccount) {
         const currencyModel = window.app.model.currency;
         const res = {
+            mainAccount,
             accountAmount: this.getAccountAmount(data),
             accountCurrency: this.getAccountCurrency(data),
             transactionAmount: this.getTransactionAmount(data),
