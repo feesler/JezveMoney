@@ -17,7 +17,7 @@ const ICON_CLASS = 'tile__icon';
 const ICON_CONTENT_CLASS = 'tile__icon-content';
 const CHECKBOX_CLASS = 'tile__checkbox';
 
-const SUBTITLE_LIMIT = 11;
+const SUBTITLE_LIMIT = 13;
 
 const defaultProps = {
     attrs: {},
@@ -149,11 +149,7 @@ export class Tile extends Component {
         const subtitle = state.subtitle ?? '';
         this.subTitleElem.textContent = subtitle;
 
-        if (subtitle.length > SUBTITLE_LIMIT) {
-            this.elem.classList.add(WIDE_CLASS);
-        } else {
-            this.elem.classList.remove(WIDE_CLASS);
-        }
+        this.elem.classList.toggle(WIDE_CLASS, (subtitle.length > SUBTITLE_LIMIT));
     }
 
     renderIcon(state, prevState = {}) {
