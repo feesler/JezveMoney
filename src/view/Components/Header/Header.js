@@ -6,12 +6,15 @@ import {
     removeEmptyClick,
     setEvents,
     re,
-    insertAfter,
+    isFunction,
 } from 'jezvejs';
 import { Switch } from 'jezvejs/Switch';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 import { DARK_THEME } from '../../js/Application.js';
 import './style.scss';
+
+/* CSS classes */
+const SHOW_ACTIONS_CLASS = 'show-actions';
 
 /**
  * Header component
@@ -21,6 +24,7 @@ export class Header extends Component {
         super(props);
 
         this.userNavEmptyClick = () => this.hideUserNavigation();
+        this.onActionsShown = null;
 
         if (this.elem) {
             this.parse();
@@ -46,7 +50,14 @@ export class Header extends Component {
         this.closeNavBtn = this.navigationContent.querySelector('.navigation__close-btn');
         setEvents(this.closeNavBtn, { click: () => this.hideNavigation() });
 
-        this.titleElem = this.elem.querySelector('.header-title');
+        // Actions
+        this.container = this.elem.querySelector('.header__container');
+        setEvents(this.container, {
+            transitionend: (e) => this.onContentTransitionEnd(e),
+        });
+
+        this.headerActions = this.elem.querySelector('.header-actions');
+        this.titleElem = this.headerActions.querySelector('.header-title');
 
         this.userBtn = ge('userbtn');
         setEvents(this.userBtn, { click: (e) => this.showUserNavigation(e) });
@@ -77,11 +88,24 @@ export class Header extends Component {
         this.themeSwitch.check(currentTheme === DARK_THEME);
     }
 
-    /** Shows user button and hides actions */
-    showUserMenu() {
+    onContentTransitionEnd() {
+        if (this.container.classList.contains(SHOW_ACTIONS_CLASS)) {
+            return;
+        }
+
         re(this.actionsContainer);
         this.actionsContainer = null;
-        show(this.userBtn, true);
+
+        if (isFunction(this.onActionsShown)) {
+            this.onActionsShown();
+        }
+        this.onActionsShown = null;
+    }
+
+    /** Shows user button and hides actions */
+    showUserMenu(onShown = null) {
+        this.onActionsShown = onShown;
+        this.container.classList.remove(SHOW_ACTIONS_CLASS);
     }
 
     /** Shows actions and hides user button */
@@ -90,9 +114,10 @@ export class Header extends Component {
             return;
         }
 
+        this.onActionsShown = null;
         this.actionsContainer = actionsContainer;
-        show(this.userBtn, false);
-        insertAfter(actionsContainer, this.userBtn);
+        this.headerActions.append(actionsContainer);
+        this.container.classList.add(SHOW_ACTIONS_CLASS);
     }
 
     /** Show navigation */

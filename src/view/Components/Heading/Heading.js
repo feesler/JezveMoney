@@ -26,6 +26,7 @@ export class Heading extends Component {
             throw new Error('Invalid element specified');
         }
 
+        this.titleElem = this.elem.querySelector('h1');
         this.actionsContainer = this.elem.querySelector('.heading-actions');
 
         this.postInit();
@@ -47,18 +48,21 @@ export class Heading extends Component {
                 return;
             }
 
-            const title = (entry.isIntersecting) ? null : this.state.title;
-            window.app.view.header.setTitle(title);
+            const headerTitle = (entry.isIntersecting) ? null : this.state.title;
+            window.app.view.header.setTitle(headerTitle);
 
             if (!this.actionsContainer) {
                 return;
             }
 
             if (entry.isIntersecting) {
-                window.app.view.header.showUserMenu();
-                this.elem.append(this.actionsContainer);
+                window.app.view.header.showUserMenu(() => {
+                    this.titleElem.textContent = this.state.title;
+                    this.elem.append(this.actionsContainer);
+                });
             } else {
                 window.app.view.header.showActions(this.actionsContainer);
+                this.titleElem.textContent = null;
             }
         }, options);
 

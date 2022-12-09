@@ -1,16 +1,21 @@
 <div class="header">
-    <div class="header__content">
-        <a class="header-logo" href="<?= BASEURL ?>admin/">
-            <span class="header-logo__icon"><?= svgIcon("header_logo", "logo-icon") ?></span>
-            <span class="header-logo__title">Admin</span>
-        </a>
-        <button class="nav-toggle-btn"><?= svgIcon("menu", "nav-toggle-icon") ?></button>
-        <div class="header-title"></div>
+    <a class="header-logo" href="<?= BASEURL ?>admin/">
+        <span class="header-logo__icon"><?= svgIcon("header_logo", "logo-icon") ?></span>
+        <span class="header-logo__title">Admin</span>
+    </a>
+    <button class="nav-toggle-btn"><?= svgIcon("menu", "nav-toggle-icon") ?></button>
 
-        <button id="userbtn" class="user-btn" type="button">
-            <span class="user-btn__icon"><?= svgIcon("user", "user-icon") ?></span>
-            <span class="user-btn__title"><?= e($this->user_name) ?></span>
-        </button>
+    <div class="header__container">
+        <div class="header__content">
+            <button id="userbtn" class="btn user-btn right-align" type="button">
+                <span class="user-btn__icon"><?= svgIcon("user", "user-icon") ?></span>
+                <span class="user-btn__title"><?= e($this->user_name) ?></span>
+            </button>
+        </div>
+
+        <div class="header__content header-actions">
+            <div class="header-title"></div>
+        </div>
     </div>
 </div>
 
