@@ -5,6 +5,7 @@ namespace JezveMoney\App\Controller;
 use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Template;
 use JezveMoney\App\Model\AccountModel;
+use JezveMoney\App\Model\CategoryModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\ImportActionModel;
@@ -19,6 +20,7 @@ class Import extends TemplateController
         $this->templateModel = ImportTemplateModel::getInstance();
         $this->ruleModel = ImportRuleModel::getInstance();
         $this->actionModel = ImportActionModel::getInstance();
+        $this->catModel = CategoryModel::getInstance();
     }
 
 
@@ -57,6 +59,7 @@ class Import extends TemplateController
             "accounts" => $data["accounts"],
             "currency" => $currMod->getData(),
             "persons" => $this->personMod->getData(["visibility" => "all"]),
+            "categories" => $this->catModel->getData(),
             "rules" => $data["importRules"],
             "templates" => $data["importTemplates"]
         ];

@@ -6,25 +6,27 @@ import {
 } from 'jezve-test';
 import { api } from '../model/api.js';
 import { App } from '../Application.js';
+import { createAccounts } from './data/accounts.js';
+import { createPersons } from './data/persons.js';
+import { createCategories } from './data/categories.js';
+import { createTransactions } from './data/transactions.js';
+import { getAccountCSV, getCardCSV } from './data/importfiles.js';
+import { createImportRules } from './data/rules.js';
+import { createImportTemplates } from './data/templates.js';
 import * as ApiTests from '../run/api/index.js';
 import * as ProfileTests from '../run/profile.js';
+import { putFile, removeFile } from '../run/import/index.js';
 import { UnitTestsStory } from './stories/UnitTestsStory.js';
 import { SecurityStory } from './stories/SecurityStory.js';
 import { ApiStory } from './stories/api/ApiStory.js';
 import { ProfileStory } from './stories/ProfileStory.js';
 import { AccountsStory } from './stories/AccountsStory.js';
 import { PersonsStory } from './stories/PersonsStory.js';
+import { CategoriesStory } from './stories/CategoriesStory.js';
 import { TransactionsStory } from './stories/transaction/TransactionsStory.js';
 import { ImportStory } from './stories/import/ImportStory.js';
 import { TransactionListStory } from './stories/TransactionListStory.js';
 import { StatisticsStory } from './stories/StatisticsStory.js';
-import { createAccounts } from './data/accounts.js';
-import { createPersons } from './data/persons.js';
-import { createTransactions } from './data/transactions.js';
-import { getAccountCSV, getCardCSV } from './data/importfiles.js';
-import { createImportRules } from './data/rules.js';
-import { createImportTemplates } from './data/templates.js';
-import { putFile, removeFile } from '../run/import/index.js';
 import { ImportListStory } from './stories/import/ImportListStory.js';
 import { ImportTemplateStory } from './stories/import/ImportTemplateStory.js';
 import { ImportRulesStory } from './stories/import/ImportRulesStory.js';
@@ -36,6 +38,7 @@ const storiesMap = {
     profile: ProfileStory,
     accounts: AccountsStory,
     persons: PersonsStory,
+    categories: CategoriesStory,
     transactions: TransactionsStory,
     transactionList: TransactionListStory,
     import: ImportStory,
@@ -196,6 +199,11 @@ export class Scenario {
         await createPersons();
     }
 
+    /** Creates common test persons */
+    async createCategories() {
+        await createCategories();
+    }
+
     /** Creates common test transactions */
     async createTransactions() {
         await createTransactions();
@@ -215,6 +223,7 @@ export class Scenario {
     async createTestData() {
         await createAccounts();
         await createPersons();
+        await createCategories();
         await createTransactions();
     }
 

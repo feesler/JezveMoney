@@ -1,12 +1,13 @@
 import {
     TestComponent,
     query,
-    queryAll,
     click,
     isVisible,
     assert,
     copyObject,
     evaluate,
+    hasClass,
+    asyncMap,
 } from 'jezve-test';
 import {
     EXPENSE,
@@ -20,6 +21,17 @@ import { App } from '../../../Application.js';
 import { OriginalImportData } from './OriginalImportData.js';
 
 const sourceTransactionTypes = ['expense', 'transferfrom', 'debtfrom'];
+
+const fieldSelectors = [
+    '.type-field',
+    '.account-field',
+    '.person-field',
+    '.src-amount-field',
+    '.dest-amount-field',
+    '.date-field',
+    '.category-field',
+    '.comment-field',
+];
 
 export class ImportTransactionItem extends TestComponent {
     constructor(parent, elem, mainAccount) {
@@ -39,17 +51,18 @@ export class ImportTransactionItem extends TestComponent {
         const selectedControls = await query(this.elem, '.select-controls');
         res.selectMode = await isVisible(selectedControls);
 
-        res.typeField = await this.parseField(await query(this.elem, '.type-field'));
-
-        const amountFields = await queryAll(this.elem, '.amount-field');
-        assert(amountFields.length === 2, 'Invalid structure of import item');
-        res.srcAmountField = await this.parseAmountField(amountFields[0]);
-        res.destAmountField = await this.parseAmountField(amountFields[1]);
-
-        res.transferAccountField = await this.parseField(await query(this.elem, '.account-field'));
-        res.personField = await this.parseField(await query(this.elem, '.person-field'));
-        res.dateField = await this.parseField(await query(this.elem, '.date-field'));
-        res.commentField = await this.parseField(await query(this.elem, '.comment-field'));
+        [
+            res.typeField,
+            res.transferAccountField,
+            res.personField,
+            res.srcAmountField,
+            res.destAmountField,
+            res.dateField,
+            res.categoryField,
+            res.commentField,
+        ] = await asyncMap(fieldSelectors, async (selector) => (
+            this.parseField(await query(this.elem, selector))
+        ));
 
         res.menuBtn = await query(this.elem, '.popup-menu-btn');
         res.contextMenuElem = await query(this.elem, '.popup-menu-list');
@@ -57,14 +70,7 @@ export class ImportTransactionItem extends TestComponent {
         res.origDataTable = await query(this.elem, '.orig-data-table');
 
         assert(
-            res.typeField
-            && res.srcAmountField
-            && res.destAmountField
-            && res.transferAccountField
-            && res.personField
-            && res.dateField
-            && res.commentField
-            && res.menuBtn,
+            res.menuBtn,
             'Invalid structure of import item',
         );
 
@@ -89,17 +95,14 @@ export class ImportTransactionItem extends TestComponent {
         }), titleElem, contentElem);
         res.elem = elem;
 
-        return res;
-    }
-
-    async parseAmountField(elem) {
-        const res = await this.parseField(elem);
-
-        const props = await evaluate((el) => ({
-            amount: el.dataset.amount,
-            currencyId: el.dataset.curr,
-        }), elem);
-        Object.assign(res, props);
+        const isAmountField = await hasClass(elem, 'amount-field');
+        if (isAmountField) {
+            const props = await evaluate((el) => ({
+                amount: el.dataset.amount,
+                currencyId: el.dataset.curr,
+            }), elem);
+            Object.assign(res, props);
+        }
 
         return res;
     }
@@ -179,6 +182,14 @@ export class ImportTransactionItem extends TestComponent {
         res.destCurrency = App.currency.getItem(res.destCurrId);
 
         res.date = cont.dateField.value;
+
+        const categoryName = cont.categoryField.value;
+        const category = (categoryName.length === 0)
+            ? { id: 0 }
+            : App.state.categories.findByName(categoryName);
+        assert(category, 'Category not found');
+        res.categoryId = category.id;
+
         res.comment = cont.commentField.value;
 
         res.isDifferent = (res.srcCurrId !== res.destCurrId);
@@ -199,6 +210,9 @@ export class ImportTransactionItem extends TestComponent {
 
         const transactionType = ImportTransaction.getTypeById(model.type);
         assert(transactionType, `Invalid transaction type: '${model.type}'`);
+
+        const category = App.state.categories.getItem(model.categoryId);
+        const categoryName = (model.categoryId === 0) ? '' : category.name;
 
         const res = {
             selectMode: model.selectMode,
@@ -224,6 +238,10 @@ export class ImportTransactionItem extends TestComponent {
             },
             dateField: {
                 value: model.date.toString(),
+                visible: true,
+            },
+            categoryField: {
+                value: categoryName,
                 visible: true,
             },
             commentField: {
@@ -309,6 +327,7 @@ export class ImportTransactionItem extends TestComponent {
         }
 
         res.date = model.date;
+        res.category_id = model.categoryId;
         res.comment = model.comment;
 
         return res;

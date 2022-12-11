@@ -9,6 +9,7 @@ import {
 const navLinksMap = {
     accountsLink: 'Accounts',
     personsLink: 'Persons',
+    categoriesLink: 'Categories',
     transactionsLink: 'Transactions',
     statisticsLink: 'Statistics',
     importLink: 'Import',
@@ -46,6 +47,10 @@ export class Navigation extends TestComponent {
 
     async goToPersons() {
         await click(this.content.personsLink.elem);
+    }
+
+    async goToCategories() {
+        await click(this.content.categoriesLink.elem);
     }
 
     async goToTransactions() {

@@ -5,6 +5,7 @@ import {
     goTo,
     copyObject,
     formatDate,
+    asArray,
 } from 'jezve-test';
 import { App } from '../Application.js';
 import { fixDate } from '../common.js';
@@ -205,7 +206,7 @@ export const filterByAccounts = async ({ accounts, directNavigate = false }) => 
 };
 
 export const filterByPersons = async ({ persons, directNavigate = false }) => {
-    const itemIds = Array.isArray(persons) ? persons : [persons];
+    const itemIds = asArray(persons);
 
     if (!directNavigate) {
         await checkNavigation();
@@ -218,6 +219,24 @@ export const filterByPersons = async ({ persons, directNavigate = false }) => {
 
     await test(`Filter by persons [${personsNames.join()}]`, async () => {
         await App.view.filterByPersons(itemIds, directNavigate);
+        return App.view.iteratePages();
+    });
+};
+
+export const filterByCategories = async ({ categories, directNavigate = false }) => {
+    const itemIds = asArray(categories);
+
+    if (!directNavigate) {
+        await checkNavigation();
+    }
+
+    const names = itemIds.map((id) => {
+        const item = App.state.categories.getItem(id);
+        return (item) ? item.name : `(${id})`;
+    });
+
+    await test(`Filter by categories [${names.join()}]`, async () => {
+        await App.view.filterByCategories(itemIds, directNavigate);
         return App.view.iteratePages();
     });
 };

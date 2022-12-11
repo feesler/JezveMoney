@@ -9,6 +9,7 @@ export class ImportTemplateStory extends TestStory {
         await App.scenario.resetData({
             accounts: true,
             persons: true,
+            categories: true,
             transactions: true,
             importtpl: true,
             importrules: true,
@@ -16,6 +17,7 @@ export class ImportTemplateStory extends TestStory {
 
         await App.scenario.createAccounts();
         await App.scenario.createPersons();
+        await App.scenario.createCategories();
         await App.scenario.createCsvFiles();
         await App.scenario.createImportRules();
 

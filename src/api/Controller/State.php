@@ -11,6 +11,7 @@ use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Item\AccountItem;
 use JezveMoney\App\Item\PersonItem;
 use JezveMoney\App\Item\TransactionItem;
+use JezveMoney\App\Model\CategoryModel;
 
 class State extends ApiController
 {
@@ -26,6 +27,7 @@ class State extends ApiController
         $this->trModel = TransactionModel::getInstance();
         $this->accModel = AccountModel::getInstance();
         $this->pModel = PersonModel::getInstance();
+        $this->catModel = CategoryModel::getInstance();
         $this->tplModel = ImportTemplateModel::getInstance();
         $this->ruleModel = ImportRuleModel::getInstance();
     }
@@ -55,6 +57,10 @@ class State extends ApiController
             $res->persons->data[] = new PersonItem($item);
         }
         $res->persons->autoincrement = $this->pModel->autoIncrement();
+        // Categories
+        $res->categories = new \stdClass();
+        $res->categories->data = $this->catModel->getData();
+        $res->categories->autoincrement = $this->catModel->autoIncrement();
         // Import templates
         $res->templates = new \stdClass();
         $res->templates->data = $this->tplModel->getData();

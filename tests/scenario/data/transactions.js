@@ -15,9 +15,13 @@ export const createTransactions = async () => {
         ACC_RUB,
         ACC_USD,
         ACC_EUR,
-    } = App.scenario;
-    const { MARIA, IVAN } = App.scenario;
-    const {
+        MARIA,
+        IVAN,
+        FOOD_CATEGORY,
+        INVEST_CATEGORY,
+        TAXES_CATEGORY,
+        TRANSPORT_CATEGORY,
+        CAFE_CATEGORY,
         RUB,
         USD,
         EUR,
@@ -29,6 +33,7 @@ export const createTransactions = async () => {
         src_id: ACC_3,
         src_amount: '500',
         comment: 'lalala',
+        category_id: FOOD_CATEGORY,
     }, {
         type: EXPENSE,
         src_id: ACC_3,
@@ -40,6 +45,7 @@ export const createTransactions = async () => {
         src_id: ACC_RUB,
         src_amount: '100',
         comment: 'hohoho',
+        category_id: TRANSPORT_CATEGORY,
     }, {
         type: EXPENSE,
         src_id: ACC_RUB,
@@ -47,6 +53,7 @@ export const createTransactions = async () => {
         dest_amount: '10',
         dest_curr: EUR,
         comment: 'кккк',
+        category_id: CAFE_CATEGORY,
     }, {
         type: EXPENSE,
         src_id: ACC_USD,
@@ -78,6 +85,7 @@ export const createTransactions = async () => {
         dest_amount: '5000',
         src_curr: USD,
         comment: '33333',
+        category_id: INVEST_CATEGORY,
     }, {
         type: INCOME,
         dest_id: ACC_EUR,
@@ -85,11 +93,13 @@ export const createTransactions = async () => {
         dest_amount: '4',
         src_curr: RUB,
         comment: 'dddd',
+        category_id: TAXES_CATEGORY,
     }, {
         type: INCOME,
         dest_id: ACC_EUR,
         dest_amount: '33',
         comment: '11 ho',
+        category_id: INVEST_CATEGORY,
     }, {
         type: TRANSFER,
         src_id: ACC_3,

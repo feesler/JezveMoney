@@ -11,22 +11,6 @@ const create = async () => {
     }, {
         name: 'Y',
         flags: 0,
-    }, {
-        // Try to create person with existing name
-        name: 'Y',
-        flags: 0,
-    }, {
-        // Invalid data tests
-        flags: 0,
-    }, {
-        name: 'ZZZ',
-    }, {
-        name: '',
-        flags: 1,
-        xxx: 1,
-    }, {
-        name: '',
-        flags: 1,
     }];
 
     [

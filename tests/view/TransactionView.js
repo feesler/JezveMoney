@@ -7,7 +7,7 @@ import {
     click,
     asyncMap,
 } from 'jezve-test';
-import { IconButton } from 'jezvejs-test';
+import { DropDown, IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
 import {
     convDate,
@@ -142,6 +142,8 @@ export class TransactionView extends AppView {
 
         res.datePicker = await DatePickerRow.create(this, await query('#date_row'));
 
+        res.categorySelect = await DropDown.createFromChild(this, await query('#category'));
+
         res.submitBtn = await query('#submitBtn');
         assert(res.submitBtn, 'Submit button not found');
         res.cancelBtn = await query('#cancelBtn');
@@ -152,7 +154,7 @@ export class TransactionView extends AppView {
         return res;
     }
 
-    async buildModel(cont) {
+    buildModel(cont) {
         const res = this.model;
 
         res.type = cont.typeMenu.value;
@@ -389,6 +391,7 @@ export class TransactionView extends AppView {
         }
 
         res.date = cont.datePicker.value;
+        res.categoryId = parseInt(cont.categorySelect.value, 10);
         res.comment = cont.comment_row.value;
 
         return res;
@@ -437,6 +440,7 @@ export class TransactionView extends AppView {
         res.src_curr = this.model.src_curr_id;
         res.dest_curr = this.model.dest_curr_id;
         res.date = this.model.date;
+        res.category_id = this.model.categoryId;
         res.comment = this.model.comment;
 
         return res;
@@ -520,6 +524,19 @@ export class TransactionView extends AppView {
                 res.exchange_row.currSign = exchSign;
                 res.exch_left.value = this.model.fmtExch;
             }
+
+            res.datePicker = {
+                visible: true,
+                value: this.model.date,
+            };
+            res.categorySelect = {
+                visible: true,
+                value: this.model.categoryId.toString(),
+            };
+            res.comment_row = {
+                visible: true,
+                value: this.model.comment,
+            };
         }
 
         if (this.model.type === EXPENSE || this.model.type === TRANSFER) {
@@ -2084,12 +2101,33 @@ export class TransactionView extends AppView {
     }
 
     async changeDate(val) {
+        this.model.date = val.toString();
+        this.expectedState = this.getExpectedState();
+
         await this.performAction(() => this.content.datePicker.input(val));
 
         return this.checkState();
     }
 
+    async changeCategory(val) {
+        const category = App.state.categories.getItem(val);
+        const categoryId = category?.id ?? 0;
+        if (this.model.categoryId === categoryId) {
+            return true;
+        }
+
+        this.model.categoryId = categoryId;
+        this.expectedState = this.getExpectedState();
+
+        await this.performAction(() => this.content.categorySelect.setSelection(val));
+
+        return this.checkState();
+    }
+
     async inputComment(val) {
+        this.model.comment = val.toString();
+        this.expectedState = this.getExpectedState();
+
         await this.performAction(() => this.content.comment_row.input(val));
 
         return this.checkState();
@@ -2152,6 +2190,8 @@ export class TransactionView extends AppView {
         } else {
             if (this.model.lastAccount_id) {
                 this.model.account = App.state.accounts.getItem(this.model.lastAccount_id);
+            } else {
+                this.model.account = App.state.getFirstAccount();
             }
             assert(this.model.account, 'Account not found');
 

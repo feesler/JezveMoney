@@ -11,7 +11,7 @@ import { InputRow } from './component/InputRow.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 
-/** Create or update account view tests */
+/** Create or update person test view */
 export class PersonView extends AppView {
     async parseContent() {
         const res = {};

@@ -25,11 +25,13 @@ const create = async () => {
         dest_amount: 100,
         dest_curr: EUR,
         comment: '22',
+        category_id: App.scenario.FOOD_CATEGORY,
     }, {
         type: EXPENSE,
         src_id: App.scenario.ACC_USD,
         src_amount: 1,
         date: App.dates.yesterday,
+        category_id: App.scenario.FOOD_CATEGORY,
     }, {
         type: INCOME,
         dest_id: App.scenario.ACC_RUB,
@@ -85,6 +87,7 @@ const create = async () => {
         acc_id: 0,
         src_amount: 1000,
         src_curr: USD,
+        category_id: App.scenario.FOOD_CATEGORY,
     }, {
         type: DEBT,
         op: 1,
@@ -125,6 +128,11 @@ const createInvalid = async () => {
         type: EXPENSE,
         src_id: App.scenario.ACC_RUB,
         src_amount: 0,
+    }, {
+        type: EXPENSE,
+        src_id: App.scenario.ACC_RUB,
+        src_amount: 10,
+        category_id: -1,
     }, {
         type: EXPENSE,
         src_id: App.scenario.ACC_RUB,
@@ -264,6 +272,7 @@ const createMultiple = async () => {
         dest_curr: EUR,
         date: App.dates.yesterday,
         comment: 'multiple expense',
+        category_id: App.scenario.FOOD_CATEGORY,
     }, {
         type: INCOME,
         dest_id: App.scenario.ACC_USD,
@@ -340,6 +349,7 @@ const update = async () => {
         id: App.scenario.TR_EXPENSE_2,
         dest_amount: 7608,
         dest_curr: RUB,
+        category_id: App.scenario.TRANSPORT_CATEGORY,
     }, {
         id: App.scenario.TR_EXPENSE_3,
         dest_amount: 0.89,
@@ -518,6 +528,12 @@ const filter = async () => {
         accounts: App.scenario.ACC_RUB,
     }, {
         persons: App.scenario.PERSON_X,
+    }, {
+        categories: 0,
+    }, {
+        categories: App.scenario.TRANSPORT_CATEGORY,
+    }, {
+        categories: [0, App.scenario.TRANSPORT_CATEGORY],
     }, {
         onPage: 10,
     }, {

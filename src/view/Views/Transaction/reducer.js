@@ -1080,6 +1080,14 @@ const slice = createSlice({
         },
     }),
 
+    categoryChange: (state, value) => ({
+        ...state,
+        transaction: {
+            ...state.transaction,
+            category_id: value,
+        },
+    }),
+
     commentChange: (state, value) => ({
         ...state,
         transaction: {

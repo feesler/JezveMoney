@@ -6,11 +6,6 @@ import { Person } from './Person.js';
  * @param {object[]} props - array of persons
  */
 export class PersonList extends List {
-    /** Static alias for PersonList constructor */
-    static create(props) {
-        return new PersonList(props);
-    }
-
     /**
      * Create list item from specified object
      * @param {Object} obj

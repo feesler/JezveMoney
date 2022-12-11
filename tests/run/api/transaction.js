@@ -248,6 +248,9 @@ export const filter = async (params) => {
         if ('persons' in params) {
             reqParams.person_id = params.persons;
         }
+        if ('categories' in params) {
+            reqParams.category_id = params.categories;
+        }
         if ('startDate' in params && 'endDate' in params) {
             reqParams.stdate = formatDate(new Date(fixDate(params.startDate)));
             reqParams.enddate = formatDate(new Date(fixDate(params.endDate)));

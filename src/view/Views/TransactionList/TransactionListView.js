@@ -12,6 +12,7 @@ import { DropDown } from 'jezvejs/DropDown';
 import { IconButton } from 'jezvejs/IconButton';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
+import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
@@ -20,6 +21,7 @@ import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { PersonList } from '../../js/model/PersonList.js';
+import { CategoryList } from '../../js/model/CategoryList.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
@@ -78,6 +80,7 @@ class TransactionListView extends View {
         window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
         window.app.loadModel(PersonList, 'persons', window.app.props.persons);
+        window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
 
         this.store = createStore(reducer, initialState);
         this.store.subscribe((state, prevState) => {
@@ -101,6 +104,7 @@ class TransactionListView extends View {
             'clearFiltersBtn',
             'typeMenu',
             'accountsFilter',
+            'categoriesFilter',
             'dateFrm',
             'searchFilter',
             // Counters
@@ -172,6 +176,21 @@ class TransactionListView extends View {
                 visible: false,
                 idPrefix: 'p',
                 group: HIDDEN_PERSONS_GROUP_TITLE,
+            });
+        }
+
+        // Categories filter
+        if (!this.isAvailable()) {
+            show(this.categoriesFilter, false);
+        } else {
+            this.categoriesDropDown = CategorySelect.create({
+                elem: 'category_id',
+                placeholder: 'Type to filter',
+                enableFilter: true,
+                noResultsMessage: 'Nothing found',
+                onitemselect: (obj) => this.onCategoryChange(obj),
+                onchange: (obj) => this.onCategoryChange(obj),
+                className: 'dd_fullwidth',
             });
         }
 
@@ -465,6 +484,24 @@ class TransactionListView extends View {
         this.requestTransactions(state.form);
     }
 
+    /**
+     * Categories filter change event handler
+     * @param {object} obj - selection object
+     */
+    onCategoryChange(selected) {
+        let state = this.store.getState();
+        const categoryIds = asArray(selected).map(({ id }) => parseInt(id, 10));
+        const filterCategories = asArray(state.form.category_id);
+        if (isSameSelection(categoryIds, filterCategories)) {
+            return;
+        }
+
+        this.store.dispatch(actions.changeCategoriesFilter(categoryIds));
+
+        state = this.store.getState();
+        this.requestTransactions(state.form);
+    }
+
     /** Search field input event handler */
     onSearchInputChange(value) {
         this.store.dispatch(actions.changeSearchQuery(value));
@@ -664,6 +701,28 @@ class TransactionListView extends View {
         });
     }
 
+    /** Render categories selection */
+    renderCategoriesFilter(state) {
+        if (!this.isAvailable()) {
+            return;
+        }
+
+        const selectedItems = this.categoriesDropDown.getSelectedItems();
+        const selectedIds = [];
+        const idsToSelect = asArray(state.form.category_id);
+        selectedItems.forEach(({ id }) => {
+            selectedIds.push(id);
+            if (!idsToSelect.includes(id)) {
+                this.categoriesDropDown.deselectItem(id);
+            }
+        });
+        idsToSelect.forEach((id) => {
+            if (!selectedIds.includes(id)) {
+                this.categoriesDropDown.selectItem(id.toString());
+            }
+        });
+    }
+
     render(state) {
         if (state.loading) {
             this.loadingIndicator.show();
@@ -675,6 +734,7 @@ class TransactionListView extends View {
         this.typeMenu.setSelection(state.form.type);
 
         this.renderAccountsFilter(state);
+        this.renderCategoriesFilter(state);
 
         // Render date
         const dateFilter = {

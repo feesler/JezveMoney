@@ -7,6 +7,8 @@ import { AccountView } from './view/AccountView.js';
 import { AccountListView } from './view/AccountListView.js';
 import { PersonView } from './view/PersonView.js';
 import { PersonListView } from './view/PersonListView.js';
+import { CategoryView } from './view/CategoryView.js';
+import { CategoryListView } from './view/CategoryListView.js';
 import { TransactionListView } from './view/TransactionListView.js';
 import { TransactionView } from './view/TransactionView.js';
 import { ImportView } from './view/ImportView.js';
@@ -28,12 +30,16 @@ const routeMap = {
         list: PersonListView,
         item: PersonView,
     },
+    categories: {
+        list: CategoryListView,
+        item: CategoryView,
+    },
     transactions: {
         list: TransactionListView,
         item: TransactionView,
     },
 };
-const listViews = ['accounts', 'persons', 'transactions'];
+const listViews = ['accounts', 'persons', 'categories', 'transactions'];
 
 /** Process request url and return view class if match */
 export async function route(env, url) {

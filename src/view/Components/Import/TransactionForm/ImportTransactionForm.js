@@ -20,6 +20,7 @@ import './style.scss';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
 import { ToggleButton } from '../../ToggleButton/ToggleButton.js';
+import { CategorySelect } from '../../CategorySelect/CategorySelect.js';
 
 /** CSS classes */
 const POPUP_CLASS = 'import-form-popup';
@@ -43,6 +44,7 @@ const SRC_AMOUNT_FIELD_CLASS = 'amount-field src-amount-field';
 const DEST_AMOUNT_FIELD_CLASS = 'amount-field dest-amount-field';
 const PERSON_FIELD_CLASS = 'person-field';
 const DATE_FIELD_CLASS = 'date-field';
+const CATEGORY_FIELD_CLASS = 'category-field';
 const COMMENT_FIELD_CLASS = 'comment-field';
 /* Controls */
 const CALENDAR_ICON_CLASS = 'icon calendar-icon';
@@ -60,6 +62,7 @@ const TITLE_FIELD_SRC_AMOUNT = 'Source amount';
 const TITLE_FIELD_DEST_AMOUNT = 'Destination amount';
 const TITLE_FIELD_DATE = 'Date';
 const TITLE_FIELD_COMMENT = 'Comment';
+const TITLE_FIELD_CATEGORY = 'Category';
 const TITLE_FIELD_SRC_ACCOUNT = 'Source account';
 const TITLE_FIELD_DEST_ACCOUNT = 'Destination account';
 const TITLE_FIELD_PERSON = 'Person';
@@ -119,10 +122,12 @@ export class ImportTransactionForm extends Component {
         this.createSourceAmountField();
         this.createDestAmountField();
         this.createDateField();
+        this.createCategoryField();
         this.createCommentField();
 
         this.topRow = createContainer(FORM_ROW_CLASS, [
             this.dateField.elem,
+            this.categoryField.elem,
             this.commentField.elem,
         ]);
 
@@ -389,6 +394,19 @@ export class ImportTransactionForm extends Component {
         });
     }
 
+    createCategoryField() {
+        this.categorySelect = CategorySelect.create({
+            className: 'dd_fullwidth',
+            onchange: (category) => this.onCategoryChanged(category),
+        });
+
+        this.categoryField = Field.create({
+            title: TITLE_FIELD_CATEGORY,
+            content: this.categorySelect.elem,
+            className: CATEGORY_FIELD_CLASS,
+        });
+    }
+
     createCommentField() {
         this.commInp = createElement('input', {
             props: {
@@ -430,15 +448,6 @@ export class ImportTransactionForm extends Component {
         this.popup.hide();
     }
 
-    /** Creates new transaction from state, run action on it and returns result */
-    runAction(type, payload, state = this.state) {
-        if (typeof type !== 'string' || !isFunction(state.transaction[type])) {
-            throw new Error('Invalid action type');
-        }
-
-        return state.transaction[type](payload);
-    }
-
     /** Toggle collapse/expand button 'click' event handler */
     toggleCollapse() {
         this.setState({
@@ -449,27 +458,30 @@ export class ImportTransactionForm extends Component {
 
     /** Transaction type select 'change' event handler */
     onTrTypeChanged(type) {
+        const { transaction } = this.state;
         this.setState({
             ...this.state,
-            transaction: this.runAction('setTransactionType', type.id),
+            transaction: transaction.setTransactionType(type.id),
             validation: defaultValidation,
         });
     }
 
     /** Destination account select 'change' event handler */
     onTransferAccountChanged(account) {
+        const { transaction } = this.state;
         this.setState({
             ...this.state,
-            transaction: this.runAction('setTransferAccount', account.id),
+            transaction: transaction.setTransferAccount(account.id),
             validation: defaultValidation,
         });
     }
 
     /** Person select 'change' event handler */
     onPersonChanged(person) {
+        const { transaction } = this.state;
         this.setState({
             ...this.state,
-            transaction: this.runAction('setPerson', person.id),
+            transaction: transaction.setPerson(person.id),
             validation: defaultValidation,
         });
     }
@@ -477,9 +489,10 @@ export class ImportTransactionForm extends Component {
     /** Source amount field 'input' event handler */
     onSrcAmountInput() {
         const { value } = this.srcAmountInp;
+        const { transaction } = this.state;
         this.setState({
             ...this.state,
-            transaction: this.runAction('setSourceAmount', value),
+            transaction: transaction.setSourceAmount(value),
             validation: defaultValidation,
         });
     }
@@ -487,27 +500,30 @@ export class ImportTransactionForm extends Component {
     /** Destination amount field 'input' event handler */
     onDestAmountInput() {
         const { value } = this.destAmountInp;
+        const { transaction } = this.state;
         this.setState({
             ...this.state,
-            transaction: this.runAction('setDestAmount', value),
+            transaction: transaction.setDestAmount(value),
             validation: defaultValidation,
         });
     }
 
     /** Currency select 'change' event handler */
     onSrcCurrChanged(currency) {
+        const { transaction } = this.state;
         this.setState({
             ...this.state,
-            transaction: this.runAction('setSourceCurrency', currency.id),
+            transaction: transaction.setSourceCurrency(currency.id),
             validation: defaultValidation,
         });
     }
 
     /** Currency select 'change' event handler */
     onDestCurrChanged(currency) {
+        const { transaction } = this.state;
         this.setState({
             ...this.state,
-            transaction: this.runAction('setDestCurrency', currency.id),
+            transaction: transaction.setDestCurrency(currency.id),
             validation: defaultValidation,
         });
     }
@@ -515,9 +531,10 @@ export class ImportTransactionForm extends Component {
     /** Date field 'input' event handler */
     onDateInput() {
         const { value } = this.dateInp;
+        const { transaction } = this.state;
         this.setState({
             ...this.state,
-            transaction: this.runAction('setDate', value),
+            transaction: transaction.setDate(value),
             validation: defaultValidation,
         });
     }
@@ -525,21 +542,33 @@ export class ImportTransactionForm extends Component {
     /** DatePicker select event handler */
     onDateSelect(date) {
         const dateFmt = window.app.formatDate(date);
+        const { transaction } = this.state;
         this.setState({
             ...this.state,
-            transaction: this.runAction('setDate', dateFmt),
+            transaction: transaction.setDate(dateFmt),
             validation: defaultValidation,
         });
 
         this.datePicker.hide();
     }
 
+    /** Category select 'change' event handler */
+    onCategoryChanged(category) {
+        const { transaction } = this.state;
+        this.setState({
+            ...this.state,
+            transaction: transaction.setCategory(category.id),
+            validation: defaultValidation,
+        });
+    }
+
     /** Comment field 'input' event handler */
     onCommentInput() {
         const { value } = this.commInp;
+        const { transaction } = this.state;
         this.setState({
             ...this.state,
-            transaction: this.runAction('setComment', value),
+            transaction: transaction.setComment(value),
             validation: defaultValidation,
         });
     }
@@ -746,7 +775,7 @@ export class ImportTransactionForm extends Component {
             transaction.destCurrId,
         );
 
-        // Second account field
+        // Transfer account field
         this.transferAccDropDown.enable(transaction.enabled && isTransfer);
         if (isTransfer) {
             const strMainAccountId = transaction.mainAccount.id.toString();
@@ -782,6 +811,10 @@ export class ImportTransactionForm extends Component {
         this.dateInp.enable(transaction.enabled);
         this.dateInp.value = transaction.date;
         window.app.setValidation(this.dateField.elem, state.validation.date);
+
+        // Category field
+        this.categorySelect.enable(transaction.enabled);
+        this.categorySelect.selectItem(transaction.categoryId);
 
         // Commend field
         enable(this.commInp, transaction.enabled);

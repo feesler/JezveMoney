@@ -59,6 +59,9 @@ export class Transaction {
         if (!res.date) {
             res.date = App.dates.now;
         }
+        if (typeof res.category_id === 'undefined') {
+            res.category_id = 0;
+        }
         if (!res.comment) {
             res.comment = '';
         }

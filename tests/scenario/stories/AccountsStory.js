@@ -15,6 +15,7 @@ export class AccountsStory extends TestStory {
         await App.scenario.resetData({
             accounts: true,
             persons: true,
+            categories: true,
         });
         await App.scenario.createTestData();
 

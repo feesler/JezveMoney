@@ -5,6 +5,7 @@ namespace JezveMoney\App\API\Controller;
 use JezveMoney\Core\ApiController;
 use JezveMoney\Core\Message;
 use JezveMoney\App\Model\AccountModel;
+use JezveMoney\App\Model\CategoryModel;
 use JezveMoney\App\Model\PersonModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Model\ImportRuleModel;
@@ -46,7 +47,7 @@ class Profile extends ApiController
 
     public function changename()
     {
-        $requiredFields = [ "name" ];
+        $requiredFields = ["name"];
         $defMsg = Message::get(ERR_PROFILE_NAME);
 
         if (!$this->isPOST()) {
@@ -74,7 +75,7 @@ class Profile extends ApiController
 
     public function changepass()
     {
-        $requiredFields = [ "current", "new" ];
+        $requiredFields = ["current", "new"];
         $defMsg = Message::get(ERR_PROFILE_PASSWORD);
 
         if (!$this->isPOST()) {
@@ -113,7 +114,15 @@ class Profile extends ApiController
             throw new \Error("Invalid type of request");
         }
 
-        $resetOptions = ["accounts", "persons", "transactions", "keepbalance", "importtpl", "importrules"];
+        $resetOptions = [
+            "accounts",
+            "persons",
+            "categories",
+            "transactions",
+            "keepbalance",
+            "importtpl",
+            "importrules"
+        ];
         $request = $this->getRequestData();
         foreach ($resetOptions as $opt) {
             $request[$opt] = isset($request[$opt]);
@@ -130,6 +139,13 @@ class Profile extends ApiController
 
         if ($request["persons"]) {
             if (!$this->personMod->reset()) {
+                throw new \Error($defMsg);
+            }
+        }
+
+        if ($request["categories"]) {
+            $categoryModel = CategoryModel::getInstance();
+            if (!$categoryModel->reset()) {
                 throw new \Error($defMsg);
             }
         }

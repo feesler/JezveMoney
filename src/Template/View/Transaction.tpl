@@ -133,6 +133,11 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 <div class="invalid-feedback">Input correct date.</div>
                             </div>
 
+                            <div id="category_row" class="view-row std_margin" <?= hidden(!$trAvailable) ?>>
+                                <label for="category">Category</label>
+                                <select id="category" name="category_id"></select>
+                            </div>
+
                             <div id="comment_row" class="view-row std_margin" <?= hidden(!$trAvailable) ?>>
                                 <label for="comm">Comment</label>
                                 <input id="comm" class="stretch-input" name="comment" type="text" value="<?= e($tr["comment"]) ?>">

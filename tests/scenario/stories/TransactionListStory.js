@@ -14,6 +14,7 @@ export class TransactionListStory extends TestStory {
         await App.scenario.resetData({
             accounts: true,
             persons: true,
+            categories: true,
         });
         await App.scenario.createTestData();
 
@@ -67,6 +68,8 @@ export class TransactionListStory extends TestStory {
             availTransTypes.map((type) => ({ type, directNavigate })),
         );
 
+        const { FOOD_CATEGORY, TRANSPORT_CATEGORY } = App.scenario;
+
         await App.scenario.runner.runTasks([{
             action: TransactionListTests.filterByAccounts,
             data: { accounts: App.scenario.ACC_3 },
@@ -86,10 +89,18 @@ export class TransactionListStory extends TestStory {
             action: TransactionListTests.filterByType,
             data: { type: [INCOME, DEBT], directNavigate },
         }, {
+            action: TransactionListTests.filterByCategories,
+            data: { categories: FOOD_CATEGORY, directNavigate },
+        }, {
+            action: TransactionListTests.filterByCategories,
+            data: {
+                categories: [FOOD_CATEGORY, TRANSPORT_CATEGORY],
+                directNavigate,
+            },
+        }, {
             action: TransactionListTests.filterByDate,
             data: { start: App.dates.weekAgo, end: App.dates.now, directNavigate },
-        },
-        {
+        }, {
             action: TransactionListTests.filterByDate,
             data: { start: App.dates.yearAgo, end: App.dates.monthAgo, directNavigate },
         }]);

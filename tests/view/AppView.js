@@ -50,6 +50,11 @@ export class AppView extends TestView {
         await navigation(() => this.content.nav.goToPersons());
     }
 
+    async navigateToCategories() {
+        assert(this.isUserLoggedIn(), 'User is not logged in');
+        await navigation(() => this.content.nav.goToCategories());
+    }
+
     async navigateToTransactions() {
         assert(this.isUserLoggedIn(), 'User is not logged in');
         await navigation(() => this.content.nav.goToTransactions());

@@ -20,6 +20,7 @@ import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { PersonList } from '../../js/model/PersonList.js';
+import { CategoryList } from '../../js/model/CategoryList.js';
 import { ImportRuleList } from '../../js/model/ImportRuleList.js';
 import { ImportTemplateList } from '../../js/model/ImportTemplateList.js';
 import './style.scss';
@@ -77,6 +78,7 @@ class ImportView extends View {
         window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
         window.app.loadModel(PersonList, 'persons', window.app.props.persons);
+        window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
         window.app.loadModel(ImportRuleList, 'rules', window.app.props.rules);
         window.app.loadModel(ImportTemplateList, 'templates', window.app.props.templates);
 

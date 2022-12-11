@@ -100,3 +100,10 @@ Message::add(MSG_IMPORT_COND_UPDATE, MSG_TYPE_SUCCESS, "Import condition success
 Message::add(ERR_IMPORT_COND_UPDATE, MSG_TYPE_ERROR, "Fail to update import condition.");
 Message::add(MSG_IMPORT_COND_DELETE, MSG_TYPE_SUCCESS, "Import condition successfully deleted.");
 Message::add(ERR_IMPORT_COND_DELETE, MSG_TYPE_ERROR, "Fail to delete import condition.");
+
+Message::add(MSG_CATEGORY_CREATE, MSG_TYPE_SUCCESS, "Category successfully created.");
+Message::add(ERR_CATEGORY_CREATE, MSG_TYPE_ERROR, "Fail to create new category.");
+Message::add(MSG_CATEGORY_UPDATE, MSG_TYPE_SUCCESS, "Category successfully updated.");
+Message::add(ERR_CATEGORY_UPDATE, MSG_TYPE_ERROR, "Fail to update category.");
+Message::add(MSG_CATEGORY_DELETE, MSG_TYPE_SUCCESS, "Category successfully deleted.");
+Message::add(ERR_CATEGORY_DELETE, MSG_TYPE_ERROR, "Fail to delete category.");

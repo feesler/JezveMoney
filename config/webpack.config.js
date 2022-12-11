@@ -41,6 +41,14 @@ export default {
             import: './src/view/Views/Person/PersonView.js',
             filename: 'view/js/[name].js',
         },
+        CategoryListView: {
+            import: './src/view/Views/CategoryList/CategoryListView.js',
+            filename: 'view/js/[name].js',
+        },
+        CategoryView: {
+            import: './src/view/Views/Category/CategoryView.js',
+            filename: 'view/js/[name].js',
+        },
         ProfileView: {
             import: './src/view/Views/Profile/ProfileView.js',
             filename: 'view/js/[name].js',

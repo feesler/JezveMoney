@@ -8,6 +8,7 @@ import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { PersonList } from '../../js/model/PersonList.js';
+import { CategoryList } from '../../js/model/CategoryList.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
 import '../../Components/Tile/style.scss';
 import './style.scss';
@@ -25,6 +26,7 @@ class MainView extends View {
         window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
         window.app.loadModel(PersonList, 'persons', window.app.props.persons);
+        window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
     }
 
     /**

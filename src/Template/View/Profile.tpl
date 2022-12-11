@@ -100,6 +100,12 @@
                 <span class="checkbox__label">Persons</span>
             </label>
 
+            <label id="categoriesCheck" class="checkbox">
+                <input type="checkbox" name="categories">
+                <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>
+                <span class="checkbox__label">Categories</span>
+            </label>
+
             <label id="transactionsCheck" class="checkbox">
                 <input type="checkbox" name="transactions">
                 <span class="checkbox__check"><?= svgIcon("check", "checkbox__icon") ?></span>

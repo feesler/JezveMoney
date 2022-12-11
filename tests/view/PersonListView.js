@@ -240,8 +240,8 @@ export class PersonListView extends AppView {
         const expected = this.getExpectedState();
 
         const tile = (num < visibleTiles)
-            ? this.content.tiles.content.items[num]
-            : this.content.hiddenTiles.content.items[num - visibleTiles];
+            ? this.content.tiles.items[num]
+            : this.content.hiddenTiles.items[num - visibleTiles];
 
         await this.performAction(() => tile.click());
 
@@ -314,8 +314,8 @@ export class PersonListView extends AppView {
             const expected = this.getExpectedState();
 
             const tile = (num < visibleTiles)
-                ? this.content.tiles.content.items[num]
-                : this.content.hiddenTiles.content.items[num - visibleTiles];
+                ? this.content.tiles.items[num]
+                : this.content.hiddenTiles.items[num - visibleTiles];
 
             await this.waitForList(() => tile.click());
 
@@ -369,7 +369,7 @@ export class PersonListView extends AppView {
         await this.waitForList(() => click(this.content.delete_warning.content.okBtn));
     }
 
-    /** Show secified accounts */
+    /** Show secified persons */
     async showPersons(persons, val = true) {
         await this.selectPersons(persons);
 
@@ -382,7 +382,7 @@ export class PersonListView extends AppView {
         }
     }
 
-    /** Hide secified accounts */
+    /** Hide specified persons */
     async hidePersons(persons) {
         await this.showPersons(persons, false);
     }

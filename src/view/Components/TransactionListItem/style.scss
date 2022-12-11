@@ -95,6 +95,7 @@
 
 .trans-item__amount,
 .trans-item__comment,
+.trans-item__category,
 .trans-item__date,
 .trans-item__title {
   height: 23px;
@@ -119,6 +120,12 @@
   font-weight: 600;
 }
 
+.trans-item__amount-category {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+}
+
 .trans-item__date-comment {
   display: flex;
   flex-flow: row nowrap;
@@ -130,6 +137,15 @@
 
 .trans-item__date {
   flex: 0 0 auto;
+}
+
+.trans-item__category {
+  padding: 0 12px;
+  margin-left: auto;
+  border-radius: 100vh;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  background-color: var(--btn-bg);
 }
 
 .trans-item__comment {

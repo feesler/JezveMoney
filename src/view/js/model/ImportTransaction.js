@@ -35,6 +35,7 @@ const defaultProps = {
     destAmount: 0,
     personId: 0,
     date: null,
+    categoryId: 0,
     comment: '',
 };
 
@@ -75,6 +76,7 @@ export class ImportTransaction {
             srcCurrId: (isExpense) ? data.accountCurrencyId : data.transactionCurrencyId,
             destCurrId: (isExpense) ? data.transactionCurrencyId : data.accountCurrencyId,
             date: window.app.formatDate(new Date(data.date)),
+            categoryId: 0,
             comment: data.comment,
         };
 
@@ -247,6 +249,7 @@ export class ImportTransaction {
             'destAmount',
             'personId',
             'date',
+            'categoryId',
             'comment',
         ];
 
@@ -633,6 +636,25 @@ export class ImportTransaction {
         });
     }
 
+    /** Set category */
+    setCategory(value) {
+        const categoryId = parseInt(value, 10);
+        if (this.categoryId === categoryId) {
+            return this;
+        }
+
+        const { categories } = window.app.model;
+        const category = categories.getItem(categoryId);
+        if (categoryId !== 0 && !category) {
+            throw new Error('Invalid category');
+        }
+
+        return new ImportTransaction({
+            ...copyObject(this),
+            categoryId,
+        });
+    }
+
     /** Set comment */
     setComment(comment) {
         if (typeof comment !== 'string') {
@@ -717,6 +739,7 @@ export class ImportTransaction {
         }
 
         res.date = this.date;
+        res.category_id = this.categoryId;
         res.comment = this.comment;
 
         return res;

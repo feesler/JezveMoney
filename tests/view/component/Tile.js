@@ -86,4 +86,12 @@ export class Tile extends TestComponent {
 
         return res;
     }
+
+    static renderCategory(category) {
+        assert(category, 'Invalid category');
+
+        return {
+            title: category.name,
+        };
+    }
 }

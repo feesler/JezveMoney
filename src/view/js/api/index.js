@@ -115,6 +115,28 @@ export const API = {
         },
     },
 
+    category: {
+        async list(options = {}) {
+            return apiGet('category/list', options);
+        },
+
+        async create(data) {
+            return apiPost('category/create', data);
+        },
+
+        async createMultiple(data) {
+            return apiPost('category/createMultiple', data);
+        },
+
+        async update(data) {
+            return apiPost('category/update', data);
+        },
+
+        async del(ids) {
+            return apiPost('category/delete', ids);
+        },
+    },
+
     transaction: {
         async createMultiple(data) {
             return apiPost('transaction/createMultiple', data);

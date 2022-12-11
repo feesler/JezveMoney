@@ -4,6 +4,7 @@ import {
     IMPORT_ACTION_SET_TR_TYPE,
     IMPORT_ACTION_SET_ACCOUNT,
     IMPORT_ACTION_SET_PERSON,
+    IMPORT_ACTION_SET_CATEGORY,
 } from '../../../../js/model/ImportAction.js';
 import './style.scss';
 
@@ -101,6 +102,14 @@ export class ImportActionItem extends Component {
             }
 
             value = item.name;
+        } else if (state.actionType === IMPORT_ACTION_SET_CATEGORY) {
+            const categoryId = parseInt(state.value, 10);
+            const item = window.app.model.categories.getItem(state.value);
+            if (categoryId !== 0 && !item) {
+                throw new Error('Category not found');
+            }
+
+            value = (categoryId !== 0) ? item.name : '';
         } else {
             value = state.value;
         }

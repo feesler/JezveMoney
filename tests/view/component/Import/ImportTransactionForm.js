@@ -32,6 +32,7 @@ const fieldSelectors = [
     '.src-amount-field',
     '.dest-amount-field',
     '.date-field',
+    '.category-field',
     '.comment-field',
 ];
 
@@ -111,6 +112,7 @@ export class ImportTransactionForm extends TestComponent {
             res.srcAmountField,
             res.destAmountField,
             res.dateField,
+            res.categoryField,
             res.commentField,
         ] = await asyncMap(fieldSelectors, async (selector) => (
             this.parseField(await query(this.elem, selector))
@@ -128,6 +130,7 @@ export class ImportTransactionForm extends TestComponent {
             && res.transferAccountField
             && res.personField
             && res.dateField
+            && res.categoryField
             && res.commentField
             && res.saveBtn
             && res.cancelBtn,
@@ -207,6 +210,7 @@ export class ImportTransactionForm extends TestComponent {
         res.destCurrency = App.currency.getItem(res.destCurrId);
 
         res.date = cont.dateField.value;
+        res.categoryId = parseInt(cont.categoryField.value, 10);
         res.comment = cont.commentField.value;
 
         res.isDifferent = (res.srcCurrId !== res.destCurrId);
@@ -295,6 +299,11 @@ export class ImportTransactionForm extends TestComponent {
                 invFeedback: {
                     visible: !model.validation.date,
                 },
+            },
+            categoryField: {
+                value: model.categoryId.toString(),
+                disabled: false,
+                visible: true,
             },
             commentField: {
                 value: model.comment.toString(),
@@ -394,6 +403,7 @@ export class ImportTransactionForm extends TestComponent {
         }
 
         res.date = model.date;
+        res.category_id = model.categoryId;
         res.comment = model.comment;
 
         return res;
@@ -764,6 +774,20 @@ export class ImportTransactionForm extends TestComponent {
         this.expectedState = this.getExpectedState(this.model);
 
         await input(this.content.dateField.inputElem, value);
+        await this.parse();
+
+        return this.checkState();
+    }
+
+    async changeCategory(value) {
+        const { dropDown } = this.content.categoryField;
+        this.checkEnabled(dropDown);
+
+        this.model.categoryId = parseInt(value, 10);
+        this.cleanValidation();
+        this.expectedState = this.getExpectedState(this.model);
+
+        await dropDown.selectItem(value);
         await this.parse();
 
         return this.checkState();

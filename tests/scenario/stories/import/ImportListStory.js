@@ -8,6 +8,7 @@ export class ImportListStory extends TestStory {
         await App.scenario.resetData({
             accounts: true,
             persons: true,
+            categories: true,
             transactions: true,
             importtpl: true,
             importrules: true,
@@ -15,6 +16,7 @@ export class ImportListStory extends TestStory {
 
         await App.scenario.createAccounts();
         await App.scenario.createPersons();
+        await App.scenario.createCategories();
         await App.scenario.createCsvFiles();
         await App.scenario.createImportRules();
         await App.scenario.createImportTemplates();
@@ -50,6 +52,7 @@ export class ImportListStory extends TestStory {
 
         await ImportTests.addItem(
             { action: 'inputDestAmount', data: '1' },
+            { action: 'changeCategory', data: App.scenario.TRANSPORT_CATEGORY },
         );
 
         setBlock('Save item', 2);

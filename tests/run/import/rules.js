@@ -209,6 +209,7 @@ const runOnRuleAction = async (params) => {
         changeTransactionType: 'Change transaction type',
         changeAccount: 'Change account',
         changePerson: 'Change person',
+        changeCategory: 'Change category',
         inputAmount: 'Input amount value',
         inputValue: 'Input value',
     };
@@ -238,6 +239,17 @@ const runOnRuleAction = async (params) => {
             assert(person, `Person (${action.data}) not found`);
 
             descr = `${actDescr[action.action]} to '${person.name}'`;
+        } else if (action.action === 'changeCategory') {
+            const categoryId = parseInt(action.data, 10);
+            const category = App.state.categories.getItem(categoryId);
+            if (categoryId !== 0) {
+                assert(category, `Category (${action.data}) not found`);
+            }
+            const categoryName = (categoryId === 0)
+                ? 'No category'
+                : category.name;
+
+            descr = `${actDescr[action.action]} to '${categoryName}'`;
         } else if (action.action === 'togglePropValue') {
             descr = `${actDescr[action.action]}`;
         } else {

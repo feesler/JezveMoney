@@ -55,6 +55,10 @@ export class TransactionListView extends AppView {
         return this.content.accDropDown;
     }
 
+    get categoryDropDown() {
+        return this.content.categoryDropDown;
+    }
+
     async parseContent() {
         const res = {
             title: { elem: await query('.content_wrap > .heading > h1') },
@@ -99,6 +103,12 @@ export class TransactionListView extends AppView {
             res.accDropDown = await DropDown.createFromChild(this, await query('#acc_id'));
         }
 
+        const categoriesFilter = await query('#categoriesFilter');
+        const categoriesFilterVisible = await isVisible(categoriesFilter);
+        if (categoriesFilterVisible) {
+            res.categoryDropDown = await DropDown.createFromChild(this, await query('#category_id'));
+        }
+
         res.dateFilter = await DatePickerFilter.create(this, await query('#dateFilter'));
         assert(res.dateFilter, 'Date filter not found');
 
@@ -140,15 +150,17 @@ export class TransactionListView extends AppView {
         return res;
     }
 
-    getDropDownFilter(dropDown, idPrefix) {
+    getDropDownFilter(dropDown, idPrefix = null) {
         if (!dropDown) {
             return [];
         }
 
         const res = [];
         dropDown.getSelectedValues().forEach((id) => {
-            if (id.startsWith(idPrefix)) {
+            if (idPrefix && id.startsWith(idPrefix)) {
                 res.push(parseInt(id.substring(idPrefix.length), 10));
+            } else if (!idPrefix) {
+                res.push(parseInt(id, 10));
             }
         });
         return res;
@@ -168,6 +180,7 @@ export class TransactionListView extends AppView {
             type: cont.typeMenu.value,
             accounts: this.getDropDownFilter(cont.accDropDown, 'a'),
             persons: this.getDropDownFilter(cont.accDropDown, 'p'),
+            categories: this.getDropDownFilter(cont.categoryDropDown),
             search: cont.searchForm.value,
             startDate: null,
             endDate: null,
@@ -276,6 +289,10 @@ export class TransactionListView extends AppView {
             params.person_id = this.model.filter.persons;
         }
 
+        if (this.model.filter.categories.length > 0) {
+            params.category_id = this.model.filter.categories;
+        }
+
         if (this.model.filter.search.length > 0) {
             params.search = this.model.filter.search;
         }
@@ -379,6 +396,9 @@ export class TransactionListView extends AppView {
             accDropDown: {
                 visible: filtersVisible && isAvailable,
             },
+            categoryDropDown: {
+                visible: filtersVisible && isAvailable,
+            },
             dateFilter: {
                 visible: filtersVisible,
                 value: {
@@ -432,6 +452,10 @@ export class TransactionListView extends AppView {
             res.accDropDown.isMulti = true;
             const ids = this.getPrefixedIds(model);
             res.accDropDown.selectedItems = ids.map((id) => ({ id }));
+
+            res.categoryDropDown.selectedItems = model.filter.categories.map(
+                (id) => ({ id: id.toString() }),
+            );
         }
 
         if (isItemsAvailable) {
@@ -555,6 +579,7 @@ export class TransactionListView extends AppView {
             type: [],
             accounts: [],
             persons: [],
+            categories: [],
             search: '',
         };
         const expected = this.onFilterUpdate();
@@ -603,21 +628,27 @@ export class TransactionListView extends AppView {
         return App.view.checkState(expected);
     }
 
-    async setFilterSelection(itemIds) {
+    async setFilterSelection(dropDown, itemIds) {
+        assert(this.content[dropDown], 'Invalid component');
+
         const ids = asArray(itemIds);
-        const selection = this.accDropDown.getSelectedValues();
+        const selection = this.content[dropDown].getSelectedValues();
         if (selection.length > 0) {
-            await this.waitForList(() => this.accDropDown.clearSelection());
+            await this.waitForList(() => this.content[dropDown].clearSelection());
         }
         if (ids.length === 0) {
             return;
         }
 
         for (const id of ids) {
-            await this.waitForList(() => this.accDropDown.selectItem(id));
+            await this.waitForList(() => this.content[dropDown].selectItem(id));
         }
 
-        await this.performAction(() => this.accDropDown.showList(false));
+        await this.performAction(() => this.content[dropDown].showList(false));
+    }
+
+    async setAccountsFilterSelection(itemIds) {
+        return this.setFilterSelection('accDropDown', itemIds);
     }
 
     async filterByAccounts(ids, directNavigate = false) {
@@ -637,7 +668,7 @@ export class TransactionListView extends AppView {
             await goTo(this.getExpectedURL());
         } else {
             const selection = this.getPrefixedIds();
-            await this.setFilterSelection(selection);
+            await this.setAccountsFilterSelection(selection);
         }
 
         return App.view.checkState(expected);
@@ -660,7 +691,29 @@ export class TransactionListView extends AppView {
             await goTo(this.getExpectedURL());
         } else {
             const selection = this.getPrefixedIds();
-            await this.setFilterSelection(selection);
+            await this.setAccountsFilterSelection(selection);
+        }
+
+        return App.view.checkState(expected);
+    }
+
+    async filterByCategories(ids, directNavigate = false) {
+        assert(App.state.categories.length > 0, 'No categories available');
+
+        if (directNavigate) {
+            this.model.filtersVisible = false;
+        } else {
+            await this.openFilters();
+        }
+
+        const categories = asArray(ids);
+        this.model.filter.categories = categories;
+        const expected = this.onFilterUpdate();
+
+        if (directNavigate) {
+            await goTo(this.getExpectedURL());
+        } else {
+            await this.setFilterSelection('categoryDropDown', categories);
         }
 
         return App.view.checkState(expected);

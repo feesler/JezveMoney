@@ -327,6 +327,7 @@ export const runFormAction = async (action) => {
         changeSourceCurrency: 'Change source currency',
         changeDestCurrency: 'Change destination currency',
         inputDate: 'Input date',
+        changeCategory: 'Change category',
         inputComment: 'Input comment',
     };
 
@@ -337,17 +338,21 @@ export const runFormAction = async (action) => {
 
         descr = `${actDescr[action.action]} to '${currency.name}'`;
     } else if (action.action === 'changeTransferAccount') {
-        const userAccounts = App.state.accounts.getUserVisible();
+        const userAccounts = App.state.getUserAccounts();
         const account = userAccounts.getItem(action.data);
         assert(account, `Account (${action.data}) not found`);
 
         descr = `${actDescr[action.action]} to '${account.name}'`;
     } else if (action.action === 'changePerson') {
-        const persons = App.state.persons.getVisible();
-        const person = persons.getItem(action.data);
+        const person = App.state.persons.getItem(action.data);
         assert(person, `Person (${action.data}) not found`);
 
         descr = `${actDescr[action.action]} to '${person.name}'`;
+    } else if (action.action === 'changeCategory') {
+        const category = App.state.categories.getItem(action.data);
+        assert(category, `Category (${action.data}) not found`);
+
+        descr = `${actDescr[action.action]} to '${category.name}'`;
     } else {
         descr = `${actDescr[action.action]} '${action.data}'`;
     }

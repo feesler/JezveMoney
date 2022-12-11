@@ -131,6 +131,7 @@ export const isTransaction = (obj) => verifyObject(obj, {
     src_result: isNum,
     dest_result: isNum,
     date: isDateString,
+    category_id: isInt,
     comment: isString,
     pos: isInt,
 }, {
@@ -142,7 +143,9 @@ export const isTransaction = (obj) => verifyObject(obj, {
 /** Verify object is transactions filter */
 export const isTransactionsFilter = (obj) => verifyObject(obj, {}, {
     type: isIntArray,
-    accounts: isIntArray,
+    acc_id: isIntArray,
+    person_id: isIntArray,
+    category_id: isIntArray,
     stdate: isString,
     enddate: isString,
     search: isString,
@@ -303,6 +306,21 @@ export const isPerson = (obj) => verifyObject(obj, {
 
 /** Verify object is array of persons */
 export const isPersonsArray = isArrayOf(isPerson);
+
+/** Verify object is category */
+export const isCategory = (obj) => verifyObject(obj, {
+    id: isInt,
+    name: isString,
+    parent_id: isInt,
+    type: isInt,
+}, {
+    user_id: isInt,
+    createdate: isInt,
+    updatedate: isInt,
+});
+
+/** Verify object is array of categories */
+export const isCategoriesArray = isArrayOf(isCategory);
 
 /** Verify object is profile */
 export const isProfile = (obj) => verifyObject(obj, {

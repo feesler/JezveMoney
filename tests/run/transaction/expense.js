@@ -24,6 +24,10 @@ export const submit = async (params) => {
         await TransactionTests.runAction({ action: 'changeDate', data: params.date });
     }
 
+    if ('category' in params) {
+        await TransactionTests.runAction({ action: 'changeCategory', data: params.category });
+    }
+
     if ('comment' in params) {
         await TransactionTests.runAction({ action: 'inputComment', data: params.comment });
     }
