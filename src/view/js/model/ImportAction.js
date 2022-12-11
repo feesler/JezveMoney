@@ -9,6 +9,7 @@ export const IMPORT_ACTION_SET_PERSON = 3;
 export const IMPORT_ACTION_SET_SRC_AMOUNT = 4;
 export const IMPORT_ACTION_SET_DEST_AMOUNT = 5;
 export const IMPORT_ACTION_SET_COMMENT = 6;
+export const IMPORT_ACTION_SET_CATEGORY = 7;
 
 /** Action types */
 const TITLE_ACTION_SET_TR_TYPE = 'Set transaction type';
@@ -17,6 +18,7 @@ const TITLE_ACTION_SET_PERSON = 'Set person';
 const TITLE_ACTION_SET_SRC_AMOUNT = 'Set source amount';
 const TITLE_ACTION_SET_DEST_AMOUNT = 'Set destination amount';
 const TITLE_ACTION_SET_COMMENT = 'Set comment';
+const TITLE_ACTION_SET_CATEGORY = 'Set category';
 /** Transaction types */
 const TITLE_TRANS_EXPENSE = 'Expense';
 const TITLE_TRANS_INCOME = 'Income';
@@ -33,6 +35,7 @@ const actionHandlers = {
     [IMPORT_ACTION_SET_SRC_AMOUNT]: (ctx, value) => ctx.setSourceAmount(value),
     [IMPORT_ACTION_SET_DEST_AMOUNT]: (ctx, value) => ctx.setDestAmount(value),
     [IMPORT_ACTION_SET_COMMENT]: (ctx, value) => ctx.setComment(value),
+    [IMPORT_ACTION_SET_CATEGORY]: (ctx, value) => ctx.setCategory(value),
 };
 
 /**
@@ -48,6 +51,7 @@ export class ImportAction extends ListItem {
         { id: IMPORT_ACTION_SET_SRC_AMOUNT, title: TITLE_ACTION_SET_SRC_AMOUNT },
         { id: IMPORT_ACTION_SET_DEST_AMOUNT, title: TITLE_ACTION_SET_DEST_AMOUNT },
         { id: IMPORT_ACTION_SET_COMMENT, title: TITLE_ACTION_SET_COMMENT },
+        { id: IMPORT_ACTION_SET_CATEGORY, title: TITLE_ACTION_SET_CATEGORY },
     ];
 
     /** List of action types requires select value from list */
@@ -55,6 +59,7 @@ export class ImportAction extends ListItem {
         IMPORT_ACTION_SET_TR_TYPE,
         IMPORT_ACTION_SET_ACCOUNT,
         IMPORT_ACTION_SET_PERSON,
+        IMPORT_ACTION_SET_CATEGORY,
     ];
 
     /** List of action types requires amount value */
@@ -113,6 +118,11 @@ export class ImportAction extends ListItem {
         return parseInt(value, 10) === IMPORT_ACTION_SET_PERSON;
     }
 
+    /** Check action type requires category id value */
+    static isCategoryValue(value) {
+        return parseInt(value, 10) === IMPORT_ACTION_SET_CATEGORY;
+    }
+
     /** Check action type requires amount value */
     static isAmountValue(value) {
         return this.amountActions.includes(parseInt(value, 10));
@@ -158,6 +168,11 @@ export class ImportAction extends ListItem {
         return ImportAction.isPersonValue(this.action_id);
     }
 
+    /** Check action requires category value */
+    isCategoryValue() {
+        return ImportAction.isCategoryValue(this.action_id);
+    }
+
     /** Check action requires amount value */
     isAmountValue() {
         return ImportAction.isAmountValue(this.action_id);
@@ -200,6 +215,15 @@ export class ImportAction extends ListItem {
             }
 
             return person.name.toLowerCase().includes(lower);
+        }
+
+        if (this.isCategoryValue()) {
+            const category = window.app.model.categories.getItem(this.value);
+            if (!category) {
+                return false;
+            }
+
+            return category.name.toLowerCase().includes(lower);
         }
 
         return this.value.toLowerCase().includes(lower);

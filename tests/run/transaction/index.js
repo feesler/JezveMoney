@@ -45,6 +45,13 @@ export const runAction = async ({ action, data }) => {
         testDescr = `Change person to (${person.name})`;
     }
 
+    if (action === 'changePersonByPos') {
+        const [person] = App.state.getPersonsByIndexes(data);
+        assert(person, `Person (${data}) not found`);
+
+        testDescr = `Change person to (${person.name})`;
+    }
+
     if (action === 'toggleAccount') {
         testDescr = App.view.model.noAccount ? 'Enable account' : 'Disable account';
     }
@@ -80,6 +87,13 @@ export const runAction = async ({ action, data }) => {
         } else {
             testDescr = `Change destination currency to ${curr.name}`;
         }
+    }
+
+    if (action === 'changeCategory') {
+        const category = App.state.categories.getItem(data);
+        assert(category, `Category (${data}) not found`);
+
+        testDescr = `Change category to (${category.name})`;
     }
 
     if (action === 'inputSrcAmount') {

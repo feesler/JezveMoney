@@ -14,6 +14,8 @@ export class DatePickerRow extends InputRow {
             await query(this.elem, '.dp__container'),
         );
 
+        res.value = res.value.replaceAll('_', '');
+
         return res;
     }
 

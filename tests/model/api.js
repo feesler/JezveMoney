@@ -286,6 +286,40 @@ export const api = {
         },
     },
 
+    category: {
+        async read(ids) {
+            const apiReq = idsRequest('category/', ids);
+            const { data } = await apiGet(apiReq);
+            return data;
+        },
+
+        async create(options) {
+            const { data } = await apiPost('category/create', options);
+            return data;
+        },
+
+        async createMultiple(options) {
+            const { data } = await apiPost('category/createMultiple', options);
+            return data;
+        },
+
+        async update(options) {
+            await apiPost('category/update', options);
+            return true;
+        },
+
+        async del(ids) {
+            await apiPost('category/delete', { id: asArray(ids) });
+            return true;
+        },
+
+        async list(options = {}) {
+            const apiReq = `category/list?${urlJoin(options)}`;
+            const { data } = await apiGet(apiReq);
+            return data;
+        },
+    },
+
     transaction: {
         async read(ids) {
             const apiReq = idsRequest('transaction/', ids);

@@ -10,6 +10,7 @@ export const IMPORT_ACTION_SET_PERSON = 3;
 export const IMPORT_ACTION_SET_SRC_AMOUNT = 4;
 export const IMPORT_ACTION_SET_DEST_AMOUNT = 5;
 export const IMPORT_ACTION_SET_COMMENT = 6;
+export const IMPORT_ACTION_SET_CATEGORY = 7;
 
 export const ImportActionTypes = {
     setTransactionType: IMPORT_ACTION_SET_TR_TYPE,
@@ -18,6 +19,7 @@ export const ImportActionTypes = {
     setSourceAmount: IMPORT_ACTION_SET_SRC_AMOUNT,
     setDestAmount: IMPORT_ACTION_SET_DEST_AMOUNT,
     setComment: IMPORT_ACTION_SET_COMMENT,
+    setCategory: IMPORT_ACTION_SET_CATEGORY,
 };
 
 export const actions = {
@@ -27,6 +29,7 @@ export const actions = {
     setSourceAmount: (value) => ({ action_id: ImportActionTypes.setSourceAmount, value }),
     setDestAmount: (value) => ({ action_id: ImportActionTypes.setDestAmount, value }),
     setComment: (value) => ({ action_id: ImportActionTypes.setComment, value }),
+    setCategory: (value) => ({ action_id: ImportActionTypes.setCategory, value }),
 };
 
 /** Import action model */
@@ -73,6 +76,12 @@ export class ImportAction {
             if (!this.isValidAmount(this.value)) {
                 return false;
             }
+        } else if (this.action_id === IMPORT_ACTION_SET_CATEGORY) {
+            const categoryId = parseInt(this.value, 10);
+            const category = App.state.categories.getItem(this.value);
+            if (categoryId !== 0 && !category) {
+                return false;
+            }
         }
 
         return true;
@@ -85,6 +94,7 @@ export class ImportAction {
         { id: IMPORT_ACTION_SET_SRC_AMOUNT, title: 'Set source amount' },
         { id: IMPORT_ACTION_SET_DEST_AMOUNT, title: 'Set destination amount' },
         { id: IMPORT_ACTION_SET_COMMENT, title: 'Set comment' },
+        { id: IMPORT_ACTION_SET_CATEGORY, title: 'Set category' },
     ];
 
     static actionsMap = {
@@ -94,6 +104,7 @@ export class ImportAction {
         [IMPORT_ACTION_SET_SRC_AMOUNT]: 'setSourceAmount',
         [IMPORT_ACTION_SET_DEST_AMOUNT]: 'setDestAmount',
         [IMPORT_ACTION_SET_COMMENT]: 'setComment',
+        [IMPORT_ACTION_SET_CATEGORY]: 'setCategory',
     };
 
     /** List of action types requires select value from list */
@@ -101,6 +112,7 @@ export class ImportAction {
         IMPORT_ACTION_SET_TR_TYPE,
         IMPORT_ACTION_SET_ACCOUNT,
         IMPORT_ACTION_SET_PERSON,
+        IMPORT_ACTION_SET_CATEGORY,
     ];
 
     /** List of action types requires amount value */
@@ -127,6 +139,11 @@ export class ImportAction {
     /** Check action type requires person id value */
     static isPersonValue(value) {
         return parseInt(value, 10) === IMPORT_ACTION_SET_PERSON;
+    }
+
+    /** Check action type requires category id value */
+    static isCategoryValue(value) {
+        return parseInt(value, 10) === IMPORT_ACTION_SET_CATEGORY;
     }
 
     /** Check action type requires amount value */
@@ -163,6 +180,11 @@ export class ImportAction {
     /** Check action requires person value */
     isPersonValue() {
         return ImportAction.isPersonValue(this.action_id);
+    }
+
+    /** Check action requires category value */
+    isCategoryValue() {
+        return ImportAction.isCategoryValue(this.action_id);
     }
 
     /** Check action requires amount value */
@@ -204,6 +226,15 @@ export class ImportAction {
             }
 
             return person.name.toLowerCase().includes(lower);
+        }
+
+        if (this.isCategoryValue()) {
+            const category = App.state.categories.getItem(this.value);
+            if (!category) {
+                return false;
+            }
+
+            return category.name.toLowerCase().includes(lower);
         }
 
         return this.value.toLowerCase().includes(lower);

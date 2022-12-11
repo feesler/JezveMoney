@@ -15,6 +15,7 @@ class TransactionItem
     public $src_result = 0;
     public $dest_result = 0;
     public $date = 0;
+    public $category_id = 0;
     public $comment = null;
     public $pos = 0;
 
@@ -36,6 +37,7 @@ class TransactionItem
         $this->src_result = $obj->src_result;
         $this->dest_result = $obj->dest_result;
         $this->date = date("d.m.Y", $obj->date);
+        $this->category_id = $obj->category_id;
         $this->comment = $obj->comment;
         $this->pos = $obj->pos;
     }

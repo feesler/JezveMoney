@@ -179,7 +179,7 @@ export class TransactionsList extends List {
     // Filter list of transactions by specified types
     // Empty array, zero or undefined assumed filter is set as ALL
     getItemsByType(list, type) {
-        let types = Array.isArray(type) ? type : [type];
+        let types = asArray(type);
         types = types.filter((item) => availTransTypes.includes(item));
         if (!types.length) {
             return list;
@@ -200,7 +200,7 @@ export class TransactionsList extends List {
     getItemsByAccounts(list, ids) {
         assert(ids, 'Invalid account ids specified');
 
-        const accounts = Array.isArray(ids) ? ids : [ids];
+        const accounts = asArray(ids);
         if (!accounts.length) {
             return list;
         }
@@ -212,6 +212,26 @@ export class TransactionsList extends List {
 
     filterByAccounts(ids) {
         const items = this.getItemsByAccounts(this.data, ids);
+        if (items === this.data) {
+            return this;
+        }
+
+        return TransactionsList.create(items);
+    }
+
+    getItemsByCategories(list, ids) {
+        assert.isDefined(ids, 'Invalid category ids specified');
+
+        const categories = asArray(ids);
+        if (!categories.length) {
+            return list;
+        }
+
+        return list.filter((item) => categories.includes(item.category_id));
+    }
+
+    filterByCategories(ids) {
+        const items = this.getItemsByCategories(this.data, ids);
         if (items === this.data) {
             return this;
         }
@@ -311,6 +331,9 @@ export class TransactionsList extends List {
 
         if ('type' in params) {
             res = this.getItemsByType(res, params.type);
+        }
+        if ('categories' in params) {
+            res = this.getItemsByCategories(res, params.categories);
         }
         if ('accounts' in params || 'persons' in params) {
             const filterAccounts = [];
@@ -434,7 +457,7 @@ export class TransactionsList extends List {
     onDeleteAccounts(list, accList, ids) {
         const res = [];
 
-        const itemIds = Array.isArray(ids) ? ids : [ids];
+        const itemIds = asArray(ids);
         for (const trans of list) {
             const srcRemoved = itemIds.includes(trans.src_id);
             const destRemoved = itemIds.includes(trans.dest_id);
@@ -491,6 +514,22 @@ export class TransactionsList extends List {
 
     deleteAccounts(accList, ids) {
         const res = this.onDeleteAccounts(this.data, accList, ids);
+
+        return TransactionsList.create(res);
+    }
+
+    /** Return expected list of transactions after delete specified categories */
+    onDeleteCategories(list, ids) {
+        const itemIds = asArray(ids);
+        return list.map((item) => (
+            (item.category_id && itemIds.includes(item.category_id))
+                ? { ...item, category_id: 0 }
+                : item
+        ));
+    }
+
+    deleteCategories(ids) {
+        const res = this.onDeleteCategories(this.data, ids);
 
         return TransactionsList.create(res);
     }

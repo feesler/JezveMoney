@@ -18,6 +18,7 @@ define("IMPORT_ACTION_SET_PERSON", 3);
 define("IMPORT_ACTION_SET_SRC_AMOUNT", 4);
 define("IMPORT_ACTION_SET_DEST_AMOUNT", 5);
 define("IMPORT_ACTION_SET_COMMENT", 6);
+define("IMPORT_ACTION_SET_CATEGORY", 7);
 
 class ImportActionModel extends CachedTable
 {
@@ -34,6 +35,7 @@ class ImportActionModel extends CachedTable
         IMPORT_ACTION_SET_SRC_AMOUNT,
         IMPORT_ACTION_SET_DEST_AMOUNT,
         IMPORT_ACTION_SET_COMMENT,
+        IMPORT_ACTION_SET_CATEGORY,
     ];
 
     protected static $actionNames = [
@@ -43,6 +45,7 @@ class ImportActionModel extends CachedTable
         IMPORT_ACTION_SET_SRC_AMOUNT => "Set source amount",
         IMPORT_ACTION_SET_DEST_AMOUNT => "Set destination amount",
         IMPORT_ACTION_SET_COMMENT => "Set comment",
+        IMPORT_ACTION_SET_CATEGORY => "Set category",
     ];
 
     protected function onStart()
@@ -373,6 +376,31 @@ class ImportActionModel extends CachedTable
             if (
                 $item->action_id === IMPORT_ACTION_SET_PERSON
                 && in_array($item->value, $persons)
+            ) {
+                $itemsToDelete[] = $item_id;
+            }
+        }
+
+        return $this->del($itemsToDelete);
+    }
+
+    // Delete all actions for specified categories
+    public function deleteCategoryActions($categories)
+    {
+        if (is_null($categories)) {
+            return false;
+        }
+        $categories = asArray($categories);
+
+        if (!$this->checkCache()) {
+            return false;
+        }
+
+        $itemsToDelete = [];
+        foreach ($this->cache as $item_id => $item) {
+            if (
+                $item->action_id === IMPORT_ACTION_SET_CATEGORY
+                && in_array($item->value, $categories)
             ) {
                 $itemsToDelete[] = $item_id;
             }

@@ -238,8 +238,8 @@ export class AccountListView extends AppView {
         const expected = this.getExpectedState();
 
         const tile = (num < visibleTiles)
-            ? this.content.tiles.content.items[num]
-            : this.content.hiddenTiles.content.items[num - visibleTiles];
+            ? this.content.tiles.items[num]
+            : this.content.hiddenTiles.items[num - visibleTiles];
 
         await this.performAction(() => tile.click());
 
@@ -312,8 +312,8 @@ export class AccountListView extends AppView {
             const expected = this.getExpectedState();
 
             const tile = (num < visibleTiles)
-                ? this.content.tiles.content.items[num]
-                : this.content.hiddenTiles.content.items[num - visibleTiles];
+                ? this.content.tiles.items[num]
+                : this.content.hiddenTiles.items[num - visibleTiles];
 
             await this.performAction(() => tile.click());
 

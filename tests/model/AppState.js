@@ -24,6 +24,7 @@ import { TransactionsList } from './TransactionsList.js';
 import { ImportRuleList } from './ImportRuleList.js';
 import { ImportTemplateList } from './ImportTemplateList.js';
 import { api } from './api.js';
+import { CategoryList } from './CategoryList.js';
 
 /**
  * Accounts
@@ -36,9 +37,14 @@ const accReqFields = ['name', 'balance', 'initbalance', 'curr_id', 'icon_id', 'f
 const pReqFields = ['name', 'flags'];
 
 /**
+ * Categories
+ */
+const catReqFields = ['name', 'parent_id', 'type'];
+
+/**
  * Transactions
  */
-const trReqFields = ['type', 'src_id', 'dest_id', 'src_amount', 'dest_amount', 'src_curr', 'dest_curr', 'date', 'comment'];
+const trReqFields = ['type', 'src_id', 'dest_id', 'src_amount', 'dest_amount', 'src_curr', 'dest_curr', 'date', 'category_id', 'comment'];
 
 /**
  * Import templates
@@ -132,6 +138,12 @@ export class AppState {
         this.transactions.setData(state.transactions.data);
         this.transactions.autoincrement = state.transactions.autoincrement;
 
+        if (!this.categories) {
+            this.categories = CategoryList.create();
+        }
+        this.categories.setData(state.categories.data);
+        this.categories.autoincrement = state.categories.autoincrement;
+
         if (!this.templates) {
             this.templates = ImportTemplateList.create();
         }
@@ -164,6 +176,7 @@ export class AppState {
 
         res.accounts = this.accounts.clone();
         res.persons = this.persons.clone();
+        res.categories = this.categories.clone();
         res.transactions = this.transactions.clone();
         res.templates = this.templates.clone();
         res.rules = this.rules.clone();
@@ -181,6 +194,9 @@ export class AppState {
 
         assert(this.persons.length === expected.persons.length);
         assert.deepMeet(this.persons.data, expected.persons.data);
+
+        assert(this.categories.length === expected.categories.length);
+        assert.deepMeet(this.categories.data, expected.categories.data);
 
         assert(this.templates.length === expected.templates.length);
         assert.deepMeet(this.templates.data, expected.templates.data);
@@ -226,6 +242,11 @@ export class AppState {
             this.deletePersons(ids);
         }
 
+        if ('categories' in options) {
+            const ids = this.categories?.getIds();
+            this.deleteCategories(ids);
+        }
+
         if ('transactions' in options) {
             this.transactions?.reset();
 
@@ -248,6 +269,7 @@ export class AppState {
         this.accounts?.reset();
         this.userAccountsCache = null;
         this.persons?.reset();
+        this.categories?.reset();
         this.personsCache = null;
         this.transactions?.reset();
         this.templates?.reset();
@@ -654,6 +676,110 @@ export class AppState {
     }
 
     /**
+     * Categories
+     */
+
+    checkCategoryCorrectness(params) {
+        if (!isObject(params)) {
+            return false;
+        }
+
+        if (typeof params.name !== 'string' || params.name === '') {
+            return false;
+        }
+
+        // Check there is no category with same name
+        const category = this.categories.findByName(params.name);
+        if (category && (!params.id || (params.id && params.id !== category.id))) {
+            return false;
+        }
+
+        // Check parent category
+        if (params.parent_id !== 0) {
+            const parent = this.categories.getItem(params.parent_id);
+            if (!parent || parent.parent_id !== 0) {
+                return false;
+            }
+        }
+
+        if (params.type !== 0 && !availTransTypes.includes(params.type)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    createCategory(params) {
+        const resExpected = this.checkCategoryCorrectness(params);
+        if (!resExpected) {
+            return false;
+        }
+
+        const data = copyFields(params, catReqFields);
+        const ind = this.categories.create(data);
+        const item = this.categories.getItemByIndex(ind);
+
+        return item.id;
+    }
+
+    updateCategory(params) {
+        const origItem = this.categories.getItem(params.id);
+        if (!origItem) {
+            return false;
+        }
+
+        const expItem = copyObject(origItem);
+        const data = copyFields(params, catReqFields);
+        Object.assign(expItem, data);
+
+        const resExpected = this.checkCategoryCorrectness(expItem);
+        if (!resExpected) {
+            return false;
+        }
+
+        this.categories.update(expItem);
+
+        return true;
+    }
+
+    getChildCategories(id) {
+        return this.categories
+            .filter((item) => item.parent_id === id)
+            .map((item) => item.id);
+    }
+
+    deleteCategories(categoryIds) {
+        const ids = asArray(categoryIds);
+        if (!ids.length) {
+            return false;
+        }
+
+        if (!ids.every((id) => this.categories.getItem(id))) {
+            return false;
+        }
+
+        const categoriesToDelete = ids.flatMap((id) => ([
+            id,
+            ...this.categories.getChildren(id),
+        ]));
+
+        // Prepare expected updates of transactions
+        this.transactions = this.transactions.deleteCategories(categoriesToDelete);
+
+        this.categories.deleteItems(categoriesToDelete);
+
+        return true;
+    }
+
+    getCategoriesByNames(names, returnIds = false) {
+        return asArray(names).map((name) => {
+            const item = this.categories.findByName(name);
+            assert(item, `Category '${name}' not found`);
+            return (returnIds) ? item.id : item;
+        });
+    }
+
+    /**
      * Transactions
      */
 
@@ -746,6 +872,13 @@ export class AppState {
             }
         }
 
+        if (params.category_id !== 0) {
+            const category = this.categories.getItem(params.category_id);
+            if (!category) {
+                return false;
+            }
+        }
+
         if ('date' in params && !checkDate(params.date)) {
             return false;
         }
@@ -793,6 +926,9 @@ export class AppState {
         const res = copyObject(params);
         if (!res.date) {
             res.date = App.dates.now;
+        }
+        if (typeof res.category_id !== 'number') {
+            res.category_id = 0;
         }
         if (!res.comment) {
             res.comment = '';

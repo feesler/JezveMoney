@@ -7,6 +7,7 @@ import {
 import { Tile } from './Tile.js';
 import { AccountsList } from '../../model/AccountsList.js';
 import { PersonsList } from '../../model/PersonsList.js';
+import { CategoryList } from '../../model/CategoryList.js';
 
 export class TilesList extends TestComponent {
     get items() {
@@ -63,43 +64,43 @@ export class TilesList extends TestComponent {
         assert.instanceOf(accountsList, AccountsList, 'Invalid data');
 
         const visibleAccounts = accountsList.getVisible(true);
-        const res = {
+        return {
             items: visibleAccounts.map(Tile.renderAccount),
         };
-
-        return res;
     }
 
     static renderHiddenAccounts(accountsList) {
         assert.instanceOf(accountsList, AccountsList, 'Invalid data');
 
         const hiddenAccounts = accountsList.getHidden(true);
-        const res = {
+        return {
             items: hiddenAccounts.map(Tile.renderAccount),
         };
-
-        return res;
     }
 
     static renderPersons(personsList, withDebts) {
         assert.instanceOf(personsList, PersonsList, 'Invalid data');
 
         const visiblePersons = personsList.getVisible(true);
-        const res = {
+        return {
             items: visiblePersons.map((p) => Tile.renderPerson(p, withDebts)),
         };
+    }
 
-        return res;
+    static renderCategories(categories) {
+        assert.instanceOf(categories, CategoryList, 'Invalid data');
+
+        return {
+            items: categories.map((c) => Tile.renderCategory(c)),
+        };
     }
 
     static renderHiddenPersons(personsList) {
         assert.instanceOf(personsList, PersonsList, 'Invalid data');
 
         const hiddenPersons = personsList.getHidden(true);
-        const res = {
+        return {
             items: hiddenPersons.map((p) => Tile.renderPerson(p, false)),
         };
-
-        return res;
     }
 }

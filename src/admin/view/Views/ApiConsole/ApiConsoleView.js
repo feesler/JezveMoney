@@ -68,6 +68,7 @@ class AdminApiConsoleView extends AdminView {
         this.initCommonForms();
         this.initAccountForms();
         this.initPersonForms();
+        this.initCategoryForms();
         this.initTransactionForms();
         this.initTemplateForms();
         this.initRuleForms();
@@ -168,6 +169,46 @@ class AdminApiConsoleView extends AdminView {
             throw new Error('Fail to init view');
         }
         setEvents(delpersonbtn, { click: (e) => this.onDeleteItemsSubmit(e, 'delpersons', 'person/delete') });
+    }
+
+    /** Initialization of forms for Category API controller */
+    initCategoryForms() {
+        const listCategoriesForm = document.querySelector('#listCategoriesForm > form');
+        if (!listCategoriesForm) {
+            throw new Error('Fail to init view');
+        }
+        setEvents(listCategoriesForm, {
+            submit: this.getVerifyHandler(apiTypes.isCategoriesArray),
+        });
+        this.initCheckboxes(listCategoriesForm);
+
+        const readCategoryBtn = ge('readCategoryBtn');
+        if (!readCategoryBtn) {
+            throw new Error('Fail to init view');
+        }
+        setEvents(readCategoryBtn, {
+            click: (e) => (
+                this.onReadItemsSubmit(e, 'read_category_id', 'category/', apiTypes.isCategoriesArray)
+            ),
+        });
+
+        const createCategoryForm = document.querySelector('#createCategoryForm > form');
+        if (!createCategoryForm) {
+            throw new Error('Fail to init view');
+        }
+        setEvents(createCategoryForm, { submit: this.getVerifyHandler(apiTypes.isCreateResult) });
+
+        const updateCategoryForm = document.querySelector('#updateCategoryForm > form');
+        if (!updateCategoryForm) {
+            throw new Error('Fail to init view');
+        }
+        setEvents(updateCategoryForm, { submit: (e) => this.onFormSubmit(e) });
+
+        const delCategoriesBtn = ge('delCategoriesBtn');
+        if (!delCategoriesBtn) {
+            throw new Error('Fail to init view');
+        }
+        setEvents(delCategoriesBtn, { click: (e) => this.onDeleteItemsSubmit(e, 'delCategories', 'category/delete') });
     }
 
     /** Initialization of forms for Transaction API controller */

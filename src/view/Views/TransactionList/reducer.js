@@ -102,6 +102,14 @@ const slice = createSlice({
         },
     }),
 
+    changeCategoriesFilter: (state, categories) => ({
+        ...state,
+        form: {
+            ...state.form,
+            category_id: categories,
+        },
+    }),
+
     changeSearchQuery: (state, value) => {
         if (state.form.search === value) {
             return state;

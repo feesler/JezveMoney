@@ -19,6 +19,7 @@ import {
     IMPORT_ACTION_SET_SRC_AMOUNT,
     IMPORT_ACTION_SET_DEST_AMOUNT,
     IMPORT_ACTION_SET_COMMENT,
+    IMPORT_ACTION_SET_CATEGORY,
 } from '../../../model/ImportAction.js';
 import { api } from '../../../model/api.js';
 import * as ImportTests from '../../../run/import/index.js';
@@ -31,6 +32,7 @@ export class ImportRulesStory extends TestStory {
         await App.scenario.resetData({
             accounts: true,
             persons: true,
+            categories: true,
             transactions: true,
             importtpl: true,
             importrules: true,
@@ -38,6 +40,7 @@ export class ImportRulesStory extends TestStory {
 
         await App.scenario.createAccounts();
         await App.scenario.createPersons();
+        await App.scenario.createCategories();
         await App.scenario.createCsvFiles();
         await App.scenario.createImportTemplates();
 
@@ -329,6 +332,10 @@ export class ImportRulesStory extends TestStory {
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_PERSON },
             { action: 'changePerson', data: App.scenario.MARIA },
+        ]);
+        await ImportTests.createRuleAction([
+            { action: 'changeAction', data: IMPORT_ACTION_SET_CATEGORY },
+            { action: 'changeCategory', data: App.scenario.TRANSPORT_CATEGORY },
         ]);
         await ImportTests.createRuleAction([
             { action: 'changeAction', data: IMPORT_ACTION_SET_COMMENT },

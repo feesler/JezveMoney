@@ -5,6 +5,10 @@ import { copyObject } from 'jezvejs';
  * @param {object[]} props - array of list items
  */
 export class List {
+    static create(props) {
+        return new this(props);
+    }
+
     constructor(props) {
         let data;
         if (props instanceof List) {
@@ -14,11 +18,6 @@ export class List {
         }
 
         this.setData(data);
-    }
-
-    /** Static alias for List constructor */
-    static create(props) {
-        return new List(props);
     }
 
     get length() {

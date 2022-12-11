@@ -25,8 +25,10 @@ const TYPE_COLUMN_CLASS = 'type-col';
 const TYPE_FIELD_CLASS = 'type-field';
 const ACCOUNT_FIELD_CLASS = 'account-field';
 const PERSON_FIELD_CLASS = 'person-field';
-const AMOUNT_FIELD_CLASS = 'amount-field';
+const SRC_AMOUNT_FIELD_CLASS = 'amount-field src-amount-field';
+const DEST_AMOUNT_FIELD_CLASS = 'amount-field dest-amount-field';
 const DATE_FIELD_CLASS = 'date-field';
+const CATEGORY_FIELD_CLASS = 'category-field';
 const COMMENT_FIELD_CLASS = 'comment-field';
 /* Field values */
 const TYPE_CLASS = 'import-item__type';
@@ -34,6 +36,7 @@ const ACCOUNT_CLASS = 'import-item__account';
 const PERSON_CLASS = 'import-item__person';
 const AMOUNT_CLASS = 'import-item__amount';
 const DATE_CLASS = 'import-item__date';
+const CATEGORY_CLASS = 'import-item__category';
 const COMMENT_CLASS = 'import-item__comment';
 /* Controls */
 const CONTROLS_CLASS = 'controls';
@@ -109,14 +112,14 @@ export class ImportTransactionItem extends Component {
         this.srcAmountField = Field.create({
             title: 'Amount',
             content: this.srcAmountTitle,
-            className: AMOUNT_FIELD_CLASS,
+            className: SRC_AMOUNT_FIELD_CLASS,
         });
 
         this.destAmountTitle = createElement('span', { props: { className: AMOUNT_CLASS } });
         this.destAmountField = Field.create({
             title: 'Destination amount',
             content: this.destAmountTitle,
-            className: AMOUNT_FIELD_CLASS,
+            className: DEST_AMOUNT_FIELD_CLASS,
         });
 
         this.dateTitle = createElement('span', { props: { className: DATE_CLASS } });
@@ -124,6 +127,13 @@ export class ImportTransactionItem extends Component {
             title: 'Date',
             content: this.dateTitle,
             className: DATE_FIELD_CLASS,
+        });
+
+        this.categoryTitle = createElement('span', { props: { className: CATEGORY_CLASS } });
+        this.categoryField = Field.create({
+            title: 'Category',
+            content: this.categoryTitle,
+            className: CATEGORY_FIELD_CLASS,
         });
 
         this.commentTitle = createElement('span', { props: { className: COMMENT_CLASS } });
@@ -135,6 +145,7 @@ export class ImportTransactionItem extends Component {
 
         this.topRow = createContainer(ROW_CLASS, [
             this.dateField.elem,
+            this.categoryField.elem,
             this.commentField.elem,
         ]);
 
@@ -305,6 +316,19 @@ export class ImportTransactionItem extends Component {
 
         // Date field
         this.dateTitle.textContent = transaction.date;
+
+        // Category field
+        if (transaction.categoryId === 0) {
+            this.categoryTitle.textContent = '';
+        } else {
+            const { categories } = window.app.model;
+            const category = categories.getItem(transaction.categoryId);
+            if (!category) {
+                throw new Error('invalid category');
+            }
+
+            this.categoryTitle.textContent = category.name;
+        }
 
         // Comment field
         this.commentTitle.textContent = transaction.comment;

@@ -489,6 +489,14 @@ label {
   --dd-active-selection-bg: var(--dd-active-bg);
 }
 
+.dd__list-group {
+  padding-left: 12px;
+
+  .dd__list-group__label {
+    padding: 0;
+  }
+}
+
 /* Stretching DropDown */
 .dd_fullwidth {
   display: flex;

@@ -73,6 +73,7 @@ class TransactionModel extends CachedTable
 
         $this->accModel = AccountModel::getInstance();
         $this->currMod = CurrencyModel::getInstance();
+        $this->catModel = CategoryModel::getInstance();
     }
 
 
@@ -96,6 +97,7 @@ class TransactionModel extends CachedTable
         $res->src_curr = intval($row["src_curr"]);
         $res->dest_curr = intval($row["dest_curr"]);
         $res->date = strtotime($row["date"]);
+        $res->category_id = intval($row["category_id"]);
         $res->comment = $row["comment"];
         $res->pos = intval($row["pos"]);
         $res->createdate = strtotime($row["createdate"]);
@@ -123,6 +125,7 @@ class TransactionModel extends CachedTable
             "src_curr",
             "dest_curr",
             "date",
+            "category_id",
             "comment"
         ];
         $res = [];
@@ -209,6 +212,11 @@ class TransactionModel extends CachedTable
         }
         $destAmount = (isset($res["dest_amount"])) ? $res["dest_amount"] : $item->dest_amount;
 
+        $res["category_id"] = (isset($params["category_id"])) ? intval($params["category_id"]) : 0;
+        if ($res["category_id"] !== 0 && !$this->catModel->isExist($res["category_id"])) {
+            throw new \Error("Invalid category_id specified");
+        }
+
         if (isset($params["src_curr"])) {
             $res["src_curr"] = intval($params["src_curr"]);
             if (
@@ -261,6 +269,7 @@ class TransactionModel extends CachedTable
             "src_curr",
             "dest_curr",
             "date",
+            "category_id",
             "comment"
         ];
 
@@ -313,6 +322,7 @@ class TransactionModel extends CachedTable
         }
 
         $res["date"] = $params["date"];
+        $res["category_id"] = $params["category_id"];
         $res["comment"] = $params["comment"];
 
         return $res;
@@ -1120,6 +1130,28 @@ class TransactionModel extends CachedTable
     }
 
 
+    // Update transactions with removed categories
+    public function onCategoryDelete($categories)
+    {
+        if (is_null($categories)) {
+            return false;
+        }
+
+        $updRes = $this->dbObj->updateQ(
+            $this->tbl_name,
+            ["category_id" => 0],
+            "category_id" . inSetCondition($categories)
+        );
+        if (!$updRes) {
+            return false;
+        }
+
+        $this->cleanCache();
+
+        return true;
+    }
+
+
     // Return condition string for list of accounts
     private function getAccCondition($accounts = null)
     {
@@ -1139,9 +1171,7 @@ class TransactionModel extends CachedTable
             return null;
         }
 
-        if (!is_array($persons)) {
-            $persons = [$persons];
-        }
+        $persons = asArray($persons);
         $res = [];
         foreach ($persons as $personId) {
             $accounts = $this->accModel->getData(["owner" => $personId]);
@@ -1158,6 +1188,47 @@ class TransactionModel extends CachedTable
     }
 
 
+    // Return list of categories and all of its child categories
+    private function getCategoriesSet($categories = null)
+    {
+        if (is_null($categories)) {
+            return null;
+        }
+
+        $categories = asArray($categories);
+        $res = [];
+        foreach ($categories as $categoryId) {
+            $res[] = intval($categoryId);
+
+            if ($categoryId === 0) {
+                continue;
+            }
+
+            $children = $this->catModel->getData([
+                "parent_id" => $categoryId,
+                "returnIds" => true,
+            ]);
+            if (is_array($children)) {
+                array_push($res, ...$children);
+            }
+        }
+
+        return $res;
+    }
+
+
+    // Return condition string for list of categories
+    private function getCategoryCondition($categories = null)
+    {
+        $setCond = inSetCondition($categories, false);
+        if (is_null($setCond)) {
+            return null;
+        }
+
+        return "category_id" . $setCond;
+    }
+
+
     // Return condition string for list of types
     private function getTypeCondition($types = null)
     {
@@ -1168,6 +1239,7 @@ class TransactionModel extends CachedTable
 
         return "type" . $setCond;
     }
+
 
     // Convert request object to transaction request parameters
     public function getRequestFilters($request, $defaults = [], $throw = false)
@@ -1235,6 +1307,23 @@ class TransactionModel extends CachedTable
             }
         }
 
+        // Categories filter
+        $categoryFilter = [];
+        if (isset($request["category_id"])) {
+            $categoriesReq = asArray($request["category_id"]);
+            foreach ($categoriesReq as $category_id) {
+                $category_id = intval($category_id);
+                if ($category_id === 0 || $this->catModel->isExist($category_id)) {
+                    $categoryFilter[] = $category_id;
+                } elseif ($throw) {
+                    throw new \Error("Invalid category '$category_id'");
+                }
+            }
+            if (count($categoryFilter) > 0) {
+                $res["categories"] = $categoryFilter;
+            }
+        }
+
         // Search query
         if (isset($request["search"]) && !is_null($request["search"])) {
             $res["search"] = $request["search"];
@@ -1299,6 +1388,15 @@ class TransactionModel extends CachedTable
             $res["person_id"] = $params["persons"];
         }
 
+        // Categories
+        if (
+            isset($params["categories"]) &&
+            is_array($params["categories"]) &&
+            count($params["categories"]) > 0
+        ) {
+            $res["category_id"] = $params["categories"];
+        }
+
         // Date range
         if (isset($params["startDate"]) && $params["endDate"]) {
             $res["stdate"] = $params["startDate"];
@@ -1355,6 +1453,17 @@ class TransactionModel extends CachedTable
             $accCond = $this->getAccCondition($accountsToFilter);
             if (!is_empty($accCond)) {
                 $res[] = $accCond;
+            }
+        }
+
+        // Categories filter condition
+        if (isset($params["categories"]) && !is_null($params["categories"])) {
+            $categoriesSet = $this->getCategoriesSet($params["categories"]);
+            if (is_array($categoriesSet) && count($categoriesSet) > 0) {
+                $catCond = $this->getCategoryCondition($categoriesSet);
+                if (!is_empty($catCond)) {
+                    $res[] = $catCond;
+                }
             }
         }
 

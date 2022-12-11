@@ -129,13 +129,13 @@ function valuesJoin($values)
 
 // Return right part of query condition to check field equal id or in set of ids
 // Zero values are omitted. In case no valid values found NULL is returned
-function inSetCondition($ids)
+function inSetCondition($ids, $skipZero = true)
 {
     if (is_null($ids)) {
         return null;
     }
 
-    $validIds = skipZeros($ids);
+    $validIds = ($skipZero) ? skipZeros($ids) : $ids;
     if (!is_array($validIds) || !count($validIds)) {
         return null;
     }

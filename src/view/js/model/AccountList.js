@@ -6,11 +6,6 @@ import { Account } from './Account.js';
  * @param {object[]} props - array of accounts
  */
 export class AccountList extends List {
-    /** Static alias for AccountList constructor */
-    static create(props) {
-        return new AccountList(props);
-    }
-
     /**
      * Create list item from specified object
      * @param {Object} obj

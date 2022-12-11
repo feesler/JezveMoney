@@ -217,6 +217,19 @@ class ImportRuleModel extends CachedTable
         return $res;
     }
 
+    // Delete conditions and actions related to removed categories
+    public function onCategoryDelete($categories)
+    {
+        if (is_null($categories)) {
+            return false;
+        }
+
+        $res = $this->actionModel->deleteCategoryActions($categories)
+            && $this->removeEmptyRules();
+
+        return $res;
+    }
+
     // Delete all import rules of user
     public function reset()
     {

@@ -32,6 +32,14 @@ const create = async () => {
         ],
     }, {
         flags: 0,
+        conditions: [
+            conditions.comment.includes.value('ANOTHER BANK'),
+        ],
+        actions: [
+            actions.setCategory(App.scenario.INVEST_CATEGORY),
+        ],
+    }, {
+        flags: 0,
         conditions: [taxiCondition],
         actions: [taxiAction],
     }, {

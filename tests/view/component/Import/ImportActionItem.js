@@ -58,6 +58,13 @@ export class ImportActionItem extends TestComponent {
             assert(person, `Person not found: '${value}'`);
 
             res.value = person.id;
+        } else if (ImportAction.isCategoryValue(actionType.id)) {
+            const category = (value.length === 0)
+                ? { id: 0 }
+                : App.state.categories.findByName(value);
+            assert(category, `Category not found: '${value}'`);
+
+            res.value = category.id;
         } else if (ImportAction.isAmountValue(actionType.id)) {
             const amount = parseFloat(value);
             assert(
@@ -99,6 +106,14 @@ export class ImportActionItem extends TestComponent {
             assert(person, `Person not found: '${model.value}'`);
 
             value = person.name;
+        } else if (ImportAction.isCategoryValue(actionType.id)) {
+            const categoryId = parseInt(model.value, 10);
+            const category = App.state.categories.getItem(model.value);
+            if (categoryId !== 0) {
+                assert(category, `Category not found: '${model.value}'`);
+            }
+
+            value = (categoryId !== 0) ? category.name : '';
         } else if (ImportAction.isAmountValue(actionType.id)) {
             const amount = parseFloat(model.value);
             assert(

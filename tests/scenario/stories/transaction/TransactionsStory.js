@@ -29,10 +29,12 @@ export class TransactionsStory extends TestStory {
         await App.scenario.resetData({
             accounts: true,
             persons: true,
+            categories: true,
         });
 
         await App.scenario.createAccounts();
         await App.scenario.createPersons();
+        await App.scenario.createCategories();
 
         const [hiddenAccountInd] = App.state.getAccountIndexesByNames(HIDDEN_ACCOUNT_NAME);
         assert(hiddenAccountInd !== -1, `Account '${HIDDEN_ACCOUNT_NAME}' not found`);
@@ -97,17 +99,24 @@ export class TransactionsStory extends TestStory {
 
     async createExpense() {
         setBlock('Create expense transactions', 1);
-        const { RUB, KRW } = App.scenario;
+        const {
+            FOOD_CATEGORY,
+            TRANSPORT_CATEGORY,
+            RUB,
+            KRW,
+        } = App.scenario;
 
         const data = [{
             fromAccount: 0,
             destAmount: '123.7801',
+            category: FOOD_CATEGORY,
             comment: 'buy',
         }, {
             fromAccount: 3,
             srcAmount: '100',
             destAmount: '7013.21',
             destCurr: RUB,
+            category: TRANSPORT_CATEGORY,
         }, {
             fromAccount: 1,
             destAmount: '0.01',
@@ -152,7 +161,7 @@ export class TransactionsStory extends TestStory {
     async createIncome() {
         setBlock('Create income transactions', 1);
 
-        const { USD, KRW } = App.scenario;
+        const { INVEST_CATEGORY, USD, KRW } = App.scenario;
         const data = [{
             fromAccount: 0,
             srcAmount: '10023.7801',
@@ -163,10 +172,12 @@ export class TransactionsStory extends TestStory {
             srcAmount: '7013.21',
             destAmount: '100',
             srcCurr: USD,
+            category: INVEST_CATEGORY,
         }, {
             fromAccount: 1,
             srcAmount: '0.01',
             date: App.dates.weekAgo,
+            category: INVEST_CATEGORY,
         }, {
             fromAccount: 1,
             destAcc: 4,
@@ -315,10 +326,11 @@ export class TransactionsStory extends TestStory {
     async updateExpense() {
         setBlock('Update expense transactions', 2);
 
-        const { USD } = App.scenario;
+        const { CAFE_CATEGORY, USD } = App.scenario;
         const data = [{
             pos: 3,
             destAmount: '124.7701',
+            category: CAFE_CATEGORY,
         }, {
             pos: 0,
             srcAmount: '101',
@@ -346,11 +358,12 @@ export class TransactionsStory extends TestStory {
     async updateIncome() {
         setBlock('Update income transactions', 2);
 
-        const { USD } = App.scenario;
+        const { TAXES_CATEGORY, USD } = App.scenario;
         const data = [{
             pos: 1,
             srcAmount: '100.001',
             date: App.dates.weekAgo,
+            category: TAXES_CATEGORY,
         }, {
             pos: 2,
             srcAmount: '0.02',
@@ -577,6 +590,7 @@ export class TransactionsStory extends TestStory {
             src_curr: RUB,
             dest_curr: RUB,
             date: '22.05.2022',
+            category_id: 0,
             comment: '',
         });
 

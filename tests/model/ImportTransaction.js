@@ -50,6 +50,7 @@ export class ImportTransaction {
             mainAccount,
             type: (data.accountAmount < 0) ? 'expense' : 'income',
             date: data.date,
+            category_id: 0,
             comment: data.comment,
             original: data,
         });
@@ -131,6 +132,7 @@ export class ImportTransaction {
             'dest_amount',
             'person_id',
             'date',
+            'category_id',
             'comment',
         ];
 
@@ -449,6 +451,7 @@ export class ImportTransaction {
         }
 
         this.date = this.original.date;
+        this.category_id = 0;
         this.comment = this.original.comment;
 
         this.rulesApplied = false;
@@ -461,6 +464,7 @@ export class ImportTransaction {
             src_curr: this.src_curr,
             dest_curr: this.dest_curr,
             date: this.date,
+            category_id: this.category_id,
             comment: this.comment,
         };
 

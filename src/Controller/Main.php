@@ -8,6 +8,7 @@ use JezveMoney\App\Model\AccountModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Item\TransactionItem;
+use JezveMoney\App\Model\CategoryModel;
 
 class Main extends TemplateController
 {
@@ -21,6 +22,7 @@ class Main extends TemplateController
         $accMod = AccountModel::getInstance();
         $transMod = TransactionModel::getInstance();
         $currMod = CurrencyModel::getInstance();
+        $catModel = CategoryModel::getInstance();
 
         $accounts = $accMod->getData();
         $data["tilesArr"] = [];
@@ -116,6 +118,7 @@ class Main extends TemplateController
             "profile" => $this->getProfileData(),
             "accounts" => $accMod->getData(["visibility" => "all", "owner" => "all"]),
             "persons" => $this->personMod->getData(["visibility" => "all"]),
+            "categories" => $catModel->getData(),
             "currency" => $currMod->getData(),
             "view" => [
                 "transactions" => $transactions,

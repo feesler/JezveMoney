@@ -10,6 +10,7 @@ use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\IconModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Item\TransactionItem;
+use JezveMoney\App\Model\CategoryModel;
 
 const MSG_ACCOUNT_NOT_AVAILABLE = "You have no accounts. Please create one.";
 const MSG_DEBT_ACCOUNT_NOT_AVAILABLE = "No accounts available";
@@ -28,6 +29,7 @@ class Transactions extends TemplateController
         $this->model = TransactionModel::getInstance();
         $this->accModel = AccountModel::getInstance();
         $this->currModel = CurrencyModel::getInstance();
+        $this->catModel = CategoryModel::getInstance();
     }
 
 
@@ -132,6 +134,7 @@ class Transactions extends TemplateController
             "accounts" => $this->accModel->getData(["owner" => "all", "visibility" => "all"]),
             "persons" => $this->personMod->getData(["visibility" => "all"]),
             "currency" => $this->currModel->getData(),
+            "categories" => $this->catModel->getData(),
             "view" => [
                 "transArr" => $trItems,
                 "filter" => (object)$filterObj,
@@ -350,8 +353,9 @@ class Transactions extends TemplateController
             "type" => $this->getRequestedType($_GET, EXPENSE),
             "src_amount" => 0,
             "dest_amount" => 0,
-            "comment" => "",
-            "date" => strtotime(date("d.m.Y"))
+            "date" => strtotime(date("d.m.Y")),
+            "category_id" => 0,
+            "comment" => ""
         ];
 
         // Check availability of selected type of transaction
@@ -641,6 +645,7 @@ class Transactions extends TemplateController
             "currency" => $this->currModel->getData(),
             "icons" => $iconModel->getData(),
             "persons" => $this->personMod->getData(["visibility" => "all"]),
+            "categories" => $this->catModel->getData(),
             "view" => [
                 "mode" => $this->action,
                 "transaction" => $tr,
@@ -912,6 +917,7 @@ class Transactions extends TemplateController
             "currency" => $this->currModel->getData(),
             "icons" => $iconModel->getData(),
             "persons" => $this->personMod->getData(["visibility" => "all"]),
+            "categories" => $this->catModel->getData(),
             "view" => [
                 "mode" => $this->action,
                 "transaction" => $tr,

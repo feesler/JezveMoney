@@ -47,6 +47,7 @@ export const createImportRules = async () => {
             actions.setTransactionType('debtfrom'),
             actions.setPerson(App.scenario.MARIA),
             actions.setComment('Taxi for Maria'),
+            actions.setCategory(App.scenario.TRANSPORT_CATEGORY),
         ],
     }, {
         flags: 0,

@@ -11,7 +11,7 @@ class DBVersion
     use Singleton;
 
     protected $tbl_name = "dbver";
-    protected $latestVersion = 12;
+    protected $latestVersion = 13;
     protected $dbClient = null;
     protected $tables = [
         "accounts",
@@ -25,6 +25,7 @@ class DBVersion
         "import_tpl",
         "persons",
         "transactions",
+        "categories",
         "users"
     ];
 
@@ -48,6 +49,7 @@ class DBVersion
             $this->createAccountsTable();
             $this->createPersonsTable();
             $this->createTransactionsTable();
+            $this->createCategoriesTable();
             $this->createUsersTable();
             $this->createIconTable();
             $this->createImportTemplateTable();
@@ -175,6 +177,9 @@ class DBVersion
             }
             if ($current < 12) {
                 $current = $this->version12();
+            }
+            if ($current < 13) {
+                $current = $this->version13();
             }
 
             $this->setVersion($current);
@@ -415,6 +420,36 @@ class DBVersion
     }
 
 
+    private function version13()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $this->createCategoriesTable();
+
+        $tableName = "transactions";
+        $columns = $this->dbClient->getColumns($tableName);
+        if (!$columns) {
+            throw new \Error("Fail to obtian columns of '$tableName' table");
+        }
+
+        if (!isset($columns["category_id"])) {
+            $res = $this->dbClient->addColumns($tableName, ["category_id" => "INT(11) NOT NULL"]);
+            if (!$res) {
+                throw new \Error("Fail to update '$tableName' table");
+            }
+
+            $res = $this->dbClient->addKeys($tableName, ["category_id" => "category_id"]);
+            if (!$res) {
+                throw new \Error("Fail to update '$tableName' table");
+            }
+        }
+
+        return 13;
+    }
+
+
     private function createCurrencyTable()
     {
         if (!$this->dbClient) {
@@ -534,6 +569,35 @@ class DBVersion
                 "`updatedate` DATETIME NOT NULL, " .
                 "`src_result` DECIMAL(15,2) NOT NULL, " .
                 "`dest_result` DECIMAL(15,2) NOT NULL, " .
+                "PRIMARY KEY (`id`)",
+            TABLE_OPTIONS
+        );
+        if (!$res) {
+            throw new \Error("Fail to create table '$tableName'");
+        }
+    }
+
+
+    private function createCategoriesTable()
+    {
+        if (!$this->dbClient) {
+            throw new \Error("Invalid DB client");
+        }
+
+        $tableName = "categories";
+        if ($this->dbClient->isTableExist($tableName)) {
+            return;
+        }
+
+        $res = $this->dbClient->createTableQ(
+            $tableName,
+            "`id` INT(11) NOT NULL AUTO_INCREMENT, " .
+                "`user_id` INT(11) NOT NULL, " .
+                "`parent_id` INT(11) NOT NULL, " .
+                "`type` INT(11) NOT NULL, " .
+                "`name` VARCHAR(255) NOT NULL, " .
+                "`createdate` DATETIME NOT NULL, " .
+                "`updatedate` DATETIME NOT NULL, " .
                 "PRIMARY KEY (`id`)",
             TABLE_OPTIONS
         );

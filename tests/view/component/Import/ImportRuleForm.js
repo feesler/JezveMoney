@@ -352,6 +352,13 @@ export class ImportRuleForm extends TestComponent {
             return person.id;
         }
 
+        if (ImportAction.isCategoryValue(type)) {
+            const category = App.state.categories.getItemByIndex(0);
+            assert(category, 'No categories available');
+
+            return category.id;
+        }
+
         return '';
     }
 
@@ -618,6 +625,9 @@ export class ImportRuleForm extends TestComponent {
         if (action === 'changePerson') {
             return this.changeActionPerson(index, data);
         }
+        if (action === 'changeCategory') {
+            return this.changeActionCategory(index, data);
+        }
         if (action === 'inputAmount') {
             return this.inputActionAmount(index, data);
         }
@@ -706,6 +716,10 @@ export class ImportRuleForm extends TestComponent {
 
     async changeActionPerson(index, value) {
         return this.changeActionValue(index, 'person', value);
+    }
+
+    async changeActionCategory(index, value) {
+        return this.changeActionValue(index, 'category', value);
     }
 
     async inputActionAmount(index, value) {

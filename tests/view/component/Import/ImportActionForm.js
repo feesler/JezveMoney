@@ -16,12 +16,14 @@ import {
     IMPORT_ACTION_SET_SRC_AMOUNT,
     IMPORT_ACTION_SET_DEST_AMOUNT,
     IMPORT_ACTION_SET_COMMENT,
+    IMPORT_ACTION_SET_CATEGORY,
 } from '../../../model/ImportAction.js';
 
 const actionValueTypes = [
     'transType',
     'account',
     'person',
+    'category',
     'amount',
     'text',
 ];
@@ -33,6 +35,7 @@ const actionValueMap = {
     [IMPORT_ACTION_SET_SRC_AMOUNT]: 'amount',
     [IMPORT_ACTION_SET_DEST_AMOUNT]: 'amount',
     [IMPORT_ACTION_SET_COMMENT]: 'text',
+    [IMPORT_ACTION_SET_CATEGORY]: 'category',
 };
 
 const fieldSelectors = [
@@ -40,6 +43,7 @@ const fieldSelectors = [
     '.trans-type-field',
     '.account-field',
     '.person-field',
+    '.category-field',
     '.amount-field',
     '.action-value-field',
 ];
@@ -58,6 +62,7 @@ export class ImportActionForm extends TestComponent {
             res.transTypeField,
             res.accountField,
             res.personField,
+            res.categoryField,
             res.amountField,
             res.textField,
         ] = await asyncMap(
@@ -70,6 +75,7 @@ export class ImportActionForm extends TestComponent {
             && res.transTypeField
             && res.accountField
             && res.personField
+            && res.categoryField
             && res.amountField
             && res.textField
             && res.deleteBtn.elem,
@@ -128,6 +134,7 @@ export class ImportActionForm extends TestComponent {
             transType: cont.transTypeField.value,
             account: parseInt(cont.accountField.value, 10),
             person: parseInt(cont.personField.value, 10),
+            category: parseInt(cont.categoryField.value, 10),
             amount: cont.amountField.value,
             text: cont.textField.value,
         };
@@ -194,6 +201,10 @@ export class ImportActionForm extends TestComponent {
 
     async changePerson(value) {
         return this.changeValue('person', value);
+    }
+
+    async changeCategory(value) {
+        return this.changeValue('category', value);
     }
 
     async inputAmount(value) {

@@ -11,6 +11,7 @@ $router->setRoutes([
     "main" => "Main",
     "accounts" => "Accounts",
     "persons" => "Persons",
+    "categories" => "Categories",
     "transactions" => "Transactions",
     "profile" => "Profile",
     "statistics" => "Statistics",

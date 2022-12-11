@@ -20,6 +20,7 @@ class Transaction extends ApiListController
         "src_curr",
         "dest_curr",
         "date",
+        "category_id",
         "comment"
     ];
     protected $debtRequiredFields = [
@@ -32,6 +33,7 @@ class Transaction extends ApiListController
         "src_curr",
         "dest_curr",
         "date",
+        "category_id",
         "comment"
     ];
 

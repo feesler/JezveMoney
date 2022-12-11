@@ -72,6 +72,10 @@ export class InputRow extends TestComponent {
         return this.content.currSign;
     }
 
+    get isInvalid() {
+        return (this.content.validationEnabled) ? this.content.isInvalid : false;
+    }
+
     async input(val) {
         return input(this.content.valueInput, val.toString());
     }

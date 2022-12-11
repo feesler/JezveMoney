@@ -21,7 +21,9 @@ const CONTENT_CLASS = 'trans-item__content';
 const TITLE_CLASS = 'trans-item__title';
 const AMOUNT_CLASS = 'trans-item__amount';
 const DATE_CLASS = 'trans-item__date';
+const CATEGORY_CLASS = 'trans-item__category';
 const COMMENT_CLASS = 'trans-item__comment';
+const AMOUNT_CATEGORY_CLASS = 'trans-item__amount-category';
 const DATE_COMMENT_CLASS = 'trans-item__date-comment';
 /* Details mode */
 const DETAILS_CLASS = 'trans-item_details';
@@ -35,6 +37,7 @@ const TITLE_FIELD_CLASS = 'trans-item__account-field';
 const AMOUNT_FIELD_CLASS = 'trans-item__amount-field';
 const RESULT_FIELD_CLASS = 'trans-item__result-field';
 const DATE_FIELD_CLASS = 'trans-item__date-field';
+const CATEGORY_FIELD_CLASS = 'trans-item__category-field';
 const COMMENT_FIELD_CLASS = 'trans-item__comment-field';
 /* Select controls */
 const SELECT_CONTROLS_CLASS = 'trans-item__select';
@@ -54,6 +57,7 @@ const LABEL_RESULT = 'Result';
 const LABEL_SRC_RESULT = 'Source result';
 const LABEL_DEST_RESULT = 'Destination result';
 const LABEL_DATE = 'Date';
+const LABEL_CATEGORY = 'Category';
 const LABEL_COMMENT = 'Comment';
 
 const defaultProps = {
@@ -99,14 +103,26 @@ export class TransactionListItem extends Component {
     initClassic() {
         this.titleElem = createElement('div', { props: { className: TITLE_CLASS } });
         this.amountElem = createElement('div', { props: { className: AMOUNT_CLASS } });
+        this.categoryElem = createElement('div', { props: { className: CATEGORY_CLASS } });
+        const amountCategoryElem = createElement('div', {
+            props: { className: AMOUNT_CATEGORY_CLASS },
+            children: [
+                this.amountElem,
+                this.categoryElem,
+            ],
+        });
+
         this.dateElem = createElement('div', { props: { className: DATE_CLASS } });
         this.commentElem = createElement('div', { props: { className: COMMENT_CLASS } });
         const dateCommentElem = createElement('div', {
             props: { className: DATE_COMMENT_CLASS },
-            children: [this.dateElem, this.commentElem],
+            children: [
+                this.dateElem,
+                this.commentElem,
+            ],
         });
 
-        this.contentElem.append(this.titleElem, this.amountElem, dateCommentElem);
+        this.contentElem.append(this.titleElem, amountCategoryElem, dateCommentElem);
     }
 
     initDetails() {
@@ -161,6 +177,13 @@ export class TransactionListItem extends Component {
             content: this.dateElem,
             className: DATE_FIELD_CLASS,
         });
+        // Category
+        this.categoryElem = createElement('div', { props: { className: CATEGORY_CLASS } });
+        this.categoryField = Field.create({
+            title: LABEL_CATEGORY,
+            content: this.categoryElem,
+            className: CATEGORY_FIELD_CLASS,
+        });
         // Comment
         this.commentElem = createElement('div', { props: { className: COMMENT_CLASS } });
         this.commentField = Field.create({
@@ -170,7 +193,11 @@ export class TransactionListItem extends Component {
 
         const dateCommentGroup = createElement('div', {
             props: { className: DATE_COMMENT_CLASS },
-            children: [this.dateField.elem, this.commentField.elem],
+            children: [
+                this.dateField.elem,
+                this.categoryField.elem,
+                this.commentField.elem,
+            ],
         });
 
         this.contentElem.append(
@@ -193,9 +220,11 @@ export class TransactionListItem extends Component {
         this.srcResultField = null;
         this.destResultField = null;
         this.dateField = null;
+        this.categoryField = null;
         this.commentField = null;
         // Common
         this.dateElem = null;
+        this.categoryElem = null;
         this.commentElem = null;
     }
 
@@ -328,6 +357,21 @@ export class TransactionListItem extends Component {
             : `${sign}${srcAmountFmt}`;
     }
 
+    getCategoryTitle(state) {
+        const { item } = state;
+        if (item.category_id === 0) {
+            return null;
+        }
+
+        const { categories } = window.app.model;
+        const category = categories.getItem(item.category_id);
+        if (!category) {
+            throw new Error('Invalid category');
+        }
+
+        return category.name;
+    }
+
     renderSelectControls(state, prevState) {
         if (state.listMode === prevState.listMode) {
             return;
@@ -358,6 +402,10 @@ export class TransactionListItem extends Component {
         this.amountElem.textContent = this.formatAmount(item);
 
         this.dateElem.textContent = item.date;
+
+        const categoryTitle = this.getCategoryTitle(state);
+        show(this.categoryElem, !!categoryTitle);
+        this.categoryElem.textContent = categoryTitle;
 
         this.commentElem.textContent = item.comment;
         this.commentElem.setAttribute('title', item.comment);
@@ -418,6 +466,10 @@ export class TransactionListItem extends Component {
 
         // Date
         this.dateField.setContent(item.date);
+
+        // Category field
+        const categoryTitle = this.getCategoryTitle(state);
+        this.categoryField.setContent(categoryTitle);
 
         // Comment
         const commentLabel = (item.comment.length > 0) ? LABEL_COMMENT : null;

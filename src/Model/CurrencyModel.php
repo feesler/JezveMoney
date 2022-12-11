@@ -9,7 +9,6 @@ use JezveMoney\Core\CachedInstance;
 use JezveMoney\App\Item\CurrencyItem;
 
 use function JezveMoney\Core\orJoin;
-use function JezveMoney\Core\qnull;
 
 class CurrencyModel extends CachedTable
 {

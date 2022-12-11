@@ -52,6 +52,8 @@ import {
     updateStateExchange,
 } from './reducer.js';
 import * as STATE from './stateId.js';
+import { CategoryList } from '../../js/model/CategoryList.js';
+import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 
 const PAGE_TITLE_UPDATE = 'Jezve Money | Edit transaction';
 const PAGE_TITLE_CREATE = 'Jezve Money | New transaction';
@@ -80,6 +82,7 @@ class TransactionView extends View {
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
         window.app.loadModel(PersonList, 'persons', window.app.props.persons);
         window.app.loadModel(IconList, 'icons', window.app.props.icons);
+        window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
 
         const currencyModel = window.app.model.currency;
         const accountModel = window.app.model.accounts;
@@ -103,10 +106,10 @@ class TransactionView extends View {
             form: {
                 sourceAmount: '',
                 destAmount: '',
-                sourceResult: '',
-                fSourceResult: null,
-                destResult: '',
-                fDestResult: null,
+                sourceResult: 0,
+                fSourceResult: 0,
+                destResult: 0,
+                fDestResult: 0,
                 exchange: 1,
                 fExchange: 1,
                 backExchange: 1,
@@ -342,6 +345,13 @@ class TransactionView extends View {
             oninput: (e) => this.onDateInput(e),
         });
 
+        this.categoryRow = ge('category_row');
+        this.categorySelect = CategorySelect.create({
+            elem: 'category',
+            className: 'dd_fullwidth',
+            onchange: (category) => this.onCategoryChanged(category),
+        });
+
         this.commentRow = ge('comment_row');
         this.commentInput = ge('comm');
         setEvents(this.commentInput, { input: (e) => this.onCommentInput(e) });
@@ -370,34 +380,6 @@ class TransactionView extends View {
 
         this.personTile = Tile.fromElement('person_tile', { parent: this });
 
-        if (transaction.type === DEBT) {
-            this.initPersonsDropDown();
-
-            const personId = transaction.person_id;
-            if (personId) {
-                this.persDDList.selectItem(personId);
-            }
-
-            if (!transaction.noAccount) {
-                this.initAccList(state);
-            }
-        }
-
-        if (transaction.type === EXPENSE || transaction.type === TRANSFER) {
-            this.initSrcAccList(state);
-        }
-
-        if (transaction.type === INCOME || transaction.type === TRANSFER) {
-            this.initDestAccList(state);
-        }
-
-        if (transaction.type === INCOME) {
-            this.initSrcCurrList(state);
-        }
-        if (transaction.type === EXPENSE) {
-            this.initDestCurrList(state);
-        }
-
         this.submitControls = ge('submit_controls');
         this.submitBtn = ge('submitBtn');
         this.cancelBtn = ge('cancelBtn');
@@ -409,6 +391,8 @@ class TransactionView extends View {
         // Check type change request
         if (state.isUpdate && transaction.type !== this.props.requestedType) {
             this.onChangeType(this.props.requestedType);
+        } else {
+            this.render(state);
         }
     }
 
@@ -789,6 +773,11 @@ class TransactionView extends View {
         this.store.dispatch(actions.dateChange(e.target.value));
     }
 
+    onCategoryChanged(category) {
+        const categoryId = parseInt(category.id, 10);
+        this.store.dispatch(actions.categoryChange(categoryId));
+    }
+
     onCommentInput(e) {
         this.store.dispatch(actions.commentChange(e.target.value));
     }
@@ -849,6 +838,7 @@ class TransactionView extends View {
             src_curr: transaction.src_curr,
             dest_curr: transaction.dest_curr,
             date: window.app.formatDate(timeToDate(state.transaction.date)),
+            category_id: transaction.category_id,
             comment: transaction.comment,
         };
 
@@ -1271,8 +1261,10 @@ class TransactionView extends View {
         );
         enable(this.swapBtn, !state.submitStarted);
 
+        // Type menu
         this.typeMenu.setActive(transaction.type);
         this.typeMenu.enable(!state.submitStarted);
+        this.typeInp.value = transaction.type;
 
         if (state.isAvailable) {
             if (transaction.type === EXPENSE) {
@@ -1293,6 +1285,7 @@ class TransactionView extends View {
         }
 
         show(this.dateRow, state.isAvailable);
+        show(this.categoryRow, state.isAvailable);
         show(this.commentRow, state.isAvailable);
         show(this.submitControls, state.isAvailable);
 
@@ -1300,86 +1293,14 @@ class TransactionView extends View {
             return;
         }
 
-        if (transaction.type === EXPENSE || transaction.type === TRANSFER) {
-            if (this.srcTile && state.srcAccount) {
-                this.srcTile.setState({ account: state.srcAccount });
-            }
-
-            this.initSrcAccList(state);
-            if (this.srcDDList && transaction.src_id) {
-                this.srcDDList.selectItem(transaction.src_id);
-            }
-            this.srcDDList?.enable(!state.submitStarted);
-        }
-
-        if (transaction.type === INCOME || transaction.type === TRANSFER) {
-            if (this.destTile && state.destAccount) {
-                this.destTile.setState({ account: state.destAccount });
-            }
-
-            this.initDestAccList(state);
-            if (this.destDDList && transaction.dest_id) {
-                this.destDDList.selectItem(transaction.dest_id);
-            }
-            this.destDDList?.enable(!state.submitStarted);
-        }
-
-        this.typeInp.value = transaction.type;
-        this.srcIdInp.value = transaction.src_id;
-        this.destIdInp.value = transaction.dest_id;
-        this.srcCurrInp.value = transaction.src_curr;
-        this.destCurrInp.value = transaction.dest_curr;
-        if (transaction.type === INCOME) {
-            this.initSrcCurrList(state);
-        }
-        if (transaction.type === EXPENSE) {
-            this.initDestCurrList(state);
-        }
-
-        const sourceAmountLbl = (state.isDiff) ? 'Source amount' : 'Amount';
-        const destAmountLbl = (state.isDiff) ? 'Destination amount' : 'Amount';
-        if (this.srcAmountRowLabel) {
-            this.srcAmountRowLabel.textContent = sourceAmountLbl;
-        }
-        if (this.destAmountRowLabel) {
-            this.destAmountRowLabel.textContent = destAmountLbl;
-        }
-
-        enable(this.srcCurrBtn, !state.submitStarted);
-        enable(this.destCurrBtn, !state.submitStarted);
-        this.setSign(this.destAmountSign, this.destCurrDDList, transaction.dest_curr);
-        this.setSign(this.srcAmountSign, this.srcCurrDDList, transaction.src_curr);
-        this.setSign(this.srcResBalanceSign, null, transaction.src_curr);
-        this.setSign(this.destResBalanceSign, null, transaction.dest_curr);
-        this.renderExchangeRate(state);
-
-        this.srcAmountInput.value = state.form.sourceAmount;
-        enable(this.srcAmountInput.elem, !state.submitStarted);
-
-        this.destAmountInput.value = state.form.destAmount;
-        enable(this.destAmountInput.elem, !state.submitStarted);
-
-        if (this.exchangeInput) {
-            this.exchangeInput.value = (state.form.useBackExchange)
-                ? state.form.backExchange
-                : state.form.exchange;
-        }
-        enable(this.exchangeInput.elem, !state.submitStarted);
-
-        if (this.srcResBalanceInput) {
-            this.srcResBalanceInput.value = state.form.sourceResult;
-        }
-        enable(this.srcResBalanceInput.elem, !state.submitStarted);
-
-        if (this.destResBalanceInput) {
-            this.destResBalanceInput.value = state.form.destResult;
-        }
-        enable(this.destResBalanceInput.elem, !state.submitStarted);
-
         const currencyModel = window.app.model.currency;
         const srcCurrency = currencyModel.getItem(transaction.src_curr);
         const destCurrency = currencyModel.getItem(transaction.dest_curr);
 
+        const sourceAmountLbl = (state.isDiff) ? 'Source amount' : 'Amount';
+        const destAmountLbl = (state.isDiff) ? 'Destination amount' : 'Amount';
+
+        // Tile info items
         if (this.srcAmountInfo) {
             const title = srcCurrency.formatValue(transaction.src_amount);
             this.srcAmountInfo.setTitle(title);
@@ -1406,17 +1327,104 @@ class TransactionView extends View {
             this.destResBalanceInfo.enable(!state.submitStarted);
         }
 
-        window.app.setValidation(this.srcAmountRow, state.validation.sourceAmount);
-        window.app.setValidation(this.destAmountRow, state.validation.destAmount);
-        window.app.setValidation(this.dateRow, state.validation.date);
+        // Source account
+        this.srcIdInp.value = transaction.src_id;
+        if (transaction.type === EXPENSE || transaction.type === TRANSFER) {
+            if (this.srcTile && state.srcAccount) {
+                this.srcTile.setState({ account: state.srcAccount });
+            }
 
+            this.initSrcAccList(state);
+            if (this.srcDDList && transaction.src_id) {
+                this.srcDDList.selectItem(transaction.src_id);
+            }
+            this.srcDDList?.enable(!state.submitStarted);
+        }
+
+        // Destination account
+        this.destIdInp.value = transaction.dest_id;
+        if (transaction.type === INCOME || transaction.type === TRANSFER) {
+            if (this.destTile && state.destAccount) {
+                this.destTile.setState({ account: state.destAccount });
+            }
+
+            this.initDestAccList(state);
+            if (this.destDDList && transaction.dest_id) {
+                this.destDDList.selectItem(transaction.dest_id);
+            }
+            this.destDDList?.enable(!state.submitStarted);
+        }
+
+        // Source amount field
+        if (this.srcAmountRowLabel) {
+            this.srcAmountRowLabel.textContent = sourceAmountLbl;
+        }
+        this.srcAmountInput.value = state.form.sourceAmount;
+        enable(this.srcAmountInput.elem, !state.submitStarted);
+        window.app.setValidation(this.srcAmountRow, state.validation.sourceAmount);
+
+        // Source currency
+        this.srcCurrInp.value = transaction.src_curr;
+        this.setSign(this.srcAmountSign, this.srcCurrDDList, transaction.src_curr);
+        if (transaction.type === INCOME) {
+            this.initSrcCurrList(state);
+        }
+        enable(this.srcCurrBtn, !state.submitStarted);
+
+        // Destination amount field
+        if (this.destAmountRowLabel) {
+            this.destAmountRowLabel.textContent = destAmountLbl;
+        }
+        this.destAmountInput.value = state.form.destAmount;
+        enable(this.destAmountInput.elem, !state.submitStarted);
+        window.app.setValidation(this.destAmountRow, state.validation.destAmount);
+
+        // Destination currency
+        this.destCurrInp.value = transaction.dest_curr;
+        this.setSign(this.destAmountSign, this.destCurrDDList, transaction.dest_curr);
+        if (transaction.type === EXPENSE) {
+            this.initDestCurrList(state);
+        }
+        enable(this.destCurrBtn, !state.submitStarted);
+
+        // Exchange rate field
+        if (this.exchangeInput) {
+            this.exchangeInput.value = (state.form.useBackExchange)
+                ? state.form.backExchange
+                : state.form.exchange;
+        }
+        enable(this.exchangeInput.elem, !state.submitStarted);
+        this.renderExchangeRate(state);
+
+        // Source result field
+        if (this.srcResBalanceInput) {
+            this.srcResBalanceInput.value = state.form.sourceResult;
+        }
+        enable(this.srcResBalanceInput.elem, !state.submitStarted);
+        this.setSign(this.srcResBalanceSign, null, transaction.src_curr);
+
+        // Destination result field
+        if (this.destResBalanceInput) {
+            this.destResBalanceInput.value = state.form.destResult;
+        }
+        enable(this.destResBalanceInput.elem, !state.submitStarted);
+        this.setSign(this.destResBalanceSign, null, transaction.dest_curr);
+
+        // Date field
         this.dateInput.enable(!state.submitStarted);
         enable(this.dateInputBtn, !state.submitStarted);
         this.dateInput.value = state.form.date;
+        window.app.setValidation(this.dateRow, state.validation.date);
 
-        enable(this.commentInput, !state.submitStarted);
+        // Category field
+        this.categorySelect.selectItem(transaction.category_id);
+        this.categorySelect.enable(!state.submitStarted);
+
+        // Comment field
         this.commentInput.value = state.form.comment;
+        enable(this.commentInput, !state.submitStarted);
 
+        // Controls
         enable(this.submitBtn, !state.submitStarted);
         show(this.cancelBtn, !state.submitStarted);
         if (this.deleteBtn) {

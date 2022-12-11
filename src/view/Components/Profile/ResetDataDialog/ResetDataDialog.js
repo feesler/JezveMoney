@@ -28,6 +28,7 @@ export class ResetDataDialog extends ProfileDialog {
         const checkboxProps = { onChange: () => this.onChange() };
         this.accountsCheck = Checkbox.fromElement(ge('accountsCheck'), checkboxProps);
         this.personsCheck = Checkbox.fromElement(ge('personsCheck'), checkboxProps);
+        this.categoriesCheck = Checkbox.fromElement(ge('categoriesCheck'), checkboxProps);
         this.transactionsCheck = Checkbox.fromElement(ge('transactionsCheck'), checkboxProps);
         this.keepBalanceCheck = Checkbox.fromElement(ge('keepBalanceCheck'), checkboxProps);
         this.importTplCheck = Checkbox.fromElement(ge('importTplCheck'), checkboxProps);
@@ -82,6 +83,7 @@ export class ResetDataDialog extends ProfileDialog {
             ...this.state,
             accounts: this.accountsCheck.checked,
             persons: this.personsCheck.checked,
+            categories: this.categoriesCheck.checked,
             transactions: this.transactionsCheck.checked,
             keepBalance: this.keepBalanceCheck.checked,
             importTpl: this.importTplCheck.checked,
@@ -91,6 +93,7 @@ export class ResetDataDialog extends ProfileDialog {
         state.resetAll = (
             state.accounts
             && state.persons
+            && state.categories
             && state.transactions
             && state.importTpl
             && state.importRules
@@ -114,6 +117,9 @@ export class ResetDataDialog extends ProfileDialog {
         if (state.persons) {
             request.persons = true;
         }
+        if (state.categories) {
+            request.categories = true;
+        }
         if (state.transactions) {
             request.transactions = true;
         }
@@ -134,6 +140,7 @@ export class ResetDataDialog extends ProfileDialog {
     renderDialog(state) {
         this.accountsCheck.check(state.accounts);
         this.personsCheck.check(state.persons);
+        this.categoriesCheck.check(state.categories);
         this.transactionsCheck.check(state.transactions);
 
         this.keepBalanceCheck.check(state.keepBalance);

@@ -34,6 +34,17 @@
             </li>
 
             <li>
+                <button>Persons</button>
+                <ul class="sub-menu-list">
+                    <li data-target="listPersonsForm">List</li>
+                    <li data-target="readPersonForm">Read</li>
+                    <li data-target="createPersonForm">Create</li>
+                    <li data-target="updatePersonForm">Update</li>
+                    <li data-target="delPersonForm">Delete</li>
+                </ul>
+            </li>
+
+            <li>
                 <button>Transactions</button>
                 <ul class="sub-menu-list">
                     <li data-target="listTrForm">List</li>
@@ -45,6 +56,17 @@
                     <li data-target="delTrForm">Delete</li>
                     <li data-target="setTrPosForm">Set position</li>
                     <li data-target="statisticsForm">Statistics</li>
+                </ul>
+            </li>
+
+            <li>
+                <button>Categories</button>
+                <ul class="sub-menu-list">
+                    <li data-target="listCategoriesForm">List</li>
+                    <li data-target="readCategoryForm">Read</li>
+                    <li data-target="createCategoryForm">Create</li>
+                    <li data-target="updateCategoryForm">Update</li>
+                    <li data-target="delCategoryForm">Delete</li>
                 </ul>
             </li>
 
@@ -89,17 +111,6 @@
                     <li data-target="createActForm">Create</li>
                     <li data-target="updateActForm">Update</li>
                     <li data-target="delActForm">Delete</li>
-                </ul>
-            </li>
-
-            <li>
-                <button>Persons</button>
-                <ul class="sub-menu-list">
-                    <li data-target="listPersonsForm">List</li>
-                    <li data-target="readPersonForm">Read</li>
-                    <li data-target="createPersonForm">Create</li>
-                    <li data-target="updatePersonForm">Update</li>
-                    <li data-target="delPersonForm">Delete</li>
                 </ul>
             </li>
 
@@ -152,7 +163,7 @@
             <div class="content">
                 <div class="content_wrap">
                     <div class="heading">
-                        <h1>API test</h1>
+                        <h1>API console</h1>
                     </div>
 
 <button id="toggleMethodsBtn" class="btn methods-toggle-btn">Methods</button>
@@ -291,6 +302,88 @@
         </div>
         </div>
 
+
+        <div id="listPersonsForm" class="request-data-form">
+        <h3>List persons</h3>
+        <form action="<?=BASEURL?>api/person/list" method="list">
+            <div class="std_margin">
+                <label class="checkbox">
+                    <input type="checkbox" data-target="visibility">
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
+                    <span class="checkbox__label">Visibility</span>
+                </label>
+                <select class="stretch-input" name="visibility" disabled>
+                    <option value="all">All</option>
+                    <option value="visible" selected>Visible</option>
+                    <option value="hidden">Hidden</option>
+                </select>
+            </div>
+            <div class="form-controls">
+                <input class="btn submit-btn" type="submit" value="Submit">
+            </div>
+        </form>
+        </div>
+
+        <div id="readPersonForm" class="request-data-form">
+            <h3>Read person</h3>
+            <div class="std_margin">
+                <label for="read_person_id">Id</label>
+                <input id="read_person_id" class="stretch-input" type="text">
+            </div>
+            <div class="form-controls">
+                <input id="readpersonbtn" class="btn submit-btn" type="button" value="Submit">
+            </div>
+        </div>
+
+        <div id="createPersonForm" class="request-data-form">
+        <h3>Create person</h3>
+        <form action="<?=BASEURL?>api/person/create" method="post">
+            <div class="std_margin">
+                <label for="create_person_name">Name</label>
+                <input id="create_person_name" class="stretch-input" name="name" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="create_person_flags">Flags (0 - person is visible; 1 - hidden)</label>
+                <input id="create_person_flags" class="stretch-input" name="flags" type="text">
+            </div>
+            <div class="form-controls">
+                <input class="btn submit-btn" type="submit" value="Submit">
+            </div>
+        </form>
+        </div>
+
+        <div id="updatePersonForm" class="request-data-form">
+        <h3>Update person</h3>
+        <form action="<?=BASEURL?>api/person/update" method="post">
+            <div class="std_margin">
+                <label for="update_person_id">Id</label>
+                <input id="update_person_id" class="stretch-input" name="id" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="update_person_name">Name</label>
+                <input id="update_person_name" class="stretch-input" name="name" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="update_person_flags">Flags (0 - person is visible; 1 - hidden)</label>
+                <input id="update_person_flags" class="stretch-input" name="flags" type="text">
+            </div>
+            <div class="form-controls">
+                <input class="btn submit-btn" type="submit" value="Submit">
+            </div>
+        </form>
+        </div>
+
+        <div id="delPersonForm" class="request-data-form">
+        <h3>Delete persons</h3>
+        <div class="std_margin">
+            <label for="delpersons">Persons (comma separated ids)</label>
+            <input id="delpersons" class="stretch-input" type="text">
+        </div>
+        <div class="form-controls">
+            <input id="delpersonbtn" class="btn submit-btn" type="submit" value="Submit">
+        </div>
+        </div>
+
         <div id="listTrForm" class="request-data-form">
         <h3>List</h3>
         <form action="<?=BASEURL?>api/transaction/list" method="list">
@@ -318,7 +411,7 @@
                     <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Types</span>
                 </label>
-                <input id="list_trans_type" class="stretch-input" name="type" type="text" value="0" disabled>
+                <input class="stretch-input" name="type" type="text" value="0" disabled>
             </div>
             <div class="std_margin">
                 <label class="checkbox">
@@ -326,7 +419,7 @@
                     <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Max. count</span>
                 </label>
-                <input id="list_trans_count" class="stretch-input" name="count" type="text" value="10" disabled>
+                <input class="stretch-input" name="count" type="text" value="10" disabled>
             </div>
             <div class="std_margin">
                 <label class="checkbox">
@@ -334,7 +427,7 @@
                     <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Page number</span>
                 </label>
-                <input id="list_trans_page" class="stretch-input" name="page" type="text" value="0" disabled>
+                <input class="stretch-input" name="page" type="text" value="0" disabled>
             </div>
             <div class="std_margin">
                 <label class="checkbox">
@@ -342,7 +435,7 @@
                     <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Pages range</span>
                 </label>
-                <input id="list_trans_range" class="stretch-input" name="range" type="text" value="1" disabled>
+                <input class="stretch-input" name="range" type="text" value="1" disabled>
             </div>
             <div class="std_margin">
                 <label class="checkbox">
@@ -350,7 +443,7 @@
                     <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Account ids</span>
                 </label>
-                <input id="list_trans_accounts" class="stretch-input" name="acc_id" type="text" value="0" disabled>
+                <input class="stretch-input" name="acc_id" type="text" value="" disabled>
             </div>
             <div class="std_margin">
                 <label class="checkbox">
@@ -358,7 +451,15 @@
                     <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Person ids</span>
                 </label>
-                <input id="list_trans_persons" class="stretch-input" name="person_id" type="text" value="0" disabled>
+                <input class="stretch-input" name="person_id" type="text" value="" disabled>
+            </div>
+            <div class="std_margin">
+                <label class="checkbox">
+                    <input type="checkbox" data-target="category_id">
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
+                    <span class="checkbox__label">Category ids</span>
+                </label>
+                <input class="stretch-input" name="category_id" type="text" value="" disabled>
             </div>
             <div class="std_margin">
                 <label class="checkbox">
@@ -366,7 +467,7 @@
                     <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Start date</span>
                 </label>
-                <input id="list_trans_stdate" class="stretch-input" name="stdate" type="text" value="" disabled>
+                <input class="stretch-input" name="stdate" type="text" value="" disabled>
             </div>
             <div class="std_margin">
                 <label class="checkbox">
@@ -374,7 +475,7 @@
                     <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">End date</span>
                 </label>
-                <input id="list_trans_enddate" class="stretch-input" name="enddate" type="text" value="" disabled>
+                <input class="stretch-input" name="enddate" type="text" value="" disabled>
             </div>
             <div class="std_margin">
                 <label class="checkbox">
@@ -382,7 +483,7 @@
                     <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                     <span class="checkbox__label">Search request</span>
                 </label>
-                <input id="list_trans_search" class="stretch-input" name="search" type="text" value="" disabled>
+                <input class="stretch-input" name="search" type="text" value="" disabled>
             </div>
             <div class="form-controls">
                 <input class="btn submit-btn" type="submit" value="Submit">
@@ -440,6 +541,11 @@
             </div>
 
             <div class="std_margin">
+                <label for="create_trans_category_id">Category</label>
+                <input id="create_trans_category_id" class="stretch-input" name="category_id" type="text">
+            </div>
+
+            <div class="std_margin">
                 <label for="create_trans_comment">Comment</label>
                 <input id="create_trans_comment" class="stretch-input" name="comment" type="text">
             </div>
@@ -488,6 +594,11 @@
             <div class="std_margin">
                 <label for="create_debt_date">Date</label>
                 <input id="create_debt_date" class="stretch-input" name="date" type="text">
+            </div>
+
+            <div class="std_margin">
+                <label for="create_debt_category_id">Category</label>
+                <input id="create_debt_category_id" class="stretch-input" name="category_id" type="text">
             </div>
 
             <div class="std_margin">
@@ -546,6 +657,11 @@
             </div>
 
             <div class="std_margin">
+                <label for="update_trans_category_id">Category</label>
+                <input id="update_trans_category_id" class="stretch-input" name="category_id" type="text">
+            </div>
+
+            <div class="std_margin">
                 <label for="update_trans_comment">Comment</label>
                 <input id="update_trans_comment" class="stretch-input" name="comment" type="text">
             </div>
@@ -600,6 +716,11 @@
             <div class="std_margin">
                 <label for="update_debt_date">Date</label>
                 <input id="update_debt_date" class="stretch-input" name="date" type="text">
+            </div>
+
+            <div class="std_margin">
+                <label for="update_debt_category_id">Category</label>
+                <input id="update_debt_category_id" class="stretch-input" name="category_id" type="text">
             </div>
 
             <div class="std_margin">
@@ -679,7 +800,7 @@
                         <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                         <span class="checkbox__label">Start date</span>
                     </label>
-                    <input id="statistics_stdate" class="stretch-input" name="stdate" type="text" value="" disabled>
+                    <input class="stretch-input" name="stdate" type="text" value="" disabled>
                 </div>
                 <div class="std_margin">
                     <label class="checkbox">
@@ -687,7 +808,7 @@
                         <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                         <span class="checkbox__label">End date</span>
                     </label>
-                    <input id="statistics_enddate" class="stretch-input" name="enddate" type="text" value="" disabled>
+                    <input class="stretch-input" name="enddate" type="text" value="" disabled>
                 </div>
             </div>
 
@@ -695,6 +816,91 @@
                 <input class="btn submit-btn" type="submit" value="Submit">
             </div>
         </form>
+        </div>
+
+        <div id="listCategoriesForm" class="request-data-form">
+        <h3>List categories</h3>
+        <form action="<?=BASEURL?>api/category/list" method="list">
+            <div class="std_margin">
+                <label class="checkbox">
+                    <input type="checkbox" data-target="parent_id">
+                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
+                    <span class="checkbox__label">Parent category</span>
+                </label>
+                <inpu class="stretch-input" name="parent_id" type="text" value="" disabled>
+            </div>
+            <div class="form-controls">
+                <input class="btn submit-btn" type="submit" value="Submit">
+            </div>
+        </form>
+        </div>
+
+        <div id="readCategoryForm" class="request-data-form">
+            <h3>Read category</h3>
+            <div class="std_margin">
+                <label for="read_category_id">Id</label>
+                <input id="read_category_id" class="stretch-input" type="text">
+            </div>
+            <div class="form-controls">
+                <input id="readCategoryBtn" class="btn submit-btn" type="button" value="Submit">
+            </div>
+        </div>
+
+        <div id="createCategoryForm" class="request-data-form">
+        <h3>Create category</h3>
+        <form action="<?=BASEURL?>api/category/create" method="post">
+            <div class="std_margin">
+                <label for="create_category_name">Name</label>
+                <input id="create_category_name" class="stretch-input" name="name" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="create_category_parent">Parent category (0 for no parent)</label>
+                <input id="create_category_parent" class="stretch-input" name="parent_id" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="create_category_type">Transaction type (0 for any)</label>
+                <input id="create_category_type" class="stretch-input" name="type" type="text">
+            </div>
+            <div class="form-controls">
+                <input class="btn submit-btn" type="submit" value="Submit">
+            </div>
+        </form>
+        </div>
+
+        <div id="updateCategoryForm" class="request-data-form">
+        <h3>Update category</h3>
+        <form action="<?=BASEURL?>api/category/update" method="post">
+            <div class="std_margin">
+                <label for="update_category_id">Id</label>
+                <input id="update_category_id" class="stretch-input" name="id" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="update_category_name">Name</label>
+                <input id="update_category_name" class="stretch-input" name="name" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="update_category_parent">Parent category (0 for no parent)</label>
+                <input id="update_category_parent" class="stretch-input" name="parent_id" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="update_category_type">Transaction type (0 for any)</label>
+                <input id="update_category_type" class="stretch-input" name="type" type="text">
+            </div>
+            <div class="form-controls">
+                <input class="btn submit-btn" type="submit" value="Submit">
+            </div>
+        </form>
+        </div>
+
+        <div id="delCategoryForm" class="request-data-form">
+        <h3>Delete categories</h3>
+        <div class="std_margin">
+            <label for="delCategories">Categories (comma separated ids)</label>
+            <input id="delCategories" class="stretch-input" type="text">
+        </div>
+        <div class="form-controls">
+            <input id="delCategoriesBtn" class="btn submit-btn" type="submit" value="Submit">
+        </div>
         </div>
 
         <div id="listTplForm" class="request-data-form">
@@ -1070,87 +1276,6 @@
         </div>
         </div>
 
-        <div id="listPersonsForm" class="request-data-form">
-        <h3>List persons</h3>
-        <form action="<?=BASEURL?>api/person/list" method="list">
-            <div class="std_margin">
-                <label class="checkbox">
-                    <input type="checkbox" data-target="visibility">
-                    <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
-                    <span class="checkbox__label">Visibility</span>
-                </label>
-                <select class="stretch-input" name="visibility" disabled>
-                    <option value="all">All</option>
-                    <option value="visible" selected>Visible</option>
-                    <option value="hidden">Hidden</option>
-                </select>
-            </div>
-            <div class="form-controls">
-                <input class="btn submit-btn" type="submit" value="Submit">
-            </div>
-        </form>
-        </div>
-
-        <div id="readPersonForm" class="request-data-form">
-            <h3>Read person</h3>
-            <div class="std_margin">
-                <label for="read_person_id">Id</label>
-                <input id="read_person_id" class="stretch-input" type="text">
-            </div>
-            <div class="form-controls">
-                <input id="readpersonbtn" class="btn submit-btn" type="button" value="Submit">
-            </div>
-        </div>
-
-        <div id="createPersonForm" class="request-data-form">
-        <h3>Create person</h3>
-        <form action="<?=BASEURL?>api/person/create" method="post">
-            <div class="std_margin">
-                <label for="create_person_name">Name</label>
-                <input id="create_person_name" class="stretch-input" name="name" type="text">
-            </div>
-            <div class="std_margin">
-                <label for="create_person_flags">Flags (0 - person is visible; 1 - hidden)</label>
-                <input id="create_person_flags" class="stretch-input" name="flags" type="text">
-            </div>
-            <div class="form-controls">
-                <input class="btn submit-btn" type="submit" value="Submit">
-            </div>
-        </form>
-        </div>
-
-        <div id="updatePersonForm" class="request-data-form">
-        <h3>Update person</h3>
-        <form action="<?=BASEURL?>api/person/update" method="post">
-            <div class="std_margin">
-                <label for="update_person_id">Id</label>
-                <input id="update_person_id" class="stretch-input" name="id" type="text">
-            </div>
-            <div class="std_margin">
-                <label for="update_person_name">Name</label>
-                <input id="update_person_name" class="stretch-input" name="name" type="text">
-            </div>
-            <div class="std_margin">
-                <label for="update_person_flags">Flags (0 - person is visible; 1 - hidden)</label>
-                <input id="update_person_flags" class="stretch-input" name="flags" type="text">
-            </div>
-            <div class="form-controls">
-                <input class="btn submit-btn" type="submit" value="Submit">
-            </div>
-        </form>
-        </div>
-
-        <div id="delPersonForm" class="request-data-form">
-        <h3>Delete persons</h3>
-        <div class="std_margin">
-            <label for="delpersons">Persons (comma separated ids)</label>
-            <input id="delpersons" class="stretch-input" type="text">
-        </div>
-        <div class="form-controls">
-            <input id="delpersonbtn" class="btn submit-btn" type="submit" value="Submit">
-        </div>
-        </div>
-
         <div id="listCurrForm" class="request-data-form">
         <h3>Get currencies</h3>
         <form action="<?=BASEURL?>api/currency/list" method="list">
@@ -1408,6 +1533,12 @@
                 <input type="checkbox" name="persons">
                 <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
                 <span class="checkbox__label">Persons</span>
+            </label>
+
+            <label class="checkbox std_margin">
+                <input type="checkbox" name="categories">
+                <span class="checkbox__check"><?=svgIcon("check", "checkbox__icon")?></span>
+                <span class="checkbox__label">Categories</span>
             </label>
 
             <label class="checkbox std_margin">

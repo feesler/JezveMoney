@@ -51,6 +51,12 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-item__link" href="<?= BASEURL ?>categories/">Categories</a>
+                <a class="nav-item__icon-btn" href="<?= BASEURL ?>categories/create/">
+                    <?= useIcon("plus-light", "nav-item__icon") ?>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-item__link" href="<?= BASEURL ?>transactions/">Transactions</a>
                 <a class="nav-item__icon-btn" href="<?= BASEURL ?>transactions/create/">
                     <?= useIcon("plus-light", "nav-item__icon") ?>
