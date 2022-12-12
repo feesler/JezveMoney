@@ -290,8 +290,17 @@ const slice = createSlice({
         };
 
         newState.pagination = getPagination(newState);
+
+        // Change page if saved item is not in current range
+        const startPage = state.pagination.page;
+        const endPage = startPage + state.pagination.range - 1;
         const pageIndex = getPageIndex(state.activeItemIndex, newState);
-        newState.pagination.page = pageIndex.page;
+        if (pageIndex.page < startPage || pageIndex.page > endPage) {
+            newState.pagination.page = pageIndex.page;
+        } else {
+            newState.pagination.page = startPage;
+            newState.pagination.range = state.pagination.range;
+        }
 
         return newState;
     },

@@ -12,6 +12,7 @@ import { DropDown } from 'jezvejs/DropDown';
 import { LinkMenu } from 'jezvejs/LinkMenu';
 import { IconButton } from 'jezvejs/IconButton';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
+import { formatValueShort } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { API } from '../../js/api/index.js';
@@ -30,7 +31,6 @@ import {
     actions,
     reducer,
 } from './reducer.js';
-import { correct, formatValue } from '../../js/utils.js';
 import './style.scss';
 
 /** CSS classes */
@@ -199,7 +199,7 @@ class StatisticsView extends View {
             renderPopup: (target) => this.renderPopupContent(target),
             showLegend: true,
             renderLegend: (data) => this.renderLegendContent(data),
-            renderYAxisLabel: (value) => this.renderYLabel(value),
+            renderYAxisLabel: (value) => formatValueShort(value),
         });
         this.histogram.elem.dataset.time = state.renderTime;
 
@@ -402,27 +402,6 @@ class StatisticsView extends View {
 
         const selectedTypes = asArray(state.form.type);
         return Transaction.getTypeTitle(selectedTypes[category]);
-    }
-
-    renderYLabel(value) {
-        let val = value;
-        let size = '';
-        if (value >= 1e12) {
-            val = correct(value / 1e12, 2);
-            size = 'T';
-        } else if (value >= 1e9) {
-            val = correct(value / 1e9, 2);
-            size = 'B';
-        } else if (value >= 1e6) {
-            val = correct(value / 1e6, 2);
-            size = 'M';
-        } else if (value >= 1e3) {
-            val = correct(value / 1e3, 2);
-            size = 'k';
-        }
-
-        const fmtValue = formatValue(val);
-        return `${fmtValue}${size}`;
     }
 
     renderLegendContent(categories) {

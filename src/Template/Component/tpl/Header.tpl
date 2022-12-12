@@ -66,7 +66,7 @@
             <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>import/">Import</a></li>
             <li class="nav-separator"></li>
         <?php    }        ?>
-        <li class="nav-bottom"><a class="nav-item__link" href="<?= BASEURL ?>about/">About</a></li>
+        <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>about/">About</a></li>
     </ul>
 </nav>
 
@@ -99,8 +99,7 @@
             <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>logout/" tabindex="6">Logout</a></li>
             <?php if ($this->adminUser) {        ?>
                 <li class="nav-separator"></li>
-
-                <li class="nav-bottom"><a class="nav-item__link" href="<?= BASEURL ?>admin/" tabindex="7">Admin panel</a></li>
+                <li class="nav-item"><a class="nav-item__link" href="<?= BASEURL ?>admin/" tabindex="7">Admin panel</a></li>
             <?php        }        ?>
         </ul>
     <?php    }        ?>

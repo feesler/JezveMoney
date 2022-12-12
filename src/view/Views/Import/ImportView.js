@@ -830,7 +830,9 @@ class ImportView extends View {
         }
 
         const pageIndex = getPageIndex(index, state);
-        if (state.pagination.page !== pageIndex.page) {
+        const startPage = state.pagination.page;
+        const endPage = startPage + state.pagination.range - 1;
+        if (pageIndex.page < startPage || pageIndex.page > endPage) {
             return;
         }
 
