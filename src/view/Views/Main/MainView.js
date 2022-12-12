@@ -2,6 +2,7 @@ import 'jezvejs/style';
 import { ge } from 'jezvejs';
 import 'jezvejs/style/IconButton';
 import { Histogram } from 'jezvejs/Histogram';
+import { formatValueShort } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
@@ -50,6 +51,7 @@ class MainView extends View {
             elem: 'chart',
             data: this.props.chartData,
             height: 200,
+            renderYAxisLabel: (value) => formatValueShort(value),
         });
     }
 }

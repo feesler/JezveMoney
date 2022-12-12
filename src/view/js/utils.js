@@ -171,3 +171,25 @@ export const isValidValue = (val) => (
 
 /** Format decimal value */
 export const formatValue = (val) => val.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ');
+
+/** Format decimal value with size postfix */
+export const formatValueShort = (value) => {
+    let val = value;
+    let size = '';
+    if (value >= 1e12) {
+        val = correct(value / 1e12, 2);
+        size = 'T';
+    } else if (value >= 1e9) {
+        val = correct(value / 1e9, 2);
+        size = 'B';
+    } else if (value >= 1e6) {
+        val = correct(value / 1e6, 2);
+        size = 'M';
+    } else if (value >= 1e3) {
+        val = correct(value / 1e3, 2);
+        size = 'k';
+    }
+
+    const fmtValue = formatValue(val);
+    return `${fmtValue}${size}`;
+};
