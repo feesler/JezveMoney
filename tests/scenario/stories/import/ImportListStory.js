@@ -100,6 +100,8 @@ export class ImportListStory extends TestStory {
         setBlock('Check pagination', 2);
 
         const { cardFile } = App.scenario;
+        const itemsOnPage = App.config.importTransactionsOnPage;
+
         await ImportTests.uploadFile(cardFile);
         await ImportTests.submitUploaded(cardFile);
         await ImportTests.uploadFile(cardFile);
@@ -110,11 +112,18 @@ export class ImportListStory extends TestStory {
             { action: 'inputDestAmount', data: '1' },
         );
         await ImportTests.goToPrevPage(); // page 2
+        // Update item on 2nd page
         await ImportTests.updateItemAndSave({
-            pos: 21,
-            action: { action: 'inputDestAmount', data: '2' },
+            pos: itemsOnPage + 1,
+            action: { action: 'inputComment', data: `Item ${itemsOnPage + 1}` },
         });
         await ImportTests.showMore(); // pages 2-3
+        // Update item on 3rd page while showing pages 2-3
+        await ImportTests.updateItemAndSave({
+            pos: (itemsOnPage * 2) + 1,
+            action: { action: 'inputComment', data: `Item ${(itemsOnPage * 2) + 1}` },
+        });
+
         await ImportTests.goToPrevPage(); // page 2
         await ImportTests.goToFirstPage(); // page 1
         await ImportTests.showMore(); // pages 1-2

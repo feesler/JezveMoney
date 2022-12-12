@@ -328,13 +328,18 @@ export class ImportView extends AppView {
         return this.items.filter((item) => item.selected);
     }
 
-    getPositionByIndex(index) {
+    getPositionByIndex(index, model = this.model) {
         assert.arrayIndex(this.items, index, 'Invalid index');
 
-        const itemsOnPage = App.config.importTransactionsOnPage;
+        const onPage = App.config.importTransactionsOnPage;
+        const startPage = model.pagination.page;
+        const page = Math.floor(index / onPage) + 1;
+        const relIndex = index % onPage;
+
         return {
-            page: Math.floor(index / itemsOnPage) + 1,
-            index: index % itemsOnPage,
+            page,
+            index: relIndex,
+            rangeIndex: relIndex + (page - startPage) * onPage,
         };
     }
 
@@ -404,22 +409,27 @@ export class ImportView extends AppView {
 
     checkValidIndex(index) {
         const pos = this.getPositionByIndex(index);
+        const startPage = this.model.pagination.page;
+        const endPage = this.currentPage();
+
         assert(
-            pos.page === this.model.pagination.page,
-            `Invalid page ${this.model.pagination.page}, expected: ${pos.page}`,
+            pos.page >= startPage && pos.page <= endPage,
+            `Invalid page ${pos.page}, expected in range: [${startPage} - ${endPage}]`,
         );
     }
 
     async openContextMenu(index) {
+        this.checkValidIndex(index);
+
         const pos = this.getPositionByIndex(index);
 
         await this.setListMode();
 
         this.model.contextMenuVisible = true;
-        this.model.contextItemIndex = pos.index;
+        this.model.contextItemIndex = pos.rangeIndex;
         const expected = this.getExpectedState();
 
-        const item = this.itemsList.getItem(pos.index);
+        const item = this.itemsList.getItem(pos.rangeIndex);
         await this.performAction(() => item.clickMenu());
         assert(this.content.contextMenu.visible, 'Context menu not visible');
 
@@ -1180,7 +1190,14 @@ export class ImportView extends AppView {
         const pagesCount = Math.ceil(this.items.length / itemsOnPage);
         this.model.pagination.pages = pagesCount;
         const pos = this.getPositionByIndex(this.formIndex);
-        this.model.pagination.page = pos.page;
+
+        const startPage = this.model.pagination.page;
+        const endPage = this.currentPage();
+        if (pos.page < startPage || pos.page > endPage) {
+            this.model.pagination.page = pos.page;
+            this.model.pagination.range = 1;
+        }
+
         this.formIndex = -1;
 
         this.expectedState = this.getExpectedState();
@@ -1280,7 +1297,7 @@ export class ImportView extends AppView {
         for (const ind of indexes) {
             await this.performAction(async () => {
                 const pos = this.getPositionByIndex(ind);
-                const item = this.itemsList.getItem(pos.index);
+                const item = this.itemsList.getItem(pos.rangeIndex);
                 await item.toggleSelect();
             });
         }
