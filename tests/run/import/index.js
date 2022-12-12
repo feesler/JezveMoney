@@ -196,7 +196,7 @@ export const submitUploaded = async (params) => {
 
 /** Change main account at upload dialog */
 export const selectUploadAccount = async (accountId) => {
-    const userAccounts = App.state.accounts.getUserVisible();
+    const userAccounts = App.state.getUserAccounts();
     const account = userAccounts.getItem(accountId);
     assert(account, `Invalid account id ${accountId}`);
 

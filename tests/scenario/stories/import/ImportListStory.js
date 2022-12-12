@@ -84,7 +84,10 @@ export class ImportListStory extends TestStory {
 
         const { cardFile } = App.scenario;
         await ImportTests.uploadFile(cardFile);
-        await ImportTests.submitUploaded(cardFile);
+        await ImportTests.submitUploaded({
+            ...cardFile,
+            account: App.scenario.ACC_3,
+        });
 
         setBlock('Cancel changes', 2);
         await ImportTests.updateItemAndSave({
@@ -103,7 +106,10 @@ export class ImportListStory extends TestStory {
         const itemsOnPage = App.config.importTransactionsOnPage;
 
         await ImportTests.uploadFile(cardFile);
-        await ImportTests.submitUploaded(cardFile);
+        await ImportTests.submitUploaded({
+            ...cardFile,
+            account: App.scenario.ACC_RUB,
+        });
         await ImportTests.uploadFile(cardFile);
         await ImportTests.submitUploaded(cardFile);
         await ImportTests.uploadFile(cardFile);

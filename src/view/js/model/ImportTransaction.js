@@ -66,6 +66,7 @@ export class ImportTransaction {
             type: (isExpense) ? 'expense' : 'income',
             originalData: {
                 ...data,
+                mainAccount: mainAccount.id,
                 origAccount: { ...mainAccount },
             },
 
@@ -292,7 +293,7 @@ export class ImportTransaction {
     restoreOriginal() {
         const res = ImportTransaction.fromImportData({
             ...this.originalData,
-            mainAccount: { ...this.originalData.origAccount },
+            mainAccount: this.originalData.origAccount,
         });
         return res.enable(this.enabled).setMainAccount(this.mainAccount.id);
     }
