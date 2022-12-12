@@ -137,4 +137,5 @@
     </form>
 </div>
 
+<?php include(ICONS_PATH . "Common.tpl");    ?>
 <?php include(TPL_PATH . "Footer.tpl");    ?>
