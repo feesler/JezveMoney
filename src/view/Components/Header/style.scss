@@ -323,7 +323,8 @@ a.nav-item__link:visited {
 }
 
 .nav-separator {
-  margin-bottom: 2rem;
+  margin: 0.5rem 0.25rem;
+  border-top: 1px solid var(--nav-menu-separator-color);
 }
 
 /* Desktop */
