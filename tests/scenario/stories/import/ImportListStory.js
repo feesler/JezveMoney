@@ -97,7 +97,7 @@ export class ImportListStory extends TestStory {
     }
 
     async pagination() {
-        setBlock('Check pagination', 2);
+        setBlock('Pagination', 1);
 
         const { cardFile } = App.scenario;
         const itemsOnPage = App.config.importTransactionsOnPage;
@@ -112,13 +112,15 @@ export class ImportListStory extends TestStory {
             { action: 'inputDestAmount', data: '1' },
         );
         await ImportTests.goToPrevPage(); // page 2
-        // Update item on 2nd page
+
+        setBlock('Update item on 2nd page', 2);
         await ImportTests.updateItemAndSave({
             pos: itemsOnPage + 1,
             action: { action: 'inputComment', data: `Item ${itemsOnPage + 1}` },
         });
         await ImportTests.showMore(); // pages 2-3
-        // Update item on 3rd page while showing pages 2-3
+
+        setBlock('Update item on 3rd page while showing pages 2-3', 2);
         await ImportTests.updateItemAndSave({
             pos: (itemsOnPage * 2) + 1,
             action: { action: 'inputComment', data: `Item ${(itemsOnPage * 2) + 1}` },
@@ -140,11 +142,17 @@ export class ImportListStory extends TestStory {
     }
 
     async listModes() {
-        setBlock('List modes', 2);
+        setBlock('List modes', 1);
 
         const { cardFile } = App.scenario;
         await ImportTests.uploadFile(cardFile);
         await ImportTests.submitUploaded(cardFile);
+
+        setBlock('Check selection is cleared on change list mode', 2);
+        await ImportTests.toggleSelectItems([0, 1]);
+        await ImportTests.setListMode();
+
+        setBlock('List items select', 2);
         await ImportTests.toggleSelectItems([0, 1]);
         await ImportTests.toggleSelectItems([0, 1]);
         await ImportTests.selectAllItems();

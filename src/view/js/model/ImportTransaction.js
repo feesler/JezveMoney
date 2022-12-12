@@ -197,6 +197,7 @@ export class ImportTransaction {
         return new ImportTransaction({
             ...copyObject(this),
             listMode,
+            selected: false,
         });
     }
 
