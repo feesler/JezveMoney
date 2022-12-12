@@ -99,10 +99,10 @@ export class ImportView extends AppView {
 
         // List menu
         res.listMenuContainer = {
-            elem: await query('#listMenu'),
-            menuBtn: await query('#listMenu .popup-menu-btn'),
+            elem: await query('.heading-actions .popup-menu'),
+            menuBtn: await query('.heading-actions .popup-menu-btn'),
         };
-        res.listMenu = { elem: await query('#listMenu .popup-menu-list') };
+        res.listMenu = { elem: await query('#listMenu') };
         if (res.listMenu.elem) {
             await this.parseMenuItems(res, menuItems);
             res.deleteAllBtn.content.disabled = await hasAttr(res.deleteAllBtn.elem, 'disabled');

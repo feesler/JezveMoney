@@ -39,10 +39,10 @@ export class AccountListView extends AppView {
             addBtn: await IconButton.create(this, await query('#add_btn')),
             listModeBtn: await IconButton.create(this, await query('#listModeBtn')),
             listMenuContainer: {
-                elem: await query('#listMenu'),
-                menuBtn: await query('#listMenu .popup-menu-btn'),
+                elem: await query('.heading-actions .popup-menu'),
+                menuBtn: await query('.heading-actions .popup-menu-btn'),
             },
-            listMenu: { elem: await query('#listMenu .popup-menu-list') },
+            listMenu: { elem: await query('#listMenu') },
             totalCounter: await Counter.create(this, await query('#itemsCounter')),
             hiddenCounter: await Counter.create(this, await query('#hiddenCounter')),
             selectedCounter: await Counter.create(this, await query('#selectedCounter')),

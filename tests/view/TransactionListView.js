@@ -69,10 +69,10 @@ export class TransactionListView extends AppView {
             closeFiltersBtn: { elem: await query('#closeFiltersBtn') },
             listModeBtn: await IconButton.create(this, await query('#listModeBtn')),
             listMenuContainer: {
-                elem: await query('#listMenu'),
-                menuBtn: await query('#listMenu .popup-menu-btn'),
+                elem: await query('.heading-actions .popup-menu'),
+                menuBtn: await query('.heading-actions .popup-menu-btn'),
             },
-            listMenu: { elem: await query('#listMenu .popup-menu-list') },
+            listMenu: { elem: await query('#listMenu') },
             totalCounter: await Counter.create(this, await query('#itemsCounter')),
             selectedCounter: await Counter.create(this, await query('#selectedCounter')),
         };
