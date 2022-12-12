@@ -20,7 +20,6 @@ const FORM_CLASS = 'cond-form';
 const CONTAINER_CLASS = 'cond-form__container';
 const PROP_FIELD_CLASS = 'property-field';
 const OPERATOR_FILED_CLASS = 'operator-field';
-const VALUE_FIELD_CLASS = 'value-field';
 const TEXT_FIELD_CLASS = 'text-field';
 const AMOUNT_FIELD_CLASS = 'amount-field';
 const ACCOUNT_FIELD_CLASS = 'account-field';
@@ -119,19 +118,15 @@ export class ImportConditionForm extends Component {
             onChange: () => this.onFieldValueChecked(),
         });
 
-        this.valueFieldBlock = window.app.createContainer(VALUE_FIELD_CLASS, [
+        this.fields = window.app.createContainer(COND_FIELDS_CLASS, [
+            this.propertyDropDown.elem,
+            this.operatorDropDown.elem,
             this.accountDropDown.elem,
             this.templateDropDown.elem,
             this.currencyDropDown.elem,
             this.amountInput,
             this.valueInput,
             this.valuePropDropDown.elem,
-        ]);
-
-        this.fields = window.app.createContainer(COND_FIELDS_CLASS, [
-            this.propertyDropDown.elem,
-            this.operatorDropDown.elem,
-            this.valueFieldBlock,
         ]);
 
         // Invalid feedback message
