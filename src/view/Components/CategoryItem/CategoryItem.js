@@ -133,11 +133,13 @@ export class CategoryItem extends Component {
         this.renderControls(state, prevState);
         this.renderContent(state, prevState);
 
-        const isSelectMode = state.listMode === 'select';
-        const selected = isSelectMode && !!state.selected;
+        const selectMode = state.listMode === 'select';
+        const selected = selectMode && !!state.selected;
         this.elem.classList.toggle(SELECTED_CLASS, selected);
-        this.checkbox?.enable(isSelectMode);
         this.checkbox?.check(selected);
+        if (this.checkbox) {
+            this.checkbox.input.tabIndex = (selectMode) ? 0 : -1;
+        }
 
         this.elem.classList.toggle(CHILD_CLASS, (item.parent_id !== 0));
     }

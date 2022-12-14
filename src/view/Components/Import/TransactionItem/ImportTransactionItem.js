@@ -216,6 +216,9 @@ export class ImportTransactionItem extends Component {
         const isSelected = selectMode && !!selected;
         this.elem.classList.toggle(SELECTED_CLASS, isSelected);
         this.checkbox?.check(isSelected);
+        if (this.checkbox) {
+            this.checkbox.input.tabIndex = (selectMode) ? 0 : -1;
+        }
     }
 
     renderContainer(state, prevState) {

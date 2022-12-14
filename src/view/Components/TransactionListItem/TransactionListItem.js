@@ -516,8 +516,12 @@ export class TransactionListItem extends Component {
 
         this.renderContent(state, prevState);
 
-        const selected = state.listMode === 'select' && !!state.selected;
+        const selectMode = state.listMode === 'select';
+        const selected = selectMode && !!state.selected;
         this.elem.classList.toggle(SELECTED_CLASS, selected);
         this.checkbox?.check(selected);
+        if (this.checkbox) {
+            this.checkbox.input.tabIndex = (selectMode) ? 0 : -1;
+        }
     }
 }
