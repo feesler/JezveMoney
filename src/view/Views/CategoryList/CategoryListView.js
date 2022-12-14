@@ -12,15 +12,17 @@ import '../../css/app.scss';
 import { View } from '../../js/View.js';
 import { API } from '../../js/api/index.js';
 import { CategoryList } from '../../js/model/CategoryList.js';
+import { Heading } from '../../Components/Heading/Heading.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { ListContainer } from '../../Components/ListContainer/ListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { Tile } from '../../Components/Tile/Tile.js';
-import './style.scss';
+import { CategoryItem } from '../../Components/CategoryItem/CategoryItem.js';
 import { createStore } from '../../js/store.js';
-import { actions, reducer } from './reducer.js';
-import { Heading } from '../../Components/Heading/Heading.js';
+import { actions, createItemsFromModel, reducer } from './reducer.js';
+import './style.scss';
 
+/* CSS classes */
+const SELECT_MODE_CLASS = 'categories-list_select';
 /** Strings */
 const STR_TITLE = 'Categories';
 const TITLE_SINGLE_CATEGORY_DELETE = 'Delete category';
@@ -39,7 +41,7 @@ class PersonListView extends View {
         window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
 
         const initialState = {
-            items: CategoryList.create(window.app.model.categories),
+            items: createItemsFromModel(),
             loading: false,
             listMode: 'list',
             contextItem: null,
@@ -60,17 +62,15 @@ class PersonListView extends View {
     onStart() {
         const state = this.store.getState();
         const listProps = {
-            ItemComponent: Tile,
-            getItemProps: (category, { listMode }) => ({
-                type: 'button',
-                attrs: { 'data-id': category.id },
-                className: 'tiles',
-                title: category.name,
-                selected: category.selected,
-                selectMode: listMode === 'select',
+            ItemComponent: CategoryItem,
+            getItemProps: (item, { listMode }) => ({
+                item,
+                selected: item.selected,
+                listMode,
+                showControls: (listMode === 'list'),
             }),
-            className: 'tiles',
-            itemSelector: '.tile',
+            className: 'categories-list',
+            itemSelector: '.category-item',
             listMode: state.listMode,
             noItemsMessage: MSG_NO_DATA,
             onItemClick: (id, e) => this.onItemClick(id, e),
@@ -94,8 +94,8 @@ class PersonListView extends View {
             title: STR_TITLE,
         });
 
-        this.tiles = ListContainer.create(listProps);
-        insertAfter(this.tiles.elem, this.contentHeader);
+        this.list = ListContainer.create(listProps);
+        insertAfter(this.list.elem, this.contentHeader);
 
         this.createBtn = ge('add_btn');
 
@@ -113,7 +113,7 @@ class PersonListView extends View {
         this.createContextMenu();
 
         this.loadingIndicator = LoadingIndicator.create();
-        insertAfter(this.loadingIndicator.elem, this.tiles.elem);
+        insertAfter(this.loadingIndicator.elem, this.list.elem);
 
         this.render(state);
     }
@@ -167,7 +167,10 @@ class PersonListView extends View {
     onItemClick(itemId, e) {
         const { listMode } = this.store.getState();
         if (listMode === 'list') {
-            this.showContextMenu(itemId);
+            const menuBtn = e?.target?.closest('.popup-menu-btn');
+            if (menuBtn) {
+                this.showContextMenu(itemId);
+            }
         } else if (listMode === 'select') {
             if (e?.target?.closest('.checkbox')) {
                 e.preventDefault();
@@ -279,22 +282,26 @@ class PersonListView extends View {
             this.contextMenu.detach();
             return;
         }
-        const category = window.app.model.categories.getItem(state.contextItem);
+
+        const itemId = state.contextItem;
+        const category = window.app.model.categories.getItem(itemId);
         if (!category) {
             this.contextMenu.detach();
             return;
         }
-        const tile = document.querySelector(`.tile[data-id="${category.id}"]`);
-        if (!tile) {
+
+        const listItem = this.list.getListItemById(itemId);
+        const menuContainer = listItem?.elem?.querySelector('.popup-menu');
+        if (!menuContainer) {
             this.contextMenu.detach();
             return;
         }
 
         const { baseURL } = window.app;
         const { items } = this.contextMenu;
-        items.ctxUpdateBtn.setURL(`${baseURL}categories/update/${category.id}`);
+        items.ctxUpdateBtn.setURL(`${baseURL}categories/update/${itemId}`);
 
-        this.contextMenu.attachAndShow(tile);
+        this.contextMenu.attachAndShow(menuContainer);
     }
 
     renderMenu(state) {
@@ -336,12 +343,13 @@ class PersonListView extends View {
         this.selItemsCount.textContent = selected.length;
 
         // List of categories
-        this.tiles.setState((listState) => ({
+        this.list.setState((listState) => ({
             ...listState,
             items: state.items,
             listMode: state.listMode,
             renderTime: Date.now(),
         }));
+        this.list.elem.classList.toggle(SELECT_MODE_CLASS, state.listMode === 'select');
 
         this.renderContextMenu(state);
         this.renderMenu(state);

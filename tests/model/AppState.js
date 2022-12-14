@@ -718,6 +718,7 @@ export class AppState {
         const data = copyFields(params, catReqFields);
         const ind = this.categories.create(data);
         const item = this.categories.getItemByIndex(ind);
+        this.categories.sortByParent();
 
         return item.id;
     }
@@ -738,14 +739,9 @@ export class AppState {
         }
 
         this.categories.update(expItem);
+        this.categories.sortByParent();
 
         return true;
-    }
-
-    getChildCategories(id) {
-        return this.categories
-            .filter((item) => item.parent_id === id)
-            .map((item) => item.id);
     }
 
     deleteCategories(categoryIds) {
@@ -760,7 +756,7 @@ export class AppState {
 
         const categoriesToDelete = ids.flatMap((id) => ([
             id,
-            ...this.categories.getChildren(id),
+            ...this.categories.findByParent(id).map((item) => item.id),
         ]));
 
         // Prepare expected updates of transactions

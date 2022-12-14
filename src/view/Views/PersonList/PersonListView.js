@@ -68,7 +68,6 @@ class PersonListView extends View {
             getItemProps: (person, { listMode }) => ({
                 type: 'button',
                 attrs: { 'data-id': person.id },
-                className: 'tiles',
                 title: person.name,
                 selected: person.selected,
                 selectMode: listMode === 'select',

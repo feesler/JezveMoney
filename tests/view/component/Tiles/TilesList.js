@@ -5,9 +5,8 @@ import {
     asyncMap,
 } from 'jezve-test';
 import { Tile } from './Tile.js';
-import { AccountsList } from '../../model/AccountsList.js';
-import { PersonsList } from '../../model/PersonsList.js';
-import { CategoryList } from '../../model/CategoryList.js';
+import { AccountsList } from '../../../model/AccountsList.js';
+import { PersonsList } from '../../../model/PersonsList.js';
 
 export class TilesList extends TestComponent {
     get items() {
@@ -84,14 +83,6 @@ export class TilesList extends TestComponent {
         const visiblePersons = personsList.getVisible(true);
         return {
             items: visiblePersons.map((p) => Tile.renderPerson(p, withDebts)),
-        };
-    }
-
-    static renderCategories(categories) {
-        assert.instanceOf(categories, CategoryList, 'Invalid data');
-
-        return {
-            items: categories.map((c) => Tile.renderCategory(c)),
         };
     }
 

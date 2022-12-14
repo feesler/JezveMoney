@@ -24,8 +24,8 @@ import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js
 import { InputRow } from './component/InputRow.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { DatePickerRow } from './component/DatePickerRow.js';
-import { TileInfoItem } from './component/TileInfoItem.js';
-import { TileBlock } from './component/TileBlock.js';
+import { TileInfoItem } from './component/Tiles/TileInfoItem.js';
+import { TileBlock } from './component/Tiles/TileBlock.js';
 import { Button } from './component/Button.js';
 import {
     EXPENSE,

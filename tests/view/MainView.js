@@ -2,7 +2,7 @@ import { assert, navigation, query } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
-import { TilesList } from './component/TilesList.js';
+import { TilesList } from './component/Tiles/TilesList.js';
 import { Widget } from './component/Widget/Widget.js';
 import { TilesWidget } from './component/Widget/TilesWidget.js';
 import { TransactionsWidget } from './component/Widget/TransactionsWidget.js';

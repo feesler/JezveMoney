@@ -1,6 +1,6 @@
 import { assert, query, navigation } from 'jezve-test';
 import { Widget } from './Widget.js';
-import { TilesList } from '../TilesList.js';
+import { TilesList } from '../Tiles/TilesList.js';
 
 export class TilesWidget extends Widget {
     async parseContent() {

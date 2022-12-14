@@ -15,8 +15,8 @@ export class CategoryList extends List {
     }
 
     /** Returns array of ids of child categories */
-    getChildren(id) {
-        return this.filter((item) => item.parent_id === id).map((item) => item.id);
+    findByParent(id) {
+        return this.filter((item) => item.parent_id === id);
     }
 
     /** Search category with specified name */
@@ -31,5 +31,14 @@ export class CategoryList extends List {
                 ? (person.name === lookupName)
                 : (person.name.toLowerCase() === lookupName)
         ));
+    }
+
+    /** Sort categories by parent */
+    sortByParent() {
+        const topLevelCategories = this.findByParent(0);
+        this.data = topLevelCategories.flatMap((item) => {
+            const children = this.findByParent(item.id);
+            return [item, ...children];
+        });
     }
 }
