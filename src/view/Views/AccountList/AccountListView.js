@@ -212,7 +212,7 @@ class AccountListView extends View {
         if (listMode === 'list') {
             this.showContextMenu(itemId);
         } else if (listMode === 'select') {
-            if (e?.target?.closest('.checkbox')) {
+            if (e?.target?.closest('.checkbox') && e.pointerType !== '') {
                 e.preventDefault();
             }
 

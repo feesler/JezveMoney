@@ -657,7 +657,7 @@ class TransactionListView extends View {
                 this.showContextMenu(itemId);
             }
         } else if (state.listMode === 'select') {
-            if (e?.target?.closest('.checkbox')) {
+            if (e?.target?.closest('.checkbox') && e.pointerType !== '') {
                 e.preventDefault();
             }
 

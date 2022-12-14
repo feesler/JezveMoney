@@ -529,7 +529,7 @@ class ImportView extends View {
             }
             this.showContextMenu(index);
         } else if (listMode === 'select') {
-            if (e.target.closest('.checkbox')) {
+            if (e.target.closest('.checkbox') && e.pointerType !== '') {
                 e.preventDefault();
             }
 
