@@ -437,6 +437,7 @@ label {
   flex-flow: row wrap;
   gap: var(--tile-gap);
   max-width: calc(var(--tile-size) * 4 + var(--tile-gap) * 3);
+  padding: 0.25rem 0;
 }
 
 /* Total list */
