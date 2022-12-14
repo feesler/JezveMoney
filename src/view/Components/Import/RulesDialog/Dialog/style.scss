@@ -69,6 +69,7 @@
   flex-flow: column nowrap;
   align-items: stretch;
   overflow-y: auto;
+  padding-bottom: var(--content-padding-bottom);
 }
 
 /* Desktop */
@@ -78,5 +79,9 @@
       padding-top: 60px;
       padding-bottom: 20px;
     }
+  }
+
+  .rules-list-container {
+    padding-bottom: 0;
   }
 }
