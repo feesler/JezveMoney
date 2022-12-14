@@ -54,6 +54,7 @@
                     <li data-target="updateTrForm">Update</li>
                     <li data-target="updateDebtForm">Update debt</li>
                     <li data-target="delTrForm">Delete</li>
+                    <li data-target="setTrCategoryForm">Set category</li>
                     <li data-target="setTrPosForm">Set position</li>
                     <li data-target="statisticsForm">Statistics</li>
                 </ul>
@@ -746,8 +747,25 @@
         </div>
         </div>
 
+        <div id="setTrCategoryForm" class="request-data-form">
+        <h3>Set category of transaction</h3>
+        <form action="<?=BASEURL?>api/transaction/setCategory" method="post">
+            <div class="std_margin">
+                <label for="trans_setCategory_id">Id</label>
+                <input id="trans_setCategory_id" class="stretch-input" name="id" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="trans_setCategory_category_id">Category id</label>
+                <input id="trans_setCategory_category_id" class="stretch-input" name="category_id" type="text">
+            </div>
+            <div class="form-controls">
+                <input class="btn submit-btn" type="submit" value="Submit">
+            </div>
+        </form>
+        </div>
+
         <div id="setTrPosForm" class="request-data-form">
-        <h3>Set position of transacction</h3>
+        <h3>Set position of transaction</h3>
         <form action="<?=BASEURL?>api/transaction/setpos" method="post">
             <div class="std_margin">
                 <label for="trans_pos_id">Id</label>

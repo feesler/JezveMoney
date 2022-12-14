@@ -8,6 +8,7 @@ import {
 } from '../../../model/Transaction.js';
 import * as AccountApiTests from '../../../run/api/account.js';
 import * as PersonApiTests from '../../../run/api/person.js';
+import * as CategoryApiTests from '../../../run/api/category.js';
 import * as TransactionApiTests from '../../../run/api/transaction.js';
 
 const prepareTests = async () => {
@@ -37,6 +38,14 @@ const prepareTests = async () => {
     ] = await App.scenario.runner.runGroup(PersonApiTests.create, [{
         name: 'API user Person',
         flags: 0,
+    }]);
+
+    [
+        App.scenario.API_USER_CATEGORY,
+    ] = await App.scenario.runner.runGroup(CategoryApiTests.create, [{
+        name: 'API user Category',
+        parent_id: 0,
+        type: EXPENSE,
     }]);
 
     [
@@ -75,6 +84,18 @@ const personsTests = async () => {
     await PersonApiTests.del(App.scenario.API_USER_PERSON);
 };
 
+const categoriesTests = async () => {
+    setBlock('Categories security', 2);
+
+    await CategoryApiTests.update({
+        id: App.scenario.API_USER_CATEGORY,
+        name: 'API Category',
+        parent_id: 0,
+        type: EXPENSE,
+    });
+    await PersonApiTests.del(App.scenario.API_USER_CATEGORY);
+};
+
 const createTransaction = async () => {
     setBlock('Create', 3);
 
@@ -87,6 +108,15 @@ const createTransaction = async () => {
         dest_curr: RUB,
         src_amount: 100,
         dest_amount: 100,
+    }, {
+        type: EXPENSE,
+        src_id: App.scenario.ACC_RUB,
+        dest_id: 0,
+        src_curr: RUB,
+        dest_curr: RUB,
+        src_amount: 100,
+        dest_amount: 100,
+        category_id: App.scenario.API_USER_CATEGORY,
     }, {
         type: INCOME,
         src_id: 0,
@@ -125,6 +155,9 @@ const updateTransaction = async () => {
     const data = [{
         id: App.scenario.TR_EXPENSE_1,
         src_id: App.scenario.API_USER_ACC_RUB,
+    }, {
+        id: App.scenario.TR_EXPENSE_1,
+        category_id: App.scenario.API_USER_CATEGORY,
     }, {
         id: App.scenario.TR_INCOME_1,
         dest_id: App.scenario.API_USER_ACC_RUB,
@@ -186,6 +219,7 @@ export const apiSecurityTests = {
     async run() {
         await accountsTests();
         await personsTests();
+        await categoriesTests();
         await transactionsTests();
     },
 };

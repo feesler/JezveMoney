@@ -65,6 +65,8 @@ Message::add(MSG_TRANS_DELETE);
 Message::add(ERR_TRANS_DELETE, MSG_TYPE_ERROR, "Fail to delete transaction.");
 Message::add(MSG_TRANS_CHANGE_POS);
 Message::add(ERR_TRANS_CHANGE_POS, MSG_TYPE_ERROR, "Fail to change position of transaction.");
+Message::add(MSG_TRANS_SET_CATEGORY);
+Message::add(ERR_TRANS_SET_CATEGORY, MSG_TYPE_ERROR, "Fail to set category of transaction(s).");
 
 Message::add(MSG_ICON_CREATE, MSG_TYPE_SUCCESS, "Icon successfully created.");
 Message::add(ERR_ICON_CREATE, MSG_TYPE_ERROR, "Fail to create new icon.");

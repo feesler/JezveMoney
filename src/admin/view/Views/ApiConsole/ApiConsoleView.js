@@ -262,6 +262,12 @@ class AdminApiConsoleView extends AdminView {
             click: (e) => this.onDeleteItemsSubmit(e, 'deltransactions', 'transaction/delete'),
         });
 
+        const setTrCategoryForm = document.querySelector('#setTrCategoryForm > form');
+        if (!setTrCategoryForm) {
+            throw new Error('Fail to init view');
+        }
+        setEvents(setTrCategoryForm, { submit: (e) => this.onSetCategorySubmit(e) });
+
         const setTrPosForm = document.querySelector('#setTrPosForm > form');
         if (!setTrPosForm) {
             throw new Error('Fail to init view');
@@ -884,7 +890,7 @@ class AdminApiConsoleView extends AdminView {
 
         const frmData = this.getFormData(e.target);
         if (!frmData) {
-            return false;
+            return;
         }
 
         if (('type' in frmData) && frmData.type) {
@@ -899,8 +905,24 @@ class AdminApiConsoleView extends AdminView {
             data: frmData,
             verify: apiTypes.isTransactionsList,
         });
+    }
 
-        return false;
+    /** Set category 'submit' event handler */
+    onSetCategorySubmit(e) {
+        e.preventDefault();
+
+        const frmData = this.getFormData(e.target);
+        if (!frmData) {
+            return;
+        }
+
+        frmData.id = this.parseIds(frmData.id).id;
+
+        this.apiRequest({
+            httpMethod: 'post',
+            method: 'transaction/setCategory',
+            data: frmData,
+        });
     }
 }
 

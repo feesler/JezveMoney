@@ -32,15 +32,20 @@ import { FiltersContainer } from '../../Components/FiltersContainer/FiltersConta
 import { createStore } from '../../js/store.js';
 import { reducer, actions, isSameSelection } from './reducer.js';
 import './style.scss';
+import { Field } from '../../Components/Field/Field.js';
 
 /* Strings */
 const STR_TITLE = 'Transactions';
 const PAGE_TITLE = 'Jezve Money | Transactions';
 const MSG_SET_POS_FAIL = 'Fail to change position of transaction.';
+/* Delete transactions confirm dialog */
 const TITLE_SINGLE_TRANS_DELETE = 'Delete transaction';
 const TITLE_MULTI_TRANS_DELETE = 'Delete transactions';
 const MSG_MULTI_TRANS_DELETE = 'Are you sure want to delete selected transactions?<br>Changes in the balance of affected accounts will be canceled.';
 const MSG_SINGLE_TRANS_DELETE = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
+/* Select category dialog */
+const TITLE_SET_CATEGORY = 'Set category';
+const TITLE_CATEGORY = 'Category';
 /* Mode selector items */
 const TITLE_SHOW_MAIN = 'Show main';
 const TITLE_SHOW_DETAILS = 'Show details';
@@ -296,6 +301,10 @@ class TransactionListView extends View {
                 id: 'separator2',
                 type: 'separator',
             }, {
+                id: 'setCategoryBtn',
+                title: 'Set category...',
+                onClick: () => this.selectCategoryForItems(),
+            }, {
                 id: 'deleteBtn',
                 icon: 'del',
                 title: 'Delete',
@@ -550,6 +559,57 @@ class TransactionListView extends View {
         });
     }
 
+    /** Send API request to change category of selected transactions */
+    async setItemsCategory(category) {
+        const state = this.store.getState();
+        if (state.loading) {
+            return;
+        }
+
+        const ids = this.getContextIds();
+        if (ids.length === 0) {
+            return;
+        }
+
+        this.startLoading();
+
+        try {
+            await API.transaction.setCategory({ id: ids, category_id: category.id });
+            this.requestTransactions(state.form);
+        } catch (e) {
+            window.app.createMessage(e.message, 'msg_error');
+            this.stopLoading();
+            this.setRenderTime();
+        }
+    }
+
+    /**
+     * Show select category dialog
+     */
+    selectCategoryForItems() {
+        const ids = this.getContextIds();
+        if (ids.length === 0) {
+            return;
+        }
+
+        const categorySelect = CategorySelect.create({
+            className: 'dd_fullwidth',
+        });
+        const categoryField = Field.create({
+            title: TITLE_CATEGORY,
+            content: categorySelect.elem,
+            className: 'view-row',
+        });
+
+        ConfirmDialog.create({
+            id: 'selectCategoryDialog',
+            title: TITLE_SET_CATEGORY,
+            content: categoryField.elem,
+            className: 'category-dialog',
+            onconfirm: () => this.setItemsCategory(categorySelect.getSelectionData()),
+        });
+    }
+
     /** Date range filter change handler */
     onChangeDateFilter(data) {
         this.store.dispatch(actions.changeDateFilter(data));
@@ -656,7 +716,7 @@ class TransactionListView extends View {
         const isListMode = state.listMode === 'list';
         const isSelectMode = (state.listMode === 'select');
         const selectedItems = this.list.getSelectedItems();
-        const totalSelCount = selectedItems.length;
+        const selCount = selectedItems.length;
 
         show(this.createBtn, isListMode);
         this.listModeBtn.show(!isListMode);
@@ -669,11 +729,12 @@ class TransactionListView extends View {
 
         show(items.separator1, isSelectMode);
 
-        items.selectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount);
-        items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount > 0);
+        items.selectAllBtn.show(isSelectMode && itemsCount > 0 && selCount < itemsCount);
+        items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && selCount > 0);
         show(items.separator2, isSelectMode);
 
-        items.deleteBtn.show(isSelectMode && totalSelCount > 0);
+        items.setCategoryBtn.show(isSelectMode && selCount > 0);
+        items.deleteBtn.show(isSelectMode && selCount > 0);
     }
 
     /** Render accounts and persons selection */

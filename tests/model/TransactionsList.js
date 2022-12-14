@@ -112,7 +112,12 @@ export class TransactionsList extends List {
         return this.getIndexById(transObj.id);
     }
 
-    update(id, data) {
+    update(data) {
+        if (!data?.id) {
+            return false;
+        }
+
+        const { id } = data;
         const origObj = this.getItem(id);
         if (!origObj) {
             return false;
@@ -136,6 +141,22 @@ export class TransactionsList extends List {
 
             this.sort();
         }
+
+        return true;
+    }
+
+    setCategory(ids, category) {
+        const itemIds = asArray(ids);
+        const categoryId = parseInt(category, 10);
+        assert.isInteger(categoryId, 'Invalid category id');
+
+        itemIds.forEach((id) => {
+            const item = this.getItem(id);
+            this.update({
+                ...item,
+                category_id: categoryId,
+            });
+        });
 
         return true;
     }
@@ -322,7 +343,7 @@ export class TransactionsList extends List {
         return TransactionsList.create(items);
     }
 
-    getItems(list, par) {
+    filterItems(list, par) {
         let res = list;
         const params = par || {};
 
@@ -367,7 +388,7 @@ export class TransactionsList extends List {
     }
 
     applyFilter(params) {
-        const items = this.getItems(this.data, params);
+        const items = this.filterItems(this.data, params);
         if (items === this.data) {
             return this;
         }

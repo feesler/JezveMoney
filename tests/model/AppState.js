@@ -1022,7 +1022,7 @@ export class AppState {
         this.accounts = this.accounts.updateTransaction(origTrans, expTrans);
 
         // Prepare expected updates of transactions
-        this.transactions.update(expTrans.id, expTrans);
+        this.transactions.update(expTrans);
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
 
@@ -1047,6 +1047,24 @@ export class AppState {
         this.updatePersonAccounts();
 
         return true;
+    }
+
+    setTransactionCategory({ id, category }) {
+        const ids = asArray(id);
+        if (ids.length === 0) {
+            return false;
+        }
+
+        if (!ids.every((itemId) => this.transactions.getItem(itemId))) {
+            return false;
+        }
+
+        const categoryId = parseInt(category, 10);
+        if (categoryId !== 0 && !this.categories.getItem(category)) {
+            return false;
+        }
+
+        return this.transactions.setCategory(id, category);
     }
 
     setTransactionPos({ id, pos }) {

@@ -27,6 +27,8 @@ export class TransactionListStory extends TestStory {
     }
 
     async runTests(directNavigate = false) {
+        const { FOOD_CATEGORY, TRANSPORT_CATEGORY } = App.scenario;
+
         if (directNavigate) {
             setBlock('Transaction List view: direct navigation', 1);
         } else {
@@ -61,14 +63,22 @@ export class TransactionListStory extends TestStory {
             await TransactionListTests.goToLastPage();
             await TransactionListTests.goToPrevPage();
             await TransactionListTests.showMore();
+
+            await TransactionListTests.goToFirstPage();
+            await TransactionListTests.setCategory({
+                items: [0, 1, 2],
+                category: FOOD_CATEGORY,
+            });
+            await TransactionListTests.setCategory({
+                items: [1],
+                category: 0,
+            });
         }
 
         await App.scenario.runner.runGroup(
             TransactionListTests.filterByType,
             availTransTypes.map((type) => ({ type, directNavigate })),
         );
-
-        const { FOOD_CATEGORY, TRANSPORT_CATEGORY } = App.scenario;
 
         await App.scenario.runner.runTasks([{
             action: TransactionListTests.filterByAccounts,

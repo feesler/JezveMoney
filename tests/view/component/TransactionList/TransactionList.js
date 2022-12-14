@@ -57,9 +57,10 @@ export class TransactionList extends TestComponent {
         assert(item, 'Invalid item');
 
         return {
+            id: item.id,
             selected: item.content.selected,
             amountText: item.content.amountText,
-            amountTitle: item.content.amountTitle,
+            accountTitle: item.content.accountTitle,
             dateFmt: item.content.dateFmt,
             comment: item.content.comment,
         };

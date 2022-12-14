@@ -192,6 +192,35 @@ export const del = async (ids) => {
     return deleteRes;
 };
 
+// Set category for specified transactions
+export const setCategory = async (params) => {
+    let result;
+
+    await test(`Set category of transaction (${formatProps(params)})`, async () => {
+        const resExpected = App.state.setTransactionCategory(params);
+
+        // Send API sequest to server
+        const request = {
+            id: params.id,
+            category_id: params.category,
+        };
+        try {
+            result = await api.transaction.setCategory(request);
+            if (resExpected !== result) {
+                return false;
+            }
+        } catch (e) {
+            if (!(e instanceof ApiRequestError) || resExpected) {
+                throw e;
+            }
+        }
+
+        return App.state.fetchAndTest();
+    });
+
+    return result;
+};
+
 // Set new position for specified transaction
 export const setPos = async (params) => {
     let result;

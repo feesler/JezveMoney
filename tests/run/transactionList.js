@@ -11,6 +11,7 @@ import { App } from '../Application.js';
 import { fixDate } from '../common.js';
 import { TransactionListView } from '../view/TransactionListView.js';
 import { availTransTypes, Transaction } from '../model/Transaction.js';
+import { TransactionList } from '../view/component/TransactionList/TransactionList.js';
 
 /** Navigate to transactions list page */
 const checkNavigation = async () => {
@@ -81,7 +82,7 @@ export const setDetailsMode = async (directNavigate = false) => {
 };
 
 export const toggleSelect = async (transactions) => {
-    const itemIds = Array.isArray(transactions) ? transactions : [transactions];
+    const itemIds = asArray(transactions);
 
     await test(`Toggle select items [${itemIds.join()}]`, async () => {
         await checkNavigation();
@@ -154,6 +155,38 @@ export const deselectAll = async () => {
     await test('Deselect all transactions', async () => {
         await checkNavigation();
         return App.view.deselectAll();
+    });
+};
+
+export const setCategory = async ({ items, category }) => {
+    const indexes = asArray(items);
+
+    await test('Set transactions category', async () => {
+        await checkNavigation();
+
+        const origItems = App.view.getItems();
+
+        const pageIds = origItems.map((item) => item.id);
+        const ids = indexes.map((ind) => {
+            assert.arrayIndex(origItems, ind);
+            return origItems[ind].id;
+        });
+
+        App.state.setTransactionCategory({
+            id: ids,
+            category,
+        });
+        const expectedItems = App.state.transactions.getItems(pageIds);
+        const expected = {
+            transList: {
+                items: TransactionList.render(expectedItems, App.state),
+            },
+        };
+
+        await App.view.setCategory(items, category);
+        App.view.checkState(expected);
+
+        return App.state.fetchAndTest();
     });
 };
 

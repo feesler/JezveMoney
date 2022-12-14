@@ -642,15 +642,51 @@ class TransactionModel extends CachedTable
             return false;
         }
 
-        foreach ($this->cache as $tr_id => $item) {
+        foreach ($this->cache as $item) {
             $trans = $this->getAffected($item);
-
             if ($trans->pos == $tr_pos) {
                 return true;
             }
         }
 
         return false;
+    }
+
+
+    public function setCategory($items, $categoryId)
+    {
+        $catModel = CategoryModel::getInstance();
+
+        $categoryId = intval($categoryId);
+        if ($categoryId !== 0 && !$catModel->isExist($categoryId)) {
+            throw new \Error("Category not found");
+        }
+
+        $items = asArray($items);
+        foreach ($items as $item_id) {
+            $item = $this->getItem($item_id);
+            if (!$item) {
+                throw new \Error("Invalid item");
+            }
+        }
+
+        $data = [
+            "category_id" => $categoryId,
+            "updatedate" => date("Y-m-d H:i:s"),
+        ];
+
+        $updRes = $this->dbObj->updateQ(
+            $this->tbl_name,
+            $data,
+            "id" . inSetCondition($items)
+        );
+        if (!$updRes) {
+            throw new \Error("Failed to update transactions");
+        }
+
+        $this->cleanCache();
+
+        return true;
     }
 
 
@@ -711,21 +747,21 @@ class TransactionModel extends CachedTable
                 $latest = $this->getLatestPos();
 
                 $affectedRange = $this->getRange($new_pos, true, $latest, true);
-                foreach ($affectedRange as $tr_id => $item) {
+                foreach ($affectedRange as $item) {
                     $queryItem = clone $item;
                     $queryItem->pos++;
                     $this->pushAffected($queryItem);
                 }
             } elseif ($new_pos < $old_pos) {       // moving up
                 $affectedRange = $this->getRange($new_pos, true, $old_pos, false);
-                foreach ($affectedRange as $tr_id => $item) {
+                foreach ($affectedRange as $item) {
                     $queryItem = clone $item;
                     $queryItem->pos++;
                     $this->pushAffected($queryItem);
                 }
             } elseif ($new_pos > $old_pos) {        // moving down
                 $affectedRange = $this->getRange($old_pos, false, $new_pos, true);
-                foreach ($affectedRange as $tr_id => $item) {
+                foreach ($affectedRange as $item) {
                     $queryItem = clone $item;
                     $queryItem->pos--;
                     $this->pushAffected($queryItem);
@@ -952,7 +988,7 @@ class TransactionModel extends CachedTable
         $this->accModel->updateBalances($balanceChanges);
 
         // delete all transactions of user
-        if (!$this->dbObj->deleteQ("transactions", "user_id" . $setCond)) {
+        if (!$this->dbObj->deleteQ($this->tbl_name, "user_id" . $setCond)) {
             return false;
         }
 

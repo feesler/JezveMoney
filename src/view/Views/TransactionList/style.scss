@@ -54,6 +54,13 @@
   }
 }
 
+.category-dialog {
+  .popup__content-box {
+    width: 100%;
+    max-width: 340px;
+  }
+}
+
 @media (hover: hover) {
   .clear-all-btn {
     text-decoration: underline;
