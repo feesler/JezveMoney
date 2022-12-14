@@ -163,6 +163,8 @@ class StatisticsView extends View {
             elem: 'acc_id',
             multiple: true,
             placeholder: 'Select account',
+            enableFilter: true,
+            noResultsMessage: 'Nothing found',
             onitemselect: (obj) => this.onAccountSel(obj),
             onchange: (obj) => this.onAccountSel(obj),
             className: 'dd_fullwidth',
