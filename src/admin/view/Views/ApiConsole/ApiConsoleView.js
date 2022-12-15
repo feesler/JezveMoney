@@ -213,6 +213,7 @@ class AdminApiConsoleView extends AdminView {
 
     /** Initialization of forms for Transaction API controller */
     initTransactionForms() {
+        // Transactions list form
         const listTrForm = document.querySelector('#listTrForm > form');
         if (!listTrForm) {
             throw new Error('Fail to init view');
@@ -220,6 +221,7 @@ class AdminApiConsoleView extends AdminView {
         setEvents(listTrForm, { submit: (e) => this.onListTransactionSubmit(e) });
         this.initCheckboxes(listTrForm);
 
+        // Read transactions by ids form
         const readtransbtn = ge('readtransbtn');
         if (!readtransbtn) {
             throw new Error('Fail to init view');
@@ -230,30 +232,35 @@ class AdminApiConsoleView extends AdminView {
             ),
         });
 
+        // Create transaction form
         const createTrForm = document.querySelector('#createTrForm > form');
         if (!createTrForm) {
             throw new Error('Fail to init view');
         }
         setEvents(createTrForm, { submit: this.getVerifyHandler(apiTypes.isCreateResult) });
 
+        // Create debt transaction form
         const createDebtForm = document.querySelector('#createDebtForm > form');
         if (!createDebtForm) {
             throw new Error('Fail to init view');
         }
         setEvents(createDebtForm, { submit: this.getVerifyHandler(apiTypes.isCreateResult) });
 
+        // Update transaction form
         const updateTrForm = document.querySelector('#updateTrForm > form');
         if (!updateTrForm) {
             throw new Error('Fail to init view');
         }
         setEvents(updateTrForm, { submit: (e) => this.onFormSubmit(e) });
 
+        // Update debt transaction form
         const updateDebtForm = document.querySelector('#updateDebtForm > form');
         if (!updateDebtForm) {
             throw new Error('Fail to init view');
         }
         setEvents(updateDebtForm, { submit: (e) => this.onFormSubmit(e) });
 
+        // Delete transactions form
         const deltransbtn = ge('deltransbtn');
         if (!deltransbtn) {
             throw new Error('Fail to init view');
@@ -262,23 +269,26 @@ class AdminApiConsoleView extends AdminView {
             click: (e) => this.onDeleteItemsSubmit(e, 'deltransactions', 'transaction/delete'),
         });
 
+        // Set transactions category form
         const setTrCategoryForm = document.querySelector('#setTrCategoryForm > form');
         if (!setTrCategoryForm) {
             throw new Error('Fail to init view');
         }
         setEvents(setTrCategoryForm, { submit: (e) => this.onSetCategorySubmit(e) });
 
+        // Set transaction position form
         const setTrPosForm = document.querySelector('#setTrPosForm > form');
         if (!setTrPosForm) {
             throw new Error('Fail to init view');
         }
         setEvents(setTrPosForm, { submit: (e) => this.onFormSubmit(e) });
 
+        // Statistics form
         const statisticsForm = document.querySelector('#statisticsForm > form');
         if (!statisticsForm) {
             throw new Error('Fail to init view');
         }
-        setEvents(statisticsForm, { submit: (e) => this.onFormSubmit(e) });
+        setEvents(statisticsForm, { submit: (e) => this.onStatisticsSubmit(e) });
         this.initCheckboxes(statisticsForm);
         const statisticsFilter = ge('statistics-filter');
         setEvents(statisticsFilter, {
@@ -788,8 +798,9 @@ class AdminApiConsoleView extends AdminView {
             ? `${apiMethodURL}${singleId}`
             : apiMethodURL;
 
+        const url = new URL(requestURL);
         const res = {
-            url: new URL(requestURL),
+            url,
             options: {
                 headers: ('headers' in request) ? request.headers : {},
             },
@@ -801,9 +812,14 @@ class AdminApiConsoleView extends AdminView {
                 res.options.body = JSON.stringify(request.data);
                 res.options.headers['Content-Type'] = 'application/json';
             } else if (!singleId) {
-                Object.entries(request.data).forEach(
-                    ([name, value]) => res.url.searchParams.set(name, value),
-                );
+                Object.entries(request.data).forEach(([name, value]) => {
+                    if (Array.isArray(value)) {
+                        const arrayName = `${name}[]`;
+                        value.forEach((item) => url.searchParams.append(arrayName, item));
+                    } else if (typeof value !== 'undefined' && value !== null) {
+                        url.searchParams.set(name, value.toString());
+                    }
+                });
             }
         }
 
@@ -899,11 +915,40 @@ class AdminApiConsoleView extends AdminView {
         if ('acc_id' in frmData) {
             frmData.acc_id = this.parseIds(frmData.acc_id).id;
         }
+        if ('person_id' in frmData) {
+            frmData.person_id = this.parseIds(frmData.person_id).id;
+        }
+        if ('category_id' in frmData) {
+            frmData.category_id = this.parseIds(frmData.category_id).id;
+        }
 
         this.apiRequest({
             method: 'transaction/list',
             data: frmData,
             verify: apiTypes.isTransactionsList,
+        });
+    }
+
+    /** Statistics form 'submit' event handler */
+    onStatisticsSubmit(e) {
+        e.preventDefault();
+
+        const frmData = this.getFormData(e.target);
+        if (!frmData) {
+            return;
+        }
+
+        if (('type' in frmData) && frmData.type) {
+            frmData.type = this.parseIds(frmData.type).id;
+        }
+        if ('acc_id' in frmData) {
+            frmData.acc_id = this.parseIds(frmData.acc_id).id;
+        }
+
+        this.apiRequest({
+            method: 'transaction/statistics',
+            data: frmData,
+            verify: apiTypes.isStatistics,
         });
     }
 

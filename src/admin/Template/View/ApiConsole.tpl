@@ -789,7 +789,7 @@
                     <label for="statistics_type">Type (1-4)</label>
                     <input id="statistics_type" class="stretch-input" name="type" type="text">
                 </div>
-                <select id="statistics-filter" class="stretch-input" name="filter">
+                <select id="statistics-filter" class="stretch-input" name="report">
                     <option value="account" selected>Account</option>
                     <option value="currency">Currency</option>
                 </select>
