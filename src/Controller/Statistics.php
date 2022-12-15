@@ -116,7 +116,11 @@ class Statistics extends TemplateController
             $account = (is_array($accounts) && count($accounts) > 0)
                 ? $accMod->getItem($accounts[0])
                 : null;
-            $accCurr = ($account) ? $account->curr_id : 0;
+
+            $accCurr = ($account) ? $account->curr_id : $currMod->getIdByPos(0);
+            if (!$accCurr) {
+                throw new \Error("No currencies available");
+            }
         }
 
         $data["titleString"] = "Jezve Money | Statistics";

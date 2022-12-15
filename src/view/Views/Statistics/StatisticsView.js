@@ -39,6 +39,7 @@ import './style.scss';
 /* Chart popup */
 const POPUP_CONTENT_CLASS = 'chart-popup__content';
 const POPUP_HEADER_CLASS = 'chart-popup__header';
+const POPUP_SERIES_CLASS = 'chart-popup__series';
 const POPUP_LIST_CLASS = 'chart-popup-list';
 const POPUP_LIST_ITEM_CLASS = 'chart-popup-list__item';
 const POPUP_LIST_ITEM_CATEGORY_CLASS = 'chart-popup-list__item-cat-';
@@ -214,6 +215,9 @@ class StatisticsView extends View {
             barWidth: 45,
             columnGap: 3,
             showPopup: true,
+            pinPopupOnClick: true,
+            showPopupOnHover: true,
+            animatePopup: true,
             activateOnHover: true,
             renderPopup: (target) => this.renderPopupContent(target),
             showLegend: true,
@@ -403,25 +407,35 @@ class StatisticsView extends View {
         const items = target.group ?? [target.item];
         const listItems = [];
         items.forEach((item) => {
-            if (item.columnIndex !== target.item.columnIndex) {
+            if (
+                item.columnIndex !== target.item.columnIndex
+                || item.value === 0
+            ) {
                 return;
             }
 
             listItems.push(this.renderPopupListItem(item));
         });
 
+        if (listItems.length === 0) {
+            return null;
+        }
+
         const list = createElement('ul', {
             props: { className: POPUP_LIST_CLASS },
             children: listItems,
         });
         const headerTitle = Transaction.getTypeTitle(target.item.groupName);
-        const header = createElement('ul', {
+        const header = createElement('div', {
             props: { className: POPUP_HEADER_CLASS, textContent: headerTitle },
+        });
+        const series = createElement('div', {
+            props: { className: POPUP_SERIES_CLASS, textContent: target.series },
         });
 
         return createElement('div', {
             props: { className: POPUP_CONTENT_CLASS },
-            children: [header, list],
+            children: [header, series, list],
         });
     }
 
