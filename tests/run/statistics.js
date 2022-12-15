@@ -24,6 +24,10 @@ export const filterByType = async (type) => {
     await test(`Filter by transaction types: [${typeNames}]`, () => App.view.filterByType(type));
 };
 
+export const byCategories = async () => {
+    await test('Show report by categories', () => App.view.byCategories());
+};
+
 export const byAccounts = async () => {
     await test('Show report by accounts', () => App.view.byAccounts());
 };
@@ -32,8 +36,16 @@ export const byCurrencies = async () => {
     await test('Show report by currencies', () => App.view.byCurrencies());
 };
 
-export const filterByAccounts = async (accounts) => {
-    await test(`Filter by accounts [${accounts}]`, () => App.view.filterByAccounts(accounts));
+export const filterByCategories = async (ids) => {
+    await test(`Filter by categories [${ids}]`, () => App.view.filterByCategories(ids));
+};
+
+export const filterByAccounts = async (ids) => {
+    await test(`Filter by accounts [${ids}]`, () => App.view.filterByAccounts(ids));
+};
+
+export const selectCurrency = async (id) => {
+    await test(`Select currency [${id}]`, () => App.view.selectCurrency(id));
 };
 
 export const groupByDay = async () => {

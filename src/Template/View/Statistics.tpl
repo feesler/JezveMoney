@@ -68,12 +68,17 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 </div>
 
                                 <div class="filters-row">
-                                    <div id="accountsFilter" class="filter-item accounts-filter" <?= hidden($byCurrency) ?>>
+                                    <div id="accountsFilter" class="filter-item accounts-filter" <?= hidden($report !== "account") ?>>
                                         <h3 class="filter-item__title">Account</h3>
                                         <select id="acc_id" multiple></select>
                                     </div>
 
-                                    <div id="currencyFilter" class="filter-item currency-filter" <?= hidden(!$byCurrency) ?>>
+                                    <div id="categoriesFilter" class="filter-item category-filter" <?= hidden($report !== "category") ?>>
+                                        <h3 class="filter-item__title">Categories</h3>
+                                        <select id="category_id" multiple></select>
+                                    </div>
+
+                                    <div id="currencyFilter" class="filter-item currency-filter" <?= hidden($report !== "currency") ?>>
                                         <h3 class="filter-item__title">Currency</h3>
                                         <select id="curr_id"></select>
                                     </div>

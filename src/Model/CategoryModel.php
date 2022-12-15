@@ -8,6 +8,8 @@ use JezveMoney\Core\Singleton;
 use JezveMoney\Core\CachedInstance;
 use JezveMoney\App\Item\CategoryItem;
 
+define("NO_CATEGORY", 0);
+
 class CategoryModel extends CachedTable
 {
     use Singleton;
@@ -16,7 +18,6 @@ class CategoryModel extends CachedTable
     private static $user_id = 0;
 
     protected $tbl_name = "categories";
-
 
     protected function onStart()
     {
@@ -150,7 +151,7 @@ class CategoryModel extends CachedTable
                 return false;
             }
             // Add child categories to remove list
-            $children = $this->getChildCategories($item_id);
+            $children = $this->findByParent($item_id);
             foreach ($children as $child) {
                 $categoriesToDelete[] = $child->id;
             }
@@ -226,10 +227,10 @@ class CategoryModel extends CachedTable
         }
 
         $returnIds = isset($params["returnIds"]) ? $params["returnIds"] : false;
-        $parentFilter = isset($params["parent_id"]) ? intval($params["parent_id"]) : 0;
+        $parentFilter = isset($params["parent_id"]) ? intval($params["parent_id"]) : null;
 
         foreach ($this->cache as $item) {
-            if ($parentFilter !== 0 && $item->parent_id !== $parentFilter) {
+            if (!is_null($parentFilter) && $item->parent_id !== $parentFilter) {
                 continue;
             }
 
@@ -240,7 +241,7 @@ class CategoryModel extends CachedTable
     }
 
 
-    public function getChildCategories($parentId = 0)
+    public function findByParent($parentId = 0)
     {
         return $this->getData(["parent_id" => $parentId]);
     }

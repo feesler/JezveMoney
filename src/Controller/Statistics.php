@@ -6,6 +6,7 @@ use JezveMoney\Core\TemplateController;
 use JezveMoney\Core\Template;
 use JezveMoney\Core\Message;
 use JezveMoney\App\Model\AccountModel;
+use JezveMoney\App\Model\CategoryModel;
 use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\TransactionModel;
 
@@ -17,15 +18,16 @@ class Statistics extends TemplateController
         $data = [];
 
         $transMod = TransactionModel::getInstance();
+        $catMod = CategoryModel::getInstance();
         $accMod = AccountModel::getInstance();
         $currMod = CurrencyModel::getInstance();
 
         $filterObj = $transMod->getHistogramFilters($_GET);
-
-        $byCurrency = ($filterObj->report == "currency");
-        $data["byCurrency"] = $byCurrency;
+        $selectedReport = $filterObj->report;
+        $data["report"] = $selectedReport;
 
         $reportTypes = [
+            ["title" => "Categories", "value" => "category"],
             ["title" => "Accounts", "value" => "account"],
             ["title" => "Currencies", "value" => "currency"]
         ];
@@ -49,14 +51,18 @@ class Statistics extends TemplateController
         $trTypes = TransactionModel::getTypeNames();
 
         $urlParams = [];
-        if ($byCurrency) {
+        if ($selectedReport === "currency") {
             $urlParams["report"] = "currency";
             if (isset($filterObj->curr_id)) {
                 $urlParams["curr_id"] = $filterObj->curr_id;
             }
-        } else {
+        } elseif ($selectedReport === "account") {
             if (isset($filterObj->acc_id)) {
                 $urlParams["acc_id"] = $filterObj->acc_id;
+            }
+        } elseif ($selectedReport === "category") {
+            if (isset($filterObj->category_id)) {
+                $urlParams["acc_id"] = $filterObj->category_id;
             }
         }
         if ($groupType_id) {
@@ -70,7 +76,6 @@ class Statistics extends TemplateController
         $baseUrl = BASEURL . "statistics/";
 
         $reportMenu = [];
-        $selectedReport = ($byCurrency) ? "currency" : "account";
         foreach ($reportTypes as $type) {
             $searchParams = $urlParams;
             $searchParams["report"] = $type["value"];
@@ -104,11 +109,12 @@ class Statistics extends TemplateController
         }
         $data["typeMenu"] = $typeMenu;
 
-        if ($byCurrency) {
+        if ($selectedReport === "currency") {
             $accCurr = $filterObj->curr_id;
         } else {
-            $account = (is_array($filterObj->acc_id) && count($filterObj->acc_id) > 0)
-                ? $accMod->getItem($filterObj->acc_id[0])
+            $accounts = $filterObj->acc_id ?? null;
+            $account = (is_array($accounts) && count($accounts) > 0)
+                ? $accMod->getItem($accounts[0])
                 : null;
             $accCurr = ($account) ? $account->curr_id : 0;
         }
@@ -119,6 +125,7 @@ class Statistics extends TemplateController
             "profile" => $this->getProfileData(),
             "currency" => $currMod->getData(),
             "accounts" => $accMod->getData(["visibility" => "all"]),
+            "categories" => $catMod->getData(),
             "view" => [
                 "accountCurrency" => $accCurr,
                 "filter" => $filterObj,

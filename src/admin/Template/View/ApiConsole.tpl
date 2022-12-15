@@ -789,17 +789,25 @@
                     <label for="statistics_type">Type (1-4)</label>
                     <input id="statistics_type" class="stretch-input" name="type" type="text">
                 </div>
-                <select id="statistics-filter" class="stretch-input" name="report">
-                    <option value="account" selected>Account</option>
-                    <option value="currency">Currency</option>
-                </select>
+                <div class="std_margin">
+                    <label for="statistics-filter">Report type</label>
+                    <select id="statistics-filter" class="stretch-input" name="report">
+                        <option value="category" selected>Category</option>
+                        <option value="account">Account</option>
+                        <option value="currency">Currency</option>
+                    </select>
+                </div>
                 <div class="std_margin">
                     <label for="statistics_curr">Currency</label>
                     <input id="statistics_curr" class="stretch-input" name="curr_id" type="text" disabled>
                 </div>
                 <div class="std_margin">
-                    <label for="statistics_acc">Account</label>
-                    <input id="statistics_acc" class="stretch-input" name="acc_id" type="text">
+                    <label for="statistics_acc">Account ids</label>
+                    <input id="statistics_acc" class="stretch-input" name="acc_id" type="text" disabled>
+                </div>
+                <div class="std_margin">
+                    <label for="statistics_cat">Category ids</label>
+                    <input id="statistics_cat" class="stretch-input" name="category_id" type="text">
                 </div>
                 <div class="std_margin">
                     <label for="statistics_group">Group by</label>

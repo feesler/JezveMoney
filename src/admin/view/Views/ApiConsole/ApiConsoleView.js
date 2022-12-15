@@ -293,9 +293,10 @@ class AdminApiConsoleView extends AdminView {
         const statisticsFilter = ge('statistics-filter');
         setEvents(statisticsFilter, {
             change: () => {
-                const isByCurrency = statisticsFilter.value === 'currency';
-                enable('statistics_curr', isByCurrency);
-                enable('statistics_acc', !isByCurrency);
+                const { value } = statisticsFilter;
+                enable('statistics_curr', (value === 'currency'));
+                enable('statistics_acc', (value === 'account'));
+                enable('statistics_cat', (value === 'account'));
             },
         });
     }
@@ -943,6 +944,9 @@ class AdminApiConsoleView extends AdminView {
         }
         if ('acc_id' in frmData) {
             frmData.acc_id = this.parseIds(frmData.acc_id).id;
+        }
+        if ('category_id' in frmData) {
+            frmData.category_id = this.parseIds(frmData.category_id).id;
         }
 
         this.apiRequest({

@@ -17,8 +17,9 @@ export class CategoryList extends List {
     }
 
     /** Returns array of ids of child categories */
-    findByParent(id) {
-        return this.filter((item) => item.parent_id === id);
+    findByParent(id = 0) {
+        const categoryId = parseInt(id, 10);
+        return this.filter((item) => item.parent_id === categoryId);
     }
 
     /** Search category with specified name */

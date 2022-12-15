@@ -663,6 +663,7 @@ export class TransactionsList extends List {
     }
 
     getStatistics(params) {
+        const report = params?.report ?? 'account';
         const amountArr = {};
         let groupArr = [];
         let sumDate = null;
@@ -672,14 +673,16 @@ export class TransactionsList extends List {
         let itemsInGroup = 0;
         let currId = params.curr_id;
         const accId = asArray(params.acc_id);
+        const categoryId = asArray(params.category_id);
+        const categoryGroups = [];
+
         const res = {
             values: [],
             series: [],
         };
 
         const categories = [];
-        const byCurrency = params.report === 'currency';
-        if (byCurrency) {
+        if (report === 'currency') {
             if (!currId) {
                 const curr = App.currency.getItemByIndex(0);
                 currId = curr?.id;
@@ -688,12 +691,26 @@ export class TransactionsList extends List {
                 return res;
             }
             categories.push(currId);
-        } else {
+        } else if (report === 'account') {
             if (accId.length === 0) {
                 return res;
             }
 
             categories.push(...accId);
+        } else if (report === 'category') {
+            if (categoryId.length === 0) {
+                const mainCategories = App.state.categories.findByParent();
+                const mainIds = mainCategories.map((item) => item.id);
+                categoryId.push(0, ...mainIds);
+            }
+
+            categories.push(...categoryId);
+
+            categories.forEach((id) => {
+                const children = App.state.categories.findByParent(id);
+                const childIds = children.map((item) => item.id);
+                categoryGroups.push([id, ...childIds]);
+            });
         }
 
         const transType = params.type ?? [EXPENSE];
@@ -717,6 +734,9 @@ export class TransactionsList extends List {
         if (accId.length > 0) {
             itemsFilter.accounts = accId;
         }
+        if (categoryId.length > 0) {
+            itemsFilter.categories = categoryId;
+        }
         if (params.startDate && params.endDate) {
             itemsFilter.startDate = params.startDate;
             itemsFilter.endDate = params.endDate;
@@ -730,13 +750,13 @@ export class TransactionsList extends List {
 
             let category = 0;
             let isSource = true;
-            if (byCurrency) {
+            if (report === 'currency') {
                 isSource = (item.type === EXPENSE);
                 category = (isSource) ? item.src_curr : item.dest_curr;
                 if (!categories.includes(category)) {
                     return;
                 }
-            } else if (accId.length > 0) {
+            } else if (report === 'account') {
                 if (categories.includes(item.src_id)) {
                     category = item.src_id;
                 } else if (categories.includes(item.dest_id)) {
@@ -745,6 +765,13 @@ export class TransactionsList extends List {
                 } else {
                     return;
                 }
+            } else if (report === 'category') {
+                const itemGroup = categoryGroups.find((group) => group.includes(item.category_id));
+                if (!itemGroup) {
+                    return;
+                }
+
+                [category] = itemGroup;
             }
 
             const time = convDate(item.date);

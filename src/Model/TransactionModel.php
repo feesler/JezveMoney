@@ -45,6 +45,8 @@ class TransactionModel extends CachedTable
     private static $destAvailTypes = [INCOME, TRANSFER, DEBT];
     private static $destMandatoryTypes = [INCOME, TRANSFER];
 
+    private static $availReports = ["account", "currency", "category"];
+
     private static $histogramGroupNames = [
         NO_GROUP => "None",
         GROUP_BY_DAY => "Day",
@@ -834,10 +836,13 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-
-    // Update result balance values of specified transactions
-    //    accounts - id or arrays of account ids to filter transactions by
-    //    pos - position of transaction to start update from, inclusively
+    /**
+     * Update result balance values of specified transactions
+     * @param mixed $accounts - id or arrays of account ids to filter transactions by
+     * @param mixed $pos - position of transaction to start update from, inclusively
+     *
+     * @return [boolean]
+     */
     protected function updateResults($accounts, $pos)
     {
         $accounts = skipZeros($accounts);
@@ -1349,7 +1354,7 @@ class TransactionModel extends CachedTable
             $categoriesReq = asArray($request["category_id"]);
             foreach ($categoriesReq as $category_id) {
                 $category_id = intval($category_id);
-                if ($category_id === 0 || $this->catModel->isExist($category_id)) {
+                if ($category_id === NO_CATEGORY || $this->catModel->isExist($category_id)) {
                     $categoryFilter[] = $category_id;
                 } elseif ($throw) {
                     throw new \Error("Invalid category '$category_id'");
@@ -1530,18 +1535,26 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-
-    // Return array of transactions
-    // Params:
-    //   type - type of transaction filter. Default is ALL
-    //   accounts - array of accounts to filter by. Default is empty
-    //   search - query string to search by comments. Default is empty
-    //   startDate - start date of transactions filter. Default is empty
-    //   endDate - end date of transactions filter. Default is empty
-    //   desc - sort result descending
-    //   onPage - count of transactions per page.
-    //   page - page to return. zero based
-    //   range - count of pages to return. Default is 1
+    /**
+     * Returns array of transactions
+     *
+     * @param array $params - array of parameters
+     *    $params = [
+     *      type - type of transaction filter. Default is ALL
+     *      accounts - array of accounts to filter by. Default is empty
+     *      persons - array of persons to filter by. Default is empty
+     *      categories - array of categories to filter by. Default is empty
+     *      search - query string to search by comments. Default is empty
+     *      startDate - start date of transactions filter. Default is empty
+     *      endDate - end date of transactions filter. Default is empty
+     *      desc - sort result descending
+     *      onPage - count of transactions per page.
+     *      page - page to return. zero based
+     *      range - count of pages to return. Default is 1
+     *    ]
+     *
+     * @return [int|CategoryItem]
+     */
     public function getData($params = null)
     {
         if (is_null($params)) {
@@ -1755,27 +1768,33 @@ class TransactionModel extends CachedTable
         $res = new \stdClass();
 
         // Report type
-        $byCurrency = (isset($request["report"]) && $request["report"] == "currency");
-        $res->report = $byCurrency ? "currency" : "account";
-
-        // Transaction type
-        $trans_type = (isset($request["type"])) ? $request["type"] : EXPENSE;
-        if (!is_array($trans_type)) {
-            $trans_type = [$trans_type];
+        $reportType = $request["report"] ?? "account";
+        if (!is_string($reportType)) {
+            throw new \Error("Invalid report type");
+        }
+        $reportType = strtolower($reportType);
+        if (!in_array($reportType, self::$availReports)) {
+            throw new \Error("Invalid report type");
         }
 
+        $res->report = $reportType;
+
+        // Transaction type
+        $transactionType = $request["type"] ?? EXPENSE;
+        $transactionType = asArray($transactionType);
+
         $transTypes = [];
-        foreach ($trans_type as $type) {
-            $intType = intval($type);
-            if (!$intType) {
+        foreach ($transactionType as $type) {
+            $type = intval($type);
+            if (!in_array($type, self::$availTypes)) {
                 throw new \Error("Invalid transaction type");
             }
-            $transTypes[] = $intType;
+            $transTypes[] = $type;
         }
         $res->type = $transTypes;
 
         // Currency or account
-        if ($byCurrency) {
+        if ($reportType === "currency") {
             if (isset($request["curr_id"]) && is_numeric($request["curr_id"])) {
                 $curr_id = intval($request["curr_id"]);
                 if (!$currModel->isExist($curr_id)) {
@@ -1788,19 +1807,33 @@ class TransactionModel extends CachedTable
                 }
             }
             $res->curr_id = $curr_id;
-        } else {
-            $accFilter = [];
+        } elseif ($reportType === "account") {
+            $accountsFilter = [];
             if (isset($request["acc_id"])) {
                 $accountsReq = asArray($request["acc_id"]);
                 foreach ($accountsReq as $acc_id) {
-                    if ($this->accModel->isExist($acc_id)) {
-                        $accFilter[] = intval($acc_id);
-                    } else {
+                    if (!$this->accModel->isExist($acc_id)) {
                         throw new \Error("Invalid account '$acc_id'");
                     }
+
+                    $accountsFilter[] = intval($acc_id);
                 }
             }
-            $res->acc_id = $accFilter;
+            $res->acc_id = $accountsFilter;
+        } elseif ($reportType === "category") {
+            $categoriesFilter = [];
+            if (isset($request["category_id"])) {
+                $categoriesReq = asArray($request["category_id"]);
+                foreach ($categoriesReq as $category_id) {
+                    $category_id = intval($category_id);
+                    if ($category_id !== NO_CATEGORY && !$this->catModel->isExist($category_id)) {
+                        throw new \Error("Invalid category '$category_id'");
+                    }
+
+                    $categoriesFilter[] = $category_id;
+                }
+            }
+            $res->category_id = $categoriesFilter;
         }
 
         // Group type
@@ -1823,37 +1856,50 @@ class TransactionModel extends CachedTable
 
 
     // Return series array of amounts and date of transactions for statistics histogram
-    public function getHistogramSeries($params = null)
+    public function getHistogramSeries($params = [])
     {
         $res = new \stdClass();
         $res->values = [];
         $res->series = [];
 
-        if (is_null($params)) {
-            $params = [];
-        }
+        $params = is_array($params) ? $params : [];
+        $reportType = $params["report"];
 
+        $accounts = [];
         $categories = [];
-        $byCurrency = (isset($params["report"]) && $params["report"] == "currency");
-        if ($byCurrency) {
+        $categoriesMap = [];
+        $dataCategories = [];
+        if ($reportType == "currency") {
             if (!isset($params["curr_id"])) {
                 return $res;
             }
 
-            $curr_id = intval($params["curr_id"]);
-            $categories = [$curr_id];
-            $acc_id = [];
-        } else {
+            $dataCategories = asArray($params["curr_id"]);
+        } elseif ($reportType == "account") {
             if (!isset($params["acc_id"])) {
                 return $res;
             }
 
-            $acc_id = asArray($params["acc_id"]);
-            $categories = $acc_id;
-            $curr_id = 0;
-
-            if (count($acc_id) === 0) {
+            $accounts = asArray($params["acc_id"]);
+            if (count($accounts) === 0) {
                 return $res;
+            }
+            $dataCategories = $accounts;
+        } elseif ($reportType == "category") {
+            if (isset($params["category_id"])) {
+                $categories = asArray($params["category_id"]);
+            }
+            if (count($categories) === 0) {
+                $mainCategories = $this->catModel->getData([
+                    "parent_id" => NO_CATEGORY,
+                    "returnIds" => true,
+                ]);
+                $categories = [NO_CATEGORY, ...$mainCategories];
+            }
+
+            $dataCategories = $categories;
+            foreach ($dataCategories as $id) {
+                $categoriesMap[] = $this->getCategoriesSet($id);
             }
         }
 
@@ -1878,7 +1924,7 @@ class TransactionModel extends CachedTable
             $transTypes[] = $intType;
             $amountArr[$intType] = [];
             $curSum[$intType] = [];
-            foreach ($categories as $category) {
+            foreach ($dataCategories as $category) {
                 $amountArr[$intType][$category] = [];
                 $curSum[$intType][$category] = 0.0;
             }
@@ -1890,12 +1936,16 @@ class TransactionModel extends CachedTable
             return null;
         }
 
+        // Prepare transactions list request
         $dataParams = [
             "type" => $transTypes,
             "orderByDate" => true,
         ];
-        if (count($acc_id) > 0) {
-            $dataParams["accounts"] = $acc_id;
+        if (count($accounts) > 0) {
+            $dataParams["accounts"] = $accounts;
+        }
+        if (count($categories) > 0) {
+            $dataParams["categories"] = $categories;
         }
         if (
             isset($params["startDate"]) && !is_null($params["startDate"]) &&
@@ -1911,24 +1961,32 @@ class TransactionModel extends CachedTable
                 continue;
             }
 
-            $category = 0;
+            $category = null;
             $isSource = true;
-            if ($byCurrency) {
-                $category = ($item->type == EXPENSE) ? $item->src_curr : $item->dest_curr;
-                if (!in_array($category, $categories)) {
-                    continue;
-                }
-
+            if ($reportType == "currency") {
                 $isSource = ($item->type == EXPENSE);
-            } elseif (count($acc_id) > 0) {
-                if (in_array($item->src_id, $categories)) {
+                $itemCurrency = ($isSource) ? $item->src_curr : $item->dest_curr;
+                if (in_array($itemCurrency, $dataCategories)) {
+                    $category = $itemCurrency;
+                }
+            } elseif ($reportType == "account") {
+                if (in_array($item->src_id, $dataCategories)) {
                     $category = $item->src_id;
-                } elseif (in_array($item->dest_id, $categories)) {
+                } elseif (in_array($item->dest_id, $dataCategories)) {
                     $category = $item->dest_id;
                     $isSource = false;
-                } else {
-                    continue;
                 }
+            } elseif ($reportType == "category") {
+                foreach ($categoriesMap as $categoryIds) {
+                    if (in_array($item->category_id, $categoryIds)) {
+                        $category = $categoryIds[0];
+                        break;
+                    }
+                }
+            }
+
+            if (is_null($category)) {
+                continue;
             }
 
             $dateInfo = $this->getDateInfo($item->date, $group_type);
@@ -1954,7 +2012,7 @@ class TransactionModel extends CachedTable
                 $dateDiff = $this->getDateDiff($sumDate, $curDate, $group_type);
 
                 foreach ($transTypes as $type) {
-                    foreach ($categories as $cat) {
+                    foreach ($dataCategories as $cat) {
                         $amountArr[$type][$cat][] = $curSum[$type][$cat];
                         $curSum[$type][$cat] = 0.0;
                         // Append empty values after saved value
@@ -1988,7 +2046,7 @@ class TransactionModel extends CachedTable
 
         if ($group_type != NO_GROUP && $remainSum != 0.0) {
             foreach ($transTypes as $type) {
-                foreach ($categories as $cat) {
+                foreach ($dataCategories as $cat) {
                     $amountArr[$type][$cat][] = $curSum[$type][$cat];
                 }
             }
@@ -2098,5 +2156,11 @@ class TransactionModel extends CachedTable
     public static function getHistogramGroupNames()
     {
         return self::$histogramGroupNames;
+    }
+
+    /** Returns array of available histogram report types */
+    public static function getHistogramReportTypes()
+    {
+        return self::$availReports;
     }
 }

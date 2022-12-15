@@ -11,6 +11,7 @@ import { Histogram } from 'jezvejs/Histogram';
 import { DropDown } from 'jezvejs/DropDown';
 import { LinkMenu } from 'jezvejs/LinkMenu';
 import { IconButton } from 'jezvejs/IconButton';
+import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { formatValueShort } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
@@ -19,6 +20,7 @@ import { API } from '../../js/api/index.js';
 import { View } from '../../js/View.js';
 import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
+import { CategoryList } from '../../js/model/CategoryList.js';
 import { Transaction } from '../../js/model/Transaction.js';
 import { Heading } from '../../Components/Heading/Heading.js';
 import { TransactionTypeMenu } from '../../Components/TransactionTypeMenu/TransactionTypeMenu.js';
@@ -49,6 +51,7 @@ const LEGEND_ITEM_TITLE_CLASS = 'chart-legend__item-title';
 /** Strings */
 const STR_TITLE = 'Statistics';
 const PAGE_TITLE = 'Jezve Money | Statistics';
+const TITLE_NO_CATEGORY = 'No category';
 /* Date range input */
 const START_DATE_PLACEHOLDER = 'From';
 const END_DATE_PLACEHOLDER = 'To';
@@ -85,6 +88,7 @@ class StatisticsView extends View {
         window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
         window.app.checkUserAccountModels();
+        window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
 
         this.store = createStore(reducer, initialState);
         this.store.subscribe((state, prevState) => {
@@ -109,6 +113,7 @@ class StatisticsView extends View {
             'typeMenu',
             'reportMenu',
             'accountsFilter',
+            'categoriesFilter',
             'currencyFilter',
             'dateFrm',
             // Chart
@@ -162,7 +167,7 @@ class StatisticsView extends View {
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
             multiple: true,
-            placeholder: 'Select account',
+            placeholder: 'Type to filter accounts',
             enableFilter: true,
             noResultsMessage: 'Nothing found',
             onitemselect: (obj) => this.onAccountSel(obj),
@@ -170,6 +175,18 @@ class StatisticsView extends View {
             className: 'dd_fullwidth',
         });
         window.app.initAccountsList(this.accountDropDown);
+
+        // Categories filter
+        this.categoryDropDown = CategorySelect.create({
+            elem: 'category_id',
+            multiple: true,
+            placeholder: 'Type to filter categories',
+            enableFilter: true,
+            noResultsMessage: 'Nothing found',
+            onitemselect: (obj) => this.onCategorySel(obj),
+            onchange: (obj) => this.onCategorySel(obj),
+            className: 'dd_fullwidth',
+        });
 
         // 'Group by' filter
         this.groupDropDown = DropDown.create({
@@ -277,10 +294,10 @@ class StatisticsView extends View {
 
     /**
      * Account select callback
-     * @param {object} obj - selected account item
+     * @param {object} accounts - selected accounts
      */
-    onAccountSel(obj) {
-        const ids = asArray(obj).map((item) => parseInt(item.id, 10));
+    onAccountSel(accounts) {
+        const ids = asArray(accounts).map((item) => parseInt(item.id, 10));
         const state = this.store.getState();
         const filterIds = state.form.acc_id ?? [];
         if (isSameSelection(ids, filterIds)) {
@@ -288,6 +305,23 @@ class StatisticsView extends View {
         }
 
         this.store.dispatch(actions.changeAccountsFilter(ids));
+        const { form } = this.store.getState();
+        this.requestData(form);
+    }
+
+    /**
+     * Categories select callback
+     * @param {object} categories - selected categories
+     */
+    onCategorySel(categories) {
+        const ids = asArray(categories).map((item) => parseInt(item.id, 10));
+        const state = this.store.getState();
+        const filterIds = state.form.category_id ?? [];
+        if (isSameSelection(ids, filterIds)) {
+            return;
+        }
+
+        this.store.dispatch(actions.changeCategoriesFilter(ids));
         const { form } = this.store.getState();
         this.requestData(form);
     }
@@ -391,19 +425,38 @@ class StatisticsView extends View {
         });
     }
 
-    getCategoryName(category) {
-        const state = this.store.getState();
-        const isStacked = (
-            state.filter.report === 'account'
-            && state.filter.acc_id?.length > 1
+    isStackedData(filter) {
+        const { report } = filter;
+        return (
+            report === 'category'
+            || (report === 'account' && filter.acc_id?.length > 1)
         );
-        if (isStacked) {
-            const account = window.app.model.userAccounts.getItem(category);
+    }
+
+    getDataCategoryName(value) {
+        const categoryId = parseInt(value, 10);
+        const state = this.store.getState();
+        const isStacked = this.isStackedData(state.filter);
+        if (!isStacked) {
+            const selectedTypes = asArray(state.form.type);
+            return Transaction.getTypeTitle(selectedTypes[categoryId]);
+        }
+
+        if (state.filter.report === 'account') {
+            const account = window.app.model.userAccounts.getItem(categoryId);
             return account.name;
         }
 
-        const selectedTypes = asArray(state.form.type);
-        return Transaction.getTypeTitle(selectedTypes[category]);
+        if (state.filter.report === 'category') {
+            if (categoryId === 0) {
+                return TITLE_NO_CATEGORY;
+            }
+
+            const category = window.app.model.categories.getItem(categoryId);
+            return category.name;
+        }
+
+        throw new Error('Invalid state');
     }
 
     renderLegendContent(categories) {
@@ -420,7 +473,7 @@ class StatisticsView extends View {
                 children: createElement('span', {
                     props: {
                         className: LEGEND_ITEM_TITLE_CLASS,
-                        textContent: this.getCategoryName(category),
+                        textContent: this.getDataCategoryName(category),
                     },
                 }),
             })),
@@ -444,6 +497,17 @@ class StatisticsView extends View {
         });
     }
 
+    renderCategoriesFilter(state) {
+        const ids = state.form?.category_id ?? [];
+        window.app.model.categories.forEach((category) => {
+            if (ids.includes(category.id)) {
+                this.categoryDropDown.selectItem(category.id);
+            } else {
+                this.categoryDropDown.deselectItem(category.id);
+            }
+        });
+    }
+
     renderFilters(state, prevState = {}) {
         if (state.form === prevState.form) {
             return;
@@ -458,13 +522,15 @@ class StatisticsView extends View {
         this.typeMenu.setURL(filterUrl);
         this.typeMenu.setSelection(state.form.type);
 
-        const isByCurrency = (state.form.report === 'currency');
-        this.reportMenu.setActive(state.form.report);
+        const { report } = state.form;
+        this.reportMenu.setActive(report);
 
-        show(this.accountsFilter, !isByCurrency);
-        show(this.currencyFilter, isByCurrency);
+        show(this.accountsFilter, (report === 'account'));
+        show(this.categoriesFilter, (report === 'category'));
+        show(this.currencyFilter, (report === 'currency'));
 
         this.renderAccountsFilter(state);
+        this.renderCategoriesFilter(state);
 
         if (state.form.curr_id) {
             this.currencyDropDown.selectItem(state.form.curr_id);
@@ -495,10 +561,7 @@ class StatisticsView extends View {
         const data = (noData)
             ? { values: [], series: [] }
             : state.chartData;
-        data.stacked = (
-            state.filter.report === 'account'
-            && state.filter.acc_id?.length > 1
-        );
+        data.stacked = this.isStackedData(state.filter);
 
         this.histogram.setData(data);
         this.histogram.elem.dataset.time = state.renderTime;

@@ -208,6 +208,7 @@ export const isStatisticsFilter = (obj) => verifyObject(obj, {
     report: isString,
 }, {
     type: isIntArray,
+    category_id: isIntArray,
     acc_id: isIntArray,
     curr_id: isInt,
     group: isString,
