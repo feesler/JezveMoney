@@ -7,7 +7,7 @@ import {
     click,
     evaluate,
 } from 'jezve-test';
-import { App } from '../../Application.js';
+import { App } from '../../../Application.js';
 
 export class Tile extends TestComponent {
     async parseContent() {
@@ -85,13 +85,5 @@ export class Tile extends TestComponent {
         }
 
         return res;
-    }
-
-    static renderCategory(category) {
-        assert(category, 'Invalid category');
-
-        return {
-            title: category.name,
-        };
     }
 }

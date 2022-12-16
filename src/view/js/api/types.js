@@ -95,6 +95,10 @@ export const isArrayOf = (verifyFunc) => {
 
 /** Verify object is array of integers */
 export const isIntArray = isArrayOf(isInt);
+/** Verify object is array of numbers */
+export const isNumArray = isArrayOf(isNum);
+/** Verify object is array of strings */
+export const isStringArray = isArrayOf(isString);
 
 /** Verify object is date string in DD.MM.YYYY format */
 export const isDateString = (obj) => checkDate(obj);
@@ -169,6 +173,53 @@ export const isTransactionsList = (obj) => verifyObject(obj, {
     pagination: isPaginator,
 }, {
     order: isString,
+});
+
+/** Verify object is statistics histogram data set */
+export const isHistogramDataset = (obj) => verifyObject(obj, {
+    data: isNumArray,
+}, {
+    group: isInt,
+    category: isInt,
+});
+
+/** Verify object is array of statistics histogram values */
+export const isHistogramValues = isArrayOf(isHistogramDataset);
+
+/** Verify object is statistics histogram series item */
+export const isStatisticsSeriesItem = (obj) => (
+    Array.isArray(obj)
+    && obj.length === 2
+    && isString(obj[0])
+    && isInt(obj[1])
+);
+
+/** Verify object is array of statistics histogram series */
+export const isStatisticsSeries = isArrayOf(isStatisticsSeriesItem);
+
+/** Verify object is statistics histogram */
+export const isStatisticsHistogram = (obj) => verifyObject(obj, {
+    values: isHistogramValues,
+    series: isStatisticsSeries,
+});
+
+/** Verify object is statistics filter */
+export const isStatisticsFilter = (obj) => verifyObject(obj, {
+    report: isString,
+}, {
+    type: isIntArray,
+    category_id: isIntArray,
+    acc_id: isIntArray,
+    curr_id: isInt,
+    group: isString,
+    stdate: isString,
+    enddate: isString,
+});
+
+/** Verify object is statistics response */
+export const isStatistics = (obj) => verifyObject(obj, {
+    histogram: isStatisticsHistogram,
+    filter: isStatisticsFilter,
 });
 
 /** Verify object is import template */

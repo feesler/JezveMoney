@@ -139,6 +139,30 @@ class Transaction extends ApiListController
     }
 
 
+    public function setCategory()
+    {
+        if (!$this->isPOST()) {
+            throw new \Error(Message::get(ERR_INVALID_REQUEST));
+        }
+
+        $request = $this->getRequestData();
+        $reqData = checkFields($request, ["id", "category_id"]);
+        if ($reqData === false) {
+            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
+        }
+
+        $this->begin();
+
+        if (!$this->model->setCategory($reqData["id"], $reqData["category_id"])) {
+            throw new \Error(Message::get(ERR_TRANS_SET_CATEGORY));
+        }
+
+        $this->commit();
+
+        $this->ok();
+    }
+
+
     public function setPos()
     {
         if (!$this->isPOST()) {
@@ -170,17 +194,17 @@ class Transaction extends ApiListController
 
         $request = $this->getRequestData();
         $filterObj = $this->model->getHistogramFilters($request);
-
-        $byCurrency = $filterObj->report == "currency";
         $params = [
             "report" => $filterObj->report,
             "type" => $filterObj->type,
         ];
 
-        if ($byCurrency) {
+        if ($params["report"] === "currency") {
             $params["curr_id"] = $filterObj->curr_id;
-        } else {
+        } elseif ($params["report"] === "account") {
             $params["acc_id"] = $filterObj->acc_id;
+        } elseif ($params["report"] === "category") {
+            $params["category_id"] = $filterObj->category_id;
         }
 
         if (isset($filterObj->group)) {

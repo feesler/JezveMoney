@@ -718,6 +718,7 @@ export class AppState {
         const data = copyFields(params, catReqFields);
         const ind = this.categories.create(data);
         const item = this.categories.getItemByIndex(ind);
+        this.categories.sortByParent();
 
         return item.id;
     }
@@ -738,14 +739,9 @@ export class AppState {
         }
 
         this.categories.update(expItem);
+        this.categories.sortByParent();
 
         return true;
-    }
-
-    getChildCategories(id) {
-        return this.categories
-            .filter((item) => item.parent_id === id)
-            .map((item) => item.id);
     }
 
     deleteCategories(categoryIds) {
@@ -760,7 +756,7 @@ export class AppState {
 
         const categoriesToDelete = ids.flatMap((id) => ([
             id,
-            ...this.categories.getChildren(id),
+            ...this.categories.findByParent(id).map((item) => item.id),
         ]));
 
         // Prepare expected updates of transactions
@@ -1026,7 +1022,7 @@ export class AppState {
         this.accounts = this.accounts.updateTransaction(origTrans, expTrans);
 
         // Prepare expected updates of transactions
-        this.transactions.update(expTrans.id, expTrans);
+        this.transactions.update(expTrans);
         this.transactions.updateResults(this.accounts);
         this.updatePersonAccounts();
 
@@ -1051,6 +1047,24 @@ export class AppState {
         this.updatePersonAccounts();
 
         return true;
+    }
+
+    setTransactionCategory({ id, category }) {
+        const ids = asArray(id);
+        if (ids.length === 0) {
+            return false;
+        }
+
+        if (!ids.every((itemId) => this.transactions.getItem(itemId))) {
+            return false;
+        }
+
+        const categoryId = parseInt(category, 10);
+        if (categoryId !== 0 && !this.categories.getItem(category)) {
+            return false;
+        }
+
+        return this.transactions.setCategory(id, category);
     }
 
     setTransactionPos({ id, pos }) {

@@ -39,11 +39,12 @@ const listMenuItems = [
     'sortModeBtn',
     'selectAllBtn',
     'deselectAllBtn',
+    'setCategoryBtn',
     'deleteBtn',
 ];
 
 const contextMenuItems = [
-    'ctxUpdateBtn', 'ctxDeleteBtn',
+    'ctxUpdateBtn', 'ctxSetCategoryBtn', 'ctxDeleteBtn',
 ];
 
 const TITLE_SHOW_MAIN = 'Show main';
@@ -130,6 +131,28 @@ export class TransactionListView extends AppView {
         res.transList = await TransactionList.create(this, transList);
 
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
+
+        const categoryDialogElem = await query('#selectCategoryDialog');
+        res.selectCategoryDialog = { elem: categoryDialogElem };
+        if (categoryDialogElem) {
+            const dropDownElem = await query(categoryDialogElem, '.dd__container');
+            const categorySelect = await DropDown.create(this, dropDownElem);
+            categorySelect.visible = await isVisible(categorySelect.elem, true);
+
+            const okBtn = {
+                elem: await query(categoryDialogElem, '.popup__controls .btn.submit-btn'),
+            };
+            okBtn.visible = await isVisible(okBtn.elem, true);
+
+            const cancelBtn = {
+                elem: await query(categoryDialogElem, '.popup__controls .btn.cancel-btn'),
+            };
+            cancelBtn.visible = await isVisible(cancelBtn.elem, true);
+
+            res.selectCategoryDialog.categorySelect = categorySelect;
+            res.selectCategoryDialog.okBtn = okBtn;
+            res.selectCategoryDialog.cancelBtn = cancelBtn;
+        }
 
         return res;
     }
@@ -220,6 +243,11 @@ export class TransactionListView extends AppView {
             const locURL = new URL(this.location);
             res.detailsMode = locURL.searchParams.has('mode') && locURL.searchParams.get('mode') === 'details';
         }
+
+        res.showCategoryDialog = cont.selectCategoryDialog.visible;
+        res.categoryDialog = {
+            categoryId: cont.selectCategoryDialog.categorySelect?.value,
+        };
 
         res.loading = cont.loadingIndicator.visible;
 
@@ -432,6 +460,7 @@ export class TransactionListView extends AppView {
             deselectAllBtn: {
                 visible: showSelectItems && selected.length > 0,
             },
+            setCategoryBtn: { visible: showSelectItems && selected.length > 0 },
             deleteBtn: { visible: showSelectItems && selected.length > 0 },
         };
 
@@ -445,6 +474,7 @@ export class TransactionListView extends AppView {
             };
 
             res.ctxUpdateBtn = { visible: true };
+            res.ctxSetCategoryBtn = { visible: true };
             res.ctxDeleteBtn = { visible: true };
         }
 
@@ -466,6 +496,20 @@ export class TransactionListView extends AppView {
             };
 
             res.modeSelector.title = (model.detailsMode) ? TITLE_SHOW_MAIN : TITLE_SHOW_DETAILS;
+        }
+
+        // Set category dialog
+        res.selectCategoryDialog = {
+            visible: model.showCategoryDialog,
+        };
+        if (model.showCategoryDialog) {
+            res.selectCategoryDialog.categorySelect = {
+                visible: true,
+                value: model.categoryDialog.categoryId,
+            };
+            res.selectCategoryDialog.okBtn = {
+                visible: true,
+            };
         }
 
         return res;
@@ -1096,11 +1140,55 @@ export class TransactionListView extends AppView {
         return navigation(() => this.content.ctxUpdateBtn.click());
     }
 
+    /** Select category for specified transaction */
+    async setTransactionCategory(index, category) {
+        await this.openContextMenu(index);
+
+        this.model.showCategoryDialog = true;
+        this.model.contextMenuVisible = false;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.ctxSetCategoryBtn.click());
+        this.checkState(expected);
+
+        const { selectCategoryDialog } = this.content;
+        const { categorySelect } = selectCategoryDialog;
+        await this.waitForList(async () => {
+            await categorySelect.setSelection(category);
+            await click(selectCategoryDialog.okBtn.elem);
+        });
+    }
+
+    /** Set category for selected transactions */
+    async setCategory(data, category) {
+        const transactions = asArray(data);
+        assert(transactions.length > 0, 'Not transactions specified');
+
+        await this.selectTransactions(transactions);
+
+        await this.openListMenu();
+
+        this.model.listMenuVisible = false;
+        this.model.showCategoryDialog = true;
+        const expected = this.getExpectedState();
+
+        await this.performAction(() => this.content.setCategoryBtn.click());
+
+        this.checkState(expected);
+
+        const { selectCategoryDialog } = this.content;
+        const { categorySelect } = selectCategoryDialog;
+        await this.waitForList(async () => {
+            await categorySelect.setSelection(category);
+            await click(selectCategoryDialog.okBtn.elem);
+        });
+    }
+
     /** Delete specified transactions */
     async deleteTransactions(data) {
         assert(data, 'No transactions specified');
 
-        const transactions = Array.isArray(data) ? data : [data];
+        const transactions = asArray(data);
         await this.selectTransactions(transactions);
 
         await this.openListMenu();

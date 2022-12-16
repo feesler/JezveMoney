@@ -8,13 +8,14 @@ import {
     navigation,
     waitForFunction,
     click,
+    queryAll,
 } from 'jezve-test';
 import { IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
-import { TilesList } from './component/TilesList.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 import { Counter } from './component/Counter.js';
+import { CategoryItem } from './component/CategoryItem.js';
 
 const listMenuItems = [
     'selectModeBtn',
@@ -29,6 +30,12 @@ const contextMenuItems = [
 
 /** List of categories view class */
 export class CategoryListView extends AppView {
+    static render(state) {
+        return {
+            items: state.categories.map((item) => CategoryItem.render(item)),
+        };
+    }
+
     async parseContent() {
         const res = {
             title: { elem: await query('.content_wrap > .heading > h1') },
@@ -51,21 +58,25 @@ export class CategoryListView extends AppView {
 
         // Context menu
         res.contextMenu = { elem: await query('#contextMenu') };
-        const contextParent = await closest(res.contextMenu.elem, '.tile');
+        const contextParent = await closest(res.contextMenu.elem, '.category-item');
         if (contextParent) {
             const itemId = await prop(contextParent, 'dataset.id');
-            res.contextMenu.tileId = parseInt(itemId, 10);
-            assert(res.contextMenu.tileId, 'Invalid category');
+            res.contextMenu.itemId = parseInt(itemId, 10);
+            assert(res.contextMenu.itemId, 'Invalid category');
 
             await this.parseMenuItems(res, contextMenuItems);
         }
 
         res.title.value = prop(res.title.elem, 'textContent');
-        res.tiles = await TilesList.create(this, await query('.content-header + .tiles'));
-        res.loadingIndicator = { elem: await query('.loading-indicator') };
-        res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
-        res.renderTime = await prop(res.tiles.elem, 'dataset.time');
+        // Categories list
+        const listContainer = await query('#contentContainer .categories-list');
+        const listItems = await queryAll(listContainer, '.category-item');
+        res.items = await asyncMap(listItems, (item) => CategoryItem.create(this, item));
+        res.renderTime = await prop(listContainer, 'dataset.time');
+
+        res.loadingIndicator = { elem: await query('#contentContainer .loading-indicator') };
+        res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
         return res;
     }
@@ -98,13 +109,13 @@ export class CategoryListView extends AppView {
         return 'list';
     }
 
-    async buildModel(cont) {
+    buildModel(cont) {
         const contextMenuVisible = cont.contextMenu.visible;
         const res = {
-            tiles: cont.tiles.getItems(),
+            items: cont.items.map((item) => item.model),
             loading: cont.loadingIndicator.visible,
             renderTime: cont.renderTime,
-            contextItem: cont.contextMenu.tileId,
+            contextItem: cont.contextMenu.itemId,
             mode: this.getViewMode(cont),
             listMenuVisible: cont.listMenu.visible,
             contextMenuVisible,
@@ -114,7 +125,7 @@ export class CategoryListView extends AppView {
     }
 
     getExpectedState(model = this.model) {
-        const itemsCount = model.tiles.length;
+        const itemsCount = model.items.length;
         const selectedItems = this.getSelectedItems(model);
         const totalSelected = selectedItems.length;
         const isListMode = model.mode === 'list';
@@ -149,7 +160,7 @@ export class CategoryListView extends AppView {
 
             res.contextMenu = {
                 visible: true,
-                tileId: model.contextItem,
+                itemId: model.contextItem,
             };
 
             res.ctxUpdateBtn = { visible: true };
@@ -160,15 +171,11 @@ export class CategoryListView extends AppView {
     }
 
     getSelectedItems(model = this.model) {
-        return model.tiles.filter((item) => item.isActive);
+        return model.items.filter((item) => item.selected);
     }
 
     onDeselectAll() {
-        this.model.tiles = this.model.tiles.map((item) => ({ ...item, isActive: false }));
-    }
-
-    getItems() {
-        return this.content.tiles.getItems();
+        this.model.items = this.model.items.map((item) => ({ ...item, selected: false }));
     }
 
     /** Click on add button */
@@ -200,21 +207,18 @@ export class CategoryListView extends AppView {
         await this.parse();
     }
 
-    async openContextMenu(num) {
+    async openContextMenu(index) {
+        assert.arrayIndex(this.model.items, index, 'Invalid category index');
+
         await this.cancelSelectMode();
 
-        const totalTiles = this.model.tiles.length;
-        assert(num >= 0 && num < totalTiles, 'Invalid category number');
-
-        const item = this.model.tiles[num];
-
+        const item = this.model.items[index];
         this.model.contextMenuVisible = true;
         this.model.contextItem = item.id;
         const expected = this.getExpectedState();
 
-        const tile = this.content.tiles.items[num];
-
-        await this.performAction(() => tile.click());
+        const categoryItem = this.content.items[index];
+        await this.performAction(() => categoryItem.clickMenu());
 
         return this.checkState(expected);
     }
@@ -269,16 +273,16 @@ export class CategoryListView extends AppView {
         await this.setSelectMode();
 
         const indexes = asArray(data);
-        for (const num of indexes) {
-            assert.arrayIndex(this.model.tiles, num, 'Invalid category number');
+        for (const index of indexes) {
+            assert.arrayIndex(this.model.items, index, 'Invalid category index');
 
-            const item = this.model.tiles[num];
-            item.isActive = !item.isActive;
+            const item = this.model.items[index];
+            item.selected = !item.selected;
 
             const expected = this.getExpectedState();
 
-            const tile = this.content.tiles.items[num];
-            await this.waitForList(() => tile.click());
+            const categoryItem = this.content.items[index];
+            await this.waitForList(() => categoryItem.click());
 
             this.checkState(expected);
         }
@@ -291,7 +295,7 @@ export class CategoryListView extends AppView {
         await this.openListMenu();
 
         this.model.listMenuVisible = false;
-        this.model.tiles = this.model.tiles.map((item) => ({ ...item, isActive: true }));
+        this.model.items = this.model.items.map((item) => ({ ...item, selected: true }));
         const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.selectAllBtn.click());
@@ -327,13 +331,5 @@ export class CategoryListView extends AppView {
         assert(this.content.delete_warning?.content?.visible, 'Delete categories warning popup not appear');
 
         await this.waitForList(() => click(this.content.delete_warning.content.okBtn));
-    }
-
-    static render(state) {
-        const res = {
-            tiles: TilesList.renderCategories(state.categories),
-        };
-
-        return res;
     }
 }

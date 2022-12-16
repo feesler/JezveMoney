@@ -54,6 +54,7 @@
                     <li data-target="updateTrForm">Update</li>
                     <li data-target="updateDebtForm">Update debt</li>
                     <li data-target="delTrForm">Delete</li>
+                    <li data-target="setTrCategoryForm">Set category</li>
                     <li data-target="setTrPosForm">Set position</li>
                     <li data-target="statisticsForm">Statistics</li>
                 </ul>
@@ -746,8 +747,25 @@
         </div>
         </div>
 
+        <div id="setTrCategoryForm" class="request-data-form">
+        <h3>Set category of transaction</h3>
+        <form action="<?=BASEURL?>api/transaction/setCategory" method="post">
+            <div class="std_margin">
+                <label for="trans_setCategory_id">Id</label>
+                <input id="trans_setCategory_id" class="stretch-input" name="id" type="text">
+            </div>
+            <div class="std_margin">
+                <label for="trans_setCategory_category_id">Category id</label>
+                <input id="trans_setCategory_category_id" class="stretch-input" name="category_id" type="text">
+            </div>
+            <div class="form-controls">
+                <input class="btn submit-btn" type="submit" value="Submit">
+            </div>
+        </form>
+        </div>
+
         <div id="setTrPosForm" class="request-data-form">
-        <h3>Set position of transacction</h3>
+        <h3>Set position of transaction</h3>
         <form action="<?=BASEURL?>api/transaction/setpos" method="post">
             <div class="std_margin">
                 <label for="trans_pos_id">Id</label>
@@ -771,17 +789,25 @@
                     <label for="statistics_type">Type (1-4)</label>
                     <input id="statistics_type" class="stretch-input" name="type" type="text">
                 </div>
-                <select id="statistics-filter" class="stretch-input" name="filter">
-                    <option value="account" selected>Account</option>
-                    <option value="currency">Currency</option>
-                </select>
+                <div class="std_margin">
+                    <label for="statistics-filter">Report type</label>
+                    <select id="statistics-filter" class="stretch-input" name="report">
+                        <option value="category" selected>Category</option>
+                        <option value="account">Account</option>
+                        <option value="currency">Currency</option>
+                    </select>
+                </div>
                 <div class="std_margin">
                     <label for="statistics_curr">Currency</label>
                     <input id="statistics_curr" class="stretch-input" name="curr_id" type="text" disabled>
                 </div>
                 <div class="std_margin">
-                    <label for="statistics_acc">Account</label>
-                    <input id="statistics_acc" class="stretch-input" name="acc_id" type="text">
+                    <label for="statistics_acc">Account ids</label>
+                    <input id="statistics_acc" class="stretch-input" name="acc_id" type="text" disabled>
+                </div>
+                <div class="std_margin">
+                    <label for="statistics_cat">Category ids</label>
+                    <input id="statistics_cat" class="stretch-input" name="category_id" type="text">
                 </div>
                 <div class="std_margin">
                     <label for="statistics_group">Group by</label>

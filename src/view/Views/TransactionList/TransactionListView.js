@@ -32,15 +32,22 @@ import { FiltersContainer } from '../../Components/FiltersContainer/FiltersConta
 import { createStore } from '../../js/store.js';
 import { reducer, actions, isSameSelection } from './reducer.js';
 import './style.scss';
+import { Field } from '../../Components/Field/Field.js';
 
 /* Strings */
 const STR_TITLE = 'Transactions';
 const PAGE_TITLE = 'Jezve Money | Transactions';
 const MSG_SET_POS_FAIL = 'Fail to change position of transaction.';
+/* Delete transactions confirm dialog */
 const TITLE_SINGLE_TRANS_DELETE = 'Delete transaction';
 const TITLE_MULTI_TRANS_DELETE = 'Delete transactions';
 const MSG_MULTI_TRANS_DELETE = 'Are you sure want to delete selected transactions?<br>Changes in the balance of affected accounts will be canceled.';
 const MSG_SINGLE_TRANS_DELETE = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
+/* */
+const TITLE_BTN_SET_CATEGORY = 'Set category...';
+/* Select category dialog */
+const TITLE_DIALOG_SET_CATEGORY = 'Set category';
+const TITLE_CATEGORY = 'Category';
 /* Mode selector items */
 const TITLE_SHOW_MAIN = 'Show main';
 const TITLE_SHOW_DETAILS = 'Show details';
@@ -74,6 +81,10 @@ class TransactionListView extends View {
             listMode: 'list',
             contextItem: null,
             selDateRange: null,
+            showCategoryDialog: false,
+            categoryDialog: {
+                categoryId: 0,
+            },
             renderTime: Date.now(),
         };
 
@@ -210,7 +221,9 @@ class TransactionListView extends View {
 
         // Loading indicator
         this.listContainer = document.querySelector('.list-container');
-        this.loadingIndicator = LoadingIndicator.create();
+        this.loadingIndicator = LoadingIndicator.create({
+            fixed: false,
+        });
         this.listContainer.append(this.loadingIndicator.elem);
 
         // List mode selected
@@ -296,6 +309,10 @@ class TransactionListView extends View {
                 id: 'separator2',
                 type: 'separator',
             }, {
+                id: 'setCategoryBtn',
+                title: TITLE_BTN_SET_CATEGORY,
+                onClick: () => this.showCategoryDialog(true),
+            }, {
                 id: 'deleteBtn',
                 icon: 'del',
                 title: 'Delete',
@@ -314,11 +331,43 @@ class TransactionListView extends View {
                 icon: 'update',
                 title: 'Edit',
             }, {
+                id: 'ctxSetCategoryBtn',
+                title: TITLE_BTN_SET_CATEGORY,
+                onClick: () => this.showCategoryDialog(true),
+            }, {
+                type: 'separator',
+            }, {
                 id: 'ctxDeleteBtn',
                 icon: 'del',
                 title: 'Delete',
                 onClick: () => this.confirmDelete(),
             }],
+        });
+    }
+
+    createSetCategoryDialog() {
+        if (this.setCategoryDialog) {
+            return;
+        }
+
+        this.categorySelect = CategorySelect.create({
+            className: 'dd_fullwidth',
+            onchange: (category) => this.onChangeCategorySelect(category),
+        });
+        this.categoryField = Field.create({
+            title: TITLE_CATEGORY,
+            content: this.categorySelect.elem,
+            className: 'view-row',
+        });
+
+        this.setCategoryDialog = ConfirmDialog.create({
+            id: 'selectCategoryDialog',
+            title: TITLE_DIALOG_SET_CATEGORY,
+            content: this.categoryField.elem,
+            className: 'category-dialog',
+            destroyOnResult: false,
+            onconfirm: () => this.setItemsCategory(),
+            onreject: () => this.closeCategoryDialog(),
         });
     }
 
@@ -330,6 +379,19 @@ class TransactionListView extends View {
 
     showContextMenu(itemId) {
         this.store.dispatch(actions.showContextMenu(itemId));
+    }
+
+    showCategoryDialog() {
+        const ids = this.getContextIds();
+        if (ids.length === 0) {
+            return;
+        }
+
+        this.store.dispatch(actions.showCategoryDialog(ids));
+    }
+
+    closeCategoryDialog() {
+        this.store.dispatch(actions.closeCategoryDialog());
     }
 
     toggleSelectItem(itemId) {
@@ -550,6 +612,35 @@ class TransactionListView extends View {
         });
     }
 
+    /** Send API request to change category of selected transactions */
+    async setItemsCategory() {
+        const state = this.store.getState();
+        if (state.loading) {
+            return;
+        }
+
+        const { ids, categoryId } = state.categoryDialog;
+        if (ids.length === 0) {
+            return;
+        }
+
+        this.closeCategoryDialog();
+        this.startLoading();
+
+        try {
+            await API.transaction.setCategory({ id: ids, category_id: categoryId });
+            this.requestTransactions(state.form);
+        } catch (e) {
+            window.app.createMessage(e.message, 'msg_error');
+            this.stopLoading();
+            this.setRenderTime();
+        }
+    }
+
+    onChangeCategorySelect(category) {
+        this.store.dispatch(actions.changeCategorySelect(category.id));
+    }
+
     /** Date range filter change handler */
     onChangeDateFilter(data) {
         this.store.dispatch(actions.changeDateFilter(data));
@@ -570,6 +661,7 @@ class TransactionListView extends View {
             ...state.form,
             range,
             page,
+            keepState: true,
         });
     }
 
@@ -597,7 +689,7 @@ class TransactionListView extends View {
                 this.showContextMenu(itemId);
             }
         } else if (state.listMode === 'select') {
-            if (e?.target?.closest('.checkbox')) {
+            if (e?.target?.closest('.checkbox') && e.pointerType !== '') {
                 e.preventDefault();
             }
 
@@ -613,10 +705,16 @@ class TransactionListView extends View {
     async requestTransactions(options) {
         this.startLoading();
 
-        try {
-            const result = await API.transaction.list(options);
+        const { keepState = false, ...request } = options;
 
-            this.store.dispatch(actions.listRequestLoaded(result.data));
+        try {
+            const result = await API.transaction.list(request);
+            const payload = {
+                ...result.data,
+                keepState,
+            };
+
+            this.store.dispatch(actions.listRequestLoaded(payload));
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
             this.store.dispatch(actions.listRequestError());
@@ -656,7 +754,7 @@ class TransactionListView extends View {
         const isListMode = state.listMode === 'list';
         const isSelectMode = (state.listMode === 'select');
         const selectedItems = this.list.getSelectedItems();
-        const totalSelCount = selectedItems.length;
+        const selCount = selectedItems.length;
 
         show(this.createBtn, isListMode);
         this.listModeBtn.show(!isListMode);
@@ -669,11 +767,12 @@ class TransactionListView extends View {
 
         show(items.separator1, isSelectMode);
 
-        items.selectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount < itemsCount);
-        items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && totalSelCount > 0);
+        items.selectAllBtn.show(isSelectMode && itemsCount > 0 && selCount < itemsCount);
+        items.deselectAllBtn.show(isSelectMode && itemsCount > 0 && selCount > 0);
         show(items.separator2, isSelectMode);
 
-        items.deleteBtn.show(isSelectMode && totalSelCount > 0);
+        items.setCategoryBtn.show(isSelectMode && selCount > 0);
+        items.deleteBtn.show(isSelectMode && selCount > 0);
     }
 
     /** Render accounts and persons selection */
@@ -723,7 +822,19 @@ class TransactionListView extends View {
         });
     }
 
-    render(state) {
+    renderCategoryDialog(state, prevState) {
+        if (state.showCategoryDialog === prevState?.showCategoryDialog) {
+            return;
+        }
+
+        if (state.showCategoryDialog) {
+            this.createSetCategoryDialog();
+        }
+        this.setCategoryDialog?.show(state.showCategoryDialog);
+        this.categorySelect?.selectItem(state.categoryDialog.categoryId);
+    }
+
+    render(state, prevState = {}) {
         if (state.loading) {
             this.loadingIndicator.show();
         }
@@ -795,6 +906,8 @@ class TransactionListView extends View {
 
         this.renderContextMenu(state);
         this.renderMenu(state);
+
+        this.renderCategoryDialog(state, prevState);
 
         if (!state.loading) {
             this.loadingIndicator.hide();

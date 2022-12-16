@@ -183,6 +183,7 @@ export class Tile extends Component {
             this.checkbox = Checkbox.create({
                 className: CHECKBOX_CLASS,
             });
+            this.checkbox.input.tabIndex = (state.type === 'static') ? 0 : -1;
             this.elem.append(this.checkbox.elem);
         }
 

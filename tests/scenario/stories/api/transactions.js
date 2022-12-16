@@ -493,6 +493,45 @@ const delInvalid = async () => {
     await App.scenario.runner.runGroup(TransactionApiTests.del, data);
 };
 
+const setCategory = async () => {
+    setBlock('Set category of transactions', 2);
+
+    const {
+        TR_EXPENSE_1,
+        TR_EXPENSE_2,
+        TR_EXPENSE_3,
+        CAFE_CATEGORY,
+        FOOD_CATEGORY,
+    } = App.scenario;
+
+    const data = [
+        { id: TR_EXPENSE_1, category_id: CAFE_CATEGORY },
+        { id: [TR_EXPENSE_2, TR_EXPENSE_3], category_id: FOOD_CATEGORY },
+        { id: [TR_EXPENSE_2], category_id: 0 },
+    ];
+
+    await App.scenario.runner.runGroup(TransactionApiTests.setPos, data);
+};
+
+const setCategoryInvalid = async () => {
+    setBlock('Set category of transactions with invalid data', 2);
+
+    const {
+        TR_EXPENSE_1,
+        CAFE_CATEGORY,
+    } = App.scenario;
+
+    const data = [
+        { id: null, category_id: CAFE_CATEGORY },
+        { id: [null, null], category_id: CAFE_CATEGORY },
+        { id: [-1], category_id: CAFE_CATEGORY },
+        { id: [TR_EXPENSE_1], category_id: null },
+        { id: [TR_EXPENSE_1], category_id: -1 },
+    ];
+
+    await App.scenario.runner.runGroup(TransactionApiTests.setPos, data);
+};
+
 const setPos = async () => {
     setBlock('Set position of transaction', 2);
 
@@ -558,12 +597,17 @@ const filter = async () => {
 const statistics = async () => {
     setBlock('Statistics', 1);
 
-    const { RUB } = App.scenario;
+    const {
+        RUB,
+        ACC_RUB,
+        FOOD_CATEGORY,
+        BIKE_CATEGORY,
+    } = App.scenario;
 
     const data = [
         {},
-        { report: 'account', acc_id: App.scenario.ACC_RUB },
-        { report: 'account', acc_id: App.scenario.ACC_RUB, type: INCOME },
+        { report: 'account', acc_id: ACC_RUB },
+        { report: 'account', acc_id: ACC_RUB, type: INCOME },
         { report: 'currency', curr_id: RUB },
         { report: 'currency', curr_id: RUB, group: 'day' },
         { report: 'currency', curr_id: RUB, group: 'week' },
@@ -576,20 +620,38 @@ const statistics = async () => {
         },
         {
             report: 'account',
-            acc_id: App.scenario.ACC_RUB,
+            acc_id: ACC_RUB,
             group: 'week',
             type: EXPENSE,
         },
         {
             report: 'account',
-            acc_id: App.scenario.ACC_RUB,
+            acc_id: ACC_RUB,
             group: 'month',
             type: EXPENSE,
         },
         {
             report: 'account',
-            acc_id: App.scenario.ACC_RUB,
+            acc_id: ACC_RUB,
             group: 'year',
+            type: EXPENSE,
+        },
+        {
+            report: 'category',
+            category_id: 0,
+            group: 'day',
+            type: EXPENSE,
+        },
+        {
+            report: 'category',
+            category_id: FOOD_CATEGORY,
+            group: 'day',
+            type: EXPENSE,
+        },
+        {
+            report: 'category',
+            category_id: [FOOD_CATEGORY, BIKE_CATEGORY],
+            group: 'day',
             type: EXPENSE,
         },
     ];
@@ -608,6 +670,8 @@ export const apiTransactionsTests = {
     async updateTests() {
         await update();
         await updateInvalid();
+        await setCategory();
+        await setCategoryInvalid();
         await setPos();
     },
 

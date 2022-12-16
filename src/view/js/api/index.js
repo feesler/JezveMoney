@@ -163,6 +163,10 @@ export const API = {
             return apiPost('transaction/delete', ids);
         },
 
+        async setCategory(options = {}) {
+            return apiPost('transaction/setCategory', options);
+        },
+
         async setPos(id, pos) {
             return apiPost('transaction/setpos', { id, pos });
         },

@@ -358,6 +358,11 @@ export const api = {
             return data;
         },
 
+        async setCategory(options) {
+            await apiPost('transaction/setCategory', options);
+            return true;
+        },
+
         async setPos(options) {
             await apiPost('transaction/setpos', options);
             return true;

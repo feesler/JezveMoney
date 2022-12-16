@@ -35,6 +35,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                             </div>
                         </div>
                     </div>
+                    <div id="contentContainer" class="content-container"></div>
                 </div>
             </div>
         </div>

@@ -24,15 +24,14 @@ export class CategorySelect extends DropDown {
 
             this.addItem({ id: category.id, title: category.name });
             // Search for children categories
-            const children = categories.getChildren(category.id);
+            const children = categories.findByParent(category.id);
             if (children.length === 0) {
                 return;
             }
             const group = this.addGroup();
-            const groupItems = children.map((id) => {
-                const child = categories.getItem(id);
-                return { id: child.id, title: child.name, group };
-            });
+            const groupItems = children.map((item) => (
+                { id: item.id, title: item.name, group }
+            ));
             this.append(groupItems);
         });
     }

@@ -18,7 +18,6 @@
   align-items: center;
   justify-content: flex-start;
   width: 0;
-  overflow: hidden;
   transition: width 0.2s ease;
 
   .checkbox {
@@ -64,11 +63,18 @@
     padding: 4px;
     background: none;
     cursor: pointer;
+
+    .popup-menu-btn__icon {
+      height: 18px;
+      width: 18px;
+      fill: var(--list-item-icon-fill);
+    }
   }
 
-  .popup-menu-btn__icon {
-    height: 18px;
-    width: 18px;
+  .popup-menu-btn:focus {
+    .popup-menu-btn__icon {
+      fill: var(--list-item-hover-icon-fill);
+    }
   }
 }
 
@@ -278,6 +284,14 @@
 
     .trans-item__balance {
       justify-content: flex-end;
+    }
+  }
+}
+
+@media (hover: hover) {
+  .trans-item__controls .popup-menu-btn:hover {
+    .popup-menu-btn__icon {
+      fill: var(--list-item-hover-icon-fill);
     }
   }
 }

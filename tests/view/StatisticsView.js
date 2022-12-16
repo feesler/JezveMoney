@@ -47,6 +47,12 @@ export class StatisticsView extends AppView {
             res.accountsDropDown = await DropDown.createFromChild(this, await query('#acc_id'));
         }
 
+        res.categoryDropDown = null;
+        const categoriesFilter = await query('#categoriesFilter');
+        if (await isVisible(categoriesFilter)) {
+            res.categoryDropDown = await DropDown.createFromChild(this, await query('#category_id'));
+        }
+
         res.currencyDropDown = null;
         const currencyFilter = await query('#currencyFilter');
         if (await isVisible(currencyFilter)) {
@@ -67,7 +73,7 @@ export class StatisticsView extends AppView {
         res.chart.renderTime = await prop(res.chart.elem, 'dataset.time');
         res.chartContainer = { elem: await query(res.chart.elem, '.charts') };
 
-        res.loadingIndicator = { elem: await query('.loading-indicator') };
+        res.loadingIndicator = { elem: await query(res.chart.elem, '.loading-indicator') };
         res.noDataMessage = { elem: await query(res.chart.elem, '.nodata-message') };
 
         const bars = await queryAll(res.chart.elem, '.histogram__bar');
@@ -92,10 +98,9 @@ export class StatisticsView extends AppView {
             filtersVisible: cont.filtersContainer.visible,
         };
 
-        const selectedReport = cont.reportMenu.value;
         res.filter = {
             type: cont.typeMenu.value,
-            byCurrency: selectedReport === 'currency',
+            report: cont.reportMenu.value,
             startDate: null,
             endDate: null,
         };
@@ -105,14 +110,16 @@ export class StatisticsView extends AppView {
             res.filter.endDate = dateRange.endDate;
         }
 
-        if (res.filter.byCurrency) {
+        if (res.filter.report === 'currency') {
             const [selectedCurr] = cont.currencyDropDown.getSelectedValues();
             const currency = App.currency.getItem(selectedCurr);
             assert(currency, 'Currency not found');
 
             res.filter.curr_id = currency.id;
-        } else {
+        } else if (res.filter.report === 'account') {
             res.filter.accounts = this.getDropDownFilter(cont.accountsDropDown);
+        } else if (res.filter.report === 'category') {
+            res.filter.categories = this.getDropDownFilter(cont.categoryDropDown);
         }
 
         const [selectedGroup] = cont.groupDropDown.getSelectedValues();
@@ -146,7 +153,7 @@ export class StatisticsView extends AppView {
 
     getExpectedState(model = this.model) {
         const { filtersVisible } = model;
-        const { byCurrency } = model.filter;
+        const { report } = model.filter;
 
         const res = {
             typeMenu: {
@@ -155,7 +162,7 @@ export class StatisticsView extends AppView {
             },
             reportMenu: {
                 visible: filtersVisible,
-                value: (byCurrency) ? 'currency' : 'account',
+                value: report,
             },
             dateFilter: {
                 visible: filtersVisible,
@@ -168,32 +175,38 @@ export class StatisticsView extends AppView {
             chartContainer: {},
         };
 
-        if (byCurrency) {
+        if (report === 'currency') {
             const currency = App.currency.getItem(model.filter.curr_id);
             res.currencyDropDown = {
                 visible: filtersVisible,
                 textValue: currency.name,
             };
-        } else {
+        } else if (report === 'account') {
             res.accountsDropDown = {
                 visible: filtersVisible,
                 isMulti: true,
-                selectedItems: model.filter.accounts.map(
-                    (accountId) => ({ id: accountId.toString() }),
-                ),
+                selectedItems: model.filter.accounts.map((id) => ({ id: id.toString() })),
+            };
+        } else if (report === 'category') {
+            res.categoryDropDown = {
+                visible: filtersVisible,
+                isMulti: true,
+                selectedItems: model.filter.categories.map((id) => ({ id: id.toString() })),
             };
         }
 
         // Prepare expected histogram data
         const params = {
             type: model.filter.type,
-            report: (byCurrency) ? 'currency' : 'account',
+            report,
             group: this.getGroupTypeString(model.filter.group),
         };
-        if (byCurrency) {
+        if (report === 'currency') {
             params.curr_id = model.filter.curr_id;
-        } else {
+        } else if (report === 'account') {
             params.acc_id = model.filter.accounts;
+        } else if (report === 'category') {
+            params.category_id = model.filter.categories;
         }
 
         if (model.filter.startDate && model.filter.endDate) {
@@ -321,11 +334,26 @@ export class StatisticsView extends AppView {
         return App.view.checkState(expected);
     }
 
+    async byCategories() {
+        await this.openFilters();
+
+        this.model.filter.report = 'category';
+        delete this.model.filter.curr_id;
+        delete this.model.filter.accounts;
+        this.model.filter.categories = [];
+        const expected = this.getExpectedState();
+
+        await this.waitForData(() => this.content.reportMenu.selectItemByValue('category'));
+
+        return App.view.checkState(expected);
+    }
+
     async byAccounts() {
         await this.openFilters();
 
-        this.model.filter.byCurrency = false;
+        this.model.filter.report = 'account';
         delete this.model.filter.curr_id;
+        delete this.model.filter.categories;
 
         const account = App.state.getFirstAccount();
         this.model.filter.accounts = account.id;
@@ -339,8 +367,9 @@ export class StatisticsView extends AppView {
     async byCurrencies() {
         await this.openFilters();
 
-        this.model.filter.byCurrency = true;
+        this.model.filter.report = 'currency';
         delete this.model.filter.accounts;
+        delete this.model.filter.categories;
 
         const currency = App.currency.getItemByIndex(0);
         this.model.filter.curr_id = currency.id;
@@ -366,6 +395,18 @@ export class StatisticsView extends AppView {
         }
 
         await this.performAction(() => this.content[dropDown].showList(false));
+    }
+
+    async filterByCategories(ids) {
+        await this.openFilters();
+
+        const categories = asArray(ids);
+        this.model.filter.categories = categories;
+        const expected = this.getExpectedState();
+
+        await this.setFilterSelection('categoryDropDown', categories);
+
+        return App.view.checkState(expected);
     }
 
     async filterByAccounts(ids) {

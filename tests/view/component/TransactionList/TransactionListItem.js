@@ -38,9 +38,10 @@ export class TransactionListItem extends TestComponent {
             ] = await queryAll(this.elem, '.trans-item__amount-field .field__content');
             const dateElem = await query(this.elem, '.trans-item__date-field .field__content');
 
-            const sourceVisible = await isVisible(srcAccountElem, false);
-            const destVisible = await isVisible(srcAccountElem, false);
-            const destAmountVisible = await isVisible(destAmountElem, false);
+            const sourceVisible = await isVisible(srcAccountElem, true);
+            const destVisible = await isVisible(destAccountElem, true);
+            const srcAmountVisible = await isVisible(srcAmountElem, true);
+            const destAmountVisible = await isVisible(destAmountElem, true);
 
             const props = await evaluate((sAccount, dAccount, sAmount, dAmount, dateEl) => ({
                 sourceContent: sAccount.textContent,
@@ -51,9 +52,9 @@ export class TransactionListItem extends TestComponent {
             }), srcAccountElem, destAccountElem, srcAmountElem, destAmountElem, dateElem);
 
             if (sourceVisible && destVisible) {
-                res.accountTitle = (sourceVisible) ? props.sourceContent : props.destContent;
-            } else {
                 res.accountTitle = `${props.sourceContent} → ${props.destContent}`;
+            } else {
+                res.accountTitle = (sourceVisible) ? props.sourceContent : props.destContent;
             }
 
             let sign;
@@ -63,27 +64,17 @@ export class TransactionListItem extends TestComponent {
             if (res.type === INCOME) {
                 sign = '+ ';
             }
-            if (res.type === TRANSFER) {
+            if (res.type === TRANSFER || res.type === DEBT) {
                 sign = '';
             }
-            if (res.type === DEBT) {
-                let debtType;
-                if (sourceVisible) {
-                    const srcAcc = App.state.accounts.findByName(props.sourceContent);
-                    debtType = srcAcc?.owner_id !== App.state.profile.owner_id;
-                } else {
-                    debtType = false;
-                }
-                const acc = (debtType) ? destVisible : sourceVisible;
 
-                sign = (acc === debtType) ? '+ ' : '- ';
-            }
-
-            if (destAmountVisible) {
+            if (srcAmountVisible && destAmountVisible) {
                 res.amountText = `${sign}${props.srcAmount} (${sign}${props.destAmount})`;
             } else {
                 res.amountText = `${sign}${props.srcAmount}`;
             }
+
+            res.dateFmt = props.dateFmt;
         } else {
             const titleElem = await query(this.elem, '.trans-item__title');
             assert(titleElem, 'Account title not found');

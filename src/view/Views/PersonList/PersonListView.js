@@ -68,7 +68,6 @@ class PersonListView extends View {
             getItemProps: (person, { listMode }) => ({
                 type: 'button',
                 attrs: { 'data-id': person.id },
-                className: 'tiles',
                 title: person.name,
                 selected: person.selected,
                 selectMode: listMode === 'select',
@@ -87,6 +86,7 @@ class PersonListView extends View {
             'selectedCounter',
             'selItemsCount',
             'heading',
+            'contentContainer',
             'hiddenTilesHeading',
         ];
         elemIds.forEach((id) => {
@@ -101,10 +101,10 @@ class PersonListView extends View {
         });
 
         this.visibleTiles = ListContainer.create(listProps);
-        insertAfter(this.visibleTiles.elem, this.contentHeader);
+        this.contentContainer.prepend(this.visibleTiles.elem);
 
         this.hiddenTiles = ListContainer.create(listProps);
-        insertAfter(this.hiddenTiles.elem, this.hiddenTilesHeading);
+        this.contentContainer.append(this.hiddenTiles.elem);
 
         this.createBtn = ge('add_btn');
 
@@ -121,8 +121,10 @@ class PersonListView extends View {
 
         this.createContextMenu();
 
-        this.loadingIndicator = LoadingIndicator.create();
-        insertAfter(this.loadingIndicator.elem, this.hiddenTiles.elem);
+        this.loadingIndicator = LoadingIndicator.create({
+            fixed: false,
+        });
+        this.contentContainer.append(this.loadingIndicator.elem);
 
         this.render(state);
     }
@@ -198,7 +200,7 @@ class PersonListView extends View {
         if (listMode === 'list') {
             this.showContextMenu(itemId);
         } else if (listMode === 'select') {
-            if (e?.target?.closest('.checkbox')) {
+            if (e?.target?.closest('.checkbox') && e.pointerType !== '') {
                 e.preventDefault();
             }
 

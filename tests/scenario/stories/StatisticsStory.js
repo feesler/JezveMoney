@@ -27,10 +27,15 @@ export class StatisticsStory extends TestStory {
         setBlock('Statistics', 1);
 
         const {
+            RUB,
+            USD,
+            EUR,
             ACC_3,
             ACC_RUB,
             ACC_EUR,
             ACC_USD,
+            FOOD_CATEGORY,
+            BIKE_CATEGORY,
         } = App.scenario;
 
         await App.view.navigateToStatistics();
@@ -61,6 +66,16 @@ export class StatisticsStory extends TestStory {
         await StatisticsTests.byCurrencies();
         // Change transaction type when currencies filter is selected
         await StatisticsTests.filterByType(EXPENSE);
+
+        await StatisticsTests.selectCurrency(USD);
+        await StatisticsTests.selectCurrency(EUR);
+        await StatisticsTests.selectCurrency(RUB);
+
+        // Show report by categories
+        await StatisticsTests.byCategories();
+        await StatisticsTests.filterByCategories(FOOD_CATEGORY);
+        await StatisticsTests.filterByCategories([FOOD_CATEGORY, BIKE_CATEGORY]);
+        await StatisticsTests.filterByCategories(0);
 
         await StatisticsTests.selectDateRange({
             start: App.dates.yearAgo,

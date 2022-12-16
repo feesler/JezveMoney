@@ -1,7 +1,23 @@
-.heading {
-  max-width: calc(var(--tile-size) * 4 + var(--tile-gap) * 3);
+.heading,
+.content-header,
+.content-container {
+  max-width: 430px;
 }
 
-.popup-menu-list {
-  --popupmenu-z-index: 2500;
+.content-container {
+  position: relative;
+}
+
+/* Categories list */
+.categories-list {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  width: 100%;
+  gap: 4px;
+  max-width: 430px;
+}
+
+.categories-list_select .trans-item {
+  cursor: pointer;
 }

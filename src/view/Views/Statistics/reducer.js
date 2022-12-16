@@ -64,6 +64,17 @@ const slice = createSlice({
         };
     },
 
+    changeCategoriesFilter: (state, ids) => {
+        const categories = asArray(ids);
+        return {
+            ...state,
+            form: {
+                ...state.form,
+                category_id: categories,
+            },
+        };
+    },
+
     changeCurrencyFilter: (state, currencyId) => (
         (state.form.curr_id === currencyId)
             ? state

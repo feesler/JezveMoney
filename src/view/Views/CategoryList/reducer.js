@@ -1,6 +1,14 @@
 import { CategoryList } from '../../js/model/CategoryList.js';
 import { createSlice } from '../../js/store.js';
 
+/** Prepare data from categories list model for list component */
+export const createItemsFromModel = () => {
+    const { categories } = window.app.model;
+    const res = CategoryList.create(categories);
+    res.sortByParent();
+    return res;
+};
+
 // Reducers
 const reduceDeselectAll = (state) => ({
     ...state,
@@ -70,7 +78,7 @@ const slice = createSlice({
 
     listRequestLoaded: (state) => ({
         ...state,
-        items: CategoryList.create(window.app.model.categories),
+        items: createItemsFromModel(),
         listMode: 'list',
         contextItem: null,
     }),

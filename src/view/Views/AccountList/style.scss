@@ -1,7 +1,9 @@
-.heading {
+.heading,
+.content-header,
+.content-container {
   max-width: calc(var(--tile-size) * 4 + var(--tile-gap) * 3);
 }
 
-.popup-menu-list {
-  --popupmenu-z-index: 2500;
+.content-container {
+  position: relative;
 }

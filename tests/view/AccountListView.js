@@ -12,7 +12,7 @@ import {
 } from 'jezve-test';
 import { IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
-import { TilesList } from './component/TilesList.js';
+import { TilesList } from './component/Tiles/TilesList.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
 import { Counter } from './component/Counter.js';
@@ -66,9 +66,9 @@ export class AccountListView extends AppView {
         }
 
         res.title.value = await prop(res.title.elem, 'textContent');
-        res.tiles = await TilesList.create(this, await query('.content-header + .tiles'));
+        res.tiles = await TilesList.create(this, await query('#contentContainer .tiles:first-child'));
         res.hiddenTiles = await TilesList.create(this, await query('#hiddenTilesHeading + .tiles'));
-        res.loadingIndicator = { elem: await query('.loading-indicator') };
+        res.loadingIndicator = { elem: await query('#contentContainer .loading-indicator') };
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
         res.renderTime = await prop(res.tiles.elem, 'dataset.time');

@@ -1,0 +1,119 @@
+/* Categories list item */
+.category-item {
+  --category-item-height: 3rem;
+  --category-item-bg: var(--list-item-bg-color);
+  --category-item-text-color: var(--accent-color-alt);
+  --category-item-font-size: 1rem;
+  --category-item-selected-color: var(--accent-color);
+
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: stretch;
+  position: relative;
+  border: 0;
+  height: var(--category-item-height);
+}
+
+/* Content */
+.category-item__content {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: 8px;
+  position: relative;
+  row-gap: 2px;
+  flex: 1 1 auto;
+  overflow: hidden;
+  background-color: var(--list-item-bg-color);
+}
+
+/* Category title */
+.category-item__title {
+  color: var(--category-item-text-color);
+  font-size: var(--category-item-font-size);
+}
+
+/* Select controls */
+.category-item__select {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  width: 0;
+  transition: width 0.2s ease;
+
+  .checkbox {
+    --checkbox-size: 24px;
+
+    margin: 0;
+  }
+
+  .checkbox__check {
+    margin: 0;
+    border-radius: 50%;
+  }
+}
+
+/* Select state */
+.categories-list_select .category-item__select {
+  width: 32px;
+}
+
+/* Menu controls */
+.category-item__controls {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  background-color: var(--category-item-bg);
+
+  .popup-menu {
+    position: static;
+    height: 26px;
+    margin: 0 4px;
+  }
+
+  .popup-menu-btn {
+    width: 26px;
+    height: 26px;
+    padding: 4px;
+    background: none;
+
+    .popup-menu-btn__icon {
+      height: 18px;
+      width: 18px;
+      fill: var(--list-item-icon-fill);
+    }
+  }
+
+  .popup-menu-btn:focus {
+    .popup-menu-btn__icon {
+      fill: var(--list-item-hover-icon-fill);
+    }
+  }
+}
+
+/* Child item */
+.category-item_child {
+  margin-left: 32px;
+}
+
+/* Selected state */
+.category-item_selected::after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 32px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border: 2px solid var(--category-item-selected-color);
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .category-item__controls .popup-menu-btn:hover {
+    .popup-menu-btn__icon {
+      fill: var(--list-item-hover-icon-fill);
+    }
+  }
+}
