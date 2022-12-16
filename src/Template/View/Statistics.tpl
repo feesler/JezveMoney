@@ -46,24 +46,22 @@ include(TPL_PATH . "Header.tpl");    ?>
                                         ]) ?>
                                     </div>
 
-                                    <div class="filters-row_fixed">
-                                        <div class="filter-item report-type-filter">
-                                            <h3 class="filter-item__title">Report type</h3>
-                                            <?= LinkMenu::render(["id" => "reportMenu", "items" => $reportMenu]) ?>
-                                        </div>
+                                    <div class="filter-item report-type-filter">
+                                        <h3 class="filter-item__title">Report type</h3>
+                                        <?= LinkMenu::render(["id" => "reportMenu", "items" => $reportMenu]) ?>
+                                    </div>
 
-                                        <div class="filter-item group-type-filter">
-                                            <h3 class="filter-item__title">Group by</h3>
-                                            <select id="groupsel">
-                                                <?php foreach ($groupTypes as $val => $grtype) {    ?>
-                                                    <?php if ($val == $groupType_id) {        ?>
-                                                        <option value="<?= e($val) ?>" selected><?= e($grtype) ?></option>
-                                                    <?php        } else { ?>
-                                                        <option value="<?= e($val) ?>"><?= e($grtype) ?></option>
-                                                    <?php        } ?>
-                                                <?php    }    ?>
-                                            </select>
-                                        </div>
+                                    <div class="filter-item group-type-filter">
+                                        <h3 class="filter-item__title">Group by</h3>
+                                        <select id="groupsel">
+                                            <?php foreach ($groupTypes as $val => $grtype) {    ?>
+                                                <?php if ($val == $groupType_id) {        ?>
+                                                    <option value="<?= e($val) ?>" selected><?= e($grtype) ?></option>
+                                                <?php        } else { ?>
+                                                    <option value="<?= e($val) ?>"><?= e($grtype) ?></option>
+                                                <?php        } ?>
+                                            <?php    }    ?>
+                                        </select>
                                     </div>
                                 </div>
 
