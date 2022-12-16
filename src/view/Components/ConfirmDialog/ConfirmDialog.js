@@ -1,6 +1,12 @@
 import { isFunction, Component } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
 
+const defaultProps = {
+    destroyOnResult: true,
+    title: null,
+    content: null,
+};
+
 /**
  * Confirmation dialog component
  * @param {Object} props
@@ -10,8 +16,11 @@ import { Popup } from 'jezvejs/Popup';
  * @param {Function} props.onreject - reject callback function
  */
 export class ConfirmDialog extends Component {
-    constructor(...args) {
-        super(...args);
+    constructor(props = {}) {
+        super({
+            ...defaultProps,
+            ...props,
+        });
 
         if (!isFunction(this.props.onconfirm)) {
             throw new Error('Invalid onconfirm callback');
@@ -59,8 +68,8 @@ export class ConfirmDialog extends Component {
     /**
      * Show/hide base element of component
      */
-    show() {
-        this.popup.show();
+    show(value = true) {
+        this.popup.show(value);
     }
 
     /**
@@ -69,7 +78,9 @@ export class ConfirmDialog extends Component {
      */
     onResult(confirmResult) {
         this.popup.hide();
-        this.popup.destroy();
+        if (this.props.destroyOnResult) {
+            this.popup.destroy();
+        }
 
         if (confirmResult) {
             this.props.onconfirm();

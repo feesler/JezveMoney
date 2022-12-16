@@ -43,8 +43,10 @@ const TITLE_SINGLE_TRANS_DELETE = 'Delete transaction';
 const TITLE_MULTI_TRANS_DELETE = 'Delete transactions';
 const MSG_MULTI_TRANS_DELETE = 'Are you sure want to delete selected transactions?<br>Changes in the balance of affected accounts will be canceled.';
 const MSG_SINGLE_TRANS_DELETE = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
+/* */
+const TITLE_BTN_SET_CATEGORY = 'Set category...';
 /* Select category dialog */
-const TITLE_SET_CATEGORY = 'Set category';
+const TITLE_DIALOG_SET_CATEGORY = 'Set category';
 const TITLE_CATEGORY = 'Category';
 /* Mode selector items */
 const TITLE_SHOW_MAIN = 'Show main';
@@ -79,6 +81,10 @@ class TransactionListView extends View {
             listMode: 'list',
             contextItem: null,
             selDateRange: null,
+            showCategoryDialog: false,
+            categoryDialog: {
+                categoryId: 0,
+            },
             renderTime: Date.now(),
         };
 
@@ -302,8 +308,8 @@ class TransactionListView extends View {
                 type: 'separator',
             }, {
                 id: 'setCategoryBtn',
-                title: 'Set category...',
-                onClick: () => this.selectCategoryForItems(),
+                title: TITLE_BTN_SET_CATEGORY,
+                onClick: () => this.showCategoryDialog(true),
             }, {
                 id: 'deleteBtn',
                 icon: 'del',
@@ -323,11 +329,43 @@ class TransactionListView extends View {
                 icon: 'update',
                 title: 'Edit',
             }, {
+                id: 'ctxSetCategoryBtn',
+                title: TITLE_BTN_SET_CATEGORY,
+                onClick: () => this.showCategoryDialog(true),
+            }, {
+                type: 'separator',
+            }, {
                 id: 'ctxDeleteBtn',
                 icon: 'del',
                 title: 'Delete',
                 onClick: () => this.confirmDelete(),
             }],
+        });
+    }
+
+    createSetCategoryDialog() {
+        if (this.setCategoryDialog) {
+            return;
+        }
+
+        this.categorySelect = CategorySelect.create({
+            className: 'dd_fullwidth',
+            onchange: (category) => this.onChangeCategorySelect(category),
+        });
+        this.categoryField = Field.create({
+            title: TITLE_CATEGORY,
+            content: this.categorySelect.elem,
+            className: 'view-row',
+        });
+
+        this.setCategoryDialog = ConfirmDialog.create({
+            id: 'selectCategoryDialog',
+            title: TITLE_DIALOG_SET_CATEGORY,
+            content: this.categoryField.elem,
+            className: 'category-dialog',
+            destroyOnResult: false,
+            onconfirm: () => this.setItemsCategory(),
+            onreject: () => this.closeCategoryDialog(),
         });
     }
 
@@ -339,6 +377,19 @@ class TransactionListView extends View {
 
     showContextMenu(itemId) {
         this.store.dispatch(actions.showContextMenu(itemId));
+    }
+
+    showCategoryDialog() {
+        const ids = this.getContextIds();
+        if (ids.length === 0) {
+            return;
+        }
+
+        this.store.dispatch(actions.showCategoryDialog(ids));
+    }
+
+    closeCategoryDialog() {
+        this.store.dispatch(actions.closeCategoryDialog());
     }
 
     toggleSelectItem(itemId) {
@@ -560,21 +611,22 @@ class TransactionListView extends View {
     }
 
     /** Send API request to change category of selected transactions */
-    async setItemsCategory(category) {
+    async setItemsCategory() {
         const state = this.store.getState();
         if (state.loading) {
             return;
         }
 
-        const ids = this.getContextIds();
+        const { ids, categoryId } = state.categoryDialog;
         if (ids.length === 0) {
             return;
         }
 
+        this.closeCategoryDialog();
         this.startLoading();
 
         try {
-            await API.transaction.setCategory({ id: ids, category_id: category.id });
+            await API.transaction.setCategory({ id: ids, category_id: categoryId });
             this.requestTransactions(state.form);
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
@@ -583,31 +635,8 @@ class TransactionListView extends View {
         }
     }
 
-    /**
-     * Show select category dialog
-     */
-    selectCategoryForItems() {
-        const ids = this.getContextIds();
-        if (ids.length === 0) {
-            return;
-        }
-
-        const categorySelect = CategorySelect.create({
-            className: 'dd_fullwidth',
-        });
-        const categoryField = Field.create({
-            title: TITLE_CATEGORY,
-            content: categorySelect.elem,
-            className: 'view-row',
-        });
-
-        ConfirmDialog.create({
-            id: 'selectCategoryDialog',
-            title: TITLE_SET_CATEGORY,
-            content: categoryField.elem,
-            className: 'category-dialog',
-            onconfirm: () => this.setItemsCategory(categorySelect.getSelectionData()),
-        });
+    onChangeCategorySelect(category) {
+        this.store.dispatch(actions.changeCategorySelect(category.id));
     }
 
     /** Date range filter change handler */
@@ -630,6 +659,7 @@ class TransactionListView extends View {
             ...state.form,
             range,
             page,
+            keepState: true,
         });
     }
 
@@ -673,10 +703,16 @@ class TransactionListView extends View {
     async requestTransactions(options) {
         this.startLoading();
 
-        try {
-            const result = await API.transaction.list(options);
+        const { keepState = false, ...request } = options;
 
-            this.store.dispatch(actions.listRequestLoaded(result.data));
+        try {
+            const result = await API.transaction.list(request);
+            const payload = {
+                ...result.data,
+                keepState,
+            };
+
+            this.store.dispatch(actions.listRequestLoaded(payload));
         } catch (e) {
             window.app.createMessage(e.message, 'msg_error');
             this.store.dispatch(actions.listRequestError());
@@ -784,7 +820,19 @@ class TransactionListView extends View {
         });
     }
 
-    render(state) {
+    renderCategoryDialog(state, prevState) {
+        if (state.showCategoryDialog === prevState?.showCategoryDialog) {
+            return;
+        }
+
+        if (state.showCategoryDialog) {
+            this.createSetCategoryDialog();
+        }
+        this.setCategoryDialog?.show(state.showCategoryDialog);
+        this.categorySelect?.selectItem(state.categoryDialog.categoryId);
+    }
+
+    render(state, prevState = {}) {
         if (state.loading) {
             this.loadingIndicator.show();
         }
@@ -856,6 +904,8 @@ class TransactionListView extends View {
 
         this.renderContextMenu(state);
         this.renderMenu(state);
+
+        this.renderCategoryDialog(state, prevState);
 
         if (!state.loading) {
             this.loadingIndicator.hide();

@@ -66,7 +66,11 @@ export class TransactionListStory extends TestStory {
 
             await TransactionListTests.goToFirstPage();
             await TransactionListTests.setCategory({
-                items: [0, 1, 2],
+                items: [0, 1],
+                category: FOOD_CATEGORY,
+            });
+            await TransactionListTests.setTransactionCategory({
+                index: 2,
                 category: FOOD_CATEGORY,
             });
             await TransactionListTests.setCategory({

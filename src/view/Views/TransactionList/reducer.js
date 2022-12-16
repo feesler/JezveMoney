@@ -145,15 +145,48 @@ const slice = createSlice({
         contextItem: null,
     }),
 
-    listRequestLoaded: (state, data) => ({
+    showCategoryDialog: (state, ids) => ({
         ...state,
-        items: [...data.items],
-        pagination: { ...data.pagination },
-        filter: { ...data.filter },
-        form: { ...data.filter },
-        listMode: 'list',
+        showCategoryDialog: true,
+        categoryDialog: {
+            ...state.categoryDialog,
+            ids,
+        },
         contextItem: null,
     }),
+
+    closeCategoryDialog: (state) => ({
+        ...state,
+        showCategoryDialog: false,
+    }),
+
+    changeCategorySelect: (state, id) => ({
+        ...state,
+        categoryDialog: {
+            ...state.categoryDialog,
+            categoryId: id,
+        },
+    }),
+
+    listRequestLoaded: (state, data) => {
+        const selectedBefore = (data.keepState && state.listMode === 'select')
+            ? state.items.filter((item) => item.selected).map((item) => item.id)
+            : [];
+
+        return {
+            ...state,
+            items: data.items.map((item) => (
+                (data.keepState)
+                    ? { ...item, selected: selectedBefore.includes(item.id) }
+                    : item
+            )),
+            pagination: { ...data.pagination },
+            filter: { ...data.filter },
+            form: { ...data.filter },
+            listMode: (data.keepState) ? state.listMode : 'list',
+            contextItem: null,
+        };
+    },
 
     listRequestError: (state) => ({
         ...state,

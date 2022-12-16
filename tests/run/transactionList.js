@@ -158,6 +158,32 @@ export const deselectAll = async () => {
     });
 };
 
+export const setTransactionCategory = async ({ index, category }) => {
+    await test('Set transaction category from context menu', async () => {
+        await checkNavigation();
+
+        const origItems = App.view.getItems();
+        const pageIds = origItems.map((item) => item.id);
+
+        const ind = parseInt(index, 10);
+        assert.arrayIndex(origItems, ind);
+        const { id } = origItems[ind];
+
+        App.state.setTransactionCategory({ id, category });
+        const expectedItems = App.state.transactions.getItems(pageIds);
+        const expected = {
+            transList: {
+                items: TransactionList.render(expectedItems, App.state),
+            },
+        };
+
+        await App.view.setTransactionCategory(index, category);
+        App.view.checkState(expected);
+
+        return App.state.fetchAndTest();
+    });
+};
+
 export const setCategory = async ({ items, category }) => {
     const indexes = asArray(items);
 
