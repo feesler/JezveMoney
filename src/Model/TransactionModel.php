@@ -1178,6 +1178,11 @@ class TransactionModel extends CachedTable
             return false;
         }
 
+        $categories = asArray($categories);
+        if (count($categories) === 0) {
+            return true;
+        }
+
         $updRes = $this->dbObj->updateQ(
             $this->tbl_name,
             ["category_id" => 0],

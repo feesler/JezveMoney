@@ -224,6 +224,11 @@ class ImportRuleModel extends CachedTable
             return false;
         }
 
+        $categories = asArray($categories);
+        if (count($categories) === 0) {
+            return true;
+        }
+
         $res = $this->actionModel->deleteCategoryActions($categories)
             && $this->removeEmptyRules();
 
