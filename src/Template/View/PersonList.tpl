@@ -39,8 +39,10 @@ include(TPL_PATH . "Header.tpl");    ?>
                             </div>
                         </div>
                     </div>
-                    <div id="hiddenTilesHeading" class="heading" hidden>
-                        <h1>Hidden</h1>
+                    <div id="contentContainer" class="content-container">
+                        <div id="hiddenTilesHeading" class="heading" hidden>
+                            <h1>Hidden</h1>
+                        </div>
                     </div>
                 </div>
             </div>

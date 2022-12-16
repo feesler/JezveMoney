@@ -70,12 +70,12 @@ export class CategoryListView extends AppView {
         res.title.value = prop(res.title.elem, 'textContent');
 
         // Categories list
-        const listContainer = await query('.categories-list');
+        const listContainer = await query('#contentContainer .categories-list');
         const listItems = await queryAll(listContainer, '.category-item');
         res.items = await asyncMap(listItems, (item) => CategoryItem.create(this, item));
         res.renderTime = await prop(listContainer, 'dataset.time');
 
-        res.loadingIndicator = { elem: await query('.loading-indicator') };
+        res.loadingIndicator = { elem: await query('#contentContainer .loading-indicator') };
         res.delete_warning = await WarningPopup.create(this, await query('#delete_warning'));
 
         return res;

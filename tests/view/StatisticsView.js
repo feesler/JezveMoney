@@ -73,7 +73,7 @@ export class StatisticsView extends AppView {
         res.chart.renderTime = await prop(res.chart.elem, 'dataset.time');
         res.chartContainer = { elem: await query(res.chart.elem, '.charts') };
 
-        res.loadingIndicator = { elem: await query('.loading-indicator') };
+        res.loadingIndicator = { elem: await query(res.chart.elem, '.loading-indicator') };
         res.noDataMessage = { elem: await query(res.chart.elem, '.nodata-message') };
 
         const bars = await queryAll(res.chart.elem, '.histogram__bar');

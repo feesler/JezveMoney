@@ -86,6 +86,7 @@ class PersonListView extends View {
             'selectedCounter',
             'selItemsCount',
             'heading',
+            'contentContainer',
             'hiddenTilesHeading',
         ];
         elemIds.forEach((id) => {
@@ -100,10 +101,10 @@ class PersonListView extends View {
         });
 
         this.visibleTiles = ListContainer.create(listProps);
-        insertAfter(this.visibleTiles.elem, this.contentHeader);
+        this.contentContainer.prepend(this.visibleTiles.elem);
 
         this.hiddenTiles = ListContainer.create(listProps);
-        insertAfter(this.hiddenTiles.elem, this.hiddenTilesHeading);
+        this.contentContainer.append(this.hiddenTiles.elem);
 
         this.createBtn = ge('add_btn');
 
@@ -120,8 +121,10 @@ class PersonListView extends View {
 
         this.createContextMenu();
 
-        this.loadingIndicator = LoadingIndicator.create();
-        insertAfter(this.loadingIndicator.elem, this.hiddenTiles.elem);
+        this.loadingIndicator = LoadingIndicator.create({
+            fixed: false,
+        });
+        this.contentContainer.append(this.loadingIndicator.elem);
 
         this.render(state);
     }

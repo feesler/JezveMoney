@@ -221,7 +221,9 @@ class TransactionListView extends View {
 
         // Loading indicator
         this.listContainer = document.querySelector('.list-container');
-        this.loadingIndicator = LoadingIndicator.create();
+        this.loadingIndicator = LoadingIndicator.create({
+            fixed: false,
+        });
         this.listContainer.append(this.loadingIndicator.elem);
 
         // List mode selected

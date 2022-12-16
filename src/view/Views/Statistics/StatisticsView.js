@@ -227,8 +227,10 @@ class StatisticsView extends View {
         this.histogram.elem.dataset.time = state.renderTime;
 
         // Loading indicator
-        this.loadingIndicator = LoadingIndicator.create();
-        insertAfter(this.loadingIndicator.elem, this.chart);
+        this.loadingIndicator = LoadingIndicator.create({
+            fixed: false,
+        });
+        this.chart.append(this.loadingIndicator.elem);
 
         // Select first account if nothing selected on account report type
         const accounts = asArray(state.form.acc_id);

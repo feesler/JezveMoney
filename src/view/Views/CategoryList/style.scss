@@ -1,5 +1,11 @@
-.heading {
+.heading,
+.content-header,
+.content-container {
   max-width: 430px;
+}
+
+.content-container {
+  position: relative;
 }
 
 /* Categories list */
