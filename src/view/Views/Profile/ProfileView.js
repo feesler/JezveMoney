@@ -1,5 +1,5 @@
 import 'jezvejs/style';
-import { ge, setEvents } from 'jezvejs';
+import { setEvents } from 'jezvejs';
 import { Application } from '../../js/Application.js';
 import { ResetDataDialog } from '../../Components/Profile/ResetDataDialog/ResetDataDialog.js';
 import '../../css/app.scss';
@@ -41,19 +41,13 @@ class ProfileView extends View {
 
     /** View initialization */
     onStart() {
-        const elemIds = [
+        this.loadElementsByIds([
             'userNameTitle',
             'changeNameBtn',
             'changePassBtn',
             'resetBtn',
             'delProfileBtn',
-        ];
-        elemIds.forEach((id) => {
-            this[id] = ge(id);
-            if (!this[id]) {
-                throw new Error('Failed to initialize view');
-            }
-        });
+        ]);
 
         setEvents(this.changeNameBtn, { click: (e) => this.onActionClick(e) });
         setEvents(this.changePassBtn, { click: (e) => this.onActionClick(e) });

@@ -34,7 +34,7 @@ export class PersonListView extends AppView {
     async parseContent() {
         const res = {
             title: { elem: await query('.content_wrap > .heading > h1') },
-            addBtn: await IconButton.create(this, await query('#add_btn')),
+            addBtn: await IconButton.create(this, await query('#createBtn')),
             listModeBtn: await IconButton.create(this, await query('#listModeBtn')),
             listMenuContainer: {
                 elem: await query('.heading-actions .popup-menu'),

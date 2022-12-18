@@ -1,6 +1,5 @@
 import 'jezvejs/style';
 import {
-    ge,
     createElement,
     show,
     setEvents,
@@ -96,7 +95,7 @@ class ImportView extends View {
             return;
         }
 
-        const elemIds = [
+        this.loadElementsByIds([
             'heading',
             'dataHeaderControls',
             'submitBtn',
@@ -104,13 +103,7 @@ class ImportView extends View {
             'enabledCount',
             'selectedCounter',
             'selectedCount',
-        ];
-        elemIds.forEach((id) => {
-            this[id] = ge(id);
-            if (!this[id]) {
-                throw new Error('Failed to initialize view');
-            }
-        });
+        ]);
 
         this.heading = Heading.fromElement(this.heading, {
             title: STR_TITLE,

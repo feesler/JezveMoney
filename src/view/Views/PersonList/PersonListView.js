@@ -1,10 +1,5 @@
 import 'jezvejs/style';
-import {
-    asArray,
-    ge,
-    insertAfter,
-    show,
-} from 'jezvejs';
+import { asArray, insertAfter, show } from 'jezvejs';
 import { IconButton } from 'jezvejs/IconButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Application } from '../../js/Application.js';
@@ -73,7 +68,7 @@ class PersonListView extends View {
             onItemClick: (id, e) => this.onItemClick(id, e),
         };
 
-        const elemIds = [
+        this.loadElementsByIds([
             'contentHeader',
             'itemsCount',
             'hiddenCount',
@@ -82,13 +77,8 @@ class PersonListView extends View {
             'heading',
             'contentContainer',
             'hiddenTilesHeading',
-        ];
-        elemIds.forEach((id) => {
-            this[id] = ge(id);
-            if (!this[id]) {
-                throw new Error('Failed to initialize view');
-            }
-        });
+            'createBtn',
+        ]);
 
         this.heading = Heading.fromElement(this.heading, {
             title: STR_TITLE,
@@ -99,8 +89,6 @@ class PersonListView extends View {
 
         this.hiddenTiles = ListContainer.create(listProps);
         this.contentContainer.append(this.hiddenTiles.elem);
-
-        this.createBtn = ge('add_btn');
 
         this.listModeBtn = IconButton.create({
             id: 'listModeBtn',

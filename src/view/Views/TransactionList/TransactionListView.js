@@ -1,6 +1,5 @@
 import 'jezvejs/style';
 import {
-    ge,
     createElement,
     show,
     insertAfter,
@@ -100,7 +99,7 @@ class TransactionListView extends View {
      * View initialization
      */
     onStart() {
-        const elemIds = [
+        this.loadElementsByIds([
             'heading',
             'createBtn',
             // Filters
@@ -117,13 +116,7 @@ class TransactionListView extends View {
             'itemsCount',
             'selectedCounter',
             'selItemsCount',
-        ];
-        elemIds.forEach((id) => {
-            this[id] = ge(id);
-            if (!this[id]) {
-                throw new Error('Failed to initialize view');
-            }
-        });
+        ]);
 
         this.heading = Heading.fromElement(this.heading, {
             title: STR_TITLE,

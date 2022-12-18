@@ -235,9 +235,9 @@ class Transactions extends TemplateController
         $acc_count = $data["acc_count"];
 
         $personContainer = [
-            "id" => "person",
+            "id" => "personContainer",
             "hidden" => (!$trAvailable || $tr["type"] != DEBT),
-            "inputId" => "person_id",
+            "inputId" => "personIdInp",
             "inputValue" => $data["person_id"],
             "title" => "Person",
             "tile" => $data["personTile"],
@@ -250,9 +250,9 @@ class Transactions extends TemplateController
             $debtAccountLabel = ($debtType) ? "Destination account" : "Source account";
         }
         $debtAccountContainer = [
-            "id" => "debtaccount",
+            "id" => "debtAccountContainer",
             "hidden" => (!$trAvailable || $tr["type"] != DEBT),
-            "inputId" => "acc_id",
+            "inputId" => "debtAccountInp",
             "inputValue" => $data["acc_id"],
             "title" => $debtAccountLabel,
             "baseHidden" => $noAccount,
@@ -280,9 +280,9 @@ class Transactions extends TemplateController
         $data["debtDestContainer"] = $debtDestContainer;
 
         $sourceContainer = [
-            "id" => "source",
+            "id" => "sourceContainer",
             "hidden" => (!$trAvailable || $tr["type"] == INCOME || $tr["type"] == DEBT),
-            "inputId" => "src_id",
+            "inputId" => "srcIdInp",
             "inputValue" => $tr["src_id"],
             "title" => "Source account",
             "tile" => $data["srcAccountTile"],
@@ -303,9 +303,9 @@ class Transactions extends TemplateController
         $data["sourceContainer"] = $sourceContainer;
 
         $destContainer = [
-            "id" => "destination",
+            "id" => "destContainer",
             "hidden" => (!$trAvailable || $tr["type"] == EXPENSE || $tr["type"] == DEBT),
-            "inputId" => "dest_id",
+            "inputId" => "destIdInp",
             "inputValue" => $tr["dest_id"],
             "title" => "Destination account",
             "tile" => $data["destAccountTile"],
@@ -423,15 +423,15 @@ class Transactions extends TemplateController
         $data["acc_id"] = ($debtAcc) ? $debtAcc->id : 0;
 
         $data["personTile"] = [
-            "id" => "person_tile",
+            "id" => "personTile",
             "title" => ($pObj) ? $pObj->name : null,
             "subtitle" => $this->currModel->format($person_balance, $person_curr)
         ];
 
         if ($tr["type"] == DEBT && $debtAcc) {
-            $data["debtAccountTile"] = $this->getAccountTileData($debtAcc, "acc_tile");
+            $data["debtAccountTile"] = $this->getAccountTileData($debtAcc, "debtAccountTile");
         } else {
-            $data["debtAccountTile"] = $this->getHiddenAccountTileData("acc_tile");
+            $data["debtAccountTile"] = $this->getHiddenAccountTileData("debtAccountTile");
         }
 
         if ($tr["type"] == DEBT) {
@@ -492,16 +492,16 @@ class Transactions extends TemplateController
         // get information about source and destination accounts
         $src = $this->accModel->getItem($tr["src_id"]);
         if ($src) {
-            $data["srcAccountTile"] = $this->getAccountTileData($src, "source_tile");
+            $data["srcAccountTile"] = $this->getAccountTileData($src, "sourceTile");
         } else {
-            $data["srcAccountTile"] = $this->getHiddenAccountTileData("source_tile");
+            $data["srcAccountTile"] = $this->getHiddenAccountTileData("sourceTile");
         }
 
         $dest = $this->accModel->getItem($tr["dest_id"]);
         if ($dest) {
-            $data["destAccountTile"] = $this->getAccountTileData($dest, "dest_tile");
+            $data["destAccountTile"] = $this->getAccountTileData($dest, "destTile");
         } else {
-            $data["destAccountTile"] = $this->getHiddenAccountTileData("dest_tile");
+            $data["destAccountTile"] = $this->getHiddenAccountTileData("destTile");
         }
 
         $data["src"] = $src;
@@ -602,31 +602,31 @@ class Transactions extends TemplateController
         $data["form"] = $form;
 
         $data["srcAmountInfo"] = [
-            "id" => "src_amount_left",
+            "id" => "srcAmountInfo",
             "title" => $data["srcAmountLbl"],
             "value" => $this->currModel->format($tr["src_amount"], $tr["src_curr"]),
             "hidden" => true
         ];
         $data["destAmountInfo"] = [
-            "id" => "dest_amount_left",
+            "id" => "destAmountInfo",
             "title" => $data["destAmountLbl"],
             "value" => $this->currModel->format($tr["dest_amount"], $tr["dest_curr"]),
             "hidden" => true
         ];
         $data["srcResultInfo"] = [
-            "id" => "src_res_balance_left",
+            "id" => "srcResBalanceInfo",
             "title" => "Result balance",
             "value" => $rtSrcResBal,
             "hidden" => false
         ];
         $data["destResultInfo"] = [
-            "id" => "dest_res_balance_left",
+            "id" => "destResBalanceInfo",
             "title" => "Result balance",
             "value" => $rtDestResBal,
             "hidden" => false
         ];
         $data["exchangeInfo"] = [
-            "id" => "exch_left",
+            "id" => "exchangeInfo",
             "title" => "Exchange rate",
             "value" => $rtExchange,
             "hidden" => !$isDiffCurr
@@ -705,16 +705,16 @@ class Transactions extends TemplateController
         // get information about source and destination accounts
         $src = $this->accModel->getItem($tr["src_id"]);
         if ($src) {
-            $data["srcAccountTile"] = $this->getAccountTileData($src, "source_tile", $tr["src_amount"]);
+            $data["srcAccountTile"] = $this->getAccountTileData($src, "sourceTile", $tr["src_amount"]);
         } else {
-            $data["srcAccountTile"] = $this->getHiddenAccountTileData("source_tile");
+            $data["srcAccountTile"] = $this->getHiddenAccountTileData("sourceTile");
         }
 
         $dest = $this->accModel->getItem($tr["dest_id"]);
         if ($dest) {
-            $data["destAccountTile"] = $this->getAccountTileData($dest, "dest_tile", -$tr["dest_amount"]);
+            $data["destAccountTile"] = $this->getAccountTileData($dest, "destTile", -$tr["dest_amount"]);
         } else {
-            $data["destAccountTile"] = $this->getHiddenAccountTileData("dest_tile");
+            $data["destAccountTile"] = $this->getHiddenAccountTileData("destTile");
         }
 
         $data["src"] = $src;
@@ -818,7 +818,7 @@ class Transactions extends TemplateController
         $data["noAccount"] = $noAccount;
 
         $data["personTile"] = [
-            "id" => "person_tile",
+            "id" => "personTile",
             "title" => ($pObj) ? $pObj->name : null,
             "subtitle" => $this->currModel->format($person_balance, $person_curr),
         ];
@@ -835,9 +835,9 @@ class Transactions extends TemplateController
                 $balanceDiff = ($debtType) ? -$tr["dest_amount"] : $tr["src_amount"];
             }
 
-            $data["debtAccountTile"] = $this->getAccountTileData($debtAcc, "acc_tile", $balanceDiff);
+            $data["debtAccountTile"] = $this->getAccountTileData($debtAcc, "debtAccountTile", $balanceDiff);
         } else {
-            $data["debtAccountTile"] = $this->getHiddenAccountTileData("acc_tile");
+            $data["debtAccountTile"] = $this->getHiddenAccountTileData("debtAccountTile");
         }
 
         $data["acc_id"] = ($debtAcc) ? $debtAcc->id : 0;
@@ -874,31 +874,31 @@ class Transactions extends TemplateController
         $data["form"] = $form;
 
         $data["srcAmountInfo"] = [
-            "id" => "src_amount_left",
+            "id" => "srcAmountInfo",
             "title" => $data["srcAmountLbl"],
             "value" => $this->currModel->format($tr["src_amount"], $tr["src_curr"]),
             "hidden" => true
         ];
         $data["destAmountInfo"] = [
-            "id" => "dest_amount_left",
+            "id" => "destAmountInfo",
             "title" => $data["destAmountLbl"],
             "value" => $this->currModel->format($tr["dest_amount"], $tr["dest_curr"]),
             "hidden" => true
         ];
         $data["srcResultInfo"] = [
-            "id" => "src_res_balance_left",
+            "id" => "srcResBalanceInfo",
             "title" => "Result balance",
             "value" => $rtSrcResBal,
             "hidden" => false
         ];
         $data["destResultInfo"] = [
-            "id" => "dest_res_balance_left",
+            "id" => "destResBalanceInfo",
             "title" => "Result balance",
             "value" => $rtDestResBal,
             "hidden" => false
         ];
         $data["exchangeInfo"] = [
-            "id" => "exch_left",
+            "id" => "exchangeInfo",
             "title" => "Exchange rate",
             "value" => $rtExchange,
             "hidden" => !$isDiffCurr

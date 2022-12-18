@@ -37,19 +37,19 @@ import {
 import { App } from '../Application.js';
 
 const infoItemSelectors = [
-    '#src_amount_left',
-    '#dest_amount_left',
-    '#src_res_balance_left',
-    '#dest_res_balance_left',
-    '#exch_left',
+    '#srcAmountInfo',
+    '#destAmountInfo',
+    '#srcResBalanceInfo',
+    '#destResBalanceInfo',
+    '#exchangeInfo',
 ];
 const inputRowSelectors = [
-    '#src_amount_row',
-    '#dest_amount_row',
-    '#exchange',
-    '#result_balance',
-    '#result_balance_dest',
-    '#comment_row',
+    '#srcAmountRow',
+    '#destAmountRow',
+    '#exchangeRow',
+    '#srcResBalanceRow',
+    '#destResBalanceRow',
+    '#commentRow',
 ];
 
 /** Create or update transaction view class */
@@ -77,23 +77,23 @@ export class TransactionView extends AppView {
         res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
         assert(!res.typeMenu.multi, 'Invalid transaction type menu');
 
-        res.notAvailMsg = { elem: await query('#notavailmsg') };
+        res.notAvailMsg = { elem: await query('#notAvailMsg') };
         assert(res.notAvailMsg.elem, 'No available transaction message element not found');
         res.notAvailMsg.message = await prop(res.notAvailMsg.elem, 'textContent');
 
-        res.person = await TileBlock.create(this, await query('#person'));
-        if (res.person) {
-            const personIdInp = await query('#person_id');
-            res.person.content.id = parseInt(await prop(personIdInp, 'value'), 10);
+        res.personContainer = await TileBlock.create(this, await query('#personContainer'));
+        if (res.personContainer) {
+            const personIdInp = await query('#personIdInp');
+            res.personContainer.content.id = parseInt(await prop(personIdInp, 'value'), 10);
         }
 
-        const debtOperationInp = await query('#debtOperation');
+        const debtOperationInp = await query('#debtOperationInp');
         res.debtOperation = parseInt(await prop(debtOperationInp, 'value'), 10);
 
-        const accountBlock = await query('#debtaccount');
-        res.account = await TileBlock.create(this, accountBlock);
-        const accountIdInp = await query('#acc_id');
-        res.account.content.id = parseInt(await prop(accountIdInp, 'value'), 10);
+        const accountBlock = await query('#debtAccountContainer');
+        res.debtAccountContainer = await TileBlock.create(this, accountBlock);
+        const debtAccountInp = await query('#debtAccountInp');
+        res.debtAccountContainer.content.id = parseInt(await prop(debtAccountInp, 'value'), 10);
 
         res.selaccount = await Button.create(this, await query(accountBlock, '.account-toggler'));
         assert(res.selaccount, 'Select account button not found');
@@ -106,43 +106,43 @@ export class TransactionView extends AppView {
         res.noAccountsMsg = { elem: await query(accountBlock, '.nodata-message') };
         assert(res.noAccountsMsg.elem, 'No accounts message element not found');
 
-        res.source = await TileBlock.create(this, await query('#source'));
-        if (res.source) {
-            const srcIdInp = await query('#src_id');
-            res.source.content.id = parseInt(await prop(srcIdInp, 'value'), 10);
+        res.sourceContainer = await TileBlock.create(this, await query('#sourceContainer'));
+        if (res.sourceContainer) {
+            const srcIdInp = await query('#srcIdInp');
+            res.sourceContainer.content.id = parseInt(await prop(srcIdInp, 'value'), 10);
         }
-        res.destination = await TileBlock.create(this, await query('#destination'));
-        if (res.destination) {
-            const destIdInp = await query('#dest_id');
-            res.destination.content.id = parseInt(await prop(destIdInp, 'value'), 10);
+        res.destContainer = await TileBlock.create(this, await query('#destContainer'));
+        if (res.destContainer) {
+            const destIdInp = await query('#destIdInp');
+            res.destContainer.content.id = parseInt(await prop(destIdInp, 'value'), 10);
         }
 
         [
-            res.src_amount_left,
-            res.dest_amount_left,
-            res.src_res_balance_left,
-            res.dest_res_balance_left,
-            res.exch_left,
+            res.srcAmountInfo,
+            res.destAmountInfo,
+            res.srcResBalanceInfo,
+            res.destResBalanceInfo,
+            res.exchangeInfo,
         ] = await asyncMap(
             infoItemSelectors,
             async (selector) => TileInfoItem.create(this, await query(selector)),
         );
 
         [
-            res.src_amount_row,
-            res.dest_amount_row,
-            res.exchange_row,
-            res.result_balance_row,
-            res.result_balance_dest_row,
-            res.comment_row,
+            res.srcAmountRow,
+            res.destAmountRow,
+            res.exchangeRow,
+            res.srcResBalanceRow,
+            res.destResBalanceRow,
+            res.commentRow,
         ] = await asyncMap(
             inputRowSelectors,
             async (selector) => InputRow.create(this, await query(selector)),
         );
 
-        res.datePicker = await DatePickerRow.create(this, await query('#date_row'));
+        res.datePicker = await DatePickerRow.create(this, await query('#dateRow'));
 
-        res.categorySelect = await DropDown.createFromChild(this, await query('#category'));
+        res.categorySelect = await DropDown.createFromChild(this, await query('#categorySelect'));
 
         res.submitBtn = await query('#submitBtn');
         assert(res.submitBtn, 'Submit button not found');
@@ -167,18 +167,18 @@ export class TransactionView extends AppView {
             res.id = cont.id;
         }
 
-        res.srcAccount = (cont.source)
-            ? App.state.accounts.getItem(cont.source.content.id)
+        res.srcAccount = (cont.sourceContainer)
+            ? App.state.accounts.getItem(cont.sourceContainer.content.id)
             : null;
-        res.destAccount = (cont.destination)
-            ? App.state.accounts.getItem(cont.destination.content.id)
+        res.destAccount = (cont.destContainer)
+            ? App.state.accounts.getItem(cont.destContainer.content.id)
             : null;
 
-        res.src_curr_id = (cont.src_amount_row)
-            ? parseInt(cont.src_amount_row.content.hiddenValue, 10)
+        res.src_curr_id = (cont.srcAmountRow)
+            ? parseInt(cont.srcAmountRow.content.hiddenValue, 10)
             : 0;
-        res.dest_curr_id = (cont.dest_amount_row)
-            ? parseInt(cont.dest_amount_row.content.hiddenValue, 10)
+        res.dest_curr_id = (cont.destAmountRow)
+            ? parseInt(cont.destAmountRow.content.hiddenValue, 10)
             : 0;
 
         res.srcCurr = App.currency.getItem(res.src_curr_id);
@@ -189,16 +189,16 @@ export class TransactionView extends AppView {
         }
         res.isDiffCurr = (res.src_curr_id !== res.dest_curr_id);
 
-        res.srcAmount = cont.src_amount_row.value;
+        res.srcAmount = cont.srcAmountRow.value;
         res.fSrcAmount = isValidValue(res.srcAmount) ? normalize(res.srcAmount) : res.srcAmount;
 
-        res.destAmount = cont.dest_amount_row.value;
+        res.destAmount = cont.destAmountRow.value;
         res.fDestAmount = isValidValue(res.destAmount) ? normalize(res.destAmount) : res.destAmount;
 
-        res.srcResBal = cont.result_balance_row.value;
+        res.srcResBal = cont.srcResBalanceRow.value;
         res.fSrcResBal = isValidValue(res.srcResBal) ? normalize(res.srcResBal) : res.srcResBal;
 
-        res.destResBal = cont.result_balance_dest_row.value;
+        res.destResBal = cont.destResBalanceRow.value;
         res.fDestResBal = isValidValue(res.destResBal) ? normalize(res.destResBal) : res.destResBal;
 
         if (res.isAvailable) {
@@ -206,14 +206,14 @@ export class TransactionView extends AppView {
             res.backExchSign = `${res.srcCurr.sign}/${res.destCurr.sign}`;
 
             res.useBackExchange = (res.isDiffCurr)
-                ? (cont.exchange_row.currSign === res.backExchSign)
+                ? (cont.exchangeRow.currSign === res.backExchSign)
                 : false;
 
             if (res.useBackExchange) {
-                res.backExchRate = cont.exchange_row.value;
+                res.backExchRate = cont.exchangeRow.value;
                 res.exchRate = this.calcExchange(res);
             } else {
-                res.exchRate = cont.exchange_row.value;
+                res.exchRate = cont.exchangeRow.value;
                 res.backExchRate = this.calcBackExchange(res);
             }
 
@@ -225,8 +225,8 @@ export class TransactionView extends AppView {
                 assert(res.srcAccount, 'Source account not found');
             }
 
-            const isResBalRowVisible = cont.result_balance_row?.content?.visible;
-            const exchRowVisible = cont.exchange_row?.content?.visible;
+            const isResBalRowVisible = cont.srcResBalanceRow?.content?.visible;
+            const exchRowVisible = cont.exchangeRow?.content?.visible;
 
             if (!res.isAvailable) {
                 res.state = -1;
@@ -246,8 +246,8 @@ export class TransactionView extends AppView {
                 assert(res.destAccount, 'Destination account not found');
             }
 
-            const destResRowVisible = cont.result_balance_dest_row?.content?.visible;
-            const exchRowVisible = cont.exchange_row?.content?.visible;
+            const destResRowVisible = cont.destResBalanceRow?.content?.visible;
+            const exchRowVisible = cont.exchangeRow?.content?.visible;
 
             if (!res.isAvailable) {
                 res.state = -1;
@@ -268,11 +268,11 @@ export class TransactionView extends AppView {
                 assert(res.destAccount, 'Destination account not found');
             }
 
-            const srcAmountRowVisible = cont.src_amount_row?.content?.visible;
-            const destAmountRowVisible = cont.dest_amount_row?.content?.visible;
-            const srcResRowVisible = cont.result_balance_row?.content?.visible;
-            const destResRowVisible = cont.result_balance_dest_row?.content?.visible;
-            const exchRowVisible = cont.exchange_row?.content?.visible;
+            const srcAmountRowVisible = cont.srcAmountRow?.content?.visible;
+            const destAmountRowVisible = cont.destAmountRow?.content?.visible;
+            const srcResRowVisible = cont.srcResBalanceRow?.content?.visible;
+            const destResRowVisible = cont.destResBalanceRow?.content?.visible;
+            const exchRowVisible = cont.exchangeRow?.content?.visible;
 
             if (!res.isAvailable) {
                 res.state = -1;
@@ -306,7 +306,7 @@ export class TransactionView extends AppView {
         }
 
         if (res.type === DEBT) {
-            res.person = App.state.persons.getItem(cont.person.content.id);
+            res.person = App.state.persons.getItem(cont.personContainer.content.id);
             if (res.isAvailable) {
                 assert(res.person, 'Person not found');
             }
@@ -321,7 +321,7 @@ export class TransactionView extends AppView {
             const isSelectAccountVisible = cont.selaccount?.content?.visible;
             res.noAccount = isSelectAccountVisible || cont.noAccountsMsg.visible;
 
-            res.account = App.state.accounts.getItem(cont.account.content.id);
+            res.account = App.state.accounts.getItem(cont.debtAccountContainer.content.id);
             if (res.isAvailable && !res.noAccount) {
                 assert(res.account, 'Account not found');
             }
@@ -348,9 +348,9 @@ export class TransactionView extends AppView {
 
             assert(res.fSrcAmount === res.fDestAmount, 'Source and destination amount are different');
 
-            const srcAmountRowVisible = cont.src_amount_row?.content?.visible;
-            const srcResRowVisible = cont.result_balance_row?.content?.visible;
-            const destResRowVisible = cont.result_balance_dest_row?.content?.visible;
+            const srcAmountRowVisible = cont.srcAmountRow?.content?.visible;
+            const srcResRowVisible = cont.srcResBalanceRow?.content?.visible;
+            const destResRowVisible = cont.destResBalanceRow?.content?.visible;
 
             if (!res.isAvailable) {
                 res.state = -1;
@@ -392,19 +392,19 @@ export class TransactionView extends AppView {
 
         res.date = cont.datePicker.value;
         res.categoryId = parseInt(cont.categorySelect.value, 10);
-        res.comment = cont.comment_row.value;
+        res.comment = cont.commentRow.value;
 
         return res;
     }
 
     isValid() {
-        if (this.content.src_amount_row?.content?.visible) {
+        if (this.content.srcAmountRow?.content?.visible) {
             if (this.model.fSrcAmount <= 0) {
                 return false;
             }
         }
 
-        if (this.content.dest_amount_row?.content?.visible) {
+        if (this.content.destAmountRow?.content?.visible) {
             if (this.model.fDestAmount <= 0) {
                 return false;
             }
@@ -452,11 +452,11 @@ export class TransactionView extends AppView {
 
         const res = {
             typeMenu: { value: this.model.type },
-            person: {
+            personContainer: {
                 tile: {},
                 visible: this.model.isAvailable && this.model.type === DEBT,
             },
-            account: {
+            debtAccountContainer: {
                 tile: {
                     visible: (
                         this.model.isAvailable
@@ -466,13 +466,13 @@ export class TransactionView extends AppView {
                 },
                 visible: this.model.isAvailable && this.model.type === DEBT,
             },
-            source: {
+            sourceContainer: {
                 visible: (
                     this.model.isAvailable
                     && (this.model.type === EXPENSE || this.model.type === TRANSFER)
                 ),
             },
-            destination: {
+            destContainer: {
                 visible: (
                     this.model.isAvailable
                     && (this.model.type === INCOME || this.model.type === TRANSFER)
@@ -484,16 +484,16 @@ export class TransactionView extends AppView {
                     && (this.model.type === TRANSFER || this.model.type === DEBT)
                 ),
             },
-            src_amount_row: {},
-            dest_amount_row: {},
-            result_balance_row: {},
-            result_balance_dest_row: {},
-            exchange_row: {},
-            src_amount_left: {},
-            dest_amount_left: {},
-            src_res_balance_left: {},
-            dest_res_balance_left: {},
-            exch_left: {},
+            srcAmountRow: {},
+            destAmountRow: {},
+            srcResBalanceRow: {},
+            destResBalanceRow: {},
+            exchangeRow: {},
+            srcAmountInfo: {},
+            destAmountInfo: {},
+            srcResBalanceInfo: {},
+            destResBalanceInfo: {},
+            exchangeInfo: {},
         };
 
         if (this.model.isUpdate) {
@@ -504,13 +504,13 @@ export class TransactionView extends AppView {
         }
 
         if (this.model.isAvailable) {
-            res.src_amount_row.value = this.model.srcAmount.toString();
-            res.src_amount_row.currSign = (this.model.srcCurr) ? this.model.srcCurr.sign : '';
-            res.src_amount_row.isCurrActive = (this.model.type === INCOME);
+            res.srcAmountRow.value = this.model.srcAmount.toString();
+            res.srcAmountRow.currSign = (this.model.srcCurr) ? this.model.srcCurr.sign : '';
+            res.srcAmountRow.isCurrActive = (this.model.type === INCOME);
 
-            res.dest_amount_row.value = this.model.destAmount.toString();
-            res.dest_amount_row.currSign = (this.model.destCurr) ? this.model.destCurr.sign : '';
-            res.dest_amount_row.isCurrActive = (this.model.type === EXPENSE);
+            res.destAmountRow.value = this.model.destAmount.toString();
+            res.destAmountRow.currSign = (this.model.destCurr) ? this.model.destCurr.sign : '';
+            res.destAmountRow.isCurrActive = (this.model.type === EXPENSE);
 
             if (this.model.destCurr && this.model.srcCurr) {
                 const exchRateValue = (this.model.useBackExchange)
@@ -520,9 +520,9 @@ export class TransactionView extends AppView {
                     ? this.model.backExchSign
                     : this.model.exchSign;
 
-                res.exchange_row.value = exchRateValue.toString();
-                res.exchange_row.currSign = exchSign;
-                res.exch_left.value = this.model.fmtExch;
+                res.exchangeRow.value = exchRateValue.toString();
+                res.exchangeRow.currSign = exchSign;
+                res.exchangeInfo.value = this.model.fmtExch;
             }
 
             res.datePicker = {
@@ -533,58 +533,58 @@ export class TransactionView extends AppView {
                 visible: true,
                 value: this.model.categoryId.toString(),
             };
-            res.comment_row = {
+            res.commentRow = {
                 visible: true,
                 value: this.model.comment,
             };
         }
 
         if (this.model.type === EXPENSE || this.model.type === TRANSFER) {
-            res.source.tile = {
+            res.sourceContainer.tile = {
                 visible: this.model.isAvailable,
             };
 
             if (this.model.isAvailable) {
-                res.source.tile.title = (this.model.srcAccount) ? this.model.srcAccount.name : '';
-                res.source.tile.subtitle = (this.model.srcAccount)
+                res.sourceContainer.tile.title = (this.model.srcAccount) ? this.model.srcAccount.name : '';
+                res.sourceContainer.tile.subtitle = (this.model.srcAccount)
                     ? this.model.srcCurr.format(this.model.srcAccount.balance)
                     : '';
             }
         }
 
         if (this.model.type === INCOME || this.model.type === TRANSFER) {
-            res.destination.tile = {
+            res.destContainer.tile = {
                 visible: this.model.isAvailable,
             };
 
             if (this.model.isAvailable) {
-                res.destination.tile.title = (this.model.destAccount) ? this.model.destAccount.name : '';
-                res.destination.tile.subtitle = (this.model.destAccount)
+                res.destContainer.tile.title = (this.model.destAccount) ? this.model.destAccount.name : '';
+                res.destContainer.tile.subtitle = (this.model.destAccount)
                     ? this.model.destCurr.format(this.model.destAccount.balance)
                     : '';
             }
         }
 
         if (this.model.type !== INCOME && this.model.isAvailable) {
-            res.result_balance_row.value = this.model.srcResBal.toString();
-            res.result_balance_row.isCurrActive = false;
+            res.srcResBalanceRow.value = this.model.srcResBal.toString();
+            res.srcResBalanceRow.isCurrActive = false;
 
-            res.src_res_balance_left.value = (this.model.srcCurr)
+            res.srcResBalanceInfo.value = (this.model.srcCurr)
                 ? this.model.srcCurr.format(this.model.fSrcResBal)
                 : '';
         }
 
         if (this.model.type !== EXPENSE && this.model.isAvailable) {
-            res.src_amount_left.value = (this.model.srcCurr) ? this.model.srcCurr.format(this.model.fSrcAmount) : '';
-            res.result_balance_dest_row.value = this.model.destResBal.toString();
-            res.result_balance_dest_row.isCurrActive = false;
+            res.srcAmountInfo.value = (this.model.srcCurr) ? this.model.srcCurr.format(this.model.fSrcAmount) : '';
+            res.destResBalanceRow.value = this.model.destResBal.toString();
+            res.destResBalanceRow.isCurrActive = false;
 
-            res.dest_res_balance_left.value = (this.model.destCurr)
+            res.destResBalanceInfo.value = (this.model.destCurr)
                 ? this.model.destCurr.format(this.model.fDestResBal)
                 : '';
         }
         if (this.model.type !== DEBT && this.model.isAvailable) {
-            res.dest_amount_left.value = (this.model.destCurr) ? this.model.destCurr.format(this.model.fDestAmount) : '';
+            res.destAmountInfo.value = (this.model.destCurr) ? this.model.destCurr.format(this.model.fDestAmount) : '';
         }
 
         if (this.model.type === EXPENSE) {
@@ -592,68 +592,68 @@ export class TransactionView extends AppView {
 
             if (this.model.isAvailable) {
                 if (state === 0 || state === 1) {
-                    res.src_amount_row.label = 'Amount';
-                    res.dest_amount_row.label = 'Amount';
+                    res.srcAmountRow.label = 'Amount';
+                    res.destAmountRow.label = 'Amount';
                 } else {
-                    res.src_amount_row.label = 'Source amount';
-                    res.dest_amount_row.label = 'Destination amount';
+                    res.srcAmountRow.label = 'Source amount';
+                    res.destAmountRow.label = 'Destination amount';
                 }
 
-                res.result_balance_row.label = 'Result balance';
+                res.srcResBalanceRow.label = 'Result balance';
             }
 
-            res.src_amount_left.visible = false;
-            res.dest_res_balance_left.visible = false;
-            res.result_balance_dest_row.visible = false;
+            res.srcAmountInfo.visible = false;
+            res.destResBalanceInfo.visible = false;
+            res.destResBalanceRow.visible = false;
 
             if (state === -1) {
-                res.dest_amount_left.visible = false;
-                res.src_res_balance_left.visible = false;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = false;
-                res.exchange_row.visible = false;
-                res.result_balance_row.visible = false;
+                res.destAmountInfo.visible = false;
+                res.srcResBalanceInfo.visible = false;
+                res.exchangeInfo.visible = false;
+                res.srcAmountRow.visible = false;
+                res.destAmountRow.visible = false;
+                res.exchangeRow.visible = false;
+                res.srcResBalanceRow.visible = false;
             } else if (state === 0) {
-                res.dest_amount_left.visible = false;
-                res.src_res_balance_left.visible = true;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = true;
-                res.exchange_row.visible = false;
-                res.result_balance_row.visible = false;
+                res.destAmountInfo.visible = false;
+                res.srcResBalanceInfo.visible = true;
+                res.exchangeInfo.visible = false;
+                res.srcAmountRow.visible = false;
+                res.destAmountRow.visible = true;
+                res.exchangeRow.visible = false;
+                res.srcResBalanceRow.visible = false;
             } else if (state === 1) {
-                res.dest_amount_left.visible = true;
-                res.src_res_balance_left.visible = false;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = false;
-                res.exchange_row.visible = false;
-                res.result_balance_row.visible = true;
+                res.destAmountInfo.visible = true;
+                res.srcResBalanceInfo.visible = false;
+                res.exchangeInfo.visible = false;
+                res.srcAmountRow.visible = false;
+                res.destAmountRow.visible = false;
+                res.exchangeRow.visible = false;
+                res.srcResBalanceRow.visible = true;
             } else if (state === 2) {
-                res.dest_amount_left.visible = false;
-                res.src_res_balance_left.visible = true;
-                res.exch_left.visible = true;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = true;
-                res.exchange_row.visible = false;
-                res.result_balance_row.visible = false;
+                res.destAmountInfo.visible = false;
+                res.srcResBalanceInfo.visible = true;
+                res.exchangeInfo.visible = true;
+                res.srcAmountRow.visible = true;
+                res.destAmountRow.visible = true;
+                res.exchangeRow.visible = false;
+                res.srcResBalanceRow.visible = false;
             } else if (state === 3) {
-                res.dest_amount_left.visible = true;
-                res.src_res_balance_left.visible = true;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = false;
-                res.exchange_row.visible = true;
-                res.result_balance_row.visible = false;
+                res.destAmountInfo.visible = true;
+                res.srcResBalanceInfo.visible = true;
+                res.exchangeInfo.visible = false;
+                res.srcAmountRow.visible = true;
+                res.destAmountRow.visible = false;
+                res.exchangeRow.visible = true;
+                res.srcResBalanceRow.visible = false;
             } else if (state === 4) {
-                res.dest_amount_left.visible = true;
-                res.src_res_balance_left.visible = false;
-                res.exch_left.visible = true;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = false;
-                res.exchange_row.visible = false;
-                res.result_balance_row.visible = true;
+                res.destAmountInfo.visible = true;
+                res.srcResBalanceInfo.visible = false;
+                res.exchangeInfo.visible = true;
+                res.srcAmountRow.visible = true;
+                res.destAmountRow.visible = false;
+                res.exchangeRow.visible = false;
+                res.srcResBalanceRow.visible = true;
             }
         }
 
@@ -661,74 +661,74 @@ export class TransactionView extends AppView {
             assert(state >= -1 && state <= 4, 'Invalid state specified');
 
             if (this.model.isAvailable) {
-                res.result_balance_dest_row.label = 'Result balance';
+                res.destResBalanceRow.label = 'Result balance';
 
                 if (state === 0 || state === 1) {
-                    res.src_amount_row.label = 'Amount';
-                    res.dest_amount_row.label = 'Amount';
+                    res.srcAmountRow.label = 'Amount';
+                    res.destAmountRow.label = 'Amount';
                 } else {
-                    res.src_amount_row.label = 'Source amount';
-                    res.dest_amount_row.label = 'Destination amount';
+                    res.srcAmountRow.label = 'Source amount';
+                    res.destAmountRow.label = 'Destination amount';
                 }
             }
 
-            res.dest_res_balance_left.visible = false;
-            res.result_balance_dest_row.visible = false;
+            res.destResBalanceInfo.visible = false;
+            res.destResBalanceRow.visible = false;
 
             if (state === -1) {
-                res.src_amount_left.visible = false;
-                res.dest_amount_left.visible = false;
-                res.dest_res_balance_left.visible = false;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = false;
-                res.result_balance_dest_row.visible = false;
-                res.exchange_row.visible = false;
+                res.srcAmountInfo.visible = false;
+                res.destAmountInfo.visible = false;
+                res.destResBalanceInfo.visible = false;
+                res.exchangeInfo.visible = false;
+                res.srcAmountRow.visible = false;
+                res.destAmountRow.visible = false;
+                res.destResBalanceRow.visible = false;
+                res.exchangeRow.visible = false;
             } else if (state === 0) {
-                res.src_amount_left.visible = false;
-                res.dest_amount_left.visible = false;
-                res.dest_res_balance_left.visible = true;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = false;
-                res.result_balance_dest_row.visible = false;
-                res.exchange_row.visible = false;
+                res.srcAmountInfo.visible = false;
+                res.destAmountInfo.visible = false;
+                res.destResBalanceInfo.visible = true;
+                res.exchangeInfo.visible = false;
+                res.srcAmountRow.visible = true;
+                res.destAmountRow.visible = false;
+                res.destResBalanceRow.visible = false;
+                res.exchangeRow.visible = false;
             } else if (state === 1) {
-                res.src_amount_left.visible = true;
-                res.dest_amount_left.visible = false;
-                res.dest_res_balance_left.visible = false;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = false;
-                res.result_balance_dest_row.visible = true;
-                res.exchange_row.visible = false;
+                res.srcAmountInfo.visible = true;
+                res.destAmountInfo.visible = false;
+                res.destResBalanceInfo.visible = false;
+                res.exchangeInfo.visible = false;
+                res.srcAmountRow.visible = false;
+                res.destAmountRow.visible = false;
+                res.destResBalanceRow.visible = true;
+                res.exchangeRow.visible = false;
             } else if (state === 2) {
-                res.src_amount_left.visible = false;
-                res.dest_amount_left.visible = false;
-                res.dest_res_balance_left.visible = true;
-                res.exch_left.visible = true;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = true;
-                res.exchange_row.visible = false;
-                res.result_balance_dest_row.visible = false;
+                res.srcAmountInfo.visible = false;
+                res.destAmountInfo.visible = false;
+                res.destResBalanceInfo.visible = true;
+                res.exchangeInfo.visible = true;
+                res.srcAmountRow.visible = true;
+                res.destAmountRow.visible = true;
+                res.exchangeRow.visible = false;
+                res.destResBalanceRow.visible = false;
             } else if (state === 3) {
-                res.src_amount_left.visible = false;
-                res.dest_amount_left.visible = true;
-                res.dest_res_balance_left.visible = true;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = false;
-                res.exchange_row.visible = true;
-                res.result_balance_dest_row.visible = false;
+                res.srcAmountInfo.visible = false;
+                res.destAmountInfo.visible = true;
+                res.destResBalanceInfo.visible = true;
+                res.exchangeInfo.visible = false;
+                res.srcAmountRow.visible = true;
+                res.destAmountRow.visible = false;
+                res.exchangeRow.visible = true;
+                res.destResBalanceRow.visible = false;
             } else if (state === 4) {
-                res.src_amount_left.visible = false;
-                res.dest_amount_left.visible = true;
-                res.dest_res_balance_left.visible = false;
-                res.exch_left.visible = true;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = false;
-                res.exchange_row.visible = false;
-                res.result_balance_dest_row.visible = true;
+                res.srcAmountInfo.visible = false;
+                res.destAmountInfo.visible = true;
+                res.destResBalanceInfo.visible = false;
+                res.exchangeInfo.visible = true;
+                res.srcAmountRow.visible = true;
+                res.destAmountRow.visible = false;
+                res.exchangeRow.visible = false;
+                res.destResBalanceRow.visible = true;
             }
         }
 
@@ -736,128 +736,128 @@ export class TransactionView extends AppView {
             assert(state >= -1 && state <= 8, 'Invalid state specified');
 
             if (this.model.isAvailable) {
-                res.result_balance_row.label = 'Result balance (Source)';
-                res.result_balance_dest_row.label = 'Result balance (Destination)';
+                res.srcResBalanceRow.label = 'Result balance (Source)';
+                res.destResBalanceRow.label = 'Result balance (Destination)';
 
                 if (state === 0 || state === 1 || state === 2) {
-                    res.src_amount_row.label = 'Amount';
-                    res.dest_amount_row.label = 'Amount';
+                    res.srcAmountRow.label = 'Amount';
+                    res.destAmountRow.label = 'Amount';
                 } else {
-                    res.src_amount_row.label = 'Source amount';
-                    res.dest_amount_row.label = 'Destination amount';
+                    res.srcAmountRow.label = 'Source amount';
+                    res.destAmountRow.label = 'Destination amount';
                 }
             }
 
             if (state === -1) {
-                res.src_amount_left.visible = false;
-                res.dest_amount_left.visible = false;
-                res.src_res_balance_left.visible = false;
-                res.dest_res_balance_left.visible = false;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = false;
-                res.result_balance_row.visible = false;
-                res.result_balance_dest_row.visible = false;
-                res.exchange_row.visible = false;
+                res.srcAmountInfo.visible = false;
+                res.destAmountInfo.visible = false;
+                res.srcResBalanceInfo.visible = false;
+                res.destResBalanceInfo.visible = false;
+                res.exchangeInfo.visible = false;
+                res.srcAmountRow.visible = false;
+                res.destAmountRow.visible = false;
+                res.srcResBalanceRow.visible = false;
+                res.destResBalanceRow.visible = false;
+                res.exchangeRow.visible = false;
             } else if (state === 0) {
-                res.src_amount_left.visible = false;
-                res.dest_amount_left.visible = false;
-                res.src_res_balance_left.visible = true;
-                res.dest_res_balance_left.visible = true;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = false;
-                res.result_balance_row.visible = false;
-                res.result_balance_dest_row.visible = false;
-                res.exchange_row.visible = false;
+                res.srcAmountInfo.visible = false;
+                res.destAmountInfo.visible = false;
+                res.srcResBalanceInfo.visible = true;
+                res.destResBalanceInfo.visible = true;
+                res.exchangeInfo.visible = false;
+                res.srcAmountRow.visible = true;
+                res.destAmountRow.visible = false;
+                res.srcResBalanceRow.visible = false;
+                res.destResBalanceRow.visible = false;
+                res.exchangeRow.visible = false;
             } else if (state === 1) {
-                res.src_amount_left.visible = true;
-                res.dest_amount_left.visible = false;
-                res.src_res_balance_left.visible = false;
-                res.dest_res_balance_left.visible = true;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = false;
-                res.result_balance_row.visible = true;
-                res.result_balance_dest_row.visible = false;
-                res.exchange_row.visible = false;
+                res.srcAmountInfo.visible = true;
+                res.destAmountInfo.visible = false;
+                res.srcResBalanceInfo.visible = false;
+                res.destResBalanceInfo.visible = true;
+                res.exchangeInfo.visible = false;
+                res.srcAmountRow.visible = false;
+                res.destAmountRow.visible = false;
+                res.srcResBalanceRow.visible = true;
+                res.destResBalanceRow.visible = false;
+                res.exchangeRow.visible = false;
             } else if (state === 2) {
-                res.src_amount_left.visible = true;
-                res.dest_amount_left.visible = false;
-                res.src_res_balance_left.visible = true;
-                res.dest_res_balance_left.visible = false;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = false;
-                res.result_balance_row.visible = false;
-                res.result_balance_dest_row.visible = true;
-                res.exchange_row.visible = false;
+                res.srcAmountInfo.visible = true;
+                res.destAmountInfo.visible = false;
+                res.srcResBalanceInfo.visible = true;
+                res.destResBalanceInfo.visible = false;
+                res.exchangeInfo.visible = false;
+                res.srcAmountRow.visible = false;
+                res.destAmountRow.visible = false;
+                res.srcResBalanceRow.visible = false;
+                res.destResBalanceRow.visible = true;
+                res.exchangeRow.visible = false;
             } else if (state === 3) {
-                res.src_amount_left.visible = false;
-                res.dest_amount_left.visible = false;
-                res.src_res_balance_left.visible = true;
-                res.dest_res_balance_left.visible = true;
-                res.exch_left.visible = true;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = true;
-                res.result_balance_row.visible = false;
-                res.result_balance_dest_row.visible = false;
-                res.exchange_row.visible = false;
+                res.srcAmountInfo.visible = false;
+                res.destAmountInfo.visible = false;
+                res.srcResBalanceInfo.visible = true;
+                res.destResBalanceInfo.visible = true;
+                res.exchangeInfo.visible = true;
+                res.srcAmountRow.visible = true;
+                res.destAmountRow.visible = true;
+                res.srcResBalanceRow.visible = false;
+                res.destResBalanceRow.visible = false;
+                res.exchangeRow.visible = false;
             } else if (state === 4) {
-                res.src_amount_left.visible = true;
-                res.dest_amount_left.visible = false;
-                res.src_res_balance_left.visible = false;
-                res.dest_res_balance_left.visible = true;
-                res.exch_left.visible = true;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = true;
-                res.result_balance_row.visible = true;
-                res.result_balance_dest_row.visible = false;
-                res.exchange_row.visible = false;
+                res.srcAmountInfo.visible = true;
+                res.destAmountInfo.visible = false;
+                res.srcResBalanceInfo.visible = false;
+                res.destResBalanceInfo.visible = true;
+                res.exchangeInfo.visible = true;
+                res.srcAmountRow.visible = false;
+                res.destAmountRow.visible = true;
+                res.srcResBalanceRow.visible = true;
+                res.destResBalanceRow.visible = false;
+                res.exchangeRow.visible = false;
             } else if (state === 5) {
-                res.src_amount_left.visible = false;
-                res.dest_amount_left.visible = true;
-                res.src_res_balance_left.visible = true;
-                res.dest_res_balance_left.visible = false;
-                res.exch_left.visible = true;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = false;
-                res.result_balance_row.visible = false;
-                res.result_balance_dest_row.visible = true;
-                res.exchange_row.visible = false;
+                res.srcAmountInfo.visible = false;
+                res.destAmountInfo.visible = true;
+                res.srcResBalanceInfo.visible = true;
+                res.destResBalanceInfo.visible = false;
+                res.exchangeInfo.visible = true;
+                res.srcAmountRow.visible = true;
+                res.destAmountRow.visible = false;
+                res.srcResBalanceRow.visible = false;
+                res.destResBalanceRow.visible = true;
+                res.exchangeRow.visible = false;
             } else if (state === 6) {
-                res.src_amount_left.visible = true;
-                res.dest_amount_left.visible = true;
-                res.src_res_balance_left.visible = false;
-                res.dest_res_balance_left.visible = false;
-                res.exch_left.visible = true;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = false;
-                res.result_balance_row.visible = true;
-                res.result_balance_dest_row.visible = true;
-                res.exchange_row.visible = false;
+                res.srcAmountInfo.visible = true;
+                res.destAmountInfo.visible = true;
+                res.srcResBalanceInfo.visible = false;
+                res.destResBalanceInfo.visible = false;
+                res.exchangeInfo.visible = true;
+                res.srcAmountRow.visible = false;
+                res.destAmountRow.visible = false;
+                res.srcResBalanceRow.visible = true;
+                res.destResBalanceRow.visible = true;
+                res.exchangeRow.visible = false;
             } else if (state === 7) {
-                res.src_amount_left.visible = false;
-                res.dest_amount_left.visible = true;
-                res.src_res_balance_left.visible = true;
-                res.dest_res_balance_left.visible = true;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = false;
-                res.result_balance_row.visible = false;
-                res.result_balance_dest_row.visible = false;
-                res.exchange_row.visible = true;
+                res.srcAmountInfo.visible = false;
+                res.destAmountInfo.visible = true;
+                res.srcResBalanceInfo.visible = true;
+                res.destResBalanceInfo.visible = true;
+                res.exchangeInfo.visible = false;
+                res.srcAmountRow.visible = true;
+                res.destAmountRow.visible = false;
+                res.srcResBalanceRow.visible = false;
+                res.destResBalanceRow.visible = false;
+                res.exchangeRow.visible = true;
             } else if (state === 8) {
-                res.src_amount_left.visible = true;
-                res.dest_amount_left.visible = true;
-                res.src_res_balance_left.visible = false;
-                res.dest_res_balance_left.visible = true;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = false;
-                res.result_balance_row.visible = true;
-                res.result_balance_dest_row.visible = false;
-                res.exchange_row.visible = true;
+                res.srcAmountInfo.visible = true;
+                res.destAmountInfo.visible = true;
+                res.srcResBalanceInfo.visible = false;
+                res.destResBalanceInfo.visible = true;
+                res.exchangeInfo.visible = false;
+                res.srcAmountRow.visible = false;
+                res.destAmountRow.visible = false;
+                res.srcResBalanceRow.visible = true;
+                res.destResBalanceRow.visible = false;
+                res.exchangeRow.visible = true;
             }
         }
 
@@ -871,49 +871,49 @@ export class TransactionView extends AppView {
             res.selaccount = { visible: isAvailable && noAccount && accountsAvailable };
             res.noacc_btn = { visible: isAvailable && !noAccount };
             res.noAccountsMsg = { visible: isAvailable && !accountsAvailable };
-            res.dest_amount_row.visible = false;
-            res.dest_amount_left.visible = false;
-            res.exchange_row.visible = false;
-            res.exch_left.visible = false;
+            res.destAmountRow.visible = false;
+            res.destAmountInfo.visible = false;
+            res.exchangeRow.visible = false;
+            res.exchangeInfo.visible = false;
 
             if (isAvailable) {
-                res.src_amount_row.label = 'Amount';
-                res.result_balance_row.label = (debtType)
+                res.srcAmountRow.label = 'Amount';
+                res.srcResBalanceRow.label = (debtType)
                     ? 'Result balance (Person)'
                     : 'Result balance (Account)';
-                res.result_balance_dest_row.label = (debtType)
+                res.destResBalanceRow.label = (debtType)
                     ? 'Result balance (Account)'
                     : 'Result balance (Person)';
             }
 
             if (debtType) {
                 if (isAvailable) {
-                    res.person.tile.title = (this.model.person) ? this.model.person.name : '';
-                    res.person.tile.subtitle = (this.model.srcAccount)
+                    res.personContainer.tile.title = (this.model.person) ? this.model.person.name : '';
+                    res.personContainer.tile.subtitle = (this.model.srcAccount)
                         ? this.model.srcCurr.format(this.model.srcAccount.balance)
                         : '';
                 }
 
                 if (!this.model.noAccount) {
                     if (isAvailable) {
-                        res.account.tile.title = (this.model.destAccount) ? this.model.destAccount.name : '';
-                        res.account.tile.subtitle = (this.model.destAccount)
+                        res.debtAccountContainer.tile.title = (this.model.destAccount) ? this.model.destAccount.name : '';
+                        res.debtAccountContainer.tile.subtitle = (this.model.destAccount)
                             ? this.model.destCurr.format(this.model.destAccount.balance)
                             : '';
                     }
                 }
             } else {
                 if (isAvailable) {
-                    res.person.tile.title = (this.model.person) ? this.model.person.name : '';
-                    res.person.tile.subtitle = (this.model.destAccount)
+                    res.personContainer.tile.title = (this.model.person) ? this.model.person.name : '';
+                    res.personContainer.tile.subtitle = (this.model.destAccount)
                         ? this.model.destCurr.format(this.model.destAccount.balance)
                         : '';
                 }
 
                 if (!this.model.noAccount) {
                     if (isAvailable) {
-                        res.account.tile.title = (this.model.srcAccount) ? this.model.srcAccount.name : '';
-                        res.account.tile.subtitle = (this.model.srcAccount)
+                        res.debtAccountContainer.tile.title = (this.model.srcAccount) ? this.model.srcAccount.name : '';
+                        res.debtAccountContainer.tile.subtitle = (this.model.srcAccount)
                             ? this.model.srcCurr.format(this.model.srcAccount.balance)
                             : '';
                     }
@@ -921,61 +921,61 @@ export class TransactionView extends AppView {
             }
 
             if (state === -1) {
-                res.src_amount_row.visible = false;
-                res.src_amount_left.visible = false;
-                res.result_balance_row.visible = false;
-                res.src_res_balance_left.visible = false;
-                res.result_balance_dest_row.visible = false;
-                res.dest_res_balance_left.visible = false;
+                res.srcAmountRow.visible = false;
+                res.srcAmountInfo.visible = false;
+                res.srcResBalanceRow.visible = false;
+                res.srcResBalanceInfo.visible = false;
+                res.destResBalanceRow.visible = false;
+                res.destResBalanceInfo.visible = false;
             } else if (state === 0 || state === 3) {
-                res.src_amount_row.visible = true;
-                res.src_amount_left.visible = false;
-                res.result_balance_row.visible = false;
-                res.src_res_balance_left.visible = true;
-                res.result_balance_dest_row.visible = false;
-                res.dest_res_balance_left.visible = true;
+                res.srcAmountRow.visible = true;
+                res.srcAmountInfo.visible = false;
+                res.srcResBalanceRow.visible = false;
+                res.srcResBalanceInfo.visible = true;
+                res.destResBalanceRow.visible = false;
+                res.destResBalanceInfo.visible = true;
             } else if (state === 1 || state === 5) {
-                res.src_amount_row.visible = false;
-                res.src_amount_left.visible = true;
-                res.result_balance_row.visible = true;
-                res.src_res_balance_left.visible = false;
-                res.result_balance_dest_row.visible = false;
-                res.dest_res_balance_left.visible = true;
+                res.srcAmountRow.visible = false;
+                res.srcAmountInfo.visible = true;
+                res.srcResBalanceRow.visible = true;
+                res.srcResBalanceInfo.visible = false;
+                res.destResBalanceRow.visible = false;
+                res.destResBalanceInfo.visible = true;
             } else if (state === 2 || state === 4) {
-                res.src_amount_row.visible = false;
-                res.src_amount_left.visible = true;
-                res.result_balance_row.visible = false;
-                res.src_res_balance_left.visible = true;
-                res.result_balance_dest_row.visible = true;
-                res.dest_res_balance_left.visible = false;
+                res.srcAmountRow.visible = false;
+                res.srcAmountInfo.visible = true;
+                res.srcResBalanceRow.visible = false;
+                res.srcResBalanceInfo.visible = true;
+                res.destResBalanceRow.visible = true;
+                res.destResBalanceInfo.visible = false;
             } else if (state === 6) {
-                res.src_amount_row.visible = true;
-                res.src_amount_left.visible = false;
-                res.result_balance_row.visible = false;
-                res.src_res_balance_left.visible = true;
-                res.result_balance_dest_row.visible = false;
-                res.dest_res_balance_left.visible = false;
+                res.srcAmountRow.visible = true;
+                res.srcAmountInfo.visible = false;
+                res.srcResBalanceRow.visible = false;
+                res.srcResBalanceInfo.visible = true;
+                res.destResBalanceRow.visible = false;
+                res.destResBalanceInfo.visible = false;
             } else if (state === 7) {
-                res.src_amount_row.visible = true;
-                res.src_amount_left.visible = false;
-                res.result_balance_row.visible = false;
-                res.src_res_balance_left.visible = false;
-                res.result_balance_dest_row.visible = false;
-                res.dest_res_balance_left.visible = true;
+                res.srcAmountRow.visible = true;
+                res.srcAmountInfo.visible = false;
+                res.srcResBalanceRow.visible = false;
+                res.srcResBalanceInfo.visible = false;
+                res.destResBalanceRow.visible = false;
+                res.destResBalanceInfo.visible = true;
             } else if (state === 8) {
-                res.src_amount_row.visible = false;
-                res.src_amount_left.visible = true;
-                res.result_balance_row.visible = false;
-                res.src_res_balance_left.visible = false;
-                res.result_balance_dest_row.visible = true;
-                res.dest_res_balance_left.visible = false;
+                res.srcAmountRow.visible = false;
+                res.srcAmountInfo.visible = true;
+                res.srcResBalanceRow.visible = false;
+                res.srcResBalanceInfo.visible = false;
+                res.destResBalanceRow.visible = true;
+                res.destResBalanceInfo.visible = false;
             } else if (state === 9) {
-                res.src_amount_row.visible = false;
-                res.src_amount_left.visible = true;
-                res.result_balance_row.visible = true;
-                res.src_res_balance_left.visible = false;
-                res.result_balance_dest_row.visible = false;
-                res.dest_res_balance_left.visible = false;
+                res.srcAmountRow.visible = false;
+                res.srcAmountInfo.visible = true;
+                res.srcResBalanceRow.visible = true;
+                res.srcResBalanceInfo.visible = false;
+                res.destResBalanceRow.visible = false;
+                res.destResBalanceInfo.visible = false;
             }
         }
 
@@ -1521,13 +1521,13 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.source.selectAccount(val));
+        await this.performAction(() => this.content.sourceContainer.selectAccount(val));
 
         return this.checkState();
     }
 
     async changeSrcAccountByPos(pos) {
-        return this.changeSrcAccount(this.content.source.content.dropDown.content.items[pos].id);
+        return this.changeSrcAccount(this.content.sourceContainer.dropDown.items[pos].id);
     }
 
     async changeDestAccount(val) {
@@ -1613,14 +1613,14 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.destination.selectAccount(val));
+        await this.performAction(() => this.content.destContainer.selectAccount(val));
 
         return this.checkState();
     }
 
     async changeDestAccountByPos(pos) {
         return this.changeDestAccount(
-            this.content.destination.content.dropDown.content.items[pos].id,
+            this.content.destContainer.dropDown.items[pos].id,
         );
     }
 
@@ -1652,7 +1652,7 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.src_amount_row.input(val));
+        await this.performAction(() => this.content.srcAmountRow.input(val));
 
         return this.checkState();
     }
@@ -1693,7 +1693,7 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.src_amount_left.click());
+        await this.performAction(() => this.content.srcAmountInfo.click());
 
         return this.checkState();
     }
@@ -1724,7 +1724,7 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.dest_amount_row.input(val));
+        await this.performAction(() => this.content.destAmountRow.input(val));
 
         return this.checkState();
     }
@@ -1769,7 +1769,7 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.src_res_balance_left.click());
+        await this.performAction(() => this.content.srcResBalanceInfo.click());
 
         return this.checkState();
     }
@@ -1806,7 +1806,7 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.dest_res_balance_left.click());
+        await this.performAction(() => this.content.destResBalanceInfo.click());
 
         return this.checkState();
     }
@@ -1840,7 +1840,7 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.dest_amount_left.click());
+        await this.performAction(() => this.content.destAmountInfo.click());
 
         return this.checkState();
     }
@@ -1868,7 +1868,7 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.result_balance_row.input(val));
+        await this.performAction(() => this.content.srcResBalanceRow.input(val));
 
         return this.checkState();
     }
@@ -1916,7 +1916,7 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.result_balance_dest_row.input(val));
+        await this.performAction(() => this.content.destResBalanceRow.input(val));
 
         return this.checkState();
     }
@@ -1955,7 +1955,7 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.src_amount_row.selectCurr(val));
+        await this.performAction(() => this.content.srcAmountRow.selectCurr(val));
 
         return this.checkState();
     }
@@ -1991,7 +1991,7 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.dest_amount_row.selectCurr(val));
+        await this.performAction(() => this.content.destAmountRow.selectCurr(val));
 
         return this.checkState();
     }
@@ -2011,7 +2011,7 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.exch_left.click());
+        await this.performAction(() => this.content.exchangeInfo.click());
 
         return this.checkState();
     }
@@ -2083,7 +2083,7 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.exchange_row.input(val));
+        await this.performAction(() => this.content.exchangeRow.input(val));
 
         return this.checkState();
     }
@@ -2095,7 +2095,7 @@ export class TransactionView extends AppView {
         this.updateExch();
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.exchange_row.clickButton());
+        await this.performAction(() => this.content.exchangeRow.clickButton());
 
         return this.checkState();
     }
@@ -2128,7 +2128,7 @@ export class TransactionView extends AppView {
         this.model.comment = val.toString();
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.comment_row.input(val));
+        await this.performAction(() => this.content.commentRow.input(val));
 
         return this.checkState();
     }
@@ -2154,13 +2154,13 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.person.selectAccount(val));
+        await this.performAction(() => this.content.personContainer.selectAccount(val));
 
         return this.checkState();
     }
 
     async changePersonByPos(pos) {
-        return this.changePerson(this.content.person.content.dropDown.content.items[pos].id);
+        return this.changePerson(this.content.personContainer.dropDown.items[pos].id);
     }
 
     async toggleAccount() {
@@ -2263,13 +2263,13 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.account.selectAccount(accountId));
+        await this.performAction(() => this.content.debtAccountContainer.selectAccount(accountId));
 
         return this.checkState();
     }
 
     changeAccountByPos(pos) {
-        return this.changeAccount(this.content.account.content.dropDown.content.items[pos].id);
+        return this.changeAccount(this.content.debtAccountContainer.dropDown.items[pos].id);
     }
 
     async swapSourceAndDest() {

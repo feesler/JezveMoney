@@ -1,5 +1,5 @@
 import 'jezvejs/style';
-import { ge, setEvents } from 'jezvejs';
+import { setEvents } from 'jezvejs';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
@@ -34,18 +34,12 @@ class RegisterView extends View {
      * View initialization
      */
     onStart() {
-        const elemIds = [
+        this.loadElementsByIds([
             'form',
             'loginInp',
             'passwordInp',
             'nameInp',
-        ];
-        elemIds.forEach((id) => {
-            this[id] = ge(id);
-            if (!this[id]) {
-                throw new Error('Failed to initialize view');
-            }
-        });
+        ]);
 
         setEvents(this.form, { submit: (e) => this.onSubmit(e) });
         setEvents(this.loginInp, { input: () => this.onLoginInput() });

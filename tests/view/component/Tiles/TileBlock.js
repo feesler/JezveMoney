@@ -8,6 +8,14 @@ import { DropDown } from 'jezvejs-test';
 import { Tile } from './Tile.js';
 
 export class TileBlock extends TestComponent {
+    get dropDown() {
+        return this.content.dropDown;
+    }
+
+    get tile() {
+        return this.content.tile;
+    }
+
     async parseContent() {
         assert(this.elem, 'Invalid tile block');
 
@@ -27,8 +35,10 @@ export class TileBlock extends TestComponent {
     }
 
     async selectAccount(accountId) {
-        if (this.content.dropDown) {
-            await this.content.dropDown.setSelection(accountId);
+        if (!this.dropDown) {
+            return;
         }
+
+        await this.dropDown.setSelection(accountId);
     }
 }

@@ -81,7 +81,7 @@ export class ImportView extends AppView {
             assert(res[child]?.elem, `Invalid structure of view: ${child} component not found`)
         ));
 
-        res.notAvailMsg = { elem: await query('#notavailmsg') };
+        res.notAvailMsg = { elem: await query('#notAvailMsg') };
         const importEnabled = !res.notAvailMsg.elem;
 
         // Heading

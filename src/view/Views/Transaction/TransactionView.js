@@ -190,171 +190,166 @@ class TransactionView extends View {
      * View initialization
      */
     onStart() {
+        this.loadElementsByIds([
+            'form',
+            'typeMenu',
+            'notAvailMsg',
+            'sourceContainer',
+            'sourceTile',
+            'destContainer',
+            'destTile',
+            'personContainer',
+            'personTile',
+            'debtAccountContainer',
+            'debtAccountTile',
+            'swapBtn',
+            'srcAmountRow',
+            'srcAmountInput',
+            'srcCurrBtn',
+            'srcAmountSign',
+            'destAmountRow',
+            'destAmountInput',
+            'destCurrBtn',
+            'destAmountSign',
+            'srcResBalanceRow',
+            'srcResBalanceInput',
+            'srcResBalanceSign',
+            'destResBalanceRow',
+            'destResBalanceInput',
+            'destResBalanceSign',
+            'exchangeRow',
+            'exchangeInput',
+            'exchangeSign',
+            'dateRow',
+            'dateInput',
+            'dateInputBtn',
+            'datePickerWrapper',
+            'categoryRow',
+            'categorySelect',
+            'commentRow',
+            'commentInput',
+            // Hidden inputs
+            'typeInp',
+            'srcIdInp',
+            'destIdInp',
+            'srcCurrInp',
+            'destCurrInp',
+            'debtOperationInp',
+            'personIdInp',
+            'debtAccountInp',
+            // Submit controls
+            'submitControls',
+            'submitBtn',
+            'cancelBtn',
+        ]);
+
         // Init form submit event handler
-        this.form = ge('mainfrm');
-        if (!this.form) {
-            throw new Error('Failed to initialize Transaction view');
-        }
         setEvents(this.form, { submit: (e) => this.onSubmit(e) });
 
         const deleteBtn = ge('deleteBtn');
         if (deleteBtn) {
-            this.deleteBtn = IconButton.fromElement('deleteBtn', {
+            this.deleteBtn = IconButton.fromElement(deleteBtn, {
                 onClick: () => this.confirmDelete(),
             });
         }
 
-        this.typeMenu = TransactionTypeMenu.fromElement(ge('typeMenu'), {
+        this.typeMenu = TransactionTypeMenu.fromElement(this.typeMenu, {
             itemParam: 'type',
             onChange: (sel) => this.onChangeType(sel),
         });
 
-        this.notAvailableMessage = ge('notavailmsg');
-        this.srcContainer = ge('source');
-        this.destContainer = ge('destination');
-        this.personContainer = ge('person');
-        this.debtAccountContainer = ge('debtaccount');
-        this.swapBtn = ge('swapBtn');
-        if (
-            !this.notAvailableMessage
-            || !this.srcContainer
-            || !this.destContainer
-            || !this.personContainer
-            || !this.debtAccountContainer
-            || !this.swapBtn
-        ) {
-            throw new Error('Failed to initialize view');
-        }
-
         setEvents(this.swapBtn, { click: () => this.store.dispatch(actions.swapSourceAndDest()) });
 
-        this.srcTileBase = this.srcContainer.querySelector('.tile-base');
-        this.srcTileContainer = this.srcContainer.querySelector('.tile_container');
-        this.srcTileInfoBlock = this.srcContainer.querySelector('.tile-info-block');
-
-        this.destTileBase = this.destContainer.querySelector('.tile-base');
-        this.destTileContainer = this.destContainer.querySelector('.tile_container');
+        this.srcTileInfoBlock = this.sourceContainer.querySelector('.tile-info-block');
         this.destTileInfoBlock = this.destContainer.querySelector('.tile-info-block');
-
         this.personTileInfoBlock = this.personContainer.querySelector('.tile-info-block');
 
         this.debtAccountTileBase = this.debtAccountContainer.querySelector('.tile-base');
         this.debtAccTileInfoBlock = this.debtAccountContainer.querySelector('.tile-info-block');
 
-        const srcTileElem = ge('source_tile');
-        this.srcTile = (srcTileElem) ? AccountTile.fromElement(srcTileElem) : null;
+        this.sourceTile = (this.sourceTile) ? AccountTile.fromElement(this.sourceTile) : null;
+        this.destTile = (this.destTile) ? AccountTile.fromElement(this.destTile) : null;
 
-        const destTileElem = ge('dest_tile');
-        this.destTile = (destTileElem) ? AccountTile.fromElement(destTileElem) : null;
-
-        this.srcAmountInfo = TileInfoItem.fromElement('src_amount_left', {
+        this.srcAmountInfo = TileInfoItem.fromElement('srcAmountInfo', {
             onclick: () => this.store.dispatch(actions.sourceAmountClick()),
         });
-        this.destAmountInfo = TileInfoItem.fromElement('dest_amount_left', {
+        this.destAmountInfo = TileInfoItem.fromElement('destAmountInfo', {
             onclick: () => this.store.dispatch(actions.destAmountClick()),
         });
-        this.exchangeInfo = TileInfoItem.fromElement('exch_left', {
+        this.exchangeInfo = TileInfoItem.fromElement('exchangeInfo', {
             onclick: () => this.store.dispatch(actions.exchangeClick()),
         });
-        this.srcResBalanceInfo = TileInfoItem.fromElement('src_res_balance_left', {
+        this.srcResBalanceInfo = TileInfoItem.fromElement('srcResBalanceInfo', {
             onclick: () => this.store.dispatch(actions.sourceResultClick()),
         });
-        this.destResBalanceInfo = TileInfoItem.fromElement('dest_res_balance_left', {
+        this.destResBalanceInfo = TileInfoItem.fromElement('destResBalanceInfo', {
             onclick: () => this.store.dispatch(actions.destResultClick()),
         });
 
-        this.srcAmountRow = ge('src_amount_row');
-        if (this.srcAmountRow) {
-            this.srcAmountRowLabel = this.srcAmountRow.querySelector('label');
+        this.srcAmountRowLabel = this.srcAmountRow.querySelector('label');
+        if (this.srcAmountInput) {
+            this.srcAmountInput = DecimalInput.create({
+                elem: this.srcAmountInput,
+                digits: CENTS_DIGITS,
+                oninput: (e) => this.onSourceAmountInput(e),
+            });
         }
-        this.srcAmountInput = DecimalInput.create({
-            elem: ge('src_amount'),
-            digits: CENTS_DIGITS,
-            oninput: (e) => this.onSourceAmountInput(e),
-        });
-        this.srcCurrBtn = ge('srcCurrBtn');
-        this.srcAmountSign = ge('srcamountsign');
 
-        this.destAmountRow = ge('dest_amount_row');
-        if (this.destAmountRow) {
-            this.destAmountRowLabel = this.destAmountRow.querySelector('label');
+        this.destAmountRowLabel = this.destAmountRow.querySelector('label');
+        if (this.destAmountInput) {
+            this.destAmountInput = DecimalInput.create({
+                elem: this.destAmountInput,
+                digits: CENTS_DIGITS,
+                oninput: (e) => this.onDestAmountInput(e),
+            });
         }
-        this.destAmountInput = DecimalInput.create({
-            elem: ge('dest_amount'),
-            digits: CENTS_DIGITS,
-            oninput: (e) => this.onDestAmountInput(e),
-        });
-        this.destCurrBtn = ge('destCurrBtn');
-        this.destAmountSign = ge('destamountsign');
 
-        this.srcResBalanceRow = ge('result_balance');
-        if (this.srcResBalanceRow) {
-            this.srcResBalanceRowLabel = this.srcResBalanceRow.querySelector('label');
+        this.srcResBalanceRowLabel = this.srcResBalanceRow.querySelector('label');
+        if (this.srcResBalanceInput) {
+            this.srcResBalanceInput = DecimalInput.create({
+                elem: this.srcResBalanceInput,
+                digits: CENTS_DIGITS,
+                oninput: (e) => this.onSourceResultInput(e),
+            });
         }
-        this.srcResBalanceInput = DecimalInput.create({
-            elem: ge('resbal'),
-            digits: CENTS_DIGITS,
-            oninput: (e) => this.onSourceResultInput(e),
-        });
-        this.srcResBalanceSign = ge('res_currsign');
 
-        this.destResBalanceRow = ge('result_balance_dest');
-        if (this.destResBalanceRow) {
-            this.destResBalanceRowLabel = this.destResBalanceRow.querySelector('label');
+        this.destResBalanceRowLabel = this.destResBalanceRow.querySelector('label');
+        if (this.destResBalanceInput) {
+            this.destResBalanceInput = DecimalInput.create({
+                elem: this.destResBalanceInput,
+                digits: CENTS_DIGITS,
+                oninput: (e) => this.onDestResultInput(e),
+            });
         }
-        this.destResBalanceInput = DecimalInput.create({
-            elem: ge('resbal_d'),
-            digits: CENTS_DIGITS,
-            oninput: (e) => this.onDestResultInput(e),
-        });
-        this.destResBalanceSign = ge('res_currsign_d');
 
-        this.exchangeRow = ge('exchange');
-        if (this.exchangeRow) {
-            this.exchangeRowLabel = this.exchangeRow.querySelector('label');
+        this.exchangeRowLabel = this.exchangeRow.querySelector('label');
+        if (this.exchangeInput) {
+            this.exchangeInput = DecimalInput.create({
+                elem: this.exchangeInput,
+                digits: EXCHANGE_DIGITS,
+                allowNegative: false,
+                oninput: (e) => this.onExchangeInput(e),
+            });
         }
-        this.exchangeInput = DecimalInput.create({
-            elem: ge('exchrate'),
-            digits: EXCHANGE_DIGITS,
-            allowNegative: false,
-            oninput: (e) => this.onExchangeInput(e),
-        });
-        this.exchangeSign = ge('exchcomm');
         setEvents(this.exchangeSign, { click: () => this.onToggleExchange() });
 
-        this.dateRow = ge('date_row');
-        this.datePickerWrapper = ge('calendar');
-
-        this.dateInputBtn = ge('cal_rbtn');
         setEvents(this.dateInputBtn, { click: () => this.showCalendar() });
 
         this.dateInput = DateInput.create({
-            elem: ge('date'),
+            elem: this.dateInput,
             locales: window.app.dateFormatLocale,
             oninput: (e) => this.onDateInput(e),
         });
 
-        this.categoryRow = ge('category_row');
         this.categorySelect = CategorySelect.create({
-            elem: 'category',
+            elem: this.categorySelect,
             className: 'dd_fullwidth',
             onchange: (category) => this.onCategoryChanged(category),
         });
 
-        this.commentRow = ge('comment_row');
-        this.commentInput = ge('comm');
         setEvents(this.commentInput, { input: (e) => this.onCommentInput(e) });
 
-        this.typeInp = ge('typeInp');
-        this.srcIdInp = ge('src_id');
-        this.destIdInp = ge('dest_id');
-        this.srcCurrInp = ge('src_curr');
-        this.destCurrInp = ge('dest_curr');
-        this.debtOperationInp = ge('debtOperation');
-
-        this.personIdInp = ge('person_id');
-        this.debtAccountInp = ge('acc_id');
-        this.debtAccountTile = AccountTile.fromElement('acc_tile');
+        this.debtAccountTile = AccountTile.fromElement(this.debtAccountTile);
 
         this.noAccountBtn = this.debtAccountContainer.querySelector('.tile_header .close-btn');
         setEvents(this.noAccountBtn, { click: () => this.toggleEnableAccount() });
@@ -365,11 +360,7 @@ class TransactionView extends View {
 
         this.debtAccountLabel = this.debtAccountContainer.querySelector('.tile_header label');
 
-        this.personTile = Tile.fromElement('person_tile', { parent: this });
-
-        this.submitControls = ge('submit_controls');
-        this.submitBtn = ge('submitBtn');
-        this.cancelBtn = ge('cancelBtn');
+        this.personTile = Tile.fromElement(this.personTile, { parent: this });
 
         this.spinner = Spinner.create();
         this.spinner.hide();
@@ -390,13 +381,13 @@ class TransactionView extends View {
 
     /** Initialize DropDown for source account tile */
     initSrcAccList(state) {
-        if (this.srcDDList) {
+        if (!this.sourceTile || this.srcDDList) {
             return;
         }
 
         const { transaction } = state;
         this.srcDDList = DropDown.create({
-            elem: 'source_tile',
+            elem: this.sourceTile.elem,
             listAttach: true,
             onitemselect: (item) => this.onSrcAccountSelect(item),
         });
@@ -410,13 +401,13 @@ class TransactionView extends View {
 
     /** Initialize DropDown for destination account tile */
     initDestAccList(state) {
-        if (this.destDDList) {
+        if (!this.destTile || this.destDDList) {
             return;
         }
 
         const { transaction } = state;
         this.destDDList = DropDown.create({
-            elem: 'dest_tile',
+            elem: this.destTile.elem,
             listAttach: true,
             onitemselect: (item) => this.onDestAccountSelect(item),
         });
@@ -430,12 +421,12 @@ class TransactionView extends View {
 
     /** Initialize DropDown for debt account tile */
     initPersonsDropDown() {
-        if (this.persDDList) {
+        if (!this.personTile || this.persDDList) {
             return;
         }
 
         this.persDDList = DropDown.create({
-            elem: 'person_tile',
+            elem: this.personTile.elem,
             listAttach: true,
             onitemselect: (item) => this.onPersonSelect(item),
         });
@@ -445,12 +436,12 @@ class TransactionView extends View {
 
     /** Initialize DropDown for debt account tile */
     initAccList(state) {
-        if (this.accDDList) {
+        if (!this.debtAccountTile || this.accDDList) {
             return;
         }
 
         this.accDDList = DropDown.create({
-            elem: 'acc_tile',
+            elem: this.debtAccountTile.elem,
             listAttach: true,
             onitemselect: (item) => this.onDebtAccountSelect(item),
         });
@@ -486,7 +477,7 @@ class TransactionView extends View {
         }
 
         this.srcCurrDDList = this.createCurrencyList({
-            elem: 'srcamountsign',
+            elem: 'srcAmountSign',
             currId: state.transaction.src_curr,
             onitemselect: (item) => this.onSrcCurrencySel(item),
         });
@@ -499,7 +490,7 @@ class TransactionView extends View {
         }
 
         this.destCurrDDList = this.createCurrencyList({
-            elem: 'destamountsign',
+            elem: 'destAmountSign',
             currId: state.transaction.dest_curr,
             onitemselect: (item) => this.onDestCurrencySel(item),
         });
@@ -1090,7 +1081,7 @@ class TransactionView extends View {
             this.exchRateSwitch(SHOW_INPUT);
         }
 
-        insertAfter(this.swapBtn, this.srcContainer);
+        insertAfter(this.swapBtn, this.sourceContainer);
 
         addChilds(this.srcTileInfoBlock, [
             this.srcAmountInfo.elem,
@@ -1233,12 +1224,12 @@ class TransactionView extends View {
                 message = MSG_DEBT_NOT_AVAILABLE;
             }
 
-            this.notAvailableMessage.textContent = message;
+            this.notAvailMsg.textContent = message;
         }
-        show(this.notAvailableMessage, !state.isAvailable);
+        show(this.notAvailMsg, !state.isAvailable);
 
         show(
-            this.srcContainer,
+            this.sourceContainer,
             state.isAvailable && (transaction.type === EXPENSE || transaction.type === TRANSFER),
         );
         show(
@@ -1322,8 +1313,8 @@ class TransactionView extends View {
         // Source account
         this.srcIdInp.value = transaction.src_id;
         if (transaction.type === EXPENSE || transaction.type === TRANSFER) {
-            if (this.srcTile && state.srcAccount) {
-                this.srcTile.setState({ account: state.srcAccount });
+            if (this.sourceTile && state.srcAccount) {
+                this.sourceTile.setState({ account: state.srcAccount });
             }
 
             this.initSrcAccList(state);

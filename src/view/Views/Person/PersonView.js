@@ -53,19 +53,13 @@ class PersonView extends View {
      * View initialization
      */
     onStart() {
-        const elemIds = [
+        this.loadElementsByIds([
             'personForm',
             'nameInp',
             'nameFeedback',
             'submitBtn',
             'cancelBtn',
-        ];
-        elemIds.forEach((id) => {
-            this[id] = ge(id);
-            if (!this[id]) {
-                throw new Error('Failed to initialize view');
-            }
-        });
+        ]);
 
         setEvents(this.personForm, { submit: (e) => this.onSubmit(e) });
         setEvents(this.nameInp, { input: (e) => this.onNameInput(e) });

@@ -1,6 +1,5 @@
 import 'jezvejs/style';
 import {
-    ge,
     createElement,
     setEvents,
     insertAfter,
@@ -98,7 +97,7 @@ class StatisticsView extends View {
      * View initialization
      */
     onStart() {
-        const elemIds = [
+        this.loadElementsByIds([
             'heading',
             // Filters
             'filtersBtn',
@@ -112,13 +111,7 @@ class StatisticsView extends View {
             'dateFrm',
             // Chart
             'chart',
-        ];
-        elemIds.forEach((id) => {
-            this[id] = ge(id);
-            if (!this[id]) {
-                throw new Error('Failed to initialize view');
-            }
-        });
+        ]);
 
         this.heading = Heading.fromElement(this.heading, {
             title: STR_TITLE,

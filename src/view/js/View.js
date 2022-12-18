@@ -1,4 +1,9 @@
-import { copyObject, onReady } from 'jezvejs';
+import {
+    asArray,
+    copyObject,
+    ge,
+    onReady,
+} from 'jezvejs';
 import { Header } from '../Components/Header/Header.js';
 
 /**
@@ -32,6 +37,23 @@ export class View {
      * View initialization event handler
      */
     onStart() { }
+
+    /**
+     * Obtain specified elements from DOM and assign as properties to view
+     * @param {Array|String} ids - id or array of element ids
+     */
+    loadElementsByIds(ids) {
+        asArray(ids).forEach((id) => {
+            if (typeof id !== 'string') {
+                throw new Error('Invalid element id');
+            }
+
+            this[id] = ge(id);
+            if (!this[id]) {
+                throw new Error(`Failed to initialize view: element '${id}' not found`);
+            }
+        });
+    }
 
     /**
      * Obtain request data of specified form element
