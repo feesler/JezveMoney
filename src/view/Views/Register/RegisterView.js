@@ -1,8 +1,10 @@
 import 'jezvejs/style';
-import { ge } from 'jezvejs';
+import { ge, setEvents } from 'jezvejs';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
+import { createStore } from '../../js/store.js';
+import { actions, reducer } from './reducer.js';
 import './style.scss';
 
 /**
@@ -12,7 +14,7 @@ class RegisterView extends View {
     constructor(...args) {
         super(...args);
 
-        this.state = {
+        const initialState = {
             form: {
                 login: '',
                 name: '',
@@ -24,78 +26,81 @@ class RegisterView extends View {
                 password: true,
             },
         };
+
+        this.store = createStore(reducer, initialState);
     }
 
     /**
      * View initialization
      */
     onStart() {
-        this.loginInp = ge('login');
-        this.passwordInp = ge('password');
-        this.nameInp = ge('name');
-        this.form = ge('regfrm');
-        if (!this.loginInp || !this.passwordInp || !this.nameInp || !this.form) {
-            throw new Error('Failed to initialize Login view');
-        }
+        const elemIds = [
+            'form',
+            'loginInp',
+            'passwordInp',
+            'nameInp',
+        ];
+        elemIds.forEach((id) => {
+            this[id] = ge(id);
+            if (!this[id]) {
+                throw new Error('Failed to initialize view');
+            }
+        });
 
-        this.loginInp.addEventListener('input', () => this.onLoginInput());
-        this.passwordInp.addEventListener('input', () => this.onPasswordInput());
-        this.nameInp.addEventListener('input', () => this.onNameInput());
-        this.form.addEventListener('submit', (e) => this.onSubmit(e));
+        setEvents(this.form, { submit: (e) => this.onSubmit(e) });
+        setEvents(this.loginInp, { input: () => this.onLoginInput() });
+        setEvents(this.passwordInp, { input: () => this.onPasswordInput() });
+        setEvents(this.nameInp, { input: () => this.onNameInput() });
+
+        this.subscribeToStore(this.store);
     }
 
     /**
      * Login field input event handler
      */
     onLoginInput() {
-        this.state.form.login = this.loginInp.value;
-        this.state.validation.login = true;
-        this.render(this.state);
+        const { value } = this.loginInp;
+        this.store.dispatch(actions.changeLogin(value));
     }
 
     /**
      * Password field input event handler
      */
     onPasswordInput() {
-        this.state.form.password = this.passwordInp.value;
-        this.state.validation.password = true;
-        this.render(this.state);
+        const { value } = this.passwordInp;
+        this.store.dispatch(actions.changePassword(value));
     }
 
     /**
      * Password field input event handler
      */
     onNameInput() {
-        this.state.form.name = this.nameInp.value;
-        this.state.validation.name = true;
-        this.render(this.state);
+        const { value } = this.nameInp;
+        this.store.dispatch(actions.changeName(value));
     }
 
     /**
      * Log in form submit event handler
      */
     onSubmit(e) {
-        const { login, name, password } = this.state.form;
-        let valid = true;
+        const state = this.store.getState();
+        const { login, name, password } = state.form;
 
         if (login.length === 0) {
-            this.state.validation.login = false;
-            valid = false;
+            this.store.dispatch(actions.invalidateLoginField());
         }
 
         if (name.length === 0) {
-            this.state.validation.name = false;
-            valid = false;
+            this.store.dispatch(actions.invalidateNameField());
         }
 
         if (password.length === 0) {
-            this.state.validation.password = false;
-            valid = false;
+            this.store.dispatch(actions.invalidatePasswordField());
         }
 
-        if (!valid) {
+        const { validation } = this.store.getState();
+        if (!validation.valid) {
             e.preventDefault();
-            this.render(this.state);
         }
     }
 
@@ -105,10 +110,15 @@ class RegisterView extends View {
         }
 
         // Login input
+        this.loginInp.value = state.form.login;
         window.app.setValidation('login-inp-block', state.validation.login);
+
         // Name input
+        this.nameInp.value = state.form.name;
         window.app.setValidation('name-inp-block', state.validation.name);
+
         // Password input
+        this.passwordInp.value = state.form.password;
         window.app.setValidation('pwd-inp-block', state.validation.password);
     }
 }

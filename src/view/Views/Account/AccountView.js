@@ -75,7 +75,6 @@ class AccountView extends View {
             'nameFeedback',
             'submitBtn',
             'cancelBtn',
-
         ];
         elemIds.forEach((id) => {
             this[id] = ge(id);
