@@ -183,7 +183,7 @@ class TransactionView extends View {
         calculateDestResult(initialState);
         updateStateExchange(initialState);
 
-        this.store = createStore(reducer, initialState);
+        this.store = createStore(reducer, { initialState });
     }
 
     /**

@@ -1,10 +1,15 @@
 import { isFunction, isObject } from 'jezvejs';
 
 class Store {
-    constructor(reducer, initialState = {}, sendInitialState = true) {
+    constructor(reducer, options = {}) {
         if (!isFunction(reducer)) {
             throw new Error('Expected reducer to be a function');
         }
+
+        const {
+            initialState = {},
+            sendInitialState = true,
+        } = options;
 
         this.reducer = reducer;
         this.state = { ...initialState };

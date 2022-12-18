@@ -60,7 +60,7 @@ class AccountView extends View {
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
         window.app.loadModel(IconList, 'icons', window.app.props.icons);
 
-        this.store = createStore(reducer, initialState);
+        this.store = createStore(reducer, { initialState });
     }
 
     /**

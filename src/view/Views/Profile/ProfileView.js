@@ -36,7 +36,7 @@ class ProfileView extends View {
             userName: profile.name,
         };
 
-        this.store = createStore(reducer, initialState);
+        this.store = createStore(reducer, { initialState });
     }
 
     /** View initialization */

@@ -43,7 +43,7 @@ class PersonListView extends View {
             renderTime: Date.now(),
         };
 
-        this.store = createStore(reducer, initialState);
+        this.store = createStore(reducer, { initialState });
     }
 
     /**

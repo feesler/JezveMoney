@@ -46,7 +46,7 @@ class PersonView extends View {
 
         window.app.loadModel(PersonList, 'persons', window.app.props.persons);
 
-        this.store = createStore(reducer, initialState);
+        this.store = createStore(reducer, { initialState });
     }
 
     /**

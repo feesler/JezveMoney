@@ -92,7 +92,7 @@ class TransactionListView extends View {
         window.app.loadModel(PersonList, 'persons', window.app.props.persons);
         window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
 
-        this.store = createStore(reducer, initialState);
+        this.store = createStore(reducer, { initialState });
     }
 
     /**

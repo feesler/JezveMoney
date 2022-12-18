@@ -60,7 +60,7 @@ class CategoryView extends View {
 
         window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
 
-        this.store = createStore(reducer, initialState);
+        this.store = createStore(reducer, { initialState });
     }
 
     /**

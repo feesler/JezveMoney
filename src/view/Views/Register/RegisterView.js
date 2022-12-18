@@ -27,7 +27,7 @@ class RegisterView extends View {
             },
         };
 
-        this.store = createStore(reducer, initialState);
+        this.store = createStore(reducer, { initialState });
     }
 
     /**

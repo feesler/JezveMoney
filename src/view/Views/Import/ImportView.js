@@ -84,7 +84,7 @@ class ImportView extends View {
             listMode: 'list',
         };
 
-        this.store = createStore(reducer, initialState);
+        this.store = createStore(reducer, { initialState });
     }
 
     /**
