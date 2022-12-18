@@ -60,6 +60,16 @@ class ImportView extends View {
     constructor(...args) {
         super(...args);
 
+        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
+        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
+        window.app.checkUserAccountModels();
+        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
+        window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
+        window.app.loadModel(ImportRuleList, 'rules', window.app.props.rules);
+        window.app.loadModel(ImportTemplateList, 'templates', window.app.props.templates);
+
+        const { userAccounts } = window.app.model;
+        const mainAccount = userAccounts.getItemByIndex(0);
         const initialState = {
             items: [],
             pagination: {
@@ -68,26 +78,14 @@ class ImportView extends View {
             form: {},
             lastId: 0,
             activeItemIndex: -1,
-            mainAccount: null,
+            mainAccount,
             rulesEnabled: true,
             checkSimilarEnabled: true,
             contextItemIndex: -1,
             listMode: 'list',
         };
 
-        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
-        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
-        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
-        window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
-        window.app.loadModel(ImportRuleList, 'rules', window.app.props.rules);
-        window.app.loadModel(ImportTemplateList, 'templates', window.app.props.templates);
-
         this.store = createStore(reducer, initialState);
-        this.store.subscribe((state, prevState) => {
-            if (state !== prevState) {
-                this.render(state, prevState);
-            }
-        });
     }
 
     /**
@@ -122,7 +120,7 @@ class ImportView extends View {
 
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
-            onchange: () => this.onMainAccChange(),
+            onchange: (account) => this.onMainAccChange(account),
             className: 'dd__main-account dd_ellipsis',
         });
         window.app.initAccountsList(this.accountDropDown);
@@ -182,14 +180,9 @@ class ImportView extends View {
         this.loadingInd = LoadingIndicator.create({ fixed: false });
         listContainer.append(this.loadingInd.elem);
 
-        const selectedAccount = this.accountDropDown.getSelectionData();
-        if (!selectedAccount) {
-            throw new Error('Invalid selection data');
-        }
-
         this.createContextMenu();
 
-        this.setMainAccount(selectedAccount.id);
+        this.subscribeToStore(this.store);
         this.setRenderTime();
     }
 
@@ -582,13 +575,12 @@ class ImportView extends View {
     /**
      * Main account select event handler
      */
-    onMainAccChange() {
-        const selected = this.accountDropDown.getSelectionData();
-        if (!selected) {
-            throw new Error('Invalid selection data');
+    onMainAccChange(account) {
+        if (!account) {
+            throw new Error('Invalid account');
         }
 
-        this.setMainAccount(selected.id);
+        this.setMainAccount(account.id);
         this.applyRules();
 
         const state = this.store.getState();

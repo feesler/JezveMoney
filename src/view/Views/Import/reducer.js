@@ -331,7 +331,8 @@ const slice = createSlice({
             return state;
         }
 
-        const mainAccount = window.app.model.accounts.getItem(accountId);
+        const { userAccounts } = window.app.model;
+        const mainAccount = userAccounts.getItem(accountId);
         if (!mainAccount) {
             throw new Error(`Account ${accountId} not found`);
         }

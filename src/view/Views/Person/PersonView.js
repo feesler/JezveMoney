@@ -47,35 +47,27 @@ class PersonView extends View {
         window.app.loadModel(PersonList, 'persons', window.app.props.persons);
 
         this.store = createStore(reducer, initialState);
-        this.store.subscribe((state, prevState) => {
-            if (state !== prevState) {
-                this.render(state, prevState);
-            }
-        });
     }
 
     /**
      * View initialization
      */
     onStart() {
-        const state = this.store.getState();
+        const elemIds = [
+            'personForm',
+            'nameInp',
+            'nameFeedback',
+            'submitBtn',
+            'cancelBtn',
+        ];
+        elemIds.forEach((id) => {
+            this[id] = ge(id);
+            if (!this[id]) {
+                throw new Error('Failed to initialize view');
+            }
+        });
 
-        this.form = ge('personForm');
-        this.nameInp = ge('pname');
-        this.nameFeedback = ge('namefeedback');
-        this.submitBtn = ge('submitBtn');
-        this.cancelBtn = ge('cancelBtn');
-        if (
-            !this.form
-            || !this.nameInp
-            || !this.nameFeedback
-            || !this.submitBtn
-            || !this.cancelBtn
-        ) {
-            throw new Error('Failed to initialize Person view');
-        }
-
-        setEvents(this.form, { submit: (e) => this.onSubmit(e) });
+        setEvents(this.personForm, { submit: (e) => this.onSubmit(e) });
         setEvents(this.nameInp, { input: (e) => this.onNameInput(e) });
 
         this.spinner = Spinner.create();
@@ -83,11 +75,14 @@ class PersonView extends View {
         insertAfter(this.spinner.elem, this.cancelBtn);
 
         // Update mode
-        if (state.original.id) {
-            this.deleteBtn = IconButton.fromElement('del_btn', {
+        const deleteBtn = ge('deleteBtn');
+        if (deleteBtn) {
+            this.deleteBtn = IconButton.fromElement(deleteBtn, {
                 onClick: () => this.confirmDelete(),
             });
         }
+
+        this.subscribeToStore(this.store);
     }
 
     /** Name input event handler */
@@ -208,12 +203,13 @@ class PersonView extends View {
         }
 
         // Name input
+        this.nameInp.value = state.data.name;
         window.app.setValidation('name-inp-block', (state.validation.name === true));
         this.nameFeedback.textContent = (state.validation.name === true)
             ? ''
             : state.validation.name;
-
         enable(this.nameInp, !state.submitStarted);
+
         enable(this.submitBtn, !state.submitStarted);
         show(this.cancelBtn, !state.submitStarted);
 

@@ -14,7 +14,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                         <h1>Categories</h1>
                         <div class="heading-actions">
                             <?= IconButton::render([
-                                "id" => "add_btn",
+                                "id" => "createBtn",
                                 "type" => "link",
                                 "classNames" => "circle-icon",
                                 "link" => BASEURL . "categories/create/",

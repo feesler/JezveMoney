@@ -29,8 +29,8 @@ export class AccountView extends AppView {
         res.heading = { elem: await query('.heading > h1') };
         assert(res.heading.elem, 'Heading element not found');
         res.heading.text = await prop(res.heading.elem, 'textContent');
-        res.delBtn = await IconButton.create(this, await query('#del_btn'));
-        res.tile = await Tile.create(this, await query('#acc_tile'));
+        res.deleteBtn = await IconButton.create(this, await query('#deleteBtn'));
+        res.tile = await Tile.create(this, await query('#accountTile'));
 
         res.formElem = await query('form');
         assert(res.formElem, 'Form element not found');
@@ -196,9 +196,9 @@ export class AccountView extends AppView {
     }
 
     async clickDeleteButton() {
-        assert(this.content.isUpdate && this.content.delBtn, 'Unexpected action clickDeleteButton');
+        assert(this.content.isUpdate && this.content.deleteBtn, 'Unexpected action clickDeleteButton');
 
-        return this.performAction(() => this.content.delBtn.click());
+        return this.performAction(() => this.content.deleteBtn.click());
     }
 
     /** Click on delete button and confir wanring popup */

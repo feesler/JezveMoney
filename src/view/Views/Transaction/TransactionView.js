@@ -184,20 +184,12 @@ class TransactionView extends View {
         updateStateExchange(initialState);
 
         this.store = createStore(reducer, initialState);
-        this.store.subscribe((state, prevState) => {
-            if (state !== prevState) {
-                this.render(state);
-            }
-        });
     }
 
     /**
      * View initialization
      */
     onStart() {
-        const state = this.store.getState();
-        const { transaction } = state;
-
         // Init form submit event handler
         this.form = ge('mainfrm');
         if (!this.form) {
@@ -205,8 +197,9 @@ class TransactionView extends View {
         }
         setEvents(this.form, { submit: (e) => this.onSubmit(e) });
 
-        if (state.isUpdate) {
-            this.deleteBtn = IconButton.fromElement('del_btn', {
+        const deleteBtn = ge('deleteBtn');
+        if (deleteBtn) {
+            this.deleteBtn = IconButton.fromElement('deleteBtn', {
                 onClick: () => this.confirmDelete(),
             });
         }
@@ -249,14 +242,10 @@ class TransactionView extends View {
         this.debtAccTileInfoBlock = this.debtAccountContainer.querySelector('.tile-info-block');
 
         const srcTileElem = ge('source_tile');
-        this.srcTile = (srcTileElem)
-            ? AccountTile.fromElement(srcTileElem, { account: state.srcAccount })
-            : null;
+        this.srcTile = (srcTileElem) ? AccountTile.fromElement(srcTileElem) : null;
 
         const destTileElem = ge('dest_tile');
-        this.destTile = (destTileElem)
-            ? AccountTile.fromElement(destTileElem, { account: state.destAccount })
-            : null;
+        this.destTile = (destTileElem) ? AccountTile.fromElement(destTileElem) : null;
 
         this.srcAmountInfo = TileInfoItem.fromElement('src_amount_left', {
             onclick: () => this.store.dispatch(actions.sourceAmountClick()),
@@ -365,9 +354,7 @@ class TransactionView extends View {
 
         this.personIdInp = ge('person_id');
         this.debtAccountInp = ge('acc_id');
-        this.debtAccountTile = AccountTile.fromElement('acc_tile', {
-            account: state.account,
-        });
+        this.debtAccountTile = AccountTile.fromElement('acc_tile');
 
         this.noAccountBtn = this.debtAccountContainer.querySelector('.tile_header .close-btn');
         setEvents(this.noAccountBtn, { click: () => this.toggleEnableAccount() });
@@ -388,11 +375,16 @@ class TransactionView extends View {
         this.spinner.hide();
         insertAfter(this.spinner.elem, this.cancelBtn);
 
+        this.subscribeToStore(this.store);
+        this.onPostInit();
+    }
+
+    onPostInit() {
+        const state = this.store.getState();
+
         // Check type change request
-        if (state.isUpdate && transaction.type !== this.props.requestedType) {
+        if (state.isUpdate && state.transaction.type !== this.props.requestedType) {
             this.onChangeType(this.props.requestedType);
-        } else {
-            this.render(state);
         }
     }
 

@@ -49,18 +49,12 @@ class PersonListView extends View {
         };
 
         this.store = createStore(reducer, initialState);
-        this.store.subscribe((state, prevState) => {
-            if (state !== prevState) {
-                this.render(state, prevState);
-            }
-        });
     }
 
     /**
      * View initialization
      */
     onStart() {
-        const state = this.store.getState();
         const listProps = {
             ItemComponent: CategoryItem,
             getItemProps: (item, { listMode }) => ({
@@ -71,7 +65,7 @@ class PersonListView extends View {
             }),
             className: 'categories-list',
             itemSelector: '.category-item',
-            listMode: state.listMode,
+            listMode: 'list',
             noItemsMessage: MSG_NO_DATA,
             onItemClick: (id, e) => this.onItemClick(id, e),
         };
@@ -82,6 +76,7 @@ class PersonListView extends View {
             'selectedCounter',
             'selItemsCount',
             'heading',
+            'createBtn',
             'contentContainer',
         ];
         elemIds.forEach((id) => {
@@ -97,8 +92,6 @@ class PersonListView extends View {
 
         this.list = ListContainer.create(listProps);
         this.contentContainer.append(this.list.elem);
-
-        this.createBtn = ge('add_btn');
 
         this.listModeBtn = IconButton.create({
             id: 'listModeBtn',
@@ -118,7 +111,7 @@ class PersonListView extends View {
         });
         this.contentContainer.append(this.loadingIndicator.elem);
 
-        this.render(state);
+        this.subscribeToStore(this.store);
     }
 
     createMenu() {

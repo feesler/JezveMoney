@@ -60,6 +60,19 @@ export class View {
         return res;
     }
 
+    /** Subscribes view to store updates */
+    subscribeToStore(store) {
+        if (!store) {
+            throw new Error('Invalid store');
+        }
+
+        store.subscribe((state, prevState) => {
+            if (state !== prevState) {
+                this.render(state, prevState);
+            }
+        });
+    }
+
     /** Update state of view and render changes */
     setState(state) {
         if (this.state === state) {

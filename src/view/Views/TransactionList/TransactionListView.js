@@ -94,11 +94,6 @@ class TransactionListView extends View {
         window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
 
         this.store = createStore(reducer, initialState);
-        this.store.subscribe((state, prevState) => {
-            if (state !== prevState) {
-                this.render(state, prevState);
-            }
-        });
     }
 
     /**
@@ -278,7 +273,7 @@ class TransactionListView extends View {
 
         this.createContextMenu();
 
-        this.render(this.store.getState());
+        this.subscribeToStore(this.store);
     }
 
     createMenu() {

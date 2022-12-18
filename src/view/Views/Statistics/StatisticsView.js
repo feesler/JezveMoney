@@ -92,19 +92,12 @@ class StatisticsView extends View {
         window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
 
         this.store = createStore(reducer, initialState);
-        this.store.subscribe((state, prevState) => {
-            if (state !== prevState) {
-                this.render(state, prevState);
-            }
-        });
     }
 
     /**
      * View initialization
      */
     onStart() {
-        const state = this.store.getState();
-
         const elemIds = [
             'heading',
             // Filters
@@ -224,13 +217,19 @@ class StatisticsView extends View {
             renderLegend: (data) => this.renderLegendContent(data),
             renderYAxisLabel: (value) => formatValueShort(value),
         });
-        this.histogram.elem.dataset.time = state.renderTime;
 
         // Loading indicator
         this.loadingIndicator = LoadingIndicator.create({
             fixed: false,
         });
         this.chart.append(this.loadingIndicator.elem);
+
+        this.subscribeToStore(this.store);
+        this.onPostInit();
+    }
+
+    onPostInit() {
+        const state = this.store.getState();
 
         // Select first account if nothing selected on account report type
         const accounts = asArray(state.form.acc_id);

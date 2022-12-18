@@ -56,18 +56,12 @@ class AccountListView extends View {
         };
 
         this.store = createStore(reducer, initialState);
-        this.store.subscribe((state, prevState) => {
-            if (state !== prevState) {
-                this.render(state, prevState);
-            }
-        });
     }
 
     /**
      * View initialization
      */
     onStart() {
-        const state = this.store.getState();
         const listProps = {
             ItemComponent: AccountTile,
             getItemProps: (account, { listMode }) => ({
@@ -79,7 +73,7 @@ class AccountListView extends View {
             }),
             className: 'tiles',
             itemSelector: '.tile',
-            listMode: state.listMode,
+            listMode: 'list',
             noItemsMessage: MSG_NO_ACCOUNTS,
             onItemClick: (id, e) => this.onItemClick(id, e),
         };
@@ -131,7 +125,7 @@ class AccountListView extends View {
         });
         this.contentContainer.append(this.loadingIndicator.elem);
 
-        this.render(state);
+        this.subscribeToStore(this.store);
     }
 
     createMenu() {

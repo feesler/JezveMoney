@@ -72,7 +72,7 @@ export class TransactionView extends AppView {
             res.heading.title = await prop(res.heading.elem, 'textContent');
         }
 
-        res.delBtn = await IconButton.create(this, await query('#del_btn'));
+        res.deleteBtn = await IconButton.create(this, await query('#deleteBtn'));
 
         res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
         assert(!res.typeMenu.multi, 'Invalid transaction type menu');
@@ -497,7 +497,7 @@ export class TransactionView extends AppView {
         };
 
         if (this.model.isUpdate) {
-            res.delBtn = {
+            res.deleteBtn = {
                 title: 'Delete',
                 visible: true,
             };
@@ -1405,9 +1405,9 @@ export class TransactionView extends AppView {
     }
 
     async clickDeleteButton() {
-        assert(this.content.isUpdate && this.content.delBtn, 'Unexpected action clickDeleteButton');
+        assert(this.content.isUpdate && this.content.deleteBtn, 'Unexpected action clickDeleteButton');
 
-        await this.performAction(() => this.content.delBtn.click());
+        await this.performAction(() => this.content.deleteBtn.click());
     }
 
     /** Click on delete button and confirm wanring popup */

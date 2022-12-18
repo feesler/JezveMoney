@@ -61,35 +61,49 @@ class CategoryView extends View {
         window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
 
         this.store = createStore(reducer, initialState);
-        this.store.subscribe((state, prevState) => {
-            if (state !== prevState) {
-                this.render(state, prevState);
-            }
-        });
     }
 
     /**
      * View initialization
      */
     onStart() {
-        const state = this.store.getState();
+        const elemIds = [
+            'categoryForm',
+            'nameInp',
+            'nameFeedback',
+            'submitBtn',
+            'cancelBtn',
+        ];
+        elemIds.forEach((id) => {
+            this[id] = ge(id);
+            if (!this[id]) {
+                throw new Error('Failed to initialize view');
+            }
+        });
 
-        this.form = ge('categoryForm');
-        this.nameInp = ge('nameInp');
-        this.nameFeedback = ge('nameFeedback');
-        this.submitBtn = ge('submitBtn');
-        this.cancelBtn = ge('cancelBtn');
-        if (
-            !this.form
-            || !this.nameInp
-            || !this.nameFeedback
-            || !this.submitBtn
-            || !this.cancelBtn
-        ) {
-            throw new Error('Failed to initialize Person view');
+        setEvents(this.categoryForm, { submit: (e) => this.onSubmit(e) });
+        setEvents(this.nameInp, { input: (e) => this.onNameInput(e) });
+
+        this.createParentCategorySelect();
+        this.createTransactionTypeSelect();
+
+        this.spinner = Spinner.create();
+        this.spinner.hide();
+        insertAfter(this.spinner.elem, this.cancelBtn);
+
+        // Update mode
+        const deleteBtn = ge('deleteBtn');
+        if (deleteBtn) {
+            this.deleteBtn = IconButton.fromElement('deleteBtn', {
+                onClick: () => this.confirmDelete(),
+            });
         }
 
-        // Parent category select
+        this.subscribeToStore(this.store);
+    }
+
+    /** Creates parent category select */
+    createParentCategorySelect() {
         this.parentSelect = DropDown.create({
             elem: 'parent',
             onitemselect: (o) => this.onParentSelect(o),
@@ -100,19 +114,16 @@ class CategoryView extends View {
         });
 
         const { categories } = window.app.model;
-        const topLevelCategories = categories
-            .filter((item) => item.parent_id === 0)
+        const mainCategories = categories.findByParent(0)
             .map(({ id, name }) => ({ id, title: name }));
-        this.parentSelect.append(topLevelCategories);
+        this.parentSelect.append(mainCategories);
+    }
 
-        if (typeof state.original.parent_id !== 'undefined') {
-            this.parentSelect.selectItem(state.original.parent_id);
-        }
-
-        // Transaction type select
+    /** Creates transaction type select */
+    createTransactionTypeSelect() {
         this.typeSelect = DropDown.create({
             elem: 'type',
-            onitemselect: (o) => this.onTypeSelect(o),
+            onitemselect: (type) => this.onTypeSelect(type),
             className: 'dd_fullwidth',
         });
         this.typeSelect.append([
@@ -122,23 +133,6 @@ class CategoryView extends View {
             { id: TRANSFER, title: TITLE_TRANSFER },
             { id: DEBT, title: TITLE_DEBT },
         ]);
-        if (typeof state.original.type !== 'undefined') {
-            this.typeSelect.selectItem(state.original.type);
-        }
-
-        setEvents(this.form, { submit: (e) => this.onSubmit(e) });
-        setEvents(this.nameInp, { input: (e) => this.onNameInput(e) });
-
-        this.spinner = Spinner.create();
-        this.spinner.hide();
-        insertAfter(this.spinner.elem, this.cancelBtn);
-
-        // Update mode
-        if (state.original.id) {
-            this.deleteBtn = IconButton.fromElement('del_btn', {
-                onClick: () => this.confirmDelete(),
-            });
-        }
     }
 
     /** Name input event handler */
@@ -148,21 +142,21 @@ class CategoryView extends View {
     }
 
     /** Parent category select event handler */
-    onParentSelect(obj) {
-        if (!obj) {
+    onParentSelect(category) {
+        if (!category) {
             return;
         }
 
-        this.store.dispatch(actions.changeParent(obj.id));
+        this.store.dispatch(actions.changeParent(category.id));
     }
 
     /** Type select event handler */
-    onTypeSelect(obj) {
-        if (!obj) {
+    onTypeSelect(type) {
+        if (!type) {
             return;
         }
 
-        this.store.dispatch(actions.changeType(obj.id));
+        this.store.dispatch(actions.changeType(type.id));
     }
 
     /** Form submit event handler */
@@ -282,13 +276,17 @@ class CategoryView extends View {
         this.nameFeedback.textContent = (state.validation.name === true)
             ? ''
             : state.validation.name;
-
-        this.parentSelect.selectItem(state.data.parent_id);
-        this.typeSelect.selectItem(state.data.type);
-
-        this.nameInp.alue = state.data.name;
-
+        this.nameInp.value = state.data.name;
         enable(this.nameInp, !state.submitStarted);
+
+        // Parent category select
+        this.parentSelect.selectItem(state.data.parent_id);
+        this.parentSelect.enable(!state.submitStarted);
+
+        // Transaction type select
+        this.typeSelect.selectItem(state.data.type);
+        this.typeSelect.enable(!state.submitStarted);
+
         enable(this.submitBtn, !state.submitStarted);
         show(this.cancelBtn, !state.submitStarted);
 

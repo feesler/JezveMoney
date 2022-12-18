@@ -60,7 +60,7 @@ export class CategoryView extends AppView {
             assert(res.id, 'Wrong category id');
         }
 
-        res.delBtn = await IconButton.create(this, await query('#del_btn'));
+        res.deleteBtn = await IconButton.create(this, await query('#deleteBtn'));
 
         res.nameInput = await InputRow.create(this, await query(res.formElem, 'div.view-row'));
         assert(res.nameInput, 'Category name input not found');
@@ -124,9 +124,9 @@ export class CategoryView extends AppView {
     }
 
     async clickDeleteButton() {
-        assert(this.content.isUpdate && this.content.delBtn, 'Unexpected action clickDeleteButton');
+        assert(this.content.isUpdate && this.content.deleteBtn, 'Unexpected action clickDeleteButton');
 
-        return this.performAction(() => this.content.delBtn.click());
+        return this.performAction(() => this.content.deleteBtn.click());
     }
 
     /** Click on delete button and confirm wanring popup */
