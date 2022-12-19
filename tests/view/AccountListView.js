@@ -35,7 +35,6 @@ const contextMenuItems = [
 export class AccountListView extends AppView {
     async parseContent() {
         const res = {
-            title: { elem: await query('.content_wrap > .heading > h1') },
             addBtn: await IconButton.create(this, await query('#createBtn')),
             listModeBtn: await IconButton.create(this, await query('#listModeBtn')),
             listMenuContainer: {
@@ -65,7 +64,6 @@ export class AccountListView extends AppView {
             await this.parseMenuItems(res, contextMenuItems);
         }
 
-        res.title.value = await prop(res.title.elem, 'textContent');
         res.tiles = await TilesList.create(this, await query('#contentContainer .tiles:first-child'));
         res.hiddenTiles = await TilesList.create(this, await query('#hiddenTilesHeading + .tiles'));
         res.loadingIndicator = { elem: await query('#contentContainer .loading-indicator') };

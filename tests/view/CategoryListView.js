@@ -38,7 +38,6 @@ export class CategoryListView extends AppView {
 
     async parseContent() {
         const res = {
-            title: { elem: await query('.content_wrap > .heading > h1') },
             createBtn: await IconButton.create(this, await query('#createBtn')),
             listModeBtn: await IconButton.create(this, await query('#listModeBtn')),
             listMenuContainer: {
@@ -66,8 +65,6 @@ export class CategoryListView extends AppView {
 
             await this.parseMenuItems(res, contextMenuItems);
         }
-
-        res.title.value = prop(res.title.elem, 'textContent');
 
         // Categories list
         const listContainer = await query('#contentContainer .categories-list');
