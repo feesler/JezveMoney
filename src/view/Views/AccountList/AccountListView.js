@@ -2,6 +2,7 @@ import 'jezvejs/style';
 import {
     asArray,
     insertAfter,
+    isFunction,
     show,
     urlJoin,
 } from 'jezvejs';
@@ -15,13 +16,13 @@ import { CurrencyList } from '../../js/model/CurrencyList.js';
 import { AccountList } from '../../js/model/AccountList.js';
 import { IconList } from '../../js/model/IconList.js';
 import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
+import { Heading } from '../../Components/Heading/Heading.js';
 import { AccountTile } from '../../Components/AccountTile/AccountTile.js';
 import { ListContainer } from '../../Components/ListContainer/ListContainer.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
 import './style.scss';
-import { Heading } from '../../Components/Heading/Heading.js';
 
 /** Strings */
 const STR_TITLE = 'Accounts';
@@ -127,15 +128,15 @@ class AccountListView extends View {
                 id: 'selectModeBtn',
                 icon: 'select',
                 title: 'Select',
-                onClick: () => this.toggleSelectMode(),
+                onClick: () => this.onMenuClick('selectModeBtn'),
             }, {
                 id: 'selectAllBtn',
                 title: 'Select all',
-                onClick: () => this.selectAll(),
+                onClick: () => this.onMenuClick('selectAllBtn'),
             }, {
                 id: 'deselectAllBtn',
                 title: 'Clear selection',
-                onClick: () => this.deselectAll(),
+                onClick: () => this.onMenuClick('deselectAllBtn'),
             }, {
                 id: 'separator2',
                 type: 'separator',
@@ -144,23 +145,33 @@ class AccountListView extends View {
                 type: 'link',
                 icon: 'export',
                 title: 'Export to CSV',
+                onClick: () => this.onMenuClick('exportBtn'),
             }, {
                 id: 'showBtn',
                 icon: 'show',
                 title: 'Restore',
-                onClick: () => this.showItems(),
+                onClick: () => this.onMenuClick('showBtn'),
             }, {
                 id: 'hideBtn',
                 icon: 'hide',
                 title: 'Hide',
-                onClick: () => this.showItems(false),
+                onClick: () => this.onMenuClick('hideBtn'),
             }, {
                 id: 'deleteBtn',
                 icon: 'del',
                 title: 'Delete',
-                onClick: () => this.confirmDelete(),
+                onClick: () => this.onMenuClick('deleteBtn'),
             }],
         });
+
+        this.menuActions = {
+            selectModeBtn: () => this.toggleSelectMode(),
+            selectAllBtn: () => this.selectAll(),
+            deselectAllBtn: () => this.deselectAll(),
+            showBtn: () => this.showItems(true),
+            hideBtn: () => this.showItems(false),
+            deleteBtn: () => this.confirmDelete(),
+        };
     }
 
     createContextMenu() {
@@ -194,6 +205,17 @@ class AccountListView extends View {
                 onClick: () => this.confirmDelete(),
             }],
         });
+    }
+
+    onMenuClick(item) {
+        this.menu.hideMenu();
+
+        const menuAction = this.menuActions[item];
+        if (!isFunction(menuAction)) {
+            return;
+        }
+
+        menuAction();
     }
 
     onItemClick(itemId, e) {

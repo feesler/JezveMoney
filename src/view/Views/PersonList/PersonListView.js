@@ -1,5 +1,10 @@
 import 'jezvejs/style';
-import { asArray, insertAfter, show } from 'jezvejs';
+import {
+    asArray,
+    insertAfter,
+    isFunction,
+    show,
+} from 'jezvejs';
 import { IconButton } from 'jezvejs/IconButton';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Application } from '../../js/Application.js';
@@ -118,15 +123,15 @@ class PersonListView extends View {
                 id: 'selectModeBtn',
                 icon: 'select',
                 title: 'Select',
-                onClick: () => this.toggleSelectMode(),
+                onClick: () => this.onMenuClick('selectModeBtn'),
             }, {
                 id: 'selectAllBtn',
                 title: 'Select all',
-                onClick: () => this.selectAll(),
+                onClick: () => this.onMenuClick('selectAllBtn'),
             }, {
                 id: 'deselectAllBtn',
                 title: 'Clear selection',
-                onClick: () => this.deselectAll(),
+                onClick: () => this.onMenuClick('deselectAllBtn'),
             }, {
                 id: 'separator2',
                 type: 'separator',
@@ -134,19 +139,28 @@ class PersonListView extends View {
                 id: 'showBtn',
                 icon: 'show',
                 title: 'Restore',
-                onClick: () => this.showItems(),
+                onClick: () => this.onMenuClick('showBtn'),
             }, {
                 id: 'hideBtn',
                 icon: 'hide',
                 title: 'Hide',
-                onClick: () => this.showItems(false),
+                onClick: () => this.onMenuClick('hideBtn'),
             }, {
                 id: 'deleteBtn',
                 icon: 'del',
                 title: 'Delete',
-                onClick: () => this.confirmDelete(),
+                onClick: () => this.onMenuClick('deleteBtn'),
             }],
         });
+
+        this.menuActions = {
+            selectModeBtn: () => this.toggleSelectMode(),
+            selectAllBtn: () => this.selectAll(),
+            deselectAllBtn: () => this.deselectAll(),
+            showBtn: () => this.showItems(true),
+            hideBtn: () => this.showItems(false),
+            deleteBtn: () => this.confirmDelete(),
+        };
     }
 
     createContextMenu() {
@@ -175,6 +189,17 @@ class PersonListView extends View {
                 onClick: () => this.confirmDelete(),
             }],
         });
+    }
+
+    onMenuClick(item) {
+        this.menu.hideMenu();
+
+        const menuAction = this.menuActions[item];
+        if (!isFunction(menuAction)) {
+            return;
+        }
+
+        menuAction();
     }
 
     onItemClick(itemId, e) {
