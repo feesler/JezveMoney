@@ -229,6 +229,10 @@ class TransactionModel extends CachedTable
             }
         }
         $srcCurrId = (isset($res["src_curr"])) ? $res["src_curr"] : $item->src_curr;
+        // Check source currency is the same as currency of source account
+        if ($srcAcc && $srcAcc->curr_id !== $srcCurrId) {
+            throw new \Error("src_curr is not the same as currency of source account");
+        }
 
         if (isset($params["dest_curr"])) {
             $res["dest_curr"] = intval($params["dest_curr"]);
@@ -240,6 +244,10 @@ class TransactionModel extends CachedTable
             }
         }
         $destCurrId = (isset($res["dest_curr"])) ? $res["dest_curr"] : $item->dest_curr;
+        // Check destination currency is the same as currency of destination account
+        if ($destAcc && $destAcc->curr_id !== $destCurrId) {
+            throw new \Error("dest_curr is not the same as currency of destination account");
+        }
 
         if ($srcCurrId === $destCurrId && $srcAmount != $destAmount) {
             throw new \Error("src_amount and dest_amount must be equal when src_curr and dest_curr are same");
@@ -298,13 +306,13 @@ class TransactionModel extends CachedTable
             throw new \Error("Invalid currency");
         }
 
-        $curr_id = ($op == 1) ? $res["src_curr"] : $res["dest_curr"];
-        $personAccount = $this->accModel->getPersonAccount($person_id, $curr_id);
+        $personCurrencyId = ($op == 1) ? $res["src_curr"] : $res["dest_curr"];
+        $personAccount = $this->accModel->getPersonAccount($person_id, $personCurrencyId);
         if (!$personAccount) {
-            $personAccount = $this->accModel->createPersonAccount($person_id, $curr_id);
+            $personAccount = $this->accModel->createPersonAccount($person_id, $personCurrencyId);
         }
         if (!$personAccount) {
-            throw new \Error("Fail to obtain person account: person_id: $person_id, curr_id: $curr_id");
+            throw new \Error("Fail to obtain person account: person_id: $person_id, curr_id: $personCurrencyId");
         }
 
         $account_id = isset($params["acc_id"]) ? intval($params["acc_id"]) : 0;

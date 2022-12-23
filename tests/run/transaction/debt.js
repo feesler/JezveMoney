@@ -16,12 +16,30 @@ export const submit = async (params) => {
         await TransactionTests.runAction({ action: 'swapSourceAndDest', data: params.debtType });
     }
 
-    assert('srcAmount' in params, 'Source amount value not specified');
+    if ('srcCurr' in params) {
+        await TransactionTests.runAction({ action: 'changeSourceCurrency', data: params.srcCurr });
+    }
 
-    await TransactionTests.runAction({ action: 'inputSrcAmount', data: params.srcAmount });
+    if ('destCurr' in params) {
+        await TransactionTests.runAction({ action: 'changeDestCurrency', data: params.destCurr });
+    }
+
+    assert(('srcAmount' in params) || ('destAmount' in params), 'No amount value not specified');
+
+    if ('srcAmount' in params) {
+        await TransactionTests.runAction({ action: 'inputSrcAmount', data: params.srcAmount });
+    }
+
+    if ('destAmount' in params) {
+        await TransactionTests.runAction({ action: 'inputDestAmount', data: params.destAmount });
+    }
 
     if ('date' in params) {
         await TransactionTests.runAction({ action: 'changeDate', data: params.date });
+    }
+
+    if ('category' in params) {
+        await TransactionTests.runAction({ action: 'changeCategory', data: params.category });
     }
 
     if ('comment' in params) {
@@ -38,10 +56,14 @@ export const create = async (params) => {
 export const update = async (params) => {
     await TransactionTests.update(DEBT, params, async (submitParams) => {
         await test('Initial state of update debt view', () => {
-            if (App.view.model.noAccount) {
-                App.view.model.state = (App.view.model.debtType) ? 6 : 7;
+            const { debtType, noAccount, isDiffCurr } = App.view.model;
+
+            if (isDiffCurr) {
+                App.view.model.state = (debtType) ? 10 : 16;
+            } else if (debtType) {
+                App.view.model.state = (noAccount) ? 6 : 0;
             } else {
-                App.view.model.state = (App.view.model.debtType) ? 0 : 3;
+                App.view.model.state = (noAccount) ? 7 : 3;
             }
 
             const expected = App.view.getExpectedState();

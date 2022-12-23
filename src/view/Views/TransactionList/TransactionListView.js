@@ -1,12 +1,12 @@
 import 'jezvejs/style';
 import {
-    ge,
     createElement,
     show,
     insertAfter,
     asArray,
     setEvents,
     debounce,
+    isFunction,
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { IconButton } from 'jezvejs/IconButton';
@@ -93,19 +93,14 @@ class TransactionListView extends View {
         window.app.loadModel(PersonList, 'persons', window.app.props.persons);
         window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
 
-        this.store = createStore(reducer, initialState);
-        this.store.subscribe((state, prevState) => {
-            if (state !== prevState) {
-                this.render(state, prevState);
-            }
-        });
+        this.store = createStore(reducer, { initialState });
     }
 
     /**
      * View initialization
      */
     onStart() {
-        const elemIds = [
+        this.loadElementsByIds([
             'heading',
             'createBtn',
             // Filters
@@ -122,13 +117,7 @@ class TransactionListView extends View {
             'itemsCount',
             'selectedCounter',
             'selItemsCount',
-        ];
-        elemIds.forEach((id) => {
-            this[id] = ge(id);
-            if (!this[id]) {
-                throw new Error('Failed to initialize view');
-            }
-        });
+        ]);
 
         this.heading = Heading.fromElement(this.heading, {
             title: STR_TITLE,
@@ -278,7 +267,7 @@ class TransactionListView extends View {
 
         this.createContextMenu();
 
-        this.render(this.store.getState());
+        this.subscribeToStore(this.store);
     }
 
     createMenu() {
@@ -288,37 +277,46 @@ class TransactionListView extends View {
                 id: 'selectModeBtn',
                 icon: 'select',
                 title: 'Select',
-                onClick: () => this.setListMode('select'),
+                onClick: () => this.onMenuClick('selectModeBtn'),
             }, {
                 id: 'sortModeBtn',
                 icon: 'sort',
                 title: 'Sort',
-                onClick: () => this.setListMode('sort'),
+                onClick: () => this.onMenuClick('sortModeBtn'),
             }, {
                 id: 'separator1',
                 type: 'separator',
             }, {
                 id: 'selectAllBtn',
                 title: 'Select all',
-                onClick: () => this.selectAll(),
+                onClick: () => this.onMenuClick('selectAllBtn'),
             }, {
                 id: 'deselectAllBtn',
                 title: 'Clear selection',
-                onClick: () => this.deselectAll(),
+                onClick: () => this.onMenuClick('deselectAllBtn'),
             }, {
                 id: 'separator2',
                 type: 'separator',
             }, {
                 id: 'setCategoryBtn',
                 title: TITLE_BTN_SET_CATEGORY,
-                onClick: () => this.showCategoryDialog(true),
+                onClick: () => this.onMenuClick('setCategoryBtn'),
             }, {
                 id: 'deleteBtn',
                 icon: 'del',
                 title: 'Delete',
-                onClick: () => this.confirmDelete(),
+                onClick: () => this.onMenuClick('deleteBtn'),
             }],
         });
+
+        this.menuActions = {
+            selectModeBtn: () => this.setListMode('select'),
+            sortModeBtn: () => this.setListMode('sort'),
+            selectAllBtn: () => this.selectAll(),
+            deselectAllBtn: () => this.deselectAll(),
+            setCategoryBtn: () => this.showCategoryDialog(true),
+            deleteBtn: () => this.confirmDelete(),
+        };
     }
 
     createContextMenu() {
@@ -369,6 +367,17 @@ class TransactionListView extends View {
             onconfirm: () => this.setItemsCategory(),
             onreject: () => this.closeCategoryDialog(),
         });
+    }
+
+    onMenuClick(item) {
+        this.menu.hideMenu();
+
+        const menuAction = this.menuActions[item];
+        if (!isFunction(menuAction)) {
+            return;
+        }
+
+        menuAction();
     }
 
     /** Returns true if accounts or persons is available */

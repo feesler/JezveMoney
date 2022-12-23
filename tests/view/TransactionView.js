@@ -6,6 +6,7 @@ import {
     navigation,
     click,
     asyncMap,
+    isObject,
 } from 'jezve-test';
 import { DropDown, IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -37,19 +38,19 @@ import {
 import { App } from '../Application.js';
 
 const infoItemSelectors = [
-    '#src_amount_left',
-    '#dest_amount_left',
-    '#src_res_balance_left',
-    '#dest_res_balance_left',
-    '#exch_left',
+    '#srcAmountInfo',
+    '#destAmountInfo',
+    '#srcResBalanceInfo',
+    '#destResBalanceInfo',
+    '#exchangeInfo',
 ];
 const inputRowSelectors = [
-    '#src_amount_row',
-    '#dest_amount_row',
-    '#exchange',
-    '#result_balance',
-    '#result_balance_dest',
-    '#comment_row',
+    '#srcAmountRow',
+    '#destAmountRow',
+    '#exchangeRow',
+    '#srcResBalanceRow',
+    '#destResBalanceRow',
+    '#commentRow',
 ];
 
 /** Create or update transaction view class */
@@ -72,28 +73,28 @@ export class TransactionView extends AppView {
             res.heading.title = await prop(res.heading.elem, 'textContent');
         }
 
-        res.delBtn = await IconButton.create(this, await query('#del_btn'));
+        res.deleteBtn = await IconButton.create(this, await query('#deleteBtn'));
 
         res.typeMenu = await TransactionTypeMenu.create(this, await query('.trtype-menu'));
         assert(!res.typeMenu.multi, 'Invalid transaction type menu');
 
-        res.notAvailMsg = { elem: await query('#notavailmsg') };
+        res.notAvailMsg = { elem: await query('#notAvailMsg') };
         assert(res.notAvailMsg.elem, 'No available transaction message element not found');
         res.notAvailMsg.message = await prop(res.notAvailMsg.elem, 'textContent');
 
-        res.person = await TileBlock.create(this, await query('#person'));
-        if (res.person) {
-            const personIdInp = await query('#person_id');
-            res.person.content.id = parseInt(await prop(personIdInp, 'value'), 10);
+        res.personContainer = await TileBlock.create(this, await query('#personContainer'));
+        if (res.personContainer) {
+            const personIdInp = await query('#personIdInp');
+            res.personContainer.content.id = parseInt(await prop(personIdInp, 'value'), 10);
         }
 
-        const debtOperationInp = await query('#debtOperation');
+        const debtOperationInp = await query('#debtOperationInp');
         res.debtOperation = parseInt(await prop(debtOperationInp, 'value'), 10);
 
-        const accountBlock = await query('#debtaccount');
-        res.account = await TileBlock.create(this, accountBlock);
-        const accountIdInp = await query('#acc_id');
-        res.account.content.id = parseInt(await prop(accountIdInp, 'value'), 10);
+        const accountBlock = await query('#debtAccountContainer');
+        res.debtAccountContainer = await TileBlock.create(this, accountBlock);
+        const debtAccountInp = await query('#debtAccountInp');
+        res.debtAccountContainer.content.id = parseInt(await prop(debtAccountInp, 'value'), 10);
 
         res.selaccount = await Button.create(this, await query(accountBlock, '.account-toggler'));
         assert(res.selaccount, 'Select account button not found');
@@ -106,43 +107,43 @@ export class TransactionView extends AppView {
         res.noAccountsMsg = { elem: await query(accountBlock, '.nodata-message') };
         assert(res.noAccountsMsg.elem, 'No accounts message element not found');
 
-        res.source = await TileBlock.create(this, await query('#source'));
-        if (res.source) {
-            const srcIdInp = await query('#src_id');
-            res.source.content.id = parseInt(await prop(srcIdInp, 'value'), 10);
+        res.sourceContainer = await TileBlock.create(this, await query('#sourceContainer'));
+        if (res.sourceContainer) {
+            const srcIdInp = await query('#srcIdInp');
+            res.sourceContainer.content.id = parseInt(await prop(srcIdInp, 'value'), 10);
         }
-        res.destination = await TileBlock.create(this, await query('#destination'));
-        if (res.destination) {
-            const destIdInp = await query('#dest_id');
-            res.destination.content.id = parseInt(await prop(destIdInp, 'value'), 10);
+        res.destContainer = await TileBlock.create(this, await query('#destContainer'));
+        if (res.destContainer) {
+            const destIdInp = await query('#destIdInp');
+            res.destContainer.content.id = parseInt(await prop(destIdInp, 'value'), 10);
         }
 
         [
-            res.src_amount_left,
-            res.dest_amount_left,
-            res.src_res_balance_left,
-            res.dest_res_balance_left,
-            res.exch_left,
+            res.srcAmountInfo,
+            res.destAmountInfo,
+            res.srcResBalanceInfo,
+            res.destResBalanceInfo,
+            res.exchangeInfo,
         ] = await asyncMap(
             infoItemSelectors,
             async (selector) => TileInfoItem.create(this, await query(selector)),
         );
 
         [
-            res.src_amount_row,
-            res.dest_amount_row,
-            res.exchange_row,
-            res.result_balance_row,
-            res.result_balance_dest_row,
-            res.comment_row,
+            res.srcAmountRow,
+            res.destAmountRow,
+            res.exchangeRow,
+            res.srcResBalanceRow,
+            res.destResBalanceRow,
+            res.commentRow,
         ] = await asyncMap(
             inputRowSelectors,
             async (selector) => InputRow.create(this, await query(selector)),
         );
 
-        res.datePicker = await DatePickerRow.create(this, await query('#date_row'));
+        res.datePicker = await DatePickerRow.create(this, await query('#dateRow'));
 
-        res.categorySelect = await DropDown.createFromChild(this, await query('#category'));
+        res.categorySelect = await DropDown.createFromChild(this, await query('#categorySelect'));
 
         res.submitBtn = await query('#submitBtn');
         assert(res.submitBtn, 'Submit button not found');
@@ -167,18 +168,18 @@ export class TransactionView extends AppView {
             res.id = cont.id;
         }
 
-        res.srcAccount = (cont.source)
-            ? App.state.accounts.getItem(cont.source.content.id)
+        res.srcAccount = (cont.sourceContainer)
+            ? App.state.accounts.getItem(cont.sourceContainer.content.id)
             : null;
-        res.destAccount = (cont.destination)
-            ? App.state.accounts.getItem(cont.destination.content.id)
+        res.destAccount = (cont.destContainer)
+            ? App.state.accounts.getItem(cont.destContainer.content.id)
             : null;
 
-        res.src_curr_id = (cont.src_amount_row)
-            ? parseInt(cont.src_amount_row.content.hiddenValue, 10)
+        res.src_curr_id = (cont.srcAmountRow)
+            ? parseInt(cont.srcAmountRow.content.hiddenValue, 10)
             : 0;
-        res.dest_curr_id = (cont.dest_amount_row)
-            ? parseInt(cont.dest_amount_row.content.hiddenValue, 10)
+        res.dest_curr_id = (cont.destAmountRow)
+            ? parseInt(cont.destAmountRow.content.hiddenValue, 10)
             : 0;
 
         res.srcCurr = App.currency.getItem(res.src_curr_id);
@@ -189,16 +190,16 @@ export class TransactionView extends AppView {
         }
         res.isDiffCurr = (res.src_curr_id !== res.dest_curr_id);
 
-        res.srcAmount = cont.src_amount_row.value;
+        res.srcAmount = cont.srcAmountRow.value;
         res.fSrcAmount = isValidValue(res.srcAmount) ? normalize(res.srcAmount) : res.srcAmount;
 
-        res.destAmount = cont.dest_amount_row.value;
+        res.destAmount = cont.destAmountRow.value;
         res.fDestAmount = isValidValue(res.destAmount) ? normalize(res.destAmount) : res.destAmount;
 
-        res.srcResBal = cont.result_balance_row.value;
+        res.srcResBal = cont.srcResBalanceRow.value;
         res.fSrcResBal = isValidValue(res.srcResBal) ? normalize(res.srcResBal) : res.srcResBal;
 
-        res.destResBal = cont.result_balance_dest_row.value;
+        res.destResBal = cont.destResBalanceRow.value;
         res.fDestResBal = isValidValue(res.destResBal) ? normalize(res.destResBal) : res.destResBal;
 
         if (res.isAvailable) {
@@ -206,27 +207,30 @@ export class TransactionView extends AppView {
             res.backExchSign = `${res.srcCurr.sign}/${res.destCurr.sign}`;
 
             res.useBackExchange = (res.isDiffCurr)
-                ? (cont.exchange_row.currSign === res.backExchSign)
+                ? (cont.exchangeRow.currSign === res.backExchSign)
                 : false;
 
             if (res.useBackExchange) {
-                res.backExchRate = cont.exchange_row.value;
+                res.backExchRate = cont.exchangeRow.value;
                 res.exchRate = this.calcExchange(res);
             } else {
-                res.exchRate = cont.exchange_row.value;
+                res.exchRate = cont.exchangeRow.value;
                 res.backExchRate = this.calcBackExchange(res);
             }
 
             this.updateExch();
         }
 
+        const srcAmountRowVisible = cont.srcAmountRow?.content?.visible;
+        const destAmountRowVisible = cont.destAmountRow?.content?.visible;
+        const srcResRowVisible = cont.srcResBalanceRow?.content?.visible;
+        const destResRowVisible = cont.destResBalanceRow?.content?.visible;
+        const exchRowVisible = cont.exchangeRow?.content?.visible;
+
         if (res.type === EXPENSE) {
             if (res.isAvailable) {
                 assert(res.srcAccount, 'Source account not found');
             }
-
-            const isResBalRowVisible = cont.result_balance_row?.content?.visible;
-            const exchRowVisible = cont.exchange_row?.content?.visible;
 
             if (!res.isAvailable) {
                 res.state = -1;
@@ -234,10 +238,10 @@ export class TransactionView extends AppView {
                 if (exchRowVisible) {
                     res.state = 3;
                 } else {
-                    res.state = (isResBalRowVisible) ? 4 : 2;
+                    res.state = (srcResRowVisible) ? 4 : 2;
                 }
             } else {
-                res.state = (isResBalRowVisible) ? 1 : 0;
+                res.state = (srcResRowVisible) ? 1 : 0;
             }
         }
 
@@ -245,9 +249,6 @@ export class TransactionView extends AppView {
             if (res.isAvailable) {
                 assert(res.destAccount, 'Destination account not found');
             }
-
-            const destResRowVisible = cont.result_balance_dest_row?.content?.visible;
-            const exchRowVisible = cont.exchange_row?.content?.visible;
 
             if (!res.isAvailable) {
                 res.state = -1;
@@ -267,12 +268,6 @@ export class TransactionView extends AppView {
                 assert(res.srcAccount, 'Source account not found');
                 assert(res.destAccount, 'Destination account not found');
             }
-
-            const srcAmountRowVisible = cont.src_amount_row?.content?.visible;
-            const destAmountRowVisible = cont.dest_amount_row?.content?.visible;
-            const srcResRowVisible = cont.result_balance_row?.content?.visible;
-            const destResRowVisible = cont.result_balance_dest_row?.content?.visible;
-            const exchRowVisible = cont.exchange_row?.content?.visible;
 
             if (!res.isAvailable) {
                 res.state = -1;
@@ -306,14 +301,12 @@ export class TransactionView extends AppView {
         }
 
         if (res.type === DEBT) {
-            res.person = App.state.persons.getItem(cont.person.content.id);
+            res.person = App.state.persons.getItem(cont.personContainer.content.id);
             if (res.isAvailable) {
                 assert(res.person, 'Person not found');
             }
 
             res.debtType = cont.debtOperation === 1;
-
-            assert(!res.isDiffCurr, 'Source and destination currencies are not the same');
 
             const personAccountCurr = (res.debtType) ? res.src_curr_id : res.dest_curr_id;
             res.personAccount = this.getPersonAccount(res.person?.id, personAccountCurr);
@@ -321,18 +314,12 @@ export class TransactionView extends AppView {
             const isSelectAccountVisible = cont.selaccount?.content?.visible;
             res.noAccount = isSelectAccountVisible || cont.noAccountsMsg.visible;
 
-            res.account = App.state.accounts.getItem(cont.account.content.id);
+            res.account = App.state.accounts.getItem(cont.debtAccountContainer.content.id);
             if (res.isAvailable && !res.noAccount) {
                 assert(res.account, 'Account not found');
+                const accountCurrency = (res.debtType) ? res.dest_curr_id : res.src_curr_id;
+                assert(res.account.curr_id === accountCurrency, 'Invalid currency of account');
             }
-            assert(
-                !(
-                    !res.noAccount
-                    && res.account
-                    && res.account.curr_id !== ((res.debtType) ? res.src_curr_id : res.dest_curr_id)
-                ),
-                'Wrong currency of account',
-            );
 
             if (this.model && this.model.lastAccount_id) {
                 res.lastAccount_id = this.model.lastAccount_id;
@@ -346,17 +333,17 @@ export class TransactionView extends AppView {
                 res.destAccount = res.personAccount;
             }
 
-            assert(res.fSrcAmount === res.fDestAmount, 'Source and destination amount are different');
-
-            const srcAmountRowVisible = cont.src_amount_row?.content?.visible;
-            const srcResRowVisible = cont.result_balance_row?.content?.visible;
-            const destResRowVisible = cont.result_balance_dest_row?.content?.visible;
+            if (res.src_curr_id === res.dest_curr_id) {
+                assert(res.fSrcAmount === res.fDestAmount, 'Source and destination amount are different');
+            }
 
             if (!res.isAvailable) {
                 res.state = -1;
             } else if (res.noAccount) {
-                if (srcAmountRowVisible) {
-                    res.state = (res.debtType) ? 6 : 7;
+                if (srcAmountRowVisible && res.debtType) {
+                    res.state = 6;
+                } else if (destAmountRowVisible && !res.debtType) {
+                    res.state = 7;
                 } else if (srcResRowVisible && res.debtType) {
                     res.state = 9;
                 } else if (destResRowVisible && !res.debtType) {
@@ -365,8 +352,32 @@ export class TransactionView extends AppView {
                     throw new Error('Unexpected state');
                 }
             } else if (!res.noAccount) {
-                if (srcAmountRowVisible) {
-                    res.state = res.debtType ? 0 : 3;
+                if (res.isDiffCurr) {
+                    if (srcAmountRowVisible && destAmountRowVisible) {
+                        res.state = (res.debtType) ? 10 : 16;
+                    } else if (destAmountRowVisible && srcResRowVisible) {
+                        res.state = (res.debtType) ? 11 : 21;
+                    } else if (srcAmountRowVisible && exchRowVisible && res.debtType) {
+                        res.state = 12;
+                    } else if (destAmountRowVisible && exchRowVisible && !res.debtType) {
+                        res.state = 18;
+                    } else if (srcResRowVisible && exchRowVisible && res.debtType) {
+                        res.state = 13;
+                    } else if (destResRowVisible && exchRowVisible && !res.debtType) {
+                        res.state = 19;
+                    } else if (srcResRowVisible && destResRowVisible) {
+                        res.state = (res.debtType) ? 14 : 20;
+                    } else if (srcAmountRowVisible && destResRowVisible) {
+                        res.state = (res.debtType) ? 15 : 17;
+                    } else if (destAmountRowVisible && srcResRowVisible && !res.debtType) {
+                        res.state = 21;
+                    } else {
+                        throw new Error('Unexpected state');
+                    }
+                } else if (srcAmountRowVisible && res.debtType) {
+                    res.state = 0;
+                } else if (destAmountRowVisible && !res.debtType) {
+                    res.state = 3;
                 } else if (srcResRowVisible) {
                     res.state = res.debtType ? 1 : 5;
                 } else if (destResRowVisible) {
@@ -392,19 +403,19 @@ export class TransactionView extends AppView {
 
         res.date = cont.datePicker.value;
         res.categoryId = parseInt(cont.categorySelect.value, 10);
-        res.comment = cont.comment_row.value;
+        res.comment = cont.commentRow.value;
 
         return res;
     }
 
     isValid() {
-        if (this.content.src_amount_row?.content?.visible) {
+        if (this.content.srcAmountRow?.content?.visible) {
             if (this.model.fSrcAmount <= 0) {
                 return false;
             }
         }
 
-        if (this.content.dest_amount_row?.content?.visible) {
+        if (this.content.destAmountRow?.content?.visible) {
             if (this.model.fDestAmount <= 0) {
                 return false;
             }
@@ -450,67 +461,73 @@ export class TransactionView extends AppView {
         const state = parseInt(this.model.state, 10);
         assert(!Number.isNaN(state), 'Invalid state specified');
 
+        const isExpense = this.model.type === EXPENSE;
+        const isIncome = this.model.type === INCOME;
+        const isTransfer = this.model.type === TRANSFER;
+        const isDebt = this.model.type === DEBT;
+        const { isAvailable, isDiffCurr } = this.model;
+
         const res = {
             typeMenu: { value: this.model.type },
-            person: {
+            personContainer: {
                 tile: {},
-                visible: this.model.isAvailable && this.model.type === DEBT,
+                visible: isAvailable && isDebt,
             },
-            account: {
+            debtAccountContainer: {
                 tile: {
                     visible: (
-                        this.model.isAvailable
-                        && this.model.type === DEBT
+                        isAvailable
+                        && isDebt
                         && !this.model.noAccount
                     ),
                 },
-                visible: this.model.isAvailable && this.model.type === DEBT,
+                visible: isAvailable && isDebt,
             },
-            source: {
+            sourceContainer: {
                 visible: (
-                    this.model.isAvailable
-                    && (this.model.type === EXPENSE || this.model.type === TRANSFER)
+                    isAvailable
+                    && (isExpense || isTransfer)
                 ),
             },
-            destination: {
+            destContainer: {
                 visible: (
-                    this.model.isAvailable
-                    && (this.model.type === INCOME || this.model.type === TRANSFER)
+                    isAvailable
+                    && (isIncome || isTransfer)
                 ),
             },
             swapBtn: {
                 visible: (
-                    this.model.isAvailable
-                    && (this.model.type === TRANSFER || this.model.type === DEBT)
+                    isAvailable
+                    && (isTransfer || isDebt)
                 ),
             },
-            src_amount_row: {},
-            dest_amount_row: {},
-            result_balance_row: {},
-            result_balance_dest_row: {},
-            exchange_row: {},
-            src_amount_left: {},
-            dest_amount_left: {},
-            src_res_balance_left: {},
-            dest_res_balance_left: {},
-            exch_left: {},
+            srcAmountRow: {},
+            destAmountRow: {},
+            srcResBalanceRow: {},
+            destResBalanceRow: {},
+            exchangeRow: {},
+            srcAmountInfo: {},
+            destAmountInfo: {},
+            srcResBalanceInfo: {},
+            destResBalanceInfo: {},
+            exchangeInfo: {},
         };
 
         if (this.model.isUpdate) {
-            res.delBtn = {
+            res.deleteBtn = {
                 title: 'Delete',
                 visible: true,
             };
         }
 
-        if (this.model.isAvailable) {
-            res.src_amount_row.value = this.model.srcAmount.toString();
-            res.src_amount_row.currSign = (this.model.srcCurr) ? this.model.srcCurr.sign : '';
-            res.src_amount_row.isCurrActive = (this.model.type === INCOME);
+        if (isAvailable) {
+            res.srcAmountRow.value = this.model.srcAmount.toString();
+            res.srcAmountRow.currSign = (this.model.srcCurr) ? this.model.srcCurr.sign : '';
+            res.srcAmountRow.isCurrActive = (isIncome || (isDebt && this.model.debtType));
 
-            res.dest_amount_row.value = this.model.destAmount.toString();
-            res.dest_amount_row.currSign = (this.model.destCurr) ? this.model.destCurr.sign : '';
-            res.dest_amount_row.isCurrActive = (this.model.type === EXPENSE);
+            res.destAmountRow.value = this.model.destAmount.toString();
+            res.destAmountRow.currSign = (this.model.destCurr) ? this.model.destCurr.sign : '';
+            res.destAmountRow.isCurrActive = (isExpense || (isDebt && !this.model.debtType));
 
             if (this.model.destCurr && this.model.srcCurr) {
                 const exchRateValue = (this.model.useBackExchange)
@@ -520,9 +537,9 @@ export class TransactionView extends AppView {
                     ? this.model.backExchSign
                     : this.model.exchSign;
 
-                res.exchange_row.value = exchRateValue.toString();
-                res.exchange_row.currSign = exchSign;
-                res.exch_left.value = this.model.fmtExch;
+                res.exchangeRow.value = exchRateValue.toString();
+                res.exchangeRow.currSign = exchSign;
+                res.exchangeInfo.value = this.model.fmtExch;
             }
 
             res.datePicker = {
@@ -533,451 +550,423 @@ export class TransactionView extends AppView {
                 visible: true,
                 value: this.model.categoryId.toString(),
             };
-            res.comment_row = {
+            res.commentRow = {
                 visible: true,
                 value: this.model.comment,
             };
         }
 
-        if (this.model.type === EXPENSE || this.model.type === TRANSFER) {
-            res.source.tile = {
-                visible: this.model.isAvailable,
+        if (isExpense || isTransfer) {
+            res.sourceContainer.tile = {
+                visible: isAvailable,
             };
 
-            if (this.model.isAvailable) {
-                res.source.tile.title = (this.model.srcAccount) ? this.model.srcAccount.name : '';
-                res.source.tile.subtitle = (this.model.srcAccount)
+            if (isAvailable) {
+                res.sourceContainer.tile.title = (this.model.srcAccount) ? this.model.srcAccount.name : '';
+                res.sourceContainer.tile.subtitle = (this.model.srcAccount)
                     ? this.model.srcCurr.format(this.model.srcAccount.balance)
                     : '';
             }
         }
 
-        if (this.model.type === INCOME || this.model.type === TRANSFER) {
-            res.destination.tile = {
-                visible: this.model.isAvailable,
+        if (isIncome || isTransfer) {
+            res.destContainer.tile = {
+                visible: isAvailable,
             };
 
-            if (this.model.isAvailable) {
-                res.destination.tile.title = (this.model.destAccount) ? this.model.destAccount.name : '';
-                res.destination.tile.subtitle = (this.model.destAccount)
+            if (isAvailable) {
+                res.destContainer.tile.title = (this.model.destAccount) ? this.model.destAccount.name : '';
+                res.destContainer.tile.subtitle = (this.model.destAccount)
                     ? this.model.destCurr.format(this.model.destAccount.balance)
                     : '';
             }
         }
 
-        if (this.model.type !== INCOME && this.model.isAvailable) {
-            res.result_balance_row.value = this.model.srcResBal.toString();
-            res.result_balance_row.isCurrActive = false;
+        if (this.model.type !== INCOME && isAvailable) {
+            res.srcResBalanceRow.value = this.model.srcResBal.toString();
+            res.srcResBalanceRow.isCurrActive = false;
 
-            res.src_res_balance_left.value = (this.model.srcCurr)
+            res.srcResBalanceInfo.value = (this.model.srcCurr)
                 ? this.model.srcCurr.format(this.model.fSrcResBal)
                 : '';
         }
 
-        if (this.model.type !== EXPENSE && this.model.isAvailable) {
-            res.src_amount_left.value = (this.model.srcCurr) ? this.model.srcCurr.format(this.model.fSrcAmount) : '';
-            res.result_balance_dest_row.value = this.model.destResBal.toString();
-            res.result_balance_dest_row.isCurrActive = false;
+        if (this.model.type !== EXPENSE && isAvailable) {
+            res.srcAmountInfo.value = (this.model.srcCurr) ? this.model.srcCurr.format(this.model.fSrcAmount) : '';
+            res.destResBalanceRow.value = this.model.destResBal.toString();
+            res.destResBalanceRow.isCurrActive = false;
 
-            res.dest_res_balance_left.value = (this.model.destCurr)
+            res.destResBalanceInfo.value = (this.model.destCurr)
                 ? this.model.destCurr.format(this.model.fDestResBal)
                 : '';
         }
-        if (this.model.type !== DEBT && this.model.isAvailable) {
-            res.dest_amount_left.value = (this.model.destCurr) ? this.model.destCurr.format(this.model.fDestAmount) : '';
+        if (this.model.type !== DEBT && isAvailable) {
+            res.destAmountInfo.value = (this.model.destCurr) ? this.model.destCurr.format(this.model.fDestAmount) : '';
         }
 
-        if (this.model.type === EXPENSE) {
+        if (isAvailable) {
+            res.srcAmountRow.label = (isDiffCurr) ? 'Source amount' : 'Amount';
+            res.destAmountRow.label = (isDiffCurr) ? 'Destination amount' : 'Amount';
+        }
+
+        if (isExpense) {
             assert(state >= -1 && state <= 4, 'Invalid state specified');
 
-            if (this.model.isAvailable) {
-                if (state === 0 || state === 1) {
-                    res.src_amount_row.label = 'Amount';
-                    res.dest_amount_row.label = 'Amount';
-                } else {
-                    res.src_amount_row.label = 'Source amount';
-                    res.dest_amount_row.label = 'Destination amount';
-                }
-
-                res.result_balance_row.label = 'Result balance';
+            if (isAvailable) {
+                res.srcResBalanceRow.label = 'Result balance';
             }
 
-            res.src_amount_left.visible = false;
-            res.dest_res_balance_left.visible = false;
-            res.result_balance_dest_row.visible = false;
+            res.srcAmountInfo.visible = false;
+            this.hideInputRow(res, 'destResBalance');
 
             if (state === -1) {
-                res.dest_amount_left.visible = false;
-                res.src_res_balance_left.visible = false;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = false;
-                res.exchange_row.visible = false;
-                res.result_balance_row.visible = false;
+                this.hideInputRow(res, 'srcAmount');
+                this.hideInputRow(res, 'destAmount');
+                this.hideInputRow(res, 'srcResBalance');
+                this.hideInputRow(res, 'exchange');
             } else if (state === 0) {
-                res.dest_amount_left.visible = false;
-                res.src_res_balance_left.visible = true;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = true;
-                res.exchange_row.visible = false;
-                res.result_balance_row.visible = false;
+                this.hideInputRow(res, 'srcAmount');
+                this.showInputRow(res, 'destAmount', true);
+                this.showInputRow(res, 'srcResBalance', false);
+                this.hideInputRow(res, 'exchange');
             } else if (state === 1) {
-                res.dest_amount_left.visible = true;
-                res.src_res_balance_left.visible = false;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = false;
-                res.exchange_row.visible = false;
-                res.result_balance_row.visible = true;
+                this.hideInputRow(res, 'srcAmount');
+                this.showInputRow(res, 'destAmount', false);
+                this.showInputRow(res, 'srcResBalance', true);
+                this.hideInputRow(res, 'exchange');
             } else if (state === 2) {
-                res.dest_amount_left.visible = false;
-                res.src_res_balance_left.visible = true;
-                res.exch_left.visible = true;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = true;
-                res.exchange_row.visible = false;
-                res.result_balance_row.visible = false;
+                this.showInputRow(res, 'srcAmount', true);
+                this.showInputRow(res, 'destAmount', true);
+                this.showInputRow(res, 'srcResBalance', false);
+                this.showInputRow(res, 'exchange', false);
             } else if (state === 3) {
-                res.dest_amount_left.visible = true;
-                res.src_res_balance_left.visible = true;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = false;
-                res.exchange_row.visible = true;
-                res.result_balance_row.visible = false;
+                this.showInputRow(res, 'srcAmount', true);
+                this.showInputRow(res, 'destAmount', false);
+                this.showInputRow(res, 'srcResBalance', false);
+                this.showInputRow(res, 'exchange', true);
             } else if (state === 4) {
-                res.dest_amount_left.visible = true;
-                res.src_res_balance_left.visible = false;
-                res.exch_left.visible = true;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = false;
-                res.exchange_row.visible = false;
-                res.result_balance_row.visible = true;
+                this.showInputRow(res, 'srcAmount', true);
+                this.showInputRow(res, 'destAmount', false);
+                this.showInputRow(res, 'srcResBalance', true);
+                this.showInputRow(res, 'exchange', false);
             }
         }
 
-        if (this.model.type === INCOME) {
+        if (isIncome) {
             assert(state >= -1 && state <= 4, 'Invalid state specified');
 
-            if (this.model.isAvailable) {
-                res.result_balance_dest_row.label = 'Result balance';
-
-                if (state === 0 || state === 1) {
-                    res.src_amount_row.label = 'Amount';
-                    res.dest_amount_row.label = 'Amount';
-                } else {
-                    res.src_amount_row.label = 'Source amount';
-                    res.dest_amount_row.label = 'Destination amount';
-                }
+            if (isAvailable) {
+                res.destResBalanceRow.label = 'Result balance';
             }
 
-            res.dest_res_balance_left.visible = false;
-            res.result_balance_dest_row.visible = false;
+            this.hideInputRow(res, 'srcResBalance');
 
             if (state === -1) {
-                res.src_amount_left.visible = false;
-                res.dest_amount_left.visible = false;
-                res.dest_res_balance_left.visible = false;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = false;
-                res.result_balance_dest_row.visible = false;
-                res.exchange_row.visible = false;
+                this.hideInputRow(res, 'srcAmount');
+                this.hideInputRow(res, 'destAmount');
+                this.hideInputRow(res, 'destResBalance');
+                this.hideInputRow(res, 'exchange');
             } else if (state === 0) {
-                res.src_amount_left.visible = false;
-                res.dest_amount_left.visible = false;
-                res.dest_res_balance_left.visible = true;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = false;
-                res.result_balance_dest_row.visible = false;
-                res.exchange_row.visible = false;
+                this.showInputRow(res, 'srcAmount', true);
+                this.hideInputRow(res, 'destAmount');
+                this.showInputRow(res, 'destResBalance', false);
+                this.hideInputRow(res, 'exchange');
             } else if (state === 1) {
-                res.src_amount_left.visible = true;
-                res.dest_amount_left.visible = false;
-                res.dest_res_balance_left.visible = false;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = false;
-                res.result_balance_dest_row.visible = true;
-                res.exchange_row.visible = false;
+                this.showInputRow(res, 'srcAmount', false);
+                this.hideInputRow(res, 'destAmount');
+                this.showInputRow(res, 'destResBalance', true);
+                this.hideInputRow(res, 'exchange');
             } else if (state === 2) {
-                res.src_amount_left.visible = false;
-                res.dest_amount_left.visible = false;
-                res.dest_res_balance_left.visible = true;
-                res.exch_left.visible = true;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = true;
-                res.exchange_row.visible = false;
-                res.result_balance_dest_row.visible = false;
+                this.showInputRow(res, 'srcAmount', true);
+                this.showInputRow(res, 'destAmount', true);
+                this.showInputRow(res, 'destResBalance', false);
+                this.showInputRow(res, 'exchange', false);
             } else if (state === 3) {
-                res.src_amount_left.visible = false;
-                res.dest_amount_left.visible = true;
-                res.dest_res_balance_left.visible = true;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = false;
-                res.exchange_row.visible = true;
-                res.result_balance_dest_row.visible = false;
+                this.showInputRow(res, 'srcAmount', true);
+                this.showInputRow(res, 'destAmount', false);
+                this.showInputRow(res, 'destResBalance', false);
+                this.showInputRow(res, 'exchange', true);
             } else if (state === 4) {
-                res.src_amount_left.visible = false;
-                res.dest_amount_left.visible = true;
-                res.dest_res_balance_left.visible = false;
-                res.exch_left.visible = true;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = false;
-                res.exchange_row.visible = false;
-                res.result_balance_dest_row.visible = true;
+                this.showInputRow(res, 'srcAmount', true);
+                this.showInputRow(res, 'destAmount', false);
+                this.showInputRow(res, 'destResBalance', true);
+                this.showInputRow(res, 'exchange', false);
             }
         }
 
-        if (this.model.type === TRANSFER) {
+        if (isTransfer) {
             assert(state >= -1 && state <= 8, 'Invalid state specified');
 
-            if (this.model.isAvailable) {
-                res.result_balance_row.label = 'Result balance (Source)';
-                res.result_balance_dest_row.label = 'Result balance (Destination)';
-
-                if (state === 0 || state === 1 || state === 2) {
-                    res.src_amount_row.label = 'Amount';
-                    res.dest_amount_row.label = 'Amount';
-                } else {
-                    res.src_amount_row.label = 'Source amount';
-                    res.dest_amount_row.label = 'Destination amount';
-                }
+            if (isAvailable) {
+                res.srcResBalanceRow.label = 'Result balance (Source)';
+                res.destResBalanceRow.label = 'Result balance (Destination)';
             }
 
             if (state === -1) {
-                res.src_amount_left.visible = false;
-                res.dest_amount_left.visible = false;
-                res.src_res_balance_left.visible = false;
-                res.dest_res_balance_left.visible = false;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = false;
-                res.result_balance_row.visible = false;
-                res.result_balance_dest_row.visible = false;
-                res.exchange_row.visible = false;
+                this.hideInputRow(res, 'srcAmount');
+                this.hideInputRow(res, 'destAmount');
+                this.hideInputRow(res, 'srcResBalance');
+                this.hideInputRow(res, 'destResBalance');
+                this.hideInputRow(res, 'exchange');
             } else if (state === 0) {
-                res.src_amount_left.visible = false;
-                res.dest_amount_left.visible = false;
-                res.src_res_balance_left.visible = true;
-                res.dest_res_balance_left.visible = true;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = false;
-                res.result_balance_row.visible = false;
-                res.result_balance_dest_row.visible = false;
-                res.exchange_row.visible = false;
+                this.showInputRow(res, 'srcAmount', true);
+                this.hideInputRow(res, 'destAmount');
+                this.showInputRow(res, 'srcResBalance', false);
+                this.showInputRow(res, 'destResBalance', false);
+                this.hideInputRow(res, 'exchange');
             } else if (state === 1) {
-                res.src_amount_left.visible = true;
-                res.dest_amount_left.visible = false;
-                res.src_res_balance_left.visible = false;
-                res.dest_res_balance_left.visible = true;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = false;
-                res.result_balance_row.visible = true;
-                res.result_balance_dest_row.visible = false;
-                res.exchange_row.visible = false;
+                this.showInputRow(res, 'srcAmount', false);
+                this.hideInputRow(res, 'destAmount');
+                this.showInputRow(res, 'srcResBalance', true);
+                this.showInputRow(res, 'destResBalance', false);
+                this.hideInputRow(res, 'exchange');
             } else if (state === 2) {
-                res.src_amount_left.visible = true;
-                res.dest_amount_left.visible = false;
-                res.src_res_balance_left.visible = true;
-                res.dest_res_balance_left.visible = false;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = false;
-                res.result_balance_row.visible = false;
-                res.result_balance_dest_row.visible = true;
-                res.exchange_row.visible = false;
+                this.showInputRow(res, 'srcAmount', false);
+                this.hideInputRow(res, 'destAmount');
+                this.showInputRow(res, 'srcResBalance', false);
+                this.showInputRow(res, 'destResBalance', true);
+                this.hideInputRow(res, 'exchange');
             } else if (state === 3) {
-                res.src_amount_left.visible = false;
-                res.dest_amount_left.visible = false;
-                res.src_res_balance_left.visible = true;
-                res.dest_res_balance_left.visible = true;
-                res.exch_left.visible = true;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = true;
-                res.result_balance_row.visible = false;
-                res.result_balance_dest_row.visible = false;
-                res.exchange_row.visible = false;
+                this.showInputRow(res, 'srcAmount', true);
+                this.showInputRow(res, 'destAmount', true);
+                this.showInputRow(res, 'srcResBalance', false);
+                this.showInputRow(res, 'destResBalance', false);
+                this.showInputRow(res, 'exchange', false);
             } else if (state === 4) {
-                res.src_amount_left.visible = true;
-                res.dest_amount_left.visible = false;
-                res.src_res_balance_left.visible = false;
-                res.dest_res_balance_left.visible = true;
-                res.exch_left.visible = true;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = true;
-                res.result_balance_row.visible = true;
-                res.result_balance_dest_row.visible = false;
-                res.exchange_row.visible = false;
+                this.showInputRow(res, 'srcAmount', false);
+                this.showInputRow(res, 'destAmount', true);
+                this.showInputRow(res, 'srcResBalance', true);
+                this.showInputRow(res, 'destResBalance', false);
+                this.showInputRow(res, 'exchange', false);
             } else if (state === 5) {
-                res.src_amount_left.visible = false;
-                res.dest_amount_left.visible = true;
-                res.src_res_balance_left.visible = true;
-                res.dest_res_balance_left.visible = false;
-                res.exch_left.visible = true;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = false;
-                res.result_balance_row.visible = false;
-                res.result_balance_dest_row.visible = true;
-                res.exchange_row.visible = false;
+                this.showInputRow(res, 'srcAmount', true);
+                this.showInputRow(res, 'destAmount', false);
+                this.showInputRow(res, 'srcResBalance', false);
+                this.showInputRow(res, 'destResBalance', true);
+                this.showInputRow(res, 'exchange', false);
             } else if (state === 6) {
-                res.src_amount_left.visible = true;
-                res.dest_amount_left.visible = true;
-                res.src_res_balance_left.visible = false;
-                res.dest_res_balance_left.visible = false;
-                res.exch_left.visible = true;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = false;
-                res.result_balance_row.visible = true;
-                res.result_balance_dest_row.visible = true;
-                res.exchange_row.visible = false;
+                this.showInputRow(res, 'srcAmount', false);
+                this.showInputRow(res, 'destAmount', false);
+                this.showInputRow(res, 'srcResBalance', true);
+                this.showInputRow(res, 'destResBalance', true);
+                this.showInputRow(res, 'exchange', false);
             } else if (state === 7) {
-                res.src_amount_left.visible = false;
-                res.dest_amount_left.visible = true;
-                res.src_res_balance_left.visible = true;
-                res.dest_res_balance_left.visible = true;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = true;
-                res.dest_amount_row.visible = false;
-                res.result_balance_row.visible = false;
-                res.result_balance_dest_row.visible = false;
-                res.exchange_row.visible = true;
+                this.showInputRow(res, 'srcAmount', true);
+                this.showInputRow(res, 'destAmount', false);
+                this.showInputRow(res, 'srcResBalance', false);
+                this.showInputRow(res, 'destResBalance', false);
+                this.showInputRow(res, 'exchange', true);
             } else if (state === 8) {
-                res.src_amount_left.visible = true;
-                res.dest_amount_left.visible = true;
-                res.src_res_balance_left.visible = false;
-                res.dest_res_balance_left.visible = true;
-                res.exch_left.visible = false;
-                res.src_amount_row.visible = false;
-                res.dest_amount_row.visible = false;
-                res.result_balance_row.visible = true;
-                res.result_balance_dest_row.visible = false;
-                res.exchange_row.visible = true;
+                this.showInputRow(res, 'srcAmount', false);
+                this.showInputRow(res, 'destAmount', false);
+                this.showInputRow(res, 'srcResBalance', true);
+                this.showInputRow(res, 'destResBalance', false);
+                this.showInputRow(res, 'exchange', true);
             }
         }
 
-        if (this.model.type === DEBT) {
-            assert(state >= -1 && state <= 9, 'Invalid state specified');
+        if (isDebt) {
+            assert(state >= -1 && state <= 21, 'Invalid state specified');
 
-            const { isAvailable, debtType, noAccount } = this.model;
+            const { debtType, noAccount } = this.model;
             const userAccounts = App.state.getUserAccounts();
             const accountsAvailable = userAccounts.length > 0;
 
             res.selaccount = { visible: isAvailable && noAccount && accountsAvailable };
             res.noacc_btn = { visible: isAvailable && !noAccount };
             res.noAccountsMsg = { visible: isAvailable && !accountsAvailable };
-            res.dest_amount_row.visible = false;
-            res.dest_amount_left.visible = false;
-            res.exchange_row.visible = false;
-            res.exch_left.visible = false;
 
             if (isAvailable) {
-                res.src_amount_row.label = 'Amount';
-                res.result_balance_row.label = (debtType)
+                res.srcResBalanceRow.label = (debtType)
                     ? 'Result balance (Person)'
                     : 'Result balance (Account)';
-                res.result_balance_dest_row.label = (debtType)
+                res.destResBalanceRow.label = (debtType)
                     ? 'Result balance (Account)'
                     : 'Result balance (Person)';
             }
 
             if (debtType) {
                 if (isAvailable) {
-                    res.person.tile.title = (this.model.person) ? this.model.person.name : '';
-                    res.person.tile.subtitle = (this.model.srcAccount)
+                    res.personContainer.tile.title = (this.model.person) ? this.model.person.name : '';
+                    res.personContainer.tile.subtitle = (this.model.srcAccount)
                         ? this.model.srcCurr.format(this.model.srcAccount.balance)
                         : '';
                 }
 
                 if (!this.model.noAccount) {
                     if (isAvailable) {
-                        res.account.tile.title = (this.model.destAccount) ? this.model.destAccount.name : '';
-                        res.account.tile.subtitle = (this.model.destAccount)
+                        res.debtAccountContainer.tile.title = (this.model.destAccount) ? this.model.destAccount.name : '';
+                        res.debtAccountContainer.tile.subtitle = (this.model.destAccount)
                             ? this.model.destCurr.format(this.model.destAccount.balance)
                             : '';
                     }
                 }
             } else {
                 if (isAvailable) {
-                    res.person.tile.title = (this.model.person) ? this.model.person.name : '';
-                    res.person.tile.subtitle = (this.model.destAccount)
+                    res.personContainer.tile.title = (this.model.person) ? this.model.person.name : '';
+                    res.personContainer.tile.subtitle = (this.model.destAccount)
                         ? this.model.destCurr.format(this.model.destAccount.balance)
                         : '';
                 }
 
                 if (!this.model.noAccount) {
                     if (isAvailable) {
-                        res.account.tile.title = (this.model.srcAccount) ? this.model.srcAccount.name : '';
-                        res.account.tile.subtitle = (this.model.srcAccount)
+                        res.debtAccountContainer.tile.title = (this.model.srcAccount) ? this.model.srcAccount.name : '';
+                        res.debtAccountContainer.tile.subtitle = (this.model.srcAccount)
                             ? this.model.srcCurr.format(this.model.srcAccount.balance)
                             : '';
                     }
                 }
             }
 
+            if (state < 10) {
+                this.hideInputRow(res, 'exchange');
+            }
+
             if (state === -1) {
-                res.src_amount_row.visible = false;
-                res.src_amount_left.visible = false;
-                res.result_balance_row.visible = false;
-                res.src_res_balance_left.visible = false;
-                res.result_balance_dest_row.visible = false;
-                res.dest_res_balance_left.visible = false;
-            } else if (state === 0 || state === 3) {
-                res.src_amount_row.visible = true;
-                res.src_amount_left.visible = false;
-                res.result_balance_row.visible = false;
-                res.src_res_balance_left.visible = true;
-                res.result_balance_dest_row.visible = false;
-                res.dest_res_balance_left.visible = true;
-            } else if (state === 1 || state === 5) {
-                res.src_amount_row.visible = false;
-                res.src_amount_left.visible = true;
-                res.result_balance_row.visible = true;
-                res.src_res_balance_left.visible = false;
-                res.result_balance_dest_row.visible = false;
-                res.dest_res_balance_left.visible = true;
-            } else if (state === 2 || state === 4) {
-                res.src_amount_row.visible = false;
-                res.src_amount_left.visible = true;
-                res.result_balance_row.visible = false;
-                res.src_res_balance_left.visible = true;
-                res.result_balance_dest_row.visible = true;
-                res.dest_res_balance_left.visible = false;
+                this.hideInputRow(res, 'srcAmount');
+                this.hideInputRow(res, 'destAmount');
+                this.hideInputRow(res, 'srcResBalance');
+                this.hideInputRow(res, 'destResBalance');
+            } else if (state === 0) {
+                this.showInputRow(res, 'srcAmount', true);
+                this.hideInputRow(res, 'destAmount');
+                this.showInputRow(res, 'srcResBalance', false);
+                this.showInputRow(res, 'destResBalance', false);
+            } else if (state === 1) {
+                this.showInputRow(res, 'srcAmount', false);
+                this.hideInputRow(res, 'destAmount');
+                this.showInputRow(res, 'srcResBalance', true);
+                this.showInputRow(res, 'destResBalance', false);
+            } else if (state === 2) {
+                this.showInputRow(res, 'srcAmount', false);
+                this.hideInputRow(res, 'destAmount');
+                this.showInputRow(res, 'srcResBalance', false);
+                this.showInputRow(res, 'destResBalance', true);
+            } else if (state === 3) {
+                this.hideInputRow(res, 'srcAmount');
+                this.showInputRow(res, 'destAmount', true);
+                this.showInputRow(res, 'srcResBalance', false);
+                this.showInputRow(res, 'destResBalance', false);
+            } else if (state === 4) {
+                this.hideInputRow(res, 'srcAmount');
+                this.showInputRow(res, 'destAmount', false);
+                this.showInputRow(res, 'srcResBalance', false);
+                this.showInputRow(res, 'destResBalance', true);
+            } else if (state === 5) {
+                this.hideInputRow(res, 'srcAmount');
+                this.showInputRow(res, 'destAmount', false);
+                this.showInputRow(res, 'srcResBalance', true);
+                this.showInputRow(res, 'destResBalance', false);
             } else if (state === 6) {
-                res.src_amount_row.visible = true;
-                res.src_amount_left.visible = false;
-                res.result_balance_row.visible = false;
-                res.src_res_balance_left.visible = true;
-                res.result_balance_dest_row.visible = false;
-                res.dest_res_balance_left.visible = false;
+                this.showInputRow(res, 'srcAmount', true);
+                this.hideInputRow(res, 'destAmount');
+                this.showInputRow(res, 'srcResBalance', false);
+                this.hideInputRow(res, 'destResBalance');
             } else if (state === 7) {
-                res.src_amount_row.visible = true;
-                res.src_amount_left.visible = false;
-                res.result_balance_row.visible = false;
-                res.src_res_balance_left.visible = false;
-                res.result_balance_dest_row.visible = false;
-                res.dest_res_balance_left.visible = true;
+                this.hideInputRow(res, 'srcAmount');
+                this.showInputRow(res, 'destAmount', true);
+                this.hideInputRow(res, 'srcResBalance');
+                this.showInputRow(res, 'destResBalance', false);
             } else if (state === 8) {
-                res.src_amount_row.visible = false;
-                res.src_amount_left.visible = true;
-                res.result_balance_row.visible = false;
-                res.src_res_balance_left.visible = false;
-                res.result_balance_dest_row.visible = true;
-                res.dest_res_balance_left.visible = false;
+                this.hideInputRow(res, 'srcAmount');
+                this.showInputRow(res, 'destAmount', false);
+                this.hideInputRow(res, 'srcResBalance');
+                this.showInputRow(res, 'destResBalance', true);
             } else if (state === 9) {
-                res.src_amount_row.visible = false;
-                res.src_amount_left.visible = true;
-                res.result_balance_row.visible = true;
-                res.src_res_balance_left.visible = false;
-                res.result_balance_dest_row.visible = false;
-                res.dest_res_balance_left.visible = false;
+                this.showInputRow(res, 'srcAmount', false);
+                this.hideInputRow(res, 'destAmount');
+                this.showInputRow(res, 'srcResBalance', true);
+                this.hideInputRow(res, 'destResBalance');
+            } else if (state === 10 || state === 16) {
+                this.showInputRow(res, 'srcAmount', true);
+                this.showInputRow(res, 'destAmount', true);
+                this.showInputRow(res, 'srcResBalance', false);
+                this.showInputRow(res, 'destResBalance', false);
+                this.showInputRow(res, 'exchange', false);
+            } else if (state === 11) {
+                this.showInputRow(res, 'srcAmount', false);
+                this.showInputRow(res, 'destAmount', true);
+                this.showInputRow(res, 'srcResBalance', true);
+                this.showInputRow(res, 'destResBalance', false);
+                this.showInputRow(res, 'exchange', false);
+            } else if (state === 12) {
+                this.showInputRow(res, 'srcAmount', true);
+                this.showInputRow(res, 'destAmount', false);
+                this.showInputRow(res, 'srcResBalance', false);
+                this.showInputRow(res, 'destResBalance', false);
+                this.showInputRow(res, 'exchange', true);
+            } else if (state === 13) {
+                this.showInputRow(res, 'srcAmount', false);
+                this.showInputRow(res, 'destAmount', false);
+                this.showInputRow(res, 'srcResBalance', true);
+                this.showInputRow(res, 'destResBalance', false);
+                this.showInputRow(res, 'exchange', true);
+            } else if (state === 14 || state === 20) {
+                this.showInputRow(res, 'srcAmount', false);
+                this.showInputRow(res, 'destAmount', false);
+                this.showInputRow(res, 'srcResBalance', true);
+                this.showInputRow(res, 'destResBalance', true);
+                this.showInputRow(res, 'exchange', false);
+            } else if (state === 15 || state === 17) {
+                this.showInputRow(res, 'srcAmount', true);
+                this.showInputRow(res, 'destAmount', false);
+                this.showInputRow(res, 'srcResBalance', false);
+                this.showInputRow(res, 'destResBalance', true);
+                this.showInputRow(res, 'exchange', false);
+            } else if (state === 18) {
+                this.showInputRow(res, 'srcAmount', false);
+                this.showInputRow(res, 'destAmount', true);
+                this.showInputRow(res, 'srcResBalance', false);
+                this.showInputRow(res, 'destResBalance', false);
+                this.showInputRow(res, 'exchange', true);
+            } else if (state === 19) {
+                this.showInputRow(res, 'srcAmount', false);
+                this.showInputRow(res, 'destAmount', false);
+                this.showInputRow(res, 'srcResBalance', false);
+                this.showInputRow(res, 'destResBalance', true);
+                this.showInputRow(res, 'exchange', true);
+            } else if (state === 21) {
+                this.showInputRow(res, 'srcAmount', false);
+                this.showInputRow(res, 'destAmount', true);
+                this.showInputRow(res, 'srcResBalance', true);
+                this.showInputRow(res, 'destResBalance', false);
+                this.showInputRow(res, 'exchange', false);
             }
         }
+
+        return res;
+    }
+
+    stateTransition(model, stateMap) {
+        const res = model;
+        const newState = stateMap[res.state];
+        assert.isDefined(newState, `Invalid state ${res.state}`);
+        res.state = newState;
+
+        return res;
+    }
+
+    showInputRow(model, name, showInput) {
+        const res = model;
+        const rowName = `${name}Row`;
+        const infoName = `${name}Info`;
+        assert(isObject(res[rowName]) && isObject(res[infoName]), `Invalid row name: ${name}`);
+
+        res[rowName].visible = showInput;
+        res[infoName].visible = !showInput;
+
+        return res;
+    }
+
+    hideInputRow(model, name) {
+        const res = model;
+        const rowName = `${name}Row`;
+        const infoName = `${name}Info`;
+        assert(isObject(res[rowName]) && isObject(res[infoName]), `Invalid row name: ${name}`);
+
+        res[rowName].visible = false;
+        res[infoName].visible = false;
 
         return res;
     }
@@ -1223,6 +1212,8 @@ export class TransactionView extends AppView {
                 this.calculateSourceResult();
             }
 
+            this.model.isDiffCurr = (this.model.src_curr_id !== this.model.dest_curr_id);
+
             if (this.model.isAvailable) {
                 this.updateExch();
             }
@@ -1269,6 +1260,8 @@ export class TransactionView extends AppView {
 
                 this.calculateDestResult();
             }
+
+            this.model.isDiffCurr = (this.model.src_curr_id !== this.model.dest_curr_id);
 
             if (this.model.isAvailable) {
                 this.updateExch();
@@ -1372,7 +1365,7 @@ export class TransactionView extends AppView {
             }
 
             this.model.isDiffCurr = (this.model.src_curr_id !== this.model.dest_curr_id);
-            this.model.noAccount = (this.model.account == null);
+            this.model.noAccount = (this.model.account === null);
             if (this.model.isAvailable) {
                 if (this.model.noAccount) {
                     this.model.state = (this.model.debtType) ? 6 : 7;
@@ -1405,9 +1398,9 @@ export class TransactionView extends AppView {
     }
 
     async clickDeleteButton() {
-        assert(this.content.isUpdate && this.content.delBtn, 'Unexpected action clickDeleteButton');
+        assert(this.content.isUpdate && this.content.deleteBtn, 'Unexpected action clickDeleteButton');
 
-        await this.performAction(() => this.content.delBtn.click());
+        await this.performAction(() => this.content.deleteBtn.click());
     }
 
     /** Click on delete button and confirm wanring popup */
@@ -1470,47 +1463,45 @@ export class TransactionView extends AppView {
                 const sameStates = [2, 3, 4]; // Transition 5, 17 or 10
                 assert(sameStates.includes(this.model.state), `Unexpected state ${this.model.state} with different currencies`);
             } else if (!this.model.isDiffCurr) {
-                const sameStates = [0, 1]; // Transition 1 or 12
+                const stateMap = {
+                    2: 0, // Transition 14
+                    3: 0, // Transition 15
+                    4: 1, // Transition 11
+                };
+                if (this.model.state in stateMap) {
+                    this.setDestAmount(this.model.srcAmount);
+                }
 
-                if (this.model.state === 2 || this.model.state === 3) {
-                    this.setDestAmount(this.model.srcAmount);
-                    this.model.state = 0; // Transition 14 or 15
-                } else if (this.model.state === 4) {
-                    this.setDestAmount(this.model.srcAmount);
-                    this.model.state = 1; // Transition 11
-                } else {
-                    assert(sameStates.includes(this.model.state), `changeSrcAccount(): Unexpected state ${this.model.state} with same currencies`);
+                const sameStates = [0, 1]; // Transition 1 or 12
+                if (!sameStates.includes(this.model.state)) {
+                    this.stateTransition(this.model, stateMap);
                 }
             }
         } else if (this.model.type === TRANSFER) {
             if (this.model.isDiffCurr) {
                 const sameStates = [3, 4, 5, 6, 7, 8]; // Transition 43, 36, 26, 49, 51 or 57
-
-                if (this.model.state === 0) {
-                    this.model.state = 3; // Transition 6
-                } else if (this.model.state === 1) {
-                    this.model.state = 4; // Transition 12
-                } else if (this.model.state === 2) {
-                    this.model.state = 5; // Transition 16
-                } else {
-                    assert(sameStates.includes(this.model.state), `changeSrcAccount(): Unexpected state ${this.model.state} with different currencies`);
+                if (!sameStates.includes(this.model.state)) {
+                    this.stateTransition(this.model, {
+                        0: 3, // Transition 6
+                        1: 4, // Transition 12
+                        2: 5, // Transition 16
+                    });
                 }
             } else {
-                const sameStates = [0, 1, 2]; // Transition 5, 11 or 15
-                const srcResStates = [4, 6, 8]; // States with visible source result
-
                 if (this.model.fSrcAmount !== this.model.fDestAmount) {
                     this.setDestAmount(this.model.fSrcAmount);
                 }
 
-                if (this.model.state === 3 || this.model.state === 7) {
-                    this.model.state = 0; // Transition 3 or 58
-                } else if (srcResStates.includes(this.model.state)) {
-                    this.model.state = 1; // Transition 37, 50 or 52
-                } else if (this.model.state === 5) {
-                    this.model.state = 2; // Transition 27
-                } else {
-                    assert(sameStates.includes(this.model.state), `changeSrcAccount(): Unexpected state ${this.model.state} with same currencies`);
+                const sameStates = [0, 1, 2]; // Transition 5, 11 or 15
+                if (!sameStates.includes(this.model.state)) {
+                    this.stateTransition(this.model, {
+                        3: 0, // Transition 3
+                        7: 0, // Transition 58
+                        4: 1, // Transition 37
+                        6: 1, // Transition 50
+                        8: 1, // Transition 52
+                        5: 2, // Transition 27
+                    });
                 }
             }
         }
@@ -1521,13 +1512,13 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.source.selectAccount(val));
+        await this.performAction(() => this.content.sourceContainer.selectAccount(val));
 
         return this.checkState();
     }
 
     async changeSrcAccountByPos(pos) {
-        return this.changeSrcAccount(this.content.source.content.dropDown.content.items[pos].id);
+        return this.changeSrcAccount(this.content.sourceContainer.dropDown.items[pos].id);
     }
 
     async changeDestAccount(val) {
@@ -1564,45 +1555,45 @@ export class TransactionView extends AppView {
                 const sameStates = [2, 3, 4]; // Transition 5, 11 or 17
                 assert(sameStates.includes(this.model.state), `Unexpected state ${this.model.state} with different currencies`);
             } else if (!this.model.isDiffCurr) {
+                const stateMap = {
+                    2: 0, // Transition 6
+                    3: 0, // Transition 12
+                    4: 1, // Transition 18
+                };
+                if (this.model.state in stateMap) {
+                    this.setSrcAmount(this.model.destAmount);
+                }
+
                 const sameStates = [0, 1]; // Transition 1 or 23
-                if (this.model.state === 2 || this.model.state === 3) {
-                    this.setSrcAmount(this.model.destAmount);
-                    this.model.state = 0; // Transition 6 or 12
-                } else if (this.model.state === 4) {
-                    this.setSrcAmount(this.model.destAmount);
-                    this.model.state = 1; // Transition 18
-                } else {
-                    assert(sameStates.includes(this.model.state), `changeDestAccount(): Unexpected state ${this.model.state} with different currencies`);
+                if (!sameStates.includes(this.model.state)) {
+                    this.stateTransition(this.model, stateMap);
                 }
             }
         } else if (this.model.type === TRANSFER) {
             if (this.model.isDiffCurr) {
                 const sameStates = [3, 4, 5, 6, 7, 8]; // Transition 41, 38, 28, 47, 59 or 53
-
-                if (this.model.state === 0) {
-                    this.model.state = 3; // Transition 8
-                } else if (this.model.state === 1) {
-                    this.model.state = 4; // Transition 14
-                } else if (this.model.state === 2) {
-                    this.model.state = 5; // Transition 18
-                } else {
-                    assert(sameStates.includes(this.model.state), `changeDestAccount(): Unexpected state ${this.model.state} with different currencies`);
+                if (!sameStates.includes(this.model.state)) {
+                    this.stateTransition(this.model, {
+                        0: 3, // Transition 8
+                        1: 4, // Transition 14
+                        2: 5, // Transition 18
+                    });
                 }
             } else {
-                const sameStates = [0, 1, 2]; // Transition 7, 13 or 17
-
                 if (this.model.fSrcAmount !== this.model.fDestAmount) {
                     this.setDestAmount(this.model, this.model.fSrcAmount);
                 }
 
-                if (this.model.state === 3 || this.model.state === 7) {
-                    this.model.state = 0; // Transition 42 or 60
-                } else if (this.model.state === 4 || this.model.state === 8) {
-                    this.model.state = 1; // Transition 39 or 54
-                } else if (this.model.state === 5 || this.model.state === 6) {
-                    this.model.state = 2; // Transition 29 or 48
-                } else {
-                    assert(sameStates.includes(this.model.state), `changeDestAccount(): Unexpected state ${this.model.state} with same currencies`);
+                const sameStates = [0, 1, 2]; // Transition 7, 13 or 17
+                if (!sameStates.includes(this.model.state)) {
+                    this.stateTransition(this.model, {
+                        3: 0, // Transition 42
+                        7: 0, // Transition 60
+                        4: 1, // Transition 39
+                        8: 1, // Transition 54
+                        5: 2, // Transition 29
+                        6: 2, // Transition 48
+                    });
                 }
             }
         }
@@ -1613,25 +1604,32 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.destination.selectAccount(val));
+        await this.performAction(() => this.content.destContainer.selectAccount(val));
 
         return this.checkState();
     }
 
     async changeDestAccountByPos(pos) {
         return this.changeDestAccount(
-            this.content.destination.content.dropDown.content.items[pos].id,
+            this.content.destContainer.dropDown.items[pos].id,
         );
     }
 
     async inputSrcAmount(val) {
         if (this.model.type === EXPENSE) {
-            assert(this.model.isDiffCurr, `Wrong state: can't input source amount on state ${this.model.state}`);
+            assert(this.model.isDiffCurr, `Invalid state: can't input source amount on state ${this.model.state}`);
         }
         const trAvailStates = [0, 3, 4, 7];
         if (this.model.type === TRANSFER) {
             assert(
                 trAvailStates.includes(this.model.state),
+                `Unexpected state ${this.model.state} to input source amount`,
+            );
+        }
+        const debtAvailStates = [0, 6, 10, 12, 15, 16, 17];
+        if (this.model.type === DEBT) {
+            assert(
+                debtAvailStates.includes(this.model.state),
                 `Unexpected state ${this.model.state} to input source amount`,
             );
         }
@@ -1652,7 +1650,7 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.src_amount_row.input(val));
+        await this.performAction(() => this.content.srcAmountRow.input(val));
 
         return this.checkState();
     }
@@ -1664,46 +1662,55 @@ export class TransactionView extends AppView {
             assert(this.model.state === 1, `Unexpected state ${this.model.state} for clickSrcAmount action`);
             this.model.state = 0; // Transition 4
         } else if (this.model.type === TRANSFER) {
-            const availStates = [1, 2, 4, 6, 8];
-            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state} for clickSrcAmount action`);
-
-            if (this.model.state === 1 || this.model.state === 2) {
-                this.model.state = 0; // Transition 2 or 4
-            } else if (this.model.state === 4) {
-                this.model.state = 3; // Transition 30
-            } else if (this.model.state === 6) {
-                this.model.state = 5; // Transition 20
-            } else if (this.model.state === 8) {
-                this.model.state = 7; // Transition 23
-            }
+            this.stateTransition(this.model, {
+                1: 0, // Transition 2
+                2: 0, // Transition 4
+                4: 3, // Transition 30
+                6: 5, // Transition 20
+                8: 7, // Transition 23
+            });
         } else if (this.model.type === DEBT) {
-            const availStates = [1, 2, 4, 5, 8, 9];
-            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state} for clickSrcAmount action`);
-
-            if (this.model.state === 1 || this.model.state === 2) {
-                this.model.state = 0; // Transition 2 or 4
-            } else if (this.model.state === 4 || this.model.state === 5) {
-                this.model.state = 3; // Transition 30 or 12
-            } else if (this.model.state === 8) {
-                this.model.state = 7; // Transition 31
-            } else if (this.model.state === 9) {
-                this.model.state = 6; // Transition 35
-            }
+            this.stateTransition(this.model, {
+                1: 0, // Transition 2
+                2: 0, // Transition 4
+                4: 3, // Transition 30
+                5: 3, // Transition 12
+                8: 7, // Transition 31
+                9: 6, // Transition 35
+                11: 10, // Transition 56
+                13: 12, // Transition 72
+                14: 15, // Transition 82
+                18: 16, // Transition 94
+                19: 17, // Transition 102
+                20: 17, // Transition 100
+                21: 16, // Transition 90
+            });
         }
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.src_amount_left.click());
+        await this.performAction(() => this.content.srcAmountInfo.click());
 
         return this.checkState();
     }
 
     async inputDestAmount(val) {
-        assert(this.model.type !== DEBT, 'Unexpected action: can\'t input destination amount');
+        if (this.model.type === INCOME) {
+            assert(this.model.isDiffCurr, `Invalid state: can't input destination amount on state ${this.model.state}`);
+        }
+
         const trAvailStates = [3, 4];
         if (this.model.type === TRANSFER) {
             assert(
                 trAvailStates.includes(this.model.state),
+                `Unexpected state ${this.model.state} to input destination amount`,
+            );
+        }
+
+        const debtAvailStates = [3, 7, 10, 11, 16, 18, 21];
+        if (this.model.type === DEBT) {
+            assert(
+                debtAvailStates.includes(this.model.state),
                 `Unexpected state ${this.model.state} to input destination amount`,
             );
         }
@@ -1724,7 +1731,7 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.dest_amount_row.input(val));
+        await this.performAction(() => this.content.destAmountRow.input(val));
 
         return this.checkState();
     }
@@ -1733,43 +1740,39 @@ export class TransactionView extends AppView {
         assert(this.model.type !== INCOME, 'Unexpected action: can\'t click by source result balance');
 
         if (this.model.type === EXPENSE) {
-            const availStates = [0, 2, 3];
-            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
-
-            if (this.model.state === 0) {
-                this.model.state = 1;
-            } else if (this.model.state === 2 || this.model.state === 3) {
-                this.model.state = 4;
-            }
+            this.stateTransition(this.model, {
+                0: 1, // Transition 2
+                2: 4, // Transition 6
+                3: 4, // Transition 18
+            });
         } else if (this.model.type === TRANSFER) {
-            const availStates = [0, 2, 3, 5, 7];
-            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
-
-            if (this.model.state === 0 || this.model.state === 2) {
-                this.model.state = 1; // Transition 1 or 10
-            } else if (this.model.state === 3) {
-                this.model.state = 4; // Transition 31
-            } else if (this.model.state === 5) {
-                this.model.state = 6; // Transition 19
-            } else if (this.model.state === 7) {
-                this.model.state = 8; // Transition 22
-            }
+            this.stateTransition(this.model, {
+                0: 1, // Transition 1
+                2: 1, // Transition 10
+                3: 4, // Transition 31
+                5: 6, // Transition 19
+                7: 8, // Transition 22
+            });
         } else if (this.model.type === DEBT) {
-            const availStates = [0, 2, 3, 4, 6];
-            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
-
-            if (this.model.state === 0 || this.model.state === 2) {
-                this.model.state = 1; // Transition 1 or 4
-            } else if (this.model.state === 3 || this.model.state === 4) {
-                this.model.state = 5; // Transition 13 or 11
-            } else if (this.model.state === 6) {
-                this.model.state = 9; // Transition 36
-            }
+            this.stateTransition(this.model, {
+                0: 1, // Transition 1
+                2: 1, // Transition 4
+                3: 5, // Transition 13
+                4: 5, // Transition 11
+                6: 9, // Transition 36
+                10: 11, // Transition 55
+                12: 13, // Transition 71
+                15: 14, // Transition 83
+                16: 21, // Transition 89
+                17: 20, // Transition 99
+                18: 21, // Transition 109
+                19: 20, // Transition 114
+            });
         }
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.src_res_balance_left.click());
+        await this.performAction(() => this.content.srcResBalanceInfo.click());
 
         return this.checkState();
     }
@@ -1778,69 +1781,79 @@ export class TransactionView extends AppView {
         assert(this.model.type !== EXPENSE, 'Unexpected action: can\'t click by destination result balance');
 
         if (this.model.type === INCOME) {
-            if (this.model.state === 0) {
-                this.model.state = 1; // Transition 2
-            } else if (this.model.state === 2 || this.model.state === 3) {
-                this.model.state = 4; // Transition 7 or 14
-            }
+            this.stateTransition(this.model, {
+                0: 1, // Transition 2
+                2: 4, // Transition 7
+                3: 4, // Transition 14
+            });
         } else if (this.model.type === TRANSFER) {
-            if (this.model.state === 0 || this.model.state === 1) {
-                this.model.state = 2; // Transition 3 or 9
-            } else if (this.model.state === 3 || this.model.state === 7) {
-                this.model.state = 5; // Transition 25 or 56
-            } else if (this.model.state === 4 || this.model.state === 8) {
-                this.model.state = 6; // Transition 32 or 46
-            }
+            this.stateTransition(this.model, {
+                0: 2, // Transition 3
+                1: 2, // Transition 9
+                3: 5, // Transition 25
+                7: 5, // Transition 56
+                4: 6, // Transition 32
+                8: 6, // Transition 46
+            });
         } else if (this.model.type === DEBT) {
-            const availStates = [0, 1, 3, 5, 7];
-            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
-
-            if (this.model.state === 0 || this.model.state === 1) {
-                this.model.state = 2; // Transition 3 or 5
-            } else if (this.model.state === 3 || this.model.state === 5) {
-                this.model.state = 4; // Transition 9
-            } else if (this.model.state === 7) {
-                this.model.state = 8; // Transition 32 or 46
-            }
+            this.stateTransition(this.model, {
+                0: 2, // Transition 3
+                1: 2, // Transition 5
+                3: 4, // Transition 9
+                5: 4, // Transition 11
+                7: 8, // Transition 30
+                10: 15, // Transition 59
+                11: 14, // Transition 63
+                12: 15, // Transition 73
+                13: 14, // Transition 78
+                16: 17, // Transition 91
+                18: 19, // Transition 107
+                21: 20, // Transition 119
+            });
         }
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.dest_res_balance_left.click());
+        await this.performAction(() => this.content.destResBalanceInfo.click());
 
         return this.checkState();
     }
 
     async clickDestAmount() {
-        assert(this.model.type !== DEBT, 'Unexpected action: can\'t click by destination amount');
-
         if (this.model.type === EXPENSE) {
-            if (this.model.state === 1) {
-                this.model.state = 0; // Transition 3
-            } else if (this.model.state === 3 || this.model.state === 4) {
-                this.model.state = 2; // Transition 16 or 7
-            }
+            this.stateTransition(this.model, {
+                1: 0, // Transition 3
+                3: 2, // Transition 16
+                4: 2, // Transition 7
+            });
         } else if (this.model.type === INCOME) {
-            assert(
-                this.model.state === 3 || this.model.state === 4,
-                `Unexpected state ${this.model.state} for clickDestAmount action`,
-            );
-
-            this.model.state = 2; // Transition 13 or 19
+            this.stateTransition(this.model, {
+                3: 2, // Transition 13
+                4: 2, // Transition 19
+            });
         } else if (this.model.type === TRANSFER) {
-            const availStates = [5, 7, 6, 8];
-            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state} for clickDestAmount action`);
-
-            if (this.model.state === 5 || this.model.state === 7) {
-                this.model.state = 3; // Transition 24 or 55
-            } else if (this.model.state === 6 || this.model.state === 8) {
-                this.model.state = 4; // Transition 33 or 35
-            }
+            this.stateTransition(this.model, {
+                5: 3, // Transition 24
+                7: 3, // Transition 55
+                6: 4, // Transition 33
+                8: 4, // Transition 35
+            });
+        } else if (this.model.type === DEBT) {
+            this.stateTransition(this.model, {
+                8: 7, // Transition 31
+                12: 10, // Transition 58
+                13: 11, // Transition 66
+                14: 11, // Transition 64
+                15: 10, // Transition 60
+                17: 16, // Transition 92
+                19: 18, // Transition 108
+                20: 21, // Transition 118
+            });
         }
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.dest_amount_left.click());
+        await this.performAction(() => this.content.destAmountInfo.click());
 
         return this.checkState();
     }
@@ -1868,7 +1881,7 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.result_balance_row.input(val));
+        await this.performAction(() => this.content.srcResBalanceRow.input(val));
 
         return this.checkState();
     }
@@ -1916,110 +1929,192 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.result_balance_dest_row.input(val));
+        await this.performAction(() => this.content.destResBalanceRow.input(val));
 
         return this.checkState();
     }
 
     async changeSourceCurrency(val) {
-        assert(this.model.type === INCOME, 'Unexpected action: can\'t change source currency');
+        const availTypes = [INCOME, DEBT];
+        assert(availTypes.includes(this.model.type), 'Unexpected action: can\'t change source currency');
+        if (this.model.type === DEBT) {
+            assert(this.model.debtType, 'Invalid state');
+        }
 
         if (this.model.src_curr_id === val) {
             return true;
         }
 
+        const isDiffBefore = this.model.isDiffCurr;
+
         this.model.src_curr_id = parseInt(val, 10);
         this.model.srcCurr = App.currency.getItem(this.model.src_curr_id);
 
+        if (this.model.type === DEBT) {
+            this.model.personAccount = this.getPersonAccount(
+                this.model.person.id,
+                this.model.src_curr_id,
+            );
+            this.model.srcAccount = this.model.personAccount;
+            this.calculateSourceResult();
+
+            if (this.model.noAccount) {
+                this.model.dest_curr_id = this.model.src_curr_id;
+                this.model.destCurr = this.model.srcCurr;
+            }
+        }
+
         this.model.isDiffCurr = (this.model.src_curr_id !== this.model.dest_curr_id);
 
-        if (this.model.isDiffCurr && this.model.state === 0) {
-            this.updateExch();
-            this.model.state = 2; // Transition 3
-        } else if (this.model.state === 2 || this.model.state === 3 || this.model.state === 4) {
+        if (isDiffBefore && !this.model.isDiffCurr) {
+            this.setDestAmount(this.model.srcAmount);
+            this.calcExchByAmounts();
+        }
+        this.updateExch();
+
+        if (this.model.type === INCOME && isDiffBefore !== this.model.isDiffCurr) {
             if (this.model.isDiffCurr) {
-                this.updateExch(); // Transition 9, 21 or 15
+                this.stateTransition(this.model, {
+                    0: 2, // Transition 3
+                });
             } else {
-                this.setDestAmount(this.model.srcAmount);
-                this.calcExchByAmounts();
-                this.updateExch();
-                if (this.model.state === 2 || this.model.state === 3) {
-                    this.model.state = 0; // Transition 10 or 16
-                } else {
-                    this.model.state = 1; // Transition 22
-                }
+                this.stateTransition(this.model, {
+                    2: 0, // Transition 10
+                    3: 0, // Transition 16
+                    4: 1, // Transition 22
+                });
             }
-        } else {
-            throw new Error('Unexpected transition');
+        }
+
+        if (this.model.type === DEBT && isDiffBefore !== this.model.isDiffCurr) {
+            if (this.model.isDiffCurr) {
+                this.stateTransition(this.model, {
+                    0: 10, // Transition 53
+                });
+            } else {
+                this.stateTransition(this.model, {
+                    10: 0, // Transition 54
+                    12: 0, // Transition 76
+                    15: 0, // Transition 86
+                });
+            }
         }
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.src_amount_row.selectCurr(val));
+        await this.performAction(() => this.content.srcAmountRow.selectCurr(val));
 
         return this.checkState();
     }
 
     async changeDestCurrency(val) {
-        assert(this.model.type === EXPENSE, 'Unexpected action: can\'t change destination currency');
+        const availTypes = [EXPENSE, DEBT];
+        assert(availTypes.includes(this.model.type), 'Unexpected action: can\'t change destination currency');
+        if (this.model.type === DEBT) {
+            assert(!this.model.debtType, 'Invalid state');
+        }
 
         if (this.model.dest_curr_id === val) {
             return true;
         }
 
+        const isDiffBefore = this.model.isDiffCurr;
+
         this.model.dest_curr_id = parseInt(val, 10);
         this.model.destCurr = App.currency.getItem(this.model.dest_curr_id);
 
+        if (this.model.type === DEBT) {
+            this.model.personAccount = this.getPersonAccount(
+                this.model.person.id,
+                this.model.dest_curr_id,
+            );
+            this.model.destAccount = this.model.personAccount;
+            this.calculateDestResult();
+
+            if (this.model.noAccount) {
+                this.model.src_curr_id = this.model.dest_curr_id;
+                this.model.srcCurr = this.model.destCurr;
+            }
+        }
         this.model.isDiffCurr = (this.model.src_curr_id !== this.model.dest_curr_id);
 
-        if (this.model.isDiffCurr && this.model.state === 0) {
-            this.updateExch();
-            this.model.state = 2; // Transition 4
-        } else if (this.model.state === 2) {
+        if (isDiffBefore && !this.model.isDiffCurr) {
+            this.setSrcAmount(this.model.fDestAmount);
+            this.calcExchByAmounts();
+        }
+        this.updateExch();
+
+        if (this.model.type === EXPENSE && isDiffBefore !== this.model.isDiffCurr) {
             if (this.model.isDiffCurr) {
-                this.updateExch();
-                this.model.state = 2; // Transition 13
+                this.stateTransition(this.model, {
+                    0: 2, // Transition 4
+                });
             } else {
-                this.setSrcAmount(this.model.fDestAmount);
-                this.calcExchByAmounts();
-                this.updateExch();
-                this.model.state = 0; // Transition 9
+                this.stateTransition(this.model, {
+                    2: 0, // Transition 9
+                });
             }
-        } else {
-            throw new Error('Unexpected transition');
+        }
+
+        if (this.model.type === DEBT && isDiffBefore !== this.model.isDiffCurr) {
+            if (this.model.isDiffCurr) {
+                this.stateTransition(this.model, {
+                    3: 16, // Transition 96
+                });
+            } else {
+                this.stateTransition(this.model, {
+                    16: 3, // Transition 95
+                    18: 3, // Transition 111
+                    21: 3, // Transition 122
+                });
+            }
         }
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.dest_amount_row.selectCurr(val));
+        await this.performAction(() => this.content.destAmountRow.selectCurr(val));
 
         return this.checkState();
     }
 
     async clickExchRate() {
-        assert(this.model.type !== DEBT, 'Unexpected action: can\'t click by exchange rate');
-
         if (this.model.type === EXPENSE || this.model.type === INCOME) {
             this.model.state = 3;
         } else if (this.model.type === TRANSFER) {
-            if (this.model.state === 3 || this.model.state === 5) {
-                this.model.state = 7; // Transition 40 or 21
-            } else if (this.model.state === 4 || this.model.state === 6) {
-                this.model.state = 8; // Transition 34 or 45
-            }
+            this.stateTransition(this.model, {
+                3: 7, // Transition 40
+                5: 7, // Transition 21
+                4: 8, // Transition 34
+                6: 8, // Transition 45
+            });
+        } else if (this.model.type === DEBT) {
+            this.stateTransition(this.model, {
+                10: 12, // Transition 57
+                11: 13, // Transition 65
+                15: 12, // Transition 74
+                14: 13, // Transition 79
+                16: 18, // Transition 93
+                17: 19, // Transition 101
+                21: 18, // Transition 110
+                20: 19, // Transition 115
+            });
         }
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.exch_left.click());
+        await this.performAction(() => this.content.exchangeInfo.click());
 
         return this.checkState();
     }
 
     isExchangeInputVisible() {
+        const transferStates = [7, 8];
+        const debtStates = [12, 13, 18, 19];
+
         return (
             ((this.model.type === EXPENSE || this.model.type === INCOME) && this.model.state === 3)
-            || (this.model.type === TRANSFER && (this.model.state === 7 || this.model.state === 8))
+            || (this.model.type === TRANSFER && transferStates.includes(this.model.state))
+            || (this.model.type === DEBT && debtStates.includes(this.model.state))
         );
     }
 
@@ -2083,7 +2178,7 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.exchange_row.input(val));
+        await this.performAction(() => this.content.exchangeRow.input(val));
 
         return this.checkState();
     }
@@ -2095,7 +2190,7 @@ export class TransactionView extends AppView {
         this.updateExch();
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.exchange_row.clickButton());
+        await this.performAction(() => this.content.exchangeRow.clickButton());
 
         return this.checkState();
     }
@@ -2128,7 +2223,7 @@ export class TransactionView extends AppView {
         this.model.comment = val.toString();
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.comment_row.input(val));
+        await this.performAction(() => this.content.commentRow.input(val));
 
         return this.checkState();
     }
@@ -2154,13 +2249,13 @@ export class TransactionView extends AppView {
 
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.person.selectAccount(val));
+        await this.performAction(() => this.content.personContainer.selectAccount(val));
 
         return this.checkState();
     }
 
     async changePersonByPos(pos) {
-        return this.changePerson(this.content.person.content.dropDown.content.items[pos].id);
+        return this.changePerson(this.content.personContainer.dropDown.items[pos].id);
     }
 
     async toggleAccount() {
@@ -2169,24 +2264,39 @@ export class TransactionView extends AppView {
         if (this.model.noAccount) {
             this.model.lastAccount_id = this.model.account.id;
             if (this.model.debtType) {
-                this.calculateDestResult();
+                this.model.dest_curr_id = this.model.src_curr_id;
+                this.model.destCurr = this.model.srcCurr;
+                this.setDestAmount(this.model.fSrcAmount);
             } else {
-                this.calculateSourceResult();
+                this.model.src_curr_id = this.model.dest_curr_id;
+                this.model.srcCurr = this.model.destCurr;
+                this.setSrcAmount(this.model.fDestAmount);
             }
+
             this.model.account = null;
 
-            const availStates = [0, 2, 1, 3, 5, 4];
-            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
+            this.model.isDiffCurr = (this.model.src_curr_id !== this.model.dest_curr_id);
 
-            if (this.model.state === 0 || this.model.state === 2) {
-                this.model.state = 6; // Transition 25 or 41
-            } else if (this.model.state === 1) {
-                this.model.state = 9; // Transition 38
-            } else if (this.model.state === 3 || this.model.state === 5) {
-                this.model.state = 7; // Transition 40 or 50
-            } else if (this.model.state === 4) {
-                this.model.state = 8; // Transition 39
-            }
+            this.stateTransition(this.model, {
+                0: 6, // Transition 25
+                1: 9, // Transition 38
+                2: 6, // Transition 41
+                3: 7, // Transition 40
+                4: 8, // Transition 39
+                5: 7, // Transition 50
+                10: 6, // Transition 61
+                11: 9, // Transition 69
+                12: 6, // Transition 77
+                13: 9, // Transition 81
+                14: 9, // Transition 85
+                15: 6, // Transition 88
+                16: 7, // Transition 97
+                17: 8, // Transition 105
+                18: 7, // Transition 113
+                19: 8, // Transition 117
+                20: 8, // Transition 121
+                21: 7, // Transition 124
+            });
         } else {
             if (this.model.lastAccount_id) {
                 this.model.account = App.state.accounts.getItem(this.model.lastAccount_id);
@@ -2195,27 +2305,38 @@ export class TransactionView extends AppView {
             }
             assert(this.model.account, 'Account not found');
 
+            this.model.personAccount = this.getPersonAccount(
+                this.model.person.id,
+                this.model.account.curr_id,
+            );
+
             if (this.model.debtType) {
+                this.model.srcAccount = this.model.personAccount;
                 this.model.destAccount = this.model.account;
                 this.calculateDestResult();
             } else {
                 this.model.srcAccount = this.model.account;
+                this.model.destAccount = this.model.personAccount;
                 this.calculateSourceResult();
             }
+            this.model.src_curr_id = this.model.srcAccount.curr_id;
+            this.model.dest_curr_id = this.model.destAccount.curr_id;
+            this.model.srcCurr = App.currency.getItem(this.model.src_curr_id);
+            this.model.destCurr = App.currency.getItem(this.model.dest_curr_id);
+            this.model.isDiffCurr = (this.model.src_curr_id !== this.model.dest_curr_id);
 
-            const availStates = [6, 7, 8, 9];
-            assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
-
-            if (this.model.state === 6) {
-                this.model.state = 0; // Transition 26
-            } else if (this.model.state === 7) {
-                this.model.state = 3; // Transition 29
-            } else if (this.model.state === 8) {
-                this.model.state = 4; // Transition 32
-            } else if (this.model.state === 9) {
-                this.model.state = 1; // Transition 37
+            if (!this.model.isDiffCurr) {
+                this.stateTransition(this.model, {
+                    6: 0, // Transition 26
+                    7: 3, // Transition 29
+                    8: 4, // Transition 32
+                    9: 1, // Transition 37
+                });
             }
         }
+
+        this.calcExchByAmounts();
+        this.updateExch();
 
         this.expectedState = this.getExpectedState();
 
@@ -2237,17 +2358,13 @@ export class TransactionView extends AppView {
 
         this.model.account = newAcc;
 
-        if (this.model.personAccount.curr_id !== this.model.account.curr_id) {
+        const isDiffBefore = this.model.isDiffCurr;
+        if (!isDiffBefore && this.model.personAccount.curr_id !== newAcc.curr_id) {
             this.model.personAccount = this.getPersonAccount(
                 this.model.person.id,
                 this.model.account.curr_id,
             );
         }
-
-        this.model.src_curr_id = this.model.account.curr_id;
-        this.model.dest_curr_id = this.model.src_curr_id;
-        this.model.srcCurr = App.currency.getItem(this.model.src_curr_id);
-        this.model.destCurr = App.currency.getItem(this.model.dest_curr_id);
 
         if (this.model.debtType) {
             this.model.srcAccount = this.model.personAccount;
@@ -2256,24 +2373,47 @@ export class TransactionView extends AppView {
             this.model.srcAccount = this.model.account;
             this.model.destAccount = this.model.personAccount;
         }
+        this.model.src_curr_id = this.model.srcAccount.curr_id;
+        this.model.dest_curr_id = this.model.destAccount.curr_id;
+        this.model.srcCurr = App.currency.getItem(this.model.src_curr_id);
+        this.model.destCurr = App.currency.getItem(this.model.dest_curr_id);
+        this.model.isDiffCurr = (this.model.src_curr_id !== this.model.dest_curr_id);
 
         this.calculateSourceResult();
         this.calculateDestResult();
         this.updateExch();
 
+        if (isDiffBefore !== this.model.isDiffCurr && !this.model.isDiffCurr) {
+            this.stateTransition(this.model, {
+                10: 0, // Transition 137
+                11: 1, // Transition 67
+                12: 0, // Transition 75
+                13: 1, // Transition 80
+                14: 1, // Transition 84
+                15: 0, // Transition 87
+                16: 3, // Transition 139
+                17: 4, // Transition 103
+                18: 3, // Transition 111
+                19: 4, // Transition 116
+                20: 4, // Transition 120
+                21: 3, // Transition 123
+            });
+        }
+
         this.expectedState = this.getExpectedState();
 
-        await this.performAction(() => this.content.account.selectAccount(accountId));
+        await this.performAction(() => this.content.debtAccountContainer.selectAccount(accountId));
 
         return this.checkState();
     }
 
     changeAccountByPos(pos) {
-        return this.changeAccount(this.content.account.content.dropDown.content.items[pos].id);
+        return this.changeAccount(this.content.debtAccountContainer.dropDown.items[pos].id);
     }
 
     async swapSourceAndDest() {
-        assert(this.model.type === TRANSFER || this.model.type === DEBT, 'Invalid transaction type: can\'t swap source and destination');
+        const availTypes = [TRANSFER, DEBT];
+        assert(availTypes.includes(this.model.type), 'Invalid transaction type: can\'t swap source and destination');
 
         const srcCurrId = this.model.src_curr_id;
         const { srcAmount, fSrcAmount, srcAccount } = this.model;
@@ -2294,41 +2434,35 @@ export class TransactionView extends AppView {
         if (this.model.type === DEBT) {
             this.model.debtType = !this.model.debtType;
 
-            if (this.model.debtType) {
-                const availStates = [3, 4, 5, 7, 8];
-                assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
-
-                if (this.model.state === 3) {
-                    this.model.state = 0; // Transition 8
-                } else if (this.model.state === 4) {
-                    this.model.state = 1; // Transition 16
-                } else if (this.model.state === 5) {
-                    this.model.state = 2; // Transition 17
-                } else if (this.model.state === 7) {
-                    this.model.state = 6; // Transition 28
-                } else if (this.model.state === 8) {
-                    this.model.state = 9; // Transition 33
-                }
-            } else {
-                const availStates = [0, 1, 2, 6, 9];
-                assert(availStates.includes(this.model.state), `Unexpected state ${this.model.state}`);
-
-                if (this.model.state === 0) {
-                    this.model.state = 3; // Transition 7
-                } else if (this.model.state === 1) {
-                    this.model.state = 4; // Transition 16
-                } else if (this.model.state === 2) {
-                    this.model.state = 5; // Transition 18
-                } else if (this.model.state === 6) {
-                    this.model.state = 7; // Transition 27
-                } else if (this.model.state === 9) {
-                    this.model.state = 8; // Transition 34
-                }
-            }
+            this.stateTransition(this.model, {
+                0: 3, // Transition 7
+                1: 4, // Transition 15
+                2: 5, // Transition 18
+                3: 0, // Transition 8
+                4: 1, // Transition 16
+                5: 2, // Transition 17
+                6: 7, // Transition 27
+                7: 6, // Transition 28
+                8: 9, // Transition 33
+                9: 8, // Transition 34
+                10: 16, // Transition 125
+                16: 10, // Transition 126
+                11: 17, // Transition 127
+                17: 11, // Transition 128
+                12: 18, // Transition 129
+                18: 12, // Transition 130
+                13: 19, // Transition 131
+                19: 13, // Transition 132
+                14: 20, // Transition 133
+                20: 14, // Transition 134
+                15: 21, // Transition 135
+                21: 15, // Transition 136
+            });
         }
 
         this.calculateSourceResult();
         this.calculateDestResult();
+        this.calcExchByAmounts();
         this.updateExch();
 
         this.expectedState = this.getExpectedState();

@@ -1,14 +1,20 @@
 import { isFunction, isObject } from 'jezvejs';
 
 class Store {
-    constructor(reducer, initialState = {}) {
+    constructor(reducer, options = {}) {
         if (!isFunction(reducer)) {
             throw new Error('Expected reducer to be a function');
         }
 
+        const {
+            initialState = {},
+            sendInitialState = true,
+        } = options;
+
         this.reducer = reducer;
         this.state = { ...initialState };
         this.listeners = [];
+        this.sendInitialState = sendInitialState;
     }
 
     getState() {
@@ -33,6 +39,11 @@ class Store {
         }
 
         this.listeners.push(listener);
+
+        // Send initial state to new listener
+        if (this.sendInitialState) {
+            listener(this.state, {});
+        }
     }
 }
 

@@ -1,11 +1,11 @@
 import 'jezvejs/style';
 import {
-    ge,
     createElement,
     show,
     setEvents,
     enable,
     insertAfter,
+    isFunction,
 } from 'jezvejs';
 import { DropDown } from 'jezvejs/DropDown';
 import { IconButton } from 'jezvejs/IconButton';
@@ -23,14 +23,14 @@ import { PersonList } from '../../js/model/PersonList.js';
 import { CategoryList } from '../../js/model/CategoryList.js';
 import { ImportRuleList } from '../../js/model/ImportRuleList.js';
 import { ImportTemplateList } from '../../js/model/ImportTemplateList.js';
-import './style.scss';
+import { Heading } from '../../Components/Heading/Heading.js';
 import { ImportUploadDialog } from '../../Components/Import/UploadDialog/Dialog/ImportUploadDialog.js';
 import { ImportRulesDialog, IMPORT_RULES_DIALOG_CLASS } from '../../Components/Import/RulesDialog/Dialog/ImportRulesDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
-import { Heading } from '../../Components/Heading/Heading.js';
+import { ImportTransactionList } from '../../Components/Import/List/ImportTransactionList.js';
 import { createStore } from '../../js/store.js';
 import { actions, reducer, getPageIndex } from './reducer.js';
-import { ImportTransactionList } from '../../Components/Import/List/ImportTransactionList.js';
+import './style.scss';
 
 /* Strings */
 const STR_TITLE = 'Import';
@@ -60,6 +60,16 @@ class ImportView extends View {
     constructor(...args) {
         super(...args);
 
+        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
+        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
+        window.app.checkUserAccountModels();
+        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
+        window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
+        window.app.loadModel(ImportRuleList, 'rules', window.app.props.rules);
+        window.app.loadModel(ImportTemplateList, 'templates', window.app.props.templates);
+
+        const { userAccounts } = window.app.model;
+        const mainAccount = userAccounts.getItemByIndex(0);
         const initialState = {
             items: [],
             pagination: {
@@ -68,26 +78,14 @@ class ImportView extends View {
             form: {},
             lastId: 0,
             activeItemIndex: -1,
-            mainAccount: null,
+            mainAccount,
             rulesEnabled: true,
             checkSimilarEnabled: true,
             contextItemIndex: -1,
             listMode: 'list',
         };
 
-        window.app.loadModel(CurrencyList, 'currency', window.app.props.currency);
-        window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
-        window.app.loadModel(PersonList, 'persons', window.app.props.persons);
-        window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
-        window.app.loadModel(ImportRuleList, 'rules', window.app.props.rules);
-        window.app.loadModel(ImportTemplateList, 'templates', window.app.props.templates);
-
-        this.store = createStore(reducer, initialState);
-        this.store.subscribe((state, prevState) => {
-            if (state !== prevState) {
-                this.render(state, prevState);
-            }
-        });
+        this.store = createStore(reducer, { initialState });
     }
 
     /**
@@ -98,7 +96,7 @@ class ImportView extends View {
             return;
         }
 
-        const elemIds = [
+        this.loadElementsByIds([
             'heading',
             'dataHeaderControls',
             'submitBtn',
@@ -106,13 +104,7 @@ class ImportView extends View {
             'enabledCount',
             'selectedCounter',
             'selectedCount',
-        ];
-        elemIds.forEach((id) => {
-            this[id] = ge(id);
-            if (!this[id]) {
-                throw new Error('Failed to initialize view');
-            }
-        });
+        ]);
 
         this.heading = Heading.fromElement(this.heading, {
             title: STR_TITLE,
@@ -122,7 +114,7 @@ class ImportView extends View {
 
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
-            onchange: () => this.onMainAccChange(),
+            onchange: (account) => this.onMainAccChange(account),
             className: 'dd__main-account dd_ellipsis',
         });
         window.app.initAccountsList(this.accountDropDown);
@@ -182,14 +174,9 @@ class ImportView extends View {
         this.loadingInd = LoadingIndicator.create({ fixed: false });
         listContainer.append(this.loadingInd.elem);
 
-        const selectedAccount = this.accountDropDown.getSelectionData();
-        if (!selectedAccount) {
-            throw new Error('Invalid selection data');
-        }
-
         this.createContextMenu();
 
-        this.setMainAccount(selectedAccount.id);
+        this.subscribeToStore(this.store);
         this.setRenderTime();
     }
 
@@ -200,7 +187,7 @@ class ImportView extends View {
                 id: 'createItemBtn',
                 icon: 'plus',
                 title: 'Add item',
-                onClick: () => this.createItem(),
+                onClick: () => this.onMenuClick('createItemBtn'),
             }, {
                 id: 'separator1',
                 type: 'separator',
@@ -208,41 +195,41 @@ class ImportView extends View {
                 id: 'selectModeBtn',
                 icon: 'select',
                 title: 'Select',
-                onClick: () => this.setListMode('select'),
+                onClick: () => this.onMenuClick('selectModeBtn'),
             }, {
                 id: 'sortModeBtn',
                 icon: 'sort',
                 title: 'Sort',
-                onClick: () => this.setListMode('sort'),
+                onClick: () => this.onMenuClick('sortModeBtn'),
             }, {
                 id: 'separator2',
                 type: 'separator',
             }, {
                 id: 'selectAllBtn',
                 title: 'Select all',
-                onClick: () => this.selectAll(),
+                onClick: () => this.onMenuClick('selectAllBtn'),
             }, {
                 id: 'deselectAllBtn',
                 title: 'Clear selection',
-                onClick: () => this.deselectAll(),
+                onClick: () => this.onMenuClick('deselectAllBtn'),
             }, {
                 id: 'enableSelectedBtn',
                 title: 'Enable selected',
-                onClick: () => this.enableSelected(true),
+                onClick: () => this.onMenuClick('enableSelectedBtn'),
             }, {
                 id: 'disableSelectedBtn',
                 title: 'Disable selected',
-                onClick: () => this.enableSelected(false),
+                onClick: () => this.onMenuClick('disableSelectedBtn'),
             }, {
                 id: 'deleteSelectedBtn',
                 icon: 'del',
                 title: 'Delete selected',
-                onClick: () => this.deleteSelected(),
+                onClick: () => this.onMenuClick('deleteSelectedBtn'),
             }, {
                 id: 'deleteAllBtn',
                 icon: 'del',
                 title: 'Delete all',
-                onClick: () => this.removeAllItems(),
+                onClick: () => this.onMenuClick('deleteAllBtn'),
             }, {
                 id: 'separator3',
                 type: 'separator',
@@ -251,12 +238,12 @@ class ImportView extends View {
                 type: 'checkbox',
                 label: 'Enable rules',
                 checked: true,
-                onChange: () => this.onToggleEnableRules(),
+                onChange: () => this.onMenuClick('rulesCheck'),
             }, {
                 id: 'rulesBtn',
                 icon: 'update',
                 title: 'Edit rules',
-                onClick: () => this.onRulesClick(),
+                onClick: () => this.onMenuClick('rulesBtn'),
             }, {
                 id: 'separator4',
                 type: 'separator',
@@ -265,9 +252,24 @@ class ImportView extends View {
                 type: 'checkbox',
                 label: 'Check similar transactions',
                 checked: true,
-                onChange: () => this.onToggleCheckSimilar(),
+                onChange: () => this.onMenuClick('similarCheck'),
             }],
         });
+
+        this.menuActions = {
+            createItemBtn: () => this.createItem(),
+            selectModeBtn: () => this.setListMode('select'),
+            sortModeBtn: () => this.setListMode('sort'),
+            selectAllBtn: () => this.selectAll(),
+            deselectAllBtn: () => this.deselectAll(),
+            enableSelectedBtn: () => this.enableSelected(true),
+            disableSelectedBtn: () => this.enableSelected(false),
+            deleteSelectedBtn: () => this.deleteSelected(),
+            deleteAllBtn: () => this.removeAllItems(),
+            rulesCheck: () => this.onToggleEnableRules(),
+            rulesBtn: () => this.onRulesClick(),
+            similarCheck: () => this.onToggleCheckSimilar(),
+        };
     }
 
     createContextMenu() {
@@ -299,6 +301,17 @@ class ImportView extends View {
                 onClick: () => this.onRemoveItem(),
             }],
         });
+    }
+
+    onMenuClick(item) {
+        this.menu.hideMenu();
+
+        const menuAction = this.menuActions[item];
+        if (!isFunction(menuAction)) {
+            return;
+        }
+
+        menuAction();
     }
 
     showContextMenu(itemIndex) {
@@ -582,13 +595,12 @@ class ImportView extends View {
     /**
      * Main account select event handler
      */
-    onMainAccChange() {
-        const selected = this.accountDropDown.getSelectionData();
-        if (!selected) {
-            throw new Error('Invalid selection data');
+    onMainAccChange(account) {
+        if (!account) {
+            throw new Error('Invalid account');
         }
 
-        this.setMainAccount(selected.id);
+        this.setMainAccount(account.id);
         this.applyRules();
 
         const state = this.store.getState();

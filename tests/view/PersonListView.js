@@ -33,8 +33,7 @@ const contextMenuItems = [
 export class PersonListView extends AppView {
     async parseContent() {
         const res = {
-            title: { elem: await query('.content_wrap > .heading > h1') },
-            addBtn: await IconButton.create(this, await query('#add_btn')),
+            addBtn: await IconButton.create(this, await query('#createBtn')),
             listModeBtn: await IconButton.create(this, await query('#listModeBtn')),
             listMenuContainer: {
                 elem: await query('.heading-actions .popup-menu'),
@@ -63,7 +62,6 @@ export class PersonListView extends AppView {
             await this.parseMenuItems(res, contextMenuItems);
         }
 
-        res.title.value = prop(res.title.elem, 'textContent');
         res.tiles = await TilesList.create(this, await query('#contentContainer .tiles:first-child'));
         res.hiddenTiles = await TilesList.create(this, await query('#hiddenTilesHeading + .tiles'));
         res.loadingIndicator = { elem: await query('#contentContainer .loading-indicator') };

@@ -24,14 +24,14 @@ export class ProfileView extends AppView {
         assert(blocks.length === 4, 'Invalid profile view structure');
 
         res.loginElem = await query(blocks[0], 'span');
-        res.nameElem = await query('#namestatic');
+        res.userNameTitle = await query('#userNameTitle');
         res.nameLinkElem = await query('#changeNameBtn');
         res.changePassLinkElem = await query('#changePassBtn');
         res.resetLinkElem = await query('#resetBtn');
         res.deleteProfileBtn = await query('#delProfileBtn');
         assert(
             res.loginElem
-            && res.nameElem
+            && res.userNameTitle
             && res.nameLinkElem
             && res.changePassLinkElem
             && res.resetLinkElem,
@@ -39,7 +39,7 @@ export class ProfileView extends AppView {
         );
 
         res.login = await prop(res.loginElem, 'textContent');
-        res.name = await prop(res.nameElem, 'textContent');
+        res.name = await prop(res.userNameTitle, 'textContent');
 
         res.changeNamePopup = {
             elem: await query('#chname_popup'),

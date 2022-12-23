@@ -271,6 +271,13 @@ export class TransactionsStory extends TestStory {
     async createDebt() {
         setBlock('Create debt transactions', 1);
 
+        const {
+            USD,
+            EUR,
+            HIDDEN_ACCOUNT_IND,
+            HIDDEN_PERSON_IND,
+        } = App.scenario;
+
         const data = [{
             fromPerson: 0,
             srcAmount: '1000',
@@ -278,7 +285,7 @@ export class TransactionsStory extends TestStory {
             fromPerson: 0,
             debtType: false,
             acc: 2,
-            srcAmount: '200',
+            destAmount: '200',
             date: App.dates.weekAgo,
         }, {
             debtType: true,
@@ -288,35 +295,57 @@ export class TransactionsStory extends TestStory {
             fromPerson: 1,
             debtType: false,
             acc: 3,
-            srcAmount: '10',
+            destAmount: '10',
             date: App.dates.yesterday,
         }, {
             acc: null,
-            srcAmount: '105',
+            destAmount: '105',
             date: App.dates.yesterday,
         }, {
             fromPerson: 1,
             debtType: false,
             acc: null,
-            srcAmount: '105',
+            destAmount: '105',
+        }, {
+            fromPerson: 0,
+            srcCurr: USD,
+            srcAmount: '10',
+            destAmount: '650',
+        }, {
+            fromPerson: 1,
+            debtType: false,
+            destCurr: EUR,
+            srcAmount: '11.5',
+            destAmount: '714',
+        }, {
+            fromPerson: 0,
+            acc: null,
+            srcCurr: USD,
+            srcAmount: '20',
+        }, {
+            fromPerson: 0,
+            debtType: false,
+            acc: null,
+            destCurr: EUR,
+            destAmount: '22.75',
         }, {
             // Check available to create transaction with hidden person
             fromPerson: 0,
-            person: App.scenario.HIDDEN_PERSON_IND,
+            person: HIDDEN_PERSON_IND,
             srcAmount: '0.01',
         }, {
             // Check available to create transaction with hidden account
             fromPerson: 1,
-            acc: App.scenario.HIDDEN_ACCOUNT_IND,
+            acc: HIDDEN_ACCOUNT_IND,
             srcAmount: '105',
         }, {
             // Try to submit debt with invalid amount
-            srcAmount: '',
+            destAmount: '',
         }, {
-            srcAmount: '-100',
+            destAmount: '-100',
         }, {
             // Try to submit debt with invalid date
-            srcAmount: '100',
+            destAmount: '100',
             date: '',
         }];
 
@@ -326,7 +355,7 @@ export class TransactionsStory extends TestStory {
     async updateExpense() {
         setBlock('Update expense transactions', 2);
 
-        const { CAFE_CATEGORY, USD } = App.scenario;
+        const { USD, CAFE_CATEGORY, HIDDEN_ACCOUNT_IND } = App.scenario;
         const data = [{
             pos: 3,
             destAmount: '124.7701',
@@ -348,7 +377,7 @@ export class TransactionsStory extends TestStory {
         }, {
             // Check available to update transaction with hidden account
             pos: 4,
-            srcAcc: App.scenario.HIDDEN_ACCOUNT_IND,
+            srcAcc: HIDDEN_ACCOUNT_IND,
             destAmount: '99.9',
         }];
 
@@ -358,7 +387,7 @@ export class TransactionsStory extends TestStory {
     async updateIncome() {
         setBlock('Update income transactions', 2);
 
-        const { TAXES_CATEGORY, USD } = App.scenario;
+        const { USD, TAXES_CATEGORY, HIDDEN_ACCOUNT_IND } = App.scenario;
         const data = [{
             pos: 1,
             srcAmount: '100.001',
@@ -379,7 +408,7 @@ export class TransactionsStory extends TestStory {
         }, {
             // Check available to update transaction with hidden account
             pos: 4,
-            destAcc: App.scenario.HIDDEN_ACCOUNT_IND,
+            destAcc: HIDDEN_ACCOUNT_IND,
             srcAmount: '99.9',
         }];
 
@@ -389,6 +418,7 @@ export class TransactionsStory extends TestStory {
     async updateTransfer() {
         setBlock('Update transfer transactions', 2);
 
+        const { HIDDEN_ACCOUNT_IND } = App.scenario;
         const data = [{
             pos: 0,
             destAcc: 0,
@@ -413,7 +443,7 @@ export class TransactionsStory extends TestStory {
         }, {
             // Check available to update transaction with hidden account
             pos: 5,
-            srcAcc: App.scenario.HIDDEN_ACCOUNT_IND,
+            srcAcc: HIDDEN_ACCOUNT_IND,
             srcAmount: '1000',
         }];
 
@@ -423,6 +453,7 @@ export class TransactionsStory extends TestStory {
     async updateDebt() {
         setBlock('Update debt transactions', 2);
 
+        const { USD, HIDDEN_ACCOUNT_IND, HIDDEN_PERSON_IND } = App.scenario;
         const data = [{
             pos: 0,
             person: 0,
@@ -435,15 +466,16 @@ export class TransactionsStory extends TestStory {
         }, {
             pos: 4,
             debtType: true,
+            srcCurr: USD,
             srcAmount: '10',
         }, {
             pos: 1,
             debtType: false,
             acc: 2,
-            srcAmount: '200.0202',
+            destAmount: '200.0202',
             date: App.dates.monthAgo,
         }, {
-            pos: 5,
+            pos: 6,
             acc: null,
             srcAmount: '200',
         }, {
@@ -453,13 +485,13 @@ export class TransactionsStory extends TestStory {
         }, {
             // Check available to update transaction with hidden person
             pos: 0,
-            acc: App.scenario.HIDDEN_PERSON_IND,
+            acc: HIDDEN_PERSON_IND,
             srcAmount: '105',
         }, {
             // Check available to update transaction with hidden account
             pos: 1,
-            acc: App.scenario.HIDDEN_ACCOUNT_IND,
-            srcAmount: '105',
+            acc: HIDDEN_ACCOUNT_IND,
+            destAmount: '105',
         }];
 
         await App.scenario.runner.runGroup(DebtTransactionTests.update, data);

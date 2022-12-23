@@ -1,6 +1,5 @@
 import 'jezvejs/style';
 import {
-    ge,
     createElement,
     setEvents,
     insertAfter,
@@ -91,21 +90,14 @@ class StatisticsView extends View {
         window.app.checkUserAccountModels();
         window.app.loadModel(CategoryList, 'categories', window.app.props.categories);
 
-        this.store = createStore(reducer, initialState);
-        this.store.subscribe((state, prevState) => {
-            if (state !== prevState) {
-                this.render(state, prevState);
-            }
-        });
+        this.store = createStore(reducer, { initialState });
     }
 
     /**
      * View initialization
      */
     onStart() {
-        const state = this.store.getState();
-
-        const elemIds = [
+        this.loadElementsByIds([
             'heading',
             // Filters
             'filtersBtn',
@@ -119,13 +111,7 @@ class StatisticsView extends View {
             'dateFrm',
             // Chart
             'chart',
-        ];
-        elemIds.forEach((id) => {
-            this[id] = ge(id);
-            if (!this[id]) {
-                throw new Error('Failed to initialize view');
-            }
-        });
+        ]);
 
         this.heading = Heading.fromElement(this.heading, {
             title: STR_TITLE,
@@ -224,13 +210,19 @@ class StatisticsView extends View {
             renderLegend: (data) => this.renderLegendContent(data),
             renderYAxisLabel: (value) => formatValueShort(value),
         });
-        this.histogram.elem.dataset.time = state.renderTime;
 
         // Loading indicator
         this.loadingIndicator = LoadingIndicator.create({
             fixed: false,
         });
         this.chart.append(this.loadingIndicator.elem);
+
+        this.subscribeToStore(this.store);
+        this.onPostInit();
+    }
+
+    onPostInit() {
+        const state = this.store.getState();
 
         // Select first account if nothing selected on account report type
         const accounts = asArray(state.form.acc_id);

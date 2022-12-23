@@ -62,7 +62,6 @@ export class TransactionListView extends AppView {
 
     async parseContent() {
         const res = {
-            title: { elem: await query('.content_wrap > .heading > h1') },
             createBtn: await IconButton.create(this, await query('#createBtn')),
             filtersBtn: await IconButton.create(this, await query('#filtersBtn')),
             filtersContainer: { elem: await query('#filtersContainer') },
@@ -123,8 +122,6 @@ export class TransactionListView extends AppView {
         res.modeSelector = await IconButton.create(this, await query('.mode-selector'));
         res.paginator = await Paginator.create(this, await query('.paginator'));
         res.showMoreBtn = { elem: await query('.show-more-btn') };
-
-        res.title.value = await prop(res.title.elem, 'textContent');
 
         const transList = await query('.trans-list');
         assert(transList, 'List of transactions not found');

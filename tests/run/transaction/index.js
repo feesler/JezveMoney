@@ -27,26 +27,39 @@ export const runAction = async ({ action, data }) => {
 
     assert(App.view.isActionAvailable(action), 'Invalid action specified');
 
-    if (action === 'changeSrcAccountByPos' || action === 'changeDestAccountByPos') {
-        const [acc] = App.state.getAccountsByIndexes(data);
+    if (action === 'changeSrcAccount' || action === 'changeSrcAccountByPos') {
+        let acc = null;
+        if (action === 'changeSrcAccount') {
+            const userAccounts = App.state.getUserAccounts();
+            acc = userAccounts.getItem(data);
+        } else {
+            [acc] = App.state.getAccountsByIndexes(data);
+        }
         assert(acc, `Account (${data}) not found`);
 
-        if (action === 'changeSrcAccountByPos') {
-            testDescr = `Change source account to (${acc.name})`;
+        testDescr = `Change source account to (${acc.name})`;
+    }
+
+    if (action === 'changeDestAccount' || action === 'changeDestAccountByPos') {
+        let acc = null;
+        if (action === 'changeDestAccount') {
+            const userAccounts = App.state.getUserAccounts();
+            acc = userAccounts.getItem(data);
         } else {
-            testDescr = `Change destination account to (${acc.name})`;
+            [acc] = App.state.getAccountsByIndexes(data);
         }
+        assert(acc, `Account (${data}) not found`);
+
+        testDescr = `Change destination account to (${acc.name})`;
     }
 
-    if (action === 'changePersonByPos') {
-        const [person] = App.state.getPersonsByIndexes(data);
-        assert(person, `Person (${data}) not found`);
-
-        testDescr = `Change person to (${person.name})`;
-    }
-
-    if (action === 'changePersonByPos') {
-        const [person] = App.state.getPersonsByIndexes(data);
+    if (action === 'changePerson' || action === 'changePersonByPos') {
+        let person = null;
+        if (action === 'changePerson') {
+            person = App.state.persons.getItem(data);
+        } else {
+            [person] = App.state.getPersonsByIndexes(data);
+        }
         assert(person, `Person (${data}) not found`);
 
         testDescr = `Change person to (${person.name})`;
@@ -56,7 +69,7 @@ export const runAction = async ({ action, data }) => {
         testDescr = App.view.model.noAccount ? 'Enable account' : 'Disable account';
     }
 
-    if (action === 'changeAccountByPos') {
+    if (action === 'changeAccount' || action === 'changeAccountByPos') {
         if (data === null) {
             if (!App.view.model.noAccount) {
                 await test('Disable account', () => App.view.toggleAccount());
@@ -67,7 +80,13 @@ export const runAction = async ({ action, data }) => {
                 await test('Enable account', () => App.view.toggleAccount());
             }
 
-            const [acc] = App.state.getAccountsByIndexes(data);
+            let acc = null;
+            if (action === 'changeAccount') {
+                const userAccounts = App.state.getUserAccounts();
+                acc = userAccounts.getItem(data);
+            } else {
+                [acc] = App.state.getAccountsByIndexes(data);
+            }
             assert(acc, `Account (${data}) not found`);
 
             testDescr = `Change account to (${acc.name})`;
@@ -391,17 +410,16 @@ export const createFromPersonAccount = async ({ type, accountId }) => {
 /** Navigate to create transaction view and check form availability according to current state */
 export const checkTransactionAvailable = async (type, directNavigate = false) => {
     await test(`${Transaction.typeToString(type)} transaction availability`, async () => {
-        if (directNavigate) {
-            const requestURL = `${baseUrl()}transactions/create/?type=${type}`;
-
-            await goTo(requestURL);
-        } else {
+        if (!directNavigate) {
             await App.view.navigateToTransactions();
             await App.view.goToCreateTransaction();
             assert.instanceOf(App.view, TransactionView, 'Invalid view');
 
-            await App.view.changeTransactionType(type);
+            return App.view.changeTransactionType(type);
         }
+
+        const requestURL = `${baseUrl()}transactions/create/?type=${type}`;
+        await goTo(requestURL);
 
         let stateId = -1;
         const userAccounts = App.state.getUserAccounts();

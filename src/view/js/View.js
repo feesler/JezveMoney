@@ -1,4 +1,9 @@
-import { copyObject, onReady } from 'jezvejs';
+import {
+    asArray,
+    copyObject,
+    ge,
+    onReady,
+} from 'jezvejs';
 import { Header } from '../Components/Header/Header.js';
 
 /**
@@ -34,6 +39,23 @@ export class View {
     onStart() { }
 
     /**
+     * Obtain specified elements from DOM and assign as properties to view
+     * @param {Array|String} ids - id or array of element ids
+     */
+    loadElementsByIds(ids) {
+        asArray(ids).forEach((id) => {
+            if (typeof id !== 'string') {
+                throw new Error('Invalid element id');
+            }
+
+            this[id] = ge(id);
+            if (!this[id]) {
+                throw new Error(`Failed to initialize view: element '${id}' not found`);
+            }
+        });
+    }
+
+    /**
      * Obtain request data of specified form element
      * @param {HTMLFormElement} form - form element to obtain data from
      */
@@ -58,6 +80,19 @@ export class View {
         }
 
         return res;
+    }
+
+    /** Subscribes view to store updates */
+    subscribeToStore(store) {
+        if (!store) {
+            throw new Error('Invalid store');
+        }
+
+        store.subscribe((state, prevState) => {
+            if (state !== prevState) {
+                this.render(state, prevState);
+            }
+        });
     }
 
     /** Update state of view and render changes */

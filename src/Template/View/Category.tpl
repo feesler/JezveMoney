@@ -15,7 +15,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                         <?php if ($this->action == "update") {        ?>
                             <div class="heading-actions">
                                 <?= IconButton::render([
-                                    "id" => "del_btn",
+                                    "id" => "deleteBtn",
                                     "classNames" => "circle-icon",
                                     "title" => "Delete",
                                     "icon" => "del"

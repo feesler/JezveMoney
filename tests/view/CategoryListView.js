@@ -38,8 +38,7 @@ export class CategoryListView extends AppView {
 
     async parseContent() {
         const res = {
-            title: { elem: await query('.content_wrap > .heading > h1') },
-            addBtn: await IconButton.create(this, await query('#add_btn')),
+            createBtn: await IconButton.create(this, await query('#createBtn')),
             listModeBtn: await IconButton.create(this, await query('#listModeBtn')),
             listMenuContainer: {
                 elem: await query('.heading-actions .popup-menu'),
@@ -66,8 +65,6 @@ export class CategoryListView extends AppView {
 
             await this.parseMenuItems(res, contextMenuItems);
         }
-
-        res.title.value = prop(res.title.elem, 'textContent');
 
         // Categories list
         const listContainer = await query('#contentContainer .categories-list');
@@ -102,7 +99,7 @@ export class CategoryListView extends AppView {
             return 'nodata';
         }
 
-        if (!cont.addBtn.content.visible) {
+        if (!cont.createBtn.content.visible) {
             return 'select';
         }
 
@@ -137,7 +134,7 @@ export class CategoryListView extends AppView {
         );
 
         const res = {
-            addBtn: { visible: isListMode },
+            createBtn: { visible: isListMode },
             listModeBtn: { visible: !isListMode },
             loadingIndicator: { visible: model.loading },
             totalCounter: { visible: true, value: itemsCount },
@@ -180,7 +177,7 @@ export class CategoryListView extends AppView {
 
     /** Click on add button */
     async goToCreateCategory() {
-        await navigation(() => this.content.addBtn.click());
+        await navigation(() => this.content.createBtn.click());
     }
 
     /** Select specified category, click on edit button */

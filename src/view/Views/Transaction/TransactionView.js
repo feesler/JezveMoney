@@ -166,16 +166,24 @@ class TransactionView extends View {
                 initialState.srcAccount = initialState.personAccount;
                 initialState.account = initialState.destAccount;
 
-                initialState.id = (initialState.transaction.noAccount)
-                    ? STATE.DG_NOACC_S_AMOUNT
-                    : STATE.DG_S_AMOUNT;
+                if (initialState.isDiff) {
+                    initialState.id = STATE.DG_S_AMOUNT_D_AMOUNT;
+                } else {
+                    initialState.id = (initialState.transaction.noAccount)
+                        ? STATE.DG_NOACC_S_AMOUNT
+                        : STATE.DG_S_AMOUNT;
+                }
             } else {
                 initialState.destAccount = initialState.personAccount;
                 initialState.account = initialState.srcAccount;
 
-                initialState.id = (transaction.noAccount)
-                    ? STATE.DT_NOACC_S_AMOUNT
-                    : STATE.DT_S_AMOUNT;
+                if (initialState.isDiff) {
+                    initialState.id = STATE.DT_S_AMOUNT_D_AMOUNT;
+                } else {
+                    initialState.id = (transaction.noAccount)
+                        ? STATE.DT_NOACC_D_AMOUNT
+                        : STATE.DT_D_AMOUNT;
+                }
             }
         }
 
@@ -183,191 +191,173 @@ class TransactionView extends View {
         calculateDestResult(initialState);
         updateStateExchange(initialState);
 
-        this.store = createStore(reducer, initialState);
-        this.store.subscribe((state, prevState) => {
-            if (state !== prevState) {
-                this.render(state);
-            }
-        });
+        this.store = createStore(reducer, { initialState });
     }
 
     /**
      * View initialization
      */
     onStart() {
-        const state = this.store.getState();
-        const { transaction } = state;
+        this.loadElementsByIds([
+            'form',
+            'typeMenu',
+            'notAvailMsg',
+            'sourceContainer',
+            'sourceTile',
+            'destContainer',
+            'destTile',
+            'personContainer',
+            'personTile',
+            'debtAccountContainer',
+            'debtAccountTile',
+            'swapBtn',
+            'srcAmountRow',
+            'srcAmountInput',
+            'srcCurrBtn',
+            'srcAmountSign',
+            'destAmountRow',
+            'destAmountInput',
+            'destCurrBtn',
+            'destAmountSign',
+            'srcResBalanceRow',
+            'srcResBalanceInput',
+            'srcResBalanceSign',
+            'destResBalanceRow',
+            'destResBalanceInput',
+            'destResBalanceSign',
+            'exchangeRow',
+            'exchangeInput',
+            'exchangeSign',
+            'dateRow',
+            'dateInput',
+            'dateInputBtn',
+            'datePickerWrapper',
+            'categoryRow',
+            'categorySelect',
+            'commentRow',
+            'commentInput',
+            // Hidden inputs
+            'typeInp',
+            'srcIdInp',
+            'destIdInp',
+            'srcCurrInp',
+            'destCurrInp',
+            'debtOperationInp',
+            'personIdInp',
+            'debtAccountInp',
+            // Submit controls
+            'submitControls',
+            'submitBtn',
+            'cancelBtn',
+        ]);
 
         // Init form submit event handler
-        this.form = ge('mainfrm');
-        if (!this.form) {
-            throw new Error('Failed to initialize Transaction view');
-        }
         setEvents(this.form, { submit: (e) => this.onSubmit(e) });
 
-        if (state.isUpdate) {
-            this.deleteBtn = IconButton.fromElement('del_btn', {
+        const deleteBtn = ge('deleteBtn');
+        if (deleteBtn) {
+            this.deleteBtn = IconButton.fromElement(deleteBtn, {
                 onClick: () => this.confirmDelete(),
             });
         }
 
-        this.typeMenu = TransactionTypeMenu.fromElement(ge('typeMenu'), {
+        this.typeMenu = TransactionTypeMenu.fromElement(this.typeMenu, {
             itemParam: 'type',
             onChange: (sel) => this.onChangeType(sel),
         });
 
-        this.notAvailableMessage = ge('notavailmsg');
-        this.srcContainer = ge('source');
-        this.destContainer = ge('destination');
-        this.personContainer = ge('person');
-        this.debtAccountContainer = ge('debtaccount');
-        this.swapBtn = ge('swapBtn');
-        if (
-            !this.notAvailableMessage
-            || !this.srcContainer
-            || !this.destContainer
-            || !this.personContainer
-            || !this.debtAccountContainer
-            || !this.swapBtn
-        ) {
-            throw new Error('Failed to initialize view');
-        }
-
         setEvents(this.swapBtn, { click: () => this.store.dispatch(actions.swapSourceAndDest()) });
 
-        this.srcTileBase = this.srcContainer.querySelector('.tile-base');
-        this.srcTileContainer = this.srcContainer.querySelector('.tile_container');
-        this.srcTileInfoBlock = this.srcContainer.querySelector('.tile-info-block');
-
-        this.destTileBase = this.destContainer.querySelector('.tile-base');
-        this.destTileContainer = this.destContainer.querySelector('.tile_container');
+        this.srcTileInfoBlock = this.sourceContainer.querySelector('.tile-info-block');
         this.destTileInfoBlock = this.destContainer.querySelector('.tile-info-block');
-
         this.personTileInfoBlock = this.personContainer.querySelector('.tile-info-block');
 
         this.debtAccountTileBase = this.debtAccountContainer.querySelector('.tile-base');
         this.debtAccTileInfoBlock = this.debtAccountContainer.querySelector('.tile-info-block');
 
-        const srcTileElem = ge('source_tile');
-        this.srcTile = (srcTileElem)
-            ? AccountTile.fromElement(srcTileElem, { account: state.srcAccount })
-            : null;
+        this.sourceTile = (this.sourceTile) ? AccountTile.fromElement(this.sourceTile) : null;
+        this.destTile = (this.destTile) ? AccountTile.fromElement(this.destTile) : null;
 
-        const destTileElem = ge('dest_tile');
-        this.destTile = (destTileElem)
-            ? AccountTile.fromElement(destTileElem, { account: state.destAccount })
-            : null;
-
-        this.srcAmountInfo = TileInfoItem.fromElement('src_amount_left', {
+        this.srcAmountInfo = TileInfoItem.fromElement('srcAmountInfo', {
             onclick: () => this.store.dispatch(actions.sourceAmountClick()),
         });
-        this.destAmountInfo = TileInfoItem.fromElement('dest_amount_left', {
+        this.destAmountInfo = TileInfoItem.fromElement('destAmountInfo', {
             onclick: () => this.store.dispatch(actions.destAmountClick()),
         });
-        this.exchangeInfo = TileInfoItem.fromElement('exch_left', {
+        this.exchangeInfo = TileInfoItem.fromElement('exchangeInfo', {
             onclick: () => this.store.dispatch(actions.exchangeClick()),
         });
-        this.srcResBalanceInfo = TileInfoItem.fromElement('src_res_balance_left', {
+        this.srcResBalanceInfo = TileInfoItem.fromElement('srcResBalanceInfo', {
             onclick: () => this.store.dispatch(actions.sourceResultClick()),
         });
-        this.destResBalanceInfo = TileInfoItem.fromElement('dest_res_balance_left', {
+        this.destResBalanceInfo = TileInfoItem.fromElement('destResBalanceInfo', {
             onclick: () => this.store.dispatch(actions.destResultClick()),
         });
 
-        this.srcAmountRow = ge('src_amount_row');
-        if (this.srcAmountRow) {
-            this.srcAmountRowLabel = this.srcAmountRow.querySelector('label');
+        this.srcAmountRowLabel = this.srcAmountRow.querySelector('label');
+        if (this.srcAmountInput) {
+            this.srcAmountInput = DecimalInput.create({
+                elem: this.srcAmountInput,
+                digits: CENTS_DIGITS,
+                oninput: (e) => this.onSourceAmountInput(e),
+            });
         }
-        this.srcAmountInput = DecimalInput.create({
-            elem: ge('src_amount'),
-            digits: CENTS_DIGITS,
-            oninput: (e) => this.onSourceAmountInput(e),
-        });
-        this.srcCurrBtn = ge('srcCurrBtn');
-        this.srcAmountSign = ge('srcamountsign');
 
-        this.destAmountRow = ge('dest_amount_row');
-        if (this.destAmountRow) {
-            this.destAmountRowLabel = this.destAmountRow.querySelector('label');
+        this.destAmountRowLabel = this.destAmountRow.querySelector('label');
+        if (this.destAmountInput) {
+            this.destAmountInput = DecimalInput.create({
+                elem: this.destAmountInput,
+                digits: CENTS_DIGITS,
+                oninput: (e) => this.onDestAmountInput(e),
+            });
         }
-        this.destAmountInput = DecimalInput.create({
-            elem: ge('dest_amount'),
-            digits: CENTS_DIGITS,
-            oninput: (e) => this.onDestAmountInput(e),
-        });
-        this.destCurrBtn = ge('destCurrBtn');
-        this.destAmountSign = ge('destamountsign');
 
-        this.srcResBalanceRow = ge('result_balance');
-        if (this.srcResBalanceRow) {
-            this.srcResBalanceRowLabel = this.srcResBalanceRow.querySelector('label');
+        this.srcResBalanceRowLabel = this.srcResBalanceRow.querySelector('label');
+        if (this.srcResBalanceInput) {
+            this.srcResBalanceInput = DecimalInput.create({
+                elem: this.srcResBalanceInput,
+                digits: CENTS_DIGITS,
+                oninput: (e) => this.onSourceResultInput(e),
+            });
         }
-        this.srcResBalanceInput = DecimalInput.create({
-            elem: ge('resbal'),
-            digits: CENTS_DIGITS,
-            oninput: (e) => this.onSourceResultInput(e),
-        });
-        this.srcResBalanceSign = ge('res_currsign');
 
-        this.destResBalanceRow = ge('result_balance_dest');
-        if (this.destResBalanceRow) {
-            this.destResBalanceRowLabel = this.destResBalanceRow.querySelector('label');
+        this.destResBalanceRowLabel = this.destResBalanceRow.querySelector('label');
+        if (this.destResBalanceInput) {
+            this.destResBalanceInput = DecimalInput.create({
+                elem: this.destResBalanceInput,
+                digits: CENTS_DIGITS,
+                oninput: (e) => this.onDestResultInput(e),
+            });
         }
-        this.destResBalanceInput = DecimalInput.create({
-            elem: ge('resbal_d'),
-            digits: CENTS_DIGITS,
-            oninput: (e) => this.onDestResultInput(e),
-        });
-        this.destResBalanceSign = ge('res_currsign_d');
 
-        this.exchangeRow = ge('exchange');
-        if (this.exchangeRow) {
-            this.exchangeRowLabel = this.exchangeRow.querySelector('label');
+        this.exchangeRowLabel = this.exchangeRow.querySelector('label');
+        if (this.exchangeInput) {
+            this.exchangeInput = DecimalInput.create({
+                elem: this.exchangeInput,
+                digits: EXCHANGE_DIGITS,
+                allowNegative: false,
+                oninput: (e) => this.onExchangeInput(e),
+            });
         }
-        this.exchangeInput = DecimalInput.create({
-            elem: ge('exchrate'),
-            digits: EXCHANGE_DIGITS,
-            allowNegative: false,
-            oninput: (e) => this.onExchangeInput(e),
-        });
-        this.exchangeSign = ge('exchcomm');
         setEvents(this.exchangeSign, { click: () => this.onToggleExchange() });
 
-        this.dateRow = ge('date_row');
-        this.datePickerWrapper = ge('calendar');
-
-        this.dateInputBtn = ge('cal_rbtn');
         setEvents(this.dateInputBtn, { click: () => this.showCalendar() });
 
         this.dateInput = DateInput.create({
-            elem: ge('date'),
+            elem: this.dateInput,
             locales: window.app.dateFormatLocale,
             oninput: (e) => this.onDateInput(e),
         });
 
-        this.categoryRow = ge('category_row');
         this.categorySelect = CategorySelect.create({
-            elem: 'category',
+            elem: this.categorySelect,
             className: 'dd_fullwidth',
             onchange: (category) => this.onCategoryChanged(category),
         });
 
-        this.commentRow = ge('comment_row');
-        this.commentInput = ge('comm');
         setEvents(this.commentInput, { input: (e) => this.onCommentInput(e) });
 
-        this.typeInp = ge('typeInp');
-        this.srcIdInp = ge('src_id');
-        this.destIdInp = ge('dest_id');
-        this.srcCurrInp = ge('src_curr');
-        this.destCurrInp = ge('dest_curr');
-        this.debtOperationInp = ge('debtOperation');
-
-        this.personIdInp = ge('person_id');
-        this.debtAccountInp = ge('acc_id');
-        this.debtAccountTile = AccountTile.fromElement('acc_tile', {
-            account: state.account,
-        });
+        this.debtAccountTile = AccountTile.fromElement(this.debtAccountTile);
 
         this.noAccountBtn = this.debtAccountContainer.querySelector('.tile_header .close-btn');
         setEvents(this.noAccountBtn, { click: () => this.toggleEnableAccount() });
@@ -378,33 +368,34 @@ class TransactionView extends View {
 
         this.debtAccountLabel = this.debtAccountContainer.querySelector('.tile_header label');
 
-        this.personTile = Tile.fromElement('person_tile', { parent: this });
-
-        this.submitControls = ge('submit_controls');
-        this.submitBtn = ge('submitBtn');
-        this.cancelBtn = ge('cancelBtn');
+        this.personTile = Tile.fromElement(this.personTile, { parent: this });
 
         this.spinner = Spinner.create();
         this.spinner.hide();
         insertAfter(this.spinner.elem, this.cancelBtn);
 
+        this.subscribeToStore(this.store);
+        this.onPostInit();
+    }
+
+    onPostInit() {
+        const state = this.store.getState();
+
         // Check type change request
-        if (state.isUpdate && transaction.type !== this.props.requestedType) {
+        if (state.isUpdate && state.transaction.type !== this.props.requestedType) {
             this.onChangeType(this.props.requestedType);
-        } else {
-            this.render(state);
         }
     }
 
     /** Initialize DropDown for source account tile */
     initSrcAccList(state) {
-        if (this.srcDDList) {
+        if (!this.sourceTile || this.srcDDList) {
             return;
         }
 
         const { transaction } = state;
         this.srcDDList = DropDown.create({
-            elem: 'source_tile',
+            elem: this.sourceTile.elem,
             listAttach: true,
             onitemselect: (item) => this.onSrcAccountSelect(item),
         });
@@ -418,13 +409,13 @@ class TransactionView extends View {
 
     /** Initialize DropDown for destination account tile */
     initDestAccList(state) {
-        if (this.destDDList) {
+        if (!this.destTile || this.destDDList) {
             return;
         }
 
         const { transaction } = state;
         this.destDDList = DropDown.create({
-            elem: 'dest_tile',
+            elem: this.destTile.elem,
             listAttach: true,
             onitemselect: (item) => this.onDestAccountSelect(item),
         });
@@ -438,12 +429,12 @@ class TransactionView extends View {
 
     /** Initialize DropDown for debt account tile */
     initPersonsDropDown() {
-        if (this.persDDList) {
+        if (!this.personTile || this.persDDList) {
             return;
         }
 
         this.persDDList = DropDown.create({
-            elem: 'person_tile',
+            elem: this.personTile.elem,
             listAttach: true,
             onitemselect: (item) => this.onPersonSelect(item),
         });
@@ -453,12 +444,12 @@ class TransactionView extends View {
 
     /** Initialize DropDown for debt account tile */
     initAccList(state) {
-        if (this.accDDList) {
+        if (!this.debtAccountTile || this.accDDList) {
             return;
         }
 
         this.accDDList = DropDown.create({
-            elem: 'acc_tile',
+            elem: this.debtAccountTile.elem,
             listAttach: true,
             onitemselect: (item) => this.onDebtAccountSelect(item),
         });
@@ -494,7 +485,7 @@ class TransactionView extends View {
         }
 
         this.srcCurrDDList = this.createCurrencyList({
-            elem: 'srcamountsign',
+            elem: 'srcAmountSign',
             currId: state.transaction.src_curr,
             onitemselect: (item) => this.onSrcCurrencySel(item),
         });
@@ -507,7 +498,7 @@ class TransactionView extends View {
         }
 
         this.destCurrDDList = this.createCurrencyList({
-            elem: 'destamountsign',
+            elem: 'destAmountSign',
             currId: state.transaction.dest_curr,
             onitemselect: (item) => this.onDestCurrencySel(item),
         });
@@ -1098,7 +1089,7 @@ class TransactionView extends View {
             this.exchRateSwitch(SHOW_INPUT);
         }
 
-        insertAfter(this.swapBtn, this.srcContainer);
+        insertAfter(this.swapBtn, this.sourceContainer);
 
         addChilds(this.srcTileInfoBlock, [
             this.srcAmountInfo.elem,
@@ -1118,37 +1109,126 @@ class TransactionView extends View {
     }
 
     renderDebt(state) {
-        this.destAmountSwitch(HIDE_BOTH);
-        this.exchRateSwitch(HIDE_BOTH);
-
-        if (state.id === STATE.DG_S_AMOUNT || state.id === STATE.DT_S_AMOUNT) {
+        if (state.id === STATE.DG_S_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INFO);
-        } else if (state.id === STATE.DG_S_RESULT || state.id === STATE.DT_S_RESULT) {
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (state.id === STATE.DG_S_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INPUT);
             this.resBalanceDestSwitch(SHOW_INFO);
-        } else if (state.id === STATE.DG_D_RESULT || state.id === STATE.DT_D_RESULT) {
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (state.id === STATE.DG_D_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (state.id === STATE.DT_D_AMOUNT) {
+            this.srcAmountSwitch(HIDE_BOTH);
+            this.destAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (state.id === STATE.DT_D_RESULT) {
+            this.srcAmountSwitch(HIDE_BOTH);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (state.id === STATE.DT_S_RESULT) {
+            this.srcAmountSwitch(HIDE_BOTH);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(HIDE_BOTH);
         } else if (state.id === STATE.DG_NOACC_S_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(HIDE_BOTH);
-        } else if (state.id === STATE.DT_NOACC_S_AMOUNT) {
-            this.srcAmountSwitch(SHOW_INPUT);
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (state.id === STATE.DT_NOACC_D_AMOUNT) {
+            this.srcAmountSwitch(HIDE_BOTH);
+            this.destAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(HIDE_BOTH);
             this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(HIDE_BOTH);
         } else if (state.id === STATE.DT_NOACC_D_RESULT) {
-            this.srcAmountSwitch(SHOW_INFO);
+            this.srcAmountSwitch(HIDE_BOTH);
+            this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(HIDE_BOTH);
             this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(HIDE_BOTH);
         } else if (state.id === STATE.DG_NOACC_S_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INPUT);
             this.resBalanceDestSwitch(HIDE_BOTH);
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (
+            state.id === STATE.DG_S_AMOUNT_D_AMOUNT
+            || state.id === STATE.DT_S_AMOUNT_D_AMOUNT
+        ) {
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INFO);
+        } else if (
+            state.id === STATE.DG_D_AMOUNT_S_RESULT
+            || state.id === STATE.DT_D_AMOUNT_S_RESULT
+        ) {
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INFO);
+        } else if (state.id === STATE.DG_S_AMOUNT_EXCH) {
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INPUT);
+        } else if (state.id === STATE.DG_S_RESULT_EXCH) {
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INPUT);
+        } else if (
+            state.id === STATE.DG_S_RESULT_D_RESULT
+            || state.id === STATE.DT_S_RESULT_D_RESULT
+        ) {
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(SHOW_INFO);
+        } else if (
+            state.id === STATE.DG_S_AMOUNT_D_RESULT
+            || state.id === STATE.DT_S_AMOUNT_D_RESULT
+        ) {
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(SHOW_INFO);
+        } else if (state.id === STATE.DT_D_AMOUNT_EXCH) {
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INPUT);
+        } else if (state.id === STATE.DT_D_RESULT_EXCH) {
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(SHOW_INPUT);
         }
 
         const { debtType, noAccount } = state.transaction;
@@ -1191,14 +1271,14 @@ class TransactionView extends View {
         this.srcResBalanceRowLabel.textContent = (debtType) ? 'Result balance (Person)' : 'Result balance (Account)';
         this.destResBalanceRowLabel.textContent = (debtType) ? 'Result balance (Account)' : 'Result balance (Person)';
 
-        this.enableSourceCurrencySelect(false);
-        this.enableDestCurrencySelect(false);
+        this.enableSourceCurrencySelect(debtType);
+        this.enableDestCurrencySelect(!debtType);
 
         this.personIdInp.value = state.person.id;
 
         const currencyModel = window.app.model.currency;
-        const srcCurrency = currencyModel.getItem(state.transaction.src_curr);
-        const personBalance = srcCurrency.formatValue(state.personAccount.balance);
+        const personAccountCurr = currencyModel.getItem(state.personAccount.curr_id);
+        const personBalance = personAccountCurr.formatValue(state.personAccount.balance);
         this.personTile.setState({
             title: state.person.name,
             subtitle: personBalance,
@@ -1241,12 +1321,12 @@ class TransactionView extends View {
                 message = MSG_DEBT_NOT_AVAILABLE;
             }
 
-            this.notAvailableMessage.textContent = message;
+            this.notAvailMsg.textContent = message;
         }
-        show(this.notAvailableMessage, !state.isAvailable);
+        show(this.notAvailMsg, !state.isAvailable);
 
         show(
-            this.srcContainer,
+            this.sourceContainer,
             state.isAvailable && (transaction.type === EXPENSE || transaction.type === TRANSFER),
         );
         show(
@@ -1330,8 +1410,8 @@ class TransactionView extends View {
         // Source account
         this.srcIdInp.value = transaction.src_id;
         if (transaction.type === EXPENSE || transaction.type === TRANSFER) {
-            if (this.srcTile && state.srcAccount) {
-                this.srcTile.setState({ account: state.srcAccount });
+            if (this.sourceTile && state.srcAccount) {
+                this.sourceTile.setState({ account: state.srcAccount });
             }
 
             this.initSrcAccList(state);
@@ -1366,7 +1446,10 @@ class TransactionView extends View {
         // Source currency
         this.srcCurrInp.value = transaction.src_curr;
         this.setSign(this.srcAmountSign, this.srcCurrDDList, transaction.src_curr);
-        if (transaction.type === INCOME) {
+        if (
+            transaction.type === INCOME
+            || (transaction.type === DEBT && transaction.debtType)
+        ) {
             this.initSrcCurrList(state);
         }
         enable(this.srcCurrBtn, !state.submitStarted);
@@ -1382,7 +1465,10 @@ class TransactionView extends View {
         // Destination currency
         this.destCurrInp.value = transaction.dest_curr;
         this.setSign(this.destAmountSign, this.destCurrDDList, transaction.dest_curr);
-        if (transaction.type === EXPENSE) {
+        if (
+            transaction.type === EXPENSE
+            || (transaction.type === DEBT && !transaction.debtType)
+        ) {
             this.initDestCurrList(state);
         }
         enable(this.destCurrBtn, !state.submitStarted);

@@ -18,7 +18,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                     </div>
 
                     <?php if (!$importAvailable) { ?>
-                        <span id="notavailmsg" class="nodata-message"><?= e($importNotAvailableMessage) ?></span>
+                        <span id="notAvailMsg" class="nodata-message"><?= e($importNotAvailableMessage) ?></span>
                     <?php   }   ?>
 
                     <div class="content-header" <?= hidden(!$importAvailable) ?>>

@@ -1,5 +1,5 @@
 import 'jezvejs/style';
-import { ge, setEvents } from 'jezvejs';
+import { setEvents } from 'jezvejs';
 import { Application } from '../../js/Application.js';
 import { ResetDataDialog } from '../../Components/Profile/ResetDataDialog/ResetDataDialog.js';
 import '../../css/app.scss';
@@ -9,6 +9,8 @@ import { ConfirmDialog } from '../../Components/ConfirmDialog/ConfirmDialog.js';
 import { LoadingIndicator } from '../../Components/LoadingIndicator/LoadingIndicator.js';
 import { ChangeNameDialog } from '../../Components/Profile/ChangeNameDialog/ChangeNameDialog.js';
 import { ChangePasswordDialog } from '../../Components/Profile/ChangePasswordDialog/ChangePasswordDialog.js';
+import { createStore } from '../../js/store.js';
+import { actions, reducer } from './reducer.js';
 import './style.scss';
 
 /** Strings */
@@ -28,38 +30,35 @@ class ProfileView extends View {
     constructor(...args) {
         super(...args);
 
-        this.state = {
+        const { profile } = window.app.model;
+        const initialState = {
             ...this.props,
+            userName: profile.name,
         };
+
+        this.store = createStore(reducer, { initialState });
     }
 
     /** View initialization */
     onStart() {
-        this.changeNamePopup = null;
-        this.changePassPopup = null;
-        this.resetPopup = null;
-
-        this.nameElem = ge('namestatic');
-        this.changeNameBtn = ge('changeNameBtn');
-        this.changePassBtn = ge('changePassBtn');
-        this.resetBtn = ge('resetBtn');
-        this.delProfileBtn = ge('delProfileBtn');
-        if (
-            !this.nameElem
-            || !this.changeNameBtn
-            || !this.changePassBtn
-            || !this.resetBtn
-            || !this.delProfileBtn
-        ) {
-            throw new Error('Failed to initialize Profile view');
-        }
+        this.loadElementsByIds([
+            'userNameTitle',
+            'changeNameBtn',
+            'changePassBtn',
+            'resetBtn',
+            'delProfileBtn',
+        ]);
 
         setEvents(this.changeNameBtn, { click: (e) => this.onActionClick(e) });
         setEvents(this.changePassBtn, { click: (e) => this.onActionClick(e) });
         setEvents(this.resetBtn, { click: (e) => this.onActionClick(e) });
         setEvents(this.delProfileBtn, { click: () => this.confirmDelete() });
 
-        this.render(this.state);
+        this.changeNamePopup = null;
+        this.changePassPopup = null;
+        this.resetPopup = null;
+
+        this.subscribeToStore(this.store);
     }
 
     onActionClick(e) {
@@ -72,17 +71,13 @@ class ProfileView extends View {
     }
 
     setAction(action) {
-        if (this.state.action === action) {
-            return;
-        }
-
-        this.setState({ ...this.state, action });
+        this.store.dispatch(actions.changeAction(action));
     }
 
     onNameChanged(value) {
         window.app.model.profile.name = value;
-        this.nameElem.textContent = value;
         this.header.setUserName(value);
+        this.store.dispatch(actions.changeUserName(value));
     }
 
     /** Send delete profile API request */
@@ -164,6 +159,8 @@ class ProfileView extends View {
 
     render(state) {
         this.replaceHistory(state);
+
+        this.userNameTitle.textContent = state.userName;
 
         if (state.action === 'password') {
             this.renderChangePasswordDialog();

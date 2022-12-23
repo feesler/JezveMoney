@@ -18,7 +18,7 @@
                     <div class="profile-block">
                         <h2>Name</h2>
                         <div class="name-container">
-                            <span id="namestatic"><?= e($profileInfo["name"]) ?></span>
+                            <span id="userNameTitle"><?= e($profileInfo["name"]) ?></span>
                             <a id="changeNameBtn" class="change-name-link" href="<?= BASEURL ?>profile/name/" data-action="name">Change</a>
                         </div>
                     </div>

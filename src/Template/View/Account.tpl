@@ -16,7 +16,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                         <?php if ($this->action == "update") {    ?>
                             <div class="heading-actions">
                                 <?= IconButton::render([
-                                    "id" => "del_btn",
+                                    "id" => "deleteBtn",
                                     "classNames" => "circle-icon",
                                     "title" => "Delete",
                                     "icon" => "del"
@@ -26,7 +26,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                     </div>
 
                     <div>
-                        <form id="accForm" method="post" action="<?= e(BASEURL . "accounts/" . $this->action) ?>/">
+                        <form id="accountForm" method="post" action="<?= e(BASEURL . "accounts/" . $this->action) ?>/">
                             <?php if ($this->action == "update") {        ?>
                                 <input id="accid" name="id" type="hidden" value="<?= e($accInfo->id) ?>">
                             <?php    }    ?>
@@ -53,9 +53,9 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 </div>
                             </div>
                             <div id="name-inp-block" class="validation-block view-row std_margin">
-                                <label for="accname">Account name</label>
-                                <input id="accname" class="stretch-input" name="name" type="text" autocomplete="off" value="<?= e($accInfo->name) ?>">
-                                <div id="namefeedback" class="invalid-feedback"></div>
+                                <label for="nameInp">Account name</label>
+                                <input id="nameInp" class="stretch-input" name="name" type="text" autocomplete="off" value="<?= e($accInfo->name) ?>">
+                                <div id="nameFeedback" class="invalid-feedback"></div>
                             </div>
                             <div id="currency-block" class="view-row std_margin">
                                 <label for="currency">Currency</label>
@@ -64,10 +64,10 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 </div>
                             </div>
                             <div id="initbal-inp-block" class="validation-block view-row std_margin">
-                                <label for="balance">Initial balance</label>
+                                <label for="balanceInp">Initial balance</label>
                                 <div class="input-group">
-                                    <input id="balance" class="input-group__input stretch-input right-align-text" name="initbalance" type="text" autocomplete="off" value="<?= e($accInfo->initbalance) ?>">
-                                    <div id="currsign" class="input-group__text"><?= e($accInfo->sign) ?></div>
+                                    <input id="balanceInp" class="input-group__input stretch-input right-align-text" name="initbalance" type="text" autocomplete="off" value="<?= e($accInfo->initbalance) ?>">
+                                    <div id="currencySign" class="input-group__text"><?= e($accInfo->sign) ?></div>
                                 </div>
                                 <div class="invalid-feedback">Input correct initial balance.</div>
                             </div>

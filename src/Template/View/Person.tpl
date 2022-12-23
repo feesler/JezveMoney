@@ -15,7 +15,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                         <?php if ($this->action == "update") {        ?>
                             <div class="heading-actions">
                                 <?= IconButton::render([
-                                    "id" => "del_btn",
+                                    "id" => "deleteBtn",
                                     "classNames" => "circle-icon",
                                     "title" => "Delete",
                                     "icon" => "del"
@@ -29,9 +29,9 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 <input id="pid" name="id" type="hidden" value="<?= e($pInfo->id) ?>">
                             <?php    }    ?>
                             <div id="name-inp-block" class="validation-block view-row std_margin">
-                                <label for="pname">Person name</label>
-                                <input id="pname" class="stretch-input" name="name" type="text" autocomplete="off" value="<?= e($pInfo->name) ?>">
-                                <div id="namefeedback" class="invalid-feedback"></div>
+                                <label for="nameInp">Person name</label>
+                                <input id="nameInp" class="stretch-input" name="name" type="text" autocomplete="off" value="<?= e($pInfo->name) ?>">
+                                <div id="nameFeedback" class="invalid-feedback"></div>
                             </div>
 
                             <div class="form-controls">

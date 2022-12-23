@@ -60,42 +60,24 @@ class AccountView extends View {
         window.app.loadModel(AccountList, 'accounts', window.app.props.accounts);
         window.app.loadModel(IconList, 'icons', window.app.props.icons);
 
-        this.store = createStore(reducer, initialState);
-        this.store.subscribe((state, prevState) => {
-            if (state !== prevState) {
-                this.render(state, prevState);
-            }
-        });
+        this.store = createStore(reducer, { initialState });
     }
 
     /**
      * View initialization
      */
     onStart() {
-        const state = this.store.getState();
+        this.loadElementsByIds([
+            'accountForm',
+            'currencySign',
+            'balanceInp',
+            'nameInp',
+            'nameFeedback',
+            'submitBtn',
+            'cancelBtn',
+        ]);
 
-        this.form = ge('accForm');
-        this.currencySign = ge('currsign');
-        this.balanceInp = ge('balance');
-        this.nameInp = ge('accname');
-        this.nameFeedback = ge('namefeedback');
-        this.submitBtn = ge('submitBtn');
-        this.cancelBtn = ge('cancelBtn');
-        if (
-            !this.form
-            || !this.currencySign
-            || !this.balanceInp
-            || !this.nameInp
-            || !this.nameFeedback
-            || !this.submitBtn
-            || !this.cancelBtn
-        ) {
-            throw new Error('Failed to initialize Account view');
-        }
-
-        this.tile = AccountTile.fromElement('acc_tile', {
-            account: state.data,
-        });
+        this.tile = AccountTile.fromElement('accountTile');
         this.iconSelect = DropDown.create({
             elem: 'icon',
             onitemselect: (o) => this.onIconSelect(o),
@@ -107,9 +89,6 @@ class AccountView extends View {
             className: 'dd_fullwidth',
         });
         window.app.initCurrencyList(this.currencySelect);
-        if (state.original.curr_id) {
-            this.currencySelect.selectItem(state.original.curr_id);
-        }
 
         this.initBalanceDecimalInput = DecimalInput.create({
             elem: this.balanceInp,
@@ -120,7 +99,7 @@ class AccountView extends View {
             throw new Error('Failed to initialize Account view');
         }
 
-        setEvents(this.form, { submit: (e) => this.onSubmit(e) });
+        setEvents(this.accountForm, { submit: (e) => this.onSubmit(e) });
         setEvents(this.nameInp, { input: (e) => this.onNameInput(e) });
 
         this.spinner = Spinner.create();
@@ -128,13 +107,14 @@ class AccountView extends View {
         insertAfter(this.spinner.elem, this.cancelBtn);
 
         // Update mode
-        if (state.original.id) {
-            this.deleteBtn = IconButton.fromElement('del_btn', {
+        const deleteBtn = ge('deleteBtn');
+        if (deleteBtn) {
+            this.deleteBtn = IconButton.fromElement(deleteBtn, {
                 onClick: () => this.confirmDelete(),
             });
         }
 
-        this.render(state);
+        this.subscribeToStore(this.store);
     }
 
     /** Icon select event handler */
@@ -313,14 +293,19 @@ class AccountView extends View {
         this.nameFeedback.textContent = (state.validation.name === true)
             ? ''
             : state.validation.name;
+        enable(this.nameInp, !state.submitStarted);
 
         // Initial balance input
         window.app.setValidation('initbal-inp-block', state.validation.initbalance);
-
-        this.iconSelect.enable(!state.submitStarted);
-        this.currencySelect.enable(!state.submitStarted);
         enable(this.balanceInp, !state.submitStarted);
-        enable(this.nameInp, !state.submitStarted);
+
+        // Icon select
+        this.iconSelect.enable(!state.submitStarted);
+
+        // Currency select
+        this.currencySelect.selectItem(state.data.curr_id);
+        this.currencySelect.enable(!state.submitStarted);
+
         enable(this.submitBtn, !state.submitStarted);
         show(this.cancelBtn, !state.submitStarted);
 

@@ -69,7 +69,6 @@ export class ImportView extends AppView {
 
     async parseContent() {
         const res = {
-            title: { elem: await query('.content_wrap > .heading > h1') },
             uploadBtn: await IconButton.create(this, await query('#uploadBtn')),
             totalCounter: await Counter.create(this, await query('#itemsCounter')),
             enabledCounter: await Counter.create(this, await query('#enabledCounter')),
@@ -81,19 +80,17 @@ export class ImportView extends AppView {
             assert(res[child]?.elem, `Invalid structure of view: ${child} component not found`)
         ));
 
-        res.notAvailMsg = { elem: await query('#notavailmsg') };
+        res.notAvailMsg = { elem: await query('#notAvailMsg') };
         const importEnabled = !res.notAvailMsg.elem;
 
         // Heading
         [
-            res.title.value,
             res.submitBtn.disabled,
             res.uploadBtn.content.disabled,
-        ] = await evaluate((titleEl, submitBtn, uploadBtn) => ([
-            titleEl.textContent,
+        ] = await evaluate((submitBtn, uploadBtn) => ([
             submitBtn.disabled,
             uploadBtn.disabled,
-        ]), res.title.elem, res.submitBtn.elem, res.uploadBtn.elem);
+        ]), res.submitBtn.elem, res.uploadBtn.elem);
 
         res.listModeBtn = await IconButton.create(this, await query('#listModeBtn'));
 
@@ -194,7 +191,6 @@ export class ImportView extends AppView {
             res.state = 'main';
         }
 
-        res.title = cont.title.value;
         res.mainAccount = (res.enabled) ? parseInt(cont.mainAccountSelect.content.value, 10) : 0;
         res.rulesEnabled = (res.enabled) ? cont.rulesCheck.checked : false;
         res.checkSimilarEnabled = (res.enabled) ? cont.similarCheck.checked : false;
@@ -228,7 +224,6 @@ export class ImportView extends AppView {
                 visible: model.enabled && listMode,
                 disabled: !model.enabled,
             },
-            title: { value: model.title.toString(), visible: true },
             totalCounter: { visible: model.enabled },
             enabledCounter: { visible: model.enabled },
             selectedCounter: { visible: model.enabled && selectMode },

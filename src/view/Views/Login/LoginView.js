@@ -1,11 +1,13 @@
 import 'jezvejs/style';
-import { ge } from 'jezvejs';
+import { setEvents } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
-import './style.scss';
 import { parseCookies, setCookie } from '../../js/utils.js';
+import { createStore } from '../../js/store.js';
+import { actions, reducer } from './reducer.js';
+import './style.scss';
 
 /**
  * User log in view
@@ -14,7 +16,7 @@ class LoginView extends View {
     constructor(...args) {
         super(...args);
 
-        this.state = {
+        const initialState = {
             form: {
                 login: '',
                 password: '',
@@ -23,34 +25,37 @@ class LoginView extends View {
             validation: {
                 login: true,
                 password: true,
+                valid: true,
             },
         };
+
+        this.store = createStore(reducer, { initialState });
     }
 
     /**
      * View initialization
      */
     onStart() {
-        this.loginInp = ge('login');
-        this.passwordInp = ge('password');
-        const checkElem = ge('rememberCheck');
-        this.form = ge('loginfrm');
-        if (
-            !this.loginInp
-            || !this.passwordInp
-            || !checkElem
-            || !this.form
-        ) {
-            throw new Error('Failed to initialize Login view');
-        }
+        this.loadElementsByIds([
+            'form',
+            'loginInp',
+            'passwordInp',
+            'rememberCheck',
+        ]);
 
-        this.loginInp.addEventListener('input', () => this.onLoginInput());
-        this.passwordInp.addEventListener('input', () => this.onPasswordInput());
-        this.rememberCheck = Checkbox.fromElement(checkElem, {
+        setEvents(this.form, { submit: (e) => this.onSubmit(e) });
+        setEvents(this.loginInp, { input: () => this.onLoginInput() });
+        setEvents(this.passwordInp, { input: () => this.onPasswordInput() });
+
+        this.rememberCheck = Checkbox.fromElement(this.rememberCheck, {
             onChange: () => this.onToggleRememberCheck(),
         });
-        this.form.addEventListener('submit', (e) => this.onSubmit(e));
 
+        this.subscribeToStore(this.store);
+        this.onPostInit();
+    }
+
+    onPostInit() {
         this.setupCookies();
     }
 
@@ -70,26 +75,23 @@ class LoginView extends View {
     setRememberUser(value) {
         setCookie('remember', (value) ? 1 : 0);
 
-        this.state.form.remember = !!value;
-        this.render(this.state);
+        this.store.dispatch(actions.setRememberUser(value));
     }
 
     /**
      * Login field input event handler
      */
     onLoginInput() {
-        this.state.form.login = this.loginInp.value;
-        this.state.validation.login = true;
-        this.render(this.state);
+        const { value } = this.loginInp;
+        this.store.dispatch(actions.changeLogin(value));
     }
 
     /**
      * Password field input event handler
      */
     onPasswordInput() {
-        this.state.form.password = this.passwordInp.value;
-        this.state.validation.password = true;
-        this.render(this.state);
+        const { value } = this.passwordInp;
+        this.store.dispatch(actions.changePassword(value));
     }
 
     /**
@@ -104,22 +106,20 @@ class LoginView extends View {
      * Log in form submit event handler
      */
     onSubmit(e) {
-        const { login, password } = this.state.form;
-        let valid = true;
+        const state = this.store.getState();
+        const { login, password } = state.form;
 
         if (login.length === 0) {
-            this.state.validation.login = false;
-            valid = false;
+            this.store.dispatch(actions.invalidateLoginField());
         }
 
         if (password.length === 0) {
-            this.state.validation.password = false;
-            valid = false;
+            this.store.dispatch(actions.invalidatePasswordField());
         }
 
-        if (!valid) {
+        const { validation } = this.store.getState();
+        if (!validation.valid) {
             e.preventDefault();
-            this.render(this.state);
         }
     }
 
@@ -129,9 +129,11 @@ class LoginView extends View {
         }
 
         // Login input
+        this.loginInp.value = state.form.login;
         window.app.setValidation('login-inp-block', state.validation.login);
 
         // Password input
+        this.passwordInp.value = state.form.password;
         window.app.setValidation('pwd-inp-block', state.validation.password);
 
         // 'Remember me' checkbox

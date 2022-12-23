@@ -1,8 +1,8 @@
 import 'jezvejs/style';
 import {
     asArray,
-    ge,
     insertAfter,
+    isFunction,
     show,
 } from 'jezvejs';
 import { IconButton } from 'jezvejs/IconButton';
@@ -48,19 +48,13 @@ class PersonListView extends View {
             renderTime: Date.now(),
         };
 
-        this.store = createStore(reducer, initialState);
-        this.store.subscribe((state, prevState) => {
-            if (state !== prevState) {
-                this.render(state, prevState);
-            }
-        });
+        this.store = createStore(reducer, { initialState });
     }
 
     /**
      * View initialization
      */
     onStart() {
-        const state = this.store.getState();
         const listProps = {
             ItemComponent: CategoryItem,
             getItemProps: (item, { listMode }) => ({
@@ -71,25 +65,20 @@ class PersonListView extends View {
             }),
             className: 'categories-list',
             itemSelector: '.category-item',
-            listMode: state.listMode,
+            listMode: 'list',
             noItemsMessage: MSG_NO_DATA,
             onItemClick: (id, e) => this.onItemClick(id, e),
         };
 
-        const elemIds = [
+        this.loadElementsByIds([
             'contentHeader',
             'itemsCount',
             'selectedCounter',
             'selItemsCount',
             'heading',
+            'createBtn',
             'contentContainer',
-        ];
-        elemIds.forEach((id) => {
-            this[id] = ge(id);
-            if (!this[id]) {
-                throw new Error('Failed to initialize view');
-            }
-        });
+        ]);
 
         this.heading = Heading.fromElement(this.heading, {
             title: STR_TITLE,
@@ -97,8 +86,6 @@ class PersonListView extends View {
 
         this.list = ListContainer.create(listProps);
         this.contentContainer.append(this.list.elem);
-
-        this.createBtn = ge('add_btn');
 
         this.listModeBtn = IconButton.create({
             id: 'listModeBtn',
@@ -118,7 +105,7 @@ class PersonListView extends View {
         });
         this.contentContainer.append(this.loadingIndicator.elem);
 
-        this.render(state);
+        this.subscribeToStore(this.store);
     }
 
     createMenu() {
@@ -128,15 +115,15 @@ class PersonListView extends View {
                 id: 'selectModeBtn',
                 icon: 'select',
                 title: 'Select',
-                onClick: () => this.toggleSelectMode(),
+                onClick: () => this.onMenuClick('selectModeBtn'),
             }, {
                 id: 'selectAllBtn',
                 title: 'Select all',
-                onClick: () => this.selectAll(),
+                onClick: () => this.onMenuClick('selectAllBtn'),
             }, {
                 id: 'deselectAllBtn',
                 title: 'Clear selection',
-                onClick: () => this.deselectAll(),
+                onClick: () => this.onMenuClick('deselectAllBtn'),
             }, {
                 id: 'separator2',
                 type: 'separator',
@@ -144,9 +131,16 @@ class PersonListView extends View {
                 id: 'deleteBtn',
                 icon: 'del',
                 title: 'Delete',
-                onClick: () => this.confirmDelete(),
+                onClick: () => this.onMenuClick('deleteBtn'),
             }],
         });
+
+        this.menuActions = {
+            selectModeBtn: () => this.toggleSelectMode(),
+            selectAllBtn: () => this.selectAll(),
+            deselectAllBtn: () => this.deselectAll(),
+            deleteBtn: () => this.confirmDelete(),
+        };
     }
 
     createContextMenu() {
@@ -165,6 +159,17 @@ class PersonListView extends View {
                 onClick: () => this.confirmDelete(),
             }],
         });
+    }
+
+    onMenuClick(item) {
+        this.menu.hideMenu();
+
+        const menuAction = this.menuActions[item];
+        if (!isFunction(menuAction)) {
+            return;
+        }
+
+        menuAction();
     }
 
     onItemClick(itemId, e) {
