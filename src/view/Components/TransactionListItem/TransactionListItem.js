@@ -334,22 +334,20 @@ export class TransactionListItem extends Component {
         const destAmountFmt = currencyModel.formatCurrency(item.dest_amount, item.dest_curr);
         const diffCurrency = item.src_curr !== item.dest_curr;
 
-        let sign;
+        let sign = '';
         if (item.type === EXPENSE) {
             sign = '- ';
         }
         if (item.type === INCOME) {
             sign = '+ ';
         }
-        if (item.type === TRANSFER) {
-            sign = '';
-        }
 
         if (item.type === DEBT) {
             const debtType = this.getDebtType(item);
             const acc = (debtType) ? item.dest_id : item.src_id;
-
-            sign = (!!acc === debtType) ? '+ ' : '- ';
+            if (!acc) {
+                sign = (debtType) ? '- ' : '+ ';
+            }
         }
 
         return (diffCurrency)

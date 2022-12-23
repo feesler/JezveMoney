@@ -63,7 +63,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 <label for="srcAmountInput"><?= e($srcAmountLbl) ?></label>
                                 <div class="input-group">
                                     <input id="srcAmountInput" name="src_amount" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?= e($form["src_amount"]) ?>">
-                                    <?php if ($tr["type"] == INCOME) { ?>
+                                    <?php if ($tr["type"] == INCOME || ($tr["type"] == DEBT && $debtType)) { ?>
                                         <button id="srcCurrBtn" class="input-group__btn" type="button" tabindex="-1">
                                             <div id="srcAmountSign" class="input-group__btn-title"><?= e($form["srcCurrSign"]) ?></div>
                                         </button>
@@ -81,7 +81,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 <label for="destAmountInput"><?= e($destAmountLbl) ?></label>
                                 <div class="input-group">
                                     <input id="destAmountInput" name="dest_amount" class="input-group__input stretch-input right-align-text" type="text" autocomplete="off" value="<?= e($form["dest_amount"]) ?>">
-                                    <?php if ($tr["type"] == EXPENSE) { ?>
+                                    <?php if ($tr["type"] == EXPENSE || ($tr["type"] == DEBT && !$debtType)) { ?>
                                         <button id="destCurrBtn" class="input-group__btn" type="button" tabindex="-1">
                                             <div id="destAmountSign" class="input-group__btn-title"><?= e($form["destCurrSign"]) ?></div>
                                         </button>

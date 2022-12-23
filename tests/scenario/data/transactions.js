@@ -151,15 +151,15 @@ export const createTransactions = async () => {
         type: DEBT,
         op: 2,
         person_id: MARIA,
-        src_amount: '990.99',
-        src_curr: RUB,
+        dest_amount: '990.99',
+        dest_curr: RUB,
         comment: 'ппп ppp',
     }, {
         type: DEBT,
         op: 2,
         person_id: IVAN,
         acc_id: ACC_USD,
-        src_amount: '105',
+        dest_amount: '105',
         comment: '6050 кккк',
     }, {
         type: DEBT,

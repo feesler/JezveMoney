@@ -166,16 +166,24 @@ class TransactionView extends View {
                 initialState.srcAccount = initialState.personAccount;
                 initialState.account = initialState.destAccount;
 
-                initialState.id = (initialState.transaction.noAccount)
-                    ? STATE.DG_NOACC_S_AMOUNT
-                    : STATE.DG_S_AMOUNT;
+                if (initialState.isDiff) {
+                    initialState.id = STATE.DG_S_AMOUNT_D_AMOUNT;
+                } else {
+                    initialState.id = (initialState.transaction.noAccount)
+                        ? STATE.DG_NOACC_S_AMOUNT
+                        : STATE.DG_S_AMOUNT;
+                }
             } else {
                 initialState.destAccount = initialState.personAccount;
                 initialState.account = initialState.srcAccount;
 
-                initialState.id = (transaction.noAccount)
-                    ? STATE.DT_NOACC_S_AMOUNT
-                    : STATE.DT_S_AMOUNT;
+                if (initialState.isDiff) {
+                    initialState.id = STATE.DT_S_AMOUNT_D_AMOUNT;
+                } else {
+                    initialState.id = (transaction.noAccount)
+                        ? STATE.DT_NOACC_D_AMOUNT
+                        : STATE.DT_D_AMOUNT;
+                }
             }
         }
 
@@ -1101,37 +1109,126 @@ class TransactionView extends View {
     }
 
     renderDebt(state) {
-        this.destAmountSwitch(HIDE_BOTH);
-        this.exchRateSwitch(HIDE_BOTH);
-
-        if (state.id === STATE.DG_S_AMOUNT || state.id === STATE.DT_S_AMOUNT) {
+        if (state.id === STATE.DG_S_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INFO);
-        } else if (state.id === STATE.DG_S_RESULT || state.id === STATE.DT_S_RESULT) {
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (state.id === STATE.DG_S_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INPUT);
             this.resBalanceDestSwitch(SHOW_INFO);
-        } else if (state.id === STATE.DG_D_RESULT || state.id === STATE.DT_D_RESULT) {
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (state.id === STATE.DG_D_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (state.id === STATE.DT_D_AMOUNT) {
+            this.srcAmountSwitch(HIDE_BOTH);
+            this.destAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (state.id === STATE.DT_D_RESULT) {
+            this.srcAmountSwitch(HIDE_BOTH);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (state.id === STATE.DT_S_RESULT) {
+            this.srcAmountSwitch(HIDE_BOTH);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(HIDE_BOTH);
         } else if (state.id === STATE.DG_NOACC_S_AMOUNT) {
             this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INFO);
             this.resBalanceDestSwitch(HIDE_BOTH);
-        } else if (state.id === STATE.DT_NOACC_S_AMOUNT) {
-            this.srcAmountSwitch(SHOW_INPUT);
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (state.id === STATE.DT_NOACC_D_AMOUNT) {
+            this.srcAmountSwitch(HIDE_BOTH);
+            this.destAmountSwitch(SHOW_INPUT);
             this.resBalanceSwitch(HIDE_BOTH);
             this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(HIDE_BOTH);
         } else if (state.id === STATE.DT_NOACC_D_RESULT) {
-            this.srcAmountSwitch(SHOW_INFO);
+            this.srcAmountSwitch(HIDE_BOTH);
+            this.destAmountSwitch(SHOW_INFO);
             this.resBalanceSwitch(HIDE_BOTH);
             this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(HIDE_BOTH);
         } else if (state.id === STATE.DG_NOACC_S_RESULT) {
             this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(HIDE_BOTH);
             this.resBalanceSwitch(SHOW_INPUT);
             this.resBalanceDestSwitch(HIDE_BOTH);
+            this.exchRateSwitch(HIDE_BOTH);
+        } else if (
+            state.id === STATE.DG_S_AMOUNT_D_AMOUNT
+            || state.id === STATE.DT_S_AMOUNT_D_AMOUNT
+        ) {
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INFO);
+        } else if (
+            state.id === STATE.DG_D_AMOUNT_S_RESULT
+            || state.id === STATE.DT_D_AMOUNT_S_RESULT
+        ) {
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INFO);
+        } else if (state.id === STATE.DG_S_AMOUNT_EXCH) {
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INPUT);
+        } else if (state.id === STATE.DG_S_RESULT_EXCH) {
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INPUT);
+        } else if (
+            state.id === STATE.DG_S_RESULT_D_RESULT
+            || state.id === STATE.DT_S_RESULT_D_RESULT
+        ) {
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INPUT);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(SHOW_INFO);
+        } else if (
+            state.id === STATE.DG_S_AMOUNT_D_RESULT
+            || state.id === STATE.DT_S_AMOUNT_D_RESULT
+        ) {
+            this.srcAmountSwitch(SHOW_INPUT);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(SHOW_INFO);
+        } else if (state.id === STATE.DT_D_AMOUNT_EXCH) {
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(SHOW_INPUT);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INFO);
+            this.exchRateSwitch(SHOW_INPUT);
+        } else if (state.id === STATE.DT_D_RESULT_EXCH) {
+            this.srcAmountSwitch(SHOW_INFO);
+            this.destAmountSwitch(SHOW_INFO);
+            this.resBalanceSwitch(SHOW_INFO);
+            this.resBalanceDestSwitch(SHOW_INPUT);
+            this.exchRateSwitch(SHOW_INPUT);
         }
 
         const { debtType, noAccount } = state.transaction;
@@ -1174,14 +1271,14 @@ class TransactionView extends View {
         this.srcResBalanceRowLabel.textContent = (debtType) ? 'Result balance (Person)' : 'Result balance (Account)';
         this.destResBalanceRowLabel.textContent = (debtType) ? 'Result balance (Account)' : 'Result balance (Person)';
 
-        this.enableSourceCurrencySelect(false);
-        this.enableDestCurrencySelect(false);
+        this.enableSourceCurrencySelect(debtType);
+        this.enableDestCurrencySelect(!debtType);
 
         this.personIdInp.value = state.person.id;
 
         const currencyModel = window.app.model.currency;
-        const srcCurrency = currencyModel.getItem(state.transaction.src_curr);
-        const personBalance = srcCurrency.formatValue(state.personAccount.balance);
+        const personAccountCurr = currencyModel.getItem(state.personAccount.curr_id);
+        const personBalance = personAccountCurr.formatValue(state.personAccount.balance);
         this.personTile.setState({
             title: state.person.name,
             subtitle: personBalance,
@@ -1349,7 +1446,10 @@ class TransactionView extends View {
         // Source currency
         this.srcCurrInp.value = transaction.src_curr;
         this.setSign(this.srcAmountSign, this.srcCurrDDList, transaction.src_curr);
-        if (transaction.type === INCOME) {
+        if (
+            transaction.type === INCOME
+            || (transaction.type === DEBT && transaction.debtType)
+        ) {
             this.initSrcCurrList(state);
         }
         enable(this.srcCurrBtn, !state.submitStarted);
@@ -1365,7 +1465,10 @@ class TransactionView extends View {
         // Destination currency
         this.destCurrInp.value = transaction.dest_curr;
         this.setSign(this.destAmountSign, this.destCurrDDList, transaction.dest_curr);
-        if (transaction.type === EXPENSE) {
+        if (
+            transaction.type === EXPENSE
+            || (transaction.type === DEBT && !transaction.debtType)
+        ) {
             this.initDestCurrList(state);
         }
         enable(this.destCurrBtn, !state.submitStarted);

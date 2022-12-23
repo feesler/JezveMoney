@@ -133,7 +133,7 @@ export class TransactionListItem extends TestComponent {
 
             res.accountTitle = destAcc.name;
         } else if (transaction.type === TRANSFER) {
-            res.amountText = App.currency.format(transaction.src_curr, transaction.src_amount);
+            res.amountText = srcAmountFmt;
             if (transaction.src_curr !== transaction.dest_curr) {
                 res.amountText += ` (${destAmountFmt})`;
             }
@@ -148,21 +148,27 @@ export class TransactionListItem extends TestComponent {
 
             const acc = (debtType) ? destAcc : srcAcc;
 
+            let sign = '';
             if (debtType) {
                 res.accountTitle = person.name;
                 if (acc) {
                     res.accountTitle += ` → ${acc.name}`;
+                } else {
+                    sign = '- ';
                 }
-                res.amountText = (acc) ? '+ ' : '- ';
             } else {
                 if (acc) {
                     res.accountTitle = `${acc.name} → `;
+                } else {
+                    sign = '+ ';
                 }
                 res.accountTitle += person.name;
-                res.amountText = (srcAcc) ? '- ' : '+ ';
             }
 
-            res.amountText += App.currency.format(personAcc.curr_id, transaction.src_amount);
+            res.amountText = `${sign}${srcAmountFmt}`;
+            if (transaction.src_curr !== transaction.dest_curr) {
+                res.amountText += ` (${sign}${destAmountFmt})`;
+            }
         }
 
         res.dateFmt = transaction.date;

@@ -1,3 +1,4 @@
+import { isObject } from 'jezvejs';
 import {
     normalize,
     normalizeExch,
@@ -211,175 +212,169 @@ const getPersonAccount = (personId, currencyId) => {
     };
 };
 
+const stateTransition = (state, stateMap) => {
+    if (!state || !stateMap) {
+        throw new Error('Invalid parameters');
+    }
+
+    if (!isObject(stateMap)) {
+        return stateMap;
+    }
+    const res = stateMap[state.id];
+    if (typeof res === 'undefined') {
+        throw new Error('Invalid state');
+    }
+
+    return res;
+};
+
+const stateTransitionByType = (state, stateMap) => {
+    if (!state || !stateMap) {
+        throw new Error('Invalid parameters');
+    }
+
+    const typeMap = stateMap[state.transaction.type];
+    if (typeof typeMap === 'undefined') {
+        throw new Error('Invalid transaction type');
+    }
+
+    return stateTransition(state, typeMap);
+};
+
 // Reducers
 const slice = createSlice({
     sourceAmountClick: (state) => {
-        let newId = state.id;
-        if (state.transaction.type === INCOME) {
-            if (state.id === STATE.I_D_RESULT) {
-                newId = STATE.I_S_AMOUNT;
-            }
-        }
+        const stateMap = {
+            [STATE.I_D_RESULT]: STATE.I_S_AMOUNT,
+            [STATE.T_S_RESULT]: STATE.T_S_AMOUNT,
+            [STATE.T_D_RESULT]: STATE.T_S_AMOUNT,
+            [STATE.T_D_AMOUNT_S_RESULT]: STATE.T_S_AMOUNT_D_AMOUNT,
+            [STATE.T_S_RESULT_D_RESULT]: STATE.T_S_AMOUNT_D_RESULT,
+            [STATE.T_EXCH_S_RESULT]: STATE.T_S_AMOUNT_EXCH,
+            [STATE.DG_S_RESULT]: STATE.DG_S_AMOUNT,
+            [STATE.DG_D_RESULT]: STATE.DG_S_AMOUNT,
+            [STATE.DT_D_RESULT]: STATE.DT_D_AMOUNT,
+            [STATE.DT_S_RESULT]: STATE.DT_D_AMOUNT,
+            [STATE.DT_NOACC_D_RESULT]: STATE.DT_NOACC_D_AMOUNT,
+            [STATE.DG_NOACC_S_RESULT]: STATE.DG_NOACC_S_AMOUNT,
+            [STATE.DG_D_AMOUNT_S_RESULT]: STATE.DG_S_AMOUNT_D_AMOUNT,
+            [STATE.DG_S_RESULT_EXCH]: STATE.DG_S_AMOUNT_EXCH,
+            [STATE.DG_S_RESULT_D_RESULT]: STATE.DG_S_AMOUNT_D_RESULT,
+            [STATE.DT_D_AMOUNT_S_RESULT]: STATE.DT_S_AMOUNT_D_AMOUNT,
+            [STATE.DT_D_AMOUNT_EXCH]: STATE.DT_S_AMOUNT_D_AMOUNT,
+            [STATE.DT_S_RESULT_D_RESULT]: STATE.DT_S_AMOUNT_D_RESULT,
+            [STATE.DT_D_RESULT_EXCH]: STATE.DT_S_AMOUNT_D_RESULT,
+        };
 
-        if (state.transaction.type === TRANSFER) {
-            if (state.id === STATE.T_S_RESULT || state.id === STATE.T_D_RESULT) {
-                newId = STATE.T_S_AMOUNT;
-            } else if (state.id === STATE.T_D_AMOUNT_S_RESULT) {
-                newId = STATE.T_S_AMOUNT_D_AMOUNT;
-            } else if (state.id === STATE.T_S_RESULT_D_RESULT) {
-                newId = STATE.T_S_AMOUNT_D_RESULT;
-            } else if (state.id === STATE.T_EXCH_S_RESULT) {
-                newId = STATE.T_S_AMOUNT_EXCH;
-            }
-        }
-
-        if (state.transaction.type === DEBT) {
-            if (state.id === STATE.DG_S_RESULT || state.id === STATE.DG_D_RESULT) {
-                newId = STATE.DG_S_AMOUNT;
-            } else if (state.id === STATE.DT_D_RESULT || state.id === STATE.DT_S_RESULT) {
-                newId = STATE.DT_S_AMOUNT;
-            } else if (state.id === STATE.DT_NOACC_D_RESULT) {
-                newId = STATE.DT_NOACC_S_AMOUNT;
-            } else if (state.id === STATE.DG_NOACC_S_RESULT) {
-                newId = STATE.DG_NOACC_S_AMOUNT;
-            }
-        }
-
+        const newId = stateTransition(state, stateMap);
         return (newId === state.id) ? state : { ...state, id: newId };
     },
 
     destAmountClick: (state) => {
-        let newId = state.id;
-        if (state.transaction.type === EXPENSE) {
-            if (state.id === STATE.E_S_RESULT) {
-                newId = STATE.E_D_AMOUNT;
-            } else if (
-                state.id === STATE.E_S_AMOUNT_EXCH
-                || state.id === STATE.E_S_AMOUNT_S_RESULT
-            ) {
-                newId = STATE.E_S_AMOUNT_D_AMOUNT;
-            }
-        }
+        const stateMap = {
+            [STATE.E_S_RESULT]: STATE.E_D_AMOUNT,
+            [STATE.E_S_AMOUNT_EXCH]: STATE.E_S_AMOUNT_D_AMOUNT,
+            [STATE.E_S_AMOUNT_S_RESULT]: STATE.E_S_AMOUNT_D_AMOUNT,
+            [STATE.I_S_AMOUNT_EXCH]: STATE.I_S_AMOUNT_D_AMOUNT,
+            [STATE.I_S_AMOUNT_D_RESULT]: STATE.I_S_AMOUNT_D_AMOUNT,
+            [STATE.T_S_AMOUNT_D_RESULT]: STATE.T_S_AMOUNT_D_AMOUNT,
+            [STATE.T_S_AMOUNT_EXCH]: STATE.T_S_AMOUNT_D_AMOUNT,
+            [STATE.T_S_RESULT_D_RESULT]: STATE.T_D_AMOUNT_S_RESULT,
+            [STATE.T_EXCH_S_RESULT]: STATE.T_D_AMOUNT_S_RESULT,
+            [STATE.DG_S_AMOUNT_EXCH]: STATE.DG_S_AMOUNT_D_AMOUNT,
+            [STATE.DG_S_RESULT_EXCH]: STATE.DG_D_AMOUNT_S_RESULT,
+            [STATE.DG_S_AMOUNT_D_RESULT]: STATE.DG_S_AMOUNT_D_AMOUNT,
+            [STATE.DT_NOACC_D_RESULT]: STATE.DT_NOACC_D_AMOUNT,
+            [STATE.DT_S_RESULT_D_RESULT]: STATE.DT_D_AMOUNT_S_RESULT,
+            [STATE.DT_D_RESULT_EXCH]: STATE.DT_D_AMOUNT_EXCH,
+            [STATE.DG_S_RESULT_D_RESULT]: STATE.DG_D_AMOUNT_S_RESULT,
+            [STATE.DT_S_AMOUNT_D_RESULT]: STATE.DT_S_AMOUNT_D_AMOUNT,
+        };
 
-        if (state.transaction.type === INCOME) {
-            if (state.id === STATE.I_S_AMOUNT_EXCH || state.id === STATE.I_S_AMOUNT_D_RESULT) {
-                newId = STATE.I_S_AMOUNT_D_AMOUNT;
-            }
-        }
-
-        if (state.transaction.type === TRANSFER) {
-            if (state.id === STATE.T_S_AMOUNT_D_RESULT || state.id === STATE.T_S_AMOUNT_EXCH) {
-                newId = STATE.T_S_AMOUNT_D_AMOUNT;
-            } else if (
-                state.id === STATE.T_S_RESULT_D_RESULT
-                || state.id === STATE.T_EXCH_S_RESULT
-            ) {
-                newId = STATE.T_D_AMOUNT_S_RESULT;
-            }
-        }
-
+        const newId = stateTransition(state, stateMap);
         return (newId === state.id) ? state : { ...state, id: newId };
     },
 
     sourceResultClick: (state) => {
-        let newId = state.id;
-        if (state.transaction.type === EXPENSE) {
-            if (state.id === STATE.E_D_AMOUNT) {
-                newId = STATE.E_S_RESULT;
-            } else if (
-                state.id === STATE.E_S_AMOUNT_D_AMOUNT
-                || state.id === STATE.E_S_AMOUNT_EXCH
-            ) {
-                newId = STATE.E_S_AMOUNT_S_RESULT;
-            }
-        }
+        const stateMap = {
+            [STATE.E_D_AMOUNT]: STATE.E_S_RESULT,
+            [STATE.E_S_AMOUNT_D_AMOUNT]: STATE.E_S_AMOUNT_S_RESULT,
+            [STATE.E_S_AMOUNT_EXCH]: STATE.E_S_AMOUNT_S_RESULT,
+            [STATE.T_S_AMOUNT]: STATE.T_S_RESULT,
+            [STATE.T_D_RESULT]: STATE.T_S_RESULT,
+            [STATE.T_S_AMOUNT_D_AMOUNT]: STATE.T_D_AMOUNT_S_RESULT,
+            [STATE.T_S_AMOUNT_D_RESULT]: STATE.T_S_RESULT_D_RESULT,
+            [STATE.T_S_AMOUNT_EXCH]: STATE.T_EXCH_S_RESULT,
+            [STATE.DG_S_AMOUNT]: STATE.DG_S_RESULT,
+            [STATE.DG_D_RESULT]: STATE.DG_S_RESULT,
+            [STATE.DT_D_AMOUNT]: STATE.DT_S_RESULT,
+            [STATE.DT_D_RESULT]: STATE.DT_S_RESULT,
+            [STATE.DG_NOACC_S_AMOUNT]: STATE.DG_NOACC_S_RESULT,
+            [STATE.DT_S_AMOUNT_D_AMOUNT]: STATE.DT_D_AMOUNT_S_RESULT,
+            [STATE.DT_S_AMOUNT_D_RESULT]: STATE.DT_S_RESULT_D_RESULT,
+            [STATE.DT_D_RESULT_EXCH]: STATE.DT_S_RESULT_D_RESULT,
+            [STATE.DT_D_AMOUNT_EXCH]: STATE.DT_D_AMOUNT_S_RESULT,
+            [STATE.DG_S_AMOUNT_EXCH]: STATE.DG_S_RESULT_EXCH,
+            [STATE.DG_S_AMOUNT_D_RESULT]: STATE.DG_S_RESULT_D_RESULT,
+            [STATE.DG_S_AMOUNT_D_AMOUNT]: STATE.DG_D_AMOUNT_S_RESULT,
+        };
 
-        if (state.transaction.type === TRANSFER) {
-            if (state.id === STATE.T_S_AMOUNT || state.id === STATE.T_D_RESULT) {
-                newId = STATE.T_S_RESULT;
-            } else if (state.id === STATE.T_S_AMOUNT_D_AMOUNT) {
-                newId = STATE.T_D_AMOUNT_S_RESULT;
-            } else if (state.id === STATE.T_S_AMOUNT_D_RESULT) {
-                newId = STATE.T_S_RESULT_D_RESULT;
-            } else if (state.id === STATE.T_S_AMOUNT_EXCH) {
-                newId = STATE.T_EXCH_S_RESULT;
-            }
-        }
-
-        if (state.transaction.type === DEBT) {
-            if (state.id === STATE.DG_S_AMOUNT || state.id === STATE.DG_D_RESULT) {
-                newId = STATE.DG_S_RESULT;
-            } else if (state.id === STATE.DT_S_AMOUNT || state.id === STATE.DT_D_RESULT) {
-                newId = STATE.DT_S_RESULT;
-            } else if (state.id === STATE.DG_NOACC_S_AMOUNT) {
-                newId = STATE.DG_NOACC_S_RESULT;
-            }
-        }
-
+        const newId = stateTransition(state, stateMap);
         return (newId === state.id) ? state : { ...state, id: newId };
     },
 
     destResultClick: (state) => {
-        let newId = state.id;
-        if (state.transaction.type === INCOME) {
-            if (state.id === STATE.I_S_AMOUNT) {
-                newId = STATE.I_D_RESULT;
-            } else if (
-                state.id === STATE.I_S_AMOUNT_D_AMOUNT
-                || state.id === STATE.I_S_AMOUNT_EXCH
-            ) {
-                newId = STATE.I_S_AMOUNT_D_RESULT;
-            }
-        }
+        const stateMap = {
+            [STATE.I_S_AMOUNT]: STATE.I_D_RESULT,
+            [STATE.I_S_AMOUNT_D_AMOUNT]: STATE.I_S_AMOUNT_D_RESULT,
+            [STATE.I_S_AMOUNT_EXCH]: STATE.I_S_AMOUNT_D_RESULT,
+            [STATE.T_S_AMOUNT]: STATE.T_D_RESULT,
+            [STATE.T_S_RESULT]: STATE.T_D_RESULT,
+            [STATE.T_S_AMOUNT_D_AMOUNT]: STATE.T_S_AMOUNT_D_RESULT,
+            [STATE.T_S_AMOUNT_EXCH]: STATE.T_S_AMOUNT_D_RESULT,
+            [STATE.T_D_AMOUNT_S_RESULT]: STATE.T_S_RESULT_D_RESULT,
+            [STATE.T_EXCH_S_RESULT]: STATE.T_S_RESULT_D_RESULT,
+            [STATE.DG_S_AMOUNT]: STATE.DG_D_RESULT,
+            [STATE.DG_S_RESULT]: STATE.DG_D_RESULT,
+            [STATE.DT_D_AMOUNT]: STATE.DT_D_RESULT,
+            [STATE.DT_S_RESULT]: STATE.DT_D_RESULT,
+            [STATE.DT_NOACC_D_AMOUNT]: STATE.DT_NOACC_D_RESULT,
+            [STATE.DG_S_AMOUNT_D_AMOUNT]: STATE.DG_S_AMOUNT_D_RESULT,
+            [STATE.DG_S_AMOUNT_EXCH]: STATE.DG_S_AMOUNT_D_RESULT,
+            [STATE.DG_D_AMOUNT_S_RESULT]: STATE.DG_S_RESULT_D_RESULT,
+            [STATE.DT_S_AMOUNT_D_AMOUNT]: STATE.DT_S_AMOUNT_D_RESULT,
+            [STATE.DT_D_AMOUNT_EXCH]: STATE.DT_D_RESULT_EXCH,
+            [STATE.DT_D_AMOUNT_S_RESULT]: STATE.DT_S_RESULT_D_RESULT,
+            [STATE.DG_S_RESULT_EXCH]: STATE.DG_S_RESULT_D_RESULT,
+        };
 
-        if (state.transaction.type === TRANSFER) {
-            if (state.id === STATE.T_S_AMOUNT || state.id === STATE.T_S_RESULT) {
-                newId = STATE.T_D_RESULT;
-            } else if (
-                state.id === STATE.T_S_AMOUNT_D_AMOUNT
-                || state.id === STATE.T_S_AMOUNT_EXCH
-            ) {
-                newId = STATE.T_S_AMOUNT_D_RESULT;
-            } else if (
-                state.id === STATE.T_D_AMOUNT_S_RESULT
-                || state.id === STATE.T_EXCH_S_RESULT
-            ) {
-                newId = STATE.T_S_RESULT_D_RESULT;
-            }
-        }
-
-        if (state.transaction.type === DEBT) {
-            if (state.id === STATE.DG_S_AMOUNT || state.id === STATE.DG_S_RESULT) {
-                newId = STATE.DG_D_RESULT;
-            } else if (state.id === STATE.DT_S_AMOUNT || state.id === STATE.DT_S_RESULT) {
-                newId = STATE.DT_D_RESULT;
-            } else if (state.id === STATE.DT_NOACC_S_AMOUNT) {
-                newId = STATE.DT_NOACC_D_RESULT;
-            }
-        }
-
+        const newId = stateTransition(state, stateMap);
         return (newId === state.id) ? state : { ...state, id: newId };
     },
 
     exchangeClick: (state) => {
-        let newId = state.id;
-        if (state.transaction.type === EXPENSE) {
-            newId = STATE.E_S_AMOUNT_EXCH;
-        }
-        if (state.transaction.type === INCOME) {
-            newId = STATE.I_S_AMOUNT_EXCH;
-        }
-        if (state.transaction.type === TRANSFER) {
-            if (state.id === STATE.T_S_AMOUNT_D_AMOUNT || state.id === STATE.T_S_AMOUNT_D_RESULT) {
-                newId = STATE.T_S_AMOUNT_EXCH;
-            } else if (
-                state.id === STATE.T_D_AMOUNT_S_RESULT
-                || state.id === STATE.T_S_RESULT_D_RESULT
-            ) {
-                newId = STATE.T_EXCH_S_RESULT;
-            }
-        }
+        const stateMap = {
+            [EXPENSE]: STATE.E_S_AMOUNT_EXCH,
+            [INCOME]: STATE.I_S_AMOUNT_EXCH,
+            [TRANSFER]: {
+                [STATE.T_S_AMOUNT_D_AMOUNT]: STATE.T_S_AMOUNT_EXCH,
+                [STATE.T_S_AMOUNT_D_RESULT]: STATE.T_S_AMOUNT_EXCH,
+                [STATE.T_D_AMOUNT_S_RESULT]: STATE.T_EXCH_S_RESULT,
+                [STATE.T_S_RESULT_D_RESULT]: STATE.T_EXCH_S_RESULT,
+            },
+            [DEBT]: {
+                [STATE.DG_S_AMOUNT_D_AMOUNT]: STATE.DG_S_AMOUNT_EXCH,
+                [STATE.DG_D_AMOUNT_S_RESULT]: STATE.DG_S_RESULT_EXCH,
+                [STATE.DG_S_AMOUNT_D_RESULT]: STATE.DG_S_AMOUNT_EXCH,
+                [STATE.DG_S_RESULT_D_RESULT]: STATE.DG_S_RESULT_EXCH,
+                [STATE.DT_S_AMOUNT_D_AMOUNT]: STATE.DT_D_AMOUNT_EXCH,
+                [STATE.DT_S_AMOUNT_D_RESULT]: STATE.DT_D_RESULT_EXCH,
+                [STATE.DT_D_AMOUNT_S_RESULT]: STATE.DT_D_AMOUNT_EXCH,
+                [STATE.DT_S_RESULT_D_RESULT]: STATE.DT_D_RESULT_EXCH,
+            },
+        };
 
+        const newId = stateTransitionByType(state, stateMap);
         return (newId === state.id) ? state : { ...state, id: newId };
     },
 
@@ -413,7 +408,7 @@ const slice = createSlice({
         if (transaction.type === EXPENSE) {
             // If currencies are same before account was changed
             // then copy source currency to destination
-            if (state.id === STATE.E_D_AMOUNT || state.id === STATE.E_S_RESULT) {
+            if (!state.isDiff) {
                 transaction.dest_curr = srcAccount.curr_id;
                 newState.destCurrency = srcCurrency;
             }
@@ -421,20 +416,16 @@ const slice = createSlice({
             updateStateExchange(newState);
 
             newState.isDiff = transaction.src_curr !== transaction.dest_curr;
-            if (!newState.isDiff) {
-                const availStates = [
-                    STATE.E_S_AMOUNT_D_AMOUNT,
-                    STATE.E_S_AMOUNT_EXCH,
-                    STATE.E_S_AMOUNT_S_RESULT,
-                ];
-                if (availStates.includes(newState.id)) {
-                    const srcAmount = transaction.src_amount;
-                    transaction.dest_amount = srcAmount;
-                    newState.form.destAmount = srcAmount;
-                    newState.id = (newState.id === STATE.E_S_AMOUNT_S_RESULT)
-                        ? STATE.E_S_RESULT
-                        : STATE.E_D_AMOUNT;
-                }
+            if (state.isDiff && !newState.isDiff) {
+                newState.id = stateTransition(state, {
+                    [STATE.E_S_AMOUNT_D_AMOUNT]: STATE.E_D_AMOUNT,
+                    [STATE.E_S_AMOUNT_EXCH]: STATE.E_D_AMOUNT,
+                    [STATE.E_S_AMOUNT_S_RESULT]: STATE.E_S_RESULT,
+                });
+
+                const srcAmount = transaction.src_amount;
+                transaction.dest_amount = srcAmount;
+                newState.form.destAmount = srcAmount;
             }
         }
 
@@ -445,33 +436,27 @@ const slice = createSlice({
             }
 
             newState.isDiff = transaction.src_curr !== transaction.dest_curr;
-            if (newState.isDiff) {
-                if (newState.id === STATE.T_S_AMOUNT) {
-                    newState.id = STATE.T_S_AMOUNT_D_AMOUNT;
-                } else if (newState.id === STATE.T_S_RESULT) {
-                    newState.id = STATE.T_D_AMOUNT_S_RESULT;
-                } else if (newState.id === STATE.T_D_RESULT) {
-                    newState.id = STATE.T_S_AMOUNT_D_RESULT;
-                }
-            } else {
-                if (transaction.dest_amount !== transaction.src_amount) {
-                    setStateDestAmount(newState, transaction.src_amount);
-                }
+            if (!newState.isDiff && transaction.dest_amount !== transaction.src_amount) {
+                setStateDestAmount(newState, transaction.src_amount);
+            }
 
-                if (
-                    newState.id === STATE.T_S_AMOUNT_D_AMOUNT
-                    || newState.id === STATE.T_S_AMOUNT_EXCH
-                ) {
-                    newState.id = STATE.T_S_AMOUNT;
-                } else if (
-                    newState.id === STATE.T_D_AMOUNT_S_RESULT
-                    || newState.id === STATE.T_S_RESULT_D_RESULT
-                    || newState.id === STATE.T_EXCH_S_RESULT
-                ) {
-                    newState.id = STATE.T_S_RESULT;
-                } else if (newState.id === STATE.T_S_AMOUNT_D_RESULT) {
-                    newState.id = STATE.T_D_RESULT;
-                }
+            const diffCurrStateMap = {
+                [STATE.T_S_AMOUNT]: STATE.T_S_AMOUNT_D_AMOUNT,
+                [STATE.T_S_RESULT]: STATE.T_D_AMOUNT_S_RESULT,
+                [STATE.T_D_RESULT]: STATE.T_S_AMOUNT_D_RESULT,
+            };
+            const sameCurrStateMap = {
+                [STATE.T_S_AMOUNT_D_AMOUNT]: STATE.T_S_AMOUNT,
+                [STATE.T_S_AMOUNT_EXCH]: STATE.T_S_AMOUNT,
+                [STATE.T_D_AMOUNT_S_RESULT]: STATE.T_S_RESULT,
+                [STATE.T_S_RESULT_D_RESULT]: STATE.T_S_RESULT,
+                [STATE.T_EXCH_S_RESULT]: STATE.T_S_RESULT,
+                [STATE.T_S_AMOUNT_D_RESULT]: STATE.T_D_RESULT,
+            };
+
+            if (state.isDiff !== newState.isDiff) {
+                const stateMap = (newState.isDiff) ? diffCurrStateMap : sameCurrStateMap;
+                newState.id = stateTransition(state, stateMap);
             }
 
             updateStateExchange(newState);
@@ -510,7 +495,7 @@ const slice = createSlice({
         if (transaction.type === INCOME) {
             // If currencies are same before account was changed
             // then copy destination currency to source
-            if (newState.id === 0 || newState.id === 1) {
+            if (!state.isDiff) {
                 newState.transaction.src_curr = destAccount.curr_id;
                 newState.srcCurrency = destCurrency;
             }
@@ -518,18 +503,14 @@ const slice = createSlice({
             updateStateExchange(newState);
 
             newState.isDiff = transaction.src_curr !== transaction.dest_curr;
-            if (!newState.isDiff) {
-                const availStates = [
-                    STATE.I_S_AMOUNT_D_AMOUNT,
-                    STATE.I_S_AMOUNT_EXCH,
-                    STATE.I_S_AMOUNT_D_RESULT,
-                ];
-                if (availStates.includes(newState.id)) {
-                    setStateSourceAmount(newState, transaction.dest_amount);
-                    newState.id = (newState.id === STATE.I_S_AMOUNT_D_RESULT)
-                        ? STATE.E_S_RESULT
-                        : STATE.E_D_AMOUNT;
-                }
+            if (state.isDiff && !newState.isDiff) {
+                setStateSourceAmount(newState, transaction.dest_amount);
+
+                newState.id = stateTransition(state, {
+                    [STATE.I_S_AMOUNT_D_AMOUNT]: STATE.I_S_AMOUNT,
+                    [STATE.I_S_AMOUNT_EXCH]: STATE.I_S_AMOUNT,
+                    [STATE.I_S_AMOUNT_D_RESULT]: STATE.I_D_RESULT,
+                });
             }
         }
 
@@ -540,35 +521,27 @@ const slice = createSlice({
             }
 
             newState.isDiff = transaction.src_curr !== transaction.dest_curr;
-            if (newState.isDiff) {
-                if (newState.id === STATE.T_S_AMOUNT) {
-                    newState.id = STATE.T_S_AMOUNT_D_AMOUNT;
-                } else if (newState.id === STATE.T_S_RESULT) {
-                    newState.id = STATE.T_D_AMOUNT_S_RESULT;
-                } else if (newState.id === STATE.T_D_RESULT) {
-                    newState.id = STATE.T_S_AMOUNT_D_RESULT;
-                }
-            } else {
-                if (transaction.dest_amount !== transaction.src_amount) {
-                    setStateDestAmount(newState, transaction.src_amount);
-                }
+            if (!newState.isDiff && transaction.dest_amount !== transaction.src_amount) {
+                setStateDestAmount(newState, transaction.src_amount);
+            }
 
-                if (
-                    newState.id === STATE.T_S_AMOUNT_D_AMOUNT
-                    || newState.id === STATE.T_S_AMOUNT_EXCH
-                ) {
-                    newState.id = STATE.T_S_AMOUNT;
-                } else if (
-                    newState.id === STATE.T_D_AMOUNT_S_RESULT
-                    || newState.id === STATE.T_EXCH_S_RESULT
-                ) {
-                    newState.id = STATE.T_S_RESULT;
-                } else if (
-                    newState.id === STATE.T_S_AMOUNT_D_RESULT
-                    || newState.id === STATE.T_S_RESULT_D_RESULT
-                ) {
-                    newState.id = STATE.T_D_RESULT;
-                }
+            const diffCurrStateMap = {
+                [STATE.T_S_AMOUNT]: STATE.T_S_AMOUNT_D_AMOUNT,
+                [STATE.T_S_RESULT]: STATE.T_D_AMOUNT_S_RESULT,
+                [STATE.T_D_RESULT]: STATE.T_S_AMOUNT_D_RESULT,
+            };
+            const sameCurrStateMap = {
+                [STATE.T_S_AMOUNT_D_AMOUNT]: STATE.T_S_AMOUNT,
+                [STATE.T_S_AMOUNT_EXCH]: STATE.T_S_AMOUNT,
+                [STATE.T_D_AMOUNT_S_RESULT]: STATE.T_S_RESULT,
+                [STATE.T_EXCH_S_RESULT]: STATE.T_S_RESULT,
+                [STATE.T_S_AMOUNT_D_RESULT]: STATE.T_D_RESULT,
+                [STATE.T_S_RESULT_D_RESULT]: STATE.T_D_RESULT,
+            };
+
+            if (state.isDiff !== newState.isDiff) {
+                const stateMap = (newState.isDiff) ? diffCurrStateMap : sameCurrStateMap;
+                newState.id = stateTransition(state, stateMap);
             }
 
             updateStateExchange(newState);
@@ -585,28 +558,23 @@ const slice = createSlice({
             return state;
         }
 
-        const account = window.app.model.accounts.getItem(accountId);
+        const { accounts, currency } = window.app.model;
+        const account = accounts.getItem(accountId);
         if (!account) {
             throw new Error('Invalid account');
         }
+        const transaction = { ...state.transaction };
         const newState = {
             ...state,
-            transaction: { ...state.transaction },
+            transaction,
             form: { ...state.form },
             account,
         };
-        const { transaction } = newState;
 
-        // Request person account wtih the same currency as account
-        if (newState.personAccount.curr_id !== account.curr_id) {
+        // Request person account with the same currency as account
+        if (!state.isDiff && newState.personAccount.curr_id !== account.curr_id) {
             newState.personAccount = getPersonAccount(newState.person.id, account.curr_id);
         }
-
-        transaction.src_curr = account.curr_id;
-        transaction.dest_curr = account.curr_id;
-        const currency = window.app.model.currency.getItem(account.curr_id);
-        newState.srcCurrency = currency;
-        newState.destCurrency = currency;
 
         if (transaction.debtType) {
             newState.srcAccount = newState.personAccount;
@@ -615,9 +583,35 @@ const slice = createSlice({
             newState.srcAccount = newState.account;
             newState.destAccount = newState.personAccount;
         }
+        transaction.src_curr = newState.srcAccount.curr_id;
+        transaction.dest_curr = newState.destAccount.curr_id;
+
+        newState.srcCurrency = currency.getItem(transaction.src_curr);
+        newState.destCurrency = currency.getItem(transaction.dest_curr);
+        newState.isDiff = transaction.src_curr !== transaction.dest_curr;
 
         calculateSourceResult(newState);
         calculateDestResult(newState);
+
+        if (state.isDiff === newState.isDiff || newState.isDiff) {
+            return newState;
+        }
+
+        const stateMap = {
+            [STATE.DG_S_AMOUNT_D_AMOUNT]: STATE.DG_S_AMOUNT,
+            [STATE.DG_D_AMOUNT_S_RESULT]: STATE.DG_S_RESULT,
+            [STATE.DG_S_AMOUNT_EXCH]: STATE.DG_S_AMOUNT,
+            [STATE.DG_S_RESULT_EXCH]: STATE.DG_S_RESULT,
+            [STATE.DG_S_RESULT_D_RESULT]: STATE.DG_S_RESULT,
+            [STATE.DG_S_AMOUNT_D_RESULT]: STATE.DG_S_AMOUNT,
+            [STATE.DT_S_AMOUNT_D_AMOUNT]: STATE.DT_D_AMOUNT,
+            [STATE.DT_S_AMOUNT_D_RESULT]: STATE.DT_D_RESULT,
+            [STATE.DT_D_AMOUNT_EXCH]: STATE.DT_D_AMOUNT,
+            [STATE.DT_D_RESULT_EXCH]: STATE.DT_D_RESULT,
+            [STATE.DT_S_RESULT_D_RESULT]: STATE.DT_D_RESULT,
+            [STATE.DT_D_AMOUNT_S_RESULT]: STATE.DT_D_AMOUNT,
+        };
+        newState.id = stateTransition(state, stateMap);
 
         return newState;
     },
@@ -632,15 +626,15 @@ const slice = createSlice({
             throw new Error('Invalid person');
         }
 
+        const transaction = {
+            ...state.transaction,
+            person_id: person.id,
+        };
         const newState = {
             ...state,
-            transaction: {
-                ...state.transaction,
-                person_id: person.id,
-            },
+            transaction,
             person,
         };
-        const { transaction } = newState;
 
         const currencyId = (transaction.debtType)
             ? transaction.src_curr
@@ -659,7 +653,12 @@ const slice = createSlice({
     },
 
     sourceCurrencyChange: (state, currencyId) => {
-        if (state.transaction.type !== INCOME || state.transaction.src_curr === currencyId) {
+        const availTypes = [INCOME, DEBT];
+        if (
+            !availTypes.includes(state.transaction.type)
+            || (state.transaction.type === DEBT && !state.transaction.debtType)
+            || state.transaction.src_curr === currencyId
+        ) {
             return state;
         }
 
@@ -668,60 +667,110 @@ const slice = createSlice({
             throw new Error('Invalid currency');
         }
 
+        const transaction = {
+            ...state.transaction,
+            src_curr: srcCurrency.id,
+        };
         const newState = {
             ...state,
-            transaction: {
-                ...state.transaction,
-                src_curr: srcCurrency.id,
-            },
+            transaction,
             srcCurrency,
-            isDiff: srcCurrency.id !== state.transaction.dest_curr,
         };
 
-        if (newState.isDiff && newState.id === STATE.I_S_AMOUNT) {
-            newState.id = STATE.I_S_AMOUNT_D_AMOUNT;
-        } else if (
-            newState.id === STATE.I_S_AMOUNT_D_AMOUNT
-            || newState.id === STATE.I_S_AMOUNT_EXCH
-            || newState.id === STATE.I_S_AMOUNT_D_RESULT
-        ) {
-            if (!newState.isDiff) {
-                setStateDestAmount(newState, newState.transaction.src_amount);
-                updateStateExchange(newState);
-                newState.id = (newState.id === STATE.I_S_AMOUNT_D_RESULT)
-                    ? STATE.I_D_RESULT
-                    : STATE.I_S_AMOUNT;
+        if (state.transaction.type === DEBT) {
+            const { person } = newState;
+            newState.personAccount = getPersonAccount(person.id, srcCurrency.id);
+            newState.srcAccount = newState.personAccount;
+            transaction.src_id = newState.personAccount.id;
+            calculateSourceResult(newState);
+
+            if (transaction.noAccount) {
+                transaction.dest_curr = transaction.src_curr;
+                newState.destCurrency = srcCurrency;
             }
+        }
+
+        newState.isDiff = (transaction.src_curr !== transaction.dest_curr);
+        if (state.isDiff && !newState.isDiff) {
+            setStateDestAmount(newState, newState.transaction.src_amount);
+            updateStateExchange(newState);
+        }
+
+        const sameCurrStateMap = {
+            [STATE.I_S_AMOUNT_D_AMOUNT]: STATE.I_S_AMOUNT,
+            [STATE.I_S_AMOUNT_EXCH]: STATE.I_S_AMOUNT,
+            [STATE.I_S_AMOUNT_D_RESULT]: STATE.I_D_RESULT,
+            [STATE.DG_S_AMOUNT_D_AMOUNT]: STATE.DG_S_AMOUNT,
+            [STATE.DG_S_AMOUNT_EXCH]: STATE.DG_S_AMOUNT,
+            [STATE.DG_S_AMOUNT_D_RESULT]: STATE.DG_S_AMOUNT,
+        };
+        const diffCurrStateMap = {
+            [STATE.I_S_AMOUNT]: STATE.I_S_AMOUNT_D_AMOUNT,
+            [STATE.DG_S_AMOUNT]: STATE.DG_S_AMOUNT_D_AMOUNT,
+        };
+        if (state.isDiff !== newState.isDiff) {
+            const stateMap = (newState.isDiff) ? diffCurrStateMap : sameCurrStateMap;
+            newState.id = stateTransition(state, stateMap);
         }
 
         return newState;
     },
 
     destCurrencyChange: (state, currencyId) => {
-        if (state.transaction.type !== EXPENSE || state.transaction.dest_curr === currencyId) {
+        const availTypes = [EXPENSE, DEBT];
+        if (
+            !availTypes.includes(state.transaction.type)
+            || (state.transaction.type === DEBT && state.transaction.debtType)
+            || state.transaction.dest_curr === currencyId
+        ) {
             return state;
         }
 
         const destCurrency = window.app.model.currency.getItem(currencyId);
 
+        const transaction = {
+            ...state.transaction,
+            dest_curr: destCurrency.id,
+        };
         const newState = {
             ...state,
-            transaction: {
-                ...state.transaction,
-                dest_curr: destCurrency.id,
-            },
+            transaction,
             destCurrency,
             isDiff: destCurrency.id !== state.transaction.src_curr,
         };
 
-        if (newState.isDiff && newState.id === STATE.E_D_AMOUNT) {
-            newState.id = STATE.E_S_AMOUNT_D_AMOUNT;
-        } else if (newState.id === STATE.E_S_AMOUNT_D_AMOUNT) {
-            if (!newState.isDiff) {
-                newState.id = STATE.E_D_AMOUNT;
-                setStateSourceAmount(newState, newState.transaction.dest_amount);
-                updateStateExchange(newState);
+        if (state.transaction.type === DEBT) {
+            const { person } = newState;
+            newState.personAccount = getPersonAccount(person.id, destCurrency.id);
+            newState.destAccount = newState.personAccount;
+            transaction.dest_id = newState.personAccount.id;
+            calculateDestResult(newState);
+
+            if (transaction.noAccount) {
+                transaction.src_curr = transaction.dest_curr;
+                newState.srcCurrency = destCurrency;
             }
+        }
+
+        newState.isDiff = (transaction.src_curr !== transaction.dest_curr);
+        if (state.isDiff && !newState.isDiff) {
+            setStateSourceAmount(newState, newState.transaction.dest_amount);
+            updateStateExchange(newState);
+        }
+
+        const diffCurrStateMap = {
+            [STATE.E_D_AMOUNT]: STATE.E_S_AMOUNT_D_AMOUNT,
+            [STATE.DT_D_AMOUNT]: STATE.DT_S_AMOUNT_D_AMOUNT,
+        };
+        const sameCurrStateMap = {
+            [STATE.E_S_AMOUNT_D_AMOUNT]: STATE.E_D_AMOUNT,
+            [STATE.DT_S_AMOUNT_D_AMOUNT]: STATE.DT_D_AMOUNT,
+            [STATE.DT_D_AMOUNT_EXCH]: STATE.DT_D_AMOUNT,
+            [STATE.DT_D_AMOUNT_S_RESULT]: STATE.DT_D_AMOUNT,
+        };
+        if (state.isDiff !== newState.isDiff) {
+            const stateMap = (newState.isDiff) ? diffCurrStateMap : sameCurrStateMap;
+            newState.id = stateTransition(state, stateMap);
         }
 
         return newState;
@@ -732,56 +781,96 @@ const slice = createSlice({
             return state;
         }
 
+        const transaction = {
+            ...state.transaction,
+            noAccount: !state.transaction.noAccount,
+        };
         const newState = {
             ...state,
-            transaction: {
-                ...state.transaction,
-                noAccount: !state.transaction.noAccount,
-            },
+            transaction,
         };
-        const { transaction } = newState;
 
         if (transaction.noAccount) {
-            if (newState.id === STATE.DG_S_AMOUNT || newState.id === STATE.DG_D_RESULT) {
-                newState.id = STATE.DG_NOACC_S_AMOUNT;
-            } else if (newState.id === STATE.DG_S_RESULT) {
-                newState.id = STATE.DG_NOACC_S_RESULT;
-            } else if (newState.id === STATE.DT_S_AMOUNT || newState.id === STATE.DT_S_RESULT) {
-                newState.id = STATE.DT_NOACC_S_AMOUNT;
-            } else if (newState.id === STATE.DT_D_RESULT) {
-                newState.id = STATE.DT_NOACC_D_RESULT;
-            }
+            newState.id = stateTransition(state, {
+                [STATE.DG_S_AMOUNT]: STATE.DG_NOACC_S_AMOUNT,
+                [STATE.DG_D_RESULT]: STATE.DG_NOACC_S_AMOUNT,
+                [STATE.DG_S_RESULT]: STATE.DG_NOACC_S_RESULT,
+                [STATE.DT_D_AMOUNT]: STATE.DT_NOACC_D_AMOUNT,
+                [STATE.DT_D_RESULT]: STATE.DT_NOACC_D_RESULT,
+                [STATE.DT_S_RESULT]: STATE.DT_NOACC_D_AMOUNT,
+                [STATE.DG_S_AMOUNT_D_AMOUNT]: STATE.DG_NOACC_S_AMOUNT,
+                [STATE.DG_D_AMOUNT_S_RESULT]: STATE.DG_NOACC_S_RESULT,
+                [STATE.DG_S_AMOUNT_EXCH]: STATE.DG_NOACC_S_AMOUNT,
+                [STATE.DG_S_RESULT_EXCH]: STATE.DG_NOACC_S_RESULT,
+                [STATE.DG_S_RESULT_D_RESULT]: STATE.DG_NOACC_S_RESULT,
+                [STATE.DG_S_AMOUNT_D_RESULT]: STATE.DG_NOACC_S_AMOUNT,
+                [STATE.DT_S_AMOUNT_D_AMOUNT]: STATE.DT_NOACC_D_AMOUNT,
+                [STATE.DT_S_AMOUNT_D_RESULT]: STATE.DT_NOACC_D_RESULT,
+                [STATE.DT_D_AMOUNT_EXCH]: STATE.DT_NOACC_D_AMOUNT,
+                [STATE.DT_D_RESULT_EXCH]: STATE.DT_NOACC_D_RESULT,
+                [STATE.DT_S_RESULT_D_RESULT]: STATE.DT_NOACC_D_RESULT,
+                [STATE.DT_D_AMOUNT_S_RESULT]: STATE.DT_NOACC_D_AMOUNT,
+            });
 
             transaction.lastAcc_id = newState.account.id;
             newState.account = null;
-        } else {
-            newState.account = window.app.model.accounts.getItem(transaction.lastAcc_id);
-            if (!newState.account) {
-                throw new Error('Account not found');
-            }
 
             if (transaction.debtType) {
+                newState.destAccount = null;
+                transaction.dest_id = 0;
+                transaction.dest_curr = transaction.src_curr;
+                setStateDestAmount(newState, transaction.src_amount);
+            } else {
+                newState.srcAccount = null;
+                transaction.src_id = 0;
+                transaction.src_curr = transaction.dest_curr;
+                setStateSourceAmount(newState, transaction.dest_amount);
+            }
+            newState.isDiff = false;
+        } else {
+            const { userAccounts } = window.app.model;
+            const account = (transaction.lastAcc_id)
+                ? userAccounts.getItem(transaction.lastAcc_id)
+                : userAccounts.getItemByIndex(0);
+            if (!account) {
+                throw new Error('Account not found');
+            }
+            newState.account = account;
+            newState.personAccount = getPersonAccount(newState.person.id, account.curr_id);
+
+            if (transaction.debtType) {
+                newState.srcAccount = newState.personAccount;
                 newState.destAccount = newState.account;
             } else {
                 newState.srcAccount = newState.account;
+                newState.destAccount = newState.personAccount;
             }
+            transaction.src_id = newState.srcAccount.id;
+            transaction.dest_id = newState.destAccount.id;
+            transaction.src_curr = newState.srcAccount.curr_id;
+            transaction.dest_curr = newState.destAccount.curr_id;
 
-            if (newState.id === STATE.DG_NOACC_S_AMOUNT) {
-                newState.id = STATE.DG_S_AMOUNT;
-            } else if (newState.id === STATE.DT_NOACC_S_AMOUNT) {
-                newState.id = STATE.DT_S_AMOUNT;
-            } else if (newState.id === STATE.DT_NOACC_D_RESULT) {
-                newState.id = STATE.DT_D_RESULT;
-            } else if (newState.id === STATE.DG_NOACC_S_RESULT) {
-                newState.id = STATE.DG_S_RESULT;
-            }
+            newState.isDiff = transaction.src_curr !== transaction.dest_curr;
+
+            newState.id = stateTransition(state, {
+                [STATE.DG_NOACC_S_AMOUNT]: STATE.DG_S_AMOUNT,
+                [STATE.DT_NOACC_D_AMOUNT]: STATE.DT_D_AMOUNT,
+                [STATE.DT_NOACC_D_RESULT]: STATE.DT_D_RESULT,
+                [STATE.DG_NOACC_S_RESULT]: STATE.DG_S_RESULT,
+            });
         }
+
+        const { currency } = window.app.model;
+        newState.srcCurrency = currency.getItem(transaction.src_curr);
+        newState.destCurrency = currency.getItem(transaction.dest_curr);
 
         if (transaction.debtType) {
             calculateDestResult(newState);
         } else {
             calculateSourceResult(newState);
         }
+
+        updateStateExchange(newState);
 
         return newState;
     },
@@ -806,32 +895,15 @@ const slice = createSlice({
 
         newState.transaction.src_amount = newValue;
 
-        if (newState.transaction.type === EXPENSE) {
+        const isIncome = newState.transaction.type === INCOME;
+        if (!isIncome) {
             calculateSourceResult(newState);
-            updateStateExchange(newState);
         }
-
-        if (newState.transaction.type === INCOME) {
-            if (newState.isDiff) {
-                if (isValidValue(newState.form.destAmount)) {
-                    updateStateExchange(newState);
-                }
-            } else {
-                setStateDestAmount(newState, newValue);
-            }
-        }
-
-        if (newState.transaction.type === TRANSFER) {
-            calculateSourceResult(newState);
-            if (newState.isDiff) {
+        if (newState.isDiff) {
+            if (!isIncome || isValidValue(newState.form.destAmount)) {
                 updateStateExchange(newState);
-            } else {
-                setStateDestAmount(newState, newValue);
             }
-        }
-
-        if (newState.transaction.type === DEBT) {
-            calculateSourceResult(newState);
+        } else {
             setStateDestAmount(newState, newValue);
         }
 
@@ -839,10 +911,6 @@ const slice = createSlice({
     },
 
     destAmountChange: (state, value) => {
-        if (state.transaction.type === DEBT) {
-            return state;
-        }
-
         const newState = {
             ...state,
             validation: {
@@ -862,32 +930,16 @@ const slice = createSlice({
 
         newState.transaction.dest_amount = newValue;
 
-        if (newState.transaction.type === EXPENSE) {
-            if (newState.isDiff) {
-                if (isValidValue(newState.form.sourceAmount)) {
-                    updateStateExchange(newState);
-                }
-            } else {
-                setStateSourceAmount(newState, newValue);
-            }
-        }
-
-        if (newState.transaction.type === INCOME) {
+        const isExpense = newState.transaction.type === EXPENSE;
+        if (!isExpense) {
             calculateDestResult(newState);
-            if (newState.isDiff) {
-                updateStateExchange(newState);
-            } else {
-                setStateSourceAmount(newState, newValue);
-            }
         }
-
-        if (newState.transaction.type === TRANSFER) {
-            calculateDestResult(newState);
-            if (newState.isDiff) {
+        if (newState.isDiff) {
+            if (!isExpense || isValidValue(newState.form.sourceAmount)) {
                 updateStateExchange(newState);
-            } else {
-                setStateSourceAmount(newState, newValue);
             }
+        } else {
+            setStateSourceAmount(newState, newValue);
         }
 
         return newState;
@@ -913,27 +965,11 @@ const slice = createSlice({
 
         newState.form.fSourceResult = newValue;
         const srcAmount = normalize(newState.srcAccount.balance - newValue);
-        newState.transaction.src_amount = srcAmount;
-        newState.form.sourceAmount = srcAmount;
+        setStateSourceAmount(newState, srcAmount);
 
-        if (newState.transaction.type === EXPENSE) {
-            if (newState.isDiff) {
-                updateStateExchange(newState);
-            } else {
-                newState.transaction.dest_amount = srcAmount;
-                newState.form.destAmount = srcAmount;
-            }
-        }
-
-        if (newState.transaction.type === TRANSFER) {
-            if (newState.isDiff) {
-                updateStateExchange(newState);
-            } else {
-                setStateDestAmount(newState, srcAmount);
-            }
-        }
-
-        if (newState.transaction.type === DEBT) {
+        if (newState.isDiff) {
+            updateStateExchange(newState);
+        } else {
             setStateDestAmount(newState, srcAmount);
         }
 
@@ -959,35 +995,13 @@ const slice = createSlice({
         }
 
         newState.form.fDestResult = newValue;
-        if (newState.transaction.type === INCOME) {
-            const srcAmount = normalize(newValue - newState.destAccount.balance);
-            newState.transaction.src_amount = srcAmount;
-            newState.form.sourceAmount = srcAmount;
 
-            if (newState.isDiff) {
-                updateStateExchange(newState);
-            } else {
-                setStateDestAmount(newState, srcAmount);
-            }
-        }
+        const destAmount = normalize(newValue - newState.destAccount.balance);
+        setStateDestAmount(newState, destAmount);
 
-        if (newState.transaction.type === TRANSFER) {
-            const destAmount = normalize(newValue - newState.destAccount.balance);
-            newState.transaction.dest_amount = destAmount;
-            newState.form.destAmount = destAmount;
-
-            if (newState.isDiff) {
-                updateStateExchange(newState);
-            } else {
-                setStateSourceAmount(newState, destAmount);
-            }
-        }
-
-        if (newState.transaction.type === DEBT) {
-            const destAmount = normalize(newValue - newState.destAccount.balance);
-            newState.transaction.dest_amount = destAmount;
-            newState.form.destAmount = destAmount;
-
+        if (newState.isDiff) {
+            updateStateExchange(newState);
+        } else {
             setStateSourceAmount(newState, destAmount);
         }
 
@@ -1048,21 +1062,13 @@ const slice = createSlice({
         return newState;
     },
 
-    toggleExchange: (state) => {
-        if (state.transaction.type === DEBT) {
-            return state;
-        }
-
-        const newState = {
-            ...state,
-            form: {
-                ...state.form,
-                useBackExchange: !state.form.useBackExchange,
-            },
-        };
-
-        return newState;
-    },
+    toggleExchange: (state) => ({
+        ...state,
+        form: {
+            ...state.form,
+            useBackExchange: !state.form.useBackExchange,
+        },
+    }),
 
     dateChange: (state, value) => ({
         ...state,
@@ -1197,6 +1203,14 @@ const slice = createSlice({
 
                 setStateSourceAmount(newState, state.form.destAmount);
                 setStateDestAmount(newState, state.form.sourceAmount);
+
+                newState.id = stateTransition(state, {
+                    [STATE.I_S_AMOUNT]: STATE.E_D_AMOUNT,
+                    [STATE.I_D_RESULT]: STATE.E_S_RESULT,
+                    [STATE.I_S_AMOUNT_D_AMOUNT]: STATE.E_S_AMOUNT_D_AMOUNT,
+                    [STATE.I_S_AMOUNT_EXCH]: STATE.E_S_AMOUNT_EXCH,
+                    [STATE.I_S_AMOUNT_D_RESULT]: STATE.E_S_AMOUNT_S_RESULT,
+                });
             } else if (currentType === TRANSFER) {
                 newState.id = STATE.E_D_AMOUNT;
                 transaction.dest_curr = transaction.src_curr;
@@ -1264,6 +1278,14 @@ const slice = createSlice({
 
                 setStateSourceAmount(newState, state.form.sourceAmount);
                 setStateDestAmount(newState, state.form.destAmount);
+
+                newState.id = stateTransition(state, {
+                    [STATE.E_D_AMOUNT]: STATE.I_S_AMOUNT,
+                    [STATE.E_S_RESULT]: STATE.I_D_RESULT,
+                    [STATE.E_S_AMOUNT_D_AMOUNT]: STATE.I_S_AMOUNT_D_AMOUNT,
+                    [STATE.E_S_AMOUNT_EXCH]: STATE.I_S_AMOUNT_EXCH,
+                    [STATE.E_S_AMOUNT_S_RESULT]: STATE.I_S_AMOUNT_D_RESULT,
+                });
             } else if (currentType === TRANSFER) {
                 newState.id = STATE.I_S_AMOUNT;
                 transaction.src_curr = transaction.dest_curr;
@@ -1390,11 +1412,11 @@ const slice = createSlice({
             if (transaction.noAccount) {
                 newState.id = (transaction.debtType)
                     ? STATE.DG_NOACC_S_AMOUNT
-                    : STATE.DT_NOACC_S_AMOUNT;
+                    : STATE.DT_NOACC_D_AMOUNT;
             } else {
                 newState.id = (transaction.debtType)
                     ? STATE.DG_S_AMOUNT
-                    : STATE.DT_S_AMOUNT;
+                    : STATE.DT_D_AMOUNT;
             }
 
             setStateSourceAmount(newState, state.form.sourceAmount);
@@ -1424,53 +1446,52 @@ const slice = createSlice({
             ...state,
             transaction: {
                 ...state.transaction,
+                src_id: state.transaction.dest_id,
+                dest_id: state.transaction.src_id,
+                src_curr: state.transaction.dest_curr,
+                dest_curr: state.transaction.src_curr,
+                src_amount: state.transaction.dest_amount,
+                dest_amount: state.transaction.src_amount,
             },
             form: {
                 ...state.form,
+                sourceAmount: state.form.destAmount,
+                destAmount: state.form.sourceAmount,
             },
+            srcAccount: state.destAccount,
+            destAccount: state.srcAccount,
+            srcCurrency: state.destCurrency,
+            destCurrency: state.srcCurrency,
         };
-
-        newState.transaction.src_id = state.transaction.dest_id;
-        newState.transaction.src_curr = state.transaction.dest_curr;
-        newState.transaction.src_amount = state.transaction.dest_amount;
-        newState.form.sourceAmount = state.form.destAmount;
-        newState.srcAccount = state.destAccount;
-        newState.srcCurrency = state.destCurrency;
-
-        newState.transaction.dest_id = state.transaction.src_id;
-        newState.transaction.dest_curr = state.transaction.src_curr;
-        newState.transaction.dest_amount = state.transaction.src_amount;
-        newState.form.destAmount = state.form.sourceAmount;
-        newState.destAccount = state.srcAccount;
-        newState.destCurrency = state.srcCurrency;
 
         if (newState.transaction.type === DEBT) {
             const debtType = !state.transaction.debtType;
             newState.transaction.debtType = debtType;
 
-            if (debtType) {
-                if (newState.id === STATE.DT_S_AMOUNT) {
-                    newState.id = STATE.DG_S_AMOUNT;
-                } else if (newState.id === STATE.DT_D_RESULT) {
-                    newState.id = STATE.DG_S_RESULT;
-                } else if (newState.id === STATE.DT_S_RESULT) {
-                    newState.id = STATE.DG_D_RESULT;
-                } else if (newState.id === STATE.DT_NOACC_S_AMOUNT) {
-                    newState.id = STATE.DG_NOACC_S_AMOUNT;
-                } else if (newState.id === STATE.DT_NOACC_D_RESULT) {
-                    newState.id = STATE.DG_NOACC_S_RESULT;
-                }
-            } else if (newState.id === STATE.DG_S_AMOUNT) {
-                newState.id = STATE.DT_S_AMOUNT;
-            } else if (newState.id === STATE.DG_S_RESULT) {
-                newState.id = STATE.DT_D_RESULT;
-            } else if (newState.id === STATE.DG_D_RESULT) {
-                newState.id = STATE.DT_S_RESULT;
-            } else if (newState.id === STATE.DG_NOACC_S_AMOUNT) {
-                newState.id = STATE.DT_NOACC_S_AMOUNT;
-            } else if (newState.id === STATE.DG_NOACC_S_RESULT) {
-                newState.id = STATE.DT_NOACC_D_RESULT;
-            }
+            newState.id = stateTransition(state, {
+                [STATE.DT_D_AMOUNT]: STATE.DG_S_AMOUNT,
+                [STATE.DG_S_AMOUNT]: STATE.DT_D_AMOUNT,
+                [STATE.DT_D_RESULT]: STATE.DG_S_RESULT,
+                [STATE.DG_S_RESULT]: STATE.DT_D_RESULT,
+                [STATE.DT_S_RESULT]: STATE.DG_D_RESULT,
+                [STATE.DG_D_RESULT]: STATE.DT_S_RESULT,
+                [STATE.DT_NOACC_D_AMOUNT]: STATE.DG_NOACC_S_AMOUNT,
+                [STATE.DG_NOACC_S_AMOUNT]: STATE.DT_NOACC_D_AMOUNT,
+                [STATE.DT_NOACC_D_RESULT]: STATE.DG_NOACC_S_RESULT,
+                [STATE.DG_NOACC_S_RESULT]: STATE.DT_NOACC_D_RESULT,
+                [STATE.DG_S_AMOUNT_D_AMOUNT]: STATE.DT_S_AMOUNT_D_AMOUNT,
+                [STATE.DT_S_AMOUNT_D_AMOUNT]: STATE.DG_S_AMOUNT_D_AMOUNT,
+                [STATE.DG_D_AMOUNT_S_RESULT]: STATE.DT_S_AMOUNT_D_RESULT,
+                [STATE.DT_S_AMOUNT_D_RESULT]: STATE.DG_D_AMOUNT_S_RESULT,
+                [STATE.DG_S_AMOUNT_EXCH]: STATE.DT_D_AMOUNT_EXCH,
+                [STATE.DT_D_AMOUNT_EXCH]: STATE.DG_S_AMOUNT_EXCH,
+                [STATE.DG_S_RESULT_EXCH]: STATE.DT_D_RESULT_EXCH,
+                [STATE.DT_D_RESULT_EXCH]: STATE.DG_S_RESULT_EXCH,
+                [STATE.DG_S_RESULT_D_RESULT]: STATE.DT_S_RESULT_D_RESULT,
+                [STATE.DT_S_RESULT_D_RESULT]: STATE.DG_S_RESULT_D_RESULT,
+                [STATE.DG_S_AMOUNT_D_RESULT]: STATE.DT_D_AMOUNT_S_RESULT,
+                [STATE.DT_D_AMOUNT_S_RESULT]: STATE.DG_S_AMOUNT_D_RESULT,
+            });
         }
 
         calculateSourceResult(newState);

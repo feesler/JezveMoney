@@ -152,18 +152,31 @@ export class Transaction {
             type: DEBT,
         };
 
-        if (!('dest_amount' in res)) {
-            res.dest_amount = res.src_amount;
-        }
+        const acc = (res.acc_id) ? state.accounts.getItem(res.acc_id) : null;
+        res.acc_id = (acc) ? acc.id : 0;
 
-        const acc = res.acc_id ? state.accounts.getItem(res.acc_id) : null;
-        if (acc) {
-            res.src_curr = acc.curr_id;
-            res.dest_curr = acc.curr_id;
+        if (res.op === 1) {
+            if (!('dest_curr' in res)) {
+                res.dest_curr = (acc) ? acc.curr_id : res.src_curr;
+            }
+            if (!('src_curr' in res)) {
+                res.src_curr = res.dest_curr;
+            }
+
+            if (!('dest_amount' in res)) {
+                res.dest_amount = res.src_amount;
+            }
         } else {
-            res.acc_id = 0;
-            res.src_curr = (res.src_curr || res.dest_curr);
-            res.dest_curr = res.src_curr;
+            if (!('src_curr' in res)) {
+                res.src_curr = (acc) ? acc.curr_id : res.dest_curr;
+            }
+            if (!('dest_curr' in res)) {
+                res.dest_curr = res.src_curr;
+            }
+
+            if (!('src_amount' in res)) {
+                res.src_amount = res.dest_amount;
+            }
         }
 
         return res;

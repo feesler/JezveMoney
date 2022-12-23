@@ -822,8 +822,8 @@ export class AppState {
                 const account = this.accounts.getItem(params.acc_id);
                 if (
                     !account
-                    || srcCurr.id !== account.curr_id
-                    || destCurr.id !== account.curr_id
+                    || (params.op === 2 && srcCurr.id !== account.curr_id)
+                    || (params.op === 1 && destCurr.id !== account.curr_id)
                 ) {
                     return false;
                 }
@@ -946,10 +946,6 @@ export class AppState {
             res.src_id = res.acc_id;
             res.dest_id = personAcc.id;
         }
-
-        // Different currencies not supported yet for debts
-        res.src_curr = reqCurr;
-        res.dest_curr = reqCurr;
 
         delete res.op;
         delete res.person_id;
