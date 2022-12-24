@@ -94,7 +94,14 @@ include(TPL_PATH . "Header.tpl");    ?>
                         </div>
 
                         <div id="chart" class="stat-histogram">
-                            <span class="nodata-message">No results found.</span>
+                            <span class="nodata-message" hidden>No results found</span>
+                        </div>
+
+                        <div id="pieChartContainer" class="piechart-container">
+                            <div id="pieChartInfo" class="piechart-info">
+                                <div id="pieChartInfoTitle" class="piechart-info__title"></div>
+                                <div id="pieChartInfoValue" class="piechart-info__value"></div>
+                            </div>
                         </div>
                     </div>
                 </div>

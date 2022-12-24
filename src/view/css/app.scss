@@ -1,5 +1,10 @@
 @use "sass:list";
 
+$colors: #20a0ff, #ff0077, #00d647, #e2de00, #00b74a, #ff8700, #db0058, #086ca2,
+  #ffba00, #ff3900, #dc0055, #00b64f, #dcf900;
+$active-colors: #00bfff, #ff3392, #00ff55, #fcf93d, #37db79, #ffa540, #ed3b83,
+  #3c9dd1, #ffcb40, #ff6b40, #ee3b80, #37da7e, #e6fc3f;
+
 :root {
   --accent-color: #0072c6;
   --accent-color-alt: #20a0ff;
@@ -15,6 +20,12 @@
   /* Popup menu, Chart popup & etc. */
   --popup-menu-backdrop-filter: blur(2px);
   --popupmenu-z-index: 9999;
+
+  /* Chart colors */
+  @for $i from 1 through length($colors) {
+    --charts-color-#{$i}: #{list.nth($colors, $i)};
+    --charts-active-color-#{$i}: #{list.nth($active-colors, $i)};
+  }
 }
 
 html,
@@ -743,16 +754,6 @@ a.paginator-arrow:focus-visible {
 }
 
 /* Histogram */
-$colors: #20a0ff, #ff0077, #00d647, #e2de00;
-$active-colors: #00bfff, #ff3392, #00ff55, #fcf93d;
-
-.histogram {
-  @for $i from 1 through length($colors) {
-    --charts-color-#{$i}: #{list.nth($colors, $i)};
-    --charts-active-color-#{$i}: #{list.nth($active-colors, $i)};
-  }
-}
-
 @for $i from 1 through length($colors) {
   .histogram_column-#{$i} {
     --historgam-bar-color: var(--charts-color-#{$i});

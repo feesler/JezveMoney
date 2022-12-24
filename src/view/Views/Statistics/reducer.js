@@ -112,6 +112,71 @@ const slice = createSlice({
         return { ...state, form };
     },
 
+    selectDataColumn: (state, target) => {
+        const pieChartData = [];
+        target.group.forEach((item) => {
+            if (item.value === 0) {
+                return;
+            }
+
+            const pieItem = {
+                value: item.value,
+                category: item.categoryIndex + 1,
+                categoryId: item.category,
+            };
+            pieChartData.push(pieItem);
+        });
+
+        return {
+            ...state,
+            pieChartData,
+            pieChartInfo: null,
+            selectedPieChartItem: null,
+        };
+    },
+
+    showPieChartInfo: (state, item) => {
+        const { sector } = item;
+        if (state.pieChartInfo?.category === sector.category) {
+            return state;
+        }
+
+        return {
+            ...state,
+            pieChartInfo: {
+                category: sector.category,
+                categoryId: sector.categoryId,
+                value: sector.value,
+            },
+        };
+    },
+
+    hidePieChartInfo: (state) => ({
+        ...state,
+        pieChartInfo: state.selectedPieChartItem,
+    }),
+
+    selectPieChartItem: (state, item) => {
+        const { sector } = item;
+        const pieChartData = state.pieChartData.map((pieItem) => ({
+            ...pieItem,
+            offset: (pieItem.category === sector?.category) ? 10 : 0,
+        }));
+
+        const selectedPieChartItem = {
+            category: sector.category,
+            categoryId: sector.categoryId,
+            value: sector.value,
+        };
+
+        return {
+            ...state,
+            pieChartData,
+            pieChartInfo: selectedPieChartItem,
+            selectedPieChartItem,
+        };
+    },
+
     dataRequestLoaded: (state, data) => ({
         ...state,
         chartData: { ...data.histogram },

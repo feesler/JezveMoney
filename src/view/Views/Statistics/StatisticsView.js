@@ -10,6 +10,7 @@ import { Histogram } from 'jezvejs/Histogram';
 import { DropDown } from 'jezvejs/DropDown';
 import { LinkMenu } from 'jezvejs/LinkMenu';
 import { IconButton } from 'jezvejs/IconButton';
+import { PieChart } from 'jezvejs/PieChart';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
 import { formatValueShort } from '../../js/utils.js';
@@ -79,6 +80,9 @@ class StatisticsView extends View {
         const initialState = {
             accountCurrency: this.props.accountCurrency,
             chartData: null,
+            pieChartData: null,
+            pieChartInfo: null,
+            selectedPieChartItem: null,
             filter: { ...this.props.filter },
             form: { ...this.props.filter },
             loading: false,
@@ -111,6 +115,10 @@ class StatisticsView extends View {
             'dateFrm',
             // Chart
             'chart',
+            'pieChartContainer',
+            'pieChartInfo',
+            'pieChartInfoTitle',
+            'pieChartInfoValue',
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
@@ -201,7 +209,6 @@ class StatisticsView extends View {
             barWidth: 45,
             columnGap: 3,
             showPopup: true,
-            pinPopupOnClick: true,
             showPopupOnHover: true,
             animatePopup: true,
             activateOnHover: true,
@@ -209,7 +216,20 @@ class StatisticsView extends View {
             showLegend: true,
             renderLegend: (data) => this.renderLegendContent(data),
             renderYAxisLabel: (value) => formatValueShort(value),
+            onitemclick: (target) => this.onSelectDataColumn(target),
         });
+
+        // Pie chart
+        this.pieChart = PieChart.create({
+            data: null,
+            radius: 100,
+            innerRadius: 70,
+            offset: 10,
+            onitemover: (item) => this.onPieChartItemOver(item),
+            onitemout: (item) => this.onPieChartItemOut(item),
+            onitemclick: (item) => this.onPieChartItemClick(item),
+        });
+        this.pieChartContainer.append(this.pieChart.elem);
 
         // Loading indicator
         this.loadingIndicator = LoadingIndicator.create({
@@ -352,6 +372,26 @@ class StatisticsView extends View {
         this.requestData(form);
     }
 
+    /** Histogram item 'click' event handler */
+    onSelectDataColumn(target) {
+        this.store.dispatch(actions.selectDataColumn(target));
+    }
+
+    /** Pie chart item 'mouseover' event handler */
+    onPieChartItemOver(item) {
+        this.store.dispatch(actions.showPieChartInfo(item));
+    }
+
+    /** Pie chart item 'mouseout' event handler */
+    onPieChartItemOut(item) {
+        this.store.dispatch(actions.hidePieChartInfo(item));
+    }
+
+    /** Pie chart item 'click' event handler */
+    onPieChartItemClick(item) {
+        this.store.dispatch(actions.selectPieChartItem(item));
+    }
+
     replaceHistory(state) {
         const url = this.getFilterURL(state);
         window.history.replaceState({}, PAGE_TITLE, url);
@@ -371,10 +411,10 @@ class StatisticsView extends View {
         this.stopLoading();
     }
 
-    formatItemValue(item) {
+    formatValue(value) {
         const state = this.store.getState();
         return window.app.model.currency.formatCurrency(
-            item.value,
+            value,
             state.accountCurrency,
         );
     }
@@ -386,7 +426,7 @@ class StatisticsView extends View {
             children: createElement('span', {
                 props: {
                     className: POPUP_LIST_VALUE_CLASS,
-                    textContent: this.formatItemValue(item),
+                    textContent: this.formatValue(item.value),
                 },
             }),
         });
@@ -575,6 +615,30 @@ class StatisticsView extends View {
         this.histogram.elem.dataset.time = state.renderTime;
     }
 
+    renderPieChart(state, prevState = {}) {
+        if (state.pieChartData === prevState?.pieChartData) {
+            return;
+        }
+
+        this.pieChart.setData(state.pieChartData);
+    }
+
+    renderPieChartInfo(state, prevState = {}) {
+        if (state.pieChartInfo === prevState?.pieChartInfo) {
+            return;
+        }
+
+        if (!state.pieChartInfo) {
+            this.pieChartInfoTitle.textContent = null;
+            this.pieChartInfoValue.textContent = null;
+            return;
+        }
+
+        const { categoryId, value } = state.pieChartInfo;
+        this.pieChartInfoTitle.textContent = this.getDataCategoryName(categoryId);
+        this.pieChartInfoValue.textContent = this.formatValue(value);
+    }
+
     render(state, prevState = {}) {
         if (!state) {
             throw new Error('Invalid state');
@@ -586,6 +650,8 @@ class StatisticsView extends View {
 
         this.renderFilters(state, prevState);
         this.renderHistogram(state, prevState);
+        this.renderPieChart(state, prevState);
+        this.renderPieChartInfo(state, prevState);
 
         if (!state.loading) {
             this.loadingIndicator.hide();

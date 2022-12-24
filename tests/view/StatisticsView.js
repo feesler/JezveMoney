@@ -220,15 +220,19 @@ export class StatisticsView extends AppView {
         const noData = !dataSet.length && !histogram.series?.length;
 
         let barsCount = 0;
+        const getValidValuesCount = (values) => values.reduce((count, value) => (
+            (value === 0) ? count : (count + 1)
+        ), 0);
+
         if (!noData) {
             if (isObject(firstValue)) {
                 histogram.values.forEach((value) => {
                     if (value?.data?.length) {
-                        barsCount += value.data.length;
+                        barsCount += getValidValuesCount(value.data);
                     }
                 });
             } else {
-                barsCount = histogram.values.length;
+                barsCount = getValidValuesCount(histogram.values);
             }
         }
 

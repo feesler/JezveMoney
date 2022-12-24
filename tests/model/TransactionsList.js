@@ -707,6 +707,11 @@ export class TransactionsList extends List {
             categories.push(...categoryId);
 
             categories.forEach((id) => {
+                if (id === 0) {
+                    categoryGroups.push([0]);
+                    return;
+                }
+
                 const children = App.state.categories.findByParent(id);
                 const childIds = children.map((item) => item.id);
                 categoryGroups.push([id, ...childIds]);
