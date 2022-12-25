@@ -13,7 +13,7 @@ import { IconButton } from 'jezvejs/IconButton';
 import { PieChart } from 'jezvejs/PieChart';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
-import { formatValueShort } from '../../js/utils.js';
+import { formatValueShort, normalize } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { API } from '../../js/api/index.js';
@@ -80,7 +80,7 @@ class StatisticsView extends View {
         const initialState = {
             accountCurrency: this.props.accountCurrency,
             chartData: null,
-            pieChartData: null,
+            selectedColumn: null,
             pieChartInfo: null,
             selectedPieChartItem: null,
             filter: { ...this.props.filter },
@@ -113,11 +113,17 @@ class StatisticsView extends View {
             'categoriesFilter',
             'currencyFilter',
             'dateFrm',
-            // Chart
+            // Histogram
             'chart',
+            // Pie chart
+            'pieChartHeaderType',
+            'pieChartHeaderDate',
+            'pieChartTotal',
+            'pieChartTotalValue',
             'pieChartContainer',
             'pieChartInfo',
             'pieChartInfoTitle',
+            'pieChartInfoPercent',
             'pieChartInfoValue',
         ]);
 
@@ -222,8 +228,8 @@ class StatisticsView extends View {
         // Pie chart
         this.pieChart = PieChart.create({
             data: null,
-            radius: 100,
-            innerRadius: 70,
+            radius: 150,
+            innerRadius: 120,
             offset: 10,
             onitemover: (item) => this.onPieChartItemOver(item),
             onitemout: (item) => this.onPieChartItemOut(item),
@@ -417,6 +423,10 @@ class StatisticsView extends View {
             value,
             state.accountCurrency,
         );
+    }
+
+    formatPercent(value) {
+        return `${normalize(value)} %`;
     }
 
     renderPopupListItem(item) {
@@ -615,12 +625,34 @@ class StatisticsView extends View {
         this.histogram.elem.dataset.time = state.renderTime;
     }
 
-    renderPieChart(state, prevState = {}) {
-        if (state.pieChartData === prevState?.pieChartData) {
+    renderPieChart(state) {
+        if (!state.selectedColumn) {
+            this.pieChart.hide();
             return;
         }
 
-        this.pieChart.setData(state.pieChartData);
+        this.pieChart.setData(state.selectedColumn.items);
+        this.pieChart.show();
+    }
+
+    renderPieChartHeader(state, prevState = {}) {
+        if (state.selectedColumn === prevState?.selectedColumn) {
+            return;
+        }
+
+        if (!state.selectedColumn) {
+            this.pieChartHeaderType.textContent = null;
+            this.pieChartHeaderDate.textContent = null;
+            show(this.pieChartTotal, false);
+            return;
+        }
+
+        const { groupName, series, total } = state.selectedColumn;
+        this.pieChartHeaderType.textContent = Transaction.getTypeTitle(groupName);
+        this.pieChartHeaderDate.textContent = series;
+
+        this.pieChartTotalValue.textContent = this.formatValue(total);
+        show(this.pieChartTotal, true);
     }
 
     renderPieChartInfo(state, prevState = {}) {
@@ -630,13 +662,20 @@ class StatisticsView extends View {
 
         if (!state.pieChartInfo) {
             this.pieChartInfoTitle.textContent = null;
+            this.pieChartInfoPercent.textContent = null;
             this.pieChartInfoValue.textContent = null;
+            show(this.pieChartInfo, false);
             return;
         }
 
         const { categoryId, value } = state.pieChartInfo;
+        const { total } = state.selectedColumn;
+
         this.pieChartInfoTitle.textContent = this.getDataCategoryName(categoryId);
+        this.pieChartInfoPercent.textContent = this.formatPercent((value / total) * 100);
         this.pieChartInfoValue.textContent = this.formatValue(value);
+
+        show(this.pieChartInfo, true);
     }
 
     render(state, prevState = {}) {
@@ -651,6 +690,7 @@ class StatisticsView extends View {
         this.renderFilters(state, prevState);
         this.renderHistogram(state, prevState);
         this.renderPieChart(state, prevState);
+        this.renderPieChartHeader(state, prevState);
         this.renderPieChartInfo(state, prevState);
 
         if (!state.loading) {

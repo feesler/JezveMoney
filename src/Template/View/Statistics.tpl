@@ -92,16 +92,25 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 <button id="applyFiltersBtn" class="btn submit-btn" type="button">Apply</button>
                             </div>
                         </div>
+                    </div>
 
-                        <div id="chart" class="stat-histogram">
-                            <span class="nodata-message" hidden>No results found</span>
-                        </div>
+                    <div id="chart" class="stat-histogram">
+                        <span class="nodata-message" hidden>No results found</span>
+                    </div>
 
-                        <div id="pieChartContainer" class="piechart-container">
-                            <div id="pieChartInfo" class="piechart-info">
-                                <div id="pieChartInfoTitle" class="piechart-info__title"></div>
-                                <div id="pieChartInfoValue" class="piechart-info__value"></div>
-                            </div>
+                    <div class="piechart-header">
+                        <div id="pieChartHeaderType" class="piechart-header__type"></div>
+                        <div id="pieChartHeaderDate" class="piechart-header__date"></div>
+                    </div>
+                    <div id="pieChartTotal" class="piechart-total">
+                        <div class="piechart-total__title">Total</div>
+                        <div id="pieChartTotalValue" class="piechart-total__value"></div>
+                    </div>
+                    <div id="pieChartContainer" class="piechart-container">
+                        <div id="pieChartInfo" class="piechart-info">
+                            <div id="pieChartInfoTitle" class="piechart-info__title"></div>
+                            <div id="pieChartInfoPercent" class="piechart-info__percent"></div>
+                            <div id="pieChartInfoValue" class="piechart-info__value"></div>
                         </div>
                     </div>
                 </div>

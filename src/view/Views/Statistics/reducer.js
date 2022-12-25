@@ -1,7 +1,10 @@
 import { asArray } from 'jezvejs';
 import { createSlice } from '../../js/store.js';
+import { normalize } from '../../js/utils.js';
 
 const groupTypes = [null, 'day', 'week', 'month', 'year'];
+
+const SECTOR_OFFSET = 10;
 
 // Utils
 export const isSameSelection = (a, b) => (
@@ -12,6 +15,12 @@ export const getGroupTypeByName = (name) => {
     const groupName = (name) ? name.toLowerCase() : null;
     return groupTypes.indexOf(groupName);
 };
+
+const pieChartInfoFromSector = (sector) => ({
+    category: sector.category,
+    categoryId: sector.categoryId,
+    value: sector.value,
+});
 
 // Reducers
 const slice = createSlice({
@@ -113,25 +122,42 @@ const slice = createSlice({
     },
 
     selectDataColumn: (state, target) => {
-        const pieChartData = [];
+        const selectedColumn = {
+            groupName: target.item.groupName,
+            series: target.series,
+            items: [],
+            total: 0,
+        };
+
         target.group.forEach((item) => {
-            if (item.value === 0) {
+            if (
+                selectedColumn.groupName !== item.groupName
+                || item.value === 0
+            ) {
                 return;
             }
 
-            const pieItem = {
+            selectedColumn.items.push({
                 value: item.value,
                 category: item.categoryIndex + 1,
                 categoryId: item.category,
-            };
-            pieChartData.push(pieItem);
+            });
+            selectedColumn.total = normalize(selectedColumn.total + item.value);
         });
+
+        if (selectedColumn.total === 0) {
+            return state;
+        }
+
+        const pieChartInfo = (selectedColumn.items.length === 1)
+            ? selectedColumn.items[0]
+            : null;
 
         return {
             ...state,
-            pieChartData,
-            pieChartInfo: null,
-            selectedPieChartItem: null,
+            selectedColumn,
+            pieChartInfo,
+            selectedPieChartItem: pieChartInfo,
         };
     },
 
@@ -143,11 +169,7 @@ const slice = createSlice({
 
         return {
             ...state,
-            pieChartInfo: {
-                category: sector.category,
-                categoryId: sector.categoryId,
-                value: sector.value,
-            },
+            pieChartInfo: pieChartInfoFromSector(sector),
         };
     },
 
@@ -156,22 +178,23 @@ const slice = createSlice({
         pieChartInfo: state.selectedPieChartItem,
     }),
 
-    selectPieChartItem: (state, item) => {
-        const { sector } = item;
-        const pieChartData = state.pieChartData.map((pieItem) => ({
-            ...pieItem,
-            offset: (pieItem.category === sector?.category) ? 10 : 0,
-        }));
+    selectPieChartItem: (state, { sector }) => {
+        const selectedColumn = (sector?.categoryId !== 0)
+            ? {
+                ...state.selectedColumn,
+                items: state.selectedColumn.items.map((item) => ({
+                    ...item,
+                    offset: (item.category === sector?.category && item.offset !== SECTOR_OFFSET)
+                        ? SECTOR_OFFSET
+                        : 0,
+                })),
+            }
+            : state.selectedColumn;
 
-        const selectedPieChartItem = {
-            category: sector.category,
-            categoryId: sector.categoryId,
-            value: sector.value,
-        };
-
+        const selectedPieChartItem = pieChartInfoFromSector(sector);
         return {
             ...state,
-            pieChartData,
+            selectedColumn,
             pieChartInfo: selectedPieChartItem,
             selectedPieChartItem,
         };
@@ -182,6 +205,9 @@ const slice = createSlice({
         chartData: { ...data.histogram },
         filter: { ...data.filter },
         form: { ...data.filter },
+        selectedColumn: null,
+        pieChartInfo: null,
+        selectedPieChartItem: null,
         renderTime: Date.now(),
     }),
 
