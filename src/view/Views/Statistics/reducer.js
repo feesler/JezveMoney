@@ -22,6 +22,12 @@ const pieChartInfoFromSector = (sector) => ({
     value: sector.value,
 });
 
+const pieChartInfoFromChartItem = (item) => ({
+    value: item.value,
+    category: item.categoryIndex + 1,
+    categoryId: item.category,
+});
+
 // Reducers
 const slice = createSlice({
     startLoading: (state) => (
@@ -129,6 +135,8 @@ const slice = createSlice({
             total: 0,
         };
 
+        const pieChartInfo = pieChartInfoFromChartItem(target.item);
+
         target.group.forEach((item) => {
             if (
                 selectedColumn.groupName !== item.groupName
@@ -137,21 +145,16 @@ const slice = createSlice({
                 return;
             }
 
-            selectedColumn.items.push({
-                value: item.value,
-                category: item.categoryIndex + 1,
-                categoryId: item.category,
-            });
+            const pieItem = pieChartInfoFromChartItem(item);
+            pieItem.offset = (item.category === pieChartInfo.categoryId) ? SECTOR_OFFSET : 0;
+
+            selectedColumn.items.push(pieItem);
             selectedColumn.total = normalize(selectedColumn.total + item.value);
         });
 
         if (selectedColumn.total === 0) {
             return state;
         }
-
-        const pieChartInfo = (selectedColumn.items.length === 1)
-            ? selectedColumn.items[0]
-            : null;
 
         return {
             ...state,
@@ -179,17 +182,15 @@ const slice = createSlice({
     }),
 
     selectPieChartItem: (state, { sector }) => {
-        const selectedColumn = (sector?.categoryId !== 0)
-            ? {
-                ...state.selectedColumn,
-                items: state.selectedColumn.items.map((item) => ({
-                    ...item,
-                    offset: (item.category === sector?.category && item.offset !== SECTOR_OFFSET)
-                        ? SECTOR_OFFSET
-                        : 0,
-                })),
-            }
-            : state.selectedColumn;
+        const selectedColumn = {
+            ...state.selectedColumn,
+            items: state.selectedColumn.items.map((item) => ({
+                ...item,
+                offset: (item.category === sector?.category && item.offset !== SECTOR_OFFSET)
+                    ? SECTOR_OFFSET
+                    : 0,
+            })),
+        };
 
         const selectedPieChartItem = pieChartInfoFromSector(sector);
         return {
