@@ -41,9 +41,12 @@ class Statistics extends TemplateController
         $groupTypes = TransactionModel::getHistogramGroupNames();
         $data["groupTypes"] = $groupTypes;
 
-        $groupType_id = 0;
+        $groupType_id = GROUP_BY_WEEK;
         if (isset($filterObj->group)) {
-            $groupType_id = TransactionModel::getHistogramGroupTypeByName($filterObj->group);
+            $groupType = TransactionModel::getHistogramGroupTypeByName($filterObj->group);
+            if ($groupType !== false) {
+                $groupType_id = $groupType;
+            }
         }
         $data["groupType_id"] = $groupType_id;
 

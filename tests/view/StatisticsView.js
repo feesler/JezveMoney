@@ -17,13 +17,12 @@ import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js
 import { App } from '../Application.js';
 import { fixDate } from '../common.js';
 
-const NO_GROUP = 0;
 const GROUP_BY_DAY = 1;
 const GROUP_BY_WEEK = 2;
 const GROUP_BY_MONTH = 3;
 const GROUP_BY_YEAR = 4;
 
-const availGroupTypes = [NO_GROUP, GROUP_BY_DAY, GROUP_BY_WEEK, GROUP_BY_MONTH, GROUP_BY_YEAR];
+const availGroupTypes = [GROUP_BY_DAY, GROUP_BY_WEEK, GROUP_BY_MONTH, GROUP_BY_YEAR];
 
 /** Statistics view class */
 export class StatisticsView extends AppView {
@@ -139,7 +138,6 @@ export class StatisticsView extends AppView {
 
     getGroupTypeString(groupType) {
         const groupTypesMap = {
-            [NO_GROUP]: 'none',
             [GROUP_BY_DAY]: 'day',
             [GROUP_BY_WEEK]: 'week',
             [GROUP_BY_MONTH]: 'month',
@@ -455,10 +453,6 @@ export class StatisticsView extends AppView {
         await this.waitForData(() => this.content.groupDropDown.setSelection(group));
 
         return App.view.checkState(expected);
-    }
-
-    noGroup() {
-        return this.groupBy(NO_GROUP);
     }
 
     groupByDay() {

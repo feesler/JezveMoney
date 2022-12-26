@@ -21,7 +21,6 @@ define("TRANSFER", 3);
 define("DEBT", 4);
 
 // Statistics group types
-define("NO_GROUP", 0);
 define("GROUP_BY_DAY", 1);
 define("GROUP_BY_WEEK", 2);
 define("GROUP_BY_MONTH", 3);
@@ -48,7 +47,6 @@ class TransactionModel extends CachedTable
     private static $availReports = ["account", "currency", "category"];
 
     private static $histogramGroupNames = [
-        NO_GROUP => "None",
         GROUP_BY_DAY => "Day",
         GROUP_BY_WEEK => "Week",
         GROUP_BY_MONTH => "Month",
@@ -1660,7 +1658,7 @@ class TransactionModel extends CachedTable
 
     protected function getLabel($time, $groupType)
     {
-        if ($groupType == NO_GROUP || $groupType == GROUP_BY_DAY || $groupType == GROUP_BY_WEEK) {
+        if ($groupType == GROUP_BY_DAY || $groupType == GROUP_BY_WEEK) {
             return date("d.m.Y", $time);
         }
 
@@ -1685,7 +1683,7 @@ class TransactionModel extends CachedTable
             "info" => $info,
         ];
 
-        if ($groupType == NO_GROUP || $groupType == GROUP_BY_DAY) {
+        if ($groupType == GROUP_BY_DAY) {
             $res["id"] = $info["mday"] . "." . $info["mon"] . "." . $info["year"];
         } elseif ($groupType == GROUP_BY_WEEK) {
             $res["id"] = $info["week"] . "." . $info["year"];
@@ -1703,16 +1701,6 @@ class TransactionModel extends CachedTable
     {
         if (!is_array($itemA) || !is_array($itemB)) {
             throw new \Error("Invalid parameters");
-        }
-
-        // In 'no group' mode any item could be next to another
-        // So, return -1/1 if time is different and 0 otherwise
-        if ($groupType == NO_GROUP) {
-            if ($itemA["id"] == $itemB["id"]) {
-                return 0;
-            }
-
-            return ($itemB["time"] > $itemA["time"]) ? 1 : -1;
         }
 
         if ($groupType == GROUP_BY_DAY) {
@@ -1749,7 +1737,6 @@ class TransactionModel extends CachedTable
     protected function getNextDate($time, $groupType)
     {
         $durationMap = [
-            NO_GROUP => "P1D",
             GROUP_BY_DAY => "P1D",
             GROUP_BY_WEEK => "P1W",
             GROUP_BY_MONTH => "P1M",
@@ -1852,9 +1839,11 @@ class TransactionModel extends CachedTable
         // Group type
         if (isset($request["group"])) {
             $groupType = self::getHistogramGroupTypeByName($request["group"]);
-            if ($groupType != 0) {
+            if ($groupType !== false) {
                 $res->group = strtolower($request["group"]);
             }
+        } else {
+            $res->group = self::$histogramGroupNames[GROUP_BY_WEEK];
         }
 
         $stDate = isset($request["stdate"]) ? $request["stdate"] : null;
@@ -1920,9 +1909,7 @@ class TransactionModel extends CachedTable
         $groupArr = [];
         $sumDate = null;
         $curDate = null;
-        $prevDate = null;
         $curSum = [];
-        $itemsInGroup = 0;
 
         $typesReq = (isset($params["type"])) ? $params["type"] : EXPENSE;
         $typesReq = asArray($typesReq);
@@ -1943,7 +1930,7 @@ class TransactionModel extends CachedTable
             }
         }
 
-        $group_type = (isset($params["group"])) ? intval($params["group"]) : NO_GROUP;
+        $group_type = (isset($params["group"])) ? intval($params["group"]) : GROUP_BY_WEEK;
         $limit = (isset($params["limit"])) ? intval($params["limit"]) : 0;
         if (!self::$user_id || !count($transTypes)) {
             return null;
@@ -2003,21 +1990,8 @@ class TransactionModel extends CachedTable
             }
 
             $dateInfo = $this->getDateInfo($item->date, $group_type);
-            $itemsInGroup++;
             $amount = ($isSource) ? $item->src_amount : $item->dest_amount;
-
-            if ($group_type == NO_GROUP) {
-                $amountArr[$item->type][$category][] = normalize($amount);
-
-                if (is_array($prevDate) && $prevDate["id"] != $dateInfo["id"]) {
-                    $label = $this->getLabel($prevDate["time"], $group_type);
-                    $groupArr[] = [$label, $itemsInGroup - 1];
-                    $itemsInGroup = 1;
-                }
-                $prevDate = $dateInfo;
-            } else {
-                $curDate = $dateInfo;
-            }
+            $curDate = $dateInfo;
 
             if (is_null($sumDate)) {        // first iteration
                 $sumDate = $curDate;
@@ -2056,8 +2030,7 @@ class TransactionModel extends CachedTable
         foreach ($transTypes as $type) {
             $remainSum += array_sum($curSum[$type]);
         }
-
-        if ($group_type != NO_GROUP && $remainSum != 0.0) {
+        if ($remainSum != 0.0) {
             foreach ($transTypes as $type) {
                 foreach ($dataCategories as $cat) {
                     $amountArr[$type][$cat][] = $curSum[$type][$cat];
@@ -2066,9 +2039,6 @@ class TransactionModel extends CachedTable
 
             $label = $this->getLabel($sumDate["time"], $group_type);
             $groupArr[] = [$label, 1];
-        } elseif ($group_type == NO_GROUP && is_array($prevDate)) {
-            $label = $this->getLabel($prevDate["time"], $group_type);
-            $groupArr[] = [$label, $itemsInGroup];
         }
 
         // Flatten arrays of values
@@ -2162,7 +2132,7 @@ class TransactionModel extends CachedTable
             }
         }
 
-        return NO_GROUP;
+        return false;
     }
 
     // Return array of histogram group names
