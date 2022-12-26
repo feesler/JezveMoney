@@ -337,6 +337,8 @@ export class StatisticsView extends AppView {
     }
 
     async byCategories() {
+        await this.parse();
+
         await this.openFilters();
 
         this.model.filter.report = 'category';
@@ -351,14 +353,14 @@ export class StatisticsView extends AppView {
     }
 
     async byAccounts() {
+        await this.parse();
+
         await this.openFilters();
 
         this.model.filter.report = 'account';
+        this.model.filter.accounts = [];
         delete this.model.filter.curr_id;
         delete this.model.filter.categories;
-
-        const account = App.state.getFirstAccount();
-        this.model.filter.accounts = account.id;
         const expected = this.getExpectedState();
 
         await this.waitForData(() => this.content.reportMenu.selectItemByValue('account'));
@@ -367,6 +369,8 @@ export class StatisticsView extends AppView {
     }
 
     async byCurrencies() {
+        await this.parse();
+
         await this.openFilters();
 
         this.model.filter.report = 'currency';

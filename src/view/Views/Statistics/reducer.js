@@ -200,6 +200,11 @@ const slice = createSlice({
         };
     },
 
+    setRenderTime: (state) => ({
+        ...state,
+        renderTime: Date.now(),
+    }),
+
     dataRequestLoaded: (state, data) => ({
         ...state,
         chartData: { ...data.histogram },
@@ -208,7 +213,6 @@ const slice = createSlice({
         selectedColumn: null,
         pieChartInfo: null,
         selectedPieChartItem: null,
-        renderTime: Date.now(),
     }),
 
     dataRequestError: (state) => ({

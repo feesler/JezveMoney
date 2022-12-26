@@ -29,6 +29,10 @@ const MS_IN_DAY = 86400000;
 
 const availGroupTypes = ['day', 'week', 'month', 'year'];
 
+const defaultReportType = 'category';
+const defaultTransactionType = EXPENSE;
+const defaultGroupType = 'week';
+
 export class TransactionsList extends List {
     async fetch() {
         return api.transaction.list();
@@ -655,7 +659,7 @@ export class TransactionsList extends List {
     }
 
     getStatistics(params) {
-        const report = params?.report ?? 'account';
+        const report = params?.report ?? defaultReportType;
         const amountArr = {};
         let groupArr = [];
         let sumDate = null;
@@ -708,7 +712,7 @@ export class TransactionsList extends List {
             });
         }
 
-        const transType = params.type ?? [EXPENSE];
+        const transType = params.type ?? defaultTransactionType;
         const transTypes = asArray(transType);
         for (const type of transTypes) {
             amountArr[type] = {};
@@ -719,7 +723,7 @@ export class TransactionsList extends List {
             }
         }
 
-        const groupType = params.group ?? 'week';
+        const groupType = params.group ?? defaultGroupType;
         const limit = params.limit ?? 0;
 
         const itemsFilter = {

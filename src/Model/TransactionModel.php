@@ -29,6 +29,10 @@ define("GROUP_BY_YEAR", 4);
 const MONTHS_IN_YEAR = 12;
 const WEEKS_IN_YEAR = 52;
 
+const DEFAULT_REPORT_TYPE = "category";
+const DEFAULT_TRANSACTION_TYPE = EXPENSE;
+const DEFAULT_GROUP_TYPE = GROUP_BY_WEEK;
+
 class TransactionModel extends CachedTable
 {
     use Singleton;
@@ -1768,7 +1772,7 @@ class TransactionModel extends CachedTable
         $res = new \stdClass();
 
         // Report type
-        $reportType = $request["report"] ?? "account";
+        $reportType = $request["report"] ?? DEFAULT_REPORT_TYPE;
         if (!is_string($reportType)) {
             throw new \Error("Invalid report type");
         }
@@ -1780,7 +1784,7 @@ class TransactionModel extends CachedTable
         $res->report = $reportType;
 
         // Transaction type
-        $transactionType = $request["type"] ?? EXPENSE;
+        $transactionType = $request["type"] ?? DEFAULT_TRANSACTION_TYPE;
         $transactionType = asArray($transactionType);
 
         $transTypes = [];
@@ -1843,7 +1847,7 @@ class TransactionModel extends CachedTable
                 $res->group = strtolower($request["group"]);
             }
         } else {
-            $res->group = self::$histogramGroupNames[GROUP_BY_WEEK];
+            $res->group = self::$histogramGroupNames[DEFAULT_GROUP_TYPE];
         }
 
         $stDate = isset($request["stdate"]) ? $request["stdate"] : null;
@@ -1911,7 +1915,7 @@ class TransactionModel extends CachedTable
         $curDate = null;
         $curSum = [];
 
-        $typesReq = (isset($params["type"])) ? $params["type"] : EXPENSE;
+        $typesReq = (isset($params["type"])) ? $params["type"] : DEFAULT_TRANSACTION_TYPE;
         $typesReq = asArray($typesReq);
 
         $transTypes = [];
@@ -1930,7 +1934,7 @@ class TransactionModel extends CachedTable
             }
         }
 
-        $group_type = (isset($params["group"])) ? intval($params["group"]) : GROUP_BY_WEEK;
+        $group_type = (isset($params["group"])) ? intval($params["group"]) : DEFAULT_GROUP_TYPE;
         $limit = (isset($params["limit"])) ? intval($params["limit"]) : 0;
         if (!self::$user_id || !count($transTypes)) {
             return null;

@@ -415,6 +415,7 @@ class StatisticsView extends View {
         }
 
         this.stopLoading();
+        this.store.dispatch(actions.setRenderTime());
     }
 
     formatValue(value) {
@@ -543,6 +544,7 @@ class StatisticsView extends View {
         window.app.model.userAccounts.forEach((account) => {
             const enable = (
                 state.accountCurrency === 0
+                || ids.length === 0
                 || account.curr_id === state.accountCurrency
             );
             this.accountDropDown.enableItem(account.id, enable);
@@ -622,7 +624,6 @@ class StatisticsView extends View {
         data.stacked = this.isStackedData(state.filter);
 
         this.histogram.setData(data);
-        this.histogram.elem.dataset.time = state.renderTime;
     }
 
     renderPieChart(state) {
@@ -692,6 +693,8 @@ class StatisticsView extends View {
         this.renderPieChart(state, prevState);
         this.renderPieChartHeader(state, prevState);
         this.renderPieChartInfo(state, prevState);
+
+        this.histogram.elem.dataset.time = state.renderTime;
 
         if (!state.loading) {
             this.loadingIndicator.hide();
