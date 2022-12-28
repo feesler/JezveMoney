@@ -57,7 +57,14 @@ class User extends TemplateController
         if (isset($_POST["remember"])) {
             $reqData["remember"] = true;
         }
-        if (!$this->uMod->login($reqData)) {
+
+        $result = false;
+        try {
+            $result = $this->uMod->login($reqData);
+        } catch (\Error $e) {
+            wlog("Login user error: " . $e->getMessage());
+        }
+        if (!$result) {
             $this->fail(ERR_LOGIN_FAIL);
         }
 
@@ -104,7 +111,14 @@ class User extends TemplateController
         $this->begin();
 
         $reqData = checkFields($_POST, $registerFields);
-        if (!$this->uMod->create($reqData)) {
+
+        $user_id = null;
+        try {
+            $user_id = $this->uMod->create($reqData);
+        } catch (\Error $e) {
+            wlog("Create user error: " . $e->getMessage());
+        }
+        if (!$user_id) {
             throw new \Error(ERR_REGISTER_FAIL);
         }
 

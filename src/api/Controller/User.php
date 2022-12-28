@@ -64,12 +64,18 @@ class User extends ApiListController
         $request["access"] = 0;
         $reqData = checkFields($request, $this->createRequiredFields);
         if ($reqData === false) {
-            throw new \Error("Invalid request data");
+            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
         }
 
         $this->begin();
 
-        if (!$this->uMod->create($reqData)) {
+        $user_id = null;
+        try {
+            $user_id = $this->uMod->create($reqData);
+        } catch (\Error $e) {
+            wlog("Create user error: " . $e->getMessage());
+        }
+        if (!$user_id) {
             throw new \Error(Message::get(ERR_REGISTER_FAIL));
         }
 
@@ -130,7 +136,13 @@ class User extends ApiListController
             throw new \Error($defMsg);
         }
 
-        if (!$this->uMod->setPassword($uObj->login, $reqData["password"])) {
+        $result = false;
+        try {
+            $result = $this->uMod->setPassword($uObj->login, $reqData["password"]);
+        } catch (\Error $e) {
+            wlog("Set password error: " . $e->getMessage());
+        }
+        if (!$result) {
             throw new \Error($defMsg);
         }
 
