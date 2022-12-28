@@ -206,7 +206,6 @@ class StatisticsView extends View {
         // Chart
         this.noDataMessage = this.chart.querySelector('.nodata-message');
         this.histogram = Histogram.create({
-            elem: this.chart,
             height: 320,
             marginTop: 35,
             scrollToEnd: true,
@@ -214,9 +213,9 @@ class StatisticsView extends View {
             animate: true,
             barWidth: 45,
             columnGap: 3,
-            showPopup: true,
             showPopupOnHover: true,
             animatePopup: true,
+            activateOnClick: true,
             activateOnHover: true,
             renderPopup: (target) => this.renderPopupContent(target),
             showLegend: true,
@@ -224,6 +223,7 @@ class StatisticsView extends View {
             renderYAxisLabel: (value) => formatValueShort(value),
             onitemclick: (target) => this.onSelectDataColumn(target),
         });
+        this.chart.append(this.histogram.elem);
 
         // Pie chart
         this.pieChart = PieChart.create({

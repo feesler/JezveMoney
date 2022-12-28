@@ -64,16 +64,16 @@ export class StatisticsView extends AppView {
         assert(res.dateFilter, 'Date filter not found');
 
         res.chart = {
-            elem: await query('#chart'),
+            elem: await query('.histogram'),
             bars: [],
         };
         assert(res.chart, 'Invalid statistics view structure');
 
         res.chart.renderTime = await prop(res.chart.elem, 'dataset.time');
-        res.chartContainer = { elem: await query(res.chart.elem, '.charts') };
+        res.chartContainer = { elem: await query(res.chart.elem, '.chart__horizontal') };
 
-        res.loadingIndicator = { elem: await query(res.chart.elem, '.loading-indicator') };
-        res.noDataMessage = { elem: await query(res.chart.elem, '.nodata-message') };
+        res.loadingIndicator = { elem: await query('.stat-histogram .loading-indicator') };
+        res.noDataMessage = { elem: await query('.stat-histogram .nodata-message') };
 
         const bars = await queryAll(res.chart.elem, '.histogram__bar');
         for (const bar of bars) {
