@@ -47,12 +47,13 @@ class MainView extends View {
         const transactionsWidget = ge('transactionsWidget');
         transactionsWidget.append(this.latestList.elem);
 
-        Histogram.create({
-            elem: 'chart',
+        const histogram = Histogram.create({
             data: this.props.chartData,
             height: 200,
             renderYAxisLabel: (value) => formatValueShort(value),
         });
+        const chart = ge('chart');
+        chart.append(histogram.elem);
     }
 }
 

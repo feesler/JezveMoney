@@ -10,18 +10,18 @@ include(TPL_PATH . "Header.tpl");    ?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
-                    <div id="heading" class="heading">
+                    <header id="heading" class="heading">
                         <h1>Import</h1>
                         <div class="heading-actions" <?= hidden(!$importAvailable) ?>>
                             <?= IconButton::render($uploadBtn) ?>
                         </div>
-                    </div>
+                    </header>
 
                     <?php if (!$importAvailable) { ?>
                         <span id="notAvailMsg" class="nodata-message"><?= e($importNotAvailableMessage) ?></span>
                     <?php   }   ?>
 
-                    <div class="content-header" <?= hidden(!$importAvailable) ?>>
+                    <header class="content-header" <?= hidden(!$importAvailable) ?>>
                         <div id="dataHeaderControls" class="data-header">
                             <div class="header-field account-field">
                                 <label>Main account</label>
@@ -46,11 +46,11 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 <span id="selectedCount" class="counter__value">0</span>
                             </div>
                         </div>
-                    </div>
+                    </header>
 
-                    <div class="data-form" <?= hidden(!$importAvailable) ?>>
+                    <main class="data-form" <?= hidden(!$importAvailable) ?>>
                         <div class="list-footer"></div>
-                    </div>
+                    </main>
                 </div>
             </div>
         </div>

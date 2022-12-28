@@ -101,7 +101,12 @@ class ApiListController extends ApiController
 
         $itemData = $this->preCreate($request);
 
-        $item_id = $this->model->create($itemData);
+        $item_id = null;
+        try {
+            $item_id = $this->model->create($itemData);
+        } catch (\Error $e) {
+            wlog("Create item error: " . $e->getMessage());
+        }
         if (!$item_id) {
             throw new \Error($this->createErrorMsg);
         }
@@ -143,7 +148,12 @@ class ApiListController extends ApiController
             $items[] = $itemData;
         }
 
-        $ids = $this->model->createMultiple($items);
+        $ids = null;
+        try {
+            $ids = $this->model->createMultiple($items);
+        } catch (\Error $e) {
+            wlog("Create multiple items error: " . $e->getMessage());
+        }
         if (!$ids) {
             throw new \Error($this->createErrorMsg);
         }
@@ -188,7 +198,13 @@ class ApiListController extends ApiController
 
         $itemData = $this->preUpdate($request);
 
-        if (!$this->model->update($request["id"], $itemData)) {
+        $updateResult = false;
+        try {
+            $updateResult = $this->model->update($request["id"], $itemData);
+        } catch (\Error $e) {
+            wlog("Update item error: " . $e->getMessage());
+        }
+        if (!$updateResult) {
             throw new \Error($this->updateErrorMsg);
         }
 
@@ -213,7 +229,13 @@ class ApiListController extends ApiController
 
         $this->begin();
 
-        if (!$this->model->del($ids)) {
+        $deleteResult = false;
+        try {
+            $deleteResult = $this->model->del($ids);
+        } catch (\Error $e) {
+            wlog("Delete item(s) error: " . $e->getMessage());
+        }
+        if (!$deleteResult) {
             throw new \Error($this->deleteErrorMsg);
         }
 

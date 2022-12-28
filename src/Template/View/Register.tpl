@@ -6,7 +6,7 @@
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
-                    <div class="form-container">
+                    <main class="form-container">
                         <div class="register-form">
                             <h1>Registration</h1>
                             <form id="form" action="<?= BASEURL ?>register/" method="post">
@@ -31,7 +31,7 @@
                                 </div>
                             </form>
                         </div>
-                    </div>
+                    </main>
                 </div>
             </div>
         </div>

@@ -17,13 +17,12 @@ import { TransactionTypeMenu } from './component/LinkMenu/TransactionTypeMenu.js
 import { App } from '../Application.js';
 import { fixDate } from '../common.js';
 
-const NO_GROUP = 0;
 const GROUP_BY_DAY = 1;
 const GROUP_BY_WEEK = 2;
 const GROUP_BY_MONTH = 3;
 const GROUP_BY_YEAR = 4;
 
-const availGroupTypes = [NO_GROUP, GROUP_BY_DAY, GROUP_BY_WEEK, GROUP_BY_MONTH, GROUP_BY_YEAR];
+const availGroupTypes = [GROUP_BY_DAY, GROUP_BY_WEEK, GROUP_BY_MONTH, GROUP_BY_YEAR];
 
 /** Statistics view class */
 export class StatisticsView extends AppView {
@@ -65,16 +64,16 @@ export class StatisticsView extends AppView {
         assert(res.dateFilter, 'Date filter not found');
 
         res.chart = {
-            elem: await query('#chart'),
+            elem: await query('.histogram'),
             bars: [],
         };
         assert(res.chart, 'Invalid statistics view structure');
 
         res.chart.renderTime = await prop(res.chart.elem, 'dataset.time');
-        res.chartContainer = { elem: await query(res.chart.elem, '.charts') };
+        res.chartContainer = { elem: await query(res.chart.elem, '.chart__horizontal') };
 
-        res.loadingIndicator = { elem: await query(res.chart.elem, '.loading-indicator') };
-        res.noDataMessage = { elem: await query(res.chart.elem, '.nodata-message') };
+        res.loadingIndicator = { elem: await query('.stat-histogram .loading-indicator') };
+        res.noDataMessage = { elem: await query('.stat-histogram .nodata-message') };
 
         const bars = await queryAll(res.chart.elem, '.histogram__bar');
         for (const bar of bars) {
@@ -139,7 +138,6 @@ export class StatisticsView extends AppView {
 
     getGroupTypeString(groupType) {
         const groupTypesMap = {
-            [NO_GROUP]: 'none',
             [GROUP_BY_DAY]: 'day',
             [GROUP_BY_WEEK]: 'week',
             [GROUP_BY_MONTH]: 'month',
@@ -220,15 +218,19 @@ export class StatisticsView extends AppView {
         const noData = !dataSet.length && !histogram.series?.length;
 
         let barsCount = 0;
+        const getValidValuesCount = (values) => values.reduce((count, value) => (
+            (value === 0) ? count : (count + 1)
+        ), 0);
+
         if (!noData) {
             if (isObject(firstValue)) {
                 histogram.values.forEach((value) => {
                     if (value?.data?.length) {
-                        barsCount += value.data.length;
+                        barsCount += getValidValuesCount(value.data);
                     }
                 });
             } else {
-                barsCount = histogram.values.length;
+                barsCount = getValidValuesCount(histogram.values);
             }
         }
 
@@ -335,6 +337,8 @@ export class StatisticsView extends AppView {
     }
 
     async byCategories() {
+        await this.parse();
+
         await this.openFilters();
 
         this.model.filter.report = 'category';
@@ -349,14 +353,14 @@ export class StatisticsView extends AppView {
     }
 
     async byAccounts() {
+        await this.parse();
+
         await this.openFilters();
 
         this.model.filter.report = 'account';
+        this.model.filter.accounts = [];
         delete this.model.filter.curr_id;
         delete this.model.filter.categories;
-
-        const account = App.state.getFirstAccount();
-        this.model.filter.accounts = account.id;
         const expected = this.getExpectedState();
 
         await this.waitForData(() => this.content.reportMenu.selectItemByValue('account'));
@@ -365,6 +369,8 @@ export class StatisticsView extends AppView {
     }
 
     async byCurrencies() {
+        await this.parse();
+
         await this.openFilters();
 
         this.model.filter.report = 'currency';
@@ -451,10 +457,6 @@ export class StatisticsView extends AppView {
         await this.waitForData(() => this.content.groupDropDown.setSelection(group));
 
         return App.view.checkState(expected);
-    }
-
-    noGroup() {
-        return this.groupBy(NO_GROUP);
     }
 
     groupByDay() {

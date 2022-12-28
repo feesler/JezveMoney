@@ -1,4 +1,4 @@
-<div class="header">
+<header class="header">
     <a class="header-logo" href="<?= BASEURL ?>" tabindex="1">
         <span class="header-logo__icon"><?= svgIcon("header_logo", "logo-icon") ?></span>
         <span class="header-logo__title">Jezve Money</span>
@@ -21,7 +21,7 @@
             <div class="header-title"></div>
         </div>
     </div>
-</div>
+</header>
 
 <nav class="main-navigation navigation-content">
     <div class="navigation-controls">
@@ -70,7 +70,7 @@
     </ul>
 </nav>
 
-<div class="user-navigation-content" hidden>
+<nav class="user-navigation-content" hidden>
     <div class="user-navigation-controls">
         <?php if ($this->user_id != 0) {        ?>
             <div class="btn user-btn">
@@ -103,4 +103,4 @@
             <?php        }        ?>
         </ul>
     <?php    }        ?>
-</div>
+</nav>

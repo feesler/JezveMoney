@@ -1,7 +1,7 @@
 <div class="rules-dialog" hidden>
-    <div class="rules-header">
+    <header class="rules-header">
         <label>Import rules</label>
         <input class="btn link-btn create-btn" type="button" value="Create">
-    </div>
+    </header>
     <div class="rules-list-container"></div>
 </div>

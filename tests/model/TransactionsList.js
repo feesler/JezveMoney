@@ -27,7 +27,11 @@ const MONTHS_IN_YEAR = 12;
 const DAYS_IN_WEEK = 7;
 const MS_IN_DAY = 86400000;
 
-const availGroupTypes = ['none', 'day', 'week', 'month', 'year'];
+const availGroupTypes = ['day', 'week', 'month', 'year'];
+
+const defaultReportType = 'category';
+const defaultTransactionType = EXPENSE;
+const defaultGroupType = 'week';
 
 export class TransactionsList extends List {
     async fetch() {
@@ -559,7 +563,7 @@ export class TransactionsList extends List {
         const date = new Date(time);
         const res = { time, date };
 
-        if (groupType === 'none' || groupType === 'day') {
+        if (groupType === 'day') {
             res.id = formatDate(date);
         } else if (groupType === 'week') {
             const week = getWeek(time);
@@ -579,14 +583,6 @@ export class TransactionsList extends List {
     getDateDiff(itemA, itemB, groupType) {
         const dateA = new Date(cutDate(itemA.date));
         const dateB = new Date(cutDate(itemB.date));
-
-        if (groupType === 'none') {
-            if (itemA.id === itemB.id) {
-                return 0;
-            }
-
-            return (dateB > dateA) ? 1 : -1;
-        }
 
         if (groupType === 'day') {
             return (dateB - dateA) / MS_IN_DAY;
@@ -618,7 +614,7 @@ export class TransactionsList extends List {
         assert(availGroupTypes.includes(groupType), 'Invalid group type');
 
         let timestamp = 0;
-        if (groupType === 'none' || groupType === 'day') {
+        if (groupType === 'day') {
             timestamp = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate() + 1);
         }
         if (groupType === 'week') {
@@ -643,7 +639,7 @@ export class TransactionsList extends List {
             return null;
         }
 
-        if (groupType === 'none' || groupType === 'day' || groupType === 'week') {
+        if (groupType === 'day' || groupType === 'week') {
             return formatDate(date);
         }
 
@@ -663,14 +659,12 @@ export class TransactionsList extends List {
     }
 
     getStatistics(params) {
-        const report = params?.report ?? 'account';
+        const report = params?.report ?? defaultReportType;
         const amountArr = {};
         let groupArr = [];
         let sumDate = null;
         let curDate = null;
-        let prevDate = null;
         const curSum = {};
-        let itemsInGroup = 0;
         let currId = params.curr_id;
         const accId = asArray(params.acc_id);
         const categoryId = asArray(params.category_id);
@@ -707,13 +701,18 @@ export class TransactionsList extends List {
             categories.push(...categoryId);
 
             categories.forEach((id) => {
+                if (id === 0) {
+                    categoryGroups.push([0]);
+                    return;
+                }
+
                 const children = App.state.categories.findByParent(id);
                 const childIds = children.map((item) => item.id);
                 categoryGroups.push([id, ...childIds]);
             });
         }
 
-        const transType = params.type ?? [EXPENSE];
+        const transType = params.type ?? defaultTransactionType;
         const transTypes = asArray(transType);
         for (const type of transTypes) {
             amountArr[type] = {};
@@ -724,7 +723,7 @@ export class TransactionsList extends List {
             }
         }
 
-        const groupType = params.group ?? 'none';
+        const groupType = params.group ?? defaultGroupType;
         const limit = params.limit ?? 0;
 
         const itemsFilter = {
@@ -776,21 +775,8 @@ export class TransactionsList extends List {
 
             const time = convDate(item.date);
             const dateInfo = this.getDateInfo(time, groupType);
-            itemsInGroup += 1;
             const amount = (isSource) ? item.src_amount : item.dest_amount;
-
-            if (groupType === 'none') {
-                amountArr[item.type][category].push(amount);
-
-                if (prevDate && prevDate.id !== dateInfo.id) {
-                    const label = this.getStatisticsLabel(prevDate.date, groupType);
-                    groupArr.push([label, itemsInGroup - 1]);
-                    itemsInGroup = 1;
-                }
-                prevDate = dateInfo;
-            } else {
-                curDate = dateInfo;
-            }
+            curDate = dateInfo;
 
             if (!sumDate) {
                 sumDate = curDate;
@@ -828,7 +814,7 @@ export class TransactionsList extends List {
             categories.some((cat) => curSum[type][cat] > 0)
         ));
 
-        if (groupType !== 'none' && valuesRemain) {
+        if (valuesRemain) {
             for (const type of transTypes) {
                 for (const cat of categories) {
                     amountArr[type][cat].push(curSum[type][cat]);
@@ -837,9 +823,6 @@ export class TransactionsList extends List {
 
             const label = this.getStatisticsLabel(sumDate.date, groupType);
             groupArr.push([label, 1]);
-        } else if (groupType === 'none' && prevDate) {
-            const label = this.getStatisticsLabel(prevDate.date, groupType);
-            groupArr.push([label, itemsInGroup]);
         }
 
         const dataSets = [];

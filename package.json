@@ -1,6 +1,6 @@
 {
     "name": "jezve-money",
-    "version": "1.42.0",
+    "version": "1.43.0",
     "description": "",
     "main": "index.js",
     "type": "module",
@@ -53,8 +53,8 @@
         "eslint-config-airbnb-base": "^14.2.1",
         "eslint-import-resolver-webpack": "^0.13.2",
         "eslint-plugin-import": "^2.26.0",
-        "jezve-test": "^1.3.3",
-        "jezvejs-test": "^1.2.6",
+        "jezve-test": "^1.4.0",
+        "jezvejs-test": "^1.2.7",
         "mini-css-extract-plugin": "^2.7.2",
         "npm-run-all": "^4.1.5",
         "postcss-cli": "^8.3.1",
@@ -71,8 +71,8 @@
     },
     "dependencies": {
         "@babel/runtime": "^7.20.7",
-        "core-js": "^3.26.1",
-        "jezvejs": "^1.63.8",
+        "core-js": "^3.27.0",
+        "jezvejs": "^1.65.2",
         "whatwg-fetch": "^3.6.2"
     }
 }

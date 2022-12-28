@@ -208,7 +208,10 @@ class Transaction extends ApiListController
         }
 
         if (isset($filterObj->group)) {
-            $params["group"] = TransactionModel::getHistogramGroupTypeByName($filterObj->group);
+            $groupType = TransactionModel::getHistogramGroupTypeByName($filterObj->group);
+            if ($groupType !== false) {
+                $params["group"] = $groupType;
+            }
         }
 
         if (isset($filterObj->stdate) && isset($filterObj->enddate)) {

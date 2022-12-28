@@ -62,7 +62,13 @@ class Profile extends ApiController
 
         $this->begin();
 
-        if (!$this->personMod->update($this->owner_id, $reqData)) {
+        $result = false;
+        try {
+            $result = $this->personMod->update($this->owner_id, $reqData);
+        } catch (\Error $e) {
+            wlog("Change name error: " . $e->getMessage());
+        }
+        if (!$result) {
             throw new \Error($defMsg);
         }
 
@@ -95,7 +101,13 @@ class Profile extends ApiController
             throw new \Error($defMsg);
         }
 
-        if (!$this->uMod->changePassword($uObj->login, $reqData["current"], $reqData["new"])) {
+        $result = false;
+        try {
+            $result = $this->uMod->changePassword($uObj->login, $reqData["current"], $reqData["new"]);
+        } catch (\Error $e) {
+            wlog("Change password error: " . $e->getMessage());
+        }
+        if (!$result) {
             throw new \Error($defMsg);
         }
 
@@ -106,10 +118,97 @@ class Profile extends ApiController
     }
 
 
+    private function resetAccounts($deletePersons = false)
+    {
+        $accMod = AccountModel::getInstance();
+        $result = false;
+        try {
+            $result = $accMod->reset(["deletePersons" => $deletePersons]);
+        } catch (\Error $e) {
+            wlog("Reset accounts error: " . $e->getMessage());
+        }
+        if (!$result) {
+            throw new \Error(Message::get(ERR_PROFILE_RESET));
+        }
+    }
+
+
+    private function resetPersons()
+    {
+        $result = false;
+        try {
+            $result = $this->personMod->reset();
+        } catch (\Error $e) {
+            wlog("Reset persons error: " . $e->getMessage());
+        }
+        if (!$result) {
+            throw new \Error(Message::get(ERR_PROFILE_RESET));
+        }
+    }
+
+
+    private function resetCategories()
+    {
+        $categoryModel = CategoryModel::getInstance();
+        $result = false;
+        try {
+            $result = $categoryModel->reset();
+        } catch (\Error $e) {
+            wlog("Reset accounts error: " . $e->getMessage());
+        }
+        if (!$result) {
+            throw new \Error(Message::get(ERR_PROFILE_RESET));
+        }
+    }
+
+
+    private function resetTransactions($keepBalance = false)
+    {
+        $transMod = TransactionModel::getInstance();
+        $result = false;
+        try {
+            $result = $transMod->reset($keepBalance);
+        } catch (\Error $e) {
+            wlog("Reset transactions error: " . $e->getMessage());
+        }
+        if (!$result) {
+            throw new \Error(Message::get(ERR_PROFILE_RESET));
+        }
+    }
+
+
+    private function resetImportTemplates()
+    {
+        $tplModel = ImportTemplateModel::getInstance();
+        $result = false;
+        try {
+            $result = $tplModel->reset();
+        } catch (\Error $e) {
+            wlog("Reset import templates error: " . $e->getMessage());
+        }
+        if (!$result) {
+            throw new \Error(Message::get(ERR_PROFILE_RESET));
+        }
+    }
+
+
+    private function resetImportRules()
+    {
+        $rulesModel = ImportRuleModel::getInstance();
+        $result = false;
+        try {
+            $result = $rulesModel->reset();
+        } catch (\Error $e) {
+            wlog("Reset import rules error: " . $e->getMessage());
+        }
+        if (!$result) {
+            throw new \Error(Message::get(ERR_PROFILE_RESET));
+        }
+    }
+
+
     public function reset()
     {
-        $defMsg = Message::get(ERR_PROFILE_RESET);
-
         if (!$this->isPOST()) {
             throw new \Error("Invalid type of request");
         }
@@ -131,44 +230,22 @@ class Profile extends ApiController
         $this->begin();
 
         if ($request["accounts"]) {
-            $accMod = AccountModel::getInstance();
-            if (!$accMod->reset(["deletePersons" => $request["persons"]])) {
-                throw new \Error($defMsg);
-            }
+            $this->resetAccounts($request["persons"]);
         }
-
         if ($request["persons"]) {
-            if (!$this->personMod->reset()) {
-                throw new \Error($defMsg);
-            }
+            $this->resetPersons();
         }
-
         if ($request["categories"]) {
-            $categoryModel = CategoryModel::getInstance();
-            if (!$categoryModel->reset()) {
-                throw new \Error($defMsg);
-            }
+            $this->resetCategories();
         }
-
         if ($request["transactions"]) {
-            $transMod = TransactionModel::getInstance();
-            if (!$transMod->reset($request["keepbalance"])) {
-                throw new \Error($defMsg);
-            }
+            $this->resetTransactions($request["keepbalance"]);
         }
-
         if ($request["importtpl"]) {
-            $tplModel = ImportTemplateModel::getInstance();
-            if (!$tplModel->reset()) {
-                throw new \Error($defMsg);
-            }
+            $this->resetImportTemplates();
         }
-
         if ($request["importrules"]) {
-            $ruleMod = ImportRuleModel::getInstance();
-            if (!$ruleMod->reset()) {
-                throw new \Error($defMsg);
-            }
+            $this->resetImportRules();
         }
 
         $this->commit();
@@ -186,7 +263,13 @@ class Profile extends ApiController
 
         $this->begin();
 
-        if (!$this->uMod->del($this->user_id)) {
+        $result = false;
+        try {
+            $result = $this->uMod->del($this->user_id);
+        } catch (\Error $e) {
+            wlog("Delete profile error: " . $e->getMessage());
+        }
+        if (!$result) {
             throw new \Error(Message::get(ERR_PROFILE_DELETE));
         }
 

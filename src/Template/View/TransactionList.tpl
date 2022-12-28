@@ -12,7 +12,7 @@ include(TPL_PATH . "Header.tpl"); ?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
-                    <div id="heading" class="heading">
+                    <header id="heading" class="heading">
                         <h1>Transactions</h1>
                         <div class="heading-actions">
                             <?= IconButton::render([
@@ -24,9 +24,9 @@ include(TPL_PATH . "Header.tpl"); ?>
                                 "icon" => "plus"
                             ]) ?>
                         </div>
-                    </div>
+                    </header>
 
-                    <div id="contentHeader" class="content-header">
+                    <header id="contentHeader" class="content-header">
                         <?= IconButton::render([
                             "id" => "filtersBtn",
                             "classNames" => "filters-btn",
@@ -34,48 +34,48 @@ include(TPL_PATH . "Header.tpl"); ?>
                             "title" => "Filters"
                         ]) ?>
 
-                        <div id="filtersContainer" class="filters-container">
-                            <div class="filters-heading">
+                        <aside id="filtersContainer" class="filters-container">
+                            <header class="filters-heading">
                                 <span class="filters-heading__title">Filters</span>
                                 <button id="closeFiltersBtn" class="btn icon-btn close-btn right-align" type="button">
                                     <svg class="icon close-icon">
                                         <use href="#close"></use>
                                     </svg>
                                 </button>
-                            </div>
+                            </header>
 
                             <div class="filters-list">
                                 <div class="filters-row">
-                                    <div class="filter-item trans-type-filter">
-                                        <h3 class="filter-item__title">Type</h3>
+                                    <section class="filter-item trans-type-filter">
+                                        <header class="filter-item__title">Type</header>
                                         <?= LinkMenu::render([
                                             "id" => "typeMenu",
                                             "classNames" => "trtype-menu",
                                             "multiple" => true,
                                             "items" => $typeMenu,
                                         ]) ?>
-                                    </div>
+                                    </section>
 
-                                    <div id="accountsFilter" class="filter-item">
-                                        <h3 class="filter-item__title">Accounts and persons</h3>
+                                    <section id="accountsFilter" class="filter-item">
+                                        <header class="filter-item__title">Accounts and persons</header>
                                         <select id="acc_id" name="acc_id" multiple></select>
-                                    </div>
+                                    </section>
 
-                                    <div id="categoriesFilter" class="filter-item">
-                                        <h3 class="filter-item__title">Categories</h3>
+                                    <section id="categoriesFilter" class="filter-item">
+                                        <header class="filter-item__title">Categories</header>
                                         <select id="category_id" name="category_id" multiple></select>
-                                    </div>
+                                    </section>
                                 </div>
 
                                 <div class="filters-row">
-                                    <div id="dateFilter" class="filter-item date-range-filter validation-block">
-                                        <h3 class="filter-item__title">Date range</h3>
+                                    <section id="dateFilter" class="filter-item date-range-filter validation-block">
+                                        <header class="filter-item__title">Date range</header>
                                         <?= DateRangeInput::render($dateRange) ?>
-                                    </div>
+                                    </section>
 
-                                    <div id="searchFilter" class="filter-item">
-                                        <h3 class="filter-item__title">Search</h3>
-                                    </div>
+                                    <section id="searchFilter" class="filter-item">
+                                        <header class="filter-item__title">Search</header>
+                                    </section>
                                 </div>
                             </div>
 
@@ -85,9 +85,9 @@ include(TPL_PATH . "Header.tpl"); ?>
                                     <span>Clear all</span>
                                 </a>
                             </div>
-                        </div>
+                        </aside>
 
-                        <div class="list-header">
+                        <header class="list-header">
                             <div class="counters">
                                 <div id="itemsCounter" class="counter">
                                     <span class="counter__title">Items</span>
@@ -98,11 +98,11 @@ include(TPL_PATH . "Header.tpl"); ?>
                                     <span id="selItemsCount" class="counter__value"></span>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </header>
+                    </header>
 
-                    <div class="list-container"></div>
-                    <div class="list-footer"></div>
+                    <main class="list-container"></main>
+                    <footer class="list-footer"></footer>
                 </div>
             </div>
         </div>

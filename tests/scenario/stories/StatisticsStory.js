@@ -41,6 +41,8 @@ export class StatisticsStory extends TestStory {
         await App.view.navigateToStatistics();
 
         await StatisticsTests.checkInitialState();
+
+        await StatisticsTests.byAccounts();
         // Income transactions filter
         await StatisticsTests.filterByType(INCOME);
         await StatisticsTests.filterByType(TRANSFER);

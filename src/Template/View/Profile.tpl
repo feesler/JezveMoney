@@ -6,39 +6,41 @@
         <div class="container">
             <div class="content">
                 <div class="content_wrap column-container">
-                    <div class="heading">
+                    <header class="heading">
                         <h1>Profile</h1>
-                    </div>
+                    </header>
 
-                    <div class="profile-block">
-                        <h2>Login</h2>
-                        <span><?= e($user_login) ?></span>
-                    </div>
+                    <main>
+                        <section class="profile-block">
+                            <h2>Login</h2>
+                            <span><?= e($user_login) ?></span>
+                        </section>
 
-                    <div class="profile-block">
-                        <h2>Name</h2>
-                        <div class="name-container">
-                            <span id="userNameTitle"><?= e($profileInfo["name"]) ?></span>
-                            <a id="changeNameBtn" class="change-name-link" href="<?= BASEURL ?>profile/name/" data-action="name">Change</a>
-                        </div>
-                    </div>
+                        <section class="profile-block">
+                            <h2>Name</h2>
+                            <div class="name-container">
+                                <span id="userNameTitle"><?= e($profileInfo["name"]) ?></span>
+                                <a id="changeNameBtn" class="change-name-link" href="<?= BASEURL ?>profile/name/" data-action="name">Change</a>
+                            </div>
+                        </section>
 
-                    <div class="profile-block">
-                        <h2>Security</h2>
-                        <div><a id="changePassBtn" href="<?= BASEURL ?>profile/password/" data-action="password">Change password</a></div>
-                    </div>
+                        <section class="profile-block">
+                            <h2>Security</h2>
+                            <div><a id="changePassBtn" href="<?= BASEURL ?>profile/password/" data-action="password">Change password</a></div>
+                        </section>
 
-                    <div class="profile-block">
-                        <h2>User data</h2>
-                        <div class="profile-block__section">
-                            <span>You also may reset your data.</span>
-                            <a id="resetBtn" href="<?= BASEURL ?>profile/reset/" data-action="reset">Reset data</a>
-                        </div>
-                        <div class="profile-block__section">
-                            <span>Completely delete profile and all related data.</span>
-                            <input id="delProfileBtn" class="btn submit-btn warning-btn" type="button" value="Delete profile">
-                        </div>
-                    </div>
+                        <section class="profile-block">
+                            <h2>User data</h2>
+                            <div class="profile-block__section">
+                                <span>You also may reset your data.</span>
+                                <a id="resetBtn" href="<?= BASEURL ?>profile/reset/" data-action="reset">Reset data</a>
+                            </div>
+                            <div class="profile-block__section">
+                                <span>Completely delete profile and all related data.</span>
+                                <input id="delProfileBtn" class="btn submit-btn warning-btn" type="button" value="Delete profile">
+                            </div>
+                        </section>
+                    </main>
                 </div>
             </div>
         </div>

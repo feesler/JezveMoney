@@ -1,5 +1,6 @@
 .dark-theme {
   --main-text-color: #dddddd;
+  --dimmed-text-color: #858585;
   --hl-text-color: #ffffff;
   --main-bg-color: #202020;
   --semitrans-bg-color: #20202066;
@@ -203,7 +204,7 @@
   }
 
   .filter-item__title {
-    color: #858585;
+    color: var(--dimmed-text-color);
   }
 
   /* Transaction list item */
@@ -227,18 +228,13 @@
   }
 
   .trans-item_details .field__title {
-    color: #858585;
+    color: var(--dimmed-text-color);
   }
 
   /* 'Show more' button */
   .show-more-btn {
     color: var(--main-text-color);
     background-color: var(--btn-bg);
-  }
-
-  /* Bar chart */
-  .charts svg text tspan {
-    fill: var(--main-text-color);
   }
 
   /* Profile view */
@@ -328,7 +324,7 @@
     }
 
     .field__title {
-      color: #858585;
+      color: var(--dimmed-text-color);
     }
 
     .btn {

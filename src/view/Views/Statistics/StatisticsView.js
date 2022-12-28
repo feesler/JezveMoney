@@ -10,9 +10,10 @@ import { Histogram } from 'jezvejs/Histogram';
 import { DropDown } from 'jezvejs/DropDown';
 import { LinkMenu } from 'jezvejs/LinkMenu';
 import { IconButton } from 'jezvejs/IconButton';
+import { PieChart } from 'jezvejs/PieChart';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
-import { formatValueShort } from '../../js/utils.js';
+import { formatValueShort, normalize } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { API } from '../../js/api/index.js';
@@ -79,6 +80,9 @@ class StatisticsView extends View {
         const initialState = {
             accountCurrency: this.props.accountCurrency,
             chartData: null,
+            selectedColumn: null,
+            pieChartInfo: null,
+            selectedPieChartItem: null,
             filter: { ...this.props.filter },
             form: { ...this.props.filter },
             loading: false,
@@ -109,8 +113,18 @@ class StatisticsView extends View {
             'categoriesFilter',
             'currencyFilter',
             'dateFrm',
-            // Chart
+            // Histogram
             'chart',
+            // Pie chart
+            'pieChartHeaderType',
+            'pieChartHeaderDate',
+            'pieChartTotal',
+            'pieChartTotalValue',
+            'pieChartContainer',
+            'pieChartInfo',
+            'pieChartInfoTitle',
+            'pieChartInfoPercent',
+            'pieChartInfoValue',
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
@@ -192,7 +206,6 @@ class StatisticsView extends View {
         // Chart
         this.noDataMessage = this.chart.querySelector('.nodata-message');
         this.histogram = Histogram.create({
-            elem: this.chart,
             height: 320,
             marginTop: 35,
             scrollToEnd: true,
@@ -200,16 +213,29 @@ class StatisticsView extends View {
             animate: true,
             barWidth: 45,
             columnGap: 3,
-            showPopup: true,
-            pinPopupOnClick: true,
             showPopupOnHover: true,
             animatePopup: true,
+            activateOnClick: true,
             activateOnHover: true,
             renderPopup: (target) => this.renderPopupContent(target),
             showLegend: true,
             renderLegend: (data) => this.renderLegendContent(data),
             renderYAxisLabel: (value) => formatValueShort(value),
+            onitemclick: (target) => this.onSelectDataColumn(target),
         });
+        this.chart.append(this.histogram.elem);
+
+        // Pie chart
+        this.pieChart = PieChart.create({
+            data: null,
+            radius: 150,
+            innerRadius: 120,
+            offset: 10,
+            onitemover: (item) => this.onPieChartItemOver(item),
+            onitemout: (item) => this.onPieChartItemOut(item),
+            onitemclick: (item) => this.onPieChartItemClick(item),
+        });
+        this.pieChartContainer.append(this.pieChart.elem);
 
         // Loading indicator
         this.loadingIndicator = LoadingIndicator.create({
@@ -352,6 +378,26 @@ class StatisticsView extends View {
         this.requestData(form);
     }
 
+    /** Histogram item 'click' event handler */
+    onSelectDataColumn(target) {
+        this.store.dispatch(actions.selectDataColumn(target));
+    }
+
+    /** Pie chart item 'mouseover' event handler */
+    onPieChartItemOver(item) {
+        this.store.dispatch(actions.showPieChartInfo(item));
+    }
+
+    /** Pie chart item 'mouseout' event handler */
+    onPieChartItemOut(item) {
+        this.store.dispatch(actions.hidePieChartInfo(item));
+    }
+
+    /** Pie chart item 'click' event handler */
+    onPieChartItemClick(item) {
+        this.store.dispatch(actions.selectPieChartItem(item));
+    }
+
     replaceHistory(state) {
         const url = this.getFilterURL(state);
         window.history.replaceState({}, PAGE_TITLE, url);
@@ -369,14 +415,19 @@ class StatisticsView extends View {
         }
 
         this.stopLoading();
+        this.store.dispatch(actions.setRenderTime());
     }
 
-    formatItemValue(item) {
+    formatValue(value) {
         const state = this.store.getState();
         return window.app.model.currency.formatCurrency(
-            item.value,
+            value,
             state.accountCurrency,
         );
+    }
+
+    formatPercent(value) {
+        return `${normalize(value)} %`;
     }
 
     renderPopupListItem(item) {
@@ -386,7 +437,7 @@ class StatisticsView extends View {
             children: createElement('span', {
                 props: {
                     className: POPUP_LIST_VALUE_CLASS,
-                    textContent: this.formatItemValue(item),
+                    textContent: this.formatValue(item.value),
                 },
             }),
         });
@@ -493,6 +544,7 @@ class StatisticsView extends View {
         window.app.model.userAccounts.forEach((account) => {
             const enable = (
                 state.accountCurrency === 0
+                || ids.length === 0
                 || account.curr_id === state.accountCurrency
             );
             this.accountDropDown.enableItem(account.id, enable);
@@ -563,7 +615,7 @@ class StatisticsView extends View {
         const [value] = state.chartData?.values ?? [];
         const dataSet = value?.data ?? [];
         const noData = !dataSet.length && !state.chartData?.series?.length;
-        show(this.noDataMessage, noData);
+        show(this.noDataMessage, state.chartData && noData);
         show(this.histogram.chartContainer, !noData);
 
         const data = (noData)
@@ -572,7 +624,59 @@ class StatisticsView extends View {
         data.stacked = this.isStackedData(state.filter);
 
         this.histogram.setData(data);
-        this.histogram.elem.dataset.time = state.renderTime;
+    }
+
+    renderPieChart(state) {
+        if (!state.selectedColumn) {
+            this.pieChart.hide();
+            return;
+        }
+
+        this.pieChart.setData(state.selectedColumn.items);
+        this.pieChart.show();
+    }
+
+    renderPieChartHeader(state, prevState = {}) {
+        if (state.selectedColumn === prevState?.selectedColumn) {
+            return;
+        }
+
+        if (!state.selectedColumn) {
+            this.pieChartHeaderType.textContent = null;
+            this.pieChartHeaderDate.textContent = null;
+            show(this.pieChartTotal, false);
+            return;
+        }
+
+        const { groupName, series, total } = state.selectedColumn;
+        this.pieChartHeaderType.textContent = Transaction.getTypeTitle(groupName);
+        this.pieChartHeaderDate.textContent = series;
+
+        this.pieChartTotalValue.textContent = this.formatValue(total);
+        show(this.pieChartTotal, true);
+    }
+
+    renderPieChartInfo(state, prevState = {}) {
+        if (state.pieChartInfo === prevState?.pieChartInfo) {
+            return;
+        }
+
+        if (!state.pieChartInfo) {
+            this.pieChartInfoTitle.textContent = null;
+            this.pieChartInfoPercent.textContent = null;
+            this.pieChartInfoValue.textContent = null;
+            show(this.pieChartInfo, false);
+            return;
+        }
+
+        const { categoryId, value } = state.pieChartInfo;
+        const { total } = state.selectedColumn;
+
+        this.pieChartInfoTitle.textContent = this.getDataCategoryName(categoryId);
+        this.pieChartInfoPercent.textContent = this.formatPercent((value / total) * 100);
+        this.pieChartInfoValue.textContent = this.formatValue(value);
+
+        show(this.pieChartInfo, true);
     }
 
     render(state, prevState = {}) {
@@ -586,6 +690,11 @@ class StatisticsView extends View {
 
         this.renderFilters(state, prevState);
         this.renderHistogram(state, prevState);
+        this.renderPieChart(state, prevState);
+        this.renderPieChartHeader(state, prevState);
+        this.renderPieChartInfo(state, prevState);
+
+        this.histogram.elem.dataset.time = state.renderTime;
 
         if (!state.loading) {
             this.loadingIndicator.hide();
