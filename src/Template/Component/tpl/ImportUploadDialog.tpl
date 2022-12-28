@@ -1,5 +1,5 @@
 <div id="uploadDialog" class="upload-dialog" hidden>
-    <div id="fileBlock" class="upload-form__browser">
+    <section id="fileBlock" class="upload-form__browser">
         <div class="upload-form__inner">
             <form id="fileimportfrm" class="upload-form" method="post" enctype="multipart/form-data" action="<?= BASEURL ?>api/import/upload">
                 <label id="fileBrowser" class="upload-form__file">
@@ -30,15 +30,15 @@
                 </label>
             <?php   }   ?>
         </div>
-    </div>
+    </section>
 
-    <div id="templateBlock" class="tpl-form" hidden>
+    <section id="templateBlock" class="tpl-form" hidden>
         <div id="tplHeading" class="tpl-form__heading" hidden>
             <div id="tplFilename" class="tpl-form__file"></div>
-            <div class="tpl-form-header">
+            <header class="tpl-form-header">
                 <label id="tplStateLbl">Template</label>
                 <input id="createTplBtn" class="btn link-btn" type="button" value="Create template">
-            </div>
+            </header>
             <div id="tplSelectGroup" class="tpl-form-fields tpl-form__select-group">
                 <div id="tplField" class="tpl-form-field template-field">
                     <select id="templateSel">
@@ -101,5 +101,5 @@
         <div id="uploadControls" class="form-controls" hidden>
             <input id="submitUploadedBtn" class="btn submit-btn" type="button" value="Submit">
         </div>
-    </div>
+    </section>
 </div>

@@ -4,14 +4,14 @@ use JezveMoney\App\Template\Component\TileInfoItem;
 ?>
 <div id="<?=($id)?>" class="account-container"<?=hidden($hidden)?>>
     <input id="<?=($inputId)?>" name="<?=($inputId)?>" type="hidden" value="<?=($inputValue)?>">
-    <div class="tile_header">
+    <header class="tile_header">
         <label><?=($title)?></label>
 <?php   if (!is_null($closeButton)) {     ?>
         <button class="close-btn" type="button"<?=hidden($closeButton)?>>
             <?=svgIcon("close", "close-icon")?>
         </button>
 <?php   }   ?>
-    </div>
+    </header>
     <div class="tile-base"<?=hidden($baseHidden)?>>
         <div class="tile_container">
             <?=Tile::render($tile)?>

@@ -6,13 +6,13 @@
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
-                    <div class="heading">
+                    <header class="heading">
                         <h1>About</h1>
-                    </div>
-                    <div>
+                    </header>
+                    <main>
                         <div>JezveMoney, 2012-<?=e($year)?></div>
                         <div>Version: <?=e($version)?></div>
-                    </div>
+                    </main>
                 </div>
             </div>
         </div>

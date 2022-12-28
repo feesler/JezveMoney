@@ -2,13 +2,13 @@
 
 <div class="layer login-layer">
     <div class="layer-box">
-        <div class="logo-container">
+        <header class="logo-container">
             <div class="login-logo row-container">
                 <span class="logo"><?= svgIcon("logo_u", "logo-icon") ?></span>
                 <span class="title">Jezve Money</span>
             </div>
-        </div>
-        <div class="form-container">
+        </header>
+        <main class="form-container">
             <form id="form" class="login-form" action="<?= BASEURL ?>login/" method="post">
                 <h1>Log in</h1>
                 <div id="login-inp-block" class="validation-block std_margin">
@@ -33,7 +33,7 @@
                     <a class="alter-link" href="<?= BASEURL ?>register/">Register</a>
                 </div>
             </form>
-        </div>
+        </main>
     </div>
 </div>
 

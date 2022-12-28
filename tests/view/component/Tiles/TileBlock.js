@@ -21,7 +21,7 @@ export class TileBlock extends TestComponent {
 
         const res = {};
 
-        const lbl = await query(this.elem, 'div > label');
+        const lbl = await query(this.elem, '.tile_header label');
         assert(lbl, 'Tile block label not found');
         res.label = await prop(lbl, 'textContent');
 

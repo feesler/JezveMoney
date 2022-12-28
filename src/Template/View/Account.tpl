@@ -11,7 +11,7 @@ include(TPL_PATH . "Header.tpl");    ?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
-                    <div class="heading">
+                    <header class="heading">
                         <h1><?= e($headString) ?></h1>
                         <?php if ($this->action == "update") {    ?>
                             <div class="heading-actions">
@@ -23,9 +23,9 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 ]) ?>
                             </div>
                         <?php    }    ?>
-                    </div>
+                    </header>
 
-                    <div>
+                    <main>
                         <form id="accountForm" method="post" action="<?= e(BASEURL . "accounts/" . $this->action) ?>/">
                             <?php if ($this->action == "update") {        ?>
                                 <input id="accid" name="id" type="hidden" value="<?= e($accInfo->id) ?>">
@@ -77,7 +77,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                             </div>
                             <input id="flags" name="flags" type="hidden" value="<?= e($accInfo->flags) ?>">
                         </form>
-                    </div>
+                    </main>
                 </div>
             </div>
         </div>

@@ -10,7 +10,7 @@ include(TPL_PATH . "Header.tpl");    ?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
-                    <div class="heading">
+                    <header class="heading">
                         <h1><?= e($headString) ?></h1>
                         <?php if ($this->action == "update") {        ?>
                             <div class="heading-actions">
@@ -22,8 +22,8 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 ]) ?>
                             </div>
                         <?php    }    ?>
-                    </div>
-                    <div>
+                    </header>
+                    <main>
                         <form id="personForm" method="post" action="<?= e(BASEURL . "persons/" . $this->action) ?>/">
                             <?php if ($this->action == "update") {        ?>
                                 <input id="pid" name="id" type="hidden" value="<?= e($pInfo->id) ?>">
@@ -40,7 +40,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                             </div>
                             <input id="flags" name="flags" type="hidden" value="<?= e($pInfo->flags) ?>">
                         </form>
-                    </div>
+                    </main>
                 </div>
             </div>
         </div>

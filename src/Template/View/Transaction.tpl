@@ -12,7 +12,7 @@ include(TPL_PATH . "Header.tpl");    ?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
-                    <div class="heading">
+                    <header class="heading">
                         <h1><?= e($headString) ?></h1>
                         <?php if ($action == "update") {    ?>
                             <div class="heading-actions">
@@ -24,8 +24,9 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 ]) ?>
                             </div>
                         <?php    }    ?>
-                    </div>
-                    <div>
+                    </header>
+
+                    <main>
                         <form id="form" method="post" action="<?= e($form["action"]) ?>">
                             <?php if ($action == "update") {    ?>
                                 <input name="id" type="hidden" value="<?= e($tr["id"]) ?>">
@@ -148,7 +149,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 <a id="cancelBtn" class="btn cancel-btn" href="<?= BASEURL ?>">Cancel</a>
                             </div>
                         </form>
-                    </div>
+                    </main>
                 </div>
             </div>
         </div>

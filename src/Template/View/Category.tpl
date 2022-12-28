@@ -10,7 +10,7 @@ include(TPL_PATH . "Header.tpl");    ?>
         <div class="container">
             <div class="content">
                 <div class="content_wrap">
-                    <div class="heading">
+                    <header class="heading">
                         <h1><?= e($headString) ?></h1>
                         <?php if ($this->action == "update") {        ?>
                             <div class="heading-actions">
@@ -22,8 +22,9 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 ]) ?>
                             </div>
                         <?php    }    ?>
-                    </div>
-                    <div>
+                    </header>
+
+                    <main>
                         <form id="categoryForm" method="post" action="<?= e(BASEURL . "categories/" . $this->action) ?>/">
                             <?php if ($this->action == "update") {        ?>
                                 <input id="categoryId" name="id" type="hidden" value="<?= e($category->id) ?>">
@@ -53,7 +54,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 <a id="cancelBtn" class="btn cancel-btn" href="<?= BASEURL ?>categories/">Cancel</a>
                             </div>
                         </form>
-                    </div>
+                    </main>
                 </div>
             </div>
         </div>
