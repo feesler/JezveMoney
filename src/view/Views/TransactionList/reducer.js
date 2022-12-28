@@ -149,7 +149,7 @@ const slice = createSlice({
         ...state,
         showCategoryDialog: true,
         categoryDialog: {
-            ...state.categoryDialog,
+            categoryId: 0,
             ids,
         },
         contextItem: null,
