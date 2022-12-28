@@ -502,7 +502,7 @@ export class TransactionListView extends AppView {
         if (model.showCategoryDialog) {
             res.selectCategoryDialog.categorySelect = {
                 visible: true,
-                value: model.categoryDialog.categoryId,
+                value: model.categoryDialog.categoryId.toString(),
             };
             res.selectCategoryDialog.okBtn = {
                 visible: true,
@@ -1142,6 +1142,7 @@ export class TransactionListView extends AppView {
         await this.openContextMenu(index);
 
         this.model.showCategoryDialog = true;
+        this.model.categoryDialog = { categoryId: 0 };
         this.model.contextMenuVisible = false;
         const expected = this.getExpectedState();
 
@@ -1167,6 +1168,7 @@ export class TransactionListView extends AppView {
 
         this.model.listMenuVisible = false;
         this.model.showCategoryDialog = true;
+        this.model.categoryDialog = { categoryId: 0 };
         const expected = this.getExpectedState();
 
         await this.performAction(() => this.content.setCategoryBtn.click());
