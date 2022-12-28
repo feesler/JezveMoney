@@ -534,16 +534,20 @@ label {
   }
 }
 
+/* Attached DropDown */
+.dd__container_active.dd__container_attached {
+  outline: 0 none;
+}
+
+.dd__container_active.dd__container_attached:focus-visible {
+  box-shadow: var(--focus-shadow);
+}
+
 /* DropDown attached to input group button */
 .input-group__btn .dd__container_attached {
   border-bottom-right-radius: var(--ig-border-radius);
   border-right-width: var(--ig-border-width);
   border-top-right-radius: var(--ig-border-radius);
-}
-
-.input-group__btn .dd__container_active.dd__container_attached {
-  outline: 0 none;
-  box-shadow: var(--focus-shadow);
 }
 
 /* Datepicker */
