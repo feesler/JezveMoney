@@ -63,6 +63,10 @@ export class PersonView extends AppView {
         return res;
     }
 
+    setExpectedPerson(person) {
+        this.model.name = person.name.toString();
+    }
+
     getExpectedPerson() {
         const res = {
             name: this.model.name,
@@ -72,6 +76,17 @@ export class PersonView extends AppView {
         if (this.model.isUpdate) {
             res.id = this.model.id;
         }
+
+        return res;
+    }
+
+    getExpectedState() {
+        const res = {
+            name: {
+                visible: true,
+                value: this.model.name.toString(),
+            },
+        };
 
         return res;
     }
@@ -103,7 +118,11 @@ export class PersonView extends AppView {
     }
 
     async inputName(val) {
-        return this.performAction(() => this.content.name.input(val));
+        this.model.name = val;
+        this.expectedState = this.getExpectedState();
+
+        await this.performAction(() => this.content.name.input(val));
+        return this.checkState();
     }
 
     async submit() {

@@ -7,6 +7,7 @@ import {
     click,
     asyncMap,
     isObject,
+    copyObject,
 } from 'jezve-test';
 import { DropDown, IconButton } from 'jezvejs-test';
 import { AppView } from './AppView.js';
@@ -36,6 +37,7 @@ import {
     availTransTypes,
 } from '../model/Transaction.js';
 import { App } from '../Application.js';
+import { AccountsList } from '../model/AccountsList.js';
 
 const infoItemSelectors = [
     '#srcAmountInfo',
@@ -155,6 +157,22 @@ export class TransactionView extends AppView {
         return res;
     }
 
+    createCancelledState(transactionId) {
+        this.cancelledState = App.state.clone();
+        const origTransaction = this.cancelledState.transactions.getItem(transactionId);
+        const originalAccounts = copyObject(this.cancelledState.accounts.data);
+        const canceled = AccountsList.cancelTransaction(originalAccounts, origTransaction);
+        this.cancelledState.accounts.data = canceled;
+    }
+
+    appState(model = this.model) {
+        if (model.isUpdate && !this.cancelledState) {
+            this.createCancelledState(model.id);
+        }
+
+        return (model.isUpdate) ? this.cancelledState : App.state;
+    }
+
     buildModel(cont) {
         const res = this.model;
 
@@ -168,11 +186,13 @@ export class TransactionView extends AppView {
             res.id = cont.id;
         }
 
+        const appState = this.appState(res);
+
         res.srcAccount = (cont.sourceContainer)
-            ? App.state.accounts.getItem(cont.sourceContainer.content.id)
+            ? appState.accounts.getItem(cont.sourceContainer.content.id)
             : null;
         res.destAccount = (cont.destContainer)
-            ? App.state.accounts.getItem(cont.destContainer.content.id)
+            ? appState.accounts.getItem(cont.destContainer.content.id)
             : null;
 
         res.src_curr_id = (cont.srcAmountRow)
@@ -301,7 +321,7 @@ export class TransactionView extends AppView {
         }
 
         if (res.type === DEBT) {
-            res.person = App.state.persons.getItem(cont.personContainer.content.id);
+            res.person = appState.persons.getItem(cont.personContainer.content.id);
             if (res.isAvailable) {
                 assert(res.person, 'Person not found');
             }
@@ -314,7 +334,7 @@ export class TransactionView extends AppView {
             const isSelectAccountVisible = cont.selaccount?.content?.visible;
             res.noAccount = isSelectAccountVisible || cont.noAccountsMsg.visible;
 
-            res.account = App.state.accounts.getItem(cont.debtAccountContainer.content.id);
+            res.account = appState.accounts.getItem(cont.debtAccountContainer.content.id);
             if (res.isAvailable && !res.noAccount) {
                 assert(res.account, 'Account not found');
                 const accountCurrency = (res.debtType) ? res.dest_curr_id : res.src_curr_id;
@@ -769,7 +789,7 @@ export class TransactionView extends AppView {
             assert(state >= -1 && state <= 21, 'Invalid state specified');
 
             const { debtType, noAccount } = this.model;
-            const userAccounts = App.state.getUserAccounts();
+            const userAccounts = this.appState().getUserAccounts();
             const accountsAvailable = userAccounts.length > 0;
 
             res.selaccount = { visible: isAvailable && noAccount && accountsAvailable };
@@ -1014,7 +1034,7 @@ export class TransactionView extends AppView {
             return 0;
         }
 
-        const account = App.state.accounts.getItem(this.model.lastAccount_id);
+        const account = this.appState().accounts.getItem(this.model.lastAccount_id);
         assert(account, 'Last account not found');
 
         return account.balance;
@@ -1118,8 +1138,8 @@ export class TransactionView extends AppView {
     }
 
     setNextSourceAccount(accountId) {
-        const nextAccountId = App.state.getNextAccount(accountId);
-        const newSrcAcc = App.state.accounts.getItem(nextAccountId);
+        const nextAccountId = this.appState().getNextAccount(accountId);
+        const newSrcAcc = this.appState().accounts.getItem(nextAccountId);
         assert(newSrcAcc, 'Next account not found');
 
         this.model.srcAccount = newSrcAcc;
@@ -1130,10 +1150,10 @@ export class TransactionView extends AppView {
     }
 
     setNextDestAccount(accountId) {
-        const nextAccountId = App.state.getNextAccount(accountId);
+        const nextAccountId = this.appState().getNextAccount(accountId);
         assert(nextAccountId, 'Next account not found');
 
-        this.model.destAccount = App.state.accounts.getItem(nextAccountId);
+        this.model.destAccount = this.appState().accounts.getItem(nextAccountId);
         this.model.dest_curr_id = this.model.destAccount.curr_id;
         this.model.destCurr = App.currency.getItem(this.model.dest_curr_id);
 
@@ -1146,7 +1166,7 @@ export class TransactionView extends AppView {
             return null;
         }
 
-        const personAccount = App.state.getPersonAccount(personId, currencyId);
+        const personAccount = this.appState().getPersonAccount(personId, currencyId);
         if (personAccount) {
             return personAccount;
         }
@@ -1170,7 +1190,7 @@ export class TransactionView extends AppView {
         }
 
         this.model.type = type;
-        this.model.isAvailable = App.state.isAvailableTransactionType(type);
+        this.model.isAvailable = this.appState().isAvailableTransactionType(type);
 
         if (type === EXPENSE) {
             if (!this.model.isAvailable) {
@@ -1199,7 +1219,7 @@ export class TransactionView extends AppView {
             } else if (currentType === DEBT) {
                 let fromAccount = this.model.account;
                 if (!fromAccount) {
-                    fromAccount = App.state.getFirstAccount();
+                    fromAccount = this.appState().getFirstAccount();
                 }
 
                 this.model.state = 0;
@@ -1248,7 +1268,7 @@ export class TransactionView extends AppView {
             } else if (currentType === DEBT) {
                 let fromAccount = this.model.account;
                 if (!fromAccount) {
-                    fromAccount = App.state.getFirstAccount();
+                    fromAccount = this.appState().getFirstAccount();
                 }
 
                 this.model.state = 0;
@@ -1287,7 +1307,7 @@ export class TransactionView extends AppView {
                 } else {
                     let scrAccount = this.model.account;
                     if (!scrAccount) {
-                        scrAccount = App.state.getFirstAccount();
+                        scrAccount = this.appState().getFirstAccount();
                     }
 
                     this.model.srcAccount = scrAccount;
@@ -1348,7 +1368,7 @@ export class TransactionView extends AppView {
             }
 
             if (this.model.isAvailable) {
-                this.model.person = App.state.getFirstPerson();
+                this.model.person = this.appState().getFirstPerson();
                 this.model.personAccount = this.getPersonAccount(
                     this.model.person?.id,
                     this.model.src_curr_id,
@@ -1433,7 +1453,7 @@ export class TransactionView extends AppView {
             'Unexpected action: can\'t change source account',
         );
 
-        const newAcc = App.state.accounts.getItem(val);
+        const newAcc = this.appState().accounts.getItem(val);
         if (!this.model.srcAccount || !newAcc || newAcc.id === this.model.srcAccount.id) {
             return true;
         }
@@ -1525,7 +1545,7 @@ export class TransactionView extends AppView {
         const availTypes = [INCOME, TRANSFER];
         assert(availTypes.includes(this.model.type), 'Unexpected action: can\'t change destination account');
 
-        const newAcc = App.state.accounts.getItem(val);
+        const newAcc = this.appState().accounts.getItem(val);
         if (!this.model.destAccount || !newAcc || newAcc.id === this.model.destAccount.id) {
             return true;
         }
@@ -2205,7 +2225,7 @@ export class TransactionView extends AppView {
     }
 
     async changeCategory(val) {
-        const category = App.state.categories.getItem(val);
+        const category = this.appState().categories.getItem(val);
         const categoryId = category?.id ?? 0;
         if (this.model.categoryId === categoryId) {
             return true;
@@ -2229,7 +2249,7 @@ export class TransactionView extends AppView {
     }
 
     async changePerson(val) {
-        this.model.person = App.state.persons.getItem(val);
+        this.model.person = this.appState().persons.getItem(val);
 
         const personAccCurrencyId = (this.model.debtType)
             ? this.model.srcCurr.id
@@ -2299,9 +2319,9 @@ export class TransactionView extends AppView {
             });
         } else {
             if (this.model.lastAccount_id) {
-                this.model.account = App.state.accounts.getItem(this.model.lastAccount_id);
+                this.model.account = this.appState().accounts.getItem(this.model.lastAccount_id);
             } else {
-                this.model.account = App.state.getFirstAccount();
+                this.model.account = this.appState().getFirstAccount();
             }
             assert(this.model.account, 'Account not found');
 
@@ -2350,7 +2370,7 @@ export class TransactionView extends AppView {
     }
 
     async changeAccount(accountId) {
-        const newAcc = App.state.accounts.getItem(accountId);
+        const newAcc = this.appState().accounts.getItem(accountId);
 
         if (!this.model.account || !newAcc || newAcc.id === this.model.account.id) {
             return true;

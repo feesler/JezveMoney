@@ -5,20 +5,20 @@ import {
     baseUrl,
     goTo,
     copyObject,
+    asArray,
 } from 'jezve-test';
-import { TransactionListView } from '../../view/TransactionListView.js';
-import { TransactionView } from '../../view/TransactionView.js';
-import { MainView } from '../../view/MainView.js';
+import { TransactionListView } from '../view/TransactionListView.js';
+import { TransactionView } from '../view/TransactionView.js';
+import { MainView } from '../view/MainView.js';
 import {
     EXPENSE,
     INCOME,
     TRANSFER,
     DEBT,
     Transaction,
-} from '../../model/Transaction.js';
-import { AccountsList } from '../../model/AccountsList.js';
-import { App } from '../../Application.js';
-import { formatProps, generateId } from '../../common.js';
+} from '../model/Transaction.js';
+import { App } from '../Application.js';
+import { generateId } from '../common.js';
 
 export const runAction = async ({ action, data }) => {
     let testDescr = null;
@@ -175,7 +175,7 @@ export const runAction = async ({ action, data }) => {
 };
 
 export const runActions = async (actions) => {
-    for (const action of actions) {
+    for (const action of asArray(actions)) {
         await runAction(action);
     }
 };
@@ -186,86 +186,114 @@ export const runGroup = async (action, data) => {
     }
 };
 
-export const submit = async () => {
-    const validInput = App.view.isValid();
+export const createFromAccount = async (index) => {
+    await test(`Initial state of create transaction view requested from account [${index}]`, async () => {
+        await App.goToMainView();
+        await App.view.goToNewTransactionByAccount(index);
 
-    const res = (validInput) ? App.view.getExpectedTransaction() : null;
-
-    await App.view.submit();
-
-    if (validInput) {
-        assert(!(App.view instanceof TransactionView), 'Fail to submit transaction');
-    }
-
-    return res;
-};
-
-export const create = async (type, params, submitHandler) => {
-    setBlock(`Create ${Transaction.typeToString(type)} (${formatProps(params)})`, 2);
-
-    // Navigate to create transaction page
-    await App.goToMainView();
-
-    if ('fromPerson' in params) {
-        await App.view.goToNewTransactionByPerson(params.fromPerson);
-    } else {
-        const accNum = ('fromAccount' in params) ? params.fromAccount : 0;
-        await App.view.goToNewTransactionByAccount(accNum);
-    }
-
-    await App.view.changeTransactionType(type);
-
-    // Input data and submit
-    const expectedTransaction = await submitHandler(params);
-    if (expectedTransaction) {
-        App.state.createTransaction(expectedTransaction);
-    } else {
-        await App.view.cancel();
-    }
-
-    await test('Submit result', async () => {
-        App.view.expectedState = MainView.render(App.state);
-        App.view.checkState();
-        return App.state.fetchAndTest();
+        App.view.expectedState = App.view.getExpectedState();
+        return App.view.checkState();
     });
 };
 
-export const update = async (type, params, submitHandler) => {
-    assert.isObject(params, 'Parameters not specified');
-    const props = copyObject(params);
+export const createFromPerson = async (index) => {
+    await test(`Initial state of create transaction view requested from person [${index}]`, async () => {
+        await App.goToMainView();
+        await App.view.goToNewTransactionByPerson(index);
 
-    const pos = parseInt(props.pos, 10);
-    assert(!Number.isNaN(pos) && pos >= 0, 'Position of transaction not specified');
-    delete props.pos;
+        App.view.expectedState = App.view.getExpectedState();
+        return App.view.checkState();
+    });
+};
 
-    setBlock(`Update ${Transaction.typeToString(type)} [${pos}] (${formatProps(props)})`, 2);
+export const submit = async () => {
+    await test('Submit transaction', async () => {
+        assert.instanceOf(App.view, TransactionView, 'Invalid view');
 
-    await App.view.navigateToTransactions();
-    await App.view.filterByType(type);
-    await App.view.goToUpdateTransaction(pos);
+        const validInput = App.view.isValid();
+        const expectedTransaction = (validInput) ? App.view.getExpectedTransaction() : null;
 
-    // Step
-    let origTransaction = App.view.getExpectedTransaction();
-    const expectedState = App.state.clone();
-    origTransaction = expectedState.getExpectedTransaction(origTransaction);
-    const originalAccounts = copyObject(expectedState.accounts.data);
-    const canceled = AccountsList.cancelTransaction(originalAccounts, origTransaction);
-    App.state.accounts.data = canceled;
-    await App.view.parse();
+        await App.view.submit();
 
-    const expectedTransaction = await submitHandler(props);
-    if (expectedTransaction) {
-        expectedState.accounts.data = originalAccounts;
-        expectedState.updateTransaction(expectedTransaction);
-        App.state.setState(expectedState);
-    }
+        if (validInput) {
+            assert(!(App.view instanceof TransactionView), 'Fail to submit transaction');
+        }
 
-    await test('Submit result', async () => {
+        if (expectedTransaction) {
+            if (expectedTransaction.id) {
+                App.state.updateTransaction(expectedTransaction);
+            } else {
+                App.state.createTransaction(expectedTransaction);
+            }
+        } else {
+            await App.view.cancel();
+        }
+
         await App.goToMainView();
         App.view.expectedState = MainView.render(App.state);
         App.view.checkState();
         return App.state.fetchAndTest();
     });
+};
+
+export const update = async (type, pos) => {
+    const index = parseInt(pos, 10);
+    assert(!Number.isNaN(index) && index >= 0, 'Position of transaction not specified');
+
+    await test(`Initial state of update ${Transaction.typeToString(type)} view [${index}]`, async () => {
+        await App.view.navigateToTransactions();
+        await App.view.filterByType(type);
+        await App.view.goToUpdateTransaction(pos);
+
+        const origTransaction = App.view.getExpectedTransaction();
+        const isDiff = (origTransaction.src_curr !== origTransaction.dest_curr);
+        if (origTransaction.type === EXPENSE || origTransaction.type === INCOME) {
+            App.view.model.state = (isDiff) ? 2 : 0;
+        }
+
+        if (origTransaction.type === TRANSFER) {
+            App.view.model.state = (isDiff) ? 3 : 0;
+        }
+
+        if (origTransaction.type === DEBT) {
+            const { debtType, noAccount, isDiffCurr } = App.view.model;
+
+            if (isDiffCurr) {
+                App.view.model.state = (debtType) ? 10 : 16;
+            } else if (debtType) {
+                App.view.model.state = (noAccount) ? 6 : 0;
+            } else {
+                App.view.model.state = (noAccount) ? 7 : 3;
+            }
+        }
+
+        const expected = App.view.getExpectedState();
+        return App.view.checkState(expected);
+    });
+};
+
+export const createFromAccountAndSubmit = async (pos, actions) => {
+    setBlock(`Create transaction from account [${pos}]`, 2);
+
+    await createFromAccount(pos);
+    await runActions(actions);
+    await submit();
+};
+
+export const createFromPersonAndSubmit = async (pos, actions) => {
+    setBlock(`Create transaction from person [${pos}]`, 2);
+
+    await createFromPerson(pos);
+    await runActions(actions);
+    await submit();
+};
+
+export const updateAndSubmit = async (type, pos, actions) => {
+    setBlock(`Update ${Transaction.typeToString(type)} [${pos}]`, 2);
+
+    await update(type, pos);
+    await runActions(actions);
+    await submit();
 };
 
 export const del = async (type, transactions) => {

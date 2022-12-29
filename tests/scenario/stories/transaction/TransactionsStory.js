@@ -7,11 +7,7 @@ import {
     availTransTypes,
 } from '../../../model/Transaction.js';
 import { api } from '../../../model/api.js';
-import * as TransactionTests from '../../../run/transaction/index.js';
-import * as ExpenseTransactionTests from '../../../run/transaction/expense.js';
-import * as IncomeTransactionTests from '../../../run/transaction/income.js';
-import * as TransferTransactionTests from '../../../run/transaction/transfer.js';
-import * as DebtTransactionTests from '../../../run/transaction/debt.js';
+import * as TransactionTests from '../../../run/transaction.js';
 import * as AccountTests from '../../../run/account.js';
 import { App } from '../../../Application.js';
 
@@ -106,166 +102,217 @@ export class TransactionsStory extends TestStory {
             KRW,
         } = App.scenario;
 
-        const data = [{
-            fromAccount: 0,
-            destAmount: '123.7801',
-            category: FOOD_CATEGORY,
-            comment: 'buy',
-        }, {
-            fromAccount: 3,
-            srcAmount: '100',
-            destAmount: '7013.21',
-            destCurr: RUB,
-            category: TRANSPORT_CATEGORY,
-        }, {
-            fromAccount: 1,
-            destAmount: '0.01',
-            date: App.dates.yesterday,
-        }, {
-            fromAccount: 1,
-            srcAcc: 4,
-            destAmount: '99.99',
-            date: App.dates.monthAgo,
-        }, {
-            // Check available to create transaction with hidden account
-            fromAccount: 0,
-            srcAcc: App.scenario.HIDDEN_ACCOUNT_IND,
-            destAmount: '0.01',
-        }, {
-            // Try to submit expense with invalid amount
-            fromAccount: 0,
-            destAmount: '',
-        }, {
-            fromAccount: 0,
-            destAmount: '-100',
-        }, {
-            fromAccount: 1,
-            destAmount: '1',
-            destCurr: KRW,
-            srcAmount: '',
-        }, {
-            fromAccount: 1,
-            destAmount: '1',
-            destCurr: KRW,
-            srcAmount: '-100',
-        }, {
-            // Try to submit expense with invalid date
-            fromAccount: 0,
-            destAmount: '100',
-            date: '01.01.69',
-        }];
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'inputDestAmount', data: '123.7801' },
+            { action: 'changeCategory', data: FOOD_CATEGORY },
+            { action: 'inputComment', data: 'buy' },
+        ]);
 
-        await App.scenario.runner.runGroup(ExpenseTransactionTests.create, data);
+        await TransactionTests.createFromAccountAndSubmit(3, [
+            { action: 'changeDestCurrency', data: RUB },
+            { action: 'inputDestAmount', data: '7013.21' },
+            { action: 'inputSrcAmount', data: '100' },
+            { action: 'changeCategory', data: TRANSPORT_CATEGORY },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(1, [
+            { action: 'inputDestAmount', data: '0.01' },
+            { action: 'changeDate', data: App.dates.yesterday },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(1, [
+            { action: 'changeSrcAccountByPos', data: 4 },
+            { action: 'inputDestAmount', data: '99.99' },
+            { action: 'changeDate', data: App.dates.monthAgo },
+        ]);
+
+        // Check create transaction with hidden account
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeSrcAccountByPos', data: App.scenario.HIDDEN_ACCOUNT_IND },
+            { action: 'inputDestAmount', data: '0.01' },
+        ]);
+
+        // Try to submit expense with invalid amount
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'inputDestAmount', data: '' },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'inputDestAmount', data: '-100' },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(1, [
+            { action: 'changeDestCurrency', data: KRW },
+            { action: 'inputDestAmount', data: '1' },
+            { action: 'inputSrcAmount', data: '' },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(1, [
+            { action: 'changeDestCurrency', data: KRW },
+            { action: 'inputDestAmount', data: '1' },
+            { action: 'inputSrcAmount', data: '-100' },
+        ]);
+
+        // Try to submit expense with invalid date
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'inputDestAmount', data: '100' },
+            { action: 'changeDate', data: '01.01.69' },
+        ]);
     }
 
     async createIncome() {
         setBlock('Create income transactions', 1);
 
         const { INVEST_CATEGORY, USD, KRW } = App.scenario;
-        const data = [{
-            fromAccount: 0,
-            srcAmount: '10023.7801',
-            date: App.dates.yesterday,
-            comment: 'some income',
-        }, {
-            fromAccount: 3,
-            srcAmount: '7013.21',
-            destAmount: '100',
-            srcCurr: USD,
-            category: INVEST_CATEGORY,
-        }, {
-            fromAccount: 1,
-            srcAmount: '0.01',
-            date: App.dates.weekAgo,
-            category: INVEST_CATEGORY,
-        }, {
-            fromAccount: 1,
-            destAcc: 4,
-            srcAmount: '99.99',
-            date: App.dates.monthAgo,
-        }, {
-            // Check available to create transaction with hidden account
-            fromAccount: 0,
-            destAcc: App.scenario.HIDDEN_ACCOUNT_IND,
-            srcAmount: '0.01',
-        }, {
-            // Try to submit income with invalid amount
-            fromAccount: 0,
-            srcAmount: '',
-        }, {
-            fromAccount: 0,
-            srcAmount: '-100',
-        }, {
-            fromAccount: 1,
-            srcAmount: '1',
-            srcCurr: KRW,
-            destAmount: '',
-        }, {
-            fromAccount: 1,
-            srcAmount: '1',
-            srcCurr: KRW,
-            destAmount: '-100',
-        },
-        // Try to submit income with invalid date
-        {
-            fromAccount: 0,
-            srcAmount: '100',
-            date: '',
-        }];
 
-        await App.scenario.runner.runGroup(IncomeTransactionTests.create, data);
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: INCOME },
+            { action: 'inputSrcAmount', data: '10023.7801' },
+            { action: 'changeDate', data: App.dates.yesterday },
+            { action: 'inputComment', data: 'some income' },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(3, [
+            { action: 'changeTransactionType', data: INCOME },
+            { action: 'changeSourceCurrency', data: USD },
+            { action: 'inputSrcAmount', data: '7013.21' },
+            { action: 'inputDestAmount', data: '100' },
+            { action: 'changeCategory', data: INVEST_CATEGORY },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(1, [
+            { action: 'changeTransactionType', data: INCOME },
+            { action: 'inputSrcAmount', data: '0.01' },
+            { action: 'changeDate', data: App.dates.weekAgo },
+            { action: 'changeCategory', data: INVEST_CATEGORY },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(1, [
+            { action: 'changeTransactionType', data: INCOME },
+            { action: 'changeDestAccountByPos', data: 4 },
+            { action: 'inputSrcAmount', data: '99.99' },
+            { action: 'changeDate', data: App.dates.monthAgo },
+        ]);
+
+        // Check create transaction with hidden account
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: INCOME },
+            { action: 'changeDestAccountByPos', data: App.scenario.HIDDEN_ACCOUNT_IND },
+            { action: 'inputSrcAmount', data: '0.01' },
+        ]);
+
+        // Try to submit income with invalid amount
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: INCOME },
+            { action: 'inputSrcAmount', data: '' },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: INCOME },
+            { action: 'inputSrcAmount', data: '-100' },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(1, [
+            { action: 'changeTransactionType', data: INCOME },
+            { action: 'changeSourceCurrency', data: KRW },
+            { action: 'inputSrcAmount', data: '1' },
+            { action: 'inputDestAmount', data: '' },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(1, [
+            { action: 'changeTransactionType', data: INCOME },
+            { action: 'changeSourceCurrency', data: KRW },
+            { action: 'inputSrcAmount', data: '1' },
+            { action: 'inputDestAmount', data: '-100' },
+        ]);
+
+        // Try to submit income with invalid date
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: INCOME },
+            { action: 'inputSrcAmount', data: '100' },
+            { action: 'changeDate', data: '' },
+        ]);
     }
 
     async createTransfer() {
         setBlock('Create transfer transactions', 1);
 
-        const data = [{
-            srcAmount: '1000',
-            comment: 'xxxx 1234 ц',
-        }, {
-            destAcc: 2,
-            srcAmount: '11.4',
-            destAmount: '10',
-        }, {
-            srcAcc: 1,
-            destAcc: 3,
-            srcAmount: '5.0301',
-            destAmount: '4.7614',
-        }, {
-            srcAcc: 2,
-            srcAmount: '10',
-            destAmount: '9.75',
-        }, {
-            destAcc: 3,
-            srcAmount: '10',
-            destAmount: '9.50',
-        }, {
-            // Check available to create transaction with hidden account
-            fromAccount: 0,
-            srcAcc: 2,
-            destAcc: App.scenario.HIDDEN_ACCOUNT_IND,
-            srcAmount: '1',
-            destAmount: '75',
-        }, {
-            // Try to submit transfer with invalid amount
-            srcAmount: '',
-        }, {
-            srcAmount: '-100',
-        }, {
-            destAcc: 2,
-            srcAmount: '11.4',
-            destAmount: '',
-        }, {
-            destAcc: 2,
-            srcAmount: '11.4',
-            destAmount: '-100',
-        }, {
-            // Try to submit transfer with invalid date
-            srcAmount: '100',
-            date: '',
-        }];
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: TRANSFER },
+            { action: 'inputSrcAmount', data: '1000' },
+            { action: 'inputComment', data: 'xxxx 1234 ц' },
+        ]);
 
-        await App.scenario.runner.runGroup(TransferTransactionTests.create, data);
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: TRANSFER },
+            { action: 'changeDestAccountByPos', data: 2 },
+            { action: 'inputSrcAmount', data: '11.4' },
+            { action: 'inputDestAmount', data: '10' },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: TRANSFER },
+            { action: 'changeSrcAccountByPos', data: 1 },
+            { action: 'changeDestAccountByPos', data: 3 },
+            { action: 'inputSrcAmount', data: '5.0301' },
+            { action: 'inputDestAmount', data: '4.7614' },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: TRANSFER },
+            { action: 'changeSrcAccountByPos', data: 2 },
+            { action: 'inputSrcAmount', data: '10' },
+            { action: 'inputDestAmount', data: '9.75' },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: TRANSFER },
+            { action: 'changeDestAccountByPos', data: 3 },
+            { action: 'inputSrcAmount', data: '10' },
+            { action: 'inputDestAmount', data: '9.50' },
+        ]);
+
+        // Check create transaction with hidden account
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: TRANSFER },
+            { action: 'changeSrcAccountByPos', data: 2 },
+            { action: 'changeDestAccountByPos', data: App.scenario.HIDDEN_ACCOUNT_IND },
+            { action: 'inputSrcAmount', data: '1' },
+            { action: 'inputDestAmount', data: '75' },
+        ]);
+
+        // Try to submit transfer with invalid amount
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: TRANSFER },
+            { action: 'inputSrcAmount', data: '' },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: TRANSFER },
+            { action: 'inputSrcAmount', data: '-100' },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: TRANSFER },
+            { action: 'changeDestAccountByPos', data: 2 },
+            { action: 'inputSrcAmount', data: '11.4' },
+            { action: 'inputDestAmount', data: '' },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: TRANSFER },
+            { action: 'changeDestAccountByPos', data: 2 },
+            { action: 'inputSrcAmount', data: '11.4' },
+            { action: 'inputDestAmount', data: '-100' },
+        ]);
+
+        // Try to submit transfer with invalid date
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: TRANSFER },
+            { action: 'changeDestAccountByPos', data: 2 },
+            { action: 'inputSrcAmount', data: '100' },
+            { action: 'changeDate', data: '' },
+        ]);
     }
 
     async createDebt() {
@@ -278,223 +325,257 @@ export class TransactionsStory extends TestStory {
             HIDDEN_PERSON_IND,
         } = App.scenario;
 
-        const data = [{
-            fromPerson: 0,
-            srcAmount: '1000',
-        }, {
-            fromPerson: 0,
-            debtType: false,
-            acc: 2,
-            destAmount: '200',
-            date: App.dates.weekAgo,
-        }, {
-            debtType: true,
-            acc: 3,
-            srcAmount: '100.0101',
-        }, {
-            fromPerson: 1,
-            debtType: false,
-            acc: 3,
-            destAmount: '10',
-            date: App.dates.yesterday,
-        }, {
-            acc: null,
-            destAmount: '105',
-            date: App.dates.yesterday,
-        }, {
-            fromPerson: 1,
-            debtType: false,
-            acc: null,
-            destAmount: '105',
-        }, {
-            fromPerson: 0,
-            srcCurr: USD,
-            srcAmount: '10',
-            destAmount: '650',
-        }, {
-            fromPerson: 1,
-            debtType: false,
-            destCurr: EUR,
-            srcAmount: '11.5',
-            destAmount: '714',
-        }, {
-            fromPerson: 0,
-            acc: null,
-            srcCurr: USD,
-            srcAmount: '20',
-        }, {
-            fromPerson: 0,
-            debtType: false,
-            acc: null,
-            destCurr: EUR,
-            destAmount: '22.75',
-        }, {
-            // Check available to create transaction with hidden person
-            fromPerson: 0,
-            person: HIDDEN_PERSON_IND,
-            srcAmount: '0.01',
-        }, {
-            // Check available to create transaction with hidden account
-            fromPerson: 1,
-            acc: HIDDEN_ACCOUNT_IND,
-            srcAmount: '105',
-        }, {
-            // Try to submit debt with invalid amount
-            destAmount: '',
-        }, {
-            destAmount: '-100',
-        }, {
-            // Try to submit debt with invalid date
-            destAmount: '100',
-            date: '',
-        }];
+        await TransactionTests.createFromPersonAndSubmit(0, [
+            { action: 'inputSrcAmount', data: '100' },
+        ]);
 
-        await App.scenario.runner.runGroup(DebtTransactionTests.create, data);
+        await TransactionTests.createFromPersonAndSubmit(0, [
+            { action: 'changeAccountByPos', data: 2 },
+            { action: 'swapSourceAndDest' },
+            { action: 'inputDestAmount', data: '100' },
+            { action: 'changeDate', data: App.dates.weekAgo },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: DEBT },
+            { action: 'changeAccountByPos', data: 3 },
+            { action: 'inputDestAmount', data: '100.0101' },
+        ]);
+
+        await TransactionTests.createFromPersonAndSubmit(1, [
+            { action: 'changeAccountByPos', data: 3 },
+            { action: 'swapSourceAndDest' },
+            { action: 'inputDestAmount', data: '10' },
+            { action: 'changeDate', data: App.dates.yesterday },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: DEBT },
+            { action: 'toggleAccount' },
+            { action: 'inputDestAmount', data: '105' },
+            { action: 'changeDate', data: App.dates.yesterday },
+        ]);
+
+        await TransactionTests.createFromPersonAndSubmit(1, [
+            { action: 'toggleAccount' },
+            { action: 'swapSourceAndDest' },
+            { action: 'changeAccountByPos', data: 3 },
+            { action: 'inputDestAmount', data: '105' },
+            { action: 'changeDate', data: App.dates.yesterday },
+        ]);
+
+        await TransactionTests.createFromPersonAndSubmit(0, [
+            { action: 'changeSourceCurrency', data: USD },
+            { action: 'inputSrcAmount', data: '10' },
+            { action: 'inputDestAmount', data: '650' },
+        ]);
+
+        await TransactionTests.createFromPersonAndSubmit(1, [
+            { action: 'swapSourceAndDest' },
+            { action: 'changeDestCurrency', data: EUR },
+            { action: 'inputSrcAmount', data: '11.5' },
+            { action: 'inputDestAmount', data: '714' },
+        ]);
+
+        await TransactionTests.createFromPersonAndSubmit(0, [
+            { action: 'toggleAccount' },
+            { action: 'changeSourceCurrency', data: USD },
+            { action: 'inputSrcAmount', data: '20' },
+        ]);
+
+        await TransactionTests.createFromPersonAndSubmit(0, [
+            { action: 'toggleAccount' },
+            { action: 'swapSourceAndDest' },
+            { action: 'changeDestCurrency', data: EUR },
+            { action: 'inputDestAmount', data: '22.75' },
+        ]);
+
+        // Check create transaction with hidden person
+        await TransactionTests.createFromPersonAndSubmit(0, [
+            { action: 'changePersonByPos', data: HIDDEN_PERSON_IND },
+            { action: 'inputSrcAmount', data: '0.01' },
+        ]);
+
+        // Check create transaction with hidden account
+        await TransactionTests.createFromPersonAndSubmit(1, [
+            { action: 'changeAccountByPos', data: HIDDEN_ACCOUNT_IND },
+            { action: 'inputSrcAmount', data: '105' },
+        ]);
+
+        // Try to submit debt with invalid amount
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: DEBT },
+            { action: 'inputDestAmount', data: '' },
+        ]);
+
+        await TransactionTests.createFromAccountAndSubmit(0, [
+            { action: 'changeTransactionType', data: DEBT },
+            { action: 'inputDestAmount', data: '-100' },
+        ]);
+
+        // Try to submit debt with invalid date
+        await TransactionTests.createFromPersonAndSubmit(0, [
+            { action: 'inputSrcAmount', data: '100' },
+            { action: 'changeDate', data: '' },
+        ]);
     }
 
     async updateExpense() {
         setBlock('Update expense transactions', 2);
 
         const { USD, CAFE_CATEGORY, HIDDEN_ACCOUNT_IND } = App.scenario;
-        const data = [{
-            pos: 3,
-            destAmount: '124.7701',
-            category: CAFE_CATEGORY,
-        }, {
-            pos: 0,
-            srcAmount: '101',
-            destAmount: '7065.30',
-            destCurr: USD,
-        }, {
-            pos: 2,
-            destAmount: '0.02',
-            date: App.dates.weekAgo,
-        }, {
-            pos: 3,
-            srcAcc: 3,
-            destAmount: '99.9',
-            date: App.dates.yesterday,
-        }, {
-            // Check available to update transaction with hidden account
-            pos: 4,
-            srcAcc: HIDDEN_ACCOUNT_IND,
-            destAmount: '99.9',
-        }];
 
-        await App.scenario.runner.runGroup(ExpenseTransactionTests.update, data);
+        await TransactionTests.updateAndSubmit(EXPENSE, 3, [
+            { action: 'inputDestAmount', data: '124.7701' },
+            { action: 'changeCategory', data: CAFE_CATEGORY },
+        ]);
+
+        await TransactionTests.updateAndSubmit(EXPENSE, 0, [
+            { action: 'changeDestCurrency', data: USD },
+            { action: 'inputDestAmount', data: '7065.30' },
+            { action: 'inputSrcAmount', data: '101' },
+        ]);
+
+        await TransactionTests.updateAndSubmit(EXPENSE, 2, [
+            { action: 'inputDestAmount', data: '0.02' },
+            { action: 'changeDate', data: App.dates.weekAgo },
+        ]);
+
+        await TransactionTests.updateAndSubmit(EXPENSE, 3, [
+            { action: 'changeSrcAccountByPos', data: 3 },
+            { action: 'inputDestAmount', data: '99.9' },
+            { action: 'changeDate', data: App.dates.yesterday },
+        ]);
+
+        // Check update transaction with hidden account
+        await TransactionTests.updateAndSubmit(EXPENSE, 4, [
+            { action: 'changeSrcAccountByPos', data: HIDDEN_ACCOUNT_IND },
+            { action: 'inputDestAmount', data: '99.9' },
+        ]);
     }
 
     async updateIncome() {
         setBlock('Update income transactions', 2);
 
         const { USD, TAXES_CATEGORY, HIDDEN_ACCOUNT_IND } = App.scenario;
-        const data = [{
-            pos: 1,
-            srcAmount: '100.001',
-            date: App.dates.weekAgo,
-            category: TAXES_CATEGORY,
-        }, {
-            pos: 2,
-            srcAmount: '0.02',
-        }, {
-            pos: 0,
-            srcAmount: '7065.30',
-            destAmount: '101',
-            srcCurr: USD,
-        }, {
-            pos: 3,
-            destAcc: 3,
-            srcAmount: '99.9',
-        }, {
-            // Check available to update transaction with hidden account
-            pos: 4,
-            destAcc: HIDDEN_ACCOUNT_IND,
-            srcAmount: '99.9',
-        }];
 
-        await App.scenario.runner.runGroup(IncomeTransactionTests.update, data);
+        await TransactionTests.updateAndSubmit(INCOME, 1, [
+            { action: 'inputSrcAmount', data: '100.001' },
+            { action: 'changeDate', data: App.dates.weekAgo },
+            { action: 'changeCategory', data: TAXES_CATEGORY },
+        ]);
+
+        await TransactionTests.updateAndSubmit(INCOME, 2, [
+            { action: 'inputSrcAmount', data: '0.02' },
+        ]);
+
+        await TransactionTests.updateAndSubmit(INCOME, 0, [
+            { action: 'changeSourceCurrency', data: USD },
+            { action: 'inputSrcAmount', data: '7065.30' },
+            { action: 'inputDestAmount', data: '101' },
+        ]);
+
+        await TransactionTests.updateAndSubmit(INCOME, 3, [
+            { action: 'changeDestAccountByPos', data: 3 },
+            { action: 'inputSrcAmount', data: '99.9' },
+        ]);
+
+        // Check update transaction with hidden account
+        await TransactionTests.updateAndSubmit(INCOME, 4, [
+            { action: 'changeDestAccountByPos', data: HIDDEN_ACCOUNT_IND },
+            { action: 'inputSrcAmount', data: '99.9' },
+        ]);
     }
 
     async updateTransfer() {
         setBlock('Update transfer transactions', 2);
 
         const { HIDDEN_ACCOUNT_IND } = App.scenario;
-        const data = [{
-            pos: 0,
-            destAcc: 0,
-            srcAmount: '11',
-        }, {
-            pos: 1,
-            srcAcc: 2,
-            srcAmount: '100',
-            destAmount: '97.55',
-        }, {
-            pos: 2,
-            srcAcc: 3,
-            srcAmount: '5.0301',
-        }, {
-            pos: 3,
-            srcAcc: 0,
-            srcAmount: '50',
-            destAmount: '0.82',
-        }, {
-            pos: 4,
-            srcAmount: '1050.01',
-        }, {
-            // Check available to update transaction with hidden account
-            pos: 5,
-            srcAcc: HIDDEN_ACCOUNT_IND,
-            srcAmount: '1000',
-        }];
 
-        await App.scenario.runner.runGroup(TransferTransactionTests.update, data);
+        await TransactionTests.updateAndSubmit(TRANSFER, 0, [
+            { action: 'changeDestAccountByPos', data: 0 },
+            { action: 'inputSrcAmount', data: '11' },
+        ]);
+
+        await TransactionTests.updateAndSubmit(TRANSFER, 1, [
+            { action: 'changeSrcAccountByPos', data: 2 },
+            { action: 'inputSrcAmount', data: '100' },
+            { action: 'inputDestAmount', data: '97.55' },
+        ]);
+
+        await TransactionTests.updateAndSubmit(TRANSFER, 2, [
+            { action: 'changeSrcAccountByPos', data: 3 },
+            { action: 'inputSrcAmount', data: '5.0301' },
+        ]);
+
+        await TransactionTests.updateAndSubmit(TRANSFER, 3, [
+            { action: 'changeSrcAccountByPos', data: 0 },
+            { action: 'inputSrcAmount', data: '50' },
+            { action: 'inputDestAmount', data: '0.82' },
+        ]);
+
+        await TransactionTests.updateAndSubmit(TRANSFER, 4, [
+            { action: 'inputSrcAmount', data: '1050.01' },
+        ]);
+
+        // Check update transaction with hidden account
+        await TransactionTests.updateAndSubmit(TRANSFER, 5, [
+            { action: 'changeSrcAccountByPos', data: HIDDEN_ACCOUNT_IND },
+            { action: 'inputSrcAmount', data: '1000' },
+        ]);
     }
 
     async updateDebt() {
         setBlock('Update debt transactions', 2);
 
         const { USD, HIDDEN_ACCOUNT_IND, HIDDEN_PERSON_IND } = App.scenario;
-        const data = [{
-            pos: 0,
-            person: 0,
-            srcAmount: '105',
-        }, {
-            pos: 3,
-            acc: 1,
-            srcAmount: '105',
-            date: App.dates.now,
-        }, {
-            pos: 4,
-            debtType: true,
-            srcCurr: USD,
-            srcAmount: '10',
-        }, {
-            pos: 1,
-            debtType: false,
-            acc: 2,
-            destAmount: '200.0202',
-            date: App.dates.monthAgo,
-        }, {
-            pos: 6,
-            acc: null,
-            srcAmount: '200',
-        }, {
-            pos: 2,
-            srcAmount: '1001',
-            date: App.dates.weekAgo,
-        }, {
-            // Check available to update transaction with hidden person
-            pos: 0,
-            acc: HIDDEN_PERSON_IND,
-            srcAmount: '105',
-        }, {
-            // Check available to update transaction with hidden account
-            pos: 1,
-            acc: HIDDEN_ACCOUNT_IND,
-            destAmount: '105',
-        }];
 
-        await App.scenario.runner.runGroup(DebtTransactionTests.update, data);
+        await TransactionTests.updateAndSubmit(DEBT, 0, [
+            { action: 'changePersonByPos', data: 0 },
+            { action: 'inputSrcAmount', data: '105' },
+        ]);
+
+        await TransactionTests.updateAndSubmit(DEBT, 3, [
+            { action: 'changeAccountByPos', data: 1 },
+            { action: 'inputSrcAmount', data: '105' },
+            { action: 'changeDate', data: App.dates.now },
+        ]);
+
+        await TransactionTests.updateAndSubmit(DEBT, 4, [
+            { action: 'swapSourceAndDest' },
+            { action: 'changeSourceCurrency', data: USD },
+            { action: 'inputSrcAmount', data: '10' },
+        ]);
+
+        await TransactionTests.updateAndSubmit(DEBT, 1, [
+            { action: 'changeAccountByPos', data: 2 },
+            { action: 'swapSourceAndDest' },
+            { action: 'changeDestCurrency', data: USD },
+            { action: 'inputDestAmount', data: '200.0202' },
+            { action: 'changeDate', data: App.dates.monthAgo },
+        ]);
+
+        await TransactionTests.updateAndSubmit(DEBT, 6, [
+            { action: 'toggleAccount' },
+            { action: 'inputSrcAmount', data: '200' },
+        ]);
+
+        await TransactionTests.updateAndSubmit(DEBT, 2, [
+            { action: 'inputSrcAmount', data: '1001' },
+            { action: 'changeDate', data: App.dates.weekAgo },
+        ]);
+
+        // Check update transaction with hidden person
+        await TransactionTests.updateAndSubmit(DEBT, 0, [
+            { action: 'changePersonByPos', data: HIDDEN_PERSON_IND },
+            { action: 'inputSrcAmount', data: '105' },
+        ]);
+
+        // Check update transaction with hidden account
+        await TransactionTests.updateAndSubmit(DEBT, 1, [
+            { action: 'changeAccountByPos', data: HIDDEN_ACCOUNT_IND },
+            { action: 'inputDestAmount', data: '105' },
+        ]);
     }
 
     async deleteExpense() {

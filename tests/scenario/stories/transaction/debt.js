@@ -1,6 +1,6 @@
 import { test, setBlock } from 'jezve-test';
 import { App } from '../../../Application.js';
-import * as TransactionTests from '../../../run/transaction/index.js';
+import * as TransactionTests from '../../../run/transaction.js';
 
 export const stateLoop = async () => {
     await App.state.fetch();
