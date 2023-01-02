@@ -70,7 +70,7 @@ export class ImportTransactionItem extends TestComponent {
 
         res.menuBtn = await query(this.elem, '.popup-menu-btn');
         res.contextMenuElem = await query(this.elem, '.popup-menu-list');
-        res.toggleBtn = await query(this.elem, '.toggle-btn');
+        res.toggleBtn = { elem: await query(this.elem, '.toggle-btn') };
         res.origDataTable = await query(this.elem, '.orig-data-table');
 
         assert(
@@ -111,8 +111,8 @@ export class ImportTransactionItem extends TestComponent {
         return res;
     }
 
-    async updateModel() {
-        await super.updateModel();
+    updateModel() {
+        super.updateModel();
 
         this.data = this.getExpectedTransaction();
         if (this.data) {
@@ -127,7 +127,7 @@ export class ImportTransactionItem extends TestComponent {
         }
     }
 
-    async buildModel(cont) {
+    buildModel(cont) {
         const res = {
             mainAccount: App.state.accounts.getItem(this.mainAccount),
         };
@@ -198,7 +198,7 @@ export class ImportTransactionItem extends TestComponent {
 
         res.isDifferent = (res.srcCurrId !== res.destCurrId);
 
-        res.imported = await isVisible(cont.toggleBtn, true);
+        res.imported = cont.toggleBtn.visible;
         if (cont.originalData) {
             res.original = {
                 ...cont.originalData.model,

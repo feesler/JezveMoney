@@ -102,7 +102,7 @@ export class AccountListView extends AppView {
         return 'list';
     }
 
-    async buildModel(cont) {
+    buildModel(cont) {
         const res = {
             locale: cont.locale,
             tiles: cont.tiles.getItems(),

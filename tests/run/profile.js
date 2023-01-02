@@ -107,7 +107,7 @@ export const changeName = async (newName) => {
                 header: { userBtn: { title: newName } },
             };
 
-            await App.view.checkState();
+            App.view.checkState();
             await App.view.closeNotification();
         }
 
@@ -131,7 +131,7 @@ export const changePass = async ({ oldPassword, newPassword }) => {
                 msgPopup: { success: true, message: __('MSG_PROFILE_PASSWORD', App.view.locale) },
             };
 
-            await App.view.checkState();
+            App.view.checkState();
             await App.view.closeNotification();
 
             await App.view.logoutUser();

@@ -118,7 +118,7 @@ export class ImportTransactionForm extends TestComponent {
             this.parseField(await query(this.elem, selector))
         ));
 
-        res.toggleBtn = await query(this.elem, '.toggle-btn');
+        res.toggleBtn = { elem: await query(this.elem, '.toggle-btn') };
         res.saveBtn = await query(this.elem, '.submit-btn');
         res.cancelBtn = await query(this.elem, '.cancel-btn');
         res.origDataTable = await query(this.elem, '.orig-data-table');
@@ -145,8 +145,8 @@ export class ImportTransactionForm extends TestComponent {
         return res;
     }
 
-    async updateModel() {
-        await super.updateModel();
+    updateModel() {
+        super.updateModel();
 
         this.data = this.getExpectedTransaction();
         if (this.data) {
@@ -159,7 +159,7 @@ export class ImportTransactionForm extends TestComponent {
         }
     }
 
-    async buildModel(cont) {
+    buildModel(cont) {
         const res = {
             mainAccount: App.state.accounts.getItem(this.mainAccount),
         };
@@ -225,7 +225,7 @@ export class ImportTransactionForm extends TestComponent {
         };
         res.invalidated = !(srcAmount && destAmount && date);
 
-        res.imported = await isVisible(cont.toggleBtn, true);
+        res.imported = cont.toggleBtn.visible;
         if (cont.originalData) {
             res.original = {
                 ...cont.originalData.model,

@@ -406,7 +406,7 @@ export const securityTests = async () => {
         App.view.expectedState = {
             msgPopup: { success: false, message: __('ERR_TRANS_UPDATE', App.view.locale) },
         };
-        await App.view.checkState();
+        App.view.checkState();
         await App.view.closeNotification();
 
         return true;
@@ -429,7 +429,7 @@ export const createFromPersonAccount = async ({ type, accountId }) => {
         App.view.expectedState = {
             msgPopup: { success: false, message: __('ERR_TRANS_CREATE', App.view.locale) },
         };
-        await App.view.checkState();
+        App.view.checkState();
         await App.view.closeNotification();
 
         return true;

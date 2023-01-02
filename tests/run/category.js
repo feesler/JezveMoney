@@ -119,7 +119,7 @@ export const submit = async () => {
             }
 
             const expected = CategoryListView.render(App.state);
-            await App.view.checkState(expected);
+            App.view.checkState(expected);
         }
 
         return App.state.fetchAndTest();
@@ -139,7 +139,7 @@ export const del = async (indexes) => {
         App.state.deleteCategories(ids);
 
         const expected = CategoryListView.render(App.state);
-        await App.view.checkState(expected);
+        App.view.checkState(expected);
 
         return App.state.fetchAndTest();
     });
@@ -158,7 +158,7 @@ export const delFromUpdate = async (index) => {
         const id = App.state.categories.indexToId(index);
         App.state.deleteCategories(id);
         const expected = CategoryListView.render(App.state);
-        await App.view.checkState(expected);
+        App.view.checkState(expected);
 
         return App.state.fetchAndTest();
     });
@@ -208,7 +208,7 @@ export const securityTests = async () => {
         const expected = {
             msgPopup: { success: false, message: __('ERR_CATEGORY_UPDATE', App.view.locale) },
         };
-        await App.view.checkState(expected);
+        App.view.checkState(expected);
         await App.view.closeNotification();
 
         return true;

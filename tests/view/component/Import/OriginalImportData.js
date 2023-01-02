@@ -60,7 +60,7 @@ export class OriginalImportData extends TestComponent {
         return res;
     }
 
-    async buildModel(cont) {
+    buildModel(cont) {
         const res = {
             ...cont,
             accountAmount: ImportTemplate.amountFix(cont.accountAmount),

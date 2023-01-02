@@ -168,7 +168,7 @@ export class ImportView extends AppView {
         return res;
     }
 
-    async buildModel(cont) {
+    buildModel(cont) {
         const res = {
             locale: cont.locale,
             enabled: !cont.notAvailMsg.visible,

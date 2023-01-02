@@ -67,7 +67,7 @@ export class AccountView extends AppView {
         return res;
     }
 
-    async buildModel(cont) {
+    buildModel(cont) {
         const res = {
             locale: cont.locale,
         };

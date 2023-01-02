@@ -100,7 +100,7 @@ export class PersonListView extends AppView {
         return 'list';
     }
 
-    async buildModel(cont) {
+    buildModel(cont) {
         const contextMenuVisible = cont.contextMenu.visible;
         const res = {
             locale: cont.locale,

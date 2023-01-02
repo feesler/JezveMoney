@@ -208,7 +208,7 @@ export class ImportRuleForm extends TestComponent {
         return res;
     }
 
-    async buildModel(cont) {
+    buildModel(cont) {
         const res = {
             conditions: cont.conditionsList.content.items.map(
                 (item) => copyObject(item.model),

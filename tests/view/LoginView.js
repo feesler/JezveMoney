@@ -31,7 +31,7 @@ export class LoginView extends AppView {
         return res;
     }
 
-    async buildModel(cont) {
+    buildModel(cont) {
         const res = {};
 
         res.login = cont.loginInp.content.value;

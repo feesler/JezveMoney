@@ -81,7 +81,7 @@ export class ImportList extends TestComponent {
         return this.content.paginator;
     }
 
-    async buildModel(cont) {
+    buildModel(cont) {
         const paginatorVisible = cont.paginator?.content?.visible;
 
         const itemsOnPage = App.config.importTransactionsOnPage;

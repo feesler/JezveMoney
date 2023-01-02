@@ -238,7 +238,7 @@ export class ImportUploadDialog extends TestComponent {
         return res;
     }
 
-    async buildModel(cont) {
+    buildModel(cont) {
         const res = {};
 
         res.state = cont.state;

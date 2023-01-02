@@ -101,7 +101,7 @@ export const submit = async () => {
         }
 
         App.view.expectedState = AccountListView.render(App.state);
-        await App.view.checkState();
+        App.view.checkState();
 
         return App.state.fetchAndTest();
     });
@@ -120,7 +120,7 @@ export const del = async (accounts) => {
         await App.view.deleteAccounts(indexes);
 
         App.view.expectedState = AccountListView.render(App.state);
-        await App.view.checkState();
+        App.view.checkState();
 
         return App.state.fetchAndTest();
     });
@@ -141,11 +141,11 @@ export const delFromUpdate = async (pos) => {
         App.state.deleteAccounts(ids);
 
         App.view.expectedState = AccountListView.render(App.state);
-        await App.view.checkState();
+        App.view.checkState();
 
         await App.goToMainView();
         App.view.expectedState = MainView.render(App.state);
-        await App.view.checkState();
+        App.view.checkState();
 
         return App.state.fetchAndTest();
     });
@@ -169,7 +169,7 @@ export const show = async (accounts, val = true) => {
         }
 
         App.view.expectedState = AccountListView.render(App.state);
-        await App.view.checkState();
+        App.view.checkState();
 
         return App.state.fetchAndTest();
     });
@@ -288,7 +288,7 @@ export const securityTests = async () => {
         App.view.expectedState = {
             msgPopup: { success: false, message: __('ERR_ACCOUNT_UPDATE', App.view.locale) },
         };
-        await App.view.checkState();
+        App.view.checkState();
         await App.view.closeNotification();
 
         return true;
