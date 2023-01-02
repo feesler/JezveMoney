@@ -84,7 +84,7 @@ class PersonListView extends View {
         this.listModeBtn = IconButton.create({
             id: 'listModeBtn',
             className: 'no-icon',
-            title: 'Done',
+            title: __('DONE'),
             onClick: () => this.toggleSelectMode(),
         });
         insertAfter(this.listModeBtn.elem, this.createBtn);
@@ -108,15 +108,15 @@ class PersonListView extends View {
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
-                title: 'Select',
+                title: __('SELECT'),
                 onClick: () => this.onMenuClick('selectModeBtn'),
             }, {
                 id: 'selectAllBtn',
-                title: 'Select all',
+                title: __('SELECT_ALL'),
                 onClick: () => this.onMenuClick('selectAllBtn'),
             }, {
                 id: 'deselectAllBtn',
-                title: 'Clear selection',
+                title: __('DESELECT_ALL'),
                 onClick: () => this.onMenuClick('deselectAllBtn'),
             }, {
                 id: 'separator2',
@@ -124,7 +124,7 @@ class PersonListView extends View {
             }, {
                 id: 'deleteBtn',
                 icon: 'del',
-                title: 'Delete',
+                title: __('DELETE'),
                 onClick: () => this.onMenuClick('deleteBtn'),
             }],
         });
@@ -145,11 +145,11 @@ class PersonListView extends View {
                 id: 'ctxUpdateBtn',
                 type: 'link',
                 icon: 'update',
-                title: 'Edit',
+                title: __('UPDATE'),
             }, {
                 id: 'ctxDeleteBtn',
                 icon: 'del',
-                title: 'Delete',
+                title: __('DELETE'),
                 onClick: () => this.confirmDelete(),
             }],
         });

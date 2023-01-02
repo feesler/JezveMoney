@@ -37,7 +37,7 @@
             <div id="tplFilename" class="tpl-form__file"></div>
             <header class="tpl-form-header">
                 <label id="tplStateLbl"><?= __("TEMPLATE") ?></label>
-                <input id="createTplBtn" class="btn link-btn" type="button" value="Create template">
+                <input id="createTplBtn" class="btn link-btn" type="button" value="<?= __("CREATE") ?>">
             </header>
             <div id="tplSelectGroup" class="tpl-form-fields tpl-form__select-group">
                 <div id="tplField" class="tpl-form-field template-field">
@@ -48,8 +48,8 @@
                     </select>
                 </div>
                 <div class="tpl-form__select-group-controls">
-                    <input id="updateTplBtn" class="btn link-btn" type="button" value="Update" hidden>
-                    <input id="deleteTplBtn" class="btn link-btn" type="button" value="Delete" hidden>
+                    <input id="updateTplBtn" class="btn link-btn" type="button" value="<?= __("UPDATE") ?>" hidden>
+                    <input id="deleteTplBtn" class="btn link-btn" type="button" value="<?= __("DELETE") ?>" hidden>
                 </div>
             </div>
             <div id="tplFormTop" class="tpl-form-fields">

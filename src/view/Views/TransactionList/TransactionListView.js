@@ -230,7 +230,7 @@ class TransactionListView extends View {
         this.listModeBtn = IconButton.create({
             id: 'listModeBtn',
             className: 'no-icon',
-            title: 'Done',
+            title: __('DONE'),
             onClick: () => this.setListMode('list'),
         });
         insertAfter(this.listModeBtn.elem, this.createBtn);
@@ -249,23 +249,23 @@ class TransactionListView extends View {
             items: [{
                 id: 'selectModeBtn',
                 icon: 'select',
-                title: 'Select',
+                title: __('SELECT'),
                 onClick: () => this.onMenuClick('selectModeBtn'),
             }, {
                 id: 'sortModeBtn',
                 icon: 'sort',
-                title: 'Sort',
+                title: __('SORT'),
                 onClick: () => this.onMenuClick('sortModeBtn'),
             }, {
                 id: 'separator1',
                 type: 'separator',
             }, {
                 id: 'selectAllBtn',
-                title: 'Select all',
+                title: __('SELECT_ALL'),
                 onClick: () => this.onMenuClick('selectAllBtn'),
             }, {
                 id: 'deselectAllBtn',
-                title: 'Clear selection',
+                title: __('DESELECT_ALL'),
                 onClick: () => this.onMenuClick('deselectAllBtn'),
             }, {
                 id: 'separator2',
@@ -277,7 +277,7 @@ class TransactionListView extends View {
             }, {
                 id: 'deleteBtn',
                 icon: 'del',
-                title: 'Delete',
+                title: __('DELETE'),
                 onClick: () => this.onMenuClick('deleteBtn'),
             }],
         });
@@ -300,7 +300,7 @@ class TransactionListView extends View {
                 id: 'ctxUpdateBtn',
                 type: 'link',
                 icon: 'update',
-                title: 'Edit',
+                title: __('UPDATE'),
             }, {
                 id: 'ctxSetCategoryBtn',
                 title: __('SET_CATEGORY'),
@@ -310,7 +310,7 @@ class TransactionListView extends View {
             }, {
                 id: 'ctxDeleteBtn',
                 icon: 'del',
-                title: 'Delete',
+                title: __('DELETE'),
                 onClick: () => this.confirmDelete(),
             }],
         });

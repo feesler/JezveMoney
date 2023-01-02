@@ -116,7 +116,7 @@ class ImportView extends View {
         this.listModeBtn = IconButton.create({
             id: 'listModeBtn',
             className: 'no-icon',
-            title: 'Done',
+            title: __('DONE'),
             onClick: () => this.setListMode('list'),
         });
         insertAfter(this.listModeBtn.elem, this.uploadBtn.elem);
