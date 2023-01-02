@@ -30,7 +30,7 @@ class Accounts extends TemplateController
     {
         $this->template = new Template(VIEW_TPL_PATH . "AccountList.tpl");
         $data = [
-            "titleString" => "Jezve Money | Accounts",
+            "titleString" => __("APP_NAME") . " | " . __("ACCOUNTS"),
             "tilesArr" => [],
             "hiddenTilesArr" => []
         ];
@@ -55,13 +55,13 @@ class Accounts extends TemplateController
     public function create()
     {
         if ($this->isPOST()) {
-            $this->fail(ERR_INVALID_REQUEST);
+            $this->fail(__("ERR_INVALID_REQUEST"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Account.tpl");
         $data = [
-            "headString" => "Create account",
-            "titleString" => "Jezve Money | Create account"
+            "headString" => __("ACCOUNT_CREATE"),
+            "titleString" => __("APP_NAME") . " | " . __("ACCOUNT_CREATE"),
         ];
 
         $currMod = CurrencyModel::getInstance();
@@ -78,14 +78,14 @@ class Accounts extends TemplateController
 
         $currObj = $currMod->getItem($accInfo->curr_id);
         if (!$currObj) {
-            throw new \Error("Currency not found");
+            throw new \Error(__("ERR_CURR_NOT_FOUND"));
         }
 
         $accInfo->sign = $currObj->sign;
         $data["accInfo"] = $accInfo;
         $data["tile"] = [
             "id" => "accountTile",
-            "title" => "New account",
+            "title" => __("ACCOUNT_NAME_NEW"),
             "subtitle" => $currMod->format($accInfo->balance, $accInfo->curr_id),
             "icon" => $accInfo->icon
         ];
@@ -112,7 +112,7 @@ class Accounts extends TemplateController
     protected function fail($msg = null)
     {
         if (!is_null($msg)) {
-            Message::set($msg);
+            Message::setError($msg);
         }
 
         setLocation(BASEURL . "accounts/");
@@ -122,13 +122,13 @@ class Accounts extends TemplateController
     public function update()
     {
         if ($this->isPOST()) {
-            $this->fail(ERR_INVALID_REQUEST);
+            $this->fail(__("ERR_INVALID_REQUEST"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Account.tpl");
         $data = [
-            "headString" => "Edit account",
-            "titleString" => "Jezve Money | Edit account"
+            "headString" => __("ACCOUNT_UPDATE"),
+            "titleString" => __("APP_NAME") . " | " . __("ACCOUNT_UPDATE"),
         ];
 
         $currMod = CurrencyModel::getInstance();
@@ -141,7 +141,7 @@ class Accounts extends TemplateController
 
         $accInfo = $this->model->getItem($acc_id);
         if (!$accInfo) {
-            $this->fail(ERR_ACCOUNT_UPDATE);
+            $this->fail(__("ERR_ACCOUNT_UPDATE"));
         }
 
         $currObj = $currMod->getItem($accInfo->curr_id);
@@ -204,13 +204,13 @@ class Accounts extends TemplateController
 
         $columns = [
             "id" => "ID",
-            "type" => "Type",
-            "src_amount" => "Source amount",
-            "dest_amount" => "Destination amount",
-            "src_result" => "Source result",
-            "dest_result" => "Destination result",
-            "date" => "Date",
-            "comment" => "Comment"
+            "type" => __("TR_TYPE"),
+            "src_amount" => __("TR_SRC_AMOUNT"),
+            "dest_amount" => __("TR_DEST_AMOUNT"),
+            "src_result" => __("TR_SRC_RESULT"),
+            "dest_result" => __("TR_DEST_RESULT"),
+            "date" => __("TR_DATE"),
+            "comment" => __("TR_COMMENT"),
         ];
 
         $colStr = [];

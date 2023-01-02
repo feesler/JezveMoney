@@ -3,6 +3,7 @@ import { App } from '../Application.js';
 import {
     fixFloat, normalize,
 } from '../common.js';
+import { __ } from './locale.js';
 import {
     EXPENSE,
     INCOME,
@@ -15,12 +16,12 @@ export const sourceTypes = ['expense', 'transferfrom', 'debtfrom'];
 export class ImportTransaction {
     /** List of available transaction types */
     static availTypes = [
-        { id: 'expense', title: 'Expense' },
-        { id: 'income', title: 'Income' },
-        { id: 'transferfrom', title: 'Transfer from' },
-        { id: 'transferto', title: 'Transfer to' },
-        { id: 'debtfrom', title: 'Debt from' },
-        { id: 'debtto', title: 'Debt to' },
+        { id: 'expense', titleToken: 'TR_EXPENSE' },
+        { id: 'income', titleToken: 'TR_INCOME' },
+        { id: 'transferfrom', titleToken: 'TR_TRANSFER_FROM' },
+        { id: 'transferto', titleToken: 'TR_TRANSFER_TO' },
+        { id: 'debtfrom', titleToken: 'TR_DEBT_FROM' },
+        { id: 'debtto', titleToken: 'TR_DEBT_TO' },
     ];
 
     /** Map transaction types from import to normal */
@@ -83,11 +84,11 @@ export class ImportTransaction {
     }
 
     /** Search import transaction type by name (case insensitive) */
-    static findTypeByName(name) {
+    static findTypeByName(name, locale) {
         assert.isString(name, 'Invalid parameter');
 
         const lcName = name.toLowerCase();
-        return this.availTypes.find((item) => item.title.toLowerCase() === lcName);
+        return this.availTypes.find((item) => __(item.titleToken, locale).toLowerCase() === lcName);
     }
 
     /** Return normal type of transaction by import type name */

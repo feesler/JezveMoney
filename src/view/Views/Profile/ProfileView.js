@@ -1,5 +1,6 @@
 import 'jezvejs/style';
 import { setEvents } from 'jezvejs';
+import { __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { ResetDataDialog } from '../../Components/Profile/ResetDataDialog/ResetDataDialog.js';
 import '../../css/app.scss';
@@ -13,14 +14,10 @@ import { createStore } from '../../js/store.js';
 import { actions, reducer } from './reducer.js';
 import './style.scss';
 
-/** Strings */
-const VIEW_TITLE = 'Jezve Money | Profile';
-const TITLE_PROFILE_DELETE = 'Delete profile';
-const MSG_PROFILE_DELETE = 'Are you sure to completely delete your profile?<br>This operation can not be undone.';
 const titleMap = {
-    name: 'Change name',
-    password: 'Change password',
-    reset: 'Reset data',
+    name: __('PROFILE_CHANGE_NAME'),
+    password: __('PROFILE_CHANGE_PASS'),
+    reset: __('PROFILE_RESET_DATA'),
 };
 
 /**
@@ -102,19 +99,20 @@ class ProfileView extends View {
 
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: TITLE_PROFILE_DELETE,
-            content: MSG_PROFILE_DELETE,
+            title: __('PROFILE_DELETE'),
+            content: __('MSG_PROFILE_DELETE'),
             onconfirm: () => this.requestDeleteProfile(),
         });
     }
 
     getViewTitle(state) {
+        const viewTitle = `${__('APP_NAME')} | ${__('PROFILE')}`;
         const { action } = state;
         if (!action || !titleMap[action]) {
-            return VIEW_TITLE;
+            return viewTitle;
         }
 
-        return `${VIEW_TITLE} | ${titleMap[action]}`;
+        return `${viewTitle} | ${titleMap[action]}`;
     }
 
     replaceHistory(state) {

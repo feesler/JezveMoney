@@ -27,6 +27,7 @@ import { SearchInput } from './component/SearchInput.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
 import { fixDate, isEmpty, urlJoin } from '../common.js';
 import { Counter } from './component/Counter.js';
+import { __ } from '../model/locale.js';
 
 const modeButtons = {
     list: 'listModeBtn',
@@ -46,9 +47,6 @@ const listMenuItems = [
 const contextMenuItems = [
     'ctxUpdateBtn', 'ctxSetCategoryBtn', 'ctxDeleteBtn',
 ];
-
-const TITLE_SHOW_MAIN = 'Show main';
-const TITLE_SHOW_DETAILS = 'Show details';
 
 /** List of transactions view class */
 export class TransactionListView extends AppView {
@@ -188,6 +186,7 @@ export class TransactionListView extends AppView {
 
     buildModel(cont) {
         const res = {
+            locale: cont.locale,
             contextItem: cont.contextMenu.itemId,
             listMode: (cont.transList) ? cont.transList.listMode : 'list',
             listMenuVisible: cont.listMenu.visible,
@@ -233,13 +232,8 @@ export class TransactionListView extends AppView {
             };
         }
 
-        const isModeSelectorVisible = cont.modeSelector?.content?.visible;
-        if (isModeSelectorVisible) {
-            res.detailsMode = cont.modeSelector.title === TITLE_SHOW_MAIN;
-        } else {
-            const locURL = new URL(this.location);
-            res.detailsMode = locURL.searchParams.has('mode') && locURL.searchParams.get('mode') === 'details';
-        }
+        const locURL = new URL(this.location);
+        res.detailsMode = locURL.searchParams.has('mode') && locURL.searchParams.get('mode') === 'details';
 
         res.showCategoryDialog = cont.selectCategoryDialog.visible;
         res.categoryDialog = {
@@ -414,6 +408,9 @@ export class TransactionListView extends AppView {
         const pageNum = this.currentPage(model);
 
         const res = {
+            header: {
+                localeSelect: { value: model.locale },
+            },
             typeMenu: {
                 value: model.filter.type,
                 visible: filtersVisible,
@@ -492,7 +489,9 @@ export class TransactionListView extends AppView {
                 active: pageNum,
             };
 
-            res.modeSelector.title = (model.detailsMode) ? TITLE_SHOW_MAIN : TITLE_SHOW_DETAILS;
+            res.modeSelector.title = (model.detailsMode)
+                ? __('TR_LIST_SHOW_MAIN', model.locale)
+                : __('TR_LIST_SHOW_DETAILS', model.locale);
         }
 
         // Set category dialog

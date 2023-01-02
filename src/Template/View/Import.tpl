@@ -11,7 +11,7 @@ include(TPL_PATH . "Header.tpl");    ?>
             <div class="content">
                 <div class="content_wrap">
                     <header id="heading" class="heading">
-                        <h1>Import</h1>
+                        <h1><?= __("IMPORT") ?></h1>
                         <div class="heading-actions" <?= hidden(!$importAvailable) ?>>
                             <?= IconButton::render($uploadBtn) ?>
                         </div>
@@ -24,25 +24,25 @@ include(TPL_PATH . "Header.tpl");    ?>
                     <header class="content-header" <?= hidden(!$importAvailable) ?>>
                         <div id="dataHeaderControls" class="data-header">
                             <div class="header-field account-field">
-                                <label>Main account</label>
+                                <label><?= __("IMPORT_MAIN_ACCOUNT") ?></label>
                                 <div class="header-field__content">
                                     <select id="acc_id"></select>
                                 </div>
                             </div>
-                            <button id="submitBtn" class="btn submit-btn" type="button" disabled>Submit</button>
+                            <button id="submitBtn" class="btn submit-btn" type="button" disabled><?= __("SUBMIT") ?></button>
                         </div>
 
                         <div class="counters">
                             <div id="itemsCounter" class="counter">
-                                <span class="counter__title">Items</span>
+                                <span class="counter__title"><?= __("LIST_ITEMS") ?></span>
                                 <span id="itemsCount" class="counter__value">0</span>
                             </div>
                             <div id="enabledCounter" class="counter">
-                                <span class="counter__title">Enabled</span>
+                                <span class="counter__title"><?= __("LIST_ENABLED") ?></span>
                                 <span id="enabledCount" class="counter__value">0</span>
                             </div>
                             <div id="selectedCounter" class="counter" hidden>
-                                <span class="counter__title">Selected</span>
+                                <span class="counter__title"><?= __("LIST_SELECTED") ?></span>
                                 <span id="selectedCount" class="counter__value">0</span>
                             </div>
                         </div>

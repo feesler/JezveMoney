@@ -4,10 +4,11 @@ import {
     Component,
 } from 'jezvejs';
 import { Spinner } from 'jezvejs/Spinner';
+import { __ } from '../../js/utils.js';
 import './style.scss';
 
 const defaultProps = {
-    title: 'Loading...',
+    title: __('LOADING'),
     visible: false,
     fixed: true,
     blockScroll: true,

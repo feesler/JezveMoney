@@ -46,16 +46,6 @@ class ImportConditionModel extends CachedTable
         IMPORT_COND_FIELD_COMMENT,
         IMPORT_COND_FIELD_DATE,
     ];
-    protected static $condFieldNames = [
-        IMPORT_COND_FIELD_MAIN_ACCOUNT => "Main account",
-        IMPORT_COND_FIELD_TPL => "Import template",
-        IMPORT_COND_FIELD_TR_AMOUNT => "Transaction amount",
-        IMPORT_COND_FIELD_TR_CURRENCY => "Transaction currency",
-        IMPORT_COND_FIELD_ACC_AMOUNT => "Account amount",
-        IMPORT_COND_FIELD_ACC_CURRENCY => "Account currency",
-        IMPORT_COND_FIELD_COMMENT => "Comment",
-        IMPORT_COND_FIELD_DATE => "Date",
-    ];
 
     protected static $availCondOperators = [
         IMPORT_COND_OP_STRING_INCLUDES,
@@ -64,13 +54,7 @@ class ImportConditionModel extends CachedTable
         IMPORT_COND_OP_LESS,
         IMPORT_COND_OP_GREATER,
     ];
-    protected static $condOperatorNames = [
-        IMPORT_COND_OP_STRING_INCLUDES => "Includes",
-        IMPORT_COND_OP_EQUAL => "Equal",
-        IMPORT_COND_OP_NOT_EQUAL => "Not equal",
-        IMPORT_COND_OP_LESS => "Less",
-        IMPORT_COND_OP_GREATER => "Greater",
-    ];
+
 
     protected function onStart()
     {
@@ -391,33 +375,60 @@ class ImportConditionModel extends CachedTable
 
     public static function getFields()
     {
-        return convertToObjectArray(self::$condFieldNames);
+        return convertToObjectArray(self::getFieldNames());
     }
 
 
+    public static function getFieldNames()
+    {
+        return [
+            IMPORT_COND_FIELD_MAIN_ACCOUNT => __("CONDITION_MAIN_ACCOUNT"),
+            IMPORT_COND_FIELD_TPL => __("CONDITION_TEMPLATE"),
+            IMPORT_COND_FIELD_TR_AMOUNT => __("CONDITION_TR_AMOUNT"),
+            IMPORT_COND_FIELD_TR_CURRENCY => __("CONDITION_TR_CURRENCY"),
+            IMPORT_COND_FIELD_ACC_AMOUNT => __("CONDITION_ACCOUNT_AMOUNT"),
+            IMPORT_COND_FIELD_ACC_CURRENCY => __("CONDITION_ACCOUNT_CURRENCY"),
+            IMPORT_COND_FIELD_COMMENT => __("CONDITION_COMMENT"),
+            IMPORT_COND_FIELD_DATE => __("CONDITION_DATE"),
+        ];
+    }
+
     public static function getFieldName($field_id)
     {
-        if (!isset(self::$condFieldNames[$field_id])) {
+        $condFieldNames = self::getFieldNames();
+        if (!isset($condFieldNames[$field_id])) {
             return null;
         }
 
-        return self::$condFieldNames[$field_id];
+        return $condFieldNames[$field_id];
     }
 
 
     public static function getOperators()
     {
-        return convertToObjectArray(self::$condOperatorNames);
+        return convertToObjectArray(self::getOperatorNames());
     }
 
 
+    public static function getOperatorNames()
+    {
+        return [
+            IMPORT_COND_OP_STRING_INCLUDES => __("OPERATOR_INCLUDES"),
+            IMPORT_COND_OP_EQUAL => __("OPERATOR_EQUAL"),
+            IMPORT_COND_OP_NOT_EQUAL => __("OPERATOR_NOT_EQUAL"),
+            IMPORT_COND_OP_LESS => __("OPERATOR_LESS"),
+            IMPORT_COND_OP_GREATER => __("OPERATOR_GREATER"),
+        ];
+    }
+
     public static function getOperatorName($operator_id)
     {
+        $condOperatorNames = self::getOperatorNames();
         $operator_id = intval($operator_id);
-        if (!isset(self::$condOperatorNames[$operator_id])) {
+        if (!isset($condOperatorNames[$operator_id])) {
             return null;
         }
 
-        return self::$condOperatorNames[$operator_id];
+        return $condOperatorNames[$operator_id];
     }
 }

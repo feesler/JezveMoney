@@ -20,6 +20,7 @@ import { App } from '../../../Application.js';
 import { fixFloat } from '../../../common.js';
 import { WarningPopup } from '../WarningPopup.js';
 import { ImportTemplate } from '../../../model/ImportTemplate.js';
+import { __ } from '../../../model/locale.js';
 
 export const BROWSE_FILE_STATE = 1;
 export const LOADING_STATE = 2;
@@ -196,9 +197,9 @@ export class ImportUploadDialog extends TestComponent {
             res.state = LOADING_STATE;
         } else if (res.templateBlock.visible) {
             const stateLabel = await prop(res.tplStateLbl.elem, 'textContent');
-            if (stateLabel === 'Create template') {
+            if (stateLabel === __('TEMPLATE_CREATE', App.view.locale)) {
                 res.state = CREATE_TPL_STATE;
-            } else if (stateLabel === 'Update template') {
+            } else if (stateLabel === __('TEMPLATE_UPDATE', App.view.locale)) {
                 res.state = UPDATE_TPL_STATE;
             } else {
                 res.state = RAW_DATA_STATE;
@@ -267,16 +268,16 @@ export class ImportUploadDialog extends TestComponent {
 
             res.template.columns = {};
             if (Array.isArray(cont.columns)) {
-                cont.columns.forEach((column, ind) => {
-                    const propTitleMap = {
-                        accountAmount: 'Account amount',
-                        transactionAmount: 'Transaction amount',
-                        accountCurrency: 'Account currency',
-                        transactionCurrency: 'Transaction currency',
-                        date: 'Date',
-                        comment: 'Comment',
-                    };
+                const propTitleMap = {
+                    accountAmount: __('COLUMN_ACCOUNT_AMOUNT', App.view.locale),
+                    transactionAmount: __('COLUMN_TR_AMOUNT', App.view.locale),
+                    accountCurrency: __('COLUMN_ACCOUNT_CURRENCY', App.view.locale),
+                    transactionCurrency: __('COLUMN_TR_CURRENCY', App.view.locale),
+                    date: __('COLUMN_DATE', App.view.locale),
+                    comment: __('COLUMN_COMMENT', App.view.locale),
+                };
 
+                cont.columns.forEach((column, ind) => {
                     for (const propName in propTitleMap) {
                         if (!Object.prototype.hasOwnProperty.call(propTitleMap, propName)) {
                             continue;

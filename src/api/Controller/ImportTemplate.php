@@ -28,9 +28,9 @@ class ImportTemplate extends ApiListController
         parent::initAPI();
 
         $this->model = ImportTemplateModel::getInstance();
-        $this->createErrorMsg = Message::get(ERR_IMPTPL_CREATE);
-        $this->updateErrorMsg = Message::get(ERR_IMPTPL_UPDATE);
-        $this->deleteErrorMsg = Message::get(ERR_IMPTPL_DELETE);
+        $this->createErrorMsg = __("ERR_IMPTPL_CREATE");
+        $this->updateErrorMsg = __("ERR_IMPTPL_UPDATE");
+        $this->deleteErrorMsg = __("ERR_IMPTPL_DELETE");
     }
 
 

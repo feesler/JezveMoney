@@ -1,5 +1,6 @@
 import { createElement } from 'jezvejs';
 import { LinkMenu } from 'jezvejs/LinkMenu';
+import { __ } from '../../js/utils.js';
 import {
     EXPENSE,
     INCOME,
@@ -8,13 +9,6 @@ import {
 } from '../../js/model/Transaction.js';
 
 const CONTAINER_CLASS = 'link-menu trtype-menu';
-
-/** Strings */
-const TITLE_SHOW_ALL = 'Show all';
-const TITLE_EXPENSE = 'Expense';
-const TITLE_INCOME = 'Income';
-const TITLE_TRANSFER = 'Transfer';
-const TITLE_DEBT = 'Debt';
 
 const defaultProps = {
     itemParam: 'type',
@@ -41,11 +35,11 @@ export class TransactionTypeMenu extends LinkMenu {
         this.setState({
             ...this.state,
             items: [
-                { title: TITLE_SHOW_ALL },
-                { value: EXPENSE, title: TITLE_EXPENSE },
-                { value: INCOME, title: TITLE_INCOME },
-                { value: TRANSFER, title: TITLE_TRANSFER },
-                { value: DEBT, title: TITLE_DEBT },
+                { title: __('SHOW_ALL') },
+                { value: EXPENSE, title: __('TR_EXPENSE') },
+                { value: INCOME, title: __('TR_INCOME') },
+                { value: TRANSFER, title: __('TR_TRANSFER') },
+                { value: DEBT, title: __('TR_DEBT') },
             ],
         });
     }

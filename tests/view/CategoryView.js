@@ -16,6 +16,9 @@ import { availTransTypes } from '../model/Transaction.js';
 export class CategoryView extends AppView {
     static getExpectedState(model) {
         const res = {
+            header: {
+                localeSelect: { value: model.locale },
+            },
             nameInput: {
                 visible: true,
                 value: model.name.toString(),
@@ -81,6 +84,7 @@ export class CategoryView extends AppView {
 
     async buildModel(cont) {
         const res = {
+            locale: cont.locale,
             isUpdate: cont.isUpdate,
             name: cont.nameInput.value,
             parent_id: parseInt(cont.parentSelect.value, 10),

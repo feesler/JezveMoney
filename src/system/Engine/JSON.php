@@ -41,4 +41,20 @@ class JSON
             );
         }
     }
+
+
+    // Obtain input of request and try to decode it as JSON
+    public static function fromFile($fileName, $asArray = false)
+    {
+        $res = null;
+
+        try {
+            $rawData = file_get_contents($fileName);
+            $res = JSON::decode($rawData, $asArray);
+        } catch (\Exception $e) {
+            wlog($e);
+        }
+
+        return $res;
+    }
 }

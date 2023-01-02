@@ -1,6 +1,7 @@
 import { assert, navigation, query } from 'jezve-test';
 import { AppView } from './AppView.js';
 import { App } from '../Application.js';
+import { __ } from '../model/locale.js';
 import { TransactionList } from './component/TransactionList/TransactionList.js';
 import { TilesList } from './component/Tiles/TilesList.js';
 import { Widget } from './component/Widget/Widget.js';
@@ -83,7 +84,7 @@ export class MainView extends AppView {
 
         // Accounts widget
         res.accountsWidget = {
-            title: 'Accounts',
+            title: __('ACCOUNTS', App.view.locale),
             tiles: TilesList.renderAccounts(userAccounts),
         };
 
@@ -98,7 +99,7 @@ export class MainView extends AppView {
 
         // Persons widget
         res.personsWidget = {
-            title: 'Persons',
+            title: __('PERSONS', App.view.locale),
             tiles: TilesList.renderPersons(state.persons, true),
         };
 

@@ -6,6 +6,7 @@ import {
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { PopupMenuButton } from 'jezvejs/PopupMenu';
+import { __ } from '../../js/utils.js';
 import {
     EXPENSE,
     INCOME,
@@ -46,19 +47,6 @@ const CONTROLS_CLASS = 'trans-item__controls';
 /* Other */
 const SELECTED_CLASS = 'trans-item_selected';
 const SORT_CLASS = 'trans-item_sort';
-
-/** Strings */
-const LABEL_SOURCE = 'Source';
-const LABEL_DESTINATION = 'Destination';
-const LABEL_AMOUNT = 'Amount';
-const LABEL_SRC_AMOUNT = 'Source amount';
-const LABEL_DEST_AMOUNT = 'Destination amount';
-const LABEL_RESULT = 'Result';
-const LABEL_SRC_RESULT = 'Source result';
-const LABEL_DEST_RESULT = 'Destination result';
-const LABEL_DATE = 'Date';
-const LABEL_CATEGORY = 'Category';
-const LABEL_COMMENT = 'Comment';
 
 const defaultProps = {
     selected: false,
@@ -128,11 +116,11 @@ export class TransactionListItem extends Component {
     initDetails() {
         // Accounts
         this.sourceField = Field.create({
-            title: LABEL_SOURCE,
+            title: __('TR_SOURCE'),
             className: TITLE_FIELD_CLASS,
         });
         this.destField = Field.create({
-            title: LABEL_DESTINATION,
+            title: __('TR_DESTINATION'),
             className: TITLE_FIELD_CLASS,
         });
         const sourceDestGroup = createElement('div', {
@@ -141,11 +129,11 @@ export class TransactionListItem extends Component {
         });
         // Amount
         this.srcAmountField = Field.create({
-            title: LABEL_SRC_AMOUNT,
+            title: __('TR_SRC_AMOUNT'),
             className: AMOUNT_FIELD_CLASS,
         });
         this.destAmountField = Field.create({
-            title: LABEL_DEST_AMOUNT,
+            title: __('TR_DEST_AMOUNT'),
             className: AMOUNT_FIELD_CLASS,
         });
         const amountGroup = createElement('div', {
@@ -154,11 +142,11 @@ export class TransactionListItem extends Component {
         });
         // Result balance
         this.srcResultField = Field.create({
-            title: LABEL_SRC_RESULT,
+            title: __('TR_SRC_RESULT'),
             className: RESULT_FIELD_CLASS,
         });
         this.destResultField = Field.create({
-            title: LABEL_DEST_RESULT,
+            title: __('TR_DEST_RESULT'),
             className: RESULT_FIELD_CLASS,
         });
         const resultsGroup = createElement('div', {
@@ -173,14 +161,14 @@ export class TransactionListItem extends Component {
         // Date
         this.dateElem = createElement('div', { props: { className: DATE_CLASS } });
         this.dateField = Field.create({
-            title: LABEL_DATE,
+            title: __('TR_DATE'),
             content: this.dateElem,
             className: DATE_FIELD_CLASS,
         });
         // Category
         this.categoryElem = createElement('div', { props: { className: CATEGORY_CLASS } });
         this.categoryField = Field.create({
-            title: LABEL_CATEGORY,
+            title: __('TR_CATEGORY'),
             content: this.categoryElem,
             className: CATEGORY_FIELD_CLASS,
         });
@@ -431,7 +419,7 @@ export class TransactionListItem extends Component {
 
         // Amount
         const isDiff = (item.src_curr !== item.dest_curr);
-        const srcAmountLabel = (isDiff) ? LABEL_SRC_AMOUNT : LABEL_AMOUNT;
+        const srcAmountLabel = (isDiff) ? __('TR_SRC_AMOUNT') : __('TR_AMOUNT');
         this.srcAmountField.setTitle(srcAmountLabel);
         if (isDiff) {
             const srcAmountFmt = currency.formatCurrency(item.src_amount, item.src_curr);
@@ -446,7 +434,7 @@ export class TransactionListItem extends Component {
 
         // Source result
         if (showSource) {
-            const srcResultLabel = (showDest) ? LABEL_SRC_RESULT : LABEL_RESULT;
+            const srcResultLabel = (showDest) ? __('TR_SRC_RESULT') : __('TR_RESULT');
             this.srcResultField.setTitle(srcResultLabel);
             const srcResult = currency.formatCurrency(item.src_result, item.src_curr);
             this.srcResultField.setContent(srcResult);
@@ -455,7 +443,7 @@ export class TransactionListItem extends Component {
 
         // Destination result
         if (showDest) {
-            const destResultLabel = (showSource) ? LABEL_DEST_RESULT : LABEL_RESULT;
+            const destResultLabel = (showSource) ? __('TR_DEST_RESULT') : __('TR_RESULT');
             this.destResultField.setTitle(destResultLabel);
             const destResult = currency.formatCurrency(item.dest_result, item.dest_curr);
             this.destResultField.setContent(destResult);
@@ -470,7 +458,7 @@ export class TransactionListItem extends Component {
         this.categoryField.setContent(categoryTitle);
 
         // Comment
-        const commentLabel = (item.comment.length > 0) ? LABEL_COMMENT : null;
+        const commentLabel = (item.comment.length > 0) ? __('TR_COMMENT') : null;
         this.commentField.setTitle(commentLabel);
         this.commentElem.textContent = item.comment;
         this.commentElem.setAttribute('title', item.comment);

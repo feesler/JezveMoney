@@ -1,11 +1,9 @@
 import { isFunction } from 'jezvejs';
 import { Sortable } from 'jezvejs/Sortable';
+import { __ } from '../../js/utils.js';
 import { ListContainer } from '../ListContainer/ListContainer.js';
 import { TransactionListItem } from '../TransactionListItem/TransactionListItem.js';
 import './style.scss';
-
-/** Strings */
-const MSG_NO_TRANSACTIONS = 'No transactions found.';
 
 /** CSS classes */
 const LIST_CLASS = 'trans-list';
@@ -18,7 +16,7 @@ const defaultProps = {
     itemSelector: '.trans-item',
     itemSortSelector: '.trans-item.trans-item_sort',
     className: LIST_CLASS,
-    noItemsMessage: MSG_NO_TRANSACTIONS,
+    noItemsMessage: __('TRANSACTIONS_NO_DATA'),
     mode: 'classic',
     showControls: true,
     onSort: null,

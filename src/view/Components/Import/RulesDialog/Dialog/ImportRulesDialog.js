@@ -8,6 +8,7 @@ import {
 import { Popup } from 'jezvejs/Popup';
 import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Paginator } from 'jezvejs/Paginator';
+import { __ } from '../../../../js/utils.js';
 import { API } from '../../../../js/api/index.js';
 import { ImportRule } from '../../../../js/model/ImportRule.js';
 import { ImportRuleForm } from '../RuleForm/ImportRuleForm.js';
@@ -23,16 +24,6 @@ export const IMPORT_RULES_DIALOG_CLASS = 'rules-dialog';
 const IMPORT_RULES_POPUP_CLASS = 'rules-popup';
 const UPDATE_BUTTON_CLASS = 'update-btn';
 const DEL_BUTTON_CLASS = 'delete-btn';
-
-/** Strings */
-const TITLE_RULE_DELETE = 'Delete import rule';
-const MSG_RULE_DELETE = 'Are you sure to delete this import rule?';
-const MSG_RULE_LIST_REQUEST_FAIL = 'Fail to read list of import rules';
-const MSG_NO_RULES = 'No rules';
-const MSG_NOT_FOUND = 'Not found';
-const TITLE_RULES_LIST = 'Import rules';
-const TITLE_CREATE_RULE = 'Create import rule';
-const TITLE_UPDATE_RULE = 'Update import rule';
 
 /** Other */
 const SHOW_ON_PAGE = 20;
@@ -75,7 +66,7 @@ export class ImportRulesDialog extends Component {
         this.listContainer.append(this.rulesList.elem);
 
         this.searchInput = SearchInput.create({
-            placeholder: 'Type to filter',
+            placeholder: __('TYPE_TO_FILTER'),
             onChange: (value) => this.onSearchInputChange(value),
         });
         insertAfter(this.searchInput.elem, this.headerElem);
@@ -115,12 +106,12 @@ export class ImportRulesDialog extends Component {
             attached: true,
             items: [{
                 icon: 'update',
-                title: 'Edit',
+                title: __('UPDATE'),
                 className: UPDATE_BUTTON_CLASS,
                 onClick: (e) => this.onUpdateItem(e),
             }, {
                 icon: 'del',
-                title: 'Delete',
+                title: __('DELETE'),
                 className: DEL_BUTTON_CLASS,
                 onClick: (e) => this.onDeleteItem(e),
             }],
@@ -291,8 +282,8 @@ export class ImportRulesDialog extends Component {
         const ruleId = this.state.contextItem;
         ConfirmDialog.create({
             id: 'rule_delete_warning',
-            title: TITLE_RULE_DELETE,
-            content: MSG_RULE_DELETE,
+            title: __('IMPORT_RULE_DELETE'),
+            content: __('MSG_RULE_DELETE'),
             onconfirm: () => this.deleteRule(ruleId),
         });
     }
@@ -346,7 +337,7 @@ export class ImportRulesDialog extends Component {
             if (!Array.isArray(result.data)) {
                 const errorMessage = (result && 'msg' in result)
                     ? result.msg
-                    : MSG_RULE_LIST_REQUEST_FAIL;
+                    : __('ERR_RULE_LIST_READ');
                 throw new Error(errorMessage);
             }
 
@@ -395,7 +386,7 @@ export class ImportRulesDialog extends Component {
         this.rulesList.setState((listState) => ({
             ...listState,
             items,
-            noItemsMessage: (state.filter !== '') ? MSG_NOT_FOUND : MSG_NO_RULES,
+            noItemsMessage: (state.filter !== '') ? __('IMPORT_RULES_NOT_FOUND') : __('IMPORT_RULES_NO_DATA'),
             renderTime: state.renderTime,
         }));
 
@@ -448,13 +439,13 @@ export class ImportRulesDialog extends Component {
         }
 
         if (state.id === this.LIST_STATE) {
-            this.titleElem.textContent = TITLE_RULES_LIST;
+            this.titleElem.textContent = __('IMPORT_RULES');
 
             this.renderList(state);
         } else if (state.id === this.CREATE_STATE || state.id === this.UPDATE_STATE) {
             this.titleElem.textContent = (state.id === this.CREATE_STATE)
-                ? TITLE_CREATE_RULE
-                : TITLE_UPDATE_RULE;
+                ? __('IMPORT_RULE_CREATE')
+                : __('IMPORT_RULE_UPDATE');
 
             this.renderForm(state);
         }

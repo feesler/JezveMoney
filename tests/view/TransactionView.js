@@ -38,6 +38,7 @@ import {
 } from '../model/Transaction.js';
 import { App } from '../Application.js';
 import { AccountsList } from '../model/AccountsList.js';
+import { __ } from '../model/locale.js';
 
 const infoItemSelectors = [
     '#srcAmountInfo',
@@ -175,6 +176,8 @@ export class TransactionView extends AppView {
 
     buildModel(cont) {
         const res = this.model;
+
+        res.locale = cont.locale;
 
         res.type = cont.typeMenu.value;
         assert(availTransTypes.includes(res.type), 'Invalid type selected');
@@ -486,8 +489,12 @@ export class TransactionView extends AppView {
         const isTransfer = this.model.type === TRANSFER;
         const isDebt = this.model.type === DEBT;
         const { isAvailable, isDiffCurr } = this.model;
+        const { locale } = this;
 
         const res = {
+            header: {
+                localeSelect: { value: this.model.locale },
+            },
             typeMenu: { value: this.model.type },
             personContainer: {
                 tile: {},
@@ -534,10 +541,7 @@ export class TransactionView extends AppView {
         };
 
         if (this.model.isUpdate) {
-            res.deleteBtn = {
-                title: 'Delete',
-                visible: true,
-            };
+            res.deleteBtn = { visible: true };
         }
 
         if (isAvailable) {
@@ -625,15 +629,17 @@ export class TransactionView extends AppView {
         }
 
         if (isAvailable) {
-            res.srcAmountRow.label = (isDiffCurr) ? 'Source amount' : 'Amount';
-            res.destAmountRow.label = (isDiffCurr) ? 'Destination amount' : 'Amount';
+            res.srcAmountRow.label = (isDiffCurr) ? __('TR_SRC_AMOUNT', locale) : __('TR_AMOUNT', locale);
+            res.destAmountRow.label = (isDiffCurr) ? __('TR_DEST_AMOUNT', locale) : __('TR_AMOUNT', locale);
         }
+
+        const resultBalanceTok = __('TR_RESULT', locale);
 
         if (isExpense) {
             assert(state >= -1 && state <= 4, 'Invalid state specified');
 
             if (isAvailable) {
-                res.srcResBalanceRow.label = 'Result balance';
+                res.srcResBalanceRow.label = resultBalanceTok;
             }
 
             res.srcAmountInfo.visible = false;
@@ -676,7 +682,7 @@ export class TransactionView extends AppView {
             assert(state >= -1 && state <= 4, 'Invalid state specified');
 
             if (isAvailable) {
-                res.destResBalanceRow.label = 'Result balance';
+                res.destResBalanceRow.label = resultBalanceTok;
             }
 
             this.hideInputRow(res, 'srcResBalance');
@@ -718,8 +724,8 @@ export class TransactionView extends AppView {
             assert(state >= -1 && state <= 8, 'Invalid state specified');
 
             if (isAvailable) {
-                res.srcResBalanceRow.label = 'Result balance (Source)';
-                res.destResBalanceRow.label = 'Result balance (Destination)';
+                res.srcResBalanceRow.label = `${resultBalanceTok} (${__('TR_SOURCE', locale)})`;
+                res.destResBalanceRow.label = `${resultBalanceTok} (${__('TR_DESTINATION', locale)})`;
             }
 
             if (state === -1) {
@@ -797,12 +803,15 @@ export class TransactionView extends AppView {
             res.noAccountsMsg = { visible: isAvailable && !accountsAvailable };
 
             if (isAvailable) {
+                const personTok = __('TR_PERSON', locale);
+                const accountTok = __('TR_ACCOUNT', locale);
+
                 res.srcResBalanceRow.label = (debtType)
-                    ? 'Result balance (Person)'
-                    : 'Result balance (Account)';
+                    ? `${resultBalanceTok} (${personTok})`
+                    : `${resultBalanceTok} (${accountTok})`;
                 res.destResBalanceRow.label = (debtType)
-                    ? 'Result balance (Account)'
-                    : 'Result balance (Person)';
+                    ? `${resultBalanceTok} (${accountTok})`
+                    : `${resultBalanceTok} (${personTok})`;
             }
 
             if (debtType) {

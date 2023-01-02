@@ -11,10 +11,13 @@ abstract class AdminController extends TemplateController
 
     public function initDefResources()
     {
+        $this->setupLocales();
+
         $this->cssArr = [];
         $this->cssAdmin = [];
         $this->jsArr = [
             "polyfill/index.js",
+            "locale/" . $this->locale . ".js",
         ];
         $this->jsAdmin = [];
     }

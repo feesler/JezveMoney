@@ -19,7 +19,7 @@ class ApiListController extends ApiController
     {
         $ids = $this->getRequestedIds();
         if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            throw new \Error(Message::get(ERR_NO_IDS));
+            throw new \Error(__("ERR_NO_IDS"));
         }
 
         $res = [];
@@ -83,18 +83,18 @@ class ApiListController extends ApiController
     public function create()
     {
         if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
+            throw new \Error(__("ERR_INVALID_REQUEST"));
         }
 
         $request = $this->getRequestData();
         if (!$request) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
+            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
         }
 
         $expectedFields = $this->getExpectedFields($request);
         $checkResult = checkFields($request, $expectedFields);
         if ($checkResult === false) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
+            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
         }
 
         $this->begin();
@@ -122,12 +122,12 @@ class ApiListController extends ApiController
     public function createMultiple()
     {
         if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
+            throw new \Error(__("ERR_INVALID_REQUEST"));
         }
 
         $request = $this->getRequestData();
         if (!is_array($request)) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
+            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
         }
 
         $this->begin();
@@ -135,13 +135,13 @@ class ApiListController extends ApiController
         $items = [];
         foreach ($request as $item) {
             if (!is_array($item)) {
-                throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
+                throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
             }
 
             $expectedFields = $this->getExpectedFields($item);
             $checkResult = checkFields($item, $expectedFields);
             if ($checkResult === false) {
-                throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
+                throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
             }
 
             $itemData = $this->preCreate($item);
@@ -180,18 +180,18 @@ class ApiListController extends ApiController
     public function update()
     {
         if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
+            throw new \Error(__("ERR_INVALID_REQUEST"));
         }
 
         $request = $this->getRequestData();
         if (!$request || !isset($request["id"])) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
+            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
         }
 
         $expectedFields = $this->getExpectedFields($request);
         $reqData = checkFields($request, $expectedFields);
         if ($reqData === false) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
+            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
         }
 
         $this->begin();
@@ -219,12 +219,12 @@ class ApiListController extends ApiController
     public function del()
     {
         if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
+            throw new \Error(__("ERR_INVALID_REQUEST"));
         }
 
         $ids = $this->getRequestedIds(true, $this->isJsonContent());
         if (is_null($ids) || !is_array($ids) || !count($ids)) {
-            throw new \Error(Message::get(ERR_NO_IDS));
+            throw new \Error(__("ERR_NO_IDS"));
         }
 
         $this->begin();

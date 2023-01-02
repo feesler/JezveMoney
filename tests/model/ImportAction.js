@@ -2,6 +2,7 @@ import { assert } from 'jezve-test';
 import { fixFloat } from '../common.js';
 import { App } from '../Application.js';
 import { ImportTransaction } from './ImportTransaction.js';
+import { __ } from './locale.js';
 
 /** Action types */
 export const IMPORT_ACTION_SET_TR_TYPE = 1;
@@ -88,13 +89,13 @@ export class ImportAction {
     }
 
     static actionTypes = [
-        { id: IMPORT_ACTION_SET_TR_TYPE, title: 'Set transaction type' },
-        { id: IMPORT_ACTION_SET_ACCOUNT, title: 'Set account' },
-        { id: IMPORT_ACTION_SET_PERSON, title: 'Set person' },
-        { id: IMPORT_ACTION_SET_SRC_AMOUNT, title: 'Set source amount' },
-        { id: IMPORT_ACTION_SET_DEST_AMOUNT, title: 'Set destination amount' },
-        { id: IMPORT_ACTION_SET_COMMENT, title: 'Set comment' },
-        { id: IMPORT_ACTION_SET_CATEGORY, title: 'Set category' },
+        { id: IMPORT_ACTION_SET_TR_TYPE, titleToken: 'ACTION_SET_TR_TYPE' },
+        { id: IMPORT_ACTION_SET_ACCOUNT, titleToken: 'ACTION_SET_ACCOUNT' },
+        { id: IMPORT_ACTION_SET_PERSON, titleToken: 'ACTION_SET_PERSON' },
+        { id: IMPORT_ACTION_SET_SRC_AMOUNT, titleToken: 'ACTION_SET_SRC_AMOUNT' },
+        { id: IMPORT_ACTION_SET_DEST_AMOUNT, titleToken: 'ACTION_SET_DEST_AMOUNT' },
+        { id: IMPORT_ACTION_SET_COMMENT, titleToken: 'ACTION_SET_COMMENT' },
+        { id: IMPORT_ACTION_SET_CATEGORY, titleToken: 'ACTION_SET_CATEGORY' },
     ];
 
     static actionsMap = {
@@ -160,11 +161,13 @@ export class ImportAction {
     }
 
     /** Search action type by name (case insensitive) */
-    static findActionByName(name) {
+    static findActionByName(name, locale) {
         assert.isString(name, 'Invalid parameter');
 
         const lcName = name.toLowerCase();
-        return this.actionTypes.find((item) => item.title.toLowerCase() === lcName);
+        return this.actionTypes.find((item) => (
+            __(item.titleToken, locale).toLowerCase() === lcName
+        ));
     }
 
     /** Check action requires select value from list */

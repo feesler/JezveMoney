@@ -5,12 +5,11 @@ import {
     Component,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
+import { __ } from '../../../../js/utils.js';
 import { API } from '../../../../js/api/index.js';
 
 /** CSS classes */
 const FILE_NAME_CLASS = 'upload-form__filename';
-/** Strings */
-const MSG_UPLOAD_FAIL = 'Fail to process file';
 
 /**
  * ImportFileUploader component
@@ -85,7 +84,7 @@ export class ImportFileUploader extends Component {
     onImportSuccess(data) {
         try {
             if (!Array.isArray(data)) {
-                throw new Error(MSG_UPLOAD_FAIL);
+                throw new Error(__('ERR_UPLOAD'));
             }
 
             if (isFunction(this.props.onUploaded)) {

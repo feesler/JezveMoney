@@ -12,16 +12,11 @@ import { PopupMenuButton } from 'jezvejs/PopupMenu';
 import { ImportRule } from '../../../../js/model/ImportRule.js';
 import { ImportConditionList } from '../../../../js/model/ImportConditionList.js';
 import { ImportActionList } from '../../../../js/model/ImportActionList.js';
+import { __ } from '../../../../js/utils.js';
 import { ImportConditionItem } from '../ConditionItem/ImportConditionItem.js';
 import { ImportActionItem } from '../ActionItem/ImportActionItem.js';
 import { ToggleButton } from '../../../ToggleButton/ToggleButton.js';
 import './style.scss';
-
-/** Strings */
-const TITLE_CONDITIONS = 'Conditions';
-const TITLE_ACTIONS = 'Actions';
-const TITLE_NO_ACTIONS = 'No actions.';
-const TITLE_NO_CONDITIONS = 'No conditions';
 
 /**
  * ImportRuleItem component
@@ -79,12 +74,12 @@ export class ImportRuleItem extends Component {
         ]);
 
         this.conditionsHeader = createElement('label', {
-            props: { className: 'rule-item__header', textContent: TITLE_CONDITIONS },
+            props: { className: 'rule-item__header', textContent: __('IMPORT_CONDITIONS') },
         });
         this.conditionsContainer = window.app.createContainer('rule-item__conditions', []);
 
         this.actionsHeader = createElement('label', {
-            props: { className: 'rule-item__header', textContent: TITLE_ACTIONS },
+            props: { className: 'rule-item__header', textContent: __('IMPORT_ACTIONS') },
         });
         this.actionsContainer = window.app.createContainer('rule-item__actions', []);
 
@@ -199,7 +194,7 @@ export class ImportRuleItem extends Component {
 
         const actionsTitle = (state.actions.length > 0)
             ? `${state.actions.length} action(s).`
-            : TITLE_NO_ACTIONS;
+            : __('IMPORT_ACTIONS_NO_DATA');
 
         if (conditionItems.length > 0) {
             const firstCondition = conditionItems[0];
@@ -213,7 +208,7 @@ export class ImportRuleItem extends Component {
 
             this.valueLabel.textContent = firstCondition.valueLabel.textContent;
         } else {
-            this.propertyLabel.textContent = TITLE_NO_CONDITIONS;
+            this.propertyLabel.textContent = __('IMPORT_CONDITIONS_NO_DATA');
         }
 
         if (conditionItems.length > 1) {

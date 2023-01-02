@@ -40,7 +40,6 @@ class TransactionModel extends CachedTable
 
     private static $user_id = 0;
     private static $owner_id = 0;
-    private static $typeNames = [EXPENSE => "Expense", INCOME => "Income", TRANSFER => "Transfer", DEBT => "Debt"];
     private static $availTypes = [EXPENSE, INCOME, TRANSFER, DEBT];
     private static $srcAvailTypes = [EXPENSE, TRANSFER, DEBT];
     private static $srcMandatoryTypes = [EXPENSE, TRANSFER];
@@ -50,11 +49,11 @@ class TransactionModel extends CachedTable
 
     private static $availReports = ["account", "currency", "category"];
 
-    private static $histogramGroupNames = [
-        GROUP_BY_DAY => "Day",
-        GROUP_BY_WEEK => "Week",
-        GROUP_BY_MONTH => "Month",
-        GROUP_BY_YEAR => "Year"
+    private static $availGroupTypes = [
+        GROUP_BY_DAY => "day",
+        GROUP_BY_WEEK => "week",
+        GROUP_BY_MONTH => "month",
+        GROUP_BY_YEAR => "year",
     ];
 
     protected $tbl_name = "transactions";
@@ -1847,7 +1846,7 @@ class TransactionModel extends CachedTable
                 $res->group = strtolower($request["group"]);
             }
         } else {
-            $res->group = self::$histogramGroupNames[DEFAULT_GROUP_TYPE];
+            $res->group = self::getHistogramGroupName(DEFAULT_GROUP_TYPE);
         }
 
         $stDate = isset($request["stdate"]) ? $request["stdate"] : null;
@@ -2095,27 +2094,32 @@ class TransactionModel extends CachedTable
 
 
     // Return string for specified transaction type
-    public static function stringToType($trans_type)
+    public static function stringToType($value)
     {
-        $reqType = strtolower($trans_type);
-        foreach (self::$typeNames as $type_id => $typeName) {
-            if (strtolower($typeName) == $reqType) {
-                return $type_id;
-            }
+        $stringTypes = [
+            "expense" => EXPENSE,
+            "income" => INCOME,
+            "transfer" => TRANSFER,
+            "debt" => DEBT,
+        ];
+
+        if (!is_string($value) || $value === "" || !isset($stringTypes[$value])) {
+            return 0;
         }
 
-        return 0;
+        return $stringTypes[$value];
     }
 
 
     // Return string for specified transaction type
     public static function typeToString($trans_type)
     {
-        if (!isset(self::$typeNames[$trans_type])) {
+        $typeNames = self::getTypeNames();
+        if (!isset($typeNames[$trans_type])) {
             return null;
         }
 
-        return self::$typeNames[$trans_type];
+        return $typeNames[$trans_type];
     }
 
 
@@ -2123,16 +2127,31 @@ class TransactionModel extends CachedTable
     // [ type => 'name string', ... ]
     public static function getTypeNames()
     {
-        return self::$typeNames;
+        return [
+            EXPENSE => __("TR_EXPENSE"),
+            INCOME => __("TR_INCOME"),
+            TRANSFER => __("TR_TRANSFER"),
+            DEBT => __("TR_DEBT"),
+        ];
+    }
+
+
+    public static function getHistogramGroupName($groupType)
+    {
+        if (!isset(self::$availGroupTypes[$groupType])) {
+            return null;
+        }
+
+        return self::$availGroupTypes[$groupType];
     }
 
 
     public static function getHistogramGroupTypeByName($name)
     {
         $lname = strtolower($name);
-        foreach (self::$histogramGroupNames as $index => $groupName) {
+        foreach (self::$availGroupTypes as $groupType => $groupName) {
             if ($lname == strtolower($groupName)) {
-                return $index;
+                return $groupType;
             }
         }
 
@@ -2140,9 +2159,15 @@ class TransactionModel extends CachedTable
     }
 
     // Return array of histogram group names
+    // [ type => 'group name string', ... ]
     public static function getHistogramGroupNames()
     {
-        return self::$histogramGroupNames;
+        return [
+            GROUP_BY_DAY => __("STAT_GROUP_BY_DAY"),
+            GROUP_BY_WEEK => __("STAT_GROUP_BY_WEEK"),
+            GROUP_BY_MONTH => __("STAT_GROUP_BY_MONTH"),
+            GROUP_BY_YEAR => __("STAT_GROUP_BY_YEAR"),
+        ];
     }
 
     /** Returns array of available histogram report types */

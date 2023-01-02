@@ -11,8 +11,6 @@ use JezveMoney\App\Model\ImportRuleModel;
 use JezveMoney\App\Model\ImportActionModel;
 use JezveMoney\App\Model\ImportTemplateModel;
 
-const MSG_NO_ACCOUNTS_AVAILABLE = "You have no one account. To start the import create one.";
-
 class Import extends TemplateController
 {
     protected function onStart()
@@ -36,17 +34,18 @@ class Import extends TemplateController
         $importAvailable = count($accounts) > 0;
 
         $data = [
+            "titleString" => __("APP_NAME") . " | " . __("IMPORT"),
             "accounts" => $accounts,
             "importAvailable" => $importAvailable,
-            "importNotAvailableMessage" => MSG_NO_ACCOUNTS_AVAILABLE,
+            "importNotAvailableMessage" => __("IMPORT_NO_ACCOUNTS_MSG"),
             "importTemplates" => $this->templateModel->getData(),
             "tplColumnTypes" => $this->templateModel->getColumnTypes(),
             "importRules" => $this->ruleModel->getData(["extended" => true]),
             "uploadBtn" => [
                 "id" => "uploadBtn",
                 "classNames" => "circle-icon",
-                "title" => "Upload",
-                "icon" => "import"
+                "title" => __("IMPORT_UPLOAD"),
+                "icon" => "import",
             ],
         ];
 
@@ -66,8 +65,6 @@ class Import extends TemplateController
 
         $this->cssArr[] = "ImportView.css";
         $this->jsArr[] = "ImportView.js";
-
-        $data["titleString"] = "Jezve Money | Import";
 
         $this->render($data);
     }

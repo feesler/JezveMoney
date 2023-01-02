@@ -14,6 +14,7 @@ import { Tile } from './component/Tiles/Tile.js';
 import { InputRow } from './component/InputRow.js';
 import { WarningPopup } from './component/WarningPopup.js';
 import { App } from '../Application.js';
+import { __ } from '../model/locale.js';
 
 /** Account view class */
 export class AccountView extends AppView {
@@ -67,7 +68,9 @@ export class AccountView extends AppView {
     }
 
     async buildModel(cont) {
-        const res = {};
+        const res = {
+            locale: cont.locale,
+        };
 
         res.isUpdate = cont.isUpdate;
         if (res.isUpdate) {
@@ -102,7 +105,7 @@ export class AccountView extends AppView {
         // Icon
         let iconObj = App.icons.findByName(cont.iconDropDown.content.textValue);
         if (!iconObj) {
-            iconObj = Icon.noIcon();
+            iconObj = Icon.noIcon(this.locale);
         }
         res.tileIcon = iconObj;
         res.icon_id = iconObj.id;
@@ -131,23 +134,23 @@ export class AccountView extends AppView {
         this.model.icon_id = account.icon_id;
     }
 
-    getExpectedAccount() {
+    getExpectedAccount(model = this.model) {
         const res = {
-            name: this.model.name,
-            initbalance: this.model.fInitBalance,
-            curr_id: this.model.curr_id,
-            icon_id: this.model.icon_id,
-            flags: this.model.flags,
+            name: model.name,
+            initbalance: model.fInitBalance,
+            curr_id: model.curr_id,
+            icon_id: model.icon_id,
+            flags: model.flags,
         };
 
-        if (this.model.isUpdate) {
-            res.id = this.model.id;
+        if (model.isUpdate) {
+            res.id = model.id;
         }
 
-        const origBalance = (this.model.isUpdate && this.origAccount)
+        const origBalance = (model.isUpdate && this.origAccount)
             ? this.origAccount.balance
             : 0;
-        const origInitBalance = (this.model.isUpdate && this.origAccount)
+        const origInitBalance = (model.isUpdate && this.origAccount)
             ? this.origAccount.initbalance
             : 0;
 
@@ -156,23 +159,26 @@ export class AccountView extends AppView {
         return res;
     }
 
-    getExpectedState() {
-        const account = this.getExpectedAccount();
+    getExpectedState(model = this.model) {
+        const account = this.getExpectedAccount(model);
         const accTile = Tile.renderAccount(account);
 
-        if (!this.model.nameTyped && !this.model.isUpdate) {
-            accTile.title = 'New account';
+        if (!model.nameTyped && !model.isUpdate) {
+            accTile.title = __('ACCOUNT_NAME_NEW', this.locale);
         }
 
         accTile.visible = true;
 
         const res = {
+            header: {
+                localeSelect: { value: model.locale },
+            },
             heading: { visible: true },
             tile: accTile,
-            name: { value: this.model.name.toString(), visible: true },
-            balance: { value: this.model.initbalance.toString(), visible: true },
-            currDropDown: { textValue: this.model.currObj.name, visible: true },
-            iconDropDown: { textValue: this.model.tileIcon.name, visible: true },
+            name: { value: model.name.toString(), visible: true },
+            balance: { value: model.initbalance.toString(), visible: true },
+            currDropDown: { textValue: model.currObj.name, visible: true },
+            iconDropDown: { textValue: model.tileIcon.name, visible: true },
         };
 
         return res;
@@ -254,7 +260,7 @@ export class AccountView extends AppView {
         }
 
         if (!val) {
-            iconObj = Icon.noIcon();
+            iconObj = Icon.noIcon(this.locale);
         }
 
         this.model.icon_id = iconObj.id;

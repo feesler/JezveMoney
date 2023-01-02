@@ -26,9 +26,7 @@ import { ImportRuleAccordion } from './ImportRuleAccordion.js';
 import { ImportActionForm } from './ImportActionForm.js';
 import { trimToDigitsLimit } from '../../../common.js';
 import { App } from '../../../Application.js';
-
-const availAccordionTitles = ['Conditions', 'Actions'];
-const isAvailableTitle = (title) => availAccordionTitles.includes(title);
+import { __ } from '../../../model/locale.js';
 
 export class ImportRuleForm extends TestComponent {
     static getExpectedCondition(model) {
@@ -168,12 +166,12 @@ export class ImportRuleForm extends TestComponent {
         );
 
         accordionItems.forEach((item) => {
-            assert(isAvailableTitle(item.content.title), `Unknown container: '${item.content.title}'`);
-
-            if (item.content.title === 'Conditions') {
+            if (item.content.title === __('IMPORT_CONDITIONS', App.view.locale)) {
                 res.conditionsList = item;
-            } else if (item.content.title === 'Actions') {
+            } else if (item.content.title === __('IMPORT_ACTIONS', App.view.locale)) {
                 res.actionsList = item;
+            } else {
+                throw new Error(`Unknown container: '${item.content.title}'`);
             }
         });
 

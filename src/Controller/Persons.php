@@ -15,7 +15,7 @@ class Persons extends TemplateController
     {
         $this->template = new Template(VIEW_TPL_PATH . "PersonList.tpl");
         $data = [
-            "titleString" => "Jezve Money | Persons",
+            "titleString" => __("APP_NAME") . " | " . __("PERSONS"),
         ];
         $data["appProps"] = [
             "persons" => $this->personMod->getData(["visibility" => "all"])
@@ -31,7 +31,7 @@ class Persons extends TemplateController
     protected function fail($msg = null)
     {
         if (!is_null($msg)) {
-            Message::set($msg);
+            Message::setError($msg);
         }
 
         setLocation(BASEURL . "persons/");
@@ -41,13 +41,13 @@ class Persons extends TemplateController
     public function create()
     {
         if ($this->isPOST()) {
-            $this->fail(ERR_INVALID_REQUEST);
+            $this->fail(__("ERR_INVALID_REQUEST"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Person.tpl");
         $data = [
-            "headString" => "New person",
-            "titleString" => "Jezve Money | New person"
+            "headString" => __("PERSON_CREATE"),
+            "titleString" => __("APP_NAME") . " | " . __("PERSON_CREATE"),
         ];
 
         $personsData = $this->personMod->getData(["visibility" => "all"]);
@@ -75,23 +75,23 @@ class Persons extends TemplateController
     public function update()
     {
         if ($this->isPOST()) {
-            $this->fail(ERR_INVALID_REQUEST);
+            $this->fail(__("ERR_INVALID_REQUEST"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Person.tpl");
         $data = [
-            "headString" => "Edit person",
-            "titleString" => "Jezve Money | Edit person"
+            "headString" => __("PERSON_UPDATE"),
+            "titleString" => __("APP_NAME") . " | " . __("PERSON_UPDATE"),
         ];
 
         $p_id = intval($this->actionParam);
         if (!$p_id) {
-            $this->fail(ERR_PERSON_UPDATE);
+            $this->fail(__("ERR_PERSON_UPDATE"));
         }
 
         $pInfo = $this->personMod->getItem($p_id);
         if (!$pInfo) {
-            $this->fail(ERR_PERSON_UPDATE);
+            $this->fail(__("ERR_PERSON_UPDATE"));
         }
         $data["pInfo"] = $pInfo;
 

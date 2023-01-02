@@ -24,9 +24,9 @@ class ImportCondition extends ApiListController
         parent::initAPI();
 
         $this->model = ImportConditionModel::getInstance();
-        $this->createErrorMsg = Message::get(ERR_IMPORT_COND_CREATE);
-        $this->updateErrorMsg = Message::get(ERR_IMPORT_COND_UPDATE);
-        $this->deleteErrorMsg = Message::get(ERR_IMPORT_COND_DELETE);
+        $this->createErrorMsg = __("ERR_IMPORT_COND_CREATE");
+        $this->updateErrorMsg = __("ERR_IMPORT_COND_UPDATE");
+        $this->deleteErrorMsg = __("ERR_IMPORT_COND_DELETE");
     }
 
 

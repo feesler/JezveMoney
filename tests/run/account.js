@@ -13,6 +13,7 @@ import { Transaction } from '../model/Transaction.js';
 import { createCSV, generateId } from '../common.js';
 import { App } from '../Application.js';
 import { AccountView } from '../view/AccountView.js';
+import { __ } from '../model/locale.js';
 
 /** Navigate to accounts list page */
 const checkNavigation = async () => {
@@ -285,7 +286,7 @@ export const securityTests = async () => {
         assert.instanceOf(App.view, AccountListView, 'Invalid view');
 
         App.view.expectedState = {
-            msgPopup: { success: false, message: 'Fail to update account.' },
+            msgPopup: { success: false, message: __('ERR_ACCOUNT_UPDATE', App.view.locale) },
         };
         await App.view.checkState();
         await App.view.closeNotification();

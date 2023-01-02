@@ -1,5 +1,8 @@
 <?php
 
+use JezveMoney\Core\Locale;
+use JezveMoney\Core\MySqlDB;
+
 $noLogs = true;
 
 defineHostConstants();
@@ -31,11 +34,12 @@ require_once(APP_ROOT . "vendor/autoload.php");
 setupLogs();
 
 $dbConfig = (require_once(APP_ROOT . "system/dbsetup.php"));
-JezveMoney\Core\MySqlDB::setup($dbConfig);
+MySqlDB::setup($dbConfig);
 
 date_default_timezone_set("Europe/Moscow");
 
+Locale::loadUserLocale();
+
 require_once(APP_ROOT . "system/Engine/Message.php");
-require_once(APP_ROOT . "system/msg_defines.php");
-require_once(APP_ROOT . "system/messages.php");
+
 wlog("==================================================");

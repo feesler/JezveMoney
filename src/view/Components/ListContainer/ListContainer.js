@@ -7,6 +7,7 @@ import {
     insertAfter,
     Component,
 } from 'jezvejs';
+import { __ } from '../../js/utils.js';
 
 /** CSS classes */
 const NO_DATA_CLASS = 'nodata-message';
@@ -17,7 +18,7 @@ const defaultProps = {
     getItemProps: null, // optional callback to map items to props
     isListChanged: null, // optional callback to verify list content was changed
     items: [],
-    noItemsMessage: 'No items',
+    noItemsMessage: __('LIST_NO_DATA'),
     listMode: 'list',
     onItemClick: null,
 };

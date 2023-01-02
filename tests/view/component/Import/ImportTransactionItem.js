@@ -8,6 +8,7 @@ import {
     evaluate,
     hasClass,
     asyncMap,
+    prop,
 } from 'jezve-test';
 import {
     EXPENSE,
@@ -19,6 +20,7 @@ import { ImportTransaction } from '../../../model/ImportTransaction.js';
 import { normalize, fixFloat } from '../../../common.js';
 import { App } from '../../../Application.js';
 import { OriginalImportData } from './OriginalImportData.js';
+import { __ } from '../../../model/locale.js';
 
 const sourceTransactionTypes = ['expense', 'transferfrom', 'debtfrom'];
 
@@ -63,6 +65,8 @@ export class ImportTransactionItem extends TestComponent {
         ] = await asyncMap(fieldSelectors, async (selector) => (
             this.parseField(await query(this.elem, selector))
         ));
+
+        res.typeField.type = await prop(res.typeField.elem, 'dataset.type');
 
         res.menuBtn = await query(this.elem, '.popup-menu-btn');
         res.contextMenuElem = await query(this.elem, '.popup-menu-list');
@@ -134,10 +138,10 @@ export class ImportTransactionItem extends TestComponent {
         res.selected = cont.selected;
         res.enabled = cont.enabled;
 
-        const transactionType = ImportTransaction.findTypeByName(cont.typeField.value);
-        assert(transactionType, `Invalid transaction type: '${cont.typeField.value}'`);
+        const transactionType = ImportTransaction.getTypeById(cont.typeField.type);
+        assert(transactionType, `Invalid transaction type: '${cont.typeField.type}'`);
 
-        res.type = transactionType.id;
+        res.type = cont.typeField.type;
         res.srcAmount = parseFloat(cont.srcAmountField.amount);
         res.destAmount = parseFloat(cont.destAmountField.amount);
 
@@ -493,7 +497,7 @@ export class ImportTransactionItem extends TestComponent {
             enabled: item.enabled,
             typeField: {
                 visible: true,
-                value: trType.title,
+                value: __(trType.titleToken, App.view.locale),
             },
             srcAmountField: {
                 visible: true,

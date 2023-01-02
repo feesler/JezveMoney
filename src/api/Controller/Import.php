@@ -217,7 +217,7 @@ class Import extends ApiController
     public function upload()
     {
         if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
+            throw new \Error(__("ERR_INVALID_REQUEST"));
         }
 
         $hdrs = [];

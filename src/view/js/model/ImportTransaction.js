@@ -1,5 +1,5 @@
 import { copyObject, checkDate } from 'jezvejs';
-import { fixFloat } from '../utils.js';
+import { fixFloat, __ } from '../utils.js';
 import {
     EXPENSE,
     INCOME,
@@ -8,13 +8,22 @@ import {
 } from './Transaction.js';
 
 export const sourceTypes = ['expense', 'transferfrom', 'debtfrom'];
-const transTypeMap = {
+export const transTypeMap = {
     expense: EXPENSE,
     income: INCOME,
     transferfrom: TRANSFER,
     transferto: TRANSFER,
     debtfrom: DEBT,
     debtto: DEBT,
+};
+
+export const typeNames = {
+    expense: __('TR_EXPENSE'),
+    income: __('TR_INCOME'),
+    transferfrom: __('TR_TRANSFER_FROM'),
+    transferto: __('TR_TRANSFER_TO'),
+    debtfrom: __('TR_DEBT_FROM'),
+    debtto: __('TR_DEBT_TO'),
 };
 
 const defaultProps = {

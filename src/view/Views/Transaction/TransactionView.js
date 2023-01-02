@@ -20,6 +20,7 @@ import {
     EXCHANGE_DIGITS,
     normalizeExch,
     timeToDate,
+    __,
 } from '../../js/utils.js';
 import {
     EXPENSE,
@@ -55,13 +56,6 @@ import * as STATE from './stateId.js';
 import { CategoryList } from '../../js/model/CategoryList.js';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 
-const PAGE_TITLE_UPDATE = 'Jezve Money | Edit transaction';
-const PAGE_TITLE_CREATE = 'Jezve Money | New transaction';
-const TITLE_TRANS_DELETE = 'Delete transaction';
-const MSG_TRANS_DELETE = 'Are you sure want to delete selected transaction?<br>Changes in the balance of affected accounts will be canceled.';
-const MSG_ACCOUNT_NOT_AVAILABLE = 'You have no one active account. Please create one.';
-const MSG_TRANSFER_NOT_AVAILABLE = 'You need at least two active accounts for transfer.';
-const MSG_DEBT_NOT_AVAILABLE = 'You have no one active person. Please create one for debts.';
 const SHOW_INFO = 0;
 const SHOW_INPUT = 1;
 const HIDE_BOTH = 2;
@@ -888,8 +882,8 @@ class TransactionView extends View {
     confirmDelete() {
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: TITLE_TRANS_DELETE,
-            content: MSG_TRANS_DELETE,
+            title: __('TR_DELETE'),
+            content: __('MSG_TRANS_DELETE'),
             onconfirm: () => this.deleteTransaction(),
         });
     }
@@ -917,7 +911,9 @@ class TransactionView extends View {
             }
         }
 
-        const title = (state.isUpdate) ? PAGE_TITLE_UPDATE : PAGE_TITLE_CREATE;
+        const title = (state.isUpdate)
+            ? `${__('APP_NAME')} | ${__('TR_UPDATE')}`
+            : `${__('APP_NAME')} | ${__('TR_CREATE')}`;
 
         window.history.replaceState({}, title, url);
     }
@@ -979,8 +975,8 @@ class TransactionView extends View {
             this.exchangeInfo.elem,
         ]);
 
-        this.srcResBalanceRowLabel.textContent = 'Result balance';
-        this.destResBalanceRowLabel.textContent = 'Result balance';
+        this.srcResBalanceRowLabel.textContent = __('TR_RESULT');
+        this.destResBalanceRowLabel.textContent = __('TR_RESULT');
 
         this.enableSourceCurrencySelect(false);
         this.enableDestCurrencySelect(true);
@@ -1025,8 +1021,8 @@ class TransactionView extends View {
             this.exchangeInfo.elem,
         ]);
 
-        this.srcResBalanceRowLabel.textContent = 'Result balance';
-        this.destResBalanceRowLabel.textContent = 'Result balance';
+        this.srcResBalanceRowLabel.textContent = __('TR_RESULT');
+        this.destResBalanceRowLabel.textContent = __('TR_RESULT');
 
         this.enableSourceCurrencySelect(true);
         this.enableDestCurrencySelect(false);
@@ -1101,8 +1097,8 @@ class TransactionView extends View {
             this.destResBalanceInfo.elem,
         ]);
 
-        this.srcResBalanceRowLabel.textContent = 'Result balance (Source)';
-        this.destResBalanceRowLabel.textContent = 'Result balance (Destination)';
+        this.srcResBalanceRowLabel.textContent = `${__('TR_RESULT')} (${__('TR_SOURCE')})`;
+        this.destResBalanceRowLabel.textContent = `${__('TR_RESULT')} (${__('TR_DESTINATION')})`;
 
         this.enableSourceCurrencySelect(false);
         this.enableDestCurrencySelect(false);
@@ -1254,9 +1250,11 @@ class TransactionView extends View {
         ]);
 
         if (noAccount) {
-            this.debtAccountLabel.textContent = 'No account';
+            this.debtAccountLabel.textContent = __('TR_NO_ACCOUNT');
         } else {
-            this.debtAccountLabel.textContent = (debtType) ? 'Destination account' : 'Source account';
+            this.debtAccountLabel.textContent = (debtType)
+                ? __('TR_DEST_ACCOUNT')
+                : __('TR_SRC_ACCOUNT');
         }
 
         show(this.noAccountBtn, !noAccount);
@@ -1268,8 +1266,10 @@ class TransactionView extends View {
         show(this.selectAccountBtn, noAccount && userAccounts.length > 0);
         enable(this.accountToggleBtn, !state.submitStarted);
 
-        this.srcResBalanceRowLabel.textContent = (debtType) ? 'Result balance (Person)' : 'Result balance (Account)';
-        this.destResBalanceRowLabel.textContent = (debtType) ? 'Result balance (Account)' : 'Result balance (Person)';
+        const srcResultTarget = __((debtType) ? 'TR_PERSON' : 'TR_ACCOUNT');
+        const destResultTarget = __((debtType) ? 'TR_ACCOUNT' : 'TR_PERSON');
+        this.srcResBalanceRowLabel.textContent = `${__('TR_RESULT')} (${srcResultTarget})`;
+        this.destResBalanceRowLabel.textContent = `${__('TR_RESULT')} (${destResultTarget})`;
 
         this.enableSourceCurrencySelect(debtType);
         this.enableDestCurrencySelect(!debtType);
@@ -1314,11 +1314,11 @@ class TransactionView extends View {
         if (!state.isAvailable) {
             let message;
             if (transaction.type === EXPENSE || transaction.type === INCOME) {
-                message = MSG_ACCOUNT_NOT_AVAILABLE;
+                message = __('TR_NO_ACCOUNTS');
             } else if (transaction.type === TRANSFER) {
-                message = MSG_TRANSFER_NOT_AVAILABLE;
+                message = __('TR_TRANSFER_NO_ACCOUNTS');
             } else if (transaction.type === DEBT) {
-                message = MSG_DEBT_NOT_AVAILABLE;
+                message = __('TR_DEBT_NO_PERSONS');
             }
 
             this.notAvailMsg.textContent = message;
@@ -1377,8 +1377,8 @@ class TransactionView extends View {
         const srcCurrency = currencyModel.getItem(transaction.src_curr);
         const destCurrency = currencyModel.getItem(transaction.dest_curr);
 
-        const sourceAmountLbl = (state.isDiff) ? 'Source amount' : 'Amount';
-        const destAmountLbl = (state.isDiff) ? 'Destination amount' : 'Amount';
+        const sourceAmountLbl = (state.isDiff) ? __('TR_SRC_AMOUNT') : __('TR_AMOUNT');
+        const destAmountLbl = (state.isDiff) ? __('TR_DEST_AMOUNT') : __('TR_AMOUNT');
 
         // Tile info items
         if (this.srcAmountInfo) {

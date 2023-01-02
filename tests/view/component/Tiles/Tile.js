@@ -8,6 +8,7 @@ import {
     evaluate,
 } from 'jezve-test';
 import { App } from '../../../Application.js';
+import { __ } from '../../../model/locale.js';
 
 export class Tile extends TestComponent {
     async parseContent() {
@@ -79,7 +80,9 @@ export class Tile extends TestComponent {
 
         if (withDebts) {
             const debtAccounts = Tile.filterPersonDebts(person.accounts);
-            res.subtitle = (debtAccounts.length) ? debtAccounts.join('\n') : 'No debts';
+            res.subtitle = (debtAccounts.length)
+                ? debtAccounts.join('\n')
+                : __('PERSON_NO_DEBTS', App.view.locale);
         } else {
             res.subtitle = '';
         }

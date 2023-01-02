@@ -11,14 +11,14 @@ include(TPL_PATH . "Header.tpl");    ?>
             <div class="content">
                 <div class="content_wrap">
                     <header id="heading" class="heading">
-                        <h1>Categories</h1>
+                        <h1><?= __("CATEGORIES") ?></h1>
                         <div class="heading-actions">
                             <?= IconButton::render([
                                 "id" => "createBtn",
                                 "type" => "link",
                                 "classNames" => "circle-icon",
                                 "link" => BASEURL . "categories/create/",
-                                "title" => "Create",
+                                "title" => __("CREATE"),
                                 "icon" => "plus"
                             ]) ?>
                         </div>
@@ -26,11 +26,11 @@ include(TPL_PATH . "Header.tpl");    ?>
                     <header id="contentHeader" class="content-header">
                         <div class="counters">
                             <div id="itemsCounter" class="counter">
-                                <span class="counter__title">Items</span>
+                                <span class="counter__title"><?= __("LIST_ITEMS") ?></span>
                                 <span id="itemsCount" class="counter__value"></span>
                             </div>
                             <div id="selectedCounter" class="counter" hidden>
-                                <span class="counter__title">Selected</span>
+                                <span class="counter__title"><?= __("LIST_SELECTED") ?></span>
                                 <span id="selItemsCount" class="counter__value"></span>
                             </div>
                         </div>

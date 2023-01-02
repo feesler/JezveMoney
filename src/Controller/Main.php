@@ -16,7 +16,7 @@ class Main extends TemplateController
     {
         $this->template = new Template(VIEW_TPL_PATH . "Main.tpl");
         $data = [
-            "titleString" => "Jezve Money"
+            "titleString" => __("APP_NAME")
         ];
 
         $accMod = AccountModel::getInstance();
@@ -69,7 +69,7 @@ class Main extends TemplateController
                 }
             }
 
-            $subtitle = (count($pBalance) > 0) ? $pBalance : "No debts";
+            $subtitle = (count($pBalance) > 0) ? $pBalance : __("PERSON_NO_DEBTS");
 
             $data["persons"][] = [
                 "type" => "link",
@@ -136,7 +136,7 @@ class Main extends TemplateController
     {
         $this->template = new Template(VIEW_TPL_PATH . "About.tpl");
         $data = [
-            "titleString" => "Jezve Money"
+            "titleString" => __("APP_NAME")
         ];
 
         $data["year"] = date("Y");

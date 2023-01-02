@@ -16,9 +16,9 @@ class Category extends ApiListController
         parent::initAPI();
 
         $this->model = CategoryModel::getInstance();
-        $this->createErrorMsg = Message::get(ERR_CATEGORY_CREATE);
-        $this->updateErrorMsg = Message::get(ERR_CATEGORY_UPDATE);
-        $this->deleteErrorMsg = Message::get(ERR_CATEGORY_DELETE);
+        $this->createErrorMsg = __("ERR_CATEGORY_CREATE");
+        $this->updateErrorMsg = __("ERR_CATEGORY_UPDATE");
+        $this->deleteErrorMsg = __("ERR_CATEGORY_DELETE");
     }
 
 

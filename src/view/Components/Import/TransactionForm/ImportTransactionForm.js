@@ -14,13 +14,14 @@ import { DecimalInput } from 'jezvejs/DecimalInput';
 import { Icon } from 'jezvejs/Icon';
 import { InputGroup } from 'jezvejs/InputGroup';
 import { Popup } from 'jezvejs/Popup';
-import { fixFloat } from '../../../js/utils.js';
+import { fixFloat, __ } from '../../../js/utils.js';
 import { Field } from '../../Field/Field.js';
 import './style.scss';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
 import { ToggleButton } from '../../ToggleButton/ToggleButton.js';
 import { CategorySelect } from '../../CategorySelect/CategorySelect.js';
+import { typeNames } from '../../../js/model/ImportTransaction.js';
 
 /** CSS classes */
 const POPUP_CLASS = 'import-form-popup';
@@ -52,26 +53,6 @@ const CALENDAR_ICON_CLASS = 'icon calendar-icon';
 const FORM_CONTROLS_CLASS = 'form-controls';
 const SUBMIT_BUTTON_CLASS = 'btn submit-btn';
 const CANCEL_BUTTON_CLASS = 'btn cancel-btn';
-
-/** Strings */
-const CREATE_TITLE = 'Create transaction';
-const UPDATE_TITLE = 'Edit transaction';
-/* Fields */
-const TITLE_FIELD_AMOUNT = 'Amount';
-const TITLE_FIELD_SRC_AMOUNT = 'Source amount';
-const TITLE_FIELD_DEST_AMOUNT = 'Destination amount';
-const TITLE_FIELD_DATE = 'Date';
-const TITLE_FIELD_COMMENT = 'Comment';
-const TITLE_FIELD_CATEGORY = 'Category';
-const TITLE_FIELD_SRC_ACCOUNT = 'Source account';
-const TITLE_FIELD_DEST_ACCOUNT = 'Destination account';
-const TITLE_FIELD_PERSON = 'Person';
-/* Validation messages */
-const MSG_INCORRECT_AMOUNT = 'Input correct amount';
-const MSG_INVALID_DATE = 'Input correct date';
-/* Controls */
-const SAVE_BTN_TITLE = 'Save';
-const CANCEL_BTN_TITLE = 'Cancel';
 
 const defaultProps = {
     isUpdate: false,
@@ -151,7 +132,7 @@ export class ImportTransactionForm extends Component {
             props: {
                 className: SUBMIT_BUTTON_CLASS,
                 type: 'submit',
-                textContent: SAVE_BTN_TITLE,
+                textContent: __('SAVE'),
             },
         });
         // Cancel button
@@ -159,7 +140,7 @@ export class ImportTransactionForm extends Component {
             props: {
                 className: CANCEL_BUTTON_CLASS,
                 type: 'button',
-                textContent: CANCEL_BTN_TITLE,
+                textContent: __('CANCEL'),
             },
             events: { click: () => this.cancel() },
         });
@@ -182,7 +163,6 @@ export class ImportTransactionForm extends Component {
         this.popup = Popup.create({
             id: 'transactionFormPopup',
             content: this.elem,
-            title: 'Transaction',
             scrollMessage: true,
             onclose: () => this.cancel(),
             btn: {
@@ -198,14 +178,14 @@ export class ImportTransactionForm extends Component {
     createTypeField() {
         const transferDisabled = window.app.model.accounts.length < 2;
         const debtDisabled = !window.app.model.persons.length;
-        const typeItems = [
-            { id: 'expense', title: 'Expense' },
-            { id: 'income', title: 'Income' },
-            { id: 'transferfrom', title: 'Transfer from', disabled: transferDisabled },
-            { id: 'transferto', title: 'Transfer to', disabled: transferDisabled },
-            { id: 'debtfrom', title: 'Debt from', disabled: debtDisabled },
-            { id: 'debtto', title: 'Debt to', disabled: debtDisabled },
-        ];
+        const typeItems = Object.keys(typeNames).map((id) => ({
+            id,
+            title: typeNames[id],
+            disabled: (
+                (id.startsWith('transfer') && transferDisabled)
+                || (id.startsWith('debt') && debtDisabled)
+            ),
+        }));
 
         this.typeDropDown = DropDown.create({
             data: typeItems,
@@ -228,7 +208,7 @@ export class ImportTransactionForm extends Component {
         window.app.initAccountsList(this.transferAccDropDown);
 
         this.transferAccountField = Field.create({
-            title: TITLE_FIELD_DEST_ACCOUNT,
+            title: __('TR_DEST_ACCOUNT'),
             content: this.transferAccDropDown.elem,
             className: ACCOUNT_FIELD_CLASS,
         });
@@ -243,7 +223,7 @@ export class ImportTransactionForm extends Component {
         window.app.initPersonsList(this.personDropDown);
 
         this.personField = Field.create({
-            title: TITLE_FIELD_PERSON,
+            title: __('TR_PERSON'),
             content: this.personDropDown.elem,
             className: PERSON_FIELD_CLASS,
         });
@@ -267,7 +247,7 @@ export class ImportTransactionForm extends Component {
                 type: 'text',
                 name: 'src_amount[]',
                 disabled: true,
-                placeholder: TITLE_FIELD_AMOUNT,
+                placeholder: __('TR_AMOUNT'),
                 autocomplete: 'off',
             },
         });
@@ -299,10 +279,10 @@ export class ImportTransactionForm extends Component {
         this.srcAmountGroup = InputGroup.create({
             children: [this.srcAmountInp, this.srcCurrencyBtn],
         });
-        const invalidFeedback = this.createInvalidFeedback(MSG_INCORRECT_AMOUNT);
+        const invalidFeedback = this.createInvalidFeedback(__('TR_INVALID_AMOUNT'));
 
         this.srcAmountField = Field.create({
-            title: TITLE_FIELD_AMOUNT,
+            title: __('TR_AMOUNT'),
             content: [this.srcAmountGroup.elem, invalidFeedback],
             className: [SRC_AMOUNT_FIELD_CLASS, VALIDATION_CLASS],
         });
@@ -315,7 +295,7 @@ export class ImportTransactionForm extends Component {
                 className: `${IG_INPUT_CLASS} ${DEFAULT_INPUT_CLASS} ${AMOUNT_INPUT_CLASS}`,
                 type: 'text',
                 name: 'dest_amount[]',
-                placeholder: TITLE_FIELD_DEST_AMOUNT,
+                placeholder: __('TR_DEST_AMOUNT'),
                 autocomplete: 'off',
             },
         });
@@ -347,10 +327,10 @@ export class ImportTransactionForm extends Component {
         this.destAmountGroup = InputGroup.create({
             children: [this.destAmountInp, this.destCurrencyBtn],
         });
-        const invalidFeedback = this.createInvalidFeedback(MSG_INCORRECT_AMOUNT);
+        const invalidFeedback = this.createInvalidFeedback(__('TR_INVALID_AMOUNT'));
 
         this.destAmountField = Field.create({
-            title: TITLE_FIELD_DEST_AMOUNT,
+            title: __('TR_DEST_AMOUNT'),
             content: [this.destAmountGroup.elem, invalidFeedback],
             className: [DEST_AMOUNT_FIELD_CLASS, VALIDATION_CLASS],
         });
@@ -364,7 +344,7 @@ export class ImportTransactionForm extends Component {
             elem,
             className: `${DEFAULT_INPUT_CLASS} ${IG_INPUT_CLASS}`,
             name: 'date[]',
-            placeholder: TITLE_FIELD_DATE,
+            placeholder: __('TR_DATE'),
             locales: window.app.dateFormatLocale,
             oninput: () => this.onDateInput(),
         });
@@ -385,10 +365,10 @@ export class ImportTransactionForm extends Component {
         this.dateGroup = InputGroup.create({
             children: [this.dateInp.elem, this.dateBtn],
         });
-        const invalidFeedback = this.createInvalidFeedback(MSG_INVALID_DATE);
+        const invalidFeedback = this.createInvalidFeedback(__('TR_INVALID_DATE'));
 
         this.dateField = Field.create({
-            title: TITLE_FIELD_DATE,
+            title: __('TR_DATE'),
             content: [this.dateGroup.elem, invalidFeedback],
             className: [DATE_FIELD_CLASS, VALIDATION_CLASS],
         });
@@ -401,7 +381,7 @@ export class ImportTransactionForm extends Component {
         });
 
         this.categoryField = Field.create({
-            title: TITLE_FIELD_CATEGORY,
+            title: __('TR_CATEGORY'),
             content: this.categorySelect.elem,
             className: CATEGORY_FIELD_CLASS,
         });
@@ -413,13 +393,13 @@ export class ImportTransactionForm extends Component {
                 className: DEFAULT_INPUT_CLASS,
                 type: 'text',
                 name: 'comment[]',
-                placeholder: TITLE_FIELD_COMMENT,
+                placeholder: __('TR_COMMENT'),
                 autocomplete: 'off',
             },
             events: { input: () => this.onCommentInput() },
         });
         this.commentField = Field.create({
-            title: TITLE_FIELD_COMMENT,
+            title: __('TR_COMMENT'),
             content: this.commInp,
             className: COMMENT_FIELD_CLASS,
         });
@@ -732,8 +712,8 @@ export class ImportTransactionForm extends Component {
         // Source amount field
         const showSrcAmount = (!isExpense || isDiff);
         const srcAmountLabel = (!isExpense && !isDiff)
-            ? TITLE_FIELD_AMOUNT
-            : TITLE_FIELD_SRC_AMOUNT;
+            ? __('TR_AMOUNT')
+            : __('TR_SRC_AMOUNT');
 
         this.srcAmountField.show(showSrcAmount);
         this.srcAmountField.setTitle(srcAmountLabel);
@@ -755,8 +735,8 @@ export class ImportTransactionForm extends Component {
         // Destination amount field
         const showDestAmount = (isExpense || isDiff);
         const destAmountLabel = (isExpense && !isDiff)
-            ? TITLE_FIELD_AMOUNT
-            : TITLE_FIELD_DEST_AMOUNT;
+            ? __('TR_AMOUNT')
+            : __('TR_DEST_AMOUNT');
 
         this.destAmountField.show(showDestAmount);
         this.destAmountField.setTitle(destAmountLabel);
@@ -793,8 +773,8 @@ export class ImportTransactionForm extends Component {
             }
 
             const accountLabel = (transaction.type === 'transferto')
-                ? TITLE_FIELD_SRC_ACCOUNT
-                : TITLE_FIELD_DEST_ACCOUNT;
+                ? __('TR_SRC_ACCOUNT')
+                : __('TR_DEST_ACCOUNT');
             this.transferAccountField.setTitle(accountLabel);
         }
         this.transferAccountField.show(isTransfer);
@@ -827,7 +807,7 @@ export class ImportTransactionForm extends Component {
             throw new Error('Invalid state');
         }
 
-        const title = (state.isUpdate) ? UPDATE_TITLE : CREATE_TITLE;
+        const title = (state.isUpdate) ? __('TR_UPDATE') : __('TR_CREATE');
         this.popup.setTitle(title);
 
         this.renderForm(state, prevState);

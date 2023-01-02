@@ -5,6 +5,7 @@ import { App } from '../Application.js';
 import { RegisterView } from '../view/RegisterView.js';
 import { ProfileView } from '../view/ProfileView.js';
 import { AboutView } from '../view/AboutView.js';
+import { __ } from '../model/locale.js';
 
 const checkLoginNavigation = async () => {
     if (App.view.isUserLoggedIn()) {
@@ -53,7 +54,7 @@ export const register = async ({ login, name, password }) => {
 
     if (validInput) {
         App.view.expectedState = {
-            msgPopup: { success: true, message: 'You successfully registered.' },
+            msgPopup: { success: true, message: __('MSG_REGISTER', App.view.locale) },
         };
 
         await test('User registration', () => App.view.checkState());
@@ -79,7 +80,7 @@ export const resetData = async (options = {}) => {
     await App.view.resetData(options);
 
     App.view.expectedState = {
-        msgPopup: { success: true, message: 'Data successfully reseted.' },
+        msgPopup: { success: true, message: __('MSG_PROFILE_RESET', App.view.locale) },
     };
     await test('Reset data', () => App.view.checkState());
 
@@ -102,7 +103,7 @@ export const changeName = async (newName) => {
             App.state.changeName(newName);
 
             App.view.expectedState = {
-                msgPopup: { success: true, message: 'User name successfully updated.' },
+                msgPopup: { success: true, message: __('MSG_PROFILE_NAME', App.view.locale) },
                 header: { userBtn: { title: newName } },
             };
 
@@ -127,7 +128,7 @@ export const changePass = async ({ oldPassword, newPassword }) => {
         await App.view.changePassword(oldPassword, newPassword);
         if (validInput) {
             App.view.expectedState = {
-                msgPopup: { success: true, message: 'Password successfully updated.' },
+                msgPopup: { success: true, message: __('MSG_PROFILE_PASSWORD', App.view.locale) },
             };
 
             await App.view.checkState();
@@ -150,7 +151,7 @@ export const deleteProfile = async () => {
 
     await App.view.deleteProfile();
     App.view.expectedState = {
-        msgPopup: { success: true, message: 'Your profile is successfully deleted.' },
+        msgPopup: { success: true, message: __('MSG_PROFILE_DELETED', App.view.locale) },
     };
     await test('Delete profile', () => App.view.checkState());
 

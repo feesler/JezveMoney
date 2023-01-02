@@ -1,5 +1,6 @@
-import { test, setBlock } from 'jezve-test';
+import { test, setBlock, assert } from 'jezve-test';
 import { App } from '../../../Application.js';
+import { TransactionView } from '../../../view/TransactionView.js';
 import * as TransactionTests from '../../../run/transaction.js';
 
 export const stateLoop = async () => {
@@ -24,6 +25,8 @@ export const stateLoop = async () => {
 
     setBlock('Debt loop', 2);
     await test('Initial state of new debt view', () => {
+        assert.instanceOf(App.view, TransactionView, 'Invalid view');
+
         App.view.model.state = (App.view.model.debtType) ? 0 : 3;
         const expected = App.view.getExpectedState();
         return App.view.checkState(expected);

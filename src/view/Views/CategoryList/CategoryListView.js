@@ -10,6 +10,7 @@ import { PopupMenu } from 'jezvejs/PopupMenu';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
+import { __ } from '../../js/utils.js';
 import { API } from '../../js/api/index.js';
 import { CategoryList } from '../../js/model/CategoryList.js';
 import { Heading } from '../../Components/Heading/Heading.js';
@@ -23,13 +24,6 @@ import './style.scss';
 
 /* CSS classes */
 const SELECT_MODE_CLASS = 'categories-list_select';
-/** Strings */
-const STR_TITLE = 'Categories';
-const TITLE_SINGLE_CATEGORY_DELETE = 'Delete category';
-const TITLE_MULTI_CATEGORY_DELETE = 'Delete categories';
-const MSG_MULTI_CATEGORY_DELETE = 'Are you sure want to delete selected categories?';
-const MSG_SINGLE_CATEGORY_DELETE = 'Are you sure want to delete selected category?';
-const MSG_NO_DATA = 'No categories';
 
 /**
  * List of persons view
@@ -66,7 +60,7 @@ class PersonListView extends View {
             className: 'categories-list',
             itemSelector: '.category-item',
             listMode: 'list',
-            noItemsMessage: MSG_NO_DATA,
+            noItemsMessage: __('CATEGORIES_NO_DATA'),
             onItemClick: (id, e) => this.onItemClick(id, e),
         };
 
@@ -81,7 +75,7 @@ class PersonListView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: STR_TITLE,
+            title: __('CATEGORIES'),
         });
 
         this.list = ListContainer.create(listProps);
@@ -279,8 +273,8 @@ class PersonListView extends View {
         const multiple = (ids.length > 1);
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: (multiple) ? TITLE_MULTI_CATEGORY_DELETE : TITLE_SINGLE_CATEGORY_DELETE,
-            content: (multiple) ? MSG_MULTI_CATEGORY_DELETE : MSG_SINGLE_CATEGORY_DELETE,
+            title: (multiple) ? __('CATEGORY_DELETE_MULTIPLE') : __('CATEGORY_DELETE'),
+            content: (multiple) ? __('MSG_CATEGORY_DELETE_MULTIPLE') : __('MSG_CATEGORY_DELETE'),
             onconfirm: () => this.deleteItems(),
         });
     }

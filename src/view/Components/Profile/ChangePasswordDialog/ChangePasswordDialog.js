@@ -1,4 +1,5 @@
 import { ge, setEvents } from 'jezvejs';
+import { __ } from '../../../js/utils.js';
 import { API } from '../../../js/api/index.js';
 import { ProfileDialog } from '../ProfileDialog/ProfileDialog.js';
 
@@ -6,8 +7,6 @@ import { ProfileDialog } from '../ProfileDialog/ProfileDialog.js';
 const DIALOG_CLASS = 'password-dialog';
 const OLD_PASS_BLOCK = 'old-pwd-inp-block';
 const NEW_PASS_BLOCK = 'new-pwd-inp-block';
-/** Strings */
-const DIALOG_TITLE = 'Change password';
 
 export class ChangePasswordDialog extends ProfileDialog {
     constructor(...args) {
@@ -33,7 +32,7 @@ export class ChangePasswordDialog extends ProfileDialog {
 
         this.initDialog({
             id: 'chpass_popup',
-            title: DIALOG_TITLE,
+            title: __('PROFILE_CHANGE_PASS'),
             className: DIALOG_CLASS,
         });
 

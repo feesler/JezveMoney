@@ -1,5 +1,8 @@
 <?php
 
+use JezveMoney\Core\JSON;
+use JezveMoney\Core\Locale;
+
 define("WHITE_THEME", 0);
 define("DARK_THEME", 1);
 
@@ -252,7 +255,6 @@ function skipZeros($arr)
     return $res;
 }
 
-
 // Check is all of expected fields present in the array or object
 // Return array with only expected fields or FALSE if something goes wrong
 function checkFields($obj, $expectedFields, $throw = false)
@@ -356,4 +358,10 @@ function disabled($cond = true)
 function checked($cond = true)
 {
     return ($cond) ? " checked" : "";
+}
+
+// Returns locale string for specified token
+function __($token)
+{
+    return Locale::getString($token);
 }

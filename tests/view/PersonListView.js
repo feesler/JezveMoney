@@ -103,6 +103,7 @@ export class PersonListView extends AppView {
     async buildModel(cont) {
         const contextMenuVisible = cont.contextMenu.visible;
         const res = {
+            locale: cont.locale,
             tiles: cont.tiles.getItems(),
             hiddenTiles: cont.hiddenTiles.getItems(),
             loading: cont.loadingIndicator.visible,
@@ -130,6 +131,9 @@ export class PersonListView extends AppView {
         );
 
         const res = {
+            header: {
+                localeSelect: { value: model.locale },
+            },
             addBtn: { visible: isListMode },
             listModeBtn: { visible: !isListMode },
             loadingIndicator: { visible: model.loading },

@@ -17,26 +17,26 @@ class Profile extends TemplateController
 
         $uObj = $this->uMod->getItem($this->user_id);
         if (!$uObj) {
-            throw new \Error("User not found");
+            throw new \Error(__("ERR_USER_NOT_FOUND"));
         }
 
         $data["user_login"] = $uObj->login;
 
         $pObj = $this->personMod->getItem($uObj->owner_id);
         if (!$pObj) {
-            throw new \Error("Person not found");
+            throw new \Error(__("ERR_PERSON_NOT_FOUND"));
         }
 
         $profileInfo = $this->getProfileData();
         $data["profileInfo"] = $profileInfo;
 
-        $titleString = "Jezve Money | Profile";
+        $titleString = __("APP_NAME") . " | " . __("PROFILE");
         if ($this->action == "name") {
-            $titleString .= " | Change name";
+            $titleString .= " | " . __("PROFILE_CHANGE_NAME");
         } elseif ($this->action == "changePass") {
-            $titleString .= " | Change password";
+            $titleString .= " | " . __("PROFILE_CHANGE_PASS");
         } elseif ($this->action == "reset") {
-            $titleString .= " | Reset data";
+            $titleString .= " | " . __("PROFILE_RESET_DATA");
         }
         $data["titleString"] = $titleString;
 
@@ -78,7 +78,7 @@ class Profile extends TemplateController
     protected function fail($msg = null)
     {
         if (!is_null($msg)) {
-            Message::set($msg);
+            Message::setError($msg);
         }
 
         setLocation(BASEURL . "profile/");

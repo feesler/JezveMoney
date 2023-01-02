@@ -18,9 +18,9 @@ class Currency extends ApiListController
         parent::initAPI();
 
         $this->model = CurrencyModel::getInstance();
-        $this->createErrorMsg = Message::get(ERR_CURRENCY_CREATE);
-        $this->updateErrorMsg = Message::get(ERR_CURRENCY_UPDATE);
-        $this->deleteErrorMsg = Message::get(ERR_CURRENCY_DELETE);
+        $this->createErrorMsg = __("ERR_CURRENCY_CREATE");
+        $this->updateErrorMsg = __("ERR_CURRENCY_UPDATE");
+        $this->deleteErrorMsg = __("ERR_CURRENCY_DELETE");
     }
 
 

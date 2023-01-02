@@ -1,4 +1,4 @@
-import { isDate } from 'jezvejs';
+import { isDate, isObject } from 'jezvejs';
 
 /** Returns array of { name, value } cookie objects */
 export const parseCookies = () => {
@@ -193,3 +193,20 @@ export const formatValueShort = (value) => {
     const fmtValue = formatValue(val);
     return `${fmtValue}${size}`;
 };
+
+/* eslint-disable no-underscore-dangle */
+/** Returns locale string for specified token */
+export const __ = (token) => {
+    if (!isObject(window.localeTokens)) {
+        throw new Error('Locale not loaded');
+    }
+    if (typeof token !== 'string') {
+        throw new Error('Invalid token');
+    }
+    if (typeof window.localeTokens[token] !== 'string') {
+        throw new Error(`Token ${token} not found`);
+    }
+
+    return window.localeTokens[token];
+};
+/* eslint-enable no-underscore-dangle */

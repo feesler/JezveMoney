@@ -13,6 +13,7 @@ import {
     ImportCondition,
     IMPORT_COND_OP_FIELD_FLAG,
 } from '../../../../js/model/ImportCondition.js';
+import { __ } from '../../../../js/utils.js';
 import './style.scss';
 
 /** CSS classes */
@@ -30,8 +31,6 @@ const COND_FIELDS_CLASS = 'cond-form__fields';
 const CONTROLS_CLASS = 'cond-form__controls';
 const VALIDATION_CLASS = 'validation-block';
 const INV_FEEDBACK_CLASS = 'invalid-feedback';
-/** Strings */
-const LABEL_PROPERTY_CMP = 'Compare with another property';
 
 const defaultProps = {
     properties: null,
@@ -114,7 +113,7 @@ export class ImportConditionForm extends Component {
 
         // Field value checkbox
         this.fieldValueCheck = Checkbox.create({
-            label: LABEL_PROPERTY_CMP,
+            label: __('CONDITION_COMPARE_PROPERTY'),
             onChange: () => this.onFieldValueChecked(),
         });
 

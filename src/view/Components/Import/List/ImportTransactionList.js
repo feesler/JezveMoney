@@ -1,5 +1,6 @@
 import { isFunction } from 'jezvejs';
 import { Sortable } from 'jezvejs/Sortable';
+import { __ } from '../../../js/utils.js';
 import { ListContainer } from '../../ListContainer/ListContainer.js';
 import { ImportTransactionItem } from '../TransactionItem/ImportTransactionItem.js';
 
@@ -7,15 +8,13 @@ import { ImportTransactionItem } from '../TransactionItem/ImportTransactionItem.
 const LIST_CLASS = 'data-container';
 const SELECT_MODE_CLASS = 'import-list_select';
 const SORT_MODE_CLASS = 'import-list_sort';
-/* Strings */
-const MSG_NO_TRANSACTIONS = 'No transactions to import';
 
 const defaultProps = {
     ItemComponent: ImportTransactionItem,
     itemSelector: '.import-item',
     itemSortSelector: '.import-item.import-item_sort',
     className: LIST_CLASS,
-    noItemsMessage: MSG_NO_TRANSACTIONS,
+    noItemsMessage: __('IMPORT_NO_DATA'),
     onSort: null,
 };
 

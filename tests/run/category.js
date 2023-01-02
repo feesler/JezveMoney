@@ -11,6 +11,7 @@ import { CategoryListView } from '../view/CategoryListView.js';
 import { CategoryView } from '../view/CategoryView.js';
 import { App } from '../Application.js';
 import { Transaction } from '../model/Transaction.js';
+import { __ } from '../model/locale.js';
 
 /** Navigate to categories list page */
 const checkNavigation = async () => {
@@ -28,6 +29,7 @@ export const create = async () => {
         await checkNavigation();
 
         const expected = CategoryView.getExpectedState({
+            locale: App.view.locale,
             isUpdate: false,
             name: '',
             parent_id: 0,
@@ -50,6 +52,7 @@ export const update = async (index) => {
         assert(category, 'Invalid category index');
 
         const expected = CategoryView.getExpectedState({
+            locale: App.view.locale,
             ...category,
             isUpdate: true,
         });
@@ -203,7 +206,7 @@ export const securityTests = async () => {
         assert(!(App.view instanceof CategoryView), 'Invalid view');
 
         const expected = {
-            msgPopup: { success: false, message: 'Fail to update category.' },
+            msgPopup: { success: false, message: __('ERR_CATEGORY_UPDATE', App.view.locale) },
         };
         await App.view.checkState(expected);
         await App.view.closeNotification();

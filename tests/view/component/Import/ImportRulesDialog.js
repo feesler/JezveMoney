@@ -20,6 +20,7 @@ import { ImportRuleItem } from './ImportRuleItem.js';
 import { WarningPopup } from '../WarningPopup.js';
 import { App } from '../../../Application.js';
 import { SearchInput } from '../SearchInput.js';
+import { __ } from '../../../model/locale.js';
 
 const ITEMS_ON_PAGE = 20;
 
@@ -103,11 +104,13 @@ export class ImportRulesDialog extends TestComponent {
             pages: (cont.paginator) ? cont.paginator.pages : 1,
         };
 
-        const isListState = cont.rulesList.visible && cont.header.title === 'Import rules';
+        const importRulesTok = __('IMPORT_RULES', App.view.locale);
+        const updateRuleTok = __('IMPORT_RULE_UPDATE', App.view.locale);
+        const isListState = cont.rulesList.visible && cont.header.title === importRulesTok;
         if (isListState) {
             res.state = 'list';
         } else {
-            const isUpdate = (cont.header.title === 'Update import rule');
+            const isUpdate = (cont.header.title === updateRuleTok);
             res.state = (isUpdate) ? 'update' : 'create';
             if (cont.ruleForm) {
                 res.rule = copyObject(cont.ruleForm.model);
@@ -128,7 +131,7 @@ export class ImportRulesDialog extends TestComponent {
         };
 
         if (isList) {
-            res.header.title = 'Import rules';
+            res.header.title = __('IMPORT_RULES', App.view.locale);
 
             const filteredRules = (model.filter !== '')
                 ? App.state.rules.filter((rule) => rule.isMatchFilter(model.filter))
@@ -149,9 +152,10 @@ export class ImportRulesDialog extends TestComponent {
                 };
             }
         } else if (isForm) {
-            res.header.title = (model.state === 'create')
-                ? 'Create import rule'
-                : 'Update import rule';
+            const titleToken = (model.state === 'create')
+                ? 'IMPORT_RULE_CREATE'
+                : 'IMPORT_RULE_UPDATE';
+            res.header.title = __(titleToken, App.view.locale);
 
             res.ruleForm = ImportRuleForm.getExpectedState(model.rule);
         }

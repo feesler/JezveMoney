@@ -1,4 +1,5 @@
 import { createElement, Component } from 'jezvejs';
+import { __ } from '../../../js/utils.js';
 import './style.scss';
 
 /** CSS classes */
@@ -8,17 +9,6 @@ const COLUMN_CLASS = 'column';
 const COLUMN_HEADER_CLASS = 'column__header';
 const COLUMN_DATA_CLASS = 'column__data';
 const COMMENT_COLUMN_CLASS = 'comment-column';
-
-/** Strings */
-const TITLE_ORIGINAL_DATA = 'Original imported data';
-const COL_MAIN = 'Main account';
-const COL_TEMPLATE = 'Template';
-const COL_DATE = 'Date';
-const COL_COMMENT = 'Comment';
-const COL_TR_AMOUNT = 'Tr. amount';
-const COL_TR_CURRENCY = 'Tr. currency';
-const COL_ACC_AMOUNT = 'Acc. amount';
-const COL_ACC_CURRENCY = 'Acc. currency';
 
 /**
  * Original import transaction data
@@ -70,18 +60,18 @@ export class OriginalImportData extends Component {
         const templateName = (template) ? template.name : '';
 
         const dataTable = [
-            [COL_MAIN, this.props.origAccount.name],
-            [COL_TEMPLATE, templateName],
-            [COL_DATE, window.app.formatDate(new Date(this.props.date))],
-            [COL_TR_AMOUNT, this.props.transactionAmount],
-            [COL_TR_CURRENCY, this.props.transactionCurrency],
-            [COL_ACC_AMOUNT, this.props.accountAmount],
-            [COL_ACC_CURRENCY, this.props.accountCurrency],
-            [COL_COMMENT, this.props.comment, COMMENT_COLUMN_CLASS],
+            [__('IMPORT_MAIN_ACCOUNT'), this.props.origAccount.name],
+            [__('TEMPLATE'), templateName],
+            [__('COLUMN_DATE'), window.app.formatDate(new Date(this.props.date))],
+            [__('COLUMN_TR_AMOUNT'), this.props.transactionAmount],
+            [__('COLUMN_TR_CURRENCY'), this.props.transactionCurrency],
+            [__('COLUMN_ACCOUNT_AMOUNT'), this.props.accountAmount],
+            [__('COLUMN_ACCOUNT_CURRENCY'), this.props.accountCurrency],
+            [__('COLUMN_COMMENT'), this.props.comment, COMMENT_COLUMN_CLASS],
         ];
 
         this.elem = window.app.createContainer(CONTAINER_CLASS, [
-            createElement('h3', { props: { textContent: TITLE_ORIGINAL_DATA } }),
+            createElement('h3', { props: { textContent: __('IMPORT_ORIG_DATA') } }),
             window.app.createContainer(
                 TABLE_CLASS,
                 dataTable.map((col) => this.renderColumn(...col)),

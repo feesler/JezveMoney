@@ -11,6 +11,7 @@ import { PersonListView } from '../view/PersonListView.js';
 import { PersonView } from '../view/PersonView.js';
 import { MainView } from '../view/MainView.js';
 import { App } from '../Application.js';
+import { __ } from '../model/locale.js';
 
 /** Navigate to persons list page */
 const checkNavigation = async () => {
@@ -218,7 +219,7 @@ export const securityTests = async () => {
         assert(!(App.view instanceof PersonView), 'Invalid view');
 
         App.view.expectedState = {
-            msgPopup: { success: false, message: 'Fail to update person.' },
+            msgPopup: { success: false, message: __('ERR_PERSON_UPDATE', App.view.locale) },
         };
         await App.view.checkState();
         await App.view.closeNotification();

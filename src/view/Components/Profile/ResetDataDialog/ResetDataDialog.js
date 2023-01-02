@@ -1,12 +1,11 @@
 import { ge } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
+import { __ } from '../../../js/utils.js';
 import { API } from '../../../js/api/index.js';
 import { ProfileDialog } from '../ProfileDialog/ProfileDialog.js';
 
 /* CSS classes */
 const DIALOG_CLASS = 'reset-dialog';
-/* Strings */
-const DIALOG_TITLE = 'Reset data';
 
 export class ResetDataDialog extends ProfileDialog {
     constructor(...args) {
@@ -36,7 +35,7 @@ export class ResetDataDialog extends ProfileDialog {
 
         this.initDialog({
             id: 'reset_popup',
-            title: DIALOG_TITLE,
+            title: __('PROFILE_RESET_DATA'),
             className: DIALOG_CLASS,
         });
     }

@@ -12,6 +12,7 @@ import {
 import { Checkbox } from 'jezvejs/Checkbox';
 import { DropDown } from 'jezvejs/DropDown';
 import { DecimalInput } from 'jezvejs/DecimalInput';
+import { __ } from '../../../../js/utils.js';
 import { API } from '../../../../js/api/index.js';
 import { ImportTemplateError } from '../../../../js/error/ImportTemplateError.js';
 import { ImportTemplate } from '../../../../js/model/ImportTemplate.js';
@@ -24,22 +25,6 @@ import './style.scss';
 const VALID_FEEDBACK_CLASS = 'valid-feedback';
 const INVALID_FEEDBACK_CLASS = 'invalid-feedback';
 
-/** Strings */
-const TITLE_TEMPLATE = 'Template';
-const TITLE_CREATE_TEMPLATE = 'Create template';
-const TITLE_UPDATE_TEMPLATE = 'Update template';
-const TITLE_TEMPLATE_DELETE = 'Delete import template';
-const MSG_TEMPLATE_DELETE = 'Are you sure to delete this import template?';
-const MSG_SEL_ACC_AMOUNT = 'Select decimal column for account amount';
-const MSG_SEL_ACC_CURRENCY = 'Select correct column for account currency';
-const MSG_SEL_TR_AMOUNT = 'Select decimal column for transaction amount';
-const MSG_SEL_TR_CURRENCY = 'Select correct column for transaction currency';
-const MSG_SEL_DATE = 'Select column for date';
-const MSG_SEL_COMMENT = 'Select column for comment';
-const MSG_TPL_LIST_REQUEST_FAIL = 'Fail to read list of import templates';
-const MSG_RULES_LIST_REQUEST_FAIL = 'Fail to read list of import rules';
-const MSG_VALID_TEMPLATE = 'Valid template';
-const MSG_NOT_MATCHED_TEMPLATE = 'Template does not match data';
 /** States */
 const LOADING_STATE = 1;
 const RAW_DATA_STATE = 2;
@@ -67,12 +52,12 @@ export class ImportTemplateManager extends Component {
         };
 
         this.columnFeedback = {
-            accountAmount: { msg: MSG_SEL_ACC_AMOUNT },
-            accountCurrency: { msg: MSG_SEL_ACC_CURRENCY },
-            transactionAmount: { msg: MSG_SEL_TR_AMOUNT },
-            transactionCurrency: { msg: MSG_SEL_TR_CURRENCY },
-            date: { msg: MSG_SEL_DATE },
-            comment: { msg: MSG_SEL_COMMENT },
+            accountAmount: { msg: __('MSG_TPL_ACCOUNT_AMOUNT') },
+            accountCurrency: { msg: __('MSG_TPL_ACCOUNT_CURRENCY') },
+            transactionAmount: { msg: __('MSG_TPL_TR_AMOUNT') },
+            transactionCurrency: { msg: __('MSG_TPL_TR_CURRENCY') },
+            date: { msg: __('MSG_TPL_DATE') },
+            comment: { msg: __('MSG_TPL_COMMENT') },
         };
 
         this.templateDropDown = DropDown.create({
@@ -445,8 +430,8 @@ export class ImportTemplateManager extends Component {
     onDeleteTemplateClick() {
         ConfirmDialog.create({
             id: 'tpl_delete_warning',
-            title: TITLE_TEMPLATE_DELETE,
-            content: MSG_TEMPLATE_DELETE,
+            title: __('TEMPLATE_DELETE'),
+            content: __('MSG_TEMPLATE_DELETE'),
             onconfirm: () => this.requestDeleteTemplate(this.state.template.id),
         });
     }
@@ -546,7 +531,7 @@ export class ImportTemplateManager extends Component {
             if (!Array.isArray(result.data)) {
                 const errorMessage = (result && 'msg' in result)
                     ? result.msg
-                    : MSG_TPL_LIST_REQUEST_FAIL;
+                    : __('ERR_TPL_LIST_READ');
                 throw new Error(errorMessage);
             }
 
@@ -594,7 +579,7 @@ export class ImportTemplateManager extends Component {
             if (!Array.isArray(result.data)) {
                 const errorMessage = (result && 'msg' in result)
                     ? result.msg
-                    : MSG_RULES_LIST_REQUEST_FAIL;
+                    : __('ERR_RULE_LIST_READ');
                 throw new Error(errorMessage);
             }
 
@@ -778,7 +763,7 @@ export class ImportTemplateManager extends Component {
             show(this.tplField, templateAvail);
             show(this.noTplLabel, !templateAvail);
             show(this.tplHeading, true);
-            this.tplStateLbl.textContent = TITLE_TEMPLATE;
+            this.tplStateLbl.textContent = __('TEMPLATE');
 
             this.loadingIndicator.hide();
             window.app.setValidation(this.nameField, true);
@@ -787,8 +772,8 @@ export class ImportTemplateManager extends Component {
             show(this.deleteTplBtn, !!state.template);
         } else if (state.id === TPL_UPDATE_STATE) {
             this.tplStateLbl.textContent = (state.template && state.template.id)
-                ? TITLE_UPDATE_TEMPLATE
-                : TITLE_CREATE_TEMPLATE;
+                ? __('TEMPLATE_UPDATE')
+                : __('TEMPLATE_CREATE');
 
             show(this.noTplLabel, false);
             show(this.tplHeading, true);
@@ -872,12 +857,12 @@ export class ImportTemplateManager extends Component {
             isValid = validateResult.valid;
             if (isValid) {
                 enable(this.submitTplBtn, true);
-                this.setTemplateFeedback(MSG_VALID_TEMPLATE, true);
+                this.setTemplateFeedback(__('TEMPLATE_VALID'), true);
             } else {
                 this.onInvalidPropertyValue(state, validateResult.column);
                 enable(this.submitTplBtn, false);
                 if (state.id === RAW_DATA_STATE) {
-                    this.setTemplateFeedback(MSG_NOT_MATCHED_TEMPLATE, false);
+                    this.setTemplateFeedback(__('MSG_TPL_NOT_MATCH'), false);
                 }
             }
         }

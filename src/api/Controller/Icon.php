@@ -17,9 +17,9 @@ class Icon extends ApiListController
         parent::initAPI();
 
         $this->model = IconModel::getInstance();
-        $this->createErrorMsg = Message::get(ERR_ICON_CREATE);
-        $this->updateErrorMsg = Message::get(ERR_ICON_UPDATE);
-        $this->deleteErrorMsg = Message::get(ERR_ICON_DELETE);
+        $this->createErrorMsg = __("ERR_ICON_CREATE");
+        $this->updateErrorMsg = __("ERR_ICON_UPDATE");
+        $this->deleteErrorMsg = __("ERR_ICON_DELETE");
     }
 
 

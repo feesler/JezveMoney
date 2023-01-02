@@ -8,6 +8,7 @@ import {
     re,
     isFunction,
 } from 'jezvejs';
+import { DropDown } from 'jezvejs/DropDown';
 import { Switch } from 'jezvejs/Switch';
 import { Offcanvas } from 'jezvejs/Offcanvas';
 import { DARK_THEME } from '../../js/Application.js';
@@ -81,6 +82,17 @@ export class Header extends Component {
         this.closeUserNavBtn = this.userNavContent.querySelector('.user-navigation__close-btn');
         setEvents(this.closeUserNavBtn, { click: () => this.hideUserNavigation() });
 
+        // Locale select
+        this.localeSelect = DropDown.create({
+            elem: 'localeSelect',
+            className: 'dd_fullwidth',
+            onchange: (locale) => this.onLocaleChange(locale),
+            data: window.app.locales.map((locale) => ({ id: locale, title: locale })),
+        });
+        const currentLocale = window.app.getCurrrentLocale();
+        this.localeSelect.selectItem(currentLocale);
+
+        // Theme swtich
         this.themeSwitch = Switch.fromElement(ge('theme-check'), {
             onChange: (checked) => this.onToggleTheme(checked),
         });
@@ -148,6 +160,18 @@ export class Header extends Component {
         show(this.userNavContent, false);
 
         removeEmptyClick(this.userNavEmptyClick);
+    }
+
+    /**
+     * Locale select 'change' event handler
+     * @param {Object} locale - selected locale
+     */
+    onLocaleChange(locale) {
+        if (!locale) {
+            return;
+        }
+
+        window.app.setLocale(locale.id);
     }
 
     /**

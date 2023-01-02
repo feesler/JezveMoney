@@ -38,15 +38,6 @@ class ImportActionModel extends CachedTable
         IMPORT_ACTION_SET_CATEGORY,
     ];
 
-    protected static $actionNames = [
-        IMPORT_ACTION_SET_TR_TYPE => "Set transaction type",
-        IMPORT_ACTION_SET_ACCOUNT => "Set account",
-        IMPORT_ACTION_SET_PERSON => "Set person",
-        IMPORT_ACTION_SET_SRC_AMOUNT => "Set source amount",
-        IMPORT_ACTION_SET_DEST_AMOUNT => "Set destination amount",
-        IMPORT_ACTION_SET_COMMENT => "Set comment",
-        IMPORT_ACTION_SET_CATEGORY => "Set category",
-    ];
 
     protected function onStart()
     {
@@ -415,12 +406,26 @@ class ImportActionModel extends CachedTable
     }
 
 
+    public static function getActionNames()
+    {
+        return [
+            IMPORT_ACTION_SET_TR_TYPE => __("ACTION_SET_TR_TYPE"),
+            IMPORT_ACTION_SET_ACCOUNT => __("ACTION_SET_ACCOUNT"),
+            IMPORT_ACTION_SET_PERSON => __("ACTION_SET_PERSON"),
+            IMPORT_ACTION_SET_SRC_AMOUNT => __("ACTION_SET_SRC_AMOUNT"),
+            IMPORT_ACTION_SET_DEST_AMOUNT => __("ACTION_SET_DEST_AMOUNT"),
+            IMPORT_ACTION_SET_COMMENT => __("ACTION_SET_COMMENT"),
+            IMPORT_ACTION_SET_CATEGORY => __("ACTION_SET_CATEGORY"),
+        ];
+    }
+
     public static function getActionName($action_id)
     {
-        if (!isset(self::$actionNames[$action_id])) {
+        $actionNames = self::getActionNames();
+        if (!isset($actionNames[$action_id])) {
             return null;
         }
 
-        return self::$actionNames[$action_id];
+        return $actionNames[$action_id];
     }
 }

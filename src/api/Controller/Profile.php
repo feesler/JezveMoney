@@ -48,7 +48,7 @@ class Profile extends ApiController
     public function changename()
     {
         $requiredFields = ["name"];
-        $defMsg = Message::get(ERR_PROFILE_NAME);
+        $defMsg = __("ERR_PROFILE_NAME");
 
         if (!$this->isPOST()) {
             throw new \Error("Invalid type of request");
@@ -74,7 +74,7 @@ class Profile extends ApiController
 
         $this->commit();
 
-        $this->setMessage(Message::get(MSG_PROFILE_NAME));
+        $this->setMessage(__("MSG_PROFILE_NAME"));
         $this->ok($reqData);
     }
 
@@ -82,7 +82,7 @@ class Profile extends ApiController
     public function changepass()
     {
         $requiredFields = ["current", "new"];
-        $defMsg = Message::get(ERR_PROFILE_PASSWORD);
+        $defMsg = __("ERR_PROFILE_PASSWORD");
 
         if (!$this->isPOST()) {
             throw new \Error("Invalid type of request");
@@ -113,7 +113,7 @@ class Profile extends ApiController
 
         $this->commit();
 
-        $this->setMessage(Message::get(MSG_PROFILE_PASSWORD));
+        $this->setMessage(__("MSG_PROFILE_PASSWORD"));
         $this->ok();
     }
 
@@ -128,7 +128,7 @@ class Profile extends ApiController
             wlog("Reset accounts error: " . $e->getMessage());
         }
         if (!$result) {
-            throw new \Error(Message::get(ERR_PROFILE_RESET));
+            throw new \Error(__("ERR_PROFILE_RESET"));
         }
     }
 
@@ -142,7 +142,7 @@ class Profile extends ApiController
             wlog("Reset persons error: " . $e->getMessage());
         }
         if (!$result) {
-            throw new \Error(Message::get(ERR_PROFILE_RESET));
+            throw new \Error(__("ERR_PROFILE_RESET"));
         }
     }
 
@@ -157,7 +157,7 @@ class Profile extends ApiController
             wlog("Reset accounts error: " . $e->getMessage());
         }
         if (!$result) {
-            throw new \Error(Message::get(ERR_PROFILE_RESET));
+            throw new \Error(__("ERR_PROFILE_RESET"));
         }
     }
 
@@ -172,7 +172,7 @@ class Profile extends ApiController
             wlog("Reset transactions error: " . $e->getMessage());
         }
         if (!$result) {
-            throw new \Error(Message::get(ERR_PROFILE_RESET));
+            throw new \Error(__("ERR_PROFILE_RESET"));
         }
     }
 
@@ -187,7 +187,7 @@ class Profile extends ApiController
             wlog("Reset import templates error: " . $e->getMessage());
         }
         if (!$result) {
-            throw new \Error(Message::get(ERR_PROFILE_RESET));
+            throw new \Error(__("ERR_PROFILE_RESET"));
         }
     }
 
@@ -202,7 +202,7 @@ class Profile extends ApiController
             wlog("Reset import rules error: " . $e->getMessage());
         }
         if (!$result) {
-            throw new \Error(Message::get(ERR_PROFILE_RESET));
+            throw new \Error(__("ERR_PROFILE_RESET"));
         }
     }
 
@@ -250,7 +250,7 @@ class Profile extends ApiController
 
         $this->commit();
 
-        $this->setMessage(Message::get(MSG_PROFILE_RESET));
+        $this->setMessage(__("MSG_PROFILE_RESET"));
         $this->ok();
     }
 
@@ -270,13 +270,13 @@ class Profile extends ApiController
             wlog("Delete profile error: " . $e->getMessage());
         }
         if (!$result) {
-            throw new \Error(Message::get(ERR_PROFILE_DELETE));
+            throw new \Error(__("ERR_PROFILE_DELETE"));
         }
 
         $this->commit();
 
-        Message::set(MSG_PROFILE_DELETE);
-        $this->setMessage(Message::get(MSG_PROFILE_DELETE));
+        Message::setSuccess(__("MSG_PROFILE_DELETED"));
+        $this->setMessage(__("MSG_PROFILE_DELETED"));
         $this->ok();
     }
 }

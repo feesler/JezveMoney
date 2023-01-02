@@ -33,9 +33,18 @@ abstract class TemplateController extends Controller
     {
         $this->cssArr = [];
 
+        $this->setupLocales();
+
         $this->jsArr = [
             "polyfill/index.js",
+            "locale/" . $this->locale . ".js",
         ];
+    }
+
+    protected function setupLocales()
+    {
+        $this->locale = Locale::getUserLocale();
+        $this->locales = Locale::getAvailable();
     }
 
 
@@ -60,6 +69,7 @@ abstract class TemplateController extends Controller
         $this->template->user_id = $this->user_id;
         $this->template->user_name = $this->user_name;
         $this->template->adminUser = $this->adminUser;
+        $this->template->locale = $this->locale;
 
         $this->setupThemes();
 
@@ -69,6 +79,8 @@ abstract class TemplateController extends Controller
         $data["appProps"]["baseURL"] = BASEURL;
         $data["appProps"]["themesPath"] = $this->themesPath;
         $data["appProps"]["themes"] = (object)$this->template->themes;
+        $data["appProps"]["locales"] = $this->locales;
+        $data["appProps"]["locale"] = $this->locale;
 
         // Check message
         $message = Message::check();

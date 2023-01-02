@@ -50,7 +50,9 @@ export class PersonView extends AppView {
     }
 
     async buildModel(cont) {
-        const res = {};
+        const res = {
+            locale: cont.locale,
+        };
 
         res.isUpdate = cont.isUpdate;
         if (res.isUpdate) {
@@ -80,11 +82,14 @@ export class PersonView extends AppView {
         return res;
     }
 
-    getExpectedState() {
+    getExpectedState(model = this.model) {
         const res = {
+            header: {
+                localeSelect: { value: model.locale },
+            },
             name: {
                 visible: true,
-                value: this.model.name.toString(),
+                value: model.name.toString(),
             },
         };
 

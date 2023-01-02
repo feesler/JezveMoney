@@ -11,7 +11,7 @@ import { DropDown } from 'jezvejs/DropDown';
 import { IconButton } from 'jezvejs/IconButton';
 import { Paginator } from 'jezvejs/Paginator';
 import { PopupMenu } from 'jezvejs/PopupMenu';
-import { timestampFromString } from '../../js/utils.js';
+import { timestampFromString, __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import { API } from '../../js/api/index.js';
 import { ImportTransactionForm } from '../../Components/Import/TransactionForm/ImportTransactionForm.js';
@@ -32,16 +32,6 @@ import { createStore } from '../../js/store.js';
 import { actions, reducer, getPageIndex } from './reducer.js';
 import './style.scss';
 
-/* Strings */
-const STR_TITLE = 'Import';
-const STR_RESTORE_ITEM = 'Cancel changes';
-const STR_ENABLE_ITEM = 'Enable';
-const STR_DISABLE_ITEM = 'Disable';
-const MSG_IMPORT_SUCCESS = 'All transactions have been successfully imported';
-const MSG_IMPORT_FAIL = 'Fail to import transactions';
-/* 'Show more' button */
-const TITLE_SHOW_MORE = 'Show more...';
-/* Other */
 const SUBMIT_LIMIT = 100;
 const SHOW_ON_PAGE = 20;
 
@@ -107,7 +97,7 @@ class ImportView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: STR_TITLE,
+            title: __('IMPORT'),
         });
 
         setEvents(this.submitBtn, { click: () => this.onSubmitClick() });
@@ -148,7 +138,7 @@ class ImportView extends View {
             props: {
                 className: 'btn show-more-btn',
                 type: 'button',
-                textContent: TITLE_SHOW_MORE,
+                textContent: __('SHOW_MORE'),
             },
             events: { click: (e) => this.showMore(e) },
         });
@@ -186,7 +176,7 @@ class ImportView extends View {
             items: [{
                 id: 'createItemBtn',
                 icon: 'plus',
-                title: 'Add item',
+                title: __('IMPORT_ITEM_CREATE'),
                 onClick: () => this.onMenuClick('createItemBtn'),
             }, {
                 id: 'separator1',
@@ -194,41 +184,41 @@ class ImportView extends View {
             }, {
                 id: 'selectModeBtn',
                 icon: 'select',
-                title: 'Select',
+                title: __('SELECT'),
                 onClick: () => this.onMenuClick('selectModeBtn'),
             }, {
                 id: 'sortModeBtn',
                 icon: 'sort',
-                title: 'Sort',
+                title: __('SORT'),
                 onClick: () => this.onMenuClick('sortModeBtn'),
             }, {
                 id: 'separator2',
                 type: 'separator',
             }, {
                 id: 'selectAllBtn',
-                title: 'Select all',
+                title: __('SELECT_ALL'),
                 onClick: () => this.onMenuClick('selectAllBtn'),
             }, {
                 id: 'deselectAllBtn',
-                title: 'Clear selection',
+                title: __('DESELECT_ALL'),
                 onClick: () => this.onMenuClick('deselectAllBtn'),
             }, {
                 id: 'enableSelectedBtn',
-                title: 'Enable selected',
+                title: __('ENABLE_SELECTED'),
                 onClick: () => this.onMenuClick('enableSelectedBtn'),
             }, {
                 id: 'disableSelectedBtn',
-                title: 'Disable selected',
+                title: __('DISABLE_SELECTED'),
                 onClick: () => this.onMenuClick('disableSelectedBtn'),
             }, {
                 id: 'deleteSelectedBtn',
                 icon: 'del',
-                title: 'Delete selected',
+                title: __('DELETE_SELECTED'),
                 onClick: () => this.onMenuClick('deleteSelectedBtn'),
             }, {
                 id: 'deleteAllBtn',
                 icon: 'del',
-                title: 'Delete all',
+                title: __('DELETE_ALL'),
                 onClick: () => this.onMenuClick('deleteAllBtn'),
             }, {
                 id: 'separator3',
@@ -236,13 +226,13 @@ class ImportView extends View {
             }, {
                 id: 'rulesCheck',
                 type: 'checkbox',
-                label: 'Enable rules',
+                label: __('IMPORT_RULES_ENABLE'),
                 checked: true,
                 onChange: () => this.onMenuClick('rulesCheck'),
             }, {
                 id: 'rulesBtn',
                 icon: 'update',
-                title: 'Edit rules',
+                title: __('IMPORT_RULES_UPDATE'),
                 onClick: () => this.onMenuClick('rulesBtn'),
             }, {
                 id: 'separator4',
@@ -250,7 +240,7 @@ class ImportView extends View {
             }, {
                 id: 'similarCheck',
                 type: 'checkbox',
-                label: 'Check similar transactions',
+                label: __('IMPORT_CHECK_SIMILAR'),
                 checked: true,
                 onChange: () => this.onMenuClick('similarCheck'),
             }],
@@ -279,7 +269,7 @@ class ImportView extends View {
             onClose: () => this.hideContextMenu(),
             items: [{
                 id: 'ctxRestoreBtn',
-                title: STR_RESTORE_ITEM,
+                title: __('IMPORT_ITEM_RESTORE'),
                 className: 'warning-item',
                 onClick: () => this.onRestoreItem(),
             }, {
@@ -287,17 +277,17 @@ class ImportView extends View {
                 type: 'separator',
             }, {
                 id: 'ctxEnableBtn',
-                title: STR_DISABLE_ITEM,
+                title: __('DISABLE'),
                 onClick: () => this.onToggleEnableItem(),
             }, {
                 id: 'ctxUpdateBtn',
                 icon: 'update',
-                title: 'Edit',
+                title: __('UPDATE'),
                 onClick: () => this.onUpdateItem(),
             }, {
                 id: 'ctxDeleteBtn',
                 icon: 'del',
-                title: 'Delete',
+                title: __('DELETE'),
                 onClick: () => this.onRemoveItem(),
             }],
         });
@@ -692,7 +682,7 @@ class ImportView extends View {
      */
     onSubmitResult(apiResult) {
         let status = false;
-        let message = MSG_IMPORT_FAIL;
+        let message = __('MSG_IMPORT_FAIL');
 
         try {
             status = (apiResult && apiResult.result === 'ok');
@@ -701,7 +691,7 @@ class ImportView extends View {
                 this.renderSubmitProgress();
 
                 if (this.submitQueue.length === 0) {
-                    message = MSG_IMPORT_SUCCESS;
+                    message = __('MSG_IMPORT_SUCCESS');
                     this.removeAllItems();
                 } else {
                     this.submitChunk();
@@ -862,7 +852,7 @@ class ImportView extends View {
         this.contextMenu.items.ctxRestoreBtn.show(itemRestoreAvail);
         show(this.contextMenu.items.separator1, itemRestoreAvail);
 
-        const title = (item.enabled) ? STR_DISABLE_ITEM : STR_ENABLE_ITEM;
+        const title = (item.enabled) ? __('DISABLE') : __('ENABLE');
         this.contextMenu.items.ctxEnableBtn.setTitle(title);
 
         this.contextMenu.attachAndShow(menuContainer);

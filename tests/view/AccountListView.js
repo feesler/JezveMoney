@@ -104,6 +104,7 @@ export class AccountListView extends AppView {
 
     async buildModel(cont) {
         const res = {
+            locale: cont.locale,
             tiles: cont.tiles.getItems(),
             hiddenTiles: cont.hiddenTiles.getItems(),
             loading: cont.loadingIndicator.visible,
@@ -126,6 +127,9 @@ export class AccountListView extends AppView {
         const showSelectItems = model.listMenuVisible && model.mode === 'select';
 
         const res = {
+            header: {
+                localeSelect: { value: model.locale },
+            },
             addBtn: { visible: isListMode },
             listModeBtn: { visible: !isListMode },
             loadingIndicator: { visible: model.loading },

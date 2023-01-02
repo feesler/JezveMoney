@@ -6,76 +6,71 @@ namespace JezveMoney\Core;
 define("MSG_TYPE_NONE", 0);
 define("MSG_TYPE_SUCCESS", 1);
 define("MSG_TYPE_ERROR", 2);
-// No message
-define("MSG_NONE", 0);
 
 class Message
 {
-    private static $msgArray = [];
-
-
-    // Define new message constant
-    public static function add($message_id, $msgType = MSG_TYPE_NONE, $message = null)
-    {
-        if ($msgType != MSG_TYPE_NONE && !is_null($message)) {
-            self::$msgArray[$message_id] = [$msgType, $message];
-        } else {
-            self::$msgArray[$message_id] = [MSG_TYPE_NONE];
-        }
-    }
-
-
-    // Try to set message
-    public static function set($msg_id)
+    /**
+     * Sets session message
+     *
+     * @param string $message - message string
+     * @param int $msgType - message type
+     *
+     * @return boolean
+     */
+    public static function set($message, $msgType = MSG_TYPE_NONE)
     {
         sessionStart();
 
-        if (!isset(self::$msgArray[$msg_id])) {
-            return false;
-        }
-
-        $_SESSION["msg"] = $msg_id;
+        $_SESSION["msg"] = $message;
+        $_SESSION["msgType"] = $msgType;
 
         return true;
     }
 
-
-    // Return message string by id
-    public static function get($msg_id)
+    /**
+     * Sets successfull session message
+     *
+     * @param string $message - message string
+     *
+     * @return boolean
+     */
+    public static function setSuccess($message)
     {
-        if (!isset(self::$msgArray[$msg_id])) {
-            return null;
-        }
-
-        $msgParam = self::$msgArray[$msg_id];
-        $msgMessage = $msgParam[1];
-
-        return $msgMessage;
+        return self::set($message, MSG_TYPE_SUCCESS);
     }
 
+    /**
+     * Sets error session message
+     *
+     * @param string $message - message string
+     *
+     * @return boolean
+     */
+    public static function setError($message)
+    {
+        return self::set($message, MSG_TYPE_ERROR);
+    }
 
-    // Check message and show it if available
+    /**
+     * Returns message data if available or null otherwise
+     *
+     * @return [array|null]
+     */
     public static function check()
     {
         sessionStart();
 
-        if (!isset($_SESSION["msg"])) {
+        if (!isset($_SESSION["msg"]) || is_null($_SESSION["msg"])) {
             return null;
         }
 
-        $msg_id = intval($_SESSION["msg"]);
-        if ($msg_id == MSG_NONE || !isset(self::$msgArray[$msg_id])) {
-            return null;
-        }
-
-        $msgParam = self::$msgArray[$msg_id];
-        $msgType = $msgParam[0];
+        $msgType = intval($_SESSION["msgType"]);
         if ($msgType == MSG_TYPE_NONE) {
-            $_SESSION["msg"] = MSG_NONE;
+            $_SESSION["msg"] = null;
             return null;
         }
 
-        $msgMessage = $msgParam[1];
+        $msgMessage = $_SESSION["msg"];
 
         $msgClass = "";
         if ($msgType == MSG_TYPE_SUCCESS) {
@@ -84,7 +79,7 @@ class Message
             $msgClass = "msg_error";
         }
 
-        $_SESSION["msg"] = MSG_NONE;
+        $_SESSION["msg"] = null;
 
         $res = [
             "title" => $msgMessage,

@@ -14,9 +14,9 @@ class User extends ApiListController
         parent::initAPI();
 
         $this->model = $this->uMod;
-        $this->createErrorMsg = Message::get(ERR_USER_CREATE);
-        $this->updateErrorMsg = Message::get(ERR_USER_UPDATE);
-        $this->deleteErrorMsg = Message::get(ERR_USER_DELETE);
+        $this->createErrorMsg = __("ERR_USER_CREATE");
+        $this->updateErrorMsg = __("ERR_USER_UPDATE");
+        $this->deleteErrorMsg = __("ERR_USER_DELETE");
     }
 
 
@@ -25,13 +25,13 @@ class User extends ApiListController
         $requiredFields = [ "login", "password" ];
 
         if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
+            throw new \Error(__("ERR_INVALID_REQUEST"));
         }
 
         $request = $this->getRequestData();
         $reqData = checkFields($request, $requiredFields);
         if (!$this->uMod->login($reqData)) {
-            throw new \Error(Message::get(ERR_LOGIN_FAIL));
+            throw new \Error(__("ERR_LOGIN_FAIL"));
         }
 
         $this->ok();
@@ -41,7 +41,7 @@ class User extends ApiListController
     public function logout()
     {
         if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
+            throw new \Error(__("ERR_INVALID_REQUEST"));
         }
 
         $this->uMod->logout();
@@ -53,7 +53,7 @@ class User extends ApiListController
     public function register()
     {
         if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
+            throw new \Error(__("ERR_INVALID_REQUEST"));
         }
 
         if ($this->user_id != 0) {
@@ -64,7 +64,7 @@ class User extends ApiListController
         $request["access"] = 0;
         $reqData = checkFields($request, $this->createRequiredFields);
         if ($reqData === false) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
+            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
         }
 
         $this->begin();
@@ -76,7 +76,7 @@ class User extends ApiListController
             wlog("Create user error: " . $e->getMessage());
         }
         if (!$user_id) {
-            throw new \Error(Message::get(ERR_REGISTER_FAIL));
+            throw new \Error(__("ERR_REGISTER_FAIL"));
         }
 
         $this->commit();
@@ -117,16 +117,16 @@ class User extends ApiListController
         $this->checkAdminAccess();
 
         $requiredFields = [ "id", "password" ];
-        $defMsg = Message::get(ERR_PROFILE_PASSWORD);
+        $defMsg = __("ERR_PROFILE_PASSWORD");
 
         if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
+            throw new \Error(__("ERR_INVALID_REQUEST"));
         }
 
         $request = $this->getRequestData();
         $reqData = checkFields($request, $requiredFields);
         if ($reqData === false) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
+            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
         }
 
         $this->begin();
@@ -148,7 +148,7 @@ class User extends ApiListController
 
         $this->commit();
 
-        $this->setMessage(Message::get(MSG_PROFILE_PASSWORD));
+        $this->setMessage(__("MSG_PROFILE_PASSWORD"));
         $this->ok();
     }
 

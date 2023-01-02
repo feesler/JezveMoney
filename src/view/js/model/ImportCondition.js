@@ -4,7 +4,7 @@ import {
     hasFlag,
     checkDate,
 } from 'jezvejs';
-import { timestampFromString, fixFloat } from '../utils.js';
+import { timestampFromString, fixFloat, __ } from '../utils.js';
 import { ListItem } from './ListItem.js';
 
 /** Condition field types */
@@ -24,22 +24,6 @@ export const IMPORT_COND_OP_LESS = 4;
 export const IMPORT_COND_OP_GREATER = 5;
 /** Condition flags */
 export const IMPORT_COND_OP_FIELD_FLAG = 0x01;
-
-/** Field names */
-const TITLE_FIELD_MAIN_ACCOUNT = 'Main account';
-const TITLE_FIELD_TEMPLATE = 'Template';
-const TITLE_FIELD_TRANS_AMOUNT = 'Transaction amount';
-const TITLE_FIELD_TRANS_CURRENCY = 'Transaction currency';
-const TITLE_FIELD_ACC_AMOUNT = 'Account amount';
-const TITLE_FIELD_ACC_CURRENCY = 'Account currency';
-const TITLE_FIELD_COMMENT = 'Comment';
-const TITLE_FIELD_DATE = 'Date';
-/** Operator names */
-const TITLE_OP_INCLUDES = 'contains';
-const TITLE_OP_EQUAL = 'is';
-const TITLE_OP_NOT_EQUAL = 'is not';
-const TITLE_OP_LESS = 'less than';
-const TITLE_OP_GREATER = 'greater than';
 
 /**
  * Import condition class
@@ -93,53 +77,53 @@ export class ImportCondition extends ListItem {
     static fieldTypes = [
         {
             id: IMPORT_COND_FIELD_MAIN_ACCOUNT,
-            title: TITLE_FIELD_MAIN_ACCOUNT,
+            title: __('CONDITION_MAIN_ACCOUNT'),
             operators: ImportCondition.itemOperators,
         },
         {
             id: IMPORT_COND_FIELD_TPL,
-            title: TITLE_FIELD_TEMPLATE,
+            title: __('CONDITION_TEMPLATE'),
             operators: ImportCondition.itemOperators,
         },
         {
             id: IMPORT_COND_FIELD_TR_AMOUNT,
-            title: TITLE_FIELD_TRANS_AMOUNT,
+            title: __('CONDITION_TR_AMOUNT'),
             operators: ImportCondition.numOperators,
         },
         {
             id: IMPORT_COND_FIELD_TR_CURRENCY,
-            title: TITLE_FIELD_TRANS_CURRENCY,
+            title: __('CONDITION_TR_CURRENCY'),
             operators: ImportCondition.itemOperators,
         },
         {
             id: IMPORT_COND_FIELD_ACC_AMOUNT,
-            title: TITLE_FIELD_ACC_AMOUNT,
+            title: __('CONDITION_ACCOUNT_AMOUNT'),
             operators: ImportCondition.numOperators,
         },
         {
             id: IMPORT_COND_FIELD_ACC_CURRENCY,
-            title: TITLE_FIELD_ACC_CURRENCY,
+            title: __('CONDITION_ACCOUNT_CURRENCY'),
             operators: ImportCondition.itemOperators,
         },
         {
             id: IMPORT_COND_FIELD_COMMENT,
-            title: TITLE_FIELD_COMMENT,
+            title: __('CONDITION_COMMENT'),
             operators: ImportCondition.stringOperators,
         },
         {
             id: IMPORT_COND_FIELD_DATE,
-            title: TITLE_FIELD_DATE,
+            title: __('CONDITION_DATE'),
             operators: ImportCondition.numOperators,
         },
     ];
 
     /** List of available condition operator types */
     static operatorTypes = [
-        { id: IMPORT_COND_OP_STRING_INCLUDES, title: TITLE_OP_INCLUDES },
-        { id: IMPORT_COND_OP_EQUAL, title: TITLE_OP_EQUAL },
-        { id: IMPORT_COND_OP_NOT_EQUAL, title: TITLE_OP_NOT_EQUAL },
-        { id: IMPORT_COND_OP_LESS, title: TITLE_OP_LESS },
-        { id: IMPORT_COND_OP_GREATER, title: TITLE_OP_GREATER },
+        { id: IMPORT_COND_OP_STRING_INCLUDES, title: __('OP_INLINE_INCLUDES') },
+        { id: IMPORT_COND_OP_EQUAL, title: __('OP_INLINE_EQUAL') },
+        { id: IMPORT_COND_OP_NOT_EQUAL, title: __('OP_INLINE_NOT_EQUAL') },
+        { id: IMPORT_COND_OP_LESS, title: __('OP_INLINE_LESS') },
+        { id: IMPORT_COND_OP_GREATER, title: __('OP_INLINE_GREATER') },
     ];
 
     /** Field type to data property name map */

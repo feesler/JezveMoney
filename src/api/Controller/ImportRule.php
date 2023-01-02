@@ -25,9 +25,9 @@ class ImportRule extends ApiListController
         $this->model = ImportRuleModel::getInstance();
         $this->condModel = ImportConditionModel::getInstance();
         $this->actionModel = ImportActionModel::getInstance();
-        $this->createErrorMsg = Message::get(ERR_IMPORT_COND_CREATE);
-        $this->updateErrorMsg = Message::get(ERR_IMPORT_COND_UPDATE);
-        $this->deleteErrorMsg = Message::get(ERR_IMPORT_COND_DELETE);
+        $this->createErrorMsg = __("ERR_IMPORT_RULE_CREATE");
+        $this->updateErrorMsg = __("ERR_IMPORT_RULE_UPDATE");
+        $this->deleteErrorMsg = __("ERR_IMPORT_RULE_DELETE");
     }
 
 
@@ -114,7 +114,7 @@ class ImportRule extends ApiListController
     protected function preCreate($request)
     {
         if (!$this->verifyRequest($request)) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
+            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
         }
 
         return $request;

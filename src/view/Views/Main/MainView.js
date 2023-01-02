@@ -2,7 +2,7 @@ import 'jezvejs/style';
 import { ge } from 'jezvejs';
 import 'jezvejs/style/IconButton';
 import { Histogram } from 'jezvejs/Histogram';
-import { formatValueShort } from '../../js/utils.js';
+import { formatValueShort, __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
@@ -13,9 +13,6 @@ import { CategoryList } from '../../js/model/CategoryList.js';
 import { TransactionList } from '../../Components/TransactionList/TransactionList.js';
 import '../../Components/Tile/style.scss';
 import './style.scss';
-
-/** Strings */
-const MSG_NO_TRANSACTIONS = 'No items';
 
 /**
  * Main view
@@ -42,7 +39,7 @@ class MainView extends View {
         this.latestList = TransactionList.create({
             items: this.props.transactions,
             showControls: false,
-            noItemsMessage: MSG_NO_TRANSACTIONS,
+            noItemsMessage: __('MAIN_TR_NO_DATA'),
         });
         const transactionsWidget = ge('transactionsWidget');
         transactionsWidget.append(this.latestList.elem);

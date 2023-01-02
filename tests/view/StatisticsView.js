@@ -94,6 +94,7 @@ export class StatisticsView extends AppView {
 
     buildModel(cont) {
         const res = {
+            locale: cont.locale,
             filtersVisible: cont.filtersContainer.visible,
         };
 
@@ -154,6 +155,9 @@ export class StatisticsView extends AppView {
         const { report } = model.filter;
 
         const res = {
+            header: {
+                localeSelect: { value: model.locale },
+            },
             typeMenu: {
                 visible: filtersVisible,
                 value: model.filter.type,

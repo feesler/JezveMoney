@@ -12,11 +12,6 @@ use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Item\TransactionItem;
 use JezveMoney\App\Model\CategoryModel;
 
-const MSG_ACCOUNT_NOT_AVAILABLE = "You have no accounts. Please create one.";
-const MSG_DEBT_ACCOUNT_NOT_AVAILABLE = "No accounts available";
-const MSG_TRANSFER_NOT_AVAILABLE = "You need at least two accounts for transfer.";
-const MSG_DEBT_NOT_AVAILABLE = "You have no persons. Please create one for debts.";
-
 class Transactions extends TemplateController
 {
     protected $model = null;
@@ -38,7 +33,7 @@ class Transactions extends TemplateController
         $this->template = new Template(VIEW_TPL_PATH . "TransactionList.tpl");
         $baseUrl = BASEURL . "transactions/";
         $data = [
-            "titleString" => "Jezve Money | Transactions",
+            "titleString" => __("APP_NAME") . " | " . __("TRANSACTIONS"),
             "clearAllURL" => $baseUrl
         ];
 
@@ -153,7 +148,7 @@ class Transactions extends TemplateController
     protected function fail($msg = null)
     {
         if (!is_null($msg)) {
-            Message::set($msg);
+            Message::setError($msg);
         }
 
         setLocation(BASEURL);
@@ -192,7 +187,7 @@ class Transactions extends TemplateController
             $res = TransactionModel::stringToType($request["type"]);
         }
         if (!$res) {
-            $this->fail("Invalid transaction type");
+            $this->fail(__("ERR_TRANSACTION_TYPE"));
         }
 
         return $res;
@@ -247,7 +242,7 @@ class Transactions extends TemplateController
         if ($noAccount) {
             $debtAccountLabel = "No account";
         } else {
-            $debtAccountLabel = ($debtType) ? "Destination account" : "Source account";
+            $debtAccountLabel = ($debtType) ? __("TR_DEST_ACCOUNT") : __("TR_SRC_ACCOUNT");
         }
         $debtAccountContainer = [
             "id" => "debtAccountContainer",
@@ -258,7 +253,7 @@ class Transactions extends TemplateController
             "baseHidden" => $noAccount,
             "closeButton" => $noAccount,
             "accountToggler" => (!$noAccount || !$acc_count),
-            "noAccountsMsg" => MSG_DEBT_ACCOUNT_NOT_AVAILABLE,
+            "noAccountsMsg" => __("TR_DEBT_NO_ACCOUNTS"),
             "noAccountsMsgHidden" => ($acc_count > 0),
             "tile" => $data["debtAccountTile"],
             "infoItems" => [],
@@ -284,7 +279,7 @@ class Transactions extends TemplateController
             "hidden" => (!$trAvailable || $tr["type"] == INCOME || $tr["type"] == DEBT),
             "inputId" => "srcIdInp",
             "inputValue" => $tr["src_id"],
-            "title" => "Source account",
+            "title" => __("TR_SRC_ACCOUNT"),
             "tile" => $data["srcAccountTile"],
             "infoItems" => [],
         ];
@@ -307,7 +302,7 @@ class Transactions extends TemplateController
             "hidden" => (!$trAvailable || $tr["type"] == EXPENSE || $tr["type"] == DEBT),
             "inputId" => "destIdInp",
             "inputValue" => $tr["dest_id"],
-            "title" => "Destination account",
+            "title" => __("TR_DEST_ACCOUNT"),
             "tile" => $data["destAccountTile"],
             "infoItems" => [],
         ];
@@ -332,7 +327,7 @@ class Transactions extends TemplateController
     public function create()
     {
         if ($this->isPOST()) {
-            $this->fail(ERR_INVALID_REQUEST);
+            $this->fail(__("ERR_INVALID_REQUEST"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Transaction.tpl");
@@ -347,7 +342,7 @@ class Transactions extends TemplateController
 
         $persons = $this->personMod->getData(["visibility" => "all", "sort" => "visibility"]);
         $iconModel = IconModel::getInstance();
-        $defMsg = ERR_TRANS_CREATE;
+        $defMsg = __("ERR_TRANS_CREATE");
 
         $tr = [
             "type" => $this->getRequestedType($_GET, EXPENSE),
@@ -362,13 +357,13 @@ class Transactions extends TemplateController
         $notAvailMessage = null;
         if ($tr["type"] == EXPENSE || $tr["type"] == INCOME) {
             $trAvailable = $acc_count > 0;
-            $notAvailMessage = MSG_ACCOUNT_NOT_AVAILABLE;
+            $notAvailMessage = __("TR_NO_ACCOUNTS");
         } elseif ($tr["type"] == TRANSFER) {
             $trAvailable = $acc_count > 1;
-            $notAvailMessage = MSG_TRANSFER_NOT_AVAILABLE;
+            $notAvailMessage = __("TR_TRANSFER_NO_ACCOUNTS");
         } elseif ($tr["type"] == DEBT) {
             $trAvailable = is_array($persons) && count($persons) > 0;
-            $notAvailMessage = MSG_DEBT_NOT_AVAILABLE;
+            $notAvailMessage = __("TR_DEBT_NO_PERSONS");
         }
         $data["trAvailable"] = $trAvailable;
         $data["notAvailMessage"] = $notAvailMessage;
@@ -514,11 +509,11 @@ class Transactions extends TemplateController
 
         $form["action"] = BASEURL . "transactions/" . $data["action"] . "/";
 
-        $srcBalTitle = "Result balance";
+        $srcBalTitle = __("TR_RESULT");
         if ($tr["type"] == TRANSFER) {
-            $srcBalTitle .= " (Source)";
+            $srcBalTitle .= " (" . __("TR_SOURCE") . ")";
         } elseif ($tr["type"] == DEBT) {
-            $srcBalTitle .= ($debtType) ? " (Person)" : " (Account)";
+            $srcBalTitle .= ($debtType) ? " (" . __("TR_PERSON") . ")" : " (" . __("TR_ACCOUNT") . ")";
         }
         $data["srcBalTitle"] = $srcBalTitle;
 
@@ -528,11 +523,11 @@ class Transactions extends TemplateController
             $src->icon = $this->accModel->getIconFile($src->id);
         }
 
-        $destBalTitle = "Result balance";
+        $destBalTitle = __("TR_RESULT");
         if ($tr["type"] == TRANSFER) {
-            $destBalTitle .= " (Destination)";
+            $destBalTitle .= " (" . __("TR_DESTINATION") . ")";
         } elseif ($tr["type"] == DEBT) {
-            $destBalTitle .= ($debtType) ? " (Account)" : " (Person)";
+            $destBalTitle .= ($debtType) ? " (" . __("TR_ACCOUNT") . ")" : " (" . __("TR_PERSON") . ")";
         }
         $data["destBalTitle"] = $destBalTitle;
 
@@ -566,8 +561,8 @@ class Transactions extends TemplateController
         $data["showDestAmount"] = $showDestAmount;
 
         $showBothAmounts = $showSrcAmount && $showDestAmount;
-        $data["srcAmountLbl"] = ($showBothAmounts) ? "Source amount" : "Amount";
-        $data["destAmountLbl"] = ($showBothAmounts) ? "Destination amount" : "Amount";
+        $data["srcAmountLbl"] = ($showBothAmounts) ? __("TR_SRC_AMOUNT") : __("TR_AMOUNT");
+        $data["destAmountLbl"] = ($showBothAmounts) ? __("TR_DEST_AMOUNT") : __("TR_AMOUNT");
 
         $currObj = $this->currModel->getItem($tr["src_curr"]);
         $srcAmountSign = $currObj ? $currObj->sign : null;
@@ -615,19 +610,19 @@ class Transactions extends TemplateController
         ];
         $data["srcResultInfo"] = [
             "id" => "srcResBalanceInfo",
-            "title" => "Result balance",
+            "title" => __("TR_RESULT"),
             "value" => $rtSrcResBal,
             "hidden" => false
         ];
         $data["destResultInfo"] = [
             "id" => "destResBalanceInfo",
-            "title" => "Result balance",
+            "title" => __("TR_RESULT"),
             "value" => $rtDestResBal,
             "hidden" => false
         ];
         $data["exchangeInfo"] = [
             "id" => "exchangeInfo",
-            "title" => "Exchange rate",
+            "title" => __("TR_EXCHANGE_RATE"),
             "value" => $rtExchange,
             "hidden" => !$isDiffCurr
         ];
@@ -636,8 +631,8 @@ class Transactions extends TemplateController
 
         $data["dateFmt"] = date("d.m.Y");
 
-        $data["headString"] = "Create transaction";
-        $data["titleString"] = "Jezve Money | " . $data["headString"];
+        $data["headString"] = __("TR_CREATE");
+        $data["titleString"] = __("APP_NAME") . " | " . $data["headString"];
 
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
@@ -663,7 +658,7 @@ class Transactions extends TemplateController
     public function update()
     {
         if ($this->isPOST()) {
-            $this->fail(ERR_INVALID_REQUEST);
+            $this->fail(__("ERR_INVALID_REQUEST"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Transaction.tpl");
@@ -674,7 +669,7 @@ class Transactions extends TemplateController
 
         $persons = $this->personMod->getData(["visibility" => "all", "sort" => "visibility"]);
         $iconModel = IconModel::getInstance();
-        $defMsg = ERR_TRANS_UPDATE;
+        $defMsg = __("ERR_TRANS_UPDATE");
 
         $trans_id = intval($this->actionParam);
         if (!$trans_id) {
@@ -740,7 +735,7 @@ class Transactions extends TemplateController
         if ($tr["type"] == DEBT) {
             $uObj = $this->uMod->getItem($this->user_id);
             if (!$uObj) {
-                throw new \Error("User not found");
+                throw new \Error(__("ERR_USER_NOT_FOUND"));
             }
 
             $debtType = (!is_null($src) && $src->owner_id != $uObj->owner_id);
@@ -749,7 +744,7 @@ class Transactions extends TemplateController
 
             $pObj = $this->personMod->getItem($person_id);
             if (!$pObj) {
-                throw new \Error("Person not found");
+                throw new \Error(__("ERR_PERSON_NOT_FOUND"));
             }
 
             $person_acc_id = ($debtType) ? $tr["src_id"] : $tr["dest_id"];
@@ -791,18 +786,18 @@ class Transactions extends TemplateController
             $person_balance = $person_res_balance;
         }
 
-        $srcBalTitle = "Result balance";
+        $srcBalTitle = __("TR_RESULT");
         if ($tr["type"] == TRANSFER) {
-            $srcBalTitle .= " (Source)";
+            $srcBalTitle .= " (" . __("TR_SOURCE") . ")";
         } elseif ($tr["type"] == DEBT) {
-            $srcBalTitle .= ($debtType) ? " (Person)" : " (Account)";
+            $srcBalTitle .= ($debtType) ? " (" . __("TR_PERSON") . ")" : " (" . __("TR_ACCOUNT") . ")";
         }
 
-        $destBalTitle = "Result balance";
+        $destBalTitle = __("TR_RESULT");
         if ($tr["type"] == TRANSFER) {
-            $destBalTitle .= " (Destination)";
+            $destBalTitle .= " (" . __("TR_DESTINATION") . ")";
         } elseif ($tr["type"] == DEBT) {
-            $destBalTitle .= ($debtType) ? " (Account)" : " (Person)";
+            $destBalTitle .= ($debtType) ? " (" . __("TR_ACCOUNT") . ")" : " (" . __("TR_PERSON") . ")";
         }
 
         $form["src_amount"] = $tr["src_amount"];
@@ -826,8 +821,8 @@ class Transactions extends TemplateController
         $data["tr"] = $tr;
 
         $showBothAmounts = $showSrcAmount && $showDestAmount;
-        $data["srcAmountLbl"] = ($showBothAmounts) ? "Source amount" : "Amount";
-        $data["destAmountLbl"] = ($showBothAmounts) ? "Destination amount" : "Amount";
+        $data["srcAmountLbl"] = ($showBothAmounts) ? __("TR_SRC_AMOUNT") : __("TR_AMOUNT");
+        $data["destAmountLbl"] = ($showBothAmounts) ? __("TR_DEST_AMOUNT") : __("TR_AMOUNT");
 
         if ($tr["type"] == DEBT && $debtAcc) {
             $balanceDiff = 0;
@@ -887,19 +882,19 @@ class Transactions extends TemplateController
         ];
         $data["srcResultInfo"] = [
             "id" => "srcResBalanceInfo",
-            "title" => "Result balance",
+            "title" => __("TR_RESULT"),
             "value" => $rtSrcResBal,
             "hidden" => false
         ];
         $data["destResultInfo"] = [
             "id" => "destResBalanceInfo",
-            "title" => "Result balance",
+            "title" => __("TR_RESULT"),
             "value" => $rtDestResBal,
             "hidden" => false
         ];
         $data["exchangeInfo"] = [
             "id" => "exchangeInfo",
-            "title" => "Exchange rate",
+            "title" => __("TR_EXCHANGE_RATE"),
             "value" => $rtExchange,
             "hidden" => !$isDiffCurr
         ];
@@ -908,8 +903,8 @@ class Transactions extends TemplateController
 
         $data["dateFmt"] = date("d.m.Y", $tr["date"]);
 
-        $data["headString"] = "Edit transaction";
-        $data["titleString"] = "Jezve Money | " . $data["headString"];
+        $data["headString"] = __("TR_UPDATE");
+        $data["titleString"] = __("APP_NAME") . " | " . $data["headString"];
 
         $data["appProps"] = [
             "profile" => $this->getProfileData(),

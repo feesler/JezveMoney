@@ -6,6 +6,7 @@ import {
 } from 'jezvejs';
 import { Icon } from 'jezvejs/Icon';
 import { Popup } from 'jezvejs/Popup';
+import { __ } from '../../../../js/utils.js';
 import { ImportFileUploader } from '../FileUploader/ImportFileUploader.js';
 import { ImportTemplateManager } from '../TemplateManager/ImportTemplateManager.js';
 import { LoadingIndicator } from '../../../LoadingIndicator/LoadingIndicator.js';
@@ -17,9 +18,7 @@ const DRAG_OVER_CLASS = 'drag-over';
 const CONVERT_TITLE_CLASS = 'upload-popup__convert-title';
 const BACK_BTN_CLASS = 'btn icon-btn back-btn';
 const BACK_ICON_CLASS = 'icon back-icon';
-/** Strings */
-const TITLE_UPLOAD = 'Upload';
-const TITLE_CONVERT = 'Convert';
+
 /** States */
 const UPLOAD_STATE = 1;
 const CONVERT_STATE = 2;
@@ -69,7 +68,7 @@ export class ImportUploadDialog extends Component {
 
         this.popup = Popup.create({
             id: 'fileupload_popup',
-            title: TITLE_UPLOAD,
+            title: __('IMPORT_UPLOAD'),
             content: this.elem,
             onclose: () => this.onClose(),
             btn: {
@@ -277,7 +276,7 @@ export class ImportUploadDialog extends Component {
         }
 
         if (state.id === UPLOAD_STATE) {
-            this.popup.setTitle(TITLE_UPLOAD);
+            this.popup.setTitle(__('IMPORT_UPLOAD'));
         } else if (state.id === CONVERT_STATE) {
             const icon = Icon.create({
                 icon: 'back',
@@ -289,7 +288,7 @@ export class ImportUploadDialog extends Component {
                 events: { click: () => this.setUploadState() },
             });
 
-            const titleElem = createElement('div', { props: { textContent: TITLE_CONVERT } });
+            const titleElem = createElement('div', { props: { textContent: __('IMPORT_CONVERT') } });
             const convertTitle = createElement('div', {
                 props: { className: CONVERT_TITLE_CLASS },
                 children: [backButton, titleElem],

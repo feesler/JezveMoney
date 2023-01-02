@@ -6,6 +6,7 @@ import {
 } from 'jezve-test';
 import { App } from '../Application.js';
 import { convDate, fixFloat } from '../common.js';
+import { __ } from './locale.js';
 
 /** Condition field types */
 export const IMPORT_COND_FIELD_MAIN_ACCOUNT = 1;
@@ -94,14 +95,14 @@ const stringOperators = [
 
 /** List of available field types */
 const fieldTypes = [
-    { id: ConditionFields.mainAccount, title: 'Main account', operators: itemOperators },
-    { id: ConditionFields.template, title: 'Template', operators: itemOperators },
-    { id: ConditionFields.transactionAmount, title: 'Transaction amount', operators: numOperators },
-    { id: ConditionFields.transactionCurrency, title: 'Transaction currency', operators: itemOperators },
-    { id: ConditionFields.accountAmount, title: 'Account amount', operators: numOperators },
-    { id: ConditionFields.accountCurrency, title: 'Account currency', operators: itemOperators },
-    { id: ConditionFields.comment, title: 'Comment', operators: stringOperators },
-    { id: ConditionFields.date, title: 'Date', operators: numOperators },
+    { id: ConditionFields.mainAccount, titleToken: 'IMPORT_MAIN_ACCOUNT', operators: itemOperators },
+    { id: ConditionFields.template, titleToken: 'TEMPLATE', operators: itemOperators },
+    { id: ConditionFields.transactionAmount, titleToken: 'COLUMN_TR_AMOUNT', operators: numOperators },
+    { id: ConditionFields.transactionCurrency, titleToken: 'COLUMN_TR_CURRENCY', operators: itemOperators },
+    { id: ConditionFields.accountAmount, titleToken: 'COLUMN_ACCOUNT_AMOUNT', operators: numOperators },
+    { id: ConditionFields.accountCurrency, titleToken: 'COLUMN_ACCOUNT_CURRENCY', operators: itemOperators },
+    { id: ConditionFields.comment, titleToken: 'COLUMN_COMMENT', operators: stringOperators },
+    { id: ConditionFields.date, titleToken: 'COLUMN_DATE', operators: numOperators },
 ];
 
 /** Field type to name map */
@@ -142,11 +143,11 @@ const operatorNames = {
 
 /** List of available condition operator types */
 const operatorTypes = [
-    { id: ConditionOperators.includes, title: 'contains' },
-    { id: ConditionOperators.is, title: 'is' },
-    { id: ConditionOperators.isNot, title: 'is not' },
-    { id: ConditionOperators.less, title: 'less than' },
-    { id: ConditionOperators.greater, title: 'greater than' },
+    { id: ConditionOperators.includes, titleToken: 'OP_INLINE_INCLUDES' },
+    { id: ConditionOperators.is, titleToken: 'OP_INLINE_EQUAL' },
+    { id: ConditionOperators.isNot, titleToken: 'OP_INLINE_NOT_EQUAL' },
+    { id: ConditionOperators.less, titleToken: 'OP_INLINE_LESS' },
+    { id: ConditionOperators.greater, titleToken: 'OP_INLINE_GREATER' },
 ];
 
 /** Search condition field type by id */
@@ -260,11 +261,11 @@ export class ImportCondition {
     }
 
     /** Search condition field type by name (case insensitive) */
-    static findFieldTypeByName(name) {
+    static findFieldTypeByName(name, locale) {
         assert.isString(name, 'Invalid parameter');
 
         const lcName = name.toLowerCase();
-        return fieldTypes.find((item) => item.title.toLowerCase() === lcName);
+        return fieldTypes.find((item) => __(item.titleToken, locale).toLowerCase() === lcName);
     }
 
     /** Search condition operator by id */
@@ -276,11 +277,11 @@ export class ImportCondition {
     }
 
     /** Search condition operator by name (case insensitive) */
-    static findOperatorByName(name) {
+    static findOperatorByName(name, locale) {
         assert.isString(name, 'Invalid parameter');
 
         const lcName = name.toLowerCase();
-        return operatorTypes.find((item) => item.title.toLowerCase() === lcName);
+        return operatorTypes.find((item) => __(item.titleToken, locale).toLowerCase() === lcName);
     }
 
     /** Check specified value is item operator(equal or not equal) */

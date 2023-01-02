@@ -1,6 +1,5 @@
 import { DropDown } from 'jezvejs/DropDown';
-
-const TITLE_NO_CATEGORY = 'No category';
+import { __ } from '../../js/utils.js';
 
 /**
  * Category DropDown component
@@ -15,7 +14,7 @@ export class CategorySelect extends DropDown {
     initCategories() {
         const { categories } = window.app.model;
 
-        this.addItem({ id: 0, title: TITLE_NO_CATEGORY });
+        this.addItem({ id: 0, title: __('NO_CATEGORY') });
 
         categories.forEach((category) => {
             if (category.parent_id !== 0) {

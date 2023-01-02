@@ -19,14 +19,6 @@ class ImportTemplateModel extends CachedTable
     private static $owner_id = 0;
 
     protected $tbl_name = "import_tpl";
-    protected $columnTypes = [
-        "accountAmount" => ["title" => "Account amount", "name" => "account_amount_col"],
-        "accountCurrency" => ["title" => "Account currency", "name" => "account_curr_col"],
-        "transactionAmount" => ["title" => "Transaction amount", "name" => "trans_amount_col"],
-        "transactionCurrency" => ["title" => "Transaction currency", "name" => "trans_curr_col"],
-        "date" => ["title" => "Date", "name" => "date_col"],
-        "comment" => ["title" => "Comment", "name" => "comment_col"]
-    ];
 
     protected function onStart()
     {
@@ -245,7 +237,32 @@ class ImportTemplateModel extends CachedTable
     // Return array of template column types
     public function getColumnTypes()
     {
-        return $this->columnTypes;
+        return [
+            "accountAmount" => [
+                "title" => __("COLUMN_ACCOUNT_AMOUNT"),
+                "name" => "account_amount_col",
+            ],
+            "accountCurrency" => [
+                "title" => __("COLUMN_ACCOUNT_CURRENCY"),
+                "name" => "account_curr_col",
+            ],
+            "transactionAmount" => [
+                "title" => __("COLUMN_TR_AMOUNT"),
+                "name" => "trans_amount_col",
+            ],
+            "transactionCurrency" => [
+                "title" => __("COLUMN_TR_CURRENCY"),
+                "name" => "trans_curr_col",
+            ],
+            "date" => [
+                "title" => __("COLUMN_DATE"),
+                "name" => "date_col",
+            ],
+            "comment" => [
+                "title" => __("COLUMN_COMMENT"),
+                "name" => "comment_col",
+            ]
+        ];
     }
 
     // Delete all import templates of user

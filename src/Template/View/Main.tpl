@@ -13,15 +13,15 @@ include(TPL_PATH . "Header.tpl");    ?>
                     <section class="widget accounts-widget">
                         <header class="widget_title">
                             <a class="widget_title-link" href="<?= BASEURL ?>accounts/">
-                                <span>Accounts</span>
+                                <span><?= __("ACCOUNTS") ?></span>
                                 <div class="glyph"><?= svgIcon("glyph", "glyph-icon") ?></div>
                             </a>
                         </header>
                         <div class="tiles">
                             <?php if (!count($tilesArr)) {    ?>
                                 <div class="nodata-group">
-                                    <span class="nodata-message">No accounts</span>
-                                    <a class="btn link-btn" href="<?= BASEURL ?>accounts/create/">Create</a>
+                                    <span class="nodata-message"><?= __("MAIN_ACCOUNTS_NO_DATA") ?></span>
+                                    <a class="btn link-btn" href="<?= BASEURL ?>accounts/create/"><?= __("CREATE") ?></a>
                                 </div>
                                 <?php    } else {
                                 foreach ($tilesArr as $tile) {    ?>
@@ -34,7 +34,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                     <?php if (count($tilesArr) > 0) {    ?>
                         <section class="widget total-widget">
                             <header class="widget_title">
-                                <span>Total</span>
+                                <span><?= __("TOTAL") ?></span>
                             </header>
                             <div class="total-list">
                                 <?php foreach ($totalsArr as $curr_id => $currData) {    ?>
@@ -48,7 +48,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                         <section id="transactionsWidget" class="widget transactions-widget">
                             <header class="widget_title">
                                 <a class="widget_title-link" href="<?= BASEURL ?>transactions/">
-                                    <span>Transactions</span>
+                                    <span><?= __("TRANSACTIONS") ?></span>
                                     <div class="glyph"><?= svgIcon("glyph", "glyph-icon") ?></div>
                                 </a>
                             </header>
@@ -58,15 +58,15 @@ include(TPL_PATH . "Header.tpl");    ?>
                     <section class="widget persons-widget">
                         <header class="widget_title">
                             <a class="widget_title-link" href="<?= BASEURL ?>persons/">
-                                <span>Persons</span>
+                                <span><?= __("PERSONS") ?></span>
                                 <div class="glyph"><?= svgIcon("glyph", "glyph-icon") ?></div>
                             </a>
                         </header>
                         <div class="tiles">
                             <?php if (!count($persons)) {        ?>
                                 <div class="nodata-group">
-                                    <span class="nodata-message">No persons</span>
-                                    <a class="btn link-btn" href="<?= BASEURL ?>persons/create/">Create</a>
+                                    <span class="nodata-message"><?= __("PERSONS_NO_DATA") ?></span>
+                                    <a class="btn link-btn" href="<?= BASEURL ?>persons/create/"><?= __("CREATE") ?></a>
                                 </div>
                             <?php    } else {    ?>
                                 <?php foreach ($persons as $personTile) {    ?>
@@ -80,13 +80,13 @@ include(TPL_PATH . "Header.tpl");    ?>
                         <section class="widget statistics-widget">
                             <header class="widget_title">
                                 <a class="widget_title-link" href="<?= BASEURL ?>statistics/">
-                                    <span>Statistics</span>
+                                    <span><?= __("STATISTICS") ?></span>
                                     <div class="glyph"><?= svgIcon("glyph", "glyph-icon") ?></div>
                                 </a>
                             </header>
                             <div id="chart" class="widget_charts">
                                 <?php if (count($transactions) === 0) {    ?>
-                                    <span class="nodata-message">No results</span>
+                                    <span class="nodata-message"><?= __("STAT_NO_DATA") ?></span>
                                 <?php    }        ?>
                             </div>
                         </section>

@@ -13,7 +13,7 @@ import { IconButton } from 'jezvejs/IconButton';
 import { PieChart } from 'jezvejs/PieChart';
 import { CategorySelect } from '../../Components/CategorySelect/CategorySelect.js';
 import { DateRangeInput } from '../../Components/DateRangeInput/DateRangeInput.js';
-import { formatValueShort, normalize } from '../../js/utils.js';
+import { formatValueShort, normalize, __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { API } from '../../js/api/index.js';
@@ -48,14 +48,6 @@ const POPUP_LIST_VALUE_CLASS = 'chart-popup-list__value';
 const LEGEND_LIST_CLASS = 'chart__legend-list';
 const LEGEND_ITEM_CAT_CLASS = 'chart-legend__item-cat-';
 const LEGEND_ITEM_TITLE_CLASS = 'chart-legend__item-title';
-
-/** Strings */
-const STR_TITLE = 'Statistics';
-const PAGE_TITLE = 'Jezve Money | Statistics';
-const TITLE_NO_CATEGORY = 'No category';
-/* Date range input */
-const START_DATE_PLACEHOLDER = 'From';
-const END_DATE_PLACEHOLDER = 'To';
 
 const defaultProps = {
     filter: {},
@@ -128,7 +120,7 @@ class StatisticsView extends View {
         ]);
 
         this.heading = Heading.fromElement(this.heading, {
-            title: STR_TITLE,
+            title: __('STATISTICS'),
         });
 
         // Filters
@@ -168,9 +160,9 @@ class StatisticsView extends View {
         this.accountDropDown = DropDown.create({
             elem: 'acc_id',
             multiple: true,
-            placeholder: 'Type to filter accounts',
+            placeholder: __('TYPE_TO_FILTER'),
             enableFilter: true,
-            noResultsMessage: 'Nothing found',
+            noResultsMessage: __('ACCOUNTS_NOT_FOUND'),
             onitemselect: (obj) => this.onAccountSel(obj),
             onchange: (obj) => this.onAccountSel(obj),
             className: 'dd_fullwidth',
@@ -181,7 +173,7 @@ class StatisticsView extends View {
         this.categoryDropDown = CategorySelect.create({
             elem: 'category_id',
             multiple: true,
-            placeholder: 'Type to filter categories',
+            placeholder: __('TYPE_TO_FILTER'),
             enableFilter: true,
             noResultsMessage: 'Nothing found',
             onitemselect: (obj) => this.onCategorySel(obj),
@@ -198,8 +190,8 @@ class StatisticsView extends View {
 
         // Date range filter
         this.dateRangeFilter = DateRangeInput.fromElement(this.dateFrm, {
-            startPlaceholder: START_DATE_PLACEHOLDER,
-            endPlaceholder: END_DATE_PLACEHOLDER,
+            startPlaceholder: __('DATE_RANGE_FROM'),
+            endPlaceholder: __('DATE_RANGE_TO'),
             onChange: (data) => this.onChangeDateFilter(data),
         });
 
@@ -400,7 +392,8 @@ class StatisticsView extends View {
 
     replaceHistory(state) {
         const url = this.getFilterURL(state);
-        window.history.replaceState({}, PAGE_TITLE, url);
+        const pageTitle = `${__('APP_NAME')} | ${__('STATISTICS')}`;
+        window.history.replaceState({}, pageTitle, url);
     }
 
     async requestData(options) {
@@ -508,7 +501,7 @@ class StatisticsView extends View {
 
         if (state.filter.report === 'category') {
             if (categoryId === 0) {
-                return TITLE_NO_CATEGORY;
+                return __('NO_CATEGORY');
             }
 
             const category = window.app.model.categories.getItem(categoryId);

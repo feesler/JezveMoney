@@ -8,6 +8,7 @@ import {
 } from 'jezvejs';
 import { IconButton } from 'jezvejs/IconButton';
 import { Spinner } from 'jezvejs/Spinner';
+import { __ } from '../../js/utils.js';
 import { Application } from '../../js/Application.js';
 import '../../css/app.scss';
 import { View } from '../../js/View.js';
@@ -18,11 +19,6 @@ import '../../Components/Heading/style.scss';
 import './style.scss';
 import { actions, reducer } from './reducer.js';
 import { createStore } from '../../js/store.js';
-
-const TITLE_PERSON_DELETE = 'Delete person';
-const MSG_PERSON_DELETE = 'Are you sure want to delete selected person?<br>Debt operations will be converted into expense or income.';
-const MSG_EMPTY_NAME = 'Input name.';
-const MSG_EXISTING_NAME = 'Person with this name already exist.';
 
 /**
  * Create/update person view
@@ -96,12 +92,12 @@ class PersonView extends View {
 
         const { name } = state.data;
         if (name.length === 0) {
-            this.store.dispatch(actions.invalidateNameField(MSG_EMPTY_NAME));
+            this.store.dispatch(actions.invalidateNameField(__('PERSON_INVALID_NAME')));
             this.nameInp.focus();
         } else {
             const person = window.app.model.persons.findByName(name);
             if (person && state.original.id !== person.id) {
-                this.store.dispatch(actions.invalidateNameField(MSG_EXISTING_NAME));
+                this.store.dispatch(actions.invalidateNameField(__('PERSON_EXISTING_NAME')));
                 this.nameInp.focus();
             }
         }
@@ -181,8 +177,8 @@ class PersonView extends View {
 
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: TITLE_PERSON_DELETE,
-            content: MSG_PERSON_DELETE,
+            title: __('PERSON_DELETE'),
+            content: __('MSG_PERSON_DELETE'),
             onconfirm: () => this.deletePerson(),
         });
     }

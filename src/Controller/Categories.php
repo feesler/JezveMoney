@@ -20,7 +20,7 @@ class Categories extends TemplateController
     {
         $this->template = new Template(VIEW_TPL_PATH . "CategoryList.tpl");
         $data = [
-            "titleString" => "Jezve Money | Categories",
+            "titleString" => __("APP_NAME") . " | " . __("CATEGORIES"),
         ];
         $data["appProps"] = [
             "categories" => $this->model->getData()
@@ -36,7 +36,7 @@ class Categories extends TemplateController
     protected function fail($msg = null)
     {
         if (!is_null($msg)) {
-            Message::set($msg);
+            Message::setError($msg);
         }
 
         setLocation(BASEURL . "categories/");
@@ -46,13 +46,13 @@ class Categories extends TemplateController
     public function create()
     {
         if ($this->isPOST()) {
-            $this->fail(ERR_INVALID_REQUEST);
+            $this->fail(__("ERR_INVALID_REQUEST"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Category.tpl");
         $data = [
-            "headString" => "New category",
-            "titleString" => "Jezve Money | New category"
+            "headString" => __("CATEGORY_CREATE"),
+            "titleString" => __("APP_NAME") . " | " . __("CATEGORY_CREATE"),
         ];
 
         $categories = $this->model->getData();
@@ -82,23 +82,23 @@ class Categories extends TemplateController
     public function update()
     {
         if ($this->isPOST()) {
-            $this->fail(ERR_INVALID_REQUEST);
+            $this->fail(__("ERR_INVALID_REQUEST"));
         }
 
         $this->template = new Template(VIEW_TPL_PATH . "Category.tpl");
         $data = [
-            "headString" => "Edit category",
-            "titleString" => "Jezve Money | Edit category"
+            "headString" => __("CATEGORY_UPDATE"),
+            "titleString" => __("APP_NAME") . " | " . __("CATEGORY_UPDATE"),
         ];
 
         $itemId = intval($this->actionParam);
         if (!$itemId) {
-            $this->fail(ERR_CATEGORY_UPDATE);
+            $this->fail(__("ERR_CATEGORY_UPDATE"));
         }
 
         $category = $this->model->getItem($itemId);
         if (!$category) {
-            $this->fail(ERR_CATEGORY_UPDATE);
+            $this->fail(__("ERR_CATEGORY_UPDATE"));
         }
         $data["category"] = $category;
 

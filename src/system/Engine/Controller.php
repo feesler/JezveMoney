@@ -80,16 +80,7 @@ abstract class Controller
     // Obtain input of request and try to decode it as JSON
     protected function getJSONContent($asArray = false)
     {
-        $rawData = file_get_contents('php://input');
-
-        try {
-            $json = JSON::decode($rawData, $asArray);
-        } catch (\Exception $e) {
-            wlog($e);
-            $json = null;
-        }
-
-        return $json;
+        return JSON::fromFile('php://input', $asArray);
     }
 
 

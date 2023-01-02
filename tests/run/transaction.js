@@ -19,6 +19,7 @@ import {
 } from '../model/Transaction.js';
 import { App } from '../Application.js';
 import { generateId } from '../common.js';
+import { __ } from '../model/locale.js';
 
 export const runAction = async ({ action, data }) => {
     let testDescr = null;
@@ -403,7 +404,7 @@ export const securityTests = async () => {
         assert.instanceOf(App.view, MainView, 'Invalid view');
 
         App.view.expectedState = {
-            msgPopup: { success: false, message: 'Fail to update transaction.' },
+            msgPopup: { success: false, message: __('ERR_TRANS_UPDATE', App.view.locale) },
         };
         await App.view.checkState();
         await App.view.closeNotification();
@@ -426,7 +427,7 @@ export const createFromPersonAccount = async ({ type, accountId }) => {
         assert.instanceOf(App.view, MainView, 'Invalid view');
 
         App.view.expectedState = {
-            msgPopup: { success: false, message: 'Fail to create new transaction.' },
+            msgPopup: { success: false, message: __('ERR_TRANS_CREATE', App.view.locale) },
         };
         await App.view.checkState();
         await App.view.closeNotification();

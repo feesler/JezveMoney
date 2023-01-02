@@ -17,7 +17,7 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 <?= IconButton::render([
                                     "id" => "deleteBtn",
                                     "classNames" => "circle-icon",
-                                    "title" => "Delete",
+                                    "title" => __("DELETE"),
                                     "icon" => "del"
                                 ]) ?>
                             </div>
@@ -29,14 +29,14 @@ include(TPL_PATH . "Header.tpl");    ?>
                                 <input id="pid" name="id" type="hidden" value="<?= e($pInfo->id) ?>">
                             <?php    }    ?>
                             <div id="name-inp-block" class="validation-block view-row std_margin">
-                                <label for="nameInp">Person name</label>
+                                <label for="nameInp"><?= __("PERSON_NAME") ?></label>
                                 <input id="nameInp" class="stretch-input" name="name" type="text" autocomplete="off" value="<?= e($pInfo->name) ?>">
                                 <div id="nameFeedback" class="invalid-feedback"></div>
                             </div>
 
                             <div class="form-controls">
-                                <input id="submitBtn" class="btn submit-btn" type="submit" value="Submit">
-                                <a id="cancelBtn" class="btn cancel-btn" href="<?= BASEURL ?>persons/">Cancel</a>
+                                <input id="submitBtn" class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
+                                <a id="cancelBtn" class="btn cancel-btn" href="<?= BASEURL ?>persons/"><?= __("CANCEL") ?></a>
                             </div>
                             <input id="flags" name="flags" type="hidden" value="<?= e($pInfo->flags) ?>">
                         </form>

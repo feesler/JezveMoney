@@ -6,10 +6,11 @@ import {
 import { Checkbox } from 'jezvejs/Checkbox';
 import { Collapsible } from 'jezvejs/Collapsible';
 import { PopupMenuButton } from 'jezvejs/PopupMenu';
+import { __ } from '../../../js/utils.js';
 import { OriginalImportData } from '../OriginalData/OriginalImportData.js';
 import { Field } from '../../Field/Field.js';
 import './style.scss';
-import { ImportTransaction } from '../../../js/model/ImportTransaction.js';
+import { ImportTransaction, typeNames } from '../../../js/model/ImportTransaction.js';
 import { SimilarTransactionInfo } from '../SimilarTransactionInfo/SimilarTransactionInfo.js';
 import { ToggleButton } from '../../ToggleButton/ToggleButton.js';
 
@@ -46,21 +47,6 @@ const SELECTED_CLASS = 'import-item_selected';
 /* Sort state */
 const SORT_CLASS = 'import-item_sort';
 
-/** Strings */
-const TITLE_FIELD_SRC_ACCOUNT = 'Source account';
-const TITLE_FIELD_DEST_ACCOUNT = 'Destination account';
-const TITLE_FIELD_AMOUNT = 'Amount';
-const TITLE_FIELD_SRC_AMOUNT = 'Source amount';
-
-const typeStrings = {
-    expense: 'Expense',
-    income: 'Income',
-    transferfrom: 'Transfer from',
-    transferto: 'Transfer to',
-    debtfrom: 'Debt from',
-    debtto: 'Debt to',
-};
-
 /**
  * Import transaction form component
  */
@@ -89,56 +75,56 @@ export class ImportTransactionItem extends Component {
 
         this.trTypeTitle = createElement('span', { props: { className: TYPE_CLASS } });
         this.trTypeField = Field.create({
-            title: 'Type',
+            title: __('TR_TYPE'),
             content: this.trTypeTitle,
             className: TYPE_FIELD_CLASS,
         });
 
         this.accountTitle = createElement('span', { props: { className: ACCOUNT_CLASS } });
         this.accountField = Field.create({
-            title: 'Account',
+            title: __('TR_ACCOUNT'),
             content: this.accountTitle,
             className: ACCOUNT_FIELD_CLASS,
         });
 
         this.personTitle = createElement('span', { props: { className: PERSON_CLASS } });
         this.personField = Field.create({
-            title: 'Person',
+            title: __('TR_PERSON'),
             content: this.personTitle,
             className: PERSON_FIELD_CLASS,
         });
 
         this.srcAmountTitle = createElement('span', { props: { className: AMOUNT_CLASS } });
         this.srcAmountField = Field.create({
-            title: 'Amount',
+            title: __('TR_AMOUNT'),
             content: this.srcAmountTitle,
             className: SRC_AMOUNT_FIELD_CLASS,
         });
 
         this.destAmountTitle = createElement('span', { props: { className: AMOUNT_CLASS } });
         this.destAmountField = Field.create({
-            title: 'Destination amount',
+            title: __('TR_DEST_AMOUNT'),
             content: this.destAmountTitle,
             className: DEST_AMOUNT_FIELD_CLASS,
         });
 
         this.dateTitle = createElement('span', { props: { className: DATE_CLASS } });
         this.dateField = Field.create({
-            title: 'Date',
+            title: __('TR_DATE'),
             content: this.dateTitle,
             className: DATE_FIELD_CLASS,
         });
 
         this.categoryTitle = createElement('span', { props: { className: CATEGORY_CLASS } });
         this.categoryField = Field.create({
-            title: 'Category',
+            title: __('TR_CATEGORY'),
             content: this.categoryTitle,
             className: CATEGORY_FIELD_CLASS,
         });
 
         this.commentTitle = createElement('span', { props: { className: COMMENT_CLASS } });
         this.commentField = Field.create({
-            title: 'Comment',
+            title: __('TR_COMMENT'),
             content: this.commentTitle,
             className: COMMENT_FIELD_CLASS,
         });
@@ -271,11 +257,12 @@ export class ImportTransactionItem extends Component {
         // Select controls
         this.renderSelectControls(state, prevState);
 
-        // Types field
-        if (!(transaction.type in typeStrings)) {
+        // Type field
+        if (!(transaction.type in typeNames)) {
             throw new Error('Invalid transaction type');
         }
-        this.trTypeTitle.textContent = typeStrings[transaction.type];
+        this.trTypeTitle.textContent = typeNames[transaction.type];
+        this.trTypeField.elem.dataset.type = transaction.type;
 
         // Account field
         this.accountField.show(isTransfer);
@@ -288,8 +275,8 @@ export class ImportTransactionItem extends Component {
             this.accountTitle.textContent = account.name;
 
             const accountTitle = (isTransferFrom)
-                ? TITLE_FIELD_DEST_ACCOUNT
-                : TITLE_FIELD_SRC_ACCOUNT;
+                ? __('TR_DEST_ACCOUNT')
+                : __('TR_SRC_ACCOUNT');
             this.accountField.setTitle(accountTitle);
         }
         // Person field
@@ -300,7 +287,7 @@ export class ImportTransactionItem extends Component {
         }
 
         // Amount fields
-        const srcAmountLabel = (isDiff) ? TITLE_FIELD_SRC_AMOUNT : TITLE_FIELD_AMOUNT;
+        const srcAmountLabel = (isDiff) ? __('TR_SRC_AMOUNT') : __('TR_AMOUNT');
         this.srcAmountField.setTitle(srcAmountLabel);
         const srcAmount = currency.formatCurrency(transaction.sourceAmount, transaction.srcCurrId);
         this.srcAmountTitle.textContent = srcAmount;

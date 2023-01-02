@@ -25,15 +25,13 @@ export class Transaction {
     }
 
     static strToType(str) {
-        /* eslint-disable quote-props */
         const strToType = {
-            'ALL': 0,
-            'EXPENSE': EXPENSE,
-            'INCOME': INCOME,
-            'TRANSFER': TRANSFER,
-            'DEBT': DEBT,
+            ALL: 0,
+            EXPENSE,
+            INCOME,
+            TRANSFER,
+            DEBT,
         };
-        /* eslint-enable quote-props */
 
         if (!str) {
             return null;

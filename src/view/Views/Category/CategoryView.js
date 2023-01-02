@@ -25,18 +25,7 @@ import {
     INCOME,
     TRANSFER,
 } from '../../js/model/Transaction.js';
-
-const TITLE_CATEGORY_DELETE = 'Delete category';
-const MSG_CATEGORY_DELETE = 'Are you sure want to delete selected category?';
-const MSG_EMPTY_NAME = 'Input name.';
-const MSG_EXISTING_NAME = 'Category with this name already exist.';
-const NO_PARENT_TITLE = 'No parent';
-
-const TITLE_ANY_TYPE = 'Any';
-const TITLE_EXPENSE = 'Expense';
-const TITLE_INCOME = 'Income';
-const TITLE_TRANSFER = 'Transfer';
-const TITLE_DEBT = 'Debt';
+import { __ } from '../../js/utils.js';
 
 /**
  * Create/update category view
@@ -104,7 +93,7 @@ class CategoryView extends View {
             className: 'dd_fullwidth',
         });
         this.parentSelect.addItem({
-            id: 0, title: NO_PARENT_TITLE,
+            id: 0, title: __('CATEGORY_NO_PARENT'),
         });
 
         const { categories } = window.app.model;
@@ -121,11 +110,11 @@ class CategoryView extends View {
             className: 'dd_fullwidth',
         });
         this.typeSelect.append([
-            { id: 0, title: TITLE_ANY_TYPE },
-            { id: EXPENSE, title: TITLE_EXPENSE },
-            { id: INCOME, title: TITLE_INCOME },
-            { id: TRANSFER, title: TITLE_TRANSFER },
-            { id: DEBT, title: TITLE_DEBT },
+            { id: 0, title: __('TR_ANY') },
+            { id: EXPENSE, title: __('TR_EXPENSE') },
+            { id: INCOME, title: __('TR_INCOME') },
+            { id: TRANSFER, title: __('TR_TRANSFER') },
+            { id: DEBT, title: __('TR_DEBT') },
         ]);
     }
 
@@ -164,12 +153,12 @@ class CategoryView extends View {
 
         const { name } = state.data;
         if (name.length === 0) {
-            this.store.dispatch(actions.invalidateNameField(MSG_EMPTY_NAME));
+            this.store.dispatch(actions.invalidateNameField(__('CATEGORY_INVALID_NAME')));
             this.nameInp.focus();
         } else {
             const category = window.app.model.categories.findByName(name);
             if (category && state.original.id !== category.id) {
-                this.store.dispatch(actions.invalidateNameField(MSG_EXISTING_NAME));
+                this.store.dispatch(actions.invalidateNameField(__('CATEGORY_EXISTING_NAME')));
                 this.nameInp.focus();
             }
         }
@@ -250,8 +239,8 @@ class CategoryView extends View {
 
         ConfirmDialog.create({
             id: 'delete_warning',
-            title: TITLE_CATEGORY_DELETE,
-            content: MSG_CATEGORY_DELETE,
+            title: __('CATEGORY_DELETE'),
+            content: __('MSG_CATEGORY_DELETE'),
             onconfirm: () => this.deleteCategory(),
         });
     }

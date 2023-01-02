@@ -109,6 +109,7 @@ export class CategoryListView extends AppView {
     buildModel(cont) {
         const contextMenuVisible = cont.contextMenu.visible;
         const res = {
+            locale: cont.locale,
             items: cont.items.map((item) => item.model),
             loading: cont.loadingIndicator.visible,
             renderTime: cont.renderTime,
@@ -134,6 +135,9 @@ export class CategoryListView extends AppView {
         );
 
         const res = {
+            header: {
+                localeSelect: { value: model.locale },
+            },
             createBtn: { visible: isListMode },
             listModeBtn: { visible: !isListMode },
             loadingIndicator: { visible: model.loading },

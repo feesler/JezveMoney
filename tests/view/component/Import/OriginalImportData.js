@@ -9,19 +9,22 @@ import {
 } from 'jezve-test';
 import { App } from '../../../Application.js';
 import { ImportTemplate } from '../../../model/ImportTemplate.js';
-
-const labelsMap = {
-    mainAccount: 'Main account',
-    template: 'Template',
-    transactionAmount: 'Tr. amount',
-    transactionCurrency: 'Tr. currency',
-    accountAmount: 'Acc. amount',
-    accountCurrency: 'Acc. currency',
-    comment: 'Comment',
-    date: 'Date',
-};
+import { __ } from '../../../model/locale.js';
 
 export class OriginalImportData extends TestComponent {
+    getLabelsMap() {
+        return {
+            mainAccount: __('IMPORT_MAIN_ACCOUNT', App.view.locale),
+            template: __('TEMPLATE', App.view.locale),
+            accountAmount: __('COLUMN_ACCOUNT_AMOUNT', App.view.locale),
+            transactionAmount: __('COLUMN_TR_AMOUNT', App.view.locale),
+            accountCurrency: __('COLUMN_ACCOUNT_CURRENCY', App.view.locale),
+            transactionCurrency: __('COLUMN_TR_CURRENCY', App.view.locale),
+            date: __('COLUMN_DATE', App.view.locale),
+            comment: __('COLUMN_COMMENT', App.view.locale),
+        };
+    }
+
     async parseContent() {
         const res = {};
 
@@ -31,6 +34,7 @@ export class OriginalImportData extends TestComponent {
             res[property] = value;
         });
 
+        const labelsMap = this.getLabelsMap();
         const valid = Object.keys(labelsMap).every((key) => key in res);
         assert(valid, 'Invalid structure of import item');
 
@@ -49,6 +53,7 @@ export class OriginalImportData extends TestComponent {
             value: valueEl.textContent,
         }), labelElem, valueElem);
 
+        const labelsMap = this.getLabelsMap();
         res.property = Object.keys(labelsMap).find((key) => res.label === labelsMap[key]);
         assert(res.property, `Invalid label: '${res.label}'`);
 

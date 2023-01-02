@@ -27,9 +27,9 @@ class Statistics extends TemplateController
         $data["report"] = $selectedReport;
 
         $reportTypes = [
-            ["title" => "Categories", "value" => "category"],
-            ["title" => "Accounts", "value" => "account"],
-            ["title" => "Currencies", "value" => "currency"]
+            ["title" => __("STAT_REPORT_CATEGORIES"), "value" => "category"],
+            ["title" => __("STAT_REPORT_ACCOUNTS"), "value" => "account"],
+            ["title" => __("STAT_REPORT_CURRENCIES"), "value" => "currency"]
         ];
 
         $data["dateRange"] = [
@@ -122,11 +122,11 @@ class Statistics extends TemplateController
 
             $accCurr = ($account) ? $account->curr_id : $currMod->getIdByPos(0);
             if (!$accCurr) {
-                throw new \Error("No currencies available");
+                throw new \Error(__("ERR_NO_CURRENCIES"));
             }
         }
 
-        $data["titleString"] = "Jezve Money | Statistics";
+        $data["titleString"] = __("APP_NAME") . " | " . __("STATISTICS");
 
         $data["appProps"] = [
             "profile" => $this->getProfileData(),
@@ -149,7 +149,7 @@ class Statistics extends TemplateController
     protected function fail($msg = null)
     {
         if (!is_null($msg)) {
-            Message::set($msg);
+            Message::setError($msg);
         }
 
         setLocation(BASEURL);

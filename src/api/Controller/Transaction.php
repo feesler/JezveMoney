@@ -3,9 +3,6 @@
 namespace JezveMoney\App\API\Controller;
 
 use JezveMoney\Core\ApiListController;
-use JezveMoney\Core\Message;
-use JezveMoney\App\Model\AccountModel;
-use JezveMoney\App\Model\CurrencyModel;
 use JezveMoney\App\Model\TransactionModel;
 use JezveMoney\App\Item\TransactionItem;
 
@@ -43,9 +40,9 @@ class Transaction extends ApiListController
         parent::initAPI();
 
         $this->model = TransactionModel::getInstance();
-        $this->createErrorMsg = Message::get(ERR_TRANS_CREATE);
-        $this->updateErrorMsg = Message::get(ERR_TRANS_UPDATE);
-        $this->deleteErrorMsg = Message::get(ERR_TRANS_DELETE);
+        $this->createErrorMsg = __("ERR_TRANS_CREATE");
+        $this->updateErrorMsg = __("ERR_TRANS_UPDATE");
+        $this->deleteErrorMsg = __("ERR_TRANS_DELETE");
     }
 
 
@@ -142,19 +139,19 @@ class Transaction extends ApiListController
     public function setCategory()
     {
         if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
+            throw new \Error(__("ERR_INVALID_REQUEST"));
         }
 
         $request = $this->getRequestData();
         $reqData = checkFields($request, ["id", "category_id"]);
         if ($reqData === false) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
+            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
         }
 
         $this->begin();
 
         if (!$this->model->setCategory($reqData["id"], $reqData["category_id"])) {
-            throw new \Error(Message::get(ERR_TRANS_SET_CATEGORY));
+            throw new \Error(__("ERR_TRANS_SET_CATEGORY"));
         }
 
         $this->commit();
@@ -166,19 +163,19 @@ class Transaction extends ApiListController
     public function setPos()
     {
         if (!$this->isPOST()) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST));
+            throw new \Error(__("ERR_INVALID_REQUEST"));
         }
 
         $request = $this->getRequestData();
         $reqData = checkFields($request, ["id", "pos"]);
         if ($reqData === false) {
-            throw new \Error(Message::get(ERR_INVALID_REQUEST_DATA));
+            throw new \Error(__("ERR_INVALID_REQUEST_DATA"));
         }
 
         $this->begin();
 
         if (!$this->model->updatePosition($reqData["id"], $reqData["pos"])) {
-            throw new \Error(Message::get(ERR_TRANS_CHANGE_POS));
+            throw new \Error(__("ERR_TRANS_CHANGE_POS"));
         }
 
         $this->commit();

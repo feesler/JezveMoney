@@ -3,13 +3,12 @@ import {
     setEvents,
     isFunction,
 } from 'jezvejs';
+import { __ } from '../../../js/utils.js';
 import { API } from '../../../js/api/index.js';
 import { ProfileDialog } from '../ProfileDialog/ProfileDialog.js';
 
 /* CSS classes */
 const DIALOG_CLASS = 'name-dialog';
-/* Strings */
-const DIALOG_TITLE = 'Change name';
 
 const defaultProps = {
     onNameChanged: null,
@@ -37,7 +36,7 @@ export class ChangeNameDialog extends ProfileDialog {
 
         this.initDialog({
             id: 'chname_popup',
-            title: DIALOG_TITLE,
+            title: __('PROFILE_CHANGE_NAME'),
             className: DIALOG_CLASS,
         });
 
