@@ -10,6 +10,9 @@ use JezveMoney\App\Item\ImportTemplateItem;
 
 use function JezveMoney\Core\inSetCondition;
 
+/**
+ * Import template model
+ */
 class ImportTemplateModel extends CachedTable
 {
     use Singleton;
@@ -19,7 +22,11 @@ class ImportTemplateModel extends CachedTable
     private static $owner_id = 0;
 
     protected $tbl_name = "import_tpl";
+    protected $accModel = null;
 
+    /**
+     * Model initialization
+     */
     protected function onStart()
     {
         $this->dbObj = MySqlDB::getInstance();
@@ -29,9 +36,14 @@ class ImportTemplateModel extends CachedTable
         $this->accModel = AccountModel::getInstance();
     }
 
-
-    // Convert DB row to item object
-    protected function rowToObj($row)
+    /**
+     * Converts table row from database to object
+     *
+     * @param array $row - array of table row fields
+     *
+     * @return object|null
+     */
+    protected function rowToObj(array $row)
     {
         if (is_null($row)) {
             return null;
@@ -58,15 +70,25 @@ class ImportTemplateModel extends CachedTable
         return $res;
     }
 
-
-    // Called from CachedTable::updateCache() and return data query object
+    /**
+     * Returns data query object for CachedTable::updateCache()
+     *
+     * @return mysqli_result|bool
+     */
     protected function dataQuery()
     {
         return $this->dbObj->selectQ("*", $this->tbl_name, "user_id=" . self::$user_id, null, "id ASC");
     }
 
-
-    protected function validateParams($params, $item_id = 0)
+    /**
+     * Validates item fields before to send create/update request to database
+     *
+     * @param array $params - item fields
+     * @param int $item_id - item id
+     *
+     * @return array
+     */
+    protected function validateParams(array $params, int $item_id = 0)
     {
         $columnFields = [
             "date_col",
@@ -141,9 +163,15 @@ class ImportTemplateModel extends CachedTable
         return $res;
     }
 
-
-    // Check same item already exist
-    protected function isSameItemExist($params, $item_id = 0)
+    /**
+     * Checks same item already exist
+     *
+     * @param array $params - item fields
+     * @param int $item_id - item id
+     *
+     * @return bool
+     */
+    protected function isSameItemExist(array $params, int $item_id = 0)
     {
         if (!is_array($params) || !isset($params["name"]) || !isset($params["type_id"])) {
             return false;
@@ -157,9 +185,15 @@ class ImportTemplateModel extends CachedTable
         return ($foundItem && $foundItem->id != $item_id);
     }
 
-
-    // Preparations for item create
-    protected function preCreate($params, $isMultiple = false)
+    /**
+     * Checks item create conditions and returns array of expressions
+     *
+     * @param array $params - item fields
+     * @param bool $isMultiple - flag for multiple create
+     *
+     * @return array|null
+     */
+    protected function preCreate(array $params, bool $isMultiple = false)
     {
         $res = $this->validateParams($params);
 
@@ -169,9 +203,15 @@ class ImportTemplateModel extends CachedTable
         return $res;
     }
 
-
-    // Preparations for item update
-    protected function preUpdate($item_id, $params)
+    /**
+     * Checks update conditions and returns array of expressions
+     *
+     * @param int $item_id - item id
+     * @param array $params - item fields
+     *
+     * @return array
+     */
+    protected function preUpdate(int $item_id, array $params)
     {
         $item = $this->getItem($item_id);
         if (!$item) {
@@ -187,9 +227,14 @@ class ImportTemplateModel extends CachedTable
         return $res;
     }
 
-
-    // Preparations for item delete
-    protected function preDelete($items)
+    /**
+     * Checks delete conditions and returns bool result
+     *
+     * @param array $items - array of item ids to remove
+     *
+     * @return bool
+     */
+    protected function preDelete(array $items)
     {
         foreach ($items as $item_id) {
             // check item is exist
@@ -205,12 +250,8 @@ class ImportTemplateModel extends CachedTable
 
 
     // Return array of items
-    public function getData($params = [])
+    public function getData(array $params = [])
     {
-        if (!is_array($params)) {
-            $params = [];
-        }
-
         $res = [];
         if (!$this->checkCache()) {
             return $res;
@@ -234,7 +275,11 @@ class ImportTemplateModel extends CachedTable
         return $res;
     }
 
-    // Return array of template column types
+    /**
+     * Returns array of template column types
+     *
+     * @return array
+     */
     public function getColumnTypes()
     {
         return [

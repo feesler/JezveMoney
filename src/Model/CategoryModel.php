@@ -10,6 +10,9 @@ use JezveMoney\App\Item\CategoryItem;
 
 define("NO_CATEGORY", 0);
 
+/**
+ * Transaction category model
+ */
 class CategoryModel extends CachedTable
 {
     use Singleton;
@@ -19,6 +22,9 @@ class CategoryModel extends CachedTable
 
     protected $tbl_name = "categories";
 
+    /**
+     * Model initialization
+     */
     protected function onStart()
     {
         $uMod = UserModel::getInstance();
@@ -27,9 +33,14 @@ class CategoryModel extends CachedTable
         $this->dbObj = MySqlDB::getInstance();
     }
 
-
-    // Convert DB row to item object
-    protected function rowToObj($row)
+    /**
+     * Converts table row from database to object
+     *
+     * @param array $row - array of table row fields
+     *
+     * @return object|null
+     */
+    protected function rowToObj(array $row)
     {
         if (is_null($row)) {
             return null;
@@ -47,15 +58,25 @@ class CategoryModel extends CachedTable
         return $res;
     }
 
-
-    // Called from CachedTable::updateCache() and return data query object
+    /**
+     * Returns data query object for CachedTable::updateCache()
+     *
+     * @return mysqli_result|bool
+     */
     protected function dataQuery()
     {
         return $this->dbObj->selectQ("*", $this->tbl_name, "user_id=" . self::$user_id, null, "id ASC");
     }
 
-
-    protected function validateParams($params, $item_id = 0)
+    /**
+     * Validates item fields before to send create/update request to database
+     *
+     * @param array $params - item fields
+     * @param int $item_id - item id
+     *
+     * @return array
+     */
+    protected function validateParams(array $params, int $item_id = 0)
     {
         $avFields = ["parent_id", "name", "type"];
         $res = [];
@@ -98,9 +119,15 @@ class CategoryModel extends CachedTable
         return $res;
     }
 
-
-    // Check same item already exist
-    protected function isSameItemExist($params, $item_id = 0)
+    /**
+     * Checks same item already exist
+     *
+     * @param array $params - item fields
+     * @param int $item_id - item id
+     *
+     * @return bool
+     */
+    protected function isSameItemExist(array $params, int $item_id = 0)
     {
         if (!is_array($params) || !isset($params["name"])) {
             return false;
@@ -112,7 +139,7 @@ class CategoryModel extends CachedTable
 
 
     // Preparations for item create
-    protected function preCreate($params, $isMultiple = false)
+    protected function preCreate(array $params, bool $isMultiple = false)
     {
         $res = $this->validateParams($params);
         $res["createdate"] = $res["updatedate"] = date("Y-m-d H:i:s");
@@ -121,9 +148,15 @@ class CategoryModel extends CachedTable
         return $res;
     }
 
-
-    // Preparations for item update
-    protected function preUpdate($item_id, $params)
+    /**
+     * Checks update conditions and returns array of expressions
+     *
+     * @param int $item_id - item id
+     * @param array $params - item fields
+     *
+     * @return array
+     */
+    protected function preUpdate(int $item_id, array $params)
     {
         $item = $this->getItem($item_id);
         if (!$item) {
@@ -139,9 +172,14 @@ class CategoryModel extends CachedTable
         return $res;
     }
 
-
-    // Preparations for item delete
-    protected function preDelete($items)
+    /**
+     * Checks delete conditions and returns bool result
+     *
+     * @param array $items - array of item ids to remove
+     *
+     * @return bool
+     */
+    protected function preDelete(array $items)
     {
         $categoriesToDelete = [];
 
@@ -161,7 +199,7 @@ class CategoryModel extends CachedTable
     }
 
 
-    protected function postDelete($items)
+    protected function postDelete(mixed $items)
     {
         $this->cleanCache();
 
@@ -175,8 +213,9 @@ class CategoryModel extends CachedTable
     }
 
     /**
-     * Delete all categories of user
-     * @return [boolean]
+     * Removes all categories of user
+     *
+     * @return bool
      */
     public function reset()
     {
@@ -216,14 +255,11 @@ class CategoryModel extends CachedTable
      *
      * @return [int|CategoryItem]
      */
-    public function getData($params = [])
+    public function getData(array $params = [])
     {
         $res = [];
         if (!$this->checkCache()) {
             return $res;
-        }
-        if (!is_array($params)) {
-            $params = [];
         }
 
         $returnIds = isset($params["returnIds"]) ? $params["returnIds"] : false;
@@ -241,13 +277,20 @@ class CategoryModel extends CachedTable
     }
 
 
-    public function findByParent($parentId = 0)
+    public function findByParent(int $parentId = 0)
     {
         return $this->getData(["parent_id" => $parentId]);
     }
 
-
-    public function findByName($name, $caseSens = false)
+    /**
+     * Searches for category with specified name
+     *
+     * @param string $name - name of category to find
+     * @param bool $caseSens - case sensitive flag
+     *
+     * @return object|null
+     */
+    public function findByName(string $name, bool $caseSens = false)
     {
         if (is_empty($name)) {
             return null;

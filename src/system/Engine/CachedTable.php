@@ -13,12 +13,16 @@ abstract class CachedTable extends Model
         return static::$dcache;
     }
 
-
-    // Query data from DB and return result object
+    /**
+     * Query data from DB
+     *
+     * @return mysqli_result|bool
+     */
     abstract protected function dataQuery();
 
-
-    // Update cache
+    /**
+     * Updates cache
+     */
     protected function updateCache()
     {
         $this->cache = [];
@@ -40,7 +44,7 @@ abstract class CachedTable extends Model
     // Check state of cache and update if needed
     protected function checkCache()
     {
-        $this->cache =& $this->getDerivedCache();
+        $this->cache = &$this->getDerivedCache();
 
         if (is_null($this->cache)) {
             $this->updateCache();
@@ -51,7 +55,7 @@ abstract class CachedTable extends Model
 
 
     // Return specified object from cache
-    public function getItem($obj_id)
+    public function getItem(int $obj_id)
     {
         $obj_id = intval($obj_id);
         if (!$obj_id) {
@@ -69,15 +73,19 @@ abstract class CachedTable extends Model
         return $this->cache[$obj_id];
     }
 
-
-    // Clean cached data. Next access to the cache will request update of data from DB
+    /**
+     * Cleans cache. Next access to the cache will request update of data from DB
+     */
     protected function cleanCache()
     {
         $this->cache = null;
     }
 
-
-    // Return count of objects
+    /**
+     * Returns count of items in the cache
+     *
+     * @return int
+     */
     public function getCount()
     {
         if (!$this->checkCache()) {
@@ -87,8 +95,11 @@ abstract class CachedTable extends Model
         return count($this->cache);
     }
 
-
-    // Return latest id from set of objects
+    /**
+     * Returns latest id from of items in the cache
+     *
+     * @return int
+     */
     public function getLatestId()
     {
         if (!$this->checkCache()) {
@@ -103,9 +114,14 @@ abstract class CachedTable extends Model
         return $res;
     }
 
-
-    // Check is specified object is exist
-    public function isExist($obj_id)
+    /**
+     * Returns true if specified item is exist
+     *
+     * @param int $obj_id - item id
+     *
+     * @return bool
+     */
+    public function isExist(int $obj_id)
     {
         $obj_id = intval($obj_id);
         if (!$obj_id) {
@@ -119,9 +135,14 @@ abstract class CachedTable extends Model
         return isset($this->cache[$obj_id]);
     }
 
-
-    // Return id of item by specified position
-    public function getIdByPos($position)
+    /**
+     * Returns id of item at specified position
+     *
+     * @param int $position
+     *
+     * @return int
+     */
+    public function getIdByPos(int $position)
     {
         if (!$this->checkCache()) {
             return 0;
@@ -136,19 +157,19 @@ abstract class CachedTable extends Model
     }
 
 
-    protected function postCreate($item_id)
+    protected function postCreate(mixed $item_id)
     {
         $this->cleanCache();
     }
 
 
-    protected function postUpdate($item_id)
+    protected function postUpdate(int $item_id)
     {
         $this->cleanCache();
     }
 
 
-    protected function postDelete($item_id)
+    protected function postDelete(array $item_id)
     {
         $this->cleanCache();
     }

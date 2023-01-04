@@ -6,7 +6,7 @@ APP_DOMAIN - application domain
 APP_PROTOCOL - http:// or https://
 APP_ROOT - path to the root directory
 APP_PATH - relative path for cookies
-PRODUCTION - is production (boolean)
+PRODUCTION - is production (bool)
 LOCAL_DEV - is local development environment
 BASEURL - base URL for project
 TPL_PATH - path to the templates directory

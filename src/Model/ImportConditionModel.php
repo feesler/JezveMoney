@@ -8,8 +8,6 @@ use JezveMoney\Core\Singleton;
 use JezveMoney\Core\CachedInstance;
 use JezveMoney\App\Item\ImportConditionItem;
 
-use function JezveMoney\Core\qnull;
-
 // Rule field
 define("IMPORT_COND_FIELD_MAIN_ACCOUNT", 1);
 define("IMPORT_COND_FIELD_TPL", 2);
@@ -28,6 +26,9 @@ define("IMPORT_COND_OP_GREATER", 5);
 // Rule flags
 define("IMPORT_COND_OP_FIELD_FLAG", 0x01);
 
+/**
+ * Import rule condition model
+ */
 class ImportConditionModel extends CachedTable
 {
     use Singleton;
@@ -35,7 +36,6 @@ class ImportConditionModel extends CachedTable
 
     private static $user_id = 0;
 
-    protected $tbl_name = "import_cond";
     protected static $availCondFields = [
         IMPORT_COND_FIELD_MAIN_ACCOUNT,
         IMPORT_COND_FIELD_TPL,
@@ -55,7 +55,12 @@ class ImportConditionModel extends CachedTable
         IMPORT_COND_OP_GREATER,
     ];
 
+    protected $tbl_name = "import_cond";
+    protected $ruleModel = null;
 
+    /**
+     * Model initialization
+     */
     protected function onStart()
     {
         $uMod = UserModel::getInstance();
@@ -65,9 +70,14 @@ class ImportConditionModel extends CachedTable
         $this->ruleModel = ImportRuleModel::getInstance();
     }
 
-
-    // Convert DB row to item object
-    protected function rowToObj($row)
+    /**
+     * Converts table row from database to object
+     *
+     * @param array $row - array of table row fields
+     *
+     * @return object|null
+     */
+    protected function rowToObj(array $row)
     {
         if (is_null($row)) {
             return null;
@@ -87,15 +97,25 @@ class ImportConditionModel extends CachedTable
         return $res;
     }
 
-
-    // Called from CachedTable::updateCache() and return data query object
+    /**
+     * Returns data query object for CachedTable::updateCache()
+     *
+     * @return mysqli_result|bool
+     */
     protected function dataQuery()
     {
         return $this->dbObj->selectQ("*", $this->tbl_name);
     }
 
-
-    protected function validateParams($params, $item_id = 0)
+    /**
+     * Validates item fields before to send create/update request to database
+     *
+     * @param array $params - item fields
+     * @param int $item_id - item id
+     *
+     * @return array
+     */
+    protected function validateParams(array $params, int $item_id = 0)
     {
         $avFields = [
             "rule_id",
@@ -147,9 +167,15 @@ class ImportConditionModel extends CachedTable
         return $res;
     }
 
-
-    // Check same item already exist
-    protected function isSameItemExist($params, $item_id = 0)
+    /**
+     * Checks same item already exist
+     *
+     * @param array $params - item fields
+     * @param int $item_id - item id
+     *
+     * @return bool
+     */
+    protected function isSameItemExist(array $params, int $item_id = 0)
     {
         if (!is_array($params)) {
             return false;
@@ -165,9 +191,15 @@ class ImportConditionModel extends CachedTable
         return ($foundItem && $foundItem->id != $item_id);
     }
 
-
-    // Preparations for item create
-    protected function preCreate($params, $isMultiple = false)
+    /**
+     * Checks item create conditions and returns array of expressions
+     *
+     * @param array $params - item fields
+     * @param bool $isMultiple - flag for multiple create
+     *
+     * @return array|null
+     */
+    protected function preCreate(array $params, bool $isMultiple = false)
     {
         $res = $this->validateParams($params);
 
@@ -177,9 +209,15 @@ class ImportConditionModel extends CachedTable
         return $res;
     }
 
-
-    // Preparations for item update
-    protected function preUpdate($item_id, $params)
+    /**
+     * Checks update conditions and returns array of expressions
+     *
+     * @param int $item_id - item id
+     * @param array $params - item fields
+     *
+     * @return array
+     */
+    protected function preUpdate(int $item_id, array $params)
     {
         $item = $this->getItem($item_id);
         if (!$item) {
@@ -195,9 +233,14 @@ class ImportConditionModel extends CachedTable
         return $res;
     }
 
-
-    // Preparations for item delete
-    protected function preDelete($items)
+    /**
+     * Checks delete conditions and returns bool result
+     *
+     * @param array $items - array of item ids to remove
+     *
+     * @return bool
+     */
+    protected function preDelete(array $items)
     {
         foreach ($items as $item_id) {
             // check item is exist
@@ -210,14 +253,15 @@ class ImportConditionModel extends CachedTable
         return true;
     }
 
-
-    // Return array of items
-    public function getData($params = [])
+    /**
+     * Returns array of conditions
+     *
+     * @param array{string} $params
+     *
+     * @return array[PersonItem]
+     */
+    public function getData(array $params = [])
     {
-        if (!is_array($params)) {
-            $params = [];
-        }
-
         $requestAll = (isset($params["full"]) && $params["full"] == true && UserModel::isAdminUser());
         $ruleFilter = isset($params["rule"]) ? intval($params["rule"]) : 0;
         $fieldFilter = isset($params["field"]) ? intval($params["field"]) : 0;

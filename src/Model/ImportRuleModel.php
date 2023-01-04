@@ -8,6 +8,9 @@ use JezveMoney\Core\Singleton;
 use JezveMoney\Core\CachedInstance;
 use JezveMoney\App\Item\ImportRuleItem;
 
+/**
+ * Import rules model
+ */
 class ImportRuleModel extends CachedTable
 {
     use Singleton;
@@ -15,7 +18,12 @@ class ImportRuleModel extends CachedTable
 
     private static $user_id = 0;
     protected $tbl_name = "import_rule";
+    protected $condModel = null;
+    protected $actionModel = null;
 
+    /**
+     * Model initialization
+     */
     protected function onStart()
     {
         $uMod = UserModel::getInstance();
@@ -26,9 +34,14 @@ class ImportRuleModel extends CachedTable
         $this->actionModel = ImportActionModel::getInstance();
     }
 
-
-    // Convert DB row to item object
-    protected function rowToObj($row)
+    /**
+     * Converts table row from database to object
+     *
+     * @param array $row - array of table row fields
+     *
+     * @return object|null
+     */
+    protected function rowToObj(array $row)
     {
         if (is_null($row)) {
             return null;
@@ -44,15 +57,25 @@ class ImportRuleModel extends CachedTable
         return $res;
     }
 
-
-    // Called from CachedTable::updateCache() and return data query object
+    /**
+     * Returns data query object for CachedTable::updateCache()
+     *
+     * @return mysqli_result|bool
+     */
     protected function dataQuery()
     {
         return $this->dbObj->selectQ("*", $this->tbl_name, "user_id=" . self::$user_id, null, "id ASC");
     }
 
-
-    protected function validateParams($params, $item_id = 0)
+    /**
+     * Validates item fields before to send create/update request to database
+     *
+     * @param array $params - item fields
+     * @param int $item_id - item id
+     *
+     * @return array
+     */
+    protected function validateParams(array $params, int $item_id = 0)
     {
         $avFields = ["flags"];
         $res = [];
@@ -69,9 +92,15 @@ class ImportRuleModel extends CachedTable
         return $res;
     }
 
-
-    // Preparations for item create
-    protected function preCreate($params, $isMultiple = false)
+    /**
+     * Checks item create conditions and returns array of expressions
+     *
+     * @param array $params - item fields
+     * @param bool $isMultiple - flag for multiple create
+     *
+     * @return array|null
+     */
+    protected function preCreate(array $params, bool $isMultiple = false)
     {
         $res = $this->validateParams($params);
 
@@ -81,9 +110,15 @@ class ImportRuleModel extends CachedTable
         return $res;
     }
 
-
-    // Preparations for item update
-    protected function preUpdate($item_id, $params)
+    /**
+     * Checks update conditions and returns array of expressions
+     *
+     * @param int $item_id - item id
+     * @param array $params - item fields
+     *
+     * @return array
+     */
+    protected function preUpdate(int $item_id, array $params)
     {
         $item = $this->getItem($item_id);
         if (!$item) {
@@ -99,9 +134,14 @@ class ImportRuleModel extends CachedTable
         return $res;
     }
 
-
-    // Preparations for item delete
-    protected function preDelete($items)
+    /**
+     * Checks delete conditions and returns bool result
+     *
+     * @param array $items - array of item ids to remove
+     *
+     * @return bool
+     */
+    protected function preDelete(array $items)
     {
         foreach ($items as $item_id) {
             // check item is exist
@@ -117,14 +157,15 @@ class ImportRuleModel extends CachedTable
         return $res;
     }
 
-
-    // Return array of items
-    public function getData($params = [])
+    /**
+     * Returns array of items
+     *
+     * @param array $params
+     *
+     * @return array[ImportRuleItem]|null
+     */
+    public function getData(array $params = [])
     {
-        if (!is_array($params)) {
-            $params = [];
-        }
-
         $requestAll = (isset($params["full"]) && $params["full"] == true && UserModel::isAdminUser());
         $addExtended = isset($params["extended"]) && $params["extended"] == true;
 
@@ -158,7 +199,11 @@ class ImportRuleModel extends CachedTable
         return $res;
     }
 
-    // Delete import rules without conditions or actions
+    /**
+     * Removes import rules without conditions or actions
+     *
+     * @return bool
+     */
     protected function removeEmptyRules()
     {
         $items = $this->getData(["extended" => true]);
@@ -177,8 +222,15 @@ class ImportRuleModel extends CachedTable
         return $this->del($itemsToDelete);
     }
 
-    // Update import rule conditiona and actions
-    public function onTemplateDelete($templates)
+    /**
+     * Handles import template(s) delete event
+     * Removes conditions related to removed templates
+     *
+     * @param mixed $templates
+     *
+     * @return bool
+     */
+    public function onTemplateDelete(mixed $templates)
     {
         if (is_null($templates)) {
             return false;
@@ -190,8 +242,15 @@ class ImportRuleModel extends CachedTable
         return $res;
     }
 
-    // Delete conditions and actions related to removed accounts
-    public function onAccountDelete($accounts)
+    /**
+     * Handles account(s) delete event
+     * Removes conditions and actions related to removed accounts
+     *
+     * @param mixed $accounts
+     *
+     * @return bool
+     */
+    public function onAccountDelete(mixed $accounts)
     {
         if (is_null($accounts)) {
             return false;

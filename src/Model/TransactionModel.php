@@ -33,6 +33,9 @@ const DEFAULT_REPORT_TYPE = "category";
 const DEFAULT_TRANSACTION_TYPE = EXPENSE;
 const DEFAULT_GROUP_TYPE = GROUP_BY_WEEK;
 
+/**
+ * Transaction model
+ */
 class TransactionModel extends CachedTable
 {
     use Singleton;
@@ -59,13 +62,16 @@ class TransactionModel extends CachedTable
     protected $tbl_name = "transactions";
     protected $accModel = null;
     protected $currMod = null;
+    protected $catModel = null;
     protected $affectedTransactions = null;
     protected $balanceChanges = null;
     protected $latestPos = null;
     protected $removedItems = null;
     protected $originalTrans = null;
 
-
+    /**
+     * Model initialization
+     */
     protected function onStart()
     {
         $this->dbObj = MySqlDB::getInstance();
@@ -79,8 +85,13 @@ class TransactionModel extends CachedTable
         $this->catModel = CategoryModel::getInstance();
     }
 
-
-    // Convert DB row to item object
+    /**
+     * Converts table row from database to object
+     *
+     * @param array $row
+     *
+     * @return object|null
+     */
     protected function rowToObj($row)
     {
         if (is_null($row)) {
@@ -109,14 +120,24 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-
-    // Called from CachedTable::updateCache() and return data query object
+    /**
+     * Returns data query object for CachedTable::updateCache()
+     *
+     * @return mysqli_result|bool
+     */
     protected function dataQuery()
     {
         return $this->dbObj->selectQ("*", $this->tbl_name, "user_id=" . self::$user_id, null, "pos ASC");
     }
 
-
+    /**
+     * Validates item fields before to send create/update request to database
+     *
+     * @param array $params
+     * @param int $item_id
+     *
+     * @return array
+     */
     protected function validateParams($params, $item_id = false)
     {
         $avFields = [
@@ -434,9 +455,15 @@ class TransactionModel extends CachedTable
         });
     }
 
-
-    // Preparations for item create
-    protected function preCreate($params, $isMultiple = false)
+    /**
+     * Checks item create conditions and returns array of expressions
+     *
+     * @param array $params - item fields
+     * @param bool $isMultiple - flag for multiple create
+     *
+     * @return array|null
+     */
+    protected function preCreate(array $params, bool $isMultiple = false)
     {
         $res = $this->validateParams($params);
 
@@ -567,9 +594,15 @@ class TransactionModel extends CachedTable
         return $res;
     }
 
-
-    // Preparations for item update
-    protected function preUpdate($item_id, $params)
+    /**
+     * Checks update conditions and returns array of expressions
+     *
+     * @param int $item_id - item id
+     * @param array $params - item fields
+     *
+     * @return array
+     */
+    protected function preUpdate(int $item_id, array $params)
     {
         $item = $this->getItem($item_id);
         if (!$item) {
@@ -847,12 +880,13 @@ class TransactionModel extends CachedTable
 
     /**
      * Update result balance values of specified transactions
-     * @param mixed $accounts - id or arrays of account ids to filter transactions by
-     * @param mixed $pos - position of transaction to start update from, inclusively
      *
-     * @return [boolean]
+     * @param mixed $accounts - id or arrays of account ids to filter transactions by
+     * @param int $pos - position of transaction to start update from, inclusively
+     *
+     * @return bool
      */
-    protected function updateResults($accounts, $pos)
+    protected function updateResults(mixed $accounts, int $pos)
     {
         $accounts = skipZeros($accounts);
 
@@ -1567,14 +1601,10 @@ class TransactionModel extends CachedTable
      *      range - count of pages to return. Default is 1
      *    ]
      *
-     * @return [int|CategoryItem]
+     * @return array
      */
-    public function getData($params = null)
+    public function getData(array $params = [])
     {
-        if (is_null($params)) {
-            $params = [];
-        }
-
         $res = [];
 
         if (!self::$user_id) {

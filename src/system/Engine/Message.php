@@ -15,7 +15,7 @@ class Message
      * @param string $message - message string
      * @param int $msgType - message type
      *
-     * @return boolean
+     * @return bool
      */
     public static function set($message, $msgType = MSG_TYPE_NONE)
     {
@@ -32,7 +32,7 @@ class Message
      *
      * @param string $message - message string
      *
-     * @return boolean
+     * @return bool
      */
     public static function setSuccess($message)
     {
@@ -44,7 +44,7 @@ class Message
      *
      * @param string $message - message string
      *
-     * @return boolean
+     * @return bool
      */
     public static function setError($message)
     {

@@ -8,8 +8,6 @@ use JezveMoney\Core\Singleton;
 use JezveMoney\Core\CachedInstance;
 use JezveMoney\App\Item\ImportActionItem;
 
-use function JezveMoney\Core\qnull;
-
 // Action types
 // Consider not to change date
 define("IMPORT_ACTION_SET_TR_TYPE", 1);
@@ -20,6 +18,9 @@ define("IMPORT_ACTION_SET_DEST_AMOUNT", 5);
 define("IMPORT_ACTION_SET_COMMENT", 6);
 define("IMPORT_ACTION_SET_CATEGORY", 7);
 
+/**
+ * Import rule action model
+ */
 class ImportActionModel extends CachedTable
 {
     use Singleton;
@@ -27,7 +28,6 @@ class ImportActionModel extends CachedTable
 
     private static $user_id = 0;
 
-    protected $tbl_name = "import_act";
     protected static $availActions = [
         IMPORT_ACTION_SET_TR_TYPE,
         IMPORT_ACTION_SET_ACCOUNT,
@@ -38,7 +38,14 @@ class ImportActionModel extends CachedTable
         IMPORT_ACTION_SET_CATEGORY,
     ];
 
+    protected $tbl_name = "import_act";
+    protected $accModel = null;
+    protected $personModel = null;
+    protected $ruleModel = null;
 
+    /**
+     * Model initialization
+     */
     protected function onStart()
     {
         $uMod = UserModel::getInstance();
@@ -50,8 +57,13 @@ class ImportActionModel extends CachedTable
         $this->ruleModel = ImportRuleModel::getInstance();
     }
 
-
-    // Convert DB row to item object
+    /**
+     * Converts table row from database to object
+     *
+     * @param array $row - array of table row fields
+     *
+     * @return object|null
+     */
     protected function rowToObj($row)
     {
         if (is_null($row)) {
@@ -398,11 +410,6 @@ class ImportActionModel extends CachedTable
         }
 
         return $this->del($itemsToDelete);
-    }
-
-    public static function getActions()
-    {
-        return convertToObjectArray(self::$actionNames);
     }
 
 
