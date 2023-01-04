@@ -31,7 +31,7 @@ export const create = async () => {
         const expAccount = {
             name: '',
             owner_id: App.owner_id,
-            initbalance: '0',
+            initbalance: '',
             balance: 0,
             curr_id: 1,
             icon_id: 0,

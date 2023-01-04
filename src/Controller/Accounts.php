@@ -71,7 +71,7 @@ class Accounts extends TemplateController
         $accInfo->name = "";
         $accInfo->curr_id = $currMod->getIdByPos(0);
         $accInfo->balance = 0;
-        $accInfo->initbalance = 0;
+        $accInfo->initbalance = "";
         $accInfo->icon_id = 0;
         $accInfo->icon = null;
         $accInfo->flags = 0;
@@ -87,7 +87,7 @@ class Accounts extends TemplateController
             "id" => "accountTile",
             "title" => __("ACCOUNT_NAME_NEW"),
             "subtitle" => $currMod->format($accInfo->balance, $accInfo->curr_id),
-            "icon" => $accInfo->icon
+            "icon" => $accInfo->icon,
         ];
 
         $iconModel = IconModel::getInstance();

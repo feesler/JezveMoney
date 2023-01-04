@@ -2,7 +2,6 @@ import 'jezvejs/style';
 import 'jezvejs/style/InputGroup';
 import {
     ge,
-    isNum,
     setEvents,
     insertAfter,
     enable,
@@ -159,7 +158,7 @@ class AccountView extends View {
             }
         }
 
-        if (initbalance.length === 0 || !isNum(initbalance)) {
+        if (initbalance.length === 0) {
             this.store.dispatch(actions.invalidateInitialBalanceField());
             this.balanceInp.focus();
         }
@@ -181,7 +180,7 @@ class AccountView extends View {
         const { data, original } = state;
         const account = {
             name: data.name,
-            initbalance: data.initbalance,
+            initbalance: data.fInitBalance,
             curr_id: data.curr_id,
             icon_id: data.icon_id,
             flags: original.flags,
@@ -193,9 +192,9 @@ class AccountView extends View {
 
         try {
             if (isUpdate) {
-                await API.account.update(data);
+                await API.account.update(account);
             } else {
-                await API.account.create(data);
+                await API.account.create(account);
             }
 
             const { baseURL } = window.app;
