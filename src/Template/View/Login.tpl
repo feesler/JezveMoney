@@ -29,7 +29,7 @@
                     </label>
                 </div>
                 <div class="form-controls std_margin">
-                    <input class="btn submit-btn" type="submit" value="Log in">
+                    <input class="btn submit-btn" type="submit" value="<?= __("LOG_IN_BUTTON") ?>">
                     <a class="alter-link" href="<?= BASEURL ?>register/"><?= __("REGISTRATION") ?></a>
                 </div>
             </form>

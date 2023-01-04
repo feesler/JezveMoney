@@ -122,7 +122,7 @@ class TransactionListView extends View {
         } else {
             this.accountDropDown = DropDown.create({
                 elem: 'acc_id',
-                placeholder: 'Type to filter',
+                placeholder: __('TYPE_TO_FILTER'),
                 enableFilter: true,
                 noResultsMessage: 'Nothing found',
                 onitemselect: (obj) => this.onAccountChange(obj),
@@ -158,9 +158,9 @@ class TransactionListView extends View {
         } else {
             this.categoriesDropDown = CategorySelect.create({
                 elem: 'category_id',
-                placeholder: 'Type to filter',
+                placeholder: __('TYPE_TO_FILTER'),
                 enableFilter: true,
-                noResultsMessage: 'Nothing found',
+                noResultsMessage: __('NOT_FOUND'),
                 onitemselect: (obj) => this.onCategoryChange(obj),
                 onchange: (obj) => this.onCategoryChange(obj),
                 className: 'dd_fullwidth',
@@ -176,7 +176,7 @@ class TransactionListView extends View {
 
         // Search input
         this.searchInput = SearchInput.create({
-            placeholder: 'Type to filter',
+            placeholder: __('TYPE_TO_FILTER'),
             onChange: debounce((val) => this.onSearchInputChange(val), SEARCH_DELAY),
         });
         this.searchFilter.append(this.searchInput.elem);

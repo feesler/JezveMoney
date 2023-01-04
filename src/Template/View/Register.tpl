@@ -26,8 +26,8 @@
                                     <div class="invalid-feedback"><?= __("REG_INVALID_PASSWORD") ?></div>
                                 </div>
                                 <div class="form-controls std_margin">
-                                    <input class="btn submit-btn" type="submit" value="Submit">
-                                    <a class="alter-link" href="<?= BASEURL ?>login/"><?= __("LOG_IN") ?></a>
+                                    <input class="btn submit-btn" type="submit" value="<?= __("SUBMIT") ?>">
+                                    <a class="alter-link" href="<?= BASEURL ?>login/"><?= __("CANCEL") ?></a>
                                 </div>
                             </form>
                         </div>

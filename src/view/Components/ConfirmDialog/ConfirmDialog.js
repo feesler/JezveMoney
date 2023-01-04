@@ -1,5 +1,6 @@
 import { isFunction, Component } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
+import { __ } from '../../js/utils.js';
 
 const defaultProps = {
     destroyOnResult: true,
@@ -16,6 +17,19 @@ const defaultProps = {
  * @param {Function} props.onreject - reject callback function
  */
 export class ConfirmDialog extends Component {
+    static create(props) {
+        let res;
+
+        try {
+            res = new ConfirmDialog(props);
+            res.show();
+        } catch (e) {
+            res = null;
+        }
+
+        return res;
+    }
+
     constructor(props = {}) {
         super({
             ...defaultProps,
@@ -34,8 +48,8 @@ export class ConfirmDialog extends Component {
             title: this.props.title,
             content: this.props.content,
             btn: {
-                okBtn: { value: 'Ok', onclick: () => this.onResult(true) },
-                cancelBtn: { value: 'Cancel', onclick: () => this.onResult(false) },
+                okBtn: { value: __('OK'), onclick: () => this.onResult(true) },
+                cancelBtn: { value: __('CANCEL'), onclick: () => this.onResult(false) },
             },
         };
         if ('id' in this.props) {
@@ -49,20 +63,6 @@ export class ConfirmDialog extends Component {
         if (!this.popup) {
             throw new Error('Failed to create popup');
         }
-    }
-
-    /** Create ConfirmDialog and show */
-    static create(props) {
-        let res;
-
-        try {
-            res = new ConfirmDialog(props);
-            res.show();
-        } catch (e) {
-            res = null;
-        }
-
-        return res;
     }
 
     /**
