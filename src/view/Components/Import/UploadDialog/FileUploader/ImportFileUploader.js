@@ -3,6 +3,7 @@ import {
     show,
     isFunction,
     Component,
+    setEvents,
 } from 'jezvejs';
 import { Checkbox } from 'jezvejs/Checkbox';
 import { __ } from '../../../../js/utils.js';
@@ -33,7 +34,7 @@ export class ImportFileUploader extends Component {
             throw new Error('Failed to initialize import file uploader');
         }
 
-        this.inputElem.addEventListener('change', () => this.onChangeUploadFile());
+        setEvents(this.inputElem, { change: () => this.onChangeUploadFile() });
 
         this.initUploadExtras();
     }
@@ -139,8 +140,8 @@ export class ImportFileUploader extends Component {
             return;
         }
 
-        this.serverAddressInput.addEventListener('input', () => this.onInputServerAddress());
-        this.uploadBtn.addEventListener('click', () => this.uploadFromServer());
+        setEvents(this.serverAddressInput, { input: () => this.onInputServerAddress() });
+        setEvents(this.uploadBtn, { click: () => this.uploadFromServer() });
 
         this.state = {
             ...this.state,

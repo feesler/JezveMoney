@@ -4,6 +4,7 @@ import {
     createElement,
     show,
     enable,
+    setEvents,
 } from 'jezvejs';
 import { Application } from '../../../../view/js/Application.js';
 import '../../../../view/css/app.scss';
@@ -41,7 +42,7 @@ class AdminUserListView extends AdminListView {
 
         this.changePassBtn = ge('passbtn');
         if (this.changePassBtn) {
-            this.changePassBtn.addEventListener('click', this.setUserPass.bind(this));
+            setEvents(this.changePassBtn, { click: (e) => this.setUserPass(e) });
         }
     }
 

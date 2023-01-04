@@ -3,6 +3,8 @@ import {
     isFunction,
     show,
     Component,
+    setEvents,
+    removeEvents,
 } from 'jezvejs';
 import { Icon } from 'jezvejs/Icon';
 import { Popup } from 'jezvejs/Popup';
@@ -47,6 +49,12 @@ export class ImportUploadDialog extends Component {
         this.dragLeaveHandler = (e) => this.onDragLeave(e);
         this.dragOverHandler = (e) => this.onDragOver(e);
         this.dropHandler = (e) => this.onDrop(e);
+        this.fileDropEvents = {
+            dragenter: this.dragEnterHandler,
+            dragleave: this.dragLeaveHandler,
+            dragover: this.dragOverHandler,
+            drop: this.dropHandler,
+        };
 
         this.init();
     }
@@ -85,17 +93,11 @@ export class ImportUploadDialog extends Component {
     }
 
     setDragHandlers() {
-        this.elem.addEventListener('dragenter', this.dragEnterHandler, false);
-        this.elem.addEventListener('dragleave', this.dragLeaveHandler, false);
-        this.elem.addEventListener('dragover', this.dragOverHandler, false);
-        this.elem.addEventListener('drop', this.dropHandler, false);
+        setEvents(this.elem, this.fileDropEvents, false);
     }
 
     removeDragHandlers() {
-        this.elem.removeEventListener('dragenter', this.dragEnterHandler, false);
-        this.elem.removeEventListener('dragleave', this.dragLeaveHandler, false);
-        this.elem.removeEventListener('dragover', this.dragOverHandler, false);
-        this.elem.removeEventListener('drop', this.dropHandler, false);
+        removeEvents(this.elem, this.fileDropEvents, false);
     }
 
     /** Show/hide dialog */

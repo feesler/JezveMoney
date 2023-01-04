@@ -1,4 +1,9 @@
-import { isFunction, enable, Component } from 'jezvejs';
+import {
+    isFunction,
+    enable,
+    Component,
+    setEvents,
+} from 'jezvejs';
 
 /**
  * TileInfoItem component
@@ -20,7 +25,7 @@ export class TileInfoItem extends Component {
 
         this.buttonElem = this.elem.querySelector('button');
         if (this.buttonElem && isFunction(this.props.onclick)) {
-            this.buttonElem.addEventListener('click', this.props.onclick);
+            setEvents(this.buttonElem, { click: this.props.onclick });
         }
     }
 

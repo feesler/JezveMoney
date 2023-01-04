@@ -1,4 +1,9 @@
-import { ge, isFunction, Component } from 'jezvejs';
+import {
+    ge,
+    isFunction,
+    Component,
+    setEvents,
+} from 'jezvejs';
 import { IconButton } from 'jezvejs/IconButton';
 import './style.scss';
 
@@ -40,7 +45,7 @@ export class Toolbar extends Component {
             throw new Error('Invalid element specified');
         }
 
-        this.elem.addEventListener('click', () => this.onClick());
+        setEvents(this.elem, { click: () => this.onClick() });
 
         const editBtn = ge('edit_btn');
         if (editBtn) {

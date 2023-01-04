@@ -4,6 +4,7 @@ import {
     insertAfter,
     isFunction,
     Component,
+    setEvents,
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
 import { PopupMenu } from 'jezvejs/PopupMenu';
@@ -91,7 +92,7 @@ export class ImportRulesDialog extends Component {
         });
         show(this.elem, true);
 
-        this.createRuleBtn.addEventListener('click', () => this.onCreateRuleClick());
+        setEvents(this.createRuleBtn, { click: () => this.onCreateRuleClick() });
 
         this.createContextMenu();
 
