@@ -1,4 +1,4 @@
-import { setBlock, assert, TestStory } from 'jezve-test';
+import { setBlock, TestStory } from 'jezve-test';
 import {
     EXPENSE,
     INCOME,
@@ -7,20 +7,16 @@ import {
     availTransTypes,
 } from '../../../model/Transaction.js';
 import { api } from '../../../model/api.js';
-import * as TransactionTests from '../../../run/transaction.js';
-import * as AccountTests from '../../../run/account.js';
 import { App } from '../../../Application.js';
-
+import * as TransactionTests from '../../../run/transaction.js';
 import * as expenseTests from './expense.js';
 import * as incomeTests from './income.js';
 import * as transferTests from './transfer.js';
 import * as debtTests from './debt.js';
+import * as AccountTests from '../../../run/account.js';
 
 export class TransactionsStory extends TestStory {
     async beforeRun() {
-        const HIDDEN_ACCOUNT_NAME = 'HIDDEN_ACC';
-        const HIDDEN_PERSON_NAME = 'Hidden person';
-
         await App.scenario.prepareTestUser();
         await App.scenario.resetData({
             accounts: true,
@@ -31,13 +27,6 @@ export class TransactionsStory extends TestStory {
         await App.scenario.createAccounts();
         await App.scenario.createPersons();
         await App.scenario.createCategories();
-
-        const [hiddenAccountInd] = App.state.getAccountIndexesByNames(HIDDEN_ACCOUNT_NAME);
-        assert(hiddenAccountInd !== -1, `Account '${HIDDEN_ACCOUNT_NAME}' not found`);
-        App.scenario.HIDDEN_ACCOUNT_IND = hiddenAccountInd;
-        const [hiddenPersonInd] = App.state.getPersonIndexesByNames(HIDDEN_PERSON_NAME);
-        assert(hiddenPersonInd !== -1, `Person '${HIDDEN_PERSON_NAME}' not found`);
-        App.scenario.HIDDEN_PERSON_IND = hiddenPersonInd;
     }
 
     async run() {
@@ -100,6 +89,8 @@ export class TransactionsStory extends TestStory {
             TRANSPORT_CATEGORY,
             RUB,
             KRW,
+            CARD_RUB,
+            HIDDEN_ACC,
         } = App.scenario;
 
         await TransactionTests.createFromAccountAndSubmit(0, [
@@ -121,14 +112,14 @@ export class TransactionsStory extends TestStory {
         ]);
 
         await TransactionTests.createFromAccountAndSubmit(1, [
-            { action: 'changeSrcAccountByPos', data: 4 },
+            { action: 'changeSrcAccount', data: CARD_RUB },
             { action: 'inputDestAmount', data: '99.99' },
             { action: 'changeDate', data: App.dates.monthAgo },
         ]);
 
         // Check create transaction with hidden account
         await TransactionTests.createFromAccountAndSubmit(0, [
-            { action: 'changeSrcAccountByPos', data: App.scenario.HIDDEN_ACCOUNT_IND },
+            { action: 'changeSrcAccount', data: HIDDEN_ACC },
             { action: 'inputDestAmount', data: '0.01' },
         ]);
 
@@ -163,7 +154,13 @@ export class TransactionsStory extends TestStory {
     async createIncome() {
         setBlock('Create income transactions', 1);
 
-        const { INVEST_CATEGORY, USD, KRW } = App.scenario;
+        const {
+            USD,
+            KRW,
+            CARD_RUB,
+            HIDDEN_ACC,
+            INVEST_CATEGORY,
+        } = App.scenario;
 
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: INCOME },
@@ -189,7 +186,7 @@ export class TransactionsStory extends TestStory {
 
         await TransactionTests.createFromAccountAndSubmit(1, [
             { action: 'changeTransactionType', data: INCOME },
-            { action: 'changeDestAccountByPos', data: 4 },
+            { action: 'changeDestAccount', data: CARD_RUB },
             { action: 'inputSrcAmount', data: '99.99' },
             { action: 'changeDate', data: App.dates.monthAgo },
         ]);
@@ -197,7 +194,7 @@ export class TransactionsStory extends TestStory {
         // Check create transaction with hidden account
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: INCOME },
-            { action: 'changeDestAccountByPos', data: App.scenario.HIDDEN_ACCOUNT_IND },
+            { action: 'changeDestAccount', data: HIDDEN_ACC },
             { action: 'inputSrcAmount', data: '0.01' },
         ]);
 
@@ -237,6 +234,13 @@ export class TransactionsStory extends TestStory {
     async createTransfer() {
         setBlock('Create transfer transactions', 1);
 
+        const {
+            ACC_RUB,
+            ACC_USD,
+            ACC_EUR,
+            HIDDEN_ACC,
+        } = App.scenario;
+
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
             { action: 'inputSrcAmount', data: '1000' },
@@ -245,29 +249,29 @@ export class TransactionsStory extends TestStory {
 
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeDestAccountByPos', data: 2 },
+            { action: 'changeDestAccount', data: ACC_USD },
             { action: 'inputSrcAmount', data: '11.4' },
             { action: 'inputDestAmount', data: '10' },
         ]);
 
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeSrcAccountByPos', data: 1 },
-            { action: 'changeDestAccountByPos', data: 3 },
+            { action: 'changeSrcAccount', data: ACC_RUB },
+            { action: 'changeDestAccount', data: ACC_EUR },
             { action: 'inputSrcAmount', data: '5.0301' },
             { action: 'inputDestAmount', data: '4.7614' },
         ]);
 
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeSrcAccountByPos', data: 2 },
+            { action: 'changeSrcAccount', data: ACC_USD },
             { action: 'inputSrcAmount', data: '10' },
             { action: 'inputDestAmount', data: '9.75' },
         ]);
 
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeDestAccountByPos', data: 3 },
+            { action: 'changeDestAccount', data: ACC_EUR },
             { action: 'inputSrcAmount', data: '10' },
             { action: 'inputDestAmount', data: '9.50' },
         ]);
@@ -275,8 +279,8 @@ export class TransactionsStory extends TestStory {
         // Check create transaction with hidden account
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeSrcAccountByPos', data: 2 },
-            { action: 'changeDestAccountByPos', data: App.scenario.HIDDEN_ACCOUNT_IND },
+            { action: 'changeSrcAccount', data: ACC_USD },
+            { action: 'changeDestAccount', data: HIDDEN_ACC },
             { action: 'inputSrcAmount', data: '1' },
             { action: 'inputDestAmount', data: '75' },
         ]);
@@ -294,14 +298,14 @@ export class TransactionsStory extends TestStory {
 
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeDestAccountByPos', data: 2 },
+            { action: 'changeDestAccount', data: ACC_USD },
             { action: 'inputSrcAmount', data: '11.4' },
             { action: 'inputDestAmount', data: '' },
         ]);
 
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeDestAccountByPos', data: 2 },
+            { action: 'changeDestAccount', data: ACC_USD },
             { action: 'inputSrcAmount', data: '11.4' },
             { action: 'inputDestAmount', data: '-100' },
         ]);
@@ -309,7 +313,7 @@ export class TransactionsStory extends TestStory {
         // Try to submit transfer with invalid date
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: TRANSFER },
-            { action: 'changeDestAccountByPos', data: 2 },
+            { action: 'changeDestAccount', data: ACC_USD },
             { action: 'inputSrcAmount', data: '100' },
             { action: 'changeDate', data: '' },
         ]);
@@ -321,8 +325,10 @@ export class TransactionsStory extends TestStory {
         const {
             USD,
             EUR,
-            HIDDEN_ACCOUNT_IND,
-            HIDDEN_PERSON_IND,
+            ACC_USD,
+            ACC_EUR,
+            HIDDEN_ACC,
+            HIDDEN_PERSON,
         } = App.scenario;
 
         await TransactionTests.createFromPersonAndSubmit(0, [
@@ -330,7 +336,7 @@ export class TransactionsStory extends TestStory {
         ]);
 
         await TransactionTests.createFromPersonAndSubmit(0, [
-            { action: 'changeAccountByPos', data: 2 },
+            { action: 'changeAccount', data: ACC_USD },
             { action: 'swapSourceAndDest' },
             { action: 'inputDestAmount', data: '100' },
             { action: 'changeDate', data: App.dates.weekAgo },
@@ -338,12 +344,12 @@ export class TransactionsStory extends TestStory {
 
         await TransactionTests.createFromAccountAndSubmit(0, [
             { action: 'changeTransactionType', data: DEBT },
-            { action: 'changeAccountByPos', data: 3 },
+            { action: 'changeAccount', data: ACC_EUR },
             { action: 'inputDestAmount', data: '100.0101' },
         ]);
 
         await TransactionTests.createFromPersonAndSubmit(1, [
-            { action: 'changeAccountByPos', data: 3 },
+            { action: 'changeAccount', data: ACC_EUR },
             { action: 'swapSourceAndDest' },
             { action: 'inputDestAmount', data: '10' },
             { action: 'changeDate', data: App.dates.yesterday },
@@ -359,7 +365,7 @@ export class TransactionsStory extends TestStory {
         await TransactionTests.createFromPersonAndSubmit(1, [
             { action: 'toggleAccount' },
             { action: 'swapSourceAndDest' },
-            { action: 'changeAccountByPos', data: 3 },
+            { action: 'changeAccount', data: ACC_EUR },
             { action: 'inputDestAmount', data: '105' },
             { action: 'changeDate', data: App.dates.yesterday },
         ]);
@@ -392,13 +398,13 @@ export class TransactionsStory extends TestStory {
 
         // Check create transaction with hidden person
         await TransactionTests.createFromPersonAndSubmit(0, [
-            { action: 'changePersonByPos', data: HIDDEN_PERSON_IND },
+            { action: 'changePerson', data: HIDDEN_PERSON },
             { action: 'inputSrcAmount', data: '0.01' },
         ]);
 
         // Check create transaction with hidden account
         await TransactionTests.createFromPersonAndSubmit(1, [
-            { action: 'changeAccountByPos', data: HIDDEN_ACCOUNT_IND },
+            { action: 'changeAccount', data: HIDDEN_ACC },
             { action: 'inputSrcAmount', data: '105' },
         ]);
 
@@ -423,7 +429,12 @@ export class TransactionsStory extends TestStory {
     async updateExpense() {
         setBlock('Update expense transactions', 2);
 
-        const { USD, CAFE_CATEGORY, HIDDEN_ACCOUNT_IND } = App.scenario;
+        const {
+            USD,
+            ACC_EUR,
+            HIDDEN_ACC,
+            CAFE_CATEGORY,
+        } = App.scenario;
 
         await TransactionTests.updateAndSubmit(EXPENSE, 3, [
             { action: 'inputDestAmount', data: '124.7701' },
@@ -442,14 +453,14 @@ export class TransactionsStory extends TestStory {
         ]);
 
         await TransactionTests.updateAndSubmit(EXPENSE, 3, [
-            { action: 'changeSrcAccountByPos', data: 3 },
+            { action: 'changeSrcAccount', data: ACC_EUR },
             { action: 'inputDestAmount', data: '99.9' },
             { action: 'changeDate', data: App.dates.yesterday },
         ]);
 
         // Check update transaction with hidden account
         await TransactionTests.updateAndSubmit(EXPENSE, 4, [
-            { action: 'changeSrcAccountByPos', data: HIDDEN_ACCOUNT_IND },
+            { action: 'changeSrcAccount', data: HIDDEN_ACC },
             { action: 'inputDestAmount', data: '99.9' },
         ]);
     }
@@ -457,7 +468,12 @@ export class TransactionsStory extends TestStory {
     async updateIncome() {
         setBlock('Update income transactions', 2);
 
-        const { USD, TAXES_CATEGORY, HIDDEN_ACCOUNT_IND } = App.scenario;
+        const {
+            USD,
+            ACC_EUR,
+            HIDDEN_ACC,
+            TAXES_CATEGORY,
+        } = App.scenario;
 
         await TransactionTests.updateAndSubmit(INCOME, 1, [
             { action: 'inputSrcAmount', data: '100.001' },
@@ -476,13 +492,13 @@ export class TransactionsStory extends TestStory {
         ]);
 
         await TransactionTests.updateAndSubmit(INCOME, 3, [
-            { action: 'changeDestAccountByPos', data: 3 },
+            { action: 'changeDestAccount', data: ACC_EUR },
             { action: 'inputSrcAmount', data: '99.9' },
         ]);
 
         // Check update transaction with hidden account
         await TransactionTests.updateAndSubmit(INCOME, 4, [
-            { action: 'changeDestAccountByPos', data: HIDDEN_ACCOUNT_IND },
+            { action: 'changeDestAccount', data: HIDDEN_ACC },
             { action: 'inputSrcAmount', data: '99.9' },
         ]);
     }
@@ -490,26 +506,31 @@ export class TransactionsStory extends TestStory {
     async updateTransfer() {
         setBlock('Update transfer transactions', 2);
 
-        const { HIDDEN_ACCOUNT_IND } = App.scenario;
+        const {
+            ACC_3,
+            ACC_USD,
+            ACC_EUR,
+            HIDDEN_ACC,
+        } = App.scenario;
 
         await TransactionTests.updateAndSubmit(TRANSFER, 0, [
-            { action: 'changeDestAccountByPos', data: 0 },
+            { action: 'changeDestAccount', data: ACC_3 },
             { action: 'inputSrcAmount', data: '11' },
         ]);
 
         await TransactionTests.updateAndSubmit(TRANSFER, 1, [
-            { action: 'changeSrcAccountByPos', data: 2 },
+            { action: 'changeSrcAccount', data: ACC_USD },
             { action: 'inputSrcAmount', data: '100' },
             { action: 'inputDestAmount', data: '97.55' },
         ]);
 
         await TransactionTests.updateAndSubmit(TRANSFER, 2, [
-            { action: 'changeSrcAccountByPos', data: 3 },
+            { action: 'changeSrcAccount', data: ACC_EUR },
             { action: 'inputSrcAmount', data: '5.0301' },
         ]);
 
         await TransactionTests.updateAndSubmit(TRANSFER, 3, [
-            { action: 'changeSrcAccountByPos', data: 0 },
+            { action: 'changeSrcAccount', data: ACC_3 },
             { action: 'inputSrcAmount', data: '50' },
             { action: 'inputDestAmount', data: '0.82' },
         ]);
@@ -520,7 +541,7 @@ export class TransactionsStory extends TestStory {
 
         // Check update transaction with hidden account
         await TransactionTests.updateAndSubmit(TRANSFER, 5, [
-            { action: 'changeSrcAccountByPos', data: HIDDEN_ACCOUNT_IND },
+            { action: 'changeSrcAccount', data: HIDDEN_ACC },
             { action: 'inputSrcAmount', data: '1000' },
         ]);
     }
@@ -528,15 +549,22 @@ export class TransactionsStory extends TestStory {
     async updateDebt() {
         setBlock('Update debt transactions', 2);
 
-        const { USD, HIDDEN_ACCOUNT_IND, HIDDEN_PERSON_IND } = App.scenario;
+        const {
+            USD,
+            ACC_RUB,
+            ACC_USD,
+            MARIA,
+            HIDDEN_ACC,
+            HIDDEN_PERSON,
+        } = App.scenario;
 
         await TransactionTests.updateAndSubmit(DEBT, 0, [
-            { action: 'changePersonByPos', data: 0 },
+            { action: 'changePerson', data: MARIA },
             { action: 'inputSrcAmount', data: '105' },
         ]);
 
         await TransactionTests.updateAndSubmit(DEBT, 3, [
-            { action: 'changeAccountByPos', data: 1 },
+            { action: 'changeAccount', data: ACC_RUB },
             { action: 'inputSrcAmount', data: '105' },
             { action: 'changeDate', data: App.dates.now },
         ]);
@@ -548,7 +576,7 @@ export class TransactionsStory extends TestStory {
         ]);
 
         await TransactionTests.updateAndSubmit(DEBT, 1, [
-            { action: 'changeAccountByPos', data: 2 },
+            { action: 'changeAccount', data: ACC_USD },
             { action: 'swapSourceAndDest' },
             { action: 'changeDestCurrency', data: USD },
             { action: 'inputDestAmount', data: '200.0202' },
@@ -567,13 +595,13 @@ export class TransactionsStory extends TestStory {
 
         // Check update transaction with hidden person
         await TransactionTests.updateAndSubmit(DEBT, 0, [
-            { action: 'changePersonByPos', data: HIDDEN_PERSON_IND },
+            { action: 'changePerson', data: HIDDEN_PERSON },
             { action: 'inputSrcAmount', data: '105' },
         ]);
 
         // Check update transaction with hidden account
         await TransactionTests.updateAndSubmit(DEBT, 1, [
-            { action: 'changeAccountByPos', data: HIDDEN_ACCOUNT_IND },
+            { action: 'changeAccount', data: HIDDEN_ACC },
             { action: 'inputDestAmount', data: '105' },
         ]);
     }

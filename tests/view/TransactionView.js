@@ -1546,10 +1546,6 @@ export class TransactionView extends AppView {
         return this.checkState();
     }
 
-    async changeSrcAccountByPos(pos) {
-        return this.changeSrcAccount(this.content.sourceContainer.dropDown.items[pos].id);
-    }
-
     async changeDestAccount(val) {
         const availTypes = [INCOME, TRANSFER];
         assert(availTypes.includes(this.model.type), 'Unexpected action: can\'t change destination account');
@@ -1636,12 +1632,6 @@ export class TransactionView extends AppView {
         await this.performAction(() => this.content.destContainer.selectAccount(val));
 
         return this.checkState();
-    }
-
-    async changeDestAccountByPos(pos) {
-        return this.changeDestAccount(
-            this.content.destContainer.dropDown.items[pos].id,
-        );
     }
 
     async inputSrcAmount(val) {
@@ -2283,10 +2273,6 @@ export class TransactionView extends AppView {
         return this.checkState();
     }
 
-    async changePersonByPos(pos) {
-        return this.changePerson(this.content.personContainer.dropDown.items[pos].id);
-    }
-
     async toggleAccount() {
         this.model.noAccount = !this.model.noAccount;
 
@@ -2434,10 +2420,6 @@ export class TransactionView extends AppView {
         await this.performAction(() => this.content.debtAccountContainer.selectAccount(accountId));
 
         return this.checkState();
-    }
-
-    changeAccountByPos(pos) {
-        return this.changeAccount(this.content.debtAccountContainer.dropDown.items[pos].id);
     }
 
     async swapSourceAndDest() {

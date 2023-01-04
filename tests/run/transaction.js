@@ -28,49 +28,34 @@ export const runAction = async ({ action, data }) => {
 
     assert(App.view.isActionAvailable(action), 'Invalid action specified');
 
-    if (action === 'changeSrcAccount' || action === 'changeSrcAccountByPos') {
-        let acc = null;
-        if (action === 'changeSrcAccount') {
-            const userAccounts = App.state.getUserAccounts();
-            acc = userAccounts.getItem(data);
-        } else {
-            [acc] = App.state.getAccountsByIndexes(data);
-        }
-        assert(acc, `Account (${data}) not found`);
+    if (action === 'changeSrcAccount') {
+        const userAccounts = App.state.getUserAccounts();
+        const acc = userAccounts.getItem(data);
+        assert(acc, `Account '${data}' not found`);
 
-        testDescr = `Change source account to (${acc.name})`;
+        testDescr = `Change source account to '${acc.name}'`;
     }
 
-    if (action === 'changeDestAccount' || action === 'changeDestAccountByPos') {
-        let acc = null;
-        if (action === 'changeDestAccount') {
-            const userAccounts = App.state.getUserAccounts();
-            acc = userAccounts.getItem(data);
-        } else {
-            [acc] = App.state.getAccountsByIndexes(data);
-        }
-        assert(acc, `Account (${data}) not found`);
+    if (action === 'changeDestAccount') {
+        const userAccounts = App.state.getUserAccounts();
+        const acc = userAccounts.getItem(data);
+        assert(acc, `Account '${data}' not found`);
 
-        testDescr = `Change destination account to (${acc.name})`;
+        testDescr = `Change destination account to '${acc.name}'`;
     }
 
-    if (action === 'changePerson' || action === 'changePersonByPos') {
-        let person = null;
-        if (action === 'changePerson') {
-            person = App.state.persons.getItem(data);
-        } else {
-            [person] = App.state.getPersonsByIndexes(data);
-        }
-        assert(person, `Person (${data}) not found`);
+    if (action === 'changePerson') {
+        const person = App.state.persons.getItem(data);
+        assert(person, `Person '${data}' not found`);
 
-        testDescr = `Change person to (${person.name})`;
+        testDescr = `Change person to '${person.name}'`;
     }
 
     if (action === 'toggleAccount') {
         testDescr = App.view.model.noAccount ? 'Enable account' : 'Disable account';
     }
 
-    if (action === 'changeAccount' || action === 'changeAccountByPos') {
+    if (action === 'changeAccount') {
         if (data === null) {
             if (!App.view.model.noAccount) {
                 await test('Disable account', () => App.view.toggleAccount());
@@ -81,16 +66,11 @@ export const runAction = async ({ action, data }) => {
                 await test('Enable account', () => App.view.toggleAccount());
             }
 
-            let acc = null;
-            if (action === 'changeAccount') {
-                const userAccounts = App.state.getUserAccounts();
-                acc = userAccounts.getItem(data);
-            } else {
-                [acc] = App.state.getAccountsByIndexes(data);
-            }
-            assert(acc, `Account (${data}) not found`);
+            const userAccounts = App.state.getUserAccounts();
+            const acc = userAccounts.getItem(data);
+            assert(acc, `Account '${data}' not found`);
 
-            testDescr = `Change account to (${acc.name})`;
+            testDescr = `Change account to '${acc.name}'`;
         }
     }
 
@@ -111,9 +91,9 @@ export const runAction = async ({ action, data }) => {
 
     if (action === 'changeCategory') {
         const category = App.state.categories.getItem(data);
-        assert(category, `Category (${data}) not found`);
+        assert(category, `Category '${data}' not found`);
 
-        testDescr = `Change category to (${category.name})`;
+        testDescr = `Change category to '${category.name}'`;
     }
 
     if (action === 'inputSrcAmount') {

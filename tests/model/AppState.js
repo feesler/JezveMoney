@@ -439,17 +439,6 @@ export class AppState {
         });
     }
 
-    getAccountIndexesByNames(names) {
-        this.cacheUserAccounts();
-
-        return asArray(names).map((name) => {
-            const acc = this.userAccountsCache.findByName(name);
-            assert(acc, `Account '${name}' not found`);
-
-            return this.userAccountsCache.getIndexById(acc.id);
-        });
-    }
-
     getFirstAccount() {
         const [account] = this.getAccountsByIndexes(0);
         return account;
@@ -656,17 +645,6 @@ export class AppState {
             const item = this.personsCache.getItemByIndex(ind);
             assert(item, `Invalid person index ${ind}`);
             return (returnIds) ? item.id : item;
-        });
-    }
-
-    getPersonIndexesByNames(names) {
-        this.cachePersons();
-
-        return asArray(names).map((name) => {
-            const person = this.personsCache.findByName(name);
-            assert(person, `Person '${name}' not found`);
-
-            return this.personsCache.getIndexById(person.id);
         });
     }
 
