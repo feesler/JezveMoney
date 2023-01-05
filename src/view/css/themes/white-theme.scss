@@ -15,6 +15,7 @@
   /* Buttons */
   --btn-bg: #e8e8e8;
   --btn-hover-bg: #c9c9c9;
+  --icon-btn-hover-bg: #dddddd;
 
   /* Inputs */
   --input-bg-color: #f2f2f2;
@@ -441,7 +442,7 @@
     }
 
     .nav-item__icon-btn:hover {
-      background: #dddddd;
+      background: var(--icon-btn-hover-bg);
     }
 
     .iconbutton:hover {
@@ -488,6 +489,10 @@
     .import-form .icon-btn:hover .icon,
     .import-item .icon-btn:hover .icon {
       fill: var(--list-item-hover-icon-fill);
+    }
+
+    .back-btn:hover {
+      background: var(--icon-btn-hover-bg);
     }
 
     .tile_header .close-btn:hover .close-icon {

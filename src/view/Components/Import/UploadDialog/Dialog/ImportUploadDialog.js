@@ -18,7 +18,7 @@ import './style.scss';
 const UPLOAD_POPUP_CLASS = 'upload-popup';
 const DRAG_OVER_CLASS = 'drag-over';
 const CONVERT_TITLE_CLASS = 'upload-popup__convert-title';
-const BACK_BTN_CLASS = 'btn icon-btn back-btn';
+const BACK_BTN_CLASS = 'btn back-btn';
 const BACK_ICON_CLASS = 'icon back-icon';
 
 /** States */
