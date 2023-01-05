@@ -3,5 +3,5 @@
         <label><?= __("IMPORT_RULES") ?></label>
         <input class="btn link-btn create-btn" type="button" value="<?= __("CREATE") ?>">
     </header>
-    <div class="rules-list-container"></div>
+    <div class="rules-content"></div>
 </div>

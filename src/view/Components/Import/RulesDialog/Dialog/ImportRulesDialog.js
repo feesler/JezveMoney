@@ -5,6 +5,7 @@ import {
     isFunction,
     Component,
     setEvents,
+    createElement,
 } from 'jezvejs';
 import { Popup } from 'jezvejs/Popup';
 import { PopupMenu } from 'jezvejs/PopupMenu';
@@ -43,11 +44,11 @@ export class ImportRulesDialog extends Component {
         this.headerElem = this.elem.querySelector('.rules-header');
         this.titleElem = this.headerElem?.querySelector('label');
         this.createRuleBtn = this.headerElem?.querySelector('.create-btn');
-        this.listContainer = this.elem.querySelector('.rules-list-container');
+        this.rulesContent = this.elem.querySelector('.rules-content');
         if (
             !this.createRuleBtn
             || !this.titleElem
-            || !this.listContainer
+            || !this.rulesContent
         ) {
             throw new Error('Failed to initialize import rules dialog');
         }
@@ -64,7 +65,12 @@ export class ImportRulesDialog extends Component {
             }),
             onItemClick: (id, e) => this.onItemClick(id, e),
         });
-        this.listContainer.append(this.rulesList.elem);
+
+        this.listContainer = createElement('div', {
+            props: { className: 'rules-list-container' },
+            children: this.rulesList.elem,
+        });
+        this.rulesContent.append(this.listContainer);
 
         this.searchInput = SearchInput.create({
             placeholder: __('TYPE_TO_FILTER'),
@@ -405,6 +411,7 @@ export class ImportRulesDialog extends Component {
 
         this.searchInput.show(true);
         this.rulesList.show(true);
+        show(this.listContainer, true);
         show(this.createRuleBtn, true);
         if (this.formContainer) {
             re(this.formContainer.elem);
@@ -423,12 +430,10 @@ export class ImportRulesDialog extends Component {
             onSubmit: (data) => this.onSubmitItem(data),
             onCancel: () => this.onCancelItem(),
         });
-
-        insertAfter(this.formContainer.elem, this.rulesList.elem);
+        this.rulesContent.append(this.formContainer.elem);
 
         this.searchInput.show(false);
-        this.rulesList.show(false);
-        this.paginator.show(false);
+        show(this.listContainer, false);
         show(this.createRuleBtn, false);
         show(this.formContainer.elem, true);
     }
