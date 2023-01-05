@@ -125,7 +125,7 @@
 .user-navigation {
   --offcanvas-bg: var(--alt-bg-color);
 
-  width: 200px;
+  max-width: 100%;
   z-index: 2110;
 }
 
